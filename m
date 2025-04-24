@@ -1,226 +1,133 @@
-Return-Path: <kvm+bounces-44131-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44132-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9046DA9AD9F
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 14:37:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6687A9ADF3
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 14:51:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86C90189E07D
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 12:38:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C19C4A07E4
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 12:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B4627BF87;
-	Thu, 24 Apr 2025 12:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B583A27BF7F;
+	Thu, 24 Apr 2025 12:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="O7BVL9J0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NF+hNjrG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFAE91C701A
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 12:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2E1153BE8;
+	Thu, 24 Apr 2025 12:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745498236; cv=none; b=gQ3Oqz20DNni9lLwKKImohsOkqxkUvpZO5pGgMJKT7UdYFigta+ewU6l0ZKK1ZmJf77samjwuFWv0XvO6987nZoiYnbBDbt6p/nxhFYpS11Uyd7CDSORK03eU9GuwGpu1jEVv4BRd3Y+5LSPmKlnUeK8rK57XOygif+I/GiP86k=
+	t=1745499057; cv=none; b=RJB0gTby8euN3gN4n+jWDvTuILGEK6zgX7t0PGEZsLCBUy6QOz5P3Is6YXGDI69+E/hFIFvYw+b5QaNV0oq2dygj7yW1W3ODMQMTUMhLTxoT/FVOu4i399iHVV2vH8zIkoYysIbXp+b4ty2/AfUAjpdYWCMTuf5pOk3dRjsibI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745498236; c=relaxed/simple;
-	bh=RtF0Ii7968sqtIEiSOoOHmfF6UJG7nfCpDcEL14f2h0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TzUbblvzT20E7IvDMb/4TxfwE9WtLz1ikbQUbNd6vLp5Gk5hSXHjwkHRK1nvYjAp23peIYi2NWjgOHUWiDUlHaUrQ84vMeLzJW3k4ThjZ9h7kFZS9BGNs422kPemsBzt1scB/GAiKfPz+pEApmWZgQ7/hlwSy5pRuy5tglCD9CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=O7BVL9J0; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-39129fc51f8so784037f8f.0
-        for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 05:37:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1745498232; x=1746103032; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mXBQ/2qXvZB57eFvN07u42A0vH9tPCFMfppvAtJvXGM=;
-        b=O7BVL9J0y6luUTGtyNRrQ+tsxebF2HkhxkgKSpGAY7xQoaVwcq9Pl2s3BKJt3W3P7A
-         wrJ3W7zkl2iFLH74pOv6watRy0SsK1b2hLGVQ09DL5mf6HP/3DYmgiuEta3WP87Lh6PX
-         O45YZcjhvX0JMiFJJCYlKz0afof5jBVQp1rpdkIokeQ+q04Hv9VtsEIpsntNlNsaDSIG
-         tLwup6sV5AR3xtOAEckVeW479kbfQteBQSAArAnxrmpMt89rR+Gr9ofNdSb4dJ/7+7Ec
-         H25LlR8BJAEnmL5hmw18OD0qUicNhf54+438iE5w/CtZ0dj/0QoPlF3A2vbpO7sqp+Mq
-         U6WA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745498232; x=1746103032;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mXBQ/2qXvZB57eFvN07u42A0vH9tPCFMfppvAtJvXGM=;
-        b=Wo2AwTRNvVhql7GPZxnBUESmkaAOPUblUv4AdZbZxKjKQ9/i2BSi5h9sVLlBppJH/h
-         tHNofzu5+Q8nLyxFzN7xrhbLCDCOjX5IlAN18ETwSoGnVvthKstN6PxTv+Iv9afQ2Ywn
-         lMGiz8rv4FWnMFk6GPH3wqH8zKjWISJCwTc/k2Id1cQ005HnPJZ66HWykD0x48BkVrcC
-         +OjUyTv1bdBv8KHfFIX5B92sqR4/m9u5STTxiNTm2ufgLTKBbhcG0dySqXah0ljNmALN
-         F6AS5Pl9lOofQYexzhhqbygrwiy7RnZSCySg7U6YP95KSZt52rWOJTVfT7osRdXI+xIG
-         1pUw==
-X-Forwarded-Encrypted: i=1; AJvYcCVv7vFhbLWiGEi/z+owzKN3+XPO59se9M9EIggLP0rYPVWpa2rtrJU3UOTzB3ByTjKxCDI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywPaO5UF3imTCS6DKW4ooC3iTunJ8ZVKRU6G4k/QLPR/QiGRBc
-	Yw9kXRS7W9lYaccVQxUJ15AjPYHv3h6mQby16bDDg14rNI0EhK+SUkeOOjP3WjY=
-X-Gm-Gg: ASbGncv6IScqlPDqSsRdPHltTBiqIQYQgiP2FQFmcMKtwqGCnUGYCZv0WrSV3kQ4DxO
-	xBIzW8huAc52GVbWbGT2JB/eBe3245vPmG3BftfKHxeqseUNElf/psHy/QieVqePZsxe1R/DMKv
-	3SH5M7yWNlqrNgfROLnWhRduA3QtUWQUo4O/Dp78g69Ghwep6F87YQDl3up0uVafX21qnPGB2O3
-	8BlUnJl7gHxqGOiJbZ9qWWFkc2JiOHeATj9cHxMdJaMAGB63QJVeHRnQ/K4C70L3tn65ng+ugnd
-	8ASZ6yH2rmoSnWHyKBgeRWEIOFBBjxs8O38ds+QI9n2yuYwuFBN0JF/BdNMtew1QfSSqIXM0r6s
-	TnsDGtY9TDA==
-X-Google-Smtp-Source: AGHT+IFQHcJdwFRaXmEWb0g3t5DToUnDgaUuyc1wuadZLcOAY6FK4EOtEA/saYPalIta+MsOsrAKYA==
-X-Received: by 2002:a05:6000:18a8:b0:391:241d:a13e with SMTP id ffacd0b85a97d-3a06cfab52fmr1726627f8f.48.1745498232082;
-        Thu, 24 Apr 2025 05:37:12 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a06d532551sm2004598f8f.65.2025.04.24.05.37.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Apr 2025 05:37:11 -0700 (PDT)
-Message-ID: <ddd4ba8a-27cf-4174-a578-b28961bdf1a5@rivosinc.com>
-Date: Thu, 24 Apr 2025 14:37:11 +0200
+	s=arc-20240116; t=1745499057; c=relaxed/simple;
+	bh=8H9DLsIGypKjg5EA6FxGNO666pgvRrUO/QmIpk1Dbt4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AbGu0W7aLEcKekvvQzLIS2KX8Lzf+93H2jVheWFWQMitKRUeCMZqxDBw8cCl+vc6T07w2M8/1NQCtVyUuRWw9KFggEFC3fgKOzjaSt2RPB9m/NFlaDFFCsnlRxdYN+Ncqk/8Fy5qyPfZzddsjbydd4iSi9X/JJqDM1nYkq+4jIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NF+hNjrG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73038C4CEE8;
+	Thu, 24 Apr 2025 12:50:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745499057;
+	bh=8H9DLsIGypKjg5EA6FxGNO666pgvRrUO/QmIpk1Dbt4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NF+hNjrGDHMWirFNyLpGK+CGY/Wtnrcaz8GKXJy/bE0XGkdVLaecqnHgHaxGfEhML
+	 7jpVM/H7S49o+1K+eHQ2EgfO2HX4uAVtcvGRrWZJiMPUTyBYsPFQrSWaQDyWiksE4I
+	 zYCVGwUO0Zy3g+Q9YtT5JjZ6L4/EJc4YcANsfzc5P8J46J4DvIu422Ekpr+LWz/xu5
+	 1tDTRL8fevCgQaBA+DwfgEVIfNxbm2kn1CppO/72VC+Bxe/6aX19AeSe+j5ZVvsX6c
+	 jKIeV1sk1Atk76qflMRZe3BT+0W+nn49+KZBrII6YRZh59RXG6gb+f1yfN7sBXtrbi
+	 XI5m2BF99M4Cw==
+Date: Thu, 24 Apr 2025 15:50:52 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
+ mapped bit
+Message-ID: <20250424125052.GS48485@unreal>
+References: <cover.1745394536.git.leon@kernel.org>
+ <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
+ <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
+ <20250423181706.GT1213339@ziepe.ca>
+ <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
+ <20250423233335.GW1213339@ziepe.ca>
+ <20250424080744.GP48485@unreal>
+ <20250424081101.GA22989@lst.de>
+ <20250424084626.GQ48485@unreal>
+ <20250424120703.GY1213339@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 13/13] RISC-V: KVM: add support for
- SBI_FWFT_MISALIGNED_DELEG
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Samuel Holland <samuel.holland@sifive.com>,
- Deepak Gupta <debug@rivosinc.com>
-References: <20250417122337.547969-1-cleger@rivosinc.com>
- <20250417122337.547969-14-cleger@rivosinc.com>
- <20250424-ae24464169f7143c509cbab5@orel>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20250424-ae24464169f7143c509cbab5@orel>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250424120703.GY1213339@ziepe.ca>
 
-
-
-On 24/04/2025 13:34, Andrew Jones wrote:
-> On Thu, Apr 17, 2025 at 02:20:00PM +0200, Clément Léger wrote:
->> SBI_FWFT_MISALIGNED_DELEG needs hedeleg to be modified to delegate
->> misaligned load/store exceptions. Save and restore it during CPU
->> load/put.
->>
->> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->> Reviewed-by: Deepak Gupta <debug@rivosinc.com>
->> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
->> ---
->>  arch/riscv/kvm/vcpu.c          |  3 +++
->>  arch/riscv/kvm/vcpu_sbi_fwft.c | 36 ++++++++++++++++++++++++++++++++++
->>  2 files changed, 39 insertions(+)
->>
->> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
->> index 542747e2c7f5..d98e379945c3 100644
->> --- a/arch/riscv/kvm/vcpu.c
->> +++ b/arch/riscv/kvm/vcpu.c
->> @@ -646,6 +646,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>  {
->>  	void *nsh;
->>  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
->> +	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
->>  
->>  	vcpu->cpu = -1;
->>  
->> @@ -671,6 +672,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>  		csr->vstval = nacl_csr_read(nsh, CSR_VSTVAL);
->>  		csr->hvip = nacl_csr_read(nsh, CSR_HVIP);
->>  		csr->vsatp = nacl_csr_read(nsh, CSR_VSATP);
->> +		cfg->hedeleg = nacl_csr_read(nsh, CSR_HEDELEG);
->>  	} else {
->>  		csr->vsstatus = csr_read(CSR_VSSTATUS);
->>  		csr->vsie = csr_read(CSR_VSIE);
->> @@ -681,6 +683,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>  		csr->vstval = csr_read(CSR_VSTVAL);
->>  		csr->hvip = csr_read(CSR_HVIP);
->>  		csr->vsatp = csr_read(CSR_VSATP);
->> +		cfg->hedeleg = csr_read(CSR_HEDELEG);
->>  	}
->>  }
->>  
->> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
->> index b0f66c7bf010..237edaefa267 100644
->> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
->> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
->> @@ -14,6 +14,8 @@
->>  #include <asm/kvm_vcpu_sbi.h>
->>  #include <asm/kvm_vcpu_sbi_fwft.h>
->>  
->> +#define MIS_DELEG (BIT_ULL(EXC_LOAD_MISALIGNED) | BIT_ULL(EXC_STORE_MISALIGNED))
->> +
->>  struct kvm_sbi_fwft_feature {
->>  	/**
->>  	 * @id: Feature ID
->> @@ -68,7 +70,41 @@ static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
->>  	return false;
->>  }
->>  
->> +static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
->> +{
->> +	return misaligned_traps_can_delegate();
->> +}
->> +
->> +static long kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
->> +					struct kvm_sbi_fwft_config *conf,
->> +					unsigned long value)
->> +{
->> +	if (value == 1)
->> +		csr_set(CSR_HEDELEG, MIS_DELEG);
->> +	else if (value == 0)
->> +		csr_clear(CSR_HEDELEG, MIS_DELEG);
->> +	else
->> +		return SBI_ERR_INVALID_PARAM;
->> +
->> +	return SBI_SUCCESS;
->> +}
->> +
->> +static long kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
->> +					struct kvm_sbi_fwft_config *conf,
->> +					unsigned long *value)
->> +{
->> +	*value = (csr_read(CSR_HEDELEG) & MIS_DELEG) != 0;
+On Thu, Apr 24, 2025 at 09:07:03AM -0300, Jason Gunthorpe wrote:
+> On Thu, Apr 24, 2025 at 11:46:26AM +0300, Leon Romanovsky wrote:
+> > On Thu, Apr 24, 2025 at 10:11:01AM +0200, Christoph Hellwig wrote:
+> > > On Thu, Apr 24, 2025 at 11:07:44AM +0300, Leon Romanovsky wrote:
+> > > > > I see, so yes order occupies 5 bits [-4,-5,-6,-7,-8] and the
+> > > > > DMA_MAPPED overlaps, it should be 9 not 7 because of the backwardness.
+> > > > 
+> > > > Thanks for the fix.
+> > > 
+> > > Maybe we can use the chance to make the scheme less fragile?  i.e.
+> > > put flags in the high bits and derive the first valid bit from the
+> > > pfn order?
+> >
+> > It can be done too. This is what I got:
 > 
-> This should be
-> 
->   (csr_read(CSR_HEDELEG) & MIS_DELEG) == MIS_DELEG;
+> Use genmask:
 
-Hum yeah indeed, I didn't thought that someone would ony delegate load
-or stores.
-
-I'll fix that,
-
-Thanks,
-
-Clément
+I can do it too, will change.
 
 > 
->> +
->> +	return SBI_SUCCESS;
->> +}
->> +
->>  static const struct kvm_sbi_fwft_feature features[] = {
->> +	{
->> +		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
->> +		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
->> +		.set = kvm_sbi_fwft_set_misaligned_delegation,
->> +		.get = kvm_sbi_fwft_get_misaligned_delegation,
->> +	},
->>  };
->>  
->>  static struct kvm_sbi_fwft_config *
->> -- 
->> 2.49.0
->>
+> enum hmm_pfn_flags {
+> 	HMM_FLAGS_START = BITS_PER_LONG - PAGE_SHIFT,
+> 	HMM_PFN_FLAGS = GENMASK(BITS_PER_LONG - 1, HMM_FLAGS_START),
 > 
-> Thanks,
-> drew
-
+> 	/* Output fields and flags */
+> 	HMM_PFN_VALID = 1UL << HMM_FLAGS_START + 0,
+> 	HMM_PFN_WRITE = 1UL << HMM_FLAGS_START + 1,
+> 	HMM_PFN_ERROR = 1UL << HMM_FLAGS_START + 2,
+> 	HMM_PFN_ORDER_MASK = GENMASK(HMM_FLAGS_START + 7, HMM_FLAGS_START + 3),
+> 
+> 	/* Input flags */
+> 	HMM_PFN_REQ_FAULT = HMM_PFN_VALID,
+> 	HMM_PFN_REQ_WRITE = HMM_PFN_WRITE,
+> };
+> 
+> Jason
 
