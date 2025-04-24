@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-44049-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44050-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97DEBA99F6B
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 05:12:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7CE9A99F69
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 05:12:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 440A81890863
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 03:12:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C92185A7CFD
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 03:11:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3901AB6D4;
-	Thu, 24 Apr 2025 03:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068261ACEDF;
+	Thu, 24 Apr 2025 03:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KV2p5Dlc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iNetuRKf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E481ACEDF;
-	Thu, 24 Apr 2025 03:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8623B1993A3;
+	Thu, 24 Apr 2025 03:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745464253; cv=none; b=vGFQYA3tzNXFqxn8q8VF0HlWFw1sdpIhOZLADDItMlUTs0o+7SNEuYdJWHU/4bLh8HFbOkC3ZgJFpYyDn5XsSDqFDfRYP3c6xMwnMxYuG2YX22qKNQScJEP3Oh/+tHmKrOsYguapvJAe/DY0tMiQ9gEPp06ytlg9nDLsBU7G9sk=
+	t=1745464267; cv=none; b=I+447rpcPrAmbOumRPINO4fDaCERWqLDJG9UtzyhuTfA1ufpxXVD1wp1ywXrEIqbfdiviTY4BBIOq3SMA9r51B9VZlJNOifUYhPaWim5Vms7qP2zkPriXviqx+kaEqmoLFBWv8CkiuQPewGD+U91ZgSXcuDR/yRMUuqWyGGiP1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745464253; c=relaxed/simple;
-	bh=g7/WI0vmaEJBgXQIFX7Fnow6UGFeVwvUw5xdNqXZ2XM=;
+	s=arc-20240116; t=1745464267; c=relaxed/simple;
+	bh=KQ0IZorEd99CDzJ/21afqi23lH32j+k2CrdlE2GhN60=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A7JBak4IpRSjb20tPzwgjyxvbR7nkPekaY2jqAAkwrMn68Ux/Pdp9s8c5X2dMamiOpS2Wh0u0flbgTilD0nc5Edm14+4x757B6Jue6KA4ENtkrBnQUIrl1K477Wo9L4lXGkJBhKHx3VBDQX7++mNaw/Ir8Hc1eioi75725tWXn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KV2p5Dlc; arc=none smtp.client-ip=192.198.163.14
+	 MIME-Version; b=nK+l217FkXAABHDNuQv/bMLbK6m+br2L0ozSuqTLtWsm273MO1G21rtDUmtM1EYbp5EbNSKf7AKSHO1SiEHMdXT2nO4DdKhFhjgxlvx40z870deevU+mrG3UYGnfMO2davSqah7Giol78NoVhuU12VqcBAUAn6cJznubp2UiaZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iNetuRKf; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745464252; x=1777000252;
+  t=1745464265; x=1777000265;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=g7/WI0vmaEJBgXQIFX7Fnow6UGFeVwvUw5xdNqXZ2XM=;
-  b=KV2p5DlcNiummXT1ToLRsKAZqINiHNbUaT8iTSeXKtJ62nyDpwlfg5tr
-   bsx6NPlYcY1ugQZNraPCVppAsII2Vzxi8qFMcb1OT5q+npfX1/mrLy596
-   JHQ38AdKSjdahGPxHjXH3J+lLs3Vmu9FavUea++J8r6iqXMTJSr+fRdC8
-   STMH7wpPefiBvr3HCfRI0LbX1JIN5XVXOP2fEWHIzUfSrpaytSyH8Z3ay
-   CK3usgJVj/7dbQ/gWV7sZ+oy5zV6/YXSvtcsPhHRBumN5DmGuBgRcoXzb
-   Mz8fl17EKrGBMj+DhRGOAlMtC1aeIm8LouD1iVjsQ3mnu/LKWPQ0lVZfm
+  bh=KQ0IZorEd99CDzJ/21afqi23lH32j+k2CrdlE2GhN60=;
+  b=iNetuRKfmJHfU7GhMepS3/ruQxgoZZ1WmAUeXOG+DtnAvYryPihfBcj3
+   chIcA8niZ7WUJM6vN7iuuWspzwByXwKABsoN0pBmCFhfi2K+felGqhfV/
+   GANOSwD6QCgoWlGIuiM8tEHQf6oRo0na87Qg8Gl/WZiRBZJFlseKPY0cp
+   zVPA6a/YGLsQqX5kX2EDggljwAla3ycN9tTwCQNATNWFBm/ie97rM3pO4
+   /CoH986b7cXRVxl4oD1qboxIMwjO0C/oInGSP9sU7Qt6m4R3PPodQk186
+   QZYuB9X1EZN5bzfmEdcNuR9GSucJGdEpUfJ27tz0Pe7vpBTqwtPEYt8gY
    Q==;
-X-CSE-ConnectionGUID: kaEk1GwTQQOrP5g6tHVc4Q==
-X-CSE-MsgGUID: cDmJMrTuQ2SNbz10fTUGkQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="47256024"
+X-CSE-ConnectionGUID: 9jrgX/ecTWetDANwaT500A==
+X-CSE-MsgGUID: LhLzoUnBR+CyWH3S1tkVDA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="64491609"
 X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="47256024"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:10:51 -0700
-X-CSE-ConnectionGUID: AbOO64miTeqw+v9Y4gGaqQ==
-X-CSE-MsgGUID: YlOl5odgTwKGYbHtDbyEYw==
+   d="scan'208";a="64491609"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:11:05 -0700
+X-CSE-ConnectionGUID: g6vhGtK4Qk+rxzC5xAVa6g==
+X-CSE-MsgGUID: FiSsbsygRha3ONBGu8KRgg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,233,1739865600"; 
-   d="scan'208";a="132222921"
+   d="scan'208";a="136565616"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:10:45 -0700
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 20:10:59 -0700
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -86,9 +86,9 @@ Cc: linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com,
 	chao.p.peng@intel.com,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH 19/21] KVM: gmem: Split huge boundary leafs for punch hole of private memory
-Date: Thu, 24 Apr 2025 11:08:58 +0800
-Message-ID: <20250424030858.519-1-yan.y.zhao@intel.com>
+Subject: [RFC PATCH 20/21] KVM: x86: Force a prefetch fault's max mapping level to 4KB for TDX
+Date: Thu, 24 Apr 2025 11:09:13 +0800
+Message-ID: <20250424030913.535-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20250424030033.32635-1-yan.y.zhao@intel.com>
 References: <20250424030033.32635-1-yan.y.zhao@intel.com>
@@ -100,126 +100,181 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Splitting of huge leafs in the mirror page table for kvm_gmem_punch_hole().
+Introduce a "prefetch" parameter to the private_max_mapping_level hook and
+enforce the max mapping level of a prefetch fault for private memory to be
+4KB. This is a preparation to enable the ignoring huge page splitting in
+the fault path.
 
-Enhance kvm_gmem_invalidate_begin() to invoke kvm_split_boundary_leafs()
-for splitting boundary huge leafs before caling kvm_unmap_gfn_range() to do
-the real zapping. As kvm_split_boundary_leafs() may fail due to out of
-memory, propagate the error to further fail the kvm_gmem_punch_hole().
+If a prefetch fault results in a 2MB huge leaf in the mirror page table,
+there may not be a vCPU available to accept the corresponding 2MB huge leaf
+in the S-EPT if the TD is not configured to receive #VE for page
+acceptance. Consequently, if a vCPU accepts the page at 4KB level, it will
+trigger an EPT violation to split the 2MB huge leaf generated by the
+prefetch fault.
 
-Splitting huge boudary leafs in the mirror page table is not required for
-kvm_gmem_release() as the entire page table is to be zapped; it's also not
-required for kvm_gmem_error_folio() as a SPTE must not map more than one
-physical folio.
+Since handling the BUSY error from SEAMCALLs for huge page splitting is
+more comprehensive in the fault path, which is with kvm->mmu_lock held for
+reading, force the max mapping level of a prefetch fault of private memory
+to be 4KB to prevent potential splitting.
 
-Note: as the kvm_gmem_punch_hole() may request to zap several GFN ranges,
-if an out-of-memory error occurs during the splitting of a GFN range, some
-previous GFN ranges may have been successfully split and zapped.
+Since prefetch faults for private memory are uncommon after the TD's build
+time, enforcing a 4KB mapping level is unlikely to cause any performance
+degradation. The max mapping level is already set to 4KB during the TD's
+build phase.
 
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- virt/kvm/guest_memfd.c | 30 +++++++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 7 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 3 ++-
+ arch/x86/kvm/mmu/mmu.c          | 7 ++++---
+ arch/x86/kvm/svm/sev.c          | 3 ++-
+ arch/x86/kvm/svm/svm.h          | 5 +++--
+ arch/x86/kvm/vmx/main.c         | 5 +++--
+ arch/x86/kvm/vmx/tdx.c          | 5 +++--
+ arch/x86/kvm/vmx/x86_ops.h      | 4 ++--
+ 7 files changed, 19 insertions(+), 13 deletions(-)
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 4bb140e7f30d..008061734ac5 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -292,13 +292,14 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index, int
- 	return folio;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 6962a8a424ef..5167458742bf 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1900,7 +1900,8 @@ struct kvm_x86_ops {
+ 	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+ 	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+ 	void (*gmem_invalidate)(kvm_pfn_t start, kvm_pfn_t end);
+-	int (*private_max_mapping_level)(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn);
++	int (*private_max_mapping_level)(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn,
++					 bool prefetch);
+ };
+ 
+ struct kvm_x86_nested_ops {
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 1a34e43bd349..94a557e010d3 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4488,7 +4488,7 @@ static inline u8 kvm_max_level_for_order(int order)
  }
  
--static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
--				      pgoff_t end)
-+static int kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
-+				     pgoff_t end, bool need_split)
+ static u8 kvm_max_private_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn,
+-					u8 max_level, int gmem_order)
++					u8 max_level, int gmem_order, bool prefetch)
  {
- 	bool flush = false, found_memslot = false;
- 	struct kvm_memory_slot *slot;
- 	struct kvm *kvm = gmem->kvm;
- 	unsigned long index;
-+	int ret = 0;
+ 	u8 req_max_level;
  
- 	xa_for_each_range(&gmem->bindings, index, slot, start, end - 1) {
- 		pgoff_t pgoff = slot->gmem.pgoff;
-@@ -319,14 +320,23 @@ static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
- 			kvm_mmu_invalidate_begin(kvm);
- 		}
+@@ -4499,7 +4499,7 @@ static u8 kvm_max_private_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gf
+ 	if (max_level == PG_LEVEL_4K)
+ 		return PG_LEVEL_4K;
  
-+		if (need_split) {
-+			ret = kvm_split_boundary_leafs(kvm, &gfn_range);
-+			if (ret < 0)
-+				goto out;
-+
-+			flush |= ret;
-+		}
- 		flush |= kvm_mmu_unmap_gfn_range(kvm, &gfn_range);
+-	req_max_level = kvm_x86_call(private_max_mapping_level)(vcpu, pfn, gfn);
++	req_max_level = kvm_x86_call(private_max_mapping_level)(vcpu, pfn, gfn, prefetch);
+ 	if (req_max_level)
+ 		max_level = min(max_level, req_max_level);
+ 
+@@ -4532,7 +4532,8 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
+ 
+ 	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+ 	fault->max_level = kvm_max_private_mapping_level(vcpu, fault->pfn, fault->gfn,
+-							 fault->max_level, max_order);
++							 fault->max_level, max_order,
++							 fault->prefetch);
+ 
+ 	return RET_PF_CONTINUE;
+ }
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index dc6cdf9fa1ba..7a9c44ad5b91 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -4910,7 +4910,8 @@ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end)
  	}
- 
-+out:
- 	if (flush)
- 		kvm_flush_remote_tlbs(kvm);
- 
- 	if (found_memslot)
- 		KVM_MMU_UNLOCK(kvm);
-+	return 0;
  }
  
- static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
-@@ -347,6 +357,7 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- 	loff_t size = i_size_read(inode);
- 	pgoff_t start, end;
- 	struct kvm_gmem *gmem;
-+	int ret = 0;
- 
- 	if (offset > size)
- 		return 0;
-@@ -361,18 +372,22 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- 	 */
- 	filemap_invalidate_lock(inode->i_mapping);
- 
--	list_for_each_entry(gmem, gmem_list, entry)
--		kvm_gmem_invalidate_begin(gmem, start, end);
-+	list_for_each_entry(gmem, gmem_list, entry) {
-+		ret = kvm_gmem_invalidate_begin(gmem, start, end, true);
-+		if (ret < 0)
-+			goto out;
-+	}
- 
- 	truncate_inode_pages_range(inode->i_mapping, offset, offset + len - 1);
- 	kvm_gmem_mark_range_unprepared(inode, start, end - start);
- 
-+out:
- 	list_for_each_entry(gmem, gmem_list, entry)
- 		kvm_gmem_invalidate_end(gmem, start, end);
- 
- 	filemap_invalidate_unlock(inode->i_mapping);
- 
--	return 0;
-+	return ret;
+-int sev_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn)
++int sev_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn,
++				  bool prefetch)
+ {
+ 	int level, rc;
+ 	bool assigned;
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 1a9738b6ae37..272a8404e1c0 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -782,7 +782,7 @@ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
+ int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
+-int sev_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn);
++int sev_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn, bool prefetch);
+ #else
+ static inline struct page *snp_safe_alloc_page_node(int node, gfp_t gfp)
+ {
+@@ -809,7 +809,8 @@ static inline int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, in
+ 	return 0;
+ }
+ static inline void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end) {}
+-static inline int sev_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn)
++static inline int sev_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
++						gfn_t gfn, bool prefetch)
+ {
+ 	return 0;
+ }
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 16c0c31dd066..82689ad8bc18 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -881,10 +881,11 @@ static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+ 	return tdx_vcpu_ioctl(vcpu, argp);
  }
  
- static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
-@@ -440,7 +455,7 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	 * Zap all SPTEs pointed at by this file.  Do not free the backing
- 	 * memory, as its lifetime is associated with the inode, not the file.
- 	 */
--	kvm_gmem_invalidate_begin(gmem, 0, -1ul);
-+	kvm_gmem_invalidate_begin(gmem, 0, -1ul, false);
- 	kvm_gmem_invalidate_end(gmem, 0, -1ul);
+-static int vt_gmem_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn)
++static int vt_gmem_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
++					     gfn_t gfn, bool prefetch)
+ {
+ 	if (is_td(vcpu->kvm))
+-		return tdx_gmem_private_max_mapping_level(vcpu, pfn, gfn);
++		return tdx_gmem_private_max_mapping_level(vcpu, pfn, gfn, prefetch);
  
- 	list_del(&gmem->entry);
-@@ -524,8 +539,9 @@ static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *fol
- 	start = folio->index;
- 	end = start + folio_nr_pages(folio);
+ 	return 0;
+ }
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 4386e1a0323e..e24d1cbcc762 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -3332,11 +3332,12 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+ 	return ret;
+ }
  
-+	/* The size of the SEPT will not exceed the size of the folio */
- 	list_for_each_entry(gmem, gmem_list, entry)
--		kvm_gmem_invalidate_begin(gmem, start, end);
-+		kvm_gmem_invalidate_begin(gmem, start, end, false);
+-int tdx_gmem_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn)
++int tdx_gmem_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn,
++				       gfn_t gfn, bool prefetch)
+ {
+ 	struct vcpu_tdx *tdx = to_tdx(vcpu);
  
- 	/*
- 	 * Do not truncate the range, what action is taken in response to the
+-	if (unlikely(to_kvm_tdx(vcpu->kvm)->state != TD_STATE_RUNNABLE))
++	if (unlikely((to_kvm_tdx(vcpu->kvm)->state != TD_STATE_RUNNABLE) || prefetch))
+ 		return PG_LEVEL_4K;
+ 
+ 	if (gfn >= tdx->violation_gfn_start && gfn < tdx->violation_gfn_end)
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index df7d4cd1436c..0619e9390e5d 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -164,7 +164,7 @@ int tdx_sept_split_private_spt(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu);
+ void tdx_flush_tlb_all(struct kvm_vcpu *vcpu);
+ void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
+-int tdx_gmem_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn);
++int tdx_gmem_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn, bool prefetch);
+ #else
+ static inline void tdx_disable_virtualization_cpu(void) {}
+ static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
+@@ -236,7 +236,7 @@ static inline int tdx_sept_split_private_spt(struct kvm *kvm, gfn_t gfn,
+ static inline void tdx_flush_tlb_current(struct kvm_vcpu *vcpu) {}
+ static inline void tdx_flush_tlb_all(struct kvm_vcpu *vcpu) {}
+ static inline void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level) {}
+-static inline int tdx_gmem_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn) { return 0; }
++static inline int tdx_gmem_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, gfn_t gfn, bool prefetch) { return 0; }
+ #endif
+ 
+ #endif /* __KVM_X86_VMX_X86_OPS_H */
 -- 
 2.43.2
 
