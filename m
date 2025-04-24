@@ -1,81 +1,80 @@
-Return-Path: <kvm+bounces-44071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44080-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C3D6A9A24F
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:34:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A399FA9A2AD
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D0CE9234FA
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 06:32:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BE851945C58
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 06:55:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241781DCB09;
-	Thu, 24 Apr 2025 06:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1891EEA4A;
+	Thu, 24 Apr 2025 06:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F2rNqUWO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JBMG74Uf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5FA176AC8
-	for <kvm@vger.kernel.org>; Thu, 24 Apr 2025 06:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E280D84FAD;
+	Thu, 24 Apr 2025 06:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745476372; cv=none; b=SxBlCZ4YeFs+UQhAvX5ZigoJArPojqsX5IJAiroCIIXaLdgwN2v7KvGowey+vU6kds+HhrfW2IsyNNvvzRbvgKXjO6+Rn96L+UKaNS5gcXH/9FGpMxRtGNYSbXJoWMg+nAkksxhTlBo+VtZSpDjSNC7w059GWuBU7tLt3qAlBys=
+	t=1745477718; cv=none; b=Cahe5lCyUTmA8xhd5zNt1JeNf0V32o4SFDOWvdfXw03N6HdaPASevNCkwAl7tnkt+m9d3polvbhE2VGeFpV0Dfj7LJEgetXss6LBabVIbxNz+ju7uxrdV4r0rNTOBE4OOlUGKTqojHm+gyj0lONLhawLBesQPE23Ntm7w+U+zZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745476372; c=relaxed/simple;
-	bh=crVvmvt20948+XIDqkkeo+K2HiFVUVQubWp6Rvxv3ZA=;
+	s=arc-20240116; t=1745477718; c=relaxed/simple;
+	bh=O2NhhAxby4h2wdAG9lotXu0r8Mq+CnbUeKJ51V9RGiM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iOkqNV5Z3yRiPpBptruEfVWCKHoAQQnTZNCQ4bE7kvUgYfKXToBiHDkFNh6zk6XCWAaQGKiCiZBEF367VGwLhu2ZDRWTdp+Wxd0w8MnINPRNy+W6Ga5WFl7tCfDmVLl1i0E0rwt0ufhSpuDFp3P6MgmjtrMrfvv6twdc6c+u2w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F2rNqUWO; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745476369; x=1777012369;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=crVvmvt20948+XIDqkkeo+K2HiFVUVQubWp6Rvxv3ZA=;
-  b=F2rNqUWOc0vq1WPGIOswEN3+h9nSXLGvZX1xathQxCYmNl1ImkwBzyAw
-   s0dm77bfKMzcWir6vzTt9kZzM25L7hyWhEkDhSbQfQEu+dU9HuuHBbvsI
-   lYaYjuGrWuyIWk6KikM7KNZhqC77JY7aqYza7pftU7Y5fifhWJwexhMrn
-   /8nhqfWytgJyT7UZjvbVYZsnPUm/w5j2eNTgTjqSeB07YCXXTnPgHPeXA
-   K88lIjuNel1VSB7B17vwynBtZNKYCf+7Xs5eiCmmJ1GoUNUMYk1AQaOom
-   A6KWq8MokOipg8TNFKyCP3TNTYWZQKdxpAAolQOw0nwoQq4bQdg0dKyo7
-   Q==;
-X-CSE-ConnectionGUID: emsnf2b3Q4KhebSpaNtqUQ==
-X-CSE-MsgGUID: x3smqrJfQNaB3kVIgjkC+g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11412"; a="47226572"
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="47226572"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2025 23:32:48 -0700
-X-CSE-ConnectionGUID: giu4a9VBT6uyMnrpiLBAeQ==
-X-CSE-MsgGUID: r0QMmQ+gS0CiIRt5Q/1iRg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,235,1739865600"; 
-   d="scan'208";a="163562658"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa001.fm.intel.com with ESMTP; 23 Apr 2025 23:32:45 -0700
-Date: Thu, 24 Apr 2025 14:53:41 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Tejus GK <tejus.gk@nutanix.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Babu Moger <babu.moger@amd.com>, Ewan Hai <ewanhai-oc@zhaoxin.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Jason Zeng <jason.zeng@intel.com>,
-	Manish Mishra <manish.mishra@nutanix.com>,
-	Tao Su <tao1.su@intel.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: Re: [RFC 05/10] i386/cpu: Introduce cache model for SapphireRapids
-Message-ID: <aAnf9YvevhAo+HJE@intel.com>
-References: <20250423114702.1529340-1-zhao1.liu@intel.com>
- <20250423114702.1529340-6-zhao1.liu@intel.com>
- <315d76f0-d81c-43ed-a13e-ef9b8e6a0e75@nutanix.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=B7bKa4MgWy8nnA6slFa2MAFA9CV2ZUhWO4Uh4kZuTcii5MbyTHnx6tbhzWVcJY+DGNMclihNzuATN0sy7NMkBWLiUHD7tJHVgMQUgj9Ac3/GTyCy/egdRHu1XBkx3OHyRW41a8hEW6K9t3iLTBCoWU9DwVNNGnVAHHcAaShh1pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JBMG74Uf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63A31C4CEE3;
+	Thu, 24 Apr 2025 06:55:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745477717;
+	bh=O2NhhAxby4h2wdAG9lotXu0r8Mq+CnbUeKJ51V9RGiM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JBMG74Uf2ayBsAyXOsGDu/Pky6ixNS1c4BDJHd4lwbNECLO5LrTPDLt1r0eNUPLy0
+	 ynut6BgnWakwJKSAx+8FK+EGFCkITnvLnelLONPxIjuG0tdC90cdj3pniHXtHm9Fxa
+	 wl45/ZTtb8BKv0iNv76Ij9tfHUWh6rTMYx7CAUO3rppkqiaLH7xleBCQXesauRPbp2
+	 FUUzSE+hvgKs3WwAsv1qWr/zBPK1T2EbndRkbynGnImy0ZnvZycZXxoAzu4XEX+teR
+	 a2VWk0rzolhjEPmNfygA5hJqIMt43/HcuEsUyDD2XFjdC06yV7sioUDVdESF6SAvcW
+	 F+H5S2kqGr5vg==
+Date: Thu, 24 Apr 2025 09:55:11 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 03/24] iommu: generalize the batched sync after map
+ interface
+Message-ID: <20250424065511.GL48485@unreal>
+References: <cover.1745394536.git.leon@kernel.org>
+ <2ce6a74ddf5e13a7fdb731984aa781a15f17749d.1745394536.git.leon@kernel.org>
+ <20250423171537.GJ1213339@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,36 +83,53 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <315d76f0-d81c-43ed-a13e-ef9b8e6a0e75@nutanix.com>
+In-Reply-To: <20250423171537.GJ1213339@ziepe.ca>
 
-Hi Tejus,
+On Wed, Apr 23, 2025 at 02:15:37PM -0300, Jason Gunthorpe wrote:
+> On Wed, Apr 23, 2025 at 11:12:54AM +0300, Leon Romanovsky wrote:
+> > From: Christoph Hellwig <hch@lst.de>
+> > 
+> > For the upcoming IOVA-based DMA API we want to use the interface batch the
+> > sync after mapping multiple entries from dma-iommu without having a
+> > scatterlist.
+> 
+> Grammer:
+> 
+>  For the upcoming IOVA-based DMA API we want to batch the
+>  ops->iotlb_sync_map() call after mapping multiple IOVAs from
+>  dma-iommu without having a scatterlist. Improve the API.
+> 
+>  Add a wrapper for the map_sync as iommu_sync_map() so that callers don't
+>  need to poke into the methods directly.
+> 
+>  Formalize __iommu_map() into iommu_map_nosync() which requires the
+>  caller to call iommu_sync_map() after all maps are completed.
+> 
+>  Refactor the existing sanity checks from all the different layers
+>  into iommu_map_nosync().
+> 
+> >  drivers/iommu/iommu.c | 65 +++++++++++++++++++------------------------
+> >  include/linux/iommu.h |  4 +++
+> >  2 files changed, 33 insertions(+), 36 deletions(-)
+> 
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> 
+> > +	/* Discourage passing strange GFP flags */
+> > +	if (WARN_ON_ONCE(gfp & (__GFP_COMP | __GFP_DMA | __GFP_DMA32 |
+> > +				__GFP_HIGHMEM)))
+> > +		return -EINVAL;
+> 
+> There is some kind of overlap with the new iommu_alloc_pages_node()
+> here that does a similar check, nothing that can be addressed in this
+> series but maybe a TBD for later..
 
-> Thank you for this improvement! I see that even within the SPR-SP line of
-> Processors, the cache sizes vary across different models. What happens for
-> an instance when a processor only has 37.5 MiB of L3 per socket, but the CPU
-> Model exposes 60 MiB of L3 to the VM?
+This series is based on pure -rc1 to allow creation of shared branch,
+while you removed iommu_alloc_pages_node() in IOMMU tree. So we must
+merge it first and tidy the code after that.
 
-AFAIK, the Linux scheduler doesn't take cache size into account, so
-generally speaking, I think there's no impat on Linux.
+Thanks
 
-If user space apps don't care about this info, then there's no problem.
-
-However, I've met some cases where certain customers prefer that the
-named cpu model also become closer to real silicon (e.g. current cache
-size). The advantage of this is that an app that works fine on real
-silicon is more likely to run normally in a Guest environment...
-Because nobody can ensure that no user space app care about cache
-size at all. And it's also unknown if there will be other OSes that
-depend on the cache size (although I think it should be fine, after
-all, current x86 only supports smp machines).
-
-In contrast, the 0x1f example is more typical. By SDM, 0x1f is only
-optional, and if 0x1f is not available, the one should check 0xb.
-However, in Mishra's case, his windows only relies on 0x1f, so making
-the named CPU model and the real silicon alignable is a better way
-of avoiding all sorts of incompatibilities.
-
-Thanks,
-Zhao
-
+> 
+> Jason
+> 
 
