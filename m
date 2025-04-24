@@ -1,137 +1,119 @@
-Return-Path: <kvm+bounces-44093-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44094-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BA57A9A503
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 09:56:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75234A9A53E
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 10:08:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EF1A189A6D5
-	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 07:56:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 113B03BD1EE
+	for <lists+kvm@lfdr.de>; Thu, 24 Apr 2025 08:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95421F419B;
-	Thu, 24 Apr 2025 07:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C94F204F83;
+	Thu, 24 Apr 2025 08:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="YAwADi+h";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="m0gLsZFK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ODyOD7bZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4681F4187;
-	Thu, 24 Apr 2025 07:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D0119CCEA;
+	Thu, 24 Apr 2025 08:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745481367; cv=none; b=Sceg4nrjIppb4d60oo8K758rV/9TzrRAe2SBkT+dUOLG5mPkpbatCAVOGJ0JooMQ8PAgkttW7ILCvAEe2gEiTR3ADrZsGPbIu3pzOODAUqS6xieT1K7C+venyi/qcbE0tjT3ijL8wDSzUf+y4l9EU7ZR/QtE0uAj+F++6MXguKU=
+	t=1745482070; cv=none; b=ZRavegX6XgO4ycdaIFapp66EzgMH4jwnRiYHYECVNbjM5GlYxy23egJRDwp79HJiW12ieeXZV+wx66UmhotCI5Eip/tDLOvzXIFWT61lAkBoNlKvHU9BieKczHwcfw/qr3kysb6zd5KaDsMwSsBiUN18OQbF4jLePVKA9QddKYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745481367; c=relaxed/simple;
-	bh=De9UShe1/X3LNdWVN26pT+PmYrdXKnozkBuEegsfHFo=;
+	s=arc-20240116; t=1745482070; c=relaxed/simple;
+	bh=gQ9J0xOhC6db6xC9+l1fS/rU8P/+uRvFwj9Ophiqh+Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fB5ctPmacr3aKXvlv1B9Ju9Qf09j9pr/e4DcbSGRMScfkxz3PmQiIOuyFauooA7DlS9RFfzCbHDMhl7zM12ZyR5aLPG9FLJLMAOizucJ9J+b9rrdOeKKAyweyXACgC0dYe4jByu0LXxKGENueHqw65QXHTWW0h5ucF+zxal2+jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=YAwADi+h; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=m0gLsZFK; arc=none smtp.client-ip=103.168.172.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id D232B1380773;
-	Thu, 24 Apr 2025 03:56:04 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Thu, 24 Apr 2025 03:56:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1745481364; x=
-	1745567764; bh=4tkLLmFEY+c9SdxK/vQyV8fujxfOxzgi0/53sas8r0M=; b=Y
-	AwADi+h6kNC89D9yEj9u/umkCp68ghlQOzsVVVK7G8xVKP0Giuog5Ve8H3bOE1Sd
-	QBhqp0dVxIYhcV23KBk3ln3sAwBuiWqpVfFlbmv6n4G20OCUhmFMaE9JxqykuHgm
-	Z3zicH24hln/ah9q3Y4LH9XNP8qw2TxpQ8sEP+zDoVw5dPMWgQjjZOvbB5n7wjJM
-	E08BZ7+m1P/+skOCb/tlz6+6/EhhHYCRNXeqyZgeJ3Z02GJDruxMKqu0ml7eg/Dn
-	4E09dKnTlmSBxJuAgk6qSjoEmmfuFj4Hz60NbG6iSg6Ea14INdo3ljDNOBtmCRHr
-	KAIkxpaBKqc5WJksEPytg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1745481364; x=1745567764; bh=4tkLLmFEY+c9SdxK/vQyV8fujxfOxzgi0/5
-	3sas8r0M=; b=m0gLsZFKIZPACqMiT2XxXdKSpr4scaqNRcI+3SgbBUoEpwxEF9E
-	P5e1RWn6eKMaeHLxXOwIkyL0aKYBCKxNam0PUJrNbq9wpRaYqGrruNjUkdFidBtu
-	auw3+U6Ca11xyl2PiDsGaAaYWeAi8w75tr9psiKcykiPTjNL6HTuKOLSxohsgBjC
-	uZILv9t1omLZOaVHwyf5BytycEyaNBzhuANTN/CjTtvhqa72TCY57apPJCqbFoYb
-	UY0TdObP1EbLWX4j4U9pQQ5qU97RR24nchRJotoAQNf7OiL6OIyDjTLPjQ4635Qf
-	QzuJfYh1UxNpncJhUPsmdBQ5BR1mQT9uw+g==
-X-ME-Sender: <xms:lO4JaGP-ZMhtd6XhI56X6omJi4P3NB-9ByBeEzDCzxeHO4eccpkJVQ>
-    <xme:lO4JaE9ex7T2cGlQUeDHz8T7p_GJxy0ENuOAM6l0FwixbUjFaDQbCXFO-izCERegr
-    KAMVEcnfwoZEMTCW6I>
-X-ME-Received: <xmr:lO4JaNR50oHnpCrS3xuu4kdnYI4TS0rlEzSPE0HXqPmqZEBcb9TeccSuAiRrEbEp9CDxvA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeekleefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddt
-    vdenucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilh
-    hlsehshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpeffvdevueetudfh
-    hfffveelhfetfeevveekleevjeduudevvdduvdelteduvefhkeenucevlhhushhtvghruf
-    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghm
-    ohhvrdhnrghmvgdpnhgspghrtghpthhtohepvdejpdhmohguvgepshhmthhpohhuthdprh
-    gtphhtthhopeihrghnrdihrdiihhgrohesihhnthgvlhdrtghomhdprhgtphhtthhopehp
-    sghonhiiihhnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepshgvrghnjhgtsehgoh
-    hoghhlvgdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhk
-    vghrnhgvlhdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtohepgiekieeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhitghk
-    rdhprdgvughgvggtohhmsggvsehinhhtvghlrdgtohhmpdhrtghpthhtohepuggrvhgvrd
-    hhrghnshgvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehkihhrihhllhdrshhhuhht
-    vghmohhvsehinhhtvghlrdgtohhm
-X-ME-Proxy: <xmx:lO4JaGvDZcyIUMKmHbMjiKceP6rKNglh6Dzo0t02V_lgUHaWxiuGMQ>
-    <xmx:lO4JaOcazqGjG6oLpmMKDnEW4E7COSB18qKyfCPeKz1DDsjGfhJu7g>
-    <xmx:lO4JaK2ax7DSdB4FmgImL3AayLZWv28pO3f7QaauCNaMWKQfcqgZOw>
-    <xmx:lO4JaC_bDaoBVcVleMCqs1PUntR5ntmWOL52mPFz58rW85FsGkrzzA>
-    <xmx:lO4JaIJqD7XPkWuLv0JF_xwciiLHzIeOOX3p69iZgQKIk8VoscvPQqjV>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 24 Apr 2025 03:55:56 -0400 (EDT)
-Date: Thu, 24 Apr 2025 10:55:53 +0300
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
-	dave.hansen@intel.com, kirill.shutemov@intel.com, tabba@google.com, 
-	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, david@redhat.com, 
-	vannapurve@google.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
-	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
-	ira.weiny@intel.com, isaku.yamahata@intel.com, xiaoyao.li@intel.com, 
-	binbin.wu@linux.intel.com, chao.p.peng@intel.com
-Subject: Re: [RFC PATCH 04/21] KVM: TDX: Enforce 4KB mapping level during TD
- build Time
-Message-ID: <g3htfhtzg23aynnmv4pqwothiub5ojewvm3xgoyfn7rpfwru5j@fdnrdiz3to7a>
-References: <20250424030033.32635-1-yan.y.zhao@intel.com>
- <20250424030500.32720-1-yan.y.zhao@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hEhM7mKefqFsB2aVpNrsNouf01/pPPMsJhi33z0xeNU66DwGpXb/oY9s5wrLJUWUOSqqhWaXFfGBcYChvPx1pEc3UqZfCKlMqC34mDU0dSd0i7O3dgC8+/Vdz7PC14srmGIsqqc5CHb8C5MOotDmQMAxfmwUI5GEZR9/RIx60sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ODyOD7bZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ED08C4CEEB;
+	Thu, 24 Apr 2025 08:07:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745482069;
+	bh=gQ9J0xOhC6db6xC9+l1fS/rU8P/+uRvFwj9Ophiqh+Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ODyOD7bZFe6psyTBbbqHrGyTN9bbO06+mLsjpOZpZAtyeVZhSMtIzzHp4uk/bPwRF
+	 Fg+5AuYPCHFaO1iJ7AZ0hnuzbSatu3RKpWWB0igu+ysf5GxyCdAj0/zoHi8abPgms6
+	 UyWqrFeuVLz7KWExbAlMl6sGk3pIBXhjJdgkeyS5U7v4meyETDlnI/bCnajjhgK5ip
+	 tIFTA4qEdRjUs4v9+5Yqy4cTSqzgz9evKITnLdxHo0yebJZSxHX+clynB3yYqiaA9g
+	 TAOPbev3sVV+FH5Ob1WbUIU/+f8jJU3YQkiM1kHRm7HKmFAywX5r91KPZh1EV5IySo
+	 WbMrUBYNBAOvw==
+Date: Thu, 24 Apr 2025 11:07:44 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Mika =?iso-8859-1?Q?Penttil=E4?= <mpenttil@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 10/24] mm/hmm: let users to tag specific PFN with DMA
+ mapped bit
+Message-ID: <20250424080744.GP48485@unreal>
+References: <cover.1745394536.git.leon@kernel.org>
+ <0a7c1e06269eee12ff8912fe0da4b7692081fcde.1745394536.git.leon@kernel.org>
+ <7185c055-fc9e-4510-a9bf-6245673f2f92@redhat.com>
+ <20250423181706.GT1213339@ziepe.ca>
+ <36891b0e-d5fa-4cf8-a181-599a20af1da3@redhat.com>
+ <20250423233335.GW1213339@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250424030500.32720-1-yan.y.zhao@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250423233335.GW1213339@ziepe.ca>
 
-On Thu, Apr 24, 2025 at 11:05:00AM +0800, Yan Zhao wrote:
-> During the TD build phase (i.e., before the TD becomes RUNNABLE), enforce a
-> 4KB mapping level both in the S-EPT managed by the TDX module and the
-> mirror page table managed by KVM.
+On Wed, Apr 23, 2025 at 08:33:35PM -0300, Jason Gunthorpe wrote:
+> On Wed, Apr 23, 2025 at 09:37:24PM +0300, Mika Penttilä wrote:
+> > 
+> > On 4/23/25 21:17, Jason Gunthorpe wrote:
+> > > On Wed, Apr 23, 2025 at 08:54:05PM +0300, Mika Penttilä wrote:
+> > >>> @@ -36,6 +38,13 @@ enum hmm_pfn_flags {
+> > >>>  	HMM_PFN_VALID = 1UL << (BITS_PER_LONG - 1),
+> > >>>  	HMM_PFN_WRITE = 1UL << (BITS_PER_LONG - 2),
+> > >>>  	HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
+> > >>> +
+> > >>> +	/*
+> > >>> +	 * Sticky flags, carried from input to output,
+> > >>> +	 * don't forget to update HMM_PFN_INOUT_FLAGS
+> > >>> +	 */
+> > >>> +	HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 7),
+> > >>> +
+> > >> How is this playing together with the mapped order usage?
+> > > Order shift starts at bit 8, DMA_MAPPED is at bit 7
+> > 
+> > hmm bits are the high bits, and order is 5 bits starting from
+> > (BITS_PER_LONG - 8)
 > 
-> During this phase, TD's memory is added via tdh_mem_page_add(), which only
-> accepts 4KB granularity. Therefore, return PG_LEVEL_4K in TDX's
-> .private_max_mapping_level hook to ensure KVM maps at the 4KB level in the
-> mirror page table. Meanwhile, iterate over each 4KB page of a large gmem
-> backend page in tdx_gmem_post_populate() and invoke tdh_mem_page_add() to
-> map at the 4KB level in the S-EPT.
-> 
-> Still allow huge pages in gmem backend during TD build time. Based on [1],
-> which gmem series allows 2MB TPH and non-in-place conversion, pass in
+> I see, so yes order occupies 5 bits [-4,-5,-6,-7,-8] and the
+> DMA_MAPPED overlaps, it should be 9 not 7 because of the backwardness.
 
-s/TPH/THP/
-
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Thanks for the fix.
 
