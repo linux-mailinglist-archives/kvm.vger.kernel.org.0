@@ -1,109 +1,310 @@
-Return-Path: <kvm+bounces-44371-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44372-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96832A9D5A9
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 00:37:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52217A9D5D2
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 00:45:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D02BA4C5F53
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 22:37:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10D464C6E73
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 22:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10252957AF;
-	Fri, 25 Apr 2025 22:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B752957D3;
+	Fri, 25 Apr 2025 22:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t+DQ0tSt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nj5kVxPf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA25F2951DF
-	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 22:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5D72957B6
+	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 22:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745620652; cv=none; b=g7BF8SfUflKc/MLMA+Cy4ulKD/43ILdX/BB+knblQFHM2tS0nYP2Pis2LoW+zOx7jkG3ExO0yOlNdAyCg4y9DIs6O+uofW7WZx2xdC6lKiImRgw0UlmP1ekOf3+1V+dLDpAzchR2bfbqZZqdO2EnTM4W5/KwiUFZLu4WPQi2ETc=
+	t=1745621124; cv=none; b=tkmpTQa+z2540bDZ9leJr9+gmPhyL2XHkhuohvKvEBjIz2WUv/Bqigy5IG/bqCY/pTwEpe4SuGOs67nP4dHcV8Q6eForZqmU/zHh+/BnAgmXG8sl3QgFJhaJdHgC3qrv7QrDvfMgocM8vSXxtO545XsQfF24/mcCbXHsyKwuPzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745620652; c=relaxed/simple;
-	bh=3KArTu/2RUkabCmBtv0e7fMu9ZeDP06C6FtALBblSxI=;
+	s=arc-20240116; t=1745621124; c=relaxed/simple;
+	bh=DxjFR1cfA5b/PMiVtDs1ZU6V7y+Bn41BSCBzUEdn1eA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kUJ5qxifoTUuWqktrcUuE2ZeaatPz/ctcTlhsNgIUPIvpQz0YxDkTCAlIdPVauHcWWjSh6z8eYX2v0suCCYqizbtgnVXipb7q9WYT0RDoQAH2w1w+dfQdPfHPyIQMToBvuRxFulzv4WpcKVNYdHj0m41bQSIuKxqbcKmAow816o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t+DQ0tSt; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=QSRGIifxJItkpCzWWjT1tK3xQcEJZX0QjwfyLQRptHsixbXs/eWXwhSznTY0qOZTjCWUJprAqVf2lbNtNVc5EIkV4b5EQ9MDu4+n3pZhoHClFDmqpE/zD+gbl3VjZpjbsxIY2aQctmtbGYunL5Bg7q+XayPFnW7Etx63HZMYjYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nj5kVxPf; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff8119b436so2183969a91.0
-        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 15:37:30 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-736cd36189bso3941945b3a.2
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 15:45:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745620650; x=1746225450; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4wtD+GeTJ9u0QHb0+YR6eCa58uhDG2aJS2glA/Qc9l0=;
-        b=t+DQ0tStN9s7v/HazE8xr5ZnphR2BzFtr+Dk4ApcPzKxpnLTwi94rAtfg4jkgap3oN
-         f2imSHiCqfvIf/rVX1gDlkMIs/5cFsrh7ayV7jbwXzE5yxpPyk8CxnbeNWp4g6UACvIH
-         PAnJMc5mQubHaW3MUbZu63I5RZ5VZAdmBc5rhTWXjrD1FimC4HSG5wX5dRSyT1BqYX5l
-         bakYB3oECrnb67N3+wbb2GqdahyvISq+4jCINFzPc+LVekX1XeRhvai5F63l3SW32IiG
-         mqLa5hY2h4iPb/A/ydGnBCQtCSZzmdkh/fsBNydX0RQmyFB37nJrWJo01wMQ0AS1Xxgu
-         HQLg==
+        d=google.com; s=20230601; t=1745621122; x=1746225922; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PkZO4mi4lxG/wlqj2CFwXmhdIEjDtuyovfVkgLxS/v0=;
+        b=nj5kVxPfkMKgTF7dr8aD9uMz5x8dB+me4BVEf7aO6gtx0OTQWZKKo9Ll+DawLvl7sb
+         ZHhw3xGQyi4Ax1a923kjBOe9BQM1DVpwkG76ZtB9jr6YGWAmB/IXBMLOr4ezFgWLGPmD
+         HCnhuY7bmIczJSh01yZBUVJylwkyT5UFZD7ox+RcmGL6OpnZQ1ytqTGdveobQQ9LBwHK
+         vjJqX/fkE4Viifz5sJG6pk8hvXIdjQMxsH15bts1HYI99Kv0qZLb+UWU3qgrkLZyDisO
+         RRlzucWMmHaQDdtuzU49c84aMbLnEJqKaMCVcclbEfNietiJgTGovWhHXWiUDZVL7lUh
+         TgVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745620650; x=1746225450;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4wtD+GeTJ9u0QHb0+YR6eCa58uhDG2aJS2glA/Qc9l0=;
-        b=VscO0XcO6joi/t602K6E9hhEuKmfAq370NuvzUu79zMqX/BaujmqqzYNEVbu/C7SWs
-         ySt8fT9HdIWqIIILPFNMdTNxYXki9QbYiCTp5XdKFoXpjc5UBVJDG9KWYe0kZRHW/cIe
-         cUtuiwOLKaqlofMvMWDBeE5ZchK4JIM8lz7VyHTqrXfFvQfoTsAhAsr+F2wwcD0sfqTc
-         UeP8YMMRWfRH1FO6FxDYkOM0wj3RNDMUOhzESh321u8NKm/+BmOfDNqxdZscqVcj0pyf
-         YFgfQqyVL2Y7wzeWn0azkIyB18odSTT613/H79MBG8M19UvFGCr7rxb/VVejHUFL0P4d
-         +rLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/KKefX8uTADPElHa+VUhrOw2Dgzr/EQqPhlrmC9Vz66bFtWchE/Ydz/AO6Tr4gmawCzE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyncuM/kIdNC5PpYTXTqIVTyTJ+ojdpSgaJo5CLy4WJqZcfjk4r
-	IdRMJvoE3HtoT6iHzCqEN6d9f/4omsrqi8/Au01OgcNnbuJTgJqGL46GiUe7HjDZEFSku+Xp5aQ
-	p5g==
-X-Google-Smtp-Source: AGHT+IGgiNwVkXSP9zfX8Bwz9AFDrYnzhJff3zo34deIREPzgpgi0hqQsE0ginF6C31hQ2DJIXsWXGg0zEc=
-X-Received: from pjbkl16.prod.google.com ([2002:a17:90b:4990:b0:2fc:201d:6026])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2810:b0:2ff:502e:62d4
- with SMTP id 98e67ed59e1d1-309f7e8ec70mr5160431a91.32.1745620649938; Fri, 25
- Apr 2025 15:37:29 -0700 (PDT)
-Date: Fri, 25 Apr 2025 15:37:17 -0700
-In-Reply-To: <20250221163352.3818347-1-yosry.ahmed@linux.dev>
+        d=1e100.net; s=20230601; t=1745621122; x=1746225922;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PkZO4mi4lxG/wlqj2CFwXmhdIEjDtuyovfVkgLxS/v0=;
+        b=Em87QKab9A+GghfIR3SY+tbuVm/6cxxIlck4wePAi+7z+saKfZwthrnIOA1nzHd2rW
+         aYutQSi2Bj8M060SRXMiMdFZXgrDPurHAhnqNfe37Bw5V5s2NEEdRPuUjPQ1X3hZh831
+         03RHjp0YTUyALQPh2y6LoZmkxdDlUjxWj+UArV5FdWjoxhpMSAsJJc70lvRU+3m7xooC
+         h6T+t5uimzQ5TtBQdcm4go6mOHJwq9CBHClc7s7btvABqmhdPbib1qexosPgN+5R4ok4
+         p6x7KYuFn49puitpo0BYLSZeNRh1G3oIQ1DCNHW/2SRvaBjpW5RaBi1XRwsQ7XwLZE6r
+         kpRw==
+X-Forwarded-Encrypted: i=1; AJvYcCVOImCBlgkE4hyzTf1xYEgAOYY/BpehJobm2aKA6H3v0Tfr9ezZRhTToC8CvoNqQZoR5Wk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8l0mCVMtggsvePV6EnjwPxygelZIh+a21Zt65OnzIruYNmJ7b
+	jb+itG+yZ21jt42/HBQIhWzxiRUYCJoJLl6Zv3Prgsm8mv+7iiMT0QLdHaJQQRhzMU/NooCzXq4
+	/rLleP7zpD65U1GviGGi7wQ==
+X-Google-Smtp-Source: AGHT+IGmnJ65gmKyA3VF08u0JIu1lEdKstgsWN4dMP/m3HjVmCFFs4RaXPIOere/UVmxFSjxhjf6/nl08qkJgAlx8w==
+X-Received: from pfbky4.prod.google.com ([2002:a05:6a00:6f44:b0:73e:1a21:4bb9])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:228a:b0:736:3d7c:236c with SMTP id d2e1a72fcca58-73ff72e4055mr1450296b3a.14.1745621122037;
+ Fri, 25 Apr 2025 15:45:22 -0700 (PDT)
+Date: Fri, 25 Apr 2025 15:45:20 -0700
+In-Reply-To: <aAsJZuLjOAYriz8v@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250221163352.3818347-1-yosry.ahmed@linux.dev>
-X-Mailer: git-send-email 2.49.0.850.g28803427d3-goog
-Message-ID: <174559612575.886958.13255435526046364721.b4-ty@google.com>
-Subject: Re: [PATCH 0/3] Unify IBRS virtualization
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, x86@kernel.org, Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
-	David Kaplan <David.Kaplan@amd.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1726009989.git.ackerleytng@google.com> <38723c5d5e9b530e52f28b9f9f4a6d862ed69bcd.1726009989.git.ackerleytng@google.com>
+ <Z+6AGxEvBRFkN5mN@yzhao56-desk.sh.intel.com> <diqzh62ezgdh.fsf@ackerleytng-ctop.c.googlers.com>
+ <aAmPQssuN9Zba//b@yzhao56-desk.sh.intel.com> <aAm9OHGt6Ag7ztqs@yzhao56-desk.sh.intel.com>
+ <c4dae65f-b5e6-44fa-b5ab-8614f1d47cb5@intel.com> <aAnytM/E6sIdvKNq@yzhao56-desk.sh.intel.com>
+ <CAGtprH-Ana5A2hz_D+CQ0NYRVxfpR6e0Sojssym-UtUnYpOPqg@mail.gmail.com>
+ <diqz7c39zas0.fsf@ackerleytng-ctop.c.googlers.com> <aAsJZuLjOAYriz8v@yzhao56-desk.sh.intel.com>
+Message-ID: <diqzwmb7yi67.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 39/39] KVM: guest_memfd: Dynamically split/reconstruct
+ HugeTLB page
+From: Ackerley Tng <ackerleytng@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Vishal Annapurve <vannapurve@google.com>, Chenyi Qiang <chenyi.qiang@intel.com>, tabba@google.com, 
+	quic_eberman@quicinc.com, roypat@amazon.co.uk, jgg@nvidia.com, 
+	peterx@redhat.com, david@redhat.com, rientjes@google.com, fvdl@google.com, 
+	jthoughton@google.com, seanjc@google.com, pbonzini@redhat.com, 
+	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	isaku.yamahata@intel.com, muchun.song@linux.dev, erdemaktas@google.com, 
+	qperret@google.com, jhubbard@nvidia.com, willy@infradead.org, 
+	shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
+	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
+	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
+	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
+	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 21 Feb 2025 16:33:49 +0000, Yosry Ahmed wrote:
-> To properly virtualize IBRS on Intel, an IBPB is executed on emulated
-> VM-exits to provide separate predictor modes for L1 and L2.
-> 
-> Similar handling is theoretically needed for AMD, unless IbrsSameMode is
-> enumerated by the CPU (which should be the case for most/all CPUs
-> anyway). For correctness and clarity, this series generalizes the
-> handling to apply for both Intel and AMD as needed.
-> 
-> [...]
+Yan Zhao <yan.y.zhao@intel.com> writes:
 
-Applied to kvm-x86 misc, thanks!
+> On Thu, Apr 24, 2025 at 11:15:11AM -0700, Ackerley Tng wrote:
+>> Vishal Annapurve <vannapurve@google.com> writes:
+>>=20
+>> > On Thu, Apr 24, 2025 at 1:15=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com=
+> wrote:
+>> >>
+>> >> On Thu, Apr 24, 2025 at 01:55:51PM +0800, Chenyi Qiang wrote:
+>> >> >
+>> >> >
+>> >> > On 4/24/2025 12:25 PM, Yan Zhao wrote:
+>> >> > > On Thu, Apr 24, 2025 at 09:09:22AM +0800, Yan Zhao wrote:
+>> >> > >> On Wed, Apr 23, 2025 at 03:02:02PM -0700, Ackerley Tng wrote:
+>> >> > >>> Yan Zhao <yan.y.zhao@intel.com> writes:
+>> >> > >>>
+>> >> > >>>> On Tue, Sep 10, 2024 at 11:44:10PM +0000, Ackerley Tng wrote:
+>> >> > >>>>> +/*
+>> >> > >>>>> + * Allocates and then caches a folio in the filemap. Returns=
+ a folio with
+>> >> > >>>>> + * refcount of 2: 1 after allocation, and 1 taken by the fil=
+emap.
+>> >> > >>>>> + */
+>> >> > >>>>> +static struct folio *kvm_gmem_hugetlb_alloc_and_cache_folio(=
+struct inode *inode,
+>> >> > >>>>> +                                                           p=
+goff_t index)
+>> >> > >>>>> +{
+>> >> > >>>>> +       struct kvm_gmem_hugetlb *hgmem;
+>> >> > >>>>> +       pgoff_t aligned_index;
+>> >> > >>>>> +       struct folio *folio;
+>> >> > >>>>> +       int nr_pages;
+>> >> > >>>>> +       int ret;
+>> >> > >>>>> +
+>> >> > >>>>> +       hgmem =3D kvm_gmem_hgmem(inode);
+>> >> > >>>>> +       folio =3D kvm_gmem_hugetlb_alloc_folio(hgmem->h, hgme=
+m->spool);
+>> >> > >>>>> +       if (IS_ERR(folio))
+>> >> > >>>>> +               return folio;
+>> >> > >>>>> +
+>> >> > >>>>> +       nr_pages =3D 1UL << huge_page_order(hgmem->h);
+>> >> > >>>>> +       aligned_index =3D round_down(index, nr_pages);
+>> >> > >>>> Maybe a gap here.
+>> >> > >>>>
+>> >> > >>>> When a guest_memfd is bound to a slot where slot->base_gfn is =
+not aligned to
+>> >> > >>>> 2M/1G and slot->gmem.pgoff is 0, even if an index is 2M/1G ali=
+gned, the
+>> >> > >>>> corresponding GFN is not 2M/1G aligned.
+>> >> > >>>
+>> >> > >>> Thanks for looking into this.
+>> >> > >>>
+>> >> > >>> In 1G page support for guest_memfd, the offset and size are alw=
+ays
+>> >> > >>> hugepage aligned to the hugepage size requested at guest_memfd =
+creation
+>> >> > >>> time, and it is true that when binding to a memslot, slot->base=
+_gfn and
+>> >> > >>> slot->npages may not be hugepage aligned.
+>> >> > >>>
+>> >> > >>>>
+>> >> > >>>> However, TDX requires that private huge pages be 2M aligned in=
+ GFN.
+>> >> > >>>>
+>> >> > >>>
+>> >> > >>> IIUC other factors also contribute to determining the mapping l=
+evel in
+>> >> > >>> the guest page tables, like lpage_info and .private_max_mapping=
+_level()
+>> >> > >>> in kvm_x86_ops.
+>> >> > >>>
+>> >> > >>> If slot->base_gfn and slot->npages are not hugepage aligned, lp=
+age_info
+>> >> > >>> will track that and not allow faulting into guest page tables a=
+t higher
+>> >> > >>> granularity.
+>> >> > >>
+>> >> > >> lpage_info only checks the alignments of slot->base_gfn and
+>> >> > >> slot->base_gfn + npages. e.g.,
+>> >> > >>
+>> >> > >> if slot->base_gfn is 8K, npages is 8M, then for this slot,
+>> >> > >> lpage_info[2M][0].disallow_lpage =3D 1, which is for GFN [4K, 2M=
++8K);
+>> >> > >> lpage_info[2M][1].disallow_lpage =3D 0, which is for GFN [2M+8K,=
+ 4M+8K);
+>> >> > >> lpage_info[2M][2].disallow_lpage =3D 0, which is for GFN [4M+8K,=
+ 6M+8K);
+>> >> > >> lpage_info[2M][3].disallow_lpage =3D 1, which is for GFN [6M+8K,=
+ 8M+8K);
+>> >> >
+>> >> > Should it be?
+>> >> > lpage_info[2M][0].disallow_lpage =3D 1, which is for GFN [8K, 2M);
+>> >> > lpage_info[2M][1].disallow_lpage =3D 0, which is for GFN [2M, 4M);
+>> >> > lpage_info[2M][2].disallow_lpage =3D 0, which is for GFN [4M, 6M);
+>> >> > lpage_info[2M][3].disallow_lpage =3D 0, which is for GFN [6M, 8M);
+>> >> > lpage_info[2M][4].disallow_lpage =3D 1, which is for GFN [8M, 8M+8K=
+);
+>> >> Right. Good catch. Thanks!
+>> >>
+>> >> Let me update the example as below:
+>> >> slot->base_gfn is 2 (for GPA 8KB), npages 2000 (for a 8MB range)
+>> >>
+>> >> lpage_info[2M][0].disallow_lpage =3D 1, which is for GPA [8KB, 2MB);
+>> >> lpage_info[2M][1].disallow_lpage =3D 0, which is for GPA [2MB, 4MB);
+>> >> lpage_info[2M][2].disallow_lpage =3D 0, which is for GPA [4MB, 6MB);
+>> >> lpage_info[2M][3].disallow_lpage =3D 0, which is for GPA [6MB, 8MB);
+>> >> lpage_info[2M][4].disallow_lpage =3D 1, which is for GPA [8MB, 8MB+8K=
+B);
+>> >>
+>> >> lpage_info indicates that a 2MB mapping is alllowed to cover GPA 4MB =
+and GPA
+>> >> 4MB+16KB. However, their aligned_index values lead guest_memfd to all=
+ocate two
+>> >> 2MB folios, whose physical addresses may not be contiguous.
+>> >>
+>> >> Additionally, if the guest accesses two GPAs, e.g., GPA 2MB+8KB and G=
+PA 4MB,
+>> >> KVM could create two 2MB mappings to cover GPA ranges [2MB, 4MB), [4M=
+B, 6MB).
+>> >> However, guest_memfd just allocates the same 2MB folio for both fault=
+s.
+>> >>
+>> >>
+>> >> >
+>> >> > >>
+>> >> > >>   ---------------------------------------------------------
+>> >> > >>   |          |  |          |  |          |  |          |  |
+>> >> > >>   8K        2M 2M+8K      4M  4M+8K     6M  6M+8K     8M  8M+8K
+>> >> > >>
+>> >> > >> For GFN 6M and GFN 6M+4K, as they both belong to lpage_info[2M][=
+2], huge
+>> >> > >> page is allowed. Also, they have the same aligned_index 2 in gue=
+st_memfd.
+>> >> > >> So, guest_memfd allocates the same huge folio of 2M order for th=
+em.
+>> >> > > Sorry, sent too fast this morning. The example is not right. The =
+correct
+>> >> > > one is:
+>> >> > >
+>> >> > > For GFN 4M and GFN 4M+16K, lpage_info indicates that 2M is allowe=
+d. So,
+>> >> > > KVM will create a 2M mapping for them.
+>> >> > >
+>> >> > > However, in guest_memfd, GFN 4M and GFN 4M+16K do not correspond =
+to the
+>> >> > > same 2M folio and physical addresses may not be contiguous.
+>> >
+>> > Then during binding, guest memfd offset misalignment with hugepage
+>> > should be same as gfn misalignment. i.e.
+>> >
+>> > (offset & ~huge_page_mask(h)) =3D=3D ((slot->base_gfn << PAGE_SHIFT) &
+>> > ~huge_page_mask(h));
+>> >
+>> > For non guest_memfd backed scenarios, KVM allows slot gfn ranges that
+>> > are not hugepage aligned, so guest_memfd should also be able to
+>> > support non-hugepage aligned memslots.
+>> >
+>>=20
+>> I drew up a picture [1] which hopefully clarifies this.
+>>=20
+>> Thanks for pointing this out, I understand better now and we will add an
+>> extra constraint during memslot binding of guest_memfd to check that gfn
+>> offsets within a hugepage must be guest_memfd offsets.
+> I'm a bit confused.
+>
+> As "index =3D gfn - slot->base_gfn + slot->gmem.pgoff", do you mean you a=
+re going
+> to force "slot->base_gfn =3D=3D slot->gmem.pgoff" ?
+>
+> For some memory region, e.g., "pc.ram", it's divided into 2 parts:
+> - one with offset 0, size 0x80000000(2G),
+>   positioned at GPA 0, which is below GPA 4G;
+> - one with offset 0x80000000(2G), size 0x80000000(2G),
+>   positioned at GPA 0x100000000(4G), which is above GPA 4G.
+>
+> For the second part, its slot->base_gfn is 0x100000000, while slot->gmem.=
+pgoff
+> is 0x80000000.
+>
 
-[1/3] x86/cpufeatures: Define X86_FEATURE_AMD_IBRS_SAME_MODE
-      commit: 9a7cb00a8ff7380a09fa75287a3f2642c472d562
-[2/3] KVM: x86: Propagate AMD's IbrsSameMode to the guest
-      commit: 65ca2872015c232d6743b497e3c08ff96596b917
-[3/3] KVM: x86: Generalize IBRS virtualization on emulated VM-exit
-      commit: 656d9624bd21d35499eaa5ee97fda6def62901c8
+Nope I don't mean to enforce that they are equal, we just need the
+offsets within the page to be equal.
 
---
-https://github.com/kvm-x86/linux/tree/next
+I edited Vishal's code snippet, perhaps it would help explain better:
+
+page_size is the size of the hugepage, so in our example,
+
+  page_size =3D SZ_2M;
+  page_mask =3D ~(page_size - 1);
+  offset_within_page =3D slot->gmem.pgoff & page_mask;
+  gfn_within_page =3D (slot->base_gfn << PAGE_SHIFT) & page_mask;
+
+We will enforce that
+
+  offset_within_page =3D=3D gfn_within_page;
+
+>> Adding checks at binding time will allow hugepage-unaligned offsets (to
+>> be at parity with non-guest_memfd backing memory) but still fix this
+>> issue.
+>>=20
+>> lpage_info will make sure that ranges near the bounds will be
+>> fragmented, but the hugepages in the middle will still be mappable as
+>> hugepages.
+>>=20
+>> [1] https://lpc.events/event/18/contributions/1764/attachments/1409/3706=
+/binding-must-have-same-alignment.svg
 
