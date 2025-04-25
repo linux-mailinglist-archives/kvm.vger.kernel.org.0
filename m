@@ -1,52 +1,65 @@
-Return-Path: <kvm+bounces-44246-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44247-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C5F4A9BE2B
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 07:50:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FCB2A9BEE0
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 08:51:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E0659A03C1
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 05:50:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E9D0927A45
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 06:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA3C22A7E8;
-	Fri, 25 Apr 2025 05:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA3F22D7B7;
+	Fri, 25 Apr 2025 06:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NzqbSrsT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx1.zhaoxin.com (MX1.ZHAOXIN.COM [210.0.225.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC02610957
-	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 05:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.0.225.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1594414;
+	Fri, 25 Apr 2025 06:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745560237; cv=none; b=EWB9olQ9JPlnbRldc1VSBY9z7OkimGJI4o3oNWup9MAqDUBjjOlkStlxhmcl0odvF/TMT6gEX37/iXrKkislbkLErKMwq/b7DEU828K8basBRJXiomosF0OWzGCWPsxhpWr2iATbxsFfFBh6azaTWlBpHKkWDPJA8VfGIexkHGY=
+	t=1745563888; cv=none; b=IXP8mfCMlGqt58tHixOObXmlTNV/FrhSzhqs8+I5BBW2nKHSe3vTt16skYMglVu/Co3q3iMbDHERrb2cdX3PpSsaZMc28W+vxy22jdZkvk3SaeGRg3PtCrksTbt8Ukj/xjq2MuPqb6ZfLwDW/Vom9ClvcOZ9yBTtFg68qs4Z5NU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745560237; c=relaxed/simple;
-	bh=g9CkTpcU6Wjrz309PAXUi9zHKV8t5ROZ05wDlvea+vI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=HSKxQ+mfo1WdsSPDLbsgUz6ri50v2HFbqrtcff32m/wNp80ehfye1CLupRw2T2H/xOCQhPdOUvSQdv3XeaonjeEaKOTsTRegxWCImAWvsP6ezArEuVbMjygwF9uiXUXKPSabNLb73vYV0KkGlc8cY+LF4P1tYO3UJVAaaIMryUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=210.0.225.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1745560220-086e234ccebe3a0001-HEqcsx
-Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx1.zhaoxin.com with ESMTP id CzmEFEBrOJKbujBo (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Fri, 25 Apr 2025 13:50:20 +0800 (CST)
-X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Received: from ZXSHMBX3.zhaoxin.com (10.28.252.165) by ZXSHMBX1.zhaoxin.com
- (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Fri, 25 Apr
- 2025 13:50:20 +0800
-Received: from ZXSHMBX3.zhaoxin.com ([fe80::8cc5:5bc6:24ec:65f2]) by
- ZXSHMBX3.zhaoxin.com ([fe80::8cc5:5bc6:24ec:65f2%6]) with mapi id
- 15.01.2507.044; Fri, 25 Apr 2025 13:50:20 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Received: from [192.168.31.91] (10.28.66.62) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Thu, 24 Apr
- 2025 21:44:35 +0800
-Message-ID: <c522ebb5-04d5-49c6-9ad8-d755b8998988@zhaoxin.com>
-Date: Thu, 24 Apr 2025 21:44:34 +0800
+	s=arc-20240116; t=1745563888; c=relaxed/simple;
+	bh=qE5He3lSxJhvmVM8Nl+q+b9mw5NmT3/KuhkzFgiNOLo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fN8pHJQSV+nQy0EV6WRi1FeyJKYTJJJMs7LnVj5nNFNJsbbX+ALiom86LVpaW3UBsg5eTTigqHjkrmUc1NV66ve1KqlieAwZ+LNtKKzbquvvi3oJIMC9xqsB/UPi2pE65W1ZKehArPWAx3OV4HpDnIX1d9LL5nn0o+FOrp9VeKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NzqbSrsT; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745563887; x=1777099887;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=qE5He3lSxJhvmVM8Nl+q+b9mw5NmT3/KuhkzFgiNOLo=;
+  b=NzqbSrsTGNFz6qt9R1k6fGgUjFmVPKf2gjMHC9Ayjb59VFCxGQ54/Hb9
+   rdh2uZ1jvHqlKj3arQdX8QMB4CPWxdqV4AaauN5mW6kJt/huZN+BCRZb2
+   Y4sFwZrAr9gSrCaA+XOpNFXcLqLue9MUyQzk8K7tJBBDP04BJcabHCi3R
+   IIjKVdTknlY+HcMKj+Fokx70h6sZ0YPFLyFrVbcVEMMlsdxFADM07PHmi
+   a0vlDPEYueMd+3jG9tmGq4SZYGuxQuFwmRKW7tNIz24t8Ob1i+wgR6Wej
+   hONU1E3FdYWYUlnx1PylQl4M3m8ye1l3YA/+Az+lrWt9PHobz7oDrdwzC
+   Q==;
+X-CSE-ConnectionGUID: GiHcf1MPTpiKrd+/g+qtZw==
+X-CSE-MsgGUID: hryq7iFnRf6ADgf8hXndtQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11413"; a="50883773"
+X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
+   d="scan'208";a="50883773"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 23:51:27 -0700
+X-CSE-ConnectionGUID: TqDgjc2aSviPiddjNwNzuA==
+X-CSE-MsgGUID: OTrdxKbbQLa5Ms3pu2HTYw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,238,1739865600"; 
+   d="scan'208";a="137987480"
+Received: from yijiemei-mobl.ccr.corp.intel.com (HELO [10.238.2.108]) ([10.238.2.108])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 23:51:21 -0700
+Message-ID: <a7d0988d-037c-454f-bc6b-57e71b357488@linux.intel.com>
+Date: Fri, 25 Apr 2025 14:51:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -54,113 +67,73 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
- Intel
-To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
-	<berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-X-ASG-Orig-Subj: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
- Intel
-CC: Babu Moger <babu.moger@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, "Tejus
- GK" <tejus.gk@nutanix.com>, Jason Zeng <jason.zeng@intel.com>, Manish Mishra
-	<manish.mishra@nutanix.com>, Tao Su <tao1.su@intel.com>,
-	<qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-References: <20250423114702.1529340-1-zhao1.liu@intel.com>
- <20250423114702.1529340-2-zhao1.liu@intel.com>
-From: Ewan Hai <ewanhai-oc@zhaoxin.com>
-In-Reply-To: <20250423114702.1529340-2-zhao1.liu@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-X-Moderation-Data: 4/25/2025 1:50:19 PM
-X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
-X-Barracuda-Start-Time: 1745560220
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.35:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 2968
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.140462
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+Subject: Re: [RFC PATCH 02/21] x86/virt/tdx: Enhance tdh_mem_page_aug() to
+ support huge pages
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com,
+ dave.hansen@intel.com, kirill.shutemov@intel.com, tabba@google.com,
+ ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com,
+ david@redhat.com, vannapurve@google.com, vbabka@suse.cz, jroedel@suse.de,
+ thomas.lendacky@amd.com, pgonda@google.com, zhiquan1.li@intel.com,
+ fan.du@intel.com, jun.miao@intel.com, ira.weiny@intel.com,
+ isaku.yamahata@intel.com, xiaoyao.li@intel.com, chao.p.peng@intel.com
+References: <20250424030033.32635-1-yan.y.zhao@intel.com>
+ <20250424030428.32687-1-yan.y.zhao@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20250424030428.32687-1-yan.y.zhao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
 
-On 4/23/25 7:46 PM, Zhao Liu wrote:
-> 
-> Per SDM, 0x80000005 leaf is reserved for Intel CPU, and its current
-> "assert" check blocks adding new cache model for non-AMD CPUs.
-> 
-> Therefore, check the vendor and encode this leaf as all-0 for Intel
-> CPU. And since Zhaoxin mostly follows Intel behavior, apply the vendor
-> check for Zhaoxin as well.
-
-Thanks for taking Zhaoxin CPUs into account.
-
-Zhaoxin follows AMD's definition for CPUID leaf 0x80000005, so this leaf is 
-valid on our CPUs rather than reserved. We do, however, follow Intel's 
-definition for leaf 0x80000006.
-
-> Note, for !vendor_cpuid_only case, non-AMD CPU would get the wrong
-> information, i.e., get AMD's cache model for Intel or Zhaoxin CPUs.
-> For this case, there is no need to tweak for non-AMD CPUs, because
-> vendor_cpuid_only has been turned on by default since PC machine v6.1.
-> 
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+On 4/24/2025 11:04 AM, Yan Zhao wrote:
+> Enhance the SEAMCALL wrapper tdh_mem_page_aug() to support huge pages.
+>
+> Verify the validity of the level and ensure that the mapping range is fully
+> contained within the page folio.
+>
+> As a conservative solution, perform CLFLUSH on all pages to be mapped into
+> the TD before invoking the SEAMCALL TDH_MEM_PAGE_AUG. This ensures that any
+> dirty cache lines do not write back later and clobber TD memory.
+>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 > ---
->   target/i386/cpu.c | 16 ++++++++++++++--
->   1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 1b64ceaaba46..8fdafa8aedaf 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -7248,11 +7248,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->           *edx = env->cpuid_model[(index - 0x80000002) * 4 + 3];
->           break;
->       case 0x80000005:
-> -        /* cache info (L1 cache) */
-> -        if (cpu->cache_info_passthrough) {
-> +        /*
-> +         * cache info (L1 cache)
-> +         *
-> +         * For !vendor_cpuid_only case, non-AMD CPU would get the wrong
-> +         * information, i.e., get AMD's cache model. It doesn't matter,
-> +         * vendor_cpuid_only has been turned on by default since
-> +         * PC machine v6.1.
-> +         */
-> +        if (cpu->vendor_cpuid_only &&
-> +            (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))) {
+>   arch/x86/virt/vmx/tdx/tdx.c | 11 ++++++++++-
+>   1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index f5e2a937c1e7..a66d501b5677 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -1595,9 +1595,18 @@ u64 tdh_mem_page_aug(struct tdx_td *td, u64 gpa, int level, struct page *page, u
+>   		.rdx = tdx_tdr_pa(td),
+>   		.r8 = page_to_phys(page),
+>   	};
+> +	unsigned long nr_pages = 1 << (level * 9);
+> +	struct folio *folio = page_folio(page);
+> +	unsigned long idx = 0;
+>   	u64 ret;
+>   
+> -	tdx_clflush_page(page);
+> +	if (!(level >= TDX_PS_4K && level < TDX_PS_NR) ||
+> +	    (folio_page_idx(folio, page) + nr_pages > folio_nr_pages(folio)))
+> +		return -EINVAL;
+> +
+> +	while (nr_pages--)
+> +		tdx_clflush_page(nth_page(page, idx++));
+Is the following better to save a variable?
 
-Given that, there is no need to add IS_ZHAOXIN_CPU(env) to the 0x80000005 path. 
-Note that the L1 TLB constants for the YongFeng core differ from the current 
-values in target/i386/cpu.c(YongFeng defaults shown in brackets):
+while (nr_pages)
+     tdx_clflush_page(nth_page(page, --nr_pages));
 
-#define L1_DTLB_2M_ASSOC       1 (4)
-#define L1_DTLB_2M_ENTRIES   255 (32)
-#define L1_DTLB_4K_ASSOC       1 (6)
-#define L1_DTLB_4K_ENTRIES   255 (96)
 
-#define L1_ITLB_2M_ASSOC       1 (4)
-#define L1_ITLB_2M_ENTRIES   255 (32)
-#define L1_ITLB_4K_ASSOC       1 (6)
-#define L1_ITLB_4K_ENTRIES   255 (96)
-
-I am still reviewing how these constants flow through cpu_x86_cpuid() for leaf 
-0x80000005, so I'm not yet certain whether they are overridden.
-
-For now, the patchset can ignore Zhaoxin in leaf 0x80000005. Once I have traced 
-the code path, I will send an update if needed. Please include Zhaoxin in the 
-handling for leaf 0x80000006.
-
-I should have sent this after completing my review, but I did not want to delay 
-your work. Sorry for the noise.
-
-Thanks again for your work.
+> +
+>   	ret = seamcall_ret(TDH_MEM_PAGE_AUG, &args);
+>   
+>   	*ext_err1 = args.rcx;
 
 
