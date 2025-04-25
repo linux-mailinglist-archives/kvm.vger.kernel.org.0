@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-44271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC1FA9C196
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 10:40:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0649CA9C150
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 10:36:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD45F4631B2
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 08:40:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CADA188295B
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 08:36:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DDD24C068;
-	Fri, 25 Apr 2025 08:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943CD23958F;
+	Fri, 25 Apr 2025 08:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="N4iHjAOs"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="D6ykqhIW"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32ECD2472A5;
-	Fri, 25 Apr 2025 08:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85E2C22ACF3;
+	Fri, 25 Apr 2025 08:35:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745570149; cv=none; b=g0zIqEMC7s9n2oXF9LksYYgOLN8WRH9QzWsmC2riVJ++puaZMMes2qz30kQd6QmcJmYFJMATP61tccFKTFstSg/+k/w4hTEyFypMoTHKFUQjcZxuDXRRdMzqaLQtIWbCwwcJafqyjo3CTwwIUq3DauOBIK2HJ5FobL5TkJvCkgc=
+	t=1745570140; cv=none; b=QjX2d88tyRLzilPcDykaGIm2eHf1QQzDuQrLiBvd8GTPDPO/cUG5SBTVgXw9ODm7ts99L2fl4GnUm+rWIoa3P2Wg7npsXqUSoEviQ0Q5pKJw7TKccT7wmDHK/w7LDmc1fBpVLvkxrw+OqtSk4ANIg+Er21LOkjyXoaC5wYoxhLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745570149; c=relaxed/simple;
-	bh=NPYu9dMZ0QEuIKHfKjU0bccgmRlUtmCo9SldxSK28m8=;
+	s=arc-20240116; t=1745570140; c=relaxed/simple;
+	bh=qUuc4oOweRn55tsIyWC4WVxLKK9LCZ9yAv/+et/s6qk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lRAfGWFEiQ1A+ehjYsMuuZUXMGfLPFgYrCkrVKNE/4SooDDQ1caEBDvSEw3GOvwxjH3dVeo7WL6bRt5Dk7fNcmuUQz/9vEPsHyoIQl/9KNnR4NC939d6gVJ2tgkNYRN+zLVnrXGjxpRHZ2qetHNuEe5yKOks9vL3r+hkCGmwLNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=N4iHjAOs; arc=none smtp.client-ip=198.137.202.136
+	 MIME-Version; b=oAdn/i0QBrGvXbS3wM4hK9XW8wCuXSs6+LDMRysvPefbQ/AR2wvbio3Shjj7NSQHFxTOTEQ3BF7nqwxrSqMTLI3mbPqjhcsYoVn81AqmODRCxQnIty4+40tDf6DqGoZZc6BqjW5LV0bpI+EX8ormCvTfYEv8Su+X1LmmVrcuWL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=D6ykqhIW; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53P8Yg5R2390085
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53P8Yg5S2390085
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Fri, 25 Apr 2025 01:34:53 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53P8Yg5R2390085
+	Fri, 25 Apr 2025 01:34:55 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53P8Yg5S2390085
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745570095;
-	bh=nBz3GLFAwDoQVYhhWmv18m7tWTqjAgxiRsxoRTTSuK8=;
+	s=2025042001; t=1745570097;
+	bh=ubV3mxjb0pTABxeIf2EwXNL4ptnwNX7V+DrJijW3VC0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=N4iHjAOsm7Qruo8uIbG+2IuASClPrN9hxKCkrfsx1aETMmREIUcXntywT7wBkuUwu
-	 lt0Bxg1Y12NDCfA2HieEUq1WhbKx0df2GqsqLWC0ob1fOxi8WNCblWtZfESz0DitR1
-	 nK5chIFy932DtseX4200GLG1ei+SJ8wY9mmRh5cBYNqKZ7rn4DLSsFoxQG/8Z311r0
-	 iZn/ULykrenXKN++xbEhsqzLR+ARmf8G46JkGG6YVvM3gvk35IEvZHOadQRfRqZXM9
-	 p4f5jYi4F9YqcuJz4Hv8c6FFGVnqcvDEs7TBLV/ESOagIOc84Zi1O9KpQaxy+IIjnm
-	 FuIb8s9SqeeVw==
+	b=D6ykqhIW5txRLYZYcwQ42AvATqG8/xptzO4imIXAdEWMalWy8M3glva32nGrtHFei
+	 /gddxrxOgYkWsZPqUTIOJB8fVcRs87dV1EYsgGms4d1AT1hJXOnUELWuX6EZmYis/C
+	 RrF79OsPNKYQGXYtJ0+NXOxxQFb2mJWjrqo3spKq+zLzZ6F3FBTuEApP1qK7t3erln
+	 1xVgD0alMjSlqAP4c4CuGpPQcPiPoaZe0p3Pibky5/UWjvZOzZSch7ann3MW9QUXc2
+	 uf3MCVYJWYwCuA/ksmn2VQvV8q1rdBJnM1x7JxX6Ac6qWnwFJeisgLXSXxBQytavQw
+	 IDmwLyJ4IdHng==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -66,9 +66,9 @@ Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
         haiyangz@microsoft.com, decui@microsoft.com,
         dapeng1.mi@linux.intel.com
-Subject: [PATCH v3 03/14] x86/msr: Rename rdpmcl() to rdpmc()
-Date: Fri, 25 Apr 2025 01:34:26 -0700
-Message-ID: <20250425083442.2390017-4-xin@zytor.com>
+Subject: [PATCH v3 04/14] x86/msr: Convert the rdpmc() macro into an always inline function
+Date: Fri, 25 Apr 2025 01:34:27 -0700
+Message-ID: <20250425083442.2390017-5-xin@zytor.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250425083442.2390017-1-xin@zytor.com>
 References: <20250425083442.2390017-1-xin@zytor.com>
@@ -80,123 +80,135 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that rdpmc() is gone, i.e. rdpmcl() is the sole PMC read helper,
-simply rename rdpmcl() to rdpmc().
+Functions offer type safety and better readability compared to macros.
+Additionally, always inline functions can match the performance of
+macros.  Converting the rdpmc() macro into an always inline function
+is simple and straightforward, so just make the change.
+
+Moreover, the read result is now the returned value, further enhancing
+readability.
 
 Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
 ---
 
-Changes in v3:
-*) Explain the reason of the renaming in the changelog (Dave Hansen).
-*) Use shorter name rdpmc() instead of rdpmcq() as the name of the
-   sole PMC read helper (Sean Christopherson).
+Change in v3:
+*) Add a changelog even it's obvious (Dave Hansen).
 ---
  arch/x86/events/amd/uncore.c              |  2 +-
  arch/x86/events/core.c                    |  2 +-
  arch/x86/events/intel/core.c              |  4 ++--
  arch/x86/events/intel/ds.c                |  2 +-
- arch/x86/include/asm/msr.h                |  2 +-
- arch/x86/include/asm/paravirt.h           |  2 +-
+ arch/x86/include/asm/msr.h                |  5 ++++-
+ arch/x86/include/asm/paravirt.h           |  4 +---
  arch/x86/kernel/cpu/resctrl/pseudo_lock.c | 12 ++++++------
- 7 files changed, 13 insertions(+), 13 deletions(-)
+ 7 files changed, 16 insertions(+), 15 deletions(-)
 
 diff --git a/arch/x86/events/amd/uncore.c b/arch/x86/events/amd/uncore.c
-index 2a3259df619a..42c833cf9d98 100644
+index 42c833cf9d98..13c4cea545c5 100644
 --- a/arch/x86/events/amd/uncore.c
 +++ b/arch/x86/events/amd/uncore.c
 @@ -108,7 +108,7 @@ static void amd_uncore_read(struct perf_event *event)
  	if (hwc->event_base_rdpmc < 0)
  		rdmsrq(hwc->event_base, new);
  	else
--		rdpmcl(hwc->event_base_rdpmc, new);
-+		rdpmc(hwc->event_base_rdpmc, new);
+-		rdpmc(hwc->event_base_rdpmc, new);
++		new = rdpmc(hwc->event_base_rdpmc);
  
  	local64_set(&hwc->prev_count, new);
  	delta = (new << COUNTER_SHIFT) - (prev << COUNTER_SHIFT);
 diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index 85b55c1dc162..ea618dd8a678 100644
+index ea618dd8a678..d8634446684e 100644
 --- a/arch/x86/events/core.c
 +++ b/arch/x86/events/core.c
 @@ -134,7 +134,7 @@ u64 x86_perf_event_update(struct perf_event *event)
  	 */
  	prev_raw_count = local64_read(&hwc->prev_count);
  	do {
--		rdpmcl(hwc->event_base_rdpmc, new_raw_count);
-+		rdpmc(hwc->event_base_rdpmc, new_raw_count);
+-		rdpmc(hwc->event_base_rdpmc, new_raw_count);
++		new_raw_count = rdpmc(hwc->event_base_rdpmc);
  	} while (!local64_try_cmpxchg(&hwc->prev_count,
  				      &prev_raw_count, new_raw_count));
  
 diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 394fa83b537b..8ac7a03ae4e9 100644
+index 8ac7a03ae4e9..9fa94b6e4e74 100644
 --- a/arch/x86/events/intel/core.c
 +++ b/arch/x86/events/intel/core.c
 @@ -2724,12 +2724,12 @@ static u64 intel_update_topdown_event(struct perf_event *event, int metric_end,
  
  	if (!val) {
  		/* read Fixed counter 3 */
--		rdpmcl((3 | INTEL_PMC_FIXED_RDPMC_BASE), slots);
-+		rdpmc((3 | INTEL_PMC_FIXED_RDPMC_BASE), slots);
+-		rdpmc((3 | INTEL_PMC_FIXED_RDPMC_BASE), slots);
++		slots = rdpmc(3 | INTEL_PMC_FIXED_RDPMC_BASE);
  		if (!slots)
  			return 0;
  
  		/* read PERF_METRICS */
--		rdpmcl(INTEL_PMC_FIXED_RDPMC_METRICS, metrics);
-+		rdpmc(INTEL_PMC_FIXED_RDPMC_METRICS, metrics);
+-		rdpmc(INTEL_PMC_FIXED_RDPMC_METRICS, metrics);
++		metrics = rdpmc(INTEL_PMC_FIXED_RDPMC_METRICS);
  	} else {
  		slots = val[0];
  		metrics = val[1];
 diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
-index 410a8975d1b9..be05e93b48e7 100644
+index be05e93b48e7..a093cb485278 100644
 --- a/arch/x86/events/intel/ds.c
 +++ b/arch/x86/events/intel/ds.c
 @@ -2274,7 +2274,7 @@ intel_pmu_save_and_restart_reload(struct perf_event *event, int count)
  	WARN_ON(this_cpu_read(cpu_hw_events.enabled));
  
  	prev_raw_count = local64_read(&hwc->prev_count);
--	rdpmcl(hwc->event_base_rdpmc, new_raw_count);
-+	rdpmc(hwc->event_base_rdpmc, new_raw_count);
+-	rdpmc(hwc->event_base_rdpmc, new_raw_count);
++	new_raw_count = rdpmc(hwc->event_base_rdpmc);
  	local64_set(&hwc->prev_count, new_raw_count);
  
  	/*
 diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
-index e05466e486fc..ae96d35e0621 100644
+index ae96d35e0621..73d44081e597 100644
 --- a/arch/x86/include/asm/msr.h
 +++ b/arch/x86/include/asm/msr.h
-@@ -234,7 +234,7 @@ static inline int rdmsrq_safe(u32 msr, u64 *p)
+@@ -234,7 +234,10 @@ static inline int rdmsrq_safe(u32 msr, u64 *p)
  	return err;
  }
  
--#define rdpmcl(counter, val) ((val) = native_read_pmc(counter))
-+#define rdpmc(counter, val) ((val) = native_read_pmc(counter))
+-#define rdpmc(counter, val) ((val) = native_read_pmc(counter))
++static __always_inline u64 rdpmc(int counter)
++{
++	return native_read_pmc(counter);
++}
  
  #endif	/* !CONFIG_PARAVIRT_XXL */
  
 diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
-index c4dedb984735..faa0713553b1 100644
+index faa0713553b1..f272c4bd3d5b 100644
 --- a/arch/x86/include/asm/paravirt.h
 +++ b/arch/x86/include/asm/paravirt.h
-@@ -244,7 +244,7 @@ static inline u64 paravirt_read_pmc(int counter)
+@@ -239,13 +239,11 @@ static inline int rdmsrq_safe(unsigned msr, u64 *p)
+ 	return err;
+ }
+ 
+-static inline u64 paravirt_read_pmc(int counter)
++static __always_inline u64 rdpmc(int counter)
+ {
  	return PVOP_CALL1(u64, cpu.read_pmc, counter);
  }
  
--#define rdpmcl(counter, val) ((val) = paravirt_read_pmc(counter))
-+#define rdpmc(counter, val) ((val) = paravirt_read_pmc(counter))
- 
+-#define rdpmc(counter, val) ((val) = paravirt_read_pmc(counter))
+-
  static inline void paravirt_alloc_ldt(struct desc_struct *ldt, unsigned entries)
  {
+ 	PVOP_VCALL2(cpu.alloc_ldt, ldt, entries);
 diff --git a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
-index 26c354bdea07..15ff62d83bd8 100644
+index 15ff62d83bd8..61d762555a79 100644
 --- a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
 +++ b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
 @@ -1019,8 +1019,8 @@ static int measure_residency_fn(struct perf_event_attr *miss_attr,
  	 * used in L1 cache, second to capture accurate value that does not
  	 * include cache misses incurred because of instruction loads.
  	 */
--	rdpmcl(hit_pmcnum, hits_before);
--	rdpmcl(miss_pmcnum, miss_before);
-+	rdpmc(hit_pmcnum, hits_before);
-+	rdpmc(miss_pmcnum, miss_before);
+-	rdpmc(hit_pmcnum, hits_before);
+-	rdpmc(miss_pmcnum, miss_before);
++	hits_before = rdpmc(hit_pmcnum);
++	miss_before = rdpmc(miss_pmcnum);
  	/*
  	 * From SDM: Performing back-to-back fast reads are not guaranteed
  	 * to be monotonic.
@@ -204,10 +216,10 @@ index 26c354bdea07..15ff62d83bd8 100644
  	 * before proceeding.
  	 */
  	rmb();
--	rdpmcl(hit_pmcnum, hits_before);
--	rdpmcl(miss_pmcnum, miss_before);
-+	rdpmc(hit_pmcnum, hits_before);
-+	rdpmc(miss_pmcnum, miss_before);
+-	rdpmc(hit_pmcnum, hits_before);
+-	rdpmc(miss_pmcnum, miss_before);
++	hits_before = rdpmc(hit_pmcnum);
++	miss_before = rdpmc(miss_pmcnum);
  	/*
  	 * Use LFENCE to ensure all previous instructions are retired
  	 * before proceeding.
@@ -215,10 +227,10 @@ index 26c354bdea07..15ff62d83bd8 100644
  	 * before proceeding.
  	 */
  	rmb();
--	rdpmcl(hit_pmcnum, hits_after);
--	rdpmcl(miss_pmcnum, miss_after);
-+	rdpmc(hit_pmcnum, hits_after);
-+	rdpmc(miss_pmcnum, miss_after);
+-	rdpmc(hit_pmcnum, hits_after);
+-	rdpmc(miss_pmcnum, miss_after);
++	hits_after = rdpmc(hit_pmcnum);
++	miss_after = rdpmc(miss_pmcnum);
  	/*
  	 * Use LFENCE to ensure all previous instructions are retired
  	 * before proceeding.
