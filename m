@@ -1,111 +1,107 @@
-Return-Path: <kvm+bounces-44363-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44364-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6672BA9D506
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 00:06:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C09A6A9D525
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 00:09:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0D6F467BFD
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 22:06:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 504CA9C2FB4
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 22:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DDAB227E8C;
-	Fri, 25 Apr 2025 22:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647AD235347;
+	Fri, 25 Apr 2025 22:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SrVMUAhQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XN0VELUT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C72752F88
-	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 22:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4529B231A55
+	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 22:09:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745618762; cv=none; b=ZwsiCQu0frppdQx9UJ7WRwijoaLDeFiHiPvEyg6czdAIHnwIm63qnNCVjU6UCgPzRwwDdWGc+eSoNm8pHptuKmlW1gOaqneOA/VfstRD3Oegw1v3EDsItGIQIkFsEiWXVpWmQZAxgfwuAmIoGaYWt7nkNEptJc54nqyVAkkpP60=
+	t=1745618957; cv=none; b=nzutcfOV0ktZSDHi1EAXHjAOq652er7qjlodbwtbb/lQN+T20CvOVWl4RXuVNMYbQAbjnJX36FM0509V6XF+Pe25w50NE0kY7zwav7oYO9fh3KuZai1qL30wayTnOUhgfwdO94zlEArtnZ3rc4BcKAkZX7FZtaF95xNKAL+4GqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745618762; c=relaxed/simple;
-	bh=Eby3fI1huX4/RdmysDqATVL53vuaJbvBADSlNAMITsM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OU7gMzrT1XOuDQMXLPVk60jeilSwfcMcUAn0GOdzozx4f2CmTsDYTGkFHNfodGaxsr+KFD1fbDJbFi60kAGx8cOVmr6SrVL7BrJg52GPcj7paBWMznXTYBa8Py0DFYB1iwC5yoKeR/m32avNwTvCgNb7gpWjOGcX5x66NPzb+3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SrVMUAhQ; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1745618957; c=relaxed/simple;
+	bh=D6uCt3M5nUftHdnO587l7uapyumvFCQFOaKN0b6Chh8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KjS0OtoMKxgqhltBrjtt85OJ39x12qVh89ZxwZ8pkIWNcieA0V/hy/VcOMc7lNrP82nLtfCQ1We+uV8cXc3D3a7jUZJecjH6SWZOayHDbMJsG3SnC07nKmi8SNrsqMsttypHS3+7KlLmK7+pjxaz+it2XZKYdd0ozGfSxhy4gCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XN0VELUT; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b1442e039eeso1645495a12.0
-        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 15:06:00 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-73720b253fcso2337925b3a.2
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 15:09:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745618760; x=1746223560; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+F64d028KGAZtVO42dZa5glMoNqroKh2j9Vqgo+fbcU=;
-        b=SrVMUAhQpbuI1sabB6eQMDsjVAxGqwzwF3LSdtJ597pohg/5MXuvPTpqex3h7L2Hgr
-         0sWNxvyYcGzk6MuZIzNOZOW97RTydqYNkbf8txgcBu/6gFMk9LFvSAu4RcF/boHrn29G
-         XqQLHe1WnYZUYYMhAye5WnF6gXrU61L7NIZ2HCPCcCEXiTiz1n2tlOLptJ5WOtqey7J+
-         i68X9sxSCfucLqvGvlB5c03mkHI0KzkF/0H5P/ZJXFQsb3UTZTPtIbkPTD6xI9S0uXxG
-         xHN67mYV1NuLfFflHPzK0uNM7HeQ0xBQw/E3GvLuuHFqVzFe6xDCVEnMvouAP+pz2Jli
-         7U0g==
+        d=google.com; s=20230601; t=1745618955; x=1746223755; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e2GzbD4EGM+CSzFK8kCRHdpCdCIIlXbfHT6y+sz5OQE=;
+        b=XN0VELUT76uH+yHhm5VB59A9ZY8rET0N9w5MW4DIgDsBg7s0w5hheyybtqhdr/P+qd
+         RmjzDAcg4tiGcj9/gfIOGGK73MtAAbIuB0YqxT/sVV6lTRvdYeqMm1UOpLYQY9dBRSxY
+         FAFbjcBOom32ftQ6uLZVpKRGLncVqorMPWpfEpiZLXVtGXPVlVK7g7S1721HBeNSFCXv
+         X4qQMBKkHwOeMnUrE9fQgDxvgSF+eohtdWurMTObYEDeMcT5cOnUar10NDo8Yfno5bjl
+         rx+wn3MipWjvG8kYFZMbMcHIWAcm1ffqZvbEUItHOd6xYiAvnuzvpAb2AUjQLLnWQ9+D
+         L6EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745618760; x=1746223560;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+F64d028KGAZtVO42dZa5glMoNqroKh2j9Vqgo+fbcU=;
-        b=ACgMJ+DNqUe7ABa71MtfV7d6TYuLYGlN5uhIPVvEVrnx/iWedBIckSk0fQ3ykj1rdC
-         WZEd8FGyauCQCQb23Zc+N9a0NeQWFtNXae4DptApccsm/JhqCuTxsvI8YGZSjZeL6nsH
-         BmrlRA8SnFLqN29VdXeCyBW1YBf3sSOqILk6pIng7rc2aeAysdVcKOD5/jPPz4Ge4ffS
-         cKe6T4b/RShJSy9reMCZrVjqs79AGZHBFmwBj3qU8KYUF49fNqlTbEeT9BTYpjKXjXRO
-         YRlPdW2EOy1OVW786PszISvm3m0396ZTDq++QvFbS1K7keRLNVGtVijI8atRE7WarFnn
-         hAUg==
-X-Gm-Message-State: AOJu0YyfXHYo4kHUtFi/bmmAUzvqjZdGK86+eSOi1MGsTam2+jyaW+3N
-	ijKCRWhyjFndjntkULmCAjZ2t83hv43LkVmhnQ2lLCLBrP4OVCjA11/W9RpFyNK94ajrMXDGEKQ
-	MIA==
-X-Google-Smtp-Source: AGHT+IG952Uv6/0hQPrnSvK5NLnUeXaBFENlC3zogSUimsHmc5rnqfKymqfteMyM1KnXwxjOmYcnWcv6fsg=
-X-Received: from pjyp12.prod.google.com ([2002:a17:90a:e70c:b0:2fc:2ee0:d38a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5246:b0:2fe:e0a9:49d4
- with SMTP id 98e67ed59e1d1-309f7d876a2mr6375394a91.2.1745618760382; Fri, 25
- Apr 2025 15:06:00 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 25 Apr 2025 15:05:57 -0700
+        d=1e100.net; s=20230601; t=1745618955; x=1746223755;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e2GzbD4EGM+CSzFK8kCRHdpCdCIIlXbfHT6y+sz5OQE=;
+        b=f8vbbrkft+fWfeSQI3T+5W0IU2AKMTgm0igsKGobn13l3X5IMka4Zi4fqOC7KzWFGh
+         UQhbSiO2SkWwvDC5JBYtytxNczQPXRukME1FpjI9YyBKB4crbPFaSigZTZp4Oz+rVAHJ
+         62rtL8Pu4VO9YHOmmsbmpSAFI8qU/Xpy7ynOAqQCN9VrYuRLP1mFXcwAGlUhs0PgByfM
+         bXMuCkPau9rJl2JPMPKZ52dRO2OXHL4e/tgRRs0VaJTPb1lNODNI1rX04rZP1OBSuTe9
+         R8ndgUKwF1UFtzXgFSrVV8VW6QKnJWhkWf5NJhlm6+2ZcDUrjUrL2EaShOeRj+RpeQRN
+         493w==
+X-Forwarded-Encrypted: i=1; AJvYcCWkDJAZhALfcmTki5HOWpuNPEl/t4j3RNDHEPjo4w0suse7/YVHTI/0Mhb7imBj6nqwexM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySMznJ0m8SKkOLd+ZkWV9v4FQ+H7lyMn11cS3KgbNLffUXZKQ9
+	aZCNJvMWKkN+QPKDp9TjU1BkG4YePg4uonKrCjB5qurzQAUlkcydQ+VI2hPlys4KNtl8mSqrP4g
+	kyA==
+X-Google-Smtp-Source: AGHT+IEFA0r9U63O0zZjEatvnLlSDLoztxBfWPQXiWY/NYkA4ig26Zev691zUOoFw1e1JFnipYoUwsgVtv8=
+X-Received: from pfbna13.prod.google.com ([2002:a05:6a00:3e0d:b0:732:9235:5f2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:9299:b0:736:6279:ca25
+ with SMTP id d2e1a72fcca58-73fd9043a02mr6057722b3a.24.1745618955316; Fri, 25
+ Apr 2025 15:09:15 -0700 (PDT)
+Date: Fri, 25 Apr 2025 15:08:55 -0700
+In-Reply-To: <ec25aad1-113e-4c6e-8941-43d432251398@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <ec25aad1-113e-4c6e-8941-43d432251398@stanley.mountain>
 X-Mailer: git-send-email 2.49.0.850.g28803427d3-goog
-Message-ID: <20250425220557.989650-1-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH] scripts: Search the entire string for the
- correct accelerator
+Message-ID: <174559663411.890078.15043837914578345884.b4-ty@google.com>
+Subject: Re: [PATCH next] KVM: x86: Check that the high 32bits are clear in kvm_arch_vcpu_ioctl_run()
 From: Sean Christopherson <seanjc@google.com>
-To: Thomas Huth <thuth@redhat.com>, Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Pankaj Gupta <pankaj.gupta@amd.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-Search the entire ACCEL string for the required accelerator as searching
-for an exact match incorrectly rejects ACCEL when additional accelerator
-specific options are provided, e.g.
+On Mon, 24 Mar 2025 13:51:28 +0300, Dan Carpenter wrote:
+> The "kvm_run->kvm_valid_regs" and "kvm_run->kvm_dirty_regs" variables are
+> u64 type.  We are only using the lowest 3 bits but we want to ensure that
+> the users are not passing invalid bits so that we can use the remaining
+> bits in the future.
+> 
+> However "sync_valid_fields" and kvm_sync_valid_fields() are u32 type so
+> the check only ensures that the lower 32 bits are clear.  Fix this by
+> changing the types to u64.
+> 
+> [...]
 
-  SKIP pmu (kvm only, but ACCEL=kvm,kernel_irqchip=on)
+Applied to kvm-x86 fixes, thanks!
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- scripts/runtime.bash | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+[1/1] KVM: x86: Check that the high 32bits are clear in kvm_arch_vcpu_ioctl_run()
+      commit: a476cadf8ef1fbb9780581316f0199dfc62a81f2
 
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 4b9c7d6b..59d1727c 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -126,7 +126,7 @@ function run()
-         machine="$MACHINE"
-     fi
- 
--    if [ -n "$accel" ] && [ -n "$ACCEL" ] && [ "$accel" != "$ACCEL" ]; then
-+    if [ -n "$accel" ] && [ -n "$ACCEL" ] && [[ ! "$ACCEL" =~ $accel ]]; then
-         print_result "SKIP" $testname "" "$accel only, but ACCEL=$ACCEL"
-         return 2
-     elif [ -n "$ACCEL" ]; then
-
-base-commit: 0d3cb7dd56ec255a71af867c2d76c8f4b22cd420
--- 
-2.49.0.850.g28803427d3-goog
-
+--
+https://github.com/kvm-x86/linux/tree/next
 
