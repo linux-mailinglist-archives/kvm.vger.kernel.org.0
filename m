@@ -1,113 +1,366 @@
-Return-Path: <kvm+bounces-44341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44342-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB74EA9D2C6
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 22:14:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B522A9D347
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 22:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F5AA17E08C
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 20:14:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4402B1899277
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 20:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FC821FF35;
-	Fri, 25 Apr 2025 20:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5870E222585;
+	Fri, 25 Apr 2025 20:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="LoudM2O5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PqKDns7J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF7018DB02;
-	Fri, 25 Apr 2025 20:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43469223DD0
+	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 20:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745612044; cv=none; b=sp91BArNqj6Phs9RWqq1MVLvwgfgUHUJ4KqFkOmKpLEUbAkITnWByLNJz6YiCTxjKGE6I4buakGEE1x8oO6XJPBHsI4wk6rE/QETq/FCSmm1Q7SUHYpkr45s6xS2nvM0Kv81p/v0i0NfL8yLNeVqeBUVx92rAgrwNj6eKEJmii0=
+	t=1745614070; cv=none; b=sYzfgVdUcHpLOqMQDqSy/JdMxcI2YPEe7Kcx7J72eMMlxNjzS/ilPE9q+1k4aNnsPkCkvzR/TSNd9TvfXc7Tl3CMP21LLhedo/xiRPbNTu8eebWpG0ijIKtD0NbbfzP3u0VuImsqsE9Hc7c9+D+2BTDtQPU6Rz4kXUyXud+rOGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745612044; c=relaxed/simple;
-	bh=Pgn/TZ1ujuuwbnzguLrmQLLDyPec5k7g882M+f0Gsi8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=M9+r+P3gfZZetmZPbQhgWB/kwEhQGCGOHh6DMLbBvuv28JJuzmumxl9PNeMdB0spGiXuGhjl55np4YEU91C1+fiudletsi2dNvqfI4/I0LQHK7DAkDRM+XiIbBUTghzGQUMTt+PIEkszl1ft79YZ0NKgeLvpx8STCVscfwmNI/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=LoudM2O5; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53PKCYWU3252234
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 25 Apr 2025 13:12:35 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53PKCYWU3252234
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745611957;
-	bh=Pgn/TZ1ujuuwbnzguLrmQLLDyPec5k7g882M+f0Gsi8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=LoudM2O5Ggb8UKAE6BloQQgcPc3DDE93Uie4tiM2kEIfkYTDiUipcf8Neu/KvASRD
-	 bE9VD4R7oFqzmvtHTCFXcREprEax191bGlgx7zIbx5omdo51jLm5RkfhQX4yDbIVRa
-	 GVL5VijALlpGtEZskIkKxZJvEBt7FnMylbJIzjd/5nwjnzxaNo83Yy1fNK7XF6PF8t
-	 DnRu+iOKDqlUdSjj+DZ7GCvEpBZIZH9XdMoGw1VbkegsrdCwgEQlt1Pl2oarHuisPj
-	 gl4+pko/7dDkS+MuVeY76Vou/tfvTznub+Ylyb0SFF25MRCp2uGdpU5pdOUWL4jNE7
-	 1qvVj2z6FqDTA==
-Date: Fri, 25 Apr 2025 13:12:33 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: =?ISO-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>
-CC: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
-        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, acme@kernel.org,
-        andrew.cooper3@citrix.com, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com
-Subject: =?US-ASCII?Q?Re=3A_=5BRFC_PATCH_v2_21/34=5D_x86/msr=3A_Utiliz?=
- =?US-ASCII?Q?e_the_alternatives_mechanism_to_write_MSR?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <35979102-2eb2-4566-b32a-f2b02ded8ae6@suse.com>
-References: <20250422082216.1954310-1-xin@zytor.com> <20250422082216.1954310-22-xin@zytor.com> <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com> <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com> <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com> <20250425123317.GB22125@noisy.programming.kicks-ass.net> <35979102-2eb2-4566-b32a-f2b02ded8ae6@suse.com>
-Message-ID: <D4ADDBA5-D9B8-4DD5-8D83-8CD482700E71@zytor.com>
+	s=arc-20240116; t=1745614070; c=relaxed/simple;
+	bh=98O+KkdivsDO2NWqnfOCx4x9uuOJMoVs1VBvNP5nxk0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BYECUGDHmiMD6+05r+ApQs3NdB8wUBs8VFxXpBwupF2GeQpJpEYqy5cwd44yPsc6mBJMIPrcavTkkb37dtV9DZ3aVvfHube/o4KZcm66oEMo60svOnu3pA8OTQPnKiy/ibCFZcw3+kCGSPMQUC4xP7F5rvJXGSsy3SbiKWgGsv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PqKDns7J; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff58318acaso4006186a91.0
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 13:47:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745614065; x=1746218865; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=w93cnDYfUyiX3NqBVzeAn79Hgen+5N/FYQPParAKnhQ=;
+        b=PqKDns7JHpnkyaT91RItA6V8r5cEdFqNVQjQn62cJB8tIHOfXtLM0Tc9LGk+tmxPOJ
+         fCOgt1cLjkZEK2zVDcMGk0ZwHae4AGdEsOw4VVRUTkNuz6lsWge+agR/QcXp/TcZHe09
+         E7FaBshmtbglJ6SUrnH2cgq663ecRe8Fij1sWbaf7Ki7Ardsw0NVHoWye1JWzgITOBoy
+         ysdGs8h4Z5bckafQMpObRQ3a46h+S4GwqnlbU/ekRPvajU0G2/k2K4+nT9x1rXDgB8au
+         JKRnVxcPyDD2ToM3E1vlv+cctBrcmC6pb+5dy133UgnNi9711dKsfuDezhDdgFMTDp49
+         3bDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745614065; x=1746218865;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w93cnDYfUyiX3NqBVzeAn79Hgen+5N/FYQPParAKnhQ=;
+        b=NtJja1zfvnRuHHbQcPrC3Tio8c1p3Vc6XbeBB+q6oEvnpY7M5EPbTpbmq5XrwadNJf
+         zkZmz2o7jWENLdE6BZmALYasDMAvKXjAMLAz32aWSeGg0suXNdKsnzTulO0iWQcaWzRI
+         39FB6htsqmJap7SOJg0I2bEiF6z5ft3UEOri5hBtK57f4UIfZ6I3WWNmTybQXloy+g6P
+         HHaOGuC/X2VjLG3PJ8cbwtMIJeQ+5p3RjYsNxXZJR4xlEu8Wp0W1wtxq8bDqthALrskG
+         XL26x8J6XeVBznT6yz/Gv3jxvjP1MDB+gfJLpijIrbq4pkCqL8LTs8FPFnEoDTOL/Nw/
+         /aFg==
+X-Forwarded-Encrypted: i=1; AJvYcCV7Ean8PaxM13FfIgTZE5uvDTE8Q+aOl7NyUvMMZ9uu6kXRwDFuO9jGLDFhTJ2vih55MxQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1Y+H+8Lw48gfazu3PKj8gi6FYCqaTYbt0fHNnQfVhGY+qaPl/
+	CuAy4W3gCJAgTaeQR4GiFkzZEAvuj3ZvC2GesRjOqWdSP9Pk52cL/cL2aU7v3lfaS7HSQFxPQb8
+	7xyOphjIEJe/HCxahRjcG1Q==
+X-Google-Smtp-Source: AGHT+IElsDlgZtm0qslaoMp4DvG4HrVO6SLFpboJQPIP7FDyvtlonFTuZasyTa7DPCPphx6QX3BLdL/MVhbqWF/zEA==
+X-Received: from pjbqd16.prod.google.com ([2002:a17:90b:3cd0:b0:2fc:aac:e580])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:52c7:b0:2ff:693a:7590 with SMTP id 98e67ed59e1d1-309f7ec20famr6324345a91.33.1745614065520;
+ Fri, 25 Apr 2025 13:47:45 -0700 (PDT)
+Date: Fri, 25 Apr 2025 20:47:34 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.850.g28803427d3-goog
+Message-ID: <20250425204743.617260-1-almasrymina@google.com>
+Subject: [PATCH net-next v12 0/9] Device memory TCP TX
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On April 25, 2025 5:51:27 AM PDT, "J=C3=BCrgen Gro=C3=9F" <jgross@suse=2Eco=
-m> wrote:
->On 25=2E04=2E25 14:33, Peter Zijlstra wrote:
->> On Wed, Apr 23, 2025 at 06:05:19PM +0200, J=C3=BCrgen Gro=C3=9F wrote:
->>=20
->>>> It's not a major change, but when it is patched to use the immediate
->>>> form MSR write instruction, it's straightforwardly streamlined=2E
->>>=20
->>> It should be rather easy to switch the current wrmsr/rdmsr paravirt pa=
-tching
->>> locations to use the rdmsr/wrmsr instructions instead of doing a call =
-to
->>> native_*msr()=2E
->>=20
->> Right, just make the Xen functions asm stubs that expect the instructio=
-n
->> registers instead of C-abi and ALT_NOT_XEN the thing=2E
->>=20
->> Shouldn't be hard at all=2E
->
->Correct=2E And for the new immediate form we can use ALTERNATIVE_3()=2E
->
->
->Juergen
+v12: https://lore.kernel.org/netdev/20250423031117.907681-1-almasrymina@google.com/
+====
 
-Yes; in the ultimate case there are *four* alternatives, but the concept i=
-s the same and again we have it implemented already=2E
+No changes in v12, just restored the selftests patch I accidentally dropped in
+v11
+
+v11: https://lore.kernel.org/netdev/20250423031117.907681-1-almasrymina@google.com/
+====
+
+Addressed a couple of nits and collected Acked-by from Harshitha
+(thanks!)
+
+v10: https://lore.kernel.org/netdev/20250417231540.2780723-1-almasrymina@google.com/
+====
+
+Addressed comments following conversations with Pavel, Stan, and
+Harshitha. Thank you guys for the reviews again. Overall minor changes:
+
+Changelog:
+- Check for !niov->pp in io_zcrx_recv_frag, just in case we end up with
+  a TX niov in that path (Pavel).
+- Fix locking case in !netif_device_present (Jakub/Stan).
+
+v9: https://lore.kernel.org/netdev/20250415224756.152002-1-almasrymina@google.com/
+===
+
+Changelog:
+- Use priv->bindings list instead of sock_bindings_list. This was missed
+  during the rebase as the bindings have been updated to use
+  priv->bindings recently (thanks Stan!)
+
+v8: https://lore.kernel.org/netdev/20250308214045.1160445-1-almasrymina@google.com/
+===
+
+Only address minor comments on V7
+
+Changelog:
+- Use netdev locking instead of rtnl_locking to match rx path.
+- Now that iouring zcrx is in net-next, use NET_IOV_IOURING instead of
+  NET_IOV_UNSPECIFIED.
+- Post send binding to net_devmem_dmabuf_bindings after it's been fully
+  initialized (Stan).
+
+v7: https://lore.kernel.org/netdev/20250227041209.2031104-1-almasrymina@google.com/
+===
+
+Changelog:
+- Check the dmabuf net_iov binding belongs to the device the TX is going
+  out on. (Jakub)
+- Provide detailed inspection of callsites of
+  __skb_frag_ref/skb_page_unref in patch 2's changelog (Jakub)
+
+v6: https://lore.kernel.org/netdev/20250222191517.743530-1-almasrymina@google.com/
+===
+
+v6 has no major changes. Addressed a few issues from Paolo and David,
+and collected Acks from Stan. Thank you everyone for the review!
+
+Changes:
+- retain behavior to process MSG_FASTOPEN even if the provided cmsg is
+  invalid (Paolo).
+- Rework the freeing of tx_vec slightly (it now has its own err label).
+  (Paolo).
+- Squash the commit that makes dmabuf unbinding scheduled work into the
+  same one which implements the TX path so we don't run into future
+  errors on bisecting (Paolo).
+- Fix/add comments to explain how dmabuf binding refcounting works
+  (David).
+
+v5: https://lore.kernel.org/netdev/20250220020914.895431-1-almasrymina@google.com/
+===
+
+v5 has no major changes; it clears up the relatively minor issues
+pointed out to in v4, and rebases the series on top of net-next to
+resolve the conflict with a patch that raced to the tree. It also
+collects the review tags from v4.
+
+Changes:
+- Rebase to net-next
+- Fix issues in selftest (Stan).
+- Address comments in the devmem and netmem driver docs (Stan and Bagas)
+- Fix zerocopy_fill_skb_from_devmem return error code (Stan).
+
+v4: https://lore.kernel.org/netdev/20250203223916.1064540-1-almasrymina@google.com/
+===
+
+v4 mainly addresses the critical driver support issue surfaced in v3 by
+Paolo and Stan. Drivers aiming to support netmem_tx should make sure not
+to pass the netmem dma-addrs to the dma-mapping APIs, as these dma-addrs
+may come from dma-bufs.
+
+Additionally other feedback from v3 is addressed.
+
+Major changes:
+- Add helpers to handle netmem dma-addrs. Add GVE support for
+  netmem_tx.
+- Fix binding->tx_vec not being freed on error paths during the
+  tx binding.
+- Add a minimal devmem_tx test to devmem.py.
+- Clean up everything obsolete from the cover letter (Paolo).
+
+v3: https://patchwork.kernel.org/project/netdevbpf/list/?series=929401&state=*
+===
+
+Address minor comments from RFCv2 and fix a few build warnings and
+ynl-regen issues. No major changes.
+
+RFC v2: https://patchwork.kernel.org/project/netdevbpf/list/?series=920056&state=*
+=======
+
+RFC v2 addresses much of the feedback from RFC v1. I plan on sending
+something close to this as net-next  reopens, sending it slightly early
+to get feedback if any.
+
+Major changes:
+--------------
+
+- much improved UAPI as suggested by Stan. We now interpret the iov_base
+  of the passed in iov from userspace as the offset into the dmabuf to
+  send from. This removes the need to set iov.iov_base = NULL which may
+  be confusing to users, and enables us to send multiple iovs in the
+  same sendmsg() call. ncdevmem and the docs show a sample use of that.
+
+- Removed the duplicate dmabuf iov_iter in binding->iov_iter. I think
+  this is good improvment as it was confusing to keep track of
+  2 iterators for the same sendmsg, and mistracking both iterators
+  caused a couple of bugs reported in the last iteration that are now
+  resolved with this streamlining.
+
+- Improved test coverage in ncdevmem. Now multiple sendmsg() are tested,
+  and sending multiple iovs in the same sendmsg() is tested.
+
+- Fixed issue where dmabuf unmapping was happening in invalid context
+  (Stan).
+
+====================================================================
+
+The TX path had been dropped from the Device Memory TCP patch series
+post RFCv1 [1], to make that series slightly easier to review. This
+series rebases the implementation of the TX path on top of the
+net_iov/netmem framework agreed upon and merged. The motivation for
+the feature is thoroughly described in the docs & cover letter of the
+original proposal, so I don't repeat the lengthy descriptions here, but
+they are available in [1].
+
+Full outline on usage of the TX path is detailed in the documentation
+included with this series.
+
+Test example is available via the kselftest included in the series as well.
+
+The series is relatively small, as the TX path for this feature largely
+piggybacks on the existing MSG_ZEROCOPY implementation.
+
+Patch Overview:
+---------------
+
+1. Documentation & tests to give high level overview of the feature
+   being added.
+
+1. Add netmem refcounting needed for the TX path.
+
+2. Devmem TX netlink API.
+
+3. Devmem TX net stack implementation.
+
+4. Make dma-buf unbinding scheduled work to handle TX cases where it gets
+   freed from contexts where we can't sleep.
+
+5. Add devmem TX documentation.
+
+6. Add scaffolding enabling driver support for netmem_tx. Add helpers, driver
+feature flag, and docs to enable drivers to declare netmem_tx support.
+
+7. Guard netmem_tx against being enabled against drivers that don't
+   support it.
+
+8. Add devmem_tx selftests. Add TX path to ncdevmem and add a test to
+   devmem.py.
+
+Testing:
+--------
+
+Testing is very similar to devmem TCP RX path. The ncdevmem test used
+for the RX path is now augemented with client functionality to test TX
+path.
+
+* Test Setup:
+
+Kernel: net-next with this RFC and memory provider API cherry-picked
+locally.
+
+Hardware: Google Cloud A3 VMs.
+
+NIC: GVE with header split & RSS & flow steering support.
+
+Performance results are not included with this version, unfortunately.
+I'm having issues running the dma-buf exporter driver against the
+upstream kernel on my test setup. The issues are specific to that
+dma-buf exporter and do not affect this patch series. I plan to follow
+up this series with perf fixes if the tests point to issues once they're
+up and running.
+
+Special thanks to Stan who took a stab at rebasing the TX implementation
+on top of the netmem/net_iov framework merged. Parts of his proposal [2]
+that are reused as-is are forked off into their own patches to give full
+credit.
+
+[1] https://lore.kernel.org/netdev/20240909054318.1809580-1-almasrymina@google.com/
+[2] https://lore.kernel.org/netdev/20240913150913.1280238-2-sdf@fomichev.me/T/#m066dd407fbed108828e2c40ae50e3f4376ef57fd
+
+Cc: sdf@fomichev.me
+Cc: asml.silence@gmail.com
+Cc: dw@davidwei.uk
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Victor Nogueira <victor@mojatatu.com>
+Cc: Pedro Tammela <pctammela@mojatatu.com>
+Cc: Samiullah Khawaja <skhawaja@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+
+Mina Almasry (8):
+  netmem: add niov->type attribute to distinguish different net_iov
+    types
+  net: add get_netmem/put_netmem support
+  net: devmem: Implement TX path
+  net: add devmem TCP TX documentation
+  net: enable driver support for netmem TX
+  gve: add netmem TX support to GVE DQO-RDA mode
+  net: check for driver support in netmem TX
+  selftests: ncdevmem: Implement devmem TCP TX
+
+Stanislav Fomichev (1):
+  net: devmem: TCP tx netlink api
+
+ Documentation/netlink/specs/netdev.yaml       |  12 +
+ Documentation/networking/devmem.rst           | 150 ++++++++-
+ .../networking/net_cachelines/net_device.rst  |   1 +
+ Documentation/networking/netdev-features.rst  |   5 +
+ Documentation/networking/netmem.rst           |  23 +-
+ drivers/net/ethernet/google/gve/gve_main.c    |   3 +
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c  |   8 +-
+ include/linux/netdevice.h                     |   2 +
+ include/linux/skbuff.h                        |  17 +-
+ include/linux/skbuff_ref.h                    |   4 +-
+ include/net/netmem.h                          |  34 +-
+ include/net/sock.h                            |   1 +
+ include/uapi/linux/netdev.h                   |   1 +
+ io_uring/zcrx.c                               |   3 +-
+ net/core/datagram.c                           |  48 ++-
+ net/core/dev.c                                |  34 +-
+ net/core/devmem.c                             | 133 ++++++--
+ net/core/devmem.h                             |  83 ++++-
+ net/core/netdev-genl-gen.c                    |  13 +
+ net/core/netdev-genl-gen.h                    |   1 +
+ net/core/netdev-genl.c                        |  80 ++++-
+ net/core/skbuff.c                             |  48 ++-
+ net/core/sock.c                               |   6 +
+ net/ipv4/ip_output.c                          |   3 +-
+ net/ipv4/tcp.c                                |  50 ++-
+ net/ipv6/ip6_output.c                         |   3 +-
+ net/vmw_vsock/virtio_transport_common.c       |   5 +-
+ tools/include/uapi/linux/netdev.h             |   1 +
+ .../selftests/drivers/net/hw/devmem.py        |  26 +-
+ .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
+ 30 files changed, 1010 insertions(+), 88 deletions(-)
+
+
+base-commit: 4acf6d4f6afc3478753e49c495132619667549d9
+-- 
+2.49.0.850.g28803427d3-goog
+
 
