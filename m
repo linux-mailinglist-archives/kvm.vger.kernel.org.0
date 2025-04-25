@@ -1,107 +1,94 @@
-Return-Path: <kvm+bounces-44374-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44375-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF2C6A9D62E
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 01:23:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3D2DA9D62F
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 01:23:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6ED49A1511
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 23:23:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C2BB4E260C
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 23:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EBB4297A48;
-	Fri, 25 Apr 2025 23:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A598E297A40;
+	Fri, 25 Apr 2025 23:23:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Poums8hn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OddkwAGi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6541218821
-	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 23:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812572973CA
+	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 23:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745623410; cv=none; b=WVesmwzY6HDhiczEP5Am+dQDrWP8FTkRWOBzLRqj5vzUqYxja7ZAwPaPzAqDmm2/d+wISW3EEB+SrKyf9CyagIoiResZ6EJ5/M6KoeMkJW1u/cdkALclhQu2HpycNhicSJuFGQHSdtAwexy/RBfzGt8xpR/Nx5ndesDZXxsBHPY=
+	t=1745623419; cv=none; b=PFuVjkTzE6CTyUXFm23lkR9frvlkKVZSO2ifElUzWvbzXskX3HHWVKJfeqYkRDo5BDzcJpdulNpFIheHuRuE+DaiWW8RXhbtI4DFjQS83xxjQliMMzQ7RpQDZj7rasI6YJNaX4JGKy8C0MxKXBuLi9KnDizF1TCSqNaeZ24QHIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745623410; c=relaxed/simple;
-	bh=xRQfMP1XFOx9qITimYkGXWDvRrdKrkeHm+DJCoV+Prk=;
+	s=arc-20240116; t=1745623419; c=relaxed/simple;
+	bh=GB7sd8MGwtzcKnzQDfwBPT+X+eVPAv+t8OzjGOIvpVA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=feGT8oduWrP/ibANfYeWICeZN41WGufzUhjo7JzdNpgcFWTJ1N0W6znNQ5q7LG6J4hvq24t1l/QDcTdRiZkfFywO9wyAY13Nwtc3ydUvOvULQzNcwk4FO+SpqF5kriFZ1+2+/+p+Dwf8593uj7mVoQMNWkDi9h0OPsGYp5AZPdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Poums8hn; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=NEjt7ddSE3Ldx/gsrI1lDbF781z4DizWfyA+UpKo3Kp/EyGRU5IaJLutvJWt4s2L0rPIeumXUJy1Vwlv6zWPvT733oJaIXArm0rUkZbTOY87LyIM9LoUnV8hTv7D6gMQyt3ZT8BsPPFrTmxiFheAh9ORrywLDCrlFUn+NpcsbmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OddkwAGi; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2254e500a73so19642605ad.0
-        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 16:23:28 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b0b2de67d6aso2956828a12.1
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 16:23:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745623408; x=1746228208; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1745623418; x=1746228218; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ywngk5EyrH43CSmFrX2G8BVOihut64iaWtRXLrbOWSE=;
-        b=Poums8hnsmcZsMIzFoYFHduhssn2oN/W2959doE6GOJ2ODHHIbeGgyOSuXdVOjGHIV
-         lU0/KyA0kvl6YbdfVFwW9FmXg0JtgBQxo5Byo4UIzfTnPkJ2i7Amj+t7DpeYo99AtG+p
-         bmuDz+hHdqEBEJl+Gt4kYdA2OBcXdcCK0dMc+AC9H0yy2ImcKTBAQykJszPyLujJWMDq
-         s0K0xp9mHSYeULUQ8fXRupAakQtZydXEB3FzmDExMAU9MdZ9SuSuT6VmqaxgmTCG3bJ9
-         /HC7EGhQpnKTGc2WIY8fGGQjlOYDTW/rVRps6UHgpIz5VwxTnpMXbs8wxglvxLiNHwcC
-         R4dQ==
+        bh=X0Z5jrWv1CabzXp7vnrRsFuaqojUSR2Bu2m+RsiTvL8=;
+        b=OddkwAGi+pfZdtGijzLUEXtkV6Icht3rZCNVVLCS5MEk6IYXeJqg1oaB9Wzju3xgfT
+         l+ceWXZpMfSSJEh9vZt8sV2t8GrX4TJLSlMpnz26ydhMZ2DyaDqmEeYiuhqd1Heifg6b
+         ER3N7I6CHRdp/PXhWxUbTneEQ34KEw6CfaMD6pbPoK9BTE9Y/Lb+ePYpRbLXARAcq10n
+         8MkHuv3QkDmhtlrbrHrs9iGS779y/lGDOV9rGKbweyHa/9wubutXYsP9W1W9c7L+5FdD
+         XWL8aCM3Yr7jf6kK+ZNLJT1zj+JO+5fzh2FdkYkGOl/oj79vSzIRNVvnAqiuQ+30MaYj
+         VBeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745623408; x=1746228208;
+        d=1e100.net; s=20230601; t=1745623418; x=1746228218;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ywngk5EyrH43CSmFrX2G8BVOihut64iaWtRXLrbOWSE=;
-        b=Em3yKM0sCc3UbouLpL/434gnitE7JeTrjCatFVmqwL5Jc6T8R3/h8YBBb2X0naVDYY
-         vxSv5bvUoUYgbZ7czyVKcxraaOe9zoqahCXk/vr4OBR1i8McwKeuWTfNiyDTQkDFM20p
-         JJZEvrS9HK0EpYgd6XmCbbVsTvUOPCdvZfR1YxffQdYRTofC1mi8YDKhD8vkesnZisBU
-         nJ/EZK2L5KBDm1RZb0HN7v8RTnJ3TDcC5Vu2rlDQfeWrkADqUv+iCnD973T4H0rtqGxC
-         JWO5yiZ68BZRLGdy4uhPIS4abT/8plITenCNLkKC1pEtt86XsghUcDF/3KS1qrE3Gs63
-         DIQg==
-X-Forwarded-Encrypted: i=1; AJvYcCVMorXPYrgw9+zF/UxFvdhav/rZ5idWRL8P/dNJ5m36/SMenwLUqQ6jtAhT/TngfcLW4wk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9SejAuUOU4sBN5W4JLCy/4mQzaj/0Ys83t301IRQMXWon0DCz
-	6xUxX3tW5YETamgETkmm6HFA9a0UV+985Vmuok5+H+aUCtqTpBbe/rG6cqBlQwIOHGn1cq3DwRM
-	WqQ==
-X-Google-Smtp-Source: AGHT+IHVxXK3XxZbeGt/u4CyqKrgiBasZXhRdDliozQ4/a+jP1h/kb8v1M5XZMgqEeCFii+UcH9HIfN932k=
-X-Received: from plblf7.prod.google.com ([2002:a17:902:fb47:b0:220:ddee:5ee])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2ec7:b0:223:5945:ffd5
- with SMTP id d9443c01a7336-22dbf6409femr57525515ad.32.1745623408006; Fri, 25
- Apr 2025 16:23:28 -0700 (PDT)
-Date: Fri, 25 Apr 2025 16:23:14 -0700
-In-Reply-To: <ee1c08fc400bb574a2b8f2c6a0bd9def10a29d35.1744130533.git.babu.moger@amd.com>
+        bh=X0Z5jrWv1CabzXp7vnrRsFuaqojUSR2Bu2m+RsiTvL8=;
+        b=UocjsXg5LUvuKpm/v6njEqcCUa7gVnwwWhis4Af6PapRTgaymJSPh35HDyD0bP/XTP
+         6BWNZfPCfReqXzE9+2wR+phxEuI8a52dnZFcv2kR+gbnUr9lt+neYICVXNuZofQDV2ia
+         tSMn35UYO8muxQFoWtWZ4tthdEaHaVq7v+7UTQXDc9YQJvcRhLdsi9dzAyKQkDsM88if
+         VDrZOBr3bibxK2vBNpR4ZdLYR1k4RmVkadtEFg7GHWcHnouJp+5GWwd2tIjUkf+ymWBl
+         AWW0e4Stm60xK7PAfM9M7y6Tl0RagmjfP9TP5NUALGvvENAWLZJaiy3txiJwFWp9lP+1
+         ikdQ==
+X-Gm-Message-State: AOJu0YyjvmJyt4mQRfvedFUkDHfrdFmRJeKCUH/WFaKhAIgituHRvAFV
+	BeV9dr8lhdUWzgTJwyIMLGo3GqpYMUB4FS/tDiamWSVbjpEGsEZjBYQUHb3ljTzwROY9YMS5acI
+	K5w==
+X-Google-Smtp-Source: AGHT+IHVpZWCS/xkKKY2zkJW9wM8MORIqBRP7NgFuMtVxTOmo2kY/V2e2wSLMu/OedKX56XMy5SVQWsLAm0=
+X-Received: from pfbjw10.prod.google.com ([2002:a05:6a00:928a:b0:732:2279:bc82])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:78a3:b0:1f5:902e:1e8c
+ with SMTP id adf61e73a8af0-2045b9f9791mr5498419637.42.1745623417711; Fri, 25
+ Apr 2025 16:23:37 -0700 (PDT)
+Date: Fri, 25 Apr 2025 16:23:16 -0700
+In-Reply-To: <20250306075425.66693-1-flyingpeng@tencent.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <ee1c08fc400bb574a2b8f2c6a0bd9def10a29d35.1744130533.git.babu.moger@amd.com>
+References: <20250306075425.66693-1-flyingpeng@tencent.com>
 X-Mailer: git-send-email 2.49.0.850.g28803427d3-goog
-Message-ID: <174562166515.1002335.4837189500291274188.b4-ty@google.com>
-Subject: Re: [PATCH] x86/cpufeatures: Define X86_FEATURE_PREFETCHI (AMD)
+Message-ID: <174562140120.1000934.7661370031788311289.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: SVM: avoid frequency indirect calls
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, pbonzini@redhat.com, 
-	Babu Moger <babu.moger@amd.com>
-Cc: x86@kernel.org, hpa@zytor.com, daniel.sneddon@linux.intel.com, 
-	jpoimboe@kernel.org, pawan.kumar.gupta@linux.intel.com, 
-	thomas.lendacky@amd.com, perry.yuan@amd.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, flyingpenghao@gmail.com
+Cc: kvm@vger.kernel.org, Peng Hao <flyingpeng@tencent.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Tue, 08 Apr 2025 17:57:09 -0500, Babu Moger wrote:
-> The latest AMD platform has introduced a new instruction called PREFETCHI.
-> This instruction loads a cache line from a specified memory address into
-> the indicated data or instruction cache level, based on locality reference
-> hints.
-> 
-> Feature bit definition:
-> CPUID_Fn80000021_EAX [bit 20] - Indicates support for IC prefetch.
-> 
-> [...]
+On Thu, 06 Mar 2025 15:54:25 +0800, flyingpenghao@gmail.com wrote:
+> When retpoline is enabled, indirect function calls introduce additional
+> performance overhead. Avoid frequent indirect calls to VMGEXIT when SEV
+> is enabled.
 
-Applied to kvm-x86 misc, with a rewritten shortlog and changelog to make it super
-clear this is KVM enabling.
+Applied to kvm-x86 svm, thanks!
 
-[1/1] KVM: x86: Advertise support for AMD's PREFETCHI
-      https://github.com/kvm-x86/linux/commit/d88bb2ded2ef
+[1/1] KVM: SVM: avoid frequency indirect calls
+      https://github.com/kvm-x86/linux/commit/bb5081f4abf2
 
 --
 https://github.com/kvm-x86/linux/tree/next
