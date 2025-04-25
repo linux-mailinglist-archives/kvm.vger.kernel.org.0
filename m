@@ -1,96 +1,98 @@
-Return-Path: <kvm+bounces-44366-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44367-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1661A9D531
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 00:10:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2955BA9D559
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 00:18:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9328F4C25B7
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 22:10:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA1019E0CE2
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 22:18:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32961235361;
-	Fri, 25 Apr 2025 22:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D74290BB2;
+	Fri, 25 Apr 2025 22:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="daJe1wps"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CYjeMmdr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0775C233153
-	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 22:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8D928FFF9
+	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 22:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745619035; cv=none; b=BsUVyaF8VLMg3IrwgBlPlDOMsUM9HdzhkrubhKrNpMDzrI/585Di7YN27VGRfdf3iFxH3WHTPuZx9Qtiau/1s0fnQ9DdVJdYgNwvmO3QZLvpT6vipvUlV8ort3YB4Jdes8igZSJPtz4/Vtj+pL+D86UeTC9E++Fexbp2xFmO2n0=
+	t=1745619527; cv=none; b=WV+YaM37RgO4k1GD3rZ8sWddgvJfiXhQ5alf3o/Ejrq6yumVNvvlnqfv8NLIvci6Lppl66+U7JSYJBzJ36YCTP+aT+rxwEHKj1+BBTBpixhgw4S46K27RktZDgSRzV2kXw0kpiJo2q2CZwcrpIRANqMxprP8VeVjFE/mF5zvQQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745619035; c=relaxed/simple;
-	bh=aimnY6tUnV94o9RMhPjhm6dvNWiap2zaXUs78GC9ue4=;
+	s=arc-20240116; t=1745619527; c=relaxed/simple;
+	bh=79khmCilj28Bw9iPJB9I+5VFOyP4giXQADVnconMfmI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UKqSVes76Qd3weFJAyfIkOt6//SAgMJ+bRFgoNpa+D00etY7Po9MlrgF8pwezrZ6dIGec6qhT4TekkqsBmJZPd+I4YpCVEAwnbY6x3mHH7wiWJ2xZK2mpmuNGFPNipkBCZSyjTBuYIra6vaPqDE9q9yZzNtWwR7QHjWvQL89br8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=daJe1wps; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=guF/kN0S8L0E4ZGg9Wj8s4oHAn4/ZDTLMriovmoqWjR0DWkUzPhDK5O5H9CCBcsRe12S1435tPG3l7NMKxjbI4HvuJqfrm5EH4GU6Clg/HnaM/sGMEieRpWqwAuG7BOad6yPi2P0p2qjWjEGJL+/JRkMNXxhPk0H4y4wQDSUmF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CYjeMmdr; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff8119b436so2175042a91.0
-        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 15:10:33 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff78dd28ecso3012606a91.1
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 15:18:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745619033; x=1746223833; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1745619526; x=1746224326; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N4LgaQ1GuAUWP/kw7PddvzqxjqGh3o+JtvV4OkUBUe8=;
-        b=daJe1wps1Ozklx5W+J2iyk0OddGhNcj5xcZ9HN4J1U6ZY62U0Vi1+hofDXtPL9OciX
-         4rflYit7WXV8QWNj5dghU40uqd0bvGgtx96H1+BwzV7wUSTmHYJMQ697eqJhl2cSqbMW
-         R835WVWUb9PgxKes0TlVtwiBhKk9OOyR9UPKsAl/AX95chJme0LJdC2tkz+BYxvSve4D
-         leY0nnuSK2+uWKh+T4vzTsn/hDYx6spTeEvY9QMnGbMWc+D7qYvAzHwG5cNxtRPWX1o+
-         lNAChxPAuz7BDWOjsLC83BkLNc6S1tn7cVTCzc5bzmd7WCKT6oi3MbuvYYpqU0AectHF
-         kt4A==
+        bh=c79mghSvLDh48/eN+ylfXjUf7C+oTHXfrsGjYdtgeRg=;
+        b=CYjeMmdr8lehepE+fLbIZl0kNZ3l8QV5Yylym2ib8nZxTbGJVqs8MpCai/rR+6ohGK
+         3wN/tJ/gmP5r3UoqPpEZs8Jz8YH1qojPr63k1d8DhV5uXJ/bzuQZVcjLB6gWwupn/V9T
+         V9IGDPtRsFLzzv1cU811r7awOy8Puzby0muOMBm65ZGHGStpa1hhg7YkchKkf5mWijGE
+         sJ7Oxr7KyJM+eKXnuuobWZUxD9QirYwAhRt+dztMes44Grd1403YlgHpBARD/3py9dwQ
+         mS1uvcEZOJQ/yWcfSPPYVlYtuI3usT5NxSRTPtAvxM3xRE3doXvtFqEeDXldWNhGy2E1
+         HjQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745619033; x=1746223833;
+        d=1e100.net; s=20230601; t=1745619526; x=1746224326;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N4LgaQ1GuAUWP/kw7PddvzqxjqGh3o+JtvV4OkUBUe8=;
-        b=aBU5LYEB0ncVvzypo0OViXAc/uP3SXp9C3aITz/4qXoh/d/AheR5F6rd/vS8zoAY0N
-         l++fopSNz6FSrFdJV90xcVeNFhHzeaNWNBqdKHbsmfNLBIZaONbqOZ0JgJC2gckI+DcN
-         gEg2MsDP4GAi9VuOXObE3Ew57I9FWegs29AWhgIXbpfjCTTG7GKh3+O6TGnSMal0Imi6
-         jr1PJNqfGJVvObqkAIAwCmw3FuRIwtI0Npo5i5sQnmzk0pjW4isEaMDlpigeABAnaDfe
-         zWQO6Uzjt5M1iWTZfz3xGMmooSfO2fYvDNyWoOmJ/uSh7evRet++k17sgCZY7NfE7I2p
-         UIfA==
-X-Forwarded-Encrypted: i=1; AJvYcCWWIUfD9pa4mM5QHVwzIXcosxuTgSVkh2mJiG7Cdac8nDHSt/kIzMkuOBlzo+1QnMX59ss=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzN4QM7uojk2Vc1B1ieKklgWMg+1MrA9qmpqxrFC41L7zsnS+oO
-	UBfvnHUbew1kH5gx4MWFTyp4b/fzJSn2ho80CLfoW2oewBicIB9ArU52P5eDx8DhGJ6yXUXNHe7
-	Qdg==
-X-Google-Smtp-Source: AGHT+IHcSOCDilduu6zKy2qslrDSQQbZGnCFwZnVCF+4bEL6G4X94qzFQSwcH21tq4LeS9ZdDdCRP63DyQE=
-X-Received: from pjbrr7.prod.google.com ([2002:a17:90b:2b47:b0:2fa:2891:e310])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4cc2:b0:2ee:44ec:e524
- with SMTP id 98e67ed59e1d1-309f7e8f6dbmr5194411a91.35.1745619033277; Fri, 25
- Apr 2025 15:10:33 -0700 (PDT)
-Date: Fri, 25 Apr 2025 15:09:00 -0700
-In-Reply-To: <20250324160617.15379-1-bp@kernel.org>
+        bh=c79mghSvLDh48/eN+ylfXjUf7C+oTHXfrsGjYdtgeRg=;
+        b=VX18j5qoSS0GwcXGb/6gnR5Hl74dbgi/fL73gt5EhqKK9E/3RTy+QvFJikbmllEF+A
+         /WqbHsfS3bG8ajtQYhgS1v61YTBfuOZNCyVoFlz2+MD5+rpDFKK39pTW/xhnXwoVYT1/
+         jvNLmQCU+Afwk0w0VE3uL7kft4nEJeGmFQ//FY8qlkQ1wsWkYykzlvFCqVsRi5Bbo5NE
+         qRwqoiChLFsb2rK45Hmype6He6HZcRplNmIcdiL153Qnq7w3Dt0asuj80KzUOAs1egVg
+         KfWIbxXJ1WkLb62e3mztS2gI5hjeuz53oHpn27fvzusv2eq3k52MK+vex74WWY+tYdfS
+         fC2w==
+X-Forwarded-Encrypted: i=1; AJvYcCWRKxe0Fipwla10Et5GGG8gLRM/knXswkq27DMfVeJfsX0n0h/nbvLMIz0Fu+p1cNPuBYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJ77rMg87G5ydhKkEj89y2reoGYryjFelntdzK9Hju0op7gsuI
+	HpskSnakFvL9S6u+wKQtX7v3KjuP90eSI2S5wTQc6XRzN9WSouqNtUWYtrkv10qHDDOm7eGN9Uy
+	LSg==
+X-Google-Smtp-Source: AGHT+IFAchsJLO7/uMp7rAAyJLviGsYQWW/6iJZ/bglJ7sMum2UgV5vjC+rx1FqdI0bNNfPq3hywGuT2vOo=
+X-Received: from pjbee16.prod.google.com ([2002:a17:90a:fc50:b0:301:1ea9:63b0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2705:b0:2f9:cf97:56a6
+ with SMTP id 98e67ed59e1d1-30a01329418mr1651850a91.14.1745619525691; Fri, 25
+ Apr 2025 15:18:45 -0700 (PDT)
+Date: Fri, 25 Apr 2025 15:09:04 -0700
+In-Reply-To: <7604cbbf-15e6-45a8-afec-cf5be46c2924@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250324160617.15379-1-bp@kernel.org>
+References: <7604cbbf-15e6-45a8-afec-cf5be46c2924@stanley.mountain>
 X-Mailer: git-send-email 2.49.0.850.g28803427d3-goog
-Message-ID: <174559664970.890368.7017242957436567888.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86: Sort CPUID_8000_0021_EAX leaf bits properly
+Message-ID: <174559676107.891772.3803946137571196074.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: x86: clean up a return
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Borislav Petkov <bp@kernel.org>
-Cc: X86 ML <x86@kernel.org>, KVM <kvm@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, "Borislav Petkov (AMD)" <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>, Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-janitors@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, 24 Mar 2025 17:06:17 +0100, Borislav Petkov wrote:
-> WRMSR_XX_BASE_NS is bit 1 so put it there, add some new bits as
-> comments only.
+On Mon, 24 Mar 2025 13:53:39 +0300, Dan Carpenter wrote:
+> Returning a literal X86EMUL_CONTINUE is slightly clearer than returning
+> rc.
 
 Applied to kvm-x86 misc, thanks!
 
-[1/1] KVM: x86: Sort CPUID_8000_0021_EAX leaf bits properly
-      commit: 49c140d5af127ef4faf19f06a89a0714edf0316f
+[1/1] KVM: x86: clean up a return
+      commit: f804dc6aa20f2ce504456ffbaafc95db646c211b
 
 --
 https://github.com/kvm-x86/linux/tree/next
