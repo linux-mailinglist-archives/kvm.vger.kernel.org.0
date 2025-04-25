@@ -1,156 +1,195 @@
-Return-Path: <kvm+bounces-44337-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44338-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DCDCA9CFDC
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 19:46:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D10F4A9D0E6
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 20:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 767001C016EE
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 17:45:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EE1B4E39F9
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 18:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF291FCFEE;
-	Fri, 25 Apr 2025 17:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0140218EBD;
+	Fri, 25 Apr 2025 18:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MS9WOj6v"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rxTV8LBK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264DB2F2A
-	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 17:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676FD1AA1C4;
+	Fri, 25 Apr 2025 18:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745603109; cv=none; b=ewGB8on3NU5cMsv0RSMv/FcvmeMZnoKDEPKVW9MpyjvtYduRkiDRm40yWRUy5dfc0i7k89xZBYo8o2AGSC27HYo49XOn8oaam0pRG4jEELSB7PDGpRj+W2Cj0yDD9rbGuL/qvq3jr47quFAPA5PjGLQnvREjlhpQniPE7rjWqPI=
+	t=1745607439; cv=none; b=nUg+Gr/eB47Q6Yfy0lDm8bYfjoX8t6cEccv5g51C37QYoKfGlwdfGczDwdR5NE8uImqMJ6XZSbbDrhIBLdCmmdoinq9UvfEKYgTT9LuFg1zZVLkXoeLxAsyI5y4fY1ShM3faV3w859ZdVl5yl1P380Qf7eaaYY67JkQhWVzJCoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745603109; c=relaxed/simple;
-	bh=K0rLCBbTM1mj0xrmWC+9xN0dlLbsdsdAQ1EyRn9wdKI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=up8fnSfLn44x2TwiDYMs2t6NN8WGmDcM1ntc77HzlqzucPXA+x4srL74B5uLksanSRsDCCxvTD5X1Ifisp6nPScUnwWOKoWyyYt4T4dZve9DeM06tFpsbMZNFm4qJmEW0yCL8YAY1wTLPb/Z/ndl3yE4/WrSlH4E7KMHU9/F9Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MS9WOj6v; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff6167e9ccso2929619a91.1
-        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 10:45:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745603106; x=1746207906; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LC/p/0ZI4m3syp7+hHV/1IymmAx0F260VaO909MQU2g=;
-        b=MS9WOj6vwxPGnGagWfG4kbnj5wsMDfL6oVcsJ2LzjiRxrqK1nz5IoxyouJuQksrgMB
-         IW75G1on8CHjQIbGEiyMzill6y663IhoH+BLzHxXyEgNN8WZ/p5iFyZjPb5k9HOshSPr
-         gFIvxRUFsKNya1dH33GZkn8efDNDIP9ZiNt5fFTlkH2IYl9nNpglmAMU4bWhUzA7TQ5w
-         /cL48X62pBxE3hg7Y3kQME4gkFAu2bpRAz00gmAXYT1CM7J4r4rABFFUcqWAzUFr42qr
-         w/ugt2459CQzJW7olPCA8LJCxS80rA4a5MMnxpIe3hCaxAnWqpSEP7FHXRg5PTnYNRFv
-         knOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745603106; x=1746207906;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LC/p/0ZI4m3syp7+hHV/1IymmAx0F260VaO909MQU2g=;
-        b=KtNgGMZkXqlddvNkD07gRDLHseH3SnJBhdvt/LUhtsv2DX7GB8uXk+Vtt4XSYgHbV9
-         M46Pt9YV1fOXFPzqlOCSOe3XKOch60l880uO5Q77LHmg4N9/IZUWUL4H/sk3y62mHQjw
-         Xr00RJ0cc1/lZZ+4Y+BTg4eZR9bsSDWbq2odtmu/vk3WyVhdiQUQl4xJG3AWXYwtsmvG
-         iuklX5ezEPTmpa5XWD2RMIlyAjXp6nmCFMfduHr+msF7HWmjw7cdXL+qMpPdXXIJ1v8S
-         bkHtJfXWG+0Ln1ECxTBwzpqi4n0njZ5Cua2FLWok8PDJWN84OcKTQmICc6he0m8Wgint
-         q6qA==
-X-Forwarded-Encrypted: i=1; AJvYcCVzqRIOUke9skdRlhfgk86eNrrMCDvJ3t4RTBTtqUfGau9Nwe+4CaewX57G6JMBIr73NUc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDq1aK+Kj4Zgf9Nc/U/bydqJTi7xmxYppSfUl1CsRVI/uDrFg/
-	NRZlftiNTV7ZanPrrCFFslbp7i4jqHeztuntwsJvucWQ5qoArApNb4TeZ+V+9wjzIz2SNMhGQVY
-	hJg==
-X-Google-Smtp-Source: AGHT+IFj+66Cpbdz2CF42k7wOzvWZFOoKUu5FeiW+Ft2GA0dpIg8L5s83paAYmPuXY1e6MWuLCMQeo87UdI=
-X-Received: from pjbsq7.prod.google.com ([2002:a17:90b:5307:b0:2fc:11a0:c549])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f89:b0:2ee:45fd:34f2
- with SMTP id 98e67ed59e1d1-309f7d98dbcmr4864088a91.6.1745603106303; Fri, 25
- Apr 2025 10:45:06 -0700 (PDT)
-Date: Fri, 25 Apr 2025 10:45:04 -0700
-In-Reply-To: <aAbhvKa8g973-lV6@google.com>
+	s=arc-20240116; t=1745607439; c=relaxed/simple;
+	bh=x7XEmKyrnTLSPQG415tcCiyGd0rHCAq19lelHp9z6iQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=npJLck4kRbTQUZMerRy2JGuYysdevzfXQhg/OJi7NXUmPPslowapVZg5Z0Ey4/02HShUG512P2o47FhCZI8djatkx1n834yCENT0uSYwcOo4jVN1qyxb9sN8Dv0aHS4C1L+93ayNLiBCxlBO9bypUwsbEAhr0P9Z0qRzlIpY6C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rxTV8LBK; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53PBdfKY007747;
+	Fri, 25 Apr 2025 18:57:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=NZ5CMcwkibg8f3O2G/yQR+21QckOSfDJrrdRNwM4V
+	B4=; b=rxTV8LBKI1s0a3yWO1UkC/KKzIYBq9nCtzlbKp535tGSC/aAXGQFFkHMP
+	bWPc21+lid/0KB/VTK5ZoKa2IxfBELhgZumFrjDy3nohoDF2QRIbPbbNVAgM5Xbn
+	rGwbb6NU1TyUCW92lQP4/Zn2dAAjFxPCm03vVcA89+oE6kG4FeLfC29zv8bDI4sH
+	IyBBN/Db32aIczCx1XW25DNQ2j8MECfgPO+Gnozw3RLerCiUueRIvF2s3LZKqj/h
+	ay301rydllpb/cxLRuI5bIZ/tbTvD2lSQCkJ3fbtB3H27zXWir0sZW8aUAK93Q9X
+	lgkisqSp7oJHcXbRvnMawBbP9Wf2w==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 467wd9n39m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Apr 2025 18:57:03 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 53PIt7JZ013791;
+	Fri, 25 Apr 2025 18:57:02 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 467wd9n39f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Apr 2025 18:57:02 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53PGVVXB005852;
+	Fri, 25 Apr 2025 18:57:01 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 466jfxppfp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 25 Apr 2025 18:57:01 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53PIuvrO53477730
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 25 Apr 2025 18:56:57 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5663420043;
+	Fri, 25 Apr 2025 18:56:57 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6B9E620040;
+	Fri, 25 Apr 2025 18:56:54 +0000 (GMT)
+Received: from li-e7e2bd4c-2dae-11b2-a85c-bfd29497117c.ibm.com.com (unknown [9.39.29.186])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 25 Apr 2025 18:56:54 +0000 (GMT)
+From: Amit Machhiwal <amachhiw@linux.ibm.com>
+To: Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Cc: Amit Machhiwal <amachhiw@linux.ibm.com>,
+        Vaibhav Jain <vaibhav@linux.ibm.com>,
+        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Naveen N Rao <naveen@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: PPC: Book3S HV: Fix IRQ map warnings with XICS on pSeries KVM Guest
+Date: Sat, 26 Apr 2025 00:26:41 +0530
+Message-ID: <20250425185641.1611857-1-amachhiw@linux.ibm.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250401155714.838398-1-seanjc@google.com> <20250401155714.838398-4-seanjc@google.com>
- <20250415200635.GA210309.vipinsh@google.com> <Z_7VKWxfO7n3eG4p@google.com> <aAbhvKa8g973-lV6@google.com>
-Message-ID: <aAvKIPaOgdtOpXlh@google.com>
-Subject: Re: [PATCH v2 3/3] KVM: x86/mmu: Defer allocation of shadow MMU's
- hashed page list
-From: Sean Christopherson <seanjc@google.com>
-To: Vipin Sharma <vipinsh@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: v88G27NCaf46Vsc9gyR-bPj9G6Uq03Fl
+X-Proofpoint-ORIG-GUID: cN1gsQoPqVbnJhhdAzabvmzrtgvAXFBC
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNDI1MDEzMiBTYWx0ZWRfX8FlgmsuvUj+C TxM698pex7OVHF45rb8/NXRHqG6OCFGCQycFTGnWTwCOvlPXlzKDxtACMMZVniTgQg7Rm8l+owD Ucz95lXpN9jTvwIzLNjjaW7p+TvwU7RyvqWRgbpHP5/SMxYSi96vg9IUVtNBzkcHTw8wyYbC+c2
+ Ot1enG5Svxqgd3NNhCulGOXThOyE96IenxGRUUAFlEBwNl+6yMXlnZ49cqubqp2gVq0Vd3zMGcF C1Mk41N2ALmnqboCFktficoh5VSK/hlKPGFvI9/75r1bVZjPABXcYrKubkNXeRZIsDKZlJTsKu5 1xqrhxzq/+kPjiGy21SSTtEKDALd5ayvl3jb8OqWpArMwKw4Dx0nVfct9sbDjGdKBoqOyu8uuue
+ j2MgurqFMmy4xvgOwIZdpZhX48IFmcnAauCfIv2vMohQe4GLwcseGUKrlFzNvv+EQsVziw74
+X-Authority-Analysis: v=2.4 cv=M5lNKzws c=1 sm=1 tr=0 ts=680bdaff cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=XR8D0OoHHMoA:10 a=VnNF1IyMAAAA:8 a=-VtFrL9j7JuT0UG71X4A:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-04-25_05,2025-04-24_02,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ priorityscore=1501 impostorscore=0 mlxlogscore=999 lowpriorityscore=0
+ bulkscore=0 clxscore=1011 adultscore=0 malwarescore=0 suspectscore=0
+ spamscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
+ definitions=main-2504250132
 
-On Mon, Apr 21, 2025, Sean Christopherson wrote:
-> On Tue, Apr 15, 2025, Sean Christopherson wrote:
-> > On Tue, Apr 15, 2025, Vipin Sharma wrote:
-> > > On 2025-04-01 08:57:14, Sean Christopherson wrote:
-> > > > +static __ro_after_init HLIST_HEAD(empty_page_hash);
-> > > > +
-> > > > +static struct hlist_head *kvm_get_mmu_page_hash(struct kvm *kvm, gfn_t gfn)
-> > > > +{
-> > > > +	struct hlist_head *page_hash = READ_ONCE(kvm->arch.mmu_page_hash);
-> > > > +
-> > > > +	if (!page_hash)
-> > > > +		return &empty_page_hash;
-> > > > +
-> > > > +	return &page_hash[kvm_page_table_hashfn(gfn)];
-> > > > +}
-> > > > +
-> > > >  
-> > > > @@ -2357,6 +2368,7 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
-> > > >  	struct kvm_mmu_page *sp;
-> > > >  	bool created = false;
-> > > >  
-> > > > +	BUG_ON(!kvm->arch.mmu_page_hash);
-> > > >  	sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-> > > 
-> > > Why do we need READ_ONCE() at kvm_get_mmu_page_hash() but not here?
-> > 
-> > We don't (need it in kvm_get_mmu_page_hash()).  I suspect past me was thinking
-> > it could be accessed without holding mmu_lock, but that's simply not true.  Unless
-> > I'm forgetting, something, I'll drop the READ_ONCE() and WRITE_ONCE() in
-> > kvm_mmu_alloc_page_hash(), and instead assert that mmu_lock is held for write.
-> 
-> I remembered what I was trying to do.  The _writer_, kvm_mmu_alloc_page_hash(),
-> doesn't hold mmu_lock, and so the READ/WRITE_ONCE() is needed.
-> 
-> But looking at this again, there's really no point in such games.  All readers
-> hold mmu_lock for write, so kvm_mmu_alloc_page_hash() can take mmu_lock for read
-> to ensure correctness.  That's far easier to reason about than taking a dependency
-> on shadow_root_allocated.
-> 
-> For performance, taking mmu_lock for read is unlikely to generate contention, as
-> this is only reachable at runtime if the TDP MMU is enabled.  And mmu_lock is
-> going to be taken for write anyways (to allocate the shadow root).
+The commit 9576730d0e6e ("KVM: PPC: select IRQ_BYPASS_MANAGER") enabled
+IRQ_BYPASS_MANAGER when CONFIG_KVM was set. Subsequently, commit
+c57875f5f9be ("KVM: PPC: Book3S HV: Enable IRQ bypass") enabled IRQ
+bypass and added the necessary callbacks to create/remove the mappings
+between host real IRQ and the guest GSI.
 
-Wrong again.  After way, way too many failed attempts (I tried some truly stupid
-ideas) and staring, I finally remembered why it's a-ok to set arch.mmu_page_hash
-outside of mmu_lock, and why it's a-ok for __kvm_mmu_get_shadow_page() to not use
-READ_ONCE().  I guess that's my penance for not writing a decent changelog or
-comments.
+The availability of IRQ bypass is determined by the arch-specific
+function kvm_arch_has_irq_bypass(), which invokes
+kvmppc_irq_bypass_add_producer_hv(). This function, in turn, calls
+kvmppc_set_passthru_irq_hv() to create a mapping in the passthrough IRQ
+map, associating a host IRQ to a guest GSI.
 
-Setting the list outside of mmu_lock is safe, as concurrent readers must hold
-mmu_lock in some capacity, shadow pages can only be added (or removed) from the
-list when mmu_lock is held for write, and tasks that are creating a shadow root
-are serialized by slots_arch_lock.  I.e. it's impossible for the list to become
-non-empty until all readers go away, and so readers are guaranteed to see an empty
-list even if they make multiple calls to kvm_get_mmu_page_hash() in a single
-mmu_lock critical section.
+However, when a pSeries KVM guest (L2) is booted within an LPAR (L1)
+with the kernel boot parameter `xive=off`, it defaults to using emulated
+XICS controller. As an attempt to establish host IRQ to guest GSI
+mappings via kvmppc_set_passthru_irq() on a PCI device hotplug
+(passhthrough) operation fail, returning -ENOENT. This failure occurs
+because only interrupts with EOI operations handled through OPAL calls
+(verified via is_pnv_opal_msi()) are currently supported.
 
-__kvm_mmu_get_shadow_page() doesn't need READ_ONCE() because it's only reachable
-after the task has gone through mmu_first_shadow_root_alloc(), i.e. access to
-mmu_page_hash in that context is fully serialized by slots_arch_lock.
+These mapping failures lead to below repeated warnings in the L1 host:
 
-> > > My understanding is that it is in kvm_get_mmu_page_hash() to avoid compiler
-> > > doing any read tear. If yes, then the same condition is valid here, isn't it?
-> > 
-> > The intent wasn't to guard against a tear, but to instead ensure mmu_page_hash
-> > couldn't be re-read and end up with a NULL pointer deref, e.g. if KVM set
-> > mmu_page_hash and then nullfied it because some later step failed.  But if
-> > mmu_lock is held for write, that is simply impossible.
+ [  509.220349] kvmppc_set_passthru_irq_hv: Could not assign IRQ map for (58,4970)
+ [  509.220368] kvmppc_set_passthru_irq (irq 58, gsi 4970) fails: -2
+ [  509.220376] vfio-pci 0015:01:00.0: irq bypass producer (token 0000000090bc635b) registration fails: -2
+ ...
+ [  509.291781] vfio-pci 0015:01:00.0: irq bypass producer (token 000000003822eed8) registration fails: -2
 
-So yes, you were 100% correct, the only reason for WRITE_ONCE/READ_ONCE is to
-ensure the compiler doesn't do something stupid and tear the accesses.
+Fix this by restricting IRQ bypass enablement on pSeries systems by
+making the IRQ bypass callbacks unavailable when running on pSeries
+platform.
+
+Signed-off-by: Amit Machhiwal <amachhiw@linux.ibm.com>
+---
+ arch/powerpc/kvm/book3s_hv.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 19f4d298dd17..7667563fb9ff 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -6541,10 +6541,6 @@ static struct kvmppc_ops kvm_ops_hv = {
+ 	.fast_vcpu_kick = kvmppc_fast_vcpu_kick_hv,
+ 	.arch_vm_ioctl  = kvm_arch_vm_ioctl_hv,
+ 	.hcall_implemented = kvmppc_hcall_impl_hv,
+-#ifdef CONFIG_KVM_XICS
+-	.irq_bypass_add_producer = kvmppc_irq_bypass_add_producer_hv,
+-	.irq_bypass_del_producer = kvmppc_irq_bypass_del_producer_hv,
+-#endif
+ 	.configure_mmu = kvmhv_configure_mmu,
+ 	.get_rmmu_info = kvmhv_get_rmmu_info,
+ 	.set_smt_mode = kvmhv_set_smt_mode,
+@@ -6662,6 +6658,22 @@ static int kvmppc_book3s_init_hv(void)
+ 		return r;
+ 	}
+ 
++#if defined(CONFIG_KVM_XICS)
++	/*
++	 * IRQ bypass is supported only for interrupts whose EOI operations are
++	 * handled via OPAL calls. Therefore, register IRQ bypass handlers
++	 * exclusively for PowerNV KVM when booted with 'xive=off', indicating
++	 * the use of the emulated XICS interrupt controller.
++	 */
++	if (!kvmhv_on_pseries()) {
++		pr_info("KVM-HV: Enabling IRQ bypass\n");
++		kvm_ops_hv.irq_bypass_add_producer =
++			kvmppc_irq_bypass_add_producer_hv;
++		kvm_ops_hv.irq_bypass_del_producer =
++			kvmppc_irq_bypass_del_producer_hv;
++	}
++#endif
++
+ 	kvm_ops_hv.owner = THIS_MODULE;
+ 	kvmppc_hv_ops = &kvm_ops_hv;
+ 
+
+base-commit: 6e3597f12dce7d5041e604fec3602493e38c330a
+-- 
+2.49.0
+
 
