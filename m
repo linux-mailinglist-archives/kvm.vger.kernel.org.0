@@ -1,133 +1,137 @@
-Return-Path: <kvm+bounces-44256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44257-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58E6BA9BFB2
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 09:26:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 101C3A9C000
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 09:47:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 900B446696D
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 07:26:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00A791B8666B
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 07:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A0322E41D;
-	Fri, 25 Apr 2025 07:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E062327A1;
+	Fri, 25 Apr 2025 07:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="G+Ng+RFl"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="BONzwATD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC141F4CAC
-	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 07:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE0D22D79B
+	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 07:46:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745565998; cv=none; b=dVZjwmJ9++fXRsuRKeKKC5DVsYy3HMu4CvwSx1e0gAljLjE6yk6orNhSaQ9VWZnSPpWvt/1J8ov0GD3T88o34md4e8CAmTbeJk4N9lj8zUXuRWeCEPg1voKskAa4M0LoskYe9rt3Ypo2cDcZ5TkdTT/s+ItjAY6I0B/WfF8K7wA=
+	t=1745567189; cv=none; b=qBCwAN1QVobAsApL0DBweMK451fkMw35DHnEPDXW0IJXANzvRhQ8/b5zvbwCZfJbPkSxy5bl4u6CLA3dvdVgJ14gz3z33B1h8d3CyuzKDfRFDKVjcCj/NHHy26eh173QhUESozqY2y4bZb3EhpxwWlLB6tYoIFUj+znxjEB9mMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745565998; c=relaxed/simple;
-	bh=WOBxNFfwoRaqVofbA8CFrImfGjl5LQJoK5Bx9c4gVxY=;
+	s=arc-20240116; t=1745567189; c=relaxed/simple;
+	bh=M2e5e0DbBcCkM53d/193BeEEWoXcJicJMcob4XfVxtg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ee8dWtoLRA7mdAtK4Zq7xeT9RlXD/4BaZhvkUbbHrzkbf7LFi/xbwBtSLtpqHwwVbdayffmIPcCgNKM5zv0a3aSawqWQgwUSGhhNYoq/wkZDA+3qyRI5WsALpRmL/yULkAU+3l+dp2DDS3Ijw/T9NUYSUEiHWGHXBw+oOPRvl24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=G+Ng+RFl; arc=none smtp.client-ip=209.85.128.53
+	 Content-Type:Content-Disposition:In-Reply-To; b=imYs6Xd+8kiQxTsyE2yxbm0AYQKLIfZBSzW55Pgsj1cm2TM1FrzmAn21P4z6mrg7NBnkwoZ0qXZM+wG7VKf0NFZeqQW4m78sjT2cpGjZ1JnChdq7Y02BXReBc3L0MIbvHhIAUgEnl8EqUsSTFXXkrJLDojxOdyG9Efboe+NfV/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=BONzwATD; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so16916215e9.3
-        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 00:26:36 -0700 (PDT)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3914aba1ce4so1425152f8f.2
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 00:46:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1745565995; x=1746170795; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8rOWai1sdUbgwofhh5Gm/RhS+Xf+8kuHnQc4bFrAWfA=;
-        b=G+Ng+RFlzYMB95D9S5v5mPE8PcsRJ+L1L53MKVN24KeRO0aiqd2jh6Bld+oP7/FTnF
-         SkxdVOfCuS0AZftZ3RNo9LdO4Yt3nbRjbTHDkTEA+Yf+5ufOIkCN8NoC98ct4dlRMpX6
-         FAcm9IFJHebAuAI7TC36AJWyR22iT1O2emh7tqsxGApLAPznuLaWnD9e1gy3XkVbF3QK
-         h7+WTN6oqgnfLWpBmJIDkCiar93TU0TO+Ibhauzt5GbaZjzlGI9dJ0ZAq9T+Nhienavx
-         kGVyJcBQB2LtVdNcJDqV5Vc+W6GL4vQAAHmDWGOU/2erL2LypG9vDzNR9n1VNVIpz8Fc
-         3LzQ==
+        d=ventanamicro.com; s=google; t=1745567186; x=1746171986; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=yalr6Bu93K2GzLCvN0XHCxzUAzn2mCxagWptxLA843Q=;
+        b=BONzwATDn/a2Jbfl2U/CRNZi6nvEygafRicZHs3E01vwo9Vk0ZH7vrqo9dHe7NAp51
+         gS/di6U0SsI2y61hjPKlZN7hHtXGxxQCTYYAVie4dgOUhY+Q7N3WXWFsB8YN55Q9i2i2
+         JTzQUtB+zF67/ain39qAEr9FBYWqwsQRfg+iIHrIaZ3G2odO5yQCBtr0IUMml9EP1bDq
+         pZpxlieYZmifYhKjSmNVmUmK+dOcxlcC/l6OdbaAssA4ntsgHsMXAk+SWpAskvjBNyul
+         8HHDB+GtNKM9Hs8rpxZeaAHMHyn9jyBJF3Jq+0ww5ss/Yx9ZAH3k/OAESYnYn+todGiu
+         X7UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745565995; x=1746170795;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8rOWai1sdUbgwofhh5Gm/RhS+Xf+8kuHnQc4bFrAWfA=;
-        b=P2d1M9u7pQ9LOEua7cVKN/0SWcMEbXwsPiMt8HXtbhoXFzG36ClNXgXphtkIdHV7Vk
-         snSpsA/1q/Gb63K7IxZlIeJcGPhJd7ihm6dm1hGvX0lmPkbMhyFiET/Mt1P3yPSQRIGm
-         Oan0oW97SIcuEjY4e83tErCpQts46DQxQybriVClWvd92GdNJGo3m2QXC3qCVs6+B6Xt
-         HkGXlip0Kb/OXlArt7mWF2UkPC0/lC3GcWSrmLWYvnM6SER5zcYSZo8ygHrRSjRfvgJN
-         temk4OKoI03rUfV6lSQWvOrG6mQiukBEaOEiPV7ix7kKRMiaNK4chqoQ05VRnt/QWXXn
-         sr+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVSydZGvFbKP4bB06jTJIeWhz00qHm7Ur8Qt2mibr/a3BKTDfOjRuCi2Mhturnl51GOubY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH4V+1kBfGDTOTC93mILhqmgOceizSgg6Ak5oOF3IhqLEtoQ40
-	R+HUnCfZEuNIm1jAyHBG4pNm4L5otFw4sVMTQ1Tdibb9ZCJdTgDQo9252QgXWwM=
-X-Gm-Gg: ASbGncvy6fOQ4zV1gNl7h5GQdYG//6fRCZlN2GZf1fruPHRE21igKURKI+Lbmzx8ADE
-	cH25LLJbvStnFz1MRV95JlDQ6bXng+bfXgd1HazfZ0NLe2FBrq0lterisuQoLUqjtFzz2yfiTnI
-	yPNl1UNoxmvSxLeyy9ByXJb9O86mOy6H624sTyH2Z9dZm/uBnRRvV3eOS6ezeMKuatWP3S00cU8
-	/riwFuP+j/61cfm/099nvvkTDQgM+aXXjoxTbeFoF7XAVPBOxHvZVUo3s5hPL6oV/wkYjk9lpUl
-	2xW3JPxQFAkWMkWy+JVWPP/WJA+4
-X-Google-Smtp-Source: AGHT+IHyL/iAGxsNCgxot5kbeyyZgpCwkYAozWtkwnyndNThNfSseLduEbxfeuXjaZvP1Jxj6O0QvQ==
-X-Received: by 2002:a05:600c:34ca:b0:43e:a7c9:8d2b with SMTP id 5b1f17b1804b1-440a66aaf1bmr8945465e9.24.1745565994713;
-        Fri, 25 Apr 2025 00:26:34 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1745567186; x=1746171986;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yalr6Bu93K2GzLCvN0XHCxzUAzn2mCxagWptxLA843Q=;
+        b=kmGZx6VkWoMhkJSJFJ9QjG16Wq6nn4L5wX92sTBgOO3L3lyyV2PQW7I67dz09mSCiK
+         H8LnlZlLJT5By+xzKvgSZ5StWA3hi1cSccYTioOqSNovIm9MIO/Nt+JM1vV5Zk4E1hJM
+         7KyFNiVHzPKsqeE9kmK5O01zvjXBAPpqnKp5gN5FyyfkVhp4Uob13YvoHzdJAeigfGzp
+         V2RIkeNITa6dRw++lgx9DX9BD9WIBbAhaXfXqyTVYW44hwU1bg7RHKVkp4E+UBN/N+tH
+         9ErVhnatee7tqo5fjH+1xr1SbP1WFpnjA7IYKlprTALOBBVMk9+XgOIXim6VM8sH/rAd
+         QW2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVZGaRs4OEz68B1vCz+ZgC1HGMczxL31BCoyhfFR1Ye2NQMbWrOgbUk8MoDHz2WInaqR04=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBLP81xoh7FHLNopJc/xFVLXAClmcH6fBxg1ph255QbWeJwC82
+	cpFhHjDfrsI/3PmmKL/qHuH/oPhnYvREy7a6yK5fKZOZstmIG+bFxBQ5+lxWdtY=
+X-Gm-Gg: ASbGncuoA096cUKYZyLXUvXPcJ+1ATAZ6/X/NJNhScSkkGAyc3uwMb6+vMCFepNeFlS
+	M2pOSyCtPeJea8ZwKNXMHHS3TwEvnEa6nKg+f8rO7do+7wExkvBtFkuQXbhlqq2eu2hNpQHRF5a
+	1dSU/C3MLDfd7iL/ARso8qewiflBGcJlETIb/7bIyKzZNbxuc4YmWwu/PPKC/idMs+PrnOxP9d2
+	rR4vt371FG24NvPlG4BQIXWYRhaJP08CUurqXB+8sD17Ct/gNk3JsZ3GrbMajwYlxxY78gXF0Eo
+	dq7SJfEoO9lDuO+LGuc7LEjSpDM3
+X-Google-Smtp-Source: AGHT+IGuKsjAp/bE7iMICTe5tl7fZLkgjjuJMOyAsBGa6hvpBqMsjN2EfsDi9JbPSKmGTEeYZJEdtA==
+X-Received: by 2002:a05:6000:4212:b0:38f:2ddd:a1bb with SMTP id ffacd0b85a97d-3a074e144a6mr901505f8f.8.1745567185228;
+        Fri, 25 Apr 2025 00:46:25 -0700 (PDT)
 Received: from localhost ([2a02:8308:a00c:e200::f716])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4409d2aab65sm46521075e9.17.2025.04.25.00.26.34
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e46c23sm1496676f8f.75.2025.04.25.00.46.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Apr 2025 00:26:34 -0700 (PDT)
-Date: Fri, 25 Apr 2025 09:26:33 +0200
+        Fri, 25 Apr 2025 00:46:24 -0700 (PDT)
+Date: Fri, 25 Apr 2025 09:46:24 +0200
 From: Andrew Jones <ajones@ventanamicro.com>
-To: Alexandre Ghiti <alexghiti@rivosinc.com>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
 Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH 2/3] riscv: Strengthen duplicate and inconsistent
- definition of RV_X()
-Message-ID: <20250425-93c9f462a1980ebd7bbc515d@orel>
-References: <20250422082545.450453-1-alexghiti@rivosinc.com>
- <20250422082545.450453-3-alexghiti@rivosinc.com>
- <20250424-f322adab22126ae97dd7c5b4@orel>
+	Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	Samuel Holland <samuel.holland@sifive.com>, Deepak Gupta <debug@rivosinc.com>
+Subject: Re: [PATCH v6 02/14] riscv: sbi: remove useless parenthesis
+Message-ID: <20250425-00fafd9027c5b1be3dd1d78e@orel>
+References: <20250424173204.1948385-1-cleger@rivosinc.com>
+ <20250424173204.1948385-3-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250424-f322adab22126ae97dd7c5b4@orel>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250424173204.1948385-3-cleger@rivosinc.com>
 
-On Thu, Apr 24, 2025 at 10:45:46AM +0200, Andrew Jones wrote:
-> On Tue, Apr 22, 2025 at 10:25:44AM +0200, Alexandre Ghiti wrote:
-> > RV_X() macro is defined in two different ways which is error prone.
-> > 
-> > So harmonize its first definition and add another macro RV_X_mask() for
-> > the second one.
-> > 
-> > Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
-> > ---
-> >  arch/riscv/include/asm/insn.h        | 39 ++++++++++++++--------------
-> >  arch/riscv/kernel/elf_kexec.c        |  1 -
-> >  arch/riscv/kernel/traps_misaligned.c |  1 -
-> >  arch/riscv/kvm/vcpu_insn.c           |  1 -
-> >  4 files changed, 20 insertions(+), 22 deletions(-)
-> > 
-> > diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.h
-> > index 2a589a58b291..4063ca35be9b 100644
-> > --- a/arch/riscv/include/asm/insn.h
-> > +++ b/arch/riscv/include/asm/insn.h
-> > @@ -288,43 +288,44 @@ static __always_inline bool riscv_insn_is_c_jalr(u32 code)
-> >  
-> >  #define RV_IMM_SIGN(x) (-(((x) >> 31) & 1))
-> >  #define RVC_IMM_SIGN(x) (-(((x) >> 12) & 1))
-> > -#define RV_X(X, s, mask)  (((X) >> (s)) & (mask))
-> > -#define RVC_X(X, s, mask) RV_X(X, s, mask)
-> > +#define RV_X(X, s, n) (((X) >> (s)) & ((1 << (n)) - 1))
+On Thu, Apr 24, 2025 at 07:31:49PM +0200, Clément Léger wrote:
+> A few parenthesis in check for SBI version/extension were useless,
+> remove them.
 > 
-> Assuming n is arbitrary then we should be using BIT_ULL.
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> ---
+>  arch/riscv/kernel/sbi.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/riscv/kernel/sbi.c b/arch/riscv/kernel/sbi.c
+> index 1989b8cade1b..1d44c35305a9 100644
+> --- a/arch/riscv/kernel/sbi.c
+> +++ b/arch/riscv/kernel/sbi.c
+> @@ -609,7 +609,7 @@ void __init sbi_init(void)
+>  		} else {
+>  			__sbi_rfence	= __sbi_rfence_v01;
+>  		}
+> -		if ((sbi_spec_version >= sbi_mk_version(0, 3)) &&
+> +		if (sbi_spec_version >= sbi_mk_version(0, 3) &&
+>  		    sbi_probe_extension(SBI_EXT_SRST)) {
+>  			pr_info("SBI SRST extension detected\n");
+>  			pm_power_off = sbi_srst_power_off;
+> @@ -617,8 +617,8 @@ void __init sbi_init(void)
+>  			sbi_srst_reboot_nb.priority = 192;
+>  			register_restart_handler(&sbi_srst_reboot_nb);
+>  		}
+> -		if ((sbi_spec_version >= sbi_mk_version(2, 0)) &&
+> -		    (sbi_probe_extension(SBI_EXT_DBCN) > 0)) {
+> +		if (sbi_spec_version >= sbi_mk_version(2, 0) &&
+> +		    sbi_probe_extension(SBI_EXT_DBCN) > 0) {
+>  			pr_info("SBI DBCN extension detected\n");
+>  			sbi_debug_console_available = true;
+>  		}
+> -- 
+> 2.49.0
 >
 
-Eh, scratch this. We know n has to be 31 or less since these macros are
-for instruction encodings.
-
-Thanks,
-drew
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
