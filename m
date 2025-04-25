@@ -1,124 +1,147 @@
-Return-Path: <kvm+bounces-44299-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44300-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 575CCA9C6FC
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 13:17:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D43AFA9C896
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 14:09:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB1143AF126
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 11:16:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E39CF4C41A0
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 12:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC50245038;
-	Fri, 25 Apr 2025 11:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AB124A046;
+	Fri, 25 Apr 2025 12:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BNdRMrep"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="zUi4Sgjl"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F63D23D2B7;
-	Fri, 25 Apr 2025 11:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4E222126C
+	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 12:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745579743; cv=none; b=HOhm9kCqCP5D01jmoPa8SjIF2xE+LhgKx6igjIzo2k5e4NocC+k0unCXUMfdIOdAev26O1LRQtKErx7FYcDkNETVYo3fxg6j9u1CiC9qAYmGDfGnimNAAzHcsG0dFbzda41tezQDET9QS5WtyA+F38k1jH7hpIoywXNaS61fbVo=
+	t=1745582985; cv=none; b=r36T9W/uR7RVh0UwGKZxKr6PF1Ovn6DaMG9SGIN0/8ATsDe+s+3kGstkk3sUf4kCUxBuvYyxR1INZ834Ns6QExgTMY1SrMf/TtiUx1Lbl67MmQF51gmeLbXd+CqE+jiCklFud//UawkcwnH9mwKyMD6D+7RDT3+cMNqOAogMuVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745579743; c=relaxed/simple;
-	bh=6U2fI6S/p8eSAqh4fKVbGSN0dho3Y9sYb0oRuK84aSc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cxrH368GHfmx2FlJckPtDW1SdL1HQnzq/XYlIMNBxkz+bOftaQfTZBqzSaFwXZZSufIoKcYlJXLzuNKoMnZkDChkd+IhHBHfo1o7c8ohX72g0esmR3BlM/7WKkD5BGDh48pngw1jaxlS+UQn/kNyJZXiqDmtTP7DHOvttlKhsLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BNdRMrep; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Y2jaLA7bHIH8e1Pz+7udopVwej63Pc20Q11o4bDXZoo=; b=BNdRMrepiS7e1KbyabGblcB3fX
-	tJtF3zYaHLY235htNDtRJc3WdQJsXI6D4eF6qsUz9/O0mJGq0By2JeywNrWQgSq6Dtb+hrFbGUBuw
-	OhpJMkLHmTkOT7MaeqL8ebjuOKW1CLl2P50TKYAqm0GTtHGgg/LF9UFe6J1kC4OR0htUdLcFP1pJh
-	o3K8ZIIb5qWTghMfTv4W4U37Kwu2NC2/lPCZ0FsVAdfGOGcyfJZbwYoxi73lRAbpzxx0c9hOLwtrs
-	Fmt3aDTje+UsHRUuUEfqUgIyeFcolu8AEkGeqZiuKNto/cSf4LLkZcdJXms6rlbOmNQKD4WG2uM+C
-	Wurzp1hg==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1u8H1o-0000000C1rJ-2BgJ;
-	Fri, 25 Apr 2025 11:15:32 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id C9B08300583; Fri, 25 Apr 2025 13:15:31 +0200 (CEST)
-Date: Fri, 25 Apr 2025 13:15:31 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com,
-	Kan <kan.liang@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Yongwei Ma <yongwei.ma@intel.com>,
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Jim Mattson <jmattson@google.com>,
-	Sandipan Das <sandipan.das@amd.com>,
-	Zide Chen <zide.chen@intel.com>,
-	Eranian Stephane <eranian@google.com>,
-	Shukla Manali <Manali.Shukla@amd.com>,
-	Nikunj Dadhania <nikunj.dadhania@amd.com>
-Subject: Re: [PATCH v4 10/38] perf/x86: Support switch_guest_ctx interface
-Message-ID: <20250425111531.GG1166@noisy.programming.kicks-ass.net>
-References: <20250324173121.1275209-1-mizhang@google.com>
- <20250324173121.1275209-11-mizhang@google.com>
+	s=arc-20240116; t=1745582985; c=relaxed/simple;
+	bh=Zxm4WulE6nllv3dcY5iH7gFi33gUsbG3+YxtX1wnINQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ucwaWpsVUixyTsW6zWO0lU60koNKFm7Nx1zMvR013n54t5Dsqot0tdNcfpFKksQDuTLD79QFXhlUGOHupU3SU/oS/UqOejOkdGocjAN/2xV+Rt6aUX/ZzUM06MiaDqUHFlzIH6hOP9lNpJHsQ4ZzhHrIB3QIXj6igXWz6wvZDgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=zUi4Sgjl; arc=none smtp.client-ip=209.85.166.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3d57143ee39so19635285ab.1
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 05:09:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1745582982; x=1746187782; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=viCw2qA4ejmDM4IL1wv9giS7D3cMPoAepDm5Vm/i2EM=;
+        b=zUi4SgjlJBzSh0xtjOn+Pcl21QkhhCwXgqVxRQr6287ChU/x8U1gPxDjcJ5JJd/a4W
+         8N+L9iyjGMqlDH13lwiilFCJQhTa+N9PiDHmp4XTg2SjgwwKcu3Rd7y2lr1aUuM+7Qou
+         QPndFx4ppyK5aK/Rh6OoxozSdZ07hXE8EKA3yOEAHPlzr6+IjVA+FgQdlHXC0AMjEyLt
+         s1YBbYN8ExY1Y/S02GgrlaUQz5Sr4GKaLMlGlq2hSVKds0uy6WiJWx2EDEtZ0QuCoXjI
+         RRA+MNKUFtYBC6JsnDcO1odi1doIoKbE3Nsvdk6MwKiEkUdBYVMBg68u4ay1NAMXRvoE
+         tBvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745582982; x=1746187782;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=viCw2qA4ejmDM4IL1wv9giS7D3cMPoAepDm5Vm/i2EM=;
+        b=TMjid/qXCznHyOzlTZSJSqHoE0aa15dOG7TnsGGy3NOF6mlFJdBIQNiX17kA6lAQKW
+         tOFmkdNHJatUm59EbDgqgkqdVvFXCen0/fqqp2ASk7idsSV7x+7aDFNEfwDmhQ819zkV
+         7RisGly8E1HHKRSFFOgCZH9CM9UgAMjW65XsyGlkbYI1k/eCpRRKw1cmBMXVij58GVEI
+         aoyvJV1dNGDpBuewNBEV+XD93kKklgCDF9+psIEH5zmbgu0xvzw0TT9qYpRYn5qMuE92
+         1dyNb0E/9gwfBGdDqT8pJ2WAenyKoKXsYIdhbR9N7wtRbnwQ8YM1goCGs7ckx2qEwwi1
+         3R/A==
+X-Forwarded-Encrypted: i=1; AJvYcCUCyvwMXxkI98akZLb/jOavotJxnBxGugj+KZSPBTcLG085rFBT0wai8xlZIDanMWXSpU8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwB7116rcN9NB19jMcQdH/B+o8GwEbsnmtz/z90YAlulObPDi4T
+	z8C1KIxqpYWsWqoOpyAmen+HmhVLPINV/zSfNeYVRkbuVB1FD01JnlfWzipwgcVUhxnvrT+uWKX
+	Jr5+btzZTznFqJ51r3eX0Lih1psA4HlWik1e0OA==
+X-Gm-Gg: ASbGncuJWcGnVqt8rgpQu/DlUs0tMWvwlkX7bm7YUMKElPfdW4P8ovHgWdyK9I+Acq4
+	i5f9wW7/eI46dn/vJ9+3PKK6IEAEvvYkyhh6fGSM69EwaND03d0snk6wnh/v5DUD+KlR6nXaZfH
+	6MLCmFzA+BEXsjhR9D8p2orTrrXH1KuTbDgw==
+X-Google-Smtp-Source: AGHT+IGoEJG5zH/Wr0uFePVEm/5CuSYxVySEAKvHuO5qDV3z6MJIg+y3hhgx9qY6URyzTt8T0jY2qH9X8K2GpPqyw1A=
+X-Received: by 2002:a05:6e02:174a:b0:3d4:2409:ce6 with SMTP id
+ e9e14a558f8ab-3d93b3aad74mr19265945ab.5.1745582981830; Fri, 25 Apr 2025
+ 05:09:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250324173121.1275209-11-mizhang@google.com>
+References: <20250324-kvm_selftest_improve-v1-0-583620219d4f@rivosinc.com> <20250324-kvm_selftest_improve-v1-1-583620219d4f@rivosinc.com>
+In-Reply-To: <20250324-kvm_selftest_improve-v1-1-583620219d4f@rivosinc.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 25 Apr 2025 17:39:30 +0530
+X-Gm-Features: ATxdqUFstmpMiz2VW1TbmZRJAZ7pd1khz3F8RMk9AGfAqqDs4TxHZFyQgyus6fM
+Message-ID: <CAAhSdy11BqtEV+RoFmnpizxCTiKaWexMQGKvP15BF-AkDZUDJQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: riscv: selftests: Add stval to exception handling
+To: Atish Patra <atishp@rivosinc.com>
+Cc: Atish Patra <atishp@atishpatra.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Alexandre Ghiti <alex@ghiti.fr>, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 24, 2025 at 05:30:50PM +0000, Mingwei Zhang wrote:
-> From: Kan Liang <kan.liang@linux.intel.com>
-> 
-> Implement switch_guest_ctx interface for x86 PMU, switch PMI to dedicated
-> KVM_GUEST_PMI_VECTOR at perf guest enter, and switch PMI back to
-> NMI at perf guest exit.
-> 
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
-> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
-> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+On Tue, Mar 25, 2025 at 6:10=E2=80=AFAM Atish Patra <atishp@rivosinc.com> w=
+rote:
+>
+> Save stval during exception handling so that it can be decoded to
+> figure out the details of exception type.
+>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+
+LGTM.
+
+Reviewed-by: Anup Patel <anup@brainfault.org>
+
+Regards,
+Anup
+
 > ---
->  arch/x86/events/core.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-> index 8f218ac0d445..28161d6ff26d 100644
-> --- a/arch/x86/events/core.c
-> +++ b/arch/x86/events/core.c
-> @@ -2677,6 +2677,16 @@ static bool x86_pmu_filter(struct pmu *pmu, int cpu)
->  	return ret;
->  }
->  
-> +static void x86_pmu_switch_guest_ctx(bool enter, void *data)
-> +{
-> +	u32 guest_lvtpc = *(u32 *)data;
-> +
-> +	if (enter)
-> +		apic_write(APIC_LVTPC, guest_lvtpc);
-> +	else
-> +		apic_write(APIC_LVTPC, APIC_DM_NMI);
-> +}
-
-This, why can't it use x86_pmu.guest_lvtpc here and call it a day? Why
-is that argument passed around through the generic code only to get back
-here?
+>  tools/testing/selftests/kvm/include/riscv/processor.h | 1 +
+>  tools/testing/selftests/kvm/lib/riscv/handlers.S      | 2 ++
+>  2 files changed, 3 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tool=
+s/testing/selftests/kvm/include/riscv/processor.h
+> index 5f389166338c..f4a7d64fbe9a 100644
+> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> @@ -95,6 +95,7 @@ struct ex_regs {
+>         unsigned long epc;
+>         unsigned long status;
+>         unsigned long cause;
+> +       unsigned long stval;
+>  };
+>
+>  #define NR_VECTORS  2
+> diff --git a/tools/testing/selftests/kvm/lib/riscv/handlers.S b/tools/tes=
+ting/selftests/kvm/lib/riscv/handlers.S
+> index aa0abd3f35bb..2884c1e8939b 100644
+> --- a/tools/testing/selftests/kvm/lib/riscv/handlers.S
+> +++ b/tools/testing/selftests/kvm/lib/riscv/handlers.S
+> @@ -45,9 +45,11 @@
+>         csrr  s0, CSR_SEPC
+>         csrr  s1, CSR_SSTATUS
+>         csrr  s2, CSR_SCAUSE
+> +       csrr  s3, CSR_STVAL
+>         sd    s0, 248(sp)
+>         sd    s1, 256(sp)
+>         sd    s2, 264(sp)
+> +       sd    s3, 272(sp)
+>  .endm
+>
+>  .macro restore_context
+>
+> --
+> 2.43.0
+>
 
