@@ -1,40 +1,80 @@
-Return-Path: <kvm+bounces-44295-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44296-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAA9EA9C6B3
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 13:09:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A03CA9C6BB
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 13:10:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16B723B4B6B
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 11:08:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDF6E3A3EE3
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 11:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EC8241668;
-	Fri, 25 Apr 2025 11:08:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90AC23FC49;
+	Fri, 25 Apr 2025 11:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z9spxGOv"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BD71E1C1A;
-	Fri, 25 Apr 2025 11:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141B3183CC3
+	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 11:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745579324; cv=none; b=YwshypWb3wOn4LL6cJ19Nr0pDqHMl232a2Q24uw7j4t13CijAyNZxuG3EtPg5LUAIuPJNDxEENFsTim3LOZlrokuPRFevE8EF18MHrBkE69Rbu51liaR7kuSg4Ej9Bx8N5mX/1yHv+42J2d69HKtESUlPcGe0wXrTGf/Xr9pXbE=
+	t=1745579450; cv=none; b=iabsKN4/GT39f3Yq8d7Huccp09UgWpTMA4eGaGZRNSLaQXGIhMvAHiaGXwyIqioaGdhmJ5/gy25jFe/lv1W4pb/Jn9Xv3HD8i9QB0SOG+lIdL8KwIHC33K8UQAdq0ekfwDoe+lBVwZvy/fOywugUVONJNe5ZD+Rpa711g2nSet4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745579324; c=relaxed/simple;
-	bh=m9oQt6VPLAxFVRIMYXwsR6soKz0BMud64V+MX8cIpw0=;
+	s=arc-20240116; t=1745579450; c=relaxed/simple;
+	bh=uc0xDVLSlTrQ/SKqn0RlNyVHTNqkF1kFdiYvrcfnSig=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GlnfPL8fULEvXc0jucmHHGw+WL1k0BNgVZWDE6bKT5dgYCRdlysMFO4/It9rq+TTzM8urjKCTm77DH/A3ME8ZK0X/N+Jua6dTDM146bmUBd94VB3i2FxhhsYmyvDU83JEpiYEIcc/K38oJd6auN5OugVHeNpVT7Mk/F6FXI3Saw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 87BC9106F;
-	Fri, 25 Apr 2025 04:08:35 -0700 (PDT)
-Received: from [10.57.45.160] (unknown [10.57.45.160])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 709853F59E;
-	Fri, 25 Apr 2025 04:08:37 -0700 (PDT)
-Message-ID: <d582f30d-4d30-4ca0-992b-6bf7d8f7da83@arm.com>
-Date: Fri, 25 Apr 2025 12:08:36 +0100
+	 In-Reply-To:Content-Type; b=TtpiHL1Xgy4kPofQRivF3poSb0aP3lwyC94au35Pt974V5P5htqdV8cKxJb7JYVp4BWT2LJ2z32vLsIsP/fgip/21VCs8zW/8E131hJm3VfRCROPBFmQYJHSBgg+bwgEpUrmJatCVBHtj9P8XIWkWgkgRuQkySTLg+gLE3oqiuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Z9spxGOv; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so15384495e9.1
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 04:10:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1745579447; x=1746184247; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Czb1fB+t7BDXhuauxEc7uGKN7eHSq5cxbtZ3MG9H3uI=;
+        b=Z9spxGOv1OepwgBZfQ6PC8JNFiXRN+dCuvLNJaFEuHavzBPpMvO2r3C1axg7zeHbUf
+         CALrNZtepVkzwtbMi3E7FjB6ltNHydgabglCa1q2DGSNxi9u9gKQ0ZqJjBjfw7aP8oGn
+         cc5kBhddwx8mQfeFTtkif5eNjBSuNZWcBpFNvqY3SWQ6BcMftMgYVvWAYo/85oEZ8HqL
+         UssCGVTmiCoxE57WO7teF4w5f/8LDslk3djM1LqCPIV5lYp5PJQxPSTuVbA0ywwPuqYZ
+         4hQiI2n4J1L1nmBcvrBzQakE7OnTM7zS2UGd4kVWg/EDJDQ3tfsngLHZGlNf5qInLpTB
+         bibg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745579447; x=1746184247;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Czb1fB+t7BDXhuauxEc7uGKN7eHSq5cxbtZ3MG9H3uI=;
+        b=sopo0t/Lds82VSvI9W7Z9LBFZ0+DKCxYVHySLhCItMJaQvCg+BhPy90feQFvVzwwEx
+         am/yaNgFj7mlyZjOuQBxsXK3kpJHqkfY9y9jlTSEZHEZPCXWe/mWjwAX8wJEIEy03OKQ
+         RBgHqWPhBwosToo7JT/DANfDW4vqKiKAf654RN+5vH3hZaVFTRVSr9zcp/E5dvl57PxD
+         fZ8qD1XtQ6xfxanUj35Pr0j5XqxOH9NzfV12M7DpUqBXifW3GVWm4vAcSoAsHgYkZvkx
+         Nu22OsX9iDRHyoBbMaItYUk6Sa5yNck7sheWI9qKro6JKWoWuCMt+vjMPJ/KaDP0dvfx
+         2D1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVbJWFW9DeOfWSLxQJ81PGiuvXNnA88iVCassVcCBbNXOrNLPHvJEhhVj3CLa5vX875HnQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+VVkrIVz3nBs4YDZS/GfgPCzosS365goj/LL5ka+3fhpmeYvq
+	2y96hnpvZLJnMsi8zcUy+mK8F0Uwe0wxFjQy7c1T45G5Now5KqIehu7Pttr3j30=
+X-Gm-Gg: ASbGncu1yORQqM3sDBm+EFM932d0vS5TVLBuLDY0+w/9DoWPn3SDT2aYm1BSMZtqwb1
+	2Nf0zdhQpt/0XSAQq3oKrvT63bKiSkRDZWlaZcO/OPO+aTZ8ZJXzwEYzYtRn0m0Fccc9c9vlzST
+	WXD2HA3VS0lzTcpiCU7Pi/GoHeMhMrZcaZ/KKJTa95JUGyTxgrxxTJr7X/eVgBrZQfTbRf+XM+n
+	L68uESisQ/ejtsxPsGBjTHT99HgXPAqkCmmfMXNoxYgMDeKziimCiSdG3yInM2e4m1DAEQrF8oq
+	fChDxqGJciOCl2wcTPbF93wL40QGa2mCoslJtXlQwCzIQOaEdrge7RcYJUTEECGKVj3asIUK7AI
+	9NrllWE+rzoOF9+jz56Y=
+X-Google-Smtp-Source: AGHT+IGPLCdantGvN2kLmQ4oiLR7ub0/ZDCsIBZwSSx18FUmBnRE+wzPAUpKZNnWVG4NUAZut3f1ZA==
+X-Received: by 2002:a05:600c:5252:b0:43d:abd:ad1c with SMTP id 5b1f17b1804b1-440a65b6f77mr13819495e9.6.1745579447214;
+        Fri, 25 Apr 2025 04:10:47 -0700 (PDT)
+Received: from [192.168.69.169] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e5c68esm1990779f8f.82.2025.04.25.04.10.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Apr 2025 04:10:46 -0700 (PDT)
+Message-ID: <876e517f-acea-4fca-8735-ba8c732bab98@linaro.org>
+Date: Fri, 25 Apr 2025 13:10:45 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,240 +82,27 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 05/43] arm64: RME: Check for RME support at KVM init
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-6-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250416134208.383984-6-steven.price@arm.com>
+Subject: Re: [PATCH v5 7/8] include/system: make functions accessible from
+ common code
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcelo Tosatti <mtosatti@redhat.com>, alex.bennee@linaro.org,
+ kvm@vger.kernel.org, manos.pitsidianakis@linaro.org,
+ richard.henderson@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+References: <20250424232829.141163-1-pierrick.bouvier@linaro.org>
+ <20250424232829.141163-8-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20250424232829.141163-8-pierrick.bouvier@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 16/04/2025 14:41, Steven Price wrote:
-> Query the RMI version number and check if it is a compatible version. A
-> static key is also provided to signal that a supported RMM is available.
-> 
-> Functions are provided to query if a VM or VCPU is a realm (or rec)
-> which currently will always return false.
-> 
-> Later patches make use of struct realm and the states as the ioctls
-> interfaces are added to support realm and REC creation and destruction.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
+On 25/4/25 01:28, Pierrick Bouvier wrote:
+> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 > ---
-> Changes since v6:
->   * Improved message for an unsupported RMI ABI version.
-> Changes since v5:
->   * Reword "unsupported" message from "host supports" to "we want" to
->     clarify that 'we' are the 'host'.
-> Changes since v2:
->   * Drop return value from kvm_init_rme(), it was always 0.
->   * Rely on the RMM return value to identify whether the RSI ABI is
->     compatible.
-> ---
->   arch/arm64/include/asm/kvm_emulate.h | 18 +++++++++
->   arch/arm64/include/asm/kvm_host.h    |  4 ++
->   arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
->   arch/arm64/include/asm/virt.h        |  1 +
->   arch/arm64/kvm/Makefile              |  3 +-
->   arch/arm64/kvm/arm.c                 |  6 +++
->   arch/arm64/kvm/rme.c                 | 56 ++++++++++++++++++++++++++++
->   7 files changed, 143 insertions(+), 1 deletion(-)
->   create mode 100644 arch/arm64/include/asm/kvm_rme.h
->   create mode 100644 arch/arm64/kvm/rme.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index d7cf66573aca..1c43a4fc25dd 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -686,4 +686,22 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->   			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnFPM;
->   	}
->   }
-> +
-> +static inline bool kvm_is_realm(struct kvm *kvm)
-> +{
-> +	if (static_branch_unlikely(&kvm_rme_is_available) && kvm)
-> +		return kvm->arch.is_realm;
-> +	return false;
-> +}
-> +
-> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
-> +{
-> +	return READ_ONCE(kvm->arch.realm.state);
-> +}
-> +
-> +static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +
->   #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e98cfe7855a6..7bd81b86eab0 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -27,6 +27,7 @@
->   #include <asm/fpsimd.h>
->   #include <asm/kvm.h>
->   #include <asm/kvm_asm.h>
-> +#include <asm/kvm_rme.h>
->   #include <asm/vncr_mapping.h>
->   
->   #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-> @@ -394,6 +395,9 @@ struct kvm_arch {
->   	 * the associated pKVM instance in the hypervisor.
->   	 */
->   	struct kvm_protected_vm pkvm;
-> +
-> +	bool is_realm;
-> +	struct realm realm;
->   };
->   
->   struct kvm_vcpu_fault_info {
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> new file mode 100644
-> index 000000000000..9c8a0b23e0e4
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -0,0 +1,56 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#ifndef __ASM_KVM_RME_H
-> +#define __ASM_KVM_RME_H
-> +
-> +/**
-> + * enum realm_state - State of a Realm
-> + */
-> +enum realm_state {
-> +	/**
-> +	 * @REALM_STATE_NONE:
-> +	 *      Realm has not yet been created. rmi_realm_create() may be
-> +	 *      called to create the realm.
-> +	 */
-> +	REALM_STATE_NONE,
-> +	/**
-> +	 * @REALM_STATE_NEW:
-> +	 *      Realm is under construction, not eligible for execution. Pages
-> +	 *      may be populated with rmi_data_create().
-> +	 */
-> +	REALM_STATE_NEW,
-> +	/**
-> +	 * @REALM_STATE_ACTIVE:
-> +	 *      Realm has been created and is eligible for execution with
-> +	 *      rmi_rec_enter(). Pages may no longer be populated with
-> +	 *      rmi_data_create().
-> +	 */
-> +	REALM_STATE_ACTIVE,
-> +	/**
-> +	 * @REALM_STATE_DYING:
-> +	 *      Realm is in the process of being destroyed or has already been
-> +	 *      destroyed.
-> +	 */
-> +	REALM_STATE_DYING,
-> +	/**
-> +	 * @REALM_STATE_DEAD:
-> +	 *      Realm has been destroyed.
-> +	 */
-> +	REALM_STATE_DEAD
-> +};
-> +
-> +/**
-> + * struct realm - Additional per VM data for a Realm
-> + *
-> + * @state: The lifetime state machine for the realm
-> + */
-> +struct realm {
-> +	enum realm_state state;
-> +};
-> +
-> +void kvm_init_rme(void);
-> +
-> +#endif /* __ASM_KVM_RME_H */
-> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> index ebf4a9f943ed..e45d47156dcf 100644
-> --- a/arch/arm64/include/asm/virt.h
-> +++ b/arch/arm64/include/asm/virt.h
-> @@ -81,6 +81,7 @@ void __hyp_reset_vectors(void);
->   bool is_kvm_arm_initialised(void);
->   
->   DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
-> +DECLARE_STATIC_KEY_FALSE(kvm_rme_is_available);
->   
->   static inline bool is_pkvm_initialized(void)
->   {
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 209bc76263f1..2ebc66812d49 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -23,7 +23,8 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->   	 vgic/vgic-v3.o vgic/vgic-v4.o \
->   	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
->   	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
-> -	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o
-> +	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
-> +	 rme.o
->   
->   kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
->   kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 68fec8c95fee..856a721d41ac 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -40,6 +40,7 @@
->   #include <asm/kvm_nested.h>
->   #include <asm/kvm_pkvm.h>
->   #include <asm/kvm_ptrauth.h>
-> +#include <asm/kvm_rme.h>
->   #include <asm/sections.h>
->   
->   #include <kvm/arm_hypercalls.h>
-> @@ -59,6 +60,8 @@ enum kvm_wfx_trap_policy {
->   static enum kvm_wfx_trap_policy kvm_wfi_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
->   static enum kvm_wfx_trap_policy kvm_wfe_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
->   
-> +DEFINE_STATIC_KEY_FALSE(kvm_rme_is_available);
-> +
->   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->   
->   DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
-> @@ -2819,6 +2822,9 @@ static __init int kvm_arm_init(void)
->   
->   	in_hyp_mode = is_kernel_in_hyp_mode();
->   
-> +	if (in_hyp_mode)
-> +		kvm_init_rme();
-> +
+>   include/system/kvm.h | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
 
-minor nit:
-
-I wondering if this check is necessary. If the host is running under a
-a hypervisor, it could relay the calls to the RMM. Nothing urgent, but
-it is a possibility. It doesn't matter to the host as such. The
-Realm Guest will do its own verification and the host can ignore
-what lies beneath ?
-
-
-Either ways,
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
 
