@@ -1,83 +1,89 @@
-Return-Path: <kvm+bounces-44325-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44324-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46387A9CAD7
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 15:51:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D93A9CAD3
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 15:50:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72F2B4E1E9D
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 13:50:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F91F7B2626
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 13:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D672724BD04;
-	Fri, 25 Apr 2025 13:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18DF2517A9;
+	Fri, 25 Apr 2025 13:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mN0LkFd0"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="UFof23l2"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D7961FF2;
-	Fri, 25 Apr 2025 13:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC53A71747
+	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 13:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745589047; cv=none; b=n/TPEjsb4hicRZ/qi1qtwsqpGaMP8YF6Gns7wEbUFWR9RRI6HzliYK6/ONuikr6K/s2727g5VdRgDz2Dhv+kFZekJiwtPxFYNW3F318/naC8/X9LqvsXVt25gee+lI3+HwTIdpGvwJvgyGn48o3Kw4jmsEaL8ZTX1SbFfxqQPf8=
+	t=1745589032; cv=none; b=m4Z+tAKeYAAjBDbIN62C1dOq0copA0207znY9BygaHPODqvyDeKo5WBbsK5V2MwwYL+aGd5Yl0z3XWT8stN0QPuUgB9XrZwnBF3UnNfWZ2oGp/SQ17kSF36sAX4gJtGxiDP4STYnKYDTZ+GcupyUcNWDhf0bIewTOy7OZvsW4RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745589047; c=relaxed/simple;
-	bh=WxQ5Ou/fI09he56FhDFzuvM5OvovP9p41Kpo80ZlRI4=;
+	s=arc-20240116; t=1745589032; c=relaxed/simple;
+	bh=D+DjpJkVY50DCH/EIM2jyo+5APpyBQvmmE9jeNvI0IY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YdOSypDgMJNC1x2yymFIx4XHrx6Rk8opYLTyV0+6wCagYkS82U7iOLV5VUUZiQK7x64KYAvkiyMfMYh/euiPOTBPu75lWKxbMdJRHSHpv20gHOIJch5BkRK85J2MgMee1a9Nz4LRorPNEKYuTCQ9aqw258qaNWMsYWsDYBZzN0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mN0LkFd0; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=hgYA6FEh3vjzB5qqCTmatdfoxf97Onxqc6wILtW6+qs=; b=mN0LkFd0GR/+ivo3qlMWXNGLgi
-	h9IJb5yyG9G4IoK0Lcj/MhbXl2a516EmM+1/AO/mUId6aN08ZsT9ue6rF4TUb/pPLf22G09xAwg4h
-	Y1yhoxu36dqnKz6Ywv4uPYzbio8Lh14wg9f/yIT41WKIhsWCl5OGHFJFO1isF1WrPlDoOnFKW9q+s
-	tcgVr0e5+ZIBsx7GflmOcxfNjuPxDJaCZf22eamqXu9K0kINXUbXOUidX6jb/NEhvL9Y7t/zuYqMg
-	z4BGNK3sgxIjlm3vI/4LLu+TwfABBUSfEY43J/GHzfqlDg2kmoOZm5vH2jon1Di/5Qz5S8VpeY0I4
-	weqzQKvQ==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1u8JRf-0000000EcS2-2PpK;
-	Fri, 25 Apr 2025 13:50:23 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id EE817300583; Fri, 25 Apr 2025 15:50:22 +0200 (CEST)
-Date: Fri, 25 Apr 2025 15:50:22 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: "x86@kernel.org" <x86@kernel.org>,
-	"kys@microsoft.com" <kys@microsoft.com>,
-	"haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"decui@microsoft.com" <decui@microsoft.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"hpa@zytor.com" <hpa@zytor.com>,
-	"jpoimboe@kernel.org" <jpoimboe@kernel.org>,
-	"pawan.kumar.gupta@linux.intel.com" <pawan.kumar.gupta@linux.intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"kees@kernel.org" <kees@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-	"samitolvanen@google.com" <samitolvanen@google.com>,
-	"ojeda@kernel.org" <ojeda@kernel.org>
-Subject: Re: [PATCH 4/6] x86,hyperv: Clean up hv_do_hypercall()
-Message-ID: <20250425135022.GB35881@noisy.programming.kicks-ass.net>
-References: <20250414111140.586315004@infradead.org>
- <20250414113754.285564821@infradead.org>
- <SN6PR02MB41576A943191D154521C23C8D4B82@SN6PR02MB4157.namprd02.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ci0PwQwrIMBbnw3gW9SLD91RzNxzjsQP6Hx1rX/lBVH0mj2DEgzDIhJJYES2c7zMllENJGA09r3O048LDi9hZuOE55ZJ9FhrWy+F99r5q8owzdmDrqBr2iZaDj/9j1/hA+3q5Y4JEvA1YQ4PGlUsBI8eq0fmf2HypfQuaWO7Kok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=UFof23l2; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43d07ca6a80so9970635e9.1
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 06:50:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1745589029; x=1746193829; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZUA/m6gOa249NNOmchovOHq5LELqOzlt/ubdwJUo+cU=;
+        b=UFof23l2l5NNuW4SRlxc5RyBLx3foa/OACM0JNkbNkWglyp3NrALdiOP13LBxFEOCY
+         DPBjBTbQVDK9MRRXCDl+/ikzUejmImiGShFwlLTR9KjMeGVGjUDgPmrGVxx36kAHJI+q
+         roV1RMdHSja37GodK2QFW8/zVz/p/La0UoeVyKWJk4OxA2Cl/5MBhwH7lJBd4QDOC+sd
+         uxiw5iZiJYfD8+ki7R2gZg5oBsyrV8iYm+H/7Ef+3PGWoyzH4H95+ELGn7+KzQgVvXqc
+         lOT0lAYw1Zi17Z8e+bqQHCGjHOZgIrPgH9NfITuXRe1qHX7xWZe3AcvXHP9I2MH/+kAF
+         wKfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745589029; x=1746193829;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZUA/m6gOa249NNOmchovOHq5LELqOzlt/ubdwJUo+cU=;
+        b=WjLHKFy6lzkuVQDXg2/mRADd4J3+gdXdNlLIzI4L013UbRKGqQ23M2KXrn0OP7Y2AT
+         VHF5L9UwVp/4QKg66NUdbq869aln9BMKGd8rpiXBFsS7naRzQhtams0INpQ5yIvnDJY9
+         azW29B0IgJqxzWfTSuntF9x/LZKJt7wFkmf3DrGjLNIfZ6O29O3LG+19iu+j4sA+woH5
+         MT8oed4a7ckX5WmL1+TA4kMQalT7zYiFlWDvjR/PpFmSl3Vmgb096S1qo4po8dknI0Qj
+         QBRyJAj24zqAEeOdkZemeoG7YVjFDQebbkBjkXjPSHS/RaOtT48MEkRdtlu/Wj7rt/fY
+         9WaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVLSlYcJ069/XQaS9a+2wvSJGu9GlEqVsGY+cPT8FIJjwjk2iiyGNf5Il6+kgXA81xqtjE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXcbZD1lduMmfFyaLx4GUHn8bu7ckP6QEBOTvyj/QCKs+dfDuC
+	dj4X1opjtyYDz9gWbWqjAv9bO6PjD6C1HWecKozm9VKOkceaojvAFoMXped3f0s=
+X-Gm-Gg: ASbGnctLdM/4uVvOejD6espxItkRZKcciZghEZSLPG/watsR3MpMetBtQjf1VJY20Ut
+	dnkHOeKBwmecMZ28sEJhPGhXejrrZdwVcXgKjCgQLgICLyrulFfItcEKTV2vKs1FGIBIXVSWyDf
+	nCuLa+tjJEvzJY/XQG/I5oOsn6Wp9DtFJQgtWf377YiGqLGUGY+fbEqU6ffrIvQ1HM7XQIRNNtQ
+	8/janB+I4wLP3nvrJyMu89q3Ur78w6nu+3mDoKwwg7v9elCUAQV56nkYVmOHEjS75X9T1dxZMe+
+	9Fv6t6gXjDsKG4FlWBPlF23iEFZC
+X-Google-Smtp-Source: AGHT+IF/LMdkzYLBWPyT5ztxJyzb+GPhFh3GxsY5b8ixWQQMljvmNbliBGV7ZjWkl9GsiErnAoI9/g==
+X-Received: by 2002:a05:600c:1f82:b0:43d:934:ea97 with SMTP id 5b1f17b1804b1-440a66ab23bmr18288315e9.27.1745589028834;
+        Fri, 25 Apr 2025 06:50:28 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200::f716])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073c8cab5sm2480265f8f.10.2025.04.25.06.50.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Apr 2025 06:50:28 -0700 (PDT)
+Date: Fri, 25 Apr 2025 15:50:27 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Atish Patra <atishp@rivosinc.com>
+Cc: Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Alexandre Ghiti <alex@ghiti.fr>, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: riscv: selftests: Add stval to exception
+ handling
+Message-ID: <20250425-dc44cb547ab5e2f994c94e80@orel>
+References: <20250324-kvm_selftest_improve-v1-0-583620219d4f@rivosinc.com>
+ <20250324-kvm_selftest_improve-v1-1-583620219d4f@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,83 +92,67 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN6PR02MB41576A943191D154521C23C8D4B82@SN6PR02MB4157.namprd02.prod.outlook.com>
+In-Reply-To: <20250324-kvm_selftest_improve-v1-1-583620219d4f@rivosinc.com>
 
-On Mon, Apr 21, 2025 at 06:27:57PM +0000, Michael Kelley wrote:
-> From: Peter Zijlstra <peterz@infradead.org> Sent: Monday, April 14, 2025 4:12 AM
-> > 
-> > What used to be a simple few instructions has turned into a giant mess
-> > (for x86_64). Not only does it use static_branch wrong, it mixes it
-> > with dynamic branches for no apparent reason.
-> > 
-> > Notably it uses static_branch through an out-of-line function call,
-> > which completely defeats the purpose, since instead of a simple
-> > JMP/NOP site, you get a CALL+RET+TEST+Jcc sequence in return, which is
-> > absolutely idiotic.
-> > 
-> > Add to that a dynamic test of hyperv_paravisor_present, something
-> > which is set once and never changed.
-> > 
-> > Replace all this idiocy with a single direct function call to the
-> > right hypercall variant.
+On Mon, Mar 24, 2025 at 05:40:29PM -0700, Atish Patra wrote:
+> Save stval during exception handling so that it can be decoded to
+> figure out the details of exception type.
 > 
-> This did indeed need cleaning after all the CoCo VM and paravisor
-> stuff got added. Thanks for doing it.
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  tools/testing/selftests/kvm/include/riscv/processor.h | 1 +
+>  tools/testing/selftests/kvm/lib/riscv/handlers.S      | 2 ++
+>  2 files changed, 3 insertions(+)
 > 
-> From looking at the code changes, I believe the 32-bit hypercall paths
-> are unchanged, as they weren't affected the CoCo VM and paravisor
-> additions. Perhaps explicitly state that intent in the commit message.
+> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
+> index 5f389166338c..f4a7d64fbe9a 100644
+> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> @@ -95,6 +95,7 @@ struct ex_regs {
+>  	unsigned long epc;
+>  	unsigned long status;
+>  	unsigned long cause;
+> +	unsigned long stval;
+>  };
+>  
+>  #define NR_VECTORS  2
+> diff --git a/tools/testing/selftests/kvm/lib/riscv/handlers.S b/tools/testing/selftests/kvm/lib/riscv/handlers.S
+> index aa0abd3f35bb..2884c1e8939b 100644
+> --- a/tools/testing/selftests/kvm/lib/riscv/handlers.S
+> +++ b/tools/testing/selftests/kvm/lib/riscv/handlers.S
+> @@ -45,9 +45,11 @@
+>  	csrr  s0, CSR_SEPC
+>  	csrr  s1, CSR_SSTATUS
+>  	csrr  s2, CSR_SCAUSE
+> +	csrr  s3, CSR_STVAL
+>  	sd    s0, 248(sp)
+>  	sd    s1, 256(sp)
+>  	sd    s2, 264(sp)
+> +	sd    s3, 272(sp)
+
+We can't add stval without also changing how much stack we allocate at the
+top of this macro, but since we need to keep sp 16-byte aligned in order
+to call C code (route_exception()) we'll need to decrement -8*36, not
+-8*35. Or, we could just switch struct ex_regs to be the kernel's struct
+pt_regs which has 36 unsigned longs. The 'badaddr' member is for stval and
+the additional long is orig_a0.
+
+>  .endm
+>  
+>  .macro restore_context
+
+I guess we should restore stval too.
+
+Thanks,
+drew
+
 > 
-> I've tested this patch set against linux-next-20250411 on normal Hyper-V
-> guests. Basic smoke tests pass, along with taking a panic, and
-> suspend/resume for guest hibernation. But getting into kdump after a
-> panic does not work. See comments in Patch 5 for the likely reason why.
+> -- 
+> 2.43.0
 > 
-> I've also tested SNP and TDX VMs with a paravisor, and basic smoke
-> tests pass. But I'm testing in the Azure cloud, and I don't have access to an
-> environment where I can test without a paravisor. So my testing doesn't
-> cover the SNP and TDX specific static call paths. Maybe someone at
-> Microsoft can test that configuration.
-
-Excellent, thanks!
-
-
-> > +#ifdef CONFIG_X86_64
-> > +u64 hv_pg_hypercall(u64 control, u64 param1, u64 param2)
 > 
-> Could this get a different name so we don't have the confusion of
-> hv_hypercall_pg vs hv_pg_hypercall?  Some possibilities:
-> 
-> hv_std_hypercall
-> hv_basic_hypercall
-> hv_core_hypercall
-> hv_normal_hypercall
-> hv_simple_hypercall
-
-Sure, I'll throw a dice an pick one ;-)
-
-
-> > @@ -483,14 +484,16 @@ static void __init ms_hyperv_init_platfo
-> >  			ms_hyperv.shared_gpa_boundary =
-> >  				BIT_ULL(ms_hyperv.shared_gpa_boundary_bits);
-> > 
-> > -		hyperv_paravisor_present = !!ms_hyperv.paravisor_present;
-> > -
-> >  		pr_info("Hyper-V: Isolation Config: Group A 0x%x, Group B 0x%x\n",
-> >  			ms_hyperv.isolation_config_a, ms_hyperv.isolation_config_b);
-> > 
-> > 
-> >  		if (hv_get_isolation_type() == HV_ISOLATION_TYPE_SNP) {
-> >  			static_branch_enable(&isolation_type_snp);
-> > +#if defined(CONFIG_AMD_MEM_ENCRYPT) && defined(CONFIG_HYPERV)
-> > +			if (!ms_hyperv.paravisor_present)
-> > +				static_call_update(hv_hypercall, hv_snp_hypercall);
-> > +#endif
-> 
-> This #ifdef (and one below for TDX) are really ugly. They could be avoided by adding
-> stubs for hv_snp_hypercall() and hv_tdx_hypercall(), and making the hv_hypercall static
-> call exist even when !CONFIG_HYPERV (and for 32-bit builds). Or is there a reason to
-> not do that?
-
-I'll try and make it so.
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
