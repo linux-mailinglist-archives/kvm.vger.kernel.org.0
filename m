@@ -1,88 +1,80 @@
-Return-Path: <kvm+bounces-44312-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44313-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EC3BA9C939
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 14:49:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B59A9C980
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 14:53:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF67F189D589
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 12:49:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04C6A1C000A3
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 12:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61CE24C067;
-	Fri, 25 Apr 2025 12:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE2C256C68;
+	Fri, 25 Apr 2025 12:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J/02qZSj"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="OqN34+0y"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF7612CD8B
-	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 12:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86A225524D
+	for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 12:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745585361; cv=none; b=XD2XRkJkjZGjV7z/JDsaar8iz7M3UQCq9MrulDbsCE7MjTTUPsCHLO/J4k6VmVBkmThcopHpltw1zyCMLFjlhe6IpLcSjD2lecHTYvlFXb4xt/lt5sBw8ENue1leSvoh3oYp7Raos1EndXiXQmzZkpzdpSDIGQ+9GOKTmo5TXwU=
+	t=1745585494; cv=none; b=JE2dcrrZIFzu9BEkY4o/TL2QptJxktekA2zbnvNKRtcrzVg7x8UOZAyH1JNI3nLqLOEzCLvDvBHl5tmpaiP2uQwiXzpQyJfALWyWk/077Nyi2N/a7UuwGrJBlySEhpjt562hSsimsw4UztSNUfOVgKM5/m/cZdJ8+0HzH3FKr/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745585361; c=relaxed/simple;
-	bh=IxNbQT3l4IEs3HjaRApxZj9AwxeNfEPN+KlTyCKmlLY=;
+	s=arc-20240116; t=1745585494; c=relaxed/simple;
+	bh=QwWtNokkfVuIeRXynko9qQzQz/Rs9NiYpTsLbebSHY4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=abFSsUWGownB0BGUgdV1mjwsI9owMd7YEec3a9feZuweuNYaEyiULVynufqcRGwJkuWaJrQjlbNipYnuL1LSyUopnWMx5PzZDv+05TI8anL/rUWE+OYewKAwWIxlL46m8rrvMzATpZMxzVJfjsVp3/tbcfyQvYCihgxeNgBYG/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J/02qZSj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745585357;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=QYGRSk9EMOc+ohdOFgvOsQqhOO83k3hgQYJev3Y0mt8=;
-	b=J/02qZSjrKvI2kNBOmnwc+TP+jLxOXQwrlCIhwrf19j3D1BK12HJifr5nWJa0WhazOmBtc
-	Xjg1YC9NoiVSwNGE/CtKxOV3tBi32zFlD+Ucynd2UlWkyD/BdEO/Ea7NgPy7nrWl87ZzcH
-	+z3QisrCWNvtSW5mZSBGQPiwN1IvcKM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-Kdna39hHObW9PofxFZW5tw-1; Fri, 25 Apr 2025 08:49:16 -0400
-X-MC-Unique: Kdna39hHObW9PofxFZW5tw-1
-X-Mimecast-MFC-AGG-ID: Kdna39hHObW9PofxFZW5tw_1745585355
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39d8e5ca9c2so1280528f8f.0
-        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 05:49:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745585355; x=1746190155;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+	 In-Reply-To:Content-Type; b=b50JamIlOCcYmH0puC5e7frEiyMnIfJqa4aldTT21DcapXqEe2+kD6PV1GEHiO9O+6781nJSzsBNK8Q3wm3YnOliRCXFSRyXNSI1F5mw8wAXKiUaIbLnPAHKOE6ZXu8yF2eDx41fN3KG19bBuAhuY59EmkIBUM1+Lyv0aWKV+Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=OqN34+0y; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5e5bc066283so3847837a12.0
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 05:51:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1745585490; x=1746190290; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=QYGRSk9EMOc+ohdOFgvOsQqhOO83k3hgQYJev3Y0mt8=;
-        b=gXmMYslrDx0Gu4nTSaRkt0XCnTiMwloRcNrnqtsKXNvOcNOpzyHaha4HjwnV5oMaIv
-         Z5deGj/BohJjH41zbCmrqcttubQTaGQChftv+btVQoEKYcERdLnuoaU+sX+XnPCcIJZY
-         jGROCpaK3CICoOWehQtO6lgaQuw1CQAmmpuQesEQpEFg1+AGU8PSgXvMfNdR+GMqysT0
-         OiYCtLSvxzJbJgN6z0Np8Eo4wZz6jdqpTXWiPhYSDEA1m22Qn0RJr4eIOdplI5MISYNC
-         qj2tI/j7EhoA8H35B5V89TTThXDjyiENAr3C+1ptaYcE/ZFUQIRmnTrPyfp+flW0s27N
-         8Ouw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+Ucgoh6PiqTwwF4YGo7TpO4i08MUCArTZkJmH5OoWvIf9cAadnuBZNv9VbXZsWPV3Oe0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywr2IHLE32zdE/IzLN+BSJvhRVtngCRGMX32XSLT+DB3HNOJPTV
-	zhzsRR7PxPG6qIJ+Du76mWFizspop7fOphgFjcVlcjQCToplmwL3J18fJ5eJFGmyzf3mdKu9HxH
-	B0XjUcVtlLsyaT/pnLdjwS9eEpy7IYyJLuaT2xdBvmO5NAWEebA==
-X-Gm-Gg: ASbGnctSbbrkaWG7LDJsHvKCZFyMZW2K0n6i28TD6COqSNS05eiu8k1QD/E9vgr489s
-	lY2jYJ06D4KG9vAPXWqCkZrTzvdm3YMnjm3JD/0mE3rJcxX0iS1f5oEGGdYzMqav+dSiccHt9KL
-	XB3b+1K3SO1rVL819ph6ODZ1M4IY/XRbKOhQEgiTNbfzlLXSoeYl3g2o2rBXQ6RBO5I+Yg+C29M
-	QzqNv9M02D/H4QZKTGiIbReNmKC909ZjOtBuWoqplSQ8IaOkL6rH3RWQfg5i5GvYPJhPqatE6rV
-	dTPwVw0t8D77JzD7kZ/yLAQ2J+zhlTIrRCYtSBactDXBd0HnY1e7oiOZfiz4zY79RjwhG9jSZ5i
-	b/OLLI3zNPFKnpYB4wmlTlEcjiBnh5AsiQOqq
-X-Received: by 2002:a5d:6d82:0:b0:391:4559:876a with SMTP id ffacd0b85a97d-3a074f2ecbemr1829664f8f.46.1745585354887;
-        Fri, 25 Apr 2025 05:49:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHtw87bkAqffObS5495XqBM3FBiJn3HJ1+ERi3N86EKTpOViCMyMKry06K00JbDrQNOGIhGbg==
-X-Received: by 2002:a5d:6d82:0:b0:391:4559:876a with SMTP id ffacd0b85a97d-3a074f2ecbemr1829635f8f.46.1745585354480;
-        Fri, 25 Apr 2025 05:49:14 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70f:6900:6c56:80f8:c14:6d2a? (p200300cbc70f69006c5680f80c146d2a.dip0.t-ipconnect.de. [2003:cb:c70f:6900:6c56:80f8:c14:6d2a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e5d4b0sm2239853f8f.89.2025.04.25.05.49.11
+        bh=QwWtNokkfVuIeRXynko9qQzQz/Rs9NiYpTsLbebSHY4=;
+        b=OqN34+0yR35o52UVOdveFAw7T8r4cuznr0RWUTaDk7WG6xFse1iBGGIgl1KmY+RJ6n
+         x1RrM0PF1tvfEkrQWimn+3b/RqI7DKQzq8yfTNK8aoLecNkymuoHWeI1cwkpjIlS5nsl
+         aALgKTBAowuIvMw6+Jf5+dJTKalr6l96NPjCeCy8JoADTV2DR/14bB2TFs+ylGaB9Yq2
+         rA/CiDWdbybCxJMeBlft8rJbfI9wVCfVk33PlmPXNAbEEovl7d7ndUIlwyf5zcsPCgRr
+         p4BsROr/K9T8ilob7cks1OCYVRyVfHFceaxNhbNpALPAFIZ+62+hwzlB2fgtbQZGyw8s
+         R6RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745585490; x=1746190290;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QwWtNokkfVuIeRXynko9qQzQz/Rs9NiYpTsLbebSHY4=;
+        b=wG0akGIsQtbXGe6WZlpR9rD/BDdLygJMQdtdAsWKntIKyfR5S3ExE+z6AhX9fzZt+q
+         mwGhBGVigA62CDOEw2Wf80r9un8Gyico55Hxid7mItGvo5ogW0vf4Fs5YfM2XysInCHU
+         SXdXMWMwH8AAaSYB0vrAJ9h//OB1osln21a3mU4bnhyPjt1VdFWgd9wD58ei5u8fhynA
+         U5Bnzs/4EQDWHPvqDuK4A4176GebwIUkgTyWlNNbyOa/AhB2f7WU5qDUYLqz8IpOqIp4
+         KPhmutbc6XXl3COg+g53O19MAAocj5ZEBRq642+4S9KsvOUOhGrYfw5FJ3gCeoXLbsYF
+         t7Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTi2m530MrfWTP2M2Chvjl9AXcqofc9jeDr4q3W0j/tHWe/JU5Azwoc4LwhJTA0ulE5LE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpduOCnOZasDh+fZn1OGvPHdV+CqXyKLZSjkrMj39bnV1NLAn2
+	qc08BrRn/wKNPtygyDURlHowADGNY5/qgWCVdQmW6gi4GtBh0DvfUGwucBo0GdY=
+X-Gm-Gg: ASbGncsQYVlusvAJJpDCTUZytx/Oj++6/UumXFEi9mz2LaA3/ByYBCE3Usm8iRc3EiF
+	m+j0MMpF3ihNrkx68wEk/McDxIYZNv29ZZlwy7FPzcOmFYqMAvfxxmbGmNACwJqmwuS/AJMeh5a
+	gMzSKE28uElMj92N9juc0nahiuMAtCOpIdIWc87yutXVWYUDAE398FTRF8tZ1gV7OU2p+jgVS0w
+	1nWLEbi6e69OSiyZzCcWW9jrtHBY1w/XNH8QfdYSX+DRid7l+WGfVbS6Q9+7cL+ygcXMu93jtXs
+	04Hc5M6lVoitXfUGJPW8tcA9e9ImQpLgpD9tL9yHL1mRZxXd52rCddeqQzIxZ6xxf/YVqtbYXr1
+	fOq+8F11uNDxuLFEUkEj/ime5D05nYIoCSFkYE5ICOcYy6yJbZPjNuyrqSy26MnE32g==
+X-Google-Smtp-Source: AGHT+IFNK5z5L+OZugp/JrHsD/ek2grtIVBstAXX/s7dAzj21zA8Jl8YCBMRL8UDCGc4m8dgmm2D+A==
+X-Received: by 2002:a05:6402:26cf:b0:5e6:bba0:6778 with SMTP id 4fb4d7f45d1cf-5f72343464emr1737937a12.23.1745585490047;
+        Fri, 25 Apr 2025 05:51:30 -0700 (PDT)
+Received: from ?IPV6:2003:e5:870f:e000:6c64:75fd:2c51:3fef? (p200300e5870fe0006c6475fd2c513fef.dip0.t-ipconnect.de. [2003:e5:870f:e000:6c64:75fd:2c51:3fef])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f7013ff81dsm1302428a12.24.2025.04.25.05.51.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Apr 2025 05:49:12 -0700 (PDT)
-Message-ID: <d1a71e00-243b-4751-ab73-c05a4e090d58@redhat.com>
-Date: Fri, 25 Apr 2025 14:49:11 +0200
+        Fri, 25 Apr 2025 05:51:29 -0700 (PDT)
+Message-ID: <35979102-2eb2-4566-b32a-f2b02ded8ae6@suse.com>
+Date: Fri, 25 Apr 2025 14:51:27 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,130 +82,200 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 04/13] memory: Introduce generic state change parent
- class for RamDiscardManager
-To: Alexey Kardashevskiy <aik@amd.com>, Chenyi Qiang
- <chenyi.qiang@intel.com>, Peter Xu <peterx@redhat.com>,
- Gupta Pankaj <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Michael Roth <michael.roth@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Williams Dan J <dan.j.williams@intel.com>,
- Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
- Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
-References: <20250407074939.18657-1-chenyi.qiang@intel.com>
- <20250407074939.18657-5-chenyi.qiang@intel.com>
- <402e0db2-b1af-4629-a651-79d71feffeec@amd.com>
-From: David Hildenbrand <david@redhat.com>
+Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
+ to write MSR
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ acme@kernel.org, andrew.cooper3@citrix.com, namhyung@kernel.org,
+ mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+ irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+ wei.liu@kernel.org, ajay.kaher@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+ pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+ luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+ haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-22-xin@zytor.com>
+ <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
+ <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
+ <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com>
+ <20250425123317.GB22125@noisy.programming.kicks-ass.net>
 Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <402e0db2-b1af-4629-a651-79d71feffeec@amd.com>
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <20250425123317.GB22125@noisy.programming.kicks-ass.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------07IxI3FeUVVif9J0hZIyhP9u"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------07IxI3FeUVVif9J0hZIyhP9u
+Content-Type: multipart/mixed; boundary="------------l43kLZ1qANrhEdych36notzD";
+ protected-headers="v1"
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Xin Li <xin@zytor.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ acme@kernel.org, andrew.cooper3@citrix.com, namhyung@kernel.org,
+ mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+ irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
+ wei.liu@kernel.org, ajay.kaher@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+ pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+ luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+ haiyangz@microsoft.com, decui@microsoft.com
+Message-ID: <35979102-2eb2-4566-b32a-f2b02ded8ae6@suse.com>
+Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
+ to write MSR
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-22-xin@zytor.com>
+ <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
+ <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
+ <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com>
+ <20250425123317.GB22125@noisy.programming.kicks-ass.net>
+In-Reply-To: <20250425123317.GB22125@noisy.programming.kicks-ass.net>
+
+--------------l43kLZ1qANrhEdych36notzD
+Content-Type: multipart/mixed; boundary="------------IalltgkvDsSESyH6wpAYJhIj"
+
+--------------IalltgkvDsSESyH6wpAYJhIj
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 
-On 09.04.25 11:56, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 7/4/25 17:49, Chenyi Qiang wrote:
->> RamDiscardManager is an interface used by virtio-mem to adjust VFIO
->> mappings in relation to VM page assignment. It manages the state of
->> populated and discard for the RAM. To accommodate future scnarios for
->> managing RAM states, such as private and shared states in confidential
->> VMs, the existing RamDiscardManager interface needs to be generalized.
->>
->> Introduce a parent class, GenericStateManager, to manage a pair of
-> 
-> "GenericState" is the same as "State" really. Call it RamStateManager.
-> 
-> 
-> 
->> opposite states with RamDiscardManager as its child. The changes include
->> - Define a new abstract class GenericStateChange.
->> - Extract six callbacks into GenericStateChangeClass and allow the child
->>     classes to inherit them.
->> - Modify RamDiscardManager-related helpers to use GenericStateManager
->>     ones.
->> - Define a generic StatChangeListener to extract fields from
-> 
-> "e" missing in StateChangeListener.
-> 
->>     RamDiscardManager listener which allows future listeners to embed it
->>     and avoid duplication.
->> - Change the users of RamDiscardManager (virtio-mem, migration, etc.) to
->>     switch to use GenericStateChange helpers.
->>
->> It can provide a more flexible and resuable framework for RAM state
->> management, facilitating future enhancements and use cases.
-> 
-> I fail to see how new interface helps with this. RamDiscardManager
-> manipulates populated/discarded. It would make sense may be if the new
-> class had more bits per page, say private/shared/discarded but it does
-> not. And PrivateSharedManager cannot coexist with RamDiscard. imho this
-> is going in a wrong direction.
+T24gMjUuMDQuMjUgMTQ6MzMsIFBldGVyIFppamxzdHJhIHdyb3RlOg0KPiBPbiBXZWQsIEFw
+ciAyMywgMjAyNSBhdCAwNjowNToxOVBNICswMjAwLCBKw7xyZ2VuIEdyb8OfIHdyb3RlOg0K
+PiANCj4+PiBJdCdzIG5vdCBhIG1ham9yIGNoYW5nZSwgYnV0IHdoZW4gaXQgaXMgcGF0Y2hl
+ZCB0byB1c2UgdGhlIGltbWVkaWF0ZQ0KPj4+IGZvcm0gTVNSIHdyaXRlIGluc3RydWN0aW9u
+LCBpdCdzIHN0cmFpZ2h0Zm9yd2FyZGx5IHN0cmVhbWxpbmVkLg0KPj4NCj4+IEl0IHNob3Vs
+ZCBiZSByYXRoZXIgZWFzeSB0byBzd2l0Y2ggdGhlIGN1cnJlbnQgd3Jtc3IvcmRtc3IgcGFy
+YXZpcnQgcGF0Y2hpbmcNCj4+IGxvY2F0aW9ucyB0byB1c2UgdGhlIHJkbXNyL3dybXNyIGlu
+c3RydWN0aW9ucyBpbnN0ZWFkIG9mIGRvaW5nIGEgY2FsbCB0bw0KPj4gbmF0aXZlXyptc3Io
+KS4NCj4gDQo+IFJpZ2h0LCBqdXN0IG1ha2UgdGhlIFhlbiBmdW5jdGlvbnMgYXNtIHN0dWJz
+IHRoYXQgZXhwZWN0IHRoZSBpbnN0cnVjdGlvbg0KPiByZWdpc3RlcnMgaW5zdGVhZCBvZiBD
+LWFiaSBhbmQgQUxUX05PVF9YRU4gdGhlIHRoaW5nLg0KPiANCj4gU2hvdWxkbid0IGJlIGhh
+cmQgYXQgYWxsLg0KDQpDb3JyZWN0LiBBbmQgZm9yIHRoZSBuZXcgaW1tZWRpYXRlIGZvcm0g
+d2UgY2FuIHVzZSBBTFRFUk5BVElWRV8zKCkuDQoNCg0KSnVlcmdlbg0K
+--------------IalltgkvDsSESyH6wpAYJhIj
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-Agreed.
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-In the future, we will have virtio-mem co-exist with guest_memfd.
+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
+kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
+=3DeeAB
+-----END PGP PUBLIC KEY BLOCK-----
 
-Both are information sources, and likely we'd have some instance on top, 
-that merges these sources to identify if anybody needs to be notified.
+--------------IalltgkvDsSESyH6wpAYJhIj--
 
-Until we figure out how that would look like, I would suggest to keep it 
-as is.
+--------------l43kLZ1qANrhEdych36notzD--
 
-Maybe, in the future we would have a single RamDiscardManager and 
-multiple RamDiscardSources per RAMBlock.
+--------------07IxI3FeUVVif9J0hZIyhP9u
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-The sources notify the manager, and the manager can ask other sources to 
-merge the information.
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Cheers,
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmgLhVAFAwAAAAAACgkQsN6d1ii/Ey8e
+vAf+KJOZqMUHxjnpltD/COFLiLrXAGHxc7ihiTnYIlmuJBNY2/PMbKPO2hF1JLAUEVIUZQrhNb3y
+ixZojM1tK6ssy5bIFD/D8z9MibUFxp18Q5+vWLWuB5Bqiv4fZ0yZ3FN1PZEifNyTWix4R8inBi7B
+oyP8CxQe7t9hRHp8vYhukpL9OwG4EAWiSNVS3r8/+D5xYtf2FhDGqTCLVm4VFuIPJfklOT4HzYhV
+4dUaIcz2by4JTRko6sJmBmyAZ3prrPCusvfMG3AaPxRu7psLlgffSxlyyXRSwOdE7y48MVAqagjm
+CHY32dOYjPAtQUadEKO+DN/Xv10wn72TiKJn+djfrw==
+=xiTo
+-----END PGP SIGNATURE-----
 
-David / dhildenb
-
+--------------07IxI3FeUVVif9J0hZIyhP9u--
 
