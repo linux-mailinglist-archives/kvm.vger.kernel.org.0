@@ -1,65 +1,54 @@
-Return-Path: <kvm+bounces-44240-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44241-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA7AA9BBB0
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 02:17:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D34E6A9BC3D
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 03:17:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CD637A9E15
-	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 00:16:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 092E41B83323
+	for <lists+kvm@lfdr.de>; Fri, 25 Apr 2025 01:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B664A0C;
-	Fri, 25 Apr 2025 00:17:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4364C502B1;
+	Fri, 25 Apr 2025 01:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HAwHIjtn"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="bwKC9WDG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5902382;
-	Fri, 25 Apr 2025 00:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850F18494;
+	Fri, 25 Apr 2025 01:16:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745540264; cv=none; b=Ue3zQ+AUAStcHEN2Jz9KxC6nO+8tuXc/t/3OP5Zwgxe1ES7tr8bM3oun+5GphKY1G5btFeASClihl/ezEp7vHJhKs7PRJIEysSw1QoBqfi/f92LL4RTbK0uQZQgIhMIro8JvIhS8phlJHkzoO7f9iSAqAy67gyi9ctt2tuP8RlA=
+	t=1745543807; cv=none; b=DDo69dry3g0Yv/a8JP9bukBaSIFoicshrr+Sv3JgrO1LlTGkPxYmUEBbdFX5Zzm2n/Zq8ri1uhGwy5PgWc5+DQlth1gp4Im7acDhTs5nTO8fYL1YVbd5+pYch8OauidNEBILSwMFtc+nwiKDeZKkwUeQVE8xiXzzhR7buuAK9Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745540264; c=relaxed/simple;
-	bh=hBejx/ayd+GyQ+0SkZMatW7XvWQxt2+ga5tDFrKq55Q=;
+	s=arc-20240116; t=1745543807; c=relaxed/simple;
+	bh=22cnopTo/mxALU1RwyL3KcFLtT6PURNTg9wJD5O4AvE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nWxeJIN6FQgG2b2wrnTMBfp/IU/xGiKo/lADDGOm324jEkIOMnIWWna8lw+LkdfOlEEfO9F0cmKjOq+0yqdMaGSf5e2ePjKUqCwHJK1jG8znImCnmpv8BSRG1Kl/Qlble+OoVWnLG4NuFmmmKG0RWNNzk2qA0IBCgEiHl4IyGDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HAwHIjtn; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745540263; x=1777076263;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hBejx/ayd+GyQ+0SkZMatW7XvWQxt2+ga5tDFrKq55Q=;
-  b=HAwHIjtnoEEeyygPoH0U0vRrxpIYdr0PVVLMu3BiSUl5pTYfwi9Fm3gY
-   5Ri2hC8lPkb9ta8jCrZuSbrQRfMWO4geG89NDqAHSEDVznn+tmRapAopm
-   UggXO1XFbD6MbWhycsEIskZyXV37fAn5s4pWwZ1dpokcof8CjSZWTlUe+
-   JA5Z8HfB4BWdhe33kjsekJ6EbmWWw0YkZEq5HlNvasgSHZxm0SqlD0MFO
-   76VXX+az7iQvSBH7CMAY4A+29J8K/OQhyR8qHT5FysRBOWTOffHeoEwph
-   7o5WyzK/sTrcxtfKyP/wHMblclhYwfHetjd/2x7AXhmrkfX21DYmFng6i
-   g==;
-X-CSE-ConnectionGUID: +iYAUrizRo+tboUd3xdLNA==
-X-CSE-MsgGUID: 6McV+jX2QRGI8mPVZTyzFA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11413"; a="64612561"
-X-IronPort-AV: E=Sophos;i="6.15,237,1739865600"; 
-   d="scan'208";a="64612561"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 17:17:41 -0700
-X-CSE-ConnectionGUID: PJfJ+tfnQl+P6lFjPBpldQ==
-X-CSE-MsgGUID: 26kbLsDHTNGSalFA9BBFUg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,237,1739865600"; 
-   d="scan'208";a="163815423"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2025 17:17:38 -0700
-Message-ID: <1fd8dd31-faf4-4657-ab06-ccba3e790d01@linux.intel.com>
-Date: Fri, 25 Apr 2025 08:17:34 +0800
+	 In-Reply-To:Content-Type; b=tHQMDKOyKeJn8JDRQ8pAWdV4Ql7Jl0dDXmnJUQpg9MFZCMlcF0xs3usI8n36qNhNUicXUbOR4A+AIPot7Vdl/ftvqBdLYY3rI5yOPn13duPjVaUMfDd5iawECm4WJGKb5KE7/VT/BYOX9OqekviFJ0u8/KH6nU3awt02dFbljHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=bwKC9WDG; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [172.27.3.244] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53P1FaK51878943
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Thu, 24 Apr 2025 18:15:37 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53P1FaK51878943
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1745543740;
+	bh=Eqcm/Hif/MkDs4mjYz2tKFyoVP1HuqqqBruNWCY5tSI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bwKC9WDGeH6PKjPk6PbPnscfTUG7uO0p90T8jZtRz/H1uV5R0u0jHyKPLpz4Lzuza
+	 jaan86VUYCLDqr62mFWyqSXvvBjaf+ve6G5ZtKNwudj3pQxiq/p0DQHubDAWAL4iVK
+	 Num9qesxZzs6c+gaFJIpcjhHqgTrRqcXI4bwh1tGXr1pf3tvinHjceiUPk+LlVYVAf
+	 mYaL7M4P9z3kr6aQ69HDJ4GJ4kjHFXVFi/8OoAlHsRrCGt5QgNwZK3Agfp39Cx1S5g
+	 BERlMv7+KxMZFAhG9+QYjnrsyKHBCBRF3w4ALl9e3WkwPa1KT4qcT1tq3RLd9c/O5Z
+	 dx3hBdqeJAyRA==
+Message-ID: <483eb20c-7302-4733-a15f-21d140396919@zytor.com>
+Date: Thu, 24 Apr 2025 18:15:36 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,36 +56,75 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: kvm guests crash when running "perf kvm top"
-To: Sean Christopherson <seanjc@google.com>
-Cc: Seth Forshee <sforshee@kernel.org>, Peter Zijlstra
- <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
- linux-perf-users@vger.kernel.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <Z_VUswFkWiTYI0eD@do-x1carbon>
- <27175b8e-144d-42cb-b149-04031e9aa698@linux.intel.com>
- <aAo445Nzi5DuAQAR@google.com>
+Subject: Re: [RFC PATCH v2 21/34] x86/msr: Utilize the alternatives mechanism
+ to write MSR
+To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
+        Xin Li
+ <xin@zytor.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+        linux-pm@vger.kernel.org, linux-edac@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-acpi@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, acme@kernel.org,
+        andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org,
+        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+        jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
+        kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+        haiyangz@microsoft.com, decui@microsoft.com
+References: <20250422082216.1954310-1-xin@zytor.com>
+ <20250422082216.1954310-22-xin@zytor.com>
+ <b2624e84-6fab-44a3-affc-ce0847cd3da4@suse.com>
+ <f7198308-e8f8-4cc5-b884-24bc5f408a2a@zytor.com>
+ <37c88ea3-dd24-4607-9ee1-0f19025aaef3@suse.com>
+ <bb8f6b85-4e7d-440a-a8c3-0e0da45864b8@zytor.com>
+ <0cdc6e9d-88eb-4ead-8d55-985474257d53@suse.com>
 Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <aAo445Nzi5DuAQAR@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: "H. Peter Anvin" <hpa@zytor.com>
+In-Reply-To: <0cdc6e9d-88eb-4ead-8d55-985474257d53@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+On 4/24/25 01:14, Jürgen Groß wrote:
+>>
+>> Actually, that is how we get this patch with the existing alternatives
+>> infrastructure.  And we took a step further to also remove the pv_ops
+>> MSR APIs...
+> 
+> And this is what I'm questioning. IMHO this approach is adding more
+> code by removing the pv_ops MSR_APIs just because "pv_ops is bad". And
+> I believe most refusal of pv_ops is based on no longer valid reasoning.
+> 
 
-On 4/24/2025 9:13 PM, Sean Christopherson wrote:
-> On Thu, Apr 24, 2025, Dapeng Mi wrote:
->> Is the command "perf kvm top" executed in host or guest when you see guest
->> crash? Is it easy to be reproduced? Could you please provide the detailed
->> steps to reproduce the issue with 6.15-rc1 kernel?
-> Host.  I already have a fix, I'll get it posted today.
->
-> https://lore.kernel.org/all/Z_aovIbwdKIIBMuq@google.com
+pvops are a headache because it is effectively a secondary alternatives 
+infrastructure that is incompatible with the alternatives one...
 
-Thumbs up! Glad to see it has been root caused. Thanks.
+>> It looks to me that you want to add a new facility to the alternatives
+>> infrastructure first?
+> 
+> Why would we need a new facility in the alternatives infrastructure?
 
+I'm not sure what Xin means with "facility", but a key motivation for 
+this is to:
+
+a. Avoid using the pvops for MSRs when on the only remaining user 
+thereof (Xen) is only using it for a very small subset of MSRs and for 
+the rest it is just overhead, even for Xen;
+
+b. Being able to do wrmsrns immediate/wrmsrns/wrmsr and rdmsr 
+immediate/rdmsr alternatives.
+
+Of these, (b) is by far the biggest motivation. The architectural 
+direction for supervisor states is to avoid ad hoc and XSAVES ISA and 
+instead use MSRs. The immediate forms are expected to be significantly 
+faster, because they make the MSR index available at the very beginning 
+of the pipeline instead of at a relatively late stage.
+
+	-hpa
 
 
