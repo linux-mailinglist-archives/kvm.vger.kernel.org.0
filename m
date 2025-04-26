@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-44389-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44390-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95B69A9D6D9
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 02:55:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFDFEA9D6EA
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 03:11:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EDD27B25C1
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 00:54:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3EED4C4DA7
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 01:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB941EF0B9;
-	Sat, 26 Apr 2025 00:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40851F63F9;
+	Sat, 26 Apr 2025 01:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uiSMb7zC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KxqczATS"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1439C3A1BA;
-	Sat, 26 Apr 2025 00:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E861DF972;
+	Sat, 26 Apr 2025 01:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745628934; cv=none; b=RtlnPDcR8H1jskXWD1OCvyrhbt9XrW0mBISgiBQLHebWgZXyG11XtAgpwN+AebsB92Uv9vAtCOKNFDviq+Gwc+TDMd90yuLX378uKsLzhePxEWjONJ9pPgM1KqH94DZyj6fWGLi8qh4B7grP1h11SuNZiC8ZdP9o9+CE/neGUO0=
+	t=1745629860; cv=none; b=rnm+XnOZmFqnX49n9POQ4Ui3iQj6hayscAODZONu9oyixkagG/KJWUnyyjVklk5wnBNbYKuC7hppnJuo8gpfmvj2JznCZ6qyNPiKuq/Ex8VYNK6Q8AKLbilaJGPbY7G5r2hAVAMkBOX59uHCg9uRo0bNovu7uz5lyhAJkTEWuLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745628934; c=relaxed/simple;
-	bh=BOXccjPCEJxJiPSX1YxnZeQAyhQmKv1c/BGHYEt+AQI=;
+	s=arc-20240116; t=1745629860; c=relaxed/simple;
+	bh=GUs6TKtXii+/XXjYUhm5P6PA6lNQdKk+Fhn0VAcFzCg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TK4TSVJ52X5WxNj6injY123kVfy6HFFkCr46/5l4EW7j0C47zsaarbEnr4JKjksvyvN1PZ6hWOsyDtYAhxdyzGfG5Hxaci/2KulVGguUh9Dfwo97Pze1olxgeRo4pIv3VdXBjSIObis3cx7GNWwl5fEgzinaXY73tXLEIB5WTMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uiSMb7zC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9371CC4CEE4;
-	Sat, 26 Apr 2025 00:55:32 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=MlV49BPg5AbvvmVpdsltbncxGcjkbmeRhzWc0Tna3jpoR2D6s9KmuuBenEsJ5BGIJzt27CxWimhNP1jTNABr2kgaXMsopVF2uTNx5ETff931RGbLG91aaCmn27fb+mpnEeICHeWftbNMECjZee59eUVx7wGUsRdL5G97UlKQUI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KxqczATS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F060C4CEE4;
+	Sat, 26 Apr 2025 01:10:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745628933;
-	bh=BOXccjPCEJxJiPSX1YxnZeQAyhQmKv1c/BGHYEt+AQI=;
+	s=k20201202; t=1745629859;
+	bh=GUs6TKtXii+/XXjYUhm5P6PA6lNQdKk+Fhn0VAcFzCg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uiSMb7zCbEnm/zWGn7r9DqfOzGFDieaQGHpUN/NLclU8yohOsRJV0b8VlvZ8vHnfZ
-	 j629XNFsK92BCIGb/47jnK6G+v1TLnv5qMOk0YCv2pbyxQ5uVV9cUeyWrhVs/54ym1
-	 X5kJdXQtjULkoUqi3pPYuKDIbr4YZdscn9yNnLfv4WPbHgpS65N8AtFsS2gsgeeVNY
-	 SuX3OHwk8XVamrwdbLNpTKGGWFQ9HIrTpqsC2+ALw2nHooGVf3ZGkVpolFHelMSllb
-	 QVl1DmjsAa5DeVaTSawCaZggs4AUOfWX3v/Z/ZMIpMfeyRV0MR0Kb5ebrxolRAKJ/8
-	 NXVVDs+pM3rpQ==
-Date: Fri, 25 Apr 2025 17:55:31 -0700
+	b=KxqczATSjba7r4EOiuW4Y78kxeaOmUn3hrN1Qeb61Bk1IEG5UNMQYfKkJP6rYhrV7
+	 8AmTGD/13GYjzSccgNMwsaqeRlpmwPv5meAChJXDj5Q06hhFENBCp7oBqxPzuc9ZO0
+	 pGKSNgygnGuSGADjucID9fOYBRhKR7ry0z4g2sDjEkMTeG3qIIFlI5culzVUuXi3wA
+	 bC8BOIqRt8uMC02v1ZmTGzq2dYb7qx2Xfv5q8Rxtr63FLkVeFvfiizkWxan0m4YeBl
+	 KHc2CWUVFGRL3C1kNb40DgyDJqN6VrFEUEYi9ZwapTJakiV2SfEKCIjtwm38N6h5V5
+	 f3X4MpEQ8rQEw==
+Date: Fri, 25 Apr 2025 18:10:57 -0700
 From: Luis Chamberlain <mcgrof@kernel.org>
 To: Leon Romanovsky <leon@kernel.org>
 Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
@@ -69,12 +69,12 @@ Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
 	Matthew Wilcox <willy@infradead.org>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v9 04/24] iommu: add kernel-doc for iommu_unmap_fast
-Message-ID: <aAwvAzZdVigusu8J@bombadil.infradead.org>
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 05/24] dma-mapping: Provide an interface to allow
+ allocate IOVA
+Message-ID: <aAwyoXHzhU42P06W@bombadil.infradead.org>
 References: <cover.1745394536.git.leon@kernel.org>
- <9becc0989ed0a6770e4e320580d1152b716acd0d.1745394536.git.leon@kernel.org>
+ <f08e12b1539b73c9ae27c06afbfe4f0ee3b85609.1745394536.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,19 +83,28 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9becc0989ed0a6770e4e320580d1152b716acd0d.1745394536.git.leon@kernel.org>
+In-Reply-To: <f08e12b1539b73c9ae27c06afbfe4f0ee3b85609.1745394536.git.leon@kernel.org>
 
-On Wed, Apr 23, 2025 at 11:12:55AM +0300, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Add kernel-doc section for iommu_unmap_fast to document existing
-> limitation of underlying functions which can't split individual ranges.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Acked-by: Will Deacon <will@kernel.org>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Tested-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+The subject reads odd, how about:
+
+dma-mapping: Provide an interface to allocate IOVA
+
+> +/**
+> + * dma_iova_free - Free an IOVA space
+> + * @dev: Device to free the IOVA space for
+> + * @state: IOVA state
+> + *
+> + * Undoes a successful dma_try_iova_alloc().
+> + *
+> + * Note that all dma_iova_link() calls need to be undone first.  For callers
+> + * that never call dma_iova_unlink(), dma_iova_destroy() can be used instead
+> + * which unlinks all ranges and frees the IOVA space in a single efficient
+> + * operation.
+> + */
+
+Probably does't matter but dma_iova_destroy() doesn't exist yet here.
+
+Other than that:
 
 Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
 
