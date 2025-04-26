@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-44426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44427-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4859A9DA99
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 14:30:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC082A9DA9B
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 14:30:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED18A1BA73C8
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 12:30:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DAC71BA745F
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 12:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344AC252284;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780FD2522B3;
 	Sat, 26 Apr 2025 12:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOfE/T3o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XdQuYbdx"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E35250C1F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9959D2512F5;
 	Sat, 26 Apr 2025 12:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745670534; cv=none; b=kaJvAkxdK7UVzQ5/ejNx4CWiuTFcFtlkXO682KijNFUYoAL6R+6VHQQC9g395srrioIUGbnLdrJZPoN8bqR2Aj7JtsjX6fI0AU68pkFhu1Uize/37K0749w+OdwxoI5CtOARUyOM5+5GAp29eVkW5MD82JDF29RL6P+jR4dv75s=
+	t=1745670534; cv=none; b=tUmC8dFgeK700eQQo+TpB7LDiE/KnOBrxprFcMv7/Vz2JqW26xwWsUCAllvMGYPvJq5JDLoLXnE6Z+SXVd3wKGieV28dOVsOFQ0GFH8cMIAZv6cjFLovV4j1c1FNbj0gmWrm4V6paUAEsudpUgmolxBacVkmJyxoLYHR46mdvLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745670534; c=relaxed/simple;
-	bh=Bpk6RKCUS8mCcn0z7DGT1SGuzw/M+c16uxJw8Nsfl3s=;
+	bh=Uxgz86q4vttcqou3lbEa8mbH5Xk35X47+RPO2LMlXkk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W7mC9CfIi6dFNZBoP7wFJ3JcGZ6Uz6HrQzYGpPMRB1QTUGP+Kie+SSkEd4CMCpG41GgcKAZ5tOUy33gkj6ngD6tThu0o987Mzq2UuAUUUPTa3Ertd9cfAebFXTZEpB9Lq5KyOMEulNpVhh6lXgI5XH1wDMkSdXYwQmfzDKvBWx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hOfE/T3o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EED3C4CEEB;
+	 MIME-Version; b=hwtxhPSV3KW7LUDiqCRePU9pLxKC2ty5PvFLjMQgRcSpBQT3hA7ZQs2yn4ya6EPJ7dHVrwNSdhM/Kms9uJnTcsZW63jNSYI7WxeNX9JftkBIlkTPYIq97z4cLAXxTuxewbCT7ENraOzmQ4ZVu7JYS+r624G8Gb7hfaAXWe7f6g8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XdQuYbdx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7470BC4CEEC;
 	Sat, 26 Apr 2025 12:28:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1745670534;
-	bh=Bpk6RKCUS8mCcn0z7DGT1SGuzw/M+c16uxJw8Nsfl3s=;
+	bh=Uxgz86q4vttcqou3lbEa8mbH5Xk35X47+RPO2LMlXkk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hOfE/T3oqYgwp07Vjl8Xm1oyVvMer6w0TMVbNitcezajYzRrZ6gJfEml7LejolVXz
-	 qBBGjpO81EYj5q9T37ikEVEyjjto8q3KDETtfS5haBZnrMXDXS5teDTEmrSACLMqig
-	 lKjFrIyiyhwGgI2nt/7OYxthdmbHHxM0fYPB1XYHn4lcUrXBhCUFfzMIKsKTrlI8XC
-	 E55bxiQeezJ+ig7Z0XIQtzWEwmXzLBWrBCDnL9yCUEURIB79sWTIqZ/wuMSIPGmOFl
-	 7Cx0tcyklZEbji4ON7QoL9+eOV/tloz4M1N6blKZEU0tXSLL9/TID3nc5AX9yvEc7D
-	 gHPkVdd2N1wyw==
+	b=XdQuYbdxcKyau7PSbfz8GgotYQ0d4XCoE7ZH/PaR17p6qpEvWfqYssMiNN9Pte/tv
+	 KKbkMmS9Do/MgtFAce8M3nz2Q/wplZNAP0gbwaDP306vmxhy9wmHdw+8G3u5RWz9X+
+	 CekYPwUDNLr70IPeU1DiKrmvpmkMxxJJ9QjqcRi6lhrhw3Ab5SXg9iAWNMtRiMOOQ7
+	 48P2IoloewPk69eJh1y0qEkuburu1VxnjTAhwn/k4wQTW1wgVCKsf1W3qEx+bd3PU2
+	 WsxWM1PJhGP8BXski5SikAhh6Sv2Jy6J5apjxoazthGP5Xr693qU0mHZ0NZC/4knWK
+	 Ry2PBF3atuKKg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u8eeK-0092VH-9v;
+	id 1u8eeK-0092VH-JQ;
 	Sat, 26 Apr 2025 13:28:52 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -59,9 +59,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v3 14/42] arm64: Add FEAT_FGT2 capability
-Date: Sat, 26 Apr 2025 13:28:08 +0100
-Message-Id: <20250426122836.3341523-15-maz@kernel.org>
+Subject: [PATCH v3 15/42] KVM: arm64: Tighten handling of unknown FGT groups
+Date: Sat, 26 Apr 2025 13:28:09 +0100
+Message-Id: <20250426122836.3341523-16-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250426122836.3341523-1-maz@kernel.org>
 References: <20250426122836.3341523-1-maz@kernel.org>
@@ -77,46 +77,40 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As we will eventually have to context-switch the FEAT_FGT2 registers
-in KVM (something that has been completely ignored so far), add
-a new cap that we will be able to check for.
+triage_sysreg_trap() assumes that it knows all the possible values
+for FGT groups, which won't be the case as we start adding more
+FGT registers (unless we add everything in one go, which is obviously
+undesirable).
+
+At the same time, it doesn't offer much in terms of debugging info
+when things go wrong.
+
+Turn the "__NR_FGT_GROUP_IDS__" case into a default, covering any
+unhandled value, and give the kernel hacker a bit of a clue about
+what's wrong (system register and full trap descriptor).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 7 +++++++
- arch/arm64/tools/cpucaps       | 1 +
- 2 files changed, 8 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 9c4d6d552b25c..bb6058c7d144c 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2876,6 +2876,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_cpuid_feature,
- 		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, IMP)
- 	},
-+	{
-+		.desc = "Fine Grained Traps 2",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_HAS_FGT2,
-+		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, FGT2)
-+	},
- #ifdef CONFIG_ARM64_SME
- 	{
- 		.desc = "Scalable Matrix Extension",
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 772c1b008e437..39b154d2198fb 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -28,6 +28,7 @@ HAS_EPAN
- HAS_EVT
- HAS_FPMR
- HAS_FGT
-+HAS_FGT2
- HAS_FPSIMD
- HAS_GCS
- HAS_GENERIC_AUTH
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index efe1eb3f1bd07..1bcbddc88a9b7 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2352,9 +2352,10 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
+ 		}
+ 		break;
+ 
+-	case __NR_FGT_GROUP_IDS__:
++	default:
+ 		/* Something is really wrong, bail out */
+-		WARN_ONCE(1, "__NR_FGT_GROUP_IDS__");
++		WARN_ONCE(1, "Bad FGT group (encoding %08x, config %016llx)\n",
++			  sysreg, tc.val);
+ 		goto local;
+ 	}
+ 
 -- 
 2.39.2
 
