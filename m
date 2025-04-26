@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-44412-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44415-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10738A9DA8D
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 14:29:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C419CA9DA8E
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 14:29:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BA045A4862
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 12:28:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 128931BA6AB2
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 12:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54D2230BED;
-	Sat, 26 Apr 2025 12:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3355B2356CD;
+	Sat, 26 Apr 2025 12:28:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbdbB6xg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X10HUAxq"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F2D1E50E;
-	Sat, 26 Apr 2025 12:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561E922FDEA;
+	Sat, 26 Apr 2025 12:28:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745670531; cv=none; b=d+q77jBCeHQp4sYLfStIzTchRTCAF7osh/j4/V7lRpbjs2xzCTLsvbURBr3oKEGAyXR6GWFzSGm/Rv4Fy2FSs6xFwexXrQv3EsK3EUH7Y0WoYLgLXsawm/x9DQi3nOloiBDdVOfUjf0wFdjcNjm1tQwhDqN9/7iO/vsu5gLPR2A=
+	t=1745670531; cv=none; b=pKeBn4CxXgkuynV20BgxpiKEAFPXJvfir49bg41Sg49mkhB2GCEq8on0fH0PH/9g2kRUxKBoeOKqGnH/TU7BFNlEO7OWowl4Qq1MXoyA3zK6RgmVslB6iS5eHFDI/Wc/uUzqPsmf/cIO/BjQIMMj7NE2Ck/VP8qbCaNjR2JPcHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745670531; c=relaxed/simple;
-	bh=44gRQXHmjU599W1FzWtYTLfeRPiNOJ8OSvboqazC2Q0=;
+	bh=SWE9gSmuNSZa/bBGdZNKJvtdTSw2W9hfegwyfvxdpf8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AVK+DGHrsngFZSZucXZAYWoeQF9TYl7HQ/eJ1yukuZtSOqZYhbbZDo1v6bd/9Ml6zvQx/AwlfSuGOquNeBTXIqfQUpaDbGEa4ac4lRBS8n/vUplWt1rbOg47HBDDWpyE/34C2q35H0/6lIXMXvjWh/Kp1LUerMfAulo04vYQg0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbdbB6xg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66E8AC4CEE2;
+	 MIME-Version; b=fAB1aOs3C/JzVQZ6s1FrtmXS8prY7SpV4d18qRixXXSANnJV3y+P1EIXlld2ZgfUqI0mxyY+8aY6D2uzG+rs76jrDd/p+z7snkZexKkS1jL/NW4oDlcfWdl5umFKUuBKgUmrnS7C/shQ0+W7k+XGfr8MNq3UeC0dYBR/G8d984w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X10HUAxq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE556C4CEEC;
 	Sat, 26 Apr 2025 12:28:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1745670530;
-	bh=44gRQXHmjU599W1FzWtYTLfeRPiNOJ8OSvboqazC2Q0=;
+	bh=SWE9gSmuNSZa/bBGdZNKJvtdTSw2W9hfegwyfvxdpf8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QbdbB6xgxessSw9Q5prEE/drdKGxcL6YWXlwkA5c37yzG25/n/Fp2fjx39IbIwRMi
-	 5/nImXAcHxZX+jiDB8ituxHqzpTRSLOlnDEmshuIeTzX5JABfu8wq0AlPyfhR9LG/8
-	 GYWgye2slLBlUD9UoY/2u0vPi+ZvIkhPMnZc34aoIa2PCbhmjV6fh9eJ5X93KgjbqD
-	 +h0q4lUGfBhw6MViJSJV9mK0BwM783IKhIxh/8OwOz5hdM9yMSBuAOkyaMq+f1Z9FL
-	 4gSPn0iivEdjPrKlj+TPF1z5nPstHz9S1C/Iu/k0ryz2ifG2vzZhiusUkt8IsJgwGO
-	 37pCaWDwtIGew==
+	b=X10HUAxqJ6UiMUaXTEjTeyplhg9UrS2xZojSUXZ8EDzcTD182GPt4PcgtF7nMV/dn
+	 jFVUBTTJWHkd4Y1IqjhfrMKYL4bBWUUi2FzqaIRP3n5ltlkegdayZxNCegAydVYjWy
+	 HJsNlsqgOFK9h5/s27PCWgvXDDmTHFSrQ6wQTDpH7zjq05CbWwoHjXrOVN5bh9Mxx6
+	 2FiqFCPyb3ujbzuANJ8bUWjHRv7XLtK4L9tiUr84tBy40ULdN2EU9AWq6R2lICEzL1
+	 FzfsN3m8SyBpQotCDaEL/HS5xgjSa+FXoSeSUxe9IFmFaT3rLMYMaUDzeNwElThgfE
+	 QJWDGdH626K7Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1u8eeG-0092VH-8J;
+	id 1u8eeG-0092VH-Hl;
 	Sat, 26 Apr 2025 13:28:48 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -59,9 +59,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v3 01/42] arm64: sysreg: Add ID_AA64ISAR1_EL1.LS64 encoding for FEAT_LS64WB
-Date: Sat, 26 Apr 2025 13:27:55 +0100
-Message-Id: <20250426122836.3341523-2-maz@kernel.org>
+Subject: [PATCH v3 02/42] arm64: sysreg: Update ID_AA64MMFR4_EL1 description
+Date: Sat, 26 Apr 2025 13:27:56 +0100
+Message-Id: <20250426122836.3341523-3-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250426122836.3341523-1-maz@kernel.org>
 References: <20250426122836.3341523-1-maz@kernel.org>
@@ -77,30 +77,70 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The 2024 extensions are adding yet another variant of LS64
-(aptly named FEAT_LS64WB) supporting LS64 accesses to write-back
-memory, as well as 32 byte single-copy atomic accesses using pairs
-of FP registers.
+Resync the ID_AA64MMFR4_EL1 with the architectue description.
 
-Add the relevant encoding to ID_AA64ISAR1_EL1.LS64.
+This results in:
+
+- the new PoPS field
+- the new NV2P1 value for the NV_frac field
+- the new RMEGDI field
+- the new SRMASK field
+
+These fields have been generated from the reference JSON file.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/tools/sysreg | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index bdf044c5d11b6..e5da8848b66b5 100644
+index e5da8848b66b5..fce8328c7c00b 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -1466,6 +1466,7 @@ UnsignedEnum	63:60	LS64
- 	0b0001	LS64
- 	0b0010	LS64_V
- 	0b0011	LS64_ACCDATA
-+	0b0100	LS64WB
- EndEnum
- UnsignedEnum	59:56	XS
+@@ -1946,12 +1946,21 @@ EndEnum
+ EndSysreg
+ 
+ Sysreg	ID_AA64MMFR4_EL1	3	0	0	7	4
+-Res0	63:40
++Res0	63:48
++UnsignedEnum	47:44	SRMASK
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++Res0	43:40
+ UnsignedEnum	39:36	E3DSE
  	0b0000	NI
+ 	0b0001	IMP
+ EndEnum
+-Res0	35:28
++Res0	35:32
++UnsignedEnum	31:28	RMEGDI
++	0b0000	NI
++	0b0001	IMP
++EndEnum
+ SignedEnum	27:24	E2H0
+ 	0b0000	IMP
+ 	0b1110	NI_NV1
+@@ -1960,6 +1969,7 @@ EndEnum
+ UnsignedEnum	23:20	NV_frac
+ 	0b0000	NV_NV2
+ 	0b0001	NV2_ONLY
++	0b0010	NV2P1
+ EndEnum
+ UnsignedEnum	19:16	FGWTE3
+ 	0b0000	NI
+@@ -1979,7 +1989,10 @@ SignedEnum	7:4	EIESB
+ 	0b0010	ToELx
+ 	0b1111	ANY
+ EndEnum
+-Res0	3:0
++UnsignedEnum	3:0	PoPS
++	0b0000	NI
++	0b0001	IMP
++EndEnum
+ EndSysreg
+ 
+ Sysreg	SCTLR_EL1	3	0	1	0	0
 -- 
 2.39.2
 
