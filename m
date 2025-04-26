@@ -1,133 +1,173 @@
-Return-Path: <kvm+bounces-44411-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44413-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97AB7A9DA79
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 14:00:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7815A9DA8F
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 14:29:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE0DC927BAE
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 12:00:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A587517CDE7
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 12:29:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB34D77111;
-	Sat, 26 Apr 2025 12:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9831230BFD;
+	Sat, 26 Apr 2025 12:28:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="mAMyN+89"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="soyth5cZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0881AAC4
-	for <kvm@vger.kernel.org>; Sat, 26 Apr 2025 12:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F9322A1E5;
+	Sat, 26 Apr 2025 12:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745668813; cv=none; b=pDD1R6J7azAFUNfrOgLj+LkrjW3Sqv/+4Wi2L5sqEKKE8oWyeiwiEMdLRxNFBpN8mfwILUthBxwaanoTbkEGqoHCoGtTl9ZD5BJtSbB/0+sJXFwahboiqbYVxlR0tSPwJmPMK4f3pRKRHgD1kPv9MBShqaKKvMbBy5ikatXJSdg=
+	t=1745670531; cv=none; b=ewRgzTFVcvKb80XtGM9yNsgbU8v0E/Fm+Winoi5eQX74noyMqVlbXuJuQixJ5+HCu9Nw+n8Jio1LdX4YRQqZ4dPefAZTP5t/d/+Fpzco38bXIWBQVsm0B4vehH1lK+fS5gRzIi3so6936881Zqyj8BBjsPM49uxkFdwADVmeX1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745668813; c=relaxed/simple;
-	bh=y2UzcmFgXugz7sN37JRnEYfgybMcwHD39Unx5ijSVAo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lmjE5hE6evgUojijEJf5nkvFF2yyL9Rv5qAnnBCnxpXxhYrs+dPPL7nyn+a21+7g2CyD+nU/osOWmvwTYLchEJMJCpF9JqIYtBa9y3QGYQ2duMQ+zrtkl+c54hXsZZx2a4SSl80SHPSddiqzPZ9sT13Vt8GSjknWPUDlfhkoUwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=mAMyN+89; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5f4d28d9fd8so3890058a12.3
-        for <kvm@vger.kernel.org>; Sat, 26 Apr 2025 05:00:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1745668810; x=1746273610; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RTzu1xS98tjw8hnNc1PSCW4inmOV0Uf2KGI05g8CT5s=;
-        b=mAMyN+89vom/DjtWMzfVy6ca7OGZvXcT+IY6ZW/i2mFg580XPM6Uiku2ipi615/ioh
-         Wr1QMkZG8lT3PrLURa9ENYD3MQ5aiVDAKOPr+oES6wHmebRy2MqlcKpIWbYSCa5l2VVl
-         gr/ELF0Qt0A/WiPyTf2j80TXmvcI0qE14fxdz3OhSAkqWfh5N12mYFqXd5RUGPz7MyoG
-         g2koLOX2XfMd7xPUiw8dIwgxeqN7Z2gEq8ZuI9aqATX6h6aoLei+naTrOIEv6XxJB8DB
-         nxEwHnamYdZMZ63+FD5dWdAxYhz74e7mu0NyHa6V+ep6vlV+RtrV7WHOLfmgysDQY341
-         m6tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745668810; x=1746273610;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RTzu1xS98tjw8hnNc1PSCW4inmOV0Uf2KGI05g8CT5s=;
-        b=ODh5zwa0QF4a2+kZaBjlc/WWOHrDvgOt78kLUJKFl+10iQ0pfSDU+rHXFOnzDX/hyV
-         PZcx5Z4NcrXPL2WdxchPjKhsbqI/ldzEttW7ecOZ7zIToUHHwmftXP4U6IpdCMJI3wzT
-         p4mF3XBFSeYLZDE8r/6nq6iCaaNI4x4d9JPAoZmufb9A0gUDH9D159l7xQFLxogjSMNc
-         RmLsbyz+6QPzD9d8vvuW3fLuZM6dWuPBxBTjHBvlBylxcPKkpKvF1O5RdOaibO1WoHkJ
-         wmMdiJZAI10Ormpev6s6MD7u/flSaINUD5AbJxTYPAaiK8VmgrnOFvyLD7a1UDdbAg58
-         ViNg==
-X-Forwarded-Encrypted: i=1; AJvYcCWMDtUvfZMVRgnWJCNyYg8aXfXeBwwClwZi3V7TR2wMsaJvsk77WD4gIPlltxJrCVDj8iI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylE8d/o83gud8qNFSMukFB5+hMufpr7ucPBv/ApXpAXJ3It7y7
-	dx3a44msTHucNfx3KRKxVLJRQGDXwIV21iDvTlzfzu4iNf3l3Xdvw4UUcFXOsjc=
-X-Gm-Gg: ASbGncs9KDHK+6f/QPzIL/qKhmEjeUu7i0QLcONa9C+G5j241X2bJbQSMWIK8VpGCyw
-	2pGCDdn2r9SxnpqO2UxYX1i2LA/q1qNLAqEesvTENXHKbWoldLbp28oWaZ31oCpnK/tOI48BiW3
-	CuZWp+dz6aAwF7SR3MjNlPonua0t6R2U1UFi1rkyOcn9uuIEg8YLFUIoC1JtiGu+S/XM+KGM1gd
-	/1k+Wp79cJcbkGO+N9fh4yLxSS/tZSrDRT7sX9FIowW+jcfAV1unxef2F+qChM9DH+OMWQVl74b
-	a8BG58d58auF1mSZscbYb+oLMflUgevOQdPKyPDw855Vokqt6iEVbThxcDpfMs8bFXCBzw==
-X-Google-Smtp-Source: AGHT+IHECmUh4ym77b/66FP4tRpCNVowAee/FmuOM9vRtlM64uQJIMP3F9x6/UbiyebOtviYFMRgAQ==
-X-Received: by 2002:a17:907:3f14:b0:ace:8144:1649 with SMTP id a640c23a62f3a-ace848f779amr230479966b.20.1745668809520;
-        Sat, 26 Apr 2025 05:00:09 -0700 (PDT)
-Received: from localhost (cst2-173-28.cust.vodafone.cz. [31.30.173.28])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ace6ecf73a2sm275320366b.114.2025.04.26.05.00.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Apr 2025 05:00:09 -0700 (PDT)
-Date: Sat, 26 Apr 2025 14:00:07 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Thomas Huth <thuth@redhat.com>, Andrew Jones <andrew.jones@linux.dev>, 
-	kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] scripts: Search the entire string for the
- correct accelerator
-Message-ID: <20250426-8f1b81cc50c34db23f34110b@orel>
-References: <20250425220557.989650-1-seanjc@google.com>
+	s=arc-20240116; t=1745670531; c=relaxed/simple;
+	bh=PxCOa7ezxiwNsj/z6VNegE0qp4zLiQ9eD8lTtFWnYPA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pHySnjanI57M+UH3z14fEwm/rdfuhH63+H65yURE0zgsch+lqY327Np/jgnF0q9HXOmNSO+AwN8Mf3MlTw7Q17Pjtrv7KZjb284Q/yUVYq7SscRH97T5FyFCM37UMISrebw7EbDUSZDV6z3LFmTZKJIDqqBK24jsZ83J0LRvqdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=soyth5cZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69019C4CEEA;
+	Sat, 26 Apr 2025 12:28:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745670530;
+	bh=PxCOa7ezxiwNsj/z6VNegE0qp4zLiQ9eD8lTtFWnYPA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=soyth5cZqEWPqnr3GfkkTlyCScP0LzNBQNJ462sXGNYAfH6/1u2mDK3rWICthzpQ5
+	 FjdXZos/KtugkyT3bR9ERCj7wfZ96a6pH/auFYXZQjFil9uxOL6Rv4k2RqRomrKhOm
+	 NbRIsbga4zt8TqM3i3MVnbgsmXfVH7GVYdzLSPzfURao5TlAMSbTPvI7hhDrVACvLW
+	 qqYmpCtgBBENWEa24YDDO5SmnADcEOt6kARVULU3sGFg/jRP2s8Unw+U+iJMOKU+lK
+	 qppd2lIX0veVFbh34BMVnc1+M5u39+TCLeVcowI+qnXD9bof8dpIMBQjg61j7qCt9P
+	 bcblPRRgYu44g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u8eeF-0092VH-Up;
+	Sat, 26 Apr 2025 13:28:48 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: [PATCH v3 00/42] KVM: arm64: Revamp Fine Grained Trap handling
+Date: Sat, 26 Apr 2025 13:27:54 +0100
+Message-Id: <20250426122836.3341523-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250425220557.989650-1-seanjc@google.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Apr 25, 2025 at 03:05:57PM -0700, Sean Christopherson wrote:
-> Search the entire ACCEL string for the required accelerator as searching
-> for an exact match incorrectly rejects ACCEL when additional accelerator
-> specific options are provided, e.g.
-> 
->   SKIP pmu (kvm only, but ACCEL=kvm,kernel_irqchip=on)
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  scripts/runtime.bash | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 4b9c7d6b..59d1727c 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -126,7 +126,7 @@ function run()
->          machine="$MACHINE"
->      fi
->  
-> -    if [ -n "$accel" ] && [ -n "$ACCEL" ] && [ "$accel" != "$ACCEL" ]; then
-> +    if [ -n "$accel" ] && [ -n "$ACCEL" ] && [[ ! "$ACCEL" =~ $accel ]]; then
+This is yet another version of the series last posted at [1].
 
-Let's use
+The eagled eye reviewer will have noticed that since v2, the series
+has more or less doubled in size for any reasonable metric (number of
+patches, number of lines added or deleted). It is therefore pretty
+urgent that this gets either merged or forgotten! ;-)
 
- [[ ! $ACCEL =~ ^$accel(,.*|$) ]]
+See the change log below for the details -- most of it is related to
+FGT2 (and its rather large dependencies) being added.
 
-to be a bit more precise.
+* From v2:
 
-Thanks,
-drew
+  - Added comprehensive support for FEAT_FGT2, as the host kernel is
+    now making use of these registers, without any form of context
+    switch in KVM. What could possibly go wrong?
 
->          print_result "SKIP" $testname "" "$accel only, but ACCEL=$ACCEL"
->          return 2
->      elif [ -n "$ACCEL" ]; then
-> 
-> base-commit: 0d3cb7dd56ec255a71af867c2d76c8f4b22cd420
-> -- 
-> 2.49.0.850.g28803427d3-goog
-> 
+  - Reworked some of the FGT description and handling primitives,
+    reducing the boilerplate code and tables that get added over time.
+
+  - Rebased on 6.15-rc3.
+
+[1]: https://lore.kernel.org/r/20250310122505.2857610-1-maz@kernel.org
+
+Marc Zyngier (41):
+  arm64: sysreg: Add ID_AA64ISAR1_EL1.LS64 encoding for FEAT_LS64WB
+  arm64: sysreg: Update ID_AA64MMFR4_EL1 description
+  arm64: sysreg: Add layout for HCR_EL2
+  arm64: sysreg: Replace HGFxTR_EL2 with HFG{R,W}TR_EL2
+  arm64: sysreg: Update ID_AA64PFR0_EL1 description
+  arm64: sysreg: Update PMSIDR_EL1 description
+  arm64: sysreg: Update TRBIDR_EL1 description
+  arm64: sysreg: Add registers trapped by HFG{R,W}TR2_EL2
+  arm64: sysreg: Add registers trapped by HDFG{R,W}TR2_EL2
+  arm64: sysreg: Add system instructions trapped by HFGIRT2_EL2
+  arm64: Remove duplicated sysreg encodings
+  arm64: tools: Resync sysreg.h
+  arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
+  arm64: Add FEAT_FGT2 capability
+  KVM: arm64: Tighten handling of unknown FGT groups
+  KVM: arm64: Simplify handling of negative FGT bits
+  KVM: arm64: Handle trapping of FEAT_LS64* instructions
+  KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_ST64_ACCDATA being
+    disabled
+  KVM: arm64: Don't treat HCRX_EL2 as a FGT register
+  KVM: arm64: Plug FEAT_GCS handling
+  KVM: arm64: Compute FGT masks from KVM's own FGT tables
+  KVM: arm64: Add description of FGT bits leading to EC!=0x18
+  KVM: arm64: Use computed masks as sanitisers for FGT registers
+  KVM: arm64: Propagate FGT masks to the nVHE hypervisor
+  KVM: arm64: Use computed FGT masks to setup FGT registers
+  KVM: arm64: Remove hand-crafted masks for FGT registers
+  KVM: arm64: Use KVM-specific HCRX_EL2 RES0 mask
+  KVM: arm64: Handle PSB CSYNC traps
+  KVM: arm64: Switch to table-driven FGU configuration
+  KVM: arm64: Validate FGT register descriptions against RES0 masks
+  KVM: arm64: Use FGT feature maps to drive RES0 bits
+  KVM: arm64: Allow kvm_has_feat() to take variable arguments
+  KVM: arm64: Use HCRX_EL2 feature map to drive fixed-value bits
+  KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits
+  KVM: arm64: Add FEAT_FGT2 registers to the VNCR page
+  KVM: arm64: Add sanitisation for FEAT_FGT2 registers
+  KVM: arm64: Add trap routing for FEAT_FGT2 registers
+  KVM: arm64: Add context-switch for FEAT_FGT2 registers
+  KVM: arm64: Allow sysreg ranges for FGT descriptors
+  KVM: arm64: Add FGT descriptors for FEAT_FGT2
+  KVM: arm64: Handle TSB CSYNC traps
+
+Mark Rutland (1):
+  KVM: arm64: Unconditionally configure fine-grain traps
+
+ arch/arm64/include/asm/el2_setup.h      |   14 +-
+ arch/arm64/include/asm/esr.h            |   10 +-
+ arch/arm64/include/asm/kvm_arm.h        |  186 ++--
+ arch/arm64/include/asm/kvm_host.h       |   56 +-
+ arch/arm64/include/asm/sysreg.h         |   26 +-
+ arch/arm64/include/asm/vncr_mapping.h   |    5 +
+ arch/arm64/kernel/cpufeature.c          |    7 +
+ arch/arm64/kvm/Makefile                 |    2 +-
+ arch/arm64/kvm/arm.c                    |   13 +
+ arch/arm64/kvm/config.c                 | 1085 +++++++++++++++++++++++
+ arch/arm64/kvm/emulate-nested.c         |  580 ++++++++----
+ arch/arm64/kvm/handle_exit.c            |   77 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  158 ++--
+ arch/arm64/kvm/hyp/nvhe/switch.c        |   12 +
+ arch/arm64/kvm/hyp/vgic-v3-sr.c         |    8 +-
+ arch/arm64/kvm/nested.c                 |  223 +----
+ arch/arm64/kvm/sys_regs.c               |   68 +-
+ arch/arm64/tools/cpucaps                |    1 +
+ arch/arm64/tools/sysreg                 | 1002 ++++++++++++++++++++-
+ tools/arch/arm64/include/asm/sysreg.h   |   65 +-
+ 20 files changed, 2888 insertions(+), 710 deletions(-)
+ create mode 100644 arch/arm64/kvm/config.c
+
+-- 
+2.39.2
+
 
