@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-44395-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44396-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30DD1A9D905
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 09:28:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2115A9D92A
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 09:42:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB5EF9A68A6
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 07:28:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C3D31890AB6
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 07:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363B424EA85;
-	Sat, 26 Apr 2025 07:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C1A250BF9;
+	Sat, 26 Apr 2025 07:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="RjCSEzfE"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="bvhYUcCC"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCCD192D97;
-	Sat, 26 Apr 2025 07:28:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927761A83F5;
+	Sat, 26 Apr 2025 07:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745652496; cv=none; b=FsM5Jp3qVceYJEXqiwhGuR+18GDtWCZQFpMdAvM8RABNLDbpm/GAXkkHDqty+OyBkuWxX8SS11qjkUsswjSOCKz1Z3T9TR23p2gwGBbUhAz9+P/a/aQxYAtyngrjKd3gVmm4zxml6UZRsmksTcE2Z0oNb4WVUU3WZiofF6MriOM=
+	t=1745653289; cv=none; b=YmAGAR4IXnEOStJrUtXWupjFnJR6RHPiRx15XV5yeUkOXtv6nJVtoLIW1kyxf+NA4uhQ7MMUh52R1TuP3l7bV9+00+1BMwN2aCaUrT90vUyVd5Izmcg31lEDOqNVcUO1sdF3N0i4StaAWVPELYD9A/EjQZBtGpvGJdXuC7nSd8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745652496; c=relaxed/simple;
-	bh=XjMjO7HflcfiRrSXpoSWT54pSI6eenhpN6xe1KG2F+g=;
+	s=arc-20240116; t=1745653289; c=relaxed/simple;
+	bh=hS1jPAiEqHUvDMPkv5Lj+oeUpVA95gPZF2GujwJl4JY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lcGye+Fzy4pavwNqtPvdn59Msv2TM2y7fFhc1wTRX75ClwZ+unhkArnSlEUMcLHqvgLuZSrENgFvmrYg3bq5DFTXLi251uy4LrvK0LWyEMZG21EFCSR1k6PmMeGhxbZxMtX4olELmw4AQI3PxTDjYjMpRwgWz5hfr3Y73Z0Cr20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=RjCSEzfE; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=ExcYtYeac3hhvXdhD3qtxPE2fV9AVcLmJFl5yZgio0+4c6z8LPGz0I9dT1mZTYt3KHusO4diWjjB3S7EFlKKue9JLTtJvrHLdsGCScNtqB51fIeoL9sRskLKfkhz1QRjGvmuX9Of0XGIW7n6iGZlTFcjGodKb+qUkUntaXbCM3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=bvhYUcCC; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53Q7RDlh4064371
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53Q7eZXY4077669
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Sat, 26 Apr 2025 00:27:14 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53Q7RDlh4064371
+	Sat, 26 Apr 2025 00:40:36 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53Q7eZXY4077669
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1745652440;
-	bh=9M1Htgas0CGK26R6ri7TrX3Gr2qZnASXeVTeX3rMiIs=;
+	s=2025042001; t=1745653241;
+	bh=EnzZeIbi73Uf9UHrFp1u6oVId+aFUuWUYzex7VH6YZ8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RjCSEzfElpajKkgYYkV/+MBKINyow1AsiXOQ9t25nN80YY48sfqpaQzNKvS9wovLg
-	 89fcrOmFuSALWEVhtziqyKoX4p5+bDKC5sOXnITQu0I9pzln1i6o6Kx+Zinny/P5J/
-	 NtEGeb3UHVlgAvvXUqporCfcK2cJ/ScxE0e/jUuyshXzNKua/GrB89ci8uE7KvUwGr
-	 Y+kiGMd8OPAUFViUOU2URxLWLLEYaoVuPqTFFCaZP8kPE0qL1U3xNnaxmiw3VuRSm3
-	 mSAabdcMTMuBrPZX+0RkvM1HHS/HvGIAZaennDGAFdhkrlTWeAl7NP0whBGetXW0Sb
-	 G0dkIqzJjgfFg==
-Message-ID: <e62b81f3-1952-43e6-85fd-18c6f37d531d@zytor.com>
-Date: Sat, 26 Apr 2025 00:27:12 -0700
+	b=bvhYUcCCrcNPHPHMfra8pagGFHBS1eIdachPY1j/LcLKf75gVtMgjo4Z3lxW/Nwx8
+	 K3abxiwtE5S6sAYo2Z6xAFmeJAbufNq9L8ADk5XuAUJ+H1tQ3G+X0J9m0VZjBLaA+s
+	 5n4Z890DiCiOntXIwifwugz7hNqwSnsVHa6YIIwsPaR3Ir9ZolFZmCw+gTKQ62dE4J
+	 YecUoTzxNgG+BOaBljb6+z0Do/A8o3VQ615cdunTjaM57EXYYspTWEBwIZzokrA2Wq
+	 9fiFpIsxxWxYHBZiB5dJyiIoZFVhM3/ZEzW/zA5+lZDd3b8R/C+bYjqUDXonYDLCCo
+	 u8/14ZBKTETHw==
+Message-ID: <3a25ce15-f95c-41c9-8f8a-3b01cffc95e5@zytor.com>
+Date: Sat, 26 Apr 2025 00:40:34 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,18 +56,18 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/14] x86/msr: Move rdtsc{,_ordered}() to <asm/tsc.h>
-To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+Subject: Re: [PATCH v3 10/14] x86/xen/msr: Remove pmu_msr_{read,write}()
+To: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
         virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
         linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
+        acme@kernel.org, andrew.cooper3@citrix.com, peterz@infradead.org,
+        namhyung@kernel.org, mark.rutland@arm.com,
         alexander.shishkin@linux.intel.com, jolsa@kernel.org,
         irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
         wei.liu@kernel.org, ajay.kaher@broadcom.com,
@@ -77,8 +77,8 @@ Cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
         haiyangz@microsoft.com, decui@microsoft.com,
         dapeng1.mi@linux.intel.com
 References: <20250425083442.2390017-1-xin@zytor.com>
- <20250425083442.2390017-2-xin@zytor.com>
- <42dc90e1-df2a-2324-d28c-d75fb525e4a2@linux.intel.com>
+ <20250425083442.2390017-11-xin@zytor.com>
+ <04d47f21-6183-42d5-bc18-f23a8c3c2009@suse.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -115,85 +115,22 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <42dc90e1-df2a-2324-d28c-d75fb525e4a2@linux.intel.com>
+In-Reply-To: <04d47f21-6183-42d5-bc18-f23a8c3c2009@suse.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 4/25/2025 8:45 AM, Ilpo Järvinen wrote:
-> To me this looks really a random set of source files, maybe it helped some
-> build success but it's hard for me to review this because there are still
-> cases that depend on indirect include chains.
+On 4/25/2025 3:08 AM, Jürgen Groß wrote:
 > 
-> Could you just look into solving all missing msr.h includes instead
-> as clearly some are still missing after 3 pre-existing ones and you adding
-> it into 3 files:
-> 
-> $ git grep -e rdmsr -e wrmsr -l drivers/platform/x86/
-> drivers/platform/x86/intel/ifs/core.c
-> drivers/platform/x86/intel/ifs/load.c
-> drivers/platform/x86/intel/ifs/runtest.c
-> drivers/platform/x86/intel/pmc/cnp.c
-> drivers/platform/x86/intel/pmc/core.c
-> drivers/platform/x86/intel/speed_select_if/isst_if_common.c
-> drivers/platform/x86/intel/speed_select_if/isst_if_mbox_msr.c
-> drivers/platform/x86/intel/speed_select_if/isst_tpmi_core.c
-> drivers/platform/x86/intel/tpmi_power_domains.c
-> drivers/platform/x86/intel/turbo_max_3.c
-> drivers/platform/x86/intel/uncore-frequency/uncore-frequency.c
-> drivers/platform/x86/intel_ips.c
-> 
-> $ git grep -e 'msr.h' -l drivers/platform/x86/
-> drivers/platform/x86/intel/pmc/core.c
-> drivers/platform/x86/intel/tpmi_power_domains.c
-> drivers/platform/x86/intel_ips.c
+> Can you please remove the two "else" instances above? With directly 
+> returning
+> form the "if" clause they are no longer needed.
 
-I think you want me to add all necessary direct inclusions, right?
-
-This is the right thing to do, and I did try it but gave up later.
-
-I will do it in the next iteration as you asked.  But I want to make my
-points:
-
-1) It's not just two patterns {rd,wr}msr, there are a lot of definitions
-    in <asm/msr.h> and we need to cover all of them:
-
-       struct msr_info
-       struct msr_regs_info
-       struct saved_msr
-       struct saved_msrs
-       {read,write}_msr
-       rdpmc
-       .*msr.*_on_cpu
-
-2) Once all necessary direct inclusions are in place, it's easy to
-    overlook adding a header inclusion in practice, especially if the
-    build passes.  Besides we often forget to remove a header when a
-    definition is removed.  In other words, direct inclusion is hard to
-    maintain.
-
-3) Some random kernel configuration combinations can cause the current
-    kernel build to fail.  I hit one in x86 UML.
-
-
-We all know Ingo is the best person to discuss this with :).  While my
-understanding of the header inclusion issue may be inaccurate or
-outdated.
-
-So for me, using "make allyesconfig" is a practical method for a quick
-local build check, plus I always send my patches to Intel LKP.
-
-
-There probably wants a script that identifies all files that reference a
-definition in a header thus need to include it explicitly.  And indirect
-includes should be zapped.
-
+I thought about it but forgot to do it later.
 
 > 
-> I'd also prefer the patch(es) adding missing includes be in a different
-> patch.
+> With that you can add my:
+> 
+> Reviewed-by: Juergen Gross <jgross@suse.com>
 
-Great suggestion!  It clearly highlights the most significant changes.
-
-Thanks!
-     Xin
+Thanks a lot!
 
