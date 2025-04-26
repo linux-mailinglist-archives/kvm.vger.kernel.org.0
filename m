@@ -1,259 +1,231 @@
-Return-Path: <kvm+bounces-44464-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44465-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44FB5A9DD43
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 23:28:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52E56A9DD9E
+	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 00:46:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71614189B56D
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 21:29:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 412F317E657
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 22:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 672341FAC4E;
-	Sat, 26 Apr 2025 21:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D211120296E;
+	Sat, 26 Apr 2025 22:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C1KLpmg9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YKGaQruU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051D21F5619;
-	Sat, 26 Apr 2025 21:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4F317E4;
+	Sat, 26 Apr 2025 22:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745702924; cv=none; b=ZxsMThBlx+NzUk6ApfenVs2TRgMZM9W4Wov0cpYAIhDFqBpeuLoo8VPkWBTFnJ0dGwyeV6CGwMqBBKbt4Z/R6ZtijoTnLFQ1mT2hw+7/FpbqY8P5xv+EUaYtHMs0DJ3bSP+/H+W6oRyo5s5xvRhC9i3S1l39pAOq4hbuz4sbus0=
+	t=1745707593; cv=none; b=SCJwqSlP42pLgpd+Wq8YdUc15rdKctnPo4TeQLSGih/8IlG8ot3pa1qXWg/LViRfBQ9biQxCac7BbTzDuMmb5TsM5NffkBAzQmskdfxg5jJhJXFB+eiVctakf+rU1OPXiQ7UF+Noq2EiR9Q3OrcWJesR6y2UaGZ9E8BwVDJ9F04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745702924; c=relaxed/simple;
-	bh=4qDv12GpymzV9cqm+5wc+FH3p/oXtI26viWEferrXSk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aY5DEDVadHqnRcNedPTS8sj7sG/FAjc4uTq9JQiJgOG77TAgx7VAtGrP25QcJpntJLEf1/hRIQ8cVA0204JMirntkwwH3YOZimngivo+bW4PeBRO4s7XKp1kBq54WfhkW7QYK/KuQ1KceTcz/jhzuHVhnxxjTiKMguXFDRSWibc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C1KLpmg9; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3d813c1c39eso32089405ab.0;
-        Sat, 26 Apr 2025 14:28:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1745702922; x=1746307722; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=in3Jc9pC1jNw19VgvSAZdkrPc3LvG10mRUdoc1WL8qI=;
-        b=C1KLpmg9kXxweCLjSFkM0u7RuqaZ+IO+NSl/DmdWrNlYXU53kp6lxlmhP2CJSQHbi2
-         FpbTnBTpHC1k5xUxJkvoC7h1R0akrkLTkFgVNnFs2HgL0sFQNNayxXbJx7schJAHCarE
-         XtmJmPaWsheEKXasasMog4AXWPljE8ypTIQNcU7qAUZbde1a43PVJ3TUPFIpHhAWqwRb
-         9QMF5c3r3Q3XCc4YvUoqCZFoDSzpf83iNlQyxuYcOZ3VRf0OraEgVx8RX5wwHjXhvNVg
-         0wDHCGHuZXwh3HHKt9tqsuBfq4ji7pnSef5jzfZXI+3YXHNqBj3qIDcZCHH21jzz8BAc
-         5MOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745702922; x=1746307722;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=in3Jc9pC1jNw19VgvSAZdkrPc3LvG10mRUdoc1WL8qI=;
-        b=QyYX8rGCJTRz/LZZVzzZlCWgZhGHntJbR4Pn+HL1kWbJ1smlRJBDTNOotzRm5tOliO
-         DiyTF+7MMYw0ZkV1VTOsiI3H6YVcyRu90taEXKBZRcRE8CpY6Yz29jI4r/R4eivDo36b
-         WxVizVv+1aMPDwj+/irtX8h8NxIp5NwAaxwDlwwFi0yETb3yEgPPlwrnHRpH2ajwenqq
-         0RvIBgmsfVhbtpuNLQYNf7v6aq3aoFhi5F5FEKffn4u1kNSuBl0cjSu6LXjdkXlEjfan
-         bbYRUIfZAMlWp+T3VfILfaEAzgQBpXz+DQfD8oSsMat5sKMDTa1zQjf90ovmP0wuGmw1
-         Ss4w==
-X-Forwarded-Encrypted: i=1; AJvYcCXdNnn+sN2+kk26T/z/AJKVr1yxfbywRkh04F1igA24rjSMPCXqpmN/gdYGxfeOb+aW8EGrMg==@vger.kernel.org, AJvYcCXwPbZQ3/DhClp5N+BZoYlK58Wek1ZOyVMHLzZHgJMVqaVRjxC/S8n8XwDBHkAdLB7qiTbfUcK5SdSe5bLG@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPqgZ7rwxrzUuV27P6Eg0LdBBTHI9hA0+yjsEsDHdscZYU4EsM
-	I5kxOIKypHRzBWiWs8TnjqBh49cguNyHC/OFQQ4Cwqk3AkmaRUq7po7ocC/s
-X-Gm-Gg: ASbGncuMwB6o4NwQVW3hLQMFstLDaVSY1OKtKnjwrDxbCNWyzil8Q9CwqiravURdKMQ
-	BjoPQ0uZSj/JqXnu7oDhRJFH5ZDOfP3rpCyJaRTczjCInUeK4d/4xx7bIyNdvaNlJl5Vexaz/7L
-	E6oa258U6bTMIGEh7csFBPFs4dJh7V9c6IhTx8QRijuK8dvyE0C3+8jtm5byNk+C7pkM29IEaTk
-	u3Ub3w5PfFBlXqwzrr0q3YSXSpV6lw57lB39evMT3bE/ous/AhVpNUJ+TRzKNCG2fIngHyX18zu
-	jjnt6Eq6X112BMRma/w1bu+F7eCquiCockcemnMpRJkrhoPKCZoq8yrV2MFmOymQrbLYsDTEnao
-	/tlR0OJLabV2Gks8pz9yvEpwVhFkVNn9NP5Gqjta9ywGHlTPB
-X-Google-Smtp-Source: AGHT+IEBsK1Ip7zewga42fow2XKfAMr6aAeFPtYTe8aj7FYt3FMb9QHjB7XcLkdoWDnjTaV1NaN4+g==
-X-Received: by 2002:a05:6e02:12e8:b0:3d0:1fc4:edf0 with SMTP id e9e14a558f8ab-3d942e12849mr42783385ab.15.1745702921897;
-        Sat, 26 Apr 2025 14:28:41 -0700 (PDT)
-Received: from master.chath-253561.iommu-security-pg0.wisc.cloudlab.us (sm220u-10s10539.wisc.cloudlab.us. [128.105.146.46])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f824ba34c1sm1454482173.126.2025.04.26.14.28.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Apr 2025 14:28:41 -0700 (PDT)
-From: Chathura Rajapaksha <chathura.abeyrathne.lk@gmail.com>
-X-Google-Original-From: Chathura Rajapaksha <chath@bu.edu>
-To: kvm@vger.kernel.org
-Cc: Chathura Rajapaksha <chath@bu.edu>,
-	William Wang <xwill@bu.edu>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Paul Moore <paul@paul-moore.com>,
-	Eric Paris <eparis@redhat.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Xin Zeng <xin.zeng@intel.com>,
-	Kevin Tian <kevin.tian@intel.com>,
+	s=arc-20240116; t=1745707593; c=relaxed/simple;
+	bh=it71BWM3Pceo9WRIYilwNRCMXHq8+IvGJApDek517BE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O/W6gbQh4x9i9aECZ43tCuHGRcXMLuSSkKsFvw1gqpxef6tnmY4EjDEK0Ig0POFBl25im5w5BcVzrC1fk8SSOJFAY35vJEpRI3H1ko0GMYu2WQltS8RklFjwFdg2rPgifrBRPNp18DqdantlPCY2w705bGx91lbgP4t7NAGv1XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YKGaQruU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69CF1C4CEE2;
+	Sat, 26 Apr 2025 22:46:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745707592;
+	bh=it71BWM3Pceo9WRIYilwNRCMXHq8+IvGJApDek517BE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YKGaQruU+xGKGdoV3l0Vdfka/Y45JUZ628iUFoujF9GwWY3FxppXFkzRMUG35MpSg
+	 EaiOBb12LBgx+b82Q725iKeAXZvDOQrTrYDbpjGsFJD/9JoTAfzclwS22FBORZc6ek
+	 YrQeuCfAS9736Zz+L8ezEhzujNRGjLTWdfKLTu8z+Sj/Nf/KYu+5QuqEX0RYVcxQVu
+	 iuNkpiXmoht3Sz9eAnub+4DM+HlcT4q+qLJWPn7TfVySmbrV5ShZFLhZN6chXawY7/
+	 o0K1zUEdi2U8Gb27lMdTVWTZAdL8kVWJyUyes55gZ+Haf+mBp0qPllLRO9rYmNiAcI
+	 bgflnweJDU5Mw==
+Date: Sat, 26 Apr 2025 15:46:30 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
 	Bjorn Helgaas <bhelgaas@google.com>,
-	Yahui Cao <yahui.cao@intel.com>,
-	Yunxiang Li <Yunxiang.Li@amd.com>,
-	Dongdong Zhang <zhangdongdong@eswincomputing.com>,
-	Avihai Horon <avihaih@nvidia.com>,
-	linux-kernel@vger.kernel.org,
-	audit@vger.kernel.org
-Subject: [RFC PATCH 2/2] audit accesses to unassigned PCI config regions
-Date: Sat, 26 Apr 2025 21:22:49 +0000
-Message-Id: <20250426212253.40473-3-chath@bu.edu>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250426212253.40473-1-chath@bu.edu>
-References: <20250426212253.40473-1-chath@bu.edu>
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v9 07/24] dma-mapping: Implement link/unlink ranges API
+Message-ID: <aA1iRtCsPkuprI-X@bombadil.infradead.org>
+References: <cover.1745394536.git.leon@kernel.org>
+ <2d6ca43ef8d26177d7674b9e3bdf0fe62b55a7ed.1745394536.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2d6ca43ef8d26177d7674b9e3bdf0fe62b55a7ed.1745394536.git.leon@kernel.org>
 
-Some PCIe devices trigger PCI bus errors when accesses are made to
-unassigned regions within their PCI configuration space. On certain
-platforms, this can lead to host system hangs or reboots.
+On Wed, Apr 23, 2025 at 11:12:58AM +0300, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> Introduce new DMA APIs to perform DMA linkage of buffers
+> in layers higher than DMA.
+> 
+> In proposed API, the callers will perform the following steps.
+> In map path:
+> 	if (dma_can_use_iova(...))
+> 	    dma_iova_alloc()
+> 	    for (page in range)
+> 	       dma_iova_link_next(...)
+> 	    dma_iova_sync(...)
+> 	else
+> 	     /* Fallback to legacy map pages */
+>              for (all pages)
+> 	       dma_map_page(...)
+> 
+> In unmap path:
+> 	if (dma_can_use_iova(...))
+> 	     dma_iova_destroy()
+> 	else
+> 	     for (all pages)
+> 		dma_unmap_page(...)
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Tested-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/iommu/dma-iommu.c   | 261 ++++++++++++++++++++++++++++++++++++
+>  include/linux/dma-mapping.h |  32 +++++
+>  2 files changed, 293 insertions(+)
+> 
+> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+> index d2c298083e0a..2e014db5a244 100644
+> --- a/drivers/iommu/dma-iommu.c
+> +++ b/drivers/iommu/dma-iommu.c
+> @@ -1818,6 +1818,267 @@ void dma_iova_free(struct device *dev, struct dma_iova_state *state)
+>  }
+>  EXPORT_SYMBOL_GPL(dma_iova_free);
+>  
+> +static int __dma_iova_link(struct device *dev, dma_addr_t addr,
+> +		phys_addr_t phys, size_t size, enum dma_data_direction dir,
+> +		unsigned long attrs)
+> +{
+> +	bool coherent = dev_is_dma_coherent(dev);
+> +
+> +	if (!coherent && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
+> +		arch_sync_dma_for_device(phys, size, dir);
 
-The current vfio-pci driver allows guests to access unassigned regions
-in the PCI configuration space. Therefore, when such a device is passed
-through to a guest, the guest can induce a host system hang or reboot
-through crafted configuration space accesses, posing a threat to
-system availability.
+So arch_sync_dma_for_device() is a no-op on some architectures, notably x86.
+So since you're doing this work and given the above pattern is common on
+the non iova case, we could save ourselves 2 branches checks on x86 on
+__dma_iova_link() and also generalize savings for the non-iova case as
+well. For the non-iova case we have two use cases, one with the attrs on
+initial mapping, and one without on subsequent sync ops. For the iova
+case the attr is always consistently used.
 
-This patch introduces auditing support for config space accesses to
-unassigned regions. When enabled, this logs such accesses for all
-passthrough devices. 
-This feature is controlled via a new Kconfig option:
+So we could just have something like this:
 
-  CONFIG_VFIO_PCI_UNASSIGNED_ACCESS_AUDIT
+#ifdef CONFIG_ARCH_HAS_SYNC_DMA_FOR_DEVICE
+static inline void arch_sync_dma_device(struct device *dev,
+                                        phys_addr_t paddr, size_t size,
+                                        enum dma_data_direction dir)
+{
+    if (!dev_is_dma_coherent(dev))
+        arch_sync_dma_for_device(paddr, size, dir);
+}
 
-A new audit event type, AUDIT_VFIO, has been introduced to support
-this, allowing administrators to monitor and investigate suspicious
-behavior by guests.
+static inline void arch_sync_dma_device_attrs(struct device *dev,
+                                              phys_addr_t paddr, size_t size,
+                                              enum dma_data_direction dir,
+                                              unsigned long attrs)
+{
+    if (!dev_is_dma_coherent(dev) && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
+        arch_sync_dma_for_device(paddr, size, dir);
+}
+#else
+static inline void arch_sync_dma_device(struct device *dev,
+                                        phys_addr_t paddr, size_t size,
+                                        enum dma_data_direction dir)
+{
+}
 
-Co-developed by: William Wang <xwill@bu.edu>
-Signed-off-by: William Wang <xwill@bu.edu>
-Signed-off-by: Chathura Rajapaksha <chath@bu.edu>
----
- drivers/vfio/pci/Kconfig           | 12 ++++++++
- drivers/vfio/pci/vfio_pci_config.c | 46 ++++++++++++++++++++++++++++--
- include/uapi/linux/audit.h         |  1 +
- 3 files changed, 57 insertions(+), 2 deletions(-)
+static inline void arch_sync_dma_device_attrs(struct device *dev,
+                                              phys_addr_t paddr, size_t size,
+                                              enum dma_data_direction dir,
+                                              unsigned long attrs)
+{
+}
+#endif
 
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index c3bcb6911c53..7f9f16262b90 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -42,6 +42,18 @@ config VFIO_PCI_IGD
- 	  and LPC bridge config space.
- 
- 	  To enable Intel IGD assignment through vfio-pci, say Y.
-+
-+config VFIO_PCI_UNASSIGNED_ACCESS_AUDIT
-+	bool "Audit accesses to unassigned PCI configuration regions"
-+	depends on AUDIT && VFIO_PCI_CORE
-+	help
-+	  Some PCIe devices are known to cause bus errors when accessing
-+	  unassigned PCI configuration space, potentially leading to host
-+	  system hangs on certain platforms. When enabled, this option
-+	  audits accesses to unassigned PCI configuration regions.
-+
-+	  If you don't know what to do here, say N.
-+
- endif
- 
- config VFIO_PCI_ZDEV_KVM
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index cb4d11aa5598..ddd10904d60f 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -25,6 +25,7 @@
- #include <linux/uaccess.h>
- #include <linux/vfio.h>
- #include <linux/slab.h>
-+#include <linux/audit.h>
- 
- #include "vfio_pci_priv.h"
- 
-@@ -1980,6 +1981,37 @@ static size_t vfio_pci_cap_remaining_dword(struct vfio_pci_core_device *vdev,
- 	return i;
- }
- 
-+enum vfio_audit {
-+	VFIO_AUDIT_READ,
-+	VFIO_AUDIT_WRITE,
-+	VFIO_AUDIT_MAX,
-+};
-+
-+static const char * const vfio_audit_str[VFIO_AUDIT_MAX] = {
-+	[VFIO_AUDIT_READ]  = "READ",
-+	[VFIO_AUDIT_WRITE] = "WRITE",
-+};
-+
-+static void vfio_audit_access(const struct pci_dev *pdev,
-+			      size_t count, loff_t *ppos, bool blocked, unsigned int op)
-+{
-+	struct audit_buffer *ab;
-+
-+	if (WARN_ON_ONCE(op >= VFIO_AUDIT_MAX))
-+		return;
-+	if (audit_enabled == AUDIT_OFF)
-+		return;
-+	ab = audit_log_start(audit_context(), GFP_ATOMIC, AUDIT_VFIO);
-+	if (unlikely(!ab))
-+		return;
-+	audit_log_format(ab,
-+			 "device=%04x:%02x:%02x.%d access=%s offset=0x%llx size=%ld blocked=%u\n",
-+			 pci_domain_nr(pdev->bus), pdev->bus->number,
-+			 PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn),
-+			 vfio_audit_str[op], *ppos, count, blocked);
-+	audit_log_end(ab);
-+}
-+
- static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user *buf,
- 				 size_t count, loff_t *ppos, bool iswrite)
- {
-@@ -1989,6 +2021,7 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
- 	int cap_start = 0, offset;
- 	u8 cap_id;
- 	ssize_t ret;
-+	bool blocked;
- 
- 	if (*ppos < 0 || *ppos >= pdev->cfg_size ||
- 	    *ppos + count > pdev->cfg_size)
-@@ -2011,13 +2044,22 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
- 	cap_id = vdev->pci_config_map[*ppos];
- 
- 	if (cap_id == PCI_CAP_ID_INVALID) {
--		if (((iswrite && block_pci_unassigned_write) ||
-+		blocked = (((iswrite && block_pci_unassigned_write) ||
- 		     (!iswrite && block_pci_unassigned_read)) &&
--		    !pci_uaccess_lookup(pdev))
-+		    !pci_uaccess_lookup(pdev));
-+		if (blocked)
- 			perm = &block_unassigned_perms;
- 		else
- 			perm = &unassigned_perms;
- 		cap_start = *ppos;
-+		if (IS_ENABLED(CONFIG_VFIO_PCI_UNASSIGNED_ACCESS_AUDIT)) {
-+			if (iswrite)
-+				vfio_audit_access(pdev, count, ppos, blocked,
-+						  VFIO_AUDIT_WRITE);
-+			else
-+				vfio_audit_access(pdev, count, ppos, blocked,
-+						  VFIO_AUDIT_READ);
-+		}
- 	} else if (cap_id == PCI_CAP_ID_INVALID_VIRT) {
- 		perm = &virt_perms;
- 		cap_start = *ppos;
-diff --git a/include/uapi/linux/audit.h b/include/uapi/linux/audit.h
-index 9a4ecc9f6dc5..c0aace7384f3 100644
---- a/include/uapi/linux/audit.h
-+++ b/include/uapi/linux/audit.h
-@@ -122,6 +122,7 @@
- #define AUDIT_OPENAT2		1337	/* Record showing openat2 how args */
- #define AUDIT_DM_CTRL		1338	/* Device Mapper target control */
- #define AUDIT_DM_EVENT		1339	/* Device Mapper events */
-+#define AUDIT_VFIO		1340	/* VFIO events */
- 
- #define AUDIT_AVC		1400	/* SE Linux avc denial or grant */
- #define AUDIT_SELINUX_ERR	1401	/* Internal SE Linux Errors */
--- 
-2.34.1
+> +/**
+> + * dma_iova_link - Link a range of IOVA space
+> + * @dev: DMA device
+> + * @state: IOVA state
+> + * @phys: physical address to link
+> + * @offset: offset into the IOVA state to map into
+> + * @size: size of the buffer
+> + * @dir: DMA direction
+> + * @attrs: attributes of mapping properties
+> + *
+> + * Link a range of IOVA space for the given IOVA state without IOTLB sync.
+> + * This function is used to link multiple physical addresses in contiguous
+> + * IOVA space without performing costly IOTLB sync.
+> + *
+> + * The caller is responsible to call to dma_iova_sync() to sync IOTLB at
+> + * the end of linkage.
+> + */
+> +int dma_iova_link(struct device *dev, struct dma_iova_state *state,
+> +		phys_addr_t phys, size_t offset, size_t size,
+> +		enum dma_data_direction dir, unsigned long attrs)
+> +{
+> +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+> +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+> +	struct iova_domain *iovad = &cookie->iovad;
+> +	size_t iova_start_pad = iova_offset(iovad, phys);
+> +
+> +	if (WARN_ON_ONCE(iova_start_pad && offset > 0))
+> +		return -EIO;
+> +
+> +	if (dev_use_swiotlb(dev, size, dir) && iova_offset(iovad, phys | size))
 
+There is already a similar check for the non-iova case for this on
+iommu_dma_map_page() and a nice comment about what why this checked,
+this seems to be just screaming for a helper:
+
+/*                                                                       
+ * Checks if a physical buffer has unaligned boundaries with respect to
+ * the IOMMU granule. Returns non-zero if either the start or end
+ * address is not aligned to the granule boundary.
+*/
+static inline size_t iova_unaligned(struct iova_domain *iovad,
+                                    phys_addr_t phys,
+				    size_t size)
+{                                                                                
+	return iova_offset(iovad, phys | size);
+}  
+
+Other than that, looks good.
+
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+
+  Luis
 
