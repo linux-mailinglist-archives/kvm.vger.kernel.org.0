@@ -1,114 +1,139 @@
-Return-Path: <kvm+bounces-44384-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44385-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 784C7A9D6A6
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 02:22:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56CFCA9D6B1
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 02:31:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2EA04C80DF
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 00:22:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 580AD7B9CD9
+	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 00:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3881C1E1E09;
-	Sat, 26 Apr 2025 00:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1ED1E4929;
+	Sat, 26 Apr 2025 00:31:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uSx9KLDJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QI642TQa"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F89613B284;
-	Sat, 26 Apr 2025 00:22:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA3419DF6A
+	for <kvm@vger.kernel.org>; Sat, 26 Apr 2025 00:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745626922; cv=none; b=AB3y6iaPDAcs8fgGNuphYafoTk39BKpQK1UzKrjo4Wjd/RKntNszLOc1ekBUZxXUdzrwl/7vNK3U6eOpAFrK4oiCfJyeytrs7S3eY3b0fyuOdNWS8gat4T4kxLH2qp/ARlflcbOQ6HVGXYWOcB2MEuqe9bfAw+azAfsmwVXldQ8=
+	t=1745627487; cv=none; b=oJn+A/YYXhP5CTVKl3G2V8h7i7AhQgZGNxWREGXXp1ihVItnx3RlzRe5BC4XOauR8Le2vsqgoQmZcj6qUT+m1uCxbUEDv8uSjUkRWPnG6Vp5MPa7tk0RhJKB/EfQbiLjE+cLPqgn9oVM0/xza04fzfR2ZEfYuFvNLNo/5Fwe7PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745626922; c=relaxed/simple;
-	bh=h50G9mpEZaBwJcj8NBjbBVE9qsIsc9fyuWGRd2gmBsM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=clCqOeqgKlcM+8L7v01XLLF+7qZfuwoVawcdhz13G/HRJsNZn5uXQsKeXCyorV6usIB762d+7hk4oRvcEzvLh1xYSoC76seolUcJvjSGaKyj++4lvlDfyQnnijLWhHxjyvP4rpsUZJykhlVMKV7zTdhPjEP2Q7iRNloQ3WyxvcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uSx9KLDJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6A96C4CEE4;
-	Sat, 26 Apr 2025 00:22:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745626921;
-	bh=h50G9mpEZaBwJcj8NBjbBVE9qsIsc9fyuWGRd2gmBsM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uSx9KLDJxnN6lYn0LOZiC4gIIRTMcevzUKTtv7QtHq94vnzWzXAWCWK4YS8t/lvCv
-	 alHXKJFiqiZH5uLDlN+4stNQPEDcFlWuzLtnpyGxFQaHCXmY/sJ3NasmNfPQ10XOsD
-	 wUw2k76EwWqC8e0qBP5fC1orpyG4CQVrSTzu1rraBPS49Yf+gV2ATcRoe77STUECZ4
-	 KJl2G7PvDJa9oNMl3b9jsvgxkMxCD7AlH1dhdpNSZwOELkRM++Hgq3UOE+eTSBx7Az
-	 pefT0sVbAaXyzhhHb4ziaDfP3nFsriO8NgoukTNrsqDiCzAfPrcBbyGzvg66JNeo6z
-	 O2DMUdv81udLg==
-Date: Fri, 25 Apr 2025 17:21:59 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH v9 01/24] PCI/P2PDMA: Refactor the p2pdma mapping helpers
-Message-ID: <aAwnJwLeOs7rfkHL@bombadil.infradead.org>
-References: <cover.1745394536.git.leon@kernel.org>
- <3a962f9039f0265de939f4c81924ee8208fc93a6.1745394536.git.leon@kernel.org>
+	s=arc-20240116; t=1745627487; c=relaxed/simple;
+	bh=9sS1jQlaw0aSh3DzVS54yCwHjJWlT7MMzb9Lp5mX0Iw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=mi2gKK0sfepRKPdNttXtEx17o36vL0LS1P0neAw6pIf1Lgzx07UpWM89O7C1V6Z+6jhQ2ATk59eaeUPl/YFEf7PgMMOCdj6PZWWHLSOd+UpVOdUwYYc409048qPV2FkS7DUpRd5djnhvY3Dnyg6YhUc8qZ5hMp01X+mmkD82fCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QI642TQa; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff8a2c7912so2195570a91.1
+        for <kvm@vger.kernel.org>; Fri, 25 Apr 2025 17:31:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745627485; x=1746232285; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b3IOGBjTq7O8fLAPAnxSaHu8qhCTmDkeWLsMrPMzyQw=;
+        b=QI642TQaiIkjK6ognItduvPNPmZ+zYZ9/4R0j7CquVNNqsAGbR4pp+CZAxk9QvBwKn
+         88OXCZjYSvmRndr1W6dibBqlHegldB2A7XVNYKar/LnW3vGXXqSoeTqcIWw5dvQDXaQg
+         eIWMDaiU1kXH8S7s0ZYglWtJx9K8RyuJ9qwEG/CeSvTNSUEkhgL7CRgGXCwsRRdcIfJ7
+         G2b9fTNA662PlF12MrwNGXrN/7SiFsXRyIQKgThQ7Pg4xCBS+TWHlCMuxdfXmp+9zo0X
+         kfIrp5nr1B5hSsKRF0RB/qO+DSdSTPD79FtuVEQpstvJknJIFR/jLfPQlJ/TZCN3Zof9
+         oyFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745627485; x=1746232285;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b3IOGBjTq7O8fLAPAnxSaHu8qhCTmDkeWLsMrPMzyQw=;
+        b=lHCWVmqpY/qcbXWRVvQ2gap0ezR4yVrh8SaCWFZlkaCkOaXtFMbFay+RqzXBHqaIbV
+         4khH/EtlmITCdAJMelinw78enTv6tNSTVuirP1wVWitv12GwHg9r+r8ulqY5XIKn5JU0
+         QCVPO5MWjWGCb8rBJoyZccjKQfvnf1FAToIyVQB3raC9dzPk/5CUSAykWYdT3W4lYPyX
+         PG/FojlMyWOLa1rz7JLXRoik9aZ6Y1KGHERR1pKg84BbvxrQVgX7bxeHyaSMPe15RWcj
+         rmyxhz+dlfSHe7mcvDO3L7KM65SkTPYHR/YN17wZDIeH1uhHO4XhERfqRbJ/70k+uS+V
+         rRKA==
+X-Gm-Message-State: AOJu0YwVhJfib8hwYvbteO9yam7rTIWbSzFRRTtq/Oas//flnawOAhpt
+	wrVlzeIoJqEJ2Bjty+JzEMeSxxtLrvgxgccc2suQnsg1LuD4vWEZRAR8QWe8B4KyKyReZqy0tAx
+	+GQ==
+X-Google-Smtp-Source: AGHT+IGaqe210ByAqDm+K8vGUEeK+g5oQ8arD5NGMbUumTCn7JblOSFTW5m4cc+cQQlAJi5i/WKfSnsklF0=
+X-Received: from pjoo7.prod.google.com ([2002:a17:90b:5827:b0:308:867e:1ced])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:fc46:b0:302:fc48:4f0a
+ with SMTP id 98e67ed59e1d1-309f8786e57mr6500844a91.0.1745627484755; Fri, 25
+ Apr 2025 17:31:24 -0700 (PDT)
+Date: Fri, 25 Apr 2025 17:31:23 -0700
+In-Reply-To: <20250414200929.3098202-6-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3a962f9039f0265de939f4c81924ee8208fc93a6.1745394536.git.leon@kernel.org>
+Mime-Version: 1.0
+References: <20250414200929.3098202-1-jthoughton@google.com> <20250414200929.3098202-6-jthoughton@google.com>
+Message-ID: <aAwpWwMIJEjtL5F9@google.com>
+Subject: Re: [PATCH v3 5/5] KVM: selftests: access_tracking_perf_test: Use
+ MGLRU for access tracking
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: kvm@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, mkoutny@suse.com, Yosry Ahmed <yosry.ahmed@linux.dev>, 
+	Yu Zhao <yuzhao@google.com>, David Matlack <dmatlack@google.com>, cgroups@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Apr 23, 2025 at 11:12:52AM +0300, Leon Romanovsky wrote:
-> From: Christoph Hellwig <hch@lst.de>
+On Mon, Apr 14, 2025, James Houghton wrote:
+> By using MGLRU's debugfs for invoking test_young() and clear_young(), we
+> avoid page_idle's incompatibility with MGLRU, and we can mark pages as
+> idle (clear_young()) much faster.
 > 
-> The current scheme with a single helper to determine the P2P status
-> and map a scatterlist segment force users to always use the map_sg
-> helper to DMA map, which we're trying to get away from because they
-> are very cache inefficient.
+> The ability to use page_idle is left in, as it is useful for kernels
+> that do not have MGLRU built in. If MGLRU is enabled but is not usable
+> (e.g. we can't access the debugfs mount), the test will fail, as
+> page_idle is not compatible with MGLRU.
 > 
-> Refactor the code so that there is a single helper that checks the P2P
-> state for a page, including the result that it is not a P2P page to
-> simplify the callers, and a second one to perform the address translation
-> for a bus mapped P2P transfer that does not depend on the scatterlist
-> structure.
+> cgroup utility functions have been borrowed so that, when running with
+> MGLRU, we can create a memcg in which to run our test.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> Tested-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> Other MGLRU-debugfs-specific parsing code has been added to
+> lru_gen_util.{c,h}.
 
-Might make it easier for patch review to split off adding
-__pci_p2pdma_update_state() in a seprate patch first. Other than that,
-looks good.
+This fails on my end due to not being able to find the cgroup.  I spent about 15
+minutes poking at it and gave it.  FWIW, this is on our devrez hosts, so it's
+presumably similar hardware to what you tested on.
 
-Reviewed-by: Luis Chamberlain <mcgrof@kenrel.org>
+Even if this turns out to be PEBKAC or some CONFIG_XXX incompatibility, there
+needs to be better hints provided to the user of how they can some this.
 
-  Luis
+And this would be a perfect opportunity to clean up this:
+
+ 	__TEST_REQUIRE(page_idle_fd >= 0,
+		       "CONFIG_IDLE_PAGE_TRACKING is not enabled");
+
+I can't count the number of times I've forgotten to run the test with root
+privileges, and wasted a bunch of time remembering it's not that the kernel
+doesn't have CONFIG_IDLE_PAGE_TRACKING, but that /sys/kernel/mm/page_idle/bitmap
+isn't accessible.
+
+I mention that, because on a kernel with MGRLU available but disabled, and
+CONFIG_IDLE_PAGE_TRACKING=n, the user has no idea that they _can_ run the test
+without mucking with their kernel.
+
+==== Test Assertion Failure ====
+  lib/lru_gen_util.c:229: stats->memcg_id > 0
+  pid=423298 tid=423298 errno=2 - No such file or directory
+     1	0x0000000000408b45: lru_gen_read_memcg_stats at lru_gen_util.c:229
+     2	0x0000000000402e4c: run_test at access_tracking_perf_test.c:421
+     3	0x0000000000403694: for_each_guest_mode at guest_modes.c:96
+     4	0x00000000004023dd: run_test_in_cg at access_tracking_perf_test.c:467
+     5	0x000000000041ba65: cg_run at cgroup_util.c:362
+     6	0x0000000000402042: main at access_tracking_perf_test.c:583
+     7	0x000000000041c753: __libc_start_call_main at libc-start.o:?
+     8	0x000000000041e9ac: __libc_start_main_impl at ??:?
+     9	0x0000000000402280: _start at ??:?
+  Couldn't find memcg: access_tracking_perf_test
+Did the memcg get created in the proper mount?
+Destroying cgroup: /sys/fs/cgroup/access_tracking_perf_test
 
