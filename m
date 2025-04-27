@@ -1,79 +1,82 @@
-Return-Path: <kvm+bounces-44494-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44495-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F36C3A9E0AF
-	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 10:13:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71256A9E0B0
+	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 10:14:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33646188EEAA
-	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 08:13:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BE97178316
+	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 08:14:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3974824A044;
-	Sun, 27 Apr 2025 08:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB4652472AC;
+	Sun, 27 Apr 2025 08:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l/Og4bFj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QtRrbIb/"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE5F8BE7;
-	Sun, 27 Apr 2025 08:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4982B18DB35
+	for <kvm@vger.kernel.org>; Sun, 27 Apr 2025 08:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745741599; cv=none; b=AXt6OT6qujARVFBUhoLNMN/dYFlxEZzzwttgZhxSBucwfNf277IKW6h6yCOzuvTmIsOguwIIzc5KFjzDA+7c7NQFZyDno2r/Vw1wLepN8jPSsO0R9UQ93bJIhisBz5qeuKwcIoId4XtwsVyFuCcacODRZD1Bvqxz/lhLNTPx2bA=
+	t=1745741643; cv=none; b=GkJ3419imTL2auRTyMbwUMx99Jrp4NZY5K4unzI5fl72VZZKwTr7uRvlbNe8uZsC02ozImml3zrM+U1/qzt7eeRXB7tigo7JEAPqiSnTSrSNHqDKlZTIhsmLd6zk8eo3Idb6zG/HYO4+x9MHnzCZsSnjt9nvxtQBDLCBqascLKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745741599; c=relaxed/simple;
-	bh=n1LP0hWDAYYPPGoxCmhHUpx37KloYPiSW/LsrkJ+pog=;
+	s=arc-20240116; t=1745741643; c=relaxed/simple;
+	bh=gEZxHnJp6+sM8XNPAyQmGSNd+CwBLXF+GjSj+W4RD5s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ck3+Dr72d+ZWiBqQdru1YnbO9WYjNmjpoNDItlRUyQt7WjfQx9qakiZbJ3ORxYR2HaJZkkOAe8pTEHIxN2uIe6JGkDVtjh0w8w1tmxWOicCZLvs0Q88J24gMZSz2o3TxdTDGVQ42a7f4RVaAdMDkilu7jP5Gx8haG+QMu1fCn6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l/Og4bFj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 103DBC4CEE3;
-	Sun, 27 Apr 2025 08:13:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745741598;
-	bh=n1LP0hWDAYYPPGoxCmhHUpx37KloYPiSW/LsrkJ+pog=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l/Og4bFjNyyLOyqiobd0OX+NlvlhiWMjlqCuR7bjQ3koqjqNsiHAbxhyy+n6EFWpx
-	 F0s02toBkpYSqLGr5zllGOwnm/YR+cBtijfhM7TVWEWRlqZZD7tdVQ2f1cr6H3j+vY
-	 /V4qD4omORMMjdDmZK0stm+5Mw4PJdjUhKlKsl6UBn8mYclrE4YOqm0/14yFLod31h
-	 ZCy3hMjY93C/oDHv0y2/amWuCxtPm2rAUMkBEU2/j5WJZJ36ZRGs00HmVVhJdNAAU3
-	 OAmjF5VOgM3oeArUzKcU+xI7P+9v0yugvVf2x9c6hhu7fKaqUTKAgYRmAQgjnW9EMm
-	 4KL9ASZVaAifQ==
-Date: Sun, 27 Apr 2025 11:13:12 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 07/24] dma-mapping: Implement link/unlink ranges API
-Message-ID: <20250427081312.GE5848@unreal>
-References: <cover.1745394536.git.leon@kernel.org>
- <2d6ca43ef8d26177d7674b9e3bdf0fe62b55a7ed.1745394536.git.leon@kernel.org>
- <aA1iRtCsPkuprI-X@bombadil.infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SQoO70tqnu+r9mBaiAJOQ+qhrPTgz9I89sn3iwzGT4KI3jre0NbArMWQSlu42I3/wmnDizMI8YA6xZRCsSfd66SP4BXd8f3KKhDUH/HmnDZhkNAD6L3sHDhU77vlOdEQbdEca0hPeRhgupDLWAjdysvYkVk+7eaJIwDlzohwbRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QtRrbIb/; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745741641; x=1777277641;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gEZxHnJp6+sM8XNPAyQmGSNd+CwBLXF+GjSj+W4RD5s=;
+  b=QtRrbIb/XfnFqnbT7Ld7cK8p0lQh3VRqTfel9G2rb1DHTVozZyq3wyly
+   CoZtYXnaM9p+lMG+9R1n/FlLpz6RnsbosroCKPsPaA+EA+B0WxZNpwna8
+   F1FG48slt/La/v4RFvuEH6vLGhmZCVJTy6k4+qu1wKmPj80MJ/eEs0N2K
+   +0LUTy8OQMY6QZoodm92Uf7JfOl5aA8qLXfLoOEvpq1Wo78rpvf0KmP2P
+   Z5fDtYZMqMokYLdnDChvY1zwfLehxjnBesTy6mvZzk7AKcDCJnq+hdjiJ
+   XpOH06lvWTs7sruR/QrGemJUGCLxqj5EMpoSE824peH2QIYYJiqIbk2eO
+   A==;
+X-CSE-ConnectionGUID: LhHh8eKbRn6RG78ShAs4QQ==
+X-CSE-MsgGUID: DIWLfaEzQxin8/yFLyHx4g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11415"; a="47477042"
+X-IronPort-AV: E=Sophos;i="6.15,243,1739865600"; 
+   d="scan'208";a="47477042"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 01:14:00 -0700
+X-CSE-ConnectionGUID: uhNwK2QiShSyWNlGPVJb3w==
+X-CSE-MsgGUID: MqnquHVXTAiy5v/sJX/M+A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,243,1739865600"; 
+   d="scan'208";a="156484577"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by fmviesa002.fm.intel.com with ESMTP; 27 Apr 2025 01:13:56 -0700
+Date: Sun, 27 Apr 2025 16:34:53 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eauger@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>,
+	qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>
+Subject: Re: [PATCH 2/5] i386/kvm: Support basic KVM PMU filter
+Message-ID: <aA3sLRzZj2270cSs@intel.com>
+References: <20250409082649.14733-1-zhao1.liu@intel.com>
+ <20250409082649.14733-3-zhao1.liu@intel.com>
+ <878qnoha3j.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,163 +85,386 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aA1iRtCsPkuprI-X@bombadil.infradead.org>
+In-Reply-To: <878qnoha3j.fsf@pond.sub.org>
 
-On Sat, Apr 26, 2025 at 03:46:30PM -0700, Luis Chamberlain wrote:
-> On Wed, Apr 23, 2025 at 11:12:58AM +0300, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Introduce new DMA APIs to perform DMA linkage of buffers
-> > in layers higher than DMA.
-> > 
-> > In proposed API, the callers will perform the following steps.
-> > In map path:
-> > 	if (dma_can_use_iova(...))
-> > 	    dma_iova_alloc()
-> > 	    for (page in range)
-> > 	       dma_iova_link_next(...)
-> > 	    dma_iova_sync(...)
-> > 	else
-> > 	     /* Fallback to legacy map pages */
-> >              for (all pages)
-> > 	       dma_map_page(...)
-> > 
-> > In unmap path:
-> > 	if (dma_can_use_iova(...))
-> > 	     dma_iova_destroy()
-> > 	else
-> > 	     for (all pages)
-> > 		dma_unmap_page(...)
-> > 
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > Tested-by: Jens Axboe <axboe@kernel.dk>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >  drivers/iommu/dma-iommu.c   | 261 ++++++++++++++++++++++++++++++++++++
-> >  include/linux/dma-mapping.h |  32 +++++
-> >  2 files changed, 293 insertions(+)
-> > 
-> > diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> > index d2c298083e0a..2e014db5a244 100644
-> > --- a/drivers/iommu/dma-iommu.c
-> > +++ b/drivers/iommu/dma-iommu.c
-> > @@ -1818,6 +1818,267 @@ void dma_iova_free(struct device *dev, struct dma_iova_state *state)
-> >  }
-> >  EXPORT_SYMBOL_GPL(dma_iova_free);
+...
+
+> > diff --git a/qemu-options.hx b/qemu-options.hx
+> > index dc694a99a30a..51a7c61ce0b0 100644
+> > --- a/qemu-options.hx
+> > +++ b/qemu-options.hx
+> > @@ -232,7 +232,8 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+> >      "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
+> >      "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
+> >      "                thread=single|multi (enable multi-threaded TCG)\n"
+> > -    "                device=path (KVM device path, default /dev/kvm)\n", QEMU_ARCH_ALL)
+> > +    "                device=path (KVM device path, default /dev/kvm)\n"
+> > +    "                pmu-filter=id (configure KVM PMU filter)\n", QEMU_ARCH_ALL)
+> 
+> As we'll see below, this property is actually available only for i386.
+> Other target-specific properties document this like "x86 only".  Please
+> do that for this one, too.
+
+Thanks! I'll change QEMU_ARCH_ALL to QEMU_ARCH_I386.
+
+> As far as I can tell, the kvm-pmu-filter object needs to be activated
+> with -accel pmu-filter=... to do anything.  Correct?
+
+Yes,
+
+> You can create any number of kvm-pmu-filter objects, but only one of
+> them can be active.  Correct?
+
+Yes! I'll try to report error when user repeats to set this object, or
+mention this rule in doc.
+
+> >  SRST
+> >  ``-accel name[,prop=value[,...]]``
+> >      This is used to enable an accelerator. Depending on the target
+> > @@ -318,6 +319,10 @@ SRST
+> >          option can be used to pass the KVM device to use via a file descriptor
+> >          by setting the value to ``/dev/fdset/NN``.
 > >  
-> > +static int __dma_iova_link(struct device *dev, dma_addr_t addr,
-> > +		phys_addr_t phys, size_t size, enum dma_data_direction dir,
-> > +		unsigned long attrs)
+> > +    ``pmu-filter=id``
+> > +        Sets the id of KVM PMU filter object. This option can be used to set
+> > +        whitelist or blacklist of PMU events for Guest.
+> 
+> Well, "this option" can't actually be used to set the lists.  That's to
+> be done with -object kvm-pmu-filter.  Perhaps:
+> 
+>            Activate a KVM PMU filter object.  That object can be used to
+>            filter guest access to PMU events.
+
+Thank you! Nice description.
+
+> > +
+> >  ERST
+> >  
+> >  DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+> > @@ -6144,6 +6149,46 @@ SRST
+> >          ::
+> >  
+> >              (qemu) qom-set /objects/iothread1 poll-max-ns 100000
+> > +
+> > +    ``-object '{"qom-type":"kvm-pmu-filter","id":id,"action":action,"events":[entry_list]}'``
+> 
+> Should this be in the previous patch?
+
+Yes, I can amend this to the previous patch.
+
+> > +        Create a kvm-pmu-filter object that configures KVM to filter
+> > +        selected PMU events for Guest.
+> 
+> The object doesn't actually configure KVM.  It merely holds the filter
+> configuration.  The configuring is done by the KVM accelerator according
+> to configuration in the connected kvm-pmu-filter object.  Perhaps:
+> 
+>            Create a kvm-pmu-filter object to hold PMU event filter
+>            configuration.
+
+Yes, that's a very accurate statement. Will fix.
+
+> > +
+> > +        This option must be written in JSON format to support ``events``
+> > +        JSON list.
+> > +
+> > +        The ``action`` parameter sets the action that KVM will take for
+> > +        the selected PMU events. It accepts ``allow`` or ``deny``. If
+> > +        the action is set to ``allow``, all PMU events except the
+> > +        selected ones will be disabled and blocked in the Guest. But if
+> > +        the action is set to ``deny``, then only the selected events
+> > +        will be denied, while all other events can be accessed normally
+> > +        in the Guest.
+> 
+> I recommend "guest" instead of "Guest".
+
+OK.
+
+> > +
+> > +        The ``events`` parameter accepts a list of PMU event entries in
+> > +        JSON format. Event entries, based on different encoding formats,
+> > +        have the following types:
+> > +
+> > +        ``{"format":"raw","code":raw_code}``
+> > +            Encode the single PMU event with raw format. The ``code``
+> > +            parameter accepts raw code of a PMU event. For x86, the raw
+> > +            code represents a combination of umask and event select:
+> > +
+> > +        ::
+> > +
+> > +            (((select & 0xf00UL) << 24) | \
+> > +             ((select) & 0xff) | \
+> > +             ((umask) & 0xff) << 8)
+> 
+> Does it?  Could the code also represent a combination of select, match,
+> and mask (masked entry format)?
+
+Yes, I'll drop this formula.
+
+> > +
+> > +        An example KVM PMU filter object would look like:
+> > +
+> > +        .. parsed-literal::
+> > +
+> > +             # |qemu_system| \\
+> > +                 ... \\
+> > +                 -accel kvm,pmu-filter=id \\
+> > +                 -object '{"qom-type":"kvm-pmu-filter","id":"f0","action":"allow","events":[{"format":"raw","code":196}]}' \\
+> > +                 ...
+> >  ERST
+> >  
+> >  
+> > diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> > index 6c749d4ee812..fa3a696654cb 100644
+> > --- a/target/i386/kvm/kvm.c
+> > +++ b/target/i386/kvm/kvm.c
+> > @@ -34,6 +34,7 @@
+> >  #include "system/system.h"
+> >  #include "system/hw_accel.h"
+> >  #include "system/kvm_int.h"
+> > +#include "system/kvm-pmu.h"
+> >  #include "system/runstate.h"
+> >  #include "kvm_i386.h"
+> >  #include "../confidential-guest.h"
+> > @@ -110,6 +111,7 @@ typedef struct {
+> >  static void kvm_init_msrs(X86CPU *cpu);
+> >  static int kvm_filter_msr(KVMState *s, uint32_t msr, QEMURDMSRHandler *rdmsr,
+> >                            QEMUWRMSRHandler *wrmsr);
+> > +static int kvm_filter_pmu_event(KVMState *s);
+> >  
+> >  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+> >      KVM_CAP_INFO(SET_TSS_ADDR),
+> > @@ -3346,6 +3348,18 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >          }
+> >      }
+> >  
+> > +    /*
+> > +     * TODO: Move this chunk to kvm_arch_pre_create_vcpu() and check
+> 
+> I can't see a function kvm_arch_pre_create_vcpu().
+
+I was referring this patch:
+https://lore.kernel.org/qemu-devel/20250425213037.8137-4-dongli.zhang@oracle.com/.
+
+Since it's an unmerged patch, I can drop this comment.
+
+> > +     * whether pmu is enabled there.
+> 
+> PMU
+
+Sure.
+
+> > +     */
+> > +    if (s->pmu_filter) {
+> > +        ret = kvm_filter_pmu_event(s);
+> > +        if (ret < 0) {
+> > +            error_report("Could not set KVM PMU filter");
+> 
+> When kvm_filter_pmu_event() failed, it already reported an error.
+> Reporting it another time can be confusing.
+
+Good catch! Will remove this error_report().
+
+> > +            return ret;
+> > +        }
+> > +    }
+> > +
+> >      return 0;
+> >  }
+> >  
+> > @@ -5942,6 +5956,82 @@ static int kvm_handle_wrmsr(X86CPU *cpu, struct kvm_run *run)
+> >      g_assert_not_reached();
+> >  }
+> >  
+> > +static bool kvm_config_pmu_event(KVMPMUFilter *filter,
+> > +                                 struct kvm_pmu_event_filter *kvm_filter)
 > > +{
-> > +	bool coherent = dev_is_dma_coherent(dev);
+> > +    KvmPmuFilterEventList *events;
+> > +    KvmPmuFilterEvent *event;
+> > +    uint64_t code;
+> > +    int idx = 0;
 > > +
-> > +	if (!coherent && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
-> > +		arch_sync_dma_for_device(phys, size, dir);
+> > +    kvm_filter->nevents = filter->nevents;
+> > +    events = filter->events;
+> > +    while (events) {
+> > +        assert(idx < kvm_filter->nevents);
+> > +
+> > +        event = events->value;
+> > +        switch (event->format) {
+> > +        case KVM_PMU_EVENT_FORMAT_RAW:
+> > +            code = event->u.raw.code;
+> > +            break;
+> > +        default:
+> > +            g_assert_not_reached();
+> > +        }
+> > +
+> > +        kvm_filter->events[idx++] = code;
+> > +        events = events->next;
+> > +    }
+> > +
+> > +    return true;
+> > +}
 > 
-> So arch_sync_dma_for_device() is a no-op on some architectures, notably x86.
-> So since you're doing this work and given the above pattern is common on
-> the non iova case, we could save ourselves 2 branches checks on x86 on
-> __dma_iova_link() and also generalize savings for the non-iova case as
-> well. For the non-iova case we have two use cases, one with the attrs on
-> initial mapping, and one without on subsequent sync ops. For the iova
-> case the attr is always consistently used.
+> This function cannot fail.  Please return void, and simplify its caller.
 
-I want to believe that compiler will discards these "if (!coherent &&
-!(attrs & DMA_ATTR_SKIP_CPU_SYNC)))" branch if case is empty.
+Yes, the error handling is unnecessary here.
 
-> 
-> So we could just have something like this:
-> 
-> #ifdef CONFIG_ARCH_HAS_SYNC_DMA_FOR_DEVICE
-> static inline void arch_sync_dma_device(struct device *dev,
->                                         phys_addr_t paddr, size_t size,
->                                         enum dma_data_direction dir)
-> {
->     if (!dev_is_dma_coherent(dev))
->         arch_sync_dma_for_device(paddr, size, dir);
-> }
-> 
-> static inline void arch_sync_dma_device_attrs(struct device *dev,
->                                               phys_addr_t paddr, size_t size,
->                                               enum dma_data_direction dir,
->                                               unsigned long attrs)
-> {
->     if (!dev_is_dma_coherent(dev) && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
->         arch_sync_dma_for_device(paddr, size, dir);
-> }
-> #else
-> static inline void arch_sync_dma_device(struct device *dev,
->                                         phys_addr_t paddr, size_t size,
->                                         enum dma_data_direction dir)
-> {
-> }
-> 
-> static inline void arch_sync_dma_device_attrs(struct device *dev,
->                                               phys_addr_t paddr, size_t size,
->                                               enum dma_data_direction dir,
->                                               unsigned long attrs)
-> {
-> }
-> #endif
-
-The problem is that dev_is_dma_coherent() and DMA_ATTR_SKIP_CPU_SYNC
-checks are scattered over all dma-iommu.c file with different
-combinations. While we can do new static functions for small number of
-use cases, it will be half-solution.
-
-> 
-> > +/**
-> > + * dma_iova_link - Link a range of IOVA space
-> > + * @dev: DMA device
-> > + * @state: IOVA state
-> > + * @phys: physical address to link
-> > + * @offset: offset into the IOVA state to map into
-> > + * @size: size of the buffer
-> > + * @dir: DMA direction
-> > + * @attrs: attributes of mapping properties
-> > + *
-> > + * Link a range of IOVA space for the given IOVA state without IOTLB sync.
-> > + * This function is used to link multiple physical addresses in contiguous
-> > + * IOVA space without performing costly IOTLB sync.
-> > + *
-> > + * The caller is responsible to call to dma_iova_sync() to sync IOTLB at
-> > + * the end of linkage.
-> > + */
-> > +int dma_iova_link(struct device *dev, struct dma_iova_state *state,
-> > +		phys_addr_t phys, size_t offset, size_t size,
-> > +		enum dma_data_direction dir, unsigned long attrs)
+> > +
+> > +static int kvm_install_pmu_event_filter(KVMState *s)
 > > +{
-> > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
-> > +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
-> > +	struct iova_domain *iovad = &cookie->iovad;
-> > +	size_t iova_start_pad = iova_offset(iovad, phys);
+> > +    struct kvm_pmu_event_filter *kvm_filter;
+> > +    KVMPMUFilter *filter = s->pmu_filter;
+> > +    int ret;
 > > +
-> > +	if (WARN_ON_ONCE(iova_start_pad && offset > 0))
-> > +		return -EIO;
-> > +
-> > +	if (dev_use_swiotlb(dev, size, dir) && iova_offset(iovad, phys | size))
+> > +    kvm_filter = g_malloc0(sizeof(struct kvm_pmu_event_filter) +
+> > +                           filter->nevents * sizeof(uint64_t));
 > 
-> There is already a similar check for the non-iova case for this on
-> iommu_dma_map_page() and a nice comment about what why this checked,
-> this seems to be just screaming for a helper:
-> 
-> /*                                                                       
->  * Checks if a physical buffer has unaligned boundaries with respect to
->  * the IOMMU granule. Returns non-zero if either the start or end
->  * address is not aligned to the granule boundary.
-> */
-> static inline size_t iova_unaligned(struct iova_domain *iovad,
->                                     phys_addr_t phys,
-> 				    size_t size)
-> {                                                                                
-> 	return iova_offset(iovad, phys | size);
-> }  
+> Should we use sizeof(filter->events[0])?
 
-I added this function, thanks.
- 
-> Other than that, looks good.
+No, here I'm trying to constructing the memory accepted in kvm interface
+(with the specific layout), which is not the same as the KVMPMUFilter
+object.
+
+> > +
+> > +    switch (filter->action) {
+> > +    case KVM_PMU_FILTER_ACTION_ALLOW:
+> > +        kvm_filter->action = KVM_PMU_EVENT_ALLOW;
+> > +        break;
+> > +    case KVM_PMU_FILTER_ACTION_DENY:
+> > +        kvm_filter->action = KVM_PMU_EVENT_DENY;
+> > +        break;
+> > +    default:
+> > +        g_assert_not_reached();
+> > +    }
+> > +
+> > +    if (!kvm_config_pmu_event(filter, kvm_filter)) {
+> > +        goto fail;
+> > +    }
+> > +
+> > +    ret = kvm_vm_ioctl(s, KVM_SET_PMU_EVENT_FILTER, kvm_filter);
+> > +    if (ret) {
+> > +        error_report("KVM_SET_PMU_EVENT_FILTER fails (%s)", strerror(-ret));
 > 
-> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+> Suggest something like "can't set KVM PMU event filter".
+
+Sure, sounds good!
+
+> > +        goto fail;
+> > +    }
+> > +
+> > +    g_free(kvm_filter);
+> > +    return 0;
+> > +fail:
+> > +    g_free(kvm_filter);
+> > +    return -EINVAL;
+> > +}
+> > +
+> > +static int kvm_filter_pmu_event(KVMState *s)
+> > +{
+> > +    if (!kvm_vm_check_extension(s, KVM_CAP_PMU_EVENT_FILTER)) {
+> > +        error_report("KVM PMU filter is not supported by Host.");
 > 
->   Luis
+> Error message should be a single phrase with no trailing punctuation.
+> More of the same below.
+
+OK, I'll clean up them.
+
+> > +        return -1;
+> > +    }
+> > +
+> > +    return kvm_install_pmu_event_filter(s);
+> > +}
+> > +
+> >  static bool has_sgx_provisioning;
+> >  
+> >  static bool __kvm_enable_sgx_provisioning(KVMState *s)
+> > @@ -6537,6 +6627,35 @@ static void kvm_arch_set_xen_evtchn_max_pirq(Object *obj, Visitor *v,
+> >      s->xen_evtchn_max_pirq = value;
+> >  }
+> >  
+> > +static void kvm_arch_check_pmu_filter(const Object *obj, const char *name,
+> > +                                      Object *child, Error **errp)
+> > +{
+> > +    KVMPMUFilter *filter = KVM_PMU_FILTER(child);
+> > +    KvmPmuFilterEventList *events = filter->events;
+> > +
+> > +    if (!filter->nevents) {
+> > +        error_setg(errp,
+> > +                   "Empty KVM PMU filter.");
+> 
+> Why is this an error?
+> 
+> action=allow with an empty would be the obvious way to allow nothing,
+> wouldn't it?
+
+allow nothing == deny everything!
+
+Yes, it makes sense :-) Will drop this limitation.
+
+> > +        return;
+> > +    }
+> > +
+> > +    while (events) {
+> > +        KvmPmuFilterEvent *event = events->value;
+> > +
+> > +        switch (event->format) {
+> > +        case KVM_PMU_EVENT_FORMAT_RAW:
+> > +            break;
+> > +        default:
+> > +            error_setg(errp,
+> > +                       "Unsupported PMU event format %s.",
+> > +                       KvmPmuEventFormat_str(events->value->format));
+> 
+> Unreachable.
+
+OK, it makes sense. Thanks.
+
+> > +            return;
+> > +        }
+> > +
+> > +        events = events->next;
+> > +    }
+> > +}
+> > +
+> >  void kvm_arch_accel_class_init(ObjectClass *oc)
+> >  {
+> >      object_class_property_add_enum(oc, "notify-vmexit", "NotifyVMexitOption",
+> > @@ -6576,6 +6695,14 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
+> >                                NULL, NULL);
+> >      object_class_property_set_description(oc, "xen-evtchn-max-pirq",
+> >                                            "Maximum number of Xen PIRQs");
+> > +
+> > +    object_class_property_add_link(oc, "pmu-filter",
+> > +                                   TYPE_KVM_PMU_FILTER,
+> > +                                   offsetof(KVMState, pmu_filter),
+> > +                                   kvm_arch_check_pmu_filter,
+> > +                                   OBJ_PROP_LINK_STRONG);
+> > +    object_class_property_set_description(oc, "pmu-filter",
+> > +                                          "Set the KVM PMU filter");
+> >  }
+> >  
+> >  void kvm_set_max_apic_id(uint32_t max_apic_id)
+> 
+> target/i386/kvm/kvm.c is compiled into the binary only for i386 target
+> with CONFIG_KVM.
+> 
+> The kvm-pmu-filter-object exists for any target with CONFIG_KVM.  But
+> it's usable only for i386.
+
+As with Philip's comment, I also need to think about compatibility with
+multiple accelerators, and we can continue that discussion in the mail
+thread of patch 1. Thanks for your feedback!
+
+> I think the previous patch's commit message should state the role of the
+> kvm-pmu-filter-object more clearly: hold KVM PMU filter configuration
+> for any target with KVM.  This patch's commit message should then
+> explain what the patch does: enable actual use of the
+> kvm-pmu-filter-object for i386 only.  Other targets are left for another
+> day.
+
+Thank you! I'll update the commit message.
+
+Regards,
+Zhao
+
 
