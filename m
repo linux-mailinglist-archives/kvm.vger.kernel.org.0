@@ -1,128 +1,96 @@
-Return-Path: <kvm+bounces-44515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44516-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D311A9E233
-	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 11:42:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E37A9E526
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 01:34:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFC607AE465
-	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 09:41:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2E241736F6
+	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 23:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C0324C08D;
-	Sun, 27 Apr 2025 09:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37AFF207A0C;
+	Sun, 27 Apr 2025 23:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mzRwLoAR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fDjI9/0I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB89246335
-	for <kvm@vger.kernel.org>; Sun, 27 Apr 2025 09:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED9E17BCE
+	for <kvm@vger.kernel.org>; Sun, 27 Apr 2025 23:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745746952; cv=none; b=WgjjHPRneCboAA2noHfVZhf5WNOoOnJ5i2wgEwK8YrgPQVWiDCMaBWSWZ0JDjwyzgA5DvHBj74XzGqjfi97B7ee2m6uE2I2IFraMcFI0QzqM4d3o1EHlXt2Oci2OmRH1W+T9AZNhQTztWRPtyOjRBbWCSBygR4OrhgTV1qzeu+E=
+	t=1745796868; cv=none; b=MbO3iyZuQj7FISWf6iy9ygXCoItkEk4azrx1pSnW7mWlKEsKjX4fZY5VCmW1n/0Smd8y+rJgHmX80aA2IkKaBR8AgsOX49DembfusYMYkmehIElucARTRpkq4HCwLHRud3WFMqcTAzlo4MZ5KAwHbgaBcDCBWW9KwiG8pwNs8+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745746952; c=relaxed/simple;
-	bh=20rtXIKpVHePMp/s5NOBXpbrgNMBI6Ac2g1H+IRiiLA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TQ3/FjFvek3Gcfada5ej35yb32p8JceJ5Bd8FocMnYlx9nmCDuWn8sbn1nRRDRxHyTWdC8O2Z0zpTY7qm7OeX7wek8xmcijZvA4jyohm5YYq3IgLa/He7gVvOU1xaWr3gw5UNwvAy1JqFqkeNXUlxDl9r07cau6s6g+Wv3rxPGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mzRwLoAR; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745746951; x=1777282951;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=20rtXIKpVHePMp/s5NOBXpbrgNMBI6Ac2g1H+IRiiLA=;
-  b=mzRwLoARF/GixZC5883T6oChLDXV2EOTQfrfC1aNAjvL0x0Uo56at6eD
-   tn8FB3ERg4U5DJY5mKV9zzIAclInXsvHHiDoeI0wpNcF154RHaz6KLgyr
-   AIrgLm1oB4LCQ9kHcDnEID+V2LpGkBYHDroFzNY0JPvA5U6P+suwLERet
-   gOansteTXcrGBKqoHo8vu6O4KKK+Qoq4bAN4RN9KxrfUUKl85mQkypGGd
-   pMgayiSkvBk/5KJIFwmILuKCn7GLavu2slV+k5G6PGY+SH48c+fuASw2q
-   DX24gapo64791ns2deZe/pEnxzdzc8BB/5ClIK+R38cS5yaJib3+gp3Py
-   g==;
-X-CSE-ConnectionGUID: M4tB6PhTR86p9CkvvwVrhA==
-X-CSE-MsgGUID: MHR1Kr+CQZuQY02a4Q5HyQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11415"; a="47438873"
-X-IronPort-AV: E=Sophos;i="6.15,243,1739865600"; 
-   d="scan'208";a="47438873"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 02:42:30 -0700
-X-CSE-ConnectionGUID: zj6lZ3H8QjOQTMsxinQBnw==
-X-CSE-MsgGUID: tMiRphQHRkWlAdVlJsZJiQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,243,1739865600"; 
-   d="scan'208";a="133759400"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 02:42:27 -0700
-Message-ID: <4ee686a3-6970-4560-b0ad-00329d773148@linux.intel.com>
-Date: Sun, 27 Apr 2025 17:42:24 +0800
+	s=arc-20240116; t=1745796868; c=relaxed/simple;
+	bh=DB9hFves7cvXuQJf/YxsB1Oq0SGjWHI00UrQVtEYIsA=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZkVH5A943Y1DMmp5j5IvFApHYYqPXdiJdyKoVCiSV8srK7Y8GDoTf0/T6mLc5GAP60CCuBCT6dxPFlqde6LGVIlErHyMBtJOSNZDsPDN+kEPoz5z0aJJGgdwkaeE+k73gxxhpyE504TInxyHRew7Tah7hFrBGPoNWDhRl/CJMn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fDjI9/0I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D28B4C4CEF2
+	for <kvm@vger.kernel.org>; Sun, 27 Apr 2025 23:34:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745796867;
+	bh=DB9hFves7cvXuQJf/YxsB1Oq0SGjWHI00UrQVtEYIsA=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=fDjI9/0IR0NWA41GjpJ+0Ng1aBji6yMUX9yX2xya6VSDZ9d/YUOH9Mpw9n/HTM73U
+	 9por82ms8G1YA+I2pjtz9lf3a4kS9HDKzzJNtwWpBOlLb8TBDYA9ViqYf4exMePA1C
+	 jLMyg8Zo5Pztv9puXaP40P5PeRPA47QNN+q0RllXeAI5qjs8lbCzl17pu50nb/iqLv
+	 zu39Dk1yjYCGVJNPhY5rN4rd5jZ6oI03IU0sdwD0tDzaq/u4RbrzV9bs5aV7+tzb0c
+	 l4Bdu/tzJG+ZJgi/+9vB0Y3NV2vWDwEht47iJpiiqoKLAyA28HFQe7bSnQDygYDfYi
+	 oF4Zq6rN5LrqA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id CC1C8C53BC7; Sun, 27 Apr 2025 23:34:27 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 220057] Kernel regression. Linux VMs crashing (I did not test
+ Windows guest VMs)
+Date: Sun, 27 Apr 2025 23:34:27 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-220057-28872-fG7ENhRFD6@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220057-28872@https.bugzilla.kernel.org/>
+References: <bug-220057-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] target/i386: Support
- VMX_VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org, Zide Chen <zide.chen@intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>, Dongli Zhang <dongli.zhang@oracle.com>,
- Mingwei Zhang <mizhang@google.com>, Das Sandipan <Sandipan.Das@amd.com>,
- Shukla Manali <Manali.Shukla@amd.com>, Dapeng Mi <dapeng1.mi@intel.com>
-References: <20250324123712.34096-1-dapeng1.mi@linux.intel.com>
- <20250324123712.34096-4-dapeng1.mi@linux.intel.com>
- <aA3w2PiRuNOMKwdM@intel.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <aA3w2PiRuNOMKwdM@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220057
 
-On 4/27/2025 4:54 PM, Zhao Liu wrote:
->> @@ -4212,7 +4213,8 @@ static const X86CPUDefinition builtin_x86_defs[] = {
->>              VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
->>              VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_IA32_PAT |
->>              VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
->> -            VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
->> +            VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER |
->> +            VMX_VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL,
->>          .features[FEAT_VMX_MISC] =
->>              MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_ACTIVITY_HLT |
->>              MSR_VMX_MISC_VMWRITE_VMEXIT,
->> @@ -4368,7 +4370,8 @@ static const X86CPUDefinition builtin_x86_defs[] = {
->>              VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
->>              VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_IA32_PAT |
->>              VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
->> -            VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
->> +            VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER |
->> +            VMX_VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL,
->>          .features[FEAT_VMX_MISC] =
->>              MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_ACTIVITY_HLT |
->>              MSR_VMX_MISC_VMWRITE_VMEXIT,
->> @@ -4511,7 +4514,8 @@ static const X86CPUDefinition builtin_x86_defs[] = {
->>              VMX_VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
->>              VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_IA32_PAT |
->>              VMX_VM_EXIT_LOAD_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
->> -            VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
->> +            VMX_VM_EXIT_LOAD_IA32_EFER | VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER |
->> +            VMX_VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL,
->>          .features[FEAT_VMX_MISC] =
->>              MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_ACTIVITY_HLT |
->>              MSR_VMX_MISC_VMWRITE_VMEXIT,
-> Instead of modifying SPR's CPU model directly, we should introduce a new
-> version (SapphireRapids-v4), like Skylake-Server-v4 enables
-> "vmx-eptp-switching".
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-Sure. Let me have a look this.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |alex.williamson@redhat.com
 
+--- Comment #2 from Artem S. Tashkinov (aros@gmx.com) ---
+Alex, please take a look.
 
->
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
