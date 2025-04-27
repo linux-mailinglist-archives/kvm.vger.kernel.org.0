@@ -1,79 +1,91 @@
-Return-Path: <kvm+bounces-44491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44488-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33CB0A9E063
-	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 09:25:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75388A9E04A
+	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 09:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67F5C17DB5A
-	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 07:25:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5B2A463FED
+	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 07:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 854D2247287;
-	Sun, 27 Apr 2025 07:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4DE245029;
+	Sun, 27 Apr 2025 07:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O1xqE+mq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e1P+d4Jj"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823868BE7;
-	Sun, 27 Apr 2025 07:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0171F4E39
+	for <kvm@vger.kernel.org>; Sun, 27 Apr 2025 07:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745738712; cv=none; b=m8A1ONpjtDWfN/06FtimLX3dQUc+seGSV4cjYLxQVMBr3T10zSz6OFjQoOxNo/vvC/XrBxC/VSFYdJYooEj1qdTGZdCYZN3CrKSgR54MQePw8lkspeS2n/Jnn/ZuLwa0lyrVnwE8mdxNfpDTLCqEjBGEkNq8nzuP/d7gQXe6Yaw=
+	t=1745737530; cv=none; b=hPJJ9IfLGlXR2148NJl64vekTefmqocSUjazvRqOj0IXOwgZ0yTE8RgYri1cR2W/hVQHxHcwAtCBVawfhgQ7LZabWpnlD8a8a1x48oIUJ6fTh6+YSoHIxGYUlvBoQ9izSz1AA8n4pVm8yMLT9N9hMlkk9VZaUQ9kgAEt339NEEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745738712; c=relaxed/simple;
-	bh=bERqNoVKbx4P/SwDDUOXyFXrxjwzNnYFUoDcCNKCVfw=;
+	s=arc-20240116; t=1745737530; c=relaxed/simple;
+	bh=/VAXcw1oJpNq80iCbs63zP5UG4yX37TNo7LthnbGVBo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cje/cKoF1gV8pQ6CBVfcjehbzOMIoEQZAq5pRKC5DnsU0sjL+HkCw1AJ2j5bQTYwXwMbRQx64JkMHr+CcWJL8pOCh/7WtryWX/aZesAYAJdMRHKZ/YjOtGyq3Fj1m5c3cLNk95Cwpq1xI76PEdDKquujyhEuzRooHD6IzJX/PFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O1xqE+mq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40495C4CEE3;
-	Sun, 27 Apr 2025 07:25:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745738712;
-	bh=bERqNoVKbx4P/SwDDUOXyFXrxjwzNnYFUoDcCNKCVfw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O1xqE+mqwh8U+55fROspjUrKNzRVSIzJfDGM+Ls83njMJYStvF3kCZtrxDGnS8SVT
-	 FH2Y3/4QmPSaIrhVwSXIBJfNKQb2jOqg/0R9XOlNO+8e0XTTOVDsgTNzItS/cuPjFL
-	 PJCX+bYuGxOwMqFXAxDt9oJubodYIurQ+knbiSyXMkoJmOUGIl6AyOiN49LQkcuXwW
-	 lX4Zt8yUC+E7ZRN3ptmo7qa1Dn9p3RQqNw+5yoy5YM9m0zO7K7IBGHJkXHsUDSieM4
-	 qCQegX3jtiPkdIH87I9vQ2L9GafYOjlgT1bfZh8UZrFfu8pXhN2WP2XoeZGCszveQ5
-	 tJLYM5tBLk6AQ==
-Date: Sun, 27 Apr 2025 10:25:07 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v9 01/24] PCI/P2PDMA: Refactor the p2pdma mapping helpers
-Message-ID: <20250427072507.GB5848@unreal>
-References: <cover.1745394536.git.leon@kernel.org>
- <3a962f9039f0265de939f4c81924ee8208fc93a6.1745394536.git.leon@kernel.org>
- <aAwnJwLeOs7rfkHL@bombadil.infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JYkn0JHrJv4qcgFnlbf1YCZmECmzZeTtm/gf8dEF3d259lNkIpT/u3A52cl1t+oLvQU72Rd4o2wz+FFjoH77jIRtLbdYHOQtKm//KunGkZYaufCgQsZcBJmPLyZs9dg0qASQF0DH2XHM0Oam0pIDgsf/AtcgIWUZ9Ia7v6qK/oQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e1P+d4Jj; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745737529; x=1777273529;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/VAXcw1oJpNq80iCbs63zP5UG4yX37TNo7LthnbGVBo=;
+  b=e1P+d4Jji5f9mpQzeKl3575fO364ueL0+bDQhwTj28d9ZI7Ltc0PAim2
+   mVuBlN5DvRgDFG1IQ6lPe/NZ3ozeTpWyLGj4GsJlekbCVzb+b+eF7H1Ad
+   EvbgxH2vk+9j2hith5THLnj0vYhilEr3whgY/7oLDuL6khLNn0P0r+RJl
+   kFwml8UAcWfvhIx1xobyzgkkkTZBgoFEGbAgouQHXDePrg7pgaGb9sw2A
+   cszBqu5m9dnNniiJmbpheixAS6qvfMoiU8OrJsRHHFD9X3qpwIzV96oij
+   5JXl3kcAR2pnaP2qdn4YPrJsNuVSDI62vSaG+WY+VF87FPwWzmGRmFyT2
+   g==;
+X-CSE-ConnectionGUID: 0zvkVwtCT7C/0MRGaZeeAA==
+X-CSE-MsgGUID: IKW5ARPWRKem5jvad5V99Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11415"; a="47255462"
+X-IronPort-AV: E=Sophos;i="6.15,243,1739865600"; 
+   d="scan'208";a="47255462"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2025 00:05:28 -0700
+X-CSE-ConnectionGUID: rVl3Mel3THqiZcQli6WIqg==
+X-CSE-MsgGUID: kb1BB0dSQ0S5A+G0fWVAEQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,243,1739865600"; 
+   d="scan'208";a="156475720"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by fmviesa002.fm.intel.com with ESMTP; 27 Apr 2025 00:05:23 -0700
+Date: Sun, 27 Apr 2025 15:26:20 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc: Markus Armbruster <armbru@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eauger@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>,
+	qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>,
+	Alexander Graf <agraf@csgraf.de>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Subject: Re: [PATCH 1/5] qapi/qom: Introduce kvm-pmu-filter object
+Message-ID: <aA3cHIcKmt3vdkVk@intel.com>
+References: <20250409082649.14733-1-zhao1.liu@intel.com>
+ <20250409082649.14733-2-zhao1.liu@intel.com>
+ <878qo8yu5u.fsf@pond.sub.org>
+ <Z/iUiEXZj52CbduB@intel.com>
+ <87frifxqgk.fsf@pond.sub.org>
+ <Z/i3+l3uQ3dTjnHT@intel.com>
+ <87fri8o70b.fsf@pond.sub.org>
+ <aAnbLhBXMFAxE2vT@intel.com>
+ <fa6f20a9-3d7a-4c2d-94e5-c20dbaf4303e@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,52 +94,73 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aAwnJwLeOs7rfkHL@bombadil.infradead.org>
+In-Reply-To: <fa6f20a9-3d7a-4c2d-94e5-c20dbaf4303e@linaro.org>
 
-On Fri, Apr 25, 2025 at 05:21:59PM -0700, Luis Chamberlain wrote:
-> On Wed, Apr 23, 2025 at 11:12:52AM +0300, Leon Romanovsky wrote:
-> > From: Christoph Hellwig <hch@lst.de>
-> > 
-> > The current scheme with a single helper to determine the P2P status
-> > and map a scatterlist segment force users to always use the map_sg
-> > helper to DMA map, which we're trying to get away from because they
-> > are very cache inefficient.
-> > 
-> > Refactor the code so that there is a single helper that checks the P2P
-> > state for a page, including the result that it is not a P2P page to
-> > simplify the callers, and a second one to perform the address translation
-> > for a bus mapped P2P transfer that does not depend on the scatterlist
-> > structure.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
-> > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> > Tested-by: Jens Axboe <axboe@kernel.dk>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Hi Philip and Markus,
+
+Let's discuss how to handle compilation for different architectures as
+well as different accelerators here.
+
+> > And "raw" format as a lower level format can be used for other arches
+> > (e.g., ARM).
 > 
-> Might make it easier for patch review to split off adding
-> __pci_p2pdma_update_state() in a seprate patch first.
-
-Original code __pci_p2pdma_update_state() had this code and was
-dependent on SG, which we are removing in this patch.
-
-       if (state->map == PCI_P2PDMA_MAP_BUS_ADDR) {
-               sg->dma_address = sg_phys(sg) + state->bus_off;
-               sg_dma_len(sg) = sg->length;
-               sg_dma_mark_bus_address(sg);
-       }
-
-So to split, we would need to introduce new version of __pci_p2pdma_update_state(),
-rename existing one to something like __pci_p2pdma_update_state2() and
-remove it in next patch. Such pattern of adding and immediately deleting
-code is not welcomed.
-
-> Other than that, looks good.
+> Since you provide the ability to use a raw format, are we sure other
+> accelerators will never be interested in such PMU filtering?
 > 
-> Reviewed-by: Luis Chamberlain <mcgrof@kenrel.org>
+> I'm pretty sure HVF could benefit of it (whether we implement it there
+> is another story).
 
-Thanks
+Nice to know it could benefit more cases.
 
-> 
->   Luis
+> What do you think about adding this as a generic accelerator feature.
+
+I can implement pmu-filter directly at the "accel" level.
+
+> If a particular accel doesn't support it and we ask to filter, we simply
+> report an error.
+
+One of the main issues is how to organize the QAPI scheme:
+
+First we have a "qapi/accelerator.json" like current implementation to
+provide:
+
+##
+# = Accelerators
+##
+
+Then we should have a "qapi/accelerator-target.json" (which will follows
+qapi/accelerator.json in qapi-schema.json, just like machine.json &
+machine-target.json), and place all pmu-filter related things in this
+file with specify the compilation condition, for example:
+
+{ 'struct': 'KvmPmuFilterProperties',
+  'data': { 'action': 'KvmPmuFilterAction',
+            '*x86-fixed-counter': 'uint32',
+            '*events': ['KvmPmuFilterEvent'] },
+  'if': 'CONFIG_KVM' }
+
+In the future, this could be expanded to: 'if': { 'any': [ 'CONFIG_HVF', 'CONFIG_KVM' ] }.
+
+I understand that there is no way to specify the architecture here,
+because it is not possible to specify a combination case like
+"TARGET_I386 & CONFIG_KVM", "TARGET_ARM & CONFIG_KVM", "TARGET_ARM & CONFIG_HVF"
+(please educate me if such "if" condition be implemented in QAPI :-)).
+
+So, I will put the arch-specific format check in pmu-filter.c by adding
+arch macros as I mentioned in this reply:
+
+https://lore.kernel.org/qemu-devel/aA3TeaYG9mNMdEiW@intel.com/
+
+And there'll need accel-specific format check (for example, maksed-entry
+is KVM specific, and it is not defined in x86 spec). I can check the
+accel-specific format in the `check` hook of
+object_class_property_add_link(), which links the pmu-filter object to
+accelerator.
+
+Do you like this idea?
+
+Thanks,
+Zhao
+
+
 
