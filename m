@@ -1,178 +1,172 @@
-Return-Path: <kvm+bounces-44480-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44485-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE5BCA9DF46
-	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 08:15:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F1DAA9E00E
+	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 08:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51ED47B174D
-	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 06:14:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 954247AB7EA
+	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 06:45:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23813235360;
-	Sun, 27 Apr 2025 06:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HUmFkslM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A86248866;
+	Sun, 27 Apr 2025 06:45:49 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C87EA94A
-	for <kvm@vger.kernel.org>; Sun, 27 Apr 2025 06:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC77B200138;
+	Sun, 27 Apr 2025 06:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745734520; cv=none; b=pB6te39cBzWy3pAJDHcLZ5gJKbZgG5zB6RZwdCVEVFMkV9REk8CeSIeYMLodS11rrrdlj0xSwq2ij84dhzKCxFr5qqvxtSTlXFOJJrcXt79nXGANyCNKM3AQtWyNEmOPwpVZItmq20w+G/ASTPL4pa7vg3LnUcjKnXKpsEO1DpE=
+	t=1745736349; cv=none; b=d9+S5ahQ2LyEcBaLm1HnuatLZaiK2d4EkJXU7/hfY5LgACMiLL0rCjjetvZkD9Qy2ji9am1fHf1XDKNkZsov8lwA9tp+NAnMMVZUAqDJAlAIG9ClErlREApsuKPHyFd6r4BmhmDIUrt/3u+lcRcajysDYQo14lYcVGeFZeYDWmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745734520; c=relaxed/simple;
-	bh=rxpNcby6Q++OoV5RweTfvn1DH4Lzi1iHyCXm0T+R9I8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=uVMZ9xEw7Fu7EU1j7AnrgW9mqZLN/2NXKFwWm2k4mwWqAch3ZPUFU65TtgtFyRSBN/HsH9NNd4wJ+SnlDi24nruz1J1KABFDiWjxVVeFA0JH9Cuzwekimw9ngSjmngCcVTgZ4b4NGKTdsMTLWu+PuTVw+B2KiG0uHW3HdePZSRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HUmFkslM; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745734518; x=1777270518;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=rxpNcby6Q++OoV5RweTfvn1DH4Lzi1iHyCXm0T+R9I8=;
-  b=HUmFkslM1X0bOoWgBhQCEsHpDZvyd0zM+5nLK8v8wSH5QuhWm1DMfpML
-   GtLNXnjuHRQS3rh2dOdgFHCU0yws0su8mTMBkVy3ATgFUZeEab0aN0Fbh
-   aEwscXUpR8RfbKrHwTakwVzPTt6an8p7nHVGg9Mi36vA4meWbk9fi4SGW
-   ifA9iBYz3aBg2urP5DAmk2bYyGAGeLNf2Z3M/SFx2nGLFFWyi7nLT1/FI
-   RWCcZiciSj8SP0Pg+SF4kWpvspAxLkDORnhtXsjAPNEgUngrDZeldIT86
-   dFuddomEp9hdupZuSrl4j3hjG9XuaBazOAmCcYxMDm1lkIa5IWspaGQki
-   Q==;
-X-CSE-ConnectionGUID: MAtWbgUuRV6agSUoTD11HQ==
-X-CSE-MsgGUID: 7pZw+x6hRjyO2Or191DmzA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11415"; a="46578504"
-X-IronPort-AV: E=Sophos;i="6.15,243,1739865600"; 
-   d="scan'208";a="46578504"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2025 23:15:18 -0700
-X-CSE-ConnectionGUID: vvPqo2DTRG+vmJSc4g3kcA==
-X-CSE-MsgGUID: osdeSxcWSsmSvbH2SRquCw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,243,1739865600"; 
-   d="scan'208";a="138331909"
-Received: from lkp-server01.sh.intel.com (HELO 050dd05385d1) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 26 Apr 2025 23:15:16 -0700
-Received: from kbuild by 050dd05385d1 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1u8vII-00068z-1k;
-	Sun, 27 Apr 2025 06:15:14 +0000
-Date: Sun, 27 Apr 2025 14:15:13 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Farrah Chen <farrah.chen@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm:queue 9/13] arch/x86/kvm/svm/avic.c:807: warning: Function
- parameter or struct member 'pi->prev_ga_tag' not described in 'if'
-Message-ID: <202504271426.qgsP6QxR-lkp@intel.com>
+	s=arc-20240116; t=1745736349; c=relaxed/simple;
+	bh=2UOdkKj3kW/gazi0HnsKyEqTEEf5o3O5/O/Db5DwnVw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=O3O/073qin4wOyP4TbEA5OAAlEjlsMrK5cnpWVGrC9kC/qWufwOozvYksY3ocOulDPl4itcXkcpngZgX/CNc/cZfFLbY/MkjALUG5yq+rrL2UfUGOXz/o5gVf28xJZvy1PFbw7Q3DSMmrlviJwWhZCApPuScXh11Gdesm/tieTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8DxbKyS0g1o7hvHAA--.2650S3;
+	Sun, 27 Apr 2025 14:45:38 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowMDxu8SP0g1oAEKYAA--.52357S2;
+	Sun, 27 Apr 2025 14:45:36 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Sean Christopherson <seanjc@google.com>
+Cc: Shuah Khan <shuah@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH v11 0/5] KVM: selftests: Add LoongArch support
+Date: Sun, 27 Apr 2025 14:45:30 +0800
+Message-Id: <20250427064535.242404-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMDxu8SP0g1oAEKYAA--.52357S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-head:   45eb29140e68ffe8e93a5471006858a018480a45
-commit: 268cbfe65bb9096f78f98d1e092b1939d3caa382 [9/13] KVM: SVM: WARN if an invalid posted interrupt IRTE entry is added
-config: x86_64-randconfig-002-20250427 (https://download.01.org/0day-ci/archive/20250427/202504271426.qgsP6QxR-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250427/202504271426.qgsP6QxR-lkp@intel.com/reproduce)
+This patchset adds KVM selftests for LoongArch system, currently only
+some common test cases are supported and pass to run. These test cases
+are listed as following:
+    coalesced_io_test
+    demand_paging_test
+    dirty_log_perf_test
+    dirty_log_test
+    guest_print_test
+    hardware_disable_test
+    kvm_binary_stats_test
+    kvm_create_max_vcpus
+    kvm_page_table_test
+    memslot_modification_stress_test
+    memslot_perf_test
+    set_memory_region_test
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202504271426.qgsP6QxR-lkp@intel.com/
+---
+Changes in v11:
+1. Fix a typo issue in notes of patch 2, it is kvm_util_arch.h rather than
+   kvm_util_base.h
 
-All warnings (new ones prefixed by >>):
+Changes in v10:
+1. Add PS_64K and remove PS_8K in file include/loongarch/processor.h
+2. Fix a typo issue in file lib/loongarch/processor.c
+3. Update file MAINTAINERS about LoongArch KVM selftests
 
->> arch/x86/kvm/svm/avic.c:807: warning: Function parameter or struct member 'pi->prev_ga_tag' not described in 'if'
-   arch/x86/kvm/svm/avic.c:807: warning: expecting prototype for In some cases, the existing irte is updated and re(). Prototype was for if() instead
-   arch/x86/kvm/svm/avic.c:823: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
-            * Allocating new amd_iommu_pi_data, which will get
-   arch/x86/kvm/svm/avic.c:936: warning: Function parameter or struct member 'kvm_vcpu_apicv_active(&svm->vcpu' not described in 'if'
-   arch/x86/kvm/svm/avic.c:936: warning: expecting prototype for Here, we setup with legacy mode in the following cases(). Prototype was for if() instead
-   arch/x86/kvm/svm/avic.c:951: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
-                            * Here, we successfully setting up vcpu affinity in
-   arch/x86/kvm/svm/avic.c:983: warning: cannot understand function prototype: 'pi.prev_ga_tag = 0; '
-   arch/x86/kvm/svm/avic.c:988: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
-                    * Check if the posted interrupt was previously
-   arch/x86/kvm/svm/avic.c:1128: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
-                    * During AVIC temporary deactivation, guest could update
+Changes in v9:
+1. Add vm mode VM_MODE_P47V47_16K, LoongArch VM uses this mode by
+   default, rather than VM_MODE_P36V47_16K.
+2. Refresh some spelling issues in changelog.
+
+Changes in v8:
+1. Porting patch based on the latest version.
+2. For macro PC_OFFSET_EXREGS, offsetof() method is used for C header file,
+   still hardcoded definition for assemble language.
+
+Changes in v7:
+1. Refine code to add LoongArch support in test case
+set_memory_region_test.
+
+Changes in v6:
+1. Refresh the patch based on latest kernel 6.8-rc1, add LoongArch
+support about testcase set_memory_region_test.
+2. Add hardware_disable_test test case.
+3. Drop modification about macro DEFAULT_GUEST_TEST_MEM, it is problem
+of LoongArch binutils, this issue is raised to LoongArch binutils owners.
+
+Changes in v5:
+1. In LoongArch kvm self tests, the DEFAULT_GUEST_TEST_MEM could be
+0x130000000, it is different from the default value in memstress.h.
+So we Move the definition of DEFAULT_GUEST_TEST_MEM into LoongArch
+ucall.h, and add 'ifndef' condition for DEFAULT_GUEST_TEST_MEM
+in memstress.h.
+
+Changes in v4:
+1. Remove the based-on flag, as the LoongArch KVM patch series
+have been accepted by Linux kernel, so this can be applied directly
+in kernel.
+
+Changes in v3:
+1. Improve implementation of LoongArch VM page walk.
+2. Add exception handler for LoongArch.
+3. Add dirty_log_test, dirty_log_perf_test, guest_print_test
+test cases for LoongArch.
+4. Add __ASSEMBLER__ macro to distinguish asm file and c file.
+5. Move ucall_arch_do_ucall to the header file and make it as
+static inline to avoid function calls.
+6. Change the DEFAULT_GUEST_TEST_MEM base addr for LoongArch.
+
+Changes in v2:
+1. We should use ".balign 4096" to align the assemble code with 4K in
+exception.S instead of "align 12".
+2. LoongArch only supports 3 or 4 levels page tables, so we remove the
+hanlders for 2-levels page table.
+3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
+DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
+4. Reorganize the test cases supported by LoongArch.
+5. Fix some code comments.
+6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
+---
+Bibo Mao (5):
+  KVM: selftests: Add VM_MODE_P47V47_16K VM mode
+  KVM: selftests: Add KVM selftests header files for LoongArch
+  KVM: selftests: Add core KVM selftests support for LoongArch
+  KVM: selftests: Add ucall test support for LoongArch
+  KVM: selftests: Add test cases for LoongArch
+
+ MAINTAINERS                                   |   2 +
+ tools/testing/selftests/kvm/Makefile          |   2 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |  18 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   6 +
+ .../kvm/include/loongarch/kvm_util_arch.h     |   7 +
+ .../kvm/include/loongarch/processor.h         | 141 ++++++++
+ .../selftests/kvm/include/loongarch/ucall.h   |  20 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +
+ .../selftests/kvm/lib/loongarch/exception.S   |  59 +++
+ .../selftests/kvm/lib/loongarch/processor.c   | 342 ++++++++++++++++++
+ .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
+ .../selftests/kvm/set_memory_region_test.c    |   2 +-
+ 12 files changed, 638 insertions(+), 2 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
 
 
-vim +807 arch/x86/kvm/svm/avic.c
-
-   791	
-   792	static int svm_ir_list_add(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
-   793	{
-   794		int ret = 0;
-   795		unsigned long flags;
-   796		struct amd_svm_iommu_ir *ir;
-   797		u64 entry;
-   798	
-   799		if (WARN_ON_ONCE(!pi->ir_data))
-   800			return -EINVAL;
-   801	
-   802		/**
-   803		 * In some cases, the existing irte is updated and re-set,
-   804		 * so we need to check here if it's already been * added
-   805		 * to the ir_list.
-   806		 */
- > 807		if (pi->prev_ga_tag) {
-   808			struct kvm *kvm = svm->vcpu.kvm;
-   809			u32 vcpu_id = AVIC_GATAG_TO_VCPUID(pi->prev_ga_tag);
-   810			struct kvm_vcpu *prev_vcpu = kvm_get_vcpu_by_id(kvm, vcpu_id);
-   811			struct vcpu_svm *prev_svm;
-   812	
-   813			if (!prev_vcpu) {
-   814				ret = -EINVAL;
-   815				goto out;
-   816			}
-   817	
-   818			prev_svm = to_svm(prev_vcpu);
-   819			svm_ir_list_del(prev_svm, pi);
-   820		}
-   821	
-   822		/**
-   823		 * Allocating new amd_iommu_pi_data, which will get
-   824		 * add to the per-vcpu ir_list.
-   825		 */
-   826		ir = kzalloc(sizeof(struct amd_svm_iommu_ir), GFP_ATOMIC | __GFP_ACCOUNT);
-   827		if (!ir) {
-   828			ret = -ENOMEM;
-   829			goto out;
-   830		}
-   831		ir->data = pi->ir_data;
-   832	
-   833		spin_lock_irqsave(&svm->ir_list_lock, flags);
-   834	
-   835		/*
-   836		 * Update the target pCPU for IOMMU doorbells if the vCPU is running.
-   837		 * If the vCPU is NOT running, i.e. is blocking or scheduled out, KVM
-   838		 * will update the pCPU info when the vCPU awkened and/or scheduled in.
-   839		 * See also avic_vcpu_load().
-   840		 */
-   841		entry = READ_ONCE(*(svm->avic_physical_id_cache));
-   842		if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK)
-   843			amd_iommu_update_ga(entry & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK,
-   844					    true, pi->ir_data);
-   845	
-   846		list_add(&ir->node, &svm->ir_list);
-   847		spin_unlock_irqrestore(&svm->ir_list_lock, flags);
-   848	out:
-   849		return ret;
-   850	}
-   851	
-
+base-commit: 5bc1018675ec28a8a60d83b378d8c3991faa5a27
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.39.3
+
 
