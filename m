@@ -1,100 +1,124 @@
-Return-Path: <kvm+bounces-44466-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44467-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68CBCA9DDA6
-	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 00:49:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 569C2A9DE14
+	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 02:47:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACB5C3BED87
-	for <lists+kvm@lfdr.de>; Sat, 26 Apr 2025 22:49:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96F1C5A7A06
+	for <lists+kvm@lfdr.de>; Sun, 27 Apr 2025 00:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F4C20125F;
-	Sat, 26 Apr 2025 22:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B735F20FA9E;
+	Sun, 27 Apr 2025 00:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dq4DN7sY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cThYwat6"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3A71F19A;
-	Sat, 26 Apr 2025 22:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF1BA47
+	for <kvm@vger.kernel.org>; Sun, 27 Apr 2025 00:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745707775; cv=none; b=Z9v8AVidEdQ8uxljX2Caf0ffdwsN5hpZ6SekpAB4kkla5ql970oOHrPXRuqFyI50RCmHsHwS555NWaKQeYeB8Dgy1eQPRWtpWLns647lbCDZ4dgZq1a0aMRDEWX9dDxAmaasxrm+VfUaGAKUUhi+Aa9yxdzHBUh5LptW/k0WRnA=
+	t=1745714819; cv=none; b=Fb5c0zXvjcx9hP5logsL+m0v3kLBalkrZDZ6tonO13rVu0fgYbgLils4SB4sTxTkuWrQ2yrRueNzImSEFGHL1KrnbrlcYf94R6mE7h+PuthMhFXI6sDDJ/WbKxg0gOj923GsiU1Mxy8ElPswJKZlI2gZOPop68fzx4Smpcc+8X4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745707775; c=relaxed/simple;
-	bh=nmMFwB0+2Q83FWwoIeN84/Hsbr1BD0MNyu6u3Ztzl+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DqQOKcI6zcxF6ERRLfIwF0Pqqcxmj19j1V/6AweGhUfQ+E8C5qBPOnqxjxxW0FtCiwZA/A8ZoMNhsTI+3vu/v6l2ieBZWzDeZZ5vbRaXAMxNxmr03h0goddky9gi/InCEwbYkyRW2YpLMc+WTH5zokOV5yz7Hvd5on4rCMzXCAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dq4DN7sY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E2A6C4CEE2;
-	Sat, 26 Apr 2025 22:49:33 +0000 (UTC)
+	s=arc-20240116; t=1745714819; c=relaxed/simple;
+	bh=6w8InrR0UjCsPBijuy+qM6D+gHqN0DCqrg5KTBN81wA=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Ra+C7KxaoJcKmoUodgN3Bwyfh5LDPV/dYlCv2ybRpwRZF4disRruzWtLQ52dVGN8WEOFEZSooDd6KDcqzmuvd5X3+YaQMRwCZh4k+wRoRufRRtfDkigSUmwOV/4sWEHI7qfor4KbdtGaqZPKqwiFTtXAXOPQ1YpqJByV1CGepbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cThYwat6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 57DADC4CEED
+	for <kvm@vger.kernel.org>; Sun, 27 Apr 2025 00:46:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745707774;
-	bh=nmMFwB0+2Q83FWwoIeN84/Hsbr1BD0MNyu6u3Ztzl+U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dq4DN7sYvzyKsbFrdTgHJyYQ/t0IfLJyjoz6RDjDdoU+n+O0s9VMQ5Fe4sETqQqXu
-	 DCeQkOkzWcikGSsz5cSEC9TkTjmCk7WVtWRGMVFf+u/m2XaDyfr5iPT82X6WifKMG2
-	 gh1V5xEEIy9jECtkpExskL33+bhy82ETGBU7hbmEoEGMpmALKALDa3hF5i3anZHhG3
-	 jVXw8747itRVfwTZvsh4/6M7lMFtHzVL1MAcGeyBOA0lj2Rflt0Cr/LoaF/1k5b43X
-	 r6s70MJCK+obsUgmZqZbzwSqcw3Wt8+DvxNsviVfWn0igDvBWICqZ4yqkUwueY0OUR
-	 l+77ooG0Rb3eQ==
-Date: Sat, 26 Apr 2025 15:49:32 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH v9 08/24] dma-mapping: add a dma_need_unmap helper
-Message-ID: <aA1i_HJ1eimihSI2@bombadil.infradead.org>
-References: <cover.1745394536.git.leon@kernel.org>
- <e55ceb86c6529a276484e13b0e6ea58764daf854.1745394536.git.leon@kernel.org>
+	s=k20201202; t=1745714818;
+	bh=6w8InrR0UjCsPBijuy+qM6D+gHqN0DCqrg5KTBN81wA=;
+	h=From:To:Subject:Date:From;
+	b=cThYwat6v9UtLf6Y8GEKa2OVPpoJseram9zBLLcB7rt8FTe9ZoF2e27ff/vGtWw0M
+	 ofNahM3Q6FG5WJRgS44LYyaHn/lEvrRIeZmZ/0lm6tdHfniPLjAlhgReVyGwKzMmoH
+	 x4Vv110jkgHXIktACtC5PmOeI/gUprjHxheMu2x0AZ4LEvHYY83yofYlexFJABL4Lj
+	 iYuvnqU5RCq0IvyNKTeyB+5zSzzEU2uNSoWGDGVv2SmWOGaZpbI+V2vPdi5hXFvsqo
+	 /4POgf8aSjYKRceLGU6gg62JpD+fpHNDSFNzjXs3yemrKcG80WUc0Dxqi6zz5uAC5K
+	 T4YyPhXFwVyPg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 501CDC53BC7; Sun, 27 Apr 2025 00:46:58 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 220057] New: Kernel regression. Linux VMs crashing (I did not
+ test Windows guest VMs)
+Date: Sun, 27 Apr 2025 00:46:58 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: adolfotregosa@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression attachments.created
+Message-ID: <bug-220057-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e55ceb86c6529a276484e13b0e6ea58764daf854.1745394536.git.leon@kernel.org>
 
-On Wed, Apr 23, 2025 at 11:12:59AM +0300, Leon Romanovsky wrote:
-> From: Christoph Hellwig <hch@lst.de>
-> 
-> Add helper that allows a driver to skip calling dma_unmap_*
-> if the DMA layer can guarantee that they are no-nops.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Tested-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220057
 
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+            Bug ID: 220057
+           Summary: Kernel regression. Linux VMs crashing (I did not test
+                    Windows guest VMs)
+           Product: Virtualization
+           Version: unspecified
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: blocking
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: adolfotregosa@gmail.com
+        Regression: No
 
-  Luis
+Created attachment 308028
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D308028&action=3Dedit
+journalctl
+
+I found a kernel regression. I'm using Proxmox, and any kernel with the
+following commit:
+
+https://github.com/torvalds/linux/commit/f9e54c3a2f5b79ecc57c7bc7d0d3521e46=
+1a2101
+
+causes an instant VM crash in some situations that involve GPU acceleration.
+I=E2=80=99m using an NVIDIA GPU passthrough, but another person experienced=
+ the same
+crashes with an AMD 9070 XT. In my case, this occurs when playing a simple
+YouTube video in Chromium-based browsers or when running some games.
+
+I have confirmed that reverting this commit prevents my Linux VMs from
+crashing.
+
+I=E2=80=99ve attached a log showing what the host=E2=80=99s journalctl log =
+displays. The error
+is always exactly the same.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
