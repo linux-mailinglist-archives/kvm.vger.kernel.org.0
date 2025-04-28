@@ -1,126 +1,134 @@
-Return-Path: <kvm+bounces-44591-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44592-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42CCBA9F75D
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 19:30:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 455F3A9F7A8
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 19:45:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1D421A85205
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 17:31:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E096F3AE0F4
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 17:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 524372949E6;
-	Mon, 28 Apr 2025 17:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF73293476;
+	Mon, 28 Apr 2025 17:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFNCyztK"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Hwt3GJtH"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E50153808;
-	Mon, 28 Apr 2025 17:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57AFE60B8A
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 17:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745861439; cv=none; b=JKVMCE2OP921/4Gzo3q/K5uW380QulmKutpljMGRc8EgITNC7kUsIt8RP2WdvdOFs0EYn/o4R4HXUj2ST0okwtUZQJhLiaSW/fAgTYyH5M+Ocfa/lWMGMlWDysw70lKqm008PJ3MGEvzcJWuyKTcqdvYwHJen9IiOD+PwwNQth4=
+	t=1745862346; cv=none; b=dxh7O7d2LYcntQ98D/99ZeudHtNmuuLrZfQrGutpVtZueMmn8ijKRPaX+X5KgrOXd2gIZSU8NWhTay4/teE0Y1ir8KSCYzxYxfnsvra/Rx7DsN11EwiZY44v5tYTKdf3wQ+5ODGd3WPfEbZ/2QWfaoZ4R/Lx8f1tXTfF+wgY8+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745861439; c=relaxed/simple;
-	bh=ab2ae8e/65ivTF8ecHo7+deewxqwGOGmR1WVeufmqHc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c6vQSr+KFjAhqKUIaFEe3o1YiqKQNQXIUEeefYK8tKgcb/PcdqglhuRcXZCBXRVqM+ZV7V7QuF0vHQNiwcqBQuj8u5P7WqWDS0U/n34v9XzLQH9k4azIG7ABXVfObK0wN1Zoe5ncZz0mnVYuKXIFC4T8OyzAOd4NfrysDGkbK4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFNCyztK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78575C4CEE4;
-	Mon, 28 Apr 2025 17:30:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745861438;
-	bh=ab2ae8e/65ivTF8ecHo7+deewxqwGOGmR1WVeufmqHc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EFNCyztKW7+/Evx7uEJGPtK2SefAgYmqtED4ANsvGmvDwBuQlhn5S/nOmqu3WBR1z
-	 +VFQyVwyP+0O2cMp8wyAXepn0PBELCi0ksp0PKLJBKlMwsEdig7AFEj4wICYu3fAJQ
-	 /zZeikIV4GSdae/Y2/DwH4bks++gRwmwp9dpfRTMH4Z1ZCpPgQcQmi4pOO08SmuMpb
-	 PTiv7J0eh/bS37eMFbiD7C8K8hWZiVIArkSUuuY+DzvZ8SoAg2vgkigVBG4ZUgJkdE
-	 7Vrm2LUXRrJhMi9MPNfGblL+7IObYzGv0HZAEJnZAxGsJP7ubWBtZWh1DwAjICEoUP
-	 0fglvd90xB7zw==
-Date: Mon, 28 Apr 2025 11:30:34 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH v10 23/24] nvme-pci: convert to blk_rq_dma_map
-Message-ID: <aA-7Oh4T-mDGvLXh@kbusch-mbp.dhcp.thefacebook.com>
-References: <cover.1745831017.git.leon@kernel.org>
- <007e00134d49160d5edab94a72c35b7b91429b09.1745831017.git.leon@kernel.org>
- <aA-w20gOKus5hyAV@kbusch-mbp.dhcp.thefacebook.com>
- <20250428172225.GG5848@unreal>
+	s=arc-20240116; t=1745862346; c=relaxed/simple;
+	bh=lSCgDLFkm+uTp6BBbwhp0BqZSIhLiEfIj/xbmsFVQEQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=QfL1G82auYKK1CQIH1YizSF1ZnEPV38GYmRCo22kT/BIcnXdsJvdCgCGUqIA42nEyrXbSLpyYjF1eSexuqMR3ivb+Buv6ZLeC1vUKdrWOuxK9t05Tp1tUsopbdz13ltVTOCNq+CpRqsi4ypitjPquI2gqR4l2mzlIL1bxO9Vxc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Hwt3GJtH; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43d4ff56136so5724515e9.3
+        for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 10:45:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1745862342; x=1746467142; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v/CANhKWFmJawB0p8jQ/NyjybjgGkYzY/3LSqUuDHX0=;
+        b=Hwt3GJtHh4j5IJHmVgpYNdakLAlsIO87ZYX7XBNZtOLvgv0Io1+LZ01V6ua2QFtNaJ
+         GvJ+qWQ8FtildThMCkmoWnT4i9Prb3kb2senYv/F75eZGghFscWJJj/KZhOB3vq4fLOf
+         ktzof6xBZtngYUPqjvzo4XTqq2CXyOeIi0HpT4r0CWvAzhjoBGXesjI0H91JmseEAfmt
+         kbn8KUutFLahP5xWtAaF12BNxgqf05+Jz1IoYlQGlRuU3bd5dunBzK2hp3lgLrB+MUG3
+         ZFjq/vwZc4O+oiy9OD/B92Q18vhh8jE43SqnAF+n4VqyBjw5XjHr8iOF5t/ugSHy/o09
+         mKPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745862342; x=1746467142;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=v/CANhKWFmJawB0p8jQ/NyjybjgGkYzY/3LSqUuDHX0=;
+        b=YjbDueUuSvjF7bH2eGBdoO2Ds5jFtZXJJ2AjrMG2mjbtU9e+KjSvN8EF3BU/oZAhqm
+         MCT0/Wvw6LG/KNVJmzyMe6U0g+0f0BbN35zgr5Z17WGSj7sDiAdRqVRFZ+i3jMQT64YJ
+         XQcSB3rrMYYK2dU56fCDPdEw+TKr+JK8xCkdJuHLqYMRqwHZsKExyX3xk8qrbPG4eEyC
+         Ljy/dC05LGwBB6ShIIQLJuISprOGfNSMUHFIxlKrHkrpTiDgwNetKzYk8rZ0eZg2Qy5V
+         mDv0FSucA3xDt+w3TbX/EhWwhEuffwfG9rOon4Hqcj6FAVShOoXQbp/0deU2g5xiQqKO
+         BeQw==
+X-Forwarded-Encrypted: i=1; AJvYcCXcUooiuDdJ9s3uIJbiAJv1JtF1Ce72390VG/bnK9Zc7lefbvBwlAPOltlHxApm4CqMCm4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/YV7+6B1m9kQ8L0mQa7ajaUqkwv43B7jRyuAUXnPceIWB/7j5
+	/DRfr8TlvkVsjSl8pM4eBBzFDajMk/vbNY1kZeuHcEjGqOkaskawTbCKzkmjeQc=
+X-Gm-Gg: ASbGncvUw5i3eeLJmc9D1UFfsEPtzt5+gRhNENSG1Jtabn+mfY5cxbUPJyYI4a5BkTv
+	/kpXX08mqVVLrY5lP4sgMEGcGX4tyXaFXEyIvFGSAvJhjJe8i7Eve9W8l9/6qBt2SkmTHnD27GH
+	QRhxf9d8B6CegnTdKJ1qetDF6QNpuqWGu/6INzdHQuNu26FyHkzaBiXoMZo6jGk3c0mdYecQYMZ
+	ibR2jkS1EhYoclkyGfpB5FJGxreH95zF3C9EdjVgaOf8EyaHd8L6JOnqiMTsQsSSOybvIxqapIe
+	Pm+NLkZozvGZtF59uMyDJ6rA04Xs1WDiawJOW34sCFVF7aA=
+X-Google-Smtp-Source: AGHT+IEvyyRwv+siNkS/+KKa7cPTZaQ24k7dR1L6NM8zAaZ/ZacC5UiUMQME2xFD4O4sKzfsTBeP0Q==
+X-Received: by 2002:a05:600c:3b82:b0:439:9fde:da76 with SMTP id 5b1f17b1804b1-440a634912dmr44268285e9.0.1745862342603;
+        Mon, 28 Apr 2025 10:45:42 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200:785:f3a7:1fbb:6b76])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e46a54sm11977490f8f.67.2025.04.28.10.45.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Apr 2025 10:45:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250428172225.GG5848@unreal>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 28 Apr 2025 19:45:41 +0200
+Message-Id: <D9IGJR9DGFAM.1PVHVOOTVRFZW@ventanamicro.com>
+Subject: Re: [PATCH 4/5] KVM: RISC-V: reset VCPU state when becoming
+ runnable
+Cc: <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
+ <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>, "Atish
+ Patra" <atishp@atishpatra.org>, "Paul Walmsley" <paul.walmsley@sifive.com>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Alexandre Ghiti" <alex@ghiti.fr>, "Andrew Jones"
+ <ajones@ventanamicro.com>, "Mayuresh Chitale" <mchitale@ventanamicro.com>
+To: "Anup Patel" <anup@brainfault.org>
+From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
+References: <20250403112522.1566629-3-rkrcmar@ventanamicro.com>
+ <20250403112522.1566629-7-rkrcmar@ventanamicro.com>
+ <CAAhSdy0e3HVN6pX-hcX2N+kpwsupsCf6BqrYq=bvtwtFOuEVhA@mail.gmail.com>
+In-Reply-To: <CAAhSdy0e3HVN6pX-hcX2N+kpwsupsCf6BqrYq=bvtwtFOuEVhA@mail.gmail.com>
 
-On Mon, Apr 28, 2025 at 08:22:25PM +0300, Leon Romanovsky wrote:
-> On Mon, Apr 28, 2025 at 10:46:19AM -0600, Keith Busch wrote:
-> > On Mon, Apr 28, 2025 at 12:22:29PM +0300, Leon Romanovsky wrote:
-> > > +	do {
-> > > +		if (WARN_ON_ONCE(mapped == entries)) {
-> > > +			iter.status = BLK_STS_IOERR;
-> > > +			break;
-> > > +		}
-> > > +		nvme_pci_sgl_set_data(&sg_list[mapped++], &iter);
-> > 
-> > I think this should say "++mapped" so that the data blocks start at
-> > index 1 (continued below...)
-> > 
-> > > +		iod->total_len += iter.len;
-> > > +	} while (blk_rq_dma_map_iter_next(req, dev->dev, &iod->dma_meta_state,
-> > > +				 &iter));
-> > >  
-> > > -out_unmap_sg:
-> > > -	dma_unmap_sgtable(dev->dev, &iod->meta_sgt, rq_dma_dir(req), 0);
-> > > -out_free_sg:
-> > > -	mempool_free(iod->meta_sgt.sgl, dev->iod_meta_mempool);
-> > > -	return BLK_STS_RESOURCE;
-> > > +	nvme_pci_sgl_set_seg(sg_list, sgl_dma, mapped);
-> > 
-> > because this here is setting sg_list index 0 to be the segment
-> > descriptor.
-> > 
-> > And you also need to increment sgl_dma to point to the element after
-> > sg_list, otherwise it's pointing right back to itself, creating a looped
-> > list.
-> 
-> Thanks for pointing to the difference between data_map and metadata_map,
+2025-04-28T17:52:25+05:30, Anup Patel <anup@brainfault.org>:
+> On Thu, Apr 3, 2025 at 5:02=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcm=
+ar@ventanamicro.com> wrote:
+>> For a cleaner solution, we should add interfaces to perform the KVM-SBI
+>> reset request on userspace demand.  I think it would also be much better
+>> if userspace was in control of the post-reset state.
+>
+> Apart from breaking KVM user-space, this patch is incorrect and
+> does not align with the:
+> 1) SBI spec
+> 2) OS boot protocol.
+>
+> The SBI spec only defines the entry state of certain CPU registers
+> (namely, PC, A0, and A1) when CPU enters S-mode:
+> 1) Upon SBI HSM start call from some other CPU
+> 2) Upon resuming from non-retentive SBI HSM suspend or
+>     SBI system suspend
+>
+> The S-mode entry state of the boot CPU is defined by the
+> OS boot protocol and not by the SBI spec. Due to this, reason
+> KVM RISC-V expects user-space to set up the S-mode entry
+> state of the boot CPU upon system reset.
 
-Yeah, They're different because the SQE has 16 bytes available for the
-data map, so the command can fit an SGL descriptor directly in its
-submission entry. The metadata field only has 8 bytes in the SQE, so we
-have to set it to the address of an external SGL segment descriptor.
+We can handle the initial state consistency in other patches.
+What needs addressing is a way to trigger the KVM reset from userspace,
+even if only to clear the internal KVM state.
+
+I think mp_state is currently the best signalization that KVM should
+reset, so I added it there.
+
+What would be your preferred interface for that?
+
+Thanks.
+
 
