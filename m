@@ -1,302 +1,160 @@
-Return-Path: <kvm+bounces-44527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44528-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19A48A9E940
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 09:26:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC11DA9E9C7
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 09:45:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C7963ACB68
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 07:26:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DC2F172CAD
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 07:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521101DE2D7;
-	Mon, 28 Apr 2025 07:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C181DF247;
+	Mon, 28 Apr 2025 07:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UVa2nysM"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="RFeRNuA3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3D11D88A4
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 07:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E611D6DAA;
+	Mon, 28 Apr 2025 07:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745825171; cv=none; b=nwB9gj395ARdbMnNrfGRKxhFQ3Dd/9pGmYw6Fb2oRxFHTvE90MM7RboiPiLeZbga3Qk+7DV7OyLXehGp5jNJdFycCYXYp7HGL1unouvJ+Scx61XPjKaVcJMUSWu49jHgOyKq+gbe5/V5155DuokL/QapcDPcMnqnrI4Jjv1B5Ms=
+	t=1745826294; cv=none; b=cs3geW8G2GDRPGIKHlU8krfS6n+Z+peexkwOP1X+jqK/4smpToctFwXOa+9kyXb6qai7uJNsTtQy1M93QMGD9fQmHrfXOIj+elG5YL4YPVXyz0NLQtCtPGpqjYGc8bhLbfyn+yCNnVf+BQI81Qw1pyAjBu1hLdRa4Vy3PrhW934=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745825171; c=relaxed/simple;
-	bh=/5olxRRzWcYoN6k+kS4e7Agil7hfcLOnKm2yXW3nFzg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=uPQeygqCw3R23qSaphAOWpj76gZUSbEJAAQgjimv8epI9mhHqL5cHgTTRAE0EKO9kDSdWw9e1vuuv9XwQU0mXNLku+0QF1l7jOFnFjO1iNTnP5SarA3BzhgIFpR9AamAVQJhwgR0vO4QM0ushEsKzHFDLf5r2M9gJOknZzuq8kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UVa2nysM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745825168;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ep5vsTDMIvlMOpMmlujwECawCCp8PH/R3i2HglWtj1U=;
-	b=UVa2nysMacysNmiu82Vr3h2woNb/RmjcNeceWgb16SKv0XTRcSb3oAqpzrzXj8OcWL3PvN
-	gEZQ8Sg4j/sAlfBBxf7PjVtEGLlS9PmvqRPDAKqBz0X8YY0hQMclisiOHr8fEnVYh5wfkF
-	R9xiZQqRHy24HbpHj2vGU41GJ/XLENE=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-274-A1i62NlANvOIKNqsvKAyjw-1; Mon,
- 28 Apr 2025 03:26:03 -0400
-X-MC-Unique: A1i62NlANvOIKNqsvKAyjw-1
-X-Mimecast-MFC-AGG-ID: A1i62NlANvOIKNqsvKAyjw_1745825162
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B8DDA1800ECA;
-	Mon, 28 Apr 2025 07:26:01 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.45.242.27])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E450830001AB;
-	Mon, 28 Apr 2025 07:26:00 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 8A93121E6682; Mon, 28 Apr 2025 09:19:07 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Eric Blake <eblake@redhat.com>,
-  Michael Roth <michael.roth@amd.com>,  Daniel P . =?utf-8?Q?Berrang=C3=A9?=
- <berrange@redhat.com>,  Eduardo Habkost <eduardo@habkost.net>,  Marcelo
- Tosatti <mtosatti@redhat.com>,  Shaoqin Huang <shahuang@redhat.com>,  Eric
- Auger <eauger@redhat.com>,  Peter Maydell <peter.maydell@linaro.org>,
-  Laurent Vivier <lvivier@redhat.com>,  Thomas Huth <thuth@redhat.com>,
-  Sebastian Ott <sebott@redhat.com>,  Gavin Shan <gshan@redhat.com>,
-  qemu-devel@nongnu.org,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
-  Dapeng Mi <dapeng1.mi@intel.com>,  Yi Lai <yi1.lai@intel.com>,
-    =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- pierrick.bouvier@linaro.org
-Subject: Re: [PATCH 3/5] i386/kvm: Support event with select & umask format
- in KVM PMU filter
-In-Reply-To: <aA3TeaYG9mNMdEiW@intel.com> (Zhao Liu's message of "Sun, 27 Apr
-	2025 14:49:29 +0800")
-References: <20250409082649.14733-1-zhao1.liu@intel.com>
-	<20250409082649.14733-4-zhao1.liu@intel.com>
-	<87frhwfuv1.fsf@pond.sub.org> <aA3TeaYG9mNMdEiW@intel.com>
-Date: Mon, 28 Apr 2025 09:19:07 +0200
-Message-ID: <87h6283g9g.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1745826294; c=relaxed/simple;
+	bh=NYm63tbfaXgDfW0aBIqEJQfnIBRLoLZfmjY0nzxO2Vs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xb6lcS0MwKCMbupveeg2HH+D0aJI0wFi4U6byUtdMG721JKXG6NSy8jb51VO8XQtqflrTBiw/X1FXSvMSoRXUHFzE5wwP0ec75YiVzQCqqsu7hMtfBshqwTzK21i72yv4vy3Lgk6XmV/Hi88kVYjJHgBtJrCqM7Sal7Da8a/DYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=RFeRNuA3; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53S7i75n3115917
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 28 Apr 2025 00:44:08 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53S7i75n3115917
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1745826251;
+	bh=+2DjUZrTCltqsS6c9mpaqFIMdN7tyQkbibgydyEnOd0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RFeRNuA3VITJtjtCWgnIR1gSeyfuKcFlaE9dfPbek+ei/rtJ6ELFEox78CBB3bzOK
+	 41LaibC4KCT1SwB6sJF4gQjRa6xA2MLNTn6+mLbk3i9Em5US8txbCR18bOwjsvqbZl
+	 yIdXK9FCN68rSPUICMMOTILqvW6O8zL4KL8ztDXzOEeXUfIvAJIS2yrfyHDei1Cr5u
+	 VTWrH/q2bNR9mq3uIst28+AHUch6ra6e+3+eep6a6kOl2yeeuZWoL9Y14ZLOAw6roO
+	 JJLicnkGRn3I/+qPwc6Te+887dVQiOciXlHKThq9Xo7ykEmsWT7e58GB5aZcK8CQOW
+	 sHY8T5/tXyoSw==
+Message-ID: <15fd8eaf-ba71-4f0e-9aed-5f7a6f5a4ea7@zytor.com>
+Date: Mon, 28 Apr 2025 00:44:06 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 3/7] x86/fpu/xstate: Differentiate default features for
+ host and guest FPUs
+To: Chao Gao <chao.gao@intel.com>, Sean Christopherson <seanjc@google.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        Stanislav Spassov <stanspas@amazon.de>,
+        "levymitchell0@gmail.com" <levymitchell0@gmail.com>,
+        "samuel.holland@sifive.com" <samuel.holland@sifive.com>,
+        Xin3 Li <xin3.li@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        "mingo@redhat.com"
+ <mingo@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "john.allen@amd.com" <john.allen@amd.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        Chang Seok Bae <chang.seok.bae@intel.com>,
+        "vigbalas@amd.com" <vigbalas@amd.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "hpa@zytor.com"
+ <hpa@zytor.com>, "bp@alien8.de" <bp@alien8.de>,
+        "aruna.ramakrishna@oracle.com" <aruna.ramakrishna@oracle.com>,
+        "x86@kernel.org" <x86@kernel.org>
+References: <20250410072605.2358393-1-chao.gao@intel.com>
+ <20250410072605.2358393-4-chao.gao@intel.com>
+ <f53bea9b13bd8351dc9bba5e443d5e4f4934555d.camel@intel.com>
+ <aAtG13wd35yMNahd@intel.com>
+ <4a4b1f18d585c7799e5262453e4cfa2cf47c3175.camel@intel.com>
+ <aAwdQ759Y6V7SGhv@google.com> <aA71VD0NgLZMmNGi@intel.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <aA71VD0NgLZMmNGi@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Zhao Liu <zhao1.liu@intel.com> writes:
+On 4/27/2025 8:26 PM, Chao Gao wrote:
+>> For KVM, it's just the one MSR, and KVM needs to support save/restore of that MSR
+>> no matter what, so supporting it via XSAVE would be more work, a bit sketchy, and
+>> create yet another way for userspace to do weird things when saving/restoring vCPU
+>> state.
+> Agreed. One more issue of including CET_S into KVM_GET/SET_XSAVE{2} is:
+> 
+> XSAVE UABI buffers adhere to the standard format defined by the SDM, which
+> never includes supervisor states. Attempting to incorporate supervisor states
+> into UABI buffers would lead to many issues, such as deviating from the
+> standard format and the need to define offsets for each supervisor state.
 
-> Hi Markus,
->
->> > +        case KVM_PMU_EVENT_FORMAT_X86_SELECT_UMASK: {
->> > +            if (event->u.x86_select_umask.select > UINT12_MAX) {
->> > +                error_setg(errp,
->> > +                           "Parameter 'select' out of range (%d).",
->> > +                           UINT12_MAX);
->> > +                goto fail;
->> > +            }
->> > +
->> > +            /* No need to check the range of umask since it's uint8_t. */
->> > +            break;
->> > +        }
->> 
->> As we'll see below, the new x86-specific format is defined in the QAPI
->> schema regardless of target.
->> 
->> It is accepted here also regardless of target.  Doesn't matter much
->> right now, as the object is effectively useless for targets other than
->> x86, but I understand that will change.
->> 
->> Should we reject it unless the target is x86?
->
-> I previously supposed that different architectures should implement
-> their own kvm_arch_check_pmu_filter(), which is the `check` hook of
-> object_class_property_add_link():
->
->     object_class_property_add_link(oc, "pmu-filter",
->                                    TYPE_KVM_PMU_FILTER,
->                                    offsetof(KVMState, pmu_filter),
->                                    kvm_arch_check_pmu_filter,
->                                    OBJ_PROP_LINK_STRONG);
+Good point.
 
-This way, the checking happens only when you actually connect the
-kvm-pmu-filter object to the accelerator.
+FRED RSPs are in the supervisor state and are not defined within the
+XSAVE area.  Their save/restore operations need to be explicitly added 
+one by one.
 
-Have you considered checking in the kvm-pmu-filter object's complete()
-method?  Simple example of how to do that: qauthz_simple_complete() in
-authz/simple.c.
+Would it be sensible to introduce a KVM supervisor MSR state that
+includes new MSRs?
 
-> For x86, I implemented kvm_arch_check_pmu_filter() in target/i386/kvm/
-> kvm.c and checked the supported formats (I also supposed arch-specific
-> PMU filter could reject the unsupported format in
-> kvm_arch_check_pmu_filter().)
->
-> But I think your idea is better, i.e., rejecting unsupported format
-> early in pmu-filter parsing.
->
-> Well, IIUC, there is no way to specify in QAPI that certain enumerations
-> are generic and certain enumerations are arch-specific,
+This approach is similar to what KVM has with its CPUID API, allowing
+batch MSR set/get operations and improving MSR code sharing.  Since the
+FRED state is entirely defined in MSRs (except for CR4.FRED), this
+should simplify the context save and restore for FRED.
 
-Here's how to make enum values conditional:
-
-    { 'enum': 'KvmPmuEventFormat',
-      'data': ['raw',
-               { 'name': 'x86-select-umask', 'if': 'TARGET_I386' }
-               { 'name': 'x86-masked-entry', 'if': 'TARGET_I386' } ] }
-
-However, TARGET_I386 is usable only in target-specific code.  This has
-two consequences here:
-
-1. It won't compile, since QAPI schema module kvm.json is
-   target-independent.  We'd have to put it into a target-specific
-   module kvm-target.json.
-
-2. Target-specific QAPI schema mdoules are problematic for the single
-   binary / heterogeneous machine work.  We are discussing how to best
-   handle that.  Unclear whether adding more target-specific QAPI
-   definitions are a good idea.
-
->                                                         so rejecting
-> unsupported format can only happen in parsing code. For example, wrap
-> the above code in "#if defined(TARGET_I386)":
->
->     for (node = head; node; node = node->next) {
->         KvmPmuFilterEvent *event = node->value;
->
->         switch (event->format) {
->         case KVM_PMU_EVENT_FORMAT_RAW:
->             break;
-> #if defined(TARGET_I386)
->         case KVM_PMU_EVENT_FORMAT_X86_SELECT_UMASK: {
->             ...
->             break;
->         }
->         case KVM_PMU_EVENT_FORMAT_X86_MASKED_ENTRY: {
->             ...
-> 	    break;
->         }
-> #endif
->         default:
-> 	    error_setg(errp,
->                        "Unsupported format.");
->             goto fail;
->         }
->
->         ...
->     }
->
-> EMM, do you like this idea?
-
-This is kvm_pmu_filter_set_event(), I presume.
-
-The #if is necessary when you make the enum values conditional.  The
-default: code is unreachable then, so it should stay
-g_assert_not_reached().
-
-The #if is fine even when you don't make the enum values conditional.
-The default: code is reachable then, unless you reject the unwanted
-enums earlier some other way.
-
->> If not, I feel the behavior should be noted in the commit message.
->
-> With the above change, I think it's possible to reject x86-specific
-> format on non-x86 arch. And I can also note this behavior in commit
-> message.
->
->> >          default:
->> >              g_assert_not_reached();
->> >          }
->> > @@ -67,6 +82,9 @@ static void kvm_pmu_filter_set_event(Object *obj, Visitor *v, const char *name,
->> >      filter->events = head;
->> >      qapi_free_KvmPmuFilterEventList(old_head);
->> >      return;
->> > +
->> > +fail:
->> > +    qapi_free_KvmPmuFilterEventList(head);
->> >  }
->> >  
->> >  static void kvm_pmu_filter_class_init(ObjectClass *oc, void *data)
->
-> ...
->
->> >  ##
->> >  # @KvmPmuFilterEvent:
->> >  #
->> > @@ -66,7 +82,8 @@
->> >  { 'union': 'KvmPmuFilterEvent',
->> >    'base': { 'format': 'KvmPmuEventFormat' },
->> >    'discriminator': 'format',
->> > -  'data': { 'raw': 'KvmPmuRawEvent' } }
->> > +  'data': { 'raw': 'KvmPmuRawEvent',
->> > +            'x86-select-umask': 'KvmPmuX86SelectUmaskEvent' } }
->> >  
->> >  ##
->> >  # @KvmPmuFilterProperties:
->> 
->> Documentation could perhaps be more explicit about this making sense
->> only for x86.
->
-> What about the following doc?
->
-> ##
-> # @KvmPmuFilterProperties:
-> #
-> # Properties of KVM PMU Filter (only for x86).
-
-Hmm.  Branch 'raw' make sense regardless of target, doesn't it?  It's
-actually usable only for i86 so far, because this series implements
-accelerator property "pmu-filter" only for i386.
-
-Let's not worry about this until we decided whether to use QAPI
-conditionals or not.
-
->> > diff --git a/qemu-options.hx b/qemu-options.hx
->> > index 51a7c61ce0b0..5dcce067d8dd 100644
->> > --- a/qemu-options.hx
->> > +++ b/qemu-options.hx
->> > @@ -6180,6 +6180,9 @@ SRST
->> >               ((select) & 0xff) | \
->> >               ((umask) & 0xff) << 8)
->> >  
->> > +        ``{"format":"x86-select-umask","select":event_select,"umask":event_umask}``
->> > +            Specify the single x86 PMU event with select and umask fields.
->> > +
->> >          An example KVM PMU filter object would look like:
->> >  
->> >          .. parsed-literal::
->> > diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
->> > index fa3a696654cb..0d36ccf250ed 100644
->> > --- a/target/i386/kvm/kvm.c
->> > +++ b/target/i386/kvm/kvm.c
->> > @@ -5974,6 +5974,10 @@ static bool kvm_config_pmu_event(KVMPMUFilter *filter,
->> >          case KVM_PMU_EVENT_FORMAT_RAW:
->> >              code = event->u.raw.code;
->> >              break;
->> > +        case KVM_PMU_EVENT_FORMAT_X86_SELECT_UMASK:
->> > +            code = X86_PMU_RAW_EVENT(event->u.x86_select_umask.select,
->> > +                                     event->u.x86_select_umask.umask);
->> > +            break;
->> >          default:
->> >              g_assert_not_reached();
->> >          }
->> > @@ -6644,6 +6648,7 @@ static void kvm_arch_check_pmu_filter(const Object *obj, const char *name,
->> >  
->> >          switch (event->format) {
->> >          case KVM_PMU_EVENT_FORMAT_RAW:
->> > +        case KVM_PMU_EVENT_FORMAT_X86_SELECT_UMASK:
->
-> Here's the current format check I mentioned above. But I agree your idea
-> and will check in the parsing of pmu-filter object.
->
->> >              break;
->> >          default:
->> >              error_setg(errp,
->> 
-
+Thanks!
+     Xin
 
