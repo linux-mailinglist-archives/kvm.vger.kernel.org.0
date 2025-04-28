@@ -1,92 +1,154 @@
-Return-Path: <kvm+bounces-44582-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44583-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 556E3A9F41C
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 17:10:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD932A9F448
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 17:22:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B5713B818A
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 15:09:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46F931897883
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 15:22:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1990727979D;
-	Mon, 28 Apr 2025 15:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mecAt24T"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B11626C39E;
+	Mon, 28 Apr 2025 15:22:15 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C56127978F
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 15:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05DA6256D
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 15:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745853007; cv=none; b=K2v/dEkd1K55eAPJVjKX2qgpskKoU4Bw+Q0sId3ZY1Vd8gRXKxjwWn6T0KIWYLptnDCtDGcu3cRuqPAm8fnvADCNbUkCf9QWnie5kYurt0A73iIQB6zWYHZ9dJ9/JlnDWmZgADuUTOALZEmFl/NZhiQix7ArxuSjF5/g+EWL8l8=
+	t=1745853734; cv=none; b=IaQh/QAdqNweZGw0uQX51TiOlOI2p5rlrdMGiTTMZpk+BrYe+jKIe00pd15HvrO8c+yyknq4JqV0e5638WJMT7tWn8NUxSJpzxVpSPooSAi6jk0yI4yanNLxmlvGvgobut0JPvPzj9Wda0h+GOFB02WYbtWMpCCMLZBTqJpxrf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745853007; c=relaxed/simple;
-	bh=T86KxSdfruNeE7iGAj5AONml49hUexAVMFx/mLrqgtg=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Qf8xApdZY1L05CV76iZM046lXhNfM4ACa+Hto96wADu7B7sAI424l0r/zkcgcD0qSN7n4KxQWqGAiZkXWu0MufhximpMp8cHMzMpYm8uxyOJ+Rs4ecdatQT8pJ608EVelOV3YNgQmnxX6IwRTfvkI7gJqQ2GoxXQbyalSGF8E9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mecAt24T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 17C73C4CEED
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 15:10:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745853007;
-	bh=T86KxSdfruNeE7iGAj5AONml49hUexAVMFx/mLrqgtg=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=mecAt24TpocTpZBiccbzM3h73MgxsyeaGE7hJldo1CPPjWcXYxJU2iyVTeYD/gc79
-	 V28Q7C0iK8GGaGx64q/9DYYfu/feLMfkjVbqlj5tBdZsHwszOB1mnjBAHcwxnnP43w
-	 s2HFab+XZYqDySX7sI8tt/NUmJgke+SQH82eSGcwvVDmLhaQNZAkCunV6lCNXdX4d2
-	 51dSSaEytO7bkzDhY0KLPtJVScJrbi3MDyza2Y6FyS9H7dp+eZLEYtubryo8Yusm/h
-	 +Upm/V9lINZEK3Gwh3U83aX63fAUVWi0CGZT6wpwubC4XEZPmoPpmpuvSl5WbXQwXE
-	 CtdG8+C4L3/tg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 0F3B4C53BC5; Mon, 28 Apr 2025 15:10:07 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 220057] Kernel regression. Linux VMs crashing (I did not test
- Windows guest VMs)
-Date: Mon, 28 Apr 2025 15:10:06 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: alex.williamson@redhat.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-220057-28872-agbQ8b2niO@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220057-28872@https.bugzilla.kernel.org/>
-References: <bug-220057-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1745853734; c=relaxed/simple;
+	bh=gxE7qbr71f04vdkZt/3olchIZHyOW0X9RzYP8P23DLk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ivaV10gYdVNDyc1dLWa0bTosS4LsWxmTvO+ymqODhmGe1KMcrMGDQqxTZUyImOxN9iEj9tN1KhPeawyHxEZuJyUV7PWN+fe/Od/RPzNPQiPIHaWVJbH4ThzcvmcuyUYfsk90s6+TWPgJWml0DVO8Viun+Y6pc5Nyb4/E5c9AVIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BD8761516;
+	Mon, 28 Apr 2025 08:22:05 -0700 (PDT)
+Received: from arm.com (unknown [10.1.197.41])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 491FC3F673;
+	Mon, 28 Apr 2025 08:22:11 -0700 (PDT)
+Date: Mon, 28 Apr 2025 16:22:08 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Cc: kvm@vger.kernel.org, Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: Re: [PATCH kvmtool v3 2/3] cpu: vmexit: Retry KVM_RUN ioctl on EINTR
+ and EAGAIN
+Message-ID: <aA+dIAof4faNGjCf@arm.com>
+References: <20250428115745.70832-1-aneesh.kumar@kernel.org>
+ <20250428115745.70832-3-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250428115745.70832-3-aneesh.kumar@kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220057
+Hi Aneesh,
 
---- Comment #6 from Alex Williamson (alex.williamson@redhat.com) ---
-What's the VM configuration? The GPU assigned?  The host CPU?  The QEMU
-version?  Is the guest using novueau or the nvidia driver?  Please link the
-other report of this issue.
+Is this to fix Will's report that the series breaks boot on x86?
 
---=20
-You may reply to this email to add a comment.
+On Mon, Apr 28, 2025 at 05:27:44PM +0530, Aneesh Kumar K.V (Arm) wrote:
+> When KVM_RUN fails with EINTR or EAGAIN, we should retry the ioctl
+> without checking kvm_run->exit_reason. These errors don't indicate a
+> valid VM exit, hence exit_reason may contain stale or undefined values.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+EAGAIN is not documented in Documentation/virt/kvm/api.rst. So I'm going to
+assume it's this code path that is causing the -EAGAIN return value [1].
+
+If that's the case, how does retrying KVM_RUN solve the issue? Just trying to
+get to the bottom of it, because there's not much detail in the docs.
+
+[1] https://elixir.bootlin.com/linux/v6.15-rc3/source/arch/x86/kvm/x86.c#L11532
+
+
+Thanks,
+Alex
+
+> 
+> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> ---
+>  include/kvm/kvm-cpu.h |  2 +-
+>  kvm-cpu.c             | 17 ++++++++++++-----
+>  2 files changed, 13 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/kvm/kvm-cpu.h b/include/kvm/kvm-cpu.h
+> index 8f76f8a1123a..72cbb86e6cef 100644
+> --- a/include/kvm/kvm-cpu.h
+> +++ b/include/kvm/kvm-cpu.h
+> @@ -16,7 +16,7 @@ void kvm_cpu__delete(struct kvm_cpu *vcpu);
+>  void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu);
+>  void kvm_cpu__setup_cpuid(struct kvm_cpu *vcpu);
+>  void kvm_cpu__enable_singlestep(struct kvm_cpu *vcpu);
+> -void kvm_cpu__run(struct kvm_cpu *vcpu);
+> +int kvm_cpu__run(struct kvm_cpu *vcpu);
+>  int kvm_cpu__start(struct kvm_cpu *cpu);
+>  bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu);
+>  int kvm_cpu__get_endianness(struct kvm_cpu *vcpu);
+> diff --git a/kvm-cpu.c b/kvm-cpu.c
+> index 40041a22b3fe..7abbdcebf075 100644
+> --- a/kvm-cpu.c
+> +++ b/kvm-cpu.c
+> @@ -35,27 +35,32 @@ void kvm_cpu__enable_singlestep(struct kvm_cpu *vcpu)
+>  		pr_warning("KVM_SET_GUEST_DEBUG failed");
+>  }
+>  
+> -void kvm_cpu__run(struct kvm_cpu *vcpu)
+> +/*
+> + * return value -1 if we need to call the kvm_cpu__run again without checking
+> + * exit_reason. return value 0 results in taking action based on exit_reason.
+> + */
+> +int kvm_cpu__run(struct kvm_cpu *vcpu)
+>  {
+>  	int err;
+>  
+>  	if (!vcpu->is_running)
+> -		return;
+> +		return -1;
+>  
+>  	err = ioctl(vcpu->vcpu_fd, KVM_RUN, 0);
+>  	if (err < 0) {
+>  		switch (errno) {
+>  		case EINTR:
+>  		case EAGAIN:
+> -			return;
+> +			return -1;
+>  		case EFAULT:
+>  			if (vcpu->kvm_run->exit_reason == KVM_EXIT_MEMORY_FAULT)
+> -				return;
+> +				return 0;
+>  			/* fallthrough */
+>  		default:
+>  			die_perror("KVM_RUN failed");
+>  		}
+>  	}
+> +	return 0;
+>  }
+>  
+>  static void kvm_cpu_signal_handler(int signum)
+> @@ -179,7 +184,9 @@ int kvm_cpu__start(struct kvm_cpu *cpu)
+>  		if (cpu->task)
+>  			kvm_cpu__run_task(cpu);
+>  
+> -		kvm_cpu__run(cpu);
+> +		if (kvm_cpu__run(cpu) == -1)
+> +			/* retry without an exit_reason check */
+> +			continue;
+>  
+>  		switch (cpu->kvm_run->exit_reason) {
+>  		case KVM_EXIT_UNKNOWN:
+> -- 
+> 2.43.0
+> 
+> 
 
