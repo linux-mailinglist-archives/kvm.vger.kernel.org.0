@@ -1,297 +1,140 @@
-Return-Path: <kvm+bounces-44577-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44579-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 368C0A9F350
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 16:21:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8662A9F3D0
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 16:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CEC17A3639
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 14:20:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2537017FDCE
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 14:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E3F26C39E;
-	Mon, 28 Apr 2025 14:21:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5FC26FDBF;
+	Mon, 28 Apr 2025 14:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LAayAwQ1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e1A9Ms5J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CD61B86EF
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 14:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1155026562C
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 14:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745850090; cv=none; b=WLjvV+clXt9t1qOaT9gUXp4l3xRrw/M+2AVSsI/yGjRBT6vd/qeqfJ0vvYbkGuLbwd4YX6GZIcTSR+iNS/2JRYH9rQUBbqIeS+XCIyXgXNL2Z+FFj3zvTW8P9chKwEJiM/O9OOqZfyzcMWjtISHu2ETzFU0ZWzt9kjZeyGoOpik=
+	t=1745851826; cv=none; b=oNhBWZJeeVGZgDuHGjz9Hlf4m3wUsyGt9ZGqhxyYmgXNxGT3/jSS/oHBfIFS/uMIDbFh7jlnw2lk+pUju/NMz9y0sKd1mjHKE2yHNSmQRvtsrmPgy1GP8C2Nj9LHjypyybZJalJGBzp2c3CKxC6WDvvNWxS7ZIkSI8GjR2naFvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745850090; c=relaxed/simple;
-	bh=M/8gKPrj9UzBo44bqxU2ZtRdrkTJFsFYsgFLwZFM444=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kzC8uUxHCmm9wcz3uc5pp1FPFW2Bt1nBB6jM/PZhsDHnMxz1WMG0faq/IUbz4HV80ysuAXrPpTyCcO0cBAlzLfD31z74vzRwCtc4LJUaODHYUTd0XMQUpOHsnPVrwJMsYwYhdMX+NeYyTqiM4RZ4OMA5xojSYrXkTAZ2Ys9/xmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LAayAwQ1; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745850088; x=1777386088;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=M/8gKPrj9UzBo44bqxU2ZtRdrkTJFsFYsgFLwZFM444=;
-  b=LAayAwQ1vywZtu8wrmcHAhYJLvNO+6ACL6VXAPixa5nJmCO3lIg65mON
-   7eDabxWS/AqEqGXCXjVbkvsDtUqmfTmVwVFNfu3XjYiVtImqGoOTzMgj7
-   7BVkw6bikycWhZC6gss6N+CLYP3/odJ/wi1Io0nOeEuVK/DEkKWfN1Fn9
-   wDKiA80nIuc4h1Slwf++kJ65ZxhbHph94IQ0SI5caY0wkV4qItL5Pp7Hk
-   6/5L/lOPcB2EJ1/9LvPtUJoGZwyIVMR4uZr9kivwGDdgrO31JaD5fBzwb
-   LUC82f1OV/9qdpKgeYQtb0oZYf6eh4uU1QGNoRUPxGRJncGKKVS9cfR7D
-   w==;
-X-CSE-ConnectionGUID: k2+LM5PtToCqi8SyaF46tw==
-X-CSE-MsgGUID: uVmOF2YVTT+6Pkt3/1aafg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11416"; a="69942576"
-X-IronPort-AV: E=Sophos;i="6.15,246,1739865600"; 
-   d="scan'208";a="69942576"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 07:21:27 -0700
-X-CSE-ConnectionGUID: aui4+n6AQBygx0YSOr8INg==
-X-CSE-MsgGUID: zDo3OoVIT7+i4mGbisKf6g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,246,1739865600"; 
-   d="scan'208";a="137584568"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa003.fm.intel.com with ESMTP; 28 Apr 2025 07:21:22 -0700
-Date: Mon, 28 Apr 2025 22:42:19 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eauger@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
-	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	pierrick.bouvier@linaro.org
-Subject: Re: [PATCH 3/5] i386/kvm: Support event with select & umask format
- in KVM PMU filter
-Message-ID: <aA+Ty2IqnE4zQhJv@intel.com>
-References: <20250409082649.14733-1-zhao1.liu@intel.com>
- <20250409082649.14733-4-zhao1.liu@intel.com>
- <87frhwfuv1.fsf@pond.sub.org>
- <aA3TeaYG9mNMdEiW@intel.com>
- <87h6283g9g.fsf@pond.sub.org>
+	s=arc-20240116; t=1745851826; c=relaxed/simple;
+	bh=/QzN4Vr/NcaXAsSbQScZ6XL3r5+GmaNle2Xta12UJfg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OmSm8qPuaMXdKyV3JTFf8Gyj6H/y3oV6SvT9nQdErCiNgn/Nmb1bsQYCvroRF80tDGLInyLz8aGV9lEXwyJlEmpCPHcDPncQLPB7yg6dlx46BXaQCVOechCW7nJYrOAFLXD86xK45AirEHdiKe/jv/DF+s+f1EiVWgyFGJX92eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e1A9Ms5J; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-af972dd0cd6so2805733a12.1
+        for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 07:50:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745851823; x=1746456623; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tlkIIua290wjyF4yv5seaaLpfJU0PyT90x6Uavs/1R8=;
+        b=e1A9Ms5JZeun7I1pVycPcG4H96CIsfBs4gcBg4Kf8An0UIM5d3srOrJd3WW3IFCrAX
+         hXQBzjZgPAkGwSFDxQOPcx00++5hSVZA0cMjA5M29SZZEwu7z1uVSa5aXfIO6G1t1BCI
+         6S7vpdD8kod2y2pLb6z+nL4BP8CpSZhEo2Zw4KCeN/rxQzhGZC2MglU8aoJze+48dFKL
+         UMauftybdAQ1mzaS+7LvEMNhohe7sMPcCTfXwT21pYrEhKihXcAW6OUpx1pwCGPSm4Uj
+         CS9tVStwDk10qqPP49BIup5GiCgnN+Z/sSc/C/es9Q43cI/+RSt0I7n3hj6xbpQfqux4
+         CFbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745851823; x=1746456623;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tlkIIua290wjyF4yv5seaaLpfJU0PyT90x6Uavs/1R8=;
+        b=cqEEm0HBAJbC1c6lNqu43AvNtT9tQ/66OxK6MwGmDJkBYnLv6JITaeCGrLh2fZLpZ6
+         POqI8NL2X6XhqQDCTrCUxwZn0SsafbjMq1wZdRRoSolGKQnmbteCDh1Pl5aenDrlc3hN
+         u5e3+CxJUxaIPYnPKLZWb2D+CUNzI71ETSENnRJ6ef2pArzwCI+6r13TCQOa5TyIhxvu
+         zP/fyfbOCUKj2dagFtTyZcyqxtCilQJ+lVwnPibCen4xcBK7L2lliI2xQxddnoEX1Aus
+         ToTdOc4Wvh7fhj/lHLb4pQsrdtmQeklJzjckaVTivywnUjFumeA2N1y1k7lTD7TjSlxU
+         SbqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4K+jQq05r8LodPc3mJbdRGjf+LsUgGorgAyJb/ig3RQEe3PQZZ7qpR7LgT3dNKSJYKXI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTeOuhtyyu5bSyQ8Tut9Vx3Le+y26JVOyL5VvXbPJDqFSdxDtE
+	ffaauRPDoe+OuMnBI0t05NFOiOn5eLelqPD4MU5HfUdypENPsZlOJbwz4MsmL159HMfXJHpWu18
+	/8A==
+X-Google-Smtp-Source: AGHT+IGQjBWCOydWNE/ttxALHJHboxteEbJ/N0QmJX6WBLFIUaxsEbVZDdieG5LwZ6lGMEcgL1Mtm1LEsuc=
+X-Received: from pgbcp12.prod.google.com ([2002:a05:6a02:400c:b0:b0d:b491:d415])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:32a9:b0:1f5:77ed:40b9
+ with SMTP id adf61e73a8af0-2045b9f4009mr20352644637.40.1745851823200; Mon, 28
+ Apr 2025 07:50:23 -0700 (PDT)
+Date: Mon, 28 Apr 2025 07:50:21 -0700
+In-Reply-To: <aA7aozbc1grlevOm@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87h6283g9g.fsf@pond.sub.org>
+Mime-Version: 1.0
+References: <20250426001056.1025157-1-seanjc@google.com> <aA7aozbc1grlevOm@yzhao56-desk.sh.intel.com>
+Message-ID: <aA-VrWyCkFuMWsaN@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Prevent installing hugepages when mem
+ attributes are changing
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Michael Roth <michael.roth@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Apr 28, 2025 at 09:19:07AM +0200, Markus Armbruster wrote:
-> Date: Mon, 28 Apr 2025 09:19:07 +0200
-> From: Markus Armbruster <armbru@redhat.com>
-> Subject: Re: [PATCH 3/5] i386/kvm: Support event with select & umask format
->  in KVM PMU filter
+On Mon, Apr 28, 2025, Yan Zhao wrote:
+> On Fri, Apr 25, 2025 at 05:10:56PM -0700, Sean Christopherson wrote:
+> > @@ -7686,6 +7707,37 @@ bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+> >  	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
+> >  		return false;
+> >  
+> > +	if (WARN_ON_ONCE(range->end <= range->start))
+> > +		return false;
+> > +
+> > +	/*
+> > +	 * If the head and tail pages of the range currently allow a hugepage,
+> > +	 * i.e. reside fully in the slot and don't have mixed attributes, then
+> > +	 * add each corresponding hugepage range to the ongoing invalidation,
+> > +	 * e.g. to prevent KVM from creating a hugepage in response to a fault
+> > +	 * for a gfn whose attributes aren't changing.  Note, only the range
+> > +	 * of gfns whose attributes are being modified needs to be explicitly
+> > +	 * unmapped, as that will unmap any existing hugepages.
+> > +	 */
+> > +	for (level = PG_LEVEL_2M; level <= KVM_MAX_HUGEPAGE_LEVEL; level++) {
+> > +		gfn_t start = gfn_round_for_level(range->start, level);
+> > +		gfn_t end = gfn_round_for_level(range->end - 1, level);
+> > +		gfn_t nr_pages = KVM_PAGES_PER_HPAGE(level);
+> > +
+> > +		if ((start != range->start || start + nr_pages > range->end) &&
+> > +		    start >= slot->base_gfn &&
+> > +		    start + nr_pages <= slot->base_gfn + slot->npages &&
+> > +		    !hugepage_test_mixed(slot, start, level))
+> Instead of checking mixed flag in disallow_lpage, could we check disallow_lpage
+> directly?
 > 
-> Zhao Liu <zhao1.liu@intel.com> writes:
+> So, if mixed flag is not set but disallow_lpage is 1, there's no need to update
+> the invalidate range.
 > 
-> > Hi Markus,
-> >
-> >> > +        case KVM_PMU_EVENT_FORMAT_X86_SELECT_UMASK: {
-> >> > +            if (event->u.x86_select_umask.select > UINT12_MAX) {
-> >> > +                error_setg(errp,
-> >> > +                           "Parameter 'select' out of range (%d).",
-> >> > +                           UINT12_MAX);
-> >> > +                goto fail;
-> >> > +            }
-> >> > +
-> >> > +            /* No need to check the range of umask since it's uint8_t. */
-> >> > +            break;
-> >> > +        }
-> >> 
-> >> As we'll see below, the new x86-specific format is defined in the QAPI
-> >> schema regardless of target.
-> >> 
-> >> It is accepted here also regardless of target.  Doesn't matter much
-> >> right now, as the object is effectively useless for targets other than
-> >> x86, but I understand that will change.
-> >> 
-> >> Should we reject it unless the target is x86?
-> >
-> > I previously supposed that different architectures should implement
-> > their own kvm_arch_check_pmu_filter(), which is the `check` hook of
-> > object_class_property_add_link():
-> >
-> >     object_class_property_add_link(oc, "pmu-filter",
-> >                                    TYPE_KVM_PMU_FILTER,
-> >                                    offsetof(KVMState, pmu_filter),
-> >                                    kvm_arch_check_pmu_filter,
-> >                                    OBJ_PROP_LINK_STRONG);
+> > +			kvm_mmu_invalidate_range_add(kvm, start, start + nr_pages);
+> > +
+> > +		if (end == start)
+> > +			continue;
+> > +
+> > +		if ((end + nr_pages) <= (slot->base_gfn + slot->npages) &&
+> > +		    !hugepage_test_mixed(slot, end, level))
+> if ((end + nr_pages > range->end) &&
+>     ((end + nr_pages) <= (slot->base_gfn + slot->npages)) &&
+>     !lpage_info_slot(gfn, slot, level)->disallow_lpage)
 > 
-> This way, the checking happens only when you actually connect the
-> kvm-pmu-filter object to the accelerator.
-> 
-> Have you considered checking in the kvm-pmu-filter object's complete()
-> method?  Simple example of how to do that: qauthz_simple_complete() in
-> authz/simple.c.
+> ?
 
-Thank you, I hadn't noticed it before. Now I study it carefully, and yes,
-this is a better way than `check` hook. Though in the following we are
-talking about other ways to handle target-specific check, this helper
-may be still useful as I proposed to help check accel-specific cases in
-the reply to Philip [*].
+No, disallow_lpage is used by write-tracking and shadow paging to prevent creating
+huge pages for a write-protected gfn.  mmu_lock is dropped after the pre_set_range
+call to kvm_handle_gfn_range(), and so disallow_lpage could go to zero if the last
+shadow page for the affected range is zapped.  In practice, KVM isn't going to be
+doing write-tracking or shadow paging for CoCo VMs, so there's no missed optimization
+on that front.
 
-[*]: https://lore.kernel.org/qemu-devel/aA3cHIcKmt3vdkVk@intel.com/
-
-> > For x86, I implemented kvm_arch_check_pmu_filter() in target/i386/kvm/
-> > kvm.c and checked the supported formats (I also supposed arch-specific
-> > PMU filter could reject the unsupported format in
-> > kvm_arch_check_pmu_filter().)
-> >
-> > But I think your idea is better, i.e., rejecting unsupported format
-> > early in pmu-filter parsing.
-> >
-> > Well, IIUC, there is no way to specify in QAPI that certain enumerations
-> > are generic and certain enumerations are arch-specific,
-> 
-> Here's how to make enum values conditional:
-> 
->     { 'enum': 'KvmPmuEventFormat',
->       'data': ['raw',
->                { 'name': 'x86-select-umask', 'if': 'TARGET_I386' }
->                { 'name': 'x86-masked-entry', 'if': 'TARGET_I386' } ] }
-
-What I'm a bit hesitant about is that, if different arches add similar
-"conditional" enumerations later, it could cause the enumeration values
-to change under different compilation conditions (correct? :-)). Although
-it might not break anything, since we don't rely on the specific numeric
-values.
-
-> However, TARGET_I386 is usable only in target-specific code.  This has
-> two consequences here:
-> 
-> 1. It won't compile, since QAPI schema module kvm.json is
->    target-independent.  We'd have to put it into a target-specific
->    module kvm-target.json.
-> 
-> 2. Target-specific QAPI schema mdoules are problematic for the single
->    binary / heterogeneous machine work.  We are discussing how to best
->    handle that.  Unclear whether adding more target-specific QAPI
->    definitions are a good idea.
-
-And per yours feedback, CONFIG_KVM can also only be used in target-specific
-code. Moreover, especially if we need to further consider multiple
-accelerators, such as the HVF need mentioned by Philip, it seems that
-we can't avoid target-specific issues here!
-
-> >                                                         so rejecting
-> > unsupported format can only happen in parsing code. For example, wrap
-> > the above code in "#if defined(TARGET_I386)":
-> >
-> >     for (node = head; node; node = node->next) {
-> >         KvmPmuFilterEvent *event = node->value;
-> >
-> >         switch (event->format) {
-> >         case KVM_PMU_EVENT_FORMAT_RAW:
-> >             break;
-> > #if defined(TARGET_I386)
-> >         case KVM_PMU_EVENT_FORMAT_X86_SELECT_UMASK: {
-> >             ...
-> >             break;
-> >         }
-> >         case KVM_PMU_EVENT_FORMAT_X86_MASKED_ENTRY: {
-> >             ...
-> > 	    break;
-> >         }
-> > #endif
-> >         default:
-> > 	    error_setg(errp,
-> >                        "Unsupported format.");
-> >             goto fail;
-> >         }
-> >
-> >         ...
-> >     }
-> >
-> > EMM, do you like this idea?
-> 
-> This is kvm_pmu_filter_set_event(), I presume.
->
-> The #if is necessary when you make the enum values conditional.  The
-> default: code is unreachable then, so it should stay
-> g_assert_not_reached().
->
-> The #if is fine even when you don't make the enum values conditional.
-> The default: code is reachable then, unless you reject the unwanted
-> enums earlier some other way.
-
-Thanks for your analysis, it's very accurate! I personally prefer the
-2nd way.
-
-> >> If not, I feel the behavior should be noted in the commit message.
-> >
-> > With the above change, I think it's possible to reject x86-specific
-> > format on non-x86 arch. And I can also note this behavior in commit
-> > message.
-> >
-> >> >          default:
-> >> >              g_assert_not_reached();
-> >> >          }
-> >> > @@ -67,6 +82,9 @@ static void kvm_pmu_filter_set_event(Object *obj, Visitor *v, const char *name,
-> >> >      filter->events = head;
-> >> >      qapi_free_KvmPmuFilterEventList(old_head);
-> >> >      return;
-> >> > +
-> >> > +fail:
-> >> > +    qapi_free_KvmPmuFilterEventList(head);
-> >> >  }
-> >> >  
-> >> >  static void kvm_pmu_filter_class_init(ObjectClass *oc, void *data)
-> >
-> > ...
-> >
-> >> >  ##
-> >> >  # @KvmPmuFilterEvent:
-> >> >  #
-> >> > @@ -66,7 +82,8 @@
-> >> >  { 'union': 'KvmPmuFilterEvent',
-> >> >    'base': { 'format': 'KvmPmuEventFormat' },
-> >> >    'discriminator': 'format',
-> >> > -  'data': { 'raw': 'KvmPmuRawEvent' } }
-> >> > +  'data': { 'raw': 'KvmPmuRawEvent',
-> >> > +            'x86-select-umask': 'KvmPmuX86SelectUmaskEvent' } }
-> >> >  
-> >> >  ##
-> >> >  # @KvmPmuFilterProperties:
-> >> 
-> >> Documentation could perhaps be more explicit about this making sense
-> >> only for x86.
-> >
-> > What about the following doc?
-> >
-> > ##
-> > # @KvmPmuFilterProperties:
-> > #
-> > # Properties of KVM PMU Filter (only for x86).
-> 
-> Hmm.  Branch 'raw' make sense regardless of target, doesn't it?  It's
-> actually usable only for i86 so far, because this series implements
-> accelerator property "pmu-filter" only for i386.
-
-The advantage of this single note is someone can easily mention other
-arch in doc :-)
-
-> Let's not worry about this until we decided whether to use QAPI
-> conditionals or not.
-
-OK, this is not a big deal (comparing with other issues).
-
-Thanks,
-Zhao
-
+And if disallow_lpage is non-zero due to a misaligned memslot base/size, then the
+start/end checks will skip this level anyways.
 
