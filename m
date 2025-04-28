@@ -1,149 +1,147 @@
-Return-Path: <kvm+bounces-44572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44573-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45BE6A9F247
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 15:26:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70801A9F280
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 15:37:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC21B5A03CA
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 13:25:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE01C17D781
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 13:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD0626B0BF;
-	Mon, 28 Apr 2025 13:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="a8/rmBUs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346CE26B0BF;
+	Mon, 28 Apr 2025 13:37:39 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3632126A1AF
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 13:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E003C26AA83
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 13:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745846700; cv=none; b=Uk956dEJ0jY3TE3Xzk4JvLqaBGodKHIvcMcPuzPLgAjLqGXnPESerRtmRmN+jvCWzPgRZc1ZPt6EY/p5Yjl9Gvyq7VWqe8dHvtAoPcjTKgATQeokx9SttPjXcudlvDf1WK4PoBogUp4Kmy0I2Dn8adGpyQdQwnPlXIoM3FIUrY4=
+	t=1745847458; cv=none; b=Yf9/+OmjM17MN03xa8m7hNN76wKsH5ldRemMNIuzTtu2fsp5fWkdQecj3U0jbKfk7ZcpX/2p02Kn4ZKB9ryTo2YoStWEyEPqQnG9h6joBdzocOrUAMyXOAlhX5azagQuOM1emeUevp9xEsQ9SYdTshCX7GHsrStfB65tj0TqafQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745846700; c=relaxed/simple;
-	bh=WMDF+xF8cv9egZiq3dKhKzV9V89Oqq0Xru+OujRAu9c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WT6g85Zv3uWK/q1kfAGIVVzFNdelVmz9oJLts6hvOfVjNMli17QHFSiD/T/YvmuMuD6IxaGX+NcEffSrns8Y0TUn+CdRa1JHewbEkezJnaI3Vmq+HarViPV0zKyTn4xrhHZXeXHPQLHGyrh2mDjeq9y3BqAMpCgcLqeI5Mdccyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=a8/rmBUs; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6ed16ce246bso25638756d6.3
-        for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 06:24:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1745846697; x=1746451497; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TghuZvI1NqWY2rKkKrKVWO9Hy4Hhr0amNahvHhrH2wo=;
-        b=a8/rmBUst1R9TjBHzyC3Rl7He+DPBljFvXOcSbBhR/iXiGfg8dhPtUruErD1PurwRF
-         4iIwOaP5OEoCakNzjmeJrvaTZi9rKQw8WWQOzq+RLwEU44e6S/zd6vaZKKYRvDLRFUjr
-         pvR/iim0F6OwB1KDOxLWgXP/kpivOnv1Rk4OXflqTxOB6tuOwQG731NTd4W1nJozoNZg
-         2KOHnJRBLn2XPFftZMmZnSTSop5FBFFrARRX8XTgI4OSNdISm2YRr5l9HaOi6HoMUqgH
-         /FAu8Cz46qvmwCc42MtXg2LBI7o+UDjBcMbBCmay0+Efgt/eItjoiv4MpYat6yJUj8wK
-         wNxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745846697; x=1746451497;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TghuZvI1NqWY2rKkKrKVWO9Hy4Hhr0amNahvHhrH2wo=;
-        b=pIwnjNSNclleki7aVJYv6YojlDrBWEAdrfEPGQILZmWhz+Esu9863Af0xYDCmpyx80
-         95ORha4nTPliUrTK7nSW6qPfVV0DbK5cImo/zXGjtXbjlKhGBOCmHD5AlNWXgoalyhqx
-         HnOuhsF+kp2BpHnH2zaRGM8ml2kcum1lOW+Z5awn8WcLQn+EIXkAlURE8xEqTvuN2AQU
-         /5rNjP2J3C8ksp33bm7TU2LZsZff9eG8XFM5X94y6GCJX5m7wAs5lZWS8CZXywbHiuOU
-         FJoVILA/98vwKjtCxhMRzsF2J5LtE3nx87qUtW//05XkDbj4kOIS25aBiRX0lfremtBE
-         R4pA==
-X-Gm-Message-State: AOJu0Yx2NLxgjPltJe6xOTmKeueMpszKNHHfRd0dx17kyajoNTQdTPUj
-	g8AUtL+vPnzwTBUgYWPbbcBgKUcjLG5RtogbsviTQ1kM7IwD8xHF7Mk075a/vdKJNVQD7Fj38s2
-	Q
-X-Gm-Gg: ASbGncvwApL9L2sNc15qQljM2h3ae041Mxv8todJjez2t46bFmG6Ujn75bLZAuStzDO
-	sZqWhE6F/V+uP+VN8CRD5aHvFgqsI5rGGAPpJeeG8zse2555Na3ibCWpvnZS8cGm16JorEKQCvf
-	Xg+1yE22C/ExQsVkxFUZzfu9iR1diRrr5F/svpTKN2UJgT8Qv/laz51QUUZRmoS58+kuGrTuH0D
-	KrmF3jd2f1o0m4xDXp7VnZ7dQRGNPkvpS5X6cJZOpjyB3IySotceILY1WUYT5zl3StzQyHVpCcQ
-	pzcBK/CXG2Vd9tJUN1xUVXkK1Gi3GlJSsEVAbaBOkjICkweR8B1KNZda/74ybzcdb1tCuzv3EFD
-	1pUXUonPytCqYF0jCmsM=
-X-Google-Smtp-Source: AGHT+IHS+LiKPwUgJdOq9cWDDSpsQLmT0n1tW9M/V5tmDv3MAmBTgvwZIZ3Uzue2gsWFtJHsf7k49Q==
-X-Received: by 2002:ad4:5746:0:b0:6eb:1e80:19fa with SMTP id 6a1803df08f44-6f4cb99d537mr193763226d6.1.1745846696983;
-        Mon, 28 Apr 2025 06:24:56 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f4c0968a44sm61218186d6.60.2025.04.28.06.24.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Apr 2025 06:24:56 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1u9OTf-00000009Tsv-49gX;
-	Mon, 28 Apr 2025 10:24:56 -0300
-Date: Mon, 28 Apr 2025 10:24:55 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Chathura Rajapaksha <chathura.abeyrathne.lk@gmail.com>
-Cc: kvm@vger.kernel.org, Chathura Rajapaksha <chath@bu.edu>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Paul Moore <paul@paul-moore.com>, Eric Paris <eparis@redhat.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Xin Zeng <xin.zeng@intel.com>, Yahui Cao <yahui.cao@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Yunxiang Li <Yunxiang.Li@amd.com>,
-	Dongdong Zhang <zhangdongdong@eswincomputing.com>,
-	Avihai Horon <avihaih@nvidia.com>, linux-kernel@vger.kernel.org,
-	audit@vger.kernel.org
-Subject: Re: [RFC PATCH 0/2] vfio/pci: Block and audit accesses to unassigned
- config regions
-Message-ID: <20250428132455.GC1213339@ziepe.ca>
-References: <20250426212253.40473-1-chath@bu.edu>
+	s=arc-20240116; t=1745847458; c=relaxed/simple;
+	bh=X1xSRHTB0PyWf/pfUW0jATiHdpAptbsL/b7Yy/v+ng0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YAakmom2yj7k+rdxlo0YCu9O4vHk/DHxvE+iGlU1L7YbDroXY60BfnXsjlQ9w8gnq1dUiLm1I5m09Ti42xyD4hxBEKqKjRnZX+TM4kBE4Mhkdh/pLodiP7HPp2x7u1dKa1hICV4Cpc7HLVzVias18dSJ3DLHWfxbH5zuHl6XimI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B94131516;
+	Mon, 28 Apr 2025 06:37:29 -0700 (PDT)
+Received: from [10.1.37.44] (Suzukis-MBP.cambridge.arm.com [10.1.37.44])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 478833F673;
+	Mon, 28 Apr 2025 06:37:35 -0700 (PDT)
+Message-ID: <9e2fe85c-f3ad-4e13-b635-78a80c115499@arm.com>
+Date: Mon, 28 Apr 2025 14:37:34 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250426212253.40473-1-chath@bu.edu>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool v3 2/3] cpu: vmexit: Retry KVM_RUN ioctl on EINTR
+ and EAGAIN
+Content-Language: en-GB
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org
+Cc: Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20250428115745.70832-1-aneesh.kumar@kernel.org>
+ <20250428115745.70832-3-aneesh.kumar@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20250428115745.70832-3-aneesh.kumar@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Apr 26, 2025 at 09:22:47PM +0000, Chathura Rajapaksha wrote:
-> Some PCIe devices trigger PCI bus errors when accesses are made to
-> unassigned regions within their PCI configuration space. On certain
-> platforms, this can lead to host system hangs or reboots.
+Hi Aneesh
 
-Do you have an example of this? What do you mean by bus error?
-
-I would expect the device to return some constant like 0, or to return
-an error TLP. The host bridge should convert the error TLP to
-0XFFFFFFF like all other read error conversions.
-
-Is it a device problem or host bridge problem you are facing?
-
-> 1. Support for blocking guest accesses to unassigned
->    PCI configuration space, and the ability to bypass this access control
->    for specific devices. The patch introduces three module parameters:
+On 28/04/2025 12:57, Aneesh Kumar K.V (Arm) wrote:
+> When KVM_RUN fails with EINTR or EAGAIN, we should retry the ioctl
+> without checking kvm_run->exit_reason. These errors don't indicate a
+> valid VM exit, hence exit_reason may contain stale or undefined values.
 > 
->    block_pci_unassigned_write:
->    Blocks write accesses to unassigned config space regions.
+> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> ---
+>   include/kvm/kvm-cpu.h |  2 +-
+>   kvm-cpu.c             | 17 ++++++++++++-----
+>   2 files changed, 13 insertions(+), 6 deletions(-)
 > 
->    block_pci_unassigned_read:
->    Blocks read accesses to unassigned config space regions.
-> 
->    uaccess_allow_ids:
->    Specifies the devices for which the above access control is bypassed.
->    The value is a comma-separated list of device IDs in
->    <vendor_id>:<device_id> format.
-> 
->    Example usage:
->    To block guest write accesses to unassigned config regions for all
->    passed through devices except for the device with vendor ID 0x1234 and
->    device ID 0x5678:
-> 
->    block_pci_unassigned_write=1 uaccess_allow_ids=1234:5678
+> diff --git a/include/kvm/kvm-cpu.h b/include/kvm/kvm-cpu.h
+> index 8f76f8a1123a..72cbb86e6cef 100644
+> --- a/include/kvm/kvm-cpu.h
+> +++ b/include/kvm/kvm-cpu.h
+> @@ -16,7 +16,7 @@ void kvm_cpu__delete(struct kvm_cpu *vcpu);
+>   void kvm_cpu__reset_vcpu(struct kvm_cpu *vcpu);
+>   void kvm_cpu__setup_cpuid(struct kvm_cpu *vcpu);
+>   void kvm_cpu__enable_singlestep(struct kvm_cpu *vcpu);
+> -void kvm_cpu__run(struct kvm_cpu *vcpu);
+> +int kvm_cpu__run(struct kvm_cpu *vcpu);
+>   int kvm_cpu__start(struct kvm_cpu *cpu);
+>   bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu);
+>   int kvm_cpu__get_endianness(struct kvm_cpu *vcpu);
+> diff --git a/kvm-cpu.c b/kvm-cpu.c
+> index 40041a22b3fe..7abbdcebf075 100644
+> --- a/kvm-cpu.c
+> +++ b/kvm-cpu.c
+> @@ -35,27 +35,32 @@ void kvm_cpu__enable_singlestep(struct kvm_cpu *vcpu)
+>   		pr_warning("KVM_SET_GUEST_DEBUG failed");
+>   }
+>   
+> -void kvm_cpu__run(struct kvm_cpu *vcpu)
+> +/*
+> + * return value -1 if we need to call the kvm_cpu__run again without checking
+> + * exit_reason. return value 0 results in taking action based on exit_reason.
+> + */
 
-No module parameters please.
+minor nit: Should we make the return value meaningful, say -EAGAIN 
+instead of -1 ?
 
-At worst the kernel should maintain a quirks list to control this,
-maybe with a sysfs to update it.
+> +int kvm_cpu__run(struct kvm_cpu *vcpu)
+>   {
+>   	int err;
+>   
+>   	if (!vcpu->is_running)
+> -		return;
+> +		return -1;
+>   
+>   	err = ioctl(vcpu->vcpu_fd, KVM_RUN, 0);
+>   	if (err < 0) {
+>   		switch (errno) {
+>   		case EINTR:
+>   		case EAGAIN:
+> -			return;
+> +			return -1;
+>   		case EFAULT:
+>   			if (vcpu->kvm_run->exit_reason == KVM_EXIT_MEMORY_FAULT)
+> -				return;
+> +				return 0;
+>   			/* fallthrough */
+>   		default:
+>   			die_perror("KVM_RUN failed");
+>   		}
+>   	}
+> +	return 0;
+>   }
+>   
+>   static void kvm_cpu_signal_handler(int signum)
+> @@ -179,7 +184,9 @@ int kvm_cpu__start(struct kvm_cpu *cpu)
+>   		if (cpu->task)
+>   			kvm_cpu__run_task(cpu);
+>   
+> -		kvm_cpu__run(cpu);
+> +		if (kvm_cpu__run(cpu) == -1)
 
-Jason
+and this could be :
+		if (kvm_cpu__run(cpu) == -EAGAIN)
+
+> +			/* retry without an exit_reason check */
+> +			continue;
+>   
+>   		switch (cpu->kvm_run->exit_reason) {
+>   		case KVM_EXIT_UNKNOWN:
+
+
+Suzuki
 
