@@ -1,181 +1,123 @@
-Return-Path: <kvm+bounces-44574-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44578-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D350A9F2C1
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 15:51:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B413FA9F36A
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 16:29:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECA101A82AC0
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 13:51:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 013D07ACB02
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 14:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD46326A1AA;
-	Mon, 28 Apr 2025 13:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F56626FA56;
+	Mon, 28 Apr 2025 14:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fvk7aIFz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mztNw7Dh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0CA269B0D
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 13:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87F2D530
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 14:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745848277; cv=none; b=CNnJS522y9oycPXzggHLui2tfvUptGb+CL2SqikjsXObhh+E5wW6iuPU4s9w4gpPkNXqq6VaUzyoFdyFFYLzHGTN6YO5871qT9q1b4k9rPFO2d2YjwIesnmwsrtmg5QuGTOcSRxnxmCgaw2JAdZ5yWWY5ri4VUvSLdxqSeKSS80=
+	t=1745850541; cv=none; b=IoVBGZifchrdklzVs1do7sgNTOh0BBtP7OIyus6Be5gXHrYHWtNHaJg6pvZya5HbGK9DIgvjNOzFzImnc3Smc/951PTL7qOIwMmIkhyGBPQCNktbl8fs1STF/dF+Z4ZBrVIdK2IL+GG5jn9fh1QJNKKNjXS/7p2/gdcyOiR2bfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745848277; c=relaxed/simple;
-	bh=VsHmrNXKviIE8IQ9R1HhlyLdam+mB76jNTS9v/imXWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bAlefjPy4bhwNfow/LHcWd2U00Thimfb9g9pyFe/32D7L7IVp355eUhHZJZ8vmhMZWcPFWBfyXmfEIvILSzH0UkkgAswaELnfTlEXhgqo6W5JasiO1eUCt8QNcCncorLeY0G9uqmDcbAC4tl4Uk/TE7ST4szUJerUt8mPIPwHzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fvk7aIFz; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745848275; x=1777384275;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VsHmrNXKviIE8IQ9R1HhlyLdam+mB76jNTS9v/imXWs=;
-  b=Fvk7aIFzAshoWJl9tPkmcUnpX/pAk1CPsJ7AKpY0exbdUuwljd/UQ9Wg
-   euojlhFoKBlBBJSSJdDGq6AddlRzIyeQO3D1PrLPEf18vPtd40oTa4XIo
-   J8GUX5oKwLEmE64QOOpwzURty2ijEbjnqzNR58cYOGoxckLmTTM5f2G44
-   7Kj7jB5jQMh6SLV/bh2mXYjXtZeyUt/n/l0tu2MKGl5z2jfFOwbbpTqEY
-   0+Lg4XVug2SkM3fH41dBfO57yMWc1ScdEM3LdXMNXFab1C81Mobscx4wA
-   vEUVVmzOJZQO4DieMHyOMNiUNb22RCu2m0Qlp+PErf9xeUXUnBK8Uo+Gd
-   w==;
-X-CSE-ConnectionGUID: CBKNITfoSYCk/sbV4ixrjw==
-X-CSE-MsgGUID: 0Fgd5atWRxC5xkCq2JS5wQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11416"; a="58085735"
-X-IronPort-AV: E=Sophos;i="6.15,246,1739865600"; 
-   d="scan'208";a="58085735"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 06:51:14 -0700
-X-CSE-ConnectionGUID: 9rsWKEuKTXSkzsns7eGPDg==
-X-CSE-MsgGUID: mHZMTY5nS4exFTHFKWI5vQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,246,1739865600"; 
-   d="scan'208";a="164487636"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by orviesa002.jf.intel.com with ESMTP; 28 Apr 2025 06:51:09 -0700
-Date: Mon, 28 Apr 2025 22:12:06 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eauger@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
-	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>
-Subject: Re: [PATCH 2/5] i386/kvm: Support basic KVM PMU filter
-Message-ID: <aA+MttdYlZKPAwqT@intel.com>
-References: <20250409082649.14733-1-zhao1.liu@intel.com>
- <20250409082649.14733-3-zhao1.liu@intel.com>
- <878qnoha3j.fsf@pond.sub.org>
- <aA3sLRzZj2270cSs@intel.com>
- <87r01c3jd2.fsf@pond.sub.org>
+	s=arc-20240116; t=1745850541; c=relaxed/simple;
+	bh=PlvGxKBAguiMMvzKwXiOHRNITOLwL/WsS4Bi+NDt3Y4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fn94zOAg0/72XDdSRz3wJEj3a382iJ6gbQH2P6MYAfl4TpkS/JdHMXbq3tnU4A5UWzBjKVF8kLjlh+AtZ+f0mqlsRcVUvlKhJHJcsPZomB7rpGLbW5wzUXiow5EU6ArfkBD82tZOr7Nb24f0toZupBVVqMltkqkkXCUb6bQi0V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mztNw7Dh; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30566e34290so4436719a91.3
+        for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 07:28:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745850539; x=1746455339; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=abibsDl5HoC6YQrSV90fu4wrxKEz17/z8+z0sJ02IW0=;
+        b=mztNw7DhHyy+gLCjtcB4c3phd7umAhW0xmF5/1tsJyF68AEKgFL1UQX4awe2RttAy2
+         8O9asqXcCY3rD08N6SB6aX2QIvcfHskYXzEoD1dO3tiMW+AMbab1sjwFOjcW6UKQDOqx
+         kqEtJoYNZlA6En0JEb79Xn+rMFPOh1SyLzGqfL8f18wlXyQXK0MEz67zcnEKcEITKjod
+         6MCuEDm66UafssSbfpjVe2ng8OzVFrQryeYzbbOdXqp2KDybzgJyr3iW/fQiGZDR2O/p
+         pP5GgxVV2KZ6Urt4/EZln+OfoSDu5pvCp1d5s72aJwqrx6OpymDPEzGMRG7U7C4E0vwc
+         u02Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745850539; x=1746455339;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=abibsDl5HoC6YQrSV90fu4wrxKEz17/z8+z0sJ02IW0=;
+        b=xEGqrSucjAGUBKG+IL7TMP0akdlvwqUudgelvC16e/iXgk9vv9TyyXyLnrdHCbJ4P4
+         B2r6HJRzLBM3jq36hQPZPC6nApdJA5baweO7iB4n4QFeRJDYxHxmm8hrIi+J/HDJc+u1
+         TkWxHKjCH6VFL6oT5pK/U7nTibqWZBhC/PtAxzs7TKoc+RPMHXJ7FA0BPI3TWEfujGfz
+         hAb3Lz52JuRuo/1EyDr4D0T9k0QZ1oYWdaxIKgvI4ztGWuTlKX3lWJFyZA4zpWumvIIL
+         ZV81RSV2OMOBGzNnojlGdNAOFc7ecvVYEjcMC3+ZHfdu28+DYLeYdVHz7uA88aRW/Uua
+         FzlA==
+X-Forwarded-Encrypted: i=1; AJvYcCWPkLcBuni11mOEVDn72z+r+gMIhjZ7EVFnZ8MhfKbPl8MOK7mnLS/okcQWiNTrLMF7PBc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0c96KClAmFc/VeR7BebefUf9MZnVbeP6s9M8+uA5CGKq4gS4r
+	eRFR1gUU1TZd9J4ruDe06wtTeDP4cBZWhYireae8SSvXDwHgrq3tdSAHLVT9dozYO11BB7uswjT
+	XvQ==
+X-Google-Smtp-Source: AGHT+IH2g5hOKU5+3T5piD6P0nZGBIX75kRIQmJW5OuqdbA1tGNsWEyhNp47vSCuY7DI26wirbZfbPwsCgg=
+X-Received: from pjbsb7.prod.google.com ([2002:a17:90b:50c7:b0:2ff:5344:b54])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:544e:b0:2ea:a9ac:eee1
+ with SMTP id 98e67ed59e1d1-309f7ddca6fmr19617208a91.10.1745850539160; Mon, 28
+ Apr 2025 07:28:59 -0700 (PDT)
+Date: Mon, 28 Apr 2025 07:28:57 -0700
+In-Reply-To: <aA71VD0NgLZMmNGi@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87r01c3jd2.fsf@pond.sub.org>
+Mime-Version: 1.0
+References: <20250410072605.2358393-1-chao.gao@intel.com> <20250410072605.2358393-4-chao.gao@intel.com>
+ <f53bea9b13bd8351dc9bba5e443d5e4f4934555d.camel@intel.com>
+ <aAtG13wd35yMNahd@intel.com> <4a4b1f18d585c7799e5262453e4cfa2cf47c3175.camel@intel.com>
+ <aAwdQ759Y6V7SGhv@google.com> <aA71VD0NgLZMmNGi@intel.com>
+Message-ID: <aA-QqaKo825uIuW7@google.com>
+Subject: Re: [PATCH v5 3/7] x86/fpu/xstate: Differentiate default features for
+ host and guest FPUs
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"ebiggers@google.com" <ebiggers@google.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, Stanislav Spassov <stanspas@amazon.de>, 
+	"levymitchell0@gmail.com" <levymitchell0@gmail.com>, 
+	"samuel.holland@sifive.com" <samuel.holland@sifive.com>, Xin3 Li <xin3.li@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Weijiang Yang <weijiang.yang@intel.com>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "john.allen@amd.com" <john.allen@amd.com>, 
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, Chang Seok Bae <chang.seok.bae@intel.com>, 
+	"vigbalas@amd.com" <vigbalas@amd.com>, "peterz@infradead.org" <peterz@infradead.org>, "hpa@zytor.com" <hpa@zytor.com>, 
+	"bp@alien8.de" <bp@alien8.de>, 
+	"aruna.ramakrishna@oracle.com" <aruna.ramakrishna@oracle.com>, "x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Apr 28, 2025 at 08:12:09AM +0200, Markus Armbruster wrote:
-> Date: Mon, 28 Apr 2025 08:12:09 +0200
-> From: Markus Armbruster <armbru@redhat.com>
-> Subject: Re: [PATCH 2/5] i386/kvm: Support basic KVM PMU filter
+On Mon, Apr 28, 2025, Chao Gao wrote:
+> >I assume the kernel has bigger problems if CET_S is somehow tied to a
+> >userspace task.
 > 
-> Zhao Liu <zhao1.liu@intel.com> writes:
+> To be clear, CET_S here refers to the CET supervisor state, which includes SSP
+> pointers for privilege levels 0 through 2. The IA32_S_CET MSR is not part of
+> that state.
 > 
-> > ...
 > >
-> >> > diff --git a/qemu-options.hx b/qemu-options.hx
-> >> > index dc694a99a30a..51a7c61ce0b0 100644
-> >> > --- a/qemu-options.hx
-> >> > +++ b/qemu-options.hx
-> >> > @@ -232,7 +232,8 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-> >> >      "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
-> >> >      "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
-> >> >      "                thread=single|multi (enable multi-threaded TCG)\n"
-> >> > -    "                device=path (KVM device path, default /dev/kvm)\n", QEMU_ARCH_ALL)
-> >> > +    "                device=path (KVM device path, default /dev/kvm)\n"
-> >> > +    "                pmu-filter=id (configure KVM PMU filter)\n", QEMU_ARCH_ALL)
-> >> 
-> >> As we'll see below, this property is actually available only for i386.
-> >> Other target-specific properties document this like "x86 only".  Please
-> >> do that for this one, too.
-> >
-> > Thanks! I'll change QEMU_ARCH_ALL to QEMU_ARCH_I386.
+> >For KVM, it's just the one MSR, and KVM needs to support save/restore of that MSR
+> >no matter what, 
+
+Oh, it's not just one MSR.  I was indeed thinking this was just IA32_S_CET.  But
+lucky for me, the statement holds for SSP0-SS2.
+
+> so supporting it via XSAVE would be more work, a bit sketchy, and
+> >create yet another way for userspace to do weird things when saving/restoring vCPU
+> >state.
 > 
-> That would be wrong :)
+> Agreed. One more issue of including CET_S into KVM_GET/SET_XSAVE{2} is:
 > 
-> QEMU_ARCH_ALL is the last argument passed to macro DEF().  It applies to
-> the entire option, in this case -accel.
-
-Thank you for correction! I didn't realize this point :-(.
-
-> I'd like you to mark the option parameter as "(x86 only)", like
-> notify-vmexit right above, and several more elsewhere.
-
-Sure, I see. This option has already provided good example for me.
-
-> >> As far as I can tell, the kvm-pmu-filter object needs to be activated
-> >> with -accel pmu-filter=... to do anything.  Correct?
-> >
-> > Yes,
-> >
-> >> You can create any number of kvm-pmu-filter objects, but only one of
-> >> them can be active.  Correct?
-> >
-> > Yes! I'll try to report error when user repeats to set this object, or
-> > mention this rule in doc.
-> 
-> Creating kvm-pmu-filter objects without using them should be harmless,
-> shouldn't it?  I think users can already create other kinds of unused
-> objects.
-
-I think I understand now. Indeed, creating an object should be allowed
-regardless of whether it's used, as this helps decouple "-object" from
-other options.
-
-I can add something that:
-
-the kvm-pmu-filter object needs to be activated with "-accel pmu-filter=id",
-and only when it is activated, its filter policy can be passed to KVM.
-
-(A single sentence is just an example; I think it needs to be carefully
-refined within the context of the entire paragraph :-).)
-
-> >> > +
-> >> > +static int kvm_install_pmu_event_filter(KVMState *s)
-> >> > +{
-> >> > +    struct kvm_pmu_event_filter *kvm_filter;
-> >> > +    KVMPMUFilter *filter = s->pmu_filter;
-> >> > +    int ret;
-> >> > +
-> >> > +    kvm_filter = g_malloc0(sizeof(struct kvm_pmu_event_filter) +
-> >> > +                           filter->nevents * sizeof(uint64_t));
-> >> 
-> >> Should we use sizeof(filter->events[0])?
-> >
-> > No, here I'm trying to constructing the memory accepted in kvm interface
-> > (with the specific layout), which is not the same as the KVMPMUFilter
-> > object.
-> 
-> You're right.  What about sizeof(kvm_filter->events[0])?
-
-I get your point now! Yes, I should do in this way.
-
-Thanks,
-Zhao
-
+> XSAVE UABI buffers adhere to the standard format defined by the SDM, which
+> never includes supervisor states. Attempting to incorporate supervisor states
+> into UABI buffers would lead to many issues, such as deviating from the
+> standard format and the need to define offsets for each supervisor state.
 
