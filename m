@@ -1,155 +1,163 @@
-Return-Path: <kvm+bounces-44526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44522-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66408A9E93F
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 09:26:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FC5EA9E80A
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 08:13:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF13E3AA7EB
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 07:25:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CE083AC677
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 06:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD551D61B7;
-	Mon, 28 Apr 2025 07:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444F71BFE00;
+	Mon, 28 Apr 2025 06:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fH7vsYCh"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="GWHX7yt4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C12815748F
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 07:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0B08F77;
+	Mon, 28 Apr 2025 06:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745825170; cv=none; b=P29y5GbncMHS1kVaCu0CXiDww0v7u3hmo4HvmEq1VpWMDOeK55z6CLCVhLn3uhQb1CzD9GRKUui9BBAt6jQ8naJ2yQvVhro56KeHfMtpyrBpWQtpiMRGADxl8Rj4F6UfypnQ+bOJuUS7Epjybtn5VXbLCDmslmsvXX3F1xgqGx8=
+	t=1745820798; cv=none; b=ibRPug1fRr13gKTWsjOUnIvxFvhIFqct6nWFcrkkA8+qhKh9r0eJiS5FvMW44g+OKcITZu9lA6kLdZEm8Cbjj/KwZPoCjMpCT6AAX8UkViOYYGHYOzVPyQmNBlfafgsTn070LS65q11H+CLmywtRYsHbyGcQDkOM5r8OXpqhXCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745825170; c=relaxed/simple;
-	bh=9OTrNH0IAEZQT3hNnhz4blUNkf4mziUyN6+x0CwPtnI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Yba3geFNXDXQo6jwZ9GnZA2yjHjEzf4XJneete4MIoXAAAi7GB9PBPSq27qpXPzXC1psw1vKUYEmXWD9zvCTEWwvlpjlLEYLo3yUMEhEsvSmV7WHlLOqZVYn7nSrDrDRqsdbHyfykMme9dUSFHovDnOAe+qQN8SdrrmAw40pCPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fH7vsYCh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745825167;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CISJnPMfG/uXMv0l6JF9iE0pkiWbduTPqPP8qKQb4lc=;
-	b=fH7vsYChrAznmqO8re0AV1vJzBXPUwOgh3J2XRem4nnupixrRlVA7Qc2NgCTo45yJZhP7V
-	Clfnr7ylddPvPD5c2jQPJu716wxxveSaF4e/P2qVGCdmkgDv3FA05G95nTcHoK6DZ+tYbQ
-	1MxVPV7FS7ODGjIHBMzOucxCZTX74wE=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-122-P6WChWBUNwemPEoOA7SP5g-1; Mon,
- 28 Apr 2025 03:26:04 -0400
-X-MC-Unique: P6WChWBUNwemPEoOA7SP5g-1
-X-Mimecast-MFC-AGG-ID: P6WChWBUNwemPEoOA7SP5g_1745825162
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6B09618004A7;
-	Mon, 28 Apr 2025 07:26:02 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.45.242.27])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C7A6E1800352;
-	Mon, 28 Apr 2025 07:26:00 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id E6E6821E66C2; Mon, 28 Apr 2025 08:12:09 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Eric Blake <eblake@redhat.com>,
-  Michael Roth <michael.roth@amd.com>,  Daniel P . =?utf-8?Q?Berrang=C3=A9?=
- <berrange@redhat.com>,  Eduardo Habkost <eduardo@habkost.net>,  Marcelo
- Tosatti <mtosatti@redhat.com>,  Shaoqin Huang <shahuang@redhat.com>,  Eric
- Auger <eauger@redhat.com>,  Peter Maydell <peter.maydell@linaro.org>,
-  Laurent Vivier <lvivier@redhat.com>,  Thomas Huth <thuth@redhat.com>,
-  Sebastian Ott <sebott@redhat.com>,  Gavin Shan <gshan@redhat.com>,
-  qemu-devel@nongnu.org,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
-  Dapeng Mi <dapeng1.mi@intel.com>,  Yi Lai <yi1.lai@intel.com>
-Subject: Re: [PATCH 2/5] i386/kvm: Support basic KVM PMU filter
-In-Reply-To: <aA3sLRzZj2270cSs@intel.com> (Zhao Liu's message of "Sun, 27 Apr
-	2025 16:34:53 +0800")
-References: <20250409082649.14733-1-zhao1.liu@intel.com>
-	<20250409082649.14733-3-zhao1.liu@intel.com>
-	<878qnoha3j.fsf@pond.sub.org> <aA3sLRzZj2270cSs@intel.com>
-Date: Mon, 28 Apr 2025 08:12:09 +0200
-Message-ID: <87r01c3jd2.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1745820798; c=relaxed/simple;
+	bh=uSinJXX141VDpRj0NJMHn0sNYk3ounLPrxE0I485AnM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Eltb45jolW7VPZ2574+/85Oo54RYnHupQ8h0wIcsWOVdavN5QDQIwZ5GSFbPWOGS+Tj2Zhb8g+YhkBhD+lCNU5UcfxSIEU2HgNBFhK9jSjuHeWirT/BrTN1DHcV91S4hd3YcbS6bx5ZIuNgoG8lgwUfZ83K3UlOT6kClCI9vFrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=GWHX7yt4; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53S6Cagf3004227
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sun, 27 Apr 2025 23:12:36 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53S6Cagf3004227
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1745820758;
+	bh=xKP2Zrh6yW8Ady/8TpHmZraikp5mGbEP9+lzght28ng=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=GWHX7yt4WEzEtf7RsGgQoXXVHdHLYcsnAJTVzpCYMTnmHRw7TjROkpOgKc8rE+dGP
+	 Otp8sx97Mp/JMnnzCi8PvemkvC7G2xMOD+BYST/DPP544q/IKCzbZJYK4zeQwdI+iB
+	 nSjkD/WE5aR0o7VND8v/xun6uqOF6/Q0jexc7NLo1+4HiuvkaMrrNUtvzmfQ1kq6Yn
+	 kiJ17T5XXdYmOjV6d1+qo5/w3pWaRmA1fGhiLiNwY9vRnqnErl+5McULvkocnQHWHr
+	 ZTudD2tB03BtfEG9FjGfJvKVuVrmrQC0zv1qoWDiB0eXVFpk6PvkWsP98EQLzVt59E
+	 8QtDbAIGG9oFg==
+Message-ID: <87f97718-b105-4385-bfd5-86d7b2e0174b@zytor.com>
+Date: Sun, 27 Apr 2025 23:12:35 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 3/7] x86/fpu/xstate: Differentiate default features for
+ host and guest FPUs
+From: Xin Li <xin@zytor.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "Spassov, Stanislav" <stanspas@amazon.de>,
+        "levymitchell0@gmail.com" <levymitchell0@gmail.com>,
+        "samuel.holland@sifive.com" <samuel.holland@sifive.com>,
+        "Li, Xin3" <xin3.li@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yang, Weijiang" <weijiang.yang@intel.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "john.allen@amd.com" <john.allen@amd.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "Bae, Chang Seok" <chang.seok.bae@intel.com>,
+        "vigbalas@amd.com" <vigbalas@amd.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "hpa@zytor.com"
+ <hpa@zytor.com>, "bp@alien8.de" <bp@alien8.de>,
+        "aruna.ramakrishna@oracle.com" <aruna.ramakrishna@oracle.com>,
+        "x86@kernel.org" <x86@kernel.org>
+References: <20250410072605.2358393-1-chao.gao@intel.com>
+ <20250410072605.2358393-4-chao.gao@intel.com>
+ <f53bea9b13bd8351dc9bba5e443d5e4f4934555d.camel@intel.com>
+ <aAtG13wd35yMNahd@intel.com>
+ <4a4b1f18d585c7799e5262453e4cfa2cf47c3175.camel@intel.com>
+ <66b3ac69-447c-433f-a907-da20241d55ed@zytor.com>
+Content-Language: en-US
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <66b3ac69-447c-433f-a907-da20241d55ed@zytor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Zhao Liu <zhao1.liu@intel.com> writes:
+On 4/27/2025 10:51 PM, Xin Li wrote:
+> On 4/25/2025 9:09 AM, Edgecombe, Rick P wrote:
+>>>    And that will create a bit of a
+>>>   :snafu if Linux does gain support for SSS.
+>>>
+>>> *:https://lore.kernel.org/kvm/ZM1jV3UPL0AMpVDI@google.com/
+>> I chatted with Xin about this a few weeks ago. It sounds like FRED 
+>> bare metal
+>> SSS will not need CET_S state, but it wasn't 100% clear.
+> 
+> FRED reuses one CET_S MSR IA32_PL0_SSP, and give it an alias
+> IA32_FRED_SSP0.
 
-> ...
->
->> > diff --git a/qemu-options.hx b/qemu-options.hx
->> > index dc694a99a30a..51a7c61ce0b0 100644
->> > --- a/qemu-options.hx
->> > +++ b/qemu-options.hx
->> > @@ -232,7 +232,8 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
->> >      "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
->> >      "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
->> >      "                thread=single|multi (enable multi-threaded TCG)\n"
->> > -    "                device=path (KVM device path, default /dev/kvm)\n", QEMU_ARCH_ALL)
->> > +    "                device=path (KVM device path, default /dev/kvm)\n"
->> > +    "                pmu-filter=id (configure KVM PMU filter)\n", QEMU_ARCH_ALL)
->> 
->> As we'll see below, this property is actually available only for i386.
->> Other target-specific properties document this like "x86 only".  Please
->> do that for this one, too.
->
-> Thanks! I'll change QEMU_ARCH_ALL to QEMU_ARCH_I386.
+Native use of IA32_FRED_SSP0 is very much like IA32_FRED_RSP0:
 
-That would be wrong :)
+1) Both are per-task constants.
 
-QEMU_ARCH_ALL is the last argument passed to macro DEF().  It applies to
-the entire option, in this case -accel.
+2) Both are only used for delivering events when running userspace.
 
-I'd like you to mark the option parameter as "(x86 only)", like
-notify-vmexit right above, and several more elsewhere.
 
->> As far as I can tell, the kvm-pmu-filter object needs to be activated
->> with -accel pmu-filter=... to do anything.  Correct?
->
-> Yes,
->
->> You can create any number of kvm-pmu-filter objects, but only one of
->> them can be active.  Correct?
->
-> Yes! I'll try to report error when user repeats to set this object, or
-> mention this rule in doc.
+IA32_FRED_RSP0 is set on return to userspace:
 
-Creating kvm-pmu-filter objects without using them should be harmless,
-shouldn't it?  I think users can already create other kinds of unused
-objects.
+https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=fe85ee391966c4cf3bfe1c405314e894c951f521
 
->> > +
->> > +static int kvm_install_pmu_event_filter(KVMState *s)
->> > +{
->> > +    struct kvm_pmu_event_filter *kvm_filter;
->> > +    KVMPMUFilter *filter = s->pmu_filter;
->> > +    int ret;
->> > +
->> > +    kvm_filter = g_malloc0(sizeof(struct kvm_pmu_event_filter) +
->> > +                           filter->nevents * sizeof(uint64_t));
->> 
->> Should we use sizeof(filter->events[0])?
->
-> No, here I'm trying to constructing the memory accepted in kvm interface
-> (with the specific layout), which is not the same as the KVMPMUFilter
-> object.
 
-You're right.  What about sizeof(kvm_filter->events[0])?
+I suppose we'll likely apply the same approach to IA32_FRED_SSP0 if we
+plan to enable SSS for the kernel.  This won't add any extra maintenance
+cost, as both x86 and KVM maintainers are well aware.
 
-[...]
-
+Thanks!
+     Xin
 
