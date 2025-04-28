@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-44604-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44605-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C6F4A9FBFE
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 23:13:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFC3CA9FC2A
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 23:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C5D1463E93
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 21:13:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6CFC3A7F8C
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 21:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1DD31E282D;
-	Mon, 28 Apr 2025 21:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B441F872A;
+	Mon, 28 Apr 2025 21:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kblqe0+H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="URuuHhsv"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FE61E4BE
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 21:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C891FF1C9
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 21:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745874706; cv=none; b=aoHAuPKCAc0SMik0q5E616JCKwc2GozxcOZvjrDYsnKy7CVjN1atIWO0UxuU2Uel3mVUeZ2dQhHrEqOngUZe7+pEn0wR0uj356yrlhWhT2CUar795t1CsaAQysfYREIhY/geiD+1lQew9355xsabtzedG8uqNLAASRIZ16CiwYg=
+	t=1745875332; cv=none; b=nIWnhR3CxYJGkn5nTJjaaGLDWrY7SheXDH4J6oK1L+Zby+fV+pQPZXGgAtjoBC5DYLc0LOYTDhHiPXLhBfQoYhAK58Z5oqsAFl1oZacsWdazEYEykP+GkHlKdkbv8hKa2vyPT2IPf7h8FItLH8DvdiqTT1ke17HILgSNqJi3Xio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745874706; c=relaxed/simple;
-	bh=oGSbJ4PUVVpv5E7Vn2EefTonxammwbO5t3/gscI1dbU=;
+	s=arc-20240116; t=1745875332; c=relaxed/simple;
+	bh=WU5i75ImZiv+7AybYE1SCaQKV7zcONIP5XevvaR6dGg=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=aWrrzbbGhDSGyx+vRo9zYD2C4oE2+S0Ii6DOxYgpDNhqO/g677o0ssFrp69mzDIcFgwUZMB1+EerSGPk0dJbHi6Lf//kRPvG7ahQopGle3rzbfTkLq6UG4kQdr1iADTq3a04xNnZUvP/dln5I+xiHNEXYjgIsvmfQy2O350cc5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kblqe0+H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 584A5C4CEED
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 21:11:46 +0000 (UTC)
+	 Content-Type:MIME-Version; b=GJGAxBqs76GF32FoFw4RBx/ez4wbbSoEiybees1Hmmw/TiFBz1s9DdMU9DXo7rQsiepGhSEz+HukuSupTvTOJXNhQHmqlDKSQV7WGy35cgg6uehSiV6+dp1cQpNJp+IUQWCYGkCCaSa8nGOKHjXBFdd6JxtSXsFls/vGi/edckU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URuuHhsv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2992CC4CEEE
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 21:22:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745874706;
-	bh=oGSbJ4PUVVpv5E7Vn2EefTonxammwbO5t3/gscI1dbU=;
+	s=k20201202; t=1745875332;
+	bh=WU5i75ImZiv+7AybYE1SCaQKV7zcONIP5XevvaR6dGg=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Kblqe0+HW1pwa3YWDELVQKdZRJ/9foEqqezOhq4FXeOSTMY/lfonb+RJLEHusqfQl
-	 9dACowN9hNVa0zLMvtkYIhW/056/yPSTE2dx7fC/L7ZcYT2k7dZuYrZChbVq9mY87P
-	 1vs6OJ96+GOGjyU0G38XJETTUFfwh+oKB+QL3UBjLp2aZPq0hwsw+fGeIs0SW76z2b
-	 jd8/mH9pUaKnKPiVQAlXG5/ideWrtQfuWqdzhjY+lf6rxVDEcqdfpUlXoR44BHm6SU
-	 kAm6yJ0PsTTMIEsNJZ/vt7tRBnzxkhihU7ygxyTkeeB5Ivk0UTSg4jiU/ExffVpwWX
-	 GrizyB1IJPpsg==
+	b=URuuHhsv5ejtckPE56cFdJnfwpRxTxWw+laJXDWsKDldMjBXlwEOjK5z90yNcpN15
+	 A87UwNiujMZmYNPWAgemwGUq9MLoaKMEsEnV6FgUwAAcHJkJSKrOBPa8JceX+khRll
+	 Dm1BvTlD/Mxc4E6PWaDI1i5U7U19URVBpUh9NCjJFs/fDenQ6XS/pmBnTUv8i9Jn36
+	 1OU9zDIrTN4noVwSU53kf4zFGLWa8p/Mi+MMS7Er/q/2CXuQxrX4/OMB4Kkvj92pVI
+	 mgV3a4jKgVByRDUVIMoPKDNx7nuIHCwdiLpOWCi18lRFexYeggVOrKruRlw6xCioOg
+	 gYrXF1sTAWyCA==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 4DA18C53BC5; Mon, 28 Apr 2025 21:11:46 +0000 (UTC)
+	id 1F7A5C433E1; Mon, 28 Apr 2025 21:22:12 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: kvm@vger.kernel.org
 Subject: [Bug 220057] Kernel regression. Linux VMs crashing (I did not test
  Windows guest VMs)
-Date: Mon, 28 Apr 2025 21:11:46 +0000
+Date: Mon, 28 Apr 2025 21:22:11 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -56,14 +56,14 @@ X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: alex.williamson@redhat.com
+X-Bugzilla-Who: adolfotregosa@gmail.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-220057-28872-eArWFnYXM9@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-220057-28872-QUk1zeGQ77@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-220057-28872@https.bugzilla.kernel.org/>
 References: <bug-220057-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -79,35 +79,14 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D220057
 
---- Comment #8 from Alex Williamson (alex.williamson@redhat.com) ---
-(In reply to Adolfo from comment #7)
+--- Comment #9 from Adolfo (adolfotregosa@gmail.com) ---
+Created attachment 308041
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D308041&action=3Dedit
+Proxmox forum screenshots
 
-> 13900 ,z790 chipset, 128GB ram.
-> Guest set to Q35. Cpu set to host. qemu 9.2. Guest is using nvidia driver.
-> Crash happen on both a 4060ti and 5060ti.
->=20
-> Other report but with AMD 9070 XT.
->=20
-> https://forum.proxmox.com/threads/opt-in-linux-6-14-kernel-for-proxmox-ve=
--8-
-> available-on-test-no-subscription.164497/page-5#post-763760
-
-I'm not able to access the attachments of this report without a proxmox
-subscription key, so I can't make any conclusions whether this is related. =
- I
-do note the post is originally dated April 14th, so it's not based on v6.14=
-.4,
-it might be based on a kernel with broken bus reset support that was revert=
-ed
-in v6.14.4.
-
-I don't see any similar issues running a stock 6.14.4 kernel, qemu 9.2, Lin=
-ux
-guest (6.14.3) running nvidia 570.144, youtube playback in chromium.
-
-Please provide full VM XML or libvirt log, host 'sudo dmesg', host 'sudo ls=
-pci
--vvv', guest nvidia driver version.
+You don't need a subscription. Just create an account. Either way you have =
+the
+screenshots attached.
 
 --=20
 You may reply to this email to add a comment.
