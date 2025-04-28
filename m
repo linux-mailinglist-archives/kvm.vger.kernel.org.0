@@ -1,324 +1,305 @@
-Return-Path: <kvm+bounces-44530-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44531-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B09C6A9EB4A
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 10:58:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10782A9EBBD
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 11:23:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB8723BE781
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 08:58:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D2AA3BA060
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 09:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F028E25E81D;
-	Mon, 28 Apr 2025 08:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F9125F97D;
+	Mon, 28 Apr 2025 09:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L3HAKl3o"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43BB420E32F;
-	Mon, 28 Apr 2025 08:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797C71FECB4;
+	Mon, 28 Apr 2025 09:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745830705; cv=none; b=BxMrYPdcNKWowUe1HtGsAbdEHu4bdfVO0K81Fqns/CxBtYKrYR2JPl+sRZ32zY4I7rn06SzrJ8/rD53+879PKDQNJdMH+KVxzJMvhQLdwY1kkbfVYvjjXuQnI8K8YgLYrV53dRFr/nlUK0fly8Cw1VW4nq4CMysfleKoz4xQ+Yc=
+	t=1745832167; cv=none; b=WFk/DuUhv7GAJSFzlRpvDz4IhfFH392ZK1QHdqRGNA53JF8e5Jg0kjRVRyZnx6r/Cd3Dk1LC0CSiVU/ecwY34nnna+al0VVj9v21E4pRFH2E8gY80ukIm6zNtZ6vUjG5PAdmhMZqS8UGk6qVS3MmEUhq3hfMH0Th7cU40kR7k3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745830705; c=relaxed/simple;
-	bh=hBhlveHVYfdqh7hjf/loO1kscPH9CqqgworRHqmeYSs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YvoSqZGNXnM3hkXzmMSy+YUsLsF0cS6rJhYy4H1tyUCY4uYYKdWuzv3N2anTYz/K98g62yhy3k05Y313lezLlzuCBIcOaeO1jCDBi36TIoJ7PM/HCu5SsuZSyVDOFYFXr9woKP/vCMGL/JlqWXHDTLxwlYX41OgGRjCTH8FzkFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9F6591595;
-	Mon, 28 Apr 2025 01:58:15 -0700 (PDT)
-Received: from [10.1.37.44] (Suzukis-MBP.cambridge.arm.com [10.1.37.44])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 29A013F673;
-	Mon, 28 Apr 2025 01:58:19 -0700 (PDT)
-Message-ID: <35a91f8c-cdf6-4595-9ed2-c792a8e9d679@arm.com>
-Date: Mon, 28 Apr 2025 09:58:18 +0100
+	s=arc-20240116; t=1745832167; c=relaxed/simple;
+	bh=+JZhbba6Y94p5DrBaAJ0+6gqrs2ChpJomt6vlounvho=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TXm1ub3OYgQXy6WsrT23q5KR0YQAmtxMF5zqSd4u6So0rPUgq0TNhI3VznkWaDBMT5WVv1bsRIBMhRlKgrHQvL39afzlF9r/tgo4kdg3fZwfYsLTsi3y6D1eJFfZek2+o8kvwpizgBBCeRuf3+cT7kEzXBbvXYnjIxYGjImZf6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L3HAKl3o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB19FC4CEE9;
+	Mon, 28 Apr 2025 09:22:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745832166;
+	bh=+JZhbba6Y94p5DrBaAJ0+6gqrs2ChpJomt6vlounvho=;
+	h=From:To:Cc:Subject:Date:From;
+	b=L3HAKl3oxYp9ViZOT2gWLHXwJ+u36OWmAs8LS5VBGRfJxKvy5NC5yJr7YsNwlgGGS
+	 MLBspboMpGjITWJIcTBNcp6LcPaEkm5XiPNilr+4gLacsrsWQ1MRW+eI5f1AsgWmNp
+	 nvCqmAxpxtB25cHGYQbvnI/NFQQ8aMyCrpTUyW/L59P1JPrYmpwbN5iikoKaLHNQlC
+	 6/c0N/dYulh+hxBW16Pz7WcPPnU9PVcgtWPElEoO8f4L965rNh3s7GOuUZ1Xv+Gzcb
+	 nkYnWFrknpIV+0wlW3vXgylx9WDQ+mt12psyVlQ/1YP5AUSRb2Nxa+sHaFuzM8wiIm
+	 xdZgUvlls6wUQ==
+From: Leon Romanovsky <leon@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>
+Cc: Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: [PATCH v10 00/24] Provide a new two step DMA mapping API
+Date: Mon, 28 Apr 2025 12:22:06 +0300
+Message-ID: <cover.1745831017.git.leon@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 06/43] arm64: RME: Define the user ABI
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-7-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250416134208.383984-7-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Steven
+Following recent on site LSF/MM 2025 [1] discussion, the overall
+response was extremely positive with many people expressed their
+desire to see this series merged, so they can base their work on it.
 
-On 16/04/2025 14:41, Steven Price wrote:
-> There is one (multiplexed) CAP which can be used to create, populate and
-> then activate the realm.
-> 
-> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v7:
->   * Add documentation of new ioctls
->   * Bump the magic numbers to avoid conflicts
-> Changes since v6:
->   * Rename some of the symbols to make their usage clearer and avoid
->     repetition.
-> Changes from v5:
->   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
->     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
-> ---
->   Documentation/virt/kvm/api.rst    | 70 +++++++++++++++++++++++++++++++
->   arch/arm64/include/uapi/asm/kvm.h | 49 ++++++++++++++++++++++
->   include/uapi/linux/kvm.h          | 10 +++++
->   3 files changed, 129 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 1f8625b7646a..99ba6c82cf37 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -3527,6 +3527,11 @@ Possible features:
->   	      - the KVM_REG_ARM64_SVE_VLS pseudo-register is immutable, and can
->   	        no longer be written using KVM_SET_ONE_REG.
->   
-> +	- KVM_ARM_VCPU_REC: Allocate a REC (Realm Execution Context) for this
-> +	  VCPU. This must be specified on all VCPUs created in a Realm VM.
-> +	  Depends on KVM_CAP_ARM_RME.
-> +	  Requires KVM_ARM_VCPU_FINALIZE(KVM_ARM_VCPU_REC).
-> +
->   4.83 KVM_ARM_PREFERRED_TARGET
->   -----------------------------
->   
-> @@ -5098,6 +5103,7 @@ Recognised values for feature:
->   
->     =====      ===========================================
->     arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
-> +  arm64      KVM_ARM_VCPU_REC (requires KVM_CAP_ARM_RME)
->     =====      ===========================================
->   
->   Finalizes the configuration of the specified vcpu feature.
-> @@ -6452,6 +6458,30 @@ the capability to be present.
->   
->   `flags` must currently be zero.
->   
-> +4.144 KVM_ARM_VCPU_RMM_PSCI_COMPLETE
-> +------------------------------------
-> +
-> +:Capability: KVM_CAP_ARM_RME
-> +:Architectures: arm64
-> +:Type: vcpu ioctl
-> +:Parameters: struct kvm_arm_rmm_psci_complete (in)
-> +:Returns: 0 if successful, < 0 on error
-> +
-> +::
-> +
-> +  struct kvm_arm_rmm_psci_complete {
-> +	__u64 target_mpidr;
-> +	__u32 psci_status;
-> +	__u32 padding[3];
-> +  };
-> +
-> +Where PSCI functions are handled by user space, the RMM needs to be informed of
-> +the target of the operation using `target_mpidr`, along with the status
-> +(`psci_status`). The RMM v1.0 specification defines two functions that require
-> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
-> +
-> +If the kernel is handling PSCI then this is done automatically and the VMM
-> +doesn't need to call this ioctl.
->   
->   .. _kvm_run:
->   
-> @@ -8280,6 +8310,46 @@ aforementioned registers before the first KVM_RUN. These registers are VM
->   scoped, meaning that the same set of values are presented on all vCPUs in a
->   given VM.
->   
-> +7.38 KVM_CAP_ARM_RME
-> +--------------------
-> +
-> +:Architectures: arm64
-> +:Target: VM
-> +:Parameters: args[0] provides an action, args[1] points to a structure in
-> +	     memory for some actions.
-> +:Returns: 0 on success, negative value on error
-> +
-> +Used to configure and set up the memory for a Realm. The available actions are:
-> +
-> +================================= =============================================
-> + KVM_CAP_ARM_RME_CONFIG_REALM     Takes struct arm_rme_config as args[1] and
-> +                                  configures realm parameters prior to it being
-> +                                  created.
-> +
-> +                                  Options are ARM_RME_CONFIG_RPV to set the
-> +                                  "Realm Personalization Value" and
-> +                                  ARM_RME_CONFIG_HASH_ALGO to set the hash
-> +                                  algorithm.
-> +
-> + KVM_CAP_ARM_RME_CREATE_REALM     Request the RMM create the realm. The realm's
+It includes, but not limited:
+ * Luis's "nvme-pci: breaking the 512 KiB max IO boundary":
+   https://lore.kernel.org/all/20250320111328.2841690-1-mcgrof@kernel.org/
+ * Chuck's NFS conversion to use one structure (bio_vec) for all types
+   of RPC transports:
+   https://lore.kernel.org/all/913df4b4-fc4a-409d-9007-088a3e2c8291@oracle.com
+ * Matthew's vision for the world without struct page:
+   https://lore.kernel.org/all/20250320111328.2841690-1-mcgrof@kernel.org/
+ * Confidential computing roadmap from Dan:
+   https://lore.kernel.org/all/6801a8e3968da_71fe29411@dwillia2-xfh.jf.intel.com.notmuch
 
-minor nit: s/RMM create/RMM to create/
+This series is combination of effort of many people who contributed ideas,
+code and testing and I'm gratefully thankful for them.
 
-Or may be rephrase it:
+[1] https://lore.kernel.org/linux-rdma/20250122071600.GC10702@unreal/
+-----------------------------------------------------------------------
+Changelog:
+v10:
+ * Rebased on top v6.15-rc3
+ * Added Luis's tags
+ * Addressed review comments from Luis about DMA patches
+ * Removed segment size check from single-segment SGL optimization code
+ * Changed NVMe unmap data code as was suggested by Christoph
+v9: https://lore.kernel.org/all/cover.1745394536.git.leon@kernel.org/
+ * Added tested-by from Jens.
+ * Replaced is_pci_p2pdma_page(bv.bv_page) check with if
+   "(IS_ENABLED(CONFIG_PCI_P2PDMA) && (req->cmd_flags & REQ_P2PDMA))"
+   which is more aligned with the goal (do not access struct page) and
+   more efficient. This is the one line only that was changed in Jens's
+   performance testing flow, so I kept his tags as is.
+ * Restored single-segment optimization for SGL path.
+ * Added forgotten unmap of metdata SGL multi-segment flow.
+ * Split and squashed optimization patch from Kanchan.
+ * Converted "bool aborted" flag to use newly introduced flag variable.
+v8: https://lore.kernel.org/all/cover.1744825142.git.leon@kernel.org/
+ * Rebased to v6.15-rc1
+ * Added NVMe patches which are now patches and not RFC. They were in
+   RFC stage because block iterator caused to performance regression
+   for very extreme case scenario (~100M IOPS), but after Kanchan fixed
+   it, the code started to be ready for merging.
+ * @Niklas, i didn't change naming in this series as it follows iommu
+   naming format.
+v7: https://lore.kernel.org/all/cover.1738765879.git.leonro@nvidia.com/
+ * Rebased to v6.14-rc1
+v6: https://lore.kernel.org/all/cover.1737106761.git.leon@kernel.org
+ * Changed internal __size variable to u64 to properly set private flag
+   in most significant bit.
+ * Added comment about why we check DMA_IOVA_USE_SWIOTLB
+ * Break unlink loop if phys is NULL, condition which we shouldn't get.
+v5: https://lore.kernel.org/all/cover.1734436840.git.leon@kernel.org
+ * Trimmed long lines in all patches.
+ * Squashed "dma-mapping: Add check if IOVA can be used" into
+   "dma: Provide an interface to allow allocate IOVA" patch.
+ * Added tags from Christoph and Will.
+ * Fixed spelling/grammar errors.
+ * Change title from "dma: Provide an  ..." to be "dma-mapping: Provide
+   an ...".
+ * Slightly changed hmm patch to set sticky flags in one place.
+v4: https://lore.kernel.org/all/cover.1733398913.git.leon@kernel.org
+ * Added extra patch to add kernel-doc for iommu_unmap and iommu_unmap_fast
+ * Rebased to v6.13-rc1
+ * Added Will's tags
+v3: https://lore.kernel.org/all/cover.1731244445.git.leon@kernel.org
+ * Added DMA_ATTR_SKIP_CPU_SYNC to p2p pages in HMM.
+ * Fixed error unwind if dma_iova_sync fails in HMM.
+ * Clear all PFN flags which were set in map to make code.
+   more clean, the callers anyway cleaned them.
+ * Generalize sticky PFN flags logic in HMM.
+ * Removed not-needed #ifdef-#endif section.
+v2: https://lore.kernel.org/all/cover.1730892663.git.leon@kernel.org
+ * Fixed docs file as Randy suggested
+ * Fixed releases of memory in HMM path. It was allocated with kv..
+   variants but released with kfree instead of kvfree.
+ * Slightly changed commit message in VFIO patch.
+v1: https://lore.kernel.org/all/cover.1730298502.git.leon@kernel.org
+ * Squashed two VFIO patches into one
+ * Added Acked-by/Reviewed-by tags
+ * Fix docs spelling errors
+ * Simplified dma_iova_sync() API
+ * Added extra check in dma_iova_destroy() if mapped size to make code more clear
+ * Fixed checkpatch warnings in p2p patch
+ * Changed implementation of VFIO mlx5 mlx5vf_add_migration_pages() to
+   be more general
+ * Reduced the number of changes in VFIO patch
+v0: https://lore.kernel.org/all/cover.1730037276.git.leon@kernel.org
 
-Request the RMM to create the Realm with the configured parameters.
+----------------------------------------------------------------------------
+ LWN coverage:
+Dancing the DMA two-step - https://lwn.net/Articles/997563/
+----------------------------------------------------------------------------
 
+Currently the only efficient way to map a complex memory description through
+the DMA API is by using the scatterlist APIs. The SG APIs are unique in that
+they efficiently combine the two fundamental operations of sizing and allocating
+a large IOVA window from the IOMMU and processing all the per-address
+swiotlb/flushing/p2p/map details.
 
-> +                                  configuration parameters must be set first.
-> +
-> + KVM_CAP_ARM_RME_INIT_RIPAS_REALM Takes struct arm_rme_init_ripas as args[1]
-> +                                  and sets the RIPAS (Realm IPA State) to
-> +                                  RIPAS_RAM of a specified area of the realm's
-> +                                  IPA.
-> +
-> + KVM_CAP_ARM_RME_POPULATE_REALM   Takes struct arm_rme_init_ripas as args[1]
+This uniqueness has been a long standing pain point as the scatterlist API
+is mandatory, but expensive to use. It prevents any kind of optimization or
+feature improvement (such as avoiding struct page for P2P) due to the
+impossibility of improving the scatterlist.
 
-nit: struct arm_rme_populate_realm
+Several approaches have been explored to expand the DMA API with additional
+scatterlist-like structures (BIO, rlist), instead split up the DMA API
+to allow callers to bring their own data structure.
 
-> +                                  and populates a region of protected address
-> +                                  space by copying the data from the shared
-> +                                  alias.
-> +
-> + KVM_CAP_ARM_RME_ACTIVATE_REALM   Request the RMM activate the realm. No
+The API is split up into parts:
+ - Allocate IOVA space:
+    To do any pre-allocation required. This is done based on the caller
+    supplying some details about how much IOMMU address space it would need
+    in worst case.
+ - Map and unmap relevant structures to pre-allocated IOVA space:
+    Perform the actual mapping into the pre-allocated IOVA. This is very
+    similar to dma_map_page().
 
-s/the RMM/the RMM to/
+In this series, examples of three different users are converted to the new API
+to show the benefits and its versatility. Each user has a unique
+flow:
+ 1. RDMA ODP is an example of "SVA mirroring" using HMM that needs to
+    dynamically map/unmap large numbers of single pages. This becomes
+    significantly faster in the IOMMU case as the map/unmap is now just
+    a page table walk, the IOVA allocation is pre-computed once. Significant
+    amounts of memory are saved as there is no longer a need to store the
+    dma_addr_t of each page.
+ 2. VFIO PCI live migration code is building a very large "page list"
+    for the device. Instead of allocating a scatter list entry per allocated
+    page it can just allocate an array of 'struct page *', saving a large
+    amount of memory.
+ 3. NVMe PCI demonstrates how a BIO can be converted to a HW scatter
+    list without having to allocate then populate an intermediate SG table.
 
-> +                                  further changes can be made to the realm's
-> +                                  configuration, and VCPUs are not permitted to
-> +                                  enter the realm until it has been activated.
+To make the use of the new API easier, HMM and block subsystems are extended
+to hide the optimization details from the caller. Among these optimizations:
+ * Memory reduction as in most real use cases there is no need to store mapped
+   DMA addresses and unmap them.
+ * Reducing the function call overhead by removing the need to call function
+   pointers and use direct calls instead.
 
-minor nit: this sounds as if "configurations" (of parameters)  are
-possible after the CREATE_REALM and before ACTIVATE_REALM ? Could we
-also make it clear that the VCPUs must have been created before ACTIVATE ?
+This step is first along a path to provide alternatives to scatterlist and
+solve some of the abuses and design mistakes.
 
+The whole series can be found here:
+https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git dma-split-Apr-27
 
-May be rephrase it to:
+Thanks
 
-No changes can be made to Realm's memory (including the IPA state). No 
-new VCPUs can be created after this step.
+Christoph Hellwig (12):
+  PCI/P2PDMA: Refactor the p2pdma mapping helpers
+  dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
+  iommu: generalize the batched sync after map interface
+  iommu/dma: Factor out a iommu_dma_map_swiotlb helper
+  dma-mapping: add a dma_need_unmap helper
+  docs: core-api: document the IOVA-based API
+  block: share more code for bio addition helper
+  block: don't merge different kinds of P2P transfers in a single bio
+  blk-mq: add scatterlist-less DMA mapping helpers
+  nvme-pci: remove struct nvme_descriptor
+  nvme-pci: use a better encoding for small prp pool allocations
+  nvme-pci: convert to blk_rq_dma_map
 
+Leon Romanovsky (12):
+  iommu: add kernel-doc for iommu_unmap_fast
+  dma-mapping: Provide an interface to allow allocate IOVA
+  dma-mapping: Implement link/unlink ranges API
+  mm/hmm: let users to tag specific PFN with DMA mapped bit
+  mm/hmm: provide generic DMA managing logic
+  RDMA/umem: Store ODP access mask information in PFN
+  RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
+    linkage
+  RDMA/umem: Separate implicit ODP initialization from explicit ODP
+  vfio/mlx5: Explicitly use number of pages instead of allocated length
+  vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+  vfio/mlx5: Enable the DMA link API
+  nvme-pci: store aborted state in flags variable
 
-> +================================= =============================================
-> +
->   8. Other capabilities.
->   ======================
->   
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index af9d9acaf997..b57712880605 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -106,6 +106,7 @@ struct kvm_regs {
->   #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
->   #define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
->   #define KVM_ARM_VCPU_HAS_EL2_E2H0	8 /* Limit NV support to E2H RES0 */
-> +#define KVM_ARM_VCPU_REC		9 /* VCPU REC state as part of Realm */
->   
->   struct kvm_vcpu_init {
->   	__u32 target;
-> @@ -429,6 +430,54 @@ enum {
->   #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
->   #define   KVM_DEV_ARM_ITS_CTRL_RESET		4
->   
-> +/* KVM_CAP_ARM_RME on VM fd */
-> +#define KVM_CAP_ARM_RME_CONFIG_REALM		0
-> +#define KVM_CAP_ARM_RME_CREATE_REALM		1
-> +#define KVM_CAP_ARM_RME_INIT_RIPAS_REALM	2
-> +#define KVM_CAP_ARM_RME_POPULATE_REALM		3
-> +#define KVM_CAP_ARM_RME_ACTIVATE_REALM		4
-> +
-> +/* List of configuration items accepted for KVM_CAP_ARM_RME_CONFIG_REALM */
-> +#define ARM_RME_CONFIG_RPV			0
-> +#define ARM_RME_CONFIG_HASH_ALGO		1
-> +
-> +#define ARM_RME_CONFIG_MEASUREMENT_ALGO_SHA256		0
-> +#define ARM_RME_CONFIG_MEASUREMENT_ALGO_SHA512		1
+ Documentation/core-api/dma-api.rst   |  71 +++
+ block/bio.c                          |  83 ++--
+ block/blk-merge.c                    | 180 ++++++-
+ drivers/infiniband/core/umem_odp.c   | 252 ++++------
+ drivers/infiniband/hw/mlx5/mlx5_ib.h |  12 +-
+ drivers/infiniband/hw/mlx5/odp.c     |  65 ++-
+ drivers/infiniband/hw/mlx5/umr.c     |  12 +-
+ drivers/infiniband/sw/rxe/rxe_odp.c  |  18 +-
+ drivers/iommu/dma-iommu.c            | 482 +++++++++++++++---
+ drivers/iommu/iommu.c                |  84 ++--
+ drivers/nvme/host/pci.c              | 699 +++++++++++++++------------
+ drivers/pci/p2pdma.c                 |  38 +-
+ drivers/vfio/pci/mlx5/cmd.c          | 375 +++++++-------
+ drivers/vfio/pci/mlx5/cmd.h          |  35 +-
+ drivers/vfio/pci/mlx5/main.c         |  87 ++--
+ include/linux/blk-mq-dma.h           |  63 +++
+ include/linux/blk_types.h            |   2 +
+ include/linux/dma-map-ops.h          |  54 ---
+ include/linux/dma-mapping.h          |  85 ++++
+ include/linux/hmm-dma.h              |  33 ++
+ include/linux/hmm.h                  |  24 +-
+ include/linux/iommu.h                |   4 +
+ include/linux/pci-p2pdma.h           |  85 ++++
+ include/rdma/ib_umem_odp.h           |  25 +-
+ kernel/dma/direct.c                  |  44 +-
+ kernel/dma/mapping.c                 |  18 +
+ mm/hmm.c                             | 263 +++++++++-
+ 27 files changed, 2115 insertions(+), 1078 deletions(-)
+ create mode 100644 include/linux/blk-mq-dma.h
+ create mode 100644 include/linux/hmm-dma.h
 
-minor nit:
-May be we could rename this to CONFIG_HASH_ALGO_* to align with the
-RMM spec (btw which also moved from measurement to hash) and the
-parameter.
-
-
-Suzuki
-
-
-> +
-> +#define ARM_RME_CONFIG_RPV_SIZE 64
-> +
-> +struct arm_rme_config {
-> +	__u32 cfg;
-> +	union {
-> +		/* cfg == ARM_RME_CONFIG_RPV */
-> +		struct {
-> +			__u8	rpv[ARM_RME_CONFIG_RPV_SIZE];
-> +		};
-> +
-> +		/* cfg == ARM_RME_CONFIG_HASH_ALGO */
-> +		struct {
-> +			__u32	hash_algo;
-> +		};
-> +
-> +		/* Fix the size of the union */
-> +		__u8	reserved[256];
-> +	};
-> +};
-> +
-> +#define KVM_ARM_RME_POPULATE_FLAGS_MEASURE	(1 << 0)
-> +struct arm_rme_populate_realm {
-> +	__u64 base;
-> +	__u64 size;
-> +	__u32 flags;
-> +	__u32 reserved[3];
-> +};
-> +
-> +struct arm_rme_init_ripas {
-> +	__u64 base;
-> +	__u64 size;
-> +	__u64 reserved[2];
-> +};
-> +
->   /* Device Control API on vcpu fd */
->   #define KVM_ARM_VCPU_PMU_V3_CTRL	0
->   #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index b6ae8ad8934b..0b8479985581 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -930,6 +930,7 @@ struct kvm_enable_cap {
->   #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
->   #define KVM_CAP_X86_GUEST_MODE 238
->   #define KVM_CAP_ARM_WRITABLE_IMP_ID_REGS 239
-> +#define KVM_CAP_ARM_RME 240
->   
->   struct kvm_irq_routing_irqchip {
->   	__u32 irqchip;
-> @@ -1582,4 +1583,13 @@ struct kvm_pre_fault_memory {
->   	__u64 padding[5];
->   };
->   
-> +/* Available with KVM_CAP_ARM_RME, only for VMs with KVM_VM_TYPE_ARM_REALM  */
-> +struct kvm_arm_rmm_psci_complete {
-> +	__u64 target_mpidr;
-> +	__u32 psci_status;
-> +	__u32 padding[3];
-> +};
-> +
-> +#define KVM_ARM_VCPU_RMM_PSCI_COMPLETE	_IOW(KVMIO, 0xd6, struct kvm_arm_rmm_psci_complete)
-> +
->   #endif /* __LINUX_KVM_H */
+-- 
+2.49.0
 
 
