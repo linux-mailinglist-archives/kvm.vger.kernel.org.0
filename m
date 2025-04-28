@@ -1,121 +1,317 @@
-Return-Path: <kvm+bounces-44588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44589-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75739A9F61F
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 18:47:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF372A9F713
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 19:14:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84D741890AE1
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 16:46:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECABE3AE095
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 17:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935A327F747;
-	Mon, 28 Apr 2025 16:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D22A28B4F3;
+	Mon, 28 Apr 2025 17:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tlk2eBun"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LXoBnbXi"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942BD7082D;
-	Mon, 28 Apr 2025 16:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E2E255E52
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 17:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745858784; cv=none; b=bzY94I3H4nk6RVYMGYY1JRmHHU/ZWiabr4x+PL/UoWk9MYMs7o3tICFRTgPuT8ejpZaFErYVLm2Ui8K+3duTrAvopinNn2mf+GFETskQPZw45l2GoM1+kx6Kom60z3kV1b0dLijVyqt9+2Kvbks5GtP2sn1hklTCCDvMz6M2Vtw=
+	t=1745860420; cv=none; b=f/dujsfm1uyZkoxy1PjiX3uyb7kNCD1+Y0639RYxoaiK/41kD94csd+Xls5C5OXr/npoCdvEmQeZ/iZ2KWLl5SobjNnZwu0YEcW/LUqcCG7TbY0LsrKPdjm+xVFkl/FaK1axROYLoRyiMkeasn7nirwoTCxC3dqPmr9ycpFzMEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745858784; c=relaxed/simple;
-	bh=Z8PCmnJ0yV8qERDqeQfISVPvJ3tqJw2Q7aIBdlyPo/k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ae2QHgO7A/bt1204w33xdWN12kgigiEFQJlJnh3M5hxE4LU7C4sNygoYDu4IThr2JEhZ56PJ4AtLGJ1RHj549wAQ7zjtiOD9U/zzmYdahNJr4kWuaN8hMCSXTHpyzZ858GU25uc8kR6r7ESHkfpJj+DOtUNTq/Pe3ycdQt1B52s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tlk2eBun; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A90AEC4CEEC;
-	Mon, 28 Apr 2025 16:46:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745858784;
-	bh=Z8PCmnJ0yV8qERDqeQfISVPvJ3tqJw2Q7aIBdlyPo/k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Tlk2eBunYES27PROXmHIGQe3zmMP6HvdTE2sKVLCxFcGCmH8DHxdGjHqd3wobjohg
-	 VwJfw0ItrR32xKrcgdCW8TRpmdlk+DeJY1swcEr9VbaiBCu3yyJuag7MxpY9rcCj1j
-	 8nTXrf6GECR+mLe+QAKunFydd77qXJZBtfWsqaoubYbzZfTupDTo+1dZCG4DPhnIKw
-	 GE9ORFXi++TgAbviRRmsybWuVr08WLZvPsjcAv5o6bRpncDLzkKDP2jiGKorIc8UjF
-	 OQmxqQxbREQlcM8XfaIRqR6lFGfo4bo5dy+E+StVFWQQTe6kZ8U9u+SSstYkVmXSTR
-	 4chXnE6KS/Cag==
-Date: Mon, 28 Apr 2025 10:46:19 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH v10 23/24] nvme-pci: convert to blk_rq_dma_map
-Message-ID: <aA-w20gOKus5hyAV@kbusch-mbp.dhcp.thefacebook.com>
-References: <cover.1745831017.git.leon@kernel.org>
- <007e00134d49160d5edab94a72c35b7b91429b09.1745831017.git.leon@kernel.org>
+	s=arc-20240116; t=1745860420; c=relaxed/simple;
+	bh=nWgWzlUJa06MxNgJOwVP/WXg4pkgTp6oaZEytmQAVYw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=F5iLqB4JNiM6dtnt0C2dk2pbVR6KePioPnncE/8z74GOKgNRbNKWJ5fSbkgmRZ/k6zgOyS7Z9KyC+G/cgaIJ3wFQ/IZ162F/7JWu/4PARe5ZIZNm+zNDvulGw1fyd1UKjohDX+L1qGFYld6sH/mJUzrVV413iQh/n675GgTiRBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LXoBnbXi; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3032ea03448so4947091a91.2
+        for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 10:13:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745860418; x=1746465218; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tLXoOx9yRCTvvCd0BrHtncY5tgqACMNmODA1lhD+RGg=;
+        b=LXoBnbXiKvfGk1QIMY/LcN49Uo6CtG4UWARBfzJTa8FgCkjNxiBqgIp8c1qJjp91qP
+         CwpmgLnz5XGv//BNbExWFy8bpgwQngMFsidtowz8F7Ddlx12Qc3YKu77PCl1rMNeCCwP
+         lENSSL25aTu/nbAeRIKYJlIPNQJB/zDCxp3evcEHoBngLiARSiIw8tKtCyp32FCv/9Uk
+         lVOY21CEQE/SJ2mFJpRzFpYFDNw8bURNlaMxaclIQYYpWLSD3FczTkt0hjreDcF8LORb
+         P521/x4rQDqyqNiU95BH9hE2/ydT2oE3KndYxNK+K36eABaj5264p5JT/Ye0qV7bm9Md
+         U3Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745860418; x=1746465218;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tLXoOx9yRCTvvCd0BrHtncY5tgqACMNmODA1lhD+RGg=;
+        b=P95i9aEAc6Q4WMbSgHlfDtOP/95S9cyvK0t5o5OTmDhaM79AnPWWg14R8vFsQPNVia
+         CJUZROinkmP6g71aAkAwzhTn2YiZWjg/2D6UoleD3L+6kOc2Wu6ftA5Jt7v++uuhStBp
+         ISFAtC6sxTiXNoga8yc7Z0NpzLFacqI5rcuaeGFX/OrS47BNa2ePa4Aiz3fy89l+M02C
+         m31C4UovP6jcnfTBsTwqqz///KDcZOvSwh8PTtt0akiIkoc0CCfp5PBlVxGJkxEoaLD1
+         un2EIUVKpRptMcLs2oH1htggZeJwCGnZZUv/bHss/SZNNiSPxtnI+c0VB4ifA+2ri1HB
+         gZEA==
+X-Forwarded-Encrypted: i=1; AJvYcCXv4ifcfzrkiEUTS0m3CzYyBYTYwjvu2X7hhxl+mr6puPeqBCD7Ea1xc7SDaKsyLiM3Pv4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+YBhPiajBLI8CLm4TlBXsPJad95ogd9/QqXFwMpWb1OAgzHo4
+	zBH7PF6iAWowQVmKarLnhTDIDr/BkZOMNjmhTE3dSE1V3pT1gEXNBO3z1WrxZJVfmwetZ53FZpz
+	TTA==
+X-Google-Smtp-Source: AGHT+IE+4L5c7j0EkfxyQmlwMTl0MgYW7wuchNMYU9Od+v/iLDBMMA3J9+5+fhqGN0g7cJa/S4ImSoG6YW8=
+X-Received: from pjyr15.prod.google.com ([2002:a17:90a:e18f:b0:309:f831:28e0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2681:b0:2ff:5e4e:864
+ with SMTP id 98e67ed59e1d1-30a013995dcmr14048612a91.25.1745860418000; Mon, 28
+ Apr 2025 10:13:38 -0700 (PDT)
+Date: Mon, 28 Apr 2025 10:13:31 -0700
+In-Reply-To: <20250426100134.GB4198@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <007e00134d49160d5edab94a72c35b7b91429b09.1745831017.git.leon@kernel.org>
+Mime-Version: 1.0
+References: <20250414111140.586315004@infradead.org> <20250414113754.172767741@infradead.org>
+ <7vfbchsyhlsvdl4hszdtmapdghw32nrj2qd652f3pjzg3yb6vn@po3bsa54b6ta>
+ <20250415074421.GI5600@noisy.programming.kicks-ass.net> <zgsycf7arbsadpphod643qljqqsk5rbmidrhhrnm2j7qie4gu2@g7pzud43yj4q>
+ <20250416083859.GH4031@noisy.programming.kicks-ass.net> <20250426100134.GB4198@noisy.programming.kicks-ass.net>
+Message-ID: <aA-3OwNum9gzHLH1@google.com>
+Subject: Re: [PATCH 3/6] x86/kvm/emulate: Avoid RET for fastops
+From: Sean Christopherson <seanjc@google.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Josh Poimboeuf <jpoimboe@kernel.org>, x86@kernel.org, kys@microsoft.com, 
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, pawan.kumar.gupta@linux.intel.com, 
+	pbonzini@redhat.com, ardb@kernel.org, kees@kernel.org, 
+	Arnd Bergmann <arnd@arndb.de>, gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-efi@vger.kernel.org, 
+	samitolvanen@google.com, ojeda@kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Apr 28, 2025 at 12:22:29PM +0300, Leon Romanovsky wrote:
-> +	do {
-> +		if (WARN_ON_ONCE(mapped == entries)) {
-> +			iter.status = BLK_STS_IOERR;
-> +			break;
-> +		}
-> +		nvme_pci_sgl_set_data(&sg_list[mapped++], &iter);
+On Sat, Apr 26, 2025, Peter Zijlstra wrote:
+> On Wed, Apr 16, 2025 at 10:38:59AM +0200, Peter Zijlstra wrote:
+> 
+> > Yeah, I finally got there. I'll go cook up something else.
+> 
+> Sean, Paolo, can I once again ask how best to test this fastop crud?
 
-I think this should say "++mapped" so that the data blocks start at
-index 1 (continued below...)
+Apply the below, build KVM selftests, enable forced emulation in KVM, and then
+run fastops_test.  It's well past time we had a selftest for this.  It won't
+detect bugs that are specific to 32-bit kernels, e.g. b63f20a778c8 ("x86/retpoline:
+Don't clobber RFLAGS during CALL_NOSPEC on i386"), since KVM selftests are 64-bit
+only, but for what you're doing, it should suffice.
 
-> +		iod->total_len += iter.len;
-> +	} while (blk_rq_dma_map_iter_next(req, dev->dev, &iod->dma_meta_state,
-> +				 &iter));
->  
-> -out_unmap_sg:
-> -	dma_unmap_sgtable(dev->dev, &iod->meta_sgt, rq_dma_dir(req), 0);
-> -out_free_sg:
-> -	mempool_free(iod->meta_sgt.sgl, dev->iod_meta_mempool);
-> -	return BLK_STS_RESOURCE;
-> +	nvme_pci_sgl_set_seg(sg_list, sgl_dma, mapped);
+For 32-bit kernels, it requires a 32-bit QEMU and KVM-Unit-Tests (or maybe even
+a full blown 32-bit guest image; I forget how much coverage KUT provides).
+Regardless, I don't see any reason to put you through that pain, I can do that
+sanity testing.
 
-because this here is setting sg_list index 0 to be the segment
-descriptor.
+I'll post a proper patch for the new selftest after testing on AMD.  The test
+relies on hardware providing deterministic behavior for undefined output (RFLAGS
+and GPRs); I don't know if that holds true on AMD.
 
-And you also need to increment sgl_dma to point to the element after
-sg_list, otherwise it's pointing right back to itself, creating a looped
-list.
+To enable forced emulation, set /sys/module/kvm/parameters/force_emulation_prefix
+to '1' (for the purposes of this test, the value doesn't matter).  The param is
+writable at runtime, so it doesn't matter if kvm.ko is built-in or a module. 
 
-> +	if (unlikely(iter.status))
-> +		nvme_unmap_metadata(dev, req);
-> +	return iter.status;
->  }
+---
+From: Sean Christopherson <seanjc@google.com>
+Date: Mon, 28 Apr 2025 08:55:44 -0700
+Subject: [PATCH] KVM: selftests: Add a test for x86's fastops emulation
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/x86/fastops_test.c  | 165 ++++++++++++++++++
+ 2 files changed, 166 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86/fastops_test.c
+
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index f62b0a5aba35..411c3d5eb5b1 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -66,6 +66,7 @@ TEST_GEN_PROGS_x86 += x86/cr4_cpuid_sync_test
+ TEST_GEN_PROGS_x86 += x86/dirty_log_page_splitting_test
+ TEST_GEN_PROGS_x86 += x86/feature_msrs_test
+ TEST_GEN_PROGS_x86 += x86/exit_on_emulation_failure_test
++TEST_GEN_PROGS_x86 += x86/fastops_test
+ TEST_GEN_PROGS_x86 += x86/fix_hypercall_test
+ TEST_GEN_PROGS_x86 += x86/hwcr_msr_test
+ TEST_GEN_PROGS_x86 += x86/hyperv_clock
+diff --git a/tools/testing/selftests/kvm/x86/fastops_test.c b/tools/testing/selftests/kvm/x86/fastops_test.c
+new file mode 100644
+index 000000000000..c3799edb5d0c
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86/fastops_test.c
+@@ -0,0 +1,165 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
++
++/*
++ * Execute a fastop() instruction, with or without forced emulation.  BT bit 0
++ * to set RFLAGS.CF based on whether or not the input is even or odd, so that
++ * instructions like ADC and SBB are deterministic.
++ */
++#define guest_execute_fastop_1(FEP, insn, type_t, __val, __flags)			\
++do {											\
++	__asm__ __volatile__("bt $0, %[val]\n\t"					\
++			     FEP insn " %[val]\n\t"					\
++			     "pushfq\n\t"						\
++			     "pop %[flags]\n\t"						\
++			     : [val]"+r"(__val), [flags]"=r"(__flags)			\
++			     : : "cc", "memory");					\
++} while (0)
++
++#define guest_test_fastop_1(insn, type_t, __val)					\
++do {											\
++	type_t val = __val, ex_val = __val, input = __val;				\
++	uint64_t flags, ex_flags;							\
++											\
++	guest_execute_fastop_1("", insn, type_t, ex_val, ex_flags);			\
++	guest_execute_fastop_1(KVM_FEP, insn, type_t, val, flags);			\
++											\
++	__GUEST_ASSERT(val == ex_val,							\
++		       "Wanted 0x%lx for '%s 0x%lx', got 0x%lx",			\
++		       (uint64_t)ex_val, insn, (uint64_t)input, (uint64_t)val);		\
++	__GUEST_ASSERT(flags == ex_flags,						\
++			"Wanted flags 0x%lx for '%s 0x%lx', got 0x%lx",			\
++			ex_flags, insn, (uint64_t)input, flags);			\
++} while (0)
++
++#define guest_execute_fastop_2(FEP, insn, type_t, __input, __output, __flags)		\
++do {											\
++	__asm__ __volatile__("bt $0, %[output]\n\t"					\
++			     FEP insn " %[input], %[output]\n\t"			\
++			     "pushfq\n\t"						\
++			     "pop %[flags]\n\t"						\
++			     : [output]"+r"(__output), [flags]"=r"(__flags)		\
++			     : [input]"r"(__input) : "cc", "memory");			\
++} while (0)
++
++#define guest_test_fastop_2(insn, type_t, __val1, __val2)				\
++do {											\
++	type_t input = __val1, input2 = __val2, output = __val2, ex_output = __val2;	\
++	uint64_t flags, ex_flags;							\
++											\
++	guest_execute_fastop_2("", insn, type_t, input, ex_output, ex_flags);		\
++	guest_execute_fastop_2(KVM_FEP, insn, type_t, input, output, flags);		\
++											\
++	__GUEST_ASSERT(output == ex_output,						\
++		       "Wanted 0x%lx for '%s 0x%lx 0x%lx', got 0x%lx",			\
++		       (uint64_t)ex_output, insn, (uint64_t)input,			\
++		       (uint64_t)input2, (uint64_t)output);				\
++	__GUEST_ASSERT(flags == ex_flags,						\
++			"Wanted flags 0x%lx for '%s 0x%lx, 0x%lx', got 0x%lx",		\
++			ex_flags, insn, (uint64_t)input, (uint64_t)input2, flags);	\
++} while (0)
++
++#define guest_execute_fastop_cl(FEP, insn, type_t, __shift, __output, __flags)		\
++do {											\
++	__asm__ __volatile__("bt $0, %[output]\n\t"					\
++			     FEP insn " %%cl, %[output]\n\t"				\
++			     "pushfq\n\t"						\
++			     "pop %[flags]\n\t"						\
++			     : [output]"+r"(__output), [flags]"=r"(__flags)		\
++			     : "c"(__shift) : "cc", "memory");				\
++} while (0)
++
++#define guest_test_fastop_cl(insn, type_t, __val1, __val2)				\
++do {											\
++	type_t output = __val2, ex_output = __val2, input = __val2;			\
++	uint8_t shift = __val1;								\
++	uint64_t flags, ex_flags;							\
++											\
++	guest_execute_fastop_cl("", insn, type_t, shift, ex_output, ex_flags);		\
++	guest_execute_fastop_cl(KVM_FEP, insn, type_t, shift, output, flags);		\
++											\
++	__GUEST_ASSERT(output == ex_output,						\
++		       "Wanted 0x%lx for '%s 0x%x, 0x%lx', got 0x%lx",			\
++		       (uint64_t)ex_output, insn, shift, (uint64_t)input,		\
++		       (uint64_t)output);						\
++	__GUEST_ASSERT(flags == ex_flags,						\
++			"Wanted flags 0x%lx for '%s 0x%x, 0x%lx', got 0x%lx",		\
++			ex_flags, insn, shift, (uint64_t)input, flags);			\
++} while (0)
++
++static const uint64_t vals[] = {
++	0,
++	1,
++	2,
++	4,
++	7,
++	0x5555555555555555,
++	0xaaaaaaaaaaaaaaaa,
++	0xfefefefefefefefe,
++	0xffffffffffffffff,
++};
++
++#define guest_test_fastops(type_t, suffix)						\
++do {											\
++	int i, j;									\
++											\
++	for (i = 0; i < ARRAY_SIZE(vals); i++) {					\
++		guest_test_fastop_1("dec" suffix, type_t, vals[i]);			\
++		guest_test_fastop_1("inc" suffix, type_t, vals[i]);			\
++		guest_test_fastop_1("neg" suffix, type_t, vals[i]);			\
++		guest_test_fastop_1("not" suffix, type_t, vals[i]);			\
++											\
++		for (j = 0; j < ARRAY_SIZE(vals); j++) {				\
++			guest_test_fastop_2("add" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("adc" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("and" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("bsf" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("bsr" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("bt" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("btc" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("btr" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("bts" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("cmp" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("imul" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("or" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("sbb" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("sub" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("test" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("xor" suffix, type_t, vals[i], vals[j]);	\
++											\
++			guest_test_fastop_cl("rol" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("ror" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("rcl" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("rcr" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("sar" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("shl" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("shr" suffix, type_t, vals[i], vals[j]);	\
++		}									\
++	}										\
++} while (0)
++
++static void guest_code(void)
++{
++	guest_test_fastops(uint16_t, "w");
++	guest_test_fastops(uint32_t, "l");
++	guest_test_fastops(uint64_t, "q");
++
++	GUEST_DONE();
++}
++
++int main(int argc, char *argv[])
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	TEST_REQUIRE(is_forced_emulation_enabled);
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
++
++	kvm_vm_free(vm);
++}
+
+base-commit: 661b7ddb2d10258b53106d7c39c309806b00a99c
+-- 
 
