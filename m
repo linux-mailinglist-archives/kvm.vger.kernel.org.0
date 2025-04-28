@@ -1,217 +1,215 @@
-Return-Path: <kvm+bounces-44596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 370D5A9F8F2
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 20:56:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CB33A9F919
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 21:02:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 824711A8599E
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 18:56:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADA037A6138
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 19:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00F32957D2;
-	Mon, 28 Apr 2025 18:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2472973A2;
+	Mon, 28 Apr 2025 19:02:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tE7X3LMO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iQuiPrLy"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2086.outbound.protection.outlook.com [40.107.101.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57BB26F478;
-	Mon, 28 Apr 2025 18:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745866568; cv=fail; b=bwg4XCZI3xuAkxKqHX10ZKRYtFi0oTC1pD5NyVCb/NVp4XBzk1Sd8hKGAkGIC2dprHihOCbc5kN6T2ob0p8ABXd4CgdLFFDWFFaJ3omz2GbTUcTMv96Rax7s1bYbUK3ikj9FVq80s82ePhiRZ1OuCWaJkl0Jm/MdPVTTeWqeAeo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745866568; c=relaxed/simple;
-	bh=rGzQkblUQJ58ZDa090HkYLMIru3SHdA9DONBOqvqIiA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZHLrwwSp/a7uZ+nbny93mm0z3SdzpJ+vspIf22AFzlV/33jg7FpWc3m3M0yBleaYj2WJQyImvFx6nnT4pMSZETpF0coceDCxQgha9nPUXlSbsrURIaHyq6G+E0jWxgtRwnQkHqTStXv68yHTan0DeT5hvYlPlhmUjYNbDn/JseA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tE7X3LMO; arc=fail smtp.client-ip=40.107.101.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rSCG80+3ZNUoEnvY7mrhycMfTH+VZuWm2PL2H3NV1w1V5IuXyy4XMiXx7VZVwkstYWl+7YHUvz+J4vhP1ZAoI0d7gBYF2WARw185szyL8HSX8acdfQTPEBwo5MG0gRJdFvTa6YtgQPkk57EkqQms+7hHHrS1cx7qNz7eI8DBh+DF7gKTMfqjD0I58EPXatMEdaCarvk7YhSh4lAzevvica38lOzd3qDO/lhC6UA4wvNWKNgrj1WCDADs9kbYgOlZsI183BqvkW7hJjf+YdHHsKPyRQrWohvqVclUnmeJfIfnvJPXyn00rtT/Vlz7SY/d3/4WVJfMMPSNdgJm0ihycw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=orO2zDYqEWC6sv1W9FavRWeI0EJwnWu2GzMIp3xJRXU=;
- b=JtIu+ANEIN/WgM/XFrc1GoouuXZ8Dkc7Jk6v8alLcMpQKRlhCa4zIRR6416yPz7vhFRwkEbiIJzwBZSlGzs0JynPFSB6Zze5F9Hhqnz3GIsspdZuxFx23tRZRtcR5c6p+oijNuA9Xkpy9NC5bUGBuzErpVeo9C5JD1pw8ivXzpRNXZ5lSnf+5S9fuCvgGFaXtj/XkBeuUQA4NjKY+dFtl81jWaaGPy2mq3yQVsuyB4keyTPnVidTF1KhuQ6lJICgrBw+xvDrSIxpPtHHh/XAy6ji6p6g96k9eXHkcc4TB8o+fx5Qk+pqxxoE3/qkYSfJMr0ByMc3RejSplyv3etCmg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=orO2zDYqEWC6sv1W9FavRWeI0EJwnWu2GzMIp3xJRXU=;
- b=tE7X3LMOPGBA77A9t6HzKodvvB0r0lICuH/T+53humHYtNY8mrA7C/+8Z6gRRWIhtLCkJGQsr8ILp+3ZL0bbMaX4cSXbQzRmro3O4T75Xz+5SNxq9chGlDgLxz1Ief2cQFmKLEOh9bKnYAsPcSeGWKvYGWoKjlZjVvBTWoQtNd4=
-Received: from MW4PR03CA0210.namprd03.prod.outlook.com (2603:10b6:303:b8::35)
- by CH3PR12MB8726.namprd12.prod.outlook.com (2603:10b6:610:17b::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.33; Mon, 28 Apr
- 2025 18:56:02 +0000
-Received: from MWH0EPF000971E3.namprd02.prod.outlook.com
- (2603:10b6:303:b8:cafe::7b) by MW4PR03CA0210.outlook.office365.com
- (2603:10b6:303:b8::35) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.36 via Frontend Transport; Mon,
- 28 Apr 2025 18:56:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MWH0EPF000971E3.mail.protection.outlook.com (10.167.243.70) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8678.33 via Frontend Transport; Mon, 28 Apr 2025 18:56:02 +0000
-Received: from tlendack-t1.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 28 Apr
- 2025 13:55:43 -0500
-From: Tom Lendacky <thomas.lendacky@amd.com>
-To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
-	<seanjc@google.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, "Thomas
- Gleixner" <tglx@linutronix.de>, Michael Roth <michael.roth@amd.com>
-Subject: [PATCH] KVM: SVM: Update dump_ghcb() to use the GHCB snapshot fields
-Date: Mon, 28 Apr 2025 13:55:31 -0500
-Message-ID: <8f03878443681496008b1b37b7c4bf77a342b459.1745866531.git.thomas.lendacky@amd.com>
-X-Mailer: git-send-email 2.46.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47EC1269D09
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 19:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745866935; cv=none; b=cGlhMrg5VksOAFciGf92+1fWYFtRgUlRhy/lT/njAJaNncan6Ha3njca5zCswuFrtbPTqKJqRG/Pold0NWY2jDmG5MDE2PMVU8q73ojW/TSKGQTynrrvkO1moxq1mHOVPFYy0P2oZXTWDEQfLfdJZ8k+dVqzHHw5m7U1zFPn5+I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745866935; c=relaxed/simple;
+	bh=dPbGPFboill6iT76EBtr4PZn6lvH5BMhMgDL2shmMZs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Nh9c8aw1Zk7tuiIGBVVIxLsHHrRDghrqocwelV9fgHsasvYnzVO17pQCQXxYF2mVgZN4GjR4AerhqtnSoRfkKKusUzUv3p7yJAKD6rKNsy9VvuCzsrUUPz5o7V8dvDLoFxQ8I9UeTnvrjoEat4S2tj/d6ICGP6gs791CXzA3Ap0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iQuiPrLy; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2242ac37caeso23255ad.1
+        for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 12:02:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745866932; x=1746471732; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0d6vKqkeMQuJL7A/bSp8ZFP6OrnkpLdgBb2QvNCbFNU=;
+        b=iQuiPrLyQzMczzwkfGmQLBxtixjLOSO60zomBAo3cMFOsYCE41n7K6w6BPAce4HVCy
+         fOuSoCs9U1wkhZv7qSaW/AFiiJhNh9cimvtaHIZl8k0+qkWFiGyWPjFBY4yn7TnGR+Kw
+         grmEA62eDz5ttqA9WgxqZ1WDP6zwdOiBNpHaxjIt/PTtID/oEcnzAvAoK7eTkVW+PJyn
+         DJD/x3SWCu/atUoh4ITJjdkMnnYVt/mJ+ZsIG374vsm2GnF/bzIap0DQmOVKbvFs5daQ
+         +mr+QJk1LTuVQm9teLn4N5sNTWL+P29YiXmczoguTi5axlJhyWMsxj6egiuxezujIVUu
+         XohQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745866932; x=1746471732;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0d6vKqkeMQuJL7A/bSp8ZFP6OrnkpLdgBb2QvNCbFNU=;
+        b=Re+gACs9hWYV8Vl/+IMnwo4xGnVFN5bMkCTjM1xwK0HPMe0RmQycTcWYqF2PaqZofA
+         IhXD9yRwNEUWL7tJCo0h5E+ClgqZamEr/cHmxwitU4aE9VeGKwYyebzxvS2ilyIgGzlC
+         91wxRrldeT1AV0D8BKqgugKrDSGl54QCe3c40Ky8SdfebgwxACwD0JyK72rmNKTK+233
+         9w9+saqfLeb8yZmTIGTC5gc93C64pzfJQnCTWmb131EASBhZGdqXQwrtZmQJb1GP8xNo
+         UDqDgW7+QRRiXoGybvZynhsFxwuD5jmUWe7ekOMH/cCN2i20GLqZkBTYYg09Vo0uFTyB
+         6jBA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/HmjIEjl8OmiJo+5SA/vIHxZXf+YSZkGHvGN/kCyUuc2jyZambPNpyoY/nxEUZONQ06U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxCmRXjHEvgF89tgSy4iebZfSKvA40SW0n15LrlWQByhw7dHEc
+	+LIYIVCJV/nFulMP0ruWsGnDep41ZeGLZg/51NekGztNZWdu8BL1yr9LqFwgkyrWZpwhJ6T+G+8
+	0A4stTVhgntN2ZCJwxKu/+o3Q0fHjbwhk4DDb
+X-Gm-Gg: ASbGncttgrQGhADycj7odgqMNAdQ6eIJM1d/21xLw0oIOPbaLsQDdzXgtala7FoATVp
+	P2zzS1jOnd6BbBBe6xsIuEQAagWUkXq7Jvq3FtPbFGGlq1AnW/RO4d79WhriXMKcvLIn+faf9ns
+	DQaBl6I1eODdAT1pqsWw3V8d0MLozMynjs96ez4bdfbVrJmVnpsnoKVezxy+iOkno=
+X-Google-Smtp-Source: AGHT+IGHVt/gKeNNEkBuiDZ/WNCdhRReTsGIQqOMd5cCX92xfcbOewQ1LqrEb8wI4CAhtx4rSrkAMWhGeINdBb7YCZY=
+X-Received: by 2002:a17:902:f54c:b0:215:65f3:27ef with SMTP id
+ d9443c01a7336-22de6c47e20mr422765ad.12.1745866932074; Mon, 28 Apr 2025
+ 12:02:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E3:EE_|CH3PR12MB8726:EE_
-X-MS-Office365-Filtering-Correlation-Id: d498a802-3e34-4757-6250-08dd868652ba
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?oO574gOmyNiGQDOv2IslB/zS3V51WpuspnwD/TaBOOCNFqA4f/IdK4mJqzh6?=
- =?us-ascii?Q?bZJJ1BDYrjsIcrnx6BDbxK9K1ilf0eM0tQAMz1fhLYFytmooTE6DfR5/uxkx?=
- =?us-ascii?Q?kJd9eNkuW8LOhoCzulpII/LnuxC9VOHc4PNyvRWuw7Ak9D6A08hx9GMmGdlE?=
- =?us-ascii?Q?ANFgzsHwiz0OliQgU6aIpp9z1Z/eLg0QOY4rcfq6cjA7uRc+1Gw+M1T/oO8W?=
- =?us-ascii?Q?drFZ6vT9wk9lYpwkC/4/jyEG6MfHVZHuL5bWy0vSMCMIpbIjsdFxr3APEnDo?=
- =?us-ascii?Q?EWbXiXEANGD47Rle4CdbkOBx7Ir1sBtEtRcm2tA5owUvXOb4rTi3lYfzn2B/?=
- =?us-ascii?Q?JZd8/s3BkZ/aIeGqVZiunI6I2vry/2QD12YsE5mp5NNlAoozTaE8hUtPmW7a?=
- =?us-ascii?Q?0gzsAhjrjzxHEqHhgDOKzSc7TM0QWKyS1mzt5qmCppAQ+aCMZxvbKB+HXB6q?=
- =?us-ascii?Q?49dJYycdfKh0e2xxIVsJTGscy55C2XLD3/zNNMixkjLpAkWQnPAuPQt0ArWf?=
- =?us-ascii?Q?hdtllDEnsLAjP1ml+YqxtD7qxKSVBrSOebzdH7fqj8DEQSAbmy1ITukj47xV?=
- =?us-ascii?Q?rd+r1MNbwFRy2p47W743p9UBvJWNodU1gF5O8BI3TX2eThgs88p92yvMIrwG?=
- =?us-ascii?Q?yt1lbnKe2FJeDXf56HpTMU70juD0TQ//oDck50TzVLEVXC/2wLaVvA7zs+a9?=
- =?us-ascii?Q?hrfwRIC25XCvhVqYYyl/O6oQTSVq5DeR8ExmJosE8n6be4+sWAfg/iukDCx5?=
- =?us-ascii?Q?+NBJ4qN+0h1wG5nHGoxBXrCSmN1F8PjkpUwh7zdE+OkUBMhCwfChfkwtyhXO?=
- =?us-ascii?Q?jdAqNYDsHldaOAY2nXqD3brpeSWqsuUl226OtFNDcmqY160zRM1nSydGu9Ej?=
- =?us-ascii?Q?ZRU6xK50gl4XhVJWXTC6RGTAkFfMOSXg74UuqkZNFa0CsDQQLAAj5KENB5w/?=
- =?us-ascii?Q?zNvawWIC525Bp6R6JOG69z+rTF1gifs9qmULUIZVieQwMGUjWmOxLBylyxyC?=
- =?us-ascii?Q?9PHPUW5SMVTjd5T2u7H1K1EHevQ+vOXH6HpXgjYS3bKU2pEOpk3NXEJZxCCO?=
- =?us-ascii?Q?YHVI8V7bmOfUyuo9bLbWrNo6Ov8nrZ0XP/Lxrn2Gcubyd3v4DSMRss2qY0cL?=
- =?us-ascii?Q?2yCRyLqewNgwUhcJI7beJk6je+G6un4c4fbIG0snO4yu9pDU96/o/ZhJFmhv?=
- =?us-ascii?Q?T+fBSZfycJZV7CopNbeIjYe7WRoDyJtj5KaRk9F5eRMsVNx9v2IpCxs65ceD?=
- =?us-ascii?Q?DPOoAn3wNP2dOCNap9qbjqRlEpGd/xMw3VnTuC3YcLpbqHtJE/fTucE2yy5A?=
- =?us-ascii?Q?EnBH9qWNfjjaKhzcyxXBjicF+OojnF+9YoR+1M8G16uUsAGtt9rI/UaEagt2?=
- =?us-ascii?Q?JjKgpRh37cCBPOX0sRRx8vw3DJJgZNeV3M+wZlpjj0DcDj1cH+JK6JwZmyHJ?=
- =?us-ascii?Q?yKzsIuFYNdCJG5R6+KhLAuAAyT5YdP79hDHtV6zp3zzUs/LDFJh4GZ57Y3OM?=
- =?us-ascii?Q?4oUJ3UNdJvwMjo9eVkWbIjmme2hNEY1MTzqV?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2025 18:56:02.6629
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d498a802-3e34-4757-6250-08dd868652ba
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E3.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8726
+References: <Z+6AGxEvBRFkN5mN@yzhao56-desk.sh.intel.com> <diqzh62ezgdh.fsf@ackerleytng-ctop.c.googlers.com>
+ <aAmPQssuN9Zba//b@yzhao56-desk.sh.intel.com> <aAm9OHGt6Ag7ztqs@yzhao56-desk.sh.intel.com>
+ <c4dae65f-b5e6-44fa-b5ab-8614f1d47cb5@intel.com> <aAnytM/E6sIdvKNq@yzhao56-desk.sh.intel.com>
+ <CAGtprH-Ana5A2hz_D+CQ0NYRVxfpR6e0Sojssym-UtUnYpOPqg@mail.gmail.com>
+ <diqz7c39zas0.fsf@ackerleytng-ctop.c.googlers.com> <aAsJZuLjOAYriz8v@yzhao56-desk.sh.intel.com>
+ <diqzwmb7yi67.fsf@ackerleytng-ctop.c.googlers.com> <aA7UXI0NB7oQQrL2@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aA7UXI0NB7oQQrL2@yzhao56-desk.sh.intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Mon, 28 Apr 2025 12:02:00 -0700
+X-Gm-Features: ATxdqUFfs0t7N5eWmI-1jNaKWhFko9iPatrQfOG5_SqVZrK0K5YoR1PgPQdgCTU
+Message-ID: <CAGtprH8o=vE+_4maevXmFv4REg2+Ls-kKK8i0vjc7D6OYDCRkw@mail.gmail.com>
+Subject: Re: [RFC PATCH 39/39] KVM: guest_memfd: Dynamically split/reconstruct
+ HugeTLB page
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, Chenyi Qiang <chenyi.qiang@intel.com>, tabba@google.com, 
+	quic_eberman@quicinc.com, roypat@amazon.co.uk, jgg@nvidia.com, 
+	peterx@redhat.com, david@redhat.com, rientjes@google.com, fvdl@google.com, 
+	jthoughton@google.com, seanjc@google.com, pbonzini@redhat.com, 
+	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	isaku.yamahata@intel.com, muchun.song@linux.dev, erdemaktas@google.com, 
+	qperret@google.com, jhubbard@nvidia.com, willy@infradead.org, 
+	shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
+	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
+	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
+	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
+	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Commit 4e15a0ddc3ff ("KVM: SEV: snapshot the GHCB before accessing it")
-updated the SEV code to take a snapshot of the GHCB before using it. But
-the dump_ghcb() function wasn't updated to use the snapshot locations.
-This results in incorrect output from dump_ghcb() for the "is_valid" and
-"valid_bitmap" fields.
+On Sun, Apr 27, 2025 at 6:08=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wro=
+te:
+>
+> On Fri, Apr 25, 2025 at 03:45:20PM -0700, Ackerley Tng wrote:
+> > Yan Zhao <yan.y.zhao@intel.com> writes:
+> > ...
+> > >
+> > > For some memory region, e.g., "pc.ram", it's divided into 2 parts:
+> > > - one with offset 0, size 0x80000000(2G),
+> > >   positioned at GPA 0, which is below GPA 4G;
+> > > - one with offset 0x80000000(2G), size 0x80000000(2G),
+> > >   positioned at GPA 0x100000000(4G), which is above GPA 4G.
+> > >
+> > > For the second part, its slot->base_gfn is 0x100000000, while slot->g=
+mem.pgoff
+> > > is 0x80000000.
+> > >
+> >
+> > Nope I don't mean to enforce that they are equal, we just need the
+> > offsets within the page to be equal.
+> >
+> > I edited Vishal's code snippet, perhaps it would help explain better:
+> >
+> > page_size is the size of the hugepage, so in our example,
+> >
+> >   page_size =3D SZ_2M;
+> >   page_mask =3D ~(page_size - 1);
+> page_mask =3D page_size - 1  ?
+>
+> >   offset_within_page =3D slot->gmem.pgoff & page_mask;
+> >   gfn_within_page =3D (slot->base_gfn << PAGE_SHIFT) & page_mask;
+> >
+> > We will enforce that
+> >
+> >   offset_within_page =3D=3D gfn_within_page;
+> For "pc.ram", if it has 2.5G below 4G, it would be configured as follows
+> - slot 1: slot->gmem.pgoff=3D0, base GPA 0, size=3D2.5G
+> - slot 2: slot->gmem.pgoff=3D2.5G, base GPA 4G, size=3D1.5G
+>
+> When binding these two slots to the same guest_memfd created with flag
+> KVM_GUEST_MEMFD_HUGE_1GB:
+> - binding the 1st slot will succeed;
+> - binding the 2nd slot will fail.
+>
+> What options does userspace have in this scenario?
 
-Update dump_ghcb() to use the proper locations.
+Userspace can create new gmem files that have aligned offsets. But I
+see your point, enforcing alignment at binding time will lead to
+wastage of memory. i.e. Your example above could be reworked to have:
+- slot 1: slot->gmem.pgoff=3D0, base GPA 0, size=3D2.5G, gmem_fd =3D x, gme=
+m_size =3D 3G
+- slot 2: slot->gmem.pgoff=3D0, base GPA 4G, size=3D1.5G, gmem_fd =3D y,
+gmem_size =3D 2G
 
-Fixes: 4e15a0ddc3ff ("KVM: SEV: snapshot the GHCB before accessing it")
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- arch/x86/kvm/svm/sev.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+This will waste 1G of memory as gmem files will have to be hugepage aligned=
+.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 0bc708ee2788..91e514d07f8a 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3173,9 +3173,14 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
- 		kvfree(svm->sev_es.ghcb_sa);
- }
- 
-+static u64 kvm_ghcb_get_sw_exit_code(struct vmcb_control_area *control)
-+{
-+	return (((u64)control->exit_code_hi) << 32) | control->exit_code;
-+}
-+
- static void dump_ghcb(struct vcpu_svm *svm)
- {
--	struct ghcb *ghcb = svm->sev_es.ghcb;
-+	struct vmcb_control_area *control = &svm->vmcb->control;
- 	unsigned int nbits;
- 
- 	/* Re-use the dump_invalid_vmcb module parameter */
-@@ -3184,18 +3189,18 @@ static void dump_ghcb(struct vcpu_svm *svm)
- 		return;
- 	}
- 
--	nbits = sizeof(ghcb->save.valid_bitmap) * 8;
-+	nbits = sizeof(svm->sev_es.valid_bitmap) * 8;
- 
- 	pr_err("GHCB (GPA=%016llx):\n", svm->vmcb->control.ghcb_gpa);
- 	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_code",
--	       ghcb->save.sw_exit_code, ghcb_sw_exit_code_is_valid(ghcb));
-+	       kvm_ghcb_get_sw_exit_code(control), kvm_ghcb_sw_exit_code_is_valid(svm));
- 	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_info_1",
--	       ghcb->save.sw_exit_info_1, ghcb_sw_exit_info_1_is_valid(ghcb));
-+	       control->exit_info_1, kvm_ghcb_sw_exit_info_1_is_valid(svm));
- 	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_info_2",
--	       ghcb->save.sw_exit_info_2, ghcb_sw_exit_info_2_is_valid(ghcb));
-+	       control->exit_info_2, kvm_ghcb_sw_exit_info_2_is_valid(svm));
- 	pr_err("%-20s%016llx is_valid: %u\n", "sw_scratch",
--	       ghcb->save.sw_scratch, ghcb_sw_scratch_is_valid(ghcb));
--	pr_err("%-20s%*pb\n", "valid_bitmap", nbits, ghcb->save.valid_bitmap);
-+	       svm->sev_es.sw_scratch, kvm_ghcb_sw_scratch_is_valid(svm));
-+	pr_err("%-20s%*pb\n", "valid_bitmap", nbits, svm->sev_es.valid_bitmap);
- }
- 
- static void sev_es_sync_to_ghcb(struct vcpu_svm *svm)
-@@ -3266,11 +3271,6 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
- 	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
- }
- 
--static u64 kvm_ghcb_get_sw_exit_code(struct vmcb_control_area *control)
--{
--	return (((u64)control->exit_code_hi) << 32) | control->exit_code;
--}
--
- static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
+> It can't reduce the flag to KVM_GUEST_MEMFD_HUGE_2MB. Adjusting the gmem.=
+pgoff
+> isn't ideal either.
+>
+> What about something similar as below?
+>
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index d2feacd14786..87c33704a748 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -1842,8 +1842,16 @@ __kvm_gmem_get_pfn(struct file *file, struct kvm_m=
+emory_slot *slot,
+>         }
+>
+>         *pfn =3D folio_file_pfn(folio, index);
+> -       if (max_order)
+> -               *max_order =3D folio_order(folio);
+> +       if (max_order) {
+> +               int order;
+> +
+> +               order =3D folio_order(folio);
+> +
+> +               while (order > 0 && ((slot->base_gfn ^ slot->gmem.pgoff) =
+& ((1 << order) - 1)))
 
-base-commit: 2d7124941a273c7233849a7a2bbfbeb7e28f1caa
--- 
-2.46.2
+This sounds better. Userspace will need to avoid this in general or
+keep such ranges short so that most of the guest memory ranges can be
+mapped at hugepage granularity. So maybe a pr_warn could be spewed
+during binding that the alignment is not optimal.
 
+> +                       order--;
+> +
+> +               *max_order =3D order;
+> +       }
+>
+>         *is_prepared =3D folio_test_uptodate(folio);
+>         return folio;
+>
+>
+> > >> Adding checks at binding time will allow hugepage-unaligned offsets =
+(to
+> > >> be at parity with non-guest_memfd backing memory) but still fix this
+> > >> issue.
+> > >>
+> > >> lpage_info will make sure that ranges near the bounds will be
+> > >> fragmented, but the hugepages in the middle will still be mappable a=
+s
+> > >> hugepages.
+> > >>
+> > >> [1] https://lpc.events/event/18/contributions/1764/attachments/1409/=
+3706/binding-must-have-same-alignment.svg
 
