@@ -1,64 +1,62 @@
-Return-Path: <kvm+bounces-44580-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44581-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 802CFA9F3F6
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 17:00:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9557A9F410
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 17:05:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBD9D3BE5D6
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 15:00:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 408133B6216
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 15:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5995A27979E;
-	Mon, 28 Apr 2025 15:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941522797A3;
+	Mon, 28 Apr 2025 15:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kQp2+ZJW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iVTSuYvj"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785BE27978B;
-	Mon, 28 Apr 2025 15:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9767192D83;
+	Mon, 28 Apr 2025 15:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745852425; cv=none; b=KOVEeCPTmvT1URdboh+/pE8VEFuIlCfTooomzl3YXjXcAXFvEVn0b+SM0HSX6zJH8f16R0GWiU6OM8bqkifUju9vf6VatZFtv7kyyq7zOaEowoHTiwHRwadVGv1MdbUQeSAJ6XURAGplJhU6XpkTX9sI5tg3l2Ju/ijg6BSrpNg=
+	t=1745852732; cv=none; b=g3w5W9M02UEBoGcTweh+Xb6p5rAHgFweVu1oR0pl4DqoEHov1Nqpg3+zFY+G3ma8kiimYx7HZUNLYnXfNXAXEcQIeD5Lf9neilIcqbuo21CHIjj9n+XvbAr1Ojsp+27VHe8nM1QgKzjAi4t70AYLHwN/VQlUHPvXtE12W7Dzjwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745852425; c=relaxed/simple;
-	bh=WAq2iabc990w1Qi0DDPIDDUC0WKvIFPY3pDowPsJQMw=;
+	s=arc-20240116; t=1745852732; c=relaxed/simple;
+	bh=VJxXe/Ga2jumdetbeBRYvHL7yi4RCMj/Ek53LW4jqPA=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=M936+de9gPc04iik+hjqzUQ2iIPrXzOJXfDZFjfV0qHDt4vcC9ds1pAdWEZPKpPPcm2fPZDExY0D5FMNsCfrNmY0A9lB14YPipjJuAMdklR4z8rKG2M6KVK1nO8kPstMNF3E2k/5HEyRaFDYs/ArEyFaeoovsJYPv+/vbYddUnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kQp2+ZJW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C62DAC4CEE4;
-	Mon, 28 Apr 2025 15:00:24 +0000 (UTC)
+	 Content-Disposition:In-Reply-To; b=mTSlu0AvfiOQqCY9YJfKr4qtDVq/C6CscPHEfoBRwbz4RvsJH0fVGPSECtZoAngM28/crpC9/ZiyWaSBg7ckYFjJrEZHNg4eUChlihmTTXXzWOxitMQW7e1V5xbNaVPsjHkmF8d+xcBvsmS1aylv5O854/bINLbYPXk6XjP1TnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iVTSuYvj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE7CC4CEE4;
+	Mon, 28 Apr 2025 15:05:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745852424;
-	bh=WAq2iabc990w1Qi0DDPIDDUC0WKvIFPY3pDowPsJQMw=;
+	s=k20201202; t=1745852732;
+	bh=VJxXe/Ga2jumdetbeBRYvHL7yi4RCMj/Ek53LW4jqPA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=kQp2+ZJW/+MDSHEWo+O6QFPsCfeB+qokVPiGOpZMvh+VJXhZ+Ml7rl8WqSIRJEgOz
-	 c5OivtOlJYD22hJ8yegza6zImUfXt7BlKNF/ChKHnYY/gNXfeyUXtVauvsq0NgWUIR
-	 2IZCVxl8WwgSBo0YkNbmlf1sQvV56/6CwSkz59keS/SHojIOwwZghrmtlPtrf24l6D
-	 BlXjnL+2CSPuVOlkqHnwdSE4eRMX9D0g1xr/Ub1WPr3UdrFw0UNFRM4h7TjBaEV7Oq
-	 NOr/kjzSdWzE65uCYubv4jeVfiFi3f4+kSSyniqm7SoMXVkY1vRQq3d4lqUVhklag+
-	 sK/zOLkNRiNNw==
-Date: Mon, 28 Apr 2025 10:00:23 -0500
+	b=iVTSuYvjNmUeYSiWEuEEl722TPRNNSMcZEfDNMMXcgrnTA4Y1k8XDQy/rq9RVk0JG
+	 V7j1S08LtgwQqZ1uBzIB8gEM2xvVqowRGithWICn7J3JZabF4ApvJINi8g3N4q5LwE
+	 BFTYNRy0sJPpclkHMyQf9nqD52F9aG4ESc5FxnUjwbuT69lYfCvnmC8HrcobFXa4zk
+	 EXaqk8hmP82hyFaEjhgpL59DKTl1zYRDH3C1P9tIS1Sl7FE739OPOKAEg6a2wRNzWD
+	 /J9usLZhoVhpurE9DT0U4OGZnsttUVCrSwepq6EtiRFZ0PEXEAD6AQMPoaTLrQTX7e
+	 A3gICimQjCE+g==
+Date: Mon, 28 Apr 2025 10:05:30 -0500
 From: Bjorn Helgaas <helgaas@kernel.org>
 To: Chathura Rajapaksha <chathura.abeyrathne.lk@gmail.com>
 Cc: kvm@vger.kernel.org, Chathura Rajapaksha <chath@bu.edu>,
 	William Wang <xwill@bu.edu>,
 	Alex Williamson <alex.williamson@redhat.com>,
 	Paul Moore <paul@paul-moore.com>, Eric Paris <eparis@redhat.com>,
-	Xin Zeng <xin.zeng@intel.com>, Yahui Cao <yahui.cao@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
 	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Yunxiang Li <Yunxiang.Li@amd.com>,
+	Xin Zeng <xin.zeng@intel.com>, Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Yahui Cao <yahui.cao@intel.com>, Yunxiang Li <Yunxiang.Li@amd.com>,
 	Dongdong Zhang <zhangdongdong@eswincomputing.com>,
-	Kevin Tian <kevin.tian@intel.com>,
 	Avihai Horon <avihaih@nvidia.com>, linux-kernel@vger.kernel.org,
 	audit@vger.kernel.org
-Subject: Re: [RFC PATCH 1/2] block accesses to unassigned PCI config regions
-Message-ID: <20250428150023.GA670069@bhelgaas>
+Subject: Re: [RFC PATCH 2/2] audit accesses to unassigned PCI config regions
+Message-ID: <20250428150530.GA670882@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,223 +65,168 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250426212253.40473-2-chath@bu.edu>
+In-Reply-To: <20250426212253.40473-3-chath@bu.edu>
 
-Hint: observe subject line conventions for the file you're changing.
-See "git log --oneline drivers/vfio/pci/vfio_pci_config.c".
-
-On Sat, Apr 26, 2025 at 09:22:48PM +0000, Chathura Rajapaksha wrote:
+On Sat, Apr 26, 2025 at 09:22:49PM +0000, Chathura Rajapaksha wrote:
 > Some PCIe devices trigger PCI bus errors when accesses are made to
 > unassigned regions within their PCI configuration space. On certain
 > platforms, this can lead to host system hangs or reboots.
-
-1) Define "unassigned regions".  From the patch, I infer that the
-64-byte header, capabilities, and extended capabilities are considered
-"assigned," and anything else would be "unassigned."
-
-2) Can you expand on what these certain platforms are and the details
-of what these errors are and how they're reported?  You mention
-"PCIe," but I suppose this is not really PCIe-specific.  I suppose the
-hang or reboot would be a consequence of the error being reported as
-SERR# or a platform-specific System Error (PCIe r6.0, sec 6.2.6)?
-
-In conventional PCI, we may not have control over SERR# assertion and
-the effect on the system.  In PCIe, bits in the Root Control register
-should control SERR# assertion.
-
+> 
 > The current vfio-pci driver allows guests to access unassigned regions
 > in the PCI configuration space. Therefore, when such a device is passed
 > through to a guest, the guest can induce a host system hang or reboot
 > through crafted configuration space accesses, posing a threat to
 > system availability.
 > 
-> This patch introduces support for blocking guest accesses to unassigned
-> PCI configuration space, and the ability to bypass this access control
-> for specific devices. The patch introduces three module parameters:
+> This patch introduces auditing support for config space accesses to
+> unassigned regions. When enabled, this logs such accesses for all
+> passthrough devices. 
+> This feature is controlled via a new Kconfig option:
 
-We already know which patch this refers to (so "this patch" is
-unnecessary) and typical style is to use imperative mood:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?id=v6.14#n94
+Add blank line between paragraphs.
 
->    block_pci_unassigned_write:
->    Blocks write accesses to unassigned config space regions.
+>   CONFIG_VFIO_PCI_UNASSIGNED_ACCESS_AUDIT
 > 
->    block_pci_unassigned_read:
->    Blocks read accesses to unassigned config space regions.
-> 
->    uaccess_allow_ids:
->    Specifies the devices for which the above access control is bypassed.
->    The value is a comma-separated list of device IDs in
->    <vendor_id>:<device_id> format.
-> 
->    Example usage:
->    To block guest write accesses to unassigned config regions for all
->    passed through devices except for the device with vendor ID 0x1234 and
->    device ID 0x5678:
-> 
->    block_pci_unassigned_write=1 uaccess_allow_ids=1234:5678
-> 
+> A new audit event type, AUDIT_VFIO, has been introduced to support
+> this, allowing administrators to monitor and investigate suspicious
+> behavior by guests.
+
+Use imperative mood ("Introduce" instead of "This patch introduces
+..." and "Add ..." instead of "A new type has been introduced").
+
 > Co-developed by: William Wang <xwill@bu.edu>
 > Signed-off-by: William Wang <xwill@bu.edu>
 > Signed-off-by: Chathura Rajapaksha <chath@bu.edu>
 > ---
->  drivers/vfio/pci/vfio_pci_config.c | 122 ++++++++++++++++++++++++++++-
->  1 file changed, 121 insertions(+), 1 deletion(-)
+>  drivers/vfio/pci/Kconfig           | 12 ++++++++
+>  drivers/vfio/pci/vfio_pci_config.c | 46 ++++++++++++++++++++++++++++--
+>  include/uapi/linux/audit.h         |  1 +
+>  3 files changed, 57 insertions(+), 2 deletions(-)
 > 
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index c3bcb6911c53..7f9f16262b90 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -42,6 +42,18 @@ config VFIO_PCI_IGD
+>  	  and LPC bridge config space.
+>  
+>  	  To enable Intel IGD assignment through vfio-pci, say Y.
+> +
+> +config VFIO_PCI_UNASSIGNED_ACCESS_AUDIT
+> +	bool "Audit accesses to unassigned PCI configuration regions"
+> +	depends on AUDIT && VFIO_PCI_CORE
+> +	help
+> +	  Some PCIe devices are known to cause bus errors when accessing
+> +	  unassigned PCI configuration space, potentially leading to host
+> +	  system hangs on certain platforms. When enabled, this option
+> +	  audits accesses to unassigned PCI configuration regions.
+> +
+> +	  If you don't know what to do here, say N.
+> +
+>  endif
+>  
+>  config VFIO_PCI_ZDEV_KVM
 > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> index 8f02f236b5b4..cb4d11aa5598 100644
+> index cb4d11aa5598..ddd10904d60f 100644
 > --- a/drivers/vfio/pci/vfio_pci_config.c
 > +++ b/drivers/vfio/pci/vfio_pci_config.c
-> @@ -120,6 +120,106 @@ struct perm_bits {
->  #define	NO_WRITE	0
->  #define	ALL_WRITE	0xFFFFFFFFU
+> @@ -25,6 +25,7 @@
+>  #include <linux/uaccess.h>
+>  #include <linux/vfio.h>
+>  #include <linux/slab.h>
+> +#include <linux/audit.h>
 >  
-> +static bool block_pci_unassigned_write;
-> +module_param(block_pci_unassigned_write, bool, 0644);
-> +MODULE_PARM_DESC(block_pci_unassigned_write,
-> +		 "Block write accesses to unassigned PCI config regions.");
-> +
-> +static bool block_pci_unassigned_read;
-> +module_param(block_pci_unassigned_read, bool, 0644);
-> +MODULE_PARM_DESC(block_pci_unassigned_read,
-> +		 "Block read accesses from unassigned PCI config regions.");
-> +
-> +static char *uaccess_allow_ids;
-> +module_param(uaccess_allow_ids, charp, 0444);
-> +MODULE_PARM_DESC(uaccess_allow_ids, "PCI IDs to allow access to unassigned PCI config regions, format is \"vendor:device\" and multiple comma separated entries can be specified");
-> +
-> +static LIST_HEAD(allowed_device_ids);
-> +static DEFINE_SPINLOCK(device_ids_lock);
-> +
-> +struct uaccess_device_id {
-> +	struct list_head slot_list;
-> +	unsigned short vendor;
-> +	unsigned short device;
+>  #include "vfio_pci_priv.h"
+>  
+> @@ -1980,6 +1981,37 @@ static size_t vfio_pci_cap_remaining_dword(struct vfio_pci_core_device *vdev,
+>  	return i;
+>  }
+>  
+> +enum vfio_audit {
+> +	VFIO_AUDIT_READ,
+> +	VFIO_AUDIT_WRITE,
+> +	VFIO_AUDIT_MAX,
 > +};
 > +
-> +static void pci_uaccess_add_device(struct uaccess_device_id *new,
-> +				   int vendor, int device)
+> +static const char * const vfio_audit_str[VFIO_AUDIT_MAX] = {
+> +	[VFIO_AUDIT_READ]  = "READ",
+> +	[VFIO_AUDIT_WRITE] = "WRITE",
+> +};
+> +
+> +static void vfio_audit_access(const struct pci_dev *pdev,
+> +			      size_t count, loff_t *ppos, bool blocked, unsigned int op)
 > +{
-> +	struct uaccess_device_id *pci_dev_id;
-> +	unsigned long flags;
-> +	int found = 0;
+> +	struct audit_buffer *ab;
 > +
-> +	spin_lock_irqsave(&device_ids_lock, flags);
-> +
-> +	list_for_each_entry(pci_dev_id, &allowed_device_ids, slot_list) {
-> +		if (pci_dev_id->vendor == vendor &&
-> +		    pci_dev_id->device == device) {
-> +			found = 1;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!found) {
-> +		new->vendor = vendor;
-> +		new->device = device;
-> +		list_add_tail(&new->slot_list, &allowed_device_ids);
-> +	}
-> +
-> +	spin_unlock_irqrestore(&device_ids_lock, flags);
-> +
-> +	if (found)
-> +		kfree(new);
+> +	if (WARN_ON_ONCE(op >= VFIO_AUDIT_MAX))
+> +		return;
+> +	if (audit_enabled == AUDIT_OFF)
+> +		return;
+> +	ab = audit_log_start(audit_context(), GFP_ATOMIC, AUDIT_VFIO);
+> +	if (unlikely(!ab))
+> +		return;
+> +	audit_log_format(ab,
+> +			 "device=%04x:%02x:%02x.%d access=%s offset=0x%llx size=%ld blocked=%u\n",
+> +			 pci_domain_nr(pdev->bus), pdev->bus->number,
+> +			 PCI_SLOT(pdev->devfn), PCI_FUNC(pdev->devfn),
+> +			 vfio_audit_str[op], *ppos, count, blocked);
+> +	audit_log_end(ab);
 > +}
 > +
-> +static bool pci_uaccess_lookup(struct pci_dev *dev)
-> +{
-> +	struct uaccess_device_id *pdev_id;
-> +	unsigned long flags;
-> +	bool found = false;
-> +
-> +	spin_lock_irqsave(&device_ids_lock, flags);
-> +	list_for_each_entry(pdev_id, &allowed_device_ids, slot_list) {
-> +		if (pdev_id->vendor == dev->vendor &&
-> +		    pdev_id->device == dev->device) {
-> +			found = true;
-> +			break;
-> +		}
-> +	}
-> +	spin_unlock_irqrestore(&device_ids_lock, flags);
-> +
-> +	return found;
-> +}
-> +
-> +static int __init pci_uaccess_init(void)
-> +{
-> +	char *p, *id;
-> +	int fields;
-> +	int vendor, device;
-> +	struct uaccess_device_id *pci_dev_id;
-> +
-> +	/* add ids specified in the module parameter */
-> +	p = uaccess_allow_ids;
-> +	while ((id = strsep(&p, ","))) {
-> +		if (!strlen(id))
-> +			continue;
-> +
-> +		fields = sscanf(id, "%x:%x", &vendor, &device);
-> +
-> +		if (fields != 2) {
-> +			pr_warn("Invalid id string \"%s\"\n", id);
-> +			continue;
-> +		}
-> +
-> +		pci_dev_id = kmalloc(sizeof(*pci_dev_id), GFP_KERNEL);
-> +		if (!pci_dev_id)
-> +			return -ENOMEM;
-> +
-> +		pci_uaccess_add_device(pci_dev_id, vendor, device);
-> +	}
-> +	return 0;
-> +}
-> +
->  static int vfio_user_config_read(struct pci_dev *pdev, int offset,
->  				 __le32 *val, int count)
+>  static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+>  				 size_t count, loff_t *ppos, bool iswrite)
 >  {
-> @@ -335,6 +435,18 @@ static struct perm_bits unassigned_perms = {
->  	.writefn = vfio_raw_config_write
->  };
+> @@ -1989,6 +2021,7 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
+>  	int cap_start = 0, offset;
+>  	u8 cap_id;
+>  	ssize_t ret;
+> +	bool blocked;
 >  
-> +/*
-> + * Read/write access to PCI unassigned config regions can be blocked
-> + * using the block_pci_unassigned_read and block_pci_unassigned_write
-> + * module parameters. The uaccess_allow_ids module parameter can be used
-> + * to whitelist devices (i.e., bypass the block) when either of the
-> + * above parameters is specified.
-> + */
-> +static struct perm_bits block_unassigned_perms = {
-> +	.readfn = NULL,
-> +	.writefn = NULL
-> +};
-> +
->  static struct perm_bits virt_perms = {
->  	.readfn = vfio_virt_config_read,
->  	.writefn = vfio_virt_config_write
-> @@ -1108,6 +1220,9 @@ int __init vfio_pci_init_perm_bits(void)
->  	ecap_perms[PCI_EXT_CAP_ID_VNDR].writefn = vfio_raw_config_write;
->  	ecap_perms[PCI_EXT_CAP_ID_DVSEC].writefn = vfio_raw_config_write;
->  
-> +	/* Device list allowed to access unassigned PCI regions */
-> +	ret |= pci_uaccess_init();
-> +
->  	if (ret)
->  		vfio_pci_uninit_perm_bits();
->  
-> @@ -1896,7 +2011,12 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
+>  	if (*ppos < 0 || *ppos >= pdev->cfg_size ||
+>  	    *ppos + count > pdev->cfg_size)
+> @@ -2011,13 +2044,22 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user
 >  	cap_id = vdev->pci_config_map[*ppos];
 >  
 >  	if (cap_id == PCI_CAP_ID_INVALID) {
-> -		perm = &unassigned_perms;
-> +		if (((iswrite && block_pci_unassigned_write) ||
-> +		     (!iswrite && block_pci_unassigned_read)) &&
-> +		    !pci_uaccess_lookup(pdev))
-> +			perm = &block_unassigned_perms;
-> +		else
-> +			perm = &unassigned_perms;
+> -		if (((iswrite && block_pci_unassigned_write) ||
+> +		blocked = (((iswrite && block_pci_unassigned_write) ||
+>  		     (!iswrite && block_pci_unassigned_read)) &&
+> -		    !pci_uaccess_lookup(pdev))
+> +		    !pci_uaccess_lookup(pdev));
+> +		if (blocked)
+>  			perm = &block_unassigned_perms;
+>  		else
+>  			perm = &unassigned_perms;
 >  		cap_start = *ppos;
+> +		if (IS_ENABLED(CONFIG_VFIO_PCI_UNASSIGNED_ACCESS_AUDIT)) {
+> +			if (iswrite)
+> +				vfio_audit_access(pdev, count, ppos, blocked,
+> +						  VFIO_AUDIT_WRITE);
+> +			else
+> +				vfio_audit_access(pdev, count, ppos, blocked,
+> +						  VFIO_AUDIT_READ);
+> +		}
+
+Simplify this patch by adding "blocked" in the first patch.  Then you
+won't have to touch the permission checking that is unrelated to the
+audit logging.  Consider adding a helper to do the checking and return
+"blocked" so it doesn't clutter vfio_config_do_rw().
+
 >  	} else if (cap_id == PCI_CAP_ID_INVALID_VIRT) {
 >  		perm = &virt_perms;
+>  		cap_start = *ppos;
+> diff --git a/include/uapi/linux/audit.h b/include/uapi/linux/audit.h
+> index 9a4ecc9f6dc5..c0aace7384f3 100644
+> --- a/include/uapi/linux/audit.h
+> +++ b/include/uapi/linux/audit.h
+> @@ -122,6 +122,7 @@
+>  #define AUDIT_OPENAT2		1337	/* Record showing openat2 how args */
+>  #define AUDIT_DM_CTRL		1338	/* Device Mapper target control */
+>  #define AUDIT_DM_EVENT		1339	/* Device Mapper events */
+> +#define AUDIT_VFIO		1340	/* VFIO events */
+>  
+>  #define AUDIT_AVC		1400	/* SE Linux avc denial or grant */
+>  #define AUDIT_SELINUX_ERR	1401	/* Internal SE Linux Errors */
 > -- 
 > 2.34.1
 > 
