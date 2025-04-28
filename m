@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-44614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49B2FA9FD0A
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 00:29:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4F39A9FD0B
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 00:31:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAE7A1A87B41
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 22:29:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE0715A5DBA
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 22:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D3C821147C;
-	Mon, 28 Apr 2025 22:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A52F20E704;
+	Mon, 28 Apr 2025 22:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmmQV+7j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LSiprqDY"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BB815ECD7
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 22:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D41139CE3
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 22:31:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745879375; cv=none; b=fvFSqQ8vO9ppgbOeXdgmWB2a2BiEzTkXEPYcBkJdvwAiccC11m4dVjCm6YkaHlript89XmfdAVGWiblylQVJnlQ3lNhh0PJv9dVC1ZuCuKrAte16qPLijKcLBW7/3vL6q/agL9M0BahOYGk5SDPhQhJw5lehUDjJ63qLAf+nKYY=
+	t=1745879487; cv=none; b=YFj0nvZhtogdlGMBLnsAPrcjbcQF0nFPxwjOshofCxT+WtL6lRkL7IOQ+iRTddpkUTfUHCj+5Im35DZNwHfIRETLguSnrxhUGoHyVenDxl7CNdBuGCOO5nHTJRgMzabPrD3mCwKrbPENznZKcUkGoKTZJcYbyx6JSRolYWZFmGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745879375; c=relaxed/simple;
-	bh=Y7Tr/APYYGaMI834mQtrhUPjbD6Go3EnTnCeehtR+K8=;
+	s=arc-20240116; t=1745879487; c=relaxed/simple;
+	bh=j6ZBehtM7oDxSHW/r05lIxNL4kOdi+rnQ1wxLD72FWc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dgXZqYdE/ICii4We0wQZUnPtSOyYE9INi45aIk2S5NVF+zUOxEUwqahF1WsQKWJLNadEy9NZ/ZeZ1AFxDCZmLnyqnGwwi/fBB3PEfodZvF3sSpyEp8WmrPPi8PvoXQP8XX8cQ/8Oz4DJ0bJR76KYPWJeI641I1hDr2qi91a1BmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmmQV+7j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A724C4CEEF
-	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 22:29:35 +0000 (UTC)
+	 Content-Type:MIME-Version; b=V20UPjIBq+K/+Zvo9XrDVEbG662LuHmRKd7pj5KwHkAwlQKhuc3IMz1TVXtPQLzNHeo35BYG4AFIN7JrcsAdo8lY8UlMkF34p0kSOwVvzztW/GrTmSw2z0NDSpV9dYrXdp5GZI/gyzmOsp4Z/PR3j/uBtGyt+sfPpVpIaz2r2Po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LSiprqDY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0A21EC4CEEF
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 22:31:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745879375;
-	bh=Y7Tr/APYYGaMI834mQtrhUPjbD6Go3EnTnCeehtR+K8=;
+	s=k20201202; t=1745879487;
+	bh=j6ZBehtM7oDxSHW/r05lIxNL4kOdi+rnQ1wxLD72FWc=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=SmmQV+7jQ8tRusgnwptXGz1v4nZQjh6GSks7PHI2P2eqZrugcejl5vcz/30GwmBg0
-	 QikpnvvkZW9zvh8E5tEObrVxVwEQjoTeN8pIunVfcme3tbS0lg3ikozJ74MZk4xmf2
-	 ja5/LxE/DrbcC4RVK999C1uzC+amxI+OmZ/Y9/VrIDSg/+vmWwzzOroOvEkJ0xH8XA
-	 yw9p7jrsVNwgTTzgcQdYZ4uzb8WAi419YsBFOc7rGp3IAAAlUhs3BWIwZ9t/Q48Y5z
-	 a2yWR+90f/Hg1tTTH/Wf98wwoGdjvWJeY9gEXhjQ4/FLDtvNeYAcF2ER0B+GdZP1FH
-	 jeu9TxfOxpK+A==
+	b=LSiprqDYniFb36fwmCtuJavans4/Ka5go0qLSzqAik0TMi4vI+5kJ1ZeP9FbYEd7r
+	 +Bk1z4Q6yqgqQUs/tTG40EXRfQZrTBnGhC8hYZQxo+TkKL9tUZdDgj5DLPuQy0Emmj
+	 CII5I7hgoOFE2iH3srcydFVpoZtvtP8OmGnuk5CAlV5HPu9YncDX7SKvOiJBWwNZa+
+	 ZRV+ym72sRAkekbp6HdG6eeXQenpRlTBgUFZ5SxrOPq6PLPzD5qn1sUQoMUc5/u5FU
+	 UM77fgEj0Sj0RgpEEcHghkgVux9r8tdvloe8hrs/OgjZ7zZhLBfYbdJ5ZL2sRvPy1G
+	 4y9ykJVJGK/4g==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 729AAC41612; Mon, 28 Apr 2025 22:29:35 +0000 (UTC)
+	id E7EADC4160E; Mon, 28 Apr 2025 22:31:26 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: kvm@vger.kernel.org
 Subject: [Bug 220057] Kernel regression. Linux VMs crashing (I did not test
  Windows guest VMs)
-Date: Mon, 28 Apr 2025 22:29:35 +0000
+Date: Mon, 28 Apr 2025 22:31:26 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -63,7 +63,7 @@ X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-220057-28872-E97SQ9YTEh@https.bugzilla.kernel.org/>
+Message-ID: <bug-220057-28872-54r6UnXgP8@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-220057-28872@https.bugzilla.kernel.org/>
 References: <bug-220057-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -79,12 +79,12 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D220057
 
---- Comment #17 from Adolfo (adolfotregosa@gmail.com) ---
-Created attachment 308046
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D308046&action=3Dedit
-phys-bits=3D39
+--- Comment #18 from Adolfo (adolfotregosa@gmail.com) ---
+Created attachment 308047
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D308047&action=3Dedit
+lspcu output
 
-log with phys-bits=3D39 on cpu line
+lspcu output has requested.
 
 --=20
 You may reply to this email to add a comment.
