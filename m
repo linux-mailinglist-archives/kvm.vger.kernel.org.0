@@ -1,127 +1,98 @@
-Return-Path: <kvm+bounces-44610-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44611-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B7EA9FC64
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 23:42:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01E0CA9FC89
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 23:49:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 960051A80C1A
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 21:42:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6D7817568F
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 21:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C118A94A;
-	Mon, 28 Apr 2025 21:42:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9DF1EF39B;
+	Mon, 28 Apr 2025 21:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K8DqQ8pT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wpew325E"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFFC78F32;
-	Mon, 28 Apr 2025 21:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D455735973
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 21:49:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745876555; cv=none; b=JRYsfbieEzjL7av8JutSSH6goaK54oVl+tQ2thuCVnkFUe7Ymyn61X4mTJRhMhtgTLrEq7ADd5vwx0q+xZi4DVlOc3ZBRUuquocCoIC6ti+nUfYj45KYimfJso0cCMMHhPiOhJqtDAI/zp8GYQmoQDh2ZD94Vt4hpoF7LQNGeGo=
+	t=1745876951; cv=none; b=PEIWBJHaV5tJpxhD+Qql6Qd86bbiLdElZgx3g5vHK3Wuk1MhF5XMGnX4dpghLjf/yBwWoL7wDcW1CyROFJEIFdaOMERUGPWKliGlmdD+9Vp9wevIJ3GfgZYQTzMo/V4jALzBYLe7smiclbXpUhzlllNM5MdInpSFi486Zteg+Zw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745876555; c=relaxed/simple;
-	bh=WDfKqbcsBrjOAyu4p9vHAjT/PfAev08KoKpJPLD9i6g=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WTVzgw8fZS5bs3AfAWoh1UZi/02lHXK5V9HVH6Gapmidkg8JagJ1sGKaunFAem/HK8yWYrcBFQTANJ9P1Kqiu4decKNyVImC2+oqhAbRqo5wWjbz5IbN+8/5qEoFFcz+5ox9sjaETVKdFe6xIkULk4s/U9OgGkhCp3miKZD5IuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K8DqQ8pT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0ACFC4CEE4;
-	Mon, 28 Apr 2025 21:42:34 +0000 (UTC)
+	s=arc-20240116; t=1745876951; c=relaxed/simple;
+	bh=EsvQDxqm4duRsISk9T1Zc+KRcskLD9WrrR7EMMPq6YE=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UMULS99aS5jyTHKlYLzCkW1LI3Jt0DHrjbvt72LdhpXXcRzK2qfxwrPdI6uBsNPUj7+dOfQ1dYt0FtzyHbwrS6f1yxagsukT96+niu5lLSJJ3tx+BCsl1mEvAHq8or3roQUY6WulcHs74a/Gj1XULND0PlsrRpTU5xZRkAgg+PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wpew325E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 513E6C4CEEF
+	for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 21:49:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745876555;
-	bh=WDfKqbcsBrjOAyu4p9vHAjT/PfAev08KoKpJPLD9i6g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K8DqQ8pTgHsxIbVHJUCtzGRBdzSNsK0un9crwW/79lrTO1JE5Xb9tgfoHH2yZdw1F
-	 ZxaELOJXovD4OO0SCHzMCCUAnIsFPDCLVY8C1+xlArPeXD8P7WZxlt8RCyGmNzz/K5
-	 U+h++XeehSrlF+afbTRahxEIgi6EzHi5NGoNaidiIjR90Jl1cq5jL30bHOuVw/MDkV
-	 a9QoUKx7cWrgH4G+P+8VxG9c9jpEcbAa1W18FlB/K9jBshIvhr8C3HeF4t5XZYPj7T
-	 fqeSwYg14HY/U+lpnLGr39Bulw6Ob9IurGyhNze8DCARq+as4I0XHSjLuyj8x33fMA
-	 6tZGlOmrFrIFQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u9WFE-009gYN-O8;
-	Mon, 28 Apr 2025 22:42:32 +0100
-Date: Mon, 28 Apr 2025 22:42:24 +0100
-Message-ID: <86jz74hsjj.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose
- <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 00/42] KVM: arm64: Revamp Fine Grained Trap handling
-In-Reply-To: <4e63a13f-c5dc-4f97-879a-26b5548da07f@os.amperecomputing.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
-	<4e63a13f-c5dc-4f97-879a-26b5548da07f@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1745876950;
+	bh=EsvQDxqm4duRsISk9T1Zc+KRcskLD9WrrR7EMMPq6YE=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=Wpew325EezHTJ0z0guqHC2E5oabZu3PjrHroLPouXXHH9bOrQPstEXJOGDJ+D3Kcr
+	 7e+C7lzLiN3UD5EMfAtfCLGD11ILH124QUWSF8YH46t5IicTb1M3JqHvowPeGoeLKK
+	 mRa+vFZzNbudh3gy7qjHS1fAYZ0zosULBLzc9wW1MvboNvuGieVIRrR7jGl+l6Rmob
+	 MjuZOXzD4utpD9TQIVKUjku3P3KbItAGlqNk8hkIIP3dsa4/LeEXqYjS5Q7opNgBq6
+	 NHdE+wSheD7sF5abQcN9YU6M6OrtNdBBvkr1rxke4XXVPWKt0MOZXsVP7tHdHnSt3Z
+	 Yve7sFNwY+1yg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 443C1C53BC5; Mon, 28 Apr 2025 21:49:10 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 220057] Kernel regression. Linux VMs crashing (I did not test
+ Windows guest VMs)
+Date: Mon, 28 Apr 2025 21:49:09 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: adolfotregosa@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-220057-28872-YDSGrLyR6E@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-220057-28872@https.bugzilla.kernel.org/>
+References: <bug-220057-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
 
-On Mon, 28 Apr 2025 19:33:10 +0100,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> Hi Marc,
-> 
-> I am trying nv-next branch and I believe these FGT related changes are
-> merged. With this, selftest arm64/set_id_regs is failing. From initial
-> debug it seems, the register access of SYS_CTR_EL0, SYS_MIDR_EL1,
-> SYS_REVIDR_EL1 and SYS_AIDR_EL1 from guest_code is resulting in trap
-> to EL2 (HCR_ID1,ID2 are set) and is getting forwarded back to EL1,
-> since EL1 sync handler is not installed in the test code, resulting in
-> hang(endless guest_exit/entry).
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220057
 
-I don't see this problem here. At the very least, an EL1 Linux guest
-runs just fine accessing these registers.
+--- Comment #14 from Adolfo (adolfotregosa@gmail.com) ---
+Created attachment 308045
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D308045&action=3Dedit
+vfio_map_dma failed
 
-> 
-> It is due to function "triage_sysreg_trap" is returning true.
-> 
-> When guest_code is in EL1 (default case) it is due to return in below if.
-> 
->  if (tc.fgt != __NO_FGT_GROUP__ &&
->             (vcpu->kvm->arch.fgu[tc.fgt] & BIT(tc.bit))) {
->                 kvm_inject_undefined(vcpu);
->                 return true;
->         }
-> 
-> IMO, Host should return the value of these sysreg read instead of
-> forwarding the trap to guest or something more to be added to
-> testcode?
+I forgot. I have no idea if this is even remotely linked but I'll leave it =
+here
+just in case.
 
-This is not a forward. It is an UNDEF. But none of these system
-registers are ever supposed to UNDEF.
+host journalctl: vfio_map_dma failed.
 
-So something is setting the FGU bit mapped to HFGRTR_EL2.MIDR_EL1 to
-1, and forces the register to UNDEF, assuming your analysis is
-correct. I'm afraid you'll have to dig a bit deeper.
+--=20
+You may reply to this email to add a comment.
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
