@@ -1,52 +1,53 @@
-Return-Path: <kvm+bounces-44539-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44540-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10ACA9EBF5
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 11:27:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE33EA9EC01
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 11:28:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 246351785C8
-	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 09:26:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 876533B2A7C
+	for <lists+kvm@lfdr.de>; Mon, 28 Apr 2025 09:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2881268699;
-	Mon, 28 Apr 2025 09:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CA5268FCC;
+	Mon, 28 Apr 2025 09:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QUB1lhoO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i33plADx"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DCE267F4D;
-	Mon, 28 Apr 2025 09:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879D425F99A;
+	Mon, 28 Apr 2025 09:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745832199; cv=none; b=ObSSUyP5xqzzSU7vLmgGU9QRiqwOdNQXxsJ5YBsPZCnQ0XN5kcLnM7yG0I5Q3dc6jv8qRhfYr1rDGOHGSmobl4ZdBbxHHIY802lPJsm6WNDcoiLiShL7jioslzdrZCSDskaoaCkeOZX57NgZt8GsLTAwmpzcdNrKBbNkaGB2WIc=
+	t=1745832203; cv=none; b=P9/7rOossnq5RMt23Hqq7JnZHJNVvckxHgpbvnZcKy2GrF8jZ9PoXS7ESRJkRn2ZEG/XXJT0aEymD/KUpneI5GxyTVOWARICbj6jQy2cvXMh2Y99KxkXrXBBPpyUSg4XeJ764puyfezkVsoORPpuWHtjqsV0eYlgddajPJu1I5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745832199; c=relaxed/simple;
-	bh=d1+z79zg+kihe5QDvuiZPuBTqwMqD9eJrziwPARATZw=;
+	s=arc-20240116; t=1745832203; c=relaxed/simple;
+	bh=DqmELyRaD+HKliKs+yhB7fshFSe2Z6G/xyJIpc/k6wk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lVeyjq621AcFCL2p2+3m5ssy8s8lzVqLizMC8cPVdBYhBFOKi9j/VKtLVLNT0bQhxNsPstqJclHadILX6IBCsUPoNErNafAT+4GOX7AJ5eYE+7Vj36ZHq45cHFfAOmylamkm2MNbfHQcHDvwZ/t4/caL2Na45zlTw505k3UfHrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QUB1lhoO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C251DC4CEE4;
-	Mon, 28 Apr 2025 09:23:17 +0000 (UTC)
+	 MIME-Version; b=P73msq3t61U9sRwq56T13iDWhvljOdAVU+YkRxUpuRhq99Uu9loKVx5Uyu0DzOQvspY74939ifISoy4LNi3qP5xowXxB6ye79Bh50rVNxVayeAJtvi/JaWp3F3bmzy36iHwtQcQqk5FvryKqUmxGHam3v10rZtgvl32pJ9fj7qA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i33plADx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A77BC4CEE4;
+	Mon, 28 Apr 2025 09:23:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745832198;
-	bh=d1+z79zg+kihe5QDvuiZPuBTqwMqD9eJrziwPARATZw=;
+	s=k20201202; t=1745832202;
+	bh=DqmELyRaD+HKliKs+yhB7fshFSe2Z6G/xyJIpc/k6wk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QUB1lhoO/1KGr0Qc2Y24vqWWVYEtzDQTf470PaEamVy2aHjYRrcXKp64fObLbiKH+
-	 bNxqnX7fKat1w5Xi0X35HNlsQwBZlouj12aYi2WunJrqDdDkEZlSfGcPj6HiaI9DBw
-	 U4gv7P24gIYOH7FsCzIuDcSsU8D4IKS4z1awHvLgXavst4fRip90kp2o+6YpEv2CE2
-	 zYvt45+/xEIlk1NMEv8TEY13AZoY9Cl4xN7/bvC563NKc5l8drOkGBh2g4VXmWHRNK
-	 pjPmt5XByo10SIhSxFUP3e5wIu8MqQfto5Bo6kx9K8xXZcJiKA5RQmTVg0LE+SeQWw
-	 z7Cz3rAsfEiPw==
+	b=i33plADx4mBDh4Mg0JhS7PdQonorQCsmo5YRKErsBgYKa4z8vOidmkY/AfS0xrH1Z
+	 yFDIAo01whKRGniuFCRzbw1+F6BnXoeGa8ey25ORoO6MG2G3/eXqsW1FNher3MmIz0
+	 +9dEW6mpOEwloxkUFgK2y3up8HxeJXMHWV+4XbrTQYL5Or5e//10k5C7G4pNzcKJ/m
+	 oANUDjKdfpR/c4GB4V24c0eKKek4BVX9/RgbDOjLjhU8rGCdF1gxhQqNesdw2rfrrL
+	 MyYaLBYM5LnbvqLH5GsIk9qtApa0VRVHM28Dg1Mr4VJ5Nm2VYTSsLzNp0HPAb/dB/M
+	 4dv4HRnILcU/A==
 From: Leon Romanovsky <leon@kernel.org>
 To: Marek Szyprowski <m.szyprowski@samsung.com>,
 	Jens Axboe <axboe@kernel.dk>,
 	Christoph Hellwig <hch@lst.de>,
 	Keith Busch <kbusch@kernel.org>
-Cc: Jake Edge <jake@lwn.net>,
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Jake Edge <jake@lwn.net>,
 	Jonathan Corbet <corbet@lwn.net>,
 	Jason Gunthorpe <jgg@ziepe.ca>,
 	Zhu Yanjun <zyjzyj2000@gmail.com>,
@@ -78,10 +79,10 @@ Cc: Jake Edge <jake@lwn.net>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Kanchan Joshi <joshi.k@samsung.com>,
 	Chaitanya Kulkarni <kch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [PATCH v10 09/24] docs: core-api: document the IOVA-based API
-Date: Mon, 28 Apr 2025 12:22:15 +0300
-Message-ID: <3c386dfbff489abb871e550c227af65eb90f920d.1745831017.git.leon@kernel.org>
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: [PATCH v10 10/24] mm/hmm: let users to tag specific PFN with DMA mapped bit
+Date: Mon, 28 Apr 2025 12:22:16 +0300
+Message-ID: <b2775690dec43b548ec8c0f1fb6ece9308fd68a6.1745831017.git.leon@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <cover.1745831017.git.leon@kernel.org>
 References: <cover.1745831017.git.leon@kernel.org>
@@ -93,99 +94,192 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Christoph Hellwig <hch@lst.de>
+From: Leon Romanovsky <leonro@nvidia.com>
 
-Add an explanation of the newly added IOVA-based mapping API.
+Introduce new sticky flag (HMM_PFN_DMA_MAPPED), which isn't overwritten
+by HMM range fault. Such flag allows users to tag specific PFNs with
+information if this specific PFN was already DMA mapped.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
 Tested-by: Jens Axboe <axboe@kernel.dk>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- Documentation/core-api/dma-api.rst | 71 ++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+ include/linux/hmm.h | 20 ++++++++++++++++--
+ mm/hmm.c            | 51 ++++++++++++++++++++++++++++-----------------
+ 2 files changed, 50 insertions(+), 21 deletions(-)
 
-diff --git a/Documentation/core-api/dma-api.rst b/Documentation/core-api/dma-api.rst
-index 8e3cce3d0a23..2ad08517e626 100644
---- a/Documentation/core-api/dma-api.rst
-+++ b/Documentation/core-api/dma-api.rst
-@@ -530,6 +530,77 @@ routines, e.g.:::
- 		....
+diff --git a/include/linux/hmm.h b/include/linux/hmm.h
+index 126a36571667..a43e56f273a1 100644
+--- a/include/linux/hmm.h
++++ b/include/linux/hmm.h
+@@ -23,6 +23,8 @@ struct mmu_interval_notifier;
+  * HMM_PFN_WRITE - if the page memory can be written to (requires HMM_PFN_VALID)
+  * HMM_PFN_ERROR - accessing the pfn is impossible and the device should
+  *                 fail. ie poisoned memory, special pages, no vma, etc
++ * HMM_PFN_DMA_MAPPED - Flag preserved on input-to-output transformation
++ *                      to mark that page is already DMA mapped
+  *
+  * On input:
+  * 0                 - Return the current state of the page, do not fault it.
+@@ -36,13 +38,19 @@ enum hmm_pfn_flags {
+ 	HMM_PFN_VALID = 1UL << (BITS_PER_LONG - 1),
+ 	HMM_PFN_WRITE = 1UL << (BITS_PER_LONG - 2),
+ 	HMM_PFN_ERROR = 1UL << (BITS_PER_LONG - 3),
+-	HMM_PFN_ORDER_SHIFT = (BITS_PER_LONG - 8),
++	/*
++	 * Sticky flags, carried from input to output,
++	 * don't forget to update HMM_PFN_INOUT_FLAGS
++	 */
++	HMM_PFN_DMA_MAPPED = 1UL << (BITS_PER_LONG - 4),
++
++	HMM_PFN_ORDER_SHIFT = (BITS_PER_LONG - 9),
+ 
+ 	/* Input flags */
+ 	HMM_PFN_REQ_FAULT = HMM_PFN_VALID,
+ 	HMM_PFN_REQ_WRITE = HMM_PFN_WRITE,
+ 
+-	HMM_PFN_FLAGS = 0xFFUL << HMM_PFN_ORDER_SHIFT,
++	HMM_PFN_FLAGS = ~((1UL << HMM_PFN_ORDER_SHIFT) - 1),
+ };
+ 
+ /*
+@@ -57,6 +65,14 @@ static inline struct page *hmm_pfn_to_page(unsigned long hmm_pfn)
+ 	return pfn_to_page(hmm_pfn & ~HMM_PFN_FLAGS);
+ }
+ 
++/*
++ * hmm_pfn_to_phys() - return physical address pointed to by a device entry
++ */
++static inline phys_addr_t hmm_pfn_to_phys(unsigned long hmm_pfn)
++{
++	return __pfn_to_phys(hmm_pfn & ~HMM_PFN_FLAGS);
++}
++
+ /*
+  * hmm_pfn_to_map_order() - return the CPU mapping size order
+  *
+diff --git a/mm/hmm.c b/mm/hmm.c
+index 082f7b7c0b9e..51fe8b011cc7 100644
+--- a/mm/hmm.c
++++ b/mm/hmm.c
+@@ -39,13 +39,20 @@ enum {
+ 	HMM_NEED_ALL_BITS = HMM_NEED_FAULT | HMM_NEED_WRITE_FAULT,
+ };
+ 
++enum {
++	/* These flags are carried from input-to-output */
++	HMM_PFN_INOUT_FLAGS = HMM_PFN_DMA_MAPPED,
++};
++
+ static int hmm_pfns_fill(unsigned long addr, unsigned long end,
+ 			 struct hmm_range *range, unsigned long cpu_flags)
+ {
+ 	unsigned long i = (addr - range->start) >> PAGE_SHIFT;
+ 
+-	for (; addr < end; addr += PAGE_SIZE, i++)
+-		range->hmm_pfns[i] = cpu_flags;
++	for (; addr < end; addr += PAGE_SIZE, i++) {
++		range->hmm_pfns[i] &= HMM_PFN_INOUT_FLAGS;
++		range->hmm_pfns[i] |= cpu_flags;
++	}
+ 	return 0;
+ }
+ 
+@@ -202,8 +209,10 @@ static int hmm_vma_handle_pmd(struct mm_walk *walk, unsigned long addr,
+ 		return hmm_vma_fault(addr, end, required_fault, walk);
+ 
+ 	pfn = pmd_pfn(pmd) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+-	for (i = 0; addr < end; addr += PAGE_SIZE, i++, pfn++)
+-		hmm_pfns[i] = pfn | cpu_flags;
++	for (i = 0; addr < end; addr += PAGE_SIZE, i++, pfn++) {
++		hmm_pfns[i] &= HMM_PFN_INOUT_FLAGS;
++		hmm_pfns[i] |= pfn | cpu_flags;
++	}
+ 	return 0;
+ }
+ #else /* CONFIG_TRANSPARENT_HUGEPAGE */
+@@ -230,14 +239,14 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
+ 	unsigned long cpu_flags;
+ 	pte_t pte = ptep_get(ptep);
+ 	uint64_t pfn_req_flags = *hmm_pfn;
++	uint64_t new_pfn_flags = 0;
+ 
+ 	if (pte_none_mostly(pte)) {
+ 		required_fault =
+ 			hmm_pte_need_fault(hmm_vma_walk, pfn_req_flags, 0);
+ 		if (required_fault)
+ 			goto fault;
+-		*hmm_pfn = 0;
+-		return 0;
++		goto out;
  	}
  
-+Part Ie - IOVA-based DMA mappings
-+---------------------------------
-+
-+These APIs allow a very efficient mapping when using an IOMMU.  They are an
-+optional path that requires extra code and are only recommended for drivers
-+where DMA mapping performance, or the space usage for storing the DMA addresses
-+matter.  All the considerations from the previous section apply here as well.
-+
-+::
-+
-+    bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
-+		phys_addr_t phys, size_t size);
-+
-+Is used to try to allocate IOVA space for mapping operation.  If it returns
-+false this API can't be used for the given device and the normal streaming
-+DMA mapping API should be used.  The ``struct dma_iova_state`` is allocated
-+by the driver and must be kept around until unmap time.
-+
-+::
-+
-+    static inline bool dma_use_iova(struct dma_iova_state *state)
-+
-+Can be used by the driver to check if the IOVA-based API is used after a
-+call to dma_iova_try_alloc.  This can be useful in the unmap path.
-+
-+::
-+
-+    int dma_iova_link(struct device *dev, struct dma_iova_state *state,
-+		phys_addr_t phys, size_t offset, size_t size,
-+		enum dma_data_direction dir, unsigned long attrs);
-+
-+Is used to link ranges to the IOVA previously allocated.  The start of all
-+but the first call to dma_iova_link for a given state must be aligned
-+to the DMA merge boundary returned by ``dma_get_merge_boundary())``, and
-+the size of all but the last range must be aligned to the DMA merge boundary
-+as well.
-+
-+::
-+
-+    int dma_iova_sync(struct device *dev, struct dma_iova_state *state,
-+		size_t offset, size_t size);
-+
-+Must be called to sync the IOMMU page tables for IOVA-range mapped by one or
-+more calls to ``dma_iova_link()``.
-+
-+For drivers that use a one-shot mapping, all ranges can be unmapped and the
-+IOVA freed by calling:
-+
-+::
-+
-+   void dma_iova_destroy(struct device *dev, struct dma_iova_state *state,
-+		size_t mapped_len, enum dma_data_direction dir,
-+                unsigned long attrs);
-+
-+Alternatively drivers can dynamically manage the IOVA space by unmapping
-+and mapping individual regions.  In that case
-+
-+::
-+
-+    void dma_iova_unlink(struct device *dev, struct dma_iova_state *state,
-+		size_t offset, size_t size, enum dma_data_direction dir,
-+		unsigned long attrs);
-+
-+is used to unmap a range previously mapped, and
-+
-+::
-+
-+   void dma_iova_free(struct device *dev, struct dma_iova_state *state);
-+
-+is used to free the IOVA space.  All regions must have been unmapped using
-+``dma_iova_unlink()`` before calling ``dma_iova_free()``.
+ 	if (!pte_present(pte)) {
+@@ -253,16 +262,14 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
+ 			cpu_flags = HMM_PFN_VALID;
+ 			if (is_writable_device_private_entry(entry))
+ 				cpu_flags |= HMM_PFN_WRITE;
+-			*hmm_pfn = swp_offset_pfn(entry) | cpu_flags;
+-			return 0;
++			new_pfn_flags = swp_offset_pfn(entry) | cpu_flags;
++			goto out;
+ 		}
  
- Part II - Non-coherent DMA allocations
- --------------------------------------
+ 		required_fault =
+ 			hmm_pte_need_fault(hmm_vma_walk, pfn_req_flags, 0);
+-		if (!required_fault) {
+-			*hmm_pfn = 0;
+-			return 0;
+-		}
++		if (!required_fault)
++			goto out;
+ 
+ 		if (!non_swap_entry(entry))
+ 			goto fault;
+@@ -304,11 +311,13 @@ static int hmm_vma_handle_pte(struct mm_walk *walk, unsigned long addr,
+ 			pte_unmap(ptep);
+ 			return -EFAULT;
+ 		}
+-		*hmm_pfn = HMM_PFN_ERROR;
+-		return 0;
++		new_pfn_flags = HMM_PFN_ERROR;
++		goto out;
+ 	}
+ 
+-	*hmm_pfn = pte_pfn(pte) | cpu_flags;
++	new_pfn_flags = pte_pfn(pte) | cpu_flags;
++out:
++	*hmm_pfn = (*hmm_pfn & HMM_PFN_INOUT_FLAGS) | new_pfn_flags;
+ 	return 0;
+ 
+ fault:
+@@ -448,8 +457,10 @@ static int hmm_vma_walk_pud(pud_t *pudp, unsigned long start, unsigned long end,
+ 		}
+ 
+ 		pfn = pud_pfn(pud) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
+-		for (i = 0; i < npages; ++i, ++pfn)
+-			hmm_pfns[i] = pfn | cpu_flags;
++		for (i = 0; i < npages; ++i, ++pfn) {
++			hmm_pfns[i] &= HMM_PFN_INOUT_FLAGS;
++			hmm_pfns[i] |= pfn | cpu_flags;
++		}
+ 		goto out_unlock;
+ 	}
+ 
+@@ -507,8 +518,10 @@ static int hmm_vma_walk_hugetlb_entry(pte_t *pte, unsigned long hmask,
+ 	}
+ 
+ 	pfn = pte_pfn(entry) + ((start & ~hmask) >> PAGE_SHIFT);
+-	for (; addr < end; addr += PAGE_SIZE, i++, pfn++)
+-		range->hmm_pfns[i] = pfn | cpu_flags;
++	for (; addr < end; addr += PAGE_SIZE, i++, pfn++) {
++		range->hmm_pfns[i] &= HMM_PFN_INOUT_FLAGS;
++		range->hmm_pfns[i] |= pfn | cpu_flags;
++	}
+ 
+ 	spin_unlock(ptl);
+ 	return 0;
 -- 
 2.49.0
 
