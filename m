@@ -1,53 +1,52 @@
-Return-Path: <kvm+bounces-44661-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44663-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 712EEAA013E
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 06:07:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37AE9AA013F
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 06:08:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C45FF482BAA
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 04:07:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC3C73B7B71
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 04:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0685827586D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDA3275871;
 	Tue, 29 Apr 2025 04:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rRQ75lu0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sl1R/QSS"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C01270ED0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B9B270ECF;
 	Tue, 29 Apr 2025 04:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745899577; cv=none; b=pfrHwvliT7+J39elDBuEkcQuuQ31fY9Dcy5SL9A2aRtfOCkl0ymWGJw06SGd8XCE7vm9Tm/pg+uz/HBHkjEtW43cVKFV7FGbTfjc6YmaT9/X/GqjCr78ZxNzAHgSeZMbSkhgt25w/8WgoyuWs49xPXaJZy9yECXLr8jBoRDUecc=
+	t=1745899577; cv=none; b=j6QX7/RqOaXLlqnZTPmOrSYOHMoKVmJqnhrFJuUEEXszghDupSALo4wH7dD1IH3b/t4fFYSiGRYJqmIjol9wHIujAQpwPUdyrtHc2djr9RErkVQ6pM4onUXmf9WjF4MABIu50zmDwFNCVzvhjEZVhtBIqPtQJyIHoVOZ9myWcQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1745899577; c=relaxed/simple;
-	bh=xaBPg6MMzZtyI5BynxGLu2CWzfYAh0y0igpwIukNl4w=;
+	bh=k2PRcTC3BnKrnGtxiZbpr39EydncBfZx8pWBXCBrn+o=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RvMsLXax76/pjn56J0aRi+zcCeUSfNOoBzjkWQBjX9zxIPNpSYICxdJ0hDWhlxdqe8e0wTrOZLNrSxRSWntGa5iEe9jsQSlUx+tFkfJ6yBSc8i5uLF218phTcuh+KwlPhTPJSxbLasmBXplmxAqa0VOFRKsVRPldM9xFXjhmwIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rRQ75lu0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1D9C1C4CEF4;
+	 In-Reply-To:To:Cc; b=degmuJZKJ/AKIWvmKcc5xHA1W5cOWhbnVaWFVa/70FCGTVcpZHXY3Z0As4TqtjOmpvsSj3Qgs18GELsKkI+ZwfWl/zkS491HHmB+6TuLSz+sP6y8HxRRcZNd3+7hw5piBStKIglw7k3F3vveMZhFcldocTalk90DzTlwR/pEIXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sl1R/QSS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 32BAAC16AAE;
 	Tue, 29 Apr 2025 04:06:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1745899577;
-	bh=xaBPg6MMzZtyI5BynxGLu2CWzfYAh0y0igpwIukNl4w=;
+	bh=k2PRcTC3BnKrnGtxiZbpr39EydncBfZx8pWBXCBrn+o=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=rRQ75lu00znvBITjVyrAMVKtCn2AtPLSrSuYcoZf125A63zHSdMhkAi/HFUGNCNeK
-	 J7X1yl7r0rN29gdmq5SsHcGn/T7CmDF/ID2Uvi7mvr0PFwvdGJmCpdOIysf5LfRnjC
-	 1w21Gx6IhBsNzjDnYjd6ko75qTravedUuRFoDbjzIS1z9I6hCFuD3mi0z2GXS1i4t6
-	 27AUHJ9cCIxoiAkllQIMQpLiz/s3c9V6KCvxFG9I9FzO5D6fpDGPZSi6DGeJKkmgmX
-	 LtIjdVeuyd+wIT4KgskYvFdzQ7diMBplESrWTHBJv/Ah47o30uQF/CA+9DkHa7pT6h
-	 70djD7BzAwDPA==
+	b=sl1R/QSSKs05tUYWMQq/uiCadkREGBOU5tVJHGA66P2EkOFGfCC1JLNOssSpJjpfv
+	 i1N3YAK7hTIvrT9evYzjPTpMtl9av07WHvpZFrJXHyBHKvQWjn/JhigCD6fkfMAGPH
+	 JkY8VguW7fzhxvQAMEhDofx3SSxc7yjIqdbHjB9Zr5KEaqG9hWmkcjzjao55vtZ/NI
+	 q8WnG0Bz6jZ+4e+KKoj5E4dzgyIM5z1gqx+F00UJmhuUlydMRP5jx4WNva+ZnwM6YJ
+	 EGWX7EYVTkC+hr3arTlEqZN+KPB4ASUlbCDvZNZIqqfe80t6+0KxhgB0ir2HqOqYyq
+	 ONp6bMmilIzFA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13BE0C3ABA8;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25755C3ABA5;
 	Tue, 29 Apr 2025 04:06:17 +0000 (UTC)
 From: Chen Linxuan via B4 Relay <devnull+chenlinxuan.uniontech.com@kernel.org>
-Date: Tue, 29 Apr 2025 12:06:09 +0800
-Subject: [PATCH RFC v3 5/8] rseq: add __always_inline for
- rseq_kernel_fields
+Date: Tue, 29 Apr 2025 12:06:10 +0800
+Subject: [PATCH RFC v3 6/8] kcov: add __always_inline for canonicalize_ip
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,7 +55,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250429-noautoinline-v3-5-4c49f28ea5b5@uniontech.com>
+Message-Id: <20250429-noautoinline-v3-6-4c49f28ea5b5@uniontech.com>
 References: <20250429-noautoinline-v3-0-4c49f28ea5b5@uniontech.com>
 In-Reply-To: <20250429-noautoinline-v3-0-4c49f28ea5b5@uniontech.com>
 To: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
@@ -92,21 +91,21 @@ Cc: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
  Chen Linxuan <chenlinxuan@uniontech.com>, 
  Changbin Du <changbin.du@intel.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1064;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=999;
  i=chenlinxuan@uniontech.com; h=from:subject:message-id;
- bh=yuauFI3DVy8k9g1XQ1OrB7eESWm7f+B3/2pt9syGKzM=;
- b=owEBbQKS/ZANAwAKAXYe5hQ5ma6LAcsmYgBoEFAyanc3Cwc7HAg/63YHY6NNSEBN2RhZfPBtP
- dtxoPOqXNeJAjMEAAEKAB0WIQTO1VElAk6xdvy0ZVp2HuYUOZmuiwUCaBBQMgAKCRB2HuYUOZmu
- i7aID/44sv/mzy4WT2GTGw2LDhzFHfM+7rL13wS9xt+G7CMG4l6A0rduPv9Kj1+aTi8eOVMJft5
- 5TiNxVdcrGKSr3zwVOY/PNRlc66oIZlthPkrupbFv0SD5r0m5xlYv9Q9WAMMOLU1a+CKw7KXlIK
- zUkQ0dGZaFEhfFS3giTzwyMqJS6nvmjb5iRc4Zz/XOtdtIIBsD6qlLRwQDdV4KuiKgfabOvMbeX
- C/d2ZrlzN8bw8uBY9bJS4LF4cptR+kay58eEnIn86mc9en18eq/l2Y01BEqmDWaad6N+FJDodwI
- pMr/+GVr6bsXlGZJ+sULeKleGffl4G1zIhAoz7H8I0oNmr/nSGd3Wn6BKIxuLhtVppnLY1KsvGa
- yf2RsSmPzJHLCXkfpLhDD/oicoxFl43gpHqaND1YU47v6537LXhTaUC1wslQX7j/d1+ujI4YwtF
- vOr8GQoQM+gOCkSVJLMdhN73NjDBDQByqvsYdot/uoc2GscYToCLN6G8w6S/yE1iwgbv9J0upsK
- hCjXyMYy0yLyfeIMCV/s3OTjYIs2fkUTwhR/5ByE/gU+4GGrFSrBbZP1FArrKKo834SUQ98QfUi
- V+gTyYTxvmL/HMhC3LP7oMkp9BWNsUvbCEi3F0KTEm/YPo52etQ+1LPa6z6VqhkHXnGwZSJcPtW
- crGc2BctRQzKvsw==
+ bh=bu46wuQGrDj6kBvEdZGeSh/hu1kfUprs2xtOHC9YvDM=;
+ b=owEBbQKS/ZANAwAKAXYe5hQ5ma6LAcsmYgBoEFAzBVNZPkSl6Omnu5oU34AQK+1mpqi/WLkNr
+ 0NEvxK8dUyJAjMEAAEKAB0WIQTO1VElAk6xdvy0ZVp2HuYUOZmuiwUCaBBQMwAKCRB2HuYUOZmu
+ i8g1D/40bhkDUMn5ZsiK4TnuOugcii2OnZKhTkti9V/LWWRvgzRyIsQwQx4FtXYSoLWNriV0VjO
+ CyBhHFDEFDn9Qz/M965AcIUUmKLR5grVtMB9zo5zCc6a91HPJy6GMCb7vQWZAzb4+pWGKnhvAMx
+ Ov0wOqEkIfqqFMjOVcO8Vm4hfpv/gUj81gfM3GBjvGd2OHSGu5Pij0pZYLJpk1zPwPTmvDqrsz4
+ oYuo8iGnQFrGPoCp8bulBU2twHYxidXZqedbEM/1LtFaKcmn/lXQC7zQRnMoVVJw/VWRJEm3H/r
+ ZAZEvQW29nAzq7hH4vvQnts2FtjI834A3qFtxQn63CS2Sfr4r+Cq1EuVsao/7MSVIED9IWykpk7
+ 4zxistnA1wTl+9FGo+ICJdWpP4NFZYJXYzFIo2tProekWZDMySQIIR8PlepBYAhmPBM4brAn4p+
+ 6EeroMTKyY8ruNjdDNz7d2T4eCWNT79QPnCWQnqqQnu6en7oxsQ2nWq0yCWUgq6PiInxlG1IrOp
+ ws0NDutFTcctb93F/sUKWR8fxwjFNCr2kJf2YNiq9h6vsJ5kJf0v5kwbgfSvV4AJmDUqbWsjulX
+ AA7Pwu8V0FCWq4C/mflHXRlVyt5MBdGeteRJDx/xMeppywk4M4UANlKUX+SDfpwBq2fbdtOztNl
+ do0e6Yl/yQUEHnA==
 X-Developer-Key: i=chenlinxuan@uniontech.com; a=openpgp;
  fpr=D818ACDD385CAE92D4BAC01A6269794D24791D21
 X-Endpoint-Received: by B4 Relay for chenlinxuan@uniontech.com/default with
@@ -121,29 +120,28 @@ Presume that kernel is compiled for x86_64 with gcc version 13.3.0:
   make allmodconfig
   make KCFLAGS="-fno-inline-small-functions -fno-inline-functions-called-once"
 
-This results some objtool warnings:
+This results a objtool warning:
 
-  vmlinux.o: warning: objtool: rseq_update_cpu_node_id+0x14c: call to rseq_kernel_fields() with UACCESS enabled
-  vmlinux.o: warning: objtool: rseq_reset_rseq_cpu_node_id+0xef: call to rseq_kernel_fields() with UACCESS enabled
+  vmlinux.o: warning: objtool: __sanitizer_cov_trace_pc+0xc: call to canonicalize_ip() with UACCESS enabled
 
 Signed-off-by: Chen Linxuan <chenlinxuan@uniontech.com>
 ---
- kernel/rseq.c | 2 +-
+ kernel/kcov.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/rseq.c b/kernel/rseq.c
-index b7a1ec327e8117b47e353cab92d62111dd261520..7a4b6c211359714087a753047581bc8ff0c6c76b 100644
---- a/kernel/rseq.c
-+++ b/kernel/rseq.c
-@@ -27,7 +27,7 @@
- 				  RSEQ_CS_FLAG_NO_RESTART_ON_MIGRATE)
- 
- #ifdef CONFIG_DEBUG_RSEQ
--static struct rseq *rseq_kernel_fields(struct task_struct *t)
-+static __always_inline struct rseq *rseq_kernel_fields(struct task_struct *t)
- {
- 	return (struct rseq *) t->rseq_fields;
+diff --git a/kernel/kcov.c b/kernel/kcov.c
+index 187ba1b80bda169d2f7efead5c6076b8829522ca..a2e2d3c655406b5a1f53e4855c782727b0541935 100644
+--- a/kernel/kcov.c
++++ b/kernel/kcov.c
+@@ -194,7 +194,7 @@ static notrace bool check_kcov_mode(enum kcov_mode needed_mode, struct task_stru
+ 	return mode == needed_mode;
  }
+ 
+-static notrace unsigned long canonicalize_ip(unsigned long ip)
++static __always_inline notrace unsigned long canonicalize_ip(unsigned long ip)
+ {
+ #ifdef CONFIG_RANDOMIZE_BASE
+ 	ip -= kaslr_offset();
 
 -- 
 2.43.0
