@@ -1,165 +1,64 @@
-Return-Path: <kvm+bounces-44759-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44745-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71BD1AA0AAF
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 13:51:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CAF4AA0A4E
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 13:44:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A4F63AE85D
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 11:50:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 052CC169829
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 11:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648AD2D4B7E;
-	Tue, 29 Apr 2025 11:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68DAF2D1935;
+	Tue, 29 Apr 2025 11:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bpfvjltT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z5IDkc9Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708242D29A6
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 11:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCA12C1E23;
+	Tue, 29 Apr 2025 11:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745927190; cv=none; b=sdAjO1EBoqpbHVVheR+5N8r5wMko2+9Fp8v9MDE/1m2ynhjQa/Ov9LmNA96hcH6L7yI+VRsgHLA44I4l/r6Ly/jv1C7R1siKb9C86hTleCCJw0Wsx3YQognCNjXfvhsCVJoDhOE1aF3Iy+Rw6DgIqXDsv5BP5QbjX6+NVshsceA=
+	t=1745926883; cv=none; b=PkUzO/nmLdjZNp2TfBQEnsiIA3MaiSQZTZxyK/etJzGjybgdD3l9QbY51vWTDSKaRxpmi4NiYISKDWYWO8R4fIXeL3m4YdLgtVW12EDSMuKP5QPofpo3nQKR2z6arhrURngCcPxl9xfLNx2CsUOZ6szLjlquyV1smPb0qFBexN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745927190; c=relaxed/simple;
-	bh=//7Q4pa0cyHdD4P62SOM8iLoDYvBplXZ4+xR7j8wswY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ue/1PXbeTM23bp6ryXNPfX6GeN0XqTQwEZtHP3JESPl6TcwtaWPDnI9OAQ+RFbJqu/dEQJ53Vid7HTfb+1BpgdT6eTup/WTJrO4oeo3+HzFIn6O3gNQCedpWR/zYL9T12WGVc8PjjFshbqocyInyalvdb0P4JlPony5cTrhZx/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bpfvjltT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745927187;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UNP0/g1fsLvLBQS0mp5T4cvzk2DsJdERKWqgqviWFK4=;
-	b=bpfvjltTUW+i2iQ6I6dlm0qUuj3ijOjCw9zy/HKdw0llJxRqEI6WEvfsUpMAoRaLX9CbLO
-	oGNrDv7ba1lUg/1McpFQf7j4c9duXxGxfgJRaFu6h+aKjGLNCVh8OPgTMoyzm+nqN3rLrg
-	RKOQcC6j8l5OVNjiD2GzqPOItKBfSwM=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-155-r7bLT26sNc-abpjlyaV0Qg-1; Tue,
- 29 Apr 2025 07:46:25 -0400
-X-MC-Unique: r7bLT26sNc-abpjlyaV0Qg-1
-X-Mimecast-MFC-AGG-ID: r7bLT26sNc-abpjlyaV0Qg_1745927181
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BEDBC1800264;
-	Tue, 29 Apr 2025 11:46:21 +0000 (UTC)
-Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.45.225.102])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4C51B19560A3;
-	Tue, 29 Apr 2025 11:45:52 +0000 (UTC)
-From: Valentin Schneider <vschneid@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev,
+	s=arc-20240116; t=1745926883; c=relaxed/simple;
+	bh=z7vRY6j0385eKhIiCYAI50mg523Vhh6+q1JFXwnzUdE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iWChlH5YaHwSv0usGsvJspBmMrmI4rYd97Cc3RSex5XRNtqQotjPZiw7gkPMFW7KEznux10fWCbqEEgh97cdE9RV3Rx3fXejUWF8zjR6gb1RgV/oq6OoHGunaimOpEOEooa4fx359w676gbKi++i+DDKhCd18sn5ds3Q07Ljh/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z5IDkc9Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EB46C4CEEB;
+	Tue, 29 Apr 2025 11:41:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745926883;
+	bh=z7vRY6j0385eKhIiCYAI50mg523Vhh6+q1JFXwnzUdE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Z5IDkc9QmnF156EVu9ZzmDZrwjdxZ90IGgHdzed+020IwE8u5OLLG3TW2V7tb/xnP
+	 gaFfLfUq66jpo4tw4iXaSyhSluCA6IkVb4v5wfP06p/YqpnzTxnQTQr2vHwbAaT1cl
+	 x3PsCXgMcBmtpwxKIkA7fsIWFYcS2gTuXX2hqJVcsm/prfh5HCCEQt7f5xk+eKiU3F
+	 S0HgXNdI751oc1+EyQvlO0p5pwEY8IbgIZfdvLSFOyAzlILoRKL5GGiY6OTcv3ufyd
+	 sTicQ27SPT+YjWApIXQ4T9inmqW+8dB6HVGklIbyvxMoyNyJ2OaA58bi955nNo/ooD
+	 oaU901VICr6OA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u9jKz-009t0f-6k;
+	Tue, 29 Apr 2025 12:41:21 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	loongarch@lists.linux.dev,
-	linux-riscv@lists.infradead.org,
-	linux-perf-users@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	rcu@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-	Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Yair Podemsky <ypodemsk@redhat.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Daniel Wagner <dwagner@suse.de>,
-	Petr Tesarik <ptesarik@suse.com>,
-	Nicolas Saenz Julienne <nsaenz@amazon.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Juergen Gross <jgross@suse.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	"Liang, Kan" <kan.liang@linux.intel.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Jason Baron <jbaron@akamai.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Petr Pavlu <petr.pavlu@suse.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Daniel Gomez <da.gomez@samsung.com>,
-	Naveen N Rao <naveen@kernel.org>,
-	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Ben Segall <bsegall@google.com>,
-	Mel Gorman <mgorman@suse.de>,
-	Kees Cook <kees@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
-	Rong Xu <xur@google.com>,
-	Rafael Aquini <aquini@redhat.com>,
-	Song Liu <song@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Brian Gerst <brgerst@gmail.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Benjamin Berg <benjamin.berg@intel.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	John Stultz <jstultz@google.com>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>
-Subject: [PATCH v5 25/25] context_tracking,x86: Defer kernel text patching IPIs
-Date: Tue, 29 Apr 2025 13:32:42 +0200
-Message-ID: <20250429113242.998312-26-vschneid@redhat.com>
-In-Reply-To: <20250429113242.998312-1-vschneid@redhat.com>
-References: <20250429113242.998312-1-vschneid@redhat.com>
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: [PATCH 0/2] KVM: arm64: Make AArch64 support sticky
+Date: Tue, 29 Apr 2025 12:41:15 +0100
+Message-Id: <20250429114117.3618800-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -167,284 +66,35 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-text_poke_bp_batch() sends IPIs to all online CPUs to synchronize
-them vs the newly patched instruction. CPUs that are executing in userspace
-do not need this synchronization to happen immediately, and this is
-actually harmful interference for NOHZ_FULL CPUs.
+It's been recently reported[1] that our sorry excuse for a test suite
+is writing a bunch of zeroes to ID_AA64PFR0_EL1.EL{0,1,2,3},
+effectively removing the advertised support for AArch64 to the guest.
 
-As the synchronization IPIs are sent using a blocking call, returning from
-text_poke_bp_batch() implies all CPUs will observe the patched
-instruction(s), and this should be preserved even if the IPI is deferred.
-In other words, to safely defer this synchronization, any kernel
-instruction leading to the execution of the deferred instruction
-sync (ct_work_flush()) must *not* be mutable (patchable) at runtime.
+This leads to an interesting interaction with the NV code which reacts
+in a slightly overzealous way and inject an UNDEF at the earliest
+opportunity.
 
-This means we must pay attention to mutable instructions in the early entry
-code:
-- alternatives
-- static keys
-- static calls
-- all sorts of probes (kprobes/ftrace/bpf/???)
+This small series fixes KVM by bluntly refusing to disable AArch64,
+and the test to stop being so lame. I'm also fixing the NV code
+separately, since it isn't upstream.
 
-The early entry code leading to ct_work_flush() is noinstr, which gets rid
-of the probes.
+[1] https://lore.kernel.org/r/4e63a13f-c5dc-4f97-879a-26b5548da07f@os.amperecomputing.com
 
-Alternatives are safe, because it's boot-time patching (before SMP is
-even brought up) which is before any IPI deferral can happen.
+Marc Zyngier (2):
+  KVM: arm64: Prevent userspace from disabling AArch64 support at any
+    virtualisable EL
+  KVM: arm64: selftest: Don't try to disable AArch64 support
 
-This leaves us with static keys and static calls.
+ arch/arm64/kvm/sys_regs.c                       | 6 ++++++
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 8 ++++----
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-Any static key used in early entry code should be only forever-enabled at
-boot time, IOW __ro_after_init (pretty much like alternatives). Exceptions
-are explicitly marked as allowed in .noinstr and will always generate an
-IPI when flipped.
-
-The same applies to static calls - they should be only updated at boot
-time, or manually marked as an exception.
-
-Objtool is now able to point at static keys/calls that don't respect this,
-and all static keys/calls used in early entry code have now been verified
-as behaving appropriately.
-
-Leverage the new context_tracking infrastructure to defer sync_core() IPIs
-to a target CPU's next kernel entry.
-
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Signed-off-by: Nicolas Saenz Julienne <nsaenzju@redhat.com>
-Signed-off-by: Valentin Schneider <vschneid@redhat.com>
----
- arch/x86/include/asm/context_tracking_work.h |  6 ++-
- arch/x86/include/asm/text-patching.h         |  1 +
- arch/x86/kernel/alternative.c                | 39 +++++++++++++++++---
- arch/x86/kernel/kprobes/core.c               |  4 +-
- arch/x86/kernel/kprobes/opt.c                |  4 +-
- arch/x86/kernel/module.c                     |  2 +-
- include/asm-generic/sections.h               | 15 ++++++++
- include/linux/context_tracking_work.h        |  4 +-
- 8 files changed, 60 insertions(+), 15 deletions(-)
-
-diff --git a/arch/x86/include/asm/context_tracking_work.h b/arch/x86/include/asm/context_tracking_work.h
-index 5f3b2d0977235..485b32881fde5 100644
---- a/arch/x86/include/asm/context_tracking_work.h
-+++ b/arch/x86/include/asm/context_tracking_work.h
-@@ -2,11 +2,13 @@
- #ifndef _ASM_X86_CONTEXT_TRACKING_WORK_H
- #define _ASM_X86_CONTEXT_TRACKING_WORK_H
- 
-+#include <asm/sync_core.h>
-+
- static __always_inline void arch_context_tracking_work(enum ct_work work)
- {
- 	switch (work) {
--	case CT_WORK_n:
--		// Do work...
-+	case CT_WORK_SYNC:
-+		sync_core();
- 		break;
- 	case CT_WORK_MAX:
- 		WARN_ON_ONCE(true);
-diff --git a/arch/x86/include/asm/text-patching.h b/arch/x86/include/asm/text-patching.h
-index ab9e143ec9fea..9dfa46f721c1d 100644
---- a/arch/x86/include/asm/text-patching.h
-+++ b/arch/x86/include/asm/text-patching.h
-@@ -33,6 +33,7 @@ extern void apply_relocation(u8 *buf, const u8 * const instr, size_t instrlen, u
-  */
- extern void *text_poke(void *addr, const void *opcode, size_t len);
- extern void text_poke_sync(void);
-+extern void text_poke_sync_deferrable(void);
- extern void *text_poke_kgdb(void *addr, const void *opcode, size_t len);
- extern void *text_poke_copy(void *addr, const void *opcode, size_t len);
- #define text_poke_copy text_poke_copy
-diff --git a/arch/x86/kernel/alternative.c b/arch/x86/kernel/alternative.c
-index bf82c6f7d6905..8c73ac6243809 100644
---- a/arch/x86/kernel/alternative.c
-+++ b/arch/x86/kernel/alternative.c
-@@ -18,6 +18,7 @@
- #include <linux/mmu_context.h>
- #include <linux/bsearch.h>
- #include <linux/sync_core.h>
-+#include <linux/context_tracking.h>
- #include <asm/text-patching.h>
- #include <asm/alternative.h>
- #include <asm/sections.h>
-@@ -2450,9 +2451,24 @@ static void do_sync_core(void *info)
- 	sync_core();
- }
- 
-+static bool do_sync_core_defer_cond(int cpu, void *info)
-+{
-+	return !ct_set_cpu_work(cpu, CT_WORK_SYNC);
-+}
-+
-+static void __text_poke_sync(smp_cond_func_t cond_func)
-+{
-+	on_each_cpu_cond(cond_func, do_sync_core, NULL, 1);
-+}
-+
- void text_poke_sync(void)
- {
--	on_each_cpu(do_sync_core, NULL, 1);
-+	__text_poke_sync(NULL);
-+}
-+
-+void text_poke_sync_deferrable(void)
-+{
-+	__text_poke_sync(do_sync_core_defer_cond);
- }
- 
- /*
-@@ -2623,6 +2639,7 @@ static int tp_vec_nr;
-  */
- static void text_poke_bp_batch(struct text_poke_loc *tp, unsigned int nr_entries)
- {
-+	smp_cond_func_t cond = do_sync_core_defer_cond;
- 	unsigned char int3 = INT3_INSN_OPCODE;
- 	unsigned int i;
- 	int do_sync;
-@@ -2658,11 +2675,21 @@ static void text_poke_bp_batch(struct text_poke_loc *tp, unsigned int nr_entries
- 	 * First step: add a int3 trap to the address that will be patched.
- 	 */
- 	for (i = 0; i < nr_entries; i++) {
--		tp[i].old = *(u8 *)text_poke_addr(&tp[i]);
--		text_poke(text_poke_addr(&tp[i]), &int3, INT3_INSN_SIZE);
-+		void *addr = text_poke_addr(&tp[i]);
-+
-+		/*
-+		 * There's no safe way to defer IPIs for patching text in
-+		 * .noinstr, record whether there is at least one such poke.
-+		 */
-+		if (is_kernel_noinstr_text((unsigned long)addr) ||
-+		    is_module_noinstr_text_address((unsigned long)addr))
-+			cond = NULL;
-+
-+		tp[i].old = *((u8 *)addr);
-+		text_poke(addr, &int3, INT3_INSN_SIZE);
- 	}
- 
--	text_poke_sync();
-+	__text_poke_sync(cond);
- 
- 	/*
- 	 * Second step: update all but the first byte of the patched range.
-@@ -2724,7 +2751,7 @@ static void text_poke_bp_batch(struct text_poke_loc *tp, unsigned int nr_entries
- 		 * not necessary and we'd be safe even without it. But
- 		 * better safe than sorry (plus there's not only Intel).
- 		 */
--		text_poke_sync();
-+		__text_poke_sync(cond);
- 	}
- 
- 	/*
-@@ -2745,7 +2772,7 @@ static void text_poke_bp_batch(struct text_poke_loc *tp, unsigned int nr_entries
- 	}
- 
- 	if (do_sync)
--		text_poke_sync();
-+		__text_poke_sync(cond);
- 
- 	/*
- 	 * Remove and wait for refs to be zero.
-diff --git a/arch/x86/kernel/kprobes/core.c b/arch/x86/kernel/kprobes/core.c
-index 09608fd936876..687e6805b7511 100644
---- a/arch/x86/kernel/kprobes/core.c
-+++ b/arch/x86/kernel/kprobes/core.c
-@@ -808,7 +808,7 @@ void arch_arm_kprobe(struct kprobe *p)
- 	u8 int3 = INT3_INSN_OPCODE;
- 
- 	text_poke(p->addr, &int3, 1);
--	text_poke_sync();
-+	text_poke_sync_deferrable();
- 	perf_event_text_poke(p->addr, &p->opcode, 1, &int3, 1);
- }
- 
-@@ -818,7 +818,7 @@ void arch_disarm_kprobe(struct kprobe *p)
- 
- 	perf_event_text_poke(p->addr, &int3, 1, &p->opcode, 1);
- 	text_poke(p->addr, &p->opcode, 1);
--	text_poke_sync();
-+	text_poke_sync_deferrable();
- }
- 
- void arch_remove_kprobe(struct kprobe *p)
-diff --git a/arch/x86/kernel/kprobes/opt.c b/arch/x86/kernel/kprobes/opt.c
-index 36d6809c6c9e1..b2ce4d9c3ba56 100644
---- a/arch/x86/kernel/kprobes/opt.c
-+++ b/arch/x86/kernel/kprobes/opt.c
-@@ -513,11 +513,11 @@ void arch_unoptimize_kprobe(struct optimized_kprobe *op)
- 	       JMP32_INSN_SIZE - INT3_INSN_SIZE);
- 
- 	text_poke(addr, new, INT3_INSN_SIZE);
--	text_poke_sync();
-+	text_poke_sync_deferrable();
- 	text_poke(addr + INT3_INSN_SIZE,
- 		  new + INT3_INSN_SIZE,
- 		  JMP32_INSN_SIZE - INT3_INSN_SIZE);
--	text_poke_sync();
-+	text_poke_sync_deferrable();
- 
- 	perf_event_text_poke(op->kp.addr, old, JMP32_INSN_SIZE, new, JMP32_INSN_SIZE);
- }
-diff --git a/arch/x86/kernel/module.c b/arch/x86/kernel/module.c
-index a7998f3517017..d89c9de0ca9f5 100644
---- a/arch/x86/kernel/module.c
-+++ b/arch/x86/kernel/module.c
-@@ -206,7 +206,7 @@ static int write_relocate_add(Elf64_Shdr *sechdrs,
- 				   write, apply);
- 
- 	if (!early) {
--		text_poke_sync();
-+		text_poke_sync_deferrable();
- 		mutex_unlock(&text_mutex);
- 	}
- 
-diff --git a/include/asm-generic/sections.h b/include/asm-generic/sections.h
-index 0755bc39b0d80..7d2403014010e 100644
---- a/include/asm-generic/sections.h
-+++ b/include/asm-generic/sections.h
-@@ -199,6 +199,21 @@ static inline bool is_kernel_inittext(unsigned long addr)
- 	       addr < (unsigned long)_einittext;
- }
- 
-+
-+/**
-+ * is_kernel_noinstr_text - checks if the pointer address is located in the
-+ *                    .noinstr section
-+ *
-+ * @addr: address to check
-+ *
-+ * Returns: true if the address is located in .noinstr, false otherwise.
-+ */
-+static inline bool is_kernel_noinstr_text(unsigned long addr)
-+{
-+	return addr >= (unsigned long)__noinstr_text_start &&
-+	       addr < (unsigned long)__noinstr_text_end;
-+}
-+
- /**
-  * __is_kernel_text - checks if the pointer address is located in the
-  *                    .text section
-diff --git a/include/linux/context_tracking_work.h b/include/linux/context_tracking_work.h
-index c68245f8d77c5..2facc621be067 100644
---- a/include/linux/context_tracking_work.h
-+++ b/include/linux/context_tracking_work.h
-@@ -5,12 +5,12 @@
- #include <linux/bitops.h>
- 
- enum {
--	CT_WORK_n_OFFSET,
-+	CT_WORK_SYNC_OFFSET,
- 	CT_WORK_MAX_OFFSET
- };
- 
- enum ct_work {
--	CT_WORK_n        = BIT(CT_WORK_n_OFFSET),
-+	CT_WORK_SYNC     = BIT(CT_WORK_SYNC_OFFSET),
- 	CT_WORK_MAX      = BIT(CT_WORK_MAX_OFFSET)
- };
- 
 -- 
-2.49.0
+2.39.2
 
 
