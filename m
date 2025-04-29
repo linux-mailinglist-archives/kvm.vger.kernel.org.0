@@ -1,54 +1,102 @@
-Return-Path: <kvm+bounces-44776-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44777-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D500FAA0D92
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 15:38:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4183AA0DAB
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 15:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7CEA5A6AE5
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 13:37:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17EBB1A8796A
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 13:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF472C3768;
-	Tue, 29 Apr 2025 13:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3EC2D29BF;
+	Tue, 29 Apr 2025 13:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="R2NcB7Cx"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8408BEE
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 13:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369EB2D193F
+	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 13:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745933890; cv=none; b=EDUIwx0dhnUs21PUgHd6dLmCOTfJ6Vpvzrye9kslejeA8xVeCzl2jOpY3ZatuE6SPpXyg4oFeAdIsUTajLpfaUCUZeGIAvA+CyxNIBj67oSavyuKkTdfQm+dTdH1dzkXwBktmqMO9xnb4i7huYfmodARzRDY13DiRug94quVL8U=
+	t=1745934252; cv=none; b=l9nxfH5M5FNqC89QbHmyWKsWtOWwxKyBmj7eYyq0uo8uE6MCcsO6H2D95/zcGTzeeezr3FCwpejl7pzepb2TlL5e+tu10V1qOX5505vQ3pOhdspiLm3GHhJq0vMsjSwayGO7Cd2kZde/5dG1IpfXXdokggK/NNeyyfEZMV+wC60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745933890; c=relaxed/simple;
-	bh=wB70FRP/aSmlCkRecgc26yX2ofUavoiKG/fAqHKjKFQ=;
+	s=arc-20240116; t=1745934252; c=relaxed/simple;
+	bh=khgmom5SwYGkHlS7uWpIwHY3reFluKKZuIoug5wMJyk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=svtaMXrFCJwERF5ad95oIaG0+XP2uhzuMjb7Q8IgCYRXjQjIfq80rl5z5LLYa9V184He01PSYoVqtYsPU/mHfzZJPbjAvynv5x8B99WpKBe1o8HqaIHF90K6EGePeelOHHj+T3bkKrWSY/WuklpH7rRMSrppywN+Pomy1Z41/Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD6D81515;
-	Tue, 29 Apr 2025 06:38:01 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 916F93F673;
-	Tue, 29 Apr 2025 06:38:06 -0700 (PDT)
-Date: Tue, 29 Apr 2025 14:38:03 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 02/42] arm64: sysreg: Update ID_AA64MMFR4_EL1
- description
-Message-ID: <20250429133803.GB1859293@e124191.cambridge.arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
- <20250426122836.3341523-3-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uTAv5ImFBn72y3sYF0eOsyBLH40SqLAYLExbgI7bTADD6vwGx/f4MC9MwioJG0art6r1eXRcOmYM5/SaU6am/JqDHaUxuOX60Mo6tt/SFqeg6ZyNDdiUL1PprBIDNPok4kNDJGiU/cI1scpnzkvQ82RYxnlZNTmby/dGRSBqCzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=R2NcB7Cx; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7c08f9d0ef3so376010185a.2
+        for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 06:44:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1745934250; x=1746539050; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H3NiznvmeEzk9qrZsVXzuwmh6VHSrphUuExjP4cJOHk=;
+        b=R2NcB7Cx6w3QyVhqCCyu6Om5rClVB54CDe52fxvmuoZcyvHL+WfAKyMhGKpETH9rQX
+         9fYepbzsdZzYfoeYdEOdbIHodJ5JAnFzW4RRXQdaJ5hGjNND6QggmrDAtnf0M84h1i3D
+         W7+O3cC8FnnMOjMgmfILqNSokB6uVSwLOKkFy6OmCO6vno36wxc5ezG8a7HMRAT4gFsz
+         16vn4Wn6486gQkK5AGlXrS0vwb7VR8ma1wXzChBLms/zSdMRMglj4lqbNTFUugtSnYEL
+         QEhmJhsrXWlnf8OwZUoza3nFE4q4MgtAyt/dRmIHR2y01sA8JEjLEU9mxTVg1AD/Qftp
+         5IgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745934250; x=1746539050;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H3NiznvmeEzk9qrZsVXzuwmh6VHSrphUuExjP4cJOHk=;
+        b=lvlnKb3lahlwh7cXlzJH9rXgerX/4B9VGl8Z+z8lNCGVZK7wX2ftf8KDN83vSYSYfX
+         kMT0aFqVZz83XWHzsqUgGhRFUJtPEqekwh4aPTDt3LSM8Jj9df3yxAO16Pz/00LR6bEP
+         qjT4a0l3eWIM82FBsB5/1qCjqe6JTK+5RLkgaIA0f/R3QNK6DTPCZvSgN7M5dinbaEl9
+         A/ZSrt0sPVOGl6vroRSCQCy+hA5L4xM8UmdhmQpwgYgSS+cWcaCnf7wztaPhEMxX9Ctg
+         fze7MAKLXRMQ81m+SazulN7SUB3kk94KPoLaFmsVXyOnU2X789pUkKpkZ7phbony7EDq
+         irjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUcgB/6QebTDOBeF91vE/kScOcv94JrctgXmZGUQce2EbnA50AMk9M221Yr3WJbH+vSXnk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2VzSxiaHjr68m36HlGrujZm5A62Mlfek89PCTEGlNnAyjRQNA
+	y464k++uLyHEvCJUp/zpv+DH62I5L6LdYyV38fsvD32RTeO+9ACl0pTLbpFlehU=
+X-Gm-Gg: ASbGncv2BBIFdmnXiiqwLboQvtmyyG9MRAN+D73GysQrew2S/gXcryUAInePcRh9q57
+	1jEjV5sVmcShsk76oJubjwxGXAvk4p35HyKruzcsMzQzrqxziRoGQcdynPt0kU/Duu28WobEn2N
+	FPvymxhYnPgA+Z5l6CYqXOG8ynk4/9RF1CwH4kHf0aSpv2Z3WZRDgSF85DgBhOqyEPuEP2VBLXs
+	BqK82vg2PCLPfa2ExyFj8gO/RchgHDF1+spyh/VnPSm876r1hbP+a0VkPnh25Uy4nK9+shQb/zn
+	32x3Rs2iQBdM7YeRGhWqtJvGsjuUmJBjHKd2PDHhpW8Tak7HXY8xLdm32iVxEjIN8DNHQf7FtzO
+	dNC864cKEmP54TXSUeyw=
+X-Google-Smtp-Source: AGHT+IGa21onp27WGYH0jVBo4uRP+h7kSdtwA1BovLylZ30nroRsVmISeIOqnDPjCHw9jw8dVdXUhQ==
+X-Received: by 2002:a05:620a:3951:b0:7c5:602f:51fc with SMTP id af79cd13be357-7cabddaf5f3mr490871385a.44.1745934249986;
+        Tue, 29 Apr 2025 06:44:09 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-219-86.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.219.86])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c958c921b4sm743361685a.19.2025.04.29.06.44.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Apr 2025 06:44:09 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1u9lFo-0000000AAmR-34V3;
+	Tue, 29 Apr 2025 10:44:08 -0300
+Date: Tue, 29 Apr 2025 10:44:08 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Chathura Rajapaksha <chathura.abeyrathne.lk@gmail.com>,
+	kvm@vger.kernel.org, Chathura Rajapaksha <chath@bu.edu>,
+	Paul Moore <paul@paul-moore.com>, Eric Paris <eparis@redhat.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Xin Zeng <xin.zeng@intel.com>, Yahui Cao <yahui.cao@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Yunxiang Li <Yunxiang.Li@amd.com>,
+	Dongdong Zhang <zhangdongdong@eswincomputing.com>,
+	Avihai Horon <avihaih@nvidia.com>, linux-kernel@vger.kernel.org,
+	audit@vger.kernel.org
+Subject: Re: [RFC PATCH 0/2] vfio/pci: Block and audit accesses to unassigned
+ config regions
+Message-ID: <20250429134408.GC2260621@ziepe.ca>
+References: <20250426212253.40473-1-chath@bu.edu>
+ <20250428132455.GC1213339@ziepe.ca>
+ <20250428142558.263c5db1.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -57,73 +105,31 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250426122836.3341523-3-maz@kernel.org>
+In-Reply-To: <20250428142558.263c5db1.alex.williamson@redhat.com>
 
-On Sat, Apr 26, 2025 at 01:27:56PM +0100, Marc Zyngier wrote:
-> Resync the ID_AA64MMFR4_EL1 with the architectue description.
-> 
-> This results in:
-> 
-> - the new PoPS field
-> - the new NV2P1 value for the NV_frac field
-> - the new RMEGDI field
-> - the new SRMASK field
-> 
-> These fields have been generated from the reference JSON file.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/tools/sysreg | 19 ++++++++++++++++---
->  1 file changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index e5da8848b66b5..fce8328c7c00b 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -1946,12 +1946,21 @@ EndEnum
->  EndSysreg
->  
->  Sysreg	ID_AA64MMFR4_EL1	3	0	0	7	4
-> -Res0	63:40
-> +Res0	63:48
-> +UnsignedEnum	47:44	SRMASK
-> +	0b0000	NI
-> +	0b0001	IMP
-> +EndEnum
-> +Res0	43:40
->  UnsignedEnum	39:36	E3DSE
->  	0b0000	NI
->  	0b0001	IMP
->  EndEnum
-> -Res0	35:28
-> +Res0	35:32
-> +UnsignedEnum	31:28	RMEGDI
-> +	0b0000	NI
-> +	0b0001	IMP
-> +EndEnum
->  SignedEnum	27:24	E2H0
->  	0b0000	IMP
->  	0b1110	NI_NV1
-> @@ -1960,6 +1969,7 @@ EndEnum
->  UnsignedEnum	23:20	NV_frac
->  	0b0000	NV_NV2
->  	0b0001	NV2_ONLY
-> +	0b0010	NV2P1
->  EndEnum
->  UnsignedEnum	19:16	FGWTE3
->  	0b0000	NI
-> @@ -1979,7 +1989,10 @@ SignedEnum	7:4	EIESB
->  	0b0010	ToELx
->  	0b1111	ANY
->  EndEnum
-> -Res0	3:0
-> +UnsignedEnum	3:0	PoPS
-> +	0b0000	NI
-> +	0b0001	IMP
-> +EndEnum
->  EndSysreg
->  
->  Sysreg	SCTLR_EL1	3	0	1	0	0
+On Mon, Apr 28, 2025 at 02:25:58PM -0600, Alex Williamson wrote:
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> PCI config space is a slow path, it's already trapped, and it's
+> theoretically architected that we could restrict and audit much of it,
+> though some devices do rely on access to unarchitected config space.
+> But even within the architected space there are device specific
+> capabilities with undocumented protocols, exposing unknown features of
+> devices.  Does this incrementally make things better in general, or is
+> this largely masking a poorly behaved device/system?
+
+I think there would be merit in having a qemu option to secure the
+config space.
+
+We talked about this before about presenting a perscribed virtualized
+config space.
+
+But we still have the issue that userpace with access to VFIO could
+crash the machine, on these uncontained platforms, which is not great.
+
+It would be nice if the kernel could discover this, but it doesn't
+seem possible. There is so much in the SOC design and FW
+implementation that has to be done correctly for errors to be properly
+containable.
+
+Jason
 
