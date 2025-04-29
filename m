@@ -1,42 +1,80 @@
-Return-Path: <kvm+bounces-44808-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44809-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0C89AA11BC
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 18:40:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CB5BAA11C9
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 18:44:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 936BC1716B9
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 16:39:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDEF64A301B
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 16:44:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67BF247298;
-	Tue, 29 Apr 2025 16:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D187D247284;
+	Tue, 29 Apr 2025 16:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cFA5a6n+"
 X-Original-To: kvm@vger.kernel.org
-Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B685221719
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 16:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E7923BCF2
+	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 16:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745944772; cv=none; b=b+mDgAaHjyFakB2vmIC+qA26hx83Gg+ICNdZ06Gc/lnWEIKtA9tiFgt9VpEYqBrDmAqnRzvxwDlEkuhT4+zNOdJ7N95s5saLqrorvAb4XF2TQl5hgvIqhs21Nfe5xXUC7A+wtmz3WyQKPtgYQqYQlIx0kmel5GllGMGw/r4ASXc=
+	t=1745945065; cv=none; b=a23f3cW+Rex8roQvXaSQ+m11Wll4NleOw5EdasTfVi9EsdVoNAUom2YIbAjdba2gJxhua901IOAYDaeMYZN0HZ7FiNveCFAeDdBmrzLcySgl/NZdB9nUKxP+Of4KW3kmggCHe8GwSvp2M5Fnya15fQYN3CaQQDDAXbqeTZv8k7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745944772; c=relaxed/simple;
-	bh=1judu/hZ8wt59TCaRo1uxqP4wZUBCi+Dmwc9Hbn+HjY=;
+	s=arc-20240116; t=1745945065; c=relaxed/simple;
+	bh=CpjOGooW90Pa/OTILSH7GCCaeGnurzZ20Kl1lj4maKk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=obxIwz3ielOMEENi9z1BTDQ/2+roBL2+aPSFAs8hFxSZ4Ho9NzUdjVW8AJ9Uc6geQ1XeIFpBUFcYpCTtFGFMdqopcW0zJ/AzRkx429yX+34DFp0B29w8ZekykIaR8YJ3SN2OtLjh3TeZRCCBz3GybP5pyRXJMG7OLK59cBtFDTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
-Received: from MUA
-	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.98.1)
-	(envelope-from <mhej@vps-ovh.mhejs.net>)
-	id 1u9nzQ-00000002eEp-3cV1;
-	Tue, 29 Apr 2025 18:39:24 +0200
-Message-ID: <174378df-525d-41b1-920f-3797ca300e3f@maciej.szmigiero.name>
-Date: Tue, 29 Apr 2025 18:39:19 +0200
+	 In-Reply-To:Content-Type; b=CY2XsTTcLXc/6Y3/vfAEGPlvb3Z7bD46suMLssfL/j4zGnRTdQH399mf1bhJBvzFNK1RPV2gNjhIXgs6r5jas45ZtvPHELanesGYV5JY8gJSF0T9n5op79Ui09/5QfTphLhbeCKWR6RHmKdHV33KVfW2MAPAJOZyrMx8M7QBmd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cFA5a6n+; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-39ee5ac4321so6717993f8f.1
+        for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 09:44:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1745945057; x=1746549857; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Aibllgg3d4RLW0Us/sHqBYj6oK5QHnm+kKAeGEcic0s=;
+        b=cFA5a6n+wOZS3uXy2YyU6eaRJYzkEvlkDRyp/PZBit+nd4nTlr7Oi6cU68n5keOZGW
+         f3GZ6ZO/HHdOHerrUlla1SpjdIhC4dMe+VV0UQpOVQqH40mMjLf3TQpwKzXyM0nCH9Uf
+         GTZu9a+jbix7DSdZhpwFagQhdKTupczB38wG3VySMtpSC8nb7jgsIdza7b1LCPfxymjI
+         pZb8NNozpV2VtPIvT9hq+nY9l+raSlV6mIJYRARgh5Rf9nC4ngyYKiXdBykzNRr0uf7a
+         2wU73Ex2rJDIAvqZCj6juztXh/FzUwktIjF9ky53KwbH6uAeDmT2Ehn41ZPFy3QVfkNS
+         brwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745945057; x=1746549857;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Aibllgg3d4RLW0Us/sHqBYj6oK5QHnm+kKAeGEcic0s=;
+        b=GvQL7RCtSoY8gX5+aDCMsbHwxLm6IvwSQCYhv+UFcSjA+rQTco6ObUrHP8ziZ5+O/T
+         Myyc1lhKnfu6LTNvxqfBHiLH4Q5NYkAox7ubrioqdZ9uzQ0pmmFQb/j94E6p9Ph5lAHz
+         T/yGJxL8jLp/xN32TL3uNKmhbNMAOom14Nx/lWxZ3LUeXUPanPmjZrWV0s4o1sDcbtL3
+         WeLJDEmNIhnK0+4n9N0qcl0MiuU4VTHns3+lD6zhwKE8v3BCSPNHve4oO9B0pXOGgnru
+         jgq1Qxif7a+GD59Z4RJ0D/CypcrjM31lIsO5kTIIg2CC44DEfMZHOgoy54VT8B+xsxI1
+         rWew==
+X-Forwarded-Encrypted: i=1; AJvYcCX1jEF6kU+NY2u/SvSc9LuJrUx0rTFaiC0dCOwdlcMIgvMQPU+88Vv/dl93pjzltBNAXrc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUKHMflGwrWCc69bR1dR9KbHrIPSjCmMN7XgJfe4/ofuLw88Yp
+	auhPlF+lvVmPU9qgeqNQsxeS4uNmX6T5f8SxKQh9tdAQSeA7ssPE6SOZL445SDg=
+X-Gm-Gg: ASbGnctA/w5gMqA+DC1RB7Q2rUQO4L1fqg3BcAhm3ZtH998JmWo70Pq0+T8GcqNIFJm
+	ZAPX99o4Gc/Atl/yFGuuTLP4aY7BRlxS9pa0d/wK0PNdHIMM6mYde3Zg9O/sF0g0c+1GJOanFvU
+	CuDC4ZxIRSdg0c+giX/Np/7Cm2ceQ49GodXoXTZBvGYbE056FxuxR3chRE1ZT9bIROApJznDkNS
+	bywAxI3FdxvF4+xp95/LuPoUBP473rE4dkabWscHKfLcsVf3t1NTEHAS9aTPvKg8ht+PIP+WdR/
+	d/Zt+tG5FcG/mMgQARh2EHh2pN/Eha/5NqNE5UZgL62TgNOPp7x7IPsVBwne51SMsxf3BR/wvoR
+	yDnbmnmdxrf7Ttw==
+X-Google-Smtp-Source: AGHT+IGKLPRuRHQYfOOvaw5wEsg1dJ5YMhJgLvy7JkTalCYHw/P2Z3FbT6NazwojEW5+LMxL5COfaw==
+X-Received: by 2002:a5d:47c6:0:b0:3a0:8712:f89b with SMTP id ffacd0b85a97d-3a08f76123bmr87938f8f.20.1745945057523;
+        Tue, 29 Apr 2025 09:44:17 -0700 (PDT)
+Received: from [192.168.69.226] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073cbf04dsm14660667f8f.52.2025.04.29.09.44.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Apr 2025 09:44:17 -0700 (PDT)
+Message-ID: <0d279fa6-97bc-4dc1-b594-a8faf33d6485@linaro.org>
+Date: Tue, 29 Apr 2025 18:44:16 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -45,115 +83,52 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v5 0/8] hw/hyperv: remove duplication compilation units
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>
 Cc: Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- alex.bennee@linaro.org, kvm@vger.kernel.org, philmd@linaro.org,
- manos.pitsidianakis@linaro.org, richard.henderson@linaro.org,
- Paolo Bonzini <pbonzini@redhat.com>
+ alex.bennee@linaro.org, kvm@vger.kernel.org, manos.pitsidianakis@linaro.org,
+ richard.henderson@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
 References: <20250424232829.141163-1-pierrick.bouvier@linaro.org>
  <81732388-d0f7-4bdf-ac8a-3537276dc284@linaro.org>
-Content-Language: en-US, pl-PL
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
- 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
-Disposition-Notification-To: "Maciej S. Szmigiero"
- <mail@maciej.szmigiero.name>
-In-Reply-To: <81732388-d0f7-4bdf-ac8a-3537276dc284@linaro.org>
+ <174378df-525d-41b1-920f-3797ca300e3f@maciej.szmigiero.name>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <174378df-525d-41b1-920f-3797ca300e3f@maciej.szmigiero.name>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Sender: mhej@vps-ovh.mhejs.net
 
-On 25.04.2025 01:30, Pierrick Bouvier wrote:
-> On 4/24/25 16:28, Pierrick Bouvier wrote:
->> Work towards having a single binary, by removing duplicated object files.
+On 29/4/25 18:39, Maciej S. Szmigiero wrote:
+> On 25.04.2025 01:30, Pierrick Bouvier wrote:
+
+
+>>> Pierrick Bouvier (8):
+>>>    hw/hyperv/hv-balloon-stub: common compilation unit
+>>>    hw/hyperv/hyperv.h: header cleanup
+>>>    hw/hyperv/vmbus: common compilation unit
+>>>    hw/hyperv/syndbg: common compilation unit
+>>>    hw/hyperv/balloon: common balloon compilation units
+>>>    hw/hyperv/hyperv_testdev: common compilation unit
+>>>    include/system: make functions accessible from common code
+>>>    hw/hyperv/hyperv: common compilation unit
+>>>
+>>>   include/hw/hyperv/hyperv.h |  3 ++-
+>>>   include/system/kvm.h       |  8 ++++----
+>>>   hw/hyperv/hyperv.c         |  3 ++-
+>>>   hw/hyperv/syndbg.c         |  9 ++++++---
+>>>   hw/hyperv/vmbus.c          |  2 +-
+>>>   hw/hyperv/meson.build      | 11 ++++++-----
+>>>   6 files changed, 21 insertions(+), 15 deletions(-)
+>>>
 >>
->> v2
->> - remove osdep from header
->> - use hardcoded buffer size for syndbg, assuming page size is always 4Kb.
->>
->> v3
->> - fix assert for page size.
->>
->> v4
->> - use KiB unit
->>
->> v5
->> - rebase on top of system memory common series
->> - make hw/hyperv/hyperv common
->>
->> v6
->> - rebase on top of master (now contains all changes needed for memory access)
->> - finish making hw/hyperv/hyperv common (hw/hyperv/hyperv.c)
->>
->> Pierrick Bouvier (8):
->>    hw/hyperv/hv-balloon-stub: common compilation unit
->>    hw/hyperv/hyperv.h: header cleanup
->>    hw/hyperv/vmbus: common compilation unit
->>    hw/hyperv/syndbg: common compilation unit
->>    hw/hyperv/balloon: common balloon compilation units
->>    hw/hyperv/hyperv_testdev: common compilation unit
->>    include/system: make functions accessible from common code
->>    hw/hyperv/hyperv: common compilation unit
->>
->>   include/hw/hyperv/hyperv.h |  3 ++-
->>   include/system/kvm.h       |  8 ++++----
->>   hw/hyperv/hyperv.c         |  3 ++-
->>   hw/hyperv/syndbg.c         |  9 ++++++---
->>   hw/hyperv/vmbus.c          |  2 +-
->>   hw/hyperv/meson.build      | 11 ++++++-----
->>   6 files changed, 21 insertions(+), 15 deletions(-)
->>
+>> @Maciej, this is now ready to be tested :)
 > 
-> @Maciej, this is now ready to be tested :)
+> Tested this patch set on a Windows VM with hv-balloon QEMU device
+> (which uses VMBus, which in turn uses basic Hyper-V host support).
+> 
+> No problems encountered, so:
+> Tested-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 
-Tested this patch set on a Windows VM with hv-balloon QEMU device
-(which uses VMBus, which in turn uses basic Hyper-V host support).
+Thank you!
 
-No problems encountered, so:
-Tested-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-
-> Regards,
-> Pierrick
-Thanks,
-Maciej
-
+Series queued.
 
