@@ -1,292 +1,118 @@
-Return-Path: <kvm+bounces-44780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0C6AAA0E12
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 16:02:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D8F5AA0E29
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 16:05:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43549841C64
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 14:02:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87A40461F62
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 14:05:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526132D191F;
-	Tue, 29 Apr 2025 14:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB7A2C2AA6;
+	Tue, 29 Apr 2025 14:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gX5PRhX1"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8647E107
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 14:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE22721A457
+	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 14:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745935332; cv=none; b=m5lN0K3NAdSOeDpuHGivFyFSUhT6R32npEijbTjT1RMzZJrghQwaq6EdH1r3d+MIWsfAAwGTS785tO4hzix+f1cCZaQwoW9EjCra1kYUlw90GbVs4fPHytZQbRF2J1TMz1UXD0NGyXciV0g2dw8J3bl8msPb639opbaxfmx3OIo=
+	t=1745935539; cv=none; b=mQhfzZ0bXFQIQKsOdHcRv1H0M5bNrnPycvLa36Js/mRAFaJxzrDAp23PiNk1wrlVm0cibTjlAn2V5d6CUJBRpw7mcjTr0AiVwWlrUs8V+vPAqU0CyW4REe+9pzHwO7OEjQQXFTgu8DDScAJyC0lYnT1usLUSFO427/7ULyIyEhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745935332; c=relaxed/simple;
-	bh=IlzTOjbT3m7PjVvPB6q6l++9Z725Gr9QMVPLS92Xj0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOirBlLOU+H/lVij6L3+Y2dN22dn3YB61MoFp38uEhpzG9XrXA+8esVImdepcjUtSB0QAIqYIW7T8/Ok665W8JYy7QTcuSykIygFTNADwc7RhBabhl17wAo2Y92uZv7h7SLObjt1O3gz4VqjcdogXHEnYGDyQ30Uo33TIcz5EZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 57E5C1515;
-	Tue, 29 Apr 2025 07:02:02 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CE2B3F66E;
-	Tue, 29 Apr 2025 07:02:07 -0700 (PDT)
-Date: Tue, 29 Apr 2025 15:02:04 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 03/42] arm64: sysreg: Add layout for HCR_EL2
-Message-ID: <20250429140204.GC1859293@e124191.cambridge.arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
- <20250426122836.3341523-4-maz@kernel.org>
+	s=arc-20240116; t=1745935539; c=relaxed/simple;
+	bh=KXkWYlsKpNS7N/qD4ZVXK0LUxaL12ArIUs7VrBlL4YE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pc1SCfZPeiWSyaTXRPEiO+eE+KKodFuOvz5FEbVoSsjgcIhfe+L3qN9BkYJEjTcLRClYabqNTJQqDjQT/bgK1wnBTUcsnnExXAyKkKpTZ5OSdf+HVKDabIGVSfWdPChrX4S3COhr8RT+93OHodQffuT48wnHeOUz5C+H3sNc7R8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gX5PRhX1; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-736cb72efd5so4497195b3a.3
+        for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 07:05:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745935537; x=1746540337; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e3iRogAF7jMgKnBN33JdvjDUDJ4zwxPn8g8eIzFTGjk=;
+        b=gX5PRhX1YoS7a2WlhZXTf6DIeoTRjNLsiV6nrF0Wry6tcLheIt5W4tYOeqAxM+B0ob
+         SNR6TfVfn9ti8GVV52OTR3gDfXgTX1scN6nhnK97vbVHSdVvhOR8po416MYxmQpqGPy3
+         uVcci5Og8ERFeyblLtEn9pqr5xTf6dlp2uitBBtABEUwGfU+gcroXWenhYTUD3DNKSAU
+         Mq8fhMVMMW2NA3G7S2jKlzOw42ugWUImB5y8G0qQsfpl8cklIWazJi03FNqoTe1F18IJ
+         6t5EFUQLVRLtxvQmQvUvBfEcm5zOOu0JEOZikfUmfHP6ilCkIGx1mRMLe7JCmgXR4mTd
+         uo+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745935537; x=1746540337;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e3iRogAF7jMgKnBN33JdvjDUDJ4zwxPn8g8eIzFTGjk=;
+        b=AWGr0C5WqnUg+QcnHCyM6G/ie3KpSVuVwOaA+wiFcJ5TQ0fstBVCJ24HI7CQDJ4U6I
+         f0I5jO/XXYkUhxhWBYr4yDRQdAAWAl6IoIwJx9wL85s4XLP8Ct49evbzlo4Smm/bVzTT
+         y0qbLzX/d+qSPnCVWKindSi8Hkw9SmNCojDfdw1kzcShrKV4AZgW7TbsfeZjMRA2JrTC
+         CaB2Jmnz0iuYZHvAOFB5IDuNbFO+bxzmwwWged7NgicofRygLyJ/ALCHWBXEKSBxUfFi
+         KIvuX2Gjp6YaVNmhCbjD/G2pWiMoye3OguZA2EkiEuYHU4WdKG+BD/TvqhWk2/LSRdwb
+         5x6A==
+X-Forwarded-Encrypted: i=1; AJvYcCUKrH5CjrOAgDQor4A1MwmONfuoIOsdJVXMyXKeIvE+V/jndp5lU0vnbyI0Ru88izl2Kwo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxU7ym5mjYtSV55VDF9wl5WyxxSAfGSY5qgYW5eyAuAjtexdfG
+	jDX4daUo9TOszz6W3KadNCDzI3hWGg+7e1zaM4Om+5V6AG+hyQLGUou0OJ9YdzvujbopeiI2ls9
+	Prg==
+X-Google-Smtp-Source: AGHT+IHPyWKc1pFYiTsLltKjh9fqoRS9IPxep5Tbp0bhwmCfOvbTbBn36Xk8y6s9Kw1UL81V/oIiaLfCk1c=
+X-Received: from pfbb10.prod.google.com ([2002:a05:6a00:ac8a:b0:730:7485:6b59])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2e9b:b0:736:4ebd:e5a
+ with SMTP id d2e1a72fcca58-74027231530mr5583562b3a.20.1745935536957; Tue, 29
+ Apr 2025 07:05:36 -0700 (PDT)
+Date: Tue, 29 Apr 2025 07:05:35 -0700
+In-Reply-To: <20250429100919.GH4198@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250426122836.3341523-4-maz@kernel.org>
+Mime-Version: 1.0
+References: <20250414111140.586315004@infradead.org> <20250414113754.172767741@infradead.org>
+ <7vfbchsyhlsvdl4hszdtmapdghw32nrj2qd652f3pjzg3yb6vn@po3bsa54b6ta>
+ <20250415074421.GI5600@noisy.programming.kicks-ass.net> <zgsycf7arbsadpphod643qljqqsk5rbmidrhhrnm2j7qie4gu2@g7pzud43yj4q>
+ <20250416083859.GH4031@noisy.programming.kicks-ass.net> <20250426100134.GB4198@noisy.programming.kicks-ass.net>
+ <aA-3OwNum9gzHLH1@google.com> <20250429100919.GH4198@noisy.programming.kicks-ass.net>
+Message-ID: <aBDcr49ez9B8u9qa@google.com>
+Subject: Re: [PATCH 3/6] x86/kvm/emulate: Avoid RET for fastops
+From: Sean Christopherson <seanjc@google.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Josh Poimboeuf <jpoimboe@kernel.org>, x86@kernel.org, kys@microsoft.com, 
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, pawan.kumar.gupta@linux.intel.com, 
+	pbonzini@redhat.com, ardb@kernel.org, kees@kernel.org, 
+	Arnd Bergmann <arnd@arndb.de>, gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-efi@vger.kernel.org, 
+	samitolvanen@google.com, ojeda@kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Apr 26, 2025 at 01:27:57PM +0100, Marc Zyngier wrote:
-> Add HCR_EL2 to the sysreg file, more or less directly generated
-> from the JSON file.
+On Tue, Apr 29, 2025, Peter Zijlstra wrote:
+> On Mon, Apr 28, 2025 at 10:13:31AM -0700, Sean Christopherson wrote:
+> > On Sat, Apr 26, 2025, Peter Zijlstra wrote:
+> > > On Wed, Apr 16, 2025 at 10:38:59AM +0200, Peter Zijlstra wrote:
+> > > 
+> > > > Yeah, I finally got there. I'll go cook up something else.
+> > > 
+> > > Sean, Paolo, can I once again ask how best to test this fastop crud?
+> > 
+> > Apply the below, build KVM selftests, 
 > 
-> Since the generated names significantly differ from the existing
-> naming, express the old names in terms of the new one. One day, we'll
-> fix this mess, but I'm not in any hurry.
+> Patch applied, my own hackery applied, host kernel built and booted,
+> foce_emulation_prefix set, but now I'm stuck at this seemingly simple
+> step..
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_arm.h | 125 ++++++++++++++++---------------
->  arch/arm64/tools/sysreg          |  68 +++++++++++++++++
->  2 files changed, 132 insertions(+), 61 deletions(-)
+> $ cd tools/testing/selftests/kvm/
+> $ make
+> ... metric ton of fail ...
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 974d72b5905b8..f36d067967c33 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -12,67 +12,70 @@
->  #include <asm/sysreg.h>
->  #include <asm/types.h>
->  
-> -/* Hyp Configuration Register (HCR) bits */
-> -
-> -#define HCR_TID5	(UL(1) << 58)
-> -#define HCR_DCT		(UL(1) << 57)
-> -#define HCR_ATA_SHIFT	56
-> -#define HCR_ATA		(UL(1) << HCR_ATA_SHIFT)
-> -#define HCR_TTLBOS	(UL(1) << 55)
-> -#define HCR_TTLBIS	(UL(1) << 54)
-> -#define HCR_ENSCXT	(UL(1) << 53)
-> -#define HCR_TOCU	(UL(1) << 52)
-> -#define HCR_AMVOFFEN	(UL(1) << 51)
-> -#define HCR_TICAB	(UL(1) << 50)
-> -#define HCR_TID4	(UL(1) << 49)
-> -#define HCR_FIEN	(UL(1) << 47)
-> -#define HCR_FWB		(UL(1) << 46)
-> -#define HCR_NV2		(UL(1) << 45)
-> -#define HCR_AT		(UL(1) << 44)
-> -#define HCR_NV1		(UL(1) << 43)
-> -#define HCR_NV		(UL(1) << 42)
-> -#define HCR_API		(UL(1) << 41)
-> -#define HCR_APK		(UL(1) << 40)
-> -#define HCR_TEA		(UL(1) << 37)
-> -#define HCR_TERR	(UL(1) << 36)
-> -#define HCR_TLOR	(UL(1) << 35)
-> -#define HCR_E2H		(UL(1) << 34)
-> -#define HCR_ID		(UL(1) << 33)
-> -#define HCR_CD		(UL(1) << 32)
-> -#define HCR_RW_SHIFT	31
-> -#define HCR_RW		(UL(1) << HCR_RW_SHIFT)
-> -#define HCR_TRVM	(UL(1) << 30)
-> -#define HCR_HCD		(UL(1) << 29)
-> -#define HCR_TDZ		(UL(1) << 28)
-> -#define HCR_TGE		(UL(1) << 27)
-> -#define HCR_TVM		(UL(1) << 26)
-> -#define HCR_TTLB	(UL(1) << 25)
-> -#define HCR_TPU		(UL(1) << 24)
-> -#define HCR_TPC		(UL(1) << 23) /* HCR_TPCP if FEAT_DPB */
-> -#define HCR_TSW		(UL(1) << 22)
-> -#define HCR_TACR	(UL(1) << 21)
-> -#define HCR_TIDCP	(UL(1) << 20)
-> -#define HCR_TSC		(UL(1) << 19)
-> -#define HCR_TID3	(UL(1) << 18)
-> -#define HCR_TID2	(UL(1) << 17)
-> -#define HCR_TID1	(UL(1) << 16)
-> -#define HCR_TID0	(UL(1) << 15)
-> -#define HCR_TWE		(UL(1) << 14)
-> -#define HCR_TWI		(UL(1) << 13)
-> -#define HCR_DC		(UL(1) << 12)
-> -#define HCR_BSU		(3 << 10)
-> -#define HCR_BSU_IS	(UL(1) << 10)
-> -#define HCR_FB		(UL(1) << 9)
-> -#define HCR_VSE		(UL(1) << 8)
-> -#define HCR_VI		(UL(1) << 7)
-> -#define HCR_VF		(UL(1) << 6)
-> -#define HCR_AMO		(UL(1) << 5)
-> -#define HCR_IMO		(UL(1) << 4)
-> -#define HCR_FMO		(UL(1) << 3)
-> -#define HCR_PTW		(UL(1) << 2)
-> -#define HCR_SWIO	(UL(1) << 1)
-> -#define HCR_VM		(UL(1) << 0)
-> -#define HCR_RES0	((UL(1) << 48) | (UL(1) << 39))
-> +/*
-> + * Because I'm terribly lazy and that repainting the whole of the KVM
-> + * code with the proper names is a pain, use a helper to map the names
-> + * inherited from AArch32 with the new fancy nomenclature. One day...
-> + */
-> +#define	__HCR(x)	HCR_EL2_##x
-> +
-> +#define HCR_TID5	__HCR(TID5)
-> +#define HCR_DCT		__HCR(DCT)
-> +#define HCR_ATA_SHIFT	__HCR(ATA_SHIFT)
-> +#define HCR_ATA		__HCR(ATA)
-> +#define HCR_TTLBOS	__HCR(TTLBOS)
-> +#define HCR_TTLBIS	__HCR(TTLBIS)
-> +#define HCR_ENSCXT	__HCR(EnSCXT)
-> +#define HCR_TOCU	__HCR(TOCU)
-> +#define HCR_AMVOFFEN	__HCR(AMVOFFEN)
-> +#define HCR_TICAB	__HCR(TICAB)
-> +#define HCR_TID4	__HCR(TID4)
-> +#define HCR_FIEN	__HCR(FIEN)
-> +#define HCR_FWB		__HCR(FWB)
-> +#define HCR_NV2		__HCR(NV2)
-> +#define HCR_AT		__HCR(AT)
-> +#define HCR_NV1		__HCR(NV1)
-> +#define HCR_NV		__HCR(NV)
-> +#define HCR_API		__HCR(API)
-> +#define HCR_APK		__HCR(APK)
-> +#define HCR_TEA		__HCR(TEA)
-> +#define HCR_TERR	__HCR(TERR)
-> +#define HCR_TLOR	__HCR(TLOR)
-> +#define HCR_E2H		__HCR(E2H)
-> +#define HCR_ID		__HCR(ID)
-> +#define HCR_CD		__HCR(CD)
-> +#define HCR_RW		__HCR(RW)
-> +#define HCR_TRVM	__HCR(TRVM)
-> +#define HCR_HCD		__HCR(HCD)
-> +#define HCR_TDZ		__HCR(TDZ)
-> +#define HCR_TGE		__HCR(TGE)
-> +#define HCR_TVM		__HCR(TVM)
-> +#define HCR_TTLB	__HCR(TTLB)
-> +#define HCR_TPU		__HCR(TPU)
-> +#define HCR_TPC		__HCR(TPCP)
-> +#define HCR_TSW		__HCR(TSW)
-> +#define HCR_TACR	__HCR(TACR)
-> +#define HCR_TIDCP	__HCR(TIDCP)
-> +#define HCR_TSC		__HCR(TSC)
-> +#define HCR_TID3	__HCR(TID3)
-> +#define HCR_TID2	__HCR(TID2)
-> +#define HCR_TID1	__HCR(TID1)
-> +#define HCR_TID0	__HCR(TID0)
-> +#define HCR_TWE		__HCR(TWE)
-> +#define HCR_TWI		__HCR(TWI)
-> +#define HCR_DC		__HCR(DC)
-> +#define HCR_BSU		__HCR(BSU)
-> +#define HCR_BSU_IS	__HCR(BSU_IS)
-> +#define HCR_FB		__HCR(FB)
-> +#define HCR_VSE		__HCR(VSE)
-> +#define HCR_VI		__HCR(VI)
-> +#define HCR_VF		__HCR(VF)
-> +#define HCR_AMO		__HCR(AMO)
-> +#define HCR_IMO		__HCR(IMO)
-> +#define HCR_FMO		__HCR(FMO)
-> +#define HCR_PTW		__HCR(PTW)
-> +#define HCR_SWIO	__HCR(SWIO)
-> +#define HCR_VM		__HCR(VM)
->  
->  /*
->   * The bits we set in HCR:
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index fce8328c7c00b..7f39c8f7f036d 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -2531,6 +2531,74 @@ Field	1	AFSR1_EL1
->  Field	0	AFSR0_EL1
->  EndSysregFields
->  
-> +Sysreg	HCR_EL2		3	4	1	1	0
-> +Field	63:60	TWEDEL
-> +Field	59	TWEDEn
-> +Field	58	TID5
-> +Field	57	DCT
-> +Field	56	ATA
-> +Field	55	TTLBOS
-> +Field	54	TTLBIS
-> +Field	53	EnSCXT
-> +Field	52	TOCU
-> +Field	51	AMVOFFEN
-> +Field	50	TICAB
-> +Field	49	TID4
-> +Field	48	GPF
-> +Field	47	FIEN
-> +Field	46	FWB
-> +Field	45	NV2
-> +Field	44	AT
-> +Field	43	NV1
-> +Field	42	NV
-> +Field	41	API
-> +Field	40	APK
-> +Field	39	TME
-> +Field	38	MIOCNCE
-> +Field	37	TEA
-> +Field	36	TERR
-> +Field	35	TLOR
-> +Field	34	E2H
-> +Field	33	ID
-> +Field	32	CD
-> +Field	31	RW
-> +Field	30	TRVM
-> +Field	29	HCD
-> +Field	28	TDZ
-> +Field	27	TGE
-> +Field	26	TVM
-> +Field	25	TTLB
-> +Field	24	TPU
-> +Field	23	TPCP
-> +Field	22	TSW
-> +Field	21	TACR
-> +Field	20	TIDCP
-> +Field	19	TSC
-> +Field	18	TID3
-> +Field	17	TID2
-> +Field	16	TID1
-> +Field	15	TID0
-> +Field	14	TWE
-> +Field	13	TWI
-> +Field	12	DC
-> +UnsignedEnum	11:10	BSU
-> +	0b00	NONE
-> +	0b01	IS
-> +	0b10	OS
-> +	0b11	FS
-> +EndEnum
-> +Field	9	FB
-> +Field	8	VSE
-> +Field	7	VI
-> +Field	6	VF
-> +Field	5	AMO
-> +Field	4	IMO
-> +Field	3	FMO
-> +Field	2	PTW
-> +Field	1	SWIO
-> +Field	0	VM
-> +EndSysreg
-> +
->  Sysreg MDCR_EL2		3	4	1	1	1
->  Res0	63:51
->  Field	50	EnSTEPOP
+> Clearly I'm doing something wrong :/
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Did you install headers in the top level directory?  I.e. make headers_install.
+The selftests build system was change a while back to require users to manually
+install headers (I forget why, but it is indeed annoying).
 
