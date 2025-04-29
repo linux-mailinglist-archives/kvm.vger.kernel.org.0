@@ -1,139 +1,240 @@
-Return-Path: <kvm+bounces-44818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6316EAA183E
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 19:57:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4BDAA18C3
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 20:04:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA3D0189420F
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 17:57:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A4DE4E0475
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 18:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F7425485A;
-	Tue, 29 Apr 2025 17:56:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE3D22AE68;
+	Tue, 29 Apr 2025 18:02:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vxjWBXUF"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q+AIyMAi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1797252284
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 17:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A35253F25
+	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 18:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745949378; cv=none; b=guuwglYjGN858P5eSbapxTFFxkvltxqG1WpTmJ/cprH8XoOg3RS4evPcdSRccMSmjA0EayAtPSgzgNq+uoZ2RH3utiP+VzlEfQlPs6wcqK87dPweqjEwiRluiQpCJS59F8WoPhDKTlJ7anwNElOIuLTqmZNrqRL0V1Ignii/4/E=
+	t=1745949724; cv=none; b=ImjM5HtGHPhIt5rQ6Z+4HfrL2M2nhuO7YxqRFCVxiOOq8O9mUnI1iUpdO1xfQOAoRhUUolKioqqi1A9ooOQZbF5zNBNm773dIbRi70dZKkf2iTCbDnO2ZxE0RqZa+zR5NyrbMLGsZzmgevqkrtXQdarIOG72MFxbpjpN2AwXG4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745949378; c=relaxed/simple;
-	bh=ph+g2Jh/sq1TGFV/Nx1F+Xyzn4ZsoCmnSsJ+oPMv5Bc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HkXgLS3H84/vEOVzebgEmtQOHxvZDh7qoErAMn03eSCiZE2k5sdeK4F3a6ALOd2LFrpD+mqR/jhvXPNPRtBu9iSNZsyB/loMgn1Ux6JrC0LmpAfgCxq5cCURc6Jg7FWTLOmJYuOqQ0e2IfpvWMLuBzOfkQoP63RXCzj/bdmYO88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vxjWBXUF; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b1415cba951so3753473a12.2
-        for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 10:56:16 -0700 (PDT)
+	s=arc-20240116; t=1745949724; c=relaxed/simple;
+	bh=Vv6CjAX0UcypBdi0r3oZDdsAEr6GHrBU4Ith4OdMgcs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qxcuZ25Cj/pMHmwFoqZmpWvTTjm7rhPmlgyDVVTngY/c0P0/G7E9YXvKc7P1GlHtj5sXG7NjQ6gPGa/Llt1tRWbkIWrvbYycY98NwFzz2lCju4EpWhthmgx7xyOqEdLlroLKfknqSYcqqiEb1YZB34Asqgtf1nOwoNTpahqljfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q+AIyMAi; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso62673145e9.1
+        for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 11:02:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1745949376; x=1746554176; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xyFfFtiA1BeLFtm4CsqWApY7h/Z3g9TMtoFu5940vNU=;
-        b=vxjWBXUFSHnCESSJG+LyrlsYgWnpKTelEYph7ANtL0k1CbOhIb2ABee2na+3GARJyG
-         eLmyB2AmYs+H2hCGxwTETBSjPa0pjUnUywmBxVHKKGKBNEVGiHhbwLfK2crA36R10gdK
-         kSzjQqo21cjLZ3xyHBZZNB5qqQYqdkNm/BWuNtxacJGVFKKZ78WRSH7kyBJhcAq2b0VG
-         7Szq4W8h1doNk8+qMyOGMhlMeDPzhozR6GPlPkKorG9ucAEUM86asXAKQ52HUl46d9+B
-         fCFCg4V709r3RekGsKWZhpfa8VCiaUcQ4o2gqma5dKMtU6oPMe9+LtypdW96c8VITVHn
-         JazQ==
+        d=linaro.org; s=google; t=1745949721; x=1746554521; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5tX6znmzbpd+MNtjGZbGG6rcM/3SSGVVvBfmXACpsrY=;
+        b=q+AIyMAi6FI8Shsc+G8SrPzSM3sdZ/byFcCTFC1fLYV/Ika7AKRQ+YPS79M+BRCSKq
+         5Gl6cU+XP3RH6oFxtwUchhRt4wlDt/MiH2iHfWbaYZN04y3YDC4EQmxmdmI4iruAVEa0
+         cKvhRsNd0qNJ3cjLXGTff8T0yPHAelugHhm5ROXDRYScwcrVjS3QPtoyZ6xywgB577eh
+         w1qY01mY7yGjT5wBZGkUzsCzzhdWyK1jd6scgPx8kOzD8IMQRBpYEK9NcWOas9KQgo+n
+         BN2Q+jhX8exoWlWNcqbsM7VMbAK5rmjGhQTrfLqvQUvVeOnzuP9NiHvbMBGCDZJCJa96
+         mkig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745949376; x=1746554176;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xyFfFtiA1BeLFtm4CsqWApY7h/Z3g9TMtoFu5940vNU=;
-        b=X8HdHfzOw1oRWMishuaxGEotV5+Ll9sA+NsiJ6g4HLL7SxiN5CpAfJesx67jDFeyWK
-         7Z5U/5A4VDm+DGT2tcHZKhzq9WVks1U6mBgYaUck3y05uK21e1+sF2TcCogxCI4/RX4w
-         ShStGze2uBACFyfkd+6UnZ6mVWfai44SOH7nW3dKM+sDUwWm52N7+CqKnZ3TJndzhvWe
-         xkdE6WQLUDsM90C2ENtn5PhBlYbOsiSKPfgeqA+VVCCQ0Wd1hlvsw+g+Xq81WVRTAUWq
-         QOc4zIEq0sIdYGvwK0V0ioX3tcNq9AfKgpigPdYGLUsnvZbkU5vzettk8MyPrfIY1mKs
-         b8Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCUbTT72UjNsZGCdAjKRy2x6DuhT9UE3JsHldLDqWu4du0CFyWDARxnEu59/YHdXHi56pHY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxD4k4hUxujjK2Nzph5PkcQaVkI+NPFrYOF1G9DRND/zL+Ajzf7
-	J95V1tCka5X4IcRkQSOCTwi1zfHtZa+h5s0aY1FGb1rP9kgxCoumD3FF/mc6S5ILwLHwbJRcqu9
-	Dlw==
-X-Google-Smtp-Source: AGHT+IG7NdYNlJNG8mcIdj3QypCXKP9cdI9GdOCwptPwZSGqNmvYFRPYVWtRwguCO11JWojVTG5Jt542KZI=
-X-Received: from plog16.prod.google.com ([2002:a17:902:8690:b0:22c:31a0:b350])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1a2c:b0:223:47d9:1964
- with SMTP id d9443c01a7336-22df35879f8mr4176195ad.34.1745949376119; Tue, 29
- Apr 2025 10:56:16 -0700 (PDT)
-Date: Tue, 29 Apr 2025 10:56:14 -0700
-In-Reply-To: <926cde15-b1e2-1324-99e8-f5f07fc71ffa@amd.com>
+        d=1e100.net; s=20230601; t=1745949721; x=1746554521;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5tX6znmzbpd+MNtjGZbGG6rcM/3SSGVVvBfmXACpsrY=;
+        b=ubbjd1zrjy1FPsEFj+XQRtA4FDtcS29L5We651mQlXuFXWn5P2wTxD2sdQ/o2NYgL1
+         wOzCCdB9iOvD5jqVvcFA7bO3CTmI11sZYQvWpWs0rJpFkgDP61wCjSJIiSFDzycWV0tC
+         wbeOUdZFbuDezJzW6K4NgNXyzT5gaF47JGfDHbxcV7OiYEiV7Vi9Aw0wwVH24UJONh4v
+         9oiDcnRE4QM0L3ch/yGKU5lZM06fXN9f5/aPuB/Eti4rs1rCqoy517ns5WCXyVDdMIpZ
+         E1lvZ+RVixK94CU1XT4Luw46K1USX1rqCNB6tYShGHq61X3ytN/9SGyX8CvtzzOLpKKf
+         Xwow==
+X-Forwarded-Encrypted: i=1; AJvYcCUJBjxGab87uHMQBSf2O/kH7szThndXJt7i+5YctOSbimxC/cC9B5/KPiu80kZaiXh3d6Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaXHDA1afB07I7DAdEi5IL6K96JmMJwqNqBy+7NwVbdrZBPnVR
+	yi3sdILpMCghkLA70zppaAJ5wAlJeQQCa/uGwE3Jh3xpQKlH0yAo6rHo47tkHXCgHTbxd3vYCcI
+	Z
+X-Gm-Gg: ASbGnctrTFRO9Bf6Zmltfc8SBX2BMUydQYcf39HhJF4yM7TATTfUvrKW8YS0QdteriC
+	Giu5bm+DEdD/93prn4RTH7CoO9gPzIIPuvfIph7K6IxAtvQ3tyJ8tQO6n4oPT7m/mlrvekr4HZC
+	ZU3sooci1agnFxdYnevUpmCX5FNFN7i9pGp7j7WSXFrlv1jLLxNKTh05TtZebp0PgGPyk9c6bzq
+	K+gOGJZGjznoAlpnp7v7tToHBmymsSrPMwJeSeUeYaLHdLMNf3BXZW/B/8usSYsvy5gI9PbUZev
+	2jl0Q7sJ2Vq4nIxany6kb4Vw1fWUedkbeQvtq/VvkzU5zt0hY1Oqsq4HNRc37Chw7+F2sgZVVT7
+	EXXExUafDSBfo4g==
+X-Google-Smtp-Source: AGHT+IGfaI23NYF76B479Bp7eKq+GJV/N5yaJymdVdvVphglf8imvkiZbjfj4oSEsp2KqhUsCvYy4A==
+X-Received: by 2002:a05:600c:3844:b0:43c:fcbc:968c with SMTP id 5b1f17b1804b1-441b1f32cb5mr1737775e9.7.1745949720801;
+        Tue, 29 Apr 2025 11:02:00 -0700 (PDT)
+Received: from [192.168.69.226] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441ae456d7dsm15945095e9.1.2025.04.29.11.01.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Apr 2025 11:02:00 -0700 (PDT)
+Message-ID: <fd70e4f4-29b8-4027-a70c-747729172ce5@linaro.org>
+Date: Tue, 29 Apr 2025 20:01:58 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <8f03878443681496008b1b37b7c4bf77a342b459.1745866531.git.thomas.lendacky@amd.com>
- <aBDumDW9kWEotu0A@google.com> <db704530-e4ae-43af-8de4-bcc431f325a2@oracle.com>
- <926cde15-b1e2-1324-99e8-f5f07fc71ffa@amd.com>
-Message-ID: <aBESvsREQ51B8AzJ@google.com>
-Subject: Re: [PATCH] KVM: SVM: Update dump_ghcb() to use the GHCB snapshot fields
-From: Sean Christopherson <seanjc@google.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Liam Merwick <liam.merwick@oracle.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Michael Roth <michael.roth@amd.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/13] meson: add common libs for target and target_system
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ alex.bennee@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-arm@nongnu.org, anjo@rev.ng, richard.henderson@linaro.org
+References: <20250429050010.971128-1-pierrick.bouvier@linaro.org>
+ <20250429050010.971128-4-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20250429050010.971128-4-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 29, 2025, Tom Lendacky wrote:
-> On 4/29/25 11:31, Liam Merwick wrote:
-> > On 29/04/2025 16:22, Sean Christopherson wrote:
-> >> On Mon, Apr 28, 2025, Tom Lendacky wrote:
-> >>> @@ -3184,18 +3189,18 @@ static void dump_ghcb(struct vcpu_svm *svm)
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >>> =C2=A0 -=C2=A0=C2=A0=C2=A0 nbits =3D sizeof(ghcb->save.valid_bitmap) =
-* 8;
-> >>> +=C2=A0=C2=A0=C2=A0 nbits =3D sizeof(svm->sev_es.valid_bitmap) * 8;
-> >>
-> >> I'm planning on adding this comment to explain the use of KVM's
-> >> snapshot.=C2=A0 Please
-> >> holler if it's wrong/misleading in any way.
-> >>
-> >> =C2=A0=C2=A0=C2=A0=C2=A0/*
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 * Print KVM's snapshot of the GHCB that was (=
-unsuccessfully) used to
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 * handle the exit.=C2=A0 If the guest has sin=
-ce modified the GHCB itself,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 * dumping the raw GHCB won't help debug why K=
-VM was unable to handle
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 * the VMGEXIT that KVM observed.
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 */
-> >>
-> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pr_err("GHCB (GPA=3D%016llx):\n", svm-=
->vmcb->control.ghcb_gpa);
-> >=20
-> > Would printing "GHCB snapshot (GPA=3D ...." here instead of just "GHCB =
-(GPA=3D
-> > ..."
-> > help gently remind people just looking at the debug output of this too?
->=20
-> Except the GPA is that of the actual GHCB. And the values being printed
-> are the actual values sent by the guest and being used by KVM at the time
-> the GHCB was read. So I'm not sure if that would clear things up at all.
+Hi Pierrick,
 
-I personally like the "snapshot" addendum.  Yes, the GPA is the GPA of the =
-GHCB,
-but it also the GPA from which the snapshot was obtained.  Ditto for the va=
-lues.
+On 29/4/25 07:00, Pierrick Bouvier wrote:
+> Following what we did for hw/, we need target specific common libraries
+> for target. We need 2 different libraries:
+> - code common to a base architecture
+> - system code common to a base architecture
+> 
+> For user code, it can stay compiled per target for now.
+> 
+> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+> ---
+>   meson.build | 78 +++++++++++++++++++++++++++++++++++++++++------------
+>   1 file changed, 61 insertions(+), 17 deletions(-)
+> 
+> diff --git a/meson.build b/meson.build
+> index 68d36ac140f..7b2cf3cd7d1 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -3684,6 +3684,8 @@ target_arch = {}
+>   target_system_arch = {}
+>   target_user_arch = {}
+>   hw_common_arch = {}
+> +target_common_arch = {}
+> +target_common_system_arch = {}
+>   
+>   # NOTE: the trace/ subdirectory needs the qapi_trace_events variable
+>   # that is filled in by qapi/.
+> @@ -4087,29 +4089,59 @@ common_all = static_library('common',
+>   
+>   # construct common libraries per base architecture
+>   hw_common_arch_libs = {}
+> +target_common_arch_libs = {}
+> +target_common_system_arch_libs = {}
+>   foreach target : target_dirs
+>     config_target = config_target_mak[target]
+>     target_base_arch = config_target['TARGET_BASE_ARCH']
+> +  target_inc = [include_directories('target' / target_base_arch)]
+> +  inc = [common_user_inc + target_inc]
+>   
+> -  # check if already generated
+> -  if target_base_arch in hw_common_arch_libs
+> -    continue
+> -  endif
+> +  # prevent common code to access cpu compile time definition,
+> +  # but still allow access to cpu.h
+> +  target_c_args = ['-DCPU_DEFS_H']
+> +  target_system_c_args = target_c_args + ['-DCOMPILING_SYSTEM_VS_USER', '-DCONFIG_SOFTMMU']
+>   
+>     if target_base_arch in hw_common_arch
+> -    target_inc = [include_directories('target' / target_base_arch)]
+> -    src = hw_common_arch[target_base_arch]
+> -    lib = static_library(
+> -      'hw_' + target_base_arch,
+> -      build_by_default: false,
+> -      sources: src.all_sources() + genh,
+> -      include_directories: common_user_inc + target_inc,
+> -      implicit_include_directories: false,
+> -      # prevent common code to access cpu compile time
+> -      # definition, but still allow access to cpu.h
+> -      c_args: ['-DCPU_DEFS_H', '-DCOMPILING_SYSTEM_VS_USER', '-DCONFIG_SOFTMMU'],
+> -      dependencies: src.all_dependencies())
+> -    hw_common_arch_libs += {target_base_arch: lib}
+> +    if target_base_arch not in hw_common_arch_libs
+> +      src = hw_common_arch[target_base_arch]
+> +      lib = static_library(
+> +        'hw_' + target_base_arch,
+> +        build_by_default: false,
+> +        sources: src.all_sources() + genh,
+> +        include_directories: inc,
+> +        c_args: target_system_c_args,
+> +        dependencies: src.all_dependencies())
+> +      hw_common_arch_libs += {target_base_arch: lib}
+> +    endif
+> +  endif
+> +
+> +  if target_base_arch in target_common_arch
+> +    if target_base_arch not in target_common_arch_libs
+> +      src = target_common_arch[target_base_arch]
+> +      lib = static_library(
+> +        'target_' + target_base_arch,
+> +        build_by_default: false,
+> +        sources: src.all_sources() + genh,
+> +        include_directories: inc,
+> +        c_args: target_c_args,
+> +        dependencies: src.all_dependencies())
+> +      target_common_arch_libs += {target_base_arch: lib}
+> +    endif
+> +  endif
+> +
+> +  if target_base_arch in target_common_system_arch
+> +    if target_base_arch not in target_common_system_arch_libs
+> +      src = target_common_system_arch[target_base_arch]
+> +      lib = static_library(
+> +        'target_system_' + target_base_arch,
+> +        build_by_default: false,
+> +        sources: src.all_sources() + genh,
+> +        include_directories: inc,
+> +        c_args: target_system_c_args,
+> +        dependencies: src.all_dependencies())
+> +      target_common_system_arch_libs += {target_base_arch: lib}
+> +    endif
+>     endif
+>   endforeach
+>   
+> @@ -4282,12 +4314,24 @@ foreach target : target_dirs
+>     target_common = common_ss.apply(config_target, strict: false)
+>     objects = [common_all.extract_objects(target_common.sources())]
+>     arch_deps += target_common.dependencies()
+> +  if target_base_arch in target_common_arch_libs
+> +    src = target_common_arch[target_base_arch].apply(config_target, strict: false)
+> +    lib = target_common_arch_libs[target_base_arch]
+> +    objects += lib.extract_objects(src.sources())
+> +    arch_deps += src.dependencies()
+> +  endif
+>     if target_type == 'system' and target_base_arch in hw_common_arch_libs
+>       src = hw_common_arch[target_base_arch].apply(config_target, strict: false)
+>       lib = hw_common_arch_libs[target_base_arch]
+>       objects += lib.extract_objects(src.sources())
+>       arch_deps += src.dependencies()
+>     endif
+> +  if target_type == 'system' and target_base_arch in target_common_system_arch_libs
+> +    src = target_common_system_arch[target_base_arch].apply(config_target, strict: false)
+> +    lib = target_common_system_arch_libs[target_base_arch]
+> +    objects += lib.extract_objects(src.sources())
+> +    arch_deps += src.dependencies()
+> +  endif
+>   
+>     target_specific = specific_ss.apply(config_target, strict: false)
+>     arch_srcs += target_specific.sources()
 
-For folks that aren't aware that KVM operates on a snapshot of the GHCB, th=
-ey
-could end up really confused if they somehow have access to the raw GHCB, e=
-.g.
-from the guest side or something.
+Somehow related to this patch, when converting from target_system_arch
+to target_common_system_arch, emptying it, I get:
+
+../../meson.build:4237:27: ERROR: Key microblaze is not in the dictionary.
+
+4235   if target.endswith('-softmmu')
+4236     target_type='system'
+4237     t = target_system_arch[target_base_arch].apply(config_target, 
+strict: false)
+
 
