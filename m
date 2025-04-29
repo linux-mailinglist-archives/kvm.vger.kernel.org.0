@@ -1,257 +1,294 @@
-Return-Path: <kvm+bounces-44709-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44710-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ADC6AA0328
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 08:23:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 746DBAA03B9
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 08:49:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E797D481FE6
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 06:22:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD6753AB85A
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 06:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872A6275878;
-	Tue, 29 Apr 2025 06:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BA9276034;
+	Tue, 29 Apr 2025 06:48:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kTGc5PsS"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Sbu+rArW"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2067.outbound.protection.outlook.com [40.107.236.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D930276046;
-	Tue, 29 Apr 2025 06:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745907534; cv=none; b=MoisXsWJm788O/KUFOo10kvuHfeox3wN4gE4FiirGHOFA7uaqAnfT6SCQwKurb+D1LbIBqGcoaGFdqmOCou+oDBkQ9VQNz+iwXPFYrp7nHDhNOymWARq5aXnw42DrVyQYc8cV1KxsksOtYOcgRBAL9LGB3sej6etg6SJoPlFdAo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745907534; c=relaxed/simple;
-	bh=vExQvIRKgBFgSfzxHEyrFALVuzPRUmMmvaWq9RovN60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l1oTR+Lk3dcq0scby1EjfHnjtlDQ23cXHbvslB9GuJDHp11E8eh13kQ1vK81UTit35v4zIqRHl5r+3tcEmJsjAgyL52rEkZ82dxHIB42ZVpsQEX5A9q+VpcbNDuGavsoP9AaKsuBY2oFF1oHpQgj5tYhJ2LGgXDVyS683XjNXPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kTGc5PsS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F91C4CEE3;
-	Tue, 29 Apr 2025 06:18:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745907533;
-	bh=vExQvIRKgBFgSfzxHEyrFALVuzPRUmMmvaWq9RovN60=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kTGc5PsSm7YoP9EmrE3/tfdAeh2ilrH28OMMhkA1i7TaGCseb+D12f8U4iRskFrE0
-	 RSM+Ykr/eeWEOV3E2nvuETPKv5WgV2r3K5S0fSLkCufCBscRZZxm5uTAwOKKZQ34F/
-	 w5YLetGv0DGVj4FS79jc9/KMtke5/3tgrMHoSQ+QeJcqJgLI/MgFlbbaDFejjar1j7
-	 p+0iatgN6tx2738QkPeIAJSzLkpoG/pCdY9ka1HCzAgLK31eNn58UEn17swH4oZLFI
-	 lBdvSt34FC1+vbqL/TFGUu3Gtp8x21gTZM2GnLCqybPJvtISk7Z3RIRONLDJ0zW3JA
-	 NWZpkM6/vXKLw==
-Date: Tue, 29 Apr 2025 09:18:49 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Baolu Lu <baolu.lu@linux.intel.com>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Kanchan Joshi <joshi.k@samsung.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v10 06/24] iommu/dma: Factor out a iommu_dma_map_swiotlb
- helper
-Message-ID: <20250429061849.GL5848@unreal>
-References: <cover.1745831017.git.leon@kernel.org>
- <f9a6a7874760a2919bea1f255bb3c81c6369ed1c.1745831017.git.leon@kernel.org>
- <8416e94f-171e-4956-b8fe-246ed12a2314@linux.intel.com>
- <20250429055339.GJ5848@unreal>
- <9d1abdbc-4b21-47e2-bcaf-6bc8ca365b01@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C0A127E18;
+	Tue, 29 Apr 2025 06:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745909320; cv=fail; b=tOm0bIIaWUgHiyESyVeeJlmR9F3ivbZluK0NR9IspKpQcIBKIRxhb6IeefasqQ1tQlO/PwD4SxxKsFrILp3w/OPWCSPg6l05EF2CSVV65SzWhEjw1zfR2ezaU+cxsIFSWelIxonSJk2Om4ERubaDunCkl03Go4TIywVHiMvrruI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745909320; c=relaxed/simple;
+	bh=lbKK2IANv48aaMk5MkyMQ4gSCglL3AYmKowhJYgh368=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=W08jx7/6sjkXTKy4w9iur8sTatpa18bUbCKoKs/Zr8gkBWKLGETGQMEjAiT2Ts43saNz0NT1nk7kUkMwPh41ybzkIHRx1iUm6EBSZFqiCPdhEgeAUjv+FPoEYPFnJ/Xa23Om48oOXld1vhsqqnyGSmCaUtKqrY0hZct/KCGKJcs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Sbu+rArW; arc=fail smtp.client-ip=40.107.236.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NItV65fQZ1QkwusC6Kicc+Rrg9+vaJDb+Jy4LVfYg6MRGGG3ia2AB1IR65hkhDzvO6OZlk2ifISyM8v7uR2m6qOlnYNXU6n64XjQFcC0cjzjtCus9mnsr66BerNUwHAdWITq8uvUVOh3Xm77jwCSD59HM2xCbsVXbUn7lHOHC1vz0LibUjFy1uQD7lHFAY7WfPgmYSI4uU+VhzmH44qpl7hipPgfQ0eMiKb4NatxuTCE94LadraukmkKkcEHd2zxtlk9jIqZRs4yRSTcmEzEidsC4vqn5UrJOt9/+4lqCVjzKzMch5LD3eDGc6c5YFmTQcvvlaFCXZPjFs3mS6Ny7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ePa3DOxPZwyemNHnmq1BPIbYnr7EAyi2ytpycp3V9hI=;
+ b=gNX11wQ15K7LPyhORF71GWzAr4Kv4kNGLJK8men8HvAfiJKBe7aMMpyZWcJDFaBDCtOv6kid1wtEbqEe/0OE3T7iK8zE1Xm2oruNJtOEMY+UoMSs5p84CKm00TlQtXuq/zfoUurvAQ0c/Y7I1vzif47u4PKCvSE0D9q+82JvTZzZujzv0mHY+w4H/LkY4siRV6fy3DzrOerjNz7O6RsSRb8CkIEjeYwyKkc5gnRVn/McKRdnUnz7/9JYVIHp2kujTllGroZYyc7qSKJuRvpmsW+aSu1dMKJ85CC3P6X6/b7ShEnMpxWFkQ5x6HuSilRn1OoAco4C5rSo3eZVbvjTvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ePa3DOxPZwyemNHnmq1BPIbYnr7EAyi2ytpycp3V9hI=;
+ b=Sbu+rArWe6NK+0cwiEU7aokNh3Y9RP5juCaYpl41/qhViL0wLJ5YijlKG0dPzbEhDc81NynoJKhjsyAG7rTNuM9TtcI8AmgZlkYVrwqfrpWVve6XOAzvXY2vYZJo60kIbI4wZGf5cv+Y1KEUICSjJOcrVGJjNrvWO2lqI5FYlKA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by DS7PR12MB5911.namprd12.prod.outlook.com (2603:10b6:8:7c::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Tue, 29 Apr
+ 2025 06:48:36 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f%4]) with mapi id 15.20.8678.028; Tue, 29 Apr 2025
+ 06:48:35 +0000
+Message-ID: <371ab632-d167-4720-8f0d-57be1e3fee84@amd.com>
+Date: Tue, 29 Apr 2025 16:48:27 +1000
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
+To: Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+ christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
+ alex.williamson@redhat.com, jgg@nvidia.com, vivek.kasireddy@intel.com,
+ dan.j.williams@intel.com
+Cc: yilun.xu@intel.com, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+ daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
+ zhenzhong.duan@intel.com, tao1.su@intel.com
+References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
+Content-Language: en-US
+From: Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <20250107142719.179636-1-yilun.xu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN7P220CA0021.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:806:123::26) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9d1abdbc-4b21-47e2-bcaf-6bc8ca365b01@linux.intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|DS7PR12MB5911:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8161b116-fc61-4128-c30a-08dd86e9dd52
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VlZUL2o0UENxaklrMGxqcklod0lEMDBvaDV3Q21iL2pydlJYcnpiZUxieTZt?=
+ =?utf-8?B?RXBRSVlBdmNKQ2UwK1RjSFBiRUZmbWJrQnpPVHFzSXR3TEtWaDdJTFNQTTl2?=
+ =?utf-8?B?NU8zK0xoamlXSWs3M0I3RVgrOUg4aU5ndVJiaFo2SmpRMWJjanVPSlVjYjVv?=
+ =?utf-8?B?dTY2QTJyMDc0cmFhY2VpeFkzWnRLcXBSanI2Z3BPeGFGL0JVUkpiSFd6bVdH?=
+ =?utf-8?B?d0srZHhoNC9aamdhbTdPS0Q2M1dSaEFWWXZRNUZSbzE4L2dVbFhhTldDWk0x?=
+ =?utf-8?B?eWhQTFA0Y2R0VUxKNE9ERE0weU0razlhd1g2VlRpK25RdlRyYUUyMjhVelAz?=
+ =?utf-8?B?VU8xWDZya0loMThpTFIydjc5Y1FrVldkcUJtSnB5enF5Z09sOTVQbzEzMk14?=
+ =?utf-8?B?TndhY2ttTzRaSGt0MjBNTUliVlFLSDdKcU92a2F5VEFPY0ZUNDEvbnh0UHIr?=
+ =?utf-8?B?MzUzbmpBWVhRSXdyUStVaHpLbVpOMVd0YlBGZVhZUXU2ZW93SnVlN2dGMlJq?=
+ =?utf-8?B?Q002MHE5S0h5OHh2U0ZKSnlsUXpZQVlPdlBqMTVGMU9URm5NSFo4Mm5WNDBw?=
+ =?utf-8?B?c3B5eG1Pd3piUVNVS01kelM0a1dnVEtXdDFXRDh2aHNFSUk1dmhqUmdkNnpS?=
+ =?utf-8?B?Qk1KTVE3MlZGMVVML0thRW40bGFobkNjSXduSHJidG1BS1RGWXd5bFZXNXM3?=
+ =?utf-8?B?eWNlK1RRUXorbUZCL1ZPU2tENXNWWGVDTlFKeHRFN0ZXREdoek5rNFR1Rm81?=
+ =?utf-8?B?ZTY4ajdHcGFndkZQN2R6Z0REek9CTUxCY24xbjRDS3MydExMekVMQ0swM2ph?=
+ =?utf-8?B?bkgvWHFkY28vV3dYdkJuam5xZXkrWFBnUHcxazl0aHBWSm9MNUlYSU41d3NG?=
+ =?utf-8?B?c3pxdGsrZGNUdWhWMmtNdzQrQ2FhN2pTQ0tTeFVIbENVN3JqRHlSdnJQdFQ4?=
+ =?utf-8?B?ZjdOMFF0SFIvY3FEMDRFYXlZS0Q1RUlIcDVZNk5BT0tJTmJKa0lYeE9SWjhr?=
+ =?utf-8?B?SGd0ZDNuNEZqSjI5UGNPdTNHZlhVZUQvcWU1RGtTdUVtREcxWS9qMWFmNWdC?=
+ =?utf-8?B?TERHZXRuL1FpbEJtbEZRZG92SkF1bTBVUWIyNFRRZ3JNYld4TUVlakpmMTN0?=
+ =?utf-8?B?LzVWMis0Tm93ZUU3Rjh1Kzk0QzZ0TEpMWjM5TEtMTGpkOXhnU1RVQW5YWC94?=
+ =?utf-8?B?VHpzVWcyWXY5MU84L3pBTU1oR0JWRUhIb3psWlpWNGRoSS9aVXR6Ly81cEJh?=
+ =?utf-8?B?U1BkMFhpaTlNZDF5U0FhWUZnc282c1Z4WHg5R0VjWXFvV3U1ajZuTUl1cUdH?=
+ =?utf-8?B?dXh6d1pHZFErc3cySHc5U25WR1ppUDJyMVdraUxvak1RZHB6eFVmS3FlbS9o?=
+ =?utf-8?B?UFNSY0xUcXBNbThINU11SkFnWGp4elRONTN6Ym9aRzgveTNhYkZtWThKa1JO?=
+ =?utf-8?B?NUsyYWpLYnd3SmtyaHpHblJ4bDU3ZnZEeXlYeVErNXJ4YmhZNitYRllncWQ1?=
+ =?utf-8?B?L1NkTytVcGNpYWpjNzlCZHc3cXg3R2JDa3BZNzRPYStReTZHa09MbkE5dVJG?=
+ =?utf-8?B?Qll6TzdCbEFYc0ZSbWxuTjN0L2ZJNVNxODJGMkV4dDlQVldtSWpmVWNNdms5?=
+ =?utf-8?B?c1QyU0xYNks0VFBlSFFBK05Xck16ZUtWT3JsTDZQQlk1QXVrYXVrUE9GWHNO?=
+ =?utf-8?B?SW1hSXBjRXBQV21JRnQ2MmdhWGlCeGxmVzdpcHR5Yk9qcFZQWWdHeEJIbmd1?=
+ =?utf-8?B?MDdMNjArV2JCQzRCWFJRSmVaOExSRDNCeEp4MW1TN1BMSzQ4ZEljNUJTd0Iz?=
+ =?utf-8?B?L2U0dlQrbXg5RUVWb1RZOWdOK3o1ZGdSMDR2MEdDMWZzN0w4NFNGV1JHYUwv?=
+ =?utf-8?B?QzJpTiswMXRUa3ljL0VmQkVka3d4R1FsNHZrcVplMVliSDZEaW5lcHExYWVK?=
+ =?utf-8?B?TnVIMUlvc1J4L0pGaFhYZHgrMmNZdXRHaGM3YVRveTZVMm5nMkNuOVJpMUN0?=
+ =?utf-8?Q?LK7+2vEr/nSrayz2txGCtNw9rk6k2g=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?V1QwMk1qamVlQjZNbTNqY2YrK1BJTmdsODd3SEJ2eE92enAvVnczTytJWjg1?=
+ =?utf-8?B?QTBVa0J5NmkyVktaVVp6SVQzL0owY2tkTVBoYjNkN0d1NmZ6bEJYdHVkdjRw?=
+ =?utf-8?B?MzFEaGtXdlZ3UjBuU3pqZ2NGNUFIbWtEWGp1Q1YzeEpGVFo0cFp0REptcEhV?=
+ =?utf-8?B?ZjFrRUY3ZmNMUG1ERjJJZmVtZ3ZoOEtwNUpkWlRIYmJYSzVkcUlhUEMvTy9o?=
+ =?utf-8?B?Qi9IcnE3SkhZaDBtOEFjV1d5VjNnWnFZUUhxQkpESnRkZDZsUllicm9tV1pC?=
+ =?utf-8?B?K0tCWnVxYXh3Z3d4VGFDazI4bzlMcGRoM1FaVW9ZUUlRRWpKVFY1cXFTM2sx?=
+ =?utf-8?B?cG9LcE5Md0pLbTJma3g5alpndXl4WkJ2SzFpbjhIRGNRWTFnMFhRMitrQTZi?=
+ =?utf-8?B?dExkVGtGdmNWMFlZeDFuNnJBNDZCdXNDSmpGRWIyc3I1anRSVHk1Y0t6UGtI?=
+ =?utf-8?B?Y2hpb3pKNW9vdHZ0YzkrQUhFZEhvTFR4eEhrVDV6eFJ6cEhxQTZGcjFNWXNG?=
+ =?utf-8?B?dEdVeXBHVUJ0NG82UVVURUhXWndKMDhZTnZ3am5paVlMRTRyZWdPSGRsYWt3?=
+ =?utf-8?B?NExOYkZZdVdQb25FampJZEdmZkZER2I3MmNiU0ZWaE1NRE1pYTBMM2tTZVd6?=
+ =?utf-8?B?SW9mU2xrdDFGbnJGSVRjd3pvcXp2dUpnblJ4TnVrZDJjbkhRaFkvcStyS0kz?=
+ =?utf-8?B?ZVJ2K3c0YjZVa0pydkhiamduUndOYnBTWFJJNDRocWQ4ZFMvbEZUb1NYMXJS?=
+ =?utf-8?B?UFRINDVGR1ZNY0kyT1U3TUs4TVY2ZXRpRTlmTFlTR1RiWVVPdFVBckxlNm5y?=
+ =?utf-8?B?QzhDQ1JyQjRucnBNajRYWGFzWkg4ZDRNdGEyaTdEMkxPWTlrUm41eWRmSnJj?=
+ =?utf-8?B?bGNJaVdyWE5Sa2lYVFFtcDcyVTV1N1V3cENDK2NLdHBxd1lDMjJKa2J3WDgw?=
+ =?utf-8?B?M1RMa2R5bElmNUJEeXBFY0NTeTZ1UC9lZHY3QnBxRUtmOFh0ZDJ1WCtEOWZH?=
+ =?utf-8?B?SHNNWWJYdmQ5emZJbFVTNzliZm5pMzJvMDNFam5SVlYxQmM3R05hVGhiSFFt?=
+ =?utf-8?B?NHVvRXp5aXRGSUY2bUVLNHF1VDdNdU5yQXRNNlpXS2xUV3Y4eXdYOXZPajdl?=
+ =?utf-8?B?anZmbkc5L2pSTXNxdnBZemRRUHhZZ1JKN1p3ZFRiaWtVRGV0VXdnaXRvbFpp?=
+ =?utf-8?B?emZma3M0QmJSbmlrcC9YVGl2VlNjMGR3OWk3Rmw4NFdrd2VmSlFkTmNJWU5F?=
+ =?utf-8?B?MUxnTUFMb3U0ajBGQlRuWi9CUWdhdStpRkhFUHozdGRWYzVhSkx0M0lYUk5L?=
+ =?utf-8?B?MHE1UUxXbUR0MHVQM2hjY2lJQzFYWno1dERaWUtSM0IzWmZoK253bnNZWEcz?=
+ =?utf-8?B?MjN4SnplUzFvQ1RxRzN4THlzZTloWVRsU0NhY2hIUEVSTzlOS0V3WVZTUml6?=
+ =?utf-8?B?U2NydFdaRmhnUXFDUVErY2VQSytzZXBZWkRYWDRQS1ZpT3lvWmtaMjlDYThJ?=
+ =?utf-8?B?VGp0L09vSG5sTUpmWFU2SWJlNnhzbE9NUFllV2FyRVBIamt5WHI2SXBpOHdW?=
+ =?utf-8?B?NHJUcWhGMXlaQ3cwWlYxNG0vUlkveEtnLzZabGtEUEl2OVVaWUNvQW1xbUt1?=
+ =?utf-8?B?Vm5zaTRjQ2gyVnR4dGQvaUp0ZDBnc2FaaTNrbE8zTm8yMFR0WEErR3RVNE91?=
+ =?utf-8?B?UE9UR2VGM002V1VDOUhzVS9WWjFCNHg4dHJYanczQlY0WFpOR2J1enQzeHBR?=
+ =?utf-8?B?WmZudzVVaHlqazZmTm5HbnU5WjVPd01rVDV0TGw5M1cyOWpGTWNlN3JiaENH?=
+ =?utf-8?B?OHdkSy9DSFhBSEc4SEJsdW5nTTZMVEdLY0x3djFSU2ZrRkVZZjkydUtPU3dm?=
+ =?utf-8?B?Tjh5U0g5ZnJWcDBuR29Xd3h2K0IzVFc3K1lXUWhBeXJQR3lHSGdrUlV3VS81?=
+ =?utf-8?B?MW05dHJ1Tnd0OTUxYzlzMzJ4cHN2Wk53YnZId3JjaXdGN0c0UVFNRW9maVRi?=
+ =?utf-8?B?a2xNMTk1QVo2ZUpndTZzTUZodXFSNDBxVWVUSzdYenErbi9rZ0pIYlZuZWJr?=
+ =?utf-8?B?NVFUeW9vSEJ2Sk1HRHBDTStlNzZxV2Z0bEJrbmlOK0NDZlBFay9HSU9JYWU2?=
+ =?utf-8?Q?IQyydVT9ITQ65F5V0V94r274Q?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8161b116-fc61-4128-c30a-08dd86e9dd52
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2025 06:48:35.7815
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BqviLQc/u0wJ7NlXIM1DDH+hIGt7QmeqIPeVc7phLsTKddw5+KHnisWiPX/tEiC/gqJB4oA6E4Z3gvZus2IQzQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5911
 
-On Tue, Apr 29, 2025 at 01:58:06PM +0800, Baolu Lu wrote:
-> On 4/29/25 13:53, Leon Romanovsky wrote:
-> > On Tue, Apr 29, 2025 at 12:58:18PM +0800, Baolu Lu wrote:
-> > > On 4/28/25 17:22, Leon Romanovsky wrote:
-> > > > From: Christoph Hellwig<hch@lst.de>
-> > > > 
-> > > > Split the iommu logic from iommu_dma_map_page into a separate helper.
-> > > > This not only keeps the code neatly separated, but will also allow for
-> > > > reuse in another caller.
-> > > > 
-> > > > Signed-off-by: Christoph Hellwig<hch@lst.de>
-> > > > Tested-by: Jens Axboe<axboe@kernel.dk>
-> > > > Reviewed-by: Luis Chamberlain<mcgrof@kernel.org>
-> > > > Signed-off-by: Leon Romanovsky<leonro@nvidia.com>
-> > > 
-> > > Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
-> > > 
-> > > with a nit below ...
-> > > 
-> > > > ---
-> > > >    drivers/iommu/dma-iommu.c | 73 ++++++++++++++++++++++-----------------
-> > > >    1 file changed, 41 insertions(+), 32 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> > > > index d3211a8d755e..d7684024c439 100644
-> > > > --- a/drivers/iommu/dma-iommu.c
-> > > > +++ b/drivers/iommu/dma-iommu.c
-> > > > @@ -1138,6 +1138,43 @@ void iommu_dma_sync_sg_for_device(struct device *dev, struct scatterlist *sgl,
-> > > >    			arch_sync_dma_for_device(sg_phys(sg), sg->length, dir);
-> > > >    }
-> > > > +static phys_addr_t iommu_dma_map_swiotlb(struct device *dev, phys_addr_t phys,
-> > > > +		size_t size, enum dma_data_direction dir, unsigned long attrs)
-> > > > +{
-> > > > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
-> > > > +	struct iova_domain *iovad = &domain->iova_cookie->iovad;
-> > > > +
-> > > > +	if (!is_swiotlb_active(dev)) {
-> > > > +		dev_warn_once(dev, "DMA bounce buffers are inactive, unable to map unaligned transaction.\n");
-> > > > +		return (phys_addr_t)DMA_MAPPING_ERROR;
-> > > > +	}
-> > > > +
-> > > > +	trace_swiotlb_bounced(dev, phys, size);
-> > > > +
-> > > > +	phys = swiotlb_tbl_map_single(dev, phys, size, iova_mask(iovad), dir,
-> > > > +			attrs);
-> > > > +
-> > > > +	/*
-> > > > +	 * Untrusted devices should not see padding areas with random leftover
-> > > > +	 * kernel data, so zero the pre- and post-padding.
-> > > > +	 * swiotlb_tbl_map_single() has initialized the bounce buffer proper to
-> > > > +	 * the contents of the original memory buffer.
-> > > > +	 */
-> > > > +	if (phys != (phys_addr_t)DMA_MAPPING_ERROR && dev_is_untrusted(dev)) {
-> > > > +		size_t start, virt = (size_t)phys_to_virt(phys);
-> > > > +
-> > > > +		/* Pre-padding */
-> > > > +		start = iova_align_down(iovad, virt);
-> > > > +		memset((void *)start, 0, virt - start);
-> > > > +
-> > > > +		/* Post-padding */
-> > > > +		start = virt + size;
-> > > > +		memset((void *)start, 0, iova_align(iovad, start) - start);
-> > > > +	}
-> > > > +
-> > > > +	return phys;
-> > > > +}
-> > > > +
-> > > >    dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
-> > > >    	      unsigned long offset, size_t size, enum dma_data_direction dir,
-> > > >    	      unsigned long attrs)
-> > > > @@ -1151,42 +1188,14 @@ dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
-> > > >    	dma_addr_t iova, dma_mask = dma_get_mask(dev);
-> > > >    	/*
-> > > > -	 * If both the physical buffer start address and size are
-> > > > -	 * page aligned, we don't need to use a bounce page.
-> > > > +	 * If both the physical buffer start address and size are page aligned,
-> > > > +	 * we don't need to use a bounce page.
-> > > >    	 */
-> > > >    	if (dev_use_swiotlb(dev, size, dir) &&
-> > > >    	    iova_offset(iovad, phys | size)) {
-> > > > -		if (!is_swiotlb_active(dev)) {
-> > > 
-> > > ... Is it better to move this check into the helper? Simply no-op if a
-> > > bounce page is not needed:
-> > > 
-> > > 	if (!dev_use_swiotlb(dev, size, dir) ||
-> > > 	    !iova_offset(iovad, phys | size))
-> > > 		return phys;
-> > 
-> > Am I missing something? iommu_dma_map_page() has more code after this
-> > check, so it is not correct to return immediately:
-> > 
-> >    1189 dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
-> >    1190               unsigned long offset, size_t size, enum dma_data_direction dir,
-> >    1191               unsigned long attrs)
-> >    1192 {
-> > 
-> > <...>
-> > 
-> >    1201         /*
-> >    1202          * If both the physical buffer start address and size are page aligned,
-> >    1203          * we don't need to use a bounce page.
-> >    1204          */
-> >    1205         if (dev_use_swiotlb(dev, size, dir) &&
-> >    1206             iova_unaligned(iovad, phys, size)) {
-> >    1207                 phys = iommu_dma_map_swiotlb(dev, phys, size, dir, attrs);
-> >    1208                 if (phys == (phys_addr_t)DMA_MAPPING_ERROR)
-> >    1209                         return DMA_MAPPING_ERROR;
-> >    1210         }
-> >    1211
-> >    1212         if (!coherent && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
-> >    1213                 arch_sync_dma_for_device(phys, size, dir);
-> >    1214
-> >    1215         iova = __iommu_dma_map(dev, phys, size, prot, dma_mask);
-> >    1216         if (iova == DMA_MAPPING_ERROR)
-> >    1217                 swiotlb_tbl_unmap_single(dev, phys, size, dir, attrs);
-> >    1218         return iova;
-> >    1219 }
+On 8/1/25 01:27, Xu Yilun wrote:
+> This series is based on an earlier kvm-coco-queue version (v6.12-rc2)
+
+Has this been pushed somewhere public? The patchset does not apply on top of v6.12-rc2, for example (I fixed locally).
+Also, is there somewhere a QEMU tree using this? I am trying to use this new DMA_BUF feature and this require quite some not so obvious plumbing. Thanks,
+
+
+> which includes all basic TDX patches.
 > 
-> static phys_addr_t iommu_dma_map_swiotlb(struct device *dev, phys_addr_t
-> phys,
-> 		size_t size, enum dma_data_direction dir, unsigned long attrs)
-> {
-> <...>
-> 	/*
-> 	 * If both the physical buffer start address and size are page aligned,
-> 	 * we don't need to use a bounce page.
-> 	 */
-> 	if (!dev_use_swiotlb(dev, size, dir) ||
-> 	    !iova_offset(iovad, phys | size))
-> 		return phys;
-> <...>
-> }
+> The series is to start the early stage discussion of the private MMIO
+> handling for Coco-VM, which is part of the Private Device
+> Assignment (aka TEE-IO, TIO) enabling. There are already some
+> disscusion about the context of TIO:
 > 
-> Then,
+> https://lore.kernel.org/linux-coco/173343739517.1074769.13134786548545925484.stgit@dwillia2-xfh.jf.intel.com/
+> https://lore.kernel.org/all/20240823132137.336874-1-aik@amd.com/
 > 
-> dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
-> 	unsigned long offset, size_t size, enum dma_data_direction dir,
-> 	unsigned long attrs)
-> {
-> <...>
-> 	phys = iommu_dma_map_swiotlb(dev, phys, size, dir, attrs);
-> 	if (phys == (phys_addr_t)DMA_MAPPING_ERROR)
-> 		return DMA_MAPPING_ERROR;
-> <...>
-> }
-
-Such change will cause to extra function call for everyone who doesn't
-use SWIOTLB (RDMA, HMM e.t.c).
-
-In addition, iommu_dma_map_swiotlb() is called through
-dma_iova_link -> 
-	iommu_dma_iova_link_swiotlb -> 
-		iommu_dma_iova_bounce_and_link() -> 
-			iommu_dma_map_swiotlb()
-and dma_iova_link() has this "if (dev_use_swiotlb(dev, size, dir) && iova_unaligned(iovad, phys, size))"
-very early at call stack.
-
-So, in dma_iova_link() we will find ourselves with same check twice.
-
-Thanks
-
+> Private MMIOs are resources owned by Private assigned devices. Like
+> private memory, they are also not intended to be accessed by host, only
+> accessible by Coco-VM via some secondary MMUs (e.g. Secure EPT). This
+> series is for KVM to map these MMIO resources without firstly mapping
+> into the host. For this purpose, This series uses the FD based MMIO
+> resources for secure mapping, and the dma-buf is chosen as the FD based
+> backend, just like guest_memfd for private memory. Patch 6 in this
+> series has more detailed description.
 > 
-> Thanks,
-> baolu
 > 
+> Patch 1 changes dma-buf core, expose a new kAPI for importers to get
+> dma-buf's PFN without DMA mapping. KVM could use this kAPI to build
+> GPA -> HPA mapping in KVM MMU.
+> 
+> Patch 2-4 are from Jason & Vivek, allow vfio-pci to export MMIO
+> resources as dma-buf. The original series are for native P2P DMA and
+> focus on p2p DMA mapping opens. I removed these p2p DMA mapping code
+> just to focus the early stage discussion of private MMIO. The original
+> series:
+> 
+> https://lore.kernel.org/all/0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com/
+> https://lore.kernel.org/kvm/20240624065552.1572580-1-vivek.kasireddy@intel.com/
+> 
+> Patch 5 is the implementation of get_pfn() callback for vfio dma-buf
+> exporter.
+> 
+> Patch 6-7 is about KVM supports the private MMIO memory slot backed by
+> vfio dma-buf.
+> 
+> Patch 8-10 is about how KVM verifies the user provided dma-buf fd
+> eligible for private MMIO slot.
+> 
+> Patch 11-12 is the example of how KVM TDX setup the Secure EPT for
+> private MMIO.
+> 
+> 
+> TODOs:
+> 
+> - Follow up the evolving of original VFIO dma-buf series.
+> - Follow up the evolving of basic TDX patches.
+> 
+> 
+> Vivek Kasireddy (3):
+>    vfio: Export vfio device get and put registration helpers
+>    vfio/pci: Share the core device pointer while invoking feature
+>      functions
+>    vfio/pci: Allow MMIO regions to be exported through dma-buf
+> 
+> Xu Yilun (9):
+>    dma-buf: Introduce dma_buf_get_pfn_unlocked() kAPI
+>    vfio/pci: Support get_pfn() callback for dma-buf
+>    KVM: Support vfio_dmabuf backed MMIO region
+>    KVM: x86/mmu: Handle page fault for vfio_dmabuf backed MMIO
+>    vfio/pci: Create host unaccessible dma-buf for private device
+>    vfio/pci: Export vfio dma-buf specific info for importers
+>    KVM: vfio_dmabuf: Fetch VFIO specific dma-buf data for sanity check
+>    KVM: x86/mmu: Export kvm_is_mmio_pfn()
+>    KVM: TDX: Implement TDX specific private MMIO map/unmap for SEPT
+> 
+>   Documentation/virt/kvm/api.rst     |   7 +
+>   arch/x86/include/asm/tdx.h         |   3 +
+>   arch/x86/kvm/mmu.h                 |   1 +
+>   arch/x86/kvm/mmu/mmu.c             |  25 ++-
+>   arch/x86/kvm/mmu/spte.c            |   3 +-
+>   arch/x86/kvm/vmx/tdx.c             |  57 +++++-
+>   arch/x86/virt/vmx/tdx/tdx.c        |  52 ++++++
+>   arch/x86/virt/vmx/tdx/tdx.h        |   3 +
+>   drivers/dma-buf/dma-buf.c          |  90 ++++++++--
+>   drivers/vfio/device_cdev.c         |   9 +-
+>   drivers/vfio/pci/Makefile          |   1 +
+>   drivers/vfio/pci/dma_buf.c         | 273 +++++++++++++++++++++++++++++
+>   drivers/vfio/pci/vfio_pci_config.c |  22 ++-
+>   drivers/vfio/pci/vfio_pci_core.c   |  64 +++++--
+>   drivers/vfio/pci/vfio_pci_priv.h   |  27 +++
+>   drivers/vfio/pci/vfio_pci_rdwr.c   |   3 +
+>   drivers/vfio/vfio_main.c           |   2 +
+>   include/linux/dma-buf.h            |  13 ++
+>   include/linux/kvm_host.h           |  25 ++-
+>   include/linux/vfio.h               |  22 +++
+>   include/linux/vfio_pci_core.h      |   1 +
+>   include/uapi/linux/kvm.h           |   1 +
+>   include/uapi/linux/vfio.h          |  34 +++-
+>   virt/kvm/Kconfig                   |   6 +
+>   virt/kvm/Makefile.kvm              |   1 +
+>   virt/kvm/kvm_main.c                |  32 +++-
+>   virt/kvm/kvm_mm.h                  |  19 ++
+>   virt/kvm/vfio_dmabuf.c             | 151 ++++++++++++++++
+>   28 files changed, 896 insertions(+), 51 deletions(-)
+>   create mode 100644 drivers/vfio/pci/dma_buf.c
+>   create mode 100644 virt/kvm/vfio_dmabuf.c
+> 
+
+-- 
+Alexey
+
 
