@@ -1,114 +1,119 @@
-Return-Path: <kvm+bounces-44797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 603A1AA1041
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 17:20:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AE09AA1054
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 17:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 652431B6795C
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 15:19:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AD817AA226
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 15:21:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1140421E086;
-	Tue, 29 Apr 2025 15:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A4122128A;
+	Tue, 29 Apr 2025 15:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fjuEtJt/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YSWjDd86"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5762746A;
-	Tue, 29 Apr 2025 15:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD622206A2
+	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 15:22:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745939955; cv=none; b=Lr71/8mUz21/msogWDMBQQjGf7ZMLRV71qaEMkCRuEse7ctS9Ozjq8vCb94cayIBFpFsrI+etDnwRzEUpmlXRjwSvmqknQEleYsqXppkM2IDj+423q4kGcAlx0LSSxh0MMWb7jIO3i5s99/vHHXA4iTD0ueUF9Vny4v2m5DdCFs=
+	t=1745940124; cv=none; b=AcdlR8rIFm1fzTvHNZFTBBCCtEbTBzWqsorfVaGWkCYRiJ4wqgZs5gvOGjWG56l08tw2JmyxeaC2YSvINMbaujA5qhpcUWDCiKGYVRtC5TjriYKsG61He4DjpEWXvaTs+egzJPsjk/coGScabuypdE5Jn7ZAAepY0TKppCMfA58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745939955; c=relaxed/simple;
-	bh=3C8fhB1fGzK7l6qdXHOl1DpkXFliBZMpdfcLMqkBWl4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oQqAZcsGzDrIhN+DZiFC4BMZEq8tXPX6Ho1I4enQlvGQ88nqD1LV2B7B4StmelRhn5fGHbvPSrqbsi6h3OB21IVQd9G0AAdm1HgBj0apNf47T7RmQS7+//r6S7gMf7+G99KoTwyuTk6HkNtSqMFsJildDkp83EtN8+q2GO1toeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=fjuEtJt/; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ylYybXRg8BOTls77x7I6uqAkR57DkifaGTI+lQneTd0=; b=fjuEtJt/emY2co4/t5cOHPVHMp
-	84aONTqApzZwB60TU2nF19qlPCxs+aw9FJi/ftyWpw+VsUF+w+NiqQVEvWGSmaC7zmWMA8eINsWNA
-	rKd6XgeTudO5qZcpXrpMlFdeF6OghsQxq+P83Fc9OLjMCFswQWdSGKrdmTgLOSw4zBrU1LPuyt3bK
-	nrL07kVqZGE589vMsiV32QGr1XH40JZA/FSQicrLARUJYnEAw3ec2OtmbuJGvrevIfH3iY2nV/Ahh
-	nzDDzEmjf6LIIy2+NLmMMGXDizYIzVq5iq+j4yr6dmR0njUFBQ0wSUmh4OdJVDi9MXrjJTdmDAEOB
-	qieQq3bg==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1u9mjg-0000000DRBs-37cP;
-	Tue, 29 Apr 2025 15:19:04 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id EAB1330035E; Tue, 29 Apr 2025 17:19:03 +0200 (CEST)
-Date: Tue, 29 Apr 2025 17:19:03 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: "x86@kernel.org" <x86@kernel.org>,
-	"kys@microsoft.com" <kys@microsoft.com>,
-	"haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"decui@microsoft.com" <decui@microsoft.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"hpa@zytor.com" <hpa@zytor.com>,
-	"jpoimboe@kernel.org" <jpoimboe@kernel.org>,
-	"pawan.kumar.gupta@linux.intel.com" <pawan.kumar.gupta@linux.intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"kees@kernel.org" <kees@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-	"samitolvanen@google.com" <samitolvanen@google.com>,
-	"ojeda@kernel.org" <ojeda@kernel.org>
-Subject: Re: [PATCH 5/6] x86_64,hyperv: Use direct call to hypercall-page
-Message-ID: <20250429151903.GK4198@noisy.programming.kicks-ass.net>
-References: <20250414111140.586315004@infradead.org>
- <20250414113754.435282530@infradead.org>
- <SN6PR02MB41575B92CD3027FE0FBFB9F3D4B82@SN6PR02MB4157.namprd02.prod.outlook.com>
- <20250425140355.GC35881@noisy.programming.kicks-ass.net>
- <SN6PR02MB41577A6B0E5898B68E2CD3C9D4842@SN6PR02MB4157.namprd02.prod.outlook.com>
- <SN6PR02MB4157194E753702D204C20D09D4862@SN6PR02MB4157.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1745940124; c=relaxed/simple;
+	bh=eTm8uUOjEA2yj6gyEF2Wj5Q6fv0haX5JFNB0Clpjs/o=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UoTKiC/Zqk88184TmorSdttLy9gMDlDVy/7yBj8ENZACl937TW+swWzRxvDWIntoAiSCv7f2iNx0cYzqLEio9eT/1jlp6ZWRTtW2OktbmTQt2SYmtDDsJCEFtsghv3a6ypkJ/aBWLFDPjF3HxMq7DIMEeosXKHpQ9JHGYAShuVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YSWjDd86; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff8340d547so5138270a91.2
+        for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 08:22:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1745940122; x=1746544922; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aNk7xuT0f0Cef+C938NHaMgqXngD7O4h38pLZxapbNs=;
+        b=YSWjDd86r2ThzV3EF7G4IMgG5Fb2415C5I2rotOspfhWTRxA0vJ37hxPYZHe4gw+wa
+         i6kXHbcEfaiKwnlX8dEo4UAmmzGUBBf29LHYYZ06LpFvnK7WKroeLpQ83muEB0to6wRV
+         lPI6pcGwOhcOadlGmtBWqFUkIJFbQfCotZQFQAi9Y0lH8x8q1d015+Izhjrc6tSVoOJL
+         tFxtivNGgHNsMnn9r3DTMX7VAS+QFPrOZghls354S5w+RF5afgnUxHqtbi6BPGGFpBwC
+         zhuRqqjWRdhC9qhYLn3vzyNyY5wQIaSJsg9NZ7KND6rgDpYQxIX10hHkud2pnrPord1A
+         wlWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745940122; x=1746544922;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aNk7xuT0f0Cef+C938NHaMgqXngD7O4h38pLZxapbNs=;
+        b=mpTgU1jIyGwM3/zwRAIK5v4ZN0762F3kn7Wu9xq++ENLnFCVuQSXlBIfk9rZsQwrgv
+         lRYB7MiA/sB7+paflXqwGkbji6gsH8AzX/unYwCnAXz/zxSGIwrjmkTp7YlqoLi2bJhd
+         xEJmhEtdlNyq9qqr2bagtfkXO5stZC6rl+4Vm4iI4+88A+eOUbF0/bEUqWORb5BJpxq2
+         g22DxZLBwsm+MrTI29ux+p/Gvo5hMIOt6RxufFSuAeKdwyFyPk4PFWkAkF+rktSdPj8k
+         VMCZNcC9ohF3v9rGKLiWND+VFjHz7DDaET9mtD7yjMKEhqbKNRmIS0VzNCwyp7bqUZOp
+         xMRg==
+X-Gm-Message-State: AOJu0YwYROrcS/tUybzZ1iv6C8GZt7PdlVKjf1lecqORaCtSI02sOcp/
+	MvkbBldDeDhLeO/xwa8tfKqVoto6MdKaqh5FFLuTvxWlORPZU4ipaSe8shbFz25ourl6ruWDF8d
+	5RA==
+X-Google-Smtp-Source: AGHT+IFYXh1I3s4XEFN65uVfk6oHWBn6YIlt2ZFbuISXBnP3zzgosLfAG8nouUaaQl7BdvugXwDdfe4pOcI=
+X-Received: from pjbsg5.prod.google.com ([2002:a17:90b:5205:b0:2f2:e97a:e77f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1e4b:b0:2ff:64c3:3bd9
+ with SMTP id 98e67ed59e1d1-30a0139a0b8mr15921485a91.23.1745940122452; Tue, 29
+ Apr 2025 08:22:02 -0700 (PDT)
+Date: Tue, 29 Apr 2025 08:22:00 -0700
+In-Reply-To: <8f03878443681496008b1b37b7c4bf77a342b459.1745866531.git.thomas.lendacky@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR02MB4157194E753702D204C20D09D4862@SN6PR02MB4157.namprd02.prod.outlook.com>
+Mime-Version: 1.0
+References: <8f03878443681496008b1b37b7c4bf77a342b459.1745866531.git.thomas.lendacky@amd.com>
+Message-ID: <aBDumDW9kWEotu0A@google.com>
+Subject: Re: [PATCH] KVM: SVM: Update dump_ghcb() to use the GHCB snapshot fields
+From: Sean Christopherson <seanjc@google.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Michael Roth <michael.roth@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Sun, Apr 27, 2025 at 03:58:54AM +0000, Michael Kelley wrote:
+On Mon, Apr 28, 2025, Tom Lendacky wrote:
+> @@ -3184,18 +3189,18 @@ static void dump_ghcb(struct vcpu_svm *svm)
+>  		return;
+>  	}
+>  
+> -	nbits = sizeof(ghcb->save.valid_bitmap) * 8;
+> +	nbits = sizeof(svm->sev_es.valid_bitmap) * 8;
 
-> Indeed, control never returns from static_call_update(). Prior to
-> hyperv_cleanup() running, crash_smp_send_stop() has been called to
-> stop all the other CPUs, and it does not update cpu_online_mask to
-> reflect the other CPUs being stopped.
-> 
-> static_call_update() runs this call sequence:
-> 
-> arch_static_call_transform()
-> __static_call_transform()
-> smp_text_poke_single()
-> smp_text_poke_batch_finish()
-> smp_text_poke_sync_each_cpu()
-> 
-> smp_text_poke_sync_each_cpu() sends an IPI to each CPU in
-> cpu_online_mask, and of course the other CPUs never respond, so
-> it waits forever.
+I'm planning on adding this comment to explain the use of KVM's snapshot.  Please
+holler if it's wrong/misleading in any way.
 
-Fair enough. I'll just remove this final call. Thanks!
+	/*
+	 * Print KVM's snapshot of the GHCB that was (unsuccessfully) used to
+	 * handle the exit.  If the guest has since modified the GHCB itself,
+	 * dumping the raw GHCB won't help debug why KVM was unable to handle
+	 * the VMGEXIT that KVM observed.
+	 */
+
+>  	pr_err("GHCB (GPA=%016llx):\n", svm->vmcb->control.ghcb_gpa);
+>  	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_code",
+> -	       ghcb->save.sw_exit_code, ghcb_sw_exit_code_is_valid(ghcb));
+> +	       kvm_ghcb_get_sw_exit_code(control), kvm_ghcb_sw_exit_code_is_valid(svm));
+>  	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_info_1",
+> -	       ghcb->save.sw_exit_info_1, ghcb_sw_exit_info_1_is_valid(ghcb));
+> +	       control->exit_info_1, kvm_ghcb_sw_exit_info_1_is_valid(svm));
+>  	pr_err("%-20s%016llx is_valid: %u\n", "sw_exit_info_2",
+> -	       ghcb->save.sw_exit_info_2, ghcb_sw_exit_info_2_is_valid(ghcb));
+> +	       control->exit_info_2, kvm_ghcb_sw_exit_info_2_is_valid(svm));
+>  	pr_err("%-20s%016llx is_valid: %u\n", "sw_scratch",
+> -	       ghcb->save.sw_scratch, ghcb_sw_scratch_is_valid(ghcb));
+> -	pr_err("%-20s%*pb\n", "valid_bitmap", nbits, ghcb->save.valid_bitmap);
+> +	       svm->sev_es.sw_scratch, kvm_ghcb_sw_scratch_is_valid(svm));
+> +	pr_err("%-20s%*pb\n", "valid_bitmap", nbits, svm->sev_es.valid_bitmap);
+>  }
 
