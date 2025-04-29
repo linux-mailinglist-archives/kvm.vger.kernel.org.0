@@ -1,193 +1,140 @@
-Return-Path: <kvm+bounces-44679-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B19F0AA0199
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 07:02:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E22AA017E
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 07:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 770E24812E3
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 05:02:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E3301B6159B
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 05:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C4A274645;
-	Tue, 29 Apr 2025 05:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A813270EAF;
+	Tue, 29 Apr 2025 05:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O3/B9y4P"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hIXipLsE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3201DE8B2;
-	Tue, 29 Apr 2025 05:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9B886338
+	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 05:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745902961; cv=none; b=kfokqoovuVNXVpz2wdojvSzuIVuLsezQH54XJX6YEGQ+vAGrGBOvL6sxuLAo4IwHq29beslTn3VFTWvOD8VTcsTEIOZdu5GO+8tyHUUmmAxrczD+mONdqDE/NX6S1Dsj5KvfQxHf8haOxcHsbpCc4AQf5UMpVj0pj69ajhz9DXA=
+	t=1745902818; cv=none; b=gWBuc+YdpPicGSrygAbRfpetLrY0tDqrVUYwj7oMpleX/3CpFK9nQmJY9aixjakElPPcUp7roQSTOqmR93mH/zO4Xw3wO69o/YsbUxciyeXadk1tvzrvCh8OLeknCNYf5CH687pK1DvJi/TPV3ZpoTR/jK9y8buFnKGdbyETgmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745902961; c=relaxed/simple;
-	bh=yJHygitItCE7AjT4PE9hDK5eTwShgF8pqCV5bUS99tg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YUs1S8cIexrshtbv7ynAmgrXMdL8m0TdE9AL4nXK+zrchQBdChlWBxcG4pktN42JtYfBgfOgvWwnmff3Bd3x0iPqwS4IzyZ1Mt+ND/0H01JcvaocWOrMhwPNT7jOpmjjqcEPD4coLqXrLLtoVupxPoYAwUmDAHnOSi3QAG4RwjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O3/B9y4P; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745902960; x=1777438960;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=yJHygitItCE7AjT4PE9hDK5eTwShgF8pqCV5bUS99tg=;
-  b=O3/B9y4PSKompQLB0b5RmqlYynOa+ey8T/WjvjEQApg2E8p9tNnzsvuv
-   GLK08LTAUYmruhTO0/EBvwgVXvWNbwxnazkIZtP/VDWUdsPI9jjlRkX/C
-   3GKfUol2SqoUKZ+75V+3vPWYVTn0I7IjZQmny0KRCdzJvJjIoWZovcFRX
-   eNC1RqscY22pE6/Cgj9ddVprRYiuZ53OEepRSXJ0SrUCZd94wz9EnlawQ
-   CNdLYxWnRBWvt6VHikTzmmxjg7zZqlCUZ8t3WR93VuxAab/1yzm5X8f6M
-   I6u1L2PDwDxAuiLHWQi86ksYUCQ4N0Zl8/qNlPwhucjXaFMvgCEYmNXPq
-   w==;
-X-CSE-ConnectionGUID: W7Z1V5aiQ/+jIW15i6Nc/w==
-X-CSE-MsgGUID: k9fEfIDTQ7We2T56517w2g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11417"; a="35121395"
-X-IronPort-AV: E=Sophos;i="6.15,248,1739865600"; 
-   d="scan'208";a="35121395"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 22:02:39 -0700
-X-CSE-ConnectionGUID: a5E3m5JXQF+Vct9TFcNxPw==
-X-CSE-MsgGUID: WNPv/oL5TCup2x/mZ3mf+A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,248,1739865600"; 
-   d="scan'208";a="138896368"
-Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 22:02:30 -0700
-Message-ID: <8416e94f-171e-4956-b8fe-246ed12a2314@linux.intel.com>
-Date: Tue, 29 Apr 2025 12:58:18 +0800
+	s=arc-20240116; t=1745902818; c=relaxed/simple;
+	bh=tBlCfVbaxBnOtPkuXQSa4s+a2mYTCFGwKB1i3Bn8nws=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TTn01Bs/WbUBet11VD0VmqYjFqM++ApVJ9WlZVS+6Xev7FjRK21I18iAnptHl2ut9OcKXK3bDvR1qW8mVD5YmpFc9w7JZ8bV6IIbiaQhcBEXAOAwTIxgHBVW/pq4egdGPsjZbHp+GnJLOcx8kHsiagT2XWvb/0vQLusj95Ah/AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hIXipLsE; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b074d908e56so4141259a12.2
+        for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 22:00:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1745902816; x=1746507616; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=E7e6flwrW0Xr7srdLRTYqMhF0r9DLRZRxyW/leVX1gE=;
+        b=hIXipLsEPiS78IxapgQ54YBshgw5l94e2AOuZifxxCq8oy0ONEkhelxUa1CFhv6CTs
+         djt7PdYVctcunBDke9gabuhUYDygWo6nNHgg5broGBllibAkXqcsfTMcFk7UzTEKW5SN
+         RZfiv0xuUGKS+XbFtsZcFFWxhCau53ls0UGJUvVGNE69DwmR/mmdubGu4tRlLHbe5Ywr
+         kMZKXTqYysoNcWwDVfsWMe92uZAc0QbD6poKqVc3sh5JuRlUkXL9s03+bHV4GuuwzWif
+         elu8u3sAskYNEtpjyTdyAmIKT0H4vtCKtp/ascJ59ac1sWCn4wVGyH6F+6LRQiWniN4T
+         1EIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745902816; x=1746507616;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E7e6flwrW0Xr7srdLRTYqMhF0r9DLRZRxyW/leVX1gE=;
+        b=HWG70YSbuuvmYzv2XkBbP91s/lFt6Pvl/+fqHGHKJ+i/Xs4LhSsyO7B7ycDJC6mpNJ
+         ajknYILwLOZZ8gmT8ZQO0oUZ9r7WxxrKFpVanCGB8JK0mWMZ1Ja1D9DUjEZzEaX4pTC3
+         eHPrEzV98NghYg88s1Tdde4KIvmMKjHxWCzdTad7UO8xODaFVMRaAil8n+hiu/tnTLNE
+         rPCkfO9TUt6JkOGzqXCA4UJFCMZAoZ2464twewal4NDKK9bTSYOvc8ZHMQuuBc5skxzm
+         8E4DLnw+h2tjIYEL5BiwigWLLKvPC/PhpPxYH4+1O9yhUJKwlQwHzc9CTeP0iwYDfylP
+         XzGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhPiqNPd0C6VRz4HUzyMNh9PyJDw5NmrMFcjdSKroMY0J5apsnVFx2BX6WFbkPSwJpIWc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrWe71hasljhyOtodM0mzihgXNHREVNlNRuCj7YthWCnwvRvX3
+	GTC6AbW6nNkqfOrsokFKiOo1UmCdKb4DtYB2r6tk8LorallLy2C9jpgIF4IRuz4=
+X-Gm-Gg: ASbGncvDVoVBMRaAmBBqCWB8MEv4uK9UqkFAtyWUeAJhhExP13y7XriXMu9xXF5X1NV
+	u1Bn15THrxFe3ZY5PT5T7lGqZo5G/Er626ZbPGyo09l8Te6PP1X0YT1IqHpkx4/9pmoFTfryxjz
+	SziqYyLGIFUWXdq3i5KxsaJzE0bjNzfQxdL8ySMEd9kpZ/9pkNRrjmYSU945rgFY/XDpBif7brd
+	LjlATGBJDVK39O3g49np0ulBWpSJKplB5nkIyBt8yeZ71/4nmr9inPaV7tnwYlUxIExNfQIU3xi
+	M8pHpsS47beiqDF9FfNrocP4rcMrZuJyVvU78qv2
+X-Google-Smtp-Source: AGHT+IGtTYums0vJIYUAxvrHOiwYyUcioYLnqAFsCGQIOBOAUh+3sHRwCcQhNBYfSH9HQfYcsvlOJQ==
+X-Received: by 2002:a17:903:2ec8:b0:216:6901:d588 with SMTP id d9443c01a7336-22dc69ffb69mr175276195ad.15.1745902816496;
+        Mon, 28 Apr 2025 22:00:16 -0700 (PDT)
+Received: from pc.. ([38.41.223.211])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4dbd6f7sm93004015ad.76.2025.04.28.22.00.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Apr 2025 22:00:16 -0700 (PDT)
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	kvm@vger.kernel.org,
+	alex.bennee@linaro.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	qemu-arm@nongnu.org,
+	anjo@rev.ng,
+	richard.henderson@linaro.org,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Subject: [PATCH 00/13] single-binary: compile target/arm twice
+Date: Mon, 28 Apr 2025 21:59:57 -0700
+Message-ID: <20250429050010.971128-1-pierrick.bouvier@linaro.org>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 06/24] iommu/dma: Factor out a iommu_dma_map_swiotlb
- helper
-To: Leon Romanovsky <leon@kernel.org>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Cc: Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
- Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <zyjzyj2000@gmail.com>,
- Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>,
- Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
- linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
- kvm@vger.kernel.org, linux-mm@kvack.org,
- Niklas Schnelle <schnelle@linux.ibm.com>,
- Chuck Lever <chuck.lever@oracle.com>, Luis Chamberlain <mcgrof@kernel.org>,
- Matthew Wilcox <willy@infradead.org>, Dan Williams
- <dan.j.williams@intel.com>, Kanchan Joshi <joshi.k@samsung.com>,
- Chaitanya Kulkarni <kch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>
-References: <cover.1745831017.git.leon@kernel.org>
- <f9a6a7874760a2919bea1f255bb3c81c6369ed1c.1745831017.git.leon@kernel.org>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <f9a6a7874760a2919bea1f255bb3c81c6369ed1c.1745831017.git.leon@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On 4/28/25 17:22, Leon Romanovsky wrote:
-> From: Christoph Hellwig<hch@lst.de>
-> 
-> Split the iommu logic from iommu_dma_map_page into a separate helper.
-> This not only keeps the code neatly separated, but will also allow for
-> reuse in another caller.
-> 
-> Signed-off-by: Christoph Hellwig<hch@lst.de>
-> Tested-by: Jens Axboe<axboe@kernel.dk>
-> Reviewed-by: Luis Chamberlain<mcgrof@kernel.org>
-> Signed-off-by: Leon Romanovsky<leonro@nvidia.com>
+More work toward single-binary.
+This series convert target/arm/cpu.c.
 
-Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+Built on {linux, windows, macos} x {x86_64, aarch64}
+Fully tested on linux-x86_64
+https://github.com/pbo-linaro/qemu/actions/runs/14722101993
 
-with a nit below ...
+Philippe Mathieu-Daudé (1):
+  target/arm: Replace target_ulong -> uint64_t for HWBreakpoint
 
-> ---
->   drivers/iommu/dma-iommu.c | 73 ++++++++++++++++++++++-----------------
->   1 file changed, 41 insertions(+), 32 deletions(-)
-> 
-> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> index d3211a8d755e..d7684024c439 100644
-> --- a/drivers/iommu/dma-iommu.c
-> +++ b/drivers/iommu/dma-iommu.c
-> @@ -1138,6 +1138,43 @@ void iommu_dma_sync_sg_for_device(struct device *dev, struct scatterlist *sgl,
->   			arch_sync_dma_for_device(sg_phys(sg), sg->length, dir);
->   }
->   
-> +static phys_addr_t iommu_dma_map_swiotlb(struct device *dev, phys_addr_t phys,
-> +		size_t size, enum dma_data_direction dir, unsigned long attrs)
-> +{
-> +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
-> +	struct iova_domain *iovad = &domain->iova_cookie->iovad;
-> +
-> +	if (!is_swiotlb_active(dev)) {
-> +		dev_warn_once(dev, "DMA bounce buffers are inactive, unable to map unaligned transaction.\n");
-> +		return (phys_addr_t)DMA_MAPPING_ERROR;
-> +	}
-> +
-> +	trace_swiotlb_bounced(dev, phys, size);
-> +
-> +	phys = swiotlb_tbl_map_single(dev, phys, size, iova_mask(iovad), dir,
-> +			attrs);
-> +
-> +	/*
-> +	 * Untrusted devices should not see padding areas with random leftover
-> +	 * kernel data, so zero the pre- and post-padding.
-> +	 * swiotlb_tbl_map_single() has initialized the bounce buffer proper to
-> +	 * the contents of the original memory buffer.
-> +	 */
-> +	if (phys != (phys_addr_t)DMA_MAPPING_ERROR && dev_is_untrusted(dev)) {
-> +		size_t start, virt = (size_t)phys_to_virt(phys);
-> +
-> +		/* Pre-padding */
-> +		start = iova_align_down(iovad, virt);
-> +		memset((void *)start, 0, virt - start);
-> +
-> +		/* Post-padding */
-> +		start = virt + size;
-> +		memset((void *)start, 0, iova_align(iovad, start) - start);
-> +	}
-> +
-> +	return phys;
-> +}
-> +
->   dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
->   	      unsigned long offset, size_t size, enum dma_data_direction dir,
->   	      unsigned long attrs)
-> @@ -1151,42 +1188,14 @@ dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
->   	dma_addr_t iova, dma_mask = dma_get_mask(dev);
->   
->   	/*
-> -	 * If both the physical buffer start address and size are
-> -	 * page aligned, we don't need to use a bounce page.
-> +	 * If both the physical buffer start address and size are page aligned,
-> +	 * we don't need to use a bounce page.
->   	 */
->   	if (dev_use_swiotlb(dev, size, dir) &&
->   	    iova_offset(iovad, phys | size)) {
-> -		if (!is_swiotlb_active(dev)) {
+Pierrick Bouvier (12):
+  include/system/hvf: missing vaddr include
+  meson: add common libs for target and target_system
+  target/arm: move kvm stubs and remove CONFIG_KVM from kvm_arm.h
+  target/arm/kvm_arm: copy definitions from kvm headers
+  target/arm/kvm-stub: add missing stubs
+  target/arm/cpu: remove CONFIG_KVM from arm_cpu_kvm_set_irq
+  accel/hvf: add hvf_enabled() for common code
+  target/arm/cpu: get endianness from cpu state
+  target/arm/cpu: remove TARGET_AARCH64 around aarch64_cpu_dump_state
+    common
+  target/arm/cpu: remove TARGET_AARCH64 in arm_cpu_finalize_features
+  target/arm/cpu: compile file twice (user, system) only
+  target/arm/cpu32-stubs.c: compile file twice (user, system)
 
-... Is it better to move this check into the helper? Simply no-op if a
-bounce page is not needed:
+ meson.build              | 78 ++++++++++++++++++++++++-------
+ include/system/hvf.h     | 15 ++++--
+ target/arm/internals.h   |  6 +--
+ target/arm/kvm_arm.h     | 99 +++++++---------------------------------
+ accel/hvf/hvf-stub.c     |  3 ++
+ target/arm/cpu.c         | 37 +++++----------
+ target/arm/cpu32-stubs.c | 24 ++++++++++
+ target/arm/hyp_gdbstub.c |  6 +--
+ target/arm/kvm-stub.c    | 87 +++++++++++++++++++++++++++++++++++
+ accel/hvf/meson.build    |  1 +
+ target/arm/meson.build   | 15 ++++--
+ 11 files changed, 233 insertions(+), 138 deletions(-)
+ create mode 100644 accel/hvf/hvf-stub.c
+ create mode 100644 target/arm/cpu32-stubs.c
 
-	if (!dev_use_swiotlb(dev, size, dir) ||
-	    !iova_offset(iovad, phys | size))
-		return phys;
+-- 
+2.47.2
 
-Thanks,
-baolu
 
