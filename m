@@ -1,133 +1,100 @@
-Return-Path: <kvm+bounces-44764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44763-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12987AA0C34
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 14:53:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96A13AA0BC5
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 14:35:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45E5F980154
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 12:52:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD3AE1B65125
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 12:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596D92C2AD8;
-	Tue, 29 Apr 2025 12:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=rev.ng header.i=@rev.ng header.b="P7bOC6ZL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 141292C2592;
+	Tue, 29 Apr 2025 12:35:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from rev.ng (rev.ng [94.130.142.21])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84A51DE4F3
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 12:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.130.142.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CCAD280A52;
+	Tue, 29 Apr 2025 12:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745931178; cv=none; b=fmVhBy78xWSWc4rShtrl2Ry93vpEz2Z5RiDMOiPMWyj94XAKIbHHG7pfu6wg8/GzJEwI0RFokCLe+CsM74QcaK1rmavNNYUlFb8Q8JnOJTU6rsCcu2Czw828/LdV1IiOnrs8A2tu0By7VNt/krh6N+irBt/AZ0rrY/tZyTOIZqU=
+	t=1745930115; cv=none; b=qLdqkvkkMJrachoxXmtxZZMklURwNE2/8UTE9LgXA7YHAskSsl0rEvT1WQ6jocT82W6H7Gg+drcV3yuc+tLXsMEqzBojH0/3Izt3RMAlLvUQNJP35hnwzQwil5KS8vxXVcG5BJA/pDrJxLNOmBWl+fCnBnYue5V85rfl7s/YtWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745931178; c=relaxed/simple;
-	bh=K+0U3tNzryEHN2dC2TANxrqOX8AChF4y2VVyiWT1+PE=;
+	s=arc-20240116; t=1745930115; c=relaxed/simple;
+	bh=YA9K64SGJNboEqUy75D/7syj4zAm+0ahG0X4Cz9zGlk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pd9+wNEyt/ayAMKgJXjQcl2QOUepo4DebLWFGAYJW2p1Xg7GXX9J3MG7IMmgTCl+OnWDVFG1ho0K7iMneovPhzwscpwcfPDLTNWKJ3pcOvSvqS4t+Hwj0SYJ5GdpOKDIELnRF4jW7Dkh9IRNaei1nV87BSZsGwfNJLVcclAcGXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rev.ng; spf=pass smtp.mailfrom=rev.ng; dkim=pass (1024-bit key) header.d=rev.ng header.i=@rev.ng header.b=P7bOC6ZL; arc=none smtp.client-ip=94.130.142.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rev.ng
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rev.ng
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rev.ng;
-	s=dkim; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:Subject
-	:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive:List-Unsubscribe:List-Unsubscribe-Post:
-	List-Help; bh=FulfBLl+ryoBJvND2Xguk6hmdm7/JzY6FmhA7EIub6k=; b=P7bOC6ZLZYKAMHf
-	YrU1O3CmQYGrLyMxE02eQxFB+rYGvLad0CFBjOgGqyed7S4z7ALirSv+B9+CcTQZ2/AAC5vwxbUsJ
-	8Mnw04MForklBltw44GvEy0YavxagJ/zgtObuTd9qY23OnkpofNMv54IiRWtnLcZuiR2DvcdlCjBL
-	Xs=;
-Date: Tue, 29 Apr 2025 14:26:30 +0200
-From: Anton Johansson <anjo@rev.ng>
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, 
-	kvm@vger.kernel.org, alex.bennee@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>, qemu-arm@nongnu.org, richard.henderson@linaro.org
-Subject: Re: [PATCH 09/13] target/arm/cpu: get endianness from cpu state
-Message-ID: <bwdflzaiqdpq33uzowvrgjbha3wye6k74puwur755pq27z67eu@mnc2ze4it5cl>
-References: <20250429050010.971128-1-pierrick.bouvier@linaro.org>
- <20250429050010.971128-10-pierrick.bouvier@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HThWlnZanLKK1YO+MeGM+jVLM+vNMRZej75JPaSkaIa0uJKbv69nRm9i9kD7Eb5IzYsYyU3UB/SxbOgRUDr352Vb2jmXZXTFrnRUfdMuG6ag6z5zlH6sEIgu4kRbJj4tir0wCzdrH6zBLK/k8ppGepLDPzd2utUC9qB7y32LiDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id DBA7F68AA6; Tue, 29 Apr 2025 14:35:04 +0200 (CEST)
+Date: Tue, 29 Apr 2025 14:35:04 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: chenlinxuan@uniontech.com
+Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Peter Huewe <peterhuewe@gmx.de>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Brendan Jackman <jackmanb@google.com>,
+	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Juergen Gross <jgross@suse.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, linux-nvme@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-integrity@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	llvm@lists.linux.dev, Winston Wen <wentao@uniontech.com>,
+	kasan-dev@googlegroups.com, xen-devel@lists.xenproject.org,
+	Changbin Du <changbin.du@intel.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH RFC v3 0/8] kernel-hacking: introduce
+ CONFIG_NO_AUTO_INLINE
+Message-ID: <20250429123504.GA13093@lst.de>
+References: <20250429-noautoinline-v3-0-4c49f28ea5b5@uniontech.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250429050010.971128-10-pierrick.bouvier@linaro.org>
+In-Reply-To: <20250429-noautoinline-v3-0-4c49f28ea5b5@uniontech.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 29/04/25, Pierrick Bouvier wrote:
-> Remove TARGET_BIG_ENDIAN dependency.
+On Tue, Apr 29, 2025 at 12:06:04PM +0800, Chen Linxuan via B4 Relay wrote:
+> This series introduces a new kernel configuration option NO_AUTO_INLINE,
+> which can be used to disable the automatic inlining of functions.
 > 
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> ---
->  target/arm/cpu.c | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
-> 
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index e7a15ade8b4..85e886944f6 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -67,6 +67,15 @@ static void arm_cpu_set_pc(CPUState *cs, vaddr value)
->      }
->  }
->  
-> +static bool arm_cpu_is_big_endian(CPUState *cs)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(cs);
-> +    CPUARMState *env = &cpu->env;
-> +
-> +    cpu_synchronize_state(cs);
-> +    return arm_cpu_data_is_big_endian(env);
-> +}
-> +
->  static vaddr arm_cpu_get_pc(CPUState *cs)
->  {
->      ARMCPU *cpu = ARM_CPU(cs);
-> @@ -1130,15 +1139,6 @@ static void arm_cpu_kvm_set_irq(void *opaque, int irq, int level)
->  #endif
->  }
->  
-> -static bool arm_cpu_virtio_is_big_endian(CPUState *cs)
-> -{
-> -    ARMCPU *cpu = ARM_CPU(cs);
-> -    CPUARMState *env = &cpu->env;
-> -
-> -    cpu_synchronize_state(cs);
-> -    return arm_cpu_data_is_big_endian(env);
-> -}
-> -
->  #ifdef CONFIG_TCG
->  bool arm_cpu_exec_halt(CPUState *cs)
->  {
-> @@ -1203,7 +1203,7 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
->  
->      info->endian = BFD_ENDIAN_LITTLE;
->      if (bswap_code(sctlr_b)) {
-> -        info->endian = TARGET_BIG_ENDIAN ? BFD_ENDIAN_LITTLE : BFD_ENDIAN_BIG;
-> +        info->endian = arm_cpu_is_big_endian(cpu) ? BFD_ENDIAN_LITTLE : BFD_ENDIAN_BIG;
->      }
+> This will allow the function tracer to trace more functions
+> because it only traces functions that the compiler has not inlined.
 
-I'm not the most familiar with arm but as far as I can tell these are
-not equivalent. My understanding is that arm_cpu_is_big_endian() models
-data endianness, and TARGET_BIG_ENDIAN instruction endianness.
+This still feels like a bad idea because it is extremely fragile.
 
-Also, for user mode where this branch is relevant, bswap_code() still
-depends on TARGET_BIG_ENDIAN anyway and the above branch would reduce to
-(on arm32)
-
-  if (TARGET_BIG_ENDIAN ^ sctlr_b) {
-      info->endian = sctlr_b ? BFD_ENDIAN_LITTLE : BFD_ENDIAN_BIG;
-  }
-
-giving the opposite result to the original code.
-
--- 
-Anton Johansson
-rev.ng Labs Srl.
 
