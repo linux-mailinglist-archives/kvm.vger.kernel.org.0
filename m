@@ -1,87 +1,113 @@
-Return-Path: <kvm+bounces-44782-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44783-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A178AA0E5C
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 16:13:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E5BAA0E65
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 16:13:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC6A17AEC7F
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 14:10:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D7A91A886A3
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 14:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEEA2D4B70;
-	Tue, 29 Apr 2025 14:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E352D029B;
+	Tue, 29 Apr 2025 14:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AyCtahKb"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B5D2D29B1
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 14:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC682D193B;
+	Tue, 29 Apr 2025 14:10:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745935800; cv=none; b=mnSSMizTkVXx9xAN+4GezFKZ1kC7PN1KGH10TIOQ6NtT6BV9tRt2Ztg5eCOcbfmRHonaWeDdYvJigrXLASejEsnp5PGVVYq/dZFIJyiqVMUZZP3fu2QDwOIIgtI7AJD55E2s8PIKI/4RXgJidSs+qMRpbqIroKHlu2Cc6TSYfPY=
+	t=1745935846; cv=none; b=JBRHHE69Z3SDbl2a4fblwvuXXT3CkzjiimKTq3avEc8GDj4iLrl0/aviukKhq/BvFn8JpudXP8eMne806m/evCA2vTZIo8oShzs0yr6D4BvWLSH0sZXATYnao8MSu3VzDbmNt8NA7dYvi+j4NtxM91fVlkmuWhA8pgHkB6Q0rbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745935800; c=relaxed/simple;
-	bh=7ilE6Mulu69YDl0t29ldX0rUe0mYNOb23tG+PTX5YIg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MxMX26d42/fLEhhaqe0rvc0yCllJQkfcAv+X/XxPcuy+CtQZnie35Zhp+cYU3Aq8rb4pRbiwrSXd0he9yWI4CUy+esgOCAlJVfyCr1ylMp1wNzj6uZe3lXbGwkgOGh1V/pAKegXqaBtN1uiuEXtDy2oyM9MuGguJ8AdeYHrVBVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 00A291515;
-	Tue, 29 Apr 2025 07:09:51 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E5E293F66E;
-	Tue, 29 Apr 2025 07:09:55 -0700 (PDT)
-Message-ID: <69211539-5ffa-45ad-bd19-25e8bcd6eccc@arm.com>
-Date: Tue, 29 Apr 2025 15:09:54 +0100
+	s=arc-20240116; t=1745935846; c=relaxed/simple;
+	bh=KohmNrKeIVTCT4vof1RJJ5QHvcKv9IYFDgEUtbY4Z1g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MYy0OhH6aJrKEFJKwPPr5EvIml74EpHqed62l5ONe1ajvasR4XUiMRB0wxnV+nPZg9+y1OjXfehys0w8nPqF3IyGK5hAmRn5u4YVNZvuF8MJ05xLoJAOh3A99AAX88mNfkN+z/tMzyGLsR76WVEP7NhH8YpMk7Vo2fnBGXiETcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AyCtahKb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54AF0C4CEE3;
+	Tue, 29 Apr 2025 14:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745935845;
+	bh=KohmNrKeIVTCT4vof1RJJ5QHvcKv9IYFDgEUtbY4Z1g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AyCtahKbU7HT2bBrwhVw+GNZADLEo/Q2ltXwweKV7xbyutZjasqJQsgeo59kg8FR3
+	 EGd2PKco1C7+bmPvBd8H2OPFia1cH9RnGQLz1yGgWp3J664OX+nDef71DHHqPzlWCG
+	 PYdJz+ULuVWV1pygWT76GVzbI5ycXNFv+whGT7Cfaq4nj+voi6z3lxpLJ2I4Wa+2bU
+	 P27w8nMEIPdZzHUQkD8p5KI4eqhzaoovk8XkwdBy0bAWg1R4sQc5ypOFt1VVbHYu8U
+	 VOJQf/hLupoRw85hspT71FoiZpMyQNeBZNb7D+IOIQ6iymgkY5DWZz41rz5dGSQgIo
+	 LRrw0KrPCi4WA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1u9lfX-009w6U-Bz;
+	Tue, 29 Apr 2025 15:10:43 +0100
+Date: Tue, 29 Apr 2025 15:10:43 +0100
+Message-ID: <86frhrhxcs.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose
+ <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 09/42] arm64: sysreg: Add registers trapped by HDFG{R,W}TR2_EL2
+In-Reply-To: <8dfaa919-228e-4a5c-abbc-efa1a19ae92b@arm.com>
+References: <20250426122836.3341523-1-maz@kernel.org>
+	<20250426122836.3341523-10-maz@kernel.org>
+	<8dfaa919-228e-4a5c-abbc-efa1a19ae92b@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 24/42] KVM: arm64: Unconditionally configure fine-grain
- traps
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
- <20250426122836.3341523-25-maz@kernel.org>
- <363383a2-c05e-458c-82b7-acc6e5d73939@arm.com> <86h627hyby.wl-maz@kernel.org>
-Content-Language: en-US
-From: Ben Horgan <ben.horgan@arm.com>
-In-Reply-To: <86h627hyby.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 4/29/25 14:49, Marc Zyngier wrote:
-> On Tue, 29 Apr 2025 14:08:27 +0100,
-> Ben Horgan <ben.horgan@arm.com> wrote:
->>>    -	__deactivate_fgt(hctxt, vcpu, kvm, HFGRTR_EL2);
->>> -	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
->> Don't we need to continue considering the ampere errata here? Or, at
->> least worth a mention in the commit message.
+On Tue, 29 Apr 2025 14:07:39 +0100,
+Ben Horgan <ben.horgan@arm.com> wrote:
 > 
-> The FGT registers are always context switched, so whatever was saved
-> *before* the workaround was applied in __activate_traps_hfgxtr() is
-> blindly restored...
+> Hi Marc,
 > 
->>> -		write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
-> 
-> ... and this write always happens.
-Thanks for the explanation. I now agree this code is correct.
-> 
-> 	M.
-> 
+> On 4/26/25 13:28, Marc Zyngier wrote:
+> > +Sysreg	SPMCR_EL0	2	3	9	12	0
+> > +Res0	63:12
+> > +Field	11	TRO
+> > +Field	10	HDBG
+> > +Field	9	FZO
+> > +Field	8	NA
+> > +Res0	7:5	
+> Nit: Trailing whitespace. There are a few other places on Res0
+> lines. Maybe your generation script could be tweaked.
 
-Thanks,
+Yeah, this is clearly not great. But this is buried really deep in a
+jq script, which is a write-only language, hence hard to fix! ;-)
 
-Ben
+"git rebase --whitespace=fix" does the trick for now.
 
+Thanks for the heads up,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
