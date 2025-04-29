@@ -1,143 +1,253 @@
-Return-Path: <kvm+bounces-44684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D764AA0223
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 07:55:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE957AA024B
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 08:02:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0181B16EE6A
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 05:55:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC992188BF30
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 06:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BA6270ECD;
-	Tue, 29 Apr 2025 05:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12F12749CA;
+	Tue, 29 Apr 2025 06:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="O6C4ba0w"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cs3CrsLt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2998A26F469
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 05:55:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F1126B080;
+	Tue, 29 Apr 2025 06:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745906149; cv=none; b=c9V2R940vgyofaNIpTaEGyK7CZsrXBYsUEGe9ZJ4vcGUI3QgHpFRVjfbp6zzKGNdgWaeDsPbcAP7yUNc2CrRuCmr+03MC1FcTXFxMyKJXzwOPuBf6ib4yhM8vFu6v78E5fMA2DQM6IQb8KFvA54gwFaAlAV96VnqZEnu1+7i2Ao=
+	t=1745906548; cv=none; b=cYY/L798EkIapnix4QJ2OB9X98jaI5HKFOGCuPaeTF64zKQrRQobQMDaP3LsqKrENOSEAqMFtRlYV5M9Q+Ki1sm2caqSbWqwOIAgdD+e6NXHkhCf0YrbEE0uIPetXqiYitLm/1Ze2UrPS1WbHsCMCKg06n9rJo2cdy/S2muwRe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745906149; c=relaxed/simple;
-	bh=1kDrlm/fhAKr9mj0zuBg0xIvCaUDFqvgW/xklUwgSOc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gcJWsk/V9yAP0xFLwtADb45RhSEB/4fn8HPC3K4tzUv1Z/3Bpp0S7bGyQN7PdlCWhXqMCgaH4GgFxISOMqjdNimvrQqVOCTzgRi+qBWzr46pnM3vOKsuJ6mYSvNCTSHmFfnCqEy3UxBOLG2+T40NPrCwF28PMlBH/mjOZz77jYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=O6C4ba0w; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-54afb5fcebaso6786124e87.3
-        for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 22:55:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1745906146; x=1746510946; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d8eFfmotZuLjE/iIngsJ3KVYn6Hy+g0+LpOOBN4vUMQ=;
-        b=O6C4ba0wjnoZwXtiuE7xcR4ETzqGDW+kywyqywRKpHJqqRzJXl1xBnjpTASwj/DkEy
-         Ash4Z7qH+3dn7cGXHdRoLYNLDR3d58uloQ/BjyIifWCTJ+JUrOnDlvP5OcMJTHbEKXsb
-         WaZzzHvnOmy7h4/G8XuoIX+I43pqADRvrB9b33bEnnWLmn545EkLeU2t9Hqh+ww2CAhW
-         d6KRwHM/RLM4ROQ+iEVU89QIjw1xJbi/on+snY1cS/wpqpmlGI205jGvv8F4SumOt3pr
-         RoEHQczBBOzYdtXQJjxjOZTSCA0wYp2TE/0fO9C5KhkshDBECP0tN1GQWHRZEdvhOWIr
-         pM2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745906146; x=1746510946;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d8eFfmotZuLjE/iIngsJ3KVYn6Hy+g0+LpOOBN4vUMQ=;
-        b=gz+0WmmJtm0cWjbj++qYVWw+cNlBysKA7rkHejM+tgYrPKpbwYm26NFY1Vf+GpBIwm
-         fim+oEKi1/gKt7wAuy4xo9bz2pdtv4FOT2+afLkVL8PA8ZGJoUFnsnSYzP7ipDw/ZVYf
-         3cgR4Md13XyD7EEOceE235TlEQVe0vViBKfDbiAk6MeKV2LNXrrq6VWzeLRJ7+luMKfn
-         y31txg5D2jCd6UyYrgtKaszbYKE/blsmTKE68ysSvPgxYXOnQPWE8MkVPfByktuzjnrW
-         odopbqKUPVgOVYZY3saTY/lyQM5uK4B3S2KhGzvq+IxY+fF4j88pgpIqRGQlBjZAiI9s
-         ogtg==
-X-Forwarded-Encrypted: i=1; AJvYcCUdIkp5AcGnD6LxOH30ZH2twuY+pSoa6UsGsURgGocrgKq5rlhC4TuS6e7dn5GKA70cXDo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVLAPG00lSmvH+dFIW3euFkKV23jLY5SP0h+ML2Rhe5D/UR5m8
-	Iy000Gu+Xb97dtzYoDHUikE02SHNNN5OdrE1+hhXrJWzXwLDRMAR6NHE0VeY18+A/42tHeYCB2z
-	umFWMMI/AaZm8d5HsxvKIiipYtWmTMfz+4GskxA==
-X-Gm-Gg: ASbGncvB9ZdAAnJuIY2NDG2SR+/R/JjSMEPgMMYdCeTu02oyt6RTMFIUBNdResFYOFW
-	57Ol1iCs91wjMlMLugx+GbICgrh2BETdYZLZb/hAdNL8UJVzJ/vWT03tLeJlSdZl6jyblwMPGYo
-	QTI7diuDpievlpzNwN2PwS/rg=
-X-Google-Smtp-Source: AGHT+IFYS//nAhdr5sQ4EKB26kjYn20qv5wR0iA6FrAr+cMy0GIfWIfPM3YUDHi8RlYpm+FL+B8w4CHY3E8C/pwtOoc=
-X-Received: by 2002:a05:6512:6d1:b0:549:9044:94ac with SMTP id
- 2adb3069b0e04-54e9e53e33cmr325134e87.23.1745906146173; Mon, 28 Apr 2025
- 22:55:46 -0700 (PDT)
+	s=arc-20240116; t=1745906548; c=relaxed/simple;
+	bh=GGOZBkZPXbXcgYWtmEjaWNBSh9vK7IAgAJHtHjY5RGk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZIdmHQr9b/kI9OHjJ0pCs5hUD4OPdUYJEtLx2cPVlva5vwnbzk8FqbkMrqfeb2eEz/GpbKwDCp90gKsYvO6TiKHu6POwytSobGj0JDbhLGdzj6ByPk3Yw+lAJbhwRwOri/i0ONrZcfVwTWh2RQfECnlFc/VPojFqjCfRh+rdLME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cs3CrsLt; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1745906547; x=1777442547;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GGOZBkZPXbXcgYWtmEjaWNBSh9vK7IAgAJHtHjY5RGk=;
+  b=cs3CrsLtcywzIDWhehr2+2I0xo1z0iAcY6R3d9NMyFBcaxisWpP/tOyM
+   q2+TRmM0GZu2gcR5WRVsVZK30l2HpZo8rKmvE0QKaMINpSa6cVN97ACd6
+   Gy2nSrVFPKouz1NWobSG2arMop28f3L/vqjARyA/WFTHa/mrpl3vv2bvU
+   60Jn31frNVHAlYfGqyycmtiMteyUgDRuq5WkGQGX60hjRAU7GHeYbODR2
+   dLtlcq+8CCUSWvQ7aZibQdHESYAHcSB50nOG0Tb9Q0QBaaQ/MPR0DOSwC
+   kLgq3KKqP3o88egOFFxVkTaN+f24TCN3fypqlqFiUoARH2PP6FNaAB0+I
+   A==;
+X-CSE-ConnectionGUID: LnBFU2J7R/SrGJ9s8XNc4w==
+X-CSE-MsgGUID: jiGU4zN9RNeS+6vBI00hpw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11417"; a="72891417"
+X-IronPort-AV: E=Sophos;i="6.15,248,1739865600"; 
+   d="scan'208";a="72891417"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 23:02:25 -0700
+X-CSE-ConnectionGUID: B6mYu5WYR6y4hHVzuSOAgA==
+X-CSE-MsgGUID: KHRkdKHCSYO/GfkXnTeDdQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,248,1739865600"; 
+   d="scan'208";a="134708735"
+Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 23:02:18 -0700
+Message-ID: <9d1abdbc-4b21-47e2-bcaf-6bc8ca365b01@linux.intel.com>
+Date: Tue, 29 Apr 2025 13:58:06 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403112522.1566629-3-rkrcmar@ventanamicro.com>
- <20250403112522.1566629-7-rkrcmar@ventanamicro.com> <CAAhSdy0e3HVN6pX-hcX2N+kpwsupsCf6BqrYq=bvtwtFOuEVhA@mail.gmail.com>
- <D9IGJR9DGFAM.1PVHVOOTVRFZW@ventanamicro.com>
-In-Reply-To: <D9IGJR9DGFAM.1PVHVOOTVRFZW@ventanamicro.com>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Tue, 29 Apr 2025 11:25:35 +0530
-X-Gm-Features: ATxdqUEiQjMeNUujcFSuwa_LrU9ri9FCJKZ6XmhF2QYcnvi_LFsWj1huKA1q38o
-Message-ID: <CAK9=C2Woc5MtrJeqNtaVkMXWEsGeZPsmUgtFQET=OKLHLwRbPA@mail.gmail.com>
-Subject: Re: [PATCH 4/5] KVM: RISC-V: reset VCPU state when becoming runnable
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: Anup Patel <anup@brainfault.org>, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Andrew Jones <ajones@ventanamicro.com>, 
-	Mayuresh Chitale <mchitale@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 06/24] iommu/dma: Factor out a iommu_dma_map_swiotlb
+ helper
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>, Jens Axboe
+ <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
+ Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Zhu Yanjun <zyjzyj2000@gmail.com>, Robin Murphy <robin.murphy@arm.com>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>,
+ Logan Gunthorpe <logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+ linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+ kvm@vger.kernel.org, linux-mm@kvack.org,
+ Niklas Schnelle <schnelle@linux.ibm.com>,
+ Chuck Lever <chuck.lever@oracle.com>, Luis Chamberlain <mcgrof@kernel.org>,
+ Matthew Wilcox <willy@infradead.org>, Dan Williams
+ <dan.j.williams@intel.com>, Kanchan Joshi <joshi.k@samsung.com>,
+ Chaitanya Kulkarni <kch@nvidia.com>
+References: <cover.1745831017.git.leon@kernel.org>
+ <f9a6a7874760a2919bea1f255bb3c81c6369ed1c.1745831017.git.leon@kernel.org>
+ <8416e94f-171e-4956-b8fe-246ed12a2314@linux.intel.com>
+ <20250429055339.GJ5848@unreal>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20250429055339.GJ5848@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 28, 2025 at 11:15=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcm=
-ar@ventanamicro.com> wrote:
->
-> 2025-04-28T17:52:25+05:30, Anup Patel <anup@brainfault.org>:
-> > On Thu, Apr 3, 2025 at 5:02=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkr=
-cmar@ventanamicro.com> wrote:
-> >> For a cleaner solution, we should add interfaces to perform the KVM-SB=
-I
-> >> reset request on userspace demand.  I think it would also be much bett=
-er
-> >> if userspace was in control of the post-reset state.
-> >
-> > Apart from breaking KVM user-space, this patch is incorrect and
-> > does not align with the:
-> > 1) SBI spec
-> > 2) OS boot protocol.
-> >
-> > The SBI spec only defines the entry state of certain CPU registers
-> > (namely, PC, A0, and A1) when CPU enters S-mode:
-> > 1) Upon SBI HSM start call from some other CPU
-> > 2) Upon resuming from non-retentive SBI HSM suspend or
-> >     SBI system suspend
-> >
-> > The S-mode entry state of the boot CPU is defined by the
-> > OS boot protocol and not by the SBI spec. Due to this, reason
-> > KVM RISC-V expects user-space to set up the S-mode entry
-> > state of the boot CPU upon system reset.
->
-> We can handle the initial state consistency in other patches.
-> What needs addressing is a way to trigger the KVM reset from userspace,
-> even if only to clear the internal KVM state.
->
-> I think mp_state is currently the best signalization that KVM should
-> reset, so I added it there.
->
-> What would be your preferred interface for that?
->
+On 4/29/25 13:53, Leon Romanovsky wrote:
+> On Tue, Apr 29, 2025 at 12:58:18PM +0800, Baolu Lu wrote:
+>> On 4/28/25 17:22, Leon Romanovsky wrote:
+>>> From: Christoph Hellwig<hch@lst.de>
+>>>
+>>> Split the iommu logic from iommu_dma_map_page into a separate helper.
+>>> This not only keeps the code neatly separated, but will also allow for
+>>> reuse in another caller.
+>>>
+>>> Signed-off-by: Christoph Hellwig<hch@lst.de>
+>>> Tested-by: Jens Axboe<axboe@kernel.dk>
+>>> Reviewed-by: Luis Chamberlain<mcgrof@kernel.org>
+>>> Signed-off-by: Leon Romanovsky<leonro@nvidia.com>
+>>
+>> Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+>>
+>> with a nit below ...
+>>
+>>> ---
+>>>    drivers/iommu/dma-iommu.c | 73 ++++++++++++++++++++++-----------------
+>>>    1 file changed, 41 insertions(+), 32 deletions(-)
+>>>
+>>> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+>>> index d3211a8d755e..d7684024c439 100644
+>>> --- a/drivers/iommu/dma-iommu.c
+>>> +++ b/drivers/iommu/dma-iommu.c
+>>> @@ -1138,6 +1138,43 @@ void iommu_dma_sync_sg_for_device(struct device *dev, struct scatterlist *sgl,
+>>>    			arch_sync_dma_for_device(sg_phys(sg), sg->length, dir);
+>>>    }
+>>> +static phys_addr_t iommu_dma_map_swiotlb(struct device *dev, phys_addr_t phys,
+>>> +		size_t size, enum dma_data_direction dir, unsigned long attrs)
+>>> +{
+>>> +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+>>> +	struct iova_domain *iovad = &domain->iova_cookie->iovad;
+>>> +
+>>> +	if (!is_swiotlb_active(dev)) {
+>>> +		dev_warn_once(dev, "DMA bounce buffers are inactive, unable to map unaligned transaction.\n");
+>>> +		return (phys_addr_t)DMA_MAPPING_ERROR;
+>>> +	}
+>>> +
+>>> +	trace_swiotlb_bounced(dev, phys, size);
+>>> +
+>>> +	phys = swiotlb_tbl_map_single(dev, phys, size, iova_mask(iovad), dir,
+>>> +			attrs);
+>>> +
+>>> +	/*
+>>> +	 * Untrusted devices should not see padding areas with random leftover
+>>> +	 * kernel data, so zero the pre- and post-padding.
+>>> +	 * swiotlb_tbl_map_single() has initialized the bounce buffer proper to
+>>> +	 * the contents of the original memory buffer.
+>>> +	 */
+>>> +	if (phys != (phys_addr_t)DMA_MAPPING_ERROR && dev_is_untrusted(dev)) {
+>>> +		size_t start, virt = (size_t)phys_to_virt(phys);
+>>> +
+>>> +		/* Pre-padding */
+>>> +		start = iova_align_down(iovad, virt);
+>>> +		memset((void *)start, 0, virt - start);
+>>> +
+>>> +		/* Post-padding */
+>>> +		start = virt + size;
+>>> +		memset((void *)start, 0, iova_align(iovad, start) - start);
+>>> +	}
+>>> +
+>>> +	return phys;
+>>> +}
+>>> +
+>>>    dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
+>>>    	      unsigned long offset, size_t size, enum dma_data_direction dir,
+>>>    	      unsigned long attrs)
+>>> @@ -1151,42 +1188,14 @@ dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
+>>>    	dma_addr_t iova, dma_mask = dma_get_mask(dev);
+>>>    	/*
+>>> -	 * If both the physical buffer start address and size are
+>>> -	 * page aligned, we don't need to use a bounce page.
+>>> +	 * If both the physical buffer start address and size are page aligned,
+>>> +	 * we don't need to use a bounce page.
+>>>    	 */
+>>>    	if (dev_use_swiotlb(dev, size, dir) &&
+>>>    	    iova_offset(iovad, phys | size)) {
+>>> -		if (!is_swiotlb_active(dev)) {
+>>
+>> ... Is it better to move this check into the helper? Simply no-op if a
+>> bounce page is not needed:
+>>
+>> 	if (!dev_use_swiotlb(dev, size, dir) ||
+>> 	    !iova_offset(iovad, phys | size))
+>> 		return phys;
+> 
+> Am I missing something? iommu_dma_map_page() has more code after this
+> check, so it is not correct to return immediately:
+> 
+>    1189 dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
+>    1190               unsigned long offset, size_t size, enum dma_data_direction dir,
+>    1191               unsigned long attrs)
+>    1192 {
+> 
+> <...>
+> 
+>    1201         /*
+>    1202          * If both the physical buffer start address and size are page aligned,
+>    1203          * we don't need to use a bounce page.
+>    1204          */
+>    1205         if (dev_use_swiotlb(dev, size, dir) &&
+>    1206             iova_unaligned(iovad, phys, size)) {
+>    1207                 phys = iommu_dma_map_swiotlb(dev, phys, size, dir, attrs);
+>    1208                 if (phys == (phys_addr_t)DMA_MAPPING_ERROR)
+>    1209                         return DMA_MAPPING_ERROR;
+>    1210         }
+>    1211
+>    1212         if (!coherent && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
+>    1213                 arch_sync_dma_for_device(phys, size, dir);
+>    1214
+>    1215         iova = __iommu_dma_map(dev, phys, size, prot, dma_mask);
+>    1216         if (iova == DMA_MAPPING_ERROR)
+>    1217                 swiotlb_tbl_unmap_single(dev, phys, size, dir, attrs);
+>    1218         return iova;
+>    1219 }
 
-Instead of creating a new interface, I would prefer that VCPU
-which initiates SBI System Reset should be resetted immediately
-in-kernel space before forwarding the system reset request to
-user space. This way we also force KVM user-space to explicitly
-set the PC, A0, and A1 before running the VCPU again after
-system reset.
+static phys_addr_t iommu_dma_map_swiotlb(struct device *dev, phys_addr_t 
+phys,
+		size_t size, enum dma_data_direction dir, unsigned long attrs)
+{
+<...>
+	/*
+	 * If both the physical buffer start address and size are page aligned,
+	 * we don't need to use a bounce page.
+	 */
+	if (!dev_use_swiotlb(dev, size, dir) ||
+	    !iova_offset(iovad, phys | size))
+		return phys;
+<...>
+}
 
-Regards,
-Anup
+Then,
+
+dma_addr_t iommu_dma_map_page(struct device *dev, struct page *page,
+	unsigned long offset, size_t size, enum dma_data_direction dir,
+	unsigned long attrs)
+{
+<...>
+	phys = iommu_dma_map_swiotlb(dev, phys, size, dir, attrs);
+	if (phys == (phys_addr_t)DMA_MAPPING_ERROR)
+		return DMA_MAPPING_ERROR;
+<...>
+}
+
+Thanks,
+baolu
 
