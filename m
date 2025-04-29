@@ -1,513 +1,303 @@
-Return-Path: <kvm+bounces-44713-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44714-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53370AA049B
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 09:34:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0593AAA04FA
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 09:50:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0B4D5A1040
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 07:34:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59E61176FFE
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 07:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5145E278149;
-	Tue, 29 Apr 2025 07:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304EA274676;
+	Tue, 29 Apr 2025 07:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bWkrMvpi"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hkknKVku"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2045.outbound.protection.outlook.com [40.107.223.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F975277813;
-	Tue, 29 Apr 2025 07:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745912051; cv=none; b=iZDlNBIp96VT46+ZqHVsTm0BWT4IQl0dWkjaKQWU2VL7JGvn1PymTWAblkOFOhNv4XN54mMXYM3YdRiL3WPN4/rlvVB1YeyF7tAsubA0hPgzGXbHud24HEc9a9xtB1X/0OGb5MXQfouXo8+eHNKjzoc8051FsbS/5uXnjTRBBmc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745912051; c=relaxed/simple;
-	bh=LQkqFpkhMYEtm10gHoIsXIbeErXzIYB3k+HILWYm/n8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oX5XWFWXZQdcQv7sYFA1/WgHyfQTMsH9/0pRYWP2wcWSItli3t58YYEQBK1fxwT/GQcGX3DGLcrV3CFLdEMmpDSesGQw2pNYn8DK5kerIG1G12H6NXeL87rGyiiu6I7lpp9UEKkYvynFEjaXg8dRXqMEBATIltFJl+KqRX4v8ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bWkrMvpi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ACBBC4CEE9;
-	Tue, 29 Apr 2025 07:34:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745912050;
-	bh=LQkqFpkhMYEtm10gHoIsXIbeErXzIYB3k+HILWYm/n8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bWkrMvpimy2ykexF825aofiZEClD3199wwqrsZrQzyCgvdzo9kBn6D/t3NfEqVK4s
-	 XdIGdZIH1X6ig0N+7LxzsgI/TqNfU9tqQ2xzJgRepGpl0zWiShiaBkXpgrtQNK67ZX
-	 Um2azKCdy4HOSYoXNhZx86BB4e4ozFobdqi3d3agaYdQjCaRQfxHv87hYXhD4/KuYF
-	 1eypFmf23xaf6zVXryJMzmpckLWM78PRDPDkDg88e9wchNk/oQr66A5/bKiHGygNkV
-	 xDEw6PEQCDG3vgvuHRiqhFotoCpXYzooKuc1dl/oH1wWDuZOGIZ6a1XCgstyKYAKzB
-	 Q1Y9ov3KIYtHA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u9fTj-009on5-AO;
-	Tue, 29 Apr 2025 08:34:07 +0100
-Date: Tue, 29 Apr 2025 08:34:17 +0100
-Message-ID: <87msbzxvye.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose
- <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 00/42] KVM: arm64: Revamp Fine Grained Trap handling
-In-Reply-To: <4e63a13f-c5dc-4f97-879a-26b5548da07f@os.amperecomputing.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
-	<4e63a13f-c5dc-4f97-879a-26b5548da07f@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1651F4199;
+	Tue, 29 Apr 2025 07:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745913015; cv=fail; b=u/A5+GLZRFb8xP+4iXSxgZ3KAa7skNSGxZF/IzZcUXRBx5w2JFy9g6FR7BjSeurjt47RWEpY6uExGy1hTaRTgZqYPHdl8Obhxdz4ii18ueoXGuCafhQ2Ac+CguEVb9TQsHDUlEhQS99O9HcshI3muTJrUp/0a0mdXsi8TSSgGFM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745913015; c=relaxed/simple;
+	bh=I544l85pcy1+F2KGFvsVNQyyDWBwGi+9P1Cg4dNcTF8=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=OdoWYI/12M9xwdF08DzhzUfAAVanQRZPrgq5r6KVKiYpgw60PRJQOjRlG1JH2xqbpaJv8QZni+zQDW7S0o0sTI/nLY/wH9S60uEOMV1aojSqmKUDlRPvOEhqVAdD2DF86eEhSroqYwpmLp0jRwdp3Qd72WFlrD9xLmwqafRog6U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=hkknKVku; arc=fail smtp.client-ip=40.107.223.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fq2kF35UzAk6gjcHd5NUpn4TuvTGb/sUOpHRBgFyOxjwmj4aG4pMUsGRLIHfwpOmwbBVYk9I/i4N6XuNEOq11XDC/g478G8/53LijiqGKJphu8Ntw+gezphbwrFRwVAghpJ4WyR2D1OndleJ2o+9L/5pKjQdq7cJrVhY4RamKIelPesmh8uoey1qMAkLqb4bYeB6ASwpfZllQS/VmP36zKbuVYUleW2T7VkaeZAqVMrFBeH/rWJQmQy2L+H/7SfuYb74rRdfARWLdGrkXomYrO5wox7b7HBYe8zFHz+4KYV4V9CC986yR1VX5UEQGRIxUBnp9gD+F6H8xRxBjBTYkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e0qt71UB7vkB0am1WJo0zup1O/FFXmKTSSZLplPaRlY=;
+ b=C7nTkU3ByjPWtT3KQdXMaxXl4camZ1aY6wKcADcYb2UuA/vAGBsOmo58g4zGe3SbPPEaZF9xsBWSnnI7YIa2BmIjfveHFxP9Iv3y5CsTUABETSU06FLwuxTpS3JUp/Lla1wkaRU+R6TkYGwUJvZXfWssnzBcvskNUHOMBL6RE7LewHhsWurlLl2DNwVZNQ40bxlBKOxafz7j0aUCWcmEi0OLhIfkWrtlRZMf0c9pR00Frk+UBdLE19wPn0Oi2WirwPxPaFtN974sz+qDVBS7vbWiDfgukR7cZS6yyJ6/o2MX4vOLsB1mobOjxH5JE7FjcExu3UOPdqvUggtKlMEe6Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=e0qt71UB7vkB0am1WJo0zup1O/FFXmKTSSZLplPaRlY=;
+ b=hkknKVkugl4WAWGZv/lbtl34z91Wcjln2NDjCOh4yQg6xWnw9pty0ziPnJ4WUI4SgG+EZp4AQiHjg/7U9SeiApqAGRm0JTSo0nGdjbSibNsnYihUB4mVeP8beE8ePdmN0WhntfwpMO6HnJeZtYfRn2nWDtptcou15bcWb5T3K/g=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by SA0PR12MB4447.namprd12.prod.outlook.com (2603:10b6:806:9b::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.19; Tue, 29 Apr
+ 2025 07:50:10 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f%4]) with mapi id 15.20.8678.028; Tue, 29 Apr 2025
+ 07:50:09 +0000
+Message-ID: <4b6dc759-86fd-47a7-a206-66b25a0ccc6d@amd.com>
+Date: Tue, 29 Apr 2025 17:50:01 +1000
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
+From: Alexey Kardashevskiy <aik@amd.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+ christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
+ alex.williamson@redhat.com, jgg@nvidia.com, vivek.kasireddy@intel.com,
+ dan.j.williams@intel.com
+Cc: yilun.xu@intel.com, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+ daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
+ zhenzhong.duan@intel.com, tao1.su@intel.com
+References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
+ <371ab632-d167-4720-8f0d-57be1e3fee84@amd.com>
+Content-Language: en-US
+In-Reply-To: <371ab632-d167-4720-8f0d-57be1e3fee84@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SA1P222CA0187.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c4::14) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|SA0PR12MB4447:EE_
+X-MS-Office365-Filtering-Correlation-Id: 11adb4c1-e4bf-4e4c-7262-08dd86f2772d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?M05KYktoMW5tckovbHp1L0ppUHFhNnBSWUJ1WW5PaFRoenllQWliZGtodUNV?=
+ =?utf-8?B?VnZZeVh0Nkw4dkJ4bU1JVnZ4TTV4d3Q5cUhyaEFCU1RGaHpqYmc0NDVwSE5L?=
+ =?utf-8?B?SjdNTmxaWmxTZFU4NzcrRCtwQWxFQ3UralQvaDZNQ2QrcEpReHlqRnhtQjJH?=
+ =?utf-8?B?Wnp0My9pc1FwS25xRXZTYWk0Rzk0Tk4vcXREa2o2M1E4cGcrd09UOXZscWwz?=
+ =?utf-8?B?UGUxZnBrdXlYTWp3dlJpQnlLSmdrbVBPMzJEbTdBaVVXZ3UzbGo0bVFoZis1?=
+ =?utf-8?B?TE1PdkNESU1uVVc0eVZYaVVTMU9XOUhmQmhxdFltRGpmaUtNQzBYWWl4ZW45?=
+ =?utf-8?B?Ym1CSFZHR2ROTDZ5eTYyczRYbFpqd2k0NDVUL3VkdkRCaVhVNHM5YXFzb1B0?=
+ =?utf-8?B?SEhjZ0Ruay9wZTM2ZHlETi9FRGVucUdrRml1Ym9oMHZvVGU0S0tJUnJEODdk?=
+ =?utf-8?B?WnIzcXNOai9VVlJTNEJTVHB1elJFK0YvVkVJcHJ2eGUyZU0wcHBuaEZ2Rkk1?=
+ =?utf-8?B?LzZoVG9wSHk0YzlxaDNUQXN0NUo3UWpFWmd2b0hUQkFTclVXUW9QZklRdVh0?=
+ =?utf-8?B?cW11cVhlaitSRVBQbHBPclFQa3FGL2c4UlJjOWh2c3F4K3JxZXhnSFV5ZS94?=
+ =?utf-8?B?N1QrNFV2VVhQMTU3NHlvSTVGLzN4bkhMdURQUFZZL05aQytENXZpZW1PdjVj?=
+ =?utf-8?B?bUxRb0ZEeUNtVGZka1JGZ3lJMDE4dVJ0NFAyTWVwRFArdldXVDkzTlJ4WE52?=
+ =?utf-8?B?ellVSWcrVHczWERyQkxpbTcvUVlYem1wS1JMb1NKRXQrcytKVWhEck1zYzBq?=
+ =?utf-8?B?THNsSWRUNjBQZDRrelVhb1BOZWh1N0RGSGtLWEVJbjRSWmZOL1crR1RoQjND?=
+ =?utf-8?B?bittaG9EZ2R6MXVvb1kzRThlMnd2TGpuQ2EwYVRzWmVML0VMeG41aGRFV0Fi?=
+ =?utf-8?B?NVBNQUhodnRtdWlEb05NUStzaFhPZXRHU0ZCbTV0MjJSZ0JMNC9oaG9wNW1E?=
+ =?utf-8?B?dm9HTmJFRVpScnZib2orK1J6WVNicHhrdmVpRjB2OXVma1VGcEp1UmlLTE1a?=
+ =?utf-8?B?Y3FYdzVOenR1QTgyQW5qZlYrU1ZReUo3YmNGVXBVejh6eC8rVmVRZkFzdUxW?=
+ =?utf-8?B?NVEzaldtUHRQTFdGZ3RjTXkzZDE0VGVJUUJNbXdlZUdGVE10UUNtZE5BNHV0?=
+ =?utf-8?B?dTF2V1Rmby95RUhFeFMrMnBHMFBqUFNUcTFJdTJCWVZVR3hBQ1YzMStPWUlO?=
+ =?utf-8?B?RElaVXhSWDRISjcyU1ZlMkxQWVlQVytGNS9GVmtPRDNTUGk3ZkkrOEJKYjlT?=
+ =?utf-8?B?VUlUYTBYanhXYnd6NTNpa24xR3dQWUhtMGxON2dpU0JTRzc0YjdMUkM1d1E3?=
+ =?utf-8?B?MWxzeFFOc0liaWYyUGtCcHBoakJ3NTJOZUtYWWpxWlBIaVdydUZwK0ZNWmda?=
+ =?utf-8?B?bnBTLysvelBhd3NhdlIxU0VOMHpLcUhEV0g4c0ZyUnAzZU5kZC8vUVBxUlRj?=
+ =?utf-8?B?b0U1R3RYRXh5MENvcS9DQnN0VXJNY255K2s5V3Bra3kyKzhNYUVrK1RqR0pK?=
+ =?utf-8?B?SXBKdTNPN29CazEvd3JMZHBPUzkwT0VvcnkzZkhMNWpmVGJuY3NPanRBQndm?=
+ =?utf-8?B?YkRlSGhQQ0lJU3ZNZU1WejJBMmtkcXBVcHpmVi80OWJ5NmE1Z2ZaaFZaRjFJ?=
+ =?utf-8?B?cGR0dkxpNitqaDZ0OTRmUmJWRnp6YWtLZC8yRmhnNGp2OVFmMnNTUmVweWJa?=
+ =?utf-8?B?aUt1bjdEUTA5WmNZNGpLamM4TlhHNHhDMEcvY2drM3V4bW9GYlUzTmRycXpN?=
+ =?utf-8?B?d2I4aTVyRyszNXBlMk5LM0lFWHNOL2svT3d5TmxPUkJkZFpzOUpkL3FoVUlS?=
+ =?utf-8?B?ZU5WRGRsZzhmOExRNTVrbnBoTkNPcjBpaXhwcU5vWTNrVzRRcWdoczRkSVVk?=
+ =?utf-8?B?RkNWU2lFY3JWcmQrUVdnR3hrSGtGZ0NJRmh2RlpOSDhsOVhKSFJjRVNrTlhJ?=
+ =?utf-8?Q?kZDriNbVwGM1uPFNmz4uQes3ux/A5k=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aERTWjBGRGZlNzV5dlltMHRqOFZkN3ZBTWZTY3VkNHRxaFVJbXlJd0cxc3oz?=
+ =?utf-8?B?MGp2eU9rcWl1QmZOVVdEdVJrYTVLWk55MncwcXNpeXVhSmxBaVZoN1BvaU9O?=
+ =?utf-8?B?dUVkN213UTRrNnFyVlcvd2lBZWZsdGJ0ZiswSVhmd1hRYi9KWjdBTUVjWGxv?=
+ =?utf-8?B?alY5ei9UQ05aaUdZT0NRRHBNVTdwZnRqWGNnZmlOdElEUWd1cFVVeXZnZGRZ?=
+ =?utf-8?B?Qko3ZW1lWHJYRlNGL2Z0WW81N3NZNnpYTk1iTnVUYWthM3B4ZkUrQ0g0enla?=
+ =?utf-8?B?Y09qK1RGcTArM2YwZW1BdWFrUWlnVVByQmR0TEtDSUxjSWZ6eHdKa3hPWStk?=
+ =?utf-8?B?elBnU1hncnYrVXUvNlRYU3EzYmZ0d3dRR3dBR2NONzZCem9HWnBGK3VrMzUv?=
+ =?utf-8?B?UzU0NGw1TVgxbmlFVERVUlBMdjQrNTJDZ1JiRWRTQmYrYUJVejdKUXBhNWgz?=
+ =?utf-8?B?Nmd3cE9kUUo2WHh2N280VVgyclV4R2RwbWxlOU5ST3lCNUFJZzBrOTRHL1cz?=
+ =?utf-8?B?bUNld2JMOVhpdGZ4OSs0dnp2TU5sdzZoeG1MQWpWcm11K2xkOE9qMkpZczNw?=
+ =?utf-8?B?Z2lXdzNiK3JEL2t6TzN1Qk1KWk9TY0JSbW1TbHdwZ0FKbVhEdkJVK21qQWxy?=
+ =?utf-8?B?OWFlLzVuc1p4M3ZvVXJ4eGNTL0owbXJxNnVFMFZjYS9HZEx6ZzFQcUl4ZUpx?=
+ =?utf-8?B?QTN5d1RUYjQ1TmxCbmwzOG5Ub2ErRENyWGhwSUZKSU5aYWVnZXFjMDRzbEZo?=
+ =?utf-8?B?R2VzbHBja0ZGaklmcTJERXY4ZnJPWCt2RnJ1RUlOaDVzNm93cmpzS0l3WGlW?=
+ =?utf-8?B?SHhZaUpaSUtLblJOMXd3SHlmUG9YMGwyVmF6V1pDUHk0WUE0SXd6T2ZzMFpL?=
+ =?utf-8?B?SW10V1Y1emgySFJqbWFkVTJQUklIelR6NzhxZlFabW05ZVloV2FGdnVJMyty?=
+ =?utf-8?B?OXFaRjFtTDhheExDQy83QWU4VmVKNFlHZHpIR0hJcUVtMkFBTjZEeEQrUVNp?=
+ =?utf-8?B?R1JROUFNNWQ5Zm9BcDNRdy92eS9GeUFIdWpOUlhrQTRaTUZrNHcreksxMjVS?=
+ =?utf-8?B?c29QNnJySElGQ2NBKzh4M0dPbWtUZXdGTEpJYWRtUUhxY3Vrb2pjOHBRQkc3?=
+ =?utf-8?B?VkFaYW9KbithQjdyNFJvelNZVHA3ejJPYVFLd2NzSFZvSFZkaUQ5c2l3NThG?=
+ =?utf-8?B?R3FVUXY0U2x3YTdTQWlzS1JhNEUzUVRsWWgvYStmM29OZFF4emhxL0VDTnNF?=
+ =?utf-8?B?c252dGMzUW9tcVNSY1RldFNwYzYwMkNjNWE5aWFrT2tyam1YQVlVQ3pxZklw?=
+ =?utf-8?B?RjNxdWt2RnZWTW5CeEMyT3ZvNHVtV1VvRGxPZ2RGMUkwK21aNGpuSWJucVFZ?=
+ =?utf-8?B?MWUvZlJFMHI1OFArS0JJbmNpVVpOQytzWkM3eVlPTVUzbnlOenlJa0R0Z3h2?=
+ =?utf-8?B?bkwvNTBKOXY1cGJ0SVFmeWlSL1pzNjZYMmhJTHNYQ202NjFFSEF5VnhkenVj?=
+ =?utf-8?B?T3JtSktlWkFTSERyai92SE1obUlxWWNwdlFxdmcraVlUSVdtNDJoWTArQnRu?=
+ =?utf-8?B?ZVhxYXJ5ZnpqUkFWRWFObjJsL1BZOUVCTzhtR3NnZVY5THE5dmthdXROWnZI?=
+ =?utf-8?B?MFFENHZvS2ZTMzgvVnZsT3JBNkJOMVdDVVlYdHVhZ3RMNmltdTdtTFR5d3Rx?=
+ =?utf-8?B?Wmp2d0RnaHRmSnVyZlhyT1NaTUwxOFlxbXJzcDNuY1QzZ0tqOE5YVFd4dGdM?=
+ =?utf-8?B?NGFCckI0Y1hkUTU3azAwWlpEcGExN050Tmg3bk56aVJsTk1PTCtRRkFGV1A3?=
+ =?utf-8?B?Qm8vYVlFc3Y4VnRkQWFsK3NSdDdmcUd2aFJrZ29UM0w0UHNtRS9ManM1S3oy?=
+ =?utf-8?B?Q1hnU2xZblc4T05wUTFMVHB1SkNhS0ZqbEhDSzl5cW4ySys1SUY1Qm1LemRC?=
+ =?utf-8?B?OFZ3Tit2ay82Qnlrblp3VVVta05BdTVRMW9kcFMrSXo0QnQyNjV6UHBlbGlj?=
+ =?utf-8?B?TTc5ZnZaUVdUMFlaWXdhYmpsWjE2RWxoYnM3SVJ6VG5PS1dYYVlSWk13UVp2?=
+ =?utf-8?B?WldKYWlFcm9VWVRtOG5RV1I4YmxsRVNxRjJnWlNobm5kenNHYmY0QXp3QkNv?=
+ =?utf-8?Q?QzPlazPzHSbtizTPJZeY+yYLY?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11adb4c1-e4bf-4e4c-7262-08dd86f2772d
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2025 07:50:09.7895
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Y5T2Q1cCUg/0gnHAOp/8S/53PlL1B+oIX9rN0uRT8uMKHSwg91IjBQMOW22/Gxs26nOv5o7mDsj+ocqxM48+Ew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4447
 
-On Mon, 28 Apr 2025 19:33:10 +0100,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+
+
+On 29/4/25 16:48, Alexey Kardashevskiy wrote:
+> On 8/1/25 01:27, Xu Yilun wrote:
+>> This series is based on an earlier kvm-coco-queue version (v6.12-rc2)
 > 
-> Hi Marc,
+> Has this been pushed somewhere public? The patchset does not apply on top of v6.12-rc2, for example (I fixed locally).
+> Also, is there somewhere a QEMU tree using this? I am trying to use this new DMA_BUF feature and this require quite some not so obvious plumbing. Thanks,
+
+
+More to the point, to make it work, QEMU needs to register VFIO MMIO BAR with KVM_SET_USER_MEMORY_REGION2 which passes slot->guest_memfd to KVM which essentially comes from VFIORegion->mmaps[0].mem->ram_block->guest_memfd. But since you disabled mmap for private MMIO, there is no MR which QEMU would even try registering as KVM memslot and there are many ways to fix it. I took a shortcut and reenabled mmap() but wonder what exactly you did. Makes sense? Thanks,
+
+
 > 
-> On 26-04-2025 17:57, Marc Zyngier wrote:
-> > This is yet another version of the series last posted at [1].
-> > 
-> > The eagled eye reviewer will have noticed that since v2, the series
-> > has more or less doubled in size for any reasonable metric (number of
-> > patches, number of lines added or deleted). It is therefore pretty
-> > urgent that this gets either merged or forgotten! ;-)
-> > 
-> > See the change log below for the details -- most of it is related to
-> > FGT2 (and its rather large dependencies) being added.
-> > 
-> > * From v2:
-> > 
-> >    - Added comprehensive support for FEAT_FGT2, as the host kernel is
-> >      now making use of these registers, without any form of context
-> >      switch in KVM. What could possibly go wrong?
-> > 
-> >    - Reworked some of the FGT description and handling primitives,
-> >      reducing the boilerplate code and tables that get added over time.
-> > 
-> >    - Rebased on 6.15-rc3.
-> > 
-> > [1]: https://lore.kernel.org/r/20250310122505.2857610-1-maz@kernel.org
-> > 
-> > Marc Zyngier (41):
-> >    arm64: sysreg: Add ID_AA64ISAR1_EL1.LS64 encoding for FEAT_LS64WB
-> >    arm64: sysreg: Update ID_AA64MMFR4_EL1 description
-> >    arm64: sysreg: Add layout for HCR_EL2
-> >    arm64: sysreg: Replace HGFxTR_EL2 with HFG{R,W}TR_EL2
-> >    arm64: sysreg: Update ID_AA64PFR0_EL1 description
-> >    arm64: sysreg: Update PMSIDR_EL1 description
-> >    arm64: sysreg: Update TRBIDR_EL1 description
-> >    arm64: sysreg: Add registers trapped by HFG{R,W}TR2_EL2
-> >    arm64: sysreg: Add registers trapped by HDFG{R,W}TR2_EL2
-> >    arm64: sysreg: Add system instructions trapped by HFGIRT2_EL2
-> >    arm64: Remove duplicated sysreg encodings
-> >    arm64: tools: Resync sysreg.h
-> >    arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
-> >    arm64: Add FEAT_FGT2 capability
-> >    KVM: arm64: Tighten handling of unknown FGT groups
-> >    KVM: arm64: Simplify handling of negative FGT bits
-> >    KVM: arm64: Handle trapping of FEAT_LS64* instructions
-> >    KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_ST64_ACCDATA being
-> >      disabled
-> >    KVM: arm64: Don't treat HCRX_EL2 as a FGT register
-> >    KVM: arm64: Plug FEAT_GCS handling
-> >    KVM: arm64: Compute FGT masks from KVM's own FGT tables
-> >    KVM: arm64: Add description of FGT bits leading to EC!=0x18
-> >    KVM: arm64: Use computed masks as sanitisers for FGT registers
-> >    KVM: arm64: Propagate FGT masks to the nVHE hypervisor
-> >    KVM: arm64: Use computed FGT masks to setup FGT registers
-> >    KVM: arm64: Remove hand-crafted masks for FGT registers
-> >    KVM: arm64: Use KVM-specific HCRX_EL2 RES0 mask
-> >    KVM: arm64: Handle PSB CSYNC traps
-> >    KVM: arm64: Switch to table-driven FGU configuration
-> >    KVM: arm64: Validate FGT register descriptions against RES0 masks
-> >    KVM: arm64: Use FGT feature maps to drive RES0 bits
-> >    KVM: arm64: Allow kvm_has_feat() to take variable arguments
-> >    KVM: arm64: Use HCRX_EL2 feature map to drive fixed-value bits
-> >    KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits
-> >    KVM: arm64: Add FEAT_FGT2 registers to the VNCR page
-> >    KVM: arm64: Add sanitisation for FEAT_FGT2 registers
-> >    KVM: arm64: Add trap routing for FEAT_FGT2 registers
-> >    KVM: arm64: Add context-switch for FEAT_FGT2 registers
-> >    KVM: arm64: Allow sysreg ranges for FGT descriptors
-> >    KVM: arm64: Add FGT descriptors for FEAT_FGT2
-> >    KVM: arm64: Handle TSB CSYNC traps
-> > 
-> > Mark Rutland (1):
-> >    KVM: arm64: Unconditionally configure fine-grain traps
-> > 
-> >   arch/arm64/include/asm/el2_setup.h      |   14 +-
-> >   arch/arm64/include/asm/esr.h            |   10 +-
-> >   arch/arm64/include/asm/kvm_arm.h        |  186 ++--
-> >   arch/arm64/include/asm/kvm_host.h       |   56 +-
-> >   arch/arm64/include/asm/sysreg.h         |   26 +-
-> >   arch/arm64/include/asm/vncr_mapping.h   |    5 +
-> >   arch/arm64/kernel/cpufeature.c          |    7 +
-> >   arch/arm64/kvm/Makefile                 |    2 +-
-> >   arch/arm64/kvm/arm.c                    |   13 +
-> >   arch/arm64/kvm/config.c                 | 1085 +++++++++++++++++++++++
-> >   arch/arm64/kvm/emulate-nested.c         |  580 ++++++++----
-> >   arch/arm64/kvm/handle_exit.c            |   77 ++
-> >   arch/arm64/kvm/hyp/include/hyp/switch.h |  158 ++--
-> >   arch/arm64/kvm/hyp/nvhe/switch.c        |   12 +
-> >   arch/arm64/kvm/hyp/vgic-v3-sr.c         |    8 +-
-> >   arch/arm64/kvm/nested.c                 |  223 +----
-> >   arch/arm64/kvm/sys_regs.c               |   68 +-
-> >   arch/arm64/tools/cpucaps                |    1 +
-> >   arch/arm64/tools/sysreg                 | 1002 ++++++++++++++++++++-
-> >   tools/arch/arm64/include/asm/sysreg.h   |   65 +-
-> >   20 files changed, 2888 insertions(+), 710 deletions(-)
-> >   create mode 100644 arch/arm64/kvm/config.c
-> > 
+>> which includes all basic TDX patches.
+>>
+>> The series is to start the early stage discussion of the private MMIO
+>> handling for Coco-VM, which is part of the Private Device
+>> Assignment (aka TEE-IO, TIO) enabling. There are already some
+>> disscusion about the context of TIO:
+>>
+>> https://lore.kernel.org/linux-coco/173343739517.1074769.13134786548545925484.stgit@dwillia2-xfh.jf.intel.com/
+>> https://lore.kernel.org/all/20240823132137.336874-1-aik@amd.com/
+>>
+>> Private MMIOs are resources owned by Private assigned devices. Like
+>> private memory, they are also not intended to be accessed by host, only
+>> accessible by Coco-VM via some secondary MMUs (e.g. Secure EPT). This
+>> series is for KVM to map these MMIO resources without firstly mapping
+>> into the host. For this purpose, This series uses the FD based MMIO
+>> resources for secure mapping, and the dma-buf is chosen as the FD based
+>> backend, just like guest_memfd for private memory. Patch 6 in this
+>> series has more detailed description.
+>>
+>>
+>> Patch 1 changes dma-buf core, expose a new kAPI for importers to get
+>> dma-buf's PFN without DMA mapping. KVM could use this kAPI to build
+>> GPA -> HPA mapping in KVM MMU.
+>>
+>> Patch 2-4 are from Jason & Vivek, allow vfio-pci to export MMIO
+>> resources as dma-buf. The original series are for native P2P DMA and
+>> focus on p2p DMA mapping opens. I removed these p2p DMA mapping code
+>> just to focus the early stage discussion of private MMIO. The original
+>> series:
+>>
+>> https://lore.kernel.org/all/0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com/
+>> https://lore.kernel.org/kvm/20240624065552.1572580-1-vivek.kasireddy@intel.com/
+>>
+>> Patch 5 is the implementation of get_pfn() callback for vfio dma-buf
+>> exporter.
+>>
+>> Patch 6-7 is about KVM supports the private MMIO memory slot backed by
+>> vfio dma-buf.
+>>
+>> Patch 8-10 is about how KVM verifies the user provided dma-buf fd
+>> eligible for private MMIO slot.
+>>
+>> Patch 11-12 is the example of how KVM TDX setup the Secure EPT for
+>> private MMIO.
+>>
+>>
+>> TODOs:
+>>
+>> - Follow up the evolving of original VFIO dma-buf series.
+>> - Follow up the evolving of basic TDX patches.
+>>
+>>
+>> Vivek Kasireddy (3):
+>>    vfio: Export vfio device get and put registration helpers
+>>    vfio/pci: Share the core device pointer while invoking feature
+>>      functions
+>>    vfio/pci: Allow MMIO regions to be exported through dma-buf
+>>
+>> Xu Yilun (9):
+>>    dma-buf: Introduce dma_buf_get_pfn_unlocked() kAPI
+>>    vfio/pci: Support get_pfn() callback for dma-buf
+>>    KVM: Support vfio_dmabuf backed MMIO region
+>>    KVM: x86/mmu: Handle page fault for vfio_dmabuf backed MMIO
+>>    vfio/pci: Create host unaccessible dma-buf for private device
+>>    vfio/pci: Export vfio dma-buf specific info for importers
+>>    KVM: vfio_dmabuf: Fetch VFIO specific dma-buf data for sanity check
+>>    KVM: x86/mmu: Export kvm_is_mmio_pfn()
+>>    KVM: TDX: Implement TDX specific private MMIO map/unmap for SEPT
+>>
+>>   Documentation/virt/kvm/api.rst     |   7 +
+>>   arch/x86/include/asm/tdx.h         |   3 +
+>>   arch/x86/kvm/mmu.h                 |   1 +
+>>   arch/x86/kvm/mmu/mmu.c             |  25 ++-
+>>   arch/x86/kvm/mmu/spte.c            |   3 +-
+>>   arch/x86/kvm/vmx/tdx.c             |  57 +++++-
+>>   arch/x86/virt/vmx/tdx/tdx.c        |  52 ++++++
+>>   arch/x86/virt/vmx/tdx/tdx.h        |   3 +
+>>   drivers/dma-buf/dma-buf.c          |  90 ++++++++--
+>>   drivers/vfio/device_cdev.c         |   9 +-
+>>   drivers/vfio/pci/Makefile          |   1 +
+>>   drivers/vfio/pci/dma_buf.c         | 273 +++++++++++++++++++++++++++++
+>>   drivers/vfio/pci/vfio_pci_config.c |  22 ++-
+>>   drivers/vfio/pci/vfio_pci_core.c   |  64 +++++--
+>>   drivers/vfio/pci/vfio_pci_priv.h   |  27 +++
+>>   drivers/vfio/pci/vfio_pci_rdwr.c   |   3 +
+>>   drivers/vfio/vfio_main.c           |   2 +
+>>   include/linux/dma-buf.h            |  13 ++
+>>   include/linux/kvm_host.h           |  25 ++-
+>>   include/linux/vfio.h               |  22 +++
+>>   include/linux/vfio_pci_core.h      |   1 +
+>>   include/uapi/linux/kvm.h           |   1 +
+>>   include/uapi/linux/vfio.h          |  34 +++-
+>>   virt/kvm/Kconfig                   |   6 +
+>>   virt/kvm/Makefile.kvm              |   1 +
+>>   virt/kvm/kvm_main.c                |  32 +++-
+>>   virt/kvm/kvm_mm.h                  |  19 ++
+>>   virt/kvm/vfio_dmabuf.c             | 151 ++++++++++++++++
+>>   28 files changed, 896 insertions(+), 51 deletions(-)
+>>   create mode 100644 drivers/vfio/pci/dma_buf.c
+>>   create mode 100644 virt/kvm/vfio_dmabuf.c
+>>
 > 
-> I am trying nv-next branch and I believe these FGT related changes are
-> merged. With this, selftest arm64/set_id_regs is failing. From initial
-> debug it seems, the register access of SYS_CTR_EL0, SYS_MIDR_EL1,
-> SYS_REVIDR_EL1 and SYS_AIDR_EL1 from guest_code is resulting in trap
-> to EL2 (HCR_ID1,ID2 are set) and is getting forwarded back to EL1,
-> since EL1 sync handler is not installed in the test code, resulting in
-> hang(endless guest_exit/entry).
-
-Let's start by calling bullshit on the test itself:
-
-root@semi-fraudulent:/home/maz# grep AA64PFR0 /sys/kernel/debug/kvm/2008-4/idregs 
- SYS_ID_AA64PFR0_EL1:	0000000020110000
-
-It basically disable anything 64bit at EL{0,1,2,3]. Frankly, all these
-tests are pure garbage. I'm baffled that anyone expects this crap to
-give any meaningful result.
-
-> It is due to function "triage_sysreg_trap" is returning true.
-> 
-> When guest_code is in EL1 (default case) it is due to return in below if.
-> 
->  if (tc.fgt != __NO_FGT_GROUP__ &&
->             (vcpu->kvm->arch.fgu[tc.fgt] & BIT(tc.bit))) {
->                 kvm_inject_undefined(vcpu);
->                 return true;
->         }
-
-That explains why we end-up here. The 64bit ISA is "disabled", a bunch
-of trap bits are advertised as depending on it, so the corresponding
-FGU bits are set to "emulate" the requested behaviour.
-
-Works as intended, and this proves once more that what we call testing
-is just horseshit.
-
-In retrospect, we should do a few things:
-
-- Prevent writes to ID_AA64PFR0_EL1 disabling the 64bit ISA, breaking
-  this stupid test for good.
-
-- Flag all the FGT bits depending on FEAT_AA64EL1 as NEVER_FGU,
-  because that shouldn't happen, by construction (there is no
-  architecture revision where these sysregs are UNDEFined).
-
-- Mark all these test as unmaintained and deprecated, recognising that
-  they are utterly pointless (optional).
-
-Full patch below.
-
-	M.
-
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index d4e1218b004dd..666070d4ccd7f 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -295,34 +295,34 @@ static const struct reg_bits_to_feat_map hfgrtr_feat_map[] = {
- 		   HFGRTR_EL2_APDBKey		|
- 		   HFGRTR_EL2_APDAKey,
- 		   feat_pauth),
--	NEEDS_FEAT(HFGRTR_EL2_VBAR_EL1		|
--		   HFGRTR_EL2_TTBR1_EL1		|
--		   HFGRTR_EL2_TTBR0_EL1		|
--		   HFGRTR_EL2_TPIDR_EL0		|
--		   HFGRTR_EL2_TPIDRRO_EL0	|
--		   HFGRTR_EL2_TPIDR_EL1		|
--		   HFGRTR_EL2_TCR_EL1		|
--		   HFGRTR_EL2_SCTLR_EL1		|
--		   HFGRTR_EL2_REVIDR_EL1	|
--		   HFGRTR_EL2_PAR_EL1		|
--		   HFGRTR_EL2_MPIDR_EL1		|
--		   HFGRTR_EL2_MIDR_EL1		|
--		   HFGRTR_EL2_MAIR_EL1		|
--		   HFGRTR_EL2_ISR_EL1		|
--		   HFGRTR_EL2_FAR_EL1		|
--		   HFGRTR_EL2_ESR_EL1		|
--		   HFGRTR_EL2_DCZID_EL0		|
--		   HFGRTR_EL2_CTR_EL0		|
--		   HFGRTR_EL2_CSSELR_EL1	|
--		   HFGRTR_EL2_CPACR_EL1		|
--		   HFGRTR_EL2_CONTEXTIDR_EL1	|
--		   HFGRTR_EL2_CLIDR_EL1		|
--		   HFGRTR_EL2_CCSIDR_EL1	|
--		   HFGRTR_EL2_AMAIR_EL1		|
--		   HFGRTR_EL2_AIDR_EL1		|
--		   HFGRTR_EL2_AFSR1_EL1		|
--		   HFGRTR_EL2_AFSR0_EL1,
--		   FEAT_AA64EL1),
-+	NEEDS_FEAT_FLAG(HFGRTR_EL2_VBAR_EL1	|
-+			HFGRTR_EL2_TTBR1_EL1	|
-+			HFGRTR_EL2_TTBR0_EL1	|
-+			HFGRTR_EL2_TPIDR_EL0	|
-+			HFGRTR_EL2_TPIDRRO_EL0	|
-+			HFGRTR_EL2_TPIDR_EL1	|
-+			HFGRTR_EL2_TCR_EL1	|
-+			HFGRTR_EL2_SCTLR_EL1	|
-+			HFGRTR_EL2_REVIDR_EL1	|
-+			HFGRTR_EL2_PAR_EL1	|
-+			HFGRTR_EL2_MPIDR_EL1	|
-+			HFGRTR_EL2_MIDR_EL1	|
-+			HFGRTR_EL2_MAIR_EL1	|
-+			HFGRTR_EL2_ISR_EL1	|
-+			HFGRTR_EL2_FAR_EL1	|
-+			HFGRTR_EL2_ESR_EL1	|
-+			HFGRTR_EL2_DCZID_EL0	|
-+			HFGRTR_EL2_CTR_EL0	|
-+			HFGRTR_EL2_CSSELR_EL1	|
-+			HFGRTR_EL2_CPACR_EL1	|
-+			HFGRTR_EL2_CONTEXTIDR_EL1|
-+			HFGRTR_EL2_CLIDR_EL1	|
-+			HFGRTR_EL2_CCSIDR_EL1	|
-+			HFGRTR_EL2_AMAIR_EL1	|
-+			HFGRTR_EL2_AIDR_EL1	|
-+			HFGRTR_EL2_AFSR1_EL1	|
-+			HFGRTR_EL2_AFSR0_EL1,
-+			NEVER_FGU, FEAT_AA64EL1),
- };
- 
- static const struct reg_bits_to_feat_map hfgwtr_feat_map[] = {
-@@ -368,25 +368,25 @@ static const struct reg_bits_to_feat_map hfgwtr_feat_map[] = {
- 		   HFGWTR_EL2_APDBKey		|
- 		   HFGWTR_EL2_APDAKey,
- 		   feat_pauth),
--	NEEDS_FEAT(HFGWTR_EL2_VBAR_EL1		|
--		   HFGWTR_EL2_TTBR1_EL1		|
--		   HFGWTR_EL2_TTBR0_EL1		|
--		   HFGWTR_EL2_TPIDR_EL0		|
--		   HFGWTR_EL2_TPIDRRO_EL0	|
--		   HFGWTR_EL2_TPIDR_EL1		|
--		   HFGWTR_EL2_TCR_EL1		|
--		   HFGWTR_EL2_SCTLR_EL1		|
--		   HFGWTR_EL2_PAR_EL1		|
--		   HFGWTR_EL2_MAIR_EL1		|
--		   HFGWTR_EL2_FAR_EL1		|
--		   HFGWTR_EL2_ESR_EL1		|
--		   HFGWTR_EL2_CSSELR_EL1	|
--		   HFGWTR_EL2_CPACR_EL1		|
--		   HFGWTR_EL2_CONTEXTIDR_EL1	|
--		   HFGWTR_EL2_AMAIR_EL1		|
--		   HFGWTR_EL2_AFSR1_EL1		|
--		   HFGWTR_EL2_AFSR0_EL1,
--		   FEAT_AA64EL1),
-+	NEEDS_FEAT_FLAG(HFGWTR_EL2_VBAR_EL1	|
-+			HFGWTR_EL2_TTBR1_EL1	|
-+			HFGWTR_EL2_TTBR0_EL1	|
-+			HFGWTR_EL2_TPIDR_EL0	|
-+			HFGWTR_EL2_TPIDRRO_EL0	|
-+			HFGWTR_EL2_TPIDR_EL1	|
-+			HFGWTR_EL2_TCR_EL1	|
-+			HFGWTR_EL2_SCTLR_EL1	|
-+			HFGWTR_EL2_PAR_EL1	|
-+			HFGWTR_EL2_MAIR_EL1	|
-+			HFGWTR_EL2_FAR_EL1	|
-+			HFGWTR_EL2_ESR_EL1	|
-+			HFGWTR_EL2_CSSELR_EL1	|
-+			HFGWTR_EL2_CPACR_EL1	|
-+			HFGWTR_EL2_CONTEXTIDR_EL1|
-+			HFGWTR_EL2_AMAIR_EL1	|
-+			HFGWTR_EL2_AFSR1_EL1	|
-+			HFGWTR_EL2_AFSR0_EL1,
-+			NEVER_FGU, FEAT_AA64EL1),
- };
- 
- static const struct reg_bits_to_feat_map hdfgrtr_feat_map[] = {
-@@ -443,17 +443,17 @@ static const struct reg_bits_to_feat_map hdfgrtr_feat_map[] = {
- 		   FEAT_TRBE),
- 	NEEDS_FEAT_FLAG(HDFGRTR_EL2_OSDLR_EL1, NEVER_FGU,
- 			FEAT_DoubleLock),
--	NEEDS_FEAT(HDFGRTR_EL2_OSECCR_EL1	|
--		   HDFGRTR_EL2_OSLSR_EL1	|
--		   HDFGRTR_EL2_DBGPRCR_EL1	|
--		   HDFGRTR_EL2_DBGAUTHSTATUS_EL1|
--		   HDFGRTR_EL2_DBGCLAIM		|
--		   HDFGRTR_EL2_MDSCR_EL1	|
--		   HDFGRTR_EL2_DBGWVRn_EL1	|
--		   HDFGRTR_EL2_DBGWCRn_EL1	|
--		   HDFGRTR_EL2_DBGBVRn_EL1	|
--		   HDFGRTR_EL2_DBGBCRn_EL1,
--		   FEAT_AA64EL1)
-+	NEEDS_FEAT_FLAG(HDFGRTR_EL2_OSECCR_EL1	|
-+			HDFGRTR_EL2_OSLSR_EL1	|
-+			HDFGRTR_EL2_DBGPRCR_EL1	|
-+			HDFGRTR_EL2_DBGAUTHSTATUS_EL1|
-+			HDFGRTR_EL2_DBGCLAIM	|
-+			HDFGRTR_EL2_MDSCR_EL1	|
-+			HDFGRTR_EL2_DBGWVRn_EL1	|
-+			HDFGRTR_EL2_DBGWCRn_EL1	|
-+			HDFGRTR_EL2_DBGBVRn_EL1	|
-+			HDFGRTR_EL2_DBGBCRn_EL1,
-+			NEVER_FGU, FEAT_AA64EL1)
- };
- 
- static const struct reg_bits_to_feat_map hdfgwtr_feat_map[] = {
-@@ -503,16 +503,16 @@ static const struct reg_bits_to_feat_map hdfgwtr_feat_map[] = {
- 		   FEAT_TRBE),
- 	NEEDS_FEAT_FLAG(HDFGWTR_EL2_OSDLR_EL1,
- 			NEVER_FGU, FEAT_DoubleLock),
--	NEEDS_FEAT(HDFGWTR_EL2_OSECCR_EL1	|
--		   HDFGWTR_EL2_OSLAR_EL1	|
--		   HDFGWTR_EL2_DBGPRCR_EL1	|
--		   HDFGWTR_EL2_DBGCLAIM		|
--		   HDFGWTR_EL2_MDSCR_EL1	|
--		   HDFGWTR_EL2_DBGWVRn_EL1	|
--		   HDFGWTR_EL2_DBGWCRn_EL1	|
--		   HDFGWTR_EL2_DBGBVRn_EL1	|
--		   HDFGWTR_EL2_DBGBCRn_EL1,
--		   FEAT_AA64EL1),
-+	NEEDS_FEAT_FLAG(HDFGWTR_EL2_OSECCR_EL1	|
-+			HDFGWTR_EL2_OSLAR_EL1	|
-+			HDFGWTR_EL2_DBGPRCR_EL1	|
-+			HDFGWTR_EL2_DBGCLAIM	|
-+			HDFGWTR_EL2_MDSCR_EL1	|
-+			HDFGWTR_EL2_DBGWVRn_EL1	|
-+			HDFGWTR_EL2_DBGWCRn_EL1	|
-+			HDFGWTR_EL2_DBGBVRn_EL1	|
-+			HDFGWTR_EL2_DBGBCRn_EL1,
-+			NEVER_FGU, FEAT_AA64EL1),
- 	NEEDS_FEAT(HDFGWTR_EL2_TRFCR_EL1, FEAT_TRF),
- };
- 
-@@ -556,38 +556,38 @@ static const struct reg_bits_to_feat_map hfgitr_feat_map[] = {
- 		   HFGITR_EL2_ATS1E1RP,
- 		   FEAT_PAN2),
- 	NEEDS_FEAT(HFGITR_EL2_DCCVADP, FEAT_DPB2),
--	NEEDS_FEAT(HFGITR_EL2_DCCVAC		|
--		   HFGITR_EL2_SVC_EL1		|
--		   HFGITR_EL2_SVC_EL0		|
--		   HFGITR_EL2_ERET		|
--		   HFGITR_EL2_TLBIVAALE1	|
--		   HFGITR_EL2_TLBIVALE1		|
--		   HFGITR_EL2_TLBIVAAE1		|
--		   HFGITR_EL2_TLBIASIDE1	|
--		   HFGITR_EL2_TLBIVAE1		|
--		   HFGITR_EL2_TLBIVMALLE1	|
--		   HFGITR_EL2_TLBIVAALE1IS	|
--		   HFGITR_EL2_TLBIVALE1IS	|
--		   HFGITR_EL2_TLBIVAAE1IS	|
--		   HFGITR_EL2_TLBIASIDE1IS	|
--		   HFGITR_EL2_TLBIVAE1IS	|
--		   HFGITR_EL2_TLBIVMALLE1IS	|
--		   HFGITR_EL2_ATS1E0W		|
--		   HFGITR_EL2_ATS1E0R		|
--		   HFGITR_EL2_ATS1E1W		|
--		   HFGITR_EL2_ATS1E1R		|
--		   HFGITR_EL2_DCZVA		|
--		   HFGITR_EL2_DCCIVAC		|
--		   HFGITR_EL2_DCCVAP		|
--		   HFGITR_EL2_DCCVAU		|
--		   HFGITR_EL2_DCCISW		|
--		   HFGITR_EL2_DCCSW		|
--		   HFGITR_EL2_DCISW		|
--		   HFGITR_EL2_DCIVAC		|
--		   HFGITR_EL2_ICIVAU		|
--		   HFGITR_EL2_ICIALLU		|
--		   HFGITR_EL2_ICIALLUIS,
--		   FEAT_AA64EL1),
-+	NEEDS_FEAT_FLAG(HFGITR_EL2_DCCVAC	|
-+			HFGITR_EL2_SVC_EL1	|
-+			HFGITR_EL2_SVC_EL0	|
-+			HFGITR_EL2_ERET		|
-+			HFGITR_EL2_TLBIVAALE1	|
-+			HFGITR_EL2_TLBIVALE1	|
-+			HFGITR_EL2_TLBIVAAE1	|
-+			HFGITR_EL2_TLBIASIDE1	|
-+			HFGITR_EL2_TLBIVAE1	|
-+			HFGITR_EL2_TLBIVMALLE1	|
-+			HFGITR_EL2_TLBIVAALE1IS	|
-+			HFGITR_EL2_TLBIVALE1IS	|
-+			HFGITR_EL2_TLBIVAAE1IS	|
-+			HFGITR_EL2_TLBIASIDE1IS	|
-+			HFGITR_EL2_TLBIVAE1IS	|
-+			HFGITR_EL2_TLBIVMALLE1IS|
-+			HFGITR_EL2_ATS1E0W	|
-+			HFGITR_EL2_ATS1E0R	|
-+			HFGITR_EL2_ATS1E1W	|
-+			HFGITR_EL2_ATS1E1R	|
-+			HFGITR_EL2_DCZVA	|
-+			HFGITR_EL2_DCCIVAC	|
-+			HFGITR_EL2_DCCVAP	|
-+			HFGITR_EL2_DCCVAU	|
-+			HFGITR_EL2_DCCISW	|
-+			HFGITR_EL2_DCCSW	|
-+			HFGITR_EL2_DCISW	|
-+			HFGITR_EL2_DCIVAC	|
-+			HFGITR_EL2_ICIVAU	|
-+			HFGITR_EL2_ICIALLU	|
-+			HFGITR_EL2_ICIALLUIS,
-+			NEVER_FGU, FEAT_AA64EL1),
- };
- 
- static const struct reg_bits_to_feat_map hafgrtr_feat_map[] = {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 157de0ace6e7e..28dc778d0d9bb 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1946,6 +1946,12 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 	if ((hw_val & mpam_mask) == (user_val & mpam_mask))
- 		user_val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
- 
-+	/* Fail the guest's request to disable the AA64 ISA at EL{0,1,2} */
-+	if (!FIELD_GET(ID_AA64PFR0_EL1_EL0, user_val) ||
-+	    !FIELD_GET(ID_AA64PFR0_EL1_EL1, user_val) ||
-+	    (vcpu_has_nv(vcpu) && !FIELD_GET(ID_AA64PFR0_EL1_EL2, user_val)))
-+		return -EINVAL;
-+
- 	return set_id_reg(vcpu, rd, user_val);
- }
- 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 322b9d3b01255..57708de2075df 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -129,10 +129,10 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, DIT, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, SEL2, 0),
- 	REG_FTR_BITS(FTR_EXACT, ID_AA64PFR0_EL1, GIC, 0),
--	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL3, 0),
--	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL2, 0),
--	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL1, 0),
--	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL0, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL3, 1),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL2, 1),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL1, 1),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR0_EL1, EL0, 1),
- 	REG_FTR_END,
- };
- 
 
 -- 
-Jazz isn't dead. It just smells funny.
+Alexey
+
 
