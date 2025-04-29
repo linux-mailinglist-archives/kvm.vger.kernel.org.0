@@ -1,80 +1,79 @@
-Return-Path: <kvm+bounces-44824-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44825-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C62CAA1CA8
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 23:07:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C1FAA1CAC
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 23:09:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF3601BC2422
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 21:07:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41534170FCC
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 21:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ECA0268688;
-	Tue, 29 Apr 2025 21:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37F826B09D;
+	Tue, 29 Apr 2025 21:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QqBIujIw"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eXqP1kpt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D9326A1D9
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 21:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CA113AC1
+	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 21:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745960827; cv=none; b=TK6CoDsgoEQU8Vw8ERCKtgIYqJMPriuQHF33PrygT55YTZCdypnSdIvO3SdEuc+uLqguClwtp2X4HksVKNqDQwM08f74+DgPHcRRUaqsj1CTXXXRzSWE7P2OaOx5X3x5kmXOyMs4kJGF6Lu+kv52W5hFOS54OOsW8oNkEyHz5Mk=
+	t=1745960951; cv=none; b=FXW73zpnYzRyUsDLU2GPeJ9UyV6JmLDNFGil91FJEEG1tFYIuHyNah0BpfImugT7vG83uossQ4uo/xC7mB3NuT5uPJjRQiSKkJWevKdV3LrEQUrzrZABgGKu9GBuJr3/dDxM3NEIa0aKqbIFCNNhvPODS/R0IX/f/7swG4ldv2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745960827; c=relaxed/simple;
-	bh=LWgkH39AdAHGMott5a3i+zxxXldGQog2oioV2KbhQzg=;
+	s=arc-20240116; t=1745960951; c=relaxed/simple;
+	bh=hgbhQTgDo62lWQEOkRNiYcPYKlAEz+do7tSxAtE5VWA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fhxWxfQh8vPsTLCL1iLngD7RArUv/4mn5oU6riNIROaboX2XS4tynfXXnCP09tW5mxU2xJQNsCKNY0+sSViNxbC0uPiEtI3owBpeFBR5QS79fSk2hDWUh1Ml6y0iIIEPgK4ERlYgsuTdDuE9vg9k2LGD1YSTU53CchdmwyxUelY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QqBIujIw; arc=none smtp.client-ip=209.85.210.182
+	 In-Reply-To:Content-Type; b=mvCi1vfQrP49vcI6cI2mZj1P8u1YOwfgByb2TWWPUKMq6ZoOAcxtFnUOGbOKlvkJyGeguaMULGFNU0xcWCbm8frEi3b6OqrxVbRDOaoZjc6nsKWkl+e+mfqA2tCL/bH/4GNq+3sb1/hFzFUdGMJiOnzCdkxZkBj9OJBaS0/jZ2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eXqP1kpt; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-74019695377so2307438b3a.3
-        for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 14:07:05 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22c33e4fdb8so70181965ad.2
+        for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 14:09:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1745960825; x=1746565625; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=linaro.org; s=google; t=1745960949; x=1746565749; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=J0R7aQy+3GY23ZMFehDXTfzL4PuUym9QxuFfe3VQUYA=;
-        b=QqBIujIwqRHsuGVkgNBZJC5fZBtt34vakZ02mjHkMHsPbWaQMD/rmpvNM1aYYTxE/O
-         VGnJ7AzTKziwrBMnny2IQCzH4tpMOukMuwagCbRGRWC4oViRjCGcqLe/ZSNpNIkmuy42
-         +g0AxRGH75aA0l7XYzUAg8it3wjuSpJrriR40fk1ayXPKjr1aavAAxvjUxCX9TJHTIPC
-         GiwINv3paNPMU9mJ14KtbVv2nxhxqEO11lZdC2hkCIc0otb37I51ew+1GUruLXORIFiS
-         pOyMoiwzqWyMhVAtAaRli/+1GXe0b21EU6qUF/clgiQK06yp4vGOuFV3ElHqq6CaLvlC
-         Ectw==
+        bh=MLeuxHcfNivb7tyBBoY+e0IZqSm/iDGYB29+J+i/d7Q=;
+        b=eXqP1kptLY8XRNjpOr5gKLdkY3tTdp/2OWzJS0RqfNgSn/rDK0Axd+U0bqcW4YgxO0
+         q9rpl6uIi6ag5Tdv6a/kRUmJqWL1Q2jC/jPOf9t8AYbkrhlmnLgEY2ATKSq58/d+8mmZ
+         jYreP7/0pUJepeVC5aoZcqeuAR07qRyS8XADKxSag27OCS5WFpOfhPLxiJMB3BIwunV2
+         +7ul+v4N06OX/NXtehNlpXvuaQIqPGoocju9L0lT0/WPa1AKH/IZ5PyrwkhJfGeOtU7Q
+         oET30yz1pauoTztLLwAC0xWzG5vlOsOkx/UnnjpdESubWc44ce2/BTxWbOaMig01dXzM
+         AGtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745960825; x=1746565625;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1745960949; x=1746565749;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J0R7aQy+3GY23ZMFehDXTfzL4PuUym9QxuFfe3VQUYA=;
-        b=aFZnqz7/EQr/d/hsV6dgRrGsU/qaEfCAlO8VqqgqptonbSBdqs0jzOHD7rd+oLSxM/
-         LsFZDVbgWKuJsO7HUUTE1QAVPpSGtuFJ3CC88my0QWH/AXv9BdlUOZBiAvDZGz77IeQb
-         4SHqyhyA4CDwxmeUtCgOW0lWJfKMpehVVMF0742OJpD572HR7Drru8rG+GsehNsmZoQ6
-         MIhumxG6KzxZnWBBI++6zNxxhTWg4+mhnFVWWjzgxCkoqNTzDBy32v+4h+GJrPPQ9MDP
-         7ZsDD0NSQUqVCu+Q8dfbXZpcOenpQxJCMVkQEEwWTKft0wXuHrdQcS15EQCjV0K2czpz
-         o1PA==
-X-Forwarded-Encrypted: i=1; AJvYcCWiOaJuzv36pK7nQvgVpQ1V0KbC0/tL/khP2vFUjjl96KigFXoDl6QC+59n1kOjVQRN+3E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwZ40tpZ2cqX1reiky2A0knKaPhLtz6EXRRS05aedEkctmFudb
-	Hc9zfgx79dG96I81YsZ+BDI7/vYPj1f58EZAx7l1CyjFWo6J1oIHlWQsBUm2R2TpCl428towRC8
-	L
-X-Gm-Gg: ASbGncvh0YOpFAoddXoo75+qXKMh1J9oP/RDi0hEy81KmVWjdHh5bERZSAF/3F3Pmoh
-	WCCNRMi2kLHOb7dkNb7ibZLM40O02+cO93j+ngnGpTwKYSi0o9At1tngfXEs7u/RIgjtOXV2mMW
-	yWq+qeiaKoW5LpsM0hFWIaEZnE4D4NZlnhOsymb+4f34gEMbk7EJkkWBSu+Uw7NSEfTrymHO158
-	/BB+PMPv+GWCDubYmBiMohGAaZNJfJClKi/RPU8bPzUt9bDaszFSvgXCG2kcedRz8uc3v2lagKY
-	RFKbtO82/t1CtNQ9hBxyWWMj/f3B8mVsmylEAe1L6sifN3bJLfyd2g==
-X-Google-Smtp-Source: AGHT+IH32wV8hOys1/FlSKA99ZrcKLdxQ/jVjCKspBhTfIoQlbisbUoYD7FByxZw5MrxgeqxouXjtA==
-X-Received: by 2002:a05:6a00:10ce:b0:739:56c2:b661 with SMTP id d2e1a72fcca58-740389b795bmr898455b3a.12.1745960824759;
-        Tue, 29 Apr 2025 14:07:04 -0700 (PDT)
+        bh=MLeuxHcfNivb7tyBBoY+e0IZqSm/iDGYB29+J+i/d7Q=;
+        b=Ptg6Kdqud5V6ghxRkkM/WkGZX8v4Wh+t2UStRRHlGjdMhvbf3OlE5dCn3copf8Dgtt
+         JWAd6ieMbTtYTK3tXnJGrYf+tckvTHIfgwH5O3+2Wq1bgjEIZ8bcIRG03QJUAMUMOtJa
+         SL4IEIuLw1yD1vOK3XN3ztnYn+6kSoUqRKXumszz5lt6kUKAUvprq7sgWV/N5xus7Rhq
+         7iaYORUOWxNXau6k2/Wiij3KrPt2ftrfwYaEk2McwwelBZApln4Gc+l2UvrjlPbrs/TL
+         nBZIy+1Oxl2n0uv9ct8g8D7ipfHFqhBybfqZnjRbE4RjDw9++8KjdZQaPBu0GYvqlQru
+         ENFA==
+X-Forwarded-Encrypted: i=1; AJvYcCX6G+y/d1t/YnISx81NIHra6yfWedeS0JwdPMwzTuBHGMUUDe3bhXVx9iCOYCeXPkya0G4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy73gknul15vUp8S1KI2KT/t41BA6+EbwLSPiyREgDExafwRUm9
+	Bd5SLdcWlEDID4qYDT2v0aNJLSXZRqxhI+QniLhGz9h+ZYEvzjRF08romb/V9bw=
+X-Gm-Gg: ASbGncvK/hX0OAUX8ZFWrs7TxYCshruyWWRUV8wFZlILFkZscnbOiALPAgy0/DcXdy5
+	1WPkGxcivp8WwdEXYK28MhyGseRVD07yDBcsND1a/iY++5c49R2oGC9ZqKtGP6TNtJzv2kgllki
+	EOjdaXEIVxXP2grd3C3YIRRbFKY9KR/dA8cMD0v45LUurePZLdaO0CHf6ORNCjcsq+4oy/QYWKX
+	QxGgilWtQkL2uRwwoh1O7TpnZSS5ektInEZ7uvdTJcpJWr97u3oWRxhPl666LqDkF/V7bFKZ2Nt
+	7txr/D8unf7hWG2WlYBgKDPFcoeTVqcuIGOqoDwCHQ3XF94MP28Yxa1+C7nBrKVb
+X-Google-Smtp-Source: AGHT+IFRj+IPjAu+ZLe7pYPx3EsLGYybdG1EozzrwQ8TYu9qesZOiZaauU4yxthkSrf6JESEIKXUQw==
+X-Received: by 2002:a17:903:3c48:b0:220:d257:cdbd with SMTP id d9443c01a7336-22df358762bmr13027345ad.48.1745960948821;
+        Tue, 29 Apr 2025 14:09:08 -0700 (PDT)
 Received: from [192.168.1.87] ([38.41.223.211])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74039a5c36bsm146946b3a.132.2025.04.29.14.07.04
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db4d770d6sm107801645ad.17.2025.04.29.14.09.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Apr 2025 14:07:04 -0700 (PDT)
-Message-ID: <6e628189-f497-4d95-a6ac-c3cc726be2ad@linaro.org>
-Date: Tue, 29 Apr 2025 14:07:03 -0700
+        Tue, 29 Apr 2025 14:09:08 -0700 (PDT)
+Message-ID: <75cc3e9c-05bc-46e0-9bd0-d0c889133434@linaro.org>
+Date: Tue, 29 Apr 2025 14:09:07 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,95 +81,68 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 09/13] target/arm/cpu: get endianness from cpu state
-To: Anton Johansson <anjo@rev.ng>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- kvm@vger.kernel.org, alex.bennee@linaro.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- qemu-arm@nongnu.org, richard.henderson@linaro.org
-References: <20250429050010.971128-1-pierrick.bouvier@linaro.org>
- <20250429050010.971128-10-pierrick.bouvier@linaro.org>
- <bwdflzaiqdpq33uzowvrgjbha3wye6k74puwur755pq27z67eu@mnc2ze4it5cl>
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Subject: Re: [PATCH 02/13] include/system/hvf: missing vaddr include
 Content-Language: en-US
-In-Reply-To: <bwdflzaiqdpq33uzowvrgjbha3wye6k74puwur755pq27z67eu@mnc2ze4it5cl>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ alex.bennee@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-arm@nongnu.org, anjo@rev.ng, richard.henderson@linaro.org
+References: <20250429050010.971128-1-pierrick.bouvier@linaro.org>
+ <20250429050010.971128-3-pierrick.bouvier@linaro.org>
+ <e178a430-7916-4294-b0c3-60343ce6f023@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <e178a430-7916-4294-b0c3-60343ce6f023@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/29/25 5:26 AM, Anton Johansson wrote:
-> On 29/04/25, Pierrick Bouvier wrote:
->> Remove TARGET_BIG_ENDIAN dependency.
+On 4/29/25 12:13 AM, Philippe Mathieu-Daudé wrote:
+> Hi Pierrick,
+> 
+> On 29/4/25 06:59, Pierrick Bouvier wrote:
+>> On MacOS x86_64:
+>> In file included from ../target/i386/hvf/x86_task.c:13:
+>> /Users/runner/work/qemu/qemu/include/system/hvf.h:42:5: error: unknown type name 'vaddr'
+>>       vaddr pc;
+>>       ^
+>> /Users/runner/work/qemu/qemu/include/system/hvf.h:43:5: error: unknown type name 'vaddr'
+>>       vaddr saved_insn;
+>>       ^
+>> /Users/runner/work/qemu/qemu/include/system/hvf.h:45:5: error: type name requires a specifier or qualifier
+>>       QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
+>>       ^
+>> /Users/runner/work/qemu/qemu/include/system/hvf.h:45:18: error: a parameter list without types is only allowed in a function definition
+>>       QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
+>>                    ^
+>> /Users/runner/work/qemu/qemu/include/system/hvf.h:45:36: error: expected ';' at end of declaration list
+>>       QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
 >>
 >> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 >> ---
->>   target/arm/cpu.c | 22 +++++++++++-----------
->>   1 file changed, 11 insertions(+), 11 deletions(-)
+>>    include/system/hvf.h | 1 +
+>>    1 file changed, 1 insertion(+)
 >>
->> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
->> index e7a15ade8b4..85e886944f6 100644
->> --- a/target/arm/cpu.c
->> +++ b/target/arm/cpu.c
->> @@ -67,6 +67,15 @@ static void arm_cpu_set_pc(CPUState *cs, vaddr value)
->>       }
->>   }
->>   
->> +static bool arm_cpu_is_big_endian(CPUState *cs)
->> +{
->> +    ARMCPU *cpu = ARM_CPU(cs);
->> +    CPUARMState *env = &cpu->env;
->> +
->> +    cpu_synchronize_state(cs);
->> +    return arm_cpu_data_is_big_endian(env);
->> +}
->> +
->>   static vaddr arm_cpu_get_pc(CPUState *cs)
->>   {
->>       ARMCPU *cpu = ARM_CPU(cs);
->> @@ -1130,15 +1139,6 @@ static void arm_cpu_kvm_set_irq(void *opaque, int irq, int level)
->>   #endif
->>   }
->>   
->> -static bool arm_cpu_virtio_is_big_endian(CPUState *cs)
->> -{
->> -    ARMCPU *cpu = ARM_CPU(cs);
->> -    CPUARMState *env = &cpu->env;
->> -
->> -    cpu_synchronize_state(cs);
->> -    return arm_cpu_data_is_big_endian(env);
->> -}
->> -
->>   #ifdef CONFIG_TCG
->>   bool arm_cpu_exec_halt(CPUState *cs)
->>   {
->> @@ -1203,7 +1203,7 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
->>   
->>       info->endian = BFD_ENDIAN_LITTLE;
->>       if (bswap_code(sctlr_b)) {
->> -        info->endian = TARGET_BIG_ENDIAN ? BFD_ENDIAN_LITTLE : BFD_ENDIAN_BIG;
->> +        info->endian = arm_cpu_is_big_endian(cpu) ? BFD_ENDIAN_LITTLE : BFD_ENDIAN_BIG;
->>       }
+>> diff --git a/include/system/hvf.h b/include/system/hvf.h
+>> index 730f927f034..356fced63e3 100644
+>> --- a/include/system/hvf.h
+>> +++ b/include/system/hvf.h
+>> @@ -15,6 +15,7 @@
+>>    
+>>    #include "qemu/accel.h"
+>>    #include "qom/object.h"
+>> +#include "exec/vaddr.h"
+>>    
+>>    #ifdef COMPILING_PER_TARGET
+>>    #include "cpu.h"
 > 
-> I'm not the most familiar with arm but as far as I can tell these are
-> not equivalent. My understanding is that arm_cpu_is_big_endian() models
-> data endianness, and TARGET_BIG_ENDIAN instruction endianness.
+> What do you think of these changes instead?
 > 
-> Also, for user mode where this branch is relevant, bswap_code() still
-> depends on TARGET_BIG_ENDIAN anyway and the above branch would reduce to
-> (on arm32)
-> 
->    if (TARGET_BIG_ENDIAN ^ sctlr_b) {
->        info->endian = sctlr_b ? BFD_ENDIAN_LITTLE : BFD_ENDIAN_BIG;
->    }
-> 
-> giving the opposite result to the original code.
-> 
+> https://lore.kernel.org/qemu-devel/20250403235821.9909-27-philmd@linaro.org/
 
-Ooops, that's a good point, I missed it was calling 
-arm_cpu_data_is_big_endian under the hoods.
+Sounds good to me, it's the right include set.
+I tried to remove cpu.h, and noticed the error, so readded it, without 
+investigating too much.
 
-I'll stick to target_big_endian().
-
-Thanks,
-Pierrick
+Feel free to merge the current patch on your side (or the version you 
+wrote, it's ok for me).
 
