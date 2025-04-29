@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-44749-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44750-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00077AA0A5B
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 13:44:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A5E3AA0A86
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 13:48:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F34F63BCBDE
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 11:44:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1B227B6245
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 11:45:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DCA72C377C;
-	Tue, 29 Apr 2025 11:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54542D8689;
+	Tue, 29 Apr 2025 11:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aPRQHm9D"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XeG655pU"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3424B2C1E1F
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 11:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFC52D4B61
+	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 11:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745926922; cv=none; b=D87PUigJ+q95GXSLTjNrswz3zxCjgIsO4LzC9sWtnQmfNhN8kwwKIO12iXP0oeioEO4tw6xDEXHhIgb0OZOGHxqyCAHPOx4X0R3/VOBwb0GDbs5NMmiFKp9njNUXXhImDuaHOgYvzVt/chrHOLDRZDz8JBD4RbjnBxobAokN9/s=
+	t=1745926953; cv=none; b=UgtLY2WMz/KLeYpoFhAYBSbXcWpH8BygS02rmwky5dKaineiNOXQy5Z+3XLcU9BA5J0d5hWTttJHX2bFo4MqtOKISTC0eVgE9wCBhSwKk3fGVBuHMUXVjODgOABD4T9rY4Goj39EtpnZuSwX0+AnVjnHsBgobRfSY9F7x0x6fnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745926922; c=relaxed/simple;
-	bh=kxWC1t7/BhbfuL23Afr2KNhXz8vZgT9DHhKCYr4vZLU=;
+	s=arc-20240116; t=1745926953; c=relaxed/simple;
+	bh=c+zFQjpOvcrIFPQrBfK1AGlkndEEv8ZnYH49Bqu+yoA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ku1FizzOV5klyAS10G8RFpK1Lc00B87XhYybo6VltUcpmtDW4q0Krf4KO1CxPvcNl1j4+zPEreGILHH7Jgp8roClywlwEgK88Nuav4oIva6PnEBAZKSp3uo9cy6Z+l6IubgJJQGNw8ErVSPNzsipWONK1LP00kYKvGVMMjVm4pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aPRQHm9D; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=CnNFPWd8oqcDvNq+arktSIbgmUFjqwlm7Q01n4VBLnK3EuXsh3WHeJOIvzC4YhVQVRHA2JIde7mFGHosx71o9zojmvOWKLKSZOu0dY4ZDcEuUDSe9lRTf4nMEc3Rw8+WUP8aAGPZlqBj4dDVJhvWwEB1Ixoxe8pd++1/PJG+lBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XeG655pU; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1745926919;
+	s=mimecast20190719; t=1745926950;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pOR+/fkeCQEE32OWhR0BqyOD5/ykiIz6VrqIxRu0TPQ=;
-	b=aPRQHm9DL8BhITg582uw1DUlWVjO2r0WYUZdrhJ8N0sOvOTn8mjZi+edq4GAHmj1io7pJa
-	SaB4guNGLLPqHRMH8Bbw1AHtB1ZWCAEVxeTOO0j1t7ewgKf951jB//RY6ZDnU5qmeHnSf3
-	GQ2nOJgwIB4Y5kHy0EATMQxyqYdlIyU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=2ERC4iHAopj7w7n3GYQADioGeTv15E5tv5xtE/u14EI=;
+	b=XeG655pUdpwUJF10v3poGNh5HtSKe0GKfgCgA7IJf0/Lld/fVXJqq1N5nZFBUrKWmdrY4R
+	Z68pJkoQPPrnK0ESlDZ2NK4IYSn4q5QnqZxMlfQiqUo6C7wM70ejng3Nn79OaH2Gz8ECrW
+	u7IuW8WtB27syCcltKF1CxDwbZyIo8A=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-203-A84IH6JAPCeA7cHwNRTckw-1; Tue,
- 29 Apr 2025 07:41:57 -0400
-X-MC-Unique: A84IH6JAPCeA7cHwNRTckw-1
-X-Mimecast-MFC-AGG-ID: A84IH6JAPCeA7cHwNRTckw_1745926913
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-695-u7QFbanhM32YQonXELOb8w-1; Tue,
+ 29 Apr 2025 07:42:26 -0400
+X-MC-Unique: u7QFbanhM32YQonXELOb8w-1
+X-Mimecast-MFC-AGG-ID: u7QFbanhM32YQonXELOb8w_1745926942
 Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 219821800360;
-	Tue, 29 Apr 2025 11:41:53 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B2406195608C;
+	Tue, 29 Apr 2025 11:42:22 +0000 (UTC)
 Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.45.225.102])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 227BD19560A3;
-	Tue, 29 Apr 2025 11:41:23 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AEFB219560A3;
+	Tue, 29 Apr 2025 11:41:53 +0000 (UTC)
 From: Valentin Schneider <vschneid@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	virtualization@lists.linux.dev,
@@ -72,8 +72,7 @@ To: linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	bpf@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
+Cc: Juri Lelli <juri.lelli@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
 	Yair Podemsky <ypodemsk@redhat.com>,
 	Josh Poimboeuf <jpoimboe@kernel.org>,
@@ -83,6 +82,7 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	Frederic Weisbecker <frederic@kernel.org>,
 	"Paul E. McKenney" <paulmck@kernel.org>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
 	Juergen Gross <jgross@suse.com>,
 	Ajay Kaher <ajay.kaher@broadcom.com>,
 	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
@@ -154,9 +154,9 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	Randy Dunlap <rdunlap@infradead.org>,
 	John Stultz <jstultz@google.com>,
 	Tiezhu Yang <yangtiezhu@loongson.cn>
-Subject: [PATCH v5 16/25] KVM: VMX: Mark __kvm_is_using_evmcs static key as __ro_after_init
-Date: Tue, 29 Apr 2025 13:32:33 +0200
-Message-ID: <20250429113242.998312-17-vschneid@redhat.com>
+Subject: [PATCH v5 17/25] x86/speculation/mds: Mark mds_idle_clear key as allowed in .noinstr
+Date: Tue, 29 Apr 2025 13:32:34 +0200
+Message-ID: <20250429113242.998312-18-vschneid@redhat.com>
 In-Reply-To: <20250429113242.998312-1-vschneid@redhat.com>
 References: <20250429113242.998312-1-vschneid@redhat.com>
 Precedence: bulk
@@ -168,31 +168,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-The static key is only ever enabled in
+Later commits will cause objtool to warn about static keys being used in
+.noinstr sections in order to safely defer instruction patching IPIs
+targeted at NOHZ_FULL CPUs.
 
-  __init hv_init_evmcs()
+mds_idle_clear is used in .noinstr code, and can be modified at
+runtime (SMT hotplug). Suppressing the text_poke_sync() IPI has little
+benefits for this key, as hotplug implies eventually going through
+takedown_cpu() -> stop_machine_cpuslocked() which is going to cause
+interference on all online CPUs anyway.
 
-so mark it appropriately as __ro_after_init.
+Mark it to let objtool know not to warn about it.
 
-Reported-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Valentin Schneider <vschneid@redhat.com>
 ---
- arch/x86/kvm/vmx/vmx_onhyperv.c | 2 +-
+ arch/x86/kernel/cpu/bugs.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.c b/arch/x86/kvm/vmx/vmx_onhyperv.c
-index b9a8b91166d02..ff3d80c9565bb 100644
---- a/arch/x86/kvm/vmx/vmx_onhyperv.c
-+++ b/arch/x86/kvm/vmx/vmx_onhyperv.c
-@@ -3,7 +3,7 @@
- #include "capabilities.h"
- #include "vmx_onhyperv.h"
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 362602b705cc4..59a77ca1bb14c 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -117,7 +117,7 @@ DEFINE_STATIC_KEY_FALSE(switch_vcpu_ibpb);
+ EXPORT_SYMBOL_GPL(switch_vcpu_ibpb);
  
--DEFINE_STATIC_KEY_FALSE(__kvm_is_using_evmcs);
-+DEFINE_STATIC_KEY_FALSE_RO(__kvm_is_using_evmcs);
+ /* Control MDS CPU buffer clear before idling (halt, mwait) */
+-DEFINE_STATIC_KEY_FALSE(mds_idle_clear);
++DEFINE_STATIC_KEY_FALSE_NOINSTR(mds_idle_clear);
+ EXPORT_SYMBOL_GPL(mds_idle_clear);
  
  /*
-  * KVM on Hyper-V always uses the latest known eVMCSv1 revision, the assumption
 -- 
 2.49.0
 
