@@ -1,89 +1,82 @@
-Return-Path: <kvm+bounces-44686-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44687-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF838AA0252
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 08:03:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D089FAA0296
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 08:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E20AD7A5E08
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 06:02:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECB301B6378E
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 06:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F12026FA54;
-	Tue, 29 Apr 2025 06:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CEE2750FC;
+	Tue, 29 Apr 2025 06:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EXCu5sAY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uDWNet5k"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E512741D6
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 06:03:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABC62749C5;
+	Tue, 29 Apr 2025 06:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745906613; cv=none; b=X4Wr4bnDFA5GvAqpQHHVxZR1eZ2k8F5JnXuN0g1jtZy6DkjuRM8jghOlzCFX7bgtpxTYzdOjwEMFGMTVrpToM5hmWQbUrtHMxTAq7VtCPmMnhoLlWZlIdpmRpa9oJUPms5HK5X8CAo6tw2PR9QQuW0VXiTXbsKYz+EUl3oxlSsE=
+	t=1745906964; cv=none; b=GMXQNt49RYwLCxCqIojbucNTRWZCxiYh7NfGTQYCbNLjC9Wmd/B9WCxRNMPcgyp7MoCUB5QxIyn0M6nx2Xi9dkjbj/D0oL2cYhEHr2Z/7eGRKfD9fTiX3sf/8KPh9JcV7ytLt1g0ztv3uR49RGXx58z/JulBkO+Wk0Hcga69R+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745906613; c=relaxed/simple;
-	bh=Y/6SsQsFPmZzG1yqe9KNbE234gRASllcF7yURiWMsc4=;
+	s=arc-20240116; t=1745906964; c=relaxed/simple;
+	bh=PNH//cVkWbnB2fS1ezNe4WtvGXzhnSIV29jcs1sTleU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hw6I489iLvcxEI9mSWLM0DsDAKq6jqf6uLrvdCXu7Ni7j5XhihKvyXPgLDRrt5SWk3O1nGbyslUYfFxAm177C9QBUqaGxGht6zwXZfFblFm18L1UgIb6uOIkfuF4je/yuHQKy6qk0r69kvuU8QuSfBvf53vaS5ricx+NnAhmkY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EXCu5sAY; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1745906612; x=1777442612;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Y/6SsQsFPmZzG1yqe9KNbE234gRASllcF7yURiWMsc4=;
-  b=EXCu5sAYY2yFe+5MbuVMFBZPSfJN1WdpJj4kh/nS/BDvU841LfOFALbB
-   9doI9sTYUSRzm1N4Z+uXZJwjmegjB+aJiJIOzosiDgRaVYyghwv4EaSva
-   dTBPsffBqsxHajhZ3H127J0fZ9VTrwGa1HWrf6erDfP8LnPSf8N/tZb4i
-   SAzVdTY52z2NgzttJ+sw9UwrG1RpQPnF+7LsuQZ3rMRT9A1efr4yd/ea1
-   knKv4zBI8yRNc0pnnzEvM8mk2J6RR8VHV1jsAzpIxgkaM9hlPwiWBDk/H
-   GQF2Z/6BTqzQXDNLx/BfMm6SlY7K1GIsswlSGII+ZvqP8kSZ/w2VXwVpd
-   w==;
-X-CSE-ConnectionGUID: uUtVo1QjSNGt4dVssN1erA==
-X-CSE-MsgGUID: Jx8KT5dHRMaPuT1XyKZ2iw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11417"; a="58881337"
-X-IronPort-AV: E=Sophos;i="6.15,248,1739865600"; 
-   d="scan'208";a="58881337"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2025 23:03:31 -0700
-X-CSE-ConnectionGUID: +FC4s7NbQ9O8szr9018u1A==
-X-CSE-MsgGUID: btLFCSAaS12P/HF88J38mA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,248,1739865600"; 
-   d="scan'208";a="164679601"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by orviesa002.jf.intel.com with ESMTP; 28 Apr 2025 23:03:27 -0700
-Date: Tue, 29 Apr 2025 14:24:24 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eauger@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
-	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	pierrick.bouvier@linaro.org
-Subject: Re: [PATCH 3/5] i386/kvm: Support event with select & umask format
- in KVM PMU filter
-Message-ID: <aBBwmDnZ5v7tpAkr@intel.com>
-References: <20250409082649.14733-1-zhao1.liu@intel.com>
- <20250409082649.14733-4-zhao1.liu@intel.com>
- <87frhwfuv1.fsf@pond.sub.org>
- <aA3TeaYG9mNMdEiW@intel.com>
- <87h6283g9g.fsf@pond.sub.org>
- <aA+Ty2IqnE4zQhJv@intel.com>
- <87ldrks17s.fsf@pond.sub.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LC4Y9G9XatJ7cZNVmDIxZjM+RNMgb1Wdr4JOc7Wyd9snxmD7kbJaqsjyFMepN95YFmTiIgsZRsCoVx8xqdNxn5+rSP38hXLhhEpY4BMAQEMOT90SH81huMGNXtf6KSsHWS0Ewa6ea+LqJvm3vC5Y+ydJq9EObC5zZU68NM4XA+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uDWNet5k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B524AC4CEE3;
+	Tue, 29 Apr 2025 06:09:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745906963;
+	bh=PNH//cVkWbnB2fS1ezNe4WtvGXzhnSIV29jcs1sTleU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uDWNet5k2IklSXyclsdy71tc6aXagAuOzOP5Z1vsPDPEw1xByvYmxH/7R8kedffmR
+	 K3ASHl60pRtDMWg9p0JxFzxO/3aGKB98mGU3GQziALdCRkObg3CMNM8boWhkMNq5Fb
+	 SoRi+onUpbh4+8C7egZp68jWH9bVq8JE2GNbbjKqgOv4PvtvgZAdPdF4XvW8+i2Vac
+	 6q6ESVLxxn8p2qJcdlZLSSecESrOtQeA31phlOs3O0ew9tbbYj38i+QlIYTLHGum0F
+	 nK+XngMnFMQRY8/5XFAQ7Xguljv3BaQDuFiBtITTOynS0B/PtXC5n3GH/3WSmM3hcr
+	 NiVEF7HYK25Ng==
+Date: Tue, 29 Apr 2025 09:09:18 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Baolu Lu <baolu.lu@linux.intel.com>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v10 03/24] iommu: generalize the batched sync after map
+ interface
+Message-ID: <20250429060918.GK5848@unreal>
+References: <cover.1745831017.git.leon@kernel.org>
+ <69da19d2cc5df0be5112f0cf2365a0337b00d873.1745831017.git.leon@kernel.org>
+ <f8d86cde-d485-4e5a-a693-e9323679474f@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,47 +85,132 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87ldrks17s.fsf@pond.sub.org>
+In-Reply-To: <f8d86cde-d485-4e5a-a693-e9323679474f@linux.intel.com>
 
-> > What I'm a bit hesitant about is that, if different arches add similar
-> > "conditional" enumerations later, it could cause the enumeration values
-> > to change under different compilation conditions (correct? :-)). Although
-> > it might not break anything, since we don't rely on the specific numeric
-> > values.
+On Tue, Apr 29, 2025 at 10:19:46AM +0800, Baolu Lu wrote:
+> On 4/28/25 17:22, Leon Romanovsky wrote:
+> > From: Christoph Hellwig<hch@lst.de>
+> > 
+> > For the upcoming IOVA-based DMA API we want to batch the
+> > ops->iotlb_sync_map() call after mapping multiple IOVAs from
+> > dma-iommu without having a scatterlist. Improve the API.
+> > 
+> > Add a wrapper for the map_sync as iommu_sync_map() so that callers
+> > don't need to poke into the methods directly.
+> > 
+> > Formalize __iommu_map() into iommu_map_nosync() which requires the
+> > caller to call iommu_sync_map() after all maps are completed.
+> > 
+> > Refactor the existing sanity checks from all the different layers
+> > into iommu_map_nosync().
+> > 
+> > Signed-off-by: Christoph Hellwig<hch@lst.de>
+> > Acked-by: Will Deacon<will@kernel.org>
+> > Tested-by: Jens Axboe<axboe@kernel.dk>
+> > Reviewed-by: Jason Gunthorpe<jgg@nvidia.com>
+> > Reviewed-by: Luis Chamberlain<mcgrof@kernel.org>
+> > Signed-off-by: Leon Romanovsky<leonro@nvidia.com>
+> > ---
+> >   drivers/iommu/iommu.c | 65 +++++++++++++++++++------------------------
+> >   include/linux/iommu.h |  4 +++
+> >   2 files changed, 33 insertions(+), 36 deletions(-)
+> > 
+> > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> > index 4f91a740c15f..02960585b8d4 100644
+> > --- a/drivers/iommu/iommu.c
+> > +++ b/drivers/iommu/iommu.c
+> > @@ -2443,8 +2443,8 @@ static size_t iommu_pgsize(struct iommu_domain *domain, unsigned long iova,
+> >   	return pgsize;
+> >   }
+> > -static int __iommu_map(struct iommu_domain *domain, unsigned long iova,
+> > -		       phys_addr_t paddr, size_t size, int prot, gfp_t gfp)
+> > +int iommu_map_nosync(struct iommu_domain *domain, unsigned long iova,
+> > +		phys_addr_t paddr, size_t size, int prot, gfp_t gfp)
+> >   {
+> >   	const struct iommu_domain_ops *ops = domain->ops;
+> >   	unsigned long orig_iova = iova;
+> > @@ -2453,12 +2453,19 @@ static int __iommu_map(struct iommu_domain *domain, unsigned long iova,
+> >   	phys_addr_t orig_paddr = paddr;
+> >   	int ret = 0;
+> > +	might_sleep_if(gfpflags_allow_blocking(gfp));
+> > +
+> >   	if (unlikely(!(domain->type & __IOMMU_DOMAIN_PAGING)))
+> >   		return -EINVAL;
+> >   	if (WARN_ON(!ops->map_pages || domain->pgsize_bitmap == 0UL))
+> >   		return -ENODEV;
+> > +	/* Discourage passing strange GFP flags */
+> > +	if (WARN_ON_ONCE(gfp & (__GFP_COMP | __GFP_DMA | __GFP_DMA32 |
+> > +				__GFP_HIGHMEM)))
+> > +		return -EINVAL;
+> > +
+> >   	/* find out the minimum page size supported */
+> >   	min_pagesz = 1 << __ffs(domain->pgsize_bitmap);
+> > @@ -2506,31 +2513,27 @@ static int __iommu_map(struct iommu_domain *domain, unsigned long iova,
+> >   	return ret;
+> >   }
+> > -int iommu_map(struct iommu_domain *domain, unsigned long iova,
+> > -	      phys_addr_t paddr, size_t size, int prot, gfp_t gfp)
+> > +int iommu_sync_map(struct iommu_domain *domain, unsigned long iova, size_t size)
+> >   {
+> >   	const struct iommu_domain_ops *ops = domain->ops;
+> > -	int ret;
+> > -
+> > -	might_sleep_if(gfpflags_allow_blocking(gfp));
+> > -	/* Discourage passing strange GFP flags */
+> > -	if (WARN_ON_ONCE(gfp & (__GFP_COMP | __GFP_DMA | __GFP_DMA32 |
+> > -				__GFP_HIGHMEM)))
+> > -		return -EINVAL;
+> > +	if (!ops->iotlb_sync_map)
+> > +		return 0;
+> > +	return ops->iotlb_sync_map(domain, iova, size);
+> > +}
 > 
-> Every binary we create contains target-specific code for at most one
-> target.  Therefore, different numerical encodings for different targets
-> are fine.
+> I am wondering whether iommu_sync_map() needs a return value. The
+> purpose of this callback is just to sync the TLB cache after new
+> mappings are created, which should effectively be a no-fail operation.
 > 
-> Same argument for struct members, by the way.  Consider
+> The definition of iotlb_sync_map in struct iommu_domain_ops seems
+> unnecessary:
 > 
->     { 'struct': 'CpuModelExpansionInfo',
->       'data': { 'model': 'CpuModelInfo',
->                 'deprecated-props' : { 'type': ['str'],
->                                        'if': 'TARGET_S390X' } },
->       'if': { 'any': [ 'TARGET_S390X',
->                        'TARGET_I386',
->                        'TARGET_ARM',
->                        'TARGET_LOONGARCH64',
->                        'TARGET_RISCV' ] } }
+> struct iommu_domain_ops {
+> ...
+>         int (*iotlb_sync_map)(struct iommu_domain *domain, unsigned long
+> iova,
+>                               size_t size);
+> ...
+> };
 > 
-> This generates
-> 
->     #if defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM) || defined(TARGET_LOONGARCH64) || defined(TARGET_RISCV)
->     struct CpuModelExpansionInfo {
->         CpuModelInfo *model;
->     #if defined(TARGET_S390X)
->         strList *deprecated_props;
->     #endif /* defined(TARGET_S390X) */
->     };
->     #endif /* defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM) || defined(TARGET_LOONGARCH64) || defined(TARGET_RISCV) */
-> 
-> The struct's size depends on the target.  If we ever add members after
-> @deprecated_props, their offset depends on the target, too.
+> Furthermore, currently no iommu driver implements this callback in a way
+> that returns a failure. We could clean up the iommu definition in a
+> subsequent patch series, but for this driver-facing interface, it's
+> better to get it right from the beginning.
 
-Thank your for further explanation!
+I see that s390 is relying on return values:
 
-Regards,
-Zhao
+  569 static int s390_iommu_iotlb_sync_map(struct iommu_domain *domain,
+  570                                      unsigned long iova, size_t size)
+  571 {
 
+<...>
+
+  581                 ret = zpci_refresh_trans((u64)zdev->fh << 32,
+  582                                          iova, size);
+  583                 /*
+  584                  * let the hypervisor discover invalidated entries
+  585                  * allowing it to free IOVAs and unpin pages
+  586                  */
+  587                 if (ret == -ENOMEM) {
+  588                         ret = zpci_refresh_all(zdev);
+  589                         if (ret)
+  590                                 break;
+  591                 }
+
+<...>
+
+  595         return ret;
+  596 }
+
+> 
+> Thanks,
+> baolu
 
