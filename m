@@ -1,105 +1,139 @@
-Return-Path: <kvm+bounces-44711-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44712-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E816AA03CC
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 08:54:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BFAFAA0423
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 09:13:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F93F462D42
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 06:54:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 103B13B1317
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 07:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E82274FF8;
-	Tue, 29 Apr 2025 06:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD40126A1C2;
+	Tue, 29 Apr 2025 07:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yl0z9Ed7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v4/UjR9D"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3271024EAB3
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 06:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA637494
+	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 07:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745909664; cv=none; b=ca8Do/9MfQmJnbneCzsKxZnL8H7hi7ZrVMc6ARKyvTc+QNvYXH2gCyy1tYq1UwRzXmidQiF63hLYEE9TZREyJ2A0fDSNlbqgJnsXgfSxiM4f3ArEcgMLOVT8AB8a1U1W7seM77aSwDnncOds+8IZCeqT4yCI4nc9NUscYTgLnCQ=
+	t=1745910828; cv=none; b=K9vRHjErwVfk/Q6DXNL31zImfWiHNJHWW2TEmiqZ3HEVTv5mT5Pvnin4Gig3BFZEI26qWDbrPDb1vD+0re1s8LHwOnucET99Y6q3VOPVkCrEikZqyKCIlOZYkjj/UH1s00rdmHiYLo6QAkjh44VLu4Kt4bbJ1/InPAoft2v9LlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745909664; c=relaxed/simple;
-	bh=u3XkUrRfQKxZfoqKhudp7vzJTR4vV2gfy8WtgO4y2DI=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SUhsEttvvsTmGk39nRHFii2z6Ni60z+m+gJ4QAmF92fSYOBEzbazgXmh50LG12dE38MspcrLNqEasSJQ5tE72JSEmHtgrMinyH9EbYPOu+KvZGTX/YzgGcuXstLigw9wAk6wuXFxqkcpgbokmeHJAe21k1ptUKfYzkzwOCsPtkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yl0z9Ed7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9FC5EC4CEE3
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 06:54:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745909663;
-	bh=u3XkUrRfQKxZfoqKhudp7vzJTR4vV2gfy8WtgO4y2DI=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Yl0z9Ed7MVzqiT1GrRNlIsSdkMDCbBxtY1eL7IS4rVOxweT2231q7u0Ea4DqpirdM
-	 FZVh3HzE/zq+B0oNLJvJs4iddpRxUeuOiOZryVvQLRu6SetNY14tQikjhM2N0xsG+u
-	 SRRmDziRxJnqRAoKXMcDopolrHJmtGQp9jeCJXHt2NH1buAokqKovX9rO9z41EPJSN
-	 FYA4c9+qvNU1SNK3D9W3bihhtJqDvnLSFOyzohYJ4kdeCN+aJJOCL6alYY12tZqFtu
-	 aczAXhI6pNC09usOSFSSkBhT7j55KkI6JhA5nW2jaT/Th5l4Rd592so7v47eTnk/y7
-	 aVcrwywBQx5xQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 86442C433E1; Tue, 29 Apr 2025 06:54:23 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 220057] Kernel regression. Linux VMs crashing (I did not test
- Windows guest VMs)
-Date: Tue, 29 Apr 2025 06:54:22 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: f.gruenbichler@proxmox.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-220057-28872-1YXGqXpycs@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-220057-28872@https.bugzilla.kernel.org/>
-References: <bug-220057-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1745910828; c=relaxed/simple;
+	bh=EiP+CKMyJA1gU0f+xTr9I3c0TmDmWP7M6mRuV2VGyH4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iinzn998A//TZiylUxiSk6+9xJbwqdD/LL8XS7tzWft0rU7sWctVf0EI+pLRm8B+8aGHXXv4r2i5An9ZXZZB61zkZn4t00zW8TaqSYoc6O5JA1nh3aaSsmYSOxkhAymXSdr3oAoScUoWpEneelZSRgmUCEJ3iRnKF8VuxNSlHcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=v4/UjR9D; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-39c14016868so5605343f8f.1
+        for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 00:13:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1745910824; x=1746515624; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yehZmGTx7uAqJaLE76x+U27DnExTYI6sNqxGDs8Q0r8=;
+        b=v4/UjR9DN4VvJM82ho0hvuEoSigUJRsU6wnwZfvc9pwctJYa9qRiqpfLwBNhpyp37i
+         J0szcEpnt0Uax4ZcAarvzWe93XL6HrpMg59fSnp6KqXoGfvq+QG0YguU1TKP84cGs7IG
+         tZ6nyklGfsBs6x1A6ExYPl8U4nK9rCnpX0ZPerSLIUCp60+MsxAvvAUm4Gm2wYEYhD06
+         96qdD+2HwnkYORT3lkbusraWkORpdGyRzzsQZHXnyxaOKeiJkZhn5yLvOGm2MtGWWUQH
+         Z34reea3/GoI+0tpuKLFLxkleKAENLlyjlEtPJg11SBgMqUD1C/HkD56tBLjxatGo36Z
+         wUyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1745910824; x=1746515624;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yehZmGTx7uAqJaLE76x+U27DnExTYI6sNqxGDs8Q0r8=;
+        b=aOtMi9vMK1fOtGyI0WSr0GSrKJ52CBW64+9emQkK85kjw44ruz0Y1F1SHDUVNGPHvm
+         5y/10vCqPLmr4xSlLmVREZeO5y3wNnTNFATT19KjWwBfeCiTch6ZnYGYwU1yZsgu3zyk
+         ygV7exd2aWZhHYKGFgXgsjinHGap1PkAWlavJ7F7085uZuTzxA2fU+Xj5HQHLVH/iM1x
+         u8uaxhUylD5pbyEeQ2sE2CrNwjBqI8LNPCZhYGfBvexS74rkK9H/ygOWlXAUDRT6CeY8
+         tkD4z4uNLeFsS2bsmY/Lr5sGLl7zGHiYMGCYpus9F/tu6QLpjFwlp1/aG7SF6wNcRyUu
+         g6pw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtBC+aPGRJkgOmyTHDbyzWWdapVDVvrNDefpjqL+4sePWA9AUTg1oUV/6IxRFm4ZXTqYk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPgSj9kbjaPvDcosD2GQNeQEoHA7/zwrhkZPg1aj3xAzWmwkDM
+	xE00f4Qt2shp2WGaCummZU8iUQdo1prR5mYfCBjGbB5Tnwn8sLcxf7b+HPP8eJo=
+X-Gm-Gg: ASbGncuLH8hwVnpFTq/n+03INqcHFBdpxHwuhIMc/uyzaVH4bCrrJsD/qt6NvbPdJ6S
+	sOClmrjyA69BDuXAo4wPQQmW6sjar+DEt21IkkPo8pkGKooD1NYVNZiB7Pn6x0AfF1AK38uDKdq
+	2/WVponkT6mRSV0+c3lXSBjXKqeU0eccYQA3CXesZycvIJqBeImKmDV+I72XruWXcL4lTtbAd/p
+	1zapy/2GzG4RwXX7uBb/X5CaP/haAR5IRspm4XFI6hZMXcn6bI0ga1FnpdwyXYb749uEYqGnAEs
+	ZXjdOrSmGpjoS4TZuJGNA12EVauv76HhjQLZgFNo1miDFFie3KSPUgZeNh5uB0Hureia/Sl1aqP
+	sIE47vvcDh3eGUg==
+X-Google-Smtp-Source: AGHT+IF3jDfaiFaE0KiZ5e+08grYBav5IRWcws2yhNnnOdNJAuGgzhyThrFzk7CHNb/gc6OX5zpWeg==
+X-Received: by 2002:a5d:4884:0:b0:39c:141a:6c67 with SMTP id ffacd0b85a97d-3a08949d731mr1735344f8f.45.1745910824440;
+        Tue, 29 Apr 2025 00:13:44 -0700 (PDT)
+Received: from [192.168.69.169] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073c8c95dsm12856743f8f.3.2025.04.29.00.13.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Apr 2025 00:13:43 -0700 (PDT)
+Message-ID: <e178a430-7916-4294-b0c3-60343ce6f023@linaro.org>
+Date: Tue, 29 Apr 2025 09:13:42 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/13] include/system/hvf: missing vaddr include
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ alex.bennee@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-arm@nongnu.org, anjo@rev.ng, richard.henderson@linaro.org
+References: <20250429050010.971128-1-pierrick.bouvier@linaro.org>
+ <20250429050010.971128-3-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20250429050010.971128-3-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220057
+Hi Pierrick,
 
-Fabian Gr=C3=BCnbichler (f.gruenbichler@proxmox.com) changed:
+On 29/4/25 06:59, Pierrick Bouvier wrote:
+> On MacOS x86_64:
+> In file included from ../target/i386/hvf/x86_task.c:13:
+> /Users/runner/work/qemu/qemu/include/system/hvf.h:42:5: error: unknown type name 'vaddr'
+>      vaddr pc;
+>      ^
+> /Users/runner/work/qemu/qemu/include/system/hvf.h:43:5: error: unknown type name 'vaddr'
+>      vaddr saved_insn;
+>      ^
+> /Users/runner/work/qemu/qemu/include/system/hvf.h:45:5: error: type name requires a specifier or qualifier
+>      QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
+>      ^
+> /Users/runner/work/qemu/qemu/include/system/hvf.h:45:18: error: a parameter list without types is only allowed in a function definition
+>      QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
+>                   ^
+> /Users/runner/work/qemu/qemu/include/system/hvf.h:45:36: error: expected ';' at end of declaration list
+>      QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
+> 
+> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+> ---
+>   include/system/hvf.h | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/include/system/hvf.h b/include/system/hvf.h
+> index 730f927f034..356fced63e3 100644
+> --- a/include/system/hvf.h
+> +++ b/include/system/hvf.h
+> @@ -15,6 +15,7 @@
+>   
+>   #include "qemu/accel.h"
+>   #include "qom/object.h"
+> +#include "exec/vaddr.h"
+>   
+>   #ifdef COMPILING_PER_TARGET
+>   #include "cpu.h"
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |f.gruenbichler@proxmox.com
+What do you think of these changes instead?
 
---- Comment #21 from Fabian Gr=C3=BCnbichler (f.gruenbichler@proxmox.com) -=
---
-FWIW, you can get the full QEMU commandline for a given VM on PVE with "qm
-showcmd XXX --pretty". you can also use this to verify whether config chang=
-es
-have the desired effect ;)
-
-our kernels are based on Ubuntu's, but since it seems you can also reproduce
-the issue with a plain upstream kernel, I'll not go into too much detail ab=
-out
-that, unless you want me to.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+https://lore.kernel.org/qemu-devel/20250403235821.9909-27-philmd@linaro.org/
 
