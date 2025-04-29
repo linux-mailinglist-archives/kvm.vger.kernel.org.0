@@ -1,184 +1,227 @@
-Return-Path: <kvm+bounces-44752-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44760-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DDC2AA0A7B
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 13:47:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FF1CAA0AEE
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 13:59:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91300842F8F
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 11:47:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EE317ACDB7
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 11:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4DA2D1921;
-	Tue, 29 Apr 2025 11:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CB62C2AB3;
+	Tue, 29 Apr 2025 11:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eef7Ny0N"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BX2BCRWM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2041.outbound.protection.outlook.com [40.107.93.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4482C374B;
-	Tue, 29 Apr 2025 11:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745927013; cv=none; b=W8vGelRsGPffuQJGJZtTHwtTQmdsyzUjM6zrhc0ABsHzlAIfKxcG06k1umyabvubPaBh+pjKkyWXug+oRkYJMi04MBOd3wZ8vZjDJ+IvUiR7HYYaFeDcQhR9f4KSk/AW1zAjMOsCnrBHqL7xvtEHPKVCdxlgT1iYekn8/Vc6vpg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745927013; c=relaxed/simple;
-	bh=9ZzZ2PUUe62ESKAkB2c5E8q80p5NNCf2tGXDF7sXtlA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u+hQhwTyuyXNm4I6JJg8nmdGAGTtWFx2yX6X1x8UWMCut7QPw7OYdPLmG2EZNkoE0gu2LC0QKfpjkW0iJn6dyBbwSCXGMQ907z++NkwQmbKDgihGz8/bukNDPp+FOV49LhgCN28OjeYIkiLtT67RXU7M6vkdm3eaI7tawHuXaB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eef7Ny0N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6D4BC4CEE3;
-	Tue, 29 Apr 2025 11:43:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1745927011;
-	bh=9ZzZ2PUUe62ESKAkB2c5E8q80p5NNCf2tGXDF7sXtlA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Eef7Ny0Nw1TSqWdRODz4I099aCTZln80IlK5ML2ODp35P7NV5Z6uBafKBI2BCfT8j
-	 tG2CgqLMZlwc4X0do2X9+RG6vD7NwjCs8tHxqGyLJmWaoigZTlntAaqxKcIH72uG/p
-	 /r3QtlD3RNShyID2I6kIaC2qUhde7kLVU+DQJt6euHZn+r63H0UAi6J24qKhZ5RNOU
-	 95bbx+r3K7t6dbSKnfbZnBrB0DDxybnaSNdCDNDQDNUVmMP2QMS7JHDgBFWFzYqcQG
-	 caEGtoF+F3QvYBbQNKAZz/cwsj+ZuXk7Heayg6DOSjtDUU+hZIWHQSNPVl+HpJ2r5K
-	 zA3PfYHylyxOA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1u9jN3-009t4S-LJ;
-	Tue, 29 Apr 2025 12:43:29 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	D Scott Phillips <scott@os.amperecomputing.com>
-Subject: [PATCH v2] KVM: arm64: Force HCR_EL2.xMO to 1 at all times in VHE mode
-Date: Tue, 29 Apr 2025 12:43:26 +0100
-Message-Id: <20250429114326.3618875-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3257E20969A;
+	Tue, 29 Apr 2025 11:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1745927639; cv=fail; b=oq1hQTdSpBjSKNvmwhLYR99qGHSX9OWjlO+86NvNkCQnSjqaUDrJ84oW1DLfYMvLEgee+lRKC9VW94sKMGdKmXfLfpuyA1fp/BvpAeDxMRu9xkJpiieQpm3IUOV0M4/sUhyPXOLc5QQzvHYThG2Xq8rT+/A55ME90CB65fizeeE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1745927639; c=relaxed/simple;
+	bh=e0G3aqGKJS4HJV4ryjQvt216LRtg97h8NnYHn+7NO/g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=hZqdxcC3yr+/OyyyH5dvVgXspbw5LTwmo+HzEQSlyWOBRgzy5P/8loJO4a6CZe65UJYI0IJwmdry4fCMccZULPGGO/Wlb78MDgKaOloa1V/xdchLYlKFxJks1uXab7FBUYRUxNiE1J0tGmAOwPEagzcG6Git2VoNepEnFv0AbRA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BX2BCRWM; arc=fail smtp.client-ip=40.107.93.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aHkK74+f2TvAAdmxtPjoqPaXr7vSbN7fyEARy8J3Knh0PCjStXQ4RsvpG4mG0PxvJymHZj0RqBwcEDcrPGAqPM/rTMOXdO5Q1MYZpx2VTqpvp/0lcDGPXI3gbZH0OWEhQ2G7Cgt8hGAxuHSiG71OZQZYLduxtogaZUN5OrRGKMPjJtb3NmuaaKr8i9ax8o/K8+vZU6JMuzlTk+FEdKHMXk+2vAlEFS/Ao1YLoZ4QemaUAT/BsMR2YVyTvg/2Vjsl20MRGT46TxNR0OsR6BUlfdvUNiuR5iNRoozllxQUuCGB3jfSAevEuPkvMBbdd3r6CAfa7BLxcyFAkxDbmKFPvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8fEZmgm5M6RSMETKWpbIYtmCdRPp4M+CCmDk7MXSVew=;
+ b=xqcNqovjLqrIWb9viUNxQUqSKzUQAIiLhPpVhS9XlVAqHDOC3k8/r0tmyR6v3B5TEyUE1Oja5N35lwrmLpG1s9P+5XXh9e69UDJKaucDiNr/AiZQhvNTEWj+eWisFHw/b6l4JUf27iUO7CP3dHvDqYJ9lV+3Y7k154YK/o/gl0pKtZ0TPiiZpkWvC7oxX4xcp7YKbHnpTpBJYUo1HyXv4X41Qell4wDXbHfxKhqdd7FUfd2XRimvheWtH8Nxfg8vUUWVRGrrtzrLb0mp4dG5l5OAWDKvPQOxojzMzBZhyDxvhuLNBElOP7KXiTHBl729TP2VE9z6L7FWIEZYW7jzeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8fEZmgm5M6RSMETKWpbIYtmCdRPp4M+CCmDk7MXSVew=;
+ b=BX2BCRWMJwRVmNr31YulOR1zz3zXPrht9kYuzu7vieIGsOBOgZSLuCofUkkxRN0dWNLz/EezF6ohSZh/xN+sNtUVWrhHNUnzI5P7T088RfES/gYwmUbePrKhkHmB+RA4AQmIAWHT5OM/5chpWWNjfh3zrC6pkWPxZJmUE1aYQV9xxABEXIG9Z4nUpSJe322xo4wgb5ZORbRaVfmNE/caZmUYym1ZPiZRJ6+/eoN5XH+DYSuA8kqyxuyT3vJIBj9WSVoG2FEArDPRMdaufNu0u4ZXQvReNowpUiOlxbgbzEzqcTGe+JlkpR5iu/zVosiL64aVk5X5DiYgW6bFv3dfaA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by BL4PR12MB9723.namprd12.prod.outlook.com (2603:10b6:208:4ed::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.32; Tue, 29 Apr
+ 2025 11:53:56 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8678.028; Tue, 29 Apr 2025
+ 11:53:55 +0000
+Date: Tue, 29 Apr 2025 08:53:54 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Baolu Lu <baolu.lu@linux.intel.com>
+Cc: Leon Romanovsky <leon@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH v10 03/24] iommu: generalize the batched sync after map
+ interface
+Message-ID: <20250429115354.GA2260709@nvidia.com>
+References: <cover.1745831017.git.leon@kernel.org>
+ <69da19d2cc5df0be5112f0cf2365a0337b00d873.1745831017.git.leon@kernel.org>
+ <f8d86cde-d485-4e5a-a693-e9323679474f@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f8d86cde-d485-4e5a-a693-e9323679474f@linux.intel.com>
+X-ClientProxiedBy: BN0PR03CA0014.namprd03.prod.outlook.com
+ (2603:10b6:408:e6::19) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, scott@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|BL4PR12MB9723:EE_
+X-MS-Office365-Filtering-Correlation-Id: aad3d614-0e59-4958-fea9-08dd871484cd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xQxr7PbUALSAzpW+8au/fVr2/1eTM4HMKyqQglZ7v+/SpDlzfFhMNvDB8T8+?=
+ =?us-ascii?Q?LsKsaABb2ErClFVxRXrJ6lkA+5USMIhjWD86qBGXEe8qwfyskbVuR9hUoibZ?=
+ =?us-ascii?Q?XnUCwvIiASurfL5IOgjiDOgJrWKRf8qLBbVXH6H90UxXK29/qvjJQWDbqpBK?=
+ =?us-ascii?Q?EURf4LkMk5np9uLm1XqNoRBW/9RvaC9CgzmADgSSFOmB8Q0XNki/VEso1y7H?=
+ =?us-ascii?Q?biG1V2ke0S9r21rfcvPHYYZ8XL/m7i1I+WXJk66V0yJzg8d0dNv5sp++PzCd?=
+ =?us-ascii?Q?6+LIujpX/trAbxYSm7hM/Fcd0SRcHs2ldN7BUClu3BJ3oMJo5G4MaLq2sPau?=
+ =?us-ascii?Q?3KjQcIUN9i55HWHIgBf+cjYG4SSiDy9Po5qQnVosCcJzVZYMU4MjMy4q0hzV?=
+ =?us-ascii?Q?f0xyAOTgEKk+wha0w5hpPQqQp9NFapuo3itqThv7FI4xClmwowIUb0VrX2hw?=
+ =?us-ascii?Q?vTatbUfA4s/wwzsBXGijmEdrYrMzM0Sn+Vb7HMTDp/qUa2UMBYCk92bwp+az?=
+ =?us-ascii?Q?qineCr8ct7FL27Hl8LGptzaxqoOGCqyEQ1Q0w6BjkMrUk+42oK2V2T+by1Gc?=
+ =?us-ascii?Q?XXcHE+NfEpx/8j9IK591sIIZ1NMel2hzW6AvrrJFvGw5E1gdHMEYLlpphtsD?=
+ =?us-ascii?Q?pouGGFMwGicxlBwEPnhQvW9BCtEUf7wiHM0kBYfneSFfJCc18FiTTCBs8an4?=
+ =?us-ascii?Q?XY5ioSSW4QottHkcJjS0hwISb+jqYT9Tj1kdwQZEYxhcoSQhoSu5+rn55VVG?=
+ =?us-ascii?Q?9dRJ+j/uSFmvrfZ4/R8OkkBz5zt9EY2stBUZ0nbSBoLskf+1pmKbFDlpZ/tY?=
+ =?us-ascii?Q?OyKicC8GtkCe9G2a7v7t4T5uPj5BGB0cCh2j8t7LfpvOFiaMcrCAhphNPBJk?=
+ =?us-ascii?Q?UNRUJLFwJGhHcmPJRRUAVHxLUuX4Es6SdxzWkRjswhDqf0mVKlymhpWpM56G?=
+ =?us-ascii?Q?MRkSjmYeuM6+tSHb5Umy1USbXI/wbnfwAV7+D+hmD+MMPNYHhd04OqDKHKPH?=
+ =?us-ascii?Q?04MCFicpUqcObuF5x8GZYoUWicQXYNk40S9BJjrHKosLBAf7yiAE35FjXLU+?=
+ =?us-ascii?Q?iO4bm4XKeFsrbCUu2aCN2UPLXhpvmlnAq+2eNG3At8p4MIbHZ5C8wiIuSF5Q?=
+ =?us-ascii?Q?CYqdcKSTTqgLu5vk0HNVMlpj+cvOwCM6h6RIu8NMaw+KYjuZpCrXSYqz1dRy?=
+ =?us-ascii?Q?kHlnJs4EyYpIwnjQVN8c0TrmdujhWNdiUjA2B9hSEMdUMYXougkBBCNmXnK+?=
+ =?us-ascii?Q?hLNpMgR6SYmfhUA7gOp0NLio+Ir+BORNeKF+RzpEOILOJlzF2xvOAuK/VtFX?=
+ =?us-ascii?Q?mgj67R1glaToAAtBMh4KBuxuSf1EJ7yIxweHItnByjxahj4iyxa4HPl5g+BH?=
+ =?us-ascii?Q?A5fx0kWHp9Ryz17y8h+3ZZFCPfDPBA/6E3ooBPh9Glk5wI+qxREB6C4ZqpxT?=
+ =?us-ascii?Q?Y/o7qM94tlk=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?wC3FIEAsz2w7nfXfG3Y9QutckGdvDqtgvT10ArxZrnBzJJ7IXU/PzVQsx7JW?=
+ =?us-ascii?Q?fFZeHTa4SHWeclfkOJNBHFM2crgeD2O7RC/HS8YrPYJvGd3Jvxd3NzFdlSSU?=
+ =?us-ascii?Q?s7C7UwSw80lBN9Oq8n/uHwoFMu0afo6BNu8NL/+pAx1hvmGzjhHjLYREZEyU?=
+ =?us-ascii?Q?FebclJ3xXddoe1DAM6FExjVPy7sa5S3mTgsOEOyWF7JPkg6eEASx0cvAp7Fi?=
+ =?us-ascii?Q?+xMaQGNkN3n44Bhv9ziHH0h3mqzxXspNe68TVtUwHw6pSV5Vf58y+fbsLH+e?=
+ =?us-ascii?Q?p9kEtQ4aZhcAR3l81mDzfTwPPgYXYhbe9byQJ+jTJZyI2GftlrhdCqRESZ4r?=
+ =?us-ascii?Q?TkzuzoJd6Fi1zYOkcUJV52K6jhC8x8ndvY7BiWugVGDrkbX9Gj5BSo8JwmN4?=
+ =?us-ascii?Q?C/Emyx+70hhQYTfX3bj+9zs1MleKuaLRP1Ski4eQydIlqQyjb7WGkslDGcXV?=
+ =?us-ascii?Q?E5u+I5ASOTgF2NELBLCP5ZxnrNQzwkViKTsq5IQpIrnGce4vdcyvs10A3e3a?=
+ =?us-ascii?Q?ELxhtFEEIHHl52HeloAMuoxibCP9wccEpWPIQqVpX29i8+TwfmhREmcAmsur?=
+ =?us-ascii?Q?o3FAoIk6fGEJcu1us7+14ObWMmq9vG5JG3yMAxhsuctSbimH8t9fpqZPv91g?=
+ =?us-ascii?Q?XVEcvhOPT6WDZqi+50kU6vLemgqDF3sTOUDTNtJBh2LeeaPpsET586eTlTIt?=
+ =?us-ascii?Q?PhPF9o4oFdPUQpAPxiM3QA/EQNQ7MwSyAeiSJLH/CI9iMoIopNM3uE/+c+mg?=
+ =?us-ascii?Q?/c8Is05w6XIznajchzaLMt45TT+ydBIzjuIHLMSVxKo+WqNSL6JIEpXQm6vb?=
+ =?us-ascii?Q?qLJGalJKUMPqRp9qkq8m2KnbmfIdSABHEKjW5mxDgAAAysIY+zSMHDv5jZ7L?=
+ =?us-ascii?Q?VCyhEghaOhNd4gwzvp2t9XG5EIVUktp3oKDyYjAs5n2j3wLdaf3vt2JTSpDR?=
+ =?us-ascii?Q?rLCGXVqG/eHi3CGhILTYs9wPR7SGXnFAiUMzQHDyfH5Qx6RU1UsI2bO0stwn?=
+ =?us-ascii?Q?EmnX6Xkc0hnJKtNg1Ms9pTYRqZt42Sylijnuj8EmaT0vQhvSeKr1KLEYcJOf?=
+ =?us-ascii?Q?WuMe9G9NNNtXX69mg/Ni7X3DnUdAOhK59421Pnj6+8Y6Pcx/+1rBVOX60uQY?=
+ =?us-ascii?Q?26IWx6ExxXIzKOIQhHBOQaKrGlQnqZf34h/eAFKKKpIYNV+IDn3xhZ/FQVNG?=
+ =?us-ascii?Q?VSoO0/RvoMeYWmybkgofExjLUYxZC43UBhDlOyB5EeAq2BmQfOWKtXiqsVzL?=
+ =?us-ascii?Q?vaHNzKfqWnQ7vhSjTTFikLd9jWwq/Rr5SAw1UijcDgKKBo7geKf+CCGy978T?=
+ =?us-ascii?Q?OtbdJ4xlQU4RNEMS2/FQWW/x+t3ueUyr+q61QrUEUZ7jDac37zWg7jThifjM?=
+ =?us-ascii?Q?6jE23jMlBAUd1frQvffgPu2zWqu2Xe9pSnjea4xrthKtCIQCoPAZG4bKlxR3?=
+ =?us-ascii?Q?aSZ7Ix6UgWF/hpkGlo6CPxWS38DJERZ3eIRFT6O54vZuKiQHUVXjR4GVzRM6?=
+ =?us-ascii?Q?QmGUJgYi86vp5/ZesJFdwTXBUglM+MRZt4lX8nKigd0FvP3oVGw9uXj4sySt?=
+ =?us-ascii?Q?JbTygTkkInjUO1J6SvNd5z+bUy9N4qVr94AP7tlM?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aad3d614-0e59-4958-fea9-08dd871484cd
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2025 11:53:55.6003
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Q0j5hm7cJQm/YijapTFank/q+P2iDLcv55P2edOp/4Y+cgQK4R4AG59xlTVPLS8m
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR12MB9723
 
-We keep setting and clearing these bits depending on the role of
-the host kernel, mimicking what we do for nVHE. But that's actually
-pretty pointless, as we always want physical interrupts to make it
-to the host, at EL2.
+On Tue, Apr 29, 2025 at 10:19:46AM +0800, Baolu Lu wrote:
+> > -int iommu_map(struct iommu_domain *domain, unsigned long iova,
+> > -	      phys_addr_t paddr, size_t size, int prot, gfp_t gfp)
+> > +int iommu_sync_map(struct iommu_domain *domain, unsigned long iova, size_t size)
+> >   {
+> >   	const struct iommu_domain_ops *ops = domain->ops;
+> > -	int ret;
+> > -
+> > -	might_sleep_if(gfpflags_allow_blocking(gfp));
+> > -	/* Discourage passing strange GFP flags */
+> > -	if (WARN_ON_ONCE(gfp & (__GFP_COMP | __GFP_DMA | __GFP_DMA32 |
+> > -				__GFP_HIGHMEM)))
+> > -		return -EINVAL;
+> > +	if (!ops->iotlb_sync_map)
+> > +		return 0;
+> > +	return ops->iotlb_sync_map(domain, iova, size);
+> > +}
+> 
+> I am wondering whether iommu_sync_map() needs a return value. The
+> purpose of this callback is just to sync the TLB cache after new
+> mappings are created, which should effectively be a no-fail operation.
 
-This has also two problems:
+Yeah, it is pretty much nonsense, the other flushes don't fail:
 
-- it prevents IRQs from being taken when these bits are cleared
-  if the implementation has chosen to implement these bits as
-  masks when HCR_EL2.{TGE,xMO}=={0,0}
+	void (*flush_iotlb_all)(struct iommu_domain *domain);
+	int (*iotlb_sync_map)(struct iommu_domain *domain, unsigned long iova,
+			      size_t size);
+	void (*iotlb_sync)(struct iommu_domain *domain,
+			   struct iommu_iotlb_gather *iotlb_gather);
 
-- it triggers a bad erratum on the AmpereOne HW, which catches
-  fire on clearing these bits while an interrupt is being taken
-  (AC03_CPU_36).
+> Furthermore, currently no iommu driver implements this callback in a way
+> that returns a failure. 
 
-Let's kill these two birds with a single stone, and permanently
-set the xMO bits when running VHE. This involves a bit of surgery
-on code paths that rely on flipping these bits on and off for
-other purposes.
+Given s390 does weirdly fail sync_map but not sync this needs a bigger
+touch than just that.
 
-Note that the earliest setting of hcr_el2 (in the init_hcr_el2
-macro) is left untouched as is runs extremely early, with interrupts
-disabled, and soon enough overwritten with the final value containing
-the xMO bits.
+But what I really want to do is get rid of iotlb_sync_map and replace it
+with iotlb_sync, and feed the gather through the iommu_map path.
 
-Reported-by: D Scott Phillips <scott@os.amperecomputing.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_arm.h |  2 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c  | 36 +++++++++++++++++++-------------
- 2 files changed, 22 insertions(+), 16 deletions(-)
+It doesn't really make sense to have a special interface for this.
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 974d72b5905b8..bba4b0e930915 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -100,7 +100,7 @@
- 			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID1)
- #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
- #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
--#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
-+#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H | HCR_AMO | HCR_IMO | HCR_FMO)
- 
- #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
- #define MPAMHCR_HOST_FLAGS	0
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index ed363aa3027e5..50aa8dbcae75b 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -429,23 +429,27 @@ u64 __vgic_v3_get_gic_config(void)
- 	/*
- 	 * To check whether we have a MMIO-based (GICv2 compatible)
- 	 * CPU interface, we need to disable the system register
--	 * view. To do that safely, we have to prevent any interrupt
--	 * from firing (which would be deadly).
-+	 * view.
- 	 *
--	 * Note that this only makes sense on VHE, as interrupts are
--	 * already masked for nVHE as part of the exception entry to
--	 * EL2.
--	 */
--	if (has_vhe())
--		flags = local_daif_save();
--
--	/*
- 	 * Table 11-2 "Permitted ICC_SRE_ELx.SRE settings" indicates
- 	 * that to be able to set ICC_SRE_EL1.SRE to 0, all the
- 	 * interrupt overrides must be set. You've got to love this.
-+	 *
-+	 * As we always run VHE with HCR_xMO set, no extra xMO
-+	 * manipulation is required in that case.
-+	 *
-+	 * To safely disable SRE, we have to prevent any interrupt
-+	 * from firing (which would be deadly). This only makes sense
-+	 * on VHE, as interrupts are already masked for nVHE as part
-+	 * of the exception entry to EL2.
- 	 */
--	sysreg_clear_set(hcr_el2, 0, HCR_AMO | HCR_FMO | HCR_IMO);
--	isb();
-+	if (has_vhe()) {
-+		flags = local_daif_save();
-+	} else {
-+		sysreg_clear_set(hcr_el2, 0, HCR_AMO | HCR_FMO | HCR_IMO);
-+		isb();
-+	}
-+
- 	write_gicreg(0, ICC_SRE_EL1);
- 	isb();
- 
-@@ -453,11 +457,13 @@ u64 __vgic_v3_get_gic_config(void)
- 
- 	write_gicreg(sre, ICC_SRE_EL1);
- 	isb();
--	sysreg_clear_set(hcr_el2, HCR_AMO | HCR_FMO | HCR_IMO, 0);
--	isb();
- 
--	if (has_vhe())
-+	if (has_vhe()) {
- 		local_daif_restore(flags);
-+	} else {
-+		sysreg_clear_set(hcr_el2, HCR_AMO | HCR_FMO | HCR_IMO, 0);
-+		isb();
-+	}
- 
- 	val  = (val & ICC_SRE_EL1_SRE) ? 0 : (1ULL << 63);
- 	val |= read_gicreg(ICH_VTR_EL2);
--- 
-2.39.2
+So I think this patch is fine as is..
 
+Jason
 
