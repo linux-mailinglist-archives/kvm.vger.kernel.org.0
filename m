@@ -1,123 +1,231 @@
-Return-Path: <kvm+bounces-44680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44681-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17514AA01DC
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 07:37:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B9C5AA01F7
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 07:46:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B733A5A6095
-	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 05:36:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F4AB1A86417
+	for <lists+kvm@lfdr.de>; Tue, 29 Apr 2025 05:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B21F23370C;
-	Tue, 29 Apr 2025 05:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767E22741D6;
+	Tue, 29 Apr 2025 05:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OBmVBcFO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OPIJHlt8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3EB433B3
-	for <kvm@vger.kernel.org>; Tue, 29 Apr 2025 05:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E8D171E43;
+	Tue, 29 Apr 2025 05:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1745905024; cv=none; b=gdWnbbwk37nUDrwf4g8cZ/mmrz74gFINmLno+lcdkbI12hgVIBoRJdEbVYR6Z1Ig07qtkjiIGNBGRbWlVaJXmbxRBJy3gVuV3Um6CbIjDV4jbwnXKxwra0UzOgeN46ikLmDHHHxdAUEUf1H/jkBfkwzurR6kLPdurWGAvIuY8kg=
+	t=1745905568; cv=none; b=pnmEHfJWmMhFSBUO3hbC3OwQ1tBGXxvSF7YZn1XLglF6bm6l8kc5yixCipDSMpQUJEIVy3nAXGmomhjn87gv9jwd4Pb7QKGi1qN5QM6IdmwzuJb0VDVVm4hcehSrh7kmZVjiPyFH8sWLyAwlGr3eoKanCdxjbCoJ1cX/zUb4Ta4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1745905024; c=relaxed/simple;
-	bh=T/ay3Q1UyRbqCpLTXDnMIelLI4jNm5sdVcMaWThx7Cw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EhnGyOV1lkjCt0wHlcfl3HHlagzwLDD6UAkVIcqHDxAgHXT8icSV6ySNS8fni+hNpFWPpj429nhYCmTbjvBVouOIC6gP0invP9zF2mdt6vaOqUKFf8eMU3k+ZY4lElWwGWdUtsB/DRZU6f9IjqxBO0g+KxIs0uMz2Mc3DJSck0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OBmVBcFO; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-39c1ef4acf2so4147733f8f.0
-        for <kvm@vger.kernel.org>; Mon, 28 Apr 2025 22:37:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1745905021; x=1746509821; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fdxbfOqh2DB6z+OvNYbD+2Iy/ee1tOeEB+GcS9VWkCY=;
-        b=OBmVBcFOGznX+hp5IidAfHDwxlb7wehuxGrD5VYodwS56IEFx8Xsrqe+7EgPyyCbus
-         JImpZeXLpWWih4eMDrTLNgdfcAJAQR0nl35CXqhdFF92JUqoXwXbP9Yihs3e+m9X68a0
-         DKQkBBqrI3g6SAbbqLcZDErOwWpGSR2tHKlAvpan5SGahnI1ZGHDJvSdSeJkbfNYJS2T
-         tEMYGoFDLRIyCrbqJudQ1+hyJgWFYJdyQK5Xlmh6RximT49yNciQD0ir9+XpmAUN2Hsx
-         WNie7qQnDJRF0Vx2Rv2iAjGXef9w2A4AGVhUVPjtJCBbtBzDD5Kf12RjnbIcvK81KHP/
-         V0bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1745905021; x=1746509821;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fdxbfOqh2DB6z+OvNYbD+2Iy/ee1tOeEB+GcS9VWkCY=;
-        b=B5xSj1ekZ52v0IAI7XVBs45SuOLSs+8kcxPmVdbMbrZLjc628qk99Krpvp5nAIoKhJ
-         WgXP4qWNV2GC+/nrBRwoIX+sGQzL1oYcEtN10IEa0iWaEtbAzTfh6qz19jdRfxWkCX+2
-         zKB8iyRSxzOegejkMVO+9YLkPPgLh2bSlCHV8+K3qNFL+Ro+9qgpfjNBuRkGtk32zj23
-         7Y4Y8SnJSCwHvzhBD9vQmzKj7LBx7EHb7c84d7jtOZPsWOwnQC0LnEza7TKYIx0do4LB
-         diAzGTMblSO5N0YE7MQHX8EQkAQTRrRzK/xvS95qRUh3dBRJsZL2liDCBvB5T0NT/a7Q
-         pL9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVZTuuauz74qUw6+swxKTTyRIvI5Q1yhF+OMz1YSQjzuwvtSwYtRUGKvnCmN+OA8l8Drc4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGL7J9sPjgoi8ouO5aCMPujYkH7VzQarAaK62U71ljbtb+d0wQ
-	EAlkcNpCIYGhTiFIqBPi0KLPzBpTF+vpuG4W18aJDqEHO+lbiMD0dcb7ZROF9UM=
-X-Gm-Gg: ASbGncuSZVdmElykAI2+vjH0J8AeffarjaTur/4FwVynkxi0biaX3mncOdtVCjTBNK/
-	ZCEvBjSy5ND5KsopcHVv511Xyj5gLcpkvMcLOATSCdWdNogSK9Xa5MRxTZZ/59EorYAQ99gTjp+
-	v36tM3uUsdGlTserVuLdGP11ks8I5DzGokhvH1EWRBFMrGNNM6545fIprCGwo+3jG97p8A34dQ5
-	8dQ707J4Z6D+1PN3f0N2IjIxIk74kj9KeIbZJQ7Uch082v7ZiGMZjxRvJxovoYXw7NxIfQX/jnr
-	ung7JrRCzOdofW8aDF75/Ko3pvggJuJi8ZNhPtiJMa/302D/9ElWpvzj0/OiE3k5Dkz/3Is4/83
-	g2NUSfc4A2xH9PQ==
-X-Google-Smtp-Source: AGHT+IHPSQ2/orz4Fh9+TApHSPnuEOz7ugayFhhxAeqRVwe7oA6djQCIKIaw1NbnQJTqpfETcN8D4w==
-X-Received: by 2002:a5d:5850:0:b0:39c:1257:dbab with SMTP id ffacd0b85a97d-3a0894a3d64mr1871645f8f.59.1745905020634;
-        Mon, 28 Apr 2025 22:37:00 -0700 (PDT)
-Received: from [192.168.69.169] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073e5d479sm13271027f8f.92.2025.04.28.22.36.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Apr 2025 22:36:59 -0700 (PDT)
-Message-ID: <9aad9038-2154-4734-a110-7a4d432330a2@linaro.org>
-Date: Tue, 29 Apr 2025 07:36:58 +0200
+	s=arc-20240116; t=1745905568; c=relaxed/simple;
+	bh=ZlzjgR8ZCmhh7ln3bWsTRkN7njOkthtsCcGhOVJD370=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cyzc7J4DORps3PTLSoeFwWSM2YP9FnaIrbUc3wxDiNjCB35VDEqIgm4JDJM6w/q5s4MJHz+JntidSZWe7zaniJUoHQ+HveWIi2sieb8RkuQFlK7LPwcVIMCyHGHj0xtTEKf2Okf0gNSfprXGF1DWB9xFg93bzBg3IDJijYJfhlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OPIJHlt8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EF06C4CEE3;
+	Tue, 29 Apr 2025 05:46:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1745905567;
+	bh=ZlzjgR8ZCmhh7ln3bWsTRkN7njOkthtsCcGhOVJD370=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OPIJHlt8bTW2SZgZvCQl0TtC/C7oWnwza0G162u6trNqiDyxNtzHYyjIBFxHIMyHP
+	 kNYqu6Gd4ME2eiPecfo02OZnUJNpPqZ11ior8m1BTlK5ogMz8NZw8SNe7GhZl9kwTJ
+	 AE9Uu94aifbn/PGHOYs6Xv+jxIIqUi/Vde5glUd+VZ5LXI9CAkEAbHZUqkqCHxgTf8
+	 5FlvFRf8qZr6a1Vlk2E6XTcc/QgHu16QEmaS6D/ZS8tOk76ZJl2EWdi8dagzkXZD/z
+	 cAVfMvTVwCBZimzwv4w3tYH/7v26KFBOlhohXUM8B1HoNMgXXtnUSEr5ZpJvKIxX2N
+	 MhsioMleKoeXg==
+Date: Tue, 29 Apr 2025 08:46:02 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Baolu Lu <baolu.lu@linux.intel.com>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Keith Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>,
+	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, linux-nvme@lists.infradead.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v10 05/24] dma-mapping: Provide an interface to allow
+ allocate IOVA
+Message-ID: <20250429054602.GI5848@unreal>
+References: <cover.1745831017.git.leon@kernel.org>
+ <30f0601d400711b3859deeb8fef3090f5b2020a4.1745831017.git.leon@kernel.org>
+ <0086302d-1cb3-43dd-a989-e4b1995a0d22@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/13] include/system/hvf: missing vaddr include
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
- alex.bennee@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-arm@nongnu.org, anjo@rev.ng, richard.henderson@linaro.org
-References: <20250429050010.971128-1-pierrick.bouvier@linaro.org>
- <20250429050010.971128-3-pierrick.bouvier@linaro.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20250429050010.971128-3-pierrick.bouvier@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0086302d-1cb3-43dd-a989-e4b1995a0d22@linux.intel.com>
 
-On 29/4/25 06:59, Pierrick Bouvier wrote:
-> On MacOS x86_64:
-> In file included from ../target/i386/hvf/x86_task.c:13:
-> /Users/runner/work/qemu/qemu/include/system/hvf.h:42:5: error: unknown type name 'vaddr'
->      vaddr pc;
->      ^
-> /Users/runner/work/qemu/qemu/include/system/hvf.h:43:5: error: unknown type name 'vaddr'
->      vaddr saved_insn;
->      ^
-> /Users/runner/work/qemu/qemu/include/system/hvf.h:45:5: error: type name requires a specifier or qualifier
->      QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
->      ^
-> /Users/runner/work/qemu/qemu/include/system/hvf.h:45:18: error: a parameter list without types is only allowed in a function definition
->      QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
->                   ^
-> /Users/runner/work/qemu/qemu/include/system/hvf.h:45:36: error: expected ';' at end of declaration list
->      QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
+On Tue, Apr 29, 2025 at 11:10:54AM +0800, Baolu Lu wrote:
+> On 4/28/25 17:22, Leon Romanovsky wrote:
+> > From: Leon Romanovsky<leonro@nvidia.com>
+> > 
+> > The existing .map_page() callback provides both allocating of IOVA
 > 
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> ---
->   include/system/hvf.h | 1 +
->   1 file changed, 1 insertion(+)
+> .map_pages()
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Changed, thanks
 
+> 
+> > and linking DMA pages. That combination works great for most of the
+> > callers who use it in control paths, but is less effective in fast
+> > paths where there may be multiple calls to map_page().
+> > 
+> > These advanced callers already manage their data in some sort of
+> > database and can perform IOVA allocation in advance, leaving range
+> > linkage operation to be in fast path.
+> > 
+> > Provide an interface to allocate/deallocate IOVA and next patch
+> > link/unlink DMA ranges to that specific IOVA.
+> > 
+> > In the new API a DMA mapping transaction is identified by a
+> > struct dma_iova_state, which holds some recomputed information
+> > for the transaction which does not change for each page being
+> > mapped, so add a check if IOVA can be used for the specific
+> > transaction.
+> > 
+> > The API is exported from dma-iommu as it is the only implementation
+> > supported, the namespace is clearly different from iommu_* functions
+> > which are not allowed to be used. This code layout allows us to save
+> > function call per API call used in datapath as well as a lot of boilerplate
+> > code.
+> > 
+> > Reviewed-by: Christoph Hellwig<hch@lst.de>
+> > Tested-by: Jens Axboe<axboe@kernel.dk>
+> > Reviewed-by: Luis Chamberlain<mcgrof@kernel.org>
+> > Signed-off-by: Leon Romanovsky<leonro@nvidia.com>
+> > ---
+> >   drivers/iommu/dma-iommu.c   | 86 +++++++++++++++++++++++++++++++++++++
+> >   include/linux/dma-mapping.h | 48 +++++++++++++++++++++
+> >   2 files changed, 134 insertions(+)
+> > 
+> > diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+> > index 9ba8d8bc0ce9..d3211a8d755e 100644
+> > --- a/drivers/iommu/dma-iommu.c
+> > +++ b/drivers/iommu/dma-iommu.c
+> > @@ -1723,6 +1723,92 @@ size_t iommu_dma_max_mapping_size(struct device *dev)
+> >   	return SIZE_MAX;
+> >   }
+> > +/**
+> > + * dma_iova_try_alloc - Try to allocate an IOVA space
+> > + * @dev: Device to allocate the IOVA space for
+> > + * @state: IOVA state
+> > + * @phys: physical address
+> > + * @size: IOVA size
+> > + *
+> > + * Check if @dev supports the IOVA-based DMA API, and if yes allocate IOVA space
+> > + * for the given base address and size.
+> > + *
+> > + * Note: @phys is only used to calculate the IOVA alignment. Callers that always
+> > + * do PAGE_SIZE aligned transfers can safely pass 0 here.
+> 
+> Have you considered adding a direct alignment parameter to
+> dma_iova_try_alloc()? '0' simply means the default PAGE_SIZE alignment.
+> 
+> I'm imagining that some devices might have particular alignment needs
+> for better performance, especially for the ATS cache efficiency. This
+> would allow those device drivers to express the requirements directly
+> during iova allocation.
+
+This is actually what is happening now, take a look in
+blk_rq_dma_map_iter_start() implementation, which uses custom alignment.
+
+> 
+> > + *
+> > + * Returns %true if the IOVA-based DMA API can be used and IOVA space has been
+> > + * allocated, or %false if the regular DMA API should be used.
+> > + */
+> > +bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
+> > +		phys_addr_t phys, size_t size)
+> > +{
+> > +	struct iommu_dma_cookie *cookie;
+> > +	struct iommu_domain *domain;
+> > +	struct iova_domain *iovad;
+> > +	size_t iova_off;
+> > +	dma_addr_t addr;
+> > +
+> > +	memset(state, 0, sizeof(*state));
+> > +	if (!use_dma_iommu(dev))
+> > +		return false;
+> > +
+> > +	domain = iommu_get_dma_domain(dev);
+> > +	cookie = domain->iova_cookie;
+> > +	iovad = &cookie->iovad;
+> > +	iova_off = iova_offset(iovad, phys);
+> > +
+> > +	if (static_branch_unlikely(&iommu_deferred_attach_enabled) &&
+> > +	    iommu_deferred_attach(dev, iommu_get_domain_for_dev(dev)))
+> > +		return false;
+> > +
+> > +	if (WARN_ON_ONCE(!size))
+> > +		return false;
+> > +
+> > +	/*
+> > +	 * DMA_IOVA_USE_SWIOTLB is flag which is set by dma-iommu
+> > +	 * internals, make sure that caller didn't set it and/or
+> > +	 * didn't use this interface to map SIZE_MAX.
+> > +	 */
+> > +	if (WARN_ON_ONCE((u64)size & DMA_IOVA_USE_SWIOTLB))
+> 
+> I'm a little concerned that device drivers might inadvertently misuse
+> the state->__size by forgetting about the high bit being used for
+> DMA_IOVA_USE_SWIOTLB. Perhaps adding a separate flag within struct
+> dma_iova_state to prevent such issues?
+
+Device drivers are not supposed to use this DMA API interface and the
+vision that subsystems will provide specific to them wrappers. See HMM,
+and block changes as an example. VFIO mlx5 implementation is a temporary
+measure till we convert another VFIO LM driver to get understanding what
+type of abstraction we will need.
+
+The high bit is used to save memory.
+
+> 
+> > +		return false;
+> > +
+> > +	addr = iommu_dma_alloc_iova(domain,
+> > +			iova_align(iovad, size + iova_off),
+> > +			dma_get_mask(dev), dev);
+> > +	if (!addr)
+> > +		return false;
+> > +
+> > +	state->addr = addr + iova_off;
+> > +	state->__size = size;
+> > +	return true;
+> > +}
+> > +EXPORT_SYMBOL_GPL(dma_iova_try_alloc);
+> 
+> Thanks,
+> baolu
+> 
 
