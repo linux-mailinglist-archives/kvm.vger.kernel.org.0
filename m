@@ -1,146 +1,130 @@
-Return-Path: <kvm+bounces-44918-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44919-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBB07AA4E73
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 16:25:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0688DAA4EDB
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 16:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30B4216CE50
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 14:25:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A99C618942A0
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 14:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FD325EF9C;
-	Wed, 30 Apr 2025 14:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B746625FA0A;
+	Wed, 30 Apr 2025 14:39:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="G1ewDVEd"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="ob4mrwLg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6C521ABC6;
-	Wed, 30 Apr 2025 14:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F8821ADC3
+	for <kvm@vger.kernel.org>; Wed, 30 Apr 2025 14:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746023103; cv=none; b=IPgMKpISL5Yfm7hI54xHYv4wJAjTWKd2hmvVXIsr5Vk7qREpBuxrO5+qWM22EM4SuxCQlRPeRrcEAzUkMBaIvN7o9NQ2taco3Tk8gnIfbuQRBHLmL/YuVVcRbQijw3KiE+iwZB+pzPKSaZQvEpzi6uQnsa7cmliGZte4zWn8fvY=
+	t=1746023941; cv=none; b=J6nvAJQn+TfQPJvLXshLPDIpRBnvmiiOQmWQyFzMWL0gmzJYOr7ENb8Z+6fRLdW90UBKt2GkyNtmt1Wva6Y2m5O+Px6YtmROC1irMxV50qn9fjFyriDGqkv6uxFk/7yabeNsHnaoEeybkxaRJKKojVuqJN76/z2GU/nVppVnhIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746023103; c=relaxed/simple;
-	bh=rjMvhhoHC1X7+lw3l2dB4rGD+6HMJz3GsS5ASyow71I=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=I0i1LuueXFVgdy2vc2anFJ0gnz7XJyx1o3WUBDhp6wTG8bnS3+8iBDw3BWuu+qYXYJoBtzKqMjP6nQJVN16bnDDtJ7sIjarrY3znJ52uh5hYL+auVSHUghHlasK2nrIXp8qDO4dQdCXOcDUPpDQokUEWwkXd56uAWfr4n265iS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=G1ewDVEd; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53UEOI5X931491
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 30 Apr 2025 07:24:18 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53UEOI5X931491
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1746023059;
-	bh=pQL8GxGCP0lOqhjZgQIjgeXZK6YREx5vQoMNpPTLrHU=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=G1ewDVEdQC6La4J5R7kMKwnkqVpNGebEjVhRdP8CbyAj4JzpaV+0lhKWzQgviR5Jz
-	 DnHGbQYWM0DUzo52eq8rHyuiP6ugp8H+u4HqECJ8ihkukboZW7TMa7IIrDAplGBmdO
-	 PnYBtM1FotSDGP0Bwmd3LQeqCgtZ+/DRE8sWb1QLo6aQbwVT8vaa4jQ32stDbGr9Pv
-	 oxP6dsv+CWX+tLfnoiF9XpDI0hZpikUo9GVld07MAjzYS/EGIUqWvWp07qhZNwt/Wg
-	 jHQIj1zz1GDMcwQqmZxnpwFKTpI2+0AEGA4hhTodBLWJXHWfh1l0J23ON/EjuigJld
-	 JJ/nQMjAp4l8g==
-Date: Wed, 30 Apr 2025 07:24:15 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Peter Zijlstra <peterz@infradead.org>, x86@kernel.org
-CC: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-        decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, seanjc@google.com,
-        pbonzini@redhat.com, ardb@kernel.org, kees@kernel.org,
-        Arnd Bergmann <arnd@arndb.de>, gregkh@linuxfoundation.org,
-        jpoimboe@kernel.org, peterz@infradead.org,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-efi@vger.kernel.org,
-        samitolvanen@google.com, ojeda@kernel.org, xin@zytor.com
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_00/13=5D_objtool=3A_Detect_and_wa?=
- =?US-ASCII?Q?rn_about_indirect_calls_in_=5F=5Fnocfi_functions?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20250430110734.392235199@infradead.org>
-References: <20250430110734.392235199@infradead.org>
-Message-ID: <8B86A3AE-A296-438C-A7A7-F844C66D0198@zytor.com>
+	s=arc-20240116; t=1746023941; c=relaxed/simple;
+	bh=BhYYOz5NlOOegoPQI5hpXU14NXhJBnlFgf+RsnopOZI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=SsiE4+m7/thx4Ft+qGfW8hB30QLNH5MoqwJ0GNnUlVw7uHRWqOI1EVBJMfTW++pIHnPvEO1KS7UMu/Emgt3japYIDyvPX6/k7Ygbu9306sOfWfQ2nVsKsO9c9JKci4U53vuIWuCl+/snXrGyn2R8lndVQVlw/MX1iScf7n0PZ4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=ob4mrwLg; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43cf825f46bso5459145e9.3
+        for <kvm@vger.kernel.org>; Wed, 30 Apr 2025 07:38:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1746023938; x=1746628738; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BhYYOz5NlOOegoPQI5hpXU14NXhJBnlFgf+RsnopOZI=;
+        b=ob4mrwLgHr/TnoJfJXzXsmPz3AP8Lup2cqan3/Ay3JNkV1HTMaDsePKim33PaO3yxV
+         cZKSPxCnwCxou6nYUna3AzwUXInpW6AuIfKcZrdmtsVml7pFop9mXLF3GUfo9KQLx5Nr
+         aF7q4mQ89CsipQt6MJBYm5XDq9gmDU5f7A/MA72rRpmxDaIaBHa+4iYfFk1I0/Sz8NNM
+         I3PkZ70OZ1awdyQU6gtMZZgifxZ0PZp1GdidYilIsFewSdL3bNpInhqcj7znXsTwYqUM
+         AXTZZqmwlsU2LcrPURzdrw/Os+jD7M3ZjWakugQYjzJ0EgRkNWPYBxYgEd5z/8DfvCKl
+         GVXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746023938; x=1746628738;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=BhYYOz5NlOOegoPQI5hpXU14NXhJBnlFgf+RsnopOZI=;
+        b=Wpl3JBwhU1gsy7EEEDv7EgNBCSY+Br56tJejRp0j5AWIhRRY0qUsbTamTOjjaouHo9
+         jh2RYXHtN/MlNDGEkR14+yaTzXS8Y1E25VtkT/eZAKvYPDEmVI9cXZFQ5fbYcx5cEV2e
+         kpUpCdGtuGOoPwydT2WIpO9HcXKAYGO0jhwiu2ogHMMd4/fP9Tz6ggqszL3SWOqIPDEg
+         ZLqJVtLd4Yp5k5gynSo0r8vLYBDBR7u8kpjmgLzgQB1azNWGnAZLEKQinPJH80tOJOFx
+         j4b9C+7NB06f3MglFZKaXeC3uRWx+CVNEp1+cNyzuhwuMSGSnwROGYlFYr0IE0DOKMm1
+         piAA==
+X-Forwarded-Encrypted: i=1; AJvYcCURLYf0o4kDD320L+f2MMlKmXVNgAdr4AxKK/rEdZBAWK5QgzNar5Rb4FT5iVXlfRlj368=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNU+CTueHcZkO8dugzhMYRj6BfvS8tX4X6kdQWyEyhj2vNQLFl
+	P8iqDku0ADVNn+sjswofNKGt3jQ/d/bi40LMyxEXp5t1Qr0Hx20XDd949fCoF+0=
+X-Gm-Gg: ASbGnct4APA/6sS3bj1OnJswhMow66MVRaH2CuP6hhLwIgHX2wysHXebvFfX0wJlm6W
+	qvXg1M5+PLOzCATiAcItHbeJvUBv1PmUlFwZua2cLMkPLNydXXC9FBtIUOizr1YtPkT/wkOJ5KG
+	qsp0h1bafTDyWybiggDQVhZP/UTgjSymxIVkVSVU0pUN5oWEZbQXiRTQ+Xghrn/EAfuEwb4tqt+
+	5ouQokw/0LIzizyLC3gfCM7b/8vBiMm4Q0/apTtYJwDTBpUUMqMlZbu0RsV6knUDXsBjNBaS3II
+	jc34xTaK1tM0G43rBWIJAi1Bffxcz8BcYbTKkssbfWFRebWyvUjbQrv9arZHzva7iAk1t4JWQ2J
+	6
+X-Google-Smtp-Source: AGHT+IEI4GADqeHdXAfmffYECZ9pL6Wjw9iSIa7PRhjYESKXYcU7d8boy1B3uio5ziNSls3PXGMoQg==
+X-Received: by 2002:a05:6000:2c8:b0:3a0:782f:9848 with SMTP id ffacd0b85a97d-3a08ff6e786mr1015889f8f.4.1746023938369;
+        Wed, 30 Apr 2025 07:38:58 -0700 (PDT)
+Received: from localhost (ip-89-103-73-235.bb.vodafone.cz. [89.103.73.235])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a073ca5473sm17383962f8f.31.2025.04.30.07.38.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Apr 2025 07:38:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 30 Apr 2025 16:38:57 +0200
+Message-Id: <D9K1TVIG544A.DAEZQAFBUDB4@ventanamicro.com>
+Subject: Re: [PATCH 4/5] KVM: RISC-V: reset VCPU state when becoming
+ runnable
+Cc: "Anup Patel" <apatel@ventanamicro.com>, <kvm-riscv@lists.infradead.org>,
+ <kvm@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+ <linux-kernel@vger.kernel.org>, "Atish Patra" <atishp@atishpatra.org>,
+ "Paul Walmsley" <paul.walmsley@sifive.com>, "Palmer Dabbelt"
+ <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre
+ Ghiti" <alex@ghiti.fr>, "Andrew Jones" <ajones@ventanamicro.com>, "Mayuresh
+ Chitale" <mchitale@ventanamicro.com>
+To: "Anup Patel" <anup@brainfault.org>
+From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
+References: <20250403112522.1566629-3-rkrcmar@ventanamicro.com>
+ <20250403112522.1566629-7-rkrcmar@ventanamicro.com>
+ <CAAhSdy0e3HVN6pX-hcX2N+kpwsupsCf6BqrYq=bvtwtFOuEVhA@mail.gmail.com>
+ <D9IGJR9DGFAM.1PVHVOOTVRFZW@ventanamicro.com>
+ <CAK9=C2Woc5MtrJeqNtaVkMXWEsGeZPsmUgtFQET=OKLHLwRbPA@mail.gmail.com>
+ <D9J1TBKYC8YH.1OPUI289U0O2C@ventanamicro.com>
+ <CAAhSdy01yBBfJwdTn90WeXFR85=1zTxuebFhi4CQJuOujVTHXg@mail.gmail.com>
+ <D9J9DW53Q2GD.1PB647ISOCXRX@ventanamicro.com>
+ <CAAhSdy0B-pF-jHmTXNYE7NXwdCWJepDtGR__S+P4MhZ1bfUERQ@mail.gmail.com>
+ <CAAhSdy20pq3KvbCeST=h+O5PWfs2E4uXpX9BbbzE7GJzn+pzkA@mail.gmail.com>
+ <D9JTZ6HH00KY.1B1SKH1Z0UI1S@ventanamicro.com>
+ <CAAhSdy0TfpWQ-kC_gUUCU0oC5dR45A1v9q84H2Tj9A8kdO0d1A@mail.gmail.com>
+ <D9JY52BJEFX2.2S5XL9NOOGBS7@ventanamicro.com>
+ <CAAhSdy1xCRocu2uNri4iDm+NQd+VE8JRVeASfYJ8Qspr5aEz8g@mail.gmail.com>
+In-Reply-To: <CAAhSdy1xCRocu2uNri4iDm+NQd+VE8JRVeASfYJ8Qspr5aEz8g@mail.gmail.com>
 
-On April 30, 2025 4:07:34 AM PDT, Peter Zijlstra <peterz@infradead=2Eorg> w=
-rote:
->Hi!
+2025-04-30T18:32:31+05:30, Anup Patel <anup@brainfault.org>:
+> On Wed, Apr 30, 2025 at 5:15=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrc=
+mar@ventanamicro.com> wrote:
+>> We can re-use KVM_SET_MP_STATE and add a KVM capability.
+>> Userspace will opt-in to reset the VCPU through the existing IOCTL.
+>>
+>> This design will also allow userspace to trigger a VCPU reset without
+>> tearing down the whole VM.
 >
->On kCFI (CONFIG_CFI_CLANG=3Dy) builds all indirect calls should have the =
-CFI
->check on (with very few exceptions)=2E Not having the CFI checks undermin=
-es the
->protection provided by CFI and will make these sites candidates for peopl=
-e
->wanting to steal your cookies=2E
+> Okay, lets go ahead with a KVM capability which user space can opt-in
+> for KVM_SET_MP_STATE ioctl().
 >
->Specifically the ABI changes are so that doing indirect calls without the=
- CFI
->magic, to a CFI adorned function is not compatible (although it happens t=
-o work
->for some setups, it very much does not for FineIBT)=2E
->
->Rust people tripped over this the other day, since their 'core' happened =
-to
->have some no_sanitize(kcfi) bits in, which promptly exploded when ran wit=
-h
->FineIBT on=2E
->
->Since this is very much not a supported model -- on purpose, have objtool
->detect and warn about such constructs=2E
->
->This effort [1] found all existing [2] non-cfi indirect calls in the kern=
-el=2E
->
->Notably the KVM fastop emulation stuff -- which I've completely rewritten=
- for
->this version -- the generated code doesn't look horrific, but is slightly=
- more
->verbose=2E I'm running on the assumption that instruction emulation is no=
-t super
->performance critical these days of zero VM-exit VMs etc=2E
->
->KVM has another; the VMX interrupt injection stuff calls the IDT handler
->directly=2E  Is there an alternative? Can we keep a table of Linux functi=
-ons
->slighly higher up the call stack (asm_\cfunc ?) and add CFI to those?
->
->HyperV hypercall page stuff, which I've previously suggested use direct c=
-alls,
->and which I've now converted (after getting properly annoyed with that co=
-de)=2E
->
->Also available at:
->
->  git://git=2Ekernel=2Eorg/pub/scm/linux/kernel/git/peterz/queue=2Egit x8=
-6/core
->
->Changes since v1:
->
-> - complete rewrite of the fastop stuff
-> - HyperV tweaks (Michael)
-> - objtool changes (Josh)
->
->
->[1] https://lkml=2Ekernel=2Eorg/r/20250410154556=2EGB9003@noisy=2Eprogram=
-ming=2Ekicks-ass=2Enet
->[2] https://lkml=2Ekernel=2Eorg/r/20250410194334=2EGA3248459@google=2Ecom
->
+> Keep in mind that at runtime Guest can still do CPU hotplug using SBI
+> HSM start/stop and do system suspend using SBI SUSP so we should
+> continue to have VCPU reset requests for both these SBI extensions.
 
-We do have a table of handlers higher up in the stack in the form of the d=
-ispatch tables for FRED=2E They don't in general even need the assembly ent=
-ry stubs, either=2E
+Will do, thanks.
 
