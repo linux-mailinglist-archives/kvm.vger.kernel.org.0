@@ -1,247 +1,208 @@
-Return-Path: <kvm+bounces-44954-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44955-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE993AA524B
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 18:58:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80496AA5259
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 19:01:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE46E9E36B2
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 16:58:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 602917B05D0
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 17:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42542274676;
-	Wed, 30 Apr 2025 16:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A21281E25E8;
+	Wed, 30 Apr 2025 17:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="neXuVFi0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XZVYPC9B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B336326C3B5
-	for <kvm@vger.kernel.org>; Wed, 30 Apr 2025 16:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543FEB674
+	for <kvm@vger.kernel.org>; Wed, 30 Apr 2025 17:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746032247; cv=none; b=di8y/r9WZzph6kj/Hi9Qs86yDN8Dfjf3j6d24rCz0nlAIHDxnQkrMQ6Rad9sIrK8wm+/6AGmoi+lkjlrSIyX9NlK37LNak7bQsByfjHl2zyotsrALWKpRcdp1aVWmove1w8cAK7GmzWFdZNkonwi/68g5ATYLPLGygBLdcEHngs=
+	t=1746032493; cv=none; b=PnUWK/6048ExkMH27oNdUP4Eghi1XyEDAb02zQ8kgjk6CYZm/9ByEMYtKEBVlIMY2QeNsobQ2AraiGKLGBEQx/oQ0XwxqVaRNRZzfbxECtsRAStmBnlgOI1D1+yGCbJVV01tDf9Mqaof72jlDLqwM/49Xv9Kj2zAbC2ExTOxNnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746032247; c=relaxed/simple;
-	bh=vZStTZsulyc+ysdbGqR4Q/xfgj4kkZUoRlaRm5P3XVM=;
+	s=arc-20240116; t=1746032493; c=relaxed/simple;
+	bh=Jw16o+DWWMk5L5htTB+2+9MEZXqx6dLp72BB7nLRi4w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Wpo7Q/jqrT8IkW7CrLTwxBEmreczdjvcQ+QrwIEwyEyt6viN/aoZjhopcb7J/lP8SQoOo8VCfcKz3iSTXUaL8XOXJ+w3LfbKhdfIy2C23Ik+TQ4kdoFey1Yf6cm+Ye9lzMFgyQtVDKZGc5gqZ1OWVEp7s517tfiGDtvOwbycae8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=neXuVFi0; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=ekR0+dbiPGeD0SG+Z4iMHTA3g5iP+XBsaW6SjEB7f4vCvcYI7rtZa1XdJxpYdOx2SPl6lC2/4PrptneHapWZwV1Fu5mCKwqCpMjLvJ59cqDLqEYTpDzfO4hdlgEGEmblWgg9eaC87d9rSIasHMIaC/A3hJEcKFB1423tmQLmNXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XZVYPC9B; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43d01024089so106995e9.1
-        for <kvm@vger.kernel.org>; Wed, 30 Apr 2025 09:57:25 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3085f5855c4so103945a91.1
+        for <kvm@vger.kernel.org>; Wed, 30 Apr 2025 10:01:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746032244; x=1746637044; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1746032491; x=1746637291; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+9uoDx+86QSTziNQV39E2QQb4dm1IuLCuTSYjONJ8/4=;
-        b=neXuVFi0iJoGUYZwtYcAOUalXqG4NwIlC3TLRi0PjgUPzlV11KfxzkchoYBEaEb2En
-         p5nhmY8TFxotpoym/uHiC0W0+krllJaXSUJLCSuEd2ObMvoP0ws1KkZq+oKaChDoKsjj
-         Oa+1YnA0k0XIX0ddXrgYMyHBUpgf1tJfVBBeSP7jnkPcR+v+0ihG3WlxKlh+es2W8ZYd
-         HxTtA4aY26tnafReEAqt4T3/piDmz7Sr/Y4yMgLTt2j+K+tti7mEg/TEhKCRAbTm5wow
-         8970hFhHjQf+WWxAe1icWQm49Jl6gnoRKcZDQAgWeGYUzO/4Qx+p53tb+tABOwHl42fT
-         uEQw==
+        bh=URk21pnT/XOSFzAg25G44Je9n7xhg0j0WDExK+T2XSo=;
+        b=XZVYPC9Bk74QJw13Z2cxih8MGfH8WsYC/EZg0caZoObVb+Jpmb5glmLHhOPMWEl3t1
+         91IwNSW5pL7mCTC1wYv090i+q83cN91JgS+qIb2aecMZ5ASpZ4oKyqK763fbXn12kKP0
+         a5QfBkGGbQRj3F3hpFarKT8dmSBRTaGoUJ3lkRc+yW+S3xd1QcOZO5UXdUgaVnDdHit3
+         jVBNpVNAhROHEooknQe5FaUcqqEHjXPT+Q5ZirM25UKwRZe+UZyOa2dhSBv5efeGAmub
+         vnJWxw7OiDtLHXC69D9ayxU1BiStwEnHCLKfKL0mMh0jNPBi3ISenhXY25sNmP9V5Zne
+         YezQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746032244; x=1746637044;
+        d=1e100.net; s=20230601; t=1746032491; x=1746637291;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+9uoDx+86QSTziNQV39E2QQb4dm1IuLCuTSYjONJ8/4=;
-        b=b6fP/sy2BWlZZag0EBTYy7YS8gQml545Tchyi7RgPv0Zb1wZ8vKN5jMiGGIHFHMbMw
-         DfDBGdsu/Ee6Ur+OKoe/EWokh3eAapj03fY16NSAPxBDzoO5IYi5sHMeDXDJ5P2HhLCz
-         NjVygaXt2riAPyKyyjbPe7yaWRFsemhgSDSaa5OsIbLeIP/lEc6SgKzB8PZhUwH48sE/
-         XkFrLaPC9e3rdf/bGaz4Xjxy8HIPU4zhFC9NDtbVG9YsBSCEkGoTTuufu2OyyG5MKInS
-         qfer23xAZxo49fhIaLPMBahVk4fD5h4N1S2htSMZyg4XbbsKMSp6qL/NG5RJnV04PFbI
-         FVDg==
-X-Gm-Message-State: AOJu0YwVBMGutFX2LIc+wO8EtQJuf9ZGy62+PgZPPJY9RI7tAGzbBClD
-	Af43TlTD5oXZNcSKZjiQuqDVRz8scr4GoV1IGEHl/fSUN68xt3Ty6PMX7+L8MDqNHCGz+1H/vp5
-	3RLiYp/SC8jBkY/RKeflO+9KWuQXvLchgfPVCRJcxvzbyjQcyLvhrKhN1FTCbwDnMwd2mO64M3t
-	BMhppQzl5nY+D7kJJmQanzHWc=
-X-Google-Smtp-Source: AGHT+IFDpTzi9FcOVjJwpujZOVhPqGqNNrby7RROx+UeO014EyEnbkZ/iK1EmHM4+ksMKNW3EMqbqBmh0g==
-X-Received: from wmqc15.prod.google.com ([2002:a05:600c:a4f:b0:43c:fce2:1db2])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:384a:b0:43c:ec28:d31b
- with SMTP id 5b1f17b1804b1-441b263a413mr38860435e9.10.1746032244111; Wed, 30
- Apr 2025 09:57:24 -0700 (PDT)
-Date: Wed, 30 Apr 2025 17:56:55 +0100
-In-Reply-To: <20250430165655.605595-1-tabba@google.com>
+        bh=URk21pnT/XOSFzAg25G44Je9n7xhg0j0WDExK+T2XSo=;
+        b=gd2QWjyea3J3jbz5+KX8KTjCScnD4qnDqvCDy5FXkPnknQue46t2QspO5Y7vUWs9iM
+         i6T3lmk00QbUIC0LT+OdqsJ+KQ3vUDqEo633270Uruwp+83Vr2gKzEODi2+OxdSoCgzG
+         BXvUFS65MvOPIeWIqbk80TNrLr2a72DuvLprbsU5ROAzfiVkpF3G+ImRNlJ/+iGpi56l
+         LrJv20ERscPJNBoaWXLzF1yz1BZQbGMbFP5HrHTwDAxF6jFGpLwxivjwu6KYQYJCYsqO
+         mns4Q2r9qYAuwLTrHGXb1s8C294VAy24mhDE5+SA9HlUqHhKY671PJzRx3nUYwsGXprT
+         lOyg==
+X-Gm-Message-State: AOJu0Yz4+PGlT1cCAa+LUIOnLfgGtBUzqhU6/0ixTetID1WCDtgSmySu
+	Ixon3K3JjP3jp9V5UHDj56c45hzKjd98yL1pUOjZJ8wVp7BUTSDPJckocKroYCMn6BpYhqjL03n
+	y6Q==
+X-Google-Smtp-Source: AGHT+IESEXuF+9+pwH1wKZ+9NbO7EwNOG2NYsEaw3R2SqqKDBeSnQYLSAYuo2qganDUT53HrDY6m/tsSN3o=
+X-Received: from pjbsk13.prod.google.com ([2002:a17:90b:2dcd:b0:2ea:9d23:79a0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c02:b0:2ff:4e90:3c55
+ with SMTP id 98e67ed59e1d1-30a3335eeb7mr5473897a91.27.1746032491582; Wed, 30
+ Apr 2025 10:01:31 -0700 (PDT)
+Date: Wed, 30 Apr 2025 10:01:29 -0700
+In-Reply-To: <20250222005943.3348627-2-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250430165655.605595-1-tabba@google.com>
-X-Mailer: git-send-email 2.49.0.967.g6a0df3ecc3-goog
-Message-ID: <20250430165655.605595-14-tabba@google.com>
-Subject: [PATCH v8 13/13] KVM: guest_memfd: selftests: guest_memfd mmap() test
- when mapping is allowed
-From: Fuad Tabba <tabba@google.com>
-To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+References: <20250222005943.3348627-1-vipinsh@google.com> <20250222005943.3348627-2-vipinsh@google.com>
+Message-ID: <aBJXabTuiJyRZb-O@google.com>
+Subject: Re: [PATCH 1/2] KVM: selftests: Add default testfiles for KVM
+ selftests runner
+From: Sean Christopherson <seanjc@google.com>
+To: Vipin Sharma <vipinsh@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, 
+	anup@brainfault.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
+	imbrenda@linux.ibm.com, maz@kernel.org, oliver.upton@linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-Expand the guest_memfd selftests to include testing mapping guest
-memory for VM types that support it.
+On Fri, Feb 21, 2025, Vipin Sharma wrote:
+> Create a root "testcases" folder in KVM selftests directory. Add test
+> files for all of the KVM selftests across all of the supported
+> platforms.  Write only default test execution command in the test files.
+> Commands written in the test files will be ran by KVM selftest runner.
+> 
+> Test files are organized based following rules:
+> 1. All test files resides in "testcases" directory.
+> 2. Test files should have .test extension. This is needed so that
+>    git doesn't ignore the test file changes.
+> 3. Each KVM selftest resides in a folder in "testcases" directory.
+>    It follows the path of KVM selftests directory. For example,
+>    kvm/x86_64/vmx_msrs_test.c will be in
+>    kvm/testcases/x86_64/vmx_msrs_tests directory.
+> 4. default.test name is reserved for the default command to execute the
+>    test.
+> 5. Different configuration of the tests should reside in their own test
+>    files under the same test directory. For example dirty_log_perf_test
+>    can have:
+>    - testcases/dirty_log_perf_test/default.test
+>    - testcases/dirty_log_perf_test/hugetlb1g.test
+>    - testcases/dirty_log_perf_test/disable_dirty_log_manual.test
+> 6. If there is an arch specific option of a common test then it should
+>    be specified under an arch name directory in the test directory. This
+>    will avoid test runner to execute the common test or its option on
+>    unsupported machine. For example:
+>    testcases/memslot_modification_stress_test/x86_64/disable_slot_zap_quirk.test
+> 
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
+>  tools/testing/selftests/kvm/.gitignore                         | 3 ++-
 
-Also, build the guest_memfd selftest for arm64.
+After spending a comical amount of time fiddling with the default testcases, I
+think I have a final opinion.
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |  1 +
- .../testing/selftests/kvm/guest_memfd_test.c  | 75 +++++++++++++++++--
- 2 files changed, 70 insertions(+), 6 deletions(-)
+We definitely auto-generate the default testcases.  Relying on the user to remember
+to add a testcase, and on the maintainer to remember to check for that, isn't a
+winning strategy.
+
+But, I do think we should commit the default.test files to the repository.  If
+they're ephemeral, then several problems arise:
+
+ 1. For out-of-tree builds, the default.test files should arguably be placed in
+    the OUTPUT directory.  But if/when we add curated testcases/, then we'll either
+    end up with multiple testcases/ directories (source and output), or we'll have
+    to copy testcases/ from the source to the output on a normal build, which is
+    rather gross.  Or we'd need e.g. "make testcases", which is also gross, e.g.
+    I don't want to have to run yet more commands just to execute tests.
+
+ 2. Generating default.test could overwrite a user-defined file.  That's firmly
+    a user error, but at least if they default.test files are commited, the user
+    will get a hint or three that they're doing things wrong.
+
+ 3. If the files aren't committed, then they probably should removed on "clean",
+    which isn't the end of the world since they're trivially easy to generate,
+    but it's kinda funky. 
+
+So, what if we add this to auto-generate the files?  It's obviously wasteful since
+the files will exist 99.9999999% of the time, but the overhead is completely
+negligible.  The only concern I have is if this will do the wrong thing for some
+build environments, i.e. shove the files in the wrong location.
 
 diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index f62b0a5aba35..ccf95ed037c3 100644
+index f62b0a5aba35..d94bb8330ad1 100644
 --- a/tools/testing/selftests/kvm/Makefile.kvm
 +++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -163,6 +163,7 @@ TEST_GEN_PROGS_arm64 += access_tracking_perf_test
- TEST_GEN_PROGS_arm64 += arch_timer
- TEST_GEN_PROGS_arm64 += coalesced_io_test
- TEST_GEN_PROGS_arm64 += dirty_log_perf_test
-+TEST_GEN_PROGS_arm64 += guest_memfd_test
- TEST_GEN_PROGS_arm64 += get-reg-list
- TEST_GEN_PROGS_arm64 += memslot_modification_stress_test
- TEST_GEN_PROGS_arm64 += memslot_perf_test
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index ce687f8d248f..bd35b56c90dc 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -34,12 +34,48 @@ static void test_file_read_write(int fd)
- 		    "pwrite on a guest_mem fd should fail");
- }
+@@ -198,6 +198,13 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH))
+ TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH))
+ LIBKVM += $(LIBKVM_$(ARCH))
  
--static void test_mmap(int fd, size_t page_size)
-+static void test_mmap_allowed(int fd, size_t total_size)
- {
-+	size_t page_size = getpagesize();
-+	const char val = 0xaa;
-+	char *mem;
-+	size_t i;
-+	int ret;
++$(foreach tc, $(TEST_PROGS), $(shell mkdir -p testcases/$(patsubst %.sh,%,$(tc))))
++$(foreach tc, $(TEST_GEN_PROGS), $(shell mkdir -p testcases/$(tc)))
++$(foreach tc, $(TEST_PROGS), \
++  $(shell echo $(tc) > $(patsubst %.sh,testcases/%/default.test,$(tc))))
++$(foreach tc, $(TEST_GEN_PROGS), \
++  $(shell echo $(tc) > $(patsubst %,testcases/%/default.test,$(tc))))
 +
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmaping() guest memory should pass.");
-+
-+	memset(mem, val, total_size);
-+	for (i = 0; i < total_size; i++)
-+		TEST_ASSERT_EQ(mem[i], val);
-+
-+	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
-+			page_size);
-+	TEST_ASSERT(!ret, "fallocate the first page should succeed");
-+
-+	for (i = 0; i < page_size; i++)
-+		TEST_ASSERT_EQ(mem[i], 0x00);
-+	for (; i < total_size; i++)
-+		TEST_ASSERT_EQ(mem[i], val);
-+
-+	memset(mem, val, total_size);
-+	for (i = 0; i < total_size; i++)
-+		TEST_ASSERT_EQ(mem[i], val);
-+
-+	ret = munmap(mem, total_size);
-+	TEST_ASSERT(!ret, "munmap should succeed");
-+}
-+
-+static void test_mmap_denied(int fd, size_t total_size)
-+{
-+	size_t page_size = getpagesize();
- 	char *mem;
+ OVERRIDE_TARGETS = 1
  
- 	mem = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
- 	TEST_ASSERT_EQ(mem, MAP_FAILED);
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT_EQ(mem, MAP_FAILED);
- }
- 
- static void test_file_size(int fd, size_t page_size, size_t total_size)
-@@ -170,19 +206,27 @@ static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
- 	close(fd1);
- }
- 
--int main(int argc, char *argv[])
-+unsigned long get_shared_type(void)
- {
--	size_t page_size;
-+#ifdef __x86_64__
-+	return KVM_X86_SW_PROTECTED_VM;
-+#endif
-+	return 0;
-+}
-+
-+void test_vm_type(unsigned long type, bool is_shared)
-+{
-+	struct kvm_vm *vm;
- 	size_t total_size;
-+	size_t page_size;
- 	int fd;
--	struct kvm_vm *vm;
- 
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
- 
- 	page_size = getpagesize();
- 	total_size = page_size * 4;
- 
--	vm = vm_create_barebones();
-+	vm = vm_create_barebones_type(type);
- 
- 	test_create_guest_memfd_invalid(vm);
- 	test_create_guest_memfd_multiple(vm);
-@@ -190,10 +234,29 @@ int main(int argc, char *argv[])
- 	fd = vm_create_guest_memfd(vm, total_size, 0);
- 
- 	test_file_read_write(fd);
--	test_mmap(fd, page_size);
-+
-+	if (is_shared)
-+		test_mmap_allowed(fd, total_size);
-+	else
-+		test_mmap_denied(fd, total_size);
-+
- 	test_file_size(fd, page_size, total_size);
- 	test_fallocate(fd, page_size, total_size);
- 	test_invalid_punch_hole(fd, page_size, total_size);
- 
- 	close(fd);
-+	kvm_vm_release(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+#ifndef __aarch64__
-+	/* For now, arm64 only supports shared guest memory. */
-+	test_vm_type(VM_TYPE_DEFAULT, false);
-+#endif
-+
-+	if (kvm_has_cap(KVM_CAP_GMEM_SHARED_MEM))
-+		test_vm_type(get_shared_type(), true);
-+
-+	return 0;
- }
--- 
-2.49.0.901.g37484f566f-goog
+ # lib.mak defines $(OUTPUT), prepends $(OUTPUT)/ to $(TEST_GEN_PROGS), and most
 
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 1d41a046a7bf..550b7c2b4a0c 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -9,4 +9,5 @@
+>  !config
+>  !settings
+>  !Makefile
+> -!Makefile.kvm
+> \ No newline at end of file
+> +!Makefile.kvm
+> +!*.test
+
+Let's keep the extension wildcards sorted alphabetically, i.e.:
+
+# SPDX-License-Identifier: GPL-2.0-only
+*
+!/**/
+!*.c
+!*.h
+!*.py
+!*.S
+!*.sh
+!*.test
+!.gitignore
+!config
+!settings
+!Makefile
+!Makefile.kvm
+
+> diff --git a/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test b/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test
+> new file mode 100644
+> index 000000000000..5db8723f554f
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test
+> @@ -0,0 +1 @@
+> +./aarch64/aarch32_id_regs
+
+I don't see any reason to make the paths directly consumable with a leading "./".
+Spoiler alert from the next patch: the location of the test executables needs to
+explicitly resolved by the test runner.
 
