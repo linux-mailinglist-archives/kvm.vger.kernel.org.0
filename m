@@ -1,88 +1,123 @@
-Return-Path: <kvm+bounces-44976-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44977-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F52AA547A
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 634C3AA5479
 	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 21:06:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B17753B4067
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 19:05:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8A225047D6
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 19:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD2226A1D9;
-	Wed, 30 Apr 2025 19:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52D52698BF;
+	Wed, 30 Apr 2025 19:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JJr6Mu0A"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mvuf2xRF"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4BE28399;
-	Wed, 30 Apr 2025 19:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70CF2B9A9
+	for <kvm@vger.kernel.org>; Wed, 30 Apr 2025 19:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746039969; cv=none; b=ViFbOwRD1sn7/4I43On0OfBvlJNF+8xXcVcYZWh16pfsyv3/MElX7iIHSa3VN+t81LiGiIm2P0DFgft0EBHlNiB3iVqhP6/i6keEQgYlnj0iNxEkS5RVgB96CL+lUFkup/0FiKU34KBfY5cMEy56ZTLgevG9QcoV/gXOW7aeoPI=
+	t=1746039981; cv=none; b=DKdQThW9488baurkb20ipuvU+eHCdsQAskDZ46VeLM3FHMFU50bgH1uCUd3XSrqxri4jBjDPK8cUM6Qfha/x87kj7SQPd7fb5yzE0d67+jW+1V4/TP/t/7H4LMIQsVyKDvjKZbVjB363wNcugerVyzGMp4B4xOSohhGnrYVVSAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746039969; c=relaxed/simple;
-	bh=HVTYUGB8B2dodtSKewK0K/BimvYomZ6GlzqFUH6W6GM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GHa9KsBrQxRJj5byBIc+OFDYgV9R1jZCChEeZPSfnldgc9aRgpik8bfuF73GwtPvqfagx4MtgI+4fmIsgGo/W3bPxVVUbpgFygDeXRjWLCndAs6vpCkOl0d6eiY9o3tBJdiOdimXV9Vv2/Q3MwxepRdwgvRPxjnhKRnc0vRVmIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JJr6Mu0A; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=shyzb66kCfe6GvSOT0DIWIKrBHWCmjZKqJTICSG4Hak=; b=JJr6Mu0AYxFe5sTs0QnftLDuzw
-	/3AP0FWOCAOjotk/UquIqNnaOARlEPZv5vEd2SN1XG4eQfkbSyk6A6F4AvZvJrnCEWBzNqaVJTI4z
-	XLm4oI5G16etLhak7enVjJ99O83+pmVTKva8d1I1HxdXbzVZV27udwyFX0WpbLrbWBjpThiqun/Iz
-	JkMfA1B2t8oQUhj1eR9qL73Qn8qGxnYMeo/Rm+odclhatt/Z0Q1/OeaXi5XjtDvZnkopW2oNxhFyY
-	8FJv5YDLJHoEG3vsHrBXhiFur2eDUI4pE+rOBJ2ZLY1hKVHsMimkth8p+f66XO+QsVxMxwpvkOub5
-	EerjtfsQ==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uACkq-0000000DZ3b-2v21;
-	Wed, 30 Apr 2025 19:06:00 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 579A2300642; Wed, 30 Apr 2025 21:06:00 +0200 (CEST)
-Date: Wed, 30 Apr 2025 21:06:00 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
-	wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	seanjc@google.com, pbonzini@redhat.com, ardb@kernel.org,
-	kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	gregkh@linuxfoundation.org, jpoimboe@kernel.org,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-efi@vger.kernel.org,
-	samitolvanen@google.com, ojeda@kernel.org, xin@zytor.com
-Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
- in __nocfi functions
-Message-ID: <20250430190600.GQ4439@noisy.programming.kicks-ass.net>
-References: <20250430110734.392235199@infradead.org>
- <8B86A3AE-A296-438C-A7A7-F844C66D0198@zytor.com>
+	s=arc-20240116; t=1746039981; c=relaxed/simple;
+	bh=qcksKdV5w13Rln4xlnTNEyq7J3OqvqFgwRXoJlYP/no=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HC3na6/heE5yefOhuhtF4INcUlCM7y+UwEHN8RuYWH+NsmYEXcT0eUyMIA0IH1xxJA2WssWlO9zZ/SRe60OZomTzC+OvILuVt0866r6fR4Il+Y0YVFnlGs845FRWXhcEDwqRb2H0Nx0YrMp9m2hjDPq+npx3bfa267iHIRymJmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mvuf2xRF; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b13e0471a2dso155274a12.2
+        for <kvm@vger.kernel.org>; Wed, 30 Apr 2025 12:06:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1746039979; x=1746644779; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OlVE7gl+CUw4uBk5E7cv6Cwlsk+3Ly8aETY/UIpTw9M=;
+        b=mvuf2xRF5tAFRA/iR8iq3j22TelgyItvIW8iVdzy5aTap244BdyiwuJXsJmOSrEpsO
+         4QNBPrglZvoli6jikBjt+R+D4KbuyN7Qi+MniI8sqKXAV2aQm+Fxoy8XEcd76LNBYN4p
+         A3OaxdfLpL5FwfE1cmqf1B8Iv35UaZ+dtDv3CXCU72T2DczXkoBpeY3ztclTtOmYXT8a
+         O3/66PH/Or5Fnu5jniF/fNCGSc2VEXyVfP4wy5LxIWC9AmjR0OaEKG/AYLcaxAK8oYvO
+         R0ix2/OsGDV6OJttbmlk9GNsZtmYoah4dEXsqvv2uTw03k7tqQ0szRnXmmgoD6qUHdOT
+         xJIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746039979; x=1746644779;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OlVE7gl+CUw4uBk5E7cv6Cwlsk+3Ly8aETY/UIpTw9M=;
+        b=hw1c6ebo/QFx2mCwIW7FarPvtR1QmUf1/5bT8e/XM7dx1xgHl+/JvV9t3ad+KFWw6o
+         Y7vABMJraEcYKDeAzERnAbNX+M0CNr4umgradGqrICMpSmZLFXukVCnOf6wNlakgwOTn
+         /QkWUccs7lI5jVqAknr30HzA544jzUy7oictwButF7I+4dSjdr6QYou4WsvlZdIE31fG
+         Lox7RXM1/j+DRr/GfcOisGDA0U/feXWdzOlxp5rVdctA7EUqb+Tu/DU8hD09jHIV4RMu
+         O4Z36Een0qndzyoZI50G+YdDtBfsm6T9Mp3NcufGl2csCsAN3LAdRfHlfpSuwU1oYx69
+         3qKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVPJj/6lApHlV7Of1ETLJeUs/l6ydVVjwY+baDXvJgIPdae6s66/hD2KWlm/C7HS4MjWaA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWAMHA0Et7XWCZ8DgGsXigKqZJ6iXtkBXChcLkGPkIbRJUfxEq
+	V0abMpQH/Jv5eRo+vULdcnOT7adsng766MMmkkSWm+RuXLtsg0wlgs3jg/Mb3/A=
+X-Gm-Gg: ASbGnctHK3m4FdZdOYtGxsqqUe5xcjgkdrINZJ+DHxJo6IJ/TfjU+LdUqh7Pn+xkT7y
+	PVeMjcU5Q6ZiRC3E5DGcO8UXNyF9JqJHVORQnMsqbk7nTknktVpPpUtEYs4+08qa73B7Y2zZgZj
+	LvMfjWfb0UiAjbM/Kg+BfKXNsnKOWA52YGAJPEmSf4zSZtGWXS4VXdrS3tKwVFT+10pIiVfv+Ey
+	WJSPXtXWu1u9dioa/c5jyIDwpQ2h4eTto2KF6w0MmFIjzWs4Ranpdr6iB5MSqC7+tB1gp3rLXKq
+	peCP8rdwoZ2niMHw05+8LW4v3EZzhidQPGo9jROeIoNGCKknbJQm/A==
+X-Google-Smtp-Source: AGHT+IGj5B6+DB2NaW+I5mAxRhlLboxIrcBkEvFW6E9iaGZb6qpzUxdVqI+SAgAnfIBrFAywlTIIXQ==
+X-Received: by 2002:a05:6a21:1511:b0:203:becd:f9ce with SMTP id adf61e73a8af0-20ba8e4bbe9mr461533637.39.1746039979042;
+        Wed, 30 Apr 2025 12:06:19 -0700 (PDT)
+Received: from [192.168.1.87] ([38.41.223.211])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b15f7ec3116sm11157941a12.31.2025.04.30.12.06.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Apr 2025 12:06:18 -0700 (PDT)
+Message-ID: <23d84ae9-5409-4022-a65b-0b0ffa5ff51a@linaro.org>
+Date: Wed, 30 Apr 2025 12:06:17 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8B86A3AE-A296-438C-A7A7-F844C66D0198@zytor.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 11/12] target/arm/cpu: compile file twice (user,
+ system) only
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ alex.bennee@linaro.org, anjo@rev.ng
+References: <20250430145838.1790471-1-pierrick.bouvier@linaro.org>
+ <20250430145838.1790471-12-pierrick.bouvier@linaro.org>
+ <e77b5c7d-5f6b-46e8-ad68-207ae87a07dc@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Content-Language: en-US
+In-Reply-To: <e77b5c7d-5f6b-46e8-ad68-207ae87a07dc@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 30, 2025 at 07:24:15AM -0700, H. Peter Anvin wrote:
+On 4/30/25 11:50 AM, Richard Henderson wrote:
+> On 4/30/25 07:58, Pierrick Bouvier wrote:
+>> +arm_common_system_ss.add(files('cpu.c'), capstone)
+> 
+> I wonder if we should inherit these dependencies from common_ss or system_ss?
+>
 
-> >KVM has another; the VMX interrupt injection stuff calls the IDT handler
-> >directly.  Is there an alternative? Can we keep a table of Linux functions
-> >slighly higher up the call stack (asm_\cfunc ?) and add CFI to those?
+I ran into the same issue when working on hw/arm [1], and didn't really 
+look for a way to do this from main meson.build.
+I thought that it's a good thing to document those kind of dependencies 
+next to the sources who depend on them, so I didn't dig too much.
+That said, I'm not opposed to it if you feel your approach is better.
 
-> We do have a table of handlers higher up in the stack in the form of
-> the dispatch tables for FRED. They don't in general even need the
-> assembly entry stubs, either.
+[1] hw/arm/meson.build
+-arm_ss.add(files('boot.c'))
++arm_common_ss.add(fdt, files('boot.c'))
+-arm_ss.add(when: 'CONFIG_MUSICPAL', if_true: files('musicpal.c'))
++arm_common_ss.add(when: 'CONFIG_MUSICPAL', if_true: [pixman, 
+files('musicpal.c')])
 
-Oh, right. I'll go have a look at those.
+> 
+> r~
+
 
