@@ -1,111 +1,146 @@
-Return-Path: <kvm+bounces-44917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8398EAA4DFE
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 16:00:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBB07AA4E73
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 16:25:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCEF49C3302
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 13:59:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30B4216CE50
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 14:25:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A1825E459;
-	Wed, 30 Apr 2025 14:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FD325EF9C;
+	Wed, 30 Apr 2025 14:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FbBbUVmN"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="G1ewDVEd"
 X-Original-To: kvm@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6F82512D9;
-	Wed, 30 Apr 2025 14:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6C521ABC6;
+	Wed, 30 Apr 2025 14:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746021610; cv=none; b=P80hAPf5b3ktteNiIJvd4KYgCIwQjNO8rLsfeRcaZKMJ0yI4fgyKWa+mC90+G157VXdVMkrdQFrwix2Ap6qOpYQxLH+/fwsjW4grHEEhCxI8HJCPEuAsSiuvEzZS0jcum8b3X6zQg+2ne99aGil5Mg7Js/ye/e/5djDUVIJqB0s=
+	t=1746023103; cv=none; b=IPgMKpISL5Yfm7hI54xHYv4wJAjTWKd2hmvVXIsr5Vk7qREpBuxrO5+qWM22EM4SuxCQlRPeRrcEAzUkMBaIvN7o9NQ2taco3Tk8gnIfbuQRBHLmL/YuVVcRbQijw3KiE+iwZB+pzPKSaZQvEpzi6uQnsa7cmliGZte4zWn8fvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746021610; c=relaxed/simple;
-	bh=jzKXco1InVJpT8YnddnfCznsHQ/xhGBSVeadGGk6FjQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E7ymVcRKUszMqa4Oa0qhosoOHv8PyQL47JUX9mDLAgs8Jix/F3/hHrFO+0bO9BP5Jzr2V9z9t4AvG/Yl/5p4doUA21Rbxufp863jijsAfnhnx99/3H6IsMUaq1ZHgJvj1fm7zSeIfRdZvqaMX3R0qrIOrYBFysIjkBANDCcPEXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FbBbUVmN; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=hp1dhRMiEEl3xs/2lDO5cInsDNc9pOFtlVo1nTqdIlw=; b=FbBbUVmNAG5SNipgjSq5IkJKVH
-	vvgl50G4wFhNJsVw1GMKgTZSpOtLq5Xs7C7+MxgvAJtjJFQR4d3ZZhDnFgn/XtW4XKlnKlL7EUWQH
-	0pKXg2MgJnGHcGTxr0vveMZcPK+3kcEZmUY+hbr97icxgYZPPsnsUS+hCimIhIhs9+gsh4AxfZk/c
-	Dtcop5nQLPyx+M6BZ9CBanmRo3sreSDnN4Dfu5ryrFRKlACSPxOwa4i7D/cWYpbrpRpC41G5uu1/v
-	w1dR2z5pz7Sv0V9mjMpP7HEG/U8en/Pom0XGayT6leUn+/E8NLzF3YmXS7eStzPi2004Z+nBS922M
-	Nvi5Zo/g==;
-Received: from [206.0.71.33] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uA7yp-0000000D40G-1cAx;
-	Wed, 30 Apr 2025 14:00:07 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: mst@redhat.com,
-	jasowang@redhat.com
-Cc: eperezma@redhat.com,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: [PATCH] vringh: use bvec_kmap_local
-Date: Wed, 30 Apr 2025 09:00:04 -0500
-Message-ID: <20250430140004.2724391-1-hch@lst.de>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1746023103; c=relaxed/simple;
+	bh=rjMvhhoHC1X7+lw3l2dB4rGD+6HMJz3GsS5ASyow71I=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=I0i1LuueXFVgdy2vc2anFJ0gnz7XJyx1o3WUBDhp6wTG8bnS3+8iBDw3BWuu+qYXYJoBtzKqMjP6nQJVN16bnDDtJ7sIjarrY3znJ52uh5hYL+auVSHUghHlasK2nrIXp8qDO4dQdCXOcDUPpDQokUEWwkXd56uAWfr4n265iS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=G1ewDVEd; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53UEOI5X931491
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 30 Apr 2025 07:24:18 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53UEOI5X931491
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1746023059;
+	bh=pQL8GxGCP0lOqhjZgQIjgeXZK6YREx5vQoMNpPTLrHU=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=G1ewDVEdQC6La4J5R7kMKwnkqVpNGebEjVhRdP8CbyAj4JzpaV+0lhKWzQgviR5Jz
+	 DnHGbQYWM0DUzo52eq8rHyuiP6ugp8H+u4HqECJ8ihkukboZW7TMa7IIrDAplGBmdO
+	 PnYBtM1FotSDGP0Bwmd3LQeqCgtZ+/DRE8sWb1QLo6aQbwVT8vaa4jQ32stDbGr9Pv
+	 oxP6dsv+CWX+tLfnoiF9XpDI0hZpikUo9GVld07MAjzYS/EGIUqWvWp07qhZNwt/Wg
+	 jHQIj1zz1GDMcwQqmZxnpwFKTpI2+0AEGA4hhTodBLWJXHWfh1l0J23ON/EjuigJld
+	 JJ/nQMjAp4l8g==
+Date: Wed, 30 Apr 2025 07:24:15 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Peter Zijlstra <peterz@infradead.org>, x86@kernel.org
+CC: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+        decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, seanjc@google.com,
+        pbonzini@redhat.com, ardb@kernel.org, kees@kernel.org,
+        Arnd Bergmann <arnd@arndb.de>, gregkh@linuxfoundation.org,
+        jpoimboe@kernel.org, peterz@infradead.org,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-efi@vger.kernel.org,
+        samitolvanen@google.com, ojeda@kernel.org, xin@zytor.com
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_00/13=5D_objtool=3A_Detect_and_wa?=
+ =?US-ASCII?Q?rn_about_indirect_calls_in_=5F=5Fnocfi_functions?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20250430110734.392235199@infradead.org>
+References: <20250430110734.392235199@infradead.org>
+Message-ID: <8B86A3AE-A296-438C-A7A7-F844C66D0198@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Use the bvec_kmap_local helper rather than digging into the bvec
-internals.
+On April 30, 2025 4:07:34 AM PDT, Peter Zijlstra <peterz@infradead=2Eorg> w=
+rote:
+>Hi!
+>
+>On kCFI (CONFIG_CFI_CLANG=3Dy) builds all indirect calls should have the =
+CFI
+>check on (with very few exceptions)=2E Not having the CFI checks undermin=
+es the
+>protection provided by CFI and will make these sites candidates for peopl=
+e
+>wanting to steal your cookies=2E
+>
+>Specifically the ABI changes are so that doing indirect calls without the=
+ CFI
+>magic, to a CFI adorned function is not compatible (although it happens t=
+o work
+>for some setups, it very much does not for FineIBT)=2E
+>
+>Rust people tripped over this the other day, since their 'core' happened =
+to
+>have some no_sanitize(kcfi) bits in, which promptly exploded when ran wit=
+h
+>FineIBT on=2E
+>
+>Since this is very much not a supported model -- on purpose, have objtool
+>detect and warn about such constructs=2E
+>
+>This effort [1] found all existing [2] non-cfi indirect calls in the kern=
+el=2E
+>
+>Notably the KVM fastop emulation stuff -- which I've completely rewritten=
+ for
+>this version -- the generated code doesn't look horrific, but is slightly=
+ more
+>verbose=2E I'm running on the assumption that instruction emulation is no=
+t super
+>performance critical these days of zero VM-exit VMs etc=2E
+>
+>KVM has another; the VMX interrupt injection stuff calls the IDT handler
+>directly=2E  Is there an alternative? Can we keep a table of Linux functi=
+ons
+>slighly higher up the call stack (asm_\cfunc ?) and add CFI to those?
+>
+>HyperV hypercall page stuff, which I've previously suggested use direct c=
+alls,
+>and which I've now converted (after getting properly annoyed with that co=
+de)=2E
+>
+>Also available at:
+>
+>  git://git=2Ekernel=2Eorg/pub/scm/linux/kernel/git/peterz/queue=2Egit x8=
+6/core
+>
+>Changes since v1:
+>
+> - complete rewrite of the fastop stuff
+> - HyperV tweaks (Michael)
+> - objtool changes (Josh)
+>
+>
+>[1] https://lkml=2Ekernel=2Eorg/r/20250410154556=2EGB9003@noisy=2Eprogram=
+ming=2Ekicks-ass=2Enet
+>[2] https://lkml=2Ekernel=2Eorg/r/20250410194334=2EGA3248459@google=2Ecom
+>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/vhost/vringh.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index 73e153f9b449..f8caa322bafa 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -1291,11 +1291,10 @@ static inline int getu16_iotlb(const struct vringh *vrh,
- 		if (ret)
- 			return ret;
- 	} else {
--		void *kaddr = kmap_local_page(ivec.iov.bvec[0].bv_page);
--		void *from = kaddr + ivec.iov.bvec[0].bv_offset;
-+		__virtio16 *from = bvec_kmap_local(&ivec.iov.bvec[0]);
- 
--		tmp = READ_ONCE(*(__virtio16 *)from);
--		kunmap_local(kaddr);
-+		tmp = READ_ONCE(*from);
-+		kunmap_local(from);
- 	}
- 
- 	*val = vringh16_to_cpu(vrh, tmp);
-@@ -1330,11 +1329,10 @@ static inline int putu16_iotlb(const struct vringh *vrh,
- 		if (ret)
- 			return ret;
- 	} else {
--		void *kaddr = kmap_local_page(ivec.iov.bvec[0].bv_page);
--		void *to = kaddr + ivec.iov.bvec[0].bv_offset;
-+		__virtio16 *to = kmap_local_page(&ivec.iov.bvec[0]);
- 
--		WRITE_ONCE(*(__virtio16 *)to, tmp);
--		kunmap_local(kaddr);
-+		WRITE_ONCE(*to, tmp);
-+		kunmap_local(to);
- 	}
- 
- 	return 0;
--- 
-2.47.2
-
+We do have a table of handlers higher up in the stack in the form of the d=
+ispatch tables for FRED=2E They don't in general even need the assembly ent=
+ry stubs, either=2E
 
