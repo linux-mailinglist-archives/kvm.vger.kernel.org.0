@@ -1,297 +1,212 @@
-Return-Path: <kvm+bounces-44908-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAA52AA49F3
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 13:29:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D84DFAA4991
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 13:12:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E15116DF3B
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 11:29:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 603617A921F
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 11:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AD625DD0A;
-	Wed, 30 Apr 2025 11:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B86524C099;
+	Wed, 30 Apr 2025 11:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W1jXDB8d"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="AOwFG/L1"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE69248F77;
-	Wed, 30 Apr 2025 11:26:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542A5189BAC;
+	Wed, 30 Apr 2025 11:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746012411; cv=none; b=iEwnlI/GcDKQ7pY/c5O28epAidwMQXrRgiWamcR1hLwL20BAn9OBeMDxZv0uwmY8A2WIdusLMCOWD47DpIGS/eTsb3XSkvnR2uZz6esuD41LHik4mi7hJbDG7iexA1j/Px7QQIocf94Z6zlhH+uXWUdXc0adC/+zn5d4UAAuc4s=
+	t=1746011532; cv=none; b=KVRFjDy9DAW3JwzbZoMnY7sBAZ0Z1NIwSA/3PPdjFQ8oDezyl9ZcqslSeskfzEu2usglQPQ9tkenrawUyPPo0mcdoL7HIyIhMcPBLzolrIn9bMNaMbGokOfHvEFvqIAjrCUUNaEX1/sFnQ37/4PqOZgaInNRIj3ieou1QOqAgbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746012411; c=relaxed/simple;
-	bh=9+/BuRDGAA6TLDb0yk7rHBW8mHDlaavPQl2vlVEAVkI=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type; b=khYqu/PxefYnawpXdg4WTkA971cWWv9IcRLPXQ0/o6QzTPy/LfgO6RnDOkNVwWUnIOtWO3TuQkj1UzTfJ66Te5TbB9xTOjfjC6ugl+xIxDu2QahRzBKdFNgoyU1ydVxwjFnX530H6+Q/QPIKebrO7ribaNEw2ggnfwvvZ3f/bas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=W1jXDB8d; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
-	Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:In-Reply-To;
-	bh=k9Ri4ZyqEibe0HpDT575gbrV5ZF8Kp/wefhRDjxVdRo=; b=W1jXDB8dLl80ZTVasLrOzMMEzh
-	nvwN1guUG/MrY2bLLuthDILrx8Ibgv6CJWPLpz5RouJhh1LnVsA7FH3OzBrgjDqTRwUj2A5NR+dfH
-	A9gBoUxEFgokwWwbM3xdPmqE+z+MmF6/Kv/YCpNb7bFDbmbrRHrabmPPZZcEPOVPN5CxVhoCymmzG
-	YeTmrD+7eYkUFrcEnXXOgSnHyTuoP2Mu/c7Cgl1K+uB0aBhA67topbnJgXxusnUvWIhICoNrA09QW
-	wTNQxOmcrHWCvC1vEZgE7Yp5KlsVeBmCsfEcWSXh8+mTopS1HAcHUojp5AESrS5oivzW6qA6SnOTZ
-	em/Kue3A==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1uA5aH-0000000Dm7z-0HsX;
-	Wed, 30 Apr 2025 11:26:37 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 0)
-	id 024933085D7; Wed, 30 Apr 2025 13:26:36 +0200 (CEST)
-Message-ID: <20250430112350.443414861@infradead.org>
-User-Agent: quilt/0.66
-Date: Wed, 30 Apr 2025 13:07:47 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: x86@kernel.org
-Cc: kys@microsoft.com,
- haiyangz@microsoft.com,
- wei.liu@kernel.org,
- decui@microsoft.com,
- tglx@linutronix.de,
- mingo@redhat.com,
- bp@alien8.de,
- dave.hansen@linux.intel.com,
- hpa@zytor.com,
- seanjc@google.com,
- pbonzini@redhat.com,
- ardb@kernel.org,
- kees@kernel.org,
- Arnd Bergmann <arnd@arndb.de>,
- gregkh@linuxfoundation.org,
- jpoimboe@kernel.org,
- peterz@infradead.org,
- linux-hyperv@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org,
- linux-efi@vger.kernel.org,
- samitolvanen@google.com,
- ojeda@kernel.org
-Subject: [PATCH v2 13/13] objtool: Validate kCFI calls
-References: <20250430110734.392235199@infradead.org>
+	s=arc-20240116; t=1746011532; c=relaxed/simple;
+	bh=OT0IiRoi8vRRVlKujREKg/KIF7uTyePc9jasTPN2g+A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ro+2+6PvyMaYGx8AKONrGwHq22/pE6ea66B2otc3XZf5L1gB9phfSFiFdX3SjKsvG+x9cxUYwbI6278MNbZ62wYg6dKB1w1Htk9ijt5RDBLYev9oTX1KHZ03HAsc5mSF+Qvo1QMHCTYtnRcXij1ih8n8fB1B3HunVlY2OEgfhc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=AOwFG/L1; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1uA5M8-006UX6-0C; Wed, 30 Apr 2025 13:12:00 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=XB7MNWZvjvw2hD4pCHc8vraylIasO9NgE5mAXAKsQ9E=; b=AOwFG/L1kAMDKat2X75H20AQXQ
+	8Vsnlt3uFMYbGWKSt5LcR5pyPxOK2TIRVaeU9pY74jPSxe1P5QcyORlKM9ic5PsdNUMprHrQWRuhp
+	GP4bQ7BbJGUUcQWujuSVmW/ARENmypDzq/1411qI62WWA2zV+i4Bub7fu5dAYCeJ1dd8otvAW+/La
+	ktWjupxMd3VCIVff2SOAYbh6UVNMvnR0sXFyz4mwOTj+Z//OB18nRiM1Wjg6fy8dUqEkIbOcbrPzm
+	dB72O0+1pjUxqrEDf70tMBKbQanSbtiYXcBWMsyLla5efTrogC0xm8/et6jy6TAf/OMovwHESv5+5
+	Uux13GQA==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1uA5M6-0006lV-Fl; Wed, 30 Apr 2025 13:11:58 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1uA5Lx-000xlG-Ui; Wed, 30 Apr 2025 13:11:50 +0200
+Message-ID: <f1943412-ccbf-4913-a5c5-818f0f586db1@rbox.co>
+Date: Wed, 30 Apr 2025 13:11:48 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/4] vsock: Move lingering logic to af_vsock
+ core
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20250430-vsock-linger-v3-0-ddbe73b53457@rbox.co>
+ <20250430-vsock-linger-v3-3-ddbe73b53457@rbox.co>
+ <oo5tmbu7okyqojwxt4xked4jvq6jqydrddowspz3p66nsjzajt@36mxuduci4am>
+ <fa71ef5e-7603-4241-bfd3-7aa7b5ea8945@rbox.co>
+ <CAGxU2F62CTUKVjuG9Fjo29E6uopVzOK8zgr+HwooqMr4V_RvLQ@mail.gmail.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <CAGxU2F62CTUKVjuG9Fjo29E6uopVzOK8zgr+HwooqMr4V_RvLQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Validate that all indirect calls adhere to kCFI rules. Notably doing
-nocfi indirect call to a cfi function is broken.
+On 4/30/25 12:37, Stefano Garzarella wrote:
+> On Wed, 30 Apr 2025 at 12:33, Michal Luczaj <mhal@rbox.co> wrote:
+>>
+>> On 4/30/25 11:36, Stefano Garzarella wrote:
+>>> On Wed, Apr 30, 2025 at 11:10:29AM +0200, Michal Luczaj wrote:
+>>>> Lingering should be transport-independent in the long run. In preparation
+>>>> for supporting other transports, as well the linger on shutdown(), move
+>>>> code to core.
+>>>>
+>>>> Guard against an unimplemented vsock_transport::unsent_bytes() callback.
+>>>>
+>>>> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>>>> ---
+>>>> include/net/af_vsock.h                  |  1 +
+>>>> net/vmw_vsock/af_vsock.c                | 25 +++++++++++++++++++++++++
+>>>> net/vmw_vsock/virtio_transport_common.c | 23 +----------------------
+>>>> 3 files changed, 27 insertions(+), 22 deletions(-)
+>>>>
+>>>> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>>>> index 9e85424c834353d016a527070dd62e15ff3bfce1..bd8b88d70423051dd05fc445fe37971af631ba03 100644
+>>>> --- a/include/net/af_vsock.h
+>>>> +++ b/include/net/af_vsock.h
+>>>> @@ -221,6 +221,7 @@ void vsock_for_each_connected_socket(struct vsock_transport *transport,
+>>>>                                   void (*fn)(struct sock *sk));
+>>>> int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk);
+>>>> bool vsock_find_cid(unsigned int cid);
+>>>> +void vsock_linger(struct sock *sk, long timeout);
+>>>>
+>>>> /**** TAP ****/
+>>>>
+>>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>>> index fc6afbc8d6806a4d98c66abc3af4bd139c583b08..946b37de679a0e68b84cd982a3af2a959c60ee57 100644
+>>>> --- a/net/vmw_vsock/af_vsock.c
+>>>> +++ b/net/vmw_vsock/af_vsock.c
+>>>> @@ -1013,6 +1013,31 @@ static int vsock_getname(struct socket *sock,
+>>>>      return err;
+>>>> }
+>>>>
+>>>> +void vsock_linger(struct sock *sk, long timeout)
+>>>> +{
+>>>> +    DEFINE_WAIT_FUNC(wait, woken_wake_function);
+>>>> +    ssize_t (*unsent)(struct vsock_sock *vsk);
+>>>> +    struct vsock_sock *vsk = vsock_sk(sk);
+>>>> +
+>>>> +    if (!timeout)
+>>>> +            return;
+>>>> +
+>>>> +    /* unsent_bytes() may be unimplemented. */
+>>>> +    unsent = vsk->transport->unsent_bytes;
+>>>> +    if (!unsent)
+>>>> +            return;
+>>>> +
+>>>> +    add_wait_queue(sk_sleep(sk), &wait);
+>>>> +
+>>>> +    do {
+>>>> +            if (sk_wait_event(sk, &timeout, unsent(vsk) == 0, &wait))
+>>>> +                    break;
+>>>> +    } while (!signal_pending(current) && timeout);
+>>>> +
+>>>> +    remove_wait_queue(sk_sleep(sk), &wait);
+>>>> +}
+>>>> +EXPORT_SYMBOL_GPL(vsock_linger);
+>>>> +
+>>>> static int vsock_shutdown(struct socket *sock, int mode)
+>>>> {
+>>>>      int err;
+>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>>> index 4425802c5d718f65aaea425ea35886ad64e2fe6e..9230b8358ef2ac1f6e72a5961bae39f9093c8884 100644
+>>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>>> @@ -1192,27 +1192,6 @@ static void virtio_transport_remove_sock(struct vsock_sock *vsk)
+>>>>      vsock_remove_sock(vsk);
+>>>> }
+>>>>
+>>>> -static void virtio_transport_wait_close(struct sock *sk, long timeout)
+>>>> -{
+>>>> -    DEFINE_WAIT_FUNC(wait, woken_wake_function);
+>>>> -    ssize_t (*unsent)(struct vsock_sock *vsk);
+>>>> -    struct vsock_sock *vsk = vsock_sk(sk);
+>>>> -
+>>>> -    if (!timeout)
+>>>> -            return;
+>>>> -
+>>>> -    unsent = vsk->transport->unsent_bytes;
+>>>> -
+>>>> -    add_wait_queue(sk_sleep(sk), &wait);
+>>>> -
+>>>> -    do {
+>>>> -            if (sk_wait_event(sk, &timeout, unsent(vsk) == 0, &wait))
+>>>> -                    break;
+>>>> -    } while (!signal_pending(current) && timeout);
+>>>> -
+>>>> -    remove_wait_queue(sk_sleep(sk), &wait);
+>>>> -}
+>>>> -
+>>>> static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
+>>>>                                             bool cancel_timeout)
+>>>> {
+>>>> @@ -1283,7 +1262,7 @@ static bool virtio_transport_close(struct vsock_sock *vsk)
+>>>>              (void)virtio_transport_shutdown(vsk, SHUTDOWN_MASK);
+>>>>
+>>>>      if (sock_flag(sk, SOCK_LINGER) && !(current->flags & PF_EXITING))
+>>>> -            virtio_transport_wait_close(sk, sk->sk_lingertime);
+>>>> +            vsock_linger(sk, sk->sk_lingertime);
+>>>
+>>> Ah, I'd also move the check in that function, I mean:
+>>>
+>>> void vsock_linger(struct sock *sk) {
+>>>       ...
+>>>       if (!sock_flag(sk, SOCK_LINGER) || (current->flags & PF_EXITING))
+>>>               return;
+>>>
+>>>       ...
+>>> }
+>>
+>> One note: if we ever use vsock_linger() in vsock_shutdown(), the PF_EXITING
+>> condition would be unnecessary checked for that caller, right?
+> 
+> Right, for shutdown it should always be false, so maybe better to keep
+> the check in the caller.
 
-Apparently some Rust 'core' code violates this and explodes when ran
-with FineIBT.
-
-All the ANNOTATE_NOCFI_SYM sites are prime targets for attackers.
-
- - runtime EFI is especially henous because it also needs to disable
-   IBT. Basically calling unknown code without CFI protection at
-   runtime is a massice security issue.
-
- - Kexec image handover; if you can exploit this, you get to keep it :-)
-
- - KVM, for the interrupt injection calling IDT gates directly.
-
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- arch/x86/kernel/machine_kexec_64.c  |    4 +++
- arch/x86/kvm/vmx/vmenter.S          |    5 ++++
- arch/x86/platform/efi/efi_stub_64.S |    4 +++
- drivers/misc/lkdtm/perms.c          |    5 ++++
- include/linux/objtool.h             |   10 ++++++++
- include/linux/objtool_types.h       |    1 
- tools/include/linux/objtool_types.h |    1 
- tools/objtool/check.c               |   41 ++++++++++++++++++++++++++++++++++++
- tools/objtool/include/objtool/elf.h |    1 
- 9 files changed, 72 insertions(+)
-
---- a/arch/x86/kernel/machine_kexec_64.c
-+++ b/arch/x86/kernel/machine_kexec_64.c
-@@ -421,6 +421,10 @@ void __nocfi machine_kexec(struct kimage
- 
- 	__ftrace_enabled_restore(save_ftrace_enabled);
- }
-+/*
-+ * Handover to the next kernel, no CFI concern.
-+ */
-+ANNOTATE_NOCFI_SYM(machine_kexec);
- 
- /* arch-dependent functionality related to kexec file-based syscall */
- 
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -363,5 +363,10 @@ SYM_FUNC_END(vmread_error_trampoline)
- .section .text, "ax"
- 
- SYM_FUNC_START(vmx_do_interrupt_irqoff)
-+	/*
-+	 * Calling an IDT gate directly; annotate away the CFI concern for now.
-+	 * Should be fixed if possible.
-+	 */
-+	ANNOTATE_NOCFI_SYM
- 	VMX_DO_EVENT_IRQOFF CALL_NOSPEC _ASM_ARG1
- SYM_FUNC_END(vmx_do_interrupt_irqoff)
---- a/arch/x86/platform/efi/efi_stub_64.S
-+++ b/arch/x86/platform/efi/efi_stub_64.S
-@@ -11,6 +11,10 @@
- #include <asm/nospec-branch.h>
- 
- SYM_FUNC_START(__efi_call)
-+	/*
-+	 * The EFI code doesn't have any CFI, annotate away the CFI violation.
-+	 */
-+	ANNOTATE_NOCFI_SYM
- 	pushq %rbp
- 	movq %rsp, %rbp
- 	and $~0xf, %rsp
---- a/drivers/misc/lkdtm/perms.c
-+++ b/drivers/misc/lkdtm/perms.c
-@@ -9,6 +9,7 @@
- #include <linux/vmalloc.h>
- #include <linux/mman.h>
- #include <linux/uaccess.h>
-+#include <linux/objtool.h>
- #include <asm/cacheflush.h>
- #include <asm/sections.h>
- 
-@@ -86,6 +87,10 @@ static noinline __nocfi void execute_loc
- 	func();
- 	pr_err("FAIL: func returned\n");
- }
-+/*
-+ * Explicitly doing the wrong thing for testing.
-+ */
-+ANNOTATE_NOCFI_SYM(execute_location);
- 
- static void execute_user_location(void *dst)
- {
---- a/include/linux/objtool.h
-+++ b/include/linux/objtool.h
-@@ -184,6 +184,15 @@
-  * WARN using UD2.
-  */
- #define ANNOTATE_REACHABLE(label)	__ASM_ANNOTATE(label, ANNOTYPE_REACHABLE)
-+/*
-+ * This should not be used; it annotates away CFI violations. There are a few
-+ * valid use cases like kexec handover to the next kernel image, and there is
-+ * no security concern there.
-+ *
-+ * There are also a few real issues annotated away, like EFI because we can't
-+ * control the EFI code.
-+ */
-+#define ANNOTATE_NOCFI_SYM(sym)		asm(__ASM_ANNOTATE(sym, ANNOTYPE_NOCFI))
- 
- #else
- #define ANNOTATE_NOENDBR		ANNOTATE type=ANNOTYPE_NOENDBR
-@@ -194,6 +203,7 @@
- #define ANNOTATE_INTRA_FUNCTION_CALL	ANNOTATE type=ANNOTYPE_INTRA_FUNCTION_CALL
- #define ANNOTATE_UNRET_BEGIN		ANNOTATE type=ANNOTYPE_UNRET_BEGIN
- #define ANNOTATE_REACHABLE		ANNOTATE type=ANNOTYPE_REACHABLE
-+#define ANNOTATE_NOCFI_SYM		ANNOTATE type=ANNOTYPE_NOCFI
- #endif
- 
- #if defined(CONFIG_NOINSTR_VALIDATION) && \
---- a/include/linux/objtool_types.h
-+++ b/include/linux/objtool_types.h
-@@ -65,5 +65,6 @@ struct unwind_hint {
- #define ANNOTYPE_IGNORE_ALTS		6
- #define ANNOTYPE_INTRA_FUNCTION_CALL	7
- #define ANNOTYPE_REACHABLE		8
-+#define ANNOTYPE_NOCFI			9
- 
- #endif /* _LINUX_OBJTOOL_TYPES_H */
---- a/tools/include/linux/objtool_types.h
-+++ b/tools/include/linux/objtool_types.h
-@@ -65,5 +65,6 @@ struct unwind_hint {
- #define ANNOTYPE_IGNORE_ALTS		6
- #define ANNOTYPE_INTRA_FUNCTION_CALL	7
- #define ANNOTYPE_REACHABLE		8
-+#define ANNOTYPE_NOCFI			9
- 
- #endif /* _LINUX_OBJTOOL_TYPES_H */
---- a/tools/objtool/check.c
-+++ b/tools/objtool/check.c
-@@ -2388,6 +2388,8 @@ static int __annotate_ifc(struct objtool
- 
- static int __annotate_late(struct objtool_file *file, int type, struct instruction *insn)
- {
-+	struct symbol *sym;
-+
- 	switch (type) {
- 	case ANNOTYPE_NOENDBR:
- 		/* early */
-@@ -2429,6 +2431,15 @@ static int __annotate_late(struct objtoo
- 		insn->dead_end = false;
- 		break;
- 
-+	case ANNOTYPE_NOCFI:
-+		sym = insn->sym;
-+		if (!sym) {
-+			ERROR_INSN(insn, "dodgy NOCFI annotation");
-+			break;
-+		}
-+		insn->sym->nocfi = 1;
-+		break;
-+
- 	default:
- 		ERROR_INSN(insn, "Unknown annotation type: %d", type);
- 		return -1;
-@@ -3998,6 +4009,36 @@ static int validate_retpoline(struct obj
- 		warnings++;
- 	}
- 
-+	if (!opts.cfi)
-+		return warnings;
-+
-+	/*
-+	 * kCFI call sites look like:
-+	 *
-+	 *     movl $(-0x12345678), %r10d
-+	 *     addl -4(%r11), %r10d
-+	 *     jz 1f
-+	 *     ud2
-+	 *  1: cs call __x86_indirect_thunk_r11
-+	 *
-+	 * Verify all indirect calls are kCFI adorned by checking for the
-+	 * UD2. Notably, doing __nocfi calls to regular (cfi) functions is
-+	 * broken.
-+	 */
-+	list_for_each_entry(insn, &file->retpoline_call_list, call_node) {
-+		struct symbol *sym = insn->sym;
-+
-+		if (sym && sym->type == STT_FUNC && !sym->nocfi) {
-+			struct instruction *prev =
-+				prev_insn_same_sym(file, insn);
-+
-+			if (!prev || prev->type != INSN_BUG) {
-+				WARN_INSN(insn, "no-cfi indirect call!");
-+				warnings++;
-+			}
-+		}
-+	}
-+
- 	return warnings;
- }
- 
---- a/tools/objtool/include/objtool/elf.h
-+++ b/tools/objtool/include/objtool/elf.h
-@@ -70,6 +70,7 @@ struct symbol {
- 	u8 local_label       : 1;
- 	u8 frame_pointer     : 1;
- 	u8 ignore	     : 1;
-+	u8 nocfi             : 1;
- 	struct list_head pv_target;
- 	struct reloc *relocs;
- };
-
+Or split it? Check `!sock_flag(sk, SOCK_LINGER) || !timeout` in
+vsock_linger() and defer `!(flags & PF_EXITING)` to whoever does the socket
+release?
 
 
