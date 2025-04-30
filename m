@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-44884-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44885-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42342AA485A
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 12:31:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73CC6AA485F
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 12:32:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B5C31C061DB
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 10:30:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1C854E538E
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 10:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A63C248F69;
-	Wed, 30 Apr 2025 10:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6DD259CBB;
+	Wed, 30 Apr 2025 10:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="LdSsqH6P"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="aOVwPP7O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615DA21ADAB;
-	Wed, 30 Apr 2025 10:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15F62580D5;
+	Wed, 30 Apr 2025 10:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746008951; cv=none; b=Dk/gQvG6G6RsE9LFcWq2J9WC+nv9j9Oca+OGv+kkh0ZbI+xzUULyH/G1o/Z9leGGvHwQXdKh247/0zxZ8heunEMLUKfps8TAqPaaWJiM/PGXJTG4Nn399jSywlmvMtn1xLFy9nMYjr2Q8nsswhLdma6wHPb4Zff9cdYIyE7Dvtc=
+	t=1746009004; cv=none; b=jydQvbe14ztPhObD+3usM1ljqPE6co+dIAzf786qrb2Ycw1ShRsbg2hTYVvFR/+77ewPcLKlFISBvIHEWoleJ/ZGLqDy7OXRxBxI3839Pi0eak/5apb0hayV/2zXWug1KfKPW5eXxvUhCjxDyblvFksRjO4Bk6RjS28keR2m3Qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746008951; c=relaxed/simple;
-	bh=pM465M1gUSTXgy6ApQoIj3s3S8XdAFXFLP63XZjXkIU=;
+	s=arc-20240116; t=1746009004; c=relaxed/simple;
+	bh=MAE9f1a8znhsgmjczgjHcCGcpadDQnbRn9xuQ+IxlCU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YXjpt/aROIDc6GxNaeWyPXS1jU18XLqN2nUL890S3727LClgFhLJKAkh8uyrlhc5yDgZ6qfrxGQcGIWfSLv4mzljfDRAl+Sw36V/QOMLeQ9f4hYb9uHtNr8MMAmsYA+VUtibN4IvqBZinsg9LgcDzFzIKXl9Y3m38GEGdI1KEV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=LdSsqH6P; arc=none smtp.client-ip=185.226.149.37
+	 In-Reply-To:Content-Type; b=NagvHcl4aTupJ4dE2asT1v0Izk8O/vKk8qoh4wR15c9YoaZOvhsccjyMhdgO3FOL5GkYh9AQ3lSc6mReXDJJDOvhhgvE5jz7jDXwogXT2tNLMkUqbsBcxKfpWX/ILDgSOYbcbzftaPB0IfRfNuxQrqUAthu4PaKFcd29jsNLKH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=aOVwPP7O; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
 Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1uA4gV-006P72-D9; Wed, 30 Apr 2025 12:28:59 +0200
+	id 1uA4hT-008vCi-Ee; Wed, 30 Apr 2025 12:29:59 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
 	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=a3Vdz3L4ux7x7a4EC16mwI0DPhJL1mCNStK+TchLXCQ=; b=LdSsqH6PQV5lBPEFpd380a9iBv
-	3wUCeW0lZoKH7+NmJsST7dEpjZraxwXsKWx+OKKyLEhG7gYhu0OMSCUzTZsFhjydyHUfBrMjEdxno
-	m5YGYSIbO2o78XXRLJ4NoAEBuHCCSd1c8nhV6qGKi/iWc+14ernge0M9TnNNB0qMqLt8oyUSl0fsO
-	pVDcFvpy47kfbdQ56mx+yKnQLw51Yg0AqBVPlOyJi49ubNLwD9ca5AgClNAS4HGdW4rSANbSwStZS
-	3jRGuj0lAO4l0ndqZ7S/61F7LDZC3/JMrSjCoNoWmWQMQWILPR0PWo46SX1CiMjxsitiP7ughARaO
-	TBSA0dyA==;
+	bh=P0KVKoqq56G7B/JYTEokhLyObIUsyyvZ16dMXwpB2zo=; b=aOVwPP7OUx3KgXBVklCghQwJJO
+	D1tKdzi71G8B4mEolMukLeJhoRoMlkxY23V642siab0d5JFuzheHrnw35eehlhMAFXt9iFgaIZpbB
+	KX3oVVWhzW7/8o/RdDIHmiu5uTq7ADKFwm9ZsKu63e2QejwwPjzjfLqM0CARTW8ARe0Y4GrjHYz3n
+	2qhm6cOUATu9YZ7P7O9LFbvSDgh9+uxMZBUjvNlgm7Ccni3Hpnn//juqKyIxzxoG3sYiG8U5Ll2O3
+	L/TWAboV8fmSVoORbncBHeHiUCCNt1h6YYROs+0x1XuV7jIXFFt+FbKqEyC9XHFHpuAhLfP8cplTk
+	gMcvVwdA==;
 Received: from [10.9.9.74] (helo=submission03.runbox)
 	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1uA4gU-0004EV-Ae; Wed, 30 Apr 2025 12:28:58 +0200
+	id 1uA4hS-0004Gm-CU; Wed, 30 Apr 2025 12:29:58 +0200
 Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1uA4gM-000mo7-DV; Wed, 30 Apr 2025 12:28:50 +0200
-Message-ID: <23bcd402-86f9-4c05-bb83-360c8e4438fc@rbox.co>
-Date: Wed, 30 Apr 2025 12:28:48 +0200
+	id 1uA4hG-000n2Y-2B; Wed, 30 Apr 2025 12:29:46 +0200
+Message-ID: <1b24198d-2e74-43b5-96be-bdf72274f712@rbox.co>
+Date: Wed, 30 Apr 2025 12:29:44 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -61,7 +61,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/4] vsock/virtio: Linger on unsent data
+Subject: Re: [PATCH net-next v3 2/4] vsock/virtio: Reduce indentation in
+ virtio_transport_wait_close()
 To: Stefano Garzarella <sgarzare@redhat.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -72,58 +73,25 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  virtualization@lists.linux.dev, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 References: <20250430-vsock-linger-v3-0-ddbe73b53457@rbox.co>
- <20250430-vsock-linger-v3-1-ddbe73b53457@rbox.co>
- <x3kkxnrqujqjkrtptr2qdd3227ncof2vb7jbrcg3aibvwjfqxa@hbinpxjuk3qe>
+ <20250430-vsock-linger-v3-2-ddbe73b53457@rbox.co>
+ <dlk4swnprv52exa3xs5omo76ir7e3x5u7bwlkkuecmrrn2cznm@smxggyqjhgke>
 Content-Language: pl-PL, en-GB
 From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <x3kkxnrqujqjkrtptr2qdd3227ncof2vb7jbrcg3aibvwjfqxa@hbinpxjuk3qe>
+In-Reply-To: <dlk4swnprv52exa3xs5omo76ir7e3x5u7bwlkkuecmrrn2cznm@smxggyqjhgke>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/30/25 11:26, Stefano Garzarella wrote:
-> On Wed, Apr 30, 2025 at 11:10:27AM +0200, Michal Luczaj wrote:
->> Currently vsock's lingering effectively boils down to waiting (or timing
->> out) until packets are consumed or dropped by the peer; be it by receiving
->> the data, closing or shutting down the connection.
->>
->> To align with the semantics described in the SO_LINGER section of man
->> socket(7) and to mimic AF_INET's behaviour more closely, change the logic
->> of a lingering close(): instead of waiting for all data to be handled,
->> block until data is considered sent from the vsock's transport point of
->> view. That is until worker picks the packets for processing and decrements
->> virtio_vsock_sock::bytes_unsent down to 0.
->>
->> Note that (some interpretation of) lingering was always limited to
->> transports that called virtio_transport_wait_close() on transport release.
->> This does not change, i.e. under Hyper-V and VMCI no lingering would be
->> observed.
->>
->> The implementation does not adhere strictly to man page's interpretation of
->> SO_LINGER: shutdown() will not trigger the lingering. This follows AF_INET.
->>
->> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->> ---
->> net/vmw_vsock/virtio_transport_common.c | 8 ++++++--
->> 1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> index 7f7de6d8809655fe522749fbbc9025df71f071bd..49c6617b467195ba385cc3db86caa4321b422d7a 100644
->> --- a/net/vmw_vsock/virtio_transport_common.c
->> +++ b/net/vmw_vsock/virtio_transport_common.c
->> @@ -1196,12 +1196,16 @@ static void virtio_transport_wait_close(struct sock *sk, long timeout)
->> {
->> 	if (timeout) {
->> 		DEFINE_WAIT_FUNC(wait, woken_wake_function);
->> +		ssize_t (*unsent)(struct vsock_sock *vsk);
->> +		struct vsock_sock *vsk = vsock_sk(sk);
->> +
->> +		unsent = vsk->transport->unsent_bytes;
+On 4/30/25 11:28, Stefano Garzarella wrote:
+> On Wed, Apr 30, 2025 at 11:10:28AM +0200, Michal Luczaj wrote:
+>> Flatten the function. Remove the nested block by inverting the condition:
+>> return early on !timeout.
 > 
-> Just use `virtio_transport_unsent_bytes`, we don't need to be generic on 
-> transport here.
+> IIUC we are removing this function in the next commit, so we can skip 
+> this patch IMO. I suggested this change, if we didn't move the code in 
+> the core.
+Right, I remember your suggestion. Sorry, I'm still a bit uncertain as to
+what should and shouldn't be done in a single commit.
 
-All right.
-
-Thanks
+Michal
 
 
