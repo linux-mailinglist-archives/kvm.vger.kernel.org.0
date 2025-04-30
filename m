@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-44886-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44887-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F87BAA4871
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 12:34:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6581AA48AF
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 12:38:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 779521B613E5
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 10:32:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 689CB4E529F
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 10:37:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A23248F6F;
-	Wed, 30 Apr 2025 10:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C0925A320;
+	Wed, 30 Apr 2025 10:33:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="bgR4oOEG"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="UtOkDoEh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F2421ADAB;
-	Wed, 30 Apr 2025 10:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199ABEC2;
+	Wed, 30 Apr 2025 10:33:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746009046; cv=none; b=u13RPc55xydu49PSOJMR1fb8l/vUFlx+fDfOHluq4n2HF3ahZ1Fgi17rfKFo77yn3qJAtH+QyMzIHNtHKUxoPaLrdf6xkue9HjUY4SfhvqmXE/ufTDeWChAXvFrcATz+Om2jHlyANgSiQ6r26DukWclXC3svvQNy2u16HZHVDmc=
+	t=1746009222; cv=none; b=IVJ/d4tjL8qytnUKdhpJoiD+yaAq2V69tavy/wVTqNYP+WQxg9muW8fNuRHEKLSdiDs5o2vZx82jBZXir8l2ht7VWhTKB1tNn13m3fAWUg9jgpMKLPW7IwxgjWjeGeuk6CIw2tFGvcmryLw9wCB7JNzUnr50hAoyYGjxshabWCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746009046; c=relaxed/simple;
-	bh=TxM+V5dYOFTWJ0bCfOaqPYVRA3R8pttwwxurIrD9WHE=;
+	s=arc-20240116; t=1746009222; c=relaxed/simple;
+	bh=4NWCp9S1XMBq7XqKcv0nEa7YDA1nkdkl4JRgjdSone8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=utysE9ZoohVJZW6zERSg9CJuKYU/HCadWG8JqyeJjS5ALM/d/o7kbZozP6EY4hbmFzaEWVoFbuv3e3zjroUc8vriv7cWmYSR6qfa/XkF6ujAgisYog5OjhgerJwFZ/lbffyym5UUTc14b1s1h5QaaHRSlEC3Ad02lOcfi1c3sGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=bgR4oOEG; arc=none smtp.client-ip=185.226.149.37
+	 In-Reply-To:Content-Type; b=uNM5beLZtlaHG3FgYphPgNUTFJkVTqEweuWqi2aJ5oqIBtSgGgUIxg48S2XzGsPkbW7zp8O+T7O/plp2xgk4SXj6+Va/wXImotZtwMus1HQXXXV0sH/S3kemHFwTBNVqQzG8OYBEkINg7+Bk4K+AYGZ55AcF6CWHalTA6top9ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=UtOkDoEh; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1uA4i3-006PLf-S4; Wed, 30 Apr 2025 12:30:35 +0200
+	id 1uA4kx-008vds-4h; Wed, 30 Apr 2025 12:33:35 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
 	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=GnPH0ihymA5hwTrx+YQBYVDBtTayw/0GWDJmjjYsRhY=; b=bgR4oOEGPyjfBo3oU5mZi4AuuY
-	ixVaOdfIfYOrtC6bavNB8EcFqrw80TkfbDyGUO28Untbb/TTFbQHPYsJ3/Z4uuXtUiEV+asRJ9wZD
-	mGs43nPrMraN6ZoikaXp8Y+8vsB/lJUZMlQ3Aq+LLF4BuQ0qOw0FEKCZO6FsTZyKbqFLblDfJx6Lr
-	JzJcmJyLrPg3zK2D7IRYfHDHefs4nupMYP9JmjXY6uXUq/OHJYH52y6KxqIZeM6vOyQL2qNTALXCu
-	Qz724cgYDUnHolI4xT4uor9nC5ONvXiybwdaiZecXOT0vTZSDLr5cILMYUuMIzellyN0CM4fVikAE
-	STi36WAA==;
+	bh=zUZM6N9l2mBWHjRXXpBLPft+3y03NrkhBpUa/Y86ZYw=; b=UtOkDoEhF7Ax7brGpkuhHjSefQ
+	Dg5nPd+TwGR4O8fnSMxZ3/zZAosW0517o7NLQ8SGfez1EoIxrweuJnlHL8SXEikgLQNohW2aej+xV
+	bz9vaMa7HY5RKhtVyLZ1mSjXxT8Wy/D0YyDHtaORzYTa9phklS1lDT1wGKhCPEA58zNXzslFj7bJh
+	R/QOyPKy6EDwLCM1iyDci8IQ1aC4PffJuux4lxWIMSId/qY1+EVCPhKDCj79P2Z6Uwxmt8J2aVPA8
+	FSM72nE5UMTwh76tuziwoGzqGb3uVCxN3eftMLsBppcMrXarFNvaHAbal/kJxzcB8BRKG9GV0od15
+	W4utw8yA==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1uA4i2-0003Jn-Lh; Wed, 30 Apr 2025 12:30:34 +0200
+	id 1uA4kw-0004aD-BP; Wed, 30 Apr 2025 12:33:34 +0200
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1uA4hi-00Cdcx-1G; Wed, 30 Apr 2025 12:30:14 +0200
-Message-ID: <cc2d5c7c-a031-402d-b2d7-fe57fa0bf321@rbox.co>
-Date: Wed, 30 Apr 2025 12:30:12 +0200
+	id 1uA4kp-00Cec2-U6; Wed, 30 Apr 2025 12:33:28 +0200
+Message-ID: <fa71ef5e-7603-4241-bfd3-7aa7b5ea8945@rbox.co>
+Date: Wed, 30 Apr 2025 12:33:26 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -74,14 +74,14 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 References: <20250430-vsock-linger-v3-0-ddbe73b53457@rbox.co>
  <20250430-vsock-linger-v3-3-ddbe73b53457@rbox.co>
- <kz3s5mu7bc5kqb22g6voacrinda3wszwhlda7nnwhm5bciweuc@dpsyq2yfrs7f>
+ <oo5tmbu7okyqojwxt4xked4jvq6jqydrddowspz3p66nsjzajt@36mxuduci4am>
 Content-Language: pl-PL, en-GB
 From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <kz3s5mu7bc5kqb22g6voacrinda3wszwhlda7nnwhm5bciweuc@dpsyq2yfrs7f>
+In-Reply-To: <oo5tmbu7okyqojwxt4xked4jvq6jqydrddowspz3p66nsjzajt@36mxuduci4am>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/30/25 11:33, Stefano Garzarella wrote:
+On 4/30/25 11:36, Stefano Garzarella wrote:
 > On Wed, Apr 30, 2025 at 11:10:29AM +0200, Michal Luczaj wrote:
 >> Lingering should be transport-independent in the long run. In preparation
 >> for supporting other transports, as well the linger on shutdown(), move
@@ -184,14 +184,21 @@ On 4/30/25 11:33, Stefano Garzarella wrote:
 >> -		virtio_transport_wait_close(sk, sk->sk_lingertime);
 >> +		vsock_linger(sk, sk->sk_lingertime);
 > 
-> What about removing the `sk->sk_lingertime` parameter here?
-> vsock_linger() can get it from sk.
+> Ah, I'd also move the check in that function, I mean:
+> 
+> void vsock_linger(struct sock *sk) {
+> 	...
+> 	if (!sock_flag(sk, SOCK_LINGER) || (current->flags & PF_EXITING))
+> 		return;
+> 
+> 	...
+> }
 
-Certainly. I assume this does not need a separate patch and can be done
-while moving (and de-indenting) the code?
+One note: if we ever use vsock_linger() in vsock_shutdown(), the PF_EXITING
+condition would be unnecessary checked for that caller, right?
 
-> BTW, the change LGTM, would be great to call vsock_linger() directly in 
-> __vsock_release(), but we can do it later.
+> Or, if we move the call to vsock_linger() in __vsock_release(), we can
+> do the check there.
 > 
 > Thanks,
 > Stefano
@@ -202,4 +209,7 @@ while moving (and de-indenting) the code?
 >>
 >> -- 
 >> 2.49.0
+>>
+>>
+
 
