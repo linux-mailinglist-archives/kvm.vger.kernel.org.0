@@ -1,146 +1,166 @@
-Return-Path: <kvm+bounces-44877-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-44878-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2EC3AA46C3
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 11:18:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C2CCAA46CD
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 11:19:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A6B75A105B
-	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 09:15:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D15201BA5637
+	for <lists+kvm@lfdr.de>; Wed, 30 Apr 2025 09:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6284A21D3F8;
-	Wed, 30 Apr 2025 09:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7971C221554;
+	Wed, 30 Apr 2025 09:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="FYumJIzv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FmVVrpX3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E9321B182;
-	Wed, 30 Apr 2025 09:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D4C288CC;
+	Wed, 30 Apr 2025 09:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746004448; cv=none; b=jnL5PuvqBAuS/vMq2jtRxu52gHPuGtRqX0l9ISI/+UJ8oD+ORRS2ct0QHlbm1oLUsoNAPSUOq9gtrveEtkjyor4q/zp/OAtwwg0kPY3ErzZNI2RS8ByIo4EwtdtvdteqSzDeENOU6AAp3VRPdnwOVaiXgl/Ad2l22cvW7mGW72c=
+	t=1746004645; cv=none; b=DkdgxIT3hRuVFklGnFICk2a2Jo94nVjDSgVCUULIyQEmnnXKJNVz8RK8o81TxJycx28ebfrMOFwZDK92wgYS+fyikj24hdBDH+WUl77gGWtiIBXngvndHyqRdmJBq3m+jpqyc6OH58vug2afb82AcEZsZAXR7jRldduHob+q98k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746004448; c=relaxed/simple;
-	bh=UmJ1a9uyxO4qBe0uD05AacX6z8QM6GlJq7FD1s2cOiU=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=PekQTK6lgv2+I+zhkuHN1Wlaig22zr6szoocCPA4PJ6l0QiL9XTht4X8aJO537stZtJZ5blZhCNZOpOwpflQcmCQLD1fj1tmgW/48SJGhuto/0jXCRxnMo0RAZ9201XQ8Ufms7oW58v4Bog02/QO6L3bHmfcTfxauRlkTlso2+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=FYumJIzv; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1uA3Vx-006EbZ-52; Wed, 30 Apr 2025 11:14:01 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=OHDVjJrfezwde0SpfzNn80K64q3m8Fq4JLDQRGdWtNQ=; b=FYumJIzvtRXzZfFYqswGPAUrMf
-	IN4NKYFmEjHuY6MAfEvTCOGSfm2urYNLaKt1CgHSdYVt6H84SNtzSG6US//nuE1h9ZgYHKH5UQ90w
-	GBMAozAYrOeZjPUrwHSR+jxaulcT23tfKwhc8YyBjgMWU7pNcOiZawIXAf/sKUHOJg2RaMVLQoVVY
-	zpEknhdAMccJKDrhInwUwBQdAMrZAJL3v6jJQfYYrQGn+G5xQIRqjdYnvKNXXU0a0x2tOP36iAY8e
-	fl8d6Av4+ZaWxztAShl9wPHORJeUVTa4lHKk3sb5kvbBciXTeH+EPT33m6QGbdfdqGxzsByOdtSXy
-	dT7kh11A==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1uA3Vv-00059H-Qg; Wed, 30 Apr 2025 11:14:00 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1uA3Vn-000UCu-TS; Wed, 30 Apr 2025 11:13:51 +0200
-Message-ID: <bd1bbdb7-8fc2-4569-8eac-157caded5731@rbox.co>
-Date: Wed, 30 Apr 2025 11:13:50 +0200
+	s=arc-20240116; t=1746004645; c=relaxed/simple;
+	bh=0MRDc7XkKAhdLo9NoWiZ7a37tKdrUj31jPMIXHPElEQ=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=RRBgKXohTast61fKl91rf3h/rwcItulzGAOl+ke5XhQwtP25bSfVXUz87MaiXjeom57bwORqkQlTji+OM/ywpXf8NxybgKyN73F8GhzrAjA5rD5xwNd/4BaGrjR/vQRTnuPUs2Quz1qniNn+W65J5pQbPlqUFBGrjCtDvTQK2kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FmVVrpX3; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746004644; x=1777540644;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version:content-id;
+  bh=0MRDc7XkKAhdLo9NoWiZ7a37tKdrUj31jPMIXHPElEQ=;
+  b=FmVVrpX31idIr+m1wN1XNNIjWkNf4aLWdVD/AxCrITc/5edUx6E0zNP8
+   aDIYb8DZbnlk1HuNqZvJVBIEUfB1iNau/84wrUaIOFqxfwY4MhRnCC+Yg
+   0XgjPd3e8V9CMTZhrBbmPEij4eQYVnsQqhqa0KqZpC2KV/BuPRZPpkid2
+   NufZNOoersoL9rdQEkBBwE1TJlC/0oEv7X2bfxTgiMJNaAZ9qJFaBOITF
+   h2mZSuqvzT40KyLxAyAi4yj7Hz7mw3Bl2tr4C2uuHKvPE1XznOTY3NuZk
+   U360C4u8lFW8pGfAIjedX0IdhMo1gfqVtQpjfwbtb27FVl5h8M9IQsstS
+   A==;
+X-CSE-ConnectionGUID: 6FmHRodMRnS6OZ1GM+ACqg==
+X-CSE-MsgGUID: Y20vUwSeT2+ehYln9NDrSA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11418"; a="73044385"
+X-IronPort-AV: E=Sophos;i="6.15,251,1739865600"; 
+   d="scan'208";a="73044385"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 02:17:22 -0700
+X-CSE-ConnectionGUID: /a7mAvi6S1y/UJBA/L4NuA==
+X-CSE-MsgGUID: NSdWhcCYRFm9Gy2+IE0YuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,251,1739865600"; 
+   d="scan'208";a="139249217"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.97])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2025 02:17:10 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Wed, 30 Apr 2025 12:17:06 +0300 (EEST)
+To: Xin Li <xin@zytor.com>
+cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org, 
+    linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+    virtualization@lists.linux.dev, linux-pm@vger.kernel.org, 
+    linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org, 
+    linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+    Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org, 
+    tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+    dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+    acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com, 
+    peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com, 
+    alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, 
+    adrian.hunter@intel.com, kan.liang@linux.intel.com, wei.liu@kernel.org, 
+    ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com, 
+    tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com, 
+    seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com, 
+    kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com, 
+    dapeng1.mi@linux.intel.com
+Subject: Re: [PATCH v4 01/15] x86/msr: Add missing includes of <asm/msr.h>
+In-Reply-To: <c16677bd-ee63-4032-8825-7d2789dd7555@zytor.com>
+Message-ID: <d1bf0657-1cc5-b6ec-5601-f31efefacd9a@linux.intel.com>
+References: <20250427092027.1598740-1-xin@zytor.com> <20250427092027.1598740-2-xin@zytor.com> <a1917b37-e41e-d303-749b-4007cda01605@linux.intel.com> <c16677bd-ee63-4032-8825-7d2789dd7555@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH net-next v2 1/3] vsock: Linger on unsent data
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Luigi Leonardi <leonardi@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250421-vsock-linger-v2-0-fe9febd64668@rbox.co>
- <20250421-vsock-linger-v2-1-fe9febd64668@rbox.co>
- <km2nad6hkdi3ngtho2xexyhhosh4aq37scir2hgxkcfiwes2wd@5dyliiq7cpuh>
- <k47d2h7dwn26eti2p6nv2fupuybabvbexwinvxv7jnfbn6o3ep@cqtbaqlqyfrq>
- <ee09df9b-9804-49de-b43b-99ccd4cbe742@rbox.co>
- <wnonuiluxgy6ixoioi57lwlixfgcu27kcewv4ajb3k3hihi773@nv3om2t3tsgo>
- <5a4f8925-0e4d-4e4c-9230-6c69af179d3e@rbox.co>
- <CAGxU2F6YSwrpV4wXH=mWSgK698sjxfQ=zzXS8tVmo3D84-bBqw@mail.gmail.com>
- <81940d67-1a9b-42e1-8594-33af86397df6@rbox.co>
- <wff4t4owsukm2jynm2dhju4rrtegyjjlrhu7o5xppsxfqrcus4@wmsvcwkdtdat>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <wff4t4owsukm2jynm2dhju4rrtegyjjlrhu7o5xppsxfqrcus4@wmsvcwkdtdat>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; BOUNDARY="8323328-830254077-1746003796=:7433"
+Content-ID: <b1309532-f075-10c2-3416-1951dccf3d32@linux.intel.com>
 
-On 4/28/25 15:56, Stefano Garzarella wrote:
-> On Thu, Apr 24, 2025 at 01:24:59PM +0200, Michal Luczaj wrote:
->> On 4/24/25 10:36, Stefano Garzarella wrote:
->>> On Thu, 24 Apr 2025 at 09:53, Michal Luczaj <mhal@rbox.co> wrote:
->>>> On 4/24/25 09:28, Stefano Garzarella wrote:
-> 
-> [...]
-> 
->>>> You're right, it was me who was confused. VMCI and Hyper-V have their own
->>>> vsock_transport::release callbacks that do not call
->>>> virtio_transport_wait_close().
->>>>
->>>> So VMCI and Hyper-V never lingered anyway?
->>>
->>> I think so.
->>>
->>> Indeed I was happy with v1, since I think this should be supported by
->>> the vsock core and should not depend on the transport.
->>> But we can do also later.
->>
->> OK, for now let me fix this nonsense in comment and commit message.
-> 
-> Thanks!
-> 
->>
->> But I'll wait for your opinion on [1] (drop, squash, change order of
->> patches?) before posting v3.
-> 
-> I'm fine with a second patch to fix the indentation and the order looks 
-> fine.
-> 
-> BTW I'm thinking if it makes sense to go back on moving the lingering in 
-> the core. I mean, if `unsent_bytes` is implemented, support linger, if 
-> not, don't support it, like now.
-> 
-> That said, this should be implemented in another patch (or eventually 
-> another series if you prefer), so my idea is the following split:
-> - use unsent_bytes() just in virtio
-> - move linger support in af_vsock.c (depending on transports 
->    implementing unsent_bytes())
-> - implement unsent_bytes() in other transports (in the future)
-> 
-> WDYT?
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Sure, makes sense. Even though I'm not certain I understand "use
-unsent_bytes() just in virtio" part. Anyway, we can carry the discussion to
-v3:
-https://lore.kernel.org/netdev/20250430-vsock-linger-v3-0-ddbe73b53457@rbox.co/
+--8323328-830254077-1746003796=:7433
+Content-Type: text/plain; CHARSET=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-ID: <d13050cf-2b1d-6913-5e66-9452e1353593@linux.intel.com>
 
-Note that I took the liberty to assume unsent_bytes() is always there for
-loopback/virtio transports. Check for NULL is introduced when the code is
-moved to core. By the end of the series it changes nothing, but I hope it's
-a tiny bit more sensible.
+On Wed, 30 Apr 2025, Xin Li wrote:
 
-Thanks,
-Michal
+> On 4/29/2025 2:45 AM, Ilpo J=E4rvinen wrote:
+> > >   arch/x86/events/msr.c                                         | 3 +=
+++
+> > >   arch/x86/events/perf_event.h                                  | 1 +
+> > >   arch/x86/events/probe.c                                       | 2 +=
++
+> > Under arch/x86/events/ a few files seem to be missing the include?
+>=20
+>=20
+> Most C files in arch/x86/events/ include arch/x86/events/perf_event.h,
+> thus they don't need to include <asm/msr.h> directly once
+> arch/x86/events/perf_event.h includes <asm/msr.h>, and this patch does
+> that.
+>=20
+>=20
+> The following files include arch/x86/events/intel/uncore.h which includes
+> arch/x86/events/perf_event.h, thus no change needed:
+>     arch/x86/events/intel/uncore.c
+>     arch/x86/events/intel/uncore_discovery.c
+>     arch/x86/events/intel/uncore_nhmex.c
+>     arch/x86/events/intel/uncore_snb.c
+>     arch/x86/events/intel/uncore_snbep.c
+>=20
+> The following 2 files don't include arch/x86/events/perf_event.h so they
+> include <asm/msr.h> directly with this patch:
+>     arch/x86/events/msr.c
+>     arch/x86/events/probe.c
+>=20
+> arch/x86/events/amd/uncore.c doesn't include
+> arch/x86/events/perf_event.h but includes <asm/msr.h> already.
+>=20
+>=20
+> So we are good in this directory, but it should be a separate patch with
+> the above explanation then.
+
+Hi,
+
+While this is not my subsystem so don't have the final say here, you had=20
+to explain quite much to prove that (and reviewer would have to go through=
+=20
+the same places to check). Wouldn't it be much simpler for all if all=20
+those .c files would just include <asm/msr.h> directly? No need to explain=
+=20
+anything then.
+
+Also, similar to what you're doing for some tsc related things in this=20
+series, somebody could in the future decide that hey, these static inline=
+=20
+functions (that use .*msr.*) belong to some other file, allowing msr.h to=
+=20
+be removed from arch/x86/events/perf_event.h. Again, we'd need to add=20
+asm/msr.h into more .c files. This is the problem with relying on indirect=
+=20
+includes, they create hard to track dependencies for #includes done in .h=
+=20
+files. If we actively encourage to depend on indirect #include=20
+dependencies like that, it makes it very hard to  _remove_ any #include=20
+from a header file (as you have yourself discovered).
+
+--=20
+ i.
+--8323328-830254077-1746003796=:7433--
 
