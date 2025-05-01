@@ -1,90 +1,54 @@
-Return-Path: <kvm+bounces-45080-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45081-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24319AA5DAB
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 13:16:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D747BAA5DC2
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 13:32:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 828359C4BB5
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 11:16:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A635E7B52FF
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 11:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D94222572;
-	Thu,  1 May 2025 11:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="T9/U85yA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D3522257D;
+	Thu,  1 May 2025 11:32:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBAE2E401;
-	Thu,  1 May 2025 11:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436E31EFF91
+	for <kvm@vger.kernel.org>; Thu,  1 May 2025 11:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746098175; cv=none; b=IUf00eHMg5l4SBJgRlxUDQjYrrpxuzk90jpDPUzj0I6zuL8oCPlqlWb8YJCE0btHk7WqIh82gfeP1Kvxj7ZBPjJAI2bd30GHQgKF2uLmKoGXdp3divG0v9AWKiZQGF0etG8YY0rRhIxEoMaaWaxYTZLjegzOkTJ5+39PSDAHSp0=
+	t=1746099170; cv=none; b=Y9jrvbsyWUSOGfepO6xOkH5pYcixF3lbFo+2ZvClY67Jds8qoik2WAPkgl9Mau2T5LYIM5EjZiRkHeSFMsqw/Yc8Zqsao/L1t+3fBp2CTfWA42F4m6RE1+uOjEJV7zUYqan3gUbQKuwdhMXc4/5ENnVAS1mQNc9zmWDNJDK+id8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746098175; c=relaxed/simple;
-	bh=SwSSX+bWsYo0Krc0eYqwPhxxTVgwr3IwX+8zNKHF+tk=;
+	s=arc-20240116; t=1746099170; c=relaxed/simple;
+	bh=X72ts72r1U0mJbX6SCdjLaQCT+Y3Tfbmyl2f2/VsB5Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NHYbCJTXS8KKa0jhJLdXzAwBn5VPubrGK/TIsKEr1baqSDq+LF+SaY8qC8LOmkIUNu4PCH0r7vT1wE7v2HPCoSHV5Qfr7X2e9BVMOEVutvxBjVo6SFI04yW2J1KLfuLQmBfczBiWbw7eY3hekbJlUZo5tPU3g4AfM7xg28teebo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=T9/U85yA; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=fDTwHpsnK1HXZhn01AWF6PLmK/DHwvlEcCJKIgKSjwU=; b=T9/U85yA6hIvoLlv4HtdStuKjP
-	k6a+M4OL1L8OrIa901hPNKwtI82kA7+N0hMBR4zoBE4E7d8nz+08o7P3Hqnf+luSVJtZHm26QDQeL
-	coxvHFky9Ql49FikfAU1SxOAuXLIYDOauM3z0FBIQq3Tir7getueoC3bLogxKBsh1TJEEzkYqaO8h
-	09XEiOWi3RGIS1ZNaoLTFMCQegpfBzn1q8vB4AjvsBn0X+A1YyCqSj+RKU0GwXh7padrqDdihLm6T
-	B92bH9jqwkkHgnw/yI9KSsUvXa44Jpy90QMruIl10CIFHO3WayAfe9wLnVOvJZd0v+25QAZwAnm2U
-	0sx7Dndw==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uARtR-0000000HaXn-0gzL;
-	Thu, 01 May 2025 11:15:53 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id A2CD8300230; Thu,  1 May 2025 13:15:52 +0200 (CEST)
-Date: Thu, 1 May 2025 13:15:52 +0200
-From: Peter Zijlstra <peterz@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=P1oxN/eGaJY61sUmOkltVuu719QUV8Wcqk9PsD2JemIld5S7efszcHhGmn9L66L9c6oYnYzb6ZyZp/HCG7ZoN8XyJv39dZQzUrOQdrzl2yKxMs6ieIA3uYgq4F53yk6fKJMJIqbMznGEJX3ALz0w0UGwcDNPfTDPQNJpLW9TLl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09FBF106F;
+	Thu,  1 May 2025 04:32:39 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 977E63F5A1;
+	Thu,  1 May 2025 04:32:44 -0700 (PDT)
+Date: Thu, 1 May 2025 12:32:41 +0100
+From: Joey Gouly <joey.gouly@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Waiman Long <longman@redhat.com>, linux-kernel@vger.kernel.org,
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>,
-	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Alexander Potapenko <glider@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Andre Przywara <andre.przywara@arm.com>, x86@kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, kvm-riscv@lists.infradead.org,
-	Atish Patra <atishp@atishpatra.org>, Ingo Molnar <mingo@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, kvmarm@lists.linux.dev,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
-	Sebastian Ott <sebott@redhat.com>, Shusen Li <lishusen2@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when
- locking all vCPUs
-Message-ID: <20250501111552.GO4198@noisy.programming.kicks-ass.net>
-References: <20250430203013.366479-1-mlevitsk@redhat.com>
- <20250430203013.366479-3-mlevitsk@redhat.com>
- <864iy4ivro.wl-maz@kernel.org>
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 21/42] KVM: arm64: Compute FGT masks from KVM's own
+ FGT tables
+Message-ID: <20250501113241.GI1859293@e124191.cambridge.arm.com>
+References: <20250426122836.3341523-1-maz@kernel.org>
+ <20250426122836.3341523-22-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -93,112 +57,176 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <864iy4ivro.wl-maz@kernel.org>
+In-Reply-To: <20250426122836.3341523-22-maz@kernel.org>
 
-On Thu, May 01, 2025 at 09:24:11AM +0100, Marc Zyngier wrote:
-> nit: in keeping with the existing arm64 patches, please write the
-> subject as "KVM: arm64: Use ..."
+On Sat, Apr 26, 2025 at 01:28:15PM +0100, Marc Zyngier wrote:
+> In the process of decoupling KVM's view of the FGT bits from the
+> wider architectural state, use KVM's own FGT tables to build
+> a synthetic view of what is actually known.
 > 
-> On Wed, 30 Apr 2025 21:30:10 +0100,
-> Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> This allows for some checking along the way.
 > 
-> [...]
-> 
-> > 
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 68fec8c95fee..d31f42a71bdc 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1914,49 +1914,6 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
-> >  	}
-> >  }
-> >  
-> > -/* unlocks vcpus from @vcpu_lock_idx and smaller */
-> > -static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
-> > -{
-> > -	struct kvm_vcpu *tmp_vcpu;
-> > -
-> > -	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
-> > -		tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
-> > -		mutex_unlock(&tmp_vcpu->mutex);
-> > -	}
-> > -}
-> > -
-> > -void unlock_all_vcpus(struct kvm *kvm)
-> > -{
-> > -	lockdep_assert_held(&kvm->lock);
-> 
-> Note this assertion...
-> 
-> > -
-> > -	unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
-> > -}
-> > -
-> > -/* Returns true if all vcpus were locked, false otherwise */
-> > -bool lock_all_vcpus(struct kvm *kvm)
-> > -{
-> > -	struct kvm_vcpu *tmp_vcpu;
-> > -	unsigned long c;
-> > -
-> > -	lockdep_assert_held(&kvm->lock);
-> 
-> and this one...
-> 
-> > -
-> > -	/*
-> > -	 * Any time a vcpu is in an ioctl (including running), the
-> > -	 * core KVM code tries to grab the vcpu->mutex.
-> > -	 *
-> > -	 * By grabbing the vcpu->mutex of all VCPUs we ensure that no
-> > -	 * other VCPUs can fiddle with the state while we access it.
-> > -	 */
-> > -	kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
-> > -		if (!mutex_trylock(&tmp_vcpu->mutex)) {
-> > -			unlock_vcpus(kvm, c - 1);
-> > -			return false;
-> > -		}
-> > -	}
-> > -
-> > -	return true;
-> > -}
-> > -
-> >  static unsigned long nvhe_percpu_size(void)
-> >  {
-> >  	return (unsigned long)CHOOSE_NVHE_SYM(__per_cpu_end) -
-> 
-> [...]
-> 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 69782df3617f..834f08dfa24c 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -1368,6 +1368,40 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
-> >  	return 0;
-> >  }
-> >  
-> > +/*
-> > + * Try to lock all of the VM's vCPUs.
-> > + * Assumes that the kvm->lock is held.
-> 
-> Assuming is not enough. These assertions have caught a number of bugs,
-> and I'm not prepared to drop them.
-> 
-> > + */
-> > +int kvm_trylock_all_vcpus(struct kvm *kvm)
-> > +{
-> > +	struct kvm_vcpu *vcpu;
-> > +	unsigned long i, j;
-> > +
-> > +	kvm_for_each_vcpu(i, vcpu, kvm)
-> > +		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-This one includes an assertion that kvm->lock is actually held.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-That said, I'm not at all sure what the purpose of all this trylock
-stuff is here.
-
-Can someone explain? Last time I asked someone said something about
-multiple VMs, but I don't know enough about kvm to know what that means.
-
-Are those vcpu->mutex another class for other VMs? Or what gives?
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  14 ++++
+>  arch/arm64/kvm/emulate-nested.c   | 106 ++++++++++++++++++++++++++++++
+>  2 files changed, 120 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7a1ef5be7efb2..95fedd27f4bb8 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -607,6 +607,20 @@ struct kvm_sysreg_masks {
+>  	} mask[NR_SYS_REGS - __SANITISED_REG_START__];
+>  };
+>  
+> +struct fgt_masks {
+> +	const char	*str;
+> +	u64		mask;
+> +	u64		nmask;
+> +	u64		res0;
+> +};
+> +
+> +extern struct fgt_masks hfgrtr_masks;
+> +extern struct fgt_masks hfgwtr_masks;
+> +extern struct fgt_masks hfgitr_masks;
+> +extern struct fgt_masks hdfgrtr_masks;
+> +extern struct fgt_masks hdfgwtr_masks;
+> +extern struct fgt_masks hafgrtr_masks;
+> +
+>  struct kvm_cpu_context {
+>  	struct user_pt_regs regs;	/* sp = sp_el0 */
+>  
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 52a2d63a667c9..528b33fcfcfd6 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2033,6 +2033,105 @@ static u32 encoding_next(u32 encoding)
+>  	return sys_reg(op0 + 1, 0, 0, 0, 0);
+>  }
+>  
+> +#define FGT_MASKS(__n, __m)						\
+> +	struct fgt_masks __n = { .str = #__m, .res0 = __m, }
+> +
+> +FGT_MASKS(hfgrtr_masks, HFGRTR_EL2_RES0);
+> +FGT_MASKS(hfgwtr_masks, HFGWTR_EL2_RES0);
+> +FGT_MASKS(hfgitr_masks, HFGITR_EL2_RES0);
+> +FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2_RES0);
+> +FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2_RES0);
+> +FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2_RES0);
+> +
+> +static __init bool aggregate_fgt(union trap_config tc)
+> +{
+> +	struct fgt_masks *rmasks, *wmasks;
+> +
+> +	switch (tc.fgt) {
+> +	case HFGRTR_GROUP:
+> +		rmasks = &hfgrtr_masks;
+> +		wmasks = &hfgwtr_masks;
+> +		break;
+> +	case HDFGRTR_GROUP:
+> +		rmasks = &hdfgrtr_masks;
+> +		wmasks = &hdfgwtr_masks;
+> +		break;
+> +	case HAFGRTR_GROUP:
+> +		rmasks = &hafgrtr_masks;
+> +		wmasks = NULL;
+> +		break;
+> +	case HFGITR_GROUP:
+> +		rmasks = &hfgitr_masks;
+> +		wmasks = NULL;
+> +		break;
+> +	}
+> +
+> +	/*
+> +	 * A bit can be reserved in either the R or W register, but
+> +	 * not both.
+> +	 */
+> +	if ((BIT(tc.bit) & rmasks->res0) &&
+> +	    (!wmasks || (BIT(tc.bit) & wmasks->res0)))
+> +		return false;
+> +
+> +	if (tc.pol)
+> +		rmasks->mask |= BIT(tc.bit) & ~rmasks->res0;
+> +	else
+> +		rmasks->nmask |= BIT(tc.bit) & ~rmasks->res0;
+> +
+> +	if (wmasks) {
+> +		if (tc.pol)
+> +			wmasks->mask |= BIT(tc.bit) & ~wmasks->res0;
+> +		else
+> +			wmasks->nmask |= BIT(tc.bit) & ~wmasks->res0;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +static __init int check_fgt_masks(struct fgt_masks *masks)
+> +{
+> +	unsigned long duplicate = masks->mask & masks->nmask;
+> +	u64 res0 = masks->res0;
+> +	int ret = 0;
+> +
+> +	if (duplicate) {
+> +		int i;
+> +
+> +		for_each_set_bit(i, &duplicate, 64) {
+> +			kvm_err("%s[%d] bit has both polarities\n",
+> +				masks->str, i);
+> +		}
+> +
+> +		ret = -EINVAL;
+> +	}
+> +
+> +	masks->res0 = ~(masks->mask | masks->nmask);
+> +	if (masks->res0 != res0)
+> +		kvm_info("Implicit %s = %016llx, expecting %016llx\n",
+> +			 masks->str, masks->res0, res0);
+> +
+> +	return ret;
+> +}
+> +
+> +static __init int check_all_fgt_masks(int ret)
+> +{
+> +	static struct fgt_masks * const masks[] __initconst = {
+> +		&hfgrtr_masks,
+> +		&hfgwtr_masks,
+> +		&hfgitr_masks,
+> +		&hdfgrtr_masks,
+> +		&hdfgwtr_masks,
+> +		&hafgrtr_masks,
+> +	};
+> +	int err = 0;
+> +
+> +	for (int i = 0; i < ARRAY_SIZE(masks); i++)
+> +		err |= check_fgt_masks(masks[i]);
+> +
+> +	return ret ?: err;
+> +}
+> +
+>  int __init populate_nv_trap_config(void)
+>  {
+>  	int ret = 0;
+> @@ -2097,8 +2196,15 @@ int __init populate_nv_trap_config(void)
+>  			ret = xa_err(prev);
+>  			print_nv_trap_error(fgt, "Failed FGT insertion", ret);
+>  		}
+> +
+> +		if (!aggregate_fgt(tc)) {
+> +			ret = -EINVAL;
+> +			print_nv_trap_error(fgt, "FGT bit is reserved", ret);
+> +		}
+>  	}
+>  
+> +	ret = check_all_fgt_masks(ret);
+> +
+>  	kvm_info("nv: %ld fine grained trap handlers\n",
+>  		 ARRAY_SIZE(encoding_to_fgt));
+>  
+> -- 
+> 2.39.2
+> 
 
