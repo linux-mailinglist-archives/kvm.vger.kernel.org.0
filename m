@@ -1,172 +1,150 @@
-Return-Path: <kvm+bounces-45082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45083-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450D2AA5E9A
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 14:44:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0EDDAA5F09
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 15:13:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AB574A83EC
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 12:44:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 115DE17E33B
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 13:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E25422688C;
-	Thu,  1 May 2025 12:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA23184540;
+	Thu,  1 May 2025 13:13:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QxDjMdGB"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="MUSd7zCp"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1F41EEE6;
-	Thu,  1 May 2025 12:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3D02DC76A
+	for <kvm@vger.kernel.org>; Thu,  1 May 2025 13:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746103472; cv=none; b=TYB8Ab9/nImi3fNlgZJwT5oB9ezMX2TJko4+gypc5rGac0jsFtglwdvq+CsSCoJNg7Gzld2BhTzYx4/bWPCfu0xB3K1A2I31czdTyaI4v/NVIIL4540JlC2TbttfJg2sUyfCfOXYL5WqJ/7Tl+Mp2OMGbTo/d19M5v82cmyz+lY=
+	t=1746105201; cv=none; b=JoCabxqkDFKBIoV9Rp0TBj3VfTCf6rLmQefW2y5Id7YQSQ1EumiIoJpKX8lBDq8+A46OQE8qK7Jt7nlJrEN0xX3ZKj9Mm7yAfF4Pg75jRTn4oAS7tQmMoRGt1Y2R1pDiHzTuwAkkMwAIsGeU4e+KNyLdkiduVEuUvxySUDjJ2r8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746103472; c=relaxed/simple;
-	bh=WPG4ItA0UQzz9G5Wed/nsDRuYNB8SmpWf7d7wvrM4Ig=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m4KkZO0oOO/Jti5Zem06Qr98h6IAgcCBcJHvhXe9mW5g4sMB3CJRxQkj5FcSKzgogT32VqyV7/7VXx4eRfVAz9RMJxy+i0ovQyKz+tx8wDci4i9wvfP0oTyGeyPYFs0wbtXFhJj+CtG7uszdg2+rbs4Sgo3RIdy3RbwzQ7ui2hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QxDjMdGB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D40FC4CEE3;
-	Thu,  1 May 2025 12:44:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746103472;
-	bh=WPG4ItA0UQzz9G5Wed/nsDRuYNB8SmpWf7d7wvrM4Ig=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QxDjMdGBaO7OILE121xxXL/ZOnOaqCLtEBXhMWqkB+3PJ/81e/MmSvY1wUToCrhj4
-	 o09UND4kIgR1FXBbOv/55FCd/OzVBwRgoBGOKRqd4tO9c5cjsRV1GlGty2ybIey98M
-	 Lg+nMO5pZgEPqvPhdAFXoifIaxQoyNf5AIQ+1z0cDZWJ9kRunCBuAPEBO/FXXum7lW
-	 W1LmcTN82A52L8g5iIa5Ucd/iUs8WO+yyP/I650zIl0luAwZDGv+aVLdfXY2xUanJs
-	 d03TuxAlnXfTT8Rtp+TeEMdJfupvUktoh6E1sLRqamQNoOxsDebivNk/cK+bAp+RnI
-	 Bf6br0mFislfA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uATHB-00AZcw-3q;
-	Thu, 01 May 2025 13:44:29 +0100
-Date: Thu, 01 May 2025 13:44:28 +0100
-Message-ID: <861pt8ijpv.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Kunkun Jiang <jiangkunkun@huawei.com>,
-	Waiman Long <longman@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Alexander Potapenko <glider@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Andre Przywara <andre.przywara@arm.com>,
-	x86@kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	kvm-riscv@lists.infradead.org,
-	Atish Patra <atishp@atishpatra.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	kvmarm@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
-	Sebastian Ott <sebott@redhat.com>,
-	Shusen Li <lishusen2@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when locking all vCPUs
-In-Reply-To: <20250501111552.GO4198@noisy.programming.kicks-ass.net>
-References: <20250430203013.366479-1-mlevitsk@redhat.com>
-	<20250430203013.366479-3-mlevitsk@redhat.com>
-	<864iy4ivro.wl-maz@kernel.org>
-	<20250501111552.GO4198@noisy.programming.kicks-ass.net>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1746105201; c=relaxed/simple;
+	bh=XvupZH27H5g/HfGLJUrSITBouY7S04F9SNYyBSsUuM0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g4p3tFfsunMTdBZkPu024NUVYCYMNYu2U5OqW16csFNJWRE0RtZpbQhIKqsSHy9nRwyg/hJuwwMVlN5rCejHokEEXyJ0NOlZ0lv0u7lIHuGgXK8JRwpSb8KOZQB3zXdbBKUM4iFhcLTRtxhwI6wTEJtNhp4StTU1HNt1GV9bJ5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=MUSd7zCp; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3d5e43e4725so2382545ab.1
+        for <kvm@vger.kernel.org>; Thu, 01 May 2025 06:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1746105199; x=1746709999; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i8cnw7gES+2CPKoNFqxe9oNSToGNtvAVlGUfutI0aoo=;
+        b=MUSd7zCpuPMvrBBe8i01Z0j1uYudSeHJFLnoLQRVCNXUUreAg9kkOtSFZxbL5CW/i+
+         /Axfwzm0qrj+J8JX670FzkTZHC86/TkZ7/x+p/zGrAUbFjaAAyP4ixSu36KblluTDu6+
+         e+1KE3Kbf6x9SqmeKnrtUv036aVASYAAkUT1h2eQN5s3WEig2m1XuUaL/HOu2OpIWQV5
+         G35FGdsXAjYSqKdtdrf00bqASvt7ed1jXQv9Dmwyh0o/if4Kpyco5qtJnsnRd6XTIDsR
+         FEAHWlS3xTpAnuMiIMVw/Z7y2RJKqXVhCpWcPNC7a+oELw35LXHbG1T2FjESLTWjDBu1
+         POVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746105199; x=1746709999;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i8cnw7gES+2CPKoNFqxe9oNSToGNtvAVlGUfutI0aoo=;
+        b=ZIOFF3VboKATIKjTYoGfTOA/WADu7K4f1g+wFEnOXeZc88QJOFAAO2qABgSgPI36cz
+         mHqwj54QqceyCoR4tVxNc84etKqhywNWBSw/AIPPOKgTjEBUKCq/t5hACQn2lKBK6xjj
+         xtshNhAbuC7FTb7NDgMLi16AuRI9gj7+HGEshEccdVUQRTrDAL0QGQqzF3HsAHnQrAK9
+         VlLdAJHgofbBp3UQPPiE7UuTgR+SbjSY+ZsJwA8yWpPwxZrN6lFjIbE3VJJ8+3eExMSi
+         7/+bQ8zqm/XYfTFKG8X144ocOaC3E3opB1iAEEdLJ7ZUlajrKHKfLc1fHr+TTGCoG0G9
+         yQ3A==
+X-Forwarded-Encrypted: i=1; AJvYcCV/sJgmsGHuXLShmCs0dWac7YBtX9Lt76SSPNOde+D//UAsToiR8UHKRJeimqWAWIq4K0I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx1AgRSt4Zn2D3DM0u0ykb3ARhjG4Cm4MpdeTkmfXXYfesgpOf
+	ohJZqg4AVjSjCpFz/DFt9egoyLFKzrytGAGnn4aEke2IOeekio8XqPGsmHPbPlGXfVR491qWn9C
+	xMM7oOwpWJjfG8cr47j4ZOVCvzPOzl2z4gbOT8QmsUMfXKpSFohU=
+X-Gm-Gg: ASbGncvpRiotkao3o00LivWZnfk8Kp2lMAvu6i2DpBIP/26KOt3CV8C8XqlaysGKCqq
+	B5t6gL9fCLX5jzXDWWGPtXRBLKsdoDyc74eB345ABDs0lxi2EIHz0nIMiRuy2OgyfLcbq8uQqmt
+	dr3owyXzLO1sZcZA1rWr6GOFs2bo1TgX0Tjg==
+X-Google-Smtp-Source: AGHT+IFYH/yz9ETM9NLPFlE2pVkQwoPg56TQHPQR5mOU/5lz7nNUj+hk9/rsWp5zS5jnU2+qLzeLlD75PGhwF7yzJJc=
+X-Received: by 2002:a05:6e02:1aaf:b0:3d9:24a7:db0c with SMTP id
+ e9e14a558f8ab-3d96f1b20ddmr38261815ab.8.1746105199109; Thu, 01 May 2025
+ 06:13:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: peterz@infradead.org, mlevitsk@redhat.com, kvm@vger.kernel.org, linux-riscv@lists.infradead.org, jiangkunkun@huawei.com, longman@redhat.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, bhelgaas@google.com, boqun.feng@gmail.com, bp@alien8.de, aou@eecs.berkeley.edu, anup@brainfault.org, paul.walmsley@sifive.com, suzuki.poulose@arm.com, palmer@dabbelt.com, alex@ghiti.fr, glider@google.com, oliver.upton@linux.dev, andre.przywara@arm.com, x86@kernel.org, joey.gouly@arm.com, tglx@linutronix.de, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, mingo@redhat.com, jingzhangos@google.com, hpa@zytor.com, dave.hansen@linux.intel.com, kvmarm@lists.linux.dev, will@kernel.org, keisuke.nishimura@inria.fr, sebott@redhat.com, lishusen2@huawei.com, pbonzini@redhat.com, rdunlap@infradead.org, seanjc@google.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20250426110348.338114-1-apatel@ventanamicro.com>
+In-Reply-To: <20250426110348.338114-1-apatel@ventanamicro.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Thu, 1 May 2025 18:43:07 +0530
+X-Gm-Features: ATxdqUFKSjteFgCBlQofgGe5rmP86z7GpzG9AH1PpGwKFUlwJL4JNjmeLly_eRQ
+Message-ID: <CAAhSdy3VJUyR=9KKQrHLpn_dqnyqpDore4CCC0SGPM4pjZ3opQ@mail.gmail.com>
+Subject: Re: [kvmtool PATCH v3 00/10] Add SBI system suspend and cpu-type option
+To: Will Deacon <will@kernel.org>
+Cc: julien.thierry.kdev@gmail.com, maz@kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Atish Patra <atishp@atishpatra.org>, 
+	Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, Anup Patel <apatel@ventanamicro.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 01 May 2025 12:15:52 +0100,
-Peter Zijlstra <peterz@infradead.org> wrote:
-> 
-> > > + */
-> > > +int kvm_trylock_all_vcpus(struct kvm *kvm)
-> > > +{
-> > > +	struct kvm_vcpu *vcpu;
-> > > +	unsigned long i, j;
-> > > +
-> > > +	kvm_for_each_vcpu(i, vcpu, kvm)
-> > > +		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
-> 
-> This one includes an assertion that kvm->lock is actually held.
+Hi Will,
 
-Ah, cunning. Thanks.
+On Sat, Apr 26, 2025 at 4:33=E2=80=AFPM Anup Patel <apatel@ventanamicro.com=
+> wrote:
+>
+> This series does the following improvements:
+> 1) Add Svvptc, Zabha, and Ziccrse extension support (PATCH2 to PATCH3)
+> 2) Add SBI system suspend support (PATCH5 to PATCH6)
+> 3) Add "--cpu-type" command-line option supporting "min" and "max"
+>    CPU types where "max" is the default (PATCH8 to PATCH10)
+>
+> These patches can also be found in the riscv_more_exts_round6_v3 branch
+> at: https://github.com/avpatel/kvmtool.git
+>
+> Changes since v2:
+>  - Addressed comments on PATCH10
+>
+> Changes since v1:
+>  - Rebased on latest KVMTOOL commit d410d9a16f91458ae2b912cc088015396f22d=
+fad
+>  - Addressed comments on PATCH8, PATCH9, and PATCH10
+>
+> Andrew Jones (3):
+>   riscv: Add SBI system suspend support
+>   riscv: Make system suspend time configurable
+>   riscv: Fix no params with nodefault segfault
+>
+> Anup Patel (7):
+>   Sync-up headers with Linux-6.14 kernel
+>   riscv: Add Svvptc extension support
+>   riscv: Add Zabha extension support
+>   riscv: Add Ziccrse extension support
+>   riscv: Include single-letter extensions in isa_info_arr[]
+>   riscv: Add cpu-type command-line option
+>   riscv: Allow including extensions in the min CPU type using
+>     command-line
+>
+>  arm64/include/asm/kvm.h             |   3 -
+>  include/linux/kvm.h                 |   8 +-
+>  include/linux/virtio_pci.h          |  14 ++
+>  riscv/aia.c                         |   2 +-
+>  riscv/fdt.c                         | 240 +++++++++++++++++++---------
+>  riscv/include/asm/kvm.h             |   7 +-
+>  riscv/include/kvm/kvm-arch.h        |   2 +
+>  riscv/include/kvm/kvm-config-arch.h |  26 +++
+>  riscv/include/kvm/sbi.h             |   9 ++
+>  riscv/kvm-cpu.c                     |  36 +++++
+>  x86/include/asm/kvm.h               |   1 +
+>  11 files changed, 265 insertions(+), 83 deletions(-)
+>
+> --
+> 2.43.0
+>
 
-> That said, I'm not at all sure what the purpose of all this trylock
-> stuff is here.
-> 
-> Can someone explain? Last time I asked someone said something about
-> multiple VMs, but I don't know enough about kvm to know what that means.
+Friendly ping ?
 
-Multiple VMs? That'd be real fun. Not.
-
-> Are those vcpu->mutex another class for other VMs? Or what gives?
-
-Nah. This is firmly single VM.
-
-The purpose of this contraption is that there are some rare cases
-where we need to make sure that if we update some global state, all
-the vcpus of a VM need to see, or none of them.
-
-For these cases, the guarantee comes from luserspace, and it gives the
-pinky promise that none of the vcpus are running at that point. But
-being of a suspicious nature, we assert that this is true by trying to
-take all the vcpu mutexes in one go. This will fail if a vcpu is
-running, as KVM itself takes the vcpu mutex before doing anything.
-
-Similar requirement exists if we need to synthesise some state for
-userspace from all the individual vcpu states.
-
-If the global locking fails, we return to userspace with a middle
-finger indication, and all is well. Of course, this is pretty
-expensive, which is why it is only done in setup phases, when the VMM
-configures the guest.
-
-The splat this is trying to address is that when you have more than 48
-vcpus in a single VM, lockdep gets upset seeing up to 512 locks of a
-similar class being taken.
-
-Disclaimer: all the above is completely arm64-specific, and I didn't
-even try to understand what other architectures are doing.
-
-HTH,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Regards,
+Anup
 
