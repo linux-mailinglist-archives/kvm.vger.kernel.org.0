@@ -1,255 +1,472 @@
-Return-Path: <kvm+bounces-45012-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45013-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C94DAA59BA
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 04:36:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30672AA59BF
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 04:38:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78E5C465BF0
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 02:36:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D26427B3976
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 02:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126A322D7BF;
-	Thu,  1 May 2025 02:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79ECD22FF2B;
+	Thu,  1 May 2025 02:38:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="N+51PcA7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S8AKrM5h"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11olkn2077.outbound.protection.outlook.com [40.92.18.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D5B182B7;
-	Thu,  1 May 2025 02:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.18.77
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746066992; cv=fail; b=oP285dI6YfHfQHO086kvstBpwLiyRHXXEbpFZpi5ii24U55q73+HZrkgK/3Df/hY+oCI7jm9xjmtRPnB0O/oo6FSIOwyWZQMMopjmf/KDwNGIo4MQ2i49ycrmUJgJjqQJJ4GB0SjCwJlN3lcXb2c6SqR5tp1Syjq+VqJci9HafE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746066992; c=relaxed/simple;
-	bh=Y8SOh+ZgYDhXYT1cskhGkDXiP12qcl8DgwdxWRHWrxw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VMjoBt8ouZUt1b7XailJbzPfXaXlup7lD55qj9/uWfp8iD6HL97UsIHUdDsJAV24dxAuJUqczboAHv8PAz1OaWe4afnIHdXNRC5kNrWCGU/4GBR44y9fJ8VIOAk79NVpjwBZZOE2iXYRq3me6SlQD06R0KLhj3h0qXTLpU2pW7I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=N+51PcA7; arc=fail smtp.client-ip=40.92.18.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uq1G9+r7/w5eKI3PjocAih8p4+OYnv0Ur6tZ1HXLsEBsRxw7H2mJs6UzwzV5sXE+uuZMX4qnk6Wejcoe7w36aBpeHY09+e8m9WD1VElIGNhieu670mJCQQiLPr201MUDn08fQJNq8DhtuHgdsuO+te0WsKQL+w3EcOlVHHrp2b7s+ajHA40cRpatwlcXt3faP3T/iE2Q0uDZ4Wa2nqtIjBx7laKTRhtVSjQEr3+ok1nszWvQEG9ua5GNMPcD4wFJJsZihJQ5Hm9oylreGds5jeNg28twgKy1zDDLalpqVIs995DM2qp67Uqofk7k2tJ9fm9F4J6cb/WvZKbUsQhNbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y8SOh+ZgYDhXYT1cskhGkDXiP12qcl8DgwdxWRHWrxw=;
- b=nuuvJ7NWpxAxzxjZq6IUSX6KYjFDdeLrNL8b3xvI3vaj+ipFP+OD0YBTIe2CjbinMG0dD5Mt6n3GQnPCXy9QhDAKRy9IH7R9YPTVak/oX+z+2gHCDeh5ogfPVzOPQTkuEhdxSO0jzpTIYXF9mbXENg5vOd3QFPSjECmraJYXx/N5VlqO0ZvdAb3JKYl69k29w5Nv9BgjclM5T3IP6S1AZrDhXoKHC2wlflRaxdSJX/ElpIafkR4dfIMpTq1XnD5JG4Q/my+QMd9E/2SF27Ccr1Rkor8UGc5Pp3TOfQ+xMqnDDmL+MBMJM67ttpDgnitnFc+/+l4FbseATP0dK/No/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y8SOh+ZgYDhXYT1cskhGkDXiP12qcl8DgwdxWRHWrxw=;
- b=N+51PcA7Sj9PiEu0ae7tMjVzlzBxp/PP4SMSdndnmK3Vyjngt5q0ovEUt7ehe45XiKtPx1NyYypUjzZyRwGewcihN6k9NStOAG9gnpLewe0g3vQfRVeg6SQhpNqOlD9CEFM+kEFplkPF3yBH7AjfZg+SJbEIue0NZqXMZQUT7DRvYOqIKG+Izb4uWdNB8UyIWcfsnmdgzZL4yzCZx2wx0dSfQUvbMGTovM13UbvlTk8PMLlxHh+HGFfF+Y+KF6fUNLrNWGbAgiVJTM/furcBhbh1vvjykYTPkT+xdUk601jFWoikZZaTYN/WCG03W9w8lLm1oQL1RLfOerwqP9pN7g==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by PH0PR02MB7350.namprd02.prod.outlook.com (2603:10b6:510:1a::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.19; Thu, 1 May
- 2025 02:36:26 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%3]) with mapi id 15.20.8699.008; Thu, 1 May 2025
- 02:36:26 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Peter Zijlstra <peterz@infradead.org>, "x86@kernel.org" <x86@kernel.org>
-CC: "kys@microsoft.com" <kys@microsoft.com>, "haiyangz@microsoft.com"
-	<haiyangz@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"decui@microsoft.com" <decui@microsoft.com>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de"
-	<bp@alien8.de>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"hpa@zytor.com" <hpa@zytor.com>, "seanjc@google.com" <seanjc@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "ardb@kernel.org"
-	<ardb@kernel.org>, "kees@kernel.org" <kees@kernel.org>, Arnd Bergmann
-	<arnd@arndb.de>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"jpoimboe@kernel.org" <jpoimboe@kernel.org>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-	"samitolvanen@google.com" <samitolvanen@google.com>, "ojeda@kernel.org"
-	<ojeda@kernel.org>
-Subject: RE: [PATCH v2 12/13] x86_64,hyperv: Use direct call to hypercall-page
-Thread-Topic: [PATCH v2 12/13] x86_64,hyperv: Use direct call to
- hypercall-page
-Thread-Index: AQHbucN9umotaZatx0OeVn5Dg618mrO9B6fQ
-Date: Thu, 1 May 2025 02:36:26 +0000
-Message-ID:
- <SN6PR02MB41577ED2C4E29F25B82548D7D4822@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <20250430110734.392235199@infradead.org>
- <20250430112350.335273952@infradead.org>
-In-Reply-To: <20250430112350.335273952@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|PH0PR02MB7350:EE_
-x-ms-office365-filtering-correlation-id: 249bd7fb-330b-496c-2e34-08dd8858f88e
-x-ms-exchange-slblob-mailprops:
- EgT5Wr3QDKyfA/kqhNtxhLoDzMvzACConmAriXbH6QNV6wCiQSOYIwCm8diSDijArey8jy07vniP73ZjsrFm9MmRQi+7txRvSVQMIrlkyuBj9TQtoyxLrYmB9G7Np0lcFX838rZtBhdRiuVa2qrItvydBYAag+rICakIAD3R1PH5vA09omer23OqnY06PEol5MzsnXAPzFO5AyTkuatdJBpZa00qbNLtqw3pNTdJgOuzmIBRtmK21OddoVfkHipuVFTr4L+mp2HMssL9kBtp40I/mlZcSbLZHFsc/wNyMWBZTRjFC+Y1WXCMptlSDX8u/VKz/JarKfszlmG/47h/0l/Qt1P7LxRtKk4rRwzWs21V5gTBCxdvdgSSmP6FHpACMSTFDssY+DaMHsAUBSGjO5ZZ7Bq5Zwh9cuXvLhzR83X+ZQxhaesqlf0F7WPTnTQTPzN0S3iT3cJ1SRV75FqQykw7+yopi+UIV1G/jddwz4/HqFn5QHbIqrpFgZ6g2Fp24U5P/MmpVgHcaVa7x+Txap869Kitaqbr6I0xMUzo+ahtjWIv76tR9Fa1z3wnpk7vqe3MqRyEhPWIEXF0AnqD+Fou9YzgYDYWqv/JJt4TslH7Mciwd7vFmPQ1/08VHxE74/xzBppSPqUviG4UbK9wRecOYVGGHnr857b9hkKPn94Q7Rav5ryHmjaqdEWTzfRoEct6rY8qN9kOr4abIXDl5s436p5bm2KvdluW7uQOrI8=
-x-microsoft-antispam:
- BCL:0;ARA:14566002|8062599003|461199028|19110799003|8060799006|15080799006|3412199025|440099028|41001999003|102099032;
-x-microsoft-antispam-message-info:
- =?utf-8?B?RXFVZnJxamRGOWxJRDF1azBQUG9CQmZVZGRRZzJCNzNXa1RwSHNQZGg0S05r?=
- =?utf-8?B?ZW1INjF5cC9UekdVd2x6QjdZd1BoVzVwaTZxY3lYOEVHWTFOOXFiSWJkVU1a?=
- =?utf-8?B?UXM4NjU4ODNDVHJYQ2VCRXNlL2NYUWg0Wm5NTVZQUkovb04yWE1hRGMwM0Qw?=
- =?utf-8?B?S1lScDNhelJ4WlVqWENNbTNhMmF3WVNXd3d4OTc3bm12d1orREJQMHJwS3FJ?=
- =?utf-8?B?Q0JmOVRSUUhxNDdiOU1wNXNYeXpQVTVPQ1NSdFo5RGFVMkFjZ3dLZHpTQlRx?=
- =?utf-8?B?RUpyWXpHeFlHZ0V4RkVOa2RmNnhXd2N3Z0RLV2dUZStQZnNSeEtNZFRiay9C?=
- =?utf-8?B?N1lPRlV5Q3diWVlSc0huVWU4bWtPUkNnUXQxYkV4aGNJSHduSUpmTFlFeW5O?=
- =?utf-8?B?blhvbW9nUUdwSzIyenJBcFJmYzBybWV5Z0RyMlB4Um9FNjJobXZLRk9xODhz?=
- =?utf-8?B?Q0YwbXgyTm1SSmRrRk85dXY3dHgrNDU5UUVObVJwNGpNaWpmbTB1TjFwZUpv?=
- =?utf-8?B?OWNLQnpMaDE2cWdKVWs1MTdxOThUeDhyeHNJbDVSL3RPU3l5a1czMytNakkr?=
- =?utf-8?B?KytlMFlrVzdlUEdjcTV2TFRIa1lCOHQwS2Y2TTFHSmhXN2xaSUVjRW5FbXpR?=
- =?utf-8?B?TUFPdm9xaFlYTnZ3eE01bFZvc1RRa2M5aitEb0phUGJNUHNWK2R6SHB4N28x?=
- =?utf-8?B?ODZlS2taQVU2ajlsL3JtdHhJSnJVOWsrVjNUd1ZMdWlFVUsvaU5mODhZYmZ5?=
- =?utf-8?B?WCtSeGVSVXE5bVFHZkwwOXlQMWlpQUdJNGlndVdvdE15M0FFUzdtaU5ZVzRI?=
- =?utf-8?B?ZUlhMjJtMFY5SWIyd3FpVU15ZG4zQW9PdjRmUjlwanpaVGVHa1V0N3dkWWtF?=
- =?utf-8?B?OTBudXA2N2ZFNmZhMkZBVlp6QUlNeHd3N3VaUWxKQlEvUWRkQmd2WWdrTmVs?=
- =?utf-8?B?ZUhqMlFMZmZjeTI1WWNEN2h6VnFWUDRsek5UVnVFaVhRK3BjVmdVMDZ3Vlk2?=
- =?utf-8?B?QTdvbVAzRHpIK25aTmVRemcvSDk4Y3Bkai9aZWFNUk5tOUhnSXJQNnAwZ0M3?=
- =?utf-8?B?T3ZJY0lUbDRrLzNoaE1HYklWYzRNY3FwZjRCWEJBRnFGWjFyNW8vaTN0ejU2?=
- =?utf-8?B?c3J1cUVxbEc3dGwyVXZROXM1OXdWNXRITkY0bmUxN1craUNJSDZyM0VlZ0hG?=
- =?utf-8?B?aGU2bjIwSnFBY1VodkJJWG9CVEUvL1ZjV2sxMEViRHdkSHlvbXgvT1VmQ3hP?=
- =?utf-8?B?SGZvTDBFTHc5bUNvdVZXMmQzQWhtdFZhT1hhWVRkclpNeWxDMExBcXFjRTZ2?=
- =?utf-8?B?RTR4a0YrMjVuN1VaellkVjVIWmw4M3pkTTJNS0REZE43dHQ5a2Ntdk9DUnRy?=
- =?utf-8?B?YXd0ZytMOGQ0SEpRZi9yTGJTdldmMkNzZGxTdjY3b2grOGxDblBxbnhBWXZv?=
- =?utf-8?B?SHI5VGlydDVlZitZWlo5amVISGRwL0QzWjBKWUtmbjNRMzVYZno2dy9Dc1o3?=
- =?utf-8?Q?aF3p/o=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?WVFWZVF4eURPcW1DWjJVTnkxSEQ2MFk2MXk4L2RYam9pbDhXbVFEV2krbmsz?=
- =?utf-8?B?MlN2aGRSZ3huY0U0OUtDblpBR1BON0k3NDFYajdWclQyTkJOdmhvVXV4T044?=
- =?utf-8?B?Mm04eDE5V1hha0Yzd3NoZkRzSGxyVWY0eDJmUC9sQUxOektuZ3lBTG9GWHJ0?=
- =?utf-8?B?dU90blJiV0cyVVIwL3lnZkVKck5FQmRqR09LQ2loQkh0QWxMZ09YNzlPTkVi?=
- =?utf-8?B?cklKdytaN2RMWStGUGUzOTlpdi92RFVvNldYODQ4V093ODRLY1FjaytVQlVJ?=
- =?utf-8?B?Zm9RL3hyWUlGRVhCb2J0Y3RRbnNnSGFvZDFBcU42MUxKeWJPZzZXOVJ3enJ5?=
- =?utf-8?B?VEcxSGRKRzJia2VySVpCSTdIMXRhTXNpMkNubjVnQlVLQzVBSENoZlNPcDVw?=
- =?utf-8?B?MVMxUWNEVVUrUkdCQXNpOHRyZ0NTOXo2WkdDRVVlRUpVTjEySlV4WFlrRDVN?=
- =?utf-8?B?cjRwWVJ2TnpFZGEraU5pbldMWnQ1YWt0a2pRR2hIQ2lLcVNBYm95TWVLa2Yx?=
- =?utf-8?B?eUpyWnNPTDFZUkFaSG4rUlJkYXBhSGJwQmlqc3VmaUdiQnpkb2FVV1NBckNM?=
- =?utf-8?B?NWo0aTlFTUpvVkNneTRROUtnamFSV0JSaThaak5PTE56L3dVSEd6LzhLN2ZP?=
- =?utf-8?B?cm1vYzd1dkE4b00zNUNEbGdnVndYQlNnT1lkUzdwME5tM0QyL05mK0F1dnRD?=
- =?utf-8?B?bGNENmpOR1hCWGZtWXBLeUk4TFZoNGtZN2ZUTEQxY2RNQUczMDNjamplR2xs?=
- =?utf-8?B?d2krVk5tcXpWQjdHRmJCcHJZRHdoK1FMQzlSb1RpU3FDNHFtdFVWK1RCdisw?=
- =?utf-8?B?emhoZmNPT0pxczlScVNBN245MTdWKzl6YXEwMm5IQTU5bmM3dGFiVWN0L0Zt?=
- =?utf-8?B?dXIwVSsreXNSTnk3OXV2TEZuRDdIQzZnVzZmTXU1YUN6L2JBbW1vaUZxM05X?=
- =?utf-8?B?bFpIbGZhZm8xZEVLbVZ0TS9jUGhSZGs2Um5XTTNnQXBpZERteWljelFRb0x1?=
- =?utf-8?B?SlVFQ1dvQ2d6Vm1UdDFZR3NyVDFoTUJ3Qm15elVTNTZMS3ZSTFZoeGpKZEtk?=
- =?utf-8?B?UlM1S01aMXZseUJLZHJhU2I0bnhvOTZDY3JQaEtHblRVQlROV2k0ZStoRlBo?=
- =?utf-8?B?NklLbXZrK1dpaytiU0xWOGw3d0lVZWd0YXhkQVR2TWRRVzlIL09nV01xQmFh?=
- =?utf-8?B?VFU0SzhDcE5OajJvMDZ6emhSbHdGRk9XRVFmR2JONWFtcENscjM3ZUdOWUc1?=
- =?utf-8?B?c1YrQ3JkY0FROEhqNnJwMmJBM0xvNUswTHR5U0xwaEEycFI1QkQxVGk5ejU5?=
- =?utf-8?B?aWkydys2b2R1a2ZNZE1tQSs1aFR5Y1RkZjluZ0dGZkRyS0ZJQmRuUFVXbTU0?=
- =?utf-8?B?NWlNODdLMGREbTdkMmhQTXJ6cWtCeitYckYvMk1zeFoycGs4cHJKTjlOSDVF?=
- =?utf-8?B?dVg5K1IwYzJIaXVpQi8ycHJpbkJRcy9ia1BWek1Rb1hmVTlaRFRtRFB4a3ov?=
- =?utf-8?B?eVlha1puYzVmYWZybVlEaFg1ZzJFdmtlbmZoL3FHZXl5NTE1eGpBVkN1cXQ2?=
- =?utf-8?B?YkV6YStuYkhwTzFNNk9yNTZOTTdaeHdZclByRnhIN25leS84VURkUWFPQUFr?=
- =?utf-8?Q?PsTPaVFPuJ9fXHyOWBjSzAbIaeOTlX+/Dw1Wc1zl2geA=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779241CD0C;
+	Thu,  1 May 2025 02:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746067079; cv=none; b=u3Lpea+IwsOpj+dMqnI1ofA9LZulHusZ0ecms2hcWLI6bdAgpdOudssPshE1Ee6UL8dJBiJWidF55Xkg/Vxfijgw+qezH/UTlvlC4b+lfEEqqaWasBsLM9kZCd44ubZeNYhxkHPQXuhtlUDCUmYdiNFt+8Zoae9mXuvqgXEm1ko=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746067079; c=relaxed/simple;
+	bh=kaGKadSipMjkOxe0UWpsondzGYM4Gzs5D64A1rgZPvE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p2WTdK2FIy2L7mtqIQ2t4GKMQoDs1QruaFDDKQqjuciL+yaprAtJDXjGnZL1938UeKL4sj+PglKkA4n8L4T+I+ckFqGPSRWcwVpKtF5sWPDXqG+FEW0cN1d/u3Y6tXsIx4S4ZxSi7xi0U93Cw1YX13s19wZnWiSkbTJVLon3cIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S8AKrM5h; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-30bf7d0c15eso4714921fa.0;
+        Wed, 30 Apr 2025 19:37:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746067075; x=1746671875; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q3w+Z99sex7Ni2LgQQ+OducHadVY0Ao4TEVcRPZFwJ4=;
+        b=S8AKrM5hqFoOOQZaCuUNtUtlQL6kS3AyaNghc4NwKNCeJY3GXNqy2HFJUkgirY4sLf
+         2IrSc1IZwKnhsNV1gHatCXMwAKazDS1k69xvAjILq6A43KxFjLiajYwb20AcYcnV2WMr
+         BncohpuFy6KI11kJ+by8YQZMCOt6NTq1neuau85tVjAp2h4CXGLAWfwhUvlzY2QGUkBv
+         cTifxmXiLSbkXZMl5Z4CAuMdi3ggf3YStYk1AhSxbBWQDExLaQDoW8PejrHuiYrKiNPf
+         gx8/uIuxYtsum+xF9WiV+GUur+os8c8k3gqmyHki4kbAcThCVNCVjQc613GEYDA3LsD0
+         780A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746067075; x=1746671875;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q3w+Z99sex7Ni2LgQQ+OducHadVY0Ao4TEVcRPZFwJ4=;
+        b=XH/nWbjq0FkzcZM0cVybVvsUb8+yARdbk193WrRxnWB1Yu2tVpharjuPQjdmgKX0u0
+         bMqwxCwZsuBEShdP8v9RvcYtWJ+trxXeArasq/VDv+VwOC2+Xp51pXJTGFCb/a3sovVH
+         Z3x2BtIZ5fifmpYd8LriyTLGH34ArxIWHqU+BhhI6797P3Lk7dJipYb5U2Rx1whd1ggJ
+         Ccm1f6ig3kClWaMphWDS77aSkVq8pHDRIGfzlVSG2eOAP3mj4mnyrS6PahcloOIiaIHU
+         9DnOzNSdsIEHBEgbrJ7+BzcVwwIJ00fjD1zcF2H8OHqTnbX6msYZr6VRb9iMu4XTYzJ+
+         jfIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUINLjTC/Wg2fq0HMs4xncj+VSadjKZ3tQNI02oEjtdg2QbZ0DfclRhrKQ3Jjb6GFuvZHU+seWudx9XAU4Y@vger.kernel.org, AJvYcCUib0WD3PszMO68EdGZZiS+ZwRzO6x0wiwpcIRxhsBDAPJhXoyhLvEwx+CUioskOrhGD2shnvrtpRtei0CjlG+B@vger.kernel.org, AJvYcCWg8atYpySTiR7hT2BG5jCzlmo2/qWowANAVOrT4WoRvBe1m18zFgEdxhs48W92eh2Sm6k=@vger.kernel.org, AJvYcCXevJ+r40dcsEN+yiSlzF8ThlS/hxpcl+9Czp3d9JqrUgtHvGrm4Wso2ILDtj9bCTztAsqAvvBo@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkTN96j5WzvdnI1BrXQ9QECQD1Jz0hmYN9vEey7YN7BV4dz5of
+	wg6M1VnKf1zCpEYeEt2+v5TP0NPrjPmFspDl6sGN23p4U2nn4tUMyh8t35gDvScxWvn32oO9vv5
+	V8JIz7pzkY0ncUJi5hkgtGU57LPY=
+X-Gm-Gg: ASbGncv4n9FR9BdS1d/+YtNLglCRZCHkoSZllHyMGCHJSBwjUzoIgl6cO1H6pUsa7As
+	H788KzN10HMjk1fctOJ7d+CZCn8+u3/YPWzLnBq1pbRprYIJoNamIAD+bMNGhVjJQhBlvVlaAVN
+	r6O5MMZxPrsUKbEZ1cbWUj8vhKNgtfng==
+X-Google-Smtp-Source: AGHT+IGr8K0QKoeX/DRDo5lbY3tKzJAxx64L6SAHJUEP8kVJUmCILE2pbbaoAxRnvBn/YyHIDfPf1TgvL1DY2x81x5Q=
+X-Received: by 2002:a2e:ad93:0:b0:31a:6644:25c with SMTP id
+ 38308e7fff4ca-31ea2da9e32mr15765931fa.12.1746067075209; Wed, 30 Apr 2025
+ 19:37:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 249bd7fb-330b-496c-2e34-08dd8858f88e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 May 2025 02:36:26.4647
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB7350
+References: <20250428-vsock-vmtest-v3-1-181af6163f3e@gmail.com> <a57wg5kmprrpk2dm3zlzvegb3gzj73ubs5lxeukyinc4edlcsw@itkgfcm44qu2>
+In-Reply-To: <a57wg5kmprrpk2dm3zlzvegb3gzj73ubs5lxeukyinc4edlcsw@itkgfcm44qu2>
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Date: Wed, 30 Apr 2025 19:37:42 -0700
+X-Gm-Features: ATxdqUFExi5mAUA3_K_BOnza8T3UmjEygvcghGvKSijB9no_-t7o0YFhm-ZnYS4
+Message-ID: <CAKB00G2pEJAFzFBMbCGW4gBNB4UqBpEw22a2Cs4oOdSXUWfsuQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] selftests/vsock: add initial vmtest.sh for vsock
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-RnJvbTogUGV0ZXIgWmlqbHN0cmEgPHBldGVyekBpbmZyYWRlYWQub3JnPiBTZW50OiBXZWRuZXNk
-YXksIEFwcmlsIDMwLCAyMDI1IDQ6MDggQU0NCj4gDQo+IEluc3RlYWQgb2YgdXNpbmcgYW4gaW5k
-aXJlY3QgY2FsbCB0byB0aGUgaHlwZXJjYWxsIHBhZ2UsIHVzZSBhIGRpcmVjdA0KPiBjYWxsIGlu
-c3RlYWQuIFRoaXMgYXZvaWRzIGFsbCBDRkkgcHJvYmxlbXMsIGluY2x1ZGluZyB0aGUgb25lIHdo
-ZXJlDQo+IHRoZSBoeXBlcmNhbGwgcGFnZSBkb2Vzbid0IGhhdmUgSUJUIG9uLg0KPiANCj4gU2ln
-bmVkLW9mZi1ieTogUGV0ZXIgWmlqbHN0cmEgKEludGVsKSA8cGV0ZXJ6QGluZnJhZGVhZC5vcmc+
-DQo+IC0tLQ0KPiAgYXJjaC94ODYvaHlwZXJ2L2h2X2luaXQuYyB8ICAgNjAgKysrKysrKysrKysr
-KysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDMw
-IGluc2VydGlvbnMoKyksIDMwIGRlbGV0aW9ucygtKQ0KPiANCj4gLS0tIGEvYXJjaC94ODYvaHlw
-ZXJ2L2h2X2luaXQuYw0KPiArKysgYi9hcmNoL3g4Ni9oeXBlcnYvaHZfaW5pdC5jDQo+IEBAIC0z
-NywyMyArMzcsNDEgQEANCj4gIHZvaWQgKmh2X2h5cGVyY2FsbF9wZzsNCj4gDQo+ICAjaWZkZWYg
-Q09ORklHX1g4Nl82NA0KPiArc3RhdGljIHU2NCBfX2h2X2h5cGVyZmFpbCh1NjQgY29udHJvbCwg
-dTY0IHBhcmFtMSwgdTY0IHBhcmFtMikNCj4gK3sNCj4gKwlyZXR1cm4gVTY0X01BWDsNCj4gK30N
-Cj4gKw0KPiArREVGSU5FX1NUQVRJQ19DQUxMKF9faHZfaHlwZXJjYWxsLCBfX2h2X2h5cGVyZmFp
-bCk7DQo+ICsNCj4gIHU2NCBodl9zdGRfaHlwZXJjYWxsKHU2NCBjb250cm9sLCB1NjQgcGFyYW0x
-LCB1NjQgcGFyYW0yKQ0KPiAgew0KPiAgCXU2NCBodl9zdGF0dXM7DQo+IA0KPiAtCWlmICghaHZf
-aHlwZXJjYWxsX3BnKQ0KPiAtCQlyZXR1cm4gVTY0X01BWDsNCj4gLQ0KPiAgCXJlZ2lzdGVyIHU2
-NCBfX3I4IGFzbSgicjgiKSA9IHBhcmFtMjsNCj4gLQlhc20gdm9sYXRpbGUgKENBTExfTk9TUEVD
-DQo+ICsJYXNtIHZvbGF0aWxlICgiY2FsbCAiIFNUQVRJQ19DQUxMX1RSQU1QX1NUUihfX2h2X2h5
-cGVyY2FsbCkNCj4gIAkJICAgICAgOiAiPWEiIChodl9zdGF0dXMpLCBBU01fQ0FMTF9DT05TVFJB
-SU5ULA0KPiAgCQkgICAgICAgICIrYyIgKGNvbnRyb2wpLCAiK2QiIChwYXJhbTEpLCAiK3IiIChf
-X3I4KQ0KPiAtCQkgICAgICA6IFRIVU5LX1RBUkdFVChodl9oeXBlcmNhbGxfcGcpDQo+IC0JCSAg
-ICAgIDogImNjIiwgIm1lbW9yeSIsICJyOSIsICJyMTAiLCAicjExIik7DQo+ICsJCSAgICAgIDog
-OiAiY2MiLCAibWVtb3J5IiwgInI5IiwgInIxMCIsICJyMTEiKTsNCj4gDQo+ICAJcmV0dXJuIGh2
-X3N0YXR1czsNCj4gIH0NCj4gKw0KPiArdHlwZWRlZiB1NjQgKCpodl9oeXBlcmNhbGxfZikodTY0
-IGNvbnRyb2wsIHU2NCBwYXJhbTEsIHU2NCBwYXJhbTIpOw0KPiArDQo+ICtzdGF0aWMgaW5saW5l
-IHZvaWQgaHZfc2V0X2h5cGVyY2FsbF9wZyh2b2lkICpwdHIpDQo+ICt7DQo+ICsJaHZfaHlwZXJj
-YWxsX3BnID0gcHRyOw0KPiArDQo+ICsJaWYgKCFwdHIpDQo+ICsJCXB0ciA9ICZfX2h2X2h5cGVy
-ZmFpbDsNCj4gKwlzdGF0aWNfY2FsbF91cGRhdGUoX19odl9oeXBlcmNhbGwsIChodl9oeXBlcmNh
-bGxfZilwdHIpOw0KPiArfQ0KPiAgI2Vsc2UNCj4gK3N0YXRpYyBpbmxpbmUgdm9pZCBodl9zZXRf
-aHlwZXJjYWxsX3BnKHZvaWQgKnB0cikNCj4gK3sNCj4gKwlodl9oeXBlcmNhbGxfcGcgPSBwdHI7
-DQo+ICt9DQo+ICBFWFBPUlRfU1lNQk9MX0dQTChodl9oeXBlcmNhbGxfcGcpOw0KPiAgI2VuZGlm
-DQo+IA0KPiBAQCAtMzQ4LDcgKzM2Niw3IEBAIHN0YXRpYyBpbnQgaHZfc3VzcGVuZCh2b2lkKQ0K
-PiAgCSAqIHBvaW50ZXIgaXMgcmVzdG9yZWQgb24gcmVzdW1lLg0KPiAgCSAqLw0KPiAgCWh2X2h5
-cGVyY2FsbF9wZ19zYXZlZCA9IGh2X2h5cGVyY2FsbF9wZzsNCj4gLQlodl9oeXBlcmNhbGxfcGcg
-PSBOVUxMOw0KPiArCWh2X3NldF9oeXBlcmNhbGxfcGcoTlVMTCk7DQo+IA0KPiAgCS8qIERpc2Fi
-bGUgdGhlIGh5cGVyY2FsbCBwYWdlIGluIHRoZSBoeXBlcnZpc29yICovDQo+ICAJcmRtc3JsKEhW
-X1g2NF9NU1JfSFlQRVJDQUxMLCBoeXBlcmNhbGxfbXNyLmFzX3VpbnQ2NCk7DQo+IEBAIC0zNzQs
-NyArMzkyLDcgQEAgc3RhdGljIHZvaWQgaHZfcmVzdW1lKHZvaWQpDQo+ICAJCXZtYWxsb2NfdG9f
-cGZuKGh2X2h5cGVyY2FsbF9wZ19zYXZlZCk7DQo+ICAJd3Jtc3JsKEhWX1g2NF9NU1JfSFlQRVJD
-QUxMLCBoeXBlcmNhbGxfbXNyLmFzX3VpbnQ2NCk7DQo+IA0KPiAtCWh2X2h5cGVyY2FsbF9wZyA9
-IGh2X2h5cGVyY2FsbF9wZ19zYXZlZDsNCj4gKwlodl9zZXRfaHlwZXJjYWxsX3BnKGh2X2h5cGVy
-Y2FsbF9wZ19zYXZlZCk7DQo+ICAJaHZfaHlwZXJjYWxsX3BnX3NhdmVkID0gTlVMTDsNCj4gDQo+
-ICAJLyoNCj4gQEAgLTUyOCw4ICs1NDYsOCBAQCB2b2lkIF9faW5pdCBoeXBlcnZfaW5pdCh2b2lk
-KQ0KPiAgCWlmIChodl9pc29sYXRpb25fdHlwZV90ZHgoKSAmJiAhbXNfaHlwZXJ2LnBhcmF2aXNv
-cl9wcmVzZW50KQ0KPiAgCQlnb3RvIHNraXBfaHlwZXJjYWxsX3BnX2luaXQ7DQo+IA0KPiAtCWh2
-X2h5cGVyY2FsbF9wZyA9IF9fdm1hbGxvY19ub2RlX3JhbmdlKFBBR0VfU0laRSwgMSwgVk1BTExP
-Q19TVEFSVCwNCj4gLQkJCVZNQUxMT0NfRU5ELCBHRlBfS0VSTkVMLCBQQUdFX0tFUk5FTF9ST1gs
-DQo+ICsJaHZfaHlwZXJjYWxsX3BnID0gX192bWFsbG9jX25vZGVfcmFuZ2UoUEFHRV9TSVpFLCAx
-LCBNT0RVTEVTX1ZBRERSLA0KPiArCQkJTU9EVUxFU19FTkQsIEdGUF9LRVJORUwsIFBBR0VfS0VS
-TkVMX1JPWCwNCg0KQ3VyaW9zaXR5IHF1ZXN0aW9uICh3aGljaCBJIGZvcmdvdCBhc2sgYWJvdXQg
-aW4gdjEpOiAgSXMgdGhpcyBjaGFuZ2Ugc28gdGhhdCB0aGUNCmh5cGVyY2FsbCBwYWdlIGtlcm5l
-bCBhZGRyZXNzIGlzICJjbG9zZSBlbm91Z2giIGZvciB0aGUgZGlyZWN0IGNhbGwgdG8gd29yayBm
-cm9tDQpidWlsdC1pbiBjb2RlIGFuZCBmcm9tIG1vZHVsZSBjb2RlPyAgT3IgaXMgdGhlcmUgc29t
-ZSBvdGhlciByZWFzb24/DQoNCj4gIAkJCVZNX0ZMVVNIX1JFU0VUX1BFUk1TLCBOVU1BX05PX05P
-REUsDQo+ICAJCQlfX2J1aWx0aW5fcmV0dXJuX2FkZHJlc3MoMCkpOw0KPiAgCWlmIChodl9oeXBl
-cmNhbGxfcGcgPT0gTlVMTCkNCj4gQEAgLTU2NywyNyArNTg1LDkgQEAgdm9pZCBfX2luaXQgaHlw
-ZXJ2X2luaXQodm9pZCkNCj4gIAkJd3Jtc3JsKEhWX1g2NF9NU1JfSFlQRVJDQUxMLCBoeXBlcmNh
-bGxfbXNyLmFzX3VpbnQ2NCk7DQo+ICAJfQ0KPiANCj4gLXNraXBfaHlwZXJjYWxsX3BnX2luaXQ6
-DQo+IC0JLyoNCj4gLQkgKiBTb21lIHZlcnNpb25zIG9mIEh5cGVyLVYgdGhhdCBwcm92aWRlIElC
-VCBpbiBndWVzdCBWTXMgaGF2ZSBhIGJ1Zw0KPiAtCSAqIGluIHRoYXQgdGhlcmUncyBubyBFTkRC
-UjY0IGluc3RydWN0aW9uIGF0IHRoZSBlbnRyeSB0byB0aGUNCj4gLQkgKiBoeXBlcmNhbGwgcGFn
-ZS4gQmVjYXVzZSBoeXBlcmNhbGxzIGFyZSBpbnZva2VkIHZpYSBhbiBpbmRpcmVjdCBjYWxsDQo+
-IC0JICogdG8gdGhlIGh5cGVyY2FsbCBwYWdlLCBhbGwgaHlwZXJjYWxsIGF0dGVtcHRzIGZhaWwg
-d2hlbiBJQlQgaXMNCj4gLQkgKiBlbmFibGVkLCBhbmQgTGludXggcGFuaWNzLiBGb3Igc3VjaCBi
-dWdneSB2ZXJzaW9ucywgZGlzYWJsZSBJQlQuDQo+IC0JICoNCj4gLQkgKiBGaXhlZCB2ZXJzaW9u
-cyBvZiBIeXBlci1WIGFsd2F5cyBwcm92aWRlIEVOREJSNjQgb24gdGhlIGh5cGVyY2FsbA0KPiAt
-CSAqIHBhZ2UsIHNvIGlmIGZ1dHVyZSBMaW51eCBrZXJuZWwgdmVyc2lvbnMgZW5hYmxlIElCVCBm
-b3IgMzItYml0DQo+IC0JICogYnVpbGRzLCBhZGRpdGlvbmFsIGh5cGVyY2FsbCBwYWdlIGhhY2tl
-cnkgd2lsbCBiZSByZXF1aXJlZCBoZXJlDQo+IC0JICogdG8gcHJvdmlkZSBhbiBFTkRCUjMyLg0K
-PiAtCSAqLw0KPiAtI2lmZGVmIENPTkZJR19YODZfS0VSTkVMX0lCVA0KPiAtCWlmIChjcHVfZmVh
-dHVyZV9lbmFibGVkKFg4Nl9GRUFUVVJFX0lCVCkgJiYNCj4gLQkgICAgKih1MzIgKilodl9oeXBl
-cmNhbGxfcGcgIT0gZ2VuX2VuZGJyKCkpIHsNCj4gLQkJc2V0dXBfY2xlYXJfY3B1X2NhcChYODZf
-RkVBVFVSRV9JQlQpOw0KPiAtCQlwcl93YXJuKCJEaXNhYmxpbmcgSUJUIGJlY2F1c2Ugb2YgSHlw
-ZXItViBidWdcbiIpOw0KPiAtCX0NCj4gLSNlbmRpZg0KDQpOaXQ6IFdpdGggdGhpcyBJQlQgY29k
-ZSByZW1vdmVkLCB0aGUgI2luY2x1ZGUgPGFzbS9pYnQuaD4gYXQgdGhlIHRvcA0Kb2YgdGhpcyBz
-b3VyY2UgY29kZSBmaWxlIHNob3VsZCBiZSByZW1vdmVkLg0KDQo+ICsJaHZfc2V0X2h5cGVyY2Fs
-bF9wZyhodl9oeXBlcmNhbGxfcGcpOw0KPiANCj4gK3NraXBfaHlwZXJjYWxsX3BnX2luaXQ6DQo+
-ICAJLyoNCj4gIAkgKiBoeXBlcnZfaW5pdCgpIGlzIGNhbGxlZCBiZWZvcmUgTEFQSUMgaXMgaW5p
-dGlhbGl6ZWQ6IHNlZQ0KPiAgCSAqIGFwaWNfaW50cl9tb2RlX2luaXQoKSAtPiB4ODZfcGxhdGZv
-cm0uYXBpY19wb3N0X2luaXQoKSBhbmQNCj4gDQo+IA0KDQpUaGUgbml0IG5vdHdpdGhzdGFuZGlu
-ZywNCg0KUmV2aWV3ZWQtYnk6IE1pY2hhZWwgS2VsbGV5IDxtaGtsaW51eEBvdXRsb29rLmNvbT4N
-Cg==
+On Wed, Apr 30, 2025 at 6:06=E2=80=AFAM Stefano Garzarella <sgarzare@redhat=
+.com> wrote:
+>
+> On Mon, Apr 28, 2025 at 04:48:11PM -0700, Bobby Eshleman wrote:
+> >This commit introduces a new vmtest.sh runner for vsock.
+> >
+> >It uses virtme-ng/qemu to run tests in a VM. The tests validate G2H,
+> >H2G, and loopback. The testing tools from tools/testing/vsock/ are
+> >reused. Currently, only vsock_test is used.
+> >
+> >VMCI and hyperv support is automatically built, though not used.
+> >
+> >Only tested on x86.
+> >
+> >To run:
+> >
+> >  $ tools/testing/selftests/vsock/vmtest.sh
+>
+> I tried and it's working, but I have a lot of these messages in the
+> output:
+>      dmesg: read kernel buffer failed: Operation not permitted
+>
+> I'm on Fedora 41:
+>
+> $ uname -r
+> 6.14.4-200.fc41.x86_64
+>
+> >
+> >or
+> >
+> >  $ make -C tools/testing/selftests TARGETS=3Dvsock run_tests
+> >
+> >Results:
+> >       # linux/tools/testing/selftests/vsock/vmtest.log
+> >       setup:  Building kernel and tests
+> >       setup:  Booting up VM
+> >       setup:  VM booted up
+> >       test:vm_server_host_client:guest:       Control socket listening =
+on 0.0.0.0:51000
+> >       test:vm_server_host_client:guest:       Control socket connection=
+ accepted...
+> >       [...]
+> >       test:vm_loopback:guest: 30 - SOCK_STREAM retry failed connect()..=
+.ok
+> >       test:vm_loopback:guest: 31 - SOCK_STREAM SO_LINGER null-ptr-deref=
+...ok
+> >       test:vm_loopback:guest: 31 - SOCK_STREAM SO_LINGER null-ptr-deref=
+...ok
+> >
+> >Future work can include vsock_diag_test.
+> >
+> >vmtest.sh is loosely based off of tools/testing/selftests/net/pmtu.sh,
+> >which was picked out of the bag of tests I knew to work with NIPA.
+> >
+> >Because vsock requires a VM to test anything other than loopback, this
+> >patch adds vmtest.sh as a kselftest itself. This is different than other
+> >systems that have a "vmtest.sh", where it is used as a utility script to
+> >spin up a VM to run the selftests as a guest (but isn't hooked into
+> >kselftest). This aspect is worth review, as I'm not aware of all of the
+> >enviroments where this would run.
+>
+> Yeah, an opinion from net maintainers on this would be great.
+>
+> >
+> >Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+> >---
+> >Changes in v3:
+> >- use common conditional syntax for checking variables
+> >- use return value instead of global rc
+> >- fix typo TEST_HOST_LISTENER_PORT -> TEST_HOST_PORT_LISTENER
+> >- use SIGTERM instead of SIGKILL on cleanup
+> >- use peer-cid=3D1 for loopback
+> >- change sleep delay times into globals
+> >- fix test_vm_loopback logging
+> >- add test selection in arguments
+> >- make QEMU an argument
+> >- check that vng binary is on path
+> >- use QEMU variable
+> >- change <tab><backslash> to <space><backslash>
+> >- fix hardcoded file paths
+> >- add comment in commit msg about script that vmtest.sh was based off of
+> >- Add tools/testing/selftest/vsock/Makefile for kselftest
+> >- Link to v2: https://lore.kernel.org/r/20250417-vsock-vmtest-v2-1-3901a=
+27331e8@gmail.com
+> >
+> >Changes in v2:
+> >- add kernel oops and warnings checker
+> >- change testname variable to use FUNCNAME
+> >- fix spacing in test_vm_server_host_client
+> >- add -s skip build option to vmtest.sh
+> >- add test_vm_loopback
+> >- pass port to vm_wait_for_listener
+> >- fix indentation in vmtest.sh
+> >- add vmci and hyperv to config
+> >- changed whitespace from tabs to spaces in help string
+> >- Link to v1: https://lore.kernel.org/r/20250410-vsock-vmtest-v1-1-f35a8=
+1dab98c@gmail.com
+> >---
+> > MAINTAINERS                                |   1 +
+> > tools/testing/selftests/vsock/.gitignore   |   1 +
+> > tools/testing/selftests/vsock/Makefile     |   9 +
+> > tools/testing/selftests/vsock/config.vsock |  10 +
+> > tools/testing/selftests/vsock/settings     |   1 +
+> > tools/testing/selftests/vsock/vmtest.sh    | 354 ++++++++++++++++++++++=
++++++++
+> > 6 files changed, 376 insertions(+)
+>
+> While applying git warned about trailing spaces, but also checkpatch is
+> warning about them, please can you fix at least the errors (and maybe
+> the misspelling):
+>
+> $ ./scripts/checkpatch.pl --strict -g master..HEAD --codespell
+> WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit
+> description?)
+> #31:
+>         test:vm_server_host_client:guest:       Control socket listening =
+on 0.0.0.0:51000
+>
+> WARNING: 'enviroments' may be misspelled - perhaps 'environments'?
+> #48:
+> enviroments where this would run.
+> ^^^^^^^^^^^
+>
+> ERROR: trailing whitespace
+> #174: FILE: tools/testing/selftests/vsock/vmtest.sh:47:
+> +^Ivm_server_host_client^IRun vsock_test in server mode on the VM and in =
+client mode on the host.^I$
+>
+> WARNING: line length of 104 exceeds 100 columns
+> #174: FILE: tools/testing/selftests/vsock/vmtest.sh:47:
+> +       vm_server_host_client   Run vsock_test in server mode on the VM a=
+nd in client mode on the host.
+>
+> ERROR: trailing whitespace
+> #175: FILE: tools/testing/selftests/vsock/vmtest.sh:48:
+> +^Ivm_client_host_server^IRun vsock_test in client mode on the VM and in =
+server mode on the host.^I$
+>
+> WARNING: line length of 104 exceeds 100 columns
+> #175: FILE: tools/testing/selftests/vsock/vmtest.sh:48:
+> +       vm_client_host_server   Run vsock_test in client mode on the VM a=
+nd in server mode on the host.
+>
+> ERROR: trailing whitespace
+> #176: FILE: tools/testing/selftests/vsock/vmtest.sh:49:
+> +^Ivm_loopback^I^IRun vsock_test using the loopback transport in the VM.^=
+I$
+>
+> ERROR: trailing whitespace
+> #443: FILE: tools/testing/selftests/vsock/vmtest.sh:316:
+> +IFS=3D"^I$
+>
+> total: 4 errors, 4 warnings, 0 checks, 382 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>        mechanically convert to the typical style using --fix or --fix-inp=
+lace.
+>
+> NOTE: Whitespace errors detected.
+>        You may wish to use scripts/cleanpatch or scripts/cleanfile
+>
+> Commit ffa17d673263 ("selftests/vsock: add initial vmtest.sh for vsock") =
+has style problems, please review.
+>
+> NOTE: If any of the errors are false positives, please report
+>        them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+
+This might not have been the right choice, but I adopted the technique
+from the pmtu selftest of
+using a tab at the end of the help text lines and then splitting with
+"IFS=3D\t\n". I guess the win is that
+running the script has the side effect of checking that the help text
+has been updated, and the tab
+is not visible?
+
+I think we could do something similar with bash arrays though and have
+no checkpatch complaints, and
+not having to do "git commit --no-verify" to bypass the checks.
+
+> >
+> >diff --git a/MAINTAINERS b/MAINTAINERS
+> >index 657a67f9031ef7798c19ac63e6383d4cb18a9e1f..3fbdd7bbfce7196a3cc7db70=
+203317c6bd0e51fd 100644
+> >--- a/MAINTAINERS
+> >+++ b/MAINTAINERS
+> >@@ -25751,6 +25751,7 @@ F:     include/uapi/linux/vm_sockets.h
+> > F:    include/uapi/linux/vm_sockets_diag.h
+> > F:    include/uapi/linux/vsockmon.h
+> > F:    net/vmw_vsock/
+> >+F:    tools/testing/selftests/vsock/
+> > F:    tools/testing/vsock/
+> >
+> > VMALLOC
+> >diff --git a/tools/testing/selftests/vsock/.gitignore b/tools/testing/se=
+lftests/vsock/.gitignore
+> >new file mode 100644
+> >index 0000000000000000000000000000000000000000..1950aa8ac68c0831c12c1aaa=
+429da45bbe41e60f
+> >--- /dev/null
+> >+++ b/tools/testing/selftests/vsock/.gitignore
+> >@@ -0,0 +1 @@
+> >+vsock_selftests.log
+> >diff --git a/tools/testing/selftests/vsock/Makefile b/tools/testing/self=
+tests/vsock/Makefile
+> >new file mode 100644
+> >index 0000000000000000000000000000000000000000..6fded8c4d593541a6f746214=
+7bffcb719def378f
+> >--- /dev/null
+> >+++ b/tools/testing/selftests/vsock/Makefile
+> >@@ -0,0 +1,9 @@
+> >+# SPDX-License-Identifier: GPL-2.0
+> >+.PHONY: all
+> >+all:
+> >+
+> >+TEST_PROGS :=3D vmtest.sh
+> >+EXTRA_CLEAN :=3D vmtest.log
+> >+
+> >+include ../lib.mk
+> >+
+> >diff --git a/tools/testing/selftests/vsock/config.vsock b/tools/testing/=
+selftests/vsock/config.vsock
+> >new file mode 100644
+> >index 0000000000000000000000000000000000000000..9e0fb2270e6a2fc0beb5f0d9=
+f0bc37158d0a9d23
+> >--- /dev/null
+> >+++ b/tools/testing/selftests/vsock/config.vsock
+> >@@ -0,0 +1,10 @@
+> >+CONFIG_VSOCKETS=3Dy
+> >+CONFIG_VSOCKETS_DIAG=3Dy
+> >+CONFIG_VSOCKETS_LOOPBACK=3Dy
+> >+CONFIG_VMWARE_VMCI_VSOCKETS=3Dy
+> >+CONFIG_VIRTIO_VSOCKETS=3Dy
+> >+CONFIG_VIRTIO_VSOCKETS_COMMON=3Dy
+> >+CONFIG_HYPERV_VSOCKETS=3Dy
+> >+CONFIG_VMWARE_VMCI=3Dy
+> >+CONFIG_VHOST_VSOCK=3Dy
+> >+CONFIG_HYPERV=3Dy
+> >diff --git a/tools/testing/selftests/vsock/settings b/tools/testing/self=
+tests/vsock/settings
+> >new file mode 100644
+> >index 0000000000000000000000000000000000000000..e7b9417537fbc4626153b72e=
+8f295ab4594c844b
+> >--- /dev/null
+> >+++ b/tools/testing/selftests/vsock/settings
+> >@@ -0,0 +1 @@
+> >+timeout=3D0
+> >diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/sel=
+ftests/vsock/vmtest.sh
+> >new file mode 100755
+> >index 0000000000000000000000000000000000000000..d70b9446e531d6d20beb24dd=
+eda2cf0a9f7e9a39
+> >--- /dev/null
+> >+++ b/tools/testing/selftests/vsock/vmtest.sh
+> >@@ -0,0 +1,354 @@
+> >+#!/bin/bash
+> >+# SPDX-License-Identifier: GPL-2.0
+> >+#
+> >+# Copyright (c) 2025 Meta Platforms, Inc. and affiliates
+> >+#
+> >+# Dependencies:
+> >+#             * virtme-ng
+> >+#             * busybox-static (used by virtme-ng)
+> >+#             * qemu  (used by virtme-ng)
+> >+
+> >+SCRIPT_DIR=3D"$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)=
+"
+> >+KERNEL_CHECKOUT=3D$(realpath ${SCRIPT_DIR}/../../../..)
+> >+QEMU=3D$(command -v qemu-system-$(uname -m))
+> >+VERBOSE=3D0
+> >+SKIP_BUILD=3D0
+> >+VSOCK_TEST=3D${KERNEL_CHECKOUT}/tools/testing/vsock/vsock_test
+> >+
+> >+TEST_GUEST_PORT=3D51000
+> >+TEST_HOST_PORT=3D50000
+> >+TEST_HOST_PORT_LISTENER=3D50001
+> >+SSH_GUEST_PORT=3D22
+> >+SSH_HOST_PORT=3D2222
+> >+VSOCK_CID=3D1234
+> >+WAIT_PERIOD=3D3
+> >+WAIT_PERIOD_MAX=3D20
+> >+
+> >+QEMU_PIDFILE=3D/tmp/qemu.pid
+> >+
+> >+# virtme-ng offers a netdev for ssh when using "--ssh", but we also nee=
+d a
+> >+# control port forwarded for vsock_test.  Because virtme-ng doesn't sup=
+port
+> >+# adding an additional port to forward to the device created from "--ss=
+h" and
+> >+# virtme-init mistakenly sets identical IPs to the ssh device and addit=
+ional
+> >+# devices, we instead opt out of using --ssh, add the device manually, =
+and also
+> >+# add the kernel cmdline options that virtme-init uses to setup the int=
+erface.
+> >+QEMU_OPTS=3D""
+> >+QEMU_OPTS=3D"${QEMU_OPTS} -netdev user,id=3Dn0,hostfwd=3Dtcp::${TEST_HO=
+ST_PORT}-:${TEST_GUEST_PORT}"
+> >+QEMU_OPTS=3D"${QEMU_OPTS},hostfwd=3Dtcp::${SSH_HOST_PORT}-:${SSH_GUEST_=
+PORT}"
+> >+QEMU_OPTS=3D"${QEMU_OPTS} -device virtio-net-pci,netdev=3Dn0"
+> >+QEMU_OPTS=3D"${QEMU_OPTS} -device vhost-vsock-pci,guest-cid=3D${VSOCK_C=
+ID}"
+> >+QEMU_OPTS=3D"${QEMU_OPTS} --pidfile ${QEMU_PIDFILE}"
+>
+> What about:
+>
+> QEMU_OPTS=3D" \
+>      -netdev user,id=3Dn0,hostfwd=3Dtcp::${TEST_HOST_PORT}-:${TEST_GUEST_=
+PORT},hostfwd=3Dtcp::${SSH_HOST_PORT}-:${SSH_GUEST_PORT} \
+>      -device virtio-net-pci,netdev=3Dn0 \
+>      -device vhost-vsock-pci,guest-cid=3D${VSOCK_CID} \
+>      --pidfile ${QEMU_PIDFILE}
+> "
+>
+> Not a strong opinion, just I see too much "QEMU_OPTS=3D"${QEMU_OPTS}" xD
+> You can leave it in that way if you prefer.
+>
+
+That's totally fine by me, no strong opinion on my side. I tend to do
+the string-building thing
+across the board because for some reason multiline strings look odd to
+me when inside
+function scope, and string-building looks like the same pattern
+everywhere. Definitely not
+a preference I hold tightly though.
+
+> >+KERNEL_CMDLINE=3D"virtme.dhcp net.ifnames=3D0 biosdevname=3D0 virtme.ss=
+h virtme_ssh_user=3D$USER"
+> >+
+> >+LOG=3D${SCRIPT_DIR}/vmtest.log
+> >+
+> >+#             Name                            Description
+> >+avail_tests=3D"
+> >+      vm_server_host_client   Run vsock_test in server mode on the VM a=
+nd in client mode on the host.
+> >+      vm_client_host_server   Run vsock_test in client mode on the VM a=
+nd in server mode on the host.
+> >+      vm_loopback             Run vsock_test using the loopback transpo=
+rt in the VM.
+> >+"
+> >+
+> >+usage() {
+> >+      echo
+> >+      echo "$0 [OPTIONS] [TEST]..."
+> >+      echo "If no TEST argument is given, all tests will be run."
+> >+      echo
+> >+      echo "Options"
+> >+      echo "  -v: verbose output"
+> >+      echo "  -s: skip build"
+> >+      echo
+> >+      echo "Available tests${avail_tests}"
+> >+      exit 1
+> >+}
+> >+
+> >+die() {
+> >+      echo "$*" >&2
+> >+      exit 1
+> >+}
+> >+
+> >+vm_ssh() {
+> >+      ssh -q -o UserKnownHostsFile=3D/dev/null -p 2222 localhost $*
+>
+> ${SSH_HOST_PORT} instead of 2222, right?
+>
+
+Oops. Yep, will fix.
+
+> The rest LGTM!
+>
+> Thanks,
+> Stefano
+>
+
+Thanks for the review!
+
+Best,
+Bobby
 
