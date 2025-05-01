@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-45025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 999D4AA5A09
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 05:43:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07D3AAA5A0D
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 05:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64DA49E1593
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 03:43:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFE2F984C10
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 03:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41103182B7;
-	Thu,  1 May 2025 03:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03202309AF;
+	Thu,  1 May 2025 03:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ObqbPHCH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VvtVvuRn"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14CB230996
-	for <kvm@vger.kernel.org>; Thu,  1 May 2025 03:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBA51EB193
+	for <kvm@vger.kernel.org>; Thu,  1 May 2025 03:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746070983; cv=none; b=kV1+jWWnWNWobdPNXpyT2Nj9JuLMUYIAC/GZy9dqb/2IsKiiAZ+IW1cZ6QcZFP/MfAIzC1nNlxCH1o/TQE0eOC1oD8xGNuHPkS0b2gqAsv8wf9pgtJGRyM6/dAf3SnMtd2j5gINMBzusRAPuQoje61GhtxDpM0nh+rjmNltFELY=
+	t=1746071425; cv=none; b=hMOASvIieZrV4n/l5UNmVmTYEY2PG4OaGXqEwEbs1hGxPDEHzH7yEPRshH6yKRnPaI9rpVBNJ4aaCsSWBYTkEDW0TzWePZ1QBb37ch2QF69pXSxFrLOmLT9UgaX9FTJ/UDe/F70opG8Ya26HV9URRSl4461aYgycXhYAVFDbEj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746070983; c=relaxed/simple;
-	bh=rCfk93JTwE7IksYYV61B6JuTCbu+HHdPHtJEQpV6aCY=;
+	s=arc-20240116; t=1746071425; c=relaxed/simple;
+	bh=PO+3BQsPIF+4e0+asMRXeh+QLcIUVpdmgRa7WCUfcr8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BKnG50gVIeJXJG7H5tU6KEvF4rntI9EUO8kTd2t7jpsNWx2O5xsC6wu16KjJhu8OgnDboX/X25dEV2Dc26d1IoXLBd+FPW5YpTIaRQpsto0PPQJfX1enZRSpD7eop8Qzcw2bca/HC8KAly7f73jUTqa/MYlLdsRE9Gkc61r+XL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ObqbPHCH; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Nlaxz6EqifEkYCt2pYEmiq44qugPwzlufBaYbMmabypbYa79USZ+kI+ioAL9GaxMww6T3zIGdNqwJP1QTlr5kv5H//+nN7s92vXZagSr8NIBR/bJuhBadXZaPcs9hlWNlK1FrCfaeuM2xBfxKGpvy7aIpY4U6CZjpcfT/Ytu52E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VvtVvuRn; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746070979;
+	s=mimecast20190719; t=1746071422;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JC4AbsVCdLJ1p7UYeSXewTdrjDsKeZ54RhtL8jSgmm0=;
-	b=ObqbPHCHqFTS2s2ebNC+6x7vAV1gyqIjHVARis6Waxf2gt9AapSfPFK5rMFMayFmp2YnZd
-	zXAYtzvBO7FDx4FJ/TFjp4/jYgr6/4WTh4lswMVVZfzwNKeaKOuA4EBq8Sq9Re95zfV3h6
-	IKf36gROdmifLfC2OwxGZG1/i37aAUg=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=eCg3VHmOtxCvew5eYi3QzhfJ1vb1uNXc4Xa6k7JPpko=;
+	b=VvtVvuRnXUp04++ObLq/ENJatsQKtnlZsf/uo3WSQWZINGiYKUCRfKCGriOFtztSDo/Dfw
+	QED4ZIDmRM4RRJ8nNoI3P73z1hUmjfC5TAPIXnimrxXVipznwMuXeeQxKMfAQMasxG2cj7
+	tRzelyQ/5M+X095A+kBIwCEUJCnj904=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-173-6odwNiyVOi-L1pIMq65iuw-1; Wed, 30 Apr 2025 23:42:57 -0400
-X-MC-Unique: 6odwNiyVOi-L1pIMq65iuw-1
-X-Mimecast-MFC-AGG-ID: 6odwNiyVOi-L1pIMq65iuw_1746070975
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-22403329f9eso4247955ad.3
-        for <kvm@vger.kernel.org>; Wed, 30 Apr 2025 20:42:56 -0700 (PDT)
+ us-mta-421-Rk5o1aQMMze9Zx3wV1kI8Q-1; Wed, 30 Apr 2025 23:50:20 -0400
+X-MC-Unique: Rk5o1aQMMze9Zx3wV1kI8Q-1
+X-Mimecast-MFC-AGG-ID: Rk5o1aQMMze9Zx3wV1kI8Q_1746071420
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-af8f28f85a7so340502a12.2
+        for <kvm@vger.kernel.org>; Wed, 30 Apr 2025 20:50:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746070975; x=1746675775;
+        d=1e100.net; s=20230601; t=1746071419; x=1746676219;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JC4AbsVCdLJ1p7UYeSXewTdrjDsKeZ54RhtL8jSgmm0=;
-        b=ZAhhcW9tAFGi/QLJpcYwr/zYHYAP2QOv6kz/U8aw5Q7ugFt5ADK6bjyFihAwJPH4ul
-         pMlnsl5qNEvybvV2OvhVG17/AHKcfHZzRJrQ1+jOAbQZkNrK2AClP4B3K7DAWoEe+DSO
-         QD5E5DrPQspv8yhGgdATbVhnr+qfqQg4I89FXsAiy7CIn6c0BWHEyjYa7n/R/Se6WQTD
-         E78JoychrH4b8//GS+3RI8tYtbetSzixN93dSiKPEcF5kvWvbT5zBP7HBl625vWfMRxn
-         2VIP906wB0B2iOEsYPF47eJroLoUA9uCwPw6cx0KG6YC4xt7lQyniUe34z9e4VsQgttK
-         f9jg==
-X-Forwarded-Encrypted: i=1; AJvYcCWVqS4lUoMH044vScTLbI6YmAaISzhpNMtEgxCni/uXxqswXjAgoAbgj+1AzGnuuyJbc34=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqnPRyLfxKnoSatS8lHM5oMWavGClhoTWSfHWfRI/0mVtrc5Sz
-	5Vha2wT8CJl8tx7Bbd7zaeRmPZJX5KvRVFllfU7B7ALeELAokd+4Y6DVFeqci5Lf8EEVkQhC42/
-	HURCks9X9To1s3hot0N4+5PveE4n422a1VA4pyE/H/N37l/Qtvw==
-X-Gm-Gg: ASbGncuKLnyOowZRRLBm/Ufz0SjOhk2fjIeX9tpIhQ9xT3zV6YhXLKQPRDolKXVDSo8
-	F99Lknm6hp5l54bu5oL6LbJMVeNR9wBKihGiEPJieo9fJxSMJ0dLYXmTPTZaleO7JbcfcxinrKc
-	ldHX5UDop5Nlt+GQHM4Ts6R62Uz7RBqdqizaFEAKxlbJqqsDu0OcQdbN+oJhNjCfVwX12pofIwG
-	vjnyJqn1OXLRe2kdlzRToeEilVyJuj15WwHYjXwa01qTAFZ2JzgNMWy4B3kRyUzfKjm+iq3FpRB
-	omqqyTU31pFm
-X-Received: by 2002:a17:902:f548:b0:21f:4649:fd49 with SMTP id d9443c01a7336-22e0863efbfmr14694145ad.49.1746070975376;
-        Wed, 30 Apr 2025 20:42:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6XeA16VOaq6zL1nFcqHpvVwTJjX64McCuJNjLU9eHJvxIX6JXOCTvpbcT/Z0Dp6bPnFYLIg==
-X-Received: by 2002:a17:902:f548:b0:21f:4649:fd49 with SMTP id d9443c01a7336-22e0863efbfmr14693805ad.49.1746070975009;
-        Wed, 30 Apr 2025 20:42:55 -0700 (PDT)
+        bh=eCg3VHmOtxCvew5eYi3QzhfJ1vb1uNXc4Xa6k7JPpko=;
+        b=YCCz9DMTNmFukTqcKpT7WY4NZ69tctKy3C6NgrFTUfxMJ1lY/fWxGvwHb4gZ2B7QL6
+         woSXE5+T/0crjn4TtlmnruJexbCP++6FRC59x4QUZmUZSw+ft1wQ5RyeV3a0BzrbagA0
+         6z1kChZivkHYwVeRXCxTkRRCUCsxJ5xMNx0YUgcjyH4FNzYfH+h6NMUuxtrQrYuhaCLF
+         YlKv5LF/AIYUDJ9zzC0383pMICp+/pBy2ZWcwiAggKlmU2a/r+XLlGCei07JQItx9zmF
+         hn+29BLQk3ikoMD/b1Xtgvi1pMlk5aOPG3MAu8+tKwU2hCAfUJ+sB9I754zmpjeKGrqW
+         tpwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9e1gwVC9xByA7fJzOhM6ZJNhwNUhc64ut85i6gjnCYmnw8ti5AA9zMtESZ92dKxTaG10=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5OIi0VtcaOD7ZKlPD6DMelcy8cmicGCx+z8wQRtf6MoO6RaRy
+	VBGiz9waArl5aEJYOLMexQ/UVJpqNPMuPogX8gJi26H1DkfuNvXOD1UcnSIj9YSjeLUrerzxabO
+	ohvTLj+DG3DbVG+vUNrB0GdwQtU4brNMd8u4QtpdXL9JalgOPJg==
+X-Gm-Gg: ASbGncsDqdWmtfgMoHpjjbUWBiUssh89diEAxITlBKYSWB0r8v8TGawOs9FwjsMLi2g
+	S37rb64W9XP5SawUIJLgJI4j/EJbHoTYUHJ38SiQl5FlxqmubzuJkHvR+Fmyj/md8YeuHREFyE8
+	/UXLi9pd4jvL05Dc0YSIfCAkNbyB4y2dTt9KYb+T8K/2BaSWWArmeS+Bqepw+MSQvawNULrjiBD
+	IEyQAP7ykM71r+TSixTb3zRw+sTlmZl08OJl+68wR5lsBfmieQb0sK3wPtfOVvYaq/6rMbgPEk+
+	5JL40aYK+oZd
+X-Received: by 2002:a17:902:ce82:b0:224:e33:889b with SMTP id d9443c01a7336-22e040bf632mr26267635ad.12.1746071419633;
+        Wed, 30 Apr 2025 20:50:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHjGXYl1nbElt//Y7QO+1qgJyi9H/AWK7L3Z8v+0R5cqVKw1fIlymBvwS8voAmkMjppWWC63Q==
+X-Received: by 2002:a17:902:ce82:b0:224:e33:889b with SMTP id d9443c01a7336-22e040bf632mr26267185ad.12.1746071419220;
+        Wed, 30 Apr 2025 20:50:19 -0700 (PDT)
 Received: from [192.168.68.51] ([180.233.125.65])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db5102b03sm130327715ad.194.2025.04.30.20.42.47
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22db5100c70sm130601505ad.166.2025.04.30.20.50.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Apr 2025 20:42:54 -0700 (PDT)
-Message-ID: <f61ef14b-9a51-48c5-b88e-518461c988cb@redhat.com>
-Date: Thu, 1 May 2025 13:42:46 +1000
+        Wed, 30 Apr 2025 20:50:18 -0700 (PDT)
+Message-ID: <b10f429b-7009-4399-966c-430ad1e02d05@redhat.com>
+Date: Thu, 1 May 2025 13:50:10 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,8 +88,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 36/43] arm64: RME: Initialize PMCR.N with number
- counter supported by RMM
+Subject: Re: [PATCH v8 37/43] arm64: RME: Propagate max SVE vector length from
+ RMM
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
@@ -106,26 +106,29 @@ Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-37-steven.price@arm.com>
+ <20250416134208.383984-38-steven.price@arm.com>
 Content-Language: en-US
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250416134208.383984-37-steven.price@arm.com>
+In-Reply-To: <20250416134208.383984-38-steven.price@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 4/16/25 11:41 PM, Steven Price wrote:
 > From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 > 
-> Provide an accurate number of available PMU counters to userspace when
-> setting up a Realm.
+> RMM provides the maximum vector length it supports for a guest in its
+> feature register. Make it visible to the rest of KVM and to userspace
+> via KVM_REG_ARM64_SVE_VLS.
 > 
 > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->   arch/arm64/include/asm/kvm_rme.h | 1 +
->   arch/arm64/kvm/pmu-emul.c        | 3 +++
->   arch/arm64/kvm/rme.c             | 5 +++++
->   3 files changed, 9 insertions(+)
+>   arch/arm64/include/asm/kvm_host.h |  2 +-
+>   arch/arm64/include/asm/kvm_rme.h  |  1 +
+>   arch/arm64/kvm/guest.c            |  2 +-
+>   arch/arm64/kvm/reset.c            | 12 ++++++++++--
+>   arch/arm64/kvm/rme.c              |  6 ++++++
+>   5 files changed, 19 insertions(+), 4 deletions(-)
 > 
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
