@@ -1,54 +1,70 @@
-Return-Path: <kvm+bounces-45075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45076-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F27F9AA5D23
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 12:17:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97EF5AA5D3F
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 12:31:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 692574C4C04
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 10:17:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49BB91BA7A30
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 10:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FB721A447;
-	Thu,  1 May 2025 10:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1F521B9CD;
+	Thu,  1 May 2025 10:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="crvnWNJn"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107132AE7F
-	for <kvm@vger.kernel.org>; Thu,  1 May 2025 10:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0C219F12D;
+	Thu,  1 May 2025 10:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746094657; cv=none; b=CaT0EQjl13LfUkviPovlovzhXRiRbdj5QXz2LMsf9EnnF1ZouAXmwKiGbiYCh8phZuPBbEJmV4dlISDdphZ7MzcdDszg6/pXA7Tj0jOtwFibJWdbr5cB4sTjOyDS3MDUfXV2LnMIJkL6tNHmuradllytNfQaT60s1nc0UtSaLCs=
+	t=1746095452; cv=none; b=YatIm8qL2hVfqlbKPZozFlPvKoxnth9c0UOtVMdgOLQK0ha0TrkXNtnwCIqXCwnzJo8AwsJTciNsoS4Bl7KskbYp4i8E425uWglHDUpQwP/kP7rV3PFg/JEmm+s6Uo967SNaJgTf1zASyIVFgkIJOa3KwTxn1sWelikuPNRaSM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746094657; c=relaxed/simple;
-	bh=vO7a5PYXV1zVWqM0nrFivNPwc8aC6yEAAZw2CN1waFs=;
+	s=arc-20240116; t=1746095452; c=relaxed/simple;
+	bh=XpbBawKWzBBuqs88Kn7OkQDVDvLjqX6HXmxzkGJ0WRo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZToqeVEwaBDrBt5fQ5QxZrycc8MbOVKs5VypuvJU/y+uWWg9eTv0XQqM1PwctrbteP5Z8yed85+KvkFOpr3gTIrGtf/Q57a7vNIJJpFX3VDbqN9HFm4dW8gx/DGabnFUxkaQpiOqbXiEJwPq///uVdfyPE3H3Ei2ai/0X2M/PZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E96E71063;
-	Thu,  1 May 2025 03:17:27 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7FB663F673;
-	Thu,  1 May 2025 03:17:33 -0700 (PDT)
-Date: Thu, 1 May 2025 11:17:30 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 13/42] arm64: Add syndrome information for trapped
- LD64B/ST64B{,V,V0}
-Message-ID: <20250501101730.GF1859293@e124191.cambridge.arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
- <20250426122836.3341523-14-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lzqVKVD96cuZrkrae9UFCXuoXd0pF+eU6NzhrX0eyKbOr69fHDm54f6tbNKEYjoW3jSs+Omz1xkvprGsQyX87QfindU8SA/e1KI3iHj3jiHVvZogfPpfqmWFm/LMDHcHiFlPkzeqE8sdOLwcfrAI0spu7iIWt5Q1s8f2i/8mGFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=crvnWNJn; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=EhR7ZzIBi89ApjQaqgEu2V5WiXEmzHjGGhYf5bYe5UA=; b=crvnWNJnqfvrBzvDW0OoZAttgL
+	rD1X7HYMrlHz8S5qoPuWFzKNpqaUuIZUJ6s+fBt0OM0oip0dfeFvCLJpXZFIetf5pdi7tqYsUJeaR
+	sDsixYqsc5ADh1iMmr2TnxHStJxyQKW5zOi8RsaxERbmiWv7FD1Vy7Y1FcY+aSXEy5hzJ1CY+aMjG
+	pHOUiJbmB68i9atReeyLxaOIKywhUuzSUG5r4In77D9U7iaV7FBhSn6NXGOuFzYk1d5kKRsedgxSc
+	ITBB+y/zeCiIiMd5bCUGRUBSQMZ/lz1RLTPNswYdF+J/ulovCBqWBexm66xmvYGgrDwHyYqSQp8l2
+	0kolHYEQ==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1uARBf-0000000Dy9Q-04Yc;
+	Thu, 01 May 2025 10:30:39 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 56531300642; Thu,  1 May 2025 12:30:38 +0200 (CEST)
+Date: Thu, 1 May 2025 12:30:38 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
+	wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	seanjc@google.com, pbonzini@redhat.com, ardb@kernel.org,
+	kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
+	gregkh@linuxfoundation.org, jpoimboe@kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-efi@vger.kernel.org,
+	samitolvanen@google.com, ojeda@kernel.org, xin@zytor.com
+Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
+ in __nocfi functions
+Message-ID: <20250501103038.GB4356@noisy.programming.kicks-ass.net>
+References: <20250430110734.392235199@infradead.org>
+ <8B86A3AE-A296-438C-A7A7-F844C66D0198@zytor.com>
+ <20250430190600.GQ4439@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -57,43 +73,24 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250426122836.3341523-14-maz@kernel.org>
+In-Reply-To: <20250430190600.GQ4439@noisy.programming.kicks-ass.net>
 
-On Sat, Apr 26, 2025 at 01:28:07PM +0100, Marc Zyngier wrote:
-> Provide the architected EC and ISS values for all the FEAT_LS64*
-> instructions.
+On Wed, Apr 30, 2025 at 09:06:00PM +0200, Peter Zijlstra wrote:
+> On Wed, Apr 30, 2025 at 07:24:15AM -0700, H. Peter Anvin wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/esr.h | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+> > >KVM has another; the VMX interrupt injection stuff calls the IDT handler
+> > >directly.  Is there an alternative? Can we keep a table of Linux functions
+> > >slighly higher up the call stack (asm_\cfunc ?) and add CFI to those?
 > 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index e4f77757937e6..a0ae66dd65da9 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -20,7 +20,8 @@
->  #define ESR_ELx_EC_FP_ASIMD	UL(0x07)
->  #define ESR_ELx_EC_CP10_ID	UL(0x08)	/* EL2 only */
->  #define ESR_ELx_EC_PAC		UL(0x09)	/* EL2 and above */
-> -/* Unallocated EC: 0x0A - 0x0B */
-> +#define ESR_ELx_EC_OTHER	UL(0x0A)
-> +/* Unallocated EC: 0x0B */
->  #define ESR_ELx_EC_CP14_64	UL(0x0C)
->  #define ESR_ELx_EC_BTI		UL(0x0D)
->  #define ESR_ELx_EC_ILL		UL(0x0E)
-> @@ -181,6 +182,11 @@
->  #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
->  #define ESR_ELx_xVC_IMM_MASK	((UL(1) << 16) - 1)
->  
-> +/* ISS definitions for LD64B/ST64B instructions */
-> +#define ESR_ELx_ISS_OTHER_ST64BV	(0)
-> +#define ESR_ELx_ISS_OTHER_ST64BV0	(1)
-> +#define ESR_ELx_ISS_OTHER_LDST64B	(2)
-> +
->  #define DISR_EL1_IDS		(UL(1) << 24)
->  /*
->   * DISR_EL1 and ESR_ELx share the bottom 13 bits, but the RES0 bits may mean
+> > We do have a table of handlers higher up in the stack in the form of
+> > the dispatch tables for FRED. They don't in general even need the
+> > assembly entry stubs, either.
+> 
+> Oh, right. I'll go have a look at those.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Right, so perhaps the easiest way around this is to setup the FRED entry
+tables unconditionally, have VMX mandate CONFIG_FRED and then have it
+always use the FRED entry points.
+
+Let me see how ugly that gets.
 
