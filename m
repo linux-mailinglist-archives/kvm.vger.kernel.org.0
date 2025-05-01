@@ -1,39 +1,39 @@
-Return-Path: <kvm+bounces-45077-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45078-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9337CAA5D66
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 12:43:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A4FAA5D79
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 13:02:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03DA14C41B8
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 10:43:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DE6F9835DD
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 11:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CAC221F20;
-	Thu,  1 May 2025 10:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE4820FAB0;
+	Thu,  1 May 2025 11:01:58 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D2A1DC9A3
-	for <kvm@vger.kernel.org>; Thu,  1 May 2025 10:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24E679FD
+	for <kvm@vger.kernel.org>; Thu,  1 May 2025 11:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746096223; cv=none; b=dE7v2D0hZw74uA7m76QY4eidIvY+x51qgyRKwyeYLjLaOK+jRmlCUFyWVYRD8pIUS+20p+iVoFK3OdCk3XDuHTuX1FTuRDFn1qLjYch1UNPaWTXeKop2RRR8NEkEthpG09w2aksifUQ/sHPTfk6NH15Jaq+FJu8B/Z49gx1h4r8=
+	t=1746097318; cv=none; b=l4boE9IEXnwL4reOPRhLYkNNrToJ8P94exJZz0ehMr6AEbAgIZOeqKPBA6IwxB+QDtzOUj9Jac/SFQvvaF1NIV7QcRT1L8enyXUgr9lFyX952nv4O9YYEEJPzIJZdJIbuy9XaMRmep5Y+QScy8fRMLn/juZtLOa5mdBmPdkZE6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746096223; c=relaxed/simple;
-	bh=0/dQJYcz+1JKfUAWj9CPp7LMRU5ymdAIIa36fhXVHi8=;
+	s=arc-20240116; t=1746097318; c=relaxed/simple;
+	bh=GiCrzs2Fdvusv4yoGsES1ow6eU4r+keqOuYRsOqAxcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ueS0Dv+x6jxXi76BRk3eL2EJCAiR5Mati19dAqyXOZmUxbCOWUU9QEtIydaKga+8dH1NhL54L8DTEsW+QdNXYQF4kM/mWFaJgb+Eg4Ik8d940qHc6jYOccnMbaXdwn1eWsgVvRQPWekHjkHSV1KXbJUdNA/ZjtDQ8u4mR9CKr30=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bfc7NmukDjglV5kLKQeflCm9Gn6Jvj84YDpVFFYRUF6X7gtZyWcTAobHDyPvKsknTgGg5OejCrLFJfE4EsaSYI/uKlGJohQlbyZN323NAMMICdJz9HXbMxOIU3lW8GYei1yRO/75TO38CfuzFEKlpNooGO81AfJyK0eKGYC4Zqo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 62F62106F;
-	Thu,  1 May 2025 03:43:33 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B2237106F;
+	Thu,  1 May 2025 04:01:47 -0700 (PDT)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F6CC3F673;
-	Thu,  1 May 2025 03:43:38 -0700 (PDT)
-Date: Thu, 1 May 2025 11:43:36 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5DFF63F5A1;
+	Thu,  1 May 2025 04:01:53 -0700 (PDT)
+Date: Thu, 1 May 2025 12:01:50 +0100
 From: Joey Gouly <joey.gouly@arm.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -44,11 +44,11 @@ Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 16/42] KVM: arm64: Simplify handling of negative FGT
- bits
-Message-ID: <20250501104336.GG1859293@e124191.cambridge.arm.com>
+Subject: Re: [PATCH v3 17/42] KVM: arm64: Handle trapping of FEAT_LS64*
+ instructions
+Message-ID: <20250501110150.GH1859293@e124191.cambridge.arm.com>
 References: <20250426122836.3341523-1-maz@kernel.org>
- <20250426122836.3341523-17-maz@kernel.org>
+ <20250426122836.3341523-18-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -57,133 +57,98 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250426122836.3341523-17-maz@kernel.org>
+In-Reply-To: <20250426122836.3341523-18-maz@kernel.org>
 
-On Sat, Apr 26, 2025 at 01:28:10PM +0100, Marc Zyngier wrote:
-> check_fgt_bit() and triage_sysreg_trap() implement the same thing
-> twice for no good reason. We have to lookup the FGT register twice,
-> as we don't communucate it. Similarly, we extract the register value
-> at the wrong spot.
+On Sat, Apr 26, 2025 at 01:28:11PM +0100, Marc Zyngier wrote:
+> We generally don't expect FEAT_LS64* instructions to trap, unless
+> they are trapped by a guest hypervisor.
 > 
-> Reorganise the code in a more logical way so that things are done
-> at the correct location, removing a lot of duplication.
+> Otherwise, this is just the guest playing tricks on us by using
+> an instruction that isn't advertised, which we handle with a well
+> deserved UNDEF.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
 Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kvm/emulate-nested.c | 49 ++++++++-------------------------
->  1 file changed, 12 insertions(+), 37 deletions(-)
+>  arch/arm64/kvm/handle_exit.c | 56 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 56 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 1bcbddc88a9b7..52a2d63a667c9 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2215,11 +2215,11 @@ static u64 kvm_get_sysreg_res0(struct kvm *kvm, enum vcpu_sysreg sr)
->  	return masks->mask[sr - __VNCR_START__].res0;
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index b73dc26bc44b4..636c14ed2bb82 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -298,6 +298,61 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+>  	return 1;
 >  }
 >  
-> -static bool check_fgt_bit(struct kvm_vcpu *vcpu, bool is_read,
-> -			  u64 val, const union trap_config tc)
-> +static bool check_fgt_bit(struct kvm_vcpu *vcpu, enum vcpu_sysreg sr,
-> +			  const union trap_config tc)
->  {
->  	struct kvm *kvm = vcpu->kvm;
-> -	enum vcpu_sysreg sr;
-> +	u64 val;
->  
->  	/*
->  	 * KVM doesn't know about any FGTs that apply to the host, and hopefully
-> @@ -2228,6 +2228,8 @@ static bool check_fgt_bit(struct kvm_vcpu *vcpu, bool is_read,
->  	if (is_hyp_ctxt(vcpu))
->  		return false;
->  
-> +	val = __vcpu_sys_reg(vcpu, sr);
+> +static int handle_other(struct kvm_vcpu *vcpu)
+> +{
+> +	bool is_l2 = vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu);
+> +	u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
+> +	u64 esr = kvm_vcpu_get_esr(vcpu);
+> +	u64 iss = ESR_ELx_ISS(esr);
+> +	struct kvm *kvm = vcpu->kvm;
+> +	bool allowed, fwd = false;
 > +
->  	if (tc.pol)
->  		return (val & BIT(tc.bit));
->  
-> @@ -2242,38 +2244,17 @@ static bool check_fgt_bit(struct kvm_vcpu *vcpu, bool is_read,
->  	if (val & BIT(tc.bit))
->  		return false;
->  
-> -	switch ((enum fgt_group_id)tc.fgt) {
-> -	case HFGRTR_GROUP:
-> -		sr = is_read ? HFGRTR_EL2 : HFGWTR_EL2;
-> -		break;
-> -
-> -	case HDFGRTR_GROUP:
-> -		sr = is_read ? HDFGRTR_EL2 : HDFGWTR_EL2;
-> -		break;
-> -
-> -	case HAFGRTR_GROUP:
-> -		sr = HAFGRTR_EL2;
-> -		break;
-> -
-> -	case HFGITR_GROUP:
-> -		sr = HFGITR_EL2;
-> -		break;
-> -
-> -	default:
-> -		WARN_ONCE(1, "Unhandled FGT group");
-> -		return false;
-> -	}
-> -
->  	return !(kvm_get_sysreg_res0(kvm, sr) & BIT(tc.bit));
->  }
->  
->  bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
->  {
-> +	enum vcpu_sysreg fgtreg;
->  	union trap_config tc;
->  	enum trap_behaviour b;
->  	bool is_read;
->  	u32 sysreg;
-> -	u64 esr, val;
-> +	u64 esr;
->  
->  	esr = kvm_vcpu_get_esr(vcpu);
->  	sysreg = esr_sys64_to_sysreg(esr);
-> @@ -2320,25 +2301,19 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
->  		break;
->  
->  	case HFGRTR_GROUP:
-> -		if (is_read)
-> -			val = __vcpu_sys_reg(vcpu, HFGRTR_EL2);
-> -		else
-> -			val = __vcpu_sys_reg(vcpu, HFGWTR_EL2);
-> +		fgtreg = is_read ? HFGRTR_EL2 : HFGWTR_EL2;
->  		break;
->  
->  	case HDFGRTR_GROUP:
-> -		if (is_read)
-> -			val = __vcpu_sys_reg(vcpu, HDFGRTR_EL2);
-> -		else
-> -			val = __vcpu_sys_reg(vcpu, HDFGWTR_EL2);
-> +		fgtreg = is_read ? HDFGRTR_EL2 : HDFGWTR_EL2;
->  		break;
->  
->  	case HAFGRTR_GROUP:
-> -		val = __vcpu_sys_reg(vcpu, HAFGRTR_EL2);
-> +		fgtreg = HAFGRTR_EL2;
->  		break;
->  
->  	case HFGITR_GROUP:
-> -		val = __vcpu_sys_reg(vcpu, HFGITR_EL2);
-> +		fgtreg = HFGITR_EL2;
->  		switch (tc.fgf) {
->  			u64 tmp;
->  
-> @@ -2359,7 +2334,7 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
->  		goto local;
->  	}
->  
-> -	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(vcpu, is_read, val, tc))
-> +	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(vcpu, fgtreg, tc))
->  		goto inject;
->  
->  	b = compute_trap_behaviour(vcpu, tc);
+> +	/*
+> +	 * We only trap for two reasons:
+> +	 *
+> +	 * - the feature is disabled, and the only outcome is to
+> +	 *   generate an UNDEF.
+> +	 *
+> +	 * - the feature is enabled, but a NV guest wants to trap the
+> +	 *   feature used my its L2 guest. We forward the exception in
+> +	 *   this case.
+> +	 *
+> +	 * What we don't expect is to end-up here if the guest is
+> +	 * expected be be able to directly use the feature, hence the
+> +	 * WARN_ON below.
+> +	 */
+> +	switch (iss) {
+> +	case ESR_ELx_ISS_OTHER_ST64BV:
+> +		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
+> +		if (is_l2)
+> +			fwd = !(hcrx & HCRX_EL2_EnASR);
+> +		break;
+> +	case ESR_ELx_ISS_OTHER_ST64BV0:
+> +		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
+> +		if (is_l2)
+> +			fwd = !(hcrx & HCRX_EL2_EnAS0);
+> +		break;
+> +	case ESR_ELx_ISS_OTHER_LDST64B:
+> +		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
+> +		if (is_l2)
+> +			fwd = !(hcrx & HCRX_EL2_EnALS);
+> +		break;
+> +	default:
+> +		/* Clearly, we're missing something. */
+> +		WARN_ON_ONCE(1);
+> +		allowed = false;
+> +	}
+> +
+> +	WARN_ON_ONCE(allowed && !fwd);
+> +
+> +	if (allowed && fwd)
+> +		kvm_inject_nested_sync(vcpu, esr);
+> +	else
+> +		kvm_inject_undefined(vcpu);
+> +
+> +	return 1;
+> +}
+> +
+>  static exit_handle_fn arm_exit_handlers[] = {
+>  	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+>  	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+> @@ -307,6 +362,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+>  	[ESR_ELx_EC_CP14_LS]	= kvm_handle_cp14_load_store,
+>  	[ESR_ELx_EC_CP10_ID]	= kvm_handle_cp10_id,
+>  	[ESR_ELx_EC_CP14_64]	= kvm_handle_cp14_64,
+> +	[ESR_ELx_EC_OTHER]	= handle_other,
+>  	[ESR_ELx_EC_HVC32]	= handle_hvc,
+>  	[ESR_ELx_EC_SMC32]	= handle_smc,
+>  	[ESR_ELx_EC_HVC64]	= handle_hvc,
 > -- 
 > 2.39.2
 > 
