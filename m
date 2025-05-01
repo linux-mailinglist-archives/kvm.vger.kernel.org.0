@@ -1,145 +1,111 @@
-Return-Path: <kvm+bounces-45120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18EEEAA60AE
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 17:23:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23F1FAA60B1
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 17:23:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F0A21B67577
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 15:23:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCBBD1B6749B
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 15:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 782BA20B1FC;
-	Thu,  1 May 2025 15:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49FC7201276;
+	Thu,  1 May 2025 15:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RqqwQegs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pVHhE/pJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC485202C52
-	for <kvm@vger.kernel.org>; Thu,  1 May 2025 15:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A951EEA46
+	for <kvm@vger.kernel.org>; Thu,  1 May 2025 15:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746112980; cv=none; b=BY/c2HhGU4Z5DQ8RSsIpYjCyJceuWuRCxP394YdHosL/gkLrzDxweyvDvuCMdT2mFWCNBTqHtp/vZOsj2HoGfr3/VmdlDh3ChO4Y7HqI9mL0hQd76z0syLTjG27k4VVXA3UrW6KCFwlj4SJMjn0F9ABfcwi+cPAcqOxoy7P8HvY=
+	t=1746113017; cv=none; b=GFqwerrAJGZY8vRNWLQ11xMM1qbqGEmYxeemaz1KhCzwO+oQwhQnPsJ5n9DDuziunUWcWWmCa7rWjychzkzCxRRivCg8sasl8NCU5MabXejNaWvvFqyNcgb1z77emtDC2TaZ8IXSBot3gk5w5LVcIXytAhdWC3gV5eXvL0/GKas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746112980; c=relaxed/simple;
-	bh=GnwsPoOxW8mCGc7CAgjoDtFw8dTWra4gUIbWL5YCLUs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=i5+XVT26ILzqqpxUuwW5B+/9ZfXU1dorNV3q9MZmnScFOZP51wSpVQb3BFc4rBpM7UgQ4yJ6l4fg1+w4k/hnlXDVGnNLbx0A8jD692sYguMyktp0DSGKRbJoVVaQZPe7tz4TrA0vQOxlCDGBun7o7cUn2oWxfVhLnSyWDKwQQuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RqqwQegs; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43f405810b4so4944255e9.1
-        for <kvm@vger.kernel.org>; Thu, 01 May 2025 08:22:58 -0700 (PDT)
+	s=arc-20240116; t=1746113017; c=relaxed/simple;
+	bh=x1Ix/T3stb3ZI5rKM3qG1WUrlRAG+1pian9YiBtC5M4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aJ7LI7vLJ0xdl6v85tYQANNCNCCHmHO7WaJrDZrEa5FB/2i8nJWE4aZs16oWmmq7wmJyumH4S9bqxrhG5deg2Jj1VLCSDBr2OyrqxMFZSafupmcCH7D72xKGuleGId/GvKp9EJlz5MFl6KofkqQKouzFJ8MzbPg/35K7O8joET4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pVHhE/pJ; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-73712952e1cso1187039b3a.1
+        for <kvm@vger.kernel.org>; Thu, 01 May 2025 08:23:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746112977; x=1746717777; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wm8HDKzWcPs/ZOJ7u1MGp3oUtkY4RQR0TPLRQCBj5DQ=;
-        b=RqqwQegsrWLsB1Yvk3XF6QMZObcZSJzZhmHOuynYxfAjO0oGplp27iKhLgAVcrPz0j
-         eWMVzCG9CejZi9x3NWPUhr1TIByngtnippTREg9TBe5WYJhV3hDngP2L9u/C0y4L+KM4
-         6ze5N6b7zDXBq/JS27TtKUGHyfcbNWTSmaEekY8HKP6pJFEwbRZsR/kH6YXFGC/5IjH3
-         e4vPZeITPxnOaDhMNWzPBrX1Dg0AwW+aEKY1dKZXOvoGEdTtmtU4GGb86piX/Aad55Da
-         /uynSSrFWN5ORTZPS8H/O00MqgO+KM9d5s2rBmL1yeW0ZzXXRC2PVlV1F/jK3ifRzbqF
-         xs4g==
+        d=linaro.org; s=google; t=1746113014; x=1746717814; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=b7n108UvSqkNg4G+6t+Prq0mGC9LU+Xzgi3XWfeqdPY=;
+        b=pVHhE/pJXSiW0fRwtQFs1Zme6021BizKFnDRSY1GjoYIrk/WT7twyvZgrwD9A22ktZ
+         tlMhnXbSBllcEs/uzuKuBpMk0FHLAvWXb9xannnZcmADlqN1e1noamPvFQDBB/JGRfxh
+         L+Gi7OoX217mbxSFCtyBhcV7uc85Ltrz4n/kx+5WDMfja2uNLo1MaJiBEGgQ50t3N1Qc
+         NmkJu/CklGevbnT1wSOX2IBIb50DJijbc2DpcXZsN3GCBwrwl1CcXwDoEQJHvI60kkZN
+         43hmmcKQ6T/8p7RDa1N8UkE6X5bVt/Aad7ZFZ/XYP02fcrytDo8ZPnaWrT39nfSFF+GD
+         NBxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746112977; x=1746717777;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wm8HDKzWcPs/ZOJ7u1MGp3oUtkY4RQR0TPLRQCBj5DQ=;
-        b=wn1sjNztzuFAqS4OgSMgVoSmM/I7d/HP16L3b+1Opq5Fjn03IymxJFas/u6Kljugbs
-         KlPPiwL7Zpep0h/dD2mvT4MLbF1hoQqe8LOpaadKMzJPPpn6AmdxV9XFux/Ec0cHZ/8K
-         4gWvyUH8DE1NbC9HvRH/Po57SINUhWc9U4R54dTjHFk1cZJ/DcsedWO3ns1ZYzpx8IL+
-         fHVeH640xlDR2XecxQl8iL/cGLRvLQY24CHrWptegbmF/ZWxRJ1zytoJM4WtN2+vVWfy
-         xyhHCLpdaGr0XUUouqEDbaXm76Ds2G16GhO/e/YTXsOI1cjpp8MP8Zkrg5Qg10C+rAXB
-         Gggg==
-X-Forwarded-Encrypted: i=1; AJvYcCUaD4iMYTFhtALKNJIrd+ju5lL/g9icQmx4MkoexDe/19q1RMUX5EoiUg5LxUKK4270wds=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmHZqzPFcxGyN6AczZPgigPIUJkRxupnYSJ79LvmAMWIppHXlN
-	7vnJdhqgN5s4heAv9b1bVju5VRRnMLQIMXqOgJi1if6XiuqlaLR0TseIsYnP8Qzj4PFjJsYBCdj
-	trS4VVK/5VQ==
-X-Google-Smtp-Source: AGHT+IG1H8EWFmTdy9mXUfcCJxQBprr6abVa1X9treBvRrD020Cub+yFF9voa0K8UUVl5WCrL4gH+SDc7+SKLQ==
-X-Received: from wmbel14.prod.google.com ([2002:a05:600c:3e0e:b0:440:5f8a:667c])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:4ec6:b0:43d:a90:9f1 with SMTP id 5b1f17b1804b1-441b2635482mr61130455e9.6.1746112976936;
- Thu, 01 May 2025 08:22:56 -0700 (PDT)
-Date: Thu, 01 May 2025 15:22:55 +0000
-In-Reply-To: <20250501150229.GU4439@noisy.programming.kicks-ass.net>
+        d=1e100.net; s=20230601; t=1746113014; x=1746717814;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b7n108UvSqkNg4G+6t+Prq0mGC9LU+Xzgi3XWfeqdPY=;
+        b=Vb6uXVcCvAbbYqU/8xCLHAt08sJEVV0CIUGqKht6Yskn2mWWXuLGKRLAs1sVc+IuMT
+         VQEwKBVO6TIMvGww78IXSrIOQGDIE3Snq5afMhxAwiBU7qKduhvzsgj23gFY6uDZLHDj
+         vD2zZRZN+8qeDcCuu5okm2/ASKUqqCFkNgbpFlXeuicGLnQm16jtJx4hp5NVZRQlk1uU
+         7N9t0Vh8C7z5Zn3IlQvbNDWGgfKG9hWDDPke3c2czC9UCFqxUxrX4FwVP8qiZ9t8I1ke
+         44a2z2OrG0HeeUe5lwNs7xRcKSygJaZWX5PwIM+q/m5YYrftLkARuiz99+U9oGaS727b
+         T9VA==
+X-Forwarded-Encrypted: i=1; AJvYcCVVndlfIygMu1AqWxdjbY0T5jf/G9RFF2FW+q/hOeYTEDduOoBCW/in+XcHS0eUEOTK60s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy36Q7InKO2CnUGE87igCA32IeuyomJxCZklAT2R9cjegU/Gtgy
+	RP0k88cIMZ6ct1XPHeazWl8Rbv8TqdhSnSjYCe6387GnKz0jWaDQ5HLuRuHTGpY=
+X-Gm-Gg: ASbGncvEC/Gtj8iNBdrfWcbG1BMwNSi6iS0v+B4PYswkt9mAY95l5YrPCzWiD6C96dM
+	NCamBMwvEU6H66vHP08EayKrd/YN/LRKfmmVAYJDYC1PcPKhq/tpffJZdIMcf92GKfGa57u2pMq
+	ggG52bTbGlk/DoPITa6jQJLEIL2WBdFlu5gtMs9NpMi7Cd8KEIOgaTyzIko2yimHUqX2o2Fc71r
+	uBl/0xLaobVvEA8ZP9O91+Z6RaSaDKqNXqIC8+adA6lrkPUdVYZstBgmlUt5RcERLj7ZgRRpk/P
+	+gJ2mmgEodqMdAYZnIANb/5xQBZnY4N3gsTI2sYVdPGYq3Mfx1i7l/nQ+zLUX7OPBIYHBHyKOur
+	FNX91GACisqnm4SuEiA==
+X-Google-Smtp-Source: AGHT+IG+xQpwe9JF6Emr8LMDFsv4jviepaSVeUO75oUuLU3qAugUOfQvpi7rbysYNF5LL/QQQa9dMA==
+X-Received: by 2002:a05:6a00:c91:b0:736:8c0f:7758 with SMTP id d2e1a72fcca58-74047785114mr4469458b3a.10.1746113014345;
+        Thu, 01 May 2025 08:23:34 -0700 (PDT)
+Received: from [192.168.0.4] (71-212-47-143.tukw.qwest.net. [71.212.47.143])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7404eeb195bsm933775b3a.36.2025.05.01.08.23.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 May 2025 08:23:33 -0700 (PDT)
+Message-ID: <cf287b71-59c4-45a9-b0cd-42b9425b410f@linaro.org>
+Date: Thu, 1 May 2025 08:23:32 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250429-noautoinline-v3-0-4c49f28ea5b5@uniontech.com>
- <20250429123504.GA13093@lst.de> <D9KW1QQR88EY.2TOSTVYZZH5KN@google.com> <20250501150229.GU4439@noisy.programming.kicks-ass.net>
-X-Mailer: aerc 0.20.0
-Message-ID: <D9KXE2YX8R2M.3L7Q6NVIXKPE9@google.com>
-Subject: Re: [PATCH RFC v3 0/8] kernel-hacking: introduce CONFIG_NO_AUTO_INLINE
-From: Brendan Jackman <jackmanb@google.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>, <chenlinxuan@uniontech.com>, 
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>, 
-	Andrew Morton <akpm@linux-foundation.org>, Yishai Hadas <yishaih@nvidia.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, 
-	Kevin Tian <kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	Peter Huewe <peterhuewe@gmx.de>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas.schier@linux.dev>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Dmitry Vyukov <dvyukov@google.com>, 
-	Andrey Konovalov <andreyknvl@gmail.com>, Juergen Gross <jgross@suse.com>, 
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, <linux-nvme@lists.infradead.org>, 
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>, <kvm@vger.kernel.org>, 
-	<virtualization@lists.linux.dev>, <linux-integrity@vger.kernel.org>, 
-	<linux-kbuild@vger.kernel.org>, <llvm@lists.linux.dev>, 
-	Winston Wen <wentao@uniontech.com>, <kasan-dev@googlegroups.com>, 
-	<xen-devel@lists.xenproject.org>, Changbin Du <changbin.du@intel.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 25/33] target/arm/arch_dump: remove TARGET_AARCH64
+ conditionals
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ alex.bennee@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, anjo@rev.ng,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ kvm@vger.kernel.org
+References: <20250501062344.2526061-1-pierrick.bouvier@linaro.org>
+ <20250501062344.2526061-26-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20250501062344.2526061-26-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu May 1, 2025 at 3:02 PM UTC, Peter Zijlstra wrote:
-> On Thu, May 01, 2025 at 02:19:47PM +0000, Brendan Jackman wrote:
->> On Tue Apr 29, 2025 at 12:35 PM UTC, Christoph Hellwig wrote:
->> > On Tue, Apr 29, 2025 at 12:06:04PM +0800, Chen Linxuan via B4 Relay wrote:
->> >> This series introduces a new kernel configuration option NO_AUTO_INLINE,
->> >> which can be used to disable the automatic inlining of functions.
->> >> 
->> >> This will allow the function tracer to trace more functions
->> >> because it only traces functions that the compiler has not inlined.
->> >
->> > This still feels like a bad idea because it is extremely fragile.
->> 
->> Can you elaborate on that - does it introduce new fragility?
->
-> given it needs to sprinkle __always_inline around where it wasn't needed
-> before, yeah.
+On 4/30/25 23:23, Pierrick Bouvier wrote:
+> Associated code is protected by cpu_isar_feature(aa64*)
+> 
+> Signed-off-by: Pierrick Bouvier<pierrick.bouvier@linaro.org>
+> ---
+>   target/arm/arch_dump.c | 6 ------
+>   1 file changed, 6 deletions(-)
 
-Right, I guess I just wouldn't have associated that with the word
-"fragility", but that's a reasonable complaint!
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> Also, why would you want this? function tracer is already too much
-> output. Why would you want even more?
-
-Yes, tracing every function is already too noisy, this would make it
-even more too-noisy, not sure "too noisy" -> "way too noisy" is a
-particularly meaningful degradation.
-
-Whereas enlarging the pool of functions that you can _optionally target_
-for tracing, or nice reliable breakpoints in GDB, and disasm that's
-easier to mentally map back to C, seems like a helpful improvement for
-test builds. Personally I sometimes spam a bunch of `noinline` into code
-I'm debugging so this seems like a way to just slap that same thing on
-the whole tree without dirtying the code, right?
-
-Not that I have a strong opinion on the cost/benefit here, but the
-benefit seems nonzero to me.
+r~
 
