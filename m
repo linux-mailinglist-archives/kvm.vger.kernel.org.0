@@ -1,117 +1,129 @@
-Return-Path: <kvm+bounces-45176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7C2FAA650F
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 23:03:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0195AA6529
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 23:14:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B2333AC421
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 21:03:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79F684A38E1
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 21:14:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE5C2609E3;
-	Thu,  1 May 2025 21:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115482609F0;
+	Thu,  1 May 2025 21:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a1+VL7nK"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u6+usVWj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B5F22541F
-	for <kvm@vger.kernel.org>; Thu,  1 May 2025 21:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64331946DA
+	for <kvm@vger.kernel.org>; Thu,  1 May 2025 21:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746133430; cv=none; b=XyEsymrtVTegv+8hPIK0pJA4/Y825FQc5zpmvbvntU+XT2wn9ELzV8Xaqk7kjK+tbWflmzuVSOxA/Uh1OAwVXpxUdiNcOaNbFiE6c1Zg93ZvMpcp8lpHm/RTOXgDcB59ff51oQGH0mEunuv8XLyepn+v/Big9E9meadxZegaTj4=
+	t=1746134063; cv=none; b=S48rRwrhuNIu4vtEK9lXEEjSOhuYIk4Hu9pGCbvOIEvkGZaf6KlZhYqEXHjCdd9RbhkyYfPbt87H+Yb5J2HW3u7PZsUCqmU/ILnpZUER3XiCqLkDreA6rt7kkLnEGs2p0cbRgPq0t55Z/OI2NwO0EGriKbDWUNzmkqFujSOplqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746133430; c=relaxed/simple;
-	bh=KnH5VvYqnintjP9wB50Y6q1JFqTDQJjI2skX7DvCHiQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rRVPalPEW8BSYb29ZWMjPU6c5K3oiYRhKrD/Dnz6vhK2ZtLKtAtFzXgcHyo7pfx4z1KXgnIK1Uf9DxwK4aaFzlorHswH7pOnTJhC4E1HLgB3bdF4Kbt/apjB+xS41w2LyKeDZGbupTWb/YWS8f3QyPk0hM4Obe9fyjR2xtTGvVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a1+VL7nK; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff798e8c90so1395640a91.1
-        for <kvm@vger.kernel.org>; Thu, 01 May 2025 14:03:49 -0700 (PDT)
+	s=arc-20240116; t=1746134063; c=relaxed/simple;
+	bh=yBnyEILSAwfluMGRoKR7Yty9ngDPq4bXZh0Bz4gssHQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DuyMjEMBvdMi7Og5yBjgEamED+B5QlaXSIP9dPHJ5aWXhIpQVnxIt4z+7xDWw9ZSiYxbFQFNHaAsxDOcSLILh1c0WZdJd/Blpt/yt3pvfHCA6s9NY56gKPVp/Y/WUw5SYJM3jw8V8LjG0lYc9IT+hmJ+ZPclG86739BwSnRCaso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=u6+usVWj; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-224019ad9edso21987345ad.1
+        for <kvm@vger.kernel.org>; Thu, 01 May 2025 14:14:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746133429; x=1746738229; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K3LgD3RsHy0idAPG24WJvE7joJXrg8YFB/6s4D5IWPE=;
-        b=a1+VL7nKTIDGRLqpMUrkQqEUIizoIS42HzdIlhu6kpmzsniVO26XAXscjuM7UaAQDu
-         w5vuP9LFZUo28NB5dGm2CGt+ifO6qjAJTPWDeO6S8iEuIa8VgsyY19XYR0zw7G/TxhMX
-         Vl4rB+k2AKwYE1OUo5sumxQus1dbNsOX7Dp7AH1ZL+seaTKhlFA73R10LWCGr76UOtO3
-         n4OmGTRo6gDXlaoCWCDESouRfXD+w4MNv0YH35NIITK34BWMzKMkOmY1ojo0A62FH/iI
-         saWXGuNLqnmzTFG069yygxaZu2RcOj1iE00J2i8swCtFdP9eYA2cpUeUGqlgSTmB9xQn
-         amOw==
+        d=linaro.org; s=google; t=1746134061; x=1746738861; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IjAzNRLbOrsoMtq/EPdzdknnHjpmqyE7LPvsWSwmdj8=;
+        b=u6+usVWjvAL9WuWouMm7Jbt8bi77HP3j/jQpLaEk507qFW461FkVhzdRIEiJUkvKmY
+         i6zWxPCrvZqyoJKUqqD5HgCeCrlk9OCZhuNym1dtEWNZYsjH3a1zobxaiRu+cuC9PuQm
+         wZLJxWtnVQN1hCM5zNyHCPjXRThcFY6u8sY5wD0WkBj0vW9CYDWOO8pNItLH3do9EpVn
+         5Sa/Iq/wvlZlQeuzcxgl9q1ihqBpJ6nUJne1PNMuHhPCTiK7t+hopBDmzdREn9B38HWq
+         NLWGrIaOM2WZ4YgI9tu8x+Y4asaDok/25NH9wpaWnREGSyoYuermRNFhV6Mo1tZf5ngE
+         AY+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746133429; x=1746738229;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K3LgD3RsHy0idAPG24WJvE7joJXrg8YFB/6s4D5IWPE=;
-        b=HtQK37aNB8pG/3TzmFfAcsw4wPociQjEWT7fzK8p/ij80cZ4q4ckWT+90n1Y8YEvdq
-         jp0Xpg6URVhJqIqlnN7MmxWvC9FZgidCp4OZV6t/ltKm55b6xjz48cZFP+uVDN+vCaRv
-         C2d1sJsOL+lb1XlgMHEwhlcP4WNRrCOGUCd14WcOjr94pEzDaVpIfM4Rwg0FAwxympQW
-         h610igBAnoSN9GV/GY5BkuVIbUlowFNSJE5jyY9Hp6h0OICtT9dMF16u34P0s3RbeYHD
-         XncetB7vn1metK5WqQLKAIuaZwiKK0WcoslGTGkNI/OeHLE1rRFwTjH0aXTYPRggoCjt
-         pgQg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4BpBqw2XxXJfeNtkcp+4migUMSl/nWMEep5lAdRvCOkW4XIIGiekmmN+LeEHuWSSyi9o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDCscT3uFi1fxB6EdHT/IXoR4HYDREgzVEnx1my1fiqIXQOfww
-	/uNYvX95wIKH7K26lqQRvb20y28pJogj3HzutXipQ/tJVi6YYE1nb54uzdBgZKsSb8v61YY83jp
-	VKA==
-X-Google-Smtp-Source: AGHT+IFsKbxWNYniktZ+08WA6b0CsvxaU/dos+kZKMRCn6iD7Ks6A9wZ87nfSSI8jfHEMe/wZJjzetRtCUk=
-X-Received: from pjbnw14.prod.google.com ([2002:a17:90b:254e:b0:2ef:7af4:5e8e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4fc2:b0:2ff:4f04:4266
- with SMTP id 98e67ed59e1d1-30a4e6949aemr658697a91.23.1746133428792; Thu, 01
- May 2025 14:03:48 -0700 (PDT)
-Date: Thu, 1 May 2025 14:03:47 -0700
-In-Reply-To: <20250501183304.2433192-1-dmatlack@google.com>
+        d=1e100.net; s=20230601; t=1746134061; x=1746738861;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IjAzNRLbOrsoMtq/EPdzdknnHjpmqyE7LPvsWSwmdj8=;
+        b=uAB1BaMGQ9rnWW/bKW1TJkAa9JKuYvjE7CB55vJRA8LnEaCRKuZp4arvHYiUhKmhzK
+         XdC8Xob9wcQZDBO/ui+FCUV9gXPA0XehJ5T8PvV8ZX1GTJxui6M8+N+m6xbyV3oLUYf5
+         xntHpoqcdAmub2JK293eRTZSK5z6Mqrre608EzKALaANB11vITsaLTu2Pwx3FRMhe8qS
+         kWo+wkAPOkqJpfvvlTAgSH0/WCA7gKqU8P0yiS9Wf2w6IyCcAzZAMuTvf2zcOQbhwb3k
+         zjvAasSPbkmgWl/p3cwYqyfu1+X1Xv5V9Gnhk8S7Wh2BiBV645shZS0lHYgb6cwb69Ih
+         X6BA==
+X-Forwarded-Encrypted: i=1; AJvYcCW4hQb1HaYUyHujHn0HkRLPNeKNVZo7JrK49sOeSodTlrwg9bhIX9zDxfBa55Ppw8mLE6A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyA7PZEDQmNcT18f73FV0Il36i/AV8vGZkgK8S5NxxjDdsW2vQS
+	CK4jgpVgMhZbPIPLGlNid5ddVd0MQXLnq+nIRV2DIfHm1HJKO7rTHSap6C+7aBk=
+X-Gm-Gg: ASbGncuC9wbIni2eaqXSnYtnNzfwhSzxV6jBd5CwAIP5iTivG4k/LkiP30r3I+mXKzU
+	sA+GqFZgpQ/OjNoUA5lITYK2YdMuC39uh5K3VMgJXP7fLptX5EsYREudoghOA18BKhmJFQLU7Oo
+	TcKfb9n6a70oSwz0bfoSTz4cRfKgF/PGmZCdEeiOauYnzpoIKYsUwMRTuIWtt6BKC0cvq7uEZT4
+	pb/jxbqB5y4VeyftrJW0sNJqvDIDviYlCo761+Oet1r6Fjazm35irDKPAU7STronjAP0kSAI3lh
+	YAQ9UjyHgiRMpXbYYmdwly142QlPLoM9BQI5EV1JKN3CNQGzsaXFgd5q5tsqcs41YfA2Tzum4yk
+	2qQxtOq4=
+X-Google-Smtp-Source: AGHT+IHrnRruNGSrJshHmWNz0Xu2ccGJ1f+1U8k2VE3mc5qFlXIZViS2LGp1pbaM8OTkQ1Dqx2jCgg==
+X-Received: by 2002:a17:903:2f91:b0:223:90ec:80f0 with SMTP id d9443c01a7336-22e10344ebamr9025215ad.22.1746134060854;
+        Thu, 01 May 2025 14:14:20 -0700 (PDT)
+Received: from [192.168.0.4] (71-212-47-143.tukw.qwest.net. [71.212.47.143])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1091702asm819235ad.206.2025.05.01.14.14.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 May 2025 14:14:20 -0700 (PDT)
+Message-ID: <757f10a3-712b-44a0-9914-5b221e185a20@linaro.org>
+Date: Thu, 1 May 2025 14:14:18 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250501183304.2433192-1-dmatlack@google.com>
-Message-ID: <aBPhs39MJz-rt_Ob@google.com>
-Subject: Re: [PATCH 00/10] KVM: selftests: Convert to kernel-style types
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Eric Auger <eric.auger@redhat.com>, 
-	James Houghton <jthoughton@google.com>, Colin Ian King <colin.i.king@gmail.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 29/33] target/arm/ptw: replace target_ulong with
+ uint64_t
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ alex.bennee@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, anjo@rev.ng,
+ kvm@vger.kernel.org
+References: <20250501062344.2526061-1-pierrick.bouvier@linaro.org>
+ <20250501062344.2526061-30-pierrick.bouvier@linaro.org>
+ <21d32a4f-8954-4a36-ba0d-6cb7a50f242d@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <21d32a4f-8954-4a36-ba0d-6cb7a50f242d@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, May 01, 2025, David Matlack wrote:
-> This series renames types across all KVM selftests to more align with
-> types used in the kernel:
+On 5/1/25 12:35, Philippe Mathieu-Daudé wrote:
+> On 1/5/25 08:23, Pierrick Bouvier wrote:
+>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+>> ---
+>>   target/arm/ptw.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/target/arm/ptw.c b/target/arm/ptw.c
+>> index d0a53d0987f..424d1b54275 100644
+>> --- a/target/arm/ptw.c
+>> +++ b/target/arm/ptw.c
+>> @@ -1660,7 +1660,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, S1Translate *ptw,
+>>       uint64_t ttbr;
+>>       hwaddr descaddr, indexmask, indexmask_grainsize;
+>>       uint32_t tableattrs;
+>> -    target_ulong page_size;
+>> +    uint64_t page_size;
 > 
->   vm_vaddr_t -> gva_t
->   vm_paddr_t -> gpa_t
+> Alternatively size_t.
 
-10000% on these.
+No, this is not related to the size of any host-side object.
 
->   uint64_t -> u64
->   uint32_t -> u32
->   uint16_t -> u16
->   uint8_t  -> u8
-> 
->   int64_t -> s64
->   int32_t -> s32
->   int16_t -> s16
->   int8_t  -> s8
+Bear in mind this particular page_size is used for the sizes of the intermediate page 
+table levels.  So, at the very top level of the page table walk this will be quite large.
 
-I'm definitely in favor of these renames.  I thought I was the only one that
-tripped over the uintNN_t stuff; at this point, I've probably lost hours of my
-life trying to type those things out.
+
+
+r~
 
