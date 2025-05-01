@@ -1,232 +1,172 @@
-Return-Path: <kvm+bounces-45081-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45082-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D747BAA5DC2
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 13:32:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450D2AA5E9A
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 14:44:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A635E7B52FF
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 11:31:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AB574A83EC
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 12:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D3522257D;
-	Thu,  1 May 2025 11:32:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E25422688C;
+	Thu,  1 May 2025 12:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QxDjMdGB"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436E31EFF91
-	for <kvm@vger.kernel.org>; Thu,  1 May 2025 11:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1F41EEE6;
+	Thu,  1 May 2025 12:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746099170; cv=none; b=Y9jrvbsyWUSOGfepO6xOkH5pYcixF3lbFo+2ZvClY67Jds8qoik2WAPkgl9Mau2T5LYIM5EjZiRkHeSFMsqw/Yc8Zqsao/L1t+3fBp2CTfWA42F4m6RE1+uOjEJV7zUYqan3gUbQKuwdhMXc4/5ENnVAS1mQNc9zmWDNJDK+id8=
+	t=1746103472; cv=none; b=TYB8Ab9/nImi3fNlgZJwT5oB9ezMX2TJko4+gypc5rGac0jsFtglwdvq+CsSCoJNg7Gzld2BhTzYx4/bWPCfu0xB3K1A2I31czdTyaI4v/NVIIL4540JlC2TbttfJg2sUyfCfOXYL5WqJ/7Tl+Mp2OMGbTo/d19M5v82cmyz+lY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746099170; c=relaxed/simple;
-	bh=X72ts72r1U0mJbX6SCdjLaQCT+Y3Tfbmyl2f2/VsB5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P1oxN/eGaJY61sUmOkltVuu719QUV8Wcqk9PsD2JemIld5S7efszcHhGmn9L66L9c6oYnYzb6ZyZp/HCG7ZoN8XyJv39dZQzUrOQdrzl2yKxMs6ieIA3uYgq4F53yk6fKJMJIqbMznGEJX3ALz0w0UGwcDNPfTDPQNJpLW9TLl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09FBF106F;
-	Thu,  1 May 2025 04:32:39 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 977E63F5A1;
-	Thu,  1 May 2025 04:32:44 -0700 (PDT)
-Date: Thu, 1 May 2025 12:32:41 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	s=arc-20240116; t=1746103472; c=relaxed/simple;
+	bh=WPG4ItA0UQzz9G5Wed/nsDRuYNB8SmpWf7d7wvrM4Ig=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m4KkZO0oOO/Jti5Zem06Qr98h6IAgcCBcJHvhXe9mW5g4sMB3CJRxQkj5FcSKzgogT32VqyV7/7VXx4eRfVAz9RMJxy+i0ovQyKz+tx8wDci4i9wvfP0oTyGeyPYFs0wbtXFhJj+CtG7uszdg2+rbs4Sgo3RIdy3RbwzQ7ui2hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QxDjMdGB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D40FC4CEE3;
+	Thu,  1 May 2025 12:44:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746103472;
+	bh=WPG4ItA0UQzz9G5Wed/nsDRuYNB8SmpWf7d7wvrM4Ig=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QxDjMdGBaO7OILE121xxXL/ZOnOaqCLtEBXhMWqkB+3PJ/81e/MmSvY1wUToCrhj4
+	 o09UND4kIgR1FXBbOv/55FCd/OzVBwRgoBGOKRqd4tO9c5cjsRV1GlGty2ybIey98M
+	 Lg+nMO5pZgEPqvPhdAFXoifIaxQoyNf5AIQ+1z0cDZWJ9kRunCBuAPEBO/FXXum7lW
+	 W1LmcTN82A52L8g5iIa5Ucd/iUs8WO+yyP/I650zIl0luAwZDGv+aVLdfXY2xUanJs
+	 d03TuxAlnXfTT8Rtp+TeEMdJfupvUktoh6E1sLRqamQNoOxsDebivNk/cK+bAp+RnI
+	 Bf6br0mFislfA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uATHB-00AZcw-3q;
+	Thu, 01 May 2025 13:44:29 +0100
+Date: Thu, 01 May 2025 13:44:28 +0100
+Message-ID: <861pt8ijpv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	Waiman Long <longman@redhat.com>,
+	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Alexander Potapenko <glider@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	x86@kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	kvm-riscv@lists.infradead.org,
+	Atish Patra <atishp@atishpatra.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	kvmarm@lists.linux.dev,
 	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 21/42] KVM: arm64: Compute FGT masks from KVM's own
- FGT tables
-Message-ID: <20250501113241.GI1859293@e124191.cambridge.arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
- <20250426122836.3341523-22-maz@kernel.org>
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
+	Sebastian Ott <sebott@redhat.com>,
+	Shusen Li <lishusen2@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when locking all vCPUs
+In-Reply-To: <20250501111552.GO4198@noisy.programming.kicks-ass.net>
+References: <20250430203013.366479-1-mlevitsk@redhat.com>
+	<20250430203013.366479-3-mlevitsk@redhat.com>
+	<864iy4ivro.wl-maz@kernel.org>
+	<20250501111552.GO4198@noisy.programming.kicks-ass.net>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250426122836.3341523-22-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peterz@infradead.org, mlevitsk@redhat.com, kvm@vger.kernel.org, linux-riscv@lists.infradead.org, jiangkunkun@huawei.com, longman@redhat.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, bhelgaas@google.com, boqun.feng@gmail.com, bp@alien8.de, aou@eecs.berkeley.edu, anup@brainfault.org, paul.walmsley@sifive.com, suzuki.poulose@arm.com, palmer@dabbelt.com, alex@ghiti.fr, glider@google.com, oliver.upton@linux.dev, andre.przywara@arm.com, x86@kernel.org, joey.gouly@arm.com, tglx@linutronix.de, kvm-riscv@lists.infradead.org, atishp@atishpatra.org, mingo@redhat.com, jingzhangos@google.com, hpa@zytor.com, dave.hansen@linux.intel.com, kvmarm@lists.linux.dev, will@kernel.org, keisuke.nishimura@inria.fr, sebott@redhat.com, lishusen2@huawei.com, pbonzini@redhat.com, rdunlap@infradead.org, seanjc@google.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Apr 26, 2025 at 01:28:15PM +0100, Marc Zyngier wrote:
-> In the process of decoupling KVM's view of the FGT bits from the
-> wider architectural state, use KVM's own FGT tables to build
-> a synthetic view of what is actually known.
+On Thu, 01 May 2025 12:15:52 +0100,
+Peter Zijlstra <peterz@infradead.org> wrote:
 > 
-> This allows for some checking along the way.
+> > > + */
+> > > +int kvm_trylock_all_vcpus(struct kvm *kvm)
+> > > +{
+> > > +	struct kvm_vcpu *vcpu;
+> > > +	unsigned long i, j;
+> > > +
+> > > +	kvm_for_each_vcpu(i, vcpu, kvm)
+> > > +		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> This one includes an assertion that kvm->lock is actually held.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Ah, cunning. Thanks.
 
-> ---
->  arch/arm64/include/asm/kvm_host.h |  14 ++++
->  arch/arm64/kvm/emulate-nested.c   | 106 ++++++++++++++++++++++++++++++
->  2 files changed, 120 insertions(+)
+> That said, I'm not at all sure what the purpose of all this trylock
+> stuff is here.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7a1ef5be7efb2..95fedd27f4bb8 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -607,6 +607,20 @@ struct kvm_sysreg_masks {
->  	} mask[NR_SYS_REGS - __SANITISED_REG_START__];
->  };
->  
-> +struct fgt_masks {
-> +	const char	*str;
-> +	u64		mask;
-> +	u64		nmask;
-> +	u64		res0;
-> +};
-> +
-> +extern struct fgt_masks hfgrtr_masks;
-> +extern struct fgt_masks hfgwtr_masks;
-> +extern struct fgt_masks hfgitr_masks;
-> +extern struct fgt_masks hdfgrtr_masks;
-> +extern struct fgt_masks hdfgwtr_masks;
-> +extern struct fgt_masks hafgrtr_masks;
-> +
->  struct kvm_cpu_context {
->  	struct user_pt_regs regs;	/* sp = sp_el0 */
->  
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 52a2d63a667c9..528b33fcfcfd6 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2033,6 +2033,105 @@ static u32 encoding_next(u32 encoding)
->  	return sys_reg(op0 + 1, 0, 0, 0, 0);
->  }
->  
-> +#define FGT_MASKS(__n, __m)						\
-> +	struct fgt_masks __n = { .str = #__m, .res0 = __m, }
-> +
-> +FGT_MASKS(hfgrtr_masks, HFGRTR_EL2_RES0);
-> +FGT_MASKS(hfgwtr_masks, HFGWTR_EL2_RES0);
-> +FGT_MASKS(hfgitr_masks, HFGITR_EL2_RES0);
-> +FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2_RES0);
-> +FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2_RES0);
-> +FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2_RES0);
-> +
-> +static __init bool aggregate_fgt(union trap_config tc)
-> +{
-> +	struct fgt_masks *rmasks, *wmasks;
-> +
-> +	switch (tc.fgt) {
-> +	case HFGRTR_GROUP:
-> +		rmasks = &hfgrtr_masks;
-> +		wmasks = &hfgwtr_masks;
-> +		break;
-> +	case HDFGRTR_GROUP:
-> +		rmasks = &hdfgrtr_masks;
-> +		wmasks = &hdfgwtr_masks;
-> +		break;
-> +	case HAFGRTR_GROUP:
-> +		rmasks = &hafgrtr_masks;
-> +		wmasks = NULL;
-> +		break;
-> +	case HFGITR_GROUP:
-> +		rmasks = &hfgitr_masks;
-> +		wmasks = NULL;
-> +		break;
-> +	}
-> +
-> +	/*
-> +	 * A bit can be reserved in either the R or W register, but
-> +	 * not both.
-> +	 */
-> +	if ((BIT(tc.bit) & rmasks->res0) &&
-> +	    (!wmasks || (BIT(tc.bit) & wmasks->res0)))
-> +		return false;
-> +
-> +	if (tc.pol)
-> +		rmasks->mask |= BIT(tc.bit) & ~rmasks->res0;
-> +	else
-> +		rmasks->nmask |= BIT(tc.bit) & ~rmasks->res0;
-> +
-> +	if (wmasks) {
-> +		if (tc.pol)
-> +			wmasks->mask |= BIT(tc.bit) & ~wmasks->res0;
-> +		else
-> +			wmasks->nmask |= BIT(tc.bit) & ~wmasks->res0;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static __init int check_fgt_masks(struct fgt_masks *masks)
-> +{
-> +	unsigned long duplicate = masks->mask & masks->nmask;
-> +	u64 res0 = masks->res0;
-> +	int ret = 0;
-> +
-> +	if (duplicate) {
-> +		int i;
-> +
-> +		for_each_set_bit(i, &duplicate, 64) {
-> +			kvm_err("%s[%d] bit has both polarities\n",
-> +				masks->str, i);
-> +		}
-> +
-> +		ret = -EINVAL;
-> +	}
-> +
-> +	masks->res0 = ~(masks->mask | masks->nmask);
-> +	if (masks->res0 != res0)
-> +		kvm_info("Implicit %s = %016llx, expecting %016llx\n",
-> +			 masks->str, masks->res0, res0);
-> +
-> +	return ret;
-> +}
-> +
-> +static __init int check_all_fgt_masks(int ret)
-> +{
-> +	static struct fgt_masks * const masks[] __initconst = {
-> +		&hfgrtr_masks,
-> +		&hfgwtr_masks,
-> +		&hfgitr_masks,
-> +		&hdfgrtr_masks,
-> +		&hdfgwtr_masks,
-> +		&hafgrtr_masks,
-> +	};
-> +	int err = 0;
-> +
-> +	for (int i = 0; i < ARRAY_SIZE(masks); i++)
-> +		err |= check_fgt_masks(masks[i]);
-> +
-> +	return ret ?: err;
-> +}
-> +
->  int __init populate_nv_trap_config(void)
->  {
->  	int ret = 0;
-> @@ -2097,8 +2196,15 @@ int __init populate_nv_trap_config(void)
->  			ret = xa_err(prev);
->  			print_nv_trap_error(fgt, "Failed FGT insertion", ret);
->  		}
-> +
-> +		if (!aggregate_fgt(tc)) {
-> +			ret = -EINVAL;
-> +			print_nv_trap_error(fgt, "FGT bit is reserved", ret);
-> +		}
->  	}
->  
-> +	ret = check_all_fgt_masks(ret);
-> +
->  	kvm_info("nv: %ld fine grained trap handlers\n",
->  		 ARRAY_SIZE(encoding_to_fgt));
->  
-> -- 
-> 2.39.2
-> 
+> Can someone explain? Last time I asked someone said something about
+> multiple VMs, but I don't know enough about kvm to know what that means.
+
+Multiple VMs? That'd be real fun. Not.
+
+> Are those vcpu->mutex another class for other VMs? Or what gives?
+
+Nah. This is firmly single VM.
+
+The purpose of this contraption is that there are some rare cases
+where we need to make sure that if we update some global state, all
+the vcpus of a VM need to see, or none of them.
+
+For these cases, the guarantee comes from luserspace, and it gives the
+pinky promise that none of the vcpus are running at that point. But
+being of a suspicious nature, we assert that this is true by trying to
+take all the vcpu mutexes in one go. This will fail if a vcpu is
+running, as KVM itself takes the vcpu mutex before doing anything.
+
+Similar requirement exists if we need to synthesise some state for
+userspace from all the individual vcpu states.
+
+If the global locking fails, we return to userspace with a middle
+finger indication, and all is well. Of course, this is pretty
+expensive, which is why it is only done in setup phases, when the VMM
+configures the guest.
+
+The splat this is trying to address is that when you have more than 48
+vcpus in a single VM, lockdep gets upset seeing up to 512 locks of a
+similar class being taken.
+
+Disclaimer: all the above is completely arm64-specific, and I didn't
+even try to understand what other architectures are doing.
+
+HTH,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
