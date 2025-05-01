@@ -1,204 +1,292 @@
-Return-Path: <kvm+bounces-45084-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45085-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 829BDAA5F24
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 15:20:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 858E7AA5F37
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 15:31:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18B1B1BA7F51
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 13:21:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EA9E1BA7C47
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 13:31:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C991199935;
-	Thu,  1 May 2025 13:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6JbTqUr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BAF21A5B9E;
+	Thu,  1 May 2025 13:31:23 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7878818C930;
-	Thu,  1 May 2025 13:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40AC199934;
+	Thu,  1 May 2025 13:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746105642; cv=none; b=aPkVy5zLl+munRbTQ3iLM6E/14W9yCovFPngVD0mpEZpRdBhHhTJPWbYAYG0+pFO7CL2xFHwN/uhYLatvpqImnmZ8MPJ4AtWxVp2ou8+hwBOuWcsTOb13cW3hye3xyybJ8r0TWlLl1tYnmret9V0JSpt4i/PJWrlZ2B8AswYsdk=
+	t=1746106282; cv=none; b=b7l34jFuiA2otvGijg5oLV18+qv1crHBYPeh0afH3URdHm8uGaHWxYfdTJ3n2+sfP5b7cV1D5/jTUuxIJdLoBXc92VlxMfVozsMZEetYoRVDxYRfTwiPMzwXR8hD1lYVWwsbWS9XttR1PxiF+vz/WIH/Z5W9YBZ+m++TEOA6Ar0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746105642; c=relaxed/simple;
-	bh=Os11/kUyL5V6AODv9qoGyyUIKSAfj1P38I2fDvunLJE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FUySqGLy8MLPoo5EH5zTO5x2LDish+l3+PQB69WiuYgOTtrzI2lmhvkM/xmcrb/3bUw/HuUnJ+UPwIvvJDT3Zap8znHi/vLRELgrQgGud8ATxTQpoBdIFaz6lFBYCLo3ZyXPN44wrhgHK6OLKkzzZRwaLZbuggKx8gkIsSwXNto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6JbTqUr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF271C4CEED;
-	Thu,  1 May 2025 13:20:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746105641;
-	bh=Os11/kUyL5V6AODv9qoGyyUIKSAfj1P38I2fDvunLJE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n6JbTqUrpaLfHlfvu5L22w27yom1lrlLhx27ERqNuGM0RwQBmGiXiihE8ZdZpQPCv
-	 cS+xxrrKGfcs6qZi9wCQUTakiukkvlhs2pNokiQJGuA0ZXdDWEcpse5GAujKrViIwU
-	 VIfB43WSzt8Lrq8PnuyRJ8JP13EIzRbVKKi87rSaepGpfSR6DsfQMDCnkw0Er5C0kj
-	 jjhKL6ZqpYi2pkODlpPzsS4J1c3sCK5WzQw5khwBlLbFL3Xi7+sqr/YroLSr4ONXjb
-	 voajhkctUHnUgjmy8Uv42ahIQs3sS/kkHHqzsru69sxz0yYjQ/xAdoU0pK/SnI9hdX
-	 lrysXZF2RHFww==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uATqB-00Aa7U-MT;
-	Thu, 01 May 2025 14:20:39 +0100
-Date: Thu, 01 May 2025 14:20:39 +0100
-Message-ID: <86zffwh3h4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 04/42] arm64: sysreg: Replace HGFxTR_EL2 with HFG{R,W}TR_EL2
-In-Reply-To: <20250429142656.GD1859293@e124191.cambridge.arm.com>
-References: <20250426122836.3341523-1-maz@kernel.org>
-	<20250426122836.3341523-5-maz@kernel.org>
-	<20250429142656.GD1859293@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1746106282; c=relaxed/simple;
+	bh=etO68qKb2gZAy7IEQvfp46hAtSkStH1cUiCh5zZ2IYg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oloHpCokLgr1mxN3X0N8YC75F7pm52VgjxqJieUTuYBFAdl1EJ0jxyuivEkwyWYzyMVyV+oT3UedNATawJU6x1lBWdmq7SCkgVg5A2ovy+sM+brAt7qrrLzhkw4bCEKFoDvdFEdaTFlwnaNaesjfZl19f5Ap4ipeBdS75kiPwf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7407A168F;
+	Thu,  1 May 2025 06:31:11 -0700 (PDT)
+Received: from [10.1.33.27] (e122027.cambridge.arm.com [10.1.33.27])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BCB6E3F5A1;
+	Thu,  1 May 2025 06:31:14 -0700 (PDT)
+Message-ID: <93477779-bec8-4e6b-b6e5-edb82f664df7@arm.com>
+Date: Thu, 1 May 2025 14:31:12 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 05/43] arm64: RME: Check for RME support at KVM init
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-6-steven.price@arm.com>
+ <d582f30d-4d30-4ca0-992b-6bf7d8f7da83@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <d582f30d-4d30-4ca0-992b-6bf7d8f7da83@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, 29 Apr 2025 15:26:56 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On 25/04/2025 12:08, Suzuki K Poulose wrote:
+> On 16/04/2025 14:41, Steven Price wrote:
+>> Query the RMI version number and check if it is a compatible version. A
+>> static key is also provided to signal that a supported RMM is available.
+>>
+>> Functions are provided to query if a VM or VCPU is a realm (or rec)
+>> which currently will always return false.
+>>
+>> Later patches make use of struct realm and the states as the ioctls
+>> interfaces are added to support realm and REC creation and destruction.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>> Changes since v6:
+>>   * Improved message for an unsupported RMI ABI version.
+>> Changes since v5:
+>>   * Reword "unsupported" message from "host supports" to "we want" to
+>>     clarify that 'we' are the 'host'.
+>> Changes since v2:
+>>   * Drop return value from kvm_init_rme(), it was always 0.
+>>   * Rely on the RMM return value to identify whether the RSI ABI is
+>>     compatible.
+>> ---
+>>   arch/arm64/include/asm/kvm_emulate.h | 18 +++++++++
+>>   arch/arm64/include/asm/kvm_host.h    |  4 ++
+>>   arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
+>>   arch/arm64/include/asm/virt.h        |  1 +
+>>   arch/arm64/kvm/Makefile              |  3 +-
+>>   arch/arm64/kvm/arm.c                 |  6 +++
+>>   arch/arm64/kvm/rme.c                 | 56 ++++++++++++++++++++++++++++
+>>   7 files changed, 143 insertions(+), 1 deletion(-)
+>>   create mode 100644 arch/arm64/include/asm/kvm_rme.h
+>>   create mode 100644 arch/arm64/kvm/rme.c
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/
+>> include/asm/kvm_emulate.h
+>> index d7cf66573aca..1c43a4fc25dd 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -686,4 +686,22 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu
+>> *vcpu)
+>>               vcpu->arch.hcrx_el2 |= HCRX_EL2_EnFPM;
+>>       }
+>>   }
+>> +
+>> +static inline bool kvm_is_realm(struct kvm *kvm)
+>> +{
+>> +    if (static_branch_unlikely(&kvm_rme_is_available) && kvm)
+>> +        return kvm->arch.is_realm;
+>> +    return false;
+>> +}
+>> +
+>> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
+>> +{
+>> +    return READ_ONCE(kvm->arch.realm.state);
+>> +}
+>> +
+>> +static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+>> +{
+>> +    return false;
+>> +}
+>> +
+>>   #endif /* __ARM64_KVM_EMULATE_H__ */
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/
+>> asm/kvm_host.h
+>> index e98cfe7855a6..7bd81b86eab0 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -27,6 +27,7 @@
+>>   #include <asm/fpsimd.h>
+>>   #include <asm/kvm.h>
+>>   #include <asm/kvm_asm.h>
+>> +#include <asm/kvm_rme.h>
+>>   #include <asm/vncr_mapping.h>
+>>     #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>> @@ -394,6 +395,9 @@ struct kvm_arch {
+>>        * the associated pKVM instance in the hypervisor.
+>>        */
+>>       struct kvm_protected_vm pkvm;
+>> +
+>> +    bool is_realm;
+>> +    struct realm realm;
+>>   };
+>>     struct kvm_vcpu_fault_info {
+>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
+>> asm/kvm_rme.h
+>> new file mode 100644
+>> index 000000000000..9c8a0b23e0e4
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>> @@ -0,0 +1,56 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * Copyright (C) 2023 ARM Ltd.
+>> + */
+>> +
+>> +#ifndef __ASM_KVM_RME_H
+>> +#define __ASM_KVM_RME_H
+>> +
+>> +/**
+>> + * enum realm_state - State of a Realm
+>> + */
+>> +enum realm_state {
+>> +    /**
+>> +     * @REALM_STATE_NONE:
+>> +     *      Realm has not yet been created. rmi_realm_create() may be
+>> +     *      called to create the realm.
+>> +     */
+>> +    REALM_STATE_NONE,
+>> +    /**
+>> +     * @REALM_STATE_NEW:
+>> +     *      Realm is under construction, not eligible for execution.
+>> Pages
+>> +     *      may be populated with rmi_data_create().
+>> +     */
+>> +    REALM_STATE_NEW,
+>> +    /**
+>> +     * @REALM_STATE_ACTIVE:
+>> +     *      Realm has been created and is eligible for execution with
+>> +     *      rmi_rec_enter(). Pages may no longer be populated with
+>> +     *      rmi_data_create().
+>> +     */
+>> +    REALM_STATE_ACTIVE,
+>> +    /**
+>> +     * @REALM_STATE_DYING:
+>> +     *      Realm is in the process of being destroyed or has already
+>> been
+>> +     *      destroyed.
+>> +     */
+>> +    REALM_STATE_DYING,
+>> +    /**
+>> +     * @REALM_STATE_DEAD:
+>> +     *      Realm has been destroyed.
+>> +     */
+>> +    REALM_STATE_DEAD
+>> +};
+>> +
+>> +/**
+>> + * struct realm - Additional per VM data for a Realm
+>> + *
+>> + * @state: The lifetime state machine for the realm
+>> + */
+>> +struct realm {
+>> +    enum realm_state state;
+>> +};
+>> +
+>> +void kvm_init_rme(void);
+>> +
+>> +#endif /* __ASM_KVM_RME_H */
+>> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/
+>> virt.h
+>> index ebf4a9f943ed..e45d47156dcf 100644
+>> --- a/arch/arm64/include/asm/virt.h
+>> +++ b/arch/arm64/include/asm/virt.h
+>> @@ -81,6 +81,7 @@ void __hyp_reset_vectors(void);
+>>   bool is_kvm_arm_initialised(void);
+>>     DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
+>> +DECLARE_STATIC_KEY_FALSE(kvm_rme_is_available);
+>>     static inline bool is_pkvm_initialized(void)
+>>   {
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 209bc76263f1..2ebc66812d49 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -23,7 +23,8 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o
+>> pvtime.o \
+>>        vgic/vgic-v3.o vgic/vgic-v4.o \
+>>        vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
+>>        vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
+>> -     vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o
+>> +     vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
+>> +     rme.o
+>>     kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+>>   kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 68fec8c95fee..856a721d41ac 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -40,6 +40,7 @@
+>>   #include <asm/kvm_nested.h>
+>>   #include <asm/kvm_pkvm.h>
+>>   #include <asm/kvm_ptrauth.h>
+>> +#include <asm/kvm_rme.h>
+>>   #include <asm/sections.h>
+>>     #include <kvm/arm_hypercalls.h>
+>> @@ -59,6 +60,8 @@ enum kvm_wfx_trap_policy {
+>>   static enum kvm_wfx_trap_policy kvm_wfi_trap_policy __read_mostly =
+>> KVM_WFX_NOTRAP_SINGLE_TASK;
+>>   static enum kvm_wfx_trap_policy kvm_wfe_trap_policy __read_mostly =
+>> KVM_WFX_NOTRAP_SINGLE_TASK;
+>>   +DEFINE_STATIC_KEY_FALSE(kvm_rme_is_available);
+>> +
+>>   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+>>     DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
+>> @@ -2819,6 +2822,9 @@ static __init int kvm_arm_init(void)
+>>         in_hyp_mode = is_kernel_in_hyp_mode();
+>>   +    if (in_hyp_mode)
+>> +        kvm_init_rme();
+>> +
 > 
-> On Sat, Apr 26, 2025 at 01:27:58PM +0100, Marc Zyngier wrote:
-
-> > @@ -240,8 +240,8 @@
-> >  	cbz	x1, .Lset_fgt_\@
-> >  
-> >  	/* Disable traps of access to GCS registers at EL0 and EL1 */
-> > -	orr	x0, x0, #HFGxTR_EL2_nGCS_EL1_MASK
-> > -	orr	x0, x0, #HFGxTR_EL2_nGCS_EL0_MASK
-> > +	orr	x0, x0, #HFGRTR_EL2_nGCS_EL1_MASK
-> > +	orr	x0, x0, #HFGRTR_EL2_nGCS_EL0_MASK
-> >  
-> >  .Lset_fgt_\@:
-> >  	msr_s	SYS_HFGRTR_EL2, x0
+> minor nit:
 > 
-> We still treat them as the same here, funny that the diff cut off the next line:
-> 
-> 	msr_s   SYS_HFGWTR_EL2, x0
-> 
-> Not saying you should do anything about it, I think it's fine.
+> I wondering if this check is necessary. If the host is running under a
+> a hypervisor, it could relay the calls to the RMM. Nothing urgent, but
+> it is a possibility. It doesn't matter to the host as such. The
+> Realm Guest will do its own verification and the host can ignore
+> what lies beneath ?
 
-Yeah, I had spotted these, but pointlessly duplicating these for R/W
-did seem over the top.
-
-Overall, What I am trying to achieve is to prevent that someone
-accidentally uses something such as HFGxTR_EL2.AIDR_EL1 to HFGWTR_EL2.
-I want to be able to catch those early (compile time) when they are
-used in macros that compose register and bit names.
-
-> 
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index f36d067967c33..43a630b940bfb 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -325,7 +325,7 @@
-> >   * Once we get to a point where the two describe the same thing, we'll
-> >   * merge the definitions. One day.
-> >   */
-> > -#define __HFGRTR_EL2_RES0	HFGxTR_EL2_RES0
-> > +#define __HFGRTR_EL2_RES0	HFGRTR_EL2_RES0
-> >  #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
-> >  #define __HFGRTR_EL2_nMASK	~(__HFGRTR_EL2_RES0 | __HFGRTR_EL2_MASK)
-> >  
-> > @@ -336,7 +336,7 @@
-> >  #define __HFGRTR_ONLY_MASK	(BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
-> >  				 GENMASK(26, 25) | BIT(21) | BIT(18) | \
-> >  				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
-> > -#define __HFGWTR_EL2_RES0	(__HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
-> > +#define __HFGWTR_EL2_RES0	HFGWTR_EL2_RES0
-> >  #define __HFGWTR_EL2_MASK	(__HFGRTR_EL2_MASK & ~__HFGRTR_ONLY_MASK)
-> >  #define __HFGWTR_EL2_nMASK	~(__HFGWTR_EL2_RES0 | __HFGWTR_EL2_MASK)
-> >  
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index e98cfe7855a62..7a1ef5be7efb2 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -273,7 +273,8 @@ struct kvm_sysreg_masks;
-> >  
-> >  enum fgt_group_id {
-> >  	__NO_FGT_GROUP__,
-> > -	HFGxTR_GROUP,
-> > +	HFGRTR_GROUP,
-> > +	HFGWTR_GROUP = HFGRTR_GROUP,
-> 
-> I think this change makes most of the diffs using this enum more confusing, but
-> it also seems to algin the code more closely with HDFGWTR_EL2 and HDFGWTR_EL2.
-
-Indeed. And once you add FEAT_FGT2 to the mix, HFGxTR becomes really
-out of place. As for the confusing aspect, I agree that the notion of
-group is a bit jarring, and maybe some documentation would help. The
-idea is actually simple:
-
-A sysreg trap always tells us whether this is for read or write. The
-data stored for each sysreg tells us which FGT register is controlling
-that trap. But since we can have one FGT register for read, and
-another for write, we would have to store both. Trouble is, we only
-have 63 bits in that descriptor. To save some space, we encode only
-the group (covering both read and write), and use the WnR bit to pick
-the correct guy.
-
-This means we can encode 11 possible registers in 3 bits, with
-restrictions. We still have plenty of bits left, but I'm pretty sure
-the architecture will force us to eat into it pretty quickly.
-
-[...]
-
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 005ad28f73068..6e01b06bedcae 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -5147,12 +5147,12 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
-> >  	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
-> >  		goto out;
-> >  
-> > -	kvm->arch.fgu[HFGxTR_GROUP] = (HFGxTR_EL2_nAMAIR2_EL1		|
-> > -				       HFGxTR_EL2_nMAIR2_EL1		|
-> > -				       HFGxTR_EL2_nS2POR_EL1		|
-> > -				       HFGxTR_EL2_nACCDATA_EL1		|
-> > -				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
-> > -				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
-> > +	kvm->arch.fgu[HFGRTR_GROUP] = (HFGRTR_EL2_nAMAIR2_EL1		|
-> > +				       HFGRTR_EL2_nMAIR2_EL1		|
-> > +				       HFGRTR_EL2_nS2POR_EL1		|
-> > +				       HFGRTR_EL2_nACCDATA_EL1		|
-> > +				       HFGRTR_EL2_nSMPRI_EL1_MASK	|
-> > +				       HFGRTR_EL2_nTPIDR2_EL0_MASK);
-> 
-> For example here you see HFGRTR_GROUP but it actually also applies to HFGWTR_GROUP.
-
-Because we use the same encoding trick. I don't see a good way to express
-that in a clean way, unfortunately. If you have an idea, I'm all ears!
+Reasonable point - I don't think we have anything yet that can do that
+sort of relaying. But I guess anything which handles the RMI API we
+should be compatible with, so there's no need specifically to require
+in_hyp_mode.
 
 Thanks,
+Steve
 
-	M.
+> 
+> Either ways,
+> 
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> 
+> 
 
--- 
-Without deviation from the norm, progress is not possible.
 
