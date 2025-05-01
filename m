@@ -1,127 +1,112 @@
-Return-Path: <kvm+bounces-45102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45101-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22F4AAA6067
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 17:03:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEEF3AA6061
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 17:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FDF2189BAEA
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 15:03:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 936FA9C1C3C
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 15:02:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F68F202F9F;
-	Thu,  1 May 2025 15:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D81B202C21;
+	Thu,  1 May 2025 15:03:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QE9K7S0F"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nPhmgSoF"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41321EA7C6;
-	Thu,  1 May 2025 15:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07BF201033
+	for <kvm@vger.kernel.org>; Thu,  1 May 2025 15:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746111791; cv=none; b=A1NB3QJuSlt0AQJcIAzD5Glj4GSf98aU4GhqvCEBi9zz/UQ/v3vlbQl75P/LWG3EFuuXHRy2XnBKrZ6KQF3tIKpxURGOumJ3nyWyqS8zTo/GUqEeWFwZEbsjq0wo17l0W7GFY8VJkuQhXmsw1/P6PMMZKcSwRKirm3FTa4ylEus=
+	t=1746111782; cv=none; b=ClWXAM6bluNpEGkyMJ9qw+qjEVMtJGV2wXJtKu43Y3C8DHLAuUd2xsjKwsJRs0O05Aubz+yoBKZCTCr681BYFpWYukt+dgKXKFQW0FGCsq0EPIaJJW7nqahZ7fepDJNtfyX9jxQOk61gSCiwY6g8ITtGhkP8CKm6t0H9DCh4IlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746111791; c=relaxed/simple;
-	bh=4ySaPdEMd4+Vb4yQ+0YUSkKNLjFLCkYhYBoAAExMs3U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mkA40cvOe/OtEv8hBUGlPDxu68SZALFpXB3HobIqYdNeHwgSfoTWLTJZ5JUaYhONFPxWvst8EFgVOjLN10UQWtklOi2tY02YJ5IR9q9NZJ1UFQwpGz/Bl1d7ChOcc8FtSc0eCQ0qGX8rybZc9CV1WKY1Ja0eSpow47+EvI3u3GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QE9K7S0F; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=SknNweDJMYv6Cc7JXUCuginAJHi4T0ZKllMpOn1Yf9A=; b=QE9K7S0FqJXdRMiI2MUQfyFVKN
-	zJkaOZZAvX0UK9xBOJnD6xr1oo4dLko0vESRIIkP4sjHHPxZkleb2D8Zai321exEYA2JJr82ElX7s
-	y72vsCa48dbNhj3sR2u6AvvpDc6GUftTpqrd7fLDiVr8l4ZJcPOvCc/B4Kso/X5VwtY001koeorb7
-	w0lpR1LpdbzQwtNNGzQXqNnli6Sbl3pH+QAdCVePhkf3FUFd/ngVNiv41q8dPOdm8t1mbTM/UmJ5P
-	NuryBBTCcNBBOjT/+JRWnUfQQL+DhMwA+igl0308JTBNEPRBnnqN+OImNHFtw2Imib6YH9ERSKUcP
-	cmUpe09A==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uAVQk-00000000oH8-33tB;
-	Thu, 01 May 2025 15:02:30 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 1B7DC30072F; Thu,  1 May 2025 17:02:30 +0200 (CEST)
-Date: Thu, 1 May 2025 17:02:29 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Brendan Jackman <jackmanb@google.com>
-Cc: Christoph Hellwig <hch@lst.de>, chenlinxuan@uniontech.com,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Peter Huewe <peterhuewe@gmx.de>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Juergen Gross <jgross@suse.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, linux-nvme@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-integrity@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	llvm@lists.linux.dev, Winston Wen <wentao@uniontech.com>,
-	kasan-dev@googlegroups.com, xen-devel@lists.xenproject.org,
-	Changbin Du <changbin.du@intel.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH RFC v3 0/8] kernel-hacking: introduce
- CONFIG_NO_AUTO_INLINE
-Message-ID: <20250501150229.GU4439@noisy.programming.kicks-ass.net>
-References: <20250429-noautoinline-v3-0-4c49f28ea5b5@uniontech.com>
- <20250429123504.GA13093@lst.de>
- <D9KW1QQR88EY.2TOSTVYZZH5KN@google.com>
+	s=arc-20240116; t=1746111782; c=relaxed/simple;
+	bh=ChhYFXHG+mLnhJ/0qrPdGyDw3G+wslc1EN5nj5VMuCU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qy8kLrqKZMzg2SSjQ+A6QVA4PwlaHG6ViSEJ8tsRLkOw7VS26r96JOU3gPZ5HCbB/KmUFzyZMOgaXa4hMx+CsnYMRDVvfVdH5MGO7SSV3LPpmLK37f3r7Yc7fM6Ke6wSOFuUQql94mFuFuogNpt20u0OXCpNU1HjN5MJZkSV61w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nPhmgSoF; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7370a2d1981so969855b3a.2
+        for <kvm@vger.kernel.org>; Thu, 01 May 2025 08:03:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1746111780; x=1746716580; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wkq/VdLFYJfyJvgcdgfMRsRb6Gxm8UUMs/yuzG02xU4=;
+        b=nPhmgSoFKlm4ZOoOmWTgRPvwEgHmreRgxjshw1nPx6UD0kmmJaAcDVEcSl9pkiCnQU
+         dmds1BtPufU3KKo11pdS0ZkgrVZQ2R/4qDNgb/1ssIcAtmawz7yL2x02E5I/MtdmMRz6
+         kslscDlwVckoaMH/wrWSF6wClvOwY9JveeeCzs7IDNLFr4WAFQnHYCZR6XxQrQEpXd0R
+         TGPcPo8TzjTlOZSS8T7Lv55P4ge3UCsUgAkPLeV329c62DPkvczZenAyi2Y7PM95bExq
+         6TvGXBMNcaYNHhKfDme8O9iy2vaxjDW3CDP9hgUaxG/9KoyIOdQITi7h1emYeH+WATHX
+         xYGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746111780; x=1746716580;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wkq/VdLFYJfyJvgcdgfMRsRb6Gxm8UUMs/yuzG02xU4=;
+        b=bBryzbgoB9z2KhixvQlwYgOBAwFmLAJSaSVUaALQ+BhphAvwiRL0+R4KNjSFPBl9cN
+         ZhYGRAEK0Ay37m/LDo4t4yypzFI2c9ZxMeSsXlJ5PVKbQW5mz+y+eiJXPWOXHjytmKXW
+         2dan1NrhvT6zgsSYK4GhKjPLkZbEjye+ZuHy32q3bkd0ReWPw7MrzY9OTEpuv8C3qW0P
+         7JFUU3MKt2W3bIGCImzkDHw02XDzW1TBg9VSI9ymXzPiU/E85PBcmL4vgfvJ7SceRo7N
+         ZL2igEXAbO7vDaJJCTHNArpkCvvPhbCZFdsF3aMJuBqKusyD5KO0Bclw7FROqaLlaEMJ
+         FGpw==
+X-Forwarded-Encrypted: i=1; AJvYcCV0VX/GSp4iuvB48sjQKQWbgL+U3bvSuUC9Ij9JlvMN6BGLaIZrKYdVzsBf8dksy0BZhIA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuxCjobO1+GMqMSHAFv7avgqYoWNzyQ15FnWeAUowXYB2Kr65A
+	nS2iCKyWxO1Jdivdciu3XMniXqwTNGyC2Cbcc4lgoduRsOZ/D5Db3A//Ox1azpU=
+X-Gm-Gg: ASbGncsjzM9Cfpn32jyPnXqshjahGz/hbUW93/YH7nfViZM+9R2EenKBGL1lXlVyYiM
+	YcEUlaeIHpavr3M2O984tNc7BjrZ8FJUqd8xLUU7j8KnYeIrT00RtoAAZkYddwMDgiGcVJK58S2
+	vLsmOFvObkQVO9iw9aeO2W8UaNDHPK5aPVVe0N1Ef0CG6bANTXP0CNgScV9qqWJCnyOpiRLMM75
+	x+x304ll6/KXBwcJ8qJOta4Qk1ODjKq6vNbitMy4bCU4C0bFerYZA8bg5tedFY81G71F8sxFxme
+	hLN/gCG2LYWfWs5NFF0o4dglQTGxqgYUpjBNaCoICd6iPRz8l13B6u8XCdb4Bxf/8oob9Yz7USd
+	16Ru/Yh8=
+X-Google-Smtp-Source: AGHT+IFpQDWzZkr7SDEpQqkD/ISUrJM6vDV/PLa2LIk+1brnq5oSIluMSLUP33z0eD1oTrBqKei8Ew==
+X-Received: by 2002:a05:6a00:1311:b0:740:3830:4119 with SMTP id d2e1a72fcca58-7404790521fmr4868652b3a.18.1746111779927;
+        Thu, 01 May 2025 08:02:59 -0700 (PDT)
+Received: from [192.168.0.4] (71-212-47-143.tukw.qwest.net. [71.212.47.143])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7404eeb1935sm938020b3a.18.2025.05.01.08.02.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 May 2025 08:02:59 -0700 (PDT)
+Message-ID: <8fdaed14-d2a1-4939-9b9b-5cf388e20ea8@linaro.org>
+Date: Thu, 1 May 2025 08:02:57 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <D9KW1QQR88EY.2TOSTVYZZH5KN@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 13/33] target/arm/helper: use i64 for
+ exception_pc_alignment
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ alex.bennee@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, anjo@rev.ng,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ kvm@vger.kernel.org
+References: <20250501062344.2526061-1-pierrick.bouvier@linaro.org>
+ <20250501062344.2526061-14-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20250501062344.2526061-14-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 01, 2025 at 02:19:47PM +0000, Brendan Jackman wrote:
-> On Tue Apr 29, 2025 at 12:35 PM UTC, Christoph Hellwig wrote:
-> > On Tue, Apr 29, 2025 at 12:06:04PM +0800, Chen Linxuan via B4 Relay wrote:
-> >> This series introduces a new kernel configuration option NO_AUTO_INLINE,
-> >> which can be used to disable the automatic inlining of functions.
-> >> 
-> >> This will allow the function tracer to trace more functions
-> >> because it only traces functions that the compiler has not inlined.
-> >
-> > This still feels like a bad idea because it is extremely fragile.
-> 
-> Can you elaborate on that - does it introduce new fragility?
+On 4/30/25 23:23, Pierrick Bouvier wrote:
+> Signed-off-by: Pierrick Bouvier<pierrick.bouvier@linaro.org>
+> ---
+>   target/arm/helper.h            | 2 +-
+>   target/arm/tcg/tlb_helper.c    | 2 +-
+>   target/arm/tcg/translate-a64.c | 2 +-
+>   target/arm/tcg/translate.c     | 2 +-
+>   4 files changed, 4 insertions(+), 4 deletions(-)
 
-given it needs to sprinkle __always_inline around where it wasn't needed
-before, yeah.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Also, why would you want this? function tracer is already too much
-output. Why would you want even more?
-
-
+r~
 
