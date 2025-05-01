@@ -1,150 +1,204 @@
-Return-Path: <kvm+bounces-45083-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45084-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0EDDAA5F09
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 15:13:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 829BDAA5F24
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 15:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 115DE17E33B
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 13:13:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18B1B1BA7F51
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 13:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA23184540;
-	Thu,  1 May 2025 13:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C991199935;
+	Thu,  1 May 2025 13:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="MUSd7zCp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6JbTqUr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3D02DC76A
-	for <kvm@vger.kernel.org>; Thu,  1 May 2025 13:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7878818C930;
+	Thu,  1 May 2025 13:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746105201; cv=none; b=JoCabxqkDFKBIoV9Rp0TBj3VfTCf6rLmQefW2y5Id7YQSQ1EumiIoJpKX8lBDq8+A46OQE8qK7Jt7nlJrEN0xX3ZKj9Mm7yAfF4Pg75jRTn4oAS7tQmMoRGt1Y2R1pDiHzTuwAkkMwAIsGeU4e+KNyLdkiduVEuUvxySUDjJ2r8=
+	t=1746105642; cv=none; b=aPkVy5zLl+munRbTQ3iLM6E/14W9yCovFPngVD0mpEZpRdBhHhTJPWbYAYG0+pFO7CL2xFHwN/uhYLatvpqImnmZ8MPJ4AtWxVp2ou8+hwBOuWcsTOb13cW3hye3xyybJ8r0TWlLl1tYnmret9V0JSpt4i/PJWrlZ2B8AswYsdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746105201; c=relaxed/simple;
-	bh=XvupZH27H5g/HfGLJUrSITBouY7S04F9SNYyBSsUuM0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g4p3tFfsunMTdBZkPu024NUVYCYMNYu2U5OqW16csFNJWRE0RtZpbQhIKqsSHy9nRwyg/hJuwwMVlN5rCejHokEEXyJ0NOlZ0lv0u7lIHuGgXK8JRwpSb8KOZQB3zXdbBKUM4iFhcLTRtxhwI6wTEJtNhp4StTU1HNt1GV9bJ5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=MUSd7zCp; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3d5e43e4725so2382545ab.1
-        for <kvm@vger.kernel.org>; Thu, 01 May 2025 06:13:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1746105199; x=1746709999; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i8cnw7gES+2CPKoNFqxe9oNSToGNtvAVlGUfutI0aoo=;
-        b=MUSd7zCpuPMvrBBe8i01Z0j1uYudSeHJFLnoLQRVCNXUUreAg9kkOtSFZxbL5CW/i+
-         /Axfwzm0qrj+J8JX670FzkTZHC86/TkZ7/x+p/zGrAUbFjaAAyP4ixSu36KblluTDu6+
-         e+1KE3Kbf6x9SqmeKnrtUv036aVASYAAkUT1h2eQN5s3WEig2m1XuUaL/HOu2OpIWQV5
-         G35FGdsXAjYSqKdtdrf00bqASvt7ed1jXQv9Dmwyh0o/if4Kpyco5qtJnsnRd6XTIDsR
-         FEAHWlS3xTpAnuMiIMVw/Z7y2RJKqXVhCpWcPNC7a+oELw35LXHbG1T2FjESLTWjDBu1
-         POVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746105199; x=1746709999;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i8cnw7gES+2CPKoNFqxe9oNSToGNtvAVlGUfutI0aoo=;
-        b=ZIOFF3VboKATIKjTYoGfTOA/WADu7K4f1g+wFEnOXeZc88QJOFAAO2qABgSgPI36cz
-         mHqwj54QqceyCoR4tVxNc84etKqhywNWBSw/AIPPOKgTjEBUKCq/t5hACQn2lKBK6xjj
-         xtshNhAbuC7FTb7NDgMLi16AuRI9gj7+HGEshEccdVUQRTrDAL0QGQqzF3HsAHnQrAK9
-         VlLdAJHgofbBp3UQPPiE7UuTgR+SbjSY+ZsJwA8yWpPwxZrN6lFjIbE3VJJ8+3eExMSi
-         7/+bQ8zqm/XYfTFKG8X144ocOaC3E3opB1iAEEdLJ7ZUlajrKHKfLc1fHr+TTGCoG0G9
-         yQ3A==
-X-Forwarded-Encrypted: i=1; AJvYcCV/sJgmsGHuXLShmCs0dWac7YBtX9Lt76SSPNOde+D//UAsToiR8UHKRJeimqWAWIq4K0I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx1AgRSt4Zn2D3DM0u0ykb3ARhjG4Cm4MpdeTkmfXXYfesgpOf
-	ohJZqg4AVjSjCpFz/DFt9egoyLFKzrytGAGnn4aEke2IOeekio8XqPGsmHPbPlGXfVR491qWn9C
-	xMM7oOwpWJjfG8cr47j4ZOVCvzPOzl2z4gbOT8QmsUMfXKpSFohU=
-X-Gm-Gg: ASbGncvpRiotkao3o00LivWZnfk8Kp2lMAvu6i2DpBIP/26KOt3CV8C8XqlaysGKCqq
-	B5t6gL9fCLX5jzXDWWGPtXRBLKsdoDyc74eB345ABDs0lxi2EIHz0nIMiRuy2OgyfLcbq8uQqmt
-	dr3owyXzLO1sZcZA1rWr6GOFs2bo1TgX0Tjg==
-X-Google-Smtp-Source: AGHT+IFYH/yz9ETM9NLPFlE2pVkQwoPg56TQHPQR5mOU/5lz7nNUj+hk9/rsWp5zS5jnU2+qLzeLlD75PGhwF7yzJJc=
-X-Received: by 2002:a05:6e02:1aaf:b0:3d9:24a7:db0c with SMTP id
- e9e14a558f8ab-3d96f1b20ddmr38261815ab.8.1746105199109; Thu, 01 May 2025
- 06:13:19 -0700 (PDT)
+	s=arc-20240116; t=1746105642; c=relaxed/simple;
+	bh=Os11/kUyL5V6AODv9qoGyyUIKSAfj1P38I2fDvunLJE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FUySqGLy8MLPoo5EH5zTO5x2LDish+l3+PQB69WiuYgOTtrzI2lmhvkM/xmcrb/3bUw/HuUnJ+UPwIvvJDT3Zap8znHi/vLRELgrQgGud8ATxTQpoBdIFaz6lFBYCLo3ZyXPN44wrhgHK6OLKkzzZRwaLZbuggKx8gkIsSwXNto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6JbTqUr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF271C4CEED;
+	Thu,  1 May 2025 13:20:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746105641;
+	bh=Os11/kUyL5V6AODv9qoGyyUIKSAfj1P38I2fDvunLJE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n6JbTqUrpaLfHlfvu5L22w27yom1lrlLhx27ERqNuGM0RwQBmGiXiihE8ZdZpQPCv
+	 cS+xxrrKGfcs6qZi9wCQUTakiukkvlhs2pNokiQJGuA0ZXdDWEcpse5GAujKrViIwU
+	 VIfB43WSzt8Lrq8PnuyRJ8JP13EIzRbVKKi87rSaepGpfSR6DsfQMDCnkw0Er5C0kj
+	 jjhKL6ZqpYi2pkODlpPzsS4J1c3sCK5WzQw5khwBlLbFL3Xi7+sqr/YroLSr4ONXjb
+	 voajhkctUHnUgjmy8Uv42ahIQs3sS/kkHHqzsru69sxz0yYjQ/xAdoU0pK/SnI9hdX
+	 lrysXZF2RHFww==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uATqB-00Aa7U-MT;
+	Thu, 01 May 2025 14:20:39 +0100
+Date: Thu, 01 May 2025 14:20:39 +0100
+Message-ID: <86zffwh3h4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 04/42] arm64: sysreg: Replace HGFxTR_EL2 with HFG{R,W}TR_EL2
+In-Reply-To: <20250429142656.GD1859293@e124191.cambridge.arm.com>
+References: <20250426122836.3341523-1-maz@kernel.org>
+	<20250426122836.3341523-5-maz@kernel.org>
+	<20250429142656.GD1859293@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250426110348.338114-1-apatel@ventanamicro.com>
-In-Reply-To: <20250426110348.338114-1-apatel@ventanamicro.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 1 May 2025 18:43:07 +0530
-X-Gm-Features: ATxdqUFKSjteFgCBlQofgGe5rmP86z7GpzG9AH1PpGwKFUlwJL4JNjmeLly_eRQ
-Message-ID: <CAAhSdy3VJUyR=9KKQrHLpn_dqnyqpDore4CCC0SGPM4pjZ3opQ@mail.gmail.com>
-Subject: Re: [kvmtool PATCH v3 00/10] Add SBI system suspend and cpu-type option
-To: Will Deacon <will@kernel.org>
-Cc: julien.thierry.kdev@gmail.com, maz@kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Atish Patra <atishp@atishpatra.org>, 
-	Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, Anup Patel <apatel@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Will,
+On Tue, 29 Apr 2025 15:26:56 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> On Sat, Apr 26, 2025 at 01:27:58PM +0100, Marc Zyngier wrote:
 
-On Sat, Apr 26, 2025 at 4:33=E2=80=AFPM Anup Patel <apatel@ventanamicro.com=
-> wrote:
->
-> This series does the following improvements:
-> 1) Add Svvptc, Zabha, and Ziccrse extension support (PATCH2 to PATCH3)
-> 2) Add SBI system suspend support (PATCH5 to PATCH6)
-> 3) Add "--cpu-type" command-line option supporting "min" and "max"
->    CPU types where "max" is the default (PATCH8 to PATCH10)
->
-> These patches can also be found in the riscv_more_exts_round6_v3 branch
-> at: https://github.com/avpatel/kvmtool.git
->
-> Changes since v2:
->  - Addressed comments on PATCH10
->
-> Changes since v1:
->  - Rebased on latest KVMTOOL commit d410d9a16f91458ae2b912cc088015396f22d=
-fad
->  - Addressed comments on PATCH8, PATCH9, and PATCH10
->
-> Andrew Jones (3):
->   riscv: Add SBI system suspend support
->   riscv: Make system suspend time configurable
->   riscv: Fix no params with nodefault segfault
->
-> Anup Patel (7):
->   Sync-up headers with Linux-6.14 kernel
->   riscv: Add Svvptc extension support
->   riscv: Add Zabha extension support
->   riscv: Add Ziccrse extension support
->   riscv: Include single-letter extensions in isa_info_arr[]
->   riscv: Add cpu-type command-line option
->   riscv: Allow including extensions in the min CPU type using
->     command-line
->
->  arm64/include/asm/kvm.h             |   3 -
->  include/linux/kvm.h                 |   8 +-
->  include/linux/virtio_pci.h          |  14 ++
->  riscv/aia.c                         |   2 +-
->  riscv/fdt.c                         | 240 +++++++++++++++++++---------
->  riscv/include/asm/kvm.h             |   7 +-
->  riscv/include/kvm/kvm-arch.h        |   2 +
->  riscv/include/kvm/kvm-config-arch.h |  26 +++
->  riscv/include/kvm/sbi.h             |   9 ++
->  riscv/kvm-cpu.c                     |  36 +++++
->  x86/include/asm/kvm.h               |   1 +
->  11 files changed, 265 insertions(+), 83 deletions(-)
->
-> --
-> 2.43.0
->
+> > @@ -240,8 +240,8 @@
+> >  	cbz	x1, .Lset_fgt_\@
+> >  
+> >  	/* Disable traps of access to GCS registers at EL0 and EL1 */
+> > -	orr	x0, x0, #HFGxTR_EL2_nGCS_EL1_MASK
+> > -	orr	x0, x0, #HFGxTR_EL2_nGCS_EL0_MASK
+> > +	orr	x0, x0, #HFGRTR_EL2_nGCS_EL1_MASK
+> > +	orr	x0, x0, #HFGRTR_EL2_nGCS_EL0_MASK
+> >  
+> >  .Lset_fgt_\@:
+> >  	msr_s	SYS_HFGRTR_EL2, x0
+> 
+> We still treat them as the same here, funny that the diff cut off the next line:
+> 
+> 	msr_s   SYS_HFGWTR_EL2, x0
+> 
+> Not saying you should do anything about it, I think it's fine.
 
-Friendly ping ?
+Yeah, I had spotted these, but pointlessly duplicating these for R/W
+did seem over the top.
 
-Regards,
-Anup
+Overall, What I am trying to achieve is to prevent that someone
+accidentally uses something such as HFGxTR_EL2.AIDR_EL1 to HFGWTR_EL2.
+I want to be able to catch those early (compile time) when they are
+used in macros that compose register and bit names.
+
+> 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index f36d067967c33..43a630b940bfb 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -325,7 +325,7 @@
+> >   * Once we get to a point where the two describe the same thing, we'll
+> >   * merge the definitions. One day.
+> >   */
+> > -#define __HFGRTR_EL2_RES0	HFGxTR_EL2_RES0
+> > +#define __HFGRTR_EL2_RES0	HFGRTR_EL2_RES0
+> >  #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+> >  #define __HFGRTR_EL2_nMASK	~(__HFGRTR_EL2_RES0 | __HFGRTR_EL2_MASK)
+> >  
+> > @@ -336,7 +336,7 @@
+> >  #define __HFGRTR_ONLY_MASK	(BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
+> >  				 GENMASK(26, 25) | BIT(21) | BIT(18) | \
+> >  				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
+> > -#define __HFGWTR_EL2_RES0	(__HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
+> > +#define __HFGWTR_EL2_RES0	HFGWTR_EL2_RES0
+> >  #define __HFGWTR_EL2_MASK	(__HFGRTR_EL2_MASK & ~__HFGRTR_ONLY_MASK)
+> >  #define __HFGWTR_EL2_nMASK	~(__HFGWTR_EL2_RES0 | __HFGWTR_EL2_MASK)
+> >  
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index e98cfe7855a62..7a1ef5be7efb2 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -273,7 +273,8 @@ struct kvm_sysreg_masks;
+> >  
+> >  enum fgt_group_id {
+> >  	__NO_FGT_GROUP__,
+> > -	HFGxTR_GROUP,
+> > +	HFGRTR_GROUP,
+> > +	HFGWTR_GROUP = HFGRTR_GROUP,
+> 
+> I think this change makes most of the diffs using this enum more confusing, but
+> it also seems to algin the code more closely with HDFGWTR_EL2 and HDFGWTR_EL2.
+
+Indeed. And once you add FEAT_FGT2 to the mix, HFGxTR becomes really
+out of place. As for the confusing aspect, I agree that the notion of
+group is a bit jarring, and maybe some documentation would help. The
+idea is actually simple:
+
+A sysreg trap always tells us whether this is for read or write. The
+data stored for each sysreg tells us which FGT register is controlling
+that trap. But since we can have one FGT register for read, and
+another for write, we would have to store both. Trouble is, we only
+have 63 bits in that descriptor. To save some space, we encode only
+the group (covering both read and write), and use the WnR bit to pick
+the correct guy.
+
+This means we can encode 11 possible registers in 3 bits, with
+restrictions. We still have plenty of bits left, but I'm pretty sure
+the architecture will force us to eat into it pretty quickly.
+
+[...]
+
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 005ad28f73068..6e01b06bedcae 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -5147,12 +5147,12 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+> >  	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+> >  		goto out;
+> >  
+> > -	kvm->arch.fgu[HFGxTR_GROUP] = (HFGxTR_EL2_nAMAIR2_EL1		|
+> > -				       HFGxTR_EL2_nMAIR2_EL1		|
+> > -				       HFGxTR_EL2_nS2POR_EL1		|
+> > -				       HFGxTR_EL2_nACCDATA_EL1		|
+> > -				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
+> > -				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
+> > +	kvm->arch.fgu[HFGRTR_GROUP] = (HFGRTR_EL2_nAMAIR2_EL1		|
+> > +				       HFGRTR_EL2_nMAIR2_EL1		|
+> > +				       HFGRTR_EL2_nS2POR_EL1		|
+> > +				       HFGRTR_EL2_nACCDATA_EL1		|
+> > +				       HFGRTR_EL2_nSMPRI_EL1_MASK	|
+> > +				       HFGRTR_EL2_nTPIDR2_EL0_MASK);
+> 
+> For example here you see HFGRTR_GROUP but it actually also applies to HFGWTR_GROUP.
+
+Because we use the same encoding trick. I don't see a good way to express
+that in a clean way, unfortunately. If you have an idea, I'm all ears!
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
