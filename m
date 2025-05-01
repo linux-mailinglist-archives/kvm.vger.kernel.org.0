@@ -1,118 +1,115 @@
-Return-Path: <kvm+bounces-45096-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45097-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19BF7AA5FC6
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 16:20:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD6FEAA5FDD
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 16:22:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8256A4C475B
-	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 14:20:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EE674C4CE8
+	for <lists+kvm@lfdr.de>; Thu,  1 May 2025 14:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6EF1F1527;
-	Thu,  1 May 2025 14:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AABD1F151E;
+	Thu,  1 May 2025 14:22:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="33VStrY3"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0hBlpnr4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C6C1F12FC
-	for <kvm@vger.kernel.org>; Thu,  1 May 2025 14:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1FF1F1313;
+	Thu,  1 May 2025 14:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746109192; cv=none; b=cqIp+CrMBI0jq8jpHrmIKGpZpaWe8JVz8K+Vf8KkKNOF/Gar91hwn0hLw+LTvbWLiJcZr6+fg3aHyIoy1JbFqyoosNh6Z9AA4u752LG6Z4SQmK0whNRnjs1HcdtLhX8vIgxzrAP85rQ+KXf5tYvA088zYUxeYvKqxGhGqX4ln1M=
+	t=1746109369; cv=none; b=hQkI3UFKJkJ22gEqp5bm7Sw63wVVKO7qHcjpSOML/O5gGROWAfnb9VyyHZdSX1bHqOcjHzh6t08lODAk4VGUrPSOpN5s8pmuAomK4LlsT0auiXmgajq/lUndfPib0xPI7gWjAsREautLnPmPjiBbGqf89wJdskvGs7ZaVwp6OP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746109192; c=relaxed/simple;
-	bh=RFwLAdDJzHnRsl1AiuqY7ErKiNdGVq/+PnAbJFngrNc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hoh9jvuzfRfr3aztizNCoCmdV8UFrUnqWn2uZ/EBmrHS26qGSkGauLYw0WNzqmq9BLW5PmcBtk/6BjGz39/1CsttvNxRvQMjYXCobxG8+lPgacqdANs8FWVR/y/KK5zpfnzJPyb2xdAlfoEKMnEd4cEXRygOTWCsb3qUTti1E+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=33VStrY3; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-43d209dc2d3so3858595e9.3
-        for <kvm@vger.kernel.org>; Thu, 01 May 2025 07:19:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746109189; x=1746713989; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TmEF1yP8U0niebBh9hfc5iyUEhI2jhPWqahRuFkaIQM=;
-        b=33VStrY3M+0grhQPsFBLTNP+0qv1sXruXkpSi2qEN4NhjcNIKTQAYuEJAYQ0BoKIG8
-         jb1Yh1UjzmsDgorOQsKiP4KrIIHxdd6+u63LJm9Mk6YBdmv+M5ucvN338dOoNyfhR91V
-         CRopi2hiNlsOiVOnOGjvjSqk0dyxZVVJMP9cAtAG0Gv9Mfe2atHMzdiix7UpzcOTDR81
-         HdiGvh1S3AxVRQUaa8BWaKBSzXZveALkGfi7lxoo80GAa/pMY0eqsZWpNchsWSXRH3vQ
-         GboPpGf0LcbzX5ppqQYS7OkW9x9vE+a3kPnyLt8rVX4WJGf8xuIz8rv5M9LRxfloCJ3e
-         +4TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746109189; x=1746713989;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TmEF1yP8U0niebBh9hfc5iyUEhI2jhPWqahRuFkaIQM=;
-        b=hK6BxmmwTCQgn0MmxJ2fKDKkr3WGLni+wiVUqPSNjSkAt0v6CrlPvtwk3rUMtlaym0
-         PQLFqwnXCzajh0/8C7bZK5dQFGMBHhwXHwALOaZ4l2DzPeCxDqDoDCDf0NREGKnXRFZ1
-         ldCv025I0AQ8jpt7YGlMMLQHFqPKvU2yPB4ThvnikmkK3BMX7dZF1R8N5GOPYAXQ56W4
-         cXll/8IZQqUCEt/00S+Luu1de/aFREGwrhQYnz4agw//ZTWyDgAFGdWAei15QYVtQwjf
-         DF4oVtUM612JyRWTr/Bu0IhCWrZycKkjB/9WAwxCP672AmbT8BE0ov7NjSixTm/CbNun
-         bfTA==
-X-Forwarded-Encrypted: i=1; AJvYcCUU6klQNPhq68Nr4fkWYaCEPVi9ue43IZQ0aJjh0I/niexGC2aLPMKvetqHlCU5m4CeZaM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEqeApnKq0E2eUMDmBCYCXjMhuboLOiaQ91tfIUTxq0lOc2i0R
-	jCndbb7FClJHQvhKa2qSMvI8VD5I/LP8GkouwjyQevOu3l+TJbKhPO4laPean/2YTyO7LhWwX8D
-	YywB8zMnNOQ==
-X-Google-Smtp-Source: AGHT+IE4OWD5XxcERH4cgRX5gY9PM+u+mzYGVEd/YlTx4e+t3SrV5tDi5azUj0xMuNVR7NdRXpnF4uWQLtuxPQ==
-X-Received: from wmbhe15.prod.google.com ([2002:a05:600c:540f:b0:441:b79a:76cf])
- (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:35d6:b0:43c:f8fc:f686 with SMTP id 5b1f17b1804b1-441b64ed9d8mr27510245e9.3.1746109189194;
- Thu, 01 May 2025 07:19:49 -0700 (PDT)
-Date: Thu, 01 May 2025 14:19:47 +0000
-In-Reply-To: <20250429123504.GA13093@lst.de>
+	s=arc-20240116; t=1746109369; c=relaxed/simple;
+	bh=4uduP/E1+iiWW5QwTqKsiTlY+NnSHbK8s0ipJNrwbCk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o1o6PHzbBv28segKLS92/sNST5HZs3OMpzDFVdKQmbupLw046rYwd+CqRsrVzM6iGqXeLYZpmdbp185Z/Y9o13uKTofEWJ1NjkX/acJ67PT4muvFANa1wFyjc2xr56OZ/G53xs0iiBWQn2CsJ1kBw1dRrdDrpybyUWAnNjgUsAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0hBlpnr4; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=Y0IQBEy5A72SAbKcBMN9KFzK0p4E//3l79XMemTBafw=; b=0hBlpnr4hU8vi3PFOkslX08aAH
+	xd3HfFz7pis+wBju+KL/ABPoI4eBWseb+TTLYm8Z0rwvhyT3RQIczD4sUgOebGMp7IaKayWsYlOdm
+	CXAyqE+RcN1cdA3yH+6Lg1xNVBXw7A30aV56zY30qxw0JWQgSxRaamKRELx7vsCzzXTO12JwiTDPb
+	Ie0xcCJXk2j7aiaWYh9ki2V/zRDFf87zNs1C61OJxDbxcb5RUeOsxcnVStTm/UhYyidx9Xl76hnUF
+	B43QBocnkbTN0hDVEjWbXMszZfTkJICHGbImWk0UiwvxHVv2BaOcSsLm6FTjv6WoaYjpMPCXc9SBi
+	bXnS5tdA==;
+Received: from [206.0.71.14] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uAUoJ-0000000FxIF-0c9G;
+	Thu, 01 May 2025 14:22:47 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: mst@redhat.com,
+	jasowang@redhat.com
+Cc: eperezma@redhat.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: [PATCH v2] vringh: use bvec_kmap_local
+Date: Thu,  1 May 2025 09:22:30 -0500
+Message-ID: <20250501142244.2888227-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250429-noautoinline-v3-0-4c49f28ea5b5@uniontech.com> <20250429123504.GA13093@lst.de>
-X-Mailer: aerc 0.20.0
-Message-ID: <D9KW1QQR88EY.2TOSTVYZZH5KN@google.com>
-Subject: Re: [PATCH RFC v3 0/8] kernel-hacking: introduce CONFIG_NO_AUTO_INLINE
-From: Brendan Jackman <jackmanb@google.com>
-To: Christoph Hellwig <hch@lst.de>, <chenlinxuan@uniontech.com>
-Cc: Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	Sagi Grimberg <sagi@grimberg.me>, Andrew Morton <akpm@linux-foundation.org>, 
-	Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>, 
-	Alex Williamson <alex.williamson@redhat.com>, Peter Huewe <peterhuewe@gmx.de>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Zi Yan <ziy@nvidia.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Peter Zijlstra <peterz@infradead.org>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
-	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, <linux-nvme@lists.infradead.org>, 
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>, <kvm@vger.kernel.org>, 
-	<virtualization@lists.linux.dev>, <linux-integrity@vger.kernel.org>, 
-	<linux-kbuild@vger.kernel.org>, <llvm@lists.linux.dev>, 
-	Winston Wen <wentao@uniontech.com>, <kasan-dev@googlegroups.com>, 
-	<xen-devel@lists.xenproject.org>, Changbin Du <changbin.du@intel.com>, 
-	Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue Apr 29, 2025 at 12:35 PM UTC, Christoph Hellwig wrote:
-> On Tue, Apr 29, 2025 at 12:06:04PM +0800, Chen Linxuan via B4 Relay wrote:
->> This series introduces a new kernel configuration option NO_AUTO_INLINE,
->> which can be used to disable the automatic inlining of functions.
->> 
->> This will allow the function tracer to trace more functions
->> because it only traces functions that the compiler has not inlined.
->
-> This still feels like a bad idea because it is extremely fragile.
+Use the bvec_kmap_local helper rather than digging into the bvec
+internals.
 
-Can you elaborate on that - does it introduce new fragility?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+
+Changes since v1:
+ - actually finish the conversion
+
+ drivers/vhost/vringh.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+index 73e153f9b449..f3ec2483b014 100644
+--- a/drivers/vhost/vringh.c
++++ b/drivers/vhost/vringh.c
+@@ -1291,11 +1291,10 @@ static inline int getu16_iotlb(const struct vringh *vrh,
+ 		if (ret)
+ 			return ret;
+ 	} else {
+-		void *kaddr = kmap_local_page(ivec.iov.bvec[0].bv_page);
+-		void *from = kaddr + ivec.iov.bvec[0].bv_offset;
++		__virtio16 *from = bvec_kmap_local(&ivec.iov.bvec[0]);
+ 
+-		tmp = READ_ONCE(*(__virtio16 *)from);
+-		kunmap_local(kaddr);
++		tmp = READ_ONCE(*from);
++		kunmap_local(from);
+ 	}
+ 
+ 	*val = vringh16_to_cpu(vrh, tmp);
+@@ -1330,11 +1329,10 @@ static inline int putu16_iotlb(const struct vringh *vrh,
+ 		if (ret)
+ 			return ret;
+ 	} else {
+-		void *kaddr = kmap_local_page(ivec.iov.bvec[0].bv_page);
+-		void *to = kaddr + ivec.iov.bvec[0].bv_offset;
++		__virtio16 *to = bvec_kmap_local(&ivec.iov.bvec[0]);
+ 
+-		WRITE_ONCE(*(__virtio16 *)to, tmp);
+-		kunmap_local(kaddr);
++		WRITE_ONCE(*to, tmp);
++		kunmap_local(to);
+ 	}
+ 
+ 	return 0;
+-- 
+2.47.2
+
 
