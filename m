@@ -1,168 +1,120 @@
-Return-Path: <kvm+bounces-45213-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45214-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255D9AA70EA
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 13:51:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584F5AA713F
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 14:08:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5557E4C4091
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 11:51:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD62F7AAE58
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 12:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013BA24C664;
-	Fri,  2 May 2025 11:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3C724C083;
+	Fri,  2 May 2025 12:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SqA0BRXi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GSnBGksC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2FE23C51B
-	for <kvm@vger.kernel.org>; Fri,  2 May 2025 11:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E3C20C488
+	for <kvm@vger.kernel.org>; Fri,  2 May 2025 12:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746186675; cv=none; b=Ng0PVLgbYwZftKbmUsbLyd6gi2IWx2KIsGulN+MyjPnVoawqgqpgEkp+gTe9KKIMudjsaBD8DI652RiJKyaLZMVNGtGJQ+I9xNBzjoxLnruPDfCDT5PNVCz/qCN3PB0vqrgvO0QtrZVW9uYO5PsTDsXFYQIX0QV8J9cXFG9P6hU=
+	t=1746187713; cv=none; b=SnJ5Sj7RUWJZACMA2fiaXhF+9OSZ/ZjWC/GkMjG444iFEWZd/cUhJ8UYYljmGqPpSqItPGPD+foNTgWj1/uIaWKZyamJwPIz9dcF6qog1vKVj4PmmDhhrto6P3iVsLvJMs/tToucxm/P8I3fptXhgyyq7KSx5tfeFqLuavQaLWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746186675; c=relaxed/simple;
-	bh=+0d8CwTuHrJs/E25TFaoH65v9LAce4x6lhTEyfS7GV8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qwf3dvrHYf00qoIw5qfolpxwWqn++VvlhKd3yEcKyG4ZxZQyQwaufAupyWUxS6L+D+LKVaDgeITkkXXT6jVcNUgpseAmG8I8nlej5CyPrDo5FQr1D8+XDqTyqc10Wpz/B6iXwdd/aBEkmtYgme1zQBztx1ELE7oSNWbAiAr9cjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SqA0BRXi; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746186670;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1ZIQ1vSgG4BCH48a70PyavGFGPqBvO/w0OyHX60QmKc=;
-	b=SqA0BRXi1yO0TlYbIoRJI/oS2OpGQjLSuH0RBW1r33/aetqs+KF/gsXu9mQVG3vkIe3beX
-	XLuFoB/gIZoQdNu1D8P01T1mhaq4hintAfmReMKRuEf+9mygIDHOjxX+Z+iN2vYpM/BTiM
-	hWmdAQ+oZUeq2v751Vbv6yo7hxq+/RY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-158-7-31bLY0Orqk5g5YuqyFhA-1; Fri, 02 May 2025 07:51:09 -0400
-X-MC-Unique: 7-31bLY0Orqk5g5YuqyFhA-1
-X-Mimecast-MFC-AGG-ID: 7-31bLY0Orqk5g5YuqyFhA_1746186668
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39c1b1c0969so1050729f8f.1
-        for <kvm@vger.kernel.org>; Fri, 02 May 2025 04:51:09 -0700 (PDT)
+	s=arc-20240116; t=1746187713; c=relaxed/simple;
+	bh=QOYAWpKobYqIjKphpV8Z/XKHUtk5wosLnvilAePfXLE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Kqbujf5HWjoDAzMjh1tdJggn8gRfAQ8Q73mADnSQXtU6k8UuldzmYwYkfoJXKLXuIRdflSIYLXd/xSgbbNOOItvo9poawhY1EmCGCtzE2NVevIwCHlD4jPhaPzrZiyLqr8CbjPU/fuFvhIrOYKO4yMaOHEoVNz4v8JqzIRSOB8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GSnBGksC; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-47666573242so276241cf.0
+        for <kvm@vger.kernel.org>; Fri, 02 May 2025 05:08:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746187710; x=1746792510; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QOYAWpKobYqIjKphpV8Z/XKHUtk5wosLnvilAePfXLE=;
+        b=GSnBGksChFEouPySf6ys9/HEZS7t/eR4bbS/j9IbvKkvC8IWykxDrys5sA4Sf8B1ww
+         ShklWetyejpVkyGTBYNvFDtudKarmbPfEvu7vQkldjtN3Ar+V83Zp+62s//E6Uzm2xe2
+         G0pTH7fV8ZNgh1Y40D8oS8I3fUexAOlG1XXVkHwbO/GER4Gmq+d7NoQUhn+FIJqcH+nM
+         7DLZ5cKzt/0t9qO7ObFdbi4t3LXKEeZmDVq12tutmqzTn6ld5KBvIcrxpFIMtjpRRcGK
+         FglYljHIIHdIUL2PTuES8watsGzHnNdaiCgsXEf8NioNlWBNMp09TlnnUTEhEicfi+nE
+         fI0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746186668; x=1746791468;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1ZIQ1vSgG4BCH48a70PyavGFGPqBvO/w0OyHX60QmKc=;
-        b=k/jEDOK3CwgQkmClrwiXk5SKdiSacGDSr+YGs2UmNUonoicoestDKzhDBCXeNKD83K
-         ba1x9hNQMKWCr0cTmObp6swHt7xgfGaqzynfuTJghlSyxw5P2rCNgFMYyAoS2Kk20oEG
-         5DR9hzZTGJCScvr+xKPMeZ4FZ3O87pqZQG14mmb8iAt2Ek95KJI4i8x2B/EUGcJYFrUB
-         JF5iEZWhqOcTnj9sEXynNTaYIqMbxpt1dDMFSCiUQY8lJar2lAnNvoOf6YidXKQ7gXMh
-         5KC4DalSsvrk5WRGSudZUy2dM1K01nctXd+XnqdTtSpdFsVfruc5RlhhN+E8ILgoANPD
-         O+mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUBjvp87RcsvGe7XhAQYzhOk7Pm4UdDX+2rb7yvmkB7rIuY2usMkuKgIuoSVwjzhzPTNiM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywpg5KBta/6JmnuqoVzisVp2QYiglTZLt6pRYmPwae5bzhoMRL5
-	Jdk95rf2/kkwV5YmGpYrM3lgYSKnAfmE5uWP6a6tDHc09byjFYtyNUrXblCaGVFkSQfHx6pKfzd
-	WfLbNPes566U4mgJfvg8sepAA5Pb9AgRB/47jXPZnsJ7b+jdmdQ==
-X-Gm-Gg: ASbGnct9s7C9Q4zP0DKIsqnCnM/dkSY9uk/h9puoRRvxCS17Dc83JM7TF3DvctK+K0o
-	B1IqsEkVvJdV6Jcwf9G6chImWRn7/NpaOmrx/aFosCwqOpbrlM12BogAFxABiQpa2wEcxvDYZ5f
-	EYhLCpm1TbANjuLjcFiDVwKXYwxP25Moouz8mWeDfYTYoc3JJwrqM6uHWU1rCCsMKwwPbbQNQrL
-	g6lXZB9/QdhwrEvPyFiw9sOtcTaBOXEMKnzXsbz7+k+CfA4f/bv/rmHGLL7K+k47zrcnqeforN/
-	s7/W9kBUDQtAHrOhrOo=
-X-Received: by 2002:a05:6000:2a6:b0:3a0:89e9:bb4 with SMTP id ffacd0b85a97d-3a099aea7f7mr2048307f8f.47.1746186667992;
-        Fri, 02 May 2025 04:51:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwOQCZM3FMB5HKcpzIblBW1hsxg0qNkNXGCkUBBPHwGkLVJaHQAHnvurydrDJEy7YqzuycIQ==
-X-Received: by 2002:a05:6000:2a6:b0:3a0:89e9:bb4 with SMTP id ffacd0b85a97d-3a099aea7f7mr2048272f8f.47.1746186667564;
-        Fri, 02 May 2025 04:51:07 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:246d:aa10::f39? ([2a0d:3344:246d:aa10::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099b10083sm1959004f8f.62.2025.05.02.04.51.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 May 2025 04:51:07 -0700 (PDT)
-Message-ID: <fd7f21d9-3f45-4f68-85cb-dd160a0a95ca@redhat.com>
-Date: Fri, 2 May 2025 13:51:04 +0200
+        d=1e100.net; s=20230601; t=1746187710; x=1746792510;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QOYAWpKobYqIjKphpV8Z/XKHUtk5wosLnvilAePfXLE=;
+        b=QjRY39Zc56lXTDxkUH+Nk/CTU38cB632oAGt+XP8GB3rWHbLE8IDcrczs293VAfzlP
+         SNFSyH5sxpe4DboEsVVy4vxKnxTEwAUvOOg+3Xh++mTI4RgLbiPFn2/4I/4F9SJO/K71
+         A0CQBAeZddC7FgaA0mvd0Dh5NpfU5hcf1tYa80/Riw230F8kNcbmeIfR6RJnQS469jy9
+         QGT4O7ZgKljGuut5II6t2rIWwRehG79rkBznV1czelE8mM7JN2RhDFnId+0A6t33pDhy
+         tkErMSvQrDXr2p1ArUTRgak8LDUWpcEbif0DSYaiNgbmVkcdA63ZWqKf7RyoAHB5eIzX
+         te4g==
+X-Gm-Message-State: AOJu0YykhYLngnpIs5ElnWFyjZyw8EtYT+0pDjavlKvSapG2bSAP/JAo
+	rO9/z245/3IvP0TXcWq7Dzd1rxCtoGcDshVXcXcNTYQiwgmByJyEoeJO2cidic64tiqXiZgpgnn
+	LgTkZd5CqltcVK/M01OqfPbGtuKI2DGTbZ9+t
+X-Gm-Gg: ASbGncsNOlhhGYkHscougegm9uu4XOqxBujWatxcYL1rfFOIwWHwa+A0n+0pUAkBQFd
+	D0jGxY0uesWSIfaM3sL/Q7BntKM5AZGxqwSk7g0pULGEqAF4PPmid8UEGrONMjh3NFacXmW1Ouk
+	7c3zB5dn8uzkow54rHFtgy0Aw=
+X-Google-Smtp-Source: AGHT+IFD/MsTgc6vAXhalHp3lSHY/zI6yBsMV+4pwk8VJYi3tcrdAsdF1VYpeQlCegmMmQLptp5frPe2rF3QY8nkeMQ=
+X-Received: by 2002:ac8:5f50:0:b0:466:8887:6751 with SMTP id
+ d75a77b69052e-48b0dfdf479mr7304751cf.23.1746187710146; Fri, 02 May 2025
+ 05:08:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 4/9] net: devmem: Implement TX path
-From: Paolo Abeni <pabeni@redhat.com>
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- io-uring@vger.kernel.org, virtualization@lists.linux.dev,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
- <willemb@google.com>, Jens Axboe <axboe@kernel.dk>,
- Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
- sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
- Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
- <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20250429032645.363766-1-almasrymina@google.com>
- <20250429032645.363766-5-almasrymina@google.com>
- <53433089-7beb-46cf-ae8a-6c58cd909e31@redhat.com>
-Content-Language: en-US
-In-Reply-To: <53433089-7beb-46cf-ae8a-6c58cd909e31@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250430165655.605595-1-tabba@google.com> <20250430165655.605595-8-tabba@google.com>
+ <6813eb1d4a3c7_2751462949f@iweiny-mobl.notmuch>
+In-Reply-To: <6813eb1d4a3c7_2751462949f@iweiny-mobl.notmuch>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 2 May 2025 13:07:53 +0100
+X-Gm-Features: ATxdqUEyPJsH6qCjTcFpIIVKvFZgDnFG5sJ_CyENlF3D_EvMdzHrMzHO_DPv0oc
+Message-ID: <CA+EHjTwmC=+tzKHvkH5t_mgg0irOwwZyD0N8BiCSYkyre+=JCw@mail.gmail.com>
+Subject: Re: [PATCH v8 07/13] KVM: Fix comments that refer to slots_lock
+To: Ira Weiny <ira.weiny@intel.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 5/2/25 1:47 PM, Paolo Abeni wrote:
-> On 4/29/25 5:26 AM, Mina Almasry wrote:
->> Augment dmabuf binding to be able to handle TX. Additional to all the RX
->> binding, we also create tx_vec needed for the TX path.
->>
->> Provide API for sendmsg to be able to send dmabufs bound to this device:
->>
->> - Provide a new dmabuf_tx_cmsg which includes the dmabuf to send from.
->> - MSG_ZEROCOPY with SCM_DEVMEM_DMABUF cmsg indicates send from dma-buf.
->>
->> Devmem is uncopyable, so piggyback off the existing MSG_ZEROCOPY
->> implementation, while disabling instances where MSG_ZEROCOPY falls back
->> to copying.
->>
->> We additionally pipe the binding down to the new
->> zerocopy_fill_skb_from_devmem which fills a TX skb with net_iov netmems
->> instead of the traditional page netmems.
->>
->> We also special case skb_frag_dma_map to return the dma-address of these
->> dmabuf net_iovs instead of attempting to map pages.
->>
->> The TX path may release the dmabuf in a context where we cannot wait.
->> This happens when the user unbinds a TX dmabuf while there are still
->> references to its netmems in the TX path. In that case, the netmems will
->> be put_netmem'd from a context where we can't unmap the dmabuf, Resolve
->> this by making __net_devmem_dmabuf_binding_free schedule_work'd.
->>
->> Based on work by Stanislav Fomichev <sdf@fomichev.me>. A lot of the meat
->> of the implementation came from devmem TCP RFC v1[1], which included the
->> TX path, but Stan did all the rebasing on top of netmem/net_iov.
->>
->> Cc: Stanislav Fomichev <sdf@fomichev.me>
->> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
->> Signed-off-by: Mina Almasry <almasrymina@google.com>
->> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> 
-> I'm sorry for the late feedback. A bunch of things I did not notice
-> before...
+On Thu, 1 May 2025 at 22:43, Ira Weiny <ira.weiny@intel.com> wrote:
+>
+> Fuad Tabba wrote:
+> > Fix comments so that they refer to slots_lock instead of slots_locks
+> > (remove trailing s).
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+>
+> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 
-The rest LGTM, and my feedback here ranges from nit to corner-cases, so
-we are probably better off with a follow-up than with a repost, other
-opinions welcome!
+Thank you for the reviews!
+/fuad
 
-/P
-
+> [snip]
 
