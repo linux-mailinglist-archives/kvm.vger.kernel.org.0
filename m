@@ -1,85 +1,88 @@
-Return-Path: <kvm+bounces-45256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45257-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48929AA7B2A
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 22:57:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41AA1AA7B2E
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 22:59:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B752172F2E
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 20:57:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B6CF1700BB
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 20:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76744202963;
-	Fri,  2 May 2025 20:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39EA1202981;
+	Fri,  2 May 2025 20:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3NuIORlw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k3yjK5Tl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC441FFC67
-	for <kvm@vger.kernel.org>; Fri,  2 May 2025 20:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28A21D515A
+	for <kvm@vger.kernel.org>; Fri,  2 May 2025 20:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746219437; cv=none; b=YW+uI7Mn3buWPnCoIx1k3YjIlCXObrZR66+zk+tq20YgSDBff1UYrc5pxJETBFqfCUkDUdWN3lVNW46VuZRVFmeCP2Zqlk8jijHSjAmt1Vl8zUavaZRZUhyyXUOUMyKs9jEn6D0zbWdppzxF3cnRYlUFBkgpHL+phwRM05Nf6nk=
+	t=1746219535; cv=none; b=P5vmvSpzh4mgu+pSr2QQxGkt8dcYZsxn8YjJEGoYiS1SUpsQGUrPwp7lGlSc2FfaDKcG+YSCt1WtGnwd6tpEJZwIXiyz4YRviBIAOow8euq+4S3pVUqaHBvvWkRNcbbDPFbO6N4C3t9Xva9y0efm6oBOV/LOhbxvRV+ZHX6mXkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746219437; c=relaxed/simple;
-	bh=geu1hvD8M1WtLM5eq0X8U0+bofpDI6etMkY3XNoydoc=;
+	s=arc-20240116; t=1746219535; c=relaxed/simple;
+	bh=FMuOYXuNARVPGbLdZKzdZACnsi/D3uRXcBJ+KxMLSJw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XrflNHi52qTddvPWM1UmHbRa5jyTBDstKUHmDEV0xgtNoWc5ETdyvyVAXwEf48xBHtjwaR3wu5K5TzzO2z85PpW9Y+YZhnk6xShDUGQQMsgVWPv0uNc1A4jX0W1F1HpXpigtYispGhoF+ECzwdjQgcROmXGFn2xAbh9oZVVvys8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3NuIORlw; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=anLfFWtO8hDzAxLvfNrLg2JCWqbeBFTVjkqzYkmjh/ZDPADKjgkeQMAh53RhdU05H2V9f9WtgQwHmI3RUqQJPruJ1JDX/enNB5CVfNxo4CRGAxEkdrn7Um3QkVU7cINHHoYY0BbH8zr2WO/3hOUjYzm9C48OnhSJ1h9oNxCdJOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k3yjK5Tl; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff8119b436so2109211a91.0
-        for <kvm@vger.kernel.org>; Fri, 02 May 2025 13:57:15 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30a59538b17so378288a91.3
+        for <kvm@vger.kernel.org>; Fri, 02 May 2025 13:58:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746219435; x=1746824235; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1746219533; x=1746824333; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZjfhxP1aTkCqZKrd23sK3YHNUgKYVqxJbIVvYWHW5Vg=;
-        b=3NuIORlwGKpiTG8uc8jaGhgjcoXRUu0mYrvL2Q0RXDm5LUEB2oKDNCqtn/r3aR2I/u
-         +0Q3sLwQh7sZJPCEdVBzqAHuy9CZ/pEBzDILJPVIZG8L62dwFcom0YBul3v610OBXqy6
-         Y35hdNKN2bbCw+pgoAs4/ZJYs7cx354wXAO/JfW12JycXALCzsdl1w4C54BXKF/gd3yM
-         qb2p7RjmsVWk0pbuWQmoIJxcn+Lzo2wGBM4lBBOfjyppTahIFEddMZ2vSoPxXbD8Fqu3
-         HURlN17/QrX1ztXlo0p9wtCHDN06XsfINcaddPaxyRfPHcmUV3P4j4OoFqL6m+GXaG6J
-         TVWQ==
+        bh=z141FLEwqm2f5UKeV3GY2SvtY7oSxEMFO78Y0lhO4Mo=;
+        b=k3yjK5TlxSHwkE10pVk/twpfj1LsProTTzA3zL6CnCOXeuNym74tyx4CsubLtdywHv
+         QDPpRfW2vGWLYWXPHvphIVLqXa3i/KtNYV5gplCEeCxYbU+tmOXfrvgF87seLPFVgtsq
+         IXx8sWCKV/Nx5AWbsjLI/diPcFrOl22W51Zr8kQWxisLlPv4EOPbvAeiNFRRfrl6uuhY
+         39n5+57jSZ2sqI30ILLDR3Kci+7FJ/TpJFq4RVjVcFNXtviVoLLt0r+7WdFyQybhaVDq
+         JvD144MdrHGUz76E6sqK2t9lRUpQPSjyQzDcP714447z3Jozew8pz92aFzeIuiXVCWYw
+         tzAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746219435; x=1746824235;
+        d=1e100.net; s=20230601; t=1746219533; x=1746824333;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZjfhxP1aTkCqZKrd23sK3YHNUgKYVqxJbIVvYWHW5Vg=;
-        b=urVuEXnpPjUnFDO4GY4bRWdsS741FaKKAcYlgWLvPu1dzsyE3Ubq/wBbvL73DqhUB5
-         ytkIYgbY2oY/VPGhtV9GK40BBoLOWaCBzDva36Wb2G8VDWO4snbY7WqVEWVupebLd/Gs
-         2QL9mtJU90UHpvu3qEcatNLi9ssBj5+2AVxo0uLAiDOkwy8unAsGyEudEdGwfcZCvraO
-         oKDKCs5lbbmd/ZzfqwZzpc7JgzK7V7IkF+GHTLdbHn6CvYFkR4CZedfg971n9tbryoks
-         1or+GsEXaDgFgR5P1md3pDaoeflcXKYlPWEZ56M7Bk1oKy0aU2JbNqh8blZl9gVIEP2h
-         fmiw==
-X-Gm-Message-State: AOJu0YwkYdnGHhLzqfVxHbDNT8MFcwDTr6hoSToiscFtVkUaQ6ZpQGg1
-	pX/tgF7amVykDuMfjknPwb7QS1HYlpglmfavotPJ94UCfxwZz5UKM9qa2ZgHVFO2GuQt8wtaniF
-	P4w==
-X-Google-Smtp-Source: AGHT+IFuPDTKjcdWvbnOJrt3XOUZC4A4co+KVYAa4VIdQzxs3SS2Bb249oxqj85YoS9Ls6YyYG5MsQtlc4s=
-X-Received: from pjbqb9.prod.google.com ([2002:a17:90b:2809:b0:2f5:63a:4513])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2f0e:b0:2ff:618c:a1e0
- with SMTP id 98e67ed59e1d1-30a4e6b2624mr6211245a91.29.1746219435414; Fri, 02
- May 2025 13:57:15 -0700 (PDT)
-Date: Fri, 2 May 2025 13:57:13 -0700
-In-Reply-To: <20250430203013.366479-6-mlevitsk@redhat.com>
+        bh=z141FLEwqm2f5UKeV3GY2SvtY7oSxEMFO78Y0lhO4Mo=;
+        b=OLuwUH2vemDid8gz8XnLWnIrij1djRsw/qWSntYDcwcFc8szYVbVqCOXMU0UsH3AaR
+         GZmBE2MAA165MKR3BH9g5veFuZ2KBFI1deNnnsD6utp7N1JIMkytUFLjIYpeiiadJ2Hc
+         0fi7N6ZuzZba/30Nfzote/WtSopZmU1Q9EagSfZnNZsCZz1NcCBn7u2gEOZhsK3oNUIn
+         sK7jmCWODKDyOHrmNcSnW17M2xVu6YZXQ4CuGyacDPKTF9fXvg1nMhel7kQQ5D5Y9KFJ
+         JBLQ1A9R7sayYbaahI0R8nw4vAc4elmAsO2Xefi+jD6wmixyJ2y6IT0f5gXzPx+4esmb
+         xoTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhvhO+7bK/bfya3YlIWnIQkD955fss9/QGV13l7bZmHpVMBiLNcHwT9F60BET044FHPI0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwS4RDb6wnmMQOB2blAGHgtED9Na8W0y4V29ocCxSnx6vW0HHPq
+	VpAEiDhTcvAVy+Gh/lx8OKRs1hN/g61S5rdzE93V86niPGxwQOOuMsALo62ATv9DFNN+1KUHsJZ
+	xOA==
+X-Google-Smtp-Source: AGHT+IGm3fjnbZdZ0P5dTXEIDYUNeozyMh591wQHnGgOaKhf2rgPLaUDWxwxyDC2IuE6wOX5aAwhTk5qwaY=
+X-Received: from pjff8.prod.google.com ([2002:a17:90b:5628:b0:2ff:8471:8e53])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f8c:b0:305:5f32:d9f0
+ with SMTP id 98e67ed59e1d1-30a4e5c5e9dmr6320303a91.19.1746219533227; Fri, 02
+ May 2025 13:58:53 -0700 (PDT)
+Date: Fri, 2 May 2025 13:58:51 -0700
+In-Reply-To: <864iy4ivro.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250430203013.366479-1-mlevitsk@redhat.com> <20250430203013.366479-6-mlevitsk@redhat.com>
-Message-ID: <aBUxqZ6qgfYZLsye@google.com>
-Subject: Re: [PATCH v4 5/5] x86: KVM: SEV: implement kvm_lock_all_vcpus and
- use it
+References: <20250430203013.366479-1-mlevitsk@redhat.com> <20250430203013.366479-3-mlevitsk@redhat.com>
+ <864iy4ivro.wl-maz@kernel.org>
+Message-ID: <aBUyC5kgTipXud-7@google.com>
+Subject: Re: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when
+ locking all vCPUs
 From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	Kunkun Jiang <jiangkunkun@huawei.com>, Waiman Long <longman@redhat.com>, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+To: Marc Zyngier <maz@kernel.org>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, Kunkun Jiang <jiangkunkun@huawei.com>, 
+	Waiman Long <longman@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
 	Catalin Marinas <catalin.marinas@arm.com>, Bjorn Helgaas <bhelgaas@google.com>, 
 	Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>, Albert Ou <aou@eecs.berkeley.edu>, 
 	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -93,69 +96,58 @@ Cc: kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
 	Will Deacon <will@kernel.org>, Keisuke Nishimura <keisuke.nishimura@inria.fr>, 
 	Sebastian Ott <sebott@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
 	Shusen Li <lishusen2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Randy Dunlap <rdunlap@infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>
+	Randy Dunlap <rdunlap@infradead.org>, Zenghui Yu <yuzenghui@huawei.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Apr 30, 2025, Maxim Levitsky wrote:
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 834f08dfa24c..9211b07b0565 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1392,6 +1392,31 @@ int kvm_trylock_all_vcpus(struct kvm *kvm)
->  }
->  EXPORT_SYMBOL_GPL(kvm_trylock_all_vcpus);
->  
-> +/*
-> + * Lock all of the VM's vCPUs.
-> + * Assumes that the kvm->lock is held.
+On Thu, May 01, 2025, Marc Zyngier wrote:
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 69782df3617f..834f08dfa24c 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -1368,6 +1368,40 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
+> >  	return 0;
+> >  }
+> >  
+> > +/*
+> > + * Try to lock all of the VM's vCPUs.
+> > + * Assumes that the kvm->lock is held.
+> 
+> Assuming is not enough. These assertions have caught a number of bugs,
+> and I'm not prepared to drop them.
+> 
+> > + */
+> > +int kvm_trylock_all_vcpus(struct kvm *kvm)
+> > +{
+> > +	struct kvm_vcpu *vcpu;
+> > +	unsigned long i, j;
+> > +
+> > +	kvm_for_each_vcpu(i, vcpu, kvm)
+> > +		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
+> > +			goto out_unlock;
+> > +	return 0;
+> > +
+> > +out_unlock:
+> > +	kvm_for_each_vcpu(j, vcpu, kvm) {
+> > +		if (i == j)
+> > +			break;
+> > +		mutex_unlock(&vcpu->mutex);
+> > +	}
+> > +	return -EINTR;
+> > +}
+> > +EXPORT_SYMBOL_GPL(kvm_trylock_all_vcpus);
+> > +
+> > +void kvm_unlock_all_vcpus(struct kvm *kvm)
+> > +{
+> > +	struct kvm_vcpu *vcpu;
+> > +	unsigned long i;
+> > +
+> > +	kvm_for_each_vcpu(i, vcpu, kvm)
+> > +		mutex_unlock(&vcpu->mutex);
+> > +}
+> > +EXPORT_SYMBOL_GPL(kvm_unlock_all_vcpus);
+> 
+> I don't mind you not including the assertions in these helpers, 
 
-Add a lockdep assertion instead of a comment.
-
-> + * Returns -EINTR if the process is killed.
-> + */
-> +int kvm_lock_all_vcpus(struct kvm *kvm)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i, j;
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm)
-
-Needs curly braces.
-
-> +		if (mutex_lock_killable_nest_lock(&vcpu->mutex, &kvm->lock))
-
-I'd rather return mutex_lock_killable_nest_lock()'s error code verbatim.  Then
-the function comment can go away, because the only thing remaining would be:
-
-	/*
-	 * Lock all of the VM's vCPUs.
-	 /*
-
-and that should be completely self-explanatory.  E.g.
-
-int kvm_lock_all_vcpus(struct kvm *kvm)
-{
-	struct kvm_vcpu *vcpu;
-	unsigned long i, j;
-	int r;
-
-	lockdep_assert_held(&kvm->lock);
-
-	kvm_for_each_vcpu(i, vcpu, kvm) {
-		r = mutex_lock_killable_nest_lock(&vcpu->mutex, &kvm->lock);
-		if (r)
-			goto out_unlock;
-	}
-	return 0;
-
-out_unlock:
-	kvm_for_each_vcpu(j, vcpu, kvm) {
-		if (i == j)
-			break;
-		mutex_unlock(&vcpu->mutex);
-	}
-	return r;
-}
-EXPORT_SYMBOL_GPL(kvm_lock_all_vcpus);
+I do :-)  I see no reason not to add assertions here, if locking all vCPUs is
+a hot path, we've probably got bigger problems.
 
