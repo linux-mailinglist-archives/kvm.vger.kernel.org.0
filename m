@@ -1,194 +1,146 @@
-Return-Path: <kvm+bounces-45272-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45273-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB4CBAA7C32
-	for <lists+kvm@lfdr.de>; Sat,  3 May 2025 00:35:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 500FDAA7C49
+	for <lists+kvm@lfdr.de>; Sat,  3 May 2025 00:41:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DD8B1BC4ABC
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 22:35:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D5E71C0218E
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 22:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F7A21ABB8;
-	Fri,  2 May 2025 22:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9AE421B182;
+	Fri,  2 May 2025 22:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ij9ysuqP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D3hoan33"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFC128F1
-	for <kvm@vger.kernel.org>; Fri,  2 May 2025 22:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D2920766E
+	for <kvm@vger.kernel.org>; Fri,  2 May 2025 22:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746225301; cv=none; b=O6zeHNsRFFzPihNSDJKIm+A6S07fQaZ4uVt3wT+xpk3330kbnC0Bs7zbn4G9JfoSOiM7wHtFy/2wYVS5ETrEH05EHyCPR38NcvnAxVZRCwMQmhhFCSVXtrTh3fsBJkLgppKOkPM6h8CHj5dtgaHt7T6Lmk8fsUkeowWGp5PZmU0=
+	t=1746225658; cv=none; b=c52aIuNd+39hbtu62s4hmdtTeAYWZILDITZBBIEZWk5qpgJD1zzi7/tWLD45zLn6pHWHMX2MTLSxjxXzZjCHR8RJAefic5biQC+ON2StnDVndfbDjoMebgOVfFgo7HwJWCV6mYXNACAjeX7kv390HnA4cCvdzpSILrNPrySA7mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746225301; c=relaxed/simple;
-	bh=jfXsnIIu2VwY0c7zeFjxjocJ4orROMa5yuTcrfzPiZw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=X8sZw0anO4QmQG+KKVR3eKrib279dPmwuIqk50h9/lBRwJGtCv9tpeHDAfSPcC+YANp+HGE7aNqsQ9r3Jlf75KmqqKt67R3rGSbkMPQRgvVjEW33kAEJF0WDik87LWef0cFZ99repQknBqUQdgw9D8rV3sCcaL6wepkuYLC2MGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ij9ysuqP; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30828f9af10so3644267a91.3
-        for <kvm@vger.kernel.org>; Fri, 02 May 2025 15:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746225299; x=1746830099; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KWVFcVyteM0rANhl8jUHaWIPAf+EazchM+HNHio5hZg=;
-        b=Ij9ysuqPhaKQa2iqJtaujgY5AWGr9mG9/RTExbyKQ0eJ0d3ovcCfADgLlxCslrqOds
-         b2VdApiZbH6rBR6AtIQetA74oDYJeH+RhBsJFy7216duL7WQX29T99x6cO70Jf5ddfpz
-         9GvXUApTKWAiP7arRTuEkz+fxqmivFWAS5uFubwY5g2flcfHG38ift1wH3rRGFrxNSzV
-         Nm7wreS3yu5tHdJKTTgj/JFhWJyPvsFF8vLJKcV4sgqgdMGtB52BtqdrsZvjJxUTb6vj
-         QrxMuPgGOZvN4jeoXtLLN8EPRBN/7oVo8N2HRVOQjufzuLtkTSGBUkggR1r46omVJQ/y
-         KgAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746225299; x=1746830099;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KWVFcVyteM0rANhl8jUHaWIPAf+EazchM+HNHio5hZg=;
-        b=N0v4v2qHW16YzzPHgUFeM6UC1/w6+ZoGdmBxhEUxNaMp5CMVVVSOag3yrnkS9psHbn
-         rw6j7tP8tzOV3gyIJOvHoD98BsQZgkcW+4MmhkWVQu2dH/zvC7kpTg99uqmdJDhZgNe0
-         R6CocW6M4+1PtPiwOVng9wjl0D8VFKK8CNIMzK15P6eiFW2UhsBCiOziqboE91yXrhk6
-         LDT4yY6K2z/K27Bcz06BRglKJTqt/DbkF8NdimEp/LsC7bONW9ruT2Zfe/pp9aXeB/Dk
-         8GUqIpNhYMXKnuajXkL0UXdxYMDQsyyEnhpyyUxGTiNYQrxjeYfnGsiH59AoY34WSDhi
-         08pA==
-X-Gm-Message-State: AOJu0YzvWEQasZOE3ppclSK2sQ5TzRqU9HNFa3In9P/NJvdqKlIG2u3M
-	RGf5lyrPulIxeOoUErOW3DT7CmZZYc54r9JzsR3FondgO8LRRLAQAdAZ2ViCy0oUBJx2viQo2c4
-	Dgg==
-X-Google-Smtp-Source: AGHT+IF80pgQ+j2xTDzPXwHebe4UI50ZVfwHe6IkhFUfpDgyVqGJc1Jvql34RQu3S0D0rnfWmpMDMB/HWeQ=
-X-Received: from pjuj6.prod.google.com ([2002:a17:90a:d006:b0:2fc:d77:541])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d648:b0:2ff:53a4:74f0
- with SMTP id 98e67ed59e1d1-30a4e6aa8d7mr7031771a91.29.1746225299268; Fri, 02
- May 2025 15:34:59 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 May 2025 15:34:56 -0700
+	s=arc-20240116; t=1746225658; c=relaxed/simple;
+	bh=zlnZNHvDSKtj61yBY6pXk50K8Zec3Hak0oiG+jfquAg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yx+DBGW7oBMQUKiGE+dMKueKgFi1HyRKFCA7aGtkwfESd3jC8CwptsEsp5K2PwPGN1Xdf4mhYXkwF6trLGubc5csLc1JX2GN61SSRV5H6AbeimREaJTESMrmaPMuSLSV4iwu6x/fLRMKW2gPquBVO5IsOUlGLR9r2Ekd7wSY64c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D3hoan33; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746225655;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AfTpVow31STgGjbJWRiqCTj7zeM2wTu0PCwlKxMuS7o=;
+	b=D3hoan33bqW/FqnxZ6xrNhPT4GIN6dcqqTyYm8dANP8tqnYe7E5xTbGfAPF6TEYkqa+qtP
+	8o/WqTFljgaTAOQKlzxrbtVRwusow6rjea3uRXMzA4Jeozo5uxkXXMFD0XcOA/Zfi11pJR
+	paXU3sdxovoBJOkB0DL39eACQHaPMVA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-441-Fbrm0R5iMFedRAm1qMh1tg-1; Fri,
+ 02 May 2025 18:40:53 -0400
+X-MC-Unique: Fbrm0R5iMFedRAm1qMh1tg-1
+X-Mimecast-MFC-AGG-ID: Fbrm0R5iMFedRAm1qMh1tg_1746225653
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D6C09180034A;
+	Fri,  2 May 2025 22:40:52 +0000 (UTC)
+Received: from omen.home.shazbot.org (unknown [10.22.80.42])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2E10130001A2;
+	Fri,  2 May 2025 22:40:50 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+To: alex.williamson@redhat.com,
+	peterx@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Adolfo <adolfotregosa@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] vfio/pci: Align huge faults to order
+Date: Fri,  2 May 2025 16:40:31 -0600
+Message-ID: <20250502224035.3183451-1-alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.906.g1f30a19c02-goog
-Message-ID: <20250502223456.887618-1-seanjc@google.com>
-Subject: [PATCH] KVM: SVM: Set/clear SRSO's BP_SPEC_REDUCE on 0 <=> 1 VM count transitions
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Michael Larabel <Michael@michaellarabel.com>, Borislav Petkov <bp@alien8.de>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Set the magic BP_SPEC_REDUCE bit to mitigate SRSO when running VMs if and
-only if KVM has at least one active VM.  Leaving the bit set at all times
-unfortunately degrades performance by a wee bit more than expected.
+The vfio-pci huge_fault handler doesn't make any attempt to insert a
+mapping containing the faulting address, it only inserts mappings if the
+faulting address and resulting pfn are aligned.  This works in a lot of
+cases, particularly in conjunction with QEMU where DMA mappings linearly
+fault the mmap.  However, there are configurations where we don't get
+that linear faulting and pages are faulted on-demand.
 
-Use a dedicated spinlock and counter instead of hooking virtualization
-enablement, as changing the behavior of kvm.enable_virt_at_load based on
-SRSO_BP_SPEC_REDUCE is painful, and has its own drawbacks, e.g. could
-result in performance issues for flows that are sensitive to VM creation
-latency.
+The scenario reported in the bug below is such a case, where the physical
+address width of the CPU is greater than that of the IOMMU, resulting in a
+VM where guest firmware has mapped device MMIO beyond the address width of
+the IOMMU.  In this configuration, the MMIO is faulted on demand and
+tracing indicates that occasionally the faults generate a VM_FAULT_OOM.
+Given the use case, this results in a "error: kvm run failed Bad address",
+killing the VM.
 
-Similarly, don't bother optimizing the 1=>N and N=>1 transitions, e.g. by
-using atomic_inc_return() to avoid taking the spinlock, as ensuring that
-BP_SPEC_REDUCE is guaranteed to be set before KVM_RUN is non-trivial.  KVM
-already serializes VM creation against kvm_lock (to add the VM to vm_list),
-and the spinlock will only be held for a handful of cycles for the 1<=>N
-cases.  I.e. the complexity needed to ensure correctness outweighs the
-marginal benefits of eliding the lock.  See the Link for details.
+The host is not under memory pressure in this test, therefore it's
+suspected that VM_FAULT_OOM is actually the result of a NULL return from
+__pte_offset_map_lock() in the get_locked_pte() path from insert_pfn().
+This suggests a potential race inserting a pte concurrent to a pmd, and
+maybe indicates some deficiency in the mm layer properly handling such a
+case.
 
-Link: https://lore.kernel.org/all/aBOnzNCngyS_pQIW@google.com
-Fixes: 8442df2b49ed ("x86/bugs: KVM: Add support for SRSO_MSR_FIX")
-Reported-by: Michael Larabel <Michael@michaellarabel.com>
-Closes: https://www.phoronix.com/review/linux-615-amd-regression
-Cc: Borislav Petkov <bp@alien8.de>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Nevertheless, Peter noted the inconsistency of vfio-pci's huge_fault
+handler where our mapping granularity depends on the alignment of the
+faulting address relative to the order rather than aligning the faulting
+address to the order to more consistently insert huge mappings.  This
+change not only uses the page tables more consistently and efficiently, but
+as any fault to an aligned page results in the same mapping, the race
+condition suspected in the VM_FAULT_OOM is avoided.
+
+Reported-by: Adolfo <adolfotregosa@gmail.com>
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=220057
+Fixes: 09dfc8a5f2ce ("vfio/pci: Fallback huge faults for unaligned pfn")
+Cc: stable@vger.kernel.org
+Tested-by: Adolfo <adolfotregosa@gmail.com>
+Co-developed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- arch/x86/kvm/svm/svm.c | 43 ++++++++++++++++++++++++++++++++++++------
- 1 file changed, 37 insertions(+), 6 deletions(-)
+ drivers/vfio/pci/vfio_pci_core.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index cc1c721ba067..364959fd1040 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -607,9 +607,6 @@ static void svm_disable_virtualization_cpu(void)
- 	kvm_cpu_svm_disable();
- 
- 	amd_pmu_disable_virt();
--
--	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
--		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
- }
- 
- static int svm_enable_virtualization_cpu(void)
-@@ -687,9 +684,6 @@ static int svm_enable_virtualization_cpu(void)
- 		rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
- 	}
- 
--	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
--		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
--
- 	return 0;
- }
- 
-@@ -5032,10 +5026,46 @@ static void svm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
- 	sev_vcpu_deliver_sipi_vector(vcpu, vector);
- }
- 
-+#ifdef CONFIG_CPU_MITIGATIONS
-+static DEFINE_SPINLOCK(srso_lock);
-+static int srso_nr_vms;
-+
-+static void svm_toggle_srso_spec_reduce(void *set)
-+{
-+	if (set)
-+		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
-+	else
-+		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
-+}
-+
-+static void svm_srso_add_remove_vm(int count)
-+{
-+	bool set;
-+
-+	if (!cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
-+		return;
-+
-+	guard(spinlock)(&srso_lock);
-+
-+	set = !srso_nr_vms;
-+	srso_nr_vms += count;
-+
-+	WARN_ON_ONCE(srso_nr_vms < 0);
-+	if (!set && srso_nr_vms)
-+		return;
-+
-+	on_each_cpu(svm_toggle_srso_spec_reduce, (void *)set, 1);
-+}
-+#else
-+static void svm_srso_add_remove_vm(int count) { }
-+#endif
-+
- static void svm_vm_destroy(struct kvm *kvm)
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 35f9046af315..6328c3a05bcd 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -1646,14 +1646,14 @@ static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
  {
- 	avic_vm_destroy(kvm);
- 	sev_vm_destroy(kvm);
-+
-+	svm_srso_add_remove_vm(-1);
- }
+ 	struct vm_area_struct *vma = vmf->vma;
+ 	struct vfio_pci_core_device *vdev = vma->vm_private_data;
+-	unsigned long pfn, pgoff = vmf->pgoff - vma->vm_pgoff;
++	unsigned long addr = vmf->address & ~((PAGE_SIZE << order) - 1);
++	unsigned long pgoff = (addr - vma->vm_start) >> PAGE_SHIFT;
++	unsigned long pfn = vma_to_pfn(vma) + pgoff;
+ 	vm_fault_t ret = VM_FAULT_SIGBUS;
  
- static int svm_vm_init(struct kvm *kvm)
-@@ -5061,6 +5091,7 @@ static int svm_vm_init(struct kvm *kvm)
- 			return ret;
+-	pfn = vma_to_pfn(vma) + pgoff;
+-
+-	if (order && (pfn & ((1 << order) - 1) ||
+-		      vmf->address & ((PAGE_SIZE << order) - 1) ||
+-		      vmf->address + (PAGE_SIZE << order) > vma->vm_end)) {
++	if (order && (addr < vma->vm_start ||
++		      addr + (PAGE_SIZE << order) > vma->vm_end ||
++		      pfn & ((1 << order) - 1))) {
+ 		ret = VM_FAULT_FALLBACK;
+ 		goto out;
  	}
- 
-+	svm_srso_add_remove_vm(1);
- 	return 0;
- }
- 
-
-base-commit: 45eb29140e68ffe8e93a5471006858a018480a45
 -- 
-2.49.0.906.g1f30a19c02-goog
+2.48.1
 
 
