@@ -1,290 +1,252 @@
-Return-Path: <kvm+bounces-45238-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45239-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE576AA75B7
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 17:11:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80AF6AA75E4
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 17:22:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F45E1C06597
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 15:11:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EE851C015D6
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 15:22:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5322571C7;
-	Fri,  2 May 2025 15:11:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33CB72580EA;
+	Fri,  2 May 2025 15:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YsLsLQu8"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VLicN+pt"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847C52566FA
-	for <kvm@vger.kernel.org>; Fri,  2 May 2025 15:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396762566;
+	Fri,  2 May 2025 15:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746198678; cv=none; b=CBvoS3lnVezfyIMy8l2fTNUoK5WRPgvZmgy8PlvZdQekkb7Mt4zeMYWDWneCRb/e0dunD8QeUwStXs+ItgzhC+joMMH1xVZEc4kuKdEbXEz763tRPQqusP+xWDH2Wlhso2qx591nM4mzAMGDgGUSkt2JirBXpHCAUuOBx5RfyZg=
+	t=1746199322; cv=none; b=X9xZpeusoa0aCSiLPhurPgppFxsx1mdX9zuYSXtC7eV/dyYYq2AVqjqt+h4Pkg15umM1HkM38soImhaKJxYU7C0BtES/VTGtlxli7bSC+7w/O4BEvm9i3F8PrW8/XgzVbDvFyCtrxK7pNP2qgJUPiCvygMJbI6uGoyjRZNA2HZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746198678; c=relaxed/simple;
-	bh=+f8fcTvqKdw0saUdjQpi1xadkwmQDthuwD77UPE6f9A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=og+EItzTtekkITNl0xJmLZJwrL7+7NARjKeQq+bHpMGfeR3XT6pb1h3JhzPxPxbAWGsnA3odhj2IcV2iI0YdTo41q36g4Xz+FdIcbgnd0xOX2QcEneVEn6iVyE0liiUYRoDUDfnrVM6D1J1m7i/Y3sEb1avOlD/fybuyz7c+OhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YsLsLQu8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746198675;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=oeOSoQEbtfOeQHIFORR+tFUtREhNLe4f74iiBENG5lw=;
-	b=YsLsLQu8HAHfaaFGlcWBjC5MLjxJVnACfzZQO6FtZWzxPAaUobU6Rbh3a/t2uBFucOsbcR
-	ZKQYYqx/IO6Abz0gc+mdrA6/9eiGL4C3maJpGNLtxU1nZP5wckS2dh6LD3Vrx9XXjHuebz
-	fkVOUqAA2zJjJkCmrJdxRXWxLMYUZXc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-135-moWuHU5pNoKp-D2nMB_j1A-1; Fri, 02 May 2025 11:11:13 -0400
-X-MC-Unique: moWuHU5pNoKp-D2nMB_j1A-1
-X-Mimecast-MFC-AGG-ID: moWuHU5pNoKp-D2nMB_j1A_1746198673
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43ceb011ea5so10868325e9.2
-        for <kvm@vger.kernel.org>; Fri, 02 May 2025 08:11:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746198672; x=1746803472;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oeOSoQEbtfOeQHIFORR+tFUtREhNLe4f74iiBENG5lw=;
-        b=oUu24JtHLV5tyJM/gbECSW/hGEt3eabSSZ+tsTb/PICQKW5VG+xJeazuRsTh609XF0
-         LBybbA52ffZpYmWCuHd/6GxWSf1JlqxyYo/oAoWXqnyWi+Tgt9yowC3fQiMP646qs9Er
-         jllqUk23SkvOZrhEoOwyyJtxP2yXMnDedlOQf+sdajRtUAGLrH3fJAGTtiFXruqvHWwR
-         SuRD2DDqyIkyGDQMLW0fv/V8vf6SMJ+wRdaurYCvc5fLDtaRJ2HF8teHE5gAnScQCQHD
-         QaatnRovCAUkkvVkycnCSFdmjWRqjlTtmmdfPwFBeV2FABQJ4vlbmmNUqeoHWL02XjZZ
-         r4Jw==
-X-Forwarded-Encrypted: i=1; AJvYcCV0q4KyQM7U69ZVsW1MtbXA3CZsrNZDSRX6lNosu8GzygOaqMLjUhzUGwJilr0Va0yJ0mE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPbnfS4t9ukEWZX7DPMiD/plij5G9JjQM1rAeUG4QOpPnDFk7U
-	aTREEYj9hH1kyFGNV6SrGG/SWc1Lagg77w6lk4DrROUVD7wdPkbvuy72qB/xskH2lFe/YGJsjBS
-	4o+rSRg52TuoTWl7b/SfiQYVxmTRMsbfQz4bPVr92n+kYPt+ACQ==
-X-Gm-Gg: ASbGncvMLl9eD8VKeCI0IofzgAsBE0aMhqriZETTYsUuzp35a0PKEDLSwIiuAG8cCZ2
-	HKqRtjuCz8gwN3p1e+CSoDYHoWf3tpS3mQwn9SkvOj+cELb8fvmdW2dISh2ctTMw/vPM3Excbtb
-	iWWpD6CmCJPCZALhLOFq+zRbDpN0tc+KlPHLPqhdZZKZTowq5gv3jshZ2iFpKg42hV2Vd0/dQJM
-	TjTuO0pjuGs6OM4QeetWoJqz15Uh60TDoMni8HSjoAqUsKbsrCWHXCZ1iOCvfInEcABytd4NmGL
-	upPM3Mcu8tJJsSvUzwvhqiVdmgudKrwH7BTG7PY568p4tKztF8GcqyVxbBYaPx51ddWYTXgDtDl
-	XxXhl7Il+dkeDaYVQcDP5EqhDoPxB33keG63Ia+g=
-X-Received: by 2002:a05:600c:4fc4:b0:43c:eeee:b70a with SMTP id 5b1f17b1804b1-441bbf2b0bamr22741705e9.22.1746198672532;
-        Fri, 02 May 2025 08:11:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG0q+1cwx8IrPw5X6nPiyFCm3Io+OO0rmrCF4BJr19jrVpzkKwi7wU2NccqcFmYZatAHG5a7g==
-X-Received: by 2002:a05:600c:4fc4:b0:43c:eeee:b70a with SMTP id 5b1f17b1804b1-441bbf2b0bamr22740975e9.22.1746198672077;
-        Fri, 02 May 2025 08:11:12 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c713:d600:afc5:4312:176f:3fb0? (p200300cbc713d600afc54312176f3fb0.dip0.t-ipconnect.de. [2003:cb:c713:d600:afc5:4312:176f:3fb0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441c0dfc537sm1328385e9.16.2025.05.02.08.11.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 May 2025 08:11:11 -0700 (PDT)
-Message-ID: <cd426cb8-e758-4028-adf6-9426884f6f7d@redhat.com>
-Date: Fri, 2 May 2025 17:11:08 +0200
+	s=arc-20240116; t=1746199322; c=relaxed/simple;
+	bh=lOTz4fM30AMVEWlFBUzcvFWNPVkGYLhLbFmCBFLUSGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RSLFbDUsm6Aoee+RBbbCjs6j5/lSoHQ3/xWCh9YXBofe5En5yNDHepoqo43iHNkPWc5NC0EWQBPItyuTM/ep/g7skykxox6ubqN92XcXHDaInfK8KPHVp+6WFQOm7k9z3q0re9SoS9b4CV5trTlavzlzZTALo4WChjS4+Hm6NPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VLicN+pt; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=el7AZkw1ZRKHIxRciQGDkRJRuJhHBYcxb7Lx2vUA2VY=; b=VLicN+ptqmmrlGpkHyenbaJkO3
+	UKl1u4ZcqZ7oWPbRw6dMMUxn72FaEy0WJ3uleLDo46IZAmhsK1s6PzstYFLXVCoeTFAELrE5DCXZV
+	2a3xjeJXk3jd+MNSv440/ctFcN/2lRBE7zBjIvFKJhZ8qlHasISVIsAF7PhbVmOI9sTPnfKtBF/j0
+	T5ii54POjzNHVsJRtQ6Eurq9+2ni0YwiVd6GYbIqODtfs42ci2vCC2IhgLIcfyKRhIXKA+++xBeTX
+	7vzCcTdWbJuGqjLYTRZaDRmsGTt0uypAIK5VRc3biSMOf5Mo2j4U1WGyzwr0huO9Ilv8zAyVG14w8
+	3oLsV5eQ==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uAsBP-00000004E1V-1rsm;
+	Fri, 02 May 2025 15:20:16 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id D6C5B30057C; Fri,  2 May 2025 17:20:02 +0200 (CEST)
+Date: Fri, 2 May 2025 17:20:02 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>,
+	Valentin Schneider <vschneid@redhat.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+	linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org,
+	kvm@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-modules@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	rcu@vger.kernel.org, linux-hardening@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Yair Podemsky <ypodemsk@redhat.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>,
+	Nicolas Saenz Julienne <nsaenz@amazon.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Juergen Gross <jgross@suse.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"Liang, Kan" <kan.liang@linux.intel.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jason Baron <jbaron@akamai.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Daniel Gomez <da.gomez@samsung.com>,
+	Naveen N Rao <naveen@kernel.org>,
+	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Kees Cook <kees@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Miguel Ojeda <ojeda@kernel.org>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Rong Xu <xur@google.com>, Rafael Aquini <aquini@redhat.com>,
+	Song Liu <song@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Brian Gerst <brgerst@gmail.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	John Stultz <jstultz@google.com>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>
+Subject: Re: [PATCH v5 00/25] context_tracking,x86: Defer some IPIs until a
+ user->kernel transition
+Message-ID: <20250502152002.GX4439@noisy.programming.kicks-ass.net>
+References: <20250429113242.998312-1-vschneid@redhat.com>
+ <fefcd1a6-f146-4f3c-b28b-f907e7346ddd@intel.com>
+ <20250430132047.01d48647@gandalf.local.home>
+ <019f6713-cfbd-466b-8fb5-dcd982cf8644@intel.com>
+ <20250502112216.GZ4198@noisy.programming.kicks-ass.net>
+ <6c44fa0e-28ed-400e-aaf2-e0e0720d3811@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 08/13] KVM: guest_memfd: Allow host to map
- guest_memfd() pages
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
- isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
- suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
- quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
- roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
- rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
-References: <20250430165655.605595-1-tabba@google.com>
- <20250430165655.605595-9-tabba@google.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250430165655.605595-9-tabba@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6c44fa0e-28ed-400e-aaf2-e0e0720d3811@intel.com>
 
-On 30.04.25 18:56, Fuad Tabba wrote:
-> Add support for mmap() and fault() for guest_memfd backed memory
-> in the host for VMs that support in-place conversion between
-> shared and private. To that end, this patch adds the ability to
-> check whether the VM type supports in-place conversion, and only
-> allows mapping its memory if that's the case.
+On Fri, May 02, 2025 at 07:33:55AM -0700, Dave Hansen wrote:
+> On 5/2/25 04:22, Peter Zijlstra wrote:
+> > On Wed, Apr 30, 2025 at 11:07:35AM -0700, Dave Hansen wrote:
+> > 
+> >> Both AMD and Intel have hardware to do it. ARM CPUs do it too, I think.
+> >> You can go buy the Intel hardware off the shelf today.
+> > To be fair, the Intel RAR thing is pretty horrific 🙁 Definitely
+> > sub-par compared to the AMD and ARM things.
+> > 
+> > Furthermore, the paper states it is a uarch feature for SPR with no
+> > guarantee future uarchs will get it (and to be fair, I'd prefer it if
+> > they didn't).
 > 
-> This patch introduces the configuration option KVM_GMEM_SHARED_MEM,
-> which enables support for in-place shared memory.
+> I don't think any of that is set in stone, fwiw. It should be entirely
+> possible to obtain a longer promise about its availability.
 > 
-> It also introduces the KVM capability KVM_CAP_GMEM_SHARED_MEM, which
-> indicates that the host can create VMs that support shared memory.
-> Supporting shared memory implies that memory can be mapped when shared
-> with the host.
+> Or ask that AMD and Intel put their heads together in their fancy new
+> x86 advisory group and figure out a single way forward. 
+
+This might be a good thing regardless.
+
+> > Furthermore, I suspect it will actually be slower than IPIs for anything
+> > with more than 64 logical CPUs due to reduced parallelism.
 > 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->   include/linux/kvm_host.h | 15 ++++++-
->   include/uapi/linux/kvm.h |  1 +
->   virt/kvm/Kconfig         |  5 +++
->   virt/kvm/guest_memfd.c   | 92 ++++++++++++++++++++++++++++++++++++++++
->   virt/kvm/kvm_main.c      |  4 ++
->   5 files changed, 116 insertions(+), 1 deletion(-)
+> Maybe my brain is crusty and I need to go back and read the spec, but I
+> remember RAR using the normal old APIC programming that normal old TLB
+> flush IPIs use. So they have similar restrictions. If it's inefficient
+> to program a wide IPI, it's also inefficient to program a RAR operation.
+> So the (theoretical) pro is that you program it like an IPI and it slots
+> into the IPI code fairly easily. But the con is that it has the same
+> limitations as IPIs.
+
+The problem is in the request structure. Sending an IPI is an async
+action. You do, done.
+
+OTOH RAR has a request buffer where pending requests are put and 'polled'
+for completion. This buffer does not have room for more than 64 CPUs.
+
+This means that if you want to invalidate across more, you need to do it
+in multiple batches.
+
+So where IPI is:
+
+ - IPI all CPUs
+ - local invalidate
+ - wait for completion
+
+This then becomes:
+
+ for ()
+   - RAR some CPUs
+   - wait for completion
+
+Or so I thought to have understood, the paper isn't the easiest to read.
+
+> I was actually concerned that INVLPGB won't be scalable. Since it
+> doesn't have the ability to target specific CPUs in the ISA, it
+> fundamentally need to either have a mechanism to reach all CPUs, or some
+> way to know which TLB entries each CPU might have.
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 9419fb99f7c2..f3af6bff3232 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -729,6 +729,17 @@ static inline bool kvm_arch_supports_gmem(struct kvm *kvm)
->   }
->   #endif
->   
-> +/*
-> + * Arch code must define kvm_arch_gmem_supports_shared_mem if support for
-> + * private memory is enabled and it supports in-place shared/private conversion.
-> + */
-> +#if !defined(kvm_arch_gmem_supports_shared_mem) && !IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM)
-> +static inline bool kvm_arch_gmem_supports_shared_mem(struct kvm *kvm)
-> +{
-> +	return false;
-> +}
-> +#endif
-> +
->   #ifndef kvm_arch_has_readonly_mem
->   static inline bool kvm_arch_has_readonly_mem(struct kvm *kvm)
->   {
-> @@ -2516,7 +2527,9 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->   
->   static inline bool kvm_mem_from_gmem(struct kvm *kvm, gfn_t gfn)
->   {
-> -	/* For now, only private memory gets consumed from guest_memfd. */
-> +	if (kvm_arch_gmem_supports_shared_mem(kvm))
-> +		return true;
+> Maybe AMD has something super duper clever to limit the broadcast scope.
+> But if they don't, then a small range flush on a small number of CPUs
+> might end up being pretty expensive, relatively.
 
-After our discussion yesterday, am I correct that we will not be 
-querying the KVM capability, but instead the "SHARED_TRACKING" (or 
-however that flag is called) on the underlying guest_memfd instead?
+So the way I understand things:
 
-I assume the function would then look something like
+Sending IPIs is sending a message on the interconnect. Mostly this is a
+cacheline in size (because MESI). Sparc (v9?) has a fun feature where
+you can actually put data payload in an IPI.
 
-if (!kvm_supports_gmem(kvm))
-	return false;
-if (kvm_arch_gmem_supports_shared_mem(kvm))
-	return .. TBD, test the gmem flag for the slot via gfn
-return kvm_mem_is_private(kvm, gfn);
+Now, we can target an IPI to a single CPU or to a (limited) set of CPU
+or broadcast to all CPUs. In fact, targeted IPIs might still be
+broadcast IPIs, except most CPUs will ignore it because it doesn't match
+them.
 
-> +
->   	return kvm_mem_is_private(kvm, gfn);
->   }
->   
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index b6ae8ad8934b..8bc8046c7f3a 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -930,6 +930,7 @@ struct kvm_enable_cap {
->   #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
->   #define KVM_CAP_X86_GUEST_MODE 238
->   #define KVM_CAP_ARM_WRITABLE_IMP_ID_REGS 239
-> +#define KVM_CAP_GMEM_SHARED_MEM 240
->   
->   struct kvm_irq_routing_irqchip {
->   	__u32 irqchip;
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 559c93ad90be..f4e469a62a60 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -128,3 +128,8 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
->   config HAVE_KVM_ARCH_GMEM_INVALIDATE
->          bool
->          depends on KVM_GMEM
-> +
-> +config KVM_GMEM_SHARED_MEM
-> +       select KVM_GMEM
-> +       bool
-> +       prompt "Enables in-place shared memory for guest_memfd"
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 6db515833f61..8bc8fc991d58 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -312,7 +312,99 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
->   	return gfn - slot->base_gfn + slot->gmem.pgoff;
->   }
->   
-> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
-> +/*
-> + * Returns true if the folio is shared with the host and the guest.
-> + */
-> +static bool kvm_gmem_offset_is_shared(struct file *file, pgoff_t index)
-> +{
-> +	struct kvm_gmem *gmem = file->private_data;
-> +
-> +	/* For now, VMs that support shared memory share all their memory. */
-> +	return kvm_arch_gmem_supports_shared_mem(gmem->kvm);
+TLBI broadcast is like sending IPIs to all CPUs, the message goes out,
+everybody sees it.
 
-Similar here: likely we want to check the guest_memfd flag.
+Much like how snoop filters and the like function, a CPU can process
+these messages async -- your CPU doesn't stall for a cacheline
+invalidate message either (except ofcourse if it is actively using that
+line). Same for TLBI, if the local TLB does not have anything that
+matches, its done. Even if it does match, as long as nothing makes
+active use of it, it can just drop the TLB entry without disturbing the
+actual core.
 
--- 
-Cheers,
+Only if the CPU has a matching TLB entry *and* it is active, then we
+have options. One option is to interrupt the core, another option is to
+wait for it to stop using it.
 
-David / dhildenb
+IIUC the current AMD implementation does the 'interrupt' thing.
 
+One thing to consider in all this is that if we TLBI for an executable
+page, we should very much also wipe the u-ops cache and all such related
+structures -- ARM might have an 'issue' here.
+
+That is, I think the TLBI problem is very similar to the I in MESI --
+except possibly simpler, because E must not happen until all CPUs
+acknowledge I etc. TLBI does not have this, it has until the next
+TLBSYNC.
+
+Anyway, I'm not a hardware person, but this is how I understand these
+things to work.
 
