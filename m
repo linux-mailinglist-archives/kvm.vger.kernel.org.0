@@ -1,186 +1,459 @@
-Return-Path: <kvm+bounces-45186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F804AA6804
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 02:46:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20415AA6851
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 03:17:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F2373B07D3
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 00:46:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0F4F1BC4D41
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 01:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F11513B797;
-	Fri,  2 May 2025 00:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB2C288A2;
+	Fri,  2 May 2025 01:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fbxi0bTT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j+Xc9vHd"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA122628C
-	for <kvm@vger.kernel.org>; Fri,  2 May 2025 00:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D321BE46
+	for <kvm@vger.kernel.org>; Fri,  2 May 2025 01:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746146780; cv=none; b=LYNm/j2TulF8EmEefmj+JoFiTPkGcVZd3vyPCemDNh1Pihnej3MKT30Rge1EndDJ14qgreL3eBMfKSmXGnOJ/qIr8K45U7U7R7QkzPOtGLf54u5QK1a2hXt4PsA759BYKL28wzqVKA3iSlyVoeyN3TfHfrgu/4VvSTVc2EymW/4=
+	t=1746148655; cv=none; b=YRdPwplxdzzNT72+wYW54ntX3TPvrlIuG8Bu3zM9oPePKrFlxu83upra5nbrTwNnBGqS4r2bCjkZG0HSP54dgwr8dRQ8BQrjay0q7AWeqnIm2uwRLD2xGwseyVM2nrMgtVobaPf4WWsP2GdQBpg93rIrnuiXwkhQ0aojhFiIzt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746146780; c=relaxed/simple;
-	bh=jpFTB7+Fe9GetEM5S34MRK+mjeh4+kvCjqKf5I8R+DM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RVRm1cz9aO6fGUJNviDHFDSTRUVTrjFhkv99Y0YM/EgtOI8IlgyE/cEx1xq5OckDT3h+AfFuoYmQYRiluk1z+zQQRK+SHBGA7TYxAyProoRTPfSXKi2lEpedUa7iqusqQE81F/qYiHNDVrSduhmNsaAWrhk3eYg9uCNkNPTp9Js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fbxi0bTT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746146777;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RzVNeQVSuEn+p0XG3JKage9a7jPIIY+5Xq1YW6zJmmc=;
-	b=Fbxi0bTTc2pssX1Rp98C4emA4S1Pma690ST+KY9c7qD1kxexCUdxgXt5/e7RdVOrhfj05u
-	5wKK8t6kPYS4E+TZcq3EvZuAPYkP6eoLzO75Cp3K74JlfAYCKeW3imCNLPInmGyBBrtAmZ
-	Bby7E5B2XPmvOFZT7RJeheZD51RjGTI=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-26-JqwNUPuVOa2nYBevppD_Ug-1; Thu, 01 May 2025 20:46:16 -0400
-X-MC-Unique: JqwNUPuVOa2nYBevppD_Ug-1
-X-Mimecast-MFC-AGG-ID: JqwNUPuVOa2nYBevppD_Ug_1746146775
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-af534e796baso773743a12.3
-        for <kvm@vger.kernel.org>; Thu, 01 May 2025 17:46:16 -0700 (PDT)
+	s=arc-20240116; t=1746148655; c=relaxed/simple;
+	bh=B1q2+ap++zLLjLUs9XEejRcMx0T6fUfUTcIS4OOKWk0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LqLF1DmydNraqf0wR8BuL0kwHhZVo6TYbXx06l+mpInxRaSgU7qmvv3a4gBeDZpq/afO/VSgObS/lLes7sA+lz0qh9llmPYrtZEV06BKD/x5DZzUyZ/RIHqk2bFpWf43yfVXQeAwVhC81hr8yu7Ng0nQP4co400gx1wTTE9D6AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j+Xc9vHd; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3055f2e1486so2330741a91.0
+        for <kvm@vger.kernel.org>; Thu, 01 May 2025 18:17:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746148653; x=1746753453; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YzlnFCXfXy0GJ6wWugPL3V4XJdypnCJtArpXO+wkfcw=;
+        b=j+Xc9vHdZWLIclD8rcikMtauMi5nbbJSOeQVyaaH4D2bxDun++Ri5r+dOtNLXs/5VQ
+         tK+Jcje4vDx/Vl8Aj6bvlfHKgVvPUqPKmCHgRO8Z/hA73ZPUp4rd2K+cgYPeG0wbc/Qa
+         KaBUnsZ9SnPHrnxN665O0lyWS+CEIeW5cPNLFBi78sZmIlth/VgM2YXcta5rws2mWPfz
+         03zNFi3qEi2/uCAxVdWrydUGUhRYv7d/jhXswKD8eoRVYE97NyUJtROIgXW39E097Jjf
+         95+7DaBkElQyGMPupCQsylR+tICSe+jEzIxg9E4yDCftk0GlDug8r2oyNPRpifRg/43n
+         dPgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746146770; x=1746751570;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RzVNeQVSuEn+p0XG3JKage9a7jPIIY+5Xq1YW6zJmmc=;
-        b=fA2eeLenU0Nj5RWOaFGGT0Uhjr/9mYV1OkQFbqj67TeXjx+/51LCIGcUg2FEnIwE7J
-         TaCYB9qGnP40kOaTUKNuviIOvnztJN+Ms23Ld1Fv9Go7l6f+/ruP8fdWXESeYibd7eil
-         THCPKESX2/amMHdbbc6Av6/LLoTivSQ2hLZLPDXaSAsXv1kVDNvLmBwwFvQK96xt1/hR
-         /2WkyEuOibJCOdANeC4E0yxwvBcPZnpZGRWd3bMXxN/WNGysWCMUwGivq/Qt+dot0Z5g
-         9K61JuCgjASv4KqM9zAWR5eTJEfiGUPOiuClLejhfa1tZ4UdlxjtXIPssv8p0q4Kd2IE
-         S7xg==
-X-Forwarded-Encrypted: i=1; AJvYcCUuzj9adRVeFAhGHiPIz1vfxb61WUOMGB/giyXOAjf2ZhWApZVj1Sk0QEHZ5oGGJrJAs+I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQfpQF6L6T/Imtjqg3mUoqBFNsTzdF+/C6S6mSCWPZBUpKhgwl
-	HgQz6Zk01hDMq9uo6jg6lJ3xd3DILZHVrQzqXub3//q0tHPUbEPoQ+jbft2g4UjImuZdluyndb5
-	/2ayTXtwtNCF0ICyPIh6Fa8C7AktM8ITdUhPut4AI+oIOA21slg==
-X-Gm-Gg: ASbGncvnbczrEqREdNmbu11GGf7bBUvRWzPup5FzsG5fILVwXs07BlyFpEft2mpXeON
-	dwUvmM0TwVgDA0egPREn/MG/ZyqCuhFyz0IwZaHP/vDuxRPeVJauxcrpzbL20qcY7nZ+v6ZDoHC
-	nOZFAUai6pvWZwc+j+owqrR7jTZm76k5OnZuT6kxyDycM3SEK+fw2pg+8bMav11cZYnGd13pKd6
-	H4dgFk7YDVFzMtCcBodnapSVjAfvDYWYN9iSc05eB8OX4gSWwvDVBNfXCogyJnqSo5IW+HMBYNf
-	UtPlqaVUkQFj
-X-Received: by 2002:a17:90b:5867:b0:2ee:7c65:ae8e with SMTP id 98e67ed59e1d1-30a4e5959b2mr1601361a91.11.1746146770084;
-        Thu, 01 May 2025 17:46:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEiL3PaKpNDJ5GxpdjSgGj8jbC5Fiag7sifRcEucRKRUwL1HksU1Lw6rYRFG+qnRZ9Au1gJFw==
-X-Received: by 2002:a17:90b:5867:b0:2ee:7c65:ae8e with SMTP id 98e67ed59e1d1-30a4e5959b2mr1601341a91.11.1746146769647;
-        Thu, 01 May 2025 17:46:09 -0700 (PDT)
-Received: from [192.168.68.51] ([180.233.125.65])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30a34826677sm4323342a91.40.2025.05.01.17.46.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 May 2025 17:46:08 -0700 (PDT)
-Message-ID: <fa874ef5-5da5-44de-a9d0-24663eb684a0@redhat.com>
-Date: Fri, 2 May 2025 10:46:00 +1000
+        d=1e100.net; s=20230601; t=1746148653; x=1746753453;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YzlnFCXfXy0GJ6wWugPL3V4XJdypnCJtArpXO+wkfcw=;
+        b=P+z+AlRZsF72+P+kFKQ1pt3Vu76nFun/v80JheQnQtroTbOj0e3Hw8R9FpP/Wn3k2s
+         gMFfDuXM0AySE1H/G6xJkB5D5GjaT6JoAuPBQ52OrtuQrQ7VKis3XI/2vsIjkqND/wD7
+         D96+Mwu7xhTf+OheoXZ+pr0AhMFH25Pv9d/ZPHa2ElaEdQV98TqPMl9AAot/8KmzUOja
+         QHT9e+xLfTbapfa7z/8lPpI4UabDQH/Sgz7PUynzkxoXGw+7jwWh95jA0WgErtMZCusY
+         mN69mbNSN1ztG0jzMvFWeraPxGP0npkbeLTw/X43bg1J+fDa76WERx2CbMVxr5KHjAOD
+         0r7g==
+X-Forwarded-Encrypted: i=1; AJvYcCWl08oUSZibkTvRKkChT4GsA8qXF2ZCtX85SZZt2CxZPEXXbkBeseQW8dH4yFoMGZtV94Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqRCwOgUcBnfisfdmZuR+E6iHasIKGHoNwKi4VhH7InvICZcrl
+	nshdcKt4JB6c+nUjz4bVy17VUzMmQaUqoZ7RXfnS1ZIJI/iCEIUx2+RsY1NakM6ux+RFKWLooVX
+	jIQ==
+X-Google-Smtp-Source: AGHT+IHiQxgcwgBaqEXKgthWbvh8SOb1o3D2BTYBYuxwdC+Nqxt8hZmjd1LtLB9rP0PHnhyFcz4d60Uxj9g=
+X-Received: from pjbsi3.prod.google.com ([2002:a17:90b:5283:b0:2ee:4a90:3d06])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:7788:b0:30a:4f0d:a6e7
+ with SMTP id 98e67ed59e1d1-30a4f0dad3cmr1182831a91.14.1746148652869; Thu, 01
+ May 2025 18:17:32 -0700 (PDT)
+Date: Thu, 1 May 2025 18:17:31 -0700
+In-Reply-To: <20250325041350.1728373-3-suleiman@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 00/43] arm64: Support for Arm CCA in KVM
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
-Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250416134208.383984-1-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250325041350.1728373-1-suleiman@google.com> <20250325041350.1728373-3-suleiman@google.com>
+Message-ID: <aBQdKyCI0fC5T8U-@google.com>
+Subject: Re: [PATCH v5 2/2] KVM: x86: Include host suspended time in steal time
+From: Sean Christopherson <seanjc@google.com>
+To: Suleiman Souhlal <suleiman@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, 
+	David Woodhouse <dwmw2@infradead.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ssouhlal@freebsd.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 4/16/25 11:41 PM, Steven Price wrote:
-
-[...]
-
+On Tue, Mar 25, 2025, Suleiman Souhlal wrote:
+> When the host resumes from a suspend, the guest thinks any task
+> that was running during the suspend ran for a long time, even though
+> the effective run time was much shorter, which can end up having
+> negative effects with scheduling.
 > 
-> The ABI to the RMM (the RMI) is based on RMM v1.0-rel0 specification[1].
+> To mitigate this issue, the time that the host was suspended is included
+> in steal time, which lets the guest subtract the duration from the
+> tasks' runtime.
 > 
-> This series is based on v6.15-rc1. It is also available as a git
-> repository:
+> In order to implement this behavior, once the suspend notifier fires,
+> vCPUs trying to run will block until the resume notifier finishes. This is
+> because the freezing of userspace tasks happens between these two points.
+> It means that vCPUs could otherwise run and get their suspend steal
+> time misaccounted, particularly if a vCPU would run after resume before
+> the resume notifier fires.
+> Incidentally, doing this also addresses a potential race with the
+> suspend notifier setting PVCLOCK_GUEST_STOPPED, which could then get
+> cleared before the suspend actually happened.
 > 
-> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v8
+> One potential caveat is that in the case of a suspend happening during
+> a VM migration, the suspend time might not be accounted for.
+> A workaround would be for the VMM to ensure that the guest is entered
+> with KVM_RUN after resuming from suspend.
+
+Please rewrite this to state what changes are being made in impreative mood, as
+commands.  Describing the _effects_ of a change makes it extremely difficult to
+understand whether the behavior is pre-patch or post-patch.
+
+E.g. for this
+
+  vCPUs trying to run will block until the resume notifier finishes
+
+I had to look at the code to understand what this was saying, which largely
+defeats the purpose of the changelog.
+
+> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+> ---
+>  Documentation/virt/kvm/x86/msr.rst | 10 ++++--
+>  arch/x86/include/asm/kvm_host.h    |  6 ++++
+>  arch/x86/kvm/x86.c                 | 51 ++++++++++++++++++++++++++++++
+>  3 files changed, 65 insertions(+), 2 deletions(-)
 > 
-> Work in progress changes for kvmtool are available from the git
-> repository below:
-> 
-> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v6
-> 
-> [1] https://developer.arm.com/documentation/den0137/1-0rel0/
-> [2] https://lore.kernel.org/r/20250408105225.4002637-17-maz%40kernel.org
-> 
+> diff --git a/Documentation/virt/kvm/x86/msr.rst b/Documentation/virt/kvm/x86/msr.rst
+> index 3aecf2a70e7b43..48f2a8ca519548 100644
+> --- a/Documentation/virt/kvm/x86/msr.rst
+> +++ b/Documentation/virt/kvm/x86/msr.rst
+> @@ -294,8 +294,14 @@ data:
+>  
+>  	steal:
+>  		the amount of time in which this vCPU did not run, in
+> -		nanoseconds. Time during which the vcpu is idle, will not be
+> -		reported as steal time.
+> +		nanoseconds. This includes the time during which the host is
+> +		suspended. Time during which the vcpu is idle, might not be
+> +		reported as steal time. The case where the host suspends
+> +		during a VM migration might not be accounted if VCPUs aren't
+> +		entered post-resume, because KVM does not currently support
+> +		suspend/resuming the associated metadata. A workaround would
+> +		be for the VMM to ensure that the guest is entered with
+> +		KVM_RUN after resuming from suspend.
 
-I got a chance to try the following combination, the guest can boot using
-qemu/kvmtool except a RCU stall is observed (more details provided below)
+Coming back to this with fresh eyes, I kinda feel like this needs an opt-in
+somewhere.  E.g. a KVM capability, or maybe a guest-side steal-time feature?  Or
+maybe we can squeak by with a module param based on your use case?
 
-host.tf-rmm      https://git.codelinaro.org/linaro/dcap/rmm.git                      (cca/v8)
-host.edk2        git@github.com:tianocore/edk2.git                                   (edk2-stable202411)
-host.tf-a        https://git.codelinaro.org/linaro/dcap/tf-a/trusted-firmware-a.git  (cca/v4)
-host.qemu        https://git.qemu.org/git/qemu.git                                   (stable-9.2)
-host.linux       https://git.gitlab.arm.com/linux-arm/linux-cca.git                  (cca-host/v8)
-host.buildroot   https://github.com/buildroot/buildroot                              (master)
-guest.qemu       https://git.codelinaro.org/linaro/dcap/qemu.git                     (cca/latest)
-guest.kvmtool    https://gitlab.arm.com/linux-arm/kvmtool-cca                        (cca/latest)
-guest.buildroot  https://github.com/buildroot/buildroot                              (master)
+IIRC, there is a guest-side fix that is needed to not go completely off the rails
+for large steal-time values.  I.e. enabling this blindly could negatively effect
+existings guests.
 
-RCU stall report
-----------------
+The forced wait behavior introduced in v4 also gives me pause, but that should
+really just be about getting the code right, i.e. shouldn't go sideways as long
+as the host kernel is bug free.
 
-[ 7816.381336] rcu: INFO: rcu_preempt self-detected stall on CPU
-[ 7816.382816] rcu:     6-....: (5249 ticks this GP) idle=3a4c/1/0x4000000000000000 softirq=6001/6003 fqs=2624
-[ 7816.384399] rcu:     (t=5250 jiffies g=29821 q=47 ncpus=8)
-[ 7816.386059] CPU: 6 UID: 0 PID: 203 Comm: qemu-system-aar Not tainted 6.15.0-rc1-gavin-g78b23c56de79 #34 PREEMPT
-[ 7816.387133] Hardware name: QEMU QEMU Virtual Machine, BIOS unknown 02/02/2022
-[ 7816.387926] pstate: 61402009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
-[ 7816.388678] pc : realm_unmap_private_range+0x19c/0x2c0
-[ 7816.389878] lr : realm_unmap_private_range+0x94/0x2c0
-[ 7816.390388] sp : ffff80008095bb60
-[ 7816.390765] x29: ffff80008095bb60 x28: 000000007caef000 x27: ffffba3322764000
-[ 7816.392321] x26: 00007fffffffffff x25: 000000007caf0000 x24: 0001000000000000
-[ 7816.393168] x23: 00000000c4000155 x22: ffff8000801b5e98 x21: 0000000106481000
-[ 7816.393999] x20: 000000007caef000 x19: 0000000000000000 x18: 0000000000000000
-[ 7816.394833] x17: 0000000000000000 x16: 0000000000000000 x15: 0000ffff8e997058
-[ 7816.395668] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
-[ 7816.396548] x11: 0000000038e38e39 x10: 0000000000000004 x9 : ffffba33218a2564
-[ 7816.397419] x8 : ffff8000801b5e98 x7 : 000000003fffffff x6 : 0000000000000001
-[ 7816.398243] x5 : 000000011e795000 x4 : 0000000000000002 x3 : 0000000000000000
-[ 7816.399062] x2 : 000000007caf0000 x1 : 000000011e796000 x0 : 0000000000000000
-[ 7816.400021] Call trace:
-[ 7816.400604]  realm_unmap_private_range+0x19c/0x2c0 (P)
-[ 7816.401347]  kvm_realm_unmap_range+0x94/0xb0
-[ 7816.401894]  __unmap_stage2_range+0x70/0xa0
-[ 7816.402421]  kvm_arch_post_set_memory_attributes+0x68/0xa8
-[ 7816.403011]  kvm_vm_ioctl+0x6bc/0x1b58
-[ 7816.403509]  __arm64_sys_ioctl+0xa4/0xe8
-[ 7816.404020]  invoke_syscall+0x50/0x120
-[ 7816.404562]  el0_svc_common.constprop.0+0x48/0xf0
-[ 7816.405113]  do_el0_svc+0x24/0x38
-[ 7816.405584]  el0_svc+0x34/0xf0
-[ 7816.406045]  el0t_64_sync_handler+0x10c/0x138
-[ 7816.406571]  el0t_64_sync+0x1ac/0x1b0
+Ugh, actually, yeah, that part needs a guard.  At the very least, it needs to be
+conditional on steal-time being enabled.  KVM most definitely should not block
+vCPUs that aren't using steal-time, as that's a complete waste and will only make
+the effects of suspend worse for the guest.  At that point, having the guest
+opt-in to the behavior is a pretty minor change, and it gives users a way to
+opt-out if this is causing pain.
 
-Thanks,
-Gavin
+>  	preempted:
+>  		indicate the vCPU who owns this struct is running or
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index f5ce2c2782142b..10634bbf2f5d21 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -124,6 +124,7 @@
+>  #define KVM_REQ_HV_TLB_FLUSH \
+>  	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_UPDATE_PROTECTED_GUEST_STATE	KVM_ARCH_REQ(34)
+> +#define KVM_REQ_WAIT_FOR_RESUME		KVM_ARCH_REQ(35)
+>  
+>  #define CR0_RESERVED_BITS                                               \
+>  	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+> @@ -917,8 +918,13 @@ struct kvm_vcpu_arch {
+>  
+>  	struct {
+>  		u8 preempted;
+> +		bool host_suspended;
+>  		u64 msr_val;
+>  		u64 last_steal;
+> +		u64 last_suspend;
+> +		u64 suspend_ns;
+> +		u64 last_suspend_ns;
+> +		wait_queue_head_t resume_waitq;
+>  		struct gfn_to_hva_cache cache;
+>  	} st;
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 6b4ea3be66e814..327d1831dc0746 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3717,6 +3717,8 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+>  	steal += current->sched_info.run_delay -
+>  		vcpu->arch.st.last_steal;
+>  	vcpu->arch.st.last_steal = current->sched_info.run_delay;
+> +	steal += vcpu->arch.st.suspend_ns - vcpu->arch.st.last_suspend_ns;
+> +	vcpu->arch.st.last_suspend_ns = vcpu->arch.st.suspend_ns;
 
+Isn't this just:
+
+	steal += vcpu->arch.st.suspend_ns;
+	vcpu->arch.st.suspend_ns = 0;
+
+or am I missing something?  I suspect you implemented the code this way to avoid
+writing vcpu->arch.st.suspend_ns in this context, because you discovered that
+record_steal_time() can run concurrently with kvm_arch_suspend_notifier(), i.e.
+because vcpu->arch.st.suspend_ns was getting corrupted.
+
+The above doesn't fully solve the problem, it just makes the badness less bad
+and/or much less likely to be hit.  E.g. if vcpu->arch.st.suspend_ns is advanced
+between the first and second loads, KVM would fail to account the delta between
+the two loads.
+
+Unless I'm missing something, the obvious/easy thing is to make arch.st.suspend_ns
+and atomic64_t, e.g.
+
+	if (unlikely(atomic64_read(&vcpu->arch.st.suspend_ns)))
+		steal += atomic64_xchg(&vcpu->arch.st.suspend_ns, 0);
+
+and then on the resume side:
+
+	atomic64_add(suspend_ns, &vcpu->arch.st.suspend_ns);
+	kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
+
+
+>  	unsafe_put_user(steal, &st->steal, out);
+>  
+>  	version += 1;
+> @@ -6930,6 +6932,19 @@ long kvm_arch_vm_compat_ioctl(struct file *filp, unsigned int ioctl,
+>  }
+>  #endif
+>  
+> +static void wait_for_resume(struct kvm_vcpu *vcpu)
+> +{
+> +	wait_event_interruptible(vcpu->arch.st.resume_waitq,
+> +	    vcpu->arch.st.host_suspended == 0);
+> +
+> +	/*
+> +	 * This might happen if we blocked here before the freezing of tasks
+> +	 * and we get woken up by the freezer.
+> +	 */
+> +	if (vcpu->arch.st.host_suspended)
+> +		kvm_make_request(KVM_REQ_WAIT_FOR_RESUME, vcpu);
+
+I most definitely don't want to add custom waiting behavior for this.  As this
+code shows, ensuring a wakeup doesn't race with blocking isn't the easiest thing
+in the world.
+
+Off the top of my head, I can't think of any reason why we can't simply send the
+vCPU into kvm_vcpu_block(), by treating the vCPU as completely non-runnable while
+it is suspended.
+
+>  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+>  static int kvm_arch_suspend_notifier(struct kvm *kvm)
+>  {
+> @@ -6939,6 +6954,19 @@ static int kvm_arch_suspend_notifier(struct kvm *kvm)
+>  
+>  	mutex_lock(&kvm->lock);
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		vcpu->arch.st.last_suspend = ktime_get_boottime_ns();
+> +		/*
+> +		 * Tasks get thawed before the resume notifier has been called
+> +		 * so we need to block vCPUs until the resume notifier has run.
+> +		 * Otherwise, suspend steal time might get applied too late,
+> +		 * and get accounted to the wrong guest task.
+> +		 * This also ensures that the guest paused bit set below
+> +		 * doesn't get checked and cleared before the host actually
+> +		 * suspends.
+> +		 */
+> +		vcpu->arch.st.host_suspended = 1;
+
+We can definitely avoid this flag, e.g. by zeroing last_suspend in the resume
+notified, and using that to detect "host suspended".
+
+> +		kvm_make_request(KVM_REQ_WAIT_FOR_RESUME, vcpu);
+> +
+>  		if (!vcpu->arch.pv_time.active)
+>  			continue;
+>  
+> @@ -6954,12 +6982,32 @@ static int kvm_arch_suspend_notifier(struct kvm *kvm)
+>  	return ret ? NOTIFY_BAD : NOTIFY_DONE;
+>  }
+>  
+> +static int kvm_arch_resume_notifier(struct kvm *kvm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	unsigned long i;
+> +
+> +	mutex_lock(&kvm->lock);
+
+No need for this, it provides zero protection and can (very, very theoretically)
+trigger deadlock.  The lock has already been dropped from the suspend notifier.
+
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		vcpu->arch.st.host_suspended = 0;
+> +		vcpu->arch.st.suspend_ns += ktime_get_boottime_ns() -
+> +		    vcpu->arch.st.last_suspend;
+> +		wake_up_interruptible(&vcpu->arch.st.resume_waitq);
+
+This needs a
+
+	kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
+
+to ensure the suspend_ns time is accounted.  kvm_arch_vcpu_load() probably
+guarantees KVM_REQ_STEAL_UPDATE is set, but KVM shouldn't rely on that.
+
+Completely untested, and I didn't add any new ABI, but something like this?
+
+---
+ Documentation/virt/kvm/x86/msr.rst | 10 ++++--
+ arch/x86/include/asm/kvm_host.h    |  2 ++
+ arch/x86/kvm/x86.c                 | 56 +++++++++++++++++++++++++++++-
+ 3 files changed, 65 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/virt/kvm/x86/msr.rst b/Documentation/virt/kvm/x86/msr.rst
+index 3aecf2a70e7b..48f2a8ca5195 100644
+--- a/Documentation/virt/kvm/x86/msr.rst
++++ b/Documentation/virt/kvm/x86/msr.rst
+@@ -294,8 +294,14 @@ data:
+ 
+ 	steal:
+ 		the amount of time in which this vCPU did not run, in
+-		nanoseconds. Time during which the vcpu is idle, will not be
+-		reported as steal time.
++		nanoseconds. This includes the time during which the host is
++		suspended. Time during which the vcpu is idle, might not be
++		reported as steal time. The case where the host suspends
++		during a VM migration might not be accounted if VCPUs aren't
++		entered post-resume, because KVM does not currently support
++		suspend/resuming the associated metadata. A workaround would
++		be for the VMM to ensure that the guest is entered with
++		KVM_RUN after resuming from suspend.
+ 
+ 	preempted:
+ 		indicate the vCPU who owns this struct is running or
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 8becf50d9ade..8a5ff888037a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -931,6 +931,8 @@ struct kvm_vcpu_arch {
+ 		u8 preempted;
+ 		u64 msr_val;
+ 		u64 last_steal;
++		atomic64_t suspend_ns;
++		u64 suspend_ts;
+ 		struct gfn_to_hva_cache cache;
+ 	} st;
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 73f4a85c72aa..b6120ebbb8fa 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3751,6 +3751,10 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ 	steal += current->sched_info.run_delay -
+ 		vcpu->arch.st.last_steal;
+ 	vcpu->arch.st.last_steal = current->sched_info.run_delay;
++
++	if (unlikely(atomic64_read(&vcpu->arch.st.suspend_ns)))
++		steal += atomic64_xchg(&vcpu->arch.st.suspend_ns, 0);
++
+ 	unsafe_put_user(steal, &st->steal, out);
+ 
+ 	version += 1;
+@@ -6992,6 +6996,7 @@ long kvm_arch_vm_compat_ioctl(struct file *filp, unsigned int ioctl,
+ #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+ static int kvm_arch_suspend_notifier(struct kvm *kvm)
+ {
++	bool kick_vcpus = false;
+ 	struct kvm_vcpu *vcpu;
+ 	unsigned long i;
+ 
+@@ -6999,9 +7004,45 @@ static int kvm_arch_suspend_notifier(struct kvm *kvm)
+ 	 * Ignore the return, marking the guest paused only "fails" if the vCPU
+ 	 * isn't using kvmclock; continuing on is correct and desirable.
+ 	 */
+-	kvm_for_each_vcpu(i, vcpu, kvm)
++	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		(void)kvm_set_guest_paused(vcpu);
+ 
++		if (vcpu->arch.st.msr_val & KVM_MSR_ENABLED) {
++			kick_vcpus = true;
++			WRITE_ONCE(vcpu->arch.st.suspend_ts,
++				   ktime_get_boottime_ns());
++		}
++	}
++
++	if (kick_vcpus)
++		kvm_make_all_cpus_request(kvm, KVM_REQ_OUTSIDE_GUEST_MODE);
++
++	return NOTIFY_DONE;
++}
++
++static int kvm_arch_resume_notifier(struct kvm *kvm)
++{
++	struct kvm_vcpu *vcpu;
++	unsigned long i;
++
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		u64 suspend_ns  = ktime_get_boottime_ns() -
++				  vcpu->arch.st.suspend_ts;
++
++		WRITE_ONCE(vcpu->arch.st.suspend_ts, 0);
++
++		/*
++		 * Only accumulate the suspend time if steal-time is enabled,
++		 * but always clear suspend_ts and kick the vCPU as the vCPU
++		 * could have disabled steal-time after the suspend notifier
++		 * grabbed suspend_ts.
++		 */
++		if (vcpu->arch.st.msr_val & KVM_MSR_ENABLED)
++			atomic64_add(suspend_ns, &vcpu->arch.st.suspend_ns);
++
++		kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
++	}
++
+ 	return NOTIFY_DONE;
+ }
+ 
+@@ -7011,6 +7052,9 @@ int kvm_arch_pm_notifier(struct kvm *kvm, unsigned long state)
+ 	case PM_HIBERNATION_PREPARE:
+ 	case PM_SUSPEND_PREPARE:
+ 		return kvm_arch_suspend_notifier(kvm);
++	case PM_POST_HIBERNATION:
++	case PM_POST_SUSPEND:
++		return kvm_arch_resume_notifier(kvm);
+ 	}
+ 
+ 	return NOTIFY_DONE;
+@@ -11251,6 +11295,16 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_has_events);
+ 
+ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+ {
++	/*
++	 * During host SUSPEND/RESUME tasks get frozen after SUSPEND notifiers
++	 * run, and thawed before RESUME notifiers, i.e. vCPUs can be actively
++	 * running when KVM sees the system as suspended.  Block the vCPU if
++	 * KVM sees the vCPU as suspended to ensure the suspend steal time is
++	 * accounted before the guest can run, and to the correct guest task.
++	 */
++	if (READ_ONCE(vcpu->arch.st.suspend_ts))
++		return false;
++
+ 	return kvm_vcpu_running(vcpu) || vcpu->arch.pv.pv_unhalted ||
+ 	       kvm_vcpu_has_events(vcpu);
+ }
+
+base-commit: 17cfb61855eafd72fd6a22d713a39be0d74660e1
+-- 
 
