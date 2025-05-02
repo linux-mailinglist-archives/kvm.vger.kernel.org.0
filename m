@@ -1,177 +1,153 @@
-Return-Path: <kvm+bounces-45251-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45252-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAFECAA7A32
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 21:25:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 347D5AA7A61
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 21:44:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1004F4C735C
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 19:25:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 011CC1B66903
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 19:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB341F419A;
-	Fri,  2 May 2025 19:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D771F4C87;
+	Fri,  2 May 2025 19:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ro3aLQGX"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="hXlnQTzu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1D01F1301
-	for <kvm@vger.kernel.org>; Fri,  2 May 2025 19:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A251F2BAD;
+	Fri,  2 May 2025 19:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746213940; cv=none; b=A0N8K3OZblyLG2Znt8hBRbIn8bDGa29iG0qGofYrm6PDgU4VfwnIzxhn1Tm/1u5mJIGZx+f5FpE1tumxT9womQkmQvJHIjeVmiALFkIRJFqKQ7Atz6qY1wumJOQzc4gfBSZ71lzS1mFM2zzQeoKft+AKBl6HaYZKcS5HbGUmDyQ=
+	t=1746215070; cv=none; b=rEVsmKRRRCQBQHU8Z9j2my0/cSZfcdfmxXDEvIxso0ujbzaMW8iRD6tKWCkcw+2sv1jYswVEqcru8lDYpbBmTatboVnQTrwvGT5hAOen0KvsjTMXR/f/MDa/Lho1qA8PrGlLF+POh7P5kxe5wDXqKzOnspfK3wrQKXVKdU1qzWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746213940; c=relaxed/simple;
-	bh=ZOraj867pk/cuv9sGYnTnO1GOcFc4HnKNvgp4QcVTF8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TpI4RFwXAotCefme1TU8o+2NjlMnSIsOyLqeRBUnxyn4blQ+1EysPp6WNcoVNpLUWD85dieyFd2M6nqo4W3NeZqwjf2Z2tPzReQ3cjiNkPosxpqKcB99L/rE3I366I7KAWyoAOVsKqeTZ9O0rA1zJP2Ft1Gix+hYGnwMq4ttUNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ro3aLQGX; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2264c9d0295so31735ad.0
-        for <kvm@vger.kernel.org>; Fri, 02 May 2025 12:25:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746213937; x=1746818737; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZOraj867pk/cuv9sGYnTnO1GOcFc4HnKNvgp4QcVTF8=;
-        b=Ro3aLQGXP8CNe9vRdK6XeulHVcTX2VBrUyrixmFqJdUgryLQtuH8O9cayvD79Dqomd
-         hHQSiFSkuPc95X4JNas9F2/1xwcaILkXQgzpKCY86CeiOFD+5Sy0rkj8IdkC9tG64AFB
-         +sLGwf0iJDKBNf46VNhOVRoslDOQ196S0dd0WmPb+3GIOS0GZsBtYyrBQgSFUD+hgnDw
-         lPFeizJfOAIUiji8A8rGz1sEsM/yvDyh8s1u+zu5Oml7qMF86VPdPkxZzBC9Ue5D6ta5
-         ogZi4kL6PgyFcScnHTl1aC7EYD3oJFVe7/pDKpJuFv0se1smNPI6iRl9/1tRg8oY0tuB
-         Q0rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746213937; x=1746818737;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZOraj867pk/cuv9sGYnTnO1GOcFc4HnKNvgp4QcVTF8=;
-        b=q3Cvdxr+j1UaesOcfhXITdYNA/eAozEjqOILur9D3cVcOqIeyYhbOKDB8VuFPtGjZo
-         OkyjKfn+YEev/3geJMB9wmTAh2v2WlNYzsSIsl02q5a+itdyB0O0Bue/54JvJB/qKzRR
-         LpDlHFhpMPVjBzLPpslC/GlluXzQX8HsG0lVesXLHTi+mCXWE8UzcOkUgG9FNO7DT22Q
-         gk7s6DuFj2KtkgFKAB1RxMLKrq8YCiCpu6pRmn/f7S1ceCwR35IANUuEiZZJedRkDz9q
-         9f46lv8N4jGFU2K36B/4Trhs7PQSvkyGg4FFfp+COIWxk1Oj0K9vnm1T+GZYJxoRXPLL
-         cIjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXmjujTqanuHHmio4iNhCDRRFDYEiyOSew4/LpQ+MMvccC4XthaOUq5oYYLYAhnbhY6XtE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpMAFSNeAbLEdAbPCghXlQY9LEsPMCX26DDfhbMs73CFVZ6Xjg
-	KzuzD3S7OfC48xoQHpZ/SULgElGQAUnDVDzo2u/edMLBiQriVE9fT7X8lmDY8V3+SpGEYqHuAzx
-	KW4DinakOgCW+QFYuZXRsb6piCyJQx1AfSixM
-X-Gm-Gg: ASbGncsYUCZVY8UV0OnjeY1tMTAiD8o2J47el+Q87kBvJK/XCls2m8xYZZZASH5mUNX
-	u7NVob1piOYyPscVF23hFRXN7tm4BKIioQrLMsJ+bMFvCcO1qMXgsF+vhbAUE6c4yhg+0j/hYci
-	Ync/d7+Q+6wv/L1Cf2nu5Vsr224fYAqDYo/A==
-X-Google-Smtp-Source: AGHT+IHUOjgBbVOP8EhCotYEtz1xj8om994DHh63iGGlYgne8/oHskra7BjgsemS01jDY9TsbdDObHSsJ810l2GltBI=
-X-Received: by 2002:a17:902:ce07:b0:21f:4986:c7d5 with SMTP id
- d9443c01a7336-22e18a3edccmr455755ad.8.1746213937102; Fri, 02 May 2025
- 12:25:37 -0700 (PDT)
+	s=arc-20240116; t=1746215070; c=relaxed/simple;
+	bh=n+L5wdWKfMSnWgjpxdKD9mYdVp2ikqZ5Yl7stiWg6xg=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=B+HZFWySXfWWe/SNufWuTFI4yGlbqcP0Ej7eN53shWf6ArYMKybUAO540HZsk+rNtYAKcG23TYhp/QbM0LwcTO60KRT3VAW+0kAs2H/KbaRtdt3fyD2BU+7jjVbsd9ArwNQxoJuSNUPGr/QwPhr48Pyd8cTG6O1sTrZNOS1OxA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=hXlnQTzu; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 542JhQjh2150495
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Fri, 2 May 2025 12:43:27 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 542JhQjh2150495
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1746215008;
+	bh=ZqLXxzNJv0IHqSG9SsLfGERgXXTrSiEhUW5FOYYelTg=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=hXlnQTzulXtKiJv1Lq04GAWzGF/0q4TfVKQJTch09TMCik6jf/8YdVqA77Ps8sd25
+	 QX5VLVzqgNsl8Q7tJ/7P4VMTaU4KPlYk/zktKDIoM1I9Fyau9p1HZQZcY2pbEW/q+I
+	 Hrxb+YOhhwHl49hLEBYFb9Y+caY17+IRSFyp2ZARE6p8jGafT8Gm2CCQb367j+1uaK
+	 o2hyqIBGWTUzPdeWKhV0Hy8YOmYk5Zqio4UbkvzM/zuTwf7JNTt3fwtQcqarSo1jrX
+	 +pBune/c9bJzdacTU00rRG5QZkwPze2HEkF2Vy037KbBFp54+9MCfbfhNp6N9c87Qu
+	 Qq3ksCCBwRmaA==
+Date: Fri, 02 May 2025 12:43:23 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Xin Li <xin@zytor.com>, Sean Christopherson <seanjc@google.com>,
+        Peter Zijlstra <peterz@infradead.org>
+CC: x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
+        wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        pbonzini@redhat.com, ardb@kernel.org, kees@kernel.org,
+        Arnd Bergmann <arnd@arndb.de>, gregkh@linuxfoundation.org,
+        jpoimboe@kernel.org, linux-hyperv@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, samitolvanen@google.com, ojeda@kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_00/13=5D_objtool=3A_Detect_and_wa?=
+ =?US-ASCII?Q?rn_about_indirect_calls_in_=5F=5Fnocfi_functions?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <9b112e40-d281-422c-b862-3c073b3c7239@zytor.com>
+References: <20250430110734.392235199@infradead.org> <8B86A3AE-A296-438C-A7A7-F844C66D0198@zytor.com> <20250430190600.GQ4439@noisy.programming.kicks-ass.net> <20250501103038.GB4356@noisy.programming.kicks-ass.net> <20250501153844.GD4356@noisy.programming.kicks-ass.net> <aBO9uoLnxCSD0UwT@google.com> <9b112e40-d281-422c-b862-3c073b3c7239@zytor.com>
+Message-ID: <80783990-FEF8-4F40-810E-5B89D9801E84@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250429032645.363766-1-almasrymina@google.com>
- <20250429032645.363766-5-almasrymina@google.com> <53433089-7beb-46cf-ae8a-6c58cd909e31@redhat.com>
- <fd7f21d9-3f45-4f68-85cb-dd160a0a95ca@redhat.com>
-In-Reply-To: <fd7f21d9-3f45-4f68-85cb-dd160a0a95ca@redhat.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 2 May 2025 12:25:23 -0700
-X-Gm-Features: ATxdqUFE7sBpQ0aEoZkfu-r1bro_WuWZDP8nLd_pOK-7HB7CvYHcAcfjkOn9v8E
-Message-ID: <CAHS8izPr_yt+PtG5Q++Ub=D4J=H7nP0S_7rOP9G7W=i2Zeau3g@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 4/9] net: devmem: Implement TX path
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 2, 2025 at 4:51=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
+On May 1, 2025 10:48:42 PM PDT, Xin Li <xin@zytor=2Ecom> wrote:
+>On 5/1/2025 11:30 AM, Sean Christopherson wrote:
+>>  From c50fb5a8a46058bbcfdcac0a100c2aa0f7f68f1c Mon Sep 17 00:00:00 2001
+>> From: Sean Christopherson<seanjc@google=2Ecom>
+>> Date: Thu, 1 May 2025 11:10:39 -0700
+>> Subject: [PATCH 2/2] x86/fred: KVM: VMX: Always use FRED for IRQ+NMI wh=
+en
+>>   CONFIG_X86_FRED=3Dy
+>>=20
+>> Now that FRED provides C-code entry points for handling IRQ and NMI exi=
+ts,
+>> use the FRED infrastructure for forwarding all such events even if FRED
+>> isn't supported in hardware=2E  Avoiding the non-FRED assembly trampoli=
+nes
+>> into the IDT handlers for IRQs eliminates the associated non-CFI indire=
+ct
+>> call (KVM performs a CALL by doing a lookup on the IDT using the IRQ
+>> vector)=2E
+>>=20
+>> Force FRED for 64-bit kernels if KVM_INTEL is enabled, as the benefits =
+of
+>> eliminating the IRQ trampoline usage far outwieghts the code overhead f=
+or
+>> FRED=2E
+>>=20
+>> Suggested-by: Peter Zijlstra<peterz@infradead=2Eorg>
+>> Signed-off-by: Sean Christopherson<seanjc@google=2Ecom>
+>> ---
+>>   arch/x86/kvm/Kconfig   | 1 +
+>>   arch/x86/kvm/vmx/vmx=2Ec | 4 ++--
+>>   2 files changed, 3 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+>> index 2eeffcec5382=2E=2E712a2ff28ce4 100644
+>> --- a/arch/x86/kvm/Kconfig
+>> +++ b/arch/x86/kvm/Kconfig
+>> @@ -95,6 +95,7 @@ config KVM_SW_PROTECTED_VM
+>>   config KVM_INTEL
+>>   	tristate "KVM for Intel (and compatible) processors support"
+>>   	depends on KVM && IA32_FEAT_CTL
+>> +	select X86_FRED if X86_64
 >
-> On 5/2/25 1:47 PM, Paolo Abeni wrote:
-> > On 4/29/25 5:26 AM, Mina Almasry wrote:
-> >> Augment dmabuf binding to be able to handle TX. Additional to all the =
-RX
-> >> binding, we also create tx_vec needed for the TX path.
-> >>
-> >> Provide API for sendmsg to be able to send dmabufs bound to this devic=
-e:
-> >>
-> >> - Provide a new dmabuf_tx_cmsg which includes the dmabuf to send from.
-> >> - MSG_ZEROCOPY with SCM_DEVMEM_DMABUF cmsg indicates send from dma-buf=
-.
-> >>
-> >> Devmem is uncopyable, so piggyback off the existing MSG_ZEROCOPY
-> >> implementation, while disabling instances where MSG_ZEROCOPY falls bac=
-k
-> >> to copying.
-> >>
-> >> We additionally pipe the binding down to the new
-> >> zerocopy_fill_skb_from_devmem which fills a TX skb with net_iov netmem=
-s
-> >> instead of the traditional page netmems.
-> >>
-> >> We also special case skb_frag_dma_map to return the dma-address of the=
-se
-> >> dmabuf net_iovs instead of attempting to map pages.
-> >>
-> >> The TX path may release the dmabuf in a context where we cannot wait.
-> >> This happens when the user unbinds a TX dmabuf while there are still
-> >> references to its netmems in the TX path. In that case, the netmems wi=
-ll
-> >> be put_netmem'd from a context where we can't unmap the dmabuf, Resolv=
-e
-> >> this by making __net_devmem_dmabuf_binding_free schedule_work'd.
-> >>
-> >> Based on work by Stanislav Fomichev <sdf@fomichev.me>. A lot of the me=
-at
-> >> of the implementation came from devmem TCP RFC v1[1], which included t=
-he
-> >> TX path, but Stan did all the rebasing on top of netmem/net_iov.
-> >>
-> >> Cc: Stanislav Fomichev <sdf@fomichev.me>
-> >> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> >> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> >
-> > I'm sorry for the late feedback. A bunch of things I did not notice
-> > before...
+>I LOVE this change, but not sure if everyone is happy with it=2E
 >
-> The rest LGTM,
-
-Does this imply I should attach your Reviewed-by or Acked-by on follow
-up submissions if any? I'm happy either way, just checking.
-
-> and my feedback here ranges from nit to corner-cases, so
-> we are probably better off with a follow-up than with a repost, other
-> opinions welcome!
+>>   	select KVM_GENERIC_PRIVATE_MEM if INTEL_TDX_HOST
+>>   	select KVM_GENERIC_MEMORY_ATTRIBUTES if INTEL_TDX_HOST
+>>   	help
+>> diff --git a/arch/x86/kvm/vmx/vmx=2Ec b/arch/x86/kvm/vmx/vmx=2Ec
+>> index ef2d7208dd20=2E=2E2ea89985107d 100644
+>> --- a/arch/x86/kvm/vmx/vmx=2Ec
+>> +++ b/arch/x86/kvm/vmx/vmx=2Ec
+>> @@ -6995,7 +6995,7 @@ static void handle_external_interrupt_irqoff(stru=
+ct kvm_vcpu *vcpu,
+>>   		return;
+>>     	kvm_before_interrupt(vcpu, KVM_HANDLING_IRQ);
+>> -	if (cpu_feature_enabled(X86_FEATURE_FRED))
+>> +	if (IS_ENABLED(CONFIG_X86_FRED))
 >
+>"if (IS_ENABLED(CONFIG_X86_64))"?
+>
+>>   		fred_entry_from_kvm(EVENT_TYPE_EXTINT, vector);
+>>   	else
+>>   		vmx_do_interrupt_irqoff(gate_offset((gate_desc *)host_idt_base + ve=
+ctor));
+>> @@ -7268,7 +7268,7 @@ noinstr void vmx_handle_nmi(struct kvm_vcpu *vcpu=
+)
+>>   		return;
+>>     	kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
+>> -	if (cpu_feature_enabled(X86_FEATURE_FRED))
+>> +	if (IS_ENABLED(CONFIG_X86_FRED))
+>
+>Ditto=2E
 
-Agreed a follow-up is better, but up to you and other maintainers.
-There is some mounting urgency on my side (we're in the process of
-optimistical backports and migrating the devmem TCP userspace that we
-previously open sourced to the upstream UAPI), but we'll oblige either
-way.
-
---=20
-Thanks,
-Mina
+I don't think anyone will have a problem with compiling it in=2E=2E=2E it =
+is such a small amount of code=2E
 
