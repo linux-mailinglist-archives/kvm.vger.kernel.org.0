@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-45199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06BFEAA6C2D
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 10:03:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2476AA6C6D
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 10:19:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 683E71B662B9
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 08:03:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67CB71BA5BDE
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 08:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C4F42690F7;
-	Fri,  2 May 2025 08:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFCA229B2A;
+	Fri,  2 May 2025 08:18:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o40ruDpd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/TX4Mf5"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D3426772A;
-	Fri,  2 May 2025 08:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0BA8828;
+	Fri,  2 May 2025 08:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746172957; cv=none; b=SsNGsBRXJZfNjBj2nlca3vZEuGbvN3I7SRrrLrzOeaE3tp8BZn43mf1SWIYNiu04HBLXibI4LRyX2YHVuLX70JMLW1Idv8qEOVu4OzWnPJQgHvdR6Kolvxin3w+DWKsBLBjGGMEe99ljp3HGaBSmm5f8l3HwQGKv1nkdRYM889U=
+	t=1746173922; cv=none; b=c7spS0+srjKBstkuctxbUFp3w05HUXca4BapjUSeMvqPQ/nM7lWHQdT46DL7FrKr3unKamw31D2scID3DNYV2qlAFrGO2YENLQE0XX7VBWtqbZxvMQTJ/kJimFn2Wj0Fj84a8p3ByDT2HSrR3mRC5M2xp+k7SCn1YEZtPTf84dM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746172957; c=relaxed/simple;
-	bh=VrP6FYMiM8APrbbiFFr3vwipUq0BMzeGXIdgg8yPKw0=;
+	s=arc-20240116; t=1746173922; c=relaxed/simple;
+	bh=cceIUw9EX6CJ615GNdppXNrElVMTPwJztPtsbm/5hy8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LCHlu1zSYY41ig/48LvnpO9otB1H8qnK5lJAz2V6++HLw/UNq3c6aR9r71UgJfjDGbsy+AtpDOc80YBA+a7cdxtk3Xv3w2GG7KlqKU8a5xw35u3t9UPtw39myLGqHMyXhxviHVio+U1AdfuDH/o+ZZtfR1jfVUXrKkoKQxEE3Uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o40ruDpd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE92BC4CEE4;
-	Fri,  2 May 2025 08:02:28 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vt7Jc/sIw8Fqc2xhbOrNLzkm5euA3Z4bFUVAjgY7NxG72qDQVoJf3NW9EC7+Z+h0s8qq3nrY/2JBhLolVntT14n2AOxgOvCXGUuNDPPk3Ui3DNcDkRl0YutnCDiA/jTRN1TY68VIjZSTeDHDT91VV8rwvF6i2n/j4np4evQcfkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/TX4Mf5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3FCDC4CEE9;
+	Fri,  2 May 2025 08:18:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746172956;
-	bh=VrP6FYMiM8APrbbiFFr3vwipUq0BMzeGXIdgg8yPKw0=;
+	s=k20201202; t=1746173921;
+	bh=cceIUw9EX6CJ615GNdppXNrElVMTPwJztPtsbm/5hy8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o40ruDpdxuzYi5SlPXBVO3KE83CyehxDNrNO/541PgVjFTDFgkp9ttfsSywwoC2Xi
-	 deyF+fk2wjQxxc5XQRBVm8Bmt2O6KE/EWUyWPBtkP4DjmRVUsgvwR4qUU7TcNGYno2
-	 LrsDSCZuBZAWl/LYiTehIFOfFP/Ile60POceUApHmDdzreBk3ZrpTs99IMSeErgzEI
-	 qcVRENdvjn60dt64quynSDl7VztBTPTl/yjYLXHI6ByaM4mPy/wh1yniu8zkGauz6l
-	 KWZFS4mxzAp7qh9gzlauN/px1lSmL30l6NU2jcy73WKeezA7wFlGHek2h34pt4xuBA
-	 QpbqWIpAjreaA==
-Date: Fri, 2 May 2025 10:02:26 +0200
+	b=U/TX4Mf5qkn+d5eWIgqv7vIk75zfM6yrIPmHLSfaOvilB1TMJCOwX6UxaLi3/4ntF
+	 CTdvcW24sQjGFvj/AXsOJGncvakw6Z4p8ZclsEDe2hknFU+ckPt2/qHvdPIyk59xbo
+	 rV1pq8QWA/qTkpUObp899r1foJ9LRWGoqI6CTS1V0Cu+JCa9JAJtB9a+QLyuX858V2
+	 70a22IBVEVB0MRp2wD32EPcEnvbH3GYXu7Ra0oeU+V0Ro/eudlwhxrpwk5f5KAdfqv
+	 vheM2b3e+KJz5ez4AHrUsoRTaS6WvSOsjRrAmUB93Bp+mNMmxeQYuTcRVRzY5U5RIz
+	 AD+AuPXxVZ3PA==
+Date: Fri, 2 May 2025 10:18:30 +0200
 From: Ingo Molnar <mingo@kernel.org>
 To: "Xin Li (Intel)" <xin@zytor.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -63,7 +63,7 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com,
 	dapeng1.mi@linux.intel.com, ilpo.jarvinen@linux.intel.com
 Subject: Re: [PATCH v4 02/15] x86/msr: Move rdtsc{,_ordered}() to <asm/tsc.h>
-Message-ID: <aBR8EoYkxaFHwZN2@gmail.com>
+Message-ID: <aBR_1oQN-gKCREBD@gmail.com>
 References: <20250427092027.1598740-1-xin@zytor.com>
  <20250427092027.1598740-3-xin@zytor.com>
 Precedence: bulk
@@ -79,50 +79,22 @@ In-Reply-To: <20250427092027.1598740-3-xin@zytor.com>
 
 * Xin Li (Intel) <xin@zytor.com> wrote:
 
-> index 94408a784c8e..13335a130edf 100644
-> --- a/arch/x86/include/asm/tsc.h
-> +++ b/arch/x86/include/asm/tsc.h
-> @@ -7,7 +7,81 @@
->  
->  #include <asm/cpufeature.h>
->  #include <asm/processor.h>
-> -#include <asm/msr.h>
-> +
-> +/*
-> + * both i386 and x86_64 returns 64-bit value in edx:eax, but gcc's "A"
-> + * constraint has different meanings. For i386, "A" means exactly
-> + * edx:eax, while for x86_64 it doesn't mean rdx:rax or edx:eax. Instead,
-> + * it means rax *or* rdx.
-> + */
-> +#ifdef CONFIG_X86_64
-> +/* Using 64-bit values saves one instruction clearing the high half of low */
-> +#define DECLARE_ARGS(val, low, high)	unsigned long low, high
-> +#define EAX_EDX_VAL(val, low, high)	((low) | (high) << 32)
-> +#define EAX_EDX_RET(val, low, high)	"=a" (low), "=d" (high)
-> +#else
-> +#define DECLARE_ARGS(val, low, high)	u64 val
-> +#define EAX_EDX_VAL(val, low, high)	(val)
-> +#define EAX_EDX_RET(val, low, high)	"=A" (val)
-> +#endif
+> For some reason, there are some TSC-related functions in the MSR
+  ^^^^^^^^^^^^^^^
+> header even though there is a tsc.h header.
 
-Meh, this patch creates a duplicate copy of DECLARE_ARGS() et al in 
-<asm/tsc.h> now:
+The real reason is that the rdtsc{,_ordered}() methods use the 
+EAX_EDX_*() macros to optimize their EDX/EAX assembly accessors, which 
+is why these methods were in <asm/msr.h>.
 
- arch/x86/include/asm/msr.h:#define DECLARE_ARGS(val, low, high) unsigned long low, high
- arch/x86/include/asm/msr.h:#define DECLARE_ARGS(val, low, high) u64 val
- arch/x86/include/asm/msr.h:     DECLARE_ARGS(val, low, high);
- arch/x86/include/asm/msr.h:     DECLARE_ARGS(val, low, high);
- arch/x86/include/asm/msr.h:     DECLARE_ARGS(val, low, high);
- arch/x86/include/asm/tsc.h:#define DECLARE_ARGS(val, low, high) unsigned long low, high
- arch/x86/include/asm/tsc.h:#define DECLARE_ARGS(val, low, high) u64 val
- arch/x86/include/asm/tsc.h:     DECLARE_ARGS(val, low, high);
- arch/x86/include/asm/tsc.h:     DECLARE_ARGS(val, low, high);
- arch/x86/include/asm/tsc.h:#undef DECLARE_ARGS
+Your followup patch tacitly acknowledges this by silently creating 
+duplicate copies of these facilities in both headers ...
 
-Which was both an undeclared change, bloats the code, causes various 
-problems, and is totally unnecessary to boot.
+I've cleaned it all up in tip:x86/msr via these preparatory patches:
 
-Please don't do that ...
+  x86/msr: Improve the comments of the DECLARE_ARGS()/EAX_EDX_VAL()/EAX_EDX_RET() facility
+  x86/msr: Rename DECLARE_ARGS() to EAX_EDX_DECLARE_ARGS
+  x86/msr: Move the EAX_EDX_*() methods from <asm/msr.h> to <asm/asm.h>
 
 Thanks,
 
