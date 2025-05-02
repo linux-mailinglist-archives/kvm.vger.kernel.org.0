@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-45225-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45229-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C665AA72EE
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 15:10:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 098D1AA72FB
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 15:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5361B1C00B57
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 13:10:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C6A97B4260
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 13:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD852256C9F;
-	Fri,  2 May 2025 13:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA98254B1F;
+	Fri,  2 May 2025 13:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QKmvliSg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lmUQ5Ows"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BFB255F34;
-	Fri,  2 May 2025 13:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A068255E37;
+	Fri,  2 May 2025 13:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746191327; cv=none; b=XY08t6ls7qQzyqY79rpiivraBn5LeRZVkbw+Eu59q8S8bL93yNPDl181QKsuGgtgNrpWcnJX/fs5mxDaoYav2aTq2WvMqwNrug8gaQmp/ucU+rgdhOlZfLZuNExFtsF6ZQeV4X9CU6fu7KZDo0S+16ioOHIcmnNE9eAVrL7+oOU=
+	t=1746191333; cv=none; b=Nq5/g5aAC6tlCyy84TmS6Ct/v3n7sDw0CTz/2py3T7R6bb/2zYVgPCxcKy28YxKY1ExnNX3g1pMtRC8638G8qopjqxWm35ivhjG8dF3oWLQcGQjuHRNIXmk0xmaVZ6yfBKunKEHmhWP07YlziaFJO9C+v5CVDvBxlN395NkOy+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746191327; c=relaxed/simple;
-	bh=WpMLEMIa0sSO19qSA7DLFIJ7BdXR/BIZhnHX4GL9a7s=;
+	s=arc-20240116; t=1746191333; c=relaxed/simple;
+	bh=j5Y6GYyeSlhNDi2dLeXJ+8OeWOwUzdTAtd6KqruAJps=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c3Aq+6T39A4KMump8JGpQnnaXB1fo8BZBl4bcZkcw6f31onS4aIV+HRWxlfP5vqUtu/epJ9wRcSu3QQWa8YYbaIraW7pXtkMHu8jLGlfWK4q65Hs1iESViT+oc34iLIdCH2zx+de7r2Nh7wZb8K6Gx2BlkQuRSrKp1FcWIk8hww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.helo=mgamail.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QKmvliSg; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=Zlh89EZ0Y03cShev8aVoKVt6XFrC7YU3fE6NCkVb/lwm2F9rg5dY3EXcD/kL2hsK70mDIp9tatRO22TrRjk5Av4+EUzpkel3gWYyDtbyHX32Y/nhH6zLxz6ha5a6zTI5D25sYJ1OpCG2wSCFMNIDMMIYC7IwCF7rMympgbl4mxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.helo=mgamail.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lmUQ5Ows; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.helo=mgamail.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746191325; x=1777727325;
+  t=1746191332; x=1777727332;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WpMLEMIa0sSO19qSA7DLFIJ7BdXR/BIZhnHX4GL9a7s=;
-  b=QKmvliSgx9ztXJLd+pSPN+P1swqoYPvNoHgd7wmEpdFYm433D6JVMEzv
-   /Y80+yE26iovMtiOdiZExeAjAuoAoBrkwgEsZXPQyfcZV1ZsQ/p0k4IWv
-   vaxGSOC9SK0PAUgy5m6FooGtaljbaghUpoxBQSGETA1d59r/wyNe0ody/
-   4ZT6hMVEdAsd+ri25VN1lQsberW59nge2kSYmuaIAQ7bPbM29ZWOn16jB
-   j/Vwl2rSfdyyu80ruHerzTfcP7ZZPPUyyzffqUY5wvMqXA4kUDiRHc/o7
-   WGeWx142fNBirj5cU6dJOeh3fe77UKaO967iJG08x/Un6Zin/SJKaVkaF
+  bh=j5Y6GYyeSlhNDi2dLeXJ+8OeWOwUzdTAtd6KqruAJps=;
+  b=lmUQ5OwslejGX+aJN4uHYO25g77foDFUdO6aZyvHZEzeLpgQpEL1rDTl
+   G7LDea95EDJrqKINHa7164wbahifp2yKX1HE+kgnZU+7xqFIbBAkYKUE4
+   eKzxG7SGqO0gPl9GvJ9bftELW3OOQ3NImVTGgDAXCpUMMQiLaTkOHpJDK
+   Fd5vxyazLcJEXGpNCihTbyOlMKsHYWkW+9H9YD7QX7xm1MEHmXTOCJl6f
+   A3e6ApGw0sTn0wrGNkI5mi+qqzaicCZG2jX3n10Yd3mS9q9+nSCYRm+F3
+   Dz91rOhecfCkDu0MtfrwhfHNtUeyv3f58UNxurFSXFTOSoYwmP5lb6MR6
    A==;
-X-CSE-ConnectionGUID: CShqPHvmTK6FBPd8oLkxSg==
-X-CSE-MsgGUID: +4oyVmvJQv6Ww11nZrau7Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11421"; a="48012978"
+X-CSE-ConnectionGUID: 6SHVNk1kQo+n0HfVBjBgHA==
+X-CSE-MsgGUID: erRWX5CHTN2/zhKQeg10pw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11421"; a="58495273"
 X-IronPort-AV: E=Sophos;i="6.15,256,1739865600"; 
-   d="scan'208";a="48012978"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2025 06:08:45 -0700
-X-CSE-ConnectionGUID: iB9ZE6uCTBSfLjMNuHdmFw==
-X-CSE-MsgGUID: sufZPuJYRA61EPn5SPwXTg==
+   d="scan'208";a="58495273"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2025 06:08:51 -0700
+X-CSE-ConnectionGUID: 0Z/06JEGRTaayqBgyOFGwg==
+X-CSE-MsgGUID: 695OBPPCQACgw1ezPztR6w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,256,1739865600"; 
-   d="scan'208";a="157871084"
+   d="scan'208";a="138657788"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa002.fm.intel.com with ESMTP; 02 May 2025 06:08:41 -0700
+  by fmviesa003.fm.intel.com with ESMTP; 02 May 2025 06:08:41 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id 589A1260; Fri, 02 May 2025 16:08:36 +0300 (EEST)
+	id 656B2325; Fri, 02 May 2025 16:08:36 +0300 (EEST)
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -76,9 +76,9 @@ Cc: rick.p.edgecombe@intel.com,
 	linux-coco@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [RFC, PATCH 06/12] KVM: TDX: Allocate PAMT memory in __tdx_td_init()
-Date: Fri,  2 May 2025 16:08:22 +0300
-Message-ID: <20250502130828.4071412-7-kirill.shutemov@linux.intel.com>
+Subject: [RFC, PATCH 07/12] KVM: TDX: Allocate PAMT memory in tdx_td_vcpu_init()
+Date: Fri,  2 May 2025 16:08:23 +0300
+Message-ID: <20250502130828.4071412-8-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250502130828.4071412-1-kirill.shutemov@linux.intel.com>
 References: <20250502130828.4071412-1-kirill.shutemov@linux.intel.com>
@@ -90,102 +90,68 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allocate PAMT memory for TDH.MNG.CREATE and TDH.MNG.ADDCX.
+Allocate PAMT memory for TDH.VP.CREATE and TDH.VP.ADDCX.
 
 PAMT memory that is associated with pages successfully added to the TD
-with TDH.MNG.ADDCX will be removed in tdx_reclaim_page() on
+with TDH.VP.ADDCX will be removed in tdx_reclaim_page() on
 tdx_reclaim_control_page().
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 41 +++++++++++++++++++++++++++++++----------
- 1 file changed, 31 insertions(+), 10 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index ea7e2d93fb44..59bbae2df485 100644
+index 59bbae2df485..18c4ae00cd8d 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -399,6 +399,31 @@ static void tdx_pamt_put(struct page *page)
- 	tdx_free_pamt_pages(&pamt_pages);
- }
+@@ -2983,7 +2983,7 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+ 	int ret, i;
+ 	u64 err;
  
-+static struct page *tdx_alloc_page(void)
-+{
-+	struct page *page;
-+
-+	page = alloc_page(GFP_KERNEL);
-+	if (!page)
-+		return NULL;
-+
-+	if (tdx_pamt_get(page)) {
-+		__free_page(page);
-+		return NULL;
-+	}
-+
-+	return page;
-+}
-+
-+static void tdx_free_page(struct page *page)
-+{
-+	if (!page)
-+		return;
-+
-+	tdx_pamt_put(page);
-+	__free_page(page);
-+}
-+
- static void tdx_clear_page(struct page *page)
- {
- 	const void *zero_page = (const void *) page_to_virt(ZERO_PAGE(0));
-@@ -2499,7 +2524,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
- 
- 	atomic_inc(&nr_configured_hkid);
- 
--	tdr_page = alloc_page(GFP_KERNEL);
-+	tdr_page = tdx_alloc_page();
- 	if (!tdr_page)
- 		goto free_hkid;
- 
-@@ -2512,7 +2537,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
- 		goto free_tdr;
- 
- 	for (i = 0; i < kvm_tdx->td.tdcs_nr_pages; i++) {
--		tdcs_pages[i] = alloc_page(GFP_KERNEL);
-+		tdcs_pages[i] = tdx_alloc_page();
- 		if (!tdcs_pages[i])
- 			goto free_tdcs;
+-	page = alloc_page(GFP_KERNEL);
++	page = tdx_alloc_page();
+ 	if (!page)
+ 		return -ENOMEM;
+ 	tdx->vp.tdvpr_page = page;
+@@ -2996,7 +2996,7 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
  	}
-@@ -2633,10 +2658,8 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
- teardown:
- 	/* Only free pages not yet added, so start at 'i' */
- 	for (; i < kvm_tdx->td.tdcs_nr_pages; i++) {
--		if (tdcs_pages[i]) {
--			__free_page(tdcs_pages[i]);
--			tdcs_pages[i] = NULL;
--		}
-+		tdx_free_page(tdcs_pages[i]);
-+		tdcs_pages[i] = NULL;
+ 
+ 	for (i = 0; i < kvm_tdx->td.tdcx_nr_pages; i++) {
+-		page = alloc_page(GFP_KERNEL);
++		page = tdx_alloc_page();
+ 		if (!page) {
+ 			ret = -ENOMEM;
+ 			goto free_tdcx;
+@@ -3020,7 +3020,7 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+ 			 * method, but the rest are freed here.
+ 			 */
+ 			for (; i < kvm_tdx->td.tdcx_nr_pages; i++) {
+-				__free_page(tdx->vp.tdcx_pages[i]);
++				tdx_free_page(tdx->vp.tdcx_pages[i]);
+ 				tdx->vp.tdcx_pages[i] = NULL;
+ 			}
+ 			return -EIO;
+@@ -3039,16 +3039,15 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+ 
+ free_tdcx:
+ 	for (i = 0; i < kvm_tdx->td.tdcx_nr_pages; i++) {
+-		if (tdx->vp.tdcx_pages[i])
+-			__free_page(tdx->vp.tdcx_pages[i]);
++		tdx_free_page(tdx->vp.tdcx_pages[i]);
+ 		tdx->vp.tdcx_pages[i] = NULL;
  	}
- 	if (!kvm_tdx->td.tdcs_pages)
- 		kfree(tdcs_pages);
-@@ -2652,15 +2675,13 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+ 	kfree(tdx->vp.tdcx_pages);
+ 	tdx->vp.tdcx_pages = NULL;
  
- free_tdcs:
- 	for (i = 0; i < kvm_tdx->td.tdcs_nr_pages; i++) {
--		if (tdcs_pages[i])
--			__free_page(tdcs_pages[i]);
-+		tdx_free_page(tdcs_pages[i]);
- 	}
- 	kfree(tdcs_pages);
- 	kvm_tdx->td.tdcs_pages = NULL;
+ free_tdvpr:
+-	if (tdx->vp.tdvpr_page)
+-		__free_page(tdx->vp.tdvpr_page);
++	tdx_free_page(tdx->vp.tdvpr_page);
++
+ 	tdx->vp.tdvpr_page = 0;
  
- free_tdr:
--	if (tdr_page)
--		__free_page(tdr_page);
-+	tdx_free_page(tdr_page);
- 	kvm_tdx->td.tdr_page = 0;
- 
- free_hkid:
+ 	return ret;
 -- 
 2.47.2
 
