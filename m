@@ -1,153 +1,102 @@
-Return-Path: <kvm+bounces-45257-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45258-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41AA1AA7B2E
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 22:59:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3570AA7B8B
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 23:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B6CF1700BB
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 20:59:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC0AD1C01FB3
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 21:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39EA1202981;
-	Fri,  2 May 2025 20:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72D12116FE;
+	Fri,  2 May 2025 21:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k3yjK5Tl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YOGsvt10"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28A21D515A
-	for <kvm@vger.kernel.org>; Fri,  2 May 2025 20:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F6320D50B
+	for <kvm@vger.kernel.org>; Fri,  2 May 2025 21:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746219535; cv=none; b=P5vmvSpzh4mgu+pSr2QQxGkt8dcYZsxn8YjJEGoYiS1SUpsQGUrPwp7lGlSc2FfaDKcG+YSCt1WtGnwd6tpEJZwIXiyz4YRviBIAOow8euq+4S3pVUqaHBvvWkRNcbbDPFbO6N4C3t9Xva9y0efm6oBOV/LOhbxvRV+ZHX6mXkI=
+	t=1746222665; cv=none; b=LA2jJ685dIJABH7nqkjHbGpJzgSIXNMK5BuuNKF0nYdcz3WLSxPI6EjtCUjJ/U3sqaAL3ALhREnRbg+XI8NylmF41P1NESXlVsQpRz9sLn56kxqDNsuKnagEU8SBIQO91EbyfvcYMyvM0y/AUTyq0OQJAVa436XZ5yQZ7CmKj5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746219535; c=relaxed/simple;
-	bh=FMuOYXuNARVPGbLdZKzdZACnsi/D3uRXcBJ+KxMLSJw=;
+	s=arc-20240116; t=1746222665; c=relaxed/simple;
+	bh=E6M0IvoLmXk8zvn7QAi4bJE+3u5ywWMaqGMb1cp3f4A=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=anLfFWtO8hDzAxLvfNrLg2JCWqbeBFTVjkqzYkmjh/ZDPADKjgkeQMAh53RhdU05H2V9f9WtgQwHmI3RUqQJPruJ1JDX/enNB5CVfNxo4CRGAxEkdrn7Um3QkVU7cINHHoYY0BbH8zr2WO/3hOUjYzm9C48OnhSJ1h9oNxCdJOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k3yjK5Tl; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=pP3vCkcrfQ06/7eWRCGKiFJryQHm6X7iqSScwGJxDm9pvGSb+ytKjwkqVIbWLRLAc9j5UWWjkMQ+kKkCvBhnel5GPKV0PwFbeHpBo+jRQBrpXUXi52JiN0H1MtvA/+WtJF5nMubLM4RUdW/uaF393O7uLe82Y68bwfCpPy0oi+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YOGsvt10; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30a59538b17so378288a91.3
-        for <kvm@vger.kernel.org>; Fri, 02 May 2025 13:58:53 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3032ea03448so2555849a91.2
+        for <kvm@vger.kernel.org>; Fri, 02 May 2025 14:51:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746219533; x=1746824333; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1746222663; x=1746827463; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z141FLEwqm2f5UKeV3GY2SvtY7oSxEMFO78Y0lhO4Mo=;
-        b=k3yjK5TlxSHwkE10pVk/twpfj1LsProTTzA3zL6CnCOXeuNym74tyx4CsubLtdywHv
-         QDPpRfW2vGWLYWXPHvphIVLqXa3i/KtNYV5gplCEeCxYbU+tmOXfrvgF87seLPFVgtsq
-         IXx8sWCKV/Nx5AWbsjLI/diPcFrOl22W51Zr8kQWxisLlPv4EOPbvAeiNFRRfrl6uuhY
-         39n5+57jSZ2sqI30ILLDR3Kci+7FJ/TpJFq4RVjVcFNXtviVoLLt0r+7WdFyQybhaVDq
-         JvD144MdrHGUz76E6sqK2t9lRUpQPSjyQzDcP714447z3Jozew8pz92aFzeIuiXVCWYw
-         tzAQ==
+        bh=L5S6kzWyRg3t7ibhxxMYEu25/92uJhpv9EtUoQxKeGk=;
+        b=YOGsvt10ihETK7UkeflFAgQFbqAlZJETITu9Ap06+rkxIivojked0at2FmuXBZwx25
+         YjLl9oQepJQmAZXPfwZ5zMZK251pUE8IA9rpGS8oLIx1u7Gha4jiUVthjULowISCA3vx
+         uw1llKQqrM+oHf7cNk8TTufI/NYJ+pxdddofmrg9Ejac9KXhey8zoQEjLlOPix8hW2O5
+         iJFPtvOHgM0Jqsh3CqdiQnLE06qFhcM7seaUR2+3u1NSZdd1KX0g9giKhW4KND+5i6sg
+         AvXP/Yqp1PIOJVCyJkyyxRhdL+FgvPCEIZKr5Pus6mmHO9LKri32SU0doWUYpStzk/q3
+         MxuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746219533; x=1746824333;
+        d=1e100.net; s=20230601; t=1746222663; x=1746827463;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z141FLEwqm2f5UKeV3GY2SvtY7oSxEMFO78Y0lhO4Mo=;
-        b=OLuwUH2vemDid8gz8XnLWnIrij1djRsw/qWSntYDcwcFc8szYVbVqCOXMU0UsH3AaR
-         GZmBE2MAA165MKR3BH9g5veFuZ2KBFI1deNnnsD6utp7N1JIMkytUFLjIYpeiiadJ2Hc
-         0fi7N6ZuzZba/30Nfzote/WtSopZmU1Q9EagSfZnNZsCZz1NcCBn7u2gEOZhsK3oNUIn
-         sK7jmCWODKDyOHrmNcSnW17M2xVu6YZXQ4CuGyacDPKTF9fXvg1nMhel7kQQ5D5Y9KFJ
-         JBLQ1A9R7sayYbaahI0R8nw4vAc4elmAsO2Xefi+jD6wmixyJ2y6IT0f5gXzPx+4esmb
-         xoTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUhvhO+7bK/bfya3YlIWnIQkD955fss9/QGV13l7bZmHpVMBiLNcHwT9F60BET044FHPI0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwS4RDb6wnmMQOB2blAGHgtED9Na8W0y4V29ocCxSnx6vW0HHPq
-	VpAEiDhTcvAVy+Gh/lx8OKRs1hN/g61S5rdzE93V86niPGxwQOOuMsALo62ATv9DFNN+1KUHsJZ
-	xOA==
-X-Google-Smtp-Source: AGHT+IGm3fjnbZdZ0P5dTXEIDYUNeozyMh591wQHnGgOaKhf2rgPLaUDWxwxyDC2IuE6wOX5aAwhTk5qwaY=
-X-Received: from pjff8.prod.google.com ([2002:a17:90b:5628:b0:2ff:8471:8e53])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f8c:b0:305:5f32:d9f0
- with SMTP id 98e67ed59e1d1-30a4e5c5e9dmr6320303a91.19.1746219533227; Fri, 02
- May 2025 13:58:53 -0700 (PDT)
-Date: Fri, 2 May 2025 13:58:51 -0700
-In-Reply-To: <864iy4ivro.wl-maz@kernel.org>
+        bh=L5S6kzWyRg3t7ibhxxMYEu25/92uJhpv9EtUoQxKeGk=;
+        b=ODD+HcVf1BnvsdKfLVuCUOVwmRh7w2RyS48PSABNd55JgKHGjrUSIzLT03MQdo2pt/
+         ptxrEie7+ReqzQAi2OWewQPnZo99rNvJpnZwYQOUiszzcDBlX29Uhe89d96rbdLHZzqv
+         Jlm1DoE3d5izKVMoh9X8zKe+mN7bxnGTpUkv7JrI/+/ZGlizyCzXgfRh47nSEcgXpcJ5
+         bGewOhd0zRxZ2PkC8jRWiwWmeLMAt9rWPJrikRD4YdZzfKtKQJakURCW/FMKj9/eXH3F
+         1cSAOfuuyhZMxCarrLLeUlO85UUtw8iBmFBqE4oVFeOjmqeMzG816eGL45EDOCyq9glx
+         5b+A==
+X-Gm-Message-State: AOJu0YyK/udl1qt+Xo+Xk+hyP5C5JfKnjBZfNqRARt/RmfcFxEFJMV9l
+	Mams6e4tnQR2py5oe0kU+ckEcMqYU2cnQ+OgkNwaVDwedHB9uai+YUYebqdRfLQgbXWZYyPY/kW
+	Srg==
+X-Google-Smtp-Source: AGHT+IEqmM5AJyCRJVxSDwYAUvBgTR1EcndjlzikTaOt866pVxcotcKieikdc2dTfpexkvGIF4+QSAcOhiI=
+X-Received: from pjbqn8.prod.google.com ([2002:a17:90b:3d48:b0:2ef:d283:5089])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5250:b0:301:a0e9:66f
+ with SMTP id 98e67ed59e1d1-30a4e5b2c34mr8131657a91.14.1746222662809; Fri, 02
+ May 2025 14:51:02 -0700 (PDT)
+Date: Fri,  2 May 2025 14:50:49 -0700
+In-Reply-To: <20250430220954.522672-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250430203013.366479-1-mlevitsk@redhat.com> <20250430203013.366479-3-mlevitsk@redhat.com>
- <864iy4ivro.wl-maz@kernel.org>
-Message-ID: <aBUyC5kgTipXud-7@google.com>
-Subject: Re: [PATCH v4 2/5] arm64: KVM: use mutex_trylock_nest_lock when
- locking all vCPUs
+References: <20250430220954.522672-1-seanjc@google.com>
+X-Mailer: git-send-email 2.49.0.906.g1f30a19c02-goog
+Message-ID: <174622206428.880669.10703752422020171252.b4-ty@google.com>
+Subject: Re: [PATCH v2] KVM: x86/mmu: Prevent installing hugepages when mem
+ attributes are changing
 From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, Kunkun Jiang <jiangkunkun@huawei.com>, 
-	Waiman Long <longman@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Borislav Petkov <bp@alien8.de>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Alexander Potapenko <glider@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Andre Przywara <andre.przywara@arm.com>, x86@kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, kvm-riscv@lists.infradead.org, 
-	Atish Patra <atishp@atishpatra.org>, Ingo Molnar <mingo@redhat.com>, 
-	Jing Zhang <jingzhangos@google.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, kvmarm@lists.linux.dev, 
-	Will Deacon <will@kernel.org>, Keisuke Nishimura <keisuke.nishimura@inria.fr>, 
-	Sebastian Ott <sebott@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Shusen Li <lishusen2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Randy Dunlap <rdunlap@infradead.org>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Michael Roth <michael.roth@amd.com>
+Content-Type: text/plain; charset="utf-8"
 
-On Thu, May 01, 2025, Marc Zyngier wrote:
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 69782df3617f..834f08dfa24c 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -1368,6 +1368,40 @@ static int kvm_vm_release(struct inode *inode, struct file *filp)
-> >  	return 0;
-> >  }
-> >  
-> > +/*
-> > + * Try to lock all of the VM's vCPUs.
-> > + * Assumes that the kvm->lock is held.
+On Wed, 30 Apr 2025 15:09:54 -0700, Sean Christopherson wrote:
+> When changing memory attributes on a subset of a potential hugepage, add
+> the hugepage to the invalidation range tracking to prevent installing a
+> hugepage until the attributes are fully updated.  Like the actual hugepage
+> tracking updates in kvm_arch_post_set_memory_attributes(), process only
+> the head and tail pages, as any potential hugepages that are entirely
+> covered by the range will already be tracked.
 > 
-> Assuming is not enough. These assertions have caught a number of bugs,
-> and I'm not prepared to drop them.
-> 
-> > + */
-> > +int kvm_trylock_all_vcpus(struct kvm *kvm)
-> > +{
-> > +	struct kvm_vcpu *vcpu;
-> > +	unsigned long i, j;
-> > +
-> > +	kvm_for_each_vcpu(i, vcpu, kvm)
-> > +		if (!mutex_trylock_nest_lock(&vcpu->mutex, &kvm->lock))
-> > +			goto out_unlock;
-> > +	return 0;
-> > +
-> > +out_unlock:
-> > +	kvm_for_each_vcpu(j, vcpu, kvm) {
-> > +		if (i == j)
-> > +			break;
-> > +		mutex_unlock(&vcpu->mutex);
-> > +	}
-> > +	return -EINTR;
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_trylock_all_vcpus);
-> > +
-> > +void kvm_unlock_all_vcpus(struct kvm *kvm)
-> > +{
-> > +	struct kvm_vcpu *vcpu;
-> > +	unsigned long i;
-> > +
-> > +	kvm_for_each_vcpu(i, vcpu, kvm)
-> > +		mutex_unlock(&vcpu->mutex);
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_unlock_all_vcpus);
-> 
-> I don't mind you not including the assertions in these helpers, 
+> [...]
 
-I do :-)  I see no reason not to add assertions here, if locking all vCPUs is
-a hot path, we've probably got bigger problems.
+Applied to kvm-x86 fixes, thanks!
+
+[1/1] KVM: x86/mmu: Prevent installing hugepages when mem attributes are changing
+      https://github.com/kvm-x86/linux/commit/9129633d568e
+
+--
+https://github.com/kvm-x86/linux/tree/next
 
