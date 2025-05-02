@@ -1,123 +1,130 @@
-Return-Path: <kvm+bounces-45198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45199-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10595AA6B09
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 08:53:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06BFEAA6C2D
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 10:03:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C712A1B65E5E
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 06:53:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 683E71B662B9
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 08:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999BF266B5E;
-	Fri,  2 May 2025 06:53:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C4F42690F7;
+	Fri,  2 May 2025 08:02:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="UHFdnLvI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o40ruDpd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31012BA45
-	for <kvm@vger.kernel.org>; Fri,  2 May 2025 06:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D3426772A;
+	Fri,  2 May 2025 08:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746168779; cv=none; b=Lxf/4y0Rpq41FhitDzr+xAV30mEr5nVisDEtpuE9izlhN5F6nFRh9oRap2Yc9H8zPVdhs3Asnu0oqDIE2UmSrc/OKt4tdNvavOm+0fhNqC/lnCk+qWhgym2ufzYKtIw1KbjSMWijqnHMLOmVWQot8csM+3+nwi6L412SqqktFnI=
+	t=1746172957; cv=none; b=SsNGsBRXJZfNjBj2nlca3vZEuGbvN3I7SRrrLrzOeaE3tp8BZn43mf1SWIYNiu04HBLXibI4LRyX2YHVuLX70JMLW1Idv8qEOVu4OzWnPJQgHvdR6Kolvxin3w+DWKsBLBjGGMEe99ljp3HGaBSmm5f8l3HwQGKv1nkdRYM889U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746168779; c=relaxed/simple;
-	bh=xJaMzCithLabHS9Lc5tNkE89qzWT/WEzl0Ufn6NxizQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=XSZj4EkoPZuP3fCUMGna3Xi/LKfbJ86IEmAgwo6Jp2Grjt+ozYE9ur4XZ1g/XmQJoce91GgoqpdlIDTXA2shQQ9idF2GIESb6F2sP5oLAN+Y744KxXQbHoypDuRbfZqHIx4eyN0hup9+CTII31LDUm+9S22oyABVabgnUmPVEis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=UHFdnLvI; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3d91db4f0c3so9401415ab.3
-        for <kvm@vger.kernel.org>; Thu, 01 May 2025 23:52:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1746168777; x=1746773577; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jLTAl+FeAYSKQcQF7p9sJodq+vcj25r5QAMFCz6+Z3s=;
-        b=UHFdnLvI9ETCly3+3RYhh2E1hnu4zcD1Qgi3ormVd3arcwurgEEkh6GrTA+qzJTm26
-         eZRkcF8b57EbpVH8HTPQD9B0lMs3Q739qPWFcQWkSdWRC/JTDqGQ6QVtyAT4OMomm1Ow
-         GymDAkXPuDJlDo9vz3uz9N1wLzrjQmm7JIDK8mXXhv2BfcAxABbJiAtZlGMZYhfdcZUu
-         pUqNFACf1GdapklwO3FMKn+jitkmc8spzGsmOeWZ18Dt4se1OjKSh0Mzjrt+cgy207fK
-         iL2181DNAj0njYFS06+dJyFDXUEJWOZA+sGEy/r+3r+n2EEoEqSnKJXb6WMpjWTnmRXR
-         Dm7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746168777; x=1746773577;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jLTAl+FeAYSKQcQF7p9sJodq+vcj25r5QAMFCz6+Z3s=;
-        b=SZ+fNh+7YhkRP8hZqEii0dCTobZt65LfaEuplDMI5f9ABg3nnViCOuLcOaBbKmZ6ve
-         k5c7KPif7QZdlJubQssW+xnftWnL/9SOUQRm4jODby3uX1BDeI11a3zuBmZHyGvkG9hY
-         qIUdDAqWkkK7cOE7RmzKl3BOHwmLcxUWE2WlFKKZLccLSc/3J7voPd1Vb1ltS3NXh/59
-         OypKMKJ0iMeM6Ls+G8mpub5qMg8bEpRLQgdDfqWcWRODcddTn8AeHrn3txSp9vOd3iNu
-         ICIXUY+az8maNhpEZwtO02uDU4fJDD2xMdp95CuN/gMA1pE3/T2ggcntX0v/MKTzZDJG
-         fwTA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6f3JCw9S+G+sFihkHz/ywYtbJ9ntEBTImNvUgPH4OydrL5MytloLjcmdKfXKrG84DcWo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcvKt1yNAUTAWLJbSTZhuyNv4VSU2d2PEVUGkNwWm5K6kGeu9g
-	+CnF81qjryR2a3WpzOnkfuY50OPE2XpocR8oNeQGyDIlv6XdVq66+GQTtIrSh/OcieyAIIr8Ikq
-	dZYSwJU4cZlFxZ6IgssfQED4XRwnes+uFsmH0lQ==
-X-Gm-Gg: ASbGncuyJQM78gfbNbgyJfzQJRJWC7cs6lRi22PB5WYQp0wRFdKxZX4IBM0YDZnhtTF
-	rWcotAN40htz98Ui2kccyCB3sHWQ7xnN0ZR5KvpawW9iFPeufRUE2QMV2fpBFfwvlcagXKgEeq/
-	2NAoLSIKH9mHUKnGfDjbatApwk7rDtbO8uqQ==
-X-Google-Smtp-Source: AGHT+IE3Tx+D1sTsJd7eLqFty9WstV2/FtUKtjDrFtmODwKSFJySlTQeqvcdWL3dLUeN0h3IDPBFvj6uN+EjXA3kCW4=
-X-Received: by 2002:a05:6e02:1fcb:b0:3d8:975:b825 with SMTP id
- e9e14a558f8ab-3d97c141a61mr20039855ab.5.1746168777040; Thu, 01 May 2025
- 23:52:57 -0700 (PDT)
+	s=arc-20240116; t=1746172957; c=relaxed/simple;
+	bh=VrP6FYMiM8APrbbiFFr3vwipUq0BMzeGXIdgg8yPKw0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LCHlu1zSYY41ig/48LvnpO9otB1H8qnK5lJAz2V6++HLw/UNq3c6aR9r71UgJfjDGbsy+AtpDOc80YBA+a7cdxtk3Xv3w2GG7KlqKU8a5xw35u3t9UPtw39myLGqHMyXhxviHVio+U1AdfuDH/o+ZZtfR1jfVUXrKkoKQxEE3Uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o40ruDpd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE92BC4CEE4;
+	Fri,  2 May 2025 08:02:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746172956;
+	bh=VrP6FYMiM8APrbbiFFr3vwipUq0BMzeGXIdgg8yPKw0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o40ruDpdxuzYi5SlPXBVO3KE83CyehxDNrNO/541PgVjFTDFgkp9ttfsSywwoC2Xi
+	 deyF+fk2wjQxxc5XQRBVm8Bmt2O6KE/EWUyWPBtkP4DjmRVUsgvwR4qUU7TcNGYno2
+	 LrsDSCZuBZAWl/LYiTehIFOfFP/Ile60POceUApHmDdzreBk3ZrpTs99IMSeErgzEI
+	 qcVRENdvjn60dt64quynSDl7VztBTPTl/yjYLXHI6ByaM4mPy/wh1yniu8zkGauz6l
+	 KWZFS4mxzAp7qh9gzlauN/px1lSmL30l6NU2jcy73WKeezA7wFlGHek2h34pt4xuBA
+	 QpbqWIpAjreaA==
+Date: Fri, 2 May 2025 10:02:26 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: "Xin Li (Intel)" <xin@zytor.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
+	linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
+	linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
+	peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
+	alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+	irogers@google.com, adrian.hunter@intel.com,
+	kan.liang@linux.intel.com, wei.liu@kernel.org,
+	ajay.kaher@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+	tony.luck@intel.com, pbonzini@redhat.com, vkuznets@redhat.com,
+	seanjc@google.com, luto@kernel.org, boris.ostrovsky@oracle.com,
+	kys@microsoft.com, haiyangz@microsoft.com, decui@microsoft.com,
+	dapeng1.mi@linux.intel.com, ilpo.jarvinen@linux.intel.com
+Subject: Re: [PATCH v4 02/15] x86/msr: Move rdtsc{,_ordered}() to <asm/tsc.h>
+Message-ID: <aBR8EoYkxaFHwZN2@gmail.com>
+References: <20250427092027.1598740-1-xin@zytor.com>
+ <20250427092027.1598740-3-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 2 May 2025 12:22:46 +0530
-X-Gm-Features: ATxdqUGAB19XvC5KYJ0fhdKln-jTeRa6jT7I7LFhf0qZedVaeYBhPkotn1vsv9M
-Message-ID: <CAAhSdy09tkokvdvACCQACLdvppTTQHDOR+O4jtkhVP4PaW_k7w@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv fixes for 6.15 take #1
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
-	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, KVM General <kvm@vger.kernel.org>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250427092027.1598740-3-xin@zytor.com>
 
-Hi Paolo,
 
-We have one fix for the 6.15 kernel which adds missing
-reset of smstateen CSRs.
+* Xin Li (Intel) <xin@zytor.com> wrote:
 
-Please pull.
+> index 94408a784c8e..13335a130edf 100644
+> --- a/arch/x86/include/asm/tsc.h
+> +++ b/arch/x86/include/asm/tsc.h
+> @@ -7,7 +7,81 @@
+>  
+>  #include <asm/cpufeature.h>
+>  #include <asm/processor.h>
+> -#include <asm/msr.h>
+> +
+> +/*
+> + * both i386 and x86_64 returns 64-bit value in edx:eax, but gcc's "A"
+> + * constraint has different meanings. For i386, "A" means exactly
+> + * edx:eax, while for x86_64 it doesn't mean rdx:rax or edx:eax. Instead,
+> + * it means rax *or* rdx.
+> + */
+> +#ifdef CONFIG_X86_64
+> +/* Using 64-bit values saves one instruction clearing the high half of low */
+> +#define DECLARE_ARGS(val, low, high)	unsigned long low, high
+> +#define EAX_EDX_VAL(val, low, high)	((low) | (high) << 32)
+> +#define EAX_EDX_RET(val, low, high)	"=a" (low), "=d" (high)
+> +#else
+> +#define DECLARE_ARGS(val, low, high)	u64 val
+> +#define EAX_EDX_VAL(val, low, high)	(val)
+> +#define EAX_EDX_RET(val, low, high)	"=A" (val)
+> +#endif
 
-Regards,
-Anup
+Meh, this patch creates a duplicate copy of DECLARE_ARGS() et al in 
+<asm/tsc.h> now:
 
-The following changes since commit b4432656b36e5cc1d50a1f2dc15357543add530e=
-:
+ arch/x86/include/asm/msr.h:#define DECLARE_ARGS(val, low, high) unsigned long low, high
+ arch/x86/include/asm/msr.h:#define DECLARE_ARGS(val, low, high) u64 val
+ arch/x86/include/asm/msr.h:     DECLARE_ARGS(val, low, high);
+ arch/x86/include/asm/msr.h:     DECLARE_ARGS(val, low, high);
+ arch/x86/include/asm/msr.h:     DECLARE_ARGS(val, low, high);
+ arch/x86/include/asm/tsc.h:#define DECLARE_ARGS(val, low, high) unsigned long low, high
+ arch/x86/include/asm/tsc.h:#define DECLARE_ARGS(val, low, high) u64 val
+ arch/x86/include/asm/tsc.h:     DECLARE_ARGS(val, low, high);
+ arch/x86/include/asm/tsc.h:     DECLARE_ARGS(val, low, high);
+ arch/x86/include/asm/tsc.h:#undef DECLARE_ARGS
 
-  Linux 6.15-rc4 (2025-04-27 15:19:23 -0700)
+Which was both an undeclared change, bloats the code, causes various 
+problems, and is totally unnecessary to boot.
 
-are available in the Git repository at:
+Please don't do that ...
 
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.15-1
+Thanks,
 
-for you to fetch changes up to 87ec7d5249bb8ebf40261420da069fa238c21789:
-
-  KVM: RISC-V: reset smstateen CSRs (2025-05-01 18:26:14 +0530)
-
-----------------------------------------------------------------
-KVM/riscv fixes for 6.15, take #1
-
-- Add missing reset of smstateen CSRs
-
-----------------------------------------------------------------
-Radim Kr=C4=8Dm=C3=A1=C5=99 (1):
-      KVM: RISC-V: reset smstateen CSRs
-
- arch/riscv/kvm/vcpu.c | 2 ++
- 1 file changed, 2 insertions(+)
+	Ingo
 
