@@ -1,318 +1,194 @@
-Return-Path: <kvm+bounces-45191-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45194-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE999AA69FC
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 07:05:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13899AA6A53
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 07:47:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B29629C1B82
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 05:04:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F6C798633E
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 05:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647921C8632;
-	Fri,  2 May 2025 05:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FFB1DB125;
+	Fri,  2 May 2025 05:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ND/9kl0w"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="R4OZ87Vt"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2045.outbound.protection.outlook.com [40.107.93.45])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E321C15DBB3;
-	Fri,  2 May 2025 05:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746162274; cv=fail; b=fmc4LNMyU70bAsSz7sNBmN5THEN5wvY9nttcHydH/laeKMQ7LstBzFBLTuyLBYKrVGRDuXxU6n1oKm2hFLYVtxpOT6/qtTMd/9+ZPBfYc1mejsNVV0jd+T8cScAdfcFeOv2r3SHJps8tEfDSzzrr6dqX66kwEfrs5U0vLSwUwUc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746162274; c=relaxed/simple;
-	bh=gjggo3NkCWuUz0cOz45wrYK0CGAlxp92vIZwdT4DLMg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I4mHJY9/+YTcD5RDs1FIgzRlHjpBQ3blDm6M6dHsSPQkK5+UmZs0lCQMtGEInM7o0zezywfRUWyYVRAu6zzDYBeJt0n7sBXmKX+RfTFCwIEh9IXBfqPTjPYHqWzQHlaTYv19niy3npvs61GCmy1MtcQCFdV5TEns9Y2wTbP5OsI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ND/9kl0w; arc=fail smtp.client-ip=40.107.93.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PZEgAdlUovaFljzRtbYouZH4h/0fAWET1EDTCA6aKUxb+qTLiM+OM1pb+TuVI5/FOGHNXqsRLCbLTOWQ5n0FVQyNvspYB4tG9bu06O401omRK/MLVdr/uBBkZvXj3ALh1OMtQgiseUKR8hKCgQVq3rmcRtSaymUJaZH7NRXtZtTZyIdX0vBPYqHHRNdItsu5vVBiEj6j8K57MihROb9rH9NSFwgTWVxbZK5F8o+8i6IK1NRcg57/D4J3s6qSnKcXCMC9Be4ePe5z2K8PnwUP2V8qmQWFFdzlJxdFOk8qhV8aAWjdpW3aY5WSthrilqH+W1wSyQ1KhK/vz/EhIKnCpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PkGlW2bhsmg03J9dWTNgmMep9hUmKyD2f+AfK7+W/RQ=;
- b=vefqXHkWTi5Srb/Z7sapdrAsv8lA8pfStgIN2LoHRYVC0r8HXx7y5e6XvwQBJbEccGZf4PnZbbCQu9j+Q1nteS2jL42f0UEdZTOWcEc+/dCOUqN+nJ0mCtLNSYP+Nia7W7Gb4CNTUBPWWhRkqjum6VEXb1/IU44dNYf29iwTpTbqm4yIFOrvfplbfOFVQI4QmM+2igQ64QVaY9YM1maGab6DaLO4Q+KjjvF5vIYH4FxetSmQxgaZJ/sFiD2Tn4Yxn5SlmlDOFmWteTo7MvPVpcReiH5K107whCx4DFxs7qGvLirea46k4LE8ABMN0m/1ulUs7l0ZZzfi3Vo7ZpBQ9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PkGlW2bhsmg03J9dWTNgmMep9hUmKyD2f+AfK7+W/RQ=;
- b=ND/9kl0w9tQCDcg7d19/VSSNHAnhaoRpB1NxrDExpPmcuGct56hWtb3RaR76yPyxa+MSoKvhcIN7D9pyXZoXVV2l7yqq4onmidTcpLV1QtqLb8IWDRkCX0wcPWstG1l2UV81Ljtl2tNiGu8x/KvDHFWr/npt5qUAgEhVbsBusKM=
-Received: from BL0PR0102CA0055.prod.exchangelabs.com (2603:10b6:208:25::32) by
- CH2PR12MB9458.namprd12.prod.outlook.com (2603:10b6:610:280::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.33; Fri, 2 May
- 2025 05:04:27 +0000
-Received: from BL02EPF0001A102.namprd05.prod.outlook.com
- (2603:10b6:208:25:cafe::3d) by BL0PR0102CA0055.outlook.office365.com
- (2603:10b6:208:25::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8699.24 via Frontend Transport; Fri,
- 2 May 2025 05:04:26 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF0001A102.mail.protection.outlook.com (10.167.241.134) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8699.20 via Frontend Transport; Fri, 2 May 2025 05:04:27 +0000
-Received: from brahmaputra.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 2 May
- 2025 00:04:24 -0500
-From: Manali Shukla <manali.shukla@amd.com>
-To: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <nikunj@amd.com>,
-	<manali.shukla@amd.com>, <bp@alien8.de>
-Subject: [PATCH v5 5/5] KVM: selftests: Add bus lock exit test
-Date: Fri, 2 May 2025 05:03:46 +0000
-Message-ID: <20250502050346.14274-6-manali.shukla@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250502050346.14274-1-manali.shukla@amd.com>
-References: <20250502050346.14274-1-manali.shukla@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B1EBA3F;
+	Fri,  2 May 2025 05:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746164858; cv=none; b=dq6+nKnO1k/ON5frBE0WZ+2ob9d6nUxFB2OayTzWBEuUXUuxT5F9SjZW06RPDKz15eUzg8p18bi2NFOxP4fu6IhWJYXMfs7ybDldQuTtWjBnuV8oxNbhnsm87EZZY3ToTjOwM8A5bk7SrWfL1qk/v+FMGRWY3p4f1TrCZaOGwE8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746164858; c=relaxed/simple;
+	bh=CRlm8DglgsjDBM3aRfMpTQ7akikLGNAa4uzuEFyxihU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WhreWaRz97+Utjfse6yzwNrIqv72g9T1M3gvU15ZDibMGGjrTa28SULnO3r/n/7m2M8YmBtbrWAC+KFZ22b3Xz88mu/bsIaniVy9vFYfJdupLSn60xRURoKidTcQ5StnkmFmkngzntHcuy1avT83y1QLIqd1G4RlKWI2Vz/w0ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=R4OZ87Vt; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5425kkje1780668
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Thu, 1 May 2025 22:46:47 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5425kkje1780668
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1746164809;
+	bh=MGfso3qvTctMT+qsQxGakZO6pbzlMRbsUmiKDI86FZ0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=R4OZ87Vtppt5v9J2EdCzFLGVKWqP9EyshJYqWkW/qTgZnPrKpAhmgz8UT6Lojiu5l
+	 3QxrJYjGaM6aeq1eXQl6//Q5LykfWO5JlHATefd0jJ3v3VKCPJg+MIR68f3r6FpFxK
+	 8EIKOQe66SNOYTTakLEaSq1FAWyDFKx+7iRJKmpNvkKCckyVnN9JkgFVdRZaBePpUX
+	 G3GLZWcf3mlcEh3Jo/PBnU7abFTYXnU6q9bRCny3G16L20vDzM7u5tQ2mA/xjHPwXP
+	 t6yVIaio1jQGUu4AErWBVEVJjIujrXCOMnr4hHudfxLoqaUxld7T63lIdgwLtHTD7s
+	 IKsiUxtRR1dXQ==
+Message-ID: <5e9bfa4b-4440-4d7b-895c-03a3358d4ae6@zytor.com>
+Date: Thu, 1 May 2025 22:46:45 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A102:EE_|CH2PR12MB9458:EE_
-X-MS-Office365-Filtering-Correlation-Id: 87cb2dcf-a3f6-4792-6f95-08dd8936d033
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?y9p6yJM2o47DpDluAHTP9FSMmrChlfhOZL/2BgquS6tusx1XF4mbC+4zhxL6?=
- =?us-ascii?Q?55UT0Cekb5LLGuvwhVfYkJmt3/fPlBLttaj6ZE7eeegs3Iif6EHd952Kux4V?=
- =?us-ascii?Q?RaaXautM/iuvTqm4xr5lKoZ7B4Tj2/ulOCJj5t/7exOTC/6Bu4JRt+N9LEbC?=
- =?us-ascii?Q?E/5rnEH3EDzzGFA31QhCtK/slvbCkKXrpFgvuBxYK7Oldw7r725MvZDRK3HM?=
- =?us-ascii?Q?Vj/MYlbMcocFrYkKe5e2Yvc551mRlMGTX9Krhrz0TyUFCsETa7s8hW9qHAuo?=
- =?us-ascii?Q?wlEuOtHq5eWjNwtzSRxw9WlUKna7Z6X0zT07t0eVxl2BiAxu8CIFbKzut8S1?=
- =?us-ascii?Q?0pxnIytvfLjaQXUnELSgTcRYwcCLPRI8Q/RreSY5ChWBohicLB7HbjFf0/qT?=
- =?us-ascii?Q?4TuA6qvhp7TQRk1sExx1kkRLJJKMSF+NSo6HGX3CCluJEw1KCroidTufJOUr?=
- =?us-ascii?Q?1phMgqAW6g6NxQaYiyWlkE4wW3OX7Wk7AfhjErH5UBO6/kb/8mN+i11hhyr8?=
- =?us-ascii?Q?7n3EpwmQSuhtqT+XuI9GTikSfJaw/3VJ4H0xHX0RGBoV/XoaV5SYjX5gtabG?=
- =?us-ascii?Q?Ygji3ggQvknu8hUVx9Wz7L4zEYJ5y5y///w0vxR4l8vRmLu0SXil7iq0cevt?=
- =?us-ascii?Q?E1v/WAjHD6rb9K3xM57y0QCZ9rlrVwem5tCeA8JmEUZArlZqjQdm/OgpCtdf?=
- =?us-ascii?Q?tBOOCpwmxerO+UdespzBKsGmMfdZ407U3c5KE0dAlLCc7Vac6zT4ktPZvMTW?=
- =?us-ascii?Q?woPMzarioNQHNsLPQRfT5VnwXwoZM2YRVRG8UyoUJyTDryPBUiHjEPy/YJOt?=
- =?us-ascii?Q?FROGNupSd/9sl1sNF5YK//t+E4wivzU2G0k642A5PMQMzD9h+TPgxy8YWCq0?=
- =?us-ascii?Q?YKF8ou3vtnJ19RER/9QuS0FhGKwhrbFBlJJWWnFuN3t7hHqSO6T3pKAtjDoG?=
- =?us-ascii?Q?b+XiogT7k2obEoNjnGtiPN4DB+XD4PpMObuAS6cNnK6FzI/vgVYaBNwFYm5j?=
- =?us-ascii?Q?d0axnE3Xwbf+zDfaNzOS2n060OwrYEbwf7+gt7PFvB8V7v02pAaUgaXNGBTG?=
- =?us-ascii?Q?NoU6iWbyGovY8AAQ1kdk7mdnieLWQ9myUUizJnTh7z6ewvtXy134Yeez5oKC?=
- =?us-ascii?Q?G8xcWDhhu5SiOExBMfvMDisUbLAoYqbNrEhBtd76Zl4dagUFy2w7jal6ScHS?=
- =?us-ascii?Q?ZtZBArR++P6HPIsC0eZZdizzB67jgzKXePoX1geS25Ha4CR3KM9KCUSQhHQC?=
- =?us-ascii?Q?5/YALwvBqMYuv5W54gau8A3qTlal6M2IX6j8Aw17GP3vUth3vHI90mQoZpuQ?=
- =?us-ascii?Q?Qd1ZttPU9wWtlXBo1O/P2GII+b5bUYPtQHo2szJ31S83kEnaI0IW4rM2I577?=
- =?us-ascii?Q?V3y1C08UqFE54CZODSaQrtKmaUVEHUkEtsLc8lEvTzGPAAPZUWx89yrFYSJ9?=
- =?us-ascii?Q?aAkMj2xOrvBNBtK9c+3qLjK0DUptunwcZL7WZZYgKwLZdH0/7fnP7zU1eeyy?=
- =?us-ascii?Q?PJZcns6TcpcY1VA79TUmmWMWj+5xEkdmnNY9?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2025 05:04:27.0308
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87cb2dcf-a3f6-4792-6f95-08dd8936d033
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A102.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB9458
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls in
+ __nocfi functions
+To: Sean Christopherson <seanjc@google.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kys@microsoft.com,
+        haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, pbonzini@redhat.com, ardb@kernel.org,
+        kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        gregkh@linuxfoundation.org, jpoimboe@kernel.org,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-efi@vger.kernel.org,
+        samitolvanen@google.com, ojeda@kernel.org
+References: <20250430110734.392235199@infradead.org>
+ <8B86A3AE-A296-438C-A7A7-F844C66D0198@zytor.com>
+ <20250430190600.GQ4439@noisy.programming.kicks-ass.net>
+ <20250501103038.GB4356@noisy.programming.kicks-ass.net>
+ <20250501153844.GD4356@noisy.programming.kicks-ass.net>
+ <aBO9uoLnxCSD0UwT@google.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <aBO9uoLnxCSD0UwT@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Nikunj A Dadhania <nikunj@amd.com>
+>> Something like so... except this is broken. Its reporting spurious
+>> interrupts on vector 0x00, so something is buggered passing that vector
+>> along.
 
-Add a test case to verify the Bus Lock exit feature
+I'm a bit late to the party :)
 
-The main thing that the selftest verifies is that when a Buslock is
-generated in the guest context, the KVM_EXIT_X86_BUS_LOCK is triggered
-for SVM or VMX when the KVM capability KVM_CAP_X86_BUS_LOCK_EXIT is
-enabled.
+Peter kind of got what I had in the FRED patch set v8 or earlier:
 
-This test case also verifies the Bus Lock exit in nested scenario.
+https://lore.kernel.org/lkml/20230410081438.1750-34-xin3.li@intel.com/
 
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-Co-developed-by: Manali Shukla <manali.shukla@amd.com>
-Signed-off-by: Manali Shukla <manali.shukla@amd.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/x86/kvm_buslock_test.c      | 135 ++++++++++++++++++
- 2 files changed, 136 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/kvm_buslock_test.c
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index f62b0a5aba35..fa65b82c1f53 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -78,6 +78,7 @@ TEST_GEN_PROGS_x86 += x86/hyperv_svm_test
- TEST_GEN_PROGS_x86 += x86/hyperv_tlb_flush
- TEST_GEN_PROGS_x86 += x86/kvm_clock_test
- TEST_GEN_PROGS_x86 += x86/kvm_pv_test
-+TEST_GEN_PROGS_x86 += x86/kvm_buslock_test
- TEST_GEN_PROGS_x86 += x86/monitor_mwait_test
- TEST_GEN_PROGS_x86 += x86/nested_emulation_test
- TEST_GEN_PROGS_x86 += x86/nested_exceptions_test
-diff --git a/tools/testing/selftests/kvm/x86/kvm_buslock_test.c b/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
-new file mode 100644
-index 000000000000..9c081525ac2a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
-@@ -0,0 +1,135 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2024 Advanced Micro Devices, Inc.
-+ */
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "svm_util.h"
-+#include "vmx.h"
-+
-+#define NR_ITERATIONS 100
-+#define L2_GUEST_STACK_SIZE 64
-+
-+#pragma GCC diagnostic push
-+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
-+
-+struct buslock_test {
-+	unsigned char pad[PAGE_SIZE - 2];
-+	atomic_long_t val;
-+} __packed;
-+
-+struct buslock_test test __aligned(PAGE_SIZE);
-+
-+static __always_inline void buslock_atomic_add(int i, atomic_long_t *v)
-+{
-+	asm volatile(LOCK_PREFIX "addl %1,%0"
-+		     : "+m" (v->counter)
-+		     : "ir" (i) : "memory");
-+}
-+
-+static void buslock_add(void)
-+{
-+	/*
-+	 * Increment a page unaligned variable atomically.
-+	 * This should generate a bus lock exit.
-+	 */
-+	for (int i = 0; i < NR_ITERATIONS; i++)
-+		buslock_atomic_add(2, &test.val);
-+}
-+
-+#pragma GCC diagnostic pop
-+
-+static void l2_guest_code(void)
-+{
-+	buslock_add();
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code(struct svm_test_data *svm)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb = svm->vmcb;
-+
-+	generic_svm_setup(svm, l2_guest_code,
-+			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+	run_guest(vmcb, svm->vmcb_gpa);
-+	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
-+	GUEST_DONE();
-+}
-+
-+static void l1_vmx_code(struct vmx_pages *vmx)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+
-+	GUEST_ASSERT_EQ(prepare_for_vmx_operation(vmx), true);
-+	GUEST_ASSERT_EQ(load_vmcs(vmx), true);
-+
-+	prepare_vmcs(vmx, NULL, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	GUEST_ASSERT(!vmwrite(GUEST_RIP, (u64)l2_guest_code));
-+	GUEST_ASSERT(!vmlaunch());
-+
-+	GUEST_ASSERT_EQ(vmreadz(VM_EXIT_REASON), EXIT_REASON_VMCALL);
-+	GUEST_DONE();
-+}
-+
-+static void guest_code(void *test_data)
-+{
-+	buslock_add();
-+
-+	if (this_cpu_has(X86_FEATURE_SVM))
-+		l1_svm_code(test_data);
-+	else
-+		l1_vmx_code(test_data);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+	vm_vaddr_t nested_test_data_gva;
-+
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM) || kvm_cpu_has(X86_FEATURE_VMX));
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_BUS_LOCK_EXIT));
-+
-+	vm = vm_create(1);
-+	vm_enable_cap(vm, KVM_CAP_X86_BUS_LOCK_EXIT, KVM_BUS_LOCK_DETECTION_EXIT);
-+	vcpu = vm_vcpu_add(vm, 0, guest_code);
-+
-+	if (kvm_cpu_has(X86_FEATURE_SVM))
-+		vcpu_alloc_svm(vm, &nested_test_data_gva);
-+	else
-+		vcpu_alloc_vmx(vm, &nested_test_data_gva);
-+
-+	vcpu_args_set(vcpu, 1, nested_test_data_gva);
-+
-+	run = vcpu->run;
-+
-+	for (;;) {
-+		struct ucall uc;
-+
-+		vcpu_run(vcpu);
-+
-+		if (run->exit_reason == KVM_EXIT_IO) {
-+			switch (get_ucall(vcpu, &uc)) {
-+			case UCALL_ABORT:
-+				REPORT_GUEST_ASSERT(uc);
-+				/* NOT REACHED */
-+			case UCALL_SYNC:
-+				continue;
-+			case UCALL_DONE:
-+				goto done;
-+			default:
-+				TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
-+			}
-+		}
-+
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_X86_BUS_LOCK);
-+	}
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.34.1
+> Uh, aren't you making this way more complex than it needs to be?  IIUC, KVM never
+> uses the FRED hardware entry points, i.e. the FRED entry tables don't need to be
+> in place because they'll never be used.  The only bits of code KVM needs is the
+> __fred_entry_from_kvm() glue.
 
++1
+
+> 
+> Lightly tested, but this combo works for IRQs and NMIs on non-FRED hardware.
+> 
+> --
+>  From 664468143109ab7c525c0babeba62195fa4c657e Mon Sep 17 00:00:00 2001
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Thu, 1 May 2025 11:20:29 -0700
+> Subject: [PATCH 1/2] x86/fred: Play nice with invoking
+>   asm_fred_entry_from_kvm() on non-FRED hardware
+> 
+> Modify asm_fred_entry_from_kvm() to allow it to be invoked by KVM even
+> when FRED isn't fully enabled, e.g. when running with CONFIG_X86_FRED=y
+> on non-FRED hardware.  This will allow forcing KVM to always use the FRED
+> entry points for 64-bit kernels, which in turn will eliminate a rather
+> gross non-CFI indirect call that KVM uses to trampoline IRQs by doing IDT
+> lookups.
+> 
+> When FRED isn't enabled, simply skip ERETS and restore RBP and RSP from
+> the stack frame prior to doing a "regular" RET back to KVM (in quotes
+> because of all the RET mitigation horrors).
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/entry/entry_64_fred.S | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/entry/entry_64_fred.S b/arch/x86/entry/entry_64_fred.S
+> index 29c5c32c16c3..7aff2f0a285f 100644
+> --- a/arch/x86/entry/entry_64_fred.S
+> +++ b/arch/x86/entry/entry_64_fred.S
+> @@ -116,7 +116,8 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
+>   	movq %rsp, %rdi				/* %rdi -> pt_regs */
+>   	call __fred_entry_from_kvm		/* Call the C entry point */
+>   	POP_REGS
+> -	ERETS
+> +
+> +	ALTERNATIVE "", __stringify(ERETS), X86_FEATURE_FRED
+
+Neat!
+
+I ever had a plan to do this with "sub $0x8,%rsp; iret;" for non-FRED
+case.  But obviously doing nothing here is the best.
+
+>   1:
+>   	/*
+>   	 * Objtool doesn't understand what ERETS does, this hint tells it that
+> @@ -124,7 +125,7 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
+>   	 * isn't strictly needed, but it's the simplest form.
+>   	 */
+>   	UNWIND_HINT_RESTORE
+> -	pop %rbp
+> +	leave
+
+This is a smart change.
+
+When !X86_FEATURE_FRED, the FRED stack frame set up for ERETS is
+implicitly skipped by leave.  Maybe add a comment to explain LEAVE works
+for both cases?
 
