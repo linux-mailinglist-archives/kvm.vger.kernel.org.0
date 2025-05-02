@@ -1,142 +1,194 @@
-Return-Path: <kvm+bounces-45271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BABAAA7C2E
-	for <lists+kvm@lfdr.de>; Sat,  3 May 2025 00:30:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB4CBAA7C32
+	for <lists+kvm@lfdr.de>; Sat,  3 May 2025 00:35:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D808F465B72
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 22:30:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DD8B1BC4ABC
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 22:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4236721B18B;
-	Fri,  2 May 2025 22:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F7A21ABB8;
+	Fri,  2 May 2025 22:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xc8LghqX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ij9ysuqP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD5A21930A
-	for <kvm@vger.kernel.org>; Fri,  2 May 2025 22:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFC128F1
+	for <kvm@vger.kernel.org>; Fri,  2 May 2025 22:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746224997; cv=none; b=N7Py2ZkIejBR9KJQi54KK3+ld/JBPk5VNDu0C5G6Rno2gLJp716lePe5hKpL8TEXWdItaXmB2no8QxQzCPsjs26r85FxRY0Y2WdZqlmD19MoYCrzrhO6id7xyP/laRXz238jJrIyzppnAKC/bxSqaZwnMm1FMdcLQrgssNeM/2c=
+	t=1746225301; cv=none; b=O6zeHNsRFFzPihNSDJKIm+A6S07fQaZ4uVt3wT+xpk3330kbnC0Bs7zbn4G9JfoSOiM7wHtFy/2wYVS5ETrEH05EHyCPR38NcvnAxVZRCwMQmhhFCSVXtrTh3fsBJkLgppKOkPM6h8CHj5dtgaHt7T6Lmk8fsUkeowWGp5PZmU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746224997; c=relaxed/simple;
-	bh=WRprQuXwQYUdAX3VvHmPFZFxoQTSuamF1CjOBaRexEw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Yq4zKCMyLM2ZMU8fT2wpa8bBZUNUGSIgykc1KVuJratedgoo6FFUElNBiXgPFpHN1wnuzrlt4A6SsMBpAywr3KDav8bh1qkVQhgTuOmx2QjkRSZxTr487dFaWxhIYgZWYpzbivqgCiEMzyHbECn2YXlOo7rmcerYhooo2fGNgGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xc8LghqX; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1746225301; c=relaxed/simple;
+	bh=jfXsnIIu2VwY0c7zeFjxjocJ4orROMa5yuTcrfzPiZw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=X8sZw0anO4QmQG+KKVR3eKrib279dPmwuIqk50h9/lBRwJGtCv9tpeHDAfSPcC+YANp+HGE7aNqsQ9r3Jlf75KmqqKt67R3rGSbkMPQRgvVjEW33kAEJF0WDik87LWef0cFZ99repQknBqUQdgw9D8rV3sCcaL6wepkuYLC2MGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ij9ysuqP; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b1f8d149911so2138075a12.0
-        for <kvm@vger.kernel.org>; Fri, 02 May 2025 15:29:55 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30828f9af10so3644267a91.3
+        for <kvm@vger.kernel.org>; Fri, 02 May 2025 15:34:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746224995; x=1746829795; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cEuzKW2y7BbwGxZiqaIrnvqUkmvau3D7fQI+/6GPgqc=;
-        b=Xc8LghqXUJI4C1318gfx1lGWLm9BpJXQJFKFnyHJ4QmsxnVmI3ap1lVJvrbL3/OwKB
-         w71p1/CGizZy+NpStUh4wcRS8IoTarHnPXhHsz9SnVvmZjSi4BoF9/B6fSnJgIBxSQAf
-         BW3w5S1ZXkql74cRGdgR6DcHVXbld4lTHhysmvgsfK2g/3NNkmAcPLmIywJCqMIa82l8
-         /5MpSRRW1/5QmeMAfEy4tCxwJW4qhmywXj3aURj4u7fTSDZxk5N1ByNlTQdIDygg122l
-         xjAdi/x+REzrPB0icU15Uy9O+kDnAumdTVbKJ6fRdzQsnKo2rM+ddlcv7SX4S/lzHpxb
-         UoHw==
+        d=google.com; s=20230601; t=1746225299; x=1746830099; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KWVFcVyteM0rANhl8jUHaWIPAf+EazchM+HNHio5hZg=;
+        b=Ij9ysuqPhaKQa2iqJtaujgY5AWGr9mG9/RTExbyKQ0eJ0d3ovcCfADgLlxCslrqOds
+         b2VdApiZbH6rBR6AtIQetA74oDYJeH+RhBsJFy7216duL7WQX29T99x6cO70Jf5ddfpz
+         9GvXUApTKWAiP7arRTuEkz+fxqmivFWAS5uFubwY5g2flcfHG38ift1wH3rRGFrxNSzV
+         Nm7wreS3yu5tHdJKTTgj/JFhWJyPvsFF8vLJKcV4sgqgdMGtB52BtqdrsZvjJxUTb6vj
+         QrxMuPgGOZvN4jeoXtLLN8EPRBN/7oVo8N2HRVOQjufzuLtkTSGBUkggR1r46omVJQ/y
+         KgAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746224995; x=1746829795;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cEuzKW2y7BbwGxZiqaIrnvqUkmvau3D7fQI+/6GPgqc=;
-        b=U2s6y5NzVaStJILoXRaQHq6VNOLV71gWqHc/IX+jmC/PKxP+P9q1kXT1Um7fUfLCm5
-         kizTTRzgrtIC1/HLeuhsVjgfQy+QmLImnx7DnVrMLSB0skk/J6AFcjDTdaxwvrTxERIy
-         Nr/UXMvAAUoumekRQCeZ/9QOB/c88Y55amacImjtESuHosFUVkzcvh9LYKORR4xzIpiu
-         dZNji5B93ZNtZgx1JtUcM8FVZQKckHZ3kAaxYT4aLJTDV2BYjL78pNVdze3/n5GFo12K
-         rHiguoTsgxYP88WSzs9Sytc+0kQEqMTZVOWGGqOB4kqcKnfZM/5rjE/wao+6Ftu9iFA6
-         pyKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOEMAenVzIlLAH7OvZOLS7QZz6OBIvQdE9GskyXetTL/mVsA5Vr6v64dyHROuvc2qbImQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbB4Ctyrv+6VESC3KHcpvrPAyoo107L3zAYD4RukE96uYeaLZA
-	zsyMgYD3lAyb61QVUkgwVd2/TyqLAF7m+HCcjRnW/HZ8beBsXwNgHGLl1UZEly3hlCTdgopmWR7
-	eVd/wjhBv7z6pfIU27fM5Ag==
-X-Google-Smtp-Source: AGHT+IEe8vGqQMSVxj7BjlZnuHTpqW1DIVZRC/VuAU5zKlDI1sbph3EfDhEdBDxNlN3ephIXKE5DhPs2EIiGRazdeA==
-X-Received: from pfbgp2.prod.google.com ([2002:a05:6a00:3b82:b0:73f:ff56:7ac2])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:ce4b:b0:1ee:c390:58ac with SMTP id adf61e73a8af0-20e075094e5mr1382934637.34.1746224995154;
- Fri, 02 May 2025 15:29:55 -0700 (PDT)
-Date: Fri, 02 May 2025 15:29:53 -0700
-In-Reply-To: <20250430165655.605595-9-tabba@google.com>
+        d=1e100.net; s=20230601; t=1746225299; x=1746830099;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KWVFcVyteM0rANhl8jUHaWIPAf+EazchM+HNHio5hZg=;
+        b=N0v4v2qHW16YzzPHgUFeM6UC1/w6+ZoGdmBxhEUxNaMp5CMVVVSOag3yrnkS9psHbn
+         rw6j7tP8tzOV3gyIJOvHoD98BsQZgkcW+4MmhkWVQu2dH/zvC7kpTg99uqmdJDhZgNe0
+         R6CocW6M4+1PtPiwOVng9wjl0D8VFKK8CNIMzK15P6eiFW2UhsBCiOziqboE91yXrhk6
+         LDT4yY6K2z/K27Bcz06BRglKJTqt/DbkF8NdimEp/LsC7bONW9ruT2Zfe/pp9aXeB/Dk
+         8GUqIpNhYMXKnuajXkL0UXdxYMDQsyyEnhpyyUxGTiNYQrxjeYfnGsiH59AoY34WSDhi
+         08pA==
+X-Gm-Message-State: AOJu0YzvWEQasZOE3ppclSK2sQ5TzRqU9HNFa3In9P/NJvdqKlIG2u3M
+	RGf5lyrPulIxeOoUErOW3DT7CmZZYc54r9JzsR3FondgO8LRRLAQAdAZ2ViCy0oUBJx2viQo2c4
+	Dgg==
+X-Google-Smtp-Source: AGHT+IF80pgQ+j2xTDzPXwHebe4UI50ZVfwHe6IkhFUfpDgyVqGJc1Jvql34RQu3S0D0rnfWmpMDMB/HWeQ=
+X-Received: from pjuj6.prod.google.com ([2002:a17:90a:d006:b0:2fc:d77:541])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d648:b0:2ff:53a4:74f0
+ with SMTP id 98e67ed59e1d1-30a4e6aa8d7mr7031771a91.29.1746225299268; Fri, 02
+ May 2025 15:34:59 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri,  2 May 2025 15:34:56 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250430165655.605595-1-tabba@google.com> <20250430165655.605595-9-tabba@google.com>
-Message-ID: <diqzecx6prxa.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v8 08/13] KVM: guest_memfd: Allow host to map
- guest_memfd() pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
-	pankaj.gupta@amd.com, tabba@google.com
+X-Mailer: git-send-email 2.49.0.906.g1f30a19c02-goog
+Message-ID: <20250502223456.887618-1-seanjc@google.com>
+Subject: [PATCH] KVM: SVM: Set/clear SRSO's BP_SPEC_REDUCE on 0 <=> 1 VM count transitions
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Michael Larabel <Michael@michaellarabel.com>, Borislav Petkov <bp@alien8.de>
 Content-Type: text/plain; charset="UTF-8"
 
-Fuad Tabba <tabba@google.com> writes:
+Set the magic BP_SPEC_REDUCE bit to mitigate SRSO when running VMs if and
+only if KVM has at least one active VM.  Leaving the bit set at all times
+unfortunately degrades performance by a wee bit more than expected.
 
-> Add support for mmap() and fault() for guest_memfd backed memory
-> in the host for VMs that support in-place conversion between
-> shared and private. To that end, this patch adds the ability to
-> check whether the VM type supports in-place conversion, and only
-> allows mapping its memory if that's the case.
->
-> This patch introduces the configuration option KVM_GMEM_SHARED_MEM,
-> which enables support for in-place shared memory.
->
-> It also introduces the KVM capability KVM_CAP_GMEM_SHARED_MEM, which
-> indicates that the host can create VMs that support shared memory.
-> Supporting shared memory implies that memory can be mapped when shared
-> with the host.
->
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  include/linux/kvm_host.h | 15 ++++++-
->  include/uapi/linux/kvm.h |  1 +
->  virt/kvm/Kconfig         |  5 +++
->  virt/kvm/guest_memfd.c   | 92 ++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/kvm_main.c      |  4 ++
->  5 files changed, 116 insertions(+), 1 deletion(-)
->
-> <snip>
+Use a dedicated spinlock and counter instead of hooking virtualization
+enablement, as changing the behavior of kvm.enable_virt_at_load based on
+SRSO_BP_SPEC_REDUCE is painful, and has its own drawbacks, e.g. could
+result in performance issues for flows that are sensitive to VM creation
+latency.
 
-At the guest_memfd call on 2025-05-01, we discussed that if guest_memfd
-is created with GUEST_MEMFD_FLAG_SUPPORT_SHARED set, then if
-slot->userspace_addr != 0, we would validate that the folio
-slot->userspace_addr points to matches up with the folio guest_memfd
-would return for the same offset.
+Similarly, don't bother optimizing the 1=>N and N=>1 transitions, e.g. by
+using atomic_inc_return() to avoid taking the spinlock, as ensuring that
+BP_SPEC_REDUCE is guaranteed to be set before KVM_RUN is non-trivial.  KVM
+already serializes VM creation against kvm_lock (to add the VM to vm_list),
+and the spinlock will only be held for a handful of cycles for the 1<=>N
+cases.  I.e. the complexity needed to ensure correctness outweighs the
+marginal benefits of eliding the lock.  See the Link for details.
 
-I can think of one way to do this validation, which is to call KVM's
-hva_to_pfn() function and then call kvm_gmem_get_folio() on the fd and
-offset, and then check that the PFNs are equal.
+Link: https://lore.kernel.org/all/aBOnzNCngyS_pQIW@google.com
+Fixes: 8442df2b49ed ("x86/bugs: KVM: Add support for SRSO_MSR_FIX")
+Reported-by: Michael Larabel <Michael@michaellarabel.com>
+Closes: https://www.phoronix.com/review/linux-615-amd-regression
+Cc: Borislav Petkov <bp@alien8.de>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/svm.c | 43 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 37 insertions(+), 6 deletions(-)
 
-However, that would cause the page to be allocated. Any ideas on how we
-could do this validation without allocating the page?
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index cc1c721ba067..364959fd1040 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -607,9 +607,6 @@ static void svm_disable_virtualization_cpu(void)
+ 	kvm_cpu_svm_disable();
+ 
+ 	amd_pmu_disable_virt();
+-
+-	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
+-		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
+ }
+ 
+ static int svm_enable_virtualization_cpu(void)
+@@ -687,9 +684,6 @@ static int svm_enable_virtualization_cpu(void)
+ 		rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
+ 	}
+ 
+-	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
+-		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
+-
+ 	return 0;
+ }
+ 
+@@ -5032,10 +5026,46 @@ static void svm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+ 	sev_vcpu_deliver_sipi_vector(vcpu, vector);
+ }
+ 
++#ifdef CONFIG_CPU_MITIGATIONS
++static DEFINE_SPINLOCK(srso_lock);
++static int srso_nr_vms;
++
++static void svm_toggle_srso_spec_reduce(void *set)
++{
++	if (set)
++		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
++	else
++		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
++}
++
++static void svm_srso_add_remove_vm(int count)
++{
++	bool set;
++
++	if (!cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
++		return;
++
++	guard(spinlock)(&srso_lock);
++
++	set = !srso_nr_vms;
++	srso_nr_vms += count;
++
++	WARN_ON_ONCE(srso_nr_vms < 0);
++	if (!set && srso_nr_vms)
++		return;
++
++	on_each_cpu(svm_toggle_srso_spec_reduce, (void *)set, 1);
++}
++#else
++static void svm_srso_add_remove_vm(int count) { }
++#endif
++
+ static void svm_vm_destroy(struct kvm *kvm)
+ {
+ 	avic_vm_destroy(kvm);
+ 	sev_vm_destroy(kvm);
++
++	svm_srso_add_remove_vm(-1);
+ }
+ 
+ static int svm_vm_init(struct kvm *kvm)
+@@ -5061,6 +5091,7 @@ static int svm_vm_init(struct kvm *kvm)
+ 			return ret;
+ 	}
+ 
++	svm_srso_add_remove_vm(1);
+ 	return 0;
+ }
+ 
+
+base-commit: 45eb29140e68ffe8e93a5471006858a018480a45
+-- 
+2.49.0.906.g1f30a19c02-goog
+
 
