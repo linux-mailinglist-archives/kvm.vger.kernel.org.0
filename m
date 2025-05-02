@@ -1,173 +1,293 @@
-Return-Path: <kvm+bounces-45249-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45250-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48E93AA792C
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 20:10:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17046AA7A26
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 21:21:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF57D1C047F5
-	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 18:10:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A70D31BA7B21
+	for <lists+kvm@lfdr.de>; Fri,  2 May 2025 19:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A65269811;
-	Fri,  2 May 2025 18:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0741F4262;
+	Fri,  2 May 2025 19:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Ik1PM2pU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YUiwqCcp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A04342A87;
-	Fri,  2 May 2025 18:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56531E9B1D
+	for <kvm@vger.kernel.org>; Fri,  2 May 2025 19:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746209422; cv=none; b=dZVLpDk76MBLh0Y9538xO/s7EchN8drZWbme7de1lrtIOwoFostyl5TNUAU5HB9r72hGQs8CYT/LgkXxHlgcMGBlo+Q6b0CWY/3I6hEmwhOsCYNAENukaYkkMTOql43BCAOWEKzYZAV10BK1+mdwY2n6NjJuFN/9+zJEW2ZwJ7k=
+	t=1746213679; cv=none; b=CwdIlPdM6s9Sn7+Gx2vBaLolY/MVq3Q7+L5fq8XHPusx3wVnSh/zY9/0Z8nw9SRzrqrKxXZR0tUlmSlbF/OyCa7r8VtUYMdFzRmfgXtoIyhodyh6vIG/xywLBBCqmkjTBz1BLqrgXZfTnfISHDnT5YpQfXShIvr46doN8AWcObU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746209422; c=relaxed/simple;
-	bh=1wXTTHb5bXBrdK2EgccYQYFHa4IE2A2pICCNASrvymc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=euZt8aldPEb5N55H7c294NmxxViMoxWJ6UOWTkaftKyTYLaHxL31j7yWohnBw8U9U4ZvtZuoDwY+aOsxa9uSLCRgqaIuJZr2RF/DcwSsWTsnmx5NjXR5+si++hnEEsgxm7Af6169i78ef80yDXFiNG6IGa80VgeW3TGbouIfNKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Ik1PM2pU; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 542I9URm2109765
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 2 May 2025 11:09:30 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 542I9URm2109765
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1746209374;
-	bh=vq/A29GwC24q+yBRNQofOThRodhc2pHOhalxWP8yF44=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ik1PM2pUOLDwsjM0pqh49zNwLFsJWsVvCOj193iIxEYzWbmWmPkLOpNjbPdzrjX3v
-	 011IuXpNubhbptoPBokYY/dElyxPQHBCRBjU3Lulkb2yxO4epZ6XSk5+/VuLkmyTKm
-	 0Ud2Zan/4XorBw9nLxr1az3pZ8UdL1JipoDA4C6q89BQQ1lor7RIvGuJ3g6OnfiFiz
-	 CnEXvlTclGzLsYNkl8D2WwBsbJipZUTOsHbneDfOJuaejckEKDSBWeybOIBPjijOO0
-	 KGDNLUtdX+eqbIB7ygYhUbhkhUiAb06+5ytRj+5jyUF4CBn/8fUyg6Mi66qsYtwZ4H
-	 VoszEMjA20uGw==
-Message-ID: <2cbb468c-188e-4e6b-9b17-b60a66208c7a@zytor.com>
-Date: Fri, 2 May 2025 11:09:29 -0700
+	s=arc-20240116; t=1746213679; c=relaxed/simple;
+	bh=JpyIjvjS1cn2CJj81nbpYGq+okHd6d4dPd65iwowKhw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kWmufJWiXmX2+mM96pAczuAtgm8iMcgVorfnI3Zprjer+nFjUBNDnw1z+4osjfNFORBmis4Dt1jE/eBvo56dfr7oUvRF5rVGx/tLmNhX5jtvJVihU6bkzgWgvgvgdFLmnHdccLD1Mu5jx8LNpicnBfmtCpfXpqQfIxAINCulLuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YUiwqCcp; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2264c9d0295so31085ad.0
+        for <kvm@vger.kernel.org>; Fri, 02 May 2025 12:21:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746213676; x=1746818476; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r96Eg/1Y8AFNbPbV0Ky1wYbeZa5VKyE7dnpUkfFRCh8=;
+        b=YUiwqCcp42fIvx0hXEG3ZdDVPwY6YQriFb4+pWFw48cxkygtG2tF1YyatJD32wC4Re
+         TOYkYC1vvnY4/WcyqzVI5pu1K/jnX6RUL4Qof3fIE/bbIFffklwyKaNYiaVsGl5v0bSv
+         Cq6Wrw1mz76OjVWs/1hU9dgl4Y/VBhaKisNg3T/pIYY2Okq9R1ZEGrZYGVczB76FskD7
+         vHSpgzgXU0IBgesuzXqNAHnxqCaN1pLxxYfOW8Hy5a2A329DHaLhDrVXNtqztASONzfk
+         qrpFWBxgJlvanZFZm1xvAq7IwwjZ4XDnDjo8LDGaocg0I7d24MD0YkicQ+GM1sCXuySL
+         GuaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746213676; x=1746818476;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r96Eg/1Y8AFNbPbV0Ky1wYbeZa5VKyE7dnpUkfFRCh8=;
+        b=nNdPdDcNvzkT1jdyrBVJUABYp6U0YmFNFOfb7hKBpUVzhPzyasoVqFBzT+II+r5A/Q
+         sOll3ML4LEpqpCF60g7jhVI8ttQ8UESHPzBvp2YQKjAYPY2268EqreZTamf72+ULdlGY
+         iea0nWIGDHPD3iyI7KA00/hfj01K32+IkOelm98OaH82+UHJhQSbZ4LnUe9gTw+eBis5
+         0jU6/4S8q704VS720D7pld8H+LkmwqUvowZOggxt+w3dK2gFrbT2SYauHMR0eaE/3ZvF
+         PXJETarLriXUH7F9bohMRkldJnzzmdpD2NiJ9TX9inXAz/h4RGqWo2XTaWEB8i6XH0NW
+         qFDA==
+X-Forwarded-Encrypted: i=1; AJvYcCUM3aYKgM0nHS5Iof1pgjgueVhhMXxT2QCabSaAaCohoBiKWXJBw65a10ECIKIwM1pyo7M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzw2IjAU/GkgBRFEP9kHLPvJmbYqN3rKnVSnf8AhJ1ZpczYJXL+
+	eSDZib8izJKqA/1QZ1RYXwe8nGxlHZpmv9A4omipWpDsHGmvRkbimx0DXlfklZVjfYaBspRjX2N
+	xZfbuaWTPkiVQaH34qriYPYSgP5mhe6ejnna+
+X-Gm-Gg: ASbGncuMGuot1tTmm1iIznrU9wCyeB2GSBVlbicbUKGNUkdqy+hslB5oSGlbHcuS1U+
+	jH+IwtcoP3dGO0kPuGmGMNbI4Y8FVvoBtHdWjWZZ7CN7smjQHvyTslU+C3wpismZBlTJV2UKbVV
+	aDqmey5VYjhtTcluOQv2ZlLDc=
+X-Google-Smtp-Source: AGHT+IHuBk7ykClXDaGo7QqylvIZQfO9tpRwiOHUQADkSCKVxiVlZuZmPaSSKezybUCfRFfNE2CLttc2KEnzLSTOJbw=
+X-Received: by 2002:a17:902:c40e:b0:21d:dba1:dd72 with SMTP id
+ d9443c01a7336-22e18ba5736mr325995ad.15.1746213675572; Fri, 02 May 2025
+ 12:21:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 02/15] x86/msr: Move rdtsc{,_ordered}() to <asm/tsc.h>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
-        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        acme@kernel.org, jgross@suse.com, andrew.cooper3@citrix.com,
-        peterz@infradead.org, namhyung@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com,
-        wei.liu@kernel.org, ajay.kaher@broadcom.com,
-        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
-        haiyangz@microsoft.com, decui@microsoft.com,
-        dapeng1.mi@linux.intel.com, ilpo.jarvinen@linux.intel.com
-References: <20250427092027.1598740-1-xin@zytor.com>
- <20250427092027.1598740-3-xin@zytor.com> <aBR8EoYkxaFHwZN2@gmail.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aBR8EoYkxaFHwZN2@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250429032645.363766-1-almasrymina@google.com>
+ <20250429032645.363766-5-almasrymina@google.com> <53433089-7beb-46cf-ae8a-6c58cd909e31@redhat.com>
+In-Reply-To: <53433089-7beb-46cf-ae8a-6c58cd909e31@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 2 May 2025 12:20:59 -0700
+X-Gm-Features: ATxdqUHudlFmLidqUMJh8A79G--WfvmY635UeHyjV1LrmdBcJP8-JhtODX9YkNk
+Message-ID: <CAHS8izMefrkHf9WXerrOY4Wo8U2KmxSVkgY+4JB+6iDuoCZ3WQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v13 4/9] net: devmem: Implement TX path
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/2/2025 1:02 AM, Ingo Molnar wrote:
-> 
-> * Xin Li (Intel) <xin@zytor.com> wrote:
-> 
->> index 94408a784c8e..13335a130edf 100644
->> --- a/arch/x86/include/asm/tsc.h
->> +++ b/arch/x86/include/asm/tsc.h
->> @@ -7,7 +7,81 @@
->>   
->>   #include <asm/cpufeature.h>
->>   #include <asm/processor.h>
->> -#include <asm/msr.h>
->> +
->> +/*
->> + * both i386 and x86_64 returns 64-bit value in edx:eax, but gcc's "A"
->> + * constraint has different meanings. For i386, "A" means exactly
->> + * edx:eax, while for x86_64 it doesn't mean rdx:rax or edx:eax. Instead,
->> + * it means rax *or* rdx.
->> + */
->> +#ifdef CONFIG_X86_64
->> +/* Using 64-bit values saves one instruction clearing the high half of low */
->> +#define DECLARE_ARGS(val, low, high)	unsigned long low, high
->> +#define EAX_EDX_VAL(val, low, high)	((low) | (high) << 32)
->> +#define EAX_EDX_RET(val, low, high)	"=a" (low), "=d" (high)
->> +#else
->> +#define DECLARE_ARGS(val, low, high)	u64 val
->> +#define EAX_EDX_VAL(val, low, high)	(val)
->> +#define EAX_EDX_RET(val, low, high)	"=A" (val)
->> +#endif
-> 
-> Meh, this patch creates a duplicate copy of DECLARE_ARGS() et al in
-> <asm/tsc.h> now:
-> 
->   arch/x86/include/asm/msr.h:#define DECLARE_ARGS(val, low, high) unsigned long low, high
->   arch/x86/include/asm/msr.h:#define DECLARE_ARGS(val, low, high) u64 val
->   arch/x86/include/asm/msr.h:     DECLARE_ARGS(val, low, high);
->   arch/x86/include/asm/msr.h:     DECLARE_ARGS(val, low, high);
->   arch/x86/include/asm/msr.h:     DECLARE_ARGS(val, low, high);
->   arch/x86/include/asm/tsc.h:#define DECLARE_ARGS(val, low, high) unsigned long low, high
->   arch/x86/include/asm/tsc.h:#define DECLARE_ARGS(val, low, high) u64 val
->   arch/x86/include/asm/tsc.h:     DECLARE_ARGS(val, low, high);
->   arch/x86/include/asm/tsc.h:     DECLARE_ARGS(val, low, high);
->   arch/x86/include/asm/tsc.h:#undef DECLARE_ARGS
-> 
-> Which was both an undeclared change, bloats the code, causes various
-> problems, and is totally unnecessary to boot.
-> 
-> Please don't do that ...
+On Fri, May 2, 2025 at 4:47=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> Hi,
+>
+> On 4/29/25 5:26 AM, Mina Almasry wrote:
+> > Augment dmabuf binding to be able to handle TX. Additional to all the R=
+X
+> > binding, we also create tx_vec needed for the TX path.
+> >
+> > Provide API for sendmsg to be able to send dmabufs bound to this device=
+:
+> >
+> > - Provide a new dmabuf_tx_cmsg which includes the dmabuf to send from.
+> > - MSG_ZEROCOPY with SCM_DEVMEM_DMABUF cmsg indicates send from dma-buf.
+> >
+> > Devmem is uncopyable, so piggyback off the existing MSG_ZEROCOPY
+> > implementation, while disabling instances where MSG_ZEROCOPY falls back
+> > to copying.
+> >
+> > We additionally pipe the binding down to the new
+> > zerocopy_fill_skb_from_devmem which fills a TX skb with net_iov netmems
+> > instead of the traditional page netmems.
+> >
+> > We also special case skb_frag_dma_map to return the dma-address of thes=
+e
+> > dmabuf net_iovs instead of attempting to map pages.
+> >
+> > The TX path may release the dmabuf in a context where we cannot wait.
+> > This happens when the user unbinds a TX dmabuf while there are still
+> > references to its netmems in the TX path. In that case, the netmems wil=
+l
+> > be put_netmem'd from a context where we can't unmap the dmabuf, Resolve
+> > this by making __net_devmem_dmabuf_binding_free schedule_work'd.
+> >
+> > Based on work by Stanislav Fomichev <sdf@fomichev.me>. A lot of the mea=
+t
+> > of the implementation came from devmem TCP RFC v1[1], which included th=
+e
+> > TX path, but Stan did all the rebasing on top of netmem/net_iov.
+> >
+> > Cc: Stanislav Fomichev <sdf@fomichev.me>
+> > Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+>
+> I'm sorry for the late feedback. A bunch of things I did not notice
+> before...
+>
+> > @@ -701,6 +743,8 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, str=
+uct sock *sk,
+> >
+> >       if (msg && msg->msg_ubuf && msg->sg_from_iter)
+> >               ret =3D msg->sg_from_iter(skb, from, length);
+> > +     else if (unlikely(binding))
+>
+> I'm unsure if the unlikely() here (and in similar tests below) it's
+> worthy: depending on the actual workload this condition could be very
+> likely.
+>
 
-Learned!
+Right, for now I'm guessing the MSG_ZEROCOPY use case in the else is
+more common workload, and putting the devmem use case in the unlikely
+path so I don't regress other use cases. We could revisit this in the
+future. In my tests, the devmem workload doesn't seem affected by this
+unlikely.
 
-Especially that every change needs to explicitly called out.
+> [...]
+> > @@ -1066,11 +1067,24 @@ int tcp_sendmsg_locked(struct sock *sk, struct =
+msghdr *msg, size_t size)
+> >       int flags, err, copied =3D 0;
+> >       int mss_now =3D 0, size_goal, copied_syn =3D 0;
+> >       int process_backlog =3D 0;
+> > +     bool sockc_valid =3D true;
+> >       int zc =3D 0;
+> >       long timeo;
+> >
+> >       flags =3D msg->msg_flags;
+> >
+> > +     sockc =3D (struct sockcm_cookie){ .tsflags =3D READ_ONCE(sk->sk_t=
+sflags),
+> > +                                     .dmabuf_id =3D 0 };
+>
+> the '.dmabuf_id =3D 0' part is not needed, and possibly the code is
+> clearer without it.
+>
+> > +     if (msg->msg_controllen) {
+> > +             err =3D sock_cmsg_send(sk, msg, &sockc);
+> > +             if (unlikely(err))
+> > +                     /* Don't return error until MSG_FASTOPEN has been
+> > +                      * processed; that may succeed even if the cmsg i=
+s
+> > +                      * invalid.
+> > +                      */
+> > +                     sockc_valid =3D false;
+> > +     }
+> > +
+> >       if ((flags & MSG_ZEROCOPY) && size) {
+> >               if (msg->msg_ubuf) {
+> >                       uarg =3D msg->msg_ubuf;
+> > @@ -1078,7 +1092,8 @@ int tcp_sendmsg_locked(struct sock *sk, struct ms=
+ghdr *msg, size_t size)
+> >                               zc =3D MSG_ZEROCOPY;
+> >               } else if (sock_flag(sk, SOCK_ZEROCOPY)) {
+> >                       skb =3D tcp_write_queue_tail(sk);
+> > -                     uarg =3D msg_zerocopy_realloc(sk, size, skb_zcopy=
+(skb));
+> > +                     uarg =3D msg_zerocopy_realloc(sk, size, skb_zcopy=
+(skb),
+> > +                                                 sockc_valid && !!sock=
+c.dmabuf_id);
+>
+> If sock_cmsg_send() failed and the user did not provide a dmabuf_id,
+> memory accounting will be incorrect.
+>
+
+Forgive me but I don't see it. sockc_valid will be false, so
+msg_zerocopy_realloc will do the normal MSG_ZEROCOPY accounting. Then
+below whech check sockc_valid in place of where we did the
+sock_cmsg_send before, and goto err. I assume the goto err should undo
+the memory accounting in the new code as in the old code. Can you
+elaborate on the bug you see?
+
+> >                       if (!uarg) {
+> >                               err =3D -ENOBUFS;
+> >                               goto out_err;
+> > @@ -1087,12 +1102,27 @@ int tcp_sendmsg_locked(struct sock *sk, struct =
+msghdr *msg, size_t size)
+> >                               zc =3D MSG_ZEROCOPY;
+> >                       else
+> >                               uarg_to_msgzc(uarg)->zerocopy =3D 0;
+> > +
+> > +                     if (sockc_valid && sockc.dmabuf_id) {
+> > +                             binding =3D net_devmem_get_binding(sk, so=
+ckc.dmabuf_id);
+> > +                             if (IS_ERR(binding)) {
+> > +                                     err =3D PTR_ERR(binding);
+> > +                                     binding =3D NULL;
+> > +                                     goto out_err;
+> > +                             }
+> > +                     }
+> >               }
+> >       } else if (unlikely(msg->msg_flags & MSG_SPLICE_PAGES) && size) {
+> >               if (sk->sk_route_caps & NETIF_F_SG)
+> >                       zc =3D MSG_SPLICE_PAGES;
+> >       }
+> >
+> > +     if (sockc_valid && sockc.dmabuf_id &&
+> > +         (!(flags & MSG_ZEROCOPY) || !sock_flag(sk, SOCK_ZEROCOPY))) {
+> > +             err =3D -EINVAL;
+> > +             goto out_err;
+> > +     }
+> > +
+> >       if (unlikely(flags & MSG_FASTOPEN ||
+> >                    inet_test_bit(DEFER_CONNECT, sk)) &&
+> >           !tp->repair) {
+> > @@ -1131,14 +1161,8 @@ int tcp_sendmsg_locked(struct sock *sk, struct m=
+sghdr *msg, size_t size)
+> >               /* 'common' sending to sendq */
+> >       }
+> >
+> > -     sockc =3D (struct sockcm_cookie) { .tsflags =3D READ_ONCE(sk->sk_=
+tsflags)};
+> > -     if (msg->msg_controllen) {
+> > -             err =3D sock_cmsg_send(sk, msg, &sockc);
+> > -             if (unlikely(err)) {
+> > -                     err =3D -EINVAL;
+> > -                     goto out_err;
+> > -             }
+> > -     }
+> > +     if (!sockc_valid)
+> > +             goto out_err;
+>
+> Here 'err' could have been zeroed by tcp_sendmsg_fastopen(), and out_err
+> could emit a wrong return value.
+>
+
+Good point indeed.
+
+> Possibly it's better to keep the 'dmabuf_id' initialization out of
+> sock_cmsg_send() in a separate helper could simplify the handling here?
+>
+
+This should be possible as well.
+
+--=20
+Thanks,
+Mina
 
