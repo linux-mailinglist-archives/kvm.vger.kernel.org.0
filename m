@@ -1,114 +1,119 @@
-Return-Path: <kvm+bounces-45281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45282-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D415AA81F0
-	for <lists+kvm@lfdr.de>; Sat,  3 May 2025 20:28:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25AA1AA8250
+	for <lists+kvm@lfdr.de>; Sat,  3 May 2025 21:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1694B5A3C97
-	for <lists+kvm@lfdr.de>; Sat,  3 May 2025 18:28:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86B8C7A5469
+	for <lists+kvm@lfdr.de>; Sat,  3 May 2025 19:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB1A27E7D7;
-	Sat,  3 May 2025 18:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5947D27E7FF;
+	Sat,  3 May 2025 19:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuL9IAtO"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="RKuStUz1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30036DCE1;
-	Sat,  3 May 2025 18:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E955F1E8847;
+	Sat,  3 May 2025 19:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746296921; cv=none; b=uYf6gS+qlhVBFvHqN6WpdyUTg3jvD1rglUjbQ8dv5pPFvRQ9gMhWlYLjEmv5c05PtDP5WtZqcwMyTG+u3WIX3PcMNFyFPYVc/HNenGW+euv5NFX7qAb66AFQLXpnCvqiUys9t0bmPSS07wg4jyHLvW0G1TyVIHUbZyuu6HIRrsk=
+	t=1746299649; cv=none; b=SxCe/tr3HdMnr1lJmJk6+nJdKJaSMaH8ZCNm+6MpGNn9qziG2wrq9okUhkXZLLwITj0N786NhtHcxFLvYhmFaz93t0txHaqbrdRcmV5dAzd4DAWNe6otsDWohEHqriWDlAEoRubjihWIgLSJo5FNGxt1mAr6vpD0FLxanMpUDkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746296921; c=relaxed/simple;
-	bh=3fKBodp5CHqkWEFP9lvNQWnLHEOn5YEIduo8h9PK+nI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o7ziVV4IWZFFHxUf2ZF1KafTf5aYvhqc7+25g+IRl/qU6BDrcEJPN9BeJZcjFAKg6j1jJYeZySq1bOMfofgie/7ToXjneDQtvb9xe4G3NtKbEI3PtN1gC0pKskxyQHS4E0ExokuuL6TZL9hDwiDK4ForQt+inpF3DCK5l88vbwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuL9IAtO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4890C4CEE3;
-	Sat,  3 May 2025 18:28:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746296920;
-	bh=3fKBodp5CHqkWEFP9lvNQWnLHEOn5YEIduo8h9PK+nI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NuL9IAtOE7d193OKwDBV73buJtEMeabKO9HM7XEjD+YA88mKiDABuwUGNX+FGv4R4
-	 4VDW1tO3Vy2KCTyHsvoSRv8BvS8GJOU8rWIXholkdw6QYaFO/GZmhacyMu+2RD5HI0
-	 dcfPQT/uu+hFaXu11qKuPsmiUSJbhxf+ZoJmm+fbf6GnxZSlE5DPHlNpKR21xM//Bf
-	 2KW3zSwmof5v9vOd2UQx256HHwi4VmgCnx+oW0zYB7iLwUJTpLwHe20qIbSjE2DIVx
-	 iLPt0T7jUHJR+tpo49FRs9as7xJXRVxeq1fzmyjOQm6moyc3+7xYBJ9RKHwEN8+12k
-	 RH27QZpxtPM8A==
-Date: Sat, 3 May 2025 11:28:37 -0700
-From: Josh Poimboeuf <jpoimboe@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Sean Christopherson <seanjc@google.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com, 
-	wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com, 
-	bp@alien8.de, dave.hansen@linux.intel.com, pbonzini@redhat.com, 
-	ardb@kernel.org, kees@kernel.org, Arnd Bergmann <arnd@arndb.de>, 
-	gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-efi@vger.kernel.org, samitolvanen@google.com, 
-	ojeda@kernel.org, xin@zytor.com
-Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
- in __nocfi functions
-Message-ID: <p6mkebfvhxvtqyz6mtohm2ko3nqe2zdawkgbfi6h2rfv2gxbuz@ktixvjaj44en>
-References: <20250430110734.392235199@infradead.org>
- <8B86A3AE-A296-438C-A7A7-F844C66D0198@zytor.com>
- <20250430190600.GQ4439@noisy.programming.kicks-ass.net>
- <20250501103038.GB4356@noisy.programming.kicks-ass.net>
- <20250501153844.GD4356@noisy.programming.kicks-ass.net>
- <aBO9uoLnxCSD0UwT@google.com>
- <20250502084007.GS4198@noisy.programming.kicks-ass.net>
- <aBUiwLV4ZY2HdRbz@google.com>
- <20250503095023.GE4198@noisy.programming.kicks-ass.net>
+	s=arc-20240116; t=1746299649; c=relaxed/simple;
+	bh=INtqWdF1ttpcGxLYcmEEmkHcr1sBjwlLz2bhiN/ZlGY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SvqMca0//DYrjQcxKLwFoQcOQFv4/Z14vWahmJPCIdAEWaQRvutl4rDDLTFL0T+pgkrr9bbXlRx9g7g0d25V/YYsVjljnpFQF5RKIzw2nDTGKEf2H8yDG/g05aUX/rVIRP3Ss8Ga25ORPwZzyB1T4mO4vlK2NAw3JIoqydxTQSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=RKuStUz1; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4ZqcsV3dB1zm0yTv;
+	Sat,  3 May 2025 19:14:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1746299638; x=1748891639; bh=INtqWdF1ttpcGxLYcmEEmkHc
+	r1sBjwlLz2bhiN/ZlGY=; b=RKuStUz1pg6Z4V5+H5A4kb2tpH0qoqhbIkzY5+Di
+	0Mx4FqbPL+wKIdXv00tSUygKf7k37efg+NegA9USEA+BtS9sCBdNxuJsDmcEZkXo
+	KGK//P45RgKzu8d8/alXy0VIGoamRPWPYuJuGoA+pRvHTZS5rvfZ8o0ph1X5HX6J
+	iTP5Of7qhYNNVXT8DuQLC0J7+xnCouyLt/xHnb0fNLYt31jsZFJ6Oj4CRIgSwz0L
+	IaOUfuFPOR6U+kODE48fdLjKvbhtxcv8R6c3Ms1Bh+fzGYiKJWiOfkB3GG1TY+aB
+	jrLZOMGZ2glyEj1WRg+H+/FJlug51RvdD9ZeWxSGVVTS0g==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id DqXzoqknLYju; Sat,  3 May 2025 19:13:58 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4ZqcrR2bKbzm0yMS;
+	Sat,  3 May 2025 19:13:09 +0000 (UTC)
+Message-ID: <08163d8b-4056-4b84-82a1-3dd553ee6468@acm.org>
+Date: Sat, 3 May 2025 12:13:08 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250503095023.GE4198@noisy.programming.kicks-ass.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v3 0/8] kernel-hacking: introduce
+ CONFIG_NO_AUTO_INLINE
+To: Brendan Jackman <jackmanb@google.com>,
+ Peter Zijlstra <peterz@infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>, chenlinxuan@uniontech.com,
+ Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Sagi Grimberg <sagi@grimberg.me>, Andrew Morton <akpm@linux-foundation.org>,
+ Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Kevin Tian <kevin.tian@intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>, Peter Huewe
+ <peterhuewe@gmx.de>, Jarkko Sakkinen <jarkko@kernel.org>,
+ Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor
+ <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Suren Baghdasaryan <surenb@google.com>,
+ Michal Hocko <mhocko@suse.com>, Johannes Weiner <hannes@cmpxchg.org>,
+ Zi Yan <ziy@nvidia.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Dmitry Vyukov <dvyukov@google.com>, Andrey Konovalov <andreyknvl@gmail.com>,
+ Juergen Gross <jgross@suse.com>, Boris Ostrovsky
+ <boris.ostrovsky@oracle.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, linux-nvme@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-integrity@vger.kernel.org,
+ linux-kbuild@vger.kernel.org, llvm@lists.linux.dev,
+ Winston Wen <wentao@uniontech.com>, kasan-dev@googlegroups.com,
+ xen-devel@lists.xenproject.org, Changbin Du <changbin.du@intel.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>
+References: <20250429-noautoinline-v3-0-4c49f28ea5b5@uniontech.com>
+ <20250429123504.GA13093@lst.de> <D9KW1QQR88EY.2TOSTVYZZH5KN@google.com>
+ <20250501150229.GU4439@noisy.programming.kicks-ass.net>
+ <D9KXE2YX8R2M.3L7Q6NVIXKPE9@google.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <D9KXE2YX8R2M.3L7Q6NVIXKPE9@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, May 03, 2025 at 11:50:23AM +0200, Peter Zijlstra wrote:
-> > +++ b/arch/x86/entry/entry_64_fred.S
-> > @@ -116,7 +116,8 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
-> >  	movq %rsp, %rdi				/* %rdi -> pt_regs */
-> >  	call __fred_entry_from_kvm		/* Call the C entry point */
-> >  	POP_REGS
-> > -	ERETS
-> > +
-> > +	ALTERNATIVE "", __stringify(ERETS), X86_FEATURE_FRED
-> >  1:
-> >  	/*
-> >  	 * Objtool doesn't understand what ERETS does, this hint tells it that
-> > @@ -124,7 +125,7 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
-> >  	 * isn't strictly needed, but it's the simplest form.
-> >  	 */
-> >  	UNWIND_HINT_RESTORE
-> > -	pop %rbp
-> > +	leave
-> >  	RET
-> 
-> So this, while clever, might be a problem with ORC unwinding. Because
-> now the stack is different depending on the alternative, and we can't
-> deal with that.
-> 
-> Anyway, I'll go have a poke on Monday (or Tuesday if Monday turns out to
-> be a bank holiday :-).
+On 5/1/25 8:22 AM, Brendan Jackman wrote:
+> Personally I sometimes spam a bunch of `noinline` into code
+> I'm debugging so this seems like a way to just slap that same thing on
+> the whole tree without dirtying the code, right?
 
-Can we just adjust the stack in the alternative?
+If this is for test builds only, has it been consider to add
+-fno-inline-functions as a local change in the top-level Makefile?
 
-	ALTERNATIVE "add $64 %rsp", __stringify(ERETS), X86_FEATURE_FRED
-1:
-	UNWIND_HINT_RESTORE
-	pop %rbp
-	RET
-
--- 
-Josh
+Bart.
 
