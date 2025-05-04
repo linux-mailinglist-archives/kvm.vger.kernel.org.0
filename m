@@ -1,75 +1,76 @@
-Return-Path: <kvm+bounces-45308-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45309-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12533AA83FD
-	for <lists+kvm@lfdr.de>; Sun,  4 May 2025 07:30:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C53E4AA83FE
+	for <lists+kvm@lfdr.de>; Sun,  4 May 2025 07:31:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE285189A90F
-	for <lists+kvm@lfdr.de>; Sun,  4 May 2025 05:31:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37DE7179F66
+	for <lists+kvm@lfdr.de>; Sun,  4 May 2025 05:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D02119AD8C;
-	Sun,  4 May 2025 05:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1958019CC3D;
+	Sun,  4 May 2025 05:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Bs6Fd9NH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d6PNm+t8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0BB16D9C2
-	for <kvm@vger.kernel.org>; Sun,  4 May 2025 05:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28431991D2
+	for <kvm@vger.kernel.org>; Sun,  4 May 2025 05:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746336575; cv=none; b=jgQIrSHDOt/zw5IuAS+j3xyX8fnn2iYGoAcsypMQr+fOlJGCxsH8O+QU6ObZ51qrP0DnHAyHzCEZ1HxbuxCN1tRrtRf8XXDe3VV+53WkxFVT+QWLdVu3VcVzASCmwdPGUFUhfIIZCFrXxhobSdq1hExhwdds5szs4n+1aA28hvM=
+	t=1746336576; cv=none; b=mUKaA5vroqtRacIuYS4MLBXBlS8vWMKbX5O83R5j1HkcwI/99LfJ9BoFes4pQsuKjxAoVZs+puOCdbG5DLDInFtbUJWvJtRKaZYXhmxq0gNkDq79IHB51VWRI06Pm+obsjJ8kx/6/+afcGwAZute+RYmxRbvq1xPzkn23oKEalA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746336575; c=relaxed/simple;
-	bh=ucVayIA+hGkub8c+axbrMCI6i+Dz2B2mE03U0WQ40KY=;
+	s=arc-20240116; t=1746336576; c=relaxed/simple;
+	bh=PpobY/Udi5mRt4jrxjOBsevMUQOfhFs6Kw8lbRo5UfA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tkx/92afHCntHKM3hmCT1F+KvhfSWHp7HKhhkqoFxNF4wONXfimTbAu0xWF+dQ2XN+pUYuAm2XnRZB+xifFLsOY18BS61DVBsZV8Bio+7auQybjNv5C8/dpSpeherjerSHn9oPUcERekF/pXCwPD3ZZbrE1Juv6hF5X8tveMS34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Bs6Fd9NH; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version; b=MskjQ+Bvvor58xdteJPgjL5QN6t7l4OhOXejkRE6yRgryARjj1I7YrXT0wVbWcXJ3BmMNyIEzRb5ECtdIB0HOJmFRE2TEh5YBFM0uqyh8j3DLEMMNPiV1aqAPLKF/SXWzI1Hn6oZp3eNHciXtISLrIDNQg2GwHtgxgrld0TtFN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=d6PNm+t8; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7394945d37eso2841216b3a.3
-        for <kvm@vger.kernel.org>; Sat, 03 May 2025 22:29:33 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-736b0c68092so3043399b3a.0
+        for <kvm@vger.kernel.org>; Sat, 03 May 2025 22:29:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1746336573; x=1746941373; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1746336574; x=1746941374; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WzMy66shbPXXlyjnEns4rH7PvNwF6buM8qH1Xg0FZ+4=;
-        b=Bs6Fd9NHVmBFKD0TBChnywSkq/r5ckca7kj8Vs6qi9rtTGdN+hm3A3KqgmlW3vI5Ya
-         QqxvRzRVcI8PoXMIMVoyG6dlI3vVy7Kn56Us6gISJ/+1zkmKyY3u0P90DPOXgmbJIi3n
-         vW9Yf/G7jL+R3/vGjaPWwabLaGjCkQnqCOp75ZAnH76UUJA6u5BJnngqqqKp94I2C5Em
-         oSOhCFNsK0FDEzb1ttXI+LGDIGyqWOY0m/mo7wwvTGqfMk5IxoarS2SncJ+diZjdPkcY
-         rVSl7T09zt9vMAwxZjavRD49SzJeUGW9wf6wNXTjS9gMjAj6PDgMLNrR9shd9wWNPr7v
-         /MLA==
+        bh=aLs0hyci0rcituyWdBDtdIR1bhX23Pfro+/0t+Mt9oA=;
+        b=d6PNm+t8Wm8eQqlaliZQJZnfxV6rG0Bm6fcrVnH4h8/DiNmfpdRLxL1K/2SvWPXn/H
+         1yj6AcZ0f5iRTGB2R09O8J+YB1QH3MDEbjIqAjcM4IT6oK2+hQuth7W4TE7YVLODGpAB
+         WSqoLnVAgw/1ATkyJM2VB6tmG9s6Ktw7UXbhc9/G9e4f347IuV8Ba4EC9TlFkkjEmf84
+         TcBNebO//JvDRkHykjVny8q1i2xDqDeOJLlo5qC0OvybGkLAp4jzn4G2O7uOlKPynBkL
+         A7yW9EYGkHmY2zEi+y+xLHDsqmJ9yk7ECsqB28dODmhk9FUZqwCgU3vS5Q3bizvQO6pU
+         cmSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746336573; x=1746941373;
+        d=1e100.net; s=20230601; t=1746336574; x=1746941374;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WzMy66shbPXXlyjnEns4rH7PvNwF6buM8qH1Xg0FZ+4=;
-        b=AmOdPvpsEnLFAZmvXl2ojGCX6Pg9qYgpQ0FqvkQaNQwEJCt0vOlsd7pUKyZAmmyGVZ
-         S9fldtkMejIhZyKU/FVbXEPYF2z4XbF2XG46woAZT/iL4UzAmpP5etUwGYyRHTT5PVI+
-         ZqMRi9HQ2H3NcQY1/xeqtTBNdHPerUa4hyeNXkSP9q5JRq6yenLGhOkchXj62hwFVHda
-         ThXoEJwhmNXz2GK16fusjbxPWU485Uy6FkJtt1wYGJGrVLBn5k8t79AxVa5wMWDmI9FY
-         XmKd618FHCoufo62d93j0EgDrWdtCJTzpFTMxQMqGnNMC31U18C8onbLpV9vcliK6Vl3
-         d7Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCWJ/d1wOxnPIb67mXzafNhO/xt02B9/9/bAKUFESGMV4Gox+aBuMtwb/iHToIBOEDQpveY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxidxD5yej7cMFZdx1SPBeAvEDDh6zVdteG1weRrTwoyr4PMBVf
-	z7yqDFXvHbQaF/QcbZFRURhpcqIlNeS4mx777TVo6COQrqKx1teEj5of9fPk+xI=
-X-Gm-Gg: ASbGncshTqlOpFWCvx+Qmd8G9gnIVZU66qPzKO9DxyakRjSAw/IyAEoO7MilZq6Yw3f
-	pA3MlIwvImmANWLfUd6CjcFEgzA/XAGGwMmxAPb/cL/48GglNSFfuTtLF07mDn851N8LX4SoyT4
-	GUdBTh5cGo2ClGWBKtx+P3OnHsZRshlmbm617YyRzCxZJf0IDaeV8/ZFiY3ye64qIZpXw6lO52P
-	PBxc0mzAYeejXOYJY5bskSOmVaXD6jo95dpeL5lzheZ/sgLMPoRAfrV6qyTITiFEG9Szdn/U2Lb
-	/2tSIwyIRU0/Ghobb/hEfXpt9zSZ+PxpxQrSFkOj
-X-Google-Smtp-Source: AGHT+IF3MsqDxnvukykvE/6O00kSUuX24CTMca9uQ13CHCSwtTjTadd/FH15AOifa1kLNKXwqjQ+ZQ==
-X-Received: by 2002:aa7:9314:0:b0:73e:30dd:d14b with SMTP id d2e1a72fcca58-7406f1769e2mr4015705b3a.15.1746336573425;
-        Sat, 03 May 2025 22:29:33 -0700 (PDT)
+        bh=aLs0hyci0rcituyWdBDtdIR1bhX23Pfro+/0t+Mt9oA=;
+        b=TSK3dlx+trn34N1jrzDillau0BDzH8dDxMWZtQcZjjMkO2aaXaedy9MmborE8tO5dc
+         m7W8jCttGkmHiiUZcPcqe6R5Lh4OIfn+5q96j85GntVs05RbyMiZ7cn2KGW2vPxfyz2Y
+         J1WLTd12vGnD7QdTq4Z9BNmeTp3c1Y3z2BLH5B3Mzzin1rmawgWQt6fjtKszykAQG7bE
+         qhxXqHl9HtrLqC/NdglrfCB513XMD2el0jsO3vc4xuZU5KTQqQFhKQmhXiLbLf2N8ei9
+         OQ68a7TsUr4VC2HXYKKoTKSwebuuQZfK0DMtUFJDDq974+HBSIYHYLWxz62IdqogERcE
+         kc1A==
+X-Forwarded-Encrypted: i=1; AJvYcCU8O0e9UaTNdqAunTEGqXUF/nfyFuQ8Zn79yKjc0gZ8flIsrrxeArKKXGQN93aEMMVcgAM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6tpJi9K1eR6RGG0kZl+JI5YllZ2s9u+IY520u//oU3U5qzxV9
+	C9CkN+YZ8RGQ+7SrObCPy/3KbQdw4FKK/5SiPkWQyw9qK4pigna3s+QZWWUkR3ZswxwCKrVtkDe
+	Oojs=
+X-Gm-Gg: ASbGncvJfE7JVPOK2DXyfK3wsqydtHTu2804Yn7s7YyueTGmaJn1I8tpkbvg9vbMCs6
+	a6L3NxTJ7wGaGWr0eJrTZZxob5XhzdeA77sCwHzU3Q3bqwU25pSeNLZVPRplRA6c+IlO9ZOe37+
+	jFmRSOMrUbqXPvODE/i/6mdTDpm4e2M8rIZS2awQrpM+713zR39NDbpuj+RJgd7YYVv2mJVf7Ew
+	BndH6aDj2qs1d7jMuc4jhwuMZXpmGl4h7bF0+5+TBtVLDDhhvm4dSkNDdI4iIlVKR1xryBASGnn
+	LhDh/v/JD6f3GXBbNIr5my4OJIBhno5FddC0CMcI
+X-Google-Smtp-Source: AGHT+IHqt8muxwIyNcbzrNrYudGYr25CIu8flyOznvSVMBbSVnp0yO/7Jx9BB+A2NmmCNDeJqM3yPw==
+X-Received: by 2002:a05:6a00:9089:b0:736:b101:aed3 with SMTP id d2e1a72fcca58-7405890a880mr10396879b3a.1.1746336574322;
+        Sat, 03 May 2025 22:29:34 -0700 (PDT)
 Received: from pc.. ([38.41.223.211])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-740590207e3sm4400511b3a.94.2025.05.03.22.29.32
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-740590207e3sm4400511b3a.94.2025.05.03.22.29.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Sat, 03 May 2025 22:29:33 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
@@ -83,9 +84,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	alex.bennee@linaro.org,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v4 15/40] target/arm/helper: use vaddr instead of target_ulong for exception_pc_alignment
-Date: Sat,  3 May 2025 22:28:49 -0700
-Message-ID: <20250504052914.3525365-16-pierrick.bouvier@linaro.org>
+Subject: [PATCH v4 16/40] target/arm/helper: use vaddr instead of target_ulong for probe_access
+Date: Sat,  3 May 2025 22:28:50 -0700
+Message-ID: <20250504052914.3525365-17-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250504052914.3525365-1-pierrick.bouvier@linaro.org>
 References: <20250504052914.3525365-1-pierrick.bouvier@linaro.org>
@@ -100,63 +101,49 @@ Content-Transfer-Encoding: 8bit
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
  target/arm/helper.h            | 2 +-
- target/arm/tcg/tlb_helper.c    | 2 +-
+ target/arm/tcg/op_helper.c     | 2 +-
  target/arm/tcg/translate-a64.c | 2 +-
- target/arm/tcg/translate.c     | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 09075058391..95b9211c6f4 100644
+index 95b9211c6f4..0a4fc90fa8b 100644
 --- a/target/arm/helper.h
 +++ b/target/arm/helper.h
-@@ -49,7 +49,7 @@ DEF_HELPER_3(exception_with_syndrome, noreturn, env, i32, i32)
- DEF_HELPER_4(exception_with_syndrome_el, noreturn, env, i32, i32, i32)
- DEF_HELPER_2(exception_bkpt_insn, noreturn, env, i32)
- DEF_HELPER_2(exception_swstep, noreturn, env, i32)
--DEF_HELPER_2(exception_pc_alignment, noreturn, env, tl)
-+DEF_HELPER_2(exception_pc_alignment, noreturn, env, vaddr)
- DEF_HELPER_1(setend, void, env)
- DEF_HELPER_2(wfi, void, env, i32)
- DEF_HELPER_1(wfe, void, env)
-diff --git a/target/arm/tcg/tlb_helper.c b/target/arm/tcg/tlb_helper.c
-index 8841f039bc6..4e3e96a2af0 100644
---- a/target/arm/tcg/tlb_helper.c
-+++ b/target/arm/tcg/tlb_helper.c
-@@ -277,7 +277,7 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
-     arm_deliver_fault(cpu, vaddr, access_type, mmu_idx, &fi);
+@@ -104,7 +104,7 @@ DEF_HELPER_FLAGS_1(rebuild_hflags_a32_newel, TCG_CALL_NO_RWG, void, env)
+ DEF_HELPER_FLAGS_2(rebuild_hflags_a32, TCG_CALL_NO_RWG, void, env, int)
+ DEF_HELPER_FLAGS_2(rebuild_hflags_a64, TCG_CALL_NO_RWG, void, env, int)
+ 
+-DEF_HELPER_FLAGS_5(probe_access, TCG_CALL_NO_WG, void, env, tl, i32, i32, i32)
++DEF_HELPER_FLAGS_5(probe_access, TCG_CALL_NO_WG, void, env, vaddr, i32, i32, i32)
+ 
+ DEF_HELPER_1(vfp_get_fpscr, i32, env)
+ DEF_HELPER_2(vfp_set_fpscr, void, env, i32)
+diff --git a/target/arm/tcg/op_helper.c b/target/arm/tcg/op_helper.c
+index 38d49cbb9d8..33bc595c992 100644
+--- a/target/arm/tcg/op_helper.c
++++ b/target/arm/tcg/op_helper.c
+@@ -1222,7 +1222,7 @@ uint32_t HELPER(ror_cc)(CPUARMState *env, uint32_t x, uint32_t i)
+     }
  }
  
--void helper_exception_pc_alignment(CPUARMState *env, target_ulong pc)
-+void helper_exception_pc_alignment(CPUARMState *env, vaddr pc)
+-void HELPER(probe_access)(CPUARMState *env, target_ulong ptr,
++void HELPER(probe_access)(CPUARMState *env, vaddr ptr,
+                           uint32_t access_type, uint32_t mmu_idx,
+                           uint32_t size)
  {
-     ARMMMUFaultInfo fi = { .type = ARMFault_Alignment };
-     int target_el = exception_target_el(env);
 diff --git a/target/arm/tcg/translate-a64.c b/target/arm/tcg/translate-a64.c
-index d9305f9d269..4f94fe179b0 100644
+index 4f94fe179b0..395c0f5c18e 100644
 --- a/target/arm/tcg/translate-a64.c
 +++ b/target/arm/tcg/translate-a64.c
-@@ -10243,7 +10243,7 @@ static void aarch64_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-          * start of the TB.
-          */
-         assert(s->base.num_insns == 1);
--        gen_helper_exception_pc_alignment(tcg_env, tcg_constant_tl(pc));
-+        gen_helper_exception_pc_alignment(tcg_env, tcg_constant_vaddr(pc));
-         s->base.is_jmp = DISAS_NORETURN;
-         s->base.pc_next = QEMU_ALIGN_UP(pc, 4);
-         return;
-diff --git a/target/arm/tcg/translate.c b/target/arm/tcg/translate.c
-index 88df9c482ab..99f07047fe5 100644
---- a/target/arm/tcg/translate.c
-+++ b/target/arm/tcg/translate.c
-@@ -7790,7 +7790,7 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-          * be possible after an indirect branch, at the start of the TB.
-          */
-         assert(dc->base.num_insns == 1);
--        gen_helper_exception_pc_alignment(tcg_env, tcg_constant_tl(pc));
-+        gen_helper_exception_pc_alignment(tcg_env, tcg_constant_vaddr(pc));
-         dc->base.is_jmp = DISAS_NORETURN;
-         dc->base.pc_next = QEMU_ALIGN_UP(pc, 4);
-         return;
+@@ -258,7 +258,7 @@ static void gen_address_with_allocation_tag0(TCGv_i64 dst, TCGv_i64 src)
+ static void gen_probe_access(DisasContext *s, TCGv_i64 ptr,
+                              MMUAccessType acc, int log2_size)
+ {
+-    gen_helper_probe_access(tcg_env, ptr,
++    gen_helper_probe_access(tcg_env, (TCGv_vaddr) ptr,
+                             tcg_constant_i32(acc),
+                             tcg_constant_i32(get_mem_index(s)),
+                             tcg_constant_i32(1 << log2_size));
 -- 
 2.47.2
 
