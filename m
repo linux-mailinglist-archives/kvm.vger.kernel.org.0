@@ -1,79 +1,80 @@
-Return-Path: <kvm+bounces-45333-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45335-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D60AA841C
-	for <lists+kvm@lfdr.de>; Sun,  4 May 2025 07:33:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38222AA876D
+	for <lists+kvm@lfdr.de>; Sun,  4 May 2025 17:52:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F9B2179FE1
-	for <lists+kvm@lfdr.de>; Sun,  4 May 2025 05:33:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92C663B4531
+	for <lists+kvm@lfdr.de>; Sun,  4 May 2025 15:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BF6E158858;
-	Sun,  4 May 2025 05:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B35D1D79A5;
+	Sun,  4 May 2025 15:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jj0h7r3S"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S7DErkwm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4055680
-	for <kvm@vger.kernel.org>; Sun,  4 May 2025 05:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDDF1FAA
+	for <kvm@vger.kernel.org>; Sun,  4 May 2025 15:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746336658; cv=none; b=sKEq/566G8H0jVn8R11SmOo+mamecfUDp5l1MA7XCxsegQmqXnlIGKveXWlkArQYbdKJXnMzhKl1GdbwBttzuEr6F7vfOhKvwlI8vaa6ADOqVB50ijX5jf7jNUDRGuAahfE+/MqpWbXvSBvToSxpxb5AJv3big+RGn2CFsSnfSo=
+	t=1746373928; cv=none; b=CTKhEjXsH8wfXluJTMrB5d/gk1it+IR7VfDXvUBd31mdDxwmvG7IXN/gbR2Tpg6ofgykDjLEioLKlcCz7x2QVmm8L/PwwdLBpNxzaA9wznFLf5/SPIw3lMm72z0Z7QStYeShzvFEpx2zfMJmzu27f172vPu0eN0OqvqYzZ8M/b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746336658; c=relaxed/simple;
-	bh=5VjPwwtl5mhQn5z1FAf8dWDjvyymWmg+mdD1XHtORP8=;
+	s=arc-20240116; t=1746373928; c=relaxed/simple;
+	bh=NyQPP4WDXqeaEGRZ8aMEXjUCeupY+egWw6WVEiNVpmc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EAoBrAC8TEx2r7ppsJtR8SUsxBcEqYE083s6F1fm5InhLpQ3dSpZ+alQJXrrd0ZX/raIxsvEfeeV1zmYh60DbXqDVNNgLSzKskQUhkA/j+31r3KQIRiP6nb5y31NC3JxJjfLxwyw6DQRvqfq4Dq7U4OeF1eVmiOlv8owqXesnVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jj0h7r3S; arc=none smtp.client-ip=209.85.216.53
+	 In-Reply-To:Content-Type; b=hteFWANQBKxFpqJbQkM9JeIF+677Ksn5heXjvsNGDlwVEVnYPLGz0xe5Kz4WDPtW4Jsf4BeLY9fWT+izVpwF9P2tF+V27o5XOasShMG7RmeNiPKdJzACNXqOQZDKp9JWsPVp7sve11G8niApmDgxmkw4jA/C7v1jc6beiL5RyJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=S7DErkwm; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-30828fc17adso3318896a91.1
-        for <kvm@vger.kernel.org>; Sat, 03 May 2025 22:30:56 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7376dd56eccso4112290b3a.0
+        for <kvm@vger.kernel.org>; Sun, 04 May 2025 08:52:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1746336656; x=1746941456; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
+        d=linaro.org; s=google; t=1746373926; x=1746978726; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=6KTAcWJ13xp5uQrxG2Jl/+OuSInS0YWXgC8gF3pCHPk=;
-        b=jj0h7r3S1jaBEv11ZTGHylDRUxdFk21ziysbE1vApP4M4QOx2kCVqxKCH6V9jzvJ81
-         wRAGjk1YGFn2TSI+HDF9GnnIQoG3Xf7hsXVeWhvMeafwWQzrHjBsacHa/oQGkZ3Vw9UA
-         Y0RoEJUhxcB5HfF+tG3wgkslRkVPF8Um0NBzAYr9BrNkdZ34PyecQ/pzHwpGKHLzb/i7
-         kwKBUOtAiH0MCT5pxU0ZI4TIIUQdCPnfhSi07vvIPVEziLfSuBCcpJH0tsAVdJnOnOvX
-         2nzgTXys22797LagSiyrgufwFYFVkknLvh12LWaIWuSt03MC/ggonFpWxOfUaRGcGedA
-         mhZA==
+        bh=FzJ7KBiUM62Kou2rvlVI27PREsZpJnLCrsZBTZ6Q1cs=;
+        b=S7DErkwmnfM/i8cL8OoiSKVpc9VARHL/sGAnD1xj8TRxv7XXveGzdv1sixkuVwhck2
+         2HBNW3jVShD7AoER8E3Tch5eQh6lrfLrp8eKI9KTqOTskmllxEh6fOP7cTbwGEMQmS++
+         MFrn+79+Ze3g/v8b0WtjWC425lUg1ZBRNJpy1QR9Eln15w5Vg15Vrp67hKNVPebZDUDG
+         rgwzXXbzxd0AMlbaifoGA/5C90Ks+ULbzdyvTI+f4XxIev2rbKCIYLmKnJeXi0xNjfWQ
+         cPqc6QtWm0D7Sgwgtlosy7B/zI+oFUb+wyV6VEs+WLmAaCCs5q8yZuRG3IQ2omR4NvNH
+         N5cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746336656; x=1746941456;
-        h=content-transfer-encoding:in-reply-to:content-language:from
+        d=1e100.net; s=20230601; t=1746373926; x=1746978726;
+        h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6KTAcWJ13xp5uQrxG2Jl/+OuSInS0YWXgC8gF3pCHPk=;
-        b=HnU06Qb53P0698zxVRsSOSYey7tcZFNA0JuUSp55anpvoONUMUbBKgUZH8iI3eG+5V
-         G+6yNwI5eqkAN9OsP/K5MvK9oIvR9X0DTIYjDIwClEtyJcQf/I77iwNVUty/3G2IEU6T
-         8KZF6xuMpUIosJlHjCH1n3mJTA62Qp2QArLQvv1USOAXf1WU7Gwh1WsaMahxESJ1NBg8
-         3YANqrPsd2i1AorDyIRyoWZhqEs5s2KyNRLG/PuG90/Ygh+iYJCmTJgN00WZwRmgmL+G
-         SR/AhrZmIo0W/s/AGgCeaXulnZrQdM5UN9lHYLQgPIX/HHN04PHEalDRKS2sFP+D0CAO
-         nI6g==
-X-Forwarded-Encrypted: i=1; AJvYcCU+9ydLt+qp0MpzqPH7eQSLYFmJXgj1uf/ff0CYnMsfQKO0xWisk2ziBEZLMJpjDnB3Zu8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1KXyS5V9sZRl7i9VM+JOVRv2DXUFO/9it3zWpJ3xRAj9DcWHE
-	pcHFoDHGEQEdRSCbPbttSDckLAQCaM4yvyyge7LB/h6FdgnFF2ln3FFuQw32I6E=
-X-Gm-Gg: ASbGncv7pB0TTZ+dJQSJj6DYexzMBOQHY4Rymh5vzL3hJRA9fCC+zcSkkUUJTXHzsct
-	byusKeEWmJydnXGcRIqa5PcobBSu5CVUq7WJexm7hp8StA6d65wHD1Z5enS+ogKUXR5dc4sbjCx
-	TiMnw5Iqye25fJYWWdAcXtXHOn3PaaLaeYTrfLU6tQXuCmrJ09ddMr8U4VjZuT9GL5YmDPPUy9H
-	jXetc7x16HaVyn65pa9P8KsBtG8Mz1iGab0aiNS1XxPblztVdtiHaVEcYjZnd7Fe3IffwWf8D9O
-	U5YbTySEArWXBDFhBxg//GlVnpBkjv6JbeiOnWb/sGAgmAoktwDjK74svCXVHU8v
-X-Google-Smtp-Source: AGHT+IFG3Fh3OmK4nyyMWaj/8CJF8m2OKT56xa6Rlm7TVxCw3VLXdVuw4KrYDmvPYL2Yqr7Q05OW6Q==
-X-Received: by 2002:a17:90b:3505:b0:308:7a70:489a with SMTP id 98e67ed59e1d1-30a61a49176mr4616861a91.30.1746336656291;
-        Sat, 03 May 2025 22:30:56 -0700 (PDT)
-Received: from [192.168.1.87] ([38.41.223.211])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e152291e3sm32237285ad.202.2025.05.03.22.30.55
+        bh=FzJ7KBiUM62Kou2rvlVI27PREsZpJnLCrsZBTZ6Q1cs=;
+        b=uukkLcFLUD1vQytwRM4w1JF0y52nXmBuHiNroKZe+LqI+y/m9rwr+NXDEd5G+iqTvv
+         Y4agecfccRvKORq0ruK/pbFzUsu8ok/psqQ/gS7uSefzxJUE3JmQC3sfhN9J0Mb0HGY+
+         E63TOfmWi32HebH91h1LY91V8iSR/UXn89iFyjJjTD+OW9DYoIJJIH0xQpSmmkqA1Ycm
+         vrO8DHDr98b0gYLlNWdwjzofYr6uT57FTo/5h6iD37DmYYfPj4SMmtbf1gFxop5m8Ur9
+         yfxkOk/4QhBYv+luTGr3Weihmry68nU53HzjIYU7EW6+9mZ3Gz2Dnillo6ouYRZgc8sm
+         HZeg==
+X-Forwarded-Encrypted: i=1; AJvYcCUkELPjgU6jPnhFMjAstocgTXIm0q4FfyJNWOnnK5G7U1JrzL17hoYydlAe+WFkqIRnT4Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7TnLstSq1XWTL4rfWNS//ZUp0/fzs3qMDo2UEtTQDl/FuHqZ2
+	zcms1/54Fa9Cj0yuy2L6GBUPqJwjZYn1FIdi0fHXKWX/fFKhAIcJB4CS3rfRUnc=
+X-Gm-Gg: ASbGncuj+hcR2Zm6l9ENEqfI5kizF2xhotjxRdYJdAr/1hOnx4WAIfPXfp0YEo/Mwin
+	vNmTs3aakdmfKIy/+UV72gWB1lsjukX8CIUxltfP9iT6gH61myXWithe8kNlKsXseuz93sh2xk1
+	oIRSLrQzRlBCeuY/zmH2PDX8LG8erfmCUsAd6KnxHsGNy+0g4z5CFGfwnNq6CVFA6FyOZ9GonDz
+	hP1jYctg8a052Hw6II1ruQwz40HT9VSrREUuST1r7CkOt8bQURCdk8DOlzFr5mJ73CssoCYnqMe
+	BseVmQRcogNtHjyAOS+cOFRJbDx+PUvR6Ni05IvvkQhyOaX2j/t49Og8aCwswe366CscdNR8Bse
+	WIm2IJJg=
+X-Google-Smtp-Source: AGHT+IFVnnGElWZWktJSHhHrK1YBadBJiOCAhPHj3KmwBboK7qXHH78eZTQ8uPZhXv/BS1Ff8Cq9qA==
+X-Received: by 2002:a05:6a00:1c9d:b0:736:a8db:93b4 with SMTP id d2e1a72fcca58-7406f092fe6mr6000996b3a.2.1746373926019;
+        Sun, 04 May 2025 08:52:06 -0700 (PDT)
+Received: from [192.168.0.4] (71-212-47-143.tukw.qwest.net. [71.212.47.143])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74059020dd4sm5003693b3a.117.2025.05.04.08.52.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 May 2025 22:30:55 -0700 (PDT)
-Message-ID: <e060e797-306f-4541-907b-7fdd8ae7781d@linaro.org>
-Date: Sat, 3 May 2025 22:30:55 -0700
+        Sun, 04 May 2025 08:52:05 -0700 (PDT)
+Message-ID: <866305e9-1751-4264-a984-7379bce6358d@linaro.org>
+Date: Sun, 4 May 2025 08:52:03 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,85 +82,34 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 04/40] meson: apply target config for picking files
- from libsystem and libuser
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, anjo@rev.ng,
- kvm@vger.kernel.org, richard.henderson@linaro.org,
- Peter Maydell <peter.maydell@linaro.org>,
+Subject: Re: [PATCH v3 30/33] target/arm/ptw: remove TARGET_AARCH64 from
+ arm_casq_ptw
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ alex.bennee@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, anjo@rev.ng,
  =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- alex.bennee@linaro.org
-References: <20250504052914.3525365-1-pierrick.bouvier@linaro.org>
- <20250504052914.3525365-5-pierrick.bouvier@linaro.org>
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+ kvm@vger.kernel.org
+References: <20250501062344.2526061-1-pierrick.bouvier@linaro.org>
+ <20250501062344.2526061-31-pierrick.bouvier@linaro.org>
+ <a6fdb501-438e-4591-b166-87c8dbd14887@linaro.org>
+ <3ba2f0d8-ce65-48a5-a662-f2350903a5c6@linaro.org>
 Content-Language: en-US
-In-Reply-To: <20250504052914.3525365-5-pierrick.bouvier@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <3ba2f0d8-ce65-48a5-a662-f2350903a5c6@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 5/3/25 10:28 PM, Pierrick Bouvier wrote:
-> semihosting code needs to be included only if CONFIG_SEMIHOSTING is set.
-> However, this is a target configuration, so we need to apply it to the
-> libsystem libuser source sets.
+On 5/3/25 15:48, Pierrick Bouvier wrote:
+> On 5/1/25 9:24 AM, Richard Henderson wrote:
+>> Are we still able to build qemu-system-arm on a 32-bit host with these changes?  It may be
+>> tricky to check, because the two easiest 32-bit hosts (i686, armv7) also happen to have a
+>> 64-bit cmpxchg.  I think "make docker-test-build@debian-mipsel-cross" will be the right 
+>> test.
 > 
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> ---
->   meson.build | 26 ++++++++++++++------------
->   1 file changed, 14 insertions(+), 12 deletions(-)
-> 
-> diff --git a/meson.build b/meson.build
-> index 6f4129826af..59c520de359 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -4056,27 +4056,19 @@ common_ss.add(qom, qemuutil)
->   common_ss.add_all(when: 'CONFIG_SYSTEM_ONLY', if_true: [system_ss])
->   common_ss.add_all(when: 'CONFIG_USER_ONLY', if_true: user_ss)
->   
-> -libuser_ss = libuser_ss.apply({})
->   libuser = static_library('user',
-> -                         libuser_ss.sources() + genh,
-> +                         libuser_ss.all_sources() + genh,
->                            c_args: ['-DCONFIG_USER_ONLY',
->                                     '-DCOMPILING_SYSTEM_VS_USER'],
-> -                         dependencies: libuser_ss.dependencies(),
-> +                         dependencies: libuser_ss.all_dependencies(),
->                            build_by_default: false)
-> -libuser = declare_dependency(objects: libuser.extract_all_objects(recursive: false),
-> -                             dependencies: libuser_ss.dependencies())
-> -common_ss.add(when: 'CONFIG_USER_ONLY', if_true: libuser)
->   
-> -libsystem_ss = libsystem_ss.apply({})
->   libsystem = static_library('system',
-> -                           libsystem_ss.sources() + genh,
-> +                           libsystem_ss.all_sources() + genh,
->                              c_args: ['-DCONFIG_SOFTMMU',
->                                       '-DCOMPILING_SYSTEM_VS_USER'],
-> -                           dependencies: libsystem_ss.dependencies(),
-> +                           dependencies: libsystem_ss.all_dependencies(),
->                              build_by_default: false)
-> -libsystem = declare_dependency(objects: libsystem.extract_all_objects(recursive: false),
-> -                               dependencies: libsystem_ss.dependencies())
-> -common_ss.add(when: 'CONFIG_SYSTEM_ONLY', if_true: libsystem)
->   
->   # Note that this library is never used directly (only through extract_objects)
->   # and is not built by default; therefore, source files not used by the build
-> @@ -4315,6 +4307,16 @@ foreach target : target_dirs
->     target_common = common_ss.apply(config_target, strict: false)
->     objects = [common_all.extract_objects(target_common.sources())]
->     arch_deps += target_common.dependencies()
-> +  if target_type == 'system'
-> +    src = libsystem_ss.apply(config_target, strict: false)
-> +    objects += libsystem.extract_objects(src.sources())
-> +    arch_deps += src.dependencies()
-> +  endif
-> +  if target_type == 'user'
-> +    src = libuser_ss.apply(config_target, strict: false)
-> +    objects += libuser.extract_objects(src.sources())
-> +    arch_deps += src.dependencies()
-> +  endif
->     if target_base_arch in target_common_arch_libs
->       src = target_common_arch[target_base_arch].apply(config_target, strict: false)
->       lib = target_common_arch_libs[target_base_arch]
+> By the way, I'm usually using debian-s390x-cross for testing a HOST_BIG_ENDIAN build. Is 
+> that the best choice available?
 
-@Philippe: this is the patch you need for semihosting (+ previous one).
+Yes.
+
+r~
 
