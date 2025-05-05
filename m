@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-45499-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45493-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E5C3AAAD5A
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 04:33:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468F3AAAD69
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 04:35:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D96BA1A84098
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 02:30:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09D343B200A
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 02:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812F83EA8F1;
-	Mon,  5 May 2025 23:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53115305732;
+	Mon,  5 May 2025 23:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jHtCHP+m"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z11/McDI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9843B11F8
-	for <kvm@vger.kernel.org>; Mon,  5 May 2025 23:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE7F28B401
+	for <kvm@vger.kernel.org>; Mon,  5 May 2025 23:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487237; cv=none; b=lhbiVkwOrq+QVQBI9CMn0G57TB8NpdraL2WTB9rqpdFCKtgQRUL4dJhd83oEl0A8jxMaXobCwRBHfQ9zuZNxgeM5mjqGq9PUTMCDScA5Z4RHq9jGElzXzRo0gCaWzmqAZRoj+17qeZBBtQ3sG+281TzwZfd80gYqHb+BhhjH/24=
+	t=1746487238; cv=none; b=h5rkd9D0qRODUiP9XiUxi8gUp0B2GVv1DXbsLec+51iy9nccYi0fRyL0lqvi9hMqFq99lSoGWg5xvYWpMrzDRHJKSjZ6Us8ZKXtIHL52E9w7tMVhL/PZDU/hrDe6JpYEvoKovp/GvMVu16XpuZn6gECmalv8tMGVUyWu8zWrvVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487237; c=relaxed/simple;
-	bh=Mzqsn120QGpE+vKtcAjFkp67eDLsrk1bAO1ZIsU/LzY=;
+	s=arc-20240116; t=1746487238; c=relaxed/simple;
+	bh=CkAdY2E+HfkrFgmcg94oXmRlHQ13EAlM5xXysCqxA8s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SBkiK8BSOucfLmWMBOIcAu3ezKScbm9XMBjUYFSOyLSZxYmZPfwZYrd8WTBNK2/hD87JOqe3pb8yxzlIRR3HGFPHV4gIJZ/P+JBuZC5a+xhznH2nbnpOg9rS0kYafdHiG9c+2T/UcZeLozQTfAHOwZCDWiwMV8uHtGplPZP0arI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jHtCHP+m; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=UqfT1UofBmuq1io5LiE4iHaJ0K+bOFoXBIGbf2CGv82HrB2tyBiWRx22CswObU+AmD5nLvo7dSIRxgUcw8rmLvx/H4q+SBnte83Dv7UpzoORkhjrL2bvP+WRbgjJB1L9WTtHl97VlbyJxUTJjM5sRydteeHOKgPW0GBkQDjCf9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Z11/McDI; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22e09f57ed4so46777855ad.0
-        for <kvm@vger.kernel.org>; Mon, 05 May 2025 16:20:34 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22c33ac23edso55093025ad.0
+        for <kvm@vger.kernel.org>; Mon, 05 May 2025 16:20:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1746487234; x=1747092034; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1746487235; x=1747092035; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4MSVLYsQ1aHRPUMsqKWeWNfiw/1OBObe6XUOYFWrKME=;
-        b=jHtCHP+myy3/oekAqWqqyTQhHZvRgqCt4auzyZrBanawn+cgmWvAJ5zTXlzP/DTK59
-         U6LUCjLDy2W6slGi7mi3RoEXj9kd1tCDoTsuZBIxlO8/6sYNLwbHpAsy4m/iXJK+KJtK
-         UCU3RuRZfM9aE9W3v2UD4MMXg4Wmu0oF/H6ddcT4gmsyzg3SMGa2FTNkxmxZmKUxFqs2
-         0Mh119ZdOIuX7tqIOnI6CNNSTjg34rl5I8kY8aVBpwY8/m0WOwB808YLovWcekX3QuCW
-         sBtUno4OMhE9fj2mRBolkExSmJDVVs1tty2sn+5D3qoCIkmQ26dfgnrEysYaYpQ4laaF
-         7U+g==
+        bh=nYwtbXWo/TvD/k3nLDnPjIkSoANte4qu/UhShUcHmQ4=;
+        b=Z11/McDIqMkEkPGwzz4Z9ga5DjFfkCWFrrq9Owx+Ap4JMwfIHym1CD628VerC4q0Bw
+         Afk7Ow8GJ5E2xC4MW7BiPf1KR8iaXpgbP41NgOq0Kz4HLpkCnEkkROtXNZcK7tAaxt6Q
+         X5HCcYoAsVGReCbonhXpPGEnVTQNLIZMzpVO1B68uULGkuJsQhUrhtK58T+/S/aLXvgl
+         vpH4ySDRNXIxuxMgEdXo/oiNPpIa6BS2Esr/JiIZpxQfVxDldd4rRrnuSkKnPjIFDhET
+         iWSIA4n8TVmPIPLQaiAK42WD/1TbDpgPnfS6oG3wZJqgAg87CzZVTEy8C3EWV4SX8ce9
+         6dYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746487234; x=1747092034;
+        d=1e100.net; s=20230601; t=1746487235; x=1747092035;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4MSVLYsQ1aHRPUMsqKWeWNfiw/1OBObe6XUOYFWrKME=;
-        b=ZfVFYQar0zC+wUx1Ip62ZhQfWRq5jmbDyzpUtIZCRmqXSDT4ZOOF0klfchRgCpMEgt
-         BBuB5V9au/BMcIwG0g0kqn5fvXnqA7vfIMBzPt+ViiVS5nQgZsnECFkxJ6cbFcw5ethI
-         L5No1yx1Xhc/6mTjC2XaaWogwc+9+cVMaAtZGUbpCHiUjXIqU5QNi34F4madLH+uQBif
-         A+6gZO/dfAqlukNczP68Fa+OB1QwEXLbrxGs8atRvPyWlhBLJazl6reg+rf8yxnvxfDk
-         XXgqcusH80T1ti1YSAGtLdXCMpx1B6eZWihC74nNn8iY+yAtTy1Queug8sx6W4S/ctBO
-         MdUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVtq7Yyjd9RaE7mD5RNcwTpDsCxOZZj6E9jHacRPmFS7/CX1eUBUSGOPTTyJWm6z+OyKv8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzO+lVlerdciQ/te0iVtllJsqtHAObuqqE6sYeL1l2c/UMLIiWP
-	WlqSCgOp1kT9brbykxPbThCDjCYxhZtA/Cg8yCxD/SCR+9HV2SIhSyQr1AOenkE=
-X-Gm-Gg: ASbGncvD7dViDZoK/Qd+zmrd23SNcg9Be6HXKqsSXCWQkiAjb/jEpDP0zeKDJTafrQp
-	yxjOIT3UPrZuTvfP4DTwy2TETI6H83xHXnoooaEAJcid7ZmCISNvny8gCaNGdb9DpjegCFEGvJg
-	mwZOOs+2NFLUmTQ9sxOzquu9T/ic869xP4aBE1bLCdbcuGx6VjORexJ8mjeV2sIk+/H/Jg70qPz
-	VELHwyH7+LWvRAn3PH4l+0Njkn27wVETj4B9YUEwt7h3jPSl8R+9y0ehIo9y27NmSLJwDJ9t3+9
-	Uyc303afGckKNcUrB3yttxW0qHBVcC8FmKSCf+oS
-X-Google-Smtp-Source: AGHT+IHTINwaey7ySLvXtg1QPxU98WusV/OE2FldyD8VBKMIteaxM9KIYsWwhG915qemWBZmFL73qA==
-X-Received: by 2002:a17:903:906:b0:215:a303:24e9 with SMTP id d9443c01a7336-22e31f7e424mr17270675ad.3.1746487233916;
-        Mon, 05 May 2025 16:20:33 -0700 (PDT)
+        bh=nYwtbXWo/TvD/k3nLDnPjIkSoANte4qu/UhShUcHmQ4=;
+        b=TXDafpPvt5FZuaB0HixJmSP5GSoLKfKETVsXyyJSzOdsauHQ3yTDGmI5dEXF0yWOBt
+         tJRJ4WPxN0TV0piEGMUNRsvBZikITNNVKxoApbfdkA+o1NGboDBf7RRKut0dD9UFUQLw
+         57U2GUQG8zVgiO9T6N12Zd2Z6gFqIGOLgpScUXy0RLifUs5wWgVMO3RGAWseOX247nYt
+         0VLvKfsAbBaeD1jVnaRTmhTL6tzU285SHjf5k+WcStH0KLxCJyp8xVmhlxvLuCZ79raQ
+         zo/0Y26y/zMe+OACWV5vaI84ZVBe9sj0fV7UmX+S9kiSfl+O9wxy4jz1N7kwv8EkkGRf
+         Knmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXvf+CGsjIY7rlRo+ucwXynd/SggTj+wv5gyYMTIg+Qb2zviWy6joV4+/QL3ovOR70VxP8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuvrFWQn8fMTqfGWxuKW6lARUhSkF4apoUnFliYcZJCLQUuSAa
+	8aEREmSe4FQYOCwxew2ApNSS90s+C4i2M4h0paYw1i6IZ7UhPs3CN+tCWZ33Skg=
+X-Gm-Gg: ASbGncvl3vd6vwhnU3xR4zl9lgLAgGMAlpX/m2Ql+o9WY+xuP56PGhJAAtBo7inKDSR
+	EjTW+8JpcAuX1zdJzXSUZn09U1dXyklUj88eZLEB1WvJ4WepjyQhSRG8Y58MAj7NhRSDzkmXXPq
+	dGApEDAmkN16Fa6mFIMNKYnupGr4+ETbPvVDrbaislLVfiFxQZLCDiIjKxipxDPUasuHekVnXLJ
+	oKP+iHwJH4YzCJbkEeCYlg1kqiFiwMYwb+WeejLgeqmhOvJLbl0+89/NFBNmdw2IciUI8QbYbNt
+	Ocrtcz3jO/8Mct6jaeUF0js9fjIC13ray+DTr0tS
+X-Google-Smtp-Source: AGHT+IEZ6VqsUNG24iDMT3idG7vLgb1bzL1cG05Jn05ziI2xH8ByDBSw6lb+7MbuYw17U4nXGnFALw==
+X-Received: by 2002:a17:903:d5:b0:22e:4203:9f33 with SMTP id d9443c01a7336-22e42041dd8mr586475ad.33.1746487234785;
+        Mon, 05 May 2025 16:20:34 -0700 (PDT)
 Received: from pc.. ([38.41.223.211])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522917asm60981715ad.201.2025.05.05.16.20.33
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522917asm60981715ad.201.2025.05.05.16.20.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 16:20:33 -0700 (PDT)
+        Mon, 05 May 2025 16:20:34 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: richard.henderson@linaro.org,
@@ -83,9 +83,9 @@ Cc: richard.henderson@linaro.org,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	qemu-arm@nongnu.org,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v6 15/50] target/arm/helper: use vaddr instead of target_ulong for exception_pc_alignment
-Date: Mon,  5 May 2025 16:19:40 -0700
-Message-ID: <20250505232015.130990-16-pierrick.bouvier@linaro.org>
+Subject: [PATCH v6 16/50] target/arm/helper: use vaddr instead of target_ulong for probe_access
+Date: Mon,  5 May 2025 16:19:41 -0700
+Message-ID: <20250505232015.130990-17-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250505232015.130990-1-pierrick.bouvier@linaro.org>
 References: <20250505232015.130990-1-pierrick.bouvier@linaro.org>
@@ -100,64 +100,36 @@ Content-Transfer-Encoding: 8bit
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- target/arm/helper.h            | 2 +-
- target/arm/tcg/tlb_helper.c    | 2 +-
- target/arm/tcg/translate-a64.c | 2 +-
- target/arm/tcg/translate.c     | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ target/arm/helper.h        | 2 +-
+ target/arm/tcg/op_helper.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 09075058391..95b9211c6f4 100644
+index 95b9211c6f4..0a4fc90fa8b 100644
 --- a/target/arm/helper.h
 +++ b/target/arm/helper.h
-@@ -49,7 +49,7 @@ DEF_HELPER_3(exception_with_syndrome, noreturn, env, i32, i32)
- DEF_HELPER_4(exception_with_syndrome_el, noreturn, env, i32, i32, i32)
- DEF_HELPER_2(exception_bkpt_insn, noreturn, env, i32)
- DEF_HELPER_2(exception_swstep, noreturn, env, i32)
--DEF_HELPER_2(exception_pc_alignment, noreturn, env, tl)
-+DEF_HELPER_2(exception_pc_alignment, noreturn, env, vaddr)
- DEF_HELPER_1(setend, void, env)
- DEF_HELPER_2(wfi, void, env, i32)
- DEF_HELPER_1(wfe, void, env)
-diff --git a/target/arm/tcg/tlb_helper.c b/target/arm/tcg/tlb_helper.c
-index 8841f039bc6..4e3e96a2af0 100644
---- a/target/arm/tcg/tlb_helper.c
-+++ b/target/arm/tcg/tlb_helper.c
-@@ -277,7 +277,7 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
-     arm_deliver_fault(cpu, vaddr, access_type, mmu_idx, &fi);
+@@ -104,7 +104,7 @@ DEF_HELPER_FLAGS_1(rebuild_hflags_a32_newel, TCG_CALL_NO_RWG, void, env)
+ DEF_HELPER_FLAGS_2(rebuild_hflags_a32, TCG_CALL_NO_RWG, void, env, int)
+ DEF_HELPER_FLAGS_2(rebuild_hflags_a64, TCG_CALL_NO_RWG, void, env, int)
+ 
+-DEF_HELPER_FLAGS_5(probe_access, TCG_CALL_NO_WG, void, env, tl, i32, i32, i32)
++DEF_HELPER_FLAGS_5(probe_access, TCG_CALL_NO_WG, void, env, vaddr, i32, i32, i32)
+ 
+ DEF_HELPER_1(vfp_get_fpscr, i32, env)
+ DEF_HELPER_2(vfp_set_fpscr, void, env, i32)
+diff --git a/target/arm/tcg/op_helper.c b/target/arm/tcg/op_helper.c
+index 38d49cbb9d8..33bc595c992 100644
+--- a/target/arm/tcg/op_helper.c
++++ b/target/arm/tcg/op_helper.c
+@@ -1222,7 +1222,7 @@ uint32_t HELPER(ror_cc)(CPUARMState *env, uint32_t x, uint32_t i)
+     }
  }
  
--void helper_exception_pc_alignment(CPUARMState *env, target_ulong pc)
-+void helper_exception_pc_alignment(CPUARMState *env, vaddr pc)
+-void HELPER(probe_access)(CPUARMState *env, target_ulong ptr,
++void HELPER(probe_access)(CPUARMState *env, vaddr ptr,
+                           uint32_t access_type, uint32_t mmu_idx,
+                           uint32_t size)
  {
-     ARMMMUFaultInfo fi = { .type = ARMFault_Alignment };
-     int target_el = exception_target_el(env);
-diff --git a/target/arm/tcg/translate-a64.c b/target/arm/tcg/translate-a64.c
-index d9305f9d269..4f94fe179b0 100644
---- a/target/arm/tcg/translate-a64.c
-+++ b/target/arm/tcg/translate-a64.c
-@@ -10243,7 +10243,7 @@ static void aarch64_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-          * start of the TB.
-          */
-         assert(s->base.num_insns == 1);
--        gen_helper_exception_pc_alignment(tcg_env, tcg_constant_tl(pc));
-+        gen_helper_exception_pc_alignment(tcg_env, tcg_constant_vaddr(pc));
-         s->base.is_jmp = DISAS_NORETURN;
-         s->base.pc_next = QEMU_ALIGN_UP(pc, 4);
-         return;
-diff --git a/target/arm/tcg/translate.c b/target/arm/tcg/translate.c
-index 88df9c482ab..99f07047fe5 100644
---- a/target/arm/tcg/translate.c
-+++ b/target/arm/tcg/translate.c
-@@ -7790,7 +7790,7 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-          * be possible after an indirect branch, at the start of the TB.
-          */
-         assert(dc->base.num_insns == 1);
--        gen_helper_exception_pc_alignment(tcg_env, tcg_constant_tl(pc));
-+        gen_helper_exception_pc_alignment(tcg_env, tcg_constant_vaddr(pc));
-         dc->base.is_jmp = DISAS_NORETURN;
-         dc->base.pc_next = QEMU_ALIGN_UP(pc, 4);
-         return;
 -- 
 2.47.2
 
