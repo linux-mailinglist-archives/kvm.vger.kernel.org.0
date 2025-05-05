@@ -1,254 +1,174 @@
-Return-Path: <kvm+bounces-45437-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45438-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED1AFAA9B29
-	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 20:03:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97DA5AA9B2E
+	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 20:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5001D17DB55
-	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 18:03:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 737601A80C07
+	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 18:04:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFBB26F450;
-	Mon,  5 May 2025 18:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC77026F450;
+	Mon,  5 May 2025 18:04:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LSpvN4Oa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PvX9/lJE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7C534CF5
-	for <kvm@vger.kernel.org>; Mon,  5 May 2025 18:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9405426D4E9
+	for <kvm@vger.kernel.org>; Mon,  5 May 2025 18:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746468185; cv=none; b=FdrGXwiADqOh+GVixnUL2/TEBA3ZbiW/MlAntWqKxuB+CmTuCsSYYijrnl4O68Iyumb21ggPxjVCe3BIIfys3XKZjWNwMOzgOC/vXWVsagUOG9O7UYWGPnMfPkvIQnNKFPgEkEyA/lhjE3XED50VcDbSSM5XgazD86GzFiYbM/0=
+	t=1746468240; cv=none; b=EFjWcQu2lU0GpTE7OD6JeBRCVyBmeK7kkJaGQ91zbnSAWk8QwozTExipdDUdF3KgmBXA1aWoiOYFekxbxSqFiVnYjboldWJUyFs2Jcz/IVLLgsbV1hJTwqGJROym4GDfFz6FVl9aCoiuw2IGom4U3E3CuR1w6EhOt8zRmcDS/6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746468185; c=relaxed/simple;
-	bh=VqbdyGtdiOP9xZl1obfcHNm1EmOvQxZOMzc0kDtFx70=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kbIqObrY8zeZm73wKI+onlIEKtLs4s3kXB4xbnOqd0bGgJ9S4vwCI9xhNGacxt9TTbNWaylEm9q4OyFSK9NFWH0G3PesRl1jjH8pwUxmtXv/Ddv6xj3QBsDbzEpQdYyYsh4yuwwsLKnxFBmkhioBGL7cMsKH1nS2iWYJRkl0tXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LSpvN4Oa; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1746468240; c=relaxed/simple;
+	bh=XQ5QQ2gsp33F/Q3s8Zxw7h5dOE4iqeEcSVQ8cTlpjiM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qPStn4oZrNXjdWnYpbhmFtpKGuwk/jPBeOKRafS8IxskYjpZbxt5Az306g8urjwq2YAJqKOgqsFKcta4vtYlmr/NJbA0mjq90L/GXGix3q3TzpA1Q40TAlKhaOpt7D+lDAIsmE84OaiiwpyylWHX00sRDkh6bKpb6+bxwOXP0AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PvX9/lJE; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff64898e2aso4211271a91.1
-        for <kvm@vger.kernel.org>; Mon, 05 May 2025 11:03:03 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-736b431ee0dso3545027b3a.0
+        for <kvm@vger.kernel.org>; Mon, 05 May 2025 11:03:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746468183; x=1747072983; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6fdHkz+qURvnP5/FWddFFQyfUC9zHcFbvyU+99/kk/A=;
-        b=LSpvN4OayvIjk3ppDnc82CgqS0m8pZKAwbm4MDzV8WsRpzneGs3whxr3/S+JyZVbP6
-         v9m6yC8e9i/ERJoo9RXRk0Mi1k0ku09uGkUolcYzCh2Vj5/sqqkPN52FPNwnYEMKqi15
-         2fPj3HRWJS7HM9VY6WHX7fXfU0WjqWvGhaLQnbYOkCrYsHIs7F1yjnGOpbOxfed43ZcT
-         WIbSmEBCXJRRojmWOask4Lg0Tz2MbIZ4vYK+cNRdzZOMsbGpwsHPx0vpVKv4gdrjtTA5
-         cYyclB9sQvnr6F1XjMs/EobzzldxbPm2nRwDMenNFji7CvtVsiqcBDulTdPJiCyyvU6O
-         VtQA==
+        d=google.com; s=20230601; t=1746468238; x=1747073038; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zw9V/AiRZvQIXS4Ub71pY6jY5U175MA0ipiGr8py2to=;
+        b=PvX9/lJE06y3IzKV16CAacEH0PEyZqRb/4ok5H1A3iGi+459B9ndiydb3pO/9u9MI6
+         VnLspSb2ryUZlRJh3loxCnGRyYHJaKSXF2T6zfB5wL1HJqI4dGeht22AIVGGK0BU9T4k
+         PIzl9yeqOlJ/n3Nkd6EUUcWXR3LYdfKLiG6Can6rsTI8HXvaEyC3C0D2b31Lr/s/dT4G
+         NFfIIY7nvtIuiFsbBzgx1tmiNpuZwOsStpRT/3enLVRB30vxnRuszbscCkrKDpfo+YJb
+         L68dlohXn0WXYx9GYXHn+55VftaebaLivbqkgjYPbbd+GgAP5h2RPf8olVnp+end6GAb
+         j/VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746468183; x=1747072983;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6fdHkz+qURvnP5/FWddFFQyfUC9zHcFbvyU+99/kk/A=;
-        b=bXlUvGqCVOdFc7yBRSIXEpSORdG45/R+09cr7iBFiq89I922GA+DubEzsy502O6hL9
-         wdRI6FHOV0cu83j22MReJ1R3nyt0Nhdy/OpEdAYZYgq/eKXU7ux6VDaCwU8DvNVU4/m1
-         1GtOFp5nk1hnW5r4EgMtO0fFLuE9vXhppW5IdUlgcspzzktdSNbPHfsyZxwd4jh5OD3h
-         jrShtF9DiK/4q5AGmmYKzeejWj7qoj2MxFKWV0LoZaVuPGnRe+r5W/MYHp1W2TUjzlhn
-         4Ujig4AzLb4lHdsa42MLXhfR7cgI7RCagmig88VCDmgNQqK6maO1t+JL701mx2nQkIjI
-         MjfA==
-X-Gm-Message-State: AOJu0YxsJwKhuD2rRN3XzhEOY20hvfXSVwHOE5ZtRtE0t6gmNEGsssZD
-	Z5sz6y9Vg/VlfZYhuBoQ6IN2O1bv3JSTYOHJ8RKbt9r+tzLFpR0qb/S6I8/EUiaJH6Dup+gwOGV
-	FHQ==
-X-Google-Smtp-Source: AGHT+IGOOZOIsWiGySRvbESMZh0DpMg7q8RyhQryXMHIN6gDz6nOKsDfCvoZ2snN2VpuUQbAnCwg8f1EIco=
-X-Received: from pjbkl6.prod.google.com ([2002:a17:90b:4986:b0:2ef:8055:93d9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5643:b0:2fa:6793:e860
- with SMTP id 98e67ed59e1d1-30a7ba2404emr726549a91.0.1746468182837; Mon, 05
- May 2025 11:03:02 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon,  5 May 2025 11:03:00 -0700
+        d=1e100.net; s=20230601; t=1746468238; x=1747073038;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zw9V/AiRZvQIXS4Ub71pY6jY5U175MA0ipiGr8py2to=;
+        b=DolgxeGHMJ/UyCGLvpZ7ghdPymmo5UcnmzNUXXb3l0+FFimYkuk7bhr/3L8cT+PjOi
+         UBxOeRK37+qWYD0mT+At5srIdBiLQ3dxaTlrtbFeL3B/72BYwmfVq//0CLe7JiXZwy70
+         UvekHRwgmpj+0W4kn9aQPcEaFhQbL7RS0MlvdGohkjH257RfZE2034omTrtA4vx+M5qM
+         rX7Mj1yuJOWp5zVGdhEjlo+mcET1MMo9uofpkmX3CUBP2B12/8BG60AzCYRIzbHmDQdH
+         SlshVJXLcE5PqWYG0pMaRIHxDEGMr8TH5nicsGW3kZBPg0MKUnYkiUWkXbp1yg3g86Sn
+         Hlfg==
+X-Forwarded-Encrypted: i=1; AJvYcCXnkuB5yZ4Hqh9bTWUdBKNuOyJ01Qzm84EGy8THBhCjtfwYV5QDXR5dAErr9Q+TK79aMTg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgUBShQIRXPBzYoYWltsl0eludhL4Th2h0p2b/hXvkFmkoykNR
+	/gb4dM8Z+nQbe1AJoHzkp/U2YjGrg8yEjGmoqSEdiYanMeDDCv0EMnFAAIQ237B3x1yrhOyR0zo
+	ORg==
+X-Google-Smtp-Source: AGHT+IHY62i2z6OoDFL8xYzLCVNQsXoClCRLU+DD54Snmess+AsdkxC/gajrRsOYSjODh9z8VZuKOF/iPO0=
+X-Received: from pfmu13.prod.google.com ([2002:aa7:838d:0:b0:736:a320:25bd])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:6ca1:b0:736:5753:12f7
+ with SMTP id d2e1a72fcca58-740589050bdmr22056587b3a.3.1746468237876; Mon, 05
+ May 2025 11:03:57 -0700 (PDT)
+Date: Mon, 5 May 2025 11:03:56 -0700
+In-Reply-To: <LV3PR12MB9265029582484A4BC7B6FA7B948E2@LV3PR12MB9265.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.967.g6a0df3ecc3-goog
-Message-ID: <20250505180300.973137-1-seanjc@google.com>
-Subject: [PATCH v2] KVM: SVM: Set/clear SRSO's BP_SPEC_REDUCE on 0 <=> 1 VM
- count transitions
+References: <f16941c6a33969a373a0a92733631dc578585c93@linux.dev>
+ <20250218111306.GFZ7RrQh3RD4JKj1lu@fat_crate.local> <20250429132546.GAaBDTWqOsWX8alox2@fat_crate.local>
+ <aBKzPyqNTwogNLln@google.com> <20250501081918.GAaBMuhq6Qaa0C_xk_@fat_crate.local>
+ <aBOnzNCngyS_pQIW@google.com> <20250505152533.GHaBjYbcQCKqxh-Hzt@fat_crate.local>
+ <LV3PR12MB9265E790428699931E58BE8D948E2@LV3PR12MB9265.namprd12.prod.outlook.com>
+ <aBjnjaK0wqnQBz8M@google.com> <LV3PR12MB9265029582484A4BC7B6FA7B948E2@LV3PR12MB9265.namprd12.prod.outlook.com>
+Message-ID: <aBj9jKhvqB9ZNoP6@google.com>
+Subject: Re: x86/bugs: KVM: Add support for SRSO_MSR_FIX, back for moar
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Michael Larabel <Michael@michaellarabel.com>, Borislav Petkov <bp@alien8.de>
-Content-Type: text/plain; charset="UTF-8"
+To: David Kaplan <David.Kaplan@amd.com>
+Cc: Borislav Petkov <bp@alien8.de>, Yosry Ahmed <yosry.ahmed@linux.dev>, 
+	Patrick Bellasi <derkling@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Josh Poimboeuf <jpoimboe@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	"x86@kernel.org" <x86@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Patrick Bellasi <derkling@matbug.net>, 
+	Brendan Jackman <jackmanb@google.com>, Michael Larabel <Michael@michaellarabel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Set the magic BP_SPEC_REDUCE bit to mitigate SRSO when running VMs if and
-only if KVM has at least one active VM.  Leaving the bit set at all times
-unfortunately degrades performance by a wee bit more than expected.
+On Mon, May 05, 2025, David Kaplan wrote:
+> > > Almost.  My thought was that kvm_run could do something like:
+> > >
+> > > If (!this_cpu_read(bp_spec_reduce_is_set)) {
+> > >    wrmsrl to set BP_SEC_REDUCE
+> > >    this_cpu_write(bp_spec_reduce_is_set, 1) }
+> > >
+> > > That ensures the bit is set for your core before VMRUN.  And as noted
+> > > below, you can clear the bit when the count drops to 0 but that one is
+> > > safe from race conditions.
+> >
+> > /facepalm
+> >
+> > I keep inverting the scenario in my head.  I'm so used to KVM needing to ensure it
+> > doesn't run with guest state that I keep forgetting that running with
+> > BP_SPEC_REDUCE=1 is fine, just a bit slower.
+> >
+> > With that in mind, the best blend of simplicity and performance is likely to hook
+> > svm_prepare_switch_to_guest() and svm_prepare_host_switch().
+> > switch_to_guest() is called when KVM is about to do VMRUN, and host_switch() is
+> > called when the vCPU is put, i.e. when the task is scheduled out or when KVM_RUN
+> > exits to userspace.
+> >
+> > The existing svm->guest_state_loaded guard avoids toggling the bit when KVM
+> > handles a VM-Exit and re-enters the guest.  The kernel may run a non-trivial
+> > amount of code with BP_SPEC_REDUCE, e.g. if #NPF triggers swap-in, an IRQ
+> > arrives while handling the exit, etc., but that's all fine from a security perspective.
+> >
+> > IIUC, per Boris[*] an IBPB is needed when toggling BP_SPEC_REDUCE on-
+> > demand:
+> >
+> >  : You want to IBPB before clearing the MSR as otherwise host kernel will be
+> >  : running with the mistrained gunk from the guest.
+> >
+> > [*]
+> > https://lore.kernel.org/all/20250217160728.GFZ7NewJHpMaWdiX2M@fat_crate.loc
+> > al
+> >
+> > Assuming that's the case...
+> >
+> > Compile-tested only.  If this looks/sounds sane, I'll test the mechanics and write a
+> > changelog.
+> 
+> I'm having trouble following the patch...where do you clear the MSR bit?
 
-Use a dedicated spinlock and counter instead of hooking virtualization
-enablement, as changing the behavior of kvm.enable_virt_at_load based on
-SRSO_BP_SPEC_REDUCE is painful, and has its own drawbacks, e.g. could
-result in performance issues for flows that are sensitive to VM creation
-latency.
+Gah, the rdmsrl() in svm_prepare_host_switch() should be a wrmsrl().
 
-Defer setting BP_SPEC_REDUCE until VMRUN is imminent to avoid impacting
-performance on CPUs that aren't running VMs, e.g. if a setup is using
-housekeeping CPUs.  Setting BP_SPEC_REDUCE in task context, i.e. without
-blasting IPIs to all CPUs, also helps avoid serializing 1<=>N transitions
-without incurring a gross amount of complexity (see the Link for details
-on how ugly coordinating via IPIs gets).
+> I thought a per-cpu "cache" of the MSR bit might be good to avoid having to
+> issue slow RDMSRs, if these paths are 'hot'.  I don't know if that's the case
+> or not.
 
-Link: https://lore.kernel.org/all/aBOnzNCngyS_pQIW@google.com
-Fixes: 8442df2b49ed ("x86/bugs: KVM: Add support for SRSO_MSR_FIX")
-Reported-by: Michael Larabel <Michael@michaellarabel.com>
-Closes: https://www.phoronix.com/review/linux-615-amd-regression
-Cc: Borislav Petkov <bp@alien8.de>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
+Oh, you were only proposing deferring setting BP_SPEC_REDUCE.  I like it.  That
+avoids setting BP_SPEC_REDUCE on CPUs that aren't running VMs, e.g. housekeeping
+CPUs, and makes it a heck of a lot easier to elide the lock on 1<=>N transitions.
 
-v2: Defer setting BP_SPEC_REDUCE until VMRUN is imminent, which in turn
-    allows for eliding the lock on 0<=>1 transitions as there is no race
-    with CPUs doing VMRUN before receiving the IPI to set the bit, and
-    having multiple tasks take the lock during svm_srso_vm_init() is a-ok.
+I posted v2 using that approach (when lore catches up):
 
-v1: https://lore.kernel.org/all/20250502223456.887618-1-seanjc@google.com
+https://lore.kernel.org/all/20250505180300.973137-1-seanjc@google.com
 
- arch/x86/kvm/svm/svm.c | 71 ++++++++++++++++++++++++++++++++++++++----
- arch/x86/kvm/svm/svm.h |  2 ++
- 2 files changed, 67 insertions(+), 6 deletions(-)
+> Also keep in mind this is a shared (per-core) MSR bit.  You can't just clear
+> it when you exit one guest because the sibling thread might be running
+> another guest.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index cc1c721ba067..15f7a0703c16 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -607,9 +607,6 @@ static void svm_disable_virtualization_cpu(void)
- 	kvm_cpu_svm_disable();
- 
- 	amd_pmu_disable_virt();
--
--	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
--		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
- }
- 
- static int svm_enable_virtualization_cpu(void)
-@@ -687,9 +684,6 @@ static int svm_enable_virtualization_cpu(void)
- 		rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
- 	}
- 
--	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
--		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
--
- 	return 0;
- }
- 
-@@ -1518,6 +1512,63 @@ static void svm_vcpu_free(struct kvm_vcpu *vcpu)
- 	__free_pages(virt_to_page(svm->msrpm), get_order(MSRPM_SIZE));
- }
- 
-+#ifdef CONFIG_CPU_MITIGATIONS
-+static DEFINE_SPINLOCK(srso_lock);
-+static atomic_t srso_nr_vms;
-+
-+static void svm_srso_clear_bp_spec_reduce(void *ign)
-+{
-+	struct svm_cpu_data *sd = this_cpu_ptr(&svm_data);
-+
-+	if (!sd->bp_spec_reduce_set)
-+		return;
-+
-+	msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
-+	sd->bp_spec_reduce_set = false;
-+}
-+
-+static void svm_srso_vm_destroy(void)
-+{
-+	if (!cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
-+		return;
-+
-+	if (atomic_dec_return(&srso_nr_vms))
-+		return;
-+
-+	guard(spinlock)(&srso_lock);
-+
-+	/*
-+	 * Verify a new VM didn't come along, acquire the lock, and increment
-+	 * the count before this task acquired the lock.
-+	 */
-+	if (atomic_read(&srso_nr_vms))
-+		return;
-+
-+	on_each_cpu(svm_srso_clear_bp_spec_reduce, NULL, 1);
-+}
-+
-+static void svm_srso_vm_init(void)
-+{
-+	if (!cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
-+		return;
-+
-+	/*
-+	 * Acquire the lock on 0 => 1 transitions to ensure a potential 1 => 0
-+	 * transition, i.e. destroying the last VM, is fully complete, e.g. so
-+	 * that a delayed IPI doesn't clear BP_SPEC_REDUCE after a vCPU runs.
-+	 */
-+	if (atomic_inc_not_zero(&srso_nr_vms))
-+		return;
-+
-+	guard(spinlock)(&srso_lock);
-+
-+	atomic_inc(&srso_nr_vms);
-+}
-+#else
-+static void svm_srso_vm_init(void) { }
-+static void svm_srso_vm_destroy(void) { }
-+#endif
-+
- static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -1550,6 +1601,11 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
- 	    (!boot_cpu_has(X86_FEATURE_V_TSC_AUX) || !sev_es_guest(vcpu->kvm)))
- 		kvm_set_user_return_msr(tsc_aux_uret_slot, svm->tsc_aux, -1ull);
- 
-+	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE) &&
-+	    !sd->bp_spec_reduce_set) {
-+		sd->bp_spec_reduce_set = true;
-+		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
-+	}
- 	svm->guest_state_loaded = true;
- }
- 
-@@ -5036,6 +5092,8 @@ static void svm_vm_destroy(struct kvm *kvm)
- {
- 	avic_vm_destroy(kvm);
- 	sev_vm_destroy(kvm);
-+
-+	svm_srso_vm_destroy();
- }
- 
- static int svm_vm_init(struct kvm *kvm)
-@@ -5061,6 +5119,7 @@ static int svm_vm_init(struct kvm *kvm)
- 			return ret;
- 	}
- 
-+	svm_srso_vm_init();
- 	return 0;
- }
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index d4490eaed55d..f16b068c4228 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -335,6 +335,8 @@ struct svm_cpu_data {
- 	u32 next_asid;
- 	u32 min_asid;
- 
-+	bool bp_spec_reduce_set;
-+
- 	struct vmcb *save_area;
- 	unsigned long save_area_pa;
- 
+Heh, well then never mind.  I'm not touching SMT coordination. 
 
-base-commit: 45eb29140e68ffe8e93a5471006858a018480a45
--- 
-2.49.0.967.g6a0df3ecc3-goog
+> >  static void svm_prepare_host_switch(struct kvm_vcpu *vcpu)  {
+> > -       to_svm(vcpu)->guest_state_loaded = false;
+> > +       struct vcpu_svm *svm = to_svm(vcpu);
+> > +
+> > +       if (!svm->guest_state_loaded)
+> > +               return;
+> > +
+> > +       if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
+> > +               indirect_branch_prediction_barrier();
+> > +               rdmsrl(MSR_ZEN4_BP_CFG, kvm_host.zen4_bp_cfg);
 
+As above, this is supposed to be wrmsrl().
+
+> > +       }
+> > +       svm->guest_state_loaded = false;
+> >  }
 
