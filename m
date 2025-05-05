@@ -1,184 +1,178 @@
-Return-Path: <kvm+bounces-45542-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45529-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7863FAAB602
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 07:40:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06293AAB777
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 08:12:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3084F50330A
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 05:36:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 796204E2C55
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 06:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3509C4B1E63;
-	Tue,  6 May 2025 00:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32990488CA1;
+	Tue,  6 May 2025 00:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GbT0zcQr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BRYIDiiS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35812FC108
-	for <kvm@vger.kernel.org>; Mon,  5 May 2025 23:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49B32F47BA
+	for <kvm@vger.kernel.org>; Mon,  5 May 2025 23:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487457; cv=none; b=tgulZmhYWEtjF0Qp6sVGPF00nxBypXIhHNiBhF+LG6/d6SgVTbm9ZzYaGbIycenQczVSJbv50NBnxo9+jVPbwZ+Hv+X2yPfUW+WhNKyaF7U5RFvfmVMCGRgcQLFNF1xbEFtH3eg34CnswGPqmFFgtP8tOQjlccy97J45xrCQqCQ=
+	t=1746486956; cv=none; b=vBQgw9vMbl/We9CWqVavSEuez+sIW0roeDQ/kwloRH4PtcYroZVt18yZk+sCIIQLtfBVIL83FVoz6sGL7ojj6LvUYcDpIMcjKZk7cWkszzKkmE6kOsmAUXT5Gx9WgKnSfYKQXJyGw2mPi0NLXFZe5xklJCzQSnSj7qxfcNK9AWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487457; c=relaxed/simple;
-	bh=faRCTrf6TBAyy1Gxn1R7zpsi5M9ebC+tFXR3moVS+yE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FDFbOB4MGHqxjfG2mw4cFM5vFIiPnQopjltrjc8/oAOFPw88dvq39pjjhJaHB8Na+Htc/F/olTiLOqpuO2d3QR3wSbPAx7oF/bJIfhlJeFgP9WBpNndX/6ukvUeDthhXteD1UBslR+/s+On7I4qdwloiVrZFA/G/LZ7aewwkJGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GbT0zcQr; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-22c33677183so59931315ad.2
-        for <kvm@vger.kernel.org>; Mon, 05 May 2025 16:24:15 -0700 (PDT)
+	s=arc-20240116; t=1746486956; c=relaxed/simple;
+	bh=FOf0phkAo0jTZUx4cTd2EAquLqa9kmlIuubRcG1DIvA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EaTOYhu9Cmh09tOSQbwEXr5/oogcD/hVcWQZz7BFy4+MNzwgRWbxvsodDgtsrlLliohmAazZp61HrfeLTHXjs6KwPkAulekIi5mB2nmDLMsEqvvKraRvpRAmflZZQBmwm8ttKkUQNU5kJZp3SffZJbZSciPS1ANEnChKYVyT9FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BRYIDiiS; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-736c0306242so6636240b3a.1
+        for <kvm@vger.kernel.org>; Mon, 05 May 2025 16:15:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1746487455; x=1747092255; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZWI42H1mGpC+qtJnGTlft49SFGxWloHLdh6QbAbdhzc=;
-        b=GbT0zcQrNQaqNmXJdgEifGL19flNIPXae4cgRiv8eg9INE5vmZPsI8M6NPDb4zN04A
-         SKfpRS47P0FnodB95RrFzjduuafkCU1zO8ePoae7ZtUxIY/O9Asc6ncDgSRCfHHWQQgs
-         PtYjWZhZho3jmdgaP3rRenf4NUGFilkOv4+p5jafhALKfe1EcUVOAVHEUyrF/jYOZEJU
-         rRKjMvUVR1P2SOAKm2JkMTFHB5grAilJtOE1Tcgjk9NaZy2h4H4RSVGzb333R5KcZaNn
-         cZv9P7unK4oF+NOGYROp85a0UU29t6PaXzbQBn90A6WJgtTPA2mOKk67s+nc0PSSCzCk
-         rdSg==
+        d=google.com; s=20230601; t=1746486953; x=1747091753; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rzmWvtp9U4UZ+ZB+aWa866i4TSOZqljMe82DBGfpzvc=;
+        b=BRYIDiiSMISLAFnT9Hqm3UjlZMNW89iG6gN2iTNoVNJ5azPXbx9+aOwJC/wvKKGzL2
+         GAlMja3u1UwRmTYwMGDYKJZREDXfpLxhg4OTktoVGsViHt37+Tn0LF3ElFM0/JXCh1UJ
+         DHvm6E8Fki039PPVGRysyCtv2+3PMb+LurHRWyN5S5lnLk12rZWfV4yrQYLCCqjQ+CJe
+         AgDpwJIqLLZlomCTbZrBuPaKH0BlFOkSX5coTOhf8T5ytgYtiWBcjCN2+WK/+paw7LjU
+         o9XD8P6kA4L1xUS9g0MfNbzV9lf9We8O2NX7x2aYUvdQE6Rjk4le7R9uF+UGgS5/VRV6
+         fIew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746487455; x=1747092255;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZWI42H1mGpC+qtJnGTlft49SFGxWloHLdh6QbAbdhzc=;
-        b=LNAavKUsNg5niyMnde88XSF1tKnTzUJm+Q436OirAEa9Pw4LD89vRogkw3Y2qDiYBy
-         Bx7r7tsY7OHMIXwOExBnfV4aoSrB0fnQfKFhYlimp4IydFLll2o/MgE8Jd450F+jSW3+
-         HkekxkuIMMe6ECDFPqXXKah/OY0uDbe91OxWZBSNe0jpdlc8Ofnj9uYhmw+6+v+E/g5s
-         xvUSq4URdVkHDaOGY2jO/Tugto3aEfgXzga2/+VtDopQvKSX9B4dUD5LSnyzluNnLaW6
-         T7aP/FtrhtlBkeLu/NZtUP1E33ZP01h6/wbX1vleqm96ADSnVxNJKf2u806TyWCPZ1fs
-         eBdA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7hEGERjunYGtrpKjjAkFhGnVVkdalG4ASj7ZzHVwx5ukRqtB0VmLnv05VvWjNp5kAWVo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2UHG+RnTg3mfHieLfKtse7ioJXvChroX+Q4yEgWkkwgt7bEXo
-	qTG7M70aIOFVPj7orjNIVznbShS4lQlClbWjCtb/6du+Dcw18De/RzM9UawhDVs=
-X-Gm-Gg: ASbGnctz94Ex29kXJG44TL/MYIlxK1ZeKGU0wY9tUgsMLD66ZRPjgOmnxczHWEXBvuJ
-	XxJ9Lm9O7D9Bvo6Nb0cSDLnSBQ5JWJX85+7QtMWFyOlujIbE+0dhXUqmSdSapqidgPX+/RFWfAh
-	N0fEkTPKznRirc7mMzf1BMbVm3BxemC9+jhdeqcBaK7+0aUhX4ykAKWUYtbzlhSPLW2LZlE7O41
-	pvSN4h08qbpMLFEAkDIP2SVCiiZrtiLR566Z5FHBtpV9T26Oiz/S/KYBY9q9y+bvVD2iadqwswh
-	waeRYsBkiFy1vfEgSrJI6GtQtH414KqfSKePWcisUoLqQCS1p3o=
-X-Google-Smtp-Source: AGHT+IEUQQFAnhHZvpgEW269JjynFC74SxQHriC0mVPlLRJAjytrepF+TKFERHIHr5qYzSkqIHY0bA==
-X-Received: by 2002:a17:902:f14d:b0:22e:37b8:7972 with SMTP id d9443c01a7336-22e37b881c3mr6291595ad.10.1746487455166;
-        Mon, 05 May 2025 16:24:15 -0700 (PDT)
-Received: from pc.. ([38.41.223.211])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e16348edasm58705265ad.28.2025.05.05.16.24.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 16:24:14 -0700 (PDT)
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: richard.henderson@linaro.org,
-	anjo@rev.ng,
-	Peter Maydell <peter.maydell@linaro.org>,
-	alex.bennee@linaro.org,
-	kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	qemu-arm@nongnu.org,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v6 48/50] target/arm/tcg/tlb-insns: compile file once (system)
-Date: Mon,  5 May 2025 16:20:13 -0700
-Message-ID: <20250505232015.130990-49-pierrick.bouvier@linaro.org>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250505232015.130990-1-pierrick.bouvier@linaro.org>
-References: <20250505232015.130990-1-pierrick.bouvier@linaro.org>
+        d=1e100.net; s=20230601; t=1746486953; x=1747091753;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rzmWvtp9U4UZ+ZB+aWa866i4TSOZqljMe82DBGfpzvc=;
+        b=sqCoWwFPHrioI/+rTiqND8QVx+O3pQtL+yVfNm9Ga5kgRZYZfv3mPqWJKQtrTubCL3
+         fH99uRZlyN0xr0N9Rq3wsf2EQrPiMHVYY6iAkOmxaFBplh/fHuCLY45aBuMRsr3cvIpT
+         9te20Ar2OANpOYPc2yXkO4Ietws9NvcrSwX9ymg3P2y/nhwAIkpeUlmj0GMvEgRC+0ov
+         HhX81fxhE9MyTWpyghL912/7YN3bdpP+RYwP+SQUOo4w2CDbTrLmYCUnRIFrhn5at9bF
+         QADr7L8kqK3MSvCggLrJLqwWNvL+oID9bI7DHD8TAa/fJGl2NAT7N6amBMu9tXxRyUSK
+         MxOg==
+X-Forwarded-Encrypted: i=1; AJvYcCUqcxVzVObW5DXg5xV9jGB3M0lHe2AZ3c4UmB2TugKHLNLum7bZ3QFmcgypPoVJ+vmfvDI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGvrOIY7bpL0zvhKUXuSFG1UUECcuWkosbyExrRoorDJqYJoJl
+	5H4y1YuFCJZMQ1fWq44vSO7aEyfArO+cRQgHuwvFG5hmFx6qgfECB+Oi6wb589YoyxI3PHyiov6
+	vdQ==
+X-Google-Smtp-Source: AGHT+IHeMOXp2eUqIo91Z2v4BMrNwcYqIw4g1PHvTLgYii5R2aPOJF8QNAZePSzs6Tddg5PSxQIyvzZa0UY=
+X-Received: from pfbde4.prod.google.com ([2002:a05:6a00:4684:b0:740:41eb:5856])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2793:b0:736:5c8e:baaa
+ with SMTP id d2e1a72fcca58-740919b43a1mr1231292b3a.2.1746486952976; Mon, 05
+ May 2025 16:15:52 -0700 (PDT)
+Date: Mon, 5 May 2025 16:15:51 -0700
+In-Reply-To: <b1cc7366-bd30-46ee-ac6e-35c2b08ffdb5@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250305230000.231025-1-prsampat@amd.com> <174622216534.881262.8086472919667553138.b4-ty@google.com>
+ <b1cc7366-bd30-46ee-ac6e-35c2b08ffdb5@amd.com>
+Message-ID: <aBlGp8i_zzGgKeIl@google.com>
+Subject: Re: [PATCH v8 00/10] Basic SEV-SNP Selftests
+From: Sean Christopherson <seanjc@google.com>
+To: "Pratik R. Sampat" <prsampat@amd.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, pbonzini@redhat.com, thomas.lendacky@amd.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, shuah@kernel.org, pgonda@google.com, 
+	ashish.kalra@amd.com, nikunj@amd.com, pankaj.gupta@amd.com, 
+	michael.roth@amd.com, sraithal@amd.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-aarch64 specific code is guarded by cpu_isar_feature(aa64*), so it's
-safe to expose it.
+On Mon, May 05, 2025, Pratik R. Sampat wrote:
+> Hi Sean,
+>=20
+> On 5/2/25 4:50 PM, Sean Christopherson wrote:
+> > On Wed, 05 Mar 2025 16:59:50 -0600, Pratik R. Sampat wrote:
+> >> This patch series extends the sev_init2 and the sev_smoke test to
+> >> exercise the SEV-SNP VM launch workflow.
+> >>
+> >> Primarily, it introduces the architectural defines, its support in the
+> >> SEV library and extends the tests to interact with the SEV-SNP ioctl()
+> >> wrappers.
+> >>
+> >> [...]
+> >=20
+> > Applied 2-9 to kvm-x86 selftests.  AIUI, the KVM side of things should =
+already
+> > be fixed.  If KVM isn't fixed, I want to take that discussion/patch to =
+a
+> > separate thread.
+> >=20
+>=20
+> Thanks for pulling these patches in.
+>=20
+> For 1 - Ashish's commit now returns failure for this case [1].
+> Although, it appears that the return code isn't checked within
+> sev_platform_init()[2], so it shouldn't change existing behavior. In the
+> kselftest case, if platform init fails, the selftest will also fail =E2=
+=80=94 just as
+> it does currently too.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
----
- target/arm/tcg/tlb-insns.c | 7 -------
- target/arm/tcg/meson.build | 2 +-
- 2 files changed, 1 insertion(+), 8 deletions(-)
+Argh, now I remember the issue.  But _sev_platform_init_locked() returns '0=
+' if
+psp_init_on_probe is true, and I don't see how deferring __sev_snp_init_loc=
+ked()
+will magically make it succeed the second time around.
 
-diff --git a/target/arm/tcg/tlb-insns.c b/target/arm/tcg/tlb-insns.c
-index 0407ad5542d..95c26c6d463 100644
---- a/target/arm/tcg/tlb-insns.c
-+++ b/target/arm/tcg/tlb-insns.c
-@@ -35,7 +35,6 @@ static CPAccessResult access_ttlbis(CPUARMState *env, const ARMCPRegInfo *ri,
-     return CP_ACCESS_OK;
- }
- 
--#ifdef TARGET_AARCH64
- /* Check for traps from EL1 due to HCR_EL2.TTLB or TTLBOS. */
- static CPAccessResult access_ttlbos(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     bool isread)
-@@ -46,7 +45,6 @@ static CPAccessResult access_ttlbos(CPUARMState *env, const ARMCPRegInfo *ri,
-     }
-     return CP_ACCESS_OK;
- }
--#endif
- 
- /* IS variants of TLB operations must affect all cores */
- static void tlbiall_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -802,7 +800,6 @@ static const ARMCPRegInfo tlbi_el3_cp_reginfo[] = {
-       .writefn = tlbi_aa64_vae3_write },
- };
- 
--#ifdef TARGET_AARCH64
- typedef struct {
-     uint64_t base;
-     uint64_t length;
-@@ -1270,8 +1267,6 @@ static const ARMCPRegInfo tlbi_rme_reginfo[] = {
-       .writefn = tlbi_aa64_paallos_write },
- };
- 
--#endif
+So shouldn't the KVM code be this?
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index e0f446922a6e..dd04f979357d 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3038,6 +3038,14 @@ void __init sev_hardware_setup(void)
+        sev_snp_supported =3D sev_snp_enabled && cc_platform_has(CC_ATTR_HO=
+ST_SEV_SNP);
+=20
+ out:
++       if (sev_enabled) {
++               init_args.probe =3D true;
++               if (sev_platform_init(&init_args))
++                       sev_supported =3D sev_es_supported =3D sev_snp_supp=
+orted =3D false;
++               else
++                       sev_snp_supported &=3D sev_is_snp_initialized();
++       }
++
+        if (boot_cpu_has(X86_FEATURE_SEV))
+                pr_info("SEV %s (ASIDs %u - %u)\n",
+                        sev_supported ? min_sev_asid <=3D max_sev_asid ? "e=
+nabled" :
+@@ -3067,12 +3075,6 @@ void __init sev_hardware_setup(void)
+=20
+        if (!sev_enabled)
+                return;
 -
- void define_tlb_insn_regs(ARMCPU *cpu)
- {
-     CPUARMState *env = &cpu->env;
-@@ -1299,7 +1294,6 @@ void define_tlb_insn_regs(ARMCPU *cpu)
-     if (arm_feature(env, ARM_FEATURE_EL3)) {
-         define_arm_cp_regs(cpu, tlbi_el3_cp_reginfo);
-     }
--#ifdef TARGET_AARCH64
-     if (cpu_isar_feature(aa64_tlbirange, cpu)) {
-         define_arm_cp_regs(cpu, tlbirange_reginfo);
-     }
-@@ -1309,5 +1303,4 @@ void define_tlb_insn_regs(ARMCPU *cpu)
-     if (cpu_isar_feature(aa64_rme, cpu)) {
-         define_arm_cp_regs(cpu, tlbi_rme_reginfo);
-     }
--#endif
+-       /*
+-        * Do both SNP and SEV initialization at KVM module load.
+-        */
+-       init_args.probe =3D true;
+-       sev_platform_init(&init_args);
  }
-diff --git a/target/arm/tcg/meson.build b/target/arm/tcg/meson.build
-index 49c8f4390a1..5d326585401 100644
---- a/target/arm/tcg/meson.build
-+++ b/target/arm/tcg/meson.build
-@@ -34,7 +34,6 @@ arm_ss.add(files(
-   'mve_helper.c',
-   'op_helper.c',
-   'vec_helper.c',
--  'tlb-insns.c',
-   'arith_helper.c',
-   'vfp_helper.c',
- ))
-@@ -68,6 +67,7 @@ arm_common_system_ss.add(files(
-   'iwmmxt_helper.c',
-   'neon_helper.c',
-   'tlb_helper.c',
-+  'tlb-insns.c',
- ))
- arm_user_ss.add(files(
-   'hflags.c',
--- 
-2.47.2
+=20
+ void sev_hardware_unsetup(void)
+--
 
+Ashish, what am I missing?
+
+> Regardless of what we decide on what the right behavior is, fail vs skip =
+(I
+> don't mind the former) we can certainly do that over new patches rebased =
+over
+> the new series.
+
+FAIL, for sure.  Unless someone else pipes up with a good reason why they n=
+eed
+to defer INIT_EX, that's Google's problem to solve.
 
