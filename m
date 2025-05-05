@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-45485-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45488-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D515EAAAD25
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 04:30:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06E47AAAD0E
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 04:28:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E0C4164503
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 02:27:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2466A7B3770
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 02:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64183E58BB;
-	Mon,  5 May 2025 23:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51753B0A04;
+	Mon,  5 May 2025 23:34:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k+wDqH4X"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vVA+4uFB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AA828B3E1
-	for <kvm@vger.kernel.org>; Mon,  5 May 2025 23:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1AA3B0A14
+	for <kvm@vger.kernel.org>; Mon,  5 May 2025 23:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487225; cv=none; b=SEo69NaG5mJzY+QX3AKIkTHJ2po67rMuG2QE8rFRxxGdG17xjwednydhxOJ6qgDnaf9bT8ta1recV67srIBcpNfJRvzE/qdpwXvvWN4wQr3SxqtuXfS0TyrPrxJWQQ1EJNj/CGuvI6j4KYMtBX3TSyD/jHByAkzHLTxJ0Y439Ko=
+	t=1746487227; cv=none; b=T5RFOfOziU62NRtWXLow5CvcdvqJKIAzHoQboWIti1KAwctmvwUOIALF+bFDm3OgNGO3Shw4EO43SZ9haSK/SvzsKmSFcVywKLTdETqE8HH3f2EpIjNTHXoTNI+Tcg6Zgml4XU8QnBbEnU7nMof01KvumVbwltKnY//HcXXRFQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487225; c=relaxed/simple;
-	bh=GHQSRfTZut4cMFa1b0PIQYfUMpKuaypMKuod6WBId3Q=;
+	s=arc-20240116; t=1746487227; c=relaxed/simple;
+	bh=znCq36hlXSwrJ49LjZDZum6F/G7FLis5lycOLVMlAUE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bC56/MMz0sZFrxQz394p4I0bwb7ssK6JXif57Sg61syXRljhPm1tuefuGvv8DTpbKxz8f/PxeMrYKro05TeTw8ln8+09YevhQQtwdiv4pL6yMhXphQ6+jc9IFrbCt6FhWXBdi9urkL3dNECxSkOT9SxOl1BBZ0vcaYJD/HYHTXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=k+wDqH4X; arc=none smtp.client-ip=209.85.216.48
+	 MIME-Version; b=VcsQ6TkHGi26G2Kvf6SSPbatx4OWiJ8QLAhbMFH9EsGzFpBJesmtrbPk2wejnpdqT1E3VYqFDXXtIbvX1UsCUvQbhlmXRHCkj9zwh2iGIRZ/vw7LTLZWdW+wVf1i+FlpikIOxH9slKbJq9m3E8O1NYL6cbn+++MLJVquQdU0MnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vVA+4uFB; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-30a452d3b38so4219397a91.3
-        for <kvm@vger.kernel.org>; Mon, 05 May 2025 16:20:22 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b1f7f239b31so5126579a12.0
+        for <kvm@vger.kernel.org>; Mon, 05 May 2025 16:20:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1746487221; x=1747092021; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1746487224; x=1747092024; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hghY4IeLObm8ysFk0eCwCGh3lWvsG0krLPTha8KLWmo=;
-        b=k+wDqH4X+ZXBA0BZX3xwNirtAIgOvjNQxAWgVdiRHwTmr3KjaWAfYS8z1EbOdKSRnK
-         31M82Mz/7hHjfHEvk0PcrpYxQ8x7G1TkYWJHnm59UndR5xLylxBp1JxABQCZOAUCGkSU
-         ZVHvUbCq5/VpSdW0WT9e4XT/JUyHet9R7p6QeW+gPPCy48nn2hdJOB2EqYWCPHy0mKw7
-         uTnZ5dFxUY7A0qaVKC8NBu/gw8WXi/LyDrqUIgA+WX1ZjciDF+ViyqLXKOuelkcKmdnA
-         XJtUEnBhHByoKT1lH3YdVHnMIYU8BP8dNKq8AdjvjsBqphHBNgBHkmX4KaPpRuqxIVrD
-         ucuQ==
+        bh=oMNeg3Y4FuUndpYOZQCJwSPCGo/Nsl7SC/sGcqIL57A=;
+        b=vVA+4uFBMaSoSx5g8csXJGvLNwDb7eb6IZV0/CZQpNHP1CcQ/+Dgj2m7yQPkatZKzk
+         BvI3e0HFcW4lv5R4VjQMD9K+8V/qNbhValArxu4cuqoZrSqhdWe3FMPEOkUpNY5mEN7f
+         19xh3Bnv8658Jgn/6qw3uyhEDn/OUiBrrBWowxDYyHf/rsbk+6J2fq2hp1FBmpksC+M6
+         vvxIhsgdFoVxt0mgdZW6zRzPjT+3JjR1FHHSr3vj9VPMqyve4ZfIWMj9UmU3n7+T+Y7G
+         cVtUl12v4zwqn6HK0j6g+k14d5I58z6MK6IJIfLpsLzKFtdmnT04Xd6a2bYWOWJHxc9J
+         SsHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746487221; x=1747092021;
+        d=1e100.net; s=20230601; t=1746487224; x=1747092024;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hghY4IeLObm8ysFk0eCwCGh3lWvsG0krLPTha8KLWmo=;
-        b=gWJCE71EetnlbwHcx6crUV0rg8oANurdoF2SsdSJ5nx65YYRK3S6kS/H40j6GwtEwP
-         l/nM/C71fTiAfFpc9ftKjfaXVCPhlzM4/lw1g7WMwbMKiNLMc7l65gXg2HJENyYpxwOD
-         kS3rqiQA1uPRE96I+AW6BJUGXehgWYoqjdgKoCBzmn+oP5LUJJnoBZMu1pbXYHzYBF1y
-         9xP3ah4VyHLIGjEWnUwPW7zdwSQVAJLzh206HjoTU1ph3xKTvlKvAvz2S2A+Rrzu7VFu
-         MAKKOdpXQmTzAQj9QSGhRJiSSdSp5oyRje3LZ5GYH0J6rG/KbsH0C1HScXpjWzk6mSjS
-         hWgg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXU/Kyig1jnIj+5Rytn3+pAex+HinRCBGiWsYA3MUHZEbhF1pIIVsVjWFo4p92ajHitRg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKR59JLhDe7ZlhOQcEOnT1z9rK5t5ZNdWjQhH5GkZgLgTxa58X
-	y6HbNpCPmy2m6nELQM1U7MPFM9o8fR9Ss9mP3F9MJhzr5vhieveD1jPYrZHGDPM=
-X-Gm-Gg: ASbGncvYyZ+tc1nmhhYw08Av35Oii1EnXUTZ8nKVO0PGToMF/bb74zFDcXzOBrmuDVr
-	5WNt5wQAxtzD8Cx56UELiC53ApNCp/+dGgYbzLwmigk9kYs6W1/S/S82BEmE+CvTfrpZYSNYtds
-	mb/h9QHqawajwVRmkahNeTshj9k8gDU3PKt+sOt7A7qdN8KJQbS07u/yqlCp1OGJ4mseUIpRu0j
-	7g9FRxGjdwkrSzUbB8aXlHt19BdRAgHWnoMrwxKGi9IjEkBYwIDFrNs3DQGS5z1hbLX9J9CEkLA
-	Ye/GIzo5xXl7Ih0aET2bEhMkBvKoqRUnfJJdrPQ5
-X-Google-Smtp-Source: AGHT+IGyW/h0d+P++2N9HLg6A6FxaGbouVs5I8Cg2OUIrJYht0qMsNp9z55lD9B0AK5WzHNucV8FRQ==
-X-Received: by 2002:a17:90b:5824:b0:309:eb44:2a58 with SMTP id 98e67ed59e1d1-30a4e623cb7mr18849133a91.22.1746487221594;
-        Mon, 05 May 2025 16:20:21 -0700 (PDT)
+        bh=oMNeg3Y4FuUndpYOZQCJwSPCGo/Nsl7SC/sGcqIL57A=;
+        b=tltkDs0smhY6bXFa0DiXW2B13b82nLH/7PwZFAGhz2jlXgjJJhssBzGUrw4ghpaqK5
+         kbzppIv5SfS5kCMlziMz3MAGN1so2CW25c3zr5TAIbtKAPDBnB16u0oNnXrFp3jm95De
+         u8P0p2RqrZUB+QpabTox2JzfFdMpFUaQwfLCJ2KxA8c6H6HYGe9JIFz50QSjiJfxIRFp
+         ADLUTbky06xAJyBrlw8CSoL7v5S1TT2J82vRJWkT8LlvpOTFg8Gh2/sQrCpZTlrjXHpS
+         lk814Csf2uW/aols4QZSlqcJJQJK2iamUpXFo/acKO7qMCnaAbsnBjqtAyYi+3Qr/Ksa
+         0EeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHsh9CYEOZ3o0sI6Ew4u8ctC/7t/z6BU89ygG1tvyWG3cO6WB3Hj/z5186Vl/50XE2FII=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxt4uGIe7nbajbqZA35Q95iQ9XSwyqQycir0d8lifIi/tGT7V5C
+	LNcQjaa63UETAV2s8pYtfYqzTRjmirPuI6Pk4v0iSXdflA9cuhzTwx/gGLmnW8Y=
+X-Gm-Gg: ASbGncvO9QlJjF6PqT0f+p314OY0wB/gDSs1WMq9ZLvIfQm1CrdWC/8RflITwGhcH7c
+	4DWmd+nx7qWFDp1Vvy+27mPuZUPmnLsxWmm86E6DPjbjLDW94eVlqacakDaS3lj+DZEkK+otpZX
+	Orm4gp73S2/eWB0KQ6bMA8m6IXXba96XKDeK0ur9gxG2EY3e5/vWLcSSf6mHvI0+7HL1NZE2YRv
+	LmP80ieYMVfEPopfQFjZHOQyAtdDLnk/0v5oS/PfdK8PoLCQ+o/iQeDEIloQClh2BWN0MzKf85W
+	scQ4MByA80GR9Fl8myzIQLvSCc8VPkxqFv8OrNbV
+X-Google-Smtp-Source: AGHT+IHoFN+rr8Lwq19Sx2mB1Yb2Gf6GH5Yb4OTaXFvREpHxBgl5rUjVxpoL1Lsyqn6N2c59nXy8cg==
+X-Received: by 2002:a17:902:daca:b0:224:3d:2ffd with SMTP id d9443c01a7336-22e3285f134mr16144225ad.17.1746487224186;
+        Mon, 05 May 2025 16:20:24 -0700 (PDT)
 Received: from pc.. ([38.41.223.211])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522917asm60981715ad.201.2025.05.05.16.20.20
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522917asm60981715ad.201.2025.05.05.16.20.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 16:20:21 -0700 (PDT)
+        Mon, 05 May 2025 16:20:23 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: richard.henderson@linaro.org,
@@ -83,9 +83,9 @@ Cc: richard.henderson@linaro.org,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	qemu-arm@nongnu.org,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v6 01/50] target/arm: Replace target_ulong -> vaddr for HWBreakpoint
-Date: Mon,  5 May 2025 16:19:26 -0700
-Message-ID: <20250505232015.130990-2-pierrick.bouvier@linaro.org>
+Subject: [PATCH v6 04/50] meson: apply target config for picking files from libsystem and libuser
+Date: Mon,  5 May 2025 16:19:29 -0700
+Message-ID: <20250505232015.130990-5-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250505232015.130990-1-pierrick.bouvier@linaro.org>
 References: <20250505232015.130990-1-pierrick.bouvier@linaro.org>
@@ -95,68 +95,71 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Philippe Mathieu-Daudé <philmd@linaro.org>
+semihosting code needs to be included only if CONFIG_SEMIHOSTING is set.
+However, this is a target configuration, so we need to apply it to the
+libsystem libuser source sets.
 
-Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- target/arm/internals.h   | 6 +++---
- target/arm/hyp_gdbstub.c | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ meson.build | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 4d3d84ffebd..79a7449041c 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -1949,9 +1949,9 @@ extern GArray *hw_breakpoints, *hw_watchpoints;
- #define get_hw_bp(i)    (&g_array_index(hw_breakpoints, HWBreakpoint, i))
- #define get_hw_wp(i)    (&g_array_index(hw_watchpoints, HWWatchpoint, i))
+diff --git a/meson.build b/meson.build
+index b2c79a7a928..1b365dcae17 100644
+--- a/meson.build
++++ b/meson.build
+@@ -4049,27 +4049,19 @@ common_ss.add(qom, qemuutil)
+ common_ss.add_all(when: 'CONFIG_SYSTEM_ONLY', if_true: [system_ss])
+ common_ss.add_all(when: 'CONFIG_USER_ONLY', if_true: user_ss)
  
--bool find_hw_breakpoint(CPUState *cpu, target_ulong pc);
--int insert_hw_breakpoint(target_ulong pc);
--int delete_hw_breakpoint(target_ulong pc);
-+bool find_hw_breakpoint(CPUState *cpu, vaddr pc);
-+int insert_hw_breakpoint(vaddr pc);
-+int delete_hw_breakpoint(vaddr pc);
+-libuser_ss = libuser_ss.apply({})
+ libuser = static_library('user',
+-                         libuser_ss.sources() + genh,
++                         libuser_ss.all_sources() + genh,
+                          c_args: ['-DCONFIG_USER_ONLY',
+                                   '-DCOMPILING_SYSTEM_VS_USER'],
+-                         dependencies: libuser_ss.dependencies(),
++                         dependencies: libuser_ss.all_dependencies(),
+                          build_by_default: false)
+-libuser = declare_dependency(objects: libuser.extract_all_objects(recursive: false),
+-                             dependencies: libuser_ss.dependencies())
+-common_ss.add(when: 'CONFIG_USER_ONLY', if_true: libuser)
  
- bool check_watchpoint_in_range(int i, vaddr addr);
- CPUWatchpoint *find_hw_watchpoint(CPUState *cpu, vaddr addr);
-diff --git a/target/arm/hyp_gdbstub.c b/target/arm/hyp_gdbstub.c
-index 0512d67f8cf..bb5969720ce 100644
---- a/target/arm/hyp_gdbstub.c
-+++ b/target/arm/hyp_gdbstub.c
-@@ -54,7 +54,7 @@ GArray *hw_breakpoints, *hw_watchpoints;
-  * here so future PC comparisons will work properly.
-  */
+-libsystem_ss = libsystem_ss.apply({})
+ libsystem = static_library('system',
+-                           libsystem_ss.sources() + genh,
++                           libsystem_ss.all_sources() + genh,
+                            c_args: ['-DCONFIG_SOFTMMU',
+                                     '-DCOMPILING_SYSTEM_VS_USER'],
+-                           dependencies: libsystem_ss.dependencies(),
++                           dependencies: libsystem_ss.all_dependencies(),
+                            build_by_default: false)
+-libsystem = declare_dependency(objects: libsystem.extract_all_objects(recursive: false),
+-                               dependencies: libsystem_ss.dependencies())
+-common_ss.add(when: 'CONFIG_SYSTEM_ONLY', if_true: libsystem)
  
--int insert_hw_breakpoint(target_ulong addr)
-+int insert_hw_breakpoint(vaddr addr)
- {
-     HWBreakpoint brk = {
-         .bcr = 0x1,                             /* BCR E=1, enable */
-@@ -80,7 +80,7 @@ int insert_hw_breakpoint(target_ulong addr)
-  * Delete a breakpoint and shuffle any above down
-  */
- 
--int delete_hw_breakpoint(target_ulong pc)
-+int delete_hw_breakpoint(vaddr pc)
- {
-     int i;
-     for (i = 0; i < hw_breakpoints->len; i++) {
-@@ -226,7 +226,7 @@ int delete_hw_watchpoint(vaddr addr, vaddr len, int type)
-     return -ENOENT;
- }
- 
--bool find_hw_breakpoint(CPUState *cpu, target_ulong pc)
-+bool find_hw_breakpoint(CPUState *cpu, vaddr pc)
- {
-     int i;
- 
+ # Note that this library is never used directly (only through extract_objects)
+ # and is not built by default; therefore, source files not used by the build
+@@ -4308,6 +4300,16 @@ foreach target : target_dirs
+   target_common = common_ss.apply(config_target, strict: false)
+   objects = [common_all.extract_objects(target_common.sources())]
+   arch_deps += target_common.dependencies()
++  if target_type == 'system'
++    src = libsystem_ss.apply(config_target, strict: false)
++    objects += libsystem.extract_objects(src.sources())
++    arch_deps += src.dependencies()
++  endif
++  if target_type == 'user'
++    src = libuser_ss.apply(config_target, strict: false)
++    objects += libuser.extract_objects(src.sources())
++    arch_deps += src.dependencies()
++  endif
+   if target_base_arch in target_common_arch_libs
+     src = target_common_arch[target_base_arch].apply(config_target, strict: false)
+     lib = target_common_arch_libs[target_base_arch]
 -- 
 2.47.2
 
