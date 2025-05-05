@@ -1,192 +1,115 @@
-Return-Path: <kvm+bounces-45421-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45422-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E09AA97C7
-	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 17:45:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF12CAA97D4
+	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 17:48:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9589A3AF7DF
-	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 15:45:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE00118888E0
+	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 15:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E9782627E5;
-	Mon,  5 May 2025 15:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FF025E457;
+	Mon,  5 May 2025 15:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d08pjh6v"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="T2A/yTdc"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003222586EF
-	for <kvm@vger.kernel.org>; Mon,  5 May 2025 15:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BBB31F540F;
+	Mon,  5 May 2025 15:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746459933; cv=none; b=T/VUcEa4fdkt+DJXhcWGufqJBfC697TN8GD6oLZKWTT1Ln+C+fG5B8V9Sz90lh6+6+O6n7ymvLBG81x2JXQll8TDZ+/PUZALoxcJX6GanbUo8b/DsJyBeTKnDZFLT8huherSHzUphCPXSDzCSQrhJ+kapf8l911vtRBxroWapQw=
+	t=1746460081; cv=none; b=bkPwprtWveC8BRLd7i+eg3iGCf1L9sO4dQy/ThaUsLcRN3R3zkLpkW51MMLrXi9Zvc/vAE+zHHxD6amWE3n6TS7HDmMLLulpx1e98TMgP0T+DcjU6J0wf/4amv4jNafpy2Wuvp6DEr1ecHDTZQBpd/PFrQ5Wbkxi63LfHsy8cHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746459933; c=relaxed/simple;
-	bh=fT63Qjgxn2mmOj4nEoT8zNbpR7UCW8tfN5uQH3dFpw4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=RvYcjdGgr1Tf+kVJe245zS6ijRBTYI+p5NOKVjHd9THndlMjwAkb7JFS9ElJE+8W5zy+zl/5eIWZf1TLN9oBzMxMDDbWbu1BJDB8frNTLh+SQbySOsZbrLnvkH4erx72/4GJoSHJ9PzSy0WKA2M92YYJ8tQkNg8o4s/rrM32eyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d08pjh6v; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746459931;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fT63Qjgxn2mmOj4nEoT8zNbpR7UCW8tfN5uQH3dFpw4=;
-	b=d08pjh6v23aH3xtEu0vQQS+VSH/Xk2dIXyDbjrIl4kalPA44cAbfQx5vWayQv5O3NeTNHJ
-	oxO6EwTGV2d+sRt2aAOyBBcfTkMIRX42+16+fxdYtOgN/Ek9xN3731JysJkZgV/hpmWuRp
-	l+7yk7K01clhl6zffzl5N6fS4bjMZZw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-371-bQZWoSjtMBGIzX1Y1FnTcA-1; Mon, 05 May 2025 11:45:26 -0400
-X-MC-Unique: bQZWoSjtMBGIzX1Y1FnTcA-1
-X-Mimecast-MFC-AGG-ID: bQZWoSjtMBGIzX1Y1FnTcA_1746459925
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43d4d15058dso32657615e9.0
-        for <kvm@vger.kernel.org>; Mon, 05 May 2025 08:45:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746459925; x=1747064725;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fT63Qjgxn2mmOj4nEoT8zNbpR7UCW8tfN5uQH3dFpw4=;
-        b=kqGOM888y5WkwT/hhsrw3122y0UrN000D8fgsoWtotn6XPNckS+X3gAbPr4DXxARLx
-         o3HQWOgrr5D5iiYqXvGMQjupwjkHuzKZhKJHxqBev4hfHlJkX8XtFJCpwEHjayytHlXn
-         INmcooUQhKUgKtaoXN5e+HEDRKGnpvu5hEpPMHorQ/wLnkzv2EwoaLBFKqhSLqgOTqa5
-         1CvACfO1YYScMdZtte+/gDu8+FHyLsIOVOVksZJjgMyN9BdESCUrxANfP+LTMmf0qBnL
-         tkE6Fnwjk15UR/pUXzjIPioZ67OpOYjjgcdO7q78/bvQleOziToY8rtH4Wc1Sv9GUGjl
-         /LNw==
-X-Forwarded-Encrypted: i=1; AJvYcCVCgiVgAYWYBX+Tst55ymwod4EEd0V62t1hmLVrJSpY3yPPOoCEeprR+Q6Hlvfph+YmgNo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCy6dOo7Vl2xCMZ5BgAxAb3HDZJ8+Aa37KnOwkOu6xicXEJ3KC
-	+vN292xOZGISB6h9uXngGfmTBILo6X8o5ro/Bwq1ED+RF5Um81m3EaOffimaG+/d+eT3IUAmSqA
-	8cZgJxMnK8XtuJQ3lF72I/34SlMpcSkQibI9iGqR2FjAJeQ6StA==
-X-Gm-Gg: ASbGnctNcYg8IIw098qDSVPxJxPJm9BU/mPJAcXO0UT0X/PgYNBmr0VedhYC5lt6ZYl
-	wEtT9O9ZAmYL3MOLcIPq/k4vTs2ibbzQSp3CMdETY2jF/EBRPcXZNL+jCTCRcscv82obY1/r35K
-	+p2AsLdwMyf2uv1Mk+0bZUmj0j49qdsNxKrkcH5IhDysth3WY8LznCBanJ7O883JhOObqVN0j+K
-	D46/hj7xIDV/iKjjQq9hpSmwMxnCepv12mnoWKpmiqlwd8B3Uhdty0+9TP962+vtvESWjZor3sq
-	/6yNd81UdPVfP/NwhJ96ZODJEGynYJRRMFhnFxb2iosdA1WU
-X-Received: by 2002:a05:600c:5290:b0:43d:fa59:bcee with SMTP id 5b1f17b1804b1-441c49340e5mr60613835e9.33.1746459924619;
-        Mon, 05 May 2025 08:45:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHbfW0Iv3UrCtUauOGIpvVxzFiIHYGFD4OyH1evLHyjz0zJwfLTvcXbPZ3pmzRKAXfEnCx79Q==
-X-Received: by 2002:a05:600c:5290:b0:43d:fa59:bcee with SMTP id 5b1f17b1804b1-441c49340e5mr60612745e9.33.1746459924071;
-        Mon, 05 May 2025 08:45:24 -0700 (PDT)
-Received: from vschneid-thinkpadt14sgen2i.remote.csb ([2001:861:43c1:5950:3e51:b684:9982:d4a2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b89d1358sm138001675e9.10.2025.05.05.08.45.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 08:45:22 -0700 (PDT)
-From: Valentin Schneider <vschneid@redhat.com>
-To: Dave Hansen <dave.hansen@intel.com>, Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
- linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org,
- kvm@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-modules@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- rcu@vger.kernel.org, linux-hardening@vger.kernel.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, Juri Lelli
- <juri.lelli@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Yair
- Podemsky <ypodemsk@redhat.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
- Daniel Wagner <dwagner@suse.de>, Petr Tesarik <ptesarik@suse.com>, Nicolas
- Saenz Julienne <nsaenz@amazon.com>, Frederic Weisbecker
- <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, Dave
- Hansen <dave.hansen@linux.intel.com>, Sean Christopherson
- <seanjc@google.com>, Juergen Gross <jgross@suse.com>, Ajay Kaher
- <ajay.kaher@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Russell King
- <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui
- <kernel@xen0n.name>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer
- Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre
- Ghiti <alex@ghiti.fr>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
- <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, x86@kernel.org, "H.
- Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
- <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Alexander
- Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa
- <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, Adrian Hunter
- <adrian.hunter@intel.com>, "Liang, Kan" <kan.liang@linux.intel.com>, Pawan
- Gupta <pawan.kumar.gupta@linux.intel.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jason Baron
- <jbaron@akamai.com>, Ard Biesheuvel <ardb@kernel.org>, Luis Chamberlain
- <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, Sami Tolvanen
- <samitolvanen@google.com>, Daniel Gomez <da.gomez@samsung.com>, Naveen N
- Rao <naveen@kernel.org>, Anil S Keshavamurthy
- <anil.s.keshavamurthy@intel.com>, "David S. Miller" <davem@davemloft.net>,
- Masami Hiramatsu <mhiramat@kernel.org>, Neeraj Upadhyay
- <neeraj.upadhyay@kernel.org>, Joel Fernandes <joel@joelfernandes.org>,
- Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
- Uladzislau Rezki <urezki@gmail.com>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>,
- Zqiang <qiang.zhang1211@gmail.com>, Vincent Guittot
- <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
- Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, Kees Cook
- <kees@kernel.org>, Shuah Khan <shuah@kernel.org>, Masahiro Yamada
- <masahiroy@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Miguel Ojeda
- <ojeda@kernel.org>, "Mike Rapoport (Microsoft)" <rppt@kernel.org>, Rong Xu
- <xur@google.com>, Rafael Aquini <aquini@redhat.com>, Song Liu
- <song@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Dan Carpenter
- <dan.carpenter@linaro.org>, Brian Gerst <brgerst@gmail.com>, "Kirill A.
- Shutemov" <kirill.shutemov@linux.intel.com>, Benjamin Berg
- <benjamin.berg@intel.com>, Vishal Annapurve <vannapurve@google.com>, Randy
- Dunlap <rdunlap@infradead.org>, John Stultz <jstultz@google.com>, Tiezhu
- Yang <yangtiezhu@loongson.cn>
-Subject: Re: [PATCH v5 00/25] context_tracking,x86: Defer some IPIs until a
- user->kernel transition
-In-Reply-To: <2c5d11cf-ad06-444c-b84a-42de7a10159d@intel.com>
-References: <20250429113242.998312-1-vschneid@redhat.com>
- <fefcd1a6-f146-4f3c-b28b-f907e7346ddd@intel.com>
- <20250430132047.01d48647@gandalf.local.home>
- <019f6713-cfbd-466b-8fb5-dcd982cf8644@intel.com>
- <20250430154228.1d6306b4@gandalf.local.home>
- <a6b3a331-1ff3-4490-b300-a62b3c21578d@intel.com>
- <xhsmhr0179w1i.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <34535b8c-35c8-4a7f-8363-f5a9c5a69023@intel.com>
- <xhsmho6wb9de3.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <2c5d11cf-ad06-444c-b84a-42de7a10159d@intel.com>
-Date: Mon, 05 May 2025 17:45:20 +0200
-Message-ID: <xhsmhldrb9i3z.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	s=arc-20240116; t=1746460081; c=relaxed/simple;
+	bh=eeAdHTJm6FSrjCZKlfIOq8+Vn3n8V2I6OFBiLTT5iKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FTbP9Xyfk87R1yx94T/FPTVrUgm0U5802EhltetkiRvaBRgR6FMkSKQ07AhQo/8k97MLLfQf3j0XFTSTP2eR6i61t71tYFAysbSJDvz6LA5nKwTxy6hNzHM+T9SnDl4hEu8brSlj5VP4vyEMFH1XJ/ZQviUJg5btMRKSq/BzvPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=T2A/yTdc; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id AD57140E01FA;
+	Mon,  5 May 2025 15:47:55 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id YEE7AJJhfvNQ; Mon,  5 May 2025 15:47:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1746460071; bh=Uoj54ZHamcLCff/Dsy1RSXhTMNk3UMUXjW5gx1XCL/c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T2A/yTdcAkpsXv56oFoV4TxKUcjztflUlTqG7JatgyVomIj57BznaXSKAM7cy0yAY
+	 17aK3s6HfwmPA0VRaZTR3myWr5sN2hIInJpJpMRA7LsX8L64ls/KPCSAIuyQU166HB
+	 7bv20nmAnDJ4HX9Ux9AV18/CqYAtoCT6Dgsqfhr9KtSdmB1OAGvxJkoCKrxY8ZdMdK
+	 HGlKitBNbH+edAVPiJS0OP+aS2aflUHid1RJZ212bfBsD/wVaLGl/meW5z1Ynp/SLm
+	 BvN+gE+R86rxANyykpVZPGUjpaU0xxHbK1w9fzPj8TJfPC8a6J0G2pHXaCR+suDWF/
+	 4TLX9WbYle0cq7D4yHHE9qayMgvE8uT7KVbbA6yof7adk6N4xApBwLfVfckHjOWudV
+	 kuATfFcS2mONV+dwaPk4IBT9FDSmSPy8HjRKat25Bx50yORxLnqdsvDvAFXLE6ha1d
+	 vEDRtmjYv2unFy7rqHf+LvQNiwQrjcJLzFo6NAa3YRNROOSR4kizFDXX0Ta4GsqUIH
+	 ksQ7lkg/TeSzQJ4GENEVLD/kdt/hH7kb/dt+1x7VL3cPhY1e0nh3Y2s3yYdh9xR4GL
+	 6NV0IojZMWmTgzcFr2JllYdd6KLZmfEYDdlSeO4mZ7m4Ovm64bcRJ2WvAC8aaFVNUA
+	 bJmwxPUdqjQBHdNvLYe0y8wg=
+Received: from zn.tnic (p579690ee.dip0.t-ipconnect.de [87.150.144.238])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7248040E0196;
+	Mon,  5 May 2025 15:47:38 +0000 (UTC)
+Date: Mon, 5 May 2025 17:47:32 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: "Kaplan, David" <David.Kaplan@amd.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Patrick Bellasi <derkling@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Patrick Bellasi <derkling@matbug.net>,
+	Brendan Jackman <jackmanb@google.com>,
+	Michael Larabel <Michael@michaellarabel.com>
+Subject: Re: x86/bugs: KVM: Add support for SRSO_MSR_FIX, back for moar
+Message-ID: <20250505154732.GIaBjdlKe_vA9U7gmb@fat_crate.local>
+References: <Z7OUZhyPHNtZvwGJ@Asmaa.>
+ <20250217202048.GIZ7OaIOWLH9Y05U-D@fat_crate.local>
+ <f16941c6a33969a373a0a92733631dc578585c93@linux.dev>
+ <20250218111306.GFZ7RrQh3RD4JKj1lu@fat_crate.local>
+ <20250429132546.GAaBDTWqOsWX8alox2@fat_crate.local>
+ <aBKzPyqNTwogNLln@google.com>
+ <20250501081918.GAaBMuhq6Qaa0C_xk_@fat_crate.local>
+ <aBOnzNCngyS_pQIW@google.com>
+ <20250505152533.GHaBjYbcQCKqxh-Hzt@fat_crate.local>
+ <LV3PR12MB9265E790428699931E58BE8D948E2@LV3PR12MB9265.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <LV3PR12MB9265E790428699931E58BE8D948E2@LV3PR12MB9265.namprd12.prod.outlook.com>
 
-On 02/05/25 10:57, Dave Hansen wrote:
-> gah, the cc list here is rotund...
->
-> On 5/2/25 09:38, Valentin Schneider wrote:
-> ...
->>> All of the paths to enter the kernel from userspace have some
->>> SWITCH_TO_KERNEL_CR3 variant. If they didn't, the userspace that they
->>> entered from could have attacked the kernel with Meltdown.
->>>
->>> I'm theorizing that if this is _just_ about avoiding TLB flush IPIs that
->>> you can get away with a single mechanism.
->>
->> So right now there would indeed be the TLB flush IPIs, but also the
->> text_poke() ones (sync_core() after patching text).
->>
->> These are the two NOHZ-breaking IPIs that show up on my HP box, and that I
->> also got reports for from folks using NOHZ_FULL + CPU isolation in
->> production, mostly on SPR "edge enhanced" type of systems.
-> ...
->> While I don't expect the list to grow much, it's unfortunately not just the
->> TLB flush IPIs.
->
-> Isn't text patching way easier than TLB flushes? You just need *some*
-> serialization. Heck, since TLB flushes are architecturally serializing,
-> you could probably even reuse the exact same mechanism: implement
-> deferred text patch serialization operations as a deferred TLB flush.
->
-> The hardest part is figuring out which CPUs are in the state where they
-> can be deferred or not. But you have to solve that in any case, and you
-> already have an algorithm to do it.
+On Mon, May 05, 2025 at 03:40:20PM +0000, Kaplan, David wrote:
+> Almost.  My thought was that kvm_run could do something like:
+> 
+> If (!this_cpu_read(bp_spec_reduce_is_set)) {
+>    wrmsrl to set BP_SEC_REDUCE
+>    this_cpu_write(bp_spec_reduce_is_set, 1)
+> }
 
-Alright, off to mess around SWITCH_TO_KERNEL_CR3 to see how shoving
-deferred operations there would look then.
+That's what I meant too. :-)
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
