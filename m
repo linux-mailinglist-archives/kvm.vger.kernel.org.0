@@ -1,75 +1,77 @@
-Return-Path: <kvm+bounces-45486-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45485-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BDFEAAAD38
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 04:31:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D515EAAAD25
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 04:30:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86BDB1891F98
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 02:28:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E0C4164503
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 02:27:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC09928D8DE;
-	Mon,  5 May 2025 23:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64183E58BB;
+	Mon,  5 May 2025 23:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YTDMCKIK"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k+wDqH4X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E87F28B3E9
-	for <kvm@vger.kernel.org>; Mon,  5 May 2025 23:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AA828B3E1
+	for <kvm@vger.kernel.org>; Mon,  5 May 2025 23:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487225; cv=none; b=L0KR1Ur4/3rU35l+E0qklY21dmIkGpoUkOMpxWR5OYFnTBYVlXIP1n0yLbioYug6NSguZWvSSlbRX8WI8SiCVB9xBOV0YTcQSA3PjdtICjAZxjFnr9eNN0new5rpojeA9ME4xp85dD3EFb9tW6jXq1hFlHRYdXREYwEIPN2/4Ic=
+	t=1746487225; cv=none; b=SEo69NaG5mJzY+QX3AKIkTHJ2po67rMuG2QE8rFRxxGdG17xjwednydhxOJ6qgDnaf9bT8ta1recV67srIBcpNfJRvzE/qdpwXvvWN4wQr3SxqtuXfS0TyrPrxJWQQ1EJNj/CGuvI6j4KYMtBX3TSyD/jHByAkzHLTxJ0Y439Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746487225; c=relaxed/simple;
-	bh=KM4e5k99+ZhpII/rmnqZ2icmNCpowZAV9OwyNYgA724=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AeE7BnOVWtjihpJPisl2kCnxpbVvIOaAd5ud9aw8me5zpjowy+aAmaJ8PO6VDElQxeAczalMi8/jejfvUhuWm+JMd8tEoQbegRbcgbblubihXO5k4a98uF/sVQRW+GwrVyCm/ZxUKU/29K9TIdcVmIInn/WDLKarFKXu09LLeME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=fail smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YTDMCKIK; arc=none smtp.client-ip=209.85.215.181
+	bh=GHQSRfTZut4cMFa1b0PIQYfUMpKuaypMKuod6WBId3Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bC56/MMz0sZFrxQz394p4I0bwb7ssK6JXif57Sg61syXRljhPm1tuefuGvv8DTpbKxz8f/PxeMrYKro05TeTw8ln8+09YevhQQtwdiv4pL6yMhXphQ6+jc9IFrbCt6FhWXBdi9urkL3dNECxSkOT9SxOl1BBZ0vcaYJD/HYHTXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=k+wDqH4X; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=linaro.org
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-af6a315b491so4540100a12.1
-        for <kvm@vger.kernel.org>; Mon, 05 May 2025 16:20:21 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-30a452d3b38so4219397a91.3
+        for <kvm@vger.kernel.org>; Mon, 05 May 2025 16:20:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1746487221; x=1747092021; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=04Ix3M4tuJXhEIQ9AeSHf28aqJlTNZ3AOq6Hx3kur6A=;
-        b=YTDMCKIK1hHLGhNWnN+n0Jl/FpRgxTq5Uwdk4xqgGADKfvHUJE9jf1uERbGzSe+EP7
-         +JVC28yif2Gp2TgrSpMKyu+011PYgKzJy8UnFqs8M/gqIG/emkEfKeF8/c8l8fWNHt9i
-         Om6+MHD++t4J9W+LPZBlt8nHkoebecMRfOim8m2rc+LMnC4EhCKXESIjjjv17LHb6PYH
-         JoFq87bzDC73ueew0tohQqqV52Ef2I9yk4vWHSwNfw0wt68yJ3jevgBgfHGu7CysUl+H
-         1JCkPvDtUbhNNM5+7+2PwOy9PSxv7EXwLcQS4LNmsT2G3Xe5dkRr/q9UkUhNPtrTzqpJ
-         1I3w==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hghY4IeLObm8ysFk0eCwCGh3lWvsG0krLPTha8KLWmo=;
+        b=k+wDqH4X+ZXBA0BZX3xwNirtAIgOvjNQxAWgVdiRHwTmr3KjaWAfYS8z1EbOdKSRnK
+         31M82Mz/7hHjfHEvk0PcrpYxQ8x7G1TkYWJHnm59UndR5xLylxBp1JxABQCZOAUCGkSU
+         ZVHvUbCq5/VpSdW0WT9e4XT/JUyHet9R7p6QeW+gPPCy48nn2hdJOB2EqYWCPHy0mKw7
+         uTnZ5dFxUY7A0qaVKC8NBu/gw8WXi/LyDrqUIgA+WX1ZjciDF+ViyqLXKOuelkcKmdnA
+         XJtUEnBhHByoKT1lH3YdVHnMIYU8BP8dNKq8AdjvjsBqphHBNgBHkmX4KaPpRuqxIVrD
+         ucuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1746487221; x=1747092021;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=04Ix3M4tuJXhEIQ9AeSHf28aqJlTNZ3AOq6Hx3kur6A=;
-        b=qaTAG9BbghciuXfrsS+yBTKRT6VUaiSHLcDeIcsqnZrNlAUE33Q3CQAas08wyH3YSw
-         fV+ScD2kTrWY9esSP2zFcUOf331eLdkI3/GRrG7gRnONIfFm7HDX/zOcn8SWZvrNhXdn
-         KME3EcXZ9aYHA2aQ9E8ZX+N6jlQA5j5M1LlKMbhXX0r7GnowqfgAhNHKMoOfGxYofj6S
-         vBhifFNfKtkD7mJwUpBh/mt2fDayFRC+nfdYkmp4hV+VQmje1MduM/a/r/3iOLaukRye
-         zuOEr+JeMz6pn9cLA4FFbqRW5vdvrXQ/cUQKGpT8t+MxlTFAnAfzPBu/S/yXApy/wdN9
-         rkTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVw8ozSG2GvxwUBkWz3ig7NFSyBqDo3zvPEneWf0KUlNKzuTacR6kFaekiSv5ydIk3s4VI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywl/7dK1uzKII/3c6b3xp2Msku4ThXwVgCf38vqMZSOrHhM3SDi
-	gPdlgGpMXlXSkAPuCcs6jil6OA3oWyraxryQQaGbToZ3AUzzUHWHpV02fOTgG/Y=
-X-Gm-Gg: ASbGnctr7+snGR3OjfLWXhtkDDO8peF3Is4yh2/YfTVNkQ0MrkwUDXR37pNWICZ6FGM
-	dEwdRtXduVV43CKJeqWH/ftRBuvLjBJObvRmkoDDvsiOXxscEECCTlP28VHRcSlke1XK5ZBUvvc
-	X0WWIPUiexkAvTA0TGtPU1ipjoLgzsotPRq8EZPJX+wv0wDZco0A/w5hCmD6seqj2V57XLB0uJf
-	HB7Vvm38JrpGiGnvmnBG+KfUVbDazHogfAFCC95JlN5SDcSsQNaQehk0wveeM5y0ThZ6cnvkkZI
-	5qKBdPWZRt8EXh++MdP+YsgWh09fBa8ohcLLeH+P
-X-Google-Smtp-Source: AGHT+IHfCgAA4+D90CVu2oz49y29SXm3HfgqMa52LdxN54WvvmDw5NiqsMm2gDuMWZrsbaNGyWXGVA==
-X-Received: by 2002:a17:903:41cb:b0:220:e1e6:4472 with SMTP id d9443c01a7336-22e328cf92emr16217105ad.13.1746487220678;
-        Mon, 05 May 2025 16:20:20 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hghY4IeLObm8ysFk0eCwCGh3lWvsG0krLPTha8KLWmo=;
+        b=gWJCE71EetnlbwHcx6crUV0rg8oANurdoF2SsdSJ5nx65YYRK3S6kS/H40j6GwtEwP
+         l/nM/C71fTiAfFpc9ftKjfaXVCPhlzM4/lw1g7WMwbMKiNLMc7l65gXg2HJENyYpxwOD
+         kS3rqiQA1uPRE96I+AW6BJUGXehgWYoqjdgKoCBzmn+oP5LUJJnoBZMu1pbXYHzYBF1y
+         9xP3ah4VyHLIGjEWnUwPW7zdwSQVAJLzh206HjoTU1ph3xKTvlKvAvz2S2A+Rrzu7VFu
+         MAKKOdpXQmTzAQj9QSGhRJiSSdSp5oyRje3LZ5GYH0J6rG/KbsH0C1HScXpjWzk6mSjS
+         hWgg==
+X-Forwarded-Encrypted: i=1; AJvYcCUXU/Kyig1jnIj+5Rytn3+pAex+HinRCBGiWsYA3MUHZEbhF1pIIVsVjWFo4p92ajHitRg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKR59JLhDe7ZlhOQcEOnT1z9rK5t5ZNdWjQhH5GkZgLgTxa58X
+	y6HbNpCPmy2m6nELQM1U7MPFM9o8fR9Ss9mP3F9MJhzr5vhieveD1jPYrZHGDPM=
+X-Gm-Gg: ASbGncvYyZ+tc1nmhhYw08Av35Oii1EnXUTZ8nKVO0PGToMF/bb74zFDcXzOBrmuDVr
+	5WNt5wQAxtzD8Cx56UELiC53ApNCp/+dGgYbzLwmigk9kYs6W1/S/S82BEmE+CvTfrpZYSNYtds
+	mb/h9QHqawajwVRmkahNeTshj9k8gDU3PKt+sOt7A7qdN8KJQbS07u/yqlCp1OGJ4mseUIpRu0j
+	7g9FRxGjdwkrSzUbB8aXlHt19BdRAgHWnoMrwxKGi9IjEkBYwIDFrNs3DQGS5z1hbLX9J9CEkLA
+	Ye/GIzo5xXl7Ih0aET2bEhMkBvKoqRUnfJJdrPQ5
+X-Google-Smtp-Source: AGHT+IGyW/h0d+P++2N9HLg6A6FxaGbouVs5I8Cg2OUIrJYht0qMsNp9z55lD9B0AK5WzHNucV8FRQ==
+X-Received: by 2002:a17:90b:5824:b0:309:eb44:2a58 with SMTP id 98e67ed59e1d1-30a4e623cb7mr18849133a91.22.1746487221594;
+        Mon, 05 May 2025 16:20:21 -0700 (PDT)
 Received: from pc.. ([38.41.223.211])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522917asm60981715ad.201.2025.05.05.16.20.19
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522917asm60981715ad.201.2025.05.05.16.20.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 16:20:20 -0700 (PDT)
+        Mon, 05 May 2025 16:20:21 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: richard.henderson@linaro.org,
@@ -81,196 +83,80 @@ Cc: richard.henderson@linaro.org,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	qemu-arm@nongnu.org,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v6 00/50] single-binary: compile target/arm twice
-Date: Mon,  5 May 2025 16:19:25 -0700
-Message-ID: <20250505232015.130990-1-pierrick.bouvier@linaro.org>
+Subject: [PATCH v6 01/50] target/arm: Replace target_ulong -> vaddr for HWBreakpoint
+Date: Mon,  5 May 2025 16:19:26 -0700
+Message-ID: <20250505232015.130990-2-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250505232015.130990-1-pierrick.bouvier@linaro.org>
+References: <20250505232015.130990-1-pierrick.bouvier@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-More work toward single-binary.
+From: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-Some files have external dependencies for the single-binary:
-- target/arm/gdbstub.c: gdbhelpers
-- target/arm/arm-qmp-cmds.c: qapi
-- target/arm/tcg/translate*: need deep cleanup in include/tcg
-- target/arm/tcg/cpu*: need TargetInfo implemented for arm/aarch64
-- target/arm/tcg/*-helper*: need deeper split between aarch64 and arm code
-They will not be ported in this series.
+Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+---
+ target/arm/internals.h   | 6 +++---
+ target/arm/hyp_gdbstub.c | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-Built on {linux, windows, macos} x {x86_64, aarch64}
-Fully tested on linux-x86_64
-
-v6
---
-
-CI: https://github.com/pbo-linaro/qemu/actions/runs/14844742069/job/41675865456
-- Replace target_ulong -> vaddr for HWBreakpoint (Philippe)
-- build target/arm/tcg/crypto_helper.c once (Richard)
-- build target/arm/tcg/tlb-insns for system only (Richard)
-- build target/arm/tcg/arith_helper once (Richard)
-
-v5
---
-
-CI: https://github.com/pbo-linaro/qemu/actions/runs/14825451208/job/41617949501
-- Do not define a separate vaddr type in tcg, simply alias to i32/i64 (Richard)
-- target/arm/tcg/crypto_helper.c
-- target/arm/tcg/hflags.c
-- target/arm/tcg/iwmmxt_helper.c
-- target/arm/tcg/neon_helper.c
-- target/arm/tcg/tlb_helper.c
-- target/arm/tcg/tlb-insns.c
-- target/arm/tcg/arith_helper.c
-- target/arm/tcg/vfp_helper.c
-
-v4
---
-
-CI: https://github.com/pbo-linaro/qemu/actions/runs/14816460393/job/41597560792
-- add patch to apply target config for picking files in libsystem/libuser
-  Useful for Philippe series for semihosting:
-  https://lore.kernel.org/qemu-devel/20250502220524.81548-1-philmd@linaro.org/T/#me750bbaeeba4d16791121fe98b44202afaec4068
-- update some patches description (Philippe & Richard)
-- tcg: introduce vaddr type (Richard)
-- modify concerned helpers to use vaddr instead of i64 (Richard)
-- use int64_t instead of uint64_t for top_bits in ptw.c (Philippe)
-- arm_casq_ptw: use CONFIG_ATOMIC64 instead of TARGET_AARCH64 and comment why
-  (Richard)
-- target/arm/machine.c
-
-v3
---
-
-CI: https://github.com/pbo-linaro/qemu/actions/runs/14765763846/job/41456754153
-- Add missing license for new files (Richard)
-- target/arm/debug_helper.c
-- target/arm/helper.c
-- target/arm/vfp_fpscr.c
-- target/arm/arch_dump.c
-- target/arm/arm-powerctl.c
-- target/arm/cortex-regs.c
-- target/arm/ptw.c
-- target/arm/kvm-stub.c
-
-v2
---
-
-- Remove duplication of kvm struct and constant (Alex)
-- Use target_big_endian() (Anton)
-
-v1
---
-
-- target/arm/cpu.c
-
-Philippe Mathieu-Daudé (1):
-  target/arm: Replace target_ulong -> vaddr for HWBreakpoint
-
-Pierrick Bouvier (49):
-  include/system/hvf: missing vaddr include
-  meson: add common libs for target and target_system
-  meson: apply target config for picking files from libsystem and
-    libuser
-  target/arm: move kvm stubs and remove CONFIG_KVM from kvm_arm.h
-  target/arm/kvm-stub: add kvm_arm_reset_vcpu stub
-  target/arm/cpu: move arm_cpu_kvm_set_irq to kvm.c
-  accel/hvf: add hvf_enabled() for common code
-  target/arm/cpu: remove TARGET_BIG_ENDIAN dependency
-  target/arm/cpu: remove TARGET_AARCH64 around aarch64_cpu_dump_state
-    common
-  target/arm/cpu: remove TARGET_AARCH64 in arm_cpu_finalize_features
-  target/arm/cpu: compile file twice (user, system) only
-  target/arm/cpu32-stubs.c: compile file twice (user, system)
-  tcg: add vaddr type for helpers
-  target/arm/helper: use vaddr instead of target_ulong for
-    exception_pc_alignment
-  target/arm/helper: use vaddr instead of target_ulong for probe_access
-  target/arm/helper: extract common helpers
-  target/arm/debug_helper: only include common helpers
-  target/arm/debug_helper: remove target_ulong
-  target/arm/debug_helper: compile file twice (user, system)
-  target/arm/helper: restrict include to common helpers
-  target/arm/helper: replace target_ulong by vaddr
-  target/arm/helper: expose aarch64 cpu registration
-  target/arm/helper: remove remaining TARGET_AARCH64
-  target/arm/helper: compile file twice (user, system)
-  target/arm/vfp_fpscr: compile file twice (user, system)
-  target/arm/arch_dump: remove TARGET_AARCH64 conditionals
-  target/arm/arch_dump: compile file once (system)
-  target/arm/arm-powerctl: compile file once (system)
-  target/arm/cortex-regs: compile file once (system)
-  target/arm/ptw: replace target_ulong with int64_t
-  target/arm/ptw: replace TARGET_AARCH64 by CONFIG_ATOMIC64 from
-    arm_casq_ptw
-  target/arm/ptw: compile file once (system)
-  target/arm/meson: accelerator files are not needed in user mode
-  target/arm/kvm-stub: compile file once (system)
-  target/arm/machine: reduce migration include to avoid target specific
-    definitions
-  target/arm/machine: remove TARGET_AARCH64 from migration state
-  target/arm/machine: move cpu_post_load kvm bits to
-    kvm_arm_cpu_post_load function
-  target/arm/kvm-stub: add missing stubs
-  target/arm/machine: compile file once (system)
-  target/arm/tcg/vec_internal: use forward declaration for CPUARMState
-  target/arm/tcg/crypto_helper: compile file once
-  target/arm/tcg/hflags: compile file twice (system, user)
-  target/arm/tcg/iwmmxt_helper: compile file twice (system, user)
-  target/arm/tcg/neon_helper: compile file twice (system, user)
-  target/arm/tcg/tlb_helper: compile file twice (system, user)
-  target/arm/helper: restrict define_tlb_insn_regs to system target
-  target/arm/tcg/tlb-insns: compile file once (system)
-  target/arm/tcg/arith_helper: compile file once
-  target/arm/tcg/vfp_helper: compile file twice (system, user)
-
- meson.build                    |  104 ++-
- include/system/hvf.h           |   15 +-
- include/tcg/tcg-op-common.h    |    1 +
- include/tcg/tcg.h              |   14 +
- target/arm/helper.h            | 1152 +------------------------------
- target/arm/internals.h         |    6 +-
- target/arm/kvm_arm.h           |   87 +--
- target/arm/tcg/helper.h        | 1153 ++++++++++++++++++++++++++++++++
- target/arm/tcg/vec_internal.h  |    2 +
- include/exec/helper-head.h.inc |   11 +
- accel/hvf/hvf-stub.c           |    5 +
- target/arm/arch_dump.c         |    6 -
- target/arm/cpu.c               |   47 +-
- target/arm/cpu32-stubs.c       |   26 +
- target/arm/debug_helper.c      |    6 +-
- target/arm/helper.c            |   23 +-
- target/arm/hyp_gdbstub.c       |    6 +-
- target/arm/kvm-stub.c          |   97 +++
- target/arm/kvm.c               |   42 +-
- target/arm/machine.c           |   15 +-
- target/arm/ptw.c               |    6 +-
- target/arm/tcg/arith_helper.c  |    5 +-
- target/arm/tcg/crypto_helper.c |    6 +-
- target/arm/tcg/hflags.c        |    4 +-
- target/arm/tcg/iwmmxt_helper.c |    4 +-
- target/arm/tcg/neon_helper.c   |    4 +-
- target/arm/tcg/op_helper.c     |    2 +-
- target/arm/tcg/tlb-insns.c     |    7 -
- target/arm/tcg/tlb_helper.c    |    5 +-
- target/arm/tcg/translate-a64.c |    2 +-
- target/arm/tcg/translate.c     |    2 +-
- target/arm/tcg/vfp_helper.c    |    4 +-
- tcg/tcg.c                      |    5 +
- accel/hvf/meson.build          |    1 +
- target/arm/meson.build         |   41 +-
- target/arm/tcg/meson.build     |   29 +-
- 36 files changed, 1547 insertions(+), 1398 deletions(-)
- create mode 100644 target/arm/tcg/helper.h
- create mode 100644 accel/hvf/hvf-stub.c
- create mode 100644 target/arm/cpu32-stubs.c
-
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 4d3d84ffebd..79a7449041c 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -1949,9 +1949,9 @@ extern GArray *hw_breakpoints, *hw_watchpoints;
+ #define get_hw_bp(i)    (&g_array_index(hw_breakpoints, HWBreakpoint, i))
+ #define get_hw_wp(i)    (&g_array_index(hw_watchpoints, HWWatchpoint, i))
+ 
+-bool find_hw_breakpoint(CPUState *cpu, target_ulong pc);
+-int insert_hw_breakpoint(target_ulong pc);
+-int delete_hw_breakpoint(target_ulong pc);
++bool find_hw_breakpoint(CPUState *cpu, vaddr pc);
++int insert_hw_breakpoint(vaddr pc);
++int delete_hw_breakpoint(vaddr pc);
+ 
+ bool check_watchpoint_in_range(int i, vaddr addr);
+ CPUWatchpoint *find_hw_watchpoint(CPUState *cpu, vaddr addr);
+diff --git a/target/arm/hyp_gdbstub.c b/target/arm/hyp_gdbstub.c
+index 0512d67f8cf..bb5969720ce 100644
+--- a/target/arm/hyp_gdbstub.c
++++ b/target/arm/hyp_gdbstub.c
+@@ -54,7 +54,7 @@ GArray *hw_breakpoints, *hw_watchpoints;
+  * here so future PC comparisons will work properly.
+  */
+ 
+-int insert_hw_breakpoint(target_ulong addr)
++int insert_hw_breakpoint(vaddr addr)
+ {
+     HWBreakpoint brk = {
+         .bcr = 0x1,                             /* BCR E=1, enable */
+@@ -80,7 +80,7 @@ int insert_hw_breakpoint(target_ulong addr)
+  * Delete a breakpoint and shuffle any above down
+  */
+ 
+-int delete_hw_breakpoint(target_ulong pc)
++int delete_hw_breakpoint(vaddr pc)
+ {
+     int i;
+     for (i = 0; i < hw_breakpoints->len; i++) {
+@@ -226,7 +226,7 @@ int delete_hw_watchpoint(vaddr addr, vaddr len, int type)
+     return -ENOENT;
+ }
+ 
+-bool find_hw_breakpoint(CPUState *cpu, target_ulong pc)
++bool find_hw_breakpoint(CPUState *cpu, vaddr pc)
+ {
+     int i;
+ 
 -- 
 2.47.2
 
