@@ -1,210 +1,156 @@
-Return-Path: <kvm+bounces-45456-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B55AA9C37
-	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 21:05:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82BE5AA9C56
+	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 21:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33E621A80903
-	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 19:06:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 810FA7A8CB8
+	for <lists+kvm@lfdr.de>; Mon,  5 May 2025 19:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA54C26B08C;
-	Mon,  5 May 2025 19:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5EB826FA40;
+	Mon,  5 May 2025 19:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q/kHWfbh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q+x8+0De"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C1D2638BA
-	for <kvm@vger.kernel.org>; Mon,  5 May 2025 19:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436061487E1
+	for <kvm@vger.kernel.org>; Mon,  5 May 2025 19:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746471947; cv=none; b=so2jvlcPmdnZ0GSPN3VdI3J6LRfQTP3tfJE2zto7JcQ3nDYmuHU3drVyoIt5BrzU23lHtsOfWLnHfP2BmZCf57yRTtJaGEag5INiCOwSZbegDwf3OAbzjlYNWe95xSVzSCEA5Ugjiir/t/KGFNmnf4tNwxOoNX+8msCx6QOqupE=
+	t=1746472635; cv=none; b=eC3K5A37P19uEvS2Casq4y+LLjm/n6UDa8G0qyMGCqQKsaLFPg/oa2P6/UKFFelTLpKhEzxsvr0rVIem/osVTt5zGY2zDyaWQHpN0T+y6lAfP1xe0qTs2mNLT+2iJioU4Fq3vrW659QBBZNriiR+GG7QYyBxEQ7sdWrgJ/b6yPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746471947; c=relaxed/simple;
-	bh=ln/n/A7vDkSHNwU9VZoPwGfRXDYa7Qag+aGXjW75oWg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gYHu8lkLWzjv5X0JcUkz75ZEvkUavOeORX4W7pNixNq/69uZ7SDvjlwndRA9BvQn2h+ImMBSVOO1hullMmIPZbB9b+IecIlM61RB4Ynd9KB6SKAx3lytmWOitRtnOA/TVL/W9d8GKKQUWTWtk/DFJrBqHvqxw8qdAbYly6dW2cU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q/kHWfbh; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22e1eafa891so29905ad.0
-        for <kvm@vger.kernel.org>; Mon, 05 May 2025 12:05:45 -0700 (PDT)
+	s=arc-20240116; t=1746472635; c=relaxed/simple;
+	bh=K6/8cOOrVZ98OQevrpLOcByD2e7QtyvMeL+Wn5ONcmc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=tXXz0y0/FmmiKLymHItMb7R0efPTxifMk7ITehO0xhQJCwpBE7hi2B0yio9uRhEUQQunMvaTBGKGTaEfmC4DtXuqLYAKksiD+RihdEcNf39tcvpZVML7LZ+klQPlFgBdCXeMqTNwsBx4GQ7L8+IFau8Bayvr8SMXfNQ9olio3Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q+x8+0De; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-223f4c06e9fso43993425ad.1
+        for <kvm@vger.kernel.org>; Mon, 05 May 2025 12:17:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746471945; x=1747076745; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nxc3AA271rP0clF1WTv1WRpUSSHlH6QI7su8jxLA6Qg=;
-        b=q/kHWfbhw19KZs0ECLnNfYLptmiz6BVkj3wOcteGCjrAYfwizDSy+lYcxpqGjwQ1ba
-         wfQVsbwTATJC2fYsNQ9QF6dxFsjV5anI/8Jxn5mNT5EE4hMuldRpMmnkqtL7qkOds0AW
-         aqyikvatBGFOu7zzsUrbggRABQlMHyQf7Q/17BbuZ47ERcmHVI8FZ2zwzbvWbi/Gpjg2
-         z+9+7zts5Z1VMiDME0UjPP5FFMZPa7/U+ER8LN0/iPjTFxj+j50dZnpvsDKc6ll5tWU4
-         zJGovmoZSpVjL48Zvq/SNqdP1yeW0qcTXIWLBKRJAM+oEKYixAEwWCk7DHeWgH7yJvds
-         DKIw==
+        d=linaro.org; s=google; t=1746472633; x=1747077433; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GW6KVIAEijcEBLlWWBZL706R8iQgdB2ZER5S3nvinZo=;
+        b=q+x8+0Deam7RGHEtUTcnCs8G090ftiMKJX1Rd3wdjcPdFhCHAAeucOPu6+5zheRsGS
+         mfg9I7L81TeF5TMm5M5NG5r6/yiK4KI1dj0XpieNBQgM7LHObGAZCq6sTdlo326ANo9b
+         R+uxdLWZ9UhykGhSg3ePaFyza/qhuGSjgCRnuHmQqtnpsM8AxIknIu/9NmeIVqTWn57r
+         rYGg89xRVTQVHHYB9vwioRPj26LWfFMpuIgb6KsIj++le4PDl2gHdbgZvgI08zMQA0MV
+         zW62XMocViANXjFMaODw0Tpa0akHjm7DpZ/AMv1nRCyfZXoYoG5Pb0n3QMLMGXBPAr2h
+         Is0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746471945; x=1747076745;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nxc3AA271rP0clF1WTv1WRpUSSHlH6QI7su8jxLA6Qg=;
-        b=uNIE5crhHgYmk98s/jRsbPUJihMlUEUu26tO0UHG8jG1/xrqqgJJYDtKV0VU2TyZ2D
-         KEnu9cRjzpLEI6lZ0vT/maqln7q2WAkNk3/mFJI9LeBl54uBC3Odcm1YFH246kDZiyOk
-         zH/N0ahfO/6vINRec8dr2pprzvgQ619y8r38YjeBDoni4XEAR+PYd/Vt/bf9Ts0ytBoO
-         /BrqrHVW6wZUkqFnbYREoHjm47pqxM/6RQkfDK1vKEBcQM8Q3+yZ6M5rVkQKWNJtsr0D
-         gtIa+YkNDFh1tx4Sg4YFMbPVI77H4eOJ96kwgbWBv9ijOUgSuxnT8V39RaGj2+YB9910
-         MZFQ==
-X-Gm-Message-State: AOJu0YwlHK9geQLg8EkTqTkg5OxfCd5nii6Yhn9uMkbRrB+blMOYPK04
-	UXf+xQU1dZg8rVOy8mN4NtEtAqs48Uadcq7tq0aNhqEcJC3eCKZhAH/XuLiWhw==
-X-Gm-Gg: ASbGncvsG8rq0pSN6uKeFmrje+0Cc0Iu7lmzcVcfHR1xg/mk6VsRWD161da+9+iX67g
-	kwGCgqJaWjtWnqjpsItdDDLBfcufYDbQpL5QEgrGbFGhgi+G0Urc4kYayS2J+k4hSBmu3tpjmZb
-	qTOcfxKWGKkfwEvDM/5rbwsdsIfCN9JZ39z/DtJOuDL9cptT+GGuqm1yVxcHiR1CLA7/AOtbEbr
-	euQSMQz8Oq6ghpDDPo8p0WUMq96SslLQYC813YS4j2HtQI4ou12rSvK6vYcrh3viBZv1yCHr+hF
-	9+CbYGIp4Yu25HwkMuLEfVqH0OXYt+cU9m9U4GqeJ01xlRmwPArdDx1m6QKFt+P54GVymcLozYo
-	=
-X-Google-Smtp-Source: AGHT+IFASicqsLQoC4gNxHelYC0aG3lNabvqq0UOOhgv1HOFYapFQUFpIvWUjmSTv3Puo5pNrUg8AQ==
-X-Received: by 2002:a17:903:46cd:b0:223:37ec:63be with SMTP id d9443c01a7336-22e34dee32bmr461265ad.4.1746471945198;
-        Mon, 05 May 2025 12:05:45 -0700 (PDT)
-Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522fa16sm58920035ad.239.2025.05.05.12.05.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 12:05:44 -0700 (PDT)
-Date: Mon, 5 May 2025 12:05:38 -0700
-From: Vipin Sharma <vipinsh@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
-	pbonzini@redhat.com, anup@brainfault.org, borntraeger@linux.ibm.com,
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, maz@kernel.org,
-	oliver.upton@linux.dev
-Subject: Re: [PATCH 1/2] KVM: selftests: Add default testfiles for KVM
- selftests runner
-Message-ID: <20250505190538.GA1168139.vipinsh@google.com>
-References: <20250222005943.3348627-1-vipinsh@google.com>
- <20250222005943.3348627-2-vipinsh@google.com>
- <aBJXabTuiJyRZb-O@google.com>
+        d=1e100.net; s=20230601; t=1746472633; x=1747077433;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GW6KVIAEijcEBLlWWBZL706R8iQgdB2ZER5S3nvinZo=;
+        b=FkKHpFsYPR7xiRjsHJWSFG3j6VC3KaqSG+UWrzdFUV0bIhWXPiBZEQPAfKcRpQ6xTa
+         q4iFCvymWqmMgxvOGuQZJ2CK6jWXl7bZpMmarmpvugEz40JpaWMKt0m4FuBZ6u4QB7D7
+         AnbkzyMfQ+Knj+sBXo4uZic4tBTEBntJuDHu2Fj/E3n+GMz7/WpqohZXyTC6TY9C8Ajs
+         d1a/igp/32CmSWuiXNSyZX/YfyyPMLiwXzuwMf5Gh7NgAHE0HjEZ5S2xgRjQF30uiZ2n
+         tg1+GXLUDZ4kH9m1GZ1+sWrWyv2wnezodqlX49fdaVTWJaJjoi7aICmdzQW3VUd/5YIg
+         Rmsg==
+X-Forwarded-Encrypted: i=1; AJvYcCWsk8kf7V7nWrGltjlPe7j2Sbbrl4U7eZhZ3DxNmluXuKLMH375lmvi3KhLs31fyW15nwU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO1MBq3DM1GOGIeKdYCUlyrfyngxGgjFyhcrWFNZknl51bU8Jn
+	c+//69vO/oy28jF4iZXouSSecJdiQQ8kPFoYpYmAUMi0YHl4cDF5o5pdndRDgrY=
+X-Gm-Gg: ASbGnct7Dl9znZvLdmbGdxgr0mpMFTtsbw1kw1Os6IYM/Gxs1TwQmRny068ikkeQDAy
+	mL2jXLizKck670xoACTmrby4mZOlyIGBGHIH7+gXpAYccbWrhQAJ3+xSfkfGooKPSrMgPeLBaGa
+	SlvVTWbCFqE/KzrcwNZraf3vmIXGsh/G6bzGyP1RRX9+4TG0jyc6qevk7AHjDPxUaWYQi1ROxEi
+	CnMajm/inUMPZKALa9bY5csdhx/LsFNiXtWDv1CEdDGtxsVEYSWbnjkQHNJ1/7dlTxBP0AUvONh
+	VnHO0yNRpSYPeqleWUrAXCAkwt+P1oBiFwTBf+8qqekanMlgXBEGuyRh5goJUNkt
+X-Google-Smtp-Source: AGHT+IGnPIGHq8VjO3UXrxZyCh63NER++S0TiK8mYQqalmCCQirVcYO0Wpw015CxlvaOu9I3VCFpcQ==
+X-Received: by 2002:a17:902:d591:b0:215:a2f4:d4ab with SMTP id d9443c01a7336-22e327567a0mr9562555ad.7.1746472633594;
+        Mon, 05 May 2025 12:17:13 -0700 (PDT)
+Received: from [192.168.1.87] ([38.41.223.211])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522936csm58574325ad.204.2025.05.05.12.17.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 May 2025 12:17:13 -0700 (PDT)
+Message-ID: <14dc3ba2-576a-4ce6-b07d-6b78280e235f@linaro.org>
+Date: Mon, 5 May 2025 12:17:12 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aBJXabTuiJyRZb-O@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 41/48] target/arm/tcg/crypto_helper: compile file twice
+ (system, user)
+Content-Language: en-US
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+ alex.bennee@linaro.org, kvm@vger.kernel.org,
+ Peter Maydell <peter.maydell@linaro.org>, anjo@rev.ng,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+References: <20250505015223.3895275-1-pierrick.bouvier@linaro.org>
+ <20250505015223.3895275-42-pierrick.bouvier@linaro.org>
+ <79916f8d-2793-40a7-b769-ee109c52ef63@linaro.org>
+ <f33fa744-1557-4c01-ba49-e64b4d3b6368@linaro.org>
+ <c67c4a79-7855-4d15-8064-b2f448ac9a42@linaro.org>
+ <83038814-8527-44ec-b1c1-2d17362d08da@linaro.org>
+In-Reply-To: <83038814-8527-44ec-b1c1-2d17362d08da@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2025-04-30 10:01:29, Sean Christopherson wrote:
-> On Fri, Feb 21, 2025, Vipin Sharma wrote:
-> We definitely auto-generate the default testcases.  Relying on the user to remember
-> to add a testcase, and on the maintainer to remember to check for that, isn't a
-> winning strategy.
-
-Good idea, this will help in at least automatically run the default tests.
-Also, if tests are in the selftest kvm source directory then it will
-give an hint to developer/maintainer that they missed writing a default
-test file for a newly introduced test when they run git status.
-
+On 5/5/25 11:53 AM, Pierrick Bouvier wrote:
+> On 5/5/25 11:51 AM, Richard Henderson wrote:
+>> On 5/5/25 11:47, Pierrick Bouvier wrote:
+>>> On 5/5/25 11:38 AM, Richard Henderson wrote:
+>>>> On 5/4/25 18:52, Pierrick Bouvier wrote:
+>>>>> --- a/target/arm/tcg/meson.build
+>>>>> +++ b/target/arm/tcg/meson.build
+>>>>> @@ -30,7 +30,6 @@ arm_ss.add(files(
+>>>>>        'translate-mve.c',
+>>>>>        'translate-neon.c',
+>>>>>        'translate-vfp.c',
+>>>>> -  'crypto_helper.c',
+>>>>>        'hflags.c',
+>>>>>        'iwmmxt_helper.c',
+>>>>>        'm_helper.c',
+>>>>> @@ -63,3 +62,10 @@ arm_system_ss.add(files(
+>>>>>      arm_system_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('cpu-v7m.c'))
+>>>>>      arm_user_ss.add(when: 'TARGET_AARCH64', if_false: files('cpu-v7m.c'))
+>>>>> +
+>>>>> +arm_common_system_ss.add(files(
+>>>>> +  'crypto_helper.c',
+>>>>> +))
+>>>>> +arm_user_ss.add(files(
+>>>>> +  'crypto_helper.c',
+>>>>> +))
+>>>>
+>>>> Could this use arm_common_ss?  I don't see anything that needs to be built user/system in
+>>>> this file...
+>>>>
+>>>
+>>> It needs vec_internal.h (clear_tail), which needs CPUARMState, which pulls cpu.h, which
+>>> uses CONFIG_USER_ONLY.
+>>
+>> Ah, right.  I didn't see that coming.  :-)
+>>
 > 
-> But, I do think we should commit the default.test files to the repository.  If
-> they're ephemeral, then several problems arise:
-> 
->  1. For out-of-tree builds, the default.test files should arguably be placed in
->     the OUTPUT directory.  But if/when we add curated testcases/, then we'll either
->     end up with multiple testcases/ directories (source and output), or we'll have
->     to copy testcases/ from the source to the output on a normal build, which is
->     rather gross.  Or we'd need e.g. "make testcases", which is also gross, e.g.
->     I don't want to have to run yet more commands just to execute tests.
-> 
->  2. Generating default.test could overwrite a user-defined file.  That's firmly
->     a user error, but at least if they default.test files are commited, the user
->     will get a hint or three that they're doing things wrong.
-> 
->  3. If the files aren't committed, then they probably should removed on "clean",
->     which isn't the end of the world since they're trivially easy to generate,
->     but it's kinda funky. 
-> 
-> So, what if we add this to auto-generate the files?  It's obviously wasteful since
-> the files will exist 99.9999999% of the time, but the overhead is completely
-> negligible.  The only concern I have is if this will do the wrong thing for some
-> build environments, i.e. shove the files in the wrong location.
+> I like the idea to have it built once though, since so far
+> {arch}_common_ss was not used, and I was not even sure such a
+> compilation unit exists.
+>
 
-We can get the current path of the Makefile.kvm by writing this at the top
-of the Makefile.kvm:
-	MAKEFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+Done.
 
-Then MAKEFILE_DIR will have the source directory of Makfile.kvm and
-testcase will be in the same directory.
-
-With this we can modify the below foreach you wrote by prefixing
-MAKEFILE_DIR to "testcases".
-
-Does this alleviate concern regaring build environment?
-
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index f62b0a5aba35..d94bb8330ad1 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -198,6 +198,13 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH))
->  TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH))
->  LIBKVM += $(LIBKVM_$(ARCH))
->  
-> +$(foreach tc, $(TEST_PROGS), $(shell mkdir -p testcases/$(patsubst %.sh,%,$(tc))))
-> +$(foreach tc, $(TEST_GEN_PROGS), $(shell mkdir -p testcases/$(tc)))
-> +$(foreach tc, $(TEST_PROGS), \
-> +  $(shell echo $(tc) > $(patsubst %.sh,testcases/%/default.test,$(tc))))
-> +$(foreach tc, $(TEST_GEN_PROGS), \
-> +  $(shell echo $(tc) > $(patsubst %,testcases/%/default.test,$(tc))))
-> +
-
-This looks good.
-
-> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> > index 1d41a046a7bf..550b7c2b4a0c 100644
-> > --- a/tools/testing/selftests/kvm/.gitignore
-> > +++ b/tools/testing/selftests/kvm/.gitignore
-> > @@ -9,4 +9,5 @@
-> >  !config
-> >  !settings
-> >  !Makefile
-> > -!Makefile.kvm
-> > \ No newline at end of file
-> > +!Makefile.kvm
-> > +!*.test
-> 
-> Let's keep the extension wildcards sorted alphabetically, i.e.:
-> 
-> # SPDX-License-Identifier: GPL-2.0-only
-> *
-> !/**/
-> !*.c
-> !*.h
-> !*.py
-> !*.S
-> !*.sh
-> !*.test
-> !.gitignore
-> !config
-> !settings
-> !Makefile
-> !Makefile.kvm
+>>> I'll take a look to break this dependency, so it can be built only once, and for other
+>>> files as well.
+>>
+>> Thanks.  Building twice is still an improvement, so for this set,
+>>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>>
+>> r~
 > 
 
-Okay.
-
-> > diff --git a/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test b/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test
-> > new file mode 100644
-> > index 000000000000..5db8723f554f
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/testcases/aarch64/aarch32_id_regs/default.test
-> > @@ -0,0 +1 @@
-> > +./aarch64/aarch32_id_regs
-> 
-> I don't see any reason to make the paths directly consumable with a leading "./".
-> Spoiler alert from the next patch: the location of the test executables needs to
-> explicitly resolved by the test runner.
-
-I will remove this.
 
