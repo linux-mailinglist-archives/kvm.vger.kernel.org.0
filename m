@@ -1,156 +1,126 @@
-Return-Path: <kvm+bounces-45483-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45484-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 598FAAAAC61
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 04:15:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CEE6AAACE6
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 04:25:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8060162C1E
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 02:14:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BE081A835AF
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 02:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743FE3C8732;
-	Mon,  5 May 2025 23:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A483002B9;
+	Mon,  5 May 2025 23:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NYvUpXYu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nSbfkM6J"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F44B2F3781;
-	Mon,  5 May 2025 23:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBC22F663E
+	for <kvm@vger.kernel.org>; Mon,  5 May 2025 23:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486875; cv=none; b=XpA7cBlDGP7N74f/Br17mPMNkyrJjviZqHrs+f0LXdKtWkDWC19Vn+M9xE0aj2BegIiPqEFZFRvLtbDBShggNVfI4j4MXqR/LuRSZY1bbbLC/QQWoRP2Eya4uFEALitWQ90Sx63YJT9UnLBmumxb0vTXgbPdUpCWSTDNR4S3pyk=
+	t=1746487082; cv=none; b=tpXbkCLFtubaHGqvQSG7CXx6/wI4FKw9QmOaI71VUsd9rwH47CL9hpjwwoJOH9491h7ry9l++YklcYsTdRG2aVT2wB5dXQW2WnMczTrrB3xdGB8K/Dt6EV4sztc46xxoFsh4bb4gVSDGxmMJGcI0mUnUEOqX8rT+5lziCgTFTsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486875; c=relaxed/simple;
-	bh=ykJqWTmi2l+7UFccg3wX3A1rlSlzWOulEI6BSMi5yNY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AQ9e6Jbmug1B1KxwNY52nhUveYF9tbWOylmginVlufzDFyH1fkoPreIsshscmeEo0qngUL8AFz695F4ibcrsjXJ7Ir8bZgevRoqEYOAEyRx2Bzbc9VsrN10Gybu3L69/zpVGKeLavRQLQq28rQYv4f/Iz2A0NdFl44vlKYY/34Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NYvUpXYu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F31D7C4CEE4;
-	Mon,  5 May 2025 23:14:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486874;
-	bh=ykJqWTmi2l+7UFccg3wX3A1rlSlzWOulEI6BSMi5yNY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NYvUpXYuqMD95X9Ha6/K3il+BD+NIkJNWcti44VMFRkTTS5cOlrqsFpGjDtsvXeA6
-	 QnCN/NJmcXZoeOHHn08wAxXJegor5bUGYs7/+HSb20cstx12OJNn8W8i3VmwnRIpw3
-	 X+83DBRcJXLUl6PyZfY7yNKS80bSUZcnjdnSQn5CrStmU/UOP8KqN/i5VIpqJvabqG
-	 UVxpLKg7Nxv6UTnE9q4wQDU2VEweRqgKO7Nz8gKCcnphfZ5EPpiYdaJw2anU7khUB8
-	 HxSexJ/JBoiZlDKtJjGWfemMUelf8Si08ZgVdS0v5qOVDyzZLO8sFgDMCIQgqU6Xug
-	 yQ7lvn+MN4MDg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	Yunxiang.Li@amd.com,
-	zhangdongdong@eswincomputing.com,
-	bhelgaas@google.com,
-	avihaih@nvidia.com,
-	jgg@ziepe.ca,
-	yi.l.liu@intel.com,
-	pstanner@redhat.com,
-	linux@treblig.org,
-	pabeni@redhat.com,
-	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 036/153] vfio/pci: Handle INTx IRQ_NOTCONNECTED
-Date: Mon,  5 May 2025 19:11:23 -0400
-Message-Id: <20250505231320.2695319-36-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
-References: <20250505231320.2695319-1-sashal@kernel.org>
+	s=arc-20240116; t=1746487082; c=relaxed/simple;
+	bh=8ZrLOI3/k1STjvSE8FjnfiooIAW0suwqXfzGYLc3uAw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=jK5eiD8LPdDPGefAxtucieJqaQN4POd2WMCH7NZ8qPEmsvL6x/1bGDVA51WNf2MYO6jveX6thKcM20RwhyyG7ciNEBpS23r4wnp6It7g8YD9FPvip8d0eQNmTbWYzYQr58x7X5x4SwXRr2dnHu2VzRXviyUs5TWmcoHgQQdteTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nSbfkM6J; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-225505d1ca5so45674755ad.2
+        for <kvm@vger.kernel.org>; Mon, 05 May 2025 16:17:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746487079; x=1747091879; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tp3hEaccs5KLjus+u7lZyGvplQzD1hJyVDYNNOcIobc=;
+        b=nSbfkM6JLSISQKjDshCg9pN8pIzihq0mRaYyGffl36JcLy8OXR/MdPoCxr9yUQUVFG
+         wppT7mBxe5o6cetBcYxvQ8S7XkXQ1qsHNwbWAi0M5WZK210SVqMdpa75IK58bbCMDJ9B
+         50UkSHCmt1k3HrGxWzgdozyMwZGxDwnbfhwihvpE5ylzicGebvK0PBmrFit+HUzTLU/8
+         UwwGhIqtNTDXaxkpVbKQTImpRO1B0CdwA0fYB1hTRLkGXgUFSsKzMdLVL3dXAVibp4qH
+         rtGZmJ5s1qBk2ryGo6/K58np5H+gQD7rUvVq4YD76gPru4FZvfpnq63gvn0P+iaKOmkw
+         xUvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746487079; x=1747091879;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tp3hEaccs5KLjus+u7lZyGvplQzD1hJyVDYNNOcIobc=;
+        b=K0T/aZD+JIHf9J9FkrrzwVEBAK4b6iITvJyDAhsL1sBP7mbcsrsXCKCE0c1vYIES1n
+         8Z2nMuJTDa23pN5s6kzX0N50RcGiD1OnDjwTjoUqajItl3AD6pS+v2O1On3BVyztMJlj
+         QnvykRFs4ujGyMsZvsC3H8iuhRIcnR5wt74+yDMPrEeV8YVIC/7Ht3+tG9Ahw8pvDUC1
+         +BHRoYUEHWXykj1fJnnKg5bsQZIuY+Lw7hQP2J5KcqjJSlbhf8yLTpd94tZYG/Sy3AFx
+         IgyVby2wcx4dRXoTB4zgMeYxaHGDYM3fPVrMCuCCWlK0iqouk0k20VtlSHo8l0o0a3GD
+         Ik9w==
+X-Forwarded-Encrypted: i=1; AJvYcCVCMsfGR+5faqJaxkqDty1QPBBLjsXzxb/uytJWJWb93VbHzQhc4yXdQBY5gCIfzq/5jF4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYiqnqrEOJ09PJeAfMGJSv1ZmTfkOr74TaN1xxgCoyL6miBoPF
+	+gCq2WXeXtpPsNGzIO6cOBfPBCv4Hais5ZnBwRS5svaX/UlKCaRD8nl6SmxM+ArrTIhJYqPyEFF
+	9Pg==
+X-Google-Smtp-Source: AGHT+IGhrX1MtCaIusgQgNQRAcx+0E6rNYmRwUcmQ9PrQBY1+RE7Ktib/G6MWTeo5oHjCygbMWb2/Z516S8=
+X-Received: from plv19.prod.google.com ([2002:a17:903:bd3:b0:220:cd24:457])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e18b:b0:22e:39f8:61fa
+ with SMTP id d9443c01a7336-22e39f864c8mr6120915ad.34.1746487079377; Mon, 05
+ May 2025 16:17:59 -0700 (PDT)
+Date: Mon, 5 May 2025 16:17:58 -0700
+In-Reply-To: <diqzfrhik62h.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.181
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <diqz7c31xyqs.fsf@ackerleytng-ctop.c.googlers.com>
+ <386c1169-8292-43d1-846b-c50cbdc1bc65@redhat.com> <aBTxJvew1GvSczKY@google.com>
+ <diqzjz6ypt9y.fsf@ackerleytng-ctop.c.googlers.com> <7e32aabe-c170-4cfc-99aa-f257d2a69364@redhat.com>
+ <diqzfrhik62h.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <aBlHJvfnV1VPKQzW@google.com>
+Subject: Re: [PATCH v8 06/13] KVM: x86: Generalize private fault lookups to
+ guest_memfd fault lookups
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
+	pankaj.gupta@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-From: Alex Williamson <alex.williamson@redhat.com>
+On Mon, May 05, 2025, Ackerley Tng wrote:
+> > On 03.05.25 00:00, Ackerley Tng wrote:
+> > We want to disable large pages if (using 2M region as example)
+> >
+> > (a) Mixed memory attributes. If a PFN falls into a 2M region, and parts
+> >      of that region are shared vs. private (mixed memory attributes ->
+> >      KVM_LPAGE_MIXED_FLAG)
+> >
+> >   -> With gmem-shared we could have mixed memory attributes, not a PFN
+> >      fracturing. (PFNs don't depend on memory attributes)
+> >
+> > (b) page track: intercepting (mostly write) access to GFNs
+> >
+> 
+> Could you explain more about page track case? 
 
-[ Upstream commit 860be250fc32de9cb24154bf21b4e36f40925707 ]
-
-Some systems report INTx as not routed by setting pdev->irq to
-IRQ_NOTCONNECTED, resulting in a -ENOTCONN error when trying to
-setup eventfd signaling.  Include this in the set of conditions
-for which the PIN register is virtualized to zero.
-
-Additionally consolidate vfio_pci_get_irq_count() to use this
-virtualized value in reporting INTx support via ioctl and sanity
-checking ioctl paths since pdev->irq is re-used when the device
-is in MSI mode.
-
-The combination of these results in both the config space of the
-device and the ioctl interface behaving as if the device does not
-support INTx.
-
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Link: https://lore.kernel.org/r/20250311230623.1264283-1-alex.williamson@redhat.com
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/vfio/pci/vfio_pci_config.c |  3 ++-
- drivers/vfio/pci/vfio_pci_core.c   | 10 +---------
- drivers/vfio/pci/vfio_pci_intrs.c  |  2 +-
- 3 files changed, 4 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 63f6308b0f8c9..fdff3359849c1 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -1756,7 +1756,8 @@ int vfio_config_init(struct vfio_pci_core_device *vdev)
- 					cpu_to_le16(PCI_COMMAND_MEMORY);
- 	}
- 
--	if (!IS_ENABLED(CONFIG_VFIO_PCI_INTX) || vdev->nointx)
-+	if (!IS_ENABLED(CONFIG_VFIO_PCI_INTX) || vdev->nointx ||
-+	    vdev->pdev->irq == IRQ_NOTCONNECTED)
- 		vconfig[PCI_INTERRUPT_PIN] = 0;
- 
- 	ret = vfio_cap_init(vdev);
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index f3916e6b16b9d..ea4e75be1884f 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -481,15 +481,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_finish_enable);
- static int vfio_pci_get_irq_count(struct vfio_pci_core_device *vdev, int irq_type)
- {
- 	if (irq_type == VFIO_PCI_INTX_IRQ_INDEX) {
--		u8 pin;
--
--		if (!IS_ENABLED(CONFIG_VFIO_PCI_INTX) ||
--		    vdev->nointx || vdev->pdev->is_virtfn)
--			return 0;
--
--		pci_read_config_byte(vdev->pdev, PCI_INTERRUPT_PIN, &pin);
--
--		return pin ? 1 : 0;
-+		return vdev->vconfig[PCI_INTERRUPT_PIN] ? 1 : 0;
- 	} else if (irq_type == VFIO_PCI_MSI_IRQ_INDEX) {
- 		u8 pos;
- 		u16 flags;
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index f20512c413f76..5ade5b81a0ffb 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -173,7 +173,7 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
- 	if (!is_irq_none(vdev))
- 		return -EINVAL;
- 
--	if (!pdev->irq)
-+	if (!pdev->irq || pdev->irq == IRQ_NOTCONNECTED)
- 		return -ENODEV;
- 
- 	name = kasprintf(GFP_KERNEL, "vfio-intx(%s)", pci_name(pdev));
--- 
-2.39.5
-
+KVM disallows hugepages when shadowing a gfn, because write-protecting a 2MiB
+(let alone a 1GiB) page would be insanely expensive, as KVM would need to intercept
+and emulate an absurd number of instructions that have nothing to do with the
+guest's page tables.
 
