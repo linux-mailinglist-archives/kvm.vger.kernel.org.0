@@ -1,201 +1,206 @@
-Return-Path: <kvm+bounces-45590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45591-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A50A8AAC3A7
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 14:16:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95233AAC5A4
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 15:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A0A47B9A20
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 12:15:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A005B189AD70
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 13:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D7E201116;
-	Tue,  6 May 2025 12:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DA627F75D;
+	Tue,  6 May 2025 13:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dVCNL36G"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MhRc8B3T"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F4527F744
-	for <kvm@vger.kernel.org>; Tue,  6 May 2025 12:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A313C0C
+	for <kvm@vger.kernel.org>; Tue,  6 May 2025 13:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746533774; cv=none; b=PQjPh+elsO9fEP2bw3fw/T21MNLD4A+NQGopP8lf3J9/TSypYZQjDRPWb07uIMGc3wAZ+oMNJp9pFxQfyiV6TNAM72hlsjzx8RhsMrSWIPNsr4igPOl+6RbgROFpnAGFVaNyFq6ygAc73ibJSi41UbUczh5YmyDkb4255iQgCdA=
+	t=1746537549; cv=none; b=KmNRG/ueBAUYqUpp151Xraj2F6ACAXZTSnD8fKoPkJP/3oeU81KefE58np2laWqNkQinMzgzndNCTOmlul+2f1qO5c41GT3pGF90BvwBTQ9SkwcRk2IfBSbfTg3u/35rxnRGWlqbFtEiPgYE2UK+By1fJ38FjQJFfzjTTA3wykI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746533774; c=relaxed/simple;
-	bh=0gj5it6bFF5wR47279deVjSN0PKeKmqzO18KDL2SWGs=;
+	s=arc-20240116; t=1746537549; c=relaxed/simple;
+	bh=YU0qkgiRqaVnf4LpHH/M34E26n57EMAF9SfvxqX6yLs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LVP+S53NnRdBAS3ZUtxa06G3MopIyoZ/V/M03KBHus/Dc6nude6BHIa8esEnrqaYnH6X9KIvbTXT7D6bkpyM6XHBXTfdl2zHVwWD2zFKqoOJvddXX1JVxdISDf7cTVbu9/L3mOk1DE82BN63v5JeC+dHcAUP21j/k1dGd6wC6Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dVCNL36G; arc=none smtp.client-ip=209.85.160.181
+	 To:Cc:Content-Type; b=h4OsEuDVFJJwFf/wsCHb7uAJY0dlejUMy17aohLe1GVQ4O5YVzjzcKbZCXcRkt8O5l9OtSZOAULO3GNDBrU/auOx6Fs6RkYIv0fdQ0toZKyIvrzI1I5TvZm5wxpeFJmrnBkDGWcdi5Bow1BT4N3os3vjFMY3OZEPA7Z93EMcEA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MhRc8B3T; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4774611d40bso305281cf.0
-        for <kvm@vger.kernel.org>; Tue, 06 May 2025 05:16:12 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22e42641d7cso106825ad.0
+        for <kvm@vger.kernel.org>; Tue, 06 May 2025 06:19:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746533771; x=1747138571; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1746537547; x=1747142347; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6f8Pkog9VRKxqJVqX7zIYOBYdtx7uWBL1I7B160ljq4=;
-        b=dVCNL36GR4sJ0NSR9uL4ZukWs7MxVv7tAAgV3q4ltGOstNFbqYfaPZEXdVm2UL7iue
-         RX6JSDFmaXXVLQBPJCDjbTKKXQ+x7T+R1rZe6zj7L17kr/GspN7nWtqNNwQGV/VH7ws+
-         ZP8HjwuvnReC00NEh2K9IJwsNn5UKaHFEyfyih8dEiaA5FtgfbX17BRirPbS1tQkVB+U
-         JWiow/UmE8hcBucWzRI7r+7I4QPGc9ACnQIHfV9i87BEDjR266iU3c/c/F/8JnJvBxXe
-         3Qu87uYsfLIckR2CHp36rB3S+gJC5zvWIxOJt/Ke1FNvZR4QGErRy+bKfU/kvoa/WtIU
-         TqgQ==
+        bh=YU0qkgiRqaVnf4LpHH/M34E26n57EMAF9SfvxqX6yLs=;
+        b=MhRc8B3T8w/XcJVQ6LOsj4jydnY43uX46MtzwmV4fbYRZivAHbR9P19ifPvWx239PR
+         4vY7Y6JJuDrMAncPpRK7I6AtQtMsWc/Z6CWJI/anaMAEOk95YnasPUCggsesQewz77Yy
+         48ph1vDGu/oC2yHypVAHVgSWSJ4rO+pa7zrC0PFVZ4io3Tt3EzKGd2VIj7jxarzIqCIU
+         UomM86VcjYnjYdIwEIbGG6o2HJ9o5H7wnjfwMty374eVVYuilK0ACMBsYGMmnKyIZuDY
+         8tiRYwY18O4HSw9ijI4TU9Z13ClG6ikYQ4ZRMZjYGuyElnxX1Sj1rcQm1WrB0cTSGUCL
+         I5yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746533771; x=1747138571;
+        d=1e100.net; s=20230601; t=1746537547; x=1747142347;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6f8Pkog9VRKxqJVqX7zIYOBYdtx7uWBL1I7B160ljq4=;
-        b=aj5m7oXsRoCFfdMpG0lHzZsSIuU8VuYyHInF5kNSnC3zYPfvgziaxh+5eTz8sjTTfk
-         lpvz0bK9AexOdS9vfsUSy3CexEdW3JaaCBEwDjBjhhc1Fp2XdQcTI1ab5664fr4J0dr3
-         8ZH+PZh+VROsTIfxnQIcikcdzPfj5et+PTfRFIK6yZpa0HQlF51lx5AAZhccLrHD8Oeq
-         ivVFx/J2UyVzZz4ukfOpFoy640EuGFhYPFICQqK05C/GREBATBfPwzKrpDEN5oStxxD1
-         ufDfyJnoj5Wousmsl7l5z2aEDejyHaD53F0i5wdt6LBLpi+94gElRM1geBqrdzwpDJo2
-         X+Dw==
-X-Gm-Message-State: AOJu0YwBIBZrjQtew0hAUMFftW5Eis+wyIUtNaPUGH+sE+x+XkQwAqtM
-	83aSw0HVlwljvhRGlrySavmBzvDgYbMzxwNKtRowsAQidGJuuoyzX3dKPYuKwgpXq5L8YinAWCP
-	72bPXzIchH3n9PZESEa3LBKIaQUKswLkzLFQY
-X-Gm-Gg: ASbGncsx3HEL+4wBG7tvj2q8qVv1+SstT/fch4TJu72lCaPRlTqzvCE01UoxRl/lQw/
-	BEKMiCyEMpK6XjKug5NS3jEEYtRp4TXIZ7wfII0f5SjJMMpMBzp+mhaDlEkJ5hYw3N9njgLsqwL
-	UAPBmqKnVPgHrUFto85QyQkJrHDRPhEKqoWPNLWd6v5b+H61OgMls=
-X-Google-Smtp-Source: AGHT+IEe8eF4GziUIN/tZf4C7cxJ7AWiVvXbtx1ZH0D0GFwoa/koUU4cjSVlt3/dzy7oD7pGBcV8s+6Nzx0ShmO/HV8=
-X-Received: by 2002:a05:622a:553:b0:486:8d63:2dfc with SMTP id
- d75a77b69052e-490f4729ab9mr4853121cf.2.1746533770768; Tue, 06 May 2025
- 05:16:10 -0700 (PDT)
+        bh=YU0qkgiRqaVnf4LpHH/M34E26n57EMAF9SfvxqX6yLs=;
+        b=NXJSC950j8MkX3do5URXZydwnSxs8ptcnFkfklAxPeas2yzOEj+bZHqrEGGUl4pTin
+         r0ztSsluOBrvX3AkIykT/58H7NVkVHzZvy+pP19cV6KNJbOyhEVqEaMY+4HKK+NIxCyO
+         jf/1mW23N6T6eNbf9bhs2eH91tLKGevEjgWD7+H4vivKXjiHuesc4fL+f/xJzS6w3iLn
+         9NF1szJp615M2Z26X0PRzVLpMxqb9p/KAf2/JwpYkf0NuywoPd03NoeXQdpx5afccT89
+         h34cCY/5GAwZnPeL0W0PbDv0uQL2LtY3+xRovJT1Iz7f9n/CPZOakByp7QO9mHmugcdQ
+         JeTw==
+X-Forwarded-Encrypted: i=1; AJvYcCVYjwN6kAWpuDdOwDWUR7+5zngKalOsj1rPopVKsJNUoy5MNzqM99cno9KEmr15NZlH9vM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCVDg9qnM+54uVSGwcr9x9Or6RBHP/fAepKuAdHEKCiorYgRly
+	2gis/9SlusVUINp+j9u8JbqLKQqJ8Qyym1a5b0JmrwHyJEoeySFxO84GL7EV9YCDO+XTYXsMkI3
+	GrbypcdTzoeqVpXO0XoT5RZT2HS3iav6HAeOD
+X-Gm-Gg: ASbGncvfZ85MxeQBR9RRn3qfDM74bnWat99ZJtqYQ1UNJWNviooOTRKMD6Xr29HavSZ
+	+1j84CAOw6NDMCCrCGkfBX/f8YzydRVf6ErU1UZ5OrtZujfYEclgYumYswsnMj4wLqK/Uk+K6py
+	oUD5y7xCX53TZaLYt+YghWMLT4P2ECYfKG8vyKP+saGk/FOi4m19HkHX4=
+X-Google-Smtp-Source: AGHT+IGXX3S1kKfsUg1hF5S3LhzbTq631LFTA84YRI4zLygnzfGjj2ffQfWCurZ/dbdLY0TZ5MqKdDb7BWJ8682XUBE=
+X-Received: by 2002:a17:902:dcca:b0:22e:4509:cb86 with SMTP id
+ d9443c01a7336-22e4509d0a9mr1232705ad.19.1746537547160; Tue, 06 May 2025
+ 06:19:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250430165655.605595-1-tabba@google.com> <20250430165655.605595-9-tabba@google.com>
- <6819283cc31f0_28880f2944f@iweiny-mobl.notmuch>
-In-Reply-To: <6819283cc31f0_28880f2944f@iweiny-mobl.notmuch>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 6 May 2025 13:15:33 +0100
-X-Gm-Features: ATxdqUH8kDs1bsapOMm1wv2xmE__aC-8T_lWieo1BBZsq2lh3T9YXMXc-QxkqaQ
-Message-ID: <CA+EHjTzwfnvYBPNyDFDOkSeKGSu6U2sajfQsYuhW-n_C35KXmQ@mail.gmail.com>
-Subject: Re: [PATCH v8 08/13] KVM: guest_memfd: Allow host to map
- guest_memfd() pages
-To: Ira Weiny <ira.weiny@intel.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
+References: <20250424030033.32635-1-yan.y.zhao@intel.com> <20250424030603.329-1-yan.y.zhao@intel.com>
+ <CAGtprH9_McMDepbuvWMLRvHooPdtE4RHog=Dgr_zFXT5s49nXA@mail.gmail.com>
+ <aBAiCBmON0g0Qro1@yzhao56-desk.sh.intel.com> <CAGtprH_ggm8N-R9QbV1f8mo8-cQkqyEta3W=h2jry-NRD7_6OA@mail.gmail.com>
+ <aBldhnTK93+eKcMq@yzhao56-desk.sh.intel.com> <CAGtprH9wi6zHJ5JeuAnjZThMAzxxibJGo=XN1G1Nx8txZRg8_w@mail.gmail.com>
+ <aBmmirBzOZfmMOJj@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aBmmirBzOZfmMOJj@yzhao56-desk.sh.intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Tue, 6 May 2025 06:18:55 -0700
+X-Gm-Features: ATxdqUE_E_xkcFezg1WJ6Xtsv-isc_XTHfLW6xTEscigvwnu1opfYy8Atv0sknw
+Message-ID: <CAGtprH9fDMiuk3JGSS12M-wFoqRj+sjdtEHJFS_5QfKX7aGkRQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
+	dave.hansen@intel.com, kirill.shutemov@intel.com, tabba@google.com, 
+	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
+	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
+	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
+	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
+	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Ira,
+On Mon, May 5, 2025 at 11:07=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wro=
+te:
+>
+> On Mon, May 05, 2025 at 10:08:24PM -0700, Vishal Annapurve wrote:
+> > On Mon, May 5, 2025 at 5:56=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> =
+wrote:
+> > >
+> > > Sorry for the late reply, I was on leave last week.
+> > >
+> > > On Tue, Apr 29, 2025 at 06:46:59AM -0700, Vishal Annapurve wrote:
+> > > > On Mon, Apr 28, 2025 at 5:52=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.=
+com> wrote:
+> > > > > So, we plan to remove folio_ref_add()/folio_put_refs() in future,=
+ only invoking
+> > > > > folio_ref_add() in the event of a removal failure.
+> > > >
+> > > > In my opinion, the above scheme can be deployed with this series
+> > > > itself. guest_memfd will not take away memory from TDX VMs without =
+an
+> > > I initially intended to add a separate patch at the end of this serie=
+s to
+> > > implement invoking folio_ref_add() only upon a removal failure. Howev=
+er, I
+> > > decided against it since it's not a must before guest_memfd supports =
+in-place
+> > > conversion.
+> > >
+> > > We can include it in the next version If you think it's better.
+> >
+> > Ackerley is planning to send out a series for 1G Hugetlb support with
+> > guest memfd soon, hopefully this week. Plus I don't see any reason to
+> > hold extra refcounts in TDX stack so it would be good to clean up this
+> > logic.
+> >
+> > >
+> > > > invalidation. folio_ref_add() will not work for memory not backed b=
+y
+> > > > page structs, but that problem can be solved in future possibly by
+> > > With current TDX code, all memory must be backed by a page struct.
+> > > Both tdh_mem_page_add() and tdh_mem_page_aug() require a "struct page=
+ *" rather
+> > > than a pfn.
+> > >
+> > > > notifying guest_memfd of certain ranges being in use even after
+> > > > invalidation completes.
+> > > A curious question:
+> > > To support memory not backed by page structs in future, is there any =
+counterpart
+> > > to the page struct to hold ref count and map count?
+> > >
+> >
+> > I imagine the needed support will match similar semantics as VM_PFNMAP
+> > [1] memory. No need to maintain refcounts/map counts for such physical
+> > memory ranges as all users will be notified when mappings are
+> > changed/removed.
+> So, it's possible to map such memory in both shared and private EPT
+> simultaneously?
 
-On Mon, 5 May 2025 at 22:05, Ira Weiny <ira.weiny@intel.com> wrote:
->
-> Fuad Tabba wrote:
-> > Add support for mmap() and fault() for guest_memfd backed memory
-> > in the host for VMs that support in-place conversion between
-> > shared and private. To that end, this patch adds the ability to
-> > check whether the VM type supports in-place conversion, and only
-> > allows mapping its memory if that's the case.
-> >
-> > This patch introduces the configuration option KVM_GMEM_SHARED_MEM,
-> > which enables support for in-place shared memory.
-> >
-> > It also introduces the KVM capability KVM_CAP_GMEM_SHARED_MEM, which
-> > indicates that the host can create VMs that support shared memory.
-> > Supporting shared memory implies that memory can be mapped when shared
-> > with the host.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  include/linux/kvm_host.h | 15 ++++++-
-> >  include/uapi/linux/kvm.h |  1 +
-> >  virt/kvm/Kconfig         |  5 +++
-> >  virt/kvm/guest_memfd.c   | 92 ++++++++++++++++++++++++++++++++++++++++
-> >  virt/kvm/kvm_main.c      |  4 ++
-> >  5 files changed, 116 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 9419fb99f7c2..f3af6bff3232 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -729,6 +729,17 @@ static inline bool kvm_arch_supports_gmem(struct k=
-vm *kvm)
-> >  }
-> >  #endif
-> >
-> > +/*
-> > + * Arch code must define kvm_arch_gmem_supports_shared_mem if support =
-for
-> > + * private memory is enabled and it supports in-place shared/private c=
-onversion.
-> > + */
-> > +#if !defined(kvm_arch_gmem_supports_shared_mem) && !IS_ENABLED(CONFIG_=
-KVM_GMEM_SHARED_MEM)
->
-> Perhaps the bots already caught this?
->
-> I just tried enabling KVM_GMEM_SHARED_MEM on x86 with this patch and it f=
-ails with:
->
-> || In file included from arch/x86/kvm/../../../virt/kvm/binary_stats.c:8:
-> || ./include/linux/kvm_host.h: In function =E2=80=98kvm_mem_from_gmem=E2=
-=80=99:
-> include/linux/kvm_host.h|2530 col 13| error: implicit declaration of func=
-tion =E2=80=98kvm_arch_gmem_supports_shared_mem=E2=80=99 [-Wimplicit-functi=
-on-declaration]
-> ||  2530 |         if (kvm_arch_gmem_supports_shared_mem(kvm))
-> ||       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> || make[4]: *** Waiting for unfinished jobs....
->
->
-> I think the predicate on !CONFIG_KVM_GMEM_SHARED_MEM is wrong.
->
-> Shouldn't this always default off?  I __think__ this then gets enabled in
-> 11/13?
+No, guest_memfd will still ensure that userspace can only fault in
+shared memory regions in order to support CoCo VM usecases.
 
-You're right. With the other comments from David and Ackerley, this
-functions is gone, replaced by checking a per-vm flag.
-
-Thanks,
-/fuad
-
-> IOW
 >
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index f3af6bff3232..577674e95c09 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -733,7 +733,7 @@ static inline bool kvm_arch_supports_gmem(struct kvm =
-*kvm)
->   * Arch code must define kvm_arch_gmem_supports_shared_mem if support fo=
-r
->   * private memory is enabled and it supports in-place shared/private con=
-version.
->   */
-> -#if !defined(kvm_arch_gmem_supports_shared_mem) && !IS_ENABLED(CONFIG_KV=
-M_GMEM_SHARED_MEM)
-> +#if !defined(kvm_arch_gmem_supports_shared_mem)
->  static inline bool kvm_arch_gmem_supports_shared_mem(struct kvm *kvm)
->  {
->         return false;
+>
+> > Any guest_memfd range updates will result in invalidations/updates of
+> > userspace, guest, IOMMU or any other page tables referring to
+> > guest_memfd backed pfns. This story will become clearer once the
+> > support for PFN range allocator for backing guest_memfd starts getting
+> > discussed.
+> Ok. It is indeed unclear right now to support such kind of memory.
+>
+> Up to now, we don't anticipate TDX will allow any mapping of VM_PFNMAP me=
+mory
+> into private EPT until TDX connect.
+
+There is a plan to use VM_PFNMAP memory for all of guest_memfd
+shared/private ranges orthogonal to TDX connect usecase. With TDX
+connect/Sev TIO, major difference would be that guest_memfd private
+ranges will be mapped into IOMMU page tables.
+
+Irrespective of whether/when VM_PFNMAP memory support lands, there
+have been discussions on not using page structs for private memory
+ranges altogether [1] even with hugetlb allocator, which will simplify
+seamless merge/split story for private hugepages to support memory
+conversion. So I think the general direction we should head towards is
+not relying on refcounts for guest_memfd private ranges and/or page
+structs altogether.
+
+I think the series [2] to work better with PFNMAP'd physical memory in
+KVM is in the very right direction of not assuming page struct backed
+memory ranges for guest_memfd as well.
+
+[1] https://lore.kernel.org/all/CAGtprH8akKUF=3D8+RkX_QMjp35C0bU1zxGi4v1Zm5=
+AWCw=3D8V8AQ@mail.gmail.com/
+[2] https://lore.kernel.org/linux-arm-kernel/20241010182427.1434605-1-seanj=
+c@google.com/
+
+> And even in that scenario, the memory is only for private MMIO, so the ba=
+ckend
+> driver is VFIO pci driver rather than guest_memfd.
+
+Not necessary. As I mentioned above guest_memfd ranges will be backed
+by VM_PFNMAP memory.
+
+>
+>
+> > [1] https://elixir.bootlin.com/linux/v6.14.5/source/mm/memory.c#L6543
 
