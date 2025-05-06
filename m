@@ -1,118 +1,185 @@
-Return-Path: <kvm+bounces-45611-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45612-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82AD4AACB06
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:32:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC5DEAACB40
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:44:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6379C1C22379
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:31:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CDE83BD0DB
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:44:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC91205E3B;
-	Tue,  6 May 2025 16:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697D2284B55;
+	Tue,  6 May 2025 16:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="MIzuHMAp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AB7dyfjo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB98E25CC41;
-	Tue,  6 May 2025 16:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A8C252282;
+	Tue,  6 May 2025 16:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746549040; cv=none; b=YSiyU9G1TeHxwbQRPcMF7/ELzBFqo+f0hgGzqf/EnRcVhn+e9VeGn/hY/7mYTiRYvx/Va7lsz4k/Q3ZfKNz5AHb1EbeB9eknNp4oCTCcYYjH3fkFI/6hgOc/P3A6MiCv47FIYKU30hz/2Kk2quu1ZmuCx7gO7m7j5Zd5jEH4Wv8=
+	t=1746549848; cv=none; b=JzXt9BNvy10S4yah1YAJJMUmFj6qT21O9vC0b1r/XlNR7yi4amzqbK/M2mhhzBUIIgyNDCsXqBVeE9HcGMpXfYjRA0g/0ErZ7WQ7qu3KBLhUkBnw1vXlEZdL2CEL4eSeW/MYBbsTbLUMmQaI7a/+leZYBGXDdaAubNYY31dXVZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746549040; c=relaxed/simple;
-	bh=sy5+FLBt8V254FwUykIHfEDCfE4L9U2Cpnole7yVjV8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=NFTrV2ct9HZFjrA9ZJ2NupWi0f44t+QLN+tdLoaeF6+YQHUo13X2TZd++NPXlJQ31qS6QKLTM5yLXSjGB5Ki2iPf8OlOq41iOSPaW+HfttA+w+eERTY1oAOc13l45LgknDV6CMUkWRv9jgfEx37IFBux8ux2VMoJiZwabZBjP9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=MIzuHMAp; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 546GThAV971224
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 6 May 2025 09:29:43 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 546GThAV971224
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025042001; t=1746548984;
-	bh=v6XPEFSGKokl1nFOIN3pFv6ErpYGqIeLKYtQQ53aKkA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=MIzuHMApNdjpQ5ZILL8ZOPep8vI7WxRjiUiWPmXLr7AzDzOJeAGF2Mg3Bs+LAbbwx
-	 607Qn0HNOUl8WsbZ4SrOxTt3IdOUq3CoaVSLbP4fgukVo/lHgJX/w60kJhrOIv+Eo3
-	 EtnpOGnOuJCfsrahyDVkm/2FpCQnFbwHzfvd5yf9xafnZ8uVrGGS9Q/Iu79cmfdGtZ
-	 Vz83BgaoYBBM4TWQhw4lZtxPxUN5TrlgmjN4OPVBEOoz3Qn0dlROG0rcLV017k47bh
-	 Gp+ab6aHjmc5mWQcCMrcJK6tZAPb5n/0ZJvsLL+Sxd7HRUAbVbByKg3hbRG9U84j1x
-	 uAAqsuKmpoD0A==
-Date: Tue, 06 May 2025 09:29:40 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Ingo Molnar <mingo@kernel.org>, Sean Christopherson <seanjc@google.com>
-CC: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org, xin@zytor.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>
-Subject: Re: [PATCH 2/6] x86/kvm: Rename the KVM private read_msr() function
-User-Agent: K-9 Mail for Android
-In-Reply-To: <aBo1w0tRoM2JUtW_@gmail.com>
-References: <20250506092015.1849-1-jgross@suse.com> <20250506092015.1849-3-jgross@suse.com> <aBoUdApwSgnr3r9V@google.com> <aBo1w0tRoM2JUtW_@gmail.com>
-Message-ID: <55944DEC-0129-4052-BBA4-7298B16326BD@zytor.com>
+	s=arc-20240116; t=1746549848; c=relaxed/simple;
+	bh=geXjI7e3xVdMJHmwrLdJeTsuEUT9kysy5HNGfgTThy8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tHpkngGAwCxAcGzgqwNuB5tn3fkw+i9h37w/TrVZMYsSfDEi1IFADlk/AN3FfZOnjB92kL4Fem7zhD5K5x0BvlOj3XMpwXuzK1hUMa2njaIXMZdoxHbYIh6Ox8Az54xBP6JYegAXkiSojyW8jyQDmyQUJnhzlN+NWL/GJXUSqBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AB7dyfjo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0834AC4CEE4;
+	Tue,  6 May 2025 16:44:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746549848;
+	bh=geXjI7e3xVdMJHmwrLdJeTsuEUT9kysy5HNGfgTThy8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=AB7dyfjozKuZZqAC7hFPnftj1PglNR0DKf6/pY2BR8VNm9yuH35JwXj4/KBcmAMhs
+	 KaLFsDgxYB8F3fLnIVdp3AEwXlbfLz8eduN0sj343ffdM1oEaM74jdavkDbpJGfyC+
+	 +WbK73LO0svX1BsERv8FWXSuneKDySyuFVe4GrqnrriJWcFdr/mU39tu/tqMC6EOcZ
+	 2Gd+obaXTtdmxtxQ3LzxEy2iBVZznhmGCytPqsnVCRloTYv2ROQWyRqM5KOoUL38of
+	 YbIzh/OxrsVUqhi3SwbWHRbYoCBf7Qxidr8qd4eXl6isupIoManoSVsMjNTXDa0jjk
+	 lcPDOmdKwQh7Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uCLOn-00CJkN-Mg;
+	Tue, 06 May 2025 17:44:05 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>
+Subject: [PATCH v4 00/43] KVM: arm64: Revamp Fine Grained Trap handling
+Date: Tue,  6 May 2025 17:43:05 +0100
+Message-Id: <20250506164348.346001-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com, ben.horgan@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On May 6, 2025 9:16:03 AM PDT, Ingo Molnar <mingo@kernel=2Eorg> wrote:
->
->* Sean Christopherson <seanjc@google=2Ecom> wrote:
->
->> On Tue, May 06, 2025, Juergen Gross wrote:
->> > Avoid a name clash with a new general MSR access helper after a futur=
-e
->> > MSR infrastructure rework by renaming the KVM specific read_msr() to
->> > kvm_read_msr()=2E
->> >=20
->> > Signed-off-by: Juergen Gross <jgross@suse=2Ecom>
->> > ---
->> >  arch/x86/include/asm/kvm_host=2Eh | 2 +-
->> >  arch/x86/kvm/vmx/vmx=2Ec          | 4 ++--
->> >  2 files changed, 3 insertions(+), 3 deletions(-)
->> >=20
->> > diff --git a/arch/x86/include/asm/kvm_host=2Eh b/arch/x86/include/asm=
-/kvm_host=2Eh
->> > index 9c971f846108=2E=2E308f7020dc9d 100644
->> > --- a/arch/x86/include/asm/kvm_host=2Eh
->> > +++ b/arch/x86/include/asm/kvm_host=2Eh
->> > @@ -2275,7 +2275,7 @@ static inline void kvm_load_ldt(u16 sel)
->> >  }
->> > =20
->> >  #ifdef CONFIG_X86_64
->> > -static inline unsigned long read_msr(unsigned long msr)
->>=20
->> Ewwww=2E  Eww, eww, eww=2E  I forgot this thing existed=2E
->>=20
->> Please just delete this and use rdmsrq() directly (or is it still rdmsr=
-l()? at
->> this point?)=2E
->
->Both will work, so code-in-transition isn't build-broken unnecessarily:
->
->  arch/x86/include/asm/msr=2Eh:#define rdmsrl(msr, val) rdmsrq(msr, val)
->
->:-)
->
->Thanks,
->
->	Ingo
+This is yet another version of the series last posted at [1].
 
-But for forward-looking code, rdmsrq()=2E
+The eagled eye reviewer will have noticed that since v2, the series
+has more or less doubled in size for any reasonable metric (number of
+patches, number of lines added or deleted). It is therefore pretty
+urgent that this gets either merged or forgotten! ;-)
+
+See the change log below for the details -- most of it is related to
+FGT2 (and its rather large dependencies) being added.
+
+* From v3:
+
+  - Added missing bit fields for CPACR_EL1
+
+  - Fixed a bunch of typos in comments and commit messages
+
+  - Cleaned-up whitespace damage from the sysreg generator
+
+  - Collected RBs from Joey, with thanks!
+
+* From v2:
+
+  - Added comprehensive support for FEAT_FGT2, as the host kernel is
+    now making use of these registers, without any form of context
+    switch in KVM. What could possibly go wrong?
+
+  - Reworked some of the FGT description and handling primitives,
+    reducing the boilerplate code and tables that get added over time.
+
+  - Rebased on 6.15-rc3.
+
+[1]: https://lore.kernel.org/r/20250426122836.3341523-1-maz@kernel.org
+
+Marc Zyngier (42):
+  arm64: sysreg: Add ID_AA64ISAR1_EL1.LS64 encoding for FEAT_LS64WB
+  arm64: sysreg: Update ID_AA64MMFR4_EL1 description
+  arm64: sysreg: Add layout for HCR_EL2
+  arm64: sysreg: Replace HFGxTR_EL2 with HFG{R,W}TR_EL2
+  arm64: sysreg: Update ID_AA64PFR0_EL1 description
+  arm64: sysreg: Update PMSIDR_EL1 description
+  arm64: sysreg: Update TRBIDR_EL1 description
+  arm64: sysreg: Update CPACR_EL1 description
+  arm64: sysreg: Add registers trapped by HFG{R,W}TR2_EL2
+  arm64: sysreg: Add registers trapped by HDFG{R,W}TR2_EL2
+  arm64: sysreg: Add system instructions trapped by HFGIRT2_EL2
+  arm64: Remove duplicated sysreg encodings
+  arm64: tools: Resync sysreg.h
+  arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
+  arm64: Add FEAT_FGT2 capability
+  KVM: arm64: Tighten handling of unknown FGT groups
+  KVM: arm64: Simplify handling of negative FGT bits
+  KVM: arm64: Handle trapping of FEAT_LS64* instructions
+  KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_LS64_ACCDATA being
+    disabled
+  KVM: arm64: Don't treat HCRX_EL2 as a FGT register
+  KVM: arm64: Plug FEAT_GCS handling
+  KVM: arm64: Compute FGT masks from KVM's own FGT tables
+  KVM: arm64: Add description of FGT bits leading to EC!=0x18
+  KVM: arm64: Use computed masks as sanitisers for FGT registers
+  KVM: arm64: Propagate FGT masks to the nVHE hypervisor
+  KVM: arm64: Use computed FGT masks to setup FGT registers
+  KVM: arm64: Remove hand-crafted masks for FGT registers
+  KVM: arm64: Use KVM-specific HCRX_EL2 RES0 mask
+  KVM: arm64: Handle PSB CSYNC traps
+  KVM: arm64: Switch to table-driven FGU configuration
+  KVM: arm64: Validate FGT register descriptions against RES0 masks
+  KVM: arm64: Use FGT feature maps to drive RES0 bits
+  KVM: arm64: Allow kvm_has_feat() to take variable arguments
+  KVM: arm64: Use HCRX_EL2 feature map to drive fixed-value bits
+  KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits
+  KVM: arm64: Add FEAT_FGT2 registers to the VNCR page
+  KVM: arm64: Add sanitisation for FEAT_FGT2 registers
+  KVM: arm64: Add trap routing for FEAT_FGT2 registers
+  KVM: arm64: Add context-switch for FEAT_FGT2 registers
+  KVM: arm64: Allow sysreg ranges for FGT descriptors
+  KVM: arm64: Add FGT descriptors for FEAT_FGT2
+  KVM: arm64: Handle TSB CSYNC traps
+
+Mark Rutland (1):
+  KVM: arm64: Unconditionally configure fine-grain traps
+
+ arch/arm64/include/asm/el2_setup.h      |   14 +-
+ arch/arm64/include/asm/esr.h            |   10 +-
+ arch/arm64/include/asm/kvm_arm.h        |  186 ++--
+ arch/arm64/include/asm/kvm_host.h       |   56 +-
+ arch/arm64/include/asm/sysreg.h         |   26 +-
+ arch/arm64/include/asm/vncr_mapping.h   |    5 +
+ arch/arm64/kernel/cpufeature.c          |    7 +
+ arch/arm64/kvm/Makefile                 |    2 +-
+ arch/arm64/kvm/arm.c                    |   13 +
+ arch/arm64/kvm/config.c                 | 1085 +++++++++++++++++++++++
+ arch/arm64/kvm/emulate-nested.c         |  583 ++++++++----
+ arch/arm64/kvm/handle_exit.c            |   77 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  158 ++--
+ arch/arm64/kvm/hyp/nvhe/switch.c        |   12 +
+ arch/arm64/kvm/hyp/vgic-v3-sr.c         |    8 +-
+ arch/arm64/kvm/nested.c                 |  223 +----
+ arch/arm64/kvm/sys_regs.c               |   68 +-
+ arch/arm64/tools/cpucaps                |    1 +
+ arch/arm64/tools/sysreg                 | 1006 ++++++++++++++++++++-
+ tools/arch/arm64/include/asm/sysreg.h   |   65 +-
+ 20 files changed, 2894 insertions(+), 711 deletions(-)
+ create mode 100644 arch/arm64/kvm/config.c
+
+-- 
+2.39.2
+
 
