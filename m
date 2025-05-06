@@ -1,106 +1,147 @@
-Return-Path: <kvm+bounces-45566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6075AABDC9
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 10:52:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2525DAABDF5
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 10:55:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A71F3A7363
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 08:51:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 144DE3AF5FF
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 08:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FCF262804;
-	Tue,  6 May 2025 08:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D42264A95;
+	Tue,  6 May 2025 08:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OWnoo6Xe"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="C21FMLvT"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4228C216399;
-	Tue,  6 May 2025 08:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CFC24C092;
+	Tue,  6 May 2025 08:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746521521; cv=none; b=kA45cyeNp4WaDu15KKufu052+aMDqS8i/IInhH/6Y6jH+wljLO6mcsfB4/S4XLzK2PV7EGlqUCaUgRRQTLRd6KzPWfJpb3QbWQXAzSrTwbfpguFAMAt2XvqzrQk6ag8j2mC1vSiCeC7UoeZbq3p0rqu/vb2Lwlt8lCyEpSXmzjA=
+	t=1746521737; cv=none; b=LwqjJoH68Tc1jq/Mh6cT5jZd1sHmcR5rLV7/qYYAfNsr6M878NeYOkGwOLQu3NrEWTTxMij5RfcIxO1Z4dUIMZfFRYYJUdtA7RBhtuJLyQ3Y6P03nS6aUD0PDS9BTNyxwTXbQiky90EtGvs6c5OoJ/gjCBPcMn28nXbPymTLJ7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746521521; c=relaxed/simple;
-	bh=6NUiTuauuVTTWDJGRfLdUgLEoCQtYK+fPlsDsFdb7uc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jKxXKSggSaWl1c0n4U7Wpvzaz7BfiMsfSE5mc51zlQ8ONjN12Iu67aTvcJ0AzLEFiOLanyppChKhEIxgRIQVlHuGaZ9oCM6VVsAhcl2I/Ty3zWvU7M7PQUsxXQlbURJfmy4A3zg5DBEnfrdPj74KaPJ5tbcU7PiNxDG8ReW7lls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OWnoo6Xe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C5BAC4CEE4;
-	Tue,  6 May 2025 08:52:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746521520;
-	bh=6NUiTuauuVTTWDJGRfLdUgLEoCQtYK+fPlsDsFdb7uc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OWnoo6XeiUf/E7X7aaYO2Wh16ejc7WkatxpgR04nnkXPUwev+4plNxTx6AYD5nZry
-	 rKM5g+jeKlRdWscq5qD9QuHgGejaznVxNuVahZB8tbRLOSOtCcriS1DBKNtC8nPp7n
-	 Yhr0itoXjoEC1WXwb6dV/fmLDkXGL5Qps4iB1cs8/vwE4U8zA1XMSSNw6/XAot22of
-	 5eW9RpWWKKK2ccdoPRbYq6gA3RgyNjcGcEIvLvhTayFjr+xpCq21j7JUVq/7jT7jYG
-	 4qWECc9C0iWGt3L/HFnyJx6/+c16osgt56vPofuA1hNnZXbSbTBiQ6L7WQRHgqOMEM
-	 +gAyGHTaKAP6Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uCE1u-00C9X1-O6;
-	Tue, 06 May 2025 09:51:58 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH] KVM: selftests: add test for SVE host corruption
-Date: Tue,  6 May 2025 09:51:54 +0100
-Message-Id: <174652150331.339671.16106130205951028954.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250417-kvm-selftest-sve-signal-v1-1-6330c2f3da0c@kernel.org>
-References: <20250417-kvm-selftest-sve-signal-v1-1-6330c2f3da0c@kernel.org>
+	s=arc-20240116; t=1746521737; c=relaxed/simple;
+	bh=cMDuM3j7k5cTHN/7wO5B3vJg3iC+cUHTDsqOA5STSCA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=T2GuVZsc90OS8yY+yx4aUnj8zBLKF+G5VTCbShliRQuF2LzxSIoJTMZ8xVnJZd5+Y+/WPnuiVlAzJKY/56VZOrC+mHrO2g7NWfRAeUN5CAJhg3TBa5Ye3tCBERsfhlmZ8vJTyBjKKJdpR+13TmAnEInPTg8770S7Xj7d8sGrDfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=C21FMLvT; arc=none smtp.client-ip=210.118.77.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20250506085527euoutp015fca07206c784e5761f1f8a188abe8f5~85EHmujOw3188231882euoutp01i;
+	Tue,  6 May 2025 08:55:27 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20250506085527euoutp015fca07206c784e5761f1f8a188abe8f5~85EHmujOw3188231882euoutp01i
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1746521727;
+	bh=a9nf+a3zOwcPKwqh9B0OLR/Jw+1OSvSECo9idk1FbTE=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=C21FMLvTm2rnAQxHrZ+XjlwShdIolbFmzs5OV92e64+XWXfkvyqlAqyB+SqMI8FWy
+	 gzLOR6h8hKT7nwqPnqVkMOQLWo7Bynuo9GrjINMuxW5+0PVvkLxThRfZTzS3j9hgVr
+	 q6wpBuza63nwFWaICKN2JQP8BsKq4m32MwuwlaaI=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20250506085526eucas1p1b3eca35ab5da96d65930d05e3de8871f~85EHQg5bx1239412394eucas1p1s;
+	Tue,  6 May 2025 08:55:26 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20250506085524eusmtip25604952270886300d2a204bfc62676fe~85EEuyRQL3058030580eusmtip2d;
+	Tue,  6 May 2025 08:55:24 +0000 (GMT)
+Message-ID: <2e89d7e2-9146-46c7-86b0-8023483e5e07@samsung.com>
+Date: Tue, 6 May 2025 10:55:23 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 0/9] Provide a new two step DMA mapping API
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Keith
+	Busch <kbusch@kernel.org>, Jake Edge <jake@lwn.net>, Jonathan Corbet
+	<corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun
+	<zyjzyj2000@gmail.com>, Robin Murphy <robin.murphy@arm.com>, Joerg Roedel
+	<joro@8bytes.org>, Will Deacon <will@kernel.org>, Sagi Grimberg
+	<sagi@grimberg.me>, Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe
+	<logang@deltatee.com>, Yishai Hadas <yishaih@nvidia.com>, Shameer Kolothum
+	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, Andrew Morton
+	<akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org, Niklas Schnelle
+	<schnelle@linux.ibm.com>, Chuck Lever <chuck.lever@oracle.com>, Luis
+	Chamberlain <mcgrof@kernel.org>, Matthew Wilcox <willy@infradead.org>, Dan
+	Williams <dan.j.williams@intel.com>, Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Content-Language: en-US
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <cover.1746424934.git.leon@kernel.org>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20250506085526eucas1p1b3eca35ab5da96d65930d05e3de8871f
+X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, shuah@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, broonie@kernel.org, mark.rutland@arm.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-RootMTR: 20250505070202eucas1p19aa3caffab7176123323fe5462773c8e
+X-EPHeader: CA
+X-CMS-RootMailID: 20250505070202eucas1p19aa3caffab7176123323fe5462773c8e
+References: <CGME20250505070202eucas1p19aa3caffab7176123323fe5462773c8e@eucas1p1.samsung.com>
+	<cover.1746424934.git.leon@kernel.org>
 
-On Thu, 17 Apr 2025 00:32:49 +0100, Mark Brown wrote:
-> This test program, originally written by Mark Rutland and lightly modified
-> by me for upstream, verifies that we do not have the issues with host SVE
-> state being discarded which were fixed in
-> 
->    fbc7e61195e2 ("KVM: arm64: Unconditionally save+flush host FPSIMD/SVE/SME state")
-> 
-> by running a simple VM while checking the SVE register state for
-> corruption.
-> 
-> [...]
+On 05.05.2025 09:01, Leon Romanovsky wrote:
+> Hi Marek,
+>
+> These are the DMA/IOMMU patches only, which have not seen functional
+> changes for a while.  They are tested and reviewed and ready to merge.
+>
+> We will work with relevant subsystems to merge rest of the conversion
+> patches. At least some of them will be done in next cycle to reduce
+> merge conflicts.
+>
+> Thanks
+>
+> =========================================================================
+> Following recent on site LSF/MM 2025 [1] discussion, the overall
+> response was extremely positive with many people expressed their
+> desire to see this series merged, so they can base their work on it.
+>
+> It includes, but not limited:
+>   * Luis's "nvme-pci: breaking the 512 KiB max IO boundary":
+>     https://lore.kernel.org/all/20250320111328.2841690-1-mcgrof@kernel.org/
+>   * Chuck's NFS conversion to use one structure (bio_vec) for all types
+>     of RPC transports:
+>     https://lore.kernel.org/all/913df4b4-fc4a-409d-9007-088a3e2c8291@oracle.com
+>   * Matthew's vision for the world without struct page:
+>     https://lore.kernel.org/all/Z-WRQOYEvOWlI34w@casper.infradead.org/
+>   * Confidential computing roadmap from Dan:
+>     https://lore.kernel.org/all/6801a8e3968da_71fe29411@dwillia2-xfh.jf.intel.com.notmuch
+>
+> This series is combination of effort of many people who contributed ideas,
+> code and testing and I'm gratefully thankful for them.
 
-Applied to kvm-arm64/misc-6.16, thanks!
 
-[1/1] KVM: selftests: add test for SVE host corruption
-      commit: e0ccc45b056d626d4b271820faeedf3837337ceb
+Thanks everyone involved in this contribution. I appreciate the effort 
+of showing that such new API is really needed and will be used by other 
+subsystems. I see benefits from this approach and I hope that any 
+pending issues can be resolved incrementally.
 
-Cheers,
+I've applied this patchset to dma-mapping-next branch and it will be 
+also available as dma-mapping-for-6.16-two-step-api [1] stable branch 
+for those who wants to base their pending work on it.
 
-	M.
+[1] 
+https://web.git.kernel.org/pub/scm/linux/kernel/git/mszyprowski/linux.git/log/?h=dma-mapping-for-6.16-two-step-api
+
+> ...
+
+Best regards
 -- 
-Without deviation from the norm, progress is not possible.
-
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
 
 
