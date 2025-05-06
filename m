@@ -1,160 +1,292 @@
-Return-Path: <kvm+bounces-45546-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45547-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B47FAAB8FB
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 08:47:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34EDFAAB8C3
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 08:41:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DC993B92FE
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 06:35:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E3AB16864C
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 06:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C0632A6D0;
-	Tue,  6 May 2025 03:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39C6298CA0;
+	Tue,  6 May 2025 03:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GC0W/wrL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MW2fIkft"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DF235014A
-	for <kvm@vger.kernel.org>; Tue,  6 May 2025 00:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6474A3537CA
+	for <kvm@vger.kernel.org>; Tue,  6 May 2025 01:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746493019; cv=none; b=hP8hQdNrW/huyXl3OXdCRNZNaLR5K32VGOAerEcWYngM9FAgO/KFmjrv4ncAlaLtB5QVOOpgticqvAF/B6be8qo0GTAoUulWzkn/pxRgsusX2PZtuBvN+9/iKAXCZp4T6J8KMdIlRCVizsBQvpVJjGXrnEF6qVG165sXanISsi4=
+	t=1746493976; cv=none; b=rvxvd8OLnO5jyQv1OJbAF3/wkXUCsdCISNUGWlIC76hcQx1sy41ZaUb6X2fyW4b1SeOv671DnQ4NTnqLDo7FDUhvp2eDY5NK+mz2H4mdsAJRB/OL4PwYSax/Kn+mmm8L9lYngb4/yyup8Zw8IPNqQ5HrhBsspThJFhHkdei7LSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746493019; c=relaxed/simple;
-	bh=ngL4kRBDSkUECBjfvf99fVbKuQB+N/pMrty5zeTZWKc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OAKmfzDJrBYovc+eoFwjB4aAoiNTl7ymKU1EFXnntOATZMDlIi+xG4U9mADtgO/FopdO1+jl+s+I5jMmwsdaxxv/IrI3zNP8IFu1KkEV3agwEvTgP57mj/A4d9StqkpU856Mxr7/O3rB9DeWPq4PA1kIaPfAVqAc4C59bLG+3i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GC0W/wrL; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1746493976; c=relaxed/simple;
+	bh=ByqIMP6Nh3w5W69TJIMu1deyWSJVf6m4KcbXUwNDpV4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=S2TiLrZ5N/n+RT0dtrBGhWXblhoMXARAc3RWoUJYu8Uo5+ueBbt/X5R7jPIMSkZZn/gWoPnvYwximrwfLU+B95Rmdfor8CBatyUe5S9Xd21Z5+AqT2W6cF8LzD4gkeSr5uSuDLdt9+/9X3w92P6U3WM2EZ8XZ3/0Kh1TSLC9ss0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MW2fIkft; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-736b22717f1so3218869b3a.1
-        for <kvm@vger.kernel.org>; Mon, 05 May 2025 17:56:57 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-309e8dc1e21so4849738a91.0
+        for <kvm@vger.kernel.org>; Mon, 05 May 2025 18:12:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746493017; x=1747097817; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6g8LwLWU5GDBk+Jxwq24ldANiEHpbz8sPHgcvAyac8A=;
-        b=GC0W/wrL5IPTmN4CQdjePsy54ZP1W36G5lL5Fqp/fFfaHayyIehzFz53KNiyJ+v0w2
-         5HY1xlr4gDBdr2S6LF4gyjBvlYfRQ3p0hOOvf/KPIddIq3mBkx4RXu6p4jUMGJKHUGQM
-         5/m1dMRyQDE+5i0vhu4ip5e3ffd9mvoHnuGAbQBi8bwaAxt3UW5lInrLi7rVdV349neW
-         NHIFpOh1DpoDjyInaR4FXcv6LFdZv0d43b3qU5mdp9kXxJT0blfzLHjS/HJv5s1p3XHH
-         1QRZXRFyn+opFohhzDQ8BS2+pE2Fb3Lxj4NUCoABWSzjTgWYwSm+NAEyOjKhUT+94IwG
-         02vw==
+        d=google.com; s=20230601; t=1746493972; x=1747098772; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CEVGH9kkgwJIz3AfndqYyl8Bygb46xzfOaZWEs7TXHE=;
+        b=MW2fIkftNV6DloozJPoVbX0m0833seYL6u6Ve6FhEg3+DvgtXZK9abWsYISYjkQnYQ
+         eAKCz8J+tNoJ8gsU3B4+6dGhpb9B5c5jNYh6qdP0EhiQME/RYxA0dppclOu6tG7nIYBz
+         9Pqsa9z54q105OQM8oysgxrNWltyYaXdy3HLH9dBDCgqQLneKyJeigNSCJIy9Gupfw6r
+         CR2/MkgT2EO+R9nt4kCJ6XB80coWEGJOm8Ascpbv2FiwAwWl0u6WXISWf90DAqe2JdML
+         Z1rS93j2s2Q0qf7Wb7F4NVge+b13c4Q/wvy+VM+heymNpYCCO+N+KWABg0//4oFO7xm/
+         G2FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746493017; x=1747097817;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6g8LwLWU5GDBk+Jxwq24ldANiEHpbz8sPHgcvAyac8A=;
-        b=kWjmdM8ERsu9DcqmKZH302eG5CaGw2m+ksxOnkRxWBNAMWXwESgNTkLLBbMMAH16pX
-         dAoVxri0DbV/zT/3oXV5gQiROp7fog7gYkzwMJ53fVP9Sh+yF41pU3m6wZ5MmagN+aPc
-         yFSq/mUsTHsasZzsVMb4pT9dUX67Sy00+72R5l/CzzdF9xIf7BHWcJ3TV3Lk3tVhSsHR
-         L9DbzEF4gfn2So/jTwnn3yEoRDjY56nVZZa7iZnPbYT+kHOaDAmYkHjFL6Xgnj1nT5Uz
-         yHvg254rzyfxpSnoJ5BhDaEc4vVje7CblREXOR6m8c3Vv1pl2QxY3Y90vQXZrDn+agwm
-         A3Tg==
-X-Forwarded-Encrypted: i=1; AJvYcCUHEE2bcdsT8cclNXfAft6xHPKxdJUbFU08PPOJX0pK5twTXIhkNtm/INAST/yCyzUnkZc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyvi0IAoXLFpVihzdEsMIVu6gWjhYvHF8V/t7wClY6YBltXSNC+
-	9oiM+zDGKHGrwwaiRsXGNJzdetOpqtKfZKt3kZvkVyIm/nSQO9dnQ2tfdZ4GduhXpNxY7ZwIIJG
-	wSg==
-X-Google-Smtp-Source: AGHT+IHFmda6X8o9RIOywhrl2OVnmBig/U1gYTcE5RpM7e9/kZR0UFvMp2Wr8+1YMfiISVdVsUDJl6tvD78=
-X-Received: from pgnb2.prod.google.com ([2002:a63:7142:0:b0:b1f:8cc1:95c1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:d04c:b0:1e1:a449:ff71
- with SMTP id adf61e73a8af0-2116f13cb94mr2312715637.1.1746493017283; Mon, 05
- May 2025 17:56:57 -0700 (PDT)
-Date: Mon, 5 May 2025 17:56:55 -0700
-In-Reply-To: <34890707-201a-44f9-afb3-b065ae71b246@amd.com>
+        d=1e100.net; s=20230601; t=1746493972; x=1747098772;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CEVGH9kkgwJIz3AfndqYyl8Bygb46xzfOaZWEs7TXHE=;
+        b=R0euYCLfIX5BJkXjFvhQBT77ydAPLHNdZGsTugVi/NutKAKdMzwVjQ0cpjwbq7u9VG
+         FFLg8BZEyhweR9ORq3KqrHAskahOBr3cNvW71pCtG54GiMS6PJhp27pXd9OzCs1TZkTB
+         pu+DdUibihoRX8TwYI/Ezuwr0TdUDUVwfRopiuwocQKZcBnDvelMK0hwrwh+fk/cD41y
+         RRKka2TTQZ496jFKy5/OLd2ly067GgvXoB7d95mR+YxP/C5WMoswgLRTFGCcU+9XxVcI
+         QHIqzY4z0yX396Vd0XwXUAQzb1Jd0+VCXz3HsU0mm6Z0pjGpd5GQvihk0B24dUxoMsZS
+         jFZw==
+X-Gm-Message-State: AOJu0YyNJAmMlPvbgokmcJ4YjHQFd/4rcNrQJbrGc52RSkQc6q1klUcH
+	CPaKLH2IQPsxgSNTIlhzr+ooHAjv3Zrx+sEHUDj8NFTlodD9VlCSmqjyMV59j/UWtym/fy69BIa
+	e+A==
+X-Google-Smtp-Source: AGHT+IHgYChK2GebS8daaWohYQeS4T0jHHXxX01AdhMPXg4gIABW2m4Tzyl1WWyigJ23sIW+H2nARb09coI=
+X-Received: from pjgg12.prod.google.com ([2002:a17:90b:57cc:b0:2fa:15aa:4d1e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d60b:b0:2fa:2133:bc87
+ with SMTP id 98e67ed59e1d1-30a7bad8b05mr2222611a91.6.1746493972553; Mon, 05
+ May 2025 18:12:52 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Mon,  5 May 2025 18:12:50 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250305230000.231025-1-prsampat@amd.com> <174622216534.881262.8086472919667553138.b4-ty@google.com>
- <b1cc7366-bd30-46ee-ac6e-35c2b08ffdb5@amd.com> <aBlGp8i_zzGgKeIl@google.com> <34890707-201a-44f9-afb3-b065ae71b246@amd.com>
-Message-ID: <aBleV3TlvA1QwcSZ@google.com>
-Subject: Re: [PATCH v8 00/10] Basic SEV-SNP Selftests
+X-Mailer: git-send-email 2.49.0.967.g6a0df3ecc3-goog
+Message-ID: <20250506011250.1089254-1-seanjc@google.com>
+Subject: [PATCH] KVM: selftests: Add a test for x86's fastops emulation
 From: Sean Christopherson <seanjc@google.com>
-To: Ashish Kalra <ashish.kalra@amd.com>
-Cc: "Pratik R. Sampat" <prsampat@amd.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
-	thomas.lendacky@amd.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, shuah@kernel.org, pgonda@google.com, 
-	nikunj@amd.com, pankaj.gupta@amd.com, michael.roth@amd.com, sraithal@amd.com
-Content-Type: text/plain; charset="us-ascii"
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, May 05, 2025, Ashish Kalra wrote:
-> On 5/5/2025 6:15 PM, Sean Christopherson wrote:
-> > @@ -3067,12 +3075,6 @@ void __init sev_hardware_setup(void)
-> >  
-> >         if (!sev_enabled)
-> >                 return;
-> > -
-> > -       /*
-> > -        * Do both SNP and SEV initialization at KVM module load.
-> > -        */
-> > -       init_args.probe = true;
-> > -       sev_platform_init(&init_args);
-> >  }
-> >  
-> >  void sev_hardware_unsetup(void)
-> > --
-> > 
-> > Ashish, what am I missing?
-> > 
-> 
-> As far as setting sev*_enabled is concerned, i believe they are more specific
-> to SNP/SEV/SEV-ES being enabled in the system, which is separate from
-> SEV_INIT/SNP_INIT (SNP_INIT success indicates that RMP been initialized, SNP
-> has to be already enabled via MSR_SYSCFG before SNP_INIT is called), though
-> SEV_INIT/SNP_INIT may fail but SEV/SNP support will still be enabled on the
-> system.
+Add a test to verify KVM's fastops emulation via forced emulation.  KVM's
+so called "fastop" infrastructure executes the to-be-emulated instruction
+directly on hardware instead of manually emulating the instruction in
+software, using various shenanigans to glue together the emulator context
+and CPU state, e.g. to get RFLAGS fed into the instruction and back out
+for the emulator.
 
-No, if SNP_INIT fails and has zero chance of succeeding, then SNP is *NOT*
-supported *by KVM*.  The platform may be configured to support SNP, but that
-matters not at all if KVM can't actually use the functionality.
+Add testcases for all instructions that are low hanging fruit.  While the
+primary goal of the selftest is to validate the glue code, a secondary
+goal is to ensure "emulation" matches hardware exactly, including for
+arithmetic flags that are architecturally undefined.  While arithmetic
+flags may be *architecturally* undefined, their behavior is deterministic
+for a given CPU (likely a given uarch, and possibly even an entire family
+or class of CPUs).  I.e. KVM has effectively been emulating underlying
+hardware behavior for years.
 
-> Additionally as SEV_INIT/SNP_INIT during sev_platform_init() have failed, so
-> any SEV/SEV-ES/SNP VM launch will fail as the firmware will return invalid
-> platform state as INITs have failed.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/x86/fastops_test.c  | 165 ++++++++++++++++++
+ 2 files changed, 166 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86/fastops_test.c
 
-Yeah, and that's *awful* behavior for KVM.  Imagine if KVM did that for every
-feature, i.e. enumerated hardware support irrespective of KVM support.
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index f62b0a5aba35..411c3d5eb5b1 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -66,6 +66,7 @@ TEST_GEN_PROGS_x86 += x86/cr4_cpuid_sync_test
+ TEST_GEN_PROGS_x86 += x86/dirty_log_page_splitting_test
+ TEST_GEN_PROGS_x86 += x86/feature_msrs_test
+ TEST_GEN_PROGS_x86 += x86/exit_on_emulation_failure_test
++TEST_GEN_PROGS_x86 += x86/fastops_test
+ TEST_GEN_PROGS_x86 += x86/fix_hypercall_test
+ TEST_GEN_PROGS_x86 += x86/hwcr_msr_test
+ TEST_GEN_PROGS_x86 += x86/hyperv_clock
+diff --git a/tools/testing/selftests/kvm/x86/fastops_test.c b/tools/testing/selftests/kvm/x86/fastops_test.c
+new file mode 100644
+index 000000000000..2ac89d6c1e46
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86/fastops_test.c
+@@ -0,0 +1,165 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
++
++/*
++ * Execute a fastop() instruction, with or without forced emulation.  BT bit 0
++ * to set RFLAGS.CF based on whether or not the input is even or odd, so that
++ * instructions like ADC and SBB are deterministic.
++ */
++#define guest_execute_fastop_1(FEP, insn, __val, __flags)				\
++({											\
++	__asm__ __volatile__("bt $0, %[val]\n\t"					\
++			     FEP insn " %[val]\n\t"					\
++			     "pushfq\n\t"						\
++			     "pop %[flags]\n\t"						\
++			     : [val]"+r"(__val), [flags]"=r"(__flags)			\
++			     : : "cc", "memory");					\
++})
++
++#define guest_test_fastop_1(insn, type_t, __val)					\
++({											\
++	type_t val = __val, ex_val = __val, input = __val;				\
++	uint64_t flags, ex_flags;							\
++											\
++	guest_execute_fastop_1("", insn, ex_val, ex_flags);				\
++	guest_execute_fastop_1(KVM_FEP, insn, val, flags);				\
++											\
++	__GUEST_ASSERT(val == ex_val,							\
++		       "Wanted 0x%lx for '%s 0x%lx', got 0x%lx",			\
++		       (uint64_t)ex_val, insn, (uint64_t)input, (uint64_t)val);		\
++	__GUEST_ASSERT(flags == ex_flags,						\
++			"Wanted flags 0x%lx for '%s 0x%lx', got 0x%lx",			\
++			ex_flags, insn, (uint64_t)input, flags);			\
++})
++
++#define guest_execute_fastop_2(FEP, insn, __input, __output, __flags)			\
++({											\
++	__asm__ __volatile__("bt $0, %[output]\n\t"					\
++			     FEP insn " %[input], %[output]\n\t"			\
++			     "pushfq\n\t"						\
++			     "pop %[flags]\n\t"						\
++			     : [output]"+r"(__output), [flags]"=r"(__flags)		\
++			     : [input]"r"(__input) : "cc", "memory");			\
++})
++
++#define guest_test_fastop_2(insn, type_t, __val1, __val2)				\
++({											\
++	type_t input = __val1, input2 = __val2, output = __val2, ex_output = __val2;	\
++	uint64_t flags, ex_flags;							\
++											\
++	guest_execute_fastop_2("", insn, input, ex_output, ex_flags);			\
++	guest_execute_fastop_2(KVM_FEP, insn, input, output, flags);			\
++											\
++	__GUEST_ASSERT(output == ex_output,						\
++		       "Wanted 0x%lx for '%s 0x%lx 0x%lx', got 0x%lx",			\
++		       (uint64_t)ex_output, insn, (uint64_t)input,			\
++		       (uint64_t)input2, (uint64_t)output);				\
++	__GUEST_ASSERT(flags == ex_flags,						\
++			"Wanted flags 0x%lx for '%s 0x%lx, 0x%lx', got 0x%lx",		\
++			ex_flags, insn, (uint64_t)input, (uint64_t)input2, flags);	\
++})
++
++#define guest_execute_fastop_cl(FEP, insn, __shift, __output, __flags)			\
++({											\
++	__asm__ __volatile__("bt $0, %[output]\n\t"					\
++			     FEP insn " %%cl, %[output]\n\t"				\
++			     "pushfq\n\t"						\
++			     "pop %[flags]\n\t"						\
++			     : [output]"+r"(__output), [flags]"=r"(__flags)		\
++			     : "c"(__shift) : "cc", "memory");				\
++})
++
++#define guest_test_fastop_cl(insn, type_t, __val1, __val2)				\
++({											\
++	type_t output = __val2, ex_output = __val2, input = __val2;			\
++	uint8_t shift = __val1;								\
++	uint64_t flags, ex_flags;							\
++											\
++	guest_execute_fastop_cl("", insn, shift, ex_output, ex_flags);			\
++	guest_execute_fastop_cl(KVM_FEP, insn, shift, output, flags);			\
++											\
++	__GUEST_ASSERT(output == ex_output,						\
++		       "Wanted 0x%lx for '%s 0x%x, 0x%lx', got 0x%lx",			\
++		       (uint64_t)ex_output, insn, shift, (uint64_t)input,		\
++		       (uint64_t)output);						\
++	__GUEST_ASSERT(flags == ex_flags,						\
++			"Wanted flags 0x%lx for '%s 0x%x, 0x%lx', got 0x%lx",		\
++			ex_flags, insn, shift, (uint64_t)input, flags);			\
++})
++
++static const uint64_t vals[] = {
++	0,
++	1,
++	2,
++	4,
++	7,
++	0x5555555555555555,
++	0xaaaaaaaaaaaaaaaa,
++	0xfefefefefefefefe,
++	0xffffffffffffffff,
++};
++
++#define guest_test_fastops(type_t, suffix)						\
++do {											\
++	int i, j;									\
++											\
++	for (i = 0; i < ARRAY_SIZE(vals); i++) {					\
++		guest_test_fastop_1("dec" suffix, type_t, vals[i]);			\
++		guest_test_fastop_1("inc" suffix, type_t, vals[i]);			\
++		guest_test_fastop_1("neg" suffix, type_t, vals[i]);			\
++		guest_test_fastop_1("not" suffix, type_t, vals[i]);			\
++											\
++		for (j = 0; j < ARRAY_SIZE(vals); j++) {				\
++			guest_test_fastop_2("add" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("adc" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("and" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("bsf" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("bsr" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("bt" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("btc" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("btr" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("bts" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("cmp" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("imul" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("or" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("sbb" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("sub" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("test" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_2("xor" suffix, type_t, vals[i], vals[j]);	\
++											\
++			guest_test_fastop_cl("rol" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("ror" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("rcl" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("rcr" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("sar" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("shl" suffix, type_t, vals[i], vals[j]);	\
++			guest_test_fastop_cl("shr" suffix, type_t, vals[i], vals[j]);	\
++		}									\
++	}										\
++} while (0)
++
++static void guest_code(void)
++{
++	guest_test_fastops(uint16_t, "w");
++	guest_test_fastops(uint32_t, "l");
++	guest_test_fastops(uint64_t, "q");
++
++	GUEST_DONE();
++}
++
++int main(int argc, char *argv[])
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	TEST_REQUIRE(is_forced_emulation_enabled);
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++
++	vcpu_run(vcpu);
++	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
++
++	kvm_vm_free(vm);
++}
 
-The API is KVM_GET_SUPPORTED_CPUID, not KVM_GET_MOSTLY_SUPPORTED_CPUID.
+base-commit: 661b7ddb2d10258b53106d7c39c309806b00a99c
+-- 
+2.49.0.967.g6a0df3ecc3-goog
 
-> >From my understanding, sev*_enabled indicates the user support to
-> >enable/disable support for SEV/SEV-ES/SEV-SNP, 
-
-Yes, and they're also used to reflect and enumerate KVM support:
-
-	if (sev_enabled) {
-		kvm_cpu_cap_set(X86_FEATURE_SEV);
-		kvm_caps.supported_vm_types |= BIT(KVM_X86_SEV_VM);
-	}
-	if (sev_es_enabled) {
-		kvm_cpu_cap_set(X86_FEATURE_SEV_ES);
-		kvm_caps.supported_vm_types |= BIT(KVM_X86_SEV_ES_VM);
-	}
-	if (sev_snp_enabled) {
-		kvm_cpu_cap_set(X86_FEATURE_SEV_SNP);
-		kvm_caps.supported_vm_types |= BIT(KVM_X86_SNP_VM);
-	}
-
-> as the sev*_enabled are the KVM module parameters, while sev*_supported
-> indicates if platform has that support enabled.
-
-sev*_supported are completely irrelevant.  They are function local scratch variables
-that exist so that KVM doesn't clobber userspace's inputs while computing what is
-fully supported and enabled.
-
-> And before the SEV/SNP init support was moved to KVM from CCP module, doing
-> SEV/SNP INIT could fail but that still had KVM detecting SEV/SNP support
-> enabled, so this moving SEV/SNP init stuff to KVM module from CCP driver is
-> consistent with the previous behavior.
-
-And one of my driving motivations for getting the initialization into KVM was to
-fix that previous behavior.
 
