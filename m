@@ -1,121 +1,242 @@
-Return-Path: <kvm+bounces-45659-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45660-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E24DBAACDEF
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 21:19:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D8F6AACDF7
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 21:23:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08B7C1C210C0
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 19:19:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52C471C21E13
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 19:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7651F4C97;
-	Tue,  6 May 2025 19:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745BC1F4624;
+	Tue,  6 May 2025 19:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lHcHa75S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uUaswSTJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428221A3A8A;
-	Tue,  6 May 2025 19:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D57158538
+	for <kvm@vger.kernel.org>; Tue,  6 May 2025 19:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746559133; cv=none; b=nDcb0edX/b2JFXhLYORIYiaHHSaqyvUcgcXtaJxnCCLwhJrvxrtf2i+6O7yRFPrrLBOa99psEtLQe9uBMDeAi3+gKteQziQA178dySRfyX8dHcaDbzk5ueHS5spLIj1lKkKytdaCWL3Zsx3stOyj6e8ulgHc4XwzoQKoP858xv4=
+	t=1746559371; cv=none; b=jU56pdohOeg6Vejav7xPFOIpDTz2Jq4xdxEbe2Soi8oaBWr6jzDixnxRldrl+X1G8HZtbTvZS65yhmufZkwyIgz8AUttbbWTZicvxJC5IFdWWBorgKcQ2856JCJQ+prMEisZw/M/CPyHRxa6XMr5w7RsYGdCYNLrTByROjXkEY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746559133; c=relaxed/simple;
-	bh=IWWPVYiHCcNYdmZwlOlrJ2372bc/2Pu9nYrjsznihX4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LroQDG0JAuFiMY+s5ryyaelvMA6SVtXaEqY7Nuhv4qKR+b2XUloVjcPiUGQan4CSJopU/LrD2YcfxgG9HNtnw9YUw2c0uurcg4ioMl+INZXKFBIPfSNfDcNxQbmwdcdXJEKUB6llTR6YBNh0ozI+wgfX/10RqzlVDHJoe1/hlwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lHcHa75S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17CA7C4CEE4;
-	Tue,  6 May 2025 19:18:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746559132;
-	bh=IWWPVYiHCcNYdmZwlOlrJ2372bc/2Pu9nYrjsznihX4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lHcHa75SVDk9HCrZ9eoC3Up3LWARsKhrbFvjqFKqZ+HbsfFljutHr5Y1ASCbFkPa5
-	 5UHJsregxDmG95toGxVxR5pWWSwpUDZymssdlLSvelb1cxf4F4nZnVmZ2O4IjDGQQm
-	 bDxHFQf+/iq2DqeZrcGq1EHSWWBgWsCWyxDJ74JGFPyeWREsktmfM8NMQbdxTcEuZn
-	 7f67f9GcGRrfUUHfU8Cpng0YuAczGB1SUXfoTiLiKip1tm2JcngfNC2aMSLPTnWOTv
-	 QUySPOezZQZTP353tarTds0Fd9VkD74lBUkLAVciu/HLmUMnJQ3i+v36oKTu4iGYaS
-	 UAxZ86/pS3Xzg==
-Date: Tue, 6 May 2025 12:18:49 -0700
-From: Josh Poimboeuf <jpoimboe@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Sean Christopherson <seanjc@google.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com, 
-	wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com, 
-	bp@alien8.de, dave.hansen@linux.intel.com, pbonzini@redhat.com, 
-	ardb@kernel.org, kees@kernel.org, Arnd Bergmann <arnd@arndb.de>, 
-	gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-efi@vger.kernel.org, samitolvanen@google.com, 
-	ojeda@kernel.org, xin@zytor.com
-Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
- in __nocfi functions
-Message-ID: <vukrlmb4kbpcol6rtest3tsw4y6obopbrwi5hcb5iwzogsopgt@sokysuzxvehi>
-References: <20250430190600.GQ4439@noisy.programming.kicks-ass.net>
- <20250501103038.GB4356@noisy.programming.kicks-ass.net>
- <20250501153844.GD4356@noisy.programming.kicks-ass.net>
- <aBO9uoLnxCSD0UwT@google.com>
- <20250502084007.GS4198@noisy.programming.kicks-ass.net>
- <aBUiwLV4ZY2HdRbz@google.com>
- <20250503095023.GE4198@noisy.programming.kicks-ass.net>
- <p6mkebfvhxvtqyz6mtohm2ko3nqe2zdawkgbfi6h2rfv2gxbuz@ktixvjaj44en>
- <20250506073100.GG4198@noisy.programming.kicks-ass.net>
- <20250506133234.GH4356@noisy.programming.kicks-ass.net>
+	s=arc-20240116; t=1746559371; c=relaxed/simple;
+	bh=adViIxT4K+8OILyTBF/w5gsHiQUH4RC4i3QZNQkAnEE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Ysj4wO+6B/YnJC2FA3Wwl12tYxuWwGA86eLqxZM4oazgNUgBcIv3J6Cpng7Vt1n7roaDq42J2LMM3oNMLHrvE1PXMEJbXmXCK9jyIvrZk5r3IyL5bJIOBi7aq5NP6NTB3o05tsrwWh5DaHSr2YC+N+frXy/ROyz2BXDWH1ebKkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uUaswSTJ; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-73dcce02a5cso3572690b3a.0
+        for <kvm@vger.kernel.org>; Tue, 06 May 2025 12:22:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746559369; x=1747164169; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YdVfAUAmDEBQ8JFX7fJFifwcWORGf91hOm42i7pODPI=;
+        b=uUaswSTJjmb1FQo3fau9BMJ+wOuLnRKen5mr6LtEv4UH1TYO5KySFZgUoF6vYRC7Ho
+         5SCmkOFM18Jqv6a8Eo4CqE671a9RU15WqQBqHN18jMnk+s7s8qK1b1yu6VSxAahL73OA
+         nyBaiXXapSnK2j/P3XUJ12c1Ulz1WIXS3RScjfCAbpmMC02pjR4RRCMvoAmHjn3V1JQB
+         3FhQ9fWzJjons3hGUFGYIxPQPUIOCi26kAWUyPq7ByhGXanFNBRAKUkRyVnwow5Z4mCs
+         ZB7ugRkPCtqOnWrFZOVLfQUuAy86fEvg8cLTz3QGNSGL5lmaRJqnRh8rI57mHWObise9
+         9GsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746559369; x=1747164169;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YdVfAUAmDEBQ8JFX7fJFifwcWORGf91hOm42i7pODPI=;
+        b=LXO4PEnp5AKhh8mh954De3nzB7mqT4YEOpX0YIYoIiyajMffQ1uNDyx0lvsfQQFnIr
+         DnvpukKcj86tLTDIg/WcWRx0HBn8YnvAeeS+dZ7Ky5PHSNFdLXhcCt4Mk+0pbi1HqQcs
+         eDkjnAHgh3uk33mPYh2vuF4EeKZkKygRoHguteMnfmWxvbBBSQIz+e/6l8+1/w2YT0FQ
+         vD8WxwPBJLiQ2ZC7is0RAnds2lymPoCG7W5zCbXAEHpK4lSIfP2wI3yJdwF6XmyHJEXF
+         d3exfQVe9hJwyJmH/vmNQvfBIqbz+hEE9D9lwLpXKN7RlAEjHKDD4JpkqPbTJdlKopYr
+         Lk6w==
+X-Forwarded-Encrypted: i=1; AJvYcCUerdyRpWTS9nYWpzxKFtmoW9ureFRijA+xeMhB25tu49WVXsTFRR+vIuTv5+jA5qEDqCE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEAxw26/A9LDf/IuYtRiSoy8oHiqDrmEJEkwPIn3Z8WsHPVBGk
+	ecklGIEctNvKXN5wGt5Ox4CQmoehcBaZTTSugjcxpVXQGfbwjl78IIbFnwEX1hQ6wbYGlZ1PxP4
+	WOxFBRFo31qHpaDVcck7XXQ==
+X-Google-Smtp-Source: AGHT+IF6xVKxxuyEiNYi+0vPcETYSLwUkqiD4tqqqh48d1N2zs7IMgRp17ja4z+L+OzOmL3DebRn7uSN+uZhGnUzFw==
+X-Received: from pfcg7.prod.google.com ([2002:a05:6a00:23c7:b0:730:8e17:ed13])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:ab05:b0:730:9946:5973 with SMTP id d2e1a72fcca58-7409cf1e873mr452083b3a.5.1746559369363;
+ Tue, 06 May 2025 12:22:49 -0700 (PDT)
+Date: Tue, 06 May 2025 12:22:47 -0700
+In-Reply-To: <aBlkplRxLNojF4m1@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250506133234.GH4356@noisy.programming.kicks-ass.net>
+Mime-Version: 1.0
+References: <aA7UXI0NB7oQQrL2@yzhao56-desk.sh.intel.com> <diqz4iy5xvgi.fsf@ackerleytng-ctop.c.googlers.com>
+ <aBlkplRxLNojF4m1@yzhao56-desk.sh.intel.com>
+Message-ID: <diqz1pt1sfw8.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 39/39] KVM: guest_memfd: Dynamically split/reconstruct
+ HugeTLB page
+From: Ackerley Tng <ackerleytng@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: vannapurve@google.com, chenyi.qiang@intel.com, tabba@google.com, 
+	quic_eberman@quicinc.com, roypat@amazon.co.uk, jgg@nvidia.com, 
+	peterx@redhat.com, david@redhat.com, rientjes@google.com, fvdl@google.com, 
+	jthoughton@google.com, seanjc@google.com, pbonzini@redhat.com, 
+	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	isaku.yamahata@intel.com, muchun.song@linux.dev, erdemaktas@google.com, 
+	qperret@google.com, jhubbard@nvidia.com, willy@infradead.org, 
+	shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
+	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
+	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
+	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
+	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, May 06, 2025 at 03:32:34PM +0200, Peter Zijlstra wrote:
-> On Tue, May 06, 2025 at 09:31:00AM +0200, Peter Zijlstra wrote:
-> > On Sat, May 03, 2025 at 11:28:37AM -0700, Josh Poimboeuf wrote:
-> > > Can we just adjust the stack in the alternative?
-> > > 
-> > > 	ALTERNATIVE "add $64 %rsp", __stringify(ERETS), X86_FEATURE_FRED
-> > 
-> > Yes, that should work. 
-> 
-> Nope, it needs to be "mov %rbp, %rsp". Because that is the actual rsp
-> value after ERETS-to-self.
-> 
-> > But I wanted to have a poke at objtool, so it
-> > will properly complain about the mistake first.
-> 
-> So a metric ton of fail here :/
-> 
-> The biggest problem is the UNWIND_HINT_RESTORE right after the
-> alternative. This ensures that objtool thinks all paths through the
-> alternative end up with the same stack. And hence won't actually
-> complain.
+Yan Zhao <yan.y.zhao@intel.com> writes:
 
-Right, that's what the unwind hints are made for, it's up to the human
-to get it right.
+>> > <snip>
+>> >
+>> > What options does userspace have in this scenario?
+>> > It can't reduce the flag to KVM_GUEST_MEMFD_HUGE_2MB. Adjusting the gmem.pgoff
+>> > isn't ideal either.
+>> >
+>> > What about something similar as below?
+>> >
+>> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> > index d2feacd14786..87c33704a748 100644
+>> > --- a/virt/kvm/guest_memfd.c
+>> > +++ b/virt/kvm/guest_memfd.c
+>> > @@ -1842,8 +1842,16 @@ __kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
+>> >         }
+>> >
+>> >         *pfn = folio_file_pfn(folio, index);
+>> > -       if (max_order)
+>> > -               *max_order = folio_order(folio);
+>> > +       if (max_order) {
+>> > +               int order;
+>> > +
+>> > +               order = folio_order(folio);
+>> > +
+>> > +               while (order > 0 && ((slot->base_gfn ^ slot->gmem.pgoff) & ((1 << order) - 1)))
+>> > +                       order--;
+>> > +
+>> > +               *max_order = order;
+>> > +       }
+>> >
+>> >         *is_prepared = folio_test_uptodate(folio);
+>> >         return folio;
+>> >
+>> 
+>> Vishal was wondering how this is working before guest_memfd was
+>> introduced, for other backing memory like HugeTLB.
+>> 
+>> I then poked around and found this [1]. I will be adding a similar check
+>> for any slot where kvm_slot_can_be_private(slot).
+>>
+>> Yan, that should work, right?
+> No, I don't think the checking of ugfn [1] should work.
+>
+> 1. Even for slots bound to in-place-conversion guest_memfd (i.e. shared memory
+> are allocated from guest_memfd), the slot->userspace_addr does not necessarily
+> have the same offset as slot->gmem.pgoff. Even if we audit the offset in
+> kvm_gmem_bind(), userspace could invoke munmap() and mmap() afterwards, causing
+> slot->userspace_addr to point to a different offset.
+>
+> 2. for slots bound to guest_memfd that do not support in-place-conversion,
+> shared memory is allocated from a different backend. Therefore, checking
+> "slot->base_gfn ^ slot->gmem.pgoff" is required for private memory. The check is
+> currently absent because guest_memfd supports 4K only.
+>
+>
 
-> Second being of course, that in order to get IRET and co correct, we'd
-> need far more of an emulator.
+Let me clarify, I meant these changes:
 
-At least finding RSP should be pretty easy, it's at a known location on
-the stack.  We already have an ORC type for doing that, but that would
-again require an unwind hint, unless we make objtool smart enough to
-know that.  But then the ORC would be inconsistent between the two
-alternative paths.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4b64ab3..d0dccf1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12938,6 +12938,11 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages)
+        return 0;
+ }
+ 
++static inline bool kvm_is_level_aligned(u64 value, int level)
++{
++       return IS_ALIGNED(value, KVM_PAGES_PER_HPAGE(level));
++}
++
+ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
+                                      struct kvm_memory_slot *slot)
+ {
+@@ -12971,16 +12976,20 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
+ 
+                slot->arch.lpage_info[i - 1] = linfo;
+ 
+-               if (slot->base_gfn & (KVM_PAGES_PER_HPAGE(level) - 1))
++               if (!kvm_is_level_aligned(slot->base_gfn, level))
+                        linfo[0].disallow_lpage = 1;
+-               if ((slot->base_gfn + npages) & (KVM_PAGES_PER_HPAGE(level) - 1))
++               if (!kvm_is_level_aligned(slot->base_gfn + npages, level))
+                        linfo[lpages - 1].disallow_lpage = 1;
+                ugfn = slot->userspace_addr >> PAGE_SHIFT;
+                /*
+-                * If the gfn and userspace address are not aligned wrt each
+-                * other, disable large page support for this slot.
++                * If the gfn and userspace address are not aligned or if gfn
++                * and guest_memfd offset are not aligned wrt each other,
++                * disable large page support for this slot.
+                 */
+-               if ((slot->base_gfn ^ ugfn) & (KVM_PAGES_PER_HPAGE(level) - 1)) {
++               if (!kvm_is_level_aligned(slot->base_gfn ^ ugfn, level) ||
++                   (kvm_slot_can_be_private(slot) &&
++                    !kvm_is_level_aligned(slot->base_gfn ^ slot->gmem.pgoff,
++                                          level))) {
+                        unsigned long j;
+ 
+                        for (j = 0; j < lpages; ++j)
 
-> Also, it actually chokes on this variant, and I've not yet figured out
-> why. Whatever state should be created by that mov, the restore hint
-> should wipe it all. But still the ORC generation bails with unknown base
-> reg -1.
+This does not rely on the ugfn check, but adds a similar check for gmem.pgoff.
 
-Weird, I'm not seeing that.
+I think this should take care of case (1.), for guest_memfds going to be
+used for both shared and private memory. Userspace can't update
+slot->userspace_addr, since guest_memfd memslots cannot be updated and
+can only be deleted.
 
--- 
-Josh
+If userspace re-uses slot->userspace_addr for some other memory address
+without deleting and re-adding a memslot,
+
++ KVM's access to memory should still be fine, since after the recent
+  discussion at guest_memfd upstream call, KVM's guest faults will
+  always go via fd+offset and KVM's access won't be disrupted
+  there. Whatever checking done at memslot binding time will still be
+  valid.
++ Host's access and other accesses (e.g. instruction emulation, which
+  uses slot->userspace_addr) to guest memory will be broken, but I think
+  there's nothing protecting against that. The same breakage would
+  happen for non-guest_memfd memslot.
+
+p.s. I will be adding the validation as you suggested [1], though that
+shouldn't make a difference here, since the above check directly
+validates against gmem.pgoff.
+
+Regarding 2., checking this checks against gmem.pgoff and should handle
+that as well.
+
+[1] https://lore.kernel.org/all/aBnMp26iWWhUrsVf@yzhao56-desk.sh.intel.com/
+
+I prefer checking at binding time because it aligns with the ugfn check
+that is already there, and avoids having to check at every fault.
+
+>> [1] https://github.com/torvalds/linux/blob/b6ea1680d0ac0e45157a819c41b46565f4616186/arch/x86/kvm/x86.c#L12996
+>> 
+>> >> >> Adding checks at binding time will allow hugepage-unaligned offsets (to
+>> >> >> be at parity with non-guest_memfd backing memory) but still fix this
+>> >> >> issue.
+>> >> >> 
+>> >> >> lpage_info will make sure that ranges near the bounds will be
+>> >> >> fragmented, but the hugepages in the middle will still be mappable as
+>> >> >> hugepages.
+>> >> >> 
+>> >> >> [1] https://lpc.events/event/18/contributions/1764/attachments/1409/3706/binding-must-have-same-alignment.svg
 
