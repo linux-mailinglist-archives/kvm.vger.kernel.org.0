@@ -1,262 +1,107 @@
-Return-Path: <kvm+bounces-45608-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45609-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA8A0AACA6A
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:05:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0790AACAAF
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:16:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC6611890C4F
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:05:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD6C17A8960
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43C7284667;
-	Tue,  6 May 2025 16:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003A1283129;
+	Tue,  6 May 2025 16:16:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nGmdfCnz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YncQSRNZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E40428151F
-	for <kvm@vger.kernel.org>; Tue,  6 May 2025 16:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2303F4B1E6E;
+	Tue,  6 May 2025 16:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746547518; cv=none; b=YQKgWcE5tNmvYrM0sKHh2nx8ODzV63toeok2LUPanDvsWvo3th6xjpH7ZMKjaypTe0MnwwcI8Vl/lWPMFk8yyxkJult64knNBWN4h2UD4+uEJiJgX8AMv3gSmuv/jzvnN6rEnf9Jp4keLLyLkH+ftixroiIHGFjrLvBaSfdtF+E=
+	t=1746548169; cv=none; b=Q8uhSo0Y6jikKFlN38hTwGwVgiDriMe+NlIkCQ0JNA/66uS81YM3J1LtBknP9ZfPs1ul10gZpn47Ha4W6lBRLS9C+EmMC71yoJYoAcPDgoMJjNxVkyJrG/9S0SB0iSlX4+H+0X7kYuEWHhkMPqmxmMupm0EdTlzRRnzSAqpX1B0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746547518; c=relaxed/simple;
-	bh=kRp4IxyzyS/awOzFbebOHY+i3kmMtE/y4muUCSNf6Qs=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=ZAPpI431pEtyTjDOjAdZJXTNPx1ClayWD57LqryAOgnqDR9AWYgwZr2Ya1DNuNwZSbDm8O1zm5ULcODg0MAGulD1q8x+GY2kuPOyGKnhgiWmnEWanzdQeWM4e4jZ8bJjWJeEySXGkwBnuvlzX6c2m/Yc/Yl6roviPOvjPQvaiHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nGmdfCnz; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22e5a558bfaso2929585ad.0
-        for <kvm@vger.kernel.org>; Tue, 06 May 2025 09:05:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746547516; x=1747152316; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=i1mo/Wo+ejg//AUbVLPWXwjlsnYrBMoTR6luF4u3TZs=;
-        b=nGmdfCnz+COlgoDiCBZ4UxH91Q+YuEodJGv9wtVqdpiIvLNSlDfUTRAs8HuSuKPjhd
-         gw9Vm1n+EAihd951/Ry+258AVq7nZCBBZTSpb7IJZzWWLhKw9pQvq/pxYeCRKzkFutCT
-         p1aMwSmrxFo0koMwu3Sg7vHEVuqtFeCFZy4CWBYdmtKRG6apxCkwnlKOJJHM99diSmPP
-         IcGXSMr0gV1cjBy7RiPArUqKCMQR1DzBFOtMRKPzVzbQwLlToJPLDNGthiR0RPiJW57R
-         ga9N+SWSYc3O8h/Mqg5ZIi0MiGKlZuFY9whPeOAtCxLi+witiFBW4EFs0q90ea1L2Zud
-         S5Jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746547516; x=1747152316;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i1mo/Wo+ejg//AUbVLPWXwjlsnYrBMoTR6luF4u3TZs=;
-        b=Qxipl2kXKF21DPXS+CCt1ZcSOJQFCJhvbBzroYzALmLy3q7C5SzaYSq86v5S7Vjv7O
-         qZWcIUny7W7Ig2vMoPIXLwqra0gkPIUU4vWmtMkOJADf0piS7GHdZiwvCby8Mo8boCio
-         VLfoNjYsk5uwtHEP76CvtDDNvXfJvv7IOXZG/bdOrE1/IulQIgdCr8SdfLLt4sBlKao3
-         30VzvmDIxrLIiMQAetZzoj3M1vhc4noThlHRP0rZrsdgT+Erw9Qkjd56k2Waitbhsmj4
-         Wk60pmVyd2XR1+nh5YAyhvl2dDlir1QIg5IuSynUqEWQljDrvknWFfxv/Shl9la370U0
-         8I0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUhq3r1wLVZV/36wcE0/wPhOdIAq++hy98isj7buABDArPyDWEsJzFQzVe5WbpbxizeA4E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyhe+xqVRDi4oIBnv2TkLXlr57uWxHJOdJHCmvheNZI++mcXLQ6
-	+tAUciznwuxgfCOn+choW/T2hR5yRqTQZ7UC2O7kCUKokz90PjqVHgUkNrejSIi3RGw6XJAyCau
-	/b8kbZIoA86qHKtHJ9Ym8sg==
-X-Google-Smtp-Source: AGHT+IH5eiqM+GukGy4eHAEU6Tq2FHVB00BdiyUDeaIE6OKI+9mYaTJy4CBBv+vaOD5LVB3g3ewfS67gEdx2/54B0w==
-X-Received: from pfbid12.prod.google.com ([2002:a05:6a00:8a8c:b0:73b:bbec:17e9])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:2408:b0:223:37ec:63d5 with SMTP id d9443c01a7336-22e32ba8292mr60504445ad.28.1746547516646;
- Tue, 06 May 2025 09:05:16 -0700 (PDT)
-Date: Tue, 06 May 2025 09:05:15 -0700
-In-Reply-To: <ZN/81KNAWofRCaQK@google.com> (message from Sean Christopherson
- on Fri, 18 Aug 2023 16:20:52 -0700)
+	s=arc-20240116; t=1746548169; c=relaxed/simple;
+	bh=zITazA5WWfeIFTzFeyrWOa8sigVntFrqs5PW7bcdz4U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S3GvQjcNTEE7nGoqG0E636BtZoZCwaivfNnmTOebdq/dtPw+vCh754g1oMr1x2pF8Qsp/Id0X4ajE8+AJ/PF1Q0QtSEsaa9M5DrpsKFAcMEkQZYITYOCHTdieL0Iqv075cyKl2IuZ7NSWFfKcDdLqOWqKFjPcWTcgKA15lkWeIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YncQSRNZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC6EFC4CEE4;
+	Tue,  6 May 2025 16:16:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746548168;
+	bh=zITazA5WWfeIFTzFeyrWOa8sigVntFrqs5PW7bcdz4U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YncQSRNZUvsmkJzY/MZ2wsaMNar7mg9c1WHgDHaDbzW04yL1p8iVgTC1YxE5yPcbA
+	 gJDdnkKg7Z2yyZyD/mz0h9wrMVu73dmYMZf0Y0c+3bMItDf02E7ZItPLDjSnrNVJMR
+	 k0+myTEWmAtKN2Ulc4aK4zk9abUxvmJc4FYsZmBysezGqPLPbNU5Crfax4HD3gHKLI
+	 cJKUorPPRu94LMDIlu6JRxCvAEFhTQ1lLKNVT/sJF+UNCSxqr0aY7a2ou//NiBTc8c
+	 gy1zwRXv635ukfwH0PHAy4khbMyd+jDATbz0azN37GufexNG6z/UTYGVjoED/H8DsI
+	 a8UBnActHKGNg==
+Date: Tue, 6 May 2025 18:16:03 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
+	x86@kernel.org, kvm@vger.kernel.org, xin@zytor.com,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH 2/6] x86/kvm: Rename the KVM private read_msr() function
+Message-ID: <aBo1w0tRoM2JUtW_@gmail.com>
+References: <20250506092015.1849-1-jgross@suse.com>
+ <20250506092015.1849-3-jgross@suse.com>
+ <aBoUdApwSgnr3r9V@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <diqzbjs5k9ms.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH 02/11] KVM: guest_mem: Add ioctl KVM_LINK_GUEST_MEMFD
-From: Ackerley Tng <ackerleytng@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, tglx@linutronix.de, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, hpa@zytor.com, shuah@kernel.org, 
-	andrew.jones@linux.dev, ricarkol@google.com, chao.p.peng@linux.intel.com, 
-	tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com, 
-	vannapurve@google.com, erdemaktas@google.com, mail@maciej.szmigiero.name, 
-	vbabka@suse.cz, david@redhat.com, qperret@google.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, Ryan Afranji <afranji@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aBoUdApwSgnr3r9V@google.com>
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> On Mon, Aug 07, 2023, Ackerley Tng wrote:
->> KVM_LINK_GUEST_MEMFD will link a gmem fd's underlying inode to a new
->> file (and fd).
->>
->> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->> ---
->>  include/uapi/linux/kvm.h |  8 +++++
->>  virt/kvm/guest_mem.c     | 73 ++++++++++++++++++++++++++++++++++++++++
->>  virt/kvm/kvm_main.c      | 10 ++++++
->>  virt/kvm/kvm_mm.h        |  7 ++++
->>  4 files changed, 98 insertions(+)
->>
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index eb900344a054..d0e2a2ce0df2 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -2299,4 +2299,12 @@ struct kvm_create_guest_memfd {
->>  	__u64 reserved[6];
->>  };
->>
->> +#define KVM_LINK_GUEST_MEMFD	_IOWR(KVMIO,  0xd5, struct kvm_link_guest_memfd)
->> +
->> +struct kvm_link_guest_memfd {
->> +	__u64 fd;
->> +	__u64 flags;
->> +	__u64 reserved[6];
->> +};
->> +
->>  #endif /* __LINUX_KVM_H */
->> diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
->> index 30d0ab8745ee..1b3df273f785 100644
->> --- a/virt/kvm/guest_mem.c
->> +++ b/virt/kvm/guest_mem.c
->> @@ -477,6 +477,79 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
->>  	return __kvm_gmem_create(kvm, size, flags, kvm_gmem_mnt);
->>  }
->>
->> +static inline void __kvm_gmem_do_link(struct inode *inode)
->> +{
->> +	/* Refer to simple_link() */
->> +
->> +	inode->i_ctime = current_time(inode);
->> +	inc_nlink(inode);
->> +
->> +	/*
->> +	 * ihold() to add additional reference to inode for reference in dentry,
->> +	 * created in kvm_gmem_alloc_file() -> alloc_file_pseudo(). This is not
->> +	 * necessary when creating a new file because alloc_inode() creates
->> +	 * inodes with i_count = 1, which is the refcount for the dentry in the
->> +	 * file.
->> +	 */
->> +	ihold(inode);
->> +
->> +	/*
->> +	 * dget() and d_instantiate() complete the setup of a dentry, but those
->> +	 * have already been done in kvm_gmem_alloc_file() ->
->> +	 * alloc_file_pseudo()
->> +	 */
->> +}
+* Sean Christopherson <seanjc@google.com> wrote:
 
-Thanks Sean, we're just circling back to this series, working on a next
-revision.
+> On Tue, May 06, 2025, Juergen Gross wrote:
+> > Avoid a name clash with a new general MSR access helper after a future
+> > MSR infrastructure rework by renaming the KVM specific read_msr() to
+> > kvm_read_msr().
+> > 
+> > Signed-off-by: Juergen Gross <jgross@suse.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h | 2 +-
+> >  arch/x86/kvm/vmx/vmx.c          | 4 ++--
+> >  2 files changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 9c971f846108..308f7020dc9d 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -2275,7 +2275,7 @@ static inline void kvm_load_ldt(u16 sel)
+> >  }
+> >  
+> >  #ifdef CONFIG_X86_64
+> > -static inline unsigned long read_msr(unsigned long msr)
+> 
+> Ewwww.  Eww, eww, eww.  I forgot this thing existed.
+> 
+> Please just delete this and use rdmsrq() directly (or is it still rdmsrl()? at
+> this point?).
 
->
-> Does this have to be done before the fd is exposed to userspace, or can it be
-> done after?
+Both will work, so code-in-transition isn't build-broken unnecessarily:
 
-Does "exposed to userspace" mean the call to get_unused_fd_flags(),
-where an fd is reserved?
+  arch/x86/include/asm/msr.h:#define rdmsrl(msr, val) rdmsrq(msr, val)
 
-Do you mean to make this reservation as late as possible?
+:-)
 
-> If it can be done after, I'd prefer to have the allocation helper
-> also install the fd, and also rename it to something that better conveys that
-> it's allocating more than just the file, e.g. that it allocates and initialize
-> kvm_gmem too.
->
-> Completely untested, but this is what I'm thinkin/hoping.
->
-> static int kvm_gmem_alloc_view(struct kvm *kvm, struct inode *inode,
-> 			       struct vfsmount *mnt)
+Thanks,
 
-Will rename this kvm_gmem_alloc_view(), that naming totally makes
-sense, and attaches a meaning to the struct file as a view into the
-memory.
-
-> {
-> 	struct file *file;
-> 	struct kvm_gmem *gmem;
->
-> 	gmem = kzalloc(sizeof(*gmem), GFP_KERNEL);
-> 	if (!gmem)
-> 		return -ENOMEM;
->
-> 	fd = get_unused_fd_flags(0);
-> 	if (fd < 0) {
-> 		r = fd;
-> 		goto err_fd;
-> 	}
-
-Do you see the fd as part of the view? I thought the fd is just a handle
-to the view (struct file).
-
->
-> 	file = alloc_file_pseudo(inode, mnt, "kvm-gmem", O_RDWR, &kvm_gmem_fops);
-> 	if (IS_ERR(file)) {
-> 		r = PTR_ERR(file);
-> 		goto err_file;
-> 	}
->
-> 	file->f_flags |= O_LARGEFILE;
-> 	file->f_mapping = inode->i_mapping;
->
-> 	kvm_get_kvm(kvm);
-> 	gmem->kvm = kvm;
-> 	xa_init(&gmem->bindings);
->
-> 	file->private_data = gmem;
->
-> 	list_add(&gmem->entry, &inode->i_mapping->private_list);
->
-> 	fd_install(fd, file);
->
-> 	return 0;
-> err:
-> 	put_unused_fd(fd);
-> err_fd:
-> 	kfree(gmem);
-> 	return r;
-> }
->
-> static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags,
-> 			     struct vfsmount *mnt)
-> {
-> 	const char *anon_name = "[kvm-gmem]";
-> 	const struct qstr qname = QSTR_INIT(anon_name, strlen(anon_name));
-> 	struct inode *inode;
-> 	struct file *file;
-> 	int fd, err;
->
-> 	inode = alloc_anon_inode(mnt->mnt_sb);
-> 	if (IS_ERR(inode))
-> 		return PTR_ERR(inode);
->
-> 	err = security_inode_init_security_anon(inode, &qname, NULL);
-> 	if (err)
-> 		goto err;
->
-> 	inode->i_private = (void *)(unsigned long)flags;
-> 	inode->i_op = &kvm_gmem_iops;
-> 	inode->i_mapping->a_ops = &kvm_gmem_aops;
-> 	inode->i_mode |= S_IFREG;
-> 	inode->i_size = size;
-> 	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-> 	mapping_set_large_folios(inode->i_mapping);
-> 	mapping_set_unevictable(inode->i_mapping);
-> 	mapping_set_unmovable(inode->i_mapping);
->
-> 	fd = kvm_gmem_alloc_view(kvm, inode, mnt);
-> 	if (fd < 0) {
-> 		err = fd;
-> 		goto err;
-> 	}
-> 	return fd;
-> err:
-> 	iput(inode);
-> 	return err;
-> }
+	Ingo
 
