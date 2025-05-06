@@ -1,230 +1,137 @@
-Return-Path: <kvm+bounces-45570-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45571-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 964AEAABF31
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 11:22:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B90FAABF5A
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 11:26:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1EDF188417C
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 09:21:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACBC01B6548C
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 09:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 066E82701CD;
-	Tue,  6 May 2025 09:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC94266EEC;
+	Tue,  6 May 2025 09:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="jTqIdkp6"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52C526FA64
-	for <kvm@vger.kernel.org>; Tue,  6 May 2025 09:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6763233136
+	for <kvm@vger.kernel.org>; Tue,  6 May 2025 09:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746523244; cv=none; b=D4bIhZ658NFtPZ5YAciBLm7Cfu7c97RepTfwyE3L1dXj36zJ/VsIEZ+wWIsr6MDkT3X3JiChNhcT5pVZu70nlHTb46acJKdjIVO9XmmM0L5BODunaE33UxjBY9ojTOa/rVXKljXi0KwmqqcIwh0zCSdoQX4ncEchb7W3nhvQrpk=
+	t=1746523478; cv=none; b=hLhi8f8tg6G2fvG40JH16mnDE+UKjgRL+lPz5fRq7lY2L8pOvJMaceC020KMC+b/k1yzt9MtQ6rkt5P2fpCN2YtuMPqaAs5WsnYlHhvILd+2d4SzE3Nw2c1fnNLqAidAOrTHWVyf3kadGbHW6reroR0y4sdpyFnRbLYqfQjIqQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746523244; c=relaxed/simple;
-	bh=4vDBTuxbpXs5OX9PuySbqXDrfoKponl4p3dkWrOXQDo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FEyOQG7jc6C/wW7tZ9iRMb3Hz0bag83Rg137oPaBp8Cj+Z7cBe6gyQr26S+L+q9UHDzKEdASCLlpK1ygu9TluqA5nx6scT6XuqG6cZLBAVI9j8EL9o1EzDVyTDTEVVFYRbYHskKvEi9MMz7wJSn1MajR283QS0HCE2enuNHBc3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id F06B01F391;
-	Tue,  6 May 2025 09:20:40 +0000 (UTC)
-Authentication-Results: smtp-out2.suse.de;
-	none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 49800137CF;
-	Tue,  6 May 2025 09:20:40 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id zH5wEGjUGWggbAAAD6G6ig
-	(envelope-from <jgross@suse.com>); Tue, 06 May 2025 09:20:40 +0000
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	linux-hyperv@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: xin@zytor.com,
-	Juergen Gross <jgross@suse.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	xen-devel@lists.xenproject.org
-Subject: [PATCH 3/6] x86/msr: minimize usage of native_*() msr access functions
-Date: Tue,  6 May 2025 11:20:12 +0200
-Message-ID: <20250506092015.1849-4-jgross@suse.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250506092015.1849-1-jgross@suse.com>
-References: <20250506092015.1849-1-jgross@suse.com>
+	s=arc-20240116; t=1746523478; c=relaxed/simple;
+	bh=2t2VKBmII81tNpczrynIzE6p9Fd1SV59q4ZmxbtvEpY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=PLMKqgpBOUhCSycf1YWWlob2mqdOPlU050YvQa6wbGTA23PNGIcRNEqtibQCYnyYHq25OrGUW3rxPM5L9eCTFWVYJJVJ9egdFWw2gMfBf2t3MeWokdgVtoiNTIjVRlwz/TjvKn8ffHO2ZrNoIWWYjgdpEZLwH7sl2dxH5c8QGDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=jTqIdkp6; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43cf89f81c5so5393145e9.2
+        for <kvm@vger.kernel.org>; Tue, 06 May 2025 02:24:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1746523475; x=1747128275; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mtrK30WSclX8+CsTIEESOGs2XijMelv6Z+mtcK6WgL8=;
+        b=jTqIdkp63McyCtFJbzaxKFT1Cq1Fp94Xr1soPQmsJ1VZxuiQj9IUQQg5oovEx++LWO
+         t0YXZrAREdJX928dz3XRpiAgmrJukwV6MHxKw4IFvs6OYlLl2WnAapasu6vkg4GwtqGk
+         5keOFlXAQJS5fSLRmUER8ddvygvPWdagIVRSQ8okuFL/Hu2m7uXLEFkn2YzU7IIinAPx
+         JM4wNk8yPqgecHsIH0KGRvN1ggiq3PZyydjMRCT/L0QsQaohW0jISRp/jbs+aHST/OzA
+         O21KZJqeXD8kBiJ6VS/Hdn3Ct/C170o9t5g8A19z5JNCT4subcXxkDULkkUuSv1DgSV1
+         klnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746523475; x=1747128275;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mtrK30WSclX8+CsTIEESOGs2XijMelv6Z+mtcK6WgL8=;
+        b=V4Q6vYiz88LpzJ/lw3WsALznNVswLglvKwmjG7YyVM8C5M5jWmAps1IEgzP9QyLxyJ
+         zP/CkAZ2CTDUzbdFzVr+f6U2Qp+AEIFQaWVeXlLbLxgknplmKFthHXzmYIG5YQB+KJlF
+         yf7dtwypNx70+gvwqkwxfp3tb52TL7QL3QC8O8tONLZaSFE+t/oWRotzpvKU2bqMUVvA
+         t7w0nK+T2M5LyqDUCPLd2cZuDNnosm6mS5B9/Pbn83baWgfBu1OBp2ngukLGic+jWxNF
+         a2ktrEI7IxtMrWywaDf5q3TwITR5fOeJOhZJuhcvYJdyOIveAyT+8qmYLnBO1oo4rAiB
+         dSTQ==
+X-Gm-Message-State: AOJu0YxtJYCui/b6d/eRoj0XEFeiLFvDeAWmuhCa5B0u1WbAeA7s8XHe
+	AtNoUJSLZxOWSu2HJ1lMZhsYscs1qy21lBeRyBaJ1GcxpQgQKQiaqcy0AX8NnNw=
+X-Gm-Gg: ASbGncsk4dZ41oNUaRa//Ah4L2y17vjmohLTLPcwdKey5dPvd7Yu/Au2SG9461hO7rm
+	rt0MrrtQqmMbflN6fS0ydkyfp9/Oj9r8oz1KfRBDlm7EbJkXTFl3F29D6kuQnpPq881/uVV0NgB
+	MZI9qTrVFEdrlHXePu4cuffjRwBWsULLnUX6b3WvLvyRh5Aa6aSk0PNtDudEzkmMUlEYmLANbmF
+	FIqcAJev4B4CcLsT/yiciW2m7+AUSR3RjlW0R1ILgCG7qQPbMebMavf48RGFY8aEaycgfFjss2B
+	cL7/OnBapYVN8Vs1Gpl8VsCcy0K/zoow0/9407Ix4migp1Vj
+X-Google-Smtp-Source: AGHT+IHZgaRK6ml9AWyse65POBkzHsZ8Ut+BjX7oVJ10RpUOC/PC4jjz2MMApvtA5diNrjCKmwAdmg==
+X-Received: by 2002:a7b:ca59:0:b0:441:d244:1463 with SMTP id 5b1f17b1804b1-441d2441701mr2017735e9.0.1746523474923;
+        Tue, 06 May 2025 02:24:34 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200:d5f0:7802:c94b:10f6])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b8992b4csm165890855e9.0.2025.05.06.02.24.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 02:24:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
-X-Spam-Score: -4.00
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: F06B01F391
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 06 May 2025 11:24:33 +0200
+Message-Id: <D9OYWFEXSA55.OUUXFPIGGBZV@ventanamicro.com>
+Subject: Re: [PATCH 0/5] Enable hstateen bits lazily for the KVM RISC-V
+ Guests
+Cc: <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+ <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
+To: "Atish Patra" <atishp@rivosinc.com>, "Anup Patel" <anup@brainfault.org>,
+ "Atish Patra" <atishp@atishpatra.org>, "Paul Walmsley"
+ <paul.walmsley@sifive.com>, "Palmer Dabbelt" <palmer@dabbelt.com>,
+ "Alexandre Ghiti" <alex@ghiti.fr>
+From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
+References: <20250505-kvm_lazy_enable_stateen-v1-0-3bfc4008373c@rivosinc.com>
+In-Reply-To: <20250505-kvm_lazy_enable_stateen-v1-0-3bfc4008373c@rivosinc.com>
 
-In order to prepare for some MSR access function reorg work, switch
-most users of native_{read|write}_msr[_safe]() to the more generic
-rdmsr*()/wrmsr*() variants.
+2025-05-05T14:39:25-07:00, Atish Patra <atishp@rivosinc.com>:
+> This series adds support for enabling hstateen bits lazily at runtime
+> instead of statically at bootime. The boot time enabling happens for
+> all the guests if the required extensions are present in the host and/or
+> guest. That may not be necessary if the guest never exercise that
+> feature. We can enable the hstateen bits that controls the access lazily
+> upon first access. This providers KVM more granular control of which
+> feature is enabled in the guest at runtime.
+>
+> Currently, the following hstateen bits are supported to control the acces=
+s
+> from VS mode.
+>
+> 1. BIT(58): IMSIC     : STOPEI and IMSIC guest interrupt file
+> 2. BIT(59): AIA       : SIPH/SIEH/STOPI
+> 3. BIT(60): AIA_ISEL  : Indirect csr access via siselect/sireg
+> 4. BIT(62): HSENVCFG  : SENVCFG access
+> 5. BIT(63): SSTATEEN0 : SSTATEEN0 access
+>
+> KVM already support trap/enabling of BIT(58) and BIT(60) in order
+> to support sw version of the guest interrupt file.
 
-For now this will have some intermediate performance impact with
-paravirtualization configured when running on bare metal, but this
-is a prereq change for the planned direct inlining of the rdmsr/wrmsr
-instructions with this configuration.
+I don't think KVM toggles the hstateen bits at runtime, because that
+would mean there is a bug even in current KVM.
 
-The main reason for this switch is the planned move of the MSR trace
-function invocation from the native_*() functions to the generic
-rdmsr*()/wrmsr*() variants. Without this switch the users of the
-native_*() functions would lose the related tracing entries.
+>                                                    This series extends
+> those to enable to correpsonding hstateen bits in PATCH1. The remaining
+> patches adds lazy enabling support of the other bits.
 
-Note that the Xen related MSR access functions will not be switched,
-as these will be handled after the move of the trace hooks.
+The ISA has a peculiar design for hstateen/sstateen interaction:
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
----
- arch/x86/hyperv/ivm.c      |  2 +-
- arch/x86/kernel/kvmclock.c |  2 +-
- arch/x86/kvm/svm/svm.c     | 16 ++++++++--------
- arch/x86/xen/pmu.c         |  4 ++--
- 4 files changed, 12 insertions(+), 12 deletions(-)
+  For every bit in an hstateen CSR that is zero (whether read-only zero
+  or set to zero), the same bit appears as read-only zero in sstateen
+  when accessed in VS-mode.
 
-diff --git a/arch/x86/hyperv/ivm.c b/arch/x86/hyperv/ivm.c
-index 09a165a3c41e..fe177a6be581 100644
---- a/arch/x86/hyperv/ivm.c
-+++ b/arch/x86/hyperv/ivm.c
-@@ -319,7 +319,7 @@ int hv_snp_boot_ap(u32 cpu, unsigned long start_ip)
- 	asm volatile("movl %%ds, %%eax;" : "=a" (vmsa->ds.selector));
- 	hv_populate_vmcb_seg(vmsa->ds, vmsa->gdtr.base);
- 
--	vmsa->efer = native_read_msr(MSR_EFER);
-+	rdmsrq(MSR_EFER, vmsa->efer);
- 
- 	vmsa->cr4 = native_read_cr4();
- 	vmsa->cr3 = __native_read_cr3();
-diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-index ca0a49eeac4a..b6cd45cce5fe 100644
---- a/arch/x86/kernel/kvmclock.c
-+++ b/arch/x86/kernel/kvmclock.c
-@@ -196,7 +196,7 @@ static void kvm_setup_secondary_clock(void)
- void kvmclock_disable(void)
- {
- 	if (msr_kvm_system_time)
--		native_write_msr(msr_kvm_system_time, 0);
-+		wrmsrq(msr_kvm_system_time, 0);
- }
- 
- static void __init kvmclock_init_mem(void)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 4c2a843780bf..3f0eed84f82a 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -482,12 +482,12 @@ static void svm_init_erratum_383(void)
- 		return;
- 
- 	/* Use _safe variants to not break nested virtualization */
--	if (native_read_msr_safe(MSR_AMD64_DC_CFG, &val))
-+	if (rdmsrq_safe(MSR_AMD64_DC_CFG, &val))
- 		return;
- 
- 	val |= (1ULL << 47);
- 
--	native_write_msr_safe(MSR_AMD64_DC_CFG, val);
-+	wrmsrq_safe(MSR_AMD64_DC_CFG, val);
- 
- 	erratum_383_found = true;
- }
-@@ -650,9 +650,9 @@ static int svm_enable_virtualization_cpu(void)
- 		u64 len, status = 0;
- 		int err;
- 
--		err = native_read_msr_safe(MSR_AMD64_OSVW_ID_LENGTH, &len);
-+		err = rdmsrq_safe(MSR_AMD64_OSVW_ID_LENGTH, &len);
- 		if (!err)
--			err = native_read_msr_safe(MSR_AMD64_OSVW_STATUS, &status);
-+			err = rdmsrq_safe(MSR_AMD64_OSVW_STATUS, &status);
- 
- 		if (err)
- 			osvw_status = osvw_len = 0;
-@@ -2149,7 +2149,7 @@ static bool is_erratum_383(void)
- 	if (!erratum_383_found)
- 		return false;
- 
--	if (native_read_msr_safe(MSR_IA32_MC0_STATUS, &value))
-+	if (rdmsrq_safe(MSR_IA32_MC0_STATUS, &value))
- 		return false;
- 
- 	/* Bit 62 may or may not be set for this mce */
-@@ -2160,11 +2160,11 @@ static bool is_erratum_383(void)
- 
- 	/* Clear MCi_STATUS registers */
- 	for (i = 0; i < 6; ++i)
--		native_write_msr_safe(MSR_IA32_MCx_STATUS(i), 0);
-+		wrmsrq_safe(MSR_IA32_MCx_STATUS(i), 0);
- 
--	if (!native_read_msr_safe(MSR_IA32_MCG_STATUS, &value)) {
-+	if (!rdmsrq_safe(MSR_IA32_MCG_STATUS, &value)) {
- 		value &= ~(1ULL << 2);
--		native_write_msr_safe(MSR_IA32_MCG_STATUS, value);
-+		wrmsrq_safe(MSR_IA32_MCG_STATUS, value);
- 	}
- 
- 	/* Flush tlb to evict multi-match entries */
-diff --git a/arch/x86/xen/pmu.c b/arch/x86/xen/pmu.c
-index 8f89ce0b67e3..d49a3bdc448b 100644
---- a/arch/x86/xen/pmu.c
-+++ b/arch/x86/xen/pmu.c
-@@ -323,7 +323,7 @@ static u64 xen_amd_read_pmc(int counter)
- 		u64 val;
- 
- 		msr = amd_counters_base + (counter * amd_msr_step);
--		native_read_msr_safe(msr, &val);
-+		rdmsrq_safe(msr, &val);
- 		return val;
- 	}
- 
-@@ -349,7 +349,7 @@ static u64 xen_intel_read_pmc(int counter)
- 		else
- 			msr = MSR_IA32_PERFCTR0 + counter;
- 
--		native_read_msr_safe(msr, &val);
-+		rdmsrq_safe(msr, &val);
- 		return val;
- 	}
- 
--- 
-2.43.0
+This means we must clear bit 63 in hstateen and trap on sstateen
+accesses if any of the sstateen bits are not supposed to be read-only 0
+to the guest while the hypervisor wants to have them as 0.
 
+Thanks.
 
