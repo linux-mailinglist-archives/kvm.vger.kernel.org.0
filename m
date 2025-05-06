@@ -1,155 +1,146 @@
-Return-Path: <kvm+bounces-45557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC3B4AABAA7
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 09:25:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 736C2AABB46
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 09:37:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4A2117DA4B
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 07:22:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEDE13BFB5D
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 07:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD1B287508;
-	Tue,  6 May 2025 05:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A794A33E4;
+	Tue,  6 May 2025 05:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jeYtJG+M"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EIYpJuK9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88A3280033
-	for <kvm@vger.kernel.org>; Tue,  6 May 2025 05:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F3623A9BD
+	for <kvm@vger.kernel.org>; Tue,  6 May 2025 05:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746508119; cv=none; b=AzbfTV3zxUDLxoFQLzCmjh/dFX2PxSQKSEh25Mq6DUoXjCeTyNXvsBQweDnnf7NAp8XexQC33fK6ziP+6XMT+Fdp3AoB/6cMQ8lUIbTGFttmtAe8DvySIEYCQAnMMldcVGnT1LdRRLhQ57Ez+SR+Cfz0PnrRCd4tE1e3VH7NuDg=
+	t=1746508647; cv=none; b=CWX7zge4rqQlawK1CaIPUEAG/GbBv24PVqTs0+c3gH+gl4F2NQSdOFvYq4n8xuKgnww/138V5DPOeFjJWgZ5MNq60VoGgZ3OsyrpzcEkhD4UK2/yBS8x9+w5HInrh0UT1lvZSfyc/+D81TEoijUq60T5qe+c64uhwZkw/sDx4Lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746508119; c=relaxed/simple;
-	bh=rUsBS9Oa+C0VRUO/HZpkAD8ejfWfMt7BVTl5jvD7mZc=;
+	s=arc-20240116; t=1746508647; c=relaxed/simple;
+	bh=FQeYSRTyGaLyx8mJE3z/WnWqQ1oIIA9h3QkTkL5Bqlo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H6yET6/lXZnEKHaDdyb3fU5qa+RgtP7kXvi853tbAkYcewB6hwJcuBZsahiDsnmtCYdlbqdybkCw2t/gDp4V3jwLPuW/CsCfWHoMlt/mGpjnEJQIb05A/Qa3ujA5/ePKidsd914NJvuL/whOQh77WOuRBzTL2Bm9PDSnU2KEywg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jeYtJG+M; arc=none smtp.client-ip=209.85.214.178
+	 To:Cc:Content-Type; b=dCqSJ28iTviwGy7dtGvc1lgpYjMAa3zND/2e7i/PjPVG9qE51ix+R3GVUQ7iSzBMDoI9SNEQXesVpzS6pCS7PDC6UzVz5n9SjAOn+88hTGg969U07m/2f856+0571N8IXDP9RG2Fa7Gvfrw9xFdFX1FPveuAagGfcZUYiHSbV0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EIYpJuK9; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22e1eafa891so101165ad.0
-        for <kvm@vger.kernel.org>; Mon, 05 May 2025 22:08:37 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22e39fbad5fso65735ad.1
+        for <kvm@vger.kernel.org>; Mon, 05 May 2025 22:17:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746508117; x=1747112917; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1746508645; x=1747113445; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rUsBS9Oa+C0VRUO/HZpkAD8ejfWfMt7BVTl5jvD7mZc=;
-        b=jeYtJG+MZSSqtKmZPbzmlq7/N4upIBK5yre7j04KIS6ownbMsnnQlpd++8c+WGxbxj
-         hFsSBhw9XmLNPB4/+UOVRWUoxbu8cmcM2FeAZb7/tWzFB1cERWFesIUFyKAF2yMy7z4R
-         j4mFkofmfh1PTruqA7veDWeTP2rZy2OjNZUgV1+IBCMDuGzj+TDHT+8TUtKwJQuPcJQ0
-         UKfdEK0WCO/514p84iYlrWlgQOPkccfSO5/NSxY9PJ2pGAw+eZfVm6L4f1bG0+4ShZQH
-         bQNGhWsBLQ7dnV17m2c4g7aCktBMw5M52adpTt4nY7gsmcbZizJvaNqy3lwRD4K0PBfN
-         J1aA==
+        bh=2/oyNXL8JmitesFhXvr9WQW93SUMwRydjKM6cb06+Bg=;
+        b=EIYpJuK9loB5PVZigkGXD1YlTlI0XqkhgaGdNRhdkfTly7uzLDu1OWQYbGaOfpz5qA
+         IJ7N4whfflwJSMGqES5690LzebWk9pkuqn1yA1NWfIiC+QERirLhLRJj3Bu5u1eHiVJF
+         oSshSwAMs7XvPdfvqYIfm/Mv63fVb4b9vqHhWEveJQm/835iSNsggU3N52TvBR0ChXW6
+         sn70S2/CC3Q8Gfi7/fFHH06UwY9Oj+kB6tOU7E1lOi8hlIMhAe6vANGCgkydqWPAsQB8
+         h/dbl2tRXFtrgDNEgV6X3XqRJ679U4IHCbOuECXA2C+/KCnIYb4vAzfrbElypzJhHFZq
+         AQ3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746508117; x=1747112917;
+        d=1e100.net; s=20230601; t=1746508645; x=1747113445;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rUsBS9Oa+C0VRUO/HZpkAD8ejfWfMt7BVTl5jvD7mZc=;
-        b=WddR6XpVoqb0YjCh0mlwGoSPgZOTVQEvsMTZxHM53RUHh1VbPHL5U7pBnhlKOjp+Rd
-         CubAe9IZhe4T6tmXob36CAVVgAbQv5MadMWk9D3CjOAuAaWoGij8r41oVvO6m3Rv+kCG
-         3rX0W8K1iQf+ZwYnY2ClEr/u8q4MijzrOf72usUOmgyYFDJiBRmnay0v2uacWf4stm9Y
-         HL6wY9WogZ5PBbc0HkUKiHxFbeDlklM9C6+MbrN1/UKMF1h9AcS5oQr29VjRebDmDr8k
-         4qiPX8lc7XiUujgzIWX/jSnVKOMOzUWkp4sfZx+i8A4b+taD1ivhU7UTEd7ezwy14yxB
-         IaMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUcuYqR4pPkJL7/nzGL2dDzGI2nR80Zv2YonX+5BSOuZw3VceoCtuvkkfz7LUz2Zcmqdrc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbuCk9YCEMplKEIdowushhFYU/ST3luPi1CicJVY8OLJCYaTwG
-	AUx+Yj9UPr8XciX9KsfauIVh3q1BX0U8eS6wHakYd0sDyzEh/6kQvLbSjH5cBTF8V6+xZGfG4EH
-	UjDHPXjNrlPvO0M328gUvN5TCR2AP+fQiZmsV
-X-Gm-Gg: ASbGncuOb03GbS3eeG3E9W/dRuP+0FY/6ni0RGIfiwuNk4sJGOHl4yqzW3BiBPGJLvj
-	8S9++2WgchmPKVGFSoLSPvyPkPvpdQjurdfNttx3P7zTuGoH+wQmo5Ce7ilBxb1oUY2bb5b202v
-	nEUTV6AINC0MjkPL4ZpKjeNyNEJoHJv843T4REkI8vO6E+NlzyuLSD748=
-X-Google-Smtp-Source: AGHT+IEkmVHrS+IeESYp9Bj0DUHQ0GCYSuq6HTfd9DWzMVCD5BSFldlOTCzMt/mb/B9tNXB4lUPvZrR+FyGxHBMd0tI=
-X-Received: by 2002:a17:903:32c1:b0:220:c905:689f with SMTP id
- d9443c01a7336-22e3b2cf6a1mr1180265ad.25.1746508116581; Mon, 05 May 2025
- 22:08:36 -0700 (PDT)
+        bh=2/oyNXL8JmitesFhXvr9WQW93SUMwRydjKM6cb06+Bg=;
+        b=PSfiN0ED3q9yH1KBujE4N7k3hpcH0NE1A/5GGJeLXt7flbO/wVMO+BWJSwry+Z5UlW
+         /fE0SLwqJoOQYReQojX4uNyjbtbRuZEwFFVBEwLPC7COmzDwdnbLFmM8gs7BreRi0s0a
+         S2S+SEKTbvq7S19O2ururo3Ce25HlCDD+5aMmfQZ5hkSJyQClYnNLI6876BDKoSbzSyQ
+         yLmkhMsY+lG+YGEcb2Pr79+YRqi6meGAgpCUeDC0e2AFfSAdsFYeaY0k3WeyrthSs4Kp
+         ixl5fqz/YJ4eZHWjYIuM5xISY/HIiWyCNnmfmhppgkMB4dnkVc7Axs3K9GdBHUeHU+32
+         c2jw==
+X-Forwarded-Encrypted: i=1; AJvYcCX/XcVWFXxfGgrObVEvtvgW6IfPIykF5ZoyN26+W/60FcIP/8wyBLYoLKs9xLDwX8xzgao=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxae1A93sLd2DLeWkLhFkXMyRGwEJGLbDRvW0cFAFFomaEyjKIe
+	1WDun3X5g0VPQxzLN8AqsfVMkKgxf/27zoXGTXOHnMlHlmKSyjM3K6gXeqe/iMFii57N3vAlZkV
+	/hRITRG6f1xnxeHzmjpyGKBga4/z+QHs04d5V
+X-Gm-Gg: ASbGncvMBhXmcEjHEUhgQlfPYpH/duRH9UDhbvkMv9nq6w+wy9dy+y5W8AtNu5beOWP
+	mKduYuVaM//CUHZ+hg2dycCkJKdn+eRbQggZpsp0412hi842AHlHIL5tILIuE8gEKo6BHOtxQK5
+	Wd9156f0GVV9X5aezryV7bGixjbbOD/fWb+NeF0xfbeG3q5RbB1NIKAK8=
+X-Google-Smtp-Source: AGHT+IGihzOzWy8x+6Ja+LalRDd0k3+jQXGYbU3MHt0hkecArEO8Kjrf7J4KdbKoNVLOX2f2VTCUMWQSCZqQ6vCwIH4=
+X-Received: by 2002:a17:902:ce10:b0:216:2839:145 with SMTP id
+ d9443c01a7336-22e3b071eb8mr1281395ad.1.1746508645256; Mon, 05 May 2025
+ 22:17:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250424030033.32635-1-yan.y.zhao@intel.com> <20250424030603.329-1-yan.y.zhao@intel.com>
- <CAGtprH9_McMDepbuvWMLRvHooPdtE4RHog=Dgr_zFXT5s49nXA@mail.gmail.com>
- <aBAiCBmON0g0Qro1@yzhao56-desk.sh.intel.com> <CAGtprH_ggm8N-R9QbV1f8mo8-cQkqyEta3W=h2jry-NRD7_6OA@mail.gmail.com>
- <aBldhnTK93+eKcMq@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aBldhnTK93+eKcMq@yzhao56-desk.sh.intel.com>
+References: <diqz7c31xyqs.fsf@ackerleytng-ctop.c.googlers.com>
+ <386c1169-8292-43d1-846b-c50cbdc1bc65@redhat.com> <aBTxJvew1GvSczKY@google.com>
+ <diqzjz6ypt9y.fsf@ackerleytng-ctop.c.googlers.com> <7e32aabe-c170-4cfc-99aa-f257d2a69364@redhat.com>
+ <aBlCSGB86cp3B3zn@google.com>
+In-Reply-To: <aBlCSGB86cp3B3zn@google.com>
 From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 5 May 2025 22:08:24 -0700
-X-Gm-Features: ATxdqUG39x19IjwosYztIXaovUZ6HU5KeKyPyCUt-tTIluSky-qf1VEpEVHS-Wg
-Message-ID: <CAGtprH9wi6zHJ5JeuAnjZThMAzxxibJGo=XN1G1Nx8txZRg8_w@mail.gmail.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
-	dave.hansen@intel.com, kirill.shutemov@intel.com, tabba@google.com, 
-	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
-	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
-	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
-	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
-	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
+Date: Mon, 5 May 2025 22:17:12 -0700
+X-Gm-Features: ATxdqUEzeS31T2q-e4VkgtgiiNIU1vS-masT4eZQygwiHzAZfHdNnbMPeJW7-MU
+Message-ID: <CAGtprH8DW-hqxbFdyo+Mg7MddsOAnN+rpLZUOHT-msD+OwCv=Q@mail.gmail.com>
+Subject: Re: [PATCH v8 06/13] KVM: x86: Generalize private fault lookups to
+ guest_memfd fault lookups
+To: Sean Christopherson <seanjc@google.com>
+Cc: David Hildenbrand <david@redhat.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 5, 2025 at 5:56=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wrot=
-e:
+On Mon, May 5, 2025 at 3:57=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+> > ...
+> > And not worry about lpage_infor for the time being, until we actually d=
+o
+> > support larger pages.
 >
-> Sorry for the late reply, I was on leave last week.
+> I don't want to completely punt on this, because if it gets messy, then I=
+ want
+> to know now and have a solution in hand, not find out N months from now.
 >
-> On Tue, Apr 29, 2025 at 06:46:59AM -0700, Vishal Annapurve wrote:
-> > On Mon, Apr 28, 2025 at 5:52=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com>=
- wrote:
-> > > So, we plan to remove folio_ref_add()/folio_put_refs() in future, onl=
-y invoking
-> > > folio_ref_add() in the event of a removal failure.
-> >
-> > In my opinion, the above scheme can be deployed with this series
-> > itself. guest_memfd will not take away memory from TDX VMs without an
-> I initially intended to add a separate patch at the end of this series to
-> implement invoking folio_ref_add() only upon a removal failure. However, =
-I
-> decided against it since it's not a must before guest_memfd supports in-p=
-lace
-> conversion.
+> That said, I don't expect it to be difficult.  What we could punt on is
+> performance of the lookups, which is the real reason KVM maintains the ra=
+ther
+> expensive disallow_lpage array.
 >
-> We can include it in the next version If you think it's better.
+> And that said, memslots can only bind to one guest_memfd instance, so I d=
+on't
+> immediately see any reason why the guest_memfd ioctl() couldn't process t=
+he
+> slots that are bound to it.  I.e. why not update KVM_LPAGE_MIXED_FLAG fro=
+m the
+> guest_memfd ioctl() instead of from KVM_SET_MEMORY_ATTRIBUTES?
 
-Ackerley is planning to send out a series for 1G Hugetlb support with
-guest memfd soon, hopefully this week. Plus I don't see any reason to
-hold extra refcounts in TDX stack so it would be good to clean up this
-logic.
+I am missing the point here to update KVM_LPAGE_MIXED_FLAG for the
+scenarios where in-place memory conversion will be supported with
+guest_memfd. As guest_memfd support for hugepages comes with the
+design that hugepages can't have mixed attributes. i.e. max_order
+returned by get_pfn will always have the same attributes for the folio
+range.
 
->
-> > invalidation. folio_ref_add() will not work for memory not backed by
-> > page structs, but that problem can be solved in future possibly by
-> With current TDX code, all memory must be backed by a page struct.
-> Both tdh_mem_page_add() and tdh_mem_page_aug() require a "struct page *" =
-rather
-> than a pfn.
->
-> > notifying guest_memfd of certain ranges being in use even after
-> > invalidation completes.
-> A curious question:
-> To support memory not backed by page structs in future, is there any coun=
-terpart
-> to the page struct to hold ref count and map count?
->
-
-I imagine the needed support will match similar semantics as VM_PFNMAP
-[1] memory. No need to maintain refcounts/map counts for such physical
-memory ranges as all users will be notified when mappings are
-changed/removed.
-
-Any guest_memfd range updates will result in invalidations/updates of
-userspace, guest, IOMMU or any other page tables referring to
-guest_memfd backed pfns. This story will become clearer once the
-support for PFN range allocator for backing guest_memfd starts getting
-discussed.
-
-[1] https://elixir.bootlin.com/linux/v6.14.5/source/mm/memory.c#L6543
+Is your suggestion around using guest_memfd ioctl() to also toggle
+memory attributes for the scenarios where guest_memfd instance doesn't
+have in-place memory conversion feature enabled?
 
