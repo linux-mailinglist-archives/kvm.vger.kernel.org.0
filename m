@@ -1,143 +1,142 @@
-Return-Path: <kvm+bounces-45593-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45594-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6897AAC673
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 15:36:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D89CEAAC6D7
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 15:47:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB67B1C20678
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 13:34:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D17D1C0081F
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 13:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45BEE28137E;
-	Tue,  6 May 2025 13:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25716280A4C;
+	Tue,  6 May 2025 13:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="n7yeE+TB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I5R7RpsL"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2A4280A22;
-	Tue,  6 May 2025 13:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0B91E3DF4
+	for <kvm@vger.kernel.org>; Tue,  6 May 2025 13:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746538368; cv=none; b=uMG6Wz4SsXvlmS2gLMsapXVch+liqSfk+8XCFvkMmIa15zg3PthkwXDpAKTiOnECgs6RER+BMSQ/l4eAyO2gOGj3OgLNPO1zSCc+9H57PVMFBY7OYvB/7kR5rRK5wIptVSpBtcxr+Y7p6G25NbHYPOm4azAkfJm4AGo3CLnvXkw=
+	t=1746539212; cv=none; b=sGe5xxTK9bUeIibxHcn7VJ8uvQyD19mgnRSF1y430U+AzK1gqiDO2rQKAM877doJZhyjNDnvKWr4RnzUMIF9ldIilxhxuXw2xHgwsvAVfKGi6EeL+KUaG8XISysySvLSfjEcGKITST/GJ1LPGZFKoBkaMQ/jl8P6HoiQ0CeME1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746538368; c=relaxed/simple;
-	bh=kSvXr+b2Hy2f2NJD4lZL4d9PEdA5TH8rETVkdgx3URI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PBOLwVFWP50frwjvZVHE12G8TFc7vq2/RwInSSz4IgFqTUZ/863EK6LtueZrifghdY21l9PyU2gs0iv9PkvIHuLvkM3Ae2zWC5bCeuyNczD0WNBX8GoIQ3Q0ZSRCyKqtiw6pVNI9iYDwsk4esSmNlxjqZmjSYwEYcRO5IueBeFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=n7yeE+TB; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=6cpI98hWfgFel/wjRnW+Dxp5TlwemkuKmbKCnMNw4jc=; b=n7yeE+TBrHIHKZGaVFCAVfDdd8
-	9yrCGjO0R1hS6oa3Owmd6CNGJXpS+KKssrLwI8chILGFybjyYgLR3+ibpbybCmTC3F5dhTMqu5RK/
-	LJRAiTsakNKkYNCTcht19eNNtRUst4+MUBY60lN/cPsf3AEpTCgRQxPpBM1OWUDD5rW+VJg62GqNw
-	X5E2fqslkkasXgjPpctQx//H+7WbEeAacaB2Wq4REG4EWuEWxfyAVR0ReiBYTwP2MKohSXt+M7ihj
-	nN1lL6geKsPbyDPTxVg4jhQKCgWYlUuagGEZIw3hC4CREIhjT0a/kPWMJuFJ9S1rjeX5+rE5xlAVQ
-	8eADS2cQ==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
-	id 1uCIPS-0000000FeCx-3nP7;
-	Tue, 06 May 2025 13:32:35 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 4E72C300348; Tue,  6 May 2025 15:32:34 +0200 (CEST)
-Date: Tue, 6 May 2025 15:32:34 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kys@microsoft.com,
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, pbonzini@redhat.com, ardb@kernel.org,
-	kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-efi@vger.kernel.org, samitolvanen@google.com,
-	ojeda@kernel.org, xin@zytor.com
-Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
- in __nocfi functions
-Message-ID: <20250506133234.GH4356@noisy.programming.kicks-ass.net>
-References: <8B86A3AE-A296-438C-A7A7-F844C66D0198@zytor.com>
- <20250430190600.GQ4439@noisy.programming.kicks-ass.net>
- <20250501103038.GB4356@noisy.programming.kicks-ass.net>
- <20250501153844.GD4356@noisy.programming.kicks-ass.net>
- <aBO9uoLnxCSD0UwT@google.com>
- <20250502084007.GS4198@noisy.programming.kicks-ass.net>
- <aBUiwLV4ZY2HdRbz@google.com>
- <20250503095023.GE4198@noisy.programming.kicks-ass.net>
- <p6mkebfvhxvtqyz6mtohm2ko3nqe2zdawkgbfi6h2rfv2gxbuz@ktixvjaj44en>
- <20250506073100.GG4198@noisy.programming.kicks-ass.net>
+	s=arc-20240116; t=1746539212; c=relaxed/simple;
+	bh=ZLyUWVGxg9mrrO7r5vzX+fzEqwROgV3Odq3dd0jP07g=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=lS/TD1c6UR1HKoeTTy+uXCJWTd++YjDV1gWU40eZZWP29yBYN570q8f/R55zIHDdpSd4w9NTPV5eCGWFwZxNT9ynljDCDMw51A/VUJoiGUrEN0PGBhXvEuaRgYxQLz8ceBKupjNGLMqHSiyxQ8eYF6BktLk5/L3vmRb3Q3YzV34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I5R7RpsL; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2241e7e3addso50699335ad.1
+        for <kvm@vger.kernel.org>; Tue, 06 May 2025 06:46:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746539210; x=1747144010; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LQUJg1xdsag4lcsUrEd4LaUAGtstgHq/VhuMBGkni7o=;
+        b=I5R7RpsLsgCyODVY7TJDKwLtrD6KpoDhmKsxc0q/3HVpcUqT9MQjueUFAvjE9lA8ks
+         oMiMe08x2Uw0YXa41wtx76eTlaIhBplhAlrpbQ0ig/lEp4teXHvqjlkSDkg1IKo8qDHQ
+         4x/JM12SyAAku1FBNvGowuyxXgjsiLjsoJPgaeXDqw6/2zKnH2lIyvfkeGbKMu2lm8ST
+         87NXeMXhPf2ObDnDchdTAl8BxU1x+dNYNhnL6zbHXVwfs+hJGfBgblykgnYu7wbijZj4
+         D9nCGBeL5zUyXgIdDH291ILIrLhnfb1gmrshTG+z/xNMQWrrcWjHCtwmERDbY9I4+g6a
+         OqPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746539210; x=1747144010;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LQUJg1xdsag4lcsUrEd4LaUAGtstgHq/VhuMBGkni7o=;
+        b=LaPeDpC4hdGR/9zh8rvE82H/g6alWbpoGacQz9+DXm7dFYK9g6I3+pxi5QBFg+KQRG
+         /eZycPRzGg9hUTHwcPFSMrUpRj5o567mIYQwXkb8/XrW++lWsSqgLQZr+QMeK1HWyzaK
+         YQ8+Qcqbbjbqw4ZRnNsmYqfLbS+iQJl+01kWtSgJDdi07OuNRDMD6clnoZ9znVNTV9rG
+         QrH9lzI6VpGRsNU8ieDVPOjRurwJ4TLYG5+GckkEDmbpzNXu6hbaA8BSUo2IiAox0HOA
+         otYCTw56QY7ovixhXX/ZSavYEg3jUocP6RSJEp9U1miMIfL/EHMW1j/eYQs1XO3WaHwz
+         pcEw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbJSyYMopprNaH75b2OwqonRcE9XcKYlXnXA5g5UwnOOOdj2/n0OpG/VKOsu4l/jGcvlQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKMYvRgyW7lPqTNlOMGEo/PQdp7bdq3wXGpeAg9TAMN31cCSjw
+	wGLe1ilGS7wjMkAOpEEqo9gCqbxQ2O7BZML8NN1icJbTeLDC1rwolfSp6VNils7yd0tmEPhYH3D
+	ekw==
+X-Google-Smtp-Source: AGHT+IHsYV+dxxS1ThICcQGbnerUzrCgNQIzKxNK/VWU507udswWRGzpamo7g53Ivg5sJVmAE8gcPACNnXg=
+X-Received: from pljs14.prod.google.com ([2002:a17:903:3bae:b0:223:225b:3d83])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:240d:b0:223:66bb:8995
+ with SMTP id d9443c01a7336-22e102f3417mr229950135ad.20.1746539210171; Tue, 06
+ May 2025 06:46:50 -0700 (PDT)
+Date: Tue, 6 May 2025 06:46:47 -0700
+In-Reply-To: <09ee8a01-9938-4ae7-bdbc-4754b7314e73@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250506073100.GG4198@noisy.programming.kicks-ass.net>
+Mime-Version: 1.0
+References: <20250305230000.231025-1-prsampat@amd.com> <174622216534.881262.8086472919667553138.b4-ty@google.com>
+ <b1cc7366-bd30-46ee-ac6e-35c2b08ffdb5@amd.com> <aBlGp8i_zzGgKeIl@google.com> <09ee8a01-9938-4ae7-bdbc-4754b7314e73@amd.com>
+Message-ID: <aBoSx-rAmajPZq07@google.com>
+Subject: Re: [PATCH v8 00/10] Basic SEV-SNP Selftests
+From: Sean Christopherson <seanjc@google.com>
+To: "Pratik R. Sampat" <prsampat@amd.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, pbonzini@redhat.com, thomas.lendacky@amd.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, shuah@kernel.org, pgonda@google.com, 
+	ashish.kalra@amd.com, nikunj@amd.com, pankaj.gupta@amd.com, 
+	michael.roth@amd.com, sraithal@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, May 06, 2025 at 09:31:00AM +0200, Peter Zijlstra wrote:
-> On Sat, May 03, 2025 at 11:28:37AM -0700, Josh Poimboeuf wrote:
-> > On Sat, May 03, 2025 at 11:50:23AM +0200, Peter Zijlstra wrote:
-> > > > +++ b/arch/x86/entry/entry_64_fred.S
-> > > > @@ -116,7 +116,8 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
-> > > >  	movq %rsp, %rdi				/* %rdi -> pt_regs */
-> > > >  	call __fred_entry_from_kvm		/* Call the C entry point */
-> > > >  	POP_REGS
-> > > > -	ERETS
-> > > > +
-> > > > +	ALTERNATIVE "", __stringify(ERETS), X86_FEATURE_FRED
-> > > >  1:
-> > > >  	/*
-> > > >  	 * Objtool doesn't understand what ERETS does, this hint tells it that
-> > > > @@ -124,7 +125,7 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
-> > > >  	 * isn't strictly needed, but it's the simplest form.
-> > > >  	 */
-> > > >  	UNWIND_HINT_RESTORE
-> > > > -	pop %rbp
-> > > > +	leave
-> > > >  	RET
-> > > 
-> > > So this, while clever, might be a problem with ORC unwinding. Because
-> > > now the stack is different depending on the alternative, and we can't
-> > > deal with that.
-> > > 
-> > > Anyway, I'll go have a poke on Monday (or Tuesday if Monday turns out to
-> > > be a bank holiday :-).
+On Mon, May 05, 2025, Pratik R. Sampat wrote:
+> On 5/5/2025 6:15 PM, Sean Christopherson wrote:
+> > On Mon, May 05, 2025, Pratik R. Sampat wrote:
+> > Argh, now I remember the issue.  But _sev_platform_init_locked() returns '0' if
+> > psp_init_on_probe is true, and I don't see how deferring __sev_snp_init_locked()
+> > will magically make it succeed the second time around.
 > > 
-> > Can we just adjust the stack in the alternative?
+> > So shouldn't the KVM code be this?
 > > 
-> > 	ALTERNATIVE "add $64 %rsp", __stringify(ERETS), X86_FEATURE_FRED
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index e0f446922a6e..dd04f979357d 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -3038,6 +3038,14 @@ void __init sev_hardware_setup(void)
+> >         sev_snp_supported = sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV_SNP);
+> >  
+> >  out:
+> > +       if (sev_enabled) {
+> > +               init_args.probe = true;
+> > +               if (sev_platform_init(&init_args))
+> > +                       sev_supported = sev_es_supported = sev_snp_supported = false;
+> > +               else
+> > +                       sev_snp_supported &= sev_is_snp_initialized();
+> > +       }
+> > +
+> >         if (boot_cpu_has(X86_FEATURE_SEV))
+> >                 pr_info("SEV %s (ASIDs %u - %u)\n",
+> >                         sev_supported ? min_sev_asid <= max_sev_asid ? "enabled" :
+> > @@ -3067,12 +3075,6 @@ void __init sev_hardware_setup(void)
+> >  
+> >         if (!sev_enabled)
+> >                 return;
+> > -
+> > -       /*
+> > -        * Do both SNP and SEV initialization at KVM module load.
+> > -        */
+> > -       init_args.probe = true;
+> > -       sev_platform_init(&init_args);
+> >  }
+> >  
+> >  void sev_hardware_unsetup(void)
+> > --
+> > 
 > 
-> Yes, that should work. 
+> I agree with this approach. One thing maybe to consider further is to also call
+> into SEV_platform_status() to check for init so that SEV/SEV-ES is not
+> penalized and disabled for SNP's failures. Another approach could be to break
+> up the SEV and SNP init setup so that we can spare a couple of platform calls
+> in the process?
 
-Nope, it needs to be "mov %rbp, %rsp". Because that is the actual rsp
-value after ERETS-to-self.
-
-> But I wanted to have a poke at objtool, so it
-> will properly complain about the mistake first.
-
-So a metric ton of fail here :/
-
-The biggest problem is the UNWIND_HINT_RESTORE right after the
-alternative. This ensures that objtool thinks all paths through the
-alternative end up with the same stack. And hence won't actually
-complain.
-
-Second being of course, that in order to get IRET and co correct, we'd
-need far more of an emulator.
-
-Also, it actually chokes on this variant, and I've not yet figured out
-why. Whatever state should be created by that mov, the restore hint
-should wipe it all. But still the ORC generation bails with unknown base
-reg -1.
-
-
+Nah, SNP initialization failure should be a rare occurence, I don't want to make
+the "normal" flow more complex just to handle something that should never happen
+in practice.
 
