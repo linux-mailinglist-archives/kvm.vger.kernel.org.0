@@ -1,111 +1,166 @@
-Return-Path: <kvm+bounces-45595-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45596-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C61CAAC706
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 15:54:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92C22AAC723
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 15:58:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27E267AEA56
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 13:53:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECD0C4A7CD3
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 13:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E712B281363;
-	Tue,  6 May 2025 13:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB1E6278745;
+	Tue,  6 May 2025 13:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P0f7f0SU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tjGlUpwz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FB927FD57
-	for <kvm@vger.kernel.org>; Tue,  6 May 2025 13:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B63C280A3D
+	for <kvm@vger.kernel.org>; Tue,  6 May 2025 13:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746539641; cv=none; b=Au00eOWK/+Il7iYh0trcxJWtV4uZ/i74KacmxtOkU0dMitLG0jBCiOMyrtxBDI9hxjzy1IFg5DjYbYxFCH+7gI+3K9noN+n5XGFoYjtbB9CzdLRnDfFcPZroJ6OYOhRssRFHdZ5tXrNmAPxnGV3ZwG22UCvVE55PTbiWljJyzPw=
+	t=1746539889; cv=none; b=KZ0zeuFzDdVi3slzLTyCbVhMRLRdCHfzyeGQh+cRYIty1FHpgdVz9qLpNdz8OUSd7yKZ5W2mDyoYf9AiZKrJUzhbg7Tyl/IZxzwN0NGzkIhoKjtHhZGx0P54gyuO4iWgCucWsybOYS2rbROIiOsb/Yob296v8+vEh29YTn1Mrqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746539641; c=relaxed/simple;
-	bh=E0MBUYNrGvgPtAL3Tx7u0b3fFrGahJZFgt+I8HqEuHQ=;
+	s=arc-20240116; t=1746539889; c=relaxed/simple;
+	bh=B/1kMBr0dMDjBz8qR4hZMYey3tTkE8Ew1cHXX/tWHi0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gxbV7tgcnXMDS7El8HIz0oPF76Ji52wymbQPSNhPrKN3iyFyv3aJ14YUnWvh8kVFiszi8ThmsEfi+/n3iHaQuUVCY7bYBbTH+HgZ3qhEoqKXpwdHVL5SD5s/efn4kha109uwl0rN9SAIDeGZp7TWKqk1k6wPdKEU5wE1tUU15iE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P0f7f0SU; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=V3YSKd//sx5O/IsieWYqMZN49qh0IZ+QkghnGahDR5pDI3blpy6uW0s3lNNUoUpG6dcgYt2wDDWdmn+Q4LS5jwU9Wz7O49DvMMQEUUmDirxJ6IMXOQSQhidgcPBq2SBKwSzmSX+f7h63+GJUHUsuvditLNh7bKaMGzrVwpHsOc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tjGlUpwz; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30a59538b17so3053082a91.3
-        for <kvm@vger.kernel.org>; Tue, 06 May 2025 06:53:59 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22650077995so82578075ad.3
+        for <kvm@vger.kernel.org>; Tue, 06 May 2025 06:58:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746539639; x=1747144439; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4mgKVk1+LFsbcw1jY+XDoGyAfQKN78O8ZSwvvMcxjVY=;
-        b=P0f7f0SUoUXReXvEU6KXkqBYdGAgWlRfUSJj7TITpoHYvTIRDo0+VWtiaSo2yoiDmC
-         wGRXuW76LLtatbPDQOK70T77SRNQqu8gZPG1dPi/GCMSPDFtHrhOz3td6Qk1jy73s7ET
-         8mDEle5IB94zT2RoKRAh3kmOXlmbJ+TI46h+M3iWDWTQELvL5lrY+B+ynO4gkam9hiPO
-         4O1Zcy/orlEjqaR969okNJ1E+MX6c7c8hKOqu5P3y7c8RBDksyJROlq4Mukk4vZYegfQ
-         EpXf1ONr2I5uu6XnN15OVZEhFGgZuVeZOrbKNOEVo3lBVvz3Q6f2VapWVaLB7h7sFJyk
-         d8/A==
+        d=google.com; s=20230601; t=1746539887; x=1747144687; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Epkui4TROaYfaMdtDACEwRS7LcO5Q0jHyiEGdQbOTDo=;
+        b=tjGlUpwz88McXQxWhYoonh0UjPU2Sy5iVVVbSW6HukQuIM3vnznT+1T2x2VW2iwOGR
+         6V+V0ocpNVSSzIRk/T+enLGd66j4QoP332PmiETY/1jb766m1Sw8SiDQo+HKzZtSO8JR
+         R/z+twBTNbAzSdr4zYY6sDTlasG5+comauwzqFLX3DnR9XvoVJ+n4lbq8b09s30ZNzeF
+         az0vlX0ta+2PoJh2sLwDTABaFe3ThRpMQ1vvBI5Z0F7o71y2rf7xkPizJ+jzjIy6LAKC
+         PU8uKsi+uz+Q332lYSxrUzws6zsMimKD7PxJ4b+YKkuNKQiRYE7YIQkk478xQ7/3+1al
+         P77Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746539639; x=1747144439;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4mgKVk1+LFsbcw1jY+XDoGyAfQKN78O8ZSwvvMcxjVY=;
-        b=kbna3LOANIBjqBYPEE0qicfLms/qLL+9Gqs9s+WSiFh1koOXel0ZFQN+sE14+wDUAv
-         +XsmTCUJG0Jl1+TmcoKGscRT1Q+Caf88pX6EBlJ6UcH3vrgwU4wGF9njEr3GkKfRbC4A
-         oKhoL/TFeLGk7NLq2gTWkcFKczEkG0EhHT/AMrTFT+GohrkhEr8STLt43DwkSxIkxzX3
-         dU9WK3FOdpSJ1vqiPIG+k4CVjeQg3vVam5u6V/Sf9WiCmxepjJCCmYWFr3WJg5Gzh7rF
-         476muUqtZNPSGIXy/vRc3U0BuK6xx1TmymP9Abm+0VQBPcZ0OO+5GffNGvOCJCWLYevK
-         Ch8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXZlc11dztWve4NWlPYDiu9Zu5O9SBoJE1VEeykdsvEk9Lq311mMhLNiC6ru9iTvZeQChg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjY2w74p6z+AQYoC+n+LqJ0NA0fkzOsztYrbZ03zvDl+NXqyJI
-	XGem1QOmwH+hKnBcPVFFL4karAG/3xNJ4Q8ALvXQJZMX6nkZKjDaVt6wPaGPyZnV9BzZt9wAu6z
-	/MQ==
-X-Google-Smtp-Source: AGHT+IGO1ZCu2E3J9DQSTbuCStxaXGcWf0OefdURtnN38ZAiX+JOfZJg+SVs+beWPtRWk/oQ9WoWHf6IzJc=
-X-Received: from pjbsc5.prod.google.com ([2002:a17:90b:5105:b0:2fc:2c9c:880])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5704:b0:2fc:3264:3666
- with SMTP id 98e67ed59e1d1-30a4e6914cemr24620709a91.30.1746539639028; Tue, 06
- May 2025 06:53:59 -0700 (PDT)
-Date: Tue, 6 May 2025 06:53:56 -0700
-In-Reply-To: <20250506092015.1849-3-jgross@suse.com>
+        d=1e100.net; s=20230601; t=1746539887; x=1747144687;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Epkui4TROaYfaMdtDACEwRS7LcO5Q0jHyiEGdQbOTDo=;
+        b=vJBGHeqRzed1HlPN+svjx+83ZfNiaLr4iK3pLsoUK918d45Njb0pSq8udtRwIMCgIk
+         bgznPM5qswOK7XuZLqbTObBEFtCi3JAI+AEhi14QAg8lupPxZ9gJsc1B6VE5Qevg0CB2
+         uH0ZLILvKoMnKMP83L5+7n0+Pa/UfI+cLZcu4XGc1OVPBfi1sQDItp/XdvtXw/En48dR
+         lLJZigOS4896bn8Dh5EYxop2JXx2Z+XZg8UZaM67Zof06uaeJquq+USeHifgYmNF8DDu
+         QU13V+fbVO7KUbINTPPjfnv9zx9GMKZkAqmHR4nQ6o3fdjryVSl+KFp9DOxkwZXv8sP/
+         NpXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVCTMH/7pggFpDhPH4LryW51OLglA9Csv5GS1iqo/vTK7Fl6G6UAKLCMp4OENIsAVJbp7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxw1yhTuDxvemSNPhTD8J8+S2klPobII3w7YiGe06Pym9OBr+To
+	UNGPUb/cSttRv1gyknR9Ox+Ret83RiMyvHVlK9D4lE5QziufEQ0owYyL4E0DjHTbN5buiURglel
+	L1A==
+X-Google-Smtp-Source: AGHT+IHreTuRAhH/wUxgD8PQxg1UOE2znzyhgkrxDm9K+FWFaiZsk+OikDER4lrfDo4rClwDb4vAN5nmo08=
+X-Received: from plbml4.prod.google.com ([2002:a17:903:34c4:b0:223:536f:9461])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:8ce:b0:220:d078:eb33
+ with SMTP id d9443c01a7336-22e36366425mr50533145ad.36.1746539886699; Tue, 06
+ May 2025 06:58:06 -0700 (PDT)
+Date: Tue, 6 May 2025 06:58:04 -0700
+In-Reply-To: <CAGtprH9AVUiFsSELhmt4p24fssN2x7sXnUqn39r31GbA0h39Sw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250506092015.1849-1-jgross@suse.com> <20250506092015.1849-3-jgross@suse.com>
-Message-ID: <aBoUdApwSgnr3r9V@google.com>
-Subject: Re: [PATCH 2/6] x86/kvm: Rename the KVM private read_msr() function
+References: <diqz7c31xyqs.fsf@ackerleytng-ctop.c.googlers.com>
+ <386c1169-8292-43d1-846b-c50cbdc1bc65@redhat.com> <aBTxJvew1GvSczKY@google.com>
+ <diqzjz6ypt9y.fsf@ackerleytng-ctop.c.googlers.com> <7e32aabe-c170-4cfc-99aa-f257d2a69364@redhat.com>
+ <aBlCSGB86cp3B3zn@google.com> <CAGtprH8DW-hqxbFdyo+Mg7MddsOAnN+rpLZUOHT-msD+OwCv=Q@mail.gmail.com>
+ <CAGtprH9AVUiFsSELhmt4p24fssN2x7sXnUqn39r31GbA0h39Sw@mail.gmail.com>
+Message-ID: <aBoVbJZEcQ2OeXhG@google.com>
+Subject: Re: [PATCH v8 06/13] KVM: x86: Generalize private fault lookups to
+ guest_memfd fault lookups
 From: Sean Christopherson <seanjc@google.com>
-To: Juergen Gross <jgross@suse.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
-	xin@zytor.com, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: David Hildenbrand <david@redhat.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 06, 2025, Juergen Gross wrote:
-> Avoid a name clash with a new general MSR access helper after a future
-> MSR infrastructure rework by renaming the KVM specific read_msr() to
-> kvm_read_msr().
-> 
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 2 +-
->  arch/x86/kvm/vmx/vmx.c          | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 9c971f846108..308f7020dc9d 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2275,7 +2275,7 @@ static inline void kvm_load_ldt(u16 sel)
->  }
->  
->  #ifdef CONFIG_X86_64
-> -static inline unsigned long read_msr(unsigned long msr)
+On Mon, May 05, 2025, Vishal Annapurve wrote:
+> On Mon, May 5, 2025 at 10:17=E2=80=AFPM Vishal Annapurve <vannapurve@goog=
+le.com> wrote:
+> >
+> > On Mon, May 5, 2025 at 3:57=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> > > > ...
+> > > > And not worry about lpage_infor for the time being, until we actual=
+ly do
+> > > > support larger pages.
+> > >
+> > > I don't want to completely punt on this, because if it gets messy, th=
+en I want
+> > > to know now and have a solution in hand, not find out N months from n=
+ow.
+> > >
+> > > That said, I don't expect it to be difficult.  What we could punt on =
+is
+> > > performance of the lookups, which is the real reason KVM maintains th=
+e rather
+> > > expensive disallow_lpage array.
+> > >
+> > > And that said, memslots can only bind to one guest_memfd instance, so=
+ I don't
+> > > immediately see any reason why the guest_memfd ioctl() couldn't proce=
+ss the
+> > > slots that are bound to it.  I.e. why not update KVM_LPAGE_MIXED_FLAG=
+ from the
+> > > guest_memfd ioctl() instead of from KVM_SET_MEMORY_ATTRIBUTES?
+> >
+> > I am missing the point here to update KVM_LPAGE_MIXED_FLAG for the
+> > scenarios where in-place memory conversion will be supported with
+> > guest_memfd. As guest_memfd support for hugepages comes with the
+> > design that hugepages can't have mixed attributes. i.e. max_order
+> > returned by get_pfn will always have the same attributes for the folio
+> > range.
 
-Ewwww.  Eww, eww, eww.  I forgot this thing existed.
+Oh, if this will naturally be handled by guest_memfd, then do that.  I was =
+purely
+reacting to David's suggestion to "not worry about lpage_infor for the time=
+ being,
+until we actually do support larger pages".
 
-Please just delete this and use rdmsrq() directly (or is it still rdmsrl()? at
-this point?).
+> > Is your suggestion around using guest_memfd ioctl() to also toggle
+> > memory attributes for the scenarios where guest_memfd instance doesn't
+> > have in-place memory conversion feature enabled?
+>=20
+> Reading more into your response, I guess your suggestion is about
+> covering different usecases present today and new usecases which may
+> land in future, that rely on kvm_lpage_info for faster lookup. If so,
+> then it should be easy to modify guest_memfd ioctl to update
+> kvm_lpage_info as you suggested.
+
+Nah, I just missed/forgot that using a single guest_memfd for private and s=
+hared
+would naturally need to split the folio and thus this would Just Work.
 
