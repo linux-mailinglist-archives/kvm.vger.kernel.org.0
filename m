@@ -1,98 +1,94 @@
-Return-Path: <kvm+bounces-45550-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45551-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1435DAAB92A
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 08:51:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E5B6AAB8F0
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 08:45:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F4133A860D
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 06:43:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE6BD16BDB1
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 06:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9355A2571A5;
-	Tue,  6 May 2025 04:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889CA1A2557;
+	Tue,  6 May 2025 04:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AUcv5z9c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E58El8rg"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2606B297128;
-	Tue,  6 May 2025 01:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B902C1E34;
+	Tue,  6 May 2025 01:39:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746495481; cv=none; b=Xy2iGnBdSqfoJ7Wby26DGDLEq/UZHkekL2gUmJhuo3dtaFpJ8U4Io0XSu8rrHzOnlY74YWYLGr/Xkzg0ZohZXOL9qeHrpe7HoizYiRhfScjcU1SZ5HOe/7fmZqacXU9BN9Gg/inehlZU+5G83F4J16qlE6mY+Emy03jEKiykWZI=
+	t=1746495597; cv=none; b=XVhCRupf92nvA5/5efuAnBoDWCECy/eIDPT2ybplHYY0zbChD9h0XiJ6PxB0a8YARv2xNdAFyYelpV2gi8HmV/+NMruUK5BiRn0U8mZ/+IHBNMtqoxMMChBjZ3RoB99yT3Z/0CyipIFubE2kR9pPUaY4ekzrEzWISnVy4Ns4540=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746495481; c=relaxed/simple;
-	bh=zKECytagb87TMOLvGwWUa+PfDXa1A/lXuEpkDrkjAnM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E6EZ+dZ+f9hOKTVe0R7h0+p/Dkze0edVobRPa0BNczcIdkxQQLkyKQm7JrX+IC6dwdd9YJAFD21QM5no9RiRrmG97l6RY7fhEr/1DgPLLeKXvW2em9w88B/2Hu7gWee7GKntQVyh/pSRmjQOZ5pyIH3mfPdMg/EPk+HwRCJ0C6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AUcv5z9c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62AD4C4CEE4;
-	Tue,  6 May 2025 01:37:59 +0000 (UTC)
+	s=arc-20240116; t=1746495597; c=relaxed/simple;
+	bh=RG7Fv4098vXZjKXhbYhSAmFoeYwghoNLjQ6woj5h+vQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hVeIEH5hBR6F2rjvRV6Qd97wScYr6WTkEEh/cnzqESQuCAyY/lSdYTRn8oQSIbucVH4ICy9yCoEq0vwI4Vxsic8xTnbn46Fx2SUad5Ao1r22uLuJpJ8jE2q5lV+8yKkAMOH/USEDxlQKjALUNakq9Ga9kBoKusrttWtZuvs49qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E58El8rg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B260AC4CEE4;
+	Tue,  6 May 2025 01:39:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746495480;
-	bh=zKECytagb87TMOLvGwWUa+PfDXa1A/lXuEpkDrkjAnM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AUcv5z9ca99yIo2NLkz4SbM2b9WWkH0uw/wz4j+St1LLxEyfCJEsFq1ZdUTAa9c2L
-	 TDlUp+WqRO3spDiJ7VP6zq4YtkngpCzgRsN3AhxF+iHbRhEpHJo/NGCGI/GH8hrwir
-	 akWRoH0LOdfxi2MuogXg+4weQT1gWeuj3VxnAbtPI8laajeMTjyU2oJPsHI0FtLUlN
-	 26f/mL+aTgG6bFUz9+H/yNgZjmt9fEPOoYa+C6GN7FIUyKlwExDdKuTyScVnhiGYBJ
-	 3wSuE0Q1rlqd6GvOeqkb9nRRKhcVH1g7UT3bBvgRcbZWqs/1L0pgZ/upZbY7X5pSUU
-	 kUOM/O+IQitUQ==
-Date: Mon, 5 May 2025 18:37:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, io-uring@vger.kernel.org,
- virtualization@lists.linux.dev, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy
- <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de
- Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, Pavel Begunkov
- <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, Neal Cardwell
- <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
- <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "Eugenio
- =?UTF-8?B?UMOpcmV6?=" <eperezma@redhat.com>, Stefan Hajnoczi
- <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan
- <shuah@kernel.org>, sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim
- <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
- <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>, Kaiyuan
- Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH net-next v13 4/9] net: devmem: Implement TX path
-Message-ID: <20250505183758.7778811c@kernel.org>
-In-Reply-To: <20250429032645.363766-5-almasrymina@google.com>
-References: <20250429032645.363766-1-almasrymina@google.com>
-	<20250429032645.363766-5-almasrymina@google.com>
+	s=k20201202; t=1746495596;
+	bh=RG7Fv4098vXZjKXhbYhSAmFoeYwghoNLjQ6woj5h+vQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=E58El8rgXquEtN8ubo2Plj5XwQnib9vZEvNYqi6QSLlNzDg5KcL83KhQ4p7B0i7Yl
+	 jh9HAGlxggCzxmhYMXIPau2IiYx3GgqK9wo94OgoDTYX0PO9knEoZgyqC+/jIry9Bf
+	 c+rvzhuc8s0UEWn+I6M4gRgcnzFFUQuDKTQqFozNjmTD2gSgdLAu7bKpZQE/ubJHrh
+	 ofENS+3MdRO6vMCJ2S5IeNG/7waVGd5XaSWjF477YaCWSPNuOwtcR6ezklZXelsSml
+	 ms6oVQl8hK1GdOKqTIaAjafJioKAbQisvR7H59jnTiowVQs/eQLaEmjePVipqp5Wr0
+	 VT00OdZSerh+Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33AC7380664B;
+	Tue,  6 May 2025 01:40:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3] vhost/net: Defer TX queue re-enable until after
+ sendmsg
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174649563599.1007977.10317536057166889809.git-patchwork-notify@kernel.org>
+Date: Tue, 06 May 2025 01:40:35 +0000
+References: <20250501020428.1889162-1-jon@nutanix.com>
+In-Reply-To: <20250501020428.1889162-1-jon@nutanix.com>
+To: Jon Kohler <jon@nutanix.com>
+Cc: mst@redhat.com, jasowang@redhat.com, eperezma@redhat.com,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-Functionally LGTM. But I'm not sure if the discussion with Paolo is
-resolved, so here's a couple more nit picks:
+Hello:
 
-On Tue, 29 Apr 2025 03:26:40 +0000 Mina Almasry wrote:
-> +	case SCM_DEVMEM_DMABUF:
-> +		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-> +			return -EINVAL;
-> +		sockc->dmabuf_id = *(u32 *)CMSG_DATA(cmsg);
-> +
->  		break;
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The empty line before break is very odd.
+On Wed, 30 Apr 2025 19:04:28 -0700 you wrote:
+> In handle_tx_copy, TX batching processes packets below ~PAGE_SIZE and
+> batches up to 64 messages before calling sock->sendmsg.
+> 
+> Currently, when there are no more messages on the ring to dequeue,
+> handle_tx_copy re-enables kicks on the ring *before* firing off the
+> batch sendmsg. However, sock->sendmsg incurs a non-zero delay,
+> especially if it needs to wake up a thread (e.g., another vhost worker).
+> 
+> [...]
 
-> +	sockc = (struct sockcm_cookie){ .tsflags = READ_ONCE(sk->sk_tsflags),
-> +					.dmabuf_id = 0 };
+Here is the summary with links:
+  - [net-next,v3] vhost/net: Defer TX queue re-enable until after sendmsg
+    https://git.kernel.org/netdev/net-next/c/8c2e6b26ffe2
 
-Too ugly to exist, either full init fits on a line or there needs to be
-a line break after {.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
