@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-45631-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45633-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D24A3AACB53
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:46:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACDDAACB55
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:46:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 859467B404B
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:44:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 425313A2703
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB41286D7D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE582874E9;
 	Tue,  6 May 2025 16:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ygth1+ur"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbT1vkHt"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A122286D4A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3589286D56;
 	Tue,  6 May 2025 16:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746549852; cv=none; b=Gq00iTExViUZ0ZAfV6SX6oYr9gWiprVko9nPjnkyB8xgzCJFn+FGZ3Mkh4NjHn/88ouDNn1sXioKsmoLew+dRYxJ85LXqrgIlbUKa+3n0zpNfrN9k/UIIObIhH0HgnSZA7ccV3DZJQOBHlWBdhWPsflYljRKHeOY7+PReW/EMlY=
+	t=1746549852; cv=none; b=KqKRhK+9RO+Oc5dHwEoa/RrAUHiF1gAlGl/T/ciMWN/ZSnJc6NFiUkLTsxuRcNdBKw5AY66Er+de4lM/i/G9Ki34UirJ+xOSvQemkO4ArajLYgVL9NQjyTf20oWNCa7+PlRXcvvY/FhSko6MzIHq9DEAQoQcFi/tTapV4P3oHhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746549852; c=relaxed/simple;
-	bh=cXLy+//a+Wbc2PWFhsn34/2XszY14fVQQbnlUcjHWGg=;
+	bh=4gVu6PuCEYwqR8T4hiE7L+z2SsXJBvzsxceLEkn+bGU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IFnJrO/ZP4o86SP3ufvzHf5opnlDeP+7buwmNCsdKsKz5uciVMnv3VaBT2r03tfB/qteU/mMmcslJVW1yPR+3cSOSzkILEdRdSmSR7cCNUo6SkyKJHPxPlDTV1wpZbmirvDjdAHU/ks8QWmRKkFC7HHA+IopGTjuUjxNaqx8xvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ygth1+ur; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 229D8C4CEF7;
+	 MIME-Version; b=aegpFTGQZx/YR41AHNI21ja8wIsHposgTvm+m1KBrj3Nc1xXdUW8Bp4WEp1YFVWS1LUm2KfqrhDBHODtQSbU8IZWXHFbn2ocvlz6eJwbwY1PoOBmdNYzA7WUqnfu2eT5BUQUyA1xUS/KWK9zqJkCmIm/0Btp0aFeLi+NUPTzv0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbT1vkHt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65002C4CEF1;
 	Tue,  6 May 2025 16:44:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746549852;
-	bh=cXLy+//a+Wbc2PWFhsn34/2XszY14fVQQbnlUcjHWGg=;
+	bh=4gVu6PuCEYwqR8T4hiE7L+z2SsXJBvzsxceLEkn+bGU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ygth1+urekfiF1GRYwFFvJEHLIbPemK0bhY89b4zJ/liMXixm3F4MhM2NYHsUJHE0
-	 vqC6Z/LsjU9njN3du52P5ckCK6DCNH1cFLGUo6dqNkIn1FQ8OYqG3G9yQxqOZgBvfC
-	 wNs/Bly56x6rUS2/GY1R7v253Na9nwlKGVtGXoOTr1gmcwg4+9uqXnE1Oq7LVm6rAm
-	 WG6621bg6lYO/U6wI4vCagZZNdvoOlyi7j0YMmtmEdKIuLY4VSHiE0l30j9+qJ9QWv
-	 sIkMpq33EELMWkjzBSKlkL3SKtvomLbuYHExsxI+vwB67cOi6Ia1PGQ37mKBU/0cMv
-	 byMxCmZNHrizQ==
+	b=bbT1vkHtonjtWVfetsIP4h+6PJL1Sq3gBgSZ+jvaGg5Mwt64UTix2hgBNLe7dp82A
+	 L+F2md7wbd8NqONehEXmUlG2qcBZjHHCK3fk6f4wpSDRc3TPXNp6Bi/vYX0OUa+sJr
+	 bgKV6t6NT2WKjEvpQB2a8XT0dXZVMSI8Nwnl24c+MOFmG6Bd63YSp7YukHqtRwKqbn
+	 qXbF/42PJQsP8EdDf9gM+MFYazU2k2fBQV9vDn+ZR+RZZjchYRnxGIOYCMtZsBcotf
+	 K1o3xfYnjT/AvKdREhNjXIaj9Dg8wuoUwlVYaBb04Olj73o+5nJBN9wTML4AFj5Mma
+	 of9hmY6BCb4/Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uCLOs-00CJkN-Cj;
+	id 1uCLOs-00CJkN-Kl;
 	Tue, 06 May 2025 17:44:10 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -60,9 +60,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v4 19/43] KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_LS64_ACCDATA being disabled
-Date: Tue,  6 May 2025 17:43:24 +0100
-Message-Id: <20250506164348.346001-20-maz@kernel.org>
+Subject: [PATCH v4 20/43] KVM: arm64: Don't treat HCRX_EL2 as a FGT register
+Date: Tue,  6 May 2025 17:43:25 +0100
+Message-Id: <20250506164348.346001-21-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250506164348.346001-1-maz@kernel.org>
 References: <20250506164348.346001-1-maz@kernel.org>
@@ -78,34 +78,35 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We currently unconditionally make ACCDATA_EL1 accesses UNDEF.
-
-As we are about to support it, restrict the UNDEF behaviour to cases
-where FEAT_LS64_ACCDATA is not exposed to the guest.
+Treating HCRX_EL2 as yet another FGT register seems excessive, and
+gets in a way of further improvements. It is actually simpler to
+just be explicit about the masking, so just to that.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6e01b06bedcae..ce347ddb6fae0 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5150,10 +5150,12 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
- 	kvm->arch.fgu[HFGRTR_GROUP] = (HFGRTR_EL2_nAMAIR2_EL1		|
- 				       HFGRTR_EL2_nMAIR2_EL1		|
- 				       HFGRTR_EL2_nS2POR_EL1		|
--				       HFGRTR_EL2_nACCDATA_EL1		|
- 				       HFGRTR_EL2_nSMPRI_EL1_MASK	|
- 				       HFGRTR_EL2_nTPIDR2_EL0_MASK);
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 3150e42d79341..027d05f308f75 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -261,12 +261,9 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ 	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
+ 		u64 hcrx = vcpu->arch.hcrx_el2;
+ 		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+-			u64 clr = 0, set = 0;
+-
+-			compute_clr_set(vcpu, HCRX_EL2, clr, set);
+-
+-			hcrx |= set;
+-			hcrx &= ~clr;
++			u64 val = __vcpu_sys_reg(vcpu, HCRX_EL2);
++			hcrx |= val & __HCRX_EL2_MASK;
++			hcrx &= ~(~val & __HCRX_EL2_nMASK);
+ 		}
  
-+	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
-+		kvm->arch.fgu[HFGRTR_GROUP] |= HFGRTR_EL2_nACCDATA_EL1;
-+
- 	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
- 		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
- 						HFGITR_EL2_TLBIRVALE1OS	|
+ 		write_sysreg_s(hcrx, SYS_HCRX_EL2);
 -- 
 2.39.2
 
