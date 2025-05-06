@@ -1,206 +1,642 @@
-Return-Path: <kvm+bounces-45591-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45592-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95233AAC5A4
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 15:19:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48DE8AAC629
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 15:32:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A005B189AD70
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 13:19:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E5E53ADEA6
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 13:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DA627F75D;
-	Tue,  6 May 2025 13:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MhRc8B3T"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C3D283137;
+	Tue,  6 May 2025 13:23:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A313C0C
-	for <kvm@vger.kernel.org>; Tue,  6 May 2025 13:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906C9280A4F;
+	Tue,  6 May 2025 13:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746537549; cv=none; b=KmNRG/ueBAUYqUpp151Xraj2F6ACAXZTSnD8fKoPkJP/3oeU81KefE58np2laWqNkQinMzgzndNCTOmlul+2f1qO5c41GT3pGF90BvwBTQ9SkwcRk2IfBSbfTg3u/35rxnRGWlqbFtEiPgYE2UK+By1fJ38FjQJFfzjTTA3wykI=
+	t=1746537811; cv=none; b=ZiXCVwvdEFyIz2TI8IuHBeYBjY8WcTDRZVrRTP2LRq2xDcpc+EgDYzIjjxz0mUk1QuzzvoL+e3i7SEmGQSLzp3Bt7+sb42TtIe6JXvWzLViEpCGsPNQsS5SAmP1+uWNKNiOfMYgvs7Cv7brq/88iBZDpTReO4HARBs0TDqky7P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746537549; c=relaxed/simple;
-	bh=YU0qkgiRqaVnf4LpHH/M34E26n57EMAF9SfvxqX6yLs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h4OsEuDVFJJwFf/wsCHb7uAJY0dlejUMy17aohLe1GVQ4O5YVzjzcKbZCXcRkt8O5l9OtSZOAULO3GNDBrU/auOx6Fs6RkYIv0fdQ0toZKyIvrzI1I5TvZm5wxpeFJmrnBkDGWcdi5Bow1BT4N3os3vjFMY3OZEPA7Z93EMcEA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MhRc8B3T; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22e42641d7cso106825ad.0
-        for <kvm@vger.kernel.org>; Tue, 06 May 2025 06:19:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746537547; x=1747142347; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YU0qkgiRqaVnf4LpHH/M34E26n57EMAF9SfvxqX6yLs=;
-        b=MhRc8B3T8w/XcJVQ6LOsj4jydnY43uX46MtzwmV4fbYRZivAHbR9P19ifPvWx239PR
-         4vY7Y6JJuDrMAncPpRK7I6AtQtMsWc/Z6CWJI/anaMAEOk95YnasPUCggsesQewz77Yy
-         48ph1vDGu/oC2yHypVAHVgSWSJ4rO+pa7zrC0PFVZ4io3Tt3EzKGd2VIj7jxarzIqCIU
-         UomM86VcjYnjYdIwEIbGG6o2HJ9o5H7wnjfwMty374eVVYuilK0ACMBsYGMmnKyIZuDY
-         8tiRYwY18O4HSw9ijI4TU9Z13ClG6ikYQ4ZRMZjYGuyElnxX1Sj1rcQm1WrB0cTSGUCL
-         I5yQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746537547; x=1747142347;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YU0qkgiRqaVnf4LpHH/M34E26n57EMAF9SfvxqX6yLs=;
-        b=NXJSC950j8MkX3do5URXZydwnSxs8ptcnFkfklAxPeas2yzOEj+bZHqrEGGUl4pTin
-         r0ztSsluOBrvX3AkIykT/58H7NVkVHzZvy+pP19cV6KNJbOyhEVqEaMY+4HKK+NIxCyO
-         jf/1mW23N6T6eNbf9bhs2eH91tLKGevEjgWD7+H4vivKXjiHuesc4fL+f/xJzS6w3iLn
-         9NF1szJp615M2Z26X0PRzVLpMxqb9p/KAf2/JwpYkf0NuywoPd03NoeXQdpx5afccT89
-         h34cCY/5GAwZnPeL0W0PbDv0uQL2LtY3+xRovJT1Iz7f9n/CPZOakByp7QO9mHmugcdQ
-         JeTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVYjwN6kAWpuDdOwDWUR7+5zngKalOsj1rPopVKsJNUoy5MNzqM99cno9KEmr15NZlH9vM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCVDg9qnM+54uVSGwcr9x9Or6RBHP/fAepKuAdHEKCiorYgRly
-	2gis/9SlusVUINp+j9u8JbqLKQqJ8Qyym1a5b0JmrwHyJEoeySFxO84GL7EV9YCDO+XTYXsMkI3
-	GrbypcdTzoeqVpXO0XoT5RZT2HS3iav6HAeOD
-X-Gm-Gg: ASbGncvfZ85MxeQBR9RRn3qfDM74bnWat99ZJtqYQ1UNJWNviooOTRKMD6Xr29HavSZ
-	+1j84CAOw6NDMCCrCGkfBX/f8YzydRVf6ErU1UZ5OrtZujfYEclgYumYswsnMj4wLqK/Uk+K6py
-	oUD5y7xCX53TZaLYt+YghWMLT4P2ECYfKG8vyKP+saGk/FOi4m19HkHX4=
-X-Google-Smtp-Source: AGHT+IGXX3S1kKfsUg1hF5S3LhzbTq631LFTA84YRI4zLygnzfGjj2ffQfWCurZ/dbdLY0TZ5MqKdDb7BWJ8682XUBE=
-X-Received: by 2002:a17:902:dcca:b0:22e:4509:cb86 with SMTP id
- d9443c01a7336-22e4509d0a9mr1232705ad.19.1746537547160; Tue, 06 May 2025
- 06:19:07 -0700 (PDT)
+	s=arc-20240116; t=1746537811; c=relaxed/simple;
+	bh=X3iLq74/I1IY+wRbX/hlVqDYLBQOQ37unjKbKWirBnY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i7USVh1oAoShUqOFtChrnNf4RZvsW8XHv2TLAi+twP2iptBgOALNCRjFWz8xYCAHJ07GutwYoZsFdpDQOBRC2BiwGI2+3o7jPNKL70sDcegmBY1Qt0C/m0QZFvkHg2dHqx2PQ/KX9bUtEvhSCeD5p33SOSK6aZPVW15DFUm/7H8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A57E1007;
+	Tue,  6 May 2025 06:23:19 -0700 (PDT)
+Received: from [10.1.37.67] (Suzukis-MBP.cambridge.arm.com [10.1.37.67])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6B1683F5A1;
+	Tue,  6 May 2025 06:23:25 -0700 (PDT)
+Message-ID: <83071e55-cbe4-4786-b60e-d26ce16368b3@arm.com>
+Date: Tue, 6 May 2025 14:23:24 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250424030033.32635-1-yan.y.zhao@intel.com> <20250424030603.329-1-yan.y.zhao@intel.com>
- <CAGtprH9_McMDepbuvWMLRvHooPdtE4RHog=Dgr_zFXT5s49nXA@mail.gmail.com>
- <aBAiCBmON0g0Qro1@yzhao56-desk.sh.intel.com> <CAGtprH_ggm8N-R9QbV1f8mo8-cQkqyEta3W=h2jry-NRD7_6OA@mail.gmail.com>
- <aBldhnTK93+eKcMq@yzhao56-desk.sh.intel.com> <CAGtprH9wi6zHJ5JeuAnjZThMAzxxibJGo=XN1G1Nx8txZRg8_w@mail.gmail.com>
- <aBmmirBzOZfmMOJj@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aBmmirBzOZfmMOJj@yzhao56-desk.sh.intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 6 May 2025 06:18:55 -0700
-X-Gm-Features: ATxdqUE_E_xkcFezg1WJ6Xtsv-isc_XTHfLW6xTEscigvwnu1opfYy8Atv0sknw
-Message-ID: <CAGtprH9fDMiuk3JGSS12M-wFoqRj+sjdtEHJFS_5QfKX7aGkRQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
-	dave.hansen@intel.com, kirill.shutemov@intel.com, tabba@google.com, 
-	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
-	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
-	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
-	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
-	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 15/43] arm64: RME: Allow VMM to set RIPAS
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-16-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20250416134208.383984-16-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, May 5, 2025 at 11:07=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wro=
-te:
->
-> On Mon, May 05, 2025 at 10:08:24PM -0700, Vishal Annapurve wrote:
-> > On Mon, May 5, 2025 at 5:56=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> =
-wrote:
-> > >
-> > > Sorry for the late reply, I was on leave last week.
-> > >
-> > > On Tue, Apr 29, 2025 at 06:46:59AM -0700, Vishal Annapurve wrote:
-> > > > On Mon, Apr 28, 2025 at 5:52=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.=
-com> wrote:
-> > > > > So, we plan to remove folio_ref_add()/folio_put_refs() in future,=
- only invoking
-> > > > > folio_ref_add() in the event of a removal failure.
-> > > >
-> > > > In my opinion, the above scheme can be deployed with this series
-> > > > itself. guest_memfd will not take away memory from TDX VMs without =
-an
-> > > I initially intended to add a separate patch at the end of this serie=
-s to
-> > > implement invoking folio_ref_add() only upon a removal failure. Howev=
-er, I
-> > > decided against it since it's not a must before guest_memfd supports =
-in-place
-> > > conversion.
-> > >
-> > > We can include it in the next version If you think it's better.
-> >
-> > Ackerley is planning to send out a series for 1G Hugetlb support with
-> > guest memfd soon, hopefully this week. Plus I don't see any reason to
-> > hold extra refcounts in TDX stack so it would be good to clean up this
-> > logic.
-> >
-> > >
-> > > > invalidation. folio_ref_add() will not work for memory not backed b=
-y
-> > > > page structs, but that problem can be solved in future possibly by
-> > > With current TDX code, all memory must be backed by a page struct.
-> > > Both tdh_mem_page_add() and tdh_mem_page_aug() require a "struct page=
- *" rather
-> > > than a pfn.
-> > >
-> > > > notifying guest_memfd of certain ranges being in use even after
-> > > > invalidation completes.
-> > > A curious question:
-> > > To support memory not backed by page structs in future, is there any =
-counterpart
-> > > to the page struct to hold ref count and map count?
-> > >
-> >
-> > I imagine the needed support will match similar semantics as VM_PFNMAP
-> > [1] memory. No need to maintain refcounts/map counts for such physical
-> > memory ranges as all users will be notified when mappings are
-> > changed/removed.
-> So, it's possible to map such memory in both shared and private EPT
-> simultaneously?
+Hi Steven
 
-No, guest_memfd will still ensure that userspace can only fault in
-shared memory regions in order to support CoCo VM usecases.
+On 16/04/2025 14:41, Steven Price wrote:
+> Each page within the protected region of the realm guest can be marked
+> as either RAM or EMPTY. Allow the VMM to control this before the guest
+> has started and provide the equivalent functions to change this (with
+> the guest's approval) at runtime.
+> 
+> When transitioning from RIPAS RAM (1) to RIPAS EMPTY (0) the memory is
+> unmapped from the guest and undelegated allowing the memory to be reused
+> by the host. When transitioning to RIPAS RAM the actual population of
+> the leaf RTTs is done later on stage 2 fault, however it may be
+> necessary to allocate additional RTTs to allow the RMM track the RIPAS
+> for the requested range.
+> 
+> When freeing a block mapping it is necessary to temporarily unfold the
+> RTT which requires delegating an extra page to the RMM, this page can
+> then be recovered once the contents of the block mapping have been
+> freed.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes from v7:
+>   * Replace use of "only_shared" with the upstream "attr_filter" field
+>     of struct kvm_gfn_range.
+>   * Clean up the logic in alloc_delegated_granule() for when to call
+>     kvm_account_pgtable_pages().
+>   * Rename realm_destroy_protected_granule() to
+>     realm_destroy_private_granule() to match the naming elsewhere. Also
+>     fix the return codes in the function to be descriptive.
+>   * Several other minor changes to names/return codes.
+> Changes from v6:
+>   * Split the code dealing with the guest triggering a RIPAS change into
+>     a separate patch, so this patch is purely for the VMM setting up the
+>     RIPAS before the guest first runs.
+>   * Drop the useless flags argument from alloc_delegated_granule().
+>   * Account RTTs allocated for a guest using kvm_account_pgtable_pages().
+>   * Deal with the RMM granule size potentially being smaller than the
+>     host's PAGE_SIZE. Although note alloc_delegated_granule() currently
+>     still allocates an entire host page for every RMM granule (so wasting
+>     memory when PAGE_SIZE>4k).
+> Changes from v5:
+>   * Adapt to rebasing.
+>   * Introduce find_map_level()
+>   * Rename some functions to be clearer.
+>   * Drop the "spare page" functionality.
+> Changes from v2:
+>   * {alloc,free}_delegated_page() moved from previous patch to this one.
+>   * alloc_delegated_page() now takes a gfp_t flags parameter.
+>   * Fix the reference counting of guestmem pages to avoid leaking memory.
+>   * Several misc code improvements and extra comments.
+> ---
+>   arch/arm64/include/asm/kvm_rme.h |   5 +
+>   arch/arm64/kvm/mmu.c             |   8 +-
+>   arch/arm64/kvm/rme.c             | 384 +++++++++++++++++++++++++++++++
+>   3 files changed, 394 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+> index 9bcad6ec5dbb..b916db8565a2 100644
+> --- a/arch/arm64/include/asm/kvm_rme.h
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -101,6 +101,11 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
+>   int kvm_create_rec(struct kvm_vcpu *vcpu);
+>   void kvm_destroy_rec(struct kvm_vcpu *vcpu);
+>   
+> +void kvm_realm_unmap_range(struct kvm *kvm,
+> +			   unsigned long ipa,
+> +			   unsigned long size,
+> +			   bool unmap_private);
+> +
+>   static inline bool kvm_realm_is_private_address(struct realm *realm,
+>   						unsigned long addr)
+>   {
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index d80a9d408f71..71c04259e39f 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -323,6 +323,7 @@ static void invalidate_icache_guest_page(void *va, size_t size)
+>    * @start: The intermediate physical base address of the range to unmap
+>    * @size:  The size of the area to unmap
+>    * @may_block: Whether or not we are permitted to block
+> + * @only_shared: If true then protected mappings should not be unmapped
+>    *
+>    * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
+>    * be called while holding mmu_lock (unless for freeing the stage2 pgd before
+> @@ -330,7 +331,7 @@ static void invalidate_icache_guest_page(void *va, size_t size)
+>    * with things behind our backs.
+>    */
+>   static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size,
+> -				 bool may_block)
+> +				 bool may_block, bool only_shared)
+>   {
+>   	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+>   	phys_addr_t end = start + size;
+> @@ -344,7 +345,7 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
+>   void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
+>   			    u64 size, bool may_block)
+>   {
+> -	__unmap_stage2_range(mmu, start, size, may_block);
+> +	__unmap_stage2_range(mmu, start, size, may_block, false);
+>   }
+>   
+>   void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
+> @@ -1975,7 +1976,8 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>   
+>   	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+>   			     (range->end - range->start) << PAGE_SHIFT,
+> -			     range->may_block);
+> +			     range->may_block,
+> +			     !(range->attr_filter & KVM_FILTER_PRIVATE));
+>   
+>   	kvm_nested_s2_unmap(kvm, range->may_block);
+>   	return false;
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index 1239eb07aca6..33eb793d8bdb 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -87,6 +87,51 @@ static int get_start_level(struct realm *realm)
+>   	return 4 - ((realm->ia_bits - 8) / (RMM_PAGE_SHIFT - 3));
+>   }
+>   
 
->
->
-> > Any guest_memfd range updates will result in invalidations/updates of
-> > userspace, guest, IOMMU or any other page tables referring to
-> > guest_memfd backed pfns. This story will become clearer once the
-> > support for PFN range allocator for backing guest_memfd starts getting
-> > discussed.
-> Ok. It is indeed unclear right now to support such kind of memory.
->
-> Up to now, we don't anticipate TDX will allow any mapping of VM_PFNMAP me=
-mory
-> into private EPT until TDX connect.
+> +
+> +static phys_addr_t alloc_delegated_granule(struct kvm_mmu_memory_cache *mc)
+> +{
+> +	phys_addr_t phys;
+> +	void *virt;
+> +
+> +	if (mc)
+> +		virt = kvm_mmu_memory_cache_alloc(mc);
+> +	else
+> +		virt = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
+> +
+> +	if (!virt)
+> +		return PHYS_ADDR_MAX;
+> +
+> +	phys = virt_to_phys(virt);
+> +
+> +	if (rmi_granule_delegate(phys)) {
+> +		free_page((unsigned long)virt);
+> +
+> +		return PHYS_ADDR_MAX;
+> +	}
+> +
 
-There is a plan to use VM_PFNMAP memory for all of guest_memfd
-shared/private ranges orthogonal to TDX connect usecase. With TDX
-connect/Sev TIO, major difference would be that guest_memfd private
-ranges will be mapped into IOMMU page tables.
 
-Irrespective of whether/when VM_PFNMAP memory support lands, there
-have been discussions on not using page structs for private memory
-ranges altogether [1] even with hugetlb allocator, which will simplify
-seamless merge/split story for private hugepages to support memory
-conversion. So I think the general direction we should head towards is
-not relying on refcounts for guest_memfd private ranges and/or page
-structs altogether.
+> +	kvm_account_pgtable_pages(virt, 1);
 
-I think the series [2] to work better with PFNMAP'd physical memory in
-KVM is in the very right direction of not assuming page struct backed
-memory ranges for guest_memfd as well.
+Could we delay this to the place where we actually use it ? Otherwise
+we may get the accounting wrong, if e.g, free it using
+free_delegated_granule() ? Also, the name doesn't suggest that
+we are allocating an rtt (though it accepts a memory_cache for rtts).
 
-[1] https://lore.kernel.org/all/CAGtprH8akKUF=3D8+RkX_QMjp35C0bU1zxGi4v1Zm5=
-AWCw=3D8V8AQ@mail.gmail.com/
-[2] https://lore.kernel.org/linux-arm-kernel/20241010182427.1434605-1-seanj=
-c@google.com/
 
-> And even in that scenario, the memory is only for private MMIO, so the ba=
-ckend
-> driver is VFIO pci driver rather than guest_memfd.
+> +
+> +	return phys;
+> +}
+> +
+>   static void free_delegated_granule(phys_addr_t phys)
+>   {
+>   	if (WARN_ON(rmi_granule_undelegate(phys))) {
+> @@ -99,6 +144,154 @@ static void free_delegated_granule(phys_addr_t phys)
+>   	free_page((unsigned long)phys_to_virt(phys));
+>   }
+>   
+> +static int realm_rtt_create(struct realm *realm,
+> +			    unsigned long addr,
+> +			    int level,
+> +			    phys_addr_t phys)
+> +{
+> +	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
+> +	return rmi_rtt_create(virt_to_phys(realm->rd), phys, addr, level);
+> +}
+> +
+> +static int realm_rtt_fold(struct realm *realm,
+> +			  unsigned long addr,
+> +			  int level,
+> +			  phys_addr_t *rtt_granule)
+> +{
+> +	unsigned long out_rtt;
+> +	int ret;
+> +
+> +	ret = rmi_rtt_fold(virt_to_phys(realm->rd), addr, level, &out_rtt);
 
-Not necessary. As I mentioned above guest_memfd ranges will be backed
-by VM_PFNMAP memory.
+minor nit: Should we align "addr" to level - 1, similar to what we do
+for rtt_create, just to be consistent and safer ?
 
->
->
-> > [1] https://elixir.bootlin.com/linux/v6.14.5/source/mm/memory.c#L6543
+> +
+> +	if (RMI_RETURN_STATUS(ret) == RMI_SUCCESS && rtt_granule)
+> +		*rtt_granule = out_rtt;
+> +
+> +	return ret;
+> +}
+> +
+> +static int realm_destroy_private_granule(struct realm *realm,
+> +					 unsigned long ipa,
+> +					 unsigned long *next_addr,
+> +					 phys_addr_t *out_rtt)
+> +{
+> +	unsigned long rd = virt_to_phys(realm->rd);
+> +	unsigned long rtt_addr;
+> +	phys_addr_t rtt;
+> +	int ret;
+> +
+> +retry:
+> +	ret = rmi_data_destroy(rd, ipa, &rtt_addr, next_addr);
+> +	if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+> +		if (*next_addr > ipa)
+> +			return 0; /* UNASSIGNED */
+> +		rtt = alloc_delegated_granule(NULL);
+> +		if (WARN_ON(rtt == PHYS_ADDR_MAX))
+> +			return -ENOMEM;
+> +		/*
+> +		 * ASSIGNED - ipa is mapped as a block, so split. The index
+> +		 * from the return code should be 2 otherwise it appears
+> +		 * there's a huge page bigger than KVM currently supports
+> +		 */
+> +		WARN_ON(RMI_RETURN_INDEX(ret) != 2);
+> +		ret = realm_rtt_create(realm, ipa, 3, rtt);
+> +		if (WARN_ON(ret)) {
+
+Can we race with another thread ? If so, we may need to do an rtt read
+to confirm if we are safe to retry and ignore the failure.
+
+> +			free_delegated_granule(rtt);
+> +			return -ENXIO;
+> +		}
+> +		goto retry;
+> +	} else if (WARN_ON(ret)) {
+
+minor nit: I am wondering, if we should add a new wrapper for warn_on, 
+which also dumps the RTT entry and the operation that caused the WARNING 
+? Might be useful to debug and pin point issues. We have several cases
+where this might be used.
+
+> +		return -ENXIO;
+> +	}
+> +
+> +	ret = rmi_granule_undelegate(rtt_addr);
+> +	if (WARN_ON(ret))
+> +		return -ENXIO;
+> +
+> +	*out_rtt = rtt_addr;
+> +
+> +	return 0;
+> +}
+> +
+> +static int realm_unmap_private_page(struct realm *realm,
+> +				    unsigned long ipa,
+> +				    unsigned long *next_addr)
+> +{
+> +	unsigned long end = ALIGN(ipa + 1, PAGE_SIZE);
+> +	unsigned long addr;
+> +	phys_addr_t out_rtt = PHYS_ADDR_MAX;
+> +	int ret;
+> +
+> +	for (addr = ipa; addr < end; addr = *next_addr) {
+> +		ret = realm_destroy_private_granule(realm, addr, next_addr,
+> +						    &out_rtt);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	if (out_rtt != PHYS_ADDR_MAX)
+> +		free_page((unsigned long)phys_to_virt(out_rtt));
+
+nit: If this non-4K host, then, we may want to ALIGN_DOWN(out_rtt, 
+PAGE_SIZE) ?
+
+> +
+> +	return 0;
+> +}
+> +
+> +static void realm_unmap_shared_range(struct kvm *kvm,
+> +				     int level,
+> +				     unsigned long start,
+> +				     unsigned long end)
+> +{
+> +	struct realm *realm = &kvm->arch.realm;
+> +	unsigned long rd = virt_to_phys(realm->rd);
+> +	ssize_t map_size = rme_rtt_level_mapsize(level);
+> +	unsigned long next_addr, addr;
+> +	unsigned long shared_bit = BIT(realm->ia_bits - 1);
+> +
+> +	if (WARN_ON(level > RMM_RTT_MAX_LEVEL))
+> +		return;
+> +
+> +	start |= shared_bit;
+> +	end |= shared_bit;
+> +
+> +	for (addr = start; addr < end; addr = next_addr) {
+> +		unsigned long align_addr = ALIGN(addr, map_size);
+> +		int ret;
+> +
+> +		next_addr = ALIGN(addr + 1, map_size);
+> +
+> +		if (align_addr != addr || next_addr > end) {
+> +			/* Need to recurse deeper */
+> +			if (addr < align_addr)
+> +				next_addr = align_addr;
+> +			realm_unmap_shared_range(kvm, level + 1, addr,
+> +						 min(next_addr, end));
+> +			continue;
+> +		}
+> +
+> +		ret = rmi_rtt_unmap_unprotected(rd, addr, level, &next_addr);
+> +		switch (RMI_RETURN_STATUS(ret)) {
+> +		case RMI_SUCCESS:
+> +			break;
+> +		case RMI_ERROR_RTT:
+> +			if (next_addr == addr) {
+> +				/*
+> +				 * There's a mapping here, but it's not a block
+> +				 * mapping, so reset next_addr to the next block
+> +				 * boundary and recurse to clear out the pages
+> +				 * one level deeper.
+> +				 */
+> +				next_addr = ALIGN(addr + 1, map_size);
+> +				realm_unmap_shared_range(kvm, level + 1, addr,
+> +							 next_addr);
+> +			}
+> +			break;
+> +		default:
+> +			WARN_ON(1);
+> +			return;
+> +		}
+> +
+> +		cond_resched_rwlock_write(&kvm->mmu_lock);
+> +	}
+> +}
+> +
+>   /* Calculate the number of s2 root rtts needed */
+>   static int realm_num_root_rtts(struct realm *realm)
+>   {
+> @@ -209,6 +402,40 @@ static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
+>   	return ret;
+>   }
+>   
+> +static int realm_create_rtt_levels(struct realm *realm,
+> +				   unsigned long ipa,
+> +				   int level,
+> +				   int max_level,
+> +				   struct kvm_mmu_memory_cache *mc)
+> +{
+> +	if (level == max_level)
+> +		return 0;
+> +
+> +	while (level++ < max_level) {
+> +		phys_addr_t rtt = alloc_delegated_granule(mc);
+> +		int ret;
+> +
+> +		if (rtt == PHYS_ADDR_MAX)
+> +			return -ENOMEM;
+> +
+> +		ret = realm_rtt_create(realm, ipa, level, rtt);
+> +
+> +		if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT &&
+> +		    RMI_RETURN_INDEX(ret) == level) {
+
+For the record, as Aneesh pointed out offline, this must be level - 1,
+as rtt_create only walks to level - 1.
+
+> +			/* The RTT already exists, continue */
+> +			continue;
+> +		}
+> +		if (ret) {
+> +			WARN(1, "Failed to create RTT at level %d: %d\n",
+> +			     level, ret);
+> +			free_delegated_granule(rtt);
+> +			return -ENXIO;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>   static int realm_tear_down_rtt_level(struct realm *realm, int level,
+>   				     unsigned long start, unsigned long end)
+>   {
+> @@ -299,6 +526,61 @@ static int realm_tear_down_rtt_range(struct realm *realm,
+>   					 start, end);
+>   }
+>   
+> +/*
+> + * Returns 0 on successful fold, a negative value on error, a positive value if
+> + * we were not able to fold all tables at this level.
+> + */
+> +static int realm_fold_rtt_level(struct realm *realm, int level,
+> +				unsigned long start, unsigned long end)
+> +{
+> +	int not_folded = 0;
+> +	ssize_t map_size;
+> +	unsigned long addr, next_addr;
+> +
+> +	if (WARN_ON(level > RMM_RTT_MAX_LEVEL))
+> +		return -EINVAL;
+> +
+> +	map_size = rme_rtt_level_mapsize(level - 1);
+> +
+> +	for (addr = start; addr < end; addr = next_addr) {
+> +		phys_addr_t rtt_granule;
+> +		int ret;
+> +		unsigned long align_addr = ALIGN(addr, map_size);
+> +
+> +		next_addr = ALIGN(addr + 1, map_size);
+> +
+> +		ret = realm_rtt_fold(realm, align_addr, level, &rtt_granule);
+> +
+> +		switch (RMI_RETURN_STATUS(ret)) {
+> +		case RMI_SUCCESS:
+> +			free_delegated_granule(rtt_granule);
+> +			break;
+> +		case RMI_ERROR_RTT:
+> +			if (level == RMM_RTT_MAX_LEVEL ||
+> +			    RMI_RETURN_INDEX(ret) < level) {
+> +				not_folded++;
+> +				break;
+> +			}
+> +			/* Recurse a level deeper */
+> +			ret = realm_fold_rtt_level(realm,
+> +						   level + 1,
+> +						   addr,
+> +						   next_addr);
+> +			if (ret < 0)
+> +				return ret;
+> +			else if (ret == 0)
+> +				/* Try again at this level */
+> +				next_addr = addr;
+> +			break;
+> +		default:
+> +			WARN_ON(1);
+> +			return -ENXIO;
+> +		}
+> +	}
+> +
+> +	return not_folded;
+> +}
+> +
+>   void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits)
+>   {
+>   	struct realm *realm = &kvm->arch.realm;
+> @@ -306,6 +588,96 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits)
+>   	WARN_ON(realm_tear_down_rtt_range(realm, 0, (1UL << ia_bits)));
+>   }
+>   
+> +static void realm_unmap_private_range(struct kvm *kvm,
+> +				      unsigned long start,
+> +				      unsigned long end)
+> +{
+> +	struct realm *realm = &kvm->arch.realm;
+> +	unsigned long next_addr, addr;
+> +	int ret;
+> +
+> +	for (addr = start; addr < end; addr = next_addr) {
+> +		ret = realm_unmap_private_page(realm, addr, &next_addr);
+> +
+> +		if (ret)
+> +			break;
+
+Do we need yielding CPU here, similar to the shared case ? It may be 
+difficult (not impossible) to define a check point to do that.
+
+
+> +	}
+> +
+> +	realm_fold_rtt_level(realm, get_start_level(realm) + 1,
+> +			     start, end);
+
+We don't seem to be reclaiing the RTTs from shared mapping case ?
+
+> +}
+> +
+> +void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
+> +			   unsigned long size, bool unmap_private)
+> +{
+> +	unsigned long end = start + size;
+> +	struct realm *realm = &kvm->arch.realm;
+> +
+> +	end = min(BIT(realm->ia_bits - 1), end);
+> +
+> +	if (realm->state == REALM_STATE_NONE)
+> +		return;
+> +
+> +	realm_unmap_shared_range(kvm, find_map_level(realm, start, end),
+> +				 start, end);
+> +	if (unmap_private)
+> +		realm_unmap_private_range(kvm, start, end);
+> +}
+> +
+> +static int realm_init_ipa_state(struct realm *realm,
+> +				unsigned long ipa,
+> +				unsigned long end)
+> +{
+> +	phys_addr_t rd_phys = virt_to_phys(realm->rd);
+> +	int ret;
+> +
+> +	while (ipa < end) {
+> +		unsigned long next;
+> +
+> +		ret = rmi_rtt_init_ripas(rd_phys, ipa, end, &next);
+> +
+> +		if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+> +			int err_level = RMI_RETURN_INDEX(ret);
+> +			int level = find_map_level(realm, ipa, end);
+> +
+> +			if (WARN_ON(err_level >= level))
+
+I am wondering if WARN_ON() is required here. A buggy VMM could trigger
+the WARN_ON(). (e.g, INIT_IPA after POPULATE, where L3 table is
+created.). The only case where it may be worth WARNING is if the level == 3.
+
+Suzuki
+
+
+
+> +				return -ENXIO;
+> +
+> +			ret = realm_create_rtt_levels(realm, ipa,
+> +						      err_level,
+> +						      level, NULL);
+> +			if (ret)
+> +				return ret;
+> +			/* Retry with the RTT levels in place */
+> +			continue;
+> +		} else if (WARN_ON(ret)) {
+> +			return -ENXIO;
+> +		}
+> +
+> +		ipa = next;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int kvm_init_ipa_range_realm(struct kvm *kvm,
+> +				    struct arm_rme_init_ripas *args)
+> +{
+> +	gpa_t addr, end;
+> +	struct realm *realm = &kvm->arch.realm;
+> +
+> +	addr = args->base;
+> +	end = addr + args->size;
+> +
+> +	if (end < addr)
+> +		return -EINVAL;
+> +
+> +	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
+> +		return -EPERM;
+> +
+> +	return realm_init_ipa_state(realm, addr, end);
+> +}
+> +
+>   /* Protects access to rme_vmid_bitmap */
+>   static DEFINE_SPINLOCK(rme_vmid_lock);
+>   static unsigned long *rme_vmid_bitmap;
+> @@ -431,6 +803,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>   	case KVM_CAP_ARM_RME_CREATE_REALM:
+>   		r = kvm_create_realm(kvm);
+>   		break;
+> +	case KVM_CAP_ARM_RME_INIT_RIPAS_REALM: {
+> +		struct arm_rme_init_ripas args;
+> +		void __user *argp = u64_to_user_ptr(cap->args[1]);
+> +
+> +		if (copy_from_user(&args, argp, sizeof(args))) {
+> +			r = -EFAULT;
+> +			break;
+> +		}
+> +
+> +		r = kvm_init_ipa_range_realm(kvm, &args);
+> +		break;
+> +	}
+>   	default:
+>   		r = -EINVAL;
+>   		break;
+
 
