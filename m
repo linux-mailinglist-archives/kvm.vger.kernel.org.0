@@ -1,137 +1,213 @@
-Return-Path: <kvm+bounces-45571-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45572-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B90FAABF5A
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 11:26:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 365E8AABF8E
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 11:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACBC01B6548C
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 09:25:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E8181C21804
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 09:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC94266EEC;
-	Tue,  6 May 2025 09:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96DD267389;
+	Tue,  6 May 2025 09:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="jTqIdkp6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Uz65PTqt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6763233136
-	for <kvm@vger.kernel.org>; Tue,  6 May 2025 09:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CE81E1DE2;
+	Tue,  6 May 2025 09:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746523478; cv=none; b=hLhi8f8tg6G2fvG40JH16mnDE+UKjgRL+lPz5fRq7lY2L8pOvJMaceC020KMC+b/k1yzt9MtQ6rkt5P2fpCN2YtuMPqaAs5WsnYlHhvILd+2d4SzE3Nw2c1fnNLqAidAOrTHWVyf3kadGbHW6reroR0y4sdpyFnRbLYqfQjIqQM=
+	t=1746523959; cv=none; b=IKdOJqKVFaY/GWNdfr29dFrlnv91/HP1dn2k+7jVt15OpLfyFrHG/naE8oJIJsUj94PqJ63Pcfpw2Cvk/vlix3YnP4kKaW1s6/oLoS7DZ7kf48fYLNjjvx2VXUgTmkN3D9vkSx/MSYXZwNNAs8YHwVVO8KPOUR4j9pw3FLUBtGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746523478; c=relaxed/simple;
-	bh=2t2VKBmII81tNpczrynIzE6p9Fd1SV59q4ZmxbtvEpY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=PLMKqgpBOUhCSycf1YWWlob2mqdOPlU050YvQa6wbGTA23PNGIcRNEqtibQCYnyYHq25OrGUW3rxPM5L9eCTFWVYJJVJ9egdFWw2gMfBf2t3MeWokdgVtoiNTIjVRlwz/TjvKn8ffHO2ZrNoIWWYjgdpEZLwH7sl2dxH5c8QGDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=jTqIdkp6; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43cf89f81c5so5393145e9.2
-        for <kvm@vger.kernel.org>; Tue, 06 May 2025 02:24:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1746523475; x=1747128275; darn=vger.kernel.org;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mtrK30WSclX8+CsTIEESOGs2XijMelv6Z+mtcK6WgL8=;
-        b=jTqIdkp63McyCtFJbzaxKFT1Cq1Fp94Xr1soPQmsJ1VZxuiQj9IUQQg5oovEx++LWO
-         t0YXZrAREdJX928dz3XRpiAgmrJukwV6MHxKw4IFvs6OYlLl2WnAapasu6vkg4GwtqGk
-         5keOFlXAQJS5fSLRmUER8ddvygvPWdagIVRSQ8okuFL/Hu2m7uXLEFkn2YzU7IIinAPx
-         JM4wNk8yPqgecHsIH0KGRvN1ggiq3PZyydjMRCT/L0QsQaohW0jISRp/jbs+aHST/OzA
-         O21KZJqeXD8kBiJ6VS/Hdn3Ct/C170o9t5g8A19z5JNCT4subcXxkDULkkUuSv1DgSV1
-         klnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746523475; x=1747128275;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mtrK30WSclX8+CsTIEESOGs2XijMelv6Z+mtcK6WgL8=;
-        b=V4Q6vYiz88LpzJ/lw3WsALznNVswLglvKwmjG7YyVM8C5M5jWmAps1IEgzP9QyLxyJ
-         zP/CkAZ2CTDUzbdFzVr+f6U2Qp+AEIFQaWVeXlLbLxgknplmKFthHXzmYIG5YQB+KJlF
-         yf7dtwypNx70+gvwqkwxfp3tb52TL7QL3QC8O8tONLZaSFE+t/oWRotzpvKU2bqMUVvA
-         t7w0nK+T2M5LyqDUCPLd2cZuDNnosm6mS5B9/Pbn83baWgfBu1OBp2ngukLGic+jWxNF
-         a2ktrEI7IxtMrWywaDf5q3TwITR5fOeJOhZJuhcvYJdyOIveAyT+8qmYLnBO1oo4rAiB
-         dSTQ==
-X-Gm-Message-State: AOJu0YxtJYCui/b6d/eRoj0XEFeiLFvDeAWmuhCa5B0u1WbAeA7s8XHe
-	AtNoUJSLZxOWSu2HJ1lMZhsYscs1qy21lBeRyBaJ1GcxpQgQKQiaqcy0AX8NnNw=
-X-Gm-Gg: ASbGncsk4dZ41oNUaRa//Ah4L2y17vjmohLTLPcwdKey5dPvd7Yu/Au2SG9461hO7rm
-	rt0MrrtQqmMbflN6fS0ydkyfp9/Oj9r8oz1KfRBDlm7EbJkXTFl3F29D6kuQnpPq881/uVV0NgB
-	MZI9qTrVFEdrlHXePu4cuffjRwBWsULLnUX6b3WvLvyRh5Aa6aSk0PNtDudEzkmMUlEYmLANbmF
-	FIqcAJev4B4CcLsT/yiciW2m7+AUSR3RjlW0R1ILgCG7qQPbMebMavf48RGFY8aEaycgfFjss2B
-	cL7/OnBapYVN8Vs1Gpl8VsCcy0K/zoow0/9407Ix4migp1Vj
-X-Google-Smtp-Source: AGHT+IHZgaRK6ml9AWyse65POBkzHsZ8Ut+BjX7oVJ10RpUOC/PC4jjz2MMApvtA5diNrjCKmwAdmg==
-X-Received: by 2002:a7b:ca59:0:b0:441:d244:1463 with SMTP id 5b1f17b1804b1-441d2441701mr2017735e9.0.1746523474923;
-        Tue, 06 May 2025 02:24:34 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200:d5f0:7802:c94b:10f6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b8992b4csm165890855e9.0.2025.05.06.02.24.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 May 2025 02:24:34 -0700 (PDT)
+	s=arc-20240116; t=1746523959; c=relaxed/simple;
+	bh=lwvJDDzJgpyzMN5j7nMzyRWTpYCN76lyhJW88Ipl7E4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hEXiTQ6Gpco/1Uy+Svit5RM/5zJmcS5Exjyhpa/jVlUBVsqyqTuLIkeFJvPPiszE0cSCCiOkSkFoVF4DE6YVQ97pQI7bgbEWaHm2d69Z4YV+67+GkPeGqA2nxkZ1nSeY4OcO32l9llVRvqBfiDLBIJndBCsn5g86gur3QYRb9k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Uz65PTqt; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746523958; x=1778059958;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lwvJDDzJgpyzMN5j7nMzyRWTpYCN76lyhJW88Ipl7E4=;
+  b=Uz65PTqt/CiwJZfFSag3Zu5M/h6Ri2DskvYsq87WOmzF7uPZzqOTYGTo
+   II+JX1BUQwKHHF4ChST+x74WNjKycKQFTuusz2yp0LxTag8k0Z2SmyZYK
+   earhNlrr9ZuXBYqF+dQonwkJWbA7n08HiDEgJZybY0syY4ekILKAaoBj/
+   gb3P4R4Xrg6Zzd5wSlgK7xzT6d/pwb1xFwWRYR4zzRKbkO2ykPhmGiaJZ
+   ECnkQKH5WhRKwA6mIGSyQ6Zsw/kkaQa/2lq6Pgv0vodaTvphrl1ZF6gLc
+   9RXXpvkq2iquV9qZr4TAvvIrVfi4oU3uSjHk/svDfmHm2e2FWPJgZErdx
+   Q==;
+X-CSE-ConnectionGUID: 3wIApTs/QBe3rY0Mf/5gOg==
+X-CSE-MsgGUID: TSiaNCvURgy/Wd+OE244TQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11424"; a="35800272"
+X-IronPort-AV: E=Sophos;i="6.15,266,1739865600"; 
+   d="scan'208";a="35800272"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 02:32:37 -0700
+X-CSE-ConnectionGUID: ezp0KobZT36Ug7UFYV0HtA==
+X-CSE-MsgGUID: Dky+NdxbTnivGhJzBRu53g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,266,1739865600"; 
+   d="scan'208";a="135446779"
+Received: from spr.sh.intel.com ([10.239.53.19])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 02:32:30 -0700
+From: Chao Gao <chao.gao@intel.com>
+To: x86@kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	tglx@linutronix.de,
+	dave.hansen@intel.com,
+	seanjc@google.com,
+	pbonzini@redhat.com
+Cc: peterz@infradead.org,
+	rick.p.edgecombe@intel.com,
+	weijiang.yang@intel.com,
+	john.allen@amd.com,
+	bp@alien8.de,
+	chang.seok.bae@intel.com,
+	xin3.li@intel.com,
+	Chao Gao <chao.gao@intel.com>,
+	Aruna Ramakrishna <aruna.ramakrishna@oracle.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Eric Biggers <ebiggers@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Kees Cook <kees@kernel.org>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Mitchell Levy <levymitchell0@gmail.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	Oleg Nesterov <oleg@redhat.com>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	Sohil Mehta <sohil.mehta@intel.com>,
+	Stanislav Spassov <stanspas@amazon.de>,
+	Uros Bizjak <ubizjak@gmail.com>,
+	Vignesh Balasubramanian <vigbalas@amd.com>,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [PATCH v6 0/7] Introduce CET supervisor state support
+Date: Tue,  6 May 2025 17:36:05 +0800
+Message-ID: <20250506093740.2864458-1-chao.gao@intel.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 06 May 2025 11:24:33 +0200
-Message-Id: <D9OYWFEXSA55.OUUXFPIGGBZV@ventanamicro.com>
-Subject: Re: [PATCH 0/5] Enable hstateen bits lazily for the KVM RISC-V
- Guests
-Cc: <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
- <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
- "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
-To: "Atish Patra" <atishp@rivosinc.com>, "Anup Patel" <anup@brainfault.org>,
- "Atish Patra" <atishp@atishpatra.org>, "Paul Walmsley"
- <paul.walmsley@sifive.com>, "Palmer Dabbelt" <palmer@dabbelt.com>,
- "Alexandre Ghiti" <alex@ghiti.fr>
-From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
-References: <20250505-kvm_lazy_enable_stateen-v1-0-3bfc4008373c@rivosinc.com>
-In-Reply-To: <20250505-kvm_lazy_enable_stateen-v1-0-3bfc4008373c@rivosinc.com>
+Content-Transfer-Encoding: 8bit
 
-2025-05-05T14:39:25-07:00, Atish Patra <atishp@rivosinc.com>:
-> This series adds support for enabling hstateen bits lazily at runtime
-> instead of statically at bootime. The boot time enabling happens for
-> all the guests if the required extensions are present in the host and/or
-> guest. That may not be necessary if the guest never exercise that
-> feature. We can enable the hstateen bits that controls the access lazily
-> upon first access. This providers KVM more granular control of which
-> feature is enabled in the guest at runtime.
->
-> Currently, the following hstateen bits are supported to control the acces=
-s
-> from VS mode.
->
-> 1. BIT(58): IMSIC     : STOPEI and IMSIC guest interrupt file
-> 2. BIT(59): AIA       : SIPH/SIEH/STOPI
-> 3. BIT(60): AIA_ISEL  : Indirect csr access via siselect/sireg
-> 4. BIT(62): HSENVCFG  : SENVCFG access
-> 5. BIT(63): SSTATEEN0 : SSTATEEN0 access
->
-> KVM already support trap/enabling of BIT(58) and BIT(60) in order
-> to support sw version of the guest interrupt file.
+Dear maintainers and reviewers,
 
-I don't think KVM toggles the hstateen bits at runtime, because that
-would mean there is a bug even in current KVM.
+I kindly request your consideration for merging this series. The changes
+between v5 (posted one month ago) and v6 are minimal, and most of the
+patches have received Reviewed-by/Acked-by tags.
 
->                                                    This series extends
-> those to enable to correpsonding hstateen bits in PATCH1. The remaining
-> patches adds lazy enabling support of the other bits.
+Thanks Chang, Rick, Xin and Sean for their help with this series.
 
-The ISA has a peculiar design for hstateen/sstateen interaction:
+== Changelog ==
+v5->v6:
+ - Collect reviews from Chang and Rick
+ - Reset guest default size to FPU legacy size when XSAVE is not available
+   or not enabled (Chang)
+ - Drop guest default user features and size, as they will not differ from
+   host FPUs (Rick)
+ - v5: https://lore.kernel.org/kvm/20250410072605.2358393-1-chao.gao@intel.com/
 
-  For every bit in an hstateen CSR that is zero (whether read-only zero
-  or set to zero), the same bit appears as read-only zero in sstateen
-  when accessed in VS-mode.
+== Background ==
 
-This means we must clear bit 63 in hstateen and trap on sstateen
-accesses if any of the sstateen bits are not supposed to be read-only 0
-to the guest while the hypervisor wants to have them as 0.
+CET defines two register states: CET user, which includes user-mode control
+registers, and CET supervisor, which consists of shadow-stack pointers for
+privilege levels 0-2.
 
-Thanks.
+Current kernels disable shadow stacks in kernel mode, making the CET
+supervisor state unused and eliminating the need for context switching.
+
+== Problem ==
+
+To virtualize CET for guests, KVM must accurately emulate hardware
+behavior. A key challenge arises because there is no CPUID flag to indicate
+that shadow stack is supported only in user mode. Therefore, KVM cannot
+assume guests will not enable shadow stacks in kernel mode and must
+preserve the CET supervisor state of vCPUs.
+
+== Solution ==
+
+An initial proposal to manually save and restore CET supervisor states
+using raw RDMSR/WRMSR in KVM was rejected due to performance concerns and
+its impact on KVM's ABI. Instead, leveraging the kernel's FPU
+infrastructure for context switching was favored [1].
+
+The main question then became whether to enable the CET supervisor state
+globally for all processes or restrict it to vCPU processes. This decision
+involves a trade-off between a 24-byte XSTATE buffer waste for all non-vCPU
+processes and approximately 100 lines of code complexity in the kernel [2].
+The agreed approach is to first try this optimal solution [3], i.e.,
+restricting the CET supervisor state to guest FPUs only and eliminating
+unnecessary space waste.
+
+Key changes in this series are:
+
+1) Fix existing issue regarding enabling guest supervisor states support.
+2) Add default features and size for guest FPUs.
+3) Add infrastructure to support guest-only features.
+4) Add CET supervisor state as the first guest-only feature.
+
+With the series in place, guest FPUs have xstate_bv[12] == xcomp_bv[12] == 1
+and CET supervisor state is saved/reloaded when xsaves/xrstors executes on
+guest FPUs. non-guest FPUs have xstate_bv[12] == xcomp_bv[12] == 0, then
+CET supervisor state is not saved/restored.
+
+== Performance ==
+
+We measured context-switching performance with the benchmark [4] in following
+three cases.
+
+case 1: the baseline. i.e., this series isn't applied
+case 2: baseline + this series. CET-S space is allocated for guest fpu only.
+case 3: baseline + allocate CET-S space for all tasks. Hardware init
+        optimization avoids writing out CET-S space on each XSAVES.
+
+The performance differences in the three cases are very small and fall within the
+run-to-run variation.
+
+[1]: https://lore.kernel.org/kvm/ZM1jV3UPL0AMpVDI@google.com/
+[2]: https://lore.kernel.org/kvm/1c2fd06e-2e97-4724-80ab-8695aa4334e7@intel.com/
+[3]: https://lore.kernel.org/kvm/2597a87b-1248-b8ce-ce60-94074bc67ea4@intel.com/
+[4]: https://github.com/antonblanchard/will-it-scale/blob/master/tests/context_switch1.c
+
+Chao Gao (4):
+  x86/fpu: Drop @perm from guest pseudo FPU container
+  x86/fpu/xstate: Differentiate default features for host and guest FPUs
+  x86/fpu: Initialize guest FPU permissions from guest defaults
+  x86/fpu: Initialize guest fpstate and FPU pseudo container from guest
+    defaults
+
+Sean Christopherson (1):
+  x86/fpu/xstate: Always preserve non-user xfeatures/flags in
+    __state_perm
+
+Yang Weijiang (2):
+  x86/fpu/xstate: Introduce "guest-only" supervisor xfeature set
+  x86/fpu/xstate: Add CET supervisor xfeature support as a guest-only
+    feature
+
+ arch/x86/include/asm/fpu/types.h  | 64 +++++++++++++++++++++++--------
+ arch/x86/include/asm/fpu/xstate.h |  9 +++--
+ arch/x86/kernel/fpu/core.c        | 46 +++++++++++++++-------
+ arch/x86/kernel/fpu/init.c        |  1 +
+ arch/x86/kernel/fpu/xstate.c      | 58 +++++++++++++++++++++-------
+ arch/x86/kernel/fpu/xstate.h      |  5 +++
+ 6 files changed, 137 insertions(+), 46 deletions(-)
+
+
+base-commit: 960bc2bcba5987a82530b9756e1f602a894cffa4
+-- 
+2.47.1
+
 
