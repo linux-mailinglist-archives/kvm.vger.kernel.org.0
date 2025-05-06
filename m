@@ -1,120 +1,594 @@
-Return-Path: <kvm+bounces-45561-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45562-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B79E1AABC47
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 10:00:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 657D6AABC82
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 10:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BD5C3B7398
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 07:48:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAD42172BAF
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 08:05:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E35238C20;
-	Tue,  6 May 2025 07:31:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZAQ3QZ5j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815B01EBFE0;
+	Tue,  6 May 2025 08:05:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71EB2343B6;
-	Tue,  6 May 2025 07:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F866CA6B;
+	Tue,  6 May 2025 08:05:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746516685; cv=none; b=hsMwDzSdVho2Ti3aM/xfcPJB7lHkEwpv/B/vwkGw+JbrMbz06C+yNtYhG+yUMVWkBPM4h/TcLtFl7hQN+nmFEpOHVBE+gyQ1QiQAwA9PQMAXR7d/IhwtazByyNrhvHESegMJXo6fmTaysUyYzxa9jFJorxqFg/bH6fgEG8+y+Y0=
+	t=1746518731; cv=none; b=rimSgmMgvXGfuKEB4Ydtxiu9BCQCHKTr/Ik/L3kQW7BFOZyoSBe+oZARbeGTc4cyEuJEch5j41ztv2LkvbfERvJKdsYIllMf8KvTEA0yz4arisbwknY1P7VPc5LieX0kZNxrduXcbyFVOKD5csswMtwXbZC6NLUWCgVxKV7SiD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746516685; c=relaxed/simple;
-	bh=3MFMFKTpvoycC4ErDW1aAMLFvTj2p3AIoaoGRL7FFac=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pUOoTTaGzJOYDECGqrzkBkHRA6TqnIkt4KD94qwVG0xVXnusg7mXV2zHUg6SRGrz/1ZyOzbWwNaZYz8+WRLGx6nQHYJHhmlzVM628DwDuu9n30Gzg7l8Z3avdsWm25aE7L9lMhiYtWfhIuEW5ltFIqFskRzAMYGUf+jUsDYRzcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZAQ3QZ5j; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Z8bIiaqqf7hK7/LPXDmXMUql27tUrzUQtZi3jDCElZo=; b=ZAQ3QZ5jU3LWyd0UL7/q0AH62B
-	yZaJIXX/DgwzpsI8b9NwdokYhsZ8Ly8OQpjk+a/s1HQbmkvEvLsK2vOVvOXTKFqyra3a+4lvCv1CY
-	ehYo1Nl6V78j9hLsYMGyg1WFyCWpNQUDPX1u/jHCoESzT588Lar1tofhIGs2njEtcDUHtmxuJS0q8
-	avVa8DOFPXMfYV3Wfx+4Um2bKtS5IjQhKCKLjEHVhYi45Dn92s2+1uUzEe+LBbW7OIvZuK7URhUxL
-	WnKFYk0UP/blwhHeFDjvVJpGqk7gWf3/OYs3z1GU6kVHYRoTjMHujhauxCgFm0zks36lx7FNZbAp/
-	eyl1yWmw==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uCClb-00000003B9S-0Jnk;
-	Tue, 06 May 2025 07:31:03 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id C2717300321; Tue,  6 May 2025 09:31:00 +0200 (CEST)
-Date: Tue, 6 May 2025 09:31:00 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kys@microsoft.com,
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, pbonzini@redhat.com, ardb@kernel.org,
-	kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-efi@vger.kernel.org, samitolvanen@google.com,
-	ojeda@kernel.org, xin@zytor.com
-Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
- in __nocfi functions
-Message-ID: <20250506073100.GG4198@noisy.programming.kicks-ass.net>
-References: <20250430110734.392235199@infradead.org>
- <8B86A3AE-A296-438C-A7A7-F844C66D0198@zytor.com>
- <20250430190600.GQ4439@noisy.programming.kicks-ass.net>
- <20250501103038.GB4356@noisy.programming.kicks-ass.net>
- <20250501153844.GD4356@noisy.programming.kicks-ass.net>
- <aBO9uoLnxCSD0UwT@google.com>
- <20250502084007.GS4198@noisy.programming.kicks-ass.net>
- <aBUiwLV4ZY2HdRbz@google.com>
- <20250503095023.GE4198@noisy.programming.kicks-ass.net>
- <p6mkebfvhxvtqyz6mtohm2ko3nqe2zdawkgbfi6h2rfv2gxbuz@ktixvjaj44en>
+	s=arc-20240116; t=1746518731; c=relaxed/simple;
+	bh=BOJ0G3dPk7G089vRafNe2YwqOxUXPQQ7nSghUo3eQTY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=r34yZs/jPhGqEvasdG3Ko3Ds4HnMWVgvrNVo1u+vYnTX9zTjHtqusfJ9dEPKsaoCD/yl5/KIt8UbmJBG61zDNunxL2S7onQJHNIaRAIn6WGe+oeu7vzgkhrafeioLnqQIz6FEt1L8aJ/K98s129eAcXeRmgCR2n+jWZhvQx9Jr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr; spf=pass smtp.mailfrom=ghiti.fr; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ghiti.fr
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 184851FCF4;
+	Tue,  6 May 2025 08:05:22 +0000 (UTC)
+Message-ID: <35fed0e0-abfd-42a3-856d-ce7c9b696964@ghiti.fr>
+Date: Tue, 6 May 2025 10:05:22 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <p6mkebfvhxvtqyz6mtohm2ko3nqe2zdawkgbfi6h2rfv2gxbuz@ktixvjaj44en>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] riscv: Move all duplicate insn parsing macros into
+ asm/insn.h
+Content-Language: en-US
+To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>,
+ Alexandre Ghiti <alexghiti@rivosinc.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org
+References: <20250422082545.450453-1-alexghiti@rivosinc.com>
+ <20250422082545.450453-4-alexghiti@rivosinc.com>
+ <64273b62-3deb-4a1b-b97c-8a98f7d9a9d1@rivosinc.com>
+From: Alexandre Ghiti <alex@ghiti.fr>
+In-Reply-To: <64273b62-3deb-4a1b-b97c-8a98f7d9a9d1@rivosinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvkeefgeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfhfhfgjtgfgsehtkeertddtvdejnecuhfhrohhmpeetlhgvgigrnhgurhgvucfihhhithhiuceorghlvgigsehghhhithhirdhfrheqnecuggftrfgrthhtvghrnhepveffvdeileeitddtheevgfehjedtuddtudfgvdevgedthfefgeeuhfeufeevteefnecuffhomhgrihhnpehinhhfrhgruggvrggurdhorhhgnecukfhppedvtddtudemkeeiudemfeefkedvmegvfheltdemheekvgdumehfvdgsgeemjegrledvmeefvdeltdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvtddtudemkeeiudemfeefkedvmegvfheltdemheekvgdumehfvdgsgeemjegrledvmeefvdeltddphhgvlhhopeglkffrggeimedvtddtudemkeeiudemfeefkedvmegvfheltdemheekvgdumehfvdgsgeemjegrledvmeefvdeltdgnpdhmrghilhhfrhhomheprghlvgigsehghhhithhirdhfrhdpnhgspghrtghpthhtohepuddtpdhrtghpthhtoheptghlvghgvghrsehrihhvohhsihhntgdrtghomhdprhgtphhtthhopegrlhgvgihghhhithhisehrihhvohhsihhntgdrtghomhdprhgtphhtthhop
+ ehprghulhdrfigrlhhmshhlvgihsehsihhfihhvvgdrtghomhdprhgtphhtthhopehprghlmhgvrhesuggrsggsvghlthdrtghomhdprhgtphhtthhopegrnhhuphessghrrghinhhfrghulhhtrdhorhhgpdhrtghpthhtoheprghtihhshhhpsegrthhishhhphgrthhrrgdrohhrghdprhgtphhtthhopehlihhnuhigqdhrihhstghvsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: alex@ghiti.fr
 
-On Sat, May 03, 2025 at 11:28:37AM -0700, Josh Poimboeuf wrote:
-> On Sat, May 03, 2025 at 11:50:23AM +0200, Peter Zijlstra wrote:
-> > > +++ b/arch/x86/entry/entry_64_fred.S
-> > > @@ -116,7 +116,8 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
-> > >  	movq %rsp, %rdi				/* %rdi -> pt_regs */
-> > >  	call __fred_entry_from_kvm		/* Call the C entry point */
-> > >  	POP_REGS
-> > > -	ERETS
-> > > +
-> > > +	ALTERNATIVE "", __stringify(ERETS), X86_FEATURE_FRED
-> > >  1:
-> > >  	/*
-> > >  	 * Objtool doesn't understand what ERETS does, this hint tells it that
-> > > @@ -124,7 +125,7 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
-> > >  	 * isn't strictly needed, but it's the simplest form.
-> > >  	 */
-> > >  	UNWIND_HINT_RESTORE
-> > > -	pop %rbp
-> > > +	leave
-> > >  	RET
-> > 
-> > So this, while clever, might be a problem with ORC unwinding. Because
-> > now the stack is different depending on the alternative, and we can't
-> > deal with that.
-> > 
-> > Anyway, I'll go have a poke on Monday (or Tuesday if Monday turns out to
-> > be a bank holiday :-).
-> 
-> Can we just adjust the stack in the alternative?
-> 
-> 	ALTERNATIVE "add $64 %rsp", __stringify(ERETS), X86_FEATURE_FRED
+Hi Clément,
 
-Yes, that should work. But I wanted to have a poke at objtool, so it
-will properly complain about the mistake first.
+On 22/04/2025 11:36, Clément Léger wrote:
+>
+> On 22/04/2025 10:25, Alexandre Ghiti wrote:
+>> kernel/traps_misaligned.c and kvm/vcpu_insn.c define the same macros to
+>> extract information from the instructions.
+>>
+>> Let's move the definitions into asm/insn.h to avoid this duplication.
+>>
+>> Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
+>> ---
+>>   arch/riscv/include/asm/insn.h        | 164 +++++++++++++++++++++++++++
+>>   arch/riscv/kernel/elf_kexec.c        |   1 +
+>>   arch/riscv/kernel/traps_misaligned.c | 136 +---------------------
+>>   arch/riscv/kvm/vcpu_insn.c           | 127 +--------------------
+>>   4 files changed, 167 insertions(+), 261 deletions(-)
+>>
+>> diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.h
+>> index 4063ca35be9b..35f316cdd699 100644
+>> --- a/arch/riscv/include/asm/insn.h
+>> +++ b/arch/riscv/include/asm/insn.h
+>> @@ -286,9 +286,173 @@ static __always_inline bool riscv_insn_is_c_jalr(u32 code)
+>>   	       (code & RVC_INSN_J_RS1_MASK) != 0;
+>>   }
+>>   
+>> +#define INSN_MATCH_LB		0x3
+>> +#define INSN_MASK_LB		0x707f
+>> +#define INSN_MATCH_LH		0x1003
+>> +#define INSN_MASK_LH		0x707f
+>> +#define INSN_MATCH_LW		0x2003
+>> +#define INSN_MASK_LW		0x707f
+>> +#define INSN_MATCH_LD		0x3003
+>> +#define INSN_MASK_LD		0x707f
+>> +#define INSN_MATCH_LBU		0x4003
+>> +#define INSN_MASK_LBU		0x707f
+>> +#define INSN_MATCH_LHU		0x5003
+>> +#define INSN_MASK_LHU		0x707f
+>> +#define INSN_MATCH_LWU		0x6003
+>> +#define INSN_MASK_LWU		0x707f
+>> +#define INSN_MATCH_SB		0x23
+>> +#define INSN_MASK_SB		0x707f
+>> +#define INSN_MATCH_SH		0x1023
+>> +#define INSN_MASK_SH		0x707f
+>> +#define INSN_MATCH_SW		0x2023
+>> +#define INSN_MASK_SW		0x707f
+>> +#define INSN_MATCH_SD		0x3023
+>> +#define INSN_MASK_SD		0x707f
+>> +
+>> +#define INSN_MATCH_C_LD		0x6000
+>> +#define INSN_MASK_C_LD		0xe003
+>> +#define INSN_MATCH_C_SD		0xe000
+>> +#define INSN_MASK_C_SD		0xe003
+>> +#define INSN_MATCH_C_LW		0x4000
+>> +#define INSN_MASK_C_LW		0xe003
+>> +#define INSN_MATCH_C_SW		0xc000
+>> +#define INSN_MASK_C_SW		0xe003
+>> +#define INSN_MATCH_C_LDSP	0x6002
+>> +#define INSN_MASK_C_LDSP	0xe003
+>> +#define INSN_MATCH_C_SDSP	0xe002
+>> +#define INSN_MASK_C_SDSP	0xe003
+>> +#define INSN_MATCH_C_LWSP	0x4002
+>> +#define INSN_MASK_C_LWSP	0xe003
+>> +#define INSN_MATCH_C_SWSP	0xc002
+>> +#define INSN_MASK_C_SWSP	0xe003
+>> +
+>> +#define INSN_OPCODE_MASK	0x007c
+>> +#define INSN_OPCODE_SHIFT	2
+>> +#define INSN_OPCODE_SYSTEM	28
+>> +
+>> +#define INSN_MASK_WFI		0xffffffff
+>> +#define INSN_MATCH_WFI		0x10500073
+>> +
+>> +#define INSN_MASK_WRS		0xffffffff
+>> +#define INSN_MATCH_WRS		0x00d00073
+>> +
+>> +#define INSN_MATCH_CSRRW	0x1073
+>> +#define INSN_MASK_CSRRW		0x707f
+>> +#define INSN_MATCH_CSRRS	0x2073
+>> +#define INSN_MASK_CSRRS		0x707f
+>> +#define INSN_MATCH_CSRRC	0x3073
+>> +#define INSN_MASK_CSRRC		0x707f
+>> +#define INSN_MATCH_CSRRWI	0x5073
+>> +#define INSN_MASK_CSRRWI	0x707f
+>> +#define INSN_MATCH_CSRRSI	0x6073
+>> +#define INSN_MASK_CSRRSI	0x707f
+>> +#define INSN_MATCH_CSRRCI	0x7073
+>> +#define INSN_MASK_CSRRCI	0x707f
+>> +
+>> +#define INSN_MATCH_FLW			0x2007
+>> +#define INSN_MASK_FLW			0x707f
+>> +#define INSN_MATCH_FLD			0x3007
+>> +#define INSN_MASK_FLD			0x707f
+>> +#define INSN_MATCH_FLQ			0x4007
+>> +#define INSN_MASK_FLQ			0x707f
+>> +#define INSN_MATCH_FSW			0x2027
+>> +#define INSN_MASK_FSW			0x707f
+>> +#define INSN_MATCH_FSD			0x3027
+>> +#define INSN_MASK_FSD			0x707f
+>> +#define INSN_MATCH_FSQ			0x4027
+>> +#define INSN_MASK_FSQ			0x707f
+>> +
+>> +#define INSN_MATCH_C_FLD		0x2000
+>> +#define INSN_MASK_C_FLD			0xe003
+>> +#define INSN_MATCH_C_FLW		0x6000
+>> +#define INSN_MASK_C_FLW			0xe003
+>> +#define INSN_MATCH_C_FSD		0xa000
+>> +#define INSN_MASK_C_FSD			0xe003
+>> +#define INSN_MATCH_C_FSW		0xe000
+>> +#define INSN_MASK_C_FSW			0xe003
+>> +#define INSN_MATCH_C_FLDSP		0x2002
+>> +#define INSN_MASK_C_FLDSP		0xe003
+>> +#define INSN_MATCH_C_FSDSP		0xa002
+>> +#define INSN_MASK_C_FSDSP		0xe003
+>> +#define INSN_MATCH_C_FLWSP		0x6002
+>> +#define INSN_MASK_C_FLWSP		0xe003
+>> +#define INSN_MATCH_C_FSWSP		0xe002
+>> +#define INSN_MASK_C_FSWSP		0xe003
+>> +
+>> +#define INSN_16BIT_MASK		0x3
+>> +
+>> +#define INSN_IS_16BIT(insn)	(((insn) & INSN_16BIT_MASK) != INSN_16BIT_MASK)
+>> +
+>> +#define INSN_LEN(insn)		(INSN_IS_16BIT(insn) ? 2 : 4)
+>> +
+>> +#define SHIFT_RIGHT(x, y)               \
+>> +	((y) < 0 ? ((x) << -(y)) : ((x) >> (y)))
+>> +
+>> +#define REG_MASK			\
+>> +	((1 << (5 + LOG_REGBYTES)) - (1 << LOG_REGBYTES))
+>> +
+>> +#define REG_OFFSET(insn, pos)		\
+>> +	(SHIFT_RIGHT((insn), (pos) - LOG_REGBYTES) & REG_MASK)
+>> +
+>> +#define REG_PTR(insn, pos, regs)	\
+>> +	((ulong *)((ulong)(regs) + REG_OFFSET(insn, pos)))
+>> +
+>> +#define GET_RS1(insn, regs)	(*REG_PTR(insn, SH_RS1, regs))
+>> +#define GET_RS2(insn, regs)	(*REG_PTR(insn, SH_RS2, regs))
+>> +#define GET_RS1S(insn, regs)	(*REG_PTR(RVC_RS1S(insn), 0, regs))
+>> +#define GET_RS2S(insn, regs)	(*REG_PTR(RVC_RS2S(insn), 0, regs))
+>> +#define GET_RS2C(insn, regs)	(*REG_PTR(insn, SH_RS2C, regs))
+>> +#define GET_SP(regs)		(*REG_PTR(2, 0, regs))
+>> +#define SET_RD(insn, regs, val)	(*REG_PTR(insn, SH_RD, regs) = (val))
+>> +#define IMM_I(insn)		((s32)(insn) >> 20)
+>> +#define IMM_S(insn)		(((s32)(insn) >> 25 << 5) | \
+>> +				 (s32)(((insn) >> 7) & 0x1f))
+> Hi Alex,
+>
+>> +#define GET_PRECISION(insn) (((insn) >> 25) & 3)
+>> +#define GET_RM(insn) (((insn) >> 12) & 7)
+>> +#define PRECISION_S 0
+>> +#define PRECISION_D 1
+> These 4 defines seems unused.
+>
+>> +
+>> +#define SH_RD			7
+>> +#define SH_RS1			15
+>> +#define SH_RS2			20
+>> +#define SH_RS2C			2
+>> +#define MASK_RX			0x1f
+>> +
+>> +#if defined(CONFIG_64BIT)
+>> +#define LOG_REGBYTES			3
+> There is already a definition for pointer log in asm.h (RISCV_LGPTR)
+> although it's a string for !ASSEMBLY, maybe that could be reused rather
+> than duplicating that ?
+
+
+It does not work out of the box because of the string definition for 
+!ASSEMBLY, I'll keep it that way then to avoid introducing a new define 
+(I just move stuff here).
+
+
+>
+>> +#define XLEN				64
+>> +#else
+>> +#define LOG_REGBYTES			2
+>> +#define XLEN				32
+>> +#endif
+>
+>> +#define REGBYTES			(1 << LOG_REGBYTES)
+>> +#define XLEN_MINUS_16			((XLEN) - 16)
+> These 2 defines seems unused and can be removed (XLEN can be removed as
+> well)
+>
+> Thanks,
+>
+> Clément
+
+
+Thanks,
+
+Alex
+
+
+>
+>> +
+>> +#define MASK_FUNCT3			0x7000
+>> +
+>> +#define GET_FUNCT3(insn)	(((insn) >> 12) & 7)
+>> +
+>>   #define RV_IMM_SIGN(x) (-(((x) >> 31) & 1))
+>>   #define RVC_IMM_SIGN(x) (-(((x) >> 12) & 1))
+>>   #define RV_X(X, s, n) (((X) >> (s)) & ((1 << (n)) - 1))
+>> +#define RVC_LW_IMM(x)	((RV_X(x, 6, 1) << 2) | \
+>> +			 (RV_X(x, 10, 3) << 3) | \
+>> +			 (RV_X(x, 5, 1) << 6))
+>> +#define RVC_LD_IMM(x)	((RV_X(x, 10, 3) << 3) | \
+>> +			 (RV_X(x, 5, 2) << 6))
+>> +#define RVC_LWSP_IMM(x)	((RV_X(x, 4, 3) << 2) | \
+>> +			 (RV_X(x, 12, 1) << 5) | \
+>> +			 (RV_X(x, 2, 2) << 6))
+>> +#define RVC_LDSP_IMM(x)	((RV_X(x, 5, 2) << 3) | \
+>> +			 (RV_X(x, 12, 1) << 5) | \
+>> +			 (RV_X(x, 2, 3) << 6))
+>> +#define RVC_SWSP_IMM(x)	((RV_X(x, 9, 4) << 2) | \
+>> +			 (RV_X(x, 7, 2) << 6))
+>> +#define RVC_SDSP_IMM(x)	((RV_X(x, 10, 3) << 3) | \
+>> +			 (RV_X(x, 7, 3) << 6))
+>> +#define RVC_RS1S(insn)	(8 + RV_X(insn, SH_RD, 3))
+>> +#define RVC_RS2S(insn)	(8 + RV_X(insn, SH_RS2C, 3))
+>> +#define RVC_RS2(insn)	RV_X(insn, SH_RS2C, 5)
+>>   #define RV_X_mask(X, s, mask)  (((X) >> (s)) & (mask))
+>>   #define RVC_X(X, s, mask) RV_X_mask(X, s, mask)
+>>   
+>> diff --git a/arch/riscv/kernel/elf_kexec.c b/arch/riscv/kernel/elf_kexec.c
+>> index 15e6a8f3d50b..1c3b76a67356 100644
+>> --- a/arch/riscv/kernel/elf_kexec.c
+>> +++ b/arch/riscv/kernel/elf_kexec.c
+>> @@ -21,6 +21,7 @@
+>>   #include <linux/memblock.h>
+>>   #include <linux/vmalloc.h>
+>>   #include <asm/setup.h>
+>> +#include <asm/insn.h>
+>>   
+>>   int arch_kimage_file_post_load_cleanup(struct kimage *image)
+>>   {
+>> diff --git a/arch/riscv/kernel/traps_misaligned.c b/arch/riscv/kernel/traps_misaligned.c
+>> index fb2599d62752..0151f670cd46 100644
+>> --- a/arch/riscv/kernel/traps_misaligned.c
+>> +++ b/arch/riscv/kernel/traps_misaligned.c
+>> @@ -17,141 +17,7 @@
+>>   #include <asm/hwprobe.h>
+>>   #include <asm/cpufeature.h>
+>>   #include <asm/vector.h>
+>> -
+>> -#define INSN_MATCH_LB			0x3
+>> -#define INSN_MASK_LB			0x707f
+>> -#define INSN_MATCH_LH			0x1003
+>> -#define INSN_MASK_LH			0x707f
+>> -#define INSN_MATCH_LW			0x2003
+>> -#define INSN_MASK_LW			0x707f
+>> -#define INSN_MATCH_LD			0x3003
+>> -#define INSN_MASK_LD			0x707f
+>> -#define INSN_MATCH_LBU			0x4003
+>> -#define INSN_MASK_LBU			0x707f
+>> -#define INSN_MATCH_LHU			0x5003
+>> -#define INSN_MASK_LHU			0x707f
+>> -#define INSN_MATCH_LWU			0x6003
+>> -#define INSN_MASK_LWU			0x707f
+>> -#define INSN_MATCH_SB			0x23
+>> -#define INSN_MASK_SB			0x707f
+>> -#define INSN_MATCH_SH			0x1023
+>> -#define INSN_MASK_SH			0x707f
+>> -#define INSN_MATCH_SW			0x2023
+>> -#define INSN_MASK_SW			0x707f
+>> -#define INSN_MATCH_SD			0x3023
+>> -#define INSN_MASK_SD			0x707f
+>> -
+>> -#define INSN_MATCH_FLW			0x2007
+>> -#define INSN_MASK_FLW			0x707f
+>> -#define INSN_MATCH_FLD			0x3007
+>> -#define INSN_MASK_FLD			0x707f
+>> -#define INSN_MATCH_FLQ			0x4007
+>> -#define INSN_MASK_FLQ			0x707f
+>> -#define INSN_MATCH_FSW			0x2027
+>> -#define INSN_MASK_FSW			0x707f
+>> -#define INSN_MATCH_FSD			0x3027
+>> -#define INSN_MASK_FSD			0x707f
+>> -#define INSN_MATCH_FSQ			0x4027
+>> -#define INSN_MASK_FSQ			0x707f
+>> -
+>> -#define INSN_MATCH_C_LD			0x6000
+>> -#define INSN_MASK_C_LD			0xe003
+>> -#define INSN_MATCH_C_SD			0xe000
+>> -#define INSN_MASK_C_SD			0xe003
+>> -#define INSN_MATCH_C_LW			0x4000
+>> -#define INSN_MASK_C_LW			0xe003
+>> -#define INSN_MATCH_C_SW			0xc000
+>> -#define INSN_MASK_C_SW			0xe003
+>> -#define INSN_MATCH_C_LDSP		0x6002
+>> -#define INSN_MASK_C_LDSP		0xe003
+>> -#define INSN_MATCH_C_SDSP		0xe002
+>> -#define INSN_MASK_C_SDSP		0xe003
+>> -#define INSN_MATCH_C_LWSP		0x4002
+>> -#define INSN_MASK_C_LWSP		0xe003
+>> -#define INSN_MATCH_C_SWSP		0xc002
+>> -#define INSN_MASK_C_SWSP		0xe003
+>> -
+>> -#define INSN_MATCH_C_FLD		0x2000
+>> -#define INSN_MASK_C_FLD			0xe003
+>> -#define INSN_MATCH_C_FLW		0x6000
+>> -#define INSN_MASK_C_FLW			0xe003
+>> -#define INSN_MATCH_C_FSD		0xa000
+>> -#define INSN_MASK_C_FSD			0xe003
+>> -#define INSN_MATCH_C_FSW		0xe000
+>> -#define INSN_MASK_C_FSW			0xe003
+>> -#define INSN_MATCH_C_FLDSP		0x2002
+>> -#define INSN_MASK_C_FLDSP		0xe003
+>> -#define INSN_MATCH_C_FSDSP		0xa002
+>> -#define INSN_MASK_C_FSDSP		0xe003
+>> -#define INSN_MATCH_C_FLWSP		0x6002
+>> -#define INSN_MASK_C_FLWSP		0xe003
+>> -#define INSN_MATCH_C_FSWSP		0xe002
+>> -#define INSN_MASK_C_FSWSP		0xe003
+>> -
+>> -#define INSN_LEN(insn)			((((insn) & 0x3) < 0x3) ? 2 : 4)
+>> -
+>> -#if defined(CONFIG_64BIT)
+>> -#define LOG_REGBYTES			3
+>> -#define XLEN				64
+>> -#else
+>> -#define LOG_REGBYTES			2
+>> -#define XLEN				32
+>> -#endif
+>> -#define REGBYTES			(1 << LOG_REGBYTES)
+>> -#define XLEN_MINUS_16			((XLEN) - 16)
+>> -
+>> -#define SH_RD				7
+>> -#define SH_RS1				15
+>> -#define SH_RS2				20
+>> -#define SH_RS2C				2
+>> -
+>> -#define RVC_LW_IMM(x)			((RV_X(x, 6, 1) << 2) | \
+>> -					 (RV_X(x, 10, 3) << 3) | \
+>> -					 (RV_X(x, 5, 1) << 6))
+>> -#define RVC_LD_IMM(x)			((RV_X(x, 10, 3) << 3) | \
+>> -					 (RV_X(x, 5, 2) << 6))
+>> -#define RVC_LWSP_IMM(x)			((RV_X(x, 4, 3) << 2) | \
+>> -					 (RV_X(x, 12, 1) << 5) | \
+>> -					 (RV_X(x, 2, 2) << 6))
+>> -#define RVC_LDSP_IMM(x)			((RV_X(x, 5, 2) << 3) | \
+>> -					 (RV_X(x, 12, 1) << 5) | \
+>> -					 (RV_X(x, 2, 3) << 6))
+>> -#define RVC_SWSP_IMM(x)			((RV_X(x, 9, 4) << 2) | \
+>> -					 (RV_X(x, 7, 2) << 6))
+>> -#define RVC_SDSP_IMM(x)			((RV_X(x, 10, 3) << 3) | \
+>> -					 (RV_X(x, 7, 3) << 6))
+>> -#define RVC_RS1S(insn)			(8 + RV_X(insn, SH_RD, 3))
+>> -#define RVC_RS2S(insn)			(8 + RV_X(insn, SH_RS2C, 3))
+>> -#define RVC_RS2(insn)			RV_X(insn, SH_RS2C, 5)
+>> -
+>> -#define SHIFT_RIGHT(x, y)		\
+>> -	((y) < 0 ? ((x) << -(y)) : ((x) >> (y)))
+>> -
+>> -#define REG_MASK			\
+>> -	((1 << (5 + LOG_REGBYTES)) - (1 << LOG_REGBYTES))
+>> -
+>> -#define REG_OFFSET(insn, pos)		\
+>> -	(SHIFT_RIGHT((insn), (pos) - LOG_REGBYTES) & REG_MASK)
+>> -
+>> -#define REG_PTR(insn, pos, regs)	\
+>> -	(ulong *)((ulong)(regs) + REG_OFFSET(insn, pos))
+>> -
+>> -#define GET_RS1(insn, regs)		(*REG_PTR(insn, SH_RS1, regs))
+>> -#define GET_RS2(insn, regs)		(*REG_PTR(insn, SH_RS2, regs))
+>> -#define GET_RS1S(insn, regs)		(*REG_PTR(RVC_RS1S(insn), 0, regs))
+>> -#define GET_RS2S(insn, regs)		(*REG_PTR(RVC_RS2S(insn), 0, regs))
+>> -#define GET_RS2C(insn, regs)		(*REG_PTR(insn, SH_RS2C, regs))
+>> -#define GET_SP(regs)			(*REG_PTR(2, 0, regs))
+>> -#define SET_RD(insn, regs, val)		(*REG_PTR(insn, SH_RD, regs) = (val))
+>> -#define IMM_I(insn)			((s32)(insn) >> 20)
+>> -#define IMM_S(insn)			(((s32)(insn) >> 25 << 5) | \
+>> -					 (s32)(((insn) >> 7) & 0x1f))
+>> -#define MASK_FUNCT3			0x7000
+>> -
+>> -#define GET_PRECISION(insn) (((insn) >> 25) & 3)
+>> -#define GET_RM(insn) (((insn) >> 12) & 7)
+>> -#define PRECISION_S 0
+>> -#define PRECISION_D 1
+>> +#include <asm/insn.h>
+>>   
+>>   #ifdef CONFIG_FPU
+>>   
+>> diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
+>> index ba4813673f95..de1f96ea6225 100644
+>> --- a/arch/riscv/kvm/vcpu_insn.c
+>> +++ b/arch/riscv/kvm/vcpu_insn.c
+>> @@ -8,132 +8,7 @@
+>>   #include <linux/kvm_host.h>
+>>   
+>>   #include <asm/cpufeature.h>
+>> -
+>> -#define INSN_OPCODE_MASK	0x007c
+>> -#define INSN_OPCODE_SHIFT	2
+>> -#define INSN_OPCODE_SYSTEM	28
+>> -
+>> -#define INSN_MASK_WFI		0xffffffff
+>> -#define INSN_MATCH_WFI		0x10500073
+>> -
+>> -#define INSN_MASK_WRS		0xffffffff
+>> -#define INSN_MATCH_WRS		0x00d00073
+>> -
+>> -#define INSN_MATCH_CSRRW	0x1073
+>> -#define INSN_MASK_CSRRW		0x707f
+>> -#define INSN_MATCH_CSRRS	0x2073
+>> -#define INSN_MASK_CSRRS		0x707f
+>> -#define INSN_MATCH_CSRRC	0x3073
+>> -#define INSN_MASK_CSRRC		0x707f
+>> -#define INSN_MATCH_CSRRWI	0x5073
+>> -#define INSN_MASK_CSRRWI	0x707f
+>> -#define INSN_MATCH_CSRRSI	0x6073
+>> -#define INSN_MASK_CSRRSI	0x707f
+>> -#define INSN_MATCH_CSRRCI	0x7073
+>> -#define INSN_MASK_CSRRCI	0x707f
+>> -
+>> -#define INSN_MATCH_LB		0x3
+>> -#define INSN_MASK_LB		0x707f
+>> -#define INSN_MATCH_LH		0x1003
+>> -#define INSN_MASK_LH		0x707f
+>> -#define INSN_MATCH_LW		0x2003
+>> -#define INSN_MASK_LW		0x707f
+>> -#define INSN_MATCH_LD		0x3003
+>> -#define INSN_MASK_LD		0x707f
+>> -#define INSN_MATCH_LBU		0x4003
+>> -#define INSN_MASK_LBU		0x707f
+>> -#define INSN_MATCH_LHU		0x5003
+>> -#define INSN_MASK_LHU		0x707f
+>> -#define INSN_MATCH_LWU		0x6003
+>> -#define INSN_MASK_LWU		0x707f
+>> -#define INSN_MATCH_SB		0x23
+>> -#define INSN_MASK_SB		0x707f
+>> -#define INSN_MATCH_SH		0x1023
+>> -#define INSN_MASK_SH		0x707f
+>> -#define INSN_MATCH_SW		0x2023
+>> -#define INSN_MASK_SW		0x707f
+>> -#define INSN_MATCH_SD		0x3023
+>> -#define INSN_MASK_SD		0x707f
+>> -
+>> -#define INSN_MATCH_C_LD		0x6000
+>> -#define INSN_MASK_C_LD		0xe003
+>> -#define INSN_MATCH_C_SD		0xe000
+>> -#define INSN_MASK_C_SD		0xe003
+>> -#define INSN_MATCH_C_LW		0x4000
+>> -#define INSN_MASK_C_LW		0xe003
+>> -#define INSN_MATCH_C_SW		0xc000
+>> -#define INSN_MASK_C_SW		0xe003
+>> -#define INSN_MATCH_C_LDSP	0x6002
+>> -#define INSN_MASK_C_LDSP	0xe003
+>> -#define INSN_MATCH_C_SDSP	0xe002
+>> -#define INSN_MASK_C_SDSP	0xe003
+>> -#define INSN_MATCH_C_LWSP	0x4002
+>> -#define INSN_MASK_C_LWSP	0xe003
+>> -#define INSN_MATCH_C_SWSP	0xc002
+>> -#define INSN_MASK_C_SWSP	0xe003
+>> -
+>> -#define INSN_16BIT_MASK		0x3
+>> -
+>> -#define INSN_IS_16BIT(insn)	(((insn) & INSN_16BIT_MASK) != INSN_16BIT_MASK)
+>> -
+>> -#define INSN_LEN(insn)		(INSN_IS_16BIT(insn) ? 2 : 4)
+>> -
+>> -#ifdef CONFIG_64BIT
+>> -#define LOG_REGBYTES		3
+>> -#else
+>> -#define LOG_REGBYTES		2
+>> -#endif
+>> -#define REGBYTES		(1 << LOG_REGBYTES)
+>> -
+>> -#define SH_RD			7
+>> -#define SH_RS1			15
+>> -#define SH_RS2			20
+>> -#define SH_RS2C			2
+>> -#define MASK_RX			0x1f
+>> -
+>> -#define RVC_LW_IMM(x)		((RV_X(x, 6, 1) << 2) | \
+>> -				 (RV_X(x, 10, 3) << 3) | \
+>> -				 (RV_X(x, 5, 1) << 6))
+>> -#define RVC_LD_IMM(x)		((RV_X(x, 10, 3) << 3) | \
+>> -				 (RV_X(x, 5, 2) << 6))
+>> -#define RVC_LWSP_IMM(x)		((RV_X(x, 4, 3) << 2) | \
+>> -				 (RV_X(x, 12, 1) << 5) | \
+>> -				 (RV_X(x, 2, 2) << 6))
+>> -#define RVC_LDSP_IMM(x)		((RV_X(x, 5, 2) << 3) | \
+>> -				 (RV_X(x, 12, 1) << 5) | \
+>> -				 (RV_X(x, 2, 3) << 6))
+>> -#define RVC_SWSP_IMM(x)		((RV_X(x, 9, 4) << 2) | \
+>> -				 (RV_X(x, 7, 2) << 6))
+>> -#define RVC_SDSP_IMM(x)		((RV_X(x, 10, 3) << 3) | \
+>> -				 (RV_X(x, 7, 3) << 6))
+>> -#define RVC_RS1S(insn)		(8 + RV_X(insn, SH_RD, 3))
+>> -#define RVC_RS2S(insn)		(8 + RV_X(insn, SH_RS2C, 3))
+>> -#define RVC_RS2(insn)		RV_X(insn, SH_RS2C, 5)
+>> -
+>> -#define SHIFT_RIGHT(x, y)		\
+>> -	((y) < 0 ? ((x) << -(y)) : ((x) >> (y)))
+>> -
+>> -#define REG_MASK			\
+>> -	((1 << (5 + LOG_REGBYTES)) - (1 << LOG_REGBYTES))
+>> -
+>> -#define REG_OFFSET(insn, pos)		\
+>> -	(SHIFT_RIGHT((insn), (pos) - LOG_REGBYTES) & REG_MASK)
+>> -
+>> -#define REG_PTR(insn, pos, regs)	\
+>> -	((ulong *)((ulong)(regs) + REG_OFFSET(insn, pos)))
+>> -
+>> -#define GET_FUNCT3(insn)	(((insn) >> 12) & 7)
+>> -
+>> -#define GET_RS1(insn, regs)	(*REG_PTR(insn, SH_RS1, regs))
+>> -#define GET_RS2(insn, regs)	(*REG_PTR(insn, SH_RS2, regs))
+>> -#define GET_RS1S(insn, regs)	(*REG_PTR(RVC_RS1S(insn), 0, regs))
+>> -#define GET_RS2S(insn, regs)	(*REG_PTR(RVC_RS2S(insn), 0, regs))
+>> -#define GET_RS2C(insn, regs)	(*REG_PTR(insn, SH_RS2C, regs))
+>> -#define GET_SP(regs)		(*REG_PTR(2, 0, regs))
+>> -#define SET_RD(insn, regs, val)	(*REG_PTR(insn, SH_RD, regs) = (val))
+>> -#define IMM_I(insn)		((s32)(insn) >> 20)
+>> -#define IMM_S(insn)		(((s32)(insn) >> 25 << 5) | \
+>> -				 (s32)(((insn) >> 7) & 0x1f))
+>> +#include <asm/insn.h>
+>>   
+>>   struct insn_func {
+>>   	unsigned long mask;
+>
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
