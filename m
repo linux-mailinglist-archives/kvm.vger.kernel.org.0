@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-45638-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45639-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AFA4AACB5D
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:46:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B82B7AACB62
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:47:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30854505943
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:46:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17CCD1BC81DE
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B132882C0;
-	Tue,  6 May 2025 16:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7B82882D0;
+	Tue,  6 May 2025 16:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OzSBZe8N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tYfljZ1K"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04381287501;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F56287511;
 	Tue,  6 May 2025 16:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746549854; cv=none; b=DYQP7Qq/8jxRaotTdGSdUzzyv1J9ihD0dR8rJZbcwkCrmFNT0dEXCwpIJH6i8zIEjbrFdjsfuCKUVUhIFoGishrSa6y2tavBBm5KI5C1f2noo4HZZnJxu8AB6ICnE1cIaZpt8yy9kVbx1rSoFQ5ebnTAhhqMvXBhX5XVINGXFBU=
+	t=1746549854; cv=none; b=DLVLMV8szdVxjAIoqn61jT+XjxTpHQfEkbjoC3nkz4yEuxX/O5pY4NykZuzn7CkyYeutP/T8wl52SQh1PS2HmJbszFnyUtQ9pSnGBYkpvu3NUZmcNpn2ZrEo1a+ZENdyP8ju0NTuRhEKsVyW6HhT3YzPRMCaq23VQgdLu0gUyek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746549854; c=relaxed/simple;
-	bh=QlIqmV68xTmqg1xztLJcaMauQklC0Pa/jGY/+EYEyfM=;
+	bh=ceQ5h51pgohC6eDTheM4F75C9biUzOEEkPGcwL/xiRg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LJI+tXv7UcgqxzKx90/JfAlS42EmYeA7/fa33On5wrVd8AOricixE8i3PScIzAdSlDTIhQwejXipFDO8yUMrR+apt6zvbpIazHEDwGx8heLMBg11vvzjWwAwAIDEDh3Zo46G1nPAB3cILg6a0OUbl5aM0KOiWonuLVaQOerKsKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OzSBZe8N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D889BC4CEF2;
-	Tue,  6 May 2025 16:44:13 +0000 (UTC)
+	 MIME-Version; b=THgwYGn62/NXJW8jzlwEWC4nJS3GhGOd2h3FaTwX1o1uBDGo4iSF/suwAX0b7UsWfPsts3FM4jTBxoiYeWLSJKK4JWBrcqjTnChouU+fpQXFENw9/+HZsbTwdx4riAk8KpfSaJvVgNY8mPJ07cqaJ6lAD39mm33W/pqIKElufg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tYfljZ1K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1843CC4CEF1;
+	Tue,  6 May 2025 16:44:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746549853;
-	bh=QlIqmV68xTmqg1xztLJcaMauQklC0Pa/jGY/+EYEyfM=;
+	s=k20201202; t=1746549854;
+	bh=ceQ5h51pgohC6eDTheM4F75C9biUzOEEkPGcwL/xiRg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OzSBZe8NuErTBkqoyVPeIcryz0ZN7/5Xe2l9e/3FBbAvVvUB8lOrb5EUHiei295xf
-	 Wy2r/IMpLzdsKOXxLJ0uDZJxXypf4f6kjt8cvhrAXRVx3BSPB0JcOERsKLH0RSRQQF
-	 iUmOFILxTzuUzg58fab+sGkPKS+JG9YwwBJ7dlv7yatw29GUhBl835D4gBewBLBow/
-	 VtD5rMD3rEcHrZt5nZc6Iau1SUBugfI/OsA9pNCu2ACLE8Igm6jNzfeH3/366Qlp2h
-	 QgIXM0UWY3Ndzoi+wZqpydfbADcclu5mKjO5JDh5mDCFnH2jW0O48vSPBDoJVXMMJ3
-	 A5COOutt9GHLg==
+	b=tYfljZ1KHDOy8Uq0SkDvg9+cCfthb4EVLF4GeuaBmY893DuwZJl5VHs+zHbgzmIHc
+	 A8dg4w1TA0ANOg/cNucDo67gXaTmziq9qyz58y/vLdZuSDQoRmgZJZhk27RZScDv/s
+	 N6wpVWaFHY+4j+09ODnluCJ+Vy0Rx22JHyl+atJoR/GhkBVn0CKLGWaUBuOzDFAgYc
+	 S8cW7HaP2cf0VkO7VOM99T5dQl7aUDE4EwrkF67NxQCHqJcsLbg7wM40/jEeVrbgZr
+	 tO31hqkVgtrtGqBu68z0Xc6RaCiIzyYgtoJyOAEYfZB/3k3JENyGXwbzAUS2scoZ4W
+	 eaAiednFd4Swg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uCLOu-00CJkN-45;
+	id 1uCLOu-00CJkN-Bb;
 	Tue, 06 May 2025 17:44:12 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -60,9 +60,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v4 26/43] KVM: arm64: Propagate FGT masks to the nVHE hypervisor
-Date: Tue,  6 May 2025 17:43:31 +0100
-Message-Id: <20250506164348.346001-27-maz@kernel.org>
+Subject: [PATCH v4 27/43] KVM: arm64: Use computed FGT masks to setup FGT registers
+Date: Tue,  6 May 2025 17:43:32 +0100
+Message-Id: <20250506164348.346001-28-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250506164348.346001-1-maz@kernel.org>
 References: <20250506164348.346001-1-maz@kernel.org>
@@ -78,71 +78,90 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The nVHE hypervisor needs to have access to its own view of the FGT
-masks, which unfortunately results in a bit of data duplication.
+Flip the hyervisor FGT configuration over to the computed FGT
+masks.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 7 +++++++
- arch/arm64/kvm/arm.c              | 8 ++++++++
- arch/arm64/kvm/hyp/nvhe/switch.c  | 7 +++++++
- 3 files changed, 22 insertions(+)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 45 +++++++++++++++++++++----
+ 1 file changed, 38 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 95fedd27f4bb8..9e5164fad0dbc 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -621,6 +621,13 @@ extern struct fgt_masks hdfgrtr_masks;
- extern struct fgt_masks hdfgwtr_masks;
- extern struct fgt_masks hafgrtr_masks;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 925a3288bd5be..e8645375499df 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -65,12 +65,41 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+ 	}
+ }
  
-+extern struct fgt_masks kvm_nvhe_sym(hfgrtr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hfgwtr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hfgitr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hdfgrtr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hdfgwtr_masks);
-+extern struct fgt_masks kvm_nvhe_sym(hafgrtr_masks);
++#define reg_to_fgt_masks(reg)						\
++	({								\
++		struct fgt_masks *m;					\
++		switch(reg) {						\
++		case HFGRTR_EL2:					\
++			m = &hfgrtr_masks;				\
++			break;						\
++		case HFGWTR_EL2:					\
++			m = &hfgwtr_masks;				\
++			break;						\
++		case HFGITR_EL2:					\
++			m = &hfgitr_masks;				\
++			break;						\
++		case HDFGRTR_EL2:					\
++			m = &hdfgrtr_masks;				\
++			break;						\
++		case HDFGWTR_EL2:					\
++			m = &hdfgwtr_masks;				\
++			break;						\
++		case HAFGRTR_EL2:					\
++			m = &hafgrtr_masks;				\
++			break;						\
++		default:						\
++			BUILD_BUG_ON(1);				\
++		}							\
++									\
++		m;							\
++	})
 +
- struct kvm_cpu_context {
- 	struct user_pt_regs regs;	/* sp = sp_el0 */
+ #define compute_clr_set(vcpu, reg, clr, set)				\
+ 	do {								\
+-		u64 hfg;						\
+-		hfg = __vcpu_sys_reg(vcpu, reg) & ~__ ## reg ## _RES0;	\
+-		set |= hfg & __ ## reg ## _MASK; 			\
+-		clr |= ~hfg & __ ## reg ## _nMASK; 			\
++		u64 hfg = __vcpu_sys_reg(vcpu, reg);			\
++		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
++		set |= hfg & m->mask;					\
++		clr |= ~hfg & m->nmask;					\
+ 	} while(0)
  
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 68fec8c95feef..8951e8693ca7b 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2450,6 +2450,14 @@ static void kvm_hyp_init_symbols(void)
- 	kvm_nvhe_sym(__icache_flags) = __icache_flags;
- 	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
+ #define reg_to_fgt_group_id(reg)					\
+@@ -101,12 +130,14 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+ #define compute_undef_clr_set(vcpu, kvm, reg, clr, set)			\
+ 	do {								\
+ 		u64 hfg = kvm->arch.fgu[reg_to_fgt_group_id(reg)];	\
+-		set |= hfg & __ ## reg ## _MASK;			\
+-		clr |= hfg & __ ## reg ## _nMASK; 			\
++		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
++		set |= hfg & m->mask;					\
++		clr |= hfg & m->nmask;					\
+ 	} while(0)
  
-+	/* Propagate the FGT state to the the nVHE side */
-+	kvm_nvhe_sym(hfgrtr_masks)  = hfgrtr_masks;
-+	kvm_nvhe_sym(hfgwtr_masks)  = hfgwtr_masks;
-+	kvm_nvhe_sym(hfgitr_masks)  = hfgitr_masks;
-+	kvm_nvhe_sym(hdfgrtr_masks) = hdfgrtr_masks;
-+	kvm_nvhe_sym(hdfgwtr_masks) = hdfgwtr_masks;
-+	kvm_nvhe_sym(hafgrtr_masks) = hafgrtr_masks;
-+
- 	/*
- 	 * Flush entire BSS since part of its data containing init symbols is read
- 	 * while the MMU is off.
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 7d2ba6ef02618..ae55d6d87e3d2 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -33,6 +33,13 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
- DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
- 
-+struct fgt_masks hfgrtr_masks;
-+struct fgt_masks hfgwtr_masks;
-+struct fgt_masks hfgitr_masks;
-+struct fgt_masks hdfgrtr_masks;
-+struct fgt_masks hdfgwtr_masks;
-+struct fgt_masks hafgrtr_masks;
-+
- extern void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
- 
- static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
+ #define update_fgt_traps_cs(hctxt, vcpu, kvm, reg, clr, set)		\
+ 	do {								\
++		struct fgt_masks *m = reg_to_fgt_masks(reg);		\
+ 		u64 c = clr, s = set;					\
+ 		u64 val;						\
+ 									\
+@@ -116,7 +147,7 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+ 									\
+ 		compute_undef_clr_set(vcpu, kvm, reg, c, s);		\
+ 									\
+-		val = __ ## reg ## _nMASK;				\
++		val = m->nmask;						\
+ 		val |= s;						\
+ 		val &= ~c;						\
+ 		write_sysreg_s(val, SYS_ ## reg);			\
 -- 
 2.39.2
 
