@@ -1,126 +1,112 @@
-Return-Path: <kvm+bounces-45600-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45601-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2494AAC7CA
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:23:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0897AAC7D9
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68F827BF01F
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 14:21:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6D74B20374
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 14:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678F12820CD;
-	Tue,  6 May 2025 14:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D5D280319;
+	Tue,  6 May 2025 14:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="jgy4Ccfq"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HMb/HbS6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E200A15E5DC;
-	Tue,  6 May 2025 14:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5B026C3AC
+	for <kvm@vger.kernel.org>; Tue,  6 May 2025 14:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746541366; cv=none; b=RVFWkHMCs+bQEi1OCxM18agzhFXGbXW9iNtodsQp1uRoSS9fBzXn83AC05XA8iGgiu0Veydk7rYui4P4g4ApuYQy5MbHlZphocDYdsKXJZyrAPPmban7zwRFjy+Qeg4ja3h+Spg2w3sryEv375KFy1zRoOUNW9+96boDQI+ms6g=
+	t=1746541464; cv=none; b=TT1OrEYcn3Hp2R2tzQOhStUWuhHyr8AAffjD5tSknEsEK2/IU9B0HG11zav+ZpdfbPct2hzt+LpNF+lFotKRetpg1AtK/FC/S5T3JKrIRVlkdhJiJPsQYG3ZEWBETMPHMuMY13ArFz2OwYQRzKMHv+P0e7KR0mLVzgTw1tGNAgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746541366; c=relaxed/simple;
-	bh=ZAqSEbsXGwAJha8vmzmKJrQMEo1vB2z12gMphbknyXU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rAxsi8HzmUVMu3EKlskCaiOgK+lDCJd+kQDzllpMxIhSQKCGJgGevmxSOzaDL2k/QuPQW3H1qEp6bgyXfc0MY8EAONBP3m+GpE/cMu1G70v2TwOubI7QraxQgvlWyouJLa7tRkrYCN9XT7dXBi47N/gefVCQY2iYolFQQUX5OAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=jgy4Ccfq; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A843E40E01FA;
-	Tue,  6 May 2025 14:22:41 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id TiIS_12gnCY9; Tue,  6 May 2025 14:22:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1746541356; bh=5uG7iiLE/nm+bAeu3HWka2R0/ZZ5zJHcClr8b2IHgEk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jgy4Ccfq++xcOxmjJLbUEZ4rJHlPPJ3lk+Gg+us2KYdtTVsHpWovEsbtbd6k6FJVL
-	 L2YLUvFnqGSljRsgqAbdLZMJ/gwy1v7zHyAKhpne5arDBdqvr1d98vNmSrgH+F8dXK
-	 PTwBhWFO50eZXk19+yybwuS/mStjQ1i8bIVCe3o/Sw0t10ryFaa8SDR1AdMFiCzqfz
-	 /OZDK4Nyz9bX5qAUDPXCxO3vL4otM2JI400kFdZaqPAjN0qAENOCkWcG7NDbdFELZW
-	 FImdVZWxn7tH20Kjdg7z7AY4n2ZyrQhlcCgui8dpt0rs3vAtI/9b5MECEVHGhGkv2w
-	 4wWDbV3Lp5bvCuvMvC1LXxgr74X5m7KUNhrBD0injdQphPC/xoF36mdtZqEDyW9Jv4
-	 c0163OmAR/71QhQsT4DPuR7yVRSdwKIszLns49IhQLoqwgE9ZXbmsytYj+eL01iF4d
-	 c9faQlBiUVFVIp7/rwBFW9MUmVaLHiCdRKYgM3t2k2kk+uDUdolihFI+uEb1eyDAMb
-	 PMKu8EsEt49gPDOeEUMkEnIiEosaMAChnTpUnP12kXciQDos6GBgxMAlYiX+LEw8Vw
-	 Elz17G8uUtqX2FeJAvy1F/85Y0i/0P2DLpuueohINd1mxlZGb3zTHBvpcQOxdg5eSv
-	 IjnHgxFXnOj9zRZ19FxI3U48=
-Received: from zn.tnic (p579690ee.dip0.t-ipconnect.de [87.150.144.238])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3BBC040E0196;
-	Tue,  6 May 2025 14:22:31 +0000 (UTC)
-Date: Tue, 6 May 2025 16:22:30 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michael Larabel <Michael@michaellarabel.com>
-Subject: Re: [PATCH v2] KVM: SVM: Set/clear SRSO's BP_SPEC_REDUCE on 0 <=> 1
- VM count transitions
-Message-ID: <20250506142230.GFaBobJucboX7ZWnxi@fat_crate.local>
-References: <20250505180300.973137-1-seanjc@google.com>
+	s=arc-20240116; t=1746541464; c=relaxed/simple;
+	bh=at31ltFAD8TCQmNeIpNOaCYk+bc/VbIqmWjvmTX1L1c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BcOecz2y6wt2VtyrTG43tpc7GrzUpreOKHq2V15q7iCD2wh0TkwuCt5dW2/nNfCs028zWIcEOS7LfCbdQ9Nmzh2dMq45o84dwkJaURHXCKlSVn9p/LCFT845nXGms78FoO8HiBRQ9yuKOs+r4BgCL2jtLUwNC+fZhCXFc+BQNcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HMb/HbS6; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22e033a3a07so60456045ad.0
+        for <kvm@vger.kernel.org>; Tue, 06 May 2025 07:24:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1746541462; x=1747146262; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wp48SLQzCDDOEhX90luVeiVR92Yj3/LBSHBEPyNAS4c=;
+        b=HMb/HbS6Dqtq9jrWP2t4+9aL4L7irU4nmIqE5XZnC7jaeQ0eP0gjHo5OPxkapIGwiq
+         FSiXyc49nos9F1YvAg82NCbyBH2eDgwe4nuizzrXUsIYJEBK9tLW4P1/UHnKnhdwBtEN
+         NS+FOoo7EVOIi4GR4P7hFdxBipljnTYlEpEsqkyZcHdFHrNIzz71vr3xQ5qdUqIj2kCZ
+         VjQkFE+eP0krOnuSeL8JI6uAFF/Ryv8sMeoIMWUwL/QeZ15xE2rkNNtES6EWR9zkI6+r
+         MV+CQkh1BZcPUBhX1HPgkiJvc5fyW75O97Pun/iTU73Wu9G9sr8KsUpXZeLLU8NjCVwY
+         RgWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746541462; x=1747146262;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wp48SLQzCDDOEhX90luVeiVR92Yj3/LBSHBEPyNAS4c=;
+        b=DwNiGNrDW6CC77DyzW06Iunv9K6xq1kzndtCLtqMlHGmevNmX2SYEPXEdThcJdejJ7
+         E6bgzXrNuJNpHjx53jYhBy6sci5kIE5tNd8VcP2nvxhmq6fI9vATfRsfjlUnLMpZI2mq
+         9ljWpXleYlnrmC5D4ixmvuk6tsSq2MtBpuUxwNT33UV8qZ6rv/ZOo9M/jekGoS/yaZGq
+         UpIKW8OSDJimAa7Py9lOkjbtb69bhaWTLee5mteQkQHkYZA90e8JmQOtTn0tYjxMxRpY
+         hj23Kzj8HhIZ5Y5dj9cR0Qp/Rwyvso0QaYQfbXPUvaXEJa1TilO4Ava9OgK0ctx29tpx
+         DpYA==
+X-Forwarded-Encrypted: i=1; AJvYcCXt94DRLbfibdpwgAFF80XnosCa12a3M6sQAQLXeuiz7Rf4OleuwULkVTTt8fc5m2gpva8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQUQOQig8bRz9PbFQSlT39CvfC6VLeZs25rERboRn6+hF41+98
+	i1el1dItB25CJFn86u6IBrb3Zn0HSBKYeSg/nab0HNHMeq9aCbQ9/GVB+BtWxNY=
+X-Gm-Gg: ASbGnctV+FtLhfCh7xVJ8R74fAvW5ErLBp2uWoq+S8oJ7CZqaAWDeyeyg7/Oh7ixQ7a
+	tsL3QbeB1LPB5upHxxcPoeo8OBz87ni0RFHI3rnqiZS34XdLkP8dU1Vb6XHKXA0ywN6wQX/+Rni
+	3WLFGZkdIJXCGOuYve83ukskT85c6ufAmsGQmF0fzijjEsSaa4O99UhjC4pg73zJMDvxv3EMnJD
+	8iHkbS5oeLt/nibKufAclIk2Spdurpovxw7XQCGuWrN9j7yW2va2bz4lR5In6kiCtUca46bGkga
+	Og2XR+7rM0LTxdv+Vrp/G9p/KfuPkUnTtCzKzdlP55o+l7ugz0dcJFE44UsYkn14f3OcsM2dDRr
+	0Il0lHEs=
+X-Google-Smtp-Source: AGHT+IG+1RetG7RJ3eDdo4fn/r93QL0JzzajDVJf57zZrejNoeQdLPPkA/gRRtthzFbovHmaOzdEAA==
+X-Received: by 2002:a17:902:f683:b0:223:f408:c3cf with SMTP id d9443c01a7336-22e36209873mr41616515ad.21.1746541462410;
+        Tue, 06 May 2025 07:24:22 -0700 (PDT)
+Received: from [192.168.0.4] (71-212-47-143.tukw.qwest.net. [71.212.47.143])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e4537d437sm12590805ad.184.2025.05.06.07.24.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 May 2025 07:24:22 -0700 (PDT)
+Message-ID: <4249c085-8879-4e20-b2a9-5e4c0032c62e@linaro.org>
+Date: Tue, 6 May 2025 07:24:20 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250505180300.973137-1-seanjc@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 41/50] target/arm/tcg/vec_internal: use forward
+ declaration for CPUARMState
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: anjo@rev.ng, Peter Maydell <peter.maydell@linaro.org>,
+ alex.bennee@linaro.org, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-arm@nongnu.org
+References: <20250505232015.130990-1-pierrick.bouvier@linaro.org>
+ <20250505232015.130990-42-pierrick.bouvier@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20250505232015.130990-42-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, May 05, 2025 at 11:03:00AM -0700, Sean Christopherson wrote:
-> Set the magic BP_SPEC_REDUCE bit to mitigate SRSO when running VMs if and
-> only if KVM has at least one active VM.  Leaving the bit set at all times
-> unfortunately degrades performance by a wee bit more than expected.
+On 5/5/25 16:20, Pierrick Bouvier wrote:
+> Needed so this header can be included without requiring cpu.h.
 > 
-> Use a dedicated spinlock and counter instead of hooking virtualization
-> enablement, as changing the behavior of kvm.enable_virt_at_load based on
-> SRSO_BP_SPEC_REDUCE is painful, and has its own drawbacks, e.g. could
-> result in performance issues for flows that are sensitive to VM creation
-> latency.
-> 
-> Defer setting BP_SPEC_REDUCE until VMRUN is imminent to avoid impacting
-> performance on CPUs that aren't running VMs, e.g. if a setup is using
-> housekeeping CPUs.  Setting BP_SPEC_REDUCE in task context, i.e. without
-> blasting IPIs to all CPUs, also helps avoid serializing 1<=>N transitions
-> without incurring a gross amount of complexity (see the Link for details
-> on how ugly coordinating via IPIs gets).
-> 
-> Link: https://lore.kernel.org/all/aBOnzNCngyS_pQIW@google.com
-> Fixes: 8442df2b49ed ("x86/bugs: KVM: Add support for SRSO_MSR_FIX")
+> Signed-off-by: Pierrick Bouvier<pierrick.bouvier@linaro.org>
+> ---
+>   target/arm/tcg/vec_internal.h | 2 ++
+>   1 file changed, 2 insertions(+)
 
-I guess
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Cc: <stable@kernel.org>
-
-as the above is in 6.14.
-
-> Reported-by: Michael Larabel <Michael@michaellarabel.com>
-> Closes: https://www.phoronix.com/review/linux-615-amd-regression
-> Cc: Borislav Petkov <bp@alien8.de>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-LGTM, seems to work too on my machine.
-
-Tested-by: Borislav Petkov (AMD) <bp@alien8.de>
-
-Thx for sticking with this and improving it!
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+r~
 
