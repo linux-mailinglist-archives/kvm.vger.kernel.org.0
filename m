@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-45617-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45620-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70735AACB4A
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:45:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A13B3AACB46
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:44:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A99934A60AA
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:44:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6DC67AC72C
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9947286402;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D085A2857FD;
 	Tue,  6 May 2025 16:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hnnubCpb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hI34H/Oz"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B430B2853EF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35DB2853FC;
 	Tue,  6 May 2025 16:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746549849; cv=none; b=UyXZTNE0DeiKtzk08nE7G52FWZAsTmJMd/4xLeTI4MWarC/oZsI5wa32rUcCd/GoPJhJni0oOeILBgi01NBMJJbFtFqvmdxoCv2jpNs7OCjnBpjWysPUAzLpi0gABxHj/BD1GeoK7v7gLB8TbphmEqI30Xo3mk+5QqpEx5SZYVM=
+	t=1746549849; cv=none; b=Kcl9oBZZH7/HAwSbBEJReLr/LykQuMo1Xs2xPfo2GFoQVoPqNXH9vdb3xPle1hE4mzugqXy3jMWGeEhRuTLlS+kP8dYY0PfYbNXZZ7VR1jV0pjRRYElog84u050vp2z9AURxG5zeJXhS2AXv9BQAuvfETD/1wdDpSGacKfkodvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746549849; c=relaxed/simple;
-	bh=7nY2O1Ac4lZe+UD4phwzjft1fg8/7D3hGPRpx5JQGJ8=;
+	bh=DLdRGSDVjuu7YR3c64XHblWDklv45C0aSRJf6NI0fX4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HEv7v/TMesJxpdGT2jG9BADrarsCzexUOTrsG892ufUGjKaYKIHs5oya1Mwo1l3fnbGSk7CPCL6qsiUZV0CieFsCpJLSZika+hq1eIcPNO3nO3e1H1LTcYPsjyXkDGooxOJaRQBtEy9nSgx8DoYZsViRUMSPYTOCBYZNAwKTZV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hnnubCpb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D625C4CEF2;
+	 MIME-Version; b=qhZtkqjpJ0iSfBAP/TkdKydUNG47b+ecewSZw2GTM2GSmMo86cl9hUWp8yDe7bzhE2w2f3Tq1Ad4HUSvrZz1uutQAC4KyT/gMuXeMZoOec7AhR/NmK8/TqcTXOdX+qtsIviZV6RNsw13CDZhg64XmASkF+4PQh3ifPWvHjEP5tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hI34H/Oz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FD8CC4CEF6;
 	Tue,  6 May 2025 16:44:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746549849;
-	bh=7nY2O1Ac4lZe+UD4phwzjft1fg8/7D3hGPRpx5JQGJ8=;
+	bh=DLdRGSDVjuu7YR3c64XHblWDklv45C0aSRJf6NI0fX4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hnnubCpbG5bQvlD+N/T87gwcZDqSyytCKb1QcEHGwExBJ6M6u8VQ7064+zMysAIjk
-	 H8KYRyvUFUk7M+NKu+D4ZCCuRGra/n/24XRpxo+VH8bFXeEyRSWMiZqOoMCpk7jxs2
-	 5OYwYA7KetJwWbICVqO6Yg5e2l69fqSaJJsEIZFtO1++yVxTc573n2WWkhAIYl5NbM
-	 CiH4r7cF5mnI/RtLjfGP0XMk7BCVWMNu9sKOhey3gk+POmARRYeEOU9TjWufPgD6mg
-	 yIdv3VTl6+WCf194Y9jydg/bj9VTVK1KfphQ0DDz8GvwqpNGAkJbLW2VjbYZI6pFQr
-	 0qTQeB8f/28UA==
+	b=hI34H/Ozjz+y4aCAsC5QuH9H5TghVoz3ZTkJQcLV5Z8iYFmUXKhIGHaABkxqxIfzx
+	 h8UpWdaoPqfs48eeu7GXuRloPsbnMWelXgoc6HP8X6l9UBYvPHGnlDPeI/CWNaRktl
+	 zH1B3JP8ox1S9dclBMMFqjlynQ/reSXRIvq1ctwHcCKNl7m46ARTAL3cIohYPJOrbY
+	 67jRq8Q20Hwba67YqVvBPO4BIv6V3BtIEdir2GzEbGRqXnJhUypZk8VUFKVUqVl1hw
+	 gPotTaVL/FIx67G2vyOtc7fR5pLPkaTMBepQfKgcnmn35i8kAoHfVHcObKXWCAnn5V
+	 w8cEEH24bFK9Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uCLOp-00CJkN-As;
+	id 1uCLOp-00CJkN-Hw;
 	Tue, 06 May 2025 17:44:07 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -60,9 +60,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v4 06/43] arm64: sysreg: Update PMSIDR_EL1 description
-Date: Tue,  6 May 2025 17:43:11 +0100
-Message-Id: <20250506164348.346001-7-maz@kernel.org>
+Subject: [PATCH v4 07/43] arm64: sysreg: Update TRBIDR_EL1 description
+Date: Tue,  6 May 2025 17:43:12 +0100
+Message-Id: <20250506164348.346001-8-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250506164348.346001-1-maz@kernel.org>
 References: <20250506164348.346001-1-maz@kernel.org>
@@ -78,59 +78,31 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the missing SME, ALTCLK, FPF, EFT. CRR and FDS fields.
+Add the missing MPAM field.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 28 ++++++++++++++++++++++++++--
- 1 file changed, 26 insertions(+), 2 deletions(-)
+ arch/arm64/tools/sysreg | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 6c64fd7d84951..dbb96e15198aa 100644
+index dbb96e15198aa..10052d2eacdf7 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -2241,7 +2241,28 @@ Field	15:0	MINLAT
+@@ -3688,7 +3688,12 @@ Field	31:0	TRG
  EndSysreg
  
- Sysreg	PMSIDR_EL1	3	0	9	9	7
--Res0	63:25
-+Res0	63:33
-+UnsignedEnum	32	SME
-+	0b0	NI
-+	0b1	IMP
-+EndEnum
-+UnsignedEnum	31:28	ALTCLK
+ Sysreg	TRBIDR_EL1	3	0	9	11	7
+-Res0	63:12
++Res0	63:16
++UnsignedEnum	15:12	MPAM
 +	0b0000	NI
-+	0b0001	IMP
-+	0b1111	IMPDEF
++	0b0001	DEFAULT
++	0b0010	IMP
 +EndEnum
-+UnsignedEnum	27	FPF
-+	0b0	NI
-+	0b1	IMP
-+EndEnum
-+UnsignedEnum	26	EFT
-+	0b0	NI
-+	0b1	IMP
-+EndEnum
-+UnsignedEnum	25	CRR
-+	0b0	NI
-+	0b1	IMP
-+EndEnum
- Field	24	PBT
- Field	23:20	FORMAT
- Enum	19:16	COUNTSIZE
-@@ -2259,7 +2280,10 @@ Enum	11:8	INTERVAL
- 	0b0111	3072
- 	0b1000	4096
- EndEnum
--Res0	7
-+UnsignedEnum	7	FDS
-+	0b0	NI
-+	0b1	IMP
-+EndEnum
- Field	6	FnE
- Field	5	ERND
- Field	4	LDS
+ Enum	11:8	EA
+ 	0b0000	NON_DESC
+ 	0b0001	IGNORE
 -- 
 2.39.2
 
