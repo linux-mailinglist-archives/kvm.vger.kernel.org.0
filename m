@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-45621-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45623-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E312AACB49
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:45:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF186AACB50
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 18:45:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C108F1C0743B
-	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:45:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66BD452167C
+	for <lists+kvm@lfdr.de>; Tue,  6 May 2025 16:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36152286423;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CDC2286884;
 	Tue,  6 May 2025 16:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KYHMvt6B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o98+irpA"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536D52857D1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B414A2857F2;
 	Tue,  6 May 2025 16:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746549850; cv=none; b=gB0WhrCP28ZXQer7zevpWphkqL/ParobbaYY5Li6F7XGyOPrVdU0veVJ89y0KsCoZQG2eNl3TdBbdo1Ts4+5/ReRRLX+wBtmcqBrGQu9aDHxD09eV1Zphcr8a4wW5AG0PF75kXiv9COCSOmxym8WRl4Ve3uRwkEgDcgnz6UnIDU=
+	t=1746549850; cv=none; b=nCsScvfFZbjX9Xp4vWxWIGQMBjgKdDPQ1XDHgFBAOwOIWnI5Y5cXWKEpiXUn7ZSBriGBhgIsP0k3NoI4g2UjltPoml0HVtFqkPnW32qVfFkGMRfjPQo6xRd+LnFtFDmZmmnFZ0L2c8kzPIcKRRLELlzJNrBwi/ET23nK6XcAFvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746549850; c=relaxed/simple;
-	bh=uEf2t5gOcXQREn6V6Q2zzQ5+MIMo4HK4VJVsiEjb2bA=;
+	bh=Zo+rOBt1gfkl557TFrZB0C2bKrVUE2CrF0/G0BIGGeY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ODbOstIJY5BbxQoqEQS57/ehg2O1rZofUGw3UMhnZ+DKeRc38bg+cERTlXOAhfzFZzp2X2rixtNXPEncfJICN8Hr5aGETid4uuH1TBTw+KSNRgES87RWS8DaM63F0T6f51zTz0RZ8ZEdExsI/WLjlFSMc4X6e+dQ2qOHgZ2Y7Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KYHMvt6B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D69AC4CEF6;
+	 MIME-Version; b=VQa6HJexRwnujhFhT3ULhb7x+a6nuqqiJ5rBXd9DNpE9RwSpLgOTuxt5oM6RxtKmJ+jtEg0iJXXt4SBR5cF1FaHOSXb4VF+GU3GyCe3z+QaVZ3npB2wKpHVJ4QDtGKx4/0lYLUIxfQgjZbDtFxS9nc7V1vTGh7eBD7xyuguhTxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o98+irpA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D35BC4CEF0;
 	Tue,  6 May 2025 16:44:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746549850;
-	bh=uEf2t5gOcXQREn6V6Q2zzQ5+MIMo4HK4VJVsiEjb2bA=;
+	bh=Zo+rOBt1gfkl557TFrZB0C2bKrVUE2CrF0/G0BIGGeY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KYHMvt6B0ebk73Rq52mA5agfpHb7MbGlgkEfxt13dFnxow3cPO4+rIQbNdU1Ik2Op
-	 WKDJ+Z+xAMPoz+klGup9DKwY+qVvsixrMHsK4KVTPEl13C8/NGJ9/J4CNZ1wVLK05C
-	 bpyl8Ga48s5rafs+ZrRK2flv7c0nyw66Gh2W+bUEpcn7dbecQ3cHMHDWvvnRpd+1Mi
-	 f12ytD1DzUeUfBD9YhKunwL+oBi6GcW39dsURETgLrCwbz8+OONUj08S7A05A3LIma
-	 Z4qMU9Wq/Y+m9QKWWJyzAzooyrDwyCrYb5mI4iPZe7NS5Zumv0o2qJMeEXakyZQoSP
-	 BaUQ/q/iAWkDQ==
+	b=o98+irpAPgmO96RNYEhJI6fZcJPTfUaVJcrTO2Xo4DB7SVEbsDmhP8IwrFA1n56ql
+	 Ztei2TkjcRhenMtQiCyairVsZBfaI1q0i12zjMGzDpUuLYG8sHOzGZK6F64UibsYbN
+	 a0EbOW+chZFmlMNzBCXf2iykOTSn/S4o5mAtwUeRHCawT69mkq9LNgtQcKVWNpYint
+	 x8Na8fLmTTldIT1OVjGUc4Aei3iJHlc43EscyPiNYW72FFkkkBlHh51+o19GRVV6dA
+	 mlPV+XLH/a4EvUG21ZTmj4gC2aaPntH5fP5AuEpFSOI7Vn2WOiV0THu9K/FVSQy6BR
+	 epqyhQogv+jWw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uCLOq-00CJkN-1F;
+	id 1uCLOq-00CJkN-9V;
 	Tue, 06 May 2025 17:44:08 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -60,9 +60,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Ben Horgan <ben.horgan@arm.com>
-Subject: [PATCH v4 09/43] arm64: sysreg: Add registers trapped by HFG{R,W}TR2_EL2
-Date: Tue,  6 May 2025 17:43:14 +0100
-Message-Id: <20250506164348.346001-10-maz@kernel.org>
+Subject: [PATCH v4 10/43] arm64: sysreg: Add registers trapped by HDFG{R,W}TR2_EL2
+Date: Tue,  6 May 2025 17:43:15 +0100
+Message-Id: <20250506164348.346001-11-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250506164348.346001-1-maz@kernel.org>
 References: <20250506164348.346001-1-maz@kernel.org>
@@ -78,443 +78,438 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Bulk addition of all the system registers trapped by HFG{R,W}TR2_EL2.
+Bulk addition of all the system registers trapped by HDFG{R,W}TR2_EL2.
 
 The descriptions are extracted from the BSD-licenced JSON file part
 of the 2025-03 drop from ARM.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 395 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 395 insertions(+)
+ arch/arm64/include/asm/sysreg.h |  10 +
+ arch/arm64/tools/sysreg         | 343 ++++++++++++++++++++++++++++++++
+ 2 files changed, 353 insertions(+)
 
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 2639d3633073d..a943eac446938 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -497,12 +497,22 @@
+ 
+ #define __PMEV_op2(n)			((n) & 0x7)
+ #define __CNTR_CRm(n)			(0x8 | (((n) >> 3) & 0x3))
++#define SYS_PMEVCNTSVRn_EL1(n)		sys_reg(2, 0, 14, __CNTR_CRm(n), __PMEV_op2(n))
+ #define SYS_PMEVCNTRn_EL0(n)		sys_reg(3, 3, 14, __CNTR_CRm(n), __PMEV_op2(n))
+ #define __TYPER_CRm(n)			(0xc | (((n) >> 3) & 0x3))
+ #define SYS_PMEVTYPERn_EL0(n)		sys_reg(3, 3, 14, __TYPER_CRm(n), __PMEV_op2(n))
+ 
+ #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
+ 
++#define	SYS_SPMCGCRn_EL1(n)		sys_reg(2, 0, 9, 13, ((n) & 1))
++
++#define __SPMEV_op2(n)			((n) & 0x7)
++#define __SPMEV_crm(p, n)		((((p) & 7) << 1) | (((n) >> 3) & 1))
++#define SYS_SPMEVCNTRn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b000, n), __SPMEV_op2(n))
++#define	SYS_SPMEVFILT2Rn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b011, n), __SPMEV_op2(n))
++#define	SYS_SPMEVFILTRn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b010, n), __SPMEV_op2(n))
++#define	SYS_SPMEVTYPERn_EL0(n)		sys_reg(2, 3, 14, __SPMEV_crm(0b001, n), __SPMEV_op2(n))
++
+ #define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
+ #define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
+ 
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index bb92464fc9abf..dc8f3134a451f 100644
+index dc8f3134a451f..44bc4defebf56 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -2068,6 +2068,26 @@ Field	1	A
- Field	0	M
+@@ -101,6 +101,17 @@ Res0	63:32
+ Field	31:0	DTRTX
  EndSysreg
  
-+Sysreg	SCTLR_EL12      3	5	1	0	0
-+Mapping	SCTLR_EL1
++Sysreg	MDSELR_EL1	2	0	0	4	2
++Res0	63:6
++Field	5:4	BANK
++Res0	3:0
 +EndSysreg
 +
-+Sysreg	SCTLRALIAS_EL1  3	0	1	4	6
-+Mapping	SCTLR_EL1
-+EndSysreg
-+
-+Sysreg	ACTLR_EL1	3	0	1	0	1
-+Field   63:0    IMPDEF
-+EndSysreg
-+
-+Sysreg	ACTLR_EL12      3	5	1	0	1
-+Mapping	ACTLR_EL1
-+EndSysreg
-+
-+Sysreg	ACTLRALIAS_EL1  3	0	1	4	5
-+Mapping	ACTLR_EL1
-+EndSysreg
-+
- Sysreg	CPACR_EL1	3	0	1	0	2
- Res0	63:32
- Field	31	TCPAC
-@@ -2083,6 +2103,323 @@ Field	17:16	ZEN
- Res0	15:0
- EndSysreg
- 
-+Sysreg	CPACR_EL12      3	5	1	0	2
-+Mapping	CPACR_EL1
-+EndSysreg
-+
-+Sysreg	CPACRALIAS_EL1  3	0	1	4	4
-+Mapping	CPACR_EL1
-+EndSysreg
-+
-+Sysreg	ACTLRMASK_EL1	3	0	1	4	1
-+Field	63:0	IMPDEF
-+EndSysreg
-+
-+Sysreg	ACTLRMASK_EL12	3	5	1	4	1
-+Mapping	ACTLRMASK_EL1
-+EndSysreg
-+
-+Sysreg	CPACRMASK_EL1	3	0	1	4	2
++Sysreg	MDSTEPOP_EL1	2	0	0	5	2
 +Res0	63:32
-+Field	31	TCPAC
-+Field	30	TAM
-+Field	29	E0POE
-+Field	28	TTA
++Field	31:0	OPCODE
++EndSysreg
++
+ Sysreg	OSECCR_EL1	2	0	0	6	2
+ Res0	63:32
+ Field	31:0	EDECCR
+@@ -111,6 +122,285 @@ Res0	63:1
+ Field	0	OSLK
+ EndSysreg
+ 
++Sysreg	SPMACCESSR_EL1	2	0	9	13	3
++UnsignedEnum	63:62	P31
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	61:60	P30
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	59:58	P29
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	57:56	P28
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	55:54	P27
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	53:52	P26
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	51:50	P25
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	49:48	P24
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	47:46	P23
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	45:44	P22
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	43:42	P21
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	41:40	P20
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	39:38	P19
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	37:36	P18
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	35:34	P17
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	33:32	P16
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	31:30	P15
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	29:28	P14
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	27:26	P13
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	25:24	P12
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	23:22	P11
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	21:20	P10
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	19:18	P9
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	17:16	P8
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	15:14	P7
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	13:12	P6
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	11:10	P5
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	9:8	P4
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	7:6	P3
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	5:4	P2
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	3:2	P1
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++UnsignedEnum	1:0	P0
++	0b00	TRAP_RW
++	0b01	TRAP_W
++	0b11	NOTRAP
++EndEnum
++EndSysreg
++
++Sysreg	SPMACCESSR_EL12	2	5	9	13	3
++Mapping	SPMACCESSR_EL1
++EndSysreg
++
++Sysreg	SPMIIDR_EL1	2	0	9	13	4
++Res0	63:32
++Field	31:20	ProductID
++Field	19:16	Variant
++Field	15:12	Revision
++Field	11:0	Implementer
++EndSysreg
++
++Sysreg	SPMDEVARCH_EL1	2	0	9	13	5
++Res0	63:32
++Field	31:21	ARCHITECT
++Field	20	PRESENT
++Field	19:16	REVISION
++Field	15:12	ARCHVER
++Field	11:0	ARCHPART
++EndSysreg
++
++Sysreg	SPMDEVAFF_EL1	2	0	9	13	6
++Res0	63:40
++Field	39:32	Aff3
++Field	31	F0V
++Field	30	U
++Res0	29:25
++Field	24	MT
++Field	23:16	Aff2
++Field	15:8	Aff1
++Field	7:0	Aff0
++EndSysreg
++
++Sysreg	SPMCFGR_EL1	2	0	9	13	7
++Res0	63:32
++Field	31:28	NCG
 +Res0	27:25
-+Field	24	SMEN
-+Res0	23:21
-+Field	20	FPEN
-+Res0	19:17
-+Field	16	ZEN
-+Res0	15:0
++Field	24	HDBG
++Field	23	TRO
++Field	22	SS
++Field	21	FZO
++Field	20	MSI
++Field	19	RAO
++Res0	18
++Field	17	NA
++Field	16	EX
++Field	15:14	RAZ
++Field	13:8	SIZE
++Field	7:0	N
 +EndSysreg
 +
-+Sysreg	CPACRMASK_EL12	3	5	1	4	2
-+Mapping CPACRMASK_EL1
++Sysreg	SPMINTENSET_EL1	2	0	9	14	1
++Field	63:0	P
 +EndSysreg
 +
-+Sysreg	PFAR_EL1	3	0	6	0	5
-+Field	63	NS
-+Field	62	NSE
-+Res0	61:56
-+Field	55:52	PA_55_52
-+Field	51:48	PA_51_48
-+Field	47:0	PA
++Sysreg	SPMINTENCLR_EL1	2	0	9	14	2
++Field	63:0	P
 +EndSysreg
 +
-+Sysreg	PFAR_EL12	3	5	6	0	5
-+Mapping	PFAR_EL1
++Sysreg	PMCCNTSVR_EL1	2	0	14	11	7
++Field	63:0	CCNT
 +EndSysreg
 +
-+Sysreg	RCWSMASK_EL1	3	0	13	0	3
-+Field	63:0	RCWSMASK
++Sysreg	PMICNTSVR_EL1	2	0	14	12	0
++Field	63:0	ICNT
 +EndSysreg
 +
-+Sysreg	SCTLR2_EL1      3	0	1	0	3
-+Res0    63:13
-+Field   12      CPTM0
-+Field   11      CPTM
-+Field   10      CPTA0
-+Field   9       CPTA
-+Field   8       EnPACM0
-+Field   7       EnPACM
-+Field   6       EnIDCP128
-+Field   5       EASE
-+Field   4       EnANERR
-+Field   3       EnADERR
-+Field   2       NMEA
-+Res0    1:0
++Sysreg	SPMCR_EL0	2	3	9	12	0
++Res0	63:12
++Field	11	TRO
++Field	10	HDBG
++Field	9	FZO
++Field	8	NA
++Res0	7:5
++Field	4	EX
++Res0	3:2
++Field	1	P
++Field	0	E
 +EndSysreg
 +
-+Sysreg	SCTLR2_EL12     3	5	1	0	3
-+Mapping	SCTLR2_EL1
++Sysreg	SPMCNTENSET_EL0	2	3	9	12	1
++Field	63:0	P
 +EndSysreg
 +
-+Sysreg	SCTLR2ALIAS_EL1 3	0	1	4	7
-+Mapping	SCTLR2_EL1
++Sysreg	SPMCNTENCLR_EL0	2	3	9	12	2
++Field	63:0	P
 +EndSysreg
 +
-+Sysreg	SCTLR2MASK_EL1	3	0	1	4	3
-+Res0	63:13
-+Field	12	CPTM0
-+Field	11	CPTM
-+Field	10	CPTA0
-+Field	9	CPTA
-+Field	8	EnPACM0
-+Field	7	EnPACM
-+Field	6	EnIDCP128
-+Field	5	EASE
-+Field	4	EnANERR
-+Field	3	EnADERR
-+Field	2	NMEA
-+Res0	1:0
++Sysreg	SPMOVSCLR_EL0	2	3	9	12	3
++Field	63:0	P
 +EndSysreg
 +
-+Sysreg	SCTLR2MASK_EL12	3	5	1	4	3
-+Mapping	SCTLR2MASK_EL1
++Sysreg	SPMZR_EL0       2	3	9	12	4
++Field   63:0      P
 +EndSysreg
 +
-+Sysreg	SCTLRMASK_EL1	3	0	1	4	0
-+Field	63	TIDCP
-+Field	62	SPINTMASK
-+Field	61	NMI
-+Field	60	EnTP2
-+Field	59	TCSO
-+Field	58	TCSO0
-+Field	57	EPAN
-+Field	56	EnALS
-+Field	55	EnAS0
-+Field	54	EnASR
-+Field	53	TME
-+Field	52	TME0
-+Field	51	TMT
-+Field	50	TMT0
-+Res0	49:47
-+Field	46	TWEDEL
-+Field	45	TWEDEn
-+Field	44	DSSBS
-+Field	43	ATA
-+Field	42	ATA0
-+Res0	41
-+Field	40	TCF
-+Res0	39
-+Field	38	TCF0
-+Field	37	ITFSB
-+Field	36	BT1
-+Field	35	BT0
-+Field	34	EnFPM
-+Field	33	MSCEn
-+Field	32	CMOW
-+Field	31	EnIA
-+Field	30	EnIB
-+Field	29	LSMAOE
-+Field	28	nTLSMD
-+Field	27	EnDA
-+Field	26	UCI
-+Field	25	EE
-+Field	24	E0E
-+Field	23	SPAN
-+Field	22	EIS
-+Field	21	IESB
-+Field	20	TSCXT
-+Field	19	WXN
-+Field	18	nTWE
-+Res0	17
-+Field	16	nTWI
-+Field	15	UCT
-+Field	14	DZE
-+Field	13	EnDB
-+Field	12	I
-+Field	11	EOS
-+Field	10	EnRCTX
-+Field	9	UMA
-+Field	8	SED
-+Field	7	ITD
-+Field	6	nAA
-+Field	5	CP15BEN
-+Field	4	SA0
-+Field	3	SA
-+Field	2	C
-+Field	1	A
-+Field	0	M
++Sysreg	SPMSELR_EL0	2	3	9	12	5
++Res0	63:10
++Field	9:4	SYSPMUSEL
++Res0	3:2
++Field	1:0	BANK
 +EndSysreg
 +
-+Sysreg	SCTLRMASK_EL12	3	5	1	4	0
-+Mapping	SCTLRMASK_EL1
++Sysreg	SPMOVSSET_EL0	2	3	9	14	3
++Field	63:0	P
 +EndSysreg
 +
-+Sysreg	TCR2MASK_EL1	3	0	2	7	3
-+Res0	63:22
-+Field	21	FNGNA1
-+Field	20	FNGNA0
-+Res0	19
-+Field	18	FNG1
-+Field	17	FNG0
-+Field	16	A2
-+Field	15	DisCH1
-+Field	14	DisCH0
-+Res0	13:12
-+Field	11	HAFT
-+Field	10	PTTWI
-+Res0	9:6
-+Field	5	D128
-+Field	4	AIE
-+Field	3	POE
-+Field	2	E0POE
-+Field	1	PIE
-+Field	0	PnCH
++Sysreg	SPMSCR_EL1	2	7	9	14	7
++Field	63:32	IMPDEF
++Field	31	RAO
++Res0	30:5
++Field	4	NAO
++Res0	3:1
++Field	0	SO
 +EndSysreg
 +
-+Sysreg	TCR2MASK_EL12	3	5	2	7	3
-+Mapping	TCR2MASK_EL1
-+EndSysreg
-+
-+Sysreg	TCRMASK_EL1	3	0	2	7	2
-+Res0	63:62
-+Field	61	MTX1
-+Field	60	MTX0
-+Field	59	DS
-+Field	58	TCMA1
-+Field	57	TCMA0
-+Field	56	E0PD1
-+Field	55	E0PD0
-+Field	54	NFD1
-+Field	53	NFD0
-+Field	52	TBID1
-+Field	51	TBID0
-+Field	50	HWU162
-+Field	49	HWU161
-+Field	48	HWU160
-+Field	47	HWU159
-+Field	46	HWU062
-+Field	45	HWU061
-+Field	44	HWU060
-+Field	43	HWU059
-+Field	42	HPD1
-+Field	41	HPD0
-+Field	40	HD
-+Field	39	HA
-+Field	38	TBI1
-+Field	37	TBI0
-+Field	36	AS
-+Res0	35:33
-+Field	32	IPS
-+Res0	31
-+Field	30	TG1
-+Res0	29
-+Field	28	SH1
-+Res0	27
-+Field	26	ORGN1
-+Res0	25
-+Field	24	IRGN1
-+Field	23	EPD1
-+Field	22	A1
-+Res0	21:17
-+Field	16	T1SZ
-+Res0	15
-+Field	14	TG0
-+Res0	13
-+Field	12	SH0
-+Res0	11
-+Field	10	ORGN0
-+Res0	9
-+Field	8	IRGN0
-+Field	7	EPD0
-+Res0	6:1
-+Field	0	T0SZ
-+EndSysreg
-+
-+Sysreg	TCRMASK_EL12	3	5	2	7	2
-+Mapping TCRMASK_EL1
-+EndSysreg
-+
-+Sysreg	ERXGSR_EL1	3	0	5	3	2
-+Field	63	S63
-+Field	62	S62
-+Field	61	S61
-+Field	60	S60
-+Field	59	S59
-+Field	58	S58
-+Field	57	S57
-+Field	56	S56
-+Field	55	S55
-+Field	54	S54
-+Field	53	S53
-+Field	52	S52
-+Field	51	S51
-+Field	50	S50
-+Field	49	S49
-+Field	48	S48
-+Field	47	S47
-+Field	46	S46
-+Field	45	S45
-+Field	44	S44
-+Field	43	S43
-+Field	42	S42
-+Field	41	S41
-+Field	40	S40
-+Field	39	S39
-+Field	38	S38
-+Field	37	S37
-+Field	36	S36
-+Field	35	S35
-+Field	34	S34
-+Field	33	S33
-+Field	32	S32
-+Field	31	S31
-+Field	30	S30
-+Field	29	S29
-+Field	28	S28
-+Field	27	S27
-+Field	26	S26
-+Field	25	S25
-+Field	24	S24
-+Field	23	S23
-+Field	22	S22
-+Field	21	S21
-+Field	20	S20
-+Field	19	S19
-+Field	18	S18
-+Field	17	S17
-+Field	16	S16
-+Field	15	S15
-+Field	14	S14
-+Field	13	S13
-+Field	12	S12
-+Field	11	S11
-+Field	10	S10
-+Field	9	S9
-+Field	8	S8
-+Field	7	S7
-+Field	6	S6
-+Field	5	S5
-+Field	4	S4
-+Field	3	S3
-+Field	2	S2
-+Field	1	S1
-+Field	0	S0
-+EndSysreg
-+
- Sysreg	TRFCR_EL1	3	0	1	2	1
- Res0	63:7
- UnsignedEnum	6:5	TS
-@@ -3409,6 +3746,60 @@ Sysreg	TTBR1_EL1	3	0	2	0	1
- Fields	TTBRx_EL1
+ Sysreg ID_PFR0_EL1	3	0	0	1	0
+ Res0	63:32
+ UnsignedEnum	31:28	RAS
+@@ -2432,6 +2722,16 @@ Field	1	ExTRE
+ Field	0	E0TRE
  EndSysreg
  
-+Sysreg	TCR_EL1		3	0	2	0	2
-+Res0    63:62
-+Field   61      MTX1
-+Field   60      MTX0
-+Field   59      DS
-+Field   58      TCMA1
-+Field   57      TCMA0
-+Field   56      E0PD1
-+Field   55      E0PD0
-+Field   54      NFD1
-+Field   53      NFD0
-+Field   52      TBID1
-+Field   51      TBID0
-+Field   50      HWU162
-+Field   49      HWU161
-+Field   48      HWU160
-+Field   47      HWU159
-+Field   46      HWU062
-+Field   45      HWU061
-+Field   44      HWU060
-+Field   43      HWU059
-+Field   42      HPD1
-+Field   41      HPD0
-+Field   40      HD
-+Field   39      HA
-+Field   38      TBI1
-+Field   37      TBI0
-+Field   36      AS
-+Res0    35
-+Field   34:32   IPS
-+Field   31:30   TG1
-+Field   29:28   SH1
-+Field   27:26   ORGN1
-+Field   25:24   IRGN1
-+Field   23      EPD1
-+Field   22      A1
-+Field   21:16   T1SZ
-+Field   15:14   TG0
-+Field   13:12   SH0
-+Field   11:10   ORGN0
-+Field   9:8     IRGN0
-+Field   7       EPD0
-+Res0    6
-+Field   5:0     T0SZ
++Sysreg	TRCITECR_EL1	3	0	1	2	3
++Res0	63:2
++Field	1	E1E
++Field	0	E0E
 +EndSysreg
 +
-+Sysreg	TCR_EL12        3	5	2	0	2
-+Mapping	TCR_EL1
++Sysreg	TRCITECR_EL12	3	5	1	2	3
++Mapping	TRCITECR_EL1
 +EndSysreg
 +
-+Sysreg	TCRALIAS_EL1    3	0	2	7	6
-+Mapping	TCR_EL1
-+EndSysreg
-+
- Sysreg	TCR2_EL1	3	0	2	0	3
- Res0	63:16
- Field	15	DisCH1
-@@ -3429,6 +3820,10 @@ Sysreg	TCR2_EL12	3	5	2	0	3
- Mapping	TCR2_EL1
+ Sysreg	SMPRI_EL1	3	0	1	2	4
+ Res0	63:4
+ Field	3:0	PRIORITY
+@@ -2665,6 +2965,16 @@ Field	16	COLL
+ Field	15:0	MSS
  EndSysreg
  
-+Sysreg	TCR2ALIAS_EL1   3	0	2	7	7
-+Mapping	TCR2_EL1
++Sysreg	PMSDSFR_EL1	3	0	9	10	4
++Field	63:0	S
 +EndSysreg
 +
- Sysreg	TCR2_EL2	3	4	2	0	3
- Res0	63:16
- Field	15	DisCH1
++Sysreg	PMBMAR_EL1	3	0	9	10	5
++Res0	63:10
++Field	9:8	SH
++Field	7:0	Attr
++EndSysreg
++
+ Sysreg	PMBIDR_EL1	3	0	9	10	7
+ Res0	63:12
+ Enum	11:8	EA
+@@ -2678,6 +2988,21 @@ Field	4	P
+ Field	3:0	ALIGN
+ EndSysreg
+ 
++Sysreg	TRBMPAM_EL1	3	0	9	11	5
++Res0	63:27
++Field	26	EN
++Field	25:24	MPAM_SP
++Field	23:16	PMG
++Field	15:0	PARTID
++EndSysreg
++
++Sysreg	PMSSCR_EL1	3	0	9	13	3
++Res0	63:33
++Field	32	NC
++Res0	31:1
++Field	0	SS
++EndSysreg
++
+ Sysreg	PMUACR_EL1	3	0	9	14	4
+ Res0	63:33
+ Field	32	F0
+@@ -2685,11 +3010,29 @@ Field	31	C
+ Field	30:0	P
+ EndSysreg
+ 
++Sysreg	PMECR_EL1	3	0	9	14	5
++Res0	63:5
++Field	4:3	SSE
++Field	2	KPME
++Field	1:0	PMEE
++EndSysreg
++
++Sysreg	PMIAR_EL1	3	0	9	14	7
++Field	63:0	ADDRESS
++EndSysreg
++
+ Sysreg	PMSELR_EL0	3	3	9	12	5
+ Res0	63:5
+ Field	4:0	SEL
+ EndSysreg
+ 
++Sysreg	PMZR_EL0        3	3	9	13	4
++Res0	63:33
++Field	32	F0
++Field	31	C
++Field	30:0	P
++EndSysreg
++
+ SysregFields	CONTEXTIDR_ELx
+ Res0	63:32
+ Field	31:0	PROCID
 -- 
 2.39.2
 
