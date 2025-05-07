@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-45682-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45683-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F43EAAD2B2
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 03:23:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2466FAAD2B6
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 03:23:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4370B985205
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 01:22:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFAA21C038D8
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 01:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D36B1C2DB2;
-	Wed,  7 May 2025 01:21:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305BD1C84CF;
+	Wed,  7 May 2025 01:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WUnbkoOz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VypvhEpx"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A7A1714B3;
-	Wed,  7 May 2025 01:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2259718C004;
+	Wed,  7 May 2025 01:21:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746580889; cv=none; b=euCDXOj34nJ5jMV51CZKxPvExh9G/Yfo/19WO6EMdVO7rzli0JwHtl2MZP3468jGP9VkMZTfNbbWbqxx/32uY1t2dGKd8fRyUrHdS3O5PsCAl0Qo02fQgQE9ZHZ7WFZv5VzroXzfq63o3LNgr4PSE+LEup3hUeKc71co4RDwANY=
+	t=1746580890; cv=none; b=JOS3p34UwN8LytHlKoR4r81aRFjJ6Irz+1IKPnuUMFQIOoC2wW/xBFH4o2OWExzWvhXEDHFZyA8NMLpCdyehiZtxo54c02r9Dhw3UAZGGPuYRh27mo/gYfj0wtEa11FBb9jIiffEnR1vcu5SpOaLJoezekjQg2R+jZ3XfsAwmHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746580889; c=relaxed/simple;
-	bh=KB+HByhgRtuXd51rhqltkjMyOee0AX2NAGnKUwpqrs4=;
+	s=arc-20240116; t=1746580890; c=relaxed/simple;
+	bh=OfBgI9CkNGv1w958qRygQ8/xJI/SuERkts1Frocyh2M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XnEGk2FAoy2BeetIJFaEDZRCNVJHF5YmrIPOZR3B4MiJHJqcIcv5R+ef/6PyiaG9E/IPf5BHpOaAMQz65nTym1qCL/BZxIOAqKQL1IjN+4z0pJFaferkGH2inJqQhKvl6GWv/1Qzs35J7BRlIYEHhxYM19Bauz4qbVS8l85FeXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WUnbkoOz; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=NOZQttorVOhD7/3GoRnOaaIHKvORd8gXAOdNh42vHIdJM8pItnSgbR06uoXtmXbJ7UZFIrLungsE/CiYn3QD+IQXdMnYUclLXutYHkQOllft5xpkujF4UrI/KqJkfrfEp/DEdfosOeeN4tI6OHB+7IQeo5k/X3ix76IO50ZTQyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VypvhEpx; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746580887; x=1778116887;
+  t=1746580888; x=1778116888;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KB+HByhgRtuXd51rhqltkjMyOee0AX2NAGnKUwpqrs4=;
-  b=WUnbkoOzjYDVD/ETjhNWGAA8OL0T3YhwAt9JKeGyDXqeFGq7y1ZH4DF3
-   //L9DatnR/8LiMQb1qxawwjG5w79bGnaCsxRVl9ikemN9djlYK6RVIluj
-   qBFghAiEftYqaFyBRuW9TgFYujnikNUylx+bzlCS2UY0tCHJRAQYdqJ4P
-   N7g8cfq2p6RwINWr2YZNOLEA+r/c6kS5j1hTT/JgplQJA4G7VX1+X5pse
-   H6FcwSXPpUIw3yYH2IKDnJwp9PErgRomE6Lap0EBwhnUmz3ZU3a5I7TAZ
-   P9GTBT2jdpFhM/5HJDi+Khap7L0R2u6xHJ4pDm3iOLzodbWn7w3BBaclx
-   Q==;
-X-CSE-ConnectionGUID: H5V3P6N7QQy6pAVM0Rny2w==
-X-CSE-MsgGUID: 0Z9LACPUSIq+CEMufZ7NKA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="47383972"
+  bh=OfBgI9CkNGv1w958qRygQ8/xJI/SuERkts1Frocyh2M=;
+  b=VypvhEpxGRnZb/RzYenk6/jSUhjbFTxd9exF1c78oIGQTDzoo2QbJp2g
+   bo7GBh/r7s6kVEsHuln2iPBRUFo4vxYzUBPkfwFpEJawd0WNrcg1LhziB
+   +t7+BO8mBzuMCb9pC4PAa1+7i33FwVuYg6TXVMDNm0gpkG0y5pwkxc+7q
+   oVwyZVOvVGlzPIE3e/iN4d5OorqfamE0+CgrvUqRHTJEFU4KDIatHzNh7
+   M0jooeouEL7HxsTnvw6z5NsMh2W/kTv0fNdyeMtekSfuwnnz8m8ULTLpe
+   MKVCyRrWMh1LUuJlBAlGI/yrwpZjV8kAr9cgbkdDOFyHenim74C945+IT
+   g==;
+X-CSE-ConnectionGUID: WnivI6tiSbaHT2Gji5ag3w==
+X-CSE-MsgGUID: ls7Qs+waTJWZ/c0rALoDlA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="47383988"
 X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="47383972"
+   d="scan'208";a="47383988"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 18:21:25 -0700
-X-CSE-ConnectionGUID: +x+7ms+KRPOXaV53By1plw==
-X-CSE-MsgGUID: WfrM0dn/QPGhE5NL+WoBgw==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 18:21:26 -0700
+X-CSE-ConnectionGUID: TpQ4dlZlTNq5Fo1yomQlhA==
+X-CSE-MsgGUID: MJoPH8AYQa6dsvF/X8d0Zw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="136808751"
+   d="scan'208";a="136808754"
 Received: from sohilmeh.sc.intel.com ([172.25.103.65])
-  by fmviesa009.fm.intel.com with ESMTP; 06 May 2025 18:21:24 -0700
+  by fmviesa009.fm.intel.com with ESMTP; 06 May 2025 18:21:25 -0700
 From: Sohil Mehta <sohil.mehta@intel.com>
 To: x86@kernel.org,
 	linux-kernel@vger.kernel.org
@@ -101,9 +101,9 @@ Cc: Xin Li <xin@zytor.com>,
 	kvm@vger.kernel.org,
 	linux-pm@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH v5 5/9] x86/nmi: Add support to handle NMIs with source information
-Date: Tue,  6 May 2025 18:21:41 -0700
-Message-ID: <20250507012145.2998143-6-sohil.mehta@intel.com>
+Subject: [PATCH v5 6/9] x86/nmi: Prepare for the new NMI-source vector encoding
+Date: Tue,  6 May 2025 18:21:42 -0700
+Message-ID: <20250507012145.2998143-7-sohil.mehta@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250507012145.2998143-1-sohil.mehta@intel.com>
 References: <20250507012145.2998143-1-sohil.mehta@intel.com>
@@ -115,110 +115,196 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The NMI-source bitmap is delivered as FRED event data to the kernel.
-When available, use NMI-source based filtering to determine the exact
-handlers to run.
+When using the send_IPI_* APIC calls, callers typically use NMI vector
+0x2 to trigger NMIs. The APIC APIs convert the NMI vector to the NMI
+delivery mode, which is eventually used to program the APIC.
 
-Activate NMI-source based filtering only for Local NMIs. While handling
-platform NMI types (such as SERR and IOCHK), do not use the source
-bitmap. They have only one handler registered per type, so there is no
-need to disambiguate between multiple handlers.
+Before FRED, the hardware would ignore the vector used with NMI delivery
+mode. However, with NMI-source reporting, the vector information is
+relayed to the destination CPU, which sets the corresponding bit in the
+NMI-source bitmap. Unfortunately, the kernel now needs to maintain a new
+set of NMI vectors and differentiate them from the IDT vectors.
 
-Some third-party chipsets may send NMI messages with a hardcoded vector
-of 2, which would result in bit 2 being set in the NMI-source bitmap.
-Skip the local NMI handlers in this situation.
+Instead of creating a parallel set of send_NMI_* APIs to handle
+NMI-source vectors, enhance the existing send_IPI_* APIs with a new
+encoding scheme to handle the NMI delivery mode along with the
+NMI-source vector.
 
-Bit 0 of the source bitmap is set by the hardware whenever a source
-vector was not used while generating an NMI, or the originator could not
-be reliably identified. Poll all the registered handlers in that case.
+NMI-source vectors would be encoded as:
+    APIC_DM_NMI (0x400) | NMI_SOURCE_VECTOR (0x1-0xF)
 
-When multiple handlers need to be executed, adhere to the existing
-priority scheme and execute the handlers registered with NMI_FLAG_FIRST
-before others.
+Also, introduce a helper to prepare the ICR value with the encoded
+delivery mode and vector. Update the guest paravirtual APIC code to use
+the new helper as well.
 
-The logic for handling legacy NMIs is unaffected since the source bitmap
-would always be zero.
+While at it, rename APIC_DM_FIXED_MASK to the more appropriate
+APIC_DM_MASK.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Co-developed-by: Xin Li (Intel) <xin@zytor.com>
+Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 Signed-off-by: Sohil Mehta <sohil.mehta@intel.com>
 ---
-v5: Significantly simplify NMI-source handling logic.
-    Get rid of a separate lookup table for NMI-source vectors.
-    Adhere to existing priority scheme for handling NMIs.
+v5: Use a simiplified encoding scheme for NMI-source vectors.
 ---
- arch/x86/kernel/nmi.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ arch/x86/include/asm/apic.h         | 30 +++++++++++++++++++++++++++++
+ arch/x86/include/asm/apicdef.h      |  2 +-
+ arch/x86/kernel/apic/ipi.c          |  4 ++--
+ arch/x86/kernel/apic/local.h        | 24 ++++++++++++-----------
+ arch/x86/kernel/kvm.c               |  9 +--------
+ drivers/thermal/intel/therm_throt.c |  2 +-
+ 6 files changed, 48 insertions(+), 23 deletions(-)
 
-diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
-index a1d672dcb6f0..183e3e717326 100644
---- a/arch/x86/kernel/nmi.c
-+++ b/arch/x86/kernel/nmi.c
-@@ -127,9 +127,25 @@ static void nmi_check_duration(struct nmiaction *action, u64 duration)
- 			    action->handler, duration, decimal_msecs);
+diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
+index c903d358405d..11a3f88518fa 100644
+--- a/arch/x86/include/asm/apic.h
++++ b/arch/x86/include/asm/apic.h
+@@ -470,6 +470,36 @@ static __always_inline bool apic_id_valid(u32 apic_id)
+ 	return apic_id <= apic->max_apic_id;
  }
  
 +/*
-+ * Match the NMI-source vector saved during registration with the source
-+ * bitmap.
++ * Prepare the delivery mode and vector for the ICR.
 + *
-+ * Always return true when bit 0 of the source bitmap is set.
++ * NMI-source vectors have the NMI delivery mode encoded within them to
++ * differentiate them from the IDT vectors. IDT vector 0x2 (NMI_VECTOR)
++ * is treated as an NMI request but without any NMI-source information.
 + */
-+static inline bool match_nmi_source(unsigned long source_bitmap, struct nmiaction *action)
++static inline u16 __prepare_ICR_DM_vector(u16 dm_vector)
 +{
-+	unsigned long match_vector;
++	u16 vector = dm_vector & APIC_VECTOR_MASK;
++	u16 dm = dm_vector & APIC_DM_MASK;
 +
-+	match_vector = BIT(NMIS_VECTOR_NONE) | BIT(action->source_vector);
++	if (dm == APIC_DM_NMI) {
++		/*
++		 * Pre-FRED, the actual vector is ignored for NMIs, but
++		 * zero it if NMI-source reporting is not supported to
++		 * avoid breakage on misbehaving hardware or hypervisors.
++		 */
++		if (!cpu_feature_enabled(X86_FEATURE_NMI_SOURCE))
++			vector = 0;
 +
-+	return (source_bitmap & match_vector);
++		return dm | vector;
++	}
++
++	if (vector == NMI_VECTOR)
++		return APIC_DM_NMI;
++	else
++		return APIC_DM_FIXED | vector;
 +}
 +
- static int nmi_handle(unsigned int type, struct pt_regs *regs)
- {
- 	struct nmi_desc *desc = nmi_to_desc(type);
-+	unsigned long source_bitmap = 0;
- 	nmi_handler_t ehandler;
- 	struct nmiaction *a;
- 	int handled=0;
-@@ -148,16 +164,40 @@ static int nmi_handle(unsigned int type, struct pt_regs *regs)
+ #else /* CONFIG_X86_LOCAL_APIC */
  
- 	rcu_read_lock();
- 
-+	/*
-+	 * Activate NMI source-based filtering only for Local NMIs.
-+	 *
-+	 * Platform NMI types (such as SERR and IOCHK) have only one
-+	 * handler registered per type, so there is no need to
-+	 * disambiguate between multiple handlers.
-+	 *
-+	 * Also, if a platform source ends up setting bit 2 in the
-+	 * source bitmap, the local NMI handlers would be skipped since
-+	 * none of them use this reserved vector.
-+	 *
-+	 * For Unknown NMIs, avoid using the source bitmap to ensure all
-+	 * potential handlers have a chance to claim responsibility.
-+	 */
-+	if (cpu_feature_enabled(X86_FEATURE_NMI_SOURCE) && type == NMI_LOCAL)
-+		source_bitmap = fred_event_data(regs);
-+
- 	/*
- 	 * NMIs are edge-triggered, which means if you have enough
- 	 * of them concurrently, you can lose some because only one
- 	 * can be latched at any given time.  Walk the whole list
- 	 * to handle those situations.
-+	 *
-+	 * However, NMI-source reporting does not have this limitation.
-+	 * When NMI-source information is available, only run the
-+	 * handlers that match the reported vectors.
+ static inline u32 apic_read(u32 reg) { return 0; }
+diff --git a/arch/x86/include/asm/apicdef.h b/arch/x86/include/asm/apicdef.h
+index 094106b6a538..3fb8fa73f6aa 100644
+--- a/arch/x86/include/asm/apicdef.h
++++ b/arch/x86/include/asm/apicdef.h
+@@ -87,8 +87,8 @@
+ #define		APIC_ICR_BUSY		0x01000
+ #define		APIC_DEST_LOGICAL	0x00800
+ #define		APIC_DEST_PHYSICAL	0x00000
++#define		APIC_DM_MASK		0x00700
+ #define		APIC_DM_FIXED		0x00000
+-#define		APIC_DM_FIXED_MASK	0x00700
+ #define		APIC_DM_LOWEST		0x00100
+ #define		APIC_DM_SMI		0x00200
+ #define		APIC_DM_REMRD		0x00300
+diff --git a/arch/x86/kernel/apic/ipi.c b/arch/x86/kernel/apic/ipi.c
+index 98a57cb4aa86..4e8bc42f3bd5 100644
+--- a/arch/x86/kernel/apic/ipi.c
++++ b/arch/x86/kernel/apic/ipi.c
+@@ -158,7 +158,7 @@ static void __default_send_IPI_shortcut(unsigned int shortcut, int vector)
+ 	 * issues where otherwise the system hangs when the panic CPU tries
+ 	 * to stop the others before launching the kdump kernel.
  	 */
- 	list_for_each_entry_rcu(a, &desc->head, list) {
- 		int thishandled;
- 		u64 delta;
+-	if (unlikely(vector == NMI_VECTOR))
++	if (unlikely(is_nmi_vector(vector)))
+ 		apic_mem_wait_icr_idle_timeout();
+ 	else
+ 		apic_mem_wait_icr_idle();
+@@ -175,7 +175,7 @@ void __default_send_IPI_dest_field(unsigned int dest_mask, int vector,
+ 				   unsigned int dest_mode)
+ {
+ 	/* See comment in __default_send_IPI_shortcut() */
+-	if (unlikely(vector == NMI_VECTOR))
++	if (unlikely(is_nmi_vector(vector)))
+ 		apic_mem_wait_icr_idle_timeout();
+ 	else
+ 		apic_mem_wait_icr_idle();
+diff --git a/arch/x86/kernel/apic/local.h b/arch/x86/kernel/apic/local.h
+index bdcf609eb283..9a54c589a4bf 100644
+--- a/arch/x86/kernel/apic/local.h
++++ b/arch/x86/kernel/apic/local.h
+@@ -24,22 +24,24 @@ extern u32 x2apic_max_apicid;
  
-+		if (source_bitmap && !match_nmi_source(source_bitmap, a))
-+			continue;
+ /* IPI */
+ 
++u16 __prepare_ICR_DM_vector(u16 vector);
 +
- 		delta = sched_clock();
- 		thishandled = a->handler(type, regs);
- 		handled += thishandled;
+ DECLARE_STATIC_KEY_FALSE(apic_use_ipi_shorthand);
+ 
++/* NMI-source vectors have the delivery mode encoded within them */
++static inline bool is_nmi_vector(u16 vector)
++{
++	if ((vector & APIC_DM_MASK) == APIC_DM_NMI)
++		return true;
++	if ((vector & APIC_VECTOR_MASK) == NMI_VECTOR)
++		return true;
++	return false;
++}
++
+ static inline unsigned int __prepare_ICR(unsigned int shortcut, int vector,
+ 					 unsigned int dest)
+ {
+-	unsigned int icr = shortcut | dest;
+-
+-	switch (vector) {
+-	default:
+-		icr |= APIC_DM_FIXED | vector;
+-		break;
+-	case NMI_VECTOR:
+-		icr |= APIC_DM_NMI;
+-		break;
+-	}
+-	return icr;
++	return shortcut | dest | __prepare_ICR_DM_vector(vector);
+ }
+ 
+ void default_init_apic_ldr(void);
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 3be9b3342c67..aa45fe4fecd0 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -517,14 +517,7 @@ static void __send_ipi_mask(const struct cpumask *mask, int vector)
+ 
+ 	local_irq_save(flags);
+ 
+-	switch (vector) {
+-	default:
+-		icr = APIC_DM_FIXED | vector;
+-		break;
+-	case NMI_VECTOR:
+-		icr = APIC_DM_NMI;
+-		break;
+-	}
++	icr = __prepare_ICR_DM_vector(vector);
+ 
+ 	for_each_cpu(cpu, mask) {
+ 		apic_id = per_cpu(x86_cpu_to_apicid, cpu);
+diff --git a/drivers/thermal/intel/therm_throt.c b/drivers/thermal/intel/therm_throt.c
+index e69868e868eb..83dd53cb4fc7 100644
+--- a/drivers/thermal/intel/therm_throt.c
++++ b/drivers/thermal/intel/therm_throt.c
+@@ -740,7 +740,7 @@ void intel_init_thermal(struct cpuinfo_x86 *c)
+ 	 * BIOS has programmed on AP based on BSP's info we saved since BIOS
+ 	 * is always setting the same value for all threads/cores.
+ 	 */
+-	if ((h & APIC_DM_FIXED_MASK) != APIC_DM_FIXED)
++	if ((h & APIC_DM_MASK) != APIC_DM_FIXED)
+ 		apic_write(APIC_LVTTHMR, lvtthmr_init);
+ 
+ 
 -- 
 2.43.0
 
