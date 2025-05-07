@@ -1,286 +1,194 @@
-Return-Path: <kvm+bounces-45715-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45716-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 672F1AAE39C
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 16:56:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D336AAE40B
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 17:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EB541BA7C98
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 14:56:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AB665082F6
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 15:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A42289E1D;
-	Wed,  7 May 2025 14:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DO25z3Pv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5126B28A1F8;
+	Wed,  7 May 2025 15:13:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB73289E09
-	for <kvm@vger.kernel.org>; Wed,  7 May 2025 14:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337D8169397;
+	Wed,  7 May 2025 15:13:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746629784; cv=none; b=ioXZesDk1MtBYsETm9VGNNuOP/ZMgzZbRy/27vj7UHum5Vgb0+dz1L3/c9i2FDxZX2ddmsw9ifMdh/R0r6NmDCTU6kYdwZONzDlLxiF5toTUgFL4dvp50CVpdhcOWjLW3gwizh7tZ3WDk6gJOjExR5nbCbxp20zz0NO8E1JYYQE=
+	t=1746630795; cv=none; b=GfiL0G8mdxJ2HiPnI1glXyfbwDhUdrrcq+yorW5oG5b9Qxu5kyK1V5AFVOIncs5a5uiYwsfKUHdYXWrO7tAH7nhMxUFaBB2bFbrwHftlodF2YUMAVn9j6znWCQXE54BDoqHaHykxoGJb93bmkRIeAxNJR19ugb17ffWUf8R4OqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746629784; c=relaxed/simple;
-	bh=K27oAefXMcxovF/muz2h6aBidpXaWFBVFXHHG1YFnk4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uHVGyDubGWZvp+u/C5OhRw4j6Ia9fTmRZRJa0EDJg8mlyFElMyytdeVbAP1Vw2Buqhgpia+0Z/kKsdQf7viJHvX3nWrPdQ/oSa3ISxjMwrk9vYevc0LvSUrfiIykQFk12/crpQS2MX6mZ5ZjdSbEEWGBF87TBtzDkfq6RpCOhgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DO25z3Pv; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-22e39fbad5fso170505ad.1
-        for <kvm@vger.kernel.org>; Wed, 07 May 2025 07:56:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746629782; x=1747234582; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K27oAefXMcxovF/muz2h6aBidpXaWFBVFXHHG1YFnk4=;
-        b=DO25z3PvRCDuvUGAq1TuWZdbEx1HrKJyIhGD0IH/TaLZdLK+rJztBs+ts0lKYA0XxS
-         7yiigAb2PNXozcO3KoGHUdJWDsjKGpIkbpgehPbj0HjXd8zEBpDCNlMbqr14pipBdw2B
-         GKHwSWURwGttpCyllmlvQqc/YMjudcAVgvUDfjl+RL+w87jFFMVzKkEBVFvUWLz7KlbV
-         iC2eohaIVxOtjDfHNlptSDz3J9WIkXpAnqakXFyc1DqWUCvREPehpj2cqJE7IWx1jtIw
-         DTzHdmVD4WHFnwuS1YKxPcSzFqIsoPhsULOTnrPyNS+uR4xKDIWnCYACk3lzDXnTi7fd
-         GGIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746629782; x=1747234582;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K27oAefXMcxovF/muz2h6aBidpXaWFBVFXHHG1YFnk4=;
-        b=tuVns/josJXU+JLDRQtj06hGZSFoIa9zFYzShTXkeB/C/nXhZovHwC8jgyZ6SD6+gP
-         I+dHZVOiincQJY+n2XviVSlhUFB5c6tbGQUs8MuZrMvE0zmESrIedRduuCbmSlX9JSI6
-         x2GsxaJxU38FJZwDAEClzZ2o5d3+FH2ecrDnKB69TyGfYoJZXkXz1C6RKuhsAAPPH12g
-         nSOvKgkK4PzN8lgvq4Hrpeis153ZXJuwBcIozL3+ZH/fvkZAabfla5pX5CbPqmaWXwp8
-         jBHNHDxbBzMWJj//d1k/XBIT+N7/o1Onl4clHnO10RdgmddsfUGdul1jdkiHX5iN+AGB
-         C4Dg==
-X-Forwarded-Encrypted: i=1; AJvYcCUMBkdiKVQmeNbuGT8r6dp+G4nl8ADx6/mOz8fRhw5jxU1SJjAyH+RjAJqssKEhgVQQMbc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlF5U075vscMtlCGMdV5Bq/xFvY1tb4+sbl0kCeCBPJeb9ChD0
-	KBDKbsTPUx/ywhNcilWRzyIpBqleVVgkFWCG9S/j/d6zSlVYZyyS4nDqICkUxip5V4S46UDGdO2
-	AthtQzUlpVtH0cxhkfUTemUtDD72FGxPdOE2A
-X-Gm-Gg: ASbGncvUt1rTY0Q234b6XvSexDMud2XmBmybZQ+TalTnayfkPvOpn+wCgns68IwXGeh
-	QaGaAvR+ZxsaLUyueJnZfnHdPgWvjLPpqKgmFpN3I1AJVIJRioYNQ6mnduZCY1vFVuendSME6Ac
-	HI9z1x5ORD0Dy1N17LfkTg8wYdj4IP2Rf+IxlvveVJXA5jJm47qXyccW8=
-X-Google-Smtp-Source: AGHT+IFUU4yzvy+tJUcjxTcjBUFWePAje5whBo7gqMHLyMsjuVgDeBEqOGRf5+tCoh6FoJpeOfgbXCVhk4Zvschc6ao=
-X-Received: by 2002:a17:903:181:b0:216:7aaa:4c5f with SMTP id
- d9443c01a7336-22e629b88a2mr2321595ad.3.1746629781200; Wed, 07 May 2025
- 07:56:21 -0700 (PDT)
+	s=arc-20240116; t=1746630795; c=relaxed/simple;
+	bh=erjqJjbQiAdebnC64Ummh0rNVRgrZ2tt5dbVIsfoKUc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HRy7Zqkb9v1Ww3pd3zDjuXhNQZPYDNIExBc5v5IJLopjOABBR2LgnSMo0fixTg8tOU87L5WmYCxy7/UnJWlXh4xSgWGG+L20uYphT07fNMH5l84JhfLTQ4Gvp3tQdpcA9ACZfgIbumemkrMev3Bqq4q8KPFoghqh+TdX3s8xsho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 367FB339;
+	Wed,  7 May 2025 08:13:03 -0700 (PDT)
+Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2C7783F58B;
+	Wed,  7 May 2025 08:13:10 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: andrew.jones@linux.dev,
+	eric.auger@redhat.com,
+	lvivier@redhat.com,
+	thuth@redhat.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com,
+	david@redhat.com,
+	pbonzini@redhat.com
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	will@kernel.org,
+	julien.thierry.kdev@gmail.com,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	joey.gouly@arm.com,
+	andre.przywara@arm.com
+Subject: [kvm-unit-tests PATCH v3 00/16] arm/arm64: Add kvmtool to the runner script
+Date: Wed,  7 May 2025 16:12:40 +0100
+Message-ID: <20250507151256.167769-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250424030033.32635-1-yan.y.zhao@intel.com> <20250424030603.329-1-yan.y.zhao@intel.com>
- <CAGtprH9_McMDepbuvWMLRvHooPdtE4RHog=Dgr_zFXT5s49nXA@mail.gmail.com>
- <aBAiCBmON0g0Qro1@yzhao56-desk.sh.intel.com> <CAGtprH_ggm8N-R9QbV1f8mo8-cQkqyEta3W=h2jry-NRD7_6OA@mail.gmail.com>
- <aBldhnTK93+eKcMq@yzhao56-desk.sh.intel.com> <CAGtprH9wi6zHJ5JeuAnjZThMAzxxibJGo=XN1G1Nx8txZRg8_w@mail.gmail.com>
- <aBmmirBzOZfmMOJj@yzhao56-desk.sh.intel.com> <CAGtprH9fDMiuk3JGSS12M-wFoqRj+sjdtEHJFS_5QfKX7aGkRQ@mail.gmail.com>
- <aBsNsZsWuVl4uo0j@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aBsNsZsWuVl4uo0j@yzhao56-desk.sh.intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Wed, 7 May 2025 07:56:08 -0700
-X-Gm-Features: ATxdqUHU0nZLAD5PmXeD87cInGxxOkrVQuKswPEoCIsWOPO_kTikScUha6SsdjY
-Message-ID: <CAGtprH-+Bo4hFxL+THiMgF5V4imdVVb0OmRhx2Uc0eom9=3JPA@mail.gmail.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
-	dave.hansen@intel.com, kirill.shutemov@intel.com, tabba@google.com, 
-	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
-	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
-	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
-	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
-	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 7, 2025 at 12:39=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> wro=
-te:
->
-> On Tue, May 06, 2025 at 06:18:55AM -0700, Vishal Annapurve wrote:
-> > On Mon, May 5, 2025 at 11:07=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com>=
- wrote:
-> > >
-> > > On Mon, May 05, 2025 at 10:08:24PM -0700, Vishal Annapurve wrote:
-> > > > On Mon, May 5, 2025 at 5:56=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.c=
-om> wrote:
-> > > > >
-> > > > > Sorry for the late reply, I was on leave last week.
-> > > > >
-> > > > > On Tue, Apr 29, 2025 at 06:46:59AM -0700, Vishal Annapurve wrote:
-> > > > > > On Mon, Apr 28, 2025 at 5:52=E2=80=AFPM Yan Zhao <yan.y.zhao@in=
-tel.com> wrote:
-> > > > > > > So, we plan to remove folio_ref_add()/folio_put_refs() in fut=
-ure, only invoking
-> > > > > > > folio_ref_add() in the event of a removal failure.
-> > > > > >
-> > > > > > In my opinion, the above scheme can be deployed with this serie=
-s
-> > > > > > itself. guest_memfd will not take away memory from TDX VMs with=
-out an
-> > > > > I initially intended to add a separate patch at the end of this s=
-eries to
-> > > > > implement invoking folio_ref_add() only upon a removal failure. H=
-owever, I
-> > > > > decided against it since it's not a must before guest_memfd suppo=
-rts in-place
-> > > > > conversion.
-> > > > >
-> > > > > We can include it in the next version If you think it's better.
-> > > >
-> > > > Ackerley is planning to send out a series for 1G Hugetlb support wi=
-th
-> > > > guest memfd soon, hopefully this week. Plus I don't see any reason =
-to
-> > > > hold extra refcounts in TDX stack so it would be good to clean up t=
-his
-> > > > logic.
-> > > >
-> > > > >
-> > > > > > invalidation. folio_ref_add() will not work for memory not back=
-ed by
-> > > > > > page structs, but that problem can be solved in future possibly=
- by
-> > > > > With current TDX code, all memory must be backed by a page struct=
-.
-> > > > > Both tdh_mem_page_add() and tdh_mem_page_aug() require a "struct =
-page *" rather
-> > > > > than a pfn.
-> > > > >
-> > > > > > notifying guest_memfd of certain ranges being in use even after
-> > > > > > invalidation completes.
-> > > > > A curious question:
-> > > > > To support memory not backed by page structs in future, is there =
-any counterpart
-> > > > > to the page struct to hold ref count and map count?
-> > > > >
-> > > >
-> > > > I imagine the needed support will match similar semantics as VM_PFN=
-MAP
-> > > > [1] memory. No need to maintain refcounts/map counts for such physi=
-cal
-> > > > memory ranges as all users will be notified when mappings are
-> > > > changed/removed.
-> > > So, it's possible to map such memory in both shared and private EPT
-> > > simultaneously?
-> >
-> > No, guest_memfd will still ensure that userspace can only fault in
-> > shared memory regions in order to support CoCo VM usecases.
-> Before guest_memfd converts a PFN from shared to private, how does it ens=
-ure
-> there are no shared mappings? e.g., in [1], it uses the folio reference c=
-ount
-> to ensure that.
->
-> Or do you believe that by eliminating the struct page, there would be no
-> GUP, thereby ensuring no shared mappings by requiring all mappers to unma=
-p in
-> response to a guest_memfd invalidation notification?
+v2 can be found here [1].
 
-Yes.
+To goal is to allow the user to do:
 
->
-> As in Documentation/core-api/pin_user_pages.rst, long-term pinning users =
-have
-> no need to register mmu notifier. So why users like VFIO must register
-> guest_memfd invalidation notification?
+$ ./configure --target=kvmtool
+$ make clean && make
+$ ./run_tests.sh
 
-VM_PFNMAP'd memory can't be long term pinned, so users of such memory
-ranges will have to adopt mechanisms to get notified. I think it would
-be easy to pursue new users of guest_memfd to follow this scheme.
-Irrespective of whether VM_PFNMAP'd support lands, guest_memfd
-hugepage support already needs the stance of: "Guest memfd owns all
-long-term refcounts on private memory" as discussed at LPC [1].
+to run all the tests automatically with kvmtool.
 
-[1] https://lpc.events/event/18/contributions/1764/attachments/1409/3182/LP=
-C%202024_%201G%20page%20support%20for%20guest_memfd.pdf
-(slide 12)
+Reasons to use kvmtool:
 
->
-> Besides, how would guest_memfd handle potential unmap failures? e.g. what
-> happens to prevent converting a private PFN to shared if there are errors=
- when
-> TDX unmaps a private PFN or if a device refuses to stop DMAing to a PFN.
+* kvmtool is smaller and a lot easier to hack than qemu, which means
+developers may prefer it when adding or prototyping new features to KVM.
+Being able to run all the tests reliably and automatically is very useful
+in the development process.
 
-Users will have to signal such failures via the invalidation callback
-results or other appropriate mechanisms. guest_memfd can relay the
-failures up the call chain to the userspace.
+* kvmtool is faster to run the tests (a couple of times faster on
+my rockpro64), making for a quick turnaround. But do keep in mind that not
+all tests work on kvmtool because of missing features compared to qemu.
 
->
-> Currently, guest_memfd can rely on page ref count to avoid re-assigning a=
- PFN
-> that fails to be unmapped.
->
->
-> [1] https://lore.kernel.org/all/20250328153133.3504118-5-tabba@google.com=
-/
->
->
-> > >
-> > >
-> > > > Any guest_memfd range updates will result in invalidations/updates =
-of
-> > > > userspace, guest, IOMMU or any other page tables referring to
-> > > > guest_memfd backed pfns. This story will become clearer once the
-> > > > support for PFN range allocator for backing guest_memfd starts gett=
-ing
-> > > > discussed.
-> > > Ok. It is indeed unclear right now to support such kind of memory.
-> > >
-> > > Up to now, we don't anticipate TDX will allow any mapping of VM_PFNMA=
-P memory
-> > > into private EPT until TDX connect.
-> >
-> > There is a plan to use VM_PFNMAP memory for all of guest_memfd
-> > shared/private ranges orthogonal to TDX connect usecase. With TDX
-> > connect/Sev TIO, major difference would be that guest_memfd private
-> > ranges will be mapped into IOMMU page tables.
-> >
-> > Irrespective of whether/when VM_PFNMAP memory support lands, there
-> > have been discussions on not using page structs for private memory
-> > ranges altogether [1] even with hugetlb allocator, which will simplify
-> > seamless merge/split story for private hugepages to support memory
-> > conversion. So I think the general direction we should head towards is
-> > not relying on refcounts for guest_memfd private ranges and/or page
-> > structs altogether.
-> It's fine to use PFN, but I wonder if there're counterparts of struct pag=
-e to
-> keep all necessary info.
->
+* kvmtool does things differently than qemu: different memory layout,
+different uart, PMU emulation is disabled by default, etc. This makes it a
+good testing vehicule for kvm-unit-tests itself.
 
-Story will become clearer once VM_PFNMAP'd memory support starts
-getting discussed. In case of guest_memfd, there is flexibility to
-store metadata for physical ranges within guest_memfd just like
-shareability tracking.
+Changes in v3
+-------------
 
->
-> > I think the series [2] to work better with PFNMAP'd physical memory in
-> > KVM is in the very right direction of not assuming page struct backed
-> > memory ranges for guest_memfd as well.
-> Note: Currently, VM_PFNMAP is usually used together with flag VM_IO. in K=
-VM
-> hva_to_pfn_remapped() only applies to "vma->vm_flags & (VM_IO | VM_PFNMAP=
-)".
->
->
-> > [1] https://lore.kernel.org/all/CAGtprH8akKUF=3D8+RkX_QMjp35C0bU1zxGi4v=
-1Zm5AWCw=3D8V8AQ@mail.gmail.com/
-> > [2] https://lore.kernel.org/linux-arm-kernel/20241010182427.1434605-1-s=
-eanjc@google.com/
-> >
-> > > And even in that scenario, the memory is only for private MMIO, so th=
-e backend
-> > > driver is VFIO pci driver rather than guest_memfd.
-> >
-> > Not necessary. As I mentioned above guest_memfd ranges will be backed
-> > by VM_PFNMAP memory.
-> >
-> > >
-> > >
-> > > > [1] https://elixir.bootlin.com/linux/v6.14.5/source/mm/memory.c#L65=
-43
+Lots of changes following the excellent feedback I got. A bird's eye view:
+
+* Split extra_params into qemu_params and test_args: qemu_params for qemu
+arguments and test_args for the test's main() function.
+
+Now that I'm putting the cover letter together I'm considering that maybe
+having qemu_params, kvmtool_params and test_params (instead of test_args)
+might be a better naming scheme.
+
+* TARGET is now exported unconditionally. Unfortunately a side effect of
+this is that checking out these series and running the tests will end up
+with an error because the scripts now expect TARGET to be defined in
+config.mak.
+
+If it's unacceptable, I can drop this and handle everything in vmm.bash by
+converting direct accesses to vmm_opts with functions defined in vmm.bash
+(vmm_opts[$TARGET:parse_premature_failure] becomes
+vmm_parse_premature_failure(), for example).
+
+* Introduced scripts/vmm.bash to keep the vmm stuff contained. As a
+consequence there's very little $TARGET stuff in scripts/runtime.bash (only
+for premature_failure(), and no more 'case' statements anywhere) and
+instead scripts/common.bash passes the correct arguments directly to
+runtime.bash::run().
+
+Unfortunately, because of all the changes, I decided not to keep some of
+the Reviewed-by tags. That's not to say that the effort is not appreciated,
+on the contrary, these changes are a direct result of the review; I dropped
+the tags because I was worried they might not apply to the current content
+of the patches.
+
+If no major changes are needed following this round of review, for the next
+iteration I'm planning to send the first two patches (extra_params renamed
+to qemu_params and the new test_args) separately, to make sure it gets the
+review it deserves from the rest of the architectures.
+
+Still haven't managed to get EDK2 to work with kvmtool, so I've decided to
+explicitely disabled UEFI tests in the last patch ("scripts: Enable
+kvmtool") - this is new.
+
+I would also like to point out that despite Drew's comment I kept the
+'disabled_if' test definition because I think using 'targets', with the
+default value of 'qemu', will probably lead to most, if not all, of the new
+tests which will be added never being run or tested with kvmtool. More
+details in patch #15 ("scripts: Add 'disabled_if' test definition parameter
+for kvmtool to use").
+
+[1] https://lore.kernel.org/kvm/20250120164316.31473-1-alexandru.elisei@arm.com/
+
+Alexandru Elisei (16):
+  scripts: unittests.cfg: Rename 'extra_params' to 'qemu_params'
+  scripts: Add 'test_args' test definition parameter
+  configure: Export TARGET unconditionally
+  run_tests.sh: Document --probe-maxsmp argument
+  scripts: Document environment variables
+  scripts: Refuse to run the tests if not configured for qemu
+  scripts: Use an associative array for qemu argument names
+  scripts: Add 'kvmtool_params' to test definition
+  scripts: Add support for kvmtool
+  scripts: Add default arguments for kvmtool
+  scripts: Add KVMTOOL environment variable for kvmtool binary path
+  scripts: Detect kvmtool failure in premature_failure()
+  scripts: Do not probe for maximum number of VCPUs when using kvmtool
+  scripts/mkstandalone: Export $TARGET
+  scripts: Add 'disabled_if' test definition parameter for kvmtool to
+    use
+  scripts: Enable kvmtool
+
+ README.md               |  18 ++++-
+ arm/efi/run             |   8 ++
+ arm/run                 | 161 +++++++++++++++++++++++--------------
+ arm/unittests.cfg       | 125 ++++++++++++++++++++---------
+ configure               |  37 ++++++---
+ docs/unittests.txt      |  54 +++++++++++--
+ powerpc/run             |   4 +-
+ powerpc/unittests.cfg   |  21 ++---
+ riscv/run               |   4 +-
+ riscv/unittests.cfg     |   2 +-
+ run_tests.sh            |  35 ++++++---
+ s390x/run               |   2 +-
+ s390x/unittests.cfg     |  53 +++++++------
+ scripts/arch-run.bash   | 113 ++++++++++----------------
+ scripts/common.bash     |  71 +++++++++++------
+ scripts/mkstandalone.sh |   4 +
+ scripts/runtime.bash    |  51 +++++-------
+ scripts/vmm.bash        | 170 ++++++++++++++++++++++++++++++++++++++++
+ x86/run                 |   4 +-
+ x86/unittests.cfg       | 164 +++++++++++++++++++++-----------------
+ 20 files changed, 730 insertions(+), 371 deletions(-)
+ create mode 100644 scripts/vmm.bash
+
+
+base-commit: 08db0f5cfbca16b36f200b7bc54a78fa4941bcce
+-- 
+2.49.0
+
 
