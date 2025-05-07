@@ -1,184 +1,148 @@
-Return-Path: <kvm+bounces-45755-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45756-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEC83AAE854
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 20:01:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 03233AAE857
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 20:04:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75AD71C203E5
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 18:01:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17B1A1BC4EA8
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 18:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768FE28DF26;
-	Wed,  7 May 2025 18:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7777F28DF21;
+	Wed,  7 May 2025 18:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kv0G2HrY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="duaswigL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3975E1E1DF6
-	for <kvm@vger.kernel.org>; Wed,  7 May 2025 18:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B091B6CE9;
+	Wed,  7 May 2025 18:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746640883; cv=none; b=W3eakjsZQeGf6QjTmZd+RiWXZmkGyhmio5qNl5pNgG3q7SesnVuvJz2uvlRmSzTq+sNzxnz3+tnpdmFTpCoud3uM9+5XyCjxD5eUrgMbZM9FL/cPBYzdk7mzCqnmE2luBux7N/t1H5RJ+eG8MPjlf8AnGkoigxLqmez+eQmW2/o=
+	t=1746641052; cv=none; b=g5YeNWBCKhhx2TjNSM7vqB1sgVfPhICGFQ92hLy1RFjfjU41y2iyvalbnhUy9q+u2oTW72rgZ1YxEi7fKsdi5IXlt8QTxCzjgzJG3+YwPRa2gqyWcofrUosknPWRt6Fq3hjYfkRhBKNZB7wHAwPgkvjzyc2D6Tr/ZwfzvNfvFBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746640883; c=relaxed/simple;
-	bh=26Zb7LiBJSl3gQZzW3a8HzAfTQc562cMCy6AuDfWssI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FNn0ElXIcIAyrj+o2HsJGHZKOH544AoYb8ETr8y7i0T2aBHl7VjQeW+viTfckXBwvc0uYMCdUv7mrvg36nQPPz8mhHuvBMw5vkLOQKB/yC4s5lF4h0AvnIQfPQO20fFLbQXYMfz+JzoVYv0T3i/pB1tw+ibcqBC2M5TPPJ7OjFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kv0G2HrY; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30a29af28d1so160541a91.0
-        for <kvm@vger.kernel.org>; Wed, 07 May 2025 11:01:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746640881; x=1747245681; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FbajxzigzwfB6KYWyyGtLYt8OcNqKAvCe8D0yhsQfcc=;
-        b=Kv0G2HrY9qAgSd8eRvjxJAABOFB5W2JhoUYOizCb6BznTq3hWvud6UF440GgE/8uvK
-         oEg1a4uIS68bqihONhGoxFd8uIpyTDnhUOKIK6CMtOzu4SM4AmFfYqHLIQDox+4VIA5s
-         y+HsGMUuA0fmC+KZ7Heh4XAeOvKAxLcYjiHQgRZaZ5qkAWSq32en+Ic3d075fUcNyFNw
-         o3XXtlZK4SqrcbLg5a6pt3W25tpQ1ijEJSfjpc2LqOKdkF6CLdNr/fIQds2QQQPE/+4n
-         5lAzSL66QYG1YuJIqVwAtCzk/Ch/IsgO/tXr/KJG+VP7rZkrWA+DuOgsngCob0N1Q/rF
-         68MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746640881; x=1747245681;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FbajxzigzwfB6KYWyyGtLYt8OcNqKAvCe8D0yhsQfcc=;
-        b=fUtLYvEIOqh/EdaX34rTzZRy/lleTVEmoN+UUtaIDLWz7kEjj/wDSnVq87EUBNkZeX
-         eBN/2d5Q7/l9B+Wa1aN8jUulxfxHe4U3GfHjBvWRANVnmJn0LmgduSFmaYbsv5IUDe9Y
-         2HWQEJl0gxTGbq0cD9KNrMTlGioqgkpQ386g6OiHq67xTrXZwL8d0F6C/ad/cE91dH9W
-         gF2pEn9GftRe1srXHl18O8nZnswv/4vhAZ7yNPU7nV7EigYN2WEQE49gpbL6QdVR2ksA
-         Xrf2OyJGY2AGMs/1qdUxRGoXvuWT4yoiw4ZHpWwqvokaqz8uU2fBKZ2Wsf0XQsTc+qRW
-         ysaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXaQUpLYR80kie3BHpQmAu7Y7lkgSKEVMUcClzjPgaC2rAM2zBVecjXV8QOQ4v6lGry9iA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSC+mC5nJHPwnk9zpyPb7bDa+aPHEdeKU0DiLqscQc0hEyHFCR
-	EJV8fMNmdWcblvqqGwqdZrpFwAmGidjUEvNpE8xvJbz4SNIkF4knzDEeI9kz03fstpYiJFHbcWl
-	bPQ==
-X-Google-Smtp-Source: AGHT+IFAAB1cRX2ShIDeBVkV9/+IDWgDLmDry9yYG7heeYgF6kyohsv+w+LtJtnvKy1ws16F4ufVFsvvfC8=
-X-Received: from pjbpm5.prod.google.com ([2002:a17:90b:3c45:b0:2ef:d136:17fc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d02:b0:30a:255c:9c89
- with SMTP id 98e67ed59e1d1-30b3a6634a4mr119512a91.19.1746640881483; Wed, 07
- May 2025 11:01:21 -0700 (PDT)
-Date: Wed, 7 May 2025 11:01:19 -0700
-In-Reply-To: <aBsNxmHE7UO03iCs@intel.com>
+	s=arc-20240116; t=1746641052; c=relaxed/simple;
+	bh=YwljjjzI9NNSw2zEIhaCiuxmmEFCJNkqDEuXTezwuRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O4y44m4kdSjw044FDDM/g5sG/vnpN550K8WZgnRL4/8Re3yqbJ5106zfIBm2LD/ew8V25gkWOZLlWy81nSDFvm4xZLuvbqsCDgdQtBgcH5lKdc8Y1dDzJ0bt2Rb6QaJK/Eq9/fCFipzxy7/BZrazGVy3O/g4JFBcA03f4hJjLug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=duaswigL; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746641050; x=1778177050;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=YwljjjzI9NNSw2zEIhaCiuxmmEFCJNkqDEuXTezwuRQ=;
+  b=duaswigLqpLfS2S/r7ktpPN++nSHmDA4dfJyqG6iyExQW859BdKltUCl
+   WT0UhL7BsZoT5TgaRk2xJgF/Ni1erld3L0gtACsb8+a2zusQkEgTQ1GmR
+   i/O3xFsdlLTwdgeUivqf7PPY4wlrNrlDlo5gnZZjHLr/QTADvPenxHgxL
+   oHczBA45XOvMaq2kqhZElJKFZ/kCmeXRhr9/IIZX+QbJb85lAsIq8+gXi
+   4CaC453stOSgOaNpC90d0qU+JKGk8S1nFpTJJGlGtelfIiJ2NjTH/Inz9
+   mufg3CxwFZiGrCnSZnBj2UTmCH1MR3Cx+FIeA1dXCPiacWKMNnKuT+KM8
+   Q==;
+X-CSE-ConnectionGUID: kSSd8M4dQBan2qkFf+7Mug==
+X-CSE-MsgGUID: ZdJz83EoSFC43p7LN7HU5Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="59786538"
+X-IronPort-AV: E=Sophos;i="6.15,270,1739865600"; 
+   d="scan'208";a="59786538"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 11:04:10 -0700
+X-CSE-ConnectionGUID: Cg+i+3ApQgCBc5uuZqusew==
+X-CSE-MsgGUID: ZlvGk9pSTaeAQUBvEBMXZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,270,1739865600"; 
+   d="scan'208";a="173232082"
+Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.124.222.63]) ([10.124.222.63])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 11:04:09 -0700
+Message-ID: <15c80733-5cd8-4d9a-9fda-0d0ec305ac6b@intel.com>
+Date: Wed, 7 May 2025 11:04:05 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250506093740.2864458-1-chao.gao@intel.com> <20250506093740.2864458-6-chao.gao@intel.com>
- <aBpFvyITMc0WhlX4@google.com> <aBsNxmHE7UO03iCs@intel.com>
-Message-ID: <aBuf7wiiDT0Wflhk@google.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v6 5/7] x86/fpu: Initialize guest fpstate and FPU pseudo
  container from guest defaults
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	tglx@linutronix.de, dave.hansen@intel.com, pbonzini@redhat.com, 
-	peterz@infradead.org, rick.p.edgecombe@intel.com, weijiang.yang@intel.com, 
-	john.allen@amd.com, bp@alien8.de, chang.seok.bae@intel.com, xin3.li@intel.com, 
-	Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Oleg Nesterov <oleg@redhat.com>, Eric Biggers <ebiggers@google.com>, 
-	Stanislav Spassov <stanspas@amazon.de>, Kees Cook <kees@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ tglx@linutronix.de, pbonzini@redhat.com, peterz@infradead.org,
+ rick.p.edgecombe@intel.com, weijiang.yang@intel.com, john.allen@amd.com,
+ bp@alien8.de, chang.seok.bae@intel.com, xin3.li@intel.com,
+ Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Oleg Nesterov <oleg@redhat.com>,
+ Eric Biggers <ebiggers@google.com>, Stanislav Spassov <stanspas@amazon.de>,
+ Kees Cook <kees@kernel.org>
+References: <20250506093740.2864458-1-chao.gao@intel.com>
+ <20250506093740.2864458-6-chao.gao@intel.com> <aBpFvyITMc0WhlX4@google.com>
+ <aBsNxmHE7UO03iCs@intel.com> <aBuf7wiiDT0Wflhk@google.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <aBuf7wiiDT0Wflhk@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 07, 2025, Chao Gao wrote:
-> From: Chao Gao <chao.gao@intel.com>
-> Date: Fri, 31 May 2024 02:03:30 -0700
-> Subject: [PATCH] x86/fpu: Initialize guest fpstate and FPU pseudo container
->  from guest defaults
+On 5/7/25 11:01, Sean Christopherson wrote:
+> And then a follow-up patch (or same patch?) to do this?
 > 
-> fpu_alloc_guest_fpstate() currently uses host defaults to initialize guest
-> fpstate and pseudo containers. Guest defaults were introduced to
-> differentiate the features and sizes of host and guest FPUs. Switch to
-> using guest defaults instead.
-> 
-> Adjust __fpstate_reset() to handle different defaults for host and guest
-> FPUs. And to distinguish between the types of FPUs, move the initialization
-> of indicators (is_guest and is_valloc) before the reset.
-> 
-> Suggested-by: Chang S. Bae <chang.seok.bae@intel.com>
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> ---
->  arch/x86/kernel/fpu/core.c | 27 ++++++++++++++++++++-------
->  1 file changed, 20 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-> index 444e517a8648..0d501bd25d79 100644
-> --- a/arch/x86/kernel/fpu/core.c
-> +++ b/arch/x86/kernel/fpu/core.c
-> @@ -236,19 +236,22 @@ bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu)
->  	struct fpstate *fpstate;
->  	unsigned int size;
->  
-> -	size = fpu_kernel_cfg.default_size + ALIGN(offsetof(struct fpstate, regs), 64);
-> +	size = guest_default_cfg.size + ALIGN(offsetof(struct fpstate, regs), 64);
-> +
->  	fpstate = vzalloc(size);
->  	if (!fpstate)
->  		return false;
->  
-> +	/* Initialize indicators to reflect properties of the fpstate */
-> +	fpstate->is_valloc	= true;
-> +	fpstate->is_guest	= true;
-> +
->  	/* Leave xfd to 0 (the reset value defined by spec) */
->  	__fpstate_reset(fpstate, 0);
->  	fpstate_init_user(fpstate);
-> -	fpstate->is_valloc	= true;
-> -	fpstate->is_guest	= true;
->  
->  	gfpu->fpstate		= fpstate;
-> -	gfpu->xfeatures		= fpu_kernel_cfg.default_features;
-> +	gfpu->xfeatures		= guest_default_cfg.features;
->  
->  	/*
->  	 * KVM sets the FP+SSE bits in the XSAVE header when copying FPU state
-> @@ -535,10 +538,20 @@ void fpstate_init_user(struct fpstate *fpstate)
->  
->  static void __fpstate_reset(struct fpstate *fpstate, u64 xfd)
->  {
-> -	/* Initialize sizes and feature masks */
-> -	fpstate->size		= fpu_kernel_cfg.default_size;
-> +	/*
-> +	 * Initialize sizes and feature masks. Supervisor features and
-> +	 * sizes may diverge between guest FPUs and host FPUs, whereas
-> +	 * user features and sizes are always identical the same.
-> +	 */
-> +	if (fpstate->is_guest) {
-> +		fpstate->size		= guest_default_cfg.size;
-> +		fpstate->xfeatures	= guest_default_cfg.features;
-> +	} else {
-> +		fpstate->size		= fpu_kernel_cfg.default_size;
-> +		fpstate->xfeatures	= fpu_kernel_cfg.default_features;
-> +	}
+> 	if (fpstate->is_guest) {
+> 		fpstate->size           = guest_default_cfg.size;
+> 		fpstate->xfeatures      = guest_default_cfg.features;
+> 		fpstate->xfd		= 0;
+> 	} else {
+> 		fpstate->size           = fpu_kernel_cfg.default_size;
+> 		fpstate->xfeatures      = fpu_kernel_cfg.default_features;
+> 		fpstate->xfd		= init_fpstate.xfd;
+> 	}
 
-Nice!  I like this idea.
-
-> +
->  	fpstate->user_size	= fpu_user_cfg.default_size;
-> -	fpstate->xfeatures	= fpu_kernel_cfg.default_features;
->  	fpstate->user_xfeatures	= fpu_user_cfg.default_features;
->  	fpstate->xfd		= xfd;
-
-And then a follow-up patch (or same patch?) to do this?
-
-	if (fpstate->is_guest) {
-		fpstate->size           = guest_default_cfg.size;
-		fpstate->xfeatures      = guest_default_cfg.features;
-		fpstate->xfd		= 0;
-	} else {
-		fpstate->size           = fpu_kernel_cfg.default_size;
-		fpstate->xfeatures      = fpu_kernel_cfg.default_features;
-		fpstate->xfd		= init_fpstate.xfd;
-	}
->  }
-> -- 
-> 2.47.1
+That looks nice because it clearly highlights how guests and bare-metal
+fpstates are different. I like it too.
 
