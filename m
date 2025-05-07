@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-45708-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45709-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF0EAAADDA2
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 13:44:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 700B4AADDF6
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 14:02:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C7EE17D136
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 11:44:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4187F3BE1C5
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 12:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913E9234970;
-	Wed,  7 May 2025 11:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703CC2594B4;
+	Wed,  7 May 2025 12:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="gU1jYMHt"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Tf1F06iL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6952233701
-	for <kvm@vger.kernel.org>; Wed,  7 May 2025 11:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A0A52580F2
+	for <kvm@vger.kernel.org>; Wed,  7 May 2025 12:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746618245; cv=none; b=ZpA/dul/JnZXhQeEngl+f9RQ6bZG6TZCu1EfrK0RjHqeiL0pdQWwZ1ya733jWGhOafkDcL2SM/3zD4ElwBWyCoPqAhVO8O75apfBRGtluYBr7f4IwmMHt005mFzgkPgctdub9ceIvX9DQToglYViv3IqxmF7yvfKP99u0jDL1wg=
+	t=1746619307; cv=none; b=u/j+01BTN0f7GoKy0aVOOWnNYantx9p9WkNVN1oin6zb8Q1KuxQ03HgE1+zhBFJT6Of7IVJ6UHA3/qdZD2bTWZ/zXvbty30TG2dcIaUqJRthH3inZn91FDMRWSeWaVLNJ47ukW716Lzu1x/+Fn3mrpX4t1dYw6mrVs+76EX+a1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746618245; c=relaxed/simple;
-	bh=qEEBf/EvhFb5+S8vt2g6XJwST6O0nTQJRpn12U1g7EA=;
+	s=arc-20240116; t=1746619307; c=relaxed/simple;
+	bh=6rv4ezCEsP2xR4MP5LGsgg8AteN/ZReqLsGo7bUMZuw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZHKnqUV9h0YFaQ9+YX8PlcO0wLLCLzRTmcdjwqR8WKrui4ZYHp3ivwENe87hbPqZrdEl3qa1mb0EbTB2EG1bL3xG4HbDtQpskNbD6oFj1vztVK++XZ7XHoSLT7oQA63hsRHQdldwA3j0EwA6aaM8MtzES7FPG36wgk5/eV///n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=gU1jYMHt; arc=none smtp.client-ip=209.85.166.43
+	 To:Cc:Content-Type; b=LEoOdFdlE8Y+Vbf4DiiexGHIrrNpASs7QXIwluGt3bGeggECXbyC6b3TpVGA0mmR35IiIc5iRTmheJ065pRxnbVV6/o0AFI/7am5yamSw7ERb+dZl4M4CJ+Mw0i6SAD5oZ47ki2HSEHxgMxSz6oJ8HmYanh8GrJ8xsmC8WBrXXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=Tf1F06iL; arc=none smtp.client-ip=209.85.166.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-86135af1045so780171839f.1
-        for <kvm@vger.kernel.org>; Wed, 07 May 2025 04:44:03 -0700 (PDT)
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3d7f111e9e1so74206655ab.1
+        for <kvm@vger.kernel.org>; Wed, 07 May 2025 05:01:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1746618243; x=1747223043; darn=vger.kernel.org;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1746619305; x=1747224105; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bVz2E+K/uMAryK5WXZfBalhzFkygNbdnQ6nqZ/JT97Y=;
-        b=gU1jYMHtLBX/bg6svOh/7/0bsT6Z+HrtMQzz7sSs+MZt1TfP1dglBLOf69poDnGZKN
-         rGGzzdWiMTgzVDiLw7vgrMpVRWE+1J74dwaV1KTqsnVjik5t+NuxzGiSUQ2ZGnqCIxNp
-         VXa8wyN+oH6CKLiCNzpnoxi88jnA5qACOS3BAagy2svsLUdUYPbe0PBSU/678M5grmac
-         CP5jSi5Y9JDkKVdXRfHqwNXY0OaiOG6skPI2gvMB0phNILSWNOhUn67LfSapnmwMlbbb
-         8BndgiZM/syqMYPm2tzvwYob1FQfT31nsoj5ZY9u9SQYiL6abQjzgCQ33ZczPsfdMsXE
-         Ar0A==
+        bh=MfksTJphxL8/tqIZbEC1vmhshvxVbtCcWFaJZOmGc+c=;
+        b=Tf1F06iLu5P6Ar8J3Rwwnc1jS8mZw0kXv+tUkX9vc987zsexeSdus+u4QAZyu7dQVM
+         yp3+j5/UZyzAU0rQYGLCkHhrh1yxyYmbPzUDnYPuBlOnf3kvolgtTTPCfR0SVwuf2fOE
+         n1K/SIIQbsXd3DwFy14uGI2u8+mCDmmilCaMztlDRHrGFl9L+OEMilceSrPYgWYdUSUj
+         8fGC4b6MRrE9+z2+cJrh2X6f0GRdbIShb/JbcRaTDk2P55Js6us3MeykZJTvBNOGdFST
+         DMR9jsP8qfzXWrstrlOAQ15sTcpOJOMuUyX8U2eyA9L4UTZLZuZPBlUkmrzuEklXjba8
+         iszQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746618243; x=1747223043;
+        d=1e100.net; s=20230601; t=1746619305; x=1747224105;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bVz2E+K/uMAryK5WXZfBalhzFkygNbdnQ6nqZ/JT97Y=;
-        b=EJgGjsA+MJHEFUbzesxAjGMDUE/EkuHYan6vO5Y+6nPcfz+56ClCttxwz18x/HSpDc
-         SpkjWkFTGstIT6Wn4Z4hBxYBKNwnhWY7FyVymyqp4Fz1mA+BmKTGjgC748RymDQS6w8i
-         07+bIfeLheFk+2s7vlf+JT04GUqHyvmCd0J4NURqwPurEkxGX/A9ot4qpI/2ZwodMc4S
-         PFpwoaPKRhurjy7ZR1V9YgzFSCUOiKDjRMQVomOo6Y0yaW8YhjApc4G3/x2uGDo0wqYA
-         rtSq3nBbgk8klc2E9w0g56yhYO0/y7Wm1rydnU0qlmaW4Y0vvrIaHsjnZbwKe4eC2Fuf
-         iGiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW88F7r1WNMpJ2WhSv8ErnCF8cT6/XZ4wrFLBdaOgn3owFt1o7FbJlnQQo6SJMPFO9WbnM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSM2WbiEFyBtYWlt/SI6rloBK9hFE3bbm3JBMAB8t8S8s847nP
-	HAPECh5HR5R8AcVEg1qJ9izCTQRrStUOqHLGcboQ46VjvLaPnZAspNq9G6vtO82g5LXDKLfIlHT
-	m/9NooZRHudIOUnMW4++ScFEA5gDMhXwVnIil3w==
-X-Gm-Gg: ASbGncs0irdANTjqa9FRUzG27oXkdMKm00O5oSmeFE8zavJ1xICb3IiI2EAvzHletu0
-	cbRlRPtHh9O2Ry6VpieTNwiwgmZeyPe6HWO84CKjwIPlp3FuBQ6Gm16KxLgBkyPSsIzuKiWjT6e
-	dGUICDQzamt70Z5oark4H+RcknkI12jtb46w==
-X-Google-Smtp-Source: AGHT+IEqTEU3gW24Jmigd2cIa8Pl0Ves+lUOw1f5tu/7B6fJK/PzbflFbxkax13tPvkDxDTPwZvRy4srBUyjnSLHpH0=
-X-Received: by 2002:a05:6e02:1529:b0:3d8:21ae:d9c with SMTP id
- e9e14a558f8ab-3da738e9934mr32539925ab.5.1746618242847; Wed, 07 May 2025
- 04:44:02 -0700 (PDT)
+        bh=MfksTJphxL8/tqIZbEC1vmhshvxVbtCcWFaJZOmGc+c=;
+        b=r/sQnDAbO1R874p8Tb1KQ1RSopYcHK5D5FTvPmBANk1GAwo6O2u9Nv8UE3AYY7tTKS
+         l/ApzXAv981QF+36JO886WsMyGLSt1HaAOZzmwbu7PIkuc3KEhFUMOgiFHUFQ2Jc2kSb
+         fQ9htAICPz5qKxkZILg0kpNjFoljlB+cQPM5Pd9Ey99cFq8CQm/wpJq+npZLaxC7sqg+
+         DYvewl2/gDkywbOokPHapd0II+NZAIu+GqzbGCTUl8nqmYxGXuU1RgnYSKT3+NqKcGSm
+         UoHCHehyhM8pevc5rELxZisaB+Uaq3PEzrDrZtEnlVOITpLP+rajReeiXj1AlycGTQLX
+         3cpw==
+X-Forwarded-Encrypted: i=1; AJvYcCXKeyiYlb+4pUhPvhrfqshOf7JEkvPVoGdIQhupi5GOOy4y/3tb+iMhmyn7Gibh8pu5cS4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhqAdTeS11BYZdKpvoDgyYUXkHZwqLwzIykNC/JCIlycZRA7MR
+	Zs9hfqt5csULEr3ZK0FW9ivneQbJd+afipXrWO9p7ZhDTNUpHal49sQ8+M2Y+Z6tdmMMPKKUjrH
+	jEwthIphLyPRQgS3qjS3vwSZGjrMJuX+T+YuNlw==
+X-Gm-Gg: ASbGncvi0kZDJxcgY7EIPSVq4vyHTYfCrTByScNVDg5aQWWfrvm5Tsd4ltSCTKbN5Kc
+	BjViey9/pDoXcfZn5paEqZJkZSH2eQeWMnz596yUNtg5aEs0Vvm/llAhWi05uzjxL+o0wFh04d4
+	f6fdx535LBD8mMZGPtn6sHo3Y=
+X-Google-Smtp-Source: AGHT+IFkZGdbLqqYtnBIxPNoB/AAAkKnYxcbV3TvXGHWR/dk3f5HpfrkqVg/svBXEFNqgSJQ1iCWCi8Uf95FPmM7zQQ=
+X-Received: by 2002:a05:6e02:1c2c:b0:3d8:1d7c:e192 with SMTP id
+ e9e14a558f8ab-3da738f849emr29139475ab.7.1746619304812; Wed, 07 May 2025
+ 05:01:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403112522.1566629-3-rkrcmar@ventanamicro.com> <20250403112522.1566629-4-rkrcmar@ventanamicro.com>
-In-Reply-To: <20250403112522.1566629-4-rkrcmar@ventanamicro.com>
+References: <20250403112522.1566629-3-rkrcmar@ventanamicro.com> <20250403112522.1566629-5-rkrcmar@ventanamicro.com>
+In-Reply-To: <20250403112522.1566629-5-rkrcmar@ventanamicro.com>
 From: Anup Patel <anup@brainfault.org>
-Date: Wed, 7 May 2025 17:13:51 +0530
-X-Gm-Features: ATxdqUETEm-yQn1qrwlBDD0f3dy7uLqyAaalj3uycXV7-PAmSrqpx552FKWRajk
-Message-ID: <CAAhSdy0XBTW1FUuUwSBanspDwpHMRbBL-8oSiRR1R=5SgF1+hw@mail.gmail.com>
-Subject: Re: [PATCH 1/5] KVM: RISC-V: refactor vector state reset
+Date: Wed, 7 May 2025 17:31:33 +0530
+X-Gm-Features: ATxdqUEfXOKoC0fyIHGD5l9Qjl_U-GZBULEO3hLfdZKgXeyi62xCroqXS1Rt6jw
+Message-ID: <CAAhSdy0v7Cw+aGF8DDWh1gjTBXA23=H01KRK8R2LTQHLRHo5Kw@mail.gmail.com>
+Subject: Re: [PATCH 2/5] KVM: RISC-V: refactor sbi reset request
 To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
 Cc: kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
@@ -94,131 +94,136 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Apr 3, 2025 at 5:02=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar=
 @ventanamicro.com> wrote:
 >
-> Do not depend on the reset structures.
->
-> vector.datap is a kernel memory pointer that needs to be preserved as it
-> is not a part of the guest vector data.
+> The same code is used twice and SBI reset sets only two variables.
 >
 > Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@ventanamicro.com>
+> ---
+>  arch/riscv/include/asm/kvm_vcpu_sbi.h |  2 ++
+>  arch/riscv/kvm/vcpu_sbi.c             | 12 ++++++++++++
+>  arch/riscv/kvm/vcpu_sbi_hsm.c         | 13 +------------
+>  arch/riscv/kvm/vcpu_sbi_system.c      | 10 +---------
+>  4 files changed, 16 insertions(+), 21 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/a=
+sm/kvm_vcpu_sbi.h
+> index 4ed6203cdd30..aaaa81355276 100644
+> --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> @@ -55,6 +55,8 @@ void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu, =
+struct kvm_run *run);
+>  void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu *vcpu,
+>                                      struct kvm_run *run,
+>                                      u32 type, u64 flags);
+> +void kvm_riscv_vcpu_sbi_request_reset(struct kvm_vcpu *vcpu,
+> +                                      unsigned long pc, unsigned long a1=
+);
+
+Use tabs for alignment instead of spaces.
+
+>  int kvm_riscv_vcpu_sbi_return(struct kvm_vcpu *vcpu, struct kvm_run *run=
+);
+>  int kvm_riscv_vcpu_set_reg_sbi_ext(struct kvm_vcpu *vcpu,
+>                                    const struct kvm_one_reg *reg);
+> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
+> index d1c83a77735e..f58368f7df1d 100644
+> --- a/arch/riscv/kvm/vcpu_sbi.c
+> +++ b/arch/riscv/kvm/vcpu_sbi.c
+> @@ -156,6 +156,18 @@ void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu=
+ *vcpu,
+>         run->exit_reason =3D KVM_EXIT_SYSTEM_EVENT;
+>  }
+>
+> +void kvm_riscv_vcpu_sbi_request_reset(struct kvm_vcpu *vcpu,
+> +                                      unsigned long pc, unsigned long a1=
+)
+> +{
+> +       spin_lock(&vcpu->arch.reset_cntx_lock);
+> +       vcpu->arch.guest_reset_context.sepc =3D pc;
+> +       vcpu->arch.guest_reset_context.a0 =3D vcpu->vcpu_id;
+> +       vcpu->arch.guest_reset_context.a1 =3D a1;
+> +       spin_unlock(&vcpu->arch.reset_cntx_lock);
+> +
+> +       kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
+> +}
+> +
+>  int kvm_riscv_vcpu_sbi_return(struct kvm_vcpu *vcpu, struct kvm_run *run=
+)
+>  {
+>         struct kvm_cpu_context *cp =3D &vcpu->arch.guest_context;
+> diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hsm.=
+c
+> index 3070bb31745d..f26207f84bab 100644
+> --- a/arch/riscv/kvm/vcpu_sbi_hsm.c
+> +++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
+> @@ -15,7 +15,6 @@
+>
+>  static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vcpu)
+>  {
+> -       struct kvm_cpu_context *reset_cntx;
+>         struct kvm_cpu_context *cp =3D &vcpu->arch.guest_context;
+>         struct kvm_vcpu *target_vcpu;
+>         unsigned long target_vcpuid =3D cp->a0;
+> @@ -32,17 +31,7 @@ static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vcp=
+u)
+>                 goto out;
+>         }
+>
+> -       spin_lock(&target_vcpu->arch.reset_cntx_lock);
+> -       reset_cntx =3D &target_vcpu->arch.guest_reset_context;
+> -       /* start address */
+> -       reset_cntx->sepc =3D cp->a1;
+> -       /* target vcpu id to start */
+> -       reset_cntx->a0 =3D target_vcpuid;
+> -       /* private data passed from kernel */
+> -       reset_cntx->a1 =3D cp->a2;
+> -       spin_unlock(&target_vcpu->arch.reset_cntx_lock);
+> -
+> -       kvm_make_request(KVM_REQ_VCPU_RESET, target_vcpu);
+> +       kvm_riscv_vcpu_sbi_request_reset(target_vcpu, cp->a1, cp->a2);
+>
+>         __kvm_riscv_vcpu_power_on(target_vcpu);
+>
+> diff --git a/arch/riscv/kvm/vcpu_sbi_system.c b/arch/riscv/kvm/vcpu_sbi_s=
+ystem.c
+> index bc0ebba89003..359be90b0fc5 100644
+> --- a/arch/riscv/kvm/vcpu_sbi_system.c
+> +++ b/arch/riscv/kvm/vcpu_sbi_system.c
+> @@ -13,7 +13,6 @@ static int kvm_sbi_ext_susp_handler(struct kvm_vcpu *vc=
+pu, struct kvm_run *run,
+>                                     struct kvm_vcpu_sbi_return *retdata)
+>  {
+>         struct kvm_cpu_context *cp =3D &vcpu->arch.guest_context;
+> -       struct kvm_cpu_context *reset_cntx;
+>         unsigned long funcid =3D cp->a6;
+>         unsigned long hva, i;
+>         struct kvm_vcpu *tmp;
+> @@ -45,14 +44,7 @@ static int kvm_sbi_ext_susp_handler(struct kvm_vcpu *v=
+cpu, struct kvm_run *run,
+>                         }
+>                 }
+>
+> -               spin_lock(&vcpu->arch.reset_cntx_lock);
+> -               reset_cntx =3D &vcpu->arch.guest_reset_context;
+> -               reset_cntx->sepc =3D cp->a1;
+> -               reset_cntx->a0 =3D vcpu->vcpu_id;
+> -               reset_cntx->a1 =3D cp->a2;
+> -               spin_unlock(&vcpu->arch.reset_cntx_lock);
+> -
+> -               kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
+> +               kvm_riscv_vcpu_sbi_request_reset(vcpu, cp->a1, cp->a2);
+>
+>                 /* userspace provides the suspend implementation */
+>                 kvm_riscv_vcpu_sbi_forward(vcpu, run);
+> --
+> 2.48.1
+>
+
+Otherwise, it looks good to me.
+I have taken care of the above comment at the time
+of merging this patch.
 
 Queued this patch for Linux-6.16
 
 Thanks,
 Anup
-
-> ---
->  arch/riscv/include/asm/kvm_vcpu_vector.h |  6 ++----
->  arch/riscv/kvm/vcpu.c                    |  5 ++++-
->  arch/riscv/kvm/vcpu_vector.c             | 13 +++++++------
->  3 files changed, 13 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/riscv/include/asm/kvm_vcpu_vector.h b/arch/riscv/includ=
-e/asm/kvm_vcpu_vector.h
-> index 27f5bccdd8b0..57a798a4cb0d 100644
-> --- a/arch/riscv/include/asm/kvm_vcpu_vector.h
-> +++ b/arch/riscv/include/asm/kvm_vcpu_vector.h
-> @@ -33,8 +33,7 @@ void kvm_riscv_vcpu_guest_vector_restore(struct kvm_cpu=
-_context *cntx,
->                                          unsigned long *isa);
->  void kvm_riscv_vcpu_host_vector_save(struct kvm_cpu_context *cntx);
->  void kvm_riscv_vcpu_host_vector_restore(struct kvm_cpu_context *cntx);
-> -int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu,
-> -                                       struct kvm_cpu_context *cntx);
-> +int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu);
->  void kvm_riscv_vcpu_free_vector_context(struct kvm_vcpu *vcpu);
->  #else
->
-> @@ -62,8 +61,7 @@ static inline void kvm_riscv_vcpu_host_vector_restore(s=
-truct kvm_cpu_context *cn
->  {
->  }
->
-> -static inline int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *v=
-cpu,
-> -                                                     struct kvm_cpu_cont=
-ext *cntx)
-> +static inline int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *v=
-cpu)
->  {
->         return 0;
->  }
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 60d684c76c58..2fb75288ecfe 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -57,6 +57,7 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
->         struct kvm_vcpu_csr *reset_csr =3D &vcpu->arch.guest_reset_csr;
->         struct kvm_cpu_context *cntx =3D &vcpu->arch.guest_context;
->         struct kvm_cpu_context *reset_cntx =3D &vcpu->arch.guest_reset_co=
-ntext;
-> +       void *vector_datap =3D cntx->vector.datap;
->         bool loaded;
->
->         /**
-> @@ -79,6 +80,8 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
->
->         kvm_riscv_vcpu_fp_reset(vcpu);
->
-> +       /* Restore datap as it's not a part of the guest context. */
-> +       cntx->vector.datap =3D vector_datap;
->         kvm_riscv_vcpu_vector_reset(vcpu);
->
->         kvm_riscv_vcpu_timer_reset(vcpu);
-> @@ -143,7 +146,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->         cntx->hstatus |=3D HSTATUS_SPV;
->         spin_unlock(&vcpu->arch.reset_cntx_lock);
->
-> -       if (kvm_riscv_vcpu_alloc_vector_context(vcpu, cntx))
-> +       if (kvm_riscv_vcpu_alloc_vector_context(vcpu))
->                 return -ENOMEM;
->
->         /* By default, make CY, TM, and IR counters accessible in VU mode=
- */
-> diff --git a/arch/riscv/kvm/vcpu_vector.c b/arch/riscv/kvm/vcpu_vector.c
-> index d92d1348045c..a5f88cb717f3 100644
-> --- a/arch/riscv/kvm/vcpu_vector.c
-> +++ b/arch/riscv/kvm/vcpu_vector.c
-> @@ -22,6 +22,9 @@ void kvm_riscv_vcpu_vector_reset(struct kvm_vcpu *vcpu)
->         struct kvm_cpu_context *cntx =3D &vcpu->arch.guest_context;
->
->         cntx->sstatus &=3D ~SR_VS;
-> +
-> +       cntx->vector.vlenb =3D riscv_v_vsize / 32;
-> +
->         if (riscv_isa_extension_available(isa, v)) {
->                 cntx->sstatus |=3D SR_VS_INITIAL;
->                 WARN_ON(!cntx->vector.datap);
-> @@ -70,13 +73,11 @@ void kvm_riscv_vcpu_host_vector_restore(struct kvm_cp=
-u_context *cntx)
->                 __kvm_riscv_vector_restore(cntx);
->  }
->
-> -int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu,
-> -                                       struct kvm_cpu_context *cntx)
-> +int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu)
->  {
-> -       cntx->vector.datap =3D kmalloc(riscv_v_vsize, GFP_KERNEL);
-> -       if (!cntx->vector.datap)
-> +       vcpu->arch.guest_context.vector.datap =3D kzalloc(riscv_v_vsize, =
-GFP_KERNEL);
-> +       if (!vcpu->arch.guest_context.vector.datap)
->                 return -ENOMEM;
-> -       cntx->vector.vlenb =3D riscv_v_vsize / 32;
->
->         vcpu->arch.host_context.vector.datap =3D kzalloc(riscv_v_vsize, G=
-FP_KERNEL);
->         if (!vcpu->arch.host_context.vector.datap)
-> @@ -87,7 +88,7 @@ int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu=
- *vcpu,
->
->  void kvm_riscv_vcpu_free_vector_context(struct kvm_vcpu *vcpu)
->  {
-> -       kfree(vcpu->arch.guest_reset_context.vector.datap);
-> +       kfree(vcpu->arch.guest_context.vector.datap);
->         kfree(vcpu->arch.host_context.vector.datap);
->  }
->  #endif
-> --
-> 2.48.1
->
 
