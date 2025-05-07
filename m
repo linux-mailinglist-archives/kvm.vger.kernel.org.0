@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-45684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38595AAD2BD
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 03:23:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C30DAAD2BF
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 03:24:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4324D985CB2
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 01:23:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C3B7985CAA
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 01:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C9461D63EF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98081DE2B5;
 	Wed,  7 May 2025 01:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YIuQwTC6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J8TFf5me"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EAC3198E8C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9DEA1A8F94;
 	Wed,  7 May 2025 01:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746580891; cv=none; b=WXoJD3Xa3MYD9dHpWWF/6zIxr+uOaGbJroFgNdynNjyfQVagnFsNS+zLQzLF738om6rjLTdeEYWqWDG7jPSK82CsA4BfCc2FvUjfjQbjB5Q9/JsW38/2XAXX5ISK4Nw5OKL3vuMSNidspvu0mVC/J5+XNFAkYo2B770rGLtNxUc=
+	t=1746580891; cv=none; b=ih/ZSZDD9zpp23DYRi2GOviDPsFqXhm4q16PTs//0aBKbRp2jdW/nfNIwwrKry1Ub8xbhVMPsY8Ff2MitOmc+aKI5XI4BaLix3BgbU2c+wt9mJlIfrc17xu9dOf7eeplUrU+f8crzXsahthYyej+oWDgHuxI8/ZAAvtN6QcQrN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746580891; c=relaxed/simple;
-	bh=HNUxDNxmsA35a4yq3ONufJvC11cN0f1ZFby/QdJGW4I=;
+	bh=rAQ3L88ydpwyxQG8W291sUzYTiqgGjWuxhg99v92Wk8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AzQRYszhUNNAapDvzThXfPxNYVbVNPKqwZjilXG3J0JLi+NNupfoUQsRi2o03pgRIrnLnSkgu2NDAkrU0PvcUOfOl7IFyFoLEGyIYq8iZrauqpm6ZM2SHLuoRr+XjG9VRIiRRwLfpeyP769llTtDyeg71haiEmt8OmiZcM9fyrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YIuQwTC6; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=hmPf18XcaQsDmzMdfDRYQHPJnathqzxWwx+lSWPy5oOsL3MJ6cUUfuo0uYr/KAmPuaZVZDoZfPqAYR684W+CPHIULum15DQxD3UwpqnSlEpOFzf/DnFn3kiBo7qSJ+TjbqARSFnu14le/YQTRKRe5eiAWVJHY6fqmrgklKmkMw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J8TFf5me; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746580889; x=1778116889;
+  t=1746580890; x=1778116890;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HNUxDNxmsA35a4yq3ONufJvC11cN0f1ZFby/QdJGW4I=;
-  b=YIuQwTC69qsKEL2if1pHhkB5uyCGEULjMTE9IWyAKMtyfll5VH+7jyBc
-   IGruUaqQmhfluXd90htpdU6cAmy5l6oDXYp3E8pgFSJtdmBrAydgXx5pK
-   dL6XIPcuIVgXH88dpw8uTfOINO9nOUQ4IslUDRSR4uF1YfJtwDNbeqx/t
-   AVu01c5Ufj5LmYo/wG16BqOb4kVsiW2PR3RNCRY+9xiMPebXq2Apuf3W1
-   D8+UsDTgBEufN1LYTSP/qOTsee+SrVUXK0vRUIM996AZBXL1zN4BgrgQc
-   UTVtxT4qW4W3gawhU2Ig+me29ns/37PssealF8Io67r0rkBN+OmnQf5lx
+  bh=rAQ3L88ydpwyxQG8W291sUzYTiqgGjWuxhg99v92Wk8=;
+  b=J8TFf5mekJRh0RfbWYk4lhKitqrPO37K2Y+5LJL2UBL5s5iinlD+RhM0
+   gd+0DZ4oCGYiMUcTdsPy2J5TKeI8S2pHGdtUqT+YSrZRQRn+lvDkwtm0K
+   UNQnZa2yOTmhNigUwagquPIhHoo/arN91AD55GoGr+xYr8WdDWXhADRJ9
+   q+Ts4zSIOWl4OsHRotSjTAsS2d6Zb1cq5HfUTFKO8GfGO2YY1MAeRjMjr
+   LJ54sCOAJBiQvskYrbfy3R24YNTnjNyf/Ghe0Z5qX8AdnBPO3WW1a/UEC
+   uBtxhmHWI8l0mC7kGtYigT3soulRCqsnJj/FPAyFlz/gDKbsClIuSvLXY
    Q==;
-X-CSE-ConnectionGUID: aQYwmjmyTr6PtolaVNMP0g==
-X-CSE-MsgGUID: EZTCZw31S4KIuTli0BeEfA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="47384004"
+X-CSE-ConnectionGUID: tnlch8FyTT29FEyJsy9Odg==
+X-CSE-MsgGUID: FHVQ+D62RwCmr748ecTyTA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="47384024"
 X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="47384004"
+   d="scan'208";a="47384024"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 18:21:27 -0700
-X-CSE-ConnectionGUID: 5GUH4ti5TgiOcIHmQG8y+g==
-X-CSE-MsgGUID: 8OXM08jjRIiFFSaVP10Vyg==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 18:21:28 -0700
+X-CSE-ConnectionGUID: BMLo4i+yStuGr+oqeXdgnQ==
+X-CSE-MsgGUID: hl0pnGzXQjacwuZyxqyeuQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="136808757"
+   d="scan'208";a="136808760"
 Received: from sohilmeh.sc.intel.com ([172.25.103.65])
-  by fmviesa009.fm.intel.com with ESMTP; 06 May 2025 18:21:26 -0700
+  by fmviesa009.fm.intel.com with ESMTP; 06 May 2025 18:21:27 -0700
 From: Sohil Mehta <sohil.mehta@intel.com>
 To: x86@kernel.org,
 	linux-kernel@vger.kernel.org
@@ -101,9 +101,9 @@ Cc: Xin Li <xin@zytor.com>,
 	kvm@vger.kernel.org,
 	linux-pm@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH v5 7/9] x86/nmi: Enable NMI-source for IPIs delivered as NMIs
-Date: Tue,  6 May 2025 18:21:43 -0700
-Message-ID: <20250507012145.2998143-8-sohil.mehta@intel.com>
+Subject: [PATCH v5 8/9] perf/x86: Enable NMI-source reporting for perfmon
+Date: Tue,  6 May 2025 18:21:44 -0700
+Message-ID: <20250507012145.2998143-9-sohil.mehta@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250507012145.2998143-1-sohil.mehta@intel.com>
 References: <20250507012145.2998143-1-sohil.mehta@intel.com>
@@ -115,117 +115,91 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With the IPI handling APIs ready to support the new NMI encoding, encode
-the NMI delivery mode directly with the NMI-source vectors to trigger
-NMIs.
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 
-Move most of the existing NMI-based IPIs to use the new NMI-source
-vectors, except for the microcode rendezvous NMI and the crash reboot
-NMI. NMI handling for them is special-cased in exc_nmi() and does not
-need NMI-source reporting.
+Program the designated PMI NMI-source vector into the local vector table
+for the PMU. An NMI for the PMU would directly invoke the PMI handler
+without polling other NMI handlers, resulting in reduced PMI delivery
+latency.
 
-However, in the future, it might be useful to assign a source vector to
-all NMI sources to improve isolation and debuggability.
-
-Originally-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Co-developed-by: Xin Li (Intel) <xin@zytor.com>
-Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+Co-developed-by: Zeng Guang <guang.zeng@intel.com>
+Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Signed-off-by: Sohil Mehta <sohil.mehta@intel.com>
+Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
 ---
-v5: Encode APIC_DM_NMI directly with the NMI-source vector.
+v5: No significant change.
 ---
- arch/x86/include/asm/apic.h      | 7 +++++++
- arch/x86/kernel/apic/hw_nmi.c    | 2 +-
- arch/x86/kernel/cpu/mce/inject.c | 2 +-
- arch/x86/kernel/kgdb.c           | 2 +-
- arch/x86/kernel/nmi_selftest.c   | 2 +-
- arch/x86/kernel/smp.c            | 2 +-
- 6 files changed, 12 insertions(+), 5 deletions(-)
+ arch/x86/events/core.c       | 4 ++--
+ arch/x86/events/intel/core.c | 6 +++---
+ arch/x86/include/asm/apic.h  | 1 +
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
+diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+index 031e908f0d61..42b270526631 100644
+--- a/arch/x86/events/core.c
++++ b/arch/x86/events/core.c
+@@ -1695,7 +1695,7 @@ int x86_pmu_handle_irq(struct pt_regs *regs)
+ 	 * This generic handler doesn't seem to have any issues where the
+ 	 * unmasking occurs so it was left at the top.
+ 	 */
+-	apic_write(APIC_LVTPC, APIC_DM_NMI);
++	apic_write(APIC_LVTPC, PERF_NMI);
+ 
+ 	for_each_set_bit(idx, x86_pmu.cntr_mask, X86_PMC_IDX_MAX) {
+ 		if (!test_bit(idx, cpuc->active_mask))
+@@ -1737,7 +1737,7 @@ void perf_events_lapic_init(void)
+ 	/*
+ 	 * Always use NMI for PMU
+ 	 */
+-	apic_write(APIC_LVTPC, APIC_DM_NMI);
++	apic_write(APIC_LVTPC, PERF_NMI);
+ }
+ 
+ static int
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index 09d2d66c9f21..87c624686c58 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -3202,7 +3202,7 @@ static int intel_pmu_handle_irq(struct pt_regs *regs)
+ 	 * NMI handler.
+ 	 */
+ 	if (!late_ack && !mid_ack)
+-		apic_write(APIC_LVTPC, APIC_DM_NMI);
++		apic_write(APIC_LVTPC, PERF_NMI);
+ 	intel_bts_disable_local();
+ 	cpuc->enabled = 0;
+ 	__intel_pmu_disable_all(true);
+@@ -3239,7 +3239,7 @@ static int intel_pmu_handle_irq(struct pt_regs *regs)
+ 
+ done:
+ 	if (mid_ack)
+-		apic_write(APIC_LVTPC, APIC_DM_NMI);
++		apic_write(APIC_LVTPC, PERF_NMI);
+ 	/* Only restore PMU state when it's active. See x86_pmu_disable(). */
+ 	cpuc->enabled = pmu_enabled;
+ 	if (pmu_enabled)
+@@ -3252,7 +3252,7 @@ static int intel_pmu_handle_irq(struct pt_regs *regs)
+ 	 * Haswell CPUs.
+ 	 */
+ 	if (late_ack)
+-		apic_write(APIC_LVTPC, APIC_DM_NMI);
++		apic_write(APIC_LVTPC, PERF_NMI);
+ 	return handled;
+ }
+ 
 diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
-index 11a3f88518fa..9bade39b5feb 100644
+index 9bade39b5feb..b2f864e77d84 100644
 --- a/arch/x86/include/asm/apic.h
 +++ b/arch/x86/include/asm/apic.h
-@@ -23,6 +23,13 @@
- #define APIC_EXTNMI_ALL		1
- #define APIC_EXTNMI_NONE	2
+@@ -29,6 +29,7 @@
+ #define BT_NMI			(APIC_DM_NMI | NMIS_VECTOR_BT)
+ #define KGDB_NMI		(APIC_DM_NMI | NMIS_VECTOR_KGDB)
+ #define MCE_NMI			(APIC_DM_NMI | NMIS_VECTOR_MCE)
++#define PERF_NMI		(APIC_DM_NMI | NMIS_VECTOR_PMI)
  
-+/* Trigger NMIs with source information */
-+#define TEST_NMI		(APIC_DM_NMI | NMIS_VECTOR_TEST)
-+#define SMP_STOP_NMI		(APIC_DM_NMI | NMIS_VECTOR_SMP_STOP)
-+#define BT_NMI			(APIC_DM_NMI | NMIS_VECTOR_BT)
-+#define KGDB_NMI		(APIC_DM_NMI | NMIS_VECTOR_KGDB)
-+#define MCE_NMI			(APIC_DM_NMI | NMIS_VECTOR_MCE)
-+
  /*
   * Debugging macros
-  */
-diff --git a/arch/x86/kernel/apic/hw_nmi.c b/arch/x86/kernel/apic/hw_nmi.c
-index 4e04f13d2de9..586f4b25feae 100644
---- a/arch/x86/kernel/apic/hw_nmi.c
-+++ b/arch/x86/kernel/apic/hw_nmi.c
-@@ -33,7 +33,7 @@ u64 hw_nmi_get_sample_period(int watchdog_thresh)
- #ifdef arch_trigger_cpumask_backtrace
- static void nmi_raise_cpu_backtrace(cpumask_t *mask)
- {
--	__apic_send_IPI_mask(mask, NMI_VECTOR);
-+	__apic_send_IPI_mask(mask, BT_NMI);
- }
- 
- void arch_trigger_cpumask_backtrace(const cpumask_t *mask, int exclude_cpu)
-diff --git a/arch/x86/kernel/cpu/mce/inject.c b/arch/x86/kernel/cpu/mce/inject.c
-index a3c753dfce91..6328a607ffc4 100644
---- a/arch/x86/kernel/cpu/mce/inject.c
-+++ b/arch/x86/kernel/cpu/mce/inject.c
-@@ -269,7 +269,7 @@ static void __maybe_unused raise_mce(struct mce *m)
- 					mce_irq_ipi, NULL, 0);
- 				preempt_enable();
- 			} else if (m->inject_flags & MCJ_NMI_BROADCAST)
--				__apic_send_IPI_mask(mce_inject_cpumask, NMI_VECTOR);
-+				__apic_send_IPI_mask(mce_inject_cpumask, MCE_NMI);
- 		}
- 		start = jiffies;
- 		while (!cpumask_empty(mce_inject_cpumask)) {
-diff --git a/arch/x86/kernel/kgdb.c b/arch/x86/kernel/kgdb.c
-index 9ca4b141da0c..3dedc5f57541 100644
---- a/arch/x86/kernel/kgdb.c
-+++ b/arch/x86/kernel/kgdb.c
-@@ -416,7 +416,7 @@ static void kgdb_disable_hw_debug(struct pt_regs *regs)
-  */
- void kgdb_roundup_cpus(void)
- {
--	apic_send_IPI_allbutself(NMI_VECTOR);
-+	apic_send_IPI_allbutself(KGDB_NMI);
- }
- #endif
- 
-diff --git a/arch/x86/kernel/nmi_selftest.c b/arch/x86/kernel/nmi_selftest.c
-index 5196023b31dc..c5c91f520c69 100644
---- a/arch/x86/kernel/nmi_selftest.c
-+++ b/arch/x86/kernel/nmi_selftest.c
-@@ -71,7 +71,7 @@ static void __init test_nmi_ipi(struct cpumask *mask)
- 	/* sync above data before sending NMI */
- 	wmb();
- 
--	__apic_send_IPI_mask(mask, NMI_VECTOR);
-+	__apic_send_IPI_mask(mask, TEST_NMI);
- 
- 	/* Don't wait longer than a second */
- 	timeout = USEC_PER_SEC;
-diff --git a/arch/x86/kernel/smp.c b/arch/x86/kernel/smp.c
-index 5be1c0bdf901..614acec5655f 100644
---- a/arch/x86/kernel/smp.c
-+++ b/arch/x86/kernel/smp.c
-@@ -217,7 +217,7 @@ static void native_stop_other_cpus(int wait)
- 			pr_emerg("Shutting down cpus with NMI\n");
- 
- 			for_each_cpu(cpu, &cpus_stop_mask)
--				__apic_send_IPI(cpu, NMI_VECTOR);
-+				__apic_send_IPI(cpu, SMP_STOP_NMI);
- 		}
- 		/*
- 		 * Don't wait longer than 10 ms if the caller didn't
 -- 
 2.43.0
 
