@@ -1,288 +1,130 @@
-Return-Path: <kvm+bounces-45690-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45691-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FCE9AAD537
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 07:28:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37337AAD568
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 07:45:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E5324C5602
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 05:28:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F33B3BA6BC
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 05:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2D21E1DF6;
-	Wed,  7 May 2025 05:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B5F1FCD1F;
+	Wed,  7 May 2025 05:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ECgvF1KJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MK6IJYal"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65751DF968;
-	Wed,  7 May 2025 05:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B1C1EE7BE;
+	Wed,  7 May 2025 05:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746595686; cv=none; b=Ne4Qxq9KHzGiIrsvpsHsbKBPknjFU2JpgVAfWik4dJG4WR99UZwqveU2gqBMlBGhl2Yb715NTP29VaxOTSGoeGdTacR1FSm1lV65ktmLjrPhDlF1h4a3JKtv3W80RGMqN4h7bBly/LTKyL64l4jqLkbAbWp8QS6F3ileS9QVhE4=
+	t=1746596692; cv=none; b=O9djkFBl+NFfWFWaYzKaoVUdphgeCOSc9pj7Fun81y9YtubfB8v8rYVr0r6XJR4ZK3mYxd412btdcHTD3qhxiKyI2Mck8nt/w7LrdLQa5b4TXrDwCBAVcLSQMHzljg2/LXAPLnaEgYVYVYdUdMOb8WBC1UCcX1Uy7PXbRZvk4OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746595686; c=relaxed/simple;
-	bh=Cijq2E0xF6duCxceftnIZjpIQiWFoR/1fj7fTD5TZoQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SYyf/NBrP9VruwvWX/ZjukmRAapc9skSXFpYCje7ibqyTeylridHKRKW8LDmZByOsELO9hurzbRaUBfUgc4JdtNTojc7sBzyLYiEQUN7zURtR+LGZHerXZWKPmhSOiAgrDSTICF4J0kKL6G0yvhS2NSqUDSrfdNz7m4mPsca7FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ECgvF1KJ; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1746596692; c=relaxed/simple;
+	bh=JQX+pNi+rd47yrsUf9LzXxL1bR3OCMpgA5gg847AdJU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UhEZpFpH/ZjWSPZPUdAJ2vMqSK/Ri4ONBplvnuVbTdq8Xmo5Aw3zezylvPcbXZ682/H7a1JnnQkZWFJPYDOlemYuwAnYx8PfbNkpdgQhViqdctKF+FhHMooOLmnOUbGFiw10cZio9+rlEJPKk7/rMgstVpUf2DmyAOKXUAYT+ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MK6IJYal; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746595685; x=1778131685;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Cijq2E0xF6duCxceftnIZjpIQiWFoR/1fj7fTD5TZoQ=;
-  b=ECgvF1KJmk6YPN7VM1ZSejEM+QEIJZR1241A4b74Kq7DLte3D0Qonmb7
-   UHf52c75wCn9xrVan0lo8BWAsZG4bqOw/+eBPi2JnuyZR2c4qFH1vRyeI
-   fFGCaQQ04gwQI0jW66EKVjpczDuyRVBzmVCzx7bq1Z0kZEtxrhjhb3+Jt
-   ghsHAsFb9kHcmDhzxqUU5RHvBOZsmBiy/Ixmi41fyK6xfaYYWJwqVFCG8
-   Z30HTIUEhfRla8Jhi3RuTtUhLlU2m1NujYMtKpkAuiJnqwrk9mvNOuiaU
-   yTIzXjLvKBiuWWwjl4S1POxy5BvYFchUyC/je/7aJFl+WzuTTLcNk5bZD
-   g==;
-X-CSE-ConnectionGUID: 3hIsq8hdSAy4X208KozZCA==
-X-CSE-MsgGUID: QQLIPbkXQF+HVF+l8q7xbA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="50950719"
+  t=1746596690; x=1778132690;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JQX+pNi+rd47yrsUf9LzXxL1bR3OCMpgA5gg847AdJU=;
+  b=MK6IJYalkhLgDuZa2sGeIx0Rd0kXh4XubKcOw6OfbaIIGm9abJZWIACe
+   /KUBBoy1ZhEv2iF8/VRW7cFI/Ub+3jegyiEElIOpn/sd0dIEyzrYfrKgM
+   niZw9zLzD0/eA/72NxZMhEVBbwWRU7oVQOgakK4vSc8poFSJhcRVuDNkF
+   YJFBjxHg7RB90b6d1st2vBArnbD8rnwfs4XXi3pqWzynWAbi3dDE4vRHA
+   uRb0Yz7wuPTT8I/L/GJYYxcglpOB1y6XSM6pHgaSHEBpEpODPMgNU4Cdj
+   qer9K+eUvOWEaqyWyt6AWE/zsrjQUPDBnqeO4bsTG4i1efefgMwdrodNK
+   A==;
+X-CSE-ConnectionGUID: GzO16g5DTF6yO5ZFZ+iT7g==
+X-CSE-MsgGUID: 2GN5LkD1RPuSFNQQ1vYnaQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="48202530"
 X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="50950719"
+   d="scan'208";a="48202530"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 22:28:04 -0700
-X-CSE-ConnectionGUID: nUoencVOTlOHLTQxhdETsA==
-X-CSE-MsgGUID: mV0hs1qPQLOZnKzMs1pu+w==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 22:44:49 -0700
+X-CSE-ConnectionGUID: h2ssVtyISB66sQtFkP2/BA==
+X-CSE-MsgGUID: 1ljMQRoCQ7G7X1gly5+u1Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="135842157"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 22:27:59 -0700
-Message-ID: <181eae79-735d-414e-9a46-caa321602204@linux.intel.com>
-Date: Wed, 7 May 2025 13:27:56 +0800
+   d="scan'208";a="135844091"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 06 May 2025 22:44:45 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uCXaF-00076C-1W;
+	Wed, 07 May 2025 05:44:43 +0000
+Date: Wed, 7 May 2025 13:44:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
+	pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+	herbert@gondor.apana.org.au
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, x86@kernel.org,
+	john.allen@amd.com, davem@davemloft.net, thomas.lendacky@amd.com,
+	michael.roth@amd.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3 3/4] crypto: ccp: Add support to enable
+ CipherTextHiding on SNP_INIT_EX
+Message-ID: <202505071309.cJl7zfy2-lkp@intel.com>
+References: <94ffa7595fca67cfdcd2352354791bdb6ac00499.1745279916.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] x86: KVM: VMX: preserve host's
- DEBUGCTLMSR_FREEZE_IN_SMM while in the guest mode
-To: mlevitsk@redhat.com, Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
- Borislav Petkov <bp@alien8.de>, Paolo Bonzini <pbonzini@redhat.com>,
- x86@kernel.org, Dave Hansen <dave.hansen@linux.intel.com>,
- Ingo Molnar <mingo@redhat.com>, linux-kernel@vger.kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>
-References: <20250416002546.3300893-1-mlevitsk@redhat.com>
- <20250416002546.3300893-4-mlevitsk@redhat.com> <aAgpD_5BI6ZcCN29@google.com>
- <2b1ec570a37992cdfa2edad325e53e0592d696c8.camel@redhat.com>
- <71af8435d2085b3f969cb3e73cff5bfacd243819.camel@redhat.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <71af8435d2085b3f969cb3e73cff5bfacd243819.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <94ffa7595fca67cfdcd2352354791bdb6ac00499.1745279916.git.ashish.kalra@amd.com>
+
+Hi Ashish,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on next-20250417]
+[cannot apply to herbert-cryptodev-2.6/master herbert-crypto-2.6/master kvm/queue kvm/next linus/master kvm/linux-next v6.15-rc3 v6.15-rc2 v6.15-rc1 v6.15-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ashish-Kalra/crypto-ccp-New-bit-field-definitions-for-SNP_PLATFORM_STATUS-command/20250422-082725
+base:   next-20250417
+patch link:    https://lore.kernel.org/r/94ffa7595fca67cfdcd2352354791bdb6ac00499.1745279916.git.ashish.kalra%40amd.com
+patch subject: [PATCH v3 3/4] crypto: ccp: Add support to enable CipherTextHiding on SNP_INIT_EX
+config: i386-buildonly-randconfig-002-20250422 (https://download.01.org/0day-ci/archive/20250507/202505071309.cJl7zfy2-lkp@intel.com/config)
+compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250507/202505071309.cJl7zfy2-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505071309.cJl7zfy2-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from arch/x86/kvm/svm/svm.c:24:
+>> include/linux/psp-sev.h:1035:74: error: use of undeclared identifier 'FALSE'
+    1035 | static inline bool is_sev_snp_ciphertext_hiding_supported(void) { return FALSE; }
+         |                                                                          ^
+   1 error generated.
 
 
-On 5/2/2025 4:53 AM, mlevitsk@redhat.com wrote:
-> On Thu, 2025-05-01 at 16:41 -0400, mlevitsk@redhat.com wrote:
->> On Tue, 2025-04-22 at 16:41 -0700, Sean Christopherson wrote:
->>> On Tue, Apr 15, 2025, Maxim Levitsky wrote:
->>>> Pass through the host's DEBUGCTL.DEBUGCTLMSR_FREEZE_IN_SMM to the guest
->>>> GUEST_IA32_DEBUGCTL without the guest seeing this value.
->>>>
->>>> Note that in the future we might allow the guest to set this bit as well,
->>>> when we implement PMU freezing on VM own, virtual SMM entry.
->>>>
->>>> Since the value of the host DEBUGCTL can in theory change between VM runs,
->>>> check if has changed, and if yes, then reload the GUEST_IA32_DEBUGCTL with
->>>> the new value of the host portion of it (currently only the
->>>> DEBUGCTLMSR_FREEZE_IN_SMM bit)
->>> No, it can't.  DEBUGCTLMSR_FREEZE_IN_SMM can be toggled via IPI callback, but
->>> IRQs are disabled for the entirety of the inner run loop.  And if I'm somehow
->>> wrong, this change movement absolutely belongs in a separate patch.
->
-> Hi,
->
-> You are right here - reading MSR_IA32_DEBUGCTLMSR in the inner loop is a performance
-> regression.
->
->
-> Any ideas on how to solve this then? Since currently its the common code that
-> reads the current value of the MSR_IA32_DEBUGCTLMSR and it doesn't leave any indication
-> about if it changed I can do either
->
-> 1. store old value as well, something like 'vcpu->arch.host_debugctl_old' Ugly IMHO.
->
-> 2. add DEBUG_CTL to the set of the 'dirty' registers, e.g add new bit for kvm_register_mark_dirty
-> It looks a bit overkill to me
->
-> 3. Add new x86 callback for something like .sync_debugctl(). I vote for this option.
->
-> What do you think/prefer?
+vim +/FALSE +1035 include/linux/psp-sev.h
 
-Hmm, not sure if I missed something, but why to move the reading host
-debug_ctrl MSR from the original place into inner loop? The interrupt has
-been disabled before reading host debug_ctrl for original code, suppose
-host debug_ctrl won't changed after reading it?
+  1034	
+> 1035	static inline bool is_sev_snp_ciphertext_hiding_supported(void) { return FALSE; }
+  1036	
 
-
->
-> Best regards,
-> 	Maxim Levitsky
->
->>>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
->>>> ---
->>>>  arch/x86/kvm/svm/svm.c |  2 ++
->>>>  arch/x86/kvm/vmx/vmx.c | 28 +++++++++++++++++++++++++++-
->>>>  arch/x86/kvm/x86.c     |  2 --
->>>>  3 files changed, 29 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->>>> index cc1c721ba067..fda0660236d8 100644
->>>> --- a/arch/x86/kvm/svm/svm.c
->>>> +++ b/arch/x86/kvm/svm/svm.c
->>>> @@ -4271,6 +4271,8 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
->>>>  	svm->vmcb->save.rsp = vcpu->arch.regs[VCPU_REGS_RSP];
->>>>  	svm->vmcb->save.rip = vcpu->arch.regs[VCPU_REGS_RIP];
->>>>  
->>>> +	vcpu->arch.host_debugctl = get_debugctlmsr();
->>>> +
->>>>  	/*
->>>>  	 * Disable singlestep if we're injecting an interrupt/exception.
->>>>  	 * We don't want our modified rflags to be pushed on the stack where
->>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>>> index c9208a4acda4..e0bc31598d60 100644
->>>> --- a/arch/x86/kvm/vmx/vmx.c
->>>> +++ b/arch/x86/kvm/vmx/vmx.c
->>>> @@ -2194,6 +2194,17 @@ static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated
->>>>  	return debugctl;
->>>>  }
->>>>  
->>>> +static u64 vmx_get_host_preserved_debugctl(struct kvm_vcpu *vcpu)
->>> No, just open code handling DEBUGCTLMSR_FREEZE_IN_SMM, or make it a #define.
->>> I'm not remotely convinced that we'll ever want to emulate DEBUGCTLMSR_FREEZE_IN_SMM,
->>> and trying to plan for that possibility and adds complexity for no immediate value.
->> Hi,
->>
->> The problem here is a bit different: we indeed are very unlikely to emulate the
->> DEBUGCTLMSR_FREEZE_IN_SMM but however, when I wrote this patch I was sure that this bit is 
->> mandatory with PMU version of 2 or more,  but looks like it is optional after all:
->>
->> "
->> Note that system software must check if the processor supports the IA32_DEBUGCTL.FREEZE_WHILE_SMM
->> control bit. IA32_DEBUGCTL.FREEZE_WHILE_SMM is supported if IA32_PERF_CAPABIL-
->> ITIES.FREEZE_WHILE_SMM[Bit 12] is reporting 1. See Section 20.8 for details of detecting the presence of
->> IA32_PERF_CAPABILITIES MSR."
->>
->> KVM indeed doesn't set the bit 12 of IA32_PERF_CAPABILITIES.
->>
->> However, note that the Linux kernel silently sets this bit without checking the aforementioned capability 
->> bit and ends up with a #GP exception, which it silently ignores.... (I checked this with a trace...)
->>
->> This led me to believe that this bit should be unconditionally supported,
->> meaning that KVM should at least fake setting it without triggering a #GP.
->>
->> Since that is not the case, I can revert to the simpler model of exclusively using GUEST_IA32_DEBUGCTL 
->> while hiding the bit from the guest, however I do vote to keep the guest/host separation.
->>
->>>> +{
->>>> +	/*
->>>> +	 * Bits of host's DEBUGCTL that we should preserve while the guest is
->>>> +	 * running.
->>>> +	 *
->>>> +	 * Some of those bits might still be emulated for the guest own use.
->>>> +	 */
->>>> +	return DEBUGCTLMSR_FREEZE_IN_SMM;
->>>>
->>>>  u64 vmx_get_guest_debugctl(struct kvm_vcpu *vcpu)
->>>>  {
->>>>  	return to_vmx(vcpu)->msr_ia32_debugctl;
->>>> @@ -2202,9 +2213,11 @@ u64 vmx_get_guest_debugctl(struct kvm_vcpu *vcpu)
->>>>  static void __vmx_set_guest_debugctl(struct kvm_vcpu *vcpu, u64 data)
->>>>  {
->>>>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->>>> +	u64 host_mask = vmx_get_host_preserved_debugctl(vcpu);
->>>>  
->>>>  	vmx->msr_ia32_debugctl = data;
->>>> -	vmcs_write64(GUEST_IA32_DEBUGCTL, data);
->>>> +	vmcs_write64(GUEST_IA32_DEBUGCTL,
->>>> +		     (vcpu->arch.host_debugctl & host_mask) | (data & ~host_mask));
->>>>  }
->>>>  
->>>>  bool vmx_set_guest_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated)
->>>> @@ -2232,6 +2245,7 @@ bool vmx_set_guest_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated
->>>>  	return true;
->>>>  }
->>>>  
->>>> +
->>> Spurious newline.
->>>
->>>>  /*
->>>>   * Writes msr value into the appropriate "register".
->>>>   * Returns 0 on success, non-0 otherwise.
->>>> @@ -7349,6 +7363,7 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
->>>>  {
->>>>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->>>>  	unsigned long cr3, cr4;
->>>> +	u64 old_debugctl;
->>>>  
->>>>  	/* Record the guest's net vcpu time for enforced NMI injections. */
->>>>  	if (unlikely(!enable_vnmi &&
->>>> @@ -7379,6 +7394,17 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
->>>>  		vmcs_write32(PLE_WINDOW, vmx->ple_window);
->>>>  	}
->>>>  
->>>> +	old_debugctl = vcpu->arch.host_debugctl;
->>>> +	vcpu->arch.host_debugctl = get_debugctlmsr();
->>>> +
->>>> +	/*
->>>> +	 * In case the host DEBUGCTL had changed since the last time we
->>>> +	 * read it, update the guest's GUEST_IA32_DEBUGCTL with
->>>> +	 * the host's bits.
->>>> +	 */
->>>> +	if (old_debugctl != vcpu->arch.host_debugctl)
->>> This can and should be optimized to only do an update if a host-preserved bit
->>> is toggled.
->> True, I will do this in the next version.
->>
->>>> +		__vmx_set_guest_debugctl(vcpu, vmx->msr_ia32_debugctl);
->>> I would rather have a helper that explicitly writes the VMCS field, not one that
->>> sets the guest value *and* writes the VMCS field.
->>> The usage in init_vmcs() doesn't need to write vmx->msr_ia32_debugctl because the
->>> vCPU is zero allocated, and this usage doesn't change vmx->msr_ia32_debugctl.
->>> So the only path that actually needs to modify vmx->msr_ia32_debugctl is
->>> vmx_set_guest_debugctl().
->>
->> But what about nested entry? nested entry pretty much sets the MSR to a value given by the guest.
->>
->> Also technically the intel_pmu_legacy_freezing_lbrs_on_pmi also changes the guest value by emulating what the real hardware does.
->>
->> Best regards,
->> 	Maxim Levitsky
->>
->>
->>>> +
->>>>  	/*
->>>>  	 * We did this in prepare_switch_to_guest, because it needs to
->>>>  	 * be within srcu_read_lock.
->>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>>> index 844e81ee1d96..05e866ed345d 100644
->>>> --- a/arch/x86/kvm/x86.c
->>>> +++ b/arch/x86/kvm/x86.c
->>>> @@ -11020,8 +11020,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->>>>  		set_debugreg(0, 7);
->>>>  	}
->>>>  
->>>> -	vcpu->arch.host_debugctl = get_debugctlmsr();
->>>> -
->>>>  	guest_timing_enter_irqoff();
->>>>  
->>>>  	for (;;) {
->>>> -- 
->>>> 2.26.3
->>>>
->
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
