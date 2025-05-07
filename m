@@ -1,208 +1,224 @@
-Return-Path: <kvm+bounces-45707-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45708-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E026AADD8A
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 13:40:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF0EAAADDA2
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 13:44:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC6C34C0BC7
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 11:40:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C7EE17D136
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 11:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AD3233727;
-	Wed,  7 May 2025 11:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913E9234970;
+	Wed,  7 May 2025 11:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fyCNaDnJ"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="gU1jYMHt"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2054.outbound.protection.outlook.com [40.107.237.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C831C07C4;
-	Wed,  7 May 2025 11:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746618001; cv=fail; b=LV14zcgy/BE5gz9fhFpK6M2ZuQmH6CTGIjD/l45qTIV+XIy86CzIaxmRr3vOCK2ml3YP1SfDxFqzjmiEH46tJz9uNH6B3y8VBkZLv2pkFHzLezI4R6rIvH5c9z5qhbk8b1SQJJFDuhFFiHDTiTltHqYy9zXNV0oVJ812vpYXCKI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746618001; c=relaxed/simple;
-	bh=LKh1cM4hxyT9zp/fqbVu8nB/YSn35sV8DoE9SQFwK3w=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=WwJ+aANsCQtqjEyGMC/I69lGvJ7nwwi3vClkm15EwyzGByquvzSHZveaPv108+913NN5X9WnfQ9RdGVffCFZsylVGiBP8fHi0ru8Mn0Cy+8q1lRvMORe+grF65e70RmWFfS26V6WSgWpzlPOakEooRqmSVBT/wj4Z1ssM9OxTec=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=fyCNaDnJ; arc=fail smtp.client-ip=40.107.237.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KogdxJxmTAgE+GW86mnO0lgWrIH7sUjVe4Tk6ZyQ/umSJPr7dQYDSq4LV7XR+AbUlupWBRGq3ewmLdlVWIN+8ME1srIKMvCZUZRslE7Q9qv06fFAh5V1ExSWNFZYlBvwHlpka8KKKpjBfyNi7wbGXkqr8kOmSSAyRfP/GRTDmZvlegQPyxXorCKC4LdALiILwKlj8u3fwHW7QpEJMjBzsMxneuf98ao2ss1lqy3GA4s4C4FvaONOWMGBCgOePLZGdYtZaauq3RE2K7Lxf7dt0qkhedX5OkFbSHBCKDQH9vlaCezJYWemDQ4a5zish69BKmkFTlxatooA2Vjh1RbbMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D2Jzn5o0h8OJN8xpeUskC10vcHVr9yFoAgmNeX3FHuE=;
- b=uk8cKAEth+GNcEq0QxhksWGYUjOToQTgNFUV/EpGgGpnyAGDg//Xa/BfMEML2yoiwdgwZdxuXdHbGDKsECP8X9uq/pgLBXOr5BrBKyD0NTKsvjoEkYBUXtKwocTuz8X2XkeJyU7Q9MrqkFEzK/DbkMKN72+gLMEZ8ibTETFr3T0uk6HpieaYFYOzH2uJNGMwUxe7Jw2SYjAjiHG704Vp3checxR3ACdecFa//yjdoKkGzJDEP9+Br98O5aWAIqkZg7VzvuZovd/tW7M/Rsy1cRXAltStHrvd+wOy2tSuh+6uq3vM3B6pCsJz3MxmjIOlEIp5XH5fK1Sv/Eraicn/Lg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D2Jzn5o0h8OJN8xpeUskC10vcHVr9yFoAgmNeX3FHuE=;
- b=fyCNaDnJEUVtcGNcVxZlC1hrN/UT5m+Pd+aCUFNbQKc9eCB6VJHwE6yDasiI4jahfXu1Faclimij5Vu+vORCQQ6mAUkzASWlacf3uTFMGrJ4mM4tecbjmnDApbmVM9DSIBUqpF1/iTyYEoR9eupzQhR6zjuRZe9Sn0+VrJkGms4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6608.namprd12.prod.outlook.com (2603:10b6:8:d0::10) by
- DM6PR12MB4452.namprd12.prod.outlook.com (2603:10b6:5:2a4::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.21; Wed, 7 May 2025 11:39:51 +0000
-Received: from DS0PR12MB6608.namprd12.prod.outlook.com
- ([fe80::b71d:8902:9ab3:f627]) by DS0PR12MB6608.namprd12.prod.outlook.com
- ([fe80::b71d:8902:9ab3:f627%6]) with mapi id 15.20.8699.024; Wed, 7 May 2025
- 11:39:51 +0000
-Message-ID: <83dbcf46-642a-48fa-b9e5-6d163f0dda35@amd.com>
-Date: Wed, 7 May 2025 17:09:37 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 01/20] KVM: x86: Move find_highest_vector() to a common
- header
-To: Borislav Petkov <bp@alien8.de>
-Cc: Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
- Thomas.Lendacky@amd.com, nikunj@amd.com, Santosh.Shukla@amd.com,
- Vasant.Hegde@amd.com, Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com,
- x86@kernel.org, hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com,
- kvm@vger.kernel.org, kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
- naveen.rao@amd.com, francescolavra.fl@gmail.com
-References: <20250429061004.205839-1-Neeraj.Upadhyay@amd.com>
- <20250429061004.205839-2-Neeraj.Upadhyay@amd.com>
- <aBDlVF4qXeUltuju@google.com> <62ae9c91-b62e-4bf9-8cf2-e68ddd0a1487@amd.com>
- <20250507103821.GOaBs4HVnMXOdzOo_y@fat_crate.local>
-Content-Language: en-US
-From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-In-Reply-To: <20250507103821.GOaBs4HVnMXOdzOo_y@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0148.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:c8::10) To DS0PR12MB6608.namprd12.prod.outlook.com
- (2603:10b6:8:d0::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6952233701
+	for <kvm@vger.kernel.org>; Wed,  7 May 2025 11:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746618245; cv=none; b=ZpA/dul/JnZXhQeEngl+f9RQ6bZG6TZCu1EfrK0RjHqeiL0pdQWwZ1ya733jWGhOafkDcL2SM/3zD4ElwBWyCoPqAhVO8O75apfBRGtluYBr7f4IwmMHt005mFzgkPgctdub9ceIvX9DQToglYViv3IqxmF7yvfKP99u0jDL1wg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746618245; c=relaxed/simple;
+	bh=qEEBf/EvhFb5+S8vt2g6XJwST6O0nTQJRpn12U1g7EA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZHKnqUV9h0YFaQ9+YX8PlcO0wLLCLzRTmcdjwqR8WKrui4ZYHp3ivwENe87hbPqZrdEl3qa1mb0EbTB2EG1bL3xG4HbDtQpskNbD6oFj1vztVK++XZ7XHoSLT7oQA63hsRHQdldwA3j0EwA6aaM8MtzES7FPG36wgk5/eV///n4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=gU1jYMHt; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-86135af1045so780171839f.1
+        for <kvm@vger.kernel.org>; Wed, 07 May 2025 04:44:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1746618243; x=1747223043; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bVz2E+K/uMAryK5WXZfBalhzFkygNbdnQ6nqZ/JT97Y=;
+        b=gU1jYMHtLBX/bg6svOh/7/0bsT6Z+HrtMQzz7sSs+MZt1TfP1dglBLOf69poDnGZKN
+         rGGzzdWiMTgzVDiLw7vgrMpVRWE+1J74dwaV1KTqsnVjik5t+NuxzGiSUQ2ZGnqCIxNp
+         VXa8wyN+oH6CKLiCNzpnoxi88jnA5qACOS3BAagy2svsLUdUYPbe0PBSU/678M5grmac
+         CP5jSi5Y9JDkKVdXRfHqwNXY0OaiOG6skPI2gvMB0phNILSWNOhUn67LfSapnmwMlbbb
+         8BndgiZM/syqMYPm2tzvwYob1FQfT31nsoj5ZY9u9SQYiL6abQjzgCQ33ZczPsfdMsXE
+         Ar0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746618243; x=1747223043;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bVz2E+K/uMAryK5WXZfBalhzFkygNbdnQ6nqZ/JT97Y=;
+        b=EJgGjsA+MJHEFUbzesxAjGMDUE/EkuHYan6vO5Y+6nPcfz+56ClCttxwz18x/HSpDc
+         SpkjWkFTGstIT6Wn4Z4hBxYBKNwnhWY7FyVymyqp4Fz1mA+BmKTGjgC748RymDQS6w8i
+         07+bIfeLheFk+2s7vlf+JT04GUqHyvmCd0J4NURqwPurEkxGX/A9ot4qpI/2ZwodMc4S
+         PFpwoaPKRhurjy7ZR1V9YgzFSCUOiKDjRMQVomOo6Y0yaW8YhjApc4G3/x2uGDo0wqYA
+         rtSq3nBbgk8klc2E9w0g56yhYO0/y7Wm1rydnU0qlmaW4Y0vvrIaHsjnZbwKe4eC2Fuf
+         iGiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW88F7r1WNMpJ2WhSv8ErnCF8cT6/XZ4wrFLBdaOgn3owFt1o7FbJlnQQo6SJMPFO9WbnM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSM2WbiEFyBtYWlt/SI6rloBK9hFE3bbm3JBMAB8t8S8s847nP
+	HAPECh5HR5R8AcVEg1qJ9izCTQRrStUOqHLGcboQ46VjvLaPnZAspNq9G6vtO82g5LXDKLfIlHT
+	m/9NooZRHudIOUnMW4++ScFEA5gDMhXwVnIil3w==
+X-Gm-Gg: ASbGncs0irdANTjqa9FRUzG27oXkdMKm00O5oSmeFE8zavJ1xICb3IiI2EAvzHletu0
+	cbRlRPtHh9O2Ry6VpieTNwiwgmZeyPe6HWO84CKjwIPlp3FuBQ6Gm16KxLgBkyPSsIzuKiWjT6e
+	dGUICDQzamt70Z5oark4H+RcknkI12jtb46w==
+X-Google-Smtp-Source: AGHT+IEqTEU3gW24Jmigd2cIa8Pl0Ves+lUOw1f5tu/7B6fJK/PzbflFbxkax13tPvkDxDTPwZvRy4srBUyjnSLHpH0=
+X-Received: by 2002:a05:6e02:1529:b0:3d8:21ae:d9c with SMTP id
+ e9e14a558f8ab-3da738e9934mr32539925ab.5.1746618242847; Wed, 07 May 2025
+ 04:44:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6608:EE_|DM6PR12MB4452:EE_
-X-MS-Office365-Filtering-Correlation-Id: dc154c17-40a5-428c-7dcd-08dd8d5be104
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dlR5QTlpVFpuNFJ0dTlGS2psMGd6T1V1RlB0TEgyTENKSnQvaUZ0aE1uUDN2?=
- =?utf-8?B?SUY3VGhrOExIRElIczB0R1B0UmNnOFRTdC9YY1NzVk8vLytVS2x2KzZ1UW84?=
- =?utf-8?B?QThkVHZ3MC8rQjBUa0E0MUFWbk9XU2JKNzI4TnNIS1JIQVY2dlVjMTJJY1hS?=
- =?utf-8?B?TS9iTHRjd2lFclVpMWhUM1MzREpOSmd1ZE41RDVibzc0WlU5VEdqai9JMFMv?=
- =?utf-8?B?eWdpMHB2NFdkMlBUT0RLUTJQRHVqdUliVEVDaWxETUVsVkdpeXB2b0xycitv?=
- =?utf-8?B?OHBLbGpTcFN3RTMrZTlkYzZWeDZLbkMzbjgvM1BDY3NuZDZSRko3MkxNVnBQ?=
- =?utf-8?B?RERKUHJpejdKbXM0bXVPelkxOWtnbTlzMnFSbkMzcUp0ZW5aZWFOMXdYU2tV?=
- =?utf-8?B?YmNCakRaSHNjS0t0anhYUFpZdnR5SllDczA2MGhBUjVtN21HMnRSeHpscDht?=
- =?utf-8?B?KzFacy9oZDBVZ3dxdVRvUmdsNGlhdmRWVG54RHpTTmowZXFSRnZXWCtxUUdH?=
- =?utf-8?B?VTYxMmVhZXVqVmJ1THhWa3R0YTR4dnNla2JVai9tNjVZMWpGUGkzeWtVamlW?=
- =?utf-8?B?am9HRlA0QlQwaVlURnJYMWxaQnUvTm5FY2E3RUJjSmdybGY0NDl2VXh0d29X?=
- =?utf-8?B?MVNTbG8wQXNQSVlDSWVDdGVwb1J3QUFtbVNmRHliL0FoR0NZTHlrd2IvYzhv?=
- =?utf-8?B?eVYvUDc4SndFQnFVbVc3bUpoSFdMemhaQXdXdWx0VWczcmxLamZvWEFOcS9l?=
- =?utf-8?B?ZTUxbjZUYm9Ca0NWSTNRaTBHclBZU1E2emlqNnBXVEZkandONkt5NER0bnhv?=
- =?utf-8?B?K2NscTZtZUc4MnJYTFpIR1FSZWt1YUpPYmdnSlhzVkg3TlM4RzZEYXdPWDB0?=
- =?utf-8?B?eUlaRCtvem90djVMMFkrTHVUSXl3aWtRTTEzdWgrdC80aDBuRWtuUyttbTBU?=
- =?utf-8?B?bDM0T1ZtamdoSGVoRi8yYXBaNWt6RHRpRUtteE92Q0o0YWZZTlMzNG1ZWVVu?=
- =?utf-8?B?K2dHNUkrMTROM3RCamh5cXZJSzJ2cHNUenFqNU9DZGdlMGpaQTczeUs4bUNn?=
- =?utf-8?B?Qk93R3VoNU4vSkhsME1wTUhOSDZzdDZDRTdxMkxUSkdqbUx0d3k0OXU4ejM3?=
- =?utf-8?B?a2w2LytmMWRyc1MvS0FOME1QR1NGTXV6cEswRDFwT0RzQThQclkxcFJUY2Iv?=
- =?utf-8?B?YTgrTW1ia09KSnh0dEhzcW1WY2N3Yml2WmhQRis4THdYdFViOGI5RGdnV0J4?=
- =?utf-8?B?V2l5Nk4yRjFPaFdEdzhuYkZUUEYxTTN0RDlQbWUxVUdYTitjNVI2Y0JPVjJw?=
- =?utf-8?B?bnlLM1RVUXNwMEQrU1dKNUVBeDdieCs2Rnk0NjFpL0FQZzlleW9aTWxXWi9P?=
- =?utf-8?B?Vnc3Rm5RSnlHYnRRNXhuRXFUQlk3ZTVXZ0hXa1lUeWlkZlg1K0duSTdUaFhT?=
- =?utf-8?B?c2hMaTJkamJwY2pCcHJzWVBpNWJxTkFTa2E1Nlo5Ly8rc2VMK252enRHSytm?=
- =?utf-8?B?cTdPZFd5MW9TdWNQeWY4c3htMjlrU29zWkl0dkUzMGR3UUhXVUR2MEdLcCti?=
- =?utf-8?B?azNqdnQwTWxWTERibG9tTjNIemlaS0VHNXBmV3ZhU2NXalFRWTNFd09iUEJV?=
- =?utf-8?B?OGJYSFhIMW9VcUxUczk1OENRdkNiMzFuM014cXlrSWhwN2ZnSmFtZjhYemZP?=
- =?utf-8?B?UDIySWlWTmZKck9sRlVtSUJuTHNveXRZekI5UnZscVBlYjl3RXdIL01ONDdw?=
- =?utf-8?B?Q3lIUjNXSHJyNDVncnlsTGdFaUk2VkZWOVFtOUIzZ3ZaZmZuOU1VMVRJVWJJ?=
- =?utf-8?B?RlhlMlYwNjlnKzVLZGZBU2lmSGdIc0RxMWt0RkZ6ckNWQktNYm9HaFE2cWlC?=
- =?utf-8?B?eTk4WDliQ2pGcE1ubVY5NnRnSTZiQ1hPc3gvVVNZMnNnU2VSYy9JMGxUcE8r?=
- =?utf-8?Q?3KDBq8lgXcM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6608.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cy9CbDZ6RXBOMDlxeXpSd3dLVkwzOGh6WnVLZWo2SVh5OStON1RKWlhxSmdz?=
- =?utf-8?B?NVlWT2JRc0llMWZpMGR5bDFWMldZa1Vob0d4THVmcmhmVitlRXdWTXYreGlq?=
- =?utf-8?B?Q0w0Wk1ZU2txOEpYa2VSZTlGYnh1V3J0NCs0ck54ZjFZdEJWMmU4cytuMEw0?=
- =?utf-8?B?a2R3RVAyUHZseHVoQ1RDTFZFRENoUWp3SE9menJxK0V2VVF4eFUrWFVFSWor?=
- =?utf-8?B?ZkNIQ1k3Y29HWXozaEx6ZXZoeGszQkNtZmRPLy91bFRjTDZoVTBoU3U5NW9J?=
- =?utf-8?B?WmNSVVlKNUM0L2J0QUpnenlRRVlad3hxaThObnBVL3ZoemlmbW9PVlFJOC9x?=
- =?utf-8?B?YU8yOWhURzdGV1dNbFUzbTNIWDE4aW9wZzR0T2lnWm84NWZ0QkFqcU92RGdS?=
- =?utf-8?B?Ky9rdE15bnFUMjY4VkV4ODV0L0t3SWRmQnprUkNrTEJtbEpyRTcvUU5TUGpi?=
- =?utf-8?B?S0huakU5QUs2QnI0RlBpMkZ5N3Nrd1dxUWhKZ0hnY0t1b0VnYmJmYys5Wkx1?=
- =?utf-8?B?RXp2Mit6MDlDa2xzVXp1TlEraDdRbEszazdLVmRkUjVEUDNhNEViMzJqYndp?=
- =?utf-8?B?clFENkZXOWN2TGRBL0VJTVZzSUhxWDcyeFp2d0tnM2xmRDg4UjMyeUZCR09p?=
- =?utf-8?B?eWRMa1g1SXVJYnR4bDUwL2MvRUZHY0ROcHlqQkVvT3p4SWw0Z1BWSTJwS3pL?=
- =?utf-8?B?N2o4Sjc1S2twOXoyeFdQYjg4eWRrTDdDQW80QjlXTlN4VEpOK3ZZN3ZjTG1Q?=
- =?utf-8?B?NUN1REo0Ty9yMEhUYmQ2QVFjSmJFaW1iZVdVNWZweWdFbnU1dFlTZld6bkJH?=
- =?utf-8?B?bDc4NnhCVlBQQTFzaXFOQWlIaTc4NlEycWcySFZxVnd0Z0FLbmlvMVdoa0tr?=
- =?utf-8?B?aCtqdGpXRDd2RXJ6ZHFoS3lLN0xhQllLdmR3ckJaVFBWWHR1d216dFQ3RGNm?=
- =?utf-8?B?a2xudFpZdVVidUhJQXRwTXRYMFVxa1FPOERnd0txdlVMSEt1eS91eENsaHNZ?=
- =?utf-8?B?a1VoQmhHdXZabk1KTmROaEt1bWxBTkd6U2sxa1BCSEM1dVNDM2Jia0d0RVBJ?=
- =?utf-8?B?ZnJNU01ma0ZrV2luUHZkZkpUdmNtVVFzbU02NU12alpPY294QlZnZEtUbUJa?=
- =?utf-8?B?ZU41VDhsQUZQVWZJUGxjc09QTUNQak1Ld2pLZ09vZFFjbmExWlk1VkJyTHp0?=
- =?utf-8?B?UGdrbENsZmFtbW9OS252SlBCTWoxT2RtZ01SYUxFWjJTMDFiRVBNMFh0SnRV?=
- =?utf-8?B?RzRXMldJUHM3cWN3VTFwcHR3bHp3eStnZzd6MlN2NWd5R0dZZExaWnVTUjhj?=
- =?utf-8?B?b01CdVNSVklQYjdYOUNTa3NwVTZHSmpXTW1OaXphbm5QbXo1MUw2MWV6QnpF?=
- =?utf-8?B?TXUwTWF5TzhJTnExcVlMelluVTNzSDN1UUF6b242OEIwekhBeDVJRE5aQStj?=
- =?utf-8?B?U2NrVmRuRXU3ZXk1elNEMG9wd09DY1FPQmllVExZWUNPU1k1bXh1K1dGNzZY?=
- =?utf-8?B?MW11WUw0U3A3bWxIbi9FMVM1SERDQmRKUVJwSXR6YmhXL3NwZGtkOWhLWllH?=
- =?utf-8?B?M21TZmliN0piQ2dNejVmS2prS0NNODZ2QkRjRzdUMGJaeDg3amFjVVoxYVZI?=
- =?utf-8?B?QTRkbWpRbFBhaGNQMVJlS1Q0KzBOK1RFcEdicXJiU3I3aFRtQ3Myc1k5cHFS?=
- =?utf-8?B?UEJSN3Qwd0dsQzJ0OHBDZStCZHlXTVpTNlNVVFdURlVrZndTNmUzQ280TW9R?=
- =?utf-8?B?K1dscWM0amJPcWxRVVhtL2pJSWVOS1pQL3hEa2hIQytqV2ptaTJjM3FHdGx3?=
- =?utf-8?B?U3BFZk9LdWRaYXc2YXBjdytyNXY5ajJvTm5kYmwzOUpvejVlNXNMZGgyWnVI?=
- =?utf-8?B?cVRmTSt4UkZyc21DMFl2QTdoa0FzQytBdU9sM2g4TWNhYnlkTEFSejdQRTdN?=
- =?utf-8?B?OHUrZ05VTmZ1UVJLOXJZR2RjV3krTEdZQURyWE5CNjhzK1ROaW5uOXFETzNX?=
- =?utf-8?B?VjNDeHFBWHFBRU9DNGE5bXUveHhjMDA5cUxlZ29vTm9XZ0RxWHIxU1dpU2p4?=
- =?utf-8?B?U1RCMDhTMWN2anZ0OHpMaWlwUW5QSnBCOXB0cWw1TGlWd1JFOVlIZ1BwUTR5?=
- =?utf-8?Q?NAz12b1nLOfzG1/AqWXQ7/Vfy?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc154c17-40a5-428c-7dcd-08dd8d5be104
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6608.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2025 11:39:51.4627
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wmx07EzIno62SP853FypWDZmxtJ4/FYlGJF9A+YgrZsWFYEVSR5YGwjJ1JMpTe4Ckn1KO3J4hEhQVubUIUqtRA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4452
+References: <20250403112522.1566629-3-rkrcmar@ventanamicro.com> <20250403112522.1566629-4-rkrcmar@ventanamicro.com>
+In-Reply-To: <20250403112522.1566629-4-rkrcmar@ventanamicro.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Wed, 7 May 2025 17:13:51 +0530
+X-Gm-Features: ATxdqUETEm-yQn1qrwlBDD0f3dy7uLqyAaalj3uycXV7-PAmSrqpx552FKWRajk
+Message-ID: <CAAhSdy0XBTW1FUuUwSBanspDwpHMRbBL-8oSiRR1R=5SgF1+hw@mail.gmail.com>
+Subject: Re: [PATCH 1/5] KVM: RISC-V: refactor vector state reset
+To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
+Cc: kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, Andrew Jones <ajones@ventanamicro.com>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Apr 3, 2025 at 5:02=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar=
+@ventanamicro.com> wrote:
+>
+> Do not depend on the reset structures.
+>
+> vector.datap is a kernel memory pointer that needs to be preserved as it
+> is not a part of the guest vector data.
+>
+> Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@ventanamicro.com>
 
+Queued this patch for Linux-6.16
 
-On 5/7/2025 4:08 PM, Borislav Petkov wrote:
-> On Tue, Apr 29, 2025 at 11:39:53PM +0530, Neeraj Upadhyay wrote:
->> My bad. I missed updating the changelog with the information about logic update.
-> 
-> No, remember: when you move code like this, your first patch is *solely*
-> *mechanical* move.
-> 
-> Then, ontop, in further patches you do other changes.
-> 
-> You want to keep mechanical move separate from other changes because it
-> complicates review unnecessarily.
-> 
-> One of the reasons I'm trying to get you guys to do review too is because then
-> you'll know.
-> 
+Thanks,
+Anup
 
-Understood. Thanks for explaining this!
-
-
-- Neeraj
-
-
-> Thx.
-> 
-
+> ---
+>  arch/riscv/include/asm/kvm_vcpu_vector.h |  6 ++----
+>  arch/riscv/kvm/vcpu.c                    |  5 ++++-
+>  arch/riscv/kvm/vcpu_vector.c             | 13 +++++++------
+>  3 files changed, 13 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/kvm_vcpu_vector.h b/arch/riscv/includ=
+e/asm/kvm_vcpu_vector.h
+> index 27f5bccdd8b0..57a798a4cb0d 100644
+> --- a/arch/riscv/include/asm/kvm_vcpu_vector.h
+> +++ b/arch/riscv/include/asm/kvm_vcpu_vector.h
+> @@ -33,8 +33,7 @@ void kvm_riscv_vcpu_guest_vector_restore(struct kvm_cpu=
+_context *cntx,
+>                                          unsigned long *isa);
+>  void kvm_riscv_vcpu_host_vector_save(struct kvm_cpu_context *cntx);
+>  void kvm_riscv_vcpu_host_vector_restore(struct kvm_cpu_context *cntx);
+> -int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu,
+> -                                       struct kvm_cpu_context *cntx);
+> +int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu);
+>  void kvm_riscv_vcpu_free_vector_context(struct kvm_vcpu *vcpu);
+>  #else
+>
+> @@ -62,8 +61,7 @@ static inline void kvm_riscv_vcpu_host_vector_restore(s=
+truct kvm_cpu_context *cn
+>  {
+>  }
+>
+> -static inline int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *v=
+cpu,
+> -                                                     struct kvm_cpu_cont=
+ext *cntx)
+> +static inline int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *v=
+cpu)
+>  {
+>         return 0;
+>  }
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 60d684c76c58..2fb75288ecfe 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -57,6 +57,7 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
+>         struct kvm_vcpu_csr *reset_csr =3D &vcpu->arch.guest_reset_csr;
+>         struct kvm_cpu_context *cntx =3D &vcpu->arch.guest_context;
+>         struct kvm_cpu_context *reset_cntx =3D &vcpu->arch.guest_reset_co=
+ntext;
+> +       void *vector_datap =3D cntx->vector.datap;
+>         bool loaded;
+>
+>         /**
+> @@ -79,6 +80,8 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
+>
+>         kvm_riscv_vcpu_fp_reset(vcpu);
+>
+> +       /* Restore datap as it's not a part of the guest context. */
+> +       cntx->vector.datap =3D vector_datap;
+>         kvm_riscv_vcpu_vector_reset(vcpu);
+>
+>         kvm_riscv_vcpu_timer_reset(vcpu);
+> @@ -143,7 +146,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>         cntx->hstatus |=3D HSTATUS_SPV;
+>         spin_unlock(&vcpu->arch.reset_cntx_lock);
+>
+> -       if (kvm_riscv_vcpu_alloc_vector_context(vcpu, cntx))
+> +       if (kvm_riscv_vcpu_alloc_vector_context(vcpu))
+>                 return -ENOMEM;
+>
+>         /* By default, make CY, TM, and IR counters accessible in VU mode=
+ */
+> diff --git a/arch/riscv/kvm/vcpu_vector.c b/arch/riscv/kvm/vcpu_vector.c
+> index d92d1348045c..a5f88cb717f3 100644
+> --- a/arch/riscv/kvm/vcpu_vector.c
+> +++ b/arch/riscv/kvm/vcpu_vector.c
+> @@ -22,6 +22,9 @@ void kvm_riscv_vcpu_vector_reset(struct kvm_vcpu *vcpu)
+>         struct kvm_cpu_context *cntx =3D &vcpu->arch.guest_context;
+>
+>         cntx->sstatus &=3D ~SR_VS;
+> +
+> +       cntx->vector.vlenb =3D riscv_v_vsize / 32;
+> +
+>         if (riscv_isa_extension_available(isa, v)) {
+>                 cntx->sstatus |=3D SR_VS_INITIAL;
+>                 WARN_ON(!cntx->vector.datap);
+> @@ -70,13 +73,11 @@ void kvm_riscv_vcpu_host_vector_restore(struct kvm_cp=
+u_context *cntx)
+>                 __kvm_riscv_vector_restore(cntx);
+>  }
+>
+> -int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu,
+> -                                       struct kvm_cpu_context *cntx)
+> +int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu *vcpu)
+>  {
+> -       cntx->vector.datap =3D kmalloc(riscv_v_vsize, GFP_KERNEL);
+> -       if (!cntx->vector.datap)
+> +       vcpu->arch.guest_context.vector.datap =3D kzalloc(riscv_v_vsize, =
+GFP_KERNEL);
+> +       if (!vcpu->arch.guest_context.vector.datap)
+>                 return -ENOMEM;
+> -       cntx->vector.vlenb =3D riscv_v_vsize / 32;
+>
+>         vcpu->arch.host_context.vector.datap =3D kzalloc(riscv_v_vsize, G=
+FP_KERNEL);
+>         if (!vcpu->arch.host_context.vector.datap)
+> @@ -87,7 +88,7 @@ int kvm_riscv_vcpu_alloc_vector_context(struct kvm_vcpu=
+ *vcpu,
+>
+>  void kvm_riscv_vcpu_free_vector_context(struct kvm_vcpu *vcpu)
+>  {
+> -       kfree(vcpu->arch.guest_reset_context.vector.datap);
+> +       kfree(vcpu->arch.guest_context.vector.datap);
+>         kfree(vcpu->arch.host_context.vector.datap);
+>  }
+>  #endif
+> --
+> 2.48.1
+>
 
