@@ -1,361 +1,371 @@
-Return-Path: <kvm+bounces-45688-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45689-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9514AAD3F7
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 05:18:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A9DAAAD501
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 07:17:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B90073A4CC3
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 03:18:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEB5E468597
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 05:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8744D1B414A;
-	Wed,  7 May 2025 03:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11A81E8348;
+	Wed,  7 May 2025 05:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Drb+4KTk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WyB8ehr0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD77978C9C;
-	Wed,  7 May 2025 03:18:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746587915; cv=fail; b=qLK0/CTKE71izpfj0TacrMp1oXz0Zr3oIi6L1peO9H5ts4zQ+CTT+1c32fKlxIm8PlzGJWUYxMgiDz7u9LUmUyEXi9piWMa9/fbzRCO6JJ/eoKoYzXiytxtCbyJZ37LBb9EhjGCqxoo4qm5Hd/wQl4vDuskd1pUCYNWQPOZZZxM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746587915; c=relaxed/simple;
-	bh=2PM87knPRgJbYwf6jT8j8GhoV78O31XlDRL7aGtvXEk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=hZ9tBT4okFYIbEruCELZE9vId7AfxGbmm6n79knlUK3RUr5B67o0Y6OwaPdMUp5+B+gp61zYctbuQKNCBsy6tos3FUbdMN0QPlzDW1HQYsFBmJm5yjdbUuLKJTCyik1qJesarYdAGLrv6Tq3Wl+3QhHyYTwHWmhyluBY5djGQLY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Drb+4KTk; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39C31DF252;
+	Wed,  7 May 2025 05:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746595034; cv=none; b=Z5R0SCFsYq4BUk5/3Dd+242uvcMJrwRSatTuSZMCQiPR0zE5qjEp28jo64VxxoXkUruXjw54ke2L4Zn9cYWzH+Olmd7zfibyGYZUcfk7ySv1emZRt1euAyGzFSYL7wic0KDTAqPvqfGC6wf+DAlUpQ9s2dUZcGvwF4bluALami0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746595034; c=relaxed/simple;
+	bh=12IwskIPhu6oGfNdKGzLFMEBm5EiP9FaKcKTQO4HPAY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i4aqN4yNnlWkFbLbCmbeNRIJcreEua+5ctsnYNcL1zgqW5/3mIPhbRDymcQbdl9ZvZHAjPPlqLn0k2cI7e3kCZ+4fkCjiXmivXT5has9U7cJNF3az16vUyZv9I1RzRC6m3qbrxTOJDOYM8ikTzsGJUPPaMrINGaA6KOAjclumbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WyB8ehr0; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746587913; x=1778123913;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=2PM87knPRgJbYwf6jT8j8GhoV78O31XlDRL7aGtvXEk=;
-  b=Drb+4KTkU3h7B5oEhyouoFnXC8S1fh+YVHXrwTREb9IUrClqihcxFqSv
-   9bJOcdSiGLOVQqjbd4XjvD3g1qYZoczCiXPfZxLBZ0GIcP23K0fCbUOaE
-   krwblhl1U9N0XrPHuKn/Z7R64lkStjDbGb1WXZoNjt/DTnYvDOrMEtQjC
-   44EbNB1uW9R72K0sCoPzo2sVK5qFbCRbmO1LMu1P16U2883tZFjCJ79Zy
-   W954cCqVIRQID53T1UXvKb8qc1x+I+Rp0/WL090eQgiKdrBEs0V4aUCye
-   gnm8K7+beOoIo8BCCvNQZfZW4MBI1JQwA1bO8noX9TXFamEeQkOhFrYHz
-   Q==;
-X-CSE-ConnectionGUID: lTXyXzfwSuWhzwYm9pGkBQ==
-X-CSE-MsgGUID: /jZY/mOLSHCMF+A8kS7lLw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="59649122"
+  t=1746595032; x=1778131032;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=12IwskIPhu6oGfNdKGzLFMEBm5EiP9FaKcKTQO4HPAY=;
+  b=WyB8ehr0o1KknEhdaxwhJg75fyA86x9K/WiMuHzSb0Fs81bqCfcWmVOa
+   RiiKCRQGU+sc1T5tBCO/EETKjfzM1xpva6KiIUnv33VeVkKKIgm+pcc1R
+   DHEpttG1ptvzgZ7yuQkiNwQQUwy2OEgs42XVJlbVcyt2/9FCtt7UudXGX
+   3HajIx5Ezb2tz23KgIP63sGMTxe9IASYJZJr+RygNNOrzhpfHpNKf0vbJ
+   n7U1gFzcdLDqbBJf6Vru45q7KANYEySJLAplb4tCmpLBWsv60soAgWQBJ
+   u8urZgRtDybfpsIVjHp2fj8Ke1owUmCKbxJu5dxQYjqItISiQOeh1geH0
+   w==;
+X-CSE-ConnectionGUID: U3iYqsOARHO5GZamphOsEw==
+X-CSE-MsgGUID: bHjBrh29Qm2n/PBsGlZgjA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="47400509"
 X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="59649122"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 20:18:32 -0700
-X-CSE-ConnectionGUID: 2vOdpGrMSdiUXzHNOOBlug==
-X-CSE-MsgGUID: syB6m8nmRTybSvvuiRNpPQ==
+   d="scan'208";a="47400509"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 22:17:11 -0700
+X-CSE-ConnectionGUID: 02f5Ksq8TaS7odhxSO8Kpw==
+X-CSE-MsgGUID: 3A7aY4KwSPGVig9mHadwXA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="140994354"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 20:18:31 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Tue, 6 May 2025 20:18:30 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Tue, 6 May 2025 20:18:30 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.177)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 6 May 2025 20:18:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kr8MeOYn9JtGHrO1NlXMmJjYb5ihzoT+cggAcRsDPyO9ba0dEVepMTNS9XuXps3p6vGf1lyIX0L6Db5R4I5gQHzhVjHqwTvZ/jJ8kGXAEXxdehcA/LK/ClAjcXyoZOcCGn/pXxpOSMhiWrqaEUh6cYS9mRkVaX5IEdnl8Me7jsCI2j7M0Oq3xGsqb57UvOS2o4HEGAkXACwWjpYmENVcFvSe6uKHb0XoK7hNoe3wnkM0YfaBAyjPr7CxKHuqbfQsOmi57l1HYYprxE9/5WWxUdUIjt6cjAmp3nvdUn5A5p6yBYssdg8qfgpcIQOlRGHHVZZSusiOjLisjEGOBfDXLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2MCAhQUO1QipXb4T704c03MJNrb1G5W6sjduAxWUTR4=;
- b=Dfktq9kBuXl2F5q71rr0eA1kH2ySMe5RLEL1VgtTfAzwMOrz54m/o4mOer9ELEHmxkGnE2MwwYyqUIogCDt5dwqEUnbfnOHdxLSfg8Z5YJvfeYp+hWB6pHh8WuqOdJveOfaqwLPpUKWmyNMog0b65XMzxc+Sa7/hq1JpkYSf59qhZYUQhVFNXG+851qJCIGlij2oy2YO+TrX1OGVG1c+N/MZ+0uixBWPTUnFdZqD3MgEDnlMVVS0/TUABeZLGajsC7s6VRPhbdGTTu1MyKhzQ35jMUw2H2TH73x9JucgKZuk1elA/h0V3Jnlj2M32ScexbbMHcO1FjcdQdKGaIOiMA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- PH7PR11MB7718.namprd11.prod.outlook.com (2603:10b6:510:2b6::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.22; Wed, 7 May
- 2025 03:17:52 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.8699.024; Wed, 7 May 2025
- 03:17:52 +0000
-Date: Wed, 7 May 2025 11:15:44 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Ackerley Tng <ackerleytng@google.com>
-CC: <vannapurve@google.com>, <chenyi.qiang@intel.com>, <tabba@google.com>,
-	<quic_eberman@quicinc.com>, <roypat@amazon.co.uk>, <jgg@nvidia.com>,
-	<peterx@redhat.com>, <david@redhat.com>, <rientjes@google.com>,
-	<fvdl@google.com>, <jthoughton@google.com>, <seanjc@google.com>,
-	<pbonzini@redhat.com>, <zhiquan1.li@intel.com>, <fan.du@intel.com>,
-	<jun.miao@intel.com>, <isaku.yamahata@intel.com>, <muchun.song@linux.dev>,
-	<erdemaktas@google.com>, <qperret@google.com>, <jhubbard@nvidia.com>,
-	<willy@infradead.org>, <shuah@kernel.org>, <brauner@kernel.org>,
-	<bfoster@redhat.com>, <kent.overstreet@linux.dev>, <pvorel@suse.cz>,
-	<rppt@kernel.org>, <richard.weiyang@gmail.com>, <anup@brainfault.org>,
-	<haibo1.xu@intel.com>, <ajones@ventanamicro.com>, <vkuznets@redhat.com>,
-	<maciej.wieczor-retman@intel.com>, <pgonda@google.com>,
-	<oliver.upton@linux.dev>, <linux-kernel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <kvm@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-Subject: Re: [RFC PATCH 39/39] KVM: guest_memfd: Dynamically
- split/reconstruct HugeTLB page
-Message-ID: <aBrQYIyrxhqd+fBO@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <aA7UXI0NB7oQQrL2@yzhao56-desk.sh.intel.com>
- <diqz4iy5xvgi.fsf@ackerleytng-ctop.c.googlers.com>
- <aBlkplRxLNojF4m1@yzhao56-desk.sh.intel.com>
- <diqz1pt1sfw8.fsf@ackerleytng-ctop.c.googlers.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <diqz1pt1sfw8.fsf@ackerleytng-ctop.c.googlers.com>
-X-ClientProxiedBy: SI2PR02CA0050.apcprd02.prod.outlook.com
- (2603:1096:4:196::11) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+   d="scan'208";a="140954642"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 22:17:07 -0700
+Message-ID: <86f9b2f0-533c-478d-ac9a-dbee11537dac@linux.intel.com>
+Date: Wed, 7 May 2025 13:17:04 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH7PR11MB7718:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7c098166-6eb4-456d-57ba-08dd8d15c07b
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?+DZDvFDeQVzsxdSQkOgp8tvrF/fpUQGoJbVzJhYwwJt1JBrZgFU3m1/7uDjp?=
- =?us-ascii?Q?EqbD7DWVxgSe1jveyy/UcWe71/YF8xSGKO8bVI/UIH5ECAwV5FvK4e598oiM?=
- =?us-ascii?Q?hXpmv4QMyPhLvV5YaXndN5G5/TW/zFnq+wt3pTSuDiK1kJ9pNG0grVRO9fd2?=
- =?us-ascii?Q?wG8DKd1d8FzzrFummG65pCFHFlKfCbTm7FxXgLLbN76guj/FE1/zprb3J/u9?=
- =?us-ascii?Q?4oZgx/DWL9UI1+Bla/13rOck7eU2K3MBHEv3pQccV8eGIPbxiSC/BfpMuKmI?=
- =?us-ascii?Q?sIIz2ef8MyAHAfa/azEAl8a9wv1hpPf+JVBjmAT6cnpw3LRKAaxAF5+i7gEL?=
- =?us-ascii?Q?sdmFjBrHhU+r/u0p4w9OrHLAgPglvDXnBWwJFjmly0qUj6BKLg8VZmFVSUDy?=
- =?us-ascii?Q?BlY2eJGJRKKOUdu+8OrbnsvUmiN0FdKRGhmcO1PMyx6alxx5u7wCos+Z50BS?=
- =?us-ascii?Q?vSh/Ckw7J6ne4r7p6i/ejTr0rc3ZK5RjgdQayD4YLqEU5GcT8lnrCGnbrf5z?=
- =?us-ascii?Q?rS3J6SOtntCJNnbuVyP97PLGJ2g4HAF6Kljq6a0n6ymZpogC7++Vmw8nDtBj?=
- =?us-ascii?Q?zPVMzu/4eFOKLgNgRxyGttgM+JhLOGoP401Z2zp5ueEjZ9OWBqATR/lhX6t/?=
- =?us-ascii?Q?wmEfD76mE/yxDdNaWuMI+SpfzD/DPrVA9wBP/+aO0Ioy04JpnmF9hCQEXD3q?=
- =?us-ascii?Q?6HopEwg5JsrqYR+Cf2zcpaHyGZxOrWX68n2hJ/hX4S77pU38AFW3qHncQhlo?=
- =?us-ascii?Q?PKvd8sbK2WZqRoiWIckW59cwdIXmFWbKE7SKcfsDieCrFmPPUrYWLAyutO8Q?=
- =?us-ascii?Q?P3r8aHcOZYmUU1ZLtEn/ZGBpgGhZyLxgnzmNWVh8GMMQfeI+5/fWpoe2RNiJ?=
- =?us-ascii?Q?7ZiLpTdQ/TvdqW3yEjx5354iRnPvrIFIC6IzhzOdcM9Skh6SLbWSM26n1s1Q?=
- =?us-ascii?Q?xcVc5N0TI3nio10pDJSi03kyz38TBm42GB0sPi0cdA3TiLKt9AjxzXi3hYHG?=
- =?us-ascii?Q?nUvvjp2fhZ25CdOg3B45BdL9f9VB11/znEalYAs+l1AvUxsCWIbqhOd6XRxz?=
- =?us-ascii?Q?UGLBqp8h3O5I//eo1iHQYOP7/M72FrCh6i5uqhLOy2pFcyOij/uTfmLSrTwI?=
- =?us-ascii?Q?xZR/JIf2m8e4GdE0/kfaLvywufHmxg5QZwMwAQPWuJhMxugaZaNxM7XlJ+C4?=
- =?us-ascii?Q?tC3II9gVpRvqqdb0DjsiI3xtTSbtWNe+SWRtHTUFSYdkZuyObtjhDxluU1JC?=
- =?us-ascii?Q?JMISUGvP6ZX0KVErttOhB1/FRkJqSE4t3glwdXU9k3xQYChw98YYCYmL5p6i?=
- =?us-ascii?Q?WC7Lnjok4EZ3rts8KT8i0kzedU/c3zJ2FSyHR50i3fGMxQfqzn9efWpk7pcH?=
- =?us-ascii?Q?OxrAF7OK1jtzsixv5AjeNyR9UtFN?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?m8NtwTaN8TUMpiHlCNn3G+OV8fXM+RJzLU5/kU9a8iyqXIUsWmOMaBUL4Cje?=
- =?us-ascii?Q?2O+UnDt1V89SMOlEeV0MYAd1NrpspWRhENWylNHSWAe1bC6opt5PRosK8W/k?=
- =?us-ascii?Q?LeSP3jTwoFvbM3SRgLpWJb36+P4y8oeP140utodMvWhqZ4bzub/tSePc8XOO?=
- =?us-ascii?Q?gJpwhT0BhFQsP5ZQwyXFpcnpRryAsze+ajcrM6zFEGx2INyOMQc/QGftRz7H?=
- =?us-ascii?Q?D0QHzbTLEwqMoqAAOQ+WMMrzMjHe5sWkbisPcs9jELgm662uwJ68mEdxP+Dp?=
- =?us-ascii?Q?TK/wZ9OMUEfvmU//fSUjvomUQOGIzQ+2vvCNggRaWsw2OkmSqEz15HwdFaFp?=
- =?us-ascii?Q?m76S0VSPV2ZT8FXvJ+KSwACwz6GmKOUc3l8KevoWwhanNX+Kf5xQ0Zaf1F5i?=
- =?us-ascii?Q?0osMFGkk8ZBX0kOPF9/AcNVxyFLkSySlY0P0vsFrEs+Ljw0IykO1H0vXWqnd?=
- =?us-ascii?Q?3lj9uIV9Ez6n1Ba90OCAsvwnw5/vDMwAg5o6KuE6KDWuhumTFeIMBZNi1chl?=
- =?us-ascii?Q?OS/IY57806bIga7QiDYVd3lIJcyUekIZtdKCt5/HP3pKLZX+qUEa/Gdm1xhO?=
- =?us-ascii?Q?8DeZtph2urkJnfTSU3ZhwnYEXz8OSHvCSwM3CSxJwJV7CsDF78TDkbJNuGBs?=
- =?us-ascii?Q?78q6t1NdBLhsVkGOFzVsQ6ewFcx6lCdntGM1BvuYIYVLAxrIVTSdubhjIlaC?=
- =?us-ascii?Q?kIAPyYRQhiRN5nGfcIr/jxFuFa+t+Bfpqne6AyFN+y9GgU2um8SyxBdrpJNs?=
- =?us-ascii?Q?K2uWLLsqDotYvEMdsmKqBnufsRIMnRemulvYppNykuStw57wTVluZyUux7bO?=
- =?us-ascii?Q?93t4J6viYxthXwcpjqj8ae6r6xROUpu2E5LfZSkf4EiXTPz+tf10jqzg38tO?=
- =?us-ascii?Q?8c6f59DGDCvaIeXkIUdL8xuJMCUnOK66hu+pIcwvZPlbhWa9MSHoundjfvx6?=
- =?us-ascii?Q?Wq4qABC+swNRU0MIxxidHdvLj0X2g46zlmzp0h3iOTpoRipihNIZFdfEhigO?=
- =?us-ascii?Q?FrLhrDNY+TaizDGSfqQbqxDblrORyVQeNedfLSestV/mYydeM/FIG4sKk0WB?=
- =?us-ascii?Q?3dYhRQEOl37GkB4qwKpEXsWcVTcjDHH2HTTTTXn64kl/WHmk/9DS6g/81KcW?=
- =?us-ascii?Q?DPjhxOvilICVOLpqJvZ7D8yl4vX7kHr8/lqoje4WXWssEAtuZJzr21AtOM+o?=
- =?us-ascii?Q?ekZQNB9UShkdoIozNutuBVJYh57PmI0oTdMLnI03GRAo8MF+KhvLqliPrWwq?=
- =?us-ascii?Q?IiBEzA1lOkXTM32gL0M2ihCr1Wy3GmzzjU0CiAkjnceh2e3lOKLEjPXi9tGM?=
- =?us-ascii?Q?sjFwI7TTkT93IqQuuTI65eTWexgLkkaNBPaGvwrclboW0xIuaaPT0CHTXawa?=
- =?us-ascii?Q?azD7vJ7npQYLgpWr1ktcarKwUFatJgrlUmMC8UByIunz3MSGc56rgPskOlTG?=
- =?us-ascii?Q?YzTCPvigzgJg763meat+aK1Wxm93t0S+XCPA9qB7S+SyDn4c/EUx5o+I1ss8?=
- =?us-ascii?Q?FQC/4maFWb6Xe2YGh52gu+lkxBpwZKe65jDp9KRZ4guPKzkQ0SJ1qsCcFd6n?=
- =?us-ascii?Q?L6XL96rRT6/b+32MDb/Un1sctkN+hB1V/buuYGLt?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c098166-6eb4-456d-57ba-08dd8d15c07b
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2025 03:17:52.1430
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: j0KwSNibL4Jr+1jQ8Zu9ZOjn0h1Zz6iI8zKaJJOCy7kABhLUxfqq69B63UVNBx/+wgrxbiTmIW4Lo1iXUo7zaA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7718
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] x86: KVM: VMX: Wrap GUEST_IA32_DEBUGCTL read/write
+ with access functions
+To: mlevitsk@redhat.com, kvm@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
+ Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+ Sean Christopherson <seanjc@google.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>,
+ linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>
+References: <20250416002546.3300893-1-mlevitsk@redhat.com>
+ <20250416002546.3300893-2-mlevitsk@redhat.com>
+ <1a0325af-f264-47de-b9f7-da9721366c20@linux.intel.com>
+ <517ee0b7ba1a68a63e9e1068ec2570c62471d695.camel@redhat.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <517ee0b7ba1a68a63e9e1068ec2570c62471d695.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 06, 2025 at 12:22:47PM -0700, Ackerley Tng wrote:
-> Yan Zhao <yan.y.zhao@intel.com> writes:
-> 
-> >> > <snip>
-> >> >
-> >> > What options does userspace have in this scenario?
-> >> > It can't reduce the flag to KVM_GUEST_MEMFD_HUGE_2MB. Adjusting the gmem.pgoff
-> >> > isn't ideal either.
-> >> >
-> >> > What about something similar as below?
-> >> >
-> >> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> >> > index d2feacd14786..87c33704a748 100644
-> >> > --- a/virt/kvm/guest_memfd.c
-> >> > +++ b/virt/kvm/guest_memfd.c
-> >> > @@ -1842,8 +1842,16 @@ __kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
-> >> >         }
-> >> >
-> >> >         *pfn = folio_file_pfn(folio, index);
-> >> > -       if (max_order)
-> >> > -               *max_order = folio_order(folio);
-> >> > +       if (max_order) {
-> >> > +               int order;
-> >> > +
-> >> > +               order = folio_order(folio);
-> >> > +
-> >> > +               while (order > 0 && ((slot->base_gfn ^ slot->gmem.pgoff) & ((1 << order) - 1)))
-> >> > +                       order--;
-> >> > +
-> >> > +               *max_order = order;
-> >> > +       }
-> >> >
-> >> >         *is_prepared = folio_test_uptodate(folio);
-> >> >         return folio;
-> >> >
-> >> 
-> >> Vishal was wondering how this is working before guest_memfd was
-> >> introduced, for other backing memory like HugeTLB.
-> >> 
-> >> I then poked around and found this [1]. I will be adding a similar check
-> >> for any slot where kvm_slot_can_be_private(slot).
-> >>
-> >> Yan, that should work, right?
-> > No, I don't think the checking of ugfn [1] should work.
-> >
-> > 1. Even for slots bound to in-place-conversion guest_memfd (i.e. shared memory
-> > are allocated from guest_memfd), the slot->userspace_addr does not necessarily
-> > have the same offset as slot->gmem.pgoff. Even if we audit the offset in
-> > kvm_gmem_bind(), userspace could invoke munmap() and mmap() afterwards, causing
-> > slot->userspace_addr to point to a different offset.
-> >
-> > 2. for slots bound to guest_memfd that do not support in-place-conversion,
-> > shared memory is allocated from a different backend. Therefore, checking
-> > "slot->base_gfn ^ slot->gmem.pgoff" is required for private memory. The check is
-> > currently absent because guest_memfd supports 4K only.
-> >
-> >
-> 
-> Let me clarify, I meant these changes:
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4b64ab3..d0dccf1 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12938,6 +12938,11 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages)
->         return 0;
->  }
->  
-> +static inline bool kvm_is_level_aligned(u64 value, int level)
-> +{
-> +       return IS_ALIGNED(value, KVM_PAGES_PER_HPAGE(level));
-> +}
-> +
->  static int kvm_alloc_memslot_metadata(struct kvm *kvm,
->                                       struct kvm_memory_slot *slot)
->  {
-> @@ -12971,16 +12976,20 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
->  
->                 slot->arch.lpage_info[i - 1] = linfo;
->  
-> -               if (slot->base_gfn & (KVM_PAGES_PER_HPAGE(level) - 1))
-> +               if (!kvm_is_level_aligned(slot->base_gfn, level))
->                         linfo[0].disallow_lpage = 1;
-> -               if ((slot->base_gfn + npages) & (KVM_PAGES_PER_HPAGE(level) - 1))
-> +               if (!kvm_is_level_aligned(slot->base_gfn + npages, level))
->                         linfo[lpages - 1].disallow_lpage = 1;
->                 ugfn = slot->userspace_addr >> PAGE_SHIFT;
->                 /*
-> -                * If the gfn and userspace address are not aligned wrt each
-> -                * other, disable large page support for this slot.
-> +                * If the gfn and userspace address are not aligned or if gfn
-> +                * and guest_memfd offset are not aligned wrt each other,
-> +                * disable large page support for this slot.
->                  */
-> -               if ((slot->base_gfn ^ ugfn) & (KVM_PAGES_PER_HPAGE(level) - 1)) {
-> +               if (!kvm_is_level_aligned(slot->base_gfn ^ ugfn, level) ||
-> +                   (kvm_slot_can_be_private(slot) &&
-> +                    !kvm_is_level_aligned(slot->base_gfn ^ slot->gmem.pgoff,
-> +                                          level))) {
->                         unsigned long j;
->  
->                         for (j = 0; j < lpages; ++j)
-> 
-> This does not rely on the ugfn check, but adds a similar check for gmem.pgoff.
-In the case of shared memory is not allocated from guest_memfd, (e.g. with the
-current upstream code), the checking of gmem.pgoff here will disallow huge page
-of shared memory even if "slot->base_gfn ^ ugfn" is aligned.
 
-> I think this should take care of case (1.), for guest_memfds going to be
-> used for both shared and private memory. Userspace can't update
-> slot->userspace_addr, since guest_memfd memslots cannot be updated and
-> can only be deleted.
-> 
-> If userspace re-uses slot->userspace_addr for some other memory address
-> without deleting and re-adding a memslot,
-> 
-> + KVM's access to memory should still be fine, since after the recent
->   discussion at guest_memfd upstream call, KVM's guest faults will
->   always go via fd+offset and KVM's access won't be disrupted
->   there. Whatever checking done at memslot binding time will still be
->   valid.
-Could the offset of shared memory and offset of private memory be different if
-userspace re-uses slot->userspace_addr without deleting and re-adding a memslot?
+On 5/2/2025 4:34 AM, mlevitsk@redhat.com wrote:
+> On Wed, 2025-04-23 at 17:51 +0800, Mi, Dapeng wrote:
+>> The shortlog "x86: KVM: VMX: Wrap GUEST_IA32_DEBUGCTL read/write with
+>> access functions" doesn't follow Sean's suggestion
+>> (https://github.com/kvm-x86/linux/blob/next/Documentation/process/maintainer-kvm-x86.rst#shortlog).
+>> Please modify. Thanks.
+>>
+>>
+>> On 4/16/2025 8:25 AM, Maxim Levitsky wrote:
+>>> Instead of reading and writing GUEST_IA32_DEBUGCTL vmcs field directly,
+>>> wrap the logic with get/set functions.
+>>>
+>>> Also move the checks that the guest's supplied value is valid to the new
+>>> 'set' function.
+>>>
+>>> In particular, the above change fixes a minor security issue in which L1
+>>> hypervisor could set the GUEST_IA32_DEBUGCTL, and eventually the host's
+>>> MSR_IA32_DEBUGCTL to any value by performing a VM entry to L2 with
+>>> VM_ENTRY_LOAD_DEBUG_CONTROLS set.
+>>>
+>>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>>> ---
+>>>  arch/x86/kvm/vmx/nested.c    | 15 +++++++---
+>>>  arch/x86/kvm/vmx/pmu_intel.c |  9 +++---
+>>>  arch/x86/kvm/vmx/vmx.c       | 58 +++++++++++++++++++++++-------------
+>>>  arch/x86/kvm/vmx/vmx.h       |  3 ++
+>>>  4 files changed, 57 insertions(+), 28 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>>> index e073e3008b16..b7686569ee09 100644
+>>> --- a/arch/x86/kvm/vmx/nested.c
+>>> +++ b/arch/x86/kvm/vmx/nested.c
+>>> @@ -2641,6 +2641,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>>>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>>>  	struct hv_enlightened_vmcs *evmcs = nested_vmx_evmcs(vmx);
+>>>  	bool load_guest_pdptrs_vmcs12 = false;
+>>> +	u64 new_debugctl;
+>>>  
+>>>  	if (vmx->nested.dirty_vmcs12 || nested_vmx_is_evmptr12_valid(vmx)) {
+>>>  		prepare_vmcs02_rare(vmx, vmcs12);
+>>> @@ -2653,11 +2654,17 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>>>  	if (vmx->nested.nested_run_pending &&
+>>>  	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS)) {
+>>>  		kvm_set_dr(vcpu, 7, vmcs12->guest_dr7);
+>>> -		vmcs_write64(GUEST_IA32_DEBUGCTL, vmcs12->guest_ia32_debugctl);
+>>> +		new_debugctl = vmcs12->guest_ia32_debugctl;
+>>>  	} else {
+>>>  		kvm_set_dr(vcpu, 7, vcpu->arch.dr7);
+>>> -		vmcs_write64(GUEST_IA32_DEBUGCTL, vmx->nested.pre_vmenter_debugctl);
+>>> +		new_debugctl = vmx->nested.pre_vmenter_debugctl;
+>>>  	}
+>>> +
+>>> +	if (CC(!vmx_set_guest_debugctl(vcpu, new_debugctl, false))) {
+>>> +		*entry_failure_code = ENTRY_FAIL_DEFAULT;
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>>  	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
+>>>  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+>>>  		vmcs_write64(GUEST_BNDCFGS, vmx->nested.pre_vmenter_bndcfgs);
+>>> @@ -3520,7 +3527,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+>>>  
+>>>  	if (!vmx->nested.nested_run_pending ||
+>>>  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
+>>> -		vmx->nested.pre_vmenter_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
+>>> +		vmx->nested.pre_vmenter_debugctl = vmx_get_guest_debugctl(vcpu);
+>>>  	if (kvm_mpx_supported() &&
+>>>  	    (!vmx->nested.nested_run_pending ||
+>>>  	     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+>>> @@ -4788,7 +4795,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+>>>  	__vmx_set_segment(vcpu, &seg, VCPU_SREG_LDTR);
+>>>  
+>>>  	kvm_set_dr(vcpu, 7, 0x400);
+>>> -	vmcs_write64(GUEST_IA32_DEBUGCTL, 0);
+>>> +	vmx_set_guest_debugctl(vcpu, 0, false);
+>>>  
+>>>  	if (nested_vmx_load_msr(vcpu, vmcs12->vm_exit_msr_load_addr,
+>>>  				vmcs12->vm_exit_msr_load_count))
+>>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>>> index 8a94b52c5731..f6f448adfb80 100644
+>>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>>> @@ -19,6 +19,7 @@
+>>>  #include "lapic.h"
+>>>  #include "nested.h"
+>>>  #include "pmu.h"
+>>> +#include "vmx.h"
+>>>  #include "tdx.h"
+>>>  
+>>>  /*
+>>> @@ -652,11 +653,11 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+>>>   */
+>>>  static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
+>>>  {
+>>> -	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+>>> +	u64 data = vmx_get_guest_debugctl(vcpu);
+>>>  
+>>>  	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
+>>>  		data &= ~DEBUGCTLMSR_LBR;
+>>> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+>>> +		vmx_set_guest_debugctl(vcpu, data, true);
+>> Two questions. 
+>>
+>> 1. why to call vmx_set_guest_debugctl() to do the extra check? currently
+>> IA32_DEBUGCTL MSR is always intercepted and it's already checked at
+>> vmx_set_msr() and seems unnecessary to check here again.
+> Hi,
+>
+>
+> I wanted this to be consistent. KVM has plenty of functions that can be both
+> guest triggered and internally triggered. For example kvm_set_cr4()
+>
+> Besides the vmx_set_guest_debugctl also notes the value the guest wrote
+> to be able to return it back to the guest if we choose to overide some
+> bits of the MSR, so it made sense to have one common function to set the msr.
+>
+> Do you think that can affect performance? 
 
-Then though the two offsets are validated as equal in kvm_gmem_bind(), they may
-differ later on.
+hmm, since only DEBUGCTLMSR_LBR bit is changed here, it's safe to skip this
+check and write guest debug_ctrl directly. I have no idea how much
+performance impact this check would bring in high sampling frequency, but
+why not to eliminate it if it can?
 
-> + Host's access and other accesses (e.g. instruction emulation, which
->   uses slot->userspace_addr) to guest memory will be broken, but I think
->   there's nothing protecting against that. The same breakage would
->   happen for non-guest_memfd memslot.
-Why is host access broken in non-guest_memfd case?
-The HVA is still a valid one in QEMU's mmap-ed address space.
 
-> p.s. I will be adding the validation as you suggested [1], though that
-> shouldn't make a difference here, since the above check directly
-> validates against gmem.pgoff.
-> 
-> Regarding 2., checking this checks against gmem.pgoff and should handle
-> that as well.
-> 
-> [1] https://lore.kernel.org/all/aBnMp26iWWhUrsVf@yzhao56-desk.sh.intel.com/
-> 
-> I prefer checking at binding time because it aligns with the ugfn check
-> that is already there, and avoids having to check at every fault.
-> 
-> >> [1] https://github.com/torvalds/linux/blob/b6ea1680d0ac0e45157a819c41b46565f4616186/arch/x86/kvm/x86.c#L12996
-> >> 
-> >> >> >> Adding checks at binding time will allow hugepage-unaligned offsets (to
-> >> >> >> be at parity with non-guest_memfd backing memory) but still fix this
-> >> >> >> issue.
-> >> >> >> 
-> >> >> >> lpage_info will make sure that ranges near the bounds will be
-> >> >> >> fragmented, but the hugepages in the middle will still be mappable as
-> >> >> >> hugepages.
-> >> >> >> 
-> >> >> >> [1] https://lpc.events/event/18/contributions/1764/attachments/1409/3706/binding-must-have-same-alignment.svg
+>
+>
+>> 2. why the argument "host_initiated" is true? It looks the data is not from
+>> host.
+> This is my mistake.
+>
+>>
+>>>  	}
+>>>  }
+>>>  
+>>> @@ -729,7 +730,7 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>>>  
+>>>  	if (!lbr_desc->event) {
+>>>  		vmx_disable_lbr_msrs_passthrough(vcpu);
+>>> -		if (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)
+>>> +		if (vmx_get_guest_debugctl(vcpu) & DEBUGCTLMSR_LBR)
+>>>  			goto warn;
+>>>  		if (test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use))
+>>>  			goto warn;
+>>> @@ -751,7 +752,7 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>>>  
+>>>  static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+>>>  {
+>>> -	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
+>>> +	if (!(vmx_get_guest_debugctl(vcpu) & DEBUGCTLMSR_LBR))
+>>>  		intel_pmu_release_guest_lbr_event(vcpu);
+>>>  }
+>>>  
+>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>> index ef2d7208dd20..4237422dc4ed 100644
+>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>> @@ -2154,7 +2154,7 @@ int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>>  			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+>>>  		break;
+>>>  	case MSR_IA32_DEBUGCTLMSR:
+>>> -		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+>>> +		msr_info->data = vmx_get_guest_debugctl(vcpu);
+>>>  		break;
+>>>  	default:
+>>>  	find_uret_msr:
+>>> @@ -2194,6 +2194,41 @@ static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated
+>>>  	return debugctl;
+>>>  }
+>>>  
+>>> +u64 vmx_get_guest_debugctl(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	return vmcs_read64(GUEST_IA32_DEBUGCTL);
+>>> +}
+>>> +
+>>> +static void __vmx_set_guest_debugctl(struct kvm_vcpu *vcpu, u64 data)
+>>> +{
+>>> +	vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+>>> +}
+>> IMO,  it seems unnecessary to add these 2  wrappers since the original code
+>> is already intuitive enough and simple. But if you want, please add
+>> "inline" before these 2 wrappers.
+> The __vmx_set_guest_debugctl in the next patch will store the written value in
+> a field, this is why I did it this way.
+>
+> The vmx_get_guest_debugctl will read this value instead, also in the next patch.
+>
+> I thought it would be cleaner to first introduce the trivial wrappers and then
+> extend them.
+>
+>>
+>>> +
+>>> +bool vmx_set_guest_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated)
+>> Since most of code in this function checks guest debugctl, better to rename
+>> it to "vmx_check_and_set_guest_debugctl".
+> I don't mind doing so.
+>
+>>
+>>> +{
+>>> +	u64 invalid = data & ~vmx_get_supported_debugctl(vcpu, host_initiated);
+>>> +
+>>> +	if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
+>>> +		kvm_pr_unimpl_wrmsr(vcpu, MSR_IA32_DEBUGCTLMSR, data);
+>>> +		data &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+>>> +		invalid &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+>> Add space around above 3 "|".
+> I copied this code "as is" from the wrmsr code. I can add this though.
+>
+> Best regards,
+> 	Maxim Levitsky
+>
+>>
+>>> +	}
+>>> +
+>>> +	if (invalid)
+>>> +		return false;
+>>> +
+>>> +	if (is_guest_mode(vcpu) && (get_vmcs12(vcpu)->vm_exit_controls &
+>>> +					VM_EXIT_SAVE_DEBUG_CONTROLS))
+>>> +		get_vmcs12(vcpu)->guest_ia32_debugctl = data;
+>>> +
+>>> +	if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
+>>> +	    (data & DEBUGCTLMSR_LBR))
+>>> +		intel_pmu_create_guest_lbr_event(vcpu);
+>>> +
+>>> +	__vmx_set_guest_debugctl(vcpu, data);
+>>> +	return true;
+>>> +}
+>>> +
+>>>  /*
+>>>   * Writes msr value into the appropriate "register".
+>>>   * Returns 0 on success, non-0 otherwise.
+>>> @@ -2263,26 +2298,9 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>>  		vmcs_writel(GUEST_SYSENTER_ESP, data);
+>>>  		break;
+>>>  	case MSR_IA32_DEBUGCTLMSR: {
+>>> -		u64 invalid;
+>>> -
+>>> -		invalid = data & ~vmx_get_supported_debugctl(vcpu, msr_info->host_initiated);
+>>> -		if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
+>>> -			kvm_pr_unimpl_wrmsr(vcpu, msr_index, data);
+>>> -			data &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+>>> -			invalid &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+>>> -		}
+>>> -
+>>> -		if (invalid)
+>>> +		if (!vmx_set_guest_debugctl(vcpu, data, msr_info->host_initiated))
+>>>  			return 1;
+>>>  
+>>> -		if (is_guest_mode(vcpu) && get_vmcs12(vcpu)->vm_exit_controls &
+>>> -						VM_EXIT_SAVE_DEBUG_CONTROLS)
+>>> -			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
+>>> -
+>>> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+>>> -		if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
+>>> -		    (data & DEBUGCTLMSR_LBR))
+>>> -			intel_pmu_create_guest_lbr_event(vcpu);
+>>>  		return 0;
+>>>  	}
+>>>  	case MSR_IA32_BNDCFGS:
+>>> @@ -4795,7 +4813,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>>>  	vmcs_write32(GUEST_SYSENTER_CS, 0);
+>>>  	vmcs_writel(GUEST_SYSENTER_ESP, 0);
+>>>  	vmcs_writel(GUEST_SYSENTER_EIP, 0);
+>>> -	vmcs_write64(GUEST_IA32_DEBUGCTL, 0);
+>>> +	__vmx_set_guest_debugctl(&vmx->vcpu, 0);
+>>>  
+>>>  	if (cpu_has_vmx_tpr_shadow()) {
+>>>  		vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, 0);
+>>> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+>>> index 6d1e40ecc024..8ac46fb47abd 100644
+>>> --- a/arch/x86/kvm/vmx/vmx.h
+>>> +++ b/arch/x86/kvm/vmx/vmx.h
+>>> @@ -404,6 +404,9 @@ u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
+>>>  
+>>>  gva_t vmx_get_untagged_addr(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
+>>>  
+>>> +bool vmx_set_guest_debugctl(struct kvm_vcpu *vcpu, u64 value, bool host_initiated);
+>>> +u64 vmx_get_guest_debugctl(struct kvm_vcpu *vcpu);
+>>> +
+>>>  static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
+>>>  					     int type, bool value)
+>>>  {
 
