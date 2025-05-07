@@ -1,301 +1,284 @@
-Return-Path: <kvm+bounces-45765-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45766-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 993B5AAEEF6
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 01:03:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61B8AAAEF56
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 01:42:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0119188D536
-	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 23:03:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 655321BA7A77
+	for <lists+kvm@lfdr.de>; Wed,  7 May 2025 23:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FFA291146;
-	Wed,  7 May 2025 23:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DBA2290D8D;
+	Wed,  7 May 2025 23:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RL4q8DCU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I5eEhOJq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3350C1C32
-	for <kvm@vger.kernel.org>; Wed,  7 May 2025 23:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7051D2AD20
+	for <kvm@vger.kernel.org>; Wed,  7 May 2025 23:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746659018; cv=none; b=AQ/RdRYCEMVP/WREHEBFXLL9a59HcgsCMorVLHNpT0BCGSsqM1uIzGQc/Gyc0KPCRV72qwOMIrKa/fr06x04Hs7WQFPdMWSNohz0waSTbZYwJrRRQKmymDKLFEEOKE1EVpyZLIJ2Z1//0jfckMKSBpvTCbubGn1sPzSO39+7bNg=
+	t=1746661366; cv=none; b=QZy55IffenLW/3YXQFgCTjLJYLc8JE+5O6E8qsMaAuKqFS4904fAgUi19I6W8K3YfP0XxVG1hiwnz01ERwCWvThpF25fdyhIWL6mq9igVvhdvxr/4f605jDhQE0MucQZmcYXsb7TP9CRcw0NIb6WKkEPk73Sq+a0l2q063rNSwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746659018; c=relaxed/simple;
-	bh=2XmKf4r7PMI/+F7HCnW1whR1EZIc9+PIVrLSuf10zLg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XJXOCDlrfFYxmlKcDpm3/J0pSomHdcKLacxypkUC7xVo6m+o74E4MxXCojuOz9qXHitEu1z5tvduCddE4e9MJLfBYvE8etahSdNpFA2rzgqyZi3P3uihfYMsXg3eNDzd2hv6ye/p8gpYMM9tXS/62K2NpHWsfUXWooSfOGl5wa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RL4q8DCU; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30a29af28d1so363701a91.0
-        for <kvm@vger.kernel.org>; Wed, 07 May 2025 16:03:36 -0700 (PDT)
+	s=arc-20240116; t=1746661366; c=relaxed/simple;
+	bh=dQNBbxhjmfGrOU1wLDxVNFa08ytj5lIani7W1uECOm8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LtcMICAcEbkEMToTlzeZAB9Udb5vEVVbAyAoVPrFwq7y6eojFneNXFMDak13CTnfiQb0VBgMiOzAZO00+DY3DIeTv20Pps8KGzO2WtCykcKZIgN0oN3ytC50ks4sCrS/Yku58F7stMZ/dP4u8ybogtwLkAikzZk3vEasiCe3gGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=I5eEhOJq; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-227d6b530d8so4592445ad.3
+        for <kvm@vger.kernel.org>; Wed, 07 May 2025 16:42:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746659016; x=1747263816; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Qq49Dart3v0WlvGRUo03jrUoC30OnK8nNG5A8WXCnUA=;
-        b=RL4q8DCU2mrJB6GqiSrdmEZevzvoOlIcvzfk5BLQQi6eQyvZKYyUw4CIN/rb4UxGLK
-         JK156ocbFzwGywLoaKvqzcXMyjydcuwNLbrjHB/lRbVsUKl4xQBw6hxicsRgPBZLKbrH
-         lUyoi/Zh+OEsaneK0qiCTv0tP8nZ0kKajbUC7fuVL8vnf3TIf8t2MwrIat+sS5L0B7Yw
-         KlHCPGxD/L+dfBqfBAVGEt4FphreATdtgFhbZQCH8he/rs0mvnhaAJFAorZllMrpU35f
-         qRh0gD4Rbr62VlCKQe6UeqKf0A2/afxZkghCJ9w+EHDwdAET4Gl0xs4keN2dUTjdh1kG
-         m6EQ==
+        d=linaro.org; s=google; t=1746661363; x=1747266163; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JehyW8M8VpKFuaI6YYMmr2hRWJI92AYFHrbysHYIqEM=;
+        b=I5eEhOJqoDcr/eV93SXT+H9iIDTPQfhn4Zrz6R215/pU9JHVWeRWMf1FAO3YQh6AS8
+         q542ZjNYmXinwbp8JSCUltWKMG2+/sKVsFA21nT1xZUEWOJYt5R3wx/CgpuQPcGlaa4m
+         bKj/K4JVaoelv89kXkB3YrKDfHZJdIu0FzDxoAEoo8OdJV5N8T9SnNphAhX+8Q9rfpxB
+         NwCb4hAuVTx6AfehnNF4RT8UDDa2JXb0ihc1r6begTTH3zCvg4XnNlRy3TyyY4NUvE/3
+         ndWL9AbcCnTMx2CdgCtOwfXGcBcnF9FjPhp5OVfgFoss+kwG51q0jbdPKKWxoHh7SNGK
+         rZ5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746659016; x=1747263816;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Qq49Dart3v0WlvGRUo03jrUoC30OnK8nNG5A8WXCnUA=;
-        b=jpw73NUvNTt3B0jO0TZdjbnhItqQ1us4nHSugCu/ut+bcgieG8SbHpXLmahfX2oH9d
-         2wG6+gBzD4HnYz0BYbJzLLwuqoc8CzU3qA2gKGsGo21MvcCK5K4RQ4zNlDrzJ6Ogfb6t
-         cj/ZsgGVlLfpY/t/Nwlx5hj1+ZJgEoUI3O6J9BpqtwN/Xcx5Piyl6pE2q2RQZtGR7Tjl
-         wIP4nSjlwtfRJ6x2A6zzj33fSLIy7+bhBQ2BVKzHSn4cPJnlFZnETyW3uksor9A6wunz
-         PX/zyYp8ofJTQ+tXVHGlGyf9/sZdyiu3HFmJsL3S3EwpC+/qdAJISlD4S8tzEvlxK8EB
-         X4sg==
-X-Gm-Message-State: AOJu0Ywkn6fEbaai9rA7WWOQIE8hF0mB8pigFLVvkua9sLz+FDJ5mb4a
-	Ga4oiBft4Ib8K92Nu+fHs6fsnDHavdeZyFCnLGCLD/fxC5dIJyrVDEX4jBEucR96Y/DMqAwamVO
-	jDw==
-X-Google-Smtp-Source: AGHT+IGf7GrnMA0ECrA5Cc+xFBVRuZ0noNkL8FCy7GwGt33Tt3DR9TcVbBH2Tlv+OXVWcHLSD3Da30W7ftU=
-X-Received: from pjbst8.prod.google.com ([2002:a17:90b:1fc8:b0:2fc:13d6:b4cb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:38c5:b0:2fe:80cb:ac05
- with SMTP id 98e67ed59e1d1-30b32a5612emr1426077a91.9.1746659016471; Wed, 07
- May 2025 16:03:36 -0700 (PDT)
-Date: Wed, 7 May 2025 16:03:34 -0700
-In-Reply-To: <71af8435d2085b3f969cb3e73cff5bfacd243819.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1746661363; x=1747266163;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JehyW8M8VpKFuaI6YYMmr2hRWJI92AYFHrbysHYIqEM=;
+        b=nUhbEQebhkBKBqDZhumoY4IrCfjdiQ/KUvOSv18ELTRyYeB6ZETNy2XcrAjQa2Giif
+         +eTHiocoY3LPkKTkfuksmA5Rlz+8rfRTJlqbPqqC2XO4+R+cS0bVccpofTEhYkZjSkET
+         BgoDe0v06YjKfguiw5GEWBCgPzMagDUnTdGkhUVuTpqhD1DREd4e1relXm0O4qF30rlC
+         JWr3BKCfO7/XMiGv/7+aV102BGHCMEviHZrmQiRjs3pS81fNr9kWmTFu03vHdQlmLbnF
+         wCQ5uteQJu1WwsZDN1FQtZsIaexHJXcbge34MeUZCmAFem97iWsu0E8xjQWbkHit6sgk
+         VciA==
+X-Forwarded-Encrypted: i=1; AJvYcCWXu4QIhlgyA+zK5lq9tlib538EQW0QzxGamKT6ZnAQ0qtDcq7oyZYvkiedfp8H96O/q5Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywps78xlaTqo3auHg09ITIfsrjJShnodcYVldCfLacpWDJr/gWD
+	dwWasjJEkAJn36c2j7fplHMhFcw4kq6LIyX6uGEL4gwfpr0EqDemR5xdUODPhtw=
+X-Gm-Gg: ASbGncsn+aherYrmF4X5TfXrd49z1G0F7yVq8TrGQUP48wbzyslqfjqspRdKegGP4NA
+	FBLpkn+JpjdSyZMkpX/Q9AN92FeavG1pzieYkBe1Ql4vsIjlE1wcaUTgeyiOtdYlvI2ZlI5JeuH
+	90yOIxJ7ufQtcUgw7SEkIhNbYkfxuG9Ow2diDAmJSfUjCLl3qbHywuTjs6gkCLGZhGEenf8oxX0
+	OryhxbaTEW4D7lyvBTazH9Gmlew5o+NANVNtwUgsHg+gFmtZUGsRlVF6Ynf4+mcgUZWGpt8Oqmf
+	YUfm1y96OX9AqhnGr4zYceAHaNxBmduYVjWhUaxP
+X-Google-Smtp-Source: AGHT+IEb8/jS6XFLZwBXKGo2JRaGqzWwUaCf2+23h6WBJFHtJioR8urxC77q0Op0VwdLUAEl1smgUg==
+X-Received: by 2002:a17:903:166e:b0:224:c47:cbd with SMTP id d9443c01a7336-22e5e98947fmr80611175ad.0.1746661363604;
+        Wed, 07 May 2025 16:42:43 -0700 (PDT)
+Received: from pc.. ([38.41.223.211])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e815806fdsm6491325ad.17.2025.05.07.16.42.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 May 2025 16:42:43 -0700 (PDT)
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org,
+	anjo@rev.ng,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	alex.bennee@linaro.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Subject: [PATCH v7 00/49] single-binary: compile target/arm twice
+Date: Wed,  7 May 2025 16:41:51 -0700
+Message-ID: <20250507234241.957746-1-pierrick.bouvier@linaro.org>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250416002546.3300893-1-mlevitsk@redhat.com> <20250416002546.3300893-4-mlevitsk@redhat.com>
- <aAgpD_5BI6ZcCN29@google.com> <2b1ec570a37992cdfa2edad325e53e0592d696c8.camel@redhat.com>
- <71af8435d2085b3f969cb3e73cff5bfacd243819.camel@redhat.com>
-Message-ID: <aBvmxjxUrXEBa3sc@google.com>
-Subject: Re: [PATCH 3/3] x86: KVM: VMX: preserve host's DEBUGCTLMSR_FREEZE_IN_SMM
- while in the guest mode
-From: Sean Christopherson <seanjc@google.com>
-To: mlevitsk@redhat.com
-Cc: kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>, 
-	Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>, 
-	linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, May 01, 2025, mlevitsk@redhat.com wrote:
-> On Thu, 2025-05-01 at 16:41 -0400, mlevitsk@redhat.com wrote:
-> > On Tue, 2025-04-22 at 16:41 -0700, Sean Christopherson wrote:
-> > > On Tue, Apr 15, 2025, Maxim Levitsky wrote:
-> > > > Pass through the host's DEBUGCTL.DEBUGCTLMSR_FREEZE_IN_SMM to the g=
-uest
-> > > > GUEST_IA32_DEBUGCTL without the guest seeing this value.
-> > > >=20
-> > > > Note that in the future we might allow the guest to set this bit as=
- well,
-> > > > when we implement PMU freezing on VM own, virtual SMM entry.
-> > > >=20
-> > > > Since the value of the host DEBUGCTL can in theory change between V=
-M runs,
-> > > > check if has changed, and if yes, then reload the GUEST_IA32_DEBUGC=
-TL with
-> > > > the new value of the host portion of it (currently only the
-> > > > DEBUGCTLMSR_FREEZE_IN_SMM bit)
-> > >=20
-> > > No, it can't.=C2=A0 DEBUGCTLMSR_FREEZE_IN_SMM can be toggled via IPI =
-callback, but
-> > > IRQs are disabled for the entirety of the inner run loop.=C2=A0 And i=
-f I'm somehow
-> > > wrong, this change movement absolutely belongs in a separate patch.
->=20
->=20
-> Hi,
->=20
-> You are right here - reading MSR_IA32_DEBUGCTLMSR in the inner loop is a
-> performance regression.
->=20
-> Any ideas on how to solve this then? Since currently its the common code =
-that
-> reads the current value of the MSR_IA32_DEBUGCTLMSR and it doesn't leave =
-any
-> indication about if it changed I can do either
->=20
-> 1. store old value as well, something like 'vcpu->arch.host_debugctl_old'=
- Ugly IMHO.
->=20
-> 2. add DEBUG_CTL to the set of the 'dirty' registers, e.g add new bit for=
- kvm_register_mark_dirty
-> It looks a bit overkill to me
->=20
-> 3. Add new x86 callback for something like .sync_debugctl(). I vote for t=
-his option.
->=20
-> What do you think/prefer?
+More work toward single-binary.
 
-I was going to say #3 as well, but I think I have a better idea.
+Some files have external dependencies for the single-binary:
+- target/arm/gdbstub.c: gdbhelpers
+- target/arm/arm-qmp-cmds.c: qapi
+- target/arm/tcg/translate*: need deep cleanup in include/tcg
+- target/arm/tcg/cpu*: need TargetInfo implemented for arm/aarch64
+- target/arm/tcg/*-helper*: need deeper split between aarch64 and arm code
+They will not be ported in this series.
 
-DR6 has a similar problem; the guest's value needs to be loaded into hardwa=
-re,
-but only somewhat rarely, and more importantly, never on a fastpath reentry=
-.
+Built on {linux, windows, macos} x {x86_64, aarch64}
+Fully tested on linux x {x86_64, aarch64}
 
-Forced immediate exits also have a similar need: some control logic in comm=
-on x86
-needs instruct kvm_x86_ops.vcpu_run() to do something.
+Series is now tested and fully reviewed. Thanks for pulling it.
 
-Unless I've misread the DEBUGCTLMSR situation, in all cases, common x86 onl=
-y needs
-to a single flag to tell vendor code to do something.  The payload for that=
- action
-is already available.
-
-So rather than add a bunch of kvm_x86_ops hooks that are only called immedi=
-ately
-before kvm_x86_ops.vcpu_run(), expand @req_immediate_exit into a bitmap of =
-flags
-to communicate what works needs to be done, without having to resort to a f=
-ield
-in kvm_vcpu_arch that isn't actually persistent.
-
-The attached patches are relatively lightly tested, but the DR6 tests from =
-the
-recent bug[*] pass, so hopefully they're correct?
-
-The downside with this approach is that it would be difficult to backport t=
-o LTS
-kernels, but given how long this has been a problem, I'm not super concerne=
-d about
-optimizing for backports.
-
-If they look ok, feel free to include them in the next version.  Or I can p=
-ost
-them separately if you want.
-
-> > > > +		__vmx_set_guest_debugctl(vcpu, vmx->msr_ia32_debugctl);
-> > >=20
-> > > I would rather have a helper that explicitly writes the VMCS field, n=
-ot one that
-> > > sets the guest value *and* writes the VMCS field.
-> >=20
-> > >=20
-> > > The usage in init_vmcs() doesn't need to write vmx->msr_ia32_debugctl=
- because the
-> > > vCPU is zero allocated, and this usage doesn't change vmx->msr_ia32_d=
-ebugctl.
-> > > So the only path that actually needs to modify vmx->msr_ia32_debugctl=
- is
-> > > vmx_set_guest_debugctl().
-> >=20
-> > But what about nested entry? nested entry pretty much sets the MSR to a
-> > value given by the guest.
-> >=20
-> > Also technically the intel_pmu_legacy_freezing_lbrs_on_pmi also changes=
- the
-> > guest value by emulating what the real hardware does.
-
-Drat, sorry, my feedback was way too terse.  What I was trying to say is th=
-at if
-we cache the guest's msr_ia32_debugctl, then I would rather have this:
-
---
-static void vmx_guest_debugctl_write(struct kvm_vcpu *vcpu)
-{
-	u64 val =3D vmx->msr_ia32_debugctl |
-		  vcpu->arch.host_debugctl & DEBUGCTLMSR_FREEZE_IN_SMM);
-
-	vmcs_write64(GUEST_IA32_DEBUGCTL, val);
-}
-
-int vmx_set_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated)
-{
-	u64 invalid =3D data & ~vmx_get_supported_debugctl(vcpu, host_initiated);
-
-	if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
-		kvm_pr_unimpl_wrmsr(vcpu, MSR_IA32_DEBUGCTLMSR, data);
-		data &=3D ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
-		invalid &=3D ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
-	}
-
-	if (invalid)
-		return 1;
-
-	if (is_guest_mode(vcpu) && (get_vmcs12(vcpu)->vm_exit_controls &
-					VM_EXIT_SAVE_DEBUG_CONTROLS))
-		get_vmcs12(vcpu)->guest_ia32_debugctl =3D data;
-
-	if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
-	    (data & DEBUGCTLMSR_LBR))
-		intel_pmu_create_guest_lbr_event(vcpu);
-
-	vmx->msr_ia32_debugctl =3D data;
-	vmx_guest_debugctl_write(vcpu);
-	return 0;
-}
+v7
 --
 
-So that the path that refreshes vmcs.GUEST_IA32_DEBUGCTL on VM-Entry doesn'=
-t have
-to feed in vmx->msr_ia32_debugctl, because the only value that is ever writ=
-ten to
-hardware is vmx->msr_ia32_debugctl.
+- rebase on top of master
+- removed patch to apply target config for picking files in libsystem/libuser,
+  since it was the only one not reviewed.
 
-However, I'm not entirely convinced that we need to cache the guest value,
-because toggling DEBUGCTLMSR_FREEZE_IN_SMM should be extremely rare.  So so=
-mething
-like this?
-
---
-static void vmx_guest_debugctl_write(struct kvm_vcpu *vcpu, u64 val)
-{
-	val |=3D vcpu->arch.host_debugctl & DEBUGCTLMSR_FREEZE_IN_SMM);
-
-	vmcs_write64(GUEST_IA32_DEBUGCTL, val);
-}
-
-int vmx_set_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated)
-{
-	u64 invalid =3D data & ~vmx_get_supported_debugctl(vcpu, host_initiated);
-
-	if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
-		kvm_pr_unimpl_wrmsr(vcpu, MSR_IA32_DEBUGCTLMSR, data);
-		data &=3D ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
-		invalid &=3D ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
-	}
-
-	if (invalid)
-		return 1;
-
-	if (is_guest_mode(vcpu) && (get_vmcs12(vcpu)->vm_exit_controls &
-					VM_EXIT_SAVE_DEBUG_CONTROLS))
-		get_vmcs12(vcpu)->guest_ia32_debugctl =3D data;
-
-	if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
-	    (data & DEBUGCTLMSR_LBR))
-		intel_pmu_create_guest_lbr_event(vcpu);
-
-	vmx_guest_debugctl_write(vcpu, data);
-	return 0;
-}
+v6
 --
 
-And then when DEBUGCTLMSR_FREEZE_IN_SMM changes:
+CI: https://github.com/pbo-linaro/qemu/actions/runs/14844742069/job/41675865456
+- Replace target_ulong -> vaddr for HWBreakpoint (Philippe)
+- build target/arm/tcg/crypto_helper.c once (Richard)
+- build target/arm/tcg/tlb-insns for system only (Richard)
+- build target/arm/tcg/arith_helper once (Richard)
 
-	if (<is DEBUGCTLMSR_FREEZE_IN_SMM toggled>)
-		vmx_guest_debugctl_write(vmcs_read64(GUEST_IA32_DEBUGCTL) &
-					 ~DEBUGCTLMSR_FREEZE_IN_SMM);
+v5
+--
 
-And the LBR crud doesn't need to call into the "full" vmx_set_debugctl() (o=
-r we
-don't even need that helper?).
+CI: https://github.com/pbo-linaro/qemu/actions/runs/14825451208/job/41617949501
+- Do not define a separate vaddr type in tcg, simply alias to i32/i64 (Richard)
+- target/arm/tcg/crypto_helper.c
+- target/arm/tcg/hflags.c
+- target/arm/tcg/iwmmxt_helper.c
+- target/arm/tcg/neon_helper.c
+- target/arm/tcg/tlb_helper.c
+- target/arm/tcg/tlb-insns.c
+- target/arm/tcg/arith_helper.c
+- target/arm/tcg/vfp_helper.c
 
-Side topic, we really should be able to drop @host_initiated, because KVM's=
- ABI
-is effectively that CPUID must be set before MSRs, i.e. allowing the host t=
-o stuff
-unsupported bits isn't necessary.  But that's a future problem.
+v4
+--
+
+CI: https://github.com/pbo-linaro/qemu/actions/runs/14816460393/job/41597560792
+- add patch to apply target config for picking files in libsystem/libuser
+  Useful for Philippe series for semihosting:
+  https://lore.kernel.org/qemu-devel/20250502220524.81548-1-philmd@linaro.org/T/#me750bbaeeba4d16791121fe98b44202afaec4068
+- update some patches description (Philippe & Richard)
+- tcg: introduce vaddr type (Richard)
+- modify concerned helpers to use vaddr instead of i64 (Richard)
+- use int64_t instead of uint64_t for top_bits in ptw.c (Philippe)
+- arm_casq_ptw: use CONFIG_ATOMIC64 instead of TARGET_AARCH64 and comment why
+  (Richard)
+- target/arm/machine.c
+
+v3
+--
+
+CI: https://github.com/pbo-linaro/qemu/actions/runs/14765763846/job/41456754153
+- Add missing license for new files (Richard)
+- target/arm/debug_helper.c
+- target/arm/helper.c
+- target/arm/vfp_fpscr.c
+- target/arm/arch_dump.c
+- target/arm/arm-powerctl.c
+- target/arm/cortex-regs.c
+- target/arm/ptw.c
+- target/arm/kvm-stub.c
+
+v2
+--
+
+- Remove duplication of kvm struct and constant (Alex)
+- Use target_big_endian() (Anton)
+
+v1
+--
+
+- target/arm/cpu.c
+
+Philippe Mathieu-Daudé (1):
+  target/arm: Replace target_ulong -> vaddr for HWBreakpoint
+
+Pierrick Bouvier (48):
+  include/system/hvf: missing vaddr include
+  meson: add common libs for target and target_system
+  target/arm: move kvm stubs and remove CONFIG_KVM from kvm_arm.h
+  target/arm/kvm-stub: add kvm_arm_reset_vcpu stub
+  target/arm/cpu: move arm_cpu_kvm_set_irq to kvm.c
+  accel/hvf: add hvf_enabled() for common code
+  target/arm/cpu: remove TARGET_BIG_ENDIAN dependency
+  target/arm/cpu: remove TARGET_AARCH64 around aarch64_cpu_dump_state
+    common
+  target/arm/cpu: remove TARGET_AARCH64 in arm_cpu_finalize_features
+  target/arm/cpu: compile file twice (user, system) only
+  target/arm/cpu32-stubs.c: compile file twice (user, system)
+  tcg: add vaddr type for helpers
+  target/arm/helper: use vaddr instead of target_ulong for
+    exception_pc_alignment
+  target/arm/helper: use vaddr instead of target_ulong for probe_access
+  target/arm/helper: extract common helpers
+  target/arm/debug_helper: only include common helpers
+  target/arm/debug_helper: remove target_ulong
+  target/arm/debug_helper: compile file twice (user, system)
+  target/arm/helper: restrict include to common helpers
+  target/arm/helper: replace target_ulong by vaddr
+  target/arm/helper: expose aarch64 cpu registration
+  target/arm/helper: remove remaining TARGET_AARCH64
+  target/arm/helper: compile file twice (user, system)
+  target/arm/vfp_fpscr: compile file twice (user, system)
+  target/arm/arch_dump: remove TARGET_AARCH64 conditionals
+  target/arm/arch_dump: compile file once (system)
+  target/arm/arm-powerctl: compile file once (system)
+  target/arm/cortex-regs: compile file once (system)
+  target/arm/ptw: replace target_ulong with int64_t
+  target/arm/ptw: replace TARGET_AARCH64 by CONFIG_ATOMIC64 from
+    arm_casq_ptw
+  target/arm/ptw: compile file once (system)
+  target/arm/meson: accelerator files are not needed in user mode
+  target/arm/kvm-stub: compile file once (system)
+  target/arm/machine: reduce migration include to avoid target specific
+    definitions
+  target/arm/machine: remove TARGET_AARCH64 from migration state
+  target/arm/machine: move cpu_post_load kvm bits to
+    kvm_arm_cpu_post_load function
+  target/arm/kvm-stub: add missing stubs
+  target/arm/machine: compile file once (system)
+  target/arm/tcg/vec_internal: use forward declaration for CPUARMState
+  target/arm/tcg/crypto_helper: compile file once
+  target/arm/tcg/hflags: compile file twice (system, user)
+  target/arm/tcg/iwmmxt_helper: compile file twice (system, user)
+  target/arm/tcg/neon_helper: compile file twice (system, user)
+  target/arm/tcg/tlb_helper: compile file twice (system, user)
+  target/arm/helper: restrict define_tlb_insn_regs to system target
+  target/arm/tcg/tlb-insns: compile file once (system)
+  target/arm/tcg/arith_helper: compile file once
+  target/arm/tcg/vfp_helper: compile file twice (system, user)
+
+ meson.build                    |   78 ++-
+ include/system/hvf.h           |   15 +-
+ include/tcg/tcg-op-common.h    |    1 +
+ include/tcg/tcg.h              |   14 +
+ target/arm/helper.h            | 1152 +------------------------------
+ target/arm/internals.h         |    6 +-
+ target/arm/kvm_arm.h           |   87 +--
+ target/arm/tcg/helper.h        | 1153 ++++++++++++++++++++++++++++++++
+ target/arm/tcg/vec_internal.h  |    2 +
+ include/exec/helper-head.h.inc |   11 +
+ accel/hvf/hvf-stub.c           |    5 +
+ target/arm/arch_dump.c         |    6 -
+ target/arm/cpu.c               |   47 +-
+ target/arm/cpu32-stubs.c       |   26 +
+ target/arm/debug_helper.c      |    6 +-
+ target/arm/helper.c            |   24 +-
+ target/arm/hyp_gdbstub.c       |    6 +-
+ target/arm/kvm-stub.c          |   97 +++
+ target/arm/kvm.c               |   42 +-
+ target/arm/machine.c           |   15 +-
+ target/arm/ptw.c               |    6 +-
+ target/arm/tcg/arith_helper.c  |    5 +-
+ target/arm/tcg/crypto_helper.c |    6 +-
+ target/arm/tcg/hflags.c        |    4 +-
+ target/arm/tcg/iwmmxt_helper.c |    4 +-
+ target/arm/tcg/neon_helper.c   |    4 +-
+ target/arm/tcg/op_helper.c     |    2 +-
+ target/arm/tcg/tlb-insns.c     |    7 -
+ target/arm/tcg/tlb_helper.c    |    5 +-
+ target/arm/tcg/translate-a64.c |    2 +-
+ target/arm/tcg/translate.c     |    2 +-
+ target/arm/tcg/vfp_helper.c    |    4 +-
+ tcg/tcg.c                      |    5 +
+ accel/hvf/meson.build          |    1 +
+ target/arm/meson.build         |   41 +-
+ target/arm/tcg/meson.build     |   29 +-
+ 36 files changed, 1534 insertions(+), 1386 deletions(-)
+ create mode 100644 target/arm/tcg/helper.h
+ create mode 100644 accel/hvf/hvf-stub.c
+ create mode 100644 target/arm/cpu32-stubs.c
+
+-- 
+2.47.2
+
 
