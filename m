@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-45853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105A5AAFB20
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:19:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C8B1AAFB33
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:22:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C7EE4C14EB
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:19:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33C601C07391
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB1D22B5A5;
-	Thu,  8 May 2025 13:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6767522B8AF;
+	Thu,  8 May 2025 13:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AXuN5SIN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MTHfcspn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DCF7F477;
-	Thu,  8 May 2025 13:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135F817BA5;
+	Thu,  8 May 2025 13:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746710366; cv=none; b=dC9+P4CL1W9XF6cCdagnz2v/KxvpO8BslfxONUIOb90c7GzA5od/5wPDrT+ZKwr/HUGvIfgtKVbunCAkMmb4Z8nnLs6MP3eG/KV0s+Jz7xw1xefeQGYCT+x9Zq9P1aVRoQMaxboY4pUJNxbsrXUdLwjv23rnF4qbSZg2s/9ID50=
+	t=1746710515; cv=none; b=PPBMIzTms3TSpI5PO4kLLzVcXMrnoY/oHJxhd378ZWGBp56EJmcEqInBTc1CkAwRFnduUMPW2gWc/BKKFZCumKOljFD0kITzJ5btjmFaI/9P+ovIUWObkSj1sgk6Yrc4O32sIQrB4/STB3y4Wmsa12Wkm2VTnqSoZTxnSAgUFtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746710366; c=relaxed/simple;
-	bh=mwlJfN+Lfy/+tFxLo5GorpTpyl8vbUUM9H3jpxrTN14=;
+	s=arc-20240116; t=1746710515; c=relaxed/simple;
+	bh=cy8Qc4ngMqBHIyfiq9amKDZY+4DjHcjHkgkdKV6rx3k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uOiF7+feuMopEsOGODtKRmotD3GLOeGKCZmGcdDy8dTgS7aPR0Gg5XZ1m+nUjTbD5Tq4BPkwmDMOuuClhqo+QhpmNE/3uN+IBPHjgGGz9a/u1Ej5IHU7SmZRykdyE8xyLWP6CqkyKYXyWBn/twXJQqabo21UD8k2pm9+bruMgDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AXuN5SIN; arc=none smtp.client-ip=192.198.163.13
+	 Content-Type:Content-Disposition:In-Reply-To; b=A9W/+migEek0PjpuIKgkiZjIEwNe+yn+JWtNr99fC3tFy/rFgzeZrjtSBMJfL4YFB2Mtso3mo4QRiY9np4hZWg4XX5L9i5dXJwmXc2VLg5JXHcvmPmdGocFldqGcV25woUzfPDZYkg9fCSFxvkRA+c0y2hGnH+GsTVMteozHxTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MTHfcspn; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746710365; x=1778246365;
+  t=1746710514; x=1778246514;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=mwlJfN+Lfy/+tFxLo5GorpTpyl8vbUUM9H3jpxrTN14=;
-  b=AXuN5SINS40pRlK6Dp5IKVHo5pLWNYCa9+SuiJLtGImp8sj2EeDLmWpZ
-   NPsrasuOcNT4ZbXBGJHqBaHz7qCdBkcqaQWqkmKc1EbJaCScEAVfNnFT/
-   PlT80vTo1fmPkjl91ROcFfjDOrh021D9Y9+BXdZAgj+6PYbQpVh18swrm
-   C6jGXF54o8Y12PHtEFtek2xNYupRLaPFfITVXEtfaaD6hlZdVbrh3kq7F
-   +B3r9PnS7EYQUJFrBH+vpfin91r1csCioZitsdEM+oONpHBgH9CKHZoJP
-   rAHg+7ZP0vDoIorQq8SyxYvVUfbYDyYKSoI8KsMpJ+s0obug0kJkTSeWp
-   w==;
-X-CSE-ConnectionGUID: zDp9Tnl5TAqnwbzYZOKf3g==
-X-CSE-MsgGUID: rLHayGXPRUevcArohXX9pw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="51153317"
+   mime-version:in-reply-to;
+  bh=cy8Qc4ngMqBHIyfiq9amKDZY+4DjHcjHkgkdKV6rx3k=;
+  b=MTHfcspntNC0d3AJgO286QWJScvPmWly5vUrij2P4dk2Ktzn9BZCN0ek
+   EwAMs+gT0ijIRvGUGL1bDExtXinOL977wHMjRPOBPI98h6rE+posazN/4
+   og9ilFw5yrChK46Q3ekpphdwd/uJDadyu/w03BDzG3r+6nzRL3Lg3msYa
+   SKW1ZsYZwxnhPtSaOQqj8QP00gv6lDuYwWg/OnCT3vMvsHUEJhbZ8VS5n
+   J89cnulb6D/Gi3wjsAVlFZKYPxKXNWW3ZF1G4P90d+3eWGI94kuwgn2yb
+   wzAEiukkIHZTBpA0NIT67VewnzSjMALni1A7yYVPWOq3DWTfwjndUxmSA
+   g==;
+X-CSE-ConnectionGUID: PLdpVGFtRiW4UE8h/u8eVA==
+X-CSE-MsgGUID: ksKO5Y2KQiqmGM89BJaRVQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="73871414"
 X-IronPort-AV: E=Sophos;i="6.15,272,1739865600"; 
-   d="scan'208";a="51153317"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 06:19:24 -0700
-X-CSE-ConnectionGUID: wQANjt/cTd2bmbymrY9p6g==
-X-CSE-MsgGUID: Vqk59ioaSj2Qx1QsXXsqzw==
+   d="scan'208";a="73871414"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 06:21:53 -0700
+X-CSE-ConnectionGUID: LvBCSwrPQnuJxdW3yjK1kQ==
+X-CSE-MsgGUID: n+puAlwHQXaXL5SYu6DMRA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,272,1739865600"; 
-   d="scan'208";a="167229229"
+   d="scan'208";a="167375171"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa002.jf.intel.com with ESMTP; 08 May 2025 06:19:21 -0700
+  by fmviesa001.fm.intel.com with ESMTP; 08 May 2025 06:21:50 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id 22B551D7; Thu, 08 May 2025 16:19:19 +0300 (EEST)
-Date: Thu, 8 May 2025 16:19:19 +0300
+	id 9B3291D7; Thu, 08 May 2025 16:21:48 +0300 (EEST)
+Date: Thu, 8 May 2025 16:21:48 +0300
 From: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
 To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Vishal Annapurve <vannapurve@google.com>, 
+Cc: Dave Hansen <dave.hansen@intel.com>, 
 	"Huang, Kai" <kai.huang@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
 	"seanjc@google.com" <seanjc@google.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, 
 	"bp@alien8.de" <bp@alien8.de>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, 
@@ -72,57 +72,67 @@ Cc: Vishal Annapurve <vannapurve@google.com>,
 	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: [RFC, PATCH 05/12] KVM: TDX: Add tdx_pamt_get()/put() helpers
-Message-ID: <o74datlk3nmbc6ihxisggvxzf6r25ebnh4wt5ureud4befy7nl@l3m74n6qksqx>
+Message-ID: <u6f6jbgbbz2judwuvwtelxdkhbl2dsqc2fqi2n4uvfwhszan75@2kvbsreeywrb>
 References: <20250502130828.4071412-1-kirill.shutemov@linux.intel.com>
  <20250502130828.4071412-6-kirill.shutemov@linux.intel.com>
  <55c1c173bfb13d897eaaabcc04f38d010608a7e3.camel@intel.com>
- <aBqxBmHtpSipnULS@yzhao56-desk.sh.intel.com>
- <CAGtprH9GvBd0QLksKGan0V-RPsbJVPrsZ9PE=PPgHx11x4z1aA@mail.gmail.com>
- <aBrIkdnpmKujtVxf@yzhao56-desk.sh.intel.com>
+ <4bb2119a-ff6d-42b6-acf4-86d87b0e9939@intel.com>
+ <aBwSICZBrgiKX2UF@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aBrIkdnpmKujtVxf@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aBwSICZBrgiKX2UF@yzhao56-desk.sh.intel.com>
 
-On Wed, May 07, 2025 at 10:42:25AM +0800, Yan Zhao wrote:
-> On Tue, May 06, 2025 at 06:15:40PM -0700, Vishal Annapurve wrote:
-> > On Tue, May 6, 2025 at 6:04 PM Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >
-> > > On Mon, May 05, 2025 at 08:44:26PM +0800, Huang, Kai wrote:
-> > > > On Fri, 2025-05-02 at 16:08 +0300, Kirill A. Shutemov wrote:
-> > > > > +static int tdx_pamt_add(atomic_t *pamt_refcount, unsigned long hpa,
-> > > > > +                   struct list_head *pamt_pages)
-> > > > > +{
-> > > > > +   u64 err;
-> > > > > +
-> > > > > +   hpa = ALIGN_DOWN(hpa, SZ_2M);
-> > > > > +
-> > > > > +   spin_lock(&pamt_lock);
-> > > >
-> > > > Just curious, Can the lock be per-2M-range?
-> > > Me too.
-> > > Could we introduce smaller locks each covering a 2M range?
-> > >
-> > > And could we deposit 2 pamt pages per-2M hpa range no matter if it's finally
-> > > mapped as a huge page or not?
-> > >
+On Thu, May 08, 2025 at 10:08:32AM +0800, Yan Zhao wrote:
+> On Wed, May 07, 2025 at 09:31:22AM -0700, Dave Hansen wrote:
+> > On 5/5/25 05:44, Huang, Kai wrote:
+> > >> +static int tdx_pamt_add(atomic_t *pamt_refcount, unsigned long hpa,
+> > >> +			struct list_head *pamt_pages)
+> > >> +{
+> > >> +	u64 err;
+> > >> +
+> > >> +	hpa = ALIGN_DOWN(hpa, SZ_2M);
+> > >> +
+> > >> +	spin_lock(&pamt_lock);
+> > > Just curious, Can the lock be per-2M-range?
 > > 
-> > Are you suggesting to keep 2 PAMT pages allocated for each private 2M
-> > page even if it's mapped as a hugepage? It will lead to wastage of
-> > memory of 4 MB per 1GB of guest memory range. For large VM sizes that
-> > will amount to high values.
-> Ok. I'm thinking of the possibility to aligning the time of PAMT page allocation
-> to that of physical page allocation.
+> > Folks, please keep it simple.
+> > 
+> > If there's lock contention on this, we'll fix the lock contention, or
+> > hash the physical address into a fixed number of locks. But having it be
+> > per-2M-range sounds awful. Then you have to size it, and allocate it and
+> > then resize it if there's ever hotplug, etc...
+> In patch 2, there're per-2M-range pamt_refcounts. Could the per-2M-range
+> lock be implemented in a similar way?
+> 
+> +static atomic_t *pamt_refcounts;
+> +atomic_t *tdx_get_pamt_refcount(unsigned long hpa)
+> +{
+> +       return &pamt_refcounts[hpa / PMD_SIZE];
+> +}
 
-No. That's mostly wasted memory. We need to aim to allocate memory only as
-needed. With huge pages wast majority of such allocations will never be
-needed.
+But why? If no contention, it is just wasteful.
+
+> > Kirill, could you put together some kind of torture test for this,
+> > please? I would imagine a workload which is sitting in a loop setting up
+> > and tearing down VMs on a bunch of CPUs would do it.
+> > 
+> > That ^ would be the worst possible case, I think. If you don't see lock
+> > contention there, you'll hopefully never see it on real systems.
+> When one vCPU is trying to install a guest page of HPA A, while another vCPU
+> is trying to install a guest page of HPA B, theoretically they may content the
+> global pamt_lock even if HPA A and B belong to different PAMT 2M blocks.
+
+This contention will be be momentary if ever happen.
+
+> > I *suspect* that real systems will get bottlenecked somewhere in the
+> > page conversion process rather than on this lock. But it should be a
+> > pretty simple experiment to run.
 
 -- 
   Kiryl Shutsemau / Kirill A. Shutemov
