@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-45893-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45894-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82C3AAAFC72
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 16:10:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7774AAFC74
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 16:11:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 136E81C23012
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 14:11:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA5309E3C29
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 14:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9E8265CA3;
-	Thu,  8 May 2025 14:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F4187266B6C;
+	Thu,  8 May 2025 14:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bm6axfZm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yZQgNjfL"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6917253F21
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 14:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD41F26560B
+	for <kvm@vger.kernel.org>; Thu,  8 May 2025 14:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746713421; cv=none; b=J8nl8/jIoxgu3ZeqjD6FcrJWosBqhWBNB0qHvVnvZSQAed6RybEHQM1BXrqLcvM576dn2x6BBTn31cXhGSEs/+r02q+WhyOfs3fmBc5Yxljd4SNADjLjN+eEu3zA3Lx1eu0/i06dNPrvkNLTH6VIshKia4S5UDNbxC2cmIrNFy8=
+	t=1746713423; cv=none; b=E2hWGxsSJhCTSzasICTHbE4Ly0GncBpW092Gbb0YjJIojwdZmOFYWzYiahh/EDuBwwPxXigJ2JChl3e5TZLYcp4o4ipdkAnriWVQKVThYNzbkOXpCDiEbRJJaYClB/qoufRvUolyDCkkumPOntw839Sv/8ecokqJGKJgV5vA0ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746713421; c=relaxed/simple;
-	bh=h9ceh9DWtwvOAv8lZI5QIIzEnFfIR1nnvswMVkuMh7c=;
+	s=arc-20240116; t=1746713423; c=relaxed/simple;
+	bh=rBZ8oHeY+uQoBWsAP98N8CQDCX40XW60zl1C5BKmQ7U=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MtPutXHPY2Rj8ZXoIz7wolIISQHzKWTdmX6dqWEcj8RMyVv9aKScTMxG0HjNKHYKfS8srrb4AnuU2SoIG0WLx2Uf2Srcu+Hb1gLRektdmuXFShW5uRCN62J2g3rnhKZwdcWV24WPx2Qx/ZmeLdyH9i7NxaZpcg1EGq3on1DYqXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bm6axfZm; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=DhtHQOzdY+9U2ltVzVbrh/GQXGKl/f5yZLtXcB/FMkbz3gzFr9f2iw0g7va9fNmqpEhh/dIWDzbgx4yBClJ/1bU94sz+tDS+PUcebOa8r6f9hb+e2ZBZippxItmEQdwLiyYXRd89gdG0TEtqg8vNvh8a6gmb5enyihpen6p+kiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yZQgNjfL; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-73bfc657aefso852610b3a.1
-        for <kvm@vger.kernel.org>; Thu, 08 May 2025 07:10:19 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-73dcce02a5cso764914b3a.0
+        for <kvm@vger.kernel.org>; Thu, 08 May 2025 07:10:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746713419; x=1747318219; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1746713421; x=1747318221; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=p+56ubm47OlXcm/VaWogaGlH7q4WP+P+2pKjZu9cp4w=;
-        b=bm6axfZmRXgeuF9fa6kEQJoma3Qim35CdnI18deLf9b2MaHRq1Z0ouEjlfGuk+Jv6J
-         GRT4f8NL/JVvw7LKwHhyuIxPK53pYd0tKVbjFT+JxDH8ZSEeG5NG0vZ1pCNwV0Ic2uMk
-         +/dW4LwVu+Mc7JoQ5ms0DVqsVQ4kaAZui1imiDkYSX6Rh9M4wmjdGNyjOJR7hZ2lSO6u
-         XSGQpQ3itYTHSfAt2Y/IDTn7OC1x3QzheU7QXT9yWpwImj0U1bzcAjwOUeBMLQSdSVMt
-         wm2L+YdvtlqTtY5ChjG6VJ7AgPc6xN0ve0lUaZNMXtC47/4jS5iqUcSZOuGrhOVEIwpf
-         vAFg==
+        bh=KJVX1DCqX7vbNbrylbBP6BivBKN94o2apUJMFPAVyIY=;
+        b=yZQgNjfLY8tMCqmk/kgtHcZGrwP+oXxFgh1o3ToR8ifTATCjTnpwLEfFcf607mTV3l
+         ZKlrYYUPZMyWKFDSlyJ1YcM/zxjw1TtNtt2VveUG71ZdDu7TtoI6uW+XVxdAfpiOyjKE
+         FqTJbwgF701mkifSYOt/vGBVrz3fAKOtst4iqCGApXJGiank5KlFqK/i2CJJoY5FXdqS
+         +g8lxUb/hqKZMsbXEFIsYuL590X1UlCZ0HVKePbLWnr08onXu/dUAZyk42JHNLaM8SgP
+         FCySqyIxKoWwc+LFFamibqBJqckq+43yB4lnaqpgNksC/mwNe2Vk7w/NXdPY+lW+p0sW
+         XuwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746713419; x=1747318219;
+        d=1e100.net; s=20230601; t=1746713421; x=1747318221;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=p+56ubm47OlXcm/VaWogaGlH7q4WP+P+2pKjZu9cp4w=;
-        b=NpjiXjdl75ivtJgs6RjW/4pRcdTNCQ2Q6oM6WX0krewsccs+3Xo27Xa6HwqJY9hSLN
-         MjWHl08FR/DiLZkZYiIAGPEE3KvZz7LR8Z9rjbB+BhCIwYwuEdEDjDVxpNoNMPeb+EC+
-         X80yY7fiR2pj0Vwohs3cu3fcHhjDJr/JhyTWt2nwOOmRx0y+XhBFaBrdaLXpNQ0PSnQu
-         d+FxZhCbmOG9c4n/5atcGG7Pz7gnkFA7YHXM8dDBojoTa/lzF3/yZUriyNhFIGxNGjQz
-         ooRQC46zbzkwdGl5W35bF4WYDXCGMeyH5v9pY6D/gIT2shvPMowfvPSh5lkenAIEcG4y
-         spRg==
-X-Gm-Message-State: AOJu0YyXaWmPdMzijuWHaRP1q/8OeO7u/R9dhXwVAw9vdXoJtvE25xBP
-	marP4ebvypVXov6hLipQxgOozdV6GOOMYnhIWkKGIA7m1fwOtyJhSWR+LWhorOH9GOJNoUvqHSe
-	ajA==
-X-Google-Smtp-Source: AGHT+IG2eg6x/bjzTx5zXZD+HM1Dnr1Anhc1D/g6qFT5/6izbWgde1cjoEAZ96/ZeW59opbMXnoIvhkIYXc=
-X-Received: from pfbdu10.prod.google.com ([2002:a05:6a00:2b4a:b0:740:41eb:584c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4c0c:b0:736:41ec:aaad
- with SMTP id d2e1a72fcca58-740a99cdbe4mr5209318b3a.14.1746713418848; Thu, 08
- May 2025 07:10:18 -0700 (PDT)
+        bh=KJVX1DCqX7vbNbrylbBP6BivBKN94o2apUJMFPAVyIY=;
+        b=QWqILMPCEMzEq696zHXzDKzpbRhej8KEfYLNcy7tsQMtgKNWHlpg6po5vV1qRbv4gD
+         JhGnzZi5tM3g8vwkMNkqLFihRkZXiB+TtzrblC2VHRkXt6rNo+AYK07KUK5CR3Bi0MVH
+         FdrL2a31LQW/UhYdb3MPm8PF9OO8uVW2FwcUk2eJ59QOOHvUMtFRcM32YsvQISG7SNOa
+         wr9v2ifPN6J8U6G53Ih7DF/Rv58HW2cc+Su2kDlfGsRMm6urB8GcZGzWOot80uR97+U4
+         lXGdRqICfAeOdDNnLPvbvFgaxAKRVCkfFU1aaixzVaenFGGyvweG8Mfz55aJE3Qg6EVu
+         QXUw==
+X-Gm-Message-State: AOJu0YyHMdPVcxx/FpB+78F5ouztRZm6WBnzjKgGlbSxKPCWfkIhDE7Q
+	l4JF0bJhXTsAFEzVHIrFXx+MmeARq9NoEFc60M4Fd0kKnTrpKZ//AUrd+wXnzzTQ8OMospOqLRj
+	MRQ==
+X-Google-Smtp-Source: AGHT+IGeOozbRNnQDObWfA03lfKGbI9CmCxprWmItBaqzUSnplsOV8hYwrU5Or4chHdRZ8SUt7GQWEf4fi8=
+X-Received: from pful19.prod.google.com ([2002:a05:6a00:1413:b0:740:addd:daba])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2908:b0:72d:3b2e:fef9
+ with SMTP id d2e1a72fcca58-7409d00d6fbmr11961256b3a.20.1746713420600; Thu, 08
+ May 2025 07:10:20 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  8 May 2025 07:10:09 -0700
+Date: Thu,  8 May 2025 07:10:10 -0700
 In-Reply-To: <20250508141012.1411952-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250508141012.1411952-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1015.ga840276032-goog
-Message-ID: <20250508141012.1411952-3-seanjc@google.com>
-Subject: [PATCH v2 2/5] KVM: Bail from the dirty ring reset flow if a signal
- is pending
+Message-ID: <20250508141012.1411952-4-seanjc@google.com>
+Subject: [PATCH v2 3/5] KVM: Conditionally reschedule when resetting the dirty ring
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,30 +84,72 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Maxim Levitsky <mlevitsk@redhat.com>, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Abort a dirty ring reset if the current task has a pending signal, as the
-hard limit of INT_MAX entries doesn't ensure KVM will respond to a signal
-in a timely fashion.
+When resetting a dirty ring, conditionally reschedule on each iteration
+after the first.  The recently introduced hard limit mitigates the issue
+of an endless reset, but isn't sufficient to completely prevent RCU
+stalls, soft lockups, etc., nor is the hard limit intended to guard
+against such badness.
+
+Note!  Take care to check for reschedule even in the "continue" paths,
+as a pathological scenario (or malicious userspace) could dirty the same
+gfn over and over, i.e. always hit the continue path.
+
+  rcu: INFO: rcu_sched self-detected stall on CPU
+  rcu: 	4-....: (5249 ticks this GP) idle=51e4/1/0x4000000000000000 softirq=309/309 fqs=2563
+  rcu: 	(t=5250 jiffies g=-319 q=608 ncpus=24)
+  CPU: 4 UID: 1000 PID: 1067 Comm: dirty_log_test Tainted: G             L     6.13.0-rc3-17fa7a24ea1e-HEAD-vm #814
+  Tainted: [L]=SOFTLOCKUP
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:kvm_arch_mmu_enable_log_dirty_pt_masked+0x26/0x200 [kvm]
+  Call Trace:
+   <TASK>
+   kvm_reset_dirty_gfn.part.0+0xb4/0xe0 [kvm]
+   kvm_dirty_ring_reset+0x58/0x220 [kvm]
+   kvm_vm_ioctl+0x10eb/0x15d0 [kvm]
+   __x64_sys_ioctl+0x8b/0xb0
+   do_syscall_64+0x5b/0x160
+   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+   </TASK>
+  Tainted: [L]=SOFTLOCKUP
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:kvm_arch_mmu_enable_log_dirty_pt_masked+0x17/0x200 [kvm]
+  Call Trace:
+   <TASK>
+   kvm_reset_dirty_gfn.part.0+0xb4/0xe0 [kvm]
+   kvm_dirty_ring_reset+0x58/0x220 [kvm]
+   kvm_vm_ioctl+0x10eb/0x15d0 [kvm]
+   __x64_sys_ioctl+0x8b/0xb0
+   do_syscall_64+0x5b/0x160
+   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+   </TASK>
 
 Fixes: fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/dirty_ring.c | 3 +++
- 1 file changed, 3 insertions(+)
+ virt/kvm/dirty_ring.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-index 77986f34eff8..e844e869e8c7 100644
+index e844e869e8c7..97cca0c02fd1 100644
 --- a/virt/kvm/dirty_ring.c
 +++ b/virt/kvm/dirty_ring.c
-@@ -118,6 +118,9 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
- 	cur_slot = cur_offset = mask = 0;
+@@ -134,6 +134,16 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
  
- 	while (likely((*nr_entries_reset) < INT_MAX)) {
-+		if (signal_pending(current))
-+			return -EINTR;
+ 		ring->reset_index++;
+ 		(*nr_entries_reset)++;
 +
- 		entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
- 
- 		if (!kvm_dirty_gfn_harvested(entry))
++		/*
++		 * While the size of each ring is fixed, it's possible for the
++		 * ring to be constantly re-dirtied/harvested while the reset
++		 * is in-progress (the hard limit exists only to guard against
++		 * wrapping the count into negative space).
++		 */
++		if (!first_round)
++			cond_resched();
++
+ 		/*
+ 		 * Try to coalesce the reset operations when the guest is
+ 		 * scanning pages in the same slot.
 -- 
 2.49.0.1015.ga840276032-goog
 
