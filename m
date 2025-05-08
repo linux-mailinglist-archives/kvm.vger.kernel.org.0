@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-45955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45956-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BDE6AAFF15
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 17:24:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7BB6AAFEC6
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 17:15:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86CEC7BEA76
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:12:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 343F33B9B36
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B7227F730;
-	Thu,  8 May 2025 15:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB1F288523;
+	Thu,  8 May 2025 15:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LDmZb5bj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gOCNHvlg"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE37128851B
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 15:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD89928851E
+	for <kvm@vger.kernel.org>; Thu,  8 May 2025 15:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746716857; cv=none; b=NTL2sLtODn/u5fiEZCHuOY92unD6THmnrnaUiFv3UDh8wd2lxfU+iTlHbewtANNBVwg70WjRqJJbOMXKPc+TaYwQ0J2z9bo+Cu9chd4kVLkREK7hL7dI7i4smbPCFWVBTsDsF1CV1jfdVd8eE6TUCvMAIryf5NtDVebe+Cs2t/Q=
+	t=1746716860; cv=none; b=Uws2wrE1Mu9sEcPeEEe4Rm2G032criD09l72VwL0ScXh1PdhThmv3YaRzsSYuiZ/LOk9adRi+B+SvYLS48cnuV788uzcFO34fNenk01bXEztb9WkM0+47kzNUwaHcXvSeSQaoqM7kXFMyN9qgF4f5J9j7k6g0v7l0lQjWEJauMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746716857; c=relaxed/simple;
-	bh=b1SbeFmnllB8wUgT5dzRNfABN3PxHQ5LHq5YrQk93vk=;
+	s=arc-20240116; t=1746716860; c=relaxed/simple;
+	bh=RnPUkkVptiBkzoG1PZzbzX6SNfcRkotJXQDy/R78Sro=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jVaWQB/leHIS95FTFVdbVS2SC/d5WaLtQNZpKMCgXbPAAz+gh0sW0ouI5fZz8rmwbJm+E1G1wpg46qihzzovfwHxA298biUjpGQfOS9CX/ycdPyhZcBR6R1tdvgr32NxMPaS6h6Bco5xQZZ482HktsRDYzEcM7ZIY10r2h+kuLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LDmZb5bj; arc=none smtp.client-ip=198.175.65.11
+	 MIME-Version; b=nFQv+tKLsJv7nuaMIeFVM76898qby43HUzJ4hlfQxMuK+PR/SjuFPuWc1c7FgY1nz0mWKWG9J9aS2i25xwkBzYUi93Ji4bXSFZ6RuFw1UA6fbb8q4+gy0Lq1lfU/CgW4lnY91Ho3s6cmTZAFNEqaK809/AVMQrv8M7R2L5PK3hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gOCNHvlg; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746716856; x=1778252856;
+  t=1746716859; x=1778252859;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=b1SbeFmnllB8wUgT5dzRNfABN3PxHQ5LHq5YrQk93vk=;
-  b=LDmZb5bjaVsfLVx05NGqNyM5GGpylajGJPQoyH7DGnwMVqhhoxM3yYP8
-   IpBk9CLeF7xbqZUgrmlYoXZdsDg9suXYh2qxxbskns5mU8nDWQguNtlyn
-   yr/TPvl+i1TncG0yxg2py3jZL0FuwFn8+vYe5z53rpXTxYHVT0YJ2JL8L
-   VvJDSDcB8MS52c+ve5qtUcJ6BqF6nOUgl5y5L63zxZBGEB+sDeVCfpCed
-   9oOg5eJYgzdknrv4RuH7ByBITTW5zFCuUFLG6yIz2epZs02DUiKBd9pTJ
-   m8CdniOugoFUDvNxXVtdux0akwTpf0OlfVDvdpHzASSCepezPBxHu+GOc
-   A==;
-X-CSE-ConnectionGUID: bkaod0SzSwSYbPvbBXdpTA==
-X-CSE-MsgGUID: 7TsXSxMbQYObfv3jML6zkg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="58716552"
+  bh=RnPUkkVptiBkzoG1PZzbzX6SNfcRkotJXQDy/R78Sro=;
+  b=gOCNHvlgCqh3QN5IUppaHQdjSFlxLWsn0uSfe0a7pCfiXsy4TCBPFz6s
+   ibk7D6wGiC6lbDYiYP4HcsexDfe2U4wc/B8kFiO9GGDM9v7eT5LpY/KZb
+   GcLDifiIfDJkjcil871iCk6FfgKY0n7gicu9XK+a5Fjkly+KWlbUaSxtU
+   buPunNDPMR4tz4NvIMMvugm/76bT0vMC/CkTPXR6yKD8zZwHLl1lLlqJD
+   jmqm+DJDAUwjFog9eueX81ZsNVvVUby4ZHchrFQvePclV8F2quDuRM6Ky
+   UQ1iabIjufpo8uvoPcv4qrvhpmMgmTuOKP2UbGFFghH0jhwo0b8IhlVBl
+   w==;
+X-CSE-ConnectionGUID: BhxQEBG+SJyxEfhswZa68Q==
+X-CSE-MsgGUID: xC2/PRlERGqHMw5Ydu6lAg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="58716568"
 X-IronPort-AV: E=Sophos;i="6.15,272,1739865600"; 
-   d="scan'208";a="58716552"
+   d="scan'208";a="58716568"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 08:07:36 -0700
-X-CSE-ConnectionGUID: eKOy1hEIQEef4f1/Gas8og==
-X-CSE-MsgGUID: ABm/70Z8T+C7RvPtmtfJsA==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 08:07:39 -0700
+X-CSE-ConnectionGUID: Ar4o2wnjSGqd0GLgwhsxrw==
+X-CSE-MsgGUID: xqj2rnT5QPC72IKLc5lneA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,272,1739865600"; 
-   d="scan'208";a="141440560"
+   d="scan'208";a="141440575"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by orviesa005.jf.intel.com with ESMTP; 08 May 2025 08:07:33 -0700
+  by orviesa005.jf.intel.com with ESMTP; 08 May 2025 08:07:35 -0700
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
@@ -71,9 +71,9 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Zhao Liu <zhao1.liu@intel.com>,
 	Rick Edgecombe <rick.p.edgecombe@intel.com>,
 	Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [PATCH v9 52/55] i386/tdx: Don't treat SYSCALL as unavailable
-Date: Thu,  8 May 2025 10:59:58 -0400
-Message-ID: <20250508150002.689633-53-xiaoyao.li@intel.com>
+Subject: [PATCH v9 53/55] i386/tdx: Make invtsc default on
+Date: Thu,  8 May 2025 10:59:59 -0400
+Message-ID: <20250508150002.689633-54-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250508150002.689633-1-xiaoyao.li@intel.com>
 References: <20250508150002.689633-1-xiaoyao.li@intel.com>
@@ -85,52 +85,28 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On Intel CPU, the value of CPUID_EXT2_SYSCALL depends on the mode of
-the vcpu. It's 0 outside 64-bit mode and 1 in 64-bit mode.
-
-The initial state of TDX vcpu is 32-bit protected mode. At the time of
-calling KVM_TDX_GET_CPUID, vcpu hasn't started running so the value read
-is 0.
-
-In reality, 64-bit mode should always be supported. So mark
-CPUID_EXT2_SYSCALL always supported to avoid false warning.
+Because it's fixed1 bit that enforced by TDX module.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Changes in v9:
- - Add commit message;
-
-Changes in v7:
- - fix CPUID_EXT2_SYSCALL by adding it to actual;
----
- target/i386/kvm/tdx.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ target/i386/kvm/tdx.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index aa1bab644352..e9c680b74040 100644
+index e9c680b74040..6aeb4fcc4975 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -852,6 +852,19 @@ static int tdx_check_features(X86ConfidentialGuest *cg, CPUState *cs)
-             continue;
-         }
+@@ -749,6 +749,9 @@ static void tdx_cpu_instance_init(X86ConfidentialGuest *cg, CPUState *cpu)
  
-+        /* Fixup for special cases */
-+        switch (w) {
-+        case FEAT_8000_0001_EDX:
-+            /*
-+             * Intel enumerates SYSCALL bit as 1 only when processor in 64-bit
-+             * mode and before vcpu running it's not in 64-bit mode.
-+             */
-+            actual |= CPUID_EXT2_SYSCALL;
-+            break;
-+        default:
-+            break;
-+        }
+     object_property_set_bool(OBJECT(cpu), "pmu", false, &error_abort);
+ 
++    /* invtsc is fixed1 for TD guest */
++    object_property_set_bool(OBJECT(cpu), "invtsc", true, &error_abort);
 +
-         requested = env->features[w];
-         unavailable = requested & ~actual;
-         mark_unavailable_features(cpu, w, unavailable, unav_prefix);
+     x86cpu->enable_cpuid_0x1f = true;
+ }
+ 
 -- 
 2.43.0
 
