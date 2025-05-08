@@ -1,320 +1,565 @@
-Return-Path: <kvm+bounces-45832-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45833-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1B11AAF38E
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 08:18:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBC61AAF3D9
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 08:38:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CA50466436
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 06:18:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B98AE3A3FCE
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 06:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA60B1DE4EF;
-	Thu,  8 May 2025 06:18:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3849221ABA7;
+	Thu,  8 May 2025 06:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="j7sQqUYp"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hh7uQ/ES"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2049.outbound.protection.outlook.com [40.107.237.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEA410E0
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 06:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746685094; cv=none; b=SncMrBoaAkFrDyWpjUDZBmZ4pDf1cajJWFBP42lYqe0KK0cVBDYaG/HitB/RkTdgVTOSr9cRqWUznO6aWsdAsw0AnwHp3sj6gYQU3KI6q+1HKTmx+gDEGYhb1HBX8BrveYAClH0zw87kGZbLcEZMUeuoViVCfP4F+Lk5X/Re8M4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746685094; c=relaxed/simple;
-	bh=Bbkq/RYcxs1x98iS+sh1uTieG+gNR4+QIdZyuTIdfr8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HSw6iv2i4goONdWpHpkJtJB6X/u0QrJHd05BWewwMgOzx2pFpe15wW+02SB70bx4CLlMAurqw2bUXzDG8p8aPFX1FaEDmgMipJy17gcBZbco6vv1rcEnwoN/mzpm+7y40EISOwI2HTX53VlgQ2BmRG+VT78NOv152bWNkxzBSdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=j7sQqUYp; arc=none smtp.client-ip=209.85.166.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-85e46f5c50fso52864339f.3
-        for <kvm@vger.kernel.org>; Wed, 07 May 2025 23:18:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1746685091; x=1747289891; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ss9yl8sXdOiHdkgttMG6M1WflUBd6V/PJ9963b+7AH0=;
-        b=j7sQqUYp6tm5t6gJ7ptNSmWB2SFDGLhFy9p8HOy4/lE9p7cg8DXjXHYzcHTaWBppoN
-         JvFvaEZTxI3H6DpKaEWRH2uhTTgm8+d6xRYrsmPl0K+mKNYEgIerLZB5rzaDSg//tKlo
-         u4uMsvZmFoR0pg6meXDOi94FzE7zym/AT/x1WfZJuKvx4sw3oS7a5To95WRq7mvZIC+u
-         DcyDnmg9NZeAGpyfSqwvUB3ew8aKAI7qc5xe1HDNCXGsM/yE1AYDYeeLAkM+2rG8WXN9
-         c9zuS+dQJlM+4TA8BtiGvvTrkEMd4h7UkH3DnvXtVO69BK8Ol5A/IqkzRsZjcQKVPMWP
-         NU6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746685091; x=1747289891;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ss9yl8sXdOiHdkgttMG6M1WflUBd6V/PJ9963b+7AH0=;
-        b=J0xhqpf+yZZ+gXTJKmcn0CxlXhP8LAPObbLGVQcNQ76w11LfY5c3qgXLQSP4vtg6MJ
-         mPITlnrzltmArBIPWlYR8wrHGF8/H8T28T7vZTtZtjsQFpiBSIkwIn9l8cYmOYIVXDNG
-         kl7M/A9tGswfTW1KwyaLUkTanbAtbaXHZuv2KU2Xfrsxx5h40e02zuCDjG0FqC/kM2h2
-         suNiTDEVGLiYD5TSL19znVD7qRaCDM0YCzl66pJ14nkC9tqZdHyug56D2s9PKUTrCbxF
-         ohb0WLd1nSHKWyLtEt5lscPJ9spFMsvcVhPNyAUUHQBKkEKWRX/9tWFwClANUApjr5zn
-         XvbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXTyqm+MdOdWkqc46GJNfLx5Am6CJ/JTmuemw39jLj96l6UHfXyYDI4RR6q95bTwMGw8Fo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMvt54wmL2sjKsPY9xMJvvW9UVv3EHVG5ocI8oKL0Cqrh1JwQz
-	R+1oF0KKXwNSVZNpuB+z71QhuKqUMu4FfA9NWtrjna6fbcToxrppB/UwASrJMM+IrJ9mdLDtnv7
-	v/iVmEvzTAOaxWPrseGRSyxlnvXdLsuz+r61noA==
-X-Gm-Gg: ASbGncvBUlzOX0dydxpGQyPEh6c1ws9XEUEWlQbIKJI2NB1x5M3QE3unhGmIDsfPNMx
-	G30cnE2VahHo6dmVvyK/C8QDITqfBqaM4piAGzHQcgajTXQFtn6F2k72GcT/+nCyLTTGn15tncJ
-	78q1nZpnNtAPVhBXZsRWslZyU=
-X-Google-Smtp-Source: AGHT+IH2Ky4AFIJnI3fge0BtYV7Dksetv4YSLA/pbKoTobhDZ77LmyQiPq5k0ylButekku7Ka+EjOBB/t3SlisqxLk0=
-X-Received: by 2002:a05:6e02:3498:b0:3d8:1cba:1854 with SMTP id
- e9e14a558f8ab-3da7854d65bmr34465065ab.1.1746685091168; Wed, 07 May 2025
- 23:18:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063F0217736;
+	Thu,  8 May 2025 06:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746686274; cv=fail; b=trlNvecV2CXsEPvqYZY0fN7s3bdD7Cw/0cB5/iDEhw2mhzWwNVKvGIyC7VrGQ2tsKn21JTf04yLc3cTKKXXmk5N5oz4JDaTMxzY54Eq0mwRvjPW/PUaZK2T1V2gNPQVy1Qgb6DJ7PQNkkrsD5XrFsyRtse6X6Rw7Xi/MFgEl2bk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746686274; c=relaxed/simple;
+	bh=/T4fc8S0aGSn5oHrrGuJEuhleBLfW1/BWNgEugQm3Wk=;
+	h=Content-Type:Message-ID:Date:From:Subject:To:Cc:References:
+	 In-Reply-To:MIME-Version; b=Ay6/85ZS1YSBJ1Dz+T7/svOOC6YbFpbBcZmSpsaqrandtaBhNf5WWrjWFcGpS5OX0o79eSwtAKWUg9bjHUH/ytYqN6s2j15541jlx5qTF2MB2FhI8M2HzkpTrrOKYeoG5M6IUe3VjTAOBnApnecmqtLs3iy7RgdWA9Q6RpFlwGo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=hh7uQ/ES; arc=fail smtp.client-ip=40.107.237.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BeJu8fdXBMikTVYaAF2dim02swyvBDIFNt6J0HYVV5hCGpp4px3zbhMfM9oCdY2j6cpH7nGbH0Zo8VHbGCluQlCd0I5FKXkPK77kZjzUXYB+RjYvI5PJ5dfK14fHV68laxQeM0jjQZNZKuZFMyBT3kkezbReGTDT9HNeDGC4lb/fwgHHU3mcoNWdDkIBxZSqcUb9Fxcv6K2c1r204Fa1apqEZeDbBCc9IzayvOX3ptEM77bk9e+p4oYV1Rd/ChNO+6JvgDLcRrTedGdVL/tDBmbCWyIuZANERL273VfE5J7aoNOnL2XWnj9HKBR7/4cc637vi28u7OHBSCHMOzEh6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=c4gH6vmlqu/hX8l9hiih0kUqJdcHpHGqZserN/dDONw=;
+ b=AywYH0bBSXji8p5ameEK9XyMcXM/nN/JRkb3PK1SyCj6/NXiu/fQ8fHwIloLOyPuNB3zUH+2LG6RDNhUEPuKBDFeQxBoGsrzIUSLVczILtsbU5dExDxD2fL2NPefg8TkNgBByxJFYbybZaZ/I1cA1jAKCXLDFD2tGOc4reGC1nmCQlchuCtKSb7WHIhuQsDM9JE23mVk4yHdKSs+oT1wIR0LF4isRppIeUHUvJZPITUY45ec7TQNNBm8FvOmq1tzjQHUbVR6ToMTA5hcv1hIoLMKBEPKcfFRbsnQZtet1wcINmNgxK6OoCgTsYyh13vrSTgjBCP3e8azhdP9hcZOJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=c4gH6vmlqu/hX8l9hiih0kUqJdcHpHGqZserN/dDONw=;
+ b=hh7uQ/ESm3G+z7SkfSqfKTazvwvvep9WyywAUlNgmwEa/Tes1SBASkaoln3APf2tUbUlBaq0hdqUa4eAwUckVkIBCGQSDLZ5LY0fVi93nIK/auuO820Q/f+ze22FWVrWj+X+tyAtewtjv80DuZpswm06WiXGZncS1tDZyLGVi7Q=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4262.namprd12.prod.outlook.com (2603:10b6:610:af::8)
+ by IA1PR12MB7709.namprd12.prod.outlook.com (2603:10b6:208:423::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.26; Thu, 8 May
+ 2025 06:37:48 +0000
+Received: from CH2PR12MB4262.namprd12.prod.outlook.com
+ ([fe80::3bdb:bf3d:8bde:7870]) by CH2PR12MB4262.namprd12.prod.outlook.com
+ ([fe80::3bdb:bf3d:8bde:7870%5]) with mapi id 15.20.8722.020; Thu, 8 May 2025
+ 06:37:46 +0000
+Content-Type: multipart/mixed; boundary="------------20J8wHG41v0zlwJYCL04QA7w"
+Message-ID: <fc6b74e1-cbe4-4871-89d4-3855ca8f576b@amd.com>
+Date: Thu, 8 May 2025 12:07:25 +0530
+User-Agent: Mozilla Thunderbird
+From: Shivank Garg <shivankg@amd.com>
+Subject: Re: [PATCH RFC v7 3/8] security: Export
+ security_inode_init_security_anon for KVM guest_memfd
+To: David Hildenbrand <david@redhat.com>,
+ Christoph Hellwig <hch@infradead.org>
+Cc: seanjc@google.com, vbabka@suse.cz, willy@infradead.org,
+ akpm@linux-foundation.org, shuah@kernel.org, pbonzini@redhat.com,
+ ackerleytng@google.com, paul@paul-moore.com, jmorris@namei.org,
+ serge@hallyn.com, pvorel@suse.cz, bfoster@redhat.com, tabba@google.com,
+ vannapurve@google.com, chao.gao@intel.com, bharata@amd.com, nikunj@amd.com,
+ michael.day@amd.com, yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com,
+ thomas.lendacky@amd.com, michael.roth@amd.com, aik@amd.com, jgg@nvidia.com,
+ kalyazin@amazon.com, peterx@redhat.com, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-security-module@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-coco@lists.linux.dev,
+ =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>,
+ Mike Rapoport <rppt@kernel.org>, brauner@kernel.org, Jan Kara <jack@suse.cz>
+References: <20250408112402.181574-1-shivankg@amd.com>
+ <20250408112402.181574-4-shivankg@amd.com> <Z_eEUrkyq1NApL1U@infradead.org>
+ <b9e5fa41-62fd-4b3d-bb2d-24ae9d3c33da@redhat.com>
+Content-Language: en-US
+In-Reply-To: <b9e5fa41-62fd-4b3d-bb2d-24ae9d3c33da@redhat.com>
+X-ClientProxiedBy: BMXPR01CA0080.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:54::20) To CH2PR12MB4262.namprd12.prod.outlook.com
+ (2603:10b6:610:af::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403112522.1566629-3-rkrcmar@ventanamicro.com> <20250403112522.1566629-6-rkrcmar@ventanamicro.com>
-In-Reply-To: <20250403112522.1566629-6-rkrcmar@ventanamicro.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 8 May 2025 11:48:00 +0530
-X-Gm-Features: ATxdqUFfRqun2viiJMiaaVjkyhvi75M7M8EY7NCPCcyFAS9GGQ49YwBXAaDX928
-Message-ID: <CAAhSdy3y0-hz59Nrqvvhp=+cWJe1s50K7EpuZmKBqfy-XQFd1Q@mail.gmail.com>
-Subject: Re: [PATCH 3/5] KVM: RISC-V: remove unnecessary SBI reset state
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Andrew Jones <ajones@ventanamicro.com>, 
-	Mayuresh Chitale <mchitale@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4262:EE_|IA1PR12MB7709:EE_
+X-MS-Office365-Filtering-Correlation-Id: b1c919c6-e476-4e1c-b51f-08dd8dfad7aa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|4053099003;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?eDZGbEs2TlNKRktVWlpPbHBvOXBLa0gxRlZPNGNFY0MzS0NTMjAzNGFEeXJp?=
+ =?utf-8?B?Zk5FaFN3ejVtQlB6UTV2UWxHSy9IOWJrWXBhcXo0SDRYekgybW95N0RYSk9F?=
+ =?utf-8?B?U0dTK0NuMkJaTStSbFJ4T1RlYWRDTWdxTk02NTFhSHZKSkV1N3ZQSURRTXQ5?=
+ =?utf-8?B?b0haN0pOR24xOHZtdzNmR2l4OWFwYTYvakRNYXpWcDE4TnJQVy9NTXJzRzRo?=
+ =?utf-8?B?OExSMHA0K1p0L3UvdE8wMEs3a0t2cE5PcGdnYmJOMjVBODVLL1RRMXB3aDY5?=
+ =?utf-8?B?aWpWQ0JHTGdsN2pCaXBvRTRhMDlrMittMUFTTWpnbTJqRlJUdVNXQzZSajA1?=
+ =?utf-8?B?K3hXcEVsNWxUSXl6L1VVc01Kb0dxRm1lR2NVU0loVm5nZTNXS3pHN1NRRDJv?=
+ =?utf-8?B?VkhDbW5ndWNrNXZuQUJoN2ZLcnFrKzQ5R29YNXhkL05vWG5hL1d6d2RidzFs?=
+ =?utf-8?B?d1NDa1hsbzJqdi85TmU5RmZCbEtMODcySW9uaVpCNXBaKzBraHZHR0JOTWEv?=
+ =?utf-8?B?Mk44SDdaem11YXNieHlxRXIwbGFYeWhmbnZDSHRpZ0tnTGhleWFQMXNNS1l2?=
+ =?utf-8?B?dDRBRGtoR3Q1azY3MnhMSkxoK3hNRUpGUzVzVlBVZTN2S3RuTitaMTBMMHk4?=
+ =?utf-8?B?NjlycGpwd3FKQ2FLSU1kMWVNUWthc3d3VDBrVDZkVUlRdDFOUDUycnN3Tlhl?=
+ =?utf-8?B?eEVOUUpNRUZmNmpZdkdKdnBrRlJOVjhDeDJid0FvcnZ2R1FnSWp5VkY3OXhi?=
+ =?utf-8?B?dWptMGV5cVBIc3Q4VjRMRlJPMnJzclNsYUkzRVRpZVdZOFMxcWtSTGhRMHMr?=
+ =?utf-8?B?a1V5am4rYTJUaW5lZW1wcWxqUzNCRURvRHEzQVhIaGRrMFl2VEdpMW5mVUZr?=
+ =?utf-8?B?R3ZXemR4T3V6NVdvZ3llbmkxSXFqY3lGTFdxM1NRcjRGR0V4WjY0cVdlNmhB?=
+ =?utf-8?B?RkxBVm5QMWxLVTk1QlFDYnpCeGRySnNWYUZYWHlIaHF3MVc1bGpWMCtSZ09u?=
+ =?utf-8?B?aytYQjV3Ym9za0RGSFN4MFdneWQ5aURqejdDeG5EaHpueDBtUzBEZEZLU21M?=
+ =?utf-8?B?TUp0UUYxbXJORTRhZDdIcjM2aEkxcE5oOGFZdjkyYW5WT0Z5TVA5WS8rVStN?=
+ =?utf-8?B?bjk3Z3dnaTArKzQxdVBhYnhWOGp6NVF0OEdwNXpqeFEwNCtGZzhUdGlUVjhW?=
+ =?utf-8?B?OGtWdWE3V1Z6SHpidGRsNTFIMFFvVE9wVDBQQS9Bb0lRY0d3UkVKVFgxRFh0?=
+ =?utf-8?B?Sjd1MENsMkJXS0RuQytLNzl5SWR2TVNTZUxOMytqWm9ZSXdPbGFWVm5UZ093?=
+ =?utf-8?B?d0o4WE0rYW9NeVBqUDFxSkJ4VUcrNGlmTmtpMnZUOThVcVN5amtLOXhqYjJ5?=
+ =?utf-8?B?RXJPUXNzYjNlRHkxd1ZLNDZWWVVXU2U1VzVOT01XaUdNZlkxZXo1UjJ6SWt0?=
+ =?utf-8?B?TjlrQUxoaXVBSmVhQlBuZGlXM0t6aTdka3ppREhxS3E1Rk5ORTJjOW9paXpN?=
+ =?utf-8?B?Uk5VWFluUkZQSUtOVXJQZ0dLTGMzUVRxT2VPbVlLR0Y4VnJER09JdHhwV2Zv?=
+ =?utf-8?B?NEVrREFVMGVwdk1nUkJhdnNiTG8vYXB4dysvWWQwdEVla1RRNUNHQy91N1ZS?=
+ =?utf-8?B?MVJURm5aYWx5dDg4UjgrQjJGQmxLc1Z0VXp1SkZtS2krTHdMeUptcS9BZHZk?=
+ =?utf-8?B?Ti9CSUFTazYzKzcwN1NUK09XUTg0Qkp1cEN5cm1XaXRma1ptNzNxNS96alhD?=
+ =?utf-8?B?SDNtQmJSOEFnSWd1WEZ6SElkR0QwdGRLUkRCNXpnMU9hb082c3RocEUrQi9T?=
+ =?utf-8?B?WkdBRUNCclluT053N2Q5ZjZrMEU0UUNYZ0F3NUc5ZGxGa2YrTTYrVit1OTgy?=
+ =?utf-8?B?OE1QM0c3YndwemlBcGl4ejBFaUJTMG1lMU9WbFBoeGQ0ZlhtTWFrMFlnTjVY?=
+ =?utf-8?Q?guI4Vy/msh0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4262.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(4053099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Z0EwTXd6ZVlaL2xZZHN6WGo4S1ozVHVUSk9xM2NrTVluT0Npd3JJTmZOKysr?=
+ =?utf-8?B?LzJBRTZiQVN6aXp4cSttVDhNNVkxeGRrU2ZZaWpnQjBTT0NFOW9lTUNYWk5z?=
+ =?utf-8?B?UEdyMkxmcUhBNmkrSnVSSnhzb3lRQkRzdUw2bS9wQzhBZXNINVo3c3YycnpC?=
+ =?utf-8?B?cFZXRnlLejBwS3RGQmx1d2FmbEdaZDZJQ1J1czVGZWpBd0I4WlU3U1ZKUWNQ?=
+ =?utf-8?B?Y3lNNWtzKzhyZWp3MGZJdC83MjNhZHU0RGxMeFdSVDR2K0d2MzF5RFJHRXpG?=
+ =?utf-8?B?bHNUOWRqaDJXRXdmYWp5RDJweFNtQUZmcmFCbVVsRnRtbHVwa0RIRTJNa2V6?=
+ =?utf-8?B?SFZkSUF0UGR5QWE5QVFlU1Ruek5HZjFEQUZ0cWVzcnpoZXloTDNKQkRUZCti?=
+ =?utf-8?B?TkFWOTE1eTJOZXBTRGdIV3F1aE15R2pPRlJieDl3L1o3bk9NQmZMcWtMRVV6?=
+ =?utf-8?B?NVZaUHJuTUFBWGl1bUFmYVAvMTFERjJPWnBUK0RZeFhlcDcxYkFZd0dubFRX?=
+ =?utf-8?B?MDdnazlKTzFqNFBYVWlPK3FaVDJXNXR5YllxT2JkWnRoZVZDcVA1VFcwems5?=
+ =?utf-8?B?ZVRLTS9ORWtRazROa09Rcy9KdURtdTdocmRHL2tJU2F1YnJpQmhBdkQ2VEYx?=
+ =?utf-8?B?dDFWYVpETWdXMUtUeTJOVUEzQlVUSWJGL05LSFF0bVdqcjFJOWFpWlk2dmFp?=
+ =?utf-8?B?eU5OcjNuOGdRWWx4SEhFRysrZHFuWkV0WUQ5UXNsT3V0NXZnT21uYlVBMFhm?=
+ =?utf-8?B?clNqdDFZcnF0Y2tVQ3liRW1VS0RVWkRreXlxWXczcnJzUzVzcFR1Sm0wNW1N?=
+ =?utf-8?B?M0liRjVxVkxEdUlvNHhaWjN2eWNPVkdyOFc1WW1sUDAwN1VRcUZrc3M3TkE3?=
+ =?utf-8?B?ZVB6cTFYUDNiOWdjZXJXMUJOdU9BRG15SFBMMmoxWVlMYjZFS3J2Rk1xWnlj?=
+ =?utf-8?B?NXN6cXh4M2RRS3k0QmpJR1ZubDJWQ2JVZmVoVGYxeTRVWS9oL3lVZ01TRlJB?=
+ =?utf-8?B?ZU1kb3lDSTI3YVdXTm85d3BaYUVSY2liU2hlVG1SVEllWDJ3T3A1NEZiaGxq?=
+ =?utf-8?B?cUFkeC9wSERQdzhEd1V6WUp5Y0E5RThCR1VzQ2c5ZDllZSthYmphVXhtU0xX?=
+ =?utf-8?B?bld5aG91K1d5c1BVc05TWW44bjF6eTZ0SS95Y3duUDA0YXp6ZEw2NklZOE41?=
+ =?utf-8?B?WHMwdXhmcHZoREZwMWtjSnNiZmJPVXlEbzhtcnhoVmpBN0RReTdKZXBNK3B0?=
+ =?utf-8?B?MUl0WXY3RUlDVzNzWjJ2T3dSVEVSb2NDTWlwRWhhUXR3Nlp0QUQ4L3NIRnkz?=
+ =?utf-8?B?UGUvNnVaam9WNFdiWlZjME9RRXBPNWJPZ1RCTHNHdVVFZE9KK0s4bFhxdzl3?=
+ =?utf-8?B?RGQ3QmVqOHhKRlV0Zm5TV1J5Z3UwRTdycGM3OC9EbE5xMzdEUXp1ZHpBei9l?=
+ =?utf-8?B?dS9YeFk2UENOUmxMR204QlFmQ3duY3VIbkltaVBXb1NzbVRMREt6bkNwanlX?=
+ =?utf-8?B?Tm5XM0lQRm1qSU9ZWGhmZWZwbTluZmxmMC94Tyt2NXI4NWFJL2p6TWhTamcz?=
+ =?utf-8?B?SGo0RmF4eE9XZk1LelVwYnhBaWlxdm03Ty9JTWFXd3NmWEZnNDQvRGNIaTlL?=
+ =?utf-8?B?SW55U0hMelN0ak1WUFVlMzNtQlNtUnNXVFhoVWZ1VWU2VUFwb0d1SUxvMzNj?=
+ =?utf-8?B?dDJCQld4dVRGNGdoNDdBQmhBdlFjMEIvbVU5QURIQklPcHB2MjU2dS9hb0VT?=
+ =?utf-8?B?aG53bExrb1RpNGZvM1Q3dkhJRkgxakZHOWVpQUc5VFc3c1ZmbUVLZ3NLb2Jm?=
+ =?utf-8?B?Zy91U3R3QjVPRm9xWklTSzc2bm0rd1NMUk54dzVhK2pXU1N2TFdWTk5pMmtY?=
+ =?utf-8?B?M0RnTk5Hb0NrT1g0ZmorcXFpUjUyYXlFQ2xRL1ZEZUprTndrY09DTjFxY29l?=
+ =?utf-8?B?blhsNlBScUd5OVFZa3Z6NnBmSlgrSWpxL3d1b1lWTTA1YW5qSlk0c0NIaU5k?=
+ =?utf-8?B?cURXaHdPam5Lc0xGQjlCNXhucVM2M0tOc3JQUmxOdThjRTNJYW11dmFTQW00?=
+ =?utf-8?B?aTlsbW8zZ095U3NNbzlDMEY4aWE5TmZFQjcxcStaMnIrZkJ4a0RWNFZ2RmR5?=
+ =?utf-8?Q?M2OotYNT7MSvO53OC4VBNGIdz?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1c919c6-e476-4e1c-b51f-08dd8dfad7aa
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4262.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2025 06:37:46.1312
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: h+kqvJRsLZN/eb+T2NbKzjrVTNAeXu1Hlqr6xZJBcprInfLMYMPNFnvFLv6cOjo/9qK0XBEpyACiB6rManyGxg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7709
 
-On Thu, Apr 3, 2025 at 5:02=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar=
-@ventanamicro.com> wrote:
->
-> The SBI reset state has only two variables -- pc and a1.
-> The rest is known, so keep only the necessary information.
->
-> The reset structures make sense if we want userspace to control the
-> reset state (which we do), but I'd still remove them now and reintroduce
-> with the userspace interface later -- we could probably have just a
-> single reset state per VM, instead of a reset state for each VCPU.
->
-> Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@ventanamicro.com>
+--------------20J8wHG41v0zlwJYCL04QA7w
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Queued this patch for Linux-6.16
 
-Thanks,
-Anup
 
+On 4/22/2025 10:55 PM, David Hildenbrand wrote:
+> On 10.04.25 10:41, Christoph Hellwig wrote:
+>> On Tue, Apr 08, 2025 at 11:23:57AM +0000, Shivank Garg wrote:
+>>> KVM guest_memfd is implementing its own inodes to store metadata for
+>>> backing memory using a custom filesystem. This requires the ability to
+>>> initialize anonymous inode using security_inode_init_security_anon().
+>>>
+>>> As guest_memfd currently resides in the KVM module, we need to export this
+>>> symbol for use outside the core kernel. In the future, guest_memfd might be
+>>> moved to core-mm, at which point the symbols no longer would have to be
+>>> exported. When/if that happens is still unclear.
+>>
+>> This really should be a EXPORT_SYMBOL_GPL, if at all.
+>>
+>> But you really should look into a new interface in anon_inode.c that
+>> can be reused instead of duplicating anonymouns inode logic in kvm.ko.
+> 
+> I assume you mean combining the alloc_anon_inode()+
+> security_inode_init_security_anon(), correct?
+> 
+> I can see mm/secretmem.c doing the same thing, so agreed that
+> we're duplicating it.
+> 
+> 
+> Regarding your other mail, I am also starting to wonder where/why
+> we want security_inode_init_security_anon(). At least for
+> mm/secretmem.c, it was introduced by:
+> 
+> commit 2bfe15c5261212130f1a71f32a300bcf426443d4
+> Author: Christian Göttsche <cgzones@googlemail.com>
+> Date:   Tue Jan 25 15:33:04 2022 +0100
+> 
+>     mm: create security context for memfd_secret inodes
+>         Create a security context for the inodes created by memfd_secret(2) via
+>     the LSM hook inode_init_security_anon to allow a fine grained control.
+>     As secret memory areas can affect hibernation and have a global shared
+>     limit access control might be desirable.
+>         Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
+>     Signed-off-by: Paul Moore <paul@paul-moore.com>
+> 
+> 
+> In combination with Paul's review comment [1]
+> 
+> "
+> This seems reasonable to me, and I like the idea of labeling the anon
+> inode as opposed to creating a new set of LSM hooks.  If we want to
+> apply access control policy to the memfd_secret() fds we are going to
+> need to attach some sort of LSM state to the inode, we might as well
+> use the mechanism we already have instead of inventing another one.
+> "
+> 
+> 
+> IIUC, we really only want security_inode_init_security_anon() when there
+> might be interest to have global access control.
+> 
+> 
+> Given that guest_memfd already shares many similarities with guest_memfd
+> (e.g., pages not swappable/migratable) and might share even more in the future
+> (e.g., directmap removal), I assume that we want the same thing for guest_memfd.
+> 
+> 
+> Would something like the following seem reasonable? We should be adding some
+> documentation for the new function, and I wonder if S_PRIVATE should actually
+> be cleared for secretmem + guest_memfd (I have no idea what this "fs-internal" flag
+> affects).
+> 
+
+Here's my understanding of S_PRIVATE flag:
+1. S_PRIVATE tells the kernel that an inode is special and it should
+skip the LSM permission checks (via IS_PRIVATE()):
+
+​For instance,
+int security_inode_mknod(struct inode *dir, struct dentry *dentry,
+                         umode_t mode, dev_t dev)
+{
+        if (unlikely(IS_PRIVATE(dir)))
+                return 0;
+        return call_int_hook(inode_mknod, dir, dentry, mode, dev);
+}
+
+2. In landlock LSM:
+S_PRIVATE inodes are denied from opening file and getting path from fd
+syscall: open_by_handle_at
+calls do_handle_open -> handle_to_path -> get_path_from_fd
+
+static int get_path_from_fd(const s32 fd, struct path *const path)
+{
+...
+        /*
+         * Forbids ruleset FDs, internal filesystems (e.g. nsfs), including
+         * pseudo filesystems that will never be mountable (e.g. sockfs,
+         * pipefs).
+         */
+        if ((fd_file(f)->f_op == &ruleset_fops) ||
+            (fd_file(f)->f_path.mnt->mnt_flags & MNT_INTERNAL) ||
+            (fd_file(f)->f_path.dentry->d_sb->s_flags & SB_NOUSER) ||
+            d_is_negative(fd_file(f)->f_path.dentry) ||
+            IS_PRIVATE(d_backing_inode(fd_file(f)->f_path.dentry)))
+                return -EBADFD;
+
+Using is_nouser_or_private() in is_access_to_paths_allowed() (allows accesses
+for requests with a common path)
+
+static bool is_access_to_paths_allowed() {
+...
+        if (is_nouser_or_private(path->dentry))
+                return true;
+
+3. S_PRIVATE skips security attribute initialization in SELinux:
+security/selinux/hooks.c
+sb_finish_set_opts(){
+...
+                if (inode) {
+                        if (!IS_PRIVATE(inode))
+                                inode_doinit_with_dentry(inode, NULL);
+
+4. mm/shmem.c
+/**
+ * shmem_kernel_file_setup - get an unlinked file living in tmpfs which must be
+ *      kernel internal.  There will be NO LSM permission checks against the
+ *      underlying inode.  So users of this interface must do LSM checks at a
+ *      higher layer.  The users are the big_key and shm implementations.  LSM
+ *      checks are provided at the key or shm level rather than the inode.
+ * @name: name for dentry (to be seen in /proc/<pid>/maps)
+ * @size: size to be set for the file
+ * @flags: VM_NORESERVE suppresses pre-accounting of the entire object size
+ */
+struct file *shmem_kernel_file_setup(const char *name, loff_t size, unsigned long flags)
+{
+        return __shmem_file_setup(shm_mnt, name, size, flags, S_PRIVATE);
+
+
+From these observations, S_PRIVATE inodes are handled differently from other inodes.
+It appears to bypass LSM checks (probably saving some cycles) or In other words, it
+ensure the LSMs don't try to reason about these files. While it expects the details
+of these inodes should not be leaked to userspace (indicated by comments around
+S_PRIVATE refs).
+
+I think we should keep the use of S_PRIVATE flag as it is for secretmem and kvm_gmem.
+However, I'm uncertain about whether we still need security_inode_init_security_anon()
+for inodes that are already marked S_PRIVATE.
+The two seem contradictory. First, we mark an inode as private to bypass LSM checks,
+but then initialize security context for it.
+
+I'd appreciate the guidance from the security team.
+
+
+> From 782a6053268d8a2bddf90ba18c008495b0791710 Mon Sep 17 00:00:00 2001
+> From: David Hildenbrand <david@redhat.com>
+> Date: Tue, 22 Apr 2025 19:22:00 +0200
+> Subject: [PATCH] tmp
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  arch/riscv/include/asm/kvm_aia.h  |  3 --
->  arch/riscv/include/asm/kvm_host.h | 12 ++++---
->  arch/riscv/kvm/aia_device.c       |  4 +--
->  arch/riscv/kvm/vcpu.c             | 58 +++++++++++++++++--------------
->  arch/riscv/kvm/vcpu_sbi.c         |  9 +++--
->  5 files changed, 44 insertions(+), 42 deletions(-)
->
-> diff --git a/arch/riscv/include/asm/kvm_aia.h b/arch/riscv/include/asm/kv=
-m_aia.h
-> index 1f37b600ca47..3b643b9efc07 100644
-> --- a/arch/riscv/include/asm/kvm_aia.h
-> +++ b/arch/riscv/include/asm/kvm_aia.h
-> @@ -63,9 +63,6 @@ struct kvm_vcpu_aia {
->         /* CPU AIA CSR context of Guest VCPU */
->         struct kvm_vcpu_aia_csr guest_csr;
->
-> -       /* CPU AIA CSR context upon Guest VCPU reset */
-> -       struct kvm_vcpu_aia_csr guest_reset_csr;
-> -
->         /* Guest physical address of IMSIC for this VCPU */
->         gpa_t           imsic_addr;
->
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
-vm_host.h
-> index 0e9c2fab6378..0c8c9c05af91 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -193,6 +193,12 @@ struct kvm_vcpu_smstateen_csr {
->         unsigned long sstateen0;
->  };
->
-> +struct kvm_vcpu_reset_state {
-> +       spinlock_t lock;
-> +       unsigned long pc;
-> +       unsigned long a1;
-> +};
-> +
->  struct kvm_vcpu_arch {
->         /* VCPU ran at least once */
->         bool ran_atleast_once;
-> @@ -227,12 +233,8 @@ struct kvm_vcpu_arch {
->         /* CPU Smstateen CSR context of Guest VCPU */
->         struct kvm_vcpu_smstateen_csr smstateen_csr;
->
-> -       /* CPU context upon Guest VCPU reset */
-> -       struct kvm_cpu_context guest_reset_context;
-> -       spinlock_t reset_cntx_lock;
-> +       struct kvm_vcpu_reset_state reset_state;
->
-> -       /* CPU CSR context upon Guest VCPU reset */
-> -       struct kvm_vcpu_csr guest_reset_csr;
->
->         /*
->          * VCPU interrupts
-> diff --git a/arch/riscv/kvm/aia_device.c b/arch/riscv/kvm/aia_device.c
-> index 39cd26af5a69..43e472ff3e1a 100644
-> --- a/arch/riscv/kvm/aia_device.c
-> +++ b/arch/riscv/kvm/aia_device.c
-> @@ -526,12 +526,10 @@ int kvm_riscv_vcpu_aia_update(struct kvm_vcpu *vcpu=
-)
->  void kvm_riscv_vcpu_aia_reset(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_vcpu_aia_csr *csr =3D &vcpu->arch.aia_context.guest_cs=
-r;
-> -       struct kvm_vcpu_aia_csr *reset_csr =3D
-> -                               &vcpu->arch.aia_context.guest_reset_csr;
->
->         if (!kvm_riscv_aia_available())
->                 return;
-> -       memcpy(csr, reset_csr, sizeof(*csr));
-> +       memset(csr, 0, sizeof(*csr));
->
->         /* Proceed only if AIA was initialized successfully */
->         if (!kvm_riscv_aia_initialized(vcpu->kvm))
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 2fb75288ecfe..b8485c1c1ce4 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -51,13 +51,40 @@ const struct kvm_stats_header kvm_vcpu_stats_header =
-=3D {
->                        sizeof(kvm_vcpu_stats_desc),
->  };
->
-> -static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
-> +static void kvm_riscv_vcpu_context_reset(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_vcpu_csr *csr =3D &vcpu->arch.guest_csr;
-> -       struct kvm_vcpu_csr *reset_csr =3D &vcpu->arch.guest_reset_csr;
->         struct kvm_cpu_context *cntx =3D &vcpu->arch.guest_context;
-> -       struct kvm_cpu_context *reset_cntx =3D &vcpu->arch.guest_reset_co=
-ntext;
-> +       struct kvm_vcpu_reset_state *reset_state =3D &vcpu->arch.reset_st=
-ate;
->         void *vector_datap =3D cntx->vector.datap;
-> +
-> +       memset(cntx, 0, sizeof(*cntx));
-> +       memset(csr, 0, sizeof(*csr));
-> +
-> +       /* Restore datap as it's not a part of the guest context. */
-> +       cntx->vector.datap =3D vector_datap;
-> +
-> +       /* Load SBI reset values */
-> +       cntx->a0 =3D vcpu->vcpu_id;
-> +
-> +       spin_lock(&reset_state->lock);
-> +       cntx->sepc =3D reset_state->pc;
-> +       cntx->a1 =3D reset_state->a1;
-> +       spin_unlock(&reset_state->lock);
-> +
-> +       /* Setup reset state of shadow SSTATUS and HSTATUS CSRs */
-> +       cntx->sstatus =3D SR_SPP | SR_SPIE;
-> +
-> +       cntx->hstatus |=3D HSTATUS_VTW;
-> +       cntx->hstatus |=3D HSTATUS_SPVP;
-> +       cntx->hstatus |=3D HSTATUS_SPV;
-> +
-> +       /* By default, make CY, TM, and IR counters accessible in VU mode=
- */
-> +       csr->scounteren =3D 0x7;
-> +}
-> +
-> +static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
+>  fs/anon_inodes.c   | 20 ++++++++++++++------
+>  include/linux/fs.h |  1 +
+>  mm/secretmem.c     |  9 +--------
+>  3 files changed, 16 insertions(+), 14 deletions(-)
+> 
+> diff --git a/fs/anon_inodes.c b/fs/anon_inodes.c
+> index 583ac81669c24..ea51fd582deb4 100644
+> --- a/fs/anon_inodes.c
+> +++ b/fs/anon_inodes.c
+> @@ -55,17 +55,18 @@ static struct file_system_type anon_inode_fs_type = {
+>      .kill_sb    = kill_anon_super,
+>  };
+>  
+> -static struct inode *anon_inode_make_secure_inode(
+> -    const char *name,
+> -    const struct inode *context_inode)
+> +static struct inode *anon_inode_make_secure_inode(struct super_block *s,
+> +        const char *name, const struct inode *context_inode,
+> +        bool fs_internal)
+>  {
+>      struct inode *inode;
+>      int error;
+>  
+> -    inode = alloc_anon_inode(anon_inode_mnt->mnt_sb);
+> +    inode = alloc_anon_inode(s);
+>      if (IS_ERR(inode))
+>          return inode;
+> -    inode->i_flags &= ~S_PRIVATE;
+> +    if (!fs_internal)
+> +        inode->i_flags &= ~S_PRIVATE;
+>      error =    security_inode_init_security_anon(inode, &QSTR(name),
+>                            context_inode);
+>      if (error) {
+> @@ -75,6 +76,12 @@ static struct inode *anon_inode_make_secure_inode(
+>      return inode;
+>  }
+>  
+> +struct inode *alloc_anon_secure_inode(struct super_block *s, const char *name)
 > +{
->         bool loaded;
->
->         /**
-> @@ -72,16 +99,10 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcp=
-u)
->
->         vcpu->arch.last_exit_cpu =3D -1;
->
-> -       memcpy(csr, reset_csr, sizeof(*csr));
+> +    return anon_inode_make_secure_inode(s, name, NULL, true);
+> +}
+> +EXPORT_SYMBOL_GPL(alloc_anon_secure_inode);
+> +
+>  static struct file *__anon_inode_getfile(const char *name,
+>                       const struct file_operations *fops,
+>                       void *priv, int flags,
+> @@ -88,7 +95,8 @@ static struct file *__anon_inode_getfile(const char *name,
+>          return ERR_PTR(-ENOENT);
+>  
+>      if (make_inode) {
+> -        inode =    anon_inode_make_secure_inode(name, context_inode);
+> +        inode =    anon_inode_make_secure_inode(anon_inode_mnt->mnt_sb,
+> +                             name, context_inode, false);
+>          if (IS_ERR(inode)) {
+>              file = ERR_CAST(inode);
+>              goto err;
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 016b0fe1536e3..0fded2e3c661a 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -3550,6 +3550,7 @@ extern int simple_write_begin(struct file *file, struct address_space *mapping,
+>  extern const struct address_space_operations ram_aops;
+>  extern int always_delete_dentry(const struct dentry *);
+>  extern struct inode *alloc_anon_inode(struct super_block *);
+> +extern struct inode *alloc_anon_secure_inode(struct super_block *, const char *);
+>  extern int simple_nosetlease(struct file *, int, struct file_lease **, void **);
+>  extern const struct dentry_operations simple_dentry_operations;
+>  
+> diff --git a/mm/secretmem.c b/mm/secretmem.c
+> index 1b0a214ee5580..c0e459e58cb65 100644
+> --- a/mm/secretmem.c
+> +++ b/mm/secretmem.c
+> @@ -195,18 +195,11 @@ static struct file *secretmem_file_create(unsigned long flags)
+>      struct file *file;
+>      struct inode *inode;
+>      const char *anon_name = "[secretmem]";
+> -    int err;
+>  
+> -    inode = alloc_anon_inode(secretmem_mnt->mnt_sb);
+> +    inode = alloc_anon_secure_inode(secretmem_mnt->mnt_sb, anon_name);
+>      if (IS_ERR(inode))
+>          return ERR_CAST(inode);
+>  
+> -    err = security_inode_init_security_anon(inode, &QSTR(anon_name), NULL);
+> -    if (err) {
+> -        file = ERR_PTR(err);
+> -        goto err_free_inode;
+> -    }
 > -
-> -       spin_lock(&vcpu->arch.reset_cntx_lock);
-> -       memcpy(cntx, reset_cntx, sizeof(*cntx));
-> -       spin_unlock(&vcpu->arch.reset_cntx_lock);
-> +       kvm_riscv_vcpu_context_reset(vcpu);
->
->         kvm_riscv_vcpu_fp_reset(vcpu);
->
-> -       /* Restore datap as it's not a part of the guest context. */
-> -       cntx->vector.datap =3D vector_datap;
->         kvm_riscv_vcpu_vector_reset(vcpu);
->
->         kvm_riscv_vcpu_timer_reset(vcpu);
-> @@ -113,8 +134,6 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned=
- int id)
->  int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  {
->         int rc;
-> -       struct kvm_cpu_context *cntx;
-> -       struct kvm_vcpu_csr *reset_csr =3D &vcpu->arch.guest_reset_csr;
->
->         spin_lock_init(&vcpu->arch.mp_state_lock);
->
-> @@ -134,24 +153,11 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->         /* Setup VCPU hfence queue */
->         spin_lock_init(&vcpu->arch.hfence_lock);
->
-> -       /* Setup reset state of shadow SSTATUS and HSTATUS CSRs */
-> -       spin_lock_init(&vcpu->arch.reset_cntx_lock);
-> -
-> -       spin_lock(&vcpu->arch.reset_cntx_lock);
-> -       cntx =3D &vcpu->arch.guest_reset_context;
-> -       cntx->sstatus =3D SR_SPP | SR_SPIE;
-> -       cntx->hstatus =3D 0;
-> -       cntx->hstatus |=3D HSTATUS_VTW;
-> -       cntx->hstatus |=3D HSTATUS_SPVP;
-> -       cntx->hstatus |=3D HSTATUS_SPV;
-> -       spin_unlock(&vcpu->arch.reset_cntx_lock);
-> +       spin_lock_init(&vcpu->arch.reset_state.lock);
->
->         if (kvm_riscv_vcpu_alloc_vector_context(vcpu))
->                 return -ENOMEM;
->
-> -       /* By default, make CY, TM, and IR counters accessible in VU mode=
- */
-> -       reset_csr->scounteren =3D 0x7;
-> -
->         /* Setup VCPU timer */
->         kvm_riscv_vcpu_timer_init(vcpu);
->
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index f58368f7df1d..3d7955e05cc3 100644
-> --- a/arch/riscv/kvm/vcpu_sbi.c
-> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> @@ -159,11 +159,10 @@ void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcp=
-u *vcpu,
->  void kvm_riscv_vcpu_sbi_request_reset(struct kvm_vcpu *vcpu,
->                                        unsigned long pc, unsigned long a1=
-)
->  {
-> -       spin_lock(&vcpu->arch.reset_cntx_lock);
-> -       vcpu->arch.guest_reset_context.sepc =3D pc;
-> -       vcpu->arch.guest_reset_context.a0 =3D vcpu->vcpu_id;
-> -       vcpu->arch.guest_reset_context.a1 =3D a1;
-> -       spin_unlock(&vcpu->arch.reset_cntx_lock);
-> +       spin_lock(&vcpu->arch.reset_state.lock);
-> +       vcpu->arch.reset_state.pc =3D pc;
-> +       vcpu->arch.reset_state.a1 =3D a1;
-> +       spin_unlock(&vcpu->arch.reset_state.lock);
->
->         kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
->  }
-> --
-> 2.48.1
->
+>      file = alloc_file_pseudo(inode, secretmem_mnt, "secretmem",
+>                   O_RDWR, &secretmem_fops);
+>      if (IS_ERR(file))
+
+Thanks for the patch.
+I have split this change into two patches and added required documentation.
+
+Best Regards,
+Shivank
+
+--------------20J8wHG41v0zlwJYCL04QA7w
+Content-Type: text/plain; charset=UTF-8;
+ name="0003-fs-add-alloc_anon_secure_inode-for-allocating-secure.patch"
+Content-Disposition: attachment;
+ filename*0="0003-fs-add-alloc_anon_secure_inode-for-allocating-secure.pa";
+ filename*1="tch"
+Content-Transfer-Encoding: base64
+
+RnJvbSA3OGY0ODQzN2E4OGIzYjcwYWE3ZDgwYTMyZGI0ZjI2OWEwODA0ZDE4IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYXZpZCBIaWxkZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT4K
+RGF0ZTogVHVlLCA2IE1heSAyMDI1IDA5OjEzOjA1ICswMDAwClN1YmplY3Q6IFtQQVRDSCBWOCAz
+LzldIGZzOiBhZGQgYWxsb2NfYW5vbl9zZWN1cmVfaW5vZGUoKSBmb3IgYWxsb2NhdGluZwogc2Vj
+dXJlIGFub255bW91cyBpbm9kZXMKClRoaXMgaW50cm9kdWNlcyBhbGxvY19hbm9uX3NlY3VyZV9p
+bm9kZSgpIGNvbWJpbmluZyBhbGxvY19hbm9uX2lub2RlKCkKd2l0aCBzZWN1cml0eV9pbm9kZV9p
+bml0X3NlY3VyaXR5X2Fub24oKSwgc2ltaWxhciB0byBzZWNyZXRtZW0ncyB1c2FnZS4KCkFzIGRp
+c2N1c3NlZCBbMV0sIHdlIG5lZWQgdGhpcyBmb3IgY2FzZXMgbGlrZSBzZWNyZXRtZW0gYW5kIGt2
+bV9nbWVtCndoZW4gdGhlcmUgbWlnaHQgYmUgaW50ZXJlc3QgdG8gaGF2ZSBnbG9iYWwgYWNjZXNz
+IGNvbnRyb2wgdmlhIExTTXMgYW5kCm5lZWQgcHJvcGVyIHNlY3VyaXR5IGxhYmVsaW5nIHdoaWxl
+IG1haW50YWluaW5nIFNfUFJJVkFURS4KClRoZSBuZXcgaGVscGVyIGF2b2lkcyBkdXBsaWNhdGlu
+ZyB0aGUgc2VjdXJpdHkgaW5pdGlhbGl6YXRpb24gZm9yIHNlY3JldG1lbQphbmQga3ZtX2dtZW0u
+CgpbMV06IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LW1tL2I5ZTVmYTQxLTYyZmQtNGIz
+ZC1iYjJkLTI0YWU5ZDNjMzNkYUByZWRoYXQuY29tCgpTaWduZWQtb2ZmLWJ5OiBEYXZpZCBIaWxk
+ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT4KW1NoaXZhbms6IGFkZCBkb2N1bWVudGF0aW9uXQpT
+aWduZWQtb2ZmLWJ5OiBTaGl2YW5rIEdhcmcgPHNoaXZhbmtnQGFtZC5jb20+Ci0tLQogZnMvYW5v
+bl9pbm9kZXMuYyAgIHwgNDYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+Ky0tLS0tLQogaW5jbHVkZS9saW51eC9mcy5oIHwgIDEgKwogMiBmaWxlcyBjaGFuZ2VkLCA0MSBp
+bnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2Fub25faW5vZGVz
+LmMgYi9mcy9hbm9uX2lub2Rlcy5jCmluZGV4IDU4M2FjODE2NjljMi4uNDc5ZWZjZWMyMGJjIDEw
+MDY0NAotLS0gYS9mcy9hbm9uX2lub2Rlcy5jCisrKyBiL2ZzL2Fub25faW5vZGVzLmMKQEAgLTU1
+LDE3ICs1NSwzMyBAQCBzdGF0aWMgc3RydWN0IGZpbGVfc3lzdGVtX3R5cGUgYW5vbl9pbm9kZV9m
+c190eXBlID0gewogCS5raWxsX3NiCT0ga2lsbF9hbm9uX3N1cGVyLAogfTsKIAotc3RhdGljIHN0
+cnVjdCBpbm9kZSAqYW5vbl9pbm9kZV9tYWtlX3NlY3VyZV9pbm9kZSgKLQljb25zdCBjaGFyICpu
+YW1lLAotCWNvbnN0IHN0cnVjdCBpbm9kZSAqY29udGV4dF9pbm9kZSkKKy8qKgorICogYW5vbl9p
+bm9kZV9tYWtlX3NlY3VyZV9pbm9kZSAtIGFsbG9jYXRlIGFuIGFub255bW91cyBpbm9kZSB3aXRo
+IHNlY3VyaXR5IGNvbnRleHQKKyAqIEBzYjoJCVtpbl0JU3VwZXJibG9jayB0byBhbGxvY2F0ZSBm
+cm9tCisgKiBAbmFtZToJW2luXQlOYW1lIG9mIHRoZSBjbGFzcyBvZiB0aGUgbmV3ZmlsZSAoZS5n
+LiwgInNlY3JldG1lbSIpCisgKiBAY29udGV4dF9pbm9kZToKKyAqCQlbaW5dCU9wdGlvbmFsIHBh
+cmVudCBpbm9kZSBmb3Igc2VjdXJpdHkgaW5oZXJpdGFuY2UKKyAqIEBmc19pbnRlcm5hbDoKKyAq
+CQlbaW5dCUlmIHRydWUsIGtlZXAgU19QUklWQVRFIHNldCAoZmxhZyBpbmRpY2F0aW5nIGludGVy
+bmFsIGZzIGlub2RlcykKKyAqCisgKiBUaGUgZnVuY3Rpb24gZW5zdXJlcyBwcm9wZXIgc2VjdXJp
+dHkgaW5pdGlhbGl6YXRpb24gdGhyb3VnaCB0aGUgTFNNIGhvb2sKKyAqIHNlY3VyaXR5X2lub2Rl
+X2luaXRfc2VjdXJpdHlfYW5vbigpLgorICoKKyAqIFJldHVybjoJUG9pbnRlciB0byBuZXcgaW5v
+ZGUgb24gc3VjY2VzcywgRVJSX1BUUiBvbiBmYWlsdXJlLgorICovCitzdGF0aWMgc3RydWN0IGlu
+b2RlICphbm9uX2lub2RlX21ha2Vfc2VjdXJlX2lub2RlKHN0cnVjdCBzdXBlcl9ibG9jayAqc2Is
+CisJCWNvbnN0IGNoYXIgKm5hbWUsIGNvbnN0IHN0cnVjdCBpbm9kZSAqY29udGV4dF9pbm9kZSwK
+KwkJYm9vbCBmc19pbnRlcm5hbCkKIHsKIAlzdHJ1Y3QgaW5vZGUgKmlub2RlOwogCWludCBlcnJv
+cjsKIAotCWlub2RlID0gYWxsb2NfYW5vbl9pbm9kZShhbm9uX2lub2RlX21udC0+bW50X3NiKTsK
+Kwlpbm9kZSA9IGFsbG9jX2Fub25faW5vZGUoc2IpOwogCWlmIChJU19FUlIoaW5vZGUpKQogCQly
+ZXR1cm4gaW5vZGU7Ci0JaW5vZGUtPmlfZmxhZ3MgJj0gflNfUFJJVkFURTsKKwlpZiAoIWZzX2lu
+dGVybmFsKQorCQlpbm9kZS0+aV9mbGFncyAmPSB+U19QUklWQVRFOworCiAJZXJyb3IgPQlzZWN1
+cml0eV9pbm9kZV9pbml0X3NlY3VyaXR5X2Fub24oaW5vZGUsICZRU1RSKG5hbWUpLAogCQkJCQkJ
+ICBjb250ZXh0X2lub2RlKTsKIAlpZiAoZXJyb3IpIHsKQEAgLTc1LDYgKzkxLDIzIEBAIHN0YXRp
+YyBzdHJ1Y3QgaW5vZGUgKmFub25faW5vZGVfbWFrZV9zZWN1cmVfaW5vZGUoCiAJcmV0dXJuIGlu
+b2RlOwogfQogCisvKioKKyAqIGFsbG9jX2Fub25fc2VjdXJlX2lub2RlIC0gYWxsb2NhdGUgYSBz
+ZWN1cmUgYW5vbnltb3VzIGlub2RlCisgKiBAc2I6CQlbaW5dCVN1cGVyYmxvY2sgdG8gYWxsb2Nh
+dGUgdGhlIGlub2RlIGZyb20KKyAqIEBuYW1lOglbaW5dCU5hbWUgb2YgdGhlIGNsYXNzIG9mIHRo
+ZSBuZXdmaWxlIChlLmcuLCAic2VjcmV0bWVtIikKKyAqCisgKiBTcGVjaWFsaXplZCB2ZXJzaW9u
+IG9mIGFub25faW5vZGVfbWFrZV9zZWN1cmVfaW5vZGUoKSBmb3IgZmlsZXN5c3RlbSB1c2UuCisg
+KiBUaGlzIGNyZWF0ZXMgYW4gaW50ZXJuYWwtdXNlIGlub2RlLCBtYXJrZWQgd2l0aCBTX1BSSVZB
+VEUgKGhpZGRlbiBmcm9tCisgKiB1c2Vyc3BhY2UpLgorICoKKyAqIFJldHVybjoJQSBwb2ludGVy
+IHRvIHRoZSBuZXcgaW5vZGUgb24gc3VjY2VzcywgRVJSX1BUUiBvbiBmYWlsdXJlLgorICovCitz
+dHJ1Y3QgaW5vZGUgKmFsbG9jX2Fub25fc2VjdXJlX2lub2RlKHN0cnVjdCBzdXBlcl9ibG9jayAq
+c2IsIGNvbnN0IGNoYXIgKm5hbWUpCit7CisJcmV0dXJuIGFub25faW5vZGVfbWFrZV9zZWN1cmVf
+aW5vZGUoc2IsIG5hbWUsIE5VTEwsIHRydWUpOworfQorRVhQT1JUX1NZTUJPTF9HUEwoYWxsb2Nf
+YW5vbl9zZWN1cmVfaW5vZGUpOworCiBzdGF0aWMgc3RydWN0IGZpbGUgKl9fYW5vbl9pbm9kZV9n
+ZXRmaWxlKGNvbnN0IGNoYXIgKm5hbWUsCiAJCQkJCSBjb25zdCBzdHJ1Y3QgZmlsZV9vcGVyYXRp
+b25zICpmb3BzLAogCQkJCQkgdm9pZCAqcHJpdiwgaW50IGZsYWdzLApAQCAtODgsNyArMTIxLDgg
+QEAgc3RhdGljIHN0cnVjdCBmaWxlICpfX2Fub25faW5vZGVfZ2V0ZmlsZShjb25zdCBjaGFyICpu
+YW1lLAogCQlyZXR1cm4gRVJSX1BUUigtRU5PRU5UKTsKIAogCWlmIChtYWtlX2lub2RlKSB7Ci0J
+CWlub2RlID0JYW5vbl9pbm9kZV9tYWtlX3NlY3VyZV9pbm9kZShuYW1lLCBjb250ZXh0X2lub2Rl
+KTsKKwkJaW5vZGUgPQlhbm9uX2lub2RlX21ha2Vfc2VjdXJlX2lub2RlKGFub25faW5vZGVfbW50
+LT5tbnRfc2IsCisJCQkJCQkgICAgIG5hbWUsIGNvbnRleHRfaW5vZGUsIGZhbHNlKTsKIAkJaWYg
+KElTX0VSUihpbm9kZSkpIHsKIAkJCWZpbGUgPSBFUlJfQ0FTVChpbm9kZSk7CiAJCQlnb3RvIGVy
+cjsKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvZnMuaCBiL2luY2x1ZGUvbGludXgvZnMuaApp
+bmRleCAwMTZiMGZlMTUzNmUuLjBmZGVkMmUzYzY2MSAxMDA2NDQKLS0tIGEvaW5jbHVkZS9saW51
+eC9mcy5oCisrKyBiL2luY2x1ZGUvbGludXgvZnMuaApAQCAtMzU1MCw2ICszNTUwLDcgQEAgZXh0
+ZXJuIGludCBzaW1wbGVfd3JpdGVfYmVnaW4oc3RydWN0IGZpbGUgKmZpbGUsIHN0cnVjdCBhZGRy
+ZXNzX3NwYWNlICptYXBwaW5nLAogZXh0ZXJuIGNvbnN0IHN0cnVjdCBhZGRyZXNzX3NwYWNlX29w
+ZXJhdGlvbnMgcmFtX2FvcHM7CiBleHRlcm4gaW50IGFsd2F5c19kZWxldGVfZGVudHJ5KGNvbnN0
+IHN0cnVjdCBkZW50cnkgKik7CiBleHRlcm4gc3RydWN0IGlub2RlICphbGxvY19hbm9uX2lub2Rl
+KHN0cnVjdCBzdXBlcl9ibG9jayAqKTsKK2V4dGVybiBzdHJ1Y3QgaW5vZGUgKmFsbG9jX2Fub25f
+c2VjdXJlX2lub2RlKHN0cnVjdCBzdXBlcl9ibG9jayAqLCBjb25zdCBjaGFyICopOwogZXh0ZXJu
+IGludCBzaW1wbGVfbm9zZXRsZWFzZShzdHJ1Y3QgZmlsZSAqLCBpbnQsIHN0cnVjdCBmaWxlX2xl
+YXNlICoqLCB2b2lkICoqKTsKIGV4dGVybiBjb25zdCBzdHJ1Y3QgZGVudHJ5X29wZXJhdGlvbnMg
+c2ltcGxlX2RlbnRyeV9vcGVyYXRpb25zOwogCi0tIAoyLjM0LjEKCg==
+
+--------------20J8wHG41v0zlwJYCL04QA7w
+Content-Type: text/plain; charset=UTF-8;
+ name="0004-mm-secretmem-use-alloc_anon_secure_inode.patch"
+Content-Disposition: attachment;
+ filename="0004-mm-secretmem-use-alloc_anon_secure_inode.patch"
+Content-Transfer-Encoding: base64
+
+RnJvbSBjYjlmMTE0YjMwOTdkNDlmOTlhMjI0Y2QzZDI0ODNkMTA2NzY2NTIxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBEYXZpZCBIaWxkZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT4K
+RGF0ZTogVHVlLCA2IE1heSAyMDI1IDA5OjIxOjI0ICswMDAwClN1YmplY3Q6IFtQQVRDSCBWOCA0
+LzldIG1tL3NlY3JldG1lbTogdXNlIGFsbG9jX2Fub25fc2VjdXJlX2lub2RlKCkKClVzZSBhbGxv
+Y19hbm9uX3NlY3VyZV9pbm9kZSgpIGluc3RlYWQgb2YgYWxsb2NfYW5vbl9pbm9kZSgpICsKc2Vj
+dXJpdHlfaW5vZGVfaW5pdF9zZWN1cml0eV9hbm9uKCkgdG8gYXZvaWQgZHVwbGljYXRpbmcgdGhl
+CmFub25faW5vZGVfbWFrZV9zZWN1cmVfaW5vZGUoKSBsb2dpYy4KClNpZ25lZC1vZmYtYnk6IERh
+dmlkIEhpbGRlbmJyYW5kIDxkYXZpZEByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTaGl2YW5r
+IEdhcmcgPHNoaXZhbmtnQGFtZC5jb20+Ci0tLQogbW0vc2VjcmV0bWVtLmMgfCA5ICstLS0tLS0t
+LQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCA4IGRlbGV0aW9ucygtKQoKZGlmZiAt
+LWdpdCBhL21tL3NlY3JldG1lbS5jIGIvbW0vc2VjcmV0bWVtLmMKaW5kZXggMWIwYTIxNGVlNTU4
+Li5jMGU0NTllNThjYjYgMTAwNjQ0Ci0tLSBhL21tL3NlY3JldG1lbS5jCisrKyBiL21tL3NlY3Jl
+dG1lbS5jCkBAIC0xOTUsMTggKzE5NSwxMSBAQCBzdGF0aWMgc3RydWN0IGZpbGUgKnNlY3JldG1l
+bV9maWxlX2NyZWF0ZSh1bnNpZ25lZCBsb25nIGZsYWdzKQogCXN0cnVjdCBmaWxlICpmaWxlOwog
+CXN0cnVjdCBpbm9kZSAqaW5vZGU7CiAJY29uc3QgY2hhciAqYW5vbl9uYW1lID0gIltzZWNyZXRt
+ZW1dIjsKLQlpbnQgZXJyOwogCi0JaW5vZGUgPSBhbGxvY19hbm9uX2lub2RlKHNlY3JldG1lbV9t
+bnQtPm1udF9zYik7CisJaW5vZGUgPSBhbGxvY19hbm9uX3NlY3VyZV9pbm9kZShzZWNyZXRtZW1f
+bW50LT5tbnRfc2IsIGFub25fbmFtZSk7CiAJaWYgKElTX0VSUihpbm9kZSkpCiAJCXJldHVybiBF
+UlJfQ0FTVChpbm9kZSk7CiAKLQllcnIgPSBzZWN1cml0eV9pbm9kZV9pbml0X3NlY3VyaXR5X2Fu
+b24oaW5vZGUsICZRU1RSKGFub25fbmFtZSksIE5VTEwpOwotCWlmIChlcnIpIHsKLQkJZmlsZSA9
+IEVSUl9QVFIoZXJyKTsKLQkJZ290byBlcnJfZnJlZV9pbm9kZTsKLQl9Ci0KIAlmaWxlID0gYWxs
+b2NfZmlsZV9wc2V1ZG8oaW5vZGUsIHNlY3JldG1lbV9tbnQsICJzZWNyZXRtZW0iLAogCQkJCSBP
+X1JEV1IsICZzZWNyZXRtZW1fZm9wcyk7CiAJaWYgKElTX0VSUihmaWxlKSkKLS0gCjIuMzQuMQoK
+
+--------------20J8wHG41v0zlwJYCL04QA7w--
 
