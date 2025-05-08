@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-45882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 277C4AAFBD5
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:44:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEB76AAFBDD
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:45:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 751EFB246AD
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:43:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C929C500E5F
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E156022D9EE;
-	Thu,  8 May 2025 13:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFFD22D9E3;
+	Thu,  8 May 2025 13:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H6J9ptEO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CxwUVTOC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9121622D4E7
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 13:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953E322A807
+	for <kvm@vger.kernel.org>; Thu,  8 May 2025 13:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746711857; cv=none; b=NdLMiBCb+vE2+My009exMfMQUSDTjoeR8jaF52e3lL4HFTvQvB2RQVMbIWKu/0B7HnJ6/v8q0W8s3KGXbBI0wPOme2y4QAl474pzbD2cXMzntmfWJn00d0vNcFl6CQcJsT8384hylCW3DwvtsxQPFW3JNhCi0/D7mNTxsBHTf4Q=
+	t=1746711879; cv=none; b=pnzWQbFndGOaJ27AiAOj9EEiqzlbO8w29TAEDiGYthqKMkUNXMlDsFWQ3195yuyrc6HhLRCNgJk16obqQfu4sSQJMGby6on+aYWpc72Cb5S5Zfz7PJMjp5O3FdlXNrqVw4GpYehF5e6OxolmqECDOnFcyjgalpbjsVzEyByoMlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746711857; c=relaxed/simple;
-	bh=jHhtZ8q29r+FEC+BvKfiNaHBaBNxDYAwNve10Mex5UQ=;
+	s=arc-20240116; t=1746711879; c=relaxed/simple;
+	bh=BBW3uB+3VA8sxUHTu0VzCPzaT8pWcPQJXL/Tqx/HXmw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MlpAO2QDMUD88yEzq1crIxd2wAdxg5P9ycp6y5B7l3ofLKdWqMkyAfMLsrhFw7cF/Upo7WGt38HxjqO7sEhzVuNlztbX4KDWrAJ4WF90AIKaSTquZ7lVEj9OFdH5hk8qdjKm3StVyStyRnsGOAd7AVjjYiwqd4McE4cDtKhtecs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=H6J9ptEO; arc=none smtp.client-ip=209.85.215.170
+	 MIME-Version:Content-Type; b=AAzgLxrYh4uuSH5i/EmGisP7vyOusTyO6HGXucGbYqxAfV1bEea3N0U9agp7mM/0qFp3ej63t7UNB26aPZwPwd2ndqGXzCROnRyx3U8x1tFg9BYepAY1mKJ4q6gqlRByqwv4t5ricuo9IHK7+aqmvydmfQKzWoWY3YEr+RRoG6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CxwUVTOC; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-af50f56b862so603458a12.1
-        for <kvm@vger.kernel.org>; Thu, 08 May 2025 06:44:15 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-30820167b47so901085a91.0
+        for <kvm@vger.kernel.org>; Thu, 08 May 2025 06:44:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1746711855; x=1747316655; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1746711877; x=1747316677; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gMLC32cD5rQa4ngqh9n69biVbtvyYihadQEH/qk7LQg=;
-        b=H6J9ptEOvHltLJDYEcO7d4mnAG71AF7QUANIFL1U/w9Fo83Y21XKTLfGvOuiZ627eA
-         ViSySK8Fe+xklST4Y1y1VqJQEMufMnG4UnHIjoM4cmJJA9i/hGvlz/dX9bIKft9EXVFf
-         LHQUvfVPRguEw7rCOk9tWK6/zBinUbFBowQnyLPwPl4q46d3hw1mmbyc6iJTMkdGAjW0
-         /Xn5sAArDrK0CCSOeV/NqZBrDmJvu7U/R6EsJoiOs6jhvRgisBRebL7y2lyOpTrIRIWH
-         nndTqdc8kuNzoaq/4zM7DIa1AHTT857LOfsUEV+MLx+HkYWvG+oL9bTf3LFlNs88mVAF
-         4MVA==
+        bh=ABC8+QfGyso1WyDvOcXI+0OZWgW+TnNwcrP3jxKT+bs=;
+        b=CxwUVTOCSUFUyRk8nXH87jIXy2pBLhylmwWie9PmrDys2P6Sriqs7aUjff01+DOrWs
+         DT63g1NAgg3PCEDJIYhnhJZ1pziIdxToZLOqusqps+3QmS+BHez2MBh74hDsFu9t9r1f
+         xE6y4wMFqCfdIxUBnGKMVr0U0vg+xetozmnnLX4xkTtRaMIZ4vlZq69mgOhCbuoTjqP7
+         t9HRaKh2DVwcG2KLPrVZEzAPaIXDCoXPsH3ZeMbvsJsiYlp/vh/qLPLr7wWi2oepoWtM
+         k4ah3T9mh/CHY+Ww4y0wQTHGtf7ES4svDn9LSLoZJw+xLQfgJB2L3SHjtEiQWpOLhkQf
+         +ptA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746711855; x=1747316655;
+        d=1e100.net; s=20230601; t=1746711877; x=1747316677;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gMLC32cD5rQa4ngqh9n69biVbtvyYihadQEH/qk7LQg=;
-        b=M7q+QmXO0t/vUs//uR7pXjirII4POryytpZpRv+pbmBY+pgPuHNwa93CmM2XqZH2nz
-         ngfGASLiWqz2D7eDGphfNkdy/C3wKFLcqD1kysg7wVNEO+r7pCCzkgSLEwMLU7RDAav5
-         57Zns0N4IDkxewq3+fKuG04MXhS3OcIC1wi0LY4w5hY9gQZbWhXzJUoOTovzK7RBLuOp
-         vwk8eLrRn8/g3m0MFLpJ+uznyEQxKTFY5IyghhOoyyvfE7QbdA++JD/6l19lYUJQvBcU
-         onJzevCNL4omR0fbi3aaFygcedLOSnn7vgG1Wxi+KEVcx/dZop7CUNpB0XIYjDmj+dev
-         vUdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjmlVCG6AAa5eo/oaeIjgSknZva31X7CROvBgM6UXwcGyLt0N3xdGt+beszWexdFyFYRU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrSFgQztzjRQXTVTdS/DDtgGKxIciP+EMEVAVIE2bH8xqhkkEP
-	sYIv+Zp7bRDbnIGdyYOX8izv6HKneKt84itVebohkMwt6di591zEvbU1Vyu2Xpk=
-X-Gm-Gg: ASbGnctw3iAOeZ3zFLmpYIdGtcEzBsoGMay9JYRYYbLbAKUDD4rIHLiRVTwlub0TIqa
-	9kVf6z700mbIF3wzEtxhaclxw3qY4rjtwF2Q4QXc9uq1vpyArhv5iC4GfC2OFvFQH7Tpxz+5fSO
-	q5YwsCZrjxegOGu3feSyF960TzpfFR689lXu7Kh29EH+FlOtOw91z/EyOFjvVptk89sN2bh+ovd
-	KUBeVE6sQ7jN0XcZD97+DMwngu94AVvGyWX7ocG0I7yteL7fQjxUhNlmu0jXOwu+lJfyMxQP09C
-	nBO+9k3o3MwO+2Q4C5WFnD9+E4HZSWcqX5/AMGKxgi5zd6M9hAQbTaGhvRJSexB1WGx6//KHjza
-	J9KBcEaYmKYww+xQ=
-X-Google-Smtp-Source: AGHT+IHMW98LKLrBk/HrYfcCCVQ80r3nhlUHxeo5FoUvbXLo766SGUMibKHsMA0gfPKgCoMTxObdMg==
-X-Received: by 2002:a05:6a21:6e41:b0:1f5:852a:dd81 with SMTP id adf61e73a8af0-2148d52bbe3mr13246245637.34.1746711854843;
-        Thu, 08 May 2025 06:44:14 -0700 (PDT)
+        bh=ABC8+QfGyso1WyDvOcXI+0OZWgW+TnNwcrP3jxKT+bs=;
+        b=WE5/1NqzmtNxCoCHRquvp3xjxCra3x3coEDSQc2TOpu4htWChaNcnjn+WHObZb0Qz2
+         UhrAsR18mNLcjwDo++iykZqEIqHJgGfm+axPJRUNZfWS60BBQJkhb+gThmEu2MCHZMNP
+         d3orprwfaNhOLdAZi1pqh0UOHYGSX6fceI46o9SOWVpRtS9/61K5wntnYHYeRIpqQo5W
+         R+OZid1Qm3SCiR/TlTz7OEn4KHyKD19JA99bMH33QFPra78Kl9liawCBYLs/HhFTYbDh
+         SEXUvXiftWWb0D+4IjByNa0llZI3esK1LabBGiQcX0GFHcpo8tCPr78BTlewl/QG/+oC
+         wfIg==
+X-Forwarded-Encrypted: i=1; AJvYcCXid4rmbNtvoMcGr8SazbxW+oB1SMSqVUosOTfAghY1r6YRJ0g2QjRt5O1Nz7Oqu5sP3qE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJ9kmvB86RQU+cKF0IK6RoEJtRhcNip0soES5QDPGlghrzTDq0
+	VMoikqZXdHSPVU/+U3klH4qRDLzSACc1jXFdJl31hge6Nh2WkqfGpkVI0AcwPNc=
+X-Gm-Gg: ASbGncuwaGgYKNkNCRt4RJfbf1KrepHynLI7CKDsQWqkmF2qpjgb84oOhn7zDrvoi+E
+	VumzGBm4WtYiLqF2E0Ai94QVBC1gmhP/VI+Bb+HyxxT26b17CWjla85sxLY4lJwFHVZDisB3RCd
+	iK7B7vWvY+sJ7KN+2PRZKK/alF5Beu7EbLGQ+y26ZJfLoRW2d1QfA/9tqJFa+QIoq0giw27PanN
+	kxsfgVYDRvWdQCOev6v5CgiwdDD3VOKTtdj/XDnqYtk9AznjoyzuIxXyZC7TqB/ELUOLlkRwPSu
+	NgM8ghD4Ua0FcuDa+3xnu7Tk/FVsGS7JwCwdytZye6XdHWkZYtzvtSTvFDKqsv9FhNPGGT6xVfB
+	MjtmN776ZFw0quGA=
+X-Google-Smtp-Source: AGHT+IEUdsHAoEH5Q8KZKtz2AvzabbEqVKF3EUjTCg5XRDEcrks+oGqKHzSziA06tvgUnitC8tKtJg==
+X-Received: by 2002:a17:90b:224e:b0:2ee:c30f:33c9 with SMTP id 98e67ed59e1d1-30adbf3b191mr5502686a91.14.1746711876787;
+        Thu, 08 May 2025 06:44:36 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74058df2a6csm13272789b3a.81.2025.05.08.06.44.00
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30ad474a05bsm2173239a91.2.2025.05.08.06.44.22
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 08 May 2025 06:44:14 -0700 (PDT)
+        Thu, 08 May 2025 06:44:36 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>,
@@ -108,9 +108,9 @@ Cc: Richard Henderson <richard.henderson@linaro.org>,
 	Huacai Chen <chenhuacai@kernel.org>,
 	Jason Wang <jasowang@redhat.com>,
 	Mark Cave-Ayland <mark.caveayland@nutanix.com>
-Subject: [PATCH v4 22/27] hw/core/machine: Remove hw_compat_2_7[] array
-Date: Thu,  8 May 2025 15:35:45 +0200
-Message-ID: <20250508133550.81391-23-philmd@linaro.org>
+Subject: [PATCH v4 23/27] hw/i386/intel_iommu: Remove IntelIOMMUState::buggy_eim field
+Date: Thu,  8 May 2025 15:35:46 +0200
+Message-ID: <20250508133550.81391-24-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250508133550.81391-1-philmd@linaro.org>
 References: <20250508133550.81391-1-philmd@linaro.org>
@@ -123,48 +123,56 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The hw_compat_2_7[] array was only used by the pc-q35-2.7 and
-pc-i440fx-2.7 machines, which got removed. Remove it.
+The IntelIOMMUState::buggy_eim boolean was only set in
+the hw_compat_2_7[] array, via the 'x-buggy-eim=true'
+property. We removed all machines using that array, lets
+remove that property, simplifying vtd_decide_config().
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
 ---
- include/hw/boards.h | 3 ---
- hw/core/machine.c   | 9 ---------
- 2 files changed, 12 deletions(-)
+ include/hw/i386/intel_iommu.h | 1 -
+ hw/i386/intel_iommu.c         | 5 ++---
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index a881db8e7d6..77707c4376a 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -838,7 +838,4 @@ extern const size_t hw_compat_2_9_len;
- extern GlobalProperty hw_compat_2_8[];
- extern const size_t hw_compat_2_8_len;
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index e95477e8554..29304329d05 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -303,7 +303,6 @@ struct IntelIOMMUState {
+     uint32_t intr_size;             /* Number of IR table entries */
+     bool intr_eime;                 /* Extended interrupt mode enabled */
+     OnOffAuto intr_eim;             /* Toggle for EIM cabability */
+-    bool buggy_eim;                 /* Force buggy EIM unless eim=off */
+     uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
+     bool dma_drain;                 /* Whether DMA r/w draining enabled */
+     bool dma_translation;           /* Whether DMA translation supported */
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 5f8ed1243d1..c980cecb4ee 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3823,7 +3823,6 @@ static const Property vtd_properties[] = {
+     DEFINE_PROP_UINT32("version", IntelIOMMUState, version, 0),
+     DEFINE_PROP_ON_OFF_AUTO("eim", IntelIOMMUState, intr_eim,
+                             ON_OFF_AUTO_AUTO),
+-    DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
+     DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
+                       VTD_HOST_ADDRESS_WIDTH),
+     DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+@@ -4731,11 +4730,11 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+     }
  
--extern GlobalProperty hw_compat_2_7[];
--extern const size_t hw_compat_2_7_len;
--
- #endif
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index ce98820f277..bde19a2ff67 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -266,15 +266,6 @@ GlobalProperty hw_compat_2_8[] = {
- };
- const size_t hw_compat_2_8_len = G_N_ELEMENTS(hw_compat_2_8);
- 
--GlobalProperty hw_compat_2_7[] = {
--    { "virtio-pci", "page-per-vq", "on" },
--    { "virtio-serial-device", "emergency-write", "off" },
--    { "ioapic", "version", "0x11" },
--    { "intel-iommu", "x-buggy-eim", "true" },
--    { "virtio-pci", "x-ignore-backend-features", "on" },
--};
--const size_t hw_compat_2_7_len = G_N_ELEMENTS(hw_compat_2_7);
--
- MachineState *current_machine;
- 
- static char *machine_get_kernel(Object *obj, Error **errp)
+     if (s->intr_eim == ON_OFF_AUTO_AUTO) {
+-        s->intr_eim = (kvm_irqchip_in_kernel() || s->buggy_eim)
++        s->intr_eim = kvm_irqchip_in_kernel()
+                       && x86_iommu_ir_supported(x86_iommu) ?
+                                               ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+     }
+-    if (s->intr_eim == ON_OFF_AUTO_ON && !s->buggy_eim) {
++    if (s->intr_eim == ON_OFF_AUTO_ON) {
+         if (kvm_irqchip_is_split() && !kvm_enable_x2apic()) {
+             error_setg(errp, "eim=on requires support on the KVM side"
+                              "(X2APIC_API, first shipped in v4.7)");
 -- 
 2.47.1
 
