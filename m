@@ -1,384 +1,255 @@
-Return-Path: <kvm+bounces-45901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BEC2AAFD1E
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 16:32:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CE58AAFDA0
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 16:47:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FE6F4C1891
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 14:32:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6FBF4C699C
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 14:47:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD262741AF;
-	Thu,  8 May 2025 14:31:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66619279785;
+	Thu,  8 May 2025 14:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="ecd7rJ+p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ftc0d1+C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D436A2701D3
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 14:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE842278173
+	for <kvm@vger.kernel.org>; Thu,  8 May 2025 14:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746714714; cv=none; b=nuS6Vz4iNJhj3JH4+DLNJlxgpcteG9+N5ZqwTNvEOltHjwAvWTK/Abq8vuZXecF0mxOcMGkDFmVJJIU17cjKBd8T2ZPtisdGzUU7I6WxJ0qrYF0KyIwwZ6ba5Db5wF/8oq4H3BOq/4/Awf4iqdZ24RDv6tkQ1obInwUMgjRczc8=
+	t=1746715623; cv=none; b=oDPtcSnCvcRrMaUavmTArP29YxpMc9I9djUYgWAu/k0FpP2vN1EldFRbgZH6E38+jWF9YZX6rq1rbjQMNrJ9cyaoWoj1EOUBS2ttVcvYyzJvFpNAox7IwWQq0yq0OWnZwzJXyThDrLfxDH+3SerVaYtyYFwnpAWagT+YcJG7YL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746714714; c=relaxed/simple;
-	bh=l5Dappur0wGcoRttIXhShtgjIcZxHdOGi/r63rgDfpM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YupPGypaaNoIa1PYtUPu6fnajfJdxa9SFjrRbuj5ouyZDTiy/5lhU+DVqlBICioLbEPZl86b+pN1/uTqErTvpXb/Ee0rFdr1e6cEtlupubJdUYWJ3GAHVoiqJrSY2wjtS0aO6AbNz4dqfaG6aJwHO2aVRL9WSul09YtueEqfAp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=ecd7rJ+p; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43f106a3591so408005e9.3
-        for <kvm@vger.kernel.org>; Thu, 08 May 2025 07:31:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1746714710; x=1747319510; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Iq0irjOP5JV+UDNdYH88ZnlyC3CUjThrEd11ryaVa8=;
-        b=ecd7rJ+pPTF6nXdM+wK6secuGz8jtIILr+TcMKQ8Ef5IFcFE13TGnu4/yPsBdQ3/SZ
-         JJu/OQxT4C9ZMYrhIsDx7Bt2QlFPcWDq+LG1U2ulwHsLTFNFm6QdCQpRxiSHWg7pCOrB
-         CvBLZl52xVyyMBGoeOwLgDcCCgRxALsg/MoVe4Mbhhys3Sgdv2G8bES5hbOUoBD+b+9u
-         k0ReWvyTIHcu4pxdHJfXVvBKzsxlZySKrP/KQyaWKybNxN0/c1ei8ORXVK5HTkI4SmcY
-         tp1j8RJkziMm3gI3O6hb0KQS0A1ifM2oxvX2b0LI6pCYKuYLmziCagL3Oduh0gNtQlT1
-         6M8Q==
+	s=arc-20240116; t=1746715623; c=relaxed/simple;
+	bh=M2kEowmn7ArZMjCEWfGm0wGjyjYahsrAwRWui+KQh/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IUDeSPDdiGr72LqPrLAK+y20h3VggXV22zv7cdFmLLw3c71hSso+M5OigLYKmSQo/zWDXYEFRYM0mIqRd1mmfpToI6UEdzI2XqNjacm/uioQFKgG7IMZGhK3h0j0+yi7/XiW3xLXd7V+DWs+wg6OL0VEVx452/VfEztD126Jkfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ftc0d1+C; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746715620;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=3WfBLYQC3hmzGXkm7havEwwHluNTlzt6k0jnmYRuEz8=;
+	b=Ftc0d1+C+SSdf0EsfK3QRjo/r5YVZYlQWk/QZZlLgIK55rrH1/9k4aGxZlrSt38JnBJn3x
+	xEawOSJheRbCCz2lrRFimvDCiRW/G+lS0EmpQv67vzZ8rFCiee6Jrv8CEM6fKdrhEzNbuO
+	cdCSm043jT3MPAU1/2Qx+Pj5BzSJWBw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-614-5lE_UpN_PFuxTqfdTpj6LQ-1; Thu, 08 May 2025 10:46:59 -0400
+X-MC-Unique: 5lE_UpN_PFuxTqfdTpj6LQ-1
+X-Mimecast-MFC-AGG-ID: 5lE_UpN_PFuxTqfdTpj6LQ_1746715618
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-442d472cf84so2285215e9.2
+        for <kvm@vger.kernel.org>; Thu, 08 May 2025 07:46:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746714710; x=1747319510;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0Iq0irjOP5JV+UDNdYH88ZnlyC3CUjThrEd11ryaVa8=;
-        b=njFU3XVzMq7IBcUpBulrm+hY9x7QJBVXP3jpn5U0AvyJzgxgKehLLJ3cUCf05G9dy6
-         coIqrPZxx8cqlPmZbrPk4uyHRVXiG7/TH2kczNVc0LOj23RQN6rxVt45yEwu4Gm3ptpL
-         WL11W5Osxx1wHpdl2InixGNCdBQnuU5e0Hhz1/tn/V7cjKGQKOjRHkPJkRBrtR6zYTxX
-         SxY4DViV6LZrHQlOKKti7bVbgnt8Fb87YEJhWKY8SkwiVboSt92sQ85vlREP8PWUdx2w
-         h9LlZcHTGTMgCARzoJor9GGPGiLQg6O2t4GuC84Om3KnWGkb/b4OhkeNF+DoGAMe9LsL
-         C5NA==
-X-Gm-Message-State: AOJu0Ywfixr4+Oh1elNWz1kGctfk5Rnj87PuEe+zzNDi5zbnmAcnTMxT
-	0fsIxkCscdxfjWPZvWE5pSLh0YBN0oTxDxteYu9b/Shn8NDLkYrFpxIIIAnFjgc=
-X-Gm-Gg: ASbGnctVu2DfsfNRICjiO+WxcsOqp/PDXVireLsnWyVfVSGAkkoBcwz4zBF6EkcaHD9
-	dAT7C34N/hCZV/N9pyAX2T9icKyrHlEDj2lQG09ymcuaf2MQXdPhHfVEj2Hc7AIoNK36yoLoHJi
-	jRuJ9SA75PyutuDDBDX3+TjQLKGrfsxkxQ7uYFndiJtaWdMHftNkDDIPdSbMcMSyVbWn+rmpXmc
-	U89BfTLTAD7FjW5bTso70kwpXjh43UwwwIza0PycWyYJRyHEzkdaMIp39/mAFlhSfLrI/qXqhTL
-	Agoz10dmw/9ePBveD1rcPUhdyV4DtSi3fSXlfvZbZtPjjWnv
-X-Google-Smtp-Source: AGHT+IFrhrrk91EQvVw5UVBWpi0thZj7ZgnrM7NMkHcfPYOymBEctXqZ2MNdkHKrUQIb01SSED3Y4g==
-X-Received: by 2002:a05:600c:1d0d:b0:439:9a5a:d3bb with SMTP id 5b1f17b1804b1-441d44bcab8mr24877085e9.2.1746714710000;
-        Thu, 08 May 2025 07:31:50 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200:a451:a252:64ea:9a0e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442cd380a79sm39022965e9.33.2025.05.08.07.31.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 May 2025 07:31:49 -0700 (PDT)
-From: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
-To: kvm-riscv@lists.infradead.org
-Cc: kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Andrew Jones <ajones@ventanamicro.com>
-Subject: [PATCH v2 2/2] RISC-V: KVM: add KVM_CAP_RISCV_MP_STATE_RESET
-Date: Thu,  8 May 2025 16:28:43 +0200
-Message-ID: <20250508142842.1496099-4-rkrcmar@ventanamicro.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250508142842.1496099-2-rkrcmar@ventanamicro.com>
-References: <20250508142842.1496099-2-rkrcmar@ventanamicro.com>
+        d=1e100.net; s=20230601; t=1746715618; x=1747320418;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3WfBLYQC3hmzGXkm7havEwwHluNTlzt6k0jnmYRuEz8=;
+        b=gqmzqbE2f2OLMS0HMPCv6ixa8MW+qM5gg8b7LBc0KYGKKhRMr+3Rp5WBuhlqehiP41
+         vGGUJ2h64kKJnbIWHYHfio7n2/PuNyUIvk2FMLHTAbBnpbGhW7oncFPQASOMLFnrfhOU
+         7tSMYbrsO/c6Hf+2xfVy1UlJrnkjLRz37Q0DcdVbC5m2RRZ1tQeTbZ0gM6/6h1QCYrzJ
+         64B9Z4dQllrt6QDS2yUS3Pqd0pN1BLBFZF5q9FY2vyH+WkUxr6rO6FpizeXObeP/L9kc
+         DH4VKbJohNDIpYUKmtQ1gTG+7JufkW76pB7rhkkpWp6tV7dqhoaeADqrgYUpfUvYcGqz
+         R/mg==
+X-Forwarded-Encrypted: i=1; AJvYcCVEIlMJ0MtU/nU6iw0vqOcDGzxPmJacbQ67Kwk1WSt+LQW17yaZFjF08CQZjUh2+Pk03/E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0bUZC9anVkfxTmMp9FwjWZtn0fMiBy3nI3MJ7jIoukvR4tTSu
+	eAnZ60ejRClhnMJDF67oRroW2s/jlnER+xWL2CZKbioP9HgwRFAt6emBgFznCfH6lsjIV3Qq1sx
+	J6dO9RNlWoeI2K299pIxvlQxs6Ue71zq+KV0Exa/JoC876xZ3WA==
+X-Gm-Gg: ASbGncuX0/M5iai7IOUtOawuPpNg4agIr1OHoAusXBVRsbIOAnElG02Y2iv0I2z0UdJ
+	VWKLOmULNqD+vDqfw2RKSLRmBxo/igZfxasKtfX8WkVbjx+UXGRPccOyLyviVzbQIEUmjTrUikB
+	aoYH9xEre5vjsvOq2lWK/gD+HIqJm15mAezkgwLC6WSEU46OK5GBmWj7fEdyVaTnQKw1MaQkJFu
+	a7XuJrg1QplJc4U9PZ6R5hPqs2I6e/hsKcfkKHUIqxd74ytWaWfMubKY0Pi7oqnUVg50jqGrbfL
+	MEOpa5U1uRCYXLuQy2T+DF8aOiaHEWNG5ooo3ULWgISx/KazKhBqEA42ji4Y3AcmduO9WrtuOvi
+	5eZ2yx6sfpz4mkidQEOo+tmaIpXj4mwWv4SsV6Bw=
+X-Received: by 2002:a05:600c:198d:b0:43d:160:cd97 with SMTP id 5b1f17b1804b1-442d034ad66mr27923515e9.25.1746715618269;
+        Thu, 08 May 2025 07:46:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEMazOFBQxOkJsC7u+4627X9ECffOM+ndlKzepZRCW/CDop3JsCzx/Dr+2gqQj4Jw/B8gOF7A==
+X-Received: by 2002:a05:600c:198d:b0:43d:160:cd97 with SMTP id 5b1f17b1804b1-442d034ad66mr27923245e9.25.1746715617803;
+        Thu, 08 May 2025 07:46:57 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f3e:5900:27aa:5f4a:b65c:3d3c? (p200300d82f3e590027aa5f4ab65c3d3c.dip0.t-ipconnect.de. [2003:d8:2f3e:5900:27aa:5f4a:b65c:3d3c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f5a4c804sm157216f8f.95.2025.05.08.07.46.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 May 2025 07:46:57 -0700 (PDT)
+Message-ID: <8b197d87-e2a6-4f35-8f25-4d32b6e34202@redhat.com>
+Date: Thu, 8 May 2025 16:46:53 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 06/13] KVM: x86: Generalize private fault lookups to
+ guest_memfd fault lookups
+To: Ackerley Tng <ackerleytng@google.com>,
+ Sean Christopherson <seanjc@google.com>,
+ Vishal Annapurve <vannapurve@google.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com,
+ chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
+ akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+ chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+ dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, mail@maciej.szmigiero.name, michael.roth@amd.com,
+ wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
+References: <diqz7c31xyqs.fsf@ackerleytng-ctop.c.googlers.com>
+ <386c1169-8292-43d1-846b-c50cbdc1bc65@redhat.com>
+ <aBTxJvew1GvSczKY@google.com>
+ <diqzjz6ypt9y.fsf@ackerleytng-ctop.c.googlers.com>
+ <7e32aabe-c170-4cfc-99aa-f257d2a69364@redhat.com>
+ <aBlCSGB86cp3B3zn@google.com>
+ <CAGtprH8DW-hqxbFdyo+Mg7MddsOAnN+rpLZUOHT-msD+OwCv=Q@mail.gmail.com>
+ <CAGtprH9AVUiFsSELhmt4p24fssN2x7sXnUqn39r31GbA0h39Sw@mail.gmail.com>
+ <aBoVbJZEcQ2OeXhG@google.com>
+ <39ea3946-6683-462e-af5d-fe7d28ab7d00@redhat.com>
+ <diqzh61xqxfh.fsf@ackerleytng-ctop.c.googlers.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <diqzh61xqxfh.fsf@ackerleytng-ctop.c.googlers.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add a toggleable VM capability to modify several reset related code
-paths.  The goals are to
- 1) Allow userspace to reset any VCPU.
- 2) Allow userspace to provide the initial VCPU state.
+>>
+>> Yeah, I ignored that fact as well. So essentially, this patch should be
+>> mostly good for now.
+>>
+> 
+>  From here [1], these changes will make it to v9
+> 
+> + kvm_max_private_mapping_level renaming to kvm_max_gmem_mapping_level
+> + kvm_mmu_faultin_pfn_private renaming to kvm_mmu_faultin_pfn_gmem
+> 
+>> Only kvm_mmu_hugepage_adjust() must be taught to not rely on
+>> fault->is_private.
+>>
+> 
+> I think fault->is_private should contribute to determining the max
+> mapping level.
+> 
+> By the time kvm_mmu_hugepage_adjust() is called,
+> 
+> * For Coco VMs using guest_memfd only for private memory,
+>    * fault->is_private would have been checked to align with
+>      kvm->mem_attr_array, so
+> * For Coco VMs using guest_memfd for both private/shared memory,
+>    * fault->is_private would have been checked to align with
+>      guest_memfd's shareability
+> * For non-Coco VMs using guest_memfd
+>    * fault->is_private would be false
 
-(Right now, the boot VCPU isn't reset by KVM and KVM sets the state for
- VCPUs brought up by sbi_hart_start while userspace for all others.)
+But as Sean said, looking at the code might be easier.
 
-The goals are achieved with the following changes:
- * Reset the VCPU when setting MP_STATE_INIT_RECEIVED through IOCTL.
- * Preserve the userspace initialized VCPU state on sbi_hart_start.
- * Return to userspace on sbi_hart_stop.
- * Don't make VCPU reset request on sbi_system_suspend.
+Maybe just send the resulting diff of the patch here real quick?
 
-The patch is reusing MP_STATE_INIT_RECEIVED, because we didn't want to
-add a new IOCTL, sorry. :)
+> 
+> Hence fault->is_private can be relied on when calling
+> kvm_mmu_hugepage_adjust().
+> 
+> If fault->is_private, there will be no host userspace mapping to check,
+> hence in __kvm_mmu_max_mapping_level(), we should skip querying host
+> page tables.
+> 
+> If !fault->is_private, for shared memory ranges, if the VM uses
+> guest_memfd only for shared memory, we should query host page tables.
+> 
+> If !fault->is_private, for shared memory ranges, if the VM uses
+> guest_memfd for both shared/private memory, we should not query host
+> page tables.
+ > > If !fault->is_private, for non-Coco VMs, we should not query host page
+> tables.
+ > > I propose to rename the parameter is_private to skip_host_page_tables,
+> so
+> 
+> - if (is_private)
+> + if (skip_host_page_tables)
+> 	return max_level;
+> 
+> and pass
+> 
+> skip_host_page_tables = fault->is_private ||
+> 			kvm_gmem_memslot_supports_shared(fault->slot);
+> 
 
-Signed-off-by: Radim Krčmář <rkrcmar@ventanamicro.com>
----
-If you search for cap 7.42 in api.rst, you'll see that it has a wrong
-number, which is why we're 7.43, in case someone bothers to fix ARM.
+How is that better than calling it "is_gmem" / "from_gmem" etc? :) 
+Anyhow, no strong opinion, spelling out that something is from gmem 
+implies that we don't care about page tables.
 
-I was also strongly considering creating all VCPUs in RUNNABLE state --
-do you know of any similar quirks that aren't important, but could be
-fixed with the new userspace toggle?
----
- Documentation/virt/kvm/api.rst        | 15 +++++++++++
- arch/riscv/include/asm/kvm_host.h     |  3 +++
- arch/riscv/include/asm/kvm_vcpu_sbi.h |  1 +
- arch/riscv/kvm/vcpu.c                 | 36 +++++++++++++++++----------
- arch/riscv/kvm/vcpu_sbi.c             | 17 +++++++++++++
- arch/riscv/kvm/vcpu_sbi_hsm.c         |  7 +++++-
- arch/riscv/kvm/vcpu_sbi_system.c      |  3 ++-
- arch/riscv/kvm/vm.c                   | 13 ++++++++++
- include/uapi/linux/kvm.h              |  1 +
- 9 files changed, 81 insertions(+), 15 deletions(-)
+> where kvm_gmem_memslot_supports_shared() checks the inode in the memslot
+> for GUEST_MEMFD_FLAG_SUPPORT_SHARED.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 47c7c3f92314..63e6d23d34f0 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8496,6 +8496,21 @@ aforementioned registers before the first KVM_RUN. These registers are VM
- scoped, meaning that the same set of values are presented on all vCPUs in a
- given VM.
- 
-+7.43 KVM_CAP_RISCV_MP_STATE_RESET
-+---------------------------------
-+
-+:Architectures: riscv
-+:Type: VM
-+:Parameters: None
-+:Returns: 0 on success, -EINVAL if arg[0] is not zero
-+
-+When this capability is enabled, KVM:
-+* Resets the VCPU when setting MP_STATE_INIT_RECEIVED through IOCTL.
-+  The original MP_STATE is preserved.
-+* Preserves the userspace initialized VCPU state on sbi_hart_start.
-+* Returns to userspace on sbi_hart_stop.
-+* Doesn't make VCPU reset request on sbi_system_suspend.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index f673ebfdadf3..85cfebc32e4c 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -119,6 +119,9 @@ struct kvm_arch {
- 
- 	/* AIA Guest/VM context */
- 	struct kvm_aia aia;
-+
-+	/* KVM_CAP_RISCV_MP_STATE_RESET */
-+	bool mp_state_reset;
- };
- 
- struct kvm_cpu_trap {
-diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-index da28235939d1..439ab2b3534f 100644
---- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
-+++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-@@ -57,6 +57,7 @@ void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu *vcpu,
- 				     u32 type, u64 flags);
- void kvm_riscv_vcpu_sbi_request_reset(struct kvm_vcpu *vcpu,
- 				      unsigned long pc, unsigned long a1);
-+void kvm_riscv_vcpu_sbi_load_reset_state(struct kvm_vcpu *vcpu);
- int kvm_riscv_vcpu_sbi_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
- int kvm_riscv_vcpu_set_reg_sbi_ext(struct kvm_vcpu *vcpu,
- 				   const struct kvm_one_reg *reg);
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index a78f9ec2fa0e..961b22c05981 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -51,11 +51,11 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
- 		       sizeof(kvm_vcpu_stats_desc),
- };
- 
--static void kvm_riscv_vcpu_context_reset(struct kvm_vcpu *vcpu)
-+static void kvm_riscv_vcpu_context_reset(struct kvm_vcpu *vcpu,
-+					 bool kvm_sbi_reset)
- {
- 	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
- 	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
--	struct kvm_vcpu_reset_state *reset_state = &vcpu->arch.reset_state;
- 	void *vector_datap = cntx->vector.datap;
- 
- 	memset(cntx, 0, sizeof(*cntx));
-@@ -65,13 +65,8 @@ static void kvm_riscv_vcpu_context_reset(struct kvm_vcpu *vcpu)
- 	/* Restore datap as it's not a part of the guest context. */
- 	cntx->vector.datap = vector_datap;
- 
--	/* Load SBI reset values */
--	cntx->a0 = vcpu->vcpu_id;
--
--	spin_lock(&reset_state->lock);
--	cntx->sepc = reset_state->pc;
--	cntx->a1 = reset_state->a1;
--	spin_unlock(&reset_state->lock);
-+	if (kvm_sbi_reset)
-+		kvm_riscv_vcpu_sbi_load_reset_state(vcpu);
- 
- 	/* Setup reset state of shadow SSTATUS and HSTATUS CSRs */
- 	cntx->sstatus = SR_SPP | SR_SPIE;
-@@ -84,10 +79,19 @@ static void kvm_riscv_vcpu_context_reset(struct kvm_vcpu *vcpu)
- 	csr->scounteren = 0x7;
- }
- 
--static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
-+static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu, bool kvm_sbi_reset)
- {
- 	bool loaded;
- 
-+	/*
-+	 * The userspace should have triggered a full reset earlier and could
-+	 * have set initial state that needs to be preserved.
-+	 */
-+	if (kvm_sbi_reset && vcpu->kvm->arch.mp_state_reset) {
-+		kvm_riscv_vcpu_sbi_load_reset_state(vcpu);
-+		return;
-+	}
-+
- 	/**
- 	 * The preemption should be disabled here because it races with
- 	 * kvm_sched_out/kvm_sched_in(called from preempt notifiers) which
-@@ -100,7 +104,7 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.last_exit_cpu = -1;
- 
--	kvm_riscv_vcpu_context_reset(vcpu);
-+	kvm_riscv_vcpu_context_reset(vcpu, kvm_sbi_reset);
- 
- 	kvm_riscv_vcpu_fp_reset(vcpu);
- 
-@@ -177,7 +181,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	kvm_riscv_vcpu_sbi_init(vcpu);
- 
- 	/* Reset VCPU */
--	kvm_riscv_reset_vcpu(vcpu);
-+	kvm_riscv_reset_vcpu(vcpu, false);
- 
- 	return 0;
- }
-@@ -526,6 +530,12 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- 	case KVM_MP_STATE_STOPPED:
- 		__kvm_riscv_vcpu_power_off(vcpu);
- 		break;
-+	case KVM_MP_STATE_INIT_RECEIVED:
-+		if (vcpu->kvm->arch.mp_state_reset)
-+			kvm_riscv_reset_vcpu(vcpu, false);
-+		else
-+			ret = -EINVAL;
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-@@ -714,7 +724,7 @@ static void kvm_riscv_check_vcpu_requests(struct kvm_vcpu *vcpu)
- 		}
- 
- 		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
--			kvm_riscv_reset_vcpu(vcpu);
-+			kvm_riscv_reset_vcpu(vcpu, true);
- 
- 		if (kvm_check_request(KVM_REQ_UPDATE_HGATP, vcpu))
- 			kvm_riscv_gstage_update_hgatp(vcpu);
-diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-index 0afef0bb261d..31fd3cc98d66 100644
---- a/arch/riscv/kvm/vcpu_sbi.c
-+++ b/arch/riscv/kvm/vcpu_sbi.c
-@@ -167,6 +167,23 @@ void kvm_riscv_vcpu_sbi_request_reset(struct kvm_vcpu *vcpu,
- 	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
- }
- 
-+void kvm_riscv_vcpu_sbi_load_reset_state(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
-+	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
-+	struct kvm_vcpu_reset_state *reset_state = &vcpu->arch.reset_state;
-+
-+	cntx->a0 = vcpu->vcpu_id;
-+
-+	spin_lock(&vcpu->arch.reset_state.lock);
-+	cntx->sepc = reset_state->pc;
-+	cntx->a1 = reset_state->a1;
-+	spin_unlock(&vcpu->arch.reset_state.lock);
-+
-+	cntx->sstatus &= ~SR_SIE;
-+	csr->vsatp = 0;
-+}
-+
- int kvm_riscv_vcpu_sbi_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hsm.c
-index f26207f84bab..d1bf1348eefd 100644
---- a/arch/riscv/kvm/vcpu_sbi_hsm.c
-+++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
-@@ -89,7 +89,12 @@ static int kvm_sbi_ext_hsm_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		ret = kvm_sbi_hsm_vcpu_start(vcpu);
- 		break;
- 	case SBI_EXT_HSM_HART_STOP:
--		ret = kvm_sbi_hsm_vcpu_stop(vcpu);
-+		if (vcpu->kvm->arch.mp_state_reset) {
-+			kvm_riscv_vcpu_sbi_forward(vcpu, run);
-+			retdata->uexit = true;
-+		} else {
-+			ret = kvm_sbi_hsm_vcpu_stop(vcpu);
-+		}
- 		break;
- 	case SBI_EXT_HSM_HART_STATUS:
- 		ret = kvm_sbi_hsm_vcpu_get_status(vcpu);
-diff --git a/arch/riscv/kvm/vcpu_sbi_system.c b/arch/riscv/kvm/vcpu_sbi_system.c
-index 359be90b0fc5..0482968705f8 100644
---- a/arch/riscv/kvm/vcpu_sbi_system.c
-+++ b/arch/riscv/kvm/vcpu_sbi_system.c
-@@ -44,7 +44,8 @@ static int kvm_sbi_ext_susp_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 			}
- 		}
- 
--		kvm_riscv_vcpu_sbi_request_reset(vcpu, cp->a1, cp->a2);
-+		if (!vcpu->kvm->arch.mp_state_reset)
-+			kvm_riscv_vcpu_sbi_request_reset(vcpu, cp->a1, cp->a2);
- 
- 		/* userspace provides the suspend implementation */
- 		kvm_riscv_vcpu_sbi_forward(vcpu, run);
-diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-index 7396b8654f45..b27ec8f96697 100644
---- a/arch/riscv/kvm/vm.c
-+++ b/arch/riscv/kvm/vm.c
-@@ -209,6 +209,19 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	return r;
- }
- 
-+int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-+{
-+	switch (cap->cap) {
-+	case KVM_CAP_RISCV_MP_STATE_RESET:
-+		if (cap->flags)
-+			return -EINVAL;
-+		kvm->arch.mp_state_reset = true;
-+		return 0;
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
- int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- {
- 	return -EINVAL;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index b6ae8ad8934b..454b7d4a0448 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -930,6 +930,7 @@ struct kvm_enable_cap {
- #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
- #define KVM_CAP_X86_GUEST_MODE 238
- #define KVM_CAP_ARM_WRITABLE_IMP_ID_REGS 239
-+#define KVM_CAP_RISCV_MP_STATE_RESET 240
- 
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
+Makes sense.
+
 -- 
-2.49.0
+Cheers,
+
+David / dhildenb
 
 
