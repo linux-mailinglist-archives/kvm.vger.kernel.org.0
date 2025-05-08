@@ -1,144 +1,97 @@
-Return-Path: <kvm+bounces-45991-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45992-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 364C6AB0644
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 01:01:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E210AB0654
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 01:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7423E4C535E
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 23:01:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3AD63B897F
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 23:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC9322B8D5;
-	Thu,  8 May 2025 23:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B91722D9F5;
+	Thu,  8 May 2025 23:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qK6Zu79Q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j3bMqfmx"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E3F1DD525
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 23:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7841F416C
+	for <kvm@vger.kernel.org>; Thu,  8 May 2025 23:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746745287; cv=none; b=ZLnXGj/FkNxCbcdOc63TpocpZ6WTg6TFsT5Pxam/4Q2Ewhnxrb10NjRTWVyPX2kO3LTVr6QT/NrAMXN3+twlugXdd77MXgAkp/feTE5K/Hh4kXuAm2FQOfjVgXljYEWlOkPq/a9C//9CaeONVC6NO77qCcnXUqgfnk6SNEWWdgQ=
+	t=1746745461; cv=none; b=c/IpPiFNvV2CHRR9GsoAK5ELpiUN4PSlQMeghMr0q1xxc6BbfsASUsK7OYaV9doTiTmeA8W6Ia6K0YNPJtpRG+LRNICOwUDBztcaWe9kKafDQ9GC9RazQ9WN2hINi1aabYRFKdzEZffDwXEVNVyLu98YHqndVJ9lBkSpQeQskwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746745287; c=relaxed/simple;
-	bh=oEuSarxiPIA0IneriI2U0oIkS7qkQy2iN4xv7e9uIV4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hZ2+8uKrmokncxjVdjFbwtVvgdTWgAZmzOxbRr3pxw4/lgDiuGicsvthrkY4AnLpRBBIjzpcckf8RvXTf8eKBJ3+TBvAIRXRC6cB3trbLdU+qq1KNnWoY/GkxboAtrchLh932MVu5fplUYwliUuecqDtz0vlUztQ39eIgxDzU1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qK6Zu79Q; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <4032b00c-1194-45b1-b1e5-4e9237ed7948@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746745283;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0podyQbI7EjhnM5+iaMAYRW3Emc7fSDLhAlACBiE+s0=;
-	b=qK6Zu79QrmwiVhmb0SUwlF/AmfkzMu19qf+dkBevTT2rvx0rNBA3gTno6MqT2qWTf4fMVs
-	gxD/PLt/EvSGIoMy129aGZ3w/Mkk5JRRS22r4+ABA1HHZbWa7Qf9RDrbOXY3uZqUb00KyB
-	qWyz0v9qW0KNNtOBJ9/V3dY4gkoObkE=
-Date: Thu, 8 May 2025 16:01:12 -0700
+	s=arc-20240116; t=1746745461; c=relaxed/simple;
+	bh=erJZlkOCNdbv/CM5/d8Y8YwzyG2lJFJShmUNyHD+VF4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Content-Type; b=tZYqFNioNYTauyaUIeyUeXwQzUK7Pr9cJ4SKSwT5V3ZarIlTvVV9UPhzQx+hE7mjNYS3Rp/09R9HefiG+JZ4ObBPs5ecbcNIggKopGYABzKQxiH6kGZnTUvHsSkY2z7oPvkuHbWXcMwKFcE71UyAxiS8N3dsO9txYiu7S34Ddhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j3bMqfmx; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30abb33d1d2so2187281a91.0
+        for <kvm@vger.kernel.org>; Thu, 08 May 2025 16:04:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746745459; x=1747350259; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SM2XJe47CN2ZOM/67xIABCaNM4TaX2ab0ZhL0Ce0aCM=;
+        b=j3bMqfmx5fU0R+dgFFAenFaArJlR8hbgChzkfW0iDpEPezHodQ+mI/fILf9ssToqqq
+         hrduayTltGi0O6QTcKX6pUvA8Hmvgan5JZYBXsAchEY0ZMtAr8fwAhBIuqCVm8fG5EdY
+         JRr7UuAaAKbfTRiQ58mCZzTqqrX3C1/1RAavRvBlwwwOwXxbfRY1wCoBhdMgdd8LYt8v
+         7ydndUJZlZPLsw+ZOLU643OuVZxqU5jj6lq3yXrC4mAsjHWmrf753vd2no+f+pnsdwn4
+         +8NI94MI6JfEcXsKmsC4kHsQRtro/m+H7n3dJUjFY9vki+uVmfeuRvLlpN7inBinLlE/
+         DeiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746745459; x=1747350259;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SM2XJe47CN2ZOM/67xIABCaNM4TaX2ab0ZhL0Ce0aCM=;
+        b=lK2YF7MQv0WgcYQMc3XAyrVUOxt80UePlNzqH76jJ4PLLl2tS134QChrfhkSoSrG5a
+         BC9f/hmY3ZktE6j1tIueDSxgDvM/78HDIDF+WJGJjERvn86tQNFyxHAUS4Ner+ts3Ov8
+         +WFFNgDYs8WRUn/LdonEojNPcRA/oi47WvM9fH0p784VjAEZF+asmZZeVnXhOUg6Rhbf
+         GFpfX4aPN2+MxiL71RERi9bqwntwhAYrZ8C7rm/0CwIxWvL4U2UrlpoQd9J3EXENzZFK
+         V0rhQIUYFUl1ebDt160phYEdm5JtXeVCY82yIyd8oiqeNC0hDUQ/OGfmwQY42RxzYUcZ
+         ihNw==
+X-Forwarded-Encrypted: i=1; AJvYcCULO9mUR9nMWCrczUqXpvKImaCrHI2lb/qflzgdGsr/wWI2aIiu6GRW7kp2Z3GpBt/d+pU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0vja7pBFE2h+plsjC1fZyWi9qu/0GQrqg3dO/KF0oY1GWZu5r
+	Rq85x9ZDl3M67xmt76dpxbnPqOZiVmE2xp3adMxnlJXxF8W+HRQuNA/ZoeePdiyEdAikPbdftVr
+	vaA==
+X-Google-Smtp-Source: AGHT+IF08fdBrYOn5rB4GiEOPUWwLd/6PgVtzInb7iYf7JX8cBQEQJ4TliUxH0+T2JuJCblZNQq5ljz3XKs=
+X-Received: from pjuw5.prod.google.com ([2002:a17:90a:d605:b0:301:4260:4d23])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3848:b0:2ff:6f88:b04a
+ with SMTP id 98e67ed59e1d1-30c3d3e8509mr2094760a91.15.1746745459276; Thu, 08
+ May 2025 16:04:19 -0700 (PDT)
+Date: Thu,  8 May 2025 16:04:09 -0700
+In-Reply-To: <20250506012251.2613-1-lirongqing@baidu.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH v6 05/14] riscv: sbi: add SBI FWFT extension calls
-To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org
-Cc: Samuel Holland <samuel.holland@sifive.com>,
- Andrew Jones <ajones@ventanamicro.com>, Deepak Gupta <debug@rivosinc.com>
-References: <20250424173204.1948385-1-cleger@rivosinc.com>
- <20250424173204.1948385-6-cleger@rivosinc.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Atish Patra <atish.patra@linux.dev>
-In-Reply-To: <20250424173204.1948385-6-cleger@rivosinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250506012251.2613-1-lirongqing@baidu.com>
+X-Mailer: git-send-email 2.49.0.1015.ga840276032-goog
+Message-ID: <174674537050.1513194.17959981986179733390.b4-ty@google.com>
+Subject: Re: [PATCH][v2] KVM: Remove obsolete comment about locking for kvm_io_bus_read/write
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, lirongqing <lirongqing@baidu.com>
+Content-Type: text/plain; charset="utf-8"
 
-On 4/24/25 10:31 AM, ClÃ©ment LÃ©ger wrote:
-> Add FWFT extension calls. This will be ratified in SBI V3.0 hence, it is
-> provided as a separate commit that can be left out if needed.
-> 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->   arch/riscv/kernel/sbi.c | 20 +++++++++++++++++++-
->   1 file changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/riscv/kernel/sbi.c b/arch/riscv/kernel/sbi.c
-> index d57e4dae7dac..070014ff35d4 100644
-> --- a/arch/riscv/kernel/sbi.c
-> +++ b/arch/riscv/kernel/sbi.c
-> @@ -299,6 +299,8 @@ static int __sbi_rfence_v02(int fid, const struct cpumask *cpu_mask,
->   	return 0;
->   }
->   
-> +static bool sbi_fwft_supported;
-> +
+On Tue, 06 May 2025 09:22:51 +0800, lirongqing wrote:
+> Nobody is actually calling these functions with slots_lock held, The
+> srcu_dereference() in kvm_io_bus_read/write() precisely communicates
+> both what is being protected, and what provides the protection. so the
+> comments are no longer needed
 
-super nit: Can declare this along with struct fwft_set_req so that they 
-are together ? You can move the sbi_fwft_set to below the struct 
-fwft_set_req.
+Applied to kvm-x86 misc, thanks!
 
->   /**
->    * sbi_fwft_set() - Set a feature on the local hart
->    * @feature: The feature ID to be set
-> @@ -309,7 +311,15 @@ static int __sbi_rfence_v02(int fid, const struct cpumask *cpu_mask,
->    */
->   int sbi_fwft_set(u32 feature, unsigned long value, unsigned long flags)
->   {
-> -	return -EOPNOTSUPP;
-> +	struct sbiret ret;
-> +
-> +	if (!sbi_fwft_supported)
-> +		return -EOPNOTSUPP;
-> +
-> +	ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_SET,
-> +			feature, value, flags, 0, 0, 0);
-> +
-> +	return sbi_err_map_linux_errno(ret.error);
->   }
->   
->   struct fwft_set_req {
-> @@ -348,6 +358,9 @@ int sbi_fwft_set_cpumask(const cpumask_t *mask, u32 feature,
->   		.error = ATOMIC_INIT(0),
->   	};
->   
-> +	if (!sbi_fwft_supported)
-> +		return -EOPNOTSUPP;
-> +
->   	if (feature & SBI_FWFT_GLOBAL_FEATURE_BIT)
->   		return -EINVAL;
->   
-> @@ -679,6 +692,11 @@ void __init sbi_init(void)
->   			pr_info("SBI DBCN extension detected\n");
->   			sbi_debug_console_available = true;
->   		}
-> +		if (sbi_spec_version >= sbi_mk_version(3, 0) &&
-> +		    sbi_probe_extension(SBI_EXT_FWFT)) {
-> +			pr_info("SBI FWFT extension detected\n");
-> +			sbi_fwft_supported = true;
-> +		}
->   	} else {
->   		__sbi_set_timer = __sbi_set_timer_v01;
->   		__sbi_send_ipi	= __sbi_send_ipi_v01;
+[1/1] KVM: Remove obsolete comment about locking for kvm_io_bus_read/write
+      https://github.com/kvm-x86/linux/commit/37d8bad41d2b
 
-Otherwise, LGTM.
-
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
+--
+https://github.com/kvm-x86/linux/tree/next
 
