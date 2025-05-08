@@ -1,203 +1,166 @@
-Return-Path: <kvm+bounces-45889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45876-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91539AAFBEB
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:46:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DBB5AAFBC4
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B43384C281D
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:46:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BA3F3B6B1C
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D370322D9F4;
-	Thu,  8 May 2025 13:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E27822D78D;
+	Thu,  8 May 2025 13:42:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EmmrF1sJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K4lQFjwB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC3719309C
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 13:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58902AD20;
+	Thu,  8 May 2025 13:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746711974; cv=none; b=kOEGw0Ac7aY3Ez+t95wwdiuEFVW5DQecOabc9NLRDi9srpjZKaXvkXaBHYTi5DvTtHj8Oho7WPBXjRYJRBbF4fkwyz+pEiuzzO3IWQ8DP+DT7rCnDkC04gKkTwLUqEQ8YD1VV/ctSQgwJO1TqhGcKoZ2f5Tg9kTTA1LejK+Pfjo=
+	t=1746711741; cv=none; b=qrTpBpKcvWxq4pYLoTkBWcrXPpOY3vJC1nPHGA160mm6jm04GVG5ih2eJ6qeO138+p6VWmUSBy2hCQyr+P0yDJoB0fXRs76FhotP2ew+/kYpBRxNOEm7j0Z1GpvIhsl/iJ/YfcqhozsD762ocO7i1hf99x+u5HMsY8niNpmp7Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746711974; c=relaxed/simple;
-	bh=Ex2GpTr6GoUbDVEbeTQuvclJK0ug9LhPdAET+OSeF9I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j/b7b4m8QyLHLB5YDLNN8k1CegSbn0sxWjIvLgzZM6T+KPU2jzKj0xDnvaX8j9HNddwstMn6wYqLhWp71BESeP0zDHFnQqgW47k0RfG+E5tttQZ599kAfWlxGGEnqU/UVInAdO7V1MINXN+eEQinlGtOjjkgLMxNud4woRMR/xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EmmrF1sJ; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-736ad42dfd6so788477b3a.3
-        for <kvm@vger.kernel.org>; Thu, 08 May 2025 06:46:13 -0700 (PDT)
+	s=arc-20240116; t=1746711741; c=relaxed/simple;
+	bh=153T2wtHJJxhKb4N8JyfLhbRn1FPHrxAGrBpSnTQ1Pg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=NoV6Eip88ldXR3/Rg/rw9Pr4SSqrZr6aeZwjAJ7TPmJ1civ2Mg/XmuuAnhmbkVBiYFsXjD7Wxo7fhKBvT0wH55d9r9WzmTY/1ylDoJdQMzT/C9VFBSHdS3N7FfTuwV4h3CopBCmXSmLIlgtNjthinu5QmsOoX7JK/QOYUQJzPY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K4lQFjwB; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6f535b11824so9917146d6.2;
+        Thu, 08 May 2025 06:42:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1746711972; x=1747316772; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1746711738; x=1747316538; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dAEnpROpQK6DxM6uJJQ1bpWzbrmSzQalAkAVB3r0tgU=;
-        b=EmmrF1sJ08H7xxF5OcamGdHBn3q78Doo/E+vgGa1uNZAiHQ0SfMjbqWE/q/qU+lyQN
-         hiFbZGsBsEzVVCJx28+DlbnZhbt3GWzTf4fKLe6W2ELOxB682YH48NCNQwHzXmnB1L++
-         u87V7MwmLS/wUlPqu4ZdTMTY1WCA6sHsX85OZE9P3DA0NRah9IM4IyAzfJB4C7m1fCXx
-         X2NEacj6+fv2QsIVIkQzaxHAoVkeRSgQpH7CNxiKV1ZwK+QlSvuWj5xjXgrA+5BIpT2b
-         PDB13SRVmri8w1erV8xKtfX7ICmLGnmk4FfNIxVscsWtUO99rulIwDeFlLcDCckLgDoK
-         sDiQ==
+        bh=1kOzwqokdjdtpRm1HS1RudL4NN1LsmIuMPcFChDAi10=;
+        b=K4lQFjwBXG8thZwraL8b+Y55Z0UfHR4hTATsuFtRbCCYTkbbU1wwfKYANyI4Oo3RlZ
+         Ehf9UZfPR7CbPLvPFxJFUPjqq/nBdj4raID0en2KLFbFV6jxIoxunfPXgrhvEKWSf/Gn
+         +DXP6plyx6GJxRHGEB2lQmkmCSmm0wsG+BjikziQVtZ+QAdwYioCfclZyRFA3AOt/c/2
+         74Dryz+FFgE2esHXyYrxxq+Tx9rp2kvYlvuLh9eNe9Ec2aEgwTWOfe7XfZQIFbBSltFT
+         LlMekM0l7lyJdC83nRghW/0eANT9f54BPNfUPQrofmKTyJo11dnkMdr8yAm3OpKx7ITj
+         05Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746711972; x=1747316772;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dAEnpROpQK6DxM6uJJQ1bpWzbrmSzQalAkAVB3r0tgU=;
-        b=HjBff35Wlkxi4KFLtoiGKFwEEtG0g5vj3V0jm3bLiKQpxM7ZQyrcAAWV32XwL4TPq7
-         tgHWIaogoi931EA7WIU0SKJgoKWwm6frHLDNAhnrLWxGHR4lvuGj8ChtGjZSxwqBgTpL
-         ToCEVECEbl2UBWOhbzJOyLefQHtckpdjzHT7PemR6oQM+clg+YazKG1YEZ4Q5Y/M4B6g
-         ELybK+CmgYk+ugRf+9S95gpmeSkVCDRWwMZSkJ946FQZ/fhot9cwBFWdI/o0E4KpjAm6
-         ewURbbigVumMyXwMs7/SdptEubtfZeFAX5FEuC9PY5kWeSIlBBxtHpJdt9ju6o66Je7H
-         7CmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVA0oBclScB4FXIQqFD7tGMZIBD6nwN7mazmgdHTl9DWOd8osf9JjAt28OGgSQI7Bwwji8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIJ5fUhVd7/Hj8eMdoBTfaD7ojuHmVQyo2nqHZpChOut1HFhun
-	V5j2SKHC5x4A2ofTLZ5NHYmLKhyWl5KjfODNhdCHITLYHjaELTVZaOBIjNjjvLQ=
-X-Gm-Gg: ASbGncvbnS0wvMjtZ07z3ORkDwHvsHCvUTKSpdoL9eo6m3lt+fxLmQmd+/fUDmqYurX
-	dDZ8tvLA9LycUemNgQYptxvh7AZv6M+1fqhTWyqCnBDUBRLO8G0NUqZ5Z41ePVKYKRpXas+j1No
-	W5lH/t9un0aYJIHUVovkPCgJOMuYto47sJQqZVYYxktF6GYcC74lHZsH8MuH9w7pssRCqx1njGO
-	otxjGl258ZT+VO4P5pcPrRNadGngFTrnVJ65rDIVbMKlC9/ejCeHFyjpvYJIQmU82apoZzckcti
-	i+aDlyJfr2Loiar150h3oAX3zSiP6wai8J8oFHAqi9/bGw7luI68YPQ5QEr/TXf9l1tahbbG+/P
-	6brOfheV+WTc+VH0=
-X-Google-Smtp-Source: AGHT+IG9WzoCZnHzGx/rhe5MQGTbfwj2jk9eAlMQ107yUfErvTrwEaQ0R1H/OfqPr8whvcSNPiejCQ==
-X-Received: by 2002:a05:6a20:9f8f:b0:1f5:5ca4:2744 with SMTP id adf61e73a8af0-2148ba256e3mr9499152637.17.1746711972638;
-        Thu, 08 May 2025 06:46:12 -0700 (PDT)
-Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74058d7a397sm13221110b3a.28.2025.05.08.06.45.56
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 08 May 2025 06:46:12 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>,
-	kvm@vger.kernel.org,
-	Sergio Lopez <slp@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>,
-	Yi Liu <yi.l.liu@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	qemu-riscv@nongnu.org,
-	Weiwei Li <liwei1518@gmail.com>,
-	Amit Shah <amit@kernel.org>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	Helge Deller <deller@gmx.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Fabiano Rosas <farosas@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	=?UTF-8?q?Cl=C3=A9ment=20Mathieu--Drif?= <clement.mathieu--drif@eviden.com>,
-	qemu-arm@nongnu.org,
-	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Jason Wang <jasowang@redhat.com>,
-	Mark Cave-Ayland <mark.caveayland@nutanix.com>
-Subject: [PATCH v4 27/27] hw/virtio/virtio-pci: Remove VIRTIO_PCI_FLAG_PAGE_PER_VQ definition
-Date: Thu,  8 May 2025 15:35:50 +0200
-Message-ID: <20250508133550.81391-28-philmd@linaro.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250508133550.81391-1-philmd@linaro.org>
-References: <20250508133550.81391-1-philmd@linaro.org>
+        d=1e100.net; s=20230601; t=1746711738; x=1747316538;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1kOzwqokdjdtpRm1HS1RudL4NN1LsmIuMPcFChDAi10=;
+        b=hy2ygbw5K33BwdstMaY3nEPu7COU8in6CzpQbVkfX9cpVvI7dURn41Sw8YsE5cZdfS
+         Rc3eMN0DRuuBsN394/iQI49REhiKutSPSdwVIYdJE1layVt+OrNMKNpK3NXSmEIpBW79
+         ZFc6VxIhsRHTElS9ecQmY6sw1fdgRMInokOO1tIDXfF/5XzKTQExFGxd6It3DLMlTx5b
+         PZb5furnQEEFpRefb87xgnbZ3TYgzflR9GO1dVvoNWBfObPDykR74igSYkaY4dKV5eL6
+         NMiYunXn2LY9BNQOpsC73CPQzVoo68IgR25uYx8DIebCtw0rahUjLjtP+XC9zHmedU+7
+         a6gA==
+X-Forwarded-Encrypted: i=1; AJvYcCUAhwBt+66syOUdQo5n6GWM5hYvspP83/Cr5GHsR2o7vwk1MMQft/ucp3AKLA73+CiyscYb@vger.kernel.org, AJvYcCXAI2dCZ3tEV/dmGtQnNAhB5FlCmQ7Vx9f0HS8w9ChdA5o0ew5aftlkXMFZG042inHCISQ=@vger.kernel.org, AJvYcCXrARiGwdatrFtFDZDj0ioBj4xB5DN6d8qS0AfTSJ6qY39IyLKbjmby5lwdSLAvU4aVi/p2bHe4FTmOn8RU@vger.kernel.org, AJvYcCXvDPGkxCTF2rqervuGiaPuZCkGlGblltqN4PNGOUugoIq+gtjIifbkNROb3CaUMljHaP0s2rSQ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVgteS6sP/+3sKLh5pwbX85I+4KgZeLZi4byVFxSOny2i7SZYq
+	3WZty3qOUpboz77kiW22557IsesQbA1rKB+lFC5NJbotTnDQOBFb
+X-Gm-Gg: ASbGncvu7Gi+8G+qNxMTkf6bbBRe3DcR0A5H2UelIZSTWK1GOexSmWb+BOJL9pNl46J
+	D2iD+7i6Rj77kyBNs+KIwGzJmcZLmKWK++yPpkhSYkpj+asWnmxz94Ykw0QwXxby/t0Kpfq7Vrz
+	ubLFkB88UcmnpaASNfiOdJI4AlEdTKqgMlf7F+32UlcbebDjwmMp0qqvVNGINVWgoaRm8N2BrqN
+	WmFS94BRE73T/1Bi8c6JpuU9cF0TKpA58ELYJ1YTTmSuLBxY7wAT6mxK7gmRsrMmJhs5iwBRXDi
+	CNi8fbfWb/KkA08nXSJLRO/pXVe6ySO2aJD4IDRa/JqVSbrIvj5HVhhdehQYDcdFGgw/+Jduu3I
+	flgmmJen7+pDmiluLJ4Qy
+X-Google-Smtp-Source: AGHT+IEDWLW6skXKOvMqdSktE7GaftAPMmvo4fOx9NvYyBhUR9W13eB1A+ZbxTatn7NW27+k/I/Z2A==
+X-Received: by 2002:ad4:5942:0:b0:6e4:7307:51c6 with SMTP id 6a1803df08f44-6f542a8148amr99323396d6.34.1746711738227;
+        Thu, 08 May 2025 06:42:18 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f542780ecfsm32927476d6.86.2025.05.08.06.42.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 May 2025 06:42:17 -0700 (PDT)
+Date: Thu, 08 May 2025 09:42:17 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jon Kohler <jon@nutanix.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ =?UTF-8?B?RXVnZW5pbyBQw6lyZXo=?= <eperezma@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>
+Message-ID: <681cb4b95dde7_2583cf294d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <C9ADA542-813C-42C4-AF5D-92445EB70A6A@nutanix.com>
+References: <20250507160206.3267692-1-jon@nutanix.com>
+ <681b96fa747b0_1f6aad29448@willemb.c.googlers.com.notmuch>
+ <C9ADA542-813C-42C4-AF5D-92445EB70A6A@nutanix.com>
+Subject: Re: [PATCH net-next] vhost/net: align variable names with XDP
+ terminology
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-VIRTIO_PCI_FLAG_PAGE_PER_VQ was only used by the hw_compat_2_7[]
-array, via the 'page-per-vq=on' property. We removed all
-machines using that array, lets remove all the code around
-VIRTIO_PCI_FLAG_PAGE_PER_VQ (see commit 9a4c0e220d8 for similar
-VIRTIO_PCI_FLAG_* enum removal).
+Jon Kohler wrote:
+> =
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
----
- include/hw/virtio/virtio-pci.h |  1 -
- hw/display/virtio-vga.c        | 10 ----------
- hw/virtio/virtio-pci.c         |  7 +------
- 3 files changed, 1 insertion(+), 17 deletions(-)
+> =
 
-diff --git a/include/hw/virtio/virtio-pci.h b/include/hw/virtio/virtio-pci.h
-index 9838e8650a6..8abc5f8f20d 100644
---- a/include/hw/virtio/virtio-pci.h
-+++ b/include/hw/virtio/virtio-pci.h
-@@ -33,7 +33,6 @@ enum {
-     VIRTIO_PCI_FLAG_BUS_MASTER_BUG_MIGRATION_BIT,
-     VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT,
-     VIRTIO_PCI_FLAG_MODERN_PIO_NOTIFY_BIT,
--    VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT,
-     VIRTIO_PCI_FLAG_ATS_BIT,
-     VIRTIO_PCI_FLAG_INIT_DEVERR_BIT,
-     VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT,
-diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-index 40e60f70fcd..83d01f089b5 100644
---- a/hw/display/virtio-vga.c
-+++ b/hw/display/virtio-vga.c
-@@ -141,16 +141,6 @@ static void virtio_vga_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-                                VIRTIO_GPU_SHM_ID_HOST_VISIBLE);
-     }
- 
--    if (!(vpci_dev->flags & VIRTIO_PCI_FLAG_PAGE_PER_VQ)) {
--        /*
--         * with page-per-vq=off there is no padding space we can use
--         * for the stdvga registers.  Make the common and isr regions
--         * smaller then.
--         */
--        vpci_dev->common.size /= 2;
--        vpci_dev->isr.size /= 2;
--    }
--
-     offset = memory_region_size(&vpci_dev->modern_bar);
-     offset -= vpci_dev->notify.size;
-     vpci_dev->notify.offset = offset;
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 7c965771907..4e0d4bda6ed 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -314,12 +314,9 @@ static bool virtio_pci_ioeventfd_enabled(DeviceState *d)
-     return (proxy->flags & VIRTIO_PCI_FLAG_USE_IOEVENTFD) != 0;
- }
- 
--#define QEMU_VIRTIO_PCI_QUEUE_MEM_MULT 0x1000
--
- static inline int virtio_pci_queue_mem_mult(struct VirtIOPCIProxy *proxy)
- {
--    return (proxy->flags & VIRTIO_PCI_FLAG_PAGE_PER_VQ) ?
--        QEMU_VIRTIO_PCI_QUEUE_MEM_MULT : 4;
-+    return 4;
- }
- 
- static int virtio_pci_ioeventfd_assign(DeviceState *d, EventNotifier *notifier,
-@@ -2348,8 +2345,6 @@ static const Property virtio_pci_properties[] = {
-                     VIRTIO_PCI_FLAG_BUS_MASTER_BUG_MIGRATION_BIT, false),
-     DEFINE_PROP_BIT("modern-pio-notify", VirtIOPCIProxy, flags,
-                     VIRTIO_PCI_FLAG_MODERN_PIO_NOTIFY_BIT, false),
--    DEFINE_PROP_BIT("page-per-vq", VirtIOPCIProxy, flags,
--                    VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT, false),
-     DEFINE_PROP_BIT("ats", VirtIOPCIProxy, flags,
-                     VIRTIO_PCI_FLAG_ATS_BIT, false),
-     DEFINE_PROP_BIT("x-ats-page-aligned", VirtIOPCIProxy, flags,
--- 
-2.47.1
+> > On May 7, 2025, at 1:23=E2=80=AFPM, Willem de Bruijn <willemdebruijn.=
+kernel@gmail.com> wrote:
+> > =
+
+> > !-------------------------------------------------------------------|=
+
+> >  CAUTION: External Email
+> > =
+
+> > |-------------------------------------------------------------------!=
+
+> > =
+
+
+Minor: can you fix email to avoid the above?
+
+> > Jon Kohler wrote:
+> >> Refactor variable names in vhost_net_build_xdp to align with XDP
+> >> terminology, enhancing code clarity and consistency. Additionally,
+> >> reorder variables to follow a reverse Christmas tree structure,
+> >> improving code organization and readability.
+> >> =
+
+> >> This change introduces no functional modifications.
+> >> =
+
+> >> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> > =
+
+> > We generally don't do pure refactoring patches.
+> > =
+
+> > They add churn to code history for little gain (and some
+> > overhead and risk).
+> > =
+
+> =
+
+> Ok, I=E2=80=99ll club this together with the larger change I=E2=80=99m =
+working on
+> for multi-buffer support in vhost/net, ill send that as a series
+> when it is ready for eyes
+
+I forgot to add that it makes stable fixes harder to apply across
+LTS, distro and other derived kernels.
+
+So resist the urge the just make stylistic changes. Functional
+improvements warrants the risk, churn and extra work.
+
 
 
