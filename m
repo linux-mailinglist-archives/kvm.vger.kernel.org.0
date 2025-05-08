@@ -1,74 +1,76 @@
-Return-Path: <kvm+bounces-45899-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45900-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1574AAFD2C
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 16:34:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C21A0AAFD19
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 16:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C58A3AC690
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 14:31:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29CF17E3A8
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 14:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD58270EB3;
-	Thu,  8 May 2025 14:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721D5272E5C;
+	Thu,  8 May 2025 14:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="buzb7CJi"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="OBUU/7uL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E643A267AFF
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 14:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07FE26D4E0
+	for <kvm@vger.kernel.org>; Thu,  8 May 2025 14:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746714711; cv=none; b=oyS6ceb+rLpmNsziJ1XrC5z/PfgkBAolNM95xGcpRmuGz10gvL9qlo/1zATcGE2LKeO5xesRZZoCbbeH2myg9/ckCYvSe0z8gRKWRnQUW3MTp7njZTMxRzKjQfNlF7Pg9uCeXVCKpUtCxHfKn08FMqQkXU4tByI7udaNIaVP8lM=
+	t=1746714712; cv=none; b=pPo7ayJkAkA+PLryRtbcm5XKXNIQczaSLb8MEvoV6V7yeoDxjU0VQwv709mn9LUyi+ke6pZvTpDc/mcwgE1GzHvB/frB89jctIEGpXcgZcBQfMNCOt64TWyLc0dPVA4TEy4CUeXjxrw6wJIMgVJPkdROGHF84wMnaCB6uKu4GNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746714711; c=relaxed/simple;
-	bh=iUSd5zriQovA+xk3dbyKc3xJaU2/s9aca/08pvkCKbE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EEQfoGPeNK7KhEWpJqHbOceJ1uWxlJoYoIFp+Xx4U9MJD/FOTOTmeoJ+nl9viYwgB9efgJy6OwkOLhsqKjb9PtUeY58ITH2/f33St8I3kv3iWI/+cGvnVCK2/XGUcYD+CCHj6OJuUzfDYGuTmup2NG9YBSzCgM4LFISVqgtacZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=buzb7CJi; arc=none smtp.client-ip=209.85.128.41
+	s=arc-20240116; t=1746714712; c=relaxed/simple;
+	bh=vvs7XvP+K3DBZ3mhg7d2yMjiTj87uIFFO65p7EPD0XI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cWuBE3Bbb+bG568TIaetVo4L5yi8Hr0JKuCO/7OoqWCz0c9wh9sSmiHw7PyyJrO1E5AO8JaAe+oFRF3q+3cHk5yo8ntytxDSSxbkxHcmYdM/L8zZt8KPZkU+566jncmD1WJ5avWT8Rbq8J2Nt5Nf/4USGNems7wiSTVLEIXk9bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=OBUU/7uL; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43f106a3591so407985e9.3
-        for <kvm@vger.kernel.org>; Thu, 08 May 2025 07:31:49 -0700 (PDT)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3a0b5b90b7aso147447f8f.1
+        for <kvm@vger.kernel.org>; Thu, 08 May 2025 07:31:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1746714708; x=1747319508; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=J289PIBzAx7Tr0WnqlsEi/cyRMc03tLDH2ivRhYAjbA=;
-        b=buzb7CJiqalCXS9DacOLDFhL5OKqhBpJFVYSOJKOA499sPmrREixwnweMoDIYZQv+l
-         UY1McDE1bSbl8iPEqTJR2kh7plG7naOCvBarLB5GYFsxQd/EM2O/6ZHmhgETjFHvAnJI
-         OmY49BHTHvoz8dY+yJ9h5z0axC0wFbvDugCiIWncQIwHp2pbM9eB8+kNyeVavFGdpAqd
-         mvhI/11ktcPJ4s/uuH8wELbHX4GiaKa62YRjkzxfICzXackcEo33us4MyPA3w3hkE2iX
-         I/p7pJPe7Yjjvy0JXQxE/sTh3HwmJHeE6l/ODiLqdnsqXsp+EoVreY56j86n2m6Q+pk4
-         DqEg==
+        d=ventanamicro.com; s=google; t=1746714709; x=1747319509; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Npf5Cp02vjjlOhdcHZRyKHohJloygz1xYGChAUxnU34=;
+        b=OBUU/7uLuwf/9srYtwK3JO+6m0fi30krBiAVBgJlvR0kFa8B1L4Tw4JKLyOD74yQ+N
+         RtgPPSE3RHaljlk54t8hGGQxt8jqZd8QZZucJNvugqhvxa3XhEb87b9/4onMNSS2f9hV
+         iLkJjUSZZPAr21YKC+/AeHLY/Xh0KZ3aF7AVxYnLo4gAyRBz3MXZFSrK63CH7F5fpGCM
+         VhuX0NHH86bualYUDwfKKSlpjoKHUwrHXdVOkxVi7LoJkD7+m0CJn8vKQEGpcIgKlZr3
+         LWL3pZm4YA3lfhmuqhpH1uBZ7bVZn2c4Qf6f2s3ev4/ifSc+KT3Et5DcpfUspycWmq1r
+         l+Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746714708; x=1747319508;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=J289PIBzAx7Tr0WnqlsEi/cyRMc03tLDH2ivRhYAjbA=;
-        b=kkc4mRaXp1vJFOsAZ6SoJZBCSocXz6zoTchbI5tcslFHpNDQZx3/YyK7Vmvz1mJsn+
-         5nc9APBqYRnpUrQWqH4409iuaa/yGSqnSF573MKVvPQ2I8xlcaoaYRqny2MkztWARPgz
-         g1RIhLa4zloEarCmMqbJn+TQElLrIp5rbeveeDa2LTlXeVtaRopPf11v6s5+kveiHJr2
-         SaqnxJ/IiW9pHYHP35rZRVwSmSuAtXq4fmBCLMcmUm144UvKhgwrGNg0Ik1NFKddFc+d
-         jfPGADnAV3phhlKxSjjMndBZaF7g5/GBUhMG1FsqeOaxDmtMowv574lsX0zjge9wRTeF
-         CvIQ==
-X-Gm-Message-State: AOJu0YzOdR03w1qxAE4RJbrqzbuM9thGkhiGsd2KYUUsnP+1hjCPOxN3
-	DmdBM3CvXECHmgb5cGnBVo8LFMMWsqpTi43vrJpPnscII5zYiylegm6586rqWFU=
-X-Gm-Gg: ASbGnct9V7igyx3kX7okNwBiTA7uqvxxGoGSeb63l826ezmgDW8e+hJRQ9JE/rHBuds
-	ReTsH+RueUO4352IMfo1p8LahP4/Xxiadodwz3tmTBApEoMjwrOcriYaYxZLm4mReXe67anBkNi
-	jsMmz46fJcvwYI/QUyx9Zf1sNeX0ZkplWi0JxOrIrvCCBt0fRGmwxh3wzIPr8oxbgO9KqmQbPUV
-	rxN5xwBduYaNBSp0RkBUJ5HasIoatMFGfNImZHkYKPqPrVMjZFmoI9mMIRPqoRjrc6wirMUocj2
-	XElNf0+Ol/paTcwZhaWvPS1FKOJ7aFFovK92jl4M8rTLikO8
-X-Google-Smtp-Source: AGHT+IERiYDpBDm+YzS6PrcsAiPhkSZhHoyL95j9WWRBe54YT3aYnzBdh6Eog8U2+DIPfLiIAXgnoQ==
-X-Received: by 2002:a05:600c:83ca:b0:441:c1ae:3340 with SMTP id 5b1f17b1804b1-441d44bcaabmr24998165e9.1.1746714708028;
+        d=1e100.net; s=20230601; t=1746714709; x=1747319509;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Npf5Cp02vjjlOhdcHZRyKHohJloygz1xYGChAUxnU34=;
+        b=LAt/vjQxLTuriZPu/93YH+lCG2ly4k1/U+MdBT/J+5UTS/x319CGhlL99Aj90H8rJn
+         XayjTkSt8RSkrjHdp24BVgWbn7TY5vkomRJ8rUxC2wAZDL4Vlvz7vJr/yIrBVzUwS7HD
+         RsSbIKhPY7IfzDy9JIPQDtVUeoAHh5Itg656w65rtCUJ4Q5l0WqPwRfc0Z0mS8EgQLAG
+         siVjVXu3yOmve2f8dxVlRNies4fUoTqHXa31J697duvImhiJW33iEJrZsSWcvjWa1lNA
+         7Ch6DxlEBGjt3XhqZXLNEbNTsrUzFRMTl9QtLVIr7Abypu8ld1G4VPV4u7dFS5K/p5sz
+         7iLg==
+X-Gm-Message-State: AOJu0YwH+ucJ5+rwVAtHTXT6Zwr3cCktVJaCsXtAk7tO4CoSfr6IxdBm
+	UWx6WnLLZN9LffnKVmb6gAlKeVa7mol5hXkQbq5k8dUrsFx3RTVwse4lU014Y3g=
+X-Gm-Gg: ASbGnct/dTb1nRmdzjM6JNrwfcEtOXc2tkBlSQKs2rOY8mCj3KYzBGizcpGLirYPXDg
+	jd8aEKH648VNaOeAMHKsCt0xphiDfr7rVwZfudtv66m4maKqJXrZMvEeABMQxFWK88fBFMLWEk1
+	ROQTOXmEIn0F4JsNfCMpw74ZJ20SQTxxlL+xvIx2B2RyxDqpnCqypEhR2KN/lU9m4PbGMGH4rUz
+	vTLccP5ascJqCxR6FupZEHh5ndJT4ilJWMYvMkwAwXj5rxJcVpH9TyK3OeNxGcWoX8h2pUfGMjR
+	Q1d0JzO1bAfT0eoxbazxjhbBHW1Tl4Fmm/mkXyrvACNTicVC
+X-Google-Smtp-Source: AGHT+IFDKtOArIEDhyzzyyo9ibITZPppPGTsVRUFviwEpobpTYwXsYjaHuTW7dWWMam5suhtm71qqw==
+X-Received: by 2002:a05:6000:2dc6:b0:3a0:b3ad:6636 with SMTP id ffacd0b85a97d-3a0b4a0356fmr2554909f8f.4.1746714708992;
         Thu, 08 May 2025 07:31:48 -0700 (PDT)
 Received: from localhost ([2a02:8308:a00c:e200:a451:a252:64ea:9a0e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442cd32f331sm39844285e9.13.2025.05.08.07.31.47
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58ecccbsm147512f8f.32.2025.05.08.07.31.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 May 2025 07:31:47 -0700 (PDT)
+        Thu, 08 May 2025 07:31:48 -0700 (PDT)
 From: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
 To: kvm-riscv@lists.infradead.org
 Cc: kvm@vger.kernel.org,
@@ -81,10 +83,12 @@ Cc: kvm@vger.kernel.org,
 	Albert Ou <aou@eecs.berkeley.edu>,
 	Alexandre Ghiti <alex@ghiti.fr>,
 	Andrew Jones <ajones@ventanamicro.com>
-Subject: [PATCH v2 0/2] VCPU reset fixes
-Date: Thu,  8 May 2025 16:28:41 +0200
-Message-ID: <20250508142842.1496099-2-rkrcmar@ventanamicro.com>
+Subject: [PATCH v2 1/2] KVM: RISC-V: reset smstateen in a better place
+Date: Thu,  8 May 2025 16:28:42 +0200
+Message-ID: <20250508142842.1496099-3-rkrcmar@ventanamicro.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250508142842.1496099-2-rkrcmar@ventanamicro.com>
+References: <20250508142842.1496099-2-rkrcmar@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -94,59 +98,37 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hello,
+This got missed when the series was applied out of order.
 
-v2 abandons the idea of fixing current userspaces and adds a new
-capability that uses MP_STATE to immediately trigger a KVM VCPU reset --
-a single-purpose interface free of any unintended side effects is
-desirable and MP_STATE is somewhat bendable, which avoids the need for a
-new IOCTL.  It's very dirty, though, so I'm not happy with it.
-
-I have prepared a preview QEMU implementation [1] and only did light
-testing with kvm-unit-tests as I still expect a high-level discussion.
-
-Because it didn't take much effort on top, v2 expands the goals --
-userspace can now choose the same post-reset state for all VCPUs.
-(This is achieved by returning from userspace on sbi_hart_stop; let me
- know if I should rather do that with another KVM capability.)
-
-This series does not fully address the VCPU hot-unplug.
-We still need a better KVM interface there, because the VCPU stopped by
-sbi_hart_stop is still assumed to be present by sbi_hart_start.
-
-I see roughly two options, with different drawbacks:
-* add a new MP_STATE for the SBI HSM acceleration in KVM
-* return to userspace even on sbi_hart_start and sbi_hart_get_status
-
-(We might want to have a better interface for handing SBI in userspace
- anyway, so that could be handled later.)
-
-v2 is based on kvm-riscv/riscv_kvm_queue, 376e3c0f8aa5 ("KVM: RISC-V:
-remove unnecessary SBI reset state").
-
-Most of the patches from v1 got merged, thanks Anup, so v2 only contains
-the completely redesigned approach [2/2] and a minor code style
-improvement that fell through the cracks when the patches got merged out
-of order [1/2].
-
+Signed-off-by: Radim Krčmář <rkrcmar@ventanamicro.com>
 ---
-1: https://github.com/qemu/qemu/commit/dec042841f383c6a825b1642b86d9f585778a2e7
+Feel free to squash this patch with 376e3c0f8aa5 ("KVM: RISC-V: remove
+unnecessary SBI reset state").
+---
+ arch/riscv/kvm/vcpu.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Radim Krčmář (2):
-  KVM: RISC-V: reset smstateen in a better place
-  RISC-V: KVM: add KVM_CAP_RISCV_MP_STATE_RESET
-
- Documentation/virt/kvm/api.rst        | 15 +++++++++++
- arch/riscv/include/asm/kvm_host.h     |  3 +++
- arch/riscv/include/asm/kvm_vcpu_sbi.h |  1 +
- arch/riscv/kvm/vcpu.c                 | 39 ++++++++++++++++-----------
- arch/riscv/kvm/vcpu_sbi.c             | 17 ++++++++++++
- arch/riscv/kvm/vcpu_sbi_hsm.c         |  7 ++++-
- arch/riscv/kvm/vcpu_sbi_system.c      |  3 ++-
- arch/riscv/kvm/vm.c                   | 13 +++++++++
- include/uapi/linux/kvm.h              |  1 +
- 9 files changed, 82 insertions(+), 17 deletions(-)
-
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index 7cc0796999eb..a78f9ec2fa0e 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -60,6 +60,7 @@ static void kvm_riscv_vcpu_context_reset(struct kvm_vcpu *vcpu)
+ 
+ 	memset(cntx, 0, sizeof(*cntx));
+ 	memset(csr, 0, sizeof(*csr));
++	memset(&vcpu->arch.smstateen_csr, 0, sizeof(vcpu->arch.smstateen_csr));
+ 
+ 	/* Restore datap as it's not a part of the guest context. */
+ 	cntx->vector.datap = vector_datap;
+@@ -101,8 +102,6 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_riscv_vcpu_context_reset(vcpu);
+ 
+-	memset(&vcpu->arch.smstateen_csr, 0, sizeof(vcpu->arch.smstateen_csr));
+-
+ 	kvm_riscv_vcpu_fp_reset(vcpu);
+ 
+ 	kvm_riscv_vcpu_vector_reset(vcpu);
 -- 
 2.49.0
 
