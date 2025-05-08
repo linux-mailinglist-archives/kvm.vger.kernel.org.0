@@ -1,129 +1,136 @@
-Return-Path: <kvm+bounces-45851-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45852-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C956AAFAF8
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:11:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5CC8AAFB12
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 245234A404F
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:11:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D24EA3AD7EA
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0600C22AE7E;
-	Thu,  8 May 2025 13:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FEF422AE59;
+	Thu,  8 May 2025 13:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="xH7ZZVDq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dBrhXZe4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BE322154A
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 13:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2060F17BA5;
+	Thu,  8 May 2025 13:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746709882; cv=none; b=s6f+pvI2Authx1WyIGrSvqq2+KGdqyX99Cs0n5V7STczEGPOSqTAXqZNkzSZvgvK56F7imv+Nne9vZ/6xm9cIw1c6XWeuHpiDz+CUz+qdFeZc9c5nrdg5bXAaf4ZT2FrvwhZsg3K2HLVoFHZjScYpyO3dDQAFA+mJMUwcyEDE6g=
+	t=1746710217; cv=none; b=Dmw8jH5feG6T7RvrRcjFWpJ4SGsrWGaEX6pHkmojAFK7p1CebJo2/XsEsSbrPYrI1ILPV7sEMTp9i68EIlugu8Lbqzy7eBKAj+OUdin0Alxj7ztSLZtewJj2sUWkI2S8r964NIuLAFYS6pYm5xS6efskh/fNZKuc9LDedw/JcwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746709882; c=relaxed/simple;
-	bh=1wwTO5Nw42Ep7tw3uZOYZ34griFSvPoI6Sesn0+sV5w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HRd5yAbVYyy3i3CMM/fHuj6oOpP6cx49bf7D6p/Q7KVuSNM7GlwoLTQl1ZqaxnFkmqIFaru0ckUk4vO9bwVs0HproSCONkrPoFZnx/ZUlnnhzPkLH/UecY6f36361stbtpaMXYDZnEOlc3nQA+XPCsWylHs0aarH7I2gcbQFQmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=xH7ZZVDq; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3d940c7ea71so4600935ab.0
-        for <kvm@vger.kernel.org>; Thu, 08 May 2025 06:11:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1746709879; x=1747314679; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nIIzVOYBzARToag3Hu6HMwC8LbExnwHHAZ9eRtDBxjM=;
-        b=xH7ZZVDqzqiI4rdOwYagK9n1lQnbR7IHdnlMMZzJ4v8b7+I2yRvvuGXkuFHI++t6JC
-         tzn53s6nw/14/jCIqQZFah61+ZYQ0ASTKVsVBhi0ZkWOAoh/aEUiJGn78Y+Fad139v7v
-         9rhtLaDsZoj1QrkC/fzeQJX5nS9J3VFNlogJgzWg+WOW22c+ZEo6Gh+c3PmiLZxFGVDQ
-         8iW/nleDxXS8USd7kM/TCjFBlFq9ULnixiENny4bJVM1WLc8TxJ6NzRXT9OXdXJShyhX
-         gKqiv8YIF0zIhuGm+7sJKorjs2I3rXfTIGbNQhXd/41njfnKJRe+CAkZtgtpBXYlnU6Z
-         cFEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746709879; x=1747314679;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nIIzVOYBzARToag3Hu6HMwC8LbExnwHHAZ9eRtDBxjM=;
-        b=anK80pJk2Nnio7sNinnOi5ryu0jOAXKBBwQQPdPXBLNJdgXnvBuDVtijSt12TsErnR
-         agvC+isUJqYuH/RZlP1/p6ZOL4Nv/ERz/waJyo+M5plqf84N/zvXlpkZ8K1xnN6lEeYH
-         HfAPYBXLllhZlzfS6GsiW/LneSsOOEsQHfE3JcRiXN6+IDq3FQ7JF5xfITl7HW95Mn8P
-         lqm1vEkMzdoi7U9j+MuWBdISjF+Qj8ThKuVQJ+YkPng8vW/zSLBjXmzXBy5ox5t9juCS
-         beakJMkVc/U6WGe48PAulKBCGYp4zqr+fpk3akRV+EY7zBgV+a+Amiu/ue2jSkoet9Mb
-         XnHA==
-X-Forwarded-Encrypted: i=1; AJvYcCUY807fevhxY+iRcOYS7zojaBBO9HwyDzgEkc5FDU4OLdDQBOW5Woae10Do46Kj2+XwbOw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxyb9QJsqFf0lh3c/levQStXl2T6RUBpQ8VMOzkrOQlr9eLcgbf
-	U00IUIY5BMz+zUZjiH6sGYReVQjq6TX09NqGJ6xmdj754Y+4flrJxpyKe4T2LDt4o7Objvvqjv3
-	V/N3BJTqnlCw7D+/PUG2s4hEfcneDjr/edpXoxw==
-X-Gm-Gg: ASbGnctvQYs8OSmCZ8odO8k8iGYFpBSlXay186/G+ACspkdfb7EOc8craQzcmFcp6uX
-	/c4UUFuisxkFCY25FoeG/miu731xmBZQmkukXd0X65m4bkOMEsYclJm1EmUpQHreFYrVLbEiH9K
-	PMiUPs5JvMwpC9G2WhBKyiysjZcy3qlTCung==
-X-Google-Smtp-Source: AGHT+IHQLQeo4Cv5ChZYTmyYcmLv/sbqMMoInT3yPEcu0Vzy2BhXgfYdd3qe4Af9myyCvg8pUIR3RpvOggHqQ9hf9zI=
-X-Received: by 2002:a05:6e02:1809:b0:3d8:2178:5c63 with SMTP id
- e9e14a558f8ab-3da738d5abcmr87761745ab.4.1746709879462; Thu, 08 May 2025
- 06:11:19 -0700 (PDT)
+	s=arc-20240116; t=1746710217; c=relaxed/simple;
+	bh=DmYv1BhRdwdssj9Hn9d+R6TbeoEowIXHu2HfHaVqAF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uOkyb6/P4CFAB04qQQ/W+1DYtw29Wgdllmb85km7k2e8vSApRi0zvs6SK0umMv8PszTwAKDewu274Y/tP1YZtQSp6OfLBt7E7lz9fEaYDzib3K/7+78eR+wPKgwM1RQtbubzmKMviflREuWToEaGifTF+TkpkNSr0RAZvr998sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dBrhXZe4; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746710216; x=1778246216;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DmYv1BhRdwdssj9Hn9d+R6TbeoEowIXHu2HfHaVqAF8=;
+  b=dBrhXZe4kNjoOFDU8j2Jc48JyMEsu0rQP/y/RezaGRPY3aXo1+NgBmVM
+   XAI32Wi9cJLoi9TGOri6MNqXhkKAG/FIreZxal6PtE/loMJ6VJSwOZOkH
+   HKJS8gBngkvFxosPzEztgwCVYbZu2Jn3ydbJ9yAOUjjHCq/vAJe87SE1C
+   E+62ja3sBzYHkPkFowhSxyn6D5KKC5o13DPCfeDk2Ij8Q09ZMk/BccDzs
+   x2TWzqUISzWW4uCupYrUWAQytnWlL/470ZrR8fkT0I3k0iBEGOfpW25L8
+   C9qCLMcpmRyutXtWQ2bwL5JuCmgB2wySikMfMOMq18WXqcIgGC8Rtir6R
+   Q==;
+X-CSE-ConnectionGUID: DfoMcpNeQi6+EKy0A51l0w==
+X-CSE-MsgGUID: apikCU3bQ4yk3Yq9zV3sdA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="52300270"
+X-IronPort-AV: E=Sophos;i="6.15,272,1739865600"; 
+   d="scan'208";a="52300270"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 06:16:55 -0700
+X-CSE-ConnectionGUID: dieNcDOZTKOjMru2aC3yxw==
+X-CSE-MsgGUID: kAVd3o24S3it0zdYcVDrjw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,272,1739865600"; 
+   d="scan'208";a="159595613"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmviesa002.fm.intel.com with ESMTP; 08 May 2025 06:16:52 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+	id 0FD5119D; Thu, 08 May 2025 16:16:50 +0300 (EEST)
+Date: Thu, 8 May 2025 16:16:50 +0300
+From: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: "Huang, Kai" <kai.huang@intel.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com" <seanjc@google.com>, 
+	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC, PATCH 05/12] KVM: TDX: Add tdx_pamt_get()/put() helpers
+Message-ID: <cu332ci4fvpgb6akgpg3p53336qndi36px5osfv57vcq5u3din@kxu2diy723tq>
+References: <20250502130828.4071412-1-kirill.shutemov@linux.intel.com>
+ <20250502130828.4071412-6-kirill.shutemov@linux.intel.com>
+ <55c1c173bfb13d897eaaabcc04f38d010608a7e3.camel@intel.com>
+ <4bb2119a-ff6d-42b6-acf4-86d87b0e9939@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403112522.1566629-3-rkrcmar@ventanamicro.com>
- <20250403112522.1566629-6-rkrcmar@ventanamicro.com> <CAAhSdy3y0-hz59Nrqvvhp=+cWJe1s50K7EpuZmKBqfy-XQFd1Q@mail.gmail.com>
- <D9QOY9TMQXSX.2VOEKVRCXKOO1@ventanamicro.com>
-In-Reply-To: <D9QOY9TMQXSX.2VOEKVRCXKOO1@ventanamicro.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 8 May 2025 18:41:08 +0530
-X-Gm-Features: ATxdqUFytTSYeO2NMWgtWuuoNAjjyJfo1ZnV22TOYS1tMfbGTisHt7Mnprxdk_c
-Message-ID: <CAAhSdy0-9OQmBf2VkJJFb+Gmwk3hmNapkjvJYvT06CG9eULDgQ@mail.gmail.com>
-Subject: Re: [PATCH 3/5] KVM: RISC-V: remove unnecessary SBI reset state
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Andrew Jones <ajones@ventanamicro.com>, 
-	Mayuresh Chitale <mchitale@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4bb2119a-ff6d-42b6-acf4-86d87b0e9939@intel.com>
 
-On Thu, May 8, 2025 at 3:32=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar=
-@ventanamicro.com> wrote:
->
-> 2025-05-08T11:48:00+05:30, Anup Patel <anup@brainfault.org>:
-> > On Thu, Apr 3, 2025 at 5:02=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkr=
-cmar@ventanamicro.com> wrote:
-> >>
-> >> The SBI reset state has only two variables -- pc and a1.
-> >> The rest is known, so keep only the necessary information.
-> >>
-> >> The reset structures make sense if we want userspace to control the
-> >> reset state (which we do), but I'd still remove them now and reintrodu=
-ce
-> >> with the userspace interface later -- we could probably have just a
-> >> single reset state per VM, instead of a reset state for each VCPU.
-> >>
-> >> Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@ventanamicro.com>
-> >
-> > Queued this patch for Linux-6.16
->
-> [5/5] was already applied, which means that [3/5] would be nicer with
->
->   memset(&vcpu->arch.smstateen_csr, 0, sizeof(vcpu->arch.smstateen_csr));
->
-> in the new function (kvm_riscv_vcpu_context_reset) where we memset(0)
-> the other csr context.
->
-> Should I add a patch to do that in v2?
+On Wed, May 07, 2025 at 09:31:22AM -0700, Dave Hansen wrote:
+> On 5/5/25 05:44, Huang, Kai wrote:
+> >> +static int tdx_pamt_add(atomic_t *pamt_refcount, unsigned long hpa,
+> >> +			struct list_head *pamt_pages)
+> >> +{
+> >> +	u64 err;
+> >> +
+> >> +	hpa = ALIGN_DOWN(hpa, SZ_2M);
+> >> +
+> >> +	spin_lock(&pamt_lock);
+> > Just curious, Can the lock be per-2M-range?
+> 
+> Folks, please keep it simple.
+> 
+> If there's lock contention on this, we'll fix the lock contention, or
+> hash the physical address into a fixed number of locks.
 
-Yes, please add it to your v2. I will update my queue accordingly.
+I had this idea in mind as well.
 
-Regards,
-Anup
+> But having it be
+> per-2M-range sounds awful. Then you have to size it, and allocate it and
+> then resize it if there's ever hotplug, etc...
+> 
+> Kirill, could you put together some kind of torture test for this,
+> please? I would imagine a workload which is sitting in a loop setting up
+> and tearing down VMs on a bunch of CPUs would do it.
+
+It has to be multiple parallel creation/teardown loops. With single TD we
+won't see much concurrency. Most of PAMT allocations comes from single
+VCPU.
+
+And it makes sense to do with huge pages as it cuts number of allocated
+PAMT memory allocated on TD creation by factor of 10 in my setup.
+
+JFYI, booting a TD with huge pages consumes 1-2MB of PAMT memory. I doubt
+any optimization here is justifiable.
+
+> That ^ would be the worst possible case, I think. If you don't see lock
+> contention there, you'll hopefully never see it on real systems.
+> 
+> I *suspect* that real systems will get bottlenecked somewhere in the
+> page conversion process rather than on this lock. But it should be a
+> pretty simple experiment to run.
+
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
