@@ -1,225 +1,818 @@
-Return-Path: <kvm+bounces-45962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45963-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC27FAAFFAC
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 17:55:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A725DAAFFC2
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 17:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4084A4A4180
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:55:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30CF69C7303
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8382E27A137;
-	Thu,  8 May 2025 15:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZIv40hw8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3485527A11A;
+	Thu,  8 May 2025 15:58:37 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE79F278E7A
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 15:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772CA27935C
+	for <kvm@vger.kernel.org>; Thu,  8 May 2025 15:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746719725; cv=none; b=VujmXmvs9XPGwMQpGmdvopwCRq7ZUJzIG4PluqaOAt9ISs75QbwXMxIWjTO49oWJAIxgrnu1iuohAEg8h1UOw+YntwVKd0OLKNCklxBI2HvHW8GYeXgyPIpBkwdTw3WGinpLzdpRHSi6HeNr12utrAK0hAj6DNdAkL5dhPfJZeA=
+	t=1746719916; cv=none; b=LNR+au0JtDQULShc03kwaRotAfwiWv1PqdGEijpXDLBz2ZyKJMbRnU01HAIT2JeoVo9DSFF7NrJCDxT4yEx+yx9sTpBq8zFX3e9resjQ6Kf3M0zNKy3d5QcGhYhade/AYRzmdd7ldzFbbQeNP/68+ASc4kltf8l3vU9yjdTEiKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746719725; c=relaxed/simple;
-	bh=UvGQn86vy5zz1K8jP/Ljlp96tviKchKyZnUa1D+9Ih8=;
+	s=arc-20240116; t=1746719916; c=relaxed/simple;
+	bh=FKWByjcf8uYv5D2Guj3u8GEpurup/IwW1llj9WHtsn8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P+wy2mQt89AHuvCI5kUjvplCCzOt6jcKiM8ruBtcq88JJxChfhbIVGqkq8P+6FKl5yRQXrEq6gWu7L9IlA1pvWXti8le9ZZCHAle426uCqI+jo8pAxNUfF0c2P+HM5JPB7kmIrA1GqA8RXFaKclCfIF7gyenN2jkEDGhpMxXP/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZIv40hw8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746719722;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w3d91AHD4clB0RQ00C0mx2TAXwRVJvVkELCY+u8Jl1U=;
-	b=ZIv40hw8v8CILJu+wJImTE+HkxMEUtGYGEcftQdrxeQU86iKr+mfr3eeqsNXpqfloG967V
-	cY00/hO9aubxSWg316qnfvbKbReU5UO9lP8g9CjqDZ/zNd9/jxpXicR8kFhYBdDbcEFlWZ
-	T0ar3hPJKgmVlTTr6zOJ+AGQmacaRuM=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-19-uYY0jpVhPvq486ytN91hIg-1; Thu,
- 08 May 2025 11:55:19 -0400
-X-MC-Unique: uYY0jpVhPvq486ytN91hIg-1
-X-Mimecast-MFC-AGG-ID: uYY0jpVhPvq486ytN91hIg_1746719718
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1275D1800446;
-	Thu,  8 May 2025 15:55:17 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.138])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D95E918003FD;
-	Thu,  8 May 2025 15:55:12 +0000 (UTC)
-Date: Thu, 8 May 2025 16:55:09 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Francesco Lavra <francescolavra.fl@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-	qemu-devel@nongnu.org,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>
-Subject: Re: [PATCH v9 13/55] i386/tdx: Support user configurable
- mrconfigid/mrowner/mrownerconfig
-Message-ID: <aBzT3TrdldaN-uqx@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20250508150002.689633-1-xiaoyao.li@intel.com>
- <20250508150002.689633-14-xiaoyao.li@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EvDbhBlCW0CSDCNN75q77fOVmSw/UG/N+9TXz4fRYuTJ1oY9TAdHYEiiA3StOyqDwViciGjuMd1skqyWyP+QP5KIP7S6GvQfFIhnqhHk1FnauJ7PPk8jU7NeO2Bum5jT5jfDiCb6MJmI2qi6zzpLEuM6NwyvYkzBxB/dGK3D6kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 524C91E2F;
+	Thu,  8 May 2025 08:58:22 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A172C3F5A1;
+	Thu,  8 May 2025 08:58:30 -0700 (PDT)
+Date: Thu, 8 May 2025 16:58:28 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>
+Subject: Re: [PATCH v4 31/43] KVM: arm64: Switch to table-driven FGU
+ configuration
+Message-ID: <20250508155828.GB3256485@e124191.cambridge.arm.com>
+References: <20250506164348.346001-1-maz@kernel.org>
+ <20250506164348.346001-32-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250508150002.689633-14-xiaoyao.li@intel.com>
-User-Agent: Mutt/2.2.14 (2025-02-20)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <20250506164348.346001-32-maz@kernel.org>
 
-On Thu, May 08, 2025 at 10:59:19AM -0400, Xiaoyao Li wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Tue, May 06, 2025 at 05:43:36PM +0100, Marc Zyngier wrote:
+> Defining the FGU behaviour is extremely tedious. It relies on matching
+> each set of bits from FGT registers with am architectural feature, and
+> adding them to the FGU list if the corresponding feature isn't advertised
+> to the guest.
 > 
-> Three sha384 hash values, mrconfigid, mrowner and mrownerconfig, of a TD
-> can be provided for TDX attestation. Detailed meaning of them can be
-> found: https://lore.kernel.org/qemu-devel/31d6dbc1-f453-4cef-ab08-4813f4e0ff92@intel.com/
+> It is however relatively easy to dump most of that information from
+> the architecture JSON description, and use that to control the FGU bits.
 > 
-> Allow user to specify those values via property mrconfigid, mrowner and
-> mrownerconfig. They are all in base64 format.
+> Let's introduce a new set of tables descripbing the mapping between
+> FGT bits and features. Most of the time, this is only a lookup in
+> an idreg field, with a few more complex exceptions.
 > 
-> example
-> -object tdx-guest, \
->   mrconfigid=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v,\
->   mrowner=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v,\
->   mrownerconfig=ASNFZ4mrze8BI0VniavN7wEjRWeJq83vASNFZ4mrze8BI0VniavN7wEjRWeJq83v
+> While this is obviously many more lines in a new file, this is
+> mostly generated, and is pretty easy to maintain.
+
+I didn't review every single value in the maps (autogenerated as you said), but
+I did take a look at a few.
+
+__compute_fixed_bits() is pretty confusing, it's doing multiple things:
+  - It returns a mask of bits that didn't match (aka RES0)
+  - or it returns a mask of bits that may have a fixed value and fills out a
+    pointer with what the fixed values are.
+
+It has the __ prefix, so it's an implemetation-detail kinda function, not
+asking you to change anything, just pointing out the most confusing part of the
+patch!
+
+Just one small whitespace nit below.
+
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
 > 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Acked-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
-> Changes in v9:
->  - return -1 directly when qbase64_decode() return NULL; (Daniel)
+>  arch/arm64/include/asm/kvm_host.h |   2 +
+>  arch/arm64/kvm/Makefile           |   2 +-
+>  arch/arm64/kvm/config.c           | 589 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c         |  73 +---
+>  4 files changed, 596 insertions(+), 70 deletions(-)
+>  create mode 100644 arch/arm64/kvm/config.c
 > 
-> Changes in v8:
->  - it gets squashed into previous patch in v7. So split it out in v8;
-> 
-> Changes in v6:
->  - refine the doc comment of QAPI properties;
-> 
-> Changes in v5:
->  - refine the description of QAPI properties and add description of
->    default value when not specified;
-> 
-> Changes in v4:
->  - describe more of there fields in qom.json
->  - free the old value before set new value to avoid memory leak in
->    _setter(); (Daniel)
-> 
-> Changes in v3:
->  - use base64 encoding instread of hex-string;
-> ---
->  qapi/qom.json         | 16 +++++++-
->  target/i386/kvm/tdx.c | 95 +++++++++++++++++++++++++++++++++++++++++++
->  target/i386/kvm/tdx.h |  3 ++
->  3 files changed, 113 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qapi/qom.json b/qapi/qom.json
-> index f229bb07aaec..a8379bac1719 100644
-> --- a/qapi/qom.json
-> +++ b/qapi/qom.json
-> @@ -1060,11 +1060,25 @@
->  #     pages.  Some guest OS (e.g., Linux TD guest) may require this to
->  #     be set, otherwise they refuse to boot.
->  #
-> +# @mrconfigid: ID for non-owner-defined configuration of the guest TD,
-> +#     e.g., run-time or OS configuration (base64 encoded SHA384 digest).
-> +#     Defaults to all zeros.
-> +#
-> +# @mrowner: ID for the guest TD’s owner (base64 encoded SHA384 digest).
-> +#     Defaults to all zeros.
-> +#
-> +# @mrownerconfig: ID for owner-defined configuration of the guest TD,
-> +#     e.g., specific to the workload rather than the run-time or OS
-> +#     (base64 encoded SHA384 digest).  Defaults to all zeros.
-> +#
->  # Since: 10.1
->  ##
->  { 'struct': 'TdxGuestProperties',
->    'data': { '*attributes': 'uint64',
-> -            '*sept-ve-disable': 'bool' } }
-> +            '*sept-ve-disable': 'bool',
-> +            '*mrconfigid': 'str',
-> +            '*mrowner': 'str',
-> +            '*mrownerconfig': 'str' } }
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 9e5164fad0dbc..9386f15cdc252 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1610,4 +1610,6 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+>  #define kvm_has_s1poe(k)				\
+>  	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
 >  
->  ##
->  # @ThreadContextProperties:
-> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index 3de3b5fa6a49..39fd964c6b27 100644
-> --- a/target/i386/kvm/tdx.c
-> +++ b/target/i386/kvm/tdx.c
-> @@ -11,8 +11,10 @@
+> +void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt);
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 209bc76263f10..7c329e01c557a 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -14,7 +14,7 @@ CFLAGS_sys_regs.o += -Wno-override-init
+>  CFLAGS_handle_exit.o += -Wno-override-init
 >  
->  #include "qemu/osdep.h"
->  #include "qemu/error-report.h"
-> +#include "qemu/base64.h"
->  #include "qapi/error.h"
->  #include "qom/object_interfaces.h"
-> +#include "crypto/hash.h"
+>  kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+> -	 inject_fault.o va_layout.o handle_exit.o \
+> +	 inject_fault.o va_layout.o handle_exit.o config.o \
+>  	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
+>  	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
+>  	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> new file mode 100644
+> index 0000000000000..85350b883abf7
+> --- /dev/null
+> +++ b/arch/arm64/kvm/config.c
+> @@ -0,0 +1,589 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2025 Google LLC
+> + * Author: Marc Zyngier <maz@kernel.org>
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +#include <asm/sysreg.h>
+> +
+> +struct reg_bits_to_feat_map {
+> +	u64		bits;
+> +
+> +#define	NEVER_FGU	BIT(0)	/* Can trap, but never UNDEF */
+> +#define	CALL_FUNC	BIT(1)	/* Needs to evaluate tons of crap */
+> +#define	FIXED_VALUE	BIT(2)	/* RAZ/WI or RAO/WI in KVM */
+> +	unsigned long	flags;
+> +
+> +	union {
+> +		struct {
+> +			u8	regidx;
+> +			u8	shift;
+> +			u8	width;
+> +			bool	sign;
+> +			s8	lo_lim;
+> +		};
+> +		bool	(*match)(struct kvm *);
+> +		bool	(*fval)(struct kvm *, u64 *);
+> +	};
+> +};
+> +
+> +#define __NEEDS_FEAT_3(m, f, id, fld, lim)		\
+> +	{						\
+> +		.bits	= (m),				\
+> +		.flags = (f),				\
+> +		.regidx	= IDREG_IDX(SYS_ ## id),	\
+> +		.shift	= id ##_## fld ## _SHIFT,	\
+> +		.width	= id ##_## fld ## _WIDTH,	\
+> +		.sign	= id ##_## fld ## _SIGNED,	\
+> +		.lo_lim	= id ##_## fld ##_## lim	\
+> +	}
+> +
+> +#define __NEEDS_FEAT_2(m, f, fun, dummy)		\
+> +	{						\
+> +		.bits	= (m),				\
+> +		.flags = (f) | CALL_FUNC,		\
+> +		.fval = (fun),				\
+> +	}
+> +
+> +#define __NEEDS_FEAT_1(m, f, fun)			\
+> +	{						\
+> +		.bits	= (m),				\
+> +		.flags = (f) | CALL_FUNC,		\
+> +		.match = (fun),				\
+> +	}
+> +
+> +#define NEEDS_FEAT_FLAG(m, f, ...)			\
+> +	CONCATENATE(__NEEDS_FEAT_, COUNT_ARGS(__VA_ARGS__))(m, f, __VA_ARGS__)
+> +
+> +#define NEEDS_FEAT_FIXED(m, ...)			\
+> +	NEEDS_FEAT_FLAG(m, FIXED_VALUE, __VA_ARGS__, 0)
+> +
+> +#define NEEDS_FEAT(m, ...)	NEEDS_FEAT_FLAG(m, 0, __VA_ARGS__)
+> +
+> +#define FEAT_SPE		ID_AA64DFR0_EL1, PMSVer, IMP
+> +#define FEAT_SPE_FnE		ID_AA64DFR0_EL1, PMSVer, V1P2
+> +#define FEAT_BRBE		ID_AA64DFR0_EL1, BRBE, IMP
+> +#define FEAT_TRC_SR		ID_AA64DFR0_EL1, TraceVer, IMP
+> +#define FEAT_PMUv3		ID_AA64DFR0_EL1, PMUVer, IMP
+> +#define FEAT_TRBE		ID_AA64DFR0_EL1, TraceBuffer, IMP
+> +#define FEAT_DoubleLock		ID_AA64DFR0_EL1, DoubleLock, IMP
+> +#define FEAT_TRF		ID_AA64DFR0_EL1, TraceFilt, IMP
+> +#define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
+> +#define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
+> +#define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
+> +#define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
+> +#define FEAT_S1PIE		ID_AA64MMFR3_EL1, S1PIE, IMP
+> +#define FEAT_THE		ID_AA64PFR1_EL1, THE, IMP
+> +#define FEAT_SME		ID_AA64PFR1_EL1, SME, IMP
+> +#define FEAT_GCS		ID_AA64PFR1_EL1, GCS, IMP
+> +#define FEAT_LS64_ACCDATA	ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA
+> +#define FEAT_RAS		ID_AA64PFR0_EL1, RAS, IMP
+> +#define FEAT_GICv3		ID_AA64PFR0_EL1, GIC, IMP
+> +#define FEAT_LOR		ID_AA64MMFR1_EL1, LO, IMP
+> +#define FEAT_SPEv1p5		ID_AA64DFR0_EL1, PMSVer, V1P5
+> +#define FEAT_ATS1A		ID_AA64ISAR2_EL1, ATS1A, IMP
+> +#define FEAT_SPECRES2		ID_AA64ISAR1_EL1, SPECRES, COSP_RCTX
+> +#define FEAT_SPECRES		ID_AA64ISAR1_EL1, SPECRES, IMP
+> +#define FEAT_TLBIRANGE		ID_AA64ISAR0_EL1, TLB, RANGE
+> +#define FEAT_TLBIOS		ID_AA64ISAR0_EL1, TLB, OS
+> +#define FEAT_PAN2		ID_AA64MMFR1_EL1, PAN, PAN2
+> +#define FEAT_DPB2		ID_AA64ISAR1_EL1, DPB, DPB2
+> +#define FEAT_AMUv1		ID_AA64PFR0_EL1, AMU, IMP
+> +
+> +static bool feat_rasv1p1(struct kvm *kvm)
+> +{
+> +	return (kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1) ||
+> +		(kvm_has_feat_enum(kvm, ID_AA64PFR0_EL1, RAS, IMP) &&
+> +		 kvm_has_feat(kvm, ID_AA64PFR1_EL1, RAS_frac, RASv1p1)));
+> +}
+> +
+> +static bool feat_csv2_2_csv2_1p2(struct kvm *kvm)
+> +{
+> +	return (kvm_has_feat(kvm,  ID_AA64PFR0_EL1, CSV2, CSV2_2) ||
+> +		(kvm_has_feat(kvm, ID_AA64PFR1_EL1, CSV2_frac, CSV2_1p2) &&
+> +		 kvm_has_feat_enum(kvm,  ID_AA64PFR0_EL1, CSV2, IMP)));
+> +}
+> +
+> +static bool feat_pauth(struct kvm *kvm)
+> +{
+> +	return kvm_has_pauth(kvm, PAuth);
+> +}
+> +
+> +static const struct reg_bits_to_feat_map hfgrtr_feat_map[] = {
+> +	NEEDS_FEAT(HFGRTR_EL2_nAMAIR2_EL1	|
+> +		   HFGRTR_EL2_nMAIR2_EL1,
+> +		   FEAT_AIE),
+> +	NEEDS_FEAT(HFGRTR_EL2_nS2POR_EL1, FEAT_S2POE),
+> +	NEEDS_FEAT(HFGRTR_EL2_nPOR_EL1		|
+> +		   HFGRTR_EL2_nPOR_EL0,
+> +		   FEAT_S1POE),
+> +	NEEDS_FEAT(HFGRTR_EL2_nPIR_EL1		|
+> +		   HFGRTR_EL2_nPIRE0_EL1,
+> +		   FEAT_S1PIE),
+> +	NEEDS_FEAT(HFGRTR_EL2_nRCWMASK_EL1, FEAT_THE),
+> +	NEEDS_FEAT(HFGRTR_EL2_nTPIDR2_EL0	|
+> +		   HFGRTR_EL2_nSMPRI_EL1,
+> +		   FEAT_SME),
+> +	NEEDS_FEAT(HFGRTR_EL2_nGCS_EL1		|
+> +		   HFGRTR_EL2_nGCS_EL0,
+> +		   FEAT_GCS),
+> +	NEEDS_FEAT(HFGRTR_EL2_nACCDATA_EL1, FEAT_LS64_ACCDATA),
+> +	NEEDS_FEAT(HFGRTR_EL2_ERXADDR_EL1	|
+> +		   HFGRTR_EL2_ERXMISCn_EL1	|
+> +		   HFGRTR_EL2_ERXSTATUS_EL1	|
+> +		   HFGRTR_EL2_ERXCTLR_EL1	|
+> +		   HFGRTR_EL2_ERXFR_EL1		|
+> +		   HFGRTR_EL2_ERRSELR_EL1	|
+> +		   HFGRTR_EL2_ERRIDR_EL1,
+> +		   FEAT_RAS),
+> +	NEEDS_FEAT(HFGRTR_EL2_ERXPFGCDN_EL1|
+> +		   HFGRTR_EL2_ERXPFGCTL_EL1|
+
+Inconsistent |.
+
+> +		   HFGRTR_EL2_ERXPFGF_EL1,
+> +		   feat_rasv1p1),
+> +	NEEDS_FEAT(HFGRTR_EL2_ICC_IGRPENn_EL1, FEAT_GICv3),
+> +	NEEDS_FEAT(HFGRTR_EL2_SCXTNUM_EL0	|
+> +		   HFGRTR_EL2_SCXTNUM_EL1,
+> +		   feat_csv2_2_csv2_1p2),
+> +	NEEDS_FEAT(HFGRTR_EL2_LORSA_EL1		|
+> +		   HFGRTR_EL2_LORN_EL1		|
+> +		   HFGRTR_EL2_LORID_EL1		|
+> +		   HFGRTR_EL2_LOREA_EL1		|
+> +		   HFGRTR_EL2_LORC_EL1,
+> +		   FEAT_LOR),
+> +	NEEDS_FEAT(HFGRTR_EL2_APIBKey		|
+> +		   HFGRTR_EL2_APIAKey		|
+> +		   HFGRTR_EL2_APGAKey		|
+> +		   HFGRTR_EL2_APDBKey		|
+> +		   HFGRTR_EL2_APDAKey,
+> +		   feat_pauth),
+> +	NEEDS_FEAT_FLAG(HFGRTR_EL2_VBAR_EL1	|
+> +			HFGRTR_EL2_TTBR1_EL1	|
+> +			HFGRTR_EL2_TTBR0_EL1	|
+> +			HFGRTR_EL2_TPIDR_EL0	|
+> +			HFGRTR_EL2_TPIDRRO_EL0	|
+> +			HFGRTR_EL2_TPIDR_EL1	|
+> +			HFGRTR_EL2_TCR_EL1	|
+> +			HFGRTR_EL2_SCTLR_EL1	|
+> +			HFGRTR_EL2_REVIDR_EL1	|
+> +			HFGRTR_EL2_PAR_EL1	|
+> +			HFGRTR_EL2_MPIDR_EL1	|
+> +			HFGRTR_EL2_MIDR_EL1	|
+> +			HFGRTR_EL2_MAIR_EL1	|
+> +			HFGRTR_EL2_ISR_EL1	|
+> +			HFGRTR_EL2_FAR_EL1	|
+> +			HFGRTR_EL2_ESR_EL1	|
+> +			HFGRTR_EL2_DCZID_EL0	|
+> +			HFGRTR_EL2_CTR_EL0	|
+> +			HFGRTR_EL2_CSSELR_EL1	|
+> +			HFGRTR_EL2_CPACR_EL1	|
+> +			HFGRTR_EL2_CONTEXTIDR_EL1|
+> +			HFGRTR_EL2_CLIDR_EL1	|
+> +			HFGRTR_EL2_CCSIDR_EL1	|
+> +			HFGRTR_EL2_AMAIR_EL1	|
+> +			HFGRTR_EL2_AIDR_EL1	|
+> +			HFGRTR_EL2_AFSR1_EL1	|
+> +			HFGRTR_EL2_AFSR0_EL1,
+> +			NEVER_FGU, FEAT_AA64EL1),
+> +};
+> +
+> +static const struct reg_bits_to_feat_map hfgwtr_feat_map[] = {
+> +	NEEDS_FEAT(HFGWTR_EL2_nAMAIR2_EL1	|
+> +		   HFGWTR_EL2_nMAIR2_EL1,
+> +		   FEAT_AIE),
+> +	NEEDS_FEAT(HFGWTR_EL2_nS2POR_EL1, FEAT_S2POE),
+> +	NEEDS_FEAT(HFGWTR_EL2_nPOR_EL1		|
+> +		   HFGWTR_EL2_nPOR_EL0,
+> +		   FEAT_S1POE),
+> +	NEEDS_FEAT(HFGWTR_EL2_nPIR_EL1		|
+> +		   HFGWTR_EL2_nPIRE0_EL1,
+> +		   FEAT_S1PIE),
+> +	NEEDS_FEAT(HFGWTR_EL2_nRCWMASK_EL1, FEAT_THE),
+> +	NEEDS_FEAT(HFGWTR_EL2_nTPIDR2_EL0	|
+> +		   HFGWTR_EL2_nSMPRI_EL1,
+> +		   FEAT_SME),
+> +	NEEDS_FEAT(HFGWTR_EL2_nGCS_EL1		|
+> +		   HFGWTR_EL2_nGCS_EL0,
+> +		   FEAT_GCS),
+> +	NEEDS_FEAT(HFGWTR_EL2_nACCDATA_EL1, FEAT_LS64_ACCDATA),
+> +	NEEDS_FEAT(HFGWTR_EL2_ERXADDR_EL1	|
+> +		   HFGWTR_EL2_ERXMISCn_EL1	|
+> +		   HFGWTR_EL2_ERXSTATUS_EL1	|
+> +		   HFGWTR_EL2_ERXCTLR_EL1	|
+> +		   HFGWTR_EL2_ERRSELR_EL1,
+> +		   FEAT_RAS),
+> +	NEEDS_FEAT(HFGWTR_EL2_ERXPFGCDN_EL1	|
+> +		   HFGWTR_EL2_ERXPFGCTL_EL1,
+> +		   feat_rasv1p1),
+> +	NEEDS_FEAT(HFGWTR_EL2_ICC_IGRPENn_EL1, FEAT_GICv3),
+> +	NEEDS_FEAT(HFGWTR_EL2_SCXTNUM_EL0	|
+> +		   HFGWTR_EL2_SCXTNUM_EL1,
+> +		   feat_csv2_2_csv2_1p2),
+> +	NEEDS_FEAT(HFGWTR_EL2_LORSA_EL1		|
+> +		   HFGWTR_EL2_LORN_EL1		|
+> +		   HFGWTR_EL2_LOREA_EL1		|
+> +		   HFGWTR_EL2_LORC_EL1,
+> +		   FEAT_LOR),
+> +	NEEDS_FEAT(HFGWTR_EL2_APIBKey		|
+> +		   HFGWTR_EL2_APIAKey		|
+> +		   HFGWTR_EL2_APGAKey		|
+> +		   HFGWTR_EL2_APDBKey		|
+> +		   HFGWTR_EL2_APDAKey,
+> +		   feat_pauth),
+> +	NEEDS_FEAT_FLAG(HFGWTR_EL2_VBAR_EL1	|
+> +			HFGWTR_EL2_TTBR1_EL1	|
+> +			HFGWTR_EL2_TTBR0_EL1	|
+> +			HFGWTR_EL2_TPIDR_EL0	|
+> +			HFGWTR_EL2_TPIDRRO_EL0	|
+> +			HFGWTR_EL2_TPIDR_EL1	|
+> +			HFGWTR_EL2_TCR_EL1	|
+> +			HFGWTR_EL2_SCTLR_EL1	|
+> +			HFGWTR_EL2_PAR_EL1	|
+> +			HFGWTR_EL2_MAIR_EL1	|
+> +			HFGWTR_EL2_FAR_EL1	|
+> +			HFGWTR_EL2_ESR_EL1	|
+> +			HFGWTR_EL2_CSSELR_EL1	|
+> +			HFGWTR_EL2_CPACR_EL1	|
+> +			HFGWTR_EL2_CONTEXTIDR_EL1|
+> +			HFGWTR_EL2_AMAIR_EL1	|
+> +			HFGWTR_EL2_AFSR1_EL1	|
+> +			HFGWTR_EL2_AFSR0_EL1,
+> +			NEVER_FGU, FEAT_AA64EL1),
+> +};
+> +
+> +static const struct reg_bits_to_feat_map hdfgrtr_feat_map[] = {
+> +	NEEDS_FEAT(HDFGRTR_EL2_PMBIDR_EL1	|
+> +		   HDFGRTR_EL2_PMSLATFR_EL1	|
+> +		   HDFGRTR_EL2_PMSIRR_EL1	|
+> +		   HDFGRTR_EL2_PMSIDR_EL1	|
+> +		   HDFGRTR_EL2_PMSICR_EL1	|
+> +		   HDFGRTR_EL2_PMSFCR_EL1	|
+> +		   HDFGRTR_EL2_PMSEVFR_EL1	|
+> +		   HDFGRTR_EL2_PMSCR_EL1	|
+> +		   HDFGRTR_EL2_PMBSR_EL1	|
+> +		   HDFGRTR_EL2_PMBPTR_EL1	|
+> +		   HDFGRTR_EL2_PMBLIMITR_EL1,
+> +		   FEAT_SPE),
+> +	NEEDS_FEAT(HDFGRTR_EL2_nPMSNEVFR_EL1, FEAT_SPE_FnE),
+> +	NEEDS_FEAT(HDFGRTR_EL2_nBRBDATA		|
+> +		   HDFGRTR_EL2_nBRBCTL		|
+> +		   HDFGRTR_EL2_nBRBIDR,
+> +		   FEAT_BRBE),
+> +	NEEDS_FEAT(HDFGRTR_EL2_TRCVICTLR	|
+> +		   HDFGRTR_EL2_TRCSTATR		|
+> +		   HDFGRTR_EL2_TRCSSCSRn	|
+> +		   HDFGRTR_EL2_TRCSEQSTR	|
+> +		   HDFGRTR_EL2_TRCPRGCTLR	|
+> +		   HDFGRTR_EL2_TRCOSLSR		|
+> +		   HDFGRTR_EL2_TRCIMSPECn	|
+> +		   HDFGRTR_EL2_TRCID		|
+> +		   HDFGRTR_EL2_TRCCNTVRn	|
+> +		   HDFGRTR_EL2_TRCCLAIM		|
+> +		   HDFGRTR_EL2_TRCAUXCTLR	|
+> +		   HDFGRTR_EL2_TRCAUTHSTATUS	|
+> +		   HDFGRTR_EL2_TRC,
+> +		   FEAT_TRC_SR),
+> +	NEEDS_FEAT(HDFGRTR_EL2_PMCEIDn_EL0	|
+> +		   HDFGRTR_EL2_PMUSERENR_EL0	|
+> +		   HDFGRTR_EL2_PMMIR_EL1	|
+> +		   HDFGRTR_EL2_PMSELR_EL0	|
+> +		   HDFGRTR_EL2_PMOVS		|
+> +		   HDFGRTR_EL2_PMINTEN		|
+> +		   HDFGRTR_EL2_PMCNTEN		|
+> +		   HDFGRTR_EL2_PMCCNTR_EL0	|
+> +		   HDFGRTR_EL2_PMCCFILTR_EL0	|
+> +		   HDFGRTR_EL2_PMEVTYPERn_EL0	|
+> +		   HDFGRTR_EL2_PMEVCNTRn_EL0,
+> +		   FEAT_PMUv3),
+> +	NEEDS_FEAT(HDFGRTR_EL2_TRBTRG_EL1	|
+> +		   HDFGRTR_EL2_TRBSR_EL1	|
+> +		   HDFGRTR_EL2_TRBPTR_EL1	|
+> +		   HDFGRTR_EL2_TRBMAR_EL1	|
+> +		   HDFGRTR_EL2_TRBLIMITR_EL1	|
+> +		   HDFGRTR_EL2_TRBIDR_EL1	|
+> +		   HDFGRTR_EL2_TRBBASER_EL1,
+> +		   FEAT_TRBE),
+> +	NEEDS_FEAT_FLAG(HDFGRTR_EL2_OSDLR_EL1, NEVER_FGU,
+> +			FEAT_DoubleLock),
+
+This confused me at first, but it's because OSDLR_EL1 is always accessible
+(with FEAT_AA64EL1), but can only be trapped with FEAT_DoubleLock.
+
+> +	NEEDS_FEAT_FLAG(HDFGRTR_EL2_OSECCR_EL1	|
+> +			HDFGRTR_EL2_OSLSR_EL1	|
+> +			HDFGRTR_EL2_DBGPRCR_EL1	|
+> +			HDFGRTR_EL2_DBGAUTHSTATUS_EL1|
+> +			HDFGRTR_EL2_DBGCLAIM	|
+> +			HDFGRTR_EL2_MDSCR_EL1	|
+> +			HDFGRTR_EL2_DBGWVRn_EL1	|
+> +			HDFGRTR_EL2_DBGWCRn_EL1	|
+> +			HDFGRTR_EL2_DBGBVRn_EL1	|
+> +			HDFGRTR_EL2_DBGBCRn_EL1,
+> +			NEVER_FGU, FEAT_AA64EL1)
+> +};
+> +
+> +static const struct reg_bits_to_feat_map hdfgwtr_feat_map[] = {
+> +	NEEDS_FEAT(HDFGWTR_EL2_PMSLATFR_EL1	|
+> +		   HDFGWTR_EL2_PMSIRR_EL1	|
+> +		   HDFGWTR_EL2_PMSICR_EL1	|
+> +		   HDFGWTR_EL2_PMSFCR_EL1	|
+> +		   HDFGWTR_EL2_PMSEVFR_EL1	|
+> +		   HDFGWTR_EL2_PMSCR_EL1	|
+> +		   HDFGWTR_EL2_PMBSR_EL1	|
+> +		   HDFGWTR_EL2_PMBPTR_EL1	|
+> +		   HDFGWTR_EL2_PMBLIMITR_EL1,
+> +		   FEAT_SPE),
+> +	NEEDS_FEAT(HDFGWTR_EL2_nPMSNEVFR_EL1, FEAT_SPE_FnE),
+> +	NEEDS_FEAT(HDFGWTR_EL2_nBRBDATA		|
+> +		   HDFGWTR_EL2_nBRBCTL,
+> +		   FEAT_BRBE),
+> +	NEEDS_FEAT(HDFGWTR_EL2_TRCVICTLR	|
+> +		   HDFGWTR_EL2_TRCSSCSRn	|
+> +		   HDFGWTR_EL2_TRCSEQSTR	|
+> +		   HDFGWTR_EL2_TRCPRGCTLR	|
+> +		   HDFGWTR_EL2_TRCOSLAR		|
+> +		   HDFGWTR_EL2_TRCIMSPECn	|
+> +		   HDFGWTR_EL2_TRCCNTVRn	|
+> +		   HDFGWTR_EL2_TRCCLAIM		|
+> +		   HDFGWTR_EL2_TRCAUXCTLR	|
+> +		   HDFGWTR_EL2_TRC,
+> +		   FEAT_TRC_SR),
+> +	NEEDS_FEAT(HDFGWTR_EL2_PMUSERENR_EL0	|
+> +		   HDFGWTR_EL2_PMCR_EL0		|
+> +		   HDFGWTR_EL2_PMSWINC_EL0	|
+> +		   HDFGWTR_EL2_PMSELR_EL0	|
+> +		   HDFGWTR_EL2_PMOVS		|
+> +		   HDFGWTR_EL2_PMINTEN		|
+> +		   HDFGWTR_EL2_PMCNTEN		|
+> +		   HDFGWTR_EL2_PMCCNTR_EL0	|
+> +		   HDFGWTR_EL2_PMCCFILTR_EL0	|
+> +		   HDFGWTR_EL2_PMEVTYPERn_EL0	|
+> +		   HDFGWTR_EL2_PMEVCNTRn_EL0,
+> +		   FEAT_PMUv3),
+> +	NEEDS_FEAT(HDFGWTR_EL2_TRBTRG_EL1	|
+> +		   HDFGWTR_EL2_TRBSR_EL1	|
+> +		   HDFGWTR_EL2_TRBPTR_EL1	|
+> +		   HDFGWTR_EL2_TRBMAR_EL1	|
+> +		   HDFGWTR_EL2_TRBLIMITR_EL1	|
+> +		   HDFGWTR_EL2_TRBBASER_EL1,
+> +		   FEAT_TRBE),
+> +	NEEDS_FEAT_FLAG(HDFGWTR_EL2_OSDLR_EL1,
+> +			NEVER_FGU, FEAT_DoubleLock),
+> +	NEEDS_FEAT_FLAG(HDFGWTR_EL2_OSECCR_EL1	|
+> +			HDFGWTR_EL2_OSLAR_EL1	|
+> +			HDFGWTR_EL2_DBGPRCR_EL1	|
+> +			HDFGWTR_EL2_DBGCLAIM	|
+> +			HDFGWTR_EL2_MDSCR_EL1	|
+> +			HDFGWTR_EL2_DBGWVRn_EL1	|
+> +			HDFGWTR_EL2_DBGWCRn_EL1	|
+> +			HDFGWTR_EL2_DBGBVRn_EL1	|
+> +			HDFGWTR_EL2_DBGBCRn_EL1,
+> +			NEVER_FGU, FEAT_AA64EL1),
+> +	NEEDS_FEAT(HDFGWTR_EL2_TRFCR_EL1, FEAT_TRF),
+> +};
+> +
+> +
+> +static const struct reg_bits_to_feat_map hfgitr_feat_map[] = {
+> +	NEEDS_FEAT(HFGITR_EL2_PSBCSYNC, FEAT_SPEv1p5),
+> +	NEEDS_FEAT(HFGITR_EL2_ATS1E1A, FEAT_ATS1A),
+> +	NEEDS_FEAT(HFGITR_EL2_COSPRCTX, FEAT_SPECRES2),
+> +	NEEDS_FEAT(HFGITR_EL2_nGCSEPP		|
+> +		   HFGITR_EL2_nGCSSTR_EL1	|
+> +		   HFGITR_EL2_nGCSPUSHM_EL1,
+> +		   FEAT_GCS),
+> +	NEEDS_FEAT(HFGITR_EL2_nBRBIALL		|
+> +		   HFGITR_EL2_nBRBINJ,
+> +		   FEAT_BRBE),
+> +	NEEDS_FEAT(HFGITR_EL2_CPPRCTX		|
+> +		   HFGITR_EL2_DVPRCTX		|
+> +		   HFGITR_EL2_CFPRCTX,
+> +		   FEAT_SPECRES),
+> +	NEEDS_FEAT(HFGITR_EL2_TLBIRVAALE1	|
+> +		   HFGITR_EL2_TLBIRVALE1	|
+> +		   HFGITR_EL2_TLBIRVAAE1	|
+> +		   HFGITR_EL2_TLBIRVAE1		|
+> +		   HFGITR_EL2_TLBIRVAALE1IS	|
+> +		   HFGITR_EL2_TLBIRVALE1IS	|
+> +		   HFGITR_EL2_TLBIRVAAE1IS	|
+> +		   HFGITR_EL2_TLBIRVAE1IS	|
+> +		   HFGITR_EL2_TLBIRVAALE1OS	|
+> +		   HFGITR_EL2_TLBIRVALE1OS	|
+> +		   HFGITR_EL2_TLBIRVAAE1OS	|
+> +		   HFGITR_EL2_TLBIRVAE1OS,
+> +		   FEAT_TLBIRANGE),
+> +	NEEDS_FEAT(HFGITR_EL2_TLBIVAALE1OS	|
+> +		   HFGITR_EL2_TLBIVALE1OS	|
+> +		   HFGITR_EL2_TLBIVAAE1OS	|
+> +		   HFGITR_EL2_TLBIASIDE1OS	|
+> +		   HFGITR_EL2_TLBIVAE1OS	|
+> +		   HFGITR_EL2_TLBIVMALLE1OS,
+> +		   FEAT_TLBIOS),
+> +	NEEDS_FEAT(HFGITR_EL2_ATS1E1WP		|
+> +		   HFGITR_EL2_ATS1E1RP,
+> +		   FEAT_PAN2),
+> +	NEEDS_FEAT(HFGITR_EL2_DCCVADP, FEAT_DPB2),
+> +	NEEDS_FEAT_FLAG(HFGITR_EL2_DCCVAC	|
+> +			HFGITR_EL2_SVC_EL1	|
+> +			HFGITR_EL2_SVC_EL0	|
+> +			HFGITR_EL2_ERET		|
+> +			HFGITR_EL2_TLBIVAALE1	|
+> +			HFGITR_EL2_TLBIVALE1	|
+> +			HFGITR_EL2_TLBIVAAE1	|
+> +			HFGITR_EL2_TLBIASIDE1	|
+> +			HFGITR_EL2_TLBIVAE1	|
+> +			HFGITR_EL2_TLBIVMALLE1	|
+> +			HFGITR_EL2_TLBIVAALE1IS	|
+> +			HFGITR_EL2_TLBIVALE1IS	|
+> +			HFGITR_EL2_TLBIVAAE1IS	|
+> +			HFGITR_EL2_TLBIASIDE1IS	|
+> +			HFGITR_EL2_TLBIVAE1IS	|
+> +			HFGITR_EL2_TLBIVMALLE1IS|
+> +			HFGITR_EL2_ATS1E0W	|
+> +			HFGITR_EL2_ATS1E0R	|
+> +			HFGITR_EL2_ATS1E1W	|
+> +			HFGITR_EL2_ATS1E1R	|
+> +			HFGITR_EL2_DCZVA	|
+> +			HFGITR_EL2_DCCIVAC	|
+> +			HFGITR_EL2_DCCVAP	|
+> +			HFGITR_EL2_DCCVAU	|
+> +			HFGITR_EL2_DCCISW	|
+> +			HFGITR_EL2_DCCSW	|
+> +			HFGITR_EL2_DCISW	|
+> +			HFGITR_EL2_DCIVAC	|
+> +			HFGITR_EL2_ICIVAU	|
+> +			HFGITR_EL2_ICIALLU	|
+> +			HFGITR_EL2_ICIALLUIS,
+> +			NEVER_FGU, FEAT_AA64EL1),
+> +};
+> +
+> +static const struct reg_bits_to_feat_map hafgrtr_feat_map[] = {
+> +	NEEDS_FEAT(HAFGRTR_EL2_AMEVTYPER115_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER114_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER113_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER112_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER111_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER110_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER19_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER18_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER17_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER16_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER15_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER14_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER13_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER12_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER11_EL0	|
+> +		   HAFGRTR_EL2_AMEVTYPER10_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR115_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR114_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR113_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR112_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR111_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR110_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR19_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR18_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR17_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR16_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR15_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR14_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR13_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR12_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR11_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR10_EL0	|
+> +		   HAFGRTR_EL2_AMCNTEN1		|
+> +		   HAFGRTR_EL2_AMCNTEN0		|
+> +		   HAFGRTR_EL2_AMEVCNTR03_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR02_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR01_EL0	|
+> +		   HAFGRTR_EL2_AMEVCNTR00_EL0,
+> +		   FEAT_AMUv1),
+> +};
+> +
+> +static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map *map)
+> +{
+> +	u64 regval = kvm->arch.id_regs[map->regidx];
+> +	u64 regfld = (regval >> map->shift) & GENMASK(map->width - 1, 0);
+> +
+> +	if (map->sign) {
+> +		s64 sfld = sign_extend64(regfld, map->width - 1);
+> +		s64 slim = sign_extend64(map->lo_lim, map->width - 1);
+> +		return sfld >= slim;
+> +	} else {
+> +		return regfld >= map->lo_lim;
+> +	}
+> +}
+> +
+> +static u64 __compute_fixed_bits(struct kvm *kvm,
+> +				const struct reg_bits_to_feat_map *map,
+> +				int map_size,
+> +				u64 *fixed_bits,
+> +				unsigned long require,
+> +				unsigned long exclude)
+> +{
+> +	u64 val = 0;
+> +
+> +	for (int i = 0; i < map_size; i++) {
+> +		bool match;
+> +
+> +		if ((map[i].flags & require) != require)
+> +			continue;
+> +
+> +		if (map[i].flags & exclude)
+> +			continue;
+> +
+> +		if (map[i].flags & CALL_FUNC)
+> +			match = (map[i].flags & FIXED_VALUE) ?
+> +				map[i].fval(kvm, fixed_bits) :
+> +				map[i].match(kvm);
+> +		else
+> +			match = idreg_feat_match(kvm, &map[i]);
+> +
+> +		if (!match || (map[i].flags & FIXED_VALUE))
+> +			val |= map[i].bits;
+> +	}
+> +
+> +	return val;
+> +}
+> +
+> +static u64 compute_res0_bits(struct kvm *kvm,
+> +			     const struct reg_bits_to_feat_map *map,
+> +			     int map_size,
+> +			     unsigned long require,
+> +			     unsigned long exclude)
+> +{
+> +	return __compute_fixed_bits(kvm, map, map_size, NULL,
+> +				    require, exclude | FIXED_VALUE);
+> +}
+> +
+> +void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt)
+> +{
+> +	u64 val = 0;
+> +
+> +	switch (fgt) {
+> +	case HFGRTR_GROUP:
+> +		val |= compute_res0_bits(kvm, hfgrtr_feat_map,
+> +					 ARRAY_SIZE(hfgrtr_feat_map),
+> +					 0, NEVER_FGU);
+> +		val |= compute_res0_bits(kvm, hfgwtr_feat_map,
+> +					 ARRAY_SIZE(hfgwtr_feat_map),
+> +					 0, NEVER_FGU);
+> +		break;
+> +	case HFGITR_GROUP:
+> +		val |= compute_res0_bits(kvm, hfgitr_feat_map,
+> +					 ARRAY_SIZE(hfgitr_feat_map),
+> +					 0, NEVER_FGU);
+> +		break;
+> +	case HDFGRTR_GROUP:
+> +		val |= compute_res0_bits(kvm, hdfgrtr_feat_map,
+> +					 ARRAY_SIZE(hdfgrtr_feat_map),
+> +					 0, NEVER_FGU);
+> +		val |= compute_res0_bits(kvm, hdfgwtr_feat_map,
+> +					 ARRAY_SIZE(hdfgwtr_feat_map),
+> +					 0, NEVER_FGU);
+> +		break;
+> +	case HAFGRTR_GROUP:
+> +		val |= compute_res0_bits(kvm, hafgrtr_feat_map,
+> +					 ARRAY_SIZE(hafgrtr_feat_map),
+> +					 0, NEVER_FGU);
+> +		break;
+> +	default:
+> +		BUG();
+> +	}
+> +
+> +	kvm->arch.fgu[fgt] = val;
+> +}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index a9ecca4b2fa74..b3e53a899c1fe 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -5147,75 +5147,10 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+>  	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+>  		goto out;
 >  
->  #include "hw/i386/x86.h"
->  #include "kvm_i386.h"
-> @@ -240,6 +242,7 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
->      CPUX86State *env = &x86cpu->env;
->      g_autofree struct kvm_tdx_init_vm *init_vm = NULL;
->      Error *local_err = NULL;
-> +    size_t data_len;
->      int retry = 10000;
->      int r = 0;
+> -	kvm->arch.fgu[HFGRTR_GROUP] = (HFGRTR_EL2_nAMAIR2_EL1		|
+> -				       HFGRTR_EL2_nMAIR2_EL1		|
+> -				       HFGRTR_EL2_nS2POR_EL1		|
+> -				       HFGRTR_EL2_nSMPRI_EL1_MASK	|
+> -				       HFGRTR_EL2_nTPIDR2_EL0_MASK);
+> -
+> -	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
+> -		kvm->arch.fgu[HFGRTR_GROUP] |= HFGRTR_EL2_nACCDATA_EL1;
+> -
+> -	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+> -		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
+> -						HFGITR_EL2_TLBIRVALE1OS	|
+> -						HFGITR_EL2_TLBIRVAAE1OS	|
+> -						HFGITR_EL2_TLBIRVAE1OS	|
+> -						HFGITR_EL2_TLBIVAALE1OS	|
+> -						HFGITR_EL2_TLBIVALE1OS	|
+> -						HFGITR_EL2_TLBIVAAE1OS	|
+> -						HFGITR_EL2_TLBIASIDE1OS	|
+> -						HFGITR_EL2_TLBIVAE1OS	|
+> -						HFGITR_EL2_TLBIVMALLE1OS);
+> -
+> -	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
+> -		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1	|
+> -						HFGITR_EL2_TLBIRVALE1	|
+> -						HFGITR_EL2_TLBIRVAAE1	|
+> -						HFGITR_EL2_TLBIRVAE1	|
+> -						HFGITR_EL2_TLBIRVAALE1IS|
+> -						HFGITR_EL2_TLBIRVALE1IS	|
+> -						HFGITR_EL2_TLBIRVAAE1IS	|
+> -						HFGITR_EL2_TLBIRVAE1IS	|
+> -						HFGITR_EL2_TLBIRVAALE1OS|
+> -						HFGITR_EL2_TLBIRVALE1OS	|
+> -						HFGITR_EL2_TLBIRVAAE1OS	|
+> -						HFGITR_EL2_TLBIRVAE1OS);
+> -
+> -	if (!kvm_has_feat(kvm, ID_AA64ISAR2_EL1, ATS1A, IMP))
+> -		kvm->arch.fgu[HFGITR_GROUP] |= HFGITR_EL2_ATS1E1A;
+> -
+> -	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, PAN, PAN2))
+> -		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_ATS1E1RP |
+> -						HFGITR_EL2_ATS1E1WP);
+> -
+> -	if (!kvm_has_s1pie(kvm))
+> -		kvm->arch.fgu[HFGRTR_GROUP] |= (HFGRTR_EL2_nPIRE0_EL1 |
+> -						HFGRTR_EL2_nPIR_EL1);
+> -
+> -	if (!kvm_has_s1poe(kvm))
+> -		kvm->arch.fgu[HFGRTR_GROUP] |= (HFGRTR_EL2_nPOR_EL1 |
+> -						HFGRTR_EL2_nPOR_EL0);
+> -
+> -	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, IMP))
+> -		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
+> -						  HAFGRTR_EL2_RES1);
+> -
+> -	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, BRBE, IMP)) {
+> -		kvm->arch.fgu[HDFGRTR_GROUP] |= (HDFGRTR_EL2_nBRBDATA  |
+> -						 HDFGRTR_EL2_nBRBCTL   |
+> -						 HDFGRTR_EL2_nBRBIDR);
+> -		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_nBRBINJ |
+> -						HFGITR_EL2_nBRBIALL);
+> -	}
+> -
+> -	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP)) {
+> -		kvm->arch.fgu[HFGRTR_GROUP] |= (HFGRTR_EL2_nGCS_EL0 |
+> -						HFGRTR_EL2_nGCS_EL1);
+> -		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_nGCSPUSHM_EL1 |
+> -						HFGITR_EL2_nGCSSTR_EL1 |
+> -						HFGITR_EL2_nGCSEPP);
+> -	}
+> +	compute_fgu(kvm, HFGRTR_GROUP);
+> +	compute_fgu(kvm, HFGITR_GROUP);
+> +	compute_fgu(kvm, HDFGRTR_GROUP);
+> +	compute_fgu(kvm, HAFGRTR_GROUP);
 >  
-> @@ -251,6 +254,45 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
->      init_vm = g_malloc0(sizeof(struct kvm_tdx_init_vm) +
->                          sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
->  
-> +    if (tdx_guest->mrconfigid) {
-> +        g_autofree uint8_t *data = qbase64_decode(tdx_guest->mrconfigid,
-> +                              strlen(tdx_guest->mrconfigid), &data_len, errp);
-> +        if (!data) {
-> +            return -1;
-> +        }
-> +        if (data_len != QCRYPTO_HASH_DIGEST_LEN_SHA384) {
-> +            error_setg(errp, "TDX: failed to decode mrconfigid");
-
-As a general guideline I'd always suggest including both the received
-and expected values, when reporting an length check failure. Also
-the error message is misleading - we successfully decoded the data,
-the decoded data was simply the wrong length.
-
-eg
-
-            error_setg(errp, "TDX mrconfigid sha386 digest was %d bytes, expected %d bytes")
-	               data_len, QCRYPTO_HASH_DIGEST_LEN_SHA384);
-
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+>  	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+>  out:
+> -- 
+> 2.39.2
+> 
 
