@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-45887-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45889-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC417AAFBE5
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:46:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91539AAFBEB
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFD3F16FB16
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:45:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B43384C281D
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4652236E1;
-	Thu,  8 May 2025 13:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D370322D9F4;
+	Thu,  8 May 2025 13:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GJFYxXPm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EmmrF1sJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE40199E89
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 13:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC3719309C
+	for <kvm@vger.kernel.org>; Thu,  8 May 2025 13:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746711950; cv=none; b=THWmdvBCwgH39BNlLmnF5NY7jRgN13Cn3RmTu37lBSjTmV1qz9tvzv5XTTemlYVO4liTTYCU0sCMx/oYBa62J0VhYh/Fm8PhGF41f4fUXIL6k1tS8SOJLvaIKnmmv+teipdVZZ7Fyimpi0hBpsrEhTCNLwwyPjjsIeWnbqRAxB0=
+	t=1746711974; cv=none; b=kOEGw0Ac7aY3Ez+t95wwdiuEFVW5DQecOabc9NLRDi9srpjZKaXvkXaBHYTi5DvTtHj8Oho7WPBXjRYJRBbF4fkwyz+pEiuzzO3IWQ8DP+DT7rCnDkC04gKkTwLUqEQ8YD1VV/ctSQgwJO1TqhGcKoZ2f5Tg9kTTA1LejK+Pfjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746711950; c=relaxed/simple;
-	bh=HcXBHa06owlgBaF3fNQf3HAJLIzHun8O3opbJHCFHE0=;
+	s=arc-20240116; t=1746711974; c=relaxed/simple;
+	bh=Ex2GpTr6GoUbDVEbeTQuvclJK0ug9LhPdAET+OSeF9I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bnlPR0VCs1EZLSvZsnlR5bwqnWLoYcgiUHcK8wXQtbEHAuXzhYdQAtOoZdwaRlM3BbdNPVlS1GXbnyhLDj6OVdxHZWKCiHJjsxhXovBEWRGomjunib8CXPZM7K/4IrovLJsgVOuK0cv+fN+TfH/JEKfgwABSmAuyjbcMWtMwtHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GJFYxXPm; arc=none smtp.client-ip=209.85.210.176
+	 MIME-Version:Content-Type; b=j/b7b4m8QyLHLB5YDLNN8k1CegSbn0sxWjIvLgzZM6T+KPU2jzKj0xDnvaX8j9HNddwstMn6wYqLhWp71BESeP0zDHFnQqgW47k0RfG+E5tttQZ599kAfWlxGGEnqU/UVInAdO7V1MINXN+eEQinlGtOjjkgLMxNud4woRMR/xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EmmrF1sJ; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7410c18bb00so508647b3a.3
-        for <kvm@vger.kernel.org>; Thu, 08 May 2025 06:45:49 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-736ad42dfd6so788477b3a.3
+        for <kvm@vger.kernel.org>; Thu, 08 May 2025 06:46:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1746711948; x=1747316748; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1746711972; x=1747316772; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ns6abkUGaM6ukyij9Yk70LzU+Vns27nmI4rpIretkkk=;
-        b=GJFYxXPmq+c7gpxxn24L8TMHgik0yZ14AlNn0lxltLticF0TU5gHsr7/P5AACc9Hf3
-         8u6TzZT6n3X6RvFDyC90RYiNFXT3Y6Uy29HxpJqiwzyxNBjS7/vuPM3TDn50Guky7Cm/
-         XFy1tC9dx3hLH2u5G0o6SMGw4A27YYxwo3Swzs8RnBOoExxGVfOYgT4e4uDjDtCDqy9S
-         YmfvRrJYVjUoWe1OnahwP+DJi2ZCVEidOSv+9KhwtyTSZq82lVwCmJLrWC/RRyubasxp
-         tSsV2ZPC+2r11kXRZVm+GFnBpaqQx1YtkGYxpBXD6qrbmsy4MtHl2IvHJC2HPl/zMpcO
-         g7sA==
+        bh=dAEnpROpQK6DxM6uJJQ1bpWzbrmSzQalAkAVB3r0tgU=;
+        b=EmmrF1sJ08H7xxF5OcamGdHBn3q78Doo/E+vgGa1uNZAiHQ0SfMjbqWE/q/qU+lyQN
+         hiFbZGsBsEzVVCJx28+DlbnZhbt3GWzTf4fKLe6W2ELOxB682YH48NCNQwHzXmnB1L++
+         u87V7MwmLS/wUlPqu4ZdTMTY1WCA6sHsX85OZE9P3DA0NRah9IM4IyAzfJB4C7m1fCXx
+         X2NEacj6+fv2QsIVIkQzaxHAoVkeRSgQpH7CNxiKV1ZwK+QlSvuWj5xjXgrA+5BIpT2b
+         PDB13SRVmri8w1erV8xKtfX7ICmLGnmk4FfNIxVscsWtUO99rulIwDeFlLcDCckLgDoK
+         sDiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746711948; x=1747316748;
+        d=1e100.net; s=20230601; t=1746711972; x=1747316772;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ns6abkUGaM6ukyij9Yk70LzU+Vns27nmI4rpIretkkk=;
-        b=ALziPOQW7G8A9VgBEH6GaYj6nkbRt4B9+OTN0W0aAVYKDIdc7JXsNTjn3JrwbNF95H
-         KG6dlqpmKdcfCIUxfZVBTILUlHEAfz/+FMwoNM/V327XWJJo2VvVxeHYf/Q62iUC9KbZ
-         pHA2/c+2wdjzTaFxdktLAEYBQXLQmAgSN2GMrLClv0bvoHeecfe8VV2XQGVIKkoMF9VV
-         mhOBRnpA2nykil5yGjxCrld4Idu0UDrVp+MDXOBs6Z4vGMRsObXubzni2maSOP4E3gql
-         jFnxUOxF05cuubXhG9gFl2IOJoGdiF0EBmH8WJCov2WNnukBLYOj6cnzpeQNkm1GXoLy
-         X2Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCXugMWKY5Ds7XZuGcC+hAdffoTy5aoc5PB/n162h8Vn5Al4II+jY8CEmoB+9dd23HgHs1A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOwRCNDm6VQ0t4qV7MUPetow44/VUBcwGRuRNXvgC5o1YfeGND
-	mVem4pg/uJbbN5c/Gnubx8heIrud7Dc2KKzE789Rl2Ccv/1a+AksQO3qXd93dPU=
-X-Gm-Gg: ASbGncuYrRUoW0BXd0Gc6MIVCfQ/7kq+/OHYX5Ns49fqHSBqzMC07oGoX0QWkIHa7mY
-	7AWuXfssL2X802iKeXSTahw5Xyx9Tzzk+Z0P/IUH82Iqkiwq3luWVV8YNsDr7P0BkNnyL2jz23f
-	PrHThnpBp23u9F4azUqOUmh95QI0pkQ8dJXEFlMSVM+0AOYeKXNQTf63ISs8Fv2W9W0UWVPqMct
-	Xx6G1w4h231TZkWsvlN2rWgQfYs4/VFPzOMHPmHxMUwVqMaOh+9MbL7cZwtobbdLcLq2XWeG4C+
-	4+kwmfNHd9lIF61sw2upXYpeEsJYxTJ4jBzpNOkBWXLsmAZiIAEh6QS+3cWprRj9o4ZtdubJseo
-	LmQWDOcyyAQePPsc=
-X-Google-Smtp-Source: AGHT+IEnO+sngRS5wIqF0he33Fpo8ZvEfqldkdJOaUMWkhexbxVM0HjmJCofWNDDAj5rwpOOd6Q5/A==
-X-Received: by 2002:a05:6a00:1308:b0:740:a879:4f7b with SMTP id d2e1a72fcca58-740a8794fcamr6118097b3a.18.1746711948529;
-        Thu, 08 May 2025 06:45:48 -0700 (PDT)
+        bh=dAEnpROpQK6DxM6uJJQ1bpWzbrmSzQalAkAVB3r0tgU=;
+        b=HjBff35Wlkxi4KFLtoiGKFwEEtG0g5vj3V0jm3bLiKQpxM7ZQyrcAAWV32XwL4TPq7
+         tgHWIaogoi931EA7WIU0SKJgoKWwm6frHLDNAhnrLWxGHR4lvuGj8ChtGjZSxwqBgTpL
+         ToCEVECEbl2UBWOhbzJOyLefQHtckpdjzHT7PemR6oQM+clg+YazKG1YEZ4Q5Y/M4B6g
+         ELybK+CmgYk+ugRf+9S95gpmeSkVCDRWwMZSkJ946FQZ/fhot9cwBFWdI/o0E4KpjAm6
+         ewURbbigVumMyXwMs7/SdptEubtfZeFAX5FEuC9PY5kWeSIlBBxtHpJdt9ju6o66Je7H
+         7CmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVA0oBclScB4FXIQqFD7tGMZIBD6nwN7mazmgdHTl9DWOd8osf9JjAt28OGgSQI7Bwwji8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIJ5fUhVd7/Hj8eMdoBTfaD7ojuHmVQyo2nqHZpChOut1HFhun
+	V5j2SKHC5x4A2ofTLZ5NHYmLKhyWl5KjfODNhdCHITLYHjaELTVZaOBIjNjjvLQ=
+X-Gm-Gg: ASbGncvbnS0wvMjtZ07z3ORkDwHvsHCvUTKSpdoL9eo6m3lt+fxLmQmd+/fUDmqYurX
+	dDZ8tvLA9LycUemNgQYptxvh7AZv6M+1fqhTWyqCnBDUBRLO8G0NUqZ5Z41ePVKYKRpXas+j1No
+	W5lH/t9un0aYJIHUVovkPCgJOMuYto47sJQqZVYYxktF6GYcC74lHZsH8MuH9w7pssRCqx1njGO
+	otxjGl258ZT+VO4P5pcPrRNadGngFTrnVJ65rDIVbMKlC9/ejCeHFyjpvYJIQmU82apoZzckcti
+	i+aDlyJfr2Loiar150h3oAX3zSiP6wai8J8oFHAqi9/bGw7luI68YPQ5QEr/TXf9l1tahbbG+/P
+	6brOfheV+WTc+VH0=
+X-Google-Smtp-Source: AGHT+IG9WzoCZnHzGx/rhe5MQGTbfwj2jk9eAlMQ107yUfErvTrwEaQ0R1H/OfqPr8whvcSNPiejCQ==
+X-Received: by 2002:a05:6a20:9f8f:b0:1f5:5ca4:2744 with SMTP id adf61e73a8af0-2148ba256e3mr9499152637.17.1746711972638;
+        Thu, 08 May 2025 06:46:12 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7405906372fsm13690156b3a.148.2025.05.08.06.45.33
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74058d7a397sm13221110b3a.28.2025.05.08.06.45.56
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 08 May 2025 06:45:48 -0700 (PDT)
+        Thu, 08 May 2025 06:46:12 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>,
@@ -106,10 +106,11 @@ Cc: Richard Henderson <richard.henderson@linaro.org>,
 	qemu-arm@nongnu.org,
 	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
 	Huacai Chen <chenhuacai@kernel.org>,
-	Jason Wang <jasowang@redhat.com>
-Subject: [PATCH v4 26/27] hw/char/virtio-serial: Do not expose the 'emergency-write' property
-Date: Thu,  8 May 2025 15:35:49 +0200
-Message-ID: <20250508133550.81391-27-philmd@linaro.org>
+	Jason Wang <jasowang@redhat.com>,
+	Mark Cave-Ayland <mark.caveayland@nutanix.com>
+Subject: [PATCH v4 27/27] hw/virtio/virtio-pci: Remove VIRTIO_PCI_FLAG_PAGE_PER_VQ definition
+Date: Thu,  8 May 2025 15:35:50 +0200
+Message-ID: <20250508133550.81391-28-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250508133550.81391-1-philmd@linaro.org>
 References: <20250508133550.81391-1-philmd@linaro.org>
@@ -122,73 +123,80 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The VIRTIO_CONSOLE_F_EMERG_WRITE feature bit was only set
-in the hw_compat_2_7[] array, via the 'emergency-write=off'
-property. We removed all machines using that array, lets remove
-that property. All instances have this feature bit set and
-it can not be disabled. VirtIOSerial::host_features mask is
-now unused, remove it.
+VIRTIO_PCI_FLAG_PAGE_PER_VQ was only used by the hw_compat_2_7[]
+array, via the 'page-per-vq=on' property. We removed all
+machines using that array, lets remove all the code around
+VIRTIO_PCI_FLAG_PAGE_PER_VQ (see commit 9a4c0e220d8 for similar
+VIRTIO_PCI_FLAG_* enum removal).
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
 ---
- include/hw/virtio/virtio-serial.h | 2 --
- hw/char/virtio-serial-bus.c       | 9 +++------
- 2 files changed, 3 insertions(+), 8 deletions(-)
+ include/hw/virtio/virtio-pci.h |  1 -
+ hw/display/virtio-vga.c        | 10 ----------
+ hw/virtio/virtio-pci.c         |  7 +------
+ 3 files changed, 1 insertion(+), 17 deletions(-)
 
-diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
-index d87c62eab7a..e6ceacec309 100644
---- a/include/hw/virtio/virtio-serial.h
-+++ b/include/hw/virtio/virtio-serial.h
-@@ -185,8 +185,6 @@ struct VirtIOSerial {
-     struct VirtIOSerialPostLoad *post_load;
+diff --git a/include/hw/virtio/virtio-pci.h b/include/hw/virtio/virtio-pci.h
+index 9838e8650a6..8abc5f8f20d 100644
+--- a/include/hw/virtio/virtio-pci.h
++++ b/include/hw/virtio/virtio-pci.h
+@@ -33,7 +33,6 @@ enum {
+     VIRTIO_PCI_FLAG_BUS_MASTER_BUG_MIGRATION_BIT,
+     VIRTIO_PCI_FLAG_USE_IOEVENTFD_BIT,
+     VIRTIO_PCI_FLAG_MODERN_PIO_NOTIFY_BIT,
+-    VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT,
+     VIRTIO_PCI_FLAG_ATS_BIT,
+     VIRTIO_PCI_FLAG_INIT_DEVERR_BIT,
+     VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT,
+diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
+index 40e60f70fcd..83d01f089b5 100644
+--- a/hw/display/virtio-vga.c
++++ b/hw/display/virtio-vga.c
+@@ -141,16 +141,6 @@ static void virtio_vga_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+                                VIRTIO_GPU_SHM_ID_HOST_VISIBLE);
+     }
  
-     virtio_serial_conf serial;
+-    if (!(vpci_dev->flags & VIRTIO_PCI_FLAG_PAGE_PER_VQ)) {
+-        /*
+-         * with page-per-vq=off there is no padding space we can use
+-         * for the stdvga registers.  Make the common and isr regions
+-         * smaller then.
+-         */
+-        vpci_dev->common.size /= 2;
+-        vpci_dev->isr.size /= 2;
+-    }
 -
--    uint64_t host_features;
- };
+     offset = memory_region_size(&vpci_dev->modern_bar);
+     offset -= vpci_dev->notify.size;
+     vpci_dev->notify.offset = offset;
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 7c965771907..4e0d4bda6ed 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -314,12 +314,9 @@ static bool virtio_pci_ioeventfd_enabled(DeviceState *d)
+     return (proxy->flags & VIRTIO_PCI_FLAG_USE_IOEVENTFD) != 0;
+ }
  
- /* Interface to the virtio-serial bus */
-diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
-index eb79f5258b6..cfc8fa42186 100644
---- a/hw/char/virtio-serial-bus.c
-+++ b/hw/char/virtio-serial-bus.c
-@@ -557,7 +557,7 @@ static uint64_t get_features(VirtIODevice *vdev, uint64_t features,
+-#define QEMU_VIRTIO_PCI_QUEUE_MEM_MULT 0x1000
+-
+ static inline int virtio_pci_queue_mem_mult(struct VirtIOPCIProxy *proxy)
+ {
+-    return (proxy->flags & VIRTIO_PCI_FLAG_PAGE_PER_VQ) ?
+-        QEMU_VIRTIO_PCI_QUEUE_MEM_MULT : 4;
++    return 4;
+ }
  
-     vser = VIRTIO_SERIAL(vdev);
- 
--    features |= vser->host_features;
-+    features |= BIT_ULL(VIRTIO_CONSOLE_F_EMERG_WRITE);
-     if (vser->bus.max_nr_ports > 1) {
-         virtio_add_feature(&features, VIRTIO_CONSOLE_F_MULTIPORT);
-     }
-@@ -587,8 +587,7 @@ static void set_config(VirtIODevice *vdev, const uint8_t *config_data)
-     VirtIOSerialPortClass *vsc;
-     uint8_t emerg_wr_lo;
- 
--    if (!virtio_has_feature(vser->host_features,
--        VIRTIO_CONSOLE_F_EMERG_WRITE) || !config->emerg_wr) {
-+    if (!config->emerg_wr) {
-         return;
-     }
- 
-@@ -1039,7 +1038,7 @@ static void virtio_serial_device_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    if (!virtio_has_feature(vser->host_features,
-+    if (!virtio_has_feature(vdev->host_features,
-                             VIRTIO_CONSOLE_F_EMERG_WRITE)) {
-         config_size = offsetof(struct virtio_console_config, emerg_wr);
-     }
-@@ -1155,8 +1154,6 @@ static const VMStateDescription vmstate_virtio_console = {
- static const Property virtio_serial_properties[] = {
-     DEFINE_PROP_UINT32("max_ports", VirtIOSerial, serial.max_virtserial_ports,
-                                                   31),
--    DEFINE_PROP_BIT64("emergency-write", VirtIOSerial, host_features,
--                      VIRTIO_CONSOLE_F_EMERG_WRITE, true),
- };
- 
- static void virtio_serial_class_init(ObjectClass *klass, const void *data)
+ static int virtio_pci_ioeventfd_assign(DeviceState *d, EventNotifier *notifier,
+@@ -2348,8 +2345,6 @@ static const Property virtio_pci_properties[] = {
+                     VIRTIO_PCI_FLAG_BUS_MASTER_BUG_MIGRATION_BIT, false),
+     DEFINE_PROP_BIT("modern-pio-notify", VirtIOPCIProxy, flags,
+                     VIRTIO_PCI_FLAG_MODERN_PIO_NOTIFY_BIT, false),
+-    DEFINE_PROP_BIT("page-per-vq", VirtIOPCIProxy, flags,
+-                    VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT, false),
+     DEFINE_PROP_BIT("ats", VirtIOPCIProxy, flags,
+                     VIRTIO_PCI_FLAG_ATS_BIT, false),
+     DEFINE_PROP_BIT("x-ats-page-aligned", VirtIOPCIProxy, flags,
 -- 
 2.47.1
 
