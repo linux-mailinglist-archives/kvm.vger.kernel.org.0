@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-45856-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45857-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 456F6AAFB5A
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:31:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B2FAAFB6C
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 15:33:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A120517C61E
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:31:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA6C9B23459
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 13:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6EC22A7FD;
-	Thu,  8 May 2025 13:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1EA022D4FA;
+	Thu,  8 May 2025 13:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Loz0hoos"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="KLrTbFlp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB5B4B1E6D
-	for <kvm@vger.kernel.org>; Thu,  8 May 2025 13:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399BA22CBF4
+	for <kvm@vger.kernel.org>; Thu,  8 May 2025 13:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746711072; cv=none; b=L4qK7f29Ivv9ROso+x4a6sIyveWyFi2OnDEhpIsDWIdST1dP2P/xeM5IDCntS45EikK02MeBTqLbEtmGC1YRuPBVcmDUWt0W/pW/g7SwbbwYuK9sabWhLadiDai9eTnP15p+KGfif7sQvrfUVQOO8nH2sptoq5HYGIq6R+1fuPo=
+	t=1746711153; cv=none; b=Fda2nD16h6nZYKomA3vcqvaQhcXQaNviiX6h5CNm3lamtS2aYuS1dAhW6e09OZjQgArwAcG0PVJNbv1VTN6g86zNp3vUMm7c01Q4mpw4tvRGqbAp5wyCShsv1vSHK1u5U0+7mrrvNPGWO5PAj6R+qnrUYErJYTqDfRYiHtrG61U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746711072; c=relaxed/simple;
-	bh=PTIxFNCKUc6RCmBCpLXRdipjalC9UH6iNZPNrIkp7Uw=;
+	s=arc-20240116; t=1746711153; c=relaxed/simple;
+	bh=UaX7lHk6APGzrlNbZtyPi82/m8GJkmtjAztxLDCFxtM=;
 	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=mFtdDeNS35/5IUSg3PBUBoTq3RNT7ic3wrR4OmPhQHdia+fsdhOOYX5Pu7lmoudvyyOf9PhlfXhOZ8vMvTBZIXk9G7xfhtelSUY/AcywHhxopATKF963W3qNVVu1DZQ8oxSphdgU0cAOVxdehtuNuEiR0iBPep465YEvEQaXGGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Loz0hoos; arc=none smtp.client-ip=209.85.128.52
+	 References:In-Reply-To; b=Vddx9BCFmLvSxF6u4CBDfg13edtWeuInRgDfW0T7SyR/uIz0mjLynrc/08fhlrDNU/4mmFJHwNQEa1Or4UQ230N8HdxI7qDLUr80OEzk1TcrZttw0C2pb52MyS2ZAqbnSOR+thPFcDyPugrd4ubXkusGw3dFjW5zdn2HBdIezks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=KLrTbFlp; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cee550af2so420655e9.1
-        for <kvm@vger.kernel.org>; Thu, 08 May 2025 06:31:09 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43d16a01deaso384135e9.2
+        for <kvm@vger.kernel.org>; Thu, 08 May 2025 06:32:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1746711068; x=1747315868; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1746711149; x=1747315949; darn=vger.kernel.org;
         h=in-reply-to:references:from:to:cc:subject:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6S+40JPuRC3gzWdqTu3aQzXeyhaHlO7szVi8IcUpV9U=;
-        b=Loz0hoosxbjIh9XfGXwj59Q6xVNvJ/uHTMgTfSbilrV3FYkFJ3NjL9koJmZF5Hkq3f
-         w4XHy2UStdeBxIyVCH/ZfMSrGNPAiKhzdVPvRN52nhimI476gay5+HzmwznQv4pkPmL6
-         0R7C36boN5Z7+1xrwhf7+aIlcw8afzHWALVxbHpXMfqatfwsMYzVZB2/4reriCFC4G1r
-         Lu2FuuBSnxSGvDxSKUepZLTa4t6OEix7lVaNaYt5Ngl9/LdpDy0Lj966YOoowqDJbkIx
-         gwT39FjStKIuiY9RYZLOXzSMRatTWqlCrMZxJkFohyx2AEkawAVA9JvC7WZ2cWwjn8qi
-         wFnQ==
+        bh=Ctop9M+S6pXp/ivb7RmdzyIsAM5dZO8eB9pvvIkCEbM=;
+        b=KLrTbFlpR9vF/XiDJfMDK1ST0j/y9ahE3N6zOECj38aO3xGC8SSqB6BwFdrYf/2AjR
+         Vk04OC7b0mTe1GYE8d+FEk0wXgArLp0AnZxLZcFsx0851Qz8qV8vdystFMGzGZbyU4RS
+         X2rD5ZI6SweGZU+IGB9i6mUQ1UnQdpzKMG/cHqX7ncCQxgiMSqdTxhRxAj4W7Cb4DLvO
+         JO7byWMbBm5+oFH1jeVkq0bMFq0Sh+4s0RnpRgqjUu5F+TE8tUVClYvtccDM5NtzLgQv
+         dMbBHVPJ6hCPa0Q/6cIYBAHM0ANjIni0B4L3oR8aijJAuiISpIZWshRfgi3OtE5v/2XL
+         hzyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746711068; x=1747315868;
+        d=1e100.net; s=20230601; t=1746711149; x=1747315949;
         h=in-reply-to:references:from:to:cc:subject:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=6S+40JPuRC3gzWdqTu3aQzXeyhaHlO7szVi8IcUpV9U=;
-        b=wZWHz9tHiwshqOt5ufOliptBNiTePRxc+Lrl1lSKNDcC/ERjYKFSbYg2yCx9nGrmmG
-         FTFol9CsBc/aqpzlTeH76xxGjUb2Yxah6zrqfEtutEHQ5wyB8/Dr/HVffIfZdG7cu2NR
-         nQvrpvOXkGqhnSrbaEzuXkCLUWxmTSllBfUcRm2nn9SD8WaJ1vdER4EfV2q8eLvYH00J
-         ZtgNJEOywvz+rrkgzfSuPDIcQhrl29o3yEW++7Uk3LXKf8kn6VkK5qQGtSYkY+0dXtdh
-         Co0Oda5MDNe//eKdwzWwAjPf462nnU6HsGRuwMTlgBtkA81pgyqYiVTyB4JHWc549Ko7
-         Rj4w==
-X-Gm-Message-State: AOJu0Yx/0btO9QOlnrf/orhYhvbrFEx58PA8v0z7kecHRa9RNTlMZ8hG
-	8LYPtqrpvUK8+AiKAUfBKcmavcd5UBsXscjYKQriNWYuCTv7lmRl3J/tkYxJ8hU=
-X-Gm-Gg: ASbGncsUgLG5LOL27vhs1/kyN8YmR4LElXfavG+y8yb7pDcqI4YEIFqvZC0sG39Uom+
-	f3Zeg621EDIZXxPJDlUx6DAccteAOtgiuu9PBahjsaOPNGwl9BOLPmgpDoX1+UcJKkd0CSp5nMA
-	l2CUar686jvw/Jzal5+X2u72lIocuYifNr3UhZ9uc0VITHSm6W6mS84sNMYMXBEcSCrBsZ0xOJF
-	GUnLk7563EYKT3FQdj2ndH8maxrDBwDlH1JubUtBXdaryUlNbJOZJHhRiyIOjgjXFSf6S2MmGhK
-	kPfcRhZ72AL2ci+iOgfun/pS773buxGQ/K6oUmKw9IwjmiBd
-X-Google-Smtp-Source: AGHT+IGijAnvSUvNKAgb7ZNKd5QJJ9UF+zXOT/jF3FQWpi7RwPSldc9C2Ir4SMyQ4xieyEHWiNZ1qw==
-X-Received: by 2002:a05:600c:1d8c:b0:43b:c825:6cde with SMTP id 5b1f17b1804b1-441d44c4749mr23230845e9.3.1746711068529;
-        Thu, 08 May 2025 06:31:08 -0700 (PDT)
+        bh=Ctop9M+S6pXp/ivb7RmdzyIsAM5dZO8eB9pvvIkCEbM=;
+        b=I1ohQSeILJQQC6BLYIbh1bx9fNigYgLh4PR0DjxOVdIN2QQfbwBlfJO6Ie0Or6bxMS
+         L0257jGIhuh0twh1FxF/lHyTnBDtp9B5hVCBPp/rgxU6A9wyCes3+625tn1miYqBH/TM
+         x6dwklaNyR5XkY8v6P3EckmTzQlWy0FFBjRlnzQwAWxn19gxJ9tvmut14GnWAsYDEglp
+         A2ccg7VAWRLNqJnTL/71vZE/s8s7tvq1GybDJGGhkh2GDi8D13I/C6cuYngjNevDTc+L
+         fpUiQFTzBRBKeNZ1rBFunMJVZQNwsrJnmhQker2XohgXjW2To2fqolr8rBv8PlVkboQF
+         pEfg==
+X-Gm-Message-State: AOJu0YyoUlG3cnQNoF/GhAYd1K3NUaTBaYKzVTEMUJNdagtml7RBTKMN
+	62xkFP1Nd3E1SVXdEbhHRxZ4zUHL9igLrw8hWLD3Is8Ksfokr2vfzuZUy9YobLw=
+X-Gm-Gg: ASbGncurJ8s3L8qgB7rd8ccrQ0fSGl2QdhMOa/lAKdkAv0x5o+qAPrJjgycFk+ykzS1
+	2CTF1iut0WUxe/+mOjvkWMhjlJ2BUKzpqBtk2Dn5Aw0TggLAF62Hej6Wx3VAsLfADJ+LViQ7mPI
+	/Y1CmAtnvZ9vbk3lSnSeiZyy/zU/LnOYg6ZgbCgFfZCDmGepUro5fjMt/RQe39Y5obXrKk41JU+
+	BpG1ELCRNPFCGof7QrAS5L5nqIS0EBvrRBri/3RJM+VhwvaMKDLSce9rFBTI+puMSSUdQ4Y7JVp
+	THpD4HtnGwgdzX4poeRsWZMTHaBxuA4GmvkvbONOA8bMAEn7
+X-Google-Smtp-Source: AGHT+IFV8Gdwh/t9ZunwZV8yC9Gjd4YDqTg8K4dFRuyEe/kGcOgQumaKBu9osZaWckRfANKTr0Qn6g==
+X-Received: by 2002:a05:600c:cca:b0:439:a3df:66f3 with SMTP id 5b1f17b1804b1-441d44e57d6mr24537645e9.6.1746711149535;
+        Thu, 08 May 2025 06:32:29 -0700 (PDT)
 Received: from localhost ([2a02:8308:a00c:e200:a451:a252:64ea:9a0e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442cd32f238sm37108665e9.11.2025.05.08.06.31.08
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442cd32b0c8sm37984755e9.3.2025.05.08.06.32.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 May 2025 06:31:08 -0700 (PDT)
+        Thu, 08 May 2025 06:32:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,9 +79,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 08 May 2025 15:31:07 +0200
-Message-Id: <D9QTEAUN0RNE.11G3ZW4IBGL5M@ventanamicro.com>
-Subject: Re: [PATCH 1/5] RISC-V: KVM: Lazy enable hstateen IMSIC & ISEL bit
+Date: Thu, 08 May 2025 15:32:25 +0200
+Message-Id: <D9QTFAE7R84D.2V08QTHORJTAH@ventanamicro.com>
+Subject: Re: [PATCH 4/5] RISC-V: KVM: Enable envcfg and sstateen bits lazily
 Cc: <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
  <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
  "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
@@ -90,21 +90,60 @@ To: "Atish Patra" <atishp@rivosinc.com>, "Anup Patel" <anup@brainfault.org>,
  <paul.walmsley@sifive.com>, "Palmer Dabbelt" <palmer@dabbelt.com>,
  "Alexandre Ghiti" <alex@ghiti.fr>
 From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
-References: <20250505-kvm_lazy_enable_stateen-v1-0-3bfc4008373c@rivosinc.com> <20250505-kvm_lazy_enable_stateen-v1-1-3bfc4008373c@rivosinc.com>
-In-Reply-To: <20250505-kvm_lazy_enable_stateen-v1-1-3bfc4008373c@rivosinc.com>
+References: <20250505-kvm_lazy_enable_stateen-v1-0-3bfc4008373c@rivosinc.com> <20250505-kvm_lazy_enable_stateen-v1-4-3bfc4008373c@rivosinc.com>
+In-Reply-To: <20250505-kvm_lazy_enable_stateen-v1-4-3bfc4008373c@rivosinc.com>
 
-2025-05-05T14:39:26-07:00, Atish Patra <atishp@rivosinc.com>:
-> Currently, we enable the smstateen bit at vcpu configure time by
-> only checking the presence of required ISA extensions.
+2025-05-05T14:39:29-07:00, Atish Patra <atishp@rivosinc.com>:
+> SENVCFG and SSTATEEN CSRs are controlled by HSENVCFG(62) and
+> SSTATEEN0(63) bits in hstateen. Enable them lazily at runtime
+> instead of bootime.
 >
-> These bits are not required to be enabled if the guest never uses
-> the corresponding architectural state. Enable the smstaeen bits
-> at runtime lazily upon first access.
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+> diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
+> @@ -256,9 +256,37 @@ int kvm_riscv_vcpu_hstateen_lazy_enable(struct kvm_v=
+cpu *vcpu, unsigned int csr_
+>  	return KVM_INSN_CONTINUE_SAME_SEPC;
+>  }
+> =20
+> +static int kvm_riscv_vcpu_hstateen_enable_senvcfg(struct kvm_vcpu *vcpu,
+> +						  unsigned int csr_num,
+> +						  unsigned long *val,
+> +						  unsigned long new_val,
+> +						  unsigned long wr_mask)
+> +{
+> +	return kvm_riscv_vcpu_hstateen_lazy_enable(vcpu, csr_num, SMSTATEEN0_HS=
+ENVCFG);
+> +}
 
-What is the advantage of enabling them lazily?
+Basically the same comments as for [1/5]:
 
-To make the trap useful, we would have to lazily perform initialization
-of the AIA.  I think it would require notable changes to AIA, though...
+Why don't we want to set the ENVCFG bit (62) unconditionally?
+
+It would save us the trap on first access.  We don't get anything from
+the trap, so it looks like a net negative to me.
+
+> +
+> +static int kvm_riscv_vcpu_hstateen_enable_stateen(struct kvm_vcpu *vcpu,
+> +						  unsigned int csr_num,
+> +						  unsigned long *val,
+> +						  unsigned long new_val,
+> +						  unsigned long wr_mask)
+> +{
+> +	const unsigned long *isa =3D vcpu->arch.isa;
+> +
+> +	if (riscv_isa_extension_available(isa, SMSTATEEN))
+> +		return kvm_riscv_vcpu_hstateen_lazy_enable(vcpu, csr_num, SMSTATEEN0_S=
+STATEEN0);
+> +	else
+> +		return KVM_INSN_EXIT_TO_USER_SPACE;
+> +}
+
+The same argument applies to the SE0 bit (63) when the guest has the
+sstateen extension.
+
+KVM doesn't want to do anything other than stop trapping and reenter, so
+it seems to me we could just not trap in the first place.
 
 Thanks.
 
