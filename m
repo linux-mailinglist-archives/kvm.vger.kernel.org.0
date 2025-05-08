@@ -1,810 +1,377 @@
-Return-Path: <kvm+bounces-45828-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-45829-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E887AAF097
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 03:24:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30921AAF0A7
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 03:33:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D0599E1257
-	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 01:23:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41C761C24838
+	for <lists+kvm@lfdr.de>; Thu,  8 May 2025 01:33:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B091A3161;
-	Thu,  8 May 2025 01:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527291B532F;
+	Thu,  8 May 2025 01:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mg1kg5lv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XhywrtKw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724831922F4;
-	Thu,  8 May 2025 01:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746667445; cv=none; b=KQUlbNZWLOqLMY+Jr1bb1/D3D8d6PVEavhpBK2anHaCrY5ksYi/PK3+bWY2/PFTWdGbRcu+z3XglNO9R9jQ3zoy5R9W/O+SKk3lVljJoCCA7hlBrN8VdbL09y3DCcc5uoZ5KPh7zx7yBh87wLUgPa8vnYCK5+UFSYg1EKZLktkc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746667445; c=relaxed/simple;
-	bh=WeJltu95Tn+DNBEeuRB9CaWU/mev8zVPMStv7LqpUJI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=VPmbj+TNlcWFk1oTVzKoUfftdbhEvghryOe6Auz03pkzak3sQC5LmwaAtAM+OB4myIAIOHZE7xTo3VEBJ0540q5izgMFH2wT1ijpq+oSfjuvz4j11CqZsJXKe+9SNakePg2KslfZOCOcDXnYcw8uUB5+aT5RBXlz5GjEpfoMIdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mg1kg5lv; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7399a2dc13fso627235b3a.2;
-        Wed, 07 May 2025 18:24:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746667441; x=1747272241; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RBUy85vWDjKVimljU6VDxoJySzTHA7r6sYi4ZEJbdD8=;
-        b=Mg1kg5lvogI99N7uZm3VvFg6mPoIcIAnbM1ePkLkYc+17j/v42o8F4pqH4tJbBJCft
-         FJf1bTgPFLOasn64BhY2a8xh74f3f5jMi5RY5hVKS5R/jNim86rVvqSWtGShzX3gsIpw
-         ePAwCvqyZaeQkMZc24LJfHmiKQPjA+0Wm3F1PuMgD7pkxpRW8zxkNMqJRibcVGEEZt7s
-         Q6hN/0LEOYpssLM9KM7KO6ngAbdnJTHJNcGXCb4XxySdr/RzHmCGGGV9oaR3UFQHKmF0
-         isXCFGeNmlolB3QnKq8OIi8VmW2yTqD/0oSAjmImDIdF33AdyxVIHy2bEYA1DCdeBF0b
-         1T+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746667441; x=1747272241;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RBUy85vWDjKVimljU6VDxoJySzTHA7r6sYi4ZEJbdD8=;
-        b=w9SyVLj8NCJVyLSLz1FpurvVTBz5QqTUyBSQjj9Nsc8rmIKtmYD5/VB6C4h5NeWdvr
-         qJbpNQksZBDHOOy7qQu4h4etpOjQ1m6wGs7+LRjwwcGN76sbwo0TAS5hHcyfKP/yF54C
-         Fsd0QgFE8PNRCBvExML3gVFvBEoJp1LbH52lxgodoR+bJwZcDNf741fAq7dol1tmI/b3
-         ZaC7Ze92gBUEkdPH4Zr9YQGKhvZnde77utMC093E7IiQRoDFxolK3e9caD20kE7k+E8p
-         CNKidr3MuK0izB7ITjkglJ2euz23lQHSchwo/HbSSwycVEHMs4T5aPA9u0Q2B+wrHrnW
-         Tx4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVuCPZkEsKnFYGAisIMiYjEqg+5i5HcIeFkVyKHNxEPWztVfuFzEsY8LcWQnVQd0ztJqzs8dAZ5@vger.kernel.org, AJvYcCVyPfWOH6eWBKoZOqD2JUMYlb1dWcULmVEf3CM99OJBZkcl3/yTI4AwZ515+IM4k67zTUAkrBhrm/qW4u/Fble7@vger.kernel.org, AJvYcCXpFclow1V/CWsjPmDZl7P5/+r8Lr4AzCxeB8P+oZ6DbG6a6G+9Md+ULaI36xbiMnQ5tGdALtGbdWlCuRA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtKhwBfEsYjG507kJDNVq/DRgZKL/29+g7BhSgXgxrUMR6ndo5
-	498N21bMjtHfVvRLZkuQfzoERzjRtpTPFgA4VB/tI8YiWieYbCH08jG6+nkK
-X-Gm-Gg: ASbGnct1yG4LQTlWP3D36dNvp4xbk6aAAmcY5mTiMsKVye1zBRSFyIfH5A1q1pRBG5y
-	8XC0D2wrS44KtIR+4EdjEKvhiIrfq+PTRoWtKR9vUWPR2aGlntMSNpMgXlsoPyD3oFSRGBJRdax
-	gvcpyDGfK5BgpwkBpsxUqS8Y9GYT8wY0zH7Lv1iaYcSkofOW6IVb3UWrbJ9R5ghZDCusEvsxzi0
-	8Zn6pgaJhJSnMwURlo704cUGxWZM4dd6Gk2VZKzCySfanrZJIgNXEPMM1XUaGyTBmVgH7NAZQku
-	9Vi/BIjlvwunGQXTR7lrxrO27aQS+EFVAZd1X+huJLJHS0k=
-X-Google-Smtp-Source: AGHT+IGB+A+f/zcJa5K38y123JsWrzyizoCcae60BRiR3wELVPT1shw0q+RoEomHBxSR8UbEFrsp7g==
-X-Received: by 2002:a05:6a00:3485:b0:736:34a2:8a18 with SMTP id d2e1a72fcca58-7409cfef821mr8301881b3a.24.1746667440469;
-        Wed, 07 May 2025 18:24:00 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:f::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-740a95f8333sm597274b3a.26.2025.05.07.18.23.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 18:23:59 -0700 (PDT)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Wed, 07 May 2025 18:23:56 -0700
-Subject: [PATCH net-next v4] selftests/vsock: add initial vmtest.sh for
- vsock
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A093519F40F;
+	Thu,  8 May 2025 01:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746667984; cv=fail; b=tXTMd0g2gujNkz4tWpZd853HZ/UiI7IyL52VVsQC28ToWGK2V7fbWlCRm7ooU7WDktrgkwg23Fmb/KLlh3OxhU4LHy/PC0VnWfU5aCAL7Ug64I5xdWdQQ6RsmkNWyk3NSzzMCSqmuEucthKk3z8VJh/0diFmpNoZ0Kq3UAxyz0E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746667984; c=relaxed/simple;
+	bh=WyJJNjyo12c007kqovDZGG/EoOX1ChoigqMhfITlLrc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=assqhSjNiINU/fKgZM70z89wv4TiRgwe+eNSwgesP0/glnNvjdXF7ZtQx0jQdUfcmMAeWER1x+RtI67p6b3lTF7OXX6VASDZDgiSuTGdChtzAAQjXiHkdHU++mEkev/F3ANEnU/HraE6a7Psnn5d4ygpBfRCC+MCr8C7z+2lsd4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XhywrtKw; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746667981; x=1778203981;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=WyJJNjyo12c007kqovDZGG/EoOX1ChoigqMhfITlLrc=;
+  b=XhywrtKwD7Vl3n1wz861y+0Nl/uhHM9CLIOGYWdPoq9UaSj/1XxNruhb
+   rt6rgKWXDe2nw8c6yzVZPvzSpvZ8B4vBpqG6D5LQ2P7BS7ccmtYIf2xTz
+   /xtU90yMc4dINbsuFKjvnFeGz4FkIg0ZUFHeVLXbcw+m0lpN/wpJbMKuH
+   4tL9m0F4AT+Wen4lFeLFN2iGeGjvy9V0igRwA4M5R35bVBXUNPz3opDkK
+   tpeuaAsdLkAReswEwGKm2O6lZVbRi+Yz1JdIO5wGHIKng1+V00teJy3rb
+   cXHNp1EWc+awJk26n7pvSD0PxjpQLed96G9Q3YBbQ22FOm7ooq/pVEKyV
+   Q==;
+X-CSE-ConnectionGUID: MJDw/1Z+SCKNGpNB0+iS0w==
+X-CSE-MsgGUID: oQzuTIlzRcyBqoDWwAs17w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="48575291"
+X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
+   d="scan'208";a="48575291"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 18:33:00 -0700
+X-CSE-ConnectionGUID: i0zhfwlERAaQYOgyigSvNQ==
+X-CSE-MsgGUID: 12702So7S6CYeVgofldiIA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
+   d="scan'208";a="141092829"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 18:33:01 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 7 May 2025 18:33:00 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 7 May 2025 18:33:00 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 7 May 2025 18:32:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ApATh4yckwlkSHahaHi6eI/mZpNb9oqGgBda50HcJazRL4hmRz4NSymBF/H97DnETj4+u6EheAqblNfWoIH/ZkiIMTbv3ll3jQAiqRI7ujx5Q7QANjwsQYkWREGOzwkAYCDOJI1QC+MnFbdqhxR4iADim8PaS2rQv4/XcZWW+jrA6Z8+ongGL1AfXPwwfrCa4VPYJDTFdm+WOhXR8KzyirtydYB+yHJOBEiirBoU9czfpcgwO6lOyKlzle7nem/y97POjQ1hIDvxEOEnm/iGE4TbPYX5RKLBrGVxDv53McihuGK+UnDmIcttsrPhkxq0/lCIz4g5HH+VzCjuCeX+2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NKnTZdjT4sWpNilw9HM4X3YKLTZ3UWz5MYmht7HWjA8=;
+ b=H4Bnw4HJiOxTGQbxO8UmtbJgzKrt+mpkq8TLP+/JRF7kAKeDfuymC03cR98sLxfCQ592oLRrWLZjhwJHJ6P4h0SGPf0wlsIUU3283yN4IfZx5Ox+VxumtsW9kqt2algaie4TbXZmHpyflhDwgHV1X8D8iOxDYW0kbjqoL8xrJb/OgBLpCkA2tWZ4dHA157MFkHZyzfQCvz/udAO/NrcVz+/5RLYY2zQcZNtDJzC6FAC3ywIDKHQ7jZYWd8XqbtIUpwnxPSohtDItuv+QAD6/5wkS44WkeNf/pWpqdL7drFXArxuLQdVNwURREOw+8pe333Vwihf24LbRbGofp5JrXQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ CY8PR11MB6939.namprd11.prod.outlook.com (2603:10b6:930:59::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8699.24; Thu, 8 May 2025 01:32:09 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.8722.020; Thu, 8 May 2025
+ 01:32:09 +0000
+Date: Thu, 8 May 2025 09:30:04 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Vishal Annapurve <vannapurve@google.com>
+CC: <pbonzini@redhat.com>, <seanjc@google.com>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <x86@kernel.org>,
+	<rick.p.edgecombe@intel.com>, <dave.hansen@intel.com>,
+	<kirill.shutemov@intel.com>, <tabba@google.com>, <ackerleytng@google.com>,
+	<quic_eberman@quicinc.com>, <michael.roth@amd.com>, <david@redhat.com>,
+	<vbabka@suse.cz>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+	<pgonda@google.com>, <zhiquan1.li@intel.com>, <fan.du@intel.com>,
+	<jun.miao@intel.com>, <ira.weiny@intel.com>, <isaku.yamahata@intel.com>,
+	<xiaoyao.li@intel.com>, <binbin.wu@linux.intel.com>, <chao.p.peng@intel.com>
+Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge
+ pages
+Message-ID: <aBwJHE/zRDvV41fH@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250424030603.329-1-yan.y.zhao@intel.com>
+ <CAGtprH9_McMDepbuvWMLRvHooPdtE4RHog=Dgr_zFXT5s49nXA@mail.gmail.com>
+ <aBAiCBmON0g0Qro1@yzhao56-desk.sh.intel.com>
+ <CAGtprH_ggm8N-R9QbV1f8mo8-cQkqyEta3W=h2jry-NRD7_6OA@mail.gmail.com>
+ <aBldhnTK93+eKcMq@yzhao56-desk.sh.intel.com>
+ <CAGtprH9wi6zHJ5JeuAnjZThMAzxxibJGo=XN1G1Nx8txZRg8_w@mail.gmail.com>
+ <aBmmirBzOZfmMOJj@yzhao56-desk.sh.intel.com>
+ <CAGtprH9fDMiuk3JGSS12M-wFoqRj+sjdtEHJFS_5QfKX7aGkRQ@mail.gmail.com>
+ <aBsNsZsWuVl4uo0j@yzhao56-desk.sh.intel.com>
+ <CAGtprH-+Bo4hFxL+THiMgF5V4imdVVb0OmRhx2Uc0eom9=3JPA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGtprH-+Bo4hFxL+THiMgF5V4imdVVb0OmRhx2Uc0eom9=3JPA@mail.gmail.com>
+X-ClientProxiedBy: SG3P274CA0004.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::16)
+ To DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250507-vsock-vmtest-v4-1-6e2a97262cd6@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAKsHHGgC/13NQQ6CMBCF4auQrq3pzAAWV97DuChlwEYBQ5tGY
- 7i7TVfI8mXy/fMVnhfHXpyLr1g4Ou/mKY3yUAh7N9PA0nVpC1RYKcJKRj/bh4xjYB9kSwahQ1B
- oUSTyWrh375y7iomDnPgdxC1d7s6HefnkPxHyPSdLUP/JCBJkT5XR0Jm20fYyjMY9j3YecyjiF
- p92GBOmRoHBExGw3mPaYNQ7TAmDBtPXUFNPvMXruv4AiP01GCwBAAA=
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Bobby Eshleman <bobbyeshleman@gmail.com>
-X-Mailer: b4 0.13.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CY8PR11MB6939:EE_
+X-MS-Office365-Filtering-Correlation-Id: 700e6712-ca32-43e4-2350-08dd8dd0265c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Y0pPZlkxZ2xRNzhTTFJWaDZ6RmovNzdUL2h3bUhOVUl6MUkzeWhuN3JCSG1D?=
+ =?utf-8?B?Uk9DWGxXQmoxWXFCd2hPam1PTlBLOGo1NFJNOWIwYi9VbWIremU0R1o2bi9k?=
+ =?utf-8?B?dlRSMkZ4V3I3cFBTR0w5cHJrTWMxc3Rvd2sxdGNtOUs2eEhBNTQzMVVxMDJQ?=
+ =?utf-8?B?WE5MTTJlNjl4SkwzNDFZM1RDam5wVjhlVU5VdHRlaWRzMm9iei9XVHBEanNx?=
+ =?utf-8?B?dDlralRWZ01INzZDclJvRHROUkR4QzIySUVuNVRKTzVmemFjUDJRRVNrcHli?=
+ =?utf-8?B?NE82cmdIYjdQNjRpanRsL1JLUkdJa3paL0Q3MlBOK2JhbDQrVENoM1VPREhz?=
+ =?utf-8?B?LzI4eEtpMHFlS3lHMVkvU3VSYmtRZFA1WDBzcjFKKzIra1B2UUZGdEJHOVZD?=
+ =?utf-8?B?dVNkaHRBY0NQcDB6RVdtOFNRcEtrM1F2SGV5NDJJbnpJNUJiRzZzQStKblNJ?=
+ =?utf-8?B?djdmOW9GQVdVZjJsY3k4OFpyS3Via1JjWE5wRGlyY1Mwd29KZUY4ZW9USlZs?=
+ =?utf-8?B?ZFZNR21OQ0hxYmNVd3YyQ3A4SWs4TzBuNEFtd2UyK0h6aExKbHFFcHJVNnFE?=
+ =?utf-8?B?bzFpZ2VIMlUwNE9jdVVIVWJneDZkdnZraEhzZWpHMUl1U21yQlhpOFp4RXNy?=
+ =?utf-8?B?b3VscS9oTHhjSU1QSEpWcUJVYUtmM0JtR0ZaMzhiVFN1a3F2MEZSOEpyb0NE?=
+ =?utf-8?B?YklSSUVUSjlRUStrbVdmSHAvbTB6QmFLYjl4dlJpL1Bha3QxY0NzU0d1eWwx?=
+ =?utf-8?B?UnJxa0Z3M0R6WWpjWGRLY2M0UDFXajlJZUQwNzVBOVlYcW03bGZ1cTRla0d4?=
+ =?utf-8?B?KzVjZGJuTDM0bmhnU1BxM0haajRwYmlwRmJuMHJ1VHJqcVRzTmJ6Wmc5ZFJi?=
+ =?utf-8?B?V2l0WDlSWkdpQUd4UElYbEdvbFVLMHJwY0U3eGZzNUFtbXNXbUQwaWFka3BS?=
+ =?utf-8?B?T3RHV0V3bXAvYVJHMlpJQVl3RVA3WmhPUnl3ZEUyWU85MXV1dVovckN5NFRp?=
+ =?utf-8?B?ZnNrUm9OT3VtQXkzMHdlZ3NkSTFWODJlcFNDbkxiUkRweDJ2WUtHSEVVMjFU?=
+ =?utf-8?B?VTRKWk9EYXlLTDBPUS9jM09RUVJXUkJyaUZsbkk1UzlnUnM0bTR3V3c1Z3Bn?=
+ =?utf-8?B?bVFxeDU3ZVY2WXkxb0Yzdmo3M2dHcG0yS1F2clBBdkhCbG1UNEdUYm1hT1V5?=
+ =?utf-8?B?eElqN3BDa1gwY0taVVF5VFFPdWR0NEFqNk0wT0JscUNmY05OTXNWL3ZpTTJS?=
+ =?utf-8?B?TEhFVi9KQVY2Zno5dGxESm1yMGxaYzk4bmFsL21RMjROOUV2RUxiT0xyY2la?=
+ =?utf-8?B?c2N2ZzBudkZ4cEduMitHNzU3WUpNZXBWbU5ZNVhYeElLbGtBZk05c3Q0TGpI?=
+ =?utf-8?B?c0Qzd0xLQnJuVSttWi9nUEpJdkV3SU5MeXYyQUZsOGJQMXpibzg2cnNGaEtX?=
+ =?utf-8?B?TTRDS0huV0FxYXFaNlNqNGxTYXRLWmZ4Mkp5cUFic1pLM3pDMUNHQkVvSHJB?=
+ =?utf-8?B?KyszSGs0MzA3R2tjVm9XdnR3MUJsbEltSFZsUkVDYytxTThzekFLYnBmRm0z?=
+ =?utf-8?B?YzdDVHB6eDRWR1hWMHYrV3RGb0p4UzRkMjZjZWpFczZOdEtyYzkyaElCTTRR?=
+ =?utf-8?B?d0ZsSmJwVW1GL0NJejBoazR5WnExSys4KzF3OE5iZ3FCUmFpemVXVlVtSkRQ?=
+ =?utf-8?B?S2lUN2oySjFrd21kQ1NFTHRsRUl1RDdjK1A5T3FpTWw0R1lFY0tNTUlvVUx2?=
+ =?utf-8?B?VFhnWkJRTUdDME1wejJqYWxWQjB3NUZibW11NGx0UHpnNmI4a0U1NEdZeUov?=
+ =?utf-8?B?ODRoLzgrWnNVbmI4NUVSWGdhdmt5U1BRYnBxbDc4S25PeldMc0pDL0RscGcr?=
+ =?utf-8?Q?ViBIxnkT8XDhE?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RExrY3d0allFTkZjeklyVlpwR2JjeElQVmJRSUdTS2NteEt4S3l0VEhhSlQ0?=
+ =?utf-8?B?andqbGZacGgxSTRIWGQ5NmViQUFqZGdUNkxVWHBodlFycTIwYVNvVGVUWkNm?=
+ =?utf-8?B?ZmpVSGd6K2lmYnVHNUFXbmZEMmJxa3g0N3VjZUxZajkwTGNTK09sMXg5OGJB?=
+ =?utf-8?B?eCtiN0VtQ0J3SmhkNnJWM1BaWGdPUk1PNm44Vlg2Zk5namY1bUV3UFFaeFlZ?=
+ =?utf-8?B?WnpUVzQ1TjEyK0hhSlVPZS9rZ2JoZXlQd1QzNTRpNmwyZEE5TTJGN1RDelRp?=
+ =?utf-8?B?SXB5WDlsWWI1S2ZzR1dkTkI3MUVQQTNON0s2bFh4WWZRcDRwblYwQnZ5WWhI?=
+ =?utf-8?B?VGlSNERkazJOaW83Q3FlNmNUUndQREgxcGtxT0o3NndYOUE4M1JXMkdqdmtV?=
+ =?utf-8?B?cDZ3MlNhaGJRbUZXZmQwb0NTUk05Q05GU0lKQnFqNzVZTGYrQlVBUUc4VG5T?=
+ =?utf-8?B?Nld2TE9BRW5FQmtsc2FNSEFYcVlsUWg0cTZRRyswWGEyMUtrQnAwQ0VsM3Uy?=
+ =?utf-8?B?bFFHUURxbWVldjNMdUYyVFo3UVZ2Y2NPOVR4L2oyeWVCWEhJSjY1VzRKelZ6?=
+ =?utf-8?B?VlRKUXUxNWYwdjBoV1hXcGFoRXBxZzJaNHBvNEtqczk0UUNsTTVtcVc5aWFK?=
+ =?utf-8?B?cE5FeWpVTTc4dStPOFNCSkZOWlcwWkJxSGZhZDIrRlVjRWcxWUJac1g4SzU3?=
+ =?utf-8?B?UGsxSDlVTmphUkQwSjNQcGlGSDFyV2FzYThoQkNZWGt2WktXMndscE5uNjlw?=
+ =?utf-8?B?S053Qk1nVFAxZDkzR0E5S2JWdVRuaUNPbXZmMXgxQUlLclNURHFPMnRmZWJD?=
+ =?utf-8?B?UDEvOVVtSGRXRFZIdjNvL0J0M002WWdUTEQyL2Rjd3hLL3B2UnJOMDk1bVRQ?=
+ =?utf-8?B?V1lUa25jVG4wV3A2TnNQd1lJWVZsMlFMc1o1S0lNZSt4YUZ3UDNmZ0pOeW9k?=
+ =?utf-8?B?WDlGRjd6ZDhGRWhreVZuWmRzTXk3N1RodnhtL0xaaWF2dWgzNWh2VVVtd1ZR?=
+ =?utf-8?B?MStFTmlUY2V2TG9FckVsWXJsd2Z1ZkdraFJzaHVWOGZuMFYwWlo1Zis1NzVz?=
+ =?utf-8?B?QXpGSDBid0wwTjAxZ3M1ejc1MVF6SVNpVzNySGhJUW5adCtUdmJVdCs5alUz?=
+ =?utf-8?B?ZDNxOVAyS0l3VHdQRDl1NmMzYTk0dTBBZ2RrU0xKUmVXLzNEUm8vKzcrcnMw?=
+ =?utf-8?B?ajNFUnF1Q1VNVXNlaFRDZlFxMVlMWHBkOTNkb003L21zK294QlBiaWpFTm9F?=
+ =?utf-8?B?TVVIdjh3NHJuQWFpd1pNWUdOWjhhZDR2VVVSbHcyckdTN0V1MjBxaEVIRGt4?=
+ =?utf-8?B?K3FISWFkSEVFbFdTOWRZck1sbnl5RTg1NzIxcUtNVlNLMGhzdHJHV29STTcx?=
+ =?utf-8?B?anhldDR6aTlwYVFrWlIyUEV5bENieDN0YTljQXI5MU9ta0Zoc05OdmljQVRy?=
+ =?utf-8?B?cVNXSzQyL3U3Uk11TzFpMWt0VEkxczNKUkdWZ2c1NGJmRmwweGRGN3dJT242?=
+ =?utf-8?B?cGxuQzk2RWFVQ0gyMld6SUxZTEZvbVR4RjVSYzQ5U1J6VG5sWmkwZWFsekR6?=
+ =?utf-8?B?Z0ZmVVMwUFFIM1BsWGhmUE02NXBnZ1Z0eDlUK3hXc1VkZkduSlRkQStTZWsw?=
+ =?utf-8?B?RitLM0FkZ3gxU1pUcmF4RXVXbXRWWmYvYXIrQjNBM2V5UHQ1c1VtcHZSMHBM?=
+ =?utf-8?B?TlQ5WEpzMDVicWgwYndwcVA5bElnVXRTMzA5R2lDTUVPOFpFKy9wK0lHdDln?=
+ =?utf-8?B?b203ZGtyTjBGVzVPK2tHVndEZWYwK25JelZDSDJXbFRpc2dwL2FPQ1N6S2Rj?=
+ =?utf-8?B?NzRPeUpYcUZSUFVXbm0rU0RwSW00eGY1QjVQVmVPYkdyWVZqS1Z6ZGhmVDJG?=
+ =?utf-8?B?MmNuS1U0cmRTUWtvT0tlNTdVZEthNnAxcklQM2wvclV6MW1Hbm9kclNDbWFC?=
+ =?utf-8?B?SGlaTllGTmJUbml4R3RQMFN3ZlpDUmVVM25IRVBWb3lYZUpFSzNJVlhjRTlL?=
+ =?utf-8?B?czdYWUZ5RXE1VUkwNURiRlRCT1V3ZlNYYVhYbm91dnRDczFGTE4rRUpHUC82?=
+ =?utf-8?B?a3k0bGFqbks2emN6RUJkeDNEVFIvSVdLeEMzSHhsVjY4LzA2Z1JXNXljQ25Y?=
+ =?utf-8?Q?RC1Wdt3O5GxRbGs4D2yEw0Ek/?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 700e6712-ca32-43e4-2350-08dd8dd0265c
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2025 01:32:09.4309
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ExrJOpDRS5hvoONGEod1JJ+LF6waX8x0iqQNnEmT+RYlC5ibBYw0RLJmNQIgFpD6qo4WE5CkuSTMg2IDYIZTVw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6939
+X-OriginatorOrg: intel.com
 
-This commit introduces a new vmtest.sh runner for vsock.
+On Wed, May 07, 2025 at 07:56:08AM -0700, Vishal Annapurve wrote:
+> On Wed, May 7, 2025 at 12:39 AM Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >
+> > On Tue, May 06, 2025 at 06:18:55AM -0700, Vishal Annapurve wrote:
+> > > On Mon, May 5, 2025 at 11:07 PM Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > >
+> > > > On Mon, May 05, 2025 at 10:08:24PM -0700, Vishal Annapurve wrote:
+> > > > > On Mon, May 5, 2025 at 5:56 PM Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > >
+> > > > > > Sorry for the late reply, I was on leave last week.
+> > > > > >
+> > > > > > On Tue, Apr 29, 2025 at 06:46:59AM -0700, Vishal Annapurve wrote:
+> > > > > > > On Mon, Apr 28, 2025 at 5:52 PM Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > > > So, we plan to remove folio_ref_add()/folio_put_refs() in future, only invoking
+> > > > > > > > folio_ref_add() in the event of a removal failure.
+> > > > > > >
+> > > > > > > In my opinion, the above scheme can be deployed with this series
+> > > > > > > itself. guest_memfd will not take away memory from TDX VMs without an
+> > > > > > I initially intended to add a separate patch at the end of this series to
+> > > > > > implement invoking folio_ref_add() only upon a removal failure. However, I
+> > > > > > decided against it since it's not a must before guest_memfd supports in-place
+> > > > > > conversion.
+> > > > > >
+> > > > > > We can include it in the next version If you think it's better.
+> > > > >
+> > > > > Ackerley is planning to send out a series for 1G Hugetlb support with
+> > > > > guest memfd soon, hopefully this week. Plus I don't see any reason to
+> > > > > hold extra refcounts in TDX stack so it would be good to clean up this
+> > > > > logic.
+> > > > >
+> > > > > >
+> > > > > > > invalidation. folio_ref_add() will not work for memory not backed by
+> > > > > > > page structs, but that problem can be solved in future possibly by
+> > > > > > With current TDX code, all memory must be backed by a page struct.
+> > > > > > Both tdh_mem_page_add() and tdh_mem_page_aug() require a "struct page *" rather
+> > > > > > than a pfn.
+> > > > > >
+> > > > > > > notifying guest_memfd of certain ranges being in use even after
+> > > > > > > invalidation completes.
+> > > > > > A curious question:
+> > > > > > To support memory not backed by page structs in future, is there any counterpart
+> > > > > > to the page struct to hold ref count and map count?
+> > > > > >
+> > > > >
+> > > > > I imagine the needed support will match similar semantics as VM_PFNMAP
+> > > > > [1] memory. No need to maintain refcounts/map counts for such physical
+> > > > > memory ranges as all users will be notified when mappings are
+> > > > > changed/removed.
+> > > > So, it's possible to map such memory in both shared and private EPT
+> > > > simultaneously?
+> > >
+> > > No, guest_memfd will still ensure that userspace can only fault in
+> > > shared memory regions in order to support CoCo VM usecases.
+> > Before guest_memfd converts a PFN from shared to private, how does it ensure
+> > there are no shared mappings? e.g., in [1], it uses the folio reference count
+> > to ensure that.
+> >
+> > Or do you believe that by eliminating the struct page, there would be no
+> > GUP, thereby ensuring no shared mappings by requiring all mappers to unmap in
+> > response to a guest_memfd invalidation notification?
+> 
+> Yes.
+> 
+> >
+> > As in Documentation/core-api/pin_user_pages.rst, long-term pinning users have
+> > no need to register mmu notifier. So why users like VFIO must register
+> > guest_memfd invalidation notification?
+> 
+> VM_PFNMAP'd memory can't be long term pinned, so users of such memory
+> ranges will have to adopt mechanisms to get notified. I think it would
+Hmm, in current VFIO, it does not register any notifier for VM_PFNMAP'd memory.
 
-It uses virtme-ng/qemu to run tests in a VM. The tests validate G2H,
-H2G, and loopback. The testing tools from tools/testing/vsock/ are
-reused. Currently, only vsock_test is used.
+> be easy to pursue new users of guest_memfd to follow this scheme.
+> Irrespective of whether VM_PFNMAP'd support lands, guest_memfd
+> hugepage support already needs the stance of: "Guest memfd owns all
+> long-term refcounts on private memory" as discussed at LPC [1].
+> 
+> [1] https://lpc.events/event/18/contributions/1764/attachments/1409/3182/LPC%202024_%201G%20page%20support%20for%20guest_memfd.pdf
+> (slide 12)
+> 
+> >
+> > Besides, how would guest_memfd handle potential unmap failures? e.g. what
+> > happens to prevent converting a private PFN to shared if there are errors when
+> > TDX unmaps a private PFN or if a device refuses to stop DMAing to a PFN.
+> 
+> Users will have to signal such failures via the invalidation callback
+> results or other appropriate mechanisms. guest_memfd can relay the
+> failures up the call chain to the userspace.
+AFAIK, operations that perform actual unmapping do not allow failure, e.g.
+kvm_mmu_unmap_gfn_range(), iopt_area_unfill_domains(),
+vfio_iommu_unmap_unpin_all(), vfio_iommu_unmap_unpin_reaccount().
 
-VMCI and hyperv support is automatically built, though not used.
+That's why we rely on increasing folio ref count to reflect failure, which are
+due to unexpected SEAMCALL errors.
 
-Only tested on x86.
+> > Currently, guest_memfd can rely on page ref count to avoid re-assigning a PFN
+> > that fails to be unmapped.
+> >
+> >
+> > [1] https://lore.kernel.org/all/20250328153133.3504118-5-tabba@google.com/
+> >
+> >
+> > > >
+> > > >
+> > > > > Any guest_memfd range updates will result in invalidations/updates of
+> > > > > userspace, guest, IOMMU or any other page tables referring to
+> > > > > guest_memfd backed pfns. This story will become clearer once the
+> > > > > support for PFN range allocator for backing guest_memfd starts getting
+> > > > > discussed.
+> > > > Ok. It is indeed unclear right now to support such kind of memory.
+> > > >
+> > > > Up to now, we don't anticipate TDX will allow any mapping of VM_PFNMAP memory
+> > > > into private EPT until TDX connect.
+> > >
+> > > There is a plan to use VM_PFNMAP memory for all of guest_memfd
+> > > shared/private ranges orthogonal to TDX connect usecase. With TDX
+> > > connect/Sev TIO, major difference would be that guest_memfd private
+> > > ranges will be mapped into IOMMU page tables.
+> > >
+> > > Irrespective of whether/when VM_PFNMAP memory support lands, there
+> > > have been discussions on not using page structs for private memory
+> > > ranges altogether [1] even with hugetlb allocator, which will simplify
+> > > seamless merge/split story for private hugepages to support memory
+> > > conversion. So I think the general direction we should head towards is
+> > > not relying on refcounts for guest_memfd private ranges and/or page
+> > > structs altogether.
+> > It's fine to use PFN, but I wonder if there're counterparts of struct page to
+> > keep all necessary info.
+> >
+> 
+> Story will become clearer once VM_PFNMAP'd memory support starts
+> getting discussed. In case of guest_memfd, there is flexibility to
+> store metadata for physical ranges within guest_memfd just like
+> shareability tracking.
+Ok.
 
-To run:
-
-  $ tools/testing/selftests/vsock/vmtest.sh
-
-or
-
-  $ make -C tools/testing/selftests TARGETS=vsock run_tests
-
-Output (vmtest.sh):
-TAP version 13
-1..3
-not ok 1 vm_server_host_client # exit=1
-ok 1 vm_client_host_server
-ok 2 vm_loopback
-SUMMARY: PASS=2 SKIP=0 FAIL=1
-1..3
-
-Future work can include vsock_diag_test.
-
-The tap output style copies mm's run_vmtests.sh.
-
-Because vsock requires a VM to test anything other than loopback, this
-patch adds vmtest.sh as a kselftest itself. This is different than other
-systems that have a "vmtest.sh", where it is used as a utility script to
-spin up a VM to run the selftests as a guest (but isn't hooked into
-kselftest).
-
-I've began testing this in one of the NIPA environments Jakub as
-graciously provided. I would expect at least one more revision to have
-that setup ironed out and fully tested.
-
-Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
----
-Changes in v4:
-- do not use special tab delimiter for help string parsing (Stefano + Paolo)
-- fix paths for when installing kselftest and running out-of-tree (Paolo)
-- change vng to using running kernel instead of compiled kernel (Paolo)
-- use multi-line string for QEMU_OPTS (Stefano)
-- change timeout to 300s (Paolo)
-- skip if tools are not found and use kselftests status codes (Paolo)
-- remove build from vmtest.sh (Paolo)
-- change 2222 -> SSH_HOST_PORT (Stefano)
-- add tap-format output
-- add vmtest.log to gitignore
-- check for vsock_test binary and remind user to build it if missing
-- create a proper build in makefile
-- style fixes
-- add ssh, timeout, and pkill to dependency check, just in case
-- fix numerical comparison in conditionals
-- check qemu pidfile exists before proceeding (avoid wasting time waiting for ssh)
-- fix tracking of pass/fail bug
-- fix stderr redirection bug
-- Link to v3: https://lore.kernel.org/r/20250428-vsock-vmtest-v3-1-181af6163f3e@gmail.com
-
-Changes in v3:
-- use common conditional syntax for checking variables
-- use return value instead of global rc
-- fix typo TEST_HOST_LISTENER_PORT -> TEST_HOST_PORT_LISTENER
-- use SIGTERM instead of SIGKILL on cleanup
-- use peer-cid=1 for loopback
-- change sleep delay times into globals
-- fix test_vm_loopback logging
-- add test selection in arguments
-- make QEMU an argument
-- check that vng binary is on path
-- use QEMU variable
-- change <tab><backslash> to <space><backslash>
-- fix hardcoded file paths
-- add comment in commit msg about script that vmtest.sh was based off of
-- Add tools/testing/selftest/vsock/Makefile for kselftest
-- Link to v2: https://lore.kernel.org/r/20250417-vsock-vmtest-v2-1-3901a27331e8@gmail.com
-
-Changes in v2:
-- add kernel oops and warnings checker
-- change testname variable to use FUNCNAME
-- fix spacing in test_vm_server_host_client
-- add -s skip build option to vmtest.sh
-- add test_vm_loopback
-- pass port to vm_wait_for_listener
-- fix indentation in vmtest.sh
-- add vmci and hyperv to config
-- changed whitespace from tabs to spaces in help string
-- Link to v1: https://lore.kernel.org/r/20250410-vsock-vmtest-v1-1-f35a81dab98c@gmail.com
----
- MAINTAINERS                              |   1 +
- tools/testing/selftests/vsock/.gitignore |   2 +
- tools/testing/selftests/vsock/Makefile   |  17 ++
- tools/testing/selftests/vsock/config     | 114 +++++++++
- tools/testing/selftests/vsock/settings   |   1 +
- tools/testing/selftests/vsock/vmtest.sh  | 423 +++++++++++++++++++++++++++++++
- 6 files changed, 558 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 657a67f9031e..3fbdd7bbfce7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -25751,6 +25751,7 @@ F:	include/uapi/linux/vm_sockets.h
- F:	include/uapi/linux/vm_sockets_diag.h
- F:	include/uapi/linux/vsockmon.h
- F:	net/vmw_vsock/
-+F:	tools/testing/selftests/vsock/
- F:	tools/testing/vsock/
- 
- VMALLOC
-diff --git a/tools/testing/selftests/vsock/.gitignore b/tools/testing/selftests/vsock/.gitignore
-new file mode 100644
-index 000000000000..9c5bf379480f
---- /dev/null
-+++ b/tools/testing/selftests/vsock/.gitignore
-@@ -0,0 +1,2 @@
-+vmtest.log
-+vsock_test
-diff --git a/tools/testing/selftests/vsock/Makefile b/tools/testing/selftests/vsock/Makefile
-new file mode 100644
-index 000000000000..71fca0a2b8da
---- /dev/null
-+++ b/tools/testing/selftests/vsock/Makefile
-@@ -0,0 +1,17 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+CURDIR := $(abspath .)
-+TOOLSDIR := $(abspath ../../..)
-+
-+$(OUTPUT)/vsock_test: $(TOOLSDIR)/testing/vsock/vsock_test
-+	install -m 755 $< $@
-+
-+$(TOOLSDIR)/testing/vsock/vsock_test:
-+	$(MAKE) -C $(TOOLSDIR)/testing/vsock vsock_test
-+
-+TEST_PROGS += vmtest.sh
-+EXTRA_CLEAN += vmtest.log
-+TEST_GEN_FILES := vsock_test
-+
-+include ../lib.mk
-+
-diff --git a/tools/testing/selftests/vsock/config b/tools/testing/selftests/vsock/config
-new file mode 100644
-index 000000000000..3bffaaf98fff
---- /dev/null
-+++ b/tools/testing/selftests/vsock/config
-@@ -0,0 +1,114 @@
-+CONFIG_BLK_DEV_INITRD=y
-+CONFIG_BPF=y
-+CONFIG_BPF_SYSCALL=y
-+CONFIG_BPF_JIT=y
-+CONFIG_HAVE_EBPF_JIT=y
-+CONFIG_BPF_EVENTS=y
-+CONFIG_FTRACE_SYSCALLS=y
-+CONFIG_FUNCTION_TRACER=y
-+CONFIG_HAVE_DYNAMIC_FTRACE=y
-+CONFIG_DYNAMIC_FTRACE=y
-+CONFIG_HAVE_KPROBES=y
-+CONFIG_KPROBES=y
-+CONFIG_KPROBE_EVENTS=y
-+CONFIG_ARCH_SUPPORTS_UPROBES=y
-+CONFIG_UPROBES=y
-+CONFIG_UPROBE_EVENTS=y
-+CONFIG_DEBUG_FS=y
-+CONFIG_FW_CFG_SYSFS=y
-+CONFIG_FW_CFG_SYSFS_CMDLINE=y
-+CONFIG_DRM=y
-+CONFIG_DRM_VIRTIO_GPU=y
-+CONFIG_DRM_VIRTIO_GPU_KMS=y
-+CONFIG_DRM_BOCHS=y
-+CONFIG_VIRTIO_IOMMU=y
-+CONFIG_SOUND=y
-+CONFIG_SND=y
-+CONFIG_SND_SEQUENCER=y
-+CONFIG_SND_PCI=y
-+CONFIG_SND_INTEL8X0=y
-+CONFIG_SND_HDA_CODEC_REALTEK=y
-+CONFIG_SECURITYFS=y
-+CONFIG_CGROUP_BPF=y
-+CONFIG_SQUASHFS=y
-+CONFIG_SQUASHFS_XZ=y
-+CONFIG_SQUASHFS_ZSTD=y
-+CONFIG_FUSE_FS=y
-+CONFIG_SERIO=y
-+CONFIG_PCI=y
-+CONFIG_INPUT=y
-+CONFIG_INPUT_KEYBOARD=y
-+CONFIG_KEYBOARD_ATKBD=y
-+CONFIG_SERIAL_8250=y
-+CONFIG_SERIAL_8250_CONSOLE=y
-+CONFIG_X86_VERBOSE_BOOTUP=y
-+CONFIG_VGA_CONSOLE=y
-+CONFIG_FB=y
-+CONFIG_FB_VESA=y
-+CONFIG_FRAMEBUFFER_CONSOLE=y
-+CONFIG_RTC_CLASS=y
-+CONFIG_RTC_HCTOSYS=y
-+CONFIG_RTC_DRV_CMOS=y
-+CONFIG_HYPERVISOR_GUEST=y
-+CONFIG_PARAVIRT=y
-+CONFIG_KVM_GUEST=y
-+CONFIG_KVM=y
-+CONFIG_KVM_INTEL=y
-+CONFIG_KVM_AMD=y
-+CONFIG_VSOCKETS=y
-+CONFIG_VSOCKETS_DIAG=y
-+CONFIG_VSOCKETS_LOOPBACK=y
-+CONFIG_VMWARE_VMCI_VSOCKETS=y
-+CONFIG_VIRTIO_VSOCKETS=y
-+CONFIG_VIRTIO_VSOCKETS_COMMON=y
-+CONFIG_HYPERV_VSOCKETS=y
-+CONFIG_VMWARE_VMCI=y
-+CONFIG_VHOST_VSOCK=y
-+CONFIG_HYPERV=y
-+CONFIG_UEVENT_HELPER=n
-+CONFIG_VIRTIO=y
-+CONFIG_VIRTIO_PCI=y
-+CONFIG_VIRTIO_MMIO=y
-+CONFIG_VIRTIO_BALLOON=y
-+CONFIG_NET=y
-+CONFIG_NET_CORE=y
-+CONFIG_NETDEVICES=y
-+CONFIG_NETWORK_FILESYSTEMS=y
-+CONFIG_INET=y
-+CONFIG_NET_9P=y
-+CONFIG_NET_9P_VIRTIO=y
-+CONFIG_9P_FS=y
-+CONFIG_VIRTIO_NET=y
-+CONFIG_CMDLINE_OVERRIDE=n
-+CONFIG_BINFMT_SCRIPT=y
-+CONFIG_SHMEM=y
-+CONFIG_TMPFS=y
-+CONFIG_UNIX=y
-+CONFIG_MODULE_SIG_FORCE=n
-+CONFIG_DEVTMPFS=y
-+CONFIG_TTY=y
-+CONFIG_VT=y
-+CONFIG_UNIX98_PTYS=y
-+CONFIG_EARLY_PRINTK=y
-+CONFIG_INOTIFY_USER=y
-+CONFIG_BLOCK=y
-+CONFIG_SCSI_LOWLEVEL=y
-+CONFIG_SCSI=y
-+CONFIG_SCSI_VIRTIO=y
-+CONFIG_BLK_DEV_SD=y
-+CONFIG_VIRTIO_CONSOLE=y
-+CONFIG_WATCHDOG=y
-+CONFIG_WATCHDOG_CORE=y
-+CONFIG_I6300ESB_WDT=y
-+CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
-+CONFIG_OVERLAY_FS=y
-+CONFIG_DAX=y
-+CONFIG_DAX_DRIVER=y
-+CONFIG_FS_DAX=y
-+CONFIG_MEMORY_HOTPLUG=y
-+CONFIG_MEMORY_HOTREMOVE=y
-+CONFIG_ZONE_DEVICE=y
-+CONFIG_FUSE_FS=y
-+CONFIG_VIRTIO_FS=y
-+CONFIG_VSOCKETS=y
-+CONFIG_VIRTIO_VSOCKETS=y
-diff --git a/tools/testing/selftests/vsock/settings b/tools/testing/selftests/vsock/settings
-new file mode 100644
-index 000000000000..694d70710ff0
---- /dev/null
-+++ b/tools/testing/selftests/vsock/settings
-@@ -0,0 +1 @@
-+timeout=300
-diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
-new file mode 100755
-index 000000000000..d7e727306175
---- /dev/null
-+++ b/tools/testing/selftests/vsock/vmtest.sh
-@@ -0,0 +1,423 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Copyright (c) 2025 Meta Platforms, Inc. and affiliates
-+#
-+# Dependencies:
-+#		* virtme-ng
-+#		* busybox-static (used by virtme-ng)
-+#		* qemu	(used by virtme-ng)
-+
-+TAP_PREFIX="# "
-+VERBOSE=0
-+KSFT_PASS=0
-+KSFT_FAIL=1
-+KSFT_SKIP=4
-+SCRIPT_DIR="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-+VSOCK_TEST=${SCRIPT_DIR}/vsock_test
-+
-+TEST_GUEST_PORT=51000
-+TEST_HOST_PORT=50000
-+TEST_HOST_PORT_LISTENER=50001
-+SSH_GUEST_PORT=22
-+SSH_HOST_PORT=2222
-+VSOCK_CID=1234
-+WAIT_PERIOD=3
-+WAIT_PERIOD_MAX=20
-+WAIT_TOTAL=$(( WAIT_PERIOD * WAIT_PERIOD_MAX ))
-+
-+QEMU_PIDFILE=/tmp/qemu.pid
-+
-+# virtme-ng offers a netdev for ssh when using "--ssh", but we also need a
-+# control port forwarded for vsock_test.  Because virtme-ng doesn't support
-+# adding an additional port to forward to the device created from "--ssh" and
-+# virtme-init mistakenly sets identical IPs to the ssh device and additional
-+# devices, we instead opt out of using --ssh, add the device manually, and also
-+# add the kernel cmdline options that virtme-init uses to setup the interface.
-+QEMU_TEST_PORT_FWD="hostfwd=tcp::${TEST_HOST_PORT}-:${TEST_GUEST_PORT}"
-+QEMU_SSH_PORT_FWD="hostfwd=tcp::${SSH_HOST_PORT}-:${SSH_GUEST_PORT}"
-+QEMU_OPTS="\
-+	 -netdev user,id=n0,${QEMU_TEST_PORT_FWD},${QEMU_SSH_PORT_FWD} \
-+	 -device virtio-net-pci,netdev=n0 \
-+	 -device vhost-vsock-pci,guest-cid=${VSOCK_CID} \
-+	 --pidfile ${QEMU_PIDFILE} \
-+"
-+KERNEL_CMDLINE="virtme.dhcp net.ifnames=0 biosdevname=0 virtme.ssh virtme_ssh_user=$USER"
-+
-+LOG=${SCRIPT_DIR}/vmtest.log
-+
-+TEST_NAMES=(vm_server_host_client vm_client_host_server vm_loopback)
-+TEST_DESCS=(
-+	"Run vsock_test in server mode on the VM and in client mode on the host."
-+	"Run vsock_test in client mode on the VM and in server mode on the host."
-+	"Run vsock_test using the loopback transport in the VM."
-+)
-+
-+usage() {
-+	local name
-+	local desc
-+	local i
-+	echo
-+	echo "$0 [OPTIONS] [TEST]..."
-+	echo "If no TEST argument is given, all tests will be run."
-+	echo
-+	echo "Options"
-+	echo "  -v: verbose output"
-+	echo
-+	echo "Available tests"
-+
-+	for ((i = 0; i < ${#TEST_NAMES[@]}; i++)); do
-+		name=${TEST_NAMES[${i}]}
-+		desc=${TEST_DESCS[${i}]}
-+		printf "\t%-35s%-35s\n" "${name}" "${desc}"
-+	done
-+	echo
-+
-+	exit 1
-+}
-+
-+die() {
-+	echo "$*" >&2
-+	exit ${KSFT_FAIL}
-+}
-+
-+vm_ssh() {
-+	ssh -q -o UserKnownHostsFile=/dev/null -p ${SSH_HOST_PORT} localhost $*
-+	return $?
-+}
-+
-+cleanup() {
-+	if [[ -f "${QEMU_PIDFILE}" ]]; then
-+		pkill -SIGTERM -F ${QEMU_PIDFILE} 2>&1 > /dev/null
-+	fi
-+}
-+
-+check_args() {
-+	local found
-+
-+	for arg in "$@"; do
-+		found=0
-+		for name in "${TEST_NAMES[@]}"; do
-+			if [[ "${name}" = "${arg}" ]]; then
-+				found=1
-+				break
-+			fi
-+		done
-+
-+		if [[ "${found}" -eq 0 ]]; then
-+			echo "${arg} is not an available test" >&2
-+			usage
-+		fi
-+	done
-+
-+	for arg in "$@"; do
-+		if ! command -v > /dev/null "test_${arg}"; then
-+			echo "Test ${arg} not found" >&2
-+			usage
-+		fi
-+	done
-+}
-+
-+check_deps() {
-+	for dep in vng ${QEMU} busybox timeout pkill ssh; do
-+		if [[ ! -x "$(command -v ${dep})" ]]; then
-+			echo -e "skip:    dependency ${dep} not found!\n"
-+			exit ${KSFT_SKIP}
-+		fi
-+	done
-+
-+	if [[ ! -x $(command -v ${VSOCK_TEST}) ]]; then
-+		printf "skip:    ${VSOCK_TEST} not found!"
-+		printf " Please build the kselftest vsock target.\n"
-+		exit ${KSFT_SKIP}
-+	fi
-+}
-+
-+vm_setup() {
-+	local VNG_OPTS=""
-+	local logfile=/dev/null
-+
-+	if [[ "${VERBOSE}" = 1 ]]; then
-+		VNG_OPTS="--verbose"
-+		logfile=/dev/stdout
-+	fi
-+	vng \
-+		$VNG_OPTS \
-+		--run \
-+		--qemu-opts="${QEMU_OPTS}" \
-+		--qemu="${QEMU}" \
-+		--user root \
-+		--append "${KERNEL_CMDLINE}" \
-+		--rw  &> ${logfile} &
-+
-+	timeout ${WAIT_TOTAL} \
-+		bash -c 'while [[ ! -e '"${QEMU_PIDFILE}"' ]]; do sleep 1; done; exit 0'
-+	if [[ ! $? -eq 0 ]]; then
-+		die "failed to boot VM"
-+	fi
-+}
-+
-+vm_wait_for_ssh() {
-+	i=0
-+	while [[ true ]]; do
-+		if [[ ${i} -gt ${WAIT_PERIOD_MAX} ]]; then
-+			die "Timed out waiting for guest ssh"
-+		fi
-+		vm_ssh -- true
-+		if [[ $? -eq 0 ]]; then
-+			break
-+		fi
-+		i=$(( i + 1 ))
-+		sleep ${WAIT_PERIOD}
-+	done
-+}
-+
-+wait_for_listener() {
-+	local port=$1
-+	local interval=$2
-+	local max_intervals=$3
-+	local i=0
-+	while ! ss -ltn | grep -q ":${port}"; do
-+		if [[ ${i} -gt ${max_intervals} ]]; then
-+			die "Timed out waiting for listener on port ${port}"
-+		fi
-+		i=$(( i + 1 ))
-+		sleep ${interval}
-+	done
-+}
-+
-+vm_wait_for_listener() {
-+	local port=$1
-+	vm_ssh <<EOF
-+$(declare -f wait_for_listener)
-+wait_for_listener ${port} ${WAIT_PERIOD} ${WAIT_PERIOD_MAX}
-+EOF
-+}
-+
-+host_wait_for_listener() {
-+	wait_for_listener ${TEST_HOST_PORT_LISTENER} ${WAIT_PERIOD} ${WAIT_PERIOD_MAX}
-+}
-+
-+__log_stdin() {
-+	cat | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }'
-+}
-+
-+__log_args() {
-+	echo "$*" | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }'
-+}
-+
-+log() {
-+	local prefix="$1"
-+	shift
-+
-+	local redirect=
-+	if [[ ${VERBOSE} -eq 0 ]]; then
-+		redirect=/dev/null
-+	else
-+		redirect=/dev/stdout
-+	fi
-+
-+	if [[ "$#" -eq 0 ]]; then
-+		__log_stdin | tee -a ${LOG} > ${redirect}
-+	else
-+		__log_args | tee -a ${LOG} > ${redirect}
-+	fi
-+}
-+
-+log_setup() {
-+	log "setup" "$@"
-+}
-+
-+log_host() {
-+	testname=$1
-+	shift
-+	log "test:${testname}:host" "$@"
-+}
-+
-+log_guest() {
-+	testname=$1
-+	shift
-+	log "test:${testname}:guest" "$@"
-+}
-+
-+tap_prefix() {
-+	sed -e "s/^/${TAP_PREFIX}/"
-+}
-+
-+tap_output() {
-+	if [[ ! -z "$TAP_PREFIX" ]]; then
-+		read str
-+		echo $str
-+	fi
-+}
-+
-+test_vm_server_host_client() {
-+	local testname="${FUNCNAME[0]#test_}"
-+
-+	vm_ssh -- "${VSOCK_TEST}" \
-+		--mode=server \
-+		--control-port="${TEST_GUEST_PORT}" \
-+		--peer-cid=2 \
-+		2>&1 | log_guest "${testname}" &
-+
-+	vm_wait_for_listener ${TEST_GUEST_PORT}
-+
-+	${VSOCK_TEST} \
-+		--mode=client \
-+		--control-host=127.0.0.1 \
-+		--peer-cid="${VSOCK_CID}" \
-+		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host "${testname}"
-+
-+	return $?
-+}
-+
-+test_vm_client_host_server() {
-+	local testname="${FUNCNAME[0]#test_}"
-+
-+	${VSOCK_TEST} \
-+		--mode "server" \
-+		--control-port "${TEST_HOST_PORT_LISTENER}" \
-+		--peer-cid "${VSOCK_CID}" 2>&1 | log_host "${testname}" &
-+
-+	host_wait_for_listener
-+
-+	vm_ssh -- "${VSOCK_TEST}" \
-+		--mode=client \
-+		--control-host=10.0.2.2 \
-+		--peer-cid=2 \
-+		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest "${testname}"
-+
-+	return $?
-+}
-+
-+test_vm_loopback() {
-+	local testname="${FUNCNAME[0]#test_}"
-+	local port=60000 # non-forwarded local port
-+
-+	vm_ssh -- ${VSOCK_TEST} \
-+		--mode=server \
-+		--control-port="${port}" \
-+		--peer-cid=1 2>&1 | log_guest "${testname}" &
-+
-+	vm_wait_for_listener ${port}
-+
-+	vm_ssh -- ${VSOCK_TEST} \
-+		--mode=client \
-+		--control-host="127.0.0.1" \
-+		--control-port="${port}" \
-+		--peer-cid=1 2>&1 | log_guest "${testname}"
-+
-+	return $?
-+}
-+
-+run_test() {
-+	unset IFS
-+	local host_oops_cnt_before
-+	local host_warn_cnt_before
-+	local vm_oops_cnt_before
-+	local vm_warn_cnt_before
-+	local host_oops_cnt_after
-+	local host_warn_cnt_after
-+	local vm_oops_cnt_after
-+	local vm_warn_cnt_after
-+	local name
-+	local rc
-+
-+	host_oops_cnt_before=$(dmesg | grep -c -i 'Oops')
-+	host_warn_cnt_before=$(dmesg --level=warn | wc -l)
-+	vm_oops_cnt_before=$(vm_ssh -- dmesg | grep -c -i 'Oops')
-+	vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | wc -l)
-+
-+	name=$(echo "${1}" | awk '{ print $1 }')
-+	eval test_"${name}"
-+	rc=$?
-+
-+	host_oops_cnt_after=$(dmesg | grep -i 'Oops' | wc -l)
-+	if [[ ${host_oops_cnt_after} -gt ${host_oops_cnt_before} ]]; then
-+		echo "${name}: kernel oops detected on host" | log_host ${name}
-+		rc=$KSFT_FAIL
-+	fi
-+
-+	host_warn_cnt_after=$(dmesg --level=warn | wc -l)
-+	if [[ ${host_warn_cnt_after} -gt ${host_warn_cnt_before} ]]; then
-+		echo "${name}: kernel warning detected on host" | log_host ${name}
-+		rc=$KSFT_FAIL
-+	fi
-+
-+	vm_oops_cnt_after=$(vm_ssh -- dmesg | grep -i 'Oops' | wc -l)
-+	if [[ ${vm_oops_cnt_after} -gt ${vm_oops_cnt_before} ]]; then
-+		echo "${name}: kernel oops detected on vm" | log_host ${name}
-+		rc=$KSFT_FAIL
-+	fi
-+
-+	vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | wc -l)
-+	if [[ ${vm_warn_cnt_after} -gt ${vm_warn_cnt_before} ]]; then
-+		echo "${name}: kernel warning detected on vm" | log_host ${name}
-+		rc=$KSFT_FAIL
-+	fi
-+
-+	return ${rc}
-+}
-+
-+while getopts :hvsq: o
-+do
-+	case $o in
-+	v) VERBOSE=1;;
-+	q) QEMU=$OPTARG;;
-+	h|*) usage;;
-+	esac
-+done
-+shift $((OPTIND-1))
-+
-+trap cleanup EXIT
-+
-+if [[ ${#} -eq 0 ]]; then
-+	ARGS=(${TEST_NAMES[@]})
-+else
-+	ARGS=($@)
-+fi
-+
-+check_args "${ARGS[@]}"
-+check_deps
-+
-+QEMU=$(command -v ${QEMU:-qemu-system-$(uname -m)})
-+
-+echo "TAP version 13" | tap_output
-+echo "1..${#ARGS[@]}" | tap_output
-+
-+rm -f "${LOG}"
-+log_setup "Booting up VM"
-+vm_setup
-+vm_wait_for_ssh
-+log_setup "VM booted up"
-+
-+cnt_pass=0
-+cnt_fail=0
-+cnt_skip=0
-+cnt_total=0
-+exitcode=0
-+for arg in "${ARGS[@]}"; do
-+	run_test "${arg}"
-+	rc=$?
-+	if [[ ${rc} == $KSFT_PASS ]]; then
-+		cnt_pass=$(( cnt_pass + 1 ))
-+		echo "[PASS]" | tap_prefix
-+		echo "ok ${cnt_total} ${arg}" | tap_output
-+	elif [[ ${rc} == $KSFT_SKIP ]]; then
-+		cnt_skip=$(( cnt_skip + 1 ))
-+		echo "[SKIP]" | tap_prefix
-+		echo "ok ${cnt_total} ${arg} # SKIP" | tap_output
-+		exitcode=$KSFT_SKIP
-+	elif [[ ${rc} == $KSFT_FAIL ]]; then
-+		cnt_fail=$(( cnt_fail + 1 ))
-+		echo "[FAIL]" | tap_prefix
-+		echo "not ok ${cnt_fail} ${arg} # exit=$rc" | tap_output
-+		exitcode=$KSFT_FAIL
-+	fi
-+	cnt_total=$(( cnt_total + 1 ))
-+done
-+
-+echo "SUMMARY: PASS=${cnt_pass} SKIP=${cnt_skip} FAIL=${cnt_fail}" | tap_prefix
-+echo "1..${cnt_total}" | tap_output
-+
-+exit ${rc}
-
----
-base-commit: 8066e388be48f1ad62b0449dc1d31a25489fa12a
-change-id: 20250325-vsock-vmtest-b3a21d2102c2
-
-Best regards,
--- 
-Bobby Eshleman <bobbyeshleman@gmail.com>
-
+> >
+> > > I think the series [2] to work better with PFNMAP'd physical memory in
+> > > KVM is in the very right direction of not assuming page struct backed
+> > > memory ranges for guest_memfd as well.
+> > Note: Currently, VM_PFNMAP is usually used together with flag VM_IO. in KVM
+> > hva_to_pfn_remapped() only applies to "vma->vm_flags & (VM_IO | VM_PFNMAP)".
+> >
+> >
+> > > [1] https://lore.kernel.org/all/CAGtprH8akKUF=8+RkX_QMjp35C0bU1zxGi4v1Zm5AWCw=8V8AQ@mail.gmail.com/
+> > > [2] https://lore.kernel.org/linux-arm-kernel/20241010182427.1434605-1-seanjc@google.com/
+> > >
+> > > > And even in that scenario, the memory is only for private MMIO, so the backend
+> > > > driver is VFIO pci driver rather than guest_memfd.
+> > >
+> > > Not necessary. As I mentioned above guest_memfd ranges will be backed
+> > > by VM_PFNMAP memory.
+> > >
+> > > >
+> > > >
+> > > > > [1] https://elixir.bootlin.com/linux/v6.14.5/source/mm/memory.c#L6543
+> 
 
