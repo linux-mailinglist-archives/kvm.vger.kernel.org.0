@@ -1,161 +1,132 @@
-Return-Path: <kvm+bounces-46097-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46098-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F77AB1FFF
-	for <lists+kvm@lfdr.de>; Sat, 10 May 2025 00:39:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD2FEAB2002
+	for <lists+kvm@lfdr.de>; Sat, 10 May 2025 00:39:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 018AB1BC6D36
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 22:39:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9940D521235
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 22:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5BB26280A;
-	Fri,  9 May 2025 22:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DFB2638A2;
+	Fri,  9 May 2025 22:39:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wWzXQ6/S"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U2uaZT8u"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2328325F79A
-	for <kvm@vger.kernel.org>; Fri,  9 May 2025 22:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD5425F79A
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 22:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746830336; cv=none; b=Whb2YiQT46Kr0cXvzrVa1aKvj7TlXAl9QvtG5AyKfzMZAXxwuAuzew7r3EKtSVMK4E+grALW4GupzPgZ4pnZPhhW9jVpz7zuR5jKC40W5L2EWvlrD8+yVU4X8jMVQgtxYVs7CNp0TffkY1LA6GU7xa0VF4lf9x4O56yhc50sihQ=
+	t=1746830358; cv=none; b=txzqrI2WFhTxa7mApg7OWDhYJ/3zkzYTTkh6zIAaGsBBTFNps5sCi1/BaHaf0L4FtCcE+J5EuapdY6Uf5dJOxnFbWOk22RpJhl6XHRLgwrMceXCvtFeU/xj6k5B8VUPMs0DfCXZqn1kMWSI5ALiDEtWS8QuEzjWOJe622IxLIn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746830336; c=relaxed/simple;
-	bh=kmDsJHb6weFuouS1GIMRh+/+zOqxj3gT5yXpY5KmAFA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W6ZoJpg4JvKwo16xrQZQnG57bQ7BAynXRNXtuPc4TIuFCaXGAD27d2adFOcTqrpYF3mtbwy3Vll/O4IvxQFkGIxbaqmQxwQYbyDY4HWC4Pcq0b7mLBMoyUhQp5W2n6h9OkXDNxeuzZqaplgFYoJ1J3E95TpkvLHFPN9j+SdAlRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wWzXQ6/S; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7086dcab64bso26450537b3.1
-        for <kvm@vger.kernel.org>; Fri, 09 May 2025 15:38:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746830334; x=1747435134; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4y+7YrkNmYTMpHr+hnhsBX+FluOGpdkroormS9kd3y0=;
-        b=wWzXQ6/S7t4abyOKC/Gk4y6Qj8lDln2X3SdbYD9OA97yAyuJO/nLWxztIl91rjBfki
-         G/k+s6L6Mp6re5Qz8q843Bxo590Ddhh0f8uR03+o4ucj4aQohwduqR0ePeGTkdBSikb7
-         lBxbcQZ5ocR5EKTaAZnU2uTq7C580kuYqT6kKb1sRDnf/hW1S0Kpigw1UVy4z9BePjME
-         Kprb6oXhO7jNSVSXMTIBg8cpOQChz4mT/4xvVCq9btvzU4N429yNbdpy3CNEqgt16Rr3
-         IFkhWzrWUWHUtFlTLwNnBOgI9o04+PUz63hB43YubyCqR06JVfvP/AgP4HCPDh587CVE
-         e3wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746830334; x=1747435134;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4y+7YrkNmYTMpHr+hnhsBX+FluOGpdkroormS9kd3y0=;
-        b=sPtdYJjrHEbOr6rYFkWp0QSip8vkzWkUc7pa3VMMnGG8fGiAMtfA4Ya4VT0qDW1sZj
-         3uKxIQxILkS+7CvBecx2w2DoclwTnzTANBYi4p4iwZy5hks07ENlyal1PO32A1eE9fwp
-         kcQxXSLZBvWnut0F/m+/YLOXK0fOqKoGrJzp0nTdU9IuoxbZrqPM8GG++mXjhDP59dhQ
-         5SwRpy5fR7KI/45yipDaNkfogrl3+bm2Omx4sAbheipZn5IRDr8kcEUV41oiTR0K0d2T
-         ZRc4oBmR+3EqCI1CHS7aIQ64yfJwTQ4V/CJ9YFi2g/T8Swzj6WD/k9aBp/LHugVGrK4U
-         Qztg==
-X-Forwarded-Encrypted: i=1; AJvYcCXJjbWLjCETLL1Bliy0quFWMqgq3lPvB+SI1qhKIncHSR2m/mJT4ujwtWHWTUQ4vznbtBo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqJc3eitVQ5WnV8ri6iZ9jlddL2qkWRRNWmmJNbAsPal6J/HTt
-	6SzahG+nh40UYRVf0AEKfPTq7XlN6tNzEi1F/qpZmywOZMPebXZf3INg89By9iwXNkiec59RxH2
-	s5dabJycmA7FFurT4OX+d0zQ0enNDZ4uREhHh
-X-Gm-Gg: ASbGnctIQ78KhwVCq+X+dZ9Xo6A5Z1BIHNtY23GDznuzeqIW9CowvaOGpFsCp/4aLJZ
-	3KgeWytcGs50CjcZKEKpWWxnwEGHGixqp+kEXkuWKzR2C9GhtrLsIWMmHaO2RGMAqGGXQGy+Lrk
-	0/XMOdqikyt+uOJ1B4+g/Bp/Yv7LPd5b+NFUIByU1zmaET5P3+RDeOffX9WdZH+28=
-X-Google-Smtp-Source: AGHT+IEdJ+t/M16J4dyjgQQaZBcaPjjKUhl0VsQtk+UZnkR2Q/ptZ5TFyDnjP/nWec8PjOqDBhuDWCDx/3z7sNn8daQ=
-X-Received: by 2002:a05:690c:498e:b0:707:48a7:ea6a with SMTP id
- 00721157ae682-70a3fa4037emr77537247b3.19.1746830333843; Fri, 09 May 2025
- 15:38:53 -0700 (PDT)
+	s=arc-20240116; t=1746830358; c=relaxed/simple;
+	bh=+z+zW6ppVO139LjzB2cgUDHUv7xx1x/Ibblmf1wA+hI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j7/+vzAeR2ALWp3k3Bnsut/T38n0b5AuoSR2FgcNXp3jaJy403Dhdy5hrC8TsuHPWOWCJTML2DsPHtBRdQGocF8EFCt/gf+bQ9vH3zhL1GZXjG0MDVl7h7UqxFMKcvLW5BAhwZCZGlQr+XAmCM/jarM8zaLi6FCV1ufn43NF4u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U2uaZT8u; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <1da6648a-251b-456b-9ddd-a7ffa95a5125@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746830344;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jsqNWeffoeI2a1Nha5CVjiw3khettMZ8t2Y5EabwFrE=;
+	b=U2uaZT8uuKGxqCUflSnTSX7zhox5JAB0nlgVO4PX9893DQ3vSWCMm1P8LhI2UeKkeH49Mo
+	IUzRFWP2cKwA1wLuc62ymb3HcegdNRpKpxlMHtPh+4CIbCBzqKuS6dc3jo2Jwd7nz0ILcI
+	CwOkbRM9NDzpt81bdlAaJYYPfF/NhlI=
+Date: Fri, 9 May 2025 15:38:55 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <diqz7c31xyqs.fsf@ackerleytng-ctop.c.googlers.com>
- <386c1169-8292-43d1-846b-c50cbdc1bc65@redhat.com> <aBTxJvew1GvSczKY@google.com>
- <diqzjz6ypt9y.fsf@ackerleytng-ctop.c.googlers.com> <7e32aabe-c170-4cfc-99aa-f257d2a69364@redhat.com>
- <aBlCSGB86cp3B3zn@google.com> <CAGtprH8DW-hqxbFdyo+Mg7MddsOAnN+rpLZUOHT-msD+OwCv=Q@mail.gmail.com>
- <CAGtprH9AVUiFsSELhmt4p24fssN2x7sXnUqn39r31GbA0h39Sw@mail.gmail.com>
- <aBoVbJZEcQ2OeXhG@google.com> <39ea3946-6683-462e-af5d-fe7d28ab7d00@redhat.com>
- <diqzh61xqxfh.fsf@ackerleytng-ctop.c.googlers.com> <CADrL8HWHAzfYJktatQraUV6n661=rU4q4+f+tYRB8Q5xwdSY_Q@mail.gmail.com>
- <e2f878c1-c2fb-4951-ac64-e1ee4a827e0b@redhat.com>
-In-Reply-To: <e2f878c1-c2fb-4951-ac64-e1ee4a827e0b@redhat.com>
-From: James Houghton <jthoughton@google.com>
-Date: Fri, 9 May 2025 15:38:17 -0700
-X-Gm-Features: AX0GCFuLEYUHA0d2HeMJJiPSjcin0qtvtKfgi2kmBbW_YclH7-KTCKoitgoaUSw
-Message-ID: <CADrL8HW5zq8j57_O_kbyYG91cDcJH89RQV81-MS2gx-Ht24Nvg@mail.gmail.com>
-Subject: Re: [PATCH v8 06/13] KVM: x86: Generalize private fault lookups to
- guest_memfd fault lookups
-To: David Hildenbrand <david@redhat.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, Sean Christopherson <seanjc@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	peterx@redhat.com, pankaj.gupta@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 4/5] RISC-V: KVM: Enable envcfg and sstateen bits lazily
+To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>,
+ Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Alexandre Ghiti <alex@ghiti.fr>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-riscv <linux-riscv-bounces@lists.infradead.org>
+References: <20250505-kvm_lazy_enable_stateen-v1-0-3bfc4008373c@rivosinc.com>
+ <20250505-kvm_lazy_enable_stateen-v1-4-3bfc4008373c@rivosinc.com>
+ <D9QTFAE7R84D.2V08QTHORJTAH@ventanamicro.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Atish Patra <atish.patra@linux.dev>
+In-Reply-To: <D9QTFAE7R84D.2V08QTHORJTAH@ventanamicro.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, May 9, 2025 at 3:29=E2=80=AFPM David Hildenbrand <david@redhat.com>=
- wrote:
->
-> On 09.05.25 23:04, James Houghton wrote:
-> > On Tue, May 6, 2025 at 1:47=E2=80=AFPM Ackerley Tng <ackerleytng@google=
-.com> wrote:
-> >>  From here [1], these changes will make it to v9
-> >>
-> >> + kvm_max_private_mapping_level renaming to kvm_max_gmem_mapping_level
-> >> + kvm_mmu_faultin_pfn_private renaming to kvm_mmu_faultin_pfn_gmem
-> >>
-> >>> Only kvm_mmu_hugepage_adjust() must be taught to not rely on
-> >>> fault->is_private.
-> >>>
-> >>
-> >> I think fault->is_private should contribute to determining the max
-> >> mapping level.
-> >>
-> >> By the time kvm_mmu_hugepage_adjust() is called,
-> >>
-> >> * For Coco VMs using guest_memfd only for private memory,
-> >>    * fault->is_private would have been checked to align with
-> >>      kvm->mem_attr_array, so
-> >> * For Coco VMs using guest_memfd for both private/shared memory,
-> >>    * fault->is_private would have been checked to align with
-> >>      guest_memfd's shareability
-> >> * For non-Coco VMs using guest_memfd
-> >>    * fault->is_private would be false
-> >
-> > I'm not sure exactly which thread to respond to, but it seems like the
-> > idea now is to have a *VM* flag determine if shared faults use gmem or
-> > use the user mappings. It seems more natural for that to be a property
-> > of the memslot / a *memslot* flag.
->
-> I think that's exactly what we discussed in the last meetings. The
-> guest_memfd flag essentially defines that.
->
-> So it's not strictly a memslot flag but rather a guest_memfd flag, and
-> the memslot is configured with that guest_memfd, inheriting that flag.
->
-> There might be a VM capability, whether it supports creation of these
-> new guest_memfds (iow, guest_memfd understands the new flag).
 
-Oh yeah, I remember now, thanks for clearing that up for me. And I can
-see it in the notes from last week's guest_memfd meeting. :)
+On 5/8/25 6:32 AM, Radim Krčmář wrote:
+> 2025-05-05T14:39:29-07:00, Atish Patra <atishp@rivosinc.com>:
+>> SENVCFG and SSTATEEN CSRs are controlled by HSENVCFG(62) and
+>> SSTATEEN0(63) bits in hstateen. Enable them lazily at runtime
+>> instead of bootime.
+>>
+>> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+>> ---
+>> diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
+>> @@ -256,9 +256,37 @@ int kvm_riscv_vcpu_hstateen_lazy_enable(struct kvm_vcpu *vcpu, unsigned int csr_
+>>   	return KVM_INSN_CONTINUE_SAME_SEPC;
+>>   }
+>>   
+>> +static int kvm_riscv_vcpu_hstateen_enable_senvcfg(struct kvm_vcpu *vcpu,
+>> +						  unsigned int csr_num,
+>> +						  unsigned long *val,
+>> +						  unsigned long new_val,
+>> +						  unsigned long wr_mask)
+>> +{
+>> +	return kvm_riscv_vcpu_hstateen_lazy_enable(vcpu, csr_num, SMSTATEEN0_HSENVCFG);
+>> +}
+> Basically the same comments as for [1/5]:
+>
+> Why don't we want to set the ENVCFG bit (62) unconditionally?
+>
+> It would save us the trap on first access.  We don't get anything from
+> the trap, so it looks like a net negative to me.
+
+We want to lazy enablement is to make sure that hypervisor is aware of 
+the what features
+guest is using. We don't want to necessarily enable the architecture 
+states for the guest if guest doesn't need it.
+
+We need lazy enablement for CTR like features anyways. This will align 
+all the the features controlled
+by stateen in the same manner. The cost is just a single trap at the 
+boot time.
+
+IMO, it's fair trade off.
+>> +
+>> +static int kvm_riscv_vcpu_hstateen_enable_stateen(struct kvm_vcpu *vcpu,
+>> +						  unsigned int csr_num,
+>> +						  unsigned long *val,
+>> +						  unsigned long new_val,
+>> +						  unsigned long wr_mask)
+>> +{
+>> +	const unsigned long *isa = vcpu->arch.isa;
+>> +
+>> +	if (riscv_isa_extension_available(isa, SMSTATEEN))
+>> +		return kvm_riscv_vcpu_hstateen_lazy_enable(vcpu, csr_num, SMSTATEEN0_SSTATEEN0);
+>> +	else
+>> +		return KVM_INSN_EXIT_TO_USER_SPACE;
+>> +}
+> The same argument applies to the SE0 bit (63) when the guest has the
+> sstateen extension.
+>
+> KVM doesn't want to do anything other than stop trapping and reenter, so
+> it seems to me we could just not trap in the first place.
+>
+> Thanks.
 
