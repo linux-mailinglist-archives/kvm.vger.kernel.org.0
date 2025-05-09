@@ -1,112 +1,138 @@
-Return-Path: <kvm+bounces-46094-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46095-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97388AB1F5C
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 23:50:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7D44AB1FDE
+	for <lists+kvm@lfdr.de>; Sat, 10 May 2025 00:27:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7AAD1C46334
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 21:50:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 237793B507E
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 22:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8DA82609F8;
-	Fri,  9 May 2025 21:49:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EC02620F5;
+	Fri,  9 May 2025 22:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uYAhK1H/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PaPQgo3b"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE88226CF4;
-	Fri,  9 May 2025 21:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FDD254B14
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 22:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746827383; cv=none; b=RForPRk/UVY42WK3FP9PZZejo/pEJ+u66fP5VKO2GErsEh2w/p+PCRwGke2iWyHC4e1AMY+lyvIf7tchDhh32a9YBuJPA2R0ERQGLllA+QfFTy9MzKr6FxmZjg3JDTHosJHkslvnCvhMZolTtS9Pv3cZzhBINvTi6oIfwk+qBfQ=
+	t=1746829644; cv=none; b=c4cpDpa5VkTgOxf/iP/YJRhhzXNHr8XnkZDZ91k3tpcIk1RxstQRebAX+wLwiYfzNj31B+1Ol9Vak5MpXMOTMTt9D+ws52sdoMo3+sZxtA6ykYIeLof3BPj1BzYZ6uR2nWUx7ZBavJZAo/NH0Uknknl4Ax7G+D5mOtSe+EmdWqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746827383; c=relaxed/simple;
-	bh=SiJ264L76W+iNGxah+QR+bqOGeUBSZ7lji/MNG6Rk4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ze/NDB7OKPt5z6kGPUeBiwbQdyhpg20xi0k4z7N88p2o9lSMWxeojCjn72vGJKzOOxZphONEM7Mp6Qg30x/G2zlDtlF89sRlGOlzUvVFcDmFMY+i3bin8qhoPYp5erAh1k/6AXU7SIKdkekTFSG68dd0ZI57r/F3LaPP/JsFJvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uYAhK1H/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02004C4CEE4;
-	Fri,  9 May 2025 21:49:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746827381;
-	bh=SiJ264L76W+iNGxah+QR+bqOGeUBSZ7lji/MNG6Rk4w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uYAhK1H/3ajc/630iBxlSZwFpfs7YQjH28MoAy/PNXdDe5ceNI2Ycnxt1dn+GTZ7d
-	 Q3lsLH2TxYfYHz+IrJ3qB14PQJo3sJspgtFfVNbI8W2CuG4oyBhBZo1LP2UragiUPj
-	 05tToUJo/K4GRvFE3hrbtcl3cCcwJhJZC4jMwKYPF//w+q7XKUk9iIZy2B6/5BbqAG
-	 M+Q4oMqDgbf7hrL7a1JZuLFLOXpo9VdqQytFBt5g+A+xD4/yEJFMVJhJlxUAT4iNI7
-	 afH+/8ACTMWKfAKZI6z5+xaLPzbvrXLxWPccl6Lm0FzuU4aNnm+LbWIiQpfIhxEwsf
-	 i5CWn2npgfs4Q==
-Date: Fri, 9 May 2025 21:49:39 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: Juergen Gross <jgross@suse.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-hyperv@vger.kernel.org, kvm@vger.kernel.org, xin@zytor.com,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH 3/6] x86/msr: minimize usage of native_*() msr access
- functions
-Message-ID: <aB54c5ajYkGZ1sPi@liuwe-devbox-ubuntu-v2.tail21d00.ts.net>
-References: <20250506092015.1849-1-jgross@suse.com>
- <20250506092015.1849-4-jgross@suse.com>
+	s=arc-20240116; t=1746829644; c=relaxed/simple;
+	bh=yKsMUjLuGE3EkuKCU26HBOsw2KJoVDDc5eXnJCektgU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Kz1B4+IGCCiYuniJVUnRULu30dvImMRDxlqzSv4HuClRKwExrs2Rlkd52GibcXQDp7J8AA/sc3uHjsSbmM5RJgZ/uIeEiK8rTBWu3GJAPelfleFwN+84qWeHuoOfhg7yYXKKyGyvPjDPEM1ldvqHMPrbohwTh+BZsfsstLEGa1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PaPQgo3b; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <260a8c6a-f92f-41c8-a212-8f9f8ddf6b5b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746829628;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jteVl+qSFnN6ueuKmbFExf6FzhNWgyq6s4G+Z3sYIiU=;
+	b=PaPQgo3bkhPNazELJ9NUurbL3qAdnBDCM4rrLX089JO2lMY65sw7yCqZXRHmBesqO7f/3y
+	LfpsLOI5NX6Bdx4UA8VAF/1JFUss+cvO+g7o3w1o5jSktrnZADu/9+aYXof68HipAsZDQa
+	Ud0eqikeeTnxFGNBnXOEyoFRQc9FAKo=
+Date: Fri, 9 May 2025 15:26:52 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250506092015.1849-4-jgross@suse.com>
+Subject: Re: [PATCH 0/5] Enable hstateen bits lazily for the KVM RISC-V Guests
+To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>,
+ Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Alexandre Ghiti <alex@ghiti.fr>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-riscv <linux-riscv-bounces@lists.infradead.org>
+References: <20250505-kvm_lazy_enable_stateen-v1-0-3bfc4008373c@rivosinc.com>
+ <D9OYWFEXSA55.OUUXFPIGGBZV@ventanamicro.com>
+ <bc0f1273-d596-47dd-bcc6-be9894157828@linux.dev>
+ <D9Q05T702L8Y.3UTLG7VXIFXOK@ventanamicro.com>
+ <ec73105c-f359-4156-8285-b471e3521378@linux.dev>
+ <D9QTOYMN362W.398FE9SQB0S4X@ventanamicro.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Atish Patra <atish.patra@linux.dev>
+In-Reply-To: <D9QTOYMN362W.398FE9SQB0S4X@ventanamicro.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, May 06, 2025 at 11:20:12AM +0200, Juergen Gross wrote:
-> In order to prepare for some MSR access function reorg work, switch
-> most users of native_{read|write}_msr[_safe]() to the more generic
-> rdmsr*()/wrmsr*() variants.
-> 
-> For now this will have some intermediate performance impact with
-> paravirtualization configured when running on bare metal, but this
-> is a prereq change for the planned direct inlining of the rdmsr/wrmsr
-> instructions with this configuration.
-> 
-> The main reason for this switch is the planned move of the MSR trace
-> function invocation from the native_*() functions to the generic
-> rdmsr*()/wrmsr*() variants. Without this switch the users of the
-> native_*() functions would lose the related tracing entries.
-> 
-> Note that the Xen related MSR access functions will not be switched,
-> as these will be handled after the move of the trace hooks.
-> 
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> ---
->  arch/x86/hyperv/ivm.c      |  2 +-
 
-Acked-by: Wei Liu <wei.liu@kernel.org>
+On 5/8/25 6:45 AM, Radim Krčmář wrote:
+> 2025-05-07T17:34:38-07:00, Atish Patra <atish.patra@linux.dev>:
+>> On 5/7/25 7:36 AM, Radim Krčmář wrote:
+>>> 2025-05-06T11:24:41-07:00, Atish Patra <atish.patra@linux.dev>:
+>>>> On 5/6/25 2:24 AM, Radim Krčmář wrote:
+>>>>> 2025-05-05T14:39:25-07:00, Atish Patra <atishp@rivosinc.com>:
+>>>>>>                                                       This series extends
+>>>>>> those to enable to correpsonding hstateen bits in PATCH1. The remaining
+>>>>>> patches adds lazy enabling support of the other bits.
+>>>>> The ISA has a peculiar design for hstateen/sstateen interaction:
+>>>>>
+>>>>>      For every bit in an hstateen CSR that is zero (whether read-only zero
+>>>>>      or set to zero), the same bit appears as read-only zero in sstateen
+>>>>>      when accessed in VS-mode.
+>>>> Correct.
+>>>>
+>>>>> This means we must clear bit 63 in hstateen and trap on sstateen
+>>>>> accesses if any of the sstateen bits are not supposed to be read-only 0
+>>>>> to the guest while the hypervisor wants to have them as 0.
+>>>> Currently, there are two bits in sstateen. FCSR and ZVT which are not
+>>>> used anywhere in opensbi/Linux/KVM stack.
+>>> True, I guess we can just make sure the current code can't by mistake
+>>> lazily enable any of the bottom 32 hstateen bits and handle the case
+>>> properly later.
+>> I can update the cover letter and leave a comment about that.
+>>
+>> Do you want a additional check in sstateen
+>> trap(kvm_riscv_vcpu_hstateen_enable_stateen)
+>> to make sure that the new value doesn't have any bits set that is not
+>> permitted by the hypervisor ?
+> I wanted to prevent kvm_riscv_vcpu_hstateen_lazy_enable() from being
+> able to modify the bottom 32 bits, because they are guest-visible and
+> KVM does not handle them correctly -- it's an internal KVM error that
+> should be made obvious to future programmers.
 
-> 
-> diff --git a/arch/x86/hyperv/ivm.c b/arch/x86/hyperv/ivm.c
-> index 09a165a3c41e..fe177a6be581 100644
-> --- a/arch/x86/hyperv/ivm.c
-> +++ b/arch/x86/hyperv/ivm.c
-> @@ -319,7 +319,7 @@ int hv_snp_boot_ap(u32 cpu, unsigned long start_ip)
->  	asm volatile("movl %%ds, %%eax;" : "=a" (vmsa->ds.selector));
->  	hv_populate_vmcb_seg(vmsa->ds, vmsa->gdtr.base);
->  
-> -	vmsa->efer = native_read_msr(MSR_EFER);
-> +	rdmsrq(MSR_EFER, vmsa->efer);
->  
+Sure. I will add something along those lines.
+
+
+>>>> In case, we need to enable one of the bits in the future, does hypevisor
+>>>> need to trap every sstateen access ?
+>>> We need to trap sstateen accesses if the guest is supposed to be able to
+>>> control a bit in sstateen, but the hypervisor wants to lazily enable
+>>> that feature and sets 0 in hstateen until the first trap.
+>> Yes. That's what PATCH 4 in this series does.
+> I was thinking about the correct emulation.
+>
+> e.g. guest sets sstateen bit X to 1, but KVM wants to handle the feature
+> X lazily, which means that hstateen bit X is 0.
+> hstateen bit SE0 must be 0 in that case, because KVM must trap the guest
+> access to bit X and properly emulate it.
+> When the guest accesses a feature controlled by sstateen bit X, KVM will
+> lazily enable the feature and then set sstateen and hstateen bit X.
+
+Yeah. That's possible. The current series is just trying to trap & 
+enable rather
+than trap & emulate except for few AIA related bits which trap even with 
+hstateen
+bit set due to sw file instead of vsfile.
+
+Once we have such requirement any other feature bit, we can extend the 
+generic
+trap & enable framework to trap & emulate.
+
 
