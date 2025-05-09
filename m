@@ -1,93 +1,121 @@
-Return-Path: <kvm+bounces-46031-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46033-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EC61AB0DCB
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 10:51:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFC6CAB0E1E
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 11:03:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E88F500EA9
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 08:50:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CCC216B4BF
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 09:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2DD27510F;
-	Fri,  9 May 2025 08:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6367B274665;
+	Fri,  9 May 2025 09:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jdzTT6Y4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i9CbWqeQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C405D2749DA
-	for <kvm@vger.kernel.org>; Fri,  9 May 2025 08:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE7414F98
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 09:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746780537; cv=none; b=Yx0ynwj6WfkMvQLhGfJ8dO3sADAwt8olVzOtM9fe9XT9UeZqKsrbWqRQlvN3klDLxFGzgsF4XOmgU+/YOGg7NUK0r47TZOn1HG+aI9cxjoebZXDSFlfO0XdCu57XpmpxHUsB3lGTZT+1Rnii8LcYmGetQUrqQpWf+LARc/Ql37c=
+	t=1746781402; cv=none; b=iMFgIdLogcRi8fTLZEaT1T8kkvyaFwem9cV0ILdTmIwK6M/bnBCWl6E5019kdRYKwb7KHmxdkKMrg6pDUyvnUh9ClSUH/ZhsjNyrmIyYQVUppQfzwvde9iPB82YjHhGmHVxtGCFrPveXm/NpE/NSg4DmKtu/MUJF4XGJZP12CZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746780537; c=relaxed/simple;
-	bh=4h8yW3D8RfZkwJwxL7/ITZyfT1u/UGlN/tQNSazro1A=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tNLsYrJXFHt6rISz/8wnz/MvARt/xVxrN1kQR8NRhkbORgbGvYWueiIiBmYNJcCG5nxnfB/7wzBxqoorsWo9XT8Wjc4hlzZWwCmk98CPyyMNSe1D5dDZaS5ia6uZhz0/14SZbbVLzqVIpzGyi/eRZn1nkegJe83mX9fMGk5EE7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jdzTT6Y4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3F3A5C4CEE9
-	for <kvm@vger.kernel.org>; Fri,  9 May 2025 08:48:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746780537;
-	bh=4h8yW3D8RfZkwJwxL7/ITZyfT1u/UGlN/tQNSazro1A=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=jdzTT6Y4A7M/k0025r7i2FDdQKTCFDzhASJhCrUYCNZeMYP7L0uebuBx6FO+ibZZm
-	 3kN2vBuXeqMFXUmgqocW2HBB8EYR0/sLejw8nTaSUQ2i/zC8TSTndHspynGZAeIOel
-	 ZA4mdbd6PdYH4CaqwAeaHiwDyQzH1wrTtkMiFyETlHNuclC4ovhtbF2jVj6SYCF58z
-	 kTrorIW3CJblr5Sp8WSTSrnQLBDfjSE1cqyldwfEb4nXgxCT3XvtzjhhN5ZECdOTaf
-	 sHhZb2J38yB7bp28U4yW1nWz/1KuqKLOFxHMBfsSNxQkco1WHCjXx28Y9EkCI2thQ2
-	 u9Z/7J7ZZkaFw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 36CE1C41616; Fri,  9 May 2025 08:48:57 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 199727] CPU freezes in KVM guests during high IO load on host
-Date: Fri, 09 May 2025 08:48:56 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: devzero@web.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-199727-28872-2dP4GgR0b1@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-199727-28872@https.bugzilla.kernel.org/>
-References: <bug-199727-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1746781402; c=relaxed/simple;
+	bh=l8JyMGZ0zcKsAe3qZtfcs7BWyCr+6rRWirZwK992pLE=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=lH6rJ0xx165zPXIEXkY/7VmBFxWuHp0TGjQ4cJ62JuscnZbMAkBxhpokLNK3RCh0UzmtTkGtctCdzweoYjx52Yc0o9AHcnV6eN4a3yXU0/1xBfFT2GX5z002JG3VvLD1GdOaTMGeqEEVPGIc9yys3TTMpbx7SgtZp3ULGpF0KBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i9CbWqeQ; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746781401; x=1778317401;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=l8JyMGZ0zcKsAe3qZtfcs7BWyCr+6rRWirZwK992pLE=;
+  b=i9CbWqeQi1b8vBwhH5zUbqWeMgDycNVfOiYbZUJshQme90aGMr9BJlVJ
+   5Lpjkt0wxaPqnDTqSlgKvJ9p5dA+LF0JNaPtCJShgkv/DlPMos36l63dp
+   crBvblcjZoqMkMdWnOiuGPkxG6Onu7zKdq9zxOjW++kVzyYgkaeyKX7c+
+   kuz9ftMz8IyCl99R+cVWrbHxyCMB0iwjartsF1+41vK7n7zIPbg0d1uev
+   DG4lj1pF/1ch7l+9LJw4dFuL2P9OU2iUYWJTjyvxhG2+iWZlwKAgxh/Mk
+   zT5TKiWuTXF+9Ad9WhtH8xZSue4dCZv1USYYwMt0HNcm5EbzbgTUKlOA0
+   A==;
+X-CSE-ConnectionGUID: NKj9bljJTxeHzwutjOh4Lw==
+X-CSE-MsgGUID: ux9tNinaT+2uirXGqDv0QQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="47710668"
+X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
+   d="scan'208";a="47710668"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 02:03:19 -0700
+X-CSE-ConnectionGUID: uinuH+qaQ/6OZxWPwkGL1g==
+X-CSE-MsgGUID: AmgzoiFRRviovWwpyWw7RQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
+   d="scan'208";a="141663661"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.124.240.236]) ([10.124.240.236])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 02:03:15 -0700
+Message-ID: <f6b9c107-4f6c-43d5-99f9-c5663cffb0cf@linux.intel.com>
+Date: Fri, 9 May 2025 17:03:13 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: baolu.lu@linux.intel.com, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Williams Dan J <dan.j.williams@intel.com>,
+ Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
+ Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
+Subject: Re: [PATCH v4 11/13] KVM: Introduce CVMPrivateSharedListener for
+ attribute changes during page conversions
+To: Chenyi Qiang <chenyi.qiang@intel.com>,
+ David Hildenbrand <david@redhat.com>, Alexey Kardashevskiy <aik@amd.com>,
+ Peter Xu <peterx@redhat.com>, Gupta Pankaj <pankaj.gupta@amd.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Michael Roth <michael.roth@amd.com>
+References: <20250407074939.18657-1-chenyi.qiang@intel.com>
+ <20250407074939.18657-12-chenyi.qiang@intel.com>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20250407074939.18657-12-chenyi.qiang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D199727
+On 4/7/2025 3:49 PM, Chenyi Qiang wrote:
+> With the introduction of the RamBlockAttribute object to manage
+> RAMBlocks with guest_memfd and the implementation of
+> PrivateSharedManager interface to convey page conversion events, it is
+> more elegant to move attribute changes into a PrivateSharedListener.
+> 
+> The PrivateSharedListener is reigstered/unregistered for each memory
+> region section during kvm_region_add/del(), and listeners are stored in
+> a CVMPrivateSharedListener list for easy management. The listener
+> handler performs attribute changes upon receiving notifications from
+> private_shared_manager_state_change() calls. With this change, the
+> state changes operations in kvm_convert_memory() can be removed.
+> 
+> Note that after moving attribute changes into a listener, errors can be
+> returned in ram_block_attribute_notify_to_private() if attribute changes
+> fail in corner cases (e.g. -ENOMEM). Since there is currently no rollback
+> operation for the to_private case, an assert is used to prevent the
+> guest from continuing with a partially changed attribute state.
 
---- Comment #29 from Roland Kletzing (devzero@web.de) ---
-can anybody reproduce this in an environemnt without qemu ?
+ From the kernel IOMMU subsystem's perspective, this lack of rollback
+might not be a significant issue. Currently, converting memory pages
+from shared to private involves unpinning the pages and removing the
+mappings from the IOMMU page table, both of which are typically non-
+failing operations.
 
-if that is not the case, maybe it would be better to file a bug report at
-https://gitlab.com/qemu-project/qemu/-/issues , as nobody seems to care here
-anyway.
+But, in the future, when it comes to partial conversions, there might be
+a cut operation before the VFIO unmap. The kernel IOMMU subsystem cannot
+guarantee an always-successful cut operation.
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Thanks,
+baolu
 
