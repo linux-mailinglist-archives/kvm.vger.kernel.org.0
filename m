@@ -1,182 +1,107 @@
-Return-Path: <kvm+bounces-46085-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46086-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6282AB1C0F
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 20:10:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C482FAB1C50
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 20:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1A467BA24C
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 18:09:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2535F50324B
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 18:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7CB823ED5A;
-	Fri,  9 May 2025 18:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E8023E347;
+	Fri,  9 May 2025 18:29:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QmAOyYPC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WITzpjs6"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6D722B8C5;
-	Fri,  9 May 2025 18:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB6023AE7C
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 18:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746814199; cv=none; b=Q1NtHPRkre8ryUKjGna8UlS6k0o/NV2nn/JAlhw1ZWwQxKRKNqMKofyMQGCy5tNYWmSToj4Fua3Kc3CNFoRKV2mRXTIPGfQ0jtkSoT94tQZ89j4nZAcFvLa+le11gP+/CfqBsF5xbB0KS/fLMJOX3qkBV1lreR58bD1g1BNaQXY=
+	t=1746815371; cv=none; b=Ufcwguy93AhjvjahTABVAEiULVxnhXdq8gxvgWiPZt12/jbTAU/4xsjbera2vEBn2IFSA5+/nVIDiE1b9MfWrZwDJp7BIoV8QGF453G97sm+zinfuq8hjmvULDCFL8kuLyLeuC3KUDt5PUMUc5JdWUI244kUmxAuH/YIk0CXWjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746814199; c=relaxed/simple;
-	bh=NVAQxVyOoG9FX0y6Y2rJq7+QOyDoipjbegh4hKfM6Ok=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HSxJ1kpi+s2oDh7zdnlJsFVb17AGm8NLY4/SwUVGdirN2ZpKUXBvYTuG2Xi59tIRQ/Lvo6ST/sLkaRl7JSdD575ohaMq105CenIPCpQl6vht8b9Mr3iUw8Y5O7CSGIPFefCFakCDh1NN6s9PV4l9u3BCKG8MjtFdN/XKKMz1fuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QmAOyYPC; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <87b2eade-acda-428e-81af-d4927e517ebe@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746814184;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=URPGJAItur5ro86msDKguo+AsJb0M+Qreyerm9JUIhE=;
-	b=QmAOyYPC6u20ITPaBw6Ha8aJZ5SkuvYHSBzdZn+LukNn9N+RF2l6kZWl4i8HY2iN8xSa3/
-	tRR0b2Vwb3FURyyvyNGCNFznDS++FHxCJiarEuklu+4bAraa+0PNDh4WOi8CnQ/hVnXHkT
-	cQd2oib4+zm6/z7aTg3m38NqWDWGL6E=
-Date: Fri, 9 May 2025 11:09:18 -0700
+	s=arc-20240116; t=1746815371; c=relaxed/simple;
+	bh=TZ/CioQKPmReLVBRaY4JcPT8DKNM7VLtQX0w+Wrv/+I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=etmEuL1vbaYRXOUa3bCYLT34RosFxkpUYHL4bm0tu8/6LPo+0ZUBz929k9MPquHWsKsxTx8/FKrzN72bacC+VkE+bWOOM421R5g89Z12PrYAIJ7tO2xjRDi6My8UHWwDVKxyIDWCIuRsemnpy6vtdtSvefcf9Ml7eyFIcixrwWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WITzpjs6; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22e7e097ef7so20052925ad.2
+        for <kvm@vger.kernel.org>; Fri, 09 May 2025 11:29:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746815369; x=1747420169; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OmUdZ7NWf24NGQucaka4MppQGDe1r3WG/B9nuhCN99s=;
+        b=WITzpjs6JY4Ll1aVaTo3Pc8LltuVb5DqJxFwTJvf9FdYUhXfhkm9Q2huSqhQnM3txo
+         aekxlXVx9YrHkOhy41JWljkE+ONcQfkGdOEKeePoJ0KJLe8EPkes8BrNBWBLGi+hp0ly
+         QJYOQX+m5idx0bFHOuNjYdNxJDy2hY5hezUATrgAE1ujjm6veYJmD/x/N5yXLyJcWLss
+         XzJYtGtoadFpb1ATZYFGdSwgnGQZddNmKZKX3E0TEqibntfdmYMjCqE3RYUG9VFS5/fX
+         hcBMANDF/Dsv41g/IGaTbHNoLQVsSvPXU/7GQ+Ntqy7xx80HASDXViu/cnjWvLZbuwjM
+         Lhdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746815369; x=1747420169;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OmUdZ7NWf24NGQucaka4MppQGDe1r3WG/B9nuhCN99s=;
+        b=vtREo/bZFPmYFMGAyRVzOaUEsLhtsz36KBnH78510ySn6Wqje5AsA4l47rU2ppxktw
+         KDFbw6y9SjN2qmooIIKfL2nEyCGLURhiJiBh2Qw0A1V5akoYUVpOzNIOIeOgoDxRSvOp
+         sBC/JzYO3JlnDCyM/6FC39CEWEJh2aHOVA8fy9Lv4nqO3xkoGSSRwzpvbXScoSVOHBEY
+         vi5ueW249L6OG5d8hW8qOVliyuw0RvJvasg7HHFr3Vkqat+v8q9wiOrDcCe18de8BuPB
+         WGyQpSGTVw+PxyaapB2VOi88IbPibGZIbSUTXKjLu9PTRy5S2EsqlF9YztxBQf7sYaa+
+         2Xzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUTJGZO/Kf5MrWaAwkDGtCTpWaM46XxkVVWTIgYpBXt02ud8F1DnQObFpjd5w5HmyAcK+s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPL5ab2riSnnz8MDknEZ4Gv35+IOWioWW89OfoesOSxlwQaHDm
+	4/8yHG7FbIuUhaS5JA/bK5WI1Sjnejek9dOuuPBy8K4TCWHWQYUmkqrxandQYYo7STRllNasF4k
+	MaQ==
+X-Google-Smtp-Source: AGHT+IFrOu+Urvz0vnEY64t3GWYiH2n9+rMd9iGS1EvnXRCr73zi7B72X8HzZk53Hxmd3/d9MS5cFDIYAAg=
+X-Received: from pjbrr8.prod.google.com ([2002:a17:90b:2b48:b0:2fc:13d6:b4cb])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e841:b0:223:60ce:2451
+ with SMTP id d9443c01a7336-22fc8b33427mr57550815ad.15.1746815369640; Fri, 09
+ May 2025 11:29:29 -0700 (PDT)
+Date: Fri, 9 May 2025 11:29:28 -0700
+In-Reply-To: <20250509081615.248896-1-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH v6 14/14] RISC-V: KVM: add support for
- SBI_FWFT_MISALIGNED_DELEG
-To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org
-Cc: Samuel Holland <samuel.holland@sifive.com>,
- Andrew Jones <ajones@ventanamicro.com>, Deepak Gupta <debug@rivosinc.com>
-References: <20250424173204.1948385-1-cleger@rivosinc.com>
- <20250424173204.1948385-15-cleger@rivosinc.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Atish Patra <atish.patra@linux.dev>
-In-Reply-To: <20250424173204.1948385-15-cleger@rivosinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250506093740.2864458-6-chao.gao@intel.com> <20250509081615.248896-1-chao.gao@intel.com>
+Message-ID: <aB5JiE6LupZhmqJ7@google.com>
+Subject: Re: [PATCH v6a 6/8] x86/fpu: Remove xfd argument from __fpstate_reset()
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: bp@alien8.de, chang.seok.bae@intel.com, dave.hansen@intel.com, 
+	dave.hansen@linux.intel.com, ebiggers@google.com, hpa@zytor.com, 
+	john.allen@amd.com, kees@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mingo@redhat.com, oleg@redhat.com, 
+	pbonzini@redhat.com, peterz@infradead.org, rick.p.edgecombe@intel.com, 
+	stanspas@amazon.de, tglx@linutronix.de, weijiang.yang@intel.com, 
+	x86@kernel.org, xin3.li@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 4/24/25 10:32 AM, ClÃ©ment LÃ©ger wrote:
-> SBI_FWFT_MISALIGNED_DELEG needs hedeleg to be modified to delegate
-> misaligned load/store exceptions. Save and restore it during CPU
-> load/put.
+On Fri, May 09, 2025, Chao Gao wrote:
+> The initial values for fpstate::xfd differ between guest and host fpstates.
+> Currently, the initial values are passed as an argument to
+> __fpstate_reset(). But, __fpstate_reset() already assigns different default
+> features and sizes based on the type of fpstates (i.e., guest or host). So,
+> handle fpstate::xfd in a similar way to highlight the differences in the
+> initial xfd value between guest and host fpstates
 > 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> Reviewed-by: Deepak Gupta <debug@rivosinc.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Link: https://lore.kernel.org/all/aBuf7wiiDT0Wflhk@google.com/
 > ---
->   arch/riscv/kvm/vcpu.c          |  3 +++
->   arch/riscv/kvm/vcpu_sbi_fwft.c | 36 ++++++++++++++++++++++++++++++++++
->   2 files changed, 39 insertions(+)
+> v6a: new.
 > 
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 542747e2c7f5..d98e379945c3 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -646,6 +646,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->   {
->   	void *nsh;
->   	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
-> +	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
->   
->   	vcpu->cpu = -1;
->   
-> @@ -671,6 +672,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->   		csr->vstval = nacl_csr_read(nsh, CSR_VSTVAL);
->   		csr->hvip = nacl_csr_read(nsh, CSR_HVIP);
->   		csr->vsatp = nacl_csr_read(nsh, CSR_VSATP);
-> +		cfg->hedeleg = nacl_csr_read(nsh, CSR_HEDELEG);
->   	} else {
->   		csr->vsstatus = csr_read(CSR_VSSTATUS);
->   		csr->vsie = csr_read(CSR_VSIE);
-> @@ -681,6 +683,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->   		csr->vstval = csr_read(CSR_VSTVAL);
->   		csr->hvip = csr_read(CSR_HVIP);
->   		csr->vsatp = csr_read(CSR_VSATP);
-> +		cfg->hedeleg = csr_read(CSR_HEDELEG);
+> Note: this quick revision is just intended to ensure that the feedback
+> has been properly addressed.
 
-Can we avoid saving hedeleg in vcpu_put path by updating the 
-cfg->hedeleg in kvm_sbi_fwft_set_misaligned_delegation.
-
-We already update the hedeleg in vcpu_load path from cfg->hedeleg.
-If the next vcpu did not enable delegation it will get the correct 
-config written to hedeleg.
-
-This will save us a csr read cost in each VM exit path for something 
-that is probably configured once in guest life time.
-
->   	}
->   }
->   
-> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> index b0f66c7bf010..d16ee477042f 100644
-> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
-> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> @@ -14,6 +14,8 @@
->   #include <asm/kvm_vcpu_sbi.h>
->   #include <asm/kvm_vcpu_sbi_fwft.h>
->   
-> +#define MIS_DELEG (BIT_ULL(EXC_LOAD_MISALIGNED) | BIT_ULL(EXC_STORE_MISALIGNED))
-> +
->   struct kvm_sbi_fwft_feature {
->   	/**
->   	 * @id: Feature ID
-> @@ -68,7 +70,41 @@ static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
->   	return false;
->   }
->   
-> +static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
-> +{
-> +	return misaligned_traps_can_delegate();
-> +}
-> +
-> +static long kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
-> +					struct kvm_sbi_fwft_config *conf,
-> +					unsigned long value)
-> +{
-> +	if (value == 1)
-> +		csr_set(CSR_HEDELEG, MIS_DELEG);
-> +	else if (value == 0)
-> +		csr_clear(CSR_HEDELEG, MIS_DELEG);
-> +	else
-> +		return SBI_ERR_INVALID_PARAM;
-> +
-> +	return SBI_SUCCESS;
-> +}
-> +
-> +static long kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
-> +					struct kvm_sbi_fwft_config *conf,
-> +					unsigned long *value)
-> +{
-> +	*value = (csr_read(CSR_HEDELEG) & MIS_DELEG) == MIS_DELEG;
-> +
-> +	return SBI_SUCCESS;
-> +}
-> +
->   static const struct kvm_sbi_fwft_feature features[] = {
-> +	{
-> +		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
-> +		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
-> +		.set = kvm_sbi_fwft_set_misaligned_delegation,
-> +		.get = kvm_sbi_fwft_get_misaligned_delegation,
-> +	},
->   };
->   
->   static struct kvm_sbi_fwft_config *
-
+Both patches LGTM.
 
