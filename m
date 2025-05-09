@@ -1,240 +1,274 @@
-Return-Path: <kvm+bounces-46054-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46053-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5525DAB0FD2
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 12:05:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16A70AB0FD1
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 12:04:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBCA43A8E28
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 10:04:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C7FD4C084A
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 10:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5418E28E59A;
-	Fri,  9 May 2025 10:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E805D28E59A;
+	Fri,  9 May 2025 10:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tz7brUIi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLUkoKa9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C25222576
-	for <kvm@vger.kernel.org>; Fri,  9 May 2025 10:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746785096; cv=fail; b=kxnVN84wIaw1eF0efKdc9ZJC9LX8RdAUNXczpBW/SUoJzGNJiHos9zwsLXFstN6KJ2gly0BGlGEr4fXjG573KTjusar/+PDGxrViZLSHqY9fWHO6RLcmlQKrxp2mPMHihmIJVqu3RSTEhaOrGkh7h6t8+2ktaZ+jK82f9Lo+oig=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746785096; c=relaxed/simple;
-	bh=c5qCAHl5ZOY4KypJieUVN4rgKgqqbZ1WwRbMJkRmoWI=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XlYL82Wf7HbMvbY+zi12VLl8Tpj22A8663EpGT4edGfksxlIo1D+Exgk8HqsGU5Ek790qp9UncOlAoR7gE6I8Qbq/czEXiQPLKkE5EjRXVUU67AIHX3jdi4uzT7cyDGrr0IFGbGR+wlp0AHKeP/X90oo9F/YKpUPMRjFsBTGqxk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tz7brUIi; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746785095; x=1778321095;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=c5qCAHl5ZOY4KypJieUVN4rgKgqqbZ1WwRbMJkRmoWI=;
-  b=Tz7brUIiqD8TLWAfRIMby9/0bi7qXn4ftfVepI9pxGNLJD3ZYMWjwoRU
-   kmn74IW5ceD41UQfoJ66kmExnqlUZdtrc7/RY+2eurMRB5BqWryBikokf
-   rWFuR4DRfIxH33LZSXvmoR/je52Q71SPc0x99J/oFoKjbqoLPTFn/ncRK
-   LR392VJq1QPWtL2MZtcTCkBUEJfBaUQIYO7pWaqxsEieIHpyr8qTC0xc7
-   VlwkFMT3QfiQ/VcomiWBf4t4Ss2AZ8MOwZ+UC+8WHrZc2pHEQxQd9ag70
-   82wn5wwr1GZnNknhTlUc0JrUBikH2Y6GSxQP5mVuvRutDEXt7axTCxXdw
-   w==;
-X-CSE-ConnectionGUID: W0V1lCVqTKK6FdJGP4xBlQ==
-X-CSE-MsgGUID: J986spXVQTm6QVO+DnFwzg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="52416533"
-X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
-   d="scan'208";a="52416533"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 03:04:26 -0700
-X-CSE-ConnectionGUID: boJo56cDSXSzBJILY95V4w==
-X-CSE-MsgGUID: aCoLgFNnRya01xbA+atoVA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
-   d="scan'208";a="136595129"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 03:04:26 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 9 May 2025 03:04:25 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Fri, 9 May 2025 03:04:25 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.174)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 9 May 2025 03:04:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WUlwb5R8vCVOx7SamHwuM/Ts1IKPXJ0kHOEOMnyv4gVWDXxe+/S4Bv5m4JBdViPj+EHdR6c571ZJNrkNjVZJfk2C53W8Bvbr1txesiphv+007pDEov0tpSFUtB3iFvAbJf4bimk+zFf8hkcYAM9zfXW0OlKNNv/zUVel/RAl9sFQfGMRtZ5zrJ5QYLJe2O7TQKrq8qb7u71xM4YEC6zUhErTXtaUcarVZta+iaE7F5/9tTulqDOd5sRlG0jdGCqJWjbRmzvoUUsh01C7RgN1h4PjvXP3jQl0MpydhIy/xnZ/WG7LpVuqDHH89UsCJxz5Ol0YKmUqq5tNBxLh+hsr2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=y5nr6y0Ojo6jRGXSEvXjEc376qq87dnEZI4bJdvZ0WM=;
- b=A/e2ZXTIS/aVgABMxgzY8Sx4kHDMp4ngMu4TLgk0rTm9A/u4COYRs+K4f/70uecTZ4UpQsGv+M6FeLMu+gBswXDL1TR3JaJg/+P1uFuZl+/2ZekN2sg68Us8PTTGBorsSYHyjsD9S6dskQYdUxqolbbKkPF9/wQmZzhAlD3pVVYjvezjZ9DP0Aw1LEbOFbZhW8NHP6ztQDtGLQHUgosN2bKXYgVcuFrxNsDjbojDHSiSOlw9fYKNlIeV+Az+cHzNcwtPh9whslJQ5EMRbPE6O8QWtutOGNVhY+VyMVjbH6WWcYS/9Wuq4Ng6+jS9KbE1kOzcXAV+10LOnXl7MirmmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
- SA1PR11MB6872.namprd11.prod.outlook.com (2603:10b6:806:2b2::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.24; Fri, 9 May
- 2025 10:04:23 +0000
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95%4]) with mapi id 15.20.8699.021; Fri, 9 May 2025
- 10:04:23 +0000
-Message-ID: <55547b18-be03-4684-9330-70fc2ba48954@intel.com>
-Date: Fri, 9 May 2025 18:04:13 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 10/13] memory: Change NotifyStateClear() definition to
- return the result
-To: Baolu Lu <baolu.lu@linux.intel.com>, David Hildenbrand <david@redhat.com>,
-	Alexey Kardashevskiy <aik@amd.com>, Peter Xu <peterx@redhat.com>, "Gupta
- Pankaj" <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>, Michael Roth
-	<michael.roth@amd.com>
-CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, Williams Dan J
-	<dan.j.williams@intel.com>, Peng Chao P <chao.p.peng@intel.com>, Gao Chao
-	<chao.gao@intel.com>, Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao
-	<xiaoyao.li@intel.com>
-References: <20250407074939.18657-1-chenyi.qiang@intel.com>
- <20250407074939.18657-11-chenyi.qiang@intel.com>
- <c7ee2562-5f66-44ed-b31f-db06916d3d7b@intel.com>
- <5fcf90b9-dff5-466c-9be5-2b6571a5de8a@linux.intel.com>
-Content-Language: en-US
-From: Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <5fcf90b9-dff5-466c-9be5-2b6571a5de8a@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0014.apcprd02.prod.outlook.com
- (2603:1096:3:17::26) To DM3PR11MB8735.namprd11.prod.outlook.com
- (2603:10b6:0:4b::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42FC9222576
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 10:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746785068; cv=none; b=Fa/jocRNaDyAhKCWhhBRdVlJmZ/oeT4kL0Gxeu7QgSAyl+RRCGirbrRwEMwyzVd4QOd031T5/4ANW7+xi5nqL/awhJulLF8LZdiymXOf9Gz6OQ1GRpPiC03WA3VkQ6FwErGGqFikbxkPGbbVILkuO32MEAuVWRtjs3Ae89Lvkms=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746785068; c=relaxed/simple;
+	bh=YdGWdajXJnO2jUJFgdShCqGe0D3/FFUYMJAE8e2eCPs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YpvFMV1zU4zWx9ibuGKOCfp7sS8/a9bBmav9Ytci20HD42eRHZEuTfIDw37+3cqgjOHSLzyjtk/zRhMtr38fhXGUtcV3wwV8LbMNCxQ5vo+BJm7jIFAV6Bgij9Qvb4YDkT5armFe91ryPjVbBFBMuxg+dTSawNkpejMqfN8ocrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fLUkoKa9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746785065;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5Kwk95fuora+GIrWiSHPyNGLxMslBv3jG49YqLT5rLo=;
+	b=fLUkoKa9xaMy0NZPY0yZw06Gol3ZrnOK2AELpPXNlC0BNyyyiKlADLvkjlh2vm64wXC5u8
+	TXu9c7yrGK9Dl52ZtVdlupLJBvwJ6CpdvkGGDVIBfpX1e+hzmg4Vfj4fJ3K2E9Grhr9QYz
+	vWhFeS+qnp39C8waKNO6XYydcCX66/w=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-15-8eJwT_XlMry864-rVgJ23w-1; Fri, 09 May 2025 06:04:23 -0400
+X-MC-Unique: 8eJwT_XlMry864-rVgJ23w-1
+X-Mimecast-MFC-AGG-ID: 8eJwT_XlMry864-rVgJ23w_1746785063
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a0bd786a53so704741f8f.0
+        for <kvm@vger.kernel.org>; Fri, 09 May 2025 03:04:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746785063; x=1747389863;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5Kwk95fuora+GIrWiSHPyNGLxMslBv3jG49YqLT5rLo=;
+        b=DYuUgzNgD3fvotMtwd2pgqEJVayd+YbRybkCrdgr54y1mG0+tHiM+zUtRujrVhBIhj
+         qIF7zaXtLJ4J4/CSReHVqoY/oqpQZwar8zg6ZicWoAmVez8ODfsVG/OYWH5aEnRQLfV9
+         ttTef1/VOjCXk+CjCIXDGNQRkpkIyi5AXcdBjrDHDCgUbQafdC/GgrV6SlIHytUVO6qL
+         V/q3qnezya7nS2LM+8v21MuaVuxXWRVJnUfKSPN0c1PyH7ae7eOL485nzRxlDQGbWrUx
+         NQNR9Anp10M/jKUZTe62dTaY68CnuFy87WxOA7Lv/f4T7x3lbOPSkOmHtpCGH9kNoExi
+         7Eyg==
+X-Forwarded-Encrypted: i=1; AJvYcCVbEyc8H7/k5k26K/QtZ2zywd0QcEe3rIhPpbDPSjsRGysbbpOnkkkNOMxtkV9x2UyQKgE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrIL6g5K4kd4hCYRNr/7kvEzKgOcm4d/F7Hd252KmSNmg7V7av
+	Y2x4UCqgYuFw05ny8bOCPy55qkIn/PT1gc6/3m80xcKPhu+jyn/I7wwvZAAl+xwKi4bST2DIDwv
+	Jpsyza6/JyPoKWNH6BVcPL0S41r7k7UGoqP4pRgxXdXTt5+EAyQ==
+X-Gm-Gg: ASbGncv7ee+texY61SCusG+XYqTAl58GkTN/EIf8XohqOdZULmzxg0Jtq19Gsz5/7mh
+	WsscAspH5OJ5+GdLX4l0LQ0RED/EXoh4novzswGEY3g0ZJsBlGpuRmGr207aSYUs8rXes89WqG0
+	GCXefN31ZTKFFbo8mujsA8feNQa2hj6qMcpTE63maSD48moPQrM1yXeaSLScgoOkE0wd76nCGyn
+	JtnWOJSIEbUx1D47GeGr+VDcfKbRYr9iCjut+rLQTjLRUQeF++j7aUVvOO1Q7v962uFxcarFLX0
+	IBFYxF6a1iMEJBNQN3N0cpIbYc/Id/W8uBnm2j6gnzTwVqoP4iEf
+X-Received: by 2002:a05:6000:3113:b0:39e:e3fa:a66b with SMTP id ffacd0b85a97d-3a1f6445d7dmr2296762f8f.34.1746785062711;
+        Fri, 09 May 2025 03:04:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFsw4mQvIe65lYAhxK8Mg5JhWSLdbpVhpDlFo1MDeWJ0PSV5WOqUhh1msYf9oVa/+jtsL1wqw==
+X-Received: by 2002:a05:6000:3113:b0:39e:e3fa:a66b with SMTP id ffacd0b85a97d-3a1f6445d7dmr2296709f8f.34.1746785062268;
+        Fri, 09 May 2025 03:04:22 -0700 (PDT)
+Received: from [192.168.0.7] (ltea-047-064-115-173.pools.arcor-ip.net. [47.64.115.173])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f5a2cee4sm2783959f8f.67.2025.05.09.03.04.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 May 2025 03:04:21 -0700 (PDT)
+Message-ID: <2f526570-7ab0-479c-967c-b3f95f9f19e3@redhat.com>
+Date: Fri, 9 May 2025 12:04:19 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|SA1PR11MB6872:EE_
-X-MS-Office365-Filtering-Correlation-Id: db7670d0-796e-4035-00ba-08dd8ee0df47
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Zld3WkZWcTBqQmFCSGFFMFdXbk54OGRtWlZkQkkvampMTFlaN1BUalArdWJW?=
- =?utf-8?B?LzVtSkVhZjZhSEs5dEg1U0JKM01OdG1CakYxUkNWbk8xMmVwS1h2ZElnWHFj?=
- =?utf-8?B?UEdPSDl6eG9Kd0p4djIrRC8weFRmMDRMSlJSZEd0UllZanE3SXJWbXJHNVdS?=
- =?utf-8?B?Y0g2VHdyb2RWaFFZSi91NStTYXU0cCtqVmdUZ3JwallwU1VGTnNaa3VKSWhi?=
- =?utf-8?B?cmRTbU96TUJRbFA0TUhkN0t4UjlBUWpKOU1rU2RERjlRbTI4TzIyOC96UWJ0?=
- =?utf-8?B?ZFo5dmo3Y0YreWFCTGRRQk9tNFdYWVlSR1lYMGUrVVZDUlNiRVNwL3k0L0xJ?=
- =?utf-8?B?czV1OXE2eGxISk54ZC9QY2piOU5UNzFqNGlqZXNiZHZMZEk4VUxVTHMrYlVI?=
- =?utf-8?B?SFhGZlhBTlJYNDNZVDdhS3hrOHRKS1BDTlh2TlIwNlVtT1JxNjVFVFdrY2ZS?=
- =?utf-8?B?RkNlcWNkdDgrendyMC9CRUVucDZUSkRqTHE1Z2NKTDVxd3VkVDhuaW1jS2F1?=
- =?utf-8?B?aEp5dEtTTmdUTzFTcUVaWVM4d3hoVzN2MUlkVjVyeVFYK0xhRWJKcWxWWVQ4?=
- =?utf-8?B?SzBwSW9sbXg2bXE5bG53VjY2bGYyU2NxdjZ6c0lQSTc3bFhmVFFBSndkWnBG?=
- =?utf-8?B?dSt1TmNVMklSQWsveWJLWGlLK3Vod0c3WXJMUzE1NVRxb1pMbVdwZFJ1SzIr?=
- =?utf-8?B?bmcrdUtJOTMva2xPcXJCMW9WS3hiL2dCd0o1dW4xUEVIR0ZJTXk5djlXU3Vo?=
- =?utf-8?B?VkFrUERyUnVCUVBuNHROandtdVdjWk5wNFZpZVBJV0ZxTUdTSndWMGhPbW5K?=
- =?utf-8?B?YWpuSVdaWXpIMjZScWd6RTJUVVpZT2dXTFJUNDhBdGM3NFN5WmlhTmc2NVQ0?=
- =?utf-8?B?VHExQWh3OEVkTXlZSjdQajdiNyt0VGZONGtxRWVZeUxsVFhhYXB4QlZ1S1k0?=
- =?utf-8?B?bWJWZDdxcDJsMHNyZDliYkw1emcxejZZbmxqek1KZW8rcmp4dXFRa24va3c0?=
- =?utf-8?B?L01mclp5QVhoSHZQanl1SHpQb0dkYkdKSThGanhpVTZJU0ZGaW9VRFI3U0NK?=
- =?utf-8?B?MGNnUndoTWtYQVc2dnRoVzQwcGN2eSttSUxWQ01pVkd4bnFGV2kwMTQ1VmVy?=
- =?utf-8?B?NEFLS1FrK3JPcGVrSGh2OXRLV3d5aDVJMjBkZlZvUkVwUkxENDh2REx1SG1Q?=
- =?utf-8?B?NTdnYnpGQlR6b1J6MEIrR3p6MlprZnJBYVRPdG93T08vOFJVUWdTa2tkQjVX?=
- =?utf-8?B?RUpUSU0vQ1Y4REltcERlL1ZtYlZTeVEwWG42M3dCYzNEbVNtYTUzRG9RSFhT?=
- =?utf-8?B?eGxvSUp6UmlDcU9nbDZUSUFLanFvRTdRQkpraTNtR2tGcTEvQlllZ3lhMkpr?=
- =?utf-8?B?ZUptNnk5bmJoZ3dQSnBuZ0ljTnVaeVNLMVBJRnNEclVNMU94dXRhTElsTXZS?=
- =?utf-8?B?clE5cWRjbXBrZ2RQeEltbjNNQWJ5QlpYaDR2OWhXWWlObzlud3VvOVIwV20r?=
- =?utf-8?B?VlRuMU1zcms3US9XMkRzbEt0NUVjWDFhWVhwb0I5dTMwTlR2Y3pwbXZoajZM?=
- =?utf-8?B?Z0JBUzRaekMvcGhqVForQlFYYmFDK2h3WFZtTkJ5cUJtdWc0OTlMOXBoRzd4?=
- =?utf-8?B?d0IzRkJaaldMaERwU05yWVN6MVVpZTlpWEh4Z0RwSVRnTEt6QkN5b1JoaHFI?=
- =?utf-8?B?NmdsL3h6b05OTHVoMUE4bE1jYlRKNklvMjdXZWJGaXBxZ054dWRHWlFCYWZx?=
- =?utf-8?B?ajEyNlBkVVZxcG5EUFBSUmlDQzF4d3BxNFBaTms4bDk3SGRIRW1ienRaK0ox?=
- =?utf-8?B?MVlKdU9uSXVXc3FRZUFUcXdwTEUzalR6amRacUs3RDFNaEYvc3JzcjdRem4y?=
- =?utf-8?B?M1JLSTJ2MDNsaGgrYVF1dFdXVGRLYTBlc21QSmtqYjVFN3c9PQ==?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UUxIRTJjTG1VVzJYMGdzc3ZIeEpiQ2JEQ0VQN1J3bStCb2tvYnN2L2lCVmlS?=
- =?utf-8?B?ckt1RmlqbmgxUHhiN3puRDJPekFrMHRsaXVHTXI2dUtyQ2xlNGtBSGJ3eUlo?=
- =?utf-8?B?U0VHb28wNDkzWnFrVkdrUWxQa1BiajFiY2ordHBHTU9PVE1RNlo0L1NZS1dV?=
- =?utf-8?B?aGZIdXhjcUtuY0VadGt4MHJrU0RKekg3K3dYTU9lSCtIdGM0NkF5UHdrWnhq?=
- =?utf-8?B?QUFTOUo0WndtSzJNNlZCYzhCWURmWTVtQUtkS2ZRYkNUZVZJWGY4WWhPYzEx?=
- =?utf-8?B?VmZyZHh6U3RhS2dFaTdsZVhoaUdRVmF2S3VZWlRVOG16enVmSVV0UXlLUXNt?=
- =?utf-8?B?eTVwTkd6SDIzYXlreVZMLzY4N0NRTFpsU214UXN5V056K2FGYlM3SVkzK25J?=
- =?utf-8?B?ZDNkMFgwY2R3L01zcVRwQWljY3VNeC9rcThmaXdaRStITGFSRExhRllHNFVw?=
- =?utf-8?B?azRkWS8yUHBuTUtTd0N0M1U3K0hZNHJCRUZzOEY4Q25jYUpMdlh0TngzU0py?=
- =?utf-8?B?K0ZUS2YveUp5V2tYMlVRRnF6ejFaY0xBZUlNdHEyT0dGcHdneHorRDMwWk5Y?=
- =?utf-8?B?anNPR0NwSVE3WitWL1dWcWhwcmtEVFVpR0pzM2JucEtoWVRUZkVEOWRlczdG?=
- =?utf-8?B?MjlwV1lQbTM3V2txTnVjcUFva2x4NzFVMDR6K3Q2MlN0VTJUVHJpR2tpa21l?=
- =?utf-8?B?OTB2a1g3c2lKdVJlc2VWMytpdXdZZTBKU3MySFd0WE1sa1RYM2FkU1Zab0Zh?=
- =?utf-8?B?SnBJL2JDWVJVWHRBK0VNaFBpM0NXQ3B4a09mODAzYXZrQmcxOC9pRGV3Yzhr?=
- =?utf-8?B?TVR3YW9VMjBCRzQ3YnZqSkwvcXhtTXo1RGFuMVpmOThqRUttRkdMb1pMSUN1?=
- =?utf-8?B?N25yNHk5ZS9oU1c5endNejhZaXh6ajR6ZkpXQ1F1bkdlcy9xK3hFUElad3Z4?=
- =?utf-8?B?dUpTOFY0NkZlR3pjdGVPS2czaVptbjlPM1NINW9LRW0zN3JDcml3Nm5Ec1dU?=
- =?utf-8?B?N0k2ZGczSXZiSkRnUm9VVVMwQjMwRXJlL3drYlg4b1RnK2E2dFZ4enJ2dXVq?=
- =?utf-8?B?TDFOdHNzV2kzN2oxaVlkamxSTUhhbm5RMGVqMUZnNThjMFh4YjhFdUNoRmVs?=
- =?utf-8?B?UFAzMzJPdkphdlF6Sk9SdEQxN3NuNGxsU2hIVWhjRGVIN3poeDJzaU02SW52?=
- =?utf-8?B?Ty9DcEw0SzY0N1R0dERYVDJkN0ZGWGcxWTF1eDFBN1RCalljU0hGRzMwcVVj?=
- =?utf-8?B?bDBIc0JsdVZXcWxCeDJzdVUyQk5GTUxwQzUzQXV0YmlCNFY2T2diY21FMzEz?=
- =?utf-8?B?OE1NL0xBQVFtZWQ4RG5Uc0dieVZqRlhId2ltN2FET1g4eVdsa3ZqbFhkWGlE?=
- =?utf-8?B?dk1CaGNpa2pqUEUxWHVNSE5nU0JKUE9JVFJ6b2NIY2dxUmxsQVVOM1ljbDZC?=
- =?utf-8?B?R3dCTGV2cUdGR2FZSFpMNENXOWFwbkFONHQwNzZUcHJLSk9LZDZ6OFJCZmlU?=
- =?utf-8?B?R0txZDA2QVhtN1lBQmVVZXgwSndqMXg0VXBsbGZCZUhtZ3ZKUG5VUFp2QVZX?=
- =?utf-8?B?ZmNtdld4U3BQN24wOXVFNlBSSTdMRlZyYlh0am5kT04rSzlwb2hUaEswYmJU?=
- =?utf-8?B?b1dYODlhQ002cjV4NHpLZ2NqN2VSaFlrWElpZDdZaXVXUTZEZHlGc0p0MnFE?=
- =?utf-8?B?djJjZFFFR0wvWFlHajBEd3F6VUJVcHJhS05WS3V0azJVYXBOTWhlM3ljYWdR?=
- =?utf-8?B?Nkc3Rk5FZ29FZGFBdlB5TGdtOGJ1SmJ0UDZXVXJPdTdaR2l3K1pFUDg3dElV?=
- =?utf-8?B?REFXYVl3UmVhemtnWENYNnZFMUhrN1c5cEFWSFJkRUxnK29RMlRqVWJRYmJ6?=
- =?utf-8?B?ZEJtOHo3VE0wSnR1QmtiZ0lpRzZxVXZsTzBXKzcyTzIydnR4TExva0VLRzNh?=
- =?utf-8?B?b0kvRHplVlNMUVRLTGU1dWNQMUdPZi9HNVpyajBmWFl1UWlHYW9RRGNmRENP?=
- =?utf-8?B?VVpxQTYwbVh4VVM2K0ZEd003Z200aVdQekMvUkR5cWl1TEwzOXcvWjU4NDZE?=
- =?utf-8?B?Y1VjSW40KzBGSTZ1ei9YMmFETmZldmM1bnRqbzRVRXAwcWMzcnNxdUI5QWwy?=
- =?utf-8?B?R0lVODdGUnRZU1BQSzRjZDluenhmS1JaVFJSZngzTDZTbUt5KzFLZG45U1hy?=
- =?utf-8?B?MVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: db7670d0-796e-4035-00ba-08dd8ee0df47
-X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2025 10:04:22.9401
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZaWbA97W+1OLsdzDFsCdRjEoISiwiOclvrvc8al7hVUI3zMk7pgjSZpWK1OSHLDgzrkKty6Zc6ZBbXdmDybx5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6872
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: How to mark internal properties (was: Re: [PATCH v4 12/27]
+ target/i386/cpu: Remove CPUX86State::enable_cpuid_0xb field)
+To: Zhao Liu <zhao1.liu@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ kvm@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier
+ <lvivier@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Yi Liu <yi.l.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-riscv@nongnu.org,
+ Weiwei Li <liwei1518@gmail.com>, Amit Shah <amit@kernel.org>,
+ Yanan Wang <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Ani Sinha <anisinha@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Fabiano Rosas <farosas@suse.de>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ =?UTF-8?Q?Cl=C3=A9ment_Mathieu--Drif?= <clement.mathieu--drif@eviden.com>,
+ qemu-arm@nongnu.org, =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?=
+ <marcandre.lureau@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Jason Wang <jasowang@redhat.com>
+References: <20250508133550.81391-1-philmd@linaro.org>
+ <20250508133550.81391-13-philmd@linaro.org>
+ <23260c74-01ba-45bc-bf2f-b3e19c28ec8a@intel.com> <aB2vjuT07EuO6JSQ@intel.com>
+From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <aB2vjuT07EuO6JSQ@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-
-
-On 5/9/2025 4:22 PM, Baolu Lu wrote:
-> On 4/27/2025 10:26 AM, Chenyi Qiang wrote:
->> Hi David,
+On 09/05/2025 09.32, Zhao Liu wrote:
+> On Fri, May 09, 2025 at 02:49:27PM +0800, Xiaoyao Li wrote:
+>> Date: Fri, 9 May 2025 14:49:27 +0800
+>> From: Xiaoyao Li <xiaoyao.li@intel.com>
+>> Subject: Re: [PATCH v4 12/27] target/i386/cpu: Remove
+>>   CPUX86State::enable_cpuid_0xb field
 >>
->> Any thought on patch 10-12, which is to move the change attribute into a
->> priority listener. A problem is how to handle the error handling of
->> private_to_shared failure. Previously, we thought it would never be able
->> to fail, but right now, it is possible in corner cases (e.g. -ENOMEM) in
->> set_attribute_private(). At present, I simply raise an assert instead of
->> adding any rollback work (see patch 11).
+>> On 5/8/2025 9:35 PM, Philippe Mathieu-Daudé wrote:
+>>> The CPUX86State::enable_cpuid_0xb boolean was only disabled
+>>> for the pc-q35-2.6 and pc-i440fx-2.6 machines, which got
+>>> removed. Being now always %true, we can remove it and simplify
+>>> cpu_x86_cpuid().
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>>> ---
+>>>    target/i386/cpu.h | 3 ---
+>>>    target/i386/cpu.c | 6 ------
+>>>    2 files changed, 9 deletions(-)
+>>>
+>>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>>> index 0db70a70439..06817a31cf9 100644
+>>> --- a/target/i386/cpu.h
+>>> +++ b/target/i386/cpu.h
+>>> @@ -2241,9 +2241,6 @@ struct ArchCPU {
+>>>         */
+>>>        bool legacy_multi_node;
+>>> -    /* Compatibility bits for old machine types: */
+>>> -    bool enable_cpuid_0xb;
+>>> -
+>>>        /* Enable auto level-increase for all CPUID leaves */
+>>>        bool full_cpuid_auto_level;
+>>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>>> index 49179f35812..6fe37f71b1e 100644
+>>> --- a/target/i386/cpu.c
+>>> +++ b/target/i386/cpu.c
+>>> @@ -6982,11 +6982,6 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>>>            break;
+>>>        case 0xB:
+>>>            /* Extended Topology Enumeration Leaf */
+>>> -        if (!cpu->enable_cpuid_0xb) {
+>>> -                *eax = *ebx = *ecx = *edx = 0;
+>>> -                break;
+>>> -        }
+>>> -
+>>>            *ecx = count & 0xff;
+>>>            *edx = cpu->apic_id;
+>>> @@ -8828,7 +8823,6 @@ static const Property x86_cpu_properties[] = {
+>>>        DEFINE_PROP_UINT64("ucode-rev", X86CPU, ucode_rev, 0),
+>>>        DEFINE_PROP_BOOL("full-cpuid-auto-level", X86CPU, full_cpuid_auto_level, true),
+>>>        DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor),
+>>> -    DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
+>>
+>> It's deprecating the "cpuid-0xb" property.
+>>
+>> I think we need go with the standard process to deprecate it.
 > 
-> Do the pages need to be pinned when converting them to a shared state
-> and unpinned when converting to a private state? Or is this handled
-> within the vfio_state_change_notify callbacks?
+> Thanks! I got your point.
+> 
+> Though this property is introduced for compatibility, as its comment
+> said "Compatibility bits for old machine types", it is also useful for
+> somer users.
 
-I think it is handled in vfio_state_change_notify(). Just like the
-device passthrough in legacy VM, the shared memory will be pinned during
-vfio dma-map and unpin during unmap.
+Thanks for your clarifications, Zhao! But I think this shows again the 
+problem that we have hit a couple of times in the past already: Properties 
+are currently used for both, config knobs for the users and internal 
+switches for configuration of the machine. We lack a proper way to say "this 
+property is usable for the user" and "this property is meant for internal 
+configuration only".
 
+I wonder whether we could maybe come up with a naming scheme to better 
+distinguish the two sets, e.g. by using a prefix similar to the "x-" prefix 
+for experimental properties? We could e.g. say that all properties starting 
+with a "q-" are meant for QEMU-internal configuration only or something 
+similar (and maybe even hide those from the default help output when running 
+"-device xyz,help" ?)? Anybody any opinions or better ideas on this?
+
+  Thomas
+
+
+> Fo example, in the early development stages of TDX, when there was no
+> full support for CPU topology, Intel had disable this property for
+> testing and found this bug:
+> 
+> https://lore.kernel.org/qemu-devel/20250227062523.124601-3-zhao1.liu@intel.com/
+> 
+> So, I think there may be other similar use cases as well.
+> 
+> And, if someone wants to emulate ancient x86 CPUs (though I can't
+> currently confirm from which generation of CPUs 0xb support started), he
+> may want to consider disable this property as well.
+> 
+> The main problem here is that the "property" mechanism doesn't
+> distinguish between internal use/public use, and although it was originally
+> intended for internal QEMU use, it also leaks to the user, creating some
+> external use cases.
+> 
+> @Philippe, thank you for cleaning up this case! I think we can keep this
+> property, and if you don't mind, I can modify its comment later to
+> indicate that it's used to adjust the topology support for the CPU.
 > 
 > Thanks,
-> baolu
+> Zhao
+> 
+> 
 
 
