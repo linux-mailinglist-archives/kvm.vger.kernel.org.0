@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-46004-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B125AB07EC
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 04:30:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A051AB07FE
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 04:39:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82A509E39ED
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 02:29:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3D62501A15
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 02:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F471244675;
-	Fri,  9 May 2025 02:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76BD722E40A;
+	Fri,  9 May 2025 02:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PZp2OnF/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eZ0HfDXM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D61C13E02D
-	for <kvm@vger.kernel.org>; Fri,  9 May 2025 02:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB1C22DFA2
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 02:39:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746757798; cv=none; b=NL3KAUAYEh4GkgAr8NmdtdV36JncT5RSBQRO6HGXrWvZwhl0dqwFsbKo7Ilb4Akgonu+dHTLEWEqaRqkulB1eJtb1KLZg7HXZivT1HSTFeWoU3CzjCLuAOkH8ftejA40Pz/y4ihQNwdIeUQhdfdCHdOjm7RNjWaggtCh/qs/bqg=
+	t=1746758345; cv=none; b=e2XbRhe25kWhbs4fpxONczZz5qxteHq9RHG2AURs27ZwJirDHmj67G1JQYCWacUc7b1mAcSkpms1kZI4P3MhRF+kkByYJE885y7dxx42KpK9lDUx1xARJkcSQfAMkJWaIELG6KseTzSjZOZW7zPQtZIJGUdAq+lLkvKmACt2QHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746757798; c=relaxed/simple;
-	bh=7Tb77gPHUH0LPQdGOdm6IjNB2V0ob4F/eCHrWe81rIU=;
+	s=arc-20240116; t=1746758345; c=relaxed/simple;
+	bh=JXwi2uJoss8m2Ee12mCsjw2jbINKA+zy0KI8tSqNQa8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jB57XliM+hsJb9rad3ki0LtCmGZUPDs04Q+ZSuES8jsRFFvCN7dEKLEeliaAgKKMM921Wg7h3gh1snoDYZwhwenM44F7pL3nqxydie4kwUTkwTM02N0ItNt6ujDwxUusmXrK0B8vv8vuigiS1RBbQ9JYen7LaKVyCj1TtbJnDm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PZp2OnF/; arc=none smtp.client-ip=192.198.163.16
+	 Content-Type:Content-Disposition:In-Reply-To; b=FjeWtxLvhpYViIkTwk/o7UlrfbOExJWX5rJRLzGezMiMP1YqWCEOkk9UwMh/GK0S8CyTRuB09F8Pe7Fn38WuVNSnQxgCDeXCZe5z7fdLWcTM/qruFOeOvIju+anci4VHkhj9/tUO5bEypbl23wbvXJzl6fflAoDjcDrBOOdip/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eZ0HfDXM; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746757797; x=1778293797;
+  t=1746758344; x=1778294344;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:content-transfer-encoding:in-reply-to;
-  bh=7Tb77gPHUH0LPQdGOdm6IjNB2V0ob4F/eCHrWe81rIU=;
-  b=PZp2OnF/mJDspnZsTrz2K5LQeK4cYvqs5DZ0wthb1p6gI3ZUy4lpKvTC
-   ND/7gVwazTk6k/FbYh6To6juSOQ5LuK/E6qosRlStTptKLFvy2BvleQrb
-   fFM4mvUqSnmrqCWa3LS1iLwWUriN7tt3DbwTfKOKxbL/cijacD0OKZpFU
-   c+MLMfp2NIUDBk2b5k22BetuAu9W88pcS4WWoda+rTdLn389LD0NXdt1X
-   zoInX5e70FrwhiQjHI/aYoEpQOmg1aQL02IVvVteU8tiJQOe6A2tuPa9W
-   CFl+EWKvbKvf4ApeH+A3GTHASQ8nAYQZ6Y5FvbGkDwpEeswg/83cAJGFc
-   w==;
-X-CSE-ConnectionGUID: 7XKkcDqLSa2aNtAah3ttdA==
-X-CSE-MsgGUID: K4Wf8DTLRZ2zWEWvASNbRQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="36196651"
+  bh=JXwi2uJoss8m2Ee12mCsjw2jbINKA+zy0KI8tSqNQa8=;
+  b=eZ0HfDXMT0lwaTE0+LK5650XdPKawD8odI2aPsDRNJon7vSEwI5jbMoC
+   4Zta7WSDUwgrTUeDkmddOhndHN1bGIawGrASjtLTgymad36oy2eFEep36
+   hdUCZACDyYpUwu7hL4+QSKnXDnJ+9jqddkzLFt0aA1CT74WuYwcZ4BaqM
+   76x5qYxYEhR024xVYCw5qPKoPV6QtjOHU9UC/eThDr85H/ctModLQ8Du7
+   N4CHnGex40tBbtzWpiGqxK7ceht6MZkrtDkaeIH6du+U/bwpUUrlLBbDx
+   g5tQs/LmP/5F8hP58qfm4bmwL6w02EwiE8JJct0HWDcqj7ErdQv+2nYN2
+   Q==;
+X-CSE-ConnectionGUID: j6UDF8ACRBmdxJEcjncUiQ==
+X-CSE-MsgGUID: LVWgwhWRQRihiI6BzmLQUg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="48719464"
 X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
-   d="scan'208";a="36196651"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 19:29:56 -0700
-X-CSE-ConnectionGUID: O4kiPmhbQaGrST7uwiUwRg==
-X-CSE-MsgGUID: ovYRMySHRxKudYS2HsQStw==
+   d="scan'208";a="48719464"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 19:39:03 -0700
+X-CSE-ConnectionGUID: yB6P+4VPT6q1SmQ9DdW/PA==
+X-CSE-MsgGUID: JLvymKaORr6aflr+3VRG7Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
-   d="scan'208";a="136362015"
+   d="scan'208";a="141389104"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by orviesa010.jf.intel.com with ESMTP; 08 May 2025 19:29:50 -0700
-Date: Fri, 9 May 2025 10:50:51 +0800
+  by fmviesa005.fm.intel.com with ESMTP; 08 May 2025 19:31:01 -0700
+Date: Fri, 9 May 2025 10:52:03 +0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
 Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
@@ -86,11 +86,11 @@ Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
 	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
 	Huacai Chen <chenhuacai@kernel.org>,
 	Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH v4 05/27] hw/nvram/fw_cfg: Factor
- fw_cfg_init_mem_internal() out
-Message-ID: <aB1ti7GJSJwbhaoz@intel.com>
+Subject: Re: [PATCH v4 06/27] hw/nvram/fw_cfg: Rename fw_cfg_init_mem_wide()
+ -> fw_cfg_init_mem_dma()
+Message-ID: <aB1t0zLvOGz065ho@intel.com>
 References: <20250508133550.81391-1-philmd@linaro.org>
- <20250508133550.81391-6-philmd@linaro.org>
+ <20250508133550.81391-7-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -100,25 +100,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250508133550.81391-6-philmd@linaro.org>
+In-Reply-To: <20250508133550.81391-7-philmd@linaro.org>
 
-On Thu, May 08, 2025 at 03:35:28PM +0200, Philippe Mathieu-Daudé wrote:
-> Date: Thu,  8 May 2025 15:35:28 +0200
+On Thu, May 08, 2025 at 03:35:29PM +0200, Philippe Mathieu-Daudé wrote:
+> Date: Thu,  8 May 2025 15:35:29 +0200
 > From: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Subject: [PATCH v4 05/27] hw/nvram/fw_cfg: Factor
->  fw_cfg_init_mem_internal() out
+> Subject: [PATCH v4 06/27] hw/nvram/fw_cfg: Rename fw_cfg_init_mem_wide() ->
+>  fw_cfg_init_mem_dma()
 > X-Mailer: git-send-email 2.47.1
 > 
-> Factor fw_cfg_init_mem_internal() out of fw_cfg_init_mem_wide().
-> In fw_cfg_init_mem_wide(), assert DMA arguments are provided.
-> Callers without DMA have to use the fw_cfg_init_mem() helper.
+> "wide" in fw_cfg_init_mem_wide() means "DMA support".
+> Rename for clarity.
 > 
+> Suggested-by: Zhao Liu <zhao1.liu@intel.com>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->  hw/nvram/fw_cfg.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
-
-Fine for me,
+>  include/hw/nvram/fw_cfg.h | 6 +++---
+>  hw/arm/virt.c             | 2 +-
+>  hw/nvram/fw_cfg.c         | 6 +++---
+>  hw/riscv/virt.c           | 4 ++--
+>  4 files changed, 9 insertions(+), 9 deletions(-)
 
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
