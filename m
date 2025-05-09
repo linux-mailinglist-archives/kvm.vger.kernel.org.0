@@ -1,303 +1,412 @@
-Return-Path: <kvm+bounces-46067-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46069-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E65B5AB16BD
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 16:05:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6364BAB1735
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 16:20:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E6B61888AD7
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 14:05:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0E8D1C438CD
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 14:21:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE93277003;
-	Fri,  9 May 2025 14:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82126219302;
+	Fri,  9 May 2025 14:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="idK6sa0+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zhVGrA/I"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2067.outbound.protection.outlook.com [40.107.244.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DE22AC17;
-	Fri,  9 May 2025 14:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746799494; cv=fail; b=NW7gSwi8dvzFyQ6ow50bnUMfUaefxpgKRrC0K4oK5fjSenNA6cT2Il2XRTyY34HKiDMEpd37/iy1YhiziBQNIiP86+wfadcGV4Q4v3rObs54yEQt1dwZYi3wZJOnmk+0Tt6flak3YpdHBN7+nxNESrmxW5izOKOgrHQMDEQ0eNk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746799494; c=relaxed/simple;
-	bh=OeT1qiNy9yvfIAM17xHru1D7GkLgUI9AMFNy7QPT6cc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=fM6TQV3jiG+VLBYLtq9XxU74Q5YgbN4jKTifQHVfmHdMO9KrUwUKAgg3f8JinCOoiym6id/mVInHTxeSszJqHDLQg1lzSngQLhFVFqOCQ8jSxzMZivcGtIlvy4G/ALtkOYXcaWAZ8hHN2J8LgACJN3eO7z4SHeBiEBUTKyY/33o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=idK6sa0+; arc=fail smtp.client-ip=40.107.244.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MxOttKxsl2gNbeBoz1w5b+wIP4FP5NlQag0uqtYgUth/O9igx4pHncbZEEB4tghNydP0YoTkMftuL5DIG7+II/EmT51+sXLz+AxGpEehtJ+fDKi894W+orzvdfQP32GXlpKwBvRLFoO0XyDpreXXQMBx5FJxafgFvwmWXckUnUJBgNsLn3DT5im0QV7FWhnkZsVXyj0j070UoGQ4ZiRKIV+PpZ8f81wEvNtZCpHauEbomrx4dV47b0YCPZ5nHodOjtop/dQT1El60zQVuJCewdZcpLC9lDVGrytOjq96brgK2yCq/SxSPsRHdTitqfZvmKapLIG2MqOtP6TE0QWNUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xbHQam/tarcFsMtGJQNBdniepYa91N8cA5EZTufWYg8=;
- b=Y1iR6hmtYmhU+L2U0YUNTUgmRPh2DEFStWdMdjQETg1xMBi72vVyKYXg+6SgSkChumQFTYwzUbT2P6HYPPPsd+yo4e184oiELCtBd5OoJhq4HsRtSC3CUapabUwPem9/zEYQEQed6CxtP49gsl2Y7Ct73QgtFfhUiHsWnjeGRReyI0AotFm6aggayqc5F3R15McMN22AEM+XEFODTfgUD+JwC2tvGqDJ30zxczBAu0mp2HmA19HkqWjoSUrlh+Zsi7STlvnspBOhU3VSkw3b7wHKw0ZestpeDDLzflxe9xfgeS7HQ7152RuMOGTF4rRCjj4cgAWebQxjbqGHLqiiFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xbHQam/tarcFsMtGJQNBdniepYa91N8cA5EZTufWYg8=;
- b=idK6sa0+42ofAG+5obTZB2jy4cYjAWbKDP6VQTvyIB4N1jOzHWmF2buAz1+h8hT9R5pkpEnEGFpGqbsjIRXsK5CTE8fGGHvp+yfNkICivGBUR69OpsMeEo2xjgT1caakbELMZwWL2K7Gv04NaizwEdHe9/INCGOcllS20hEUgPs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by PH0PR12MB5647.namprd12.prod.outlook.com (2603:10b6:510:144::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.26; Fri, 9 May
- 2025 14:04:49 +0000
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e%3]) with mapi id 15.20.8722.024; Fri, 9 May 2025
- 14:04:49 +0000
-Message-ID: <30ec902e-821f-7b26-4316-ca0e51ec4a03@amd.com>
-Date: Fri, 9 May 2025 09:04:42 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] KVM: SEV: Disable SEV-SNP support on initialization
- failure
-Content-Language: en-US
-To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, shuah@kernel.org, prsampat@amd.com
-Cc: pgonda@google.com, nikunj@amd.com, pankaj.gupta@amd.com,
- michael.roth@amd.com, sraithal@amd.com, linux-kernel@vger.kernel.org,
- x86@kernel.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-coco@lists.linux.dev
-References: <20250508225257.9810-1-Ashish.Kalra@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20250508225257.9810-1-Ashish.Kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR13CA0108.namprd13.prod.outlook.com
- (2603:10b6:806:24::23) To DM4PR12MB5070.namprd12.prod.outlook.com
- (2603:10b6:5:389::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D8720DD72
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 14:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746800445; cv=none; b=oH1d7Ve7TOE+6w5frD1qrwDUoaTbomDMLPlenTorGKDGVNTv3dEUmC1ZXYnys7FaVeQ+dVDd6rTIbjZPNtM3iKCrJrIGsdkHEJonTBYHJARjkJ7VRWjphIOXp2Pw0LLnPgrybb4cV3p7borD7o2Crr6sW8uaa4U7Z6UNG8TS/Co=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746800445; c=relaxed/simple;
+	bh=eDc7hpV8mFz9ZVKRbb2cWOFUhIvHrxzxI01GBMazwLE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bcWmAicsaKYERGPyfeO4lH8Fq3wINL8Ld7idLVbxZdCRyA6QEsE9X/DxbmOTeSeY31ehYsM3E9eC48P+8sUcqDbRbyFJDfuD+3yirxqlrA1dhpdYpuBw7YvrXW3YrF+KxWebom006ytMDx6P9vHmXrlvbFrxFopDh7Uc7PvhQn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zhVGrA/I; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22fa47f295dso149755ad.1
+        for <kvm@vger.kernel.org>; Fri, 09 May 2025 07:20:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746800443; x=1747405243; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=moBHzHDyJ+ya/MaaN6Oywnqn4QEL/5Jq1pzflezF+gw=;
+        b=zhVGrA/IEtPmKrmlWPhvDMM8FUBG2JLore1sk7WY/6FFaSyIjhMCXpAUr1uNtU4mdT
+         nx/i85ABaYDCbX80aCuWHHBeI1cs9CBv9LMKnDs1sdmsR+1/z1dkabILjYhvjjYbctkd
+         5I5/YYFjXgMdhlk8WhGQfwEnxsrCem89Pcn6a8g7jzXTCibjp51TfMoKRsx4smMwZVjS
+         h50sgMRS6Ebx3uYlpPfWpseXrDErma5yCDHbv29XBQsoEonvMaXVoea4UBa1QzDtFOcN
+         m0BPrNMEf3GQEhag98MTYPR2PpabbrQp2+9MfcjBP6BlbcT1SoiVcTf5l80GBMwiKFjY
+         ZN7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746800443; x=1747405243;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=moBHzHDyJ+ya/MaaN6Oywnqn4QEL/5Jq1pzflezF+gw=;
+        b=dAJdgYbJBtZPQKFmBvQbNhiV3PZ8dDjqFJ4ZY6fwhwIbzOotIidfFXDmG7wxAlXzvS
+         nO7p7BZ9T7hjKCQUvOc7Vw1UkF3szgs1OybDideBuuU4GWL0Fdfl/ReruKjnL5vFW88x
+         Eu16uEf7EJ9yYRddKoMd62w00c6Egj6SwX4xB2/OhqxapsV4NvXa8se0ecOfuD0J4zdw
+         ichmeHfd8pmNsicqaAmIGRo0Ne04H+wMwALhXXS70QBPUMSz1cN1KS+KGUg/Z/oS/G/+
+         RzhpUdRPmp4MmB7DSERBQi1a3dm93YLQ01Qk+wDqy1DMvcAxRDhGid3x4upDvSLg7i/r
+         p27Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVMVfCQNRBLVb3O+h6P0H2MQVDJWwPQ8XPUOzORRwuiJgieqf199bOluLvqs7KMOf/SipY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxL1JJlPn+VtWhfmbMV68UzVRTb1k3mGsMbxqXbSa7bFBIMedRp
+	glgjqAtr/d0Vw3cLrukdp2llrA/u8rAoYO7DZJb9y2uO0OkZTtqhUbuauV2lr6Ry/7Lv8mr63c8
+	BDnemiSeJINs6YbqorX3HHUXS2rt+Any5v8FZ
+X-Gm-Gg: ASbGncuEz0r1IO05m30x/X+cFvws3J1p9R4wlXo5pBuduJYIKtt/Z/NHXLpC6kesKiC
+	x27/5si2UVmo53x8b0+4RoFd+CyiRxlfb27kY9Lf2/TxCAWcg0JTenbNbXPTeTM6z+bmFGSk/Xh
+	eB8NBalPQm3UIBwcrPaOy5j/IcDfIRx5O81QaQ6/M+4Hri3iYJCWdrKrg++zim8LKFvA==
+X-Google-Smtp-Source: AGHT+IGRSEChiQBLtmQX3oCLi80JzANjJTCCCR1ABm66fOsAg41JG6MCKCK1VHfnHqLqXXy8ThrnyKByKMuZOv62JY8=
+X-Received: by 2002:a17:903:4403:b0:216:21cb:2e14 with SMTP id
+ d9443c01a7336-22fcfa67bbdmr1914215ad.21.1746800442422; Fri, 09 May 2025
+ 07:20:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|PH0PR12MB5647:EE_
-X-MS-Office365-Filtering-Correlation-Id: b2cb9fdb-d80e-43a5-82f0-08dd8f027625
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UzlIYmxKbEw1MFoxMHNMeWl5cmNlWlFVZHRkVThYbitXOURoR201L0VXQk82?=
- =?utf-8?B?R25IdFFpQ25mbGhoL0lNSVowVFFaZFZiektiWG9tTXV2WElnRFU0UGlxMXp6?=
- =?utf-8?B?K2E3L2YwN2xhUHBQTWIrTkh3bk5XbmNFbnpUdGFJRGhkWkV5WEhkbUd0Tlc1?=
- =?utf-8?B?eFBONzcxMVdwSThmNE5jc1d4Zk9va0wzd3VQczJvc0tCVnIvRGR6OFU4QklX?=
- =?utf-8?B?cjRmcHZTWHg1VmJyc0tpM3dKMDhlOGVsTDA2K1NLby9GbHU0S3FvRGNsTmpa?=
- =?utf-8?B?cWFsSXROTllSMVh3NXMwYWJkU2hBRDBRQlkvRGFQNDUrWWI1U1ZwSzdsa0ps?=
- =?utf-8?B?WTdQbkZHOHpvTlh0MFp1UXNyeWtlZFVwRzkrRkZBL0J1R0ErdWJNa3Y4a1ZD?=
- =?utf-8?B?YWtOS2F5cjIrUGM2U0R2d2xFbGxsVmVNZHFHNFFUQk52cGdaUlBCNEVPVDZZ?=
- =?utf-8?B?MnlxdGloSmRUcXN0MnJvdWx0MDBFTTZNUHFxTzk2NG8yN0M5dzVmV3dEQVRZ?=
- =?utf-8?B?bGdMNnNYTk1yWk55M09kSlhPQURucjJaRVBDMGM5RFF2LzRqSmVMOExwci9a?=
- =?utf-8?B?cEM1R3d4WmJkc0JSVGVIMlNXL1d4Z3h2bHh2UkxOMVB0S0pzb3luanhaRU5R?=
- =?utf-8?B?YUJrdXFxL2FaalQvUHJlZWIyUWNGR2lhQm02SVUvclRVa3RXTS85UnNWaTBp?=
- =?utf-8?B?UmV3WWZjYmhYT0p0SzBpZjZiUGY1azdBWGRmam8zc3dYQWZzeGd1S1ZpalF6?=
- =?utf-8?B?bVlRZEZmeFhsbGcyTU9lQU9qUUJGcVNwdFFGZW5UZENLVFZ6UGZWVWZta2Fo?=
- =?utf-8?B?Skw4Z3hHcldBU2dHVzVVYUNZRlNiN055K3NKMW9ESTJsVEI3NExQbTFjZzRm?=
- =?utf-8?B?NWlUTzU1eTd4VGxOL1JDUU15ZUJhNWordmxOWkxta0ZqNDYwNTZoeDBjWmYy?=
- =?utf-8?B?MXF0K0wrOWFCUUFJbXlzaEcvRUxGczh1WnVsTXY1emNvcHNUNjJTcWtZZlNz?=
- =?utf-8?B?VWx1RXVnYWF3ZHdDZUt6dkhSaUw0c2Z1OGRaVG1ndHI1TTQxd2hVZ0N3d3ly?=
- =?utf-8?B?THVuSTNHMEZISWpES2t2QVFHQUR4eS9uQVVKNE44TnQwV1VPZlo5T0tndGFZ?=
- =?utf-8?B?cGYrdDk5SHY4eHpMQWs1THFWeFVwOURnTGl3QVJTejQ1UE1LY3J2UFBoL3lT?=
- =?utf-8?B?YnVsdU5MMmI3RHdYUFA1T3NKNDVyNHZqN2ZQVkhwWDgycStGTnNlZmtpNTh0?=
- =?utf-8?B?MCtNelphRUpxTG51aGFZWjlNY2pvSm52MDdkc2lYRzBHT2s2Q2w4SDFGODkz?=
- =?utf-8?B?Q2lEcXRRMmE5bXJ6UnBWeUp2NDU2SnJvTDhpMlpsV2NzVFdJdTdVdFZ4R3E1?=
- =?utf-8?B?R0tZUzdpWjU1R2sySmRKRUs1dWw1UWZmSS9hUTZ6bnRXdWVsSVBCRWJIR0FT?=
- =?utf-8?B?QzV4UXRYUkI2ZTFmbytnOER1VFRkZkJUSEJTbTVDVFU1VkhyQm9jVXc4REdY?=
- =?utf-8?B?cGZIUXV4a29VWThHb0tKc201SjBsSHlTOFYzYXBLSmVKY3gveE5xN21LNmJ2?=
- =?utf-8?B?YXdQTHJvRUNNYTd4cXpQRXZpNWRKM0wzUDZiV2Q5QVBDWVF6a0FvUHpHcGVm?=
- =?utf-8?B?NU05U2plSklWWHZHVFBXazZwL3REdE5aVGgrblNxNW5MUWd5OGFOK1JUb1hO?=
- =?utf-8?B?THFWeitzYlJ5QnpEOHVlbkVlSGNqTmREakxtQ1dhdDdtajJJS2ZseTJTL2pr?=
- =?utf-8?B?UVM3UDRmdm5Rcmg1YkJ5QXFrc1R4bGJoKzNYYmt3azFzaWM5c3ZPK09qYjlq?=
- =?utf-8?B?MUtaV3lGVXRrY0NyMmNVRThOamRBeDhYekFTUWhZa2ErNWphUU1OWU14aGJ4?=
- =?utf-8?B?RFE5aUV2dzNJbFF2UG1KNG1EZGl4aFJDQ25qUU45cGtxcDhOemxVb0FjUnFY?=
- =?utf-8?Q?DFl3CZuCo2w=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OWJIOUJaSjN6b0RWUHExQkZ5WVJVQ1I3RzlvTTVocDVMemIvZEI0NnpEWVFK?=
- =?utf-8?B?OGxBdDVvempBSjNPWW9oakRWdGo3azlmZFZsQjZtR1NxaDUwTi96WndhZkE0?=
- =?utf-8?B?YlZoWDlGeEdaYkljVFVrZERZN0ZDUno5WHY1S0xrT3B4TVdFSTJKVkkvWWxo?=
- =?utf-8?B?Y2YyREhhMFVmdjhKVXdNaWEwU2tpcC9DY2g0VEZidzlEeExDaE9TNVpZYVYz?=
- =?utf-8?B?VDlYcW4xVnhhQXVSYnN3RjAxQ3pWazFrSkp5UlZkYW5uRkVQWXQxa0s5c1pY?=
- =?utf-8?B?RklqZkdHQXRtU1pHVU1xaVhEdkd4WE1pWkFEaXRoQTJZbjJ5c3ZxR05HSENW?=
- =?utf-8?B?SmpxODlOTEhzVmsrSi9WR3ZRRFJFdWRHdTc0U1JKeUY3cG41QU1mdi92OGxE?=
- =?utf-8?B?VnJMT2pGZ1JpNjNucG9EZ3kwTTFNbysvWFZETEJsUVFxQys5cUlBVEE3VkhG?=
- =?utf-8?B?NkdzUytiOExyaDVYRXNNeTlidVpnc3RxOWdKaGRWaEtEaGVnMU9Ud2g4ajI1?=
- =?utf-8?B?VUZmSVNsd1R4N1orUXZFWkVXRTdxcGFnVXRSaHh5ejMzV1dXQXRnRXREOXlF?=
- =?utf-8?B?RmFZT0taZ1poQVB0WTJnZWlhTFV0bTNKYzhVdVpPdEhJenNER3FFalIzcVpL?=
- =?utf-8?B?alFXVTdOeTRVNU8wSzh5LzliSmNWN0o5TVYwS05KM0c2QVlSYlNWWCtGR1Ew?=
- =?utf-8?B?NDVwN2xqVjB5VFZEUm9HUHR6T2FzRXVzS1NUbjgvZFNYdW1FSWoxdnlyUmFL?=
- =?utf-8?B?RGRJdi9lQTl6eEV6MFdOemFDZXpWeEIxZU1SOWtlRFFuZXB0dy9RZ0tqS1lm?=
- =?utf-8?B?VVN5eDMzKzd3S005SGVCa0RvWXgzWUhBL2xpb2lCMjB4ek5QWjJxakhQNUlo?=
- =?utf-8?B?RkVxQzFieFA1bVpmclFoTHozWUxMSUE5eWNmTHpuOGdhZWk1Z1ozU0hKZlZC?=
- =?utf-8?B?MkI4Sjh0Y1o4TlgzZ1NOSTBSMC9NUWhxbkliVXpUMkdRbGhzSDVNSkVSME1F?=
- =?utf-8?B?cHE1TFErbmhsSHBZZGFqallwb09melNtQytGTmVjNXZORWZrRzRDV2IvMVBz?=
- =?utf-8?B?em9tQTIrd0Z4Rk1kdGE3VHoza203S3lCQkJXY3R3YTExTVRDbVI0ejZwOWt2?=
- =?utf-8?B?TDVuajRGc3BMWEd2bWc2djgrWjZQc3MxK3ZuZVp2MDJBQUhuWXA5ODZVdyt6?=
- =?utf-8?B?ZFFkcWRLZHFLSnU1TURKaXNHSndOYVp1V0VLZWxMeVM5RXBjZG1aTFNGT0ps?=
- =?utf-8?B?RE84S1VHaTBCdEZiWnZlZGNlaGFZNnlWUFdoNGQ1dVJXNFJHRm9JekFUcnRT?=
- =?utf-8?B?dlFxS1BOaURvcnZ1SDJ3S0duN3d0bDNvOWMvU2VIeE5QN2ZNL0ZLU0JMQlkr?=
- =?utf-8?B?ZTA5MHM1VHpEVmJQV3R6a0k2YzNtUHQ4S1l5cG5pb0JTNXBtWUNEWmR5WTI1?=
- =?utf-8?B?aEp3SHB0UC9SRDdrbDFia1ViMEN0MStidG9qZHdqczBHektQc2g4cVRYWWsx?=
- =?utf-8?B?YWk1NGo5QUtXaVhxMGpacjFjWnd6M3QwT09xY1F2bXQza013SVdvNEFlWG1P?=
- =?utf-8?B?ZkVEL2JXdVpnM3dLSE5ueWp1YXBaSEFSaFVxL2d1YzJ2OHZEMDEvaG5GN0V1?=
- =?utf-8?B?ci9UWU0yRTdPdkUvTkFNRTdSR2dMRjh1ejNzTHdwZWdHTUpobVZDUEY2NVQr?=
- =?utf-8?B?U3lXb2o2WkRFZHZIcXg1bkRmVUo2WXJQZnBtR01PYm04eWFhVlBhb2VJd0FF?=
- =?utf-8?B?TlRHK1lUc2RXR2g2L3lFYUNBY1pFQVA2Tkdzei9ZU0FLeS9SempuYlRDUlhN?=
- =?utf-8?B?Mm1maityUEZKMmJjU3F6QUFmVDF2L0ZFUTZwcnZZMlYzY0tCcWVJdnRYaU5z?=
- =?utf-8?B?SlBxWWpobWFwN3FkM2kvU0FzNklOa0tRK0RySG43MEQxWlZVcWZFQVJOSkx0?=
- =?utf-8?B?YVBCZ3E5eTFSUjhId2VMNHhYaVRVQ2dBTUFJbitLTnpNbkpOcmpuOXBvWi8v?=
- =?utf-8?B?ZmlrbTFxc1lzc0poT05hZm9IUmp0cjk5MFZDN2wvNTFYaTBZWWhKUXUxMnJo?=
- =?utf-8?B?bDk3RVlzTEl4SXVqdnZlVnVFcWhvTnNORzJiV2hEYTFvTCtSOEJGemE3VXRh?=
- =?utf-8?Q?z0LH8cSy2SLbJhCMJk//a38Uj?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2cb9fdb-d80e-43a5-82f0-08dd8f027625
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2025 14:04:49.4817
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NwZbbOpdkIkw/7zB5oDYecuxNbnAki70UUL47NFsf84XTtjwgqPpduZYpjhimzDUTBJP1PQFIOuH1QkzPDXD9g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5647
+References: <aBAiCBmON0g0Qro1@yzhao56-desk.sh.intel.com> <CAGtprH_ggm8N-R9QbV1f8mo8-cQkqyEta3W=h2jry-NRD7_6OA@mail.gmail.com>
+ <aBldhnTK93+eKcMq@yzhao56-desk.sh.intel.com> <CAGtprH9wi6zHJ5JeuAnjZThMAzxxibJGo=XN1G1Nx8txZRg8_w@mail.gmail.com>
+ <aBmmirBzOZfmMOJj@yzhao56-desk.sh.intel.com> <CAGtprH9fDMiuk3JGSS12M-wFoqRj+sjdtEHJFS_5QfKX7aGkRQ@mail.gmail.com>
+ <aBsNsZsWuVl4uo0j@yzhao56-desk.sh.intel.com> <CAGtprH-+Bo4hFxL+THiMgF5V4imdVVb0OmRhx2Uc0eom9=3JPA@mail.gmail.com>
+ <aBwJHE/zRDvV41fH@yzhao56-desk.sh.intel.com> <CAGtprH9hwj7BvSm4DgRkHmdPnmi-1-FMH5Z7xK1VBh=s4W8VYA@mail.gmail.com>
+ <aB10gNcmsw0TSrqh@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aB10gNcmsw0TSrqh@yzhao56-desk.sh.intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Fri, 9 May 2025 07:20:30 -0700
+X-Gm-Features: ATxdqUEFpmOgH9gL4BF0ErzQfY3agqA_hxkjzfvkMyRXh9Eg-VzGAj1LA5FoSo0
+Message-ID: <CAGtprH8=-70DU2e52OJe=w0HfuW5Zg6wGHV32FWD_hQzYBa=fA@mail.gmail.com>
+Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
+	dave.hansen@intel.com, kirill.shutemov@intel.com, tabba@google.com, 
+	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
+	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
+	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
+	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
+	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/8/25 17:52, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> During platform init, SNP initialization may fail for several reasons,
-> such as firmware command failures and incompatible versions. However,
-> the KVM capability may continue to advertise support for it.
-> 
-> The platform may have SNP enabled but if SNP_INIT fails then SNP is
-> not supported by KVM.
-> 
-> During KVM module initialization query the SNP platform status to obtain
-> the SNP initialization state and use it as an additional condition to
-> determine support for SEV-SNP.
-> 
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Co-developed-by: Pratik R. Sampat <prsampat@amd.com>
-> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 43 +++++++++++++++++++++++++++++++++---------
->  1 file changed, 34 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index ada53f04158c..a6abdb26f877 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2934,6 +2934,32 @@ void __init sev_set_cpu_caps(void)
->  	}
->  }
->  
-> +static bool sev_is_snp_initialized(void)
-> +{
-> +	struct sev_user_data_snp_status *status;
-> +	struct sev_data_snp_addr buf;
-> +	bool initialized = false;
-> +	void *data;
+On Thu, May 8, 2025 at 8:22=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wrot=
+e:
+>
+> On Thu, May 08, 2025 at 07:10:19AM -0700, Vishal Annapurve wrote:
+> > On Wed, May 7, 2025 at 6:32=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> =
+wrote:
+> > >
+> > > On Wed, May 07, 2025 at 07:56:08AM -0700, Vishal Annapurve wrote:
+> > > > On Wed, May 7, 2025 at 12:39=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.=
+com> wrote:
+> > > > >
+> > > > > On Tue, May 06, 2025 at 06:18:55AM -0700, Vishal Annapurve wrote:
+> > > > > > On Mon, May 5, 2025 at 11:07=E2=80=AFPM Yan Zhao <yan.y.zhao@in=
+tel.com> wrote:
+> > > > > > >
+> > > > > > > On Mon, May 05, 2025 at 10:08:24PM -0700, Vishal Annapurve wr=
+ote:
+> > > > > > > > On Mon, May 5, 2025 at 5:56=E2=80=AFPM Yan Zhao <yan.y.zhao=
+@intel.com> wrote:
+> > > > > > > > >
+> > > > > > > > > Sorry for the late reply, I was on leave last week.
+> > > > > > > > >
+> > > > > > > > > On Tue, Apr 29, 2025 at 06:46:59AM -0700, Vishal Annapurv=
+e wrote:
+> > > > > > > > > > On Mon, Apr 28, 2025 at 5:52=E2=80=AFPM Yan Zhao <yan.y=
+.zhao@intel.com> wrote:
+> > > > > > > > > > > So, we plan to remove folio_ref_add()/folio_put_refs(=
+) in future, only invoking
+> > > > > > > > > > > folio_ref_add() in the event of a removal failure.
+> > > > > > > > > >
+> > > > > > > > > > In my opinion, the above scheme can be deployed with th=
+is series
+> > > > > > > > > > itself. guest_memfd will not take away memory from TDX =
+VMs without an
+> > > > > > > > > I initially intended to add a separate patch at the end o=
+f this series to
+> > > > > > > > > implement invoking folio_ref_add() only upon a removal fa=
+ilure. However, I
+> > > > > > > > > decided against it since it's not a must before guest_mem=
+fd supports in-place
+> > > > > > > > > conversion.
+> > > > > > > > >
+> > > > > > > > > We can include it in the next version If you think it's b=
+etter.
+> > > > > > > >
+> > > > > > > > Ackerley is planning to send out a series for 1G Hugetlb su=
+pport with
+> > > > > > > > guest memfd soon, hopefully this week. Plus I don't see any=
+ reason to
+> > > > > > > > hold extra refcounts in TDX stack so it would be good to cl=
+ean up this
+> > > > > > > > logic.
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > > > invalidation. folio_ref_add() will not work for memory =
+not backed by
+> > > > > > > > > > page structs, but that problem can be solved in future =
+possibly by
+> > > > > > > > > With current TDX code, all memory must be backed by a pag=
+e struct.
+> > > > > > > > > Both tdh_mem_page_add() and tdh_mem_page_aug() require a =
+"struct page *" rather
+> > > > > > > > > than a pfn.
+> > > > > > > > >
+> > > > > > > > > > notifying guest_memfd of certain ranges being in use ev=
+en after
+> > > > > > > > > > invalidation completes.
+> > > > > > > > > A curious question:
+> > > > > > > > > To support memory not backed by page structs in future, i=
+s there any counterpart
+> > > > > > > > > to the page struct to hold ref count and map count?
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > I imagine the needed support will match similar semantics a=
+s VM_PFNMAP
+> > > > > > > > [1] memory. No need to maintain refcounts/map counts for su=
+ch physical
+> > > > > > > > memory ranges as all users will be notified when mappings a=
+re
+> > > > > > > > changed/removed.
+> > > > > > > So, it's possible to map such memory in both shared and priva=
+te EPT
+> > > > > > > simultaneously?
+> > > > > >
+> > > > > > No, guest_memfd will still ensure that userspace can only fault=
+ in
+> > > > > > shared memory regions in order to support CoCo VM usecases.
+> > > > > Before guest_memfd converts a PFN from shared to private, how doe=
+s it ensure
+> > > > > there are no shared mappings? e.g., in [1], it uses the folio ref=
+erence count
+> > > > > to ensure that.
+> > > > >
+> > > > > Or do you believe that by eliminating the struct page, there woul=
+d be no
+> > > > > GUP, thereby ensuring no shared mappings by requiring all mappers=
+ to unmap in
+> > > > > response to a guest_memfd invalidation notification?
+> > > >
+> > > > Yes.
+> > > >
+> > > > >
+> > > > > As in Documentation/core-api/pin_user_pages.rst, long-term pinnin=
+g users have
+> > > > > no need to register mmu notifier. So why users like VFIO must reg=
+ister
+> > > > > guest_memfd invalidation notification?
+> > > >
+> > > > VM_PFNMAP'd memory can't be long term pinned, so users of such memo=
+ry
+> > > > ranges will have to adopt mechanisms to get notified. I think it wo=
+uld
+> > > Hmm, in current VFIO, it does not register any notifier for VM_PFNMAP=
+'d memory.
+> >
+> > I don't completely understand how VM_PFNMAP'd memory is used today for
+> > VFIO. Maybe only MMIO regions are backed by pfnmap today and the story
+> > for normal memory backed by pfnmap is yet to materialize.
+> VFIO can fault in VM_PFNMAP'd memory which is not from MMIO regions. It w=
+orks
+> because it knows VM_PFNMAP'd memory are always pinned.
+>
+> Another example is udmabuf (drivers/dma-buf/udmabuf.c), it mmaps normal f=
+olios
+> with VM_PFNMAP flag without registering mmu notifier because those folios=
+ are
+> pinned.
+>
 
-No need for 'data', just allocate directly to 'status', no?
+I might be wrongly throwing out some terminologies here then.
+VM_PFNMAP flag can be set for memory backed by folios/page structs.
+udmabuf seems to be working with pinned "folios" in the backend.
 
-> +	int error;
-> +
+The goal is to get to a stage where guest_memfd is backed by pfn
+ranges unmanaged by kernel that guest_memfd owns and distributes to
+userspace, KVM, IOMMU subject to shareability attributes. if the
+shareability changes, the users will get notified and will have to
+invalidate their mappings. guest_memfd will allow mmaping such ranges
+with VM_PFNMAP flag set by default in the VMAs to indicate the need of
+special handling/lack of page structs.
 
-	if (!sev_snp_supported)
-		return false;
+As an intermediate stage, it makes sense to me to just not have
+private memory backed by page structs and use a special "filemap" to
+map file offsets to these private memory ranges. This step will also
+need similar contract with users -
+   1) memory is pinned by guest_memfd
+   2) users will get invalidation notifiers on shareability changes
 
-No need to issue the command if it doesn't matter.
+I am sure there is a lot of work here and many quirks to be addressed,
+let's discuss this more with better context around. A few related RFC
+series are planned to be posted in the near future.
 
-> +	data = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> > >
+> > > > be easy to pursue new users of guest_memfd to follow this scheme.
+> > > > Irrespective of whether VM_PFNMAP'd support lands, guest_memfd
+> > > > hugepage support already needs the stance of: "Guest memfd owns all
+> > > > long-term refcounts on private memory" as discussed at LPC [1].
+> > > >
+> > > > [1] https://lpc.events/event/18/contributions/1764/attachments/1409=
+/3182/LPC%202024_%201G%20page%20support%20for%20guest_memfd.pdf
+> > > > (slide 12)
+> > > >
+> > > > >
+> > > > > Besides, how would guest_memfd handle potential unmap failures? e=
+.g. what
+> > > > > happens to prevent converting a private PFN to shared if there ar=
+e errors when
+> > > > > TDX unmaps a private PFN or if a device refuses to stop DMAing to=
+ a PFN.
+> > > >
+> > > > Users will have to signal such failures via the invalidation callba=
+ck
+> > > > results or other appropriate mechanisms. guest_memfd can relay the
+> > > > failures up the call chain to the userspace.
+> > > AFAIK, operations that perform actual unmapping do not allow failure,=
+ e.g.
+> > > kvm_mmu_unmap_gfn_range(), iopt_area_unfill_domains(),
+> > > vfio_iommu_unmap_unpin_all(), vfio_iommu_unmap_unpin_reaccount().
+> >
+> > Very likely because these operations simply don't fail.
+>
+> I think they are intentionally designed to be no-fail.
+>
+> e.g. in __iopt_area_unfill_domain(), no-fail is achieved by using a small=
+ backup
+> buffer allocated on stack in case of kmalloc() failure.
+>
+>
+> > >
+> > > That's why we rely on increasing folio ref count to reflect failure, =
+which are
+> > > due to unexpected SEAMCALL errors.
+> >
+> > TDX stack is adding a scenario where invalidation can fail, a cleaner
+> > solution would be to propagate the result as an invalidation failure.
+> Not sure if linux kernel accepts unmap failure.
+>
+> > Another option is to notify guest_memfd out of band to convey the
+> > ranges that failed invalidation.
+> Yes, this might be better. Something similar like holding folio ref count=
+ to
+> let guest_memfd know that a certain PFN cannot be re-assigned.
+>
+> > With in-place conversion supported, even if the refcount is raised for
+> > such pages, they can still get used by the host if the guest_memfd is
+> > unaware that the invalidation failed.
+> I thought guest_memfd should check if folio ref count is 0 (or a base cou=
+nt)
+> before conversion, splitting or re-assignment. Otherwise, why do you care=
+ if
+> TDX holds the ref count? :)
+>
 
-GFP_KERNEL instead of GFP_KERNEL_ACCOUNT ?
+Soon to be posted RFC series by Ackerley currently explicitly checks
+for safe private page refcounts when folio splitting is needed and not
+for every private to shared conversion. A simple solution would be for
+guest_memfd to check safe page refcounts for each private to shared
+conversion even if split is not required but will need to be reworked
+when either of the stages discussed above land where page structs are
+not around.
 
-> +	if (!data)
-> +		return initialized;
-
-		return false;
-
-I like explicit values in these conditions, but that's just me.
-
-> +
-> +	buf.address = __psp_pa(data);
-> +	if (sev_do_cmd(SEV_CMD_SNP_PLATFORM_STATUS, &buf, &error))
-
-You should issue an error message here or not pass in error (I would
-prefer the former).
-
-> +		goto out;
-> +
-> +	status = (struct sev_user_data_snp_status *)data;
-> +	if (status->state)
-> +		initialized = true;
-
-	initialized = !!status->state; ?
-
-> +
-> +out:
-> +	snp_free_firmware_page(data);
-> +
-> +	return initialized;
-> +}
-> +
->  void __init sev_hardware_setup(void)
->  {
->  	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
-> @@ -3038,6 +3064,14 @@ void __init sev_hardware_setup(void)
->  	sev_snp_supported = sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV_SNP);
->  
->  out:
-> +	if (sev_enabled) {
-> +		init_args.probe = true;
-> +		if (sev_platform_init(&init_args))
-> +			sev_supported = sev_es_supported = sev_snp_supported = false;
-> +		else
-> +			sev_snp_supported &= sev_is_snp_initialized();
-
-With changes above, then you can just do:
-
-	sev_snp_supported = sev_is_snp_initialized()
-
-Thanks,
-Tom
-
-> +	}
-> +
->  	if (boot_cpu_has(X86_FEATURE_SEV))
->  		pr_info("SEV %s (ASIDs %u - %u)\n",
->  			sev_supported ? min_sev_asid <= max_sev_asid ? "enabled" :
-> @@ -3064,15 +3098,6 @@ void __init sev_hardware_setup(void)
->  	sev_supported_vmsa_features = 0;
->  	if (sev_es_debug_swap_enabled)
->  		sev_supported_vmsa_features |= SVM_SEV_FEAT_DEBUG_SWAP;
-> -
-> -	if (!sev_enabled)
-> -		return;
-> -
-> -	/*
-> -	 * Do both SNP and SEV initialization at KVM module load.
-> -	 */
-> -	init_args.probe = true;
-> -	sev_platform_init(&init_args);
->  }
->  
->  void sev_hardware_unsetup(void)
+>
+> > >
+> > > > > Currently, guest_memfd can rely on page ref count to avoid re-ass=
+igning a PFN
+> > > > > that fails to be unmapped.
+> > > > >
+> > > > >
+> > > > > [1] https://lore.kernel.org/all/20250328153133.3504118-5-tabba@go=
+ogle.com/
+> > > > >
+> > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > > Any guest_memfd range updates will result in invalidations/=
+updates of
+> > > > > > > > userspace, guest, IOMMU or any other page tables referring =
+to
+> > > > > > > > guest_memfd backed pfns. This story will become clearer onc=
+e the
+> > > > > > > > support for PFN range allocator for backing guest_memfd sta=
+rts getting
+> > > > > > > > discussed.
+> > > > > > > Ok. It is indeed unclear right now to support such kind of me=
+mory.
+> > > > > > >
+> > > > > > > Up to now, we don't anticipate TDX will allow any mapping of =
+VM_PFNMAP memory
+> > > > > > > into private EPT until TDX connect.
+> > > > > >
+> > > > > > There is a plan to use VM_PFNMAP memory for all of guest_memfd
+> > > > > > shared/private ranges orthogonal to TDX connect usecase. With T=
+DX
+> > > > > > connect/Sev TIO, major difference would be that guest_memfd pri=
+vate
+> > > > > > ranges will be mapped into IOMMU page tables.
+> > > > > >
+> > > > > > Irrespective of whether/when VM_PFNMAP memory support lands, th=
+ere
+> > > > > > have been discussions on not using page structs for private mem=
+ory
+> > > > > > ranges altogether [1] even with hugetlb allocator, which will s=
+implify
+> > > > > > seamless merge/split story for private hugepages to support mem=
+ory
+> > > > > > conversion. So I think the general direction we should head tow=
+ards is
+> > > > > > not relying on refcounts for guest_memfd private ranges and/or =
+page
+> > > > > > structs altogether.
+> > > > > It's fine to use PFN, but I wonder if there're counterparts of st=
+ruct page to
+> > > > > keep all necessary info.
+> > > > >
+> > > >
+> > > > Story will become clearer once VM_PFNMAP'd memory support starts
+> > > > getting discussed. In case of guest_memfd, there is flexibility to
+> > > > store metadata for physical ranges within guest_memfd just like
+> > > > shareability tracking.
+> > > Ok.
+> > >
+> > > > >
+> > > > > > I think the series [2] to work better with PFNMAP'd physical me=
+mory in
+> > > > > > KVM is in the very right direction of not assuming page struct =
+backed
+> > > > > > memory ranges for guest_memfd as well.
+> > > > > Note: Currently, VM_PFNMAP is usually used together with flag VM_=
+IO. in KVM
+> > > > > hva_to_pfn_remapped() only applies to "vma->vm_flags & (VM_IO | V=
+M_PFNMAP)".
+> > > > >
+> > > > >
+> > > > > > [1] https://lore.kernel.org/all/CAGtprH8akKUF=3D8+RkX_QMjp35C0b=
+U1zxGi4v1Zm5AWCw=3D8V8AQ@mail.gmail.com/
+> > > > > > [2] https://lore.kernel.org/linux-arm-kernel/20241010182427.143=
+4605-1-seanjc@google.com/
+> > > > > >
+> > > > > > > And even in that scenario, the memory is only for private MMI=
+O, so the backend
+> > > > > > > driver is VFIO pci driver rather than guest_memfd.
+> > > > > >
+> > > > > > Not necessary. As I mentioned above guest_memfd ranges will be =
+backed
+> > > > > > by VM_PFNMAP memory.
+> > > > > >
+> > > > > > >
+> > > > > > >
+> > > > > > > > [1] https://elixir.bootlin.com/linux/v6.14.5/source/mm/memo=
+ry.c#L6543
+> > > >
 
