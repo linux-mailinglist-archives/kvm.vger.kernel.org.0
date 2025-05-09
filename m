@@ -1,85 +1,85 @@
-Return-Path: <kvm+bounces-46071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94482AB1862
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 17:24:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 836F5AB189F
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 17:34:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91C289E1717
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 15:23:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44021A0090D
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 15:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8429D22DF8B;
-	Fri,  9 May 2025 15:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E4C22DFA2;
+	Fri,  9 May 2025 15:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZD79d1N"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cl22f+jI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E91622DA10
-	for <kvm@vger.kernel.org>; Fri,  9 May 2025 15:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C0A22CBE9
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 15:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746804228; cv=none; b=nF32G9ZzUA3gKYk7acvhgCq4+3lSm2iG0lpRXtjUEcqcEko072+DCauYwkF4aq6djpHti3XDzRmO7hTnFoEEaPwJ3GIIUN+8ohU4R0MQez4IMSJQHPxrWrUMuyPS/2brC269ObwknpYDvY6EW+VNocWutThzBXEe432TBT4JnnM=
+	t=1746804824; cv=none; b=HSv24rn1r1EHtdZuTcn0HRONp5ignw2vuZAjKFIOeyiPo3z3hubzJNaXuF/tn7q/b+/u7GhTH2l/S7A9nyTWLXRJXHMn2BPj+9XDG+IeYHF8a3mmt2oeu200SK46FWfsvaK//TPn17B3tA0UBbLfiI6HagtR9dH/fZit3neNUKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746804228; c=relaxed/simple;
-	bh=bSHvkoUMAGUvpPbwAld32PC6XRt5ph5cd71mNkkkyDI=;
+	s=arc-20240116; t=1746804824; c=relaxed/simple;
+	bh=HldbnI7znCYnOnbLT4smVScvkvvXgrFbnasmUcwcVF8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=afa+F6G+p5e2+ojOYn0F1pjZcKQAMOI+KqF3gYCfhQSC1dgrHClFuC2dsjKiJtkLDK537rXuHvR1KAOk/zsZy1MXFxkPPrag6JN6SVtyLAueLaY185vPaBuGeTNKJ1m8gwtVoPBR6+158bqkUL/7ZQT5mzOkm9/dGXn+UspWd4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OZD79d1N; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=HFRNXdN02vi+DibBm7JMPBcyTscMD9Tkz8wXt/fZAllXE25hINYkCIT5xofTwVCju+Oy/P0+57pUljy5Vc1MZlbTmQVvu4asMRhOJsIE0Kt0JV8Tc3b9VvR6shI3C3r5aJ5KhBnt7fjUfI4F3FKE0sLL4Qs40AiBoWH3kNZrdqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cl22f+jI; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746804226;
+	s=mimecast20190719; t=1746804821;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UbfgctwTat72Vztwb/ysK4sx3FtDutARgQGzZ60JQJo=;
-	b=OZD79d1NnNxV0aF1BO+gKsqaG4t1epDQqUy8g88QqYBIQ/6uf1bbAgATf0nQysiCeAJ/ig
-	zllsyJZxS158+wwfE9k8fZpPB2j2uIKcTreoVR9/ma1+HswcizgyvdkzRV7S6hjAMOKl/Z
-	vzDvW/G1T7rZTvASeszYdk3oJ4/GNwk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=cxYNx3ojouceqPK+Dr7auESWb9mDE/VjwCaYTP8lEmw=;
+	b=cl22f+jIhOLr4F4dEys0mGoMisZnsQWl+tKxpxXBHLd8MNk9vd2DLO2A/DmKSuqbxDWXY0
+	VnMOtMpJSxLYL9p5GE+bWnoEYQsI0sEFYqY/m2LYaAwbOgJ2a7dC8b/4euumXRB/POK0pP
+	NaVW6PGrteOK2/HPg0TJhRVArtd7MTs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-681-2fg458lJOemPzb3nlYOlDw-1; Fri, 09 May 2025 11:23:43 -0400
-X-MC-Unique: 2fg458lJOemPzb3nlYOlDw-1
-X-Mimecast-MFC-AGG-ID: 2fg458lJOemPzb3nlYOlDw_1746804222
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43d209dc2d3so10560585e9.3
-        for <kvm@vger.kernel.org>; Fri, 09 May 2025 08:23:42 -0700 (PDT)
+ us-mta-516-QDPAWoz6OzCxH0sWfOEjjQ-1; Fri, 09 May 2025 11:33:40 -0400
+X-MC-Unique: QDPAWoz6OzCxH0sWfOEjjQ-1
+X-Mimecast-MFC-AGG-ID: QDPAWoz6OzCxH0sWfOEjjQ_1746804819
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a0b63ca572so1384546f8f.0
+        for <kvm@vger.kernel.org>; Fri, 09 May 2025 08:33:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746804221; x=1747409021;
+        d=1e100.net; s=20230601; t=1746804819; x=1747409619;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UbfgctwTat72Vztwb/ysK4sx3FtDutARgQGzZ60JQJo=;
-        b=p59w1VEd82mJiPGN5sD/kLY4mqZ657X88Iwp4YoaZ2TQrByaOHahGrC1mmljSB/ggJ
-         WMtcotui6GxH27PIf/ZcdEq53RuCzbBYC0CVIW5Io1mo7WVAUEkJw1pg02tCd0Y1341k
-         w5gOLikf7NdHhXyJm5ckAFdXATJEXiPYD3mj5UK+aN2q8kp5VGSGoruCX5BhZUyimB56
-         cz8txlvS9pqdb9vC1sOxNYSICQcoqZv4R/7t28GnuwqAaI1Ov+77lDnEt6slvVvhlJkR
-         5HmZmYllYDTQ+soV1FTdHGyTAAqfI0F6Cmbrrbu/tbHP0O3I02bTtCzW9ZFX/whc7uyB
-         Rzew==
-X-Forwarded-Encrypted: i=1; AJvYcCUy3tzF4Ntx1o/3RrZMGVkjYIDPaRj3XtzS/72tYiAQ8wxIOKpkRzdruB8YX3mxES0yG58=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSsDWZjImmL469DEq9kBn+K9Lbq31OsG6Wk5+P8dWztFoFBMad
-	LWI4vIEdKLyOU9SiUb9GxlDzRvvRfi7cR90zUvmFVt42lO4xU3X8L3F8Ti3NfBihiKFwWU1Qq1q
-	t9DHj/xsL/SrdZzsalX+aAhuiPlfJcmrFgU1+ubC8tMjBMMocnTgzO/SR65z8
-X-Gm-Gg: ASbGnctflYC3z3+o69ohU7jukimLELa/Z40SL1pYA34M8x63PNpFBp9gSRjeiJmZi+Q
-	mF11lgDvoXY6woDSsdOVmu41ixzGDvO9u4G/xiYRsG3lIGiI8F2MyrmbTonYYIxGSC3tlBrgdl+
-	JXjun47SEVzaPGvzYssR3NCusk/3sM2vC2wTErKuHl9HuzrBNYQidEU6Gr2BK0lC6e8VlWpnrHB
-	CVafkr+JfrMshS3dkEQov1AF4BgUUgKhT6pyW5DFo+G13jfZMqTbrenbow04kL6wlAKMmWqUOzF
-	PE/27uGBrLwLmDO3UwpkplTfpEfjIdOX
-X-Received: by 2002:a05:600c:4e46:b0:442:c993:6f94 with SMTP id 5b1f17b1804b1-442d6d3dafbmr37079555e9.12.1746804221460;
-        Fri, 09 May 2025 08:23:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFP9pYN9puPiqkAj4uLWOelxROpw1y+p6NieMuknXnqrPphphHn4Ue+I3VMsXEnn2/RaKCr7w==
-X-Received: by 2002:a05:600c:4e46:b0:442:c993:6f94 with SMTP id 5b1f17b1804b1-442d6d3dafbmr37079275e9.12.1746804221031;
-        Fri, 09 May 2025 08:23:41 -0700 (PDT)
+        bh=cxYNx3ojouceqPK+Dr7auESWb9mDE/VjwCaYTP8lEmw=;
+        b=G5wKbi3WmWJH/2xelq9QOaMdHvSiDkU2g8HsFIkaJZrIoQr2zevp1/5PnnrWcGvUj/
+         61Cnrdzud1TJdKNwz9vwCfKvEIlkgW5nt36HaqUSi4GJT1UG/eYrzCUwwEHqN3LKWnkT
+         nszcBnLv4UwM6IEBmjbYjgusSqBpxM2LU8CXslLL3qG1Sax0cM3Jdyq318Krmiux0gnj
+         eKc8aNG5BkeG2Aw7L4Y/hPBva/hz0mxZS+E82JmlhsMzrc23jiii6nyy3GWR8XxxrlLC
+         +t+hGfgm8ijtCxbkH5lNe0ShaCrVn/uU9S41vtC9KlwHaxPOdO465gj8AVD+U3mVZKb5
+         Wt4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXOwatqzIgIahYxhwln+4z3MUpNpfUQf9ufEm7rkPOYNNrnVdBnO0pGKGLoPMOB/kxuyRQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw05NYSfeJkHy2AMDPKR68MfhAwO8ok1MNE75M7PuVFKCaE2Mmg
+	30/QiLTeda8DDLq+2QDIkLb56LrHpZ4C7xo8T+3RwfL3a8v/IDmulLhZexvbG+iJrx2ZMxOsYG7
+	p4oKjHiWjvbEpHFYbhsMKDsksxfnFw7KnmeTr2VMxTdIf+TkWdw==
+X-Gm-Gg: ASbGncuVNLACPDhiC+0O+3lgQz2jHyUtqc49PXU4tGbQ3ieubpacuE508htKpKiqi/V
+	7Isp8qIHOZ+6Oj+wEe4RhvLgf5MSuDxWumXVlFwbPCxw+OuIMLQiVTPUI5f8cnT3hTod2kjWm7k
+	beE7dHSpFTlS9gL7rtFfwwCPdjXVqLeCgZspXoSjp51SX/rm6efuAG9/na2wta5tl10yXavByEG
+	UdvFpwf+KnwDnzMObBVFGbhGApMcSfunX9zDqveFbGQAA6ASJGND6hy2CrlbfSquLay8dyQwY3s
+	OreS7/DZWRcy/6kV6lfL9o60S7Ljirex
+X-Received: by 2002:a5d:5f82:0:b0:3a0:7af3:843f with SMTP id ffacd0b85a97d-3a1f6432cb9mr3198015f8f.19.1746804818901;
+        Fri, 09 May 2025 08:33:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFAfD/C9+Rd/HZglAXP5B2WMfZsTezpKhI7nWOkj4yUnpGfRvi8xCrHDa7gf8c/nYw5T+r/1A==
+X-Received: by 2002:a5d:5f82:0:b0:3a0:7af3:843f with SMTP id ffacd0b85a97d-3a1f6432cb9mr3197999f8f.19.1746804818536;
+        Fri, 09 May 2025 08:33:38 -0700 (PDT)
 Received: from imammedo.users.ipa.redhat.com ([85.93.96.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442d67efdd0sm32939935e9.24.2025.05.09.08.23.38
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442d14e6d74sm66226135e9.21.2025.05.09.08.33.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 May 2025 08:23:40 -0700 (PDT)
-Date: Fri, 9 May 2025 17:23:36 +0200
+        Fri, 09 May 2025 08:33:38 -0700 (PDT)
+Date: Fri, 9 May 2025 17:33:36 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>
 Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
@@ -99,14 +99,13 @@ Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?B?Q2zDqW1lbnQ=?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
  qemu-arm@nongnu.org, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau
  <marcandre.lureau@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, Jason
- Wang <jasowang@redhat.com>, Mark Cave-Ayland <mark.caveayland@nutanix.com>,
- Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v4 01/27] hw/i386/pc: Remove deprecated pc-q35-2.6 and
- pc-i440fx-2.6 machines
-Message-ID: <20250509172336.6e73884f@imammedo.users.ipa.redhat.com>
-In-Reply-To: <20250508133550.81391-2-philmd@linaro.org>
+ Wang <jasowang@redhat.com>
+Subject: Re: [PATCH v4 03/27] hw/nvram/fw_cfg: Rename fw_cfg_init_mem() with
+ '_nodma' suffix
+Message-ID: <20250509173336.637f0ed8@imammedo.users.ipa.redhat.com>
+In-Reply-To: <20250508133550.81391-4-philmd@linaro.org>
 References: <20250508133550.81391-1-philmd@linaro.org>
-	<20250508133550.81391-2-philmd@linaro.org>
+	<20250508133550.81391-4-philmd@linaro.org>
 X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -117,77 +116,72 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu,  8 May 2025 15:35:24 +0200
+On Thu,  8 May 2025 15:35:26 +0200
 Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> wrote:
 
-> These machines has been supported for a period of more than 6 years.
-> According to our versioned machine support policy (see commit
-> ce80c4fa6ff "docs: document special exception for machine type
-> deprecation & removal") they can now be removed.
-
-if these machine types are the last users of compat arrays,
-it's better to remove array at the same time, aka squash
-those patches later in series into this one.
-That leaves no illusion that compats could be used in the later patches.
-=20
+> Rename fw_cfg_init_mem() as fw_cfg_init_mem_nodma()
+> to distinct with the DMA version (currently named
+> fw_cfg_init_mem_wide).
 >=20
+> Suggested-by: Zhao Liu <zhao1.liu@intel.com>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-> Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
 > ---
->  hw/i386/pc_piix.c | 14 --------------
->  hw/i386/pc_q35.c  | 14 --------------
->  2 files changed, 28 deletions(-)
+>  include/hw/nvram/fw_cfg.h | 3 ++-
+>  hw/hppa/machine.c         | 2 +-
+>  hw/nvram/fw_cfg.c         | 7 +++----
+>  3 files changed, 6 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 7a62bb06500..98a118fd4a0 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -764,20 +764,6 @@ static void pc_i440fx_machine_2_7_options(MachineCla=
-ss *m)
+> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+> index d41b9328fd1..d5161a79436 100644
+> --- a/include/hw/nvram/fw_cfg.h
+> +++ b/include/hw/nvram/fw_cfg.h
+> @@ -307,7 +307,8 @@ bool fw_cfg_add_file_from_generator(FWCfgState *s,
 > =20
->  DEFINE_I440FX_MACHINE(2, 7);
+>  FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>                                  AddressSpace *dma_as);
+> -FWCfgState *fw_cfg_init_mem(hwaddr ctl_addr, hwaddr data_addr);
+> +FWCfgState *fw_cfg_init_mem_nodma(hwaddr ctl_addr, hwaddr data_addr,
+> +                                  unsigned data_width);
+>  FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>                                   hwaddr data_addr, uint32_t data_width,
+>                                   hwaddr dma_addr, AddressSpace *dma_as);
+> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+> index dacedc5409c..0d768cb90b0 100644
+> --- a/hw/hppa/machine.c
+> +++ b/hw/hppa/machine.c
+> @@ -201,7 +201,7 @@ static FWCfgState *create_fw_cfg(MachineState *ms, PC=
+IBus *pci_bus,
+>      int btlb_entries =3D HPPA_BTLB_ENTRIES(&cpu[0]->env);
+>      int len;
 > =20
-> -static void pc_i440fx_machine_2_6_options(MachineClass *m)
-> -{
-> -    X86MachineClass *x86mc =3D X86_MACHINE_CLASS(m);
-> -    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
-> -
-> -    pc_i440fx_machine_2_7_options(m);
-> -    pcmc->legacy_cpu_hotplug =3D true;
-> -    x86mc->fwcfg_dma_enabled =3D false;
-> -    compat_props_add(m->compat_props, hw_compat_2_6, hw_compat_2_6_len);
-> -    compat_props_add(m->compat_props, pc_compat_2_6, pc_compat_2_6_len);
-> -}
-> -
-> -DEFINE_I440FX_MACHINE(2, 6);
-> -
->  #ifdef CONFIG_ISAPC
->  static void isapc_machine_options(MachineClass *m)
->  {
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index 33211b1876f..b7ffb5f1216 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -658,17 +658,3 @@ static void pc_q35_machine_2_7_options(MachineClass =
-*m)
+> -    fw_cfg =3D fw_cfg_init_mem(addr, addr + 4);
+> +    fw_cfg =3D fw_cfg_init_mem_nodma(addr, addr + 4, 1);
+>      fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, ms->smp.cpus);
+>      fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, HPPA_MAX_CPUS);
+>      fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, ms->ram_size);
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 54cfa07d3f5..10f8f8db86f 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -1087,11 +1087,10 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>      return s;
 >  }
 > =20
->  DEFINE_Q35_MACHINE(2, 7);
-> -
-> -static void pc_q35_machine_2_6_options(MachineClass *m)
-> -{
-> -    X86MachineClass *x86mc =3D X86_MACHINE_CLASS(m);
-> -    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
-> -
-> -    pc_q35_machine_2_7_options(m);
-> -    pcmc->legacy_cpu_hotplug =3D true;
-> -    x86mc->fwcfg_dma_enabled =3D false;
-> -    compat_props_add(m->compat_props, hw_compat_2_6, hw_compat_2_6_len);
-> -    compat_props_add(m->compat_props, pc_compat_2_6, pc_compat_2_6_len);
-> -}
-> -
-> -DEFINE_Q35_MACHINE(2, 6);
+> -FWCfgState *fw_cfg_init_mem(hwaddr ctl_addr, hwaddr data_addr)
+> +FWCfgState *fw_cfg_init_mem_nodma(hwaddr ctl_addr, hwaddr data_addr,
+> +                                  unsigned data_width)
+>  {
+> -    return fw_cfg_init_mem_wide(ctl_addr, data_addr,
+> -                                fw_cfg_data_mem_ops.valid.max_access_siz=
+e,
+> -                                0, NULL);
+> +    return fw_cfg_init_mem_wide(ctl_addr, data_addr, data_width, 0, NULL=
+);
+>  }
+> =20
+> =20
 
 
