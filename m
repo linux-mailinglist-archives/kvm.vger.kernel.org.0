@@ -1,129 +1,96 @@
-Return-Path: <kvm+bounces-46052-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46056-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A70FAB0FB4
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 11:59:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15442AB1005
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 12:11:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0225A9C4137
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 09:58:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F88B1C252B1
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 10:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850CA28DF53;
-	Fri,  9 May 2025 09:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5EB128EA41;
+	Fri,  9 May 2025 10:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jldv0FcS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oeJVqoXz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E107B2676FE
-	for <kvm@vger.kernel.org>; Fri,  9 May 2025 09:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C4728DF5F
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 10:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746784744; cv=none; b=RaAoZsII5avZCDtVBJ++AFatidWJ5UP8rZ9uGXluXSPwDeDw0MQWWZ9Zgz5n0pbjfeYU8YqOACxaY4SjtzycrcY5/yQ5SqxoeSoihPB4PEyOgzQ6NMZMu1hkIq8Z/qvc4GzjrOib7CV3fO5B+oZMZ3MeVB2P7RmeWFwLxhnujZQ=
+	t=1746785490; cv=none; b=qvpAxTz/bX/tOZe8qPmpL1IYXA/6nBHALGhg7y5vkoQM0Eohgpl8zazAWo/y41ndeBgAMSiozJy2V6S8+Y8Op39b01ks2v5Fuuy3Su9KrD3ATfV/085ZvhAsmwIlVoPnQ+kFrZCi2H83nrwEPGuaRYYwxu/0G0QgD8+n0/kucvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746784744; c=relaxed/simple;
-	bh=FrtgzPushvTfBtYzrA4xryV0T5y0Ofrk1OzBI442UsA=;
+	s=arc-20240116; t=1746785490; c=relaxed/simple;
+	bh=Ar0OFSFbAZYi+/eYa8H5g+BNAP9J4sNaDYBUw0iwgo8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W/vsY8JEBDxn1Su/So+mJl9G1szJBB7npemFTPFFzXBlW2Lldm2SzvxfVpq8m0C/+QwK/RxgJiWMfDpYvnphJpfWVAL3rvuTv7OnkjLFXHGi/RILNq6wQgA678bg/y9KO8TvHV7X3b88/5J5B45HGPKpiROuDCmu3qErGryE4L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jldv0FcS; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746784743; x=1778320743;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=FrtgzPushvTfBtYzrA4xryV0T5y0Ofrk1OzBI442UsA=;
-  b=jldv0FcSLqdkk2+miLitmlcBvWS8wf1fU4fcyUqdh0fSLfPaiI7qy8kK
-   ZG44hDoP7qCwJ/IN37C5ID1xNa1zIJ309mWsrlzST2KBWETbR6GuUg4So
-   u619UFar3d7F620baRGzT16Dk3C643pJSuQsC3EWOmOamVqecox5FhZSa
-   aAMgev9pe/3o+xBrd1sooQD92KtmuYFUs1Zth+iEnlnxzLHbSWRayg4Hi
-   EL5GqvSnvebsgUX2b5aAd1sv9ltRArsjoDnG1Nhqr8CS2+nMZ6X0sqA5O
-   OPgDaugrEQMWc+kpTn2zDQIytsaZlNrG41sqqyi+BBAu+PdBl/6Krh/Os
-   w==;
-X-CSE-ConnectionGUID: 0fX4TXi/RFKpfD5hTqJRaQ==
-X-CSE-MsgGUID: 80WK1V5sQm2CHp3s+tZ5Kw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="51263050"
-X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
-   d="scan'208";a="51263050"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 02:59:02 -0700
-X-CSE-ConnectionGUID: QWtv1rnXQuKrD0DM8sgCQA==
-X-CSE-MsgGUID: iX3VjJpPSQSoXwK10eontg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
-   d="scan'208";a="141524192"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by orviesa004.jf.intel.com with ESMTP; 09 May 2025 02:58:54 -0700
-Date: Fri, 9 May 2025 18:19:56 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
-	kvm@vger.kernel.org, Sergio Lopez <slp@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>, Yi Liu <yi.l.liu@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-riscv@nongnu.org,
-	Weiwei Li <liwei1518@gmail.com>, Amit Shah <amit@kernel.org>,
-	Yanan Wang <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Fabiano Rosas <farosas@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	=?iso-8859-1?Q?Cl=E9ment?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
-	qemu-arm@nongnu.org,
-	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Jason Wang <jasowang@redhat.com>,
-	Mark Cave-Ayland <mark.caveayland@nutanix.com>
-Subject: Re: [PATCH v4 27/27] hw/virtio/virtio-pci: Remove
- VIRTIO_PCI_FLAG_PAGE_PER_VQ definition
-Message-ID: <aB3WzIjvBmE1SjI9@intel.com>
-References: <20250508133550.81391-1-philmd@linaro.org>
- <20250508133550.81391-28-philmd@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aNWZZJQL52/YMweuzq5+o8j0OeQtCr3sNcG9EL913OyAeJiodUpRkrxetfoEze6OxHkllXXeZlEunspY/yfFHcdpy8kzLKU2oD3zvfEalpU7Mnb9eneYwOhjR04AgyVOIzQf0+cN8bxyhY/DP8W+d0CYz1Po7cXs8++T+JTZDCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oeJVqoXz; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 9 May 2025 03:11:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746785486;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gADP7rDY+Aim+5KEmwjyMEJOxyUwFF8/OBHyG20/FUA=;
+	b=oeJVqoXzqvHiRN3YALK3a5w3UYfGRpQO+N4t0GHjMe0EjZ8C4TJwY+s8DH22NNVQbEqZ8D
+	aFg0CxBak1q68+mfPJhXLlnm9PjE5BKbYIdKEt06F6WG2iv2sCE7rXB00plRCQgSBWwnat
+	7I8cKYIOA5Tub8dbHiaHpQnAqV0baRA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v3 02/17] KVM: arm64: nv: Allocate VNCR page when required
+Message-ID: <aB3UxDxwXhz5iY9J@linux.dev>
+References: <20250423151508.2961768-1-maz@kernel.org>
+ <20250423151508.2961768-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250508133550.81391-28-philmd@linaro.org>
+In-Reply-To: <20250423151508.2961768-3-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, May 08, 2025 at 03:35:50PM +0200, Philippe Mathieu-Daudé wrote:
-> Date: Thu,  8 May 2025 15:35:50 +0200
-> From: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Subject: [PATCH v4 27/27] hw/virtio/virtio-pci: Remove
->  VIRTIO_PCI_FLAG_PAGE_PER_VQ definition
-> X-Mailer: git-send-email 2.47.1
+On Wed, Apr 23, 2025 at 04:14:53PM +0100, Marc Zyngier wrote:
+> If running a NV guest on an ARMv8.4-NV capable system, let's
+> allocate an additional page that will be used by the hypervisor
+> to fulfill system register accesses.
 > 
-> VIRTIO_PCI_FLAG_PAGE_PER_VQ was only used by the hw_compat_2_7[]
-> array, via the 'page-per-vq=on' property. We removed all
-> machines using that array, lets remove all the code around
-> VIRTIO_PCI_FLAG_PAGE_PER_VQ (see commit 9a4c0e220d8 for similar
-> VIRTIO_PCI_FLAG_* enum removal).
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
+> Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  include/hw/virtio/virtio-pci.h |  1 -
->  hw/display/virtio-vga.c        | 10 ----------
->  hw/virtio/virtio-pci.c         |  7 +------
->  3 files changed, 1 insertion(+), 17 deletions(-)
+>  arch/arm64/kvm/nested.c | 9 +++++++++
+>  arch/arm64/kvm/reset.c  | 1 +
+>  2 files changed, 10 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 4a3fc11f7ecf3..884b3e25795c4 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -55,6 +55,12 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>  	    !cpus_have_final_cap(ARM64_HAS_HCR_NV1))
+>  		return -EINVAL;
+>  
+> +	if (!vcpu->arch.ctxt.vncr_array)
+> +		vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
 
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+Think you want GFP_KERNEL_ACCOUNT here.
 
+Thanks,
+Oliver
 
