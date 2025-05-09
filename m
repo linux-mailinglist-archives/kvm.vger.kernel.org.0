@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-46039-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46041-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18FEDAB0E67
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 11:14:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCEC8AB0EB5
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 11:19:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 653771C237F6
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 09:14:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 063171C25F58
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 09:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253D3275873;
-	Fri,  9 May 2025 09:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D01274664;
+	Fri,  9 May 2025 09:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FBFcofSf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DTx7WEf0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C870D73477
-	for <kvm@vger.kernel.org>; Fri,  9 May 2025 09:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5C5275849
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 09:16:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746782062; cv=none; b=pYK8VSvJMCbw10LTdFXG/gD5fFBN5Nd+uVfPebF2yVGG/zt4XwtXdHUp+xR3VmsQmQjQsA+NDKDTEfOWjHISZT1WR+oTOmoCFEpbBmwUNdBQRU+xsSoml46P3YWhXXdgZlclvWjqyOHaIp1vhUv3O7zLxGD/v/RDJLtVjCJ4cbM=
+	t=1746782217; cv=none; b=sVRoSj1cDkArKoDtHFCqazBS9ADLKOqSoUthg/i+XzmIMmpW4D7BICFpdQUFpneONaXowJ9qJrJ/w4yiXc/r1JETlo2mTwQ/HF0/Bzapo7jiwGNm6VdMeLO+IDmRXHwwNBFB2+Gyssur9wJo8rFfuhNd3571R/+n0xorRsTgfUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746782062; c=relaxed/simple;
-	bh=yOfR3/SCjW8m6LHYck+yUmtN9nPJnKBOsrhORO48N2Y=;
+	s=arc-20240116; t=1746782217; c=relaxed/simple;
+	bh=fWuJszRoYNIae1SRNi4ekLG9TgewBETWDbuBAJi2yAI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bsp2Qd2T1L9mqQRFFG+GlcsVQKvIjgkOcnqqrwrwsEh9BIdjEqd1Z/wva2mh8J9z6WM8Hz3aBC/78Mv0O1JX4GsZRh1QeF9U5ECNwpWgCxGlCsfAYeGpFrXKChDeMFsrU046+75cISbSCdMwaM7sOGvssDCUQQEa+0sCUbgkr4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FBFcofSf; arc=none smtp.client-ip=198.175.65.10
+	 Content-Type:Content-Disposition:In-Reply-To; b=LhJFnzw7v8NpZoOxmtrASv7FJ27NJSTrD4WN13TpcoveSTh75URPSNy3TVFqRUlBKO0e4KbAerq1hCA1rL/3/pRhjunoVcMd2ItRMjDtPtiAOyVRVgckMGddXwGdjrofQKLz0k0OjyrZ7oYdWNM0MQacB4B3reULYD896BbsToM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DTx7WEf0; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746782061; x=1778318061;
+  t=1746782216; x=1778318216;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:content-transfer-encoding:in-reply-to;
-  bh=yOfR3/SCjW8m6LHYck+yUmtN9nPJnKBOsrhORO48N2Y=;
-  b=FBFcofSfvvjij+Iod+aGB6QaRx6cMBLLPipjqkCVQ1R9jXk3KIE9Nocz
-   GIDxLpnHK8/5ewSHALAK8qsBSU1+LKMLVbxiyIuQ9+DDNSBMb1cOECgZ3
-   hhMaitrN9hc2Na0D4tHby+SGkU9GCvxahngq2oHpIniA4k/MFi895Uo+Y
-   QA7+76Iky/shrGFszwvYxS4fW3j4Vav9xq9EryzhoSASAIy2sSR05Ht0A
-   VBQAU1FCwbQxBFuzVEVxSjVU73RgEnFqwNMxNnb0PDpqg7SjiRgnOrSSu
-   MwERo5DfWiylbFun65jo3gQCE6J0Dv/tLCUSlCRgoj4tlM77k3ndhXxxo
-   A==;
-X-CSE-ConnectionGUID: SOQGHLaWSoiTdnWjJzbWJQ==
-X-CSE-MsgGUID: sfgZ3qFiQ0ifuJrzQmmLOQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="66008400"
+  bh=fWuJszRoYNIae1SRNi4ekLG9TgewBETWDbuBAJi2yAI=;
+  b=DTx7WEf05l58YdeYWMU2TeNRuOM/3hZyJK+GJSDm/hKnTD/Mbm822vu+
+   2sraV09kyJa4imeEXJFPFWN98JChsjM2P0j4MsrM1cWo6//O1GlkJPnFD
+   dlLbjB72pJvz6WUAW77UpKFy5oaMN9YJntDesfrkL1+ykDlkqpcJ7nC48
+   XwhAgshVdDQCGBzIFr1NUuVnNFllIBZI/L6+kmMhnd8dGMvPcPO1QWgdX
+   PQ85XT0lEga9pzxxbAHsevCffhpD/T3vgmXcL+DYE9pck6k2NSbMGYF8f
+   rnTYE/xwSIxrKA/8NN8PDA12FU+/LC0eiqlHr45PG4RS3Nge2QfY5SPgT
+   Q==;
+X-CSE-ConnectionGUID: IrITnC5/Q8CMXzsSWEM+iQ==
+X-CSE-MsgGUID: a8jA9qxASqSVXYyRRAqgwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="59599997"
 X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
-   d="scan'208";a="66008400"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 02:14:20 -0700
-X-CSE-ConnectionGUID: Kyk8rOoGToSDu0vEaYOiAA==
-X-CSE-MsgGUID: qXi3Pi5HRCyZIy7ZvkebgQ==
+   d="scan'208";a="59599997"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 02:16:55 -0700
+X-CSE-ConnectionGUID: WP0RCFLKT46ejuRYK87bag==
+X-CSE-MsgGUID: zI96hvJRQfaATwVfgYUpog==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
-   d="scan'208";a="141776520"
+   d="scan'208";a="167641269"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa004.fm.intel.com with ESMTP; 09 May 2025 02:14:13 -0700
-Date: Fri, 9 May 2025 17:35:15 +0800
+  by fmviesa001.fm.intel.com with ESMTP; 09 May 2025 02:16:49 -0700
+Date: Fri, 9 May 2025 17:37:51 +0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
 Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
@@ -85,12 +85,12 @@ Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
 	qemu-arm@nongnu.org,
 	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
 	Huacai Chen <chenhuacai@kernel.org>,
-	Jason Wang <jasowang@redhat.com>,
-	Mark Cave-Ayland <mark.caveayland@nutanix.com>
-Subject: Re: [PATCH v4 18/27] hw/i386/pc: Remove pc_compat_2_7[] array
-Message-ID: <aB3MUyPaJkiotnvf@intel.com>
+	Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH v4 19/27] target/i386/cpu: Remove
+ CPUX86State::full_cpuid_auto_level field
+Message-ID: <aB3M7/RlxxDFg5al@intel.com>
 References: <20250508133550.81391-1-philmd@linaro.org>
- <20250508133550.81391-19-philmd@linaro.org>
+ <20250508133550.81391-20-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -100,23 +100,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250508133550.81391-19-philmd@linaro.org>
+In-Reply-To: <20250508133550.81391-20-philmd@linaro.org>
 
-On Thu, May 08, 2025 at 03:35:41PM +0200, Philippe Mathieu-Daudé wrote:
-> Date: Thu,  8 May 2025 15:35:41 +0200
+On Thu, May 08, 2025 at 03:35:42PM +0200, Philippe Mathieu-Daudé wrote:
+> Date: Thu,  8 May 2025 15:35:42 +0200
 > From: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Subject: [PATCH v4 18/27] hw/i386/pc: Remove pc_compat_2_7[] array
+> Subject: [PATCH v4 19/27] target/i386/cpu: Remove
+>  CPUX86State::full_cpuid_auto_level field
 > X-Mailer: git-send-email 2.47.1
 > 
-> The pc_compat_2_7[] array was only used by the pc-q35-2.7
-> and pc-i440fx-2.7 machines, which got removed. Remove it.
+> The CPUX86State::full_cpuid_auto_level boolean was only
+> disabled for the pc-q35-2.7 and pc-i440fx-2.7 machines,
+> which got removed. Being now always %true, we can remove
+> it and simplify x86_cpu_expand_features().
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
 > ---
->  include/hw/i386/pc.h |  3 ---
->  hw/i386/pc.c         | 10 ----------
->  2 files changed, 13 deletions(-)
+>  target/i386/cpu.h |   3 --
+>  target/i386/cpu.c | 106 ++++++++++++++++++++++------------------------
+>  2 files changed, 51 insertions(+), 58 deletions(-)
+
+This property is a fix, so,
 
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
