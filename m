@@ -1,172 +1,113 @@
-Return-Path: <kvm+bounces-46059-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46060-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1531AAB1204
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 13:18:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16C3EAB123A
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 13:30:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C330B1BC1F56
-	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 11:18:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D50CD3B1A14
+	for <lists+kvm@lfdr.de>; Fri,  9 May 2025 11:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33E528F95E;
-	Fri,  9 May 2025 11:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1626828FAA7;
+	Fri,  9 May 2025 11:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D+k7tabO"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="jJRn4jiu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7BA226D04;
-	Fri,  9 May 2025 11:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABC028ECEE
+	for <kvm@vger.kernel.org>; Fri,  9 May 2025 11:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746789493; cv=none; b=rNFrk8WK+bn7xkoBmE8aTiHnuFMu+Fg9/OkT/dFalPPCzHEmUDqwWQaDQDzY5ou+bedzVYfXoOapVDAI9G+OMs5Q9Zc7Vg6F1DHGF3bJaUzC2nFOy6ksUnWBR0DOUfjCu2kL0Wpzqdo+cnLJkfyiFQF+4H/rdn0+1uoNvjVCzGA=
+	t=1746790201; cv=none; b=DgpXBoPjmmE27tXXt06Grb3ioXAzK6R40HuEuZg+ylTG5WopXuk4buv8ma7LsVM86Mm+pE73lYbYXzmgryAI648zfAGWap1wBp41ad3iEl5srKClIhOQ8NkWO5ZA85lPhosXZBnUKPAda2xyaGTQDx7/PX7kdN9+jspjKvCiZ7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746789493; c=relaxed/simple;
-	bh=aiPaYDwSGvN0K0HQK9CDqTSbttoNGl/6tY2Cm6xaBBs=;
+	s=arc-20240116; t=1746790201; c=relaxed/simple;
+	bh=fzs4MBOvD+LF7kzFPGxEsVFsEfSDbIKVc/1rCNfRN5E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zzps36xMJJY+roc+9HgimgmR6EDMXRhpC9Pg8PcwI+VpaLB+I1G0bZr3khLQEFZwMFufoExHBwa6ozOHtyZ4YlV2RW/jERPxfPeUclJ/9uTUMrL8xJioxO7QKuOacE05JziZFEyHwnaWvooIXoffvG5RvNsnwAtMJt9xJ+Pa5Pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D+k7tabO; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746789491; x=1778325491;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=aiPaYDwSGvN0K0HQK9CDqTSbttoNGl/6tY2Cm6xaBBs=;
-  b=D+k7tabOKOIL7tJ2NgJbn5avF239nlxYZIix3stzqbyGRByseyGe4uaG
-   ZVFzM9o2U2X3/bXV9w+VXNhmqdrjS7PFMcWbVo5yKxAmY16cQuj85xxd6
-   cDhd/wJgn+ExsG4HqD/5HROsuhZ4ZZFnqnk/CbMuIGf9ui87/0uFuS1G9
-   CRY5HVUdXFPgz0iiKFwjyTqu/Hjg97Q/uiEkqzoT1zvOSYb4eoHfVSTwS
-   ZZqTvaBEIN8kamEeTmXmidTv6jMQsHY29nq6OegwZ540D95RYyEyC+cfa
-   zgJ3TGwNtNSyrTpGcXRHCxicYASTaf5oRLctwX+sr1XUqI4KJIMHEgT0G
-   w==;
-X-CSE-ConnectionGUID: vAKYOpV1TzyszkM8l1uifQ==
-X-CSE-MsgGUID: t7xsvERHQdO1BDMcUc57Tw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="52422846"
-X-IronPort-AV: E=Sophos;i="6.15,275,1739865600"; 
-   d="scan'208";a="52422846"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 04:18:10 -0700
-X-CSE-ConnectionGUID: IO0YruilQeCpWzu6FzjjTw==
-X-CSE-MsgGUID: 19XzKC/dT36Fay078oLWsg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,275,1739865600"; 
-   d="scan'208";a="136294670"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa009.jf.intel.com with ESMTP; 09 May 2025 04:18:06 -0700
-Date: Fri, 9 May 2025 19:12:46 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	jgg@nvidia.com, vivek.kasireddy@intel.com, dan.j.williams@intel.com,
-	yilun.xu@intel.com, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
-	zhenzhong.duan@intel.com, tao1.su@intel.com
-Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
-Message-ID: <aB3jLmlUKKziwdeG@yilunxu-OptiPlex-7050>
-References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
- <371ab632-d167-4720-8f0d-57be1e3fee84@amd.com>
- <4b6dc759-86fd-47a7-a206-66b25a0ccc6d@amd.com>
- <c10bf9c2-e073-479d-ad1c-6796c592d333@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MkiRcexLVty5X6iNi8tXjtm663VflFqZdziNQxHBPCF6x59B+zzAhztFDMBkP7wWSB72Bj1zwMIJAnpHcpxdQu5mMwKTM0yNvx7gfsk/8gwfB8hTJ4df9OmqOrt99fxMRsYcP65yPTVxHPpYgyToGtpzHkZjqmwvb4juZ/76+aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=jJRn4jiu; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a0b7fbdde7so1780975f8f.2
+        for <kvm@vger.kernel.org>; Fri, 09 May 2025 04:29:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1746790198; x=1747394998; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PS161WiIseqQMvNduUZogtk3N3mmBOCWz6m7XRDgGoE=;
+        b=jJRn4jiu8D89meBWhVKaKxXTJxO0mIREa4bVYTi307NVfp72tQvcylqqqZX7Ur92Gs
+         8xj3aJPEIFkvh3CTfa+b6V/7GYu36VfDkhBfDKA1fy6ea6d/XrI7ouXsKv1bM/03Gkii
+         xQ/NP1zpg3f5UXK7H3pnSgOdXm2/SeqjNItf8miX/2StDX5/l4JjWMrcI8Jpja8zwBX/
+         kfHUmIxrIT3u6ZeHb7zlyio2At+oWsKpp8Jb/a0aFbD31xbB+ZkaStja9Yed0ygEmKGf
+         gBMqI3x9i9FvPk4Mp7q4IxygRetqy0Mb3zrbBKA2gm3oLEX6jXmQG3CMMMKoVwIHqmj5
+         bIoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746790198; x=1747394998;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PS161WiIseqQMvNduUZogtk3N3mmBOCWz6m7XRDgGoE=;
+        b=pjpXUFyz2aSw92aNuu0lAWuiJ0HTLyGxzJwNhT8PH+DyfugH3WGIR7uNEdvy5c5ppM
+         LFmCGpLg+Orp4oHgDAXRpH1xtDCnzgmdGdwPttgayLxAQsuRMdc0rNnEHRoX74SGAQPl
+         p298vYajxUiQ4EJR9io2lCirTOIL3z+i8ADjd8PpWDV0us2aqSQVv+E+xGxNoW08P8Bx
+         gUdRcqiZ7uEhFX4tv2CvMR4tpnHmP/vhR/t7T0WaZj2B9wRP+P0s2ln4j74/XmlM1YdZ
+         cTN4smOK8/ihOQ4iEeOT6RgwQhC31oa0Zl7SLM8g0P6iYYXoJy74VNGkYfFKcR5sbR+Z
+         2nXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV1PUsWjAIxDi1Ml/D1oAd476Mdzk59jI9nAroDh6ngREuO+BOXJB3nHQFMTzUIeEaJeW8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZC8YRCgoIm/jiFBjUM97YnNEE22iU1eQ7Vk1uacm1R8hxMR7d
+	xRTbLGg+VEnphMFtPj9Z2FxniZzVlqt1ByB2in9ksrZRa/IY80fN/CtZvJJOEbo=
+X-Gm-Gg: ASbGncssxbl/oBZnVMBWwwkiO6OKEF1TYxue3xo0UMfG/37fK9qlt/+s8YXmOOHM1OW
+	z416OrA8luSos9xFr07cew1kfCyjR36tqVDFTYjw2qiCtNxbAr0XACFpRRfipRuvsfJ8lR1HmfJ
+	dVgfiXcK2lb0t3Ig3qj8utWUxo5CFKyKITp0VtNq/y1HsAznGmVs4KtKi2I5WnwrnXNHdGVK++/
+	gx5V04t0ZcolFXuxCtY9qqOmiRNAsZS7S53wW0SFEgfpEmRGvi8CKd+/Y3+j8GLSXhe0hKN5QTo
+	Rg6SQSYygb/oPMHDPZMdXRorpDPF
+X-Google-Smtp-Source: AGHT+IFyD+sjIl6oyk+GUqpe3q06X8ef9h4zpi/ejp13lhZHBDbgLcyRC1n+m1ZiSGeYARfIOQsk7g==
+X-Received: by 2002:adf:e78b:0:b0:3a1:f70c:19bc with SMTP id ffacd0b85a97d-3a1f70c19d8mr1667927f8f.48.1746790197611;
+        Fri, 09 May 2025 04:29:57 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200::ce80])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f5a2d2c8sm2977553f8f.61.2025.05.09.04.29.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 May 2025 04:29:57 -0700 (PDT)
+Date: Fri, 9 May 2025 13:29:56 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Alexandre Ghiti <alexghiti@rivosinc.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 2/3] riscv: Strengthen duplicate and inconsistent
+ definition of RV_X()
+Message-ID: <20250509-1b7cbe3ce1c23a20c571d3c6@orel>
+References: <20250508125202.108613-1-alexghiti@rivosinc.com>
+ <20250508125202.108613-3-alexghiti@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c10bf9c2-e073-479d-ad1c-6796c592d333@amd.com>
+In-Reply-To: <20250508125202.108613-3-alexghiti@rivosinc.com>
 
-On Fri, May 09, 2025 at 01:04:58PM +1000, Alexey Kardashevskiy wrote:
-> Ping?
-
-Sorry for late reply from vacation.
-
-> Also, since there is pushback on 01/12 "dma-buf: Introduce dma_buf_get_pfn_unlocked() kAPI", what is the plan now? Thanks,
-
-As disscussed in the thread, this kAPI is not well considered but IIUC
-the concept of "importer mapping" is still valid. We need more
-investigation about all the needs - P2P, CC memory, private bus
-channel, and work out a formal API.
-
-However in last few months I'm focusing on high level TIO flow - TSM
-framework, IOMMUFD based bind/unbind, so no much progress here and is
-still using this temporary kAPI. But as long as "importer mapping" is
-alive, the dmabuf fd for KVM is still valid and we could enable TIO
-based on that.
-
+On Thu, May 08, 2025 at 02:52:01PM +0200, Alexandre Ghiti wrote:
+> RV_X() macro is defined in two different ways which is error prone.
 > 
+> So harmonize its first definition and add another macro RV_X_mask() for
+> the second one.
 > 
-> On 29/4/25 17:50, Alexey Kardashevskiy wrote:
-> > 
-> > 
-> > On 29/4/25 16:48, Alexey Kardashevskiy wrote:
-> > > On 8/1/25 01:27, Xu Yilun wrote:
-> > > > This series is based on an earlier kvm-coco-queue version (v6.12-rc2)
-> > > 
-> > > Has this been pushed somewhere public? The patchset does not apply on top of v6.12-rc2, for example (I fixed locally).
+> Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
+> ---
+>  arch/riscv/include/asm/insn.h        | 39 ++++++++++++++--------------
+>  arch/riscv/kernel/elf_kexec.c        |  2 +-
+>  arch/riscv/kernel/traps_misaligned.c |  2 +-
+>  arch/riscv/kvm/vcpu_insn.c           |  2 +-
+>  4 files changed, 23 insertions(+), 22 deletions(-)
+>
 
-Sorry, not yet. I'm trying to solve this ... same for the QEMU tree.
-
-> > > Also, is there somewhere a QEMU tree using this? I am trying to use this new DMA_BUF feature and this require quite some not so obvious plumbing. Thanks,
-> > 
-> > 
-> > More to the point, to make it work, QEMU needs to register VFIO MMIO BAR with KVM_SET_USER_MEMORY_REGION2 which passes slot->guest_memfd to KVM which essentially comes from VFIORegion->mmaps[0].mem->ram_block->guest_memfd. But since you disabled mmap for private MMIO, there is no MR which QEMU would even try registering as KVM memslot and there are many ways to fix it. I took a shortcut and reenabled mmap() but wonder what exactly you did. Makes sense? Thanks,
-
-Yes, QEMU needs change. 08/12 "vfio/pci: Create host unaccessible dma-buf for private device“
-adds a new flag VFIO_REGION_INFO_FLAG_PRIVATE to indicate user could
-create dmabuf on this region.
-
-I'm also not very serious about QEMU changes now, just FYI:
-
-I use VFIO_REGION_INFO_FLAG_PRIVATE flag to revive region->mmaps.
-
-int vfio_region_setup(Object *obj, VFIODevice *vbasedev, VFIORegion *region,
-	...
-
-+        if (region->flags & VFIO_REGION_INFO_FLAG_PRIVATE) {
-+            region->nr_mmaps = 1;
-+            region->mmaps = g_new0(VFIOMmap, region->nr_mmaps);
-+            region->mmaps[0].offset = 0;
-+            region->mmaps[0].size = region->size;
-+            region->mmaps[0].dmabuf_fd = -1;
-         }
-
-Then in vfio_region_mmap(), use a new memory_region_init_dmabuf() to populate
-the MR.
-
-int vfio_region_mmap(VFIORegion *region)
-
-+        if (use_dmabuf) {
-+            /* create vfio dmabuf fd */
-+            ret = vfio_create_dmabuf(region->vbasedev, region->nr,
-+                                     region->mmaps[i].offset,
-+                                     region->mmaps[i].size);
-+            if (ret < 0) {
-+                goto sub_unmap;
-+            }
-+
-+            region->mmaps[i].dmabuf_fd = ret;
-+
-+            name = g_strdup_printf("%s dmabuf[%d]",
-+                                   memory_region_name(region->mem), i);
-+            memory_region_init_dmabuf(&region->mmaps[i].mem,
-+                                             memory_region_owner(region->mem),
-+                                             name, region->mmaps[i].size,
-+                                             region->mmaps[i].dmabuf_fd);
-+            g_free(name);
-+        } else {
-
-Thanks,
-Yilun
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
