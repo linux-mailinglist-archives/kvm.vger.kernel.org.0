@@ -1,159 +1,113 @@
-Return-Path: <kvm+bounces-46112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51D59AB232D
-	for <lists+kvm@lfdr.de>; Sat, 10 May 2025 11:56:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41FF8AB2439
+	for <lists+kvm@lfdr.de>; Sat, 10 May 2025 17:10:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 432233AC3A4
-	for <lists+kvm@lfdr.de>; Sat, 10 May 2025 09:56:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E5834C0E72
+	for <lists+kvm@lfdr.de>; Sat, 10 May 2025 15:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471A2221F2A;
-	Sat, 10 May 2025 09:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E843922FAF8;
+	Sat, 10 May 2025 15:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkbKUX7W"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JDIG4re3"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684A81D9A54;
-	Sat, 10 May 2025 09:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FDD1DD0C7
+	for <kvm@vger.kernel.org>; Sat, 10 May 2025 15:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746870992; cv=none; b=kYKQY6T7AdHp+xhElbkOSbqscnCPg5zWF0qsMi1rK0k1OpTgW3inyp9AgUvomBMYGqYHOdwtp+3qxwmSLYSYE8KkpwgmSLI7SSROPFR/C8X7AJphQrgWfxL+MC4CgptygJRYbE87xswSvRihNE7Zxdf3Udl+N7AwlnrKyr93gmY=
+	t=1746889810; cv=none; b=fusPYJyXXzoN4LZVkM4DMvyrkeBIF2LF2L3AO5TF/1vds7gc4o6fwg3A9vovCIPUvizItfDec+gbus/KG+jX41yF1qxjO/lP+dyAREQbZ8xgM4H63uoEVPlBGD0y7Mm2/0G9Nh5TUdPX2gkKF2Gd0LlEpbvAu/KoHX0GQWxv7TE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746870992; c=relaxed/simple;
-	bh=OXVam+0Q2orOkHKRReKLiYIXpAXiFSA2E5n7tXsaBGA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vv62oVLS2L3kibnx7g+dQ4VaR64niUDjCQDKIZOn875CmX7uq8aRxZOfmL12/QO/o9b15wnZpwnxtOWgHHW1Cidr46kfzT2pNtWaeUv9UgsS54g7jDZ5tFtXlur1u7Q/koGi2PrFCDu720Up0vszSQ8W65VKJo+JLjjw8mW6EZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkbKUX7W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD605C4CEE2;
-	Sat, 10 May 2025 09:56:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746870991;
-	bh=OXVam+0Q2orOkHKRReKLiYIXpAXiFSA2E5n7tXsaBGA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FkbKUX7WqHUffy9/Z6JrTDRg1Ns4T7ZOhcGcfp2Rl3Jx5c8IT93xwWPtPgnPFdtYr
-	 6jeWmb0WquwoJHppA3VKgLQwzczdhXkWp3VKPfJif0sbXLiM+woBOQpbxeO/u4UFxU
-	 ryoC+BLHynWrkb7lMixzhm9bMK6JJ4cORCyiIA4Z9dibbYbYfDLsA0qhK6nEKa25VH
-	 umdviRAkKRHLEeAAGXa5IgYpg5OJciAKg169fwFYfiqYyY8pHcJCuB2ed6XVP3WWgx
-	 KPYdbPCS6FZ3jD+XNBLMHkpD90e09mZn58e0dMsOtsTDqUq3UxZWoA6TtYOtb4oR9t
-	 k5NrgwpFElWJg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uDgwX-00DeFq-Jh;
-	Sat, 10 May 2025 10:56:29 +0100
-Date: Sat, 10 May 2025 10:56:29 +0100
-Message-ID: <87ikm86b76.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>
-Subject: Re: [PATCH v4 31/43] KVM: arm64: Switch to table-driven FGU configuration
-In-Reply-To: <20250508155828.GB3256485@e124191.cambridge.arm.com>
-References: <20250506164348.346001-1-maz@kernel.org>
-	<20250506164348.346001-32-maz@kernel.org>
-	<20250508155828.GB3256485@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1746889810; c=relaxed/simple;
+	bh=LSp0XQpzSTcNL5A8tzPVsKcCl0AKeTrOu/sN2l5jc/g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RbYVSwBqUWYoRkW16ypkeHlwGTQ5kz/rKI29OEYjyfTN21/tpYSlQ3Soq+bf/vmi1ZuwLIE3C+Qgz8IAjPVQDZ54KCf4nuEQ8IMyacUZoex9lxBaD4jJvFL8qWBebQmYuIxGTPIJ6F8byyWJ7OUC9Z53VR9hkxUDR5qIoFA8Yg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JDIG4re3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746889806;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LSp0XQpzSTcNL5A8tzPVsKcCl0AKeTrOu/sN2l5jc/g=;
+	b=JDIG4re3jCX3r4WEZyjRr+77HnOnilllL+rKiTizoby3ufG09onAtnTezG9UF6tL8d9ciw
+	fD0AMrTtvMMNLobckAX8TT6f11x5tNpPoExrZsK6M5M+Mb3E125o/i71xL4/2CbNYKp6WS
+	pDumVCE8X55lNbsn4ASy5QQR9S7I4UM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-407-4meS9jd5PUKHzNbOx4FWrQ-1; Sat, 10 May 2025 11:10:05 -0400
+X-MC-Unique: 4meS9jd5PUKHzNbOx4FWrQ-1
+X-Mimecast-MFC-AGG-ID: 4meS9jd5PUKHzNbOx4FWrQ_1746889804
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a0b7cd223fso1594095f8f.2
+        for <kvm@vger.kernel.org>; Sat, 10 May 2025 08:10:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746889802; x=1747494602;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LSp0XQpzSTcNL5A8tzPVsKcCl0AKeTrOu/sN2l5jc/g=;
+        b=b7oX9nKu5IkMg9NzgcthWaux2Q3X6WHlnr6KQNPQsoxgIuZyJH5N387XakktM3DgQz
+         FyVqLenmOXNw1xLlcxogZVDg/CTQ0xqUH18XFFzl8JIB1b3awBd5yx59vLkxrHBP9B6G
+         NsmV54xyxn/vv7WhnZx2+yoFZs9ii+r/dqZ2V/4sBopsOZ8HoAYPzF0tj21xiocuhGna
+         LzdbEwdmnS01ivDfOvJVEEuyhnl5jOewpTzZC5pDPjltyDLJpvGor0H6VLVfJkUjthlc
+         YnxG1MwdpmRYQQIPY5aCxgBzkzwyeNjAy7evJTkdjIrYxOiJP6uF9Brjn+diHFCftyX2
+         Z6xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU64hxDhVT9kMqNKpGrfkTynoypZNTOcsdhsp8dBfIBMW1SdowH+/GbzDgWebxhmmam0Pw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKtTAsfe4gdHp64pZtA52oTXIuNMVUOwlVARp7/+3gSdoNQk4X
+	Z55GFA3jHp6LOEZGUzW6ag36MVQ6dALJ9HJuXlkKfzQadbZw3J/RCEqdjacOjRIFlGI+lIXmiS0
+	FYS1wfRGItHlXFmrAaP+ljuQb/IeRRW8TZaK9MIVGRn3Hlw3L2E649qYFHlDzTEV85+GMnG3xpS
+	2ZzOW2s8ya5tFYco3poicXEp6UVxCg1K+vUOk=
+X-Gm-Gg: ASbGncvM+O57VKsCcBKyKxoBwCqL8A8J+jOp1Lh9DvJlc8pPEUjuCK/R1ULxm7jViyx
+	JWHFxCRekIP9qjv7eggHz3CBWaGpgTIy+yl7GQ0fuXoGOJN3bYGXjpINhbZom31A7Pl3N
+X-Received: by 2002:adf:f44c:0:b0:3a1:f701:ea15 with SMTP id ffacd0b85a97d-3a1f701ea9bmr5340947f8f.55.1746889802388;
+        Sat, 10 May 2025 08:10:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGTrsQVFY/Fgr8ISgzK47J1kK+Yrt701ZSvnSrnrcZmClYr8VRCd08zVc7FFV0ODaXSCdq0pbsc9V1BsmPfAkY=
+X-Received: by 2002:adf:f44c:0:b0:3a1:f701:ea15 with SMTP id
+ ffacd0b85a97d-3a1f701ea9bmr5340935f8f.55.1746889801993; Sat, 10 May 2025
+ 08:10:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com, ben.horgan@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <CAAhSdy09tkokvdvACCQACLdvppTTQHDOR+O4jtkhVP4PaW_k7w@mail.gmail.com>
+In-Reply-To: <CAAhSdy09tkokvdvACCQACLdvppTTQHDOR+O4jtkhVP4PaW_k7w@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sat, 10 May 2025 17:09:50 +0200
+X-Gm-Features: AX0GCFtixaY2aut0ABjtOGBW3kol_5pEkPm5-SgtfoURVxZJrIE5ml20E7vbZQM
+Message-ID: <CABgObfY+2CpcBNc8ugsrvOKr9dR_P=KBuysgVN_cx3_ekQSR2Q@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/riscv fixes for 6.15 take #1
+To: Anup Patel <anup@brainfault.org>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
+	Atish Patra <atishp@atishpatra.org>, Atish Patra <atishp@rivosinc.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, KVM General <kvm@vger.kernel.org>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 08 May 2025 16:58:28 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> On Tue, May 06, 2025 at 05:43:36PM +0100, Marc Zyngier wrote:
-> > Defining the FGU behaviour is extremely tedious. It relies on matching
-> > each set of bits from FGT registers with am architectural feature, and
-> > adding them to the FGU list if the corresponding feature isn't advertised
-> > to the guest.
-> > 
-> > It is however relatively easy to dump most of that information from
-> > the architecture JSON description, and use that to control the FGU bits.
-> > 
-> > Let's introduce a new set of tables descripbing the mapping between
-> > FGT bits and features. Most of the time, this is only a lookup in
-> > an idreg field, with a few more complex exceptions.
-> > 
-> > While this is obviously many more lines in a new file, this is
-> > mostly generated, and is pretty easy to maintain.
-> 
-> I didn't review every single value in the maps (autogenerated as you said), but
-> I did take a look at a few.
-> 
-> __compute_fixed_bits() is pretty confusing, it's doing multiple things:
->   - It returns a mask of bits that didn't match (aka RES0)
->   - or it returns a mask of bits that may have a fixed value and fills out a
->     pointer with what the fixed values are.
-> 
-> It has the __ prefix, so it's an implemetation-detail kinda function, not
-> asking you to change anything, just pointing out the most confusing part of the
-> patch!
+On Fri, May 2, 2025 at 8:53=E2=80=AFAM Anup Patel <anup@brainfault.org> wro=
+te:
+>
+> Hi Paolo,
+>
+> We have one fix for the 6.15 kernel which adds missing
+> reset of smstateen CSRs.
+>
+> Please pull.
 
-I know. My OCDing self couldn't deal with having two helpers differing
-only by the position of a single bit, hence the catch-all helper. But
-I'm happy to revisit this in the future to make it more palatable.
+Done, thanks.
 
-It's just that I'm getting a bit fed-up with this series... :-/
+Paolo
 
-> 
-> Just one small whitespace nit below.
-> 
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-Thank you!
-
-> > +	NEEDS_FEAT(HFGRTR_EL2_ERXPFGCDN_EL1|
-> > +		   HFGRTR_EL2_ERXPFGCTL_EL1|
-> 
-> Inconsistent |.
-
-Ah, nice. Fixed.
-
-> > +	NEEDS_FEAT_FLAG(HDFGRTR_EL2_OSDLR_EL1, NEVER_FGU,
-> > +			FEAT_DoubleLock),
-> 
-> This confused me at first, but it's because OSDLR_EL1 is always accessible
-> (with FEAT_AA64EL1), but can only be trapped with FEAT_DoubleLock.
-
-Exactly. This is the conjunction of two architectural constraints
-(selective output from my script):
-
-- OSDLR_EL1: # Reg cond: IsFeatureImplemented(FEAT_AA64)
-- HDFGRTR_EL2.OSDLR_EL1: # Field cond: IsFeatureImplemented(FEAT_DoubleLock)
-
-The first implies that this can never UNDEF, while the second
-indicates that the trap bit only exists under specific conditions.
-It's one of these cases where the architecture is playing catch-up
-with itself (v8.0 vs v8.6).
-
-Thanks again,
-
-	M.
-
--- 
-Jazz isn't dead. It just smells funny.
 
