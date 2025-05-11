@@ -1,217 +1,114 @@
-Return-Path: <kvm+bounces-46120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C30DFAB27EF
-	for <lists+kvm@lfdr.de>; Sun, 11 May 2025 13:22:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5FECAB288F
+	for <lists+kvm@lfdr.de>; Sun, 11 May 2025 15:40:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E23B170F1B
-	for <lists+kvm@lfdr.de>; Sun, 11 May 2025 11:22:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 853361892FE3
+	for <lists+kvm@lfdr.de>; Sun, 11 May 2025 13:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525861D7995;
-	Sun, 11 May 2025 11:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE64A2571BB;
+	Sun, 11 May 2025 13:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IwCVRfs6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nghPzRIy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EE04315E
-	for <kvm@vger.kernel.org>; Sun, 11 May 2025 11:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D86C2571AF
+	for <kvm@vger.kernel.org>; Sun, 11 May 2025 13:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746962553; cv=none; b=fI0UHn8J5es62rHAEmzy5wXdoBZM8NWTXkfjjBMq15GqCla1kQYm8Z1rH9BEPjE2tIJxSqlSxF/WvZByxIxpcoVk2gZGwhw2A+/76nqMFnBYAP/FHK8px5BpzzXO7MclYKznyOid5An/H4IDIr1ABku3VRNLKPlVYa9vhTTDIYI=
+	t=1746970823; cv=none; b=QPajpNBo1nuzjTWbYfIg/A+o3vfwZLs5Oaw34dD8ABBvkZ8vnJe6LqSj2+LikgZt91/S+06dj1pXiBz+9h/yeCspBbO7gB1EX/N8kX146Eo8XQ7733zdmp63cYcCECNPrBvCrL1yqbnMM6ayRTyds1lM6s2UCvvnoM3gTfRQcfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746962553; c=relaxed/simple;
-	bh=xMg4bh+bQA+IPFAhVKIA/zhq5G+/gV3IsMQRSnrn8ng=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KM0pJNt7UJuOXTeevpo1fA78GU5F2GlzofNmATug9kHNpGhxaQHTjXQ1AbbFqNMMv741imJZxjDXfJLK50/EFMcNZMbw6WhvcoRVf7zRd/tsnb+7+j7++hLmfup1QbWUD/KRMaD2nsZ0cTjqIAc5NVfr6LxnbEbzjwiODKcFi/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IwCVRfs6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746962550;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=/EODiwMTIGjE0ilIelFQY+bLRs3QQynzSkDS0Rn1VtM=;
-	b=IwCVRfs6e+ycK7wCu5IDDa4tQV3S7MLZKZs0q34ChjRyJ3z9ap0ebruUS7zp1JR2sbK+30
-	Cdch1UxKU4SW/EVeoGV98avvZnaVtJbBQKWM59J6CEE7ji5Cd6i++Cf1Cwd6XoK9CdNEEM
-	1yNzNnwlMWvRDb0pYdRCdU06Qc96gWI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-674-yF2Ngt7fOAK_1booxGB0sw-1; Sun, 11 May 2025 07:22:28 -0400
-X-MC-Unique: yF2Ngt7fOAK_1booxGB0sw-1
-X-Mimecast-MFC-AGG-ID: yF2Ngt7fOAK_1booxGB0sw_1746962548
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ad240e3f501so70011566b.1
-        for <kvm@vger.kernel.org>; Sun, 11 May 2025 04:22:28 -0700 (PDT)
+	s=arc-20240116; t=1746970823; c=relaxed/simple;
+	bh=tQYCAYnSnMLVlXmM6Q3dpe1j9yqTGHdnD9s/TU+XfR0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iH1lqPcsEVqp3BdxrpRARt0IrQ1vKomzdIqgISp0hOdrFmRN4NTm7I7sSEtLibrQisrREuiMJaGW8/29t4DSD0TMMc8NPJDzAodX+ta2QsuSLGREjJ7367PIf3Q2GunbsMNzj7oKzq8Ksx8dVMDk8yM7A7uY07vBbisKpVWx07Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nghPzRIy; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e733a6ff491so3575127276.2
+        for <kvm@vger.kernel.org>; Sun, 11 May 2025 06:40:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1746970820; x=1747575620; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tQYCAYnSnMLVlXmM6Q3dpe1j9yqTGHdnD9s/TU+XfR0=;
+        b=nghPzRIyMV/yjuSA0R4nFD18MsUDZpLEiX1qswiXrz1y105YeEZ5qhpzHTq+h4hI8a
+         0XOT2UcoSHJvoDE/YZTO2tw5bLd8Pveb/beDCr1YSs4g1zETFrn0I2IJ8teDLj4U3+KR
+         Ou4N/trzNEaBINi9rqh2+FikVCcmfspEVvlF9iQ6G7qbvsZF0nO2emaOkogLRLONfb87
+         Lgv1AX0smSZCd/YYAsYo1FquCjZelh7OzNM1AXE2ZUs2W5IwdTZdzEkwgRnVWR9i8VPZ
+         SNJCvWSyVr4VivLPAw6AIa1VkAdMXL3ZZNKvOQ6v95NDXhs5TFMMk2kG2p2KnrEH2WzQ
+         TL+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746962547; x=1747567347;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1746970820; x=1747575620;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/EODiwMTIGjE0ilIelFQY+bLRs3QQynzSkDS0Rn1VtM=;
-        b=OPnKohzbOJDO+9O0tdJghwuZdaRKleEzUYoFREaPzkhUwvkh4sXDeeNcDbKLBkMQy+
-         mhflR0ia2Bev9KmNvYziYNp61fp8EiJB2XLvcDjxGOO6+8xIzAwhA8tFKhV2hWehz4Ev
-         hcI0j2gxMzGxk57KRGWe/TQmoommVqV1oMbTBMX7Q6QQN6UPt1jl7A5t9AV2LQo+1hbd
-         UpKvltNQhugnzj3DEkurjANOdj5edMlFT9j3FrjOvnJIu2bbs+eu5Y5LpeYKB2rO1yZA
-         4c7zZ9XARFiYm2hCzfr/y/GjMi/NOiOR69OXATLXOFUnBpbqHaeuXiGgYeTyNFRehJtC
-         4R0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXnZIIVY0e+ZChDysI2H3xUsdNDLk8cuqrZhYl1HacGo3aqMkdK6HppUMCzyGnflYlqk00=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywl9MS28T+VTQQt/VpneXU3xUGkuKEKX2uBpbFD78BTlTehiEqp
-	NomrnuWOjHWL0znch0Jvjt/Lo3uYcEnOZnOv0l7MydJoZYDqcCBPRrWxOdKB2VZklA8HD/Xr8fB
-	e7BGqrY6NmmWCyttGwYqV3489Niataw3EL/4w0Bf1WDWss4Dp7Q==
-X-Gm-Gg: ASbGnctwNScJc3YSy1gvN7j0tg3yP5/47c8arPtf8Xo/rFhN5jcx42JMKk9ayZu8B4b
-	m3XEN6qMu74rYJ9GyLgAi+g4SFNKkMbOMEK8J178d4tSRE2XDMxX+ieBpXzyYo7QfTL6Z6TLbRr
-	gPHdq92sxcQ4jbgIUhxY1m22pVrTBligLl+uWFU4Al0f4ezvMKeLhetVjCQCz90x7CjQT/D2ejO
-	CMn0kkEyrUiW9PmuiVnv/+J7sW6QVyrNNgqd+D7/5FwSZHoxRDxkCa6SR+EQPxcwURNZklMXnfV
-	GS3TviK1nSwZw2E=
-X-Received: by 2002:a17:907:9444:b0:ad2:532e:abde with SMTP id a640c23a62f3a-ad2532eafffmr47907566b.1.1746962547494;
-        Sun, 11 May 2025 04:22:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEYeSjy1KdQYUnm++WAgswDRuwlIqOy1LMznzsEtnEw1htUbIqZluyhKPquF82ELDvFe7A6HQ==
-X-Received: by 2002:a17:907:9444:b0:ad2:532e:abde with SMTP id a640c23a62f3a-ad2532eafffmr47904966b.1.1746962547048;
-        Sun, 11 May 2025 04:22:27 -0700 (PDT)
-Received: from [192.168.122.1] ([151.62.197.53])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad23da570desm232018466b.118.2025.05.11.04.22.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 May 2025 04:22:26 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM changes for Linux 6.15-rc6
-Date: Sun, 11 May 2025 13:22:23 +0200
-Message-ID: <20250511112225.47328-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.49.0
+        bh=tQYCAYnSnMLVlXmM6Q3dpe1j9yqTGHdnD9s/TU+XfR0=;
+        b=cmhm81JMa7xvRnta9T7JFXmOiiwpNmYsfOAyC6qPcflP9u33I0IupTz66sgeZlKCwI
+         Gy3KpaKcSKo56+J7gXWyQmMyj7XtvCN599LWwCv7stooKEwkj+dHbQqabIbsSnpaLIqs
+         bgyifaq/pOH0ttyjPwLAgZmGydEn7JNhOnaPFkde5YbG6Qa9RmwOgHdQ1iTySa8EAQzN
+         jSEdynXB6gD9rb0o8sowRDUW00wNcdSI3wsP+/XLbqoILK6gEl6w0k0aDbangs4XpWqg
+         JHwz0sYwAHKzMUS66cqJe5DDv0KeF+eoUJMDHmdWkgFp4fbl8y6cU958pBDOvYvd+y4n
+         hHbg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8WV9/rss+2N0/NyKXYi7hpYjHj4heE5W3/28DuFQVZNjl/QW+nfj+JK0ciJhPB4Oe20A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmhihPbN+ZQM5bRiA4kENZ8uqW2M+GQGcAkte11os+i3eDNfW+
+	L1zcvXXa3yaqYp69vxU7/a2SK9ktFshs2e0t4IPnLVedT1gcknhySKb6woxDW9FNzTZ+6wN9MIq
+	2Mb5Vt6Ll7jIt81W56QgEGlkZbfJntcOU0mNzxA==
+X-Gm-Gg: ASbGncupDPL4FS1THxg4Cg4uyOnOQveuPITLEFdlOSV8KeqOo8E8SqFs2eJdtoWtVrq
+	H90tayuNTK91Y40ppIEqj1sgnO7TCbGtoPxtphdEfMvryGXUbd4MQZdrdkWMQX17st6FU8QyKQU
+	CMKCHnA8GbcMRryQz4OSOcfiRg4oIT2nFFcg==
+X-Google-Smtp-Source: AGHT+IE0KyLbfrS2S6y6k0L5Sv5Y/BL7XPKyq9u/1NkOPd9IMbHcYOljv/+I7+C94CfPc8CC+GuYQ3cEH7yDPqKhrqM=
+X-Received: by 2002:a05:6902:2503:b0:e78:f4df:8441 with SMTP id
+ 3f1490d57ef6-e78fd9be186mr13405339276.0.1746970820155; Sun, 11 May 2025
+ 06:40:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250507234241.957746-1-pierrick.bouvier@linaro.org>
+In-Reply-To: <20250507234241.957746-1-pierrick.bouvier@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 11 May 2025 14:40:09 +0100
+X-Gm-Features: AX0GCFthFJShMwduZaRe8unlmupmQOaRCZ993P7xtVVqY51NCVV1-mxoKOxg2B0
+Message-ID: <CAFEAcA_NgJw=eu+M5WJty0gsq240b8gK3-ZcJ1znwYZz5WC=wA@mail.gmail.com>
+Subject: Re: [PATCH v7 00/49] single-binary: compile target/arm twice
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, anjo@rev.ng, 
+	Richard Henderson <richard.henderson@linaro.org>, alex.bennee@linaro.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Linus,
+On Thu, 8 May 2025 at 00:42, Pierrick Bouvier
+<pierrick.bouvier@linaro.org> wrote:
+>
+> More work toward single-binary.
+>
+> Some files have external dependencies for the single-binary:
+> - target/arm/gdbstub.c: gdbhelpers
+> - target/arm/arm-qmp-cmds.c: qapi
+> - target/arm/tcg/translate*: need deep cleanup in include/tcg
+> - target/arm/tcg/cpu*: need TargetInfo implemented for arm/aarch64
+> - target/arm/tcg/*-helper*: need deeper split between aarch64 and arm code
+> They will not be ported in this series.
+>
+> Built on {linux, windows, macos} x {x86_64, aarch64}
+> Fully tested on linux x {x86_64, aarch64}
+>
+> Series is now tested and fully reviewed. Thanks for pulling it.
 
-The following changes since commit 92a09c47464d040866cf2b4cd052bc60555185fb:
+Do you/Philippe have a plan for how you want this to go into
+the tree? I know Philippe has been taking a lot of the
+single-binary related patches. Let me know if you want me
+to pick it up via target-arm.
 
-  Linux 6.15-rc5 (2025-05-04 13:55:04 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to add20321af2f882ad18716a2fb7b2ce861963f76:
-
-  Merge tag 'kvm-x86-fixes-6.15-rcN' of https://github.com/kvm-x86/linux into HEAD (2025-05-10 11:11:06 -0400)
-
-----------------------------------------------------------------
-ARM:
-
-* Avoid use of uninitialized memcache pointer in user_mem_abort()
-
-* Always set HCR_EL2.xMO bits when running in VHE, allowing interrupts
-  to be taken while TGE=0 and fixing an ugly bug on AmpereOne that
-  occurs when taking an interrupt while clearing the xMO bits
-  (AC03_CPU_36)
-
-* Prevent VMMs from hiding support for AArch64 at any EL virtualized by
-  KVM
-
-* Save/restore the host value for HCRX_EL2 instead of restoring an
-  incorrect fixed value
-
-* Make host_stage2_set_owner_locked() check that the entire requested
-  range is memory rather than just the first page
-
-RISC-V:
-
-* Add missing reset of smstateen CSRs
-
-x86:
-
-* Forcibly leave SMM on SHUTDOWN interception on AMD CPUs to avoid causing
-  problems due to KVM stuffing INIT on SHUTDOWN (KVM needs to sanitize the
-  VMCB as its state is undefined after SHUTDOWN, emulating INIT is the
-  least awful choice).
-
-* Track the valid sync/dirty fields in kvm_run as a u64 to ensure KVM
-  KVM doesn't goof a sanity check in the future.
-
-* Free obsolete roots when (re)loading the MMU to fix a bug where
-  pre-faulting memory can get stuck due to always encountering a stale
-  root.
-
-* When dumping GHCB state, use KVM's snapshot instead of the raw GHCB page
-  to print state, so that KVM doesn't print stale/wrong information.
-
-* When changing memory attributes (e.g. shared <=> private), add potential
-  hugepage ranges to the mmu_invalidate_range_{start,end} set so that KVM
-  doesn't create a shared/private hugepage when the the corresponding
-  attributes will become mixed (the attributes are commited *after* KVM
-  finishes the invalidation).
-
-* Rework the SRSO mitigation to enable BP_SPEC_REDUCE only when KVM has at
-  least one active VM.  Effectively BP_SPEC_REDUCE when KVM is loaded led
-  to very measurable performance regressions for non-KVM workloads.
-
-----------------------------------------------------------------
-Dan Carpenter (1):
-      KVM: x86: Check that the high 32bits are clear in kvm_arch_vcpu_ioctl_run()
-
-Marc Zyngier (5):
-      KVM: arm64: Force HCR_EL2.xMO to 1 at all times in VHE mode
-      KVM: arm64: Prevent userspace from disabling AArch64 support at any virtualisable EL
-      KVM: arm64: selftest: Don't try to disable AArch64 support
-      KVM: arm64: Properly save/restore HCRX_EL2
-      KVM: arm64: Kill HCRX_HOST_FLAGS
-
-Mikhail Lobanov (1):
-      KVM: SVM: Forcibly leave SMM mode on SHUTDOWN interception
-
-Mostafa Saleh (1):
-      KVM: arm64: Fix memory check in host_stage2_set_owner_locked()
-
-Paolo Bonzini (3):
-      Merge tag 'kvm-riscv-fixes-6.15-1' of https://github.com/kvm-riscv/linux into HEAD
-      Merge tag 'kvmarm-fixes-6.15-3' of https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-      Merge tag 'kvm-x86-fixes-6.15-rcN' of https://github.com/kvm-x86/linux into HEAD
-
-Radim Krčmář (1):
-      KVM: RISC-V: reset smstateen CSRs
-
-Sean Christopherson (2):
-      KVM: x86/mmu: Prevent installing hugepages when mem attributes are changing
-      KVM: SVM: Set/clear SRSO's BP_SPEC_REDUCE on 0 <=> 1 VM count transitions
-
-Sebastian Ott (1):
-      KVM: arm64: Fix uninitialized memcache pointer in user_mem_abort()
-
-Tom Lendacky (1):
-      KVM: SVM: Update dump_ghcb() to use the GHCB snapshot fields
-
-Yan Zhao (1):
-      KVM: x86/mmu: Check and free obsolete roots in kvm_mmu_reload()
-
- arch/arm64/include/asm/el2_setup.h              |  2 +-
- arch/arm64/include/asm/kvm_arm.h                |  3 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h         | 13 ++--
- arch/arm64/kvm/hyp/nvhe/mem_protect.c           |  2 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c                 | 36 +++++-----
- arch/arm64/kvm/mmu.c                            | 13 ++--
- arch/arm64/kvm/sys_regs.c                       |  6 ++
- arch/riscv/kvm/vcpu.c                           |  2 +
- arch/x86/kvm/mmu.h                              |  3 +
- arch/x86/kvm/mmu/mmu.c                          | 90 ++++++++++++++++++-------
- arch/x86/kvm/smm.c                              |  1 +
- arch/x86/kvm/svm/sev.c                          | 32 +++++----
- arch/x86/kvm/svm/svm.c                          | 75 +++++++++++++++++++--
- arch/x86/kvm/svm/svm.h                          |  2 +
- arch/x86/kvm/x86.c                              |  4 +-
- tools/testing/selftests/kvm/arm64/set_id_regs.c |  8 +--
- 16 files changed, 210 insertions(+), 82 deletions(-)
-
+-- PMM
 
