@@ -1,138 +1,98 @@
-Return-Path: <kvm+bounces-46172-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46173-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29E37AB3959
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 15:34:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 144BFAB395E
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 15:34:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E811518860E1
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 13:33:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8345F1883775
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 13:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C7F2949FC;
-	Mon, 12 May 2025 13:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bK3Zssgc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9431295512;
+	Mon, 12 May 2025 13:34:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C815674E
-	for <kvm@vger.kernel.org>; Mon, 12 May 2025 13:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8402DDD2
+	for <kvm@vger.kernel.org>; Mon, 12 May 2025 13:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747056799; cv=none; b=E/BGggOkYnabRfAlv3SPHYoxddTre/zuMG3rsxnsnan1jCDdus1Am0NVw/xPvHWnufi6ER0KPPKjj89H60aF3DdcNUlCkg5BudUuT+x0AlLFSSYOcU5OFgiBztfcTbXb1FdE2TWhAEuplGxUwBbt/9WO0rEN2kMbADsp0rzPLdg=
+	t=1747056870; cv=none; b=B9lf5hi/cHrcQw5k+yzP+tIuMBOtxN6OHh/kO7yovf+uF591E46MxZPiFmPYWQrpodudQmrOt/neANa5XPdP7GJeH6XtAuuccfBHZcqkDuNh6k4C702QkH/rPW6L+70vzkR+xZWtXjUsff6Q5kCrZXOmko6MoyIYStuqCNP+jcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747056799; c=relaxed/simple;
-	bh=F7j3cep47puNwkdI95QJzzsEY4MpzPeMA6iUkercExs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SyP/C+1onJbPX6BSedKyfjT3CJ3PWZkUVl30taJjjxT4tdohCx2qlYr04WVqlihUA4WNbNlXYF5BUOInWXq9nzey2hBK2QZCIcFREtg8rgoBe9NJUxgECydW+7LxE62Q+WVJSkxLKgGvjYSp57QhPzl79AI4wR+FGAbsWxVKekg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bK3Zssgc; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747056798; x=1778592798;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=F7j3cep47puNwkdI95QJzzsEY4MpzPeMA6iUkercExs=;
-  b=bK3Zssgc8WQxXhhFAFnh/xeAjzQGldHBH+/xhMISnk6ai2quRCGgoo1X
-   c6Z3il0ahMADTlz0DJQrQHGT/dUtPrEMm9vTHqp6LdDODzMVKPdnM4JqB
-   tYFfh4+K7Ad7DbaMU/TJ3ROYgKooOzjPSC1pNU2CC3I89AIByq7Zehv7Q
-   Tqqso0/02s90HM2IRRk0Iok23Vjl/HzyeV+HwDXIoFC7LYctbM/PnUFJK
-   zxF1OvPC0j5quUYR7l2x2hk7C3yQcEHQw1wz3Hqaq9IKgq6bsX6rWOeei
-   GiNMOVBrcuOOsluTAxDHdVlveBhpTmDWIU437CnD6vCZkkVdJuGuivWJy
-   g==;
-X-CSE-ConnectionGUID: XRLwSzvTS6O4NveA5shidg==
-X-CSE-MsgGUID: JKwYrNWdTGGlpxaW1l5naA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="47960751"
-X-IronPort-AV: E=Sophos;i="6.15,282,1739865600"; 
-   d="scan'208";a="47960751"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 06:33:17 -0700
-X-CSE-ConnectionGUID: 8a8HyKboSVah4ASvPQPnYQ==
-X-CSE-MsgGUID: zzCrsy+8RXOjD7uwBo8uaA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,282,1739865600"; 
-   d="scan'208";a="137081420"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 06:33:10 -0700
-Message-ID: <e5a305cc-4c8b-48df-99fe-539ebd9b72f9@intel.com>
-Date: Mon, 12 May 2025 21:33:06 +0800
+	s=arc-20240116; t=1747056870; c=relaxed/simple;
+	bh=4Vv5Yavxgz87k3KuWmpKhv4WsaWKlfAaBZkeX599/AI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=b+IZK64Ql+9GmfEex/HV+a9BuLxtIBjH1oR83qoNduJC7NV6v2RkW4c6BA1c7NefhOfjRRPUU+oNza+gxyOhXOw22aeI4R4rBY+cd4/nRpXtgzPGC9cTT+xSAZkVR1ehnJjCoaI34Br9T6dn7L1dPmPdS9imkofbtv4TjPnzhnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3da731b7df8so43272425ab.1
+        for <kvm@vger.kernel.org>; Mon, 12 May 2025 06:34:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747056868; x=1747661668;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z9j2UdJGB9ncPUm9WnqkIs+crKjDK28ACVt9UMi6y/c=;
+        b=n5Z20XmcLSyQHVDejvGI/IVHYRR1VTLxLN/iX2OEZXR6uCdyTbGH1NhGUcPfokB/ns
+         TskopNVvHqBbf/7O1wOvHuSX/JV1W0FaXz7tukcYt0i4yCi1pVQBID/mpmOo1xNXuoVf
+         hQ+VCNotSFHoMztDjdwBSojr/zPCit3VBPbld2rKdnck3ZpcgZucjiKX9vI3XGTUKLQQ
+         QDOBl5zPdn5o+FO+p6KaTbXXshrssUfUNob8T8F58nvDanf0uNW45NgKvyYIcz2Eejla
+         C69ZpAK/daA9KNvqciB0uN/CvlAkdOA+SC/DFsc2clD9PoiKQ8fWctC0TH2PNMJoXauN
+         s1ZA==
+X-Gm-Message-State: AOJu0Yy9ByxtrnJvEKkg+AXqyyYAPuiTMcmCnzPOJ6XgzSX8QwkIgmHM
+	EANu6C3+QIApu9ak5aZPJUEed5UzLuV28FgwPIfuJ7r3Sf1wO+36aMmtYg7/j8FE7G88Ge4duDE
+	7p0XLoKHvPkaG3CiVEhMSq5E4bDJucNLzQ0NUETLMHbO6Nx+su69jqys=
+X-Google-Smtp-Source: AGHT+IHHriIn233CQCM00NI3zG6RxV1LoxUc7TKJ43olQ7KOLrk7exRKx9VgDgN+GkhkyaOpluyPTlV/aeUW3UE5tSTki/ffnh8X
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: How to mark internal properties
-To: Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Zhao Liu <zhao1.liu@intel.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- kvm@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Yi Liu <yi.l.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-riscv@nongnu.org,
- Weiwei Li <liwei1518@gmail.com>, Amit Shah <amit@kernel.org>,
- Yanan Wang <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>,
- Palmer Dabbelt <palmer@dabbelt.com>, Ani Sinha <anisinha@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Fabiano Rosas <farosas@suse.de>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
- =?UTF-8?Q?Cl=C3=A9ment_Mathieu--Drif?= <clement.mathieu--drif@eviden.com>,
- qemu-arm@nongnu.org, =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?=
- <marcandre.lureau@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
- Jason Wang <jasowang@redhat.com>
-References: <20250508133550.81391-1-philmd@linaro.org>
- <20250508133550.81391-13-philmd@linaro.org>
- <23260c74-01ba-45bc-bf2f-b3e19c28ec8a@intel.com> <aB2vjuT07EuO6JSQ@intel.com>
- <2f526570-7ab0-479c-967c-b3f95f9f19e3@redhat.com>
- <CAFEAcA-kuHvxjuV_cMh-Px3C-k2Gd51jFqhwndO52vm++M_jAA@mail.gmail.com>
- <aCG6MuDLrQpoTqpg@redhat.com> <87jz6mqeu5.fsf@pond.sub.org>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <87jz6mqeu5.fsf@pond.sub.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:2612:b0:3da:70a8:5b26 with SMTP id
+ e9e14a558f8ab-3da7e2b03dbmr135754495ab.0.1747056868146; Mon, 12 May 2025
+ 06:34:28 -0700 (PDT)
+Date: Mon, 12 May 2025 06:34:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6821f8e4.050a0220.f2294.0062.GAE@google.com>
+Subject: [syzbot] Monthly kvm report (May 2025)
+From: syzbot <syzbot+lista6f7ce0ccccfec4c13d0@syzkaller.appspotmail.com>
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 5/12/2025 6:54 PM, Markus Armbruster wrote:
-> Daniel P. Berrangé<berrange@redhat.com> writes:
-> 
->> On Mon, May 12, 2025 at 09:46:30AM +0100, Peter Maydell wrote:
->>> On Fri, 9 May 2025 at 11:04, Thomas Huth<thuth@redhat.com> wrote:
->>>> Thanks for your clarifications, Zhao! But I think this shows again the
->>>> problem that we have hit a couple of times in the past already: Properties
->>>> are currently used for both, config knobs for the users and internal
->>>> switches for configuration of the machine. We lack a proper way to say "this
->>>> property is usable for the user" and "this property is meant for internal
->>>> configuration only".
->>>>
->>>> I wonder whether we could maybe come up with a naming scheme to better
->>>> distinguish the two sets, e.g. by using a prefix similar to the "x-" prefix
->>>> for experimental properties? We could e.g. say that all properties starting
->>>> with a "q-" are meant for QEMU-internal configuration only or something
->>>> similar (and maybe even hide those from the default help output when running
->>>> "-device xyz,help" ?)? Anybody any opinions or better ideas on this?
->>> I think a q-prefix is potentially a bit clunky unless we also have
->>> infrastructure to say eg DEFINE_INTERNAL_PROP_BOOL("foo", ...)
->>> and have it auto-add the prefix, and to have the C APIs for
->>> setting properties search for both "foo" and "q-foo" so you
->>> don't have to write qdev_prop_set_bit(dev, "q-foo", ...).
+Hello kvm maintainers/developers,
 
-> If we make intent explicit with DEFINE_INTERNAL_PROP_FOO(), is repeating
-> intent in the name useful?
+This is a 31-day syzbot report for the kvm subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/kvm
 
-+1 for DEFINE_INTERNAL_PROP_FOO(). I have the same thought.
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 129 have already been fixed.
 
-We need something in code to restrict the *internal* property really 
-internal, i.e., not user settable. What the name of the property is 
-doesn't matter.
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 506     Yes   WARNING: locking bug in kvm_xen_set_evtchn_fast
+                  https://syzkaller.appspot.com/bug?extid=919877893c9d28162dc2
+<2> 6       Yes   WARNING in __kvm_gpc_refresh (3)
+                  https://syzkaller.appspot.com/bug?extid=cde12433b6c56f55d9ed
+<3> 6       Yes   WARNING in vcpu_run
+                  https://syzkaller.appspot.com/bug?extid=1522459a74d26b0ac33a
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
