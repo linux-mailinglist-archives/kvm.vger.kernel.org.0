@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-46223-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46224-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86253AB423A
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 20:20:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51303AB434D
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 20:32:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E797F16E81B
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 18:19:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 038DD7B8C2C
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 18:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8042BF96C;
-	Mon, 12 May 2025 18:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58C22297B6D;
+	Mon, 12 May 2025 18:05:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U1TMv4s4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wlfw4hv+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643432BF3C0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153B02BF3CE
 	for <kvm@vger.kernel.org>; Mon, 12 May 2025 18:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747073134; cv=none; b=WIFVZrqnnsNR9BKFQGmi/7cbkKunqSA7weFrDwLgwRYm7wVAE/+SzRgX5I904+3xdT37KOSQlCsg/nJ2jZUNrbnuIEHvssWRuFbCDNYAN3DEfVRTPW94RLPMfKARcVMYrWxHmQ0sj8p5e42EElXz/IkOIZW1EB+JT1lSIEzkIHo=
+	t=1747073134; cv=none; b=O7t9CSOfGM1501bk4wMWi6PYqWU4bdrYwJbrVg5QGDX/LcMZY7r/PUZdmnx50/wAUn6yUG+zekMZ/29QuEUGwJ1HoUetguxPfpDt4YZgtrlJA0Dizjz0rltWzKI12HzL6fAMET/UWyRouSm0JcoSLx8NDH3uIIkOUt4E+RxUJdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747073134; c=relaxed/simple;
-	bh=tZh69ADPoa8BGKnVUC7QOrC98CkpyE3YFEBrIYEQvvA=;
+	bh=0ND4mB9JS7urQpEVchws9S6EzmrvFhsdvB7VUnUD0HI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bJUZl4zIH5nUmWqZE7Znj87+ks1YoVm1gLe9DkhMGRzjLw2/C0hrqY9vCZOYU2kd3xIwtxtkvQS8dXEwMC80AgDrS0qh/JfFqkZDzEy2n9+0RnXbb+Wx8HNzhYG/jPPIAv22T8FZu2Pdf1Zh3z1gvlWOD1FShQn62i8LDOIZO5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=U1TMv4s4; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=LXkoCHMEZQN5jPFufJcx9HJr806mx0HEZOB3bCMT6XzWF8kS75KHVF4YIiILORlsxLGk2HaVl5iyRsp53mRZYS34ipOwfVXIDQ01KGyM2G9fSsWRabj1m3utuxyzwf76NI68JLyjBobFfJP6ku+ooX3pIUi7uypYA9aUZ4+vO0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wlfw4hv+; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-22fa47d6578so48223035ad.2
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-22e7eff58a0so47382255ad.3
         for <kvm@vger.kernel.org>; Mon, 12 May 2025 11:05:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1747073131; x=1747677931; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1747073132; x=1747677932; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QH1qfLH+/zCru9XWBwZx/jkW56FRhaJPBlyr85eQl0I=;
-        b=U1TMv4s4DT4vBYoVu6LuRAb0B0h14yKCoEYrpvz1SuzCqpv/J6F3cXBokV2GNyPH+m
-         2OJTnPt8VBO0lrFiBMkPGi4+UuimCwWW1aLh73ZEHn4ohtPCNNSEhwLROn8nNPlhveZD
-         H5ZPjYvmQ6t6HEleYn6FmvntEwfopTjyPzaGkN36Gd+bbHZG45OfI6oGeiacW8gNQkQo
-         UGAQbdMhnK1biBJSYQi6LL1uQwP3KQle9qae+7BP13XzGTBHZkXajMB3ObhRgnRZRtwT
-         yLTRWnPEL58Fb0n55/mO9i1UkNE1eGu9XrPX1EFXWCKnB6e73lXRmIlau7nsI1edyHpr
-         YkYw==
+        bh=4DYtSZEbP1atLGb677pRK4UuiMz1CYlbqC5aWBJkLTc=;
+        b=wlfw4hv+2euvLIOuP4D/BF3cZlDITxtnGNbr6v+E2xdwJB0sCOIJvt5tu/fRM3DskI
+         GXFP+31ntEetm99IVDGoaBhfCyKkg7VeXI9aqCn9QL1VTQNquu4pvAwgLDEZabkTZL4b
+         6mDjNCL2344XhguQb7+C9d5GYZ6RNugdzacJ3ImAeFfxjbdy5BvWqUMlktCaeI8MnH/x
+         U7PVnibPOXZxdFfLEOM7d9pUxca/67r9tk7wyMlia903xmEl7XU2TGTd1qJ0+XmVB080
+         KMYJ61whzdXALwyVC63gq4BXFTSdTYrIEA3ks6do/GmdPYoZ3C7tfwmxtya/Ew8gp2j4
+         8uzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747073131; x=1747677931;
+        d=1e100.net; s=20230601; t=1747073132; x=1747677932;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QH1qfLH+/zCru9XWBwZx/jkW56FRhaJPBlyr85eQl0I=;
-        b=dh+op+0qQhctkp7nDuqwQ5n+uJ2P8GbB7xAcksyEvrFl1FmK2Qoy4J5YuCJbFoADHz
-         +0wBjUOBv801SNE9sm6FkF5LPcXmH3IOXe2TQuusT6A6OnWS+5MRarVMIZcjqra0lcrX
-         fsTutkdogULfugazzCMKHM2HoOV8Toljr7ETpBxbmWh0/UwcmgdL6QVQI3jKTcNpar4x
-         sParIxFA2+iOW7Skj9ifXV0M6FcDwZvGM3YogQiyHiCZNPuPMCH6K5ZxtQL/5jQ01C2r
-         7GgABfaUGwkAaqi0uybB8jGE5BaAcms95/XuHDCJGcwfbd321wHBhEnOa41AZYBF0k4W
-         77Sg==
-X-Forwarded-Encrypted: i=1; AJvYcCXJNtVaZVcAn86GstrvYx9cgSSFLv/0zScLN1BupZfgrVcQAZxjumC28SSiGeIQFS8Tg40=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yye0pKzC4PEYO/J1FSGD+DWHmJPG9mf24Z0fi2WdKUY35uJH636
-	1bldstAu+r7TeVTOTZWuFJLGWIRmy3prkZEc06C4KH2x8ibU5scSE8J9pUHEWEU=
-X-Gm-Gg: ASbGnctpGpnPxm5BRbLAO1p3LC0X27TkYpcI94hvazteC1PXPpX4r1us4hfP3fddLqv
-	2cA/NKluv/s3a+KHCLb8cgcci60jluj0a3ns9i/JqRxmZPrCinu/ru1ZqHk2EP8Tj580XmCqlMI
-	J0VU+Ur6oc5nlNAk1uY6YIFHQQayXdcLY/TvhyXa6dcQqLbeBM1LTkrwEcAvVPfS37Uoi5ncZ74
-	+JNj87QtHvj6OMaKpwPg5rpcO+dgR+BSYfTqZFLTGgFTFSpFNEjbM9lzKbTNxZdd5LA5xK7KQe3
-	HESwnbMi7uQPpVbdSIN8GChXC5oIlInJsNyQVnePm9Olztwf1xA=
-X-Google-Smtp-Source: AGHT+IE3cGskjzjRojgLkr1I7mB9wKn6lFQ8dcZYSyN1P9AGSzZnigX6VHGug8trK7WU8FJVQVXhIg==
-X-Received: by 2002:a17:902:c406:b0:22e:7e00:4288 with SMTP id d9443c01a7336-22fc91cb78bmr201982785ad.53.1747073131634;
-        Mon, 12 May 2025 11:05:31 -0700 (PDT)
+        bh=4DYtSZEbP1atLGb677pRK4UuiMz1CYlbqC5aWBJkLTc=;
+        b=iFpgpDT0pN3wNZ4yp1Vv/yAoX9NnWL51pG3Ux9GhPtBnkxpZZpFf3dGL+3btCNSG01
+         m12Jyod5iwyQoIFkARyPovd3agrw626cudsRAmCNF/ZCO3/ssgnCRN78ir9lE/9ckFcP
+         kBscxk8P9PPk/iWkhYi8fpnCk4fvl9y92YnxQEEGQ+jMWjfubHbIjWLwWHh+HTand1b6
+         bX93rliTlCKgpZJHArKYBv+BmsFsTpx9D5eInTdOdB3W3I0oLLUNoKrPr1EwxCP4xWrR
+         bCBYXeuwksyUM/4qGmHqBI8lwWKlA0gr3N+gOKRWuUGadw27moq2ad2uuNiDRATKyP/m
+         DZ5A==
+X-Forwarded-Encrypted: i=1; AJvYcCVk606gjmRgfYKg5bWlNhk7G13/9GE3rMtOPSODoc6HPMSUrKhNWpRY1U269udAGiIn7xk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywc6pQGggeRH6jrWTCXY9U3oWZICnr+G4tduOztZ9bCaBWLcXcZ
+	1eeuKSifHSa2IxMCGLbhKLdlourKxQuAIPsSLOqQEAsakfC5PGAMUhoINH50OW0=
+X-Gm-Gg: ASbGncsgeh9dThnjDyoqsCWOJH/bhPrxHdVX4Iovx2t3VqNWJyi1K2O3SuR97/9t0E9
+	ye9UPQ0w1hwu0NLVHk+9vuyZhcIdcuL5+/736jmNWwonbIc+kzk2oohShYOhPPWoLG9B12Prrbk
+	V96TIIh/PvwUbJk4lHSL3V6kedguBBMvN6H3EX9DKEV2VhfjE9E7GDCC0X9+/a1bjyQJ/Njps1W
+	2ElURRwf/pTULxGPUF88KUXKXc2u01Xabv2lqhXkkOQpGA3700dGBx+BQ08eOOkB+soFHseLS2B
+	+01GpeN7x3QHJZfQGzhgXnC37/f87DRTX8TrFRYxT93CYeiH+6g=
+X-Google-Smtp-Source: AGHT+IEUchA3BCwBh+OJ1cNAY6I61vJmEW2d9AGpseNu/E7o6pb1DxCo2KJeldjr8AJ2t8R3hCpqEA==
+X-Received: by 2002:a17:903:40ce:b0:22e:4a24:5781 with SMTP id d9443c01a7336-22fc8b79590mr203976175ad.30.1747073132481;
+        Mon, 12 May 2025 11:05:32 -0700 (PDT)
 Received: from pc.. ([38.41.223.211])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc82a2e4fsm65792005ad.232.2025.05.12.11.05.30
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc82a2e4fsm65792005ad.232.2025.05.12.11.05.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 11:05:31 -0700 (PDT)
+        Mon, 12 May 2025 11:05:32 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
@@ -83,9 +83,9 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v8 22/48] target/arm/helper: remove remaining TARGET_AARCH64
-Date: Mon, 12 May 2025 11:04:36 -0700
-Message-ID: <20250512180502.2395029-23-pierrick.bouvier@linaro.org>
+Subject: [PATCH v8 23/48] target/arm/helper: compile file twice (user, system)
+Date: Mon, 12 May 2025 11:04:37 -0700
+Message-ID: <20250512180502.2395029-24-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250512180502.2395029-1-pierrick.bouvier@linaro.org>
 References: <20250512180502.2395029-1-pierrick.bouvier@linaro.org>
@@ -97,68 +97,40 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-They were hiding aarch64_sve_narrow_vq and aarch64_sve_change_el, which
-we can expose safely.
-
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- target/arm/helper.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ target/arm/meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 92a975bbf78..aae8554e8f2 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -29,6 +29,7 @@
- #include "qemu/guest-random.h"
- #ifdef CONFIG_TCG
- #include "accel/tcg/probe.h"
-+#include "accel/tcg/getpc.h"
- #include "semihosting/common-semi.h"
- #endif
- #include "cpregs.h"
-@@ -6565,9 +6566,7 @@ static void zcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-      */
-     new_len = sve_vqm1_for_el(env, cur_el);
-     if (new_len < old_len) {
--#ifdef TARGET_AARCH64
-         aarch64_sve_narrow_vq(env, new_len + 1);
--#endif
-     }
- }
+diff --git a/target/arm/meson.build b/target/arm/meson.build
+index 48a6bf59353..c8c80c3f969 100644
+--- a/target/arm/meson.build
++++ b/target/arm/meson.build
+@@ -2,7 +2,6 @@ arm_ss = ss.source_set()
+ arm_common_ss = ss.source_set()
+ arm_ss.add(files(
+   'gdbstub.c',
+-  'helper.c',
+   'vfp_fpscr.c',
+ ))
+ arm_ss.add(zlib)
+@@ -32,6 +31,7 @@ arm_user_ss.add(when: 'TARGET_AARCH64', if_false: files(
+ ))
+ arm_user_ss.add(files(
+   'debug_helper.c',
++  'helper.c',
+ ))
  
-@@ -10625,9 +10624,7 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
-          * Note that new_el can never be 0.  If cur_el is 0, then
-          * el0_a64 is is_a64(), else el0_a64 is ignored.
-          */
--#ifdef TARGET_AARCH64
-         aarch64_sve_change_el(env, cur_el, new_el, is_a64(env));
--#endif
-     }
+ arm_common_system_ss.add(files('cpu.c'), capstone)
+@@ -39,6 +39,7 @@ arm_common_system_ss.add(when: 'TARGET_AARCH64', if_false: files(
+   'cpu32-stubs.c'))
+ arm_common_system_ss.add(files(
+   'debug_helper.c',
++  'helper.c',
+ ))
  
-     if (cur_el < new_el) {
-@@ -11418,7 +11415,6 @@ ARMMMUIdx arm_mmu_idx(CPUARMState *env)
-     return arm_mmu_idx_el(env, arm_current_el(env));
- }
- 
--#ifdef TARGET_AARCH64
- /*
-  * The manual says that when SVE is enabled and VQ is widened the
-  * implementation is allowed to zero the previously inaccessible
-@@ -11530,12 +11526,9 @@ void aarch64_sve_change_el(CPUARMState *env, int old_el,
- 
-     /* When changing vector length, clear inaccessible state.  */
-     if (new_len < old_len) {
--#ifdef TARGET_AARCH64
-         aarch64_sve_narrow_vq(env, new_len + 1);
--#endif
-     }
- }
--#endif
- 
- #ifndef CONFIG_USER_ONLY
- ARMSecuritySpace arm_security_space(CPUARMState *env)
+ subdir('hvf')
 -- 
 2.47.2
 
