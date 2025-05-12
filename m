@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-46147-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46150-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76B1BAB3287
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 11:00:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB415AB328C
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 11:01:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01072189C876
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 09:00:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B53C189484C
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 09:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E4325A325;
-	Mon, 12 May 2025 08:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D87E26656B;
+	Mon, 12 May 2025 08:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HAxHghDU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dyqNmqy8"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEA025A2A6;
-	Mon, 12 May 2025 08:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F047E25B691;
+	Mon, 12 May 2025 08:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747040264; cv=none; b=cSTtPvAxCpDNw0Q5Y1aoiEPYC6Dqk6UxNoERUHzv6YBiqDN5SN0NsZaott0HOExMB593Sdrf6s6e8siwIIaxYd45o3wPvCxl5CPXt5TC9tV+B0tU7DSExyz6ZCipfV5OOAJhEbRRXfBw3cd8+RGVlImwPcbGS+n/d224BEYQqzw=
+	t=1747040268; cv=none; b=B9VvuZX+XtRzG8Y5MUKvcU/KOie1rcr/3kUorVpzlqb25x8eu3iZtyi/q33y4hh2vQr9U1WTivhVlOsmd/8pUEX2GSY8ztPSGvqDKUqHtksGWWRKBNEjOeL4/JV5JCoRor/RubAUbr6JH9nr0A3YTws8WXJ/gG8SCa2kRUbO3H8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747040264; c=relaxed/simple;
-	bh=2hwfJlxtKCrmA/U7kWwtPfgBIj+XASaD+BQF4ujJlQA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h42AfwNpSPWyGm5+Vp/zWzgoKaq58B253Z83vXQuYZWrB76bfQyMIUMrQMWqQkSeAhuu0fj3ewsZvjIbTfhL9DIDObB4TZDLZ8gkeQwmj6Hz3m+iYo284Z5l9UAxHRjGRGNa1wx+aEGA0d/w9vUpv6oKNfSRIBpRnl4bILlwLxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HAxHghDU; arc=none smtp.client-ip=192.198.163.9
+	s=arc-20240116; t=1747040268; c=relaxed/simple;
+	bh=+hNZSzs+UU0rkjlXcA84b2Bq54FhNUxCpNk6I3td9qg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rvSPOl7c+wzGJ2AI/QJR4NsVd1tqiRes2bxnXeD4dPuQXA6Ww6+JtwwV9XbT3EichOJVbv8nuT8rDo6S+nFKIKy6QtPJk5/e/Mg6QYu3nd4Ob6p4YWEVaeZPQ+SRsSydVogYADQl6Oa+zVpsXOCPzXQgEAve/K/NHIqt31Gj+EQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dyqNmqy8; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747040263; x=1778576263;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2hwfJlxtKCrmA/U7kWwtPfgBIj+XASaD+BQF4ujJlQA=;
-  b=HAxHghDUOaW68hwHyh1oFRGkoAr3TGUroI9Mp8PXB3Wfn1GI4kJFRzN0
-   lMV7QnGct5Vds2gvjPY0/cvueQXafhPMtp81JGboUiVF8bzMYslnf0RBT
-   mZzmFZs8X1TK2sRIz9NK8dYnudEsJu/SOtHOYUHGXqz4S4v8uylTZZnuo
-   WWExptrXFlsmDpqWyNzkJMJlgMINWD/QGZ1r3KUD22zCpiFDVYcXP2gIT
-   t3caZoMO9hTskzKA0v75Qs5GxGqVxLoyXNK5FE9YCw9sDO1KQLsqzj113
-   +j7mF5SfXMQyC/S28RmpeMTeptJSC4pDikYX79E1+8AtpYYE5++HmQ5Gh
-   w==;
-X-CSE-ConnectionGUID: +FkhSPRTS9ueuzqfBd6ysA==
-X-CSE-MsgGUID: i0xJIGAJSSuOHrc0/huFQg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11430"; a="59488677"
+  t=1747040265; x=1778576265;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+hNZSzs+UU0rkjlXcA84b2Bq54FhNUxCpNk6I3td9qg=;
+  b=dyqNmqy8GaJtLdGswb7BcpF0xj2EIyhgk1VbsuFiAxemcf9XhwiFi+tD
+   KWnelDuywME4RAmGhCEd5FZrHkeyoRmn/KKEhKXeLQnM08j+Q6GgrfYwR
+   weCSa90Y+wTb1FYJ5/y3UutaL2QA8p8jcigu4h+91VkWOaVFvx1cX9+yQ
+   lCyPtkfN2HZPtwFSMXChlIBYuKDwFRDZoJdM5ybMzJsyjj0O1Y2P5Jk2t
+   pY5XENSMQJmCOE9wB8+BnVhboZnQ+XePRiO1qeyXMrwfOHYWYXG5kUVb2
+   PzPYACIpLNwGzyPG3OUeZ3lQsD8eSJ9Xa+Ig9i1JKVV/8sXP5+r90Yob5
+   Q==;
+X-CSE-ConnectionGUID: dLcqbt58SW2jcvyKMWFFgw==
+X-CSE-MsgGUID: 6PkiyQKwRoumycdJSwSTqw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11430"; a="59488692"
 X-IronPort-AV: E=Sophos;i="6.15,281,1739865600"; 
-   d="scan'208";a="59488677"
+   d="scan'208";a="59488692"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 01:57:42 -0700
-X-CSE-ConnectionGUID: rC1bDCljTv+3nTsch+G/Xg==
-X-CSE-MsgGUID: ZDoCbOdQS/uiChmcW5EFKA==
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 01:57:44 -0700
+X-CSE-ConnectionGUID: eDU5l9WKQp2Mq9YEp1dZiw==
+X-CSE-MsgGUID: /0EaOvfmQACyWE7Up/w+1w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,281,1739865600"; 
-   d="scan'208";a="138235770"
+   d="scan'208";a="138235776"
 Received: from 984fee019967.jf.intel.com ([10.165.54.94])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 01:57:42 -0700
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 01:57:44 -0700
 From: Chao Gao <chao.gao@intel.com>
 To: x86@kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -73,132 +74,204 @@ Cc: peterz@infradead.org,
 	chang.seok.bae@intel.com,
 	xin3.li@intel.com,
 	Chao Gao <chao.gao@intel.com>,
-	Aruna Ramakrishna <aruna.ramakrishna@oracle.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Eric Biggers <ebiggers@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
 	Ingo Molnar <mingo@redhat.com>,
-	Kees Cook <kees@kernel.org>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Samuel Holland <samuel.holland@sifive.com>,
 	Mitchell Levy <levymitchell0@gmail.com>,
+	Kees Cook <kees@kernel.org>,
+	Stanislav Spassov <stanspas@amazon.de>,
+	Eric Biggers <ebiggers@google.com>,
 	Nikolay Borisov <nik.borisov@suse.com>,
 	Oleg Nesterov <oleg@redhat.com>,
-	Samuel Holland <samuel.holland@sifive.com>,
-	Sohil Mehta <sohil.mehta@intel.com>,
-	Stanislav Spassov <stanspas@amazon.de>,
-	Uros Bizjak <ubizjak@gmail.com>,
-	Vignesh Balasubramanian <vigbalas@amd.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v7 0/6] Introduce CET supervisor state support
-Date: Mon, 12 May 2025 01:57:03 -0700
-Message-ID: <20250512085735.564475-1-chao.gao@intel.com>
+	Vignesh Balasubramanian <vigbalas@amd.com>
+Subject: [PATCH v7 1/6] x86/fpu/xstate: Differentiate default features for host and guest FPUs
+Date: Mon, 12 May 2025 01:57:04 -0700
+Message-ID: <20250512085735.564475-2-chao.gao@intel.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250512085735.564475-1-chao.gao@intel.com>
+References: <20250512085735.564475-1-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Dear maintainers and reviewers,
+Currently, guest and host FPUs share the same default features. However,
+the CET supervisor xstate is the first feature that needs to be enabled
+exclusively for guest FPUs. Enabling it for host FPUs leads to a waste of
+24 bytes in the XSAVE buffer.
 
-I kindly request your consideration for merging this series. Most of
-patches have received Reviewed-by/Acked-by tags.
+To support "guest-only" features, add a new structure to hold the
+default features and sizes for guest FPUs to clearly differentiate them
+from those for host FPUs.
 
-Thanks Chang, Rick, Xin, Sean and Dave for their help with this series.
+Note that,
+1) for now, the default features for guest and host FPUs remain the
+same. This will change in a follow-up patch once guest permissions, default
+xfeatures, and fpstate size are all converted to use the guest defaults.
 
-== Changelog ==
-v6->v7:
- - Collect reviews from Rick
- - Tweak __fpstate_reset() to handle guest fpstate rather than adding a
-   guest-specific reset function (Sean & Dave)
- - Fold xfd initialization into __fpstate_reset() (Sean)
- - v6: https://lore.kernel.org/all/20250506093740.2864458-1-chao.gao@intel.com/
+2) only supervisor features will diverge between guest FPUs and host
+FPUs, while user features will remain the same [1][2]. So, the new
+vcpu_fpu_config struct does not include default user features and size
+for the UABI buffer.
 
-== Background ==
+An alternative approach is adding a guest_only_xfeatures member to
+fpu_kernel_cfg and adding two helper functions to calculate the guest
+default xfeatures and size. However, calculating these defaults at runtime
+would introduce unnecessary overhead.
 
-CET defines two register states: CET user, which includes user-mode control
-registers, and CET supervisor, which consists of shadow-stack pointers for
-privilege levels 0-2.
+Suggested-by: Chang S. Bae <chang.seok.bae@intel.com>
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Link: https://lore.kernel.org/kvm/aAwdQ759Y6V7SGhv@google.com/ [1]
+Link: https://lore.kernel.org/kvm/9ca17e1169805f35168eb722734fbf3579187886.camel@intel.com/ [2]
+---
+v7: add Rick's Reviewed-by
 
-Current kernel disables shadow stacks in kernel mode, making the CET
-supervisor state unused and eliminating the need for context switching.
+v6:
+Drop vcpu_fpu_config.user_* (Rick)
+Reset guest default size when XSAVE is unavaiable or disabled (Chang)
 
-== Problem ==
+v5:
+Add a new vcpu_fpu_config instead of adding new members to
+fpu_state_config (Chang)
+Extract a helper to set default values (Chang)
+---
+ arch/x86/include/asm/fpu/types.h | 26 ++++++++++++++++++++++++++
+ arch/x86/kernel/fpu/core.c       |  1 +
+ arch/x86/kernel/fpu/init.c       |  1 +
+ arch/x86/kernel/fpu/xstate.c     | 27 +++++++++++++++++++++------
+ 4 files changed, 49 insertions(+), 6 deletions(-)
 
-To virtualize CET for guests, KVM must accurately emulate hardware
-behavior. A key challenge arises because there is no CPUID flag to indicate
-that shadow stack is supported only in user mode. Therefore, KVM cannot
-assume guests will not enable shadow stacks in kernel mode and must
-preserve the CET supervisor state of vCPUs.
-
-== Solution ==
-
-An initial proposal to manually save and restore CET supervisor states
-using raw RDMSR/WRMSR in KVM was rejected due to performance concerns and
-its impact on KVM's ABI. Instead, leveraging the kernel's FPU
-infrastructure for context switching was favored [1].
-
-The main question then became whether to enable the CET supervisor state
-globally for all processes or restrict it to vCPU processes. This decision
-involves a trade-off between a 24-byte XSTATE buffer waste for all non-vCPU
-processes and approximately 100 lines of code complexity in the kernel [2].
-The agreed approach is to first try this optimal solution [3], i.e.,
-restricting the CET supervisor state to guest FPUs only and eliminating
-unnecessary space waste.
-
-Key changes in this series are:
-
-1) Fix existing issue regarding enabling guest supervisor states support.
-2) Add default features and size for guest FPUs.
-3) Add infrastructure to support guest-only features.
-4) Add CET supervisor state as the first guest-only feature.
-
-With the series in place, guest FPUs have xstate_bv[12] == xcomp_bv[12] == 1
-and CET supervisor state is saved/reloaded when xsaves/xrstors executes on
-guest FPUs. non-guest FPUs have xstate_bv[12] == xcomp_bv[12] == 0, then
-CET supervisor state is not saved/restored.
-
-== Performance ==
-
-We measured context-switching performance with the benchmark [4] in following
-three cases.
-
-case 1: the baseline. i.e., this series isn't applied
-case 2: baseline + this series. CET-S space is allocated for guest fpu only.
-case 3: baseline + allocate CET-S space for all tasks. Hardware init
-        optimization avoids writing out CET-S space on each XSAVES.
-
-The performance differences in the three cases are very small and fall within the
-run-to-run variation.
-
-[1]: https://lore.kernel.org/kvm/ZM1jV3UPL0AMpVDI@google.com/
-[2]: https://lore.kernel.org/kvm/1c2fd06e-2e97-4724-80ab-8695aa4334e7@intel.com/
-[3]: https://lore.kernel.org/kvm/2597a87b-1248-b8ce-ce60-94074bc67ea4@intel.com/
-[4]: https://github.com/antonblanchard/will-it-scale/blob/master/tests/context_switch1.c
-
-Chao Gao (4):
-  x86/fpu/xstate: Differentiate default features for host and guest FPUs
-  x86/fpu: Initialize guest FPU permissions from guest defaults
-  x86/fpu: Initialize guest fpstate and FPU pseudo container from guest
-    defaults
-  x86/fpu: Remove xfd argument from __fpstate_reset()
-
-Yang Weijiang (2):
-  x86/fpu/xstate: Introduce "guest-only" supervisor xfeature set
-  x86/fpu/xstate: Add CET supervisor xfeature support as a guest-only
-    feature
-
- arch/x86/include/asm/fpu/types.h  | 49 +++++++++++++++++++++++++++----
- arch/x86/include/asm/fpu/xstate.h |  9 ++++--
- arch/x86/kernel/fpu/core.c        | 49 ++++++++++++++++++++++---------
- arch/x86/kernel/fpu/init.c        |  1 +
- arch/x86/kernel/fpu/xstate.c      | 40 ++++++++++++++++++++-----
- arch/x86/kernel/fpu/xstate.h      |  5 ++++
- 6 files changed, 123 insertions(+), 30 deletions(-)
-
+diff --git a/arch/x86/include/asm/fpu/types.h b/arch/x86/include/asm/fpu/types.h
+index 1c94121acd3d..abd193a1a52e 100644
+--- a/arch/x86/include/asm/fpu/types.h
++++ b/arch/x86/include/asm/fpu/types.h
+@@ -551,6 +551,31 @@ struct fpu_guest {
+ 	struct fpstate			*fpstate;
+ };
+ 
++/*
++ * FPU state configuration data for fpu_guest.
++ * Initialized at boot time. Read only after init.
++ */
++struct vcpu_fpu_config {
++	/*
++	 * @size:
++	 *
++	 * The default size of the register state buffer in guest FPUs.
++	 * Includes all supported features except independent managed
++	 * features and features which have to be requested by user space
++	 * before usage.
++	 */
++	unsigned int size;
++
++	/*
++	 * @features:
++	 *
++	 * The default supported features bitmap in guest FPUs. Does not
++	 * include independent managed features and features which have to
++	 * be requested by user space before usage.
++	 */
++	u64 features;
++};
++
+ /*
+  * FPU state configuration data. Initialized at boot time. Read only after init.
+  */
+@@ -606,5 +631,6 @@ struct fpu_state_config {
+ 
+ /* FPU state configuration information */
+ extern struct fpu_state_config fpu_kernel_cfg, fpu_user_cfg;
++extern struct vcpu_fpu_config guest_default_cfg;
+ 
+ #endif /* _ASM_X86_FPU_TYPES_H */
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index 1cda5b78540b..2cd5e1910ff8 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -36,6 +36,7 @@ DEFINE_PER_CPU(u64, xfd_state);
+ /* The FPU state configuration data for kernel and user space */
+ struct fpu_state_config	fpu_kernel_cfg __ro_after_init;
+ struct fpu_state_config fpu_user_cfg __ro_after_init;
++struct vcpu_fpu_config guest_default_cfg __ro_after_init;
+ 
+ /*
+  * Represents the initial FPU state. It's mostly (but not completely) zeroes,
+diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
+index 6bb3e35c40e2..e19660cdc70c 100644
+--- a/arch/x86/kernel/fpu/init.c
++++ b/arch/x86/kernel/fpu/init.c
+@@ -202,6 +202,7 @@ static void __init fpu__init_system_xstate_size_legacy(void)
+ 	fpu_kernel_cfg.default_size = size;
+ 	fpu_user_cfg.max_size = size;
+ 	fpu_user_cfg.default_size = size;
++	guest_default_cfg.size = size;
+ }
+ 
+ /*
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index 1c8410b68108..f32047e12500 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -742,6 +742,9 @@ static int __init init_xstate_size(void)
+ 	fpu_user_cfg.default_size =
+ 		xstate_calculate_size(fpu_user_cfg.default_features, false);
+ 
++	guest_default_cfg.size =
++		xstate_calculate_size(guest_default_cfg.features, compacted);
++
+ 	return 0;
+ }
+ 
+@@ -762,6 +765,7 @@ static void __init fpu__init_disable_system_xstate(unsigned int legacy_size)
+ 	fpu_kernel_cfg.default_size = legacy_size;
+ 	fpu_user_cfg.max_size = legacy_size;
+ 	fpu_user_cfg.default_size = legacy_size;
++	guest_default_cfg.size = legacy_size;
+ 
+ 	/*
+ 	 * Prevent enabling the static branch which enables writes to the
+@@ -772,6 +776,21 @@ static void __init fpu__init_disable_system_xstate(unsigned int legacy_size)
+ 	fpstate_reset(x86_task_fpu(current));
+ }
+ 
++static void __init init_default_features(u64 kernel_max_features, u64 user_max_features)
++{
++	u64 kfeatures = kernel_max_features;
++	u64 ufeatures = user_max_features;
++
++	/* Default feature sets should not include dynamic xfeatures. */
++	kfeatures &= ~XFEATURE_MASK_USER_DYNAMIC;
++	ufeatures &= ~XFEATURE_MASK_USER_DYNAMIC;
++
++	fpu_kernel_cfg.default_features = kfeatures;
++	fpu_user_cfg.default_features   = ufeatures;
++
++	guest_default_cfg.features      = kfeatures;
++}
++
+ /*
+  * Enable and initialize the xsave feature.
+  * Called once per system bootup.
+@@ -854,12 +873,8 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
+ 	fpu_user_cfg.max_features = fpu_kernel_cfg.max_features;
+ 	fpu_user_cfg.max_features &= XFEATURE_MASK_USER_SUPPORTED;
+ 
+-	/* Clean out dynamic features from default */
+-	fpu_kernel_cfg.default_features = fpu_kernel_cfg.max_features;
+-	fpu_kernel_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+-
+-	fpu_user_cfg.default_features = fpu_user_cfg.max_features;
+-	fpu_user_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
++	/* Now, given maximum feature set, determine default values */
++	init_default_features(fpu_kernel_cfg.max_features, fpu_user_cfg.max_features);
+ 
+ 	/* Store it for paranoia check at the end */
+ 	xfeatures = fpu_kernel_cfg.max_features;
 -- 
 2.47.1
 
