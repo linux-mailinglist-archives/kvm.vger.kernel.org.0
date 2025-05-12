@@ -1,146 +1,133 @@
-Return-Path: <kvm+bounces-46154-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46155-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55FB3AB32BB
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 11:07:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B16BAB33BB
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 11:35:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B122E188E92D
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 09:07:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75DEA189FBB9
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 09:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ECC7257443;
-	Mon, 12 May 2025 09:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADDB25C80B;
+	Mon, 12 May 2025 09:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CTnU96ja"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fYy0luue"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C6617BB6
-	for <kvm@vger.kernel.org>; Mon, 12 May 2025 09:07:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B7C25D526;
+	Mon, 12 May 2025 09:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747040846; cv=none; b=IbayBcwWLIcVTG9SwiJCbPp1fKx5qSELl8FtUf6EgNkvYXEboenSC8Kif7uSjsWKNNP1BMfbCbPO8e+VK4Mbfy1n37EyDSwJfETEhgRDxURjxqAo1SIxCtzNsTvrfsY+mdZLbV2YpGYVRye/lIZbjx4JY1OYIlvXSeRKgMOxTck=
+	t=1747042173; cv=none; b=VKgZZIyNZv77E9qlxz0gOSQMqvag2pBsH1i45i51vykafou/o17DsRLSei0TZaaQOlaGztskGshrtNfCpQNWaptIAxMz7brjM1TxevRm7avuJriGssVBhwOp8HoUXNMtejWIT5LPbnVTzL8PNJ5ugQax2SVVdbDireC2QE7Focs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747040846; c=relaxed/simple;
-	bh=TOcAHwmbXWBt8hhO/LpUSu7leJ3168e2PtCljpq4C6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UkEaT74Ba+wig7Dqu2n8gyT7zhzIvfqqUXfldNCO6kfpT6a0zbbTr3Gn+nKm/O21E3ylCZRGcDpIhNpyX3HmQf5CEnnNUzW0hhyYBClWOkvYrGVDnCz4HtNqhO59gVvaWZJ6X42XDYWpLEW2d6WZm/ouCOmoLHbxDKHxIBwQNbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CTnU96ja; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747040843;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=5odr4a2Xq+180JEfvS0fVAKnaUgen9zbM0bNb4Nha9w=;
-	b=CTnU96jamCzbWxO8SyuyxiWYFDUfs8KzUPw86tSwpptp44zaj+4drC3SlwsZ2xtwAceRN1
-	zXnezDxrEbuw9pDMqgF7vyf7OVN9IJDDX74QlpAsvW8Hdj7pDwtMU+44JkAJuhvay+L5Sc
-	0AJhqdqWLLv86mZh2GFQWLy6dX/YNug=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-56-W3OS7mmcMvm-XVakSNQqgA-1; Mon,
- 12 May 2025 05:07:19 -0400
-X-MC-Unique: W3OS7mmcMvm-XVakSNQqgA-1
-X-Mimecast-MFC-AGG-ID: W3OS7mmcMvm-XVakSNQqgA_1747040836
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C99FC1955DEA;
-	Mon, 12 May 2025 09:07:15 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.162])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D175119560A3;
-	Mon, 12 May 2025 09:07:01 +0000 (UTC)
-Date: Mon, 12 May 2025 10:06:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Zhao Liu <zhao1.liu@intel.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Markus Armbruster <armbru@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-	Richard Henderson <richard.henderson@linaro.org>,
-	kvm@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>, Yi Liu <yi.l.liu@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-riscv@nongnu.org,
-	Weiwei Li <liwei1518@gmail.com>, Amit Shah <amit@kernel.org>,
-	Yanan Wang <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Fabiano Rosas <farosas@suse.de>,
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-	=?utf-8?Q?Cl=C3=A9ment?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
-	qemu-arm@nongnu.org,
-	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Jason Wang <jasowang@redhat.com>
-Subject: Re: How to mark internal properties (was: Re: [PATCH v4 12/27]
- target/i386/cpu: Remove CPUX86State::enable_cpuid_0xb field)
-Message-ID: <aCG6MuDLrQpoTqpg@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20250508133550.81391-1-philmd@linaro.org>
- <20250508133550.81391-13-philmd@linaro.org>
- <23260c74-01ba-45bc-bf2f-b3e19c28ec8a@intel.com>
- <aB2vjuT07EuO6JSQ@intel.com>
- <2f526570-7ab0-479c-967c-b3f95f9f19e3@redhat.com>
- <CAFEAcA-kuHvxjuV_cMh-Px3C-k2Gd51jFqhwndO52vm++M_jAA@mail.gmail.com>
+	s=arc-20240116; t=1747042173; c=relaxed/simple;
+	bh=uA/bjrzzQG7eMN/hwUZQzo6cKMvMjHSVAhAY1sOfp7Y=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=qqX1CqLVgY4duSs8ROhfgwyvpahmyXwoIeuMSuZuibpR8345SYDHq5JmyxUcGh33pDcN1LVNzpslp3QB1y7DUqvarQjiHl3UlyCUp8UJsDfSwQWUSwcRaYb81lOrwujmj/KLeXOAreKwyxo0Ufv/ifQmNinPLwhOuG+Ni/0X2O8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fYy0luue; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-442e9c00bf4so637665e9.3;
+        Mon, 12 May 2025 02:29:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747042170; x=1747646970; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nd8TTTPpuhPv6JEY+T0EMF/g2hoFO/+rGDPodo/b3cE=;
+        b=fYy0luueK8rU0XzqR8cnMP6jN3o61sqzjmkY0i3KROLpDvGxbmWxkqVQfzgT+xpqNh
+         8nyHhXAZb34HtUstMmWo1hutuwQ74RfiKBhuwJYVycXDLrieW7ZiJw+cfvHSal7ey86a
+         oDCX98K71Y41PfdnfivEEjxw6KpH9UulmSfqZOXI+DKcEObciYwvCT3TFD6cA82K98uo
+         XzrTU/WRhOVfCF/UalKsTySzxy3+WfMZS7yllek0bMzyoFAv+7A9s6eyeOAGa3TKrdAt
+         hu3gZtvzB+zPk7GbZjwNC+EKGdcpAmO8R+LX20ikXbRtjQLCXkWhrXVTLy6TtAwCLMWX
+         5i1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747042170; x=1747646970;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nd8TTTPpuhPv6JEY+T0EMF/g2hoFO/+rGDPodo/b3cE=;
+        b=D2j4IwyjoWpfcwW6F8eMPyuHmDlbPsPSYAckepJsMNSx+SKRGv6y+YMz5i3yB0t2AG
+         A0HCoK0v3vdoHmoShtok6PPJs0ZHTkIomLaxY/ixAvH+cxHUYOsLLVJp/ZEC+rOyoveY
+         WqHOnHlgGz0/5VJZDn+KWCKza6tBXBFgTLbWH74XmbGXefWCA5zZEMHvRT4WHfb+aoFk
+         uABGgfYt4fXLnbzp4X4Pnu8mwZMNfa+8/cZy/+5OezumrBxsYl3Jpe1CyfZTIfi+F/Q4
+         boQVfkWU/JLNp++5JnvCyp3iOKekDIa7aYk7qZwGdnZYXQ4p3/MGIbdpoCSJ3IMmrzM4
+         kHYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUTJ129713dlc/7fXAgbDuTQ0Q8sd+Nxo/cd/z4dMKs289s906yY3IzMF/dBAeIxtDcbds=@vger.kernel.org, AJvYcCUee9PZC8pUq/7GefWAm6tZtH2prkpIGYcFP3A8KlS5QD/4z8pEHf+V3KkWnovWkcZOYCw59nHYGL1l6nws@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvGz4+lbYkixVQNPw2fH7utawQgsvQ9JZb4hvqTE7XVbW8+vlW
+	RXdIHTykuxLQ20FWQYiV+/n/i/+rGfEw9f144hNb5P94IZX/Xwtf
+X-Gm-Gg: ASbGnct+FpZJ0kdlW01HtMLI4u6ujUrtPZ1cJhSWlJf1TnX+tUGQFgaLk/Zo/wGBY6Q
+	679wZLyHrxn2mBPLANWGXoNDQtq8R/pIuYSnDzJvhsNS+ja3INhJl6i4AimHr+qKu3e9r8pllOy
+	MT3aY1R40o3pEs3pv6IV4gCwV1WViGzWDjuqqvxvndhYEGG/nFru6jeFzqP8SHcMEtZ7j1SAFjf
+	FoP//zwYHzKmUUfedjG3XUxlAD5h50nPfdVFFe7tI+wF5UHHyqbkAewGx9Rq+2VsbjreyDP18Vm
+	vS7LGigN2mtutYotexWV9nwE442NA1g/fxYTxgEKa9UKSfXCcJ/X38V0iIfcXgbyEE5xPlmNRRV
+	sDGdwkWI=
+X-Google-Smtp-Source: AGHT+IFHhb80V8vUQZEwb04PyfWMfXMEuVgvCMYP1AjbTd4plf7jZskkeNy6rkNelRjoUUpdJNmCnA==
+X-Received: by 2002:a05:600c:681b:b0:43d:47e:3205 with SMTP id 5b1f17b1804b1-442d6d44d27mr96631565e9.11.1747042169128;
+        Mon, 12 May 2025 02:29:29 -0700 (PDT)
+Received: from [192.168.8.119] (54-240-197-238.amazon.com. [54.240.197.238])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442d14e6d74sm151355005e9.21.2025.05.12.02.29.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 May 2025 02:29:28 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <7fedbeac-300f-48a3-9860-e05b6d286cd1@xen.org>
+Date: Mon, 12 May 2025 10:29:26 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-kuHvxjuV_cMh-Px3C-k2Gd51jFqhwndO52vm++M_jAA@mail.gmail.com>
-User-Agent: Mutt/2.2.14 (2025-02-20)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: KVM: x86/xen: Allow 'out of range' event channel ports in IRQ
+ routing table.
+To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>, "Orlov, Ivan" <iorlov@amazon.co.uk>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ linux-kernel@vger.kernel.org
+References: <e489252745ac4b53f1f7f50570b03fb416aa2065.camel@infradead.org>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <e489252745ac4b53f1f7f50570b03fb416aa2065.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, May 12, 2025 at 09:46:30AM +0100, Peter Maydell wrote:
-> On Fri, 9 May 2025 at 11:04, Thomas Huth <thuth@redhat.com> wrote:
-> > Thanks for your clarifications, Zhao! But I think this shows again the
-> > problem that we have hit a couple of times in the past already: Properties
-> > are currently used for both, config knobs for the users and internal
-> > switches for configuration of the machine. We lack a proper way to say "this
-> > property is usable for the user" and "this property is meant for internal
-> > configuration only".
-> >
-> > I wonder whether we could maybe come up with a naming scheme to better
-> > distinguish the two sets, e.g. by using a prefix similar to the "x-" prefix
-> > for experimental properties? We could e.g. say that all properties starting
-> > with a "q-" are meant for QEMU-internal configuration only or something
-> > similar (and maybe even hide those from the default help output when running
-> > "-device xyz,help" ?)? Anybody any opinions or better ideas on this?
+On 08/05/2025 21:30, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> I think a q-prefix is potentially a bit clunky unless we also have
-> infrastructure to say eg DEFINE_INTERNAL_PROP_BOOL("foo", ...)
-> and have it auto-add the prefix, and to have the C APIs for
-> setting properties search for both "foo" and "q-foo" so you
-> don't have to write qdev_prop_set_bit(dev, "q-foo", ...).
+> To avoid imposing an ordering constraint on userspace, allow 'invalid'
+> event channel targets to be configured in the IRQ routing table.
+> 
+> This is the same as accepting interrupts targeted at vCPUs which don't
+> exist yet, which is already the case for both Xen event channels *and*
+> for MSIs (which don't do any filtering of permitted APIC ID targets at
+> all).
+> 
+> If userspace actually *triggers* an IRQ with an invalid target, that
+> will fail cleanly, as kvm_xen_set_evtchn_fast() also does the same range
+> check.
+> 
+> If KVM enforced that the IRQ target must be valid at the time it is
+> *configured*, that would force userspace to create all vCPUs and do
+> various other parts of setup (in this case, setting the Xen long_mode)
+> before restoring the IRQ table.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>   arch/x86/kvm/xen.c | 14 ++++++++++++--
+>   1 file changed, 12 insertions(+), 2 deletions(-)
+> 
 
-I think it is also not obvious enough that a 'q-' prefix means private.
-
-Perhaps borrow from the C world and declare that a leading underscore
-indicates a private property. People are more likely to understand and
-remember that, than 'q-'.
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Reviewed-by: Paul Durrant <paul@xen.org>
 
