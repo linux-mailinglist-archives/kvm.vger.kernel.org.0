@@ -1,174 +1,237 @@
-Return-Path: <kvm+bounces-46272-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46273-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04D4BAB4713
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 00:02:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA503AB472C
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 00:17:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 203C8189ADDD
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 22:03:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1A70189C110
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 22:17:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA56B25C82D;
-	Mon, 12 May 2025 22:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953BE299AA5;
+	Mon, 12 May 2025 22:16:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q4u0YqE6"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ngihn0ve"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2087.outbound.protection.outlook.com [40.107.220.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D19A1AA791
-	for <kvm@vger.kernel.org>; Mon, 12 May 2025 22:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747087359; cv=none; b=QRRz/0fbMNlZZq7RJJp5er+nCWJfOahBhDJhD/WT8aJIhcq3eOH1ygUzPjyZRGMsB0/NoBO55tyPhQBfWVbQbqdDdHflLJchpqMlgB5iJa/uKc0zyZw9LSxU3C6J17NM/yKB1C1iDn+Ml2VyAqpAtLgR9jaXNSSCuVZoBWeHmOY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747087359; c=relaxed/simple;
-	bh=Oi1DAOtb6owPdmhsxmbmlFroX+fOcLI+wg1xCtwIW1U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VWYLfwaDDGcYFF8bf+hhlDbueuknoW2XycuRqsQcfKddNLGNLxTIr0Sd3ZiCoJHwSpvuR3zY4rdsFJp3zZxESpdYMv+jT3QUzEqo+GRqAPWItGEecHosX12TwUKXWOMeLGdxk69CxRwgM85h0idmIhU2qcF3sOhpHhtAfpuO92s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q4u0YqE6; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-70a2d8a8404so42493697b3.3
-        for <kvm@vger.kernel.org>; Mon, 12 May 2025 15:02:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747087356; x=1747692156; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vW7A5aHjiKH+X9Ydb070/D1q8O2n+GGEFy0ERxt+OF4=;
-        b=Q4u0YqE6wSFKuiGLaxX+Ucm94VA3VV1anbL+PCSLoWiRVtgI4AQtAyCRs33RsG6vhV
-         kK1MtytZ7MEMF6Il0wcXkXtDxq9epybhYg3FWfm5tOwHRXVorHQxQujV5JBsxOzWrMmY
-         yooX2jsvEv1ykKDXjA5CMqodyDm/Z/TOdWauiQBwM/T6uK7Hd3tk3XMmU2lYi+YMRrgF
-         pxIMAWiWsdiKwCTqp1YOKYSlGr0IEOqqU/Ap6x5uqdWtgmyObrZrz7YnYs8CJNCEiLaJ
-         Y1iqp/Chq5WRyrcnZ4hJemcNJ6g7zsKoje75t6Y8JBgK2b7dgMYQbB+fP8pOshRFVNLE
-         HY4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747087356; x=1747692156;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vW7A5aHjiKH+X9Ydb070/D1q8O2n+GGEFy0ERxt+OF4=;
-        b=lO0Ayilldd6IBnhK+12XHPfyLvtGOMuqtrTHABrd8N950Mf0OdqCuKWLAeOj3irE5Q
-         +kZYUzlexELX4R+tC+MvHCvr2C43mmmFL/H7oygpYsc2wJ4MErIDHyCMlfxNhf8kCkrJ
-         dSIdkgXpbZK5a355E868IIX8kxkkqKWuSxS0KjPo9NCdtv3AtMK/yVqTMbxRPmXK4ZX2
-         kolhuN6biQhW8F0L5+0ioxg0g4tCrDPbQWGQH6o8RXtEh/jvMFG94ytWcEC3FBm5QOfV
-         7QK6V/8xH2rr/bKOaVnrCh8G11aImNxdVIs3XUtO91q3lz7S5aqP9x84NiC3LNdYuRRW
-         6pQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUP0Vs6sqeiHHD9FBIFXFasuudyhs4FEXO1yYpGtWhfwoDjxgvcc0/rx/KGXZFllMsuX74=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQKXQAqt8Lk2GJoMr/jbDRXa+znQx3EorWfqjP4ywwtVcv/9rm
-	cnkKY5n0YqfwLMvhYwd6qGCA0vRZexOvM4zOLIRlHMWS2ZVsrxJlXT1EgbzULxt6DeLE+75kn/J
-	TGqQzTdrrM3mpgGv+Y/FAN0QwVNN04CzBOaBv
-X-Gm-Gg: ASbGncsr0S+UPxMIF9w7XxOJMAXeyvxJZYAn8R1KQ2PXmd/DfZiVJf4XRt4fUfCpPLJ
-	nTkANqIkycGrxVxhH++5wuSTf4STOly/vGPY8+wZHfDDADTGmwS5K5r//wBsTWnAzaHDqk+uUEC
-	+Rt46k2sSG1GWlDjfAjxar17xPWWBVsdvtuwOhzfYcCjuGIZRyUS6CF/Vz3oAHoPQ=
-X-Google-Smtp-Source: AGHT+IEY2Wm0wRuKLCb1QmSEkjT4BonO7vkJwDLak0FvVLGxCP+HmOGNgi+tbfiHD1pu4N/5AkT34JQGp18mtpkll4U=
-X-Received: by 2002:a05:690c:7209:b0:6fd:318b:9acf with SMTP id
- 00721157ae682-70a3fb6c30cmr199093197b3.38.1747087356145; Mon, 12 May 2025
- 15:02:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238F824BD1F;
+	Mon, 12 May 2025 22:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747088209; cv=fail; b=md/WD3EkAHNRQy+tN/QePaH+8XU6W1u9cN0UZehjQEyZcxY084/AKOXwBFUiQKuVT4h0kPetpd/CxPBdQ/Yt5M+NLj3OVG+sjDt+q6Yo9HWOU+vWWXvfHO15KuyGSkPW499UVKmQPQQeAmGgAcLMqLyv/sTKCiUBGq+KQ4pR61U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747088209; c=relaxed/simple;
+	bh=KARAmECtdI8zyPrxu53/O8qRJf3ijeRwvRWT2nGLECg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tzbzkokENIibEx+OTrNZimaBr/OPZllOut34DLNCdQunAy6211TnBYKm/b7jOOswoJ9i4saZBnKMGddTbPdXZz7yi3l6YcayBfOOTvGDg5wK25x70PRJdlE5dccWWrNSKIl5jP7/c5cvW1fHKnFFPpNjtWwkNyVsqaBx4Jlcm3g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ngihn0ve; arc=fail smtp.client-ip=40.107.220.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yfb1UJCoh3OTlDQXi40wXouB6zHJzTx/YQ/CGTC4Zq79v8TG93ixFql/vBNN5NF5e56jtm6FINqLJfYJrMcU0hgpjCW//ldIMUfhuXkCoagtfgVMumrAy8jn8jJIlwiWMXDGbii5F63ZlkAWyP5EW4CqZZChUub1iA+5LFApdiaRYzG2eCD8fDbObfid2OjjVYUH29ToC7OxZOEYdnXL+eMPMNCbEJ56aYGSe6r+xSXwdJODODEebfOk77spoLjcZssUVqs4bA9ymGlO8ziQtTxFSf7Y1gp2mFc1R+vnShZ3mPRVetjh6qxyIB+sUiv/FAVnF/lX90vCZFTqWh0D2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QO9i8JbsdHQ5K1Mnmr7CWIu+rQA8pVjLeDYUPMrTeXM=;
+ b=AxZGtvgdx+XfDwqk1COUt1sHkBbqtecYIfCWRGy+cGK7OH/ISQbjh77ZhFceN9xzwzLG8+GY1Xf+LSg25JPxU5Ohb3V9UUZqcBzffPgBOkqdg0PleUumKJHnoUxhxymP0TUZRAxr49RQ+M/qCPsy9gXc8rd7MRVsFgz79TC5kxFeVJi6wdzQOREP/Z2OPSCvd6L7WUDSHI2sZ/ZJAZK1f4e0l7ciI/KGs3uPqw/gQWP3cuRpcjCgPRh05WRkbMGLcB/xSEl6o1lznjlXTKia2FZm6LJSXEvVwZqt1sfIM7as52womOBB27LxdO3p7B0cPJWB/jJj5x4qnxaeXZBGJw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QO9i8JbsdHQ5K1Mnmr7CWIu+rQA8pVjLeDYUPMrTeXM=;
+ b=ngihn0veF2mSCYtsIFxd12qdhafQlfoEvsjgFRygWnyvLQkt6UEsRIxWt5z3X/wVrDryjpMGTMXNmn5EwXcRvp18Ty7Hg5QKf4YiIkEjq93COzQlYE3ojl3gMnFFxdRxaq1p6MYC94Orzkx4ylvK/NtqCUqVDIg/SuDnGPR4H7g=
+Received: from MN2PR01CA0042.prod.exchangelabs.com (2603:10b6:208:23f::11) by
+ DM4PR12MB8572.namprd12.prod.outlook.com (2603:10b6:8:17d::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8722.21; Mon, 12 May 2025 22:16:44 +0000
+Received: from BL6PEPF00022573.namprd02.prod.outlook.com
+ (2603:10b6:208:23f:cafe::82) by MN2PR01CA0042.outlook.office365.com
+ (2603:10b6:208:23f::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8699.31 via Frontend Transport; Mon,
+ 12 May 2025 22:16:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF00022573.mail.protection.outlook.com (10.167.249.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8722.18 via Frontend Transport; Mon, 12 May 2025 22:16:44 +0000
+Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 12 May
+ 2025 17:16:43 -0500
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<thomas.lendacky@amd.com>, <shuah@kernel.org>, <prsampat@amd.com>
+CC: <pgonda@google.com>, <nikunj@amd.com>, <pankaj.gupta@amd.com>,
+	<michael.roth@amd.com>, <sraithal@amd.com>, <linux-kernel@vger.kernel.org>,
+	<x86@kernel.org>, <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>
+Subject: [PATCH v3] KVM: SEV: Disable SEV-SNP support on initialization failure
+Date: Mon, 12 May 2025 22:16:34 +0000
+Message-ID: <20250512221634.12045-1-Ashish.Kalra@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250508141012.1411952-1-seanjc@google.com> <20250508141012.1411952-4-seanjc@google.com>
-In-Reply-To: <20250508141012.1411952-4-seanjc@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Mon, 12 May 2025 15:02:00 -0700
-X-Gm-Features: AX0GCFtYvDiSjKXwNYi5yPNZUrZVRNCxuiYwCVVYJdbwfCZQdLE8KCQ5ZWcpNFo
-Message-ID: <CADrL8HURpnXgN0ux4sUk0nVze=A6d488i_ztiZTwGZUdDMoTvg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/5] KVM: Conditionally reschedule when resetting the
- dirty ring
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Peter Xu <peterx@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF00022573:EE_|DM4PR12MB8572:EE_
+X-MS-Office365-Filtering-Correlation-Id: e7742d21-a264-4cf7-030e-08dd91a2ade8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|82310400026|1800799024|36860700013|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?fbMfd8qkOhQKRSU6XSwkIYTG5vdZzfiGnBlTI5OfID5r0CQxqMqcXy5PM1mF?=
+ =?us-ascii?Q?wuW8C9FvUy6ES+udJnfpL8WB3pymf95NNKw16JJXhzR+K6ZPFnH/9Q0SdkPl?=
+ =?us-ascii?Q?tvH69Hhqba6bybv1GYPNRwUQPi7hD8VQKOcAya/Y1qXbFJJmJn8RpCS8vio3?=
+ =?us-ascii?Q?JUl6/1TmeCsJlP0TBZp3YNvPO6F4TNH4U39oZTintgnrJo1f8d+h+ruS4GTR?=
+ =?us-ascii?Q?xL2e+eZI+V9CRU5FX27p0MUQW0EuNP6eQBUYr75pigUzsFxHOTek1wOPYJGt?=
+ =?us-ascii?Q?7VFnGfgmf7A0q2SNALq6YBdq4HVwhX2EZ6cQd8HBDGWSOTFwj4LnCOhxDyes?=
+ =?us-ascii?Q?JE2hwDZMwwtYnXxTfXUYOOxQ/KSGPs+5u90IKgyd7UpfqNaKeFdCZ7GjPKzv?=
+ =?us-ascii?Q?y6Gri2XByot4xKVAtPKQHGOlihWhre4gvkMqMKXDgaNdjE/s6wzg0dZvbePv?=
+ =?us-ascii?Q?y8szNkC4Jw7W9j8MJspjj1D7hY+srl0+zMrHCYoSLYoJVJbojgyuBgedmzHY?=
+ =?us-ascii?Q?v4Y3Uvt6jHHz91SPJvgcxnp+m4EnzjGHRS/daolXY0mruF8uVRkGl5td8UeD?=
+ =?us-ascii?Q?J5v8ZvbZJ/0+a4/+9i/jZjgd35guxWi19uzRaP0lW09akovHPSu+W7G1Xyvt?=
+ =?us-ascii?Q?IPqSiRHnxCgFvuhjFMKF9EZ//FSJ7HxRjyaBSZTg+5sF7J4QCZB/IRCyufGi?=
+ =?us-ascii?Q?y3FX6+yFWueKtr4n02zXaxVhJ996ELQJBeFr9ls80IEkRIvKxeyVyuYmffy1?=
+ =?us-ascii?Q?TYQlcHYhaDn3XswvGs8pOwqQgZLWxWKTe6EvIMDqyC23lIjDg1qbn0pdxo2l?=
+ =?us-ascii?Q?NyLEWEfs8qMGHYA1LPVmxBFTfEtpzwE8Y4aThFWzv5Ss8rivSWK5CC5Qe14+?=
+ =?us-ascii?Q?rQJpDv1ddvvyN8kYYlQJtCX8UHi7W/y2hToJgOKf9eW08nKgtFoVfVD9ZQTS?=
+ =?us-ascii?Q?ctzSgKz99vFD6p7mQB5bnOpBHViT13cbUjOhKf8ppJp+a0P5sDl8JwFbqpQi?=
+ =?us-ascii?Q?9/nUG45pn3w1fl8ZeWZVr+gyzNfYlwkPfr+wYq1lyopvHKWrKtCume54dv8h?=
+ =?us-ascii?Q?k2wfaFbQ+H45xFgZOGOKYSCqXOp/0fH+q3LFeUr8u5J91HbdBW3ts7vk64OP?=
+ =?us-ascii?Q?uJGbaLs4iikUCe+7hSdSxMY++Dwj/FP4Le3oq8Y1wHFuFp3GGWCIFGqiUsp8?=
+ =?us-ascii?Q?hGxCB0Ad1NcBwHdsMyC+c0SL/OADc9iZytKOu0w2aZ3XIMvAcC5ggUXMnQUJ?=
+ =?us-ascii?Q?K71KJxeRJlzzNjsRngb7cV8dgXJu8Oipbzzan6Fabz6a1hFnbtfW04Vyjr8h?=
+ =?us-ascii?Q?ChS5xxLQEU6uqgnG0yyJLsVUwAI3GA75vJtvTssoc7ed4bYysZuhtQz4Vfza?=
+ =?us-ascii?Q?hiSPrzAP9f1CM9B24Zqw3Ys/tKfQMnqR+KUACNTbWOQXlUy0qAIdjBpLouXK?=
+ =?us-ascii?Q?3mji0dh7nL5c6u4AcTtN8tgLkztzmmVg/3R9N2roT5cZQBifHmL4Jgw7CuL1?=
+ =?us-ascii?Q?kTlWgAis5VDC1jvtH388C1zLRwYukIMyl4mz?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(1800799024)(36860700013)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 22:16:44.4410
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7742d21-a264-4cf7-030e-08dd91a2ade8
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF00022573.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8572
 
-On Thu, May 8, 2025 at 7:11=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> When resetting a dirty ring, conditionally reschedule on each iteration
-> after the first.  The recently introduced hard limit mitigates the issue
-> of an endless reset, but isn't sufficient to completely prevent RCU
-> stalls, soft lockups, etc., nor is the hard limit intended to guard
-> against such badness.
->
-> Note!  Take care to check for reschedule even in the "continue" paths,
-> as a pathological scenario (or malicious userspace) could dirty the same
-> gfn over and over, i.e. always hit the continue path.
->
->   rcu: INFO: rcu_sched self-detected stall on CPU
->   rcu:  4-....: (5249 ticks this GP) idle=3D51e4/1/0x4000000000000000 sof=
-tirq=3D309/309 fqs=3D2563
->   rcu:  (t=3D5250 jiffies g=3D-319 q=3D608 ncpus=3D24)
->   CPU: 4 UID: 1000 PID: 1067 Comm: dirty_log_test Tainted: G             =
-L     6.13.0-rc3-17fa7a24ea1e-HEAD-vm #814
->   Tainted: [L]=3DSOFTLOCKUP
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/20=
-15
->   RIP: 0010:kvm_arch_mmu_enable_log_dirty_pt_masked+0x26/0x200 [kvm]
->   Call Trace:
->    <TASK>
->    kvm_reset_dirty_gfn.part.0+0xb4/0xe0 [kvm]
->    kvm_dirty_ring_reset+0x58/0x220 [kvm]
->    kvm_vm_ioctl+0x10eb/0x15d0 [kvm]
->    __x64_sys_ioctl+0x8b/0xb0
->    do_syscall_64+0x5b/0x160
->    entry_SYSCALL_64_after_hwframe+0x4b/0x53
->    </TASK>
->   Tainted: [L]=3DSOFTLOCKUP
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/20=
-15
->   RIP: 0010:kvm_arch_mmu_enable_log_dirty_pt_masked+0x17/0x200 [kvm]
->   Call Trace:
->    <TASK>
->    kvm_reset_dirty_gfn.part.0+0xb4/0xe0 [kvm]
->    kvm_dirty_ring_reset+0x58/0x220 [kvm]
->    kvm_vm_ioctl+0x10eb/0x15d0 [kvm]
->    __x64_sys_ioctl+0x8b/0xb0
->    do_syscall_64+0x5b/0x160
->    entry_SYSCALL_64_after_hwframe+0x4b/0x53
->    </TASK>
->
-> Fixes: fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory trackin=
-g")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  virt/kvm/dirty_ring.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->
-> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> index e844e869e8c7..97cca0c02fd1 100644
-> --- a/virt/kvm/dirty_ring.c
-> +++ b/virt/kvm/dirty_ring.c
-> @@ -134,6 +134,16 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm=
-_dirty_ring *ring,
->
->                 ring->reset_index++;
->                 (*nr_entries_reset)++;
-> +
-> +               /*
-> +                * While the size of each ring is fixed, it's possible fo=
-r the
-> +                * ring to be constantly re-dirtied/harvested while the r=
-eset
-> +                * is in-progress (the hard limit exists only to guard ag=
-ainst
-> +                * wrapping the count into negative space).
-> +                */
-> +               if (!first_round)
-> +                       cond_resched();
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Should we be dropping slots_lock here?
+During platform init, SNP initialization may fail for several reasons,
+such as firmware command failures and incompatible versions. However,
+the KVM capability may continue to advertise support for it.
 
-It seems like we need to be holding slots_lock to call
-kvm_reset_dirty_gfn(), but that's it. Userspace can already change the
-memslots after enabling the dirty ring, so `entry->slot` can already
-be stale, so dropping slots_lock for the cond_resched() seems harmless
-(and better than not dropping it).
+The platform may have SNP enabled but if SNP_INIT fails then SNP is
+not supported by KVM.
+
+During KVM module initialization query the SNP platform status to obtain
+the SNP initialization state and use it as an additional condition to
+determine support for SEV-SNP.
+
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Co-developed-by: Pratik R. Sampat <prsampat@amd.com>
+Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+---
+ arch/x86/kvm/svm/sev.c | 44 +++++++++++++++++++++++++++++++++---------
+ 1 file changed, 35 insertions(+), 9 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index dea9480b9ff6..8c3b12e3de8c 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2935,6 +2935,33 @@ void __init sev_set_cpu_caps(void)
+ 	}
+ }
+ 
++static bool is_sev_snp_initialized(void)
++{
++	struct sev_user_data_snp_status *status;
++	struct sev_data_snp_addr buf;
++	bool initialized = false;
++	int ret, error = 0;
++
++	status = snp_alloc_firmware_page(GFP_KERNEL | __GFP_ZERO);
++	if (!status)
++		return false;
++
++	buf.address = __psp_pa(status);
++	ret = sev_do_cmd(SEV_CMD_SNP_PLATFORM_STATUS, &buf, &error);
++	if (ret) {
++		pr_err("SEV: SNP_PLATFORM_STATUS failed ret=%d, fw_error=%d (%#x)\n",
++		       ret, error, error);
++		goto out;
++	}
++
++	initialized = !!status->state;
++
++out:
++	snp_free_firmware_page(status);
++
++	return initialized;
++}
++
+ void __init sev_hardware_setup(void)
+ {
+ 	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
+@@ -3039,6 +3066,14 @@ void __init sev_hardware_setup(void)
+ 	sev_snp_supported = sev_snp_enabled && cc_platform_has(CC_ATTR_HOST_SEV_SNP);
+ 
+ out:
++	if (sev_enabled) {
++		init_args.probe = true;
++		if (sev_platform_init(&init_args))
++			sev_supported = sev_es_supported = sev_snp_supported = false;
++		else if (sev_snp_supported)
++			sev_snp_supported = is_sev_snp_initialized();
++	}
++
+ 	if (boot_cpu_has(X86_FEATURE_SEV))
+ 		pr_info("SEV %s (ASIDs %u - %u)\n",
+ 			sev_supported ? min_sev_asid <= max_sev_asid ? "enabled" :
+@@ -3065,15 +3100,6 @@ void __init sev_hardware_setup(void)
+ 	sev_supported_vmsa_features = 0;
+ 	if (sev_es_debug_swap_enabled)
+ 		sev_supported_vmsa_features |= SVM_SEV_FEAT_DEBUG_SWAP;
+-
+-	if (!sev_enabled)
+-		return;
+-
+-	/*
+-	 * Do both SNP and SEV initialization at KVM module load.
+-	 */
+-	init_args.probe = true;
+-	sev_platform_init(&init_args);
+ }
+ 
+ void sev_hardware_unsetup(void)
+-- 
+2.34.1
+
 
