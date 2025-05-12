@@ -1,121 +1,134 @@
-Return-Path: <kvm+bounces-46175-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46176-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C6DEAB3A11
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 16:09:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7C4AAB3A2C
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 16:13:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E9EC19E040F
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 14:09:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6264862A06
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 14:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31CF1E3769;
-	Mon, 12 May 2025 14:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2911E47CA;
+	Mon, 12 May 2025 14:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="s9KQ4ByV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0cIyOtr9"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FAE1E32D7
-	for <kvm@vger.kernel.org>; Mon, 12 May 2025 14:09:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75F11E32DB
+	for <kvm@vger.kernel.org>; Mon, 12 May 2025 14:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747058964; cv=none; b=Zv1rUDrh5Rxh21lIbDC8GfOapPrai6rxDGiAOip0aL0a8zlPOx0mBVXP5b2BqorteAnx0DgWlv6M6rWrYIwTBI+9JyS+eDqC7CROWaqzTjFR7AZcyP6ANYGNzc9lXkLUqa0n6Wdy3riNbMPYvkKqeD2ZzFoIVRElewB7QR0CJ5s=
+	t=1747059193; cv=none; b=UBYX7/V0lyEVYJ4vg+Y5y+4F5GlURYMiUl8Ak9mj5dUmXc+G/odAfq+sFUpBHfKduAj7wtph88jKdOxiAj+kZ/xiAcBcx2ETosKKNyFeYkdXciP1JDr8Ti9PiBHU1K3Zowz6GtGJbTvKF4UL8KYHot+6d405NoJ9TVgKUR2PyPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747058964; c=relaxed/simple;
-	bh=bs0KT0uEopTREFIV09FXprEMp4r+yb1cp38ev0pRS7o=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XZd5qwzHbQsT+uF8wVlrtdikXDAfbNwMvfEoTzUxr6GXev4LBxHCZsbaZdSB06QOUSk5huQcvQ99HxymEj1rx05kge6CWT15f52I6o6BQLGTtbaJ0Tn7vvYV8XeBbpCwbaBFxA6fLjDL6yVTOfqyAN/fJ2vVxTDtr0EjB677KE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=s9KQ4ByV; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1747059193; c=relaxed/simple;
+	bh=SKnN1ncZSJj/MEbr0gfzXGZNfOFzaykDF0R1s1+8CYk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GmJFAk8hjH/Slt1eG7b682VjqX1q8rHblma7/1rJuqjB89B+V0CzYN3QnkqyZQaHnUw6O2lcGvyKh8DOZ5C6+CrVqAGRPjBWSheXYEZGTl95cMCaFR2ACBb4zy7BFtri83mi25/elsirGZhthm60wbHNZYvUPCrYQu6OSH/lXco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0cIyOtr9; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30a80fe759bso6103698a91.1
+        for <kvm@vger.kernel.org>; Mon, 12 May 2025 07:13:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1747058963; x=1778594963;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bs0KT0uEopTREFIV09FXprEMp4r+yb1cp38ev0pRS7o=;
-  b=s9KQ4ByVZwCtw8FnIG6rzV6PwIa71HAg9AGlviS8njwPznNMUB1hH9Rr
-   o+xyeWd0F6UxHAtUurb9meYdifM9rgt+78ztOBdw7OoOD+KumGmftyuIA
-   kxqw7IHz+pGVMVoPEjbCEYLm1FHI+XrR0GdCV8MEAAskSuc5J3T4mwjWo
-   7p7NkvrsqZDaxBmTtBWEOtDqbDp2cnpOC0yPFjp9Ohhq0zPbe3RqOHqBn
-   716x7QrSh5CwRKrAhif8kpLbey8utMbdge8Nb25YyjrF+ofEJL5/GCHw4
-   JD8IteHfcPMHy8UjujvJHjEt3/9G2GeNsUvlZHhg1RvfRd3WEjtG39n4E
-   w==;
-X-IronPort-AV: E=Sophos;i="6.15,282,1739836800"; 
-   d="scan'208";a="489002478"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 14:09:19 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:46847]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.21.215:2525] with esmtp (Farcaster)
- id d1c2ccfc-6936-4d2e-9e97-d566a0803f65; Mon, 12 May 2025 14:09:19 +0000 (UTC)
-X-Farcaster-Flow-ID: d1c2ccfc-6936-4d2e-9e97-d566a0803f65
-Received: from EX19D023EUB003.ant.amazon.com (10.252.51.5) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 12 May 2025 14:09:18 +0000
-Received: from dev-dsk-dssauerw-1b-2c5f429c.eu-west-1.amazon.com
- (10.13.238.31) by EX19D023EUB003.ant.amazon.com (10.252.51.5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1544.14; Mon, 12 May 2025 14:09:13 +0000
-From: David Sauerwein <dssauerw@amazon.de>
-To: <jingzhangos@google.com>
-CC: <andre.przywara@arm.com>, <coltonlewis@google.com>, <eauger@redhat.com>,
-	<jiangkunkun@huawei.com>, <joey.gouly@arm.com>, <kvm@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<lishusen2@huawei.com>, <maz@kernel.org>, <oupton@google.com>,
-	<pbonzini@redhat.com>, <rananta@google.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <graf@amazon.com>, <nh-open-source@amazon.com>
-Subject: Re: [PATCH v4 5/5] KVM: arm64: vgic-its: Clear ITE when DISCARD frees an ITE
-Date: Mon, 12 May 2025 14:09:09 +0000
-Message-ID: <20250512140909.3464-1-dssauerw@amazon.de>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241107214137.428439-6-jingzhangos@google.com>
-References: <20241107214137.428439-6-jingzhangos@google.com>
+        d=google.com; s=20230601; t=1747059191; x=1747663991; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E+Bh7c4UsvgqnjXtLXLGDW84tHDJYaJRZGq7z5u1X5E=;
+        b=0cIyOtr98HT2Cj8JWQt81Sc9cdhJ9UkWO/ZiuJ/t8K3Gy3jCVJv5zQSI4oeujDYUp1
+         97XgxPKzLFR6GD9pJzo7msdo5YdDF5fuglOkKf6fHeObk14AgpyYtXbzBOHxn8jdG64x
+         11GXIig6NgYuitexBSsZQvG0W+goRzI0XMy0K6MjzyN2G7gJKpV27T3PST97pcX7Tu0a
+         AJKZA2x0bu/RmMzvLWJcdCWALIUtywSCQc76eVeVW/mSz/gPI4fdPuaFvNYC4lTE5RhI
+         BNPB73eNGkxff/1jN88Q+lshlCnzPoyBLBMuFzPf8ukIxkv+5w2R+jVI7+ZstDLJKGbt
+         LyvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747059191; x=1747663991;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E+Bh7c4UsvgqnjXtLXLGDW84tHDJYaJRZGq7z5u1X5E=;
+        b=jB1/w3aKJC3UwSoF1ZogPj0k7TRr5P7mXyNe8Rea+lVcqJcEf/0on9xwns/lbYDln+
+         bpGZZlphApWw0cnZ9D4wsRMsjKjit1XRG8ZWV7xcMBuFPdIciAfWZeir8cFTc18GqsrB
+         1BI94CKdLTIQ/LMrLDn7Hrkl7rXZoG3WG+R1gypRLeFi33ZlndYFA+C/RhXV88mwbNnE
+         vmFQ2O90rDLf9cZmgekS1YZIIta1RWTBtX+dou+yGyIP96n6YdmdXNdPiFp8t85drnDI
+         /d3HnOTSttXgQz3jHKxKk75MZwkXFUJAwFyIGc1iN3O4j+f4FZFrFt8nvdy6rhWsDoCw
+         jqGw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJcEwreOi8qjZBCGNPJTpE4mic03tnOaJrlkDQmv75Ahd4XHn9MEf60d4OMH27QUlhAXM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6q6LfuJZsgqgJmOWpU9EYYaykTjz0FmMdZQr+lkkcf+RLDasQ
+	zctmCf/Ltzrwoc97LgNtrNLlOUlYq6a0Xn489RfJ/fREbDy5tdq+0dIhFpxZggsekavXE/+wF6O
+	GQw==
+X-Google-Smtp-Source: AGHT+IFQm5taTcpUiAapk9Ux8rFT+sINfQek692ts0xWXhUSaKE8lGTK0QG66OYMwFe+55PbQ2ArW2nFZqY=
+X-Received: from pjj12.prod.google.com ([2002:a17:90b:554c:b0:30a:2020:e2bd])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:52cf:b0:2ff:52e1:c49f
+ with SMTP id 98e67ed59e1d1-30c3d62e58dmr16671203a91.26.1747059191196; Mon, 12
+ May 2025 07:13:11 -0700 (PDT)
+Date: Mon, 12 May 2025 07:13:08 -0700
+In-Reply-To: <20250512085735.564475-4-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
- EX19D023EUB003.ant.amazon.com (10.252.51.5)
+Mime-Version: 1.0
+References: <20250512085735.564475-1-chao.gao@intel.com> <20250512085735.564475-4-chao.gao@intel.com>
+Message-ID: <aCIB3nZSUTBXr80O@google.com>
+Subject: Re: [PATCH v7 3/6] x86/fpu: Initialize guest fpstate and FPU pseudo
+ container from guest defaults
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	tglx@linutronix.de, dave.hansen@intel.com, pbonzini@redhat.com, 
+	peterz@infradead.org, rick.p.edgecombe@intel.com, weijiang.yang@intel.com, 
+	john.allen@amd.com, bp@alien8.de, chang.seok.bae@intel.com, xin3.li@intel.com, 
+	Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Eric Biggers <ebiggers@google.com>, Kees Cook <kees@kernel.org>
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
 
-Hi Jing,
+On Mon, May 12, 2025, Chao Gao wrote:
+> @@ -535,10 +538,20 @@ void fpstate_init_user(struct fpstate *fpstate)
+>  
+>  static void __fpstate_reset(struct fpstate *fpstate, u64 xfd)
+>  {
+> -	/* Initialize sizes and feature masks */
+> -	fpstate->size		= fpu_kernel_cfg.default_size;
+> +	/*
+> +	 * Initialize sizes and feature masks. Supervisor features and
+> +	 * sizes may diverge between guest FPUs and host FPUs, whereas
+> +	 * user features and sizes are always identical the same.
 
-After pulling this patch in via the v6.6.64 and v5.10.226 LTS releases, I see
-NULL pointer dereferences in some guests. The dereference happens in different
-parts of the kernel outside of the GIC driver (file systems, NVMe driver,
-etc.). The issue only appears once every few hundred DISCARDs / guest boots.
-Reverting the commit does fix the problem. I have seen multiple different guest
-kernel versions (4.14, 5.15) and distributions exhibit this issue.
+Pick of of "identical" or "the same" :-)
 
-The issue looks like some kind of race. I think the guest re-uses the memory
-allocated for the ITT before the hypervisor is actually done with the DISCARD
-command, i.e. before it zeros the ITE. From what I can tell, the guest should
-wait for the command to finish via its_wait_for_range_completion(). I tried
-locking reads to its->cwriter in vgic_mmio_read_its_cwriter() and its->creadr
-in vgic_mmio_read_its_creadr() with its->cmd_lock in the hypervisor kernel, but
-that did not help. I also instrumented the guest kernel both via printk() and
-trace events. In both cases the issue disappears once the instrumentation is in
-place, so I'm not able to fully observe what is happening on the guest side.
+And maybe explain why supervisor features can diverge, while the kernel ensures
+user features are identical?  Ditto for the XFD divergence.  E.g. I think this
+would be accurate (though I may be reading too much into user features):
 
-Do you have an idea of what might cause the issue?
+	/*
+	 * Supervisor features (and thus sizes) may diverge between guest FPUs
+	 * and host FPUs, as some supervisor features are supported for guests
+	 * despite not being utilized by the host.  User features and sizes are
+	 * always identical, which allows for common guest and userspace ABI.
+	 *
+	 * For the host, set XFD to the kernel's desired initialization value.
+	 * For guests, set XFD to its architectural RESET value.
+	 */
 
-David
-
-
-
-Amazon Web Services Development Center Germany GmbH
-Tamara-Danz-Str. 13
-10243 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
-
+> +	 */
+> +	if (fpstate->is_guest) {
+> +		fpstate->size		= guest_default_cfg.size;
+> +		fpstate->xfeatures	= guest_default_cfg.features;
+> +	} else {
+> +		fpstate->size		= fpu_kernel_cfg.default_size;
+> +		fpstate->xfeatures	= fpu_kernel_cfg.default_features;
+> +	}
+> +
+>  	fpstate->user_size	= fpu_user_cfg.default_size;
+> -	fpstate->xfeatures	= fpu_kernel_cfg.default_features;
+>  	fpstate->user_xfeatures	= fpu_user_cfg.default_features;
+>  	fpstate->xfd		= xfd;
+>  }
+> -- 
+> 2.47.1
+> 
 
