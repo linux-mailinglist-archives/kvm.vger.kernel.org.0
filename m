@@ -1,239 +1,212 @@
-Return-Path: <kvm+bounces-46128-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D115AB2D88
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 04:33:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B4BBAB2D79
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 04:24:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8462D172AD3
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 02:33:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06BB7172003
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 02:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D4025392D;
-	Mon, 12 May 2025 02:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D67253351;
+	Mon, 12 May 2025 02:24:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WSpoYzPY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N/BC6y8P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BD78834;
-	Mon, 12 May 2025 02:33:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747017197; cv=fail; b=Y1mDXdw3IRNAJtABZz1xiRF0uyj9TTspq9hnU0Qd9l4R+DZ18WNnQlpsDJ9rEEC54oa06KVFsTJN8W2yy6gZRyhUaQbMdCk99Grn6A3MlNbF6ORXE1Dde5OtnBGkphZ0jLoXfn+/OhrM+J2h6miJgsAPUNNSd3rU/5ibuXPL8Nw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747017197; c=relaxed/simple;
-	bh=/JMg07gqYHrLPjGFjihNDimertqCm6f4vUBbYJicj2M=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=QWxJIi4PKrv/6U5tiGbIRCKP1T5icdzOrzHpMoaI8VtGzJ30mBOUX6T6oEC9MCQiR5VePgoyWGkCI39CpBYqeMd8siTsrGXeqfQAqLuOyHTfPBZTLo5zH2favsH9KaQ1SCkwoeaVw8dSAbDKY6cbmDmfoMfWYJF+JhoiPbRjg7Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WSpoYzPY; arc=fail smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC494128816
+	for <kvm@vger.kernel.org>; Mon, 12 May 2025 02:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747016689; cv=none; b=E6QMd1ENQ/SgvGl7M3DrZXhGAruIjGNuzKewrNy+N5rufqdTdQWWcIfPoL4t6dtswLW/JzY2TyNQd9fbFU3wzxilp6JafZdUDrRtxaPdbHpV/4Jo3HXWlr72OYkjHlv4uGI8lD6l4kDO2ovJ8iCuj4171hiJYzkKTgaqtN+ZbTQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747016689; c=relaxed/simple;
+	bh=z7qhnh/wiUvOpKBKk84OgMz6hz8R1PuKuj0Ro9Ok98M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eyKXDJ9L9VH5K4yynlrwGAmu/bKfRTfMaTEkDMkWaTgCbQCbwRgdawJlNmZR2ENhqWXSF4RR/ieimy46SGvWfQguJ+eyGHf58CO3jpNcrXaKSriNWCdm4YE6gEV42ikQocHTF7SRDOO2vx2brcgvP05XRfGHrKy+1EqUa/sKRDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N/BC6y8P; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747017195; x=1778553195;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=/JMg07gqYHrLPjGFjihNDimertqCm6f4vUBbYJicj2M=;
-  b=WSpoYzPYbCeEa85bnRiWGLHaHVQ6qGv3531XVfefHQ9+AW+WIZxcrOHI
-   dzpr74E/aBQOzHOvgNEzVtwXPZbMIZnaSQoB2ynxFBKSCfY2yV4hQZXoe
-   htuVxuK0J8+a+OdduffVP/tnNX3AU5LD418/ATXWtTiKB8PqPRFGUPNeF
-   lpip/1NDNLaq2fnZzEjFm3Mt7+soFPv4ggnT6XoAzN3MqHW5KunyYV/1l
-   2RnEjONpOV9cYCuBt79wADOO3kFuFOEbuRHAYeIrS7jfx3Q6pz0ho6cZF
-   knlT3nYJfK4g/0U+vwAqyxur0/gbUe/VdWnfcdbprgiB8KW4UEQ7hZJxu
-   g==;
-X-CSE-ConnectionGUID: 5vZ/weKnSHWrglMcoQHSzA==
-X-CSE-MsgGUID: qIzQHEf7RFuDoCF/9klfBA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11430"; a="36426277"
+  t=1747016688; x=1778552688;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=z7qhnh/wiUvOpKBKk84OgMz6hz8R1PuKuj0Ro9Ok98M=;
+  b=N/BC6y8PFnQ2H87NSZ48n0B/eS4Nob0tnnnHHplhLjRace1YBNLY45fV
+   mn8cpRIRbbAhg7WJCji6p5lxgtUW/dPf+aEgR+1a88wGxMx29DnckUC+w
+   fNoy+Dv7bowNTO0tf3xQTv3el9QRY/piKapUPnEsC22silAANwYvi7YPH
+   gEUbTXzXS6EAJdLybIdhMi1jJVYa8qYS0GD77vrwgaiXVRwRwWFgIKZLJ
+   dYqL08yy7zXzzKKYdBaHDvs3q4RLcZp/QG9lPJIDr0YfbbkrdMR1zj4jl
+   kTZfA0AhNbJ9oz3FAuHS5eXzHtCYyg8rvOhcoyddrHQ/XQOaz99sz/OGx
+   w==;
+X-CSE-ConnectionGUID: ARYDyf0SQ4esnOQ6a9ma4w==
+X-CSE-MsgGUID: HbMvI0GoTF6neSgsYJbTTQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11430"; a="60202900"
 X-IronPort-AV: E=Sophos;i="6.15,281,1739865600"; 
-   d="scan'208";a="36426277"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2025 19:33:13 -0700
-X-CSE-ConnectionGUID: 1rqjkSg0T8eS4qfXactM5A==
-X-CSE-MsgGUID: HZABnjAJTvuH1qz5KPgOLQ==
+   d="scan'208";a="60202900"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2025 19:24:47 -0700
+X-CSE-ConnectionGUID: MOgSV+puRlO3gTTA58Sv+Q==
+X-CSE-MsgGUID: nX5TD5wBSsGv9x37LRRe2Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,281,1739865600"; 
-   d="scan'208";a="138202170"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2025 19:27:50 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Sun, 11 May 2025 19:27:49 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Sun, 11 May 2025 19:27:49 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Sun, 11 May 2025 19:27:49 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VbbCiPWbehVw401v/jpYfjvh1V6eJR76nlT7Ykg86uaS7hoBP4/dDmAlts8pmHWCc2w8BWnrbZS3xnseGpQfJYyaVzjrRudvmMoPXBhngkhihTRsSrsVa4BKmlioxYjd3OsarYjeGzgsc4R+GUq4tziO4VxsCLyh/LzxFM4CNU8c5sjPAIfEi0G2amPGH5AYdEmGCA3wbpom0tVAu69ELr/P/qWZ4m/8uLBRLMRZGEQjqzb7c4IB4I738spt2JmXRVh6gndBu9amt/OnJql43ljbsqz8JCmIBn4jA0tWg/t9McCD64MrzzFeEFAXPfqKMb36/KX5DubUq+crY9jg1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tjt6woImh13PN9knVXz6Hr2QDY7iEXUBFCZ5P6osCxA=;
- b=vH9ghOBCx4i+y6voY1Dp+vbcDnwejEvGXmUF4pQDIn7oCTmvCcMv/IVG0NuQh+KUp1j1Do0niGjcRWPCNyUNAT55+v40iY5RvnuXKKij8WDexGfLH2Pxu+P65ysWk7/peGOoTWsdF1EUEmytPeyC2VuA+hBi57zcw0oETSAw7CDn31BYTd8STw7NL05RPsD5aeYc7hFO98wu21jh0U/8A2OBuFJYwe47WXq+kdch4l9AsBlSS5RC3im8FCqjuIWF37B0t2W/unilnPKF1n2n2yW1oAbtluxs7qTiyWGEVEEQxH26mihnO5F/YBoyb2s/ev36lgRtSgVqPrwJWqU0MA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- SA0PR11MB4541.namprd11.prod.outlook.com (2603:10b6:806:94::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.29; Mon, 12 May 2025 02:27:08 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.8722.027; Mon, 12 May 2025
- 02:27:07 +0000
-Date: Mon, 12 May 2025 10:25:01 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "seanjc@google.com"
-	<seanjc@google.com>, "Shutemov, Kirill" <kirill.shutemov@intel.com>,
-	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, "Li, Xiaoyao"
-	<xiaoyao.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Hansen,
- Dave" <dave.hansen@intel.com>, "david@redhat.com" <david@redhat.com>,
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "tabba@google.com"
-	<tabba@google.com>, "Li, Zhiquan1" <zhiquan1.li@intel.com>, "Du, Fan"
-	<fan.du@intel.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "michael.roth@amd.com"
-	<michael.roth@amd.com>, "Weiny, Ira" <ira.weiny@intel.com>, "vbabka@suse.cz"
-	<vbabka@suse.cz>, "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-	"ackerleytng@google.com" <ackerleytng@google.com>, "Yamahata, Isaku"
-	<isaku.yamahata@intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>,
-	"Annapurve, Vishal" <vannapurve@google.com>, "jroedel@suse.de"
-	<jroedel@suse.de>, "Miao, Jun" <jun.miao@intel.com>, "pgonda@google.com"
-	<pgonda@google.com>, "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [RFC PATCH 18/21] KVM: x86: Split huge boundary leafs before
- private to shared conversion
-Message-ID: <aCFb/ecA2AR2sNm1@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20250424030033.32635-1-yan.y.zhao@intel.com>
- <20250424030844.502-1-yan.y.zhao@intel.com>
- <fa85ac0cf3e6fae190dca953006d57c02fac6978.camel@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <fa85ac0cf3e6fae190dca953006d57c02fac6978.camel@intel.com>
-X-ClientProxiedBy: SI2PR01CA0046.apcprd01.prod.exchangelabs.com
- (2603:1096:4:193::18) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+   d="scan'208";a="137094374"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by orviesa010.jf.intel.com with ESMTP; 11 May 2025 19:24:40 -0700
+Date: Mon, 12 May 2025 10:45:42 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Markus Armbruster <armbru@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	"Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
+	Richard Henderson <richard.henderson@linaro.org>,
+	kvm@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>, Yi Liu <yi.l.liu@intel.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-riscv@nongnu.org,
+	Weiwei Li <liwei1518@gmail.com>, Amit Shah <amit@kernel.org>,
+	Yanan Wang <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	Fabiano Rosas <farosas@suse.de>,
+	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+	=?iso-8859-1?Q?Cl=E9ment?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
+	qemu-arm@nongnu.org,
+	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Jason Wang <jasowang@redhat.com>
+Subject: Re: How to mark internal properties (was: Re: [PATCH v4 12/27]
+ target/i386/cpu: Remove CPUX86State::enable_cpuid_0xb field)
+Message-ID: <aCFg1hr1wpNZIcL3@intel.com>
+References: <20250508133550.81391-1-philmd@linaro.org>
+ <20250508133550.81391-13-philmd@linaro.org>
+ <23260c74-01ba-45bc-bf2f-b3e19c28ec8a@intel.com>
+ <aB2vjuT07EuO6JSQ@intel.com>
+ <2f526570-7ab0-479c-967c-b3f95f9f19e3@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SA0PR11MB4541:EE_
-X-MS-Office365-Filtering-Correlation-Id: b3a0af5d-85a6-497a-502b-08dd90fc7df2
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?wv904jX4B8QQ5JDaijNz1PWVxSICrJFQqxDd9LZHJIriXUxH26dw8R33g2Db?=
- =?us-ascii?Q?UaxDpk3ymiAxOfZ7em5oyuaMxlzzq9HQPztyWvhuOiYhZ1codB5vUL9H+s2i?=
- =?us-ascii?Q?BaBZPFNcoK9ocRt6Pizpl6nlOtncJzUy6BT/TZ0hVx1rp7cLbW7vxYTl56Ie?=
- =?us-ascii?Q?gOF1f+3haSmZVw47QtUPA92LG+xI06QpiWOOJRRBL/ZlWHW2+r5IHiEQVsHb?=
- =?us-ascii?Q?WWlDONWRbFGORvf8SbDgFS1i6B5Vq7GBXr0pzyFb1yTRQLeWA6azoJWYQtw5?=
- =?us-ascii?Q?T+47X11BVm2ji6aLyRxPX+cSP+VF6GwldBLaPFgVGXOZ1/O6EURBNfIkhNph?=
- =?us-ascii?Q?+G/CYmx8BcQXbVlLc/1XUcOmhRNfUu4UfHFJVNf6XQKhPOKtMB6Ro9/mP+jU?=
- =?us-ascii?Q?GWmeptxOf9kciy0cmSVTSal2vzU7GWccpRvlIOrMlrY0tUl2v6hk9dUFwaSy?=
- =?us-ascii?Q?QSSkdDHHqmP/FqaTa3/n7JK/LXfyef7S/QFcW4Y+qMGwTV3OoPwktxzflnel?=
- =?us-ascii?Q?VhDThpCuhPLHySz3WRwzt3zLmn7sbmJ7j2hiPCpyFkq7A8so61GeD7QKEGhH?=
- =?us-ascii?Q?NOP2PMW1cuoX0Ole5rQAGR0QfmPUGSs0TsKbthPFL2zGXSUXKc3BqpZZ6eWk?=
- =?us-ascii?Q?CGGnXwElsZuRaU8yWppntQsSi1dyptKYxaaGXdYtTcwXMfMpeY0KfQVv9mLH?=
- =?us-ascii?Q?OutdZGvsNriDI7F3BsywZrdKzQOw7KtyJTSDYNx0UnFYI0TWYUyhZAKXuo+S?=
- =?us-ascii?Q?DU+jbNeohgPgJcgARdCGsfe9cnUoSe0oJOu/K6hbeCWeO2oryrnwkiqQHzCI?=
- =?us-ascii?Q?6pHodZZ5BiflMJq01lCRKIGPaRhjZTDK+8oI3q5QYqy/L7pAEzqoJjkNgjEy?=
- =?us-ascii?Q?lpnAmKuLUFWjhVOCmQkTeZhcL4DUHWsRA+vr6WbwBD1bP3yM4/0MIJlSSBUY?=
- =?us-ascii?Q?aXYpnYm/2FNdRObOcy0t2nujlGakQmQahupWUMDWKsUnUtxsjRj7LAXSfAEQ?=
- =?us-ascii?Q?cCnTU1auOqDKCDFVNiPrTvTgtr8pHmGDfrKp0WSFq54PaXryn+xNSmLlXCCN?=
- =?us-ascii?Q?Ew6XTv0ZS58sO4T6/Ur0jeP57StL2QUzqlD1aMKlYWP7cTuuPdo9ke+rlpeC?=
- =?us-ascii?Q?cY+ZSNmLD2xoflNeW2rW3W5rjsNLjtYpiib9y+TYmRVDSS9DeZpH1BUZ+bRA?=
- =?us-ascii?Q?AeO+KP8C7mcI+joAF15aMFoGVT1Z+QppoF9WUIITXH3XdgOzWS/oce0pp6ru?=
- =?us-ascii?Q?BEL/A6OaPDZR7bH3KY8A0251XJTfbARgEtyTMR8F12L7VsWdbukzbqnF/o42?=
- =?us-ascii?Q?dSE/I5o3GGk+iMs+xrIVdS09f+KjC5skVMxyfAPcrtQxTW1Zrpof7p+Tqrmn?=
- =?us-ascii?Q?JwAFrex0D0fHLET+RtbOG7awOAC3EqxkqD1nh3cZSA0FJyeK5jcVFauiwChK?=
- =?us-ascii?Q?7Q2L3aRRJbk=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ztjLhbQMH8ifqKvFletjYcTfrKYokoeheJwnFxbDDMtah1QjteNWH91VVrex?=
- =?us-ascii?Q?bmKiEqXlFtFdWQss+zcjqkiLRRvkmHeX+aRBWbeHUCCHCk784TCMQ+n3KGrq?=
- =?us-ascii?Q?W63HlR/zw5RA2UD3fBSGko/4F88OBDahyZOaiCnAjaoFCfq8Era8l61FSIBf?=
- =?us-ascii?Q?jKHcsHSavqXiE452OfbrFZVnvYVm6d7dOLmY8YNP1wHBbFVI5k2D6KbUejAI?=
- =?us-ascii?Q?PnNh5rzIq6RseTfNTwP8WN9alcULlIZpiu3zQWFS0UHnZdfb7NFVJksyrpuO?=
- =?us-ascii?Q?V2rfD1IYG0nNYbOJo+jg0NhiA/a1cyVPNMGsZTYpbjIE12QBD9c+e7CRj3xE?=
- =?us-ascii?Q?j7v1+I3K2zAIOc/UCShfkDxq8Waz3Symo2mJAMznwn/yRqvqtSiqw9lNRqSE?=
- =?us-ascii?Q?wvW3uhhos3Rq+/ARcdk+MbfAhr62/fk98ahLl1AHAHtnaXZuUngIQux3l9+D?=
- =?us-ascii?Q?IapvTYFmzea5Y/fDAFhRE+Lm+92MMMvBqi6t0t5sbZbq1d8ZOYVRC5fD5TR2?=
- =?us-ascii?Q?Lm3bak6Ud+F8nY9S740/OPfTDjqoUDJy4lErR9QaUeMYcLyB+YZZtUf6X6V0?=
- =?us-ascii?Q?G/zHU/r+M9WytiaJwdepWf4CFbZCC+08fOgBeCxW5gCwgdjyzMsJJ1nVAVC0?=
- =?us-ascii?Q?ct9NUhos+1yi8u/k9/qOnXW5z/dgJCon0w34W/8A2lCeUnhbNTaDJlsbAKLW?=
- =?us-ascii?Q?NF65RWpKHVz0Hp12mbUdtMzBvY8tDgvhPNoNoCXY9UPCPt+adRVfns8+UM+S?=
- =?us-ascii?Q?iQG8DmpvzAyiCW5ejtjl9cUb+v8xZ+FGgGXnNWrzqNA8XLN93E1PLboa+HGr?=
- =?us-ascii?Q?TyE0R5jvTAuWWjhm857FO6vW29Abmb0RUo/gR5K+D+3zdXQPUKF+2tnLSomg?=
- =?us-ascii?Q?reFP3CbhtxDR8yV9ixJYIKAZXO5iCnnWcs1cDQhtrXDasq9DkDK2xVDNIn36?=
- =?us-ascii?Q?9JVp0O/shoRUTxMH54D3MBcW+U3cFlf6pzBPtI2fRc2SHLSOZKNrwLpCeaJ/?=
- =?us-ascii?Q?TQ/rBfFuNlWMHMkN/jYqBBHARJrYdGIDVp0IYkEwCqLrNdDg3MEK1HWgzl99?=
- =?us-ascii?Q?sAksVjMiWqRQ/iDKuALRl8yK+y8qJZri2pS95cxHFlB3ueIMBVewuikHxCJ0?=
- =?us-ascii?Q?Swxd+NAP7HSJgHOyyx8/jYti/Xd5wxTev9JxRZFowXTtGSI6RzpB8IAWMdpY?=
- =?us-ascii?Q?txHgPfOuxKnPYwf3b8FfDAg5AJqaVSMeYAbm2cO/IYmZ/qce3kRnbK7nUsae?=
- =?us-ascii?Q?T1Yn2CntRo5Nc84Eu7ILFyvhqdHMXvfy3pBqKG+KuuAH1Oczt4H6XMKt7ed5?=
- =?us-ascii?Q?6kvXNYAfCcWluMJ3po29WVD86JjnyvNjODiEAaIlGz1ekoz1slF5GNrPCbSm?=
- =?us-ascii?Q?oZcVMNRE+QdP5CjEUXb+8s3CPdSz90SPhyb8MpkkFnvcL0HNQIzffdbrCV5+?=
- =?us-ascii?Q?0TCoaMbCf80+nitTy573PjQmFK4tGy6e7YgRMrToG+Zd015C06RSr95A19Gh?=
- =?us-ascii?Q?JIQrigmXSgID3Ft2roiS64ytPNLAfx6tqpf0bevMmNF8h28hRBdHC3KASxwD?=
- =?us-ascii?Q?+ZweCvW8PD1sxQEcNEa68BzD/2c/dW4w6iEtC0tK?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3a0af5d-85a6-497a-502b-08dd90fc7df2
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 02:27:07.7538
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: H3QrR2XeufW0mdDFDVlO469twhUNNFC8FFzrk5KNgm17qkT5s1DhZBtVpYZFDfS11Ffil24uFqbUNGzmJ94IaQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4541
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=gb2312
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2f526570-7ab0-479c-967c-b3f95f9f19e3@redhat.com>
 
-On Sat, May 10, 2025 at 07:34:39AM +0800, Edgecombe, Rick P wrote:
-> On Thu, 2025-04-24 at 11:08 +0800, Yan Zhao wrote:
-> > Before converting a GFN range from private to shared, it is necessary to
-> > zap the mirror page table. When huge pages are supported and the GFN range
-> > intersects with a huge leaf, split the huge leaf to prevent zapping GFNs
-> > outside the conversion range.
+On Fri, May 09, 2025 at 12:04:19PM +0200, Thomas Huth wrote:
+> Date: Fri, 9 May 2025 12:04:19 +0200
+> From: Thomas Huth <thuth@redhat.com>
+> Subject: How to mark internal properties (was: Re: [PATCH v4 12/27]
+>  target/i386/cpu: Remove CPUX86State::enable_cpuid_0xb field)
 > 
-> FALLOC_FL_PUNCH_HOLE demotion failure doesn't look like it is addressed in this
-Hmm, FALLOC_FL_PUNCH_HOLE demotion failure is handled in patch 19.
+> On 09/05/2025 09.32, Zhao Liu wrote:
+> > On Fri, May 09, 2025 at 02:49:27PM +0800, Xiaoyao Li wrote:
+> > > Date: Fri, 9 May 2025 14:49:27 +0800
+> > > From: Xiaoyao Li <xiaoyao.li@intel.com>
+> > > Subject: Re: [PATCH v4 12/27] target/i386/cpu: Remove
+> > >   CPUX86State::enable_cpuid_0xb field
+> > > 
+> > > On 5/8/2025 9:35 PM, Philippe Mathieu-Daud¨¦ wrote:
+> > > > The CPUX86State::enable_cpuid_0xb boolean was only disabled
+> > > > for the pc-q35-2.6 and pc-i440fx-2.6 machines, which got
+> > > > removed. Being now always %true, we can remove it and simplify
+> > > > cpu_x86_cpuid().
+> > > > 
+> > > > Signed-off-by: Philippe Mathieu-Daud¨¦ <philmd@linaro.org>
+> > > > ---
+> > > >    target/i386/cpu.h | 3 ---
+> > > >    target/i386/cpu.c | 6 ------
+> > > >    2 files changed, 9 deletions(-)
+> > > > 
+> > > > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> > > > index 0db70a70439..06817a31cf9 100644
+> > > > --- a/target/i386/cpu.h
+> > > > +++ b/target/i386/cpu.h
+> > > > @@ -2241,9 +2241,6 @@ struct ArchCPU {
+> > > >         */
+> > > >        bool legacy_multi_node;
+> > > > -    /* Compatibility bits for old machine types: */
+> > > > -    bool enable_cpuid_0xb;
+> > > > -
+> > > >        /* Enable auto level-increase for all CPUID leaves */
+> > > >        bool full_cpuid_auto_level;
+> > > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > > index 49179f35812..6fe37f71b1e 100644
+> > > > --- a/target/i386/cpu.c
+> > > > +++ b/target/i386/cpu.c
+> > > > @@ -6982,11 +6982,6 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+> > > >            break;
+> > > >        case 0xB:
+> > > >            /* Extended Topology Enumeration Leaf */
+> > > > -        if (!cpu->enable_cpuid_0xb) {
+> > > > -                *eax = *ebx = *ecx = *edx = 0;
+> > > > -                break;
+> > > > -        }
+> > > > -
+> > > >            *ecx = count & 0xff;
+> > > >            *edx = cpu->apic_id;
+> > > > @@ -8828,7 +8823,6 @@ static const Property x86_cpu_properties[] = {
+> > > >        DEFINE_PROP_UINT64("ucode-rev", X86CPU, ucode_rev, 0),
+> > > >        DEFINE_PROP_BOOL("full-cpuid-auto-level", X86CPU, full_cpuid_auto_level, true),
+> > > >        DEFINE_PROP_STRING("hv-vendor-id", X86CPU, hyperv_vendor),
+> > > > -    DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
+> > > 
+> > > It's deprecating the "cpuid-0xb" property.
+> > > 
+> > > I think we need go with the standard process to deprecate it.
+> > 
+> > Thanks! I got your point.
+> > 
+> > Though this property is introduced for compatibility, as its comment
+> > said "Compatibility bits for old machine types", it is also useful for
+> > somer users.
+> 
+> Thanks for your clarifications, Zhao! But I think this shows again the
+> problem that we have hit a couple of times in the past already: Properties
+> are currently used for both, config knobs for the users and internal
+> switches for configuration of the machine. We lack a proper way to say "this
+> property is usable for the user" and "this property is meant for internal
+> configuration only".
 
-> series. I noticed that mmu notifier failures are allowed to be handled by
-> blocking until success is possible, in most cases. KVM just doesn't need to
-> because it can't fail. We could think about doing retries for
-> FALLOC_FL_PUNCH_HOLE, while checking for signals. Or adding a ENOMEM error code
-> to fallocate.
-In patch 19, FALLOC_FL_PUNCH_HOLE could return -ENOMEM.
+Hi Thomas, thank you.
 
-Returning -ENOMEM may be inevitable as we can't endlessly retry. So for
-simplicity, there's no retry in this series.
+AFAIK, there are two ways to configure whether an object/device is
+allowed to be created by user or not:
 
+* TYPE_USER_CREATABLE
+* DeviceClass: user_creatable
 
-Besides that, do you think whether we need to conduct splittings before any
-unmap is invoked?
+So, it looks like it would be tricky to change the infrastructure around
+object_property_add because it's not easy to be compatible with both of the
+above user creation ways.
 
-As in the patch log:
-"
-The downside of this approach is that although kvm_split_boundary_leafs()        
-is invoked before kvm_unmap_gfn_range() for each GFN range, the entire           
-conversion range may consist of several GFN ranges. If an out-of-memory          
-error occurs during the splitting of a GFN range, some previous GFN ranges       
-may have been successfully split and zapped, even though their page              
-attributes remain unchanged due to the splitting failure. This may not be a      
-big problem as the user can retry the ioctl to split and zap the full            
-range.
-"
+> I wonder whether we could maybe come up with a naming scheme to better
+> distinguish the two sets, e.g. by using a prefix similar to the "x-" prefix
+> for experimental properties? We could e.g. say that all properties starting
+> with a "q-" are meant for QEMU-internal configuration only or something
+> similar (and maybe even hide those from the default help output when running
+> "-device xyz,help" ?)? Anybody any opinions or better ideas on this?
+
+Therefore, I think the ¡°q-¡± prefix might be a good way, simple and effective.
+
+Let's see if any other maintainers have a better idea.
+
+Regards,
+Zhao
+
 
