@@ -1,238 +1,235 @@
-Return-Path: <kvm+bounces-46141-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46143-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93DF3AB30BC
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 09:46:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3899FAB3146
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 10:14:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D137B189BAC7
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 07:46:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6ADE189087E
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 08:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA6F25525C;
-	Mon, 12 May 2025 07:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8EF1257AF2;
+	Mon, 12 May 2025 08:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G07hTV/O"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="ar35yTb7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539492566D4
-	for <kvm@vger.kernel.org>; Mon, 12 May 2025 07:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A590B253F1B
+	for <kvm@vger.kernel.org>; Mon, 12 May 2025 08:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747035989; cv=none; b=R81TVUKwu7Y64rrDbAi9IQpkFZvtZOF/p1/4QGtbsMhzK9ghWnrR+j7FJBQtoHbvTa663nG1G7U8Ela7sK3lf+aYT0KL9g61cSHijm2V+6EI7BLQ6cXAaEnUOo0E8TqfxCE/4zYysefofk2mc+Ez1R++XJaTckUTOKZMpre9aa0=
+	t=1747037680; cv=none; b=k5yT82YwdgBfVrcRWI7rGW2PxplikK+Did5DY8MDq8I3Pf3UAFrNhFfaZ8atrweGcNqxxXAUbv+RuIxchJMq+jqXvuVDtHjl3tJ7F2z24hW5S5EPUoH49MKMrjJINjNu67GuQziEDONo7QEwRD2/NRFbGUmtBvgdsBU4WdczIP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747035989; c=relaxed/simple;
-	bh=iBK0lK8aZNneNniNfW/LpU9WpjK3D8Ahrjop4/GkZK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lkg9s8YokU/Pjs4EVN7DHSlyUJVwmUJOnx4u3rRyYKYxN/P2KrH0AbJJLUSnH07LIQ0FX3qfrjHOMTnwgtP536KQGZh9IwiTHBjlKyuRTsJrqhjHSHuayKet5a8hh6MFZbTBg+X0Msz43FvQ1cgg19tPLyWQ/7ayi0HRb4N6gJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G07hTV/O; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747035987; x=1778571987;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=iBK0lK8aZNneNniNfW/LpU9WpjK3D8Ahrjop4/GkZK0=;
-  b=G07hTV/O2znOw0CElnNwwynmop7FyLhnb+LMYeXn1wjF+1MSypbR2vjM
-   4DyICq0yZTidP1Z1WoWlsCnNQQduPYEOxl6ONUzelBqFN7WeKKHRcJl00
-   B5AsiTr5MvDq4sJBCiZaOVOH+btVr7IaAqefCGwX1k0F4M/nbjsREDFa7
-   ZqMxpj/9gXBxbBfES/KRVJ3WSCDmk8nO2s50NT91oIRki7zy0k4VZ+o7A
-   3NKi7jAvGbSagX6bWxuhTp1VUgAitBzCN+CaVDvgDRDORas6kRMWGRUqk
-   vFL0+/iKIE28SCqbycJKzckqlQcvZ8E1ri5qsqc8zE9SDdNdnUWMnQiWV
-   w==;
-X-CSE-ConnectionGUID: irN4O8dERPiI/vZVp4Qyhg==
-X-CSE-MsgGUID: ifSciN7jTKKDAOkysNA0Wg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11430"; a="48744428"
-X-IronPort-AV: E=Sophos;i="6.15,281,1739865600"; 
-   d="scan'208";a="48744428"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 00:46:27 -0700
-X-CSE-ConnectionGUID: j59mCUCoTHuhaqL6Sbi2vg==
-X-CSE-MsgGUID: EHcgkk8oR/SiWI3IT1I5ZQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,281,1739865600"; 
-   d="scan'208";a="142250312"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by orviesa004.jf.intel.com with ESMTP; 12 May 2025 00:46:23 -0700
-Date: Mon, 12 May 2025 16:07:26 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Chenyi Qiang <chenyi.qiang@intel.com>
-Cc: David Hildenbrand <david@redhat.com>,
-	Alexey Kardashevskiy <aik@amd.com>, Peter Xu <peterx@redhat.com>,
-	Gupta Pankaj <pankaj.gupta@amd.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
-	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
-Subject: Re: [PATCH v4 07/13] ram-block-attribute: Introduce
- RamBlockAttribute to manage RAMBLock with guest_memfd
-Message-ID: <aCGsPh/A3sh0dDlI@intel.com>
-References: <20250407074939.18657-1-chenyi.qiang@intel.com>
- <20250407074939.18657-8-chenyi.qiang@intel.com>
+	s=arc-20240116; t=1747037680; c=relaxed/simple;
+	bh=ZTzMqrn1URom1KwjBf0pttZCkEBA9ZhKUjt81jZvKpI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=olLqNvGsrABgTKSD9XXqEe63/JLYer3s8Z85WsbgyrbI8S8alNEgpdZwiq1131Jvmno/ypotNvPPHJLSq+XLR35V0+SsV1iReys46QqlWa8m0rEQqsjf4cLblKO/ssxsNFvetzqv1BchqaKxt15uobOCr0y9Mrj3l1XaK69hA0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=ar35yTb7; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a0ba0b6b76so2888584f8f.1
+        for <kvm@vger.kernel.org>; Mon, 12 May 2025 01:14:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1747037677; x=1747642477; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KUWtnXREtfU0bglSJPdPg3dSI06mpwAnzzgVNIScr4k=;
+        b=ar35yTb7To8DY9zWyhaj6CjMROYLdYrYlJZcHgm8BIoBZKjBvh9TZEgkQaroHM/MrB
+         0wf28gvakTOoSeYMpA6KMAbG08lbGK/ok2kSq9L1ZmyJh5KXFFlmffG9UELfgi7zB18U
+         jP0ErP40tITWcyfs3kIvcjv1BmmqBu8kTyM33P+c6cGRxbXKDOPAGGWPp5h6uRx3cHTR
+         31XQCxU138vYBdRT6Hm9wTWKs8uVODmvhntVgrSj6w4mpYbUxROsxbTkO9u26UyFwdNq
+         WgXQxFMF4ViuxbOgxtOkjQNkhJhJpamWjzsewC/ctHdizn8euM/TQ+GmPG+em6a4ObwO
+         c+ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747037677; x=1747642477;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KUWtnXREtfU0bglSJPdPg3dSI06mpwAnzzgVNIScr4k=;
+        b=NV5/GBpThVMA/BfXqsEgQEa77j4WnxqHeJpFuy7D8Awla2Z04jlJpjFeC+aFvXvmYK
+         g0iRd7tHZWboRnTfGwp2TLK1uiPheHRBEJlSZP4suNyLaV1Lka7xNJPWKYL40awhdB61
+         /xp68KQGoensqlt58Ps4K9pn8JBoPGfgUbWNrO5PBROO8NtpJX6RD3ZWdP1/wtkxBzZ+
+         WCsb23ckk5C2W+8ILOalV1TABYdHFDWYT/J6cfYzMfLgWKaoKyeodbjD4kNtRyXsJ6JU
+         YwnoNaHayc7y9N9WpZtOKruruROh7TKRTNf1u1teuPZLOjjJfVjZLK58q7qfC/HYn/xI
+         Zdug==
+X-Forwarded-Encrypted: i=1; AJvYcCVvoIzVyf9k1Qp2w7ntJJQNzynhH2VA5WZD51QW9Qp/6LG8fNfIWhBv6z6rSvYUtrSBxjk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlnGdk8IUyXuLIsidC9/SeweGbw5ctaL12cNkuRwgnkXoTC1C3
+	CGsd7jHon9KshRa5A+TOehJRHJAtjAjm4GvBUZT6oA7+JPiR2fnciTx/bb4TT6s=
+X-Gm-Gg: ASbGnctB7yUWMqfpPBl+zrOv0MVtnHsNeuqjIn4knu4mzdKM9Tq9hbwGaDtch9zdfG/
+	B9ikX31Ljg+kj0kQn6QcZIncTZ+WtMvUGad/Q44nkttKwUbJycWpRRTSanFbQp7cFeXmgdVQsjd
+	RosfCQSANqHobT42I6mDME2NW+dQZC33hF3GjZmkBH9oBUGHhClkOor/VlbRSTwt27TwrvjQHC4
+	wSaQ1OKuoc6QzP5LhkRzplW9pd8frdTDNEaZUHxPlYhEevAgpDj5QHG66MYdaAY87+nxL3JW7Vr
+	VH5Egb00FHOa74ho3Uy6rmSWNTvIiqATlkhIkyAmVtl/ofaFzj/t5zHQ6T2ZHKwmuyKeNnyNSa5
+	1PwaXvNgAWeCyN3B2asDL
+X-Google-Smtp-Source: AGHT+IF5FdpyihNwkP+pz8qwsSi03YYChIIL/diT4CyeFnMpdYT9qUG8HkxnvNgaNA1vzLlpCGu/5Q==
+X-Received: by 2002:a05:6000:186f:b0:399:6dd9:9f40 with SMTP id ffacd0b85a97d-3a1f643acbemr9221007f8f.9.1747037676817;
+        Mon, 12 May 2025 01:14:36 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f5a2cf43sm11626947f8f.70.2025.05.12.01.14.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 May 2025 01:14:36 -0700 (PDT)
+Message-ID: <fe9d801b-007d-476d-97fe-96d0f3d218cd@rivosinc.com>
+Date: Mon, 12 May 2025 10:14:35 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407074939.18657-8-chenyi.qiang@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 04/14] riscv: sbi: add FWFT extension interface
+To: Atish Patra <atish.patra@linux.dev>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-kselftest@vger.kernel.org
+Cc: Samuel Holland <samuel.holland@sifive.com>,
+ Andrew Jones <ajones@ventanamicro.com>, Deepak Gupta <debug@rivosinc.com>
+References: <20250424173204.1948385-1-cleger@rivosinc.com>
+ <20250424173204.1948385-5-cleger@rivosinc.com>
+ <1c385a47-0a01-4be4-a34b-51a2f168e62d@linux.dev>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <1c385a47-0a01-4be4-a34b-51a2f168e62d@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-[snip]
 
-> ---
->  include/exec/ramblock.h      |  24 +++
->  system/meson.build           |   1 +
->  system/ram-block-attribute.c | 282 +++++++++++++++++++++++++++++++++++
->  3 files changed, 307 insertions(+)
->  create mode 100644 system/ram-block-attribute.c
 
-checkpatch.pl complains a lot about code line length:
+On 09/05/2025 02:18, Atish Patra wrote:
+> On 4/24/25 10:31 AM, ClÃ©ment LÃ©ger wrote:
+>> This SBI extensions enables supervisor mode to control feature that are
+>> under M-mode control (For instance, Svadu menvcfg ADUE bit, Ssdbltrp
+>> DTE, etc). Add an interface to set local features for a specific cpu
+>> mask as well as for the online cpu mask.
+>>
+>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+>> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+>> ---
+>>   arch/riscv/include/asm/sbi.h | 17 +++++++++++
+>>   arch/riscv/kernel/sbi.c      | 57 ++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 74 insertions(+)
+>>
+>> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
+>> index 7ec249fea880..3bbef56bcefc 100644
+>> --- a/arch/riscv/include/asm/sbi.h
+>> +++ b/arch/riscv/include/asm/sbi.h
+>> @@ -503,6 +503,23 @@ int sbi_remote_hfence_vvma_asid(const struct
+>> cpumask *cpu_mask,
+>>                   unsigned long asid);
+>>   long sbi_probe_extension(int ext);
+>>   +int sbi_fwft_set(u32 feature, unsigned long value, unsigned long
+>> flags);
+>> +int sbi_fwft_set_cpumask(const cpumask_t *mask, u32 feature,
+>> +             unsigned long value, unsigned long flags);
+>> +/**
+>> + * sbi_fwft_set_online_cpus() - Set a feature on all online cpus
+>> + * @feature: The feature to be set
+>> + * @value: The feature value to be set
+>> + * @flags: FWFT feature set flags
+>> + *
+>> + * Return: 0 on success, appropriate linux error code otherwise.
+>> + */
+>> +static inline int sbi_fwft_set_online_cpus(u32 feature, unsigned long
+>> value,
+>> +                       unsigned long flags)
+>> +{
+>> +    return sbi_fwft_set_cpumask(cpu_online_mask, feature, value, flags);
+>> +}
+>> +
+>>   /* Check if current SBI specification version is 0.1 or not */
+>>   static inline int sbi_spec_is_0_1(void)
+>>   {
+>> diff --git a/arch/riscv/kernel/sbi.c b/arch/riscv/kernel/sbi.c
+>> index 1d44c35305a9..d57e4dae7dac 100644
+>> --- a/arch/riscv/kernel/sbi.c
+>> +++ b/arch/riscv/kernel/sbi.c
+>> @@ -299,6 +299,63 @@ static int __sbi_rfence_v02(int fid, const struct
+>> cpumask *cpu_mask,
+>>       return 0;
+>>   }
+>>   +/**
+>> + * sbi_fwft_set() - Set a feature on the local hart
+>> + * @feature: The feature ID to be set
+>> + * @value: The feature value to be set
+>> + * @flags: FWFT feature set flags
+>> + *
+>> + * Return: 0 on success, appropriate linux error code otherwise.
+>> + */
+>> +int sbi_fwft_set(u32 feature, unsigned long value, unsigned long flags)
+>> +{
+>> +    return -EOPNOTSUPP;
+>> +}
+>> +
+>> +struct fwft_set_req {
+>> +    u32 feature;
+>> +    unsigned long value;
+>> +    unsigned long flags;
+>> +    atomic_t error;
+>> +};
+>> +
+>> +static void cpu_sbi_fwft_set(void *arg)
+>> +{
+>> +    struct fwft_set_req *req = arg;
+>> +    int ret;
+>> +
+>> +    ret = sbi_fwft_set(req->feature, req->value, req->flags);
+>> +    if (ret)
+>> +        atomic_set(&req->error, ret);
+> 
+> What happens when cpuX executed first reported an error but cpuY
+> executed this function later and report success.
+> 
+> The error will be masked in that case.
 
-total: 5 errors, 34 warnings, 324 lines checked
+We actually only set the bit if an error happened (consider it as a
+sticky error bit). So if CPUy reports success, it won't clear the bit.
 
-> diff --git a/include/exec/ramblock.h b/include/exec/ramblock.h
-> index 0babd105c0..b8b5469db9 100644
-> --- a/include/exec/ramblock.h
-> +++ b/include/exec/ramblock.h
-> @@ -23,6 +23,10 @@
->  #include "cpu-common.h"
->  #include "qemu/rcu.h"
->  #include "exec/ramlist.h"
-> +#include "system/hostmem.h"
-> +
-> +#define TYPE_RAM_BLOCK_ATTRIBUTE "ram-block-attribute"
-> +OBJECT_DECLARE_TYPE(RamBlockAttribute, RamBlockAttributeClass, RAM_BLOCK_ATTRIBUTE)
+Thanks,
 
-Could we use "OBJECT_DECLARE_SIMPLE_TYPE" here? Since I find class
-doesn't have any virtual method.
+Clément
 
->  struct RAMBlock {
->      struct rcu_head rcu;
-> @@ -90,5 +94,25 @@ struct RAMBlock {
->       */
->      ram_addr_t postcopy_length;
->  };
-> +
-> +struct RamBlockAttribute {
-> +    Object parent;
-> +
-> +    MemoryRegion *mr;
-> +
-> +    /* 1-setting of the bit represents the memory is populated (shared) */
-> +    unsigned shared_bitmap_size;
-> +    unsigned long *shared_bitmap;
-> +
-> +    QLIST_HEAD(, PrivateSharedListener) psl_list;
-> +};
-> +
-> +struct RamBlockAttributeClass {
-> +    ObjectClass parent_class;
-> +};
+> 
+>> +}
+>> +
+>> +/**
+>> + * sbi_fwft_set_cpumask() - Set a feature for the specified cpumask
+>> + * @mask: CPU mask of cpus that need the feature to be set
+>> + * @feature: The feature ID to be set
+>> + * @value: The feature value to be set
+>> + * @flags: FWFT feature set flags
+>> + *
+>> + * Return: 0 on success, appropriate linux error code otherwise.
+>> + */
+>> +int sbi_fwft_set_cpumask(const cpumask_t *mask, u32 feature,
+>> +                   unsigned long value, unsigned long flags)
+>> +{
+>> +    struct fwft_set_req req = {
+>> +        .feature = feature,
+>> +        .value = value,
+>> +        .flags = flags,
+>> +        .error = ATOMIC_INIT(0),
+>> +    };
+>> +
+>> +    if (feature & SBI_FWFT_GLOBAL_FEATURE_BIT)
+>> +        return -EINVAL;
+>> +
+>> +    on_each_cpu_mask(mask, cpu_sbi_fwft_set, &req, 1);
+>> +
+>> +    return atomic_read(&req.error);
+>> +}
+>> +
+>>   /**
+>>    * sbi_set_timer() - Program the timer for next timer event.
+>>    * @stime_value: The value after which next timer event should fire.
+> 
 
-With OBJECT_DECLARE_SIMPLE_TYPE, this class definition is not needed.
-
-> +int ram_block_attribute_realize(RamBlockAttribute *attr, MemoryRegion *mr);
-> +void ram_block_attribute_unrealize(RamBlockAttribute *attr);
-> +
->  #endif
->  #endif
-> diff --git a/system/meson.build b/system/meson.build
-> index 4952f4b2c7..50a5a64f1c 100644
-> --- a/system/meson.build
-> +++ b/system/meson.build
-> @@ -15,6 +15,7 @@ system_ss.add(files(
->    'dirtylimit.c',
->    'dma-helpers.c',
->    'globals.c',
-> +  'ram-block-attribute.c',
-
-This new file is missing a MAINTAINERS entry.
-
->    'memory_mapping.c',
->    'qdev-monitor.c',
->    'qtest.c',
-
-[snip]
-
-> +static size_t ram_block_attribute_get_block_size(const RamBlockAttribute *attr)
-> +{
-> +    /*
-> +     * Because page conversion could be manipulated in the size of at least 4K or 4K aligned,
-> +     * Use the host page size as the granularity to track the memory attribute.
-> +     */
-> +    g_assert(attr && attr->mr && attr->mr->ram_block);
-> +    g_assert(attr->mr->ram_block->page_size == qemu_real_host_page_size());
-> +    return attr->mr->ram_block->page_size;
-
-What about using qemu_ram_pagesize() instead of accessing
-ram_block->page_size directly?
-
-Additionally, maybe we can add a simple helper to get page size from
-RamBlockAttribute.
-
-> +}
-> +
-
-[snip]
-
-> +static void ram_block_attribute_psm_register_listener(GenericStateManager *gsm,
-> +                                                      StateChangeListener *scl,
-> +                                                      MemoryRegionSection *section)
-> +{
-> +    RamBlockAttribute *attr = RAM_BLOCK_ATTRIBUTE(gsm);
-> +    PrivateSharedListener *psl = container_of(scl, PrivateSharedListener, scl);
-> +    int ret;
-> +
-> +    g_assert(section->mr == attr->mr);
-> +    scl->section = memory_region_section_new_copy(section);
-> +
-> +    QLIST_INSERT_HEAD(&attr->psl_list, psl, next);
-> +
-> +    ret = ram_block_attribute_for_each_shared_section(attr, section, scl,
-> +                                                      ram_block_attribute_notify_shared_cb);
-> +    if (ret) {
-> +        error_report("%s: Failed to register RAM discard listener: %s", __func__,
-> +                     strerror(-ret));
-
-There will be 2 error messages: one is the above, and another is from
-ram_block_attribute_for_each_shared_section().
-
-Could we just exit to handle this error?
-
-> +    }
-> +}
-> +
-> +static void ram_block_attribute_psm_unregister_listener(GenericStateManager *gsm,
-> +                                                        StateChangeListener *scl)
-> +{
-> +    RamBlockAttribute *attr = RAM_BLOCK_ATTRIBUTE(gsm);
-> +    PrivateSharedListener *psl = container_of(scl, PrivateSharedListener, scl);
-> +    int ret;
-> +
-> +    g_assert(scl->section);
-> +    g_assert(scl->section->mr == attr->mr);
-> +
-> +    ret = ram_block_attribute_for_each_shared_section(attr, scl->section, scl,
-> +                                                      ram_block_attribute_notify_private_cb);
-> +    if (ret) {
-> +        error_report("%s: Failed to unregister RAM discard listener: %s", __func__,
-> +                     strerror(-ret));
-
-Ditto.
-
-> +    }
-> +
-> +    memory_region_section_free_copy(scl->section);
-> +    scl->section = NULL;
-> +    QLIST_REMOVE(psl, next);
-> +}
-> +
 
