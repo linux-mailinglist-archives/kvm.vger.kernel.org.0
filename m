@@ -1,203 +1,162 @@
-Return-Path: <kvm+bounces-46193-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46194-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21ED6AB4104
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 20:00:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BFFEAB41AF
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 20:10:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65095466C35
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 18:00:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFA52862565
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 18:07:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BEAA296FA4;
-	Mon, 12 May 2025 18:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122D3298CB4;
+	Mon, 12 May 2025 18:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hGlf2DxK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V8F4QJe5"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114BB1EE03B;
-	Mon, 12 May 2025 18:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECEA298CA2
+	for <kvm@vger.kernel.org>; Mon, 12 May 2025 18:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747072842; cv=none; b=T4zfIvV5vgnN9xduoVolfkYrIkoS6hJ+cbySUOB7ppSI756jBAOkvFLVkNyui1h/xvI6yRcgIqzXhw3lW2BbH+nJDAjGmSW4ShQJaLZfCjSoDWsL1ZrN3ySBCDa8uni9GZiFBXjecXSHvaWdNh0lFM3SbrCCRT8YVY9cvXKp8uo=
+	t=1747073070; cv=none; b=F0EfY48eIhB5//mxSCEFtWth2gEbOrfB6fY8mBfmZ2GuPamfrrnlYWd/UTWLEL74ZC93VzcgQ22o59HhS16z9EYIG2GuTQxVNpePGU8t6o6TZ/ey5wuMXcfw+RzYDC7WjK4V+quwD02YlU3MFVwxWQjbtOTFB9WezLSyf+M71xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747072842; c=relaxed/simple;
-	bh=fGBDzm38SHotQ4ArsU6HmeU+3zz7XAVrMhlyZFy3IZs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NdtO0QeLJpAvMGQqE5i1DnjVF926LbVVmvQuVv2QkwMb9oK+X1ksh3gy4PPCjYp9TjoHEjFJLTrdkBfCNNnNABz3yqogBvkIDcfQWLlStHk7DGMh/JjWmCzpzQz1G1dZN/6aYfNIdcZVouJE9OtEm6C6HPL7C9Cs41u0U3wO3XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hGlf2DxK; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f27b0506-4841-4650-a0ee-0fe1643fdf37@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1747072827;
+	s=arc-20240116; t=1747073070; c=relaxed/simple;
+	bh=01AxGl5y9sewo+AjNmG3P95dBC2IXR63aHqvqvehehg=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=gidgaWQ366NX3J4cVX+Krp67bovnMN3zNhfT9YtIXcYJMQd6SNq9UlQ3b/JqSmJn9AOAu3FvrLccrVMaHobSA+fFQa0Zn8jlNpDum8aRe6umCoTuW3e1hxyHfUFtouS6K/yrvB8d0w12OiuWgeqot6uPElPAYXkXXEKtyTvR3pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V8F4QJe5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747073067;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ma5n1WWRt3IZMb/J5uvgHDAZKLn3T38CaI/Jo/Q76W4=;
-	b=hGlf2DxK/ll+4zVXxruxyenHniDCnXz8vzRbFapb8hUS/itdZEy/TPz0teFHV4TatUnnP5
-	BZv20ibsOKJy8hV5P8G/DZG5leGxmgDJH5uq+u9fW1PbSJFjurDRqz8BLE1IErge+GiHcI
-	Rumre5V3Jb6JPbLB6RELqbbucJ4f7ug=
-Date: Mon, 12 May 2025 11:00:21 -0700
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Jzez9beQL600E+agH2Z2p3TWupq3wuiKJM0KPUz5arQ=;
+	b=V8F4QJe59ykqnfEiGTgloV1W9QpVYkAT/gji7ZkLvAX2NY75areriaiDqrIhWjNFsHxZwf
+	vDnMi/8BIThAivEUenzm3yPMjMxK4Ccd4Hx8ZJ3PxF0FQU+tZWp5+tD5GtlUXewRCu3TkL
+	YPhVZPcPqRE2mTvNB/HUcZC3YZG73qU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-Mc8z2qJpM0WcOmyyGPFIow-1; Mon,
+ 12 May 2025 14:04:25 -0400
+X-MC-Unique: Mc8z2qJpM0WcOmyyGPFIow-1
+X-Mimecast-MFC-AGG-ID: Mc8z2qJpM0WcOmyyGPFIow_1747073061
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7837C1800263;
+	Mon, 12 May 2025 18:04:17 +0000 (UTC)
+Received: from intellaptop.lan (unknown [10.22.80.5])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B909630002D4;
+	Mon, 12 May 2025 18:04:08 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: kvm@vger.kernel.org
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Shusen Li <lishusen2@huawei.com>,
+	Waiman Long <longman@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-arm-kernel@lists.infradead.org,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Anup Patel <anup@brainfault.org>,
+	Will Deacon <will@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Alexander Potapenko <glider@google.com>,
+	kvmarm@lists.linux.dev,
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	x86@kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>,
+	linux-riscv@lists.infradead.org,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	linux-kernel@vger.kernel.org,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	kvm-riscv@lists.infradead.org,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Albert Ou <aou@eecs.berkeley.edu>
+Subject: [PATCH v5 0/6] KVM: lockdep improvements
+Date: Mon, 12 May 2025 14:04:01 -0400
+Message-ID: <20250512180407.659015-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6 04/14] riscv: sbi: add FWFT extension interface
-To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org
-Cc: Samuel Holland <samuel.holland@sifive.com>,
- Andrew Jones <ajones@ventanamicro.com>, Deepak Gupta <debug@rivosinc.com>
-References: <20250424173204.1948385-1-cleger@rivosinc.com>
- <20250424173204.1948385-5-cleger@rivosinc.com>
- <1c385a47-0a01-4be4-a34b-51a2f168e62d@linux.dev>
- <fe9d801b-007d-476d-97fe-96d0f3d218cd@rivosinc.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Atish Patra <atish.patra@linux.dev>
-In-Reply-To: <fe9d801b-007d-476d-97fe-96d0f3d218cd@rivosinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
+This is	a continuation of my 'extract lock_all_vcpus/unlock_all_vcpus'=0D
+patch series.=0D
+=0D
+Implement the suggestion of using lockdep's "nest_lock" feature=0D
+when locking all KVM vCPUs by adding mutex_trylock_nest_lock() and=0D
+mutex_lock_killable_nest_lock() and use these functions	in the=0D
+implementation of the=0D
+kvm_trylock_all_vcpus()/kvm_lock_all_vcpus()/kvm_unlock_all_vcpus().=0D
+=0D
+Those changes allow removal of a custom workaround that was needed to=0D
+silence the lockdep warning in the SEV code and also stop lockdep from=0D
+complaining in case of ARM and RISC-V code which doesn't include the above=
+=0D
+mentioned workaround.=0D
+=0D
+Finally, it's worth noting that this patch series removes a fair=0D
+amount of duplicate code by implementing the logic in one place.=0D
+=0D
+V5: addressed review feedback.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (6):=0D
+  locking/mutex: implement mutex_trylock_nested=0D
+  locking/mutex: implement mutex_lock_killable_nest_lock=0D
+  KVM: add kvm_lock_all_vcpus and kvm_trylock_all_vcpus=0D
+  x86: KVM: SVM: use kvm_lock_all_vcpus instead of a custom=0D
+    implementation=0D
+  KVM: arm64: use kvm_trylock_all_vcpus when locking all vCPUs=0D
+  RISC-V: KVM: use kvm_trylock_all_vcpus when locking all vCPUs=0D
+=0D
+ arch/arm64/include/asm/kvm_host.h     |  3 --=0D
+ arch/arm64/kvm/arch_timer.c           |  4 +-=0D
+ arch/arm64/kvm/arm.c                  | 43 ----------------=0D
+ arch/arm64/kvm/vgic/vgic-init.c       |  4 +-=0D
+ arch/arm64/kvm/vgic/vgic-its.c        |  8 +--=0D
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 12 ++---=0D
+ arch/riscv/kvm/aia_device.c           | 34 +------------=0D
+ arch/x86/kvm/svm/sev.c                | 72 ++-------------------------=0D
+ include/linux/kvm_host.h              |  4 ++=0D
+ include/linux/mutex.h                 | 32 ++++++++++--=0D
+ kernel/locking/mutex.c                | 21 +++++---=0D
+ virt/kvm/kvm_main.c                   | 59 ++++++++++++++++++++++=0D
+ 12 files changed, 126 insertions(+), 170 deletions(-)=0D
+=0D
+-- =0D
+2.46.0=0D
+=0D
 
-On 5/12/25 1:14 AM, Clément Léger wrote:
->
-> On 09/05/2025 02:18, Atish Patra wrote:
->> On 4/24/25 10:31 AM, ClÃ©ment LÃ©ger wrote:
->>> This SBI extensions enables supervisor mode to control feature that are
->>> under M-mode control (For instance, Svadu menvcfg ADUE bit, Ssdbltrp
->>> DTE, etc). Add an interface to set local features for a specific cpu
->>> mask as well as for the online cpu mask.
->>>
->>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->>> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
->>> ---
->>>    arch/riscv/include/asm/sbi.h | 17 +++++++++++
->>>    arch/riscv/kernel/sbi.c      | 57 ++++++++++++++++++++++++++++++++++++
->>>    2 files changed, 74 insertions(+)
->>>
->>> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
->>> index 7ec249fea880..3bbef56bcefc 100644
->>> --- a/arch/riscv/include/asm/sbi.h
->>> +++ b/arch/riscv/include/asm/sbi.h
->>> @@ -503,6 +503,23 @@ int sbi_remote_hfence_vvma_asid(const struct
->>> cpumask *cpu_mask,
->>>                    unsigned long asid);
->>>    long sbi_probe_extension(int ext);
->>>    +int sbi_fwft_set(u32 feature, unsigned long value, unsigned long
->>> flags);
->>> +int sbi_fwft_set_cpumask(const cpumask_t *mask, u32 feature,
->>> +             unsigned long value, unsigned long flags);
->>> +/**
->>> + * sbi_fwft_set_online_cpus() - Set a feature on all online cpus
->>> + * @feature: The feature to be set
->>> + * @value: The feature value to be set
->>> + * @flags: FWFT feature set flags
->>> + *
->>> + * Return: 0 on success, appropriate linux error code otherwise.
->>> + */
->>> +static inline int sbi_fwft_set_online_cpus(u32 feature, unsigned long
->>> value,
->>> +                       unsigned long flags)
->>> +{
->>> +    return sbi_fwft_set_cpumask(cpu_online_mask, feature, value, flags);
->>> +}
->>> +
->>>    /* Check if current SBI specification version is 0.1 or not */
->>>    static inline int sbi_spec_is_0_1(void)
->>>    {
->>> diff --git a/arch/riscv/kernel/sbi.c b/arch/riscv/kernel/sbi.c
->>> index 1d44c35305a9..d57e4dae7dac 100644
->>> --- a/arch/riscv/kernel/sbi.c
->>> +++ b/arch/riscv/kernel/sbi.c
->>> @@ -299,6 +299,63 @@ static int __sbi_rfence_v02(int fid, const struct
->>> cpumask *cpu_mask,
->>>        return 0;
->>>    }
->>>    +/**
->>> + * sbi_fwft_set() - Set a feature on the local hart
->>> + * @feature: The feature ID to be set
->>> + * @value: The feature value to be set
->>> + * @flags: FWFT feature set flags
->>> + *
->>> + * Return: 0 on success, appropriate linux error code otherwise.
->>> + */
->>> +int sbi_fwft_set(u32 feature, unsigned long value, unsigned long flags)
->>> +{
->>> +    return -EOPNOTSUPP;
->>> +}
->>> +
->>> +struct fwft_set_req {
->>> +    u32 feature;
->>> +    unsigned long value;
->>> +    unsigned long flags;
->>> +    atomic_t error;
->>> +};
->>> +
->>> +static void cpu_sbi_fwft_set(void *arg)
->>> +{
->>> +    struct fwft_set_req *req = arg;
->>> +    int ret;
->>> +
->>> +    ret = sbi_fwft_set(req->feature, req->value, req->flags);
->>> +    if (ret)
->>> +        atomic_set(&req->error, ret);
->> What happens when cpuX executed first reported an error but cpuY
->> executed this function later and report success.
->>
->> The error will be masked in that case.
-> We actually only set the bit if an error happened (consider it as a
-> sticky error bit). So if CPUy reports success, it won't clear the bit.
-
-Ahh yes. I missed that.
-
-> Thanks,
->
-> Clément
->
->>> +}
->>> +
->>> +/**
->>> + * sbi_fwft_set_cpumask() - Set a feature for the specified cpumask
->>> + * @mask: CPU mask of cpus that need the feature to be set
->>> + * @feature: The feature ID to be set
->>> + * @value: The feature value to be set
->>> + * @flags: FWFT feature set flags
->>> + *
->>> + * Return: 0 on success, appropriate linux error code otherwise.
->>> + */
->>> +int sbi_fwft_set_cpumask(const cpumask_t *mask, u32 feature,
->>> +                   unsigned long value, unsigned long flags)
->>> +{
->>> +    struct fwft_set_req req = {
->>> +        .feature = feature,
->>> +        .value = value,
->>> +        .flags = flags,
->>> +        .error = ATOMIC_INIT(0),
->>> +    };
->>> +
->>> +    if (feature & SBI_FWFT_GLOBAL_FEATURE_BIT)
->>> +        return -EINVAL;
->>> +
->>> +    on_each_cpu_mask(mask, cpu_sbi_fwft_set, &req, 1);
->>> +
->>> +    return atomic_read(&req.error);
->>> +}
->>> +
->>>    /**
->>>     * sbi_set_timer() - Program the timer for next timer event.
->>>     * @stime_value: The value after which next timer event should fire.
 
