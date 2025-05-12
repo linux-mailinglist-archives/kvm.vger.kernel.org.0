@@ -1,159 +1,174 @@
-Return-Path: <kvm+bounces-46139-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46140-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9C9AB3042
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 09:09:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 174ACAB30BB
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 09:46:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBD113B51F3
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 07:09:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 878D7177723
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 07:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7A92566C4;
-	Mon, 12 May 2025 07:09:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5535256C73;
+	Mon, 12 May 2025 07:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OTjxxVDt"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="Ky9NTgh/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D432E255F50
-	for <kvm@vger.kernel.org>; Mon, 12 May 2025 07:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA155186A;
+	Mon, 12 May 2025 07:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747033772; cv=none; b=d3yVn+QPGckTektkR0v5zExtHoAyeMeaT83emNBSbz1M+wSMWAa1SRDFsN2pdhNpTOR0Xda4HxOrjd8rsK7vknf95z1ofj8dFJQ5W4GtEsrl9YCDp91M9VWsuf+9WYWNYvASS8fj/Ik0f1rW5WMJdg0dZW/H6KgF/15ViFyL75E=
+	t=1747035983; cv=none; b=P2sOhiCR4MANOoB2e8zaD7UBDu0KYpBIFNcXwymJEEoSLHXj/Cb2X+7luU8MqTGMOk9LM/Jv0IEp2mFEJz0xtZ/GSIcXgeAzqj+/+5UMGUVMfrbLYmxzr0WuSLEBfkrOjfV8RNdljPwt4xMb8o2HkfafAd/3uCSyV6Ra4z0Vti0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747033772; c=relaxed/simple;
-	bh=+0UL+4ECd5ggGsQ+5dDpr+JU2V8Gxp3IpSWXJSEWr7k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k4e6X2/KvzXxxUqeRrT9LOcV9q5hdFrjR/qObeHxvupgzt6JUxMd10SAni2pgWLxpTcgs9orYu7zf1kf4z6YRChPQsKdI5lqzzsavyA9AhK9flxlbW9JuKSaHBegxoAiJ/pbU7dQwhhS+IbFlp1EAAkHW+zI+RcNfXoLemjCNS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OTjxxVDt; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4774611d40bso431861cf.0
-        for <kvm@vger.kernel.org>; Mon, 12 May 2025 00:09:30 -0700 (PDT)
+	s=arc-20240116; t=1747035983; c=relaxed/simple;
+	bh=0RT5pR3zu8s4u/ve/UmtKxEnYyePlnDmI1fmyK7EEu4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FlR4ZYv7zoXTkqg4mCbjynF8ylxH0XjyI9ZZteI4EK04M8dhKSi9xkpGBDIGEkh+aP56Gmw8JVeXnnYg27BPUIz13bjq8dgiUJDQ+36kOBANlC9Nb1GwJGd8RPiO0X58+1Biy+v0jnK+pdskNxc7YhkkQfV184sP05eM679PC+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=Ky9NTgh/; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747033769; x=1747638569; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XSmTOYCiVv7/OshHrbhVrhF4ObIKGNu6xZWV2038bpM=;
-        b=OTjxxVDt+73t5r0FKcHN4JPf5zRpnDJjlmNn08R0FPbBgTEz7MQQvobSMkubRS0T2g
-         S9adq9hcwNYAuNfrnl5WRU+U17EMvBlp/Ow7X/eJ5e1eq998TnbaKOKq+bZJhNYVuNfz
-         5CD2IHXQKGBq5B3+k+cHlTjBQXWtnjjbIKnAWNDin5vOc5Awo2WBe9FGFbR2AZXgjqcC
-         VhIT/mkbrIVmKJO6NqlTCwDJFh2+cKU3ukHyJu++YLwbpWYylbjBrLUrOqHx3pfcEDx/
-         9WUDIFQPAWVevMtWryK+P5yhTBH/JCuqDJ7f+IlKbC8mEF7GOApNao7WUSa8PqjfDG+w
-         5kbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747033769; x=1747638569;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XSmTOYCiVv7/OshHrbhVrhF4ObIKGNu6xZWV2038bpM=;
-        b=oNufR/W9vykBRhbO3BomVdbj/hsaF4joFEg7KUtuRSGn9TGH2VUAGI6tixejocz9Cm
-         kz5ZdN8VemzAhOuUPRBHBvLHYBMjGPmmbW8z3HHjOWU3C38AwnsGwyID/nq/jyVP1ff2
-         awzfBzz+Ihp/LBZPjTyD34mI3nNLcUE+dPodkLptE8aQnJ0lmZYooU6Ct5w8dJKdNXb3
-         OqO1ZD6DJNahHnuvlCtSL3lEjTkQ16ujJ5L2Aqare9BqoQrXBY8tnUM+qljg51DWkibv
-         Cupm1Hiee3CY4ZHdYj8jDRIx/W7/Gr+8B8nF5NrJAbIoKP73RCpP3UytXnwgpxDozQhs
-         hjfw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWJsYyRODIp5bIA+RWsn6y/lr/fdU3/ZvhIrqmI4pSE3i4xdedBCqhraYDhJBzduxqzR8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx02yEU67H9n+dIm2EqlPmlHinAbeX07LHs76rXySQ7RXyTvLFJ
-	26YBPSkWobbArVKwuJ2MfORxigtuhX3tRO7c7Wa1LhWQpcbX9hQ8GIs0JF3EBWFgH6AM1+bx1TO
-	MkvA4c86FtGmyDX+68pcjkdxzYwvrbfwNVmpi
-X-Gm-Gg: ASbGncsMSrLyq4dub/AvIvJELVzsS1I3HZMfmbK9JDtkmAv1EZ7L7ehSIvqMWKYpfLW
-	O6Su/W5amaLfO2upmbklnxU7/PoMc0HuKrKu0V+qxfHRjTdlhgcGqHSQ+kXUhPzrO1XHpYH2kp1
-	V0TgFMyMRTuYz0AOwu9TMalWiWC9/WOywx+ANc7FCM/xRt
-X-Google-Smtp-Source: AGHT+IFWkn43x0P4nlxGLXdV3CrSVT40wPdseY7NOjafRyvqEjQ9QNxnsrVcDogvYXeKprPQ5Mqc/SYgP14o+2RK6eY=
-X-Received: by 2002:ac8:5889:0:b0:494:5923:8bcd with SMTP id
- d75a77b69052e-49462d40c04mr6781711cf.3.1747033769418; Mon, 12 May 2025
- 00:09:29 -0700 (PDT)
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1747035983; x=1778571983;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=UFHX9bhgLQx+UYifQKLj+r4SVr4Xj6mwpCPoMq7PFqQ=;
+  b=Ky9NTgh/kirHEfchj3SZlw5XbWbYdjEhkC3iU1ehMnhMDxWX6+mgPEWF
+   w4ilAP6ooybz5IH4WuWZ4oDAbpIX9ugKD/jcamQBvjuCmR+nHjYXNVnwz
+   iu2mSBCByRHBNzwCuOltRe+31xuDy/PXUCu7foZEn5Hr/BwZnrbqHlmGS
+   0Zikquj+fFGXjfrQGRUnBq/AwzLoZYg2wWtNszP6E/XsLtRl3KT5UFPhl
+   Auy1LMTw5nMrwiJFeHNfp+2SMRz5DfLrzkoWDGCqwEJFyUnvs79wstYn0
+   51BURJZyuqtYM/Uj1wLfQ7I5X+hl+SbOyUQtRboXPlHyr/BlSVPXtp7V2
+   A==;
+X-IronPort-AV: E=Sophos;i="6.15,281,1739836800"; 
+   d="scan'208";a="491223325"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 07:46:19 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:57683]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.1.36:2525] with esmtp (Farcaster)
+ id 2a2a5210-3103-4885-a716-a4de45963b83; Mon, 12 May 2025 07:46:18 +0000 (UTC)
+X-Farcaster-Flow-ID: 2a2a5210-3103-4885-a716-a4de45963b83
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 12 May 2025 07:46:17 +0000
+Received: from EX19D015EUB004.ant.amazon.com (10.252.51.13) by
+ EX19D015EUB004.ant.amazon.com (10.252.51.13) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 12 May 2025 07:46:17 +0000
+Received: from EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a]) by
+ EX19D015EUB004.ant.amazon.com ([fe80::2dc9:7aa9:9cd3:fc8a%3]) with mapi id
+ 15.02.1544.014; Mon, 12 May 2025 07:46:17 +0000
+From: "Roy, Patrick" <roypat@amazon.co.uk>
+To: "david@redhat.com" <david@redhat.com>
+CC: "ackerleytng@google.com" <ackerleytng@google.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"amoorthy@google.com" <amoorthy@google.com>, "anup@brainfault.org"
+	<anup@brainfault.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"brauner@kernel.org" <brauner@kernel.org>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "chenhuacai@kernel.org"
+	<chenhuacai@kernel.org>, "dmatlack@google.com" <dmatlack@google.com>,
+	"fvdl@google.com" <fvdl@google.com>, "hch@infradead.org" <hch@infradead.org>,
+	"hughd@google.com" <hughd@google.com>, "isaku.yamahata@gmail.com"
+	<isaku.yamahata@gmail.com>, "isaku.yamahata@intel.com"
+	<isaku.yamahata@intel.com>, "james.morse@arm.com" <james.morse@arm.com>,
+	"jarkko@kernel.org" <jarkko@kernel.org>, "jgg@nvidia.com" <jgg@nvidia.com>,
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "jthoughton@google.com"
+	<jthoughton@google.com>, "keirf@google.com" <keirf@google.com>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "liam.merwick@oracle.com"
+	<liam.merwick@oracle.com>, "linux-arm-msm@vger.kernel.org"
+	<linux-arm-msm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, "maz@kernel.org"
+	<maz@kernel.org>, "mic@digikod.net" <mic@digikod.net>, "michael.roth@amd.com"
+	<michael.roth@amd.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "palmer@dabbelt.com"
+	<palmer@dabbelt.com>, "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"qperret@google.com" <qperret@google.com>, "quic_cvanscha@quicinc.com"
+	<quic_cvanscha@quicinc.com>, "quic_eberman@quicinc.com"
+	<quic_eberman@quicinc.com>, "quic_mnalajal@quicinc.com"
+	<quic_mnalajal@quicinc.com>, "quic_pderrin@quicinc.com"
+	<quic_pderrin@quicinc.com>, "quic_pheragu@quicinc.com"
+	<quic_pheragu@quicinc.com>, "quic_svaddagi@quicinc.com"
+	<quic_svaddagi@quicinc.com>, "quic_tsoni@quicinc.com"
+	<quic_tsoni@quicinc.com>, "rientjes@google.com" <rientjes@google.com>, "Roy,
+ Patrick" <roypat@amazon.co.uk>, "seanjc@google.com" <seanjc@google.com>,
+	"shuah@kernel.org" <shuah@kernel.org>, "steven.price@arm.com"
+	<steven.price@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"tabba@google.com" <tabba@google.com>, "vannapurve@google.com"
+	<vannapurve@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "wei.w.wang@intel.com"
+	<wei.w.wang@intel.com>, "will@kernel.org" <will@kernel.org>,
+	"willy@infradead.org" <willy@infradead.org>, "xiaoyao.li@intel.com"
+	<xiaoyao.li@intel.com>, "yilun.xu@intel.com" <yilun.xu@intel.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>
+Subject: Re: [PATCH v8 08/13] KVM: guest_memfd: Allow host to map
+ guest_memfd() pages
+Thread-Topic: [PATCH v8 08/13] KVM: guest_memfd: Allow host to map
+ guest_memfd() pages
+Thread-Index: AQHbwxHxVdW3j+H8JUSlmMeNB3J9nA==
+Date: Mon, 12 May 2025 07:46:16 +0000
+Message-ID: <20250512074615.27394-1-roypat@amazon.co.uk>
+References: <702d9951-ac26-4ee4-8a78-d5104141c2e4@redhat.com>
+In-Reply-To: <702d9951-ac26-4ee4-8a78-d5104141c2e4@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250430165655.605595-1-tabba@google.com> <20250430165655.605595-9-tabba@google.com>
- <CADrL8HVO6s7V0c0Jv0gJ58Wk4NKr3F+sqS4i2dFw069P6ot7Fg@mail.gmail.com> <702d9951-ac26-4ee4-8a78-d5104141c2e4@redhat.com>
-In-Reply-To: <702d9951-ac26-4ee4-8a78-d5104141c2e4@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 12 May 2025 08:08:52 +0100
-X-Gm-Features: AX0GCFv-MyXwz1MDe12JSf9b8ojiBGKwn87SyNuOsfPf6zdJXpwsIjIp3k07lFM
-Message-ID: <CA+EHjTyCQJccwGim_xe5xSv7ihLANRdcrwhrMAib+ByBzVAwSg@mail.gmail.com>
-Subject: Re: [PATCH v8 08/13] KVM: guest_memfd: Allow host to map
- guest_memfd() pages
-To: David Hildenbrand <david@redhat.com>
-Cc: James Houghton <jthoughton@google.com>, kvm@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
-	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
-	amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, 
-	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	peterx@redhat.com, pankaj.gupta@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi James.
-
-On Sun, 11 May 2025 at 09:03, David Hildenbrand <david@redhat.com> wrote:
->
-> On 09.05.25 22:54, James Houghton wrote:
-> > On Wed, Apr 30, 2025 at 9:57=E2=80=AFAM Fuad Tabba <tabba@google.com> w=
-rote:
-> >> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vm=
-a)
-> >> +{
-> >> +       struct kvm_gmem *gmem =3D file->private_data;
-> >> +
-> >> +       if (!kvm_arch_gmem_supports_shared_mem(gmem->kvm))
-> >> +               return -ENODEV;
-> >> +
-> >> +       if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=3D
-> >> +           (VM_SHARED | VM_MAYSHARE)) {
-> >> +               return -EINVAL;
-> >> +       }
-> >> +
-> >> +       vm_flags_set(vma, VM_DONTDUMP);
-> >
-> > Hi Fuad,
-> >
-> > Sorry if I missed this, but why exactly do we set VM_DONTDUMP here?
-> > Could you leave a small comment? (I see that it seems to have
-> > originally come from Patrick? [1]) I get that guest memory VMAs
-> > generally should have VM_DONTDUMP; is there a bigger reason?
->
-> (David replying)
->
-> I assume because we might have inaccessible parts in there that SIGBUS
-> on access.
-
-That was my thinking.
-
-> get_dump_page() does ignore any errors, though (returning NULL), so
-> likely we don't need VM_DONTDUMP.
-
-In which case I'll remove this from the next respin.
-
-Thanks,
-/fuad
-
-> --
-> Cheers,
->
-> David / dhildenb
->
+On Sun, 2025-05-11 at 09:03 +0100, David Hildenbrand wrote:=0A=
+>>>                return -ENODEV;=0A=
+>>> +=0A=
+>>> +       if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=3D=0A=
+>>> +           (VM_SHARED | VM_MAYSHARE)) {=0A=
+>>> +               return -EINVAL;=0A=
+>>> +       }=0A=
+>>> +=0A=
+>>> +       vm_flags_set(vma, VM_DONTDUMP);=0A=
+>>=0A=
+>> Hi Fuad,=0A=
+>>=0A=
+>> Sorry if I missed this, but why exactly do we set VM_DONTDUMP here?=0A=
+>> Could you leave a small comment? (I see that it seems to have=0A=
+>> originally come from Patrick? [1]) I get that guest memory VMAs=0A=
+>> generally should have VM_DONTDUMP; is there a bigger reason?=0A=
+=0A=
+Iirc, I essentially copied my mmap handler from secretmem for that RFC. But=
+=0A=
+even for direct map removal, it seems this is not needed, because get_dump_=
+page=0A=
+goes via GUP, which errors out for direct map removed VMAs. So what David i=
+s=0A=
+saying below also applies in that case.=0A=
+ =0A=
+> (David replying)=0A=
+> =0A=
+> I assume because we might have inaccessible parts in there that SIGBUS=0A=
+> on access.=0A=
+> =0A=
+> get_dump_page() does ignore any errors, though (returning NULL), so=0A=
+> likely we don't need VM_DONTDUMP.=0A=
+> =0A=
+> -- =0A=
+> Cheers,=0A=
+> =0A=
+> David / dhildenb=0A=
+=0A=
+Best,=0A=
+Patrick=0A=
 
