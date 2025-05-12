@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-46203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5CAEAB423D
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 20:20:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D146DAB4218
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 20:18:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E64F57B4A6D
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 18:14:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3DFE3A7749
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 18:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00C7297118;
-	Mon, 12 May 2025 18:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F742BD58C;
+	Mon, 12 May 2025 18:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ShWVdcUB"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F/CXL3OF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF6E2BCF75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C52D2BD017
 	for <kvm@vger.kernel.org>; Mon, 12 May 2025 18:05:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747073116; cv=none; b=VSF2NOjPueUmUMJFKAO1NkW+KoHX/kJi76CNBhUd8z59x6XKILpKFxpK/Dp20MQYO3uUxq1jvfLXZqHqYEX6cGU3hHUomRkF2m3oD6pRFFiOGQ0nfaILJJTYx/BG0E7V0RXLJMAxu9ovLrYps2mVSFtw4L93a6Ep6sY355HAId4=
+	t=1747073117; cv=none; b=FTtigOit9UVtedMij5HRKvvqjvTfgCusb7aYE1oSIuxttkBG70Y4f1yoJ6GlAJreIVdV40oqgrVDIzApr4LL7XWR589PakpTi70t0/DygaT827grQ43kLf9UaOT+6zQASDZsu1ARLuY/TJwSAL9aAXjjqMJ5gWnGd9HZjdE7Uf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747073116; c=relaxed/simple;
-	bh=1EeclPzmYy7xWfD7EowRs87goZnUTxZAJc+Pof/Velg=;
+	s=arc-20240116; t=1747073117; c=relaxed/simple;
+	bh=nHLB4cPQI+YybzMbPC0nddTq4ayzQU1BYK72ytXMW+c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rxmNFJlbSCwO2xcYaDrtq7EfMm+984sT08S1reyuiky3bgi2KexS5M7m3wrxEvjmqppy+C+roVtCXVpOUOKmm5IrqS3Ro+M01214TH0aHJSlQvM85apsknnpvPZBXY23njXIq27scb4O/1dqxy/N++qXVo0BUcgzEHx/ewPYRnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ShWVdcUB; arc=none smtp.client-ip=209.85.215.169
+	 MIME-Version; b=aMFaRG6B0Oo67fdQFKagFFJUmVSr66wkzhsLRAERTq0mKdtvuNBwrDuP9D6iW/wD0UeRQJyGU5mh6OAxRLZPhOAW+LVr5HEKovLmc0EfMY73SuBDVja8VQhfGsT47uDf5NSUZjyDkFR3mYe7SJLdE0qVwaa/iTBsFyeAobUHs58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F/CXL3OF; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b13e0471a2dso3371718a12.2
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22e45088d6eso61800405ad.0
         for <kvm@vger.kernel.org>; Mon, 12 May 2025 11:05:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1747073113; x=1747677913; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1747073114; x=1747677914; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kJMyYCTFAIbu3EwtVFYHiNKkH2seNanmqLNgECsCQ48=;
-        b=ShWVdcUB2Td4GpvdhWdFxjnZINSQkHLxPnrv3hPsZOoY95mBglnfvmUDgRcrc3wOkC
-         KJ37NwW6IIToXhjYgXPZIxqYe7m8f3uxACAOxuCt83q7zzCtTu2uDwOAhcCvbmippbXQ
-         0jxhAelwZDCPzgKO/P6LvjvaHgEU+ZTGwGc7ol9HYjMwAsdrJD/DBvsRvCdQOL52TfBV
-         UMolZNA6LG3YLz4iWy8Zkn9EQ6M8YCTfDVDybLJi9kxYH/eTSi84Gvsw33CSgBKgEneB
-         bGl/ID+9/68mv2pqz76GCY8Z2qYoMdHwmXwwqlO1/y17lJOclXZ1rVZQJXmAZk1piz2/
-         Jqag==
+        bh=6FGLSZTqO/KSoe45Th2y1VHmRd/kN2aH8D38tKOyoXc=;
+        b=F/CXL3OFGalvQT3zEpe+LdXeB6Ezz1PmxYK8E9et05pd//xZ27lr0cXxZXyho8VtQn
+         roXqUypo/EKLnLAZBRo4/p/gUnSExLqU4hm1DztMBVhbOx7XDkQEIGfy6t7sXUPdlXeR
+         n7STqwOXVAc5qSezFIZIs6JCoocKIjzS9/XzIVyZue863XlM+TYQV4nxpXh5iS/SUhXW
+         zkYa+hz4L3cy+hBBlrxH9qCnvcYaoKdjWpYyDnX0RbuR0EDc6kO09I+A8IFSKxwqSjnT
+         1IU1JkW1BasRGHP7ulxlpdgiL27cJZd70fM57ru2//3GB7SfIh3EcGZcWGmc5Jty899g
+         0SyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747073113; x=1747677913;
+        d=1e100.net; s=20230601; t=1747073114; x=1747677914;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kJMyYCTFAIbu3EwtVFYHiNKkH2seNanmqLNgECsCQ48=;
-        b=kfvmHCPKwc7AiwacNDxwhinJM0X6vFxxZxNjIjFJS+F6bLSQRD4RYVrG+yVs2+AO2q
-         6e9BSMa7IpJF11ToRWm9Y07+4qRcxMiZST98ehx4r1vbPhLPqefBVq9BbpQx1/8/jnC0
-         vgsDkfMgst1tq4uhFTrp/Hxun2fpU27ah0AFnA0/szCqi3hhtqjMN9Yrcc7wsJk/N+Oe
-         3UnH/HuJ88kw2WYSRluX1CWmyT6YpJVjC6iqlNHoCvlm8OovMsftnKF7Sz9doHXVdjdf
-         pFmyKbNE3nNb5FdOrQhcpG8JtZp3Po8fgKkItbqgRXvlMF+9RbX6NLnkrqqiUSDzknng
-         ESLg==
-X-Forwarded-Encrypted: i=1; AJvYcCUppVLxCVikeM4EPHgnkMBLeDGusXwoUKwFIE9q1YnesHIfs79hGKh3Hl0BJZbJT1zTc54=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzromfL1ORRjCeo5Q0ueoQAW/u0cDXh9LBy8s2Y4HlqLcgTLfua
-	YYK0cFoLESDZNEU1weef2glRjVAhbE8xDdeaJWE5UizKVRtaUkPlNwiMG6R2bLY=
-X-Gm-Gg: ASbGnctEFKCx858vvvjsy59dtcj7hnBaJx8CPPx/CoXUjCYjTJ2eN9Rrwb5Jt/7n1yg
-	VVplwCIah7OOQNRtJh2HyTLDZ2x4cyrt9MfQLvKakDQhyFIcRfOq3d+79d2VgmGLc29F9rL3D+i
-	FO4c/BkJ7YFpG1WaX2kwUN/dMfA1hgWNmHoZ7uc2xoJiPKBNKtISXPOSpxp7dgYvhSqqmXaTi6D
-	zpzRq6GGD6ow2qOygqCbUadaeEupPvwg6xhFwwhBVkuHxgTJVP7WuC50DvFltPJOepcHCg9DiqG
-	kbltN2CnQCbZeoA8W400s5wg5Bm1Lbt/Iwz+EzUb8A0evfixAHrjd5QFh0BgAw==
-X-Google-Smtp-Source: AGHT+IHdpFnpSMK7x9VszJ7ESn4Xre+yM34qcZNm54/vUIBuvH533/FuI4IGWiU34ZcU4u+AyvAchw==
-X-Received: by 2002:a17:902:c950:b0:22f:c83d:d726 with SMTP id d9443c01a7336-22fc8e99ec8mr190068085ad.33.1747073113601;
-        Mon, 12 May 2025 11:05:13 -0700 (PDT)
+        bh=6FGLSZTqO/KSoe45Th2y1VHmRd/kN2aH8D38tKOyoXc=;
+        b=dIuneAZn/sBAJ4r82+Tgy/e116f4kEJYdNPMmeeSIp+7j/U7D+KpnGnsNjPvig7+LR
+         Drq+PI4GQTwOb5gDooB8xeXdajHyj1Q3mhqG1y0xqwtOcF0Ap/gbMT5OX2GkZDiZv2hQ
+         KODUMeDShQGy83Zn5/vKig2DhetXynklzCnG04dsPIO3cqWE6hBmGVih4UlT9LV+Etr4
+         00sy5oohpMFXqnDi3bKsN6ehViwitYrcUhKjZkXU5Cmjpn1b+mYJigZen9Y+EaQYzZGT
+         QjmBKGMU9rFMA4XWV0ynaSGhvpKzQTjjK8ZeQjhqtS1tnMPEfvdMsk9J/SFmml0iCBCi
+         kBkg==
+X-Forwarded-Encrypted: i=1; AJvYcCX7pxj5m4+oiq5X2rdWIPblGFlVjPS8hFm5oYMqpscWxeQYFb3YuaQ7/tixQxzwGBxTads=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEMP46kH25OmVHqipBnR5F3xU6oavj3QP9PK58hAHunnJeAvBr
+	IAu9Y6xUOsvwXaIMapSRCVgUWeX5aP+GHucBV1VtxaOVuCb46550sKwyV0sc/0w=
+X-Gm-Gg: ASbGncvkw1B+VVcUsnMQyJVF6MojNZrADHUDZLc7KAE1X1NyoJWBGBEtAqk5lML3jx5
+	XZE/fLcVjRzLWQYdhtVROmXY9U9qlwNSI5RMrdK12vQdAZ/FgGsgfCb9OGTaG5LDCHSAVx1/qeh
+	0QYxVEfthvLPL2E1L7ZytnvwyicYCmPJLTzkonhMHBpQnUMUX15orWlUbEmrJBvPTLsGuKLRvsY
+	tn2rWdYzDscJZTa0ET08pg/bw9Ayba/pfGTypAOUrJlwVNrYyUy7E2Y0oa5qCbJW7x34xBwfR/f
+	C+Qw9EIDc9vNHycDt6AuqCDDvLewijEatE9wv8Qs6c+smSFlid47U6QlTfsvMQ==
+X-Google-Smtp-Source: AGHT+IFmXHZOtSdCdLVo7meuSiXO0630xCPLqApSephMacKWL+WSH3IS2ya1Tkuv7qwGub+XyjrxZg==
+X-Received: by 2002:a17:903:98c:b0:22f:9f6a:7cf with SMTP id d9443c01a7336-22fc91a8c92mr188920805ad.52.1747073114488;
+        Mon, 12 May 2025 11:05:14 -0700 (PDT)
 Received: from pc.. ([38.41.223.211])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc82a2e4fsm65792005ad.232.2025.05.12.11.05.12
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc82a2e4fsm65792005ad.232.2025.05.12.11.05.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 11:05:13 -0700 (PDT)
+        Mon, 12 May 2025 11:05:14 -0700 (PDT)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
@@ -83,9 +83,9 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v8 02/48] include/system/hvf: missing vaddr include
-Date: Mon, 12 May 2025 11:04:16 -0700
-Message-ID: <20250512180502.2395029-3-pierrick.bouvier@linaro.org>
+Subject: [PATCH v8 03/48] meson: add common libs for target and target_system
+Date: Mon, 12 May 2025 11:04:17 -0700
+Message-ID: <20250512180502.2395029-4-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250512180502.2395029-1-pierrick.bouvier@linaro.org>
 References: <20250512180502.2395029-1-pierrick.bouvier@linaro.org>
@@ -95,45 +95,136 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On MacOS x86_64:
-In file included from ../target/i386/hvf/x86_task.c:13:
-/Users/runner/work/qemu/qemu/include/system/hvf.h:42:5: error: unknown type name 'vaddr'
-    vaddr pc;
-    ^
-/Users/runner/work/qemu/qemu/include/system/hvf.h:43:5: error: unknown type name 'vaddr'
-    vaddr saved_insn;
-    ^
-/Users/runner/work/qemu/qemu/include/system/hvf.h:45:5: error: type name requires a specifier or qualifier
-    QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
-    ^
-/Users/runner/work/qemu/qemu/include/system/hvf.h:45:18: error: a parameter list without types is only allowed in a function definition
-    QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
-                 ^
-/Users/runner/work/qemu/qemu/include/system/hvf.h:45:36: error: expected ';' at end of declaration list
-    QTAILQ_ENTRY(hvf_sw_breakpoint) entry;
+Following what we did for hw/, we need target specific common libraries
+for target. We need 2 different libraries:
+- code common to a base architecture
+- system code common to a base architecture
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+For user code, it can stay compiled per target for now.
+
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- include/system/hvf.h | 1 +
- 1 file changed, 1 insertion(+)
+ meson.build | 78 +++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 61 insertions(+), 17 deletions(-)
 
-diff --git a/include/system/hvf.h b/include/system/hvf.h
-index 7b45a2e1988..a9a502f0c8f 100644
---- a/include/system/hvf.h
-+++ b/include/system/hvf.h
-@@ -17,6 +17,7 @@
- #include "qemu/queue.h"
- #include "exec/vaddr.h"
- #include "qom/object.h"
-+#include "exec/vaddr.h"
+diff --git a/meson.build b/meson.build
+index bbcba3a84a1..bdcde9746c1 100644
+--- a/meson.build
++++ b/meson.build
+@@ -3706,6 +3706,8 @@ target_arch = {}
+ target_system_arch = {}
+ target_user_arch = {}
+ hw_common_arch = {}
++target_common_arch = {}
++target_common_system_arch = {}
  
- #ifdef COMPILING_PER_TARGET
- # ifdef CONFIG_HVF
+ # NOTE: the trace/ subdirectory needs the qapi_trace_events variable
+ # that is filled in by qapi/.
+@@ -4111,29 +4113,59 @@ common_all = static_library('common',
+ 
+ # construct common libraries per base architecture
+ hw_common_arch_libs = {}
++target_common_arch_libs = {}
++target_common_system_arch_libs = {}
+ foreach target : target_dirs
+   config_target = config_target_mak[target]
+   target_base_arch = config_target['TARGET_BASE_ARCH']
++  target_inc = [include_directories('target' / target_base_arch)]
++  inc = [common_user_inc + target_inc]
+ 
+-  # check if already generated
+-  if target_base_arch in hw_common_arch_libs
+-    continue
+-  endif
++  # prevent common code to access cpu compile time definition,
++  # but still allow access to cpu.h
++  target_c_args = ['-DCPU_DEFS_H']
++  target_system_c_args = target_c_args + ['-DCOMPILING_SYSTEM_VS_USER', '-DCONFIG_SOFTMMU']
+ 
+   if target_base_arch in hw_common_arch
+-    target_inc = [include_directories('target' / target_base_arch)]
+-    src = hw_common_arch[target_base_arch]
+-    lib = static_library(
+-      'hw_' + target_base_arch,
+-      build_by_default: false,
+-      sources: src.all_sources() + genh,
+-      include_directories: common_user_inc + target_inc,
+-      implicit_include_directories: false,
+-      # prevent common code to access cpu compile time
+-      # definition, but still allow access to cpu.h
+-      c_args: ['-DCPU_DEFS_H', '-DCOMPILING_SYSTEM_VS_USER', '-DCONFIG_SOFTMMU'],
+-      dependencies: src.all_dependencies())
+-    hw_common_arch_libs += {target_base_arch: lib}
++    if target_base_arch not in hw_common_arch_libs
++      src = hw_common_arch[target_base_arch]
++      lib = static_library(
++        'hw_' + target_base_arch,
++        build_by_default: false,
++        sources: src.all_sources() + genh,
++        include_directories: inc,
++        c_args: target_system_c_args,
++        dependencies: src.all_dependencies())
++      hw_common_arch_libs += {target_base_arch: lib}
++    endif
++  endif
++
++  if target_base_arch in target_common_arch
++    if target_base_arch not in target_common_arch_libs
++      src = target_common_arch[target_base_arch]
++      lib = static_library(
++        'target_' + target_base_arch,
++        build_by_default: false,
++        sources: src.all_sources() + genh,
++        include_directories: inc,
++        c_args: target_c_args,
++        dependencies: src.all_dependencies())
++      target_common_arch_libs += {target_base_arch: lib}
++    endif
++  endif
++
++  if target_base_arch in target_common_system_arch
++    if target_base_arch not in target_common_system_arch_libs
++      src = target_common_system_arch[target_base_arch]
++      lib = static_library(
++        'target_system_' + target_base_arch,
++        build_by_default: false,
++        sources: src.all_sources() + genh,
++        include_directories: inc,
++        c_args: target_system_c_args,
++        dependencies: src.all_dependencies())
++      target_common_system_arch_libs += {target_base_arch: lib}
++    endif
+   endif
+ endforeach
+ 
+@@ -4306,12 +4338,24 @@ foreach target : target_dirs
+   target_common = common_ss.apply(config_target, strict: false)
+   objects = [common_all.extract_objects(target_common.sources())]
+   arch_deps += target_common.dependencies()
++  if target_base_arch in target_common_arch_libs
++    src = target_common_arch[target_base_arch].apply(config_target, strict: false)
++    lib = target_common_arch_libs[target_base_arch]
++    objects += lib.extract_objects(src.sources())
++    arch_deps += src.dependencies()
++  endif
+   if target_type == 'system' and target_base_arch in hw_common_arch_libs
+     src = hw_common_arch[target_base_arch].apply(config_target, strict: false)
+     lib = hw_common_arch_libs[target_base_arch]
+     objects += lib.extract_objects(src.sources())
+     arch_deps += src.dependencies()
+   endif
++  if target_type == 'system' and target_base_arch in target_common_system_arch_libs
++    src = target_common_system_arch[target_base_arch].apply(config_target, strict: false)
++    lib = target_common_system_arch_libs[target_base_arch]
++    objects += lib.extract_objects(src.sources())
++    arch_deps += src.dependencies()
++  endif
+ 
+   target_specific = specific_ss.apply(config_target, strict: false)
+   arch_srcs += target_specific.sources()
 -- 
 2.47.2
 
