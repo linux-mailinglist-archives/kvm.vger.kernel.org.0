@@ -1,159 +1,323 @@
-Return-Path: <kvm+bounces-46181-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 885D4AB3B44
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 16:48:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B7DAB3AF0
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 16:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D2323B15D5
-	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 14:47:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B8887A492B
+	for <lists+kvm@lfdr.de>; Mon, 12 May 2025 14:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CEE22C356;
-	Mon, 12 May 2025 14:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7B222A7EA;
+	Mon, 12 May 2025 14:45:03 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from zero.eik.bme.hu (zero.eik.bme.hu [152.66.115.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C61822AE45
-	for <kvm@vger.kernel.org>; Mon, 12 May 2025 14:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.66.115.2
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49F51E3DD6;
+	Mon, 12 May 2025 14:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747061244; cv=none; b=hgaAVlrY8XbxkfGU+hAT+LnotGMnSMiDlzuznLYCPQihA9E31MgUaIqdWCmARwdAHGHDsKFxTVBckiqGtKeSi7AoJg0zefAvVt5alAAgs+3rM/hqHSK9eTq/c23helBHHeqglM7ZfsBP/ntiiiO+WkF4yoDkfj+iRDiZV4Zxmjs=
+	t=1747061102; cv=none; b=Cg8aP7qUbuIjRwr4QNAUY+mhcXKGqAWeg2I/cDGNiNns9FNES/OUKRxQvBXKepW/hfHkTGH/Ny0Dfedo7rHThq8czlnGIEN9TgD/uBsc61IfQpSfv+j9MQQj7Nw0DSKgY4JCXwU7Ro+ICvZpKVewh5yrTfyM1nXemDNSCTuDUSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747061244; c=relaxed/simple;
-	bh=ZZkH8XvmFmUK4WxBZmsZnVm4mP+x69PKN5vGewkrDFI=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=utUL5/2UTlr+3TJpNtE/7ZrMmcaX5aNRSSCXmcnbu9PTIs07xJ2Gnr49C9237P7zS4QLJ8Jt1AXG1g7tPrSH47OPmahx57Y+Qp0yqLa8MMu59YicYDie2Ou2dmfH9gYPHyO+RQ/LmrNs7aGtU2u2WqLK22bmywG+bLttinYn+W4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu; spf=pass smtp.mailfrom=eik.bme.hu; arc=none smtp.client-ip=152.66.115.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eik.bme.hu
-Received: from zero.eik.bme.hu (localhost [127.0.0.1])
-	by zero.eik.bme.hu (Postfix) with ESMTP id 0683755BC03;
-	Mon, 12 May 2025 16:41:03 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at eik.bme.hu
-Received: from zero.eik.bme.hu ([127.0.0.1])
- by zero.eik.bme.hu (zero.eik.bme.hu [127.0.0.1]) (amavisd-new, port 10028)
- with ESMTP id Z7rQEdTdCDjh; Mon, 12 May 2025 16:41:00 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
-	id DEB0955BC02; Mon, 12 May 2025 16:41:00 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by zero.eik.bme.hu (Postfix) with ESMTP id DB06B745682;
-	Mon, 12 May 2025 16:41:00 +0200 (CEST)
-Date: Mon, 12 May 2025 16:41:00 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-cc: Markus Armbruster <armbru@redhat.com>, 
-    =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>, 
-    Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, 
-    Zhao Liu <zhao1.liu@intel.com>, 
-    =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>, 
-    Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, 
-    Richard Henderson <richard.henderson@linaro.org>, kvm@vger.kernel.org, 
-    Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <lvivier@redhat.com>, 
-    Jiaxun Yang <jiaxun.yang@flygoat.com>, Yi Liu <yi.l.liu@intel.com>, 
-    "Michael S. Tsirkin" <mst@redhat.com>, 
-    Eduardo Habkost <eduardo@habkost.net>, 
-    Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, 
-    Alistair Francis <alistair.francis@wdc.com>, 
-    Daniel Henrique Barboza <dbarboza@ventanamicro.com>, 
-    Marcelo Tosatti <mtosatti@redhat.com>, qemu-riscv@nongnu.org, 
-    Weiwei Li <liwei1518@gmail.com>, Amit Shah <amit@kernel.org>, 
-    Yanan Wang <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>, 
-    Palmer Dabbelt <palmer@dabbelt.com>, Ani Sinha <anisinha@redhat.com>, 
-    Igor Mammedov <imammedo@redhat.com>, Fabiano Rosas <farosas@suse.de>, 
-    Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, 
-    =?ISO-8859-15?Q?Cl=E9ment_Mathieu--Drif?= <clement.mathieu--drif@eviden.com>, 
-    qemu-arm@nongnu.org, 
-    =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>, 
-    Huacai Chen <chenhuacai@kernel.org>, Jason Wang <jasowang@redhat.com>
-Subject: Re: How to mark internal properties
-In-Reply-To: <e5a305cc-4c8b-48df-99fe-539ebd9b72f9@intel.com>
-Message-ID: <f342557b-e589-f51d-cfd8-04f97e9c5efd@eik.bme.hu>
-References: <20250508133550.81391-1-philmd@linaro.org> <20250508133550.81391-13-philmd@linaro.org> <23260c74-01ba-45bc-bf2f-b3e19c28ec8a@intel.com> <aB2vjuT07EuO6JSQ@intel.com> <2f526570-7ab0-479c-967c-b3f95f9f19e3@redhat.com>
- <CAFEAcA-kuHvxjuV_cMh-Px3C-k2Gd51jFqhwndO52vm++M_jAA@mail.gmail.com> <aCG6MuDLrQpoTqpg@redhat.com> <87jz6mqeu5.fsf@pond.sub.org> <e5a305cc-4c8b-48df-99fe-539ebd9b72f9@intel.com>
+	s=arc-20240116; t=1747061102; c=relaxed/simple;
+	bh=XAITQ9gGYPlNcp5g5iWOivskIm4vLmuGTyg7TfZHkIQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RAiMJAnhZGEwFV3HWtVVBpZ+QZBmRnuJ2D5rfs6uyogNlli0JZahyrlXvlR1dQ/O+7ixmB3L3YcJQ6Z49rZBBQPSFABlC7IJ03AwEbAyPCz2zGuzSJrvTEW2ya6AupaXgACcUCYzl27Bi4W57dBIVIOSYkgPQw9+8J1EVcVY2fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 39CAC14BF;
+	Mon, 12 May 2025 07:44:47 -0700 (PDT)
+Received: from [10.57.21.218] (unknown [10.57.21.218])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A08D3F673;
+	Mon, 12 May 2025 07:44:53 -0700 (PDT)
+Message-ID: <8f7ab79a-6d9e-4b66-a74e-5fb1dd2beecd@arm.com>
+Date: Mon, 12 May 2025 15:44:51 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="3866299591-2120470484-1747060860=:11021"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 13/43] arm64: RME: Support for the VGIC in realms
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-14-steven.price@arm.com>
+ <bf0b9232-36b0-41c5-89a5-6639719cd09e@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <bf0b9232-36b0-41c5-89a5-6639719cd09e@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 02/05/2025 12:04, Suzuki K Poulose wrote:
+> On 16/04/2025 14:41, Steven Price wrote:
+>> The RMM provides emulation of a VGIC to the realm guest but delegates
+>> much of the handling to the host. Implement support in KVM for
+>> saving/restoring state to/from the REC structure.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes from v5:
+>>   * Handle RMM providing fewer GIC LRs than the hardware supports.
+>> ---
+>>   arch/arm64/include/asm/kvm_rme.h |  1 +
+>>   arch/arm64/kvm/arm.c             | 16 +++++++++---
+>>   arch/arm64/kvm/rme.c             |  5 ++++
+>>   arch/arm64/kvm/vgic/vgic-init.c  |  2 +-
+>>   arch/arm64/kvm/vgic/vgic-v3.c    |  6 ++++-
+>>   arch/arm64/kvm/vgic/vgic.c       | 43 ++++++++++++++++++++++++++++++--
+>>   6 files changed, 66 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
+>> asm/kvm_rme.h
+>> index f716b890e484..9bcad6ec5dbb 100644
+>> --- a/arch/arm64/include/asm/kvm_rme.h
+>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>> @@ -92,6 +92,7 @@ struct realm_rec {
+>>     void kvm_init_rme(void);
+>>   u32 kvm_realm_ipa_limit(void);
+>> +u32 kvm_realm_vgic_nr_lr(void);
+>>     int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap
+>> *cap);
+>>   int kvm_init_realm_vm(struct kvm *kvm);
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index fd83efb667cc..808d7e479571 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -683,19 +683,24 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>           kvm_call_hyp_nvhe(__pkvm_vcpu_put);
+>>       }
+>>   +    kvm_timer_vcpu_put(vcpu);
+>> +    kvm_vgic_put(vcpu);
+>> +
+>> +    vcpu->cpu = -1;
+>> +
+>> +    if (vcpu_is_rec(vcpu))
+>> +        return;
+>> +
+>>       kvm_vcpu_put_debug(vcpu);
+>>       kvm_arch_vcpu_put_fp(vcpu);
+>>       if (has_vhe())
+>>           kvm_vcpu_put_vhe(vcpu);
+>> -    kvm_timer_vcpu_put(vcpu);
+>> -    kvm_vgic_put(vcpu);
+>>       kvm_vcpu_pmu_restore_host(vcpu);
+>>       if (vcpu_has_nv(vcpu))
+>>           kvm_vcpu_put_hw_mmu(vcpu);
+>>       kvm_arm_vmid_clear_active();
+>>         vcpu_clear_on_unsupported_cpu(vcpu);
+>> -    vcpu->cpu = -1;
+>>   }
+>>     static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>> @@ -912,6 +917,11 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu
+>> *vcpu)
+>>               return ret;
+>>       }
+>>   +    if (!irqchip_in_kernel(kvm) && kvm_is_realm(vcpu->kvm)) {
+>> +        /* Userspace irqchip not yet supported with Realms */
+>> +        return -EOPNOTSUPP;
+>> +    }
+>> +
+>>       mutex_lock(&kvm->arch.config_lock);
+>>       set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
+>>       mutex_unlock(&kvm->arch.config_lock);
+>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+>> index f4923fc3b34e..1239eb07aca6 100644
+>> --- a/arch/arm64/kvm/rme.c
+>> +++ b/arch/arm64/kvm/rme.c
+>> @@ -77,6 +77,11 @@ u32 kvm_realm_ipa_limit(void)
+>>       return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
+>>   }
+>>   +u32 kvm_realm_vgic_nr_lr(void)
+>> +{
+>> +    return u64_get_bits(rmm_feat_reg0,
+>> RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS);
+>> +}
+>> +
+>>   static int get_start_level(struct realm *realm)
+>>   {
+>>       return 4 - ((realm->ia_bits - 8) / (RMM_PAGE_SHIFT - 3));
+>> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/
+>> vgic-init.c
+>> index 1f33e71c2a73..a81c7f3d1d42 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-init.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+>> @@ -81,7 +81,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>>        * the proper checks already.
+>>        */
+>>       if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
+>> -        !kvm_vgic_global_state.can_emulate_gicv2)
+>> +        (!kvm_vgic_global_state.can_emulate_gicv2 || kvm_is_realm(kvm)))
+>>           return -ENODEV;
+>>         /* Must be held to avoid race with vCPU creation */
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-
+>> v3.c
+>> index b9ad7c42c5b0..c10ad817030d 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+>> @@ -8,9 +8,11 @@
+>>   #include <linux/kvm_host.h>
+>>   #include <linux/string_choices.h>
+>>   #include <kvm/arm_vgic.h>
+>> +#include <asm/kvm_emulate.h>
+>>   #include <asm/kvm_hyp.h>
+>>   #include <asm/kvm_mmu.h>
+>>   #include <asm/kvm_asm.h>
+>> +#include <asm/rmi_smc.h>
+>>     #include "vgic.h"
+>>   @@ -758,7 +760,9 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
+>>           return;
+>>       }
+>>   -    if (likely(!is_protected_kvm_enabled()))
+>> +    if (vcpu_is_rec(vcpu))
+>> +        cpu_if->vgic_vmcr = vcpu->arch.rec.run->exit.gicv3_vmcr;
+>> +    else if (likely(!is_protected_kvm_enabled()))
+>>           kvm_call_hyp(__vgic_v3_save_vmcr_aprs, cpu_if);
+>>       WARN_ON(vgic_v4_put(vcpu));
+>>   diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+>> index 8d189ce18ea0..c68a41a29917 100644
+>> --- a/arch/arm64/kvm/vgic/vgic.c
+>> +++ b/arch/arm64/kvm/vgic/vgic.c
+>> @@ -10,7 +10,9 @@
+>>   #include <linux/list_sort.h>
+>>   #include <linux/nospec.h>
+>>   +#include <asm/kvm_emulate.h>
+>>   #include <asm/kvm_hyp.h>
+>> +#include <asm/kvm_rme.h>
+>>     #include "vgic.h"
+>>   @@ -23,6 +25,8 @@ struct vgic_global kvm_vgic_global_state
+>> __ro_after_init = {
+>>     static inline int kvm_vcpu_vgic_nr_lr(struct kvm_vcpu *vcpu)
+>>   {
+>> +    if (unlikely(vcpu_is_rec(vcpu)))
+>> +        return kvm_realm_vgic_nr_lr();
+>>       return kvm_vgic_global_state.nr_lr;
+>>   }
+>>   @@ -864,10 +868,23 @@ static inline bool
+>> can_access_vgic_from_kernel(void)
+>>       return !
+>> static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif) || has_vhe();
+>>   }
+>>   +static inline void vgic_rmm_save_state(struct kvm_vcpu *vcpu)
+>> +{
+>> +    struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +    int i;
+>> +
+>> +    for (i = 0; i < kvm_vcpu_vgic_nr_lr(vcpu); i++) {
+>> +        cpu_if->vgic_lr[i] = vcpu->arch.rec.run->exit.gicv3_lrs[i];
+>> +        vcpu->arch.rec.run->enter.gicv3_lrs[i] = 0;
+>> +    }
+>> +}
+> 
+> We also need to save/restore gicv3_hcr/cpuif->vgic_hcr.
 
---3866299591-2120470484-1747060860=:11021
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+I'm not sure how I missed that. Note that the RMM spec restricts the
+fields that the normal world is allowed to set. So I'll also add a new
+define to rmi_smc.h to provide the bitmask:
 
-On Mon, 12 May 2025, Xiaoyao Li wrote:
-> On 5/12/2025 6:54 PM, Markus Armbruster wrote:
->> Daniel P. Berrangé<berrange@redhat.com> writes:
->>> On Mon, May 12, 2025 at 09:46:30AM +0100, Peter Maydell wrote:
->>>> On Fri, 9 May 2025 at 11:04, Thomas Huth<thuth@redhat.com> wrote:
->>>>> Thanks for your clarifications, Zhao! But I think this shows again the
->>>>> problem that we have hit a couple of times in the past already: 
->>>>> Properties
->>>>> are currently used for both, config knobs for the users and internal
->>>>> switches for configuration of the machine. We lack a proper way to say 
->>>>> "this
->>>>> property is usable for the user" and "this property is meant for 
->>>>> internal
->>>>> configuration only".
->>>>> 
->>>>> I wonder whether we could maybe come up with a naming scheme to better
->>>>> distinguish the two sets, e.g. by using a prefix similar to the "x-" 
->>>>> prefix
->>>>> for experimental properties? We could e.g. say that all properties 
->>>>> starting
->>>>> with a "q-" are meant for QEMU-internal configuration only or something
->>>>> similar (and maybe even hide those from the default help output when 
->>>>> running
->>>>> "-device xyz,help" ?)? Anybody any opinions or better ideas on this?
->>>> I think a q-prefix is potentially a bit clunky unless we also have
->>>> infrastructure to say eg DEFINE_INTERNAL_PROP_BOOL("foo", ...)
->>>> and have it auto-add the prefix, and to have the C APIs for
->>>> setting properties search for both "foo" and "q-foo" so you
->>>> don't have to write qdev_prop_set_bit(dev, "q-foo", ...).
->
->> If we make intent explicit with DEFINE_INTERNAL_PROP_FOO(), is repeating
->> intent in the name useful?
->
-> +1 for DEFINE_INTERNAL_PROP_FOO(). I have the same thought.
->
-> We need something in code to restrict the *internal* property really 
-> internal, i.e., not user settable. What the name of the property is doesn't 
-> matter.
+#define RMI_PERMITTED_GICV3_HCR_BITS   (ICH_HCR_EL2_UIE |              \
+                                        ICH_HCR_EL2_LRENPIE |          \
+                                        ICH_HCR_EL2_NPIE |             \
+                                        ICH_HCR_EL2_VGrp0EIE |         \
+                                        ICH_HCR_EL2_VGrp0DIE |         \
+                                        ICH_HCR_EL2_VGrp1EIE |         \
+                                        ICH_HCR_EL2_VGrp1DIE |         \
+                                        ICH_HCR_EL2_TDIR)
 
-What's an internal property? Properties are there to make some field of an 
-object introspectable and settable from command line and QEMU monitor or 
-other external interfaces. If that's not needed for something why is it 
-defined as a property in the first place and not just e.g. C accessor 
-functions as part of the device's interface instead? I think this may be 
-overusing QOM for things that may not need it and adding complexity where 
-not needed. It reminds me of patches that wanted to export via-ide IRQs or 
-ISA IRQs just to be able to connect them to other parts _of the same chip_ 
-becuase this chip is modeled as multiple QOM objects for reusing code from 
-those. But in reality the chip does not have such pins and these are 
-internal connections so I think it would be better to model these as 
-functions and not QOM constructs that the user can change. In general, if 
-the device or object has an external connection or a knob that the user 
-may need to change or connect to another device (like building a board 
-from parts you can wire pins together) then those need properties or 
-qemu_irqs but other "internal properties" may need some other way to 
-access and often simple accessor functions are enough for this as these 
-internal properties are only accessed form the code. That way we would not 
-need even more complexity to hide these from the user, instead of that 
-just don't expose them but use something else where a property is not 
-needed. A property is just like an accessor function with additional 
-complexity to expose it to other interfaces so it's externally settable 
-and introspectable but we don't need those for internal properties so we 
-can drop that complexity and get back to the accessor function at the 
-bottom of it.
+>> +
+>>   static inline void vgic_save_state(struct kvm_vcpu *vcpu)
+>>   {
+>>       if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>>           vgic_v2_save_state(vcpu);
+>> +    else if (vcpu_is_rec(vcpu))
+>> +        vgic_rmm_save_state(vcpu);
+>>       else
+>>           __vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
+>>   }
+>> @@ -903,10 +920,28 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>>       vgic_prune_ap_list(vcpu);
+>>   }
+>>   +static inline void vgic_rmm_restore_state(struct kvm_vcpu *vcpu)
+>> +{
+>> +    struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +    int i;
+>> +
+>> +    for (i = 0; i < kvm_vcpu_vgic_nr_lr(vcpu); i++) {
+>> +        vcpu->arch.rec.run->enter.gicv3_lrs[i] = cpu_if->vgic_lr[i];
+>> +        /*
+>> +         * Also populate the rec.run->exit copies so that a late
+>> +         * decision to back out from entering the realm doesn't cause
+>> +         * the state to be lost
+>> +         */
+>> +        vcpu->arch.rec.run->exit.gicv3_lrs[i] = cpu_if->vgic_lr[i];
+>> +    }
+>> +}
+>> +
+>>   static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
+>>   {
+>>       if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>>           vgic_v2_restore_state(vcpu);
+>> +    else if (vcpu_is_rec(vcpu))
+>> +        vgic_rmm_restore_state(vcpu);
+>>       else
+>>           __vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
+>>   }
+>> @@ -976,7 +1011,9 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>>     void kvm_vgic_load(struct kvm_vcpu *vcpu)
+>>   {
+>> -    if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !
+>> vgic_initialized(vcpu->kvm))) {
+>> +    if (unlikely(!irqchip_in_kernel(vcpu->kvm) ||
+>> +             !vgic_initialized(vcpu->kvm) ||
+>> +             vcpu_is_rec(vcpu))) {
+> 
+> 
+>>           if (has_vhe() &&
+>> static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>>               __vgic_v3_activate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+>>           return;
+>> @@ -990,7 +1027,9 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu)
+>>     void kvm_vgic_put(struct kvm_vcpu *vcpu)
+>>   {
+>> -    if (unlikely(!irqchip_in_kernel(vcpu->kvm) || !
+>> vgic_initialized(vcpu->kvm))) {
+>> +    if (unlikely(!irqchip_in_kernel(vcpu->kvm) ||
+>> +             !vgic_initialized(vcpu->kvm) ||
+>> +             vcpu_is_rec(vcpu))) {
+>>           if (has_vhe() &&
+>> static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>>               __vgic_v3_deactivate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+> 
+> We could return early here for rec, and skip the unnecessary trap steps.
+> Similar for the vgic_load case.
 
-Regards,
-BALATON Zoltan
---3866299591-2120470484-1747060860=:11021--
+Ack. I think this was me getting confused during a rebase ;) I'll pull
+out the "if (unlikely(vcpu_is_rec())" and return early.
+
+Steve
+
+> Rest looks good to me.
+> 
+> Suzuki
+> 
+> 
+>>           return;
+> 
+
 
