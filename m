@@ -1,85 +1,85 @@
-Return-Path: <kvm+bounces-46334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46335-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5652AB530E
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 12:44:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9737AB52ED
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 12:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2103F866772
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 10:37:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BA051B43136
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 10:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB3B23A989;
-	Tue, 13 May 2025 10:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C509244682;
+	Tue, 13 May 2025 10:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vs5mIYB2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Haka4uiH"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CAD23AE9B
-	for <kvm@vger.kernel.org>; Tue, 13 May 2025 10:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A5A211A16
+	for <kvm@vger.kernel.org>; Tue, 13 May 2025 10:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747132146; cv=none; b=LJiM/Ky+qDT/Xc8EyxMIybynP7qw1YETJvG61dORF4VoJQPHc9dlVVau9ZfTDJtOvb61JVYJ967w9NMw+OJYFl3CQm5f1tnX7vrlBfETKDxDBtDpX/5L1dA0ZQ3RFNvuab3t5dRHvLI/crQ5jjkP1nZVZ3sPlR+ib84pBUUHD4k=
+	t=1747132222; cv=none; b=H1EV84KRTYQ256aCzxWCRrHOuN8zWe6FatLQMBfvl555yfATgQO2pxjumb6nBqTsBVAuCdy1CZGBixqvlRVn5UQscPNQF5GhY3WC33Xp3f2pgBVe5zXh5ULcUiDtiEDTgieUEh16h4OINGEX743O1yIV6zTh3WwjeoTeecOHeZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747132146; c=relaxed/simple;
-	bh=wpMeNLu8nNUfunr0fcnrXxcrRFtYmHqswemJvTgucRk=;
+	s=arc-20240116; t=1747132222; c=relaxed/simple;
+	bh=lnNifqSFirb8T0jB/tOkqcWeY6HGS6x6fBJJFBCgp30=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sUXmVPBnepqBHy+x4E1fpp2gofYBi9JobuEoIvE7nqZkmzPxN6nNZtuGzMjVMkHnZaWIo56uHrbCKcFDNMSAJ5BE7VVMF2n54wuZKhE/xfHTu4HLD0tgLVkEPe4DhTe501c1wfY7NtY1iOkj4XpW95hcyLxQQbpLf8K//sxgjag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vs5mIYB2; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=JYLYr4JrgmmorK98rBo6yW8PKUu8sJICpYvpV3R2UmXJvaYefwGmx615c4bSTSSVBKWY9/mCK/DBgarmJXlwo380DpVMbAc5+pkuv/tBLCjLLlOuxvXk+kQTenuqMkV/8k5uS3s44UE1fKRxDVoS+bSZpzqbfWF14eE01FRlyaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Haka4uiH; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747132143;
+	s=mimecast20190719; t=1747132219;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2Q9Purpm/K4u0zXRViMrb/8QUlPpX+E7LaiOih2O93w=;
-	b=Vs5mIYB2CgJNx6O1BJ2jzcgYhiowKIqRmF9vPlUnOvl4krcJr5PI8LIt2K4pxPs4RobGif
-	H4o19ALZ25qCb7nR2NjLgEZ8sQeDz9xDS136yaR+4Q4D054QbFe/x1vfQY4gCQcJJoeMrv
-	oj1KMSN+5A39jJCNXxCAfOmf93mG0Ts=
+	bh=K8iuDoVUKmba4R8nSTe6+wX/Mku81yEFf9qrmeNuvU0=;
+	b=Haka4uiHPPzZiHmy1FxSZBfyRmUBQ2aFt5nref4wJ41fCAAHYxZWIMheZxK3AcMA85iatL
+	AhJeixluv0/y4q0coSFKVfrBXKQK6/ZkwzTr/EG5RHhLYJe4p9KczIiBGY1NamcT7i+DSS
+	97DwJZviKj5p69ZotiKQsgW3hewpvOs=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-JukhNVkNOTWAE3R8jSMXWg-1; Tue, 13 May 2025 06:29:02 -0400
-X-MC-Unique: JukhNVkNOTWAE3R8jSMXWg-1
-X-Mimecast-MFC-AGG-ID: JukhNVkNOTWAE3R8jSMXWg_1747132142
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43d5ca7c86aso26147025e9.0
-        for <kvm@vger.kernel.org>; Tue, 13 May 2025 03:29:02 -0700 (PDT)
+ us-mta-461-uGXhXiP9PAOj2FjqPiOyRw-1; Tue, 13 May 2025 06:30:18 -0400
+X-MC-Unique: uGXhXiP9PAOj2FjqPiOyRw-1
+X-Mimecast-MFC-AGG-ID: uGXhXiP9PAOj2FjqPiOyRw_1747132217
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-442ccf0eb4eso40448265e9.1
+        for <kvm@vger.kernel.org>; Tue, 13 May 2025 03:30:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747132141; x=1747736941;
+        d=1e100.net; s=20230601; t=1747132217; x=1747737017;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2Q9Purpm/K4u0zXRViMrb/8QUlPpX+E7LaiOih2O93w=;
-        b=Q7fmHDQZXqEX8Shg9T9WU8doZBcij7X6FHvCm/y/SVOVtm0hHfRPzFSFNTLeL9h8aS
-         AN2w7bc0nD/z2IW3q/1z62QO7uu/XsaziaUtHrd2FWiVB85iEZ9UiJIGeStib0WL4sRH
-         BjPdp5/y63Ir0Tg1Jrsc6s0L77sI9XPRvv3fVo2gxWe+dnnnT1C651CjuEO246zO8pDW
-         SeSuu0HxfylySkRFlyR+Wp/67PMELrBbYGk8dvknJd8egSsJux7kNbQ1vR2yMYCCUHBF
-         e5cpClata/4/G++jPZnWF70EMsZ+DZC2bzWxvFiGi6PTT9KnFg34sT3hhx77GG8tSQZf
-         ir1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUBa1fs95iF9BoHSo8p8/wpihYWdsqq9S5/DU2IEiYa2tkexQtkfWMdZ+DxXNK8wsbWpFo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJ8EsQqcbuTESVSTCzAHG2MeaCcQKk0rCoh9v3CQe5sj++Ii1K
-	hjjrvu2m1NMbS7NzQr9XuA2Ks8cjVjq5bwwUzNdFmVliIerw5raq660FLwuFvuu/7OmiR8tZ4K0
-	ahFLPj/hnpZYBG+3vmTnGeZ+emE3ESPUqs/OPf7JyD+3OxsvG1A==
-X-Gm-Gg: ASbGncvFVlJFc0ErrWrWWsnlBABKkHKaMYj88jhbsiJTqJ8tieucopDJwX8MGaOqeRO
-	jLqm4Hp2cHHGKEXsm9GbH934q4nqPB12IBQRj2i0iE76ODmBtDzH+x2FHYUAEQTZsNjFs9BoSsY
-	QZyR5CzdUmnBGAM+mI3IKF7H0uj8SDyHCRbscGzx+9EQRR9SEUIrf2y5gtHF3/8SlZTZyJeSLVY
-	u+9BG6gbAGzHl0V8gHSWqo9AGKRXWWXoXHOMIoa0P9+wbVSRrNS98FDqb/cN2xNg8QLZ0Z8qFDu
-	IaATv8Mx0I0uAAIed9+9nXdgh7XfV+DX
-X-Received: by 2002:a05:600c:a089:b0:43c:e9d0:9ee5 with SMTP id 5b1f17b1804b1-442d6d6ad82mr144906915e9.18.1747132141536;
-        Tue, 13 May 2025 03:29:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHi10nzAH1EKGO/kzFRGmvYqSgNFAee4ggzvFi1MDmC4i0/84NFAoHOBMIjVrdAh6iczoq/8A==
-X-Received: by 2002:a05:600c:a089:b0:43c:e9d0:9ee5 with SMTP id 5b1f17b1804b1-442d6d6ad82mr144906565e9.18.1747132141134;
-        Tue, 13 May 2025 03:29:01 -0700 (PDT)
+        bh=K8iuDoVUKmba4R8nSTe6+wX/Mku81yEFf9qrmeNuvU0=;
+        b=ZP1QcWMuJGQpQ7Fc6hKY2atqFmDRY5yELToaOfxUDdRVloj8cuIp+heP9vV/U/GOIM
+         az6XHWdC2jkjrzc9mIVg3FUesCxM/xsV4X4FiyYIQywhzNvrD0LkZZPoCPGmrwvF9q1S
+         iBFPx+0eL6wRaHZvStuEmE2Epmvtuk/CqRkkw8xAsx0H8UElctaTKGu7JhGoJHSzd3Ak
+         0GSMq5Iol1iPNpb+M2iw+cSVK84eJOSy+uv76e07pAzUInSIRpqR9LkLTV31qq131QxW
+         87TcUT8er/f41/VcUO1sFCj115HQH5ffaTuTdySA35Kl2wfGoTC+ue3+u7PgAlWLrVxR
+         qO8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXGvNTkiZ2iqigbXEQcwiEmFodSw0smnIQx0/lKiPmUeIKPviG7yHSp6cvcLFlrty7UBLM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQK/leRemlJCX4GJ39M2sKrgNOBfWWFDSJ9Cok6m+WnRD/3WL2
+	jHA6skoCo72J+SUHtlduW+TRrC4S73Fxxb92e4t9r62e676/ZoiWdJ4ANopPCgvFI7nZyQKlfOq
+	9QRkZ6s9qUmj3Jti33HfWiTeH7Vf81WQ3ZuzkmAZsaYs7qrwdHQ==
+X-Gm-Gg: ASbGncum2Yo2UrSdr4dvkSSfG3Zlp0aI/Tx3nSrYE+X0pihwbui1gk7xLRwmgXCd6Cc
+	pascM7LgmvzgJ1OYmHmeSmQdZ+Pu7rXz6FfcXu/aUzefIe1Xjy54vhErqVumdD7zfnIcWXpuDiK
+	d0J8xOfn/rLoMgeU8myyqJiT28uswTOUpvh1xwvMgW+T9LfRYEKyvfsNtScUWVdWkt9LKbgD0I/
+	g0mJe4uxU8Uxx4yRJytOxxYJwWieDR+EY93+TsnyIcGoQDMD4Y4luNe6GaKxwOCW57vJdV53tcM
+	dwSBQS6zjUQMjX9fIyi87gtaiLlULudR
+X-Received: by 2002:a05:600c:3e8c:b0:43c:f969:13c0 with SMTP id 5b1f17b1804b1-442d6ddec16mr137058915e9.29.1747132217492;
+        Tue, 13 May 2025 03:30:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGWH2SlPJhTSYnfcP8ynqc1cV83KOO/vg2sWk6ss3ErHbO0veyJed2wklFPjNGmKZ6c9j4PTQ==
+X-Received: by 2002:a05:600c:3e8c:b0:43c:f969:13c0 with SMTP id 5b1f17b1804b1-442d6ddec16mr137058455e9.29.1747132217110;
+        Tue, 13 May 2025 03:30:17 -0700 (PDT)
 Received: from imammedo.users.ipa.redhat.com ([85.93.96.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442cd34bde2sm201853865e9.19.2025.05.13.03.28.59
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442cd3aecb0sm208576865e9.28.2025.05.13.03.30.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 May 2025 03:29:00 -0700 (PDT)
-Date: Tue, 13 May 2025 12:28:58 +0200
+        Tue, 13 May 2025 03:30:16 -0700 (PDT)
+Date: Tue, 13 May 2025 12:30:14 +0200
 From: Igor Mammedov <imammedo@redhat.com>
 To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>
 Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
@@ -100,12 +100,12 @@ Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
  qemu-arm@nongnu.org, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau
  <marcandre.lureau@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, Jason
  Wang <jasowang@redhat.com>, Mark Cave-Ayland <mark.caveayland@nutanix.com>
-Subject: Re: [PATCH v4 24/27] hw/intc/ioapic: Remove
- IOAPICCommonState::version field
-Message-ID: <20250513122858.2a596bd9@imammedo.users.ipa.redhat.com>
-In-Reply-To: <20250508133550.81391-25-philmd@linaro.org>
+Subject: Re: [PATCH v4 25/27] hw/virtio/virtio-pci: Remove
+ VirtIOPCIProxy::ignore_backend_features field
+Message-ID: <20250513123014.763837de@imammedo.users.ipa.redhat.com>
+In-Reply-To: <20250508133550.81391-26-philmd@linaro.org>
 References: <20250508133550.81391-1-philmd@linaro.org>
-	<20250508133550.81391-25-philmd@linaro.org>
+	<20250508133550.81391-26-philmd@linaro.org>
 X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -116,161 +116,61 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu,  8 May 2025 15:35:47 +0200
+On Thu,  8 May 2025 15:35:48 +0200
 Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> wrote:
 
-> The IOAPICCommonState::version integer was only set
-> in the hw_compat_2_7[] array, via the 'version=3D0x11'
-> property. We removed all machines using that array,
-> lets remove that property, simplify by only using the
-> default version (defined as IOAPIC_VER_DEF).
->=20
-> For the record, this field was introduced in commit
-> 20fd4b7b6d9 ("x86: ioapic: add support for explicit EOI"):
->=20
->  >   Some old Linux kernels (upstream before v4.0), or any released RHEL
->  >   kernels has problem in sending APIC EOI when IR is enabled.
->  >   Meanwhile, many of them only support explicit EOI for IOAPIC, which
->  >   is only introduced in IOAPIC version 0x20. This patch provide a way
->  >   to boost QEMU IOAPIC to version 0x20, in order for QEMU to correctly
->  >   receive EOI messages.
->  >
->  >   Without boosting IOAPIC version to 0x20, kernels before commit
->  >   d32932d ("x86/irq: Convert IOAPIC to use hierarchical irqdomain
->  >   interfaces") will have trouble enabling both IR and level-triggered
->  >   interrupt devices (like e1000).
->  >
->  >   To upgrade IOAPIC to version 0x20, we need to specify:
->  >
->  >     -global ioapic.version=3D0x20
->  >
-
-that crutch might be in-use by external users, and even if they use
-0x20, removing property will break CLI.
-
-I'd deprecate it first and then remove.
-
->  >   To be compatible with old systems, 0x11 will still be the default
->  >   IOAPIC version. Here 0x11 and 0x20 are the only versions to be
->  >   supported.
-looking at the code removed, default is 0x20 which doesn't match above
-statement. Have something changed between then and now (missing ref to
-0x20 becoming default)?
-
->  >
->  >   One thing to mention: this patch only applies to emulated IOAPIC. It
->  >   does not affect kernel IOAPIC behavior. =20
+> The VirtIOPCIProxy::ignore_backend_features boolean was only set
+> in the hw_compat_2_7[] array, via the 'x-ignore-backend-features=3Don'
+> property. We removed all machines using that array, lets remove
+> that property, simplify by only using the default version.
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
 > Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
 > ---
->  hw/intc/ioapic_internal.h |  3 +--
->  hw/intc/ioapic.c          | 18 ++----------------
->  hw/intc/ioapic_common.c   |  2 +-
->  3 files changed, 4 insertions(+), 19 deletions(-)
+>  include/hw/virtio/virtio-pci.h | 1 -
+>  hw/virtio/virtio-pci.c         | 5 +----
+>  2 files changed, 1 insertion(+), 5 deletions(-)
 >=20
-> diff --git a/hw/intc/ioapic_internal.h b/hw/intc/ioapic_internal.h
-> index 51205767f44..330ce195222 100644
-> --- a/hw/intc/ioapic_internal.h
-> +++ b/hw/intc/ioapic_internal.h
-> @@ -82,7 +82,7 @@
->  #define IOAPIC_ID_MASK                  0xf
-> =20
->  #define IOAPIC_VER_ENTRIES_SHIFT        16
-> -
-> +#define IOAPIC_VER_DEF                  0x20
-> =20
->  #define TYPE_IOAPIC_COMMON "ioapic-common"
->  OBJECT_DECLARE_TYPE(IOAPICCommonState, IOAPICCommonClass, IOAPIC_COMMON)
-> @@ -104,7 +104,6 @@ struct IOAPICCommonState {
->      uint32_t irr;
->      uint64_t ioredtbl[IOAPIC_NUM_PINS];
->      Notifier machine_done;
-> -    uint8_t version;
->      uint64_t irq_count[IOAPIC_NUM_PINS];
->      int irq_level[IOAPIC_NUM_PINS];
->      int irq_eoi[IOAPIC_NUM_PINS];
-> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-> index 133bef852d1..5cc97767d9d 100644
-> --- a/hw/intc/ioapic.c
-> +++ b/hw/intc/ioapic.c
-> @@ -315,7 +315,7 @@ ioapic_mem_read(void *opaque, hwaddr addr, unsigned i=
-nt size)
->              val =3D s->id << IOAPIC_ID_SHIFT;
->              break;
->          case IOAPIC_REG_VER:
-> -            val =3D s->version |
-> +            val =3D IOAPIC_VER_DEF |
->                  ((IOAPIC_NUM_PINS - 1) << IOAPIC_VER_ENTRIES_SHIFT);
->              break;
->          default:
-> @@ -411,8 +411,7 @@ ioapic_mem_write(void *opaque, hwaddr addr, uint64_t =
-val,
->          }
->          break;
->      case IOAPIC_EOI:
-> -        /* Explicit EOI is only supported for IOAPIC version 0x20 */
-> -        if (size !=3D 4 || s->version !=3D 0x20) {
-> +        if (size !=3D 4) {
->              break;
->          }
->          ioapic_eoi_broadcast(val);
-> @@ -444,18 +443,10 @@ static void ioapic_machine_done_notify(Notifier *no=
-tifier, void *data)
->  #endif
->  }
-> =20
-> -#define IOAPIC_VER_DEF 0x20
-> -
->  static void ioapic_realize(DeviceState *dev, Error **errp)
->  {
->      IOAPICCommonState *s =3D IOAPIC_COMMON(dev);
-> =20
-> -    if (s->version !=3D 0x11 && s->version !=3D 0x20) {
-> -        error_setg(errp, "IOAPIC only supports version 0x11 or 0x20 "
-> -                   "(default: 0x%x).", IOAPIC_VER_DEF);
-> -        return;
-> -    }
-> -
->      memory_region_init_io(&s->io_memory, OBJECT(s), &ioapic_io_ops, s,
->                            "ioapic", 0x1000);
-> =20
-> @@ -476,10 +467,6 @@ static void ioapic_unrealize(DeviceState *dev)
->      timer_free(s->delayed_ioapic_service_timer);
->  }
-> =20
-> -static const Property ioapic_properties[] =3D {
-> -    DEFINE_PROP_UINT8("version", IOAPICCommonState, version, IOAPIC_VER_=
-DEF),
-> -};
-> -
->  static void ioapic_class_init(ObjectClass *klass, const void *data)
->  {
->      IOAPICCommonClass *k =3D IOAPIC_COMMON_CLASS(klass);
-> @@ -493,7 +480,6 @@ static void ioapic_class_init(ObjectClass *klass, con=
-st void *data)
+> diff --git a/include/hw/virtio/virtio-pci.h b/include/hw/virtio/virtio-pc=
+i.h
+> index f962c9116c1..9838e8650a6 100644
+> --- a/include/hw/virtio/virtio-pci.h
+> +++ b/include/hw/virtio/virtio-pci.h
+> @@ -149,7 +149,6 @@ struct VirtIOPCIProxy {
+>      int config_cap;
+>      uint32_t flags;
+>      bool disable_modern;
+> -    bool ignore_backend_features;
+>      OnOffAuto disable_legacy;
+>      /* Transitional device id */
+>      uint16_t trans_devid;
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 8d68e56641a..7c965771907 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1965,8 +1965,7 @@ static void virtio_pci_device_plugged(DeviceState *=
+d, Error **errp)
+>       * Virtio capabilities present without
+>       * VIRTIO_F_VERSION_1 confuses guests
 >       */
->      k->post_load =3D ioapic_update_kvm_routes;
->      device_class_set_legacy_reset(dc, ioapic_reset_common);
-> -    device_class_set_props(dc, ioapic_properties);
->  }
+> -    if (!proxy->ignore_backend_features &&
+> -            !virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)=
+) {
+> +    if (!virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
+>          virtio_pci_disable_modern(proxy);
 > =20
->  static const TypeInfo ioapic_info =3D {
-> diff --git a/hw/intc/ioapic_common.c b/hw/intc/ioapic_common.c
-> index fce3486e519..8b3e2ba9384 100644
-> --- a/hw/intc/ioapic_common.c
-> +++ b/hw/intc/ioapic_common.c
-> @@ -83,7 +83,7 @@ static void ioapic_print_redtbl(GString *buf, IOAPICCom=
-monState *s)
->      int i;
-> =20
->      g_string_append_printf(buf, "ioapic0: ver=3D0x%x id=3D0x%02x sel=3D0=
-x%02x",
-> -                           s->version, s->id, s->ioregsel);
-> +                           IOAPIC_VER_DEF, s->id, s->ioregsel);
->      if (s->ioregsel) {
->          g_string_append_printf(buf, " (redir[%u])\n",
->                                 (s->ioregsel - IOAPIC_REG_REDTBL_BASE) >>=
- 1);
+>          if (!legacy) {
+> @@ -2351,8 +2350,6 @@ static const Property virtio_pci_properties[] =3D {
+>                      VIRTIO_PCI_FLAG_MODERN_PIO_NOTIFY_BIT, false),
+>      DEFINE_PROP_BIT("page-per-vq", VirtIOPCIProxy, flags,
+>                      VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT, false),
+> -    DEFINE_PROP_BOOL("x-ignore-backend-features", VirtIOPCIProxy,
+> -                     ignore_backend_features, false),
+>      DEFINE_PROP_BIT("ats", VirtIOPCIProxy, flags,
+>                      VIRTIO_PCI_FLAG_ATS_BIT, false),
+>      DEFINE_PROP_BIT("x-ats-page-aligned", VirtIOPCIProxy, flags,
 
 
