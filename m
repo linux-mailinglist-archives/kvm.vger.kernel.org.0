@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-46295-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46294-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DCC6AB4CA0
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 09:23:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92387AB4C9F
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 09:23:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7C791B414C3
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 07:23:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 352FE1B41062
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 07:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3629A1F1538;
-	Tue, 13 May 2025 07:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75C61F1301;
+	Tue, 13 May 2025 07:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OLObRHyx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m6Lk5bmQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25501F09B6
-	for <kvm@vger.kernel.org>; Tue, 13 May 2025 07:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D69D11F03CF
+	for <kvm@vger.kernel.org>; Tue, 13 May 2025 07:23:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747120990; cv=none; b=tFH/J5oRakRRZEMNf6Z+N00QRFeeV9JJPM9M/njfkWg21wRJInY6KbTs56OdKBfjfaFE0czK5R9BFnFHjzeaZGXjs4eaJCAnmIa0dIYLCEPxoCts+L5oB1tc+88ZHk9JyiH5xYaZQ0jBEmaVWP7UKLJ06waX6zqiZMqe8GQMePw=
+	t=1747120988; cv=none; b=EzqBrQPxBARUTspMJ/VZ6+xmUIm2Zcrbu3wFGt4RBuSTA33/VDzQWXyEQfA8jp4p66eZyRFk/ubLmZfrYOPsNqkmyaevKzBheSqKSXLXfeKKG16tiJr6XsEYlFocmRJaGDoOZ8yfGFQZumIxwGtEw8gvn0EPHxdI6QE4JDTilxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747120990; c=relaxed/simple;
-	bh=ElufbUIvktIAaQZeenWiBAaG3rfxmtKgtmJt88z4Ioc=;
+	s=arc-20240116; t=1747120988; c=relaxed/simple;
+	bh=EPC6U6yiCK6g7OuDEcRZQieAypoiB/RRi99ssf4cCRA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OVbPXw61k5S9719pcXJRI7HoTW9c6q20jRMXJbOAQ9vlUERlJmSPLUDpvqZ4z43KBPmXwdZd+xE79VDVMyJt0iysNBpHGe0hiZA/31LC9mKxVvvRGAvLS6JMjJQJGVSGDRyyUc21lOR+4UY8Fek67tbJZl72xRp+AEkYFfLRk7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OLObRHyx; arc=none smtp.client-ip=198.175.65.17
+	 MIME-Version; b=jzlWljusqH/apIwrhdDNKmCv2GnUp7E/DlYw9R+1//h3MzZhwtOrLf8kKbcWZ5jWmcie/VcE99l9FlJsuIFjPtpwetay3Bkvqy7Y+Yzp7+78hqP3QwwCnGteXHbfMIlIROCVhYBntdyKj8aVjkcaKlHiff6TndEw3CabON2N4O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m6Lk5bmQ; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747120989; x=1778656989;
+  t=1747120987; x=1778656987;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ElufbUIvktIAaQZeenWiBAaG3rfxmtKgtmJt88z4Ioc=;
-  b=OLObRHyxEJIJBD2d8JHgq9BXyttKpZZnmBv0KX9wHcR4Lv+I0CycOzwP
-   weyh6CgDZqhRXh2GAIkn1AWyGZrPXps7TsuACkEq1iY/17yvQOOjCXGLm
-   52c2IkC/X+Wrfq72XriYE4UhowHkXLA5/TIxvUwJ0yzLYXv0tdtJPuAl+
-   pKK4XSdmfBJad4fgwc97NS4q+SxEvtbcWdWgt+XVW3U2B+/1uNK/5qX2J
-   BMU9AUWgi/7Z3a3Un5q9YBSX9ZrXUpKfo284rKWH9GUuoOv7FTpfJa1B4
-   VcHRXOnaEzZNEE1L2syLLxVj5FndVtxOek648Dd50yS4IiDVUy5ECfS6P
-   g==;
-X-CSE-ConnectionGUID: pHO61/e2TgeZk5+HUDXgiQ==
-X-CSE-MsgGUID: +61o471PRnK3TJkLYSu83Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="48941009"
+  bh=EPC6U6yiCK6g7OuDEcRZQieAypoiB/RRi99ssf4cCRA=;
+  b=m6Lk5bmQIj7gP9ObZAUPlmeWqFKUeFPHTfFYlOYPYFvsLAeSr/XTM+TC
+   ZsA1XWFMsICty3axzcwteANDxJyzD6OVQXVw2rRiXPQWW/4QEtB6WHDoz
+   94r9e29ODOAA+bqI+viGnbe+GOVclStiIn07K3ga7vbm0m5ViSct4ItNe
+   jQqBuF39aI/iEGNzZX5kHvUogOrgJdP95efJ2qmdGI8JMWbZaHu+895rx
+   ObTl1oTLmEy5K58dBxw1E9Evf4vaV/m0X31wehowpj3BwbuboH0UNjHn9
+   /+yjGSkVBiU4ha1kV1HHX5rpuxagDMVgzrf1y2x4VAOp95rZ0LKONotdM
+   w==;
+X-CSE-ConnectionGUID: zcpi4lpzR9aH3braNwANjQ==
+X-CSE-MsgGUID: krvUchKARgm7RsFDrE11ng==
+X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="48941012"
 X-IronPort-AV: E=Sophos;i="6.15,284,1739865600"; 
-   d="scan'208";a="48941009"
+   d="scan'208";a="48941012"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
   by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 00:23:04 -0700
-X-CSE-ConnectionGUID: U/Sp2KurR1GdluLui/pQrw==
-X-CSE-MsgGUID: zcpC5pvzS/qQ8X1LShmB5Q==
+X-CSE-ConnectionGUID: lemLWooLQgyJJAGnFoNvcw==
+X-CSE-MsgGUID: NklkadLXT/S9p6QzkWrQtA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,284,1739865600"; 
-   d="scan'208";a="142740610"
+   d="scan'208";a="142740612"
 Received: from 984fee019967.jf.intel.com ([10.165.54.94])
   by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 00:23:03 -0700
 From: Chao Gao <chao.gao@intel.com>
@@ -63,9 +63,9 @@ To: kvm@vger.kernel.org
 Cc: pbonzini@redhat.com,
 	seanjc@google.com,
 	Chao Gao <chao.gao@intel.com>
-Subject: [kvm-unit-tests PATCH v1 4/8] x86: cet: Validate #CP error code
-Date: Tue, 13 May 2025 00:22:46 -0700
-Message-ID: <20250513072250.568180-5-chao.gao@intel.com>
+Subject: [kvm-unit-tests PATCH v1 5/8] x86: cet: Use report_skip()
+Date: Tue, 13 May 2025 00:22:47 -0700
+Message-ID: <20250513072250.568180-6-chao.gao@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250513072250.568180-1-chao.gao@intel.com>
 References: <20250513072250.568180-1-chao.gao@intel.com>
@@ -77,57 +77,42 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The #CP exceptions include an error code that provides additional
-information about how the exception occurred. Previously, CET tests simply
-printed these error codes without validation.
+report_skip() function is preferred for skipping inapplicable tests when
+the necessary hardware features are unavailable. For example, with this
+patch applied, the test output is as follows if IBT is not supported:
 
-Enhance the CET tests to validate the #CP error code.
+SKIP: IBT not enabled
+SUMMARY: 1 tests, 1 skipped
 
-This requires the run_in_user() infrastructure to catch the exception
-vector, error code, and rflags, similar to what check_exception_table()
-does.
+Previously, it printed:
+
+IBT not enabled
+SUMMARY: 0 tests
 
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 ---
- lib/x86/usermode.c | 4 ++++
- x86/cet.c          | 4 ++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ x86/cet.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
-index c3ec0ad7..f896e3bd 100644
---- a/lib/x86/usermode.c
-+++ b/lib/x86/usermode.c
-@@ -23,6 +23,10 @@ static void restore_exec_to_jmpbuf(void)
- 
- static void restore_exec_to_jmpbuf_exception_handler(struct ex_regs *regs)
- {
-+	this_cpu_write_exception_vector(regs->vector);
-+	this_cpu_write_exception_rflags_rf((regs->rflags >> 16) & 1);
-+	this_cpu_write_exception_error_code(regs->error_code);
-+
- 	/* longjmp must happen after iret, so do not do it now.  */
- 	regs->rip = (unsigned long)&restore_exec_to_jmpbuf;
- 	regs->cs = KERNEL_CS;
 diff --git a/x86/cet.c b/x86/cet.c
-index 3e18e3b4..3162b3da 100644
+index 3162b3da..5b7d311b 100644
 --- a/x86/cet.c
 +++ b/x86/cet.c
-@@ -92,13 +92,13 @@ int main(int ac, char **av)
+@@ -59,12 +59,12 @@ int main(int ac, char **av)
+ 	bool rvc;
  
- 	printf("Unit test for CET user mode...\n");
- 	run_in_user((usermode_func)cet_shstk_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
--	report(rvc, "Shadow-stack protection test.");
-+	report(rvc && exception_error_code() == 1, "Shadow-stack protection test.");
+ 	if (!this_cpu_has(X86_FEATURE_SHSTK)) {
+-		printf("SHSTK not enabled\n");
++		report_skip("SHSTK not enabled");
+ 		return report_summary();
+ 	}
  
- 	/* Enable indirect-branch tracking */
- 	wrmsr(MSR_IA32_U_CET, ENABLE_IBT_BIT);
+ 	if (!this_cpu_has(X86_FEATURE_IBT)) {
+-		printf("IBT not enabled\n");
++		report_skip("IBT not enabled");
+ 		return report_summary();
+ 	}
  
- 	run_in_user((usermode_func)cet_ibt_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
--	report(rvc, "Indirect-branch tracking test.");
-+	report(rvc && exception_error_code() == 3, "Indirect-branch tracking test.");
- 
- 	write_cr4(read_cr4() & ~X86_CR4_CET);
- 	wrmsr(MSR_IA32_U_CET, 0);
 -- 
 2.47.1
 
