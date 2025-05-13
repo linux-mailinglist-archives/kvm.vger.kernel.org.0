@@ -1,138 +1,121 @@
-Return-Path: <kvm+bounces-46313-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46314-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28510AB4FB2
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 11:26:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0055AB4FCF
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 11:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B34E0165AFA
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 09:26:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 673307A51DE
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 09:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75C7226183;
-	Tue, 13 May 2025 09:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 810D322A80F;
+	Tue, 13 May 2025 09:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJ5StDbd"
 X-Original-To: kvm@vger.kernel.org
-Received: from zero.eik.bme.hu (zero.eik.bme.hu [152.66.115.2])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BA12253E1
-	for <kvm@vger.kernel.org>; Tue, 13 May 2025 09:26:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.66.115.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82408227E8C;
+	Tue, 13 May 2025 09:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747128399; cv=none; b=nh3lWzkuHgW8W5ywwCotaMSz+W+J9dORx1qqNU2jyXnqeUcb7PS28DD+/QFygYGMVhv42xnU2Ci2qeEs+smJzwWePphZcYuAdX486zbE1VhazzlCgwBFPSPcEEbeeCoHpfOi2HD2jEr+OdByBjGcnsO0Oe3BcYFn1NTn2cClltY=
+	t=1747128606; cv=none; b=O5Nk4olKc0C6MSTowdRXg3BAJsgb7An9/yQqweOHpc7tFXoLTYMpzFoVUvvAkePms9wlWaqKzm1TeEPP8UD/87f/DuHuuxYmCRGEozNBBPkC2gWxOJAYC1pIGXXoYxN/kSk+PcGRg7uIHH0Bl2ACbVzxrOLZu10jroNaLmp9KLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747128399; c=relaxed/simple;
-	bh=7IJy1STBafUPGlHYbDQIwbLaOYJ5YYRzZKCauwXGXfY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=e2b/c3MAkd+KR/BEolW4z+EskdgXUd5NR1gSdoMDWWtKBiXEBYV0qqnDW8GVHudgBpeHRwdUyp0Ho6kG3NlvIjXrdcsmWUc70fv03zVfSiIXlK7mJXYkLcIjInYxccP8eWHf7vz72M9tBXBobyAokxnxyeIYHO12M06xSsUmyN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu; spf=pass smtp.mailfrom=eik.bme.hu; arc=none smtp.client-ip=152.66.115.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=eik.bme.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eik.bme.hu
-Received: from zero.eik.bme.hu (localhost [127.0.0.1])
-	by zero.eik.bme.hu (Postfix) with ESMTP id BAE3C55CA5C;
-	Tue, 13 May 2025 11:26:33 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at eik.bme.hu
-Received: from zero.eik.bme.hu ([127.0.0.1])
- by zero.eik.bme.hu (zero.eik.bme.hu [127.0.0.1]) (amavisd-new, port 10028)
- with ESMTP id yB4rYU66MMtP; Tue, 13 May 2025 11:26:31 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
-	id B632C55CA5D; Tue, 13 May 2025 11:26:31 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by zero.eik.bme.hu (Postfix) with ESMTP id B3669745683;
-	Tue, 13 May 2025 11:26:31 +0200 (CEST)
-Date: Tue, 13 May 2025 11:26:31 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Markus Armbruster <armbru@redhat.com>
-cc: Mark Cave-Ayland <mark.caveayland@nutanix.com>, 
-    =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>, 
-    Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, 
-    Zhao Liu <zhao1.liu@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-    =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>, 
-    Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, 
-    Richard Henderson <richard.henderson@linaro.org>, kvm@vger.kernel.org, 
-    Gerd Hoffmann <kraxel@redhat.com>, Laurent Vivier <lvivier@redhat.com>, 
-    Jiaxun Yang <jiaxun.yang@flygoat.com>, Yi Liu <yi.l.liu@intel.com>, 
-    "Michael S. Tsirkin" <mst@redhat.com>, 
-    Eduardo Habkost <eduardo@habkost.net>, 
-    Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, 
-    Alistair Francis <alistair.francis@wdc.com>, 
-    Daniel Henrique Barboza <dbarboza@ventanamicro.com>, 
-    Marcelo Tosatti <mtosatti@redhat.com>, qemu-riscv@nongnu.org, 
-    Weiwei Li <liwei1518@gmail.com>, Amit Shah <amit@kernel.org>, 
-    Yanan Wang <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>, 
-    Palmer Dabbelt <palmer@dabbelt.com>, Ani Sinha <anisinha@redhat.com>, 
-    Igor Mammedov <imammedo@redhat.com>, Fabiano Rosas <farosas@suse.de>, 
-    Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, 
-    =?ISO-8859-15?Q?Cl=E9ment_Mathieu--Drif?= <clement.mathieu--drif@eviden.com>, 
-    qemu-arm@nongnu.org, 
-    =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>, 
-    Huacai Chen <chenhuacai@kernel.org>, Jason Wang <jasowang@redhat.com>
-Subject: Re: How to mark internal properties
-In-Reply-To: <87ecwshqj4.fsf@pond.sub.org>
-Message-ID: <60cd3ba8-2ab1-74ac-54ea-5e3b309788a1@eik.bme.hu>
-References: <20250508133550.81391-1-philmd@linaro.org> <20250508133550.81391-13-philmd@linaro.org> <23260c74-01ba-45bc-bf2f-b3e19c28ec8a@intel.com> <aB2vjuT07EuO6JSQ@intel.com> <2f526570-7ab0-479c-967c-b3f95f9f19e3@redhat.com>
- <CAFEAcA-kuHvxjuV_cMh-Px3C-k2Gd51jFqhwndO52vm++M_jAA@mail.gmail.com> <aCG6MuDLrQpoTqpg@redhat.com> <87jz6mqeu5.fsf@pond.sub.org> <eedd1fa2-5856-41b8-8e6b-38bd5c98ce8f@nutanix.com> <87ecwshqj4.fsf@pond.sub.org>
+	s=arc-20240116; t=1747128606; c=relaxed/simple;
+	bh=982jXf6QjefdLWj60I4V7qnuv7iqFenReu2jMD1Hcfw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=q3qJdNxfBktA4+CSxShq8fZpzdt7yocr342ltES4cNSJCG900LA9dVvswKQx9ySvQfiy42l6msW9WPP1wWhrftFHtohA+9L3OBkedsr3MVpdtMCd2b0lf3oIw4oTywWSgqWqMgDxlTzWlxPOFb0lzGjHxrJhqNicbXBFk+V4aAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJ5StDbd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC583C4CEE4;
+	Tue, 13 May 2025 09:30:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747128605;
+	bh=982jXf6QjefdLWj60I4V7qnuv7iqFenReu2jMD1Hcfw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cJ5StDbdMUqgFU1nibcKTcrE/lbpar8UNz+17VvmArjbq84lV9qpZZqyb1B0AE5F0
+	 hzLxOV7veV6tbS1CpfJ5d1udD1Dmx22doiZvU3S0D+beoc4jKqsLWChkqyUjXAbTBc
+	 Ps0hpLc4ENGfEhFxB+Z7bfRoPm7cZZJQGXKVzgPS3fIJHygsFh1GgJSna8BIaytCHN
+	 GX1bgSWC8ATTt5ym2XRwjuH+nZnROAbHmox5yXjEnIlbQmRPsCOY21TaZtoxqCkY0p
+	 pAJSg1K3OfodDaqE8/TZ+2gCV0N+JrRw2vwA4f76drx+Dp6A1beSfuE3d/BFT6at2z
+	 YZiYii6kMOuqA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF8839D6553;
+	Tue, 13 May 2025 09:30:44 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v14 0/9] Device memory TCP TX
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174712864353.1250182.17683820324947823076.git-patchwork-notify@kernel.org>
+Date: Tue, 13 May 2025 09:30:43 +0000
+References: <20250508004830.4100853-1-almasrymina@google.com>
+In-Reply-To: <20250508004830.4100853-1-almasrymina@google.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, io-uring@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, donald.hunter@gmail.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, corbet@lwn.net, andrew+netdev@lunn.ch, jeroendb@google.com,
+ hramamurthy@google.com, kuniyu@amazon.com, willemb@google.com,
+ axboe@kernel.dk, asml.silence@gmail.com, dsahern@kernel.org,
+ ncardwell@google.com, mst@redhat.com, jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com, eperezma@redhat.com, stefanha@redhat.com,
+ sgarzare@redhat.com, shuah@kernel.org, sdf@fomichev.me, dw@davidwei.uk,
+ jhs@mojatatu.com, victor@mojatatu.com, pctammela@mojatatu.com,
+ skhawaja@google.com
 
-On Tue, 13 May 2025, Markus Armbruster wrote:
-> Mark Cave-Ayland <mark.caveayland@nutanix.com> writes:
->> On a related note this also brings us back to the discussion as to the 
->> relationship between qdev and QOM: at one point I was under the 
->> impression that qdev properties were simply QOM properties that were 
->> exposed externally, i.e on the commmand line for use with -device.
->>
->> Can you provide an update on what the current thinking is in this area, 
->> in particular re: scoping of qdev vs QOM properties?
->
-> qdev is a leaky layer above QOM.
->
-> qdev properties are also QOM properties.
->
-> All device properties are exposed externally.
+Hello:
 
-That was clear but the question was if QOM properties (that are not qdev 
-properties) exist and if so are they also exposed? If not exposed it may 
-be used for internal properties (where simpler solutions aren't 
-convenient) but maybe qdev also adds easier definition of properties 
-that's why they used instead of QOM properties?
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> We use device properties for:
->
-> * Letting users configure pluggable devices, with -device or device_add
->
-> * Letting code configure onboard devices
->
->  For onboard devices that are also pluggable, everything exposed to
->  code is also exposed externally.  This might be a mistake in places.
+On Thu,  8 May 2025 00:48:20 +0000 you wrote:
+> v14: https://lore.kernel.org/netdev/20250429032645.363766-1-almasrymina@google.com/
+> ===
+> 
+> Picked up acks from Paolo, and addressed feedback from Paolo and Jakub.
+> 
+> Changelog:
+> - Fix issue in patch 4 where sockc_valid == false but err is
+>   overwritten.
+> - Addressed nits.
+> 
+> [...]
 
-If a device is pluggable, theoretically a user could create a machine from 
-them declaratively, e.g. starting from a "none" machine or like plugging 
-cards in a motherboard so their properties should be exposed as long as 
-those properties correspond to the device pins they model or configurable 
-options. Only properties that are implementation details should not be 
-exposed because setting them can break the device. There are a few places 
-where we have such properties. But you say "in places" so I think you 
-meant the same.
+Here is the summary with links:
+  - [net-next,v14,1/9] netmem: add niov->type attribute to distinguish different net_iov types
+    https://git.kernel.org/netdev/net-next/c/03e96b8c11d1
+  - [net-next,v14,2/9] net: add get_netmem/put_netmem support
+    https://git.kernel.org/netdev/net-next/c/e9f3d61db5cb
+  - [net-next,v14,3/9] net: devmem: TCP tx netlink api
+    https://git.kernel.org/netdev/net-next/c/8802087d20c0
+  - [net-next,v14,4/9] net: devmem: Implement TX path
+    https://git.kernel.org/netdev/net-next/c/bd61848900bf
+  - [net-next,v14,5/9] net: add devmem TCP TX documentation
+    https://git.kernel.org/netdev/net-next/c/17af8cc06a5a
+  - [net-next,v14,6/9] net: enable driver support for netmem TX
+    https://git.kernel.org/netdev/net-next/c/383faec0fd64
+  - [net-next,v14,7/9] gve: add netmem TX support to GVE DQO-RDA mode
+    https://git.kernel.org/netdev/net-next/c/c32532670cec
+  - [net-next,v14,8/9] net: check for driver support in netmem TX
+    https://git.kernel.org/netdev/net-next/c/ae28cb114727
+  - [net-next,v14,9/9] selftests: ncdevmem: Implement devmem TCP TX
+    https://git.kernel.org/netdev/net-next/c/2f1a805f32ba
 
-> * Letting the machine versioning machinery adjust device configuration
->
->  Some properties are meant to be used just for this.  They're exposed
->  externally regardless, which is a mistake.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Question is if we want to allow users to tweak these compatibility 
-options, like selectively enable/disable when migrating between QEMU 
-versions or for testing. It might have some uses and maybe that's the 
-reason why people would like these to go through deprecation instead of 
-just dropping them. Marking some properties not exposed would get the same 
-resistance then so may not solve the issue.
 
-Regards,
-BALATON Zoltan
 
