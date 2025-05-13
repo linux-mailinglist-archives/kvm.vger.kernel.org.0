@@ -1,166 +1,183 @@
-Return-Path: <kvm+bounces-46310-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46311-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A741AB4EE3
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 11:12:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6CD3AB4F00
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 11:16:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4B5919E41AE
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 09:12:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31BE93A79C4
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 09:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FABA213E94;
-	Tue, 13 May 2025 09:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92107212FA2;
+	Tue, 13 May 2025 09:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJRZ+77P"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JWKQDwN0"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744E51D7E5B
-	for <kvm@vger.kernel.org>; Tue, 13 May 2025 09:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C8F1E0DFE
+	for <kvm@vger.kernel.org>; Tue, 13 May 2025 09:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747127533; cv=none; b=iGwf/RXhWsli70imhkTKhBU5755o+Jl92p7hk0WXBqRZ5VdPNZcRhuDNOAFE+VKwrbQnpQjfP6B7QNv9mBEB13hDiF+4eeEW+iTiuFUfcmVjGhmYYYjUjssqfIHttXkno51Wtuio+I+3t/TO41Npar+DFz+dSPYfd6RToEv2xkw=
+	t=1747127782; cv=none; b=Mu3M1zYRf78eO+zP1KgCJZGw7s7KPpUmTrOEqh6s0He2zvmMv9KSiqRSpHfudedvZnT9PwG08fEux1/lsZEsHCIe1PNWPlTZBnsj3HRwS2kTKgDieU+cpt0ThQ4vi5W0/p1HYAsODW4+6M6kSU7fqqTVtP7TOIN/UxyIwqGnS/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747127533; c=relaxed/simple;
-	bh=WDlpFsWbDcfzZLGnp/d3QNExJHb0unwOgNVXbvwod6g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lQLXpS7EYJbNoWVYFLhavMD+7f3tQ9gJSUpgU640drIy/DBYq+OL2AVvhsgeVUQJ6g56wetuSHryu4f4u5FV/c4PFtosrkYxeZ91xzdSEE1PgUJAxaIp2AOCvMdNc/dsGa7f1jK2q3KNoUGo7a+m3RoKiHMxJzb2ZMLMN59n2IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YJRZ+77P; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1747127782; c=relaxed/simple;
+	bh=HNtjjCsC/MT4RXrShvWdcT3xvS8QL8bkihqK2Jg1q8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZmZjI3S2eKmCxKvkudPg8Cak+EeaM4eaeJFmpKOE1/1aOomGL1QI07WnxdjnJ+kllFXReMOfQfSSmvM3fje/RtXwmabxU+E9CT+jsZPu5MeSqW2ePtcQ9A4hdDhn4RBsg4Hlv2TjEreS9bY79Fb0m6KAovDUyXE8OQtM+mujuN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JWKQDwN0; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747127530;
+	s=mimecast20190719; t=1747127779;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lSKXGvXgaIuXifWFUaLvMDff9Ik6twAKIvR+Y496sQE=;
-	b=YJRZ+77PE8fUZxIWsKZlghHM0YJkUVwOeJZwBMeezfbfQRLkI1xIQo9Oie4XCDO0BxO/tu
-	u8rct+uqA1Lkz5Cy/ZMqQUKq7R6z/mzQSLroxYxYDwhwJVZ04u1PGSchHAjEbIaNPl2koP
-	4Nfjrqz/MTJEgZkreySYNy4Qrwb7HU4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=HlADszS+Jp7Q3TGl9uZ1eHzM09x0nyHrIGrUpdW9aBo=;
+	b=JWKQDwN0pSDx/g1GA6zTji++Me02ha7VaarjpmP6bt0iQICsZ8cwkGO4MKRogGnHxPnCfA
+	L1GKaK1w7ftsQagAN1FjcBM/SCY1kA13qGkIkxzvlArrZk/Zv7k+9cj6q+G065oRtsb45b
+	z2XjksHhsrSdwl4gS7e5LvtsrrC1oE8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-151-TXLjsBRbM3uG0-fHxuiL6w-1; Tue, 13 May 2025 05:12:09 -0400
-X-MC-Unique: TXLjsBRbM3uG0-fHxuiL6w-1
-X-Mimecast-MFC-AGG-ID: TXLjsBRbM3uG0-fHxuiL6w_1747127528
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-442cdf07ad9so22222875e9.2
-        for <kvm@vger.kernel.org>; Tue, 13 May 2025 02:12:09 -0700 (PDT)
+ us-mta-444-moBnj5AlPgOUHe6hhvxhKQ-1; Tue, 13 May 2025 05:16:18 -0400
+X-MC-Unique: moBnj5AlPgOUHe6hhvxhKQ-1
+X-Mimecast-MFC-AGG-ID: moBnj5AlPgOUHe6hhvxhKQ_1747127777
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43ea256f039so39710765e9.0
+        for <kvm@vger.kernel.org>; Tue, 13 May 2025 02:16:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747127528; x=1747732328;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lSKXGvXgaIuXifWFUaLvMDff9Ik6twAKIvR+Y496sQE=;
-        b=VFGbj7Yh9GAwmXfrVL5KSCyrppVKLr4bhInLhAISoKy5CKO2SmspTRSYv2RoDvhw3P
-         sYT29aAvEX7oKVxrMfpf6cF4ZbBKM4By1HN7CB4DiyKTOUlHfFnlYYwi/I2dhZau9aw4
-         kzOL+rai4dKJLyPcrVCKEWehXKnTrQzrL/sn+oGXdHrE78YSKvDdKp2GjFflKZb66sOQ
-         BtEnrlml7+M170x97PrZi6K7kZgkvHZrh0f7WOT12V1lxOJlJ3Zbju34tVmTZsrnyd3n
-         QpG3CL8PW5nH5btg+bpJ+bQDwWvY36yE0V8y6QUSZjqaYqNIL1pwBpGnBlSy9ois8WPm
-         r69g==
-X-Forwarded-Encrypted: i=1; AJvYcCXinyL4b8h4P9+74LKgD8y1LpHQqdp0DOFLJtKW9UZpQhL5qb4uoxsTuLC+5a+ZyNlOLRY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGekf+Mp4DeOpHWH6CoK+sxPUu+8ZMvv6iQGGAx3EuTyrWNAVb
-	9Oa+itoLLsSU1ZMHLF3UpABej46g+c3O1fT/GeRZLieGUHtulLSG5v7byh3USBYswzYC1LelPqJ
-	OeKrylDhxp8HGfrr4ivtdJJu4hwDmvQfacXIZEbwvpcsWklW9vsdGOWVKiwOr
-X-Gm-Gg: ASbGncshSzBXtEyxSJC9d+Pu18zetb3zQnssskqni/eWObTvm1KhnzUYNz0Psw8Uq3T
-	YDlhea5NJfEg+pw1XVEru+nyNYM9I8W3SzpjT2mLCxfXYUErC7pKCoX6gQQN+ELpcWNrn336r/f
-	HRDZzqwDQofPgRHwAWLESjzYlsMgsnLz6Wffj2wkl7aYSkUVhqtbAzn725YgufQlJV7J9ueCOzF
-	4HdxQ4+nMFPD5Osfmdb0cW6utr+OI2Q8+9/L1WEUvs0SJSQImxxzNdmKX2uqJb6GdmzfYIVr1Y+
-	wPFVjD4aBhLyiMIWEx8=
-X-Received: by 2002:a05:600c:4454:b0:440:9b1a:cd78 with SMTP id 5b1f17b1804b1-442d6d44aa7mr175600125e9.10.1747127527695;
-        Tue, 13 May 2025 02:12:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF7UByCIdv1fV6GeTCbxFUgA3MTskc+HSiE9ez+aliKyTiJ4Fv/7gBQk/cE3vpwwsDlBoiWaw==
-X-Received: by 2002:a05:600c:4454:b0:440:9b1a:cd78 with SMTP id 5b1f17b1804b1-442d6d44aa7mr175599485e9.10.1747127527311;
-        Tue, 13 May 2025 02:12:07 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cc59:6510::f39? ([2a0d:3341:cc59:6510::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442ea367102sm36670345e9.3.2025.05.13.02.12.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 May 2025 02:12:06 -0700 (PDT)
-Message-ID: <085a78fc-acfc-4a86-9dbf-18795ad68b4c@redhat.com>
-Date: Tue, 13 May 2025 11:12:04 +0200
+        d=1e100.net; s=20230601; t=1747127777; x=1747732577;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HlADszS+Jp7Q3TGl9uZ1eHzM09x0nyHrIGrUpdW9aBo=;
+        b=nWmOB+IEXx6ZRbDj7IxxiofKILAbVc54n9lj+v+dm8Iw0UKJJhyz8ToyOZJE1j44/T
+         ARByJ//OFTVksnv5pfN4Xqn2zLCGP8QD2jRpeyG9gOGLe/uAiXqM3n9Y0WzR2UqZj006
+         +LVjexGklu4Xun7WdEYjpVyVHbiQQ/fM5uh0D3wRgYplOge4982YPkPkB779F7h12vRp
+         9sZBJUaci8usHTwMojQfKbJrhPZziHS+XkFodR9BRM2BrVza0hCxtxZ2+ohkTnjiNv1m
+         gXCvat+S+6eBXj3qTtcZOImQQenTYVOC7EVs8oWcPY7aovNildhhsrNe278XzD0mIyt5
+         n1WQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/QMa6USt3/XRCdxyDyUR3dbTTZAK4FIDBoqJspxFtTugkmACyWo2Svf8gOiyX9DL9c4w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP1yy+ILUZhqf6xjnn7jLifryc8wIgX8VXKXwddesy7tsu6s8c
+	spm56oRMtcDw6FyHXIRsQI/G1Sj2pAEdvzst2c8Wzx+PZwAOVjTMw8XDPHXTM2lfCfRFhppMjwG
+	ng65pyza5crKnVHNqPlHbW1SCK3n3LxP4O3nQJKVSno3wD+eYnw==
+X-Gm-Gg: ASbGncuqZETa6pTPc/CPbKG+3Ls8Rrhsx/1bLa4vvfOOO1iRk3rRSdBPMFmIXQ7o/IK
+	P1rkj/OK1oPOzCalHMTEcgapTjXKBhKG+ornf6vAoy4pGx72ohbelnSJn1ShIkSV2hPQrC32qZ0
+	3HupPCRAAk7bsx1G48c9Hi12Jc718zhjFf/0xw163F/ePk89KQi8vwyHjBG2Nv8l4AaXdf7PHgq
+	cKGGqi7mAhpTQSCPMfYjHR2HDVSAJhP4k+paQwtKg19VnpzoFvbUtjAIxyT6qBPTHlCTA2UZA9I
+	p6RuT0PrT316jWEqjc8PIlzr8b+6aQ7d
+X-Received: by 2002:a05:600c:6308:b0:43c:fe15:41c9 with SMTP id 5b1f17b1804b1-442d6d3e6d9mr160272625e9.9.1747127776777;
+        Tue, 13 May 2025 02:16:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE1T/5gFVuk4ijjzA9YbA5QxEtUdD+KlrGtP96PmXtcNzFC1cX7Zq93bTxtyhDRAIbOqgjkbg==
+X-Received: by 2002:a05:600c:6308:b0:43c:fe15:41c9 with SMTP id 5b1f17b1804b1-442d6d3e6d9mr160272145e9.9.1747127776344;
+        Tue, 13 May 2025 02:16:16 -0700 (PDT)
+Received: from imammedo.users.ipa.redhat.com ([85.93.96.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58f2f65sm15734373f8f.55.2025.05.13.02.16.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 May 2025 02:16:15 -0700 (PDT)
+Date: Tue, 13 May 2025 11:16:14 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ kvm@vger.kernel.org, Sergio Lopez <slp@redhat.com>, Gerd Hoffmann
+ <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laurent
+ Vivier <lvivier@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>, Yi Liu
+ <yi.l.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo
+ Habkost <eduardo@habkost.net>, Marcel Apfelbaum
+ <marcel.apfelbaum@gmail.com>, Alistair Francis <alistair.francis@wdc.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, qemu-riscv@nongnu.org, Weiwei Li
+ <liwei1518@gmail.com>, Amit Shah <amit@kernel.org>, Zhao Liu
+ <zhao1.liu@intel.com>, Yanan Wang <wangyanan55@huawei.com>, Helge Deller
+ <deller@gmx.de>, Palmer Dabbelt <palmer@dabbelt.com>, Ani Sinha
+ <anisinha@redhat.com>, Fabiano Rosas <farosas@suse.de>, Paolo Bonzini
+ <pbonzini@redhat.com>, Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ =?UTF-8?B?Q2zDqW1lbnQ=?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
+ qemu-arm@nongnu.org, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau
+ <marcandre.lureau@redhat.com>, Huacai Chen <chenhuacai@kernel.org>, Jason
+ Wang <jasowang@redhat.com>, Mark Cave-Ayland <mark.caveayland@nutanix.com>
+Subject: Re: [PATCH v4 23/27] hw/i386/intel_iommu: Remove
+ IntelIOMMUState::buggy_eim field
+Message-ID: <20250513111614.31479c42@imammedo.users.ipa.redhat.com>
+In-Reply-To: <20250508133550.81391-24-philmd@linaro.org>
+References: <20250508133550.81391-1-philmd@linaro.org>
+	<20250508133550.81391-24-philmd@linaro.org>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v14 4/9] net: devmem: Implement TX path
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- io-uring@vger.kernel.org, virtualization@lists.linux.dev,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
- <willemb@google.com>, Jens Axboe <axboe@kernel.dk>,
- Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
- sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
- Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
- <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20250508004830.4100853-1-almasrymina@google.com>
- <20250508004830.4100853-5-almasrymina@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250508004830.4100853-5-almasrymina@google.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 5/8/25 2:48 AM, Mina Almasry wrote:
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 86c427f166367..0ae265d39184e 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -1059,6 +1059,7 @@ int tcp_sendmsg_fastopen(struct sock *sk, struct msghdr *msg, int *copied,
->  
->  int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
->  {
-> +	struct net_devmem_dmabuf_binding *binding = NULL;
->  	struct tcp_sock *tp = tcp_sk(sk);
->  	struct ubuf_info *uarg = NULL;
->  	struct sk_buff *skb;
-> @@ -1066,11 +1067,23 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
->  	int flags, err, copied = 0;
->  	int mss_now = 0, size_goal, copied_syn = 0;
->  	int process_backlog = 0;
-> +	bool sockc_valid = true;
->  	int zc = 0;
->  	long timeo;
->  
->  	flags = msg->msg_flags;
->  
-> +	sockc = (struct sockcm_cookie){ .tsflags = READ_ONCE(sk->sk_tsflags) };
-> +	if (msg->msg_controllen) {
-> +		err = sock_cmsg_send(sk, msg, &sockc);
-> +		if (unlikely(err))
-> +			/* Don't return error until MSG_FASTOPEN has been
-> +			 * processed; that may succeed even if the cmsg is
-> +			 * invalid.
-> +			 */
-> +			sockc_valid = false;
+On Thu,  8 May 2025 15:35:46 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> wrote:
 
-It occurred to me a bit too late that this chunk of code could be
-cleaned-up a bit using a 'sockc_err' variable to store the
-sock_cmsg_send() return code instead of the 'sockc_valid' bool. It
-should avoid a conditional here and in the later error check.
+> The IntelIOMMUState::buggy_eim boolean was only set in
+> the hw_compat_2_7[] array, via the 'x-buggy-eim=3Dtrue'
+> property. We removed all machines using that array, lets
+> remove that property, simplifying vtd_decide_config().
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
 
-(just to mention a possible follow-up! no need to repost!)
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Thanks,
-
-Paolo
+> ---
+>  include/hw/i386/intel_iommu.h | 1 -
+>  hw/i386/intel_iommu.c         | 5 ++---
+>  2 files changed, 2 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index e95477e8554..29304329d05 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -303,7 +303,6 @@ struct IntelIOMMUState {
+>      uint32_t intr_size;             /* Number of IR table entries */
+>      bool intr_eime;                 /* Extended interrupt mode enabled */
+>      OnOffAuto intr_eim;             /* Toggle for EIM cabability */
+> -    bool buggy_eim;                 /* Force buggy EIM unless eim=3Doff =
+*/
+>      uint8_t aw_bits;                /* Host/IOVA address width (in bits)=
+ */
+>      bool dma_drain;                 /* Whether DMA r/w draining enabled =
+*/
+>      bool dma_translation;           /* Whether DMA translation supported=
+ */
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 5f8ed1243d1..c980cecb4ee 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -3823,7 +3823,6 @@ static const Property vtd_properties[] =3D {
+>      DEFINE_PROP_UINT32("version", IntelIOMMUState, version, 0),
+>      DEFINE_PROP_ON_OFF_AUTO("eim", IntelIOMMUState, intr_eim,
+>                              ON_OFF_AUTO_AUTO),
+> -    DEFINE_PROP_BOOL("x-buggy-eim", IntelIOMMUState, buggy_eim, false),
+>      DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
+>                        VTD_HOST_ADDRESS_WIDTH),
+>      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALS=
+E),
+> @@ -4731,11 +4730,11 @@ static bool vtd_decide_config(IntelIOMMUState *s,=
+ Error **errp)
+>      }
+> =20
+>      if (s->intr_eim =3D=3D ON_OFF_AUTO_AUTO) {
+> -        s->intr_eim =3D (kvm_irqchip_in_kernel() || s->buggy_eim)
+> +        s->intr_eim =3D kvm_irqchip_in_kernel()
+>                        && x86_iommu_ir_supported(x86_iommu) ?
+>                                                ON_OFF_AUTO_ON : ON_OFF_AU=
+TO_OFF;
+>      }
+> -    if (s->intr_eim =3D=3D ON_OFF_AUTO_ON && !s->buggy_eim) {
+> +    if (s->intr_eim =3D=3D ON_OFF_AUTO_ON) {
+>          if (kvm_irqchip_is_split() && !kvm_enable_x2apic()) {
+>              error_setg(errp, "eim=3Don requires support on the KVM side"
+>                               "(X2APIC_API, first shipped in v4.7)");
 
 
