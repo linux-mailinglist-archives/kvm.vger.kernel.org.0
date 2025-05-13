@@ -1,210 +1,291 @@
-Return-Path: <kvm+bounces-46350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A1C0AB5521
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 14:45:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1725AB5531
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 14:51:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B89F816AA2F
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 12:45:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 309223A3DD6
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 12:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D6D91D130E;
-	Tue, 13 May 2025 12:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB5128DEF0;
+	Tue, 13 May 2025 12:51:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E9Eu7nhe"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="oNNhEZvX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2087.outbound.protection.outlook.com [40.107.94.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5406617597
-	for <kvm@vger.kernel.org>; Tue, 13 May 2025 12:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747140326; cv=none; b=BTZ/pU2ID8EjdwxAbUTHyHHOhdYyPNSz+2FzGT43BJBl1LmiBtr2sU6qXVGZYzYkX0/z23RgLo3QWE9DAYkiLYSPFj/DUFGkovGcBC6nX0j4lte/cT0X2N8CKQTnpim7kCUDgQAEe/Bgq70nsLn+wzFmoke/QbkZoreKz/hvl/A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747140326; c=relaxed/simple;
-	bh=e3VlcZ/2FBdH1yUgjkq/EwjBQEnGlwBXOfnuCwhVqtA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n0bCssfI1uJzdmvg/cMPo/4Pb+SYEo/sS8myxJw5q4s3pFVNnKgzj1Ggq+UmYsrnu99i20FbVPZ+Ej7GTWtzMfL2AdrvznAf6HWB+cJjhdpxCcrR6qH/0uMG4qI6GKHbYXe3vAuaru2z9DazjosVnVex8WIrYIMwtzwbWqcknoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E9Eu7nhe; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747140323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9qbzKwIrC2/FHuWNCqW2F1uNvDxrKnayEbn3X40B/pY=;
-	b=E9Eu7nhe6vk83gFci4pADcgdF88Ou0jEFd9lgr5kAEPSHwH8ImHfasebd84QTg8YEO+iV7
-	D2Q4zNrgO4F07nzvsGHfwg2TCh3t4HFjLGcTvTEGGay7P8eDk2Nl7J4MLPDWKC37flNCIA
-	/iqQNhZnT9EBOMrbSITdFQxFjfLQjh8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-481-a9TrJx1aNji9Tcho5cztNQ-1; Tue, 13 May 2025 08:45:20 -0400
-X-MC-Unique: a9TrJx1aNji9Tcho5cztNQ-1
-X-Mimecast-MFC-AGG-ID: a9TrJx1aNji9Tcho5cztNQ_1747140319
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43f251dc364so34411125e9.2
-        for <kvm@vger.kernel.org>; Tue, 13 May 2025 05:45:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747140319; x=1747745119;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9qbzKwIrC2/FHuWNCqW2F1uNvDxrKnayEbn3X40B/pY=;
-        b=d51G05siJPgvIe9aXucTmQ7jvSOgpnxU5vE4/CJn2o0T9ozbUU2XFlGb6Pl3IXSRQp
-         eTsNSavMdXCSeVWuQGWBzrk10uGAQhC2BTdxAj5Y/Es4hU+D9SMWV3Pl94e+4QUT19Tu
-         yqms1kWsP9qBlRDYrZKk61V0S6CF9Web60z7UJMkMW6FdVvamsjbYMdIs3nnFQx7FAoW
-         5HtE1bDF0JYB5Ote4Bbf/kR7+8BXlPF6bKpKTO/PgJJRrseWNN3wUX3GwLVJhSX8Y5vF
-         6DsJemLg+XkX2Vaf9Kl6UlBg6HIQLlV4NQ4pM4mWTylUod349u7v8WggMKiT8vuByxLg
-         jIrg==
-X-Forwarded-Encrypted: i=1; AJvYcCVLYBNk+9xRFgXfnpYE+oxwGjLDQM6Rr6ysq1RAs1ZZ1ZXihluFoEpnn6YHjIK3iH8SXr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHdIDRrRRpJ1x1GkwwCMs4xkNJToQoFSbOZfyfrWUHHvA7tjOE
-	7M68VRBBByAKwH0sdcEuFTG2kNUNcPsyIi015TDOc3GKVZJ9Ta4D8dQ8vhnMo1U7G5H6q+alGG2
-	FP6g92hz4jBZjTwW/ofDwhuaHkL7FmkPclMTtw7pVWlBluZf8ag==
-X-Gm-Gg: ASbGnctOQLVi244MDHSomm6GOqje5/hvA5PiBp43xJyHmA5n/y16RFuvJhIkTlZOdfe
-	ZBvoR7ebdAewoPycqVIrCU8HExXFmTHYFwZD4xgY5HxrHMJSN30Cv6Y3S4M5F6GWin9ZQCbO6BI
-	6bKJG9yIeTHypap2GyxjbTBhh7Qeo34BGF8WV8cLsurcl0CW8H+L5LWL4KPVJ2fVdPhRl8pIU/p
-	6tnRYVC8b+m4/8Mo/Sy1o1CCVWLoz9WaVGvUaUGPXjTv3Oo5XGtGJN7NIoD3EdeKgFeS5bxl0Gt
-	1dGkmqKosTs8yesRumevDXzUQeo3fzeg
-X-Received: by 2002:a05:600c:6819:b0:442:cab1:e092 with SMTP id 5b1f17b1804b1-442d6d1fadamr135825285e9.11.1747140318797;
-        Tue, 13 May 2025 05:45:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwUzWUPASx2NiQ1Kn3uuvcgEdnOm17Ak4ZkvlCvpTjzcgN+0pD9VaNQeoqRZ/ENeDLe7VIdA==
-X-Received: by 2002:a05:600c:6819:b0:442:cab1:e092 with SMTP id 5b1f17b1804b1-442d6d1fadamr135824865e9.11.1747140318428;
-        Tue, 13 May 2025 05:45:18 -0700 (PDT)
-Received: from imammedo.users.ipa.redhat.com ([85.93.96.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58eb91bsm16387897f8f.33.2025.05.13.05.45.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 May 2025 05:45:18 -0700 (PDT)
-Date: Tue, 13 May 2025 14:45:15 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, "Daniel P . =?UTF-8?B?QmVycmFuZ8Op?="
- <berrange@redhat.com>, Babu Moger <babu.moger@amd.com>, Ewan Hai
- <ewanhai-oc@zhaoxin.com>, Xiaoyao Li <xiaoyao.li@intel.com>, Tejus GK
- <tejus.gk@nutanix.com>, Jason Zeng <jason.zeng@intel.com>, Manish Mishra
- <manish.mishra@nutanix.com>, Tao Su <tao1.su@intel.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [RFC 06/10] i386/cpu: Introduce enable_cpuid_0x1f to force
- exposing CPUID 0x1f
-Message-ID: <20250513144515.37615651@imammedo.users.ipa.redhat.com>
-In-Reply-To: <20250423114702.1529340-7-zhao1.liu@intel.com>
-References: <20250423114702.1529340-1-zhao1.liu@intel.com>
-	<20250423114702.1529340-7-zhao1.liu@intel.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C316214F70;
+	Tue, 13 May 2025 12:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747140675; cv=fail; b=UPrbNgQbHE10va1Qmm2P5WVCi25MJaGi2HQReocU0MBB94qco+Wi/EhrAGaLwJ0QE5iffy4DeU+LBnzSassmrVR5lgvdhsRJWMYSphCxCNRrazOuc8SR8G9zlPrGhWOiixskUyN3g9AxHB71GrrzGtc+JFQXBNWQLuWiJ9ZiG9U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747140675; c=relaxed/simple;
+	bh=BIi8s8W0WgTM7WKpS3b4x2Gwg9VwytHT/rVIQfIyeW8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=lZsUAv90ePjalGzDD6+7W75vH8u1toJgbPTJcXpQKWBjIx7fw3cso3U5frjpRjScJRgcvbk0lrUg99JK1dF7aH5RVPuv07pKPFKFxM5SOYtQ24sP9BVfKT9pFWoj8MdPpHB6IB8oIn72enlCOcCmIdXa/oVSR1MHK24MsIypKSM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=oNNhEZvX; arc=fail smtp.client-ip=40.107.94.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jGiqgucvimHwhQ1f4jqs+DQIj9h7C1ZhNuLnNz13XslpJqXD8O+YNMCxrhTlKuKqKg60F1bI6qomvhLDw23zGosvk6zD9yENzLnSbLSB5O/UBV0IZ4NQqLLvHUYG//+NKxtQw9r96K3H9dqm2Lzst0Zh/S1l/Q1a+6N1SOdjCRJbMSqatkM/pRtZ2TW6DHCEe8h5Rw/IkaSdQ4VPhihFfcWJqaQDqw42mdrRGUx8xVnr6C6p75dLjn0J1zl5xmrr/zljGcXyDxVLXLSesc42uZO0Kt9Cypw56u893ZwVqWhYwpxifqowmXjjabrViVhcYNA1Jp8Ka3ebk/MrnccU4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZIZXXFjXR+UyP6+SEB4SYks1Poszx4QW9OENDEKSKC8=;
+ b=fr0DsswvuCLSF1dOT+KIvXUt3XBxDDBnr92/VwbYgEgOsJu8wcI3grJwWp8h7R6b1nsl1ll5fCFkb/zjXCybtSgEdQjs4U8HUg3Hx9KkSnytUwVhq8f+85AscV5R1yVRRXHdL3N7sEklZ1A1fKKwon+vM9o9xUUc9iSprl97Jw19ygBWBKuts5/4EEEcUevDd2a6yZEjAsUDz5d9UEn6gw/ClTDXYQ/NjhpbooPmj7hx2rcw/ppm0RDPHph2FR6uwBIP2zbB1c5xTE7ERDz6IO+oTvBO8s7xOwOtOJGIpTJmLNh/ZlGcI/IIK0bQZhxfmmdKnZ90gSZ8wPovHQi3ng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZIZXXFjXR+UyP6+SEB4SYks1Poszx4QW9OENDEKSKC8=;
+ b=oNNhEZvXsmFde7D9+AV6apdoMkCCrkCrUZ5d01gd25ZErNFBdTBWpuFDeBnQzS1l0ZWeAHxr2dFOacMiIXitCJZpuz1ek1og6VueAYO5DERQ5InHnjHCHVDH19QhM9COqbug7kwCgpqiLZePlSZ3Pia/ac0E1gQ5N9moP7Psb+Q=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com (2603:10b6:208:3f0::13)
+ by SA1PR12MB8697.namprd12.prod.outlook.com (2603:10b6:806:385::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.29; Tue, 13 May
+ 2025 12:51:11 +0000
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48]) by IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48%3]) with mapi id 15.20.8722.027; Tue, 13 May 2025
+ 12:51:10 +0000
+Message-ID: <f8a6e61e-dfa4-4523-bd25-6b6ef7f8b53d@amd.com>
+Date: Tue, 13 May 2025 14:51:06 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 4/5] KVM: Check for empty mask of harvested dirty ring
+ entries in caller
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Peter Xu <peterx@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
+References: <20250508141012.1411952-1-seanjc@google.com>
+ <20250508141012.1411952-5-seanjc@google.com>
+Content-Language: en-US
+From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
+In-Reply-To: <20250508141012.1411952-5-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0320.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:eb::9) To IA1PR12MB8189.namprd12.prod.outlook.com
+ (2603:10b6:208:3f0::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB8189:EE_|SA1PR12MB8697:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7eba8ac8-2108-4d67-bdac-08dd921cd615
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WjBKR1FiR2dVOFFWVlIzK0IyYVRIVVp1MGZwRVZweWcyNjdPbHB4SUVCSzVI?=
+ =?utf-8?B?R3ZOMTZqV3lhLyt3d2ZkeVB1MzZveTZlY1RmOWI2blAwRVFndGhGajUwWERB?=
+ =?utf-8?B?NTdPaFdmcjcwYUFoK0h0ZFl0ME4zOFJxa25mV2tNWUhrckU0dkUxZldjWVRt?=
+ =?utf-8?B?UUhaQlA0ZnBPdnFZcHc1L3pxcjRlYjJtZVFJZ1pKTXZLT3RPTEJMbjB2MlFj?=
+ =?utf-8?B?NkJPa0VqYWhQU2lhOElGVy9GL3NjdXZIM3B4alBWQlQ1RnZoYXdEZTIzTDJT?=
+ =?utf-8?B?ajVkcUVoMTh1SnBuZ1Y3Nk1iMFhBSFVJZE1XWHdMZm9PWUVIUzI4Y1RLTUV3?=
+ =?utf-8?B?QjI3STFLNzMzdmVpeFlVT1lSSzZJc0E1dE1tUlMzcWF4U2RJUXR3QUdSdnY3?=
+ =?utf-8?B?KzJJTnhDRDlNUWdkTUhKNnc5b0NoRmNEU1hYYU5VTjZRaXZvSnlyQ21ORi8v?=
+ =?utf-8?B?N1VUN2FBNiswSzhLZ1pXWmk3eVJyeDhZRTBHUzBVRkVURlZwKzlwSHVUak8w?=
+ =?utf-8?B?bXk4RFk3elJzZ3JuWWNGdkk0N3hHTjZXQSswcTJFRTBXK2d3MGdwem5KYW5L?=
+ =?utf-8?B?dkNBWS9neTFCVWxMVFF4a2psbGZsdUI0c2FDRWtoRHQ1bWlPZ25ZUzl5WnJn?=
+ =?utf-8?B?VXFROTZ4R1RhR0JjZ0Q3OGZULzhsS3hNV1h6U2ZVeUR4NFZLcytSZC9ibFMv?=
+ =?utf-8?B?d2poTXZwMTY2Q3BYRk5RUjJBTGRMM0tzNUVSdVBzY1h0VGlSYmdmejhmR2JO?=
+ =?utf-8?B?bWppTm5FUFNBcU1tK2tjMGJMVHVXNEx4eXViSk9PRlMzNHQ4WG0zM21zaDZQ?=
+ =?utf-8?B?dFlJYks1SSs4eEJnWk5tM1M5ZmorV1RHa0FmSXZPbnVFTm5pOHNPelBTNGwy?=
+ =?utf-8?B?ZVhiR0dJM09adnJ6Zk5oSWRhWUt1RFR5SDFFbk5Ya3JVZUtPT0ZiaGdQZ3ZH?=
+ =?utf-8?B?TERFOHRVOXZQR3VPaC9yUDRoZTg3S251QW1vL3ZMUVlUV3NOdjczWlNVdVpx?=
+ =?utf-8?B?TExOSHVkaFNMdmNLdmI5MHZ3OGVza0cxQ1ltN0hLbmJqcW1Zb0Nsb25xdklX?=
+ =?utf-8?B?U3lOcHV0ck4ra1dGSitZbWdlNGFvSjZoK1E1c3Z5c0lKckViRHlkeFJXaktG?=
+ =?utf-8?B?MVUwOVZVZFZiaXQzdms2VGl1RlRpYUh5QS8rTVdCeHVCNkdZWW00WjV2eExa?=
+ =?utf-8?B?Uis5N1NKUVF1L2pxRE1MQWVuOUdnRUdNNnRVYXdkVU5Wa1RrZnY3VDFQcnJx?=
+ =?utf-8?B?dkdDempWQU5ZcHBYWndaT2diYUx5Vi96L0phS0luTUhDNU5RTWRYRnQ5Vllq?=
+ =?utf-8?B?alZUak5yZTlyTGExTmc2cnVzNzc5a0JCZGdSSEVYMWxIMnc2U2JEc25ETVdG?=
+ =?utf-8?B?S0RRN3I2eHlRUHdhdlNCcUsxUlc4QmIzLzg4QXZMT3BZakxkMEtrTmF6RnB6?=
+ =?utf-8?B?R3N0TmRyQXJzSVprSXZ3OWpvYzRHVzU4WWozRFlaR0FPbnhHcjRvcytwUkNh?=
+ =?utf-8?B?eG14U3JxNzcrNXc4ZEdzczRXNjRQYm1oUXFjSlVzYXJkeDgxOUJ1aUlMSFRM?=
+ =?utf-8?B?UXdzbjVCdVh0SFZHL2ZVVHRnTDhmUVNhejJlZCtTTFBvMGtQZWlsQk9iR1lG?=
+ =?utf-8?B?dURkYUFoWFhSaDhZdUtzWUhLd3lUM3laZ1V3dEdDSGxjNTZLRkg0dXNsKzFl?=
+ =?utf-8?B?Lys4WGx5aG1PcTFiRzZDK0pqdjVQazF2OTBjNy8xQTlVRGpldjdVdEJudWNB?=
+ =?utf-8?B?YTh3UkkvWU4zQWNqSituZHdvM3EvRG00K08xRzZxOEM4VUhtNnJmNjdpdXFB?=
+ =?utf-8?B?STk4YThRWVdTQ2F3OC8wU2NDSFN6VGx5V2IvdkZOcklvdW1BVURHVG53VnNo?=
+ =?utf-8?B?U05LZk9RMHJsaUtwQ1N3VXFNN29FVzYxWTY2aVRjdHh1VmRGMEowUFg1eldO?=
+ =?utf-8?Q?UrShKfcZ/BI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VURmYUtGV3R3a1gzZVBzYytFMGNVV25PSjlqeDk0YndMSTB0QUExSDlMcUpj?=
+ =?utf-8?B?VG45d2RoK3V6b3B1WFFtaEtITnpPQjg4bXVZKzk3cDBNTmlVcThVdmQzc1lt?=
+ =?utf-8?B?RmtISHBkaGJGTEZjcGppTW13bWNYaVVLa1RtS1NrT3VyMFdGYWZtVFZmc2Zs?=
+ =?utf-8?B?cXNJYlV2VE5OcUhNMmNSYkRQTTFGeXhhV3RpRUtOT2tNVG9OK2hpbzNhaGdQ?=
+ =?utf-8?B?bFowenFtMGY5Q1lBVVp1Q2Fody9ackRDcTMwSXpjdjhxMjc1YlFJekl1Y2J2?=
+ =?utf-8?B?K1NHYlBMQXFVSVZ6MFdIWmtzdHA4RldHcUxsbStFN1JocWlwZ1ZBZ2dXMTFE?=
+ =?utf-8?B?c0hYL0Qyd0dSZWozOXZScC9VVTBwZHRKdVhpREhOWEtpdTZQK29uc1czV2dD?=
+ =?utf-8?B?Nk9vQkpacDdRR21wOGRlb282SFpLNzF4QVNsdkJ6Q214elg1WlNxS1BMbis4?=
+ =?utf-8?B?TElsdmtuSThWN0ZNcy9aSENRQnVUV2g4d1phVzBkakJieGRCdGh3WXZxZzIy?=
+ =?utf-8?B?TVFNYWtoYWRyTnJVNUZCZVFsUkJIRmwxSThQeWFzb2JSMEN3eHpFREUvaWZj?=
+ =?utf-8?B?TDJWc2Roek5aTTR2ZmU0SkRURDU5TitKU0VoZDhRVkU4eTUwN24vb2lLOEdw?=
+ =?utf-8?B?a1AvckNQSEtiMWRPZEsvekNVeitPaDBvQlduaGRPVUVlak1hWGdHSjlCUVIr?=
+ =?utf-8?B?QWw3RmtuOE10d2NGdUFWWTM4djVRZVJFYm4vZStwZmN1a0JxZDBVQ3BXNUNr?=
+ =?utf-8?B?ZnNaeDI0Y1JzSGk3YTRhVlZzM2RKdktQRVRlRUQ5U0Zabzd5WE1FUjZnaHpF?=
+ =?utf-8?B?TS9CWHVLNTcyY1BWM21xeExoUTM2UnBZVUN2aklCYkM2ZnN2aTdHdGZqZ3lJ?=
+ =?utf-8?B?QXltQi9Vd292cHpBb3p4SmtYK0luRG9iQThTODVzdVVXOG95Z2FTUUNPeWhX?=
+ =?utf-8?B?cFI5aTBJZXM0K2RvUFNPQTd4Q2dGWTduWndpU0pjV0EzUGdHbzRXdUgxUmdq?=
+ =?utf-8?B?YjVPK0dwWjMwditaRG5HSmVjcG9lYWtnRlpGTlVZd0hoVDRyTCtFaUJ5VVVR?=
+ =?utf-8?B?Z2o4cWtxZkdpNitFRDJHdVhFRzRJeGt1WDc1RHlwalJxTGJaM3BUVklIMWtV?=
+ =?utf-8?B?OFBDUW52aWlnaTQzZThOalIyeUdYSVk3UW1BeVFxaWZLT0wwM2FuaWsrUkxR?=
+ =?utf-8?B?M0EyVUdGYjIrd2dKL0Q0by9lOU1RRE55cHdqdVJVNzNyK2x3MldHTllxUVpL?=
+ =?utf-8?B?VzQwNW5VUFZoeUFxZ0Qvd3gxZW5LQ1M2NXVmY0JQQ0pGQTl6SCtzNVFLSzh3?=
+ =?utf-8?B?UVROSkZLaGhJbm4ybzBPZndmMFp5TVA5NHZYRnpJeFhZWmhNdStGSUVzMXd2?=
+ =?utf-8?B?S1Nra2JNSEJDTUdIcU10dUg2YW53NXdDVm9RemNGNkZxNllTRUNGNDZBTjZn?=
+ =?utf-8?B?bW0rU3J1K2dObzVNbHFWcG1LTElwZ0ZITmFtc2c0OHNhL2xaYThwVTU5Tm41?=
+ =?utf-8?B?NTFTL0s5Qmo1R2t2WmZGTXJQTTNEczgxZlZveVZHSG1UVXI2ZTBCTXNOZnRP?=
+ =?utf-8?B?cFBVSnRRQTNQTjlQVVhvaHJXR2xvalBJRmZMNGFraEtnVkZrRnFzdTR6Rjlu?=
+ =?utf-8?B?a3A1WElVeFhGZSs0ZGdsMGd1Tmc2Q3hMYmxKaC8rNHdxYW12M3k3bjdOQjBR?=
+ =?utf-8?B?YnZKOFR3WkwwVFNvcnRRckxRMk10V0ZXWERRdzljWTlqbWR5aXNZcWVTNStu?=
+ =?utf-8?B?bSs1Q1UzWnhmOER4TU9mVFBDcmt4S2g2bW9SNEwyVE9sOCt0OWFvenU0MnEz?=
+ =?utf-8?B?S0RaQlpsYkwwRXhTSE9xaWpTL0ZoVlBaVVY3VUdRTlN5TndBb2taWEgyS3RG?=
+ =?utf-8?B?SHB0d1RlaEluQjZzZ2lvVTNlKy9YMlc2RXJTcFdVQXVDODd5aUFjYTdRNzBS?=
+ =?utf-8?B?UFI3c1NnTm5pcnR2cktiM25LOTJNdm9yQUJHazYzS2N4QlRCT2VGeVd1RWtj?=
+ =?utf-8?B?NmZpNVRsUWhReTQwK25qWkJ2U003NHd0L25kU0RKMlFnenJRQjQ4NTFaUWht?=
+ =?utf-8?B?TzBXV3ZYWEZMM2t0U25ERWxmQVpRV0I5Zmh1S2I3QWRVRlhuS292K3BYbEV6?=
+ =?utf-8?Q?xmtvILMf4/JXgAbmkGWdlxZyL?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7eba8ac8-2108-4d67-bdac-08dd921cd615
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8189.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2025 12:51:10.7854
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ftk3Q0y03YZzdGTPnRu+Sw3anRhQb90KlvuKxpNSe/zdYbJW+uM7wZmTYS070x9pElHbVpvTUYL/4FtFqfJnfQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8697
 
-On Wed, 23 Apr 2025 19:46:58 +0800
-Zhao Liu <zhao1.liu@intel.com> wrote:
-
-> From: Xiaoyao Li <xiaoyao.li@intel.com>
+On 5/8/2025 4:10 PM, Sean Christopherson wrote:
+> When resetting a dirty ring, explicitly check that there is work to be
+> done before calling kvm_reset_dirty_gfn(), e.g. if no harvested entries
+> are found and/or on the loop's first iteration, and delete the extremely
+> misleading comment "This is only needed to make compilers happy".  KVM
+> absolutely relies on mask to be zero-initialized, i.e. the comment is an
+> outright lie.  Furthermore, the compiler is right to complain that KVM is
+> calling a function with uninitialized data, as there are no guarantees
+> the implementation details of kvm_reset_dirty_gfn() will be visible to
+> kvm_dirty_ring_reset().
 > 
-> Currently, QEMU exposes CPUID 0x1f to guest only when necessary, i.e.,
-> when topology level that cannot be enumerated by leaf 0xB, e.g., die or
-> module level, are configured for the guest, e.g., -smp xx,dies=2.
+> While the flaw could be fixed by simply deleting (or rewording) the
+> comment, and duplicating the check is unfortunate, checking mask in the
+> caller will allow for additional cleanups.
 > 
-> However, TDX architecture forces to require CPUID 0x1f to configure CPU
-> topology.
+> Opportunisticaly drop the zero-initialization of cur_slot and cur_offset.
+> If a bug were introduced where either the slot or offset was consumed
+> before mask is set to a non-zero value, then it is highly desirable for
+> the compiler (or some other sanitizer) to yell.
 > 
-> Introduce a bool flag, enable_cpuid_0x1f, in CPU for the case that
-> requires CPUID leaf 0x1f to be exposed to guest.
-> 
-> Introduce a new function x86_has_cpuid_0x1f(), which is the warpper of
-> cpu->enable_cpuid_0x1f and x86_has_extended_topo() to check if it needs
-> to enable cpuid leaf 0x1f for the guest.
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Yan Zhao <yan.y.zhao@intel.com>
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-that reminds me about recent attempt to remove enable_cpuid_0xb,
+LGTM
 
-So is enable_cpuid_0x1f inteded to be used by external users or
-it's internal only knob for TDX sake?
+Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
 
-I'd push for it being marked as internal|unstable with the means
-we currently have (i.e. adding 'x-' prefix)
-
-and also enable_ is not right here, the leaf is enabled when
-topology requires it.
-perhaps s/enable_/force_/
- 
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > ---
->  target/i386/cpu.c     | 4 ++--
->  target/i386/cpu.h     | 9 +++++++++
->  target/i386/kvm/kvm.c | 2 +-
->  3 files changed, 12 insertions(+), 3 deletions(-)
+>   virt/kvm/dirty_ring.c | 44 ++++++++++++++++++++++++++++++++++---------
+>   1 file changed, 35 insertions(+), 9 deletions(-)
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index d90e048d48f2..e0716dbe5934 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -7292,7 +7292,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->          break;
->      case 0x1F:
->          /* V2 Extended Topology Enumeration Leaf */
-> -        if (!x86_has_extended_topo(env->avail_cpu_topo)) {
-> +        if (!x86_has_cpuid_0x1f(cpu)) {
->              *eax = *ebx = *ecx = *edx = 0;
->              break;
->          }
-> @@ -8178,7 +8178,7 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->           * cpu->vendor_cpuid_only has been unset for compatibility with older
->           * machine types.
->           */
-> -        if (x86_has_extended_topo(env->avail_cpu_topo) &&
-> +        if (x86_has_cpuid_0x1f(cpu) &&
->              (IS_INTEL_CPU(env) || !cpu->vendor_cpuid_only)) {
->              x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x1F);
->          }
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 76f24446a55d..3910b488f775 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -2251,6 +2251,9 @@ struct ArchCPU {
->      /* Compatibility bits for old machine types: */
->      bool enable_cpuid_0xb;
->  
-> +    /* Force to enable cpuid 0x1f */
-> +    bool enable_cpuid_0x1f;
+> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> index 97cca0c02fd1..a3434be8f00d 100644
+> --- a/virt/kvm/dirty_ring.c
+> +++ b/virt/kvm/dirty_ring.c
+> @@ -55,9 +55,6 @@ static void kvm_reset_dirty_gfn(struct kvm *kvm, u32 slot, u64 offset, u64 mask)
+>   	struct kvm_memory_slot *memslot;
+>   	int as_id, id;
+>   
+> -	if (!mask)
+> -		return;
+> -
+>   	as_id = slot >> 16;
+>   	id = (u16)slot;
+>   
+> @@ -108,15 +105,24 @@ static inline bool kvm_dirty_gfn_harvested(struct kvm_dirty_gfn *gfn)
+>   int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
+>   			 int *nr_entries_reset)
+>   {
+> +	/*
+> +	 * To minimize mmu_lock contention, batch resets for harvested entries
+> +	 * whose gfns are in the same slot, and are within N frame numbers of
+> +	 * each other, where N is the number of bits in an unsigned long.  For
+> +	 * simplicity, process the current set of entries when the next entry
+> +	 * can't be included in the batch.
+> +	 *
+> +	 * Track the current batch slot, the gfn offset into the slot for the
+> +	 * batch, and the bitmask of gfns that need to be reset (relative to
+> +	 * offset).  Note, the offset may be adjusted backwards, e.g. so that
+> +	 * a sequence of gfns X, X-1, ... X-N can be batched.
+> +	 */
+>   	u32 cur_slot, next_slot;
+>   	u64 cur_offset, next_offset;
+> -	unsigned long mask;
+> +	unsigned long mask = 0;
+>   	struct kvm_dirty_gfn *entry;
+>   	bool first_round = true;
+>   
+> -	/* This is only needed to make compilers happy */
+> -	cur_slot = cur_offset = mask = 0;
+> -
+>   	while (likely((*nr_entries_reset) < INT_MAX)) {
+>   		if (signal_pending(current))
+>   			return -EINTR;
+> @@ -164,14 +170,34 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
+>   				continue;
+>   			}
+>   		}
+> -		kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
 > +
->      /* Enable auto level-increase for all CPUID leaves */
->      bool full_cpuid_auto_level;
->  
-> @@ -2513,6 +2516,12 @@ void host_cpuid(uint32_t function, uint32_t count,
->                  uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx);
->  bool cpu_has_x2apic_feature(CPUX86State *env);
->  
-> +static inline bool x86_has_cpuid_0x1f(X86CPU *cpu)
-> +{
-> +    return cpu->enable_cpuid_0x1f ||
-> +           x86_has_extended_topo(cpu->env.avail_cpu_topo);
-> +}
+> +		/*
+> +		 * Reset the slot for all the harvested entries that have been
+> +		 * gathered, but not yet fully processed.
+> +		 */
+> +		if (mask)
+> +			kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
 > +
->  /* helper.c */
->  void x86_cpu_set_a20(X86CPU *cpu, int a20_state);
->  void cpu_sync_avx_hflag(CPUX86State *env);
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 6c749d4ee812..23b8de308525 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -1863,7 +1863,7 @@ static uint32_t kvm_x86_build_cpuid(CPUX86State *env,
->              break;
->          }
->          case 0x1f:
-> -            if (!x86_has_extended_topo(env->avail_cpu_topo)) {
-> +            if (!x86_has_cpuid_0x1f(env_archcpu(env))) {
->                  cpuid_i--;
->                  break;
->              }
+> +		/*
+> +		 * The current slot was reset or this is the first harvested
+> +		 * entry, (re)initialize the metadata.
+> +		 */
+>   		cur_slot = next_slot;
+>   		cur_offset = next_offset;
+>   		mask = 1;
+>   		first_round = false;
+>   	}
+>   
+> -	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+> +	/*
+> +	 * Perform a final reset if there are harvested entries that haven't
+> +	 * been processed, which is guaranteed if at least one harvested was
+> +	 * found.  The loop only performs a reset when the "next" entry can't
+> +	 * be batched with "current" the entry(s), and that reset processes the
+> +	 * _current_ entry(s), i.e. the last harvested entry, a.k.a. next, will
+> +	 * always be left pending.
+> +	 */
+> +	if (mask)
+> +		kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+>   
+>   	/*
+>   	 * The request KVM_REQ_DIRTY_RING_SOFT_FULL will be cleared
 
 
