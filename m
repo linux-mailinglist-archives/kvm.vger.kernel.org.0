@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-46298-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46295-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEBD8AB4CA3
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 09:23:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DCC6AB4CA0
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 09:23:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5524C17F26D
-	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 07:23:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7C791B414C3
+	for <lists+kvm@lfdr.de>; Tue, 13 May 2025 07:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97371F2C45;
-	Tue, 13 May 2025 07:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3629A1F1538;
+	Tue, 13 May 2025 07:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bt8DpvLI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OLObRHyx"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E831F03CF
-	for <kvm@vger.kernel.org>; Tue, 13 May 2025 07:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25501F09B6
+	for <kvm@vger.kernel.org>; Tue, 13 May 2025 07:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747120992; cv=none; b=EDhix2HaPN3l8qSySLGl3x050V8Pf6lt6hmpFUFHTBwV2dsXqEO0gFLQMScPL05JQvn39K+LApRRBwlqj+25Uou5MyE88K/aEnI2jFQm712D/QuHqO5jau8NAw0JG6wGDXRxt9Qe/AexMcpMMd437dtxGb02Pd7aYsA3sQi0YWM=
+	t=1747120990; cv=none; b=tFH/J5oRakRRZEMNf6Z+N00QRFeeV9JJPM9M/njfkWg21wRJInY6KbTs56OdKBfjfaFE0czK5R9BFnFHjzeaZGXjs4eaJCAnmIa0dIYLCEPxoCts+L5oB1tc+88ZHk9JyiH5xYaZQ0jBEmaVWP7UKLJ06waX6zqiZMqe8GQMePw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747120992; c=relaxed/simple;
-	bh=iL9IHodsWG7yrsq3tPYrUNmzLWH2gIJrjMwoMz335BE=;
+	s=arc-20240116; t=1747120990; c=relaxed/simple;
+	bh=ElufbUIvktIAaQZeenWiBAaG3rfxmtKgtmJt88z4Ioc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=h6Jt7u2YTCZuDkFsdYDClpYeL9Yryo2jAb549iFvZYWOaNC0Eseo6nQixvMgfC0wT9EgtKw733EqCZ/H1TUUniQim1MyqOwWLv/dphdgnGsfxYFFnmMDsn+tgJrrKEt2uK/5JhSlbz5O5cQqxUM2mjaCy9tIDq3P2IwDYvQjjVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bt8DpvLI; arc=none smtp.client-ip=198.175.65.17
+	 MIME-Version; b=OVbPXw61k5S9719pcXJRI7HoTW9c6q20jRMXJbOAQ9vlUERlJmSPLUDpvqZ4z43KBPmXwdZd+xE79VDVMyJt0iysNBpHGe0hiZA/31LC9mKxVvvRGAvLS6JMjJQJGVSGDRyyUc21lOR+4UY8Fek67tbJZl72xRp+AEkYFfLRk7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OLObRHyx; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747120991; x=1778656991;
+  t=1747120989; x=1778656989;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=iL9IHodsWG7yrsq3tPYrUNmzLWH2gIJrjMwoMz335BE=;
-  b=Bt8DpvLIn04do5HRjOZw/QtkUiQqGZjjvaWsDZ40i2ZsMNqqa2khwTRK
-   AaxuJGwq/fWoSbqFR86ENZGChmw1420uw9Ghsz5QBdYMmzZrf/pgRznkp
-   2BWbRcw/5IEuSJ6zVp/rEjLcokVw3r0wMl5MWfNzmCxQ8XxwIZBU+5/8c
-   tBM55rdO47N8dh2mP3HoHvIJU+uqhUaF65fpCcBvfh1wYjzjpefo3T3DE
-   tTGB8sz8O32YN8Uj4JWxQQ7RKvFRiIsToA1G/URk6ApLUQRG7dxcNr9SX
-   68/hBFen/htsbE8QHEjJ+1+qJLUawYTrgXj6+RWpdJVbV8T58limaiUBM
+  bh=ElufbUIvktIAaQZeenWiBAaG3rfxmtKgtmJt88z4Ioc=;
+  b=OLObRHyxEJIJBD2d8JHgq9BXyttKpZZnmBv0KX9wHcR4Lv+I0CycOzwP
+   weyh6CgDZqhRXh2GAIkn1AWyGZrPXps7TsuACkEq1iY/17yvQOOjCXGLm
+   52c2IkC/X+Wrfq72XriYE4UhowHkXLA5/TIxvUwJ0yzLYXv0tdtJPuAl+
+   pKK4XSdmfBJad4fgwc97NS4q+SxEvtbcWdWgt+XVW3U2B+/1uNK/5qX2J
+   BMU9AUWgi/7Z3a3Un5q9YBSX9ZrXUpKfo284rKWH9GUuoOv7FTpfJa1B4
+   VcHRXOnaEzZNEE1L2syLLxVj5FndVtxOek648Dd50yS4IiDVUy5ECfS6P
    g==;
-X-CSE-ConnectionGUID: GO2uHPQvTdqeNCPAbL/D1Q==
-X-CSE-MsgGUID: mzAHb/EpREeVR6Dfknj2bw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="48941006"
+X-CSE-ConnectionGUID: pHO61/e2TgeZk5+HUDXgiQ==
+X-CSE-MsgGUID: +61o471PRnK3TJkLYSu83Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="48941009"
 X-IronPort-AV: E=Sophos;i="6.15,284,1739865600"; 
-   d="scan'208";a="48941006"
+   d="scan'208";a="48941009"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
   by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 00:23:04 -0700
-X-CSE-ConnectionGUID: nO2YklddRTaQhac7XZfR0Q==
-X-CSE-MsgGUID: iH2zz7uIRgO8n1YWG38xAw==
+X-CSE-ConnectionGUID: U/Sp2KurR1GdluLui/pQrw==
+X-CSE-MsgGUID: zcpC5pvzS/qQ8X1LShmB5Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,284,1739865600"; 
-   d="scan'208";a="142740606"
+   d="scan'208";a="142740610"
 Received: from 984fee019967.jf.intel.com ([10.165.54.94])
   by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 00:23:03 -0700
 From: Chao Gao <chao.gao@intel.com>
@@ -63,9 +63,9 @@ To: kvm@vger.kernel.org
 Cc: pbonzini@redhat.com,
 	seanjc@google.com,
 	Chao Gao <chao.gao@intel.com>
-Subject: [kvm-unit-tests PATCH v1 3/8] x86: cet: Directly check for #CP exception in run_in_user()
-Date: Tue, 13 May 2025 00:22:45 -0700
-Message-ID: <20250513072250.568180-4-chao.gao@intel.com>
+Subject: [kvm-unit-tests PATCH v1 4/8] x86: cet: Validate #CP error code
+Date: Tue, 13 May 2025 00:22:46 -0700
+Message-ID: <20250513072250.568180-5-chao.gao@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250513072250.568180-1-chao.gao@intel.com>
 References: <20250513072250.568180-1-chao.gao@intel.com>
@@ -77,82 +77,54 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Current CET tests validate if a #CP exception is raised by registering
-a #CP handler. This handler counts the #CP exceptions and raises a #GP
-exception, which is then caught by the run_in_user() infrastructure to
-switch back to the kernel. This is convoluted.
+The #CP exceptions include an error code that provides additional
+information about how the exception occurred. Previously, CET tests simply
+printed these error codes without validation.
 
-Catch the #CP exception directly by run_in_user() to avoid the manual
-counting of #CP exceptions and the #CP->#GP dance.
+Enhance the CET tests to validate the #CP error code.
+
+This requires the run_in_user() infrastructure to catch the exception
+vector, error code, and rflags, similar to what check_exception_table()
+does.
 
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 ---
- x86/cet.c | 23 ++++-------------------
- 1 file changed, 4 insertions(+), 19 deletions(-)
+ lib/x86/usermode.c | 4 ++++
+ x86/cet.c          | 4 ++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
+diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
+index c3ec0ad7..f896e3bd 100644
+--- a/lib/x86/usermode.c
++++ b/lib/x86/usermode.c
+@@ -23,6 +23,10 @@ static void restore_exec_to_jmpbuf(void)
+ 
+ static void restore_exec_to_jmpbuf_exception_handler(struct ex_regs *regs)
+ {
++	this_cpu_write_exception_vector(regs->vector);
++	this_cpu_write_exception_rflags_rf((regs->rflags >> 16) & 1);
++	this_cpu_write_exception_error_code(regs->error_code);
++
+ 	/* longjmp must happen after iret, so do not do it now.  */
+ 	regs->rip = (unsigned long)&restore_exec_to_jmpbuf;
+ 	regs->cs = KERNEL_CS;
 diff --git a/x86/cet.c b/x86/cet.c
-index 214976f9..3e18e3b4 100644
+index 3e18e3b4..3162b3da 100644
 --- a/x86/cet.c
 +++ b/x86/cet.c
-@@ -8,9 +8,6 @@
- #include "alloc_page.h"
- #include "fault_test.h"
- 
--static int cp_count;
--static unsigned long invalid_offset = 0xffffffffffffff;
--
- static u64 cet_shstk_func(void)
- {
- 	unsigned long *ret_addr, *ssp;
-@@ -54,15 +51,6 @@ static u64 cet_ibt_func(void)
- #define ENABLE_SHSTK_BIT 0x1
- #define ENABLE_IBT_BIT   0x4
- 
--static void handle_cp(struct ex_regs *regs)
--{
--	cp_count++;
--	printf("In #CP exception handler, error_code = 0x%lx\n",
--		regs->error_code);
--	/* Below jmp is expected to trigger #GP */
--	asm("jmpq *%0": :"m"(invalid_offset));
--}
--
- int main(int ac, char **av)
- {
- 	char *shstk_virt;
-@@ -70,7 +58,6 @@ int main(int ac, char **av)
- 	pteval_t pte = 0;
- 	bool rvc;
- 
--	cp_count = 0;
- 	if (!this_cpu_has(X86_FEATURE_SHSTK)) {
- 		printf("SHSTK not enabled\n");
- 		return report_summary();
-@@ -82,7 +69,6 @@ int main(int ac, char **av)
- 	}
- 
- 	setup_vm();
--	handle_exception(CP_VECTOR, handle_cp);
- 
- 	/* Allocate one page for shadow-stack. */
- 	shstk_virt = alloc_vpage();
-@@ -105,15 +91,14 @@ int main(int ac, char **av)
- 	write_cr4(read_cr4() | X86_CR4_CET);
+@@ -92,13 +92,13 @@ int main(int ac, char **av)
  
  	printf("Unit test for CET user mode...\n");
--	run_in_user((usermode_func)cet_shstk_func, GP_VECTOR, 0, 0, 0, 0, &rvc);
--	report(cp_count == 1, "Completed shadow-stack protection test successfully.");
--	cp_count = 0;
-+	run_in_user((usermode_func)cet_shstk_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
-+	report(rvc, "Shadow-stack protection test.");
+ 	run_in_user((usermode_func)cet_shstk_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
+-	report(rvc, "Shadow-stack protection test.");
++	report(rvc && exception_error_code() == 1, "Shadow-stack protection test.");
  
  	/* Enable indirect-branch tracking */
  	wrmsr(MSR_IA32_U_CET, ENABLE_IBT_BIT);
  
--	run_in_user((usermode_func)cet_ibt_func, GP_VECTOR, 0, 0, 0, 0, &rvc);
--	report(cp_count == 1, "Completed Indirect-branch tracking test successfully.");
-+	run_in_user((usermode_func)cet_ibt_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
-+	report(rvc, "Indirect-branch tracking test.");
+ 	run_in_user((usermode_func)cet_ibt_func, CP_VECTOR, 0, 0, 0, 0, &rvc);
+-	report(rvc, "Indirect-branch tracking test.");
++	report(rvc && exception_error_code() == 3, "Indirect-branch tracking test.");
  
  	write_cr4(read_cr4() & ~X86_CR4_CET);
  	wrmsr(MSR_IA32_U_CET, 0);
