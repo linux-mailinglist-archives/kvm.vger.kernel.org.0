@@ -1,158 +1,220 @@
-Return-Path: <kvm+bounces-46425-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46426-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8A87AB63B0
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 09:03:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 290D5AB63CD
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 09:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95A044A17C9
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 07:03:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F12F7A9447
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 07:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B16520A5E1;
-	Wed, 14 May 2025 07:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCC920766C;
+	Wed, 14 May 2025 07:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Uta2K00a"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C67E20297F;
-	Wed, 14 May 2025 07:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4640B634EC;
+	Wed, 14 May 2025 07:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747206130; cv=none; b=uVRXXjcVXdHFcjQRyIbnv3eDWuSwkoFbeShKw0bTPipE6mL12cyWyhsNgsh6G2qfwRQdWpa73+csiz0VFqKjOfXlcxnTxYLkPS7igdsRQ+HesSLE62sjQ9BeZXEAX0TlMQraNahPnmWm2tajVfnRBEFmuRq2ge6f99IBbndpjZU=
+	t=1747206538; cv=none; b=WnUKpPLdUvivq3SRY12B0QMhbvxRqvsSiEd7KsrXHAUk5Kfi6QjxKZB+4Ch9HcWgvYiutJG8xSHVa3FzwGli7GtOHj+tIlKjEvQmFO675Q+MWbuIoe2EcW+RGIvKHTQQm5A3kE7HUtR8RLFnle6Lg/9ODxR2aurRU5A5LN/t4Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747206130; c=relaxed/simple;
-	bh=vs5b+EHYKYPsWMhmT/qyRr8Xjgec3HQB2Fry1oY6b54=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HVmsXnteJ9fLxE0i9MHjO/r6SCxuw2gfwhSQ9R6k7O85t1mtH9zciYsIPYvlZDIrX2e4V+oxcyvglpU1YJ4MlwOKCuC06Xs1Rm0zjhBLx+/BYSJCdGK0R+rb9EWVZDHNKyAPv+zTbG21/HXy/mmNnlhFtAudyx4B+xnsnf1LBSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Zy40p0dS2zyVKc;
-	Wed, 14 May 2025 14:57:46 +0800 (CST)
-Received: from kwepemg500010.china.huawei.com (unknown [7.202.181.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 87E68140155;
-	Wed, 14 May 2025 15:02:04 +0800 (CST)
-Received: from huawei.com (10.67.174.76) by kwepemg500010.china.huawei.com
- (7.202.181.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 14 May
- 2025 15:02:03 +0800
-From: Yuntao Liu <liuyuntao12@huawei.com>
-To: <x86@kernel.org>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<bpf@vger.kernel.org>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<hpa@zytor.com>, <liuyuntao12@huawei.com>
-Subject: [PATCH] kvm: x86: fix infinite loop in kvm_guest_time_update when tsc is 0
-Date: Wed, 14 May 2025 06:49:41 +0000
-Message-ID: <20250514064941.51609-1-liuyuntao12@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1747206538; c=relaxed/simple;
+	bh=I5ZeDzwTsw5smVFSGfLPW9Kqqd0AVZLFXaBqDiREk1U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k8AiFaClqJ8EepZSj63asRb18MZAonHA4lGAtj5CnSDl9LHsU9HngvOFo/Gip/oD10k5FHT7ptKXNX4AvMOLGai+ax0yccdLkOL9RElMcuLmj23nKgK1of3kCVedgroLPaasGWlDOMthxmT1k7fCx08HGs1IkB+HrvqpiToOAEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Uta2K00a; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747206536; x=1778742536;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=I5ZeDzwTsw5smVFSGfLPW9Kqqd0AVZLFXaBqDiREk1U=;
+  b=Uta2K00aq9ueI+Sf/9yzC7MAl/hKx62vxlybNhpyJBuuCx3oBmycl3cY
+   qRqJf1Uo8XIplW4a/xJkzpLw2nIHTt2Vp3JEqNpkU9ktR1ISqgAmrDgjD
+   kh9kbP1mrWsUfIvHT+OumUV3EPGVwqGSa54mfKp1G8wjjqEfp8WSUNRTb
+   RLLQwtu1ZF4rSZfFJvuqoP+0YDNfokpgmQkFFoCoyyWW1zdjskD5INupl
+   b8vl+K6p409bOLnDkiALl6Y4zeaI3bcKPyeYjPtGSF6+ZirjzYEUI/Dc8
+   EKzu0+bSwJ7cfprNEIvlhz8XxPB7Hs3TkmB25ZhYDtk2Lh0ihEpzeEW7X
+   g==;
+X-CSE-ConnectionGUID: VLu4ss5PRze7K4shRscZ5w==
+X-CSE-MsgGUID: 4oIrn8zzSBeIK0hmsa/WCA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11432"; a="66635949"
+X-IronPort-AV: E=Sophos;i="6.15,287,1739865600"; 
+   d="scan'208";a="66635949"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 00:08:33 -0700
+X-CSE-ConnectionGUID: PlY5bNZKQKau2P5xsihc5w==
+X-CSE-MsgGUID: rrPdk0y0QkOk1bT2XRucfw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,287,1739865600"; 
+   d="scan'208";a="142894346"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa004.jf.intel.com with ESMTP; 14 May 2025 00:08:27 -0700
+Date: Wed, 14 May 2025 15:02:53 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+	christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
+	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
+	dan.j.williams@intel.com, yilun.xu@intel.com,
+	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	lukas@wunner.de, yan.y.zhao@intel.com, daniel.vetter@ffwll.ch,
+	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
+Message-ID: <aCRAHRCKP1s0Oi0c@yilunxu-OptiPlex-7050>
+References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
+ <371ab632-d167-4720-8f0d-57be1e3fee84@amd.com>
+ <4b6dc759-86fd-47a7-a206-66b25a0ccc6d@amd.com>
+ <c10bf9c2-e073-479d-ad1c-6796c592d333@amd.com>
+ <aB3jLmlUKKziwdeG@yilunxu-OptiPlex-7050>
+ <aB4tQHmHzHooDeTE@yilunxu-OptiPlex-7050>
+ <20250509184318.GD5657@nvidia.com>
+ <aB7Ma84WXATiu5O1@yilunxu-OptiPlex-7050>
+ <2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
+ <20250512140617.GA285583@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemg500010.china.huawei.com (7.202.181.71)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250512140617.GA285583@nvidia.com>
 
-Syzkaller testing detected a soft lockup.
+On Mon, May 12, 2025 at 11:06:17AM -0300, Jason Gunthorpe wrote:
+> On Mon, May 12, 2025 at 07:30:21PM +1000, Alexey Kardashevskiy wrote:
+> 
+> > > > I'm surprised by this.. iommufd shouldn't be doing PCI stuff, it is
+> > > > just about managing the translation control of the device.
+> > > 
+> > > I have a little difficulty to understand. Is TSM bind PCI stuff? To me
+> > > it is. Host sends PCI TDISP messages via PCI DOE to put the device in
+> > > TDISP LOCKED state, so that device behaves differently from before. Then
+> > > why put it in IOMMUFD?
+> > 
+> > 
+> > "TSM bind" sets up the CPU side of it, it binds a VM to a piece of
+> > IOMMU on the host CPU. The device does not know about the VM, it
+> > just enables/disables encryption by a request from the CPU (those
+> > start/stop interface commands). And IOMMUFD won't be doing DOE, the
+> > platform driver (such as AMD CCP) will. Nothing to do for VFIO here.
+> > 
+> > We probably should notify VFIO about the state transition but I do
+> > not know VFIO would want to do in response.
+> 
+> We have an awkward fit for what CCA people are doing to the various
+> Linux APIs. Looking somewhat maximally across all the arches a "bind"
+> for a CC vPCI device creation operation does:
+> 
+>  - Setup the CPU page tables for the VM to have access to the MMIO
 
-watchdog: BUG: soft lockup - CPU#3 stuck for 127s! [syz.1.2088:9817]
-Modules linked in:
-CPU: 3 PID: 9817 Comm: syz.1.2088 Tainted: G S                 6.6.0+
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-RIP: 0010:__sanitizer_cov_trace_const_cmp4+0x8/0x20 kernel/kcov.c:313
-Code: bf 03 00 00 00 e9 48 fe ff ff 0f 1f 84 00 00 00 00 00 90 90 90 90
-90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 48 8b 0c 24 <89> f2 89
-   fe bf 05 00 00 00 e9 1a fe ff ff 66 2e 0f 1f 84 00 00 00
-RSP: 0018:ffff888016d8fad8 EFLAGS: 00000206
-RAX: 0000000000080000 RBX: ffff88810e242540 RCX: ffffffff901150d6
-RDX: 0000000000080000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffff888016d8fb50 R08: 0000000000000001 R09: ffffed1021c484af
-R10: 0000000000000000 R11: 0000000000000277 R12: 0000000000000000
-R13: fffffed357281918 R14: 0000000000000000 R15: 0000000000000001
-FS:  00007f2a8f6ea6c0(0000) GS:ffff888119780000(0000)
-knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000012c56c0 CR3: 000000000dce8001 CR4: 0000000000772ee0
-DR0: 0000000000000000 DR1: 0000000000d3eb1c DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-PKRU: 80000000
-Call Trace:
- <TASK>
- kvm_get_time_scale arch/x86/kvm/x86.c:2458 [inline]
- kvm_guest_time_update+0x926/0xb00 arch/x86/kvm/x86.c:3268
- vcpu_enter_guest.constprop.0+0x1e70/0x3cf0 arch/x86/kvm/x86.c:10678
- vcpu_run+0x129/0x8d0 arch/x86/kvm/x86.c:11126
- kvm_arch_vcpu_ioctl_run+0x37a/0x13d0 arch/x86/kvm/x86.c:11352
- kvm_vcpu_ioctl+0x56b/0xe60 virt/kvm/kvm_main.c:4188
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:871 [inline]
- __se_sys_ioctl+0x12d/0x190 fs/ioctl.c:857
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x59/0x110 arch/x86/entry/common.c:81
- entry_SYSCALL_64_after_hwframe+0x78/0xe2
+This is guest side thing, is it? Anything host need to opt-in?
 
-ioctl$KVM_SET_TSC_KHZ(r2, 0xaea2, 0x1)
-user_tsc_khz = 0x1
-	|
-kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz)
-	|
-	ioctl$KVM_RUN(r2, 0xae80, 0x0)
-		|
-		...
-	kvm_guest_time_update(struct kvm_vcpu *v)
-		|
-		if (kvm_caps.has_tsc_control)
-			tgt_tsc_khz = kvm_scale_tsc(tgt_tsc_khz,
-					    v->arch.l1_tsc_scaling_ratio);
-			|
-			kvm_scale_tsc(u64 tsc, u64 ratio)
-			|
-			__scale_tsc(u64 ratio, u64 tsc)
-			ratio=122380531, tsc=2299998, N=48
-			ratio*tsc >> N = 0.999... -> 0
-			|
-		kvm_get_time_scale
+>  - Revoke hypervisor access to the MMIO
 
-In function __scale_tsc, it uses fixed point number to calculate
-tsc, therefore, a certain degree of precision is lost, the actual tsc
-value of 0.999... would be 0. In function kvm_get_time_scale
-tps32=tps64=base_hz=0, would lead second while_loop infinite. when
-CONFIG_PREEMPT is n, it causes a soft lockup issue.
+VFIO could choose never to mmap MMIO, so in this case nothing to do?
 
-Fixes: 35181e86df97 ("KVM: x86: Add a common TSC scaling function")
-Signed-off-by: Yuntao Liu <liuyuntao12@huawei.com>
----
- arch/x86/kvm/x86.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+>  - Setup the vIOMMU to understand the vPCI device
+>  - Take over control of some of the IOVA translation, at least for T=1,
+>    and route to the the vIOMMU
+>  - Register the vPCI with any attestation functions the VM might use
+>  - Do some DOE stuff to manage/validate TDSIP/etc
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1fa5d89f8d27..3e9d6f368eed 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2605,10 +2605,14 @@ static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
-  * point number (mult + frac * 2^(-N)).
-  *
-  * N equals to kvm_caps.tsc_scaling_ratio_frac_bits.
-+ *
-+ * return 1 if _tsc is 0.
-  */
- static inline u64 __scale_tsc(u64 ratio, u64 tsc)
- {
--	return mul_u64_u64_shr(tsc, ratio, kvm_caps.tsc_scaling_ratio_frac_bits);
-+	u64 _tsc = mul_u64_u64_shr(tsc, ratio, kvm_caps.tsc_scaling_ratio_frac_bits);
-+
-+	return  !_tsc ? 1 : _tsc;
- }
- 
- u64 kvm_scale_tsc(u64 tsc, u64 ratio)
--- 
-2.34.1
+Intel TDX Connect has a extra requirement for "unbind":
 
+- Revoke KVM page table (S-EPT) for the MMIO only after TDISP
+  CONFIG_UNLOCK
+
+Another thing is, seems your term "bind" includes all steps for
+shared -> private conversion. But in my mind, "bind" only includes
+putting device in TDISP LOCK state & corresponding host setups required
+by firmware. I.e "bind" means host lockes down the CC setup, waiting for
+guest attestation.
+
+While "unbind" means breaking CC setup, no matter the vPCI device is
+already accepted as CC device, or only locked and waiting for attestation.
+
+> 
+> So we have interactions of things controlled by PCI, KVM, VFIO, and
+> iommufd all mushed together.
+> 
+> iommufd is the only area that already has a handle to all the required
+> objects:
+>  - The physical PCI function
+>  - The CC vIOMMU object
+>  - The KVM FD
+>  - The CC vPCI object
+> 
+> Which is why I have been thinking it is the right place to manage
+> this.
+
+Yeah, I see the merit.
+
+> 
+> It doesn't mean that iommufd is suddenly doing PCI stuff, no, that
+> stays in VFIO.
+
+I'm not sure if Alexey's patch [1] illustates your idea. It calls
+tsm_tdi_bind() which directly does device stuff, and impacts MMIO.
+VFIO doesn't know about this.
+
+I have to interpret this as VFIO firstly hand over device CC features
+and MMIO resources to IOMMUFD, so VFIO never cares about them.
+
+[1] https://lore.kernel.org/all/20250218111017.491719-15-aik@amd.com/
+
+> 
+> > > > So your issue is you need to shoot down the dmabuf during vPCI device
+> > > > destruction?
+> > > 
+> > > I assume "vPCI device" refers to assigned device in both shared mode &
+> > > prvate mode. So no, I need to shoot down the dmabuf during TSM unbind,
+> > > a.k.a. when assigned device is converting from private to shared.
+> > > Then recover the dmabuf after TSM unbind. The device could still work
+> > > in VM in shared mode.
+> 
+> What are you trying to protect with this? Is there some intelism where
+> you can't have references to encrypted MMIO pages?
+> 
+> > > What I really want is, one SW component to manage MMIO dmabuf, secure
+> > > iommu & TSM bind/unbind. So easier coordinate these 3 operations cause
+> > > these ops are interconnected according to secure firmware's requirement.
+> >
+> > This SW component is QEMU. It knows about FLRs and other config
+> > space things, it can destroy all these IOMMUFD objects and talk to
+> > VFIO too, I've tried, so far it is looking easier to manage. Thanks,
+> 
+> Yes, qemu should be sequencing this. The kernel only needs to enforce
+> any rules required to keep the system from crashing.
+
+To keep from crashing, The kernel still needs to enforce some firmware
+specific rules. That doesn't reduce the interactions between kernel
+components. E.g. for TDX, if VFIO doesn't control "bind" but controls
+MMIO, it should refuse FLR or MSE when device is bound. That means VFIO
+should at least know from IOMMUFD whether device is bound.
+
+Further more, these rules are platform firmware specific, "QEMU executes
+kernel checks" means more SW components should be aware of these rules.
+That multiples the effort.
+
+And QEMU can be killed, means if kernel wants to reclaim all the
+resources, it still have to deal with the sequencing. And I don't think
+it is a good idea that kernel just stales large amount of resources.
+
+Thanks,
+Yilun
+> 
+> Jason
 
