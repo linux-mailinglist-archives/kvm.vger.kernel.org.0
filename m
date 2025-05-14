@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-46434-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46435-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9AC9AB6400
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 09:21:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3078AAB640B
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 09:22:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 765F016CA62
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 07:21:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3474861370
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 07:21:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE7F2080E8;
-	Wed, 14 May 2025 07:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C3921ADD6;
+	Wed, 14 May 2025 07:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="m5UzS5QF"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Md1r1Ywz"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2087.outbound.protection.outlook.com [40.107.101.87])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2054.outbound.protection.outlook.com [40.107.102.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12AF205501;
-	Wed, 14 May 2025 07:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39843216E23;
+	Wed, 14 May 2025 07:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747207254; cv=fail; b=GDjXfcZ2M5ODsjUAdxx/3pKsrdSeeKoYbyurA3WBZFlKOcw+dI1aIt6v7LSblxOEpkHvk8nBSwEoRhzOp5i8NXbYwq5JHlRUQHOItthMqn6h7OMuavJIE1Ra1yzRd8M8p1rsr6ytq4u9BvaSkGMuR1vuCq/wGm99H1PjbmZGh4U=
+	t=1747207276; cv=fail; b=m6n2zC7AUErFo/I0C/S/+Gg0szYXOA+EIFGb3VBhaGi0FCUbrjJ+gRUik1nF0xvUJ7zB2mIDBZFLoy//I73c1YaIW/kYTN5N5hUaDvvGf5LuGxm2qZoKFLuT4ffTR/Ka8ft4vleXqEAZKhAVDM2JfhsPqCeQaoFaNzL/49jNnog=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747207254; c=relaxed/simple;
-	bh=J0frIIb/BQlFW2NWbPyjEZDeQc8pQ7PRD7CZKuNvEYw=;
+	s=arc-20240116; t=1747207276; c=relaxed/simple;
+	bh=b3+K4ObIgu4HsjGAuty5yH+Fk3MNnUaP0oB0wPQ+VIg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ml8+OcEXt0hAonOgPjBSsa7VY0J9OX/AkkIP738q48Mc7Bm70BZMTVznwN65o0CcchjNAa/log4SpAv+PEIanU7GHeCoVeAVQMcXrGG/gtumdmHh/zVBo5qf5K4jxKiwWY+RgZ9Pe0iSVvEHwkqivugOU2xNJvpQ6+1tC8sqTHE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=m5UzS5QF; arc=fail smtp.client-ip=40.107.101.87
+	 MIME-Version:Content-Type; b=CGcxBlMz6ldBbEkpaevDDUpCNWFtCNWya7yBmBwHZ1ho711U5avLrXvcZvDtDd9jS1KsOVb+JoWuyA6vD2AJUSG1din6llfkUhm+2An6slnjCPYX2EfR3XXENN7i0BKsF/4eMYK68oRY36jmPKxtRRLPZxJW59N/rkWqDwxYzmo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Md1r1Ywz; arc=fail smtp.client-ip=40.107.102.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=R2bD4fGo8MwbiLlbEjJaPcTWFpwRJLWkdDuOK1GJxqzb3ylJBfDY82G6+k3uCY13Ewo/L41MwREy6/1FcDGtoIaolztZ+yqoxbuW5iRtqzcaxhCPJ+m9T6HcyQH1wVyjjwywpYZ3DNyFl2eH4gezdtA/fSzqgquLIAGTjVloXgi39fHMT3iOKV1KLu0gZHkVuk9HOWXJ/xFC3XLPjoGklrotRCXwP6mVZumzUjU7vIkKCzhe1HoJsqtyyoRS8r7R3orhTs2g/sxzyTJFXK9rlwmhrNEDBRFMH/I9cJa/S6bA3bKNDoPzFiA2LBrCcGKzJ+KOIdJ/uWL4ufNPgNrd/A==
+ b=RafAvMIB8QTgCQVA5UdMqbQL9Ac9JQ2Zc7JpMjYgHZ/b9hHTmWQKp3CG7sB3JarUQJrmJ/tKsVfoY5vQkSACyynKZesT2IU75f2tVor7TBF4hDSdxQFsFMRrfS1ojFpRvp3o5g00RE89S3ZOpnMLqAxp4U2ywcBqGnlOQoP+LNUkZY5E8pXwGx1MqpE9hw/hyvuKxHZswJPISAOBoj9oBuK00nZ5Tvcok34DhSaupmy4QuT6/zelzN6OAQ5OT0lIOsKsJPcL5D7LvtcjSpfjdc38CuidxHdckb5BxBoPY66TxyJgB0F3FDou9tH09VpMMV/CMEGGhBAeWr/zy5pXCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ihYiOQ2cJ2eqrVq71wxgTZhmo7ec7BXg/HSpYhrwHqg=;
- b=D5HP9pjpi2S4C01QSbM37xpO8eMA/3REjxNwxnGkgg8Y7VUqLyGkg6OapKEFBQgR28AMhFw+2Y/PXlkV8gCkUAQoZil3ZSm9iNzOyQAgQgsPBN8rw2iu7naxGe8Cu4KTtwwqGnt6CLvbwscvEuSg11s6JP4ZY2lCc7u6eVAuBFgs3WTijIMlWFxwKWBa3q53rU1nwF42bdgkL2n3XXV96dxMq2RZ1KSHW3K3AeKBXSmlzoJjjx785bez8R6o4qECJQRiK4MSKPEQpy9fIQrpsYXtScjrbhE3g6RWX/5IBos040gl6t2Ha3zGmi7YKyJAUGsigzQBtiEi7vnnHElEYg==
+ bh=4IQnfBKvhsu/aQJOy5wBqMpPaVwAilhm80/Cv0iBuEk=;
+ b=oX4FVqug2C4xMWH0unsaQOnj2O/TytQ3y26bd/j8AD0K1o/QImWMaibaSD406oFcVWSo3rkXhFflMMBA/udvasvP1xqy27smdkxq2Xfj61Xy7JXVmwte0o0Efbom6zbCPXExNAuWKI/88DzltmcqhtadZ9mrr6TIsSg8sSjv0Cf3kJawOHqbvEDqJ5ZO25Mx5W3lzhUAvdajIi9y9e51VNcF+m8BlGmiwb24IyUK4XLaR//K5Loqmeh2HTRcpBFXpP/L2LRDyCiBGUw+dwxpS5zJMxY+amv21QjcEY3i0GLZw/Ph5PjgaNub/SezwMkOCXV8nDVrk68ih7KeOd1m4Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ihYiOQ2cJ2eqrVq71wxgTZhmo7ec7BXg/HSpYhrwHqg=;
- b=m5UzS5QF7hEgEXnp6v55M9I+88eh78BzlRsW5CKJjfHPuEv6680IG3qKuqg/AH2bit4xEOt+rZ0EIaOzBEeN1+otfluoRNAeMaQbBfD8Mw874Ix56iVIJhue3nFjcCVNdYtx3jKNiHPX7HiBmSkMXhvjivCZ/Qjd6I3vcQ0Ylns=
-Received: from PH7P221CA0015.NAMP221.PROD.OUTLOOK.COM (2603:10b6:510:32a::11)
- by PH7PR12MB7428.namprd12.prod.outlook.com (2603:10b6:510:203::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.29; Wed, 14 May
- 2025 07:20:46 +0000
-Received: from SN1PEPF00036F43.namprd05.prod.outlook.com
- (2603:10b6:510:32a:cafe::ad) by PH7P221CA0015.outlook.office365.com
- (2603:10b6:510:32a::11) with Microsoft SMTP Server (version=TLS1_3,
+ bh=4IQnfBKvhsu/aQJOy5wBqMpPaVwAilhm80/Cv0iBuEk=;
+ b=Md1r1Ywz8Auaq45YJ5dSCpNL6oN4O14zcR0Cr/ibsT86CSVdzKLVRhRjOtl1JL58zJwoRn9/tne7wIgAS8hfQI+8viDGFENwibbXR4zjYPMUu6YeMZc2REYmZq7zLCANFf94oyzN2Z3DENdniP/6j9qi4TD7PJ0Q7U7aUzSxwn0=
+Received: from SN4PR0501CA0018.namprd05.prod.outlook.com
+ (2603:10b6:803:40::31) by LV8PR12MB9207.namprd12.prod.outlook.com
+ (2603:10b6:408:187::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.31; Wed, 14 May
+ 2025 07:21:06 +0000
+Received: from SN1PEPF00036F3F.namprd05.prod.outlook.com
+ (2603:10b6:803:40:cafe::e2) by SN4PR0501CA0018.outlook.office365.com
+ (2603:10b6:803:40::31) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8746.16 via Frontend Transport; Wed,
- 14 May 2025 07:20:40 +0000
+ 14 May 2025 07:21:05 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF00036F43.mail.protection.outlook.com (10.167.248.27) with Microsoft
+ SN1PEPF00036F3F.mail.protection.outlook.com (10.167.248.23) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8722.18 via Frontend Transport; Wed, 14 May 2025 07:20:40 +0000
+ 15.20.8722.18 via Frontend Transport; Wed, 14 May 2025 07:21:05 +0000
 Received: from BLR-L-NUPADHYA.xilinx.com (10.180.168.240) by
  SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 14 May 2025 02:20:30 -0500
+ 15.1.2507.39; Wed, 14 May 2025 02:20:56 -0500
 From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 To: <linux-kernel@vger.kernel.org>
 CC: <bp@alien8.de>, <tglx@linutronix.de>, <mingo@redhat.com>,
@@ -80,9 +80,9 @@ CC: <bp@alien8.de>, <tglx@linutronix.de>, <mingo@redhat.com>,
 	<pbonzini@redhat.com>, <kvm@vger.kernel.org>,
 	<kirill.shutemov@linux.intel.com>, <huibo.wang@amd.com>,
 	<naveen.rao@amd.com>, <francescolavra.fl@gmail.com>, <tiala@microsoft.com>
-Subject: [RFC PATCH v6 06/32] KVM: x86: Move {REG,VEC}_POS() macros to lapic.c
-Date: Wed, 14 May 2025 12:47:37 +0530
-Message-ID: <20250514071803.209166-7-Neeraj.Upadhyay@amd.com>
+Subject: [RFC PATCH v6 07/32] KVM: x86: apic_test_vector() to common code
+Date: Wed, 14 May 2025 12:47:38 +0530
+Message-ID: <20250514071803.209166-8-Neeraj.Upadhyay@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250514071803.209166-1-Neeraj.Upadhyay@amd.com>
 References: <20250514071803.209166-1-Neeraj.Upadhyay@amd.com>
@@ -92,72 +92,64 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F43:EE_|PH7PR12MB7428:EE_
-X-MS-Office365-Filtering-Correlation-Id: d192b9a1-8d90-41d3-88ac-08dd92b7d4ab
+X-MS-TrafficTypeDiagnostic: SN1PEPF00036F3F:EE_|LV8PR12MB9207:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6b7bb677-a530-4ce3-bfc9-08dd92b7e413
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|1800799024|36860700013;
+	BCL:0;ARA:13230040|82310400026|376014|7416014|36860700013|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZmtkaHl5NU1VMmVQdDlyRXpJMjkzazhpN3Fpd1JsRmlXemxGcFNZbW9ZcmN4?=
- =?utf-8?B?b2h6ZjNDOTBrUFZCSzUxWGZJUWFaK0VnZ2VYaCtaR3U2NFJwNmJrWGhXUzZZ?=
- =?utf-8?B?bjJRRDJXUXRWeDcvcE14NmRKMC9ORmUzWVg0RVJoM3hVVzlLWng4NkE5RGtF?=
- =?utf-8?B?TnVCSEE2bEN3M09lR1RETzNRR1VINkwyWFhIQlpsbDRTQko2Vm9mblROZHJz?=
- =?utf-8?B?V254T3pwMXUySlFjdEJqaUkyc2tDRnNlQ1NyYnB1emY5QnJMWHIxVEg4emVY?=
- =?utf-8?B?aEpyTHg5Y2VRek5XakZOY2x3eTkxV3NXN3IweWNjQ3ZkL0RZUEVQTUkxUmlu?=
- =?utf-8?B?Qjh3NGF3T3g4SnpOSmloVndBSEd2VVJPNzJPUGpyMVhUQUVCMC9WN0ZNY0N3?=
- =?utf-8?B?VDFpclk5My9aRDcwenU4T3djcXU0T1JIRmlpTEZBNHphZ1NCUUJzdlRXL0Vk?=
- =?utf-8?B?S0Fra2Z4ZVhqRWVkd3hpdkdpbWVyaGZ0RmdadG1VQ2haSkhDYVo0N3VKM21j?=
- =?utf-8?B?M1d4UjltUUN1K1FvazMzeTgvYXBXNHpVMGViNHZFWU4zWi9XL3J2S1JPOTY4?=
- =?utf-8?B?RXA2OVJQZ3d0V1J3NHUzWlRnaWRrWk10NktWTVFZWXlMMEVXTW1pK1BIWTlJ?=
- =?utf-8?B?b21lREZHTkp4aE0wSkZsdUxJOFNSUytNTzViNFZScUpoSmd6bzh1UXJ1eHVE?=
- =?utf-8?B?TlZPZlcxNk9ObVk5M2JMUy9SQk1WdGMxVUFQTFp4RExxVkYycklhY3JIUXcr?=
- =?utf-8?B?dWJiWWpmWjlQSW1KZWJDS0l6VWw2VURqNXlPRmJ1dTNudVRHOHFjODlJN1V1?=
- =?utf-8?B?eEt1azBJUEQ4aWlXUTVEQ3I3QktpOU5xU29rQ3JqY01xaHVETGJRUHNLRWhZ?=
- =?utf-8?B?TDF6b1F4QmZBMkpscVNyNU9TQ0xuRDJJTGJMdXRPeXVORGNXci83MmhXUXZC?=
- =?utf-8?B?Q2VuSTlUSzNZT29qRXpTd2dEN0dDQ0JGTXZkejVlUVlDTUR1M3BRTDAybCtW?=
- =?utf-8?B?TXFzUmlFTGM1M1FRNHBHSXA0Q1E1aHpjNklLb00rQTBiVnhGNVU4MVlvakMz?=
- =?utf-8?B?bDhGRzhQZlp0bytTSk4vUmpmdVJoTzRQZmhiVDNqYzgyd3M3WjVmV0J6QjIz?=
- =?utf-8?B?aE5NbDN5SmdjLzZUUGhvQjZRUEdHZ0FWSEo0UmkxVWJGQTJOdnVUKzV1dlpH?=
- =?utf-8?B?WkZYdjhmRmZydzlIdFNoZ3I4bG84NGJVVTV3a0JvelNITkoySWZDZ1p2VkZw?=
- =?utf-8?B?ZWpRaW8zdGFPejRpQUZlajh5MVVYcTdkU3JvOE5mTU4rRDZDZS9sQkZabThT?=
- =?utf-8?B?OUxKa1d5NEhuZjFYUVF4SUFpWjVGWWJ0QjY4TlFuVmVwSERxWXlrVUJwV2ds?=
- =?utf-8?B?UDFyN21FRVJMUkZ5RjdnYi9NbTR2NFZqTEYzQ3lLSVU2NVNUYVpITjlsVlhY?=
- =?utf-8?B?MU92U0MzNndSVGNRMU9uZ2F5c1d3ZENYMkgva0J2SFNVWGwrSmQ0NVBEWENw?=
- =?utf-8?B?bXZlMGFNWWFoQkJvYUozTmtQMkFYZk9QZFJqbnJlNlJMKzVZZGVsdTRzdlZE?=
- =?utf-8?B?aGZFTFlzQUdQTDYvdUdoVm1KU0lFcUFobUYvMVE1d1IwSjh4QUZhdm50NTlZ?=
- =?utf-8?B?Y0ZvYjVnLzlnTnh3cjhla0N4VUFmRnl1UU9lZ3V4a1l1d0l3OWRFNEIrRy92?=
- =?utf-8?B?MkQ0d1NFOUJncmlreTZwV1pyajhDZjJTVm9Jc1pkSmtWN2FiVHAya2p6Qk9J?=
- =?utf-8?B?RHBUVG1DQTRRVXBVRXl1VGtjemtRd3FmYVIzQ2tLd3BZVG91aHlRK2VpMXR0?=
- =?utf-8?B?eWJKNS9YL3dZdlJYUVU1NWZxRittVmE1aGJBc2tCYW8rM3NkdEtlTWRlQ3J4?=
- =?utf-8?B?YTRCMTZVQUtGeThNdXgxc2twOWVBbDlQSzErcFhteHk1VWdkZkZUVkppYmsz?=
- =?utf-8?B?NmlZK1pIZm9wejVHRVl5Y2tOaFlOUXk1eFdUR0JvcFl6cXhMWUd6Q1BLUUNJ?=
- =?utf-8?B?a3JpMU5qOGhVWlJMQTRFN1JOaVA0UFZBRkR3MTU4OXRKZkRiMTNJYU5aSzc5?=
- =?utf-8?Q?eziEHl?=
+	=?us-ascii?Q?BIrVj4XUiW37wC4ebU4f9C84kxLT/Hn+dbw5UnlYVH3+YCEWE2ap3DP/wlk/?=
+ =?us-ascii?Q?sFjD7HkLyxJNLpq4A0uKwTkIpOIMUBj2t6XzETO0RorrtvoYf32mBwOE1gBV?=
+ =?us-ascii?Q?gysns1x6GEQYztsDI3ekwUk1Lv17Z8s0A6Cpr21WRbRyQWK1nyk7eepx+BdN?=
+ =?us-ascii?Q?3WOLLXZKyzXB+AE3WcIfYrVicfECXQNOy1vqVKjPNU/GPypHcW4f19OazKHO?=
+ =?us-ascii?Q?QqESMES9Hq2HJKVdnrDDlKVfAavESD+wn3sM27Oop/Bx0+GuqWmwuaTT2QnX?=
+ =?us-ascii?Q?EexSSM0sG8uoGh0Gv81InbDRq7YG9vLKzaF/gmhrfTdCnQbkFhgsXhciJ+0Z?=
+ =?us-ascii?Q?0DPdsTQwdrwUsWCxK4+ygEGY3u1K2vVaczwZVksbB4OOvrp46Hj8AaZ35p3E?=
+ =?us-ascii?Q?p0jv7iwDy1bWCBcXDEwWW3VPWy4+D6NVG9K9l0ySU9pZL1mwYOsA9kgd3vRq?=
+ =?us-ascii?Q?F4zWYuKSbcVdmswS8UQwPY0Jrh8H4DHGxT3hOz0LlbYZH8ZX4gutHozZTdY7?=
+ =?us-ascii?Q?iXU2ndXsIXO7jJ3hysycKNESKZeBW27Tz0ABacLCquSANJdXrzaZ5g/RcM2Q?=
+ =?us-ascii?Q?84zdVgQTgk9PO9fT52OkmJfwrgh2/2erAQpVAIcM5lUxZQ9ROlBLPpbWpDBX?=
+ =?us-ascii?Q?oF7JK3cRB8HL4WbK5t2skLBHBqPzhIV43cRE277IHA0Y5Evd3LIb8IaJUDsD?=
+ =?us-ascii?Q?uyWOtSFtw9m2BVC3ciBcBFqRhGIInuEpcRPCVavTy/ZrqzuoU8iMNGepzqju?=
+ =?us-ascii?Q?M/kILISpmIMKl5q/tTRwwGidVPRtpyUQv1VaqUYJwb+A8naTuxkR/lRoKKWs?=
+ =?us-ascii?Q?nUaKiM+v7OzB7vRNhF5fNNvmsQYaUT3BSYwy4U+VEMUj1W3VDJLNRFCV+1Tg?=
+ =?us-ascii?Q?Jx7mRHC9Gz/uu4ic57P3OMnixrOzLxO45BiRBvTacViI+lWKKVuQY6HW7cFI?=
+ =?us-ascii?Q?RPAbdSW/Qrn4RzQ6n9DQ1Xz/FKzaXU7L1VEzyo5H7Iy0uH0NKWt6pgvASmQL?=
+ =?us-ascii?Q?y/FjiblY5It2saittCt68Nc6JUmWBV5X4EVSxgyh08Yse2bBFR3rpM/91kxu?=
+ =?us-ascii?Q?atzpmuEDIyxL6JzvYxz+ezobD7nD9RmTVtcB5gXZzEHdZJXCVfNWssQqHDQZ?=
+ =?us-ascii?Q?EeFJhgFZKfdwr9XhckvMPd/0Q0kYYe8q8jfR+w1PCGTw0hL4JzhhvPUYpXgk?=
+ =?us-ascii?Q?fGo5pag2sjd3q0MwPIckYQr+rWPPzZRNr2SgK1b0x0JG1bnXdk1807DBzwkJ?=
+ =?us-ascii?Q?Xg2Drt28YJNFXCBthBbr2DeSCipMfCOPAJHwexYO+01urQdKEdwxmOLG+LOI?=
+ =?us-ascii?Q?Tm4X4NFSjvAUjHuGlucqrI2lSgrSzbPQM3VHG7wlpxuVRy5RuIRy5gLHzPJW?=
+ =?us-ascii?Q?YUl5NV0vZ9SYbxnVuZszlSjs0LVCqSKJSuR52SEDzzwILqF8qgcfAU+CRdc5?=
+ =?us-ascii?Q?19GihwNfWytXMS8GarW6PFcgC1qdq51WIBWKHWYAO+H2i6DttYW6BCmaQ2QS?=
+ =?us-ascii?Q?ST/rkdlltegv9rcK9xMkASwIygMG4rokQsrz?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(7416014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2025 07:20:40.0478
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2025 07:21:05.8915
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d192b9a1-8d90-41d3-88ac-08dd92b7d4ab
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b7bb677-a530-4ce3-bfc9-08dd92b7e413
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F43.namprd05.prod.outlook.com
+	SN1PEPF00036F3F.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7428
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9207
 
-Since the {REG,VEC}_POS() macros are no longer used in lapic.h,
-move them to lapic.c.
+Move apic_test_vector() to apic.h in order to reuse it in the
+Secure AVIC guest APIC driver in later patches to test vector
+state in the APIC backing page.
 
-No functional changes intended.
+No function changes intended.
 
 Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 ---
@@ -165,38 +157,42 @@ Changes since v5:
 
  - New change.
 
- arch/x86/kvm/lapic.c | 3 +++
- arch/x86/kvm/lapic.h | 3 ---
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/apic.h | 5 +++++
+ arch/x86/kvm/lapic.c        | 5 -----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 23d0a2f585bd..25fd4ad72554 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -57,6 +57,9 @@
- #define APIC_VERSION			0x14UL
- #define LAPIC_MMIO_LENGTH		(1 << 12)
+diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
+index ef5b1be5eeab..d7377615d93a 100644
+--- a/arch/x86/include/asm/apic.h
++++ b/arch/x86/include/asm/apic.h
+@@ -557,6 +557,11 @@ static inline void apic_set_vector(int vec, void *bitmap)
+ 	set_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), (bitmap) + APIC_VECTOR_TO_REG_OFFSET(vec));
+ }
  
-+#define VEC_POS(v) APIC_VECTOR_TO_BIT_NUMBER(v)
-+#define REG_POS(v) APIC_VECTOR_TO_REG_OFFSET(v)
++static inline int apic_test_vector(int vec, void *bitmap)
++{
++	return test_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), (bitmap) + APIC_VECTOR_TO_REG_OFFSET(vec));
++}
 +
  /*
-  * Enable local APIC timer advancement (tscdeadline mode only) with adaptive
-  * tuning.  When enabled, KVM programs the host timer event to fire early, i.e.
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 50f22f12a1ad..f6e5b3b77a05 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -145,9 +145,6 @@ void kvm_lapic_exit(void);
+  * Warm reset vector position:
+  */
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 25fd4ad72554..8ecc3e960121 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -96,11 +96,6 @@ static __always_inline void kvm_lapic_set_reg64(struct kvm_lapic *apic,
+ 	apic_set_reg64(apic->regs, reg, val);
+ }
  
- u64 kvm_lapic_readable_reg_mask(struct kvm_lapic *apic);
- 
--#define VEC_POS(v) APIC_VECTOR_TO_BIT_NUMBER(v)
--#define REG_POS(v) APIC_VECTOR_TO_REG_OFFSET(v)
+-static inline int apic_test_vector(int vec, void *bitmap)
+-{
+-	return test_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
+-}
 -
- static inline void kvm_lapic_set_irr(int vec, struct kvm_lapic *apic)
+ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector)
  {
- 	apic_set_vector(vec, apic->regs + APIC_IRR);
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
 -- 
 2.34.1
 
