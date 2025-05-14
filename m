@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-46575-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46576-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C25AB79CA
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 01:50:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A28FCAB79CE
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 01:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F7B217565C
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 23:50:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A68643B00CD
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 23:50:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED7524A074;
-	Wed, 14 May 2025 23:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C406248F70;
+	Wed, 14 May 2025 23:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ykQwpTao"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P8rY/Ivv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594352475C3
-	for <kvm@vger.kernel.org>; Wed, 14 May 2025 23:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF080248F59
+	for <kvm@vger.kernel.org>; Wed, 14 May 2025 23:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747266210; cv=none; b=QHFVeoRdOklm1deg1lS67kUGjUxni+dzXh9DjZunuIGX2DilZyKca3QtUBgxgJtFdzj8C9wryfeilUnC+rFUQRl7HqWzACz7sP14jv0Udn/hA/WjEh2MUei806ZV27eNkk0e0jGaN4bF4BC8eNoTxxw8lPpugUtL0BG4j1XJieI=
+	t=1747266212; cv=none; b=I9DyqgxIBknz9tV55pCjVqOJ+lCS05NhHefbBRzus+H09GIN21+wIG2VaCnpSDuzdu4EI+5mnjZXzviv631UTbAemQxU9hHI5EmdVI+oxDkPLS2yM5GkyUurMpsPbFZHEaPkv70DJy8xE6nFGr73xXjQCyOLgvF0ot4iaW8uCis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747266210; c=relaxed/simple;
-	bh=nwUvWK7j9Kj8KbBDPMeg5Tkw109j7gyxcczO1q9K5+o=;
+	s=arc-20240116; t=1747266212; c=relaxed/simple;
+	bh=mDAgY99g40Yyk1XjcdF9j+JWk/+4IZdORF7bJ79w+2M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RGkPzqGXazI4i9UGQBbF0yeeLoTgjqKJ0CVgVrar7oQ3yP/mmPaL7OGYkuvJZ1o+zF42SXrK7if+YHCjHUMaei+7GCO1SMxpI1ltf9aedpz15sWHqDakk12LZPQGl+apqO+O09i5NWvqaXFmsaKtIhYCfBdi0/yX0zMezLliSDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ykQwpTao; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=OvAjLKlOwc8KKHJkxR7lvRtNfuJeEvAIEWpbqenaFdhSdiXSKnzl5p4KjZXxRR/OEG47rp8jP10C94lpga5LSbhftVHkecJVVMH6K6iAO32HwnPk/VHR4UQgkG4zS+CD10Wwl+nzKfvcIa7R4hxwscJpxvGLg91pVUt5XAqJJ6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P8rY/Ivv; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30c371c34e7so404097a91.1
-        for <kvm@vger.kernel.org>; Wed, 14 May 2025 16:43:29 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b23d12e14bdso259641a12.1
+        for <kvm@vger.kernel.org>; Wed, 14 May 2025 16:43:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747266208; x=1747871008; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747266210; x=1747871010; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iLum4dPU4sErthKtiaaPqZqnqSJWRV85cksXnAwJxvE=;
-        b=ykQwpTaov4j6+oFidjP1X8A3elVTfV9/2BoGF7Vlbl9FSRYPdpXlin0PoCPLM/n3R6
-         /vE+XBE+wYZOOIvq0pmn+MDErxokm3JT3picReyh7V81pJzvmkCvEArGPrLoQtNvvJIB
-         dg65XgamWP69LLo56qhJSG6hDDSdQ/I+LykYqEeKlTJet+liIJwB6RBMB9mf6/N3O+Gm
-         icRy74MdAdTIyEPpHmI2M5R08Bx8Tyzf6w2PtmyhUEcUrIcv86H1Dve3iAh6nV0B2g0t
-         DfIbXtqcu6Sgir4TZkmWwVmQYWiiBllHMyByqDoPyIiMOhJRAjq2OMyPdaOcmSGyqsHi
-         1Fgw==
+        bh=4sIecgGyO0lUZDlGmfbLoDOBmwYRGdtl4g13CxMI1VY=;
+        b=P8rY/IvvwBvyW70WJBFVGFGhlMamvpRQiCX2/3Q1nOTdYLdi/RsRfZI/YllEZ4XHSw
+         mhp7L+FwBIfmLMHVGDUBdqmeyV0KiJG39NT/ZnJ5IkopEJ9ClSKoN2F2wdlh5xakAM1o
+         2XikV3dtuSleHExPqPDT8SPMlNc1zFUrwDPBnQbilrSCP5E7vOuZrN2c0SrLtj6WX3f5
+         1yHhzCeAHmyuxBRYCsASzmJMJmSSCsqv995fZ6IqXEMBWzBt6br/wxovx1H5Pm2nogz0
+         y8n2ykCVBI7VKICLRD7yRsPfamkyz0jwX80kBG6j0lqu2Himuf77p+J9nn1cQB3SoIVK
+         AdjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747266208; x=1747871008;
+        d=1e100.net; s=20230601; t=1747266210; x=1747871010;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iLum4dPU4sErthKtiaaPqZqnqSJWRV85cksXnAwJxvE=;
-        b=Lteb4BUr/aO76v/2pCda8RJSGtfAG+IiQPNr8zlO/nrsprDspj8ba3nD5VVsHs32We
-         dAs831pJBX+JQrTT+yZeh+7bxcp6DJooxRVxVdDx5jSoiMmorie6hFf/BaUgKBuGJC/H
-         Ot/SCgrirJR0z6UczTxIzKWeeXyhHsG8/b1wN25YF/Xq7Q3Z+CLNiZOpttJYhJyxV3Ns
-         4k3D+oPs6GY9mzXlb1+60py5SDqflecdMOCxK+iHrXddle2lh+meE4fQluThDo2NvEG6
-         FVwV8uyYcPheiJ706Tj0d7lOY3D4wghPfXTVfbwRabTn3dQyeWcMz9bSlpAS/POrjhB7
-         EWbA==
-X-Gm-Message-State: AOJu0YxMpEuDK8e4jtdp75RLF3g3UCX9eCGo8GVlL+8+bPHxtAJeNU9I
-	2NuNLpK4dAbVBlfmymplMI/HFLLJlpdP3K4uTcdsY0SN+mc66CP3LUiXOuSv8vGkgGfX/y0bj3w
-	NhwruY5+mFlorCzEYThIeI676kafjEE9yEDRGW0CJF2kLnQd8yBGnG6B4yDeFiNV9ugxO/dnwu8
-	jvCYAAREleEl6m2xv64yUPLBbW2o6wjPdx04VvwGMT40JVV5AjB9We//g=
-X-Google-Smtp-Source: AGHT+IFTVxsTLBGkiAhxwxfXI0xdufC6Hc5PJQ+0/Nhxii2q/tPBLHxyosuWUQut2LexX0oTzZIxWEdMSOoJvrMGKg==
-X-Received: from pjbpm14.prod.google.com ([2002:a17:90b:3c4e:b0:2fa:15aa:4d2b])
+        bh=4sIecgGyO0lUZDlGmfbLoDOBmwYRGdtl4g13CxMI1VY=;
+        b=KGJhSF+u7WPpfT5j+v05JZtfZUzZXDL17/hNDYaKXrVmoiVZrkfY0ausner/j+fKch
+         tZiF7O2S9tjS63y+h1JbwQhnSfC3OrrWgwnQvwuHJEy2FsiMCcgRWhVGIdL2/diDZdSg
+         n4tyvAGon69jR7do/yFfFrk0CkVbDQuZs3Ku8xPAS03eJldPdZwXRaOwAvzKDsj4rI8f
+         hY+wzQFwni4Ekwv044P0McgUv9jonwwpGF79y449/MpwPt5kFa0NwPKL9D8C8W+7YEhD
+         31wOi13HMDiMcWXxmoc435mXUKmGiTl//5tE3FloUOkSCBG0AJvYGS5XtiHGmcu1ueq1
+         urKw==
+X-Gm-Message-State: AOJu0YxpIGuq/LSwkrg1dSYOKgBHGr2uNvxjG4mQ+cBUwF5EbUmHsbsX
+	6QdU6jE/CdXUW/yqIYSgErbSTj1lM9WVe5l50dU74yenEaWJszSyj0w7OKTbleBpuQt3Pc/K2CZ
+	tGoKHVulyYVACDc2KtXqv88Via9k7rtZ1wlVYaMoalZgJYfSRr2lgW4CozKaWUzrGV5DXJIsZ/u
+	HVXuouzwsiIuWK8lbA3YC3zXotFOT4JlXmmH4GLvXpbrEOITuQdfP9Wpk=
+X-Google-Smtp-Source: AGHT+IHE2ihGcSaSi+44FOfQo2JFT44j8vrPkcuV6SQcS6l9oOHcwMqkj/ZKectxEWeBtOTnjJpM1DV+MxgAJO4ylw==
+X-Received: from pjbsw16.prod.google.com ([2002:a17:90b:2c90:b0:308:87dc:aa52])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:1cce:b0:306:b6f7:58ba with SMTP id 98e67ed59e1d1-30e5156ea36mr715371a91.6.1747266208304;
- Wed, 14 May 2025 16:43:28 -0700 (PDT)
-Date: Wed, 14 May 2025 16:41:59 -0700
+ 2002:a17:90a:d647:b0:30c:540b:9b6 with SMTP id 98e67ed59e1d1-30e2e419501mr9813764a91.0.1747266209881;
+ Wed, 14 May 2025 16:43:29 -0700 (PDT)
+Date: Wed, 14 May 2025 16:42:00 -0700
 In-Reply-To: <cover.1747264138.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1747264138.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.49.0.1045.g170613ef41-goog
-Message-ID: <faa8085e653c2967fd8a3b7e73aa93eab34bdd4f.1747264138.git.ackerleytng@google.com>
-Subject: [RFC PATCH v2 20/51] mm: mempolicy: Refactor out policy_node_nodemask()
+Message-ID: <c6ecf0b9425db4993fb043caf3f48f2b32d7eb28.1747264138.git.ackerleytng@google.com>
+Subject: [RFC PATCH v2 21/51] mm: hugetlb: Inline huge_node() into callers
 From: Ackerley Tng <ackerleytng@google.com>
 To: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
 	x86@kernel.org, linux-fsdevel@vger.kernel.org
@@ -108,130 +108,132 @@ Cc: ackerleytng@google.com, aik@amd.com, ajones@ventanamicro.com,
 	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
 	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
 	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com, 
-	kernel test robot <lkp@intel.com>, Gregory Price <gourry@gourry.net>
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
 Content-Type: text/plain; charset="UTF-8"
 
-This was refactored out of huge_node().
+huge_node()'s role was to read struct mempolicy (mpol) from the vma
+and also interpret mpol to get node id and nodemask.
 
-huge_node()'s interpretation of vma for order assumes the
-hugetlb-specific storage of the hstate information in the
-inode. policy_node_nodemask() does not assume that, and can be used
-more generically.
+huge_node() can be inlined into callers since 2 out of 3 of the
+callers will be refactored in later patches to take and interpret mpol
+without reading mpol from the vma.
 
-This refactoring also enforces that nid default to the current node
-id, which was not previously enforced.
-
-alloc_pages_mpol() is the last remaining direct user of
-policy_nodemask(). All its callers begin with nid being the current
-node id as well. More refactoring is required for to simplify that.
-
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202409140519.DIQST28c-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202409140553.G2RGVWNA-lkp@intel.com/
-Reviewed-by: Gregory Price <gourry@gourry.net>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 
-Change-Id: I5774b27d2e718f4d08b59f8d2fedbb34eda7bac3
+Change-Id: Ic94b2ed916fd4f89b7d2755288a3a2f6a56051f7
 ---
- include/linux/mempolicy.h |  9 +++++++++
- mm/mempolicy.c            | 33 ++++++++++++++++++++++++++-------
- 2 files changed, 35 insertions(+), 7 deletions(-)
+ include/linux/mempolicy.h | 12 ------------
+ mm/hugetlb.c              | 13 ++++++++++---
+ mm/mempolicy.c            | 21 ---------------------
+ 3 files changed, 10 insertions(+), 36 deletions(-)
 
 diff --git a/include/linux/mempolicy.h b/include/linux/mempolicy.h
-index ce9885e0178a..840c576abcfd 100644
+index 840c576abcfd..41fc53605ef0 100644
 --- a/include/linux/mempolicy.h
 +++ b/include/linux/mempolicy.h
-@@ -138,6 +138,8 @@ extern void numa_policy_init(void);
- extern void mpol_rebind_task(struct task_struct *tsk, const nodemask_t *new);
- extern void mpol_rebind_mm(struct mm_struct *mm, nodemask_t *new);
+@@ -140,9 +140,6 @@ extern void mpol_rebind_mm(struct mm_struct *mm, nodemask_t *new);
  
-+extern int policy_node_nodemask(struct mempolicy *mpol, gfp_t gfp_flags,
-+				pgoff_t ilx, nodemask_t **nodemask);
- extern int huge_node(struct vm_area_struct *vma,
- 				unsigned long addr, gfp_t gfp_flags,
- 				struct mempolicy **mpol, nodemask_t **nodemask);
-@@ -251,6 +253,13 @@ static inline void mpol_rebind_mm(struct mm_struct *mm, nodemask_t *new)
- {
+ extern int policy_node_nodemask(struct mempolicy *mpol, gfp_t gfp_flags,
+ 				pgoff_t ilx, nodemask_t **nodemask);
+-extern int huge_node(struct vm_area_struct *vma,
+-				unsigned long addr, gfp_t gfp_flags,
+-				struct mempolicy **mpol, nodemask_t **nodemask);
+ extern bool init_nodemask_of_mempolicy(nodemask_t *mask);
+ extern bool mempolicy_in_oom_domain(struct task_struct *tsk,
+ 				const nodemask_t *mask);
+@@ -260,15 +257,6 @@ static inline int policy_node_nodemask(struct mempolicy *mpol, gfp_t gfp_flags,
+ 	return 0;
  }
  
-+static inline int policy_node_nodemask(struct mempolicy *mpol, gfp_t gfp_flags,
-+				       pgoff_t ilx, nodemask_t **nodemask)
-+{
-+	*nodemask = NULL;
-+	return 0;
-+}
+-static inline int huge_node(struct vm_area_struct *vma,
+-				unsigned long addr, gfp_t gfp_flags,
+-				struct mempolicy **mpol, nodemask_t **nodemask)
+-{
+-	*mpol = NULL;
+-	*nodemask = NULL;
+-	return 0;
+-}
+-
+ static inline bool init_nodemask_of_mempolicy(nodemask_t *m)
+ {
+ 	return false;
+diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+index b822b204e9b3..5cc261b90e39 100644
+--- a/mm/hugetlb.c
++++ b/mm/hugetlb.c
+@@ -1372,10 +1372,12 @@ static struct folio *dequeue_hugetlb_folio(struct hstate *h,
+ 	struct mempolicy *mpol;
+ 	gfp_t gfp_mask;
+ 	nodemask_t *nodemask;
++	pgoff_t ilx;
+ 	int nid;
+ 
+ 	gfp_mask = htlb_alloc_mask(h);
+-	nid = huge_node(vma, address, gfp_mask, &mpol, &nodemask);
++	mpol = get_vma_policy(vma, address, h->order, &ilx);
++	nid = policy_node_nodemask(mpol, gfp_mask, ilx, &nodemask);
+ 
+ 	if (mpol_is_preferred_many(mpol)) {
+ 		folio = dequeue_hugetlb_folio_nodemask(h, gfp_mask,
+@@ -2321,8 +2323,11 @@ static struct folio *alloc_surplus_hugetlb_folio(struct hstate *h,
+ 	gfp_t gfp_mask = htlb_alloc_mask(h);
+ 	int nid;
+ 	nodemask_t *nodemask;
++	pgoff_t ilx;
 +
- static inline int huge_node(struct vm_area_struct *vma,
- 				unsigned long addr, gfp_t gfp_flags,
- 				struct mempolicy **mpol, nodemask_t **nodemask)
++	mpol = get_vma_policy(vma, addr, h->order, &ilx);
++	nid = policy_node_nodemask(mpol, gfp_mask, ilx, &nodemask);
+ 
+-	nid = huge_node(vma, addr, gfp_mask, &mpol, &nodemask);
+ 	if (mpol_is_preferred_many(mpol)) {
+ 		gfp_t gfp = gfp_mask & ~(__GFP_DIRECT_RECLAIM | __GFP_NOFAIL);
+ 
+@@ -6829,10 +6834,12 @@ static struct folio *alloc_hugetlb_folio_vma(struct hstate *h,
+ 	nodemask_t *nodemask;
+ 	struct folio *folio;
+ 	gfp_t gfp_mask;
++	pgoff_t ilx;
+ 	int node;
+ 
+ 	gfp_mask = htlb_alloc_mask(h);
+-	node = huge_node(vma, address, gfp_mask, &mpol, &nodemask);
++	mpol = get_vma_policy(vma, address, h->order, &ilx);
++	node = policy_node_nodemask(mpol, gfp_mask, ilx, &nodemask);
+ 	/*
+ 	 * This is used to allocate a temporary hugetlb to hold the copied
+ 	 * content, which will then be copied again to the final hugetlb
 diff --git a/mm/mempolicy.c b/mm/mempolicy.c
-index b28a1e6ae096..7837158ee5a8 100644
+index 7837158ee5a8..39d0abc407dc 100644
 --- a/mm/mempolicy.c
 +++ b/mm/mempolicy.c
-@@ -1261,7 +1261,7 @@ static struct folio *alloc_migration_target_by_mpol(struct folio *src,
- 
- 		h = folio_hstate(src);
- 		gfp = htlb_alloc_mask(h);
--		nodemask = policy_nodemask(gfp, pol, ilx, &nid);
-+		nid = policy_node_nodemask(pol, gfp, ilx, &nodemask);
- 		return alloc_hugetlb_folio_nodemask(h, nid, nodemask, gfp,
- 				htlb_allow_alloc_fallback(MR_MEMPOLICY_MBIND));
- 	}
-@@ -2121,6 +2121,29 @@ static nodemask_t *policy_nodemask(gfp_t gfp, struct mempolicy *pol,
- 	return nodemask;
+@@ -2145,27 +2145,6 @@ int policy_node_nodemask(struct mempolicy *mpol, gfp_t gfp_flags,
  }
  
-+/**
-+ * policy_node_nodemask() - Interpret memory policy to get nodemask and nid.
-+ *
-+ * @mpol: the memory policy to interpret.
-+ * @gfp_flags: gfp flags for this request.
-+ * @ilx: interleave index, for use only when MPOL_INTERLEAVE or
-+ *       MPOL_WEIGHTED_INTERLEAVE
-+ * @nodemask: (output) pointer to nodemask pointer for 'bind' and 'prefer-many'
-+ *            policy
-+ *
-+ * Context: must hold reference on @mpol.
-+ * Return: a nid suitable for a page allocation and a pointer. If the effective
-+ *         policy is 'bind' or 'prefer-many', returns a pointer to the
-+ *         mempolicy's @nodemask for filtering the zonelist.
-+ */
-+int policy_node_nodemask(struct mempolicy *mpol, gfp_t gfp_flags,
-+			 pgoff_t ilx, nodemask_t **nodemask)
-+{
-+	int nid = numa_node_id();
-+	*nodemask = policy_nodemask(gfp_flags, mpol, ilx, &nid);
-+	return nid;
-+}
-+
  #ifdef CONFIG_HUGETLBFS
+-/*
+- * huge_node(@vma, @addr, @gfp_flags, @mpol)
+- * @vma: virtual memory area whose policy is sought
+- * @addr: address in @vma for shared policy lookup and interleave policy
+- * @gfp_flags: for requested zone
+- * @mpol: pointer to mempolicy pointer for reference counted mempolicy
+- * @nodemask: pointer to nodemask pointer for 'bind' and 'prefer-many' policy
+- *
+- * Returns a nid suitable for a huge page allocation and a pointer
+- * to the struct mempolicy for conditional unref after allocation.
+- * If the effective policy is 'bind' or 'prefer-many', returns a pointer
+- * to the mempolicy's @nodemask for filtering the zonelist.
+- */
+-int huge_node(struct vm_area_struct *vma, unsigned long addr, gfp_t gfp_flags,
+-		struct mempolicy **mpol, nodemask_t **nodemask)
+-{
+-	pgoff_t ilx;
+-
+-	*mpol = get_vma_policy(vma, addr, hstate_vma(vma)->order, &ilx);
+-	return policy_node_nodemask(*mpol, gfp_flags, ilx, nodemask);
+-}
+ 
  /*
-  * huge_node(@vma, @addr, @gfp_flags, @mpol)
-@@ -2139,12 +2162,9 @@ int huge_node(struct vm_area_struct *vma, unsigned long addr, gfp_t gfp_flags,
- 		struct mempolicy **mpol, nodemask_t **nodemask)
- {
- 	pgoff_t ilx;
--	int nid;
- 
--	nid = numa_node_id();
- 	*mpol = get_vma_policy(vma, addr, hstate_vma(vma)->order, &ilx);
--	*nodemask = policy_nodemask(gfp_flags, *mpol, ilx, &nid);
--	return nid;
-+	return policy_node_nodemask(*mpol, gfp_flags, ilx, nodemask);
- }
- 
- /*
-@@ -2601,8 +2621,7 @@ unsigned long alloc_pages_bulk_mempolicy_noprof(gfp_t gfp,
- 		return alloc_pages_bulk_preferred_many(gfp,
- 				numa_node_id(), pol, nr_pages, page_array);
- 
--	nid = numa_node_id();
--	nodemask = policy_nodemask(gfp, pol, NO_INTERLEAVE_INDEX, &nid);
-+	nid = policy_node_nodemask(pol, gfp, NO_INTERLEAVE_INDEX, &nodemask);
- 	return alloc_pages_bulk_noprof(gfp, nid, nodemask,
- 				       nr_pages, page_array);
- }
+  * init_nodemask_of_mempolicy
 -- 
 2.49.0.1045.g170613ef41-goog
 
