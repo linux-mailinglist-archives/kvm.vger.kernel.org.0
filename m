@@ -1,143 +1,360 @@
-Return-Path: <kvm+bounces-46554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46555-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84201AB7971
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 01:31:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73480AB7987
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 01:43:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 206154C51FC
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 23:31:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04DD53BABC1
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 23:42:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57EA226CF4;
-	Wed, 14 May 2025 23:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE94D227B87;
+	Wed, 14 May 2025 23:43:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rhS8+rB6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dYdTzitm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847361E833E
-	for <kvm@vger.kernel.org>; Wed, 14 May 2025 23:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6D71DA4E
+	for <kvm@vger.kernel.org>; Wed, 14 May 2025 23:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747265455; cv=none; b=JzO27+iwhWlbeZaVEE70nt94dyPpum4jOwBvJrz0P1j3je/0M/trTbsxCQ/ganD1+AX8QSv8wfzCkSe7Cve3bsitALvDqkx6hb84x8FGtWWASamJyiRIOkjyrv8P1VD5eQEDOIAaFMPxZDM/qE1p9pS9hJUYqP9PAbfMgemHy3w=
+	t=1747266180; cv=none; b=fIjINiH08mctVYKmuvVZDPbqtHctm3OJYzFOfUduKEr7yJb0Zyh/4BWquDD/kk9qFn0DMDEXHvE2dCsyoqsdv9KyybOVBBXihYskHSEWXSv/nZePJzQeoYESLcmtx2ZygHFOwQEAqKzDgUPmJqGbPBB9FgGCohEsLgOaCt0s5aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747265455; c=relaxed/simple;
-	bh=8IwAmJ0usLb0XmLJEmRAj1KQT7kUoSHh+GUD4ztFINU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aZ7YbfT2QtTMQFw4D6bB2TwEp76m4gj1Vuqskdgr4S+uogMWdv2CBOka+7+jIjKa76tqE4T8fDwyhWsbvM12P1MVd5xGApnuYkzYsfTJqJKKWlWh6N13DU0+hixuh83flP4QShZPUINFGxNCChTmAIHVjdA3hDHQ5DaG7kc68dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rhS8+rB6; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1747266180; c=relaxed/simple;
+	bh=kG7HoMTrfHXv8bqvsDGKYcmezmpctmHwllOqn9qt2cs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=aJP+3iF7BOy4IylxqsAh1mBXXl4F/R37/Rbw+tU/aJmoHuVaCRCIcJdIEPIwRSxxgVHw+/KfeQRE8WxKLnsg6QZjZ5TWH7+n6HAlTiEogZNGsJ0YcOBhTVjazp8bln+cczWW3oB6RlaG09rEKJGLIFmqcK86h8r5YbxKVEucFn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dYdTzitm; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30c06465976so350465a91.0
-        for <kvm@vger.kernel.org>; Wed, 14 May 2025 16:30:54 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30c371c34e7so403750a91.1
+        for <kvm@vger.kernel.org>; Wed, 14 May 2025 16:42:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747265453; x=1747870253; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K4/upwCU1p7ZhRZCIWHVB5zuv5a/gxQLx/KwiZLDsIs=;
-        b=rhS8+rB6n5ez4I56fUlA2ea8yo2iMu8mHM4munJorrMkjZ4JK0fe6kOQpePclO/gRM
-         LE8FWui0h6m8RKwc0n7dHRFM/H/lL5x+7xRFg6ALmnIL6k+oyWoGM3xGoB4MxX6ps6vS
-         fM7R1ORHSZquSl8kYImaTs+VcCvSgf+IbOihdLZbZLxsat3vfEZBKkvjUfL2ZYCcXKdx
-         9Q/jGgOLe3dEHLhW6D4TyNAsOofvZsbo7nKVs667kRgenKkZxkYqHIyHgc4kzRRGvfm3
-         R+tpC7hEnI84pJufBOZtD9rb6+uiwieEEmV3SLGvNE/jrKCQbMpxKDCNZ02bEMRhAZwo
-         Edaw==
+        d=google.com; s=20230601; t=1747266177; x=1747870977; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zwqGrUiOjHvJJnxbyG+X+anw8ewdbXKmpYSNoes50/Y=;
+        b=dYdTzitmVv6y+TD329LfdTqV5s6eDzgDWz90QFEFBQsDg4O2kdW4tO+g+iPLI8CH0X
+         Ow/NdMeGhUHeFb0Fwl02SwSFCVHDJsm5Lfnjma2D5dwMYAXbAy0Fb/qX+jenfcdD6EgU
+         VxDmROMNSjIb3M1xgEay34k3hP+YB+OIypxh8deDHk3DHCx5HCMBHhTLISMEN5mpRAQB
+         e6C0NCGVGebl2DcgdyqLGo6B/z4xuPZYU25wWLaf8FW3O4TXT7M3kh/IqwOdZc0wtR1D
+         MVTzoGUVUVJY12hzAOKi5FDJM1wUN49xDWqSBLpnLvfWoF6iXjQWyvOY3bX8xTTon/E5
+         Oodg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747265453; x=1747870253;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K4/upwCU1p7ZhRZCIWHVB5zuv5a/gxQLx/KwiZLDsIs=;
-        b=XYPA4/e8w4perssFdMjfe8zaNVCKeLTf1CXCJNYadQUxknKVGy+IDrU/AubvpGkJQc
-         ve31LzOn9bR8aOshOlP0wMDSm/tUVc7yLyQmSVRyrqA4WKDbdx+/N/WI40ulYIYWjsNy
-         HupgsLlfhDDRu5UOWVANi0246COD/oOIevyb3omEHsvGcp7gSS++y/aL5dO+bHcT9VEi
-         DjoANEzJv6p1ZbH6hIoSp19uDPJA5exT7n2i54LWZOelg+r/4FVisAv9oH3KOPrzo+xK
-         esDZ61wJU7pOuvOsiB/m9e/Vzj/rNIEDdnBdgLwL86e+VTSK6AMFl8x3jU55UksvKwE/
-         3YbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxZvbfKCBzR5c4NKygc1yrs3IWtU40f0NaI+IcVwHyu+jrfitKYoNz4fGDbExPGr4gZiA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHLOKGe/NBjakoOzYiK767jjrD2wrLg7q6DRJ0y0rs0MTjkglk
-	i+SiVN/vN64spkO5mOTBBPtqL8gjvQCsT9MsNf/AR7a88ZNW33ANoavO0fA0wS0tgtvyG1SryuW
-	M0A==
-X-Google-Smtp-Source: AGHT+IFAtfFAcg5G+bktrxdFp1CjONIgOLPqtbYX0j8nNBPhJiLTtnFl1U1b1LHV+tCsNxvNYjV//Y0pDCQ=
-X-Received: from pjbee14.prod.google.com ([2002:a17:90a:fc4e:b0:301:1bf5:2f07])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5292:b0:2ff:5357:1c7f
- with SMTP id 98e67ed59e1d1-30e2e64260bmr8268883a91.30.1747265453399; Wed, 14
- May 2025 16:30:53 -0700 (PDT)
-Date: Wed, 14 May 2025 16:30:51 -0700
-In-Reply-To: <20250324173121.1275209-10-mizhang@google.com>
+        d=1e100.net; s=20230601; t=1747266177; x=1747870977;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zwqGrUiOjHvJJnxbyG+X+anw8ewdbXKmpYSNoes50/Y=;
+        b=k9+1p56QVFVW95PQXMaJWK/rRVXXy593oGHcvtip+N/7k9vGFxF5s8gOoJrQ1jbxk/
+         4LIVjYM1J72JinrRZ2IXNsYaHZeUPNeEckIj2UCJALpxKuEUHt7HIQKdAzaG94Pez9l2
+         /1P6DdkrVgNh8pHGD/cfFTfB77Xm5IKeQKL5OZ1/PEUBk9KSm2umtUpm/Gc41bjKBoLz
+         AxPHAAn87iUQOKYysQ/g5zI3VVXvaSvJW8l7TU2o2QRtnWXHZ2fH4BN1CqrsnPwGgF17
+         2x3Ezc4xX6y7O+IKkrZD8b9RtXpZfzjewDiqgMRdKcUERnFRxl67tZ9P3TfFGqMNL/I4
+         PclA==
+X-Gm-Message-State: AOJu0YwoIkI5JN0Uei0LRwHtH0dSg4IeBJPhMha5uDvd2R0FrbiF8VR7
+	EPg5OOt736RrbPZY2tarmJC8ScXevQeE4qcCkPK9eK6AjEDLyKblmJMjTWBqcIVmLr/ORdVZAJF
+	VvGdPMEmpShHq/90zPWF6ijTkpW28otdqhCUW+CCuwEnplZdCgkEAKacSIz7zPZUSRjaCOlpOhh
+	hgsUCXzqYbqDL5zIexRTksZymZsc/R0xU6fa4cPwhniaLjSB/E2Bzc2rg=
+X-Google-Smtp-Source: AGHT+IERrB6TWSBQZL8LGOX6EETFEN6+F+QJfjTnuW65iRmylkCaeR55nU6SQCFovka0Yb5n9ELAV7ZNQnoM1ohNmw==
+X-Received: from pjf3.prod.google.com ([2002:a17:90b:3f03:b0:2fb:fa85:1678])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:5403:b0:301:1d9f:4ba2 with SMTP id 98e67ed59e1d1-30e51914ea8mr650385a91.28.1747266176876;
+ Wed, 14 May 2025 16:42:56 -0700 (PDT)
+Date: Wed, 14 May 2025 16:41:39 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-10-mizhang@google.com>
-Message-ID: <aCUnq4M33yTj_t1F@google.com>
-Subject: Re: [PATCH v4 09/38] perf: Add switch_guest_ctx() interface
-From: Sean Christopherson <seanjc@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com, 
-	Kan <kan.liang@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Yongwei Ma <yongwei.ma@intel.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>, Jim Mattson <jmattson@google.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Zide Chen <zide.chen@intel.com>, 
-	Eranian Stephane <eranian@google.com>, Shukla Manali <Manali.Shukla@amd.com>, 
-	Nikunj Dadhania <nikunj.dadhania@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.49.0.1045.g170613ef41-goog
+Message-ID: <cover.1747264138.git.ackerleytng@google.com>
+Subject: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+From: Ackerley Tng <ackerleytng@google.com>
+To: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org
+Cc: ackerleytng@google.com, aik@amd.com, ajones@ventanamicro.com, 
+	akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com, 
+	anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com, 
+	binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com, 
+	chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com, 
+	david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk, 
+	erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com, 
+	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Mar 24, 2025, Mingwei Zhang wrote:
-> From: Kan Liang <kan.liang@linux.intel.com>
-> 
-> When entering/exiting a guest, some contexts for a guest have to be
-> switched. For examples, there is a dedicated interrupt vector for
-> guests on Intel platforms.
-> 
-> When PMI switch into a new guest vector, guest_lvtpc value need to be
-> reflected onto HW, e,g., guest clear PMI mask bit, the HW PMI mask
-> bit should be cleared also, then PMI can be generated continuously
-> for guest. So guest_lvtpc parameter is added into perf_guest_enter()
-> and switch_guest_ctx().
-> 
-> Add a dedicated list to track all the pmus with the PASSTHROUGH cap, which
-> may require switching the guest context. It can avoid going through the
-> huge pmus list.
-> 
-> Suggested-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  include/linux/perf_event.h | 17 +++++++++++--
->  kernel/events/core.c       | 51 +++++++++++++++++++++++++++++++++++++-
->  2 files changed, 65 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-> index 37187ee8e226..58c1cf6939bf 100644
-> --- a/include/linux/perf_event.h
-> +++ b/include/linux/perf_event.h
-> @@ -584,6 +584,11 @@ struct pmu {
->  	 * Check period value for PERF_EVENT_IOC_PERIOD ioctl.
->  	 */
->  	int (*check_period)		(struct perf_event *event, u64 value); /* optional */
-> +
-> +	/*
-> +	 * Switch guest context when a guest enter/exit, e.g., interrupt vectors.
-> +	 */
-> +	void (*switch_guest_ctx)	(bool enter, void *data); /* optional */
+Hello,
 
-IMO, putting this in "struct pmu" is unnecessarily convoluted and complex, and a
-poor fit for what needs to be done.  The only usage of the hook is for the CPU to
-swap the LVTPC, and the @data payload communicates exactly that.  I.e. this has
-one user, and can't reasonably be extended to other users without some ugliness.
+This patchset builds upon discussion at LPC 2024 and many guest_memfd
+upstream calls to provide 1G page support for guest_memfd by taking
+pages from HugeTLB.
 
-And if by some miracle there's no CPU pmu in perf, KVM's mediated PMU still needs
-to swap to its PMI IRQ.  So rather than per-PMU hook along with a list and a
-spinlock, just make this an arch hook.  And if all of the mediated PMU code is
-guarded by a Kconfig, then perf doesn't even needs __weak stubs.
+This patchset is based on Linux v6.15-rc6, and requires the mmap support
+for guest_memfd patchset (Thanks Fuad!) [1].
+
+For ease of testing, this series is also available, stitched together,
+at https://github.com/googleprodkernel/linux-cc/tree/gmem-1g-page-support-rfc-v2
+
+This patchset can be divided into two sections:
+
+(a) Patches from the beginning up to and including "KVM: selftests:
+    Update script to map shared memory from guest_memfd" are a modified
+    version of "conversion support for guest_memfd", which Fuad is
+    managing [2].
+
+(b) Patches after "KVM: selftests: Update script to map shared memory
+    from guest_memfd" till the end are patches that actually bring in 1G
+    page support for guest_memfd.
+
+These are the significant differences between (a) and [2]:
+
++ [2] uses an xarray to track sharability, but I used a maple tree
+  because for 1G pages, iterating pagewise to update shareability was
+  prohibitively slow even for testing. I was choosing from among
+  multi-index xarrays, interval trees and maple trees [3], and picked
+  maple trees because
+    + Maple trees were easier to figure out since I didn't have to
+      compute the correct multi-index order and handle edge cases if the
+      converted range wasn't a neat power of 2.
+    + Maple trees were easier to figure out as compared to updating
+      parts of a multi-index xarray.
+    + Maple trees had an easier API to use than interval trees.
++ [2] doesn't yet have a conversion ioctl, but I needed it to test 1G
+  support end-to-end.
++ (a) Removes guest_memfd from participating in LRU, which I needed, to
+  get conversion selftests to work as expected, since participation in
+  LRU was causing some unexpected refcounts on folios which was blocking
+  conversions.
+
+I am sending (a) in emails as well, as opposed to just leaving it on
+GitHub, so that we can discuss by commenting inline on emails. If you'd
+like to just look at 1G page support, here are some key takeaways from
+the first section (a):
+
++ If GUEST_MEMFD_FLAG_SUPPORT_SHARED is requested during guest_memfd
+  creation, guest_memfd will
+    + Track shareability (whether an index in the inode is guest-only or
+      if the host is allowed to fault memory at a given index).
+    + Always be used for guest faults - specifically, kvm_gmem_get_pfn()
+      will be used to provide pages for the guest.
+    + Always be used by KVM to check private/shared status of a gfn.
++ guest_memfd now has conversion ioctls, allowing conversion to
+  private/shared
+    + Conversion can fail if there are unexpected refcounts on any
+      folios in the range.
+
+Focusing on (b) 1G page support, here's an overview:
+
+1. A bunch of refactoring patches for HugeTLB that isolates the
+   allocation of a HugeTLB folio from other HugeTLB concepts such as
+   VMA-level reservations, and HugeTLBfs-specific concepts, such as
+   where memory policy is stored in the VMA, or where the subpool is
+   stored on the inode.
+2. A few patches that add a guestmem_hugetlb allocator within mm/. The
+   guestmem_hugetlb allocator is a wrapper around HugeTLB to modularize
+   the memory management functions, and to cleanly handle cleanup, so
+   that folio cleanup can happen after the guest_memfd inode (and even
+   KVM) goes away.
+3. Some updates to guest_memfd to use the guestmem_hugetlb allocator.
+4. Selftests for 1G page support.
+
+Here are some remaining issues/TODOs:
+
+1. Memory error handling such as machine check errors have not been
+   implemented.
+2. I've not looked into preparedness of pages, only zeroing has been
+   considered.
+3. When allocating HugeTLB pages, if two threads allocate indices
+   mapping to the same huge page, the utilization in guest_memfd inode's
+   subpool may momentarily go over the subpool limit (the requested size
+   of the inode at guest_memfd creation time), causing one of the two
+   threads to get -ENOMEM. Suggestions to solve this are appreciated!
+4. max_usage_in_bytes statistic (cgroups v1) for guest_memfd HugeTLB
+   pages should be correct but needs testing and could be wrong.
+5. memcg charging (charge_memcg()) for cgroups v2 for guest_memfd
+   HugeTLB pages after splitting should be correct but needs testing and
+   could be wrong.
+6. Page cache accounting: When a hugetlb page is split, guest_memfd will
+   incur page count in both NR_HUGETLB (counted at hugetlb allocation
+   time) and NR_FILE_PAGES stats (counted when split pages are added to
+   the filemap). Is this aligned with what people expect?
+
+Here are some optimizations that could be explored in future series:
+
+1. Pages could be split from 1G to 2M first and only split to 4K if
+   necessary.
+2. Zeroing could be skipped for Coco VMs if hardware already zeroes the
+   pages.
+
+Here's RFC v1 [4] if you're interested in the motivation behind choosing
+HugeTLB, or the history of this patch series.
+
+[1] https://lore.kernel.org/all/20250513163438.3942405-11-tabba@google.com/T/
+[2] https://lore.kernel.org/all/20250328153133.3504118-1-tabba@google.com/T/
+[3] https://lore.kernel.org/all/diqzzfih8q7r.fsf@ackerleytng-ctop.c.googlers.com/
+[4] https://lore.kernel.org/all/cover.1726009989.git.ackerleytng@google.com/T/
+
+---
+
+Ackerley Tng (49):
+  KVM: guest_memfd: Make guest mem use guest mem inodes instead of
+    anonymous inodes
+  KVM: guest_memfd: Introduce and use shareability to guard faulting
+  KVM: selftests: Update guest_memfd_test for INIT_PRIVATE flag
+  KVM: guest_memfd: Introduce KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+  KVM: guest_memfd: Skip LRU for guest_memfd folios
+  KVM: Query guest_memfd for private/shared status
+  KVM: guest_memfd: Add CAP KVM_CAP_GMEM_CONVERSION
+  KVM: selftests: Test flag validity after guest_memfd supports
+    conversions
+  KVM: selftests: Test faulting with respect to
+    GUEST_MEMFD_FLAG_INIT_PRIVATE
+  KVM: selftests: Refactor vm_mem_add to be more flexible
+  KVM: selftests: Allow cleanup of ucall_pool from host
+  KVM: selftests: Test conversion flows for guest_memfd
+  KVM: selftests: Add script to exercise private_mem_conversions_test
+  KVM: selftests: Update private_mem_conversions_test to mmap
+    guest_memfd
+  KVM: selftests: Update script to map shared memory from guest_memfd
+  mm: hugetlb: Consolidate interpretation of gbl_chg within
+    alloc_hugetlb_folio()
+  mm: hugetlb: Cleanup interpretation of gbl_chg in
+    alloc_hugetlb_folio()
+  mm: hugetlb: Cleanup interpretation of map_chg_state within
+    alloc_hugetlb_folio()
+  mm: hugetlb: Rename alloc_surplus_hugetlb_folio
+  mm: mempolicy: Refactor out policy_node_nodemask()
+  mm: hugetlb: Inline huge_node() into callers
+  mm: hugetlb: Refactor hugetlb allocation functions
+  mm: hugetlb: Refactor out hugetlb_alloc_folio()
+  mm: hugetlb: Add option to create new subpool without using surplus
+  mm: truncate: Expose preparation steps for truncate_inode_pages_final
+  mm: hugetlb: Expose hugetlb_subpool_{get,put}_pages()
+  mm: Introduce guestmem_hugetlb to support folio_put() handling of
+    guestmem pages
+  mm: guestmem_hugetlb: Wrap HugeTLB as an allocator for guest_memfd
+  mm: truncate: Expose truncate_inode_folio()
+  KVM: x86: Set disallow_lpage on base_gfn and guest_memfd pgoff
+    misalignment
+  KVM: guest_memfd: Support guestmem_hugetlb as custom allocator
+  KVM: guest_memfd: Allocate and truncate from custom allocator
+  mm: hugetlb: Add functions to add/delete folio from hugetlb lists
+  mm: guestmem_hugetlb: Add support for splitting and merging pages
+  mm: Convert split_folio() macro to function
+  KVM: guest_memfd: Split allocator pages for guest_memfd use
+  KVM: guest_memfd: Merge and truncate on fallocate(PUNCH_HOLE)
+  KVM: guest_memfd: Update kvm_gmem_mapping_order to account for page
+    status
+  KVM: Add CAP to indicate support for HugeTLB as custom allocator
+  KVM: selftests: Add basic selftests for hugetlb-backed guest_memfd
+  KVM: selftests: Update conversion flows test for HugeTLB
+  KVM: selftests: Test truncation paths of guest_memfd
+  KVM: selftests: Test allocation and conversion of subfolios
+  KVM: selftests: Test that guest_memfd usage is reported via hugetlb
+  KVM: selftests: Support various types of backing sources for private
+    memory
+  KVM: selftests: Update test for various private memory backing source
+    types
+  KVM: selftests: Update private_mem_conversions_test.sh to test with
+    HugeTLB pages
+  KVM: selftests: Add script to test HugeTLB statistics
+  KVM: selftests: Test guest_memfd for accuracy of st_blocks
+
+Elliot Berman (1):
+  filemap: Pass address_space mapping to ->free_folio()
+
+Fuad Tabba (1):
+  mm: Consolidate freeing of typed folios on final folio_put()
+
+ Documentation/filesystems/locking.rst         |    2 +-
+ Documentation/filesystems/vfs.rst             |   15 +-
+ Documentation/virt/kvm/api.rst                |    5 +
+ arch/arm64/include/asm/kvm_host.h             |    5 -
+ arch/x86/include/asm/kvm_host.h               |   10 -
+ arch/x86/kvm/x86.c                            |   53 +-
+ fs/hugetlbfs/inode.c                          |    2 +-
+ fs/nfs/dir.c                                  |    9 +-
+ fs/orangefs/inode.c                           |    3 +-
+ include/linux/fs.h                            |    2 +-
+ include/linux/guestmem.h                      |   23 +
+ include/linux/huge_mm.h                       |    6 +-
+ include/linux/hugetlb.h                       |   19 +-
+ include/linux/kvm_host.h                      |   32 +-
+ include/linux/mempolicy.h                     |   11 +-
+ include/linux/mm.h                            |    2 +
+ include/linux/page-flags.h                    |   32 +
+ include/uapi/linux/guestmem.h                 |   29 +
+ include/uapi/linux/kvm.h                      |   16 +
+ include/uapi/linux/magic.h                    |    1 +
+ mm/Kconfig                                    |   13 +
+ mm/Makefile                                   |    1 +
+ mm/debug.c                                    |    1 +
+ mm/filemap.c                                  |   12 +-
+ mm/guestmem_hugetlb.c                         |  512 +++++
+ mm/guestmem_hugetlb.h                         |    9 +
+ mm/hugetlb.c                                  |  488 ++---
+ mm/internal.h                                 |    1 -
+ mm/memcontrol.c                               |    2 +
+ mm/memory.c                                   |    1 +
+ mm/mempolicy.c                                |   44 +-
+ mm/secretmem.c                                |    3 +-
+ mm/swap.c                                     |   32 +-
+ mm/truncate.c                                 |   27 +-
+ mm/vmscan.c                                   |    4 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |    2 +
+ .../kvm/guest_memfd_conversions_test.c        |  797 ++++++++
+ .../kvm/guest_memfd_hugetlb_reporting_test.c  |  384 ++++
+ ...uest_memfd_provide_hugetlb_cgroup_mount.sh |   36 +
+ .../testing/selftests/kvm/guest_memfd_test.c  |  293 ++-
+ ...memfd_wrap_test_check_hugetlb_reporting.sh |   95 +
+ .../testing/selftests/kvm/include/kvm_util.h  |  104 +-
+ .../testing/selftests/kvm/include/test_util.h |   20 +-
+ .../selftests/kvm/include/ucall_common.h      |    1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  465 +++--
+ tools/testing/selftests/kvm/lib/test_util.c   |  102 +
+ .../testing/selftests/kvm/lib/ucall_common.c  |   16 +-
+ .../kvm/x86/private_mem_conversions_test.c    |  195 +-
+ .../kvm/x86/private_mem_conversions_test.sh   |  100 +
+ virt/kvm/Kconfig                              |    5 +
+ virt/kvm/guest_memfd.c                        | 1655 ++++++++++++++++-
+ virt/kvm/kvm_main.c                           |   14 +-
+ virt/kvm/kvm_mm.h                             |    9 +-
+ 53 files changed, 5080 insertions(+), 640 deletions(-)
+ create mode 100644 include/linux/guestmem.h
+ create mode 100644 include/uapi/linux/guestmem.h
+ create mode 100644 mm/guestmem_hugetlb.c
+ create mode 100644 mm/guestmem_hugetlb.h
+ create mode 100644 tools/testing/selftests/kvm/guest_memfd_conversions_test.c
+ create mode 100644 tools/testing/selftests/kvm/guest_memfd_hugetlb_reporting_test.c
+ create mode 100755 tools/testing/selftests/kvm/guest_memfd_provide_hugetlb_cgroup_mount.sh
+ create mode 100755 tools/testing/selftests/kvm/guest_memfd_wrap_test_check_hugetlb_reporting.sh
+ create mode 100755 tools/testing/selftests/kvm/x86/private_mem_conversions_test.sh
+
+--
+2.49.0.1045.g170613ef41-goog
 
