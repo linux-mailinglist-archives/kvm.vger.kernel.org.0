@@ -1,147 +1,129 @@
-Return-Path: <kvm+bounces-46508-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46510-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A38AB6E8D
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 16:53:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D95E3AB6FCC
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 17:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 301073B2DED
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 14:52:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD6993B39DC
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 15:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B1A1B0F2C;
-	Wed, 14 May 2025 14:52:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B61C1DFD8B;
+	Wed, 14 May 2025 15:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EZyIATW7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JsRIRuio"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2856186E20;
-	Wed, 14 May 2025 14:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9DC8488
+	for <kvm@vger.kernel.org>; Wed, 14 May 2025 15:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747234361; cv=none; b=N6HZdMBVEdYXxHW/3D0+8sX6UqDkX6/4cpWPoAT+2uYvmRg29T9j7nEy7HasdCDB9uQV1Tb08eyWI+IIxD6TvPhfMq7McnsL20Aj3fFXLOvPsAm7JkEzQ80L7x6qkX/PMvT9pXWRrFnZm8xLLjAmDovsKBROlaEcAyFQ4R6HGSQ=
+	t=1747236106; cv=none; b=NaBo+B19aYhGkWo3+vXqfS5EuzMK/jKl0syxVHtER/543kRIvOgxmwg3nHd/IEe9hhQaCTKPR/amQAIyl+SJesxfGfjw1xWWM7MX2jFfA1ytIO3dj6nIniH98CsucrLwo8nHrs8uKteeL7pywN/NMFnnYend6qkxKEamG1FAQYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747234361; c=relaxed/simple;
-	bh=MGry8nGOh38zyKXq66KoqnQD7ODjB3x9wJqWF5lMYzY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B1gV+Ll2Vq2XgiU4Yh0tAO8t5pQzGJY0jJ1XywEZ+Bm+2UPeLxxKeb3ENlATzInv7NzEeakLfksYnPyZdNcfAE6ts1T3T0R+GYW9TPIV5Kjt90ny5lNkozjuVtwufRkAcK0NIsBcJ+mtmp8rPR0kLEWz81ZbRhFjmSDaJGB/cbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EZyIATW7; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54E8pOJ5029482;
-	Wed, 14 May 2025 14:52:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=sP9HCX
-	m3oiUlMsavHEc5ksXvFcineQQa645gWvOSAPI=; b=EZyIATW7w7UAdIdAiRL3SZ
-	8qAbqpGt+LYy7JqNRpJHtlMJthhCzFBQ8iZy6q273n+ANx2fgd+hXHIbPG/45Gee
-	1492Sm65ZeYfFQAHwf0ikUEYh+M/DEO9LY/7GmtHLH961SDV5B/zHExw6XqXiMZY
-	QyY371DkYEBCwMf7I8AGc9c7Wa9iFA5Pq2tkxaZYt4aVw2SUhqqavWi7GSyi9Jnm
-	CTSS7zsowlB1tsNUr17g46ZWWYPKQgbGoS6xn4Ttu55lNti9XMTbJEQgzWPavQ1m
-	r42YD8gLhNhAb1ltJM5CqmS2lSyi1dL4gxTLEGkQVj+6GUP78XvCu+cbmzQ9yFxA
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46mr1ghtf6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 May 2025 14:52:24 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54EDWk0X019883;
-	Wed, 14 May 2025 14:52:23 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 46mbfrmsb5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 May 2025 14:52:23 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54EEqJOq34669212
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 14 May 2025 14:52:19 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8659A200CA;
-	Wed, 14 May 2025 14:52:19 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B1DDE200A8;
-	Wed, 14 May 2025 14:52:18 +0000 (GMT)
-Received: from [9.111.70.163] (unknown [9.111.70.163])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 14 May 2025 14:52:18 +0000 (GMT)
-Message-ID: <6f8f3780-902b-49d4-a766-ea2e1a8f85ea@linux.ibm.com>
-Date: Wed, 14 May 2025 16:52:18 +0200
+	s=arc-20240116; t=1747236106; c=relaxed/simple;
+	bh=aqm8chgeUHE9w7V6OzdaFcFnAZV9Anw5fN17DWsCSJo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S4kw+TU6UGaN3573TCnM9LICOPPvOxKT8w1QJrX7PEieUMamYfX0n6pjPyQGzRoHT9oz8g/nN7rx3vdZ9bZvT0TAsH2MjWaiXkV4O96rJH7OAE6wtF8LlxSHeTN5npjK+IYVueND2heS03bhmR2JSt7si3nSMHDP7SXNAVMtm1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JsRIRuio; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-231a2d139bfso114975ad.0
+        for <kvm@vger.kernel.org>; Wed, 14 May 2025 08:21:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747236104; x=1747840904; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A5kkfSfbrLWrkERpgfX2DFIg4PKuqh/HkLXjbsJIBtM=;
+        b=JsRIRuioQ495Qd3nepF0Bc6CIfxhBkn/YI223RIzJqB+OX2sfcvKoAI/h5xqQbIeZU
+         SISxBCVYFlkkLbLEpdXlcIcMVfix7EM+mbEop1GW0rr/E97ygGVqz/w7GiisNeMFkuGg
+         fCK+3YEAjeRsts/RAuQ42lfuLqECNb92h9nbTOJUh62xBPClcLk8HeSgXo9wNvbl1e6h
+         DIGHXL1v5SJ/Lnt/hCbL1oFBIVU99MYy0m6Lf4BNErcIfln2ACDwPcWSRxEHkf0IMX7n
+         1eREBE253YnGHO9PQsmSc8t7eCrMRUQioLhyiQS68cpCN4VNTjZTk7kFpzBXXd1NP8yM
+         8lzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747236104; x=1747840904;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A5kkfSfbrLWrkERpgfX2DFIg4PKuqh/HkLXjbsJIBtM=;
+        b=GXOSacgukk/di8HIptlxglD2FCeogv7/7t53BXBRTRhuIMWBJSZRMTlb1um5kqxZnV
+         rCnGnTt9sqFDDoGaJz/57tNmxd4KoDjUPHRNaQYp6i2W3Ab8yaJMqBBMxdb3cGaozbFT
+         MW1BaHmRq8ipVQikdeUpp3ED2qFFHej8AJ8pEzgbsJpI+MmbRthTPzDf20B5gYFQp7O4
+         tisfCRFlPHDIXN+W3AOU1NJapTFw6NSW5f+YgL62pUjl6Tw/YBPovO/CisEgybSYRVzF
+         VQCdZ2apQtl2pk446z9EXQ+BDTqtqQRhyqPOodGhoOAw16hPxrV5G32xnhnr9zey0FxA
+         DMwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWUi07LkT74CRNzP6t/UjevIVNvbqcMSexUn1PoPWd3YnQ7jhd8t/WKmgiKBlBWzntRtKg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzdb4prqRmi+tkz5JsbQIW1pSMFp2GkCjKP6hvsPKQRPMoT/0Qn
+	f/66NBnIS71H2qJeCcx+iVt38ktgrHuN4UxBSIOOnmT1HoaF2XgPxQes8g8mHq96gXS4EHKcO18
+	5D83sWFzfVTiADfYP7WpuPvx8RLbZkTwZNRspk7Fv
+X-Gm-Gg: ASbGncsiO4TVtiecYfqqvZ/98f0BjlQaovdlD2SEcqyjRnJE5b2YbqldIymtzKv/qek
+	I5cNbG8SIfO5Eeg2XhNFnb7C6PS5QD8zYwHTKs2bA0SKue7CUXp0IlOKijadCN7gc/noN19JvYu
+	fTYusfv7F8gtqK61Hr9yxRLUcgB/Sr2KvmPlDLNldfu4zXoHIhjBCtK6s4xbD3A5zJhA==
+X-Google-Smtp-Source: AGHT+IEDFjAEViaETl+HXGG3nCMSzRvQ2B8Cbr4reJBBfbEw48+Tr0BGQ9AFALmBDU3tuYflnPtNSELVDngmLibLraQ=
+X-Received: by 2002:a17:903:1109:b0:215:f0c6:4dbf with SMTP id
+ d9443c01a7336-2319909c216mr3419965ad.14.1747236104067; Wed, 14 May 2025
+ 08:21:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [akpm-mm:mm-new 320/331] arch/s390/kvm/gaccess.c:321:2: error:
- expected identifier
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-        Ignacio Moreno Gonzalez <Ignacio.MorenoGonzalez@kuka.com>,
-        kernel test robot <lkp@intel.com>, oe-kbuild-all@lists.linux.dev,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Yang Shi <yang@os.amperecomputing.com>,
-        Janosch Frank
- <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com
-References: <202505140943.IgHDa9s7-lkp@intel.com>
- <63ddfc13-6608-4738-a4a2-219066e7a36d@kuka.com>
- <8e506dd6-245f-4987-91de-496c4e351ace@lucifer.local>
- <20250514162722.01c6c247@p-imbrenda>
- <0da0f2fc-c97f-4e95-b28e-fa8e7bede9cb@linux.ibm.com>
- <20250514164822.4b44dc5c@p-imbrenda>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20250514164822.4b44dc5c@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: vZQvzaD6N2zKvmDBrayT5pqw2jZzs1K6
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE0MDEzMCBTYWx0ZWRfXzLJ5iNsvV+yB 3jA/+o81u1shUiK2qniX3WjvGKQjxeTmfT6V1IiKG1D0MJ/GZphNr94WH0jf4OpcpRU/fh0H/Gl eMyxNVG+UmkD5ejn3hm84rdeKBhRfm4oytj/fLuRpjXfxgROwgedAYRjRB8m8iRkBI9U3OIbvtb
- 75Fc110Wq+EKpeg7gaB79Z1KH6aIpTBRVNhHhpuqqNoazYOMiKYIt217Y0oyQ1fUzFTfRbRrm0N qeXNBLZIdlzm+Gl6yCOYYQQltMrHhlfstd2AOFbHIfP84Tz89tet+VKpiI4G1r/GseRPQVpWffW Ah7YcJRivGhmnfripCt9rw/KUEAOgmUeCS4N47lLolgLKGJZ9ER6ZCVybjPCYiG6p0TCrx4n+Z9
- NALJYInoFNKbMJ2kgBy5njkcwDfbrRyoacnuFGK6s6qT2GSbDMtRDl9zXYR3OodaQjXl5+VB
-X-Proofpoint-GUID: vZQvzaD6N2zKvmDBrayT5pqw2jZzs1K6
-X-Authority-Analysis: v=2.4 cv=QOxoRhLL c=1 sm=1 tr=0 ts=6824ae28 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=zy4cdgbtwusFmoiP-5MA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-14_04,2025-05-14_03,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- phishscore=0 spamscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0
- clxscore=1015 mlxscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=978
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505070000
- definitions=main-2505140130
+References: <20250502130828.4071412-1-kirill.shutemov@linux.intel.com>
+ <20250502130828.4071412-12-kirill.shutemov@linux.intel.com> <6a7f0639-78fc-4721-8d84-6224c83c07d2@intel.com>
+In-Reply-To: <6a7f0639-78fc-4721-8d84-6224c83c07d2@intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 14 May 2025 08:21:32 -0700
+X-Gm-Features: AX0GCFscmcl35uOjE18U2ra8ong5Qbdrs0qjWEtEJdayACylFUy94ngUS-DfONY
+Message-ID: <CAGtprH--e6i6b9grOLTUwYXKSNb=Ws5sNPniY+oJpyctM1cdTA@mail.gmail.com>
+Subject: Re: [RFC, PATCH 11/12] KVM: TDX: Reclaim PAMT memory
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, pbonzini@redhat.com, seanjc@google.com, 
+	rick.p.edgecombe@intel.com, isaku.yamahata@intel.com, yan.y.zhao@intel.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, kvm@vger.kernel.org, x86@kernel.org, 
+	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, May 13, 2025 at 6:12=E2=80=AFPM Huang, Kai <kai.huang@intel.com> wr=
+ote:
+>
+>
+>
+> On 3/05/2025 1:08 am, Kirill A. Shutemov wrote:
+> > The PAMT memory holds metadata for TDX-protected memory. With Dynamic
+> > PAMT, PAMT_4K is allocated on demand. The kernel supplies the TDX modul=
+e
+> > with a few pages that cover 2M of host physical memory.
+> >
+> > PAMT memory can be reclaimed when the last user is gone. It can happen
+> > in a few code paths:
+> >
+> > - On TDH.PHYMEM.PAGE.RECLAIM in tdx_reclaim_td_control_pages() and
+> >    tdx_reclaim_page().
+> >
+> > - On TDH.MEM.PAGE.REMOVE in tdx_sept_drop_private_spte().
+> >
+> > - In tdx_sept_zap_private_spte() for pages that were in the queue to be
+> >    added with TDH.MEM.PAGE.ADD, but it never happened due to an error.
+> >
+> > Add tdx_pamt_put() in these code paths.
+>
+> IMHO, instead of explicitly hooking tdx_pamt_put() to various places, we
+> should just do tdx_free_page() for the pages that were allocated by
+> tdx_alloc_page() (i.e., control pages, SEPT pages).
+>
+> That means, IMHO, we should do PAMT allocation/free when we actually
+> *allocate* and *free* the target TDX private page(s).  I.e., we should:
 
-
-Am 14.05.25 um 16:48 schrieb Claudio Imbrenda:
-
->>>>> A possible fix for this would be to rename PROT_NONE in the enum to PROT_TYPE_NONE.
->>>
->>> please write a patch to rename PROT_NONE in our enum to
->>> PROT_TYPE_DUMMY, I can review it quickly.
->>>
->>> if Paolo has no objections, I'm fine with having the patch go through
->>> the mm tree
->>
->> Yes, lets do a quick fix and I can also do
->> Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
->>
->> for a s/PROT_NONE/PROT_TYPE_NONE/g
->> patch.
-> 
-> I'd rather have PROT_TYPE_DUMMY, since it's a dummy value and not
-> something that indicates "no protection"
-
-makes sense.
+I think it's important to ensure that PAMT pages are *only* allocated
+for a 2M range if it's getting mapped in EPT at 4K granularity.
+Physical memory allocation order can be different from the EPT mapping
+granularity.
 
