@@ -1,175 +1,320 @@
-Return-Path: <kvm+bounces-46541-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46542-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B53E8AB75C6
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 21:23:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97233AB765D
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 22:05:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB1A21782ED
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 19:23:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 662E68C1FD9
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 20:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453C8296700;
-	Wed, 14 May 2025 19:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B605C295511;
+	Wed, 14 May 2025 20:05:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dikJrf5+"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="d+5e0rg/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0CC2951BE
-	for <kvm@vger.kernel.org>; Wed, 14 May 2025 19:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747250533; cv=none; b=utfja5lqhVNONWzjPPgUCTqSmzqcXFLoA7H06hUZlBfRu9CHy/Y3YYSmG514CrLJzD5PW/C9qvHqEy02a0rUCzjMux49A2k3nG1ao9EQQPoIVhjsXpCxe4OdS6p7Tq+BKtFqZZAS9pss9w/EOemg89E2xGww040DUPI5miclF8U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747250533; c=relaxed/simple;
-	bh=YOzE7iJKn1cKrVnHeYmsANZJwRedYEE2+tWwGO6R4Sg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uyYBE+jQ6F/+R/VeF0eqnVAuYlFMHfmaQlOUREVbVDTwmqHKspXhnXfm6Fl/aJ3EA5m1gbdzaXpvU9sv/VA/vScCBxU/UEiqKrPN85TuGUNNfjqLquu+9mQyxcDrVs3DeYjJbwyTPZrEaNO7H24DH8zIN6nQ1KK0FRReWF4J4c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dikJrf5+; arc=none smtp.client-ip=209.85.166.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
-Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-85b3a6c37e2so17012739f.0
-        for <kvm@vger.kernel.org>; Wed, 14 May 2025 12:22:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747250530; x=1747855330; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=s3CSQ6PBMOqGVYj+xqhMBfKnGOIDEpoWfmf6grdNY9M=;
-        b=dikJrf5+joAOhXTosvS3NsOY/z+tSo4by/LgKMISPQSvAo/98Nx319OVZk9YWOXqy7
-         wSqYeMbL9ytLGGTmyII2Dqqkuf4UQMt81cL3JO+yVo01vKEnVends0qUNGGNGtqgIwwO
-         0bFEuOrPTdful96Gu/WK2Mw+TZwUyo61WvWztJKWM1O2GkgUPtbVNUMSvW3Ki5BProV+
-         XpNb3K3PEAa0HHzQAymIKnmGTuaJkfClcl+dIO7LdndigYoH4p+fAp8Tf44GLRkFNGyJ
-         PK1Uq60hfI8uHPjfBZj+FP8CgbIuApC8lDNYPOA6THNw6Cb60XGqpAjeEtgBa0bgu87q
-         J+LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747250530; x=1747855330;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s3CSQ6PBMOqGVYj+xqhMBfKnGOIDEpoWfmf6grdNY9M=;
-        b=cV3wPrA3xhaBUucXsYOIx6yvaCJ9z2xf3elWSgYhiXWRuwAzp31APaux+wlayFDibH
-         aiNUuyufuh+DCqDeCRvBPd2NBFWhrjZjGk1FCNt6n1wJqdg2TvO949kVH/u31OkIV5CQ
-         7/NOwf9HAAQhh0hEhhooXPt4BlOeLwy/B/Pl9WN7pKw5kQNuzXk6XAbimxXZJpoU+8qk
-         8FFZkIH2Qrymb/E2TX5tGtJsurU/U19gOa2fSfWBdisGFgkY4K5E+YZi32GOW3DOWOez
-         y5Wqja/Z3gbloMYtm2i/VLzmW2jD2uD+aG/6JxQSZ/+nalk+FJfv4zwV6EV/6MVaRIge
-         KqCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUI6SSmsX3UhyeK1tMTjmfPhEO9zgLLzMZuwMUGjFbBSgb//4pGTXds79qW4ldPcARWDWA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxi3Ii6KCtOvBouUEqWGGfRQN4SbLxbZBjvjvUgq9YtL32WngK2
-	gPHjtGIjQFw3TgR+IWLEdJHekjLyWbO/vJXw4MoeNEFTZmTvGVk7Haad/g+bAD948gfMM0rEMDk
-	HenYZTA==
-X-Google-Smtp-Source: AGHT+IGg18AnCuBF63uwtJjiLbr7/IX5pN6tnMFQzW8sojexBjp+3ynRNR8yhYl88WVyZs8zmM6M9UEXqLY6
-X-Received: from ilbby14.prod.google.com ([2002:a05:6e02:260e:b0:3d8:1a1e:8c05])
- (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6602:36c8:b0:85b:3791:b2ed
- with SMTP id ca18e2360f4ac-86a08ded21cmr611062639f.8.1747250528149; Wed, 14
- May 2025 12:22:08 -0700 (PDT)
-Date: Wed, 14 May 2025 19:21:59 +0000
-In-Reply-To: <20250514192159.1751538-1-rananta@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB232951A6;
+	Wed, 14 May 2025 20:05:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747253128; cv=fail; b=hsFucEeJGjF5YUNNHm+mJgyT1AeBI6vXJuUu4MQqs09uJ4YIq8txFZUsCGSaWF33HckhLyruTUFXyWGLsumASzLWYxqiqpFjmcImjG+UW/+W3oFMoXSYKT4E2JjczSnQ7j53MUHZAK5Y5pQZdPgnZUqyRZjevS74++VB4xBnA+M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747253128; c=relaxed/simple;
+	bh=YycmEZEZI2pNcj/hQUm3twCuLxv5Wa9VflAPGvVv90w=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HgSA7KEUoYbt+QGCnVxUm1F/FFwZNj33lx5a3IRktN8T+tBopsxUh15zs+mky63xqgSvNRPcCGZuZcjlx0zllMUa9c5SZ79bjhjXeSwFRByDhq7mMMWRJ3/PDjsRBEwP5c3MN/C1/RP0CED3ttqfCek1b1tArYJXwSnJz3CmOmE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=d+5e0rg/; arc=fail smtp.client-ip=40.107.244.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=s3g0H61irAmh0CXNwsneeZSOcvwknJJg+RnZZfjaLVAWQt4ofhUZwiyuRIOpEYO2yjLRB7VHw01tJLiKMmgAKhJm4GXEHINMGvqjZkWy8ckjI9Y7Wer34UtMxYGXZ+lmfw838QVPZrUlGGIXD4tZVbqW9TioiPs4bDVn26dUdYUk1QJYs+fFRicVFFHJMRFKHmoq1IiZjRqhnhTnlC2L8lj8BsxlvxNPz/m6X9Tt+xBhZtmuLYdBzER9A3T0Lf6QhaJ2W0uyX1D3/aQmLJH5EDRx8gSLVjUn956yYyS5vmS8eCZEXNbnEqJIhdpeZcZyPHRPHdaK5CWI2ekvpngTlw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3LMaNDKdd1AKrLPHqbVwhzBvq0gkRQIcizeMA4Gc4LI=;
+ b=m0Q3sFImgouwCla3B68x43WQ+o/7UY/gDWDnznn9JrfK7vZWhZYmin73Q/5ZuZB9oUKAgYevGXGZZH6Obej40ah6lqY+o+GL8PZoX7WqpJlfgxVwvjJjqCC3DKx1bfPEdyV87oiZ8jlcR79lCWnfrEc5ijWiCaXzvXIc44QSTILzJtd0/2MalasVc74iQmJZS36GheLB2QNzyx0Tw9z+W4vVC+6J+Bx8oGrbCbLLSOOcB+X5upHDw+N4ro8V/rH2nfbtzJsQKiUd1vncsJqg/w3cq57hFzI2WlAvHf0jBCdHaXOjJctCafxQavrCDSXEcw7/ivZwORW3uDGskG2GDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3LMaNDKdd1AKrLPHqbVwhzBvq0gkRQIcizeMA4Gc4LI=;
+ b=d+5e0rg/nrmzHpbm+8ew9dd+NPhSh0HrKc0K8pJH1tqL4Gi1n149IhzBEZV90oIe0PUdteyetN3oPJHNcgGQiGnjBVSsxPKWMnCuWuM/Xgt3z0Fwv6DVf5Zxmyc/ywgP76rVSnXRfhGCafgbrQsbbMlZZbXbj4v+PMQCULKYPWXI6iGcMtVFmdS8x+byW5i5w1VA1xlDcCkSQ473oeiNz0XWPQXjgG6AlIDcwLGrcisBRQU36u/bZ0mmcOes5eXDam7Me6qvClIu3an3RNiVEtCoAAJYpGPm1oCBlICPyIK+B4VBwVY20Gw1pcKTJbf62SmSsWKky7Cjkti/I8VRbw==
+Received: from MN2PR20CA0022.namprd20.prod.outlook.com (2603:10b6:208:e8::35)
+ by IA0PPFB67404FBA.namprd12.prod.outlook.com (2603:10b6:20f:fc04::be2) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8655.35; Wed, 14 May
+ 2025 20:05:23 +0000
+Received: from BL6PEPF0001AB53.namprd02.prod.outlook.com
+ (2603:10b6:208:e8:cafe::76) by MN2PR20CA0022.outlook.office365.com
+ (2603:10b6:208:e8::35) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8699.29 via Frontend Transport; Wed,
+ 14 May 2025 20:05:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ BL6PEPF0001AB53.mail.protection.outlook.com (10.167.241.5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8722.18 via Frontend Transport; Wed, 14 May 2025 20:05:22 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 14 May
+ 2025 13:05:08 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 14 May 2025 13:05:07 -0700
+Received: from inno-thin-client (10.127.8.11) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Wed, 14 May 2025 13:05:03 -0700
+Date: Wed, 14 May 2025 23:05:02 +0300
+From: Zhi Wang <zhiw@nvidia.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+CC: Jason Gunthorpe <jgg@nvidia.com>, Alexey Kardashevskiy <aik@amd.com>,
+	<kvm@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<linux-media@vger.kernel.org>, <linaro-mm-sig@lists.linaro.org>,
+	<sumit.semwal@linaro.org>, <christian.koenig@amd.com>, <pbonzini@redhat.com>,
+	<seanjc@google.com>, <alex.williamson@redhat.com>,
+	<vivek.kasireddy@intel.com>, <dan.j.williams@intel.com>,
+	<yilun.xu@intel.com>, <linux-coco@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <lukas@wunner.de>, <yan.y.zhao@intel.com>,
+	<daniel.vetter@ffwll.ch>, <leon@kernel.org>, <baolu.lu@linux.intel.com>,
+	<zhenzhong.duan@intel.com>, <tao1.su@intel.com>
+Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
+Message-ID: <20250514230502.6b64da7f.zhiw@nvidia.com>
+In-Reply-To: <aCRmoDupzK9zTqFL@yilunxu-OptiPlex-7050>
+References: <371ab632-d167-4720-8f0d-57be1e3fee84@amd.com>
+	<4b6dc759-86fd-47a7-a206-66b25a0ccc6d@amd.com>
+	<c10bf9c2-e073-479d-ad1c-6796c592d333@amd.com>
+	<aB3jLmlUKKziwdeG@yilunxu-OptiPlex-7050>
+	<aB4tQHmHzHooDeTE@yilunxu-OptiPlex-7050>
+	<20250509184318.GD5657@nvidia.com>
+	<aB7Ma84WXATiu5O1@yilunxu-OptiPlex-7050>
+	<2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
+	<20250512140617.GA285583@nvidia.com>
+	<20250513130315.0158a626.zhiw@nvidia.com>
+	<aCRmoDupzK9zTqFL@yilunxu-OptiPlex-7050>
+Organization: NVIDIA
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250514192159.1751538-1-rananta@google.com>
-X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <20250514192159.1751538-4-rananta@google.com>
-Subject: [PATCH 3/3] KVM: selftests: Extend vgic_init to test GICv4 config attr
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: Raghavendra Rao Anata <rananta@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB53:EE_|IA0PPFB67404FBA:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1083feb4-670c-48c1-b82c-08dd9322a8af
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|7416014|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?CYKDfFJHYYpl8DptySGI40bXgq/o/Q2T1QzDmxgoqc19Vx9qctN0Au8b+2U0?=
+ =?us-ascii?Q?FOwKHPBte4GwbLt+sYKl+eYMUdmyj/Q/hi89bafZXyzQtIZgylhytjv50ykJ?=
+ =?us-ascii?Q?WNQ2M2xHqcN7Zo3CHxJrnvezigjqsnHyWr8yccuqOf80ySoPefoOqJuUQB9v?=
+ =?us-ascii?Q?pJVwwpuzyR9c8e4a3ykXBhY0ux86CrMbpvbKZE/zgXrmNpX24h9tc7BjveLA?=
+ =?us-ascii?Q?LzDcCQcS3ntWiWoSWCa+lnQsFuQDmF9FKaJ7/tM7cbA2dpyLxVFQoV6TyxlL?=
+ =?us-ascii?Q?xIkI/VQ/A3x+NdufKf+d6JFmfoLncuIWwuaAaS1Lq7nyEth2iaGtI0edoJmG?=
+ =?us-ascii?Q?fT9QsLrzBhOQ5BgZ4hUGSKuvZwr3IKRDafwQp28xPqMrrhAlkGQKi3Je/7TG?=
+ =?us-ascii?Q?+gw0WKqZWP+YsLBT1a7Lw3EIG6BJ/WHqSA1GemCVPuhLhA9D0JlMnIEwCUdA?=
+ =?us-ascii?Q?KwSlCLXBEiQOtxcgNc6wwXO1w9syFtmhMCiKdbGnoHPLxNJX+Z8C5gWYqKZN?=
+ =?us-ascii?Q?/BPMvjr/Ddjy4vm8eRrS4w4HkyxplWFcWKkeajjM/UcOBStkjLgNLm7CkCeL?=
+ =?us-ascii?Q?y8V0yY3zKWS9jFsdSquuGdAab8CaeF2PW5NIMpnRVx+jaVJlw8PL5ersFasS?=
+ =?us-ascii?Q?ERqQxy/Zfcwm/DM5PiHovwWw5yKMUzd8gghXdvflFIxBH46ZwpoxXEI+55J2?=
+ =?us-ascii?Q?Hq2ENWNAdOlX3rZ3tRo1UKjkNF6MCN2pogeXmmB60w8HlhiZIwYzSHQA3FYz?=
+ =?us-ascii?Q?+KCNariJ0l4W+tKbAjEElNVYJWSVmzuPZKw9jbSCfSNWq/zAyPNUSlZ2VOgV?=
+ =?us-ascii?Q?yEvtufC5A28z2uG3+njX4eAPzVCh9ye7wXKAhOxHLaRjoHIx5W1r9Haa2x1x?=
+ =?us-ascii?Q?zikZu4h6tdt2ovBol3JnAIq4JbbGNMlddTZ/N4bpx3s23B4hMFECVtuxZT4G?=
+ =?us-ascii?Q?6nzcutlrBzYmmL4iQVNGb2sQKrHj3ex70CIXfItF2+W7I8v7XmhZ6b9rUOD/?=
+ =?us-ascii?Q?1hPAUsxGHWpYDcIzl4D0F8nw8nqefI9H1WDP/FzKT6QbwhgV5GsI72ruuwe2?=
+ =?us-ascii?Q?4kBJaVeSqvuFNlOwcqR3ak8Is8aIS8d4n8tZeWj6GUOFfoC7/syADnjDqjB4?=
+ =?us-ascii?Q?oxySzYIYNAOTq7STxNO5ZdLxoaCtu5/tq46eiGvH66IUai6EB79O62wkTgMq?=
+ =?us-ascii?Q?F9seK2xR4Qjw6krzJqQHLP2uPS9M4iEsh4GKwZFaGXCElHGvLXL9M0rBKBN8?=
+ =?us-ascii?Q?aso2qNNp89gBzKHVtZfGPrErbHymeO3VTW2ZHuCLEtWLQVx6JCAHtaO4J/Dh?=
+ =?us-ascii?Q?BT8lAffGspvFJvvq9HvnJMak5h9cYNynvIpoTuVEfXTUW7T2VbjcQPB7jYQq?=
+ =?us-ascii?Q?fqLyAJjQssAYr2MAVBpw5Mci/fFUpSJZbOfhZ8YUKWNJxH3U8VZieJRjSZXC?=
+ =?us-ascii?Q?SNXcYFJeGz+DNukEniOS6OOW/h0upskxxxvNui79t8358V+i2V5gvJszxhX3?=
+ =?us-ascii?Q?3FoeRzcqH1JjkWPVkSEzElwyWCF5ZXMSuzjM?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2025 20:05:22.2748
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1083feb4-670c-48c1-b82c-08dd9322a8af
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB53.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PPFB67404FBA
 
-Extend the arm64 vgic_init test to check KVM_DEV_ARM_VGIC_CONFIG_GICV4
-attribute. This includes testing the interface with various
-configurations when KVM has vGICv4 enabled (kvm-arm.vgic_v4_enable=1
-cmdline) and disabled.
+On Wed, 14 May 2025 17:47:12 +0800
+Xu Yilun <yilun.xu@linux.intel.com> wrote:
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- tools/testing/selftests/kvm/arm64/vgic_init.c | 58 +++++++++++++++++++
- 1 file changed, 58 insertions(+)
+> On Tue, May 13, 2025 at 01:03:15PM +0300, Zhi Wang wrote:
+> > On Mon, 12 May 2025 11:06:17 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > 
+> > > On Mon, May 12, 2025 at 07:30:21PM +1000, Alexey Kardashevskiy
+> > > wrote:
+> > > 
+> > > > > > I'm surprised by this.. iommufd shouldn't be doing PCI
+> > > > > > stuff, it is just about managing the translation control of
+> > > > > > the device.
+> > > > > 
+> > > > > I have a little difficulty to understand. Is TSM bind PCI
+> > > > > stuff? To me it is. Host sends PCI TDISP messages via PCI DOE
+> > > > > to put the device in TDISP LOCKED state, so that device
+> > > > > behaves differently from before. Then why put it in IOMMUFD?
+> > > > 
+> > > > 
+> > > > "TSM bind" sets up the CPU side of it, it binds a VM to a piece
+> > > > of IOMMU on the host CPU. The device does not know about the
+> > > > VM, it just enables/disables encryption by a request from the
+> > > > CPU (those start/stop interface commands). And IOMMUFD won't be
+> > > > doing DOE, the platform driver (such as AMD CCP) will. Nothing
+> > > > to do for VFIO here.
+> > > > 
+> > > > We probably should notify VFIO about the state transition but I
+> > > > do not know VFIO would want to do in response.
+> > > 
+> > > We have an awkward fit for what CCA people are doing to the
+> > > various Linux APIs. Looking somewhat maximally across all the
+> > > arches a "bind" for a CC vPCI device creation operation does:
+> > > 
+> > >  - Setup the CPU page tables for the VM to have access to the MMIO
+> > >  - Revoke hypervisor access to the MMIO
+> > >  - Setup the vIOMMU to understand the vPCI device
+> > >  - Take over control of some of the IOVA translation, at least for
+> > > T=1, and route to the the vIOMMU
+> > >  - Register the vPCI with any attestation functions the VM might
+> > > use
+> > >  - Do some DOE stuff to manage/validate TDSIP/etc
+> > > 
+> > > So we have interactions of things controlled by PCI, KVM, VFIO,
+> > > and iommufd all mushed together.
+> > > 
+> > > iommufd is the only area that already has a handle to all the
+> > > required objects:
+> > >  - The physical PCI function
+> > >  - The CC vIOMMU object
+> > >  - The KVM FD
+> > >  - The CC vPCI object
+> > > 
+> > > Which is why I have been thinking it is the right place to manage
+> > > this.
+> > > 
+> > > It doesn't mean that iommufd is suddenly doing PCI stuff, no, that
+> > > stays in VFIO.
+> > > 
+> > > > > > So your issue is you need to shoot down the dmabuf during
+> > > > > > vPCI device destruction?
+> > > > > 
+> > > > > I assume "vPCI device" refers to assigned device in both
+> > > > > shared mode & prvate mode. So no, I need to shoot down the
+> > > > > dmabuf during TSM unbind, a.k.a. when assigned device is
+> > > > > converting from private to shared. Then recover the dmabuf
+> > > > > after TSM unbind. The device could still work in VM in shared
+> > > > > mode.
+> > > 
+> > > What are you trying to protect with this? Is there some intelism
+> > > where you can't have references to encrypted MMIO pages?
+> > > 
+> > 
+> > I think it is a matter of design choice. The encrypted MMIO page is
+> > related to the TDI context and secure second level translation table
+> > (S-EPT). and S-EPT is related to the confidential VM's context.
+> > 
+> > AMD and ARM have another level of HW control, together
+> > with a TSM-owned meta table, can simply mask out the access to those
+> > encrypted MMIO pages. Thus, the life cycle of the encrypted
+> > mappings in the second level translation table can be de-coupled
+> > from the TDI unbound. They can be reaped un-harmfully later by
+> > hypervisor in another path.
+> > 
+> > While on Intel platform, it doesn't have that additional level of
+> > HW control by design. Thus, the cleanup of encrypted MMIO page
+> > mapping in the S-EPT has to be coupled tightly with TDI context
+> > destruction in the TDI unbind process.
+> 
+> Thanks for the accurate explanation. Yes, in TDX, the
+> references/mapping to the encrypted MMIO page means a CoCo-VM owns
+> the MMIO page. So TDX firmware won't allow the CC vPCI device (which
+> physically owns the MMIO page) unbind/freed from a CoCo-VM, while the
+> VM still have the S-EPT mapping.
+> 
+> AMD doesn't use KVM page table to track CC ownership, so no need to
+> interact with KVM.
+> 
 
-diff --git a/tools/testing/selftests/kvm/arm64/vgic_init.c b/tools/testing/selftests/kvm/arm64/vgic_init.c
-index b3b5fb0ff0a9..adcfaf461b2b 100644
---- a/tools/testing/selftests/kvm/arm64/vgic_init.c
-+++ b/tools/testing/selftests/kvm/arm64/vgic_init.c
-@@ -675,6 +675,63 @@ static void test_v3_its_region(void)
- 	vm_gic_destroy(&v);
- }
- 
-+static void test_v3_vgicv4_config(void)
-+{
-+	struct kvm_vcpu *vcpus[NR_VCPUS];
-+	uint8_t gicv4_config;
-+	struct vm_gic v;
-+	int ret;
-+
-+	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS, vcpus);
-+	if (__kvm_has_device_attr(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+					KVM_DEV_ARM_VGIC_CONFIG_GICV4))
-+		return;
-+
-+	kvm_device_attr_get(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+				KVM_DEV_ARM_VGIC_CONFIG_GICV4, &gicv4_config);
-+
-+	if (gicv4_config == KVM_DEV_ARM_VGIC_CONFIG_GICV4_UNAVAILABLE) {
-+		gicv4_config = KVM_DEV_ARM_VGIC_CONFIG_GICV4_DISABLE;
-+		ret = __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+				KVM_DEV_ARM_VGIC_CONFIG_GICV4, &gicv4_config);
-+		TEST_ASSERT(ret && errno == ENXIO,
-+			"vGICv4 allowed to be disabled even though it's unavailable");
-+
-+		gicv4_config = KVM_DEV_ARM_VGIC_CONFIG_GICV4_ENABLE;
-+		ret = __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+				KVM_DEV_ARM_VGIC_CONFIG_GICV4, &gicv4_config);
-+		TEST_ASSERT(ret && errno == ENXIO,
-+			"vGICv4 allowed to be enabled even though it's unavailable");
-+	} else { /* kvm-arm.vgic_v4_enable=1 */
-+		TEST_ASSERT(gicv4_config == KVM_DEV_ARM_VGIC_CONFIG_GICV4_ENABLE,
-+				"Expected vGICv4 to be enabled by default");
-+
-+		gicv4_config = KVM_DEV_ARM_VGIC_CONFIG_GICV4_DISABLE;
-+		kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+				KVM_DEV_ARM_VGIC_CONFIG_GICV4, &gicv4_config);
-+
-+		gicv4_config = KVM_DEV_ARM_VGIC_CONFIG_GICV4_ENABLE;
-+		kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+				KVM_DEV_ARM_VGIC_CONFIG_GICV4, &gicv4_config);
-+
-+		gicv4_config = KVM_DEV_ARM_VGIC_CONFIG_GICV4_ENABLE + 1;
-+		ret = __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+			KVM_DEV_ARM_VGIC_CONFIG_GICV4, &gicv4_config);
-+		TEST_ASSERT(ret && errno == EINVAL,
-+			"vGICv4 allowed to be configured with unknown value");
-+
-+		kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+					KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
-+		gicv4_config = KVM_DEV_ARM_VGIC_CONFIG_GICV4_DISABLE;
-+		ret = __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+			KVM_DEV_ARM_VGIC_CONFIG_GICV4, &gicv4_config);
-+		TEST_ASSERT(ret && errno == EBUSY,
-+			"Changing vGICv4 config allowed after vGIC initialization");
-+	}
-+
-+	vm_gic_destroy(&v);
-+}
-+
- /*
-  * Returns 0 if it's possible to create GIC device of a given type (V2 or V3).
-  */
-@@ -730,6 +787,7 @@ void run_tests(uint32_t gic_dev_type)
- 		test_v3_last_bit_single_rdist();
- 		test_v3_redist_ipa_range_check_at_vcpu_run();
- 		test_v3_its_region();
-+		test_v3_vgicv4_config();
- 	}
- }
- 
--- 
-2.49.0.1101.gccaa498523-goog
+IMHO, I think it might be helpful that you can picture out what are the
+minimum requirements (function/life cycle) to the current IOMMUFD TSM
+bind architecture:
+
+1.host tsm_bind (preparation) is in IOMMUFD, triggered by QEMU handling
+the TVM-HOST call.
+2. TDI acceptance is handled in guest_request() to accept the TDI after
+the validation in the TVM)
+
+and which part/where need to be modified in the current architecture to
+reach there. Try to fold vendor-specific knowledge as much as possible,
+but still keep them modular in the TSM driver and let's see how it looks
+like. Maybe some example TSM driver code to demonstrate together with
+VFIO dma-buf patch.
+
+If some where is extremely hacky in the TSM driver, let's see how they
+can be lift to the upper level or the upper call passes more parameters
+to them.
+
+Z.
+
+> Thanks,
+> Yilun
+> 
+> > 
+> > If the TDI unbind is triggered in VFIO/IOMMUFD, there has be a
+> > cross-module notification to KVM to do cleanup in the S-EPT.
+> > 
+> > So shooting down the DMABUF object (encrypted MMIO page) means
+> > shooting down the S-EPT mapping and recovering the DMABUF object
+> > means re-construct the non-encrypted MMIO mapping in the EPT after
+> > the TDI is unbound. 
+> > 
+> > Z.
+> > 
+> > > > > What I really want is, one SW component to manage MMIO dmabuf,
+> > > > > secure iommu & TSM bind/unbind. So easier coordinate these 3
+> > > > > operations cause these ops are interconnected according to
+> > > > > secure firmware's requirement.
+> > > >
+> > > > This SW component is QEMU. It knows about FLRs and other config
+> > > > space things, it can destroy all these IOMMUFD objects and talk
+> > > > to VFIO too, I've tried, so far it is looking easier to manage.
+> > > > Thanks,
+> > > 
+> > > Yes, qemu should be sequencing this. The kernel only needs to
+> > > enforce any rules required to keep the system from crashing.
+> > > 
+> > > Jason
+> > > 
+> > 
+> 
 
 
