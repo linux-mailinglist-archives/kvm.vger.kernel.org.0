@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-46527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46528-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77251AB72DC
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 19:34:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAD43AB72FA
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 19:39:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE7ED86840C
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 17:34:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 664991BA0317
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 17:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770F9280337;
-	Wed, 14 May 2025 17:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274FE280A4B;
+	Wed, 14 May 2025 17:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a5R0zvar"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8+ok9Xj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B0227B4E7
-	for <kvm@vger.kernel.org>; Wed, 14 May 2025 17:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9398727F747
+	for <kvm@vger.kernel.org>; Wed, 14 May 2025 17:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747244068; cv=none; b=lZ6Q3MQsFXDtzyWwCzW7iG4Ig+ov32P7bvrnxWVFiCPfMKS4XIACwW1+CmAG4YLHJssIOXWyX5hfi7NdJAR6q2veB/wpfYdLC1gXtY8TUVfEaaNQv7Pb6HFZSW+og7gnx9d/uHUXvdQlpPWTnMfv1ITok5J/4hnuoCQBXbz3JVg=
+	t=1747244371; cv=none; b=b+rbVcYmkkmH2UUV/IqcdB5BipJFa9QMO47IJxZboKlVgmvP1PCJ3ge2ovBhZNivR3dZwiBvcqA7jRf0ReYxoo449ODZ/QKbBIpVqw/fOVh/FRTu+1MBlaDsRLUuS6khxXvKcrQZYUIGPUAv7beKrSggOjb+x+E939pvb0gO+g0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747244068; c=relaxed/simple;
-	bh=kVRO3G/4PNVYlIlAQRXqbDnSY+k6vJJXhBt+6U/6DIY=;
+	s=arc-20240116; t=1747244371; c=relaxed/simple;
+	bh=DybxN6tHW3pRqRDzexg5O/mxkhdrtfiw60WByyFkILo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SwN32ccbA50ImY6V6ZZR4bpcphgXiYOz8T92n4GOdD6z2z286L9VoPvWku2Rr2BhyuCLdpaMyU+LwFqbI+wAJBHgvxzdWo35+J9/ZtM3TAI12MhDbbqsrRzd4xaEcT4KSpy9PJUvdmz8+kAlX3bODfACBFUwrbBlqWfQQTQUzu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a5R0zvar; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=p7sLGKcp7wY+RFP8ckLb1/NFB+mFd7a2lsldeaLPucGSIfzZ79LBbK03qtPJ/5dD1kqNoG0d8lA6Nx7o+PT9uPno+UFT1wK2slLQVBH+HHgMGWymm8MD9Z/R6Gc4XjQnYSaOhYO6c/8dPhgIyns6wVZ3W+CBJBrU1W9kfuHnSv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U8+ok9Xj; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747244065;
+	s=mimecast20190719; t=1747244368;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Mi+ZyIRicg0MtDqlOGNscgLfMwwnzViispwL1nSnpp0=;
-	b=a5R0zvarDiZGiiuabmaOo6sVkRttvJ7zolw5s5sf/P0MUrjfheauMAM8UZY21e1yWHJfSd
-	YCB4RePVy2braj6Zr8WR5RNPTqVyMf7wdQ83tUgGWef8+voe8w6QuXF8cAIg716agAYIJ6
-	7Mx00+Vna7FPrr8LUwp+KObcwHjdNjc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Vk9Xh8XvArJD+LRx2+377usNjpdXE43bkUgaFQ0lI2A=;
+	b=U8+ok9XjkioIqI3DdL40Qk2yrLW7AxXk+VBQqXF25RaUzxrrb/EBzTYpYJCkhkotExB5HQ
+	oI60ymPmIK4EvQpf+PYAeA/2kPA49v5xwPtGDwBWQSIQinZoWTtHuLjkUfwLeJ5eiqL4JE
+	RyjRbABvoCvEhCs6CSOxyyF+vlmdgtE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-376-7414ZKs5M8-dMDKQfyMUCg-1; Wed, 14 May 2025 13:34:24 -0400
-X-MC-Unique: 7414ZKs5M8-dMDKQfyMUCg-1
-X-Mimecast-MFC-AGG-ID: 7414ZKs5M8-dMDKQfyMUCg_1747244063
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a0b7c8b3e2so22622f8f.1
-        for <kvm@vger.kernel.org>; Wed, 14 May 2025 10:34:24 -0700 (PDT)
+ us-mta-473-98Ge370hMXCP61zFZ0QKpw-1; Wed, 14 May 2025 13:39:27 -0400
+X-MC-Unique: 98Ge370hMXCP61zFZ0QKpw-1
+X-Mimecast-MFC-AGG-ID: 98Ge370hMXCP61zFZ0QKpw_1747244366
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf44b66f7so434385e9.1
+        for <kvm@vger.kernel.org>; Wed, 14 May 2025 10:39:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747244063; x=1747848863;
+        d=1e100.net; s=20230601; t=1747244366; x=1747849166;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=Mi+ZyIRicg0MtDqlOGNscgLfMwwnzViispwL1nSnpp0=;
-        b=RpHQ3iaib6N5e6aYJaPa7QGHX09kBh498dbW/pCycq+xeSkSmuhyTAtBytYAg63PjP
-         g2KRsq4Yk4j0OTKMA7trU0QDHe7WY2EZa/RndpX4ZXaBMc6rAJ0qXy5zSGL5PDeh+zZb
-         QFGR6lsNwoCeo9RmKZ5WOdt5Vh3HeFYFubTLYCI+XDPy7JVfQ7PHKshSeIqj9oduA6iq
-         qid03Lh3nfCh0kfXCcQZkLI7J7RGY+3AkOzLRtsi9MPUd7fBy4jaWy1CJsX4QtFD1UBn
-         la/sH+q6n7DgkzMYhCG0V9ttg2RSh3NPNrZkfft9jfd+ep6fRxzc2SLJRg8UjO3+Xwok
-         Nexw==
-X-Forwarded-Encrypted: i=1; AJvYcCUtJ4Kdx2YOb6VCvncbhK+ElUIs6WZShWa5PMURxL3vgulZajy/hl+d/AXE6nPBwnYoGVc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1RYpu4WAMerIV/dqxTjd3gDtdayE3MaXdkKnRGbb49CTYOSGg
-	n0PjT8ZvnQOI+N8nged0ebtHSpBWsNxyRlumDFiXBu4W9JxcfQyD9ntjDgCopNFBM0JfJEka6IP
-	m2jIuwlwAzUJ5V2YpSgVOj/cu26SJMXol68vNoVSI6Zkddwrulg==
-X-Gm-Gg: ASbGnctFrAhe6LZoUPioz5oAbwl0RyaQeDL2Q0kQYXStjVzsCsEmgSXqTDvksPY624n
-	8u/eYvrphxnmC9lIheBIvaXTioTWNamyuwYh5ShdJtfsKcCkk/1NkapdPmT3CgrFF8+zBjLVvoZ
-	1SQAtTPeUeDD/dvBIsfpt0MzjlRktuhCdFl901gSS+AY1vsnf4GU2Z+HuqypumOlh/z3+MdMeOa
-	FS6peBJsdz25WxdKlLtkeI8iLmBNhUGLlOR4MM6G7xOGyyZQFW4WS+jfySQC9C3DJ0i79k5tWRX
-	pENsjgZxxFvejERyK4+vCR21lzlcSKcfbeXCLwfl8jHgOUyw4Cr7eRM6RFBILa447DQBuKRQVfy
-	sqkTA1uFYCQUvCKFPvkm8EN47075yxuyo+G9TyT4=
-X-Received: by 2002:a05:6000:2aa:b0:3a3:4bb4:8464 with SMTP id ffacd0b85a97d-3a34bb48467mr2686877f8f.8.1747244063467;
-        Wed, 14 May 2025 10:34:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFa3g3LP+U+uSfcYupSsUHt9Zkl25zLjBPUACeKrUZx2gS4O4Cucoe5dqK//Bex5xxb0o9t3g==
-X-Received: by 2002:a05:6000:2aa:b0:3a3:4bb4:8464 with SMTP id ffacd0b85a97d-3a34bb48467mr2686856f8f.8.1747244063070;
-        Wed, 14 May 2025 10:34:23 -0700 (PDT)
+        bh=Vk9Xh8XvArJD+LRx2+377usNjpdXE43bkUgaFQ0lI2A=;
+        b=KaR+GImSe4BG+JzfP9+D1XMZq1MKBzRyGxAvQoIr4Shna2nYspnngQz46AUz0Ic5Qm
+         1BuGlGL5vMtPOGKK/r9Qi9AXZYu5PIMtsNx5O5H3tXU7QmnCsUm2L2QNrEAyKbRXG2s9
+         GmAUqhKORtuHh/dDtN8E+Avru7BrO2n64eStCPcaYiIV2mJl/dj0adAQ8MsuomNANPdC
+         jLy/18Xr+Uk9xWVjQ4BKdPCFfUMqow/iWq/h/IUYPfah2qDhSx7fKrywFiEnFXRm84dv
+         Tc9p2Pe+ZbvtxwZwlPcoHrH8q3+2n6o6Sk1EggLY+1HIlIF2NNPUpFuKXXszt9Ghz96U
+         wCIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVLEyAmtTK0ifQXUolCVWBw0LOZZsWXj7xnWvedFbZQAItvlpsVOfOMK736GShlgJKyQoM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgHo4zJA6panZCVgIPUsH1ztpXdQZtcjfO9LejZSZBS3vTFa1p
+	n5HTBTv0CUcLZXRelR1etvgxuPXGagpY61mcVigo49Sm29LD7wom0AKL94CrQa4UdNeqIsyADYa
+	gAPtiSocNwXo0/Ab8yYkT/BW3eF93/0xz6pXmE7MhTjejF1ho2A==
+X-Gm-Gg: ASbGncvDm1B7iFiaN9YS6joxL1UuV/H/b+scWULwdLAzP8n0pZR51HbSPtts3ETYIGf
+	wbG0OVziKokBgP4t0/nE8HUAxE/xUeUez8AoiC0vra/UgBE4eWi7H+bP0L/JsE9jcyXeSH16hiG
+	RRkSfCegN69qvgr+OnpXB1+oGPxj5YbYc33ApPFWB3It81b3gNTYxeUcv6U3uOCQJlBJAM1jr9x
+	PeV4F95GnRGodJFMBDgqBJR0YOp7lhtrO2C3Il0YSR4IxIxTHcL2gPBiK1GnX/+YrHZseNS3J1r
+	SONKbOsDLvI0U32eMzHXrH6vobiX6rz7YybjlzDdOERQbKgtir/O88UnT4N4p5f7CYkL49+Ptqo
+	QbEbNdW5OgcFjIroKcYwXuTqs6dKKBlXkxlRFS6g=
+X-Received: by 2002:a05:600c:358b:b0:43d:42b:e186 with SMTP id 5b1f17b1804b1-442f20e8141mr39825305e9.8.1747244365836;
+        Wed, 14 May 2025 10:39:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQHpSZjD5VZhXH8bp5bUHN2OiSM/BgOW5x2KH7T+UY5v92NfRDDAwGcMz7DinxHmUBaaQbew==
+X-Received: by 2002:a05:600c:358b:b0:43d:42b:e186 with SMTP id 5b1f17b1804b1-442f20e8141mr39825125e9.8.1747244365413;
+        Wed, 14 May 2025 10:39:25 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f15:6200:d485:1bcd:d708:f5df? (p200300d82f156200d4851bcdd708f5df.dip0.t-ipconnect.de. [2003:d8:2f15:6200:d485:1bcd:d708:f5df])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58f2b02sm20677344f8f.51.2025.05.14.10.34.22
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f5a2d96csm20462242f8f.69.2025.05.14.10.39.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 May 2025 10:34:22 -0700 (PDT)
-Message-ID: <2a46072c-ef97-40a4-9bb4-fe521232dea1@redhat.com>
-Date: Wed, 14 May 2025 19:34:21 +0200
+        Wed, 14 May 2025 10:39:24 -0700 (PDT)
+Message-ID: <d6acaa76-bba7-468f-be19-dc0696409eac@redhat.com>
+Date: Wed, 14 May 2025 19:39:22 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,15 +90,32 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] KVM: s390: Use ESCA instead of BSCA at VM init
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org
-References: <20250514-rm-bsca-v1-0-6c2b065a8680@linux.ibm.com>
+Subject: Re: [PATCH v9 08/17] KVM: guest_memfd: Check that userspace_addr and
+ fd+offset refer to same range
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
+ roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250513163438.3942405-1-tabba@google.com>
+ <20250513163438.3942405-9-tabba@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -146,40 +163,68 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250514-rm-bsca-v1-0-6c2b065a8680@linux.ibm.com>
+In-Reply-To: <20250513163438.3942405-9-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 14.05.25 18:34, Christoph Schlameuss wrote:
-> All modern IBM Z and Linux One machines do offer support for the
-> Extended System Control Area (ESCA). The ESCA is available since the
-> z114/z196 released in 2010.
-> KVM needs to allocate and manage the SCA for guest VMs. Prior to this
-> change the SCA was setup as Basic SCA only supporting a maximum of 64
-> vCPUs when initializing the VM. With addition of the 65th vCPU the SCA
-> was needed to be converted to a ESCA.
+On 13.05.25 18:34, Fuad Tabba wrote:
+> From: Ackerley Tng <ackerleytng@google.com>
 > 
-> Instead we will now allocate the ESCA directly upon VM creation
-> simplifying the code in multiple places as well as completely removing
-> the need to convert an existing SCA.
+> On binding of a guest_memfd with a memslot, check that the slot's
+> userspace_addr and the requested fd and offset refer to the same memory
+> range.
 > 
-> In cases where the ESCA is not supported (z10 and earlier) the use of
-> the SCA entries and with that SIGP interpretation are disabled for VMs.
-> This increases the number of exits from the VM in multiprocessor
-> scenarios and thus decreases performance.
+> This check is best-effort: nothing prevents userspace from later mapping
+> other memory to the same provided in slot->userspace_addr and breaking
+> guest operation.
+> 
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Suggested-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>   virt/kvm/guest_memfd.c | 37 ++++++++++++++++++++++++++++++++++---
+>   1 file changed, 34 insertions(+), 3 deletions(-)
+> 
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 8e6d1866b55e..2f499021df66 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -556,6 +556,32 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+>   	return __kvm_gmem_create(kvm, size, flags);
+>   }
+>   
+> +static bool kvm_gmem_is_same_range(struct kvm *kvm,
+> +				   struct kvm_memory_slot *slot,
+> +				   struct file *file, loff_t offset)
+> +{
+> +	struct mm_struct *mm = kvm->mm;
+> +	loff_t userspace_addr_offset;
+> +	struct vm_area_struct *vma;
+> +	bool ret = false;
+> +
+> +	mmap_read_lock(mm);
+> +
+> +	vma = vma_lookup(mm, slot->userspace_addr);
+> +	if (!vma)
+> +		goto out;
+> +
+> +	if (vma->vm_file != file)
+> +		goto out;
+> +
+> +	userspace_addr_offset = slot->userspace_addr - vma->vm_start;
+> +	ret = userspace_addr_offset + (vma->vm_pgoff << PAGE_SHIFT) == offset;
 
-Trying to remember vsie details ... I recall that for the vsie we never 
-cared about the layout, because we simply pin+forward the given block, 
-but disable any facility that would try de-referencing the vcpu 
-pointers. So we only pin a single page.
+You'd probably have to iterate over the whole range (which might span 
+multiple VMAs), but reading the discussion, I'm fine with dropping this 
+patch for now.
 
-pin_blocks() documents: "As we reuse the sca, the vcpu pointers 
-contained in it are invalid. We must therefore not enable any facilities 
-that access these pointers (e.g. SIGPIF)."
+I think it's more important to document that thoroughly: what does it 
+mean when we use GUEST_MEMFD_FLAG_SUPPORT_SHARED and then pass that fd 
+in a memslot.
 
-
-So I assume this change here will not affect (degrade) when being run as 
-a nested hypervisor, right?
+Skimming over patch #15, I assume this is properly documented in there.
 
 -- 
 Cheers,
