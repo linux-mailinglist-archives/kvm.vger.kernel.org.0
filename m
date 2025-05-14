@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-46594-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46595-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34AE4AB7A14
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 01:56:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94606AB7A18
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 01:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7A281BA6DAC
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 23:56:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96EF33AC2FE
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 23:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F6F261574;
-	Wed, 14 May 2025 23:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA45264A63;
+	Wed, 14 May 2025 23:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N+4E1C+O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xcZycVHj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E4A25D528
-	for <kvm@vger.kernel.org>; Wed, 14 May 2025 23:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEE125DD15
+	for <kvm@vger.kernel.org>; Wed, 14 May 2025 23:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747266241; cv=none; b=dav95IWN+lsFt/mPiN9dpLpX+ieuaHl3CpMs3BBVRXOkAAmV2F+UCFvG9GKfBv1wge8B1vcvfQt9RUVFalVjigMinj0h8+xFyoG+5PK5c1EUKqEn2E89b+Avw6phd0SFDsDGyNb6vIdHtXnediobMI37k99vqSWVbDTpPfoWUic=
+	t=1747266242; cv=none; b=gH7FMxbeLrjyP+FHQYktm2I8X/hjp+PGvpdog6emHGUY+cpNouA3VaIFKWso+pKRixcSGPZMwlY4oEmG99gmjSdm8/EfHuPQF4lGkf8bycGF+/cMbbUDcQQolLhzpVNt8pQP4dI4Cj0Yuo69eyPQ5iX1u4SmFygoEKcxOM+UPQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747266241; c=relaxed/simple;
-	bh=102GvifG4zt1ttrSz67mMu9EOxHXu/R1+sbn9BQTSZg=;
+	s=arc-20240116; t=1747266242; c=relaxed/simple;
+	bh=3P1w96IQ4XSGB18Ay+axlVK9B9zTFk4aMEWu6OYLYcM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fSWWpFTJjJ6vEbIkwrfbOP/+I9ny++t4MMormQhFUJ3+fuESqozDVHDrj0TYuPpyU8FvROTpWiW+q7P0OT+mg/YYHk8oiDmOrW7RMVMNQaokLT1ZVUVYstoJshUS2SWsgbc+A0FtMvz3NfLhwv0MaPzAVbS3oObxhvk9yu7y6wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N+4E1C+O; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=eYpvs6osX7beGgJXb3zDB4bTL4W6WUb29LqD45gMarYvgxDFcVE+iYZJLblL5erkZJDSfBaxhvGNTN0Ep6tyO6maJNt3KJu5AuVYzLqiWg3ZZX8+m/207uPH1N4wzcOPVV9JEUYJv40WTcMdffEpBjUd/Cg9a+ceTJCi+9rYKdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xcZycVHj; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22e45821fd7so3487635ad.0
-        for <kvm@vger.kernel.org>; Wed, 14 May 2025 16:43:59 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b00e4358a34so167138a12.0
+        for <kvm@vger.kernel.org>; Wed, 14 May 2025 16:44:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747266238; x=1747871038; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747266240; x=1747871040; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pmGFcMqll2ZECWkoZDuet36vvCpdEEo2q3JYb5OCRKk=;
-        b=N+4E1C+O66u/2AsRaBgT91MJS9ng42C+9NjRXQ3YNyKU42nyuFhpbcN/JwWuKvlEPU
-         en9fcu8azoG/a1PQ9ifKcy0UelB0dOwmMHBEn3F8BobX7Y0NcbQu84cWord+3mL4H/ln
-         xiQIdnqLrpcgCGVHBFog50fU327p7AhtoEDvulCt5TV1Ze50XVp/fOCRUloIh8ssPVQ5
-         QIVgG7r7e36Z6YwJl7QyeK0b4B+WCmU4koDKATAzizKCStQeElL5CQBd25B78Mmo1UDa
-         xfPtDymGbD34ZlOi7ghcLmQfbgRHlM3lNj5NTX7DORFiAHu4VCebVNrob22VaWRdbc6f
-         K2XQ==
+        bh=w59iMjR8iadMOYtl6Kc2hNNZvpxUqRzRIVqBODddmXk=;
+        b=xcZycVHjw4RW8M98HOF38surOmCoUT/RcVNXxjoYmXfH9icQ7eV6ADwT8IiFkZlj5M
+         Pk/ljf6tJvphd+g9iL+9GgoaEQQ1SCdsP7SlLy83xGR49hnpp3B4lUIzg6GqE+3NQUko
+         IkrPuY3oW7qPqNp2nCBX0w6YGUo1TdNZP4Mnv9aASeFQyQIrQFP4cZ9T1U3Shl67Hn8V
+         JkV7EYXDaQWTOD6u0/rxSR4HOqBCszHwJ+yza/kDK/NWsCN9qrGd0SjmVGXzIZserK7/
+         9kJ5zDqZFQH8jWudyy9kwytRoOMm0lLjhnJgRtDsByPmbTGlSX1ElftINp8ZsEgIsjXe
+         d9Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747266238; x=1747871038;
+        d=1e100.net; s=20230601; t=1747266240; x=1747871040;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pmGFcMqll2ZECWkoZDuet36vvCpdEEo2q3JYb5OCRKk=;
-        b=pxjAJe9GCdiIawlotNDakSt8+yGNsjZ7HTMTWPc+6Y6gjzMMB0Ix6iAKhWdzwAv2qf
-         htfzg8hhoF7BYOuoB0MthEodOvwaBTRLiMdHFBF3VtrDGI7Ey+4exptuYB8wAjE+1XgO
-         tmGBbiIzHy07fuK/GGk1/Ro0xh6eFzvyFWtdrfAxiPXUUtGHnd/9kJ/uP755z8m77bDK
-         S8Sg0JXuSpXhUAIStCvX4KrsUIJ0csbwtWh8SAtXrFkPTERaTZURpUcJgup8NNinOaW4
-         S5J+enmAxVGJvExjt0vooHaxuOPU5kEZ1mHt5SG1NoO3m4LB+dKsgJupLzkgAeXtFehj
-         iWaA==
-X-Gm-Message-State: AOJu0Yzuun6zXslHAtoqwphzcI5N2yUf5GUvZWIoSZQhysNXyX9YmEp7
-	D+v+TNCC/kkKvJQFfHG4gW4Zt4dluJAlljEdKn6hUwHFNfy2podbNiZ8N8nApi1ZbOEbwWZBiDa
-	iy8PUHmcw4H+6s+gSWArrpP3Iu+CYC2TFjCJPSIpYSofpwgundD8eBymHDsBcJBdwTClrqgI+5x
-	VVQWSS9ba/vJczLUVdkVkbU6PIZn6FO2C+Q/8TNBvXjxfzpQmtbcjCyf8=
-X-Google-Smtp-Source: AGHT+IGyG3aK+TPRgSsxWpjag/A4ruHzJ2SmD21jLoxWwmPBfdNpP7Yc+Ypfwlkx2TEetNXBaMC3rrsf4RqZeQwBkA==
-X-Received: from pjbsz11.prod.google.com ([2002:a17:90b:2d4b:b0:308:7499:3dfc])
+        bh=w59iMjR8iadMOYtl6Kc2hNNZvpxUqRzRIVqBODddmXk=;
+        b=Qr3iXTKPAks2mPStP2486M9YJgLZEF77fUgPQejK8/DrOC3boG87n0B8teJGKxKKIC
+         WKmu2G52PCu+pvh1CdnVdnje8HcYNEW3z7on5BfRSLF0OmqRj2w3uUBKAHvKN+cBL1Mu
+         poTtKxkF3+lbbRaYY354hkDo3HLn1mO40rEEKsD9IaKS5uFVhM6l4bFPZMpMO+BCgd1C
+         HYWwK3mgpsuz1sytRvITYxyoGrG+G2J3Akc6UBW3atcMbg6oBcDZ6ZzgFjrQx/72Ykei
+         v3Vi277IyPkGve9nWaUPpQOIj0CKTjnXOejWUuZh0GJ9xV4z3Sjm2fX9S/o4GJs/Hfe7
+         WcCQ==
+X-Gm-Message-State: AOJu0YxzbzIZXPK2kRULkszSVNC4GSQ/vYMI+Dqaz3J9crCtXHz8d6yS
+	PBTqT1gMgdjZ/Ow4gqu26EleRkWIcAqEzR/CyIO4bGxzUFt5KmWsYCUIZzwMoUFyR46/dsqLAjl
+	G3Syxx74afRzKqBIYqAbtIcrNrBeXmUdPd/jjbQQ3f663b2Qzm1fQUEzV8D3rnmXTEXq2qsRXzq
+	ojD8fJoAVTe5QAPA9Jfa23rGotLYRyBKFJ0gJaGwnvrwfTjalsYwSxhhQ=
+X-Google-Smtp-Source: AGHT+IGyLkn3nqeNKfrPwmXh8d7PdkrS0NNj4rvg8/rg8+lUUn5fqkFx2CkNgkz2N4cDBWoYAECpFAIq4YtOUG++oA==
+X-Received: from pjbsy6.prod.google.com ([2002:a17:90b:2d06:b0:2e0:915d:d594])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:228a:b0:223:60ce:2451 with SMTP id d9443c01a7336-231b5e26004mr6306905ad.15.1747266237995;
- Wed, 14 May 2025 16:43:57 -0700 (PDT)
-Date: Wed, 14 May 2025 16:42:18 -0700
+ 2002:a17:90b:38cc:b0:2ff:5ec1:6c6a with SMTP id 98e67ed59e1d1-30e2e5dcdcamr9260937a91.18.1747266239615;
+ Wed, 14 May 2025 16:43:59 -0700 (PDT)
+Date: Wed, 14 May 2025 16:42:19 -0700
 In-Reply-To: <cover.1747264138.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1747264138.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.49.0.1045.g170613ef41-goog
-Message-ID: <625bd9c98ad4fd49d7df678f0186129226f77d7d.1747264138.git.ackerleytng@google.com>
-Subject: [RFC PATCH v2 39/51] KVM: guest_memfd: Merge and truncate on fallocate(PUNCH_HOLE)
+Message-ID: <3f48795c0c34f4faf661394e5ad9805f9014ae23.1747264138.git.ackerleytng@google.com>
+Subject: [RFC PATCH v2 40/51] KVM: guest_memfd: Update kvm_gmem_mapping_order
+ to account for page status
 From: Ackerley Tng <ackerleytng@google.com>
 To: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
 	x86@kernel.org, linux-fsdevel@vger.kernel.org
@@ -111,188 +112,139 @@ Cc: ackerleytng@google.com, aik@amd.com, ajones@ventanamicro.com,
 	yuzenghui@huawei.com, zhiquan1.li@intel.com
 Content-Type: text/plain; charset="UTF-8"
 
-Merge and truncate on fallocate(PUNCH_HOLE), but if the file is being
-closed, defer merging to folio_put() callback.
+kvm_gmem_mapping_order() should return the maximum mapping order for a
+gfn if a page were to be faulted in for that gfn.
 
-Change-Id: Iae26987756e70c83f3b121edbc0ed0bc105eec0d
+For inodes that support a custom allocator, the maximum mapping order
+should be determined by the custom allocator in conjunction with
+guest_memfd.
+
+This patch updates kvm_gmem_mapping_order() to take into account that
+for the guestmem_hugetlb custom allocator, pages are split if any page
+in a huge page range is shared.
+
+Change-Id: I5c061af6cefdcbd708a4334cd58edc340afcf44e
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
- virt/kvm/guest_memfd.c | 76 +++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 68 insertions(+), 8 deletions(-)
+ virt/kvm/guest_memfd.c | 72 ++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 62 insertions(+), 10 deletions(-)
 
 diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index cb426c1dfef8..04b1513c2998 100644
+index 04b1513c2998..8b5fe1360e58 100644
 --- a/virt/kvm/guest_memfd.c
 +++ b/virt/kvm/guest_memfd.c
-@@ -859,6 +859,35 @@ static int kvm_gmem_restructure_folios_in_range(struct inode *inode,
+@@ -709,19 +709,27 @@ static int kvm_gmem_split_folio_in_filemap(struct inode *inode, struct folio *fo
  	return ret;
  }
  
-+static long kvm_gmem_merge_truncate_indices(struct inode *inode, pgoff_t index,
-+					   size_t nr_pages)
++static inline bool kvm_gmem_should_split_at_index(struct inode *inode,
++						  pgoff_t index)
 +{
-+	struct folio *f;
-+	pgoff_t unused;
-+	long num_freed;
++	pgoff_t index_floor;
++	size_t nr_pages;
++	void *priv;
 +
-+	unmap_mapping_pages(inode->i_mapping, index, nr_pages, false);
++	priv = kvm_gmem_allocator_private(inode);
++	nr_pages = kvm_gmem_allocator_ops(inode)->nr_pages_in_folio(priv);
++	index_floor = round_down(index, nr_pages);
 +
-+	if (!kvm_gmem_has_safe_refcount(inode->i_mapping, index, nr_pages, &unused))
-+		return -EAGAIN;
-+
-+	f = filemap_get_folio(inode->i_mapping, index);
-+	if (IS_ERR(f))
-+		return 0;
-+
-+	/* Leave just filemap's refcounts on the folio. */
-+	folio_put(f);
-+
-+	WARN_ON(kvm_gmem_merge_folio_in_filemap(inode, f));
-+
-+	num_freed = folio_nr_pages(f);
-+	folio_lock(f);
-+	truncate_inode_folio(inode->i_mapping, f);
-+	folio_unlock(f);
-+
-+	return num_freed;
++	return kvm_gmem_has_some_shared(inode, index_floor, nr_pages);
 +}
 +
- #else
- 
  static inline int kvm_gmem_try_split_folio_in_filemap(struct inode *inode,
-@@ -874,6 +903,12 @@ static int kvm_gmem_restructure_folios_in_range(struct inode *inode,
- 	return 0;
- }
+ 						      struct folio *folio)
+ {
+-	size_t to_nr_pages;
+-	void *priv;
+-
+ 	if (!kvm_gmem_has_custom_allocator(inode))
+ 		return 0;
  
-+static long kvm_gmem_merge_truncate_indices(struct inode *inode, pgoff_t index,
-+					   size_t nr_pages)
-+{
-+	return 0;
-+}
-+
- #endif
+-	priv = kvm_gmem_allocator_private(inode);
+-	to_nr_pages = kvm_gmem_allocator_ops(inode)->nr_pages_in_page(priv);
+-
+-	if (kvm_gmem_has_some_shared(inode, folio->index, to_nr_pages))
++	if (kvm_gmem_should_split_at_index(inode, folio->index))
+ 		return kvm_gmem_split_folio_in_filemap(inode, folio);
+ 
+ 	return 0;
+@@ -890,6 +898,12 @@ static long kvm_gmem_merge_truncate_indices(struct inode *inode, pgoff_t index,
  
  #else
-@@ -1182,8 +1217,10 @@ static long kvm_gmem_truncate_indices(struct address_space *mapping,
-  *
-  * Removes folios beginning @index for @nr_pages from filemap in @inode, updates
-  * inode metadata.
-+ *
-+ * Return: 0 on success and negative error otherwise.
-  */
--static void kvm_gmem_truncate_inode_aligned_pages(struct inode *inode,
-+static long kvm_gmem_truncate_inode_aligned_pages(struct inode *inode,
- 						  pgoff_t index,
- 						  size_t nr_pages)
+ 
++static inline bool kvm_gmem_should_split_at_index(struct inode *inode,
++						  pgoff_t index)
++{
++	return false;
++}
++
+ static inline int kvm_gmem_try_split_folio_in_filemap(struct inode *inode,
+ 						      struct folio *folio)
  {
-@@ -1191,19 +1228,34 @@ static void kvm_gmem_truncate_inode_aligned_pages(struct inode *inode,
- 	long num_freed;
- 	pgoff_t idx;
- 	void *priv;
-+	long ret;
- 
- 	priv = kvm_gmem_allocator_private(inode);
- 	nr_per_huge_page = kvm_gmem_allocator_ops(inode)->nr_pages_in_folio(priv);
- 
-+	ret = 0;
- 	num_freed = 0;
- 	for (idx = index; idx < index + nr_pages; idx += nr_per_huge_page) {
--		num_freed += kvm_gmem_truncate_indices(
--			inode->i_mapping, idx, nr_per_huge_page);
-+		if (mapping_exiting(inode->i_mapping) ||
-+		    !kvm_gmem_has_some_shared(inode, idx, nr_per_huge_page)) {
-+			num_freed += kvm_gmem_truncate_indices(
-+				inode->i_mapping, idx, nr_per_huge_page);
-+		} else {
-+			ret = kvm_gmem_merge_truncate_indices(inode, idx,
-+							      nr_per_huge_page);
-+			if (ret < 0)
-+				break;
-+
-+			num_freed += ret;
-+			ret = 0;
-+		}
- 	}
- 
- 	spin_lock(&inode->i_lock);
- 	inode->i_blocks -= (num_freed << PAGE_SHIFT) / 512;
- 	spin_unlock(&inode->i_lock);
-+
-+	return ret;
+@@ -1523,7 +1537,7 @@ static inline struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
+ 	return get_file_active(&slot->gmem.file);
  }
+ 
+-static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
++static pgoff_t kvm_gmem_get_index(const struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+ 	return gfn - slot->base_gfn + slot->gmem.pgoff;
+ }
+@@ -2256,14 +2270,52 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+ EXPORT_SYMBOL_GPL(kvm_gmem_get_pfn);
  
  /**
-@@ -1252,8 +1304,10 @@ static void kvm_gmem_zero_range(struct address_space *mapping,
-  *
-  * Removes full (huge)pages from the filemap and zeroing incomplete
-  * (huge)pages. The pages in the range may be split.
+- * Returns the mapping order for this @gfn in @slot.
++ * kvm_gmem_mapping_order() - Get the mapping order for this @gfn in @slot.
 + *
-+ * Return: 0 on success and negative error otherwise.
++ * @slot: the memslot that gfn belongs to.
++ * @gfn: the gfn to look up mapping order for.
+  *
+  * This is equal to max_order that would be returned if kvm_gmem_get_pfn() were
+  * called now.
++ *
++ * Return: the mapping order for this @gfn in @slot.
   */
--static void kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
-+static long kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
- 					  loff_t lend)
+ int kvm_gmem_mapping_order(const struct kvm_memory_slot *slot, gfn_t gfn)
  {
- 	pgoff_t full_hpage_start;
-@@ -1263,6 +1317,7 @@ static void kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
- 	pgoff_t start;
- 	pgoff_t end;
- 	void *priv;
-+	long ret;
- 
- 	priv = kvm_gmem_allocator_private(inode);
- 	nr_per_huge_page = kvm_gmem_allocator_ops(inode)->nr_pages_in_folio(priv);
-@@ -1279,10 +1334,11 @@ static void kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
- 		kvm_gmem_zero_range(inode->i_mapping, start, zero_end);
- 	}
- 
-+	ret = 0;
- 	if (full_hpage_end > full_hpage_start) {
- 		nr_pages = full_hpage_end - full_hpage_start;
--		kvm_gmem_truncate_inode_aligned_pages(inode, full_hpage_start,
--						      nr_pages);
-+		ret = kvm_gmem_truncate_inode_aligned_pages(
-+			inode, full_hpage_start, nr_pages);
- 	}
- 
- 	if (end > full_hpage_end && end > full_hpage_start) {
-@@ -1290,6 +1346,8 @@ static void kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
- 
- 		kvm_gmem_zero_range(inode->i_mapping, zero_start, end);
- 	}
-+
-+	return ret;
- }
- 
- static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
-@@ -1298,6 +1356,7 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- 	pgoff_t start = offset >> PAGE_SHIFT;
- 	pgoff_t end = (offset + len) >> PAGE_SHIFT;
- 	struct kvm_gmem *gmem;
-+	long ret;
- 
- 	/*
- 	 * Bindings must be stable across invalidation to ensure the start+end
-@@ -1308,8 +1367,9 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- 	list_for_each_entry(gmem, gmem_list, entry)
- 		kvm_gmem_invalidate_begin_and_zap(gmem, start, end);
- 
-+	ret = 0;
- 	if (kvm_gmem_has_custom_allocator(inode)) {
--		kvm_gmem_truncate_inode_range(inode, offset, offset + len);
-+		ret = kvm_gmem_truncate_inode_range(inode, offset, offset + len);
- 	} else {
- 		/* Page size is PAGE_SIZE, so use optimized truncation function. */
- 		truncate_inode_pages_range(inode->i_mapping, offset, offset + len - 1);
-@@ -1320,7 +1380,7 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- 
- 	filemap_invalidate_unlock(inode->i_mapping);
- 
 -	return 0;
++	struct inode *inode;
++	struct file *file;
++	int ret;
++
++	file = kvm_gmem_get_file((struct kvm_memory_slot *)slot);
++	if (!file)
++		return 0;
++
++	inode = file_inode(file);
++
++	ret = 0;
++	if (kvm_gmem_has_custom_allocator(inode)) {
++		bool should_split;
++		pgoff_t index;
++
++		index = kvm_gmem_get_index(slot, gfn);
++
++		filemap_invalidate_lock_shared(inode->i_mapping);
++		should_split = kvm_gmem_should_split_at_index(inode, index);
++		filemap_invalidate_unlock_shared(inode->i_mapping);
++
++		if (!should_split) {
++			size_t nr_pages;
++			void *priv;
++
++			priv = kvm_gmem_allocator_private(inode);
++			nr_pages = kvm_gmem_allocator_ops(inode)->nr_pages_in_folio(priv);
++
++			ret = ilog2(nr_pages);
++		}
++	}
++
++	fput(file);
 +	return ret;
  }
+ EXPORT_SYMBOL_GPL(kvm_gmem_mapping_order);
  
- static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
 -- 
 2.49.0.1045.g170613ef41-goog
 
