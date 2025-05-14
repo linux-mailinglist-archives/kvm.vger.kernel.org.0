@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-46604-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46605-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 624E2AB7A38
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 01:59:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B04FCAB7A37
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 01:59:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB104178BF8
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 23:59:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5431E1899E50
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 23:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5761326C399;
-	Wed, 14 May 2025 23:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C16726D4EF;
+	Wed, 14 May 2025 23:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xN3xVQ5M"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZIUZ4C7H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE37322DF86
-	for <kvm@vger.kernel.org>; Wed, 14 May 2025 23:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1753926B2CC
+	for <kvm@vger.kernel.org>; Wed, 14 May 2025 23:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747266256; cv=none; b=TTKMNHGTgICSRyv3CZ/fvn0C7pc2BK7MzNCG1jzMuJoA1H/hLvcSG327L/5u9lw6EZrz2bvwgkXSj1ndWsNnzRd4RoPL1TY3lpjNC8GCbRBVBdjAs5M2aKAou5YMkCFPjAVpB0zDAc84cGy7e5dhzRU9vOXb3OwX1WKlrLdZc1s=
+	t=1747266257; cv=none; b=Jget1ju2BUrZTXNyHSr/3S/+vN2Z2Pkyooy5rXm7WLxR6ZY7NpggKzwYzosAMM0JkMB2/kangisF4WhgXNzKCYPljMMlj9Qh6b1C+EwgIw3b4l+jUuIpboPs7DQNCz0/Kh6mJiAj5x5xf9gwORp7hN+b9998tGr7avkGoRIky9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747266256; c=relaxed/simple;
-	bh=W4BuF5k7B7Tw/7iEJJF+2Dr7h9c8MMcjTfURTwwSkno=;
+	s=arc-20240116; t=1747266257; c=relaxed/simple;
+	bh=eoNudGoVVrSmlzo9/8eda7elJKi5T0wlPjDob88hz8o=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fNQgbNxqTtX5e/j609lAFY6wOMW1kbQhGvuOOVNMJ9OgYmwqEui4zuOFCEJ/rV0uVOhiurwFh+KL1y1+BFgXJYJta8Ofha9qDtOBs5RgtGrmzSTHW8m7rwC30RRDi+QBgxAWQBzqEOALyYHCSFJePVcNKLYenoDPFXyK0eRx1Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xN3xVQ5M; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=Y1HFTT7RbdLZpyvl2q8Iqh5WHnVEO4VxNNJ6h5janI0Jr7XpSBfLiCk4U8SQgKqENzE9tg6+jlCNqdvwfmyrIddOrHQeRewW99/hLXCbK/2GRt09KWrONTeqr6uLw2VGBnCXQkeAjceAP/NF5MnBYAARuKPR219RUoczYr2Kpb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZIUZ4C7H; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30c4b072631so348551a91.2
-        for <kvm@vger.kernel.org>; Wed, 14 May 2025 16:44:14 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30ad109bc89so371857a91.0
+        for <kvm@vger.kernel.org>; Wed, 14 May 2025 16:44:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747266254; x=1747871054; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747266255; x=1747871055; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cgpRGOQjA/CW069YjbpUEsTR9l1DVf09U2PvTNruEdk=;
-        b=xN3xVQ5MBlt7ING8YtP7kdoFTcQQYr+idO4YOSfyE8Ov36J/U2IVYS69BUq7bVUYvk
-         BgUcHYh3wUgg+HuAv60t/SlMBOdOk4cGiJnIS0Ht5RH1DGVfbZ2sVTPn/vv/m44tInVj
-         sghXHb0U4NYVnjbsFBqKd9Go64SNTHw+S5Ty10gTT+6bSQp5lXMl3eXVy16vTNcx8Loy
-         sKlMvcW0WKkxHK8W50y8zkgqrH7QGGuoHNOrw2bMMWFaFsH81PApXdSLEJteHTaP+69r
-         wh9fYBCV4naU0lR5QDBaDCFSGq85ixY16itXygSnvMzesmHzpaZm/nc1n/qkKDfXr2ty
-         Yyhw==
+        bh=CiDwHat/uPl/OY4yi7AkHkDLS3qdk3FYn5t6iuFb10s=;
+        b=ZIUZ4C7HoQGw2645aJtKvzMePKkDWg2YY3lBkVh8ZoBfWikppORePjvgMFRRc8CEGd
+         Se5wGgpE+W9r1TW3HCFbVqmqPb+U5oq6HJip6HHYTJBX0ZTy129hxEM+oPB5zcg1oNCv
+         k/ex2jFIrFF5isODx6layZZHkpDFGoUh5hROc80TDxdIt2+1IPA1tR2+dvwfV/5OQgXm
+         K5M1T5p18C1k1AkmMjDGEYaIbZuJez88fyJbHqEfSuILs+ufG1fse2DSlCSY0RSGJGxi
+         hAjLlU16jYEpYscnbRxs1GTXZ1g4wLEZ2xeMsKw3LTSbyFxKRd52YNd1zR1OL8yM8bbJ
+         cNvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747266254; x=1747871054;
+        d=1e100.net; s=20230601; t=1747266255; x=1747871055;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cgpRGOQjA/CW069YjbpUEsTR9l1DVf09U2PvTNruEdk=;
-        b=eHFSidtEE+Cki2ggQP93Su6jcKVnqttFqg/PWsWShVjucDsZ7b+pPySDVt5x/vTNNJ
-         YzNMiMAFt7jz880vFwFtRBvQI8XPsNkGrP00OLanG5/fEn38kP9Qze+qTrgLmwCf5Ic6
-         PxQuvXw9Gw7w//+RvbbRrGd2wuZJtdBGnSZn00SxwraUpS1sjT7Nw4NObofNnAHQtyeI
-         Fll7XC18cq1Nf+rSp3Ytigc82jvovFrmMn8NUVEN62ThmYgbkoVIkMUniwKQCaJP/xOA
-         ACIs4InaPzq3mZc+/AhJzMWmG1JseyhSiW422Fe6hj35UUCES+sj9+01p61v5jswNDjD
-         5aFg==
-X-Gm-Message-State: AOJu0Yz4Dh2PJYXYX+bResMf1w/yoFOtur8z7ymHy79J/4olV5kfQebs
-	j1Dasc7FseyNXTqBpncdbJR/sbmjz0YmOq9AmsrqqKdyZC6aP37I3NilxdiIO/T0C+0RFQvuUzu
-	M3oLejhGFuAKYVJ7H3oqfsdI7NIn59BY9AGK6HzqZb82p7jJ6freFFJFzg+h8SJmqcyAB/zThgd
-	RzAqAfZARLbOrB1ZrsoiuPh8+o2MWX+HY94QvEZeyl/d+JP5dlHfh/P0Y=
-X-Google-Smtp-Source: AGHT+IGCW/uG3koL7ZmUpNQ3fu2bu9Qxb+Pwj1sAO0kEu9QYRpIBgr98bzhS9ZJB60f0G+PEHbBrD9llUcw4LLEWwA==
-X-Received: from pjboh6.prod.google.com ([2002:a17:90b:3a46:b0:2f4:465d:5c61])
+        bh=CiDwHat/uPl/OY4yi7AkHkDLS3qdk3FYn5t6iuFb10s=;
+        b=lsCF9+IuDhRmipCmuASQQcs4eHe+tlKGFztV+rzOBuiGRlKSj4EfjHWxozcoTOg7H5
+         kw6+c3SIJq4LstF4Ilmgor4jk2Pch+i3XvkpwrV2Gb6VXw8IgUoJUxq0Pyc1UKY+YnkV
+         GYMpRzlk36RdJ08TnH2SZzqAGu1EqvBwSJI77+zBzZtnrhn4qY+rS/n1sruAwekuyDSK
+         nXmGcdsnu8pyJD69DIiS3ZbCRhZwpAB+ZsTW0rxUTUcHYRlu/qFxtz9I+cauKmDbobv2
+         kUjlcMfIqEeuZrH6TCuRc9J+3/6da/TZiQouH2pWgSKFwk7lDfkfD5u4LDQQ8dw5we2j
+         IPMw==
+X-Gm-Message-State: AOJu0YwpdetXO27bhrdUbd1/TS36817yPvWOmeo5TzG4GaYh98X57JNR
+	CSTiP0IOOPL/bre9l8dHDXHrIcO4Poo8hFGqis3Oah0Ios9wu9lCA/TWiveH7mYoVIXaEDQs33e
+	66pPUDGHR2W/PGu/9uTS7jZf0HGzv9BdMo9Ui5+TEfTP+/h5P2C8f1G4jMkyfvnlP63eGE2C1/c
+	SGhqmvNVF3zkfbN9ybcSyk3OqaFNEeIxhNzPP8DzatYVKfWOkHjlZYyUE=
+X-Google-Smtp-Source: AGHT+IFOAM9UVwj4ad58iQw+X7kCOsmk0nNgnZGussZhDVj2+jakXhlWEPGRVMVXx6qiGavsIkJ+Vleisd/CLOi4bA==
+X-Received: from pjbsu3.prod.google.com ([2002:a17:90b:5343:b0:2fc:3022:36b8])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2d4f:b0:2fe:a336:fe63 with SMTP id 98e67ed59e1d1-30e5190763cmr782897a91.24.1747266253599;
- Wed, 14 May 2025 16:44:13 -0700 (PDT)
-Date: Wed, 14 May 2025 16:42:28 -0700
+ 2002:a17:90b:56cd:b0:2ff:7ad4:77b1 with SMTP id 98e67ed59e1d1-30e5156ea2bmr771844a91.2.1747266255223;
+ Wed, 14 May 2025 16:44:15 -0700 (PDT)
+Date: Wed, 14 May 2025 16:42:29 -0700
 In-Reply-To: <cover.1747264138.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1747264138.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.49.0.1045.g170613ef41-goog
-Message-ID: <d8cab3a09f541bebb327decc043d830da3384f9c.1747264138.git.ackerleytng@google.com>
-Subject: [RFC PATCH v2 49/51] KVM: selftests: Update private_mem_conversions_test.sh
- to test with HugeTLB pages
+Message-ID: <9c38fdff026b84f8e4a3e1279d5ed4eed6dce0ba.1747264138.git.ackerleytng@google.com>
+Subject: [RFC PATCH v2 50/51] KVM: selftests: Add script to test HugeTLB statistics
 From: Ackerley Tng <ackerleytng@google.com>
 To: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
 	x86@kernel.org, linux-fsdevel@vger.kernel.org
@@ -112,66 +111,120 @@ Cc: ackerleytng@google.com, aik@amd.com, ajones@ventanamicro.com,
 	yuzenghui@huawei.com, zhiquan1.li@intel.com
 Content-Type: text/plain; charset="UTF-8"
 
-Update test script to also test HugeTLB support for guest_memfd.
+This script wraps other tests to check that HugeTLB statistics are
+restored to what they were before the test was run.
 
+Does not account HugeTLB statistics updated by other non-test
+processes running in the background while the test is running.
+
+Change-Id: I1d827656ef215fd85e368f4a3629f306e7f33f18
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-
-Change-Id: I7c6cc25d6b86e1e0dc74018f46c7e2796fab6357
 ---
- .../kvm/x86/private_mem_conversions_test.sh   | 29 ++++++++++++++-----
- 1 file changed, 22 insertions(+), 7 deletions(-)
+ ...memfd_wrap_test_check_hugetlb_reporting.sh | 95 +++++++++++++++++++
+ 1 file changed, 95 insertions(+)
+ create mode 100755 tools/testing/selftests/kvm/guest_memfd_wrap_test_check_hugetlb_reporting.sh
 
-diff --git a/tools/testing/selftests/kvm/x86/private_mem_conversions_test.sh b/tools/testing/selftests/kvm/x86/private_mem_conversions_test.sh
-index 5dda6916e071..0d2c5fa729fd 100755
---- a/tools/testing/selftests/kvm/x86/private_mem_conversions_test.sh
-+++ b/tools/testing/selftests/kvm/x86/private_mem_conversions_test.sh
-@@ -57,6 +57,17 @@ backing_src_types+=( shmem )
- 	backing_src_types+=( shared_hugetlb ) || \
- 	echo "skipping shared_hugetlb backing source type"
- 
-+private_mem_backing_src_types=( private_mem_guest_mem )
-+[ -n "$hugepage_default_enabled" ] && \
-+	private_mem_backing_src_types+=( private_mem_hugetlb ) || \
-+	echo "skipping private_mem_hugetlb backing source type"
-+[ -n "$hugepage_2mb_enabled" ] && \
-+	private_mem_backing_src_types+=( private_mem_hugetlb_2mb ) || \
-+	echo "skipping private_mem_hugetlb_2mb backing source type"
-+[ -n "$hugepage_1gb_enabled" ] && \
-+	private_mem_backing_src_types+=( private_mem_hugetlb_1gb ) || \
-+	echo "skipping private_mem_hugetlb_1gb backing source type"
+diff --git a/tools/testing/selftests/kvm/guest_memfd_wrap_test_check_hugetlb_reporting.sh b/tools/testing/selftests/kvm/guest_memfd_wrap_test_check_hugetlb_reporting.sh
+new file mode 100755
+index 000000000000..475ec5c4ce1b
+--- /dev/null
++++ b/tools/testing/selftests/kvm/guest_memfd_wrap_test_check_hugetlb_reporting.sh
+@@ -0,0 +1,95 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Wrapper that runs test, checking that HugeTLB-related statistics have not
++# changed before and after test.
++#
++# Example:
++#   ./guest_memfd_wrap_test_check_hugetlb_reporting.sh ./guest_memfd_test
++#
++# Example of combining this with ./guest_memfd_provide_hugetlb_cgroup_mount.sh:
++#   ./guest_memfd_provide_hugetlb_cgroup_mount.sh \
++#     ./guest_memfd_wrap_test_check_hugetlb_reporting.sh \
++#     ./guest_memfd_hugetlb_reporting_test
++#
++# Copyright (C) 2025, Google LLC.
 +
- set +e
- 
- TEST_EXECUTABLE="$(dirname "$0")/private_mem_conversions_test"
-@@ -66,17 +77,21 @@ TEST_EXECUTABLE="$(dirname "$0")/private_mem_conversions_test"
- 
- 	for src_type in "${backing_src_types[@]}"; do
- 
--		set -x
-+		for private_mem_src_type in "${private_mem_backing_src_types[@]}"; do
- 
--                $TEST_EXECUTABLE -s "$src_type" -n $num_vcpus_to_test
--		$TEST_EXECUTABLE -s "$src_type" -n $num_vcpus_to_test -m $num_memslots_to_test
-+			set -x
- 
--                $TEST_EXECUTABLE -s "$src_type" -n $num_vcpus_to_test -g
--		$TEST_EXECUTABLE -s "$src_type" -n $num_vcpus_to_test -m $num_memslots_to_test -g
-+			$TEST_EXECUTABLE -s "$src_type" -p "$private_mem_src_type" -n $num_vcpus_to_test
-+			$TEST_EXECUTABLE -s "$src_type" -p "$private_mem_src_type" -n $num_vcpus_to_test -m $num_memslots_to_test
- 
--		{ set +x; } 2>/dev/null
-+			$TEST_EXECUTABLE -s "$src_type" -p "$private_mem_src_type" -n $num_vcpus_to_test -g
-+			$TEST_EXECUTABLE -s "$src_type" -p "$private_mem_src_type" -n $num_vcpus_to_test -m $num_memslots_to_test -g
- 
--		echo
-+			{ set +x; } 2>/dev/null
++declare -A baseline
 +
-+			echo
++hugetlb_sizes=(
++  "2048kB"
++  "1048576kB"
++)
 +
-+		done
- 
- 	done
- )
++statistics=(
++  "free_hugepages"
++  "nr_hugepages"
++  "nr_overcommit_hugepages"
++  "resv_hugepages"
++  "surplus_hugepages"
++)
++
++cgroup_hugetlb_sizes=(
++  "2MB"
++  "1GB"
++)
++
++cgroup_statistics=(
++  "limit_in_bytes"
++  "max_usage_in_bytes"
++  "usage_in_bytes"
++)
++
++establish_statistics_baseline() {
++  for size in "${hugetlb_sizes[@]}"; do
++
++    for statistic in "${statistics[@]}"; do
++
++      local path="/sys/kernel/mm/hugepages/hugepages-${size}/${statistic}"
++      baseline["$path"]=$(cat "$path")
++
++    done
++
++  done
++
++  if [ -n "$HUGETLB_CGROUP_PATH" ]; then
++
++    for size in "${cgroup_hugetlb_sizes[@]}"; do
++
++      for statistic in "${cgroup_statistics[@]}"; do
++
++        local rsvd_path="${HUGETLB_CGROUP_PATH}/hugetlb.${size}.rsvd.${statistic}"
++        local path="${HUGETLB_CGROUP_PATH}/hugetlb.${size}.${statistic}"
++
++        baseline["$rsvd_path"]=$(cat "$rsvd_path")
++        baseline["$path"]=$(cat "$path")
++
++      done
++
++    done
++
++  fi
++}
++
++assert_path_at_baseline() {
++  local path=$1
++
++  current=$(cat "$path")
++  expected=${baseline["$path"]}
++  if [ "$current" != "$expected"  ]; then
++    echo "$path was $current instead of $expected"
++  fi
++}
++
++assert_statistics_at_baseline() {
++  for path in "${!baseline[@]}"; do
++    assert_path_at_baseline $path
++  done
++}
++
++
++establish_statistics_baseline
++
++$@
++
++assert_statistics_at_baseline
 -- 
 2.49.0.1045.g170613ef41-goog
 
