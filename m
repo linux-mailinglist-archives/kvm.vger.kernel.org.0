@@ -1,153 +1,157 @@
-Return-Path: <kvm+bounces-46411-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46412-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8381AB612F
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 05:26:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 009F0AB6138
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 05:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0335E1B446F9
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 03:26:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82AF41B44F84
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 03:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD001DE894;
-	Wed, 14 May 2025 03:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C9215199A;
+	Wed, 14 May 2025 03:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iDAjfITm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLqh14AK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E728A2260C;
-	Wed, 14 May 2025 03:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D3B1F0E20
+	for <kvm@vger.kernel.org>; Wed, 14 May 2025 03:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747193169; cv=none; b=Wrk1QZ7UkyK95CZ6OVGpS8ud2pVv+oMTSi/H9vPXtsdxEOqfaDQAo9pOsVvGQdOtgSxmynZYHQ4VW5polkTBca7Rjeffgo0dqpalY7A/YNpFxsThhl7BPAnu68fQik/29XUOybOjyYr+a3ra7qo6tl6F5vcnd0NU/EkJ1OOjjnU=
+	t=1747193406; cv=none; b=kBw6k368vOEdG7K4h6j/WPmeltVg559HVr0SahzL3jqO4SITpoe+8cHI9QZD5wAXhut2Ehuur7ieUAuS2mTlT27sh8bBgbHXITM9ungwB2T4rdgiuRVN5cl2hCw7GO+wpnLaG/Qp5lmYwBGXMj8NK9FI7BSkrWF4nXZZd4EM+zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747193169; c=relaxed/simple;
-	bh=Vl2JsS0XoEFiPBo2fr8NpOs+oJP1wxKRrrfjW+0W2cw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HgPAwgEf+5nllTVBdIma9ehGbt2ii4jksQK4z33u9DF8CyYaRn79X+kJDmtU9eIqxq/6Ylw/8SFI/vZg9e6L6IzBd3xQFbCja/YHseeigSiuCVLSq+hF2oEAn0Y9nUBuEE1mcEWwRhUy1J6/48RoJBHJaXGkSc5L57Gqfjhk9zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iDAjfITm; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747193168; x=1778729168;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Vl2JsS0XoEFiPBo2fr8NpOs+oJP1wxKRrrfjW+0W2cw=;
-  b=iDAjfITmbHsjerNVQjnIEb/F+0E0U0P8kvZkCez91M8aRa0evoQq3UNB
-   Q6pwqaob9QZVoaUfYBRpEJcCuxA6m+tnQS05wTrUaBwOQ92RN7OeaYnUW
-   TA3Drmnjesf6qZV9Rutm+H5gF43XF4TNV6qTl5wJloRxGwEqW8FGkMaPX
-   hlFhXGOBP9ocWbshZTHxDV4FHbygZEdRg6b9Rb5oGYThopzIP84Gb3+ot
-   nllM9/P9dD0xa8HU63RIfhdoKppvmwrIRe58iBIDjm9aRYy92n47t/RIM
-   mliqlLx596A1nNaSHsTGurjVzHSoanhCZdO3P8Fje4h7SHa1vEHKYmgqI
-   A==;
-X-CSE-ConnectionGUID: 8qYWF0CgQ7G5w5LYKjGj2w==
-X-CSE-MsgGUID: zrIJFVyCTcm/1jkAwhfExQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11432"; a="60471341"
-X-IronPort-AV: E=Sophos;i="6.15,287,1739865600"; 
-   d="scan'208";a="60471341"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 20:26:07 -0700
-X-CSE-ConnectionGUID: fvdv4vi/TEOML9s+DB98Cg==
-X-CSE-MsgGUID: IVD+dxO3Q+uiMjPNb8pcYw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,287,1739865600"; 
-   d="scan'208";a="137948936"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa007.fm.intel.com with ESMTP; 13 May 2025 20:26:01 -0700
-Date: Wed, 14 May 2025 11:20:27 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
-	christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
-	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
-	dan.j.williams@intel.com, yilun.xu@intel.com,
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	lukas@wunner.de, yan.y.zhao@intel.com, daniel.vetter@ffwll.ch,
-	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
-Message-ID: <aCQL+/HDYcxfWM4F@yilunxu-OptiPlex-7050>
-References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
- <371ab632-d167-4720-8f0d-57be1e3fee84@amd.com>
- <4b6dc759-86fd-47a7-a206-66b25a0ccc6d@amd.com>
- <c10bf9c2-e073-479d-ad1c-6796c592d333@amd.com>
- <aB3jLmlUKKziwdeG@yilunxu-OptiPlex-7050>
- <aB4tQHmHzHooDeTE@yilunxu-OptiPlex-7050>
- <20250509184318.GD5657@nvidia.com>
- <aB7Ma84WXATiu5O1@yilunxu-OptiPlex-7050>
- <2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
+	s=arc-20240116; t=1747193406; c=relaxed/simple;
+	bh=xe+r7aUNbKYL48IaCa6f/vynWducxTozNskiWKlpSl0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oXBLfG/0tz/IsFl4yiLl3xvuF2xe3XllEVRh6MiMtSOPeSapP0o8tOkDjiM58kHUqtjgkrtxwFtVsxUub3Fa3RwTL6V+4QI5hP/IgVfue8AIl7QDDp+Scft4TckmR/FaU096rQjkwIZzsMLsqy6CdQnqObnwPrsCWKbMr6GbsUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BLqh14AK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747193403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zPNj1R9ALDGy4ZhAvSAe9nUoPzbthadZcf4T/oJDS44=;
+	b=BLqh14AK3i7yq/SIhFdIqLoMtEscnaCcni++vjELUvuo9ccaUuNG2PsuvRAzWtKck4lnwI
+	R2978GwDIgjes9m5so8sPcCpaEpVDmYdNs7Q867VAmHwlgvCVjTK1SR+cDKBQzJmIhvOTu
+	iTk9sAxY4VXFDq+i+orSXwd7SHR2Y5Q=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-616-LLa-MH3MO9CK84JXdtBCiA-1; Tue, 13 May 2025 23:30:02 -0400
+X-MC-Unique: LLa-MH3MO9CK84JXdtBCiA-1
+X-Mimecast-MFC-AGG-ID: LLa-MH3MO9CK84JXdtBCiA_1747193402
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-742849f4155so464375b3a.1
+        for <kvm@vger.kernel.org>; Tue, 13 May 2025 20:30:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747193402; x=1747798202;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zPNj1R9ALDGy4ZhAvSAe9nUoPzbthadZcf4T/oJDS44=;
+        b=n5SPU3XLARj2nM5+KrGC//sIT/gUMVeQvTy+hQYQvMfbA/9K2lyezEiJZ7RnXK8zaR
+         5yCTqmJzi3QPYbXx+8BFtoLgVwqhzqHIUpmVOec4jN8yPmPzq7GXRiiJD+ygFKZDC/RI
+         dgJJsTKUQBgk0a6Byo3KvJIWq0b0sK9sPh8fLkoKwq2KDmWPR1Snq4ZqaDb7gS4x4ktJ
+         D2ua+6S8o7ldXvzXxImWEyOOY/mZxXpSlcU78iSGz3gd/Z7h2KC1VpVrGiHs+j4n2pz4
+         BzMHZzCmdR8BvQ9Go4I5hV8N/XcFT0Erm7Kl2HNlt7W46fsAudDRowUmRAiWAP4sREjU
+         IPTA==
+X-Gm-Message-State: AOJu0YwOeW/WzIXOm+MsIWMdYHN0HbjUmlqE787q8wxY9T3x36kqgOVi
+	8GZWB1GONH3cvfvQ1qnQcmnCMqCco6xD2DaeCYuJoBfTiHZMojb68cpXMUsG4X2mcBfoicqSxQP
+	DQ6pZOeg1sT5Hn2IyefmagE3c1gfnf/CZKl5gNpr+3Wjvbi7+9g==
+X-Gm-Gg: ASbGnctZ3qTP99fNtG22wmq1CMYEWMBISDhvwEe+1/GvavdvFKco48vXm5pWzm6Zou0
+	VEfk/lXnI3rN5Zw7tac92gZELiFfwnDPQZuWDPXLAm7Znx+cejr3+rF3JfTUgPIHvBejjjg3fJ/
+	cNPO0+PC/hDIo0VqY6cSBdwah79hBCMTZ2tJIf9ivmyJksYkqnQMPBLmeVJuw+IvdzXgacsbEKj
+	NvtjlekXcJTg9unrigH8A8vADSPFmHvi955ba39xRYrzVttagyLGhnmJKiX2iSVWCUnrObf/Fme
+	/Crf1LktZfCNQ1hs
+X-Received: by 2002:a05:6a00:849:b0:73e:2367:c914 with SMTP id d2e1a72fcca58-7428907dbbemr2608214b3a.7.1747193401134;
+        Tue, 13 May 2025 20:30:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE4NfRMilmo0WhS6bonXckoq6ayKF8QYGypn6TRZn6O1csy9tmwHCGt4njEOo+8VL50NM6NRQ==
+X-Received: by 2002:a05:6a00:849:b0:73e:2367:c914 with SMTP id d2e1a72fcca58-7428907dbbemr2608173b3a.7.1747193400666;
+        Tue, 13 May 2025 20:30:00 -0700 (PDT)
+Received: from [10.72.116.125] ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74237a8a3adsm8406109b3a.158.2025.05.13.20.29.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 May 2025 20:30:00 -0700 (PDT)
+Message-ID: <54b5bb37-5304-4e73-afc8-bf2a23e6490b@redhat.com>
+Date: Wed, 14 May 2025 11:29:51 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v3 04/16] run_tests.sh: Document
+ --probe-maxsmp argument
+To: Alexandru Elisei <alexandru.elisei@arm.com>, andrew.jones@linux.dev,
+ eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+ frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+ david@redhat.com, pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com,
+ maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
+References: <20250507151256.167769-1-alexandru.elisei@arm.com>
+ <20250507151256.167769-5-alexandru.elisei@arm.com>
+Content-Language: en-US
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20250507151256.167769-5-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, May 12, 2025 at 07:30:21PM +1000, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 10/5/25 13:47, Xu Yilun wrote:
-> > On Fri, May 09, 2025 at 03:43:18PM -0300, Jason Gunthorpe wrote:
-> > > On Sat, May 10, 2025 at 12:28:48AM +0800, Xu Yilun wrote:
-> > > > On Fri, May 09, 2025 at 07:12:46PM +0800, Xu Yilun wrote:
-> > > > > On Fri, May 09, 2025 at 01:04:58PM +1000, Alexey Kardashevskiy wrote:
-> > > > > > Ping?
-> > > > > 
-> > > > > Sorry for late reply from vacation.
-> > > > > 
-> > > > > > Also, since there is pushback on 01/12 "dma-buf: Introduce dma_buf_get_pfn_unlocked() kAPI", what is the plan now? Thanks,
-> > > > > 
-> > > > > As disscussed in the thread, this kAPI is not well considered but IIUC
-> > > > > the concept of "importer mapping" is still valid. We need more
-> > > > > investigation about all the needs - P2P, CC memory, private bus
-> > > > > channel, and work out a formal API.
-> > > > > 
-> > > > > However in last few months I'm focusing on high level TIO flow - TSM
-> > > > > framework, IOMMUFD based bind/unbind, so no much progress here and is
-> > > > > still using this temporary kAPI. But as long as "importer mapping" is
-> > > > > alive, the dmabuf fd for KVM is still valid and we could enable TIO
-> > > > > based on that.
-> > > > 
-> > > > Oh I forgot to mention I moved the dmabuf creation from VFIO to IOMMUFD
-> > > > recently, the IOCTL is against iommufd_device.
-> > > 
-> > > I'm surprised by this.. iommufd shouldn't be doing PCI stuff, it is
-> > > just about managing the translation control of the device.
-> > 
-> > I have a little difficulty to understand. Is TSM bind PCI stuff? To me
-> > it is. Host sends PCI TDISP messages via PCI DOE to put the device in
-> > TDISP LOCKED state, so that device behaves differently from before. Then
-> > why put it in IOMMUFD?
-> 
-> 
-> "TSM bind" sets up the CPU side of it, it binds a VM to a piece of IOMMU on the host CPU.
 
-I didn't fully get your idea, are you defending for "TSM bind is NOT PCI
-stuff"? To me it is not true.
 
-TSM bind also sets up the device side. From your patch, it calls
-tsm_tdi_bind(), which in turn calls spdm_forward(), I assume it is doing
-TDISP LOCK. And TDISP LOCK changes device a lot.
-
-> The device does not know about the VM, it just enables/disables encryption by a request from the CPU (those start/stop interface commands).
-> And IOMMUFD won't be doing DOE, the platform driver (such as AMD CCP) will. Nothing to do for VFIO here.
-
-IOMMUFD calls tsm_tdi_bind(), which is an interface doing PCI stuff.
-
-Thanks,
-Yilun
-
+On 5/7/25 11:12 PM, Alexandru Elisei wrote:
+> Commit 5dd20ec76ea63 ("runtime: Update MAX_SMP probe") added the
+> --probe-maxmp argument, but the help message for run_tests.sh wasn't
+> updated. Document --probe-maxsmp.
 > 
-> We probably should notify VFIO about the state transition but I do not know VFIO would want to do in response.
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+
+> ---
+>   run_tests.sh | 17 +++++++++--------
+>   1 file changed, 9 insertions(+), 8 deletions(-)
 > 
-> 
+> diff --git a/run_tests.sh b/run_tests.sh
+> index 152323ffc8a2..f30b6dbd131c 100755
+> --- a/run_tests.sh
+> +++ b/run_tests.sh
+> @@ -17,14 +17,15 @@ cat <<EOF
+>   
+>   Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t] [-l]
+>   
+> -    -h, --help      Output this help text
+> -    -v, --verbose   Enables verbose mode
+> -    -a, --all       Run all tests, including those flagged as 'nodefault'
+> -                    and those guarded by errata.
+> -    -g, --group     Only execute tests in the given group
+> -    -j, --parallel  Execute tests in parallel
+> -    -t, --tap13     Output test results in TAP format
+> -    -l, --list      Only output all tests list
+> +    -h, --help          Output this help text
+> +    -v, --verbose       Enables verbose mode
+> +    -a, --all           Run all tests, including those flagged as 'nodefault'
+> +                        and those guarded by errata.
+> +    -g, --group         Only execute tests in the given group
+> +    -j, --parallel      Execute tests in parallel
+> +    -t, --tap13         Output test results in TAP format
+> +    -l, --list          Only output all tests list
+> +        --probe-maxsmp  Update the maximum number of VCPUs supported by host
+>   
+>   Set the environment variable QEMU=/path/to/qemu-system-ARCH to
+>   specify the appropriate qemu binary for ARCH-run.
+
+-- 
+Shaoqin
+
 
