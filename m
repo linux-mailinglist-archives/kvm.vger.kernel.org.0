@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-46485-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46489-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AEDAAB68EF
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 12:36:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50735AB68F0
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 12:37:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AA703AF7DC
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 10:36:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B1CD3B0BC4
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 10:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA8A276056;
-	Wed, 14 May 2025 10:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F75278163;
+	Wed, 14 May 2025 10:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZmsjlaaH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z0vIT+d1"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAEB274FCE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8852277806;
 	Wed, 14 May 2025 10:35:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747218909; cv=none; b=M8+hFMmO5jfQzqBirW082vK3fvzDHNjN6oXLY0zLS0hpgyZA3NQxYP2TuP1CNCc7cP17CI93RRNfUxdrHTE5ahEE3IGsnUW6GhbRVXFIFhgaMDxjvZXs9ThSroSr22sCwpp0VdmS74GfYAR9TLynrb0d//d+s20XZ8ZAMiD6Zbc=
+	t=1747218910; cv=none; b=QCHehbn6PfUyc+AXcQ2Jco38bvSsssRrFmVqWlXXpfjI9Rnm/2P4eenZcvTxcY9PRzYGdGJrO8AiYba2Pe+1+h+DHQhPtWTZAkFO2ILhf/B7N4AgqPMQChvCiL1qJtxcdqSeaZ1cKLEyqK5MO8p1BYdgULuD6WtgiWcmOfBINgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747218909; c=relaxed/simple;
-	bh=QXWML07vMieaqb/obaP1emEXNEc9cWHjd/dRppNxB+A=;
+	s=arc-20240116; t=1747218910; c=relaxed/simple;
+	bh=6xnfxO24XeMhZUOFnH7AZVi9lO940gonY1iIvv10IoA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WxwE/0xa1YbLzCoCgA1RpkDKOdEoNo1Oj8z1joGeLlTlyG922/m28XD12Y22HanHOyr7wted+UekyPqZKmM3IcmmCvHIo61r7asnYFYg0aXNv7HT5+bEF3coXWWm2r4skhIImMqid/6n+vpslGX5TaME5VwOnY1msZoJnuoATJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZmsjlaaH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF05FC4CEF0;
-	Wed, 14 May 2025 10:35:08 +0000 (UTC)
+	 MIME-Version; b=AcW3QP5XxPbicjl9wDKPAEOdmADHMERhJFLK1OWgoHWGoiD7ZVdIL7hqMgHrCHAk/CN8PigbQxQ9lgC9yzADdhxsNAWjxGsM20+ay1/9duw+p/4Z4njaCehAJCtchhmeY5Ea9BBBMPv8IBRqHSxDD5GaR0+87vCrzPEovYf+NBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z0vIT+d1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 238FAC4CEE9;
+	Wed, 14 May 2025 10:35:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1747218909;
-	bh=QXWML07vMieaqb/obaP1emEXNEc9cWHjd/dRppNxB+A=;
+	bh=6xnfxO24XeMhZUOFnH7AZVi9lO940gonY1iIvv10IoA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZmsjlaaHfGxVJWjPlRNL53qq7F0/dA/anh1bFj37dD2MQDUJ6Btkv9olOCnvF9qtp
-	 nYrNk6ERXGsMNPEbl3yZWOXNgub6kMnsTNGT40nRbUjyCEMLXOXazxqAqlNpMH7s0X
-	 Oiz7MLYvmBbPwwMSd2g7cyFtabY4Bmq4lbmyPxPJRHChBiJK8IKFgDKSFXufjqROeV
-	 /vU9qmb4PKY+VJ2315VZj7qu0/ceaxL+xvQ4BXjwHwpOJzQH+rR73xnklAoirko9vI
-	 w+ZEBW2WJSxpLQeLmweAqKnJN3KuJ7whwJExiwrhzJnLWRmYztpo/3kXwDEvIcOdX/
-	 fBlEYXz41Qr7w==
+	b=Z0vIT+d1T/KWB+Gwz6oiqrERfVUZCCZrJFP2uegVvy5hTjm7o3DjYMLBR/fM8kDOo
+	 PPbcEB5rsF3nvmglD/HxqaKZ0YLwhxjQEGvpGQ6UJ4i+Lmh+3BrYDz6X7q46FAUX97
+	 yt83Nei4dtDAIb0XfHOPu5PTYVb+g0zQNkuszasBR9tX2cTnMQUU5dv0yYVsUItlha
+	 Qtf/h168HUFmxZQv3BpUFJPnO1N6jMDV4KMlehRMA60fD6jSws42tNRK65ekoYvKB1
+	 xLfQy+OVUXeBk6oskZYC5ehSbU2rIN8RY+BQvONJhLlNLxVp4pjelPOSTHYC6GpL8M
+	 66uzL4BTe0DHw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uF9S7-00Eos3-5t;
+	id 1uF9S7-00Eos3-Cg;
 	Wed, 14 May 2025 11:35:07 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: [PATCH v4 14/17] KVM: arm64: nv: Plumb TLBI S1E2 into system instruction dispatch
-Date: Wed, 14 May 2025 11:34:57 +0100
-Message-Id: <20250514103501.2225951-15-maz@kernel.org>
+Subject: [PATCH v4 15/17] KVM: arm64: nv: Remove dead code from ERET handling
+Date: Wed, 14 May 2025 11:34:58 +0100
+Message-Id: <20250514103501.2225951-16-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250514103501.2225951-1-maz@kernel.org>
 References: <20250514103501.2225951-1-maz@kernel.org>
@@ -75,170 +75,31 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Now that we have to handle TLBI S1E2 in the core code, plumb the
-sysinsn dispatch code into it, so that these instructions don't
-just UNDEF anymore.
+Cleanly, this code cannot trigger, since we filter this from the
+caller. Drop it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 87 +++++++++++++++++++++++++++------------
- 1 file changed, 61 insertions(+), 26 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 204470283ccc3..de954524b7870 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -3628,11 +3628,22 @@ static void s2_mmu_tlbi_s1e1(struct kvm_s2_mmu *mmu,
- 	WARN_ON(__kvm_tlbi_s1e2(mmu, info->va.addr, info->va.encoding));
- }
- 
-+static bool handle_tlbi_el2(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
-+{
-+	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+
-+	if (!kvm_supported_tlbi_s1e2_op(vcpu, sys_encoding))
-+		return undef_access(vcpu, p, r);
-+
-+	kvm_handle_s1e2_tlbi(vcpu, sys_encoding, p->regval);
-+	return true;
-+}
-+
- static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 0fcfcc0478f94..5e9fec251684d 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2471,13 +2471,6 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
  {
- 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
--	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+ 	u64 spsr, elr, esr;
  
- 	/*
- 	 * If we're here, this is because we've trapped on a EL1 TLBI
-@@ -3643,6 +3654,13 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	 * - HCR_EL2.E2H == 0 : a non-VHE guest
- 	 * - HCR_EL2.{E2H,TGE} == { 1, 0 } : a VHE guest in guest mode
- 	 *
-+	 * Another possibility is that we are invalidating the EL2 context
-+	 * using EL1 instructions, but that we landed here because we need
-+	 * additional invalidation for structures that are not held in the
-+	 * CPU TLBs (such as the VNCR pseudo-TLB and its EL2 mapping). In
-+	 * that case, we are guaranteed that HCR_EL2.{E2H,TGE} == { 1, 1 }
-+	 * as we don't allow an NV-capable L1 in a nVHE configuration.
-+	 *
- 	 * We don't expect these helpers to ever be called when running
- 	 * in a vEL1 context.
- 	 */
-@@ -3652,7 +3670,13 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (!kvm_supported_tlbi_s1e1_op(vcpu, sys_encoding))
- 		return undef_access(vcpu, p, r);
- 
--	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
-+	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) {
-+		kvm_handle_s1e2_tlbi(vcpu, sys_encoding, p->regval);
-+		return true;
-+	}
-+
-+	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm,
-+				   get_vmid(__vcpu_sys_reg(vcpu, VTTBR_EL2)),
- 				   &(union tlbi_info) {
- 					   .va = {
- 						   .addr = p->regval,
-@@ -3774,16 +3798,21 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_IPAS2LE1IS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1IS, handle_ripas2e1is),
- 
--	SYS_INSN(TLBI_ALLE2OS, undef_access),
--	SYS_INSN(TLBI_VAE2OS, undef_access),
-+	SYS_INSN(TLBI_ALLE2OS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_VAE2OS, handle_tlbi_el2),
- 	SYS_INSN(TLBI_ALLE1OS, handle_alle1is),
--	SYS_INSN(TLBI_VALE2OS, undef_access),
-+	SYS_INSN(TLBI_VALE2OS, handle_tlbi_el2),
- 	SYS_INSN(TLBI_VMALLS12E1OS, handle_vmalls12e1is),
- 
--	SYS_INSN(TLBI_RVAE2IS, undef_access),
--	SYS_INSN(TLBI_RVALE2IS, undef_access),
-+	SYS_INSN(TLBI_RVAE2IS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_RVALE2IS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_ALLE2IS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_VAE2IS, handle_tlbi_el2),
- 
- 	SYS_INSN(TLBI_ALLE1IS, handle_alle1is),
-+
-+	SYS_INSN(TLBI_VALE2IS, handle_tlbi_el2),
-+
- 	SYS_INSN(TLBI_VMALLS12E1IS, handle_vmalls12e1is),
- 	SYS_INSN(TLBI_IPAS2E1OS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_IPAS2E1, handle_ipas2e1is),
-@@ -3793,11 +3822,17 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_IPAS2LE1, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1, handle_ripas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1OS, handle_ripas2e1is),
--	SYS_INSN(TLBI_RVAE2OS, undef_access),
--	SYS_INSN(TLBI_RVALE2OS, undef_access),
--	SYS_INSN(TLBI_RVAE2, undef_access),
--	SYS_INSN(TLBI_RVALE2, undef_access),
-+	SYS_INSN(TLBI_RVAE2OS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_RVALE2OS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_RVAE2, handle_tlbi_el2),
-+	SYS_INSN(TLBI_RVALE2, handle_tlbi_el2),
-+	SYS_INSN(TLBI_ALLE2, handle_tlbi_el2),
-+	SYS_INSN(TLBI_VAE2, handle_tlbi_el2),
-+
- 	SYS_INSN(TLBI_ALLE1, handle_alle1is),
-+
-+	SYS_INSN(TLBI_VALE2, handle_tlbi_el2),
-+
- 	SYS_INSN(TLBI_VMALLS12E1, handle_vmalls12e1is),
- 
- 	SYS_INSN(TLBI_IPAS2E1ISNXS, handle_ipas2e1is),
-@@ -3805,19 +3840,19 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_IPAS2LE1ISNXS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1ISNXS, handle_ripas2e1is),
- 
--	SYS_INSN(TLBI_ALLE2OSNXS, undef_access),
--	SYS_INSN(TLBI_VAE2OSNXS, undef_access),
-+	SYS_INSN(TLBI_ALLE2OSNXS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_VAE2OSNXS, handle_tlbi_el2),
- 	SYS_INSN(TLBI_ALLE1OSNXS, handle_alle1is),
--	SYS_INSN(TLBI_VALE2OSNXS, undef_access),
-+	SYS_INSN(TLBI_VALE2OSNXS, handle_tlbi_el2),
- 	SYS_INSN(TLBI_VMALLS12E1OSNXS, handle_vmalls12e1is),
- 
--	SYS_INSN(TLBI_RVAE2ISNXS, undef_access),
--	SYS_INSN(TLBI_RVALE2ISNXS, undef_access),
--	SYS_INSN(TLBI_ALLE2ISNXS, undef_access),
--	SYS_INSN(TLBI_VAE2ISNXS, undef_access),
-+	SYS_INSN(TLBI_RVAE2ISNXS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_RVALE2ISNXS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_ALLE2ISNXS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_VAE2ISNXS, handle_tlbi_el2),
- 
- 	SYS_INSN(TLBI_ALLE1ISNXS, handle_alle1is),
--	SYS_INSN(TLBI_VALE2ISNXS, undef_access),
-+	SYS_INSN(TLBI_VALE2ISNXS, handle_tlbi_el2),
- 	SYS_INSN(TLBI_VMALLS12E1ISNXS, handle_vmalls12e1is),
- 	SYS_INSN(TLBI_IPAS2E1OSNXS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_IPAS2E1NXS, handle_ipas2e1is),
-@@ -3827,14 +3862,14 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_IPAS2LE1NXS, handle_ipas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1NXS, handle_ripas2e1is),
- 	SYS_INSN(TLBI_RIPAS2LE1OSNXS, handle_ripas2e1is),
--	SYS_INSN(TLBI_RVAE2OSNXS, undef_access),
--	SYS_INSN(TLBI_RVALE2OSNXS, undef_access),
--	SYS_INSN(TLBI_RVAE2NXS, undef_access),
--	SYS_INSN(TLBI_RVALE2NXS, undef_access),
--	SYS_INSN(TLBI_ALLE2NXS, undef_access),
--	SYS_INSN(TLBI_VAE2NXS, undef_access),
-+	SYS_INSN(TLBI_RVAE2OSNXS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_RVALE2OSNXS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_RVAE2NXS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_RVALE2NXS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_ALLE2NXS, handle_tlbi_el2),
-+	SYS_INSN(TLBI_VAE2NXS, handle_tlbi_el2),
- 	SYS_INSN(TLBI_ALLE1NXS, handle_alle1is),
--	SYS_INSN(TLBI_VALE2NXS, undef_access),
-+	SYS_INSN(TLBI_VALE2NXS, handle_tlbi_el2),
- 	SYS_INSN(TLBI_VMALLS12E1NXS, handle_vmalls12e1is),
- };
+-	/*
+-	 * Forward this trap to the virtual EL2 if the virtual
+-	 * HCR_EL2.NV bit is set and this is coming from !EL2.
+-	 */
+-	if (forward_hcr_traps(vcpu, HCR_NV))
+-		return;
+-
+ 	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+ 	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
  
 -- 
 2.39.2
