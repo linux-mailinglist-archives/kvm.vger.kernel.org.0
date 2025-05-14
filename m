@@ -1,220 +1,191 @@
-Return-Path: <kvm+bounces-46471-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46473-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF182AB68B9
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 12:24:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 230A4AB68DF
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 12:35:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 511F0860CD4
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 10:24:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F3D4463EC6
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 10:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590E5270552;
-	Wed, 14 May 2025 10:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC95270ED1;
+	Wed, 14 May 2025 10:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fJvI1Z+h"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D371E04BD;
-	Wed, 14 May 2025 10:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF936200B99;
+	Wed, 14 May 2025 10:35:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747218259; cv=none; b=fYL8opt0OS7e02vdq18Y8lWH+ZgSz2OhM4vmuP3hrXwqS090DjjWO4Gi5RIeUErdxKgKlzfQ1ZePFaC+TSnTYnqAlEX+8cIfXN5yxdHip4c46z8BRdth2v4S4vvtbVjXsTPzs7gvhp7UtQ3dI+twqsRUmxydo6ulHoG4qFKWk5o=
+	t=1747218906; cv=none; b=r7U8yu1fjCOyo01oUHj1p4dmHEUN4dH8VyurpzPl/lcClW3TgQq6q0nVSU8QhoTjE1SZ7B/x7WL2JrRzdLhee8s8jOyHswOuI/YrenCnVGd8McmJAjRHBTX5zTbfeB7HJxzKsy5VWXRtfmdR9pDYSiwN+mFk5XFqIo6UxjQ2ISI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747218259; c=relaxed/simple;
-	bh=BOofkBfaOlAL0tDVDzAKaauS2ThgBGfeSjAHZg5HhgQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TOSZHhLe7ujLvJ2cD17NBtTK0w+6FND7XSdxV9AItVovUL7e43e8LCExhABJ97dZMOhwBXPjSoIOSxQc62rf+/3op2TCiY/XorJl1ZVyV9yKNkUNRDnzkq4MNcRKnyDJ6B77+tMg+n06BF5T0KC1+4xhJVSph+0zDdDBLSr6RR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6673E14BF;
-	Wed, 14 May 2025 03:24:05 -0700 (PDT)
-Received: from [10.57.24.82] (unknown [10.57.24.82])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A00C53F673;
-	Wed, 14 May 2025 03:24:12 -0700 (PDT)
-Message-ID: <36c46f16-85c2-43f8-b460-942f34631e0d@arm.com>
-Date: Wed, 14 May 2025 11:24:10 +0100
+	s=arc-20240116; t=1747218906; c=relaxed/simple;
+	bh=E358mMfAnCsPzCuNa5BrQ0CoZMIt4W4gmPNK4Mp1xy8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fOkyPtc3f74x4/IJwMsx0FWXSm87ldii475C+Ek5VeuFLxv6JgZMOMsohuE19pNHkae5tVtwmloCbuZFt3k9Tm69oCvhT/q1I4B91tDieIZD9aWMCrFuYIVPU1lffkUedDZ9nex0WKrIIxrXqpaq0Zg+tiGiKaQJaJQ+fwA9Z4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fJvI1Z+h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4878CC4CEEB;
+	Wed, 14 May 2025 10:35:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747218906;
+	bh=E358mMfAnCsPzCuNa5BrQ0CoZMIt4W4gmPNK4Mp1xy8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=fJvI1Z+hQ2i8N0+6JnDFvtWLvlpPGpJK0IrG3Wuh0HVgDMcE4YCGrQqTa94QAV4uB
+	 zYxteqoyO1zq587ItSd6DyDWexxAdRio11rnRIsWlRaxaDM9fiLWsquDBgJJpKLXmo
+	 bZjezCnkEjaPsbWpVRuXoerOVwMi2cpVWaFcUPZlIEvWy4hpKdbuCWBgAEzW3BuXZW
+	 o58WNW34nWLVSNeVw79e9FOV+KkwBmwrWn+lYndsY7VvDYB0lTxotLcZNVTZcqczHE
+	 jApV+3fPHHPIstdgXxdwl6Z9j57kNSBWVj4NWToMRTjtLxf5w0WHb4v0syXAUCGKPc
+	 wvdmovhlIjC+Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uF9S3-00Eos3-Vt;
+	Wed, 14 May 2025 11:35:04 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: [PATCH v4 00/17] KVM: arm64: Recursive NV support
+Date: Wed, 14 May 2025 11:34:43 +0100
+Message-Id: <20250514103501.2225951-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 15/43] arm64: RME: Allow VMM to set RIPAS
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-16-steven.price@arm.com>
- <83071e55-cbe4-4786-b60e-d26ce16368b3@arm.com>
- <f4ee678d-112d-46d1-8b87-70e55d6617e1@arm.com>
- <d0cbb637-6ba1-4858-b326-31271e9949ea@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <d0cbb637-6ba1-4858-b326-31271e9949ea@arm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, eric.auger@redhat.com, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 13/05/2025 11:43, Suzuki K Poulose wrote:
-> On 12/05/2025 15:45, Steven Price wrote:
->> On 06/05/2025 14:23, Suzuki K Poulose wrote:
->>> Hi Steven
->>>
->>> On 16/04/2025 14:41, Steven Price wrote:
+This is probably the most interesting bit of the whole NV adventure.
+So far, everything else has been a walk in the park, but this one is
+where the real fun takes place.
 
-[...]
+With FEAT_NV2, most of the NV support revolves around tricking a guest
+into accessing memory while it tries to access system registers. The
+hypervisor's job is to handle the context switch of the actual
+registers with the state in memory as needed.
 
-> 
->>
->>>> +    }
->>>> +
->>>> +    realm_fold_rtt_level(realm, get_start_level(realm) + 1,
->>>> +                 start, end);
->>>
->>> We don't seem to be reclaiing the RTTs from shared mapping case ?
->>
->> I'm not sure I follow: realm_fold_rtt_level() will free any RTTs that
->> are released.
->>
->> Or are you referring to the fact that we don't (yet) fold the shared
->> range? I have been purposefully leaving that for now as normally we'd
-> 
-> sorry it was a bit vague. We don't seem to be reclaiming the RTTs in
-> realm_unmap_shared_range(), like we do for the private range.
+This memory (which we shall call the VNCR page henceforth) lives at an
+EL2 VA, and is therefore accessed out of context by the EL1 guest
+hypervisor.
 
-Ah, you mean we potentially leave empty RTTs which are only reclaimed
-when destroying the realm. Whereas in the private range we
-opportunistically fold which will (usually) cause these to be freed.
+So far, so good. But what does it mean to virtualise VNCR itself?
 
->> follow the page size in the VMM to choose the page size on the guest,
->> but that doesn't work when the RMM might have a different page size to
->> the host. So my reasons for leaving it for later are:
->>
->>   * First huge pages is very much a TODO in general.
->>
->>   * When we support >4K host pages then a huge page on the host may not
->>     be available in the RMM, so we can't just follow the VMM.
->>
->>   * We don't have support in realm_unmap_shared_range() to split a block
->>     mapping up - it could be added, but it's not clear to me if it's best
->>     to split a block mapping, or remove the whole and refault as
->>     required.
->>
->>   * guest_memfd might well be able to provide some good hints here, but
->>     we'll have to wait for that series to settle.
-> 
-> I am not sure I follow. None of this affects folding, once we have
-> "unmapped". For that matter, we could easily DESTROY the RTTs in
-> shared side without unmapping, but we can do that later as an
-> optimisation.
+It means that when L1 has a prepared a VNCR page for L2, we must map
+it in the L0 EL2, and allow L2 to magically access it. Isn't that fun?
+To some extent. But there's more!
 
-Yeah, ignore the above - like you say it's not relevant to unmapping, I
-hadn't understood your point ;)
+Having that L0 mapping on behalf of L1 comes with strings attached. It
+means that we must be prepared for this page to become inaccessible,
+which can happen for a variety of reasons:
 
-I'll stick a call to realm_fold_rtt_level() at the end of
-realm_unmap_shared_range() which should opportunistically free unused
-RTTs. Like you say there's a optimisation to just straight to destroying
-the RTTs in the shared region - but I think that's best left until later.
+- paged out from the host (MMU notifiers)
 
->>
->>>> +}
->>>> +
->>>> +void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
->>>> +               unsigned long size, bool unmap_private)
->>>> +{
->>>> +    unsigned long end = start + size;
->>>> +    struct realm *realm = &kvm->arch.realm;
->>>> +
->>>> +    end = min(BIT(realm->ia_bits - 1), end);
->>>> +
->>>> +    if (realm->state == REALM_STATE_NONE)
->>>> +        return;
->>>> +
->>>> +    realm_unmap_shared_range(kvm, find_map_level(realm, start, end),
->>>> +                 start, end);
->>>> +    if (unmap_private)
->>>> +        realm_unmap_private_range(kvm, start, end);
->>>> +}
->>>> +
->>>> +static int realm_init_ipa_state(struct realm *realm,
->>>> +                unsigned long ipa,
->>>> +                unsigned long end)
->>>> +{
->>>> +    phys_addr_t rd_phys = virt_to_phys(realm->rd);
->>>> +    int ret;
->>>> +
->>>> +    while (ipa < end) {
->>>> +        unsigned long next;
->>>> +
->>>> +        ret = rmi_rtt_init_ripas(rd_phys, ipa, end, &next);
->>>> +
->>>> +        if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->>>> +            int err_level = RMI_RETURN_INDEX(ret);
->>>> +            int level = find_map_level(realm, ipa, end);
->>>> +
->>>> +            if (WARN_ON(err_level >= level))
->>>
->>> I am wondering if WARN_ON() is required here. A buggy VMM could trigger
->>> the WARN_ON(). (e.g, INIT_IPA after POPULATE, where L3 table is
->>> created.). The only case where it may be worth WARNING is if the level
->>> == 3.
->>
->> I have to admit I've struggled to get my head round this ;)
->>
->> init_ripas will fail with ERROR_RTT in three cases:
->>
->>   1. (base_align) The base address isn't aligned for the level reached.
->>
->>   2. (rtt_state) The rtte state is !UNASSIGNED.
->>
->>   3. (no_progress) base==walk_top - the while condition should prevent
->>      this.
->>
->> So I think case 1 is the case we're expecting, and creating RTTs should
->> resolve it.
->>
->> Case 2 is presumably the case you are concerned about, although it's not
->> because tables have been created, but because INIT_RIPAS is invalid on
->> areas that have been populated already.
-> 
-> Correct, this is the case I was referring to.
-> 
->>
->> If my reading of the spec is correct, then level == 3 isn't a possible
->> result, so beyond potentially finding RMM bugs I don't think a WARN for
-> 
-> It is almost certainly possible, with L3 page mapping created for
-> POPULATE and a follow up INIT_RIPAS with 2M or even 1G alignment, could
-> lead us to expect that only L1 or L2 is required (find_map_level) but
-> the RTT walk reached L3 and failed. This is not a case of RMM bug, but
-> a VMM not following the rules.
+- unmapped from L1 EL2 stage-1
 
-Sorry, I wasn't clear. I mean "level == 3" isn't something that we
-should be WARNing on.
+- permission changes in L1 EL2 stage-1
 
->> that is very interesting. So for now I'll just drop the WARN_ON here
->> altogether.
-> 
-> Thanks, that is much safer
+And in case you're wondering, yes, all of these have TLB invalidation
+in common. That's because performing this mapping is akin to
+allocating a "SW managed" TLB for L1's VNCR page.
 
-Ack.
+This is what the bulk of this series is about: TLB management for VNCR
+pages, and making sure we have the correct page at the right time.
 
-Thanks,
-Steve
+From an implementation perspective, it isn't that complicated, as it
+plugs into the existing NV artillery (TLBI, AT, MMU notifiers). Of
+course, nothing is optimised, because we're not at this stage yet. I
+have plans to make this better (i.e. fewer TLBIs, which implies fewer
+traps when nesting), but that's all future work.
 
-> Suzuki
-> 
+But this is functional enough that I can run an L4 guest on my QC
+box. Slowly.
+
+As an added bonus, this series now includes the last two patches that
+switch the damned thing on. Does it mean this is bug-free? Of course
+not. But we're at a point where NV is no longer a third-rate citizen.
+Only a second-rate one.
+
+Patches on top of my kvm-arm64/at-fixes-6.16 branch posted at [4],
+itself based on 6.15-rc3. The full integration is, as always, in my
+kvm-arm64/nv-next branch.
+
+* From v3 [3]:
+
+  - Added GFP_KERNEL_ACCOUNT on VNCR page allocation
+
+* From v2 [2]:
+
+  - Handle access fault on translating the guest S1 to populate the
+    VNCR TLB
+
+  - Added RBs by Ganapatrao on a couple of patches
+
+* From v1 [1]:
+
+  - Rebased on 6.15-rc1
+
+  - Picked up the last two patches to enable the full NV shebang
+
+[1] https://lore.kernel.org/r/20250215150134.3765791-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20250408105225.4002637-1-maz@kernel.org
+[3] https://lore.kernel.org/r/20250423151508.2961768-1-maz@kernel.org
+[4] https://lore.kernel.org/r/20250422122612.2675672-1-maz@kernel.org
+
+Marc Zyngier (17):
+  arm64: sysreg: Add layout for VNCR_EL2
+  KVM: arm64: nv: Allocate VNCR page when required
+  KVM: arm64: nv: Extract translation helper from the AT code
+  KVM: arm64: nv: Snapshot S1 ASID tagging information during walk
+  KVM: arm64: nv: Move TLBI range decoding to a helper
+  KVM: arm64: nv: Don't adjust PSTATE.M when L2 is nesting
+  KVM: arm64: nv: Add pseudo-TLB backing VNCR_EL2
+  KVM: arm64: nv: Add userspace and guest handling of VNCR_EL2
+  KVM: arm64: nv: Handle VNCR_EL2-triggered faults
+  KVM: arm64: nv: Handle mapping of VNCR_EL2 at EL2
+  KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU notifiers
+  KVM: arm64: nv: Program host's VNCR_EL2 to the fixmap address
+  KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2
+  KVM: arm64: nv: Plumb TLBI S1E2 into system instruction dispatch
+  KVM: arm64: nv: Remove dead code from ERET handling
+  KVM: arm64: Allow userspace to request KVM_ARM_VCPU_EL2*
+  KVM: arm64: Document NV caps and vcpu flags
+
+ Documentation/virt/kvm/api.rst      |  14 +-
+ arch/arm64/include/asm/esr.h        |   2 +
+ arch/arm64/include/asm/fixmap.h     |   6 +
+ arch/arm64/include/asm/kvm_host.h   |  15 +-
+ arch/arm64/include/asm/kvm_nested.h | 100 +++++
+ arch/arm64/include/asm/sysreg.h     |   1 -
+ arch/arm64/kvm/arm.c                |  10 +
+ arch/arm64/kvm/at.c                 | 123 +++---
+ arch/arm64/kvm/emulate-nested.c     |   7 -
+ arch/arm64/kvm/handle_exit.c        |   1 +
+ arch/arm64/kvm/hyp/vhe/switch.c     |  46 ++-
+ arch/arm64/kvm/nested.c             | 610 +++++++++++++++++++++++++++-
+ arch/arm64/kvm/reset.c              |   2 +
+ arch/arm64/kvm/sys_regs.c           | 135 +++---
+ arch/arm64/tools/sysreg             |   6 +
+ include/uapi/linux/kvm.h            |   2 +
+ 16 files changed, 942 insertions(+), 138 deletions(-)
+
+-- 
+2.39.2
 
 
