@@ -1,242 +1,336 @@
-Return-Path: <kvm+bounces-46543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8A56AB7728
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 22:34:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C89E7AB7733
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 22:40:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 982D116BEBA
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 20:34:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAD948650D9
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 20:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20ABD296173;
-	Wed, 14 May 2025 20:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1EEF296173;
+	Wed, 14 May 2025 20:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Czm4sIlj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HOVSjksD"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2073.outbound.protection.outlook.com [40.107.220.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0F929372F;
-	Wed, 14 May 2025 20:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747254821; cv=fail; b=bZB4AUdK6cVSlq97hCoxfg0i0YHV0ezEzUdNjS7QzN0ZkMK1tJAyQvp3kMa7iQbdq+W6gbAHx3zQgAJnSlbYL4KyDduHYNtFTZJDXBcNVcMMi5T4htqwRCbWVzWKyXsF5Be6hRt0Z4cMTy/inGku9GkS3JagrmJwKkJf/Hsz1Ew=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747254821; c=relaxed/simple;
-	bh=lDlZ8XgYya0+ySeAr2ZX+k6Q+mxS9uq/Mzq3sTr+oFw=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kx5zMovbXX8gscWNdRy+oYb6ZupE255hMjtZeK0Vt3qAV6m/Cmunt2PNGgVFJWE/plqkLTYAa6ZqRRvpYPYMHCEVFpVcDtA3XbciBZP6RiNerJ3FSaeiKgmQRVFia+km5BelhvLAJlykXoE/TiWkRqUdw+YY9l9Q0nWpNowPFvU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Czm4sIlj; arc=fail smtp.client-ip=40.107.220.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JJBhwyVyrVT2Pq7LNNNCLizS53KnluUiFIlUFpebPOufB3x7uDocHSMJ26yTWeBfUew60DObaSqFWTKRyJTwxtAYBYvyZNeuBxgRe6C3/m1Z9oA4ZrNvRZz0pYR4bMYgdVo8O1/R9EL4EWj8X0zSLldy2ib2s7JInhFY7uEm7pIieyhHfs/gUqJSJcXnWNWiqLTtgbgQ7f15vkVez1TAUgTWZq5X+hvw96nGD3v0cUUBWqkDqD2/rrfHCxEnEBFiKLFFQ8HdHHldwbkgohC61Qp1IVC8rDGYR76DCcQpTFo/Un7HQDXsZytR5SFxFMCit7Rscof3mIy99RwIymkskw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mTFNCqf9NgukDeTYUwhGd4FbwbIv+S++rtIwEOapBb0=;
- b=o81bUWPpCJQt2+7xekdor6PCz5Kz0YBJBgwHxq+8zHPYxWdFyj/etWO9pwI9W+WNGyR5xciQCg5EAxxD34YXj0RmO1//kc+TRyBqA4xKfQr3JuKBmdg+POQ5HUhWVcvNx0RuX2Nz1qvzcDx7X4R1OFaAIwPxe6MBTGd3iQyMKl//Tdr/Ao9CFAAaDw1eoJMK/5PkhDncvGeLYTtRXZln7gYyBWhcLIPPnFQOMegbTiEAJ9+foD5DDqTiWJjeoIKFhTi8bWlik68rQzBetpJ/IIETxJt4aMV9oIkffoWHQPPwMYREQbKF7gMBrE7xXDoZV4KZDjrGxBI0Zil5+JtWiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mTFNCqf9NgukDeTYUwhGd4FbwbIv+S++rtIwEOapBb0=;
- b=Czm4sIlj3vVP2p3rUH2XTPgY6maAP++mqoWJf/MXchNxcmUfaUNypaHp4q30K1maA/nInqP7ZkT1Esyf7QEP4MsIkMudCHlScUlf33UUO799fFwnzESoEzrchUNxzkwk0lkwgo7blU9rxXOkRzsuWi21kploAcHm5Z0RjMmF6HEX9WCqnHJNdRbAkMAqBQJ3WCVFhrRJtyby3ect5ijXHkey5uHMLNqpR5aSaqfyKXN+uFIKBGYSORhSX0noATiKo/XQGQLucyyElgOL+X3Fy1GREGXzpf2oibKF4dI/1HKqdV4R/OACmEQuuvRneK7lFMN7CpC8C8ANGwhxq39Zjw==
-Received: from BYAPR01CA0014.prod.exchangelabs.com (2603:10b6:a02:80::27) by
- SA1PR12MB6679.namprd12.prod.outlook.com (2603:10b6:806:252::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.29; Wed, 14 May
- 2025 20:33:36 +0000
-Received: from SJ1PEPF000023D1.namprd02.prod.outlook.com
- (2603:10b6:a02:80:cafe::3) by BYAPR01CA0014.outlook.office365.com
- (2603:10b6:a02:80::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8699.32 via Frontend Transport; Wed,
- 14 May 2025 20:33:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ1PEPF000023D1.mail.protection.outlook.com (10.167.244.7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.18 via Frontend Transport; Wed, 14 May 2025 20:33:35 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 14 May
- 2025 13:33:21 -0700
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 14 May
- 2025 13:33:21 -0700
-Received: from inno-thin-client (10.127.8.11) by mail.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 14
- May 2025 13:33:17 -0700
-Date: Wed, 14 May 2025 23:33:17 +0300
-From: Zhi Wang <zhiw@nvidia.com>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>, <rick.p.edgecombe@intel.com>,
-	<isaku.yamahata@intel.com>, <kai.huang@intel.com>, <yan.y.zhao@intel.com>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <kvm@vger.kernel.org>, <x86@kernel.org>,
-	<linux-coco@lists.linux.dev>, <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC, PATCH 00/12] TDX: Enable Dynamic PAMT
-Message-ID: <20250514233317.306f69f9.zhiw@nvidia.com>
-In-Reply-To: <20250502130828.4071412-1-kirill.shutemov@linux.intel.com>
-References: <20250502130828.4071412-1-kirill.shutemov@linux.intel.com>
-Organization: NVIDIA
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D15A156C6F
+	for <kvm@vger.kernel.org>; Wed, 14 May 2025 20:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747255246; cv=none; b=XxBLRylrIq/rfJLUtQ90DrTPNa3z36dduxAWdocZTPO9i4YqsB6W3Y+4zoJQEJU+aNpNEvCOszSr9snRDAHLPFfQEr9I8zbC7ZJetybnxDGe+ZVUu0f3qQAVG9sqo5jweHSVXbIgiyvd/dmBlN6P+244HLbkgIKIl4A04xn4LL8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747255246; c=relaxed/simple;
+	bh=vrW2FSdPgIX7PzIoHiNHHY5rcWWp2rmJQgDUkY4gCu8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XhnhkZ8Maq7AAiBYED8llPEfHG9s9XiQQUHke6QhIzCs/cr55ahqcowQKJAvucnC/32Y5u0sOUlAeaRe3lFLkc61hHkr/wMAfxlwOtBmrn+l0SLcm0836tvlDCuVf9Ij2SIY1W/6PBeiL9osxalgbLIzY8GhD72//fipaEi90Yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HOVSjksD; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7081165a238so1853537b3.1
+        for <kvm@vger.kernel.org>; Wed, 14 May 2025 13:40:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747255243; x=1747860043; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T/7+afizZx7+/RQDjCUDJIpgGk5iqWIyw/rWqCvD/nw=;
+        b=HOVSjksDbdxvAMixpbw5y0ocHbZDqYxtx4UOSZ1YA06S6fed0EDW1EpoI16ZNmkC+D
+         Vl/34dE/Scc/xHUP0mWuyg1ZI16l89wxqUtbJoc82md8CQrihW0qZjA5rT/sz+BO4RN3
+         /db+Y4J+JkxCcyRWT56GroDaLw4/Z8NegddrS03OgQNHhOBfOlvT4adXnAhGPmBtRAvq
+         HouCfc93kug0d3sH/WuAfMTSbKYniK5GeG5imyffsbJRg1gYM5MKk9sjJkaZQTUe7pyM
+         jO9q2SWJu7mn+Z+w0vfXldjUFq7iBJhXW5OVueQqVLh1D2vai3pJE1+tTpQDuhuT2bCz
+         cQOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747255243; x=1747860043;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T/7+afizZx7+/RQDjCUDJIpgGk5iqWIyw/rWqCvD/nw=;
+        b=lsvUp6g9HFP0l3+IRiVhhWr7rhdLysMLAMhPgbb/bvyqzxuIRWNISw+/3f5VN7NZO6
+         OpzVwZiw1CMrKOKFbGByreU1L8G+nnYKt6rqtCUs9y9369uFWPXMCqC/+CwTP4eXkf3L
+         wNXvQlPTyy2yNFHzfFfvSgaRCjK/G4oHwj/bn/cza3hG8Fg4bftbNBXsCA0X7JSdVMC+
+         te//3JnJ76tOrxmqT+w47WsNO21Mg0kWtmZdyRfDtiQ3YyCbYG/rlaxvbs74s67waWN1
+         JrEC4Gm1eyzdj3AXQXGiutS6qHsoJwANBZTfEF+mam6MHBQ7ft830VsTM/bMDL26hza4
+         MTyA==
+X-Gm-Message-State: AOJu0Yz4Iijpt/AstLw2ruqqn0gunzLWWDxXvELqM1UIXEA+NGRx5KFw
+	t3bJyxjLYXr/wsN9ch02VclR0U8WCbmhjurFFgyVYCmDSFH8shfkQKlL5T/3KON1yDdpj1m7LYV
+	hS2OPUeMZ5vIlxruxA1emNskoNk6OkkvEDoevoVTLN3qxWUcr1aQLxEN56Q==
+X-Gm-Gg: ASbGncvD1a3CMMv1NolCikMTh9Jbta4zWKXlciIBeTV40WIFHjUwKK2KQ7CkV9TXuII
+	GybEW8pO+h06E5oKzxjvBtksfZE61QtH/cIPyp21LXvNUhT6QsGN6Y4laRgYasQvxnJol6j9F1X
+	uzm5LHfbWbL+/Ub++wJjndcwBlfpaIuv9U0pI/EfUOb7no8P/+InOccwwDF8ryi6g=
+X-Google-Smtp-Source: AGHT+IHMOoxxNuOHFNWO8IK0boxKcMaNPhWodorBvd9h9FTfRV8OHIpNfD/gZaEW3uynJG2ygIW8tBaT72OOCtVP8aM=
+X-Received: by 2002:a05:690c:508d:b0:70c:9364:2c61 with SMTP id
+ 00721157ae682-70c936433d2mr1717257b3.9.1747255242891; Wed, 14 May 2025
+ 13:40:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D1:EE_|SA1PR12MB6679:EE_
-X-MS-Office365-Filtering-Correlation-Id: a484a758-be2f-44f9-e5f0-08dd93269a09
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700013|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?TymIWV9n8XvBbP2uIiInFpKSPDrOTh/3YyVHXT+T052UlIdvgFPIzajX4Nv8?=
- =?us-ascii?Q?9Rx6prY68xpJ4yqkdGfjaWvgfiVxHH+bL3GyPyjRORlk9KDBLIt9d1HRzY+m?=
- =?us-ascii?Q?T61gTVsunm4XBxusEM9Pv2RH7vx36b3qLXQJeU9MV3UpeNb27R5e9la0frQO?=
- =?us-ascii?Q?wes8FhTKWfnbFLziRZva+X1NmMAEWVZ1tii+/+TiGkjbue7vEVXES9YoTlLO?=
- =?us-ascii?Q?V1FciSiKN0WR3epEdDwFBlCmpJGrsygpKnkYxM/fOF2l6nORD1USGIO0CATy?=
- =?us-ascii?Q?4zHgQC3Vh98ki9mV7Y6u/nXg4EKLnwuFRsY8Ragxiak0mHmrak/RXA2XZmUU?=
- =?us-ascii?Q?KgpUmcaEjx/oyXvmVBUm/pYi/Np6/bH6V0lYc1C51KLaFi+A4QJe6C5+V341?=
- =?us-ascii?Q?XCxSBV/XAhWZrj+60XlOOb48CngTctojhuGMEx80ViMF74FXcgzjSxLqtuGE?=
- =?us-ascii?Q?0w+9M9I22qOSumru41MO3O4esS/04ZpvXS3MREJmt8v+9HVOGLn4SGJkqUr5?=
- =?us-ascii?Q?8HVR49xCamyFuktd24e1XWW43x926ylBoHg8nXz8jyEWgGG2UJx7u75AEcHw?=
- =?us-ascii?Q?Od1zrZw1dU4X/HsFEuJWUC4yTdNxv+wLpP+QIEEHQEcajU9j0h8mFRHbaxol?=
- =?us-ascii?Q?MfK3MEeiiTf+f2+tEpVGG9bua0hoUbSVbzuZt9loRbDG8Vx5XbKFUCl9tg/K?=
- =?us-ascii?Q?NvY0j+QdB6DEHphXa6Fmcwh/Iur3RWJ1TIMPDEThxaJ/1bYIiIoxJGishRrf?=
- =?us-ascii?Q?Aaz2cdV1AXnZ4RYhX6BniIXrdbrHAo3SK2xJUSLmqaqzbq3sUrMt+OMlnphC?=
- =?us-ascii?Q?IQS8pVKxoKshtqF4KFXiaoBjsNnGuaPP8qjslIDeAqKkh0W3zFnFylVpxM3/?=
- =?us-ascii?Q?ecZ2dQ0xWCVcfxxVXgD21bwb/3RL8OiwneqGtR3sA5nIh6PC4/IVPdIGVU1J?=
- =?us-ascii?Q?95srfYhmbNoL39iV+1/s3wLo84a01+ytseYrFJF/ZGPpgMPqd/EtHp95yhmG?=
- =?us-ascii?Q?ArEu9kJeR+w7NLsE8LaRvXBBCviYy+PelFDSpuC4bi9hYV5DJLkvW292eEbi?=
- =?us-ascii?Q?mmyltwaRNM+lrz1SAPm/8wSKOKSYOYnSvQ+kidD4ddyxsXGvaUFy9zHpq2w1?=
- =?us-ascii?Q?IstDbZ8jMK5GLS1UtwJlXw6bO9oABByV+RfJ37Uuq9tJFII99FEieKLTqQVj?=
- =?us-ascii?Q?ClVJbpYnB9NvJO2we8l5KTdwR84fDcv7QkZFp+2WVEvez+B6YigqRMM5mJ+M?=
- =?us-ascii?Q?0FbGrMUzB9/MGreHI8L27IcBJsWdrLF8PsDvy7b3Jr1DVGBatpsMeNJ8RqvS?=
- =?us-ascii?Q?x6Kcg+DazBklkSo2eVfRgqoQBvZ7URUzuoW6xzB8G1vkOKyAgwTd8XePjSrB?=
- =?us-ascii?Q?veePuAtl5ogJDzuBjq+kQ7cDu5IkXIj6MQ0fQXjWcpjvHaZzd+bzHUR2wN7f?=
- =?us-ascii?Q?7wplGoi/Di/5xweaSqrdFvXOgX2WafzKzJ26A+cPin++sqoQPtz9D4C3SsdM?=
- =?us-ascii?Q?cU12kioW0qH9+Uxa95jV1lZwV4HEgvdb6PpSkaEixUv0spqjKqn3G2Yt4A?=
- =?us-ascii?Q?=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700013)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2025 20:33:35.8483
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a484a758-be2f-44f9-e5f0-08dd93269a09
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000023D1.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6679
+References: <20250513163438.3942405-1-tabba@google.com> <20250513163438.3942405-8-tabba@google.com>
+In-Reply-To: <20250513163438.3942405-8-tabba@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Wed, 14 May 2025 13:40:06 -0700
+X-Gm-Features: AX0GCFtK2DyiNvyhImWHSxXTuu1QIux7oSRN4_q-FDUfQ5BDQ4-9OKFnUEDKbWU
+Message-ID: <CADrL8HW+Rv4k-VX2s96n7m8OZ9R_NsHOCvtpAKUiwybiyJ63Pg@mail.gmail.com>
+Subject: Re: [PATCH v9 07/17] KVM: guest_memfd: Allow host to map
+ guest_memfd() pages
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri,  2 May 2025 16:08:16 +0300
-"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com> wrote:
+,
 
-> This RFC patchset enables Dynamic PAMT in TDX. It is not intended to
-> be applied, but rather to receive early feedback on the feature
-> design and enabling.
-> 
-> From our perspective, this feature has a lower priority compared to
-> huge page support. I will rebase this patchset on top of Yan's huge
-> page enabling at a later time, as it requires additional work.
-> 
-> Any feedback is welcome. We are open to ideas.
-> 
+On Tue, May 13, 2025 at 9:34=E2=80=AFAM Fuad Tabba <tabba@google.com> wrote=
+:
+>
+> This patch enables support for shared memory in guest_memfd, including
+> mapping that memory at the host userspace. This support is gated by the
+> configuration option KVM_GMEM_SHARED_MEM, and toggled by the guest_memfd
+> flag GUEST_MEMFD_FLAG_SUPPORT_SHARED, which can be set when creating a
+> guest_memfd instance.
+>
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 10 ++++
+>  include/linux/kvm_host.h        | 13 +++++
+>  include/uapi/linux/kvm.h        |  1 +
+>  virt/kvm/Kconfig                |  5 ++
+>  virt/kvm/guest_memfd.c          | 88 +++++++++++++++++++++++++++++++++
+>  5 files changed, 117 insertions(+)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index 709cc2a7ba66..f72722949cae 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2255,8 +2255,18 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_fo=
+rced_root_level,
+>
+>  #ifdef CONFIG_KVM_GMEM
+>  #define kvm_arch_supports_gmem(kvm) ((kvm)->arch.supports_gmem)
+> +
+> +/*
+> + * CoCo VMs with hardware support that use guest_memfd only for backing =
+private
+> + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping enab=
+led.
+> + */
+> +#define kvm_arch_vm_supports_gmem_shared_mem(kvm)                      \
+> +       (IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM) &&                      \
+> +        ((kvm)->arch.vm_type =3D=3D KVM_X86_SW_PROTECTED_VM ||          =
+   \
+> +         (kvm)->arch.vm_type =3D=3D KVM_X86_DEFAULT_VM))
+>  #else
+>  #define kvm_arch_supports_gmem(kvm) false
+> +#define kvm_arch_vm_supports_gmem_shared_mem(kvm) false
+>  #endif
+>
+>  #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state=
+)
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index ae70e4e19700..2ec89c214978 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -729,6 +729,19 @@ static inline bool kvm_arch_supports_gmem(struct kvm=
+ *kvm)
+>  }
+>  #endif
+>
+> +/*
+> + * Returns true if this VM supports shared mem in guest_memfd.
+> + *
+> + * Arch code must define kvm_arch_vm_supports_gmem_shared_mem if support=
+ for
+> + * guest_memfd is enabled.
+> + */
+> +#if !defined(kvm_arch_vm_supports_gmem_shared_mem) && !IS_ENABLED(CONFIG=
+_KVM_GMEM)
+> +static inline bool kvm_arch_vm_supports_gmem_shared_mem(struct kvm *kvm)
+> +{
+> +       return false;
+> +}
+> +#endif
+> +
+>  #ifndef kvm_arch_has_readonly_mem
+>  static inline bool kvm_arch_has_readonly_mem(struct kvm *kvm)
+>  {
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index b6ae8ad8934b..9857022a0f0c 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1566,6 +1566,7 @@ struct kvm_memory_attributes {
+>  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+>
+>  #define KVM_CREATE_GUEST_MEMFD _IOWR(KVMIO,  0xd4, struct kvm_create_gue=
+st_memfd)
+> +#define GUEST_MEMFD_FLAG_SUPPORT_SHARED        (1UL << 0)
+>
+>  struct kvm_create_guest_memfd {
+>         __u64 size;
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 559c93ad90be..f4e469a62a60 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -128,3 +128,8 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+>  config HAVE_KVM_ARCH_GMEM_INVALIDATE
+>         bool
+>         depends on KVM_GMEM
+> +
+> +config KVM_GMEM_SHARED_MEM
+> +       select KVM_GMEM
+> +       bool
+> +       prompt "Enables in-place shared memory for guest_memfd"
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 6db515833f61..8e6d1866b55e 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -312,7 +312,88 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_=
+slot *slot, gfn_t gfn)
+>         return gfn - slot->base_gfn + slot->gmem.pgoff;
+>  }
+>
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +
+> +static bool kvm_gmem_supports_shared(struct inode *inode)
+> +{
+> +       uint64_t flags =3D (uint64_t)inode->i_private;
+> +
+> +       return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> +}
+> +
+> +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+> +{
+> +       struct inode *inode =3D file_inode(vmf->vma->vm_file);
+> +       struct folio *folio;
+> +       vm_fault_t ret =3D VM_FAULT_LOCKED;
+> +
+> +       filemap_invalidate_lock_shared(inode->i_mapping);
+> +
+> +       folio =3D kvm_gmem_get_folio(inode, vmf->pgoff);
+> +       if (IS_ERR(folio)) {
+> +               int err =3D PTR_ERR(folio);
+> +
+> +               if (err =3D=3D -EAGAIN)
+> +                       ret =3D VM_FAULT_RETRY;
+> +               else
+> +                       ret =3D vmf_error(err);
+> +
+> +               goto out_filemap;
+> +       }
+> +
+> +       if (folio_test_hwpoison(folio)) {
+> +               ret =3D VM_FAULT_HWPOISON;
+> +               goto out_folio;
+> +       }
+> +
+> +       if (WARN_ON_ONCE(folio_test_large(folio))) {
+> +               ret =3D VM_FAULT_SIGBUS;
+> +               goto out_folio;
+> +       }
+> +
+> +       if (!folio_test_uptodate(folio)) {
+> +               clear_highpage(folio_page(folio, 0));
+> +               kvm_gmem_mark_prepared(folio);
+> +       }
+> +
+> +       vmf->page =3D folio_file_page(folio, vmf->pgoff);
+> +
+> +out_folio:
+> +       if (ret !=3D VM_FAULT_LOCKED) {
+> +               folio_unlock(folio);
+> +               folio_put(folio);
+> +       }
+> +
+> +out_filemap:
+> +       filemap_invalidate_unlock_shared(inode->i_mapping);
+> +
+> +       return ret;
+> +}
+> +
+> +static const struct vm_operations_struct kvm_gmem_vm_ops =3D {
+> +       .fault =3D kvm_gmem_fault_shared,
+> +};
+> +
+> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+> +{
+> +       if (!kvm_gmem_supports_shared(file_inode(file)))
+> +               return -ENODEV;
+> +
+> +       if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=3D
+> +           (VM_SHARED | VM_MAYSHARE)) {
+> +               return -EINVAL;
+> +       }
+> +
+> +       vma->vm_ops =3D &kvm_gmem_vm_ops;
+> +
+> +       return 0;
+> +}
+> +#else
+> +#define kvm_gmem_mmap NULL
+> +#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+> +
+>  static struct file_operations kvm_gmem_fops =3D {
+> +       .mmap           =3D kvm_gmem_mmap,
+>         .open           =3D generic_file_open,
+>         .release        =3D kvm_gmem_release,
+>         .fallocate      =3D kvm_gmem_fallocate,
+> @@ -463,6 +544,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_creat=
+e_guest_memfd *args)
+>         u64 flags =3D args->flags;
+>         u64 valid_flags =3D 0;
+>
+> +       if (kvm_arch_vm_supports_gmem_shared_mem(kvm))
+> +               valid_flags |=3D GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> +
+>         if (flags & ~valid_flags)
+>                 return -EINVAL;
+>
+> @@ -501,6 +585,10 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory=
+_slot *slot,
+>             offset + size > i_size_read(inode))
+>                 goto err;
+>
+> +       if (kvm_gmem_supports_shared(inode) &&
 
-Do we have any estimation on how much extra cost on TVM creation/destroy
-when tightly couple the PAMT allocation/de-allocation to the private
-page allocation/de-allocation? It has been trendy nowadays that
-meta pages are required to be given to the TSM when doing stuff with
-private page in many platforms. When the pool of the meta page is
-extensible/shrinkable, there are always ideas about batch pre-charge the
-pool and lazy batch reclaim it at a certain path for performance
-considerations or VM characteristics. That might turn into a
-vendor-agnostic path in KVM with tunable configurations.
+When building without CONFIG_KVM_GMEM_SHARED_MEM, my compiler
+complains that kvm_gmem_supports_shared() is not defined.
 
-Z.
-
-> =========================================================================
-> 
-> The Physical Address Metadata Table (PAMT) holds TDX metadata for
-> physical memory and must be allocated by the kernel during TDX module
-> initialization.
-> 
-> The exact size of the required PAMT memory is determined by the TDX
-> module and may vary between TDX module versions, but currently it is
-> approximately 0.4% of the system memory. This is a significant
-> commitment, especially if it is not known upfront whether the machine
-> will run any TDX guests.
-> 
-> The Dynamic PAMT feature reduces static PAMT allocations. PAMT_1G and
-> PAMT_2M levels are still allocated on TDX module initialization, but
-> the PAMT_4K level is allocated dynamically, reducing static
-> allocations to approximately 0.004% of the system memory.
-> 
-> PAMT memory is dynamically allocated as pages gain TDX protections.
-> It is reclaimed when TDX protections have been removed from all
-> pages in a contiguous area.
-> 
-> TODO:
->   - Rebase on top of Yan's huge page support series. Demotion requires
->     additional handling with Dynamic PAMT;
->   - Get better vmalloc API from core-mm and simplify patch 02/12.
-> 
-> Kirill A. Shutemov (12):
->   x86/virt/tdx: Allocate page bitmap for Dynamic PAMT
->   x86/virt/tdx: Allocate reference counters for PAMT memory
->   x86/virt/tdx: Add wrappers for TDH.PHYMEM.PAMT.ADD/REMOVE
->   x86/virt/tdx: Account PAMT memory and print if in /proc/meminfo
->   KVM: TDX: Add tdx_pamt_get()/put() helpers
->   KVM: TDX: Allocate PAMT memory in __tdx_td_init()
->   KVM: TDX: Allocate PAMT memory in tdx_td_vcpu_init()
->   KVM: x86/tdp_mmu: Add phys_prepare() and phys_cleanup() to
-> kvm_x86_ops KVM: TDX: Preallocate PAMT pages to be used in page fault
-> path KVM: TDX: Hookup phys_prepare() and phys_cleanup() kvm_x86_ops
->   KVM: TDX: Reclaim PAMT memory
->   x86/virt/tdx: Enable Dynamic PAMT
-> 
->  arch/x86/include/asm/kvm-x86-ops.h          |   2 +
->  arch/x86/include/asm/kvm_host.h             |   5 +
->  arch/x86/include/asm/set_memory.h           |   2 +
->  arch/x86/include/asm/tdx.h                  |  22 ++
->  arch/x86/include/asm/tdx_global_metadata.h  |   1 +
->  arch/x86/kvm/mmu/mmu.c                      |  10 +
->  arch/x86/kvm/mmu/tdp_mmu.c                  |  47 ++++-
->  arch/x86/kvm/vmx/main.c                     |   2 +
->  arch/x86/kvm/vmx/tdx.c                      | 215
-> ++++++++++++++++++-- arch/x86/kvm/vmx/tdx_errno.h                |
-> 1 + arch/x86/kvm/vmx/x86_ops.h                  |   9 +
->  arch/x86/mm/Makefile                        |   2 +
->  arch/x86/mm/meminfo.c                       |  11 +
->  arch/x86/mm/pat/set_memory.c                |   2 +-
->  arch/x86/virt/vmx/tdx/tdx.c                 | 211 ++++++++++++++++++-
->  arch/x86/virt/vmx/tdx/tdx.h                 |   5 +-
->  arch/x86/virt/vmx/tdx/tdx_global_metadata.c |   3 +
->  virt/kvm/kvm_main.c                         |   1 +
->  18 files changed, 522 insertions(+), 29 deletions(-)
->  create mode 100644 arch/x86/mm/meminfo.c
-> 
-
+> +           !kvm_arch_vm_supports_gmem_shared_mem(kvm))
+> +               goto err;
+> +
+>         filemap_invalidate_lock(inode->i_mapping);
+>
+>         start =3D offset >> PAGE_SHIFT;
+> --
+> 2.49.0.1045.g170613ef41-goog
+>
 
