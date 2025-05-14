@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-46551-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46552-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6775FAB7963
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 01:19:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C3F4AB7969
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 01:21:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D64751B67349
-	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 23:20:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04A783AE1E1
+	for <lists+kvm@lfdr.de>; Wed, 14 May 2025 23:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427C7226CE0;
-	Wed, 14 May 2025 23:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E1B226527;
+	Wed, 14 May 2025 23:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T3DNf+WR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xd7F1Oye"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C103C282E1
-	for <kvm@vger.kernel.org>; Wed, 14 May 2025 23:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17609282E1
+	for <kvm@vger.kernel.org>; Wed, 14 May 2025 23:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747264781; cv=none; b=CtofxKvPt/RTnicReuYzjOFLC/W5ImLXfIBOSC5bAhdbfGTZ9QnSIT2KMoWZ+Vc7ckuvsisbCR+Adh+7+b4vsNtltiy2igN61O1R/XgoSlS68+wsKy5lWRrIfCzxo9/xD73Oir9Lg2+4xH76aYcdZr+Ntk9wXUjAWD1fxSeTkyo=
+	t=1747264880; cv=none; b=OCgcBJDYSdpmiVqYTe0+c3rBXP6AVomX03va3VPl2YonUQoiBeP9XsRSMWBiq+8w6iuMNb4lsjXDX1igrfjdJpKMFy1Bi+0cwYY8hVRwgKpKpXs261t7/0ZnXMKcsPd0AW+61NazFSkzGwkNnXPxKL4yxunkjRL+FNEnJzMhklE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747264781; c=relaxed/simple;
-	bh=cNlVPYYnsQtqPjb2poMyKHUJYGJOPlxbA0jgyo6XDX8=;
+	s=arc-20240116; t=1747264880; c=relaxed/simple;
+	bh=YEKXLYRf3Z91CVsnsWfdQ9wfCYW5gqK6f8e442q5Hiw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SnKYu01KSfxwKZ/xQssNjxbh+KUc7F5eB3A34HCPoI9dWtHG1jUXSVH3jCI2+KfkxZOeKzOlNE3AK39WrfxiYiRhd4BXMmjanGHFPky3+7ECfD581CAE/3Hsglwnn6nvRHHT/PjIohjYDp2xB7qNp+CBKCNE7f8361F5Z/ULPCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T3DNf+WR; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=dzJO3RWK9NUbQE6e3icys8cxAYeOvs6qfbKrx4so3sJ+B1w9Q8YWf0uqvim2q0csndRYDdC1o1UuaAV8V5QmHxoJhSovIdHlTyn/VIX3pgAeNSH0T5Rxd42XHnk4nOkpoCquWjAXexJrwfonjF5TjUEMQCI21NtPDd0UTqDXzq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xd7F1Oye; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30ab5d34fdbso346785a91.0
-        for <kvm@vger.kernel.org>; Wed, 14 May 2025 16:19:38 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30c54b4007cso167797a91.3
+        for <kvm@vger.kernel.org>; Wed, 14 May 2025 16:21:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747264778; x=1747869578; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747264878; x=1747869678; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=inzL0y+cbDFsyp/vzuyCwIe54VBn5YH91v/9/7m3MOg=;
-        b=T3DNf+WRt5TCmAdcQ2vjHChChL+rwFC4OyuabZZXH3xG2eihOqqE0q38YK5UjrXvfK
-         g7hSKkygwQRYlIGAsjaZhpH+GYVdZWL/ZAwRBHy6pQmVlG3igiYuBe49tVZ2KkRCyW7+
-         qMtGr+/PDlHcMVzt9pM1eBFCS01/nhzQ0oDKgB5JNKWrmLb+Pp1ASpGnBd7xjxZVVpos
-         Vw/kSahbU+LOc5hM9k9OB3lJoNIfyl5uO+n1sys9BjncipwhV0SHKay2xB/zO/4froQ9
-         2L6rWGMwqhhip/wuTW2gUrx+wlO1CxqFLgUTMFRsG9Jktw1I21fKx1IN1q99p7WjexN1
-         aM3g==
+        bh=0W5oRAU5Tx1bBNWhYqi9a+fsUdga8B/qghEhaqvlHzU=;
+        b=xd7F1OyehJBJvB2ccUvc1pKbtQVY5d09+V8IxScIfm8ZLwDX9UjVOD56BcsIxCzNzn
+         rOyIJsHArhieQweztEahZnvtMw/USUgm+zMrAaFzNUbNARnmgoiSfn0FNt3M7WU8WyUj
+         m2itZn6ay/9gZwfo5OTyWFLWgI1rGPzRndG2NK8orSxQCGnavft5U0RgLQTOMRn64+8e
+         LYmDrkJNfgyeIi42TES2rhHKsPnDzsVosuz/GhQ7KPWfa0UcSz/cXSB2LlL+z6Ua4/EZ
+         KxiBo+q+aCJKIBGZkpU8dtKGBEl0Eetv3/wIEvqA85lixJW4B3dD6oNqCCNm7iVoupP8
+         O+Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747264778; x=1747869578;
+        d=1e100.net; s=20230601; t=1747264878; x=1747869678;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=inzL0y+cbDFsyp/vzuyCwIe54VBn5YH91v/9/7m3MOg=;
-        b=pJSB1lcQtndNg1VnWEi+mtaePwjj1o/EUf5xd7U5MAvTByafs4auwTdmbZ2macMc94
-         QuiZ1LGQxF/tvpCcyaAfZ0RIoJAQfKG9veHxS/vV3GAHLYcFnNNXrOsNasw0gGRk02qo
-         1VgUeZyLKi8pZqWodneRZByeDkzoHR2X6LuosqwP5/rUZZU48R09uhMMbi7LVqAZJQO0
-         mmXYZnoO+x3r7cmSLlibxRpOXwACB6OSe5xKNU//oqBC81L5Ab+ijLOoYxfj75iTLN43
-         owDZVxjjPEAUD4hsZEH91OFPAYGkSms8X2GbrX33ewdSaqPY3SsqlK/bTxj0rUn/i+HP
-         C3Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCVzCKT0YFv4bV1RcdAzsQeC1lG1oKTvZyTFYeZbXkbzZ84q5e3QSDXGAwgh6FD9EcZgvLk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtKR/cwgW43b9EBYENcaGx/NRX3OlrTHYM01AokPtwM3KdcTIo
-	IY1lvUgrfWLvzNTNvv9naGRp3c3YwzUD8wOncEyr0/3Eo7XOu0A+Acjs+RdylmJi/5KTLS392T5
-	NcA==
-X-Google-Smtp-Source: AGHT+IGCQ/sRX+3EYNcQDJbTeqc67xnpDL/NXZuajHJEmLyvMC58UdBnQowu6qn5H0+QlUsXIshKg9Pma6c=
-X-Received: from pjn12.prod.google.com ([2002:a17:90b:570c:b0:2ef:8055:93d9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:17d2:b0:30a:214c:24c9
- with SMTP id 98e67ed59e1d1-30e2e5d612dmr7495408a91.3.1747264778031; Wed, 14
- May 2025 16:19:38 -0700 (PDT)
-Date: Wed, 14 May 2025 16:19:36 -0700
-In-Reply-To: <20250425111352.GF1166@noisy.programming.kicks-ass.net>
+        bh=0W5oRAU5Tx1bBNWhYqi9a+fsUdga8B/qghEhaqvlHzU=;
+        b=a8Xf0KS3cMsLE6QbRvCwoA1b90KwdzDS2e2xEeDHLndCbBwijwBPf+W6lXpi100mc2
+         Jp4GbYQPyE3e2OmfBLE5tqhK89k2IkScLlXSPIbm7f46qJ64KptstBZr3ddAip8Yg8c3
+         PmuQS3KlRgws6CJNQcF2NL4WIILtcR3rno8lui5wkxaNpqR3teEIFw0MV1M0ofgCMCRU
+         daGCBU+jitmLvtF2X7wfVubf8Fi4D+C7zZyixDwj9aP+4PkgB9mlJdxDC7XERsIMnXQM
+         21dmZss8W2lDwFZqE9ujd2qiCIto0n7BJL6zEMfcoFy/i2z5o8pxZJifnLBButsNVhLc
+         0vfA==
+X-Forwarded-Encrypted: i=1; AJvYcCXczyQjHSnfj1d+XPRN2VfDMA/gOzfVAl/7Y9uZ9nTWAvfd3qi2nwm+36DlB6T0jUBj7cQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy155XmlPKStcAN7Nf4/btoAXtHULrQWVcnwa1sQriEvEJ1XJ/S
+	3iRhvan9/3hkhVGKK60VIOIrtVhOwKADZIuJNdHumkGJrvLYSkC7L5D61UxfrOat0oysEQICout
+	g+g==
+X-Google-Smtp-Source: AGHT+IGTO73AIKyjnTSCUICJ5vVeiHlgCc/yVjvzHrQyDqfhwzwnQP3wljVXsvhihVqXHqt1ySm+522Vois=
+X-Received: from pjuj4.prod.google.com ([2002:a17:90a:d004:b0:2ff:852c:ceb8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:564d:b0:2ef:31a9:95c6
+ with SMTP id 98e67ed59e1d1-30e2e5c3177mr9009619a91.14.1747264878446; Wed, 14
+ May 2025 16:21:18 -0700 (PDT)
+Date: Wed, 14 May 2025 16:21:16 -0700
+In-Reply-To: <20250324173121.1275209-7-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-6-mizhang@google.com>
- <20250425111352.GF1166@noisy.programming.kicks-ass.net>
-Message-ID: <aCUlCApeDM9Uy4a0@google.com>
-Subject: Re: [PATCH v4 05/38] perf: Add generic exclude_guest support
+References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-7-mizhang@google.com>
+Message-ID: <aCUlbDNoxQ-65mc0@google.com>
+Subject: Re: [PATCH v4 06/38] x86/irq: Factor out common code for installing
+ kvm irq handler
 From: Sean Christopherson <seanjc@google.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Mingwei Zhang <mizhang@google.com>, Ingo Molnar <mingo@redhat.com>, 
+To: Mingwei Zhang <mizhang@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
 	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Mark Rutland <mark.rutland@arm.com>, 
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
@@ -93,145 +93,38 @@ Cc: Mingwei Zhang <mizhang@google.com>, Ingo Molnar <mingo@redhat.com>,
 	Nikunj Dadhania <nikunj.dadhania@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Apr 25, 2025, Peter Zijlstra wrote:
-> On Mon, Mar 24, 2025 at 05:30:45PM +0000, Mingwei Zhang wrote:
-> 
-> > @@ -6040,6 +6041,71 @@ void perf_put_mediated_pmu(void)
-> >  }
-> >  EXPORT_SYMBOL_GPL(perf_put_mediated_pmu);
-> >  
-> > +static inline void perf_host_exit(struct perf_cpu_context *cpuctx)
-> > +{
-> > +	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
-> > +	ctx_sched_out(&cpuctx->ctx, NULL, EVENT_GUEST);
-> > +	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
-> > +	if (cpuctx->task_ctx) {
-> > +		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
-> > +		task_ctx_sched_out(cpuctx->task_ctx, NULL, EVENT_GUEST);
-> > +		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
-> > +	}
-> > +}
-> > +
-> > +/* When entering a guest, schedule out all exclude_guest events. */
-> > +void perf_guest_enter(void)
-> > +{
-> > +	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
-> > +
-> > +	lockdep_assert_irqs_disabled();
-> > +
-> > +	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
-> > +
-> > +	if (WARN_ON_ONCE(__this_cpu_read(perf_in_guest)))
-> > +		goto unlock;
-> > +
-> > +	perf_host_exit(cpuctx);
-> > +
-> > +	__this_cpu_write(perf_in_guest, true);
-> > +
-> > +unlock:
-> > +	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
-> > +}
-> > +EXPORT_SYMBOL_GPL(perf_guest_enter);
-> > +
-> > +static inline void perf_host_enter(struct perf_cpu_context *cpuctx)
-> > +{
-> > +	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
-> > +	if (cpuctx->task_ctx)
-> > +		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
-> > +
-> > +	perf_event_sched_in(cpuctx, cpuctx->task_ctx, NULL, EVENT_GUEST);
-> > +
-> > +	if (cpuctx->task_ctx)
-> > +		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
-> > +	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
-> > +}
-> > +
-> > +void perf_guest_exit(void)
-> > +{
-> > +	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
-> > +
-> > +	lockdep_assert_irqs_disabled();
-> > +
-> > +	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
-> > +
-> > +	if (WARN_ON_ONCE(!__this_cpu_read(perf_in_guest)))
-> > +		goto unlock;
-> > +
-> > +	perf_host_enter(cpuctx);
-> > +
-> > +	__this_cpu_write(perf_in_guest, false);
-> > +unlock:
-> > +	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
-> > +}
-> > +EXPORT_SYMBOL_GPL(perf_guest_exit);
-> 
-> This naming is confusing on purpose? Pick either guest/host and stick
-> with it.
+On Mon, Mar 24, 2025, Mingwei Zhang wrote:
+> diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
+> index 385e3a5fc304..18cd418fe106 100644
+> --- a/arch/x86/kernel/irq.c
+> +++ b/arch/x86/kernel/irq.c
+> @@ -312,16 +312,22 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_x86_platform_ipi)
+>  static void dummy_handler(void) {}
+>  static void (*kvm_posted_intr_wakeup_handler)(void) = dummy_handler;
+>  
+> -void kvm_set_posted_intr_wakeup_handler(void (*handler)(void))
+> +void x86_set_kvm_irq_handler(u8 vector, void (*handler)(void))
+>  {
+> -	if (handler)
+> +	if (!handler)
+> +		handler = dummy_handler;
+> +
+> +	if (vector == POSTED_INTR_WAKEUP_VECTOR &&
+> +	    (handler == dummy_handler ||
+> +	     kvm_posted_intr_wakeup_handler == dummy_handler))
+>  		kvm_posted_intr_wakeup_handler = handler;
+> -	else {
+> -		kvm_posted_intr_wakeup_handler = dummy_handler;
+> +	else
+> +		WARN_ON_ONCE(1);
+> +
+> +	if (handler == dummy_handler)
 
-+1.  I also think the inner perf_host_{enter,exit}() helpers are superflous.
-These flows
+Eww.  Aside from the fact that the dummy_handler implementation is pointless
+overhead, I don't think KVM should own the IRQ vector.  Given that perf owns the
+LVTPC, i.e. responsible for switching between NMI and the medited PMI IRQ, I
+think perf should also own the vector.  KVM can then use the existing perf guest
+callbacks to wire up its PMI handler.
 
-After a bit of hacking, and with a few spoilers, this is what I ended up with
-(not anywhere near fully tested).  I like following KVM's kvm_xxx_{load,put}()
-nomenclature to tie everything together, so I went with "guest" instead of "host"
-even though the majority of work being down is to shedule out/in host context.
-
-/* When loading a guest's mediated PMU, schedule out all exclude_guest events. */
-void perf_load_guest_context(unsigned long data)
-{
-	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
-
-	lockdep_assert_irqs_disabled();
-
-	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
-
-	if (WARN_ON_ONCE(__this_cpu_read(guest_ctx_loaded)))
-		goto unlock;
-
-	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
-	ctx_sched_out(&cpuctx->ctx, NULL, EVENT_GUEST);
-	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
-	if (cpuctx->task_ctx) {
-		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
-		task_ctx_sched_out(cpuctx->task_ctx, NULL, EVENT_GUEST);
-		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
-	}
-
-	arch_perf_load_guest_context(data);
-
-	__this_cpu_write(guest_ctx_loaded, true);
-
-unlock:
-	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
-}
-EXPORT_SYMBOL_GPL(perf_load_guest_context);
-
-void perf_put_guest_context(void)
-{
-	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
-
-	lockdep_assert_irqs_disabled();
-
-	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
-
-	if (WARN_ON_ONCE(!__this_cpu_read(guest_ctx_loaded)))
-		goto unlock;
-
-	arch_perf_put_guest_context();
-
-	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
-	if (cpuctx->task_ctx)
-		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
-
-	perf_event_sched_in(cpuctx, cpuctx->task_ctx, NULL, EVENT_GUEST);
-
-	if (cpuctx->task_ctx)
-		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
-	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
-
-	__this_cpu_write(guest_ctx_loaded, false);
-unlock:
-	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
-}
-EXPORT_SYMBOL_GPL(perf_put_guest_context);
+And with that, this patch can be dropped.
 
