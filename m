@@ -1,162 +1,155 @@
-Return-Path: <kvm+bounces-46723-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46724-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EAF2AB8FF6
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 21:26:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3D0AB9027
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 21:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0A02A0688D
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 19:25:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 422551BC7F94
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 19:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B13298CC0;
-	Thu, 15 May 2025 19:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54061297A48;
+	Thu, 15 May 2025 19:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y2Ez2VWQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OPcdyKPg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058DD28AB1A
-	for <kvm@vger.kernel.org>; Thu, 15 May 2025 19:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7297D296FB9
+	for <kvm@vger.kernel.org>; Thu, 15 May 2025 19:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747337147; cv=none; b=aNQawyg5U+KRDjffnRGG9+tQB9DeC1hrVvkhERs2zSjBGXCdnIXTc2QR/aEaJVcG1Dz6U+DMfbMMxA8upke+IiBeOXtUvmxPvBPE8QExah/WCbjoQzqpX17+d+VixG4BZyTXxLkVNW6AZn5PWW9r5wZ1mTvCeZwqLm+bEUHEz+c=
+	t=1747338681; cv=none; b=HRE9GCqbhvPKS9AmjICmdByUYLorQcPEfkP+Nx53HvM5McpvWkycuBkVW2uG+VLyfYQas5hGKZ+ZG9h3ELw7a+IKJJgU+0+IEQGdFSXwOp1L/tmBcadt1IF2iGbqWZ9EwUzgdtWMrRfWq8EPnFiZCazM+82fvSSIE1wvPYt+1B0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747337147; c=relaxed/simple;
-	bh=zZ5aWmM8OMpv9EBcLKQSdDKlyFMLUjP1YzCEI1CApF8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=m8Gsa9TWM7JpbGd6/biQmEYU0Y6NR/8lngnN0rF8kNzjlT8TKR7QwUN2w41KMsCz9O9ROeVb6p4kyvbsdEOv+YyKFr03VqaLaG726B/AqYglZMMQuEINK7JOM1tz9Q3QrOxcytNIja+nwCTV3/268yRysKpdD8vOYUBOPgeGFOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y2Ez2VWQ; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30c4bdd0618so1456118a91.1
-        for <kvm@vger.kernel.org>; Thu, 15 May 2025 12:25:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747337144; x=1747941944; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PJSWz1qQY0bOXhQozVAxmE44I1S4t/sjttyPXQeJ8IA=;
-        b=Y2Ez2VWQKD8ykMesyPGe5Sk9lwA99kOHZBc/CpOJo0njXtSajYe6PGwH8Rp2Tv3vi7
-         wZa3Jk4nphL3OUz/VlDFoh+d1DaYbwYLIJ/wco9ribNUbTFjtAjryb4q91lamAmd4SOX
-         Ys5ammPTuJQWFCCcDZJbPQ/2gLv2uPv8WZnDmYrx4PjRnG+6QBYCPBFwdG3P3MMw6rDj
-         iYmPn1yARz890pOwaqG/3jZXsDtCO8JWa3cs2DsQsp0fbD+rCubMCriSzsecGJsRda57
-         +SF1VYF2YPoy5VR0NEqa9yXdNoM44nLAhzd701xgiqOt3VnDgv+Fo/SndKTc/VWIDayf
-         +sIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747337144; x=1747941944;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PJSWz1qQY0bOXhQozVAxmE44I1S4t/sjttyPXQeJ8IA=;
-        b=ik7Wh4fjTaGz/SUi4yfcFvhMSoLU30Khmo5uFdlTSNdOdnu13+bferY9LESwwA4/st
-         pLSgbvPsA0cKbrzmsVOA/AcVlPrV5TRmJVhzTJvJnSuhVcpXJyn4uUKyyasC9iIrQSHP
-         xt0qc7DfqGjx5xnf7HbdvDtbRRFNGZHF1uvshw3c/xDEsj2JfXzDgJuJmnwG/shpXL8V
-         MfxGBPvG795371jKRRSk2g6gg9bjRqB6dgja5dtKLSl/dOrhxGr/OPWhCW3RTuzJ3XW3
-         8c6i+32Bxyow158sxGSps2linynzq6DbH4Uu1yEzZEIPGjtcsmV3Fh+nji3BwyvjFxMP
-         R78w==
-X-Forwarded-Encrypted: i=1; AJvYcCUQArZGr+j+l9xUv4IBxXfxeRsYC8lJsfzPI3z90t48fbMeJX5LY4YBpwEc5mk4tW/NJv4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3pMHmJ+/QIzyPA+3m7r13ult+X/LJQHafFQ/apMt3G7lntOCm
-	0R02MJLEmAXnv/nCe9RazesD8H9HHcM03/56iwbQLJCexj+MwhE5mulIi7qZ1yctpHEm+OQYhL1
-	6/HtaPQ==
-X-Google-Smtp-Source: AGHT+IGnnpSy0LS4moSG7jQw0vd/6SN3ne1/zkd5xblJsV96qiTU23vCFfxne9MCIwYbbn2km+mxYmv5Vhc=
-X-Received: from pji8.prod.google.com ([2002:a17:90b:3fc8:b0:2ea:5084:5297])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:6d0:b0:2ea:3f34:f18f
- with SMTP id 98e67ed59e1d1-30e7d55c397mr714765a91.19.1747337143852; Thu, 15
- May 2025 12:25:43 -0700 (PDT)
-Date: Thu, 15 May 2025 12:25:42 -0700
-In-Reply-To: <4aaf67ab-aa5c-41e6-bced-3cb000172c52@linux.intel.com>
+	s=arc-20240116; t=1747338681; c=relaxed/simple;
+	bh=SM7Fsp7OBkR12UwEkjhPIInqFpNqTlTloiXdSI0R6HY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UH7RHTuY82sUPMmO0o9VBEHDgqDcoo5PfmQlkDOMgtAJyYj1iyycEZBnZ+jx5R4Nwc2tNjK5OFWeEl4q6JntVj5SxN0Vp9CB2gdg2QH0poLrKWFw3lgKvlg7bTpmn2WsD7MFWus8L1Y5JMWSKhJsev5mNhzj141+/5YBwV7XTFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OPcdyKPg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1717CC4CEF0;
+	Thu, 15 May 2025 19:51:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747338680;
+	bh=SM7Fsp7OBkR12UwEkjhPIInqFpNqTlTloiXdSI0R6HY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OPcdyKPg+FQX0zX7nyDXXkM4xDAm5Jxc6VSU2Xrnoso7xzt2ZyWKK+lS9g/Oji8II
+	 FlQ7bWdtkgel4576D5ZfRO5nwKz5s40d/yLg0W3BchmsbHcapD5EJTQ9qjnnoTZZVd
+	 dc0bnrEosroqwu4ktWBkkHaTdj8kgVNDviJ9CgIqIqoA+fY1LpFDESW/YTzBBXFaJ/
+	 Xs9mvXa6uViJm5DBDQY5hZ9yYN0yo/8Lg15Oy/f0fpeiSFms/YxScMhXpMJUifraCP
+	 q4ti9tgXXdCoDpLEKKlpy0Kf7qiwl3emnrdvnavLAAUfxmf06ayjJ8+PlXxYASSgR0
+	 g4wOdZO6CPjRw==
+Date: Thu, 15 May 2025 22:51:16 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>, kvm@vger.kernel.org,
+	Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [GIT PULL] Please pull mlx5 VFIO PCI DMA conversion
+Message-ID: <20250515195116.GP22843@unreal>
+References: <20250513104811.265533-1-leon@kernel.org>
+ <20250515114715.0f718ce0.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-6-mizhang@google.com>
- <20250425111352.GF1166@noisy.programming.kicks-ass.net> <aCUlCApeDM9Uy4a0@google.com>
- <4aaf67ab-aa5c-41e6-bced-3cb000172c52@linux.intel.com>
-Message-ID: <aCY_tkjzxknAbEgq@google.com>
-Subject: Re: [PATCH v4 05/38] perf: Add generic exclude_guest support
-From: Sean Christopherson <seanjc@google.com>
-To: Kan Liang <kan.liang@linux.intel.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Mingwei Zhang <mizhang@google.com>, 
-	Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com, 
-	"H. Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Yongwei Ma <yongwei.ma@intel.com>, 
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Jim Mattson <jmattson@google.com>, Sandipan Das <sandipan.das@amd.com>, 
-	Zide Chen <zide.chen@intel.com>, Eranian Stephane <eranian@google.com>, 
-	Shukla Manali <Manali.Shukla@amd.com>, Nikunj Dadhania <nikunj.dadhania@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250515114715.0f718ce0.alex.williamson@redhat.com>
 
-On Thu, May 15, 2025, Kan Liang wrote:
-> On 2025-05-14 7:19 p.m., Sean Christopherson wrote:
-> >> This naming is confusing on purpose? Pick either guest/host and stick
-> >> with it.
-> > 
-> > +1.  I also think the inner perf_host_{enter,exit}() helpers are superflous.
-> > These flows
-> > 
-> > After a bit of hacking, and with a few spoilers, this is what I ended up with
-> > (not anywhere near fully tested).  I like following KVM's kvm_xxx_{load,put}()
-> > nomenclature to tie everything together, so I went with "guest" instead of "host"
-> > even though the majority of work being down is to shedule out/in host context.
-> > 
-> > /* When loading a guest's mediated PMU, schedule out all exclude_guest events. */
-> > void perf_load_guest_context(unsigned long data)
-> > {
-> > 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
-> > 
-> > 	lockdep_assert_irqs_disabled();
-> > 
-> > 	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
-> > 
-> > 	if (WARN_ON_ONCE(__this_cpu_read(guest_ctx_loaded)))
-> > 		goto unlock;
-> > 
-> > 	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
-> > 	ctx_sched_out(&cpuctx->ctx, NULL, EVENT_GUEST);
-> > 	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
-> > 	if (cpuctx->task_ctx) {
-> > 		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
-> > 		task_ctx_sched_out(cpuctx->task_ctx, NULL, EVENT_GUEST);
-> > 		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
-> > 	}
-> > 
-> > 	arch_perf_load_guest_context(data);
-> > 
-> > 	__this_cpu_write(guest_ctx_loaded, true);
-> > 
-> > unlock:
-> > 	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
-> > }
-> > EXPORT_SYMBOL_GPL(perf_load_guest_context);
-> > 
-> > void perf_put_guest_context(void)
-> > {
-> > 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
-> > 
-> > 	lockdep_assert_irqs_disabled();
-> > 
-> > 	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
-> > 
-> > 	if (WARN_ON_ONCE(!__this_cpu_read(guest_ctx_loaded)))
-> > 		goto unlock;
-> > 
-> > 	arch_perf_put_guest_context();
+On Thu, May 15, 2025 at 11:47:15AM -0600, Alex Williamson wrote:
+> On Tue, 13 May 2025 13:48:10 +0300
+> Leon Romanovsky <leon@kernel.org> wrote:
 > 
-> It will set the guest_ctx_loaded to false.
-> The update_context_time() invoked in the perf_event_sched_in() will not
-> get a chance to update the guest time.
+> > Hi Alex,
+> > 
+> > Please accept this pull request, which presents subset of new DMA-API
+> > patchset [1] specific for VFIO subsystem.
+> > 
+> > It is based on Marek's dma-mapping-for-6.16-two-step-api branch, so merging
+> > now will allow us to reduce possible rebase errors in mlx5 vfio code and give
+> > enough time to start to work on second driver conversion. Such conversion will
+> > allow us to generalize the API for VFIO kernel drivers, in similiar way that
+> > was done for RDMA, HMM and block layers.
+> 
+> Hi Leon,
+> 
+> Pull requests are not my typical workflow.  Are these mlx5-vfio-pci
+> changes intended to enter mainline through the vfio tree or your rdma
+> tree?
 
-The guest_ctx_loaded in arch/x86/events/core.c is a different variable, it just
-happens to have the same name.
+VFIO changes will come through your tree. DMA patches are the same as in
+Marek's DMA tree and in our RDMA tree.
 
-It's completely gross, but exposing guest_ctx_loaded outside of kernel/events/core.c
-didn't seem like a great alternative.  If we wanted to use a single variable,
-then the writes in arch_perf_{load,put}_guest_context() can simply go away.
+I prepared PR to save from your hassle of merging dma/dma-mapping-for-6.16-two-step-api
+topic from Marek and collecting VFIO patches from ML.
+
+> Why do the commits not include a review/ack from Yishai?
+
+They have Jason's review tags and as far as I know Yishai, he trusts
+Jason's judgement.
+
+> 
+> Typically I'd expect a patch series for the mlx5-vfio-pci changes that
+> I would apply, with Yishai's approval, to a shared branch containing the
+> commits Marek has already accepted.  I'm not sure why we're preempting
+> that process here.  Thanks,
+
+This is exactly what is in this PR: reviewed VFIO patches which were
+posted to the ML on top of Marek's shared branch.
+
+If you prefer, I can repost the VFIO patches.
+
+Thanks
+
+> 
+> Alex
+> 
+> > [1] [PATCH v10 00/24] Provide a new two step DMA mapping API
+> > https://lore.kernel.org/all/cover.1745831017.git.leon@kernel.org/
+> > 
+> > ----------------------------------------------------------------
+> > The following changes since commit 3ee7d9496342246f4353716f6bbf64c945ff6e2d:
+> > 
+> >   docs: core-api: document the IOVA-based API (2025-05-06 08:36:54 +0200)
+> > 
+> > are available in the Git repository at:
+> > 
+> >   https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git tags/vfio-dma-two-step
+> > 
+> > for you to fetch changes up to 855c89a25e1756b7699b863afd4d6afcbd0de0d6:
+> > 
+> >   vfio/mlx5: Enable the DMA link API (2025-05-13 03:58:27 -0400)
+> > 
+> > ----------------------------------------------------------------
+> > Convert mlx5 VFIO PCI driver to new two step DMA API
+> > 
+> > This PR is based on newly accepted DMA API, which allows us
+> > to avoid building scatter-gather lists just to batch mapping
+> > and unmapping of pages.
+> > 
+> > VFIO PCI live migration code is building a very large "page list"
+> > for the device. Instead of allocating a scatter list entry per
+> > allocated page it can just allocate an array of 'struct page *',
+> > saving a large amount of memory.
+> > 
+> > Signed-off-by: Leon Romanovsky <leon@kernel.org>
+> > 
+> > ----------------------------------------------------------------
+> > Leon Romanovsky (3):
+> >       vfio/mlx5: Explicitly use number of pages instead of allocated length
+> >       vfio/mlx5: Rewrite create mkey flow to allow better code reuse
+> >       vfio/mlx5: Enable the DMA link API
+> > 
+> >  drivers/vfio/pci/mlx5/cmd.c  | 375 +++++++++++++++++++++----------------------
+> >  drivers/vfio/pci/mlx5/cmd.h  |  35 ++--
+> >  drivers/vfio/pci/mlx5/main.c |  87 +++++-----
+> >  3 files changed, 239 insertions(+), 258 deletions(-)
+> > 
+> 
 
