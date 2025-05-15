@@ -1,163 +1,188 @@
-Return-Path: <kvm+bounces-46742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6BA6AB92E0
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 01:43:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CED6AB92E9
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 01:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 018764E798E
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 23:43:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C52AD1BC56A6
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 23:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34CFB28E5F1;
-	Thu, 15 May 2025 23:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C3A12E7F;
+	Thu, 15 May 2025 23:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKtnNuS4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1CtJqb6o"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B361C1E5B97
-	for <kvm@vger.kernel.org>; Thu, 15 May 2025 23:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D69A1F3FDC
+	for <kvm@vger.kernel.org>; Thu, 15 May 2025 23:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747352579; cv=none; b=Cs4bsKbebF0mPZBB1xV5bzFoH8dCom+5C0vn7awZeInwdo9WiV0uAHytJnc7kEwKUZLfv9vgGjzcV9hxE9PF8lwVmEiAPrxBUyj8vd4aGKtAwnwXol0v68VL7FbGkyG8EVgzgKxfrAiBG0EdljGmLoxYb4wlsmMouSYuvrndeRA=
+	t=1747353085; cv=none; b=Q5sw4zc/jKjLtt7IS2rfp7oIVc5fzmqjjyrwj0sasX0MwBMxffAsFb8nPgilh4rKy6XBF1kkY8qtfAUNjT38oOsvXcv0BE7qv9WcJ8MyhtwwDCJQiKxA+JvL0tfpGSVbsnuO1R67RSO1cxBLhhs95e11qIDKzkdy6miyE8YwRCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747352579; c=relaxed/simple;
-	bh=uJ0aT88Wt5fc3RAOz7XQ9F4rbUALOUsnM+yBgPuBdRk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RtnGsthMGhlC1exz1vZSn/dH8vC72YkV/g6tnQgpFP7rvD9lFwQdvDA5Snqzjzd7qKUzBXJFNjmHn2vHcYAI3A6adeDhTQfVxNFIpQ8My2mJw6+X0Q6skbdblkYwEPYSjqoX9vdM8fp34W8KgQl/Q700q3sybHnHe3q4NPuzhfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JKtnNuS4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747352576;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D543q3muZl4ZTiDO4u6l3P+84dJKDCsQhD2gkZu4SUY=;
-	b=JKtnNuS4x0cOCaOJVskJiDNikNzKCvEtkI+rhTQQWCkJv3wvvmhc5b7MXMBdveYfio9N2X
-	h8tgqnzfE/KU0wJDsoGTPQp2WTL4v+N0CJ8BSS5qTW0Ey4JoUsyP8Lf6GBQxLhWINmA6Qj
-	KUw9tvGkTGf2b8JGQPHGbhzUchEAPBc=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-621-byuR1INbOKusuXZzZ3gihg-1; Thu, 15 May 2025 19:42:55 -0400
-X-MC-Unique: byuR1INbOKusuXZzZ3gihg-1
-X-Mimecast-MFC-AGG-ID: byuR1INbOKusuXZzZ3gihg_1747352574
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-30c14d46b55so2388908a91.3
-        for <kvm@vger.kernel.org>; Thu, 15 May 2025 16:42:55 -0700 (PDT)
+	s=arc-20240116; t=1747353085; c=relaxed/simple;
+	bh=AfXZUnoHkQOtVDGyZJxH9KXA4kgHaJBtdGiOM+DpRo4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qx+2M/8tHuut6kwmoG8+RwouQu+4CLrLKQBwLrbaj6JGbBpGDWQq8yZknAj+TeE3+hUPBwM+PUATxlO0DMV+x+iHfecOcHYJlj19BO+vLi8WusHKwYaj5XXsADJmTezN32GPwg7GFGAQls7cQ5ketxr9x6Ua89X+r8jv6IDK03Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1CtJqb6o; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-708b31650ffso14690087b3.0
+        for <kvm@vger.kernel.org>; Thu, 15 May 2025 16:51:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747353082; x=1747957882; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XPr3QgE6XopAJbneoL2gWRrUZHMd+L1uMUHvEpVxd34=;
+        b=1CtJqb6o/HN+LDS0jcnoZjd1riuadkwMfbutpCpg0j38xn6RHtmy/w5ydkx5FwDWmT
+         03RokmAvCbGqfjegXbDbGRXcUauCKlFq2LHoqomUA0v+TccgOIohXlTxSfsJFYrpm9c/
+         cC7sLCVIrodL+fSRMrjj0sx9nZkmsso+b01p59PtmdhTXFw5TI09irZR7wBtnt9NzZtp
+         YUW52RLrMCwupdj5+2mzRURkt8DLKpogGBzB1n7wglPkVHbAjsTKrhbVkRnIMLNYlH2H
+         2wXqL1eKFIVj+Oj2mfePe/U/bOF8iQyl2yaHkbAgKqCAOkiP3CE6PHrJx3e5HWXUnWo8
+         pP0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747352574; x=1747957374;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D543q3muZl4ZTiDO4u6l3P+84dJKDCsQhD2gkZu4SUY=;
-        b=sUtG7SFYoqge03TACZQQxjKWnbhgyL60oouxDOuoR29GEU9OFSgE1XSodrhaNUZLbF
-         K2OzWtqv5StrxRuGqeggVpWz8R0jmWzVXcg6wFWNTird5UfC2PJNjJHcu/TsM9CyK+tQ
-         z3xuRBKjgAHcgL1LR8N4obm5Gbet9xo3wGhEpxe8QpaBJU8Cwda2L6irCfDM+NO45BUc
-         JgSbZcot+kkymB+Mr93E6rM1XRzYDWHtqUYFoAd3UDf+sQke2RUIDlovpkB8+R5FQrJS
-         5uM54bLM431/PNBiPu/bWnZF1Anyz+7Oq1yLQYQLZZb33vUuiaROmDoYOSxN2CcDelX5
-         HY7g==
-X-Forwarded-Encrypted: i=1; AJvYcCX0s0ZZ1MdpoVhBGBST4GRTeYSO7r7vuf8ldj09r4cCptgQkKMMqolHjp5QyU5JlRs2xGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCXgkVdHqruU2e1839G9EICcGh4AzjlA4ounxggf7kcnExv3E/
-	sR7ZBQGKHlG+DLUDYSzTiA1HAIdhcl6z0wIPkjACOApzRKnf02lM0uBPnOyUl4ErMHLXc4PUREa
-	8s3h2i5+1sDkSwHPdsf7eJvQS1T3ywdxTlrQCQxyWcmpq9C5bveUV4w==
-X-Gm-Gg: ASbGncsISzpY27rzJYuADlBJmPl++s50bq4CEdZnimmxfGiwFub0ifljfIVYxQTsccw
-	si9O/srUjVcxcEC6pS1TcPQoZfBYRGmGjLTseEh/2grdsqs6g1o3jc05D2rItoD5SCugdTfAXDF
-	6IJ7AuFhKuNMmFLbJrz1mnr3w4flTtyjBa/JvjXbmXm3nEzB5CX2xfPSvdCSK3VG25Uzikh9QY6
-	cim+nn/w9HR/yhVFjrr8SKZsHUSxG6OaKI+c4Vj/pEj7fTZVzC97eONZ8iDNl5b9UQ2vlMNYpXw
-	gIHX8qXZndiD
-X-Received: by 2002:a17:90b:3e8e:b0:2ff:58e1:2bb1 with SMTP id 98e67ed59e1d1-30e7d5bb1e9mr1333526a91.32.1747352574472;
-        Thu, 15 May 2025 16:42:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFRL/1O/Rrnq8ioMs+d0i5/D3GPpfrLPajlUsLeikruv+Yje3p8yvM4Ix2Eud3DGPaH1u34zA==
-X-Received: by 2002:a17:90b:3e8e:b0:2ff:58e1:2bb1 with SMTP id 98e67ed59e1d1-30e7d5bb1e9mr1333477a91.32.1747352574064;
-        Thu, 15 May 2025 16:42:54 -0700 (PDT)
-Received: from [192.168.68.51] ([180.233.125.65])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30e334016e7sm4069046a91.9.2025.05.15.16.42.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 May 2025 16:42:53 -0700 (PDT)
-Message-ID: <9a2431e0-252d-41c9-a91d-9e02a8779e8c@redhat.com>
-Date: Fri, 16 May 2025 09:42:31 +1000
+        d=1e100.net; s=20230601; t=1747353082; x=1747957882;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XPr3QgE6XopAJbneoL2gWRrUZHMd+L1uMUHvEpVxd34=;
+        b=evw0pxIrA7tN5j9aF8WRz8n10w6ogILKbE7/E7saeRKsV5AJ3CeJNrWhouXywrr1u7
+         xpvHjf7ryMU2bkAKde6toJcg0mtCLFKHacATARvLwZ8wDuHlYuTuS2tF9TB7TpeRcD7K
+         apKW+Ao2LxN3+f2d5qGCQKYJ9kdxYuLbpLbhNVrJxL/gRevbiA9QftekzyDp+fw6xSIh
+         OCFk6DR7Pu4BB3veq/Npz2gn1ADyjpQ6Nn6AinWXRzCdyxSk5WS6V4ipI5GN7V3ctcYB
+         FO9PYvOScXudmExQKBftDFoydIF9whhZCPD0ZF92qaOdIyrSWIBj3A+b2zKyUDXMx0k7
+         HmWA==
+X-Gm-Message-State: AOJu0Yxm6d4QPMy88YkYDQtT1kjCMLZmIx2DLO7FvOkYDA6h+xmYsMvb
+	BUuIwHhfPBqIKlpGog1zZeEbdaXHaCBRCwGvjnVVlMPfqOsipktnLkxM0zhG7+bHllhU34tPMpi
+	6ARKBDxqbkmhu/dt06APY6IAl8mWwH6p823ezBGF2
+X-Gm-Gg: ASbGncs+qvhp4wQUgaikU43QU9G4j8uzrCliHpHNJleF08jX3Bya9tgKChBZ8lx8FXZ
+	eXWAi5W7Bl3fqndmaMwRCm0QGuPX6VhIWiozITLprzk1qeaA7s8Ngrl+d4AXDOv9DEv+5dEOPbd
+	ITZouIdTY5OzzO/m7d+tn1E6yHtmafuUkB1gndGAdaPFAC/BstHe08csYnTwornrj51SSxxPRcJ
+	g==
+X-Google-Smtp-Source: AGHT+IFtFp+P9O4VK8Qg9OzC+jX855YZKb1zj5TbuTuZP6rzUXb2ZUvAPIYYnFVnT20lddtCCBfDaOJ6HpF0TmLVRBg=
+X-Received: by 2002:a05:690c:74c8:b0:709:32df:b41d with SMTP id
+ 00721157ae682-70ca797c496mr28163037b3.8.1747353082130; Thu, 15 May 2025
+ 16:51:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 07/17] KVM: guest_memfd: Allow host to map
- guest_memfd() pages
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250513163438.3942405-1-tabba@google.com>
- <20250513163438.3942405-8-tabba@google.com>
-Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250513163438.3942405-8-tabba@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250513163438.3942405-1-tabba@google.com> <20250513163438.3942405-15-tabba@google.com>
+In-Reply-To: <20250513163438.3942405-15-tabba@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Thu, 15 May 2025 16:50:45 -0700
+X-Gm-Features: AX0GCFsvPupUGBEWmI9iLoV-X7DO-vyiE5FRi3DFqxSHp3h36n9H0MRG3xg22Hg
+Message-ID: <CADrL8HXN=9r0Kat5Rix8OdAFmHK+qqRNqyCU93XPK7WbM4f2vg@mail.gmail.com>
+Subject: Re: [PATCH v9 14/17] KVM: arm64: Enable mapping guest_memfd in arm64
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Fuad,
-
-On 5/14/25 2:34 AM, Fuad Tabba wrote:
-> This patch enables support for shared memory in guest_memfd, including
-> mapping that memory at the host userspace. This support is gated by the
-> configuration option KVM_GMEM_SHARED_MEM, and toggled by the guest_memfd
-> flag GUEST_MEMFD_FLAG_SUPPORT_SHARED, which can be set when creating a
-> guest_memfd instance.
-> 
-> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+On Tue, May 13, 2025 at 9:35=E2=80=AFAM Fuad Tabba <tabba@google.com> wrote=
+:
+>
+> Enable mapping guest_memfd in arm64. For now, it applies to all
+> VMs in arm64 that use guest_memfd. In the future, new VM types
+> can restrict this via kvm_arch_gmem_supports_shared_mem().
+>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->   arch/x86/include/asm/kvm_host.h | 10 ++++
->   include/linux/kvm_host.h        | 13 +++++
->   include/uapi/linux/kvm.h        |  1 +
->   virt/kvm/Kconfig                |  5 ++
->   virt/kvm/guest_memfd.c          | 88 +++++++++++++++++++++++++++++++++
->   5 files changed, 117 insertions(+)
-> 
+>  arch/arm64/include/asm/kvm_host.h | 10 ++++++++++
+>  arch/arm64/kvm/Kconfig            |  1 +
+>  2 files changed, 11 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
+vm_host.h
+> index 08ba91e6fb03..2514779f5131 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1593,4 +1593,14 @@ static inline bool kvm_arch_has_irq_bypass(void)
+>         return true;
+>  }
+>
+> +static inline bool kvm_arch_supports_gmem(struct kvm *kvm)
+> +{
+> +       return IS_ENABLED(CONFIG_KVM_GMEM);
+> +}
 
-[...]
+This is written as if it is okay for CONFIG_KVM_GMEM not to be
+enabled, but when disabling CONFIG_KVM_GMEM you will get an error for
+redefining kvm_arch_supports_gmem().
 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index b6ae8ad8934b..9857022a0f0c 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1566,6 +1566,7 @@ struct kvm_memory_attributes {
->   #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
->   
->   #define KVM_CREATE_GUEST_MEMFD	_IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
-> +#define GUEST_MEMFD_FLAG_SUPPORT_SHARED	(1UL << 0)
->   
+I think you either want to include:
 
-This would be (1ULL << 0) to be consistent with '__u64 struct kvm_create_guest_memfd::flags'
+#define kvm_arch_supports_gmem kvm_arch_supports_gmem
 
-Thanks,
-Gavin
+or just do something closer to what x86 does:
 
+#ifdef CONFIG_KVM_GMEM
+#define kvm_arch_supports_gmem(kvm) true
+#endif
+
+> +
+> +static inline bool kvm_arch_vm_supports_gmem_shared_mem(struct kvm *kvm)
+> +{
+> +       return IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM);
+> +}
+
+And this applies here as well.
+
+#define kvm_arch_vm_supports_gmem_shared_mem
+kvm_arch_vm_supports_gmem_shared_mem
+
+or
+
+#ifdef CONFIG_KVM_GMEM
+#define kvm_arch_vm_supports_gmem_shared_mem(kvm)
+IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM);
+#endif
+
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 096e45acadb2..8c1e1964b46a 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -38,6 +38,7 @@ menuconfig KVM
+>         select HAVE_KVM_VCPU_RUN_PID_CHANGE
+>         select SCHED_INFO
+>         select GUEST_PERF_EVENTS if PERF_EVENTS
+> +       select KVM_GMEM_SHARED_MEM
+
+This makes it impossible to see the error, but I think we should fix
+it anyway. :)
+
+>         help
+>           Support hosting virtualized guest machines.
+>
+> --
+> 2.49.0.1045.g170613ef41-goog
+>
 
