@@ -1,88 +1,84 @@
-Return-Path: <kvm+bounces-46612-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46613-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2C35AB7AA0
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 02:33:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD67AB7AA7
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 02:37:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B2474C34FF
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 00:33:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66CE67B36E9
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 00:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7792164A98;
-	Thu, 15 May 2025 00:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC7D81CAA4;
+	Thu, 15 May 2025 00:37:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dVQ9JN6W"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="urR8CUfh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB60F9D6
-	for <kvm@vger.kernel.org>; Thu, 15 May 2025 00:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBF0F9D6
+	for <kvm@vger.kernel.org>; Thu, 15 May 2025 00:37:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747269220; cv=none; b=tuxwUnpkmduiPzeCnAK3WoXx4uADT/BSph4/RaeRpP0lUOoXaQLiPNDofiUJoZzpPH6e7fQWFFpB1cNi5/jrWhQ0bCpiMsVsiUMKYylhv8TlYUnd/rY1FuespMoSc9/woycqJfL9Y6EmeKcuatYCvub/D8BwTQhhElDG+KCS4G4=
+	t=1747269450; cv=none; b=n+eKKKaba7q2jUHI9gAuNFy2orT8oSlxkepuE0GhW7DhDHO3qKVwWrNW93OzBzfnnftZfPD3eleIeFr/SuWwUWULNpVvxYoJaOSF6YfukYUVzkspXEYGAkBLCRMs8XMQcAD99r6Q/nV4Y2UmWSXhg5lDhZS2HadGPhgBswSDJx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747269220; c=relaxed/simple;
-	bh=kWsTqq0lhBMvBNJ0ZtIHiTgXO8OwzpD8p2bSnfGsB4c=;
+	s=arc-20240116; t=1747269450; c=relaxed/simple;
+	bh=20JZZATn2xYn8yCBr4Nu5Nw8VR/pgtNNgy1qu7hFmHY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Kb/WUl1fkQNRXsVG/pjPEzPa+kGIn0MLiAKmQWQWPIpaMvLG8vHY4NZzT0FvczKofEr0PDFK8htKGiscyA/r7cWgz+gUuODYDsh5iRUjzmzJy6RoHqPmcKHEhB/lKz8naEpxbfXYh8j7aUijzqBqWsRQN/hsc1IsVJd+JVE+GuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dVQ9JN6W; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=qcp/Zqht5x16gzRtupUE06aG/1ZVm9AMf9yV1axwxOiNsayhude7kNOSZ3m5C5BWWBsBnNp7WVxFi8LuoCFScQeQryEYMp1KUqiGXgpC1ZchstOfWKNC5OdRBiFRH6eZDB/l4OzQ6tbBzmpotRmdKmUBMj5r7dSLqlWjT6jU4cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=urR8CUfh; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b240fdc9c20so313187a12.3
-        for <kvm@vger.kernel.org>; Wed, 14 May 2025 17:33:38 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22fc0e42606so5759775ad.2
+        for <kvm@vger.kernel.org>; Wed, 14 May 2025 17:37:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747269218; x=1747874018; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rglF/R5KGMHdjiJ2t6dRwR5H/A5Ey37gucnisvzxi0s=;
-        b=dVQ9JN6WuOjMcxel8aEUJzlHkH6MCVPTDm7b18SyF/CwUChE49fMCr1C8I48ag/PwH
-         Is2mL3EBGGsbm2GvJpL1qS5PlZ8wfMi8fnvNmSLsow05W5hIAaemnpLqgTinOMO1IH4Z
-         Y56ysH++uvrZ/3qlgLjiC+MHJTFb2aYH/WzrbOL4FH7G5cpBp/TkI9Eq9RwmlVSzIbun
-         RJkREqPM703c6y82wFRmNEFFPjZaPzsH+R0fwCQK/xbwqxiJ/8nClSu4+6rBVOLChMzC
-         1/DKKnQub04X1NCsb9bBitytLdYxhzOqZ/OOL744aqhbGtCz+9M20nKH0QP+Ee7144NX
-         Hc0Q==
+        d=google.com; s=20230601; t=1747269447; x=1747874247; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2QJBCuK1Gmwp843LF9HX9up42dO/Q8RSynscXuV78Hc=;
+        b=urR8CUfht/kxJEmiPUzudfpInfP0vDOH9AUkUO5PFtkjxO3REUOnYrD3RHzN1cNAsq
+         /lCA2oriXCJ6NBkMc9TvG7dlThoOYcTMdVvACUEpxQFQO9Oq5dfE04sLssjkOJNFSHmx
+         4CJjAqFxPAe6hMkgud535k67q+q3Letyv3bpPc4wibj4ZT8X6BBTSAK55Js6YGNNeKMB
+         qsmOEiDTq7ozhfcPdQY2lw2tusd1GBJiT0ZD0E8B3vmJLu5HmF5Wo3dIZcPSGG+MUztG
+         /XrSHt4ehJ/eG/3EznurxSGzCdcGJM+2odczdvY43OE3LjOGe4sZUQcxSCloWJDAdZSJ
+         fiGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747269218; x=1747874018;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rglF/R5KGMHdjiJ2t6dRwR5H/A5Ey37gucnisvzxi0s=;
-        b=VK4d9elOsmtqIMjRgFeAQTrs0o7U8abHhEwM/AOPJmTLj38O8XHRvzbrIAy7chL3yP
-         P3ciUbkUxjcDgLVf5zZFA9rtLSii02NwKtfNyH6gIbOCX+mxE5monDqEhWPSYpbqmN5x
-         L+6r9w2mkQkHQLv1wtpyHksL9W7JjUDcYE4CefWbrZVGXAzfFte8MAZg2k7rIgfjZPcy
-         I7aheYYqwW9dAX6GF64beZJekDyIac9lfeQBwJoz6mcXbU1BCt/INSPpF/vn6XrRKjU2
-         oghySF7YdYyrz3d8iIvu5a2eSjRGi9y4aVrAv1vCvoPuK8On7B49SF0fI5DsCTDBjFMt
-         S8yw==
-X-Forwarded-Encrypted: i=1; AJvYcCWUdF7iAI6t1WWZ4wu3Vgl7obMOvR9CDEZCEQFDsaGThS02s17t6wr6mVAJUJY+Yf9hz/Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8dk0hBqz0aIlN4t1yjvy0sg+F6C6bq5+5MgC8MPTCgMJzLpu+
-	P9eWYEl2la/jVIhT+q5/TmExqJZOJtDaDL2NZGkTY//RWnx8kgMFzFzMp0PovIe34aJPO6soJlu
-	V9w==
-X-Google-Smtp-Source: AGHT+IFk5amrAydk8MqHTBzn+9OeH6tHjtTovD4ZDO0wIQz+gLvtk/uGbMGbdXJBPpjYoOvEfN2C4N4FPJ8=
-X-Received: from plblm5.prod.google.com ([2002:a17:903:2985:b0:223:fb3a:ac08])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d4cf:b0:220:e5be:29c7
- with SMTP id d9443c01a7336-231981a2d5fmr72176585ad.39.1747269218174; Wed, 14
- May 2025 17:33:38 -0700 (PDT)
-Date: Wed, 14 May 2025 17:33:36 -0700
-In-Reply-To: <CAL715WLfr5k=Rz0cQ08xS=eHEyRn83PBTiqQ5H7iX4qH=jiS8A@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1747269447; x=1747874247;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2QJBCuK1Gmwp843LF9HX9up42dO/Q8RSynscXuV78Hc=;
+        b=rxgv/OHb8gjzlyj24YoJ2ebyyGlyAdlTSLS/Z4hSzQQkha9Yfo3RPhyrBKvvHuqUKu
+         ZVCX/AY3kS/V0MGi5R7gFbFebE24tzZjLlBX4/7Pe/KN4Dx4raroHdm6oT/McswbhhkI
+         uTHwK/LFYErHDaxOhMlJ+qfqEwWgc/z5vMBJr6OxeiUx2Pasab757t7mi3G4CIDDtaqt
+         AWWOklJu/lt13ePnxpWalyNal3E30SxnPDAK7qnvv3DUKTjSQKj6cyUrXFY5UBWeqT91
+         CkTJNIbKYnxEGajsszYo7Vb20RAt/R9xrg6y6x7rVSK764b3igwB0/W/B98dzWCfdMsA
+         a86w==
+X-Forwarded-Encrypted: i=1; AJvYcCV9Ad8VObjq7k8apeTHg7TpiNipKiMRuekewpozQMyYUZKEiynv/RPhXC5aWgOXoT0/SKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQxKbfVubjOqGgBZ1dkbJG8fTa/WIcrd8Ae5Sd+5QcW4GluxUO
+	Zrr4q0USM/Yzl8AK9/ZAr8TOoVWBR/QEiysTq9eKFMVzlY3294TGzdAvReCGPsjFkyjym4I3Q4x
+	2lg==
+X-Google-Smtp-Source: AGHT+IEwfm+Du4RUeKdC/ksRMikSeXOxPtIXncZ5f2NEIIJa2t/AKg6M6lFZyNG4z4xRSqoFUoMMpIdmjzY=
+X-Received: from pjbsk9.prod.google.com ([2002:a17:90b:2dc9:b0:308:64af:7bb9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c0a:b0:303:703f:7f8
+ with SMTP id 98e67ed59e1d1-30e2e633642mr7091539a91.34.1747269447560; Wed, 14
+ May 2025 17:37:27 -0700 (PDT)
+Date: Wed, 14 May 2025 17:37:26 -0700
+In-Reply-To: <20250324173121.1275209-23-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-22-mizhang@google.com>
- <4d55c919-92ab-4bfe-a8c2-c0a756546f7c@intel.com> <CAL715WLfr5k=Rz0cQ08xS=eHEyRn83PBTiqQ5H7iX4qH=jiS8A@mail.gmail.com>
-Message-ID: <aCU2YEpU0dOk7RTk@google.com>
-Subject: Re: [PATCH v4 21/38] KVM: x86/pmu/vmx: Save/load guest
- IA32_PERF_GLOBAL_CTRL with vm_exit/entry_ctrl
+References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-23-mizhang@google.com>
+Message-ID: <aCU3Ri0iz0aDBDup@google.com>
+Subject: Re: [PATCH v4 22/38] KVM: x86/pmu: Optimize intel/amd_pmu_refresh() helpers
 From: Sean Christopherson <seanjc@google.com>
 To: Mingwei Zhang <mizhang@google.com>
-Cc: Zide Chen <zide.chen@intel.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Mark Rutland <mark.rutland@arm.com>, 
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
 	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com, 
@@ -91,220 +87,101 @@ Cc: Zide Chen <zide.chen@intel.com>, Peter Zijlstra <peterz@infradead.org>,
 	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
 	Yongwei Ma <yongwei.ma@intel.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
 	Dapeng Mi <dapeng1.mi@linux.intel.com>, Jim Mattson <jmattson@google.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Eranian Stephane <eranian@google.com>, 
-	Shukla Manali <Manali.Shukla@amd.com>, Nikunj Dadhania <nikunj.dadhania@amd.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	Sandipan Das <sandipan.das@amd.com>, Zide Chen <zide.chen@intel.com>, 
+	Eranian Stephane <eranian@google.com>, Shukla Manali <Manali.Shukla@amd.com>, 
+	Nikunj Dadhania <nikunj.dadhania@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Mar 26, 2025, Mingwei Zhang wrote:
-> On Wed, Mar 26, 2025 at 9:51=E2=80=AFAM Chen, Zide <zide.chen@intel.com> =
-wrote:
-> > > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> > > index 6ad71752be4b..4e8cefcce7ab 100644
-> > > --- a/arch/x86/kvm/pmu.c
-> > > +++ b/arch/x86/kvm/pmu.c
-> > > @@ -646,6 +646,30 @@ void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
-> > >       }
-> > >  }
-> > >
-> > > +static void kvm_pmu_sync_global_ctrl_from_vmcs(struct kvm_vcpu *vcpu=
-)
-> > > +{
-> > > +     struct msr_data msr_info =3D { .index =3D MSR_CORE_PERF_GLOBAL_=
-CTRL };
-> > > +
-> > > +     if (!kvm_mediated_pmu_enabled(vcpu))
-> > > +             return;
-> > > +
-> > > +     /* Sync pmu->global_ctrl from GUEST_IA32_PERF_GLOBAL_CTRL. */
-> > > +     kvm_pmu_call(get_msr)(vcpu, &msr_info);
-> > > +}
-> > > +
-> > > +static void kvm_pmu_sync_global_ctrl_to_vmcs(struct kvm_vcpu *vcpu, =
-u64 global_ctrl)
-> > > +{
-> > > +     struct msr_data msr_info =3D {
-> > > +             .index =3D MSR_CORE_PERF_GLOBAL_CTRL,
-> > > +             .data =3D global_ctrl };
-> > > +
-> > > +     if (!kvm_mediated_pmu_enabled(vcpu))
-> > > +             return;
-> > > +
-> > > +     /* Sync pmu->global_ctrl to GUEST_IA32_PERF_GLOBAL_CTRL. */
-> > > +     kvm_pmu_call(set_msr)(vcpu, &msr_info);
+This is not an optimization in any sane interpretation of that word.
 
-Eh, just add a dedicated kvm_pmu_ops hook.  Feeding this through set_msr() =
-avoids
-adding another hook, but makes the code hard to follow and requires the abo=
-ve
-ugly boilerplate.
+On Mon, Mar 24, 2025, Mingwei Zhang wrote:
+> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> 
+> Currently pmu->global_ctrl is initialized in the common kvm_pmu_refresh()
+> helper since both Intel and AMD CPUs set enable bits for all GP counters
+> for PERF_GLOBAL_CTRL MSR. But it may be not the best place to initialize
+> pmu->global_ctrl. Strictly speaking, pmu->global_ctrl is vendor specific
 
-> > > +}
-> > > +
-> > >  bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
-> > >  {
-> > >       switch (msr) {
-> > > @@ -680,7 +704,6 @@ int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct=
- msr_data *msr_info)
-> > >               msr_info->data =3D pmu->global_status;
-> > >               break;
-> > >       case MSR_AMD64_PERF_CNTR_GLOBAL_CTL:
-> > > -     case MSR_CORE_PERF_GLOBAL_CTRL:
-> > >               msr_info->data =3D pmu->global_ctrl;
-> > >               break;
-> > >       case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR:
-> > > @@ -731,6 +754,9 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct=
- msr_data *msr_info)
-> >
-> >
-> > pmu->global_ctrl doesn't always have the up-to-date guest value, need t=
-o
-> > sync from vmcs/vmbc before comparing it against 'data'.
-> >
-> > +               kvm_pmu_sync_global_ctrl_from_vmcs(vcpu);
-> >                 if (pmu->global_ctrl !=3D data) {
->=20
-> Good catch. Thanks!
->=20
-> This is why I really prefer just unconditionally syncing the global
-> ctrl from VMCS to pmu->global_ctrl and vice versa.
->=20
-> We might get into similar problems as well in the future.
+And?  There's mounds of KVM code that show it's very, very easy to manage
+global_ctrl in common code.
 
-The problem isn't conditional synchronization, it's that y'all reinvented t=
-he
-wheel, poorly.  This is a solved problem via EXREG and wrappers.
+> and there are lots of global_ctrl related processing in
+> intel/amd_pmu_refresh() helpers, so better handle them in same place.
+> Thus move pmu->global_ctrl initialization into intel/amd_pmu_refresh()
+> helpers.
+> 
+> Besides, intel_pmu_refresh() doesn't handle global_ctrl_rsvd and
+> global_status_rsvd properly and fix it.
 
-That said, I went through the exercise of adding a PERF_GLOBAL_CTRL EXREG a=
-nd
-associated wrappers, and didn't love the result.  Host writes should be rar=
-e, so
-the dirty tracking is overkill.  For reads, the cost of VMREAD is lower tha=
-n
-VMWRITE (doesn't trigger consistency check re-evaluation on VM-Enter), and =
-is
-dwarfed by the cost of switching all other PMU state.
+Really?  You mention a bug fix in passing, and squash it into an opinionated
+refactoring that is advertised as "optimizations" without even stating what the
+bug is?  C'mon.
 
-So I think for the initial implementation, it makes sense to propagated wri=
-tes
-to the VMCS on demand, but do VMREAD after VM-Exit (if VM-Enter was success=
-ful).
-We can always revisit the optimization if/when we optimize the PMU world sw=
-itches,
-e.g. to defer them if there are no active host events.
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> ---
+>  arch/x86/kvm/pmu.c           | 10 -------
+>  arch/x86/kvm/svm/pmu.c       | 14 +++++++--
+>  arch/x86/kvm/vmx/pmu_intel.c | 55 ++++++++++++++++++------------------
+>  3 files changed, 39 insertions(+), 40 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 4e8cefcce7ab..2ac4c039de8b 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -843,16 +843,6 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
+>  		return;
+>  
+>  	kvm_pmu_call(refresh)(vcpu);
+> -
+> -	/*
+> -	 * At RESET, both Intel and AMD CPUs set all enable bits for general
+> -	 * purpose counters in IA32_PERF_GLOBAL_CTRL (so that software that
+> -	 * was written for v1 PMUs don't unknowingly leave GP counters disabled
+> -	 * in the global controls).  Emulate that behavior when refreshing the
+> -	 * PMU so that userspace doesn't need to manually set PERF_GLOBAL_CTRL.
+> -	 */
+> -	if (kvm_pmu_has_perf_global_ctrl(pmu) && pmu->nr_arch_gp_counters)
+> -		pmu->global_ctrl = GENMASK_ULL(pmu->nr_arch_gp_counters - 1, 0);
 
-> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > > index 8a7af02d466e..ecf72394684d 100644
-> > > --- a/arch/x86/kvm/vmx/nested.c
-> > > +++ b/arch/x86/kvm/vmx/nested.c
-> > > @@ -7004,7 +7004,8 @@ static void nested_vmx_setup_exit_ctls(struct v=
-mcs_config *vmcs_conf,
-> > >               VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
-> > >               VM_EXIT_LOAD_IA32_EFER | VM_EXIT_SAVE_IA32_EFER |
-> > >               VM_EXIT_SAVE_VMX_PREEMPTION_TIMER | VM_EXIT_ACK_INTR_ON=
-_EXIT |
-> > > -             VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-> > > +             VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-> > > +             VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL;
+Absolutely not, this code stays where it is.
 
-This is completely wrong.  Stuffing VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL here
-advertises support for KVM emulation of the control, and that support is no=
-n-existent
-in this patch (and series).
+>  }
+>  
+>  void kvm_pmu_init(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+> index 153972e944eb..eba086ef5eca 100644
+> --- a/arch/x86/kvm/svm/pmu.c
+> +++ b/arch/x86/kvm/svm/pmu.c
+> @@ -198,12 +198,20 @@ static void __amd_pmu_refresh(struct kvm_vcpu *vcpu)
+>  	pmu->nr_arch_gp_counters = min_t(unsigned int, pmu->nr_arch_gp_counters,
+>  					 kvm_pmu_cap.num_counters_gp);
+>  
+> -	if (pmu->version > 1) {
+> -		pmu->global_ctrl_rsvd = ~((1ull << pmu->nr_arch_gp_counters) - 1);
+> +	if (kvm_pmu_cap.version > 1) {
 
-Just drop this, emulation of VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL can be done
-separately.
+It's not just global_ctrl.  PEBS and the fixed counters also depend on v2+ (the
+SDM contradicts itself; KVM's ABI is that they're v2+).
 
-> > > +     mediated =3D kvm_mediated_pmu_enabled(vcpu);
-> > > +     if (cpu_has_load_perf_global_ctrl()) {
-> > > +             vm_entry_controls_changebit(vmx,
-> > > +                     VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL, mediated);
-> > > +             /*
-> > > +              * Initialize guest PERF_GLOBAL_CTRL to reset value as =
-SDM rules.
-> > > +              *
-> > > +              * Note: GUEST_IA32_PERF_GLOBAL_CTRL must be initialize=
-d to
-> > > +              * "BIT_ULL(pmu->nr_arch_gp_counters) - 1" instead of p=
-mu->global_ctrl
-> > > +              * since pmu->global_ctrl is only be initialized when g=
-uest
-> > > +              * pmu->version > 1. Otherwise if pmu->version is 1, pm=
-u->global_ctrl
-> > > +              * is 0 and guest counters are never really enabled.
-> > > +              */
-> > > +             if (mediated)
-> > > +                     vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL,
-> > > +                                  BIT_ULL(pmu->nr_arch_gp_counters) =
-- 1);
+> +		/*
+> +		 * At RESET, AMD CPUs set all enable bits for general purpose counters in
+> +		 * IA32_PERF_GLOBAL_CTRL (so that software that was written for v1 PMUs
+> +		 * don't unknowingly leave GP counters disabled in the global controls).
+> +		 * Emulate that behavior when refreshing the PMU so that userspace doesn't
+> +		 * need to manually set PERF_GLOBAL_CTRL.
+> +		 */
+> +		pmu->global_ctrl = BIT_ULL(pmu->nr_arch_gp_counters) - 1;
+> +		pmu->global_ctrl_rsvd = ~pmu->global_ctrl;
+>  		pmu->global_status_rsvd = pmu->global_ctrl_rsvd;
+>  	}
+>  
+> -	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << 48) - 1;
+> +	pmu->counter_bitmask[KVM_PMC_GP] = BIT_ULL(48) - 1;
 
-This belongs in common code, as a call to the aforementioned hook to propag=
-ate
-PERF_GLOBAL_CTRL to hardware.
+I like these cleanups, but they too belong in a separate patch.
 
-> > > +     }
-> > > +
-> > > +     if (cpu_has_save_perf_global_ctrl())
-> > > +             vm_exit_controls_changebit(vmx,
-> > > +                     VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-> > > +                     VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL, mediated);
-> > >  }
-> > >
-> > >  static void intel_pmu_init(struct kvm_vcpu *vcpu)
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index ff66f17d6358..38ecf3c116bd 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -4390,6 +4390,13 @@ void vmx_set_constant_host_state(struct vcpu_v=
-mx *vmx)
-> > >
-> > >       if (cpu_has_load_ia32_efer())
-> > >               vmcs_write64(HOST_IA32_EFER, kvm_host.efer);
-> > > +
-> > > +     /*
-> > > +      * Initialize host PERF_GLOBAL_CTRL to 0 to disable all counter=
-s
-> > > +      * immediately once VM exits. Mediated vPMU then call perf_gues=
-t_exit()
-> > > +      * to re-enable host perf events.
-> > > +      */
-> > > +     vmcs_write64(HOST_IA32_PERF_GLOBAL_CTRL, 0);
-
-This needs to be conditioned on the mediated PMU being enabled, because thi=
-s field
-is not constant when using the emulated PMU (or no vPMU).
-
-> > > @@ -8451,6 +8462,15 @@ __init int vmx_hardware_setup(void)
-> > >               enable_sgx =3D false;
-> > >  #endif
-> > >
-> > > +     /*
-> > > +      * All CPUs that support a mediated PMU are expected to support=
- loading
-> > > +      * and saving PERF_GLOBAL_CTRL via dedicated VMCS fields.
-> > > +      */
-> > > +     if (enable_mediated_pmu &&
-> > > +         (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl() ||
-> > > +                       !cpu_has_save_perf_global_ctrl())))
-
-This needs to be conditioned on !HYPERVISOR, or it *will* fire.
-
-And placing this check here, without *any* mention of *why* you did so, is =
-evil
-and made me very grumpy.  I had to discover the hard way that you checked t=
-he
-VMCS fields here, instead of in kvm_init_pmu_capability() where it logicall=
-y
-belongs, because the VMCS configuration isn't yet initialized.
-
-Grumpiness aside, I don't like this late clear of enable_mediated_pmu, as i=
-t risks
-a variation of the problem you're trying to avoid, i.e. risks consuming the=
- variable
-between kvm_init_pmu_capability() and here.
-
-I don't see any reason why setup_vmcs_config() can't be called before
-kvm_x86_vendor_init(), so unless I'm missing/forgetting something, let's ju=
-st do
-that, and move these checks where they belong.
+>  	pmu->reserved_bits = 0xfffffff000280000ull;
+>  	pmu->raw_event_mask = AMD64_RAW_EVENT_MASK;
+>  	/* not applicable to AMD; but clean them to prevent any fall out */
 
