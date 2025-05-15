@@ -1,328 +1,190 @@
-Return-Path: <kvm+bounces-46718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4519AB8F32
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 20:39:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BB57AB8F3C
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 20:43:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D64233BC1E0
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 18:39:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07A3C4E18EC
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 18:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A442C2853E7;
-	Thu, 15 May 2025 18:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5537C28642D;
+	Thu, 15 May 2025 18:42:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kYJ/zPjj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MN3jb+Dp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA19821CA07;
-	Thu, 15 May 2025 18:39:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8312690E0
+	for <kvm@vger.kernel.org>; Thu, 15 May 2025 18:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747334367; cv=none; b=VaXyuYFrbsTpbk+3LIE2Cgc5cbg0Xn9tQp1+or1YOrV5B90Mzlj6f1Z3qV5eML4Jgm4KWSM1qIBG8n9ws4y7GNPcfwUz6cD0vZ3LYXXACny+rHsZOJ4pWh0FAz+2K5zhF7k0wa4yhO/v42XICBkuSrgsJAK58X+m08314ftBooU=
+	t=1747334577; cv=none; b=V+XVh9VaACS29vw9wY54AmLXm6SNjktFW+9JQPLZGlXQr68/QnmZHw8AmtTnq9LKvaGelQcrv4ZbwgOmAl7m4iruyXLFzJ0bE8zk/fuWNUDQ5RguZNoj9BfTtXJGNOVRiUKM5GIXnw7xKOJ89bocvuHqcieT7xd8KK/pBkOezF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747334367; c=relaxed/simple;
-	bh=RmNrUco0zxz/y4TKei1Fbe1gISOzYB3qxdMUh9Ndukc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ilvmcjKoxGB6klAAwiF3Jemc5laMXQ7pAz7gRNlQ+ArHXxk3tHKH9J3nTBuWM3ubeUj3Re0iGenKwL9ymPLKWq5CcjO6Gjv39hwYij2B7FRcdd8TcmIJ2ysIh8s1FdG2E1cZ2roe9lgoTQ6Nk88Ps1u9xDadkVGmjPJsWRFC9qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kYJ/zPjj; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747334366; x=1778870366;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=RmNrUco0zxz/y4TKei1Fbe1gISOzYB3qxdMUh9Ndukc=;
-  b=kYJ/zPjj9cy+GDjpiNTlf85ZBmfjeSyAv/e25Y/Gsyl9WPVkm59wphva
-   jE80mvPRK66rFE1SLBZCPwTDiV/5p/nKAkOL+joH+9KrlyhJ7M/mpEeMK
-   4L7g3NZXjk9cZsOgHk8H+bjvBoTQmDS0YcYiykdV14JPnKOGNmjCqd8ek
-   GdCXSGQmkNOmk/uJuK+WZau7NFpLwayo7DoiotYwRYQbpDJlx7AgmWR77
-   eRROqL1a661JRZA9df1caXZ/GZwGZ4o+PUXKjBaqEqbb2pGFObl2BlHWB
-   ggQeCXPe8vbUs9Mfq9zMIWeYBYN31qDn1Ite8mVyxnKsZol9rt3wI4Sz1
-   w==;
-X-CSE-ConnectionGUID: nO+rdsScQamkYaqryIT69w==
-X-CSE-MsgGUID: FFLvCVVJQLaCQtYabVs1LA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11434"; a="49161438"
-X-IronPort-AV: E=Sophos;i="6.15,292,1739865600"; 
-   d="scan'208";a="49161438"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 11:39:26 -0700
-X-CSE-ConnectionGUID: /hvQEoTZRM68LLzqRtoI+A==
-X-CSE-MsgGUID: o/DXloZFTNC8zWnTsiU6xg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,292,1739865600"; 
-   d="scan'208";a="138354531"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 11:39:24 -0700
-Received: from [10.246.136.52] (kliang2-mobl1.ccr.corp.intel.com [10.246.136.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by linux.intel.com (Postfix) with ESMTPS id 6CF2D20B5736;
-	Thu, 15 May 2025 11:39:21 -0700 (PDT)
-Message-ID: <4aaf67ab-aa5c-41e6-bced-3cb000172c52@linux.intel.com>
-Date: Thu, 15 May 2025 14:39:20 -0400
+	s=arc-20240116; t=1747334577; c=relaxed/simple;
+	bh=OE706X3jddYBbsCzcihcsNrO+b6byFOlN93t1s1rrXY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qaG7DIRNzps7DMxPyrtumEvP3wpKgj8kd2DGOTWccCs1hEJl2Ue1wxmVJ2rTPoPmNqlolIZ3+vQXZRPLSw8pmduSBDZ8YFlIsUyPbPvkpjnjCmiKBIr9l+R5N9T7JJ1lAmNklYh6jrk48lBWUX43WT4DQOr+swF4+dKD9sS2W4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MN3jb+Dp; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-231ba6da557so23705ad.1
+        for <kvm@vger.kernel.org>; Thu, 15 May 2025 11:42:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747334575; x=1747939375; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OE706X3jddYBbsCzcihcsNrO+b6byFOlN93t1s1rrXY=;
+        b=MN3jb+DpQ+CFs3nV8xA7pSHZDs9ezl8ebaNuw7CbKcu2llW+DFVW5mOVA0qNP1h2uu
+         q/nxcZdWxhITquO2EHDp8xstq6Aau0JZmoZWY2OQu/wTWPWDUUP+OKTZDDIt2xYS7YXN
+         Y6rDslP2LlrpMknORXlRwi18rK/8Xt0tlvdPUq1y2SLO3sBeC5V1ckmORvdq6WvWbPrm
+         k/VF6UgSg4ml9oSexk+ICP0xYgGLu4DfhBSUXRfTn51pzB1vkxsFJndmlco0fXUskgGr
+         szt5zaNHz1e3Xpl6J/FPkZeJH5lG4o1+7K7YxMeOBplda3hTPRJYpGzASyKXtFd2uMfH
+         q3NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747334575; x=1747939375;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OE706X3jddYBbsCzcihcsNrO+b6byFOlN93t1s1rrXY=;
+        b=FIl87+9uJV8epr1327jwNl+SdYByhstCT9jO4I/vfxLvnL1iH9goCqG32xeNEOR401
+         761KG7bRaEdUZcELOifxmLkyyJnGQsyyHertPeVln1Fa40yP53rWNN4lyvv5AONzEgO1
+         9Rcm5+/Ms6dVoYJkp82OAHBdLi31QlcKTk2PIK5Nd54YmQYBwynzEESx/kpAVyow1+pS
+         WQPByE+qZndsWpfds5HY7qihgLuTTgN9C8xiAVC3FnFtAtx28tH9P9ZCxeuGsOWlmNEm
+         E/Mg+nKcQdc87LUCAzzcJ9V3AmlTNkPbV/FqqrIBG2ppc6d+/DqJJVjp5K3NUIcEjSfO
+         CQ+A==
+X-Forwarded-Encrypted: i=1; AJvYcCVg6Dhyk2oc3DWqeLdMvtD3oZSvg7sC2ovuEBFTXjHjjR6z6UeMdg15zYd8EOuo9S/ZIG0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhjsP8yIq/0Lyu56cshWDUT89Tdfp8TW6ljdS0xZjT4O3zZJtG
+	VsMECSE+bNEtxacgytNEfyXPc4pR34W6N2T4dRB+O6RNxWXQPSoDs+NjD2C0jhOPibTVxZIvT8a
+	CVKf/CV/MjTdtcRWl6iCEpf9bEFxOihc+xriTk/yC
+X-Gm-Gg: ASbGncviwKgVuTejFZ15z77Z1GXLBTPsksvUddmXyjkaiUtQiN0IitC7j0g2PERz/yb
+	wbNiwYdQttt6RsCLliJzxw/go6Ph9+Y/dfy4Qy2PJy1rx/vMGpdNLi0pwYVsF+pbhf2XHoY6/Rr
+	5d5mEA/MxuXmmN3EQ3EUwAVkRjO8d/exYEBaHg3qGJnJmpgTu2kHReudwtPpUUNVE=
+X-Google-Smtp-Source: AGHT+IGTq3Qv35p4EQDVKyuQpdaEqwPis17PY14p3nnamKgz6JsccKxsXhBauQW2GGY2ychs+aiWiE3WzGrkhDw7670=
+X-Received: by 2002:a17:903:3b86:b0:215:65f3:27ef with SMTP id
+ d9443c01a7336-231b492239amr3491205ad.12.1747334574890; Thu, 15 May 2025
+ 11:42:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 05/38] perf: Add generic exclude_guest support
-To: Sean Christopherson <seanjc@google.com>,
- Peter Zijlstra <peterz@infradead.org>
-Cc: Mingwei Zhang <mizhang@google.com>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com,
- "H. Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Yongwei Ma <yongwei.ma@intel.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>, Jim Mattson <jmattson@google.com>,
- Sandipan Das <sandipan.das@amd.com>, Zide Chen <zide.chen@intel.com>,
- Eranian Stephane <eranian@google.com>, Shukla Manali
- <Manali.Shukla@amd.com>, Nikunj Dadhania <nikunj.dadhania@amd.com>
-References: <20250324173121.1275209-1-mizhang@google.com>
- <20250324173121.1275209-6-mizhang@google.com>
- <20250425111352.GF1166@noisy.programming.kicks-ass.net>
- <aCUlCApeDM9Uy4a0@google.com>
-Content-Language: en-US
-From: "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <aCUlCApeDM9Uy4a0@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1747264138.git.ackerleytng@google.com> <ada87be8b9c06bc0678174b810e441ca79d67980.camel@intel.com>
+In-Reply-To: <ada87be8b9c06bc0678174b810e441ca79d67980.camel@intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Thu, 15 May 2025 11:42:43 -0700
+X-Gm-Features: AX0GCFtFPmb6VMVpripLOpX9FHawevhToT7FohCfCgdNjLdWb4V3SRl6QrbKhds
+Message-ID: <CAGtprH9CTsVvaS8g62gTuQub4aLL97S7Um66q12_MqTFoRNMxA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "ackerleytng@google.com" <ackerleytng@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, 
+	"palmer@dabbelt.com" <palmer@dabbelt.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "Miao, Jun" <jun.miao@intel.com>, 
+	"Shutemov, Kirill" <kirill.shutemov@intel.com>, "pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, 
+	"steven.price@arm.com" <steven.price@arm.com>, "peterx@redhat.com" <peterx@redhat.com>, 
+	"vbabka@suse.cz" <vbabka@suse.cz>, "jack@suse.cz" <jack@suse.cz>, 
+	"amoorthy@google.com" <amoorthy@google.com>, "maz@kernel.org" <maz@kernel.org>, 
+	"keirf@google.com" <keirf@google.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
+	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, 
+	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, "hughd@google.com" <hughd@google.com>, 
+	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, "Wang, Wei W" <wei.w.wang@intel.com>, 
+	"Du, Fan" <fan.du@intel.com>, 
+	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, 
+	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "Hansen, Dave" <dave.hansen@intel.com>, 
+	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, 
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, "nsaenz@amazon.es" <nsaenz@amazon.es>, "aik@amd.com" <aik@amd.com>, 
+	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, 
+	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "fvdl@google.com" <fvdl@google.com>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
+	"bfoster@redhat.com" <bfoster@redhat.com>, "willy@infradead.org" <willy@infradead.org>, 
+	"anup@brainfault.org" <anup@brainfault.org>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
+	"tabba@google.com" <tabba@google.com>, "mic@digikod.net" <mic@digikod.net>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
+	"Li, Zhiquan1" <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
+	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, "Aktas, Erdem" <erdemaktas@google.com>, 
+	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "Xu, Haibo1" <haibo1.xu@intel.com>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
+	"jthoughton@google.com" <jthoughton@google.com>, "will@kernel.org" <will@kernel.org>, 
+	"steven.sistare@oracle.com" <steven.sistare@oracle.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
+	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
+	"Huang, Kai" <kai.huang@intel.com>, "shuah@kernel.org" <shuah@kernel.org>, 
+	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, 
+	"Peng, Chao P" <chao.p.peng@intel.com>, "nikunj@amd.com" <nikunj@amd.com>, 
+	"Graf, Alexander" <graf@amazon.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"jgowans@amazon.com" <jgowans@amazon.com>, "Xu, Yilun" <yilun.xu@intel.com>, 
+	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, 
+	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, "Weiny, Ira" <ira.weiny@intel.com>, 
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
+	"qperret@google.com" <qperret@google.com>, 
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "dmatlack@google.com" <dmatlack@google.com>, 
+	"james.morse@arm.com" <james.morse@arm.com>, "brauner@kernel.org" <brauner@kernel.org>, 
+	"pgonda@google.com" <pgonda@google.com>, "quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, 
+	"hch@infradead.org" <hch@infradead.org>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
+	"seanjc@google.com" <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, May 15, 2025 at 11:03=E2=80=AFAM Edgecombe, Rick P
+<rick.p.edgecombe@intel.com> wrote:
+>
+> On Wed, 2025-05-14 at 16:41 -0700, Ackerley Tng wrote:
+> > Hello,
+> >
+> > This patchset builds upon discussion at LPC 2024 and many guest_memfd
+> > upstream calls to provide 1G page support for guest_memfd by taking
+> > pages from HugeTLB.
+>
+> Do you have any more concrete numbers on benefits of 1GB huge pages for
+> guestmemfd/coco VMs? I saw in the LPC talk it has the benefits as:
+> - Increase TLB hit rate and reduce page walks on TLB miss
+> - Improved IO performance
+> - Memory savings of ~1.6% from HugeTLB Vmemmap Optimization (HVO)
+> - Bring guest_memfd to parity with existing VMs that use HugeTLB pages fo=
+r
+> backing memory
+>
+> Do you know how often the 1GB TDP mappings get shattered by shared pages?
+>
+> Thinking from the TDX perspective, we might have bigger fish to fry than =
+1.6%
+> memory savings (for example dynamic PAMT), and the rest of the benefits d=
+on't
+> have numbers. How much are we getting for all the complexity, over say bu=
+ddy
+> allocated 2MB pages?
 
+This series should work for any page sizes backed by hugetlb memory.
+Non-CoCo VMs, pKVM and Confidential VMs all need hugepages that are
+essential for certain workloads and will emerge as guest_memfd users.
+Features like KHO/memory persistence in addition also depend on
+hugepage support in guest_memfd.
 
-On 2025-05-14 7:19 p.m., Sean Christopherson wrote:
-> On Fri, Apr 25, 2025, Peter Zijlstra wrote:
->> On Mon, Mar 24, 2025 at 05:30:45PM +0000, Mingwei Zhang wrote:
->>
->>> @@ -6040,6 +6041,71 @@ void perf_put_mediated_pmu(void)
->>>  }
->>>  EXPORT_SYMBOL_GPL(perf_put_mediated_pmu);
->>>  
->>> +static inline void perf_host_exit(struct perf_cpu_context *cpuctx)
->>> +{
->>> +	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
->>> +	ctx_sched_out(&cpuctx->ctx, NULL, EVENT_GUEST);
->>> +	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
->>> +	if (cpuctx->task_ctx) {
->>> +		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
->>> +		task_ctx_sched_out(cpuctx->task_ctx, NULL, EVENT_GUEST);
->>> +		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
->>> +	}
->>> +}
->>> +
->>> +/* When entering a guest, schedule out all exclude_guest events. */
->>> +void perf_guest_enter(void)
->>> +{
->>> +	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
->>> +
->>> +	lockdep_assert_irqs_disabled();
->>> +
->>> +	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
->>> +
->>> +	if (WARN_ON_ONCE(__this_cpu_read(perf_in_guest)))
->>> +		goto unlock;
->>> +
->>> +	perf_host_exit(cpuctx);
->>> +
->>> +	__this_cpu_write(perf_in_guest, true);
->>> +
->>> +unlock:
->>> +	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
->>> +}
->>> +EXPORT_SYMBOL_GPL(perf_guest_enter);
->>> +
->>> +static inline void perf_host_enter(struct perf_cpu_context *cpuctx)
->>> +{
->>> +	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
->>> +	if (cpuctx->task_ctx)
->>> +		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
->>> +
->>> +	perf_event_sched_in(cpuctx, cpuctx->task_ctx, NULL, EVENT_GUEST);
->>> +
->>> +	if (cpuctx->task_ctx)
->>> +		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
->>> +	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
->>> +}
->>> +
->>> +void perf_guest_exit(void)
->>> +{
->>> +	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
->>> +
->>> +	lockdep_assert_irqs_disabled();
->>> +
->>> +	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
->>> +
->>> +	if (WARN_ON_ONCE(!__this_cpu_read(perf_in_guest)))
->>> +		goto unlock;
->>> +
->>> +	perf_host_enter(cpuctx);
->>> +
->>> +	__this_cpu_write(perf_in_guest, false);
->>> +unlock:
->>> +	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
->>> +}
->>> +EXPORT_SYMBOL_GPL(perf_guest_exit);
->>
->> This naming is confusing on purpose? Pick either guest/host and stick
->> with it.
-> 
-> +1.  I also think the inner perf_host_{enter,exit}() helpers are superflous.
-> These flows
-> 
-> After a bit of hacking, and with a few spoilers, this is what I ended up with
-> (not anywhere near fully tested).  I like following KVM's kvm_xxx_{load,put}()
-> nomenclature to tie everything together, so I went with "guest" instead of "host"
-> even though the majority of work being down is to shedule out/in host context.
-> 
-> /* When loading a guest's mediated PMU, schedule out all exclude_guest events. */
-> void perf_load_guest_context(unsigned long data)
-> {
-> 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
-> 
-> 	lockdep_assert_irqs_disabled();
-> 
-> 	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
-> 
-> 	if (WARN_ON_ONCE(__this_cpu_read(guest_ctx_loaded)))
-> 		goto unlock;
-> 
-> 	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
-> 	ctx_sched_out(&cpuctx->ctx, NULL, EVENT_GUEST);
-> 	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
-> 	if (cpuctx->task_ctx) {
-> 		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
-> 		task_ctx_sched_out(cpuctx->task_ctx, NULL, EVENT_GUEST);
-> 		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
-> 	}
-> 
-> 	arch_perf_load_guest_context(data);
-> 
-> 	__this_cpu_write(guest_ctx_loaded, true);
-> 
-> unlock:
-> 	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
-> }
-> EXPORT_SYMBOL_GPL(perf_load_guest_context);
-> 
-> void perf_put_guest_context(void)
-> {
-> 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
-> 
-> 	lockdep_assert_irqs_disabled();
-> 
-> 	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
-> 
-> 	if (WARN_ON_ONCE(!__this_cpu_read(guest_ctx_loaded)))
-> 		goto unlock;
-> 
-> 	arch_perf_put_guest_context();
+This series takes strides towards making guest_memfd compatible with
+usecases where 1G pages are essential and non-confidential VMs are
+already exercising them.
 
-It will set the guest_ctx_loaded to false.
-The update_context_time() invoked in the perf_event_sched_in() will not
-get a chance to update the guest time.
+I think the main complexity here lies in supporting in-place
+conversion which applies to any huge page size even for buddy
+allocated 2MB pages or THP.
 
-I think something as below should work.
+This complexity arises because page structs work at a fixed
+granularity, future roadmap towards not having page structs for guest
+memory (at least private memory to begin with) should help towards
+greatly reducing this complexity.
 
-- Disable all in the PMU (disable global control)
-- schedule in the host counters (but not run yet since the global
-control of the PMU is disabled)
-- arch_perf_put_guest_context()
-- Enable all in the PMU (Enable global control. The host counters now start)
-
-void perf_put_guest_context(void)
-{
-	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
-
-	lockdep_assert_irqs_disabled();
-
-	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
-
-	if (WARN_ON_ONCE(!__this_cpu_read(guest_ctx_loaded)))
-		goto unlock;
-
-	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
-	if (cpuctx->task_ctx)
-		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
-
-	perf_event_sched_in(cpuctx, cpuctx->task_ctx, NULL, EVENT_GUEST);
-
-	arch_perf_put_guest_context();
-
-	if (cpuctx->task_ctx)
-		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
-	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
-
-unlock:
-	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
-}
-
-
-
-Similar to the perf_load_guest_context().
-
-- Disable all in the PMU (disable global control)
-- schedule out all the host counters
-- arch_perf_load_guest_context()
-- Enable all in the PMU (enable global control)
-
-void perf_load_guest_context(unsigned long data)
-{
-	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
-
-	lockdep_assert_irqs_disabled();
-
-	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
-
-	if (WARN_ON_ONCE(__this_cpu_read(guest_ctx_loaded)))
-		goto unlock;
-
-	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
-	ctx_sched_out(&cpuctx->ctx, NULL, EVENT_GUEST);
-	if (cpuctx->task_ctx) {
-		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
-		task_ctx_sched_out(cpuctx->task_ctx, NULL, EVENT_GUEST);
-	}
-
-	arch_perf_load_guest_context(data);
-
-	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
-	if (cpuctx->task_ctx)
-		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
-unlock:
-	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
-}
-
-
-Thanks,
-Kan
-
-> 
-> 	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
-> 	if (cpuctx->task_ctx)
-> 		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
-> 
-> 	perf_event_sched_in(cpuctx, cpuctx->task_ctx, NULL, EVENT_GUEST);
-> 
-> 	if (cpuctx->task_ctx)
-> 		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
-> 	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
-> 
-> 	__this_cpu_write(guest_ctx_loaded, false);
-> unlock:> 	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
-> }
-> EXPORT_SYMBOL_GPL(perf_put_guest_context);
-
+That being said, DPAMT and huge page EPT mappings for TDX VMs remain
+essential and complement this series well for better memory footprint
+and overall performance of TDX VMs.
 
