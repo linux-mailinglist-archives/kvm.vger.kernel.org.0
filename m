@@ -1,113 +1,138 @@
-Return-Path: <kvm+bounces-46629-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46630-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E4FAB7B6A
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 04:09:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36DFCAB7B72
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 04:11:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D2443B0A1A
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 02:09:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C001746431D
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 02:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98637290BA6;
-	Thu, 15 May 2025 02:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D4428DB6B;
+	Thu, 15 May 2025 02:10:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Gkb/Py1b"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ye5kJwou"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3367A1A2391;
-	Thu, 15 May 2025 02:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1A01A2391;
+	Thu, 15 May 2025 02:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747274962; cv=none; b=a9FrMKFh/qktUlZivn99Dpj/DyvUOdm73BJy5tluQa0YOza5iE0NpAWhk0pRBNKU0yBAkNrOXBzgKwJJbCEXH9jfdpIMegkT9jaBYsbKVvTHFEXrrmXYjcz2VNUuF+c2zYVxftomaDDIADNuuAp7RkmsYUDTKTCl7jk94zXStz4=
+	t=1747275052; cv=none; b=rFlwjlQONsJ2MInR4RVOU79RJHobBs9dvqJsCdQefsuMvX8XpyNj/sAN18QyCsiRQIvzmSnYf0bwjtpFwlOBTZeKdA5ufrQgXMPR3Jm98bc4FbypdN/5KR/5aTDb8DfWVFK7/qIW4bdnQ/Hh39+nwpLK2InTgryF74Nxfy8OMxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747274962; c=relaxed/simple;
-	bh=8NALHghH/1cRfmuWG2BGindcgl8eogceSoeVSCsKcvU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JCi5TXPhbsl3LbPe7fotmltCP16EXJFcz1iaZjF3FDaKt7DoiPtCdLraqCJbbKd78969I0g7dTsIEYMZysXla9MtBK05ss7sEWW5KkIn3swwSM3WieRIxVbE8nzLr2J6AnxSe1P4Uwq5IRUiOuviPz8Eh7S/etW0hbW2M/WAh6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Gkb/Py1b; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=rcjPKZsckWOuKXk0QifKBxWsi1qc+2jD7wDRi0Ywjjc=; b=Gkb/Py1b7SjqiY1IGeHDhfdcCL
-	yvhvtigNLD+QDMU8nTMuug0k4mBcU+NXK6ujLoVDD/sPcE+MKnU3S1ZcfCUbt4KjOvLFTzFsjAiyX
-	/H4EhwPE/ersknsH/hoLBaJpJabGHmuveNdCnxSlZ5VqAyrgsF+7BJqJ15iWSmU6edqmvC/1SbV7w
-	elk0lR+tJVedxKzMHM4iM4fuOYW4cETrHukFQCvJYId5QDcUI382ItL8qYyerpmlx2FuZOaKxx6iE
-	qtaiiKM9R7055aVBDvgMfVciujS9UaGiuUPDIPmcgFB15pOOfwJXCm7R+wOcLyXhG1Km+oFw7N+Fc
-	5AS2L9Sw==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uFO21-0000000DAIW-1QpN;
-	Thu, 15 May 2025 02:09:09 +0000
-Date: Thu, 15 May 2025 03:09:09 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com,
-	ajones@ventanamicro.com, akpm@linux-foundation.org,
-	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org,
-	aou@eecs.berkeley.edu, bfoster@redhat.com,
-	binbin.wu@linux.intel.com, brauner@kernel.org,
-	catalin.marinas@arm.com, chao.p.peng@intel.com,
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
-	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca,
-	jgowans@amazon.com, jhubbard@nvidia.com, jroedel@suse.de,
-	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com,
-	keirf@google.com, kent.overstreet@linux.dev,
-	kirill.shutemov@intel.com, liam.merwick@oracle.com,
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name,
-	maz@kernel.org, mic@digikod.net, michael.roth@amd.com,
-	mpe@ellerman.id.au, muchun.song@linux.dev, nikunj@amd.com,
-	nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com,
-	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com,
-	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com,
-	pvorel@suse.cz, qperret@google.com, quic_cvanscha@quicinc.com,
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com,
-	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com,
-	rientjes@google.com, roypat@amazon.co.uk, rppt@kernel.org,
-	seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com,
-	thomas.lendacky@amd.com, usama.arif@bytedance.com,
-	vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com,
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Subject: Re: [RFC PATCH v2 16/51] mm: hugetlb: Consolidate interpretation of
- gbl_chg within alloc_hugetlb_folio()
-Message-ID: <aCVMxRRTz1d_QyUA@casper.infradead.org>
-References: <cover.1747264138.git.ackerleytng@google.com>
- <8548af334e01401a776aae37a0e9f30f9ffbba8c.1747264138.git.ackerleytng@google.com>
+	s=arc-20240116; t=1747275052; c=relaxed/simple;
+	bh=q5cjI7xerfFkG/7nI9gsuCw4hY0So9s9zAigg13F+Wg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=akNItv9YELdiswmXI2kx0q71hQyPVJxBzqg2SJImbqPv9p+zHNvF7JkPkct6FjiIszHhsUd9EW1wyhbDJHExzLzWoHeN8xxmONWLkbR6co24s1Lr01gEqv5eZT0zE67zDPn0PGcI9sGghTNUwZxXlCD2w8Ghc+3dihzu3JfkIF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ye5kJwou; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747275051; x=1778811051;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=q5cjI7xerfFkG/7nI9gsuCw4hY0So9s9zAigg13F+Wg=;
+  b=Ye5kJwouHqE4Sh69VTIN1X9ji5MT1Cqs9XKzzHCbFIVCcrupb+HRUZKu
+   yHUp7Xi8c0Z3KNKzSUNptupwzzAfFQs0xFtou67bzHNOBlCuXqHSYKDO4
+   xrkpVtQhMI74YFbDiWtyMMYqs/EoS04NE87aTgGhXaTIxj5nE0fOmt5Pa
+   ZpFh3WXAZwFepxY1OCLFXSMBBSmuxxAE7srEqnzpR1cxrxyf+LNCDup9E
+   +EUMm0DFjBMnA/226ViblXBPc9gIZnCydkFgsUF3LgIHePkE75y3iLOD6
+   mVuLd52gzv5lOQzY6fmFN4Uri5KzYqhR4K+qj06QdMPN49iJaXkVkoGM+
+   g==;
+X-CSE-ConnectionGUID: 50/WRPnLRZimtXoy9MrJ4Q==
+X-CSE-MsgGUID: eCnxJ143Qcm5gIeCFiJAUw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11433"; a="59424278"
+X-IronPort-AV: E=Sophos;i="6.15,289,1739865600"; 
+   d="scan'208";a="59424278"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 19:10:50 -0700
+X-CSE-ConnectionGUID: /gaxGn5vSPaE4QGAvQCg3A==
+X-CSE-MsgGUID: PXQm5kYZRzKkSQkjnS2XpA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,289,1739865600"; 
+   d="scan'208";a="138093463"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 19:10:43 -0700
+Message-ID: <434055d7-e7ec-48ad-9ef5-2d80bb824a63@linux.intel.com>
+Date: Thu, 15 May 2025 10:10:40 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8548af334e01401a776aae37a0e9f30f9ffbba8c.1747264138.git.ackerleytng@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 06/38] x86/irq: Factor out common code for installing
+ kvm irq handler
+To: Sean Christopherson <seanjc@google.com>,
+ Mingwei Zhang <mizhang@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com,
+ Kan <kan.liang@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Yongwei Ma <yongwei.ma@intel.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+ Jim Mattson <jmattson@google.com>, Sandipan Das <sandipan.das@amd.com>,
+ Zide Chen <zide.chen@intel.com>, Eranian Stephane <eranian@google.com>,
+ Shukla Manali <Manali.Shukla@amd.com>,
+ Nikunj Dadhania <nikunj.dadhania@amd.com>
+References: <20250324173121.1275209-1-mizhang@google.com>
+ <20250324173121.1275209-7-mizhang@google.com> <aCUlbDNoxQ-65mc0@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <aCUlbDNoxQ-65mc0@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 14, 2025 at 04:41:55PM -0700, Ackerley Tng wrote:
-> -static struct folio *dequeue_hugetlb_folio_vma(struct hstate *h,
-> -				struct vm_area_struct *vma,
-> -				unsigned long address, long gbl_chg)
-> +static struct folio *dequeue_hugetlb_folio(struct hstate *h,
-> +					   struct vm_area_struct *vma,
-> +					   unsigned long address)
 
-Pleaase don't mess with the indentation unless necessary.  Nobody
-cares what your personal style preference is.  You're obscuring the
-actual changes.
+On 5/15/2025 7:21 AM, Sean Christopherson wrote:
+> On Mon, Mar 24, 2025, Mingwei Zhang wrote:
+>> diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
+>> index 385e3a5fc304..18cd418fe106 100644
+>> --- a/arch/x86/kernel/irq.c
+>> +++ b/arch/x86/kernel/irq.c
+>> @@ -312,16 +312,22 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_x86_platform_ipi)
+>>  static void dummy_handler(void) {}
+>>  static void (*kvm_posted_intr_wakeup_handler)(void) = dummy_handler;
+>>  
+>> -void kvm_set_posted_intr_wakeup_handler(void (*handler)(void))
+>> +void x86_set_kvm_irq_handler(u8 vector, void (*handler)(void))
+>>  {
+>> -	if (handler)
+>> +	if (!handler)
+>> +		handler = dummy_handler;
+>> +
+>> +	if (vector == POSTED_INTR_WAKEUP_VECTOR &&
+>> +	    (handler == dummy_handler ||
+>> +	     kvm_posted_intr_wakeup_handler == dummy_handler))
+>>  		kvm_posted_intr_wakeup_handler = handler;
+>> -	else {
+>> -		kvm_posted_intr_wakeup_handler = dummy_handler;
+>> +	else
+>> +		WARN_ON_ONCE(1);
+>> +
+>> +	if (handler == dummy_handler)
+> Eww.  Aside from the fact that the dummy_handler implementation is pointless
+> overhead, I don't think KVM should own the IRQ vector.  Given that perf owns the
+> LVTPC, i.e. responsible for switching between NMI and the medited PMI IRQ, I
+> think perf should also own the vector.  KVM can then use the existing perf guest
+> callbacks to wire up its PMI handler.
 
+Hmm, yes, make sense.
+
+
+>
+> And with that, this patch can be dropped.
+>
 
