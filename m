@@ -1,290 +1,307 @@
-Return-Path: <kvm+bounces-46676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E12C4AB836B
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 11:58:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7607BAB83D6
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 12:29:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE7F93B07C9
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 09:58:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EA5E1BA3D41
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 10:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A042297A7F;
-	Thu, 15 May 2025 09:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C422980AA;
+	Thu, 15 May 2025 10:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bYABw1fO"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lshKw8WU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2040.outbound.protection.outlook.com [40.107.243.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA74297A58
-	for <kvm@vger.kernel.org>; Thu, 15 May 2025 09:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747303095; cv=none; b=mWSyxO0+H515UQAO6sg0sMJ4dABP14vTGkdJ6IYGn3HW43AdiKkybqf4MGxlzcn2CoELp/3bx0CbcP/K11Ub6iwKm6Y37siPF3aHqhburrQ21XW5X/aG+IIOk1odS8LLVhbuuN5UcO3oVnvswOA3pBXwWsmxJUPfSiE9YZ3hAGA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747303095; c=relaxed/simple;
-	bh=WMbyjKOYZKjUsunAus/iE7CaOUThNQmodpnmYOlPdsc=;
-	h=Message-ID:Date:MIME-Version:From:Cc:Subject:To:Content-Type; b=mfW4yQLaofybOJAyLtNPxiaZpY61L/D5c13366i5keNiBzfD8je3u1l1HSBYhQ/WYoycHhUANYrZCTDI/o4skbxelQRyWK/unHfjTJmdTlyztNHw/2XW4xGxvscMUG9Xhg6bbFB57ksvjwn6S/kyGL1Qlpmz+SBMUrR9e5taMWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bYABw1fO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747303092;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
-	bh=pTGqGXVw8z80rGktDR9uqeOqFeSCceq/wKqHsvtbKIw=;
-	b=bYABw1fOqOOfKCseGnhnwl/NHxzH8akmFIkMLPnCdNBB1E2s8wuaxJJFQ7Q0HYGJtwIFOT
-	dmMSYgyuoy1EQiS7gZWHy0fL/cuzCcdAcQDwcQQHwPeFqQ3eLSVreCj+/Cpo11bpOucVW4
-	kL+026zhKc7H7L+gkIaeDyeOWjp88lM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-481-Yjt8ilSZPb6n6M4REZ5KxQ-1; Thu, 15 May 2025 05:58:11 -0400
-X-MC-Unique: Yjt8ilSZPb6n6M4REZ5KxQ-1
-X-Mimecast-MFC-AGG-ID: Yjt8ilSZPb6n6M4REZ5KxQ_1747303090
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43d4d15058dso6633525e9.0
-        for <kvm@vger.kernel.org>; Thu, 15 May 2025 02:58:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747303090; x=1747907890;
-        h=content-transfer-encoding:to:subject:cc:organization:autocrypt:from
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pTGqGXVw8z80rGktDR9uqeOqFeSCceq/wKqHsvtbKIw=;
-        b=Dl3sf1pGz3GifD/w9kUcXulH1Obzeh8q4QY0AVPBflfc2VAtTYWTAqHHH2d3AcEAca
-         JsaqAPU03YfO6EdiE0zewHLEHjZLVg1A+WkHUfGUA0G/+42NthUYgfUbmzyqRS40vdFd
-         U0MWivgJYhCBAq3lkl+bn78zr+UwJ/SWLpf4kOAn2rOL7hPe9rFN/geW8JnTXFneFhIw
-         oS9O5PgiN/El8wCD2Cw6bvy+4H9t8RJfes58K/dcfdLgUEmZIU4IkccFJNPVV/T9CHq3
-         Rp2q5BFK9vLZOOko+9kjWaGfx3NDQQGU/ZTCx/pyrkPmtgMpzf1qmQIhRlYQ8Oig29w9
-         iQMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUS6i03Kp58O8q4M9f7llQ5oDlllVqfJeUaftvja5IwI7DvfsWPq9fwCg/EipyVvEAu/U0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMU+XnzPYrwkHd4FnA3m5ape8NJQe8Q9brDZOXOowLpUl31dJz
-	ukgfcomh71OjddoWI44nJC2g6GQHP83H9xwHTAAACGWjaXFePW6D3FrIg18nSyrI8/VJJrdqrxf
-	I7tphOSDKaZcBYTlEIa0gqu5I9ptpbyhSsOg2tDzYPmtmZ15T1w==
-X-Gm-Gg: ASbGncssv2HiDVuGlfnF5LzzHQwkPxED5VUvZhX5yEtuQmmHVbmH4SmapsWH/Xo83SC
-	FzcH4pU00toxMgF8RccYZUKQG4SBiO0JJFu4DjLJanyS2eoSxgIIC/1AWDzrGx6pUW8tNCp0TKp
-	8jqGmSuGh7SXbGeq/rYIO5kivtrp5DWv/K7lzkR5qTppZoRu7jfE70Rbf4+bhi0PiGH8eju6Jgf
-	laDLB2VLwGndtv0BvqwkPyIUr35wBkynR42VoYunmCjGP1xlwt2LJf726drFGzLzwp8UIFOmfBO
-	oY24X5n5UyBd4vuD+NwwXcTPeV44sfKxZhwfXI6u4TgVOP5NEoT4VpH4vHUxWGghIJEzWEdFTKF
-	3O3nZQYzLGgKIjxgL79iQQiL+TrbffaPeAnAV4Ro=
-X-Received: by 2002:a05:600c:3b85:b0:442:f12f:bd9f with SMTP id 5b1f17b1804b1-442f2178431mr53187715e9.27.1747303089967;
-        Thu, 15 May 2025 02:58:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/+zH4hXXxDYKXmH9e7v7sDqIDgpWi4J6S+8+V8DNyJGvt2Kf7Y50xBY8atc/g20ZfKeT/hw==
-X-Received: by 2002:a05:600c:3b85:b0:442:f12f:bd9f with SMTP id 5b1f17b1804b1-442f2178431mr53187415e9.27.1747303089470;
-        Thu, 15 May 2025 02:58:09 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f4a:8900:884a:b3af:e3c9:ec88? (p200300d82f4a8900884ab3afe3c9ec88.dip0.t-ipconnect.de. [2003:d8:2f4a:8900:884a:b3af:e3c9:ec88])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f3951494sm66106625e9.22.2025.05.15.02.58.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 May 2025 02:58:09 -0700 (PDT)
-Message-ID: <c1c9591d-218a-495c-957b-ba356c8f8e09@redhat.com>
-Date: Thu, 15 May 2025 11:58:07 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A3629673D;
+	Thu, 15 May 2025 10:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747304971; cv=fail; b=nUAEs1dNiA+pRI9tkF/Wj1fBam7UEWfsDDILNT54+afNmHVdUb3YvfN8hVqcaRc19Zea7XDBp4UIPIovM1QIXdd5fFRGWFAt/icyTul37QHVSiFNYEWbZV56GVl/9IBGcMJh5VgJrBfZtHWguCGzFDGqyBSjfBM19l7aXmCBvTU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747304971; c=relaxed/simple;
+	bh=CyARGZxw6wUYrQKuX4colR1SXQqwY0leAtRqacRkvvc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=FGs9gxbGPPk8HFKJ57Y6ckTqwQRY5aWv6LZLq0H5rtlwAT0STfVg4B/ehIr3toorx/jYb44aQoRetozJ93C1KfoGCadbZYTMrfZ42s3NDcEPh4n722Z9/1TzvIKWPy4dChcztxI2uC6Te9FSVA63dvyBQ9cV7/E/RIGCR2m0YGo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lshKw8WU; arc=fail smtp.client-ip=40.107.243.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IYWPKQ54H0HHeXfZJ+50T9D7OZp0JoOLRWQAif4FGGCGzAAxcYi22ix95rMIYMGT/zV+sjEKvmRp+ALo54GmS+E+Ipxgp82onzspCOdKEe234kRujEZ8IzXYEcNa51/xrK+LenWVDe/uylLv1hp4JrJZRM3Lwf+lBo+qpDbgtpuWkrbfmbTgfV4HBPgXFyX/gsub5BjyqA72SZjpIPGrXw5zKrpx98kR3n/EZfNl4F7JyeIOZm8c25E0t8xgHeMtTYHY/XpsKnfLFZ0HjjxjAUJ9VAQoyXVmkDF4RE+RtQ0zyz4l4EbkxT7cmUno00TumqeDme3wmENrEiiu3quz3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Yyas2n2fvpeeJes95u3AIkr9e8WxHGfNMHdhl2Kq13Y=;
+ b=pUI7v4RmlCt9vHm+uC3GWnryksaJpmJRVojQp89HR3gowBzAix2jMNKoKDc6St8FiulhpBLOHrcppd8eDnlQ2ioFlvmILHwwdYSbhzFVz46Blg0PhYzgnLsAiXNlRs5ytCB7pOKEG2EDptUpUvnj2YjzOf+VgqK2IUn91NrPRAX5VUD7Gkp+ZACQfnSth3LjJn5x5AoQTVhFg6OAbO0xb6jGUbervPlffbuOH/IXupfcZ2ZWEmFyEP2lNbQqw6uFuZcCYa02wqS2w+gosXPMCGngR/KM/lHJCTAXnZdiVH0pkwnuOZkU4VIOvTsb5Mtn4cxK3I0jRxVGPNXoKsvx5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Yyas2n2fvpeeJes95u3AIkr9e8WxHGfNMHdhl2Kq13Y=;
+ b=lshKw8WUKlHkPUT1ZT1G4fFIdqoYvRAxF6QuMDiUId+ddLO7bdNo0hIQQgo5Jo1UUX3rLsETYGVaHn36twsbklbxH6gHDHwKyJbFecj4WZHerEiOMX5BiDuW3CkThpEimXgGuMXTCy52kB/puWHRmCvlqnw4LIZMYdwsTt43Td0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by DS7PR12MB8082.namprd12.prod.outlook.com (2603:10b6:8:e6::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.29; Thu, 15 May
+ 2025 10:29:26 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f%5]) with mapi id 15.20.8722.031; Thu, 15 May 2025
+ 10:29:26 +0000
+Message-ID: <8bc605ad-54ad-4d3a-9547-caa9d15887f2@amd.com>
+Date: Thu, 15 May 2025 20:29:16 +1000
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
+To: Zhi Wang <zhiw@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+ christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
+ alex.williamson@redhat.com, vivek.kasireddy@intel.com,
+ dan.j.williams@intel.com, yilun.xu@intel.com, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+ daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
+ zhenzhong.duan@intel.com, tao1.su@intel.com
+References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
+ <371ab632-d167-4720-8f0d-57be1e3fee84@amd.com>
+ <4b6dc759-86fd-47a7-a206-66b25a0ccc6d@amd.com>
+ <c10bf9c2-e073-479d-ad1c-6796c592d333@amd.com>
+ <aB3jLmlUKKziwdeG@yilunxu-OptiPlex-7050>
+ <aB4tQHmHzHooDeTE@yilunxu-OptiPlex-7050> <20250509184318.GD5657@nvidia.com>
+ <aB7Ma84WXATiu5O1@yilunxu-OptiPlex-7050>
+ <2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
+ <20250512140617.GA285583@nvidia.com>
+ <20250513130315.0158a626.zhiw@nvidia.com>
+Content-Language: en-US
+From: Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <20250513130315.0158a626.zhiw@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SY5P300CA0025.AUSP300.PROD.OUTLOOK.COM
+ (2603:10c6:10:1ff::18) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
- 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
- rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
- wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
- 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
- pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
- KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
- BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
- 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
- 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
- M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
- AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
- boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
- 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
- XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
- a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
- Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
- 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
- kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
- th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
- jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
- WNyWQQ==
-Organization: Red Hat
-Cc: gshan@redhat.com, ackerleytng@google.com, kalyazin@amazon.com,
- pankaj.gupta@amd.com, papaluri@amd.com, peterx@redhat.com,
- seanjc@google.com, shivankg@amd.com, tabba@google.com,
- vannapurve@google.com, shan.gavin@gmail.com,
- aneeshkumar.kizhakeveetil@arm.com, ashish.kalra@amd.com,
- dan.j.williams@intel.com, ddutile@redhat.com, quic_eberman@quicinc.com,
- michael.roth@amd.com, roypat@amazon.co.uk, suzuki.poulose@arm.com,
- vbabka@suse.com, yuzhao@google.com, rppt@kernel.org, jgowans@amazon.com,
- Nikita Kalyazin <kalyazin@amazon.com>, Yan Zhao <yan.y.zhao@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Subject: [Overview] guest_memfd extensions and dependencies 2025-05-15
-To: "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>, KVM <kvm@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-Hi,
-
-as requested, a quick overview of guest_memfd extensions and their 
-relationship/dependencies; this also highlights the order in which 
-patches should likely go upstream (current state). Some things will 
-likely change, especially the further we go down the dependency chain :)
-
-TL;DR
-
-A
-|       +-- Expected dependency
-|       |
-|       v
-+--B--E--F--G
-|
-+--C
-|
-+--D
-|
-+--H--I
-
-As we post stuff that depends on something that is not upstream yet, we 
-should (1) tag it as RFC and (2) provide a branch that contains all 
-relevant patches.
-
-
-
-(A) "Stage 1": Basic mmap support (Fuad) [1]
-
-Allow guest_memfd to mmap'ed and contain "shared" memory. No in-place 
-conversion support: either all-shared or all-private. Shared pages can 
-be faulted in.
-
-
-(B) "Stage 2": In-place conversion support (Fuad) [2]
-
-Allow guest_memfd to contain a mixture of shared and private pages, and
-converting between shared<->private in-place. Memory attributes 
-(shared/private) are managed by guest_memfd instead of KVM.
-
-Depends on (A).
-
-
-(C) Direct-map removal support (Patrick) [3]
-
-Allow for removal of the directmap of guest_memfd pages/folios.
-
-Depends on (A)
-
-
-(D) NUMA mempolicy support (Shivank) [4]
-
-Configure the "shared mempolicy" similar to shmem using the VMA.
-
-Depends on (A). But we'll have to be able to mmap any guest_memfd -- 
-just all faults must fail for ones that don't support shared memory, so 
-might require some tweaks on top of (A).
-
-
-(E) 1G huge page support (via hugetlb) (Ackerley) [5]
-
-Add support for huge pages obtained from hugetlb, splitting large folios 
-to small folios whenever we convert to shared. Need to reassemble large 
-folios before handing them back to hugetlb.
-
-I *assume* that further changes are required to make Intel / AMD CoCo 
-VMs make use of it -- essentially what (F) and (G) also deal with.
-
-Depends on (B)
-
-
-(F) AMD huge page support (via the buddy) (Michael) [6]
-
-Add support for huge pages / large folios that we allocate from the 
-buddy + preparedness tracking for AMD. In theory, we could add this 
-support for "private only" memory, but likely we will just do it 
-properly and base it on in-place conversion support.
-
-So, expected to depend on (B), but likely depends to some degree on 
-infrastructure being added in (E)
-
-
-(G) Intel TDX huge page support (via the buddy) (Yan) [7]
-
-Similar to (F) but for TDX.
-
-Depends on (F).
-
-
-(H) write() support (Nikita) [8]
-
-Allow for using write() to more efficiently preallocate/populate memory 
-for "all shared memory" VMs.
-
-Depends on (A)
-
-
-(I) UFFD-missing support (Nikita) [9]
-
-Support userfaultfd-missing fault handling for guest_memfd.
-
-Depends on (I), but likely could be based on (A) only.
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|DS7PR12MB8082:EE_
+X-MS-Office365-Filtering-Correlation-Id: e314cf43-8478-447a-5271-08dd939b5d98
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?MTRuWHhKaFJrakJPMWJJQ3VJOUlKZkFmZFNFNitseFNtcnVEY0dJcGJpMi9a?=
+ =?utf-8?B?LzEveHUzRjVXeDY2QWZtbzRFRHZBRGF6NmM2QmdySlVGZCs2UWc1eVVPK1F2?=
+ =?utf-8?B?c3hJa2k1SzRHTzNIVTVpZ0xaTXdDUkZyZEVDN0Q2bFdnc1dhWUc3M3FEdHJE?=
+ =?utf-8?B?aFF0bEI1N1ptS0VLMHpCOVE3b0ZZZWJvaGdCRTE3MXdHZ0RGWlRSbW1MUmpa?=
+ =?utf-8?B?c2owUmNvdG5pdkVod1ZMWHhXU3k0QmNUN3M4QWdUZTJzSEtIWkZXMmZhTmgw?=
+ =?utf-8?B?NmJKV2RKbW5DRE8rSTMvdWF3dGZGaXZrNDFRTnprK2pIV3FsNEs1QklCYzdl?=
+ =?utf-8?B?bzgwUll3b2VqUk5jdmxnSkgwZ3ovejFScWtERUF1NHBGSWVjTGhLbHppN0Fo?=
+ =?utf-8?B?MXdQVVpLbU93V1lKVjhST25wdEZWaFpuaEtJcEtLamRwbnBwQnJ4L2lVc1l6?=
+ =?utf-8?B?SHErUkQvZ0FibThaSEk4MlBmcDArSmNsZC8wSzBGZ0dwZHg1dEk3aVlTcE5B?=
+ =?utf-8?B?MXJtRHltYWc5L2RpRmYyckFuOEdJVTBLSEsrOEpzSVR4N1NIa2hhdVdMNjVP?=
+ =?utf-8?B?Rk4xZU1kNnViaE9IUndzdGJWVzVuNTBxcy80cVpzT0ZyTnM0QUw5V1FyVzE5?=
+ =?utf-8?B?blhQQzNhcTBUd2JXbFc5M3ErQWlBamorT1VqRUF1THhWQXZPTCs2b0VsVE9i?=
+ =?utf-8?B?UjJ4M2VWZ1B1U2V3Y0JRTEVzL0N6Wkp3ME42TmVaVTgweTRvczVHdGRaaTAy?=
+ =?utf-8?B?T3Q1R2RtczBMaWxFZkl4akc1V1NPZVhyM1dpUXlnUjJyQmVhdGxhZ0dhZjYx?=
+ =?utf-8?B?dHR6UkhUQVR0cWpRSTJBbjFmd3RCR2d3eUdncmg4eUFFRFBjNWxzdXl5NWhI?=
+ =?utf-8?B?SCtrQjJsTk1kNE13bnJUVTlNZHAxRmhrU1VXU2VTSWlINThwZjlmNkZXVitp?=
+ =?utf-8?B?cDRldHg4QW9kY2h1Z2p3ZjNydmI1RFNjTzg2RUx0VU5VMThTWk5vQzdzRjRN?=
+ =?utf-8?B?a3ZkczRIQkpIM2NOeGlsaWh6VVlFSmFScEdBUGhId1RyUC9qNDFjTmR1QlFO?=
+ =?utf-8?B?Q1hNZ2hhVUhoTk44MXRDcnJpSCtjZ3ZxUi94OTdMVnFBZ1NiUWZxZnpNc2pu?=
+ =?utf-8?B?OEttcjZvZHRWbEQwaDZzYU9EdTM3NjZxQWVESzB0T0lQU0V6Yitqc0pIRFQr?=
+ =?utf-8?B?UjBrZjkvMjBja3JsSmtkZUwyamd2Y2lKcUdOZElGT2kvdHdiRkFWR2x4ZXpx?=
+ =?utf-8?B?NlJQenNvYkg4eUs4QkgyaDFKa2FLL0N4VG84OVY5dHZPSG9iemNGbWUzZFBr?=
+ =?utf-8?B?alM0c1RwcXpHRFMrcHJKY3pFRW1NZnJlYXNXYUlyVXFucExFT2tEZXdZSkgy?=
+ =?utf-8?B?VTBTMlFKWUMyTEhBRzZhRWl1Y0RDUjFOQUNmeTR3cXk5bXhkcDJRVjkvSmRs?=
+ =?utf-8?B?azYycUdDVmRNUGo5eXd3WjBmRFJuRUZmaHJkaEVjUy9kcHRwbGpFV3NLZXFt?=
+ =?utf-8?B?dy9rWDRtRHVkdzkwanZWTmo5eTZpSUxPbXZsNWhnVlNnS2piekl5TkwzRWkz?=
+ =?utf-8?B?ZDIrRUxEWTh0OERFajZtWlEvSmxkK0s3SE5XdlU4b1JscUo5YUdnZ0x2ZGVW?=
+ =?utf-8?B?SmtlVHBMV2gxbE9iWjN0dTBBUGprZTU2MlpqcFMvSTRzREVwNmYxTThseE1x?=
+ =?utf-8?B?NFRMcWplWEhtaDJrcnZUT2FPbzNXbG94OU9EV2FaTGlSMU1vekxFeE0zZzBj?=
+ =?utf-8?B?UzhrYTBoY3RheGpmcnlUSVZMUmJDSVpLSThEbzcrc1Z6V2xQU2Mzd3RPc3NK?=
+ =?utf-8?B?RlZuNXA4WWJLSVh6cjc4R29vUkhIT3RpZVRBdFRLNWhsZlg5dWx5YUxwZ3pE?=
+ =?utf-8?B?MXBrZkpISG0rdy9mR2E1OTc1UjVEMnhOUGkzSmkveklTeUE9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WUUwdlRvTkExS1RqMWxRMVdaRnZhMXBEVkJMMGFlRVFTUk5DdFhOalN1eUhB?=
+ =?utf-8?B?K1RJanhFbVkzMUkzZkRpakhHanVaZGlZblhnSHk5UnJVUDBXNEZ4UDQwNmRG?=
+ =?utf-8?B?VVR1bHBqTHVEQ3NCRzFjdE1FZno3SFQ4WldrNTQyZFZaZ1J4R0YyZGlqQUYx?=
+ =?utf-8?B?V2MrZWJlSzhXdEVEdzdvR0FvQkVLVmRjeHVNcXFyQ1B4N1lDTXdhVDN3eW8v?=
+ =?utf-8?B?bDJwK29ieFpadzBBUkNpejZ4Mk82NGNRQVlzQ1AvQU1CRXU3dGxWU2RKenFR?=
+ =?utf-8?B?NjRrRzVrdExGYlJMTmVwY2tWWkVWS2FWU0xHbEVoR1FpWE9McDc1V1MwUUtD?=
+ =?utf-8?B?R1Bsc2NmVDZQbUU4dTlndXN4RUFnSG94M09hZnc3alZPNUh2THJ2NThCWkVj?=
+ =?utf-8?B?NTY4RGYvWmRFTmNiZW5xTGRVcEpoZGxIRjdMeGpxY1M5WVUvZ1FkVEhTZmI3?=
+ =?utf-8?B?cW80ZDlacm91b3JKMGlrbzZIWXhBZHpsbFYwR0hVWXZ2NFdNaGdGWi9HUmRl?=
+ =?utf-8?B?dklqNVFkekU2ZXZqQ0Q3Vno5cXdydS84OTg3TWM5R1JYWTVXVm4vbTE3aGY0?=
+ =?utf-8?B?TXMwdEtyUnVMK0l5b2hEQ3VuSkl2OGZlQmVjYTZ1SE4vN2dKRHlGcFAvY0ZW?=
+ =?utf-8?B?MGgvTVJ2TDFKb3JTMWdpSC9xRWhMVHpGZ3FrQzRNakhsUUovWVhhVUxrTnpI?=
+ =?utf-8?B?K2p5OHJFUWJNV1FuMmY3Ty95d0tSa1BoSVdaaEVPQVp5clRJME5Zbzk4Y3VF?=
+ =?utf-8?B?Zy9qWE5iRmluaXNLMm1CRW5ZSzhwdXRodW0zbjlWTGQ3NWVuK3BOVlB0ZVkv?=
+ =?utf-8?B?WHdWWFJCczhIUm9VWUgveVIySk1nbHloc3VaWjBrVlBmT09XN3I5QzBsMWE2?=
+ =?utf-8?B?LzQ2Ym8rL0Naa3FVV3hSUU83NXY5Ym9qWXBxZHY2THMyekdZTTVqbDllbVY2?=
+ =?utf-8?B?ZzRkZjFBajFZMWk5NEI5VSt4Z0o2VjhlQmtqOEZFSmZtOElod0duN2ZwZU5a?=
+ =?utf-8?B?a0JyNno0RFdPM0hNT0xUdGVYRWRLZ2R2UnNQWGJyNE5nb1ZSZFRHc1hnMklF?=
+ =?utf-8?B?UTNKUXVyektVQ1BoSnVBQ0hpWmhEK1pQQWVlM2MwM0R6ME1XK2wrRmRKeEJB?=
+ =?utf-8?B?OVUzZHBLdmR1alRNekwrK1BJR1FvVVA3VndHZElwYXVpc1RMZnpFOTNNR2Ju?=
+ =?utf-8?B?b2ZSenVsVkkwTDFvY0pFTjFzV3pVbmJraEpVSzgwSTNnbUh3eG5sNnJMSlRZ?=
+ =?utf-8?B?QkZKOUxCaStwdy9wenFURVl0T0xpR1BiRUlvOHZpR0dQR0U2L3NLWUxRTlh1?=
+ =?utf-8?B?YnlUcWsrZ2VwQmhlRFFPdXdyZE5ybTVyYVl0ZWFkWDNLeDJSdHBzaTdJYllU?=
+ =?utf-8?B?SytuamRZVWF2TzEzV0JmQWNISkZybjRnaU9obWpmV1BwWlFvaVpkOXF3Y2ts?=
+ =?utf-8?B?ajJhc0RzWUE5SzJDS3JMZlQrNTFiT0JlUVFoN2szclJzYUNrVERCQUl5TEY4?=
+ =?utf-8?B?RERqZ3ZYR2tKWWZvWWhJd3ZsRlFwYlZRQzVFR0ZlWEd3MGdvbFVPSVRVazRI?=
+ =?utf-8?B?RUxjUU5rQWo4YVVFU01MRVRKc0lCZmRmZlQxYU54Q2tZWGplaTA3MjNBZDA3?=
+ =?utf-8?B?WTVmV1I0M3hiYStOTERKZFdtY3RJTEV3MUJocEF0VG1kQUIrbFhhM0wvQ2tR?=
+ =?utf-8?B?ZGRFc0RtdTdiTDlZLzBSK2ZzL2QrSHlJTTVkV3B4Q1RRL21CczY0amVWdWs2?=
+ =?utf-8?B?VWZ4YnlGWUs4NTE2SGl0R2xOQnNoRU8vZk43N2Vwcm9TUDAyUjVLdnJ0d1BF?=
+ =?utf-8?B?bUd2NmM3TnRDNzc5a1RCMUl5TVlzSkN2UTZPcDVyTHB4YzF6T1FtU05CYzBX?=
+ =?utf-8?B?ZVNtKzlUd2daREZzK0tyckJZNUdUUlFBV1JOUzBGTCtkMmFQNlB2N25MRGdS?=
+ =?utf-8?B?MTZuKzhHb3l3NmNGaUlGNHRXTFlzdFdjNnd5dDM0eTNDYWdXdkdrZjJzLzhl?=
+ =?utf-8?B?WUVPQzc3QWhwaE1CS0I5TXRVZkhhOWdUcVJRME80YW9tOCtMNWJNQSttb05Y?=
+ =?utf-8?B?b1BRRXVmUkQ5d1cvcGNzbGlqNVd3dXJwLzVCZVhud3VKVm9ldzkxUVJWZytK?=
+ =?utf-8?Q?QVo8eLfClICpfOnbdihhXt6AQ?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e314cf43-8478-447a-5271-08dd939b5d98
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2025 10:29:25.9563
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FSnJhpSnGfKVIBJnhwl67ERhaTSs4sHXxMeWnjE76b8s2HrsVamOhPjX7C6i96ZrIb4+53FX63H8JLLICm1XFA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8082
 
 
 
-I'm not listing the "factor out guest_memfd from KVM to mm/guestmem.c" / 
-"guestmem library" / "guestmem shim" for now [10] as it will likely be 
-covered by one of the other items as required.
+On 13/5/25 20:03, Zhi Wang wrote:
+> On Mon, 12 May 2025 11:06:17 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+>> On Mon, May 12, 2025 at 07:30:21PM +1000, Alexey Kardashevskiy wrote:
+>>
+>>>>> I'm surprised by this.. iommufd shouldn't be doing PCI stuff,
+>>>>> it is just about managing the translation control of the device.
+>>>>
+>>>> I have a little difficulty to understand. Is TSM bind PCI stuff?
+>>>> To me it is. Host sends PCI TDISP messages via PCI DOE to put the
+>>>> device in TDISP LOCKED state, so that device behaves differently
+>>>> from before. Then why put it in IOMMUFD?
+>>>
+>>>
+>>> "TSM bind" sets up the CPU side of it, it binds a VM to a piece of
+>>> IOMMU on the host CPU. The device does not know about the VM, it
+>>> just enables/disables encryption by a request from the CPU (those
+>>> start/stop interface commands). And IOMMUFD won't be doing DOE, the
+>>> platform driver (such as AMD CCP) will. Nothing to do for VFIO here.
+>>>
+>>> We probably should notify VFIO about the state transition but I do
+>>> not know VFIO would want to do in response.
+>>
+>> We have an awkward fit for what CCA people are doing to the various
+>> Linux APIs. Looking somewhat maximally across all the arches a "bind"
+>> for a CC vPCI device creation operation does:
+>>
+>>   - Setup the CPU page tables for the VM to have access to the MMIO
+>>   - Revoke hypervisor access to the MMIO
+>>   - Setup the vIOMMU to understand the vPCI device
+>>   - Take over control of some of the IOVA translation, at least for
+>> T=1, and route to the the vIOMMU
+>>   - Register the vPCI with any attestation functions the VM might use
+>>   - Do some DOE stuff to manage/validate TDSIP/etc
+>>
+>> So we have interactions of things controlled by PCI, KVM, VFIO, and
+>> iommufd all mushed together.
+>>
+>> iommufd is the only area that already has a handle to all the required
+>> objects:
+>>   - The physical PCI function
+>>   - The CC vIOMMU object
+>>   - The KVM FD
+>>   - The CC vPCI object
+>>
+>> Which is why I have been thinking it is the right place to manage
+>> this.
+>>
+>> It doesn't mean that iommufd is suddenly doing PCI stuff, no, that
+>> stays in VFIO.
+>>
+>>>>> So your issue is you need to shoot down the dmabuf during vPCI
+>>>>> device destruction?
+>>>>
+>>>> I assume "vPCI device" refers to assigned device in both shared
+>>>> mode & prvate mode. So no, I need to shoot down the dmabuf during
+>>>> TSM unbind, a.k.a. when assigned device is converting from
+>>>> private to shared. Then recover the dmabuf after TSM unbind. The
+>>>> device could still work in VM in shared mode.
+>>
+>> What are you trying to protect with this? Is there some intelism where
+>> you can't have references to encrypted MMIO pages?
+>>
+> 
+> I think it is a matter of design choice. The encrypted MMIO page is
+> related to the TDI context and secure second level translation table
+> (S-EPT). and S-EPT is related to the confidential VM's context.
+> 
+> AMD and ARM have another level of HW control, together
+> with a TSM-owned meta table, can simply mask out the access to those
+> encrypted MMIO pages. Thus, the life cycle of the encrypted mappings in
+> the second level translation table can be de-coupled from the TDI
+> unbound. They can be reaped un-harmfully later by hypervisor in another
+> path.
+> 
+> While on Intel platform, it doesn't have that additional level of
+> HW control by design. Thus, the cleanup of encrypted MMIO page mapping
+> in the S-EPT has to be coupled tightly with TDI context destruction in
+> the TDI unbind process.
+> 
+> If the TDI unbind is triggered in VFIO/IOMMUFD, there has be a
+> cross-module notification to KVM to do cleanup in the S-EPT.
 
-Also, there is a lot of other planned work ("all shared" VMs can allow 
-for not splitting large folios because there is no in-place conversion, 
-guest_memfs, ... ).
+QEMU should know about this unbind and can tell KVM about it too. No cross module notification needed, it is not a hot path.
 
 
-[1] https://lkml.kernel.org/r/20250513163438.3942405-1-tabba@google.com
-[2] https://lore.kernel.org/all/20250328153133.3504118-1-tabba@google.com/
-[3] https://lkml.kernel.org/r/20250221160728.1584559-1-roypat@amazon.co.uk
-[4] 
-https://lore.kernel.org/linux-mm/20250408112402.181574-1-shivankg@amd.com/
-[5] 
-https://lore.kernel.org/all/cover.1747264138.git.ackerleytng@google.com/T/#u
-[6] 
-https://lore.kernel.org/all/20241212063635.712877-1-michael.roth@amd.com/T/#u
-[7] 
-https://lore.kernel.org/all/20250424030033.32635-1-yan.y.zhao@intel.com/T/#u
-[8] 
-https://lore.kernel.org/kvm/20250303130838.28812-1-kalyazin@amazon.com/T/
-[9] 
-https://lore.kernel.org/all/20250303133011.44095-1-kalyazin@amazon.com/T/#u
-[10] 
-https://lore.kernel.org/all/20241113-guestmem-library-v3-0-71fdee85676b@quicinc.com/T/#u
+> So shooting down the DMABUF object (encrypted MMIO page) means shooting
+> down the S-EPT mapping and recovering the DMABUF object means
+> re-construct the non-encrypted MMIO mapping in the EPT after the TDI is
+> unbound.
+
+This is definitely QEMU's job to re-mmap MMIO to the userspace (as it does for non-trusted devices today) so later on nested page fault could fill the nested PTE. Thanks,
+
+
+> 
+> Z.
+> 
+>>>> What I really want is, one SW component to manage MMIO dmabuf,
+>>>> secure iommu & TSM bind/unbind. So easier coordinate these 3
+>>>> operations cause these ops are interconnected according to secure
+>>>> firmware's requirement.
+>>>
+>>> This SW component is QEMU. It knows about FLRs and other config
+>>> space things, it can destroy all these IOMMUFD objects and talk to
+>>> VFIO too, I've tried, so far it is looking easier to manage. Thanks,
+>>
+>> Yes, qemu should be sequencing this. The kernel only needs to enforce
+>> any rules required to keep the system from crashing.
+>>
+>> Jason
+>>
+> 
 
 -- 
-Cheers,
-
-David / dhildenb
+Alexey
 
 
