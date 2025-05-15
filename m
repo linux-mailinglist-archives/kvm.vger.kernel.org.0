@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-46640-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46641-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C4E6AB7D06
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 07:35:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F16BAB7D0D
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 07:38:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 095671B64857
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 05:35:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A64E61BA524E
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 05:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B804289E00;
-	Thu, 15 May 2025 05:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D164295529;
+	Thu, 15 May 2025 05:38:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jPlCQykV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TVIK7mEr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F254B1E71;
-	Thu, 15 May 2025 05:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137304B1E71;
+	Thu, 15 May 2025 05:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747287298; cv=none; b=La9rJLhftcPcmkBdo8w52ZAR2nxyX6ms4hT2XsJ6sw5otFHBIZvVmrK+qdnSF0OkRK4QrQDOFu8O9DUbLxQBw2JDPb7MuTkp8ib1GFO7QspuHllpc10ZSO3vkAuBbOwbf84GHmZCw58RdkB2UykG/jTg93xAusImAZIbygDoRTc=
+	t=1747287479; cv=none; b=YEzG/d6vPMitshzaoBguNjdtnRnlg11gzZVbtpjgTbE2Q+0r8CDEHhoFWJSQJH0B6B/f72BqLg1sRLrV/CzyAVHeL+KLwLJkq2ydjmVffgAEMbL4DykEAJ2rntmYSC64EZ5/zCgGmsNPMX5DrA17PeRu4lzlB4J6x+egGUqqmjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747287298; c=relaxed/simple;
-	bh=M2vgp7I9jexpSjOmNO3GYj+dqtyAy1KjTL1WYYh/TrM=;
+	s=arc-20240116; t=1747287479; c=relaxed/simple;
+	bh=xLlmQORNl2yGCmXe0IMxm/678rmJHgDejJHZphvssXE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EgdYq5JdURUSaHbs+LztASCHi//EMjl50RZiHsdrJbAUt2/swjXvyPkCIR93GKejDyye5RjI8L9NBgJRx96SOM+FU2NKuwWI2VaMI/5h18lgc20UAfF7X6JtRoSnPnSAYgnw+L5d1ZQuAmdXUZyOpbei08FpYidjEpljdrir9ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jPlCQykV; arc=none smtp.client-ip=192.198.163.17
+	 In-Reply-To:Content-Type; b=V+Uuk8kAU2+oMXw8et35XRuLBLT/PGUchSxfA5owDDpG2ZbvkkOT+MgyAGLn7LhDAxmhOnSDZWF5no6bc46bm/I2AE7b5PLs6L/BM2ydpozoXAhyxfE8VWIUVKIAJohGPyQnULU5rwQr+XA/f0Ql7KadvOO5VXpCTXcS4YQ8chQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TVIK7mEr; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747287297; x=1778823297;
+  t=1747287478; x=1778823478;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=M2vgp7I9jexpSjOmNO3GYj+dqtyAy1KjTL1WYYh/TrM=;
-  b=jPlCQykV4rTz1llImClqqquAZ9cC061Fhe9D/yptDohnBEELgKTuKA2v
-   1t+gXMDNa7BPVzI6exNUrjX1zV35fDTGIddXFwZYV7pk07kFEOvTydu/v
-   wFWpgBHKGzhnB+cH9R9sFLU2JfihPoiOzQmSWxh67GXk4cUpjc2A3rG0i
-   SOoMhTCR2cFZ3fx4+qLiRO6y3AQUUONYcs/mVYBotDkT7Ln244cDdnbz8
-   hvFWMTPs9/vIH/Ooesd4Vb6VoIK2pnn2k2pJtfj9ChOLlidTnHZbt3uEq
-   D9mAEknXgj4qDlKvSdw2BNARRFFpqlYBhSRSpYUo45XmKkpFhE+LtVllO
-   A==;
-X-CSE-ConnectionGUID: H06P1TaQQ6OgfyfO4Zfzag==
-X-CSE-MsgGUID: OZtw9Q1YTDaTtyB1pmh+IA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11433"; a="49143175"
+  bh=xLlmQORNl2yGCmXe0IMxm/678rmJHgDejJHZphvssXE=;
+  b=TVIK7mErNuK6VokogK9Km+jWv+xVSwqDUoUXawDGHzKYPqenlGhOKqxb
+   VrWQIYBCYz7zf1wwK3rmetC4bd5TDFpKTPUP0Lj4yKni8OsiAe9/2cxm1
+   McppnSL8NSWaYFjzq7RjMBYq5vy4YV8CWT9DiR4tqIrpMH6eo2YFIxU7b
+   A95QS10ZNXMjfKQ1UwYqB5o6iTbqW+Cm5O9GKojhXBAWm6Jwz0ESGlOhw
+   3dyto01Ats3xKVsW+QR6cIfgxyBvxJ1EvdP9QGX+PPtXv1NYn0njFa5VF
+   LuYJg+lpCyrf9xiz6/RNe0UHAu8k5dOdfhjq7tZfr9FGO/i3PXdiIbiFo
+   Q==;
+X-CSE-ConnectionGUID: 7jFZLurTTvmXzd1dnNveHQ==
+X-CSE-MsgGUID: 3aycLS5PQUumlUVQPbXrgg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11433"; a="71717818"
 X-IronPort-AV: E=Sophos;i="6.15,290,1739865600"; 
-   d="scan'208";a="49143175"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 22:34:56 -0700
-X-CSE-ConnectionGUID: XAh8ozvOR2yqwm3TeljeRQ==
-X-CSE-MsgGUID: jHSqDxIjSdSCc5T68V0NKw==
+   d="scan'208";a="71717818"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 22:37:58 -0700
+X-CSE-ConnectionGUID: 22anqOZvToCOExIJT0BGWg==
+X-CSE-MsgGUID: hmfxcQ46QYG1wU7dAWPwQg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,290,1739865600"; 
-   d="scan'208";a="138761559"
+   d="scan'208";a="138129187"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 22:34:50 -0700
-Message-ID: <1f35b6b4-58b6-4c7e-b788-3edbb2f807f3@linux.intel.com>
-Date: Thu, 15 May 2025 13:34:48 +0800
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 22:37:52 -0700
+Message-ID: <bac13842-9d15-4664-a20d-4916abcdc3e7@linux.intel.com>
+Date: Thu, 15 May 2025 13:37:49 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 26/38] KVM: x86/pmu: Introduce eventsel_hw to prepare
- for pmu event filtering
+Subject: Re: [PATCH v4 23/38] KVM: x86/pmu: Configure the interception of PMU
+ MSRs
 To: Sean Christopherson <seanjc@google.com>,
  Mingwei Zhang <mizhang@google.com>
 Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
@@ -88,22 +88,43 @@ Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
  Shukla Manali <Manali.Shukla@amd.com>,
  Nikunj Dadhania <nikunj.dadhania@amd.com>
 References: <20250324173121.1275209-1-mizhang@google.com>
- <20250324173121.1275209-27-mizhang@google.com> <aCU4cHtvjwDordxW@google.com>
+ <20250324173121.1275209-24-mizhang@google.com> <aCU4Uuhzo_ovR7r8@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <aCU4cHtvjwDordxW@google.com>
+In-Reply-To: <aCU4Uuhzo_ovR7r8@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
-On 5/15/2025 8:42 AM, Sean Christopherson wrote:
-> On Mon, Mar 24, 2025, Mingwei Zhang wrote:
->> -	pmu->fixed_ctr_ctrl = pmu->global_ctrl = pmu->global_status = 0;
->> +	pmu->fixed_ctr_ctrl = pmu->fixed_ctr_ctrl_hw = 0;
->> +	pmu->global_ctrl = pmu->global_status = 0;
-> VMCS needs to be updated.
+On 5/15/2025 8:41 AM, Sean Christopherson wrote:
+> Again, use more precise language.  "Configure interceptions" is akin to "do work".
+> It gives readers a vague idea of what's going on, but this
+>
+>   KVM: x86/pmu: Disable interception of select PMU MSRs for mediated vPMUs
+>
+> is just as concise, and more descriptive.
 
-Yes. Thanks.
+Yes, absolutely. Thanks.
 
+
+>
+>> +	/*
+>> +	 * In mediated vPMU, intercept global PMU MSRs when guest PMU only owns
+>> +	 * a subset of counters provided in HW or its version is less than 2.
+>> +	 */
+>> +	if (kvm_mediated_pmu_enabled(vcpu) && kvm_pmu_has_perf_global_ctrl(pmu) &&
+>> +	    pmu->nr_arch_gp_counters == kvm_pmu_cap.num_counters_gp)
+> This logic belongs in common code.  Just because AMD doesn't have fixed counters
+> doesn't mean KVM can't have a superfluous "0 == 0" check.
+
+Yes.
+
+
+>
+>> +	if (kvm_mediated_pmu_enabled(vcpu) && kvm_pmu_has_perf_global_ctrl(pmu) &&
+> Just require the guest to have PERF_GLOBAL_CTRL, I don't see any reason to support
+> v1 PMUs.  It adds complexity and weirdness, and I can't imagine there's a use case.
+
+Ok.
 
 
