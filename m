@@ -1,133 +1,176 @@
-Return-Path: <kvm+bounces-46737-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46738-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB4F8AB922B
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 00:06:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E99F2AB9250
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 00:41:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 535CD16DBC9
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 22:06:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EE8717B62B
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 22:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6CF288531;
-	Thu, 15 May 2025 22:06:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F1928B4FE;
+	Thu, 15 May 2025 22:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="zfeFT7WZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zR+BVJSs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684E228B3E4
-	for <kvm@vger.kernel.org>; Thu, 15 May 2025 22:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A10A171C9
+	for <kvm@vger.kernel.org>; Thu, 15 May 2025 22:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747346772; cv=none; b=uLM18lbifRNcSpj/rK08m6SN1IRYQ5LoSwPWXPOcHl3/ix4gFWBdrpv0gJe+rBqq3BZCuafcbghm8Lal1W4MCGG5Mt9RJTt/VSO2hV6xEqp6JdbFBacjrELrwNUEe+5NJq6iZ82684cnWT8d+WmS7NW+tdeShel3huozSic2m/Q=
+	t=1747348856; cv=none; b=JeFaSZDZKdX9+RJjO+u73aViU9pcw0ORemBQBx/LqoP7Zm0GXvjGX1W2yTDneoGWseI8bCHqoGxlxiITYfBatgFNaRlA1hfeo3QhfcbLTguKWzdygC73539TWgbQ5N5IAvm3E4aqNIiNsCQQD+qiZPiHPkplQJoF/hJypLWKL6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747346772; c=relaxed/simple;
-	bh=u/EaVaHKx9F1SHv14qeTnwcVtfcQnc0b+jYaydTMHlE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=m8XbYZQZuNtfLaP0r5hmpT8FXnGzjs49gBFTlEsZpzjJrBKN4JZZgywgssAcvQ7+IMM7PMF9p6fGtGUF5BeXhSP4Ttph+jzyvD8wV7EKQb5P2vWQwRl9EvgMKHCMyhrOnw6cNFU2Yb3gdEPZtHoGtjAUc1SSP4ZdJbEe1Gtiq48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=zfeFT7WZ; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22fbbf9c01bso12655435ad.3
-        for <kvm@vger.kernel.org>; Thu, 15 May 2025 15:06:09 -0700 (PDT)
+	s=arc-20240116; t=1747348856; c=relaxed/simple;
+	bh=gAwcrn7C3OtzQnccbEtzwNEUv9I14BWeIkkCpTqjRkU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=oq9/nxcJUHpxMjb3kGKKStJOHzr6w5W9acj4q3prl899wQyOKGY+WgP626SSPRf6N89j8xzK9GPa/fQvSm0qyCuOQymeFwXDHY9kgA1btGxiPNQJ+HW+KwMeDO9YuzDd6tuFX/hGlCAnZ5Bs5COI1wqN6SLXqcz9T2hsbJCTZXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zR+BVJSs; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30c371c34e7so1643548a91.1
+        for <kvm@vger.kernel.org>; Thu, 15 May 2025 15:40:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1747346769; x=1747951569; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pKEzAEjPYjOvvo8wW1NKB/AseRp560F6iFtwwKSA2eo=;
-        b=zfeFT7WZ5WjSHFEw9NPu91v9Yj8cRuhhsCo5Ld1JRZnIIhJ9u1rzjwXqep7bKH2dlt
-         DFGBNOZQM5PkuRyteA8fMo5zpctStytekeEV/JvPrDf78vKDIflzLUtjcqPf4/Z37wcC
-         YIltQPpLPqLFBrdHbQo2QIXZF/2/sotC3CBd+MAIXux9wOqwE4GLjs+i95UDn0kH6iWj
-         WP1fsR1/0nP+vLThP/fPLWMDpVwprG/KfJFeJ/5CIcGMDi/HDQHgzm5xSMP428ilODmV
-         CbikMHj5R8r4DkZGXONLYTjQ4GaYlcEB0Pypf61tAsAH7GDjyhpkuTD/Og7w7DGNqLZq
-         G+0w==
+        d=google.com; s=20230601; t=1747348854; x=1747953654; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QzbQSdflaHCK3ugNtNk4sqO5eX+TPn6H7YDD2IwnvfQ=;
+        b=zR+BVJSs2sHv65D4jksJG9URE1HWMRVvutsEm7K6rVaNNd9KowUeO1/+MQulb/ML4r
+         OsAy8X8rGWH4sRcENXjv1wdsmTOGDm6pjxzWS7Uv5kUZ2dGG3ifrne8GPx8D0I/l8nI5
+         2MLlXVf1KF8m8FJnkDcnq5oV6mYav1Ywo0JW2O13ikMd6hoV6MVNiu0+SvtZQ+1j6rVy
+         gLyxw2iL+LCsKa81rs9bQxgV9DFJ2hbY7l82pEjixn4yIKIgnU7JWAcr7KXPcE1GPrA/
+         T9pBecZzZIRPsWxuhqg8WODqCAzBGxUz8cFxD6v30Xoc6+icyADHDCVX2HL25GgqrQ6B
+         B5JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747346769; x=1747951569;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pKEzAEjPYjOvvo8wW1NKB/AseRp560F6iFtwwKSA2eo=;
-        b=FIhfJlzwIVA5iqtwlQke5DF7cRhm9pVTNGES5rkxcQG/EdoS3zKMpaykM/KLLGDYjg
-         y7M9pkJcH8ibJByosOuu0BtrldXGABRLJeO/F9/uer6pn/HyvJ63nTqjBecLMz2zQeB1
-         vJe4bk9/U5/1ate5fxdwnbSSjHe0mvDRDud3OHoXWKIQMcxEj+weoGIDjvt6KwZ/qHkn
-         HLf72FvzIwPd1fxknT0SjnLo8Ca1DXBU9Id+yusJ6Fak7Z/U03wfQcYKbUT4B6dYrgVD
-         O1GqovFniR6HqXsXdSG3bFJ0d0Njb4hCASYVrwmpgbipgst2pTRFnSq9qQSTont80qrq
-         2O/w==
-X-Gm-Message-State: AOJu0Yw+Ke6lFiikBD/ZW1twmFpvjuK/hD9Wz9bjcnLoqeIVRkuFC5IQ
-	chhJzjjsMCXUZ9Z9rofPlc3N9WHqn8ESxE5TYoY4dUVifJYtvEJy0pvRU3SdVetOPS8=
-X-Gm-Gg: ASbGncvKjgWrvs3KobXsxR3ibIjT1+kYsiKklwEG7GhidD4ICJZYEDGTKKbaa+tB40B
-	CRn00MO9ABXNKuySIzA26hXtE+QBjiuV1BOegP5KKNiMBa9ncpB/SsHp08HER6yg1zkne15UfZh
-	Gwn+n18M/dUkWJ3ddT7yElQIHD3h1X+dhKhzFOj0qwtxATx5Pj9wPAbrVNUS9RTjOBMdUZa6KmP
-	79m+HgHt8ocBqQuF0toCTRhNoQkrWpwXleqBwDlYhO0sa2qDbJH3RRpE1llKPAD3Xbx4sk9vTET
-	Fp2b1+zPYfwikHwWOqgS0eKa2K0HidL1GGvMe5MCH75LUI5aJ/jZV+ZTDEy+u0Ck
-X-Google-Smtp-Source: AGHT+IFiKNNYtzCEg6C6XYe7DP0nZARy3KIK4XDqNnkJzROZ4X9NmluwSJ7FFKC6yeImxQGIHZ2cIQ==
-X-Received: by 2002:a17:902:e805:b0:22c:33e4:fa5a with SMTP id d9443c01a7336-231d43d9c05mr11341725ad.9.1747346769141;
-        Thu, 15 May 2025 15:06:09 -0700 (PDT)
-Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4ed25a9sm2470515ad.223.2025.05.15.15.06.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 May 2025 15:06:08 -0700 (PDT)
-From: Atish Patra <atishp@rivosinc.com>
-Date: Thu, 15 May 2025 15:06:05 -0700
-Subject: [PATCH v2] RISC-V: KVM: Remove scounteren initialization
+        d=1e100.net; s=20230601; t=1747348854; x=1747953654;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QzbQSdflaHCK3ugNtNk4sqO5eX+TPn6H7YDD2IwnvfQ=;
+        b=tu1ieVRFRcli2cdm9LzOsSt0gDwrtb7+OXDEQTITYhqZ9qe3GP16FWzFwmUO/Ge03e
+         S9a9XeLslTXBAutH0sE/hUw9BEV8h0mXsJuj4mjH22YoSbKazZQec9PfQ9Kvn0Lue8zW
+         xQxDbgfbZ7dNwCBTKzbagOMInFOzpHIfrQgL2Hc958jZlUl1ZQnxSgJ/ahDeZUTiX5mD
+         vPVa14V604XWKmZ0Vg9CrcsvmD5ocjTyZfUBOxhOZGPebaz4k9y8NC+x8eGcWC4bbN4F
+         jy0zHcfPECEuOGLzRVwIHevVWkN1i5nZAb/HLuqwT78exppWdZ5nIeseExI4XRDYyq/n
+         AHoA==
+X-Gm-Message-State: AOJu0YzOhOx0JQjMItxEjXWxvSBZfXpRyxnagkjuE8RzDk21pnpxiqy0
+	THDIh08jY8SREq/2tEjOJ5SzQqZnFJNY6+OtPC9Dhduc1AMyCVnkszFJ3OqhLgB4c6HbzyIb0KC
+	DRtoa0w==
+X-Google-Smtp-Source: AGHT+IHhpbVQYCulfsGsx71Tw2jSSQWwT4/3osOtwdZFSgnfe66APRY0T7q2w4vwHNkAbfsnzNQMQ2bPnv4=
+X-Received: from pja11.prod.google.com ([2002:a17:90b:548b:b0:30e:65cf:2614])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f8b:b0:30a:2007:65b6
+ with SMTP id 98e67ed59e1d1-30e83235af7mr236409a91.34.1747348854468; Thu, 15
+ May 2025 15:40:54 -0700 (PDT)
+Date: Thu, 15 May 2025 15:40:52 -0700
+In-Reply-To: <20250515220400.1096945-2-dionnaglaze@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250515-fix_scounteren_vs-v2-1-1fd8dc0693e8@rivosinc.com>
-X-B4-Tracking: v=1; b=H4sIAExlJmgC/32NQQ6CMBBFr0JmbQ0tqYgr72EIwWEqs7AlHWw0p
- He3cgCX7+f/9zcQikwCl2qDSImFgy9gDhXgPPoHKZ4Kg6mNra1ulOP3IBhefqVIfkii3DSdT8Z
- abO8tlN0SqZR2560vPLOsIX72i6R/6T9b0kor1M6a0XUNtt01cgrCHo8YntDnnL+d7uw+tQAAA
- A==
-X-Change-ID: 20250513-fix_scounteren_vs-fdd86255c7b7
-To: Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Alexandre Ghiti <alex@ghiti.fr>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Atish Patra <atishp@rivosinc.com>
-X-Mailer: b4 0.15-dev-42535
+Mime-Version: 1.0
+References: <20250515220400.1096945-1-dionnaglaze@google.com> <20250515220400.1096945-2-dionnaglaze@google.com>
+Message-ID: <aCZtdN0LhkRqm1Vn@google.com>
+Subject: Re: [PATCH v5 1/2] kvm: sev: Add SEV-SNP guest request throttling
+From: Sean Christopherson <seanjc@google.com>
+To: Dionna Glaze <dionnaglaze@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-coco@lists.linux.dev, Thomas Lendacky <Thomas.Lendacky@amd.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <jroedel@suse.de>, Peter Gonda <pgonda@google.com>, 
+	Borislav Petkov <bp@alien8.de>
+Content-Type: text/plain; charset="us-ascii"
 
-Scounteren CSR controls the direct access the hpmcounters and cycle/
-instret/time from the userspace. It's the supervisor's responsibility
-to set it up correctly for it's user space. They hypervisor doesn't
-need to decide the policy on behalf of the supervisor.
+On Thu, May 15, 2025, Dionna Glaze wrote:
+> The AMD-SP is a precious resource that doesn't have a scheduler other
+> than a mutex lock queue. To avoid customers from causing a DoS, a
+> mem_enc_ioctl command for rate limiting guest requests is added.
+> 
+> Recommended values are {.interval_ms = 1000, .burst = 1} or
+> {.interval_ms = 2000, .burst = 2} to average 1 request every second.
+> You may need to allow 2 requests back to back to allow for the guest
+> to query the certificate length in an extended guest request without
+> a pause. The 1 second average is our target for quality of service
+> since empirical tests show that 64 VMs can concurrently request an
+> attestation report with a maximum latency of 1 second. We don't
 
-Signed-off-by: Atish Patra <atishp@rivosinc.com>
----
-Changes in v2:
-- Remove the scounteren initialization instead of just setting the TM bit. 
-- Link to v1: https://lore.kernel.org/r/20250513-fix_scounteren_vs-v1-1-c1f52af93c79@rivosinc.com
----
- arch/riscv/kvm/vcpu.c | 3 ---
- 1 file changed, 3 deletions(-)
+Who is we?
 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 60d684c76c58..fa3713b5a41b 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -146,9 +146,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	if (kvm_riscv_vcpu_alloc_vector_context(vcpu, cntx))
- 		return -ENOMEM;
- 
--	/* By default, make CY, TM, and IR counters accessible in VU mode */
--	reset_csr->scounteren = 0x7;
--
- 	/* Setup VCPU timer */
- 	kvm_riscv_vcpu_timer_init(vcpu);
- 
+> anticipate more concurrency than that for a seldom used request for
+> a majority well-behaved set of VMs. The majority point is decided as
+> >64 VMs given the assumed 128 VM count for "extreme load".
+> 
+> Cc: Thomas Lendacky <Thomas.Lendacky@amd.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Joerg Roedel <jroedel@suse.de>
+> Cc: Peter Gonda <pgonda@google.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Sean Christopherson <seanjc@google.com>
+> 
+> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
+> ---
+>  .../virt/kvm/x86/amd-memory-encryption.rst    | 23 +++++++++++++
+>  arch/x86/include/uapi/asm/kvm.h               |  7 ++++
+>  arch/x86/kvm/svm/sev.c                        | 33 +++++++++++++++++++
+>  arch/x86/kvm/svm/svm.h                        |  3 ++
+>  4 files changed, 66 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> index 1ddb6a86ce7f..1b5b4fc35aac 100644
+> --- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> @@ -572,6 +572,29 @@ Returns: 0 on success, -negative on error
+>  See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
+>  details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
+>  
+> +21. KVM_SEV_SNP_SET_REQUEST_THROTTLE_RATE
+> +-----------------------------------------
+> +
+> +The KVM_SEV_SNP_SET_REQUEST_THROTTLE_RATE command is used to set a per-VM rate
+> +limit on responding to requests for AMD-SP to process a guest request.
+> +The AMD-SP is a global resource with limited capacity, so to avoid noisy
+> +neighbor effects, the host may set a request rate for guests.
+> +
+> +Parameters (in): struct kvm_sev_snp_set_request_throttle_rate
+> +
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +
+> +	struct kvm_sev_snp_set_request_throttle_rate {
+> +		__u32 interval_ms;
+> +		__u32 burst;
+> +	};
+> +
+> +The interval will be translated into jiffies, so if it after transformation
 
----
-base-commit: 01f95500a162fca88cefab9ed64ceded5afabc12
-change-id: 20250513-fix_scounteren_vs-fdd86255c7b7
---
-Regards,
-Atish patra
+I assume this is a limitation of the __ratelimit() interface?
 
+> +the interval is 0, the command will return ``-EINVAL``. The ``burst`` value
+> +must be greater than 0.
+
+Ugh, whose terribly idea was a per-VM capability?  Oh, mine[*].  *sigh*
+
+Looking at this again, a per-VM capability doesn't change anything.  In fact,
+it's far, far worse.  At least with a module param there's guaranteed to be some
+amount of ratelimiting.  Relying on the VMM to opt-in to ratelimiting its VM if
+userspace is compromised is completely nonsensical.
+
+Unless someone has a better idea, let's just go with a module param.  
+
+[*] https://lore.kernel.org/all/Y8rEFpbMV58yJIKy@google.com
+
+> @@ -4015,6 +4042,12 @@ static int snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_
+>  
+>  	mutex_lock(&sev->guest_req_mutex);
+>  
+> +	if (!__ratelimit(&sev->snp_guest_msg_rs)) {
+> +		svm_vmgexit_no_action(svm, SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_BUSY, 0));
+> +		ret = 1;
+> +		goto out_unlock;
+
+Can you (or anyone) explain what a well-behaved guest will do in in response to
+BUSY?  And/or explain why KVM injecting an error into the guest is better than
+exiting to userspace.
 
