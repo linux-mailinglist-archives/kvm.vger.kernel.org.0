@@ -1,148 +1,171 @@
-Return-Path: <kvm+bounces-46643-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46644-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F173BAB7D13
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 07:40:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B68BAB7D29
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 07:46:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 924BB1BA6102
-	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 05:41:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 872EA1B684B8
+	for <lists+kvm@lfdr.de>; Thu, 15 May 2025 05:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30085286D56;
-	Thu, 15 May 2025 05:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52D12295DAD;
+	Thu, 15 May 2025 05:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="V2oFhZXf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RS4CGm7y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59201B3955
-	for <kvm@vger.kernel.org>; Thu, 15 May 2025 05:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5FE2951DF;
+	Thu, 15 May 2025 05:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747287649; cv=none; b=XGL8SwqVnhBPGjPyms9TrBPaRQQL5fUHb7x3RY16v9yQLA6HM+c6JpWyTMsFTGSUr9pj+jTnsll7oCKGsU9SJEpCKDxp51byJEglnv6WPZGDiOY0a45/9/bmCEskMdhgKTtGft1UIIGjLYgKyb2yw9dmrFliF8Bul9btU/qmwoM=
+	t=1747287966; cv=none; b=PMPljOXf7B8GDS9FJ0yxJMhuZc6A5mKfn95wkZZ9SHL613JSqD2+CrbmPHocdsfwX9/5kEi6pI1TlWZQGPOq2mVlM1Cq6Dt9IyMroLtsaBjhoz4nDn2xMlfoo/0d6RTgvzqWOFUH8N8eWCJnseCHFwcsxbV0qrfVvm0kLKiomyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747287649; c=relaxed/simple;
-	bh=uZ03ovrsaV/oectkcsY8eo0Gp96WfQfn2ObNxL8evqs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SNPVVvEylSxOD8w/8Xem0DszC5W2VuNsREj8Arumw+0Jw1aT4BvMxP7q43metyC7QLeE0g62HVlbvv2dEr8RyeE+TC2w4lIvZWhjPwT2MrEuAzsm2FHlbfu1TzR8h34n1oj0L59W3QyALOdjuKAvtX+dpj9PVPw8HOK5kRfddDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=V2oFhZXf; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d96d16b369so4656195ab.0
-        for <kvm@vger.kernel.org>; Wed, 14 May 2025 22:40:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1747287647; x=1747892447; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uz1T20yidSVCKk3JyCiwZoMyHHxlzlfZ7sxgHG4h3Ms=;
-        b=V2oFhZXfWpFBkA7BrH7qJJ1SdCimKZDQD/cyVfxbtjihKadt+JuwXDgYcBfyeOjo5t
-         NAq1s4cVu/s/WGIs3pz1qQhGAgyyESlu/SBE/GHy8BdCV3uYNXhdkyDViZyC0RqrjQSO
-         YlvuRxBM6OU7JFyNjSyoHqX7ZhHZHMhfTp+RxtOq92PZUAjakSG6hPFSGKn+kwDyBv8K
-         6rPweHBukcdMhWzm1tlyuENXEFoL6dX1KQlY6xD3iG7vFPewTl4qJ8hXMN60FdQtkb4r
-         7L8VVzDk7/27WxuhzoiSmyHONHyTUq8P//Xo8uefdbe/x6mM5bhOZeMbeTahMaZ9PFnT
-         1uxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747287647; x=1747892447;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Uz1T20yidSVCKk3JyCiwZoMyHHxlzlfZ7sxgHG4h3Ms=;
-        b=Qpae48Tm1ppdSh8AuymK5WKHq07vv0FmP7OO4pt+3sjgv9LfIdmmgpv5vNrGkZwNQ9
-         K5lEHZi7oLroS5jTsi0Lqatgp6XbOC62OPwPeKlQ7Vqup97Hfgo1xZwlrXBkrUt/Ni57
-         +IqMM1KL1Z9k+jNi1Ocbd8e09sKx6m3DS2VeQbmYcf0eH6vnXm5vqdFSUP2FT29fz5To
-         ygCQOg/XCO+CoKXcPv+qvzPKql8MfvW8/9wxtZYZf41dDwV3pQjA8mjdadk8kwIVSA2a
-         6ua/qiylozY53zJDW3EJm3Btx3INMVcTm+AKd/S1p76RNAN5dtEyc5vV58wFZuPEevFO
-         sszA==
-X-Forwarded-Encrypted: i=1; AJvYcCXN7HLfQpdENEIuPrvoudz9WFTklrLwFYdXZZw2XTVvr1bT/CRRwc58bCbqmPT/QQFDuUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiF5B39ajeet3L3Pu0Dn8ldR4UqK9qw4Rcjt8bSfdZ1ARFIV7/
-	YfItF9wjxkc2BeOsJ8SVWYOW8B3ktcBuZL5NZnxm5Ahr7VP1L1ku+O04jXuAVqrGTKBBhU3NhlW
-	malYO6q9eaJ9iSSd4etZTJcLU2+fV+5pKfABjCtnxOATKirSx
-X-Gm-Gg: ASbGnctSVLIqZFpjdDUhJgXio++o+e22IZDtQOK+017pmnKkGamQk5KnieizOzhoIlL
-	PQcurOvNQj5dbyAgr1n0aSectKtrTnS72cecdtLMvhg52/fMLS0Y84VkNcRQ98SBypmr7S8+B2Q
-	va/XIsRUY0YVzLODYwNFi8mOLfAOPspig=
-X-Google-Smtp-Source: AGHT+IFTDygqebxFrfLhPNX+H4Kgt8uWXhKH50xWzqmnoJDcPg0UVlggjxomSWbuTCti64Fu8NXM5RNuQ470N3l+oyw=
-X-Received: by 2002:a05:6e02:1fc6:b0:3d9:39f3:f250 with SMTP id
- e9e14a558f8ab-3db6f794c00mr72097505ab.3.1747287646677; Wed, 14 May 2025
- 22:40:46 -0700 (PDT)
+	s=arc-20240116; t=1747287966; c=relaxed/simple;
+	bh=nWgDAOIXKZ2IPfTE1uaEbLd4e6rx6r6ee9joklJj4pA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IG+RLlUWvB3QoN/ZpERPcuQTn7YWukOVS4l989tQlPm8KKlWrn3ohlM9fHr/+9Z469VmafTff4wFNWuv4ecWdk6XQv1Yeata60pADvHOh2mbvYvypVOIj+LLeyeiLaa5TaEKBN+owCfkwWZbJzn8SZrVKU6+MQOj0pc7KzVZzds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RS4CGm7y; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747287965; x=1778823965;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nWgDAOIXKZ2IPfTE1uaEbLd4e6rx6r6ee9joklJj4pA=;
+  b=RS4CGm7ybfxHSxrN1a0FhnuVvHZ64DsKQWDsJrZM7lmYnYlCGeiZxjk9
+   gZpFvONXRzBq+ADcq+MqnAlYTtYImTNTHj1IGapR1/GQF9xze02Cvre25
+   bBq2YGg1/KA7ekVwnJ0vCXZbh8Og1kWbidrkXFB6MYIKtRyo97atfhfZ2
+   s/adVLSqlr0BfAMP+hA8U3zM2FqgM3aja5GQYjE9ILx898sYaBKhGPwGt
+   BVmG4VH/W78OppGbyQd1R0sPgZQ/j902VIFd28iSe94UL5glQtL49SqfE
+   PMD9hFWW4fCWUEA4JXe5rNLl6L5zc6OZbo3dd/upcxfqRSvd8sofAvTtY
+   Q==;
+X-CSE-ConnectionGUID: 0EgnPkabSpqyQ6okkDmOpw==
+X-CSE-MsgGUID: l9pySCPtQhKhXF5/lfpgsQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11433"; a="49144083"
+X-IronPort-AV: E=Sophos;i="6.15,290,1739865600"; 
+   d="scan'208";a="49144083"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 22:46:04 -0700
+X-CSE-ConnectionGUID: i+/fNnEKQk+uwN3n571WJw==
+X-CSE-MsgGUID: 6Ys/it48SaGfY9gtAnoUMw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,290,1739865600"; 
+   d="scan'208";a="138763941"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 22:45:58 -0700
+Message-ID: <ed365c1a-259c-43b4-b08b-9364986968d9@linux.intel.com>
+Date: Thu, 15 May 2025 13:45:56 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250513-fix_scounteren_vs-v1-1-c1f52af93c79@rivosinc.com>
- <CAAhSdy2LbLwRxuFVtMrrcTTD5NCxVCGLy4o=ZUowxT_9DXGqBA@mail.gmail.com> <CAHBxVyHXJYDWbfY7FAEBB0S0ZG2+ka6KpWpd7+NO9jhApxav5g@mail.gmail.com>
-In-Reply-To: <CAHBxVyHXJYDWbfY7FAEBB0S0ZG2+ka6KpWpd7+NO9jhApxav5g@mail.gmail.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 15 May 2025 11:10:34 +0530
-X-Gm-Features: AX0GCFvhFxNwn3sOoUM6uFOgfx0BZ3COs0Idy6xZaupJBYExW9VxrohdUkojQQE
-Message-ID: <CAAhSdy2DG0y3r8T=AqJ-T7+VaVcVpY0pSRZDptfYwwknshB+zg@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: Disable instret/cycle for VU mode by default
-To: Atish Kumar Patra <atishp@rivosinc.com>
-Cc: Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Alexandre Ghiti <alex@ghiti.fr>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/38] Mediated vPMU 4.0 for x86
+To: Sean Christopherson <seanjc@google.com>,
+ Mingwei Zhang <mizhang@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com,
+ Kan <kan.liang@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Yongwei Ma <yongwei.ma@intel.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+ Jim Mattson <jmattson@google.com>, Sandipan Das <sandipan.das@amd.com>,
+ Zide Chen <zide.chen@intel.com>, Eranian Stephane <eranian@google.com>,
+ Shukla Manali <Manali.Shukla@amd.com>,
+ Nikunj Dadhania <nikunj.dadhania@amd.com>
+References: <20250324173121.1275209-1-mizhang@google.com>
+ <aCU6EjbXzPct9v7B@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <aCU6EjbXzPct9v7B@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 15, 2025 at 2:31=E2=80=AFAM Atish Kumar Patra <atishp@rivosinc.=
-com> wrote:
+
+On 5/15/2025 8:49 AM, Sean Christopherson wrote:
+> On Mon, Mar 24, 2025, Mingwei Zhang wrote:
+>> Dapeng Mi (18):
+>>   KVM: x86/pmu: Introduce enable_mediated_pmu global parameter
+>>   KVM: x86/pmu: Check PMU cpuid configuration from user space
+>>   KVM: x86: Rename vmx_vmentry/vmexit_ctrl() helpers
+>>   KVM: x86/pmu: Add perf_capabilities field in struct kvm_host_values{}
+>>   KVM: x86/pmu: Move PMU_CAP_{FW_WRITES,LBR_FMT} into msr-index.h header
+>>   KVM: VMX: Add macros to wrap around
+>>     {secondary,tertiary}_exec_controls_changebit()
+>>   KVM: x86/pmu: Check if mediated vPMU can intercept rdpmc
+>>   KVM: x86/pmu/vmx: Save/load guest IA32_PERF_GLOBAL_CTRL with
+>>     vm_exit/entry_ctrl
+>>   KVM: x86/pmu: Optimize intel/amd_pmu_refresh() helpers
+>>   KVM: x86/pmu: Setup PMU MSRs' interception mode
+>>   KVM: x86/pmu: Handle PMU MSRs interception and event filtering
+>>   KVM: x86/pmu: Switch host/guest PMU context at vm-exit/vm-entry
+>>   KVM: x86/pmu: Handle emulated instruction for mediated vPMU
+>>   KVM: nVMX: Add macros to simplify nested MSR interception setting
+>>   KVM: selftests: Add mediated vPMU supported for pmu tests
+>>   KVM: Selftests: Support mediated vPMU for vmx_pmu_caps_test
+>>   KVM: Selftests: Fix pmu_counters_test error for mediated vPMU
+>>   KVM: x86/pmu: Expose enable_mediated_pmu parameter to user space
+>>
+>> Kan Liang (8):
+>>   perf: Support get/put mediated PMU interfaces
+>>   perf: Skip pmu_ctx based on event_type
+>>   perf: Clean up perf ctx time
+>>   perf: Add a EVENT_GUEST flag
+>>   perf: Add generic exclude_guest support
+>>   perf: Add switch_guest_ctx() interface
+>>   perf/x86: Support switch_guest_ctx interface
+>>   perf/x86/intel: Support PERF_PMU_CAP_MEDIATED_VPMU
+>>
+>> Mingwei Zhang (5):
+>>   perf/x86: Forbid PMI handler when guest own PMU
+>>   perf/x86/core: Plumb mediated PMU capability from x86_pmu to
+>>     x86_pmu_cap
+>>   KVM: x86/pmu: Exclude PMU MSRs in vmx_get_passthrough_msr_slot()
+>>   KVM: x86/pmu: introduce eventsel_hw to prepare for pmu event filtering
+>>   KVM: nVMX: Add nested virtualization support for mediated PMU
+>>
+>> Sandipan Das (4):
+>>   perf/x86/core: Do not set bit width for unavailable counters
+>>   KVM: x86/pmu: Add AMD PMU registers to direct access list
+>>   KVM: x86/pmu/svm: Set GuestOnly bit and clear HostOnly bit when guest
+>>     write to event selectors
+>>   perf/x86/amd: Support PERF_PMU_CAP_MEDIATED_VPMU for AMD host
+>>
+>> Xiong Zhang (3):
+>>   x86/irq: Factor out common code for installing kvm irq handler
+>>   perf: core/x86: Register a new vector for KVM GUEST PMI
+>>   KVM: x86/pmu: Register KVM_GUEST_PMI_VECTOR handler
+> I ran out of time today and didn't get emails send for all patches.  I'm planning
+> on getting that done tomorrow.
 >
-> On Wed, May 14, 2025 at 3:55=E2=80=AFAM Anup Patel <anup@brainfault.org> =
-wrote:
-> >
-> > On Wed, May 14, 2025 at 12:13=E2=80=AFPM Atish Patra <atishp@rivosinc.c=
-om> wrote:
-> > >
-> > > The KVM virtualizes PMU in RISC-V and disables all counter access exc=
-ept
-> > > TM bit by default vi hstateen CSR. There is no benefit in enabling CY=
-/TM
-> > > bits in scounteren for the guest user space as it can't be run withou=
-t
-> > > hcounteren anyways.
-> > >
-> > > Allow only TM bit which matches the hcounteren default setting.
-> > >
-> > > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> > > ---
-> > >  arch/riscv/kvm/vcpu.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > > index 60d684c76c58..873593bfe610 100644
-> > > --- a/arch/riscv/kvm/vcpu.c
-> > > +++ b/arch/riscv/kvm/vcpu.c
-> > > @@ -146,8 +146,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> > >         if (kvm_riscv_vcpu_alloc_vector_context(vcpu, cntx))
-> > >                 return -ENOMEM;
-> > >
-> > > -       /* By default, make CY, TM, and IR counters accessible in VU =
-mode */
-> > > -       reset_csr->scounteren =3D 0x7;
-> > > +       /* By default, only TM should be accessible in VU mode */
-> > > +       reset_csr->scounteren =3D 0x2;
-> >
-> > Let's remove this as well because the Linux SBI PMU driver
-> > does initialize scounteren correctly.
-> >
+> I already have most of the proposed changes implemented:
 >
-> But other guests may not. I thought time should be a basic one that
-> should be allowed by default.
+>   https://github.com/sean-jc/linux.git x86/mediated_pmu
 >
+> It compiles and doesn't explode, but it's not fully functional (PMU tests fail).
+> I'll poke at it over the next few days, but if someone is itching to figure out
+> what I broke, then by all means.
+>
+> Given that I've already made many modifications (I have a hard time reviewing a
+> series this big without editing as I go), unless someone objects, I'll post v5
+> (and v6+ as needed), though that'll like be days/weeks as I need to get it working,
+> and want to do more passes over the code, shortlogs, and changelogs. 
 
-There is no specification (SBI or Priv spec) which mandates M-mode
-or HS-mode to setup S-mode CSRs. Setting scounteren bits (including
-TM bit) has always been a HACK or work-around.
+Sean, thank you very much for reviewing and refactoring the patchset. I
+would look at the code and check it locally in next several days as well.
 
-It is better to remove scounteren initialization HACK from KVM RISC-V
-before more supervisor software starts depending on it.
 
-Regards,
-Anup
 
