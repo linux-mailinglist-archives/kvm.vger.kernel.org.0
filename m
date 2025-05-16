@@ -1,165 +1,242 @@
-Return-Path: <kvm+bounces-46773-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46774-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78B27AB96E2
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 09:52:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00D2BAB96F4
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 09:57:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 542F3A01608
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 07:52:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80DD5500A9E
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 07:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58C222CBC7;
-	Fri, 16 May 2025 07:52:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851A522ACD6;
+	Fri, 16 May 2025 07:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bu1sQAAX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PZxYxTfr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655C019CC3D;
-	Fri, 16 May 2025 07:52:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188B821ADC6
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 07:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747381926; cv=none; b=m+R7tDvGS9gQW/+rdGiz24X1ebuNHLF37BC3/YbQX65Bkg6s71/PxmSKcBLsxphAo+FuDM4aGOr6OXYCBaLaZRhFFV/aZl6IC0lQ8I2vKcHC6vzpFDZqrEmWButhR+gYJqg79Q0KoLuFQkB4sysnEeIdiTcSkJwR4B+tIehOCaw=
+	t=1747382240; cv=none; b=Fhj60/g4tyiMu9VfY1EV02BZjoDudLakNXH+rjVBkeJe7Z1Ja/7n86eu1TZoqZ00plMIpXx/fX0CLYjkORRaYjLGplHNxhDeedWyd/3xzoznWqKmcRoKTJNyfLMJtioLi4IhRW1yU4uLvSOvCfaNXXvyhM9YQ5A89fbzAW0wNeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747381926; c=relaxed/simple;
-	bh=SVuKXCGj/7B/whhXrusKH/C7G4Boc4zOdgjOBusvJUc=;
+	s=arc-20240116; t=1747382240; c=relaxed/simple;
+	bh=2Xe2E/kHvoxjxWu0Pb3uOMNnbXKgBwRPMFf36qsD7T0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HQjP6iLNVgWn9nc6+p6PVc/DEQSJc4nngPq05D4fA81BbQolGwhhJ7WY0uRkt13EVahAEfzVAR37XEY5BrLVgyp2M42rU6srAbe56AFvewJq6sIu/CZeIjjWsZhbEel3eu+zrvcJCdOxQr7xQ0GJroQmO7XKzQdC7EfDtsEUSQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bu1sQAAX; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-327fa3cece6so18298401fa.3;
-        Fri, 16 May 2025 00:52:04 -0700 (PDT)
+	 To:Cc:Content-Type; b=RFkiDZd3oXsKJUSQZe/rHOfHblpDR6gQmUmiFNGu5DjjnH/sREi7n8AvBXnCASY4IEns5ndNSNNP+BYCUN2E30RSoAbB6wsAYOQbRNMjHRC/IcgkdwNCzadlmuTfULlMBVR27fLW6HSzrMyFTOrLx6BkskgAdTQU5shvs57N+BA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PZxYxTfr; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-48b7747f881so164681cf.1
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 00:57:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747381922; x=1747986722; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eoXm5o4suzGFTYY5rdZqNPh4U5i+lWoDCLG6w4UKKeQ=;
-        b=Bu1sQAAXDPRooezx883mdo59wfA9uInFU5HJoEb78VyPH2C7vTrvEkzGLxf8VBRcXJ
-         N3BiHfNlwy6STuxA7N5XQRNNsF2tVvW7jzT1uSnGg2HtdN8jIr7Yd81xZNY/GO0I0itA
-         bjBWSzha0vpUyrNx03wkYx0i5Iv+qNMbb7IOSwPwLXD2RDg2ztbq16HCO0yYsJhWSmMY
-         obyg1VtHXIGdVEFikLJSSp4kZUgvD7FtsxCrN1695WpvD9dJhOfRQ/Bu4odn4bIIqFC9
-         FldeYBplXTaeENU9CQ2SXLO53h6ktO/u5qPAgQep12TpzjZKLkHpBHQBE2Hwc4Z1gCRZ
-         jnRg==
+        d=google.com; s=20230601; t=1747382238; x=1747987038; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=c3Jp6kgbpokvgF/j4fzbi4O9fxQfi2BTNxp2Nw2geBk=;
+        b=PZxYxTfrUL48S+8Yq+P2+MKtfaFQjHONSFVf3Ap1HhbAQRJHvI6GlDAtJ2vcdDusQ7
+         UOan/D7YwBmP1jO1iTcnii3I9qCN5+JZ+KdAlZ6c63GVHBNVw3u9cLGDs5z7v/ed1fbI
+         Xw9M65RCN+i0ZwlCxOqJrR1GsCrGI54jb6VavHUsm4bqqXk42sMZ24vnqKPXGnZFcYLV
+         jBU+yjHVOwNaVwtNnbIXNhr9pHGjO6MFqnykS5/kUKHxmetyTihT+RMhaqGVmhRBr5me
+         M7l5XpONe4DnazOAocsrwjMiUjiVfABnZB+zOBqOdQULwE/qbCvT+Fvo3B8kGZAZKOlt
+         bp0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747381922; x=1747986722;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eoXm5o4suzGFTYY5rdZqNPh4U5i+lWoDCLG6w4UKKeQ=;
-        b=GURmTMkprbCeAVPsGTMSk51eAcTw4aK+d6QyImukVaS7nC6yll24IUK9Vj40GANol3
-         zz4J0nRKUcfvsxGodsEVKeie/wM9oQdgTbRrR9ahLIXeCXSNjxMPOP/dFXQcJEhAZT5f
-         k2Ry5A21NS6uXzgW329vofwvHpzIA+6Etr6Q6nZR13g9L5Zk44mqmrAoQ1nnTOcmtjl9
-         k8QkmSrdmbuIHh5jIUM9KPulUw83jsdCUczpp96O/qohnQoUvq812TbPEstDO890/n03
-         rQKUQiJ4g/lw3kzXwZNuVHdu9MjygVpa2MR1dMLB5xjKh67p39XFLzLxma/Gn8OhBBvK
-         vPng==
-X-Forwarded-Encrypted: i=1; AJvYcCUgscnqWgs0+8FAGstw0syZ8M6kVjJKyuC7Nrg03VgCN+skbBpYjua6Gxnxh952BjgszE0=@vger.kernel.org, AJvYcCVYd6OawSj1h/FjYBYxnLGNwcKLLbU8cL/3p5dwmdpN6ZAMsB3P68pz8rd0sgYk59UuJuzV1GEJmH9q9NRN@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVV6nN3w3xaIxhxO65wolveTWEH8FwRTGYV7AEUw7k13DaDHmC
-	rjGVz98upzvoPIJzkFReHIRzUZf5qYxvWGYQ6kt51jx3n0i9ZdLzhofXGNqQdw7E5U1/g8gPfZa
-	c6LGgT/oLkRnFVU8Js2iWKXnQHqzInMs=
-X-Gm-Gg: ASbGncvywYGrQQJO4EwsX/f66gNNXaZeX5FOK4tQntFWKDrCLcY7V2bJ1PdymoT7spE
-	F/Di14eP5I+dcphdffDiXigu2ov4runAhMFAY1GI6saPIXo8eDMuSIMHj775ifbjuneUl1HXqxQ
-	WZoAJa2tMjV5WsU+GEB0TAfzLFtzmi9gqA
-X-Google-Smtp-Source: AGHT+IG0k1HfHErcjyt9UnnNCHtTUUIyy9cay2f9NiptQYUe8IiwicLu7EVqawy0NSGddEzQCzLdj/3rpy8rtxg74zM=
-X-Received: by 2002:a05:651c:552:b0:30a:2a8a:e4b5 with SMTP id
- 38308e7fff4ca-328077917e1mr7382711fa.27.1747381922119; Fri, 16 May 2025
- 00:52:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747382238; x=1747987038;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=c3Jp6kgbpokvgF/j4fzbi4O9fxQfi2BTNxp2Nw2geBk=;
+        b=etC/cx6J5bLl+pA5kLnrBFJrUGA/9t4GeQ4Rr+BQoTIAwyFNRBQXWT8RAGfnKefxP6
+         9Z26roFMYlMXjlCpbMuPlNLGIwqJtIxbpg5dodhe94DqhoKQfXIE47ZP4VvECRniVjZT
+         QKkfvoi9sPRIWncU9YWzu2k3xQZnY1qL4kgfODpa4u2xOks4AfnnWIjP6z7eYq0DhRfM
+         4B8ITnjDVhINznl1y/BOsO8GnAPqf4o6CWO2+27uqI0MSQnyr0NA7tb9uqQLPp1JOqsu
+         N3yH3AOgxNi6/fNNI5w5MYRjl2uWQqL0n3DMum730Dv7GydIBF3XkNOgNM3z1oic4wDP
+         i91A==
+X-Gm-Message-State: AOJu0Yxv1FHMz/g5ieErtN3slqkXXwJyJq9rISgNcn/6HYOglBSLaCpG
+	s7KjKxQATm7+TrEYeBcN68nCU13q3kS5kPw7MvRVJaNcLOaHUiBO2F/rONr3lJyBZfPNUIuvyWp
+	WFuMWkniADanJVVdNcBxx1SJbFGIZXxM29LowOAL8
+X-Gm-Gg: ASbGncuLtkirgmK1cT7hlHUV1W1+jideBj01FgTiO+YScrT84ZSsKfQW8CtxLbgnbRu
+	gYjVWoMizCHs6KRiw8Y/cDCAHkjg8xKgqnlhxsWH7fp23Go5IHzMxJemm/miifHV7ZttVKovLP8
+	FI2tXcTL3dk+9eAbHidVQ4IBsUTBt7r0+xOyMKDefrUsIu4FXH/md0yM06Ix3PNbYD6u91wQ==
+X-Google-Smtp-Source: AGHT+IF/V6uW3bEV/QeZYXYvfB0OwV6WFGk/h+346eJJtcMY/gVnuOalQpd686iaC+A67ZGGGKAJiTFIjn6pAEoEFKg=
+X-Received: by 2002:a05:622a:13c8:b0:494:58a3:d3d3 with SMTP id
+ d75a77b69052e-494a1dcf605mr7242811cf.20.1747382237556; Fri, 16 May 2025
+ 00:57:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250512085735.564475-1-chao.gao@intel.com>
-In-Reply-To: <20250512085735.564475-1-chao.gao@intel.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Fri, 16 May 2025 09:51:50 +0200
-X-Gm-Features: AX0GCFvQIHrKhWBqY5HZUiaCr7YpQaIuo0VzyzRBnasZaLwdOeH3IdMPQ6Kj6Us
-Message-ID: <CAFULd4Y3VvqNS8VEvw0ObnqnVDtsC-q3kDEnyc070=gZ9oehgg@mail.gmail.com>
-Subject: Re: [PATCH v7 0/6] Introduce CET supervisor state support
-To: Chao Gao <chao.gao@intel.com>
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	tglx@linutronix.de, dave.hansen@intel.com, seanjc@google.com, 
-	pbonzini@redhat.com, peterz@infradead.org, rick.p.edgecombe@intel.com, 
-	weijiang.yang@intel.com, john.allen@amd.com, bp@alien8.de, 
-	chang.seok.bae@intel.com, xin3.li@intel.com, 
-	Aruna Ramakrishna <aruna.ramakrishna@oracle.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Eric Biggers <ebiggers@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
-	Kees Cook <kees@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Mitchell Levy <levymitchell0@gmail.com>, Nikolay Borisov <nik.borisov@suse.com>, 
-	Oleg Nesterov <oleg@redhat.com>, Samuel Holland <samuel.holland@sifive.com>, 
-	Sohil Mehta <sohil.mehta@intel.com>, Stanislav Spassov <stanspas@amazon.de>, 
-	Vignesh Balasubramanian <vigbalas@amd.com>, Zhao Liu <zhao1.liu@intel.com>
+References: <20250513163438.3942405-1-tabba@google.com> <20250513163438.3942405-8-tabba@google.com>
+ <c48843fb-c492-44d4-8000-705413aa9f08@redhat.com>
+In-Reply-To: <c48843fb-c492-44d4-8000-705413aa9f08@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 16 May 2025 09:56:40 +0200
+X-Gm-Features: AX0GCFu_obOMEV6g2Z1S4ek2joHav2c-LHI4X8n0urIcq6zSRgkZfd8hv3mz17Y
+Message-ID: <CA+EHjTwYfZf0rsFa-O386qowRKCsKHvhUjtc-q_+9aKddRVCFQ@mail.gmail.com>
+Subject: Re: [PATCH v9 07/17] KVM: guest_memfd: Allow host to map
+ guest_memfd() pages
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 12, 2025 at 10:57=E2=80=AFAM Chao Gao <chao.gao@intel.com> wrot=
-e:
->
-> Dear maintainers and reviewers,
->
-> I kindly request your consideration for merging this series. Most of
-> patches have received Reviewed-by/Acked-by tags.
->
-> Thanks Chang, Rick, Xin, Sean and Dave for their help with this series.
->
-> =3D=3D Changelog =3D=3D
-> v6->v7:
->  - Collect reviews from Rick
->  - Tweak __fpstate_reset() to handle guest fpstate rather than adding a
->    guest-specific reset function (Sean & Dave)
->  - Fold xfd initialization into __fpstate_reset() (Sean)
->  - v6: https://lore.kernel.org/all/20250506093740.2864458-1-chao.gao@inte=
-l.com/
->
-> =3D=3D Background =3D=3D
->
-> CET defines two register states: CET user, which includes user-mode contr=
-ol
-> registers, and CET supervisor, which consists of shadow-stack pointers fo=
-r
-> privilege levels 0-2.
->
-> Current kernel disables shadow stacks in kernel mode, making the CET
-> supervisor state unused and eliminating the need for context switching.
->
-> =3D=3D Problem =3D=3D
->
-> To virtualize CET for guests, KVM must accurately emulate hardware
-> behavior. A key challenge arises because there is no CPUID flag to indica=
-te
-> that shadow stack is supported only in user mode. Therefore, KVM cannot
-> assume guests will not enable shadow stacks in kernel mode and must
-> preserve the CET supervisor state of vCPUs.
->
-> =3D=3D Solution =3D=3D
->
-> An initial proposal to manually save and restore CET supervisor states
-> using raw RDMSR/WRMSR in KVM was rejected due to performance concerns and
-> its impact on KVM's ABI. Instead, leveraging the kernel's FPU
-> infrastructure for context switching was favored [1].
+Hi Gavin,
 
-Dear Chao,
+On Fri, 16 May 2025 at 08:09, Gavin Shan <gshan@redhat.com> wrote:
+>
+> Hi Fuad,
+>
+> On 5/14/25 2:34 AM, Fuad Tabba wrote:
+> > This patch enables support for shared memory in guest_memfd, including
+> > mapping that memory at the host userspace. This support is gated by the
+> > configuration option KVM_GMEM_SHARED_MEM, and toggled by the guest_memfd
+> > flag GUEST_MEMFD_FLAG_SUPPORT_SHARED, which can be set when creating a
+> > guest_memfd instance.
+> >
+> > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >   arch/x86/include/asm/kvm_host.h | 10 ++++
+> >   include/linux/kvm_host.h        | 13 +++++
+> >   include/uapi/linux/kvm.h        |  1 +
+> >   virt/kvm/Kconfig                |  5 ++
+> >   virt/kvm/guest_memfd.c          | 88 +++++++++++++++++++++++++++++++++
+> >   5 files changed, 117 insertions(+)
+> >
+>
+> [...]
+>
+> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> > index 6db515833f61..8e6d1866b55e 100644
+> > --- a/virt/kvm/guest_memfd.c
+> > +++ b/virt/kvm/guest_memfd.c
+> > @@ -312,7 +312,88 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+> >       return gfn - slot->base_gfn + slot->gmem.pgoff;
+> >   }
+> >
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +
+> > +static bool kvm_gmem_supports_shared(struct inode *inode)
+> > +{
+> > +     uint64_t flags = (uint64_t)inode->i_private;
+> > +
+> > +     return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> > +}
+> > +
+> > +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+> > +{
+> > +     struct inode *inode = file_inode(vmf->vma->vm_file);
+> > +     struct folio *folio;
+> > +     vm_fault_t ret = VM_FAULT_LOCKED;
+> > +
+> > +     filemap_invalidate_lock_shared(inode->i_mapping);
+> > +
+> > +     folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> > +     if (IS_ERR(folio)) {
+> > +             int err = PTR_ERR(folio);
+> > +
+> > +             if (err == -EAGAIN)
+> > +                     ret = VM_FAULT_RETRY;
+> > +             else
+> > +                     ret = vmf_error(err);
+> > +
+> > +             goto out_filemap;
+> > +     }
+> > +
+> > +     if (folio_test_hwpoison(folio)) {
+> > +             ret = VM_FAULT_HWPOISON;
+> > +             goto out_folio;
+> > +     }
+> > +
+> > +     if (WARN_ON_ONCE(folio_test_large(folio))) {
+> > +             ret = VM_FAULT_SIGBUS;
+> > +             goto out_folio;
+> > +     }
+> > +
+>
+> I don't think there is a large folio involved since the max/min folio order
+> (stored in struct address_space::flags) should have been set to 0, meaning
+> only order-0 is possible when the folio (page) is allocated and added to the
+> page-cache. More details can be referred to AS_FOLIO_ORDER_MASK. It's unnecessary
+> check but not harmful. Maybe a comment is needed to mention large folio isn't
+> around yet, but double confirm.
 
-I wonder if the same approach can be used to optimize switching of
-Intel PT configuration context. There was a patch series [1] posted
-some time ago that showed substantial reduction of overhead when
-switching Intel PT configuration context on VM-Entry/Exit using
-XSAVES/XRSTORS instructions:
+The idea is to document the lack of hugepage support in code, but if
+you think it's necessary, I could add a comment.
 
-Manual save(rdmsr):     ~334  cycles
-Manual restore(wrmsr):  ~1668 cycles
 
-XSAVES insturction:     ~124  cycles
-XRSTORS instruction:    ~378  cycles
+>
+> > +     if (!folio_test_uptodate(folio)) {
+> > +             clear_highpage(folio_page(folio, 0));
+> > +             kvm_gmem_mark_prepared(folio);
+> > +     }
+> > +
+>
+> I must be missing some thing here. This chunk of code is out of sync to kvm_gmem_get_pfn(),
+> where kvm_gmem_prepare_folio() and kvm_arch_gmem_prepare() are executed, and then
+> PG_uptodate is set after that. In the latest ARM CCA series, kvm_arch_gmem_prepare()
+> isn't used, but it would delegate the folio (page) with the prerequisite that
+> the folio belongs to the private address space.
+>
+> I guess that kvm_arch_gmem_prepare() is skipped here because we have the assumption that
+> the folio belongs to the shared address space? However, this assumption isn't always
+> true. We probably need to ensure the folio range is really belonging to the shared
+> address space by poking kvm->mem_attr_array, which can be modified by VMM through
+> ioctl KVM_SET_MEMORY_ATTRIBUTES.
 
-[1] https://lore.kernel.org/lkml/1557995114-21629-1-git-send-email-luwei.ka=
-ng@intel.com/
+This series only supports shared memory, and the idea is not to use
+the attributes to check. We ensure that only certain VM types can set
+the flag (e.g., VM_TYPE_DEFAULT and KVM_X86_SW_PROTECTED_VM).
 
-Best regards,
-Uros.
+In the patch series that builds on it, with in-place conversion
+between private and shared, we do add a check that the memory faulted
+in is in-fact shared.
+
+Thanks,
+/fuad
+
+> > +     vmf->page = folio_file_page(folio, vmf->pgoff);
+> > +
+> > +out_folio:
+> > +     if (ret != VM_FAULT_LOCKED) {
+> > +             folio_unlock(folio);
+> > +             folio_put(folio);
+> > +     }
+> > +
+> > +out_filemap:
+> > +     filemap_invalidate_unlock_shared(inode->i_mapping);
+> > +
+> > +     return ret;
+> > +}
+> > +
+>
+> Thanks,
+> Gavin
+>
 
