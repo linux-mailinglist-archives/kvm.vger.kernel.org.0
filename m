@@ -1,202 +1,232 @@
-Return-Path: <kvm+bounces-46869-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F3C6ABA3B9
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 21:25:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD437ABA3C6
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 21:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BF84A241BD
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 19:24:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 126A67B4DD7
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 19:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0443D28001C;
-	Fri, 16 May 2025 19:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E79B272E63;
+	Fri, 16 May 2025 19:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C1CMQbKb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VelvmmjH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98898280018
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 19:22:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABCC2253B5
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 19:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747423357; cv=none; b=cA7PpfBwsipYrS7Oz0FWKpZyejEEf6l544ZqY7tp5hrUqBO42aSl5M7TkcuNxoNUWtt9AZY22gn7GgcvSy58t/ZaYRMwoBwVAjRzQIj+jHoZyBKIsVPfcUiQknkKYqY0ngLPYCHI84WtaSK+6nXoWa0ZBhDBXhK2kB3dOFJ9XXU=
+	t=1747423709; cv=none; b=qz1TSf9mZ16qjQf3YpN+VrsgsbLWNy+Yh5d1Cp/vFYgJjiMI00YfyWlsgbxs4uO0kjlsMHAybrcSmQo2A/1VXOvKn2jWvUS38XBR0bvBfnhVa/tI2gj0mGxt5ftS8LWKabRDD2rswc2Ki99PDLv2o7n88wSFrxgqQRinHw/k9Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747423357; c=relaxed/simple;
-	bh=mv1Ins7jvbobKa3n2jnizEHtuD4BULDUPYaGteSuvOE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P6eAO7X/pVtH82qDxH/mjs3EBQrv0/UnOsqrYKF7bBAoD16wnKB06Q0L5GlAm5NuoZmjsCna7Z3s0c4iDaEpgI1J5gwTZQtusuvDUoOfYwfXKCt/vbZX8vQoVg0c+y8w4WoaJ7jjwZTLWNKufMYo+QjpS0yW4uTlqO/9Mm0EobQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C1CMQbKb; arc=none smtp.client-ip=209.85.128.177
+	s=arc-20240116; t=1747423709; c=relaxed/simple;
+	bh=TJ3c9l4pdDm97mcloPavrFSmJivYWHpes/mnfR0ofnU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nhvZVyjsQ3MT/lPgqzR1IW4K5TfACK9LCXmISZCcj4nNPoQEJu8Ymk6/NeKionWO/ZOYll+XZet04QoRvpk44rO96fAOW6/2K0DmMN/5CcNDTfY0gesCDYlveBclvRJ2sOIpTXUzb0mi4t3zE/nKBAJajvkP2hGKFz5abe0kvl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VelvmmjH; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-70900a80907so22881237b3.0
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 12:22:35 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7398d70abbfso3295905b3a.2
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 12:28:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747423354; x=1748028154; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X5csGcQ8badg6OQc2j12fcylP9C8BoCep+FBckAp9xQ=;
-        b=C1CMQbKb13wdheh5RbK8OT4VZyiX0o20ZWgRmHOLxPPIR43ZifNSAwB/mWzjpKjZ3t
-         m6Vc1TMJlIP1vIxm2vN71sGPbl8cKSzcPARflld3T/wD4T3+TGT10f+lDIoOGdjxpnAZ
-         NuCZwYKxj7NhM/eCw9AF5zbanrdpyCdS3ucNI0x/DkO3CEPJPxwKD05bM2rgIR0Oa2vE
-         lpxSkXlZBzv4Cr6avrKeRcWaJKCzxyY67ZVRBiW4lBOJDY3GjMO7WIpSBYFnaW2itO8d
-         lMsHsskl8O+496VKaT8UpDFRY39DWnSgy1OSyIcpaSzIEeiryIGI2NpLX7nWtTJcof6B
-         b9cQ==
+        d=google.com; s=20230601; t=1747423707; x=1748028507; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4SuDgnPpkaah3slF5YunYH8RTWaJ6H4jJOeD+ScylJY=;
+        b=VelvmmjHy01Y0SepF+9uG2jqfqO2EiRq6QuqGkvQp3NMpetwbkoc0eRhntgZdP+yVz
+         oAAgVfyCGyfm49fjQWs0N1nGsEI1qYeAxa7CDa0dn9yAeiCs9VUyHVHFDVweqildWXKa
+         G8y8oU5awbp3LF1FfHpzLPkWWcEZCAyPgweP4mKSdOYZVuKwChh1NRZE6QNfpW2s4LCQ
+         hOUvfuAHoxHaLX2HODNag1mEdBLB8PMH/ckTnXOPidtlyrQhdHbGity1d50fa5bUH4vW
+         ey6zVk8bgbkHBJzIJna/or4nv07hyvwrWj9XD9tefSb6VGntNdJerEHKCJ+POjb4e7mx
+         wCeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747423354; x=1748028154;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X5csGcQ8badg6OQc2j12fcylP9C8BoCep+FBckAp9xQ=;
-        b=HWAmdyJ2ZuqvuTquMb7xbW+kk8XrmoG5QZhzG1o3L/G4SSFlPOmNbW6/xlfJWyy1nV
-         yoDCBDfs4fNFs7xqxepDT8iH1eyKezEEwwd6VqN8UZpNt8ldeABCKDySzSiq60LrZbPG
-         lrDbztimMpsnSlOueE9fX+PpUHrY3TjJwMni+KkquHDIGXamP7EIodq3nvKNJqtatpZR
-         03dXREVhk/+xctixe/vxE1ClYr+RJ6VFWsvPBpmSDpp0zINSasQxXLe0ZvLGxwM5FNRP
-         boT/iXlluDASSlXk4fGAMlRICJ+DVQW9EwfBqHRslWB9j/niQ47d7ClBlV24yf4Jxe63
-         zYdA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4250GvZ851fhpu4POXU5CV0hU9lRD2OAz8EZ/28LDAWuRAvA1cRx+vjMRL16iWdjHnIw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFhG1XiWieSZYqESp0UJ/DPtbMoFxilskGTmw3cboIhWvAihPw
-	0TlFS3+O/jUuxSvZOcUSvCAcUMJ6NO2NnjPZWJHxXSB8Gu/3U709hsHpJLpIXMHp4iZmQbJ1dNe
-	kSxKkI7oxTmFkHYM/4jnrER4rRskRhWU93tyECMga
-X-Gm-Gg: ASbGncsxKFWdn3kdEN76JhaaaHYqxx3VyXUlcZ4J/0eoDHTLTgufwegg9YJ4w8H/yty
-	fIn76HvUGbQ0pd1rba/2GvFcPY9RVd4pBJ3TLjyJ667CHOYNeW+Jr5ZC/y0UZRavi6VqQygL+yl
-	sZpmWTssirPOrWH1M6T7adkVuQeo34PCLi/PtUV2PVTgUq4W/B6RqMJW89qlrJDA==
-X-Google-Smtp-Source: AGHT+IHmB5XBLYghERElfsJfzIa8m2PhXb5Oe8yfTFbW3QD907B5QsRiG5OVykLoPEH8ozkVNKkbLJW7xYSYXhG8Zqs=
-X-Received: by 2002:a05:690c:6f03:b0:6fb:8461:e828 with SMTP id
- 00721157ae682-70ca7c108f1mr74013577b3.30.1747423354023; Fri, 16 May 2025
- 12:22:34 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747423707; x=1748028507;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4SuDgnPpkaah3slF5YunYH8RTWaJ6H4jJOeD+ScylJY=;
+        b=jUaYko0u/5LPmC2ttqxBFD7NtlcF7yZi/kA1KuXfNhjvTQSm8zwP7oIVAW0xVM+929
+         10+S0KUb0tVlvXAHecmvHJBFguR8q31eVeulXplu7kgDXgr3gfc4nzNQKONrvasox/V3
+         FcWBGKV5g0NDrBIys7K9krZoIrcro3C3xj1Ha3EaLD/Txq7AS54I6mHTxhxh/zNT9r4l
+         KfxHpUhT+8+ALagthGJwq12t8G5Ve6tD1U+i78rIjXfeDNhyOk4tHCkD7zfu7aNGthmY
+         ccM8htK8iipWQnNuUQsWgD5tSoGJBqpqPL7qEAYWJ+itB7vHv7HfRmWP7/0aeEAGZEUV
+         eLGQ==
+X-Gm-Message-State: AOJu0YyNw9vrqAdEsl6r9GtnFbCFMLnnHM8AHNWuJdZgvaX97qArNYjp
+	er6dQmaGixSh3qdaUzFGwNCuDOz8xyBxN2vo9cS0TTFQY5KQvad60cXwsutouZSFamgSo9cSYU4
+	63bVM0w==
+X-Google-Smtp-Source: AGHT+IHXzW2hkrzTBIe3eiFxBkJs41fk/sX0hV5YrOzJFA+YwLSyxJbf5aJqKWTCqRwGNGNz0qnN8aD/Wps=
+X-Received: from pfbei22.prod.google.com ([2002:a05:6a00:80d6:b0:736:415f:3d45])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:a06:b0:72d:9cbc:730d
+ with SMTP id d2e1a72fcca58-742a97d4650mr5732591b3a.11.1747423707415; Fri, 16
+ May 2025 12:28:27 -0700 (PDT)
+Date: Fri, 16 May 2025 12:28:25 -0700
+In-Reply-To: <20250502050346.14274-6-manali.shukla@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250513163438.3942405-8-tabba@google.com> <diqzsel8pdab.fsf@ackerleytng-ctop.c.googlers.com>
-In-Reply-To: <diqzsel8pdab.fsf@ackerleytng-ctop.c.googlers.com>
-From: James Houghton <jthoughton@google.com>
-Date: Fri, 16 May 2025 12:21:58 -0700
-X-Gm-Features: AX0GCFtvTxSjQg-C2lcu7Fqz9j01UftX46-yoNDwQ9IypZOUYYVgSBCYUAztoPs
-Message-ID: <CADrL8HX4WfmHk8cLKxL2xrA9a_mLpOmwiojxeFRMdYfvMH0vOQ@mail.gmail.com>
-Subject: Re: [PATCH v9 07/17] KVM: guest_memfd: Allow host to map
- guest_memfd() pages
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250502050346.14274-1-manali.shukla@amd.com> <20250502050346.14274-6-manali.shukla@amd.com>
+Message-ID: <aCeR2TjPzC_OYBfG@google.com>
+Subject: Re: [PATCH v5 5/5] KVM: selftests: Add bus lock exit test
+From: Sean Christopherson <seanjc@google.com>
+To: Manali Shukla <manali.shukla@amd.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
+	nikunj@amd.com, bp@alien8.de
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, May 13, 2025 at 11:37=E2=80=AFAM Ackerley Tng <ackerleytng@google.c=
-om> wrote:
->
-> Fuad Tabba <tabba@google.com> writes:
-> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> > index 6db515833f61..8e6d1866b55e 100644
-> > --- a/virt/kvm/guest_memfd.c
-> > +++ b/virt/kvm/guest_memfd.c
-> > @@ -312,7 +312,88 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memor=
-y_slot *slot, gfn_t gfn)
-> >       return gfn - slot->base_gfn + slot->gmem.pgoff;
-> >  }
-> >
-> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
-> > +
-> > +static bool kvm_gmem_supports_shared(struct inode *inode)
-> > +{
-> > +     uint64_t flags =3D (uint64_t)inode->i_private;
-> > +
-> > +     return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
-> > +}
-> > +
-> > +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
-> > +{
-> > +     struct inode *inode =3D file_inode(vmf->vma->vm_file);
-> > +     struct folio *folio;
-> > +     vm_fault_t ret =3D VM_FAULT_LOCKED;
-> > +
-> > +     filemap_invalidate_lock_shared(inode->i_mapping);
-> > +
-> > +     folio =3D kvm_gmem_get_folio(inode, vmf->pgoff);
-> > +     if (IS_ERR(folio)) {
-> > +             int err =3D PTR_ERR(folio);
-> > +
-> > +             if (err =3D=3D -EAGAIN)
-> > +                     ret =3D VM_FAULT_RETRY;
-> > +             else
-> > +                     ret =3D vmf_error(err);
-> > +
-> > +             goto out_filemap;
-> > +     }
-> > +
-> > +     if (folio_test_hwpoison(folio)) {
-> > +             ret =3D VM_FAULT_HWPOISON;
-> > +             goto out_folio;
-> > +     }
+On Fri, May 02, 2025, Manali Shukla wrote:
+> diff --git a/tools/testing/selftests/kvm/x86/kvm_buslock_test.c b/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
+> new file mode 100644
+> index 000000000000..9c081525ac2a
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
+> @@ -0,0 +1,135 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2024 Advanced Micro Devices, Inc.
+> + */
+> +
+> +#include "test_util.h"
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "svm_util.h"
+> +#include "vmx.h"
+> +
+> +#define NR_ITERATIONS 100
+> +#define L2_GUEST_STACK_SIZE 64
+> +
+> +#pragma GCC diagnostic push
+> +#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 
-nit: shmem_fault() does not include an equivalent of the above
-HWPOISON check, and __do_fault() already handles HWPOISON.
+Eww.
 
-It's very unlikely for `folio` to be hwpoison and not up-to-date, and
-even then, writing over poison (to zero the folio) is not usually
-fatal.
+> +
+> +struct buslock_test {
+> +	unsigned char pad[PAGE_SIZE - 2];
+> +	atomic_long_t val;
+> +} __packed;
 
-> > +
-> > +     if (WARN_ON_ONCE(folio_test_large(folio))) {
-> > +             ret =3D VM_FAULT_SIGBUS;
-> > +             goto out_folio;
-> > +     }
+You don't need an entire page to generate a bus lock, two cache lines will do
+nicely.  And there's certain no need for __packed.
 
-nit: I would prefer we remove this SIGBUS bit and change the below
-clearing logic to handle large folios. Up to you I suppose.
+> +struct buslock_test test __aligned(PAGE_SIZE);
+> +
+> +static __always_inline void buslock_atomic_add(int i, atomic_long_t *v)
+> +{
+> +	asm volatile(LOCK_PREFIX "addl %1,%0"
+> +		     : "+m" (v->counter)
+> +		     : "ir" (i) : "memory");
+> +}
 
-> > +
-> > +     if (!folio_test_uptodate(folio)) {
-> > +             clear_highpage(folio_page(folio, 0));
-> > +             kvm_gmem_mark_prepared(folio);
-> > +     }
-> > +
-> > +     vmf->page =3D folio_file_page(folio, vmf->pgoff);
-> > +
-> > +out_folio:
-> > +     if (ret !=3D VM_FAULT_LOCKED) {
-> > +             folio_unlock(folio);
-> > +             folio_put(folio);
-> > +     }
-> > +
-> > +out_filemap:
-> > +     filemap_invalidate_unlock_shared(inode->i_mapping);
->
-> Do we need to hold the filemap_invalidate_lock while zeroing? Would
-> holding the folio lock be enough?
+If only there were utilities for atomics...
 
-Do we need to hold the filemap_invalidate_lock for reading *at all*?
+> +static void buslock_add(void)
 
-I don't see why we need it. We're not checking gmem->bindings, and
-filemap_grab_folio() already synchronizes with filemap removal
-properly.
+guest_generate_buslocks()
 
->
-> > +
-> > +     return ret;
-> > +}
+> +{
+> +	/*
+> +	 * Increment a page unaligned variable atomically.
+> +	 * This should generate a bus lock exit.
+
+Not should, will.
+
+> +	 */
+> +	for (int i = 0; i < NR_ITERATIONS; i++)
+> +		buslock_atomic_add(2, &test.val);
+
+Don't do weird and completely arbitrary things like adding '2' instead of '1',
+it makes readers look for intent and purpose that doesn't exist.
+
+> +}
+
+...
+
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_run *run;
+> +	struct kvm_vm *vm;
+> +	vm_vaddr_t nested_test_data_gva;
+> +
+> +	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM) || kvm_cpu_has(X86_FEATURE_VMX));
+
+There's no reason to make nested support a hard dependency, it's just as easy to
+make it conditional.
+
+> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_BUS_LOCK_EXIT));
+> +
+> +	vm = vm_create(1);
+> +	vm_enable_cap(vm, KVM_CAP_X86_BUS_LOCK_EXIT, KVM_BUS_LOCK_DETECTION_EXIT);
+> +	vcpu = vm_vcpu_add(vm, 0, guest_code);
+> +
+> +	if (kvm_cpu_has(X86_FEATURE_SVM))
+> +		vcpu_alloc_svm(vm, &nested_test_data_gva);
+> +	else
+> +		vcpu_alloc_vmx(vm, &nested_test_data_gva);
+> +
+> +	vcpu_args_set(vcpu, 1, nested_test_data_gva);
+> +
+> +	run = vcpu->run;
+> +
+> +	for (;;) {
+> +		struct ucall uc;
+> +
+> +		vcpu_run(vcpu);
+> +
+> +		if (run->exit_reason == KVM_EXIT_IO) {
+> +			switch (get_ucall(vcpu, &uc)) {
+> +			case UCALL_ABORT:
+> +				REPORT_GUEST_ASSERT(uc);
+> +				/* NOT REACHED */
+> +			case UCALL_SYNC:
+> +				continue;
+> +			case UCALL_DONE:
+> +				goto done;
+> +			default:
+> +				TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
+> +			}
+> +		}
+> +
+> +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_X86_BUS_LOCK);
+> +	}
+
+*sigh*
+
+This doesn't actually ****VERIFY**** that the expected number of bus lock exits
+were generated.  KVM could literally do nothing and the test will pass.  E.g. the
+test passes if I do this:
+
+diff --git a/tools/testing/selftests/kvm/x86/kvm_buslock_test.c b/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
+index 9c081525ac2a..aa65d6be0f13 100644
+--- a/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
++++ b/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
+@@ -93,10 +93,10 @@ int main(int argc, char *argv[])
+        vm_vaddr_t nested_test_data_gva;
+ 
+        TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM) || kvm_cpu_has(X86_FEATURE_VMX));
+-       TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_BUS_LOCK_EXIT));
++//     TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_BUS_LOCK_EXIT));
+ 
+        vm = vm_create(1);
+-       vm_enable_cap(vm, KVM_CAP_X86_BUS_LOCK_EXIT, KVM_BUS_LOCK_DETECTION_EXIT);
++//     vm_enable_cap(vm, KVM_CAP_X86_BUS_LOCK_EXIT, KVM_BUS_LOCK_DETECTION_EXIT);
+        vcpu = vm_vcpu_add(vm, 0, guest_code);
+ 
+        if (kvm_cpu_has(X86_FEATURE_SVM))
+--
+
+The test would also fail to detect if KVM completely skipped the instruction.
+
+This is not rocket science.  If you can't make your test fail by introducing bugs
+in what you're testing, then your test is worthless.
+
+No need for a v6, I'm going to do surgery when I apply, this series has dragged
+on for far too long.
 
