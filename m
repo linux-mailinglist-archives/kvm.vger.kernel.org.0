@@ -1,114 +1,180 @@
-Return-Path: <kvm+bounces-46810-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46811-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED37AB9E05
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 15:54:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34F77AB9E30
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 16:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 202584E1EDD
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 13:54:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1E8F3B80E7
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 14:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFFE136347;
-	Fri, 16 May 2025 13:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F28D14AD2B;
+	Fri, 16 May 2025 14:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cP1EnUur"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="idtMLIEf"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A273672601
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 13:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406E9139579
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 14:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747403670; cv=none; b=fvbfbs93TQb/Ogx0mDxIp4Cc8QiAoKWOIcmUpTfGmI35u1tKTBPu9RQt5SWX72nEMPhV2W/66FfLXYNhJ+G2jyVUrD/bwroOH8jjI6hagQweac+67nZ4uFvm455pjOH+Yu8O1zNe++DtiIUywUR1V4ix0/MFqOU6vTA+DiJKFPo=
+	t=1747404450; cv=none; b=tZaCXUwb3o0oE0Gyc9RsT649d7bwWg3/9xU2BHwyocGd14h8OhSBioUKz6/16/wnIwLKl59gEI4XjO+laoylahSEs1/lqnypRluUZ2dePVlopLFdK63wbObJKJfegNDWsblp4dGB9HnXeJ2LAJrS5/5IV9z0XjPwAO536anhQqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747403670; c=relaxed/simple;
-	bh=C7Ii4OS+lxxxizXe6a0Y+j3ekj3OuHIkNw86WOZShJ4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZsfAVm/IAOTklVhe8mAWcc5JpooHf/biczixzhav41RqW1rVCLc1KDqE1l8MGmhoFLg89IE2CVVoK2GUXK7282kWM36LgA70wDglWnanNsf9Sw+mBpy+tTTahLBiUcdJpGiK49fJptaSindfSOwacYf+Gh7emcmD6IXTgKldGlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cP1EnUur; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2801C4CEE4;
-	Fri, 16 May 2025 13:54:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747403670;
-	bh=C7Ii4OS+lxxxizXe6a0Y+j3ekj3OuHIkNw86WOZShJ4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cP1EnUurIruml39wNmTO916nwYV+JYsFTfnPP4nmjkaih3cGNOdQ9z4N0TbXPE48V
-	 zYmBC78TTb004+vCQE1NpvjKsIarFG4VohkLfJj6OiqAzaS8OZ28EXgDx0f0DrDa6h
-	 1fNsWCOBqOuhZsjd4ADjabrCtgBEH/14EqvO0Vfn+datPh9GrRWBcgg3VicNv/0csM
-	 ldMmmqXUbseIsffincpiS9ONc04q4SDM7QG65hs/WvPhdV3SG644WXYbgqh38S6ER4
-	 3nISgaBqtAW5Km97OFt1D7bEVoH5+gg6NQd6GBw8kuTtzfu6oLlG4NBKBBoQDn0Ojh
-	 /02Fxkf4SP4UQ==
-From: Will Deacon <will@kernel.org>
-To: julien.thierry.kdev@gmail.com,
-	maz@kernel.org,
-	Anup Patel <apatel@ventanamicro.com>
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <anup@brainfault.org>,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org
-Subject: Re: [kvmtool PATCH v3 00/10] Add SBI system suspend and cpu-type option
-Date: Fri, 16 May 2025 14:54:24 +0100
-Message-Id: <174740291953.2568869.1965604295335396910.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20250426110348.338114-1-apatel@ventanamicro.com>
-References: <20250426110348.338114-1-apatel@ventanamicro.com>
+	s=arc-20240116; t=1747404450; c=relaxed/simple;
+	bh=ZiJQtCrV56w4/Y1W+Sd1A8QY8PZatBWXeocXad9ibgg=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=e22Z1ehVebCsKxdHdNvvDQTWYkHIMhVM3cZmnTqwF91MJv6ZoLVRlzdo7ZyEJZpnyy/d36eMV2UULp16ybFgoCj2UfJQb6bGE97GU8QrE8YDsm/ZRB8nhNkAGWcdWgpHqC+uG2yuZCYZbE9q1PdXSogvlQqGTTxJYSUsXeRyhP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=idtMLIEf; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-740adfc7babso1869605b3a.0
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 07:07:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747404448; x=1748009248; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=I0BEoaGPs7E0lHGHqMtx20JU7Z7mIAdbQ03kowt/oEI=;
+        b=idtMLIEfiyQRD6EJjBSQqU6I0nM3t0N49ASuI9AsmxSORZZjg7PTZJe7Pu1/6ljRUo
+         JYs1vLhGN8/vXI+0YYJnISfclbcul9ilyjI6gxvwxQ3oNJEbrUtpMCAOj3vpgo2+HYke
+         xjsb/zWmHVAut0NPgXLvppVfXSKzckVvffKVJ/zo8SpIklO4huTgSW2Z6VvNtbxXjubP
+         HNo08DOadfNYsWP+6tq20NUf6NLSBJRvpIoRLFfuEUjKZoUKFra16T/waDeum5JskYRp
+         vr1q1gm9w2T5Oevxx6PxfJXF1OF3lv/+7OD5O2fM4dFcpHZBAFQtQWXU8tX/32xiEf92
+         mUgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747404448; x=1748009248;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I0BEoaGPs7E0lHGHqMtx20JU7Z7mIAdbQ03kowt/oEI=;
+        b=XbaNoppzlLPeXgc0e5i2I11+QKsXcZsn/4F0gxYAnhd61B7vyaEGAzdv7rEsrWUa1Q
+         w8QOC1F3Q4sIy25SiFxJXXXuZwXwBCPT9bqUMmxuTNGbeYNvbZ1dpa+S7ZrzNb8qp9SV
+         Fku6bI7hu+XkA0VTyb+HHlhk4rE6uvkbWB7OP0k6L46bJ+saFHrN8dN33ei8CIHCD710
+         weGGaFnBQQKyOOem1wIEidFOryYBldn25fqmcwVOnpYGwGtT7gBavFNx/fNyPsA2hAr3
+         ESUAIEPWONQ+3Y5zjgVfU97kodvLRzLN4JzX5NRVqMqzBK5Chv/odsLU5wNdo4QK24Ji
+         cv2Q==
+X-Gm-Message-State: AOJu0YzAENNEYO7yzAF/qe0bUxr/lYh7aWUGqMpgWNrFLIabE2PCxUjL
+	3c8c8CgPiQ2DbIDdIvT6VbcHqppj0dvm+2XogSPMXDaAWotiieDaE8TWwaiY63RUf75b+xKjPRM
+	jnvJ15VhLbj+1TsoymNCwcQfpwA==
+X-Google-Smtp-Source: AGHT+IHjj8hb/RVvZ0IOpTAd6gcfF67ZbXjAX68CTThBkFnrnLTw7dIsH6cNRpPgLu+DDO0Lal4k3FXkbzgyillaoQ==
+X-Received: from pffl14.prod.google.com ([2002:a62:be0e:0:b0:73e:1cf2:cd5c])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:c8d:b0:740:6f69:f52a with SMTP id d2e1a72fcca58-742a9616b19mr4851938b3a.0.1747404448303;
+ Fri, 16 May 2025 07:07:28 -0700 (PDT)
+Date: Fri, 16 May 2025 07:07:27 -0700
+In-Reply-To: <b3c2da681c5bf139e2eaf0ea82c7422f972f6288.1747264138.git.ackerleytng@google.com>
+ (message from Ackerley Tng on Wed, 14 May 2025 16:42:08 -0700)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Message-ID: <diqzzffcfy3k.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v2 29/51] mm: guestmem_hugetlb: Wrap HugeTLB as an
+ allocator for guest_memfd
+From: Ackerley Tng <ackerleytng@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, 26 Apr 2025 16:33:37 +0530, Anup Patel wrote:
-> This series does the following improvements:
-> 1) Add Svvptc, Zabha, and Ziccrse extension support (PATCH2 to PATCH3)
-> 2) Add SBI system suspend support (PATCH5 to PATCH6)
-> 3) Add "--cpu-type" command-line option supporting "min" and "max"
->    CPU types where "max" is the default (PATCH8 to PATCH10)
-> 
-> These patches can also be found in the riscv_more_exts_round6_v3 branch
-> at: https://github.com/avpatel/kvmtool.git
-> 
-> [...]
+Ackerley Tng <ackerleytng@google.com> writes:
 
-Applied to kvmtool (master), thanks!
+> guestmem_hugetlb is an allocator for guest_memfd. It wraps HugeTLB to
+> provide huge folios for guest_memfd.
+>
+> This patch also introduces guestmem_allocator_operations as a set of
+> operations that allocators for guest_memfd can provide. In a later
+> patch, guest_memfd will use these operations to manage pages from an
+> allocator.
+>
+> The allocator operations are memory-management specific and are placed
+> in mm/ so key mm-specific functions do not have to be exposed
+> unnecessarily.
+>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+>
+> Change-Id: I3cafe111ea7b3c84755d7112ff8f8c541c11136d
+> ---
+>  include/linux/guestmem.h      |  20 +++++
+>  include/uapi/linux/guestmem.h |  29 +++++++
+>  mm/Kconfig                    |   5 +-
+>  mm/guestmem_hugetlb.c         | 159 ++++++++++++++++++++++++++++++++++
+>  4 files changed, 212 insertions(+), 1 deletion(-)
+>  create mode 100644 include/linux/guestmem.h
+>  create mode 100644 include/uapi/linux/guestmem.h
+>
+> <snip>
+>
+> diff --git a/mm/Kconfig b/mm/Kconfig
+> index 131adc49f58d..bb6e39e37245 100644
+> --- a/mm/Kconfig
+> +++ b/mm/Kconfig
+> @@ -1218,7 +1218,10 @@ config SECRETMEM
+>  
+>  config GUESTMEM_HUGETLB
+>  	bool "Enable guestmem_hugetlb allocator for guest_memfd"
+> -	depends on HUGETLBFS
+> +	select GUESTMEM
+> +	select HUGETLBFS
+> +	select HUGETLB_PAGE
+> +	select HUGETLB_PAGE_OPTIMIZE_VMEMMAP
 
-(I updated the headers myself after fixing the script we have).
+My bad. I left out CONFIG_HUGETLB_PAGE_OPTIMIZE_VMEMMAP_DEFAULT_ON=y in
+my testing and just found that when it is set, I hit
 
-[02/10] riscv: Add Svvptc extension support
-        https://git.kernel.org/will/kvmtool/c/a9880860d781
-[03/10] riscv: Add Zabha extension support
-        https://git.kernel.org/will/kvmtool/c/8be1c78896b4
-[04/10] riscv: Add Ziccrse extension support
-        https://git.kernel.org/will/kvmtool/c/0641ed8c3763
-[05/10] riscv: Add SBI system suspend support
-        https://git.kernel.org/will/kvmtool/c/fcc316016e9f
-[06/10] riscv: Make system suspend time configurable
-        https://git.kernel.org/will/kvmtool/c/1132ace1c069
-[07/10] riscv: Fix no params with nodefault segfault
-        https://git.kernel.org/will/kvmtool/c/b6e9f38b28c9
-[08/10] riscv: Include single-letter extensions in isa_info_arr[]
-        https://git.kernel.org/will/kvmtool/c/d47ad017c404
-[09/10] riscv: Add cpu-type command-line option
-        https://git.kernel.org/will/kvmtool/c/a50e8d888be8
-[10/10] riscv: Allow including extensions in the min CPU type using command-line
-        https://git.kernel.org/will/kvmtool/c/1117dbc8ceb2
+  BUG_ON(pte_page(ptep_get(pte)) != walk->reuse_page);
 
-Cheers,
--- 
-Will
+with the basic guest_memfd_test on splitting pages on allocation.
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+I'll follow up with the fix soon.
+
+Another note about testing: I've been testing in a nested VM for the
+development process:
+
+1. Host
+2. VM for development
+3. Nested VM running kernel being developed
+4. Nested nested VMs created during selftests
+
+This series has not yet been tested on a physical host.
+
+>  	help
+>  	  Enable this to make HugeTLB folios available to guest_memfd
+>  	  (KVM virtualization) as backing memory.
+>
+> <snip>
+>
 
