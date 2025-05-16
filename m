@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-46806-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46807-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450C2AB9D9E
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 15:35:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 670A7AB9DA5
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 15:36:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C92AB4E51F5
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 13:35:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D81F23A83D6
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 13:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 702B278F49;
-	Fri, 16 May 2025 13:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54EA172607;
+	Fri, 16 May 2025 13:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XCZwYujY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="htm8yxHC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4686560B8A
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 13:35:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188B72A1AA
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 13:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747402546; cv=none; b=o2RAod/gYThDwwtPutB0XtpE03h6Ucco/J2yGU8ma+SO1i8VyEJHoGqmPVEJAzkmCryczocyYVD5blBkkKui15EAAbO1v1HhBy2hlKprWCYyWOqOaFj3eXxFYRPgOQm6f5OpzA2J35ggPKr1ntreGedDisxtuoh7W7PiTw4D03c=
+	t=1747402593; cv=none; b=SeohcNwqMOTkapubbVLHlsA/4INPaNsLwMTbXlSVyc5FKyIM9imPlllT63O3Hf4duNdg6cnsozkuh3ZLsaaZWw+SSF3EC7rKkuLAHrG50ju6yXQezrmVR5X02Zn5+xDejhCe6tOpvcXmHQFZ/4ivO8q5Fu3f1qO6mFri58NDTqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747402546; c=relaxed/simple;
-	bh=mbNJO6rbhRMwuIoVTU8ZDSG2mOIuj9eAx47BnBtUGTw=;
+	s=arc-20240116; t=1747402593; c=relaxed/simple;
+	bh=gzBy5TTcFJ3Ju+lkxl17/Cv2ww6IlyXb3lMPvTTW0+Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=row8toJT/HqLQze+yl3wNASY12dHZbXVCmWSFXEFBctOSQLq01qztdGtdgHlZ3WZcmV4rt+vWG+BHUVqUTMF5miA44055cXQS3owQlcrQgLHpozFqP8pD9ac21VX9+FmO6HCj0etTdFOOiOvd6ARkTKDyN5UG2oR441vZJAw9XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XCZwYujY; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=U8gMiiUl8Zb6YHHVqgXYBAqjSyEGOutK4yw26lBjppRWTG9XgWZEuQiXB1/QBW5G1ksQbpej+oUraF6hDvk4vETsYK+hVipK1r0tQGQSh2SuhBiOr9X8QIjsyMjd/z+4twQL4Gga/Z6ZZvmEsf+VcKzdQwiXMHHAkHPqKeMWS28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=htm8yxHC; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22e816139b8so18630875ad.3
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 06:35:45 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7375e2642b4so1592426b3a.2
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 06:36:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747402544; x=1748007344; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747402591; x=1748007391; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LnEPS5xIYcZ/9QBFlM2YvgXWlEvCitmvF/+QPuGAd2E=;
-        b=XCZwYujYQfYJsx/wj/myE0yvEc3xR3IA8lSVucuBObUMrXF0cIxgmbGCIv0rkbooja
-         xSeje9BnYXphJu5V8YW6g3C+pEvb9XPeeRzWczYqzkNtme49LMmGawLHABx5QNK2Kzur
-         TLzRs5MURdmLNJ3sDfhFVD+RIIg1TgxHKgbhMKfcvQyycJvB/G5/0dADnJiOugPh45gH
-         srDS0nC447YKE2NFgChNM9iNTe34/ArNk43WTAkuB03R8jFIL7yOgef67XMZUUaTaNLt
-         nNEr4dE+N7eyVAcFYZxfCJImugtEfmd4CtbLkmBbZAYaDOHz+Qok1Fhu3poTvbDrxmqQ
-         ZXkA==
+        bh=sr0VF1D9f4EdiXRgig2Y19NqlMlaKz9LNUFtzyrU4Tw=;
+        b=htm8yxHCwbnujK5LXLcVoxYrpuPDdapk/TVsm2G1KX0VWhKO9UZWCDKcK+fBD/H4d1
+         BIyv5yfojAxEp1QqGfgnvZmaMRaH5MgnZJgqHTpyb2VdM8811I3B4x5ndZO41cixfs1n
+         vJIMFKrlVXU1ZYuDVBtycpiP/lu+Q4AGT1L0rbN3K7RVu/+wM/DtdVK6JTwchoQ0mu8+
+         YLuODh+kkPP1Vm0/a9fkdy1w+Agh7UiGK5xDe/r8u/6O2KiajcecSZ2Mu/G9d9vGRO2U
+         YzhcD2pT4X8v/4XGnVeHrwzB0DhJl9lJ5czRbesFlKRfFdj3Pt8GbHQfRV6WVocKjbVh
+         j5aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747402544; x=1748007344;
+        d=1e100.net; s=20230601; t=1747402591; x=1748007391;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LnEPS5xIYcZ/9QBFlM2YvgXWlEvCitmvF/+QPuGAd2E=;
-        b=XWOTcmu3UKyjca0VxV4VQBR1Kiayt8LYMbz3/pVqVX0O8jMI6vAbTIYIhnTE26pZig
-         Yh2MszHrSol0s0LikkOiz5EcvkDT7AipC/qoN7+DOUVUWbFGNP1lBgcWXAGdhfYu1faC
-         9E88TpAFJ/vx7vfTciUmz4Dhvp970UWtXM6Kx41JJ/lwPFaBzfmCQGZ6C/jCT3sOyMAm
-         iNSb4te2XnaBnc+edAAvdcSencEyplrvSzMdme8k10POWcZHuUs15lwhHWXULmhpToAf
-         0jhAMeM5lE5tpDQ1uyAUEYmwTJBs6nUGFAKzbjE5qmA6Lfzm3dQu5yrL0w1P54Mnys3X
-         5oig==
-X-Forwarded-Encrypted: i=1; AJvYcCVoHL11J/zlghgWvxnnoLs9cNNFCTphJnAA7DMx2egYHZOrCCXdu6i2p2+a0lIKO3TWrT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzdh4oY9bTxmQkEFXLXfeJmq6sG+yw8hCqXvRKI0vavCTFtT4hV
-	OczTWYrvyuRx5BZZaOVRHV+wU1fm1mfdnCi88Nkh0SstH2NDf7NNQN818mgKUWWwfVS7FXqITYk
-	MjZcVZw==
-X-Google-Smtp-Source: AGHT+IGYPJLPbPNyk9fQYDfhkPqOAQlx8+ac872IbMGJ++7mqndtzn4UY6HAjcLA0ay95SrGo+cLkFm5AkA=
-X-Received: from plblm14.prod.google.com ([2002:a17:903:298e:b0:220:ca3c:96bc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1ca:b0:221:78a1:27fb
- with SMTP id d9443c01a7336-231d438a223mr46909995ad.11.1747402544334; Fri, 16
- May 2025 06:35:44 -0700 (PDT)
-Date: Fri, 16 May 2025 06:35:42 -0700
-In-Reply-To: <20250324173121.1275209-25-mizhang@google.com>
+        bh=sr0VF1D9f4EdiXRgig2Y19NqlMlaKz9LNUFtzyrU4Tw=;
+        b=v9BL9130PI/aKk/PiXEv8vmfr8IeF4akQoGtNL/A7aeNw22CJo34hHghyfZlBc8DE1
+         9SUXW+a/kRPfT7ssvHqIdfYeDRL5A7QLxFpNgQoZb3uBwdmBXe7MEB0AaM9q29DZmi7v
+         KCauG8IncbfMNsQ60T/pHfP49pkK95r9PX9xdHgwgGyes3OA8AseEeIjIspcX9m4DVPq
+         AJc239Qyi0dIkJ2IgXG6A5hcN5F3gLJHYIf8+SKQMvtTKcQWsSfbTw+NPliArFdElwtG
+         0atHqdFvBm/MWO4LGZGJ/lIT1r9jxNUcJ7alyTMyXytETRvaSeeK/D50nPToridXkM8g
+         ms/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVH4pjRxFd4gtJemcS7ounfm70EcRkyWYWQEM5jOWwetO2vbdmtJfzE2AcfVpyZ5d5ykqA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwY5itbSZO2gdIIyXfnxbXyKL0zD6uoa88W5EQw/+b2zCj7CnJL
+	QWLTFQY1ZjVyo3gpyzcC0QcoSeI8SnTbss5K4xfXo0hh+QYBJxiY1812Y+IfWEHtNTJtksgbxr1
+	kOfK3vA==
+X-Google-Smtp-Source: AGHT+IEhdLfsUKZfqxAmSSK/NZ6cCAotywEPb/wMxpYTMH4NdwOB83MvM0a738g3iK2/V7i3Nl+pBDtNm2c=
+X-Received: from pfbkm42.prod.google.com ([2002:a05:6a00:3c6a:b0:736:3e92:66d7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d1f:b0:1f3:3690:bf32
+ with SMTP id adf61e73a8af0-216218c644dmr4974759637.18.1747402591371; Fri, 16
+ May 2025 06:36:31 -0700 (PDT)
+Date: Fri, 16 May 2025 06:36:30 -0700
+In-Reply-To: <20250324173121.1275209-26-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-25-mizhang@google.com>
-Message-ID: <aCc_LmORNibXBt8V@google.com>
-Subject: Re: [PATCH v4 24/38] KVM: x86/pmu: Exclude PMU MSRs in vmx_get_passthrough_msr_slot()
+References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-26-mizhang@google.com>
+Message-ID: <aCc_Xh4hSCL4eVV8@google.com>
+Subject: Re: [PATCH v4 25/38] KVM: x86/pmu: Add AMD PMU registers to direct
+ access list
 From: Sean Christopherson <seanjc@google.com>
 To: Mingwei Zhang <mizhang@google.com>
 Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
@@ -93,48 +94,74 @@ Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
 Content-Type: text/plain; charset="us-ascii"
 
 On Mon, Mar 24, 2025, Mingwei Zhang wrote:
-> Reject PMU MSRs interception explicitly in
-> vmx_get_passthrough_msr_slot() since interception of PMU MSRs are
-> specially handled in intel_passthrough_pmu_msrs().
+> From: Sandipan Das <sandipan.das@amd.com>
 > 
+> Add all PMU-related MSRs (including legacy K7 MSRs) to the list of
+> possible direct access MSRs.  Most of them will not be intercepted when
+> using passthrough PMU.
+> 
+> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
 > Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> Co-developed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 > ---
->  arch/x86/kvm/vmx/vmx.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/svm/svm.c | 24 ++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.h |  2 +-
+>  2 files changed, 25 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 38ecf3c116bd..7bb16bed08da 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -165,7 +165,7 @@ module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
->  
->  /*
->   * List of MSRs that can be directly passed to the guest.
-> - * In addition to these x2apic, PT and LBR MSRs are handled specially.
-> + * In addition to these x2apic, PMU, PT and LBR MSRs are handled specially.
->   */
->  static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
->  	MSR_IA32_SPEC_CTRL,
-> @@ -691,6 +691,16 @@ static int vmx_get_passthrough_msr_slot(u32 msr)
->  	case MSR_LBR_CORE_FROM ... MSR_LBR_CORE_FROM + 8:
->  	case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
->  		/* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
-> +	case MSR_IA32_PMC0 ...
-> +		MSR_IA32_PMC0 + KVM_MAX_NR_GP_COUNTERS - 1:
-> +	case MSR_IA32_PERFCTR0 ...
-> +		MSR_IA32_PERFCTR0 + KVM_MAX_NR_GP_COUNTERS - 1:
-> +	case MSR_CORE_PERF_FIXED_CTR0 ...
-> +		MSR_CORE_PERF_FIXED_CTR0 + KVM_MAX_NR_FIXED_COUNTERS - 1:
-> +	case MSR_CORE_PERF_GLOBAL_STATUS:
-> +	case MSR_CORE_PERF_GLOBAL_CTRL:
-> +	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> +		/* PMU MSRs. These are handled in intel_passthrough_pmu_msrs() */
->  		return -ENOENT;
->  	}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index a713c803a3a3..bff351992468 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -143,6 +143,30 @@ static const struct svm_direct_access_msrs {
+>  	{ .index = X2APIC_MSR(APIC_TMICT),		.always = false },
+>  	{ .index = X2APIC_MSR(APIC_TMCCT),		.always = false },
+>  	{ .index = X2APIC_MSR(APIC_TDCR),		.always = false },
+> +	{ .index = MSR_K7_EVNTSEL0,			.always = false },
 
-This belongs in the patch that configures interception.  A better split would be
-to have an Intel patch and an AMD patch, not three patches with logic splattered
-all over.
+These are always intercepted, i.e. don't belong in this list.
+
+> +	{ .index = MSR_K7_PERFCTR0,			.always = false },
+> +	{ .index = MSR_K7_EVNTSEL1,			.always = false },
+> +	{ .index = MSR_K7_PERFCTR1,			.always = false },
+> +	{ .index = MSR_K7_EVNTSEL2,			.always = false },
+> +	{ .index = MSR_K7_PERFCTR2,			.always = false },
+> +	{ .index = MSR_K7_EVNTSEL3,			.always = false },
+> +	{ .index = MSR_K7_PERFCTR3,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTL0,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTR0,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTL1,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTR1,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTL2,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTR2,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTL3,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTR3,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTL4,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTR4,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTL5,			.always = false },
+> +	{ .index = MSR_F15H_PERF_CTR5,			.always = false },
+> +	{ .index = MSR_AMD64_PERF_CNTR_GLOBAL_CTL,	.always = false },
+> +	{ .index = MSR_AMD64_PERF_CNTR_GLOBAL_STATUS,	.always = false },
+> +	{ .index = MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR,	.always = false },
+> +	{ .index = MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_SET,	.always = false },
+>  	{ .index = MSR_INVALID,				.always = false },
+>  };
+
+As with the Intel patch, this absolutely belongs in the patch that supports
+disabling intercepts.
+
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 9d7cdb8fbf87..ae71bf5f12d0 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -44,7 +44,7 @@ static inline struct page *__sme_pa_to_page(unsigned long pa)
+>  #define	IOPM_SIZE PAGE_SIZE * 3
+>  #define	MSRPM_SIZE PAGE_SIZE * 2
+>  
+> -#define MAX_DIRECT_ACCESS_MSRS	48
+> +#define MAX_DIRECT_ACCESS_MSRS	72
+>  #define MSRPM_OFFSETS	32
+>  extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
+>  extern bool npt_enabled;
+> -- 
+> 2.49.0.395.g12beb8f557-goog
+> 
 
