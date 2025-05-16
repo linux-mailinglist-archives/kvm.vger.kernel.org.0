@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-46864-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46865-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E830ABA3A1
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 21:22:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F80EABA3A5
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 21:23:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95713507C55
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 19:22:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33A8EA24567
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 19:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B95C283123;
-	Fri, 16 May 2025 19:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0AE27FB2F;
+	Fri, 16 May 2025 19:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mjwW8P6m"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kjBaW/fa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8731A28151C
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 19:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3D72820BB
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 19:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747423204; cv=none; b=nfuyv34fKDecGkobEGWobMOjmkdj/RQu5M8rQdk2bwEhi2fABo+SpJYc1a9xcKUfhUTn9JQjCidXqeHg7Ql3GiNFzeunJLtAHZ60zNPayZ/UCySM4IbKTHuS5r4mwy4vLyO8tTcFfjgPNB1Xqsr7nkmamHnrKpmGHp1aCHX3fjE=
+	t=1747423205; cv=none; b=rNpWe0b7zLzwBSa+95vipQNR00ze+Hm/N5ImoeSZ58a8vZuUqDQjfzyJnGTQrWI+QH+mcJrSM2YwOy6f+WH7qpTJrvF0RIjKTEaeVwf7HOVviHBnYcF5E02YVDxrwxnUyqQsdCW4bZNC9AAjgF1cMQwifzJY5GiLnNv6byAa4k0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747423204; c=relaxed/simple;
-	bh=NuB/f6nkq4OHFjVHs3gXXIOsYIstssVeMan9gyJklK8=;
+	s=arc-20240116; t=1747423205; c=relaxed/simple;
+	bh=zI703iJCDbnk2s6d61LSt5o9bFxMF1iFazDfQ6c+5lo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VsAqd7JgF/jEOwry2UJKN1WpDWfkSFBTMPnxo8Q8MOqlcnwq6CXpyUIYekf3rAoealtkQq90ECjAY30Hmo3b6QKeX7zINZd0U8U+MXlWjZA3YHR4nVGb8pu9Nv8zwVPLNjlFvgAgI8JUIdMg+M0OB81pUN2fjD5JZAgjpGSSRWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mjwW8P6m; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=jy3wXVwCprB9XloiTXGKhH0X/ZEWyd38tM9e45A6qoesMiwB82DZjMhIWzU/yeBs+3XVAYdRH0l+BhJOCSpbpQTDwbo7G97BL2mBUhpOqMWkUBeQKa/5hwI5gHzqw6YKJsdEMJZrTRbVOZDFB9s7fdhcGW/42ylgnqqS52adBvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kjBaW/fa; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22e50a45d73so23347435ad.3
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 12:20:02 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30e57a372dcso2649586a91.2
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 12:20:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747423202; x=1748028002; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747423203; x=1748028003; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pcD6u0JZ2o5dpCGxWEFpq76ioIg39n0Fm+ILo2b7fTo=;
-        b=mjwW8P6maoDIIbGFFNwK97/yj8bo7I0LSYbVCYRHIkRdmadi0sB2A+stpItNvu/amb
-         XfMiDf9/M1UBoxk3h/um2ikuxsa2cyWBpssL6pN5v+ATJXvTQPlrxLQ5QYtJPf7VU9Mm
-         3yQLA2gsHV+YLaf1x5vDZpxfgzVCLctzeGLv2n/USSrEegGY009AEeobfhJcsUk13dkJ
-         S0cSUmyUuLp2JkjarNbkujX9H8PvhvpOiHCIN8uGSNhHLIxa5Y17nzZe1lyBtlbJ7PRI
-         X06dRR8vSfOVMdAuTnayTVxJUXhmyPpiPFIoFDJG88CeEgtaXPYinrGHi4KSGFzwRUr9
-         pRPw==
+        bh=Xw0kwmlCHmpdsX/DiL844LcPhYI529J79EzDxXuX1+o=;
+        b=kjBaW/faJLsmRpkYDLcpuE44pBFxM774oWFWGs/U/exePEWWfWzkgCyILUbXl0VE0m
+         RiVmZymxIHz7xgF/RhaBIji8SNXkNa0GspmhXEd7gC4ZmnYJnLM/CQLytwtNuqBmoMb7
+         24xrFyevRQ4MrIQDCfndBhBzF2DTo1K8Fx32xGJ6JORBiigVC9oHzC3z6vBm6qRVpejm
+         TaQi7QWvqJtemLU56lf9CDA0BzwEMB0SjZ585RksO3a+VZ6Xbp5Wn0FBmPn5wV5o/bvN
+         A9lgJH46+n8QXo0A13epSqB9XEO/+Q/bEDCJVkoFfdL4Uygplw6ehIoImmRYsZlQBKWK
+         kqzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747423202; x=1748028002;
+        d=1e100.net; s=20230601; t=1747423203; x=1748028003;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pcD6u0JZ2o5dpCGxWEFpq76ioIg39n0Fm+ILo2b7fTo=;
-        b=J8WI/nQkfbMLxjvz/AWFo55Yaeb2drXnOI2sOCNVue82YQbLLhw3N7b68FU4a1HDqg
-         XwZTmNraqJPu19K40fsBGpMrNPNH4GxHae5X7dUAbVW79dw3rrcteKtL/cZi/5Fmm31v
-         BpJ0TdmX2LzW2nhWvSfr+fI2VuEBlvYY9upTwevrSaIVDBkammkpWA8aJuuJjtROKgjD
-         IZK0r0pu10NIh2kbbodzMnrsZczc222iRXzjd5YAlzu8QYWXB/v5IbY2w2SNrEzhPilF
-         izBwXk6CmEGRWpQdf51Zu/kNpKemCOJhGx0Okxtuyzf0+yj/PvK0GsoHKbKDYUpe80hL
-         FQSg==
-X-Forwarded-Encrypted: i=1; AJvYcCWMsx4mxAuqLu9CDoicAchqJ2bp+6l15C/Os3KdbcTMFkhrA/wGPExKeyAqnLp8lcD415s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyDnXBJJgGDnpjm0hE9kVUbimo6E33SLxk8VGF3p+wvp7ib+0Q
-	qn/RFQkGZDFN4fTBonvlGv9iCmkoYbcrB62njmEEap75XP0TdJIdbDiKKBb821glYVsdlFF23q9
-	4k0XGGlVJWyDqeGahEoffRU9jbQYhmWsyvj4SYYTqmjMVonLI78091qT2NeC+vkI=
-X-Google-Smtp-Source: AGHT+IHAks9p6aEl1daXh7zR8tIAiKXLPdB+oQKMTtgz7kcarMzyttyq7vXQeQX44ygO4jg4JLr2qMfpus3k
-X-Received: from plpe4.prod.google.com ([2002:a17:903:3c24:b0:22e:4288:ad7])
- (user=afranji job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:40d0:b0:224:194c:694c
- with SMTP id d9443c01a7336-231de3764d3mr58245605ad.28.1747423201887; Fri, 16
- May 2025 12:20:01 -0700 (PDT)
-Date: Fri, 16 May 2025 19:19:29 +0000
+        bh=Xw0kwmlCHmpdsX/DiL844LcPhYI529J79EzDxXuX1+o=;
+        b=wFpFXtrXesW81TgfEMs0X0wbRjH/ms0/Hp6oWQ9Wl8AVmbZTHap4i9ZiGSqJpXfmDN
+         gnel06KkY+nNsG452AiB6bqTVowBt3NKIXSvRUguEEjaxn1Sx+cpJTHP2YR2E97bzDS9
+         871OebujGOP5pgXnup6WOU1MHJo4H/qRSsAiau8WDqZoS6u8KvLEmOHfWs9kF2jdnvFe
+         ykGFBmO7jUl530FJvJKBBX4Td7htcUNMTW0cOzoX5sgGRn6H/JqY8zLJeyNxUcqCaEPp
+         80BpNMV+wIhDJ9jR4zzHIvzIImqKSdCYQjhCfNI8mJFDU280GyudWBSMEtMPZlZ+Y7ok
+         RuZw==
+X-Forwarded-Encrypted: i=1; AJvYcCVlhZKd7X50oJcO6Uq/ufTl4JZ703+Tv8UG2XjmxKHSNKsUC+Dtz3NbXFBOQeEepNtSq/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9UQVGYe9rQcDfSog6UWq1TTjsxUFL1V9lBYTumTg9MjYmnFsT
+	GbDv3Qe0feuwg83itv6FSFs4FbHfYvDUuBC7eODCKzxogyEC//fa1Zs6ynowe+mIpPbAOdDniWz
+	fCGDibqqJmx2lsB7qq6WTJoH6UkIgipOz6DjDbE4Aex2LaTO+yWuFjWB6G96SFfk=
+X-Google-Smtp-Source: AGHT+IHuWIFRKFYUeYZ/E0Mn4pw8FwJ4Uk8VOlO7RIg7ETTqbymvwLUfY9oGU3oIEt0b7BaEDlNyVDhXpsne
+X-Received: from pjb12.prod.google.com ([2002:a17:90b:2f0c:b0:30a:a05c:6e7d])
+ (user=afranji job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:558e:b0:2ee:8ea0:6b9c
+ with SMTP id 98e67ed59e1d1-30e830fb83cmr6780268a91.12.1747423203424; Fri, 16
+ May 2025 12:20:03 -0700 (PDT)
+Date: Fri, 16 May 2025 19:19:30 +0000
 In-Reply-To: <cover.1747368092.git.afranji@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1747368092.git.afranji@google.com>
 X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <02fa2a32b0628bf9e8e9700a79fa02f0b13b2e90.1747368093.git.afranji@google.com>
-Subject: [RFC PATCH v2 09/13] KVM: x86: Refactor common migration preparation
- code out of sev_vm_move_enc_context_from
+Message-ID: <7c51d4ae251323ce8c224aa362a4be616b4cfeba.1747368093.git.afranji@google.com>
+Subject: [RFC PATCH v2 10/13] KVM: x86: Let moving encryption context be configurable
 From: Ryan Afranji <afranji@google.com>
 To: afranji@google.com, ackerleytng@google.com, pbonzini@redhat.com, 
 	seanjc@google.com, tglx@linutronix.de, x86@kernel.org, kvm@vger.kernel.org, 
@@ -94,155 +93,66 @@ X-ccpol: medium
 
 From: Ackerley Tng <ackerleytng@google.com>
 
-Co-developed-by: Sagi Shahar <sagis@google.com>
-Signed-off-by: Sagi Shahar <sagis@google.com>
+SEV-capable VMs may also use the KVM_X86_SW_PROTECTED_VM type, but
+they will still need architecture-specific handling to move encryption
+context. Hence, we let moving of encryption context be configurable
+and store that configuration in a flag.
+
 Co-developed-by: Vishal Annapurve <vannapurve@google.com>
 Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Ryan Afranji <afranji@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/svm/sev.c          | 29 +++---------------------
- arch/x86/kvm/svm/svm.h          |  2 +-
- arch/x86/kvm/x86.c              | 39 ++++++++++++++++++++++++++++++++-
- 4 files changed, 43 insertions(+), 29 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/svm/sev.c          | 2 ++
+ arch/x86/kvm/x86.c              | 9 ++++++++-
+ 3 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6c06f3d6e081..179618300270 100644
+index 179618300270..db37ce814611 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1871,7 +1871,7 @@ struct kvm_x86_ops {
- 	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
- 	int (*mem_enc_unregister_region)(struct kvm *kvm, struct kvm_enc_region *argp);
- 	int (*vm_copy_enc_context_from)(struct kvm *kvm, unsigned int source_fd);
--	int (*vm_move_enc_context_from)(struct kvm *kvm, unsigned int source_fd);
-+	int (*vm_move_enc_context_from)(struct kvm *kvm, struct kvm *source_kvm);
- 	void (*guest_memory_reclaimed)(struct kvm *kvm);
+@@ -1576,6 +1576,7 @@ struct kvm_arch {
+ #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
+ 	struct kvm_mmu_memory_cache split_desc_cache;
  
- 	int (*get_feature_msr)(u32 msr, u64 *data);
++	bool use_vm_enc_ctxt_op;
+ 	gfn_t gfn_direct_bits;
+ 
+ 	/*
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index b3048ec411e2..689521d9e26f 100644
+index 689521d9e26f..95083556d321 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2000,34 +2000,15 @@ static int sev_check_source_vcpus(struct kvm *dst, struct kvm *src)
- 	return 0;
- }
+@@ -442,6 +442,8 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+ 	if (ret)
+ 		goto e_no_asid;
  
--int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
-+int sev_vm_move_enc_context_from(struct kvm *kvm, struct kvm *source_kvm)
- {
- 	struct kvm_sev_info *dst_sev = to_kvm_sev_info(kvm);
- 	struct kvm_sev_info *src_sev, *cg_cleanup_sev;
--	CLASS(fd, f)(source_fd);
--	struct kvm *source_kvm;
- 	bool charged = false;
- 	int ret;
- 
--	if (fd_empty(f))
--		return -EBADF;
--
--	if (!file_is_kvm(fd_file(f)))
--		return -EBADF;
--
--	source_kvm = fd_file(f)->private_data;
--	ret = kvm_mark_migration_in_progress(kvm, source_kvm);
--	if (ret)
--		return ret;
--	ret = kvm_lock_two_vms(kvm, source_kvm);
--	if (ret)
--		goto out_mark_migration_done;
--
--	if (kvm->arch.vm_type != source_kvm->arch.vm_type ||
--	    sev_guest(kvm) || !sev_guest(source_kvm)) {
--		ret = -EINVAL;
--		goto out_unlock;
--	}
-+	if (sev_guest(kvm) || !sev_guest(source_kvm))
-+		return -EINVAL;
- 
- 	src_sev = to_kvm_sev_info(source_kvm);
- 
-@@ -2066,10 +2047,6 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 		sev_misc_cg_uncharge(cg_cleanup_sev);
- 	put_misc_cg(cg_cleanup_sev->misc_cg);
- 	cg_cleanup_sev->misc_cg = NULL;
--out_unlock:
--	kvm_unlock_two_vms(kvm, source_kvm);
--out_mark_migration_done:
--	kvm_mark_migration_done(kvm, source_kvm);
- 	return ret;
- }
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 35df8be621c5..7bd31c0b135a 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -757,7 +757,7 @@ int sev_mem_enc_register_region(struct kvm *kvm,
- int sev_mem_enc_unregister_region(struct kvm *kvm,
- 				  struct kvm_enc_region *range);
- int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd);
--int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd);
-+int sev_vm_move_enc_context_from(struct kvm *kvm, struct kvm *source_kvm);
- void sev_guest_memory_reclaimed(struct kvm *kvm);
- int sev_handle_vmgexit(struct kvm_vcpu *vcpu);
- 
++	kvm->arch.use_vm_enc_ctxt_op = true;
++
+ 	init_args.probe = false;
+ 	ret = sev_platform_init(&init_args);
+ 	if (ret)
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 422c66a033d2..637540309456 100644
+index 637540309456..3a7e05c47aa8 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -6597,6 +6597,43 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_event,
- 	return 0;
- }
+@@ -6624,7 +6624,14 @@ static int kvm_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+ 	if (r)
+ 		goto out_mark_migration_done;
  
-+static int kvm_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
-+{
-+	int r;
-+	struct kvm *source_kvm;
-+	struct fd f = fdget(source_fd);
-+	struct file *file = fd_file(f);
-+
-+	r = -EBADF;
-+	if (!file)
-+		return r;
-+
-+	if (!file_is_kvm(file))
-+		goto out_fdput;
-+
-+	r = -EINVAL;
-+	source_kvm = file->private_data;
-+	if (kvm->arch.vm_type != source_kvm->arch.vm_type)
-+		goto out_fdput;
-+
-+	r = kvm_mark_migration_in_progress(kvm, source_kvm);
-+	if (r)
-+		goto out_fdput;
-+
-+	r = kvm_lock_two_vms(kvm, source_kvm);
-+	if (r)
-+		goto out_mark_migration_done;
-+
-+	r = kvm_x86_call(vm_move_enc_context_from)(kvm, source_kvm);
-+
-+	kvm_unlock_two_vms(kvm, source_kvm);
-+out_mark_migration_done:
-+	kvm_mark_migration_done(kvm, source_kvm);
-+out_fdput:
-+	fdput(f);
-+	return r;
-+}
-+
- int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			    struct kvm_enable_cap *cap)
- {
-@@ -6738,7 +6775,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		if (!kvm_x86_ops.vm_move_enc_context_from)
- 			break;
+-	r = kvm_x86_call(vm_move_enc_context_from)(kvm, source_kvm);
++	/*
++	 * Different types of VMs will allow userspace to define if moving
++	 * encryption context should be required.
++	 */
++	if (kvm->arch.use_vm_enc_ctxt_op &&
++	    kvm_x86_ops.vm_move_enc_context_from) {
++		r = kvm_x86_call(vm_move_enc_context_from)(kvm, source_kvm);
++	}
  
--		r = kvm_x86_call(vm_move_enc_context_from)(kvm, cap->args[0]);
-+		r = kvm_vm_move_enc_context_from(kvm, cap->args[0]);
- 		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
- 		if (cap->args[0] & ~KVM_EXIT_HYPERCALL_VALID_MASK) {
+ 	kvm_unlock_two_vms(kvm, source_kvm);
+ out_mark_migration_done:
 -- 
 2.49.0.1101.gccaa498523-goog
 
