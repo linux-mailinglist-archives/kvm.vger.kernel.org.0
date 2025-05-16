@@ -1,216 +1,313 @@
-Return-Path: <kvm+bounces-46801-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46802-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8495CAB9CF6
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 15:10:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 097A0AB9D04
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 15:13:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B267502FE1
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 13:10:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9F9A9E1172
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 13:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF76A244661;
-	Fri, 16 May 2025 13:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F48243367;
+	Fri, 16 May 2025 13:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="N6aK/QuY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TGx+AlKw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC7C24291A
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 13:09:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8D53232
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 13:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747400995; cv=none; b=JNvqjksdx8908yCSCAKphPQ6ttuWi0QSBndryfv1SGHTHdplQHL+r+PgXPdv4MI+kAWubocRdWuhq92dPpRypOYTpVq1N2dqdNW/u+ruCSKo3BvqyCIsmaZTfvgVSijY5DRG6YRHYW3BM6VlPsiu48r+OMppUIhgcxRPSB/44Jg=
+	t=1747401132; cv=none; b=A/WzvPdMz9R5XhOCqLMcqBiYLha6LFXOz67VIQIKzVuIEfnAm4ae7YwQsqav/gaCKLHvOhu16f8M8OtAGsxEtArpgCZnMDNzVGESvgT6ON5Aj+TJT9d3uI22qXf6BnfJuiDS12lstKbjnjcrRooTj/DDltbsIYst5uvz1RFYY6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747400995; c=relaxed/simple;
-	bh=KeeqOAOGD2IxZktca9/VQWKsKkXiMamtPhRfiYyinBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HgeQedNJBG9IXbrdauV/lAtgiO6/ywCzdSWh9lHgnQ54qzhKkoXSucPkGVk5u5RqoJzE54GKkQnMOhVdd08+uDufFQ/9FIIqu1TdvcSsLutYPozU+PIuWL267b/AFUdJ3cBFXj58HLp1x2mXviF6jkIvRU1KG++b5LErRQAKAa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=N6aK/QuY; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6f6e398767eso41461946d6.1
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 06:09:52 -0700 (PDT)
+	s=arc-20240116; t=1747401132; c=relaxed/simple;
+	bh=NiiFqWZZg0iu28D3kw6sHBbg2+Jj2+n51oesFaRNgac=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nErItth4TF072DOKZ/BNZmUPo06rrDS6/db8V1pOn/FFMJqIF4+e5LDEqNVMPikUYgIcVX+oC3jMmNjVUTcdtjlc4lJhPU57HrhSrK0FxU+2Irk0dQ5/pRT3PnTyu9Nnwok4TsEKhjkoi+Z7gs2os+EBidV5Udv7hcB9IfxCceA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TGx+AlKw; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-231f37e114eso28785ad.1
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 06:12:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1747400992; x=1748005792; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WBkLgz+xs0k99ZNtnJXNN8FdEZvlmytfCxgniwbp1fs=;
-        b=N6aK/QuY/aBobCo1Y4KMAlQpboDW2ZkhOjnQiPxpwYCo2C2bv6G8pjpvI0U/VcV07w
-         iKB09xqesGfk4M6naEJuR1tunrC8xRT+7uep7DXRuSCMl6ZOm3A2gfeSb3vEKLgTRUg8
-         5ZlxHh5YFlQv7hEjd/NmrY2ARqArwsl6gwVNVL5PltoCKzHr/ORWfZ8ka358rMgNj7aM
-         OltfMFww5Ut6y7lVyx8RmlSvsK0w06CwEDq+tCa2pjdHBdfMDNb175TnD4DMR6K7aySs
-         7kZajIY4nzaVqxY6+s/76B+eZxXWAo7Wkr+6ShiQZVyazb1P82zoWstqXwNSU9oMlzzy
-         OZyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747400992; x=1748005792;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1747401129; x=1748005929; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WBkLgz+xs0k99ZNtnJXNN8FdEZvlmytfCxgniwbp1fs=;
-        b=iheZsq52gb2ED7l5XkUffeM202TNNZPBa5nHTorkmxi+NHQkl0hjGHZcGKBgqgH/vQ
-         w64u0u106NQc++m+IlZ2VXSqLSvczKw1jMjicWgOzGwzCo24Q1dJocUsL4cgjUL5IN1n
-         QeIR3O3BIQDR05lNU5idRcpRsT7S0V5RBiV1cW1AylF3O05HqBqHdlFv0O+qhPJLVZw1
-         c4tMPb08c2Hmdt8c9Qa0EcXV40s8VP8mP1or+2gpxh3kWKX8sjVDr6CqaxYvJdlIWoMQ
-         08mXG2dJ5XlG3wZpv3C4Kh67lbfoTGGarwRAbT9se7OWUx4kRuMQ87UxuoF26YcMWxuo
-         IN2A==
-X-Forwarded-Encrypted: i=1; AJvYcCXxfdpTXr1/bSnGMK+xEboh3/PtzhuBF25JZPMX/3g+OaIqiGLR8kT++l1vOSUqYxnKcuw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeG/N+IXQr9cgiu22SMfvK38g++ofx2fLSfhJSt13BTcecjBpT
-	rIMlySqF12QyZ2yUYTvCrTq/PG5Ks9RGqkS2zRBe1/irgD7ZpXEoxCsSpwcdbYL/LVE=
-X-Gm-Gg: ASbGnctsRmOK0oDHhbIYdUFf3ei3GN1r5olNYfEl/uxkJm37hsNtgRJzGjp3N9qgaQA
-	R7HsMGOE3g/IFxrjeVdKs77Dxtu72SZtZqS1MpAAWw/bvs43AAchsZIVl/mVmIG29M0RjS3T1fK
-	0ZNL5qWUHv9LG5XW+tmIJtMI+9On3M4ZFHfFmEGtMzkpqSo0aGIpQ58cytjZvy7t1VRUXkPfKh4
-	eMl3FDiaQuh/ocKpSSklkk5ejavW+Z44wlJ300okybkQF/B7kGrFEHPV6HMSjc0xVLxK58GHIPX
-	P7WaJZ5Pd0AukrgB5FfTxvUm2khUHlGkMxWCR8beV0GH6ENZVQHtRA3k+ENXOv3pw3TIPsn3taV
-	buHm8Gy5vfpcQ/YLFu7pUhCkBOEM=
-X-Google-Smtp-Source: AGHT+IHPCApkxTW848mw2pAvy0O37cjq5r1nPCJEjsfJzIZSF+v0PF+8hsJhAhsmje7cLGzcj8IimA==
-X-Received: by 2002:a05:6214:2428:b0:6e2:4da9:4e2d with SMTP id 6a1803df08f44-6f8b124984bmr51931186d6.9.1747400991725;
-        Fri, 16 May 2025 06:09:51 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-56-70.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.56.70])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f8b097a59fsm11761186d6.102.2025.05.16.06.09.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 May 2025 06:09:50 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1uFuow-00000002fSS-05ik;
-	Fri, 16 May 2025 10:09:50 -0300
-Date: Fri, 16 May 2025 10:09:50 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	Jun Miao <jun.miao@intel.com>,
-	"nsaenz@amazon.es" <nsaenz@amazon.es>,
-	"pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>,
-	"vbabka@suse.cz" <vbabka@suse.cz>,
-	"peterx@redhat.com" <peterx@redhat.com>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"tabba@google.com" <tabba@google.com>,
-	"keirf@google.com" <keirf@google.com>,
-	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>,
-	"amoorthy@google.com" <amoorthy@google.com>,
-	"pvorel@suse.cz" <pvorel@suse.cz>,
-	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>,
-	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>,
-	Wei W Wang <wei.w.wang@intel.com>, "jack@suse.cz" <jack@suse.cz>,
-	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
-	Yan Y Zhao <yan.y.zhao@intel.com>,
-	Dave Hansen <dave.hansen@intel.com>,
-	"ajones@ventanamicro.com" <ajones@ventanamicro.com>,
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>,
-	"aik@amd.com" <aik@amd.com>,
-	"usama.arif@bytedance.com" <usama.arif@bytedance.com>,
-	"willy@infradead.org" <willy@infradead.org>,
-	"rppt@kernel.org" <rppt@kernel.org>,
-	"bfoster@redhat.com" <bfoster@redhat.com>,
-	"quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>,
-	Fan Du <fan.du@intel.com>, "fvdl@google.com" <fvdl@google.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-	"mic@digikod.net" <mic@digikod.net>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"steven.price@arm.com" <steven.price@arm.com>,
-	"muchun.song@linux.dev" <muchun.song@linux.dev>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-	Zhiquan1 Li <zhiquan1.li@intel.com>,
-	"rientjes@google.com" <rientjes@google.com>,
-	"mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-	Erdem Aktas <erdemaktas@google.com>,
-	"david@redhat.com" <david@redhat.com>,
-	"hughd@google.com" <hughd@google.com>,
-	Haibo1 Xu <haibo1.xu@intel.com>,
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>,
-	"anup@brainfault.org" <anup@brainfault.org>,
-	"maz@kernel.org" <maz@kernel.org>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	"jthoughton@google.com" <jthoughton@google.com>,
-	"steven.sistare@oracle.com" <steven.sistare@oracle.com>,
-	"jarkko@kernel.org" <jarkko@kernel.org>,
-	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>,
-	Kirill Shutemov <kirill.shutemov@intel.com>,
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	Kai Huang <kai.huang@intel.com>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>,
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>,
-	Chao Peng <chao.p.peng@intel.com>,
-	"nikunj@amd.com" <nikunj@amd.com>, Alexander Graf <graf@amazon.com>,
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"jroedel@suse.de" <jroedel@suse.de>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"jgowans@amazon.com" <jgowans@amazon.com>,
-	Yilun Xu <yilun.xu@intel.com>,
-	"liam.merwick@oracle.com" <liam.merwick@oracle.com>,
-	"michael.roth@amd.com" <michael.roth@amd.com>,
-	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>,
-	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>,
-	Ira Weiny <ira.weiny@intel.com>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	"qperret@google.com" <qperret@google.com>,
-	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>,
-	"dmatlack@google.com" <dmatlack@google.com>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"roypat@amazon.co.uk" <roypat@amazon.co.uk>,
-	"ackerleytng@google.com" <ackerleytng@google.com>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"pgonda@google.com" <pgonda@google.com>,
-	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"will@kernel.org" <will@kernel.org>,
-	"hch@infradead.org" <hch@infradead.org>
-Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
-Message-ID: <20250516130950.GA530183@ziepe.ca>
-References: <cover.1747264138.git.ackerleytng@google.com>
- <ada87be8b9c06bc0678174b810e441ca79d67980.camel@intel.com>
- <CAGtprH9CTsVvaS8g62gTuQub4aLL97S7Um66q12_MqTFoRNMxA@mail.gmail.com>
- <24e8ae7483d0fada8d5042f9cd5598573ca8f1c5.camel@intel.com>
- <aCaM7LS7Z0L3FoC8@google.com>
+        bh=vRZigz65utFUqAMmPQfonu5ixQiHldB3hpjMC8Trs54=;
+        b=TGx+AlKwJ6gbZZEmFAXDxe5HPuo19khYCyz1xRT1A1Q7OKjGPgkn30nMumeH1/w3Q9
+         ukicbC8TP8lHNl0A/6DAegQpD7ev0WU2x7G8t9WL5UUS99r6DVv4r/D4vBZQKeHuc+tw
+         89D7P3RBR3VNj6N5X9TZiqA5nrU3NvdTFN1cTJ9k3l166XTRB2TGKxnHp421NqwDh25W
+         5FF5ro8Y4QzJfTwrLNGRgFbZmL8bvaeSdFsOg0jZZKrjQy4RUMzdaEwvSKLACbGACNId
+         gFpr73ChCRM08u7ZAUiMa7eeibvNlGsYRcYh+2mICeg1U9IPWruE245lF+ylszjDfTJ+
+         +n7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747401129; x=1748005929;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vRZigz65utFUqAMmPQfonu5ixQiHldB3hpjMC8Trs54=;
+        b=BQdlH/6Z+JZFvZNP24/fQX+Rz8D0CtGlF7q+z4/6aOuaaOgAupJxe8e9+ZuXy8u6Bn
+         q1Boo7zufMsKVPj3IhR6Vv8eerrBugIjln0UFBUeVq9iLtjvs+U88YTDsu215LxgBjdO
+         13Pu7HKaHoHX3+PIq+HPZJYPtQOg4dPC0XwdN7El9ZelaYoVURtHm9ZiCULYgd5uyVzR
+         khBIJeH1DnxpyzmvqukZLWxogVQYphIMcb263RQ3jXI3XSXhTpPTTqOP4xAGYcrNZ5Ip
+         jb12hXNF+m0D8pZmDHnLbFAmA2yvbulPZVWQC1WED+UHJ14ZYQd5JrDlB5D6g8QUW6cU
+         DJ/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUhsi4pI8V7tovBKUQRw0xL2qWxLsLYR66eh62RmZ2SSt4M0qj43P7u7hjTLjCU/DF8Nto=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxy05+6WPMXpXv0Ct3mctJNEqQlttxA36MYS7AGRlrwOusYioiq
+	4EO3dukngUgHmUZi0YsczxlQImzhPagPBKjV8W6qFd7GXb/Vn5slRz1Aaj6QLf4YmGEJuNdT1r8
+	BGgut0GAha0FCL34LZYzaKlLyskaGmHz04Cq3jbep
+X-Gm-Gg: ASbGncukPUNwvPJIMMhV+rj/GjrUK00ecYVXlHyRyI4QMdkw6b+FKPM3ibFilQHWmdt
+	ouLvZXIwT+VV4EqN4Eo43x3eO0/nEfFJkSOmU2mgYO/NQrDLi7tA01qwDv27PWZEZbT7i5bSRz0
+	q4EBI1T3FavKN0bqvB64L6TkeoicQcw8TkQ1auDj5kNoaKOPm8isKQc0hUilwhn1sx
+X-Google-Smtp-Source: AGHT+IHWzQxgLF5GinQQAT7heQR9B/bnByY6NVpp33fJcRw7lCpA5vIJ/aZyc6R8k4XwPwfMJ4BqgdEyoxgbu+RiAgI=
+X-Received: by 2002:a17:902:d2c6:b0:223:37ec:63be with SMTP id
+ d9443c01a7336-231b497f774mr6867365ad.4.1747401128820; Fri, 16 May 2025
+ 06:12:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aCaM7LS7Z0L3FoC8@google.com>
+References: <cover.1747264138.git.ackerleytng@google.com> <ada87be8b9c06bc0678174b810e441ca79d67980.camel@intel.com>
+ <CAGtprH9CTsVvaS8g62gTuQub4aLL97S7Um66q12_MqTFoRNMxA@mail.gmail.com>
+ <24e8ae7483d0fada8d5042f9cd5598573ca8f1c5.camel@intel.com>
+ <aCaM7LS7Z0L3FoC8@google.com> <7d3b391f3a31396bd9abe641259392fd94b5e72f.camel@intel.com>
+In-Reply-To: <7d3b391f3a31396bd9abe641259392fd94b5e72f.camel@intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Fri, 16 May 2025 06:11:56 -0700
+X-Gm-Features: AX0GCFs6I9TXzPWCzzMaQ_r47X6z5Mtwr_vfS-VvWPoNm6giHe9GgjB_h50xjcU
+Message-ID: <CAGtprH8EMnmvvVir6_U+L5S3SEvrU1OzLrvkL58fXgfg59bjoA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "seanjc@google.com" <seanjc@google.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
+	"Miao, Jun" <jun.miao@intel.com>, "Shutemov, Kirill" <kirill.shutemov@intel.com>, 
+	"pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, "steven.price@arm.com" <steven.price@arm.com>, 
+	"peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"amoorthy@google.com" <amoorthy@google.com>, "tabba@google.com" <tabba@google.com>, 
+	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "maz@kernel.org" <maz@kernel.org>, 
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, 
+	"keirf@google.com" <keirf@google.com>, "hughd@google.com" <hughd@google.com>, 
+	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
+	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
+	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, "willy@infradead.org" <willy@infradead.org>, 
+	"jack@suse.cz" <jack@suse.cz>, "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, "aik@amd.com" <aik@amd.com>, 
+	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, 
+	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "fvdl@google.com" <fvdl@google.com>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
+	"nsaenz@amazon.es" <nsaenz@amazon.es>, "vbabka@suse.cz" <vbabka@suse.cz>, "Du, Fan" <fan.du@intel.com>, 
+	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "mic@digikod.net" <mic@digikod.net>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "bfoster@redhat.com" <bfoster@redhat.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
+	"Li, Zhiquan1" <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
+	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, "Aktas, Erdem" <erdemaktas@google.com>, 
+	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "Xu, Haibo1" <haibo1.xu@intel.com>, 
+	"anup@brainfault.org" <anup@brainfault.org>, "Hansen, Dave" <dave.hansen@intel.com>, 
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
+	"Wang, Wei W" <wei.w.wang@intel.com>, 
+	"steven.sistare@oracle.com" <steven.sistare@oracle.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
+	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
+	"Huang, Kai" <kai.huang@intel.com>, "shuah@kernel.org" <shuah@kernel.org>, 
+	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, 
+	"Peng, Chao P" <chao.p.peng@intel.com>, "nikunj@amd.com" <nikunj@amd.com>, 
+	"Graf, Alexander" <graf@amazon.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"jgowans@amazon.com" <jgowans@amazon.com>, "Xu, Yilun" <yilun.xu@intel.com>, 
+	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, 
+	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, "Weiny, Ira" <ira.weiny@intel.com>, 
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
+	"qperret@google.com" <qperret@google.com>, 
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "dmatlack@google.com" <dmatlack@google.com>, 
+	"james.morse@arm.com" <james.morse@arm.com>, "brauner@kernel.org" <brauner@kernel.org>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "pgonda@google.com" <pgonda@google.com>, 
+	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "will@kernel.org" <will@kernel.org>, 
+	"hch@infradead.org" <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 15, 2025 at 05:57:57PM -0700, Sean Christopherson wrote:
+On Thu, May 15, 2025 at 7:12=E2=80=AFPM Edgecombe, Rick P
+<rick.p.edgecombe@intel.com> wrote:
+>
+> On Thu, 2025-05-15 at 17:57 -0700, Sean Christopherson wrote:
+> > > > > Thinking from the TDX perspective, we might have bigger fish to f=
+ry than
+> > > > > 1.6% memory savings (for example dynamic PAMT), and the rest of t=
+he
+> > > > > benefits don't have numbers. How much are we getting for all the
+> > > > > complexity, over say buddy allocated 2MB pages?
+> >
+> > TDX may have bigger fish to fry, but some of us have bigger fish to fry=
+ than
+> > TDX :-)
+>
+> Fair enough. But TDX is on the "roadmap". So it helps to say what the tar=
+get of
+> this series is.
+>
+> >
+> > > > This series should work for any page sizes backed by hugetlb memory=
+.
+> > > > Non-CoCo VMs, pKVM and Confidential VMs all need hugepages that are
+> > > > essential for certain workloads and will emerge as guest_memfd user=
+s.
+> > > > Features like KHO/memory persistence in addition also depend on
+> > > > hugepage support in guest_memfd.
+> > > >
+> > > > This series takes strides towards making guest_memfd compatible wit=
+h
+> > > > usecases where 1G pages are essential and non-confidential VMs are
+> > > > already exercising them.
+> > > >
+> > > > I think the main complexity here lies in supporting in-place
+> > > > conversion which applies to any huge page size even for buddy
+> > > > allocated 2MB pages or THP.
+> > > >
+> > > > This complexity arises because page structs work at a fixed
+> > > > granularity, future roadmap towards not having page structs for gue=
+st
+> > > > memory (at least private memory to begin with) should help towards
+> > > > greatly reducing this complexity.
+> > > >
+> > > > That being said, DPAMT and huge page EPT mappings for TDX VMs remai=
+n
+> > > > essential and complement this series well for better memory footpri=
+nt
+> > > > and overall performance of TDX VMs.
+> > >
+> > > Hmm, this didn't really answer my questions about the concrete benefi=
+ts.
+> > >
+> > > I think it would help to include this kind of justification for the 1=
+GB
+> > > guestmemfd pages. "essential for certain workloads and will emerge" i=
+s a bit
+> > > hard to review against...
+> > >
+> > > I think one of the challenges with coco is that it's almost like a sp=
+rint to
+> > > reimplement virtualization. But enough things are changing at once th=
+at not
+> > > all of the normal assumptions hold, so it can't copy all the same sol=
+utions.
+> > > The recent example was that for TDX huge pages we found that normal
+> > > promotion paths weren't actually yielding any benefit for surprising =
+TDX
+> > > specific reasons.
+> > >
+> > > On the TDX side we are also, at least currently, unmapping private pa=
+ges
+> > > while they are mapped shared, so any 1GB pages would get split to 2MB=
+ if
+> > > there are any shared pages in them. I wonder how many 1GB pages there=
+ would
+> > > be after all the shared pages are converted. At smaller TD sizes, it =
+could
+> > > be not much.
+> >
+> > You're conflating two different things.  guest_memfd allocating and man=
+aging
+> > 1GiB physical pages, and KVM mapping memory into the guest at 1GiB/2MiB
+> > granularity.  Allocating memory in 1GiB chunks is useful even if KVM ca=
+n only
+> > map memory into the guest using 4KiB pages.
+>
+> I'm aware of the 1.6% vmemmap benefits from the LPC talk. Is there more? =
+The
+> list quoted there was more about guest performance. Or maybe the clever p=
+age
+> table walkers that find contiguous small mappings could benefit guest
+> performance too? It's the kind of thing I'd like to see at least broadly =
+called
+> out.
 
-> You're conflating two different things.  guest_memfd allocating and managing
-> 1GiB physical pages, and KVM mapping memory into the guest at 1GiB/2MiB
-> granularity.  Allocating memory in 1GiB chunks is useful even if KVM can only
-> map memory into the guest using 4KiB pages.
+The crux of this series really is hugetlb backing support for
+guest_memfd and handling CoCo VMs irrespective of the page size as I
+suggested earlier, so 2M page sizes will need to handle similar
+complexity of in-place conversion.
 
-Even if KVM is limited to 4K the IOMMU might not be - alot of these
-workloads have a heavy IO component and we need the iommu to perform
-well too.
+Google internally uses 1G hugetlb pages to achieve high bandwidth IO,
+lower memory footprint using HVO and lower MMU/IOMMU page table memory
+footprint among other improvements. These percentages carry a
+substantial impact when working at the scale of large fleets of hosts
+each carrying significant memory capacity.
 
-Frankly, I don't think there should be objection to making memory more
-contiguous. There is alot of data that this always brings wins
-somewhere for someone.
+guest_memfd hugepage support + hugepage EPT mapping support for TDX
+VMs significantly help:
+1) ~70% decrease in TDX VM boot up time
+2) ~65% decrease in TDX VM shutdown time
+3) ~90% decrease in TDX VM PAMT memory overhead
+4) Improvement in TDX SEPT memory overhead
 
-> The longer term goal of guest_memfd is to make it suitable for backing all VMs,
-> hence Vishal's "Non-CoCo VMs" comment.  Yes, some of this is useful for TDX, but
-> we (and others) want to use guest_memfd for far more than just CoCo VMs.  And
-> for non-CoCo VMs, 1GiB hugepages are mandatory for various workloads.
+And we believe this combination should also help achieve better
+performance with TDX connect in future.
 
-Yes, even from an iommu perspective with 2D translation we need to
-have the 1G pages from the S2 resident in the IOTLB or performance
-falls off a cliff.
+Hugetlb huge pages are preferred as they are statically carved out at
+boot and so provide much better guarantees of availability. Once the
+pages are carved out, any VMs scheduled on such a host will need to
+work with the same hugetlb memory sizes. This series attempts to use
+hugetlb pages with in-place conversion, avoiding the double allocation
+problem that otherwise results in significant memory overheads for
+CoCo VMs.
 
-Jason
+>
+> I'm thinking that Google must have a ridiculous amount of learnings about=
+ VM
+> memory management. And this is probably designed around those learnings. =
+But
+> reviewers can't really evaluate it if they don't know the reasons and tra=
+deoffs
+> taken. If it's going upstream, I think it should have at least the high l=
+evel
+> reasoning explained.
+>
+> I don't mean to harp on the point so hard, but I didn't expect it to be
+> controversial either.
+>
+> >
+> > > So for TDX in isolation, it seems like jumping out too far ahead to
+> > > effectively consider the value. But presumably you guys are testing t=
+his on
+> > > SEV or something? Have you measured any performance improvement? For =
+what
+> > > kind of applications? Or is the idea to basically to make guestmemfd =
+work
+> > > like however Google does guest memory?
+> >
+> > The longer term goal of guest_memfd is to make it suitable for backing =
+all
+> > VMs, hence Vishal's "Non-CoCo VMs" comment.
+>
+> Oh, I actually wasn't aware of this. Or maybe I remember now. I thought h=
+e was
+> talking about pKVM.
+>
+> >   Yes, some of this is useful for TDX, but we (and others) want to use
+> > guest_memfd for far more than just CoCo VMs.
+>
+>
+> >  And for non-CoCo VMs, 1GiB hugepages are mandatory for various workloa=
+ds.
+> I've heard this a lot. It must be true, but I've never seen the actual nu=
+mbers.
+> For a long time people believed 1GB huge pages on the direct map were cri=
+tical,
+> but then benchmarking on a contemporary CPU couldn't find much difference
+> between 2MB and 1GB. I'd expect TDP huge pages to be different than that =
+because
+> the combined walks are huge, iTLB, etc, but I'd love to see a real number=
+.
 
