@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-46861-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46862-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F791ABA396
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 21:21:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75852ABA39A
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 21:22:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE3DC507B8B
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 19:21:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D91E7BA93A
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 19:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8DD28135C;
-	Fri, 16 May 2025 19:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5E228150D;
+	Fri, 16 May 2025 19:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JDXEf5Dr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o4aaaQ9s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1827528032D
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 19:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCB6280CF5
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 19:19:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747423199; cv=none; b=u5yBfqIYAeceLA3D7Sq9X/4yRfPJoCNqKsdDgOCxSJAUmi3Gv3NLdUqUZ5FImZHXpADXQkjwoiIrmcUVGM9TO7MRHIWcFOoq89QSAbJqOyBxWIvoT/essm5bVj6IJ4U/99Z3QOamMf5vSNy6ag1tXFivIliduJqdt4/dBeIlv4A=
+	t=1747423201; cv=none; b=n6dyBXFmkd2Gmhgbv7vdc9JTUtzmMwgx+al5z+k7Ym/fa362uzaoIvTm2S04jaerZbDuUEEKZE0NIFIG6ZjYUr+j7t1dXqMXLsQl+6eSl4Y1R/vIUYftiG7Ts1EqMammdObh27mNXjgTHeyGQNbzpotRIkyXWnQ1c0TyxmAsmJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747423199; c=relaxed/simple;
-	bh=/R9vB/KqEvAjXWixKptCo/7lWCpS9NBKQF8SStvrMlc=;
+	s=arc-20240116; t=1747423201; c=relaxed/simple;
+	bh=3OVBGplhuLyJXi91gK0acJyrlMFbObAXSg45TnNYvbw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gDMvUdZORQlHCkeFu9L/Bb7nmmeb0regudqXxEt0onY2nNKp69ySTPuUTlnw59udY756PumbDdT0A8iycmcm5KOKS7lc4yg6q4njrU69ziiLvrJkUc0iPMg7wQqVBn/kLzRRj1HZCxwThSekCEsjP6TVRoCCNQkCC4kbzjpc5FU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JDXEf5Dr; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=ZQiijHeLeVRFeQ5yz5AGW5Yc7+cEVZlMs+YmdlhsQmkaCmY5Aw2VZrxF4d+UmziQizOPao16c+XT+uF/lOW4g2IjbUi/eKZSAo5WdJDd9akvng5CL/I61xUXon1othSBY1G+qML+ZjfBp0cJi2uW0Gm2TCXul6b3lBlZsDouw+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o4aaaQ9s; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30c8c9070d2so3918076a91.0
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 12:19:57 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b0f807421c9so1436009a12.0
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 12:19:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747423197; x=1748027997; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747423199; x=1748027999; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fj+O3835hB+mDLIwn62GyrN5K+Himp712LOqeVzKuMw=;
-        b=JDXEf5DrhNAjKz3Pxbn2Wmciu0O/sMxPTAEWXU+/VEP7riA+/8rwR4YPbiz7pUEYu2
-         jMX2Wt41mRUlJDnhlzChVONUaDzkju/SZnrCbwndPYN+p4ckrjjCzCRXOjOzZ2xTJZbP
-         MLwOkt9ElCqagjlly6FPoUPayJ/CCz09mgu5I/+4yydKGezq/oQU+6IrbSNh3Q3I1oas
-         dQkmZ+P1uEzBaEoDpJo9s+HIvaR99n3qFEFIzRXQkYufjhTLIBMLaXMKx1loR6i8B5Dt
-         F/TcnJTMYJycaG6v2a+ml2xwPfgy4boIb3w2+cdQ51WrBlENeY2QdT14UHteg3PtQJDs
-         btCw==
+        bh=7Ey+qHNz3Id949hQmd8IqzRnzJEXEhx4K2zZ7tQ+zaA=;
+        b=o4aaaQ9sGG6wCtxro+Qc8JnHRiR6pDBRMUX4USXdy74+puTRJ89aVNbNjkQcOErHs5
+         k8FY7BH+w3EJBdGXttIl0DWOeOIsLGsUzcsAR/sAehTL80T5KVjVexv7R2T9YP2t3IQZ
+         wccPBBXqM9cwZpJGSFMkg/lbpiDu0BMTtRnUSLSnA4XeKMptLoDhvlSQaZTvCLlozXVv
+         mi7GwXGMLxanIxcPSHyyFwBGFzDyRli53AIQgTGyo6Cj4lmYA98vS3sPHALMGaaYPNAf
+         lWZ+OIjytDZMy07GWlVSMeRHL7wZiUXw9poQq77Mr9pscSenf3WxEFNkpUEalQo/Bv6e
+         kV/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747423197; x=1748027997;
+        d=1e100.net; s=20230601; t=1747423199; x=1748027999;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fj+O3835hB+mDLIwn62GyrN5K+Himp712LOqeVzKuMw=;
-        b=seRv4RtHYBPwcIxc9trcUp5hhnuOblFcgbflLmirUb0WYcJfLhlBlUyFYKeIGdTO9C
-         8njKRGundV38lahAFiAakPqyW2gYAwc7VSMRUZyx4qXDeYILOtea+eaic2VwFymXU9T2
-         ikRegXfzp9VKjae1TxSkcWZWeB2uN2alPLqkFOStCe5EB25rpYl4Gd5LfMtEfs1vI8R3
-         gmJa+Mi3Iy+aN5DTEkiYPpOobILOlVeOIpQaChlmHvQQcuGZVMO+96/I9w2/ErWsE/uD
-         664o9Yaqwzz0f7gYut+uMsbQWBak14623ZGeBLjoXmck3QJakchZoLhVLYdXxNtG2TWs
-         jnxw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4NqMH50pfWkaYAHkZPhl1wvGTBcqx+KH+T1XzUptOnHEP6LUun/YuYxk4Idtkwb4bQEI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx87QhtClcG4AxziWdL8faf/OvNBcRS7vMflfbWdInacaog8sMQ
-	xHiZlfJlaQ+tgXuzWwUEjNxPAziZhvGnQedW3Z3y59zTKsC9TXpC/R5o3kAEZLwGuu3RiZAWJnw
-	IjV5E9ukV7w==
-X-Google-Smtp-Source: AGHT+IHsBpALK/e0rg+JB1mNGETo/0o1fwTI4vHuGOsLELeZyBF3WgvYCnwYUD0i5CByXpXpO2KcQaRcAv/0
-X-Received: from pjbqn6.prod.google.com ([2002:a17:90b:3d46:b0:2fc:ccfe:368])
- (user=afranji job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e185:b0:2ff:6ac2:c5a5
- with SMTP id 98e67ed59e1d1-30e7d5a8600mr5955317a91.26.1747423197397; Fri, 16
- May 2025 12:19:57 -0700 (PDT)
-Date: Fri, 16 May 2025 19:19:26 +0000
+        bh=7Ey+qHNz3Id949hQmd8IqzRnzJEXEhx4K2zZ7tQ+zaA=;
+        b=ibSU7R1WpOL4chXemUex7dG7r56lQKAfqWe2WlhTcil3MY4Fl5TdlM8zTnLNZh7p4f
+         wU27VTPHljVB2+yCJ9SGZ2vPRvcQwoyT3puDsXaZP86+WzjpFInpjFXFkJS/Bu58N2Js
+         JD+XFSxBetikUP0xoMS8A7MD1LFP38LWkcQue45sL0KLfyteyCSw/rKP3vWOY1KNpkuv
+         LGoXFJSCEgAPMSnP+8T8JC2jgBJQ0S4VOfbnvK6yggBl/chifQstM9Xm6EMr5Pq/fktS
+         +ZCv98Oi0br+g7Nhsssa0rbdTfBiVLt4oooLg6q0k+mXZCtX8O0Xde5kr8byToegcc7p
+         lQEw==
+X-Forwarded-Encrypted: i=1; AJvYcCWvos2v2bXyz/SytwavvwpRiuePFA3ZdzV6ebSD/TUYhqjosIcvQIVGjpypYbOm0gKTlmw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzk0RgfNoRKetRbQVN7XXOB4GAV5UHEJUuxv40hupwxZ4XKGcZW
+	+ns09PysNbsdvKu/4dMdsUcgemHLv3kAqAlaPQTQPEqfA0d77JKHU2kxpYoxTeYoVY7khkjQSoz
+	U963q9JrJpA==
+X-Google-Smtp-Source: AGHT+IF3tOGDs3uMTUXFN04Lh1XuUUSb8FRl25FYpCEolQddp0RRUtONR8vJwzDBqRDLQzwKKqJKODObKV73
+X-Received: from pjz15.prod.google.com ([2002:a17:90b:56cf:b0:2ef:786a:1835])
+ (user=afranji job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d407:b0:30e:823f:ef25
+ with SMTP id 98e67ed59e1d1-30e823fefedmr5901603a91.28.1747423198880; Fri, 16
+ May 2025 12:19:58 -0700 (PDT)
+Date: Fri, 16 May 2025 19:19:27 +0000
 In-Reply-To: <cover.1747368092.git.afranji@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1747368092.git.afranji@google.com>
 X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <d6ebd0aa1d9f38e4b10a100bfd09df49cddafe73.1747368093.git.afranji@google.com>
-Subject: [RFC PATCH v2 06/13] KVM: selftests: Test transferring private memory
- to another VM
+Message-ID: <6ef77cc986aa89c1799cf3709de30edd6e4e70ee.1747368093.git.afranji@google.com>
+Subject: [RFC PATCH v2 07/13] KVM: x86: Refactor sev's flag
+ migration_in_progress to kvm struct
 From: Ryan Afranji <afranji@google.com>
 To: afranji@google.com, ackerleytng@google.com, pbonzini@redhat.com, 
 	seanjc@google.com, tglx@linutronix.de, x86@kernel.org, kvm@vger.kernel.org, 
@@ -93,106 +93,97 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ackerley Tng <ackerleytng@google.com>
 
+The migration_in_progress flag will also be needed for migration of
+non-sev VMs.
+
+Co-developed-by: Sagi Shahar <sagis@google.com>
+Signed-off-by: Sagi Shahar <sagis@google.com>
+Co-developed-by: Vishal Annapurve <vannapurve@google.com>
+Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Ryan Afranji <afranji@google.com>
 ---
- .../kvm/x86/private_mem_migrate_tests.c       | 87 +++++++++++++++++++
- 1 file changed, 87 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/private_mem_migrate_tests.c
+ arch/x86/kvm/svm/sev.c   | 17 ++++++-----------
+ arch/x86/kvm/svm/svm.h   |  1 -
+ include/linux/kvm_host.h |  1 +
+ 3 files changed, 7 insertions(+), 12 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86/private_mem_migrate_tests.c b/tools/testing/selftests/kvm/x86/private_mem_migrate_tests.c
-new file mode 100644
-index 000000000000..4226de3ebd41
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/private_mem_migrate_tests.c
-@@ -0,0 +1,87 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include "kvm_util_base.h"
-+#include "test_util.h"
-+#include "ucall_common.h"
-+#include <linux/kvm.h>
-+#include <linux/sizes.h>
-+
-+#define TRANSFER_PRIVATE_MEM_TEST_SLOT 10
-+#define TRANSFER_PRIVATE_MEM_GPA ((uint64_t)(1ull << 32))
-+#define TRANSFER_PRIVATE_MEM_GVA TRANSFER_PRIVATE_MEM_GPA
-+#define TRANSFER_PRIVATE_MEM_VALUE 0xdeadbeef
-+
-+static void transfer_private_mem_guest_code_src(void)
-+{
-+	uint64_t volatile *const ptr = (uint64_t *)TRANSFER_PRIVATE_MEM_GVA;
-+
-+	*ptr = TRANSFER_PRIVATE_MEM_VALUE;
-+
-+	GUEST_SYNC1(*ptr);
-+}
-+
-+static void transfer_private_mem_guest_code_dst(void)
-+{
-+	uint64_t volatile *const ptr = (uint64_t *)TRANSFER_PRIVATE_MEM_GVA;
-+
-+	GUEST_SYNC1(*ptr);
-+}
-+
-+static void test_transfer_private_mem(void)
-+{
-+	struct kvm_vm *src_vm, *dst_vm;
-+	struct kvm_vcpu *src_vcpu, *dst_vcpu;
-+	int src_memfd, dst_memfd;
-+	struct ucall uc;
-+
-+	const struct vm_shape shape = {
-+		.mode = VM_MODE_DEFAULT,
-+		.type = KVM_X86_SW_PROTECTED_VM,
-+	};
-+
-+	/* Build the source VM, use it to write to private memory */
-+	src_vm = __vm_create_shape_with_one_vcpu(
-+		shape, &src_vcpu, 0, transfer_private_mem_guest_code_src);
-+	src_memfd = vm_create_guest_memfd(src_vm, SZ_4K, 0);
-+
-+	vm_mem_add(src_vm, DEFAULT_VM_MEM_SRC, TRANSFER_PRIVATE_MEM_GPA,
-+		   TRANSFER_PRIVATE_MEM_TEST_SLOT, 1, KVM_MEM_PRIVATE,
-+		   src_memfd, 0);
-+
-+	virt_map(src_vm, TRANSFER_PRIVATE_MEM_GVA, TRANSFER_PRIVATE_MEM_GPA, 1);
-+	vm_set_memory_attributes(src_vm, TRANSFER_PRIVATE_MEM_GPA, SZ_4K,
-+				 KVM_MEMORY_ATTRIBUTE_PRIVATE);
-+
-+	vcpu_run(src_vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(src_vcpu, KVM_EXIT_IO);
-+	get_ucall(src_vcpu, &uc);
-+	TEST_ASSERT(uc.args[0] == TRANSFER_PRIVATE_MEM_VALUE,
-+		    "Source VM should be able to write to private memory");
-+
-+	/* Build the destination VM with linked fd */
-+	dst_vm = __vm_create_shape_with_one_vcpu(
-+		shape, &dst_vcpu, 0, transfer_private_mem_guest_code_dst);
-+	dst_memfd = vm_link_guest_memfd(dst_vm, src_memfd, 0);
-+
-+	vm_mem_add(dst_vm, DEFAULT_VM_MEM_SRC, TRANSFER_PRIVATE_MEM_GPA,
-+		   TRANSFER_PRIVATE_MEM_TEST_SLOT, 1, KVM_MEM_PRIVATE,
-+		   dst_memfd, 0);
-+
-+	virt_map(dst_vm, TRANSFER_PRIVATE_MEM_GVA, TRANSFER_PRIVATE_MEM_GPA, 1);
-+	vm_set_memory_attributes(dst_vm, TRANSFER_PRIVATE_MEM_GPA, SZ_4K,
-+				 KVM_MEMORY_ATTRIBUTE_PRIVATE);
-+
-+	vcpu_run(dst_vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(dst_vcpu, KVM_EXIT_IO);
-+	get_ucall(dst_vcpu, &uc);
-+	TEST_ASSERT(uc.args[0] == TRANSFER_PRIVATE_MEM_VALUE,
-+		    "Destination VM should be able to read value transferred");
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	TEST_REQUIRE(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM));
-+
-+	test_transfer_private_mem();
-+
-+	return 0;
-+}
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 0bc708ee2788..89c06cfcc200 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1838,8 +1838,6 @@ static bool is_cmd_allowed_from_mirror(u32 cmd_id)
+ 
+ static int sev_lock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
+ {
+-	struct kvm_sev_info *dst_sev = to_kvm_sev_info(dst_kvm);
+-	struct kvm_sev_info *src_sev = to_kvm_sev_info(src_kvm);
+ 	int r = -EBUSY;
+ 
+ 	if (dst_kvm == src_kvm)
+@@ -1849,10 +1847,10 @@ static int sev_lock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
+ 	 * Bail if these VMs are already involved in a migration to avoid
+ 	 * deadlock between two VMs trying to migrate to/from each other.
+ 	 */
+-	if (atomic_cmpxchg_acquire(&dst_sev->migration_in_progress, 0, 1))
++	if (atomic_cmpxchg_acquire(&dst_kvm->migration_in_progress, 0, 1))
+ 		return -EBUSY;
+ 
+-	if (atomic_cmpxchg_acquire(&src_sev->migration_in_progress, 0, 1))
++	if (atomic_cmpxchg_acquire(&src_kvm->migration_in_progress, 0, 1))
+ 		goto release_dst;
+ 
+ 	r = -EINTR;
+@@ -1865,21 +1863,18 @@ static int sev_lock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
+ unlock_dst:
+ 	mutex_unlock(&dst_kvm->lock);
+ release_src:
+-	atomic_set_release(&src_sev->migration_in_progress, 0);
++	atomic_set_release(&src_kvm->migration_in_progress, 0);
+ release_dst:
+-	atomic_set_release(&dst_sev->migration_in_progress, 0);
++	atomic_set_release(&dst_kvm->migration_in_progress, 0);
+ 	return r;
+ }
+ 
+ static void sev_unlock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
+ {
+-	struct kvm_sev_info *dst_sev = to_kvm_sev_info(dst_kvm);
+-	struct kvm_sev_info *src_sev = to_kvm_sev_info(src_kvm);
+-
+ 	mutex_unlock(&dst_kvm->lock);
+ 	mutex_unlock(&src_kvm->lock);
+-	atomic_set_release(&dst_sev->migration_in_progress, 0);
+-	atomic_set_release(&src_sev->migration_in_progress, 0);
++	atomic_set_release(&dst_kvm->migration_in_progress, 0);
++	atomic_set_release(&src_kvm->migration_in_progress, 0);
+ }
+ 
+ /* vCPU mutex subclasses.  */
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index d4490eaed55d..35df8be621c5 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -107,7 +107,6 @@ struct kvm_sev_info {
+ 	struct list_head mirror_vms; /* List of VMs mirroring */
+ 	struct list_head mirror_entry; /* Use as a list entry of mirrors */
+ 	struct misc_cg *misc_cg; /* For misc cgroup accounting */
+-	atomic_t migration_in_progress;
+ 	void *snp_context;      /* SNP guest context page */
+ 	void *guest_req_buf;    /* Bounce buffer for SNP Guest Request input */
+ 	void *guest_resp_buf;   /* Bounce buffer for SNP Guest Request output */
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 1dedc421b3e3..0c1d637a6e7d 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -862,6 +862,7 @@ struct kvm {
+ 	/* Protected by slots_locks (for writes) and RCU (for reads) */
+ 	struct xarray mem_attr_array;
+ #endif
++	atomic_t migration_in_progress;
+ 	char stats_id[KVM_STATS_NAME_SIZE];
+ };
+ 
 -- 
 2.49.0.1101.gccaa498523-goog
 
