@@ -1,245 +1,114 @@
-Return-Path: <kvm+bounces-46809-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46810-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8690EAB9DF9
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 15:51:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED37AB9E05
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 15:54:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A27E01890F5A
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 13:51:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 202584E1EDD
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 13:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E19D153BED;
-	Fri, 16 May 2025 13:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AFFE136347;
+	Fri, 16 May 2025 13:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cP1EnUur"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DEFF4B1E73;
-	Fri, 16 May 2025 13:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A273672601
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 13:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747403438; cv=none; b=kT24H2td1vtcFLehX5HMItc5vwqvEY0rpy0e2gthF3KsFQ2s4o4c57nx61hwZUNtGkF1lX7AV2zNffiIWSz/aBlKU3z23uDNrEJ04PgKtbNljEYNLeB2WUf6hHO9st62SIo4sfZNzmGditpE5p/QonHMAn7YH4939fB/+tpwE/E=
+	t=1747403670; cv=none; b=fvbfbs93TQb/Ogx0mDxIp4Cc8QiAoKWOIcmUpTfGmI35u1tKTBPu9RQt5SWX72nEMPhV2W/66FfLXYNhJ+G2jyVUrD/bwroOH8jjI6hagQweac+67nZ4uFvm455pjOH+Yu8O1zNe++DtiIUywUR1V4ix0/MFqOU6vTA+DiJKFPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747403438; c=relaxed/simple;
-	bh=0THkZyxxSuZVTH5og5hjwibotSM4qUDA6bNyzgM51BM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GWgTWM5899gOyN1kFSEjQbKuMqU4xwi7fGB4Oqtwl3QX2mbmQQFYllF5UxKHLDzM8aJl2oTxDXRcEtBIfVSRSIvq5dV60BzzJnKstPjtP4atXXysre8mcwm6yJsq0IDDj6o271xATnHv+BUIYNfU7tas8Zse/ka7S5dD3Eh9e1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C511169C;
-	Fri, 16 May 2025 06:50:23 -0700 (PDT)
-Received: from [10.1.27.17] (e122027.cambridge.arm.com [10.1.27.17])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EAE733F673;
-	Fri, 16 May 2025 06:50:30 -0700 (PDT)
-Message-ID: <c4c2d45a-0c9f-41ee-8659-d119edda457b@arm.com>
-Date: Fri, 16 May 2025 14:50:28 +0100
+	s=arc-20240116; t=1747403670; c=relaxed/simple;
+	bh=C7Ii4OS+lxxxizXe6a0Y+j3ekj3OuHIkNw86WOZShJ4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZsfAVm/IAOTklVhe8mAWcc5JpooHf/biczixzhav41RqW1rVCLc1KDqE1l8MGmhoFLg89IE2CVVoK2GUXK7282kWM36LgA70wDglWnanNsf9Sw+mBpy+tTTahLBiUcdJpGiK49fJptaSindfSOwacYf+Gh7emcmD6IXTgKldGlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cP1EnUur; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2801C4CEE4;
+	Fri, 16 May 2025 13:54:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747403670;
+	bh=C7Ii4OS+lxxxizXe6a0Y+j3ekj3OuHIkNw86WOZShJ4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=cP1EnUurIruml39wNmTO916nwYV+JYsFTfnPP4nmjkaih3cGNOdQ9z4N0TbXPE48V
+	 zYmBC78TTb004+vCQE1NpvjKsIarFG4VohkLfJj6OiqAzaS8OZ28EXgDx0f0DrDa6h
+	 1fNsWCOBqOuhZsjd4ADjabrCtgBEH/14EqvO0Vfn+datPh9GrRWBcgg3VicNv/0csM
+	 ldMmmqXUbseIsffincpiS9ONc04q4SDM7QG65hs/WvPhdV3SG644WXYbgqh38S6ER4
+	 3nISgaBqtAW5Km97OFt1D7bEVoH5+gg6NQd6GBw8kuTtzfu6oLlG4NBKBBoQDn0Ojh
+	 /02Fxkf4SP4UQ==
+From: Will Deacon <will@kernel.org>
+To: julien.thierry.kdev@gmail.com,
+	maz@kernel.org,
+	Anup Patel <apatel@ventanamicro.com>
+Cc: catalin.marinas@arm.com,
+	kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Atish Patra <atishp@atishpatra.org>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Anup Patel <anup@brainfault.org>,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Subject: Re: [kvmtool PATCH v3 00/10] Add SBI system suspend and cpu-type option
+Date: Fri, 16 May 2025 14:54:24 +0100
+Message-Id: <174740291953.2568869.1965604295335396910.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20250426110348.338114-1-apatel@ventanamicro.com>
+References: <20250426110348.338114-1-apatel@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 17/43] arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-18-steven.price@arm.com>
- <54a21b12-2b17-4e0a-9cbf-f68406fb003a@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <54a21b12-2b17-4e0a-9cbf-f68406fb003a@arm.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On 07/05/2025 11:42, Suzuki K Poulose wrote:
-> On 16/04/2025 14:41, Steven Price wrote:
->> The guest can request that a region of it's protected address space is
->> switched between RIPAS_RAM and RIPAS_EMPTY (and back) using
->> RSI_IPA_STATE_SET. This causes a guest exit with the
->> RMI_EXIT_RIPAS_CHANGE code. We treat this as a request to convert a
->> protected region to unprotected (or back), exiting to the VMM to make
->> the necessary changes to the guest_memfd and memslot mappings. On the
->> next entry the RIPAS changes are committed by making RMI_RTT_SET_RIPAS
->> calls.
->>
->> The VMM may wish to reject the RIPAS change requested by the guest. For
->> now it can only do with by no longer scheduling the VCPU as we don't
->> currently have a usecase for returning that rejection to the guest, but
->> by postponing the RMI_RTT_SET_RIPAS changes to entry we leave the door
->> open for adding a new ioctl in the future for this purpose.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v7:
->>   * Rework the loop in realm_set_ipa_state() to make it clear when the
->>     'next' output value of rmi_rtt_set_ripas() is used.
->> New patch for v7: The code was previously split awkwardly between two
->> other patches.
->> ---
->>   arch/arm64/kvm/rme.c | 88 ++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 88 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->> index bee9dfe12e03..fe0d5b8703d2 100644
->> --- a/arch/arm64/kvm/rme.c
->> +++ b/arch/arm64/kvm/rme.c
->> @@ -624,6 +624,65 @@ void kvm_realm_unmap_range(struct kvm *kvm,
->> unsigned long start,
->>           realm_unmap_private_range(kvm, start, end);
->>   }
->>   +static int realm_set_ipa_state(struct kvm_vcpu *vcpu,
->> +                   unsigned long start,
->> +                   unsigned long end,
->> +                   unsigned long ripas,
->> +                   unsigned long *top_ipa)
->> +{
->> +    struct kvm *kvm = vcpu->kvm;
->> +    struct realm *realm = &kvm->arch.realm;
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +    phys_addr_t rd_phys = virt_to_phys(realm->rd);
->> +    phys_addr_t rec_phys = virt_to_phys(rec->rec_page);
->> +    struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
->> +    unsigned long ipa = start;
->> +    int ret = 0;
->> +
->> +    while (ipa < end) {
->> +        unsigned long next;
->> +
->> +        ret = rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &next);
->> +
->> +        if (RMI_RETURN_STATUS(ret) == RMI_SUCCESS) {
->> +            ipa = next;
->> +        } else if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->> +            int walk_level = RMI_RETURN_INDEX(ret);
->> +            int level = find_map_level(realm, ipa, end);
->> +
->> +            /*
->> +             * If the RMM walk ended early then more tables are
->> +             * needed to reach the required depth to set the RIPAS.
->> +             */
->> +            if (walk_level < level) {
->> +                ret = realm_create_rtt_levels(realm, ipa,
->> +                                  walk_level,
->> +                                  level,
->> +                                  memcache);
->> +                /* Retry with RTTs created */
+On Sat, 26 Apr 2025 16:33:37 +0530, Anup Patel wrote:
+> This series does the following improvements:
+> 1) Add Svvptc, Zabha, and Ziccrse extension support (PATCH2 to PATCH3)
+> 2) Add SBI system suspend support (PATCH5 to PATCH6)
+> 3) Add "--cpu-type" command-line option supporting "min" and "max"
+>    CPU types where "max" is the default (PATCH8 to PATCH10)
 > 
-> minor nit: Do we need to add a comment here, saying, we stop processing
-> the request if we run out of RTT pages in this go and Realm could retry
-> it.
-
-I'm not really sure this is the right place, and following Gavin's
-comment I've combined this with the INIT_RIPAS code.
-
-Also the situation at the moment isn't that we return to the guest -
-kvm_complete_ripas_change() will topup the memory cache and retry until
-the whole region is covered. There is an argument that perhaps it
-shouldn't, but I'm not sure what a guest can usefully do beyond retry in
-the case of a partial RIPAS change. In which case why have the overhead
-of returning to the guest?
-
->> +                if (!ret)
->> +                    continue;
->> +            } else {
->> +                ret = -EINVAL;
->> +            }
->> +
->> +            break;
->> +        } else {
->> +            WARN(1, "Unexpected error in %s: %#x\n", __func__,
->> +                 ret);
->> +            ret = -ENXIO;
->> +            break;
->> +        }
+> These patches can also be found in the riscv_more_exts_round6_v3 branch
+> at: https://github.com/avpatel/kvmtool.git
 > 
-> minor nit: Following from Gavin's comment on another patch, could
-> switch() make the above code more readable and remove the continue; ?
-> 
->         switch (RMI_RETURN_STATUS(ret)) {
->         case RMI_SUCCESS:
->             ipa = next;
->             break;
->         case RMI_ERROR_RTT: {
-> 
->        
->         }
->             break;
->         default:
->             WARN(..);
->             ret = -ENXIO;
->             goto out;
->         }
-> 
-> I am fine either way.
+> [...]
 
-Since I'm combining the two functions, I've kept just the switch()
-version of the code.
+Applied to kvmtool (master), thanks!
 
->> +    }
->> +
-> 
-> out:
-> 
->> +    *top_ipa = ipa;
->> +
->> +    if (ripas == RMI_EMPTY && ipa != start)
->> +        realm_unmap_private_range(kvm, start, ipa);
->> +
->> +    return ret;
->> +}
->> +
->>   static int realm_init_ipa_state(struct realm *realm,
->>                   unsigned long ipa,
->>                   unsigned long end)
->> @@ -863,6 +922,32 @@ void kvm_destroy_realm(struct kvm *kvm)
->>       kvm_free_stage2_pgd(&kvm->arch.mmu);
->>   }
->>   +static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
->> +{
->> +    struct kvm *kvm = vcpu->kvm;
->> +    struct realm_rec *rec = &vcpu->arch.rec;
->> +    unsigned long base = rec->run->exit.ripas_base;
->> +    unsigned long top = rec->run->exit.ripas_top;
->> +    unsigned long ripas = rec->run->exit.ripas_value;
->> +    unsigned long top_ipa;
->> +    int ret;
->> +
->> +    do {
->> +        kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_cache,
->> +                       kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
->> +        write_lock(&kvm->mmu_lock);
->> +        ret = realm_set_ipa_state(vcpu, base, top, ripas, &top_ipa);
->> +        write_unlock(&kvm->mmu_lock);
->> +
->> +        if (WARN_RATELIMIT(ret && ret != -ENOMEM,
->> +                   "Unable to satisfy RIPAS_CHANGE for %#lx - %#lx,
->> ripas: %#lx\n",
->> +                   base, top, ripas))
->> +            break;
->> +
->> +        base = top_ipa;
->> +    } while (top_ipa < top);
->> +}
->> +
-> 
-> Rest looks good to me.
+(I updated the headers myself after fixing the script we have).
 
-Thanks,
-Steve
+[02/10] riscv: Add Svvptc extension support
+        https://git.kernel.org/will/kvmtool/c/a9880860d781
+[03/10] riscv: Add Zabha extension support
+        https://git.kernel.org/will/kvmtool/c/8be1c78896b4
+[04/10] riscv: Add Ziccrse extension support
+        https://git.kernel.org/will/kvmtool/c/0641ed8c3763
+[05/10] riscv: Add SBI system suspend support
+        https://git.kernel.org/will/kvmtool/c/fcc316016e9f
+[06/10] riscv: Make system suspend time configurable
+        https://git.kernel.org/will/kvmtool/c/1132ace1c069
+[07/10] riscv: Fix no params with nodefault segfault
+        https://git.kernel.org/will/kvmtool/c/b6e9f38b28c9
+[08/10] riscv: Include single-letter extensions in isa_info_arr[]
+        https://git.kernel.org/will/kvmtool/c/d47ad017c404
+[09/10] riscv: Add cpu-type command-line option
+        https://git.kernel.org/will/kvmtool/c/a50e8d888be8
+[10/10] riscv: Allow including extensions in the min CPU type using command-line
+        https://git.kernel.org/will/kvmtool/c/1117dbc8ceb2
 
+Cheers,
+-- 
+Will
 
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
 
