@@ -1,78 +1,83 @@
-Return-Path: <kvm+bounces-46890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CC22ABA542
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 23:36:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61714ABA549
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 23:36:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE9ED7A6860
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 21:34:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F42324A8269
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 21:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4FE280311;
-	Fri, 16 May 2025 21:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53207280CFF;
+	Fri, 16 May 2025 21:35:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fKNYuCzp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fxhgg+MY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCAC28002D
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 21:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A94280307
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 21:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747431344; cv=none; b=mE/4mm8TjHwrhdjF/NGKmf+MScKgUvDiJStOo/RS7VcO9ABQ3rB4RsUNplicCFiag78Ltjo/yQY/vevzBe2wqcQfNsGTuvBaLAePrONDDAHMqmiEMERtE2prbdyi3OMWxaod6eqompMcFDv3aVoji7wI3DwYCskWg7Ehjh7DqZ8=
+	t=1747431346; cv=none; b=tR4i9X+BxOavqlhtgti5/dJqfLNUZiaesgLfHJer/X6/ZuZ0KrSMhOnMBgwvgMDl0MjGoqlA+hlWduYzUSsYo+OnoS/uw/rw2cZhyUKENXvpamAWU+KIzRcyv49/V+QOLwJO6NeY9PVykVD8lKQX1VW/vLihJzQ6dcj7xGH1H7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747431344; c=relaxed/simple;
-	bh=hPL5e/P/cV9diBrTyzd7jSCS8KcQA3rmpSv703Ir/mA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nDtFQ1Kaivn2MHnb6RpOmW4GzZI9oobYCsER40nfdHu+rfMUNJk2zh/Y+O/K8YrSVjQhBZgVJsGu8rhrCzWctUVNqocVJgbnu8IWAMRt1xr32D9OYGihz4KVIzm/j0BB3SQvJK1uzX/tWIyfWatHfDWXMpvncJsvgcarC0mAy24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fKNYuCzp; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1747431346; c=relaxed/simple;
+	bh=TPssax79sxW9s4Uhhkr+BKlQZkVGnbippa0fsIPWqo0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Ar6BKIPhMtJWVkXvt1t4Ri6QC/rTzx41/O57rwHKrqFORAMQu0MPWq1vbLRBliVOZnBpsFu0yt4L63njFVdhlzx6cw6LZtakU8WTJ72bKZRCfjLu/+SFYjh0n0Fu2Y973GgEV5nMoJ1EyFJP1+3sdZri4N/whMGaKfpJvePgf3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fxhgg+MY; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30e810d6901so974987a91.3
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 14:35:42 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22e816139b8so21712355ad.3
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 14:35:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747431342; x=1748036142; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xNHr7Po9X4IY3i+xCFCFaGljs9bw7WMHVo7Wciw81Ak=;
-        b=fKNYuCzptjRrJ/2VP6KkiDeawUaee+ngU3wTPYo+etQBz9sTgYegt6ZKemaHZIGWNT
-         //QGsxD7NrmLeaNcNFMKxTa9Q3Bd/oTChsf4VZpy/21rxpGiv9R8ehrau+lkA2B0TC8y
-         ARd+Zz1InG+Ox0Er5HQ4V+7FATYeF2ZCVx3UjhOzYMVvpaltNvQHT9/H7dCrr09N7jMn
-         M96IZT9bB7j/4vipVdL0Y29HCbdt5bBkS5B7l4nhAdpzSzMN+mMFlproe6yCuiqbqXtr
-         rteNfmfkjiXAG90ZoJKgnwQs9V+dcmOjJ3dkhH7L0yx4NvlkGrPTvI7oi1hjfm11gxFR
-         7lqQ==
+        d=google.com; s=20230601; t=1747431344; x=1748036144; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=32n3PJO9GBTARszoinMNB66MtnH1QTCvI0q5z3orUsw=;
+        b=Fxhgg+MYRKX5u3T6BOnRhHghesd9cKMdhtf01T/Hh6CHbGYy9e2vNKfxoorrmO6lZr
+         nclYniCFXiI0OaAvTofyKGSyP4y9CaR5JJKgv0eEcnxFQV94R0eXb3EYgq5uTuGdHnG3
+         KRc/RvhajwMb/JWpeK6CfjyMLPcHdg4dsc1f999Lo7QRp+SpgGrKFyVKESr3B0W/xYuP
+         QavTBXWxDHsHFQ2LxOLIJ5CPbN5Osk90Gc+TnyW/fMuhFfp+HqXjLZ7flHpq9+FNmZfz
+         dqZPRgaSd53l/QectZLZ0HXHjUocg62OuYQfINagQBwY2tLtFIg/DMsrWi32Hh8k8tqF
+         dwww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747431342; x=1748036142;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xNHr7Po9X4IY3i+xCFCFaGljs9bw7WMHVo7Wciw81Ak=;
-        b=qbCNYyAhihVfKyqq95Ce+3meDj5oI2ivT6qobxYlP5aH6S4g8FzQW1zibVbLMMtZdZ
-         Hy0XIMD0UfnV3oC8oZrlXC0fNk1t1h8oTioaelMNMaxW4fiMBo8zHB2q+f+Q4+IUMp5y
-         1pWILcVDtU+PcWZgDP9DT9aChCjX3QHL/O1FIeRVb51HWd54zR6z7EamxIqTA23gq9id
-         3La6vHaqTwJYWVr3HHwhv9w4/cHbSEs6twG2bNC2HXNGRXdKvk7phhw82ywKkRY+rCw+
-         7Lj0mX9iaYkLtLG9K+fTU6Ys1eje72HDm3kpWNmCiwQtcqgkW7A9dGNPpn2wP5lZKyFZ
-         vZvQ==
-X-Gm-Message-State: AOJu0Yz4G//SN+M+cn3ag/OgbqtPDqBQAUdsEJ7mu+dYj7t4MGDTPRoO
-	q+XtlBeD4FIZybL3a/53fOX0w/v8bLcVVPvl/vVwLO0KjpnkQpWUVXbYAEXDApiJ2XA8SbOOcPz
-	gmO76HQ==
-X-Google-Smtp-Source: AGHT+IG+XyFJvw9Pd7od/AslUHXgv3/EqoXQrpwCSuULnqlUWxViE7nATwFTEJvFMOEYURtUCNEgKSxbh84=
-X-Received: from pjbsy8.prod.google.com ([2002:a17:90b:2d08:b0:30e:65cf:2614])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c05:b0:2ff:5ec1:6c6a
- with SMTP id 98e67ed59e1d1-30e7d55ba27mr7784969a91.18.1747431342299; Fri, 16
- May 2025 14:35:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747431344; x=1748036144;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=32n3PJO9GBTARszoinMNB66MtnH1QTCvI0q5z3orUsw=;
+        b=n42rJnqYSIXBmSZXzXZSHVNOx3wAr6Fc0zb9hzAIrV/uhe6ygeSRk+1+/q+iX/yWLZ
+         dyuaGr6dWmwPK14bViZGkC0/1FO9t2UMKmBfGvk5wBJL0L+pvRMtIbF7dx453bT2Poqx
+         zfoAPH9rssxyJH3BgnRyTAI3lq1UmVXvwJyn4gK465uQo5pL4M2quMS3LxXv8yW67Pok
+         z1VqkEsWIjFyxnMv5Pv3sm2WGBEINKzVDrFin5/cn1JtpSHqy93FCOqSAWIK20gEGzbp
+         tW4QpVH9vFiHq6OFCeAi6YQon/RLSIV6/ThrzdATgAI2sXd49gZjg/nvG5mweP0W37lb
+         rdlQ==
+X-Gm-Message-State: AOJu0YzK6IghJABt3moOfj+Y4P+UBxgD0Wqo0YDovOBwB0nFVRAP8Po5
+	/XmUtrw/n1ahLV7YW2VYmU9Vyp/ROdzqBFQl/LG61PH5ifLOtQRVFskRhysHcFj8GY7gLbfdNvQ
+	LsTs21Q==
+X-Google-Smtp-Source: AGHT+IG5j10n9pBrXztcWjA8kxz2B2rfIvBK/g2w38KT4xlpjVSYu39IgoUnHrzq9k9yoHJvwCdr38hRT4s=
+X-Received: from plht15.prod.google.com ([2002:a17:903:2f0f:b0:223:225b:3d83])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e787:b0:224:26fd:82e5
+ with SMTP id d9443c01a7336-231d455d9ddmr69825065ad.48.1747431344204; Fri, 16
+ May 2025 14:35:44 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 16 May 2025 14:35:34 -0700
+Date: Fri, 16 May 2025 14:35:35 -0700
+In-Reply-To: <20250516213540.2546077-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250516213540.2546077-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1112.g889b7c5bd8-goog
-Message-ID: <20250516213540.2546077-1-seanjc@google.com>
-Subject: [PATCH v3 0/6]  KVM: Dirty ring fixes and cleanups
+Message-ID: <20250516213540.2546077-2-seanjc@google.com>
+Subject: [PATCH v3 1/6] KVM: Bound the number of dirty ring entries in a
+ single reset at INT_MAX
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -82,69 +87,142 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Pankaj Gupta <pankaj.gupta@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Fix issues with dirty ring harvesting where KVM doesn't bound the processing
-of entries in any way, which allows userspace to keep KVM in a tight loop
-indefinitely.
+Cap the number of ring entries that are reset in a single ioctl to INT_MAX
+to ensure userspace isn't confused by a wrap into negative space, and so
+that, in a truly pathological scenario, KVM doesn't miss a TLB flush due
+to the count wrapping to zero.  While the size of the ring is fixed at
+0x10000 entries and KVM (currently) supports at most 4096, userspace is
+allowed to harvest entries from the ring while the reset is in-progress,
+i.e. it's possible for the ring to always have harvested entries.
 
-E.g.
+Opportunistically return an actual error code from the helper so that a
+future fix to handle pending signals can gracefully return -EINTR.  Drop
+the function comment now that the return code is a stanard 0/-errno (and
+because a future commit will add a proper lockdep assertion).
 
-        struct kvm_dirty_gfn *dirty_gfns = vcpu_map_dirty_ring(vcpu);
+Opportunistically drop a similarly stale comment for kvm_dirty_ring_push().
 
-        if (fork()) {
-                int r;
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Binbin Wu <binbin.wu@linux.intel.com>
+Fixes: fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking")
+Reviewed-by: James Houghton <jthoughton@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ include/linux/kvm_dirty_ring.h | 18 +++++-------------
+ virt/kvm/dirty_ring.c          | 10 +++++-----
+ virt/kvm/kvm_main.c            |  9 ++++++---
+ 3 files changed, 16 insertions(+), 21 deletions(-)
 
-                for (;;) {
-                        r = kvm_vm_reset_dirty_ring(vcpu->vm);
-                        if (r)
-                                printf("RESET %d dirty ring entries\n", r);
-                }
-        } else {
-                int i;
-
-                for (i = 0; i < test_dirty_ring_count; i++) {
-                        dirty_gfns[i].slot = TEST_MEM_SLOT_INDEX;
-                        dirty_gfns[i].offset = (i * 64) % host_num_pages;
-                }
-
-                for (;;) {
-                        for (i = 0; i < test_dirty_ring_count; i++)
-                                WRITE_ONCE(dirty_gfns[i].flags, KVM_DIRTY_GFN_F_RESET);
-                }
-        }
-
-Patches 1-3 address that class of bugs.  Patches 4-6 are cleanups.
-
-v3:
- - Fix typos (I apparently can't spell opportunistically to save my life).
-   [Binbin, James]
- - Clean up stale comments. [Binbin]
- - Collect reviews. [James, Pankaj]
- - Add a lockdep assertion on slots_lock, along with a comment. [James]
-
-v2:
- - https://lore.kernel.org/all/20250508141012.1411952-1-seanjc@google.com
- - Expand on comments in dirty ring harvesting code. [Yan]
-
-v1: https://lore.kernel.org/all/20250111010409.1252942-1-seanjc@google.com
-
-Sean Christopherson (6):
-  KVM: Bound the number of dirty ring entries in a single reset at
-    INT_MAX
-  KVM: Bail from the dirty ring reset flow if a signal is pending
-  KVM: Conditionally reschedule when resetting the dirty ring
-  KVM: Check for empty mask of harvested dirty ring entries in caller
-  KVM: Use mask of harvested dirty ring entries to coalesce dirty ring
-    resets
-  KVM: Assert that slots_lock is held when resetting per-vCPU dirty
-    rings
-
- include/linux/kvm_dirty_ring.h |  18 ++----
- virt/kvm/dirty_ring.c          | 111 +++++++++++++++++++++++----------
- virt/kvm/kvm_main.c            |   9 ++-
- 3 files changed, 89 insertions(+), 49 deletions(-)
-
-
-base-commit: 7ef51a41466bc846ad794d505e2e34ff97157f7f
+diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+index da4d9b5f58f1..eb10d87adf7d 100644
+--- a/include/linux/kvm_dirty_ring.h
++++ b/include/linux/kvm_dirty_ring.h
+@@ -49,9 +49,10 @@ static inline int kvm_dirty_ring_alloc(struct kvm *kvm, struct kvm_dirty_ring *r
+ }
+ 
+ static inline int kvm_dirty_ring_reset(struct kvm *kvm,
+-				       struct kvm_dirty_ring *ring)
++				       struct kvm_dirty_ring *ring,
++				       int *nr_entries_reset)
+ {
+-	return 0;
++	return -ENOENT;
+ }
+ 
+ static inline void kvm_dirty_ring_push(struct kvm_vcpu *vcpu,
+@@ -77,17 +78,8 @@ bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm);
+ u32 kvm_dirty_ring_get_rsvd_entries(struct kvm *kvm);
+ int kvm_dirty_ring_alloc(struct kvm *kvm, struct kvm_dirty_ring *ring,
+ 			 int index, u32 size);
+-
+-/*
+- * called with kvm->slots_lock held, returns the number of
+- * processed pages.
+- */
+-int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring);
+-
+-/*
+- * returns =0: successfully pushed
+- *         <0: unable to push, need to wait
+- */
++int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
++			 int *nr_entries_reset);
+ void kvm_dirty_ring_push(struct kvm_vcpu *vcpu, u32 slot, u64 offset);
+ 
+ bool kvm_dirty_ring_check_request(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+index d14ffc7513ee..77986f34eff8 100644
+--- a/virt/kvm/dirty_ring.c
++++ b/virt/kvm/dirty_ring.c
+@@ -105,19 +105,19 @@ static inline bool kvm_dirty_gfn_harvested(struct kvm_dirty_gfn *gfn)
+ 	return smp_load_acquire(&gfn->flags) & KVM_DIRTY_GFN_F_RESET;
+ }
+ 
+-int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
++int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
++			 int *nr_entries_reset)
+ {
+ 	u32 cur_slot, next_slot;
+ 	u64 cur_offset, next_offset;
+ 	unsigned long mask;
+-	int count = 0;
+ 	struct kvm_dirty_gfn *entry;
+ 	bool first_round = true;
+ 
+ 	/* This is only needed to make compilers happy */
+ 	cur_slot = cur_offset = mask = 0;
+ 
+-	while (true) {
++	while (likely((*nr_entries_reset) < INT_MAX)) {
+ 		entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
+ 
+ 		if (!kvm_dirty_gfn_harvested(entry))
+@@ -130,7 +130,7 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+ 		kvm_dirty_gfn_set_invalid(entry);
+ 
+ 		ring->reset_index++;
+-		count++;
++		(*nr_entries_reset)++;
+ 		/*
+ 		 * Try to coalesce the reset operations when the guest is
+ 		 * scanning pages in the same slot.
+@@ -167,7 +167,7 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+ 
+ 	trace_kvm_dirty_ring_reset(ring);
+ 
+-	return count;
++	return 0;
+ }
+ 
+ void kvm_dirty_ring_push(struct kvm_vcpu *vcpu, u32 slot, u64 offset)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index b24db92e98f3..571688507204 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4903,15 +4903,18 @@ static int kvm_vm_ioctl_reset_dirty_pages(struct kvm *kvm)
+ {
+ 	unsigned long i;
+ 	struct kvm_vcpu *vcpu;
+-	int cleared = 0;
++	int cleared = 0, r;
+ 
+ 	if (!kvm->dirty_ring_size)
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&kvm->slots_lock);
+ 
+-	kvm_for_each_vcpu(i, vcpu, kvm)
+-		cleared += kvm_dirty_ring_reset(vcpu->kvm, &vcpu->dirty_ring);
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		r = kvm_dirty_ring_reset(vcpu->kvm, &vcpu->dirty_ring, &cleared);
++		if (r)
++			break;
++	}
+ 
+ 	mutex_unlock(&kvm->slots_lock);
+ 
 -- 
 2.49.0.1112.g889b7c5bd8-goog
 
