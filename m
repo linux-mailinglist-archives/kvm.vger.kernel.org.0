@@ -1,255 +1,189 @@
-Return-Path: <kvm+bounces-46796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46799-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2860CAB9C5A
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 14:41:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C02BEAB9C96
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 14:50:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63CCB7A8053
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 12:39:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E560EA007A1
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 12:49:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58D2244674;
-	Fri, 16 May 2025 12:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C56B22F176;
+	Fri, 16 May 2025 12:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FPkqyini"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VzYcp7dU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2074.outbound.protection.outlook.com [40.107.95.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4686424336D
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 12:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747399203; cv=none; b=utxXhnDNWyucAEiR+u+kmI49qFDpafi4uq911bjWilKoGKhPmvHTyFNyKaLLUCzQhLVhx25kaO2z5tG/4Fx9a8xOZq737wH6iDxIawvqtcHzkK/Nme5vBYw0zY4bAHOLPlsc9Z2uGcZhPWeCLssByCSoqdt0IQ7Mj3/Rs9UqtJo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747399203; c=relaxed/simple;
-	bh=rdOAlDn565rE1FqMI4nBJDb9BzleRulrsucs0xSkJLA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EKV0xHi4OAt8rCuEfdGPZK3D4UaUkcjtBKL3c2x/JSCMgKntxD5dkxmFYVfQ4m2bX8wIqmvTawKbbA4LYs0awREnNMyk1ZGialm7jd6v3CHd9g8MeUpWmFmqB5AAlSXMbPnZu1Jn+6M6fqdjVP+rN2Ys6NcAPrU4Qy4/ovIrSng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FPkqyini; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747399200;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hiLZZy7QAtq/50XMExKGpNPia0HeTXt82qBD/QjAX4s=;
-	b=FPkqyiniFF+1BIjQ42qbT9ml+S5MjfjDcV4CKb7zKl7aNPs0rSvE7uUMsUDvHUe348LPx0
-	s3iCX9Hmx7ZPuZU8glULaTAZr2DJvRBH+Jc7R4NXt+/bJz3KBnAxadcraUKJ0W0Rmnw8uP
-	cyJF1iP/cXPI/KyDY4ZlaghTsy2amlA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-685-eqCcYsoAO4WFBV5AutCi-A-1; Fri, 16 May 2025 08:39:57 -0400
-X-MC-Unique: eqCcYsoAO4WFBV5AutCi-A-1
-X-Mimecast-MFC-AGG-ID: eqCcYsoAO4WFBV5AutCi-A_1747399196
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43efa869b19so15713565e9.2
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 05:39:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747399196; x=1748003996;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hiLZZy7QAtq/50XMExKGpNPia0HeTXt82qBD/QjAX4s=;
-        b=RvgUgvO5+pdAMFSI/ivac77EsGEu2tvSksS6Ix7v40np7VMdzgzw3Wtud42whHXc8P
-         WQAWF7S9mwnDAxVwx+g6QH/LpvY/PdBV3Gg831D5IyWGppd29QO03JcGfQpZlWyS1lLC
-         P/8BDwSBywlfhqCfhEED4MNTWSFyKlVnH0tlbFXlHkdcHmK+XXA6KnR07CNxK8c4P7Rf
-         VWosBPDw8VVpyiY5UijXIRXKKudvVnVNw4jJvx53SEUjLzzFM/XpRFFEe1va4+lCh0E4
-         GOrlRiReQHv2IHfA2bxbT259cJWgwh1jwJfFLE8OTXTH5mczYpde5h3sMYyOthtPbSBd
-         4tnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXgJGXIYV+qtOHzouW9cOc722MfoVwTjzNXxZawW1BvLa3zFp/g6q7RO+nhRVRgH6n5v+A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpFYqtqtUy//XRpipP1IsxPd7mcm8RkYW0q+Pj3V9uVU8/OIVB
-	yjoJp2Kuw6XdSu6zAfHOxQG1Og7nqBcIZ7g809RAfVeO9VKTxVsr/vDontDbJ52LfXCGprzHbxd
-	LlNRU+d5jJz+niZfzvFJcpv8+stxRp2Cs6cxCTTw6NM9z3Zlwj73GMg==
-X-Gm-Gg: ASbGncu0gtNfakPnwDWBz/wT6SbJ7CtzdOAsJbE9fjkyJAFqP7WQ8gqtINMAD2JiExQ
-	r9qlPd0Wj+QayEDdrgXpG7wgrhrKt9SiDTsQrynxDWvOv25287lAYv1kfLspLezpBqd2OsxO7F9
-	eWc114HZR/AjZpWVK0k9IqvPv9w2+zlWxMssQnfQTYT2o0wDRJz/pWejKY6fgb0/Kgz1lLwzh+l
-	xIU96ah+BrF1EOIwws4qm1Vj68R905h6SZYNS0+jeg2QfJXRVx26zHb+BZFSExVGcJkwYRCZNDT
-	byfhwJTTbYeTTRd/IQxixrbyoiYw2dOxt1p5XQTcb4yLnNkE4ERL9DM+s9AwwyHLQMVFAnsj
-X-Received: by 2002:a05:600c:c1b:b0:43c:e481:3353 with SMTP id 5b1f17b1804b1-442feffbb8dmr28003385e9.17.1747399195774;
-        Fri, 16 May 2025 05:39:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHPCjYc5Wqc+yI//ttOUMN3UV92gYVHaHXlQYA3K8J/bBkEM9DoFCaA+VbVbF4V9/mI2J6diA==
-X-Received: by 2002:a05:600c:c1b:b0:43c:e481:3353 with SMTP id 5b1f17b1804b1-442feffbb8dmr28002955e9.17.1747399195319;
-        Fri, 16 May 2025 05:39:55 -0700 (PDT)
-Received: from localhost (p200300d82f474700e6f9f4539ece7602.dip0.t-ipconnect.de. [2003:d8:2f47:4700:e6f9:f453:9ece:7602])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-442f3380498sm108750375e9.11.2025.05.16.05.39.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 May 2025 05:39:54 -0700 (PDT)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-s390@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-mm@kvack.org,
-	David Hildenbrand <david@redhat.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Zi Yan <ziy@nvidia.com>,
-	Sebastian Mitterle <smitterl@redhat.com>
-Subject: [PATCH v1 3/3] s390/uv: improve splitting of large folios that cannot be split while dirty
-Date: Fri, 16 May 2025 14:39:46 +0200
-Message-ID: <20250516123946.1648026-4-david@redhat.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250516123946.1648026-1-david@redhat.com>
-References: <20250516123946.1648026-1-david@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139BC1DFDE;
+	Fri, 16 May 2025 12:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747399799; cv=fail; b=X293gx3bl/f2J7wbIhY/mkxfuwiK1ZHhjrkAwWtI8Ow40ShhBPwb3aRmWg7dzBvzPBgDHpIYbQkCAy68gEW2+1GuqYnk7XNkiscS3RfFFGxiop4I99jgxzMshK8pdonbd3PayO4VOTwDHGObzu72jN6t1DthJ7v6BwofI+8foqU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747399799; c=relaxed/simple;
+	bh=/ssxdQx4KBY4OPAe6Nn+lJC2blTajUh+GRZj7o79He0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=oYvnqkvVE7JbXSM2o9u2CvG+nrT3xdbYZg81TOgsCAzJD7MdDbIDAcmTtKvLdOoe0sVv5OeFmAhYyx4w1Y16LZjidDXN0SzYnrLqfmRvvm+OE7Iuyr+WkX1AJ0ifccAmzYB8Ebd//PaETrOfuqJJHlKd6OBzCwNwxBHTURhtwKo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VzYcp7dU; arc=fail smtp.client-ip=40.107.95.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bZZGRSanTmg6iwhMe7oGyogTjem71pdxHlLOOL+MI3a6k74CiXRp2pkrlnuuG24oTVp+Ow7cFHG8tz0xuMZs0v/PKeNH3XssoFBPvJPdWItWvCAk4BwgDh69+NQoQuTmqR8B93cS7c4DM20gZlLXXBk+DeIGNZiIcm79qSQnPncqyrcOZavAUg3Htj/pP9F1yczmDxHwl7XK8qnttj3Kb4uG2/KGuRNmWLW5Y7ROJVgCHqAkjYOIdektCjyjd7PJhBAasjrT2lXRIQ7NLempbSsJ0Gk4vcb+YE16+i7gFLvIPvt5sd+5z1LE2nKWaFlFjVUUvGBctdhpjcCQrCKvAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HCOliCDFiza2YXF/6yogjX8ZCITtgDW9sZwjVVE5EJQ=;
+ b=O/ueFMTl93ZP2vrB5a2lYu6b8yBJEdPvZ8LGVx3pTM62Z09c5aMxzSscNufXNLMMwHlS0PFDCHQUMFtIsVxzhtSVMSUBmdmuR00fZBaBv+GUWsMKYOo1yXeYTnP2yU8hNzWln2ZeDFkP33veMbV0FGO1ZUrTgIqtZjENPJf5AvhRC42pHpFvd5Evtva0yV6wa5NCIyFcoKda5UwAqVtxGOaA9pikK9fLaKWLxQGDj4JoD+5oLvconJ0RJ8c5Y347ytDMPGzpcMpufGZH2LWMDHAwWoAq3LAQldzcdUwti/1x7XS02vSmwb3mhpNd6nqu3Wj6GvtKn3VBbNj0MJsvGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HCOliCDFiza2YXF/6yogjX8ZCITtgDW9sZwjVVE5EJQ=;
+ b=VzYcp7dUV9Y4FZj6pXoQyafuHXBXOBavJbhc3wi1ffK87mk9w9WsAWOterkCyuCqApVxQBjBn7kC+hdtjZ9rfbEFr49dPXOIyxHegT4PdvGxFBSmHMCcza8VqNWZQcbLa20LFLMk/Zpbu6jai8yzqjm71pVYUcQX9dh/4avCtr+BOnfAz8prX27T/PC6sxRxZjBcrKciVNW5jgJZqukse4rJAHQmLNYkvY2PikSZthLFwFzg1ZOG4hIJjBT31gjI+iYeudUH6eUPVPM3ROAvW0GWhh46B2Wlqhx33eHjvajwsMHbbUH6O+JIds0CCYvF09RDXeR45kMzMRhXs6Rkfw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by LV8PR12MB9407.namprd12.prod.outlook.com (2603:10b6:408:1f9::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.21; Fri, 16 May
+ 2025 12:49:55 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%7]) with mapi id 15.20.8722.031; Fri, 16 May 2025
+ 12:49:54 +0000
+Date: Fri, 16 May 2025 09:49:53 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Zhi Wang <zhiw@nvidia.com>, Alexey Kardashevskiy <aik@amd.com>,
+	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	sumit.semwal@linaro.org, christian.koenig@amd.com,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
+	zhenzhong.duan@intel.com, tao1.su@intel.com
+Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
+Message-ID: <20250516124953.GD613512@nvidia.com>
+References: <20250509184318.GD5657@nvidia.com>
+ <aB7Ma84WXATiu5O1@yilunxu-OptiPlex-7050>
+ <2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
+ <20250512140617.GA285583@nvidia.com>
+ <20250513130315.0158a626.zhiw@nvidia.com>
+ <aCRmoDupzK9zTqFL@yilunxu-OptiPlex-7050>
+ <20250514230502.6b64da7f.zhiw@nvidia.com>
+ <aCYsNSFQJZzHVOFI@yilunxu-OptiPlex-7050>
+ <20250515192127.GA580805@nvidia.com>
+ <aCbZATrK7EPyH4qt@yilunxu-OptiPlex-7050>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aCbZATrK7EPyH4qt@yilunxu-OptiPlex-7050>
+X-ClientProxiedBy: BLAPR05CA0008.namprd05.prod.outlook.com
+ (2603:10b6:208:36e::11) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|LV8PR12MB9407:EE_
+X-MS-Office365-Filtering-Correlation-Id: 99866117-8bb5-455c-7975-08dd947827de
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?0A88D7Xk+4Dbcoa0kk5LY4CRSr3WKbN1QYlt1yWoEDxXzPBhjfJVtp2Yy70Y?=
+ =?us-ascii?Q?zUz11APEe6lFpVGs+yeUiSpTj0mIgBnpo/kfpGHEvYtoZKUhLbQKjZMl1sEE?=
+ =?us-ascii?Q?CV9td+Qee3912GrSa7VjI2rwSX37M+KjgE7QlYbf0dVRrlwuzIX2fDEJfAmE?=
+ =?us-ascii?Q?5U9i+jOQiSLuQgiRai82kf/cVWWIqbxaWR8ZuzPZOtbO4E0sZmdR0VTzMH8h?=
+ =?us-ascii?Q?vz00nwGeg+ZGvc++i5/wu2CfNwCOFwLRlCJu8/9OwprXgJAdqz/8x9TCL7OD?=
+ =?us-ascii?Q?51JuCuxp+vntQSDica86aKKREJnGpWDKPXX2dw8CYdZosK72MgXpHl8JVC0d?=
+ =?us-ascii?Q?73Wsoc2Pilt/JKr4GCTSVMnsPgmZLMQi3Q3pE1ksHyjgRqs5sKl7h9/dZHHZ?=
+ =?us-ascii?Q?5oZuF7m7bNPfFIBFU3P2Q9gv5d+wWDT+elyxQaCGYVk/ruzEvhAViQYTa47C?=
+ =?us-ascii?Q?LDAKS1AYyzvz5nuKNCgYmIBJESsoMtI5OHZ39/+gzegWQszJGjSGQcVFfgfd?=
+ =?us-ascii?Q?WKE0cRbY/MqDFENIrh4rYFoW8lj0IqnDdnfPhh2yD0+AoDppCsbQCkLq4nb1?=
+ =?us-ascii?Q?QCwz7GORKJhNmbdhaSAftCzGHZi0SbkzOMhdvJEyA+QqZ8jPInkU98tLCJez?=
+ =?us-ascii?Q?T2XFOX5VT2YyKO19J6lyXJnH0w3qr8IXbQy6/0ahKikb4aR6pOWLb6xvwDRY?=
+ =?us-ascii?Q?F4yzjvQwN0qOQ0x0MVEhuRcWmeLbeshyh7/cKS+ZFP6KZ/j9FeeM1FMJtdhE?=
+ =?us-ascii?Q?iGCDCVQyHFX96jSaU9l2huSIWbADOrU+5mfZ8CpMcwtU+soxueEHNyQl1Von?=
+ =?us-ascii?Q?91t7lvYpBAQcf+ggO99EH5zWblwNgQCAzwYt1Z8voCDoahtrYUZks9M+FVIK?=
+ =?us-ascii?Q?0t3jUkYT0vcnzTPz3h35Kgaq4WyR0eC9UjMTJ0nCnNyxwXokkkljBUKv42Ib?=
+ =?us-ascii?Q?ki1o2CZOB783irbyzS1V2znb1kKx/Y4oGXWemCEBtJeR46eHlwW5IoA/jDYr?=
+ =?us-ascii?Q?6EZy0Heb5j+okEOeprp2jGHS5lc1zLFv4blKBKcO1J21NJNfhZtCAxqYIzUF?=
+ =?us-ascii?Q?wSwZec69g0bUMaXurPv3Je/LObXvsc6NiCWF50VH14WlfGK2uGFe4M50UGYW?=
+ =?us-ascii?Q?MiymA/rokXkXwNtIeroSNDxt2ZxIIS375xPBo1xvaa6kfhYWEmUZ6ydiHHU/?=
+ =?us-ascii?Q?vqb8BL20SyMOGUFfZxn0Tv+eVHmwHe5e1nGJYlWCqX2fDe+sgfXVDFkDqlRo?=
+ =?us-ascii?Q?RD4rPqzOmq/v9zJB+rBvZFw43UeANuyjyYGHOclcW5vjcefxgghj4jb16Har?=
+ =?us-ascii?Q?U8NlWa40wQv7DEVMslb0BXpUYZoAs1tXRWmb/K1j2oxUmw/4QziHBawfyIBB?=
+ =?us-ascii?Q?Fidxp8MS1VqMllg4fyYc3nJ71ed1KgCsFvQ2GlSUpuYR1zkaSY/tjtJrVnBh?=
+ =?us-ascii?Q?N0a533mpn3g=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?LGVK2F8W0Wm3fJq3ZH963qAVxDpJoZRHn4o5ndnnNZH/Njvb7ymARfuw+Czd?=
+ =?us-ascii?Q?rU6fY25yEtam3E6LXUVvmWcc2WylEzpf83sB+Ot4GwHFAIfMQSTR8nhWrgnb?=
+ =?us-ascii?Q?m4rcBXdsv/PpVq7jqo0JZ+FlzoZd9RBFiIUp04odOR5kP3cA3Ku5ktCoxQrd?=
+ =?us-ascii?Q?7mhCdLGNWPpfqLMOCwfpg1OfUWqESkMMIkuYetsGuN9Jf0Wj6c3mcnKwCiR7?=
+ =?us-ascii?Q?OBVvHfUewD9FCZgpEtyDWW23nIyf4bfXYNwQpzfF3mgaicWutsgnVjWijEAT?=
+ =?us-ascii?Q?50AtqDWBGt8Fa2kDU0CxnG8+BhudVe4R9mAiQX0cwapU8d3PnE5Ah8QhheO9?=
+ =?us-ascii?Q?DXaE3QJcSPZmXpqMd5U92ecN2js83z0bcqyjaVBxnTyj7FU4KZsX5Sp7yDDy?=
+ =?us-ascii?Q?u/FqbiWlIpZbI366Z9ev41YeQJsutysF/QLqv/MRUmD5N50zSJ2fxaVIw4EH?=
+ =?us-ascii?Q?b9EZ1X/TcKmlFiMMXl73xRRYsLPu3IRNpJAQKhqSlOq1g0sjCrWh4rBhuS08?=
+ =?us-ascii?Q?PC8XBkHmJO1f26bx2egFq9nonFXHwHItp6ALJE+Nj8LO8IgbYgim5HVbeVcQ?=
+ =?us-ascii?Q?4fRrMQX6vPrR0MaOFP7CuzXuCgt/B87G3VAxfOS0wS/70YcUwaiFOITqjsqs?=
+ =?us-ascii?Q?jMavqJ+D+qHlv+5bFlxLfiVz1vStPbR2H4GNmPPdydSxbfXvryRPupu83J2I?=
+ =?us-ascii?Q?jtNVn70+3k1iDTkw4vSBEHYcizEoP0My4+bCWy8nC0EvQEjLdRyB5MqC1B3c?=
+ =?us-ascii?Q?gSdUEi1ZvExUQaicrVVJ7CKG4ltYW6sA0+3NT9wf4qJmFmGvvKQR8Bu02Bx2?=
+ =?us-ascii?Q?5uu235zAA1l4xNl0mlWiqam3dZxIx+ZLzbdp1i6N8pLIgtcPbzYKISQVrhwj?=
+ =?us-ascii?Q?GASA5nc30bbVRL2QveY7fym+ItFOVXaN94HuucZGS5YrtU/+j0ddVFomRgZ/?=
+ =?us-ascii?Q?P/VMNInvVl57yJDsY4Q2CiI0WEYPgcDTzG+MgX9VWZsGjekLiPWciAQnkm0X?=
+ =?us-ascii?Q?58aQYmpPpvG+EumBIVsOt5/Ak1OsQkrmsMSpNOouQQ3bmYRSbI64C5YnhU0o?=
+ =?us-ascii?Q?qNkrR9ikpV5BdFDYb1sBzbQojEbYikYKjyjRA137a8Kbr1Xbm8yGwgFTVaKf?=
+ =?us-ascii?Q?kCbHlZz3qLhe0jrKnNTVE063hrrdF2yfIwJ//DKtwFM1GPakbnRKf3GgItcK?=
+ =?us-ascii?Q?LycW0tLTZ0rePXdEL+YO4tHUy1oe5P5BkTtPQZvLqHZduOrDq2SXa4Gekigk?=
+ =?us-ascii?Q?bzusr7gpP6c65BVxD4papYI7WmyvyCLujluSuMgrOTBWw8HiWnymc9cwV0kH?=
+ =?us-ascii?Q?f6QScR0RRbujCtJw/DXa4w/XlETbpurBKkU4c2rkncq+yrHRykYYo8zATLT2?=
+ =?us-ascii?Q?1LnlXep6JKSLfE89xAuqC0dHsgdglZ6bfVjQE2E2BqaZYfTYIuDpE3KfJvB4?=
+ =?us-ascii?Q?tvAmTjkCs/qHQTW7Yk6ZwiOFT7EU9kzThORcgcymRezw/RvVXY3gGB2C7pP3?=
+ =?us-ascii?Q?zobk7N238b4zs5M+gHQ99tl8UlHsR1Krmf54uyVPdigca/LG9gx7Qe9fXD94?=
+ =?us-ascii?Q?bxnKHikjOdKIOq/6oXWPQ0tdT31QZF7G3xm500mz?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99866117-8bb5-455c-7975-08dd947827de
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 May 2025 12:49:54.4226
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qHDieHybEthLyfPYmZGKux0H70WkxopgOQkWV1RZOpH6ipjgKvxAGwv7uUgjSCwU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9407
 
-Currently, starting a PV VM on an iomap-based filesystem with large
-folio support, such as XFS, will not work. We'll be stuck in
-unpack_one()->gmap_make_secure(), because we can't seem to make progress
-splitting the large folio.
+On Fri, May 16, 2025 at 02:19:45PM +0800, Xu Yilun wrote:
+> > I don't know why you'd disable a viommu while the VM is running,
+> > doesn't make sense.
+> 
+> Here it means remove the CC setup for viommu, shared setup is still
+> kept.
 
-The problem is that we require a writable PTE but a writable PTE under such
-filesystems will imply a dirty folio.
+That might makes sense for the vPCI function, but not the vIOMMU. A
+secure VIOMMU needs to be running at all times while the guest is
+running. Perhaps it has no devices it can be used with, but it's
+functionality has to be there because a driver in the VM will be
+connected to it.
 
-So whenever we have a writable PTE, we'll have a dirty folio, and dirty
-iomap folios cannot currently get split, because
-split_folio()->split_huge_page_to_list_to_order()->filemap_release_folio()
-will fail in iomap_release_folio().
+At most "bind" should only tell the already existing secure vIOMMU
+that it is allowed to translate for a specific vPCI function.
 
-So we will not make any progress splitting such large folios.
-
-Until dirty folios can be split more reliably, let's manually trigger
-writeback of the problematic folio using
-filemap_write_and_wait_range(), and retry the split immediately
-afterwards exactly once, before looking up the folio again.
-
-Should this logic be part of split_folio()? Likely not; most split users
-don't have to split so eagerly to make any progress.
-
-For now, this seems to affect xfs, zonefs and erofs, and this patch
-makes it work again (tested on xfs only).
-
-While this could be considered a fix for 6795801366da ("xfs: Support
-large folios"), df2f9708ff1f ("zonefs: enable support for large folios")
-and ce529cc25b18 ("erofs: enable large folios for iomap mode"), before
-commit eef88fe45ac9 ("s390/uv: Split large folios in gmap_make_secure()"),
-we did not try splitting large folios at all. So it's all rather part of
-making SE compatible with file systems that support large folios. But to
-have some "Fixes:" tag, let's just use eef88fe45ac9.
-
-Not CCing stable, because there are a lot of dependencies, and it simply
-not working is not critical in stable kernels.
-
-Reported-by: Sebastian Mitterle <smitterl@redhat.com>
-Closes: https://issues.redhat.com/browse/RHEL-58218
-Fixes: eef88fe45ac9 ("s390/uv: Split large folios in gmap_make_secure()")
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- arch/s390/kernel/uv.c | 66 +++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 60 insertions(+), 6 deletions(-)
-
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index f6ddb2b54032e..d278bf0c09d1b 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -15,6 +15,7 @@
- #include <linux/pagemap.h>
- #include <linux/swap.h>
- #include <linux/pagewalk.h>
-+#include <linux/backing-dev.h>
- #include <asm/facility.h>
- #include <asm/sections.h>
- #include <asm/uv.h>
-@@ -338,22 +339,75 @@ static int make_folio_secure(struct mm_struct *mm, struct folio *folio, struct u
-  */
- static int s390_wiggle_split_folio(struct mm_struct *mm, struct folio *folio)
- {
--	int rc;
-+	int rc, tried_splits;
- 
- 	lockdep_assert_not_held(&mm->mmap_lock);
- 	folio_wait_writeback(folio);
- 	lru_add_drain_all();
- 
--	if (folio_test_large(folio)) {
-+	if (!folio_test_large(folio))
-+		return 0;
-+
-+	for (tried_splits = 0; tried_splits < 2; tried_splits++) {
-+		struct address_space *mapping;
-+		loff_t lstart, lend;
-+		struct inode *inode;
-+
- 		folio_lock(folio);
- 		rc = split_folio(folio);
-+		if (rc != -EBUSY) {
-+			folio_unlock(folio);
-+			return rc;
-+		}
-+
-+		/*
-+		 * Splitting with -EBUSY can fail for various reasons, but we
-+		 * have to handle one case explicitly for now: some mappings
-+		 * don't allow for splitting dirty folios; writeback will
-+		 * mark them clean again, including marking all page table
-+		 * entries mapping the folio read-only, to catch future write
-+		 * attempts.
-+		 *
-+		 * While the system should be writing back dirty folios in the
-+		 * background, we obtained this folio by looking up a writable
-+		 * page table entry. On these problematic mappings, writable
-+		 * page table entries imply dirty folios, preventing the
-+		 * split in the first place.
-+		 *
-+		 * To prevent a livelock when trigger writeback manually and
-+		 * letting the caller look up the folio again in the page
-+		 * table (turning it dirty), immediately try to split again.
-+		 *
-+		 * This is only a problem for some mappings (e.g., XFS);
-+		 * mappings that do not support writeback (e.g., shmem) do not
-+		 * apply.
-+		 */
-+		if (!folio_test_dirty(folio) || folio_test_anon(folio) ||
-+		    !folio->mapping || !mapping_can_writeback(folio->mapping)) {
-+			folio_unlock(folio);
-+			break;
-+		}
-+
-+		/*
-+		 * Ideally, we'd only trigger writeback on this exact folio. But
-+		 * there is no easy way to do that, so we'll stabilize the
-+		 * mapping while we still hold the folio lock, so we can drop
-+		 * the folio lock to trigger writeback on the range currently
-+		 * covered by the folio instead.
-+		 */
-+		mapping = folio->mapping;
-+		lstart = folio_pos(folio);
-+		lend = lstart + folio_size(folio) - 1;
-+		inode = igrab(mapping->host);
- 		folio_unlock(folio);
- 
--		if (rc != -EBUSY)
--			return rc;
--		return -EAGAIN;
-+		if (unlikely(!inode))
-+			break;
-+
-+		filemap_write_and_wait_range(mapping, lstart, lend);
-+		iput(mapping->host);
- 	}
--	return 0;
-+	return -EAGAIN;
- }
- 
- int make_hva_secure(struct mm_struct *mm, unsigned long hva, struct uv_cb_header *uvcb)
--- 
-2.49.0
-
+Jason
 
