@@ -1,78 +1,82 @@
-Return-Path: <kvm+bounces-46913-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AC79ABA62A
-	for <lists+kvm@lfdr.de>; Sat, 17 May 2025 01:07:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0891EABA62F
+	for <lists+kvm@lfdr.de>; Sat, 17 May 2025 01:08:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B2347AF267
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 23:06:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C19BF1B67E9D
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 23:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA73E280034;
-	Fri, 16 May 2025 23:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874E9280A5F;
+	Fri, 16 May 2025 23:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EAfwHezS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q3VauYOt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA00227B9A
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 23:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189A5232365
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 23:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747436859; cv=none; b=qUAj7NaTWGkhilMfRoDRI9dC+niKaoADBsoPkAXMBRtZQcrPlYDSzoaXRe5DPJcmLQ8fRvjkvxT1TvCdVm5b+RftVvQgdwEZ6AfVA3wHEyqXI4LCUCmlzV0h6gi+7iVcZQfiYvow2CIrFHnjhjWybH1D6st7bCCz9Mt5VW0wDDw=
+	t=1747436861; cv=none; b=URZl8yIQVmlzysXzWUDMmU1I9//BuJmk50i/ARCQeXAvG48ZCBBuZN/+/3RDkQTOQLiHxKPeQ4QAOczntlVjt7xxvikvZBwrA0DAuA357PuOQr3UCoalRBEU9EJRvSGQIfYo6hXtqR5FLdCHaQoba4mrm0M3r5fAU2KdZ2vie84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747436859; c=relaxed/simple;
-	bh=AVnn78Uc3EWeUJSQ7ziRvaqm0OPYoWQKB0eMNz4K9JQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KnLd0+El53xQ8iqrlYAP8Sdi3oVe9cyl9Wh6NbTJDC6eLChvux4gtMNFAmIf0YgtoqXthvtLKbmELjxq1JOz70bVukoJZyXh1H+eHK+4Nnn/q+F9YPz6WWF6bR9Zd8bQLD1xqIYu53fGajS8850mnfXmmjJIk31Fq6FgOAFldXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EAfwHezS; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1747436861; c=relaxed/simple;
+	bh=I1ALcWIwC8w2ZTqFEjmPzQUw5bLz7mdjqS6Qdf0kmJ0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VOP0TdihIAbnUCmdnNWxBckRrTA9WY1o7RhajH4dDlOR5mfkSuF75dIekq5/NBQJkn3hM7Z0mXE0pMHS0jtRjHRdmO/r+OPTgMVKsYmHGLFtF2sj75VsmplkmH5+sKzeY1VvTpZVarEj5fO92Ce4O0KnBy99mVWt7bIl0cFvre4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q3VauYOt; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-af59547f55bso1540583a12.0
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 16:07:38 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30a29af28d1so2159776a91.0
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 16:07:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747436858; x=1748041658; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nuPZrVo3m9ILiCK6u6rwy2V97Y83MmsuXvc2pUzideg=;
-        b=EAfwHezSm9vCY59gWxTn2oVu2ODdv4BTL0jS/G1SOZYpTpd6RqWpd9iiwqG0bLPQR/
-         mentDoc2U+AmX3B90Owx/+fohgnxONjEwYnWcn5XMpsy05iUWLCeiLVKQctxWb3K2mpW
-         41bp3L0Fg8WTYrOhv78rVUbwPTNjSQrsQwG5hRATJOdPZ59fBe00YIVf9EDiVNYqK6IG
-         gsgbXcfLegMmTjJNgwRbyMiq+V2SEB9qd+Ml705SoRlTdLm0Nj1ks0TrQfFUZR3aDwIq
-         PHj/THmbaYbhHYmewb4mZvqnWNnV/j7f/tHkpi1qLQUnv/Ua9GPDHiNHU4UMM6s8oIr/
-         0amg==
+        d=google.com; s=20230601; t=1747436859; x=1748041659; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=8kDa/puR8zC/TVy/ii11k+vGNrXdae9yxfqU/1udF6g=;
+        b=q3VauYOtN04RZ0hh3sol0uU4/jLOh+yA68XJ3uItKyLT3IGd+IUTszJX85M7o6zT0D
+         7qy0tqgNdqvp1wmKi2BFS+nrWhz4T0xENqoVxul4ie15EgDjHQij82WJa/3Z1IB4PT7V
+         rT8v+FuB8kKWm2gxY70LBr7Br2/n95XjlOV9kVGaUDbPS5vaxCttCDLJ1TFmX6j/g7OC
+         0I17Ed9BzisZ1vSGkvxDzJmZN8rFAYUqeSRDCtz3qE/jZgzeKU687JXaGKnp/BuV6eCq
+         amyWSsLC908LB5kFMPQtclFcR/1whoRqCGHVG67bUjTwOweZ/N+3j8pM8JsQhLG5pmVh
+         mTzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747436858; x=1748041658;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nuPZrVo3m9ILiCK6u6rwy2V97Y83MmsuXvc2pUzideg=;
-        b=r5yLVDFW+z9AG5vSDS7JiXNY10k5KzVosQQAYdtmpaLQ0qnrG9akZuw+RftOyi/7Cj
-         ghFoLo7DELOwthH4AkIM5tQNKW9sj/RnE8kYIXULPA+YHaKz9G7txWQlGWANEKC08vFp
-         /4G6UV5D/saldn6DnjjD/3Vwcpf2dW5/pJnNXh82QzO6l6BYiaRX/ATxDkWeNryKHaY0
-         iAFT6X4/SwUzcRDEdYCIKFFt8VNXCA8YPU8GcP6OEPKAsvVTQ5LQFQ47qd2b2Vzjnc0E
-         PMckwqAMylx3RTtly0Eyboih10qVhWT0kA+YDk6r+4vNshA+G01FyWV7hrwvX3Lbuqgy
-         XIwg==
-X-Gm-Message-State: AOJu0Yzp2zG9TUdc9A7t7gi8VOIk2Rh2YfeTF6FKGGJE8rknKDkRGuzi
-	FwSwmSZjk9Z5utQRXpTUE/O/8zSfXNzFuRp6OoUVshOvbgOXrB4RAI2OBiThLMfs7y6RHKDBhgW
-	cIHpt8w==
-X-Google-Smtp-Source: AGHT+IEva6akKzygsV3eTjAuHUFzTW5RKHcvkYUPembdBdAiDgn0hyDfnrXciaaTEYE+lnp6Pa6eayl2kZA=
-X-Received: from pjbse12.prod.google.com ([2002:a17:90b:518c:b0:308:6685:55e6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a83:b0:2ee:9b09:7d3d
- with SMTP id 98e67ed59e1d1-30e8313da6fmr5609248a91.19.1747436857700; Fri, 16
- May 2025 16:07:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747436859; x=1748041659;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8kDa/puR8zC/TVy/ii11k+vGNrXdae9yxfqU/1udF6g=;
+        b=fTlICQlPLtCpjihUKoKHnsjU7RM2RH7mldSqZU40OQV23RAUvbPQStpdhh3EpIpKMs
+         VizOBRtuW81wZDklclHYdi3ePHgxtisH4vLKSe1DHPh3E+IvL+WlKIAW/KhXH71ZnIk6
+         oFRE5vVhoil8C3dLoehp3iEzbhb915FunKJ4MHA2EeYM/PkiVDMyzCmes+rQUtDX6ovF
+         7lci9MRx7J5kKV7Pz/rbF6BA6+djAfq+UAipsb1drO8HqFoSQjmdELl56KtHBEc+xxRe
+         LBy4FjPGwYLLlq1SmpWfvDwbK+HiSkcYjHRr5ntqw3VSn7GzvCPYNqtZysr8iUY3bj5f
+         n5Qg==
+X-Gm-Message-State: AOJu0Ywq8aU6O/v+YBj/+4zT0OLR6nOcF3O8z9nanx6jZ8YRbWfQxzaX
+	YeCbsiiBBkwCK4tlx2wjFGpZXTcOvK0xH4/S7hzto5yXKg9aTk4g+f5V7a6CTjjN1SsaSrWnDLD
+	S6wxBQw==
+X-Google-Smtp-Source: AGHT+IGms52EOzdUpeUySel370WkLvf5qcqXwBrssv6N0gEIpnS2oZ+4XnP+3IKYtmrBjEsQ2ftNzRdpjys=
+X-Received: from pjbsb5.prod.google.com ([2002:a17:90b:50c5:b0:301:2679:9d9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e8e:b0:301:1bce:c255
+ with SMTP id 98e67ed59e1d1-30e7d5a93bamr7142197a91.27.1747436859419; Fri, 16
+ May 2025 16:07:39 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 16 May 2025 16:07:26 -0700
+Date: Fri, 16 May 2025 16:07:27 -0700
+In-Reply-To: <20250516230734.2564775-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250516230734.2564775-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1112.g889b7c5bd8-goog
-Message-ID: <20250516230734.2564775-1-seanjc@google.com>
-Subject: [PATCH v2 0/8] irqbypass: Cleanups and a perf improvement
+Message-ID: <20250516230734.2564775-2-seanjc@google.com>
+Subject: [PATCH v2 1/8] irqbypass: Drop pointless and misleading THIS_MODULE get/put
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
@@ -84,68 +88,108 @@ Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
 	Binbin Wu <binbin.wu@linux.intel.com>, Yong He <alexyonghe@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The two primary goals of this series are to make the irqbypass concept
-easier to understand, and to address the terrible performance that can
-result from using a list to track connections.
+Drop irqbypass.ko's superfluous and misleading get/put calls on
+THIS_MODULE.  A module taking a reference to itself is useless; no amount
+of checks will prevent doom and destruction if the caller hasn't already
+guaranteed the liveliness of the module (this goes for any module).  E.g.
+if try_module_get() fails because irqbypass.ko is being unloaded, then the
+kernel has already hit a use-after-free by virtue of executing code whose
+lifecycle is tied to irqbypass.ko.
 
-For the first goal, track the producer/consumer "tokens" as eventfd context
-pointers instead of opaque "void *".  Supporting arbitrary token types was
-dead infrastructure when it was added 10 years ago, and nothing has changed
-since.  Taking an opaque token makes a very simple concept (device signals
-eventfd; KVM listens to eventfd) unnecessarily difficult to understand.
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ virt/lib/irqbypass.c | 20 --------------------
+ 1 file changed, 20 deletions(-)
 
-Burying that simple behind a layer of obfuscation also makes the overall
-code more brittle, as callers can pass in literally anything. I.e. passing
-in a token that will never be paired would go unnoticed.
-
-For the performance issue, use an xarray.  I'm definitely not wedded to an
-xarray, but IMO it doesn't add meaningful complexity (even requires less
-code), and pretty much Just Works.  Like tried this a while back[1], but
-the implementation had undesirable behavior changes and stalled out.
-
-Note, I want to do more aggressive cleanups of irqbypass at some point,
-e.g. not reporting an error to userspace if connect() fails is awful
-behavior for environments that want/need irqbypass to always work.  And
-KVM shold probably have a KVM_IRQFD_FLAG_NO_IRQBYPASS if a VM is never going
-to use device posted interrupts.  But those are future problems.
-
-v2:
- - Collect reviews. [Kevin, Michael]
- - Track the pointer as "struct eventfd_ctx *eventfd" instead of "void *token".
-   [Alex]
- - Fix typos and stale comments. [Kevin, Binbin]
- - Use "trigger" instead of the null token/eventfd pointer on failure in
-   vfio_msi_set_vector_signal(). [Kevin]
- - Drop a redundant "tmp == consumer" check from patch 3. [Kevin]
- - Require producers to pass in the line IRQ number.
-
-v1: https://lore.kernel.org/all/20250404211449.1443336-1-seanjc@google.com
-
-[1] https://lore.kernel.org/all/20230801115646.33990-1-likexu@tencent.com
-[2] https://lore.kernel.org/all/20250401161804.842968-1-seanjc@google.com
-
-Sean Christopherson (8):
-  irqbypass: Drop pointless and misleading THIS_MODULE get/put
-  irqbypass: Drop superfluous might_sleep() annotations
-  irqbypass: Take ownership of producer/consumer token tracking
-  irqbypass: Explicitly track producer and consumer bindings
-  irqbypass: Use paired consumer/producer to disconnect during
-    unregister
-  irqbypass: Use guard(mutex) in lieu of manual lock+unlock
-  irqbypass: Use xarray to track producers and consumers
-  irqbypass: Require producers to pass in Linux IRQ number during
-    registration
-
- arch/x86/kvm/x86.c                |   4 +-
- drivers/vfio/pci/vfio_pci_intrs.c |  10 +-
- drivers/vhost/vdpa.c              |  10 +-
- include/linux/irqbypass.h         |  46 ++++----
- virt/kvm/eventfd.c                |   7 +-
- virt/lib/irqbypass.c              | 190 +++++++++++-------------------
- 6 files changed, 107 insertions(+), 160 deletions(-)
-
-
-base-commit: 7ef51a41466bc846ad794d505e2e34ff97157f7f
+diff --git a/virt/lib/irqbypass.c b/virt/lib/irqbypass.c
+index 28fda42e471b..080c706f3b01 100644
+--- a/virt/lib/irqbypass.c
++++ b/virt/lib/irqbypass.c
+@@ -92,9 +92,6 @@ int irq_bypass_register_producer(struct irq_bypass_producer *producer)
+ 
+ 	might_sleep();
+ 
+-	if (!try_module_get(THIS_MODULE))
+-		return -ENODEV;
+-
+ 	mutex_lock(&lock);
+ 
+ 	list_for_each_entry(tmp, &producers, node) {
+@@ -120,7 +117,6 @@ int irq_bypass_register_producer(struct irq_bypass_producer *producer)
+ 	return 0;
+ out_err:
+ 	mutex_unlock(&lock);
+-	module_put(THIS_MODULE);
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(irq_bypass_register_producer);
+@@ -142,9 +138,6 @@ void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
+ 
+ 	might_sleep();
+ 
+-	if (!try_module_get(THIS_MODULE))
+-		return; /* nothing in the list anyway */
+-
+ 	mutex_lock(&lock);
+ 
+ 	list_for_each_entry(tmp, &producers, node) {
+@@ -159,13 +152,10 @@ void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
+ 		}
+ 
+ 		list_del(&producer->node);
+-		module_put(THIS_MODULE);
+ 		break;
+ 	}
+ 
+ 	mutex_unlock(&lock);
+-
+-	module_put(THIS_MODULE);
+ }
+ EXPORT_SYMBOL_GPL(irq_bypass_unregister_producer);
+ 
+@@ -188,9 +178,6 @@ int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer)
+ 
+ 	might_sleep();
+ 
+-	if (!try_module_get(THIS_MODULE))
+-		return -ENODEV;
+-
+ 	mutex_lock(&lock);
+ 
+ 	list_for_each_entry(tmp, &consumers, node) {
+@@ -216,7 +203,6 @@ int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer)
+ 	return 0;
+ out_err:
+ 	mutex_unlock(&lock);
+-	module_put(THIS_MODULE);
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(irq_bypass_register_consumer);
+@@ -238,9 +224,6 @@ void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
+ 
+ 	might_sleep();
+ 
+-	if (!try_module_get(THIS_MODULE))
+-		return; /* nothing in the list anyway */
+-
+ 	mutex_lock(&lock);
+ 
+ 	list_for_each_entry(tmp, &consumers, node) {
+@@ -255,12 +238,9 @@ void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
+ 		}
+ 
+ 		list_del(&consumer->node);
+-		module_put(THIS_MODULE);
+ 		break;
+ 	}
+ 
+ 	mutex_unlock(&lock);
+-
+-	module_put(THIS_MODULE);
+ }
+ EXPORT_SYMBOL_GPL(irq_bypass_unregister_consumer);
 -- 
 2.49.0.1112.g889b7c5bd8-goog
 
