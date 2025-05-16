@@ -1,151 +1,193 @@
-Return-Path: <kvm+bounces-46820-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46821-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED1DAB9EDB
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 16:45:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06841AB9EED
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 16:50:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DF367B20CC
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 14:44:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AF9B172E21
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 14:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A3E1AC88A;
-	Fri, 16 May 2025 14:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B8E71A76D0;
+	Fri, 16 May 2025 14:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uH3oPosz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hdVCbq/o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800131A0730
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 14:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAFB192598
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 14:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747406705; cv=none; b=Q7IQ8tqynOUgWIXI/dDS5ohuWNOCpNgTXBPAtpjhPnoVMNVykpPTGeUnVuUf99TGp5vAgnbVoJwR60PIYOA1rfdHZ3SQcRDkCDedaBYfBLliL3mgLqvM3d8tA7mQ1YByMnV38mI2oOljVj10qbKbq+FrMhhdKuANZaGp3BDVoZI=
+	t=1747406972; cv=none; b=dlhM5OZbXRRx0Mre4Lmo84ZYXulKA2gAIsFdm942SD2PAIUj8y/iCPROZ2OAgOnA8x3W02eHoHS8RXsHAQxx264cosbmbwc9S81t5C+krPkufK+KNPA3xA5vevWf/w20i8d4/0WTJf4QSgiAOAr5uT4yTYg5dsMiI2nxv3Hp4Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747406705; c=relaxed/simple;
-	bh=ai4HsUXe8Hf6sgaIpmcQ3fB9qzjUu4+7671cWfxzTsc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TvqrpnLBRP3P6fUstSDqAVS/QYtgulbGqUg7nUP4g/1CijfQQqnY+rmYGFk8TeK8N/XMfuIgVRMVzLyci+YxTfmLNRgdHJLTZjrZKsiKVg/PKmeOT/FNGMht/6v5ukgO7+tZL89K95u7Ltp/Dcx/BwoFan8X6AgPDsjC26MIKfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uH3oPosz; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7398d70abbfso2926904b3a.2
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 07:45:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747406703; x=1748011503; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JxpWO6d9RGjAdSroDlrJKpnDNm7YQaegewDBnMK2Spc=;
-        b=uH3oPosztB48FWUBaOZobTU4C6fJCfrxU1ukw5ExcGD3P1MTmO/z9rK38yiwd3NAqE
-         nQj3zIXF5RS9LpfGka2ur2ZMa7WsXFpm3s4x2kDjsxiR6xUmMcRACBbaRRqPajI4zRY6
-         Bgl+y6NJAR/cXmCiqUlNTN+O/PEABZWf8yHOaIvW/EA7wJYyJoDMI+MSap1Urzj0CfmE
-         n7g01DxrBstx+XiCDeNxWqSUPzM6iXoytAT2qFe8HhPcpa5dsLQleYQjqBqWyELYwVyQ
-         mHBQa2rZh6cw1iUxF1zEJHw4euKXj1SGnQp15PCHS8uC66EjIp69sTdurH/5RFjJ3FR4
-         5Jfw==
+	s=arc-20240116; t=1747406972; c=relaxed/simple;
+	bh=V1IhcdHuLlr/d6r+F0mxbsOxSnhxkIGaaWWorKm7lCk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=aZt21v4nw0Hwyz2N/vmqyo3RZkQ8rPU2n9eCU6WP1smpAecBmSJPgUNIt6FV/GmduOvTw7E/Cwm4reDUvb2HTjJyDOzutikuisdyGIATVfKR9Y1lyBkSdJosJBVS6XAXCFPnlhXq9VdCFnoonFQ+OBLWXGd9HKLKZdNSfcfG1Dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hdVCbq/o; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747406968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mUcEcOcsB6h+4BkG97q/0gEUCHaJixYyDJw3pTDwFoI=;
+	b=hdVCbq/ohMerUW0vwm1VyKT/NMoXU0KbKJbHSOJXoEGIUN8okSLKz9ineb5xQdQMPOEICb
+	vp75PNjCf1oprQci4TqGCcn9xJ/0o85Gqbm2ul3W713c7AUXi9yUqtSx1W76JI+GyOLsqP
+	1oGZEIJfUmZzyZ5gn3NWVNdV0R2h1kQ=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-206-2CDownvrOZeTOZ9HSa73sA-1; Fri, 16 May 2025 10:49:27 -0400
+X-MC-Unique: 2CDownvrOZeTOZ9HSa73sA-1
+X-Mimecast-MFC-AGG-ID: 2CDownvrOZeTOZ9HSa73sA_1747406967
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7cabd21579eso353850085a.3
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 07:49:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747406703; x=1748011503;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JxpWO6d9RGjAdSroDlrJKpnDNm7YQaegewDBnMK2Spc=;
-        b=UqS2ftJRpGl5nSUwRnecJpU/wGAV2fSytagL6NFG5gvWea/qlkBrBU6Z7b+lvDd4ZT
-         qMgrtWtf2AXPr0SQS45+bukVL8s7a7dr6ZSvBcy0/MWC8ykARsKj1+/JyUbnBXdD7tZV
-         KqNfVlOaT3AYpuklJrTiGLhLDhjx0DjgIHNAy7SmjsphRd1Iw2kI60Wl/y/9r8fOBMi3
-         f9MJ6uJXzsQmNIVfb+j/XQItKbcEkz7XhEenpojXAQPqQi99RM0oeYOVRAnRRUgHBwjl
-         gYWfAx4Omu7e9NYzajecbMwKzTGh91Ks4G+47d3vPJA9GRde1hFZr6CGwsZ+Tb6izCj4
-         5iig==
-X-Forwarded-Encrypted: i=1; AJvYcCUjAyb/gxZ+0TD0MDEUna+mUTbnSDNiWpEwFpJVU0JDZV1F3QfdRv9+lgqXnWpZaLrBbfc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqbPpoxatZz/RaJKJxYUS+tWWMuU3iteznMXw78P6/yKmwrUx8
-	7PzdFkUB3q2ps6aonDEP9p+SRsNJ0Yh/QAi/O5vaG0inXrdnGn1a/KO+rtnvn3JOEKnW1DDgua6
-	okFyFmA==
-X-Google-Smtp-Source: AGHT+IFUIIMoWvWfo/p1yEuFxXr/0VSd/5n+vRtdSY5Ojpq4Jm9/+IMOBJg1hmy8i1Fg/Wi7gFvmjRxoy+4=
-X-Received: from pfbdf3.prod.google.com ([2002:a05:6a00:4703:b0:740:41eb:584c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2e9b:b0:73e:1e21:b653
- with SMTP id d2e1a72fcca58-742a978e6a3mr5100316b3a.5.1747406702664; Fri, 16
- May 2025 07:45:02 -0700 (PDT)
-Date: Fri, 16 May 2025 07:45:01 -0700
-In-Reply-To: <aCc_LmORNibXBt8V@google.com>
+        d=1e100.net; s=20230601; t=1747406967; x=1748011767;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mUcEcOcsB6h+4BkG97q/0gEUCHaJixYyDJw3pTDwFoI=;
+        b=AHze7JnZKWPph19KB9Jp8Rxq1qUZKdkMAsdbhsgUDYw+hVAzKyNULxB9a+rbU9YQiL
+         /gLdMaJft0o4g1MqIK2gUOzcruLdgr3TCzj3MAOU9yRjRzY2FQbNW/zgjtUrmVPYqHpP
+         bdbS2yKFLJl3zdBt4FKxw3+FpDrpxBWJmva8iSC6RoDKmm7WhLqMqL3/xMMRmpn0sgy4
+         WOV5V7I4FeZMJ4N445c1lx6hv6arLd339qTjA+dsbIB9TSsrOVjPE3SvPbDTZ3VJZ/Pb
+         2tqaUrpo1NbW9qvNF22IF+t5s+6Dm+dK38RY0X8/rzemBCr+JD9PYBL+LRBQe3tcQlxd
+         x7qA==
+X-Gm-Message-State: AOJu0YyPZ4tJGk9DcopTj8H2DvquKaGxoRHpcJdV+wepdVWfPnCUScn2
+	QJFYJyYFe3lzBn5+S6Eq6V+XONdgqSzkcNZ+P4ilgo03azsCN6R30PkPM2W6Eg/2gm+7qA1DNY6
+	j1PJLjWdLCesI7z5EnkauTe8aLUpXttHGQ6lV8uv55XBVbiXIstT7Ow==
+X-Gm-Gg: ASbGncuZt/Nmbm9OudXl8MDacrTCJZ9qzvXUbbzwkrhL0VT9umlInZ72cBprXH9ysy/
+	s6O0FXbTOovilxS8j1NeARpq99nUsylMv946p5J7n22FWLpWCjOTBHYam4EKRCfAuoxKsM1XueU
+	ecQQWo0uNjAaN3e5UIGijb8/JtfZjWLyh1/leeaV8Wmm+fIFJ3gylR9V7jdTWDrlyASe/3qKDm6
+	cLxpdaBDvFItc72CwmK6j5gLxm3u4zQi7T1+VAqvQVWa3AY75hGE160QOJ75gDviEuAyFs0wbcv
+	qSEbzaPxbrAJufgZQz2SsBwwjxYKVza7/EdfJI4fteEQnB8gM7peuMi+Zvk=
+X-Received: by 2002:a05:620a:29c3:b0:7ca:ef12:966d with SMTP id af79cd13be357-7cd467b103dmr613005985a.56.1747406966766;
+        Fri, 16 May 2025 07:49:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0u0P+i81pUZ2hIpvTs4Eb+N0jEjlBklcN57ZAA9+FoG4QFTalDVFOAfKwNgrgmTQEBgRbdQ==
+X-Received: by 2002:a05:620a:29c3:b0:7ca:ef12:966d with SMTP id af79cd13be357-7cd467b103dmr612999985a.56.1747406966341;
+        Fri, 16 May 2025 07:49:26 -0700 (PDT)
+Received: from ?IPv6:2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38? ([2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cd467da087sm126161685a.41.2025.05.16.07.49.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 May 2025 07:49:25 -0700 (PDT)
+Message-ID: <5b43682cff05f0399c4d75cf6361374280f12c05.camel@redhat.com>
+Subject: Re: [PATCH v4 4/4] x86: KVM: VMX: preserve DEBUGCTLMSR_FREEZE_IN_SMM
+From: mlevitsk@redhat.com
+To: Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Sean
+ Christopherson <seanjc@google.com>, Borislav Petkov <bp@alien8.de>,
+ x86@kernel.org, Ingo Molnar <mingo@redhat.com>, 
+ linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>
+Date: Fri, 16 May 2025 10:49:24 -0400
+In-Reply-To: <aCazfDoU8DV3s/mh@intel.com>
+References: <20250515005353.952707-1-mlevitsk@redhat.com>
+	 <20250515005353.952707-5-mlevitsk@redhat.com> <aCazfDoU8DV3s/mh@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-25-mizhang@google.com>
- <aCc_LmORNibXBt8V@google.com>
-Message-ID: <aCdPbZiYmtni4Bjs@google.com>
-Subject: Re: [PATCH v4 24/38] KVM: x86/pmu: Exclude PMU MSRs in vmx_get_passthrough_msr_slot()
-From: Sean Christopherson <seanjc@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com, 
-	Kan <kan.liang@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Yongwei Ma <yongwei.ma@intel.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>, Jim Mattson <jmattson@google.com>, 
-	Sandipan Das <sandipan.das@amd.com>, Zide Chen <zide.chen@intel.com>, 
-	Eranian Stephane <eranian@google.com>, Shukla Manali <Manali.Shukla@amd.com>, 
-	Nikunj Dadhania <nikunj.dadhania@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 
-On Fri, May 16, 2025, Sean Christopherson wrote:
-> On Mon, Mar 24, 2025, Mingwei Zhang wrote:
-> > Reject PMU MSRs interception explicitly in
-> > vmx_get_passthrough_msr_slot() since interception of PMU MSRs are
-> > specially handled in intel_passthrough_pmu_msrs().
-> > 
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> > Co-developed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> > Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 12 +++++++++++-
-> >  1 file changed, 11 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 38ecf3c116bd..7bb16bed08da 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -165,7 +165,7 @@ module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
-> >  
-> >  /*
-> >   * List of MSRs that can be directly passed to the guest.
-> > - * In addition to these x2apic, PT and LBR MSRs are handled specially.
-> > + * In addition to these x2apic, PMU, PT and LBR MSRs are handled specially.
+On Fri, 2025-05-16 at 11:39 +0800, Chao Gao wrote:
+> > @@ -7368,6 +7381,9 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u6=
+4 run_flags)
+> > 	if (run_flags & KVM_RUN_LOAD_GUEST_DR6)
+> > 		set_debugreg(vcpu->arch.dr6, 6);
+> >=20
+> > +	if (run_flags & KVM_RUN_LOAD_DEBUGCTL)
+> > +		vmx_guest_debugctl_write(vcpu, vmx_guest_debugctl_read());
+>=20
+> ...
+>=20
+> > +
+> > 	/*
+> > 	 * Refresh vmcs.HOST_CR3 if necessary.=C2=A0 This must be done immedia=
+tely
+> > 	 * prior to VM-Enter, as the kernel may load a new ASID (PCID) any tim=
+e
+> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> > index 1b80479505d3..5ddedf73392b 100644
+> > --- a/arch/x86/kvm/vmx/vmx.h
+> > +++ b/arch/x86/kvm/vmx/vmx.h
+> > @@ -416,6 +416,8 @@ static inline void vmx_set_intercept_for_msr(struct=
+ kvm_vcpu *vcpu, u32 msr,
+> >=20
+> > void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
+> > u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiat=
+ed);
+> > +void vmx_guest_debugctl_write(struct kvm_vcpu *vcpu, u64 val);
+> > +u64 vmx_guest_debugctl_read(void);
+> >=20
+> > /*
+> > =C2=A0* Note, early Intel manuals have the write-low and read-high bitm=
+ap offsets
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 684b8047e0f2..a85078dfa36d 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -10752,7 +10752,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vc=
+pu)
+> > 		dm_request_for_irq_injection(vcpu) &&
+> > 		kvm_cpu_accept_dm_intr(vcpu);
+> > 	fastpath_t exit_fastpath;
+> > -	u64 run_flags;
+> > +	u64 run_flags, host_debug_ctl;
+> >=20
+> > 	bool req_immediate_exit =3D false;
+> >=20
+> > @@ -11024,7 +11024,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *v=
+cpu)
+> > 		set_debugreg(0, 7);
+> > 	}
+> >=20
+> > -	vcpu->arch.host_debugctl =3D get_debugctlmsr();
+> > +	host_debug_ctl =3D get_debugctlmsr();
+> > +	if (host_debug_ctl !=3D vcpu->arch.host_debugctl)
+> > +		run_flags |=3D KVM_RUN_LOAD_DEBUGCTL;
+> > +	vcpu->arch.host_debugctl =3D host_debug_ctl;
+>=20
+> IIUC, using run_flags here may only update the GUEST_DEBUGCTL field of a =
+vmcs02,
+> leaving vmcs01 not updated.
 
-Except y'all forgot to actually do the "special" handling, vmx_msr_filter_changed()
-needs to refresh the PMU MSR filters.  Only the x2APIC MSRs are excluded from
-userspace filtering (see kvm_msr_allowed()), everything else can be intercepted
-by userespace.  E.g. if an MSR filter is set _before_ PMU refresh, KVM's behavior
-will diverge from a filter that is set after PMU refresh.
+Hi,
 
-> >   */
-> >  static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
-> >  	MSR_IA32_SPEC_CTRL,
-> > @@ -691,6 +691,16 @@ static int vmx_get_passthrough_msr_slot(u32 msr)
-> >  	case MSR_LBR_CORE_FROM ... MSR_LBR_CORE_FROM + 8:
-> >  	case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
-> >  		/* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
-> > +	case MSR_IA32_PMC0 ...
-> > +		MSR_IA32_PMC0 + KVM_MAX_NR_GP_COUNTERS - 1:
-> > +	case MSR_IA32_PERFCTR0 ...
-> > +		MSR_IA32_PERFCTR0 + KVM_MAX_NR_GP_COUNTERS - 1:
-> > +	case MSR_CORE_PERF_FIXED_CTR0 ...
-> > +		MSR_CORE_PERF_FIXED_CTR0 + KVM_MAX_NR_FIXED_COUNTERS - 1:
-> > +	case MSR_CORE_PERF_GLOBAL_STATUS:
-> > +	case MSR_CORE_PERF_GLOBAL_CTRL:
-> > +	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> > +		/* PMU MSRs. These are handled in intel_passthrough_pmu_msrs() */
-> >  		return -ENOENT;
-> >  	}
-> 
-> This belongs in the patch that configures interception.  A better split would be
-> to have an Intel patch and an AMD patch, 
+Thankfully this should not be a problem because when KVM exits from vmcs02 =
+to vmcs01 the
+IA32_DEBUGCTL is reset to 0.=C2=A0
 
-I take that back, splitting the Intel and AMD logic makes is just as messy,
-because the control logic is very much shared between VMX and SVM.
+If I=E2=80=99m not mistaken, this always happens regardless of the VM_ENTRY=
+_LOAD_DEBUG_CONTROLS.
+
+Now since I wrapped the write of the with a helper function (vmx_guest_debu=
+gctl_write),
+it should pick up the new value.
+
+
+Best regards,
+	Maxim Levitsky
+
+>=20
+> >=20
+> > 	guest_timing_enter_irqoff();
+> >=20
+> > --=20
+> > 2.46.0
+> >=20
+> >=20
+>=20
+
 
