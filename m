@@ -1,142 +1,292 @@
-Return-Path: <kvm+bounces-46818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD493AB9E7D
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 16:19:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A6EDAB9E8D
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 16:22:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBF3C4E3D64
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 14:19:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D11291893267
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 14:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC901A0BE1;
-	Fri, 16 May 2025 14:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9504718D649;
+	Fri, 16 May 2025 14:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="ZJ1fvfyI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G/CNFniB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8976C199FAC
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 14:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16795282E1
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 14:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747405101; cv=none; b=Hur4CC9tNojhZjBHLn/d6VZ/43H4DtR9BWb00ARvcrPO/zmKBRC1cGmmTPLgXUADbwEroy4snjVpyQS7CHECxabJsoeLIhLhnVIhVanBeMcv0uf2/ymHpxIZKfTI3ZeOXTYToJRSegpM7xKEuDOIP0Q28EGQ5Le1H4MyObesCR0=
+	t=1747405302; cv=none; b=GZwh/3MJlZ1STkHQAnKIDbKycL4WuYSyPTwE4mPgqRhEb6Wkk6hZ6Ib6B9xdA1r46QAZNlpESF2IOMkzMmiRnuD9pvNam0hPIlQIssMiLWJT3O/+t4mxzGSX6XBiPI+fEm3lVd3LoOl+BDHrXP/mCh81j/6omrGQ9wLeY+X+Ahs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747405101; c=relaxed/simple;
-	bh=Mg6g1/TzH+Xhtn16KUSbRqht0teHBbYz5hWZnb6szNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l4k3sH0o6aVsGXDZlQ1fwyGqzwTioqeR0nsWOos9LRr19dsS+JxDCCV1qQOxfdw0hie98TKOqjPmTGCCnQXQljIC3Ex55zFomslCftRIizKT8PDF4W2MmoJ+g+w4OI4jw9+kItSHRWdHP8UhyJI+PPAdhxe7eEHwCnln62OoA60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=ZJ1fvfyI; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6f8b47c5482so10321896d6.3
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 07:18:18 -0700 (PDT)
+	s=arc-20240116; t=1747405302; c=relaxed/simple;
+	bh=EVkKLFS+FB4G/g2QYE9biq/j8EBnMuGWOFYlp5uz1OI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=irvurWyL+008tirAmdlpZLAEliyAoC6z7CJrr3SsusQRrgtHH2GkXAO9/J6Are9JaRNv33t8jacCHo7NVYKICMYJ+F57bN3rswZqj8cvS7FjU7WKabbbskXsxtIIq2KnBLm6zX1cWLe+BBrfIiUuNFXdRsmuk64gT767JwCvs3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G/CNFniB; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4774611d40bso300141cf.0
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 07:21:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1747405097; x=1748009897; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oku1snLMpD2EhPjxkL/jicRSSroCJrOHGMPvLIw4vjs=;
-        b=ZJ1fvfyIoPLhOUTfFLPr2CV0SxTY9jmFKzOClANqq33HzLbTTit4sVHm3+pv/ET8Nd
-         unQVmiHNboGffcxc0Rp/3UKZyQ9IOugXQ1AtwalwgujlN1gNlXpirN+i81W0rdbMFJfF
-         XgsS3J2RWJVcwqzdQ8n0SlNqakXit4pYwveCXj63pvD3XwDaLWwU9rfrzuyRhucdyvCS
-         xXXe3XUhPmXwMl4S0AEWT5aCNwaj6PxFrEModJVAP/KZgk21sKe7cs9shJeV/C1MV+nC
-         oIOcl9xeFgoWC2Pq4KP8G3fpvdp4RJOWZGJvuGuKdaW4tCPRt9OjQfzbHAXAfeJ4O+hc
-         yedw==
+        d=google.com; s=20230601; t=1747405299; x=1748010099; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Gx95MeEuG9a5F4o5TlfsgBawZJUohJXGboelCMmm1E=;
+        b=G/CNFniB8TM0+qGCs81Bt5cWciQ4XXv7YM90tZGwdA/EE26O3wZlGa5w9tBYSrhEpx
+         TU4XbgEVAQoyz5jnP4oXtmytmtCNRD8AJMuOs3vL6GEAy6QbjHJuyTIT8/7/LQKRFZci
+         UV6AORpiQEC6vRXSUt1h3NeRySMpJtVQrnvsY8Pi4wMFoRxDXuD9I4hTfVd7qpdfkwoK
+         3GVD8PmNnaUgexTZ8bavoAzypaOWhf7AMTg3T1pCUz9R/ocmJAdLciLVT3w8g7hYSdJv
+         zJgdXP5df+zNS/dmvOipOl7h5HZ0zogZaxHfZOg4lUAoD1o6TCFn9Jrzg8BLceDEOMQg
+         SLHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747405097; x=1748009897;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oku1snLMpD2EhPjxkL/jicRSSroCJrOHGMPvLIw4vjs=;
-        b=eoh1lAhfWdoqEZtd6QAwfmFO0Wg3UgI7+xB+imLAmi40KYXwpCroBDR3Zw2z4lYbyU
-         KUZ3m4+T02N9qadw1hENRMEB/74ZLdsp9xh2oQa15X5A/rcSBv0uAFWEBQLsBMDKd2mF
-         vySYf+2nU7ibeG3cU95oIyD6JtJaExp6cd3JNU+pgifTywEaYTeEAHX2aDiosD/hOH1u
-         7UKOtCuTvrrbko7S3DDrViqOuSuRQ4cFG9D69ONCBc8NKw6P7CKjnm5EI+x4JjtoiEuP
-         fg4AdGH1ChN5inhBO7+IvkRs6IQz1p2eJePwXV/sWdN/2LK1i/vw99om8YfraSDvitVf
-         erng==
-X-Forwarded-Encrypted: i=1; AJvYcCURZTDbqzBk+wMW01JE8zBDqsRV6E7NCg4zlM+mH0SgjndutWUzyT7/4xH2wiJjRRbHPg4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTO+gP85omYDsR49WdzbFSJDOgC/erdZI1cdl2PojFciOqP4eE
-	YUI564USdY0l7qq/+wIaUAJ7+NyJ7D+Zz+y+Ukc+aJyrOB/h+UDzpuUAnvSc5+Hu5/E=
-X-Gm-Gg: ASbGncsBU9yP3/evfP7ke4PA6OE/pNV0GKxAUCc0RfEhlH/233rnjttufBcucTnObzE
-	h++YFLHwbaxdEODVEj01vGDE+3U611xB6CeEDbfFwtcl6HwbtNLOrQsx8IoB9PjKHjHTGPSZ1MJ
-	FxnF/iqFBqeE3ytp2VWcqBWgi4CKp4aYYXqbfW+87HydLvEV5ueFfN/+WKtQFZrUXfZFrXTVJD/
-	BYKsR66vqA2njHrmutBkkkjXTbds7PjwmNAnvDOSeS5JWG38F09B1eRmI5LE5wAYqiGICI4TyJt
-	5tFgqihZlb/nwy62uWHbjrUCF6CjqbTdC/Co6+bn+fg8iFouNYaPqSmcAYhpkAzaibjRBdCQr17
-	5tJgUfMNYG4Fts12l7boEJYXZ8aM=
-X-Google-Smtp-Source: AGHT+IFtHK6p6wGrGRp+/Uark86W3HpnkGxzK5no2sq/+GtMDf7N3+z/MjO6uU/3WYiZf7Bgzm5AWQ==
-X-Received: by 2002:a05:6214:27e2:b0:6f5:4055:83d9 with SMTP id 6a1803df08f44-6f8b2c32c7bmr45344226d6.6.1747405097419;
-        Fri, 16 May 2025 07:18:17 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-56-70.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.56.70])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f8b096dda9sm12537746d6.71.2025.05.16.07.18.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 May 2025 07:18:16 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1uFvtA-00000002g0J-0A2r;
-	Fri, 16 May 2025 11:18:16 -0300
-Date: Fri, 16 May 2025 11:18:16 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: lizhe.67@bytedance.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, muchun.song@linux.dev,
-	Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH] vfio/type1: optimize vfio_pin_pages_remote() for
- hugetlbfs folio
-Message-ID: <20250516141816.GB530183@ziepe.ca>
-References: <20250513035730.96387-1-lizhe.67@bytedance.com>
- <20250515151946.1e6edf8b.alex.williamson@redhat.com>
+        d=1e100.net; s=20230601; t=1747405299; x=1748010099;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4Gx95MeEuG9a5F4o5TlfsgBawZJUohJXGboelCMmm1E=;
+        b=gQECkzOFEm+2rDA40Zfkios9wYJhz1uinsX97TTMp7Hq18mrZ3c91QKN8BryYgdP6+
+         gTU07KVPOm1ZE1y6nLbth8f12tbi9Y9YQgPPFXub8zdrRWjSmyJvNMw/8vk3cR6xA4e4
+         5D0HZCihNvqiJyiUEZ2kdhanXGPySERMoKsBMimakOteVetF4IvJcrcnWpHAtMJ7gIpo
+         92NBh879qMF/GADOlkwWdJNpz/LZAWbQKSDck11Bejglw5vqt8uQbLXx7hyBdyHrWOZI
+         7+FAYWx5JCstIJn3cZDmPoXt4bATUKoJc6Bixq0bvppHRsZxXhZHzCV74+SSLCn4qcZv
+         AUcg==
+X-Gm-Message-State: AOJu0Yx7886qPAe8qktYTAZUtiAp8LtGBkIZZQwawdQQKRZPamSqMUa/
+	ipZQ0ALREdOqH1vyz1RKNeEbtapvsHec3IJFdj42Srr9GugCfLxq+oHMlIIX7F12fQatQmw75Yr
+	Dnq9cluSb6BE1IMxIFpMq1XLfE9Sswm0pKxeIT1vG
+X-Gm-Gg: ASbGncsKdeFEtaSZnMwYPVq0+D9Tye1gDioEvOuZN6aEjJKf2Me4ePxfIfyUoVwEgJc
+	GQJ9TvyPfCrCnS1Xu0O5PeBZ16uR7RieazRkvaYQZ/d8vPvt0vMQTLDMZljjh1QWd9ijCawV3Kh
+	DK0UtDpFZNO1/lPS9FoZoJQZfrOeH87efewXznM0YnZ/SSL3td/wt9HagLBlM=
+X-Google-Smtp-Source: AGHT+IG9BQbe3D6OYznrgokRiyHAr+oO2Hki2vzSI5InxPp964z0WMUS12BNQkJEUsPjbiIDcuFg4vmGiIRRO2BGv8g=
+X-Received: by 2002:a05:622a:13ca:b0:494:58a3:d3e6 with SMTP id
+ d75a77b69052e-494a1dc9945mr9046861cf.26.1747405298218; Fri, 16 May 2025
+ 07:21:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250515151946.1e6edf8b.alex.williamson@redhat.com>
+References: <20250513163438.3942405-1-tabba@google.com> <20250513163438.3942405-8-tabba@google.com>
+ <c48843fb-c492-44d4-8000-705413aa9f08@redhat.com> <CA+EHjTwYfZf0rsFa-O386qowRKCsKHvhUjtc-q_+9aKddRVCFQ@mail.gmail.com>
+ <de375d2e-21ec-4494-8a8e-800e66076647@redhat.com>
+In-Reply-To: <de375d2e-21ec-4494-8a8e-800e66076647@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 16 May 2025 16:20:00 +0200
+X-Gm-Features: AX0GCFs9MZr6pehdoYL4Z29-N60sTr4wuO1DvLFNqQOlgs5ePz8Qsa7qzqPuLrE
+Message-ID: <CA+EHjTwsYoTZHsv+yvy=aRLamGuxMNbTqACXmZ5Hw+5XCi7aHA@mail.gmail.com>
+Subject: Re: [PATCH v9 07/17] KVM: guest_memfd: Allow host to map
+ guest_memfd() pages
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, May 15, 2025 at 03:19:46PM -0600, Alex Williamson wrote:
-> On Tue, 13 May 2025 11:57:30 +0800
-> lizhe.67@bytedance.com wrote:
-> 
-> > From: Li Zhe <lizhe.67@bytedance.com>
-> > 
-> > When vfio_pin_pages_remote() is called with a range of addresses that
-> > includes hugetlbfs folios, the function currently performs individual
-> > statistics counting operations for each page. This can lead to significant
-> > performance overheads, especially when dealing with large ranges of pages.
-> > 
-> > This patch optimize this process by batching the statistics counting
-> > operations.
-> > 
-> > The performance test results for completing the 8G VFIO IOMMU DMA mapping,
-> > obtained through trace-cmd, are as follows. In this case, the 8G virtual
-> > address space has been mapped to physical memory using hugetlbfs with
-> > pagesize=2M.
-> > 
-> > Before this patch:
-> > funcgraph_entry:      # 33813.703 us |  vfio_pin_map_dma();
-> > 
-> > After this patch:
-> > funcgraph_entry:      # 15635.055 us |  vfio_pin_map_dma();
-> > 
-> > Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
-> > ---
-> >  drivers/vfio/vfio_iommu_type1.c | 49 +++++++++++++++++++++++++++++++++
-> >  1 file changed, 49 insertions(+)
-> 
-> Hi,
-> 
-> Thanks for looking at improvements in this area...
+Hi Gavin,
 
-Why not just use iommufd? Doesn't it already does all these
-optimizations?
+On Fri, 16 May 2025 at 13:12, Gavin Shan <gshan@redhat.com> wrote:
+>
+> Hi Fuad,
+>
+> On 5/16/25 5:56 PM, Fuad Tabba wrote:
+> > On Fri, 16 May 2025 at 08:09, Gavin Shan <gshan@redhat.com> wrote:
+> >> On 5/14/25 2:34 AM, Fuad Tabba wrote:
+> >>> This patch enables support for shared memory in guest_memfd, including
+> >>> mapping that memory at the host userspace. This support is gated by the
+> >>> configuration option KVM_GMEM_SHARED_MEM, and toggled by the guest_memfd
+> >>> flag GUEST_MEMFD_FLAG_SUPPORT_SHARED, which can be set when creating a
+> >>> guest_memfd instance.
+> >>>
+> >>> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> >>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> >>> Signed-off-by: Fuad Tabba <tabba@google.com>
+> >>> ---
+> >>>    arch/x86/include/asm/kvm_host.h | 10 ++++
+> >>>    include/linux/kvm_host.h        | 13 +++++
+> >>>    include/uapi/linux/kvm.h        |  1 +
+> >>>    virt/kvm/Kconfig                |  5 ++
+> >>>    virt/kvm/guest_memfd.c          | 88 +++++++++++++++++++++++++++++++++
+> >>>    5 files changed, 117 insertions(+)
+> >>>
+> >>
+> >> [...]
+> >>
+> >>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> >>> index 6db515833f61..8e6d1866b55e 100644
+> >>> --- a/virt/kvm/guest_memfd.c
+> >>> +++ b/virt/kvm/guest_memfd.c
+> >>> @@ -312,7 +312,88 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+> >>>        return gfn - slot->base_gfn + slot->gmem.pgoff;
+> >>>    }
+> >>>
+> >>> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> >>> +
+> >>> +static bool kvm_gmem_supports_shared(struct inode *inode)
+> >>> +{
+> >>> +     uint64_t flags = (uint64_t)inode->i_private;
+> >>> +
+> >>> +     return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> >>> +}
+> >>> +
+> >>> +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+> >>> +{
+> >>> +     struct inode *inode = file_inode(vmf->vma->vm_file);
+> >>> +     struct folio *folio;
+> >>> +     vm_fault_t ret = VM_FAULT_LOCKED;
+> >>> +
+> >>> +     filemap_invalidate_lock_shared(inode->i_mapping);
+> >>> +
+> >>> +     folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> >>> +     if (IS_ERR(folio)) {
+> >>> +             int err = PTR_ERR(folio);
+> >>> +
+> >>> +             if (err == -EAGAIN)
+> >>> +                     ret = VM_FAULT_RETRY;
+> >>> +             else
+> >>> +                     ret = vmf_error(err);
+> >>> +
+> >>> +             goto out_filemap;
+> >>> +     }
+> >>> +
+> >>> +     if (folio_test_hwpoison(folio)) {
+> >>> +             ret = VM_FAULT_HWPOISON;
+> >>> +             goto out_folio;
+> >>> +     }
+> >>> +
+> >>> +     if (WARN_ON_ONCE(folio_test_large(folio))) {
+> >>> +             ret = VM_FAULT_SIGBUS;
+> >>> +             goto out_folio;
+> >>> +     }
+> >>> +
+> >>
+> >> I don't think there is a large folio involved since the max/min folio order
+> >> (stored in struct address_space::flags) should have been set to 0, meaning
+> >> only order-0 is possible when the folio (page) is allocated and added to the
+> >> page-cache. More details can be referred to AS_FOLIO_ORDER_MASK. It's unnecessary
+> >> check but not harmful. Maybe a comment is needed to mention large folio isn't
+> >> around yet, but double confirm.
+> >
+> > The idea is to document the lack of hugepage support in code, but if
+> > you think it's necessary, I could add a comment.
+> >
+>
+> Ok, I was actually nit-picky since we're at v9, which is close to integration,
+> I guess. If another respin is needed, a comment wouldn't be harmful, but it's
+> also perfectly fine without it :)
+>
+> >
+> >>
+> >>> +     if (!folio_test_uptodate(folio)) {
+> >>> +             clear_highpage(folio_page(folio, 0));
+> >>> +             kvm_gmem_mark_prepared(folio);
+> >>> +     }
+> >>> +
+> >>
+> >> I must be missing some thing here. This chunk of code is out of sync to kvm_gmem_get_pfn(),
+> >> where kvm_gmem_prepare_folio() and kvm_arch_gmem_prepare() are executed, and then
+> >> PG_uptodate is set after that. In the latest ARM CCA series, kvm_arch_gmem_prepare()
+> >> isn't used, but it would delegate the folio (page) with the prerequisite that
+> >> the folio belongs to the private address space.
+> >>
+> >> I guess that kvm_arch_gmem_prepare() is skipped here because we have the assumption that
+> >> the folio belongs to the shared address space? However, this assumption isn't always
+> >> true. We probably need to ensure the folio range is really belonging to the shared
+> >> address space by poking kvm->mem_attr_array, which can be modified by VMM through
+> >> ioctl KVM_SET_MEMORY_ATTRIBUTES.
+> >
+> > This series only supports shared memory, and the idea is not to use
+> > the attributes to check. We ensure that only certain VM types can set
+> > the flag (e.g., VM_TYPE_DEFAULT and KVM_X86_SW_PROTECTED_VM).
+> >
+> > In the patch series that builds on it, with in-place conversion
+> > between private and shared, we do add a check that the memory faulted
+> > in is in-fact shared.
+> >
+>
+> Ok, thanks for your clarification. I plan to review that series, but not
+> getting a chance yet. Right, it's sensible to limit the capability of modifying
+> page's attribute (private vs shared) to the particular machine types since
+> the whole feature (restricted mmap and in-place conversion) is applicable
+> to particular machine types. I can understand KVM_X86_SW_PROTECTED_VM
+> (similar to pKVM) needs the feature, but I don't understand why VM_TYPE_DEFAULT
+> needs the feature. I guess we may want to use guest-memfd as to tmpfs or
+> shmem, meaning all the address space associated with a guest-memfd is shared,
+> but without the corresponding private space pointed by struct kvm_userspace_memory_region2
+> ::userspace_addr. Instead, the 'userspace_addr' will be mmap(guest-memfd) from
+> VMM's perspective if I'm correct.
 
-Indeed today you can use iommufd with a memfd handle which should
-return the huge folios directly from the hugetlbfs and we never
-iterate with 4K pages.
+There are two reasons for why we're adding this feature for
+VM_TYPE_DEFAULT. The first is for VMMs like Firecracker to be able to
+run guests backed completely by guest_memfd [1]. Combined with
+Patrick's series for direct map removal in guest_memfd [2], this would
+allow running VMs that offer additional hardening against Spectre-like
+transient execution attacks. The other one is that, in the long term,
+the hope is for guest_memfd to become the main way for backing guests,
+regardless of the type of guest they represent.
 
-Jason
+If you're interested to find out more, we had a discussion about this
+a couple of weeks ago during the bi-weekly guest_memfd upstream call
+(May 1) [3].
+
+Cheers,
+/fuad
+
+[1] https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
+[2] https://lore.kernel.org/all/20250221160728.1584559-1-roypat@amazon.co.uk/
+[3] https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?tab=t.0#heading=h.jwwteecellpo
+
+
+
+
+
+> Thanks,
+> Gavin
+>
+> > Thanks,
+> > /fuad
+> >
+> >>> +     vmf->page = folio_file_page(folio, vmf->pgoff);
+> >>> +
+> >>> +out_folio:
+> >>> +     if (ret != VM_FAULT_LOCKED) {
+> >>> +             folio_unlock(folio);
+> >>> +             folio_put(folio);
+> >>> +     }
+> >>> +
+> >>> +out_filemap:
+> >>> +     filemap_invalidate_unlock_shared(inode->i_mapping);
+> >>> +
+> >>> +     return ret;
+> >>> +}
+> >>> +
+> >>
+> >> Thanks,
+> >> Gavin
+> >>
+> >
+>
 
