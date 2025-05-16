@@ -1,165 +1,152 @@
-Return-Path: <kvm+bounces-46912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E255ABA601
-	for <lists+kvm@lfdr.de>; Sat, 17 May 2025 00:43:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC79ABA62A
+	for <lists+kvm@lfdr.de>; Sat, 17 May 2025 01:07:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 353161B631D2
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 22:43:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B2347AF267
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 23:06:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77614280032;
-	Fri, 16 May 2025 22:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA73E280034;
+	Fri, 16 May 2025 23:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="swf0vnjs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EAfwHezS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C571ACEDC
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 22:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA00227B9A
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 23:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747435397; cv=none; b=BIOIybOUJYxGvYpBpxQ1CdqEMTJT9qcfWcuPgL6oCAF7DrMjfgT5l+sV23emH1spQwx8xR4fGz1JM3hJi27ZserJhtyPkx6ElXLQY1SLyRjuk06H6zvsEdskhkBph8CTTu15iP32FchiHGS9frfSPf4BZ0qmM0Upg7wDrVeHIsU=
+	t=1747436859; cv=none; b=qUAj7NaTWGkhilMfRoDRI9dC+niKaoADBsoPkAXMBRtZQcrPlYDSzoaXRe5DPJcmLQ8fRvjkvxT1TvCdVm5b+RftVvQgdwEZ6AfVA3wHEyqXI4LCUCmlzV0h6gi+7iVcZQfiYvow2CIrFHnjhjWybH1D6st7bCCz9Mt5VW0wDDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747435397; c=relaxed/simple;
-	bh=hfabRiLljbl1HANiIdfWAP98Xpico/Kdype+mEpmFZk=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=PYIKVcseeyGJfVZipXIlDW6R21ccZik9hryKykfdtmU1fuHpxw5c4rk1Ba+uH7PBVBFRvr3pqlA/MBYtUU1ssI1YXGcs9TmgLnq5E4q/3H0zrZhnj3X4r7RLuMPaDmxHYAEz7NelSRhNbnwVX1TBJp0+1PBb0sp9BGLKqB3/IzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=swf0vnjs; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1747436859; c=relaxed/simple;
+	bh=AVnn78Uc3EWeUJSQ7ziRvaqm0OPYoWQKB0eMNz4K9JQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KnLd0+El53xQ8iqrlYAP8Sdi3oVe9cyl9Wh6NbTJDC6eLChvux4gtMNFAmIf0YgtoqXthvtLKbmELjxq1JOz70bVukoJZyXh1H+eHK+4Nnn/q+F9YPz6WWF6bR9Zd8bQLD1xqIYu53fGajS8850mnfXmmjJIk31Fq6FgOAFldXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EAfwHezS; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7398d70abbfso3461728b3a.2
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 15:43:15 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-af59547f55bso1540583a12.0
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 16:07:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747435395; x=1748040195; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UwP/Vx2iaUwHKjVIPmZoWWF77us3LDnzfoBHKI6jETg=;
-        b=swf0vnjsKIMT2fTQe+sqHWGAX7MA6kIAcyVNygFs2ygYb+D4ykhk3aqjHm9t2V0SIO
-         nSX1HuUPwzXuj216CoOV/Iv7RUMahF4PiK+SqFLf6GYzk+ckYmcU4bW45jx9fGqjaidE
-         aNQ5AZie7LkJ7PH5i5ZEGHwLOGnxlkBW4LSZAbrJfs4tb7Vd+84yc+/m0oRFWnDprtoF
-         zl4Q6In/9U7jj42AjavRC6d6RN2uMJkvg6bWmtMPQ3G49vkpIf8gfk/i0FENlRxCeYwQ
-         3pdFqI2ydVnXNXuEMk6u2pXIvrmSiIaqbO37CFvxAqEdN1ASMIGp7HsGiNnt9pAwiPs1
-         Kyvw==
+        d=google.com; s=20230601; t=1747436858; x=1748041658; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nuPZrVo3m9ILiCK6u6rwy2V97Y83MmsuXvc2pUzideg=;
+        b=EAfwHezSm9vCY59gWxTn2oVu2ODdv4BTL0jS/G1SOZYpTpd6RqWpd9iiwqG0bLPQR/
+         mentDoc2U+AmX3B90Owx/+fohgnxONjEwYnWcn5XMpsy05iUWLCeiLVKQctxWb3K2mpW
+         41bp3L0Fg8WTYrOhv78rVUbwPTNjSQrsQwG5hRATJOdPZ59fBe00YIVf9EDiVNYqK6IG
+         gsgbXcfLegMmTjJNgwRbyMiq+V2SEB9qd+Ml705SoRlTdLm0Nj1ks0TrQfFUZR3aDwIq
+         PHj/THmbaYbhHYmewb4mZvqnWNnV/j7f/tHkpi1qLQUnv/Ua9GPDHiNHU4UMM6s8oIr/
+         0amg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747435395; x=1748040195;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+        d=1e100.net; s=20230601; t=1747436858; x=1748041658;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UwP/Vx2iaUwHKjVIPmZoWWF77us3LDnzfoBHKI6jETg=;
-        b=vpUcRyeDDP7n6omuUMsIuzCfA3a1KFMRrI9RwZ0GnQkiEmuytUP++YZQd5sib3sCzq
-         pgMWd1bzRZ07iU1mVfKqzWKT5t/Dq98FMb5/mS6NEFV29NLBkj5WF0wO5oIsjFsh1m0h
-         nQcpDFQX1iOVk/yb8FMdILzWnbiuVmGA38c++JorgxNXoQTc7gd1iVv7+hyOJM9kvUIB
-         tQC2e1Xxgdh5j+dAW0c0J30nFm/5Dyg8/7i4tXf5gh0RtaCHRZnROQ1yP4ykuIIR26n4
-         xlCRWWV3AhC68522LoqrANkp+PqAgx0/a9mDujh+SfKjTPiNciJ30ee5gmtU1Aij0mAR
-         r8DA==
-X-Gm-Message-State: AOJu0YzFvOQXWxUmSxJFhZVNsSWN7YBjQFj+UmQ1IAhjIrctaKj0iZvI
-	FYtvJDGSmjl6d+vnQdL7hz8bU2i3UsPJ2/8s99eCIle64vNKP1dQfeOG5qwYz7h+0RJCO67ontg
-	XGx25/GMciYuI+hGi+n6RPIdyqg==
-X-Google-Smtp-Source: AGHT+IG6+sFRSJbWE22FTz4ijWTukSwix/9j770r9PlxkRLB52VwmrOJ/kpeM4pmmDos7Oer2aGmJhNogxMLy5V/6g==
-X-Received: from pfbik5.prod.google.com ([2002:a05:6a00:8d05:b0:73c:29d8:b795])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:10c6:b0:740:a52f:9652 with SMTP id d2e1a72fcca58-742a97aa35emr6301726b3a.6.1747435395246;
- Fri, 16 May 2025 15:43:15 -0700 (PDT)
-Date: Fri, 16 May 2025 15:43:14 -0700
-In-Reply-To: <cover.1747264138.git.ackerleytng@google.com> (message from
- Ackerley Tng on Wed, 14 May 2025 16:41:39 -0700)
+        bh=nuPZrVo3m9ILiCK6u6rwy2V97Y83MmsuXvc2pUzideg=;
+        b=r5yLVDFW+z9AG5vSDS7JiXNY10k5KzVosQQAYdtmpaLQ0qnrG9akZuw+RftOyi/7Cj
+         ghFoLo7DELOwthH4AkIM5tQNKW9sj/RnE8kYIXULPA+YHaKz9G7txWQlGWANEKC08vFp
+         /4G6UV5D/saldn6DnjjD/3Vwcpf2dW5/pJnNXh82QzO6l6BYiaRX/ATxDkWeNryKHaY0
+         iAFT6X4/SwUzcRDEdYCIKFFt8VNXCA8YPU8GcP6OEPKAsvVTQ5LQFQ47qd2b2Vzjnc0E
+         PMckwqAMylx3RTtly0Eyboih10qVhWT0kA+YDk6r+4vNshA+G01FyWV7hrwvX3Lbuqgy
+         XIwg==
+X-Gm-Message-State: AOJu0Yzp2zG9TUdc9A7t7gi8VOIk2Rh2YfeTF6FKGGJE8rknKDkRGuzi
+	FwSwmSZjk9Z5utQRXpTUE/O/8zSfXNzFuRp6OoUVshOvbgOXrB4RAI2OBiThLMfs7y6RHKDBhgW
+	cIHpt8w==
+X-Google-Smtp-Source: AGHT+IEva6akKzygsV3eTjAuHUFzTW5RKHcvkYUPembdBdAiDgn0hyDfnrXciaaTEYE+lnp6Pa6eayl2kZA=
+X-Received: from pjbse12.prod.google.com ([2002:a17:90b:518c:b0:308:6685:55e6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a83:b0:2ee:9b09:7d3d
+ with SMTP id 98e67ed59e1d1-30e8313da6fmr5609248a91.19.1747436857700; Fri, 16
+ May 2025 16:07:37 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 16 May 2025 16:07:26 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <diqzbjrsfa7x.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
-From: Ackerley Tng <ackerleytng@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
-	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
-	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
-	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
-	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
-	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
-	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
-	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
-	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
-	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
+X-Mailer: git-send-email 2.49.0.1112.g889b7c5bd8-goog
+Message-ID: <20250516230734.2564775-1-seanjc@google.com>
+Subject: [PATCH v2 0/8] irqbypass: Cleanups and a perf improvement
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kevin Tian <kevin.tian@intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	David Matlack <dmatlack@google.com>, Like Xu <like.xu.linux@gmail.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Yong He <alexyonghe@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Ackerley Tng <ackerleytng@google.com> writes:
+The two primary goals of this series are to make the irqbypass concept
+easier to understand, and to address the terrible performance that can
+result from using a list to track connections.
 
-> <snip>
->
-> Here are some remaining issues/TODOs:
->
-> 1. Memory error handling such as machine check errors have not been
->    implemented.
-> 2. I've not looked into preparedness of pages, only zeroing has been
->    considered.
-> 3. When allocating HugeTLB pages, if two threads allocate indices
->    mapping to the same huge page, the utilization in guest_memfd inode's
->    subpool may momentarily go over the subpool limit (the requested size
->    of the inode at guest_memfd creation time), causing one of the two
->    threads to get -ENOMEM. Suggestions to solve this are appreciated!
-> 4. max_usage_in_bytes statistic (cgroups v1) for guest_memfd HugeTLB
->    pages should be correct but needs testing and could be wrong.
-> 5. memcg charging (charge_memcg()) for cgroups v2 for guest_memfd
->    HugeTLB pages after splitting should be correct but needs testing and
->    could be wrong.
-> 6. Page cache accounting: When a hugetlb page is split, guest_memfd will
->    incur page count in both NR_HUGETLB (counted at hugetlb allocation
->    time) and NR_FILE_PAGES stats (counted when split pages are added to
->    the filemap). Is this aligned with what people expect?
->
+For the first goal, track the producer/consumer "tokens" as eventfd context
+pointers instead of opaque "void *".  Supporting arbitrary token types was
+dead infrastructure when it was added 10 years ago, and nothing has changed
+since.  Taking an opaque token makes a very simple concept (device signals
+eventfd; KVM listens to eventfd) unnecessarily difficult to understand.
 
-For people who might be testing this series with non-Coco VMs (heads up,
-Patrick and Nikita!), this currently splits the folio as long as some
-shareability in the huge folio is shared, which is probably unnecessary?
+Burying that simple behind a layer of obfuscation also makes the overall
+code more brittle, as callers can pass in literally anything. I.e. passing
+in a token that will never be paired would go unnoticed.
 
-IIUC core-mm doesn't support mapping at 1G but from a cursory reading it
-seems like the faulting function calling kvm_gmem_fault_shared() could
-possibly be able to map a 1G page at 4K.
+For the performance issue, use an xarray.  I'm definitely not wedded to an
+xarray, but IMO it doesn't add meaningful complexity (even requires less
+code), and pretty much Just Works.  Like tried this a while back[1], but
+the implementation had undesirable behavior changes and stalled out.
 
-Looks like we might need another flag like
-GUEST_MEMFD_FLAG_SUPPORT_CONVERSION, which will gate initialization of
-the shareability maple tree/xarray.
+Note, I want to do more aggressive cleanups of irqbypass at some point,
+e.g. not reporting an error to userspace if connect() fails is awful
+behavior for environments that want/need irqbypass to always work.  And
+KVM shold probably have a KVM_IRQFD_FLAG_NO_IRQBYPASS if a VM is never going
+to use device posted interrupts.  But those are future problems.
 
-If shareability is NULL for the entire hugepage range, then no splitting
-will occur.
+v2:
+ - Collect reviews. [Kevin, Michael]
+ - Track the pointer as "struct eventfd_ctx *eventfd" instead of "void *token".
+   [Alex]
+ - Fix typos and stale comments. [Kevin, Binbin]
+ - Use "trigger" instead of the null token/eventfd pointer on failure in
+   vfio_msi_set_vector_signal(). [Kevin]
+ - Drop a redundant "tmp == consumer" check from patch 3. [Kevin]
+ - Require producers to pass in the line IRQ number.
 
-For Coco VMs, this should be safe, since if this flag is not set,
-kvm_gmem_fault_shared() will always not be able to fault (the
-shareability value will be NULL.
+v1: https://lore.kernel.org/all/20250404211449.1443336-1-seanjc@google.com
 
-> Here are some optimizations that could be explored in future series:
->
-> 1. Pages could be split from 1G to 2M first and only split to 4K if
->    necessary.
-> 2. Zeroing could be skipped for Coco VMs if hardware already zeroes the
->    pages.
->
-> <snip>
+[1] https://lore.kernel.org/all/20230801115646.33990-1-likexu@tencent.com
+[2] https://lore.kernel.org/all/20250401161804.842968-1-seanjc@google.com
+
+Sean Christopherson (8):
+  irqbypass: Drop pointless and misleading THIS_MODULE get/put
+  irqbypass: Drop superfluous might_sleep() annotations
+  irqbypass: Take ownership of producer/consumer token tracking
+  irqbypass: Explicitly track producer and consumer bindings
+  irqbypass: Use paired consumer/producer to disconnect during
+    unregister
+  irqbypass: Use guard(mutex) in lieu of manual lock+unlock
+  irqbypass: Use xarray to track producers and consumers
+  irqbypass: Require producers to pass in Linux IRQ number during
+    registration
+
+ arch/x86/kvm/x86.c                |   4 +-
+ drivers/vfio/pci/vfio_pci_intrs.c |  10 +-
+ drivers/vhost/vdpa.c              |  10 +-
+ include/linux/irqbypass.h         |  46 ++++----
+ virt/kvm/eventfd.c                |   7 +-
+ virt/lib/irqbypass.c              | 190 +++++++++++-------------------
+ 6 files changed, 107 insertions(+), 160 deletions(-)
+
+
+base-commit: 7ef51a41466bc846ad794d505e2e34ff97157f7f
+-- 
+2.49.0.1112.g889b7c5bd8-goog
+
 
