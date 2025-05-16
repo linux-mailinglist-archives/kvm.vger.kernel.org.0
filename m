@@ -1,145 +1,156 @@
-Return-Path: <kvm+bounces-47580-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FD83AC224E
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 14:01:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F400AC2381
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 15:13:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C548C1BC2B1D
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 12:01:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03B3A1C04F53
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 13:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69352236451;
-	Fri, 23 May 2025 12:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E186A19E975;
+	Fri, 23 May 2025 13:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nxHUTEje"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MPxVG9Do"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002A32036ED;
-	Fri, 23 May 2025 12:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2349914885B;
+	Fri, 23 May 2025 13:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748001663; cv=none; b=hh0j+rpKQtcDlq1TXA2jfo6PIjWVQ7PWk3I/LAophVFZf3hxYrArYQaP8+oqaLeiW7QCm5sBLotObi8ZZEus/a89+pfWVRN8fVda5LsLdPzieP7bKrheEKv8UCjh4ssa/5Ytu5A7WVCBq4mISHVqnSTmXQUJe8Y/oiqh/P4wVgQ=
+	t=1748005960; cv=none; b=tlNLByJ7L34/8fWljh6dDetkFkoMGPYEiyAB242WaY9gVWb+NBAQe7IVDs0dpxCqXHwztpddvhqRKS1b07zSrBxB8EATEtSs4QQoHX2nTHioBGFw4zkBVp6a/dy2qrgbZoOlN6ChrDtfpAfZl7tfquWwSpbr+y1+oID0AwxirIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748001663; c=relaxed/simple;
-	bh=7IjIckS/eHld9WifYNay9DZZv9Fs5Z1uq608lkoIXkI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iYQY65v78qAduUeDMz7cshtgQ1aQjLX7qCGprRAzUpdDZAO7R1OQ9UAp3CDGbi4B8sSrV4PgNpIgRoLA2EUSaRvr2aKrlCHllhl3HUKJh55kMuBHlWJMlMQhVX0vEMuEeu3PFzX+CjTaWVJzhuovdrKBP/rC5Fqkkhn28uR3xfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nxHUTEje; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1748005960; c=relaxed/simple;
+	bh=9SugXRrE9PpqZwWLIG/qzbGhzadN0J1Xh2e9tSKDdFQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jOZVbtVoC/0jWkieM5vPeDRUrnbP3CLzZqMAnfNTwyy0ec4sjKQ04RyELlLeDScIF5AJdF5sbyOy28rRM/AQHuWb0Ec7aU/ic2ECKyqLN3xn1y0VqU74d3ZIWcJsbPSM4J5P2LdpRKgkVe8V67i+J69BebGMbck/3zIM1LttqOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MPxVG9Do; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748001662; x=1779537662;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=7IjIckS/eHld9WifYNay9DZZv9Fs5Z1uq608lkoIXkI=;
-  b=nxHUTEjeRckz0pihB027tb/94QuYG4HV3b5v1rEib/k/2qgaPQExy4ij
-   HRVc7bxLeCrpqNg0Y5BQR3NtwJyeZXEtE9iY6C+8f/MKevm4/6Lt/WIAs
-   gsvseR7rn+NuACa67HRsk5Hcexhtrp1fniZeNpvM5FOgLLHmrw21rLXpH
-   w1Xs4GDKY7Tr47jbKnvjqGeJc+izqBEJyXusYME85+pZxvR2/PVsh9HIm
-   yIFRHKkKV7egxzi9QS2ciOB8W81wR8bYw22Pu64muIfe9CkxV8Xi8nwxI
-   kjYkuWAT7PcHTQs5x8D2CJErT36Dg3uyUDoSFCrHzXdX8FqKzK6qy/oYx
+  t=1748005958; x=1779541958;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=9SugXRrE9PpqZwWLIG/qzbGhzadN0J1Xh2e9tSKDdFQ=;
+  b=MPxVG9Dob5fYGZ0t77KCD8ESDvuZSr5wo0sBlfgWBr64GZ11OYWc/6/q
+   ngAzCK0gMIyq+WxuywE1lUftOxUyMIgJpmV1j9pjMhKMfndT0ZoAfnPQf
+   ciKJ9WcEupDda5awZoNUaRCVHayB7ImsVyNfMfmh4VdMsNeHiZ5OxUJdg
+   OUWgZ2sRwxGeH2zMvy2UXLN2IoWFQFkwkhE8k2Yjpc1O813sZ/nbE6MH6
+   YJBFchX2+KHcpupIANmg4JYbQgehpGSyFj3hB4erblDjgTT2//g9YYMTS
+   UVybV33I2jkxUWZ0aImCBfXqAnh5wNnNRqZlSSef4iIVkKRj5zZXbxPSp
    Q==;
-X-CSE-ConnectionGUID: GXi5kTDVTe2MItB97A3lUw==
-X-CSE-MsgGUID: GieZnZyMSRW9inJwlotmSw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="50220491"
+X-CSE-ConnectionGUID: bSSJGygTTreFkJfZrwL4fw==
+X-CSE-MsgGUID: EuaUNaTWTMS48SiYhvJZaQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="49766784"
 X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
-   d="scan'208";a="50220491"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 05:01:01 -0700
-X-CSE-ConnectionGUID: 7NjLot7PTG2we7A1X3P5lw==
-X-CSE-MsgGUID: 7qugAWUHQgK6aOkQIYfU1A==
+   d="scan'208";a="49766784"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 06:12:37 -0700
+X-CSE-ConnectionGUID: FS7zd6hQRtaKz/WmDWSIhw==
+X-CSE-MsgGUID: Zxpj9SUSS+SuYp4TB3pPog==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
-   d="scan'208";a="141178468"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa007.fm.intel.com with ESMTP; 23 May 2025 05:00:58 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id ACD931F6; Fri, 23 May 2025 15:00:56 +0300 (EEST)
-Date: Fri, 23 May 2025 15:00:56 +0300
-From: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "seanjc@google.com" <seanjc@google.com>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>
-Subject: Re: [RFC, PATCH 08/12] KVM: x86/tdp_mmu: Add phys_prepare() and
- phys_cleanup() to kvm_x86_ops
-Message-ID: <mgu7at7d3qy4h55bchxfmxj6yzqyi7gh4ieds4ecdvlv243frl@bzou376shiak>
-References: <20250502130828.4071412-1-kirill.shutemov@linux.intel.com>
- <20250502130828.4071412-9-kirill.shutemov@linux.intel.com>
- <aBn4pfn4aMXcFHd7@yzhao56-desk.sh.intel.com>
- <t2im27kgcfsl2qltxbf3cear35szyoafczgvmmwootxthnbcdp@dasmg4bdfd6i>
- <aB1ZplDCPkDCkhQr@yzhao56-desk.sh.intel.com>
- <2bi4cz2ulrki62odprol253mhxkvjdu3xtq4p6dbndowsufnmu@7kzlzywmi22s>
- <8668efe87d6e538b5a49a3c7508ade612a6d766b.camel@intel.com>
+   d="scan'208";a="146126629"
+Received: from msatwood-mobl.amr.corp.intel.com (HELO [10.125.109.147]) ([10.125.109.147])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 06:12:36 -0700
+Message-ID: <509a5751-f2a4-45af-8bfb-1058dae549fb@intel.com>
+Date: Fri, 16 May 2025 08:19:18 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8668efe87d6e538b5a49a3c7508ade612a6d766b.camel@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 0/6] Introduce CET supervisor state support
+To: Ingo Molnar <mingo@kernel.org>, Chao Gao <chao.gao@intel.com>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ tglx@linutronix.de, seanjc@google.com, pbonzini@redhat.com,
+ peterz@infradead.org, rick.p.edgecombe@intel.com, weijiang.yang@intel.com,
+ john.allen@amd.com, bp@alien8.de, chang.seok.bae@intel.com,
+ xin3.li@intel.com, Aruna Ramakrishna <aruna.ramakrishna@oracle.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Eric Biggers
+ <ebiggers@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Ingo Molnar <mingo@redhat.com>, Kees Cook <kees@kernel.org>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Mitchell Levy
+ <levymitchell0@gmail.com>, Nikolay Borisov <nik.borisov@suse.com>,
+ Oleg Nesterov <oleg@redhat.com>, Samuel Holland <samuel.holland@sifive.com>,
+ Sohil Mehta <sohil.mehta@intel.com>, Stanislav Spassov <stanspas@amazon.de>,
+ Uros Bizjak <ubizjak@gmail.com>, Vignesh Balasubramanian <vigbalas@amd.com>,
+ Zhao Liu <zhao1.liu@intel.com>
+References: <20250512085735.564475-1-chao.gao@intel.com>
+ <aCYLMY00dKbiIfsB@gmail.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <aCYLMY00dKbiIfsB@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 14, 2025 at 12:00:17AM +0000, Huang, Kai wrote:
-> On Mon, 2025-05-12 at 12:55 +0300, Kirill A. Shutemov wrote:
-> > On Fri, May 09, 2025 at 09:25:58AM +0800, Yan Zhao wrote:
-> > > On Thu, May 08, 2025 at 04:23:56PM +0300, Kirill A. Shutemov wrote:
-> > > > On Tue, May 06, 2025 at 07:55:17PM +0800, Yan Zhao wrote:
-> > > > > On Fri, May 02, 2025 at 04:08:24PM +0300, Kirill A. Shutemov wrote:
-> > > > > > The functions kvm_x86_ops::link_external_spt() and
-> > > > > > kvm_x86_ops::set_external_spte() are used to assign new memory to a VM.
-> > > > > > When using TDX with Dynamic PAMT enabled, the assigned memory must be
-> > > > > > covered by PAMT.
-> > > > > > 
-> > > > > > The new function kvm_x86_ops::phys_prepare() is called before
-> > > > > > link_external_spt() and set_external_spte() to ensure that the memory is
-> > > > > > ready to be assigned to the virtual machine. In the case of TDX, it
-> > > > > > makes sure that the memory is covered by PAMT.
-> > > > > > 
-> > > > > > kvm_x86_ops::phys_prepare() is called in a context where struct kvm_vcpu
-> > > > > > is available, allowing the implementation to allocate memory from a
-> > > > > > per-VCPU pool.
-> > > > > > 
-> > > > > Why not invoke phys_prepare() and phys_cleanup() in set_external_spte_present()?
-> > > > > Or in tdx_sept_set_private_spte()/tdx_sept_link_private_spt()?
-> > > > 
-> > > > Because the memory pool we allocated from is per-vcpu and we lost access
-> > > > to vcpu by then. And not all callers provide vcpu.
-> > > Maybe we can get vcpu via kvm_get_running_vcpu(), as in [1].
-> > > Then for callers not providing vcpu (where vcpu is NULL), we can use per-KVM
-> > > cache? 
-> > 
-> > Hm. I was not aware of kvm_get_running_vcpu(). Will play with it, thanks.
+On 5/15/25 08:41, Ingo Molnar wrote:
+> * Chao Gao <chao.gao@intel.com> wrote:
+>> I kindly request your consideration for merging this series. Most of 
+>> patches have received Reviewed-by/Acked-by tags.
+> I don't see anything objectionable in this series.
 > 
-> I am not sure why per-vcpu cache matters.
-> 
-> For non-leaf SEPT pages, AFAICT the "vcpu->arch.mmu_external_spt_cache" is just
-> an empty cache, and eventually __get_free_page() is used to allocate in:
->                                                                                             
->   sp->external_spt = 
-> 	kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_external_spt_cache);
-> 
-> So why not we actually create a kmem_cache for it with an actual 'ctor', and we
-> can call tdx_alloc_page() in that.  This makes sure when the "external_spt" is
-> allocated, the underneath PAMT entry is there.
+> The upcoming v6.16 merge window is already quite crowded in terms of 
+> FPU changes, so I think at this point we are looking at a v6.17 merge, 
+> done shortly after v6.16-rc1 if everything goes well. Dave, what do you 
+> think?
 
-I looked closer to this and while it is good idea, but ctor in kmem_cache
-cannot fail which makes this approach not viable.
+It's getting into shape, but it has a slight shortage of reviews. For
+now, it's an all-Intel patch even though I _thought_ AMD had this
+feature too. It's also purely for KVM and has some suggested-by's from
+Sean, but no KVM acks on it.
 
-I guess we can a constructor directly into struct kvm_mmu_memory_cache.
-Let me play with this.
-
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+I have the feeling Sean would speak up if this was going in a bad
+direction for KVM, but I do love to see acks accompanying suggested-by's
+to indicate that the suggestion was interpreted properly.
 
