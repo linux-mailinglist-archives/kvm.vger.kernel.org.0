@@ -1,238 +1,202 @@
-Return-Path: <kvm+bounces-46868-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46869-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE968ABA3AE
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 21:24:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F3C6ABA3B9
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 21:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EAF7A27DFE
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 19:23:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BF84A241BD
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 19:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F9828467B;
-	Fri, 16 May 2025 19:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0443D28001C;
+	Fri, 16 May 2025 19:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="muzAEcx3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C1CMQbKb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC97283C8D
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 19:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98898280018
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 19:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747423210; cv=none; b=sPSfehGuXEeYZSqg7AR9qb6SBrqBWZZPTRx/d9bh65wbXfvPot5c6DMrxApAtTqJWKdxS1H4uttLsHvscWDZ3vCrstWCHTIBsp9OCyIbNMQwAkB21Nlfz/dVsGRC8To233+0VHQivZAEjgzDc/uWONFX3DG+IH0NNp8C6IiQvSI=
+	t=1747423357; cv=none; b=cA7PpfBwsipYrS7Oz0FWKpZyejEEf6l544ZqY7tp5hrUqBO42aSl5M7TkcuNxoNUWtt9AZY22gn7GgcvSy58t/ZaYRMwoBwVAjRzQIj+jHoZyBKIsVPfcUiQknkKYqY0ngLPYCHI84WtaSK+6nXoWa0ZBhDBXhK2kB3dOFJ9XXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747423210; c=relaxed/simple;
-	bh=286azteypIeGDNxuuOVgHebViNvaqsxBRbBpJ41BQWU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=a6/gFLqmOEkDslk46QhvCT9N9cTrsQfQ1F/b27Y8GKRcE3Mc7TdHTG2o+WvX+ntNlrchL+tQBvAlYPN48hcs0ErEOvq+gX1ZC0DVw0uY4Iji/ggdsCFUPJLfFfK2QIVRQyvOlyynDAr/03zRRUlMcOOha/gAboojQh+PHnp8bzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=muzAEcx3; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1747423357; c=relaxed/simple;
+	bh=mv1Ins7jvbobKa3n2jnizEHtuD4BULDUPYaGteSuvOE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P6eAO7X/pVtH82qDxH/mjs3EBQrv0/UnOsqrYKF7bBAoD16wnKB06Q0L5GlAm5NuoZmjsCna7Z3s0c4iDaEpgI1J5gwTZQtusuvDUoOfYwfXKCt/vbZX8vQoVg0c+y8w4WoaJ7jjwZTLWNKufMYo+QjpS0yW4uTlqO/9Mm0EobQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C1CMQbKb; arc=none smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7391d68617cso2776868b3a.0
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 12:20:08 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-70900a80907so22881237b3.0
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 12:22:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747423208; x=1748028008; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o/DXUzrkv3zGlmZlSMCdLZe68HkBWyu2pzyjcV2UND4=;
-        b=muzAEcx35/+br5ctE1QZqiCykknGmCfP7lXVwzcZCervlpEGX5UzDr+8cKlr7NI/MS
-         nzJegQPu/xGt8X0pJsvQjg/pVEsAb502R6432/4gxRRAZ6CH6nwv/ymWNvQIQssfIPOq
-         SzyDIJ8YZbjeI7YKyrUOmeZN+RYy1sWEOYvT3LDWapdo38MHQQ7zrhvq0mjYn77y/Ffe
-         Je2qwLcEdqrAb44tKotAPUCGOi++kUlg80FDp9WDHoTM535vD47VyzN6xmOBzHdP9C6a
-         0eXqJuvDtkilH5xyfg709qdO7TdW6roYniRQstRBFWvp9paHoclMD8iHX7NbOSqeFmBy
-         fUNg==
+        d=google.com; s=20230601; t=1747423354; x=1748028154; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X5csGcQ8badg6OQc2j12fcylP9C8BoCep+FBckAp9xQ=;
+        b=C1CMQbKb13wdheh5RbK8OT4VZyiX0o20ZWgRmHOLxPPIR43ZifNSAwB/mWzjpKjZ3t
+         m6Vc1TMJlIP1vIxm2vN71sGPbl8cKSzcPARflld3T/wD4T3+TGT10f+lDIoOGdjxpnAZ
+         NuCZwYKxj7NhM/eCw9AF5zbanrdpyCdS3ucNI0x/DkO3CEPJPxwKD05bM2rgIR0Oa2vE
+         lpxSkXlZBzv4Cr6avrKeRcWaJKCzxyY67ZVRBiW4lBOJDY3GjMO7WIpSBYFnaW2itO8d
+         lMsHsskl8O+496VKaT8UpDFRY39DWnSgy1OSyIcpaSzIEeiryIGI2NpLX7nWtTJcof6B
+         b9cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747423208; x=1748028008;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o/DXUzrkv3zGlmZlSMCdLZe68HkBWyu2pzyjcV2UND4=;
-        b=prAxzZ/yAO8JcnSPtIzeSukeErBF6nvFAJ1vUMTE73/R3ilch9XE3et72OyqazDSpA
-         OmexwBR/F2URTRMocg2eqmwTrxcXPBRjONz9K5iAdj4LJavxLIGppoYv35iO607baoI8
-         f1FdTUZFptWPKycndb5Yw6XG/ewf+JvUYYU1bkE3dVz8UqgyeeMaF+AkPHcCk5BkwUpV
-         UlsIrHb46gSSf9LqC+5VUH67/L7iFEQdaxMpVC9bLeMGrbAugPtvBRhCzLQ/X9vjwthz
-         wrsZTwzlcU4OUpdbbwLKi3cqAwCobU4mNP55kajkgV++hVLl1/5ofVyhpvQAT+NStzAO
-         skTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXmfownpr9tCMMz+cG/2zNtmCT6jrJ/Vdb0I9xFUCmm4ptg6cId3IjsPEGsySj/m9oz+Vk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWyrMhMnzoXulG5gW+iiIh4z8f4qGvGbw72kcuvfJ6qwaiGR0e
-	8ODdAQjfHCAm9ZNYkdLeQ+u5G1s07qm3apDQAhMPibCGnHq3lQkvH5PIjJW3cVQTIakfziORQWV
-	RXi+YvwvYuA==
-X-Google-Smtp-Source: AGHT+IELettSJSAjPN0ajEgghq8cce8mY33OF/qwq78Jwt00Tyez7vqBw2SJQ3LE86dpcucnhoMJmApM4i8D
-X-Received: from pfdf22.prod.google.com ([2002:aa7:8b16:0:b0:740:63b6:1826])
- (user=afranji job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6f96:b0:1f3:26ae:7792
- with SMTP id adf61e73a8af0-2165f87234fmr5820413637.18.1747423207727; Fri, 16
- May 2025 12:20:07 -0700 (PDT)
-Date: Fri, 16 May 2025 19:19:33 +0000
-In-Reply-To: <cover.1747368092.git.afranji@google.com>
+        d=1e100.net; s=20230601; t=1747423354; x=1748028154;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X5csGcQ8badg6OQc2j12fcylP9C8BoCep+FBckAp9xQ=;
+        b=HWAmdyJ2ZuqvuTquMb7xbW+kk8XrmoG5QZhzG1o3L/G4SSFlPOmNbW6/xlfJWyy1nV
+         yoDCBDfs4fNFs7xqxepDT8iH1eyKezEEwwd6VqN8UZpNt8ldeABCKDySzSiq60LrZbPG
+         lrDbztimMpsnSlOueE9fX+PpUHrY3TjJwMni+KkquHDIGXamP7EIodq3nvKNJqtatpZR
+         03dXREVhk/+xctixe/vxE1ClYr+RJ6VFWsvPBpmSDpp0zINSasQxXLe0ZvLGxwM5FNRP
+         boT/iXlluDASSlXk4fGAMlRICJ+DVQW9EwfBqHRslWB9j/niQ47d7ClBlV24yf4Jxe63
+         zYdA==
+X-Forwarded-Encrypted: i=1; AJvYcCX4250GvZ851fhpu4POXU5CV0hU9lRD2OAz8EZ/28LDAWuRAvA1cRx+vjMRL16iWdjHnIw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFhG1XiWieSZYqESp0UJ/DPtbMoFxilskGTmw3cboIhWvAihPw
+	0TlFS3+O/jUuxSvZOcUSvCAcUMJ6NO2NnjPZWJHxXSB8Gu/3U709hsHpJLpIXMHp4iZmQbJ1dNe
+	kSxKkI7oxTmFkHYM/4jnrER4rRskRhWU93tyECMga
+X-Gm-Gg: ASbGncsxKFWdn3kdEN76JhaaaHYqxx3VyXUlcZ4J/0eoDHTLTgufwegg9YJ4w8H/yty
+	fIn76HvUGbQ0pd1rba/2GvFcPY9RVd4pBJ3TLjyJ667CHOYNeW+Jr5ZC/y0UZRavi6VqQygL+yl
+	sZpmWTssirPOrWH1M6T7adkVuQeo34PCLi/PtUV2PVTgUq4W/B6RqMJW89qlrJDA==
+X-Google-Smtp-Source: AGHT+IHmB5XBLYghERElfsJfzIa8m2PhXb5Oe8yfTFbW3QD907B5QsRiG5OVykLoPEH8ozkVNKkbLJW7xYSYXhG8Zqs=
+X-Received: by 2002:a05:690c:6f03:b0:6fb:8461:e828 with SMTP id
+ 00721157ae682-70ca7c108f1mr74013577b3.30.1747423354023; Fri, 16 May 2025
+ 12:22:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1747368092.git.afranji@google.com>
-X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <4310b9291b9662c1059ebcf50e267760bc8e1c6f.1747368093.git.afranji@google.com>
-Subject: [RFC PATCH v2 13/13] KVM: selftests: Add tests for migration of
- private mem
-From: Ryan Afranji <afranji@google.com>
-To: afranji@google.com, ackerleytng@google.com, pbonzini@redhat.com, 
-	seanjc@google.com, tglx@linutronix.de, x86@kernel.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	tabba@google.com
-Cc: mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	shuah@kernel.org, andrew.jones@linux.dev, ricarkol@google.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com, 
-	vannapurve@google.com, erdemaktas@google.com, mail@maciej.szmigiero.name, 
-	vbabka@suse.cz, david@redhat.com, qperret@google.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, sagis@google.com, jthoughton@google.com
+MIME-Version: 1.0
+References: <20250513163438.3942405-8-tabba@google.com> <diqzsel8pdab.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzsel8pdab.fsf@ackerleytng-ctop.c.googlers.com>
+From: James Houghton <jthoughton@google.com>
+Date: Fri, 16 May 2025 12:21:58 -0700
+X-Gm-Features: AX0GCFtvTxSjQg-C2lcu7Fqz9j01UftX46-yoNDwQ9IypZOUYYVgSBCYUAztoPs
+Message-ID: <CADrL8HX4WfmHk8cLKxL2xrA9a_mLpOmwiojxeFRMdYfvMH0vOQ@mail.gmail.com>
+Subject: Re: [PATCH v9 07/17] KVM: guest_memfd: Allow host to map
+ guest_memfd() pages
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ackerley Tng <ackerleytng@google.com>
+On Tue, May 13, 2025 at 11:37=E2=80=AFAM Ackerley Tng <ackerleytng@google.c=
+om> wrote:
+>
+> Fuad Tabba <tabba@google.com> writes:
+> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> > index 6db515833f61..8e6d1866b55e 100644
+> > --- a/virt/kvm/guest_memfd.c
+> > +++ b/virt/kvm/guest_memfd.c
+> > @@ -312,7 +312,88 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memor=
+y_slot *slot, gfn_t gfn)
+> >       return gfn - slot->base_gfn + slot->gmem.pgoff;
+> >  }
+> >
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +
+> > +static bool kvm_gmem_supports_shared(struct inode *inode)
+> > +{
+> > +     uint64_t flags =3D (uint64_t)inode->i_private;
+> > +
+> > +     return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> > +}
+> > +
+> > +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+> > +{
+> > +     struct inode *inode =3D file_inode(vmf->vma->vm_file);
+> > +     struct folio *folio;
+> > +     vm_fault_t ret =3D VM_FAULT_LOCKED;
+> > +
+> > +     filemap_invalidate_lock_shared(inode->i_mapping);
+> > +
+> > +     folio =3D kvm_gmem_get_folio(inode, vmf->pgoff);
+> > +     if (IS_ERR(folio)) {
+> > +             int err =3D PTR_ERR(folio);
+> > +
+> > +             if (err =3D=3D -EAGAIN)
+> > +                     ret =3D VM_FAULT_RETRY;
+> > +             else
+> > +                     ret =3D vmf_error(err);
+> > +
+> > +             goto out_filemap;
+> > +     }
+> > +
+> > +     if (folio_test_hwpoison(folio)) {
+> > +             ret =3D VM_FAULT_HWPOISON;
+> > +             goto out_folio;
+> > +     }
 
-Tests that private mem (in guest_mem files) can be migrated. Also
-demonstrates the migration flow.
+nit: shmem_fault() does not include an equivalent of the above
+HWPOISON check, and __do_fault() already handles HWPOISON.
 
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-Signed-off-by: Ryan Afranji <afranji@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |  1 +
- .../kvm/x86/private_mem_migrate_tests.c       | 56 ++++++++++---------
- 2 files changed, 32 insertions(+), 25 deletions(-)
+It's very unlikely for `folio` to be hwpoison and not up-to-date, and
+even then, writing over poison (to zero the folio) is not usually
+fatal.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index f62b0a5aba35..e9d53ea6c6c8 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -85,6 +85,7 @@ TEST_GEN_PROGS_x86 += x86/platform_info_test
- TEST_GEN_PROGS_x86 += x86/pmu_counters_test
- TEST_GEN_PROGS_x86 += x86/pmu_event_filter_test
- TEST_GEN_PROGS_x86 += x86/private_mem_conversions_test
-+TEST_GEN_PROGS_x86 += x86/private_mem_migrate_tests
- TEST_GEN_PROGS_x86 += x86/private_mem_kvm_exits_test
- TEST_GEN_PROGS_x86 += x86/set_boot_cpu_id
- TEST_GEN_PROGS_x86 += x86/set_sregs_test
-diff --git a/tools/testing/selftests/kvm/x86/private_mem_migrate_tests.c b/tools/testing/selftests/kvm/x86/private_mem_migrate_tests.c
-index 4226de3ebd41..4ad94ea04b66 100644
---- a/tools/testing/selftests/kvm/x86/private_mem_migrate_tests.c
-+++ b/tools/testing/selftests/kvm/x86/private_mem_migrate_tests.c
-@@ -1,32 +1,32 @@
- // SPDX-License-Identifier: GPL-2.0
--#include "kvm_util_base.h"
-+#include "kvm_util.h"
- #include "test_util.h"
- #include "ucall_common.h"
- #include <linux/kvm.h>
- #include <linux/sizes.h>
- 
--#define TRANSFER_PRIVATE_MEM_TEST_SLOT 10
--#define TRANSFER_PRIVATE_MEM_GPA ((uint64_t)(1ull << 32))
--#define TRANSFER_PRIVATE_MEM_GVA TRANSFER_PRIVATE_MEM_GPA
--#define TRANSFER_PRIVATE_MEM_VALUE 0xdeadbeef
-+#define MIGRATE_PRIVATE_MEM_TEST_SLOT 10
-+#define MIGRATE_PRIVATE_MEM_GPA ((uint64_t)(1ull << 32))
-+#define MIGRATE_PRIVATE_MEM_GVA MIGRATE_PRIVATE_MEM_GPA
-+#define MIGRATE_PRIVATE_MEM_VALUE 0xdeadbeef
- 
--static void transfer_private_mem_guest_code_src(void)
-+static void migrate_private_mem_data_guest_code_src(void)
- {
--	uint64_t volatile *const ptr = (uint64_t *)TRANSFER_PRIVATE_MEM_GVA;
-+	uint64_t volatile *const ptr = (uint64_t *)MIGRATE_PRIVATE_MEM_GVA;
- 
--	*ptr = TRANSFER_PRIVATE_MEM_VALUE;
-+	*ptr = MIGRATE_PRIVATE_MEM_VALUE;
- 
- 	GUEST_SYNC1(*ptr);
- }
- 
--static void transfer_private_mem_guest_code_dst(void)
-+static void migrate_private_mem_guest_code_dst(void)
- {
--	uint64_t volatile *const ptr = (uint64_t *)TRANSFER_PRIVATE_MEM_GVA;
-+	uint64_t volatile *const ptr = (uint64_t *)MIGRATE_PRIVATE_MEM_GVA;
- 
- 	GUEST_SYNC1(*ptr);
- }
- 
--static void test_transfer_private_mem(void)
-+static void test_migrate_private_mem_data(bool migrate)
- {
- 	struct kvm_vm *src_vm, *dst_vm;
- 	struct kvm_vcpu *src_vcpu, *dst_vcpu;
-@@ -40,40 +40,43 @@ static void test_transfer_private_mem(void)
- 
- 	/* Build the source VM, use it to write to private memory */
- 	src_vm = __vm_create_shape_with_one_vcpu(
--		shape, &src_vcpu, 0, transfer_private_mem_guest_code_src);
-+		shape, &src_vcpu, 0, migrate_private_mem_data_guest_code_src);
- 	src_memfd = vm_create_guest_memfd(src_vm, SZ_4K, 0);
- 
--	vm_mem_add(src_vm, DEFAULT_VM_MEM_SRC, TRANSFER_PRIVATE_MEM_GPA,
--		   TRANSFER_PRIVATE_MEM_TEST_SLOT, 1, KVM_MEM_PRIVATE,
-+	vm_mem_add(src_vm, DEFAULT_VM_MEM_SRC, MIGRATE_PRIVATE_MEM_GPA,
-+		   MIGRATE_PRIVATE_MEM_TEST_SLOT, 1, KVM_MEM_GUEST_MEMFD,
- 		   src_memfd, 0);
- 
--	virt_map(src_vm, TRANSFER_PRIVATE_MEM_GVA, TRANSFER_PRIVATE_MEM_GPA, 1);
--	vm_set_memory_attributes(src_vm, TRANSFER_PRIVATE_MEM_GPA, SZ_4K,
-+	virt_map(src_vm, MIGRATE_PRIVATE_MEM_GVA, MIGRATE_PRIVATE_MEM_GPA, 1);
-+	vm_set_memory_attributes(src_vm, MIGRATE_PRIVATE_MEM_GPA, SZ_4K,
- 				 KVM_MEMORY_ATTRIBUTE_PRIVATE);
- 
- 	vcpu_run(src_vcpu);
- 	TEST_ASSERT_KVM_EXIT_REASON(src_vcpu, KVM_EXIT_IO);
- 	get_ucall(src_vcpu, &uc);
--	TEST_ASSERT(uc.args[0] == TRANSFER_PRIVATE_MEM_VALUE,
-+	TEST_ASSERT(uc.args[0] == MIGRATE_PRIVATE_MEM_VALUE,
- 		    "Source VM should be able to write to private memory");
- 
- 	/* Build the destination VM with linked fd */
- 	dst_vm = __vm_create_shape_with_one_vcpu(
--		shape, &dst_vcpu, 0, transfer_private_mem_guest_code_dst);
-+		shape, &dst_vcpu, 0, migrate_private_mem_guest_code_dst);
- 	dst_memfd = vm_link_guest_memfd(dst_vm, src_memfd, 0);
- 
--	vm_mem_add(dst_vm, DEFAULT_VM_MEM_SRC, TRANSFER_PRIVATE_MEM_GPA,
--		   TRANSFER_PRIVATE_MEM_TEST_SLOT, 1, KVM_MEM_PRIVATE,
-+	vm_mem_add(dst_vm, DEFAULT_VM_MEM_SRC, MIGRATE_PRIVATE_MEM_GPA,
-+		   MIGRATE_PRIVATE_MEM_TEST_SLOT, 1, KVM_MEM_GUEST_MEMFD,
- 		   dst_memfd, 0);
- 
--	virt_map(dst_vm, TRANSFER_PRIVATE_MEM_GVA, TRANSFER_PRIVATE_MEM_GPA, 1);
--	vm_set_memory_attributes(dst_vm, TRANSFER_PRIVATE_MEM_GPA, SZ_4K,
--				 KVM_MEMORY_ATTRIBUTE_PRIVATE);
-+	virt_map(dst_vm, MIGRATE_PRIVATE_MEM_GVA, MIGRATE_PRIVATE_MEM_GPA, 1);
-+	if (migrate)
-+		vm_migrate_from(dst_vm, src_vm);
-+	else
-+		vm_set_memory_attributes(dst_vm, MIGRATE_PRIVATE_MEM_GPA, SZ_4K,
-+					 KVM_MEMORY_ATTRIBUTE_PRIVATE);
- 
- 	vcpu_run(dst_vcpu);
- 	TEST_ASSERT_KVM_EXIT_REASON(dst_vcpu, KVM_EXIT_IO);
- 	get_ucall(dst_vcpu, &uc);
--	TEST_ASSERT(uc.args[0] == TRANSFER_PRIVATE_MEM_VALUE,
-+	TEST_ASSERT(uc.args[0] == MIGRATE_PRIVATE_MEM_VALUE,
- 		    "Destination VM should be able to read value transferred");
- }
- 
-@@ -81,7 +84,10 @@ int main(int argc, char *argv[])
- {
- 	TEST_REQUIRE(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM));
- 
--	test_transfer_private_mem();
-+	test_migrate_private_mem_data(false);
-+
-+	if (kvm_check_cap(KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM))
-+		test_migrate_private_mem_data(true);
- 
- 	return 0;
- }
--- 
-2.49.0.1101.gccaa498523-goog
+> > +
+> > +     if (WARN_ON_ONCE(folio_test_large(folio))) {
+> > +             ret =3D VM_FAULT_SIGBUS;
+> > +             goto out_folio;
+> > +     }
 
+nit: I would prefer we remove this SIGBUS bit and change the below
+clearing logic to handle large folios. Up to you I suppose.
+
+> > +
+> > +     if (!folio_test_uptodate(folio)) {
+> > +             clear_highpage(folio_page(folio, 0));
+> > +             kvm_gmem_mark_prepared(folio);
+> > +     }
+> > +
+> > +     vmf->page =3D folio_file_page(folio, vmf->pgoff);
+> > +
+> > +out_folio:
+> > +     if (ret !=3D VM_FAULT_LOCKED) {
+> > +             folio_unlock(folio);
+> > +             folio_put(folio);
+> > +     }
+> > +
+> > +out_filemap:
+> > +     filemap_invalidate_unlock_shared(inode->i_mapping);
+>
+> Do we need to hold the filemap_invalidate_lock while zeroing? Would
+> holding the folio lock be enough?
+
+Do we need to hold the filemap_invalidate_lock for reading *at all*?
+
+I don't see why we need it. We're not checking gmem->bindings, and
+filemap_grab_folio() already synchronizes with filemap removal
+properly.
+
+>
+> > +
+> > +     return ret;
+> > +}
 
