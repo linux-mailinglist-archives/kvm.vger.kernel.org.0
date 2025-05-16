@@ -1,178 +1,188 @@
-Return-Path: <kvm+bounces-46846-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46847-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B259ABA23A
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 19:52:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8164DABA240
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 19:54:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE5C74E37CB
-	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 17:52:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8A1F161202
+	for <lists+kvm@lfdr.de>; Fri, 16 May 2025 17:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADD82749F0;
-	Fri, 16 May 2025 17:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A15B2777FD;
+	Fri, 16 May 2025 17:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tVybtsgY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mG7GnUsT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388B521CC5A
-	for <kvm@vger.kernel.org>; Fri, 16 May 2025 17:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A087D27586A
+	for <kvm@vger.kernel.org>; Fri, 16 May 2025 17:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747417914; cv=none; b=r1nGfOWsUpl9s1wAE90VpD2HJYWjV6oUcMqJJVYZIjzETQmgAXX0eJUzRAXPwERd1+LFECHwfdBfW5Z/zjQ08Op2upAYdZk/r6WhPzhpNf/cg4ScVOnOwtPcpWyLieYzXc0FioZXq4hBoU/gSRbJfj5kIFCSchJz8HS9RjXDCg8=
+	t=1747418022; cv=none; b=lBSnIum+qFwEa4Zr3aJzyew2rTOxEfDh6lQfuxohEVkVkCz9jWlI6EKKSJqeYQMtE902rbXSmRVFwHeMCW78LTwQ/zcMX6uu0B1HVhSwDE3b+gydUkf72zfSBJ0nrRGpSZ40tEh5BTzP44YfH6xayHR/Rl60IvUcsBOvaRDiBaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747417914; c=relaxed/simple;
-	bh=2Q3t7q7zXPiO9TUpc46lPD0ZwFpz2ZIFeKkfnFOyL64=;
+	s=arc-20240116; t=1747418022; c=relaxed/simple;
+	bh=HJfPGu9SHo5W2l3D7Ly+k/GNEpBm/EasByT5N7ysZac=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oCiDOq6isLCWUn0v/RTvCCDa6b2e/ji0uYoGAxhtm8yGcCG875iOFr5EwdF2sUPJuQ+NCzv1E0lp/2UxI7JZB1KpcuMZqhkaL9qTX4aHSWL+7+m0NFLpMGs2jfeZWoSlyBh7p96ESTZwzPyMYYG6By40p4koN3bnQdySdO5VbJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tVybtsgY; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=GUm2o3DGqSxwHO/jN3QVzX29FpjksRg3p1a4WY4fhhqLi+ad0AaNXkO0RDJGxvK6ph1AkjxN2kW2CTNsdkda+6iV7hXC9yYtdi8bM+gGRyXEFteY8bkVbS44PfS3ZDQ5X/cG7E+lgSK6fM40tKkU9VQAGSfz8TjJQAGv/q/HOV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mG7GnUsT; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30e2bd11716so2486594a91.3
-        for <kvm@vger.kernel.org>; Fri, 16 May 2025 10:51:52 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7429fc0bfc8so1527548b3a.1
+        for <kvm@vger.kernel.org>; Fri, 16 May 2025 10:53:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747417912; x=1748022712; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747418019; x=1748022819; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V5HQp6kq+X9VHvMiTR+cwYmP5qs8g8pvYOQWqNMSHLc=;
-        b=tVybtsgYeCWwe2RqoWixByGp6XXq0Mpcco8c0dtI956qNccwIqImmJOk5JGqSacjDo
-         G8EROcJ0VV+yds8A5Tde7Nh4Vmg0EzElYePNBLu4BgliKafDlDxxaAfIEGnakaGbomNv
-         OuvOwHOBsuj7D8qWezvmcuYIq+AS0XeHGF4Qaom7uoj6DV/RV4HTHP1Qw7A1iqo0vjht
-         CKbTBf257dtqsRKnnpuUlXpmlOQipzwEk4f5I/C0oDQ4lrfeh/TUPCc2AT5Sj+AZwziq
-         8420bpxkYvF27gQjUZvoqRHsAu7F1HgpNJC6dNVEpAppAVuW1cAKDjAk/JFlimIGmsMQ
-         YQJA==
+        bh=8cF3oG0ZvlxQApliLAWy8AhC33oXxmPcmw1u1Vqb2bU=;
+        b=mG7GnUsToXtW+YWIzm9HwjARtlPmALFGp58UoOIWR0XDUiiAvVPhQVDeA+s7gtJTQn
+         6o9VMxY9vH5/EpB+pO706VumTrw9OXc8LkCIIctGmugQAoHgY9cONBTcArwYbHOh92Ow
+         T8BZVX2yElEuKOZ/LCn3bQvVH2YXE3ZMMU4XuBlzjUxnpD7tyyjdySQWyDSsrZ+QpWcj
+         tBomF7OU+NTx1YL27Dy0Az32h9G2XNjgFRSgDoGkyw1Sv4zGtXW9tw7V5IpfC+dq5jqU
+         VTVwxLroNSRm8r7H92pGqdQfh4KIQ/uKmRMu2NJSV/0yAehLPihClVF2PjtTi3/mjmsL
+         ByKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747417912; x=1748022712;
+        d=1e100.net; s=20230601; t=1747418019; x=1748022819;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V5HQp6kq+X9VHvMiTR+cwYmP5qs8g8pvYOQWqNMSHLc=;
-        b=erNNwc9Jipv8KRPM9PqIgDegjvUb7sqsl8cvBrHpN7kg2E5tpXKgGeJIB1tQtOMSEl
-         ahXdNraCwlP9PO9KcoUKRcWLoLyP6fhU1d0kBeIItZvC3OG8GWJqEXxggV7aRSx9S5q6
-         OGCnHNNDhxZhqH30b/CUH+N2sr9YZ5eHKsP1Vv8uTBIzCTvNwwl8NO39CwnVckmN/T/p
-         Nyk7pkFYxto+z0nvqCjyPgBZtTadaj+dU7By11RUVUHKIDDMDFZmY7Molqu8kHDr58px
-         w2QfTGZOeQtJOfR3HbgEE4XjO9xP5E8JR/nsjWC3Zo9GQIox9+BLZ4GHDFmBIUDzi0IR
-         Q2KA==
-X-Forwarded-Encrypted: i=1; AJvYcCVneFyGhI1FjeNl1eo9KWT6fZcx8gHy3w6JSepJOc3MVbIswJ0fQY2YxXnom2y/fnstCl0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjQB/ZJdYTUXU95l7SN5U331siKA/hL8XNBGmOII9iMSrEkFa9
-	eNjptYzo4RYs5wz8VUjfRVMTvUM2yyLR4mB2EJt6PgM8Y+M8h1KU5hKO108XePBB9ZtrHWuU9bO
-	QufWGoQ==
-X-Google-Smtp-Source: AGHT+IFwtvvhEW33lcn8I0JC2VzVOUh9GPDEpoRuyJJmzbZM79EJn+UNnUU3HQ0UiE4FGqM+5/rqg3sdCXQ=
-X-Received: from pjyd7.prod.google.com ([2002:a17:90a:dfc7:b0:2ff:5752:a78f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2b45:b0:30e:823f:ef21
- with SMTP id 98e67ed59e1d1-30e83228e05mr4391414a91.32.1747417912343; Fri, 16
- May 2025 10:51:52 -0700 (PDT)
-Date: Fri, 16 May 2025 10:51:50 -0700
-In-Reply-To: <ce15353884bd67cc2608d36ef40a178a8d140333.camel@intel.com>
+        bh=8cF3oG0ZvlxQApliLAWy8AhC33oXxmPcmw1u1Vqb2bU=;
+        b=VbOV4HVVZedgFU/mrdco4rSTWaJM/fv2/6FxD+xcPHlRoZ5bMZBYoQJvo/4BKgwYv2
+         CxhL7udfWBJM9fpHR+8hbHuW2119eWFBd7fOvvaxTm4Jj1qibjlCxL4iHf+FLEnEJ6yE
+         IYW8+cqahX2/1dcwxmN/SwlpE4XMoXxUFGR82Hy9yv/UL7CTcRTvH3t6IQSUOgF4t4GZ
+         BGfRhAGYvomyM+yoIKvrnml8DAXYF47GERv1zDiTtNnqckEzoOSQsA7seGSWrnEnZLUI
+         G/v+I7hpdDyTEu12zJsj2K5uOwBubGD9VgI/bPVRYE1XGqfLOTkVpS7yc40uC5Uc/1Xx
+         ClEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqnCk0qPuj3i0JslaIyo+U0jws5Xk8vuol0k1ESTFpBuXZW7Qpci6d0V6Es1hbTmqPmAI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmDb6cb+ST9861iRzVuKj/Ish0HHVPlhxuIigq+kKu+B8KgRlv
+	dftndqi2OM0tpIT+Hm8arejtEaRTLUrxcBTabvRdQGgj23k32N3+3SNQhHMMpwhsL1cU/3xTpF1
+	K6lvTewPnEduOm78ktq33x6uSlw==
+X-Google-Smtp-Source: AGHT+IHTUNH+ccDKQDLHandSLB8Cs2YqxqxBQL8lX50pqIiEe34TWuIXzn9EkbeNJjz0gF0OHqoknNNeE+FoIqCs2g==
+X-Received: from pfbmc24.prod.google.com ([2002:a05:6a00:7698:b0:740:b53a:e67f])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:d494:b0:215:eb10:9f13 with SMTP id adf61e73a8af0-2165f87269fmr5223554637.17.1747418018754;
+ Fri, 16 May 2025 10:53:38 -0700 (PDT)
+Date: Fri, 16 May 2025 10:53:37 -0700
+In-Reply-To: <6825ff323cc63_337c39294e3@iweiny-mobl.notmuch>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <ada87be8b9c06bc0678174b810e441ca79d67980.camel@intel.com>
- <CAGtprH9CTsVvaS8g62gTuQub4aLL97S7Um66q12_MqTFoRNMxA@mail.gmail.com>
- <24e8ae7483d0fada8d5042f9cd5598573ca8f1c5.camel@intel.com>
- <aCaM7LS7Z0L3FoC8@google.com> <7d3b391f3a31396bd9abe641259392fd94b5e72f.camel@intel.com>
- <CAGtprH8EMnmvvVir6_U+L5S3SEvrU1OzLrvkL58fXgfg59bjoA@mail.gmail.com> <ce15353884bd67cc2608d36ef40a178a8d140333.camel@intel.com>
-Message-ID: <aCd5wZ_Tp863I6pP@google.com>
-Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
-From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Vishal Annapurve <vannapurve@google.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-	Jun Miao <jun.miao@intel.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
-	"pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"amoorthy@google.com" <amoorthy@google.com>, "jack@suse.cz" <jack@suse.cz>, "maz@kernel.org" <maz@kernel.org>, 
-	"tabba@google.com" <tabba@google.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
-	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, 
-	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, "hughd@google.com" <hughd@google.com>, 
-	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, Wei W Wang <wei.w.wang@intel.com>, 
-	"keirf@google.com" <keirf@google.com>, Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, 
-	Yan Y Zhao <yan.y.zhao@intel.com>, Dave Hansen <dave.hansen@intel.com>, 
-	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, "rppt@kernel.org" <rppt@kernel.org>, 
-	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "aik@amd.com" <aik@amd.com>, 
-	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, "fvdl@google.com" <fvdl@google.com>, 
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, 
-	"quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, "nsaenz@amazon.es" <nsaenz@amazon.es>, 
-	"willy@infradead.org" <willy@infradead.org>, Fan Du <fan.du@intel.com>, 
-	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "mic@digikod.net" <mic@digikod.net>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, Kirill Shutemov <kirill.shutemov@intel.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "steven.price@arm.com" <steven.price@arm.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
-	Zhiquan1 Li <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
-	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, Erdem Aktas <erdemaktas@google.com>, 
-	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"bfoster@redhat.com" <bfoster@redhat.com>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>, 
-	Haibo1 Xu <haibo1.xu@intel.com>, "anup@brainfault.org" <anup@brainfault.org>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, "jthoughton@google.com" <jthoughton@google.com>, 
-	"will@kernel.org" <will@kernel.org>, "steven.sistare@oracle.com" <steven.sistare@oracle.com>, 
-	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, Kai Huang <kai.huang@intel.com>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, 
-	"pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, Chao P Peng <chao.p.peng@intel.com>, 
-	"nikunj@amd.com" <nikunj@amd.com>, Alexander Graf <graf@amazon.com>, 
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "jroedel@suse.de" <jroedel@suse.de>, 
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "jgowans@amazon.com" <jgowans@amazon.com>, 
-	Yilun Xu <yilun.xu@intel.com>, "liam.merwick@oracle.com" <liam.merwick@oracle.com>, 
-	"michael.roth@amd.com" <michael.roth@amd.com>, "quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, 
-	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, Ira Weiny <ira.weiny@intel.com>, 
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"qperret@google.com" <qperret@google.com>, 
-	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "dmatlack@google.com" <dmatlack@google.com>, 
-	"james.morse@arm.com" <james.morse@arm.com>, "brauner@kernel.org" <brauner@kernel.org>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "pgonda@google.com" <pgonda@google.com>, 
-	"quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hch@infradead.org" <hch@infradead.org>
-Content-Type: text/plain; charset="us-ascii"
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <6825ff323cc63_337c39294e3@iweiny-mobl.notmuch>
+Message-ID: <diqzjz6gfnmm.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+From: Ackerley Tng <ackerleytng@google.com>
+To: Ira Weiny <ira.weiny@intel.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org
+Cc: aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, May 16, 2025, Rick P Edgecombe wrote:
-> On Fri, 2025-05-16 at 06:11 -0700, Vishal Annapurve wrote:
-> > Google internally uses 1G hugetlb pages to achieve high bandwidth IO,
-> > lower memory footprint using HVO and lower MMU/IOMMU page table memory
-> > footprint among other improvements. These percentages carry a
-> > substantial impact when working at the scale of large fleets of hosts
-> > each carrying significant memory capacity.
-> 
-> There must have been a lot of measuring involved in that. But the numbers I was
-> hoping for were how much does *this* series help upstream.
+Ira Weiny <ira.weiny@intel.com> writes:
 
-...
+> Ackerley Tng wrote:
+>
+> [snip]
+>
+>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+>> 
+>
+> [snip]
+>
+>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> index 590932499eba..f802116290ce 100644
+>> --- a/virt/kvm/guest_memfd.c
+>> +++ b/virt/kvm/guest_memfd.c
+>> @@ -30,6 +30,10 @@ enum shareability {
+>>  };
+>>  
+>>  static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index);
+>> +static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+>> +				      pgoff_t end);
+>> +static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
+>> +				    pgoff_t end);
+>>  
+>>  static struct kvm_gmem_inode_private *kvm_gmem_private(struct inode *inode)
+>>  {
+>> @@ -85,6 +89,306 @@ static struct folio *kvm_gmem_get_shared_folio(struct inode *inode, pgoff_t inde
+>>  	return kvm_gmem_get_folio(inode, index);
+>>  }
+>>  
+>> +/**
+>> + * kvm_gmem_shareability_store() - Sets shareability to @value for range.
+>> + *
+>> + * @mt: the shareability maple tree.
+>> + * @index: the range begins at this index in the inode.
+>> + * @nr_pages: number of PAGE_SIZE pages in this range.
+>> + * @value: the shareability value to set for this range.
+>> + *
+>> + * Unlike mtree_store_range(), this function also merges adjacent ranges that
+>> + * have the same values as an optimization.
+>
+> Is this an optimization or something which will be required to convert
+> from shared back to private and back to a huge page mapping?
+>
 
-> I asked this question assuming there were some measurements for the 1GB part of
-> this series. It sounds like the reasoning is instead that this is how Google
-> does things, which is backed by way more benchmarking than kernel patches are
-> used to getting. So it can just be reasonable assumed to be helpful.
-> 
-> But for upstream code, I'd expect there to be a bit more concrete than "we
-> believe" and "substantial impact". It seems like I'm in the minority here
-> though. So if no one else wants to pressure test the thinking in the usual way,
-> I guess I'll just have to wonder.
+This is an optimization.
 
-From my perspective, 1GiB hugepage support in guest_memfd isn't about improving
-CoCo performance, it's about achieving feature parity on guest_memfd with respect
-to existing backing stores so that it's possible to use guest_memfd to back all
-VM shapes in a fleet.
+> If this is purely an optimization it might be best to leave it out for now
+> to get functionality first.
+>
 
-Let's assume there is significant value in backing non-CoCo VMs with 1GiB pages,
-unless you want to re-litigate the existence of 1GiB support in HugeTLBFS.
+I see this (small) optimization as part of using maple trees.
 
-If we assume 1GiB support is mandatory for non-CoCo VMs, then it becomes mandatory
-for CoCo VMs as well, because it's the only realistic way to run CoCo VMs and
-non-CoCo VMs on a single host.  Mixing 1GiB HugeTLBFS with any other backing store
-for VMs simply isn't tenable due to the nature of 1GiB allocations.  E.g. grabbing
-sub-1GiB chunks of memory for CoCo VMs quickly fragments memory to the point where
-HugeTLBFS can't allocate memory for non-CoCo VMs.
+Fuad's version [1] uses xarrays and has 1 xarray entry per page
+offset. I wanted to illustrate that by using maple trees, we can share
+just 1 entry for a whole range, and part of that sharing involves
+merging adjacent shareability entries that have the same value.
 
-Teaching HugeTLBFS to play nice with TDX and SNP isn't happening, which leaves
-adding 1GiB support to guest_memfd as the only way forward.
+IIUC, these other users of maple trees also do some kind of
+expansion/range merging:
 
-Any boost to TDX (or SNP) performance is purely a bonus.
++ VMAs in vma_expand() [2]
++ regcache in regcache_maple_write() [3]
+
+> I have more to review but wanted to ask this.
+>
+> Ira
+>
+> [snip]
+
+[1] https://lore.kernel.org/all/20250328153133.3504118-4-tabba@google.com/
+[2] https://elixir.bootlin.com/linux/v6.14.6/source/mm/vma.c#L1059
+[3] https://elixir.bootlin.com/linux/v6.14.6/source/drivers/base/regmap/regcache-maple.c#L38
 
