@@ -1,219 +1,177 @@
-Return-Path: <kvm+bounces-46940-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46941-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C77ABB0A4
-	for <lists+kvm@lfdr.de>; Sun, 18 May 2025 17:18:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF08CABB184
+	for <lists+kvm@lfdr.de>; Sun, 18 May 2025 22:11:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A57DD1895C6F
-	for <lists+kvm@lfdr.de>; Sun, 18 May 2025 15:18:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45AFA18947F3
+	for <lists+kvm@lfdr.de>; Sun, 18 May 2025 20:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D964C21CA08;
-	Sun, 18 May 2025 15:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC921FDE14;
+	Sun, 18 May 2025 20:10:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mkooatep"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MkYBZt6k"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D681EEE0
-	for <kvm@vger.kernel.org>; Sun, 18 May 2025 15:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90A11EB18A
+	for <kvm@vger.kernel.org>; Sun, 18 May 2025 20:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747581486; cv=none; b=EiSLvsLTWAHcY2x1eOQkaPQOLY8VwzEYyfhWJRK73GyPnVed8yrOVPISbC5AzL3GpDk9JIWVeFAd9hTzA1ne5L3E3htyrrxIDIUoshQo19al1SDup29wXfNfG67nrd9uezuxTx4yQVgi2xCplgJFo2J53u2EJxqZ4u1rcW0wdgQ=
+	t=1747599058; cv=none; b=s4J5JTwsv8HCMLKgCgCh7JmiQMBDLM3gB8GNvhRzlEddld3GShzACdf/jzWLmqjvZz6o3USXD9WyRAgKGTpfrW9JtcT0+XQqvMsdPwP6Bd2uUFMnvw6M9B5L5oGzH4tBXROy7IAtAUT471hTOC0TM5TUBas3L6pvvRBcndc4CUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747581486; c=relaxed/simple;
-	bh=j5bH60nzc1Wy2cpmmt83VduYjN1P8wEIccp/ebbjVQ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Da9402aG4g9AUIqcq+59Nnwz6HJCKDEAUDpNiGa9rbWCFbRjpr+GlBfxq2s3VMzmePBrZ5HGXvi3v9IL8Zh2BeXYGIRgsedkK62vxF1QnQJLKQIhmlsqxmJ0J0H0zAZ4/nds01NGWm41F5i2NqmUrMHDp04nmIMQ0ompDUduY28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mkooatep; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-47666573242so370881cf.0
-        for <kvm@vger.kernel.org>; Sun, 18 May 2025 08:18:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747581483; x=1748186283; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=89H6l5EPE7llhy2U2sdeyWXbsFYSBwqQ2gw98qt9JjI=;
-        b=mkooatepoRA1cYfwU3tdxhzWj+wrz1f1K2mP0VXbowySzDk2/FtBzH+7FjZ+JkZwTO
-         Z+tcjO2b9QbkDZGylwOOAkN0QjYMGyNSAiL1UYX6fzCPWyrEnm5jlZCcTS66dXTwNgnB
-         KBBeDutBsVJ6xMh6bc1k0oBcrRYHZt/XQ7z6I2c7nh5RGirF6J39LDsTx6tv0eWZMfmD
-         9g3qx2hLzIfLuy/A5PmfyPqOpvGl3/TbWGOH0Vo69cmRN2ZqIRKGippvCEpBok9kg4Ob
-         sKoH7oMYVnlJ4IUgGcSBoVdzKPogoMvD4E17/bDoPI7cWff3rA4gBvOqkW1WK734DLLy
-         qr1A==
+	s=arc-20240116; t=1747599058; c=relaxed/simple;
+	bh=BZghFxnzXNSsmGXc+tWUOfKJ3tXV3mjjGNZeuOUUjHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iLIZ6kUbLS43g7X0fSOqE9S4bWLTgvraGGTGyKX2EJNA36kNNIteCI8dEVRAP4NY2gvRs16TZe+u6y2GTPhnTTzhDQvp7VkR95qrdXkAcoYZlfxy6/+4HJiUhsz6yA5YwNoDsOkqvqjcx7EzN2N9MCL++R6BmfCOMubApBQzF7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MkYBZt6k; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747599053;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o3OJIBHhQbvH4C7u2Xf44+7JcPKOKfrafXSUikraTic=;
+	b=MkYBZt6kh8zX2DOq93FdRGfgaaTnZvLEJ8uhlCkuOK72tksb2vWzs731E/Lj+4lY4jLCFO
+	qifwpD81rwD9x5c3bjoVtZDH/D5f2CrRYWBPgOXIZoxU/djHGjfqXjdEr4/o6bscllIJxd
+	qUGEaJRr1RTABNKoSUSSUTc95/Cvizc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-nl4sGyM7NhqRK8sESXg1aw-1; Sun, 18 May 2025 16:10:52 -0400
+X-MC-Unique: nl4sGyM7NhqRK8sESXg1aw-1
+X-Mimecast-MFC-AGG-ID: nl4sGyM7NhqRK8sESXg1aw_1747599051
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43eed325461so21107295e9.3
+        for <kvm@vger.kernel.org>; Sun, 18 May 2025 13:10:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747581483; x=1748186283;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=89H6l5EPE7llhy2U2sdeyWXbsFYSBwqQ2gw98qt9JjI=;
-        b=hRYiICExuziVOCsa9fR0OuATLlRQNsEhN7Ta+wtjuJdUU2/PCAixopPvvJIMMrKWYo
-         c4E6cqcW/ixNmX8qBZBgGM7r+2h2swyEOsRm9mIe5LViQqu3zEiXJfGrYUTfUVU40wQj
-         y8eeGQjU7eUKf4c+feDRYYFA81/iSYJnpgf3+f5bWu3z/pu6Yi924sfloshy7fpl7Hqk
-         arDnvW3qdtA30qIJyXOjofYq1oaL9FMQlwf7+qS0uqTIizB/ma1tgtviJNjWyf2JgBf9
-         U0Au7Z48ph1skrmvVPfMv5pvj0iw0g90jQDwLRl9l3MP7M2j5jc8h7piswdIETXFU7fd
-         7kZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW/cIPxwOHV1MY5wtUW7FWEG0ZbVavY4vahpaPu2g0NSfIQsdLe4UIUwvNEx+0mLACG0ck=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH26fZowryotLMBnQxHjNe9Yn/PVn04zCjLR9vs8JCGqtr5+GB
-	Pzy7zz4krJJEidBOc17qgq6/M81FisJDq5MHiT/Rv3oVFNbUj4leE6AroVE9Q72UC/wuq19dU8/
-	01N61ylDr61/tGTGrmyKRpm5W64lUe/1gDCuZoxRR
-X-Gm-Gg: ASbGncuH/x+mgXxn2NGA66zLTJvsPBYEH++MaiL0+KDXUBhF0Aqerto9XeexcDfAmz/
-	b6fHdTPgFicMzzmqfnhw402IAIM6/Lt5VKnEyh2zQWR/+FpW/MXI5NVP5cgt6eEiMvlwsjviu1L
-	e/K4KY9m1YrN+7cSY63HK+TYPFNEvBm8XWguPCV6K8JWZJJXbx2m9Irqo=
-X-Google-Smtp-Source: AGHT+IFRzewsTYnfRaUxtfMHOlJKr+aHtCr5bWwYiAywfSAbjQ0plDNnk3E1Hhl9zLOMpM1iIOObSO8HVZNQbyqIF1E=
-X-Received: by 2002:ac8:5a8e:0:b0:477:8686:901d with SMTP id
- d75a77b69052e-495ff6d3f0dmr3340951cf.1.1747581482781; Sun, 18 May 2025
- 08:18:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747599051; x=1748203851;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o3OJIBHhQbvH4C7u2Xf44+7JcPKOKfrafXSUikraTic=;
+        b=vKzg6QA68bx91TQD9J1rUur6r80FWiTkF5EqPFWlw4WZQYrLl+JB3/vAVuxc0qiIxK
+         WjlUhg5/ek9I4pBhHBHhX3Cq3lx7NymcayquQOKr4cjxgOYCYGrIohHITkfHnLHia2Rc
+         WdglZcuv7y05aKybIXqjprdJSO0Wg7+JCGAiL2GuNujBbhGAsXIy+DfXLp/sorqZqmG3
+         eoS2uqY7m4yhAxTOiv1fR7hi8tArI+cKj6ytYzgsgmcsIbAozORr1rYmBIGLjBkGM+QL
+         RhEy3QipZdVmgR2iYRuKTCEP7S3niZlq7rW908MCYyWoDfXq1fNEgO3hcrp3u9dVsjhu
+         shnA==
+X-Forwarded-Encrypted: i=1; AJvYcCVzooxAldegSpVKoQmsZ9VLQouhCQTfGivwc9merPuJaKHDBneqLwuiLBQeufxxMb9CH1A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWXHQxhE4gRTSds2c7mXRwZk06iK+EeLI7zGyBymZsrSEeeq4g
+	K4CeH066OsBW7b0gqNi0pN3XF7XtDL93VFP31vil4BHa3RhCHTY3GHDAimNo+cfwuCsPhgYtK11
+	+mo3SXwhTEvYrLICdpoug2KQKpA6ynoJsILfClRyMtosIip5CxYAVQg==
+X-Gm-Gg: ASbGnctm3ukDrsmUiYpxFDi4HmKlYBkdDVBtj/W1WWSMXZ6uP/IEkp0ACC1DKRwFV4H
+	qEXKFjSnEp54T0xWH2b9ZefCpuTtNVoXsGESbPqfuSrhC9Tth3lkhSFzE0NVilw9N5+0X5wNLOJ
+	fE87P1+rvi52sSFVJOnktNm2TZsqL+1S4k1VDpDW9Nkct6+ktGp/V/uDuLur6n4KofzCZQd1eS4
+	+SksyMVeDqivT4yd2sgq7FpTIiaQ436Xi/WBR3M/T+e71YfsWX1eAWkxdRfVtl1kc5Pb+Jqz1ki
+	1asEVw==
+X-Received: by 2002:a05:600c:3c82:b0:43d:7588:667b with SMTP id 5b1f17b1804b1-445229b42b7mr37633445e9.10.1747599050883;
+        Sun, 18 May 2025 13:10:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG9jnPJWyH4uHKeXx423hSexRvEamch9ljSyzfnly8GcWhHz5Jv8eYgLruUdeBR+mLa1dJkMw==
+X-Received: by 2002:a05:600c:3c82:b0:43d:7588:667b with SMTP id 5b1f17b1804b1-445229b42b7mr37633235e9.10.1747599050463;
+        Sun, 18 May 2025 13:10:50 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f3951854sm183062725e9.24.2025.05.18.13.10.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 May 2025 13:10:49 -0700 (PDT)
+Date: Sun, 18 May 2025 16:10:46 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	David Matlack <dmatlack@google.com>,
+	Like Xu <like.xu.linux@gmail.com>,
+	Binbin Wu <binbin.wu@linux.intel.com>,
+	Yong He <alexyonghe@tencent.com>
+Subject: Re: [PATCH v2 0/8] irqbypass: Cleanups and a perf improvement
+Message-ID: <20250518161024-mutt-send-email-mst@kernel.org>
+References: <20250516230734.2564775-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250513163438.3942405-8-tabba@google.com> <diqzsel8pdab.fsf@ackerleytng-ctop.c.googlers.com>
- <CADrL8HX4WfmHk8cLKxL2xrA9a_mLpOmwiojxeFRMdYfvMH0vOQ@mail.gmail.com>
-In-Reply-To: <CADrL8HX4WfmHk8cLKxL2xrA9a_mLpOmwiojxeFRMdYfvMH0vOQ@mail.gmail.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Sun, 18 May 2025 17:17:10 +0200
-X-Gm-Features: AX0GCFssYVagTak9Gz2PtNx886k7vA2OBbm85fBLGgkvBAmAIyAh5VjNRHYwgYY
-Message-ID: <CA+EHjTz7JzgceGF4ZBTEuj_CidKe=pVcanuFfPMrXhubV7c2ug@mail.gmail.com>
-Subject: Re: [PATCH v9 07/17] KVM: guest_memfd: Allow host to map
- guest_memfd() pages
-To: James Houghton <jthoughton@google.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
-	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
-	amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com, 
-	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250516230734.2564775-1-seanjc@google.com>
 
-Hi James,
+On Fri, May 16, 2025 at 04:07:26PM -0700, Sean Christopherson wrote:
+> The two primary goals of this series are to make the irqbypass concept
+> easier to understand, and to address the terrible performance that can
+> result from using a list to track connections.
+> 
+> For the first goal, track the producer/consumer "tokens" as eventfd context
+> pointers instead of opaque "void *".  Supporting arbitrary token types was
+> dead infrastructure when it was added 10 years ago, and nothing has changed
+> since.  Taking an opaque token makes a very simple concept (device signals
+> eventfd; KVM listens to eventfd) unnecessarily difficult to understand.
+> 
+> Burying that simple behind a layer of obfuscation also makes the overall
+> code more brittle, as callers can pass in literally anything. I.e. passing
+> in a token that will never be paired would go unnoticed.
+> 
+> For the performance issue, use an xarray.  I'm definitely not wedded to an
+> xarray, but IMO it doesn't add meaningful complexity (even requires less
+> code), and pretty much Just Works.  Like tried this a while back[1], but
+> the implementation had undesirable behavior changes and stalled out.
+> 
+> Note, I want to do more aggressive cleanups of irqbypass at some point,
+> e.g. not reporting an error to userspace if connect() fails is awful
+> behavior for environments that want/need irqbypass to always work.  And
+> KVM shold probably have a KVM_IRQFD_FLAG_NO_IRQBYPASS if a VM is never going
+> to use device posted interrupts.  But those are future problems.
+> 
+> v2:
+>  - Collect reviews. [Kevin, Michael]
+>  - Track the pointer as "struct eventfd_ctx *eventfd" instead of "void *token".
+>    [Alex]
+>  - Fix typos and stale comments. [Kevin, Binbin]
+>  - Use "trigger" instead of the null token/eventfd pointer on failure in
+>    vfio_msi_set_vector_signal(). [Kevin]
+>  - Drop a redundant "tmp == consumer" check from patch 3. [Kevin]
+>  - Require producers to pass in the line IRQ number.
 
-On Fri, 16 May 2025 at 21:22, James Houghton <jthoughton@google.com> wrote:
->
-> On Tue, May 13, 2025 at 11:37=E2=80=AFAM Ackerley Tng <ackerleytng@google=
-.com> wrote:
-> >
-> > Fuad Tabba <tabba@google.com> writes:
-> > > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> > > index 6db515833f61..8e6d1866b55e 100644
-> > > --- a/virt/kvm/guest_memfd.c
-> > > +++ b/virt/kvm/guest_memfd.c
-> > > @@ -312,7 +312,88 @@ static pgoff_t kvm_gmem_get_index(struct kvm_mem=
-ory_slot *slot, gfn_t gfn)
-> > >       return gfn - slot->base_gfn + slot->gmem.pgoff;
-> > >  }
-> > >
-> > > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
-> > > +
-> > > +static bool kvm_gmem_supports_shared(struct inode *inode)
-> > > +{
-> > > +     uint64_t flags =3D (uint64_t)inode->i_private;
-> > > +
-> > > +     return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
-> > > +}
-> > > +
-> > > +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
-> > > +{
-> > > +     struct inode *inode =3D file_inode(vmf->vma->vm_file);
-> > > +     struct folio *folio;
-> > > +     vm_fault_t ret =3D VM_FAULT_LOCKED;
-> > > +
-> > > +     filemap_invalidate_lock_shared(inode->i_mapping);
-> > > +
-> > > +     folio =3D kvm_gmem_get_folio(inode, vmf->pgoff);
-> > > +     if (IS_ERR(folio)) {
-> > > +             int err =3D PTR_ERR(folio);
-> > > +
-> > > +             if (err =3D=3D -EAGAIN)
-> > > +                     ret =3D VM_FAULT_RETRY;
-> > > +             else
-> > > +                     ret =3D vmf_error(err);
-> > > +
-> > > +             goto out_filemap;
-> > > +     }
-> > > +
-> > > +     if (folio_test_hwpoison(folio)) {
-> > > +             ret =3D VM_FAULT_HWPOISON;
-> > > +             goto out_folio;
-> > > +     }
->
-> nit: shmem_fault() does not include an equivalent of the above
-> HWPOISON check, and __do_fault() already handles HWPOISON.
->
-> It's very unlikely for `folio` to be hwpoison and not up-to-date, and
-> even then, writing over poison (to zero the folio) is not usually
-> fatal.
 
-No strong preference, but the fact the it's still possible (even if
-unlikely) makes me lean towards keeping it.
+VDPA bits:
 
-> > > +
-> > > +     if (WARN_ON_ONCE(folio_test_large(folio))) {
-> > > +             ret =3D VM_FAULT_SIGBUS;
-> > > +             goto out_folio;
-> > > +     }
->
-> nit: I would prefer we remove this SIGBUS bit and change the below
-> clearing logic to handle large folios. Up to you I suppose.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-No strong preference here either. This is meant as a way to point out
-the lack of hugepage support, based on suggestions from a previous
-spin of this series.
+> v1: https://lore.kernel.org/all/20250404211449.1443336-1-seanjc@google.com
+> 
+> [1] https://lore.kernel.org/all/20230801115646.33990-1-likexu@tencent.com
+> [2] https://lore.kernel.org/all/20250401161804.842968-1-seanjc@google.com
+> 
+> Sean Christopherson (8):
+>   irqbypass: Drop pointless and misleading THIS_MODULE get/put
+>   irqbypass: Drop superfluous might_sleep() annotations
+>   irqbypass: Take ownership of producer/consumer token tracking
+>   irqbypass: Explicitly track producer and consumer bindings
+>   irqbypass: Use paired consumer/producer to disconnect during
+>     unregister
+>   irqbypass: Use guard(mutex) in lieu of manual lock+unlock
+>   irqbypass: Use xarray to track producers and consumers
+>   irqbypass: Require producers to pass in Linux IRQ number during
+>     registration
+> 
+>  arch/x86/kvm/x86.c                |   4 +-
+>  drivers/vfio/pci/vfio_pci_intrs.c |  10 +-
+>  drivers/vhost/vdpa.c              |  10 +-
+>  include/linux/irqbypass.h         |  46 ++++----
+>  virt/kvm/eventfd.c                |   7 +-
+>  virt/lib/irqbypass.c              | 190 +++++++++++-------------------
+>  6 files changed, 107 insertions(+), 160 deletions(-)
+> 
+> 
+> base-commit: 7ef51a41466bc846ad794d505e2e34ff97157f7f
+> -- 
+> 2.49.0.1112.g889b7c5bd8-goog
 
-> > > +
-> > > +     if (!folio_test_uptodate(folio)) {
-> > > +             clear_highpage(folio_page(folio, 0));
-> > > +             kvm_gmem_mark_prepared(folio);
-> > > +     }
-> > > +
-> > > +     vmf->page =3D folio_file_page(folio, vmf->pgoff);
-> > > +
-> > > +out_folio:
-> > > +     if (ret !=3D VM_FAULT_LOCKED) {
-> > > +             folio_unlock(folio);
-> > > +             folio_put(folio);
-> > > +     }
-> > > +
-> > > +out_filemap:
-> > > +     filemap_invalidate_unlock_shared(inode->i_mapping);
-> >
-> > Do we need to hold the filemap_invalidate_lock while zeroing? Would
-> > holding the folio lock be enough?
->
-> Do we need to hold the filemap_invalidate_lock for reading *at all*?
->
-> I don't see why we need it. We're not checking gmem->bindings, and
-> filemap_grab_folio() already synchronizes with filemap removal
-> properly.
-
-Ack.
-
-Thanks!
-/fuad
-
-> >
-> > > +
-> > > +     return ret;
-> > > +}
 
