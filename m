@@ -1,189 +1,130 @@
-Return-Path: <kvm+bounces-46980-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46981-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E1AAABBD28
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 14:00:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 579F1ABBDAB
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 14:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 541973B35D5
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 11:59:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 610EA189DE6B
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 12:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69BDB276054;
-	Mon, 19 May 2025 12:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68AC3278146;
+	Mon, 19 May 2025 12:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lccKlshv"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="F+styEMs"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD0A2690F9;
-	Mon, 19 May 2025 12:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FDD243364
+	for <kvm@vger.kernel.org>; Mon, 19 May 2025 12:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747656003; cv=none; b=Hm/xMoipFy1AMB2YtXAWYIIZrt83MQRoSNcPpoAlsqK1/MveZH9x+Ii+WvRHR8fZoXGKyZt/AGLNzZqaNdTQK7/nSgQYD2nmO034Ct34aBEsLjp9dBUUL2RaAhDiO4r1JhQHvCLvyaQAmEVP6iJQrGx19Xmfp2mu6jySmC4flRs=
+	t=1747657542; cv=none; b=fMmFMO7+kUX+MypsZr8+qjhmHeImwi4RaoSkF85SFIoYjM2VcawG0eyYBX3ybXSCyPk3S1hUFXgTGbXlZf4nnMtE4JQFyxcpLKjzotjwFmlTouWyt45jci5RsH2sxDLlSt5f/Fje0KeR3SaTH4uJzrd7ukikcRHNJCdooLb+FlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747656003; c=relaxed/simple;
-	bh=o36p20zzdltSGrsO+bxyIBTuQpGkmuNulgK1bAhY/Ak=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OC4CuduqbG3pTlHArWokZaAF0rzE3Xl51UP/E+KlQM6kpksknr48fHVawE0hdV/X/gPbRtuEcKa33xbYhlRRIii/TiGvxGBL6moqBpZtWihhg1okZNR+sLqqbMEZAV9L6BnSMdzsqiMlXBpL7IflJQgxDiYRXfUZ4hUSU0pDOzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lccKlshv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F33A4C4CEE9;
-	Mon, 19 May 2025 12:00:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747656003;
-	bh=o36p20zzdltSGrsO+bxyIBTuQpGkmuNulgK1bAhY/Ak=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lccKlshvSYlD99U8Az8i/TQEQMgFbc8rqkZrbkR+lUt3B1SECWQS0NocAJb0zInoY
-	 TOFjs5j19WFiK7CAvaTL7FUoHChIsx6y/JDRTR7jYfZX3FzZ1sgIomuNkQQIEJrzao
-	 2zRG38G9p6jPFLhpz+7Uk9vnXE9WNC7807nriHHPCOovkyG2ehCDAhxKzv+s+rZFqQ
-	 8UBAJtaUIQTC6S132Mvl8rRRp6OyEbJ5Wy6VzTW+3hJy8Wk6wWwDw++QzeMu79IYgm
-	 YjAXrQcEvud5+4qoYLb3rAGhditevSmBLGNefKSSQL/v42mDqLnHYWqcP9iNjSMKeU
-	 Y9/vR0tMaE7xA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uGz9z-00GDYo-5q;
-	Mon, 19 May 2025 13:00:00 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>
-Subject: Re: [PATCH v4 00/43] KVM: arm64: Revamp Fine Grained Trap handling
-Date: Mon, 19 May 2025 12:59:55 +0100
-Message-Id: <174765597419.3054795.9601866173269003599.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250506164348.346001-1-maz@kernel.org>
-References: <20250506164348.346001-1-maz@kernel.org>
+	s=arc-20240116; t=1747657542; c=relaxed/simple;
+	bh=UVMu7q/OWhagwnpQvr8VA3KbUOVlB7q/qERrJlFh/e0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=Knq4wWMd+XKvtwJFdC6+lWnHi4Xun6qsQbDbTDhyZGueEj2GgY05rLSAFhbraic19g5JHl4OWCLVLyhbG/jqfrdpwEymvT1kN0fMO6V6qExo49C3ocRRuKxcg4y5CfANXCBxW4K9uPE9PH4VcJk9kFO//+Q/ZHI4r7SGiD0mIvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=F+styEMs; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a365bc0af8so280398f8f.3
+        for <kvm@vger.kernel.org>; Mon, 19 May 2025 05:25:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1747657539; x=1748262339; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dYOuWvhD2IrISJ7Y8B2LTWIZ7qteHjlohGpX67eP4RQ=;
+        b=F+styEMswkviQeGy3AzZ1xxt6qOdTeskT0vzdjeOYy9OOgZOSKw/CaIzL6kwuEBFo2
+         BoSQENOpA2UNXfROOjLRJmzALbJws6fpzFAh1dLfCcPjNNTngfQj8mWdHnJD4Z4a4L2x
+         cW53d9mabzM+cXpvEWCpvQGQWm5HUTUUtrQXZcnSRiJ/XoYYeTQ88CE6pPKbcvDsfwPm
+         WUTba1GtANQwP1WSAbpz1tvO/idaTyPkHIbKa821amUyd60vxt6hDJ0Hk4Mk/FKKpnRm
+         rpt87prvle/QhbRnNt6b+Vp3RwTiD0IVKoSqBdxaIgpcUs3r9yGTj/XQ1xTbbWo7R6bx
+         S9/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747657539; x=1748262339;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=dYOuWvhD2IrISJ7Y8B2LTWIZ7qteHjlohGpX67eP4RQ=;
+        b=kOrXrKQ4QQX/d7AFYj9NeStwLfycByR4JYk7Eeb4nPeDFa67Tub6gUhkhT3FVc3AlK
+         HyNrjpSXeklsoeFk0VMxCq3VlpJmwSC7av6DSR0tXB6ZHcj4M82g0lFDuU4Ag4F4rWps
+         9CLcDn5t1dF18VD6Wbl6spFQbfXJVQ4lKV7vqvS5R5NoZQY/toXHgnCmr0UrzN1WUUKn
+         d2t/WMmynFie0FYXUaKlCiEz4vNAUYDOFIQTMr49n2o/MnBA0Yp3hdbKrEVYVAp+J5+v
+         4IWbIZtEA05AcNreqlLivrdfLTmKR3SxaTixubrKgGZeI2yjOpe9iGigJ1UgZUhOr/5/
+         hTuw==
+X-Forwarded-Encrypted: i=1; AJvYcCWRjtTaTZ0wHmC9u73KB9aD2veBLcbVr8FaAS04ezpyMH7IidaaAvh5iSRnw31UgQi05hA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi87igpw6uTvu2PkyT80FqU8Q2UHcakIBcgms1BeiQvTW/cfo6
+	MSOqIUFEyK39ru1iDGdDest336IO817ndyhatvpBkdpf38DLmc49c1u3S6MdlNn98Uo=
+X-Gm-Gg: ASbGncsemJj+F5N9Mr4+m78zu+EMq1EZyYT3uibqH9GfP8g4fs0LEyeQ6s8Ahvx087g
+	Uu78m98+jfUQjXfnjc7Z5c/T2ARUaxRJPSedRhwShlY6UonmcUzHbb0N6vGjwhan2kZn3EjjOiv
+	fhy5EHOMJEClWuSlvv5w561sijtSvDIq1XmvDpezKMSSz9J4PWmt6B3aece37bDr6ELTfHuNaCT
+	Ei5eyZTY42oTkboceca4db9m0nNnJO9Kabvx4SI1okn8+b3J3Bh7vbAdnMiXjT1E6jqcpF5GgAj
+	5RVbOl++3hKF6lN4IgW/DPqya9b9aCg3LJupWncP84oXSwLEZgSdzjEr4hA=
+X-Google-Smtp-Source: AGHT+IGD0SGS0rGbL2ckKskUyJdOJSyzovDYQ2VXjwxG5bR2UNb0kyCq4qlYyH1RbivwrICgl0vwjQ==
+X-Received: by 2002:a5d:5888:0:b0:3a3:7351:6f39 with SMTP id ffacd0b85a97d-3a373517245mr709772f8f.15.1747657539155;
+        Mon, 19 May 2025 05:25:39 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200:29b7:4911:a29c:2135])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f33804d9sm209160935e9.12.2025.05.19.05.25.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 May 2025 05:25:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, mark.rutland@arm.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com, ben.horgan@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 19 May 2025 14:25:36 +0200
+Message-Id: <DA04W4PO99EJ.1XWOAUMZV4BXG@ventanamicro.com>
+Subject: Re: [PATCH v3 1/2] RISC-V: KVM: add KVM_CAP_RISCV_MP_STATE_RESET
+Cc: <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
+ <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>, "Atish
+ Patra" <atishp@atishpatra.org>, "Paul Walmsley" <paul.walmsley@sifive.com>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Alexandre Ghiti" <alex@ghiti.fr>, "Andrew Jones" <ajones@ventanamicro.com>
+To: "Anup Patel" <anup@brainfault.org>
+From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
+References: <20250515143723.2450630-4-rkrcmar@ventanamicro.com>
+ <20250515143723.2450630-5-rkrcmar@ventanamicro.com>
+ <CAAhSdy1Z43xRC7tGS21-5rcX7uMeuWCHhABSuqNzELbp26aj0Q@mail.gmail.com>
+In-Reply-To: <CAAhSdy1Z43xRC7tGS21-5rcX7uMeuWCHhABSuqNzELbp26aj0Q@mail.gmail.com>
 
-On Tue, 06 May 2025 17:43:05 +0100, Marc Zyngier wrote:
-> This is yet another version of the series last posted at [1].
-> 
-> The eagled eye reviewer will have noticed that since v2, the series
-> has more or less doubled in size for any reasonable metric (number of
-> patches, number of lines added or deleted). It is therefore pretty
-> urgent that this gets either merged or forgotten! ;-)
-> 
-> [...]
+2025-05-16T17:55:05+05:30, Anup Patel <anup@brainfault.org>:
+> On Thu, May 15, 2025 at 8:22=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrc=
+mar@ventanamicro.com> wrote:
+>>
+>> Add a toggleable VM capability to reset the VCPU from userspace by
+>> setting MP_STATE_INIT_RECEIVED through IOCTL.
+>>
+>> Reset through a mp_state to avoid adding a new IOCTL.
+>> Do not reset on a transition from STOPPED to RUNNABLE, because it's
+>> better to avoid side effects that would complicate userspace adoption.
+>> The MP_STATE_INIT_RECEIVED is not a permanent mp_state -- IOCTL resets
+>> the VCPU while preserving the original mp_state -- because we wouldn't
+>> gain much from having a new state it in the rest of KVM, but it's a very
+>> non-standard use of the IOCTL.
+>>
+>> Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@ventanamicro.com>
+>> ---
+>> If we want a permanent mp_state, I think that MP_STATE_UNINITIALIZED
+>> would be reasonable.  KVM could reset on transition to any other state.
+>
+> Yes, MP_STATE_UNINITIALIZED looks better. I also suggest
+> that VCPU should be reset when set_mpstate() is called with
+> MP_STATE_UNINITIALIZED and the current state is
+> MP_STATE_STOPPED.
 
-Applied to next, thanks!
+That would result in two resets (stopped -> uninitialized -> *), unless
+we changed the logic.
 
-[01/43] arm64: sysreg: Add ID_AA64ISAR1_EL1.LS64 encoding for FEAT_LS64WB
-        commit: 2030396dac5f564ec85422ceb4327fcdb0054f83
-[02/43] arm64: sysreg: Update ID_AA64MMFR4_EL1 description
-        commit: eef33835bf6f297faa222f48bf941d57d2f8bda0
-[03/43] arm64: sysreg: Add layout for HCR_EL2
-        commit: d0f39259eff447fb4518777c36c7dffcf8b4ef9e
-[04/43] arm64: sysreg: Replace HFGxTR_EL2 with HFG{R,W}TR_EL2
-        commit: 0f013a524b240e7d67dc94d083a0d3ab72516ea3
-[05/43] arm64: sysreg: Update ID_AA64PFR0_EL1 description
-        commit: 9d737fddc93946d87f0ef60e00f506260534b1f4
-[06/43] arm64: sysreg: Update PMSIDR_EL1 description
-        commit: 894f2841f51fdeb1a7f61c74e00c883582a5af94
-[07/43] arm64: sysreg: Update TRBIDR_EL1 description
-        commit: 4533a0238df75d8215e72a4f3e006418ad6fe45d
-[08/43] arm64: sysreg: Update CPACR_EL1 description
-        commit: f062c19a9348d23a9bb7c6609ad17de3749157fd
-[09/43] arm64: sysreg: Add registers trapped by HFG{R,W}TR2_EL2
-        commit: 0be91cfbfdcd2f37ecf238760ce74c0ad2518e19
-[10/43] arm64: sysreg: Add registers trapped by HDFG{R,W}TR2_EL2
-        commit: dd161dc2dfcbdef19849f46745949b18f5ef54f9
-[11/43] arm64: sysreg: Add system instructions trapped by HFGIRT2_EL2
-        commit: 7c9cb893ae3e06c9f38bd86d62992eae906bf2b7
-[12/43] arm64: Remove duplicated sysreg encodings
-        commit: 7a11d98d6e4893e9d8b145f211ffa94ec4e6be4e
-[13/43] arm64: tools: Resync sysreg.h
-        commit: 3654f454bcfdd17446544841bcac3803907122ff
-[14/43] arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
-        commit: 7c7d56fcebd0c029c73c41d8daba49f9787eb9c2
-[15/43] arm64: Add FEAT_FGT2 capability
-        commit: fbc8a4e137e5673600ec276b06ca31a46967167b
-[16/43] KVM: arm64: Tighten handling of unknown FGT groups
-        commit: 04af8a39684f471e3785261f5d2f0df265fd77b6
-[17/43] KVM: arm64: Simplify handling of negative FGT bits
-        commit: 4b4af68dd972aedc4193bd886e383c123511d275
-[18/43] KVM: arm64: Handle trapping of FEAT_LS64* instructions
-        commit: 2e04378f1a766b9a8962004962d32e5df06a5707
-[19/43] KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_LS64_ACCDATA being disabled
-        commit: 9308d0b1d7abe36f0ee2052b0ffceb7869e83f8e
-[20/43] KVM: arm64: Don't treat HCRX_EL2 as a FGT register
-        commit: 09be03c6b54dd8959eba6cb25051c20a475ecde9
-[21/43] KVM: arm64: Plug FEAT_GCS handling
-        commit: 5329358c222fec1132169ab3de9973aa4cd63aa9
-[22/43] KVM: arm64: Compute FGT masks from KVM's own FGT tables
-        commit: 1b8570be89f8436b25bddc8afd7e54fcd906c3aa
-[23/43] KVM: arm64: Add description of FGT bits leading to EC!=0x18
-        commit: 3164899c21fd915f4ca60a215fe57a671a9699bc
-[24/43] KVM: arm64: Use computed masks as sanitisers for FGT registers
-        commit: 7ed43d84c17cc90e683b3901e92993864756a601
-[25/43] KVM: arm64: Unconditionally configure fine-grain traps
-        commit: ea266c72496873468bd2fdfd53ac1db203330142
-[26/43] KVM: arm64: Propagate FGT masks to the nVHE hypervisor
-        commit: 311ba55a5f8637d9a79035d4ea624236283c8c99
-[27/43] KVM: arm64: Use computed FGT masks to setup FGT registers
-        commit: aed34b6d2134efcfaf4c123e02b1926bb789f5c3
-[28/43] KVM: arm64: Remove hand-crafted masks for FGT registers
-        commit: 3ce9bbba935714c344bcff096973b6daa29cf857
-[29/43] KVM: arm64: Use KVM-specific HCRX_EL2 RES0 mask
-        commit: ef6d7d2682d948df217db73985e0a159305c7743
-[30/43] KVM: arm64: Handle PSB CSYNC traps
-        commit: 397411c743c77a9c1d90f407b502010227a259dc
-[31/43] KVM: arm64: Switch to table-driven FGU configuration
-        commit: 63d423a7635bca6d817a30adff29be58ee99c6d5
-[32/43] KVM: arm64: Validate FGT register descriptions against RES0 masks
-        commit: 938a79d0aa8dd0f75e4302a67006db4f45e1ce4e
-[33/43] KVM: arm64: Use FGT feature maps to drive RES0 bits
-        commit: c6cbe6a4c1bdce88bb0384df0e3679e4ef81dcd6
-[34/43] KVM: arm64: Allow kvm_has_feat() to take variable arguments
-        commit: a764b56bf90b6d758ff21408c13cd686c2519ef9
-[35/43] KVM: arm64: Use HCRX_EL2 feature map to drive fixed-value bits
-        commit: beed4448418ee2e2f48a9d5d6c01fe79df200bc2
-[36/43] KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits
-        commit: b2a324ff01feac7ea1ffe5a521cffc2749e9f113
-[37/43] KVM: arm64: Add FEAT_FGT2 registers to the VNCR page
-        commit: df56f1ccb0ec02570a0740703c63cac6bf0ec57c
-[38/43] KVM: arm64: Add sanitisation for FEAT_FGT2 registers
-        commit: 4bc0fe089840695538aff879e25efab2cdad22bd
-[39/43] KVM: arm64: Add trap routing for FEAT_FGT2 registers
-        commit: fc631df00c4cef4a95b25ac87842b9d1ec9ceaa1
-[40/43] KVM: arm64: Add context-switch for FEAT_FGT2 registers
-        commit: 1ba41c816007107e0f774d6803e0cbbbb40a47e0
-[41/43] KVM: arm64: Allow sysreg ranges for FGT descriptors
-        commit: f654e9e47eac95424b8ef4b285f331604460174b
-[42/43] KVM: arm64: Add FGT descriptors for FEAT_FGT2
-        commit: af2d78dcadbc2386610566ab2052fee78993fb53
-[43/43] KVM: arm64: Handle TSB CSYNC traps
-        commit: 98dbe56a016a4ea457ef312637a625d3c627dbd9
+Would you prefer to reset on transition to the new permanent mp_state?
+MP_STATE_INIT_RECEIVED seems a more fitting name for the state, then.
 
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Thanks.
 
