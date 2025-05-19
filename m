@@ -1,332 +1,638 @@
-Return-Path: <kvm+bounces-46969-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46970-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A73A0ABB796
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 10:43:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24042ABB7F9
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 10:56:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EBD316710E
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 08:41:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7666816A001
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 08:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D8A26B2C0;
-	Mon, 19 May 2025 08:34:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C0F269D11;
+	Mon, 19 May 2025 08:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QgOCZ0TR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="imp5kS8K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BB926AABE;
-	Mon, 19 May 2025 08:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747643671; cv=fail; b=nMkURnpA4XRzCdpdP2tFgui69lHWtfbS0jWytYe/BB9Crxa7iQZFDpB4ynjpPdjJ5th0/jG1XyI35v2BLJNcLnphHaIxCmdr2kd88KD1LCBtNvUx8m4U/IokurTYkr0IzwTHcNtZL3DHsO/qhXlXKDGbIll/nQ0QQ0mZlRIEoFg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747643671; c=relaxed/simple;
-	bh=dnRWMgymcUA0Ph/r7eNT8gmBTbObhdQvBLRfTEYvSZM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=YL+H8w0IBF8IiaAfB8s3DY7HqVf6Q7mLKquOZlaG+ie1HyQzKveaV0rbiGkwymBp+K7kPwFfUnhdpVTP8oY83KqeS41UZvF/dBrHNlSVuEzxRifLye9sbKrgnoEntD1g9TNP4UMQQBXmt1sitnw3xbhivddo5V9aQAOKA8N3OjU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QgOCZ0TR; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747643670; x=1779179670;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=dnRWMgymcUA0Ph/r7eNT8gmBTbObhdQvBLRfTEYvSZM=;
-  b=QgOCZ0TRdxB2Peexu63dprWdP1DNquH6IUyVeGfi5dgNyRFOiBQOjv4Y
-   wVSZwvj+qOCfgGIw2BZy4xqbhVYBUx5f5fgKcN7rjjhbU4f4mGOjtFxVr
-   /NKTmLcUuQG6MDzVYsGfmw5lVnf7mgx1GlvUzg1Af0l4AjpSfNRa2zdq+
-   Urbtv8tM+Q3F9insJUZZWRt+IxarbNUtaw/y3x9Dt9c9V//+5Jz0W5j09
-   bxPErC3jARsIulyWyD63ZbyMv/V/jHDsPfl0VIrNaMJj7SDIxVPWqj5cM
-   sNmVed+MuZDLzAstrj3Dqu70SR7dBD54lWQjv0apFqLLQjsqjFQFwG/YK
-   Q==;
-X-CSE-ConnectionGUID: oFYAVwmASFyMH1+b6fc3aw==
-X-CSE-MsgGUID: IXF2pcLkQAS7AYe/h4BExA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11437"; a="49464671"
-X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
-   d="scan'208";a="49464671"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 01:34:27 -0700
-X-CSE-ConnectionGUID: EdlfAd91S0mrd5AK6pIaoQ==
-X-CSE-MsgGUID: Aqn6IjImQu2Mae8v85pnKg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
-   d="scan'208";a="176415586"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 01:34:26 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 19 May 2025 01:34:26 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Mon, 19 May 2025 01:34:26 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 19 May 2025 01:34:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A9Z67jswaLzZ+wMnz0KjPen9c9A/cKmdQzKUyAyV5Bs6acIqEsjkibfQ2PTEnARO2NglqIHw7VCyycQjcIr9EWP1bPDxzNmaLzOVCdS5yeGfOzjJwSGNVXlo3tIbVPjD1qRGFPDC+GmJ6f3d2fYXOzq8oa+0bUxmYw2jswaGQo3zDHmbdG4S4g6/5prsI3gdzBVhsDUN+0lIopxKiZzyylKHmDS/YQctKcaiQEHEMihwNzG1g6WNZW5dqDBspfYEXzs1R8YVSFyabWE2vXjXk5RzCfJ+rsZWfuenhFvRVm1hf6YsyIgdINqw/I7zFVhtYwhNWRoMY47cTvK3UCli9g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Jj5BcT4bWtHzEId3OZOXs9VYHAiHZA5n1htCl5vp8sc=;
- b=i7s855Aq446itLYNC1K5qiIlOw3agNeCtyzlsXK3wCmLxJMxQOQ7Bi13M0RRPlP1LOjhjXUKl+zAqPpYQOgK1rKRPPxZuVGIfeFjfu4j/Fen/rzYsFrQXksWRGUaBBUh1gfBwlV6G8HVkhfEEqTxN6seMKNAbUlKDCK3y2NMZlMH0m5mmwodGhv6LDrw1UU0Pv3oprGCZm0eRnD21aa6z7kO7WXkSTEvNyp496Ke11/l5iNEI6mxoNN9fewXcL8N9fQJHimXndVSsK0t1tqak6hEmly/X+AvgUufDlx/1xTqtiHZ6IdYnK9TEW6bi1C0ZsnrA+5sZffeDNaGHwISdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- DM6PR11MB4721.namprd11.prod.outlook.com (2603:10b6:5:2a3::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8746.30; Mon, 19 May 2025 08:34:23 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%2]) with mapi id 15.20.8746.030; Mon, 19 May 2025
- 08:34:23 +0000
-Date: Mon, 19 May 2025 16:32:11 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
-CC: "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, "Li, Xiaoyao"
-	<xiaoyao.li@intel.com>, "Shutemov, Kirill" <kirill.shutemov@intel.com>,
-	"Hansen, Dave" <dave.hansen@intel.com>, "david@redhat.com"
-	<david@redhat.com>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-	"vbabka@suse.cz" <vbabka@suse.cz>, "Li, Zhiquan1" <zhiquan1.li@intel.com>,
-	"Du, Fan" <fan.du@intel.com>, "michael.roth@amd.com" <michael.roth@amd.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>, "Weiny, Ira" <ira.weiny@intel.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "ackerleytng@google.com"
-	<ackerleytng@google.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"tabba@google.com" <tabba@google.com>, "Peng, Chao P"
-	<chao.p.peng@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "Annapurve, Vishal"
-	<vannapurve@google.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"jroedel@suse.de" <jroedel@suse.de>, "Miao, Jun" <jun.miao@intel.com>,
-	"pgonda@google.com" <pgonda@google.com>, "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [RFC PATCH 09/21] KVM: TDX: Enable 2MB mapping size after TD is
- RUNNABLE
-Message-ID: <aCrsi1k4y8mGdfv7@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20250424030033.32635-1-yan.y.zhao@intel.com>
- <20250424030618.352-1-yan.y.zhao@intel.com>
- <dc20a7338f615d34966757321a27de10ddcbeae6.camel@intel.com>
- <c19b4f450d8d079131088a045c0821eeb6fcae52.camel@intel.com>
- <aCcIrjw9B2h0YjuV@yzhao56-desk.sh.intel.com>
- <c98cbbd0d2a164df162a3637154cf754130b3a3d.camel@intel.com>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c98cbbd0d2a164df162a3637154cf754130b3a3d.camel@intel.com>
-X-ClientProxiedBy: SI2PR01CA0042.apcprd01.prod.exchangelabs.com
- (2603:1096:4:193::23) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B8E1FDE14
+	for <kvm@vger.kernel.org>; Mon, 19 May 2025 08:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747644973; cv=none; b=gMJKwOcLY1Eimll2ywUovV0YbmWEuDDwM+LVWFA22PZMXnisKkNvUICYuo3hmrV/siPncuoAdVSBaNfAlHnJC949UOoEyz1Yd67wIzxQNNwrUECHrP0mE3o2/Kmhtc9v06S2aPnRMrzRAIdWPZjrMgFdUIwLHd5+bwwSQ5ab//s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747644973; c=relaxed/simple;
+	bh=w8d7GSAu49EfOvQ3lbUi0gCI8ryGGLwqoEEEkyCP58c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ndwxkQRxdsAh0G0FDrZJL3NCFZ7HrwOdyLk+QWSqzq/nYj6HP3ZbMY+EpzHk3WzvlO/pvhAprkyKCdVjkyzxTi8XvvH4pLj90hKYVA+baYurk47LSxs+L5XeZH9jDJD8Chpc/MKx/YucjBWWkWo0zWNr6a5t3sGqXfq0giO6nvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=imp5kS8K; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747644969;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+8sI82yq/f8FgFoZEta+4VkgQiL0NBrWh/StSsatWxk=;
+	b=imp5kS8KYmh28ZnLLhaHbCqOuFRtFe9XuD5DCPgqB93099NUTeccOgh0wyVVJD4jMb3jyw
+	HNtoqpx9DPBF7yo9oaM3giUOtO0XnsQxaHIe2tNaEgRl7vK5WEk1v08FfemBFu6q0MhJg/
+	Bbhr7Kqnn7WWPzHEkejm/aBJ7GO5Gak=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-62-yj-7l2N8O96QFdEpI3kK3Q-1; Mon, 19 May 2025 04:56:08 -0400
+X-MC-Unique: yj-7l2N8O96QFdEpI3kK3Q-1
+X-Mimecast-MFC-AGG-ID: yj-7l2N8O96QFdEpI3kK3Q_1747644967
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-742cede1473so1314595b3a.3
+        for <kvm@vger.kernel.org>; Mon, 19 May 2025 01:56:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747644967; x=1748249767;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+8sI82yq/f8FgFoZEta+4VkgQiL0NBrWh/StSsatWxk=;
+        b=H8cYY8JK55YybKwtN8Ve39j47CI331x7V3C8YePmatjodcFYma3ebLUN+uNgs1Ki9z
+         UZUQBQzcapxF3VjLQ8zRpl3XQ1bSpsr5knt/2e6PzW8K9D9sTDy9ViWfUSPkSFSXqobz
+         XRBUHBl7a1aPVLO1FBzC0GVklL03cUfzinG66auNR+LI+v1W/F5uFe8RwSt1BEEijkzd
+         2ZBJk4h33EYNq2iHvYqm3iGZXDjx7F9CNcJNV35LbXHd7bYjAwVr3Gx+/w1+Pytgs9Lm
+         HWcxagGUS9jLHc+V2lc5HIzfilWBq+tqPrwN/y/00vDalbE5f9wFr8g+Mmq2e6prJpg0
+         LFxw==
+X-Gm-Message-State: AOJu0YyBc5v53lIrqOF7pCF70A8IffGB5L08+/LsHW1pkuJaXabTvNh3
+	ggIB1U/WwDn95Rd0lSSKWTMSopU9A0r8uSHxbcKPMug92Br2zxXHf/N856Qa2g5aNaSJAqlWn0e
+	luimFIx9oDgKPt+qeUsDLCTdE1ufqLynPMZ2uDnnBTuPU0/9NjPKzwQ==
+X-Gm-Gg: ASbGncsMwUaEfaQzxp5KpGtG93N4VGrY1Sti2MYmaR35kLlBaa9jSF/Jf65juwyRmf3
+	cQIOrt7OLD1ysotm38+YaNxOeK3S6EZNCdzttTBnzVuhzMJxeDrV4FIYyOyYqiI/pT8HeeS2adO
+	ARE4ZGXvIeXsXoakWA2NHK4pv3kU7rIui/L5lhdIlz4su4/SIUapT+VwElWfzKtGmhW7fcMN38J
+	M84SFNqULpcQjPBGH0B+BagV0CKR3jqDthgRQQoLDrPdLQJdEoSDjFzvHoPMD826ARGkEMIYRs+
+	bUqhLBcuKgSmZ7Ls
+X-Received: by 2002:a05:6a21:9208:b0:209:251d:47d2 with SMTP id adf61e73a8af0-2170cb2609dmr14733206637.11.1747644966785;
+        Mon, 19 May 2025 01:56:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFfWMc3DaNswLVk3gKWW45O5beN+npa+Ty5x6tqyEpyLBL1yIWrxHAXKN90bYSxUmk6KSXyfQ==
+X-Received: by 2002:a05:6a21:9208:b0:209:251d:47d2 with SMTP id adf61e73a8af0-2170cb2609dmr14733145637.11.1747644966186;
+        Mon, 19 May 2025 01:56:06 -0700 (PDT)
+Received: from [10.72.116.146] ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30e33401a81sm10738870a91.2.2025.05.19.01.55.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 May 2025 01:56:05 -0700 (PDT)
+Message-ID: <8aae95b9-4444-4ede-9f27-7ff759b6586f@redhat.com>
+Date: Mon, 19 May 2025 16:55:55 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DM6PR11MB4721:EE_
-X-MS-Office365-Filtering-Correlation-Id: d2315fc8-a608-49b1-7374-08dd96aff52a
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7416014;
-X-Microsoft-Antispam-Message-Info: =?iso-8859-1?Q?Jj71OxDggCWrAU6vBPVuqhjwvqXTDGf+Ns+OewVanXuJF81r4RTqy9IT4y?=
- =?iso-8859-1?Q?kb1jmOGC8WSW+aMkXIzkoL8IZEtzlyJNojlrZgaeH+jOrknTNVN2BIFG+L?=
- =?iso-8859-1?Q?MGNCLqme5WM7D1irr3yMXalJjGyH7tsKxYfNHQ+UlgLplWt/Hmu0Phd1EA?=
- =?iso-8859-1?Q?YWUnah1KFAzFVA2jUuCDd2T2wQ56I3zeupGnhqCyQe61Zcdd57NTAssKIY?=
- =?iso-8859-1?Q?9fJkoxzxko286kWeSwVS24XOH6ZI3tc4ytdY+CCDYe5AfNAr3seeURbu5u?=
- =?iso-8859-1?Q?XPlU+njaGhTXqaq3MXcIWPLbJe3DDSwjrTW5pUeS0QPs/3KEYXq4gx4tjo?=
- =?iso-8859-1?Q?yZEkNLSkw8xhExQAUWkS7QfJ8n1y8cK95mvJBpIsJe7TEx/U6a3iz4xe9E?=
- =?iso-8859-1?Q?2D/KWmJvN8b1iId/q+ejqISCICyCJo6gHoyN2Rj5IwN3fTfKukz9mYjelf?=
- =?iso-8859-1?Q?OF/Y0ULVkn9qkwInKgrVeWk2px3KJuHk4F5vjkEb3Q7Epkfw0wvFoTsmuO?=
- =?iso-8859-1?Q?cxwqgAVOwueok3GhURcWZF4msrT3b+5mVJOUfw6u8i6PnlAtlQ8qIr8exa?=
- =?iso-8859-1?Q?3wtWOkpAoTnxihrjakoDLrxoR5dObcTFVry9npurdkGLsZB+vnDHadYluf?=
- =?iso-8859-1?Q?CUk+WH5tEE/ykxcdlP2MrNlB9mE08dqArRz324IulGizh9rZzNd8o3LLmi?=
- =?iso-8859-1?Q?o5RoPAYDJYWgYcxyzEiIkicZva4nFsM2mF1PKICTd1sy5Rmo9K7ctVxrnv?=
- =?iso-8859-1?Q?UeTw5n1kiGofHAq5AkSnKmZs7h5xaaUsuLMI5F0GFNxw/bwchna1wcFVNT?=
- =?iso-8859-1?Q?3tiRCXyml2zjP5+XWaQm2+PBHCPEo1hAvblb3pDpqTdullEN3LQOD1E/vY?=
- =?iso-8859-1?Q?QymJxH5hgvlMLrpqT4Fo7n4LwlHRydlLWN23doBQaGzGWRWw/qPNSJNWw3?=
- =?iso-8859-1?Q?hYPE1O+Xo81VG4oaITDO6pSWi7hi/+J/XsWJ7pbWmgqQGVbCaCusOjBaPA?=
- =?iso-8859-1?Q?11DtLdO/MjSRPY/NqTUrNR2nC5G+YrqAyJarRJsp32+H/DEarCr5/aqjSi?=
- =?iso-8859-1?Q?ATy5/23yquxrSENCod/fBVy9sxeXcnJcCQBNLe7uMOTOg0hbuZB+fBt6Cw?=
- =?iso-8859-1?Q?xiBXkcyOONt5EhHI/WVZ8L+LmmHomSb9xP2MlnbjmvrHKojdyfAoCapxoO?=
- =?iso-8859-1?Q?A3HEEog+AqmzNPcglAuH08ct+ovx+mRku5yxTTKgZatCorspneZbabkMSo?=
- =?iso-8859-1?Q?tuMF+/wj7rIvFu2QBwDeO/vNOKor3CjpsqGFDPOG8XypVmI/GOwtZ6qjJF?=
- =?iso-8859-1?Q?yKeVVsvZ/j659IDbX8GYoSzjgP/jQ4RSISmncGpdUp7ft6fqVkH+Bs3TUJ?=
- =?iso-8859-1?Q?fN1L9XEVTYV4QnvAK4/c4G8YXMZZzGP9MSG2zRW2ubNp05sRV9Goh4R8cP?=
- =?iso-8859-1?Q?tmRn87/lDUZvJu1R?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?TN/YCimB1kqn8swj1LNTdOrDtbI7owKTb5jFNGMQvDnyvriaANS3vaq1FJ?=
- =?iso-8859-1?Q?EqC4csxcomxlTGLl8GHjWjcutpwacXsV3G4Yxi/V9L8U3oRb4sQGsmLSWV?=
- =?iso-8859-1?Q?k5aA5Qyct86HtU4mARHJJOtMJJHRKqKiLTJqd+JRUjit/nfo9KXXgSutgB?=
- =?iso-8859-1?Q?ezbjoboWAobWInY49zZk6z+qDh/KbCyvV7IGRMHpUehF+CK8QhiAz+u2ym?=
- =?iso-8859-1?Q?zrLOFoVOV9V52uzed2QtEkyNwAnOK/8n3vnrdiyYCpsZNWnM6eGiHD5Jes?=
- =?iso-8859-1?Q?M/UgntqKustVhFKTeqQGZIaNmsqFn1K9J7oTI3kdoiREC0QoZIl/uqr0Sn?=
- =?iso-8859-1?Q?cWmbIfW551DkxMETIjryVtFcgZkTFRFs3cJfgGf8a1JLQgiK9EhDs/QkIu?=
- =?iso-8859-1?Q?fwCoc2oPVP55/oMx/bYkPm2x9/M2Oa2EmZvVgZO8u86f7JzmKBaMaeYA8p?=
- =?iso-8859-1?Q?BAZzuheM7W6kzwOY1zvtXbvH2bm8KT5bg2ZAfTyRAlReIPCNtv3wwMJN4u?=
- =?iso-8859-1?Q?pzV7Ho4vp0DM372JpZU84ZbSGa9W5eUSz7hg/PDmI36ahKUe9OmTK0/8qn?=
- =?iso-8859-1?Q?W3eVOBv3GDDeKqdnEr+XWlhh6d14FkA+iB3P4qAbSZIPum+mK6YLIeu8fu?=
- =?iso-8859-1?Q?MTYnF690hTuYRb+DNcrTvFZ68ssDJst88Ww/knxtsWRqnvccBUCOmPCLCz?=
- =?iso-8859-1?Q?1RFwx/PjPfl4k3nGsS3U1i1zfD2A0/l6M0Rwlku9vzrRpoBpSJFVnxbhy1?=
- =?iso-8859-1?Q?GzOqYlR8zCVpbDmJcJtWq1Bsf319tkJpcJKNLLAnd19aj+aj2pg/UWOTkX?=
- =?iso-8859-1?Q?nDUoHpED9h824Kt7rgv9B0ys/nfkFu5fVzul22486a5FfImVHzI9NXjf+Q?=
- =?iso-8859-1?Q?zBpSU3QrdTQigDamXQUZ0JLWHqBXJBUg9cE95LguhPyLZg5qAtq8V253fp?=
- =?iso-8859-1?Q?ZmisvP5ZlNubrhNnT1QagL5SHDc787SZJn0DyXAIFXam+lktRBjBPFe6BB?=
- =?iso-8859-1?Q?kuGSw+UfCuTfz75ev8hPa7raUXfqTynuadXVX79q3zYQzSepLfVbAwYhph?=
- =?iso-8859-1?Q?/jnqDfP336GvuIlV37oxxg9FZa7rO1wUBMGJJK3YhYwZ2BOP7iTx9PcMfN?=
- =?iso-8859-1?Q?0AZhTdmhtdHw63pGqGjolxCDoflbcBIpbgLokDyiOsYvvLPiMYeU0wfzH5?=
- =?iso-8859-1?Q?n4oGrMBMIiuTCeCF4/GdcoHrGcikTnm9AaHaeGLX63CY2AnJ+EtIeE17VN?=
- =?iso-8859-1?Q?Jus/XfeZ+OvhlUW2m8rLr/l5HfZ2NSZyRQ6OCgycdWK154VgVL1WMcYxsw?=
- =?iso-8859-1?Q?gauoS25kstqwMbFJfuOP7+VG+fSeTn4xOcCMFQPPQ6Finke0oCvQbXvmv3?=
- =?iso-8859-1?Q?ED6W8XEHJXQIEdc24e/jRqyZGXtYDmVmOp84rSBO5KZqDB1FxlL+XOnNhb?=
- =?iso-8859-1?Q?mnXIvgmnSQHifud9xIa+oBy0wNItQ5lTr5x/mi+S8fycdIRGdUzCZ7PzyZ?=
- =?iso-8859-1?Q?xmq5ayTJvAA3bBBnpv5GEUtsx1jNVOZ1bUa3O9Jd4g6a7/IgmJ9djvTVMu?=
- =?iso-8859-1?Q?REVZRviTJxyHwKoK9/wOiLMbDHDNxd37+pb/w+Lchge5+lVa19Ff/WMO28?=
- =?iso-8859-1?Q?DuLpL2Xg4/nrXT6sYjvBIs4h13pkjhhYAv?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2315fc8-a608-49b1-7374-08dd96aff52a
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2025 08:34:23.4511
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: t1obkgqLsYFLRnt65y8IQw/BIAvIW9VbPnzw7KXy0d92tNsqJB+L0QjQ7lIGyzvl+yjK/q9iWYQo1ne/6+ZxXA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4721
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v3 09/16] scripts: Add support for kvmtool
+To: Alexandru Elisei <alexandru.elisei@arm.com>, andrew.jones@linux.dev,
+ eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+ frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+ david@redhat.com, pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com,
+ maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
+References: <20250507151256.167769-1-alexandru.elisei@arm.com>
+ <20250507151256.167769-10-alexandru.elisei@arm.com>
+Content-Language: en-US
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20250507151256.167769-10-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, May 17, 2025 at 06:35:57AM +0800, Huang, Kai wrote:
-> On Fri, 2025-05-16 at 17:43 +0800, Zhao, Yan Y wrote:
-> > On Fri, May 16, 2025 at 09:35:37AM +0800, Huang, Kai wrote:
-> > > On Tue, 2025-05-13 at 20:10 +0000, Edgecombe, Rick P wrote:
-> > > > > @@ -3265,7 +3263,7 @@ int tdx_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
-> > > > >   	if (unlikely(to_kvm_tdx(kvm)->state != TD_STATE_RUNNABLE))
-> > > > >   		return PG_LEVEL_4K;
-> > > > >   
-> > > > > -	return PG_LEVEL_4K;
-> > > > > +	return PG_LEVEL_2M;
-> > > > 
-> > > > Maybe combine this with patch 4, or split them into sensible categories.
-> > > 
-> > > How about merge with patch 12
-> > > 
-> > >   [RFC PATCH 12/21] KVM: TDX: Determine max mapping level according to vCPU's 
-> > >   ACCEPT level
-> > > 
-> > > instead?
-> > > 
-> > > Per patch 12, the fault due to TDH.MEM.PAGE.ACCPT contains fault level info, so
-> > > KVM should just return that.  But seems we are still returning PG_LEVEL_2M if no
-> > > such info is provided (IIUC):
-> > Yes, if without such info (tdx->violation_request_level), we always return
-> > PG_LEVEL_2M.
-> > 
-> > 
-> > > int tdx_gmem_private_max_mapping_level(struct kvm_vcpu *vcpu, kvm_pfn_t pfn, 
-> > > 				       gfn_t gfn)
-> > >  {
-> > > +	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> > > +
-> > >  	if (unlikely(to_kvm_tdx(vcpu->kvm)->state != TD_STATE_RUNNABLE))
-> > >  		return PG_LEVEL_4K;
-> > >  
-> > > +	if (gfn >= tdx->violation_gfn_start && gfn < tdx->violation_gfn_end)
-> > > +		return tdx->violation_request_level;
-> > > +
-> > >  	return PG_LEVEL_2M;
-> > >  }
-> > > 
-> > > So why not returning PT_LEVEL_4K at the end?
-> > > 
-> > > I am asking because below text mentioned in the coverletter:
-> > > 
-> > >     A rare case that could lead to splitting in the fault path is when a TD
-> > >     is configured to receive #VE and accesses memory before the ACCEPT
-> > >     operation. By the time a vCPU accesses a private GFN, due to the lack
-> > >     of any guest preferred level, KVM could create a mapping at 2MB level.
-> > >     If the TD then only performs the ACCEPT operation at 4KB level,
-> > >     splitting in the fault path will be triggered. However, this is not
-> > >     regarded as a typical use case, as usually TD always accepts pages in
-> > >     the order from 1GB->2MB->4KB. The worst outcome to ignore the resulting
-> > >     splitting request is an endless EPT violation. This would not happen
-> > >     for a Linux guest, which does not expect any #VE.
-> > > 
-> > > Changing to return PT_LEVEL_4K should avoid this problem.  It doesn't hurt
-> > For TDs expect #VE, guests access private memory before accept it.
-> > In that case, upon KVM receives EPT violation, there's no expected level from
-> > the TDX module. Returning PT_LEVEL_4K at the end basically disables huge pages
-> > for those TDs.
+
+
+On 5/7/25 11:12 PM, Alexandru Elisei wrote:
+> Teach the arm runner to use kvmtool when kvm-unit-tests has been configured
+> appropriately.
 > 
-> Just want to make sure I understand correctly:
+> The test is ran using run_test_status(), and a 0 return code (which means
+> success) is converted to 1, because kvmtool does not have a testdev device
+> to return the test exit code, so kvm-unit-tests must always parse the
+> "EXIT: STATUS" line for the exit code.
 > 
-> Linux TDs always ACCEPT memory first before touching that memory, therefore KVM
-> should always be able to get the accept level for Linux TDs.
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+
+> ---
+>   arm/run               | 161 ++++++++++++++++++++++++++----------------
+>   powerpc/run           |   4 +-
+>   riscv/run             |   4 +-
+>   s390x/run             |   2 +-
+>   scripts/arch-run.bash | 112 +++++++++++------------------
+>   scripts/vmm.bash      |  89 +++++++++++++++++++++++
+>   x86/run               |   4 +-
+>   7 files changed, 236 insertions(+), 140 deletions(-)
 > 
-> In other words, returning PG_LEVEL_4K doesn't impact establishing large page
-> mapping for Linux TDs.
->
-> However, other TDs may choose to touch memory first to receive #VE and then
-> accept that memory.  Returning PG_LEVEL_2M allows those TDs to use large page
-> mappings in SEPT.  Otherwise, returning PG_LEVEL_4K essentially disables large
-> page for them (since we don't support PROMOTE for now?).
-Not only because we don't support PROMOTE.
+> diff --git a/arm/run b/arm/run
+> index 56562ed1628f..e3c4ffc49136 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -12,80 +12,117 @@ fi
+>   
+>   check_vmm_supported
+>   
+> -qemu_cpu="$TARGET_CPU"
+> -
+> -if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+> -   [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+> -   [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
+> -	ACCEL="tcg"
+> -fi
+> +function arch_run_qemu()
+> +{
+> +	qemu_cpu="$TARGET_CPU"
+> +
+> +	if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
+> +	   [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
+> +	   [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
+> +		ACCEL="tcg"
+> +	fi
+>   
+> -set_qemu_accelerator || exit $?
+> -if [ "$ACCEL" = "kvm" ]; then
+> -	QEMU_ARCH=$HOST
+> -fi
+> +	set_qemu_accelerator || exit $?
+> +	if [ "$ACCEL" = "kvm" ]; then
+> +		QEMU_ARCH=$HOST
+> +	fi
+>   
+> -qemu=$(search_qemu_binary) ||
+> -	exit $?
+> +	qemu=$(search_qemu_binary) ||
+> +		exit $?
+>   
+> -if ! $qemu -machine '?' | grep -q 'ARM Virtual Machine'; then
+> -	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
+> -	exit 2
+> -fi
+> +	if ! $qemu -machine '?' | grep -q 'ARM Virtual Machine'; then
+> +		echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
+> +		exit 2
+> +	fi
+>   
+> -M='-machine virt'
+> +	M='-machine virt'
+>   
+> -if [ "$ACCEL" = "kvm" ]; then
+> -	if $qemu $M,\? | grep -q gic-version; then
+> -		M+=',gic-version=host'
+> +	if [ "$ACCEL" = "kvm" ]; then
+> +		if $qemu $M,\? | grep -q gic-version; then
+> +			M+=',gic-version=host'
+> +		fi
+>   	fi
+> -fi
+>   
+> -if [ -z "$qemu_cpu" ]; then
+> -	if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
+> -	   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
+> -		qemu_cpu="host"
+> -		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+> -			qemu_cpu+=",aarch64=off"
+> +	if [ -z "$qemu_cpu" ]; then
+> +		if ( [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ] ) &&
+> +		   ( [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ] ); then
+> +			qemu_cpu="host"
+> +			if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+> +				qemu_cpu+=",aarch64=off"
+> +			fi
+> +		else
+> +			qemu_cpu="$DEFAULT_QEMU_CPU"
+>   		fi
+> -	else
+> -		qemu_cpu="$DEFAULT_QEMU_CPU"
+>   	fi
+> -fi
+>   
+> -if [ "$ARCH" = "arm" ]; then
+> -	M+=",highmem=off"
+> -fi
+> +	if [ "$ARCH" = "arm" ]; then
+> +		M+=",highmem=off"
+> +	fi
+>   
+> -if ! $qemu $M -device '?' | grep -q virtconsole; then
+> -	echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
+> -	exit 2
+> -fi
+> +	if ! $qemu $M -device '?' | grep -q virtconsole; then
+> +		echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
+> +		exit 2
+> +	fi
+>   
+> -if ! $qemu $M -chardev '?' | grep -q testdev; then
+> -	echo "$qemu doesn't support chr-testdev. Exiting."
+> -	exit 2
+> -fi
+> +	if ! $qemu $M -chardev '?' | grep -q testdev; then
+> +		echo "$qemu doesn't support chr-testdev. Exiting."
+> +		exit 2
+> +	fi
+>   
+> -if [ "$UEFI_SHELL_RUN" != "y" ] && [ "$EFI_USE_ACPI" != "y" ]; then
+> -	chr_testdev='-device virtio-serial-device'
+> -	chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
+> -fi
+> +	if [ "$UEFI_SHELL_RUN" != "y" ] && [ "$EFI_USE_ACPI" != "y" ]; then
+> +		chr_testdev='-device virtio-serial-device'
+> +		chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
+> +	fi
+>   
+> -pci_testdev=
+> -if $qemu $M -device '?' | grep -q pci-testdev; then
+> -	pci_testdev="-device pci-testdev"
+> -fi
+> +	pci_testdev=
+> +	if $qemu $M -device '?' | grep -q pci-testdev; then
+> +		pci_testdev="-device pci-testdev"
+> +	fi
+>   
+> -A="-accel $ACCEL$ACCEL_PROPS"
+> -command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
+> -command+=" -display none -serial stdio"
+> -command="$(migration_cmd) $(timeout_cmd) $command"
+> -
+> -if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> -	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
+> -elif [ "$EFI_USE_ACPI" = "y" ]; then
+> -	run_qemu_status $command -kernel "$@"
+> -else
+> -	run_qemu $command -kernel "$@"
+> -fi
+> +	A="-accel $ACCEL$ACCEL_PROPS"
+> +	command="$qemu -nodefaults $M $A -cpu $qemu_cpu $chr_testdev $pci_testdev"
+> +	command+=" -display none -serial stdio"
+> +	command="$(migration_cmd) $(timeout_cmd) $command"
+> +
+> +	if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> +		ENVIRON_DEFAULT=n run_test_status $command "$@"
+> +	elif [ "$EFI_USE_ACPI" = "y" ]; then
+> +		run_test_status $command -kernel "$@"
+> +	else
+> +		run_test $command -kernel "$@"
+> +	fi
+> +}
+> +
+> +function arch_run_kvmtool()
+> +{
+> +	local command
+> +
+> +	kvmtool=$(search_kvmtool_binary) ||
+> +		exit $?
+> +
+> +	if [ "$ACCEL" ] && [ "$ACCEL" != "kvm" ]; then
+> +		echo "kvmtool does not support $ACCEL" >&2
+> +		exit 2
+> +	fi
+> +
+> +	if ! kvm_available; then
+> +		echo "kvmtool requires KVM but not available on the host" >&2
+> +		exit 2
+> +	fi
+> +
+> +	command="$(timeout_cmd) $kvmtool run"
+> +	if [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ]; then
+> +		run_test_status $command --kernel "$@" --aarch32
+> +	else
+> +		run_test_status $command --kernel "$@"
+> +	fi
+> +}
+> +
+> +case $TARGET in
+> +qemu)
+> +	arch_run_qemu "$@"
+> +	;;
+> +kvmtool)
+> +	arch_run_kvmtool "$@"
+> +	;;
+> +esac
+> diff --git a/powerpc/run b/powerpc/run
+> index 27abf1ef6a4d..0b25a227429a 100755
+> --- a/powerpc/run
+> +++ b/powerpc/run
+> @@ -59,8 +59,8 @@ command+=" -display none -serial stdio -kernel"
+>   command="$(migration_cmd) $(timeout_cmd) $command"
+>   
+>   # powerpc tests currently exit with rtas-poweroff, which exits with 0.
+> -# run_qemu treats that as a failure exit and returns 1, so we need
+> +# run_test treats that as a failure exit and returns 1, so we need
+>   # to fixup the fixup below by parsing the true exit code from the output.
+>   # The second fixup is also a FIXME, because once we add chr-testdev
+>   # support for powerpc, we won't need the second fixup.
+> -run_qemu_status $command "$@"
+> +run_test_status $command "$@"
+> diff --git a/riscv/run b/riscv/run
+> index 3b2fc36f2afb..562347e8bea2 100755
+> --- a/riscv/run
+> +++ b/riscv/run
+> @@ -36,8 +36,8 @@ command+=" $mach $acc $firmware -cpu $qemu_cpu "
+>   command="$(migration_cmd) $(timeout_cmd) $command"
+>   
+>   if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> -	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
+> +	ENVIRON_DEFAULT=n run_test_status $command "$@"
+>   else
+>   	# We return the exit code via stdout, not via the QEMU return code
+> -	run_qemu_status $command -kernel "$@"
+> +	run_test_status $command -kernel "$@"
+>   fi
+> diff --git a/s390x/run b/s390x/run
+> index 34552c2747d4..9ecfaf983a3d 100755
+> --- a/s390x/run
+> +++ b/s390x/run
+> @@ -47,4 +47,4 @@ command+=" -kernel"
+>   command="$(panic_cmd) $(migration_cmd) $(timeout_cmd) $command"
+>   
+>   # We return the exit code via stdout, not via the QEMU return code
+> -run_qemu_status $command "$@"
+> +run_test_status $command "$@"
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 8643bab3b252..8cf67e4f3b51 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -1,30 +1,7 @@
+> -##############################################################################
+> -# run_qemu translates the ambiguous exit status in Table1 to that in Table2.
+> -# Table3 simply documents the complete status table.
+> -#
+> -# Table1: Before fixup
+> -# --------------------
+> -# 0      - Unexpected exit from QEMU (possible signal), or the unittest did
+> -#          not use debug-exit
+> -# 1      - most likely unittest succeeded, or QEMU failed
+> -#
+> -# Table2: After fixup
+> -# -------------------
+> -# 0      - Everything succeeded
+> -# 1      - most likely QEMU failed
+> -#
+> -# Table3: Complete table
+> -# ----------------------
+> -# 0      - SUCCESS
+> -# 1      - most likely QEMU failed
+> -# 2      - most likely a run script failed
+> -# 3      - most likely the unittest failed
+> -# 124    - most likely the unittest timed out
+> -# 127    - most likely the unittest called abort()
+> -# 1..127 - FAILURE (could be QEMU, a run script, or the unittest)
+> -# >= 128 - Signal (signum = status - 128)
+> -##############################################################################
+> -run_qemu ()
+> +source config.mak
+> +source scripts/vmm.bash
+> +
+> +run_test ()
+>   {
+>   	local stdout errors ret sig
+>   
+> @@ -39,48 +16,17 @@ run_qemu ()
+>   	ret=$?
+>   	exec {stdout}>&-
+>   
+> -	[ $ret -eq 134 ] && echo "QEMU Aborted" >&2
+> -
+> -	if [ "$errors" ]; then
+> -		sig=$(grep 'terminating on signal' <<<"$errors")
+> -		if [ "$sig" ]; then
+> -			# This is too complex for ${var/search/replace}
+> -			# shellcheck disable=SC2001
+> -			sig=$(sed 's/.*terminating on signal \([0-9][0-9]*\).*/\1/' <<<"$sig")
+> -		fi
+> -	fi
+> -
+> -	if [ $ret -eq 0 ]; then
+> -		# Some signals result in a zero return status, but the
+> -		# error log tells the truth.
+> -		if [ "$sig" ]; then
+> -			((ret=sig+128))
+> -		else
+> -			# Exiting with zero (non-debugexit) is an error
+> -			ret=1
+> -		fi
+> -	elif [ $ret -eq 1 ]; then
+> -		# Even when ret==1 (unittest success) if we also got stderr
+> -		# logs, then we assume a QEMU failure. Otherwise we translate
+> -		# status of 1 to 0 (SUCCESS)
+> -	        if [ "$errors" ]; then
+> -			if ! grep -qvi warning <<<"$errors" ; then
+> -				ret=0
+> -			fi
+> -		else
+> -			ret=0
+> -		fi
+> -	fi
+> +	ret=$(${vmm_opts[$TARGET:fixup_return_code]} $ret $errors)
+>   
+>   	return $ret
+>   }
+>   
+> -run_qemu_status ()
+> +run_test_status ()
+>   {
+>   	local stdout ret
+>   
+>   	exec {stdout}>&1
+> -	lines=$(run_qemu "$@" > >(tee /dev/fd/$stdout))
+> +	lines=$(run_test "$@" > >(tee /dev/fd/$stdout))
+>   	ret=$?
+>   	exec {stdout}>&-
+>   
+> @@ -422,6 +368,25 @@ search_qemu_binary ()
+>   	export PATH=$save_path
+>   }
+>   
+> +search_kvmtool_binary ()
+> +{
+> +	local kvmtoolcmd kvmtool
+> +
+> +	for kvmtoolcmd in lkvm vm lkvm-static; do
+> +		if "$kvmtoolcmd" --help 2>/dev/null| grep -q 'The most commonly used'; then
+> +			kvmtool="$kvmtoolcmd"
+> +			break
+> +		fi
+> +	done
+> +
+> +	if [ -z "$kvmtool" ]; then
+> +		echo "A kvmtool binary was not found." >&2
+> +		return 2
+> +	fi
+> +
+> +	command -v $kvmtool
+> +}
+> +
+>   initrd_cleanup ()
+>   {
+>   	rm -f $KVM_UNIT_TESTS_ENV
+> @@ -447,7 +412,7 @@ initrd_create ()
+>   	fi
+>   
+>   	unset INITRD
+> -	[ -f "$KVM_UNIT_TESTS_ENV" ] && INITRD="-initrd $KVM_UNIT_TESTS_ENV"
+> +	[ -f "$KVM_UNIT_TESTS_ENV" ] && INITRD="${vmm_opts[$TARGET:initrd]} $KVM_UNIT_TESTS_ENV"
+>   
+>   	return 0
+>   }
+> @@ -471,18 +436,23 @@ env_params ()
+>   	local qemu have_qemu
+>   	local _ rest
+>   
+> -	qemu=$(search_qemu_binary) && have_qemu=1
+> +	env_add_params TARGET
+>   
+> -	if [ "$have_qemu" ]; then
+> -		if [ -n "$ACCEL" ] || [ -n "$QEMU_ACCEL" ]; then
+> -			[ -n "$ACCEL" ] && QEMU_ACCEL=$ACCEL
+> +	# kvmtool's versioning has been broken since it was split from the
+> +	# kernel source.
+> +	if [ $TARGET = "qemu" ]; then
+> +		qemu=$(search_qemu_binary) && have_qemu=1
+> +		if [ "$have_qemu" ]; then
+> +			if [ -n "$ACCEL" ] || [ -n "$QEMU_ACCEL" ]; then
+> +				[ -n "$ACCEL" ] && QEMU_ACCEL=$ACCEL
+> +			fi
+> +			QEMU_VERSION_STRING="$($qemu -h | head -1)"
+> +			# Shellcheck does not see QEMU_MAJOR|MINOR|MICRO are used
+> +			# shellcheck disable=SC2034
+> +			IFS='[ .]' read -r _ _ _ QEMU_MAJOR QEMU_MINOR QEMU_MICRO rest <<<"$QEMU_VERSION_STRING"
+>   		fi
+> -		QEMU_VERSION_STRING="$($qemu -h | head -1)"
+> -		# Shellcheck does not see QEMU_MAJOR|MINOR|MICRO are used
+> -		# shellcheck disable=SC2034
+> -		IFS='[ .]' read -r _ _ _ QEMU_MAJOR QEMU_MINOR QEMU_MICRO rest <<<"$QEMU_VERSION_STRING"
+> +		env_add_params QEMU_ACCEL QEMU_VERSION_STRING QEMU_MAJOR QEMU_MINOR QEMU_MICRO
+>   	fi
+> -	env_add_params QEMU_ACCEL QEMU_VERSION_STRING QEMU_MAJOR QEMU_MINOR QEMU_MICRO
+>   
+>   	KERNEL_VERSION_STRING=$(uname -r)
+>   	IFS=. read -r KERNEL_VERSION KERNEL_PATCHLEVEL rest <<<"$KERNEL_VERSION_STRING"
+> diff --git a/scripts/vmm.bash b/scripts/vmm.bash
+> index b02055a5c0b6..20968f2e6b10 100644
+> --- a/scripts/vmm.bash
+> +++ b/scripts/vmm.bash
+> @@ -1,10 +1,99 @@
+>   source config.mak
+>   
+> +##############################################################################
+> +# qemu_fixup_return_code translates the ambiguous exit status in Table1 to that
+> +# in Table2.  Table3 simply documents the complete status table.
+> +#
+> +# Table1: Before fixup
+> +# --------------------
+> +# 0      - Unexpected exit from QEMU (possible signal), or the unittest did
+> +#          not use debug-exit
+> +# 1      - most likely unittest succeeded, or QEMU failed
+> +#
+> +# Table2: After fixup
+> +# -------------------
+> +# 0      - Everything succeeded
+> +# 1      - most likely QEMU failed
+> +#
+> +# Table3: Complete table
+> +# ----------------------
+> +# 0      - SUCCESS
+> +# 1      - most likely QEMU failed
+> +# 2      - most likely a run script failed
+> +# 3      - most likely the unittest failed
+> +# 124    - most likely the unittest timed out
+> +# 127    - most likely the unittest called abort()
+> +# 1..127 - FAILURE (could be QEMU, a run script, or the unittest)
+> +# >= 128 - Signal (signum = status - 128)
+> +##############################################################################
+> +qemu_fixup_return_code()
+> +{
+> +	local ret=$1
+> +	# Remove $ret from the list of arguments
+> +	shift 1
+> +	local errors="$@"
+> +	local sig
+> +
+> +	[ $ret -eq 134 ] && echo "QEMU Aborted" >&2
+> +
+> +	if [ "$errors" ]; then
+> +		sig=$(grep 'terminating on signal' <<<"$errors")
+> +		if [ "$sig" ]; then
+> +			# This is too complex for ${var/search/replace}
+> +			# shellcheck disable=SC2001
+> +			sig=$(sed 's/.*terminating on signal \([0-9][0-9]*\).*/\1/' <<<"$sig")
+> +		fi
+> +	fi
+> +
+> +	if [ $ret -eq 0 ]; then
+> +		# Some signals result in a zero return status, but the
+> +		# error log tells the truth.
+> +		if [ "$sig" ]; then
+> +			((ret=sig+128))
+> +		else
+> +			# Exiting with zero (non-debugexit) is an error
+> +			ret=1
+> +		fi
+> +	elif [ $ret -eq 1 ]; then
+> +		# Even when ret==1 (unittest success) if we also got stderr
+> +		# logs, then we assume a QEMU failure. Otherwise we translate
+> +		# status of 1 to 0 (SUCCESS)
+> +	        if [ "$errors" ]; then
+> +			if ! grep -qvi warning <<<"$errors" ; then
+> +				ret=0
+> +			fi
+> +		else
+> +			ret=0
+> +		fi
+> +	fi
+> +
+> +	echo $ret
+> +}
+> +
+> +kvmtool_fixup_return_code()
+> +{
+> +	local ret=$1
+> +
+> +	# Force run_test_status() to interpret the STATUS line.
+> +	if [ $ret -eq 0 ]; then
+> +		ret=1
+> +	fi
+> +
+> +	echo $ret
+> +}
+> +
+>   declare -A vmm_opts=(
+>   	[qemu:nr_cpus]='-smp'
+>   	[qemu:kernel]='-kernel'
+>   	[qemu:args]='-append'
+>   	[qemu:initrd]='-initrd'
+> +	[qemu:fixup_return_code]=qemu_fixup_return_code
+> +
+> +	[kvmtool:nr_cpus]='--cpus'
+> +	[kvmtool:kernel]='--kernel'
+> +	[kvmtool:args]='--params'
+> +	[kvmtool:initrd]='--initrd'
+> +	[kvmtool:fixup_return_code]=kvmtool_fixup_return_code
+>   )
+>   
+>   function check_vmm_supported()
+> diff --git a/x86/run b/x86/run
+> index a3d3e7db8891..91bcd0b9ae41 100755
+> --- a/x86/run
+> +++ b/x86/run
+> @@ -49,7 +49,7 @@ if [ "${CONFIG_EFI}" = y ]; then
+>   	# UEFI, the test case binaries are passed to QEMU through the disk
+>   	# image, not through the '-kernel' flag. And QEMU reports an error if it
+>   	# gets '-initrd' without a '-kernel'
+> -	ENVIRON_DEFAULT=n run_qemu ${command} "$@"
+> +	ENVIRON_DEFAULT=n run_test ${command} "$@"
+>   else
+> -	run_qemu ${command} "$@"
+> +	run_test ${command} "$@"
+>   fi
 
-After KVM maps at 4KB level, if the guest accepts at 2MB level, it would get
-a TDACCEPT_SIZE_MISMATCH error.
+-- 
+Shaoqin
 
-The case of "KVM maps at 4KB, guest accepts at 2MB" is different from
-"KVM maps at 2MB, guest accepts at 4KB".
-
-For the former, the guest can't trigger endless EPT violation. Just consider
-when the guest wants to accept at 2MB while KVM can't meet its request.
-If it can trigger endless EPT violation, the linux guest should trigger endless
-EPT already with today's basic TDX.
-
-> But in the above text you mentioned that, if doing so, because we choose to
-> ignore splitting request on read, returning 2M could result in *endless* EPT
-> violation.
-I don't get what you mean.
-What's the relationship between splitting and "returning 2M could result in
-*endless* EPT" ?
-
-> So to me it seems you choose a design that could bring performance gain for
-> certain non-Linux TDs when they follow a certain behaviour but otherwise could
-> result in endless EPT violation in KVM.
-Also don't understand here.
-Which design could result in endless EPT violation?
-
-> I am not sure how is this OK?  Or probably I have misunderstanding?
-
-> > 
-> > Besides, according to Kirill [1], the order from 1GB->2MB->4KB is only the case
-> > for linux guests.
-> > 
-> > [1] https://lore.kernel.org/all/6vdj4mfxlyvypn743klxq5twda66tkugwzljdt275rug2gmwwl@zdziylxpre6y/#t
-> 
-> I am not sure how is this related?
-> 
-> On the opposite, if other non-Linux TDs don't follow 1G->2M->4K accept order,
-> e.g., they always accept 4K, there could be *endless EPT violation* if I
-> understand your words correctly.
-> 
-> Isn't this yet-another reason we should choose to return PG_LEVEL_4K instead of
-> 2M if no accept level is provided in the fault?
-As I said, returning PG_LEVEL_4K would disallow huge pages for non-Linux TDs.
-TD's accept operations at size > 4KB will get TDACCEPT_SIZE_MISMATCH. 
-
-> 
-> > 
-> > > normal cases either, since guest will always do ACCEPT (which contains the
-> > > accepting level) before accessing the memory.
 
