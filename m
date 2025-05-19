@@ -1,215 +1,245 @@
-Return-Path: <kvm+bounces-46965-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46967-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5719EABB66E
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 09:51:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FB95ABB6E2
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 10:15:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E640E169F4D
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 07:51:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54E67189899A
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 08:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2930D2690D0;
-	Mon, 19 May 2025 07:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B161269AFD;
+	Mon, 19 May 2025 08:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bk+TKVGJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBCFB257ACF;
-	Mon, 19 May 2025 07:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747641095; cv=none; b=U6GEEcmAoQP4Ma2sbGSaWR55I1LGLsWu6snB3NynB7zGjQZwjKaPVW4BlD6UBkQ1tUcc+nmw4qpima5Sf5W+E1g8xBR7rArezPLKLrp52o1IcHkumuBlVRiomWV+sjUwlp6QcSIVwaahTFXBd3jjCdVG7maNhEQv/oC/LYAyPLI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747641095; c=relaxed/simple;
-	bh=pIgYBqjJhlTxCn6HS+F6fJkGuIkeQQVUs19OKyDqyqU=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=RUnkU6Q0L8l4p8aMCCLgNvebVO2Ze4PTJun2Qi+M/Gd79lAkPIeXVRcZbwsxoaD58A1w1/Gsqr7l9HgcJyn8xWko6l0p4Ij+9BRfs7ne6Y89YLrPcyo/XibDavep6JkcjUvSPLx/GUW7tMIpVxSk4nDNcdPNWseaCIptSsWv2e4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8AxbeL04ipoWNLxAA--.25215S3;
-	Mon, 19 May 2025 15:51:16 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMBxLsfv4ipoGcbgAA--.55423S3;
-	Mon, 19 May 2025 15:51:14 +0800 (CST)
-Subject: Re: [PATCH v11 0/5] KVM: selftests: Add LoongArch support
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20250427064535.242404-1-maobibo@loongson.cn>
- <CAAhV-H7XmHcvea-8NvgnSzfg6dVt5wATyDKmDYp31ThYZa+Fgw@mail.gmail.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <70949c17-5ed4-189c-3e7a-47848a27684c@loongson.cn>
-Date: Mon, 19 May 2025 15:50:01 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDE4153BD9;
+	Mon, 19 May 2025 08:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747642533; cv=fail; b=N9e+R1L9D02LKWANdsyCybqanW+YvJA8tttDd/k4iLv6dQbytDf+5zYVlZ/sgziMcWSthkVMo8dQKMO9F8V3l4zDZtgxpWXK1nEIuMCqM+mTyjC2pAA7Mizh//WbzGWvAkvfiq2HlLnZRjmu1bhsXIyIK7mQ6YrOzPn/ffvfUAk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747642533; c=relaxed/simple;
+	bh=p8uw1TbJN30yWmH5minDP+sX58ZMTWNm4QZCZSy5XjA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=OqFNyctk3xMg9iZvQMRHFNCm6Kwma/PWhMMMdw5SLNhVXUmVbfEfbrX5vs4D+89ufLal3hzrQIRQ+CVhLTW990MGhPDS2uoYl0SHNhphpIeN7rDhnFARNpKPQf3uXj+PCTtPmXNGBT7vzUbcDmztzkyzf9WhZKybSgfnRFixGaA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bk+TKVGJ; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747642532; x=1779178532;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=p8uw1TbJN30yWmH5minDP+sX58ZMTWNm4QZCZSy5XjA=;
+  b=Bk+TKVGJI3ap1+QfgCqhnddREL2JZd/+Nv6JStKP8wx1faIGIurz3/ry
+   66LERaBsFsDDs7bEyoDbZW31iUwjIY9hfVyC2xsq7j1NddMjyd0P3RJ0P
+   MhhaGr9gkA2TiNP4HR0u2RBDmwUbnKDJAh4z5W9/jCYgND4TBPxLkP99B
+   wh41ZFOtLe6JS4FRb72R1k5GFfhqCQptfyCqgD5PjnrO6qasC8KWvodlK
+   x7dULZk9iOYIXrUmr+kVY/JNAXVnQU+zN8Io4FgHGEes3vD3Vi6JHHZUX
+   E2dCDqPQrkSsv2mQHa3kE+K7jFilLeJGP5BGV2v1uSxNnSuqb8mv4OPEm
+   w==;
+X-CSE-ConnectionGUID: bvLsu5dfT/eTCLoWSzTFrA==
+X-CSE-MsgGUID: Rfi1yDyuQfKbX5sdPlME0w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11437"; a="60924636"
+X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
+   d="scan'208";a="60924636"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 01:15:31 -0700
+X-CSE-ConnectionGUID: NOqdKDmPRCKVz1Tr4xLC1Q==
+X-CSE-MsgGUID: Gl2d6bt8QK2plgftTIvBAQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
+   d="scan'208";a="162590735"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 01:15:30 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 19 May 2025 01:15:30 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 19 May 2025 01:15:30 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 19 May 2025 01:15:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uVJjYoQ/og0djpNzVpG5KPv4ySR6t+63+PTr6pX4r8Nb4Dk+8YbUuMb6GRGyshwwsd0FvOy8K02NaY6TvH/RMpwXdE8l9I264eM45c5+nJF86+3uYKGiisO2HvQMYwJh5BaoQEl9FpGn9Wu/qtUOHWGmqPLAnoiRHtjPi8brWsCgOkKmWhVnCi4aQkCBb2421F4dO3+elwuTdwkb8fpX1fPyl4t2Nc3XH0WedG7nmlw5nEtmkN+81+xqK6TZwFI8A+lIX0a6lULKxRjJm2EbumIRTJVrkjEoroMam4IKHgXZkKcDNLTmlpKBYPIq6RuPHqgZ4RaVtWT4gfvK/s7Fhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K7xbCAtWd9DyXAZOwBsAOFaUD4cq9t94q+xDHgm7GE4=;
+ b=Ci8VL8DUxIekPqcyaClEuRQt+Y2Go8K7KEQvtU3oa7+djz0I/susWyORnzvHKzEiF5no+av3tPmwPrXpPMgRHwnGmA3vucFumCA54O+pMnvCqPOObfquUwtHx4cXl7lTpWIC6qS4v0Gh/iGyzEnBG/SCAFStWpXR/4HGsbih1gJbjoJ5GNylD2rToom98rWDDssWIF0w7ac8I64c/TSUKSNMdFrcg0nh4rGaPLw1PtNhXP2splGaJe094xZb1bl0ehXI75SrhWouPM2lwj1yT+72t38Cd3l4l8i1AP4DcwY8rEQatsurTgZrAHUjIWi8kaYlgXUctKnoy2YpUTQzuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ IA1PR11MB8099.namprd11.prod.outlook.com (2603:10b6:208:448::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.33; Mon, 19 May
+ 2025 08:15:11 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%2]) with mapi id 15.20.8746.030; Mon, 19 May 2025
+ 08:15:11 +0000
+Date: Mon, 19 May 2025 16:12:58 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+CC: "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, "Li, Xiaoyao"
+	<xiaoyao.li@intel.com>, "Shutemov, Kirill" <kirill.shutemov@intel.com>,
+	"Hansen, Dave" <dave.hansen@intel.com>, "david@redhat.com"
+	<david@redhat.com>, "Li, Zhiquan1" <zhiquan1.li@intel.com>,
+	"tabba@google.com" <tabba@google.com>, "thomas.lendacky@amd.com"
+	<thomas.lendacky@amd.com>, "michael.roth@amd.com" <michael.roth@amd.com>,
+	"seanjc@google.com" <seanjc@google.com>, "Weiny, Ira" <ira.weiny@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "ackerleytng@google.com"
+	<ackerleytng@google.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>, "Peng, Chao P" <chao.p.peng@intel.com>,
+	"Du, Fan" <fan.du@intel.com>, "binbin.wu@linux.intel.com"
+	<binbin.wu@linux.intel.com>, "Annapurve, Vishal" <vannapurve@google.com>,
+	"jroedel@suse.de" <jroedel@suse.de>, "Miao, Jun" <jun.miao@intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pgonda@google.com"
+	<pgonda@google.com>, "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [RFC PATCH 16/21] KVM: x86/mmu: Introduce
+ kvm_split_boundary_leafs() to split boundary leafs
+Message-ID: <aCroCtBYqhtAgudt@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250424030033.32635-1-yan.y.zhao@intel.com>
+ <20250424030816.470-1-yan.y.zhao@intel.com>
+ <e989353abcafd102a9d9a28e2effe6f0d10cc781.camel@intel.com>
+ <aCbtbemWD6RBOBln@yzhao56-desk.sh.intel.com>
+ <aCbxSyLUhjyeB+05@yzhao56-desk.sh.intel.com>
+ <39cc767dd2f3792f1b36e224f1567dfb997fc0cf.camel@intel.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <39cc767dd2f3792f1b36e224f1567dfb997fc0cf.camel@intel.com>
+X-ClientProxiedBy: SI2PR02CA0016.apcprd02.prod.outlook.com
+ (2603:1096:4:194::9) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H7XmHcvea-8NvgnSzfg6dVt5wATyDKmDYp31ThYZa+Fgw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMBxLsfv4ipoGcbgAA--.55423S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxKr18Jr1rZF4DWrW8Kry5KFX_yoW7Ar1xpa
-	yI9Fn5Kr4xJF1xAas7K34kZFyFya1fKrWxWr13tryUuw1qyry8Jw4xKFs0kas3Z395XF1F
-	v3W8t3W3Wa4UtagCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
-	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAF
-	wI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4
-	CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
-	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMI
-	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
-	14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JV
-	WxJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUcVc_
-	UUUUU
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|IA1PR11MB8099:EE_
+X-MS-Office365-Filtering-Correlation-Id: 08d3a17e-fa2e-4bd1-9d50-08dd96ad46b5
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7416014;
+X-Microsoft-Antispam-Message-Info: =?iso-8859-1?Q?0gjs1bTYo+WFvfYFSUHpLahsthIg1XVZrNnylLS6gZCYFgORwAPaCYyJB4?=
+ =?iso-8859-1?Q?O++VgIqoIxbV+Jgkv+yqgai0hchnSEKkrjA+Sqnzb5M8MmIzmUzD7hPSr6?=
+ =?iso-8859-1?Q?VnhOb26Z9n66HVTNDOeKpnIQ2qYKQ1YqNED1yQ6UOSbURchPdMncMQ94MR?=
+ =?iso-8859-1?Q?faDFtfIgIQeuLFEpmTLGbgSCAMCnqEybKSZej5wd9b/e4tD0KVvF6wU8J3?=
+ =?iso-8859-1?Q?KBI1zkbfDPxhcVCySonfyDENuJE6EW6YR/sw5TPMk4XW5pnHpsWunjyD2+?=
+ =?iso-8859-1?Q?tsoy6SqgF2+HHM9TvbAQIYIdNvmfKREkvkDx+VTJMGj5L5mAQJB5TVdLz5?=
+ =?iso-8859-1?Q?cRdPrrFU/0ag4E34mKcBblU8p/YHObDwwWPmkFn86Hlk02+7cNt5UlTDzY?=
+ =?iso-8859-1?Q?WzI5NuQB62+J6ca6wjevnbSozbf+W+nzUzu4B1m0NdU2bMudrIK4D7CiPl?=
+ =?iso-8859-1?Q?yLpvzj4xK654zLjYCiDwtgacDgiPyDUNnJwWE1JUnlWvlh3ByIgRSSB88W?=
+ =?iso-8859-1?Q?icTQTBQr2syDWMKBC2tHvnKJ8c7Bi295CbQ5C22DMu4QNVVvQxIVcJLUG2?=
+ =?iso-8859-1?Q?FsMdKQ/ctOHZneKBbQOBrXB82MLFj6hzBZsUnviP3OOxBNxHiLf9cVNJ63?=
+ =?iso-8859-1?Q?reWS34RfUWo0FVuBLUYekruzPv3uvJ+2MqWdhJk+iiTFYy+74FS1jzGLU1?=
+ =?iso-8859-1?Q?OhwHgmraDPHxpWSYNXCcethlBFw12uY9Ni5sGnVGV6glVt/1cQZSnOwPYB?=
+ =?iso-8859-1?Q?PMVeM8CFc1uzbfR/QTWFkLzB6Pwx3PU484Wdl19jrsOBmftZFgr6EmCPBX?=
+ =?iso-8859-1?Q?uKT3NOZg9yO6m5YjoJ1EZ0g0/0TbAy/52XDQbRAoSRA4HH7yvDmnm0hPFu?=
+ =?iso-8859-1?Q?Wm1RAwZFpg3E55FDabl9Rap4kXaV21KqpVquM2l9hu9u3XiY3FLlCQ6F2X?=
+ =?iso-8859-1?Q?XPIRtonzBshGZO/RaaGiArMAja3qJBTtIbmbqp0GY6p9CHddAioLib7w31?=
+ =?iso-8859-1?Q?pabwaHELPhteRSJyGdVqQlqAue28oE54SR9+72uEhzOH0u0aShjTqz+o95?=
+ =?iso-8859-1?Q?5C3PUB0XJcjuH43sis29C9g0egNQTxmfcbzRk+/Xh16TXAWH1z/EIxia4f?=
+ =?iso-8859-1?Q?TCUu+kczsSSPEK6f2cJ80zvaCPLH0Q1LFH0SWGgf/w6DC8434oMNtXQNQH?=
+ =?iso-8859-1?Q?P30lu76SeCuQd8qNMXc+tQeDsiXTv5F0WKcL1udAw7ra+Cm8JJrEkChqpY?=
+ =?iso-8859-1?Q?p7v7uk0HP+7K3XLIPa274/lR+NMABV3X5gRSAxfHAjlB2rx38A1vNg4RAL?=
+ =?iso-8859-1?Q?m3zn2kHdD5ZDwCTN4ofP36jdmd9lvdmT8F5t1cTeeRcpVQY0wwPdaGX27n?=
+ =?iso-8859-1?Q?L/knq+ylyuiYlnScINB7DFJH7yyNyBCSLJvs7cChxAc2Sp3Bk9zSEV7qJB?=
+ =?iso-8859-1?Q?KsMRJFMuvLQxaMJA1t/A9THZ8zErCk7xhkoy77EWtp19V6EnxI4xFriJwI?=
+ =?iso-8859-1?Q?A=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?y2YwJ4VbvjFJSNQaYaemoZvHD7FBPt0cOVRowC3d18hlZsWzfG3HmMlEfr?=
+ =?iso-8859-1?Q?6PeIbGrM3CKpGkTgkhx+OYQQgB2cElBqZJlrY91RBCsDJCOET2/LpW2hNa?=
+ =?iso-8859-1?Q?yRdtaUI2o1a9/PBQVWwSiF24bgopt2yFNuiFR7YJO2kmnfXmeVi7FNKNaF?=
+ =?iso-8859-1?Q?KyTqsTmryA04po13u2k7AA34sfADwoNcp1d0bv2Wt596skA9d/56k03sy4?=
+ =?iso-8859-1?Q?n2U1VJM58NlS0Vo/J1/aFzoBIAfXKYmESSkbSZ2KsWMwITavgHV2If8AL8?=
+ =?iso-8859-1?Q?KQeeKNN188sUD70WsC49lNyfRBWmEutojE8XO5iFdOzjdY/jHQpzyntUkM?=
+ =?iso-8859-1?Q?VL6Wyrs87R3bxejWOvg8h4cr+FePLQsrx0fQs6x/gAxc9q2r3F42twRm/b?=
+ =?iso-8859-1?Q?ooTvO/0QPl2UxyDOD38YGL9gostLTqRsBSZY0dSASTlUXI76ETw5bi1fdK?=
+ =?iso-8859-1?Q?tshpOBMw9TPiCQwThuQU42THO/SqG/TmoilEgOJ5dg9jZ3xCoU1O62HPou?=
+ =?iso-8859-1?Q?TIjz4e+D4mWXXzfT3rvE+EnaX4eKk6////FXAjzJDnPfOXuMWFr2GNP8fm?=
+ =?iso-8859-1?Q?PhgUIlTiIEIt0RBqg4FAZdV8+H+SNEUe1b2ZRGq9IROe8ho2GfUG/ENU6L?=
+ =?iso-8859-1?Q?K3Cv0RYSVVpAqNY8S8u+pJjcATUhw75SuU88KpNsR5DODie1TF4i/h5GYp?=
+ =?iso-8859-1?Q?jAAxNk0s4D/mTMqro8MHBqhsSiUN/jQ42a6ZU+bEWyrcHsESAvP7H1AKj1?=
+ =?iso-8859-1?Q?za26jts3/J0eKxzKaeemRxb0vqaHpguMgDs4qAiEwD8rPg6hv4jyygvvTQ?=
+ =?iso-8859-1?Q?OjEepuYsViTp2jP1oEh2YGm5v0HifXg3Y9QtPFMUitZMpemh8I9M6o1bF5?=
+ =?iso-8859-1?Q?5HM+kFjL2IKLCgX6q+M05OcOPgUT9fK5vx7u3aZQYVo6uapIP7wenhMewE?=
+ =?iso-8859-1?Q?yN6LinCip+NOY78AF83OaiQGjfcX73KpoZZTpRiKcyAO0DDHEHEaFIWGYs?=
+ =?iso-8859-1?Q?8AY0uMh6kHb8oxpWNKBqT014xp2n5whI3exYsBfVhJmQWa4GniQi9ILjkF?=
+ =?iso-8859-1?Q?LgmKnUYoq4LHdoOA9qdJ7gGXr1st2wxusOkSSXMiRedhS4RGvZfnmPBXPS?=
+ =?iso-8859-1?Q?1jNKSYwtNlJ7Y/KmCdWBbW66rSqX2cc3X1tTU9iaaSkLGqab2HXw99QRw3?=
+ =?iso-8859-1?Q?CTh20E9a/0DvB4J3oUoh4bljG9bJtq3V0U41I0o5PRgK5pa+sXbBFz2mRm?=
+ =?iso-8859-1?Q?UVy0XehnJAUwhaRHoQ3suAcqe4VP8XW6PE7+rXK76Yupn4FKju+CTqlCXV?=
+ =?iso-8859-1?Q?rwU+Ycn2/T1zhyZSRaDNNksnthKB2AEYrmcHEALOaaT50iyR8vR3ZF4ois?=
+ =?iso-8859-1?Q?b9OZiDy7UVehFljsWdZEAr+1/Vzoq6U9+XiVWb6r6qyee1s1XRwdi6Of9j?=
+ =?iso-8859-1?Q?xvDBeLOO9NnyA6jGay7Y9VuX+VwJWq/q/gheGUW2K7R7TVDcuEuw0aXW58?=
+ =?iso-8859-1?Q?YPs/aVOy7mx908snGf8/AYlHkwrE2yW7Ipz3El9M+XlPZ5bQfsmMfGvxuG?=
+ =?iso-8859-1?Q?bda9lXHqECfYS+G5nVMIhMnq40Mv4GiUk8Bs7nrl2/I3nOcDfp3pcTNt7Z?=
+ =?iso-8859-1?Q?PZDGLPHkL6ZfwmriN+41zS5ZqtcMITxPY0?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 08d3a17e-fa2e-4bd1-9d50-08dd96ad46b5
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2025 08:15:11.7982
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: c8lkOnvJBq+a9YpoA4Q2bKs3ZHdpckjS8QnNq9obIvvic2SB9cBPBAVEkHrPcqfqdnEdund3lo64Iz+EoGLDiQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB8099
+X-OriginatorOrg: intel.com
 
+On Sat, May 17, 2025 at 06:27:10AM +0800, Edgecombe, Rick P wrote:
+> On Fri, 2025-05-16 at 16:03 +0800, Yan Zhao wrote:
+> > > 
+> > > > > +int kvm_tdp_mmu_gfn_range_split_boundary(struct kvm *kvm, struct
+> > > > > kvm_gfn_range *range)
+> > > > > +{
+> > > > > +	enum kvm_tdp_mmu_root_types types;
+> > > > > +	struct kvm_mmu_page *root;
+> > > > > +	bool flush = false;
+> > > > > +	int ret;
+> > > > > +
+> > > > > +	types = kvm_gfn_range_filter_to_root_types(kvm, range-
+> > > > > >attr_filter) | KVM_INVALID_ROOTS;
+> > > > 
+> > > > What is the reason for KVM_INVALID_ROOTS in this case?
+> > > I wanted to keep consistent with that in kvm_tdp_mmu_unmap_gfn_range().
+> 
+> Yea, lack of consistency would raise other questions.
+> 
+> > With this consistency, we can warn in tdp_mmu_zap_leafs() as below though
+> > there should be no invalid mirror root.
+> > 
+> > WARN_ON_ONCE(iter_split_required(kvm, root, &iter, start, end));
+> > �
+> 
+> Hmm, let's be clear about the logic. This is essentially a mirror TDP only
+> function, and there we don't have the same invalid root scenarios as the more
+> complicated cases. I'm not exactly sure how we could hit the warning if they
+> didn't match. I guess a hole punch on the fd while the TD is getting torn down?
+In practice, the warning shoudn't be hit because mirror root should only be
+invalidated after gmem_fd is destroyed.
 
-
-On 2025/5/12 下午2:53, Huacai Chen wrote:
-> Hi, Bibo,
-> 
-> On Sun, Apr 27, 2025 at 2:45 PM Bibo Mao <maobibo@loongson.cn> wrote:
->>
->> This patchset adds KVM selftests for LoongArch system, currently only
->> some common test cases are supported and pass to run. These test cases
->> are listed as following:
->>      coalesced_io_test
->>      demand_paging_test
->>      dirty_log_perf_test
->>      dirty_log_test
->>      guest_print_test
->>      hardware_disable_test
->>      kvm_binary_stats_test
->>      kvm_create_max_vcpus
->>      kvm_page_table_test
->>      memslot_modification_stress_test
->>      memslot_perf_test
->>      set_memory_region_test
-> I have applied this series [1] but with some modifications (see
-> comments in other patches). You can test it to see if everything is
-> OK.
-> 
-> And if it's OK, it is better to fetch the patches from [1] and then send V12.
-> 
-> [1] https://github.com/chenhuacai/linux/commits/loongarch-next
-That is ok for me. Will send V12 soon.
-
-Regards
-Bibo Mao
-> 
-> 
-> 
-> Huacai
-> 
->>
->> ---
->> Changes in v11:
->> 1. Fix a typo issue in notes of patch 2, it is kvm_util_arch.h rather than
->>     kvm_util_base.h
->>
->> Changes in v10:
->> 1. Add PS_64K and remove PS_8K in file include/loongarch/processor.h
->> 2. Fix a typo issue in file lib/loongarch/processor.c
->> 3. Update file MAINTAINERS about LoongArch KVM selftests
->>
->> Changes in v9:
->> 1. Add vm mode VM_MODE_P47V47_16K, LoongArch VM uses this mode by
->>     default, rather than VM_MODE_P36V47_16K.
->> 2. Refresh some spelling issues in changelog.
->>
->> Changes in v8:
->> 1. Porting patch based on the latest version.
->> 2. For macro PC_OFFSET_EXREGS, offsetof() method is used for C header file,
->>     still hardcoded definition for assemble language.
->>
->> Changes in v7:
->> 1. Refine code to add LoongArch support in test case
->> set_memory_region_test.
->>
->> Changes in v6:
->> 1. Refresh the patch based on latest kernel 6.8-rc1, add LoongArch
->> support about testcase set_memory_region_test.
->> 2. Add hardware_disable_test test case.
->> 3. Drop modification about macro DEFAULT_GUEST_TEST_MEM, it is problem
->> of LoongArch binutils, this issue is raised to LoongArch binutils owners.
->>
->> Changes in v5:
->> 1. In LoongArch kvm self tests, the DEFAULT_GUEST_TEST_MEM could be
->> 0x130000000, it is different from the default value in memstress.h.
->> So we Move the definition of DEFAULT_GUEST_TEST_MEM into LoongArch
->> ucall.h, and add 'ifndef' condition for DEFAULT_GUEST_TEST_MEM
->> in memstress.h.
->>
->> Changes in v4:
->> 1. Remove the based-on flag, as the LoongArch KVM patch series
->> have been accepted by Linux kernel, so this can be applied directly
->> in kernel.
->>
->> Changes in v3:
->> 1. Improve implementation of LoongArch VM page walk.
->> 2. Add exception handler for LoongArch.
->> 3. Add dirty_log_test, dirty_log_perf_test, guest_print_test
->> test cases for LoongArch.
->> 4. Add __ASSEMBLER__ macro to distinguish asm file and c file.
->> 5. Move ucall_arch_do_ucall to the header file and make it as
->> static inline to avoid function calls.
->> 6. Change the DEFAULT_GUEST_TEST_MEM base addr for LoongArch.
->>
->> Changes in v2:
->> 1. We should use ".balign 4096" to align the assemble code with 4K in
->> exception.S instead of "align 12".
->> 2. LoongArch only supports 3 or 4 levels page tables, so we remove the
->> hanlders for 2-levels page table.
->> 3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
->> DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
->> 4. Reorganize the test cases supported by LoongArch.
->> 5. Fix some code comments.
->> 6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
->> ---
->> Bibo Mao (5):
->>    KVM: selftests: Add VM_MODE_P47V47_16K VM mode
->>    KVM: selftests: Add KVM selftests header files for LoongArch
->>    KVM: selftests: Add core KVM selftests support for LoongArch
->>    KVM: selftests: Add ucall test support for LoongArch
->>    KVM: selftests: Add test cases for LoongArch
->>
->>   MAINTAINERS                                   |   2 +
->>   tools/testing/selftests/kvm/Makefile          |   2 +-
->>   tools/testing/selftests/kvm/Makefile.kvm      |  18 +
->>   .../testing/selftests/kvm/include/kvm_util.h  |   6 +
->>   .../kvm/include/loongarch/kvm_util_arch.h     |   7 +
->>   .../kvm/include/loongarch/processor.h         | 141 ++++++++
->>   .../selftests/kvm/include/loongarch/ucall.h   |  20 +
->>   tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +
->>   .../selftests/kvm/lib/loongarch/exception.S   |  59 +++
->>   .../selftests/kvm/lib/loongarch/processor.c   | 342 ++++++++++++++++++
->>   .../selftests/kvm/lib/loongarch/ucall.c       |  38 ++
->>   .../selftests/kvm/set_memory_region_test.c    |   2 +-
->>   12 files changed, 638 insertions(+), 2 deletions(-)
->>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
->>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
->>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
->>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
->>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
->>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
->>
->>
->> base-commit: 5bc1018675ec28a8a60d83b378d8c3991faa5a27
->> --
->> 2.39.3
->>
-
+> Let's comment the reasoning at least.
+Will do.
 
