@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-47048-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47049-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBFBDABCB7C
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 01:32:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4629BABCB80
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 01:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 666407A1206
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 23:30:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9345C7A1990
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 23:31:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029D5225768;
-	Mon, 19 May 2025 23:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7200226CEF;
+	Mon, 19 May 2025 23:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zcece23w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wgc9aXZG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868F62248BA
-	for <kvm@vger.kernel.org>; Mon, 19 May 2025 23:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0DD2253EA
+	for <kvm@vger.kernel.org>; Mon, 19 May 2025 23:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747697318; cv=none; b=l/n4i7W5Ah07c43G76RI3KNHS7D5KVxCQV9aseUbGIFVBHZwmuqG1KsNxESyEQBR1iIVhLrFnu9aAbfd8OExZnHTl8CTkinNmV+DsJ6f+vAz8q6ETa4OapCIEXYOo0lUCicuaHMq//3hx2iyKGntYxQkNJuSXaNpsead4ZlG3zU=
+	t=1747697320; cv=none; b=gfb0/T2pIkBeFl1ZdURC+kyWL7mp+k+Z4gtL+MIZamBelecskDdekXUfoFyHPe4uWZk+5WA+/PylwDKtAE0+NaZ+ZDmj1RZVfunMU4U3J/If52156id2SHT2ZaJJcQgVILVoMbzFMTcj/ykvKPjULveOAU4eASdIcy2zW3iCcE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747697318; c=relaxed/simple;
-	bh=qQIM5Tr5nBvDkLCbk46mds4m9dIPyNzVYzD4a6yvVvY=;
+	s=arc-20240116; t=1747697320; c=relaxed/simple;
+	bh=tc/GDYNKJ/JO970W56dR3hFPJB+jiI1xGAiF+LJQ+ps=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Y1TVzMpNAsDWHuts79+U298agp+p/wJNMb/jYfbYD4auuadl0QDrYMgLZISGWryrB+xm+PSXqs6xVFLzIa2y3tOznohUNX+xfox/DI5Uj7UgeCvA+tqQ7DaX50v6yeTeTGXk5y9bqcWp4D1Ik19YnJECeTdfktmbwTSD5BZBof0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zcece23w; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=RWuVfF7L7j7PLMeJIlhK8I0gcS6wtI+7Pmmcp1XvqgP14lFS5fLc+LT/CoUz6DWl8eSpFBPYbQ/2Rt4jMQq6OaXrkR+DE750rLTs3blrB+zdMl3wHCZ732Bnf4YZEpbCsHAIPAEPLhv+0pELZ/bsIth/Efz/qjJLsUmNIOx1RFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wgc9aXZG; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-74292762324so3692489b3a.0
-        for <kvm@vger.kernel.org>; Mon, 19 May 2025 16:28:36 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-af5310c1ac1so2949731a12.2
+        for <kvm@vger.kernel.org>; Mon, 19 May 2025 16:28:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747697316; x=1748302116; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747697317; x=1748302117; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=jzqljEkDXtAFBsLi8kcGKkXBiNdwCtNEp6kp2mMRpEQ=;
-        b=Zcece23wVKa7V75EID6upDRAziP9YbnhojNHdyIbEHBbvy4AnyVRAU1G2Y9FNSrXhX
-         FjHSTK1ZDRz1yFOxNGuXDT49+q9GdVupeUbiDwes56qZ3p2rPUOhJJTtHUk9ygPqZK2C
-         osgHOOMPnxvo5DWljbjXd/pRmJs4Bzgl30VLn37JNbrvjFFK5G9SE2iWcqkz7ecHXG/r
-         XP5y8lhSDV623bd3HEy5m5j8Bh7aBNx8h+uHx3vkxY9z9X4W4oiEk2b41J5W7mQEBop9
-         g0kMT1bysHu9a8G04eTgmS0YJyvPlAd7OLjbIRHaryK01K48igaFvnJb7kOwQm0yfJGy
-         7Xwg==
+        bh=Yt8dL6gvia2/Aq5+LlGzwWYcB9Uwzc86WQj4RAHOGf4=;
+        b=wgc9aXZGcswbz/OPihLpxSJb3hMF9BvnMYYscI+vI8rwp5+WXvTB9K8Uyfus8Rt9xh
+         DySXqiJKABtTEJrWcVRU+Fa+JvHCmsNSLePgWqO7vPyNk7UyOaHYm7MVI/z+4Ykw2XaE
+         sJ8p2GYIEVGV5WPauCIMzk1psRG1wnQQsGt4pix54aVfjxqeuacvAj9O5utS+jxV3nyX
+         gHG2vT1Y8h7D0dIxLyWBS2jMPQUcJzSBmvJHhRrLHufJaX/OWIPW+rYMeAYTsfuyUWXy
+         WEjBDJYgO+K7uU6n1z3ScEyZLYEqli8Im2qNYLSTa1Kiu/rHCQZ54B88oVGi1gydAYU8
+         TunA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747697316; x=1748302116;
+        d=1e100.net; s=20230601; t=1747697317; x=1748302117;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jzqljEkDXtAFBsLi8kcGKkXBiNdwCtNEp6kp2mMRpEQ=;
-        b=FIpoBGYjhBNsZ7XiGAVOI+kwZy9HnfaFCEcoVmrHPxWaXp4k/1QcjiKdmKMbCfBG8a
-         M80IrNmkpS8WmZ/UEhefHlp8rJXMezQ8laDC4Mdzyq+xCG/ADAqOp6zBuvdEKo/tDL3X
-         5q0O0QNFF39PU1bmZqHD0sPLzpO0Jq6HCG6rtqLsBx69EV2aVDslDCRRqJGaXhX3wIkS
-         +GV0eobQgJIdsdbO2aZpZfiG8qse/4apde18Ko76XFtjCAvb5LwRAcGtIA0628Pf5kEt
-         Zz3SXhn1r0n0OkCqQqDYA5LGLEr7vcAJxJbXkiIBy6c9jpbQ69Er9kREUsJj/DT8Ty+1
-         J06g==
-X-Gm-Message-State: AOJu0YwbrNAG5WxfpqaxuafwqLAJqtVnUO9npUNSPyHcpfcy23jCSlWZ
-	wg43JjwuQIcoCUVsuEqC7GCvD0rwnYEnQJhdLFvGuepWQET7MyQHeiZXKIt7ENX0L0tfnYo3p1t
-	myuvERg==
-X-Google-Smtp-Source: AGHT+IGYPQHinoGic07rRcLqLfD0l06dUYUgvVqfZvDuAHBo4yxWC/GP7uWYn1Sj/q1GSZLdB0srqGbjfm4=
-X-Received: from pfmy21.prod.google.com ([2002:aa7:8055:0:b0:73e:665:360])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:10c6:b0:736:a540:c9ad
- with SMTP id d2e1a72fcca58-742a98b833bmr19860524b3a.20.1747697315919; Mon, 19
- May 2025 16:28:35 -0700 (PDT)
+        bh=Yt8dL6gvia2/Aq5+LlGzwWYcB9Uwzc86WQj4RAHOGf4=;
+        b=uIwsUSMMQISn3F9Y5AkrzShq5UBK8GxF4Frl/TtO3RqarzpQ6RdlFXdLwIUr8Ta3j+
+         llR6EDSj7SNgnHY362Yk5JE7yeVAqRwTOz5ZiVt0FHD8Lus7gYWL7H1mo+EXkBinEhyt
+         Bp60wkAvwbH0P4g1HIElSa7UfjMN/hvnJ0L9McyLJ6ly+40WNeJdluWHVfdfthql4oX7
+         WgHZch1W5N0Kdmr+h4BKpmp6IT68mYVLvF0TnrCbxWFVU5xrbtAxEm8GZYAVIurQarhw
+         XcqX9MVf2FqUT+4uRAylsFps+tRc8ZTxesaeFvCuNePyXM+fpC032lUWOOkBr1+3WPNg
+         /MwQ==
+X-Gm-Message-State: AOJu0YyMn92IvFZIHAiJcWsodQL7PhXl5QXrHv9mtyt/YCoPxiIGPmkC
+	8DbmUq9Jv73qVAp+EL8M3mZJZAHoKtdpqGS0d+//srnewjW1V+0c1963WWB6uzqNbNFjIbvCK4t
+	HMjxxAQ==
+X-Google-Smtp-Source: AGHT+IGXrytGt+sKwT00ZGV+dLlBuxNOAw6WYkk4wC/ia6pi8Ets885sNOOc2hhxCbcbWIDEA37QMYR48rc=
+X-Received: from pjyp3.prod.google.com ([2002:a17:90a:e703:b0:2fa:a101:755])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c0a:b0:2fa:157e:c78e
+ with SMTP id 98e67ed59e1d1-30e7d4ebdb1mr23846796a91.7.1747697317621; Mon, 19
+ May 2025 16:28:37 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 19 May 2025 16:28:06 -0700
+Date: Mon, 19 May 2025 16:28:07 -0700
 In-Reply-To: <20250519232808.2745331-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,49 +75,230 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250519232808.2745331-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <20250519232808.2745331-14-seanjc@google.com>
-Subject: [PATCH 13/15] KVM: selftests: Fall back to split IRQ chip if full
- in-kernel chip is unsupported
+Message-ID: <20250519232808.2745331-15-seanjc@google.com>
+Subject: [PATCH 14/15] KVM: x86: Move IRQ mask notifier infrastructure to I/O
+ APIC emulation
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Now that KVM x86 allows compiling out support for in-kernel I/O APIC (and
-PIC and PIT) emulation, i.e. allows disabling KVM_CREATE_IRQCHIP for all
-intents and purposes, fall back to a split IRQ chip for x86 if creating
-the full in-kernel version fails with ENOTTY.
+Move the IRQ mask logic to ioapic.c as KVM's only user is its in-kernel
+I/O APIC emulation.  In addition to encapsulating more I/O APIC specific
+code, trimming down irq_comm.c helps pave the way for removing it entirely.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h | 16 --------------
+ arch/x86/kvm/i8254.h            |  2 ++
+ arch/x86/kvm/i8259.c            |  2 ++
+ arch/x86/kvm/ioapic.c           | 37 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/ioapic.h           | 16 ++++++++++++++
+ arch/x86/kvm/irq_comm.c         | 33 -----------------------------
+ arch/x86/kvm/x86.c              |  1 -
+ 7 files changed, 57 insertions(+), 50 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 50edc59cc0ca..53116f4ffe97 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1713,7 +1713,18 @@ void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
- /* Create an interrupt controller chip for the specified VM. */
- void vm_create_irqchip(struct kvm_vm *vm)
- {
--	vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
-+	int r;
-+
-+	/*
-+	 * Allocate a fully in-kernel IRQ chip by default, but fall back to a
-+	 * split model (x86 only) if that fails (KVM x86 allows compiling out
-+	 * support for KVM_CREATE_IRQCHIP).
-+	 */
-+	r = __vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
-+	if (r && errno == ENOTTY && kvm_has_cap(KVM_CAP_SPLIT_IRQCHIP))
-+		vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
-+	else
-+		TEST_ASSERT_VM_VCPU_IOCTL(!r, KVM_CREATE_IRQCHIP, r, vm);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f5ff5174674c..21ccb122ab76 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1426,9 +1426,6 @@ struct kvm_arch {
+ 	struct delayed_work kvmclock_update_work;
+ 	struct delayed_work kvmclock_sync_work;
  
- 	vm->has_irqchip = true;
+-	/* reads protected by irq_srcu, writes by irq_lock */
+-	struct hlist_head mask_notifier_list;
+-
+ #ifdef CONFIG_KVM_HYPERV
+ 	struct kvm_hv hyperv;
+ #endif
+@@ -2038,19 +2035,6 @@ int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3);
+ int emulator_write_phys(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 			  const void *val, int bytes);
+ 
+-struct kvm_irq_mask_notifier {
+-	void (*func)(struct kvm_irq_mask_notifier *kimn, bool masked);
+-	int irq;
+-	struct hlist_node link;
+-};
+-
+-void kvm_register_irq_mask_notifier(struct kvm *kvm, int irq,
+-				    struct kvm_irq_mask_notifier *kimn);
+-void kvm_unregister_irq_mask_notifier(struct kvm *kvm, int irq,
+-				      struct kvm_irq_mask_notifier *kimn);
+-void kvm_fire_mask_notifiers(struct kvm *kvm, unsigned irqchip, unsigned pin,
+-			     bool mask);
+-
+ extern bool tdp_enabled;
+ 
+ u64 vcpu_tsc_khz(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/i8254.h b/arch/x86/kvm/i8254.h
+index 14fb310357f2..de172567b56a 100644
+--- a/arch/x86/kvm/i8254.h
++++ b/arch/x86/kvm/i8254.h
+@@ -6,6 +6,8 @@
+ 
+ #include <kvm/iodev.h>
+ 
++#include "ioapic.h"
++
+ struct kvm_kpit_channel_state {
+ 	u32 count; /* can be 65536 */
+ 	u16 latched_count;
+diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+index 4de055efc4ee..2ac7f1678c46 100644
+--- a/arch/x86/kvm/i8259.c
++++ b/arch/x86/kvm/i8259.c
+@@ -31,6 +31,8 @@
+ #include <linux/mm.h>
+ #include <linux/slab.h>
+ #include <linux/bitops.h>
++
++#include "ioapic.h"
+ #include "irq.h"
+ 
+ #include <linux/kvm_host.h>
+diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+index 151ee9a64c3c..daaf16e4681a 100644
+--- a/arch/x86/kvm/ioapic.c
++++ b/arch/x86/kvm/ioapic.c
+@@ -310,6 +310,42 @@ void kvm_arch_post_irq_ack_notifier_list_update(struct kvm *kvm)
+ 	kvm_make_scan_ioapic_request(kvm);
  }
+ 
++void kvm_register_irq_mask_notifier(struct kvm *kvm, int irq,
++				    struct kvm_irq_mask_notifier *kimn)
++{
++	struct kvm_ioapic *ioapic = kvm->arch.vioapic;
++
++	mutex_lock(&kvm->irq_lock);
++	kimn->irq = irq;
++	hlist_add_head_rcu(&kimn->link, &ioapic->mask_notifier_list);
++	mutex_unlock(&kvm->irq_lock);
++}
++
++void kvm_unregister_irq_mask_notifier(struct kvm *kvm, int irq,
++				      struct kvm_irq_mask_notifier *kimn)
++{
++	mutex_lock(&kvm->irq_lock);
++	hlist_del_rcu(&kimn->link);
++	mutex_unlock(&kvm->irq_lock);
++	synchronize_srcu(&kvm->irq_srcu);
++}
++
++void kvm_fire_mask_notifiers(struct kvm *kvm, unsigned irqchip, unsigned pin,
++			     bool mask)
++{
++	struct kvm_ioapic *ioapic = kvm->arch.vioapic;
++	struct kvm_irq_mask_notifier *kimn;
++	int idx, gsi;
++
++	idx = srcu_read_lock(&kvm->irq_srcu);
++	gsi = kvm_irq_map_chip_pin(kvm, irqchip, pin);
++	if (gsi != -1)
++		hlist_for_each_entry_rcu(kimn, &ioapic->mask_notifier_list, link)
++			if (kimn->irq == gsi)
++				kimn->func(kimn, mask);
++	srcu_read_unlock(&kvm->irq_srcu, idx);
++}
++
+ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+ {
+ 	unsigned index;
+@@ -736,6 +772,7 @@ int kvm_ioapic_init(struct kvm *kvm)
+ 		return -ENOMEM;
+ 	spin_lock_init(&ioapic->lock);
+ 	INIT_DELAYED_WORK(&ioapic->eoi_inject, kvm_ioapic_eoi_inject_work);
++	INIT_HLIST_HEAD(&ioapic->mask_notifier_list);
+ 	kvm->arch.vioapic = ioapic;
+ 	kvm_ioapic_reset(ioapic);
+ 	kvm_iodevice_init(&ioapic->dev, &ioapic_mmio_ops);
+diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
+index fee17eb201ef..f5c1ff640635 100644
+--- a/arch/x86/kvm/ioapic.h
++++ b/arch/x86/kvm/ioapic.h
+@@ -86,8 +86,24 @@ struct kvm_ioapic {
+ 	struct delayed_work eoi_inject;
+ 	u32 irq_eoi[IOAPIC_NUM_PINS];
+ 	u32 irr_delivered;
++
++	/* reads protected by irq_srcu, writes by irq_lock */
++	struct hlist_head mask_notifier_list;
+ };
+ 
++struct kvm_irq_mask_notifier {
++	void (*func)(struct kvm_irq_mask_notifier *kimn, bool masked);
++	int irq;
++	struct hlist_node link;
++};
++
++void kvm_register_irq_mask_notifier(struct kvm *kvm, int irq,
++				    struct kvm_irq_mask_notifier *kimn);
++void kvm_unregister_irq_mask_notifier(struct kvm *kvm, int irq,
++				      struct kvm_irq_mask_notifier *kimn);
++void kvm_fire_mask_notifiers(struct kvm *kvm, unsigned irqchip, unsigned pin,
++			     bool mask);
++
+ #ifdef DEBUG
+ #define ASSERT(x)  							\
+ do {									\
+diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+index a4ef150fdd1c..fc0fa8155882 100644
+--- a/arch/x86/kvm/irq_comm.c
++++ b/arch/x86/kvm/irq_comm.c
+@@ -161,39 +161,6 @@ int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
+ 	return -EWOULDBLOCK;
+ }
+ 
+-void kvm_register_irq_mask_notifier(struct kvm *kvm, int irq,
+-				    struct kvm_irq_mask_notifier *kimn)
+-{
+-	mutex_lock(&kvm->irq_lock);
+-	kimn->irq = irq;
+-	hlist_add_head_rcu(&kimn->link, &kvm->arch.mask_notifier_list);
+-	mutex_unlock(&kvm->irq_lock);
+-}
+-
+-void kvm_unregister_irq_mask_notifier(struct kvm *kvm, int irq,
+-				      struct kvm_irq_mask_notifier *kimn)
+-{
+-	mutex_lock(&kvm->irq_lock);
+-	hlist_del_rcu(&kimn->link);
+-	mutex_unlock(&kvm->irq_lock);
+-	synchronize_srcu(&kvm->irq_srcu);
+-}
+-
+-void kvm_fire_mask_notifiers(struct kvm *kvm, unsigned irqchip, unsigned pin,
+-			     bool mask)
+-{
+-	struct kvm_irq_mask_notifier *kimn;
+-	int idx, gsi;
+-
+-	idx = srcu_read_lock(&kvm->irq_srcu);
+-	gsi = kvm_irq_map_chip_pin(kvm, irqchip, pin);
+-	if (gsi != -1)
+-		hlist_for_each_entry_rcu(kimn, &kvm->arch.mask_notifier_list, link)
+-			if (kimn->irq == gsi)
+-				kimn->func(kimn, mask);
+-	srcu_read_unlock(&kvm->irq_srcu, idx);
+-}
+-
+ bool kvm_arch_can_set_irq_routing(struct kvm *kvm)
+ {
+ 	return irqchip_in_kernel(kvm);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 52eff4919d95..3ac6f7c83a06 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12799,7 +12799,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	if (ret)
+ 		goto out_uninit_mmu;
+ 
+-	INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
+ 	atomic_set(&kvm->arch.noncoherent_dma_count, 0);
+ 
+ 	raw_spin_lock_init(&kvm->arch.tsc_write_lock);
 -- 
 2.49.0.1101.gccaa498523-goog
 
