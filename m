@@ -1,331 +1,522 @@
-Return-Path: <kvm+bounces-46978-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-46979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C50F0ABBCE3
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 13:45:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4926CABBCEB
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 13:49:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E260166C97
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 11:45:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D142D3AAAC5
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 11:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE27926B2A3;
-	Mon, 19 May 2025 11:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A242750FD;
+	Mon, 19 May 2025 11:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3L6zwXiN"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="L/OfofzD"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2062.outbound.protection.outlook.com [40.107.243.62])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7FDD1C700D;
-	Mon, 19 May 2025 11:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747655135; cv=fail; b=hi34PaVeKpWiRzM0JcWMezzQFVUwsUFDSUA9umNdoC3SbgPG2vbmamozE5/+bnFq3St/oVWu8FkZ3qOF+E11R+a3Pm7K1oEcSgGyhDNU8Dad2Io4V5xXuKJwq8AX3IyJPYw5YMfcHizh/cgHrG7nmlmwC5uFRCL81tECp00t/Lk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747655135; c=relaxed/simple;
-	bh=a2GAXJTWteEJGYHMvWN2ZUmPwVYCBFXlPgt/sLBEecU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Z++HOrDtlkfwzSgD9xhGYhynpeQZg4CP9nje43jiz1hlIKv2LXqwg4VPF2bxrGfAy2GTp/KnWfZ8N2K4j41ZBD8SDaf2g0i8ulDghsUrd75yDs2aPfpFxJKE0098pYuhWMhkPXM7RQKjsHbnakdO38GpWp1+0+6hvCtnaUnLVHI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3L6zwXiN; arc=fail smtp.client-ip=40.107.243.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Id1ryFkFdc+HHUzA8C/zwShgQncj6nKW0czGxE8eh0eQtUbDV1y5414TAx5XcaHoxS1GGtYVgmuxViVs2h4cZKgLr8qG8Imw9b24U9vVywhlErbPUEl3md2z8kE61LE35xNPit9I4yn2TAI4M6TQbzuSEDr4FvDSPffBm3Rf1QVKVjyzfitXwuj+rrS4lDWsPp9VuAddC2OQ7uF0uuMCdgW3cw3ekVpjWzyW5Osegbd2AegAYVYmLOHMNwaDhR9nLzYC7zrr0Ek2vCi31j/bL6pftqPe2FcS8vGEfd8hhsHCWqY4KSKnQ8U346T9Dfx2q89HX3OusndsYIrNGlOYeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V2Db8k5oQapz7gSsrZVxFU3+caJylwGvG1VvO/gFpmo=;
- b=GQtbCZ9m/GTyACh38tCI8QM6MA+I9eYjdyVNfpvwMUs1Ml1T33yH6XuFWzMpuRD7p3SfgpszsRy4hjDp+IcKul03W9W9Tzvnm+QzEUdAFkIFiMp9jq5FzHR6+iT/FXkMEB4ySbGpuTBsbbKeTGVxSex3T6A9OpELOsjXTaOt9Y+mSkFA4lD67WutmrZSxL2xE+V9YRnshllyQ7UAqHH4RXRDjHaUvDIWnWWZwBB2eg16JV/56M6WLTv+55AB8IdUB8qg7CtiiIfkumC2W/8cIX0laSrYXQFYxkE13sNaUTHVHIjK1H8WnG6HTTeqMT+QkzNweiTt9/rB0nXsbhM0BQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V2Db8k5oQapz7gSsrZVxFU3+caJylwGvG1VvO/gFpmo=;
- b=3L6zwXiNAquvdkZJ5JzhSgVjyKx1CYeOh1c9kzp9OXInzpaM5zDCBbtoVBZ/eW9eXCmi/qfPc08MMzXrRwRleHuXancufiBrvQPS1DzOedSn7B3QADI0zPI+HbreulzLA3EexG4sE0NplqCAPCQ0oS50gvKXnl1/0A1UPd0+ETM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- DM6PR12MB4385.namprd12.prod.outlook.com (2603:10b6:5:2a6::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.33; Mon, 19 May 2025 11:45:30 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb%3]) with mapi id 15.20.8746.030; Mon, 19 May 2025
- 11:45:30 +0000
-Message-ID: <e77951e3-8606-4935-a05f-88b092d5771d@amd.com>
-Date: Mon, 19 May 2025 17:15:24 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 5/5] KVM: selftests: Add bus lock exit test
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- pbonzini@redhat.com, nikunj@amd.com, bp@alien8.de
-References: <20250502050346.14274-1-manali.shukla@amd.com>
- <20250502050346.14274-6-manali.shukla@amd.com> <aCeR2TjPzC_OYBfG@google.com>
-Content-Language: en-US
-From: Manali Shukla <manali.shukla@amd.com>
-In-Reply-To: <aCeR2TjPzC_OYBfG@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN4PR01CA0035.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:273::16) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6305F1F03F2;
+	Mon, 19 May 2025 11:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747655388; cv=none; b=Mq8t4FTRSojrzVaqZlHsjDJxRbCb81j0gNOIS70PGUcooNoLMY3UaxP+UrJNgtZ8Lwo70pQoYjGlT5pwge4rehiBDeYmsYLtMUakjg3DtI411Bh2nQIuudBuNd/DIdMIf7tVWdcrAS0E9ATEWeGyiPfNIIrsgNvtgtyZieFRvUw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747655388; c=relaxed/simple;
+	bh=9JXUQ8Zn4FFtk6856uawMFHZrOsYA6rG/Z+3feDwLno=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qig5SF8JF/0N0/511HwRhHYnKNCg1sJtiez6w42sWe4+2JJzYi0T7dhzd4aIv1fF2XmtByToJw1fiiprRtsl+/853VdaNOjcnJGzMhrMHaIIhR/y5Kz0u1hcLWb7i3Xu4f6bih8R+iZLXGIiezTD7XJYl7o46PxwWQ+ya6htmj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=L/OfofzD; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54J8DmV3010082;
+	Mon, 19 May 2025 11:49:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=b/nZUl
+	+MlMgCqA04bH30Mox6mhUVP0JR6Wpf5Sk9I6A=; b=L/OfofzDdQxenfhd1wXVUo
+	Y6PULX73vEFYXWVhbLjdsMFW1jUW6XzePfu3yR7aNkTjxonHppBFKoDirf7BwVf0
+	jVK+056BIfv6OQrbg78a2hAUnGaFvmm+0hgMaB+sHsIRynBlzzQl7b8lPpR/9ROH
+	IUszjJtxrxHprFglFhVSRY/Bbdt9CfbQBR77G6D00W8A+/vssLP4xGyw5H2Pzy5i
+	pa1uR0gASqiZeih5N49MAidSLx1InJLRf1liVqShLfxJEz9D2XlX7+C1hMT/WBxS
+	laDXtzLqMxpYnb3VJ5PxOMX+7Ci1xZMYt9Kf+lCnHQOrReK9JgGpV27RgueVmBXA
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46qn87ucc5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 May 2025 11:49:43 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54J7t4Dn016147;
+	Mon, 19 May 2025 11:49:43 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 46q7g264dp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 May 2025 11:49:43 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54JBndd755443840
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 19 May 2025 11:49:39 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 56DBF2004F;
+	Mon, 19 May 2025 11:49:39 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 047312004D;
+	Mon, 19 May 2025 11:49:39 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 19 May 2025 11:49:38 +0000 (GMT)
+Date: Mon, 19 May 2025 13:49:35 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David
+ Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily
+ Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Subject: Re: [PATCH v2 2/3] KVM: s390: Always allocate esca_block
+Message-ID: <20250519134935.377e76e8@p-imbrenda>
+In-Reply-To: <20250519-rm-bsca-v2-2-e3ea53dd0394@linux.ibm.com>
+References: <20250519-rm-bsca-v2-0-e3ea53dd0394@linux.ibm.com>
+	<20250519-rm-bsca-v2-2-e3ea53dd0394@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|DM6PR12MB4385:EE_
-X-MS-Office365-Filtering-Correlation-Id: 266377fc-a00e-44fb-08ae-08dd96caa7e8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?YWZqM2RNWGhpd2JDd01UTjdTUmFnQ1YxK3o5Q0hKRUdKK1hZRDh4cFpnQWh3?=
- =?utf-8?B?T3h5VU1jelQzZjBSREE3WXVlbktvb3lobzR4VmwzUlp4VHNCb0x3V3M0QVVZ?=
- =?utf-8?B?U3FXWVJiUDdHWWtCaFZpUERYNFFrSTlndnFRdWxBVjJJSk53eFc5eHlabTRQ?=
- =?utf-8?B?VzRWRkFDK3kxUC9iTWRqRHI3MmgzZDhSenNQdXc5U2ZoWlRHYkJUZDhNUEhh?=
- =?utf-8?B?LzJCVnA1WE95OXk3aFJ2K2pXcUgxSzNZRzJoc04zMUIrMWQrY0VLZ3I0TGZ5?=
- =?utf-8?B?UzZpTnFCK09BbU5QajJsdDhmQkpDdWtDWHd0OUh3ZlRNVVpCMVZLbWxWSzBz?=
- =?utf-8?B?TS9rNk9wdkRmclR2a29IbzA0U2tiTmQyWmpKRjZXYXhCdGI2SGJHNkdrYlY2?=
- =?utf-8?B?alZKTFBZWGRmeXZocmhYY0pESmdvU1VsVUtleHpjZ1NxdjZTMFAvYnVQRStt?=
- =?utf-8?B?SGdiY2psWWFZZDhLNk1sYWRQRnRsYzFEeUs0T1llNEZmcmp0OVdodTN2Z1hi?=
- =?utf-8?B?dUdqOWRmbXBaMFk4NnNwa1pmcHB3dEN0Mmozais5UVp1dnVmK0FRUnprYjdm?=
- =?utf-8?B?ckV5bGd5ZGFtcmwreUNiNTYvQXdyWTJwQ3dUdmxheVM3V1Y5U1NWTGdTdFZC?=
- =?utf-8?B?a1ZEY0lSYTd1MWg1N3Uybk5UbXhycFNDSUM2M3ovZTlITXczWGUxbzJQcWtL?=
- =?utf-8?B?TGczSU1xdGVTSTd2Rk9aZitJRS9xZlFaeFhkVXZKdDA1cURUb2hDcmN5c1Fl?=
- =?utf-8?B?S09ualg1akQvR05oc1JPUjlRd3QyVm0yTTB6REQ1WFh5Z3BOanJpN0Z4cUxw?=
- =?utf-8?B?c29mRFNWaE5BbmxvZVNSRXI3UHZiSmZJMkhhSHJUVG5NSU9yQlgxdWI3b3Nz?=
- =?utf-8?B?cklXWEkwVWJWL0ZHRUVnMjFUUmlWM0U4d251NFZGQTZhVEQyRlBLR0V0bHNR?=
- =?utf-8?B?T1czZ2drTkhjQllsVytGeW5MNnM1dHpzUW5uWkc3aVl5L3hWQ0NpL3crOGpO?=
- =?utf-8?B?K0lRNHZndU9mWUY5NCtsNUFpVVNqVmZMbXdsWW9Ea1h3QXIzQ1llT0pSRDlN?=
- =?utf-8?B?TWYwdE9xVTdmVWhyTjJGZXRpNytlTUVkZExWSXZFUERHQ1BiR0JmTTg5bGxU?=
- =?utf-8?B?OEhHTTdOTzNEdHZ1SmpUd3RyZzVWYktUdVFtbXV3eUZ6RDVFekVtaDVOQndq?=
- =?utf-8?B?WGVyMEd1YUpyWThCdm00YnN5UGV1Y1c0dkZFWTFPOTVqQk5GTzE2Wkl6bXFm?=
- =?utf-8?B?OFE2VVdycC9HUE5kMkhMaDRUUDYyVzV5b2x4bVU5WExIV0lKVUdueDVMWTd1?=
- =?utf-8?B?bk1ZY1N3OHdXdDA4N0szV3g1bEovTHM5WFZNeGxGMTVodXNBbmdnYWxVTjRx?=
- =?utf-8?B?UnRsTm5WSkVhV3NmVjc4a0dUSmpmcnU5a2lSREVlNW0wRWo5dzlMYmxvTW9j?=
- =?utf-8?B?MmFVTEpyaktPekkyRlBxZEFBWGZIWEZvNDJvSnI1K3ppeHRBUGd4bmFteFBE?=
- =?utf-8?B?Q3kvRVJoZ2pZVmxwZi92V0JoK25hVTlWL2doMjRMSGg5RFBjakFuNHJMaWFY?=
- =?utf-8?B?Z093V3RxYXNwWlF4UytSc0tIeVNSLy95YTRpSllPVUx3N1piQzl1NS9XWXB6?=
- =?utf-8?B?Tms0UzZmUEt2TWgzYi9DOVFlU1BIcGdMdEo3Q0ltMmE5V3c5bXJmM2svZ21m?=
- =?utf-8?B?R2p0VDFtYi9Qd3VzdWc0a2Z2WnlYY3JKd3pzNmF3NDVkVFRqSXFWdStGYjBr?=
- =?utf-8?B?WllxYXdaN2U1b1l1VE1XVDZCaUdxMjFuc1o1SFNlR2JIa1dxRkd0eVNIbTFs?=
- =?utf-8?B?VG15TFZ6QWVDQWRkNUpZdWs3MjdEVTBSb3pqNysreXdNRDU1MzlkUGh6bmt4?=
- =?utf-8?B?N1dKaG1ydFFIdDhHdHBoUlhUTU9McGgxVm01ZEViMlJrL0E9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?R1VscFVsYll0eStyQUhiUnZTVloveHU3UEdXQ0xpdmVWdWxBWnBpQ1RoR2NM?=
- =?utf-8?B?MEFpME9QT2YvRVE0TXRJbzAzSDdCZFR3VnVVRWIraVNiTVFPRm1lN3JrSVNV?=
- =?utf-8?B?UDRzNGZ2NldaNGZWMXlZVkkwMHpWMnhyVnRWZkU0RU1mSHJQbDQ2d3RnbElv?=
- =?utf-8?B?bUdhV0RiMTdxSFFranRhdWxjUmtwRlB4T0FpZlVWYTVGeXM1NW4yZ3ZWK1c0?=
- =?utf-8?B?YWF4MmtaRUtWSGMrTUhwSHZsamRJUUsyY1kvOGN0SmR3Y2MyUHZUcGFlSU9E?=
- =?utf-8?B?MitiZnhvVHpwd0Uxb2VjcUpkRjVNZjRHQlNEMW1nOVR3a0ZHemQxalczeU5I?=
- =?utf-8?B?OTdVNXZROUtmV1hvVldUdngvTVpsdVlFQ3RHZTJHeHVYN1BpVXl2NHY3djB5?=
- =?utf-8?B?U1RpOTVLdVZWSHZweUZhZEs1dmNyaGVOdUVKcW1VS0FLZjhBZklqYzBPUDdC?=
- =?utf-8?B?cXY0RFNNeVFMYlZqbmIvQmVnM1ZZMXgwWjVoMWV6TkRqL0g0WUhCTVY2ekN3?=
- =?utf-8?B?RzAxTEcyUmR1ZHM4bkNQWmlWOTlHS001WUFjWWFuWE1PbFRiaUJKSVdJcEp1?=
- =?utf-8?B?UW9ndWlzMUhicWhZK2h6dWkvZ0ZzdHdZcDhOdndrejNraHVoRGtJaktxZ3NG?=
- =?utf-8?B?TGNwcE9IaEFMbkxlWWFOeEwvKzVuM1RzK1lCejFzSmNOZG90TGJKb2JKOGZh?=
- =?utf-8?B?NkhqdWxYVDJlYk5ZYTh4dUpuUHpjY0JZZDhqcDdWeERXTG9RcWF4V3lWa1N1?=
- =?utf-8?B?bGZvbWRFSXg0UndVLzVKNzkzK1Y2Qmd4QjdmVHNmeGIza1ZnMXc4bjdtM3JQ?=
- =?utf-8?B?Slo1ZDlyTTFoOXNhT0Q1dkxmaG1PRy9Ca1hVVkpBdDV1SHFub1JXaEhLa1hG?=
- =?utf-8?B?S3k5VTBjK3EyNjFlN3Nld3VzNTI3WTVlYlFYSkpDZjFWWXRoSldxTWo2VUNq?=
- =?utf-8?B?eG9PbllmQi9iNVhSTHd0ZjN1c2hIVzNTN2EwY3VVUEJnUThlcTgzVFU4Z3Rz?=
- =?utf-8?B?cFpLVDh5YzZ3K25UWXA2TVRTYVVTQ0pDUk9raFBjYUZqNTJRY1A5bTNtOURj?=
- =?utf-8?B?NkxLY05nUGpHd0lvTHBaUUh4b2U0MHhnTnBERHBUT29mUjR4YVBKTStmQTV6?=
- =?utf-8?B?cUZnZXRrRm8wb1hsTnhIVFlrc3RSWWhiNWFtSHlVV2VXU01rT2tRMnVCaFFJ?=
- =?utf-8?B?RTNuRkR2VTBWL0I0NHFVaW4zejMzOEsyVDAzeTdhTlZUMjZmT0xNTTMyMC9G?=
- =?utf-8?B?dUFsYW9JOHR6emJHZWtHNjBwQ0VSM3NySlRKUHEyWTdjWC8xcnloTTNNTi9G?=
- =?utf-8?B?WTdtSnlTTVcrMEl4ZmdFdVovaUFwSHhVSSsrdWEvSG16bmFkMU9VMnhYYjRU?=
- =?utf-8?B?aVBDZXlIL3lOaWRpVitGeXkvYkVUaktwaGlPU3ArZkluaGliV2VHbHgxWkx5?=
- =?utf-8?B?TDRua2FuQlZIRGhqdThGRzJXQ1BtUHMwamtNRFZDZlRHK1pYOGlXL1FXQkhm?=
- =?utf-8?B?djNnNHA0YVNRTDMwYWF4VEpuZnFyeTFJQlVhVm9YODdhS2FOcDh4cDBleUJm?=
- =?utf-8?B?UXJKRnhRSFd6VlJKY2RNRUNEcHFScGZlYkRSTEM1T29qdU1xS0c4TE1pbklC?=
- =?utf-8?B?dW1vc1RDMWtGVGtweEdIZWxkT1JrMjU3R0ZqZ2ZVaHE1UVhmZTl5VzNvZ1R3?=
- =?utf-8?B?aUpvL1gwMDdNNlNnOVFrbVBuYUR0SlFkZFUzOUlHMCtkemU5Nks4MlU2OVR4?=
- =?utf-8?B?REdiV1k4SFUxbE9ZUUNLMkhrcUZnRnJ5em91cFp4RDkyNlV5NEQ3ZnpEaFZG?=
- =?utf-8?B?UHpiMTZZdnRDME0yLzZ3UVliL0ZIbjRCMzBCeUF6Z2t2QmpVOHVVeTk4aFMv?=
- =?utf-8?B?cHpSRzVpWjIxYVhaRnluaUk1OGdtSnEvWTUzVEdnYWNGVnVaR2FkZkt3ek1D?=
- =?utf-8?B?dGRxck1pbURPWEVPQXRYYm9RYTcvd1VSY2tiVWtpUkpraWRhRS9tYlJmbXJs?=
- =?utf-8?B?aWJIbHBXcGdIdW5yRS9saEJpN1o0M3UxVGdRS245U3o3VEtzZllHd2xtYnlI?=
- =?utf-8?B?ejNnWS9wb25DRmlIRkltbU43SVozK2ZKR2c3dm5CdGJWR3VYRXF5Qi9BZDNi?=
- =?utf-8?Q?wNN8yRI4U68Dlyvsahig81AIQ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 266377fc-a00e-44fb-08ae-08dd96caa7e8
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2025 11:45:30.5327
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ce7a7YV73QH26fNTrQtOmNUaQk6cicOzIKY+F7KGF09ExWAQI9/yZ76K26GiHc8dDS7wYxfw2WAaEQVb5Yj2Vg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4385
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE5MDEwOSBTYWx0ZWRfXw53QpEvv9HGJ vxMleDSIPPj+nNhSJhWouI8gGm3kVCdkjSNLqRU4dPCjQ2mFJu8slAszoUTUXGGeM4QV1D+12IV 6SnpJXbiJeZ6Qx1xJquanJPmeaLGsB5IU6wHLWFUz00REa/MoWxIxfBSBiw7nr41f5XFHWFH6Ww
+ g1L5iDXQXDFy7rEAAJe0Qs/byFC9UNSh3H6KlJBIHPCKNIR2sjSELJyXzhB6cfa2P8Q52Sy9cr0 VNa1jN9R07KufdNLHhObVmjZ/Q6FxG332zJWhE+QvCb3OBA/9P6if7cj6dE0MoWByTzhPk8bNiC RloSHN5u/CJaQGpP1dA0M0Te/GYlBukbcEEFJIDyquuoc+XUVaL9T8+Vp31wFnX8qkrTAQX9QzC
+ mLsSD9LIc5H4wFJtZaOjurwlYCluyA0JjRW7SasEut1UlIrszaDGIjX8WYevkEo1h8GvfpAr
+X-Proofpoint-ORIG-GUID: xF2x_zxS4472wnQZe9loXGZJI_Yf7jIf
+X-Authority-Analysis: v=2.4 cv=ff+ty1QF c=1 sm=1 tr=0 ts=682b1ad7 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=3Qaq3o0QIONBCY1I0B8A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: xF2x_zxS4472wnQZe9loXGZJI_Yf7jIf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-19_05,2025-05-16_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 impostorscore=0 suspectscore=0 spamscore=0
+ mlxlogscore=999 adultscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0
+ bulkscore=0 clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505070000
+ definitions=main-2505190109
 
-On 5/17/2025 12:58 AM, Sean Christopherson wrote:
-> On Fri, May 02, 2025, Manali Shukla wrote:
->> diff --git a/tools/testing/selftests/kvm/x86/kvm_buslock_test.c b/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
->> new file mode 100644
->> index 000000000000..9c081525ac2a
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
->> @@ -0,0 +1,135 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (C) 2024 Advanced Micro Devices, Inc.
->> + */
->> +
->> +#include "test_util.h"
->> +#include "kvm_util.h"
->> +#include "processor.h"
->> +#include "svm_util.h"
->> +#include "vmx.h"
->> +
->> +#define NR_ITERATIONS 100
->> +#define L2_GUEST_STACK_SIZE 64
->> +
->> +#pragma GCC diagnostic push
->> +#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
-> 
-> Eww.
-> 
->> +
->> +struct buslock_test {
->> +	unsigned char pad[PAGE_SIZE - 2];
->> +	atomic_long_t val;
->> +} __packed;
-> 
-> You don't need an entire page to generate a bus lock, two cache lines will do
-> nicely.  And there's certain no need for __packed.
-> 
->> +struct buslock_test test __aligned(PAGE_SIZE);
->> +
->> +static __always_inline void buslock_atomic_add(int i, atomic_long_t *v)
->> +{
->> +	asm volatile(LOCK_PREFIX "addl %1,%0"
->> +		     : "+m" (v->counter)
->> +		     : "ir" (i) : "memory");
->> +}
-> 
-> If only there were utilities for atomics...
-> 
->> +static void buslock_add(void)
-> 
-> guest_generate_buslocks()
-> 
->> +{
->> +	/*
->> +	 * Increment a page unaligned variable atomically.
->> +	 * This should generate a bus lock exit.
-> 
-> Not should, will.
-> 
->> +	 */
->> +	for (int i = 0; i < NR_ITERATIONS; i++)
->> +		buslock_atomic_add(2, &test.val);
-> 
-> Don't do weird and completely arbitrary things like adding '2' instead of '1',
-> it makes readers look for intent and purpose that doesn't exist.
-> 
+On Mon, 19 May 2025 13:36:10 +0200
+Christoph Schlameuss <schlameuss@linux.ibm.com> wrote:
 
-Got it. Thanks for the feedback.
+> Instead of allocating a BSCA and upgrading it for PV or when adding the
+> 65th cpu we can always use the ESCA.
+> 
+> The only downside of the change is that we will always allocate 4 pages
+> for a 248 cpu ESCA instead of a single page for the BSCA per VM.
+> In return we can delete a bunch of checks and special handling depending
+> on the SCA type as well as the whole BSCA to ESCA conversion.
+> 
+> As a fallback we can still run without SCA entries when the SIGP
+> interpretation facility or ESCA are not available.
+> 
+> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 
->> +}
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  arch/s390/include/asm/kvm_host.h |   1 -
+>  arch/s390/kvm/interrupt.c        |  67 ++++-------------
+>  arch/s390/kvm/kvm-s390.c         | 159 ++++++---------------------------------
+>  arch/s390/kvm/kvm-s390.h         |   4 +-
+>  4 files changed, 42 insertions(+), 189 deletions(-)
 > 
-> ...
-> 
->> +int main(int argc, char *argv[])
->> +{
->> +	struct kvm_vcpu *vcpu;
->> +	struct kvm_run *run;
->> +	struct kvm_vm *vm;
->> +	vm_vaddr_t nested_test_data_gva;
->> +
->> +	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM) || kvm_cpu_has(X86_FEATURE_VMX));
-> 
-> There's no reason to make nested support a hard dependency, it's just as easy to
-> make it conditional.
-> 
->> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_BUS_LOCK_EXIT));
->> +
->> +	vm = vm_create(1);
->> +	vm_enable_cap(vm, KVM_CAP_X86_BUS_LOCK_EXIT, KVM_BUS_LOCK_DETECTION_EXIT);
->> +	vcpu = vm_vcpu_add(vm, 0, guest_code);
->> +
->> +	if (kvm_cpu_has(X86_FEATURE_SVM))
->> +		vcpu_alloc_svm(vm, &nested_test_data_gva);
->> +	else
->> +		vcpu_alloc_vmx(vm, &nested_test_data_gva);
->> +
->> +	vcpu_args_set(vcpu, 1, nested_test_data_gva);
->> +
->> +	run = vcpu->run;
->> +
->> +	for (;;) {
->> +		struct ucall uc;
->> +
->> +		vcpu_run(vcpu);
->> +
->> +		if (run->exit_reason == KVM_EXIT_IO) {
->> +			switch (get_ucall(vcpu, &uc)) {
->> +			case UCALL_ABORT:
->> +				REPORT_GUEST_ASSERT(uc);
->> +				/* NOT REACHED */
->> +			case UCALL_SYNC:
->> +				continue;
->> +			case UCALL_DONE:
->> +				goto done;
->> +			default:
->> +				TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
->> +			}
->> +		}
->> +
->> +		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_X86_BUS_LOCK);
->> +	}
-> 
-> *sigh*
-> 
-> This doesn't actually ****VERIFY**** that the expected number of bus lock exits
-> were generated.  KVM could literally do nothing and the test will pass.  E.g. the
-> test passes if I do this:
-> 
-> diff --git a/tools/testing/selftests/kvm/x86/kvm_buslock_test.c b/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
-> index 9c081525ac2a..aa65d6be0f13 100644
-> --- a/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
-> +++ b/tools/testing/selftests/kvm/x86/kvm_buslock_test.c
-> @@ -93,10 +93,10 @@ int main(int argc, char *argv[])
->         vm_vaddr_t nested_test_data_gva;
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index f51bac835260f562eaf4bbfd373a24bfdbc43834..d03e354a63d9c931522c1a1607eba8685c24527f 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -631,7 +631,6 @@ struct kvm_s390_pv {
 >  
->         TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM) || kvm_cpu_has(X86_FEATURE_VMX));
-> -       TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_BUS_LOCK_EXIT));
-> +//     TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_BUS_LOCK_EXIT));
+>  struct kvm_arch{
+>  	void *sca;
+> -	int use_esca;
+>  	rwlock_t sca_lock;
+>  	debug_info_t *dbf;
+>  	struct kvm_s390_float_interrupt float_int;
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index 60c360c18690f6b94e8483dab2c25f016451204b..50f8e8167a6f0bb2f4dc2149a34b4148ccb6506f 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -51,21 +51,11 @@ static int sca_ext_call_pending(struct kvm_vcpu *vcpu, int *src_id)
 >  
->         vm = vm_create(1);
-> -       vm_enable_cap(vm, KVM_CAP_X86_BUS_LOCK_EXIT, KVM_BUS_LOCK_DETECTION_EXIT);
-> +//     vm_enable_cap(vm, KVM_CAP_X86_BUS_LOCK_EXIT, KVM_BUS_LOCK_DETECTION_EXIT);
->         vcpu = vm_vcpu_add(vm, 0, guest_code);
+>  	BUG_ON(!kvm_s390_use_sca_entries());
+>  	read_lock(&vcpu->kvm->arch.sca_lock);
+> -	if (vcpu->kvm->arch.use_esca) {
+> -		struct esca_block *sca = vcpu->kvm->arch.sca;
+> -		union esca_sigp_ctrl sigp_ctrl =
+> -			sca->cpu[vcpu->vcpu_id].sigp_ctrl;
+> +	struct esca_block *sca = vcpu->kvm->arch.sca;
+> +	union esca_sigp_ctrl sigp_ctrl = sca->cpu[vcpu->vcpu_id].sigp_ctrl;
 >  
->         if (kvm_cpu_has(X86_FEATURE_SVM))
-> --
+> -		c = sigp_ctrl.c;
+> -		scn = sigp_ctrl.scn;
+> -	} else {
+> -		struct bsca_block *sca = vcpu->kvm->arch.sca;
+> -		union bsca_sigp_ctrl sigp_ctrl =
+> -			sca->cpu[vcpu->vcpu_id].sigp_ctrl;
+> -
+> -		c = sigp_ctrl.c;
+> -		scn = sigp_ctrl.scn;
+> -	}
+> +	c = sigp_ctrl.c;
+> +	scn = sigp_ctrl.scn;
+>  	read_unlock(&vcpu->kvm->arch.sca_lock);
+>  
+>  	if (src_id)
+> @@ -80,33 +70,17 @@ static int sca_inject_ext_call(struct kvm_vcpu *vcpu, int src_id)
+>  
+>  	BUG_ON(!kvm_s390_use_sca_entries());
+>  	read_lock(&vcpu->kvm->arch.sca_lock);
+> -	if (vcpu->kvm->arch.use_esca) {
+> -		struct esca_block *sca = vcpu->kvm->arch.sca;
+> -		union esca_sigp_ctrl *sigp_ctrl =
+> -			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
+> -		union esca_sigp_ctrl new_val = {0}, old_val;
+> -
+> -		old_val = READ_ONCE(*sigp_ctrl);
+> -		new_val.scn = src_id;
+> -		new_val.c = 1;
+> -		old_val.c = 0;
+> -
+> -		expect = old_val.value;
+> -		rc = cmpxchg(&sigp_ctrl->value, old_val.value, new_val.value);
+> -	} else {
+> -		struct bsca_block *sca = vcpu->kvm->arch.sca;
+> -		union bsca_sigp_ctrl *sigp_ctrl =
+> -			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
+> -		union bsca_sigp_ctrl new_val = {0}, old_val;
+> +	struct esca_block *sca = vcpu->kvm->arch.sca;
+> +	union esca_sigp_ctrl *sigp_ctrl = &sca->cpu[vcpu->vcpu_id].sigp_ctrl;
+> +	union esca_sigp_ctrl new_val = {0}, old_val;
+>  
+> -		old_val = READ_ONCE(*sigp_ctrl);
+> -		new_val.scn = src_id;
+> -		new_val.c = 1;
+> -		old_val.c = 0;
+> +	old_val = READ_ONCE(*sigp_ctrl);
+> +	new_val.scn = src_id;
+> +	new_val.c = 1;
+> +	old_val.c = 0;
+>  
+> -		expect = old_val.value;
+> -		rc = cmpxchg(&sigp_ctrl->value, old_val.value, new_val.value);
+> -	}
+> +	expect = old_val.value;
+> +	rc = cmpxchg(&sigp_ctrl->value, old_val.value, new_val.value);
+>  	read_unlock(&vcpu->kvm->arch.sca_lock);
+>  
+>  	if (rc != expect) {
+> @@ -123,19 +97,10 @@ static void sca_clear_ext_call(struct kvm_vcpu *vcpu)
+>  		return;
+>  	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_ECALL_PEND);
+>  	read_lock(&vcpu->kvm->arch.sca_lock);
+> -	if (vcpu->kvm->arch.use_esca) {
+> -		struct esca_block *sca = vcpu->kvm->arch.sca;
+> -		union esca_sigp_ctrl *sigp_ctrl =
+> -			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
+> -
+> -		WRITE_ONCE(sigp_ctrl->value, 0);
+> -	} else {
+> -		struct bsca_block *sca = vcpu->kvm->arch.sca;
+> -		union bsca_sigp_ctrl *sigp_ctrl =
+> -			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
+> +	struct esca_block *sca = vcpu->kvm->arch.sca;
+> +	union esca_sigp_ctrl *sigp_ctrl = &sca->cpu[vcpu->vcpu_id].sigp_ctrl;
+>  
+> -		WRITE_ONCE(sigp_ctrl->value, 0);
+> -	}
+> +	WRITE_ONCE(sigp_ctrl->value, 0);
+>  	read_unlock(&vcpu->kvm->arch.sca_lock);
+>  }
+>  
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index b65e4cbe67cf70a7d614607ebdd679060e7d31f4..321745580c57dd21070eb5bc30ebab263da7d329 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -271,7 +271,6 @@ debug_info_t *kvm_s390_dbf_uv;
+>  /* forward declarations */
+>  static void kvm_gmap_notifier(struct gmap *gmap, unsigned long start,
+>  			      unsigned long end);
+> -static int sca_switch_to_extended(struct kvm *kvm);
+>  
+>  static void kvm_clock_sync_scb(struct kvm_s390_sie_block *scb, u64 delta)
+>  {
+> @@ -631,11 +630,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_NR_VCPUS:
+>  	case KVM_CAP_MAX_VCPUS:
+>  	case KVM_CAP_MAX_VCPU_ID:
+> -		r = KVM_S390_BSCA_CPU_SLOTS;
+> +		r = KVM_S390_ESCA_CPU_SLOTS;
+>  		if (!kvm_s390_use_sca_entries())
+>  			r = KVM_MAX_VCPUS;
+> -		else if (sclp.has_esca && sclp.has_64bscao)
+> -			r = KVM_S390_ESCA_CPU_SLOTS;
+>  		if (ext == KVM_CAP_NR_VCPUS)
+>  			r = min_t(unsigned int, num_online_cpus(), r);
+>  		else if (ext == KVM_CAP_MAX_VCPU_ID)
+> @@ -1932,13 +1929,11 @@ static int kvm_s390_get_cpu_model(struct kvm *kvm, struct kvm_device_attr *attr)
+>   * Updates the Multiprocessor Topology-Change-Report bit to signal
+>   * the guest with a topology change.
+>   * This is only relevant if the topology facility is present.
+> - *
+> - * The SCA version, bsca or esca, doesn't matter as offset is the same.
+>   */
+>  static void kvm_s390_update_topology_change_report(struct kvm *kvm, bool val)
+>  {
+>  	union sca_utility new, old;
+> -	struct bsca_block *sca;
+> +	struct esca_block *sca;
+>  
+>  	read_lock(&kvm->arch.sca_lock);
+>  	sca = kvm->arch.sca;
+> @@ -1969,7 +1964,7 @@ static int kvm_s390_get_topo_change_indication(struct kvm *kvm,
+>  		return -ENXIO;
+>  
+>  	read_lock(&kvm->arch.sca_lock);
+> -	topo = ((struct bsca_block *)kvm->arch.sca)->utility.mtcr;
+> +	topo = ((struct esca_block *)kvm->arch.sca)->utility.mtcr;
+>  	read_unlock(&kvm->arch.sca_lock);
+>  
+>  	return put_user(topo, (u8 __user *)attr->addr);
+> @@ -2668,14 +2663,6 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+>  		if (kvm_s390_pv_is_protected(kvm))
+>  			break;
+>  
+> -		/*
+> -		 *  FMT 4 SIE needs esca. As we never switch back to bsca from
+> -		 *  esca, we need no cleanup in the error cases below
+> -		 */
+> -		r = sca_switch_to_extended(kvm);
+> -		if (r)
+> -			break;
+> -
+>  		r = s390_disable_cow_sharing();
+>  		if (r)
+>  			break;
+> @@ -3316,10 +3303,7 @@ static void kvm_s390_crypto_init(struct kvm *kvm)
+>  
+>  static void sca_dispose(struct kvm *kvm)
+>  {
+> -	if (kvm->arch.use_esca)
+> -		free_pages_exact(kvm->arch.sca, sizeof(struct esca_block));
+> -	else
+> -		free_page((unsigned long)(kvm->arch.sca));
+> +	free_pages_exact(kvm->arch.sca, sizeof(struct esca_block));
+>  	kvm->arch.sca = NULL;
+>  }
+>  
+> @@ -3333,10 +3317,9 @@ void kvm_arch_free_vm(struct kvm *kvm)
+>  
+>  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  {
+> -	gfp_t alloc_flags = GFP_KERNEL_ACCOUNT;
+> -	int i, rc;
+> +	gfp_t alloc_flags = GFP_KERNEL_ACCOUNT | __GFP_ZERO;
+>  	char debug_name[16];
+> -	static unsigned long sca_offset;
+> +	int i, rc;
+>  
+>  	rc = -EINVAL;
+>  #ifdef CONFIG_KVM_S390_UCONTROL
+> @@ -3358,17 +3341,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	if (!sclp.has_64bscao)
+>  		alloc_flags |= GFP_DMA;
+>  	rwlock_init(&kvm->arch.sca_lock);
+> -	/* start with basic SCA */
+> -	kvm->arch.sca = (struct bsca_block *) get_zeroed_page(alloc_flags);
+> -	if (!kvm->arch.sca)
+> -		goto out_err;
+>  	mutex_lock(&kvm_lock);
+> -	sca_offset += 16;
+> -	if (sca_offset + sizeof(struct bsca_block) > PAGE_SIZE)
+> -		sca_offset = 0;
+> -	kvm->arch.sca = (struct bsca_block *)
+> -			((char *) kvm->arch.sca + sca_offset);
+> +
+> +	kvm->arch.sca = alloc_pages_exact(sizeof(*kvm->arch.sca), alloc_flags);
+>  	mutex_unlock(&kvm_lock);
+> +	if (!kvm->arch.sca)
+> +		goto out_err;
+>  
+>  	sprintf(debug_name, "kvm-%u", current->pid);
+>  
+> @@ -3550,17 +3528,10 @@ static void sca_del_vcpu(struct kvm_vcpu *vcpu)
+>  	if (!kvm_s390_use_sca_entries())
+>  		return;
+>  	read_lock(&vcpu->kvm->arch.sca_lock);
+> -	if (vcpu->kvm->arch.use_esca) {
+> -		struct esca_block *sca = vcpu->kvm->arch.sca;
+> -
+> -		clear_bit_inv(vcpu->vcpu_id, (unsigned long *) sca->mcn);
+> -		sca->cpu[vcpu->vcpu_id].sda = 0;
+> -	} else {
+> -		struct bsca_block *sca = vcpu->kvm->arch.sca;
+> +	struct esca_block *sca = vcpu->kvm->arch.sca;
+>  
+> -		clear_bit_inv(vcpu->vcpu_id, (unsigned long *) &sca->mcn);
+> -		sca->cpu[vcpu->vcpu_id].sda = 0;
+> -	}
+> +	clear_bit_inv(vcpu->vcpu_id, (unsigned long *)sca->mcn);
+> +	sca->cpu[vcpu->vcpu_id].sda = 0;
+>  	read_unlock(&vcpu->kvm->arch.sca_lock);
+>  }
+>  
+> @@ -3575,105 +3546,23 @@ static void sca_add_vcpu(struct kvm_vcpu *vcpu)
+>  		return;
+>  	}
+>  	read_lock(&vcpu->kvm->arch.sca_lock);
+> -	if (vcpu->kvm->arch.use_esca) {
+> -		struct esca_block *sca = vcpu->kvm->arch.sca;
+> -		phys_addr_t sca_phys = virt_to_phys(sca);
+> -
+> -		sca->cpu[vcpu->vcpu_id].sda = virt_to_phys(vcpu->arch.sie_block);
+> -		vcpu->arch.sie_block->scaoh = sca_phys >> 32;
+> -		vcpu->arch.sie_block->scaol = sca_phys & ESCA_SCAOL_MASK;
+> -		vcpu->arch.sie_block->ecb2 |= ECB2_ESCA;
+> -		set_bit_inv(vcpu->vcpu_id, (unsigned long *) sca->mcn);
+> -	} else {
+> -		struct bsca_block *sca = vcpu->kvm->arch.sca;
+> -		phys_addr_t sca_phys = virt_to_phys(sca);
+> -
+> -		sca->cpu[vcpu->vcpu_id].sda = virt_to_phys(vcpu->arch.sie_block);
+> -		vcpu->arch.sie_block->scaoh = sca_phys >> 32;
+> -		vcpu->arch.sie_block->scaol = sca_phys;
+> -		set_bit_inv(vcpu->vcpu_id, (unsigned long *) &sca->mcn);
+> -	}
+> +	struct esca_block *sca = vcpu->kvm->arch.sca;
+> +	phys_addr_t sca_phys = virt_to_phys(sca);
+> +
+> +	sca->cpu[vcpu->vcpu_id].sda = virt_to_phys(vcpu->arch.sie_block);
+> +	vcpu->arch.sie_block->scaoh = sca_phys >> 32;
+> +	vcpu->arch.sie_block->scaol = sca_phys & ESCA_SCAOL_MASK;
+> +	vcpu->arch.sie_block->ecb2 |= ECB2_ESCA;
+> +	set_bit_inv(vcpu->vcpu_id, (unsigned long *)sca->mcn);
+>  	read_unlock(&vcpu->kvm->arch.sca_lock);
+>  }
+>  
+> -/* Basic SCA to Extended SCA data copy routines */
+> -static inline void sca_copy_entry(struct esca_entry *d, struct bsca_entry *s)
+> -{
+> -	d->sda = s->sda;
+> -	d->sigp_ctrl.c = s->sigp_ctrl.c;
+> -	d->sigp_ctrl.scn = s->sigp_ctrl.scn;
+> -}
+> -
+> -static void sca_copy_b_to_e(struct esca_block *d, struct bsca_block *s)
+> -{
+> -	int i;
+> -
+> -	d->ipte_control = s->ipte_control;
+> -	d->mcn[0] = s->mcn;
+> -	for (i = 0; i < KVM_S390_BSCA_CPU_SLOTS; i++)
+> -		sca_copy_entry(&d->cpu[i], &s->cpu[i]);
+> -}
+> -
+> -static int sca_switch_to_extended(struct kvm *kvm)
+> -{
+> -	struct bsca_block *old_sca = kvm->arch.sca;
+> -	struct esca_block *new_sca;
+> -	struct kvm_vcpu *vcpu;
+> -	unsigned long vcpu_idx;
+> -	u32 scaol, scaoh;
+> -	phys_addr_t new_sca_phys;
+> -
+> -	if (kvm->arch.use_esca)
+> -		return 0;
+> -
+> -	new_sca = alloc_pages_exact(sizeof(*new_sca), GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> -	if (!new_sca)
+> -		return -ENOMEM;
+> -
+> -	new_sca_phys = virt_to_phys(new_sca);
+> -	scaoh = new_sca_phys >> 32;
+> -	scaol = new_sca_phys & ESCA_SCAOL_MASK;
+> -
+> -	kvm_s390_vcpu_block_all(kvm);
+> -	write_lock(&kvm->arch.sca_lock);
+> -
+> -	sca_copy_b_to_e(new_sca, old_sca);
+> -
+> -	kvm_for_each_vcpu(vcpu_idx, vcpu, kvm) {
+> -		vcpu->arch.sie_block->scaoh = scaoh;
+> -		vcpu->arch.sie_block->scaol = scaol;
+> -		vcpu->arch.sie_block->ecb2 |= ECB2_ESCA;
+> -	}
+> -	kvm->arch.sca = new_sca;
+> -	kvm->arch.use_esca = 1;
+> -
+> -	write_unlock(&kvm->arch.sca_lock);
+> -	kvm_s390_vcpu_unblock_all(kvm);
+> -
+> -	free_page((unsigned long)old_sca);
+> -
+> -	VM_EVENT(kvm, 2, "Switched to ESCA (0x%p -> 0x%p)",
+> -		 old_sca, kvm->arch.sca);
+> -	return 0;
+> -}
+> -
+>  static int sca_can_add_vcpu(struct kvm *kvm, unsigned int id)
+>  {
+> -	int rc;
+> -
+> -	if (!kvm_s390_use_sca_entries()) {
+> -		if (id < KVM_MAX_VCPUS)
+> -			return true;
+> -		return false;
+> -	}
+> -	if (id < KVM_S390_BSCA_CPU_SLOTS)
+> -		return true;
+> -	if (!sclp.has_esca || !sclp.has_64bscao)
+> -		return false;
+> -
+> -	rc = kvm->arch.use_esca ? 0 : sca_switch_to_extended(kvm);
+> +	if (!kvm_s390_use_sca_entries())
+> +		return id < KVM_MAX_VCPUS;
+>  
+> -	return rc == 0 && id < KVM_S390_ESCA_CPU_SLOTS;
+> +	return id < KVM_S390_ESCA_CPU_SLOTS;
+>  }
+>  
+>  /* needs disabled preemption to protect from TOD sync and vcpu_load/put */
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 8d3bbb2dd8d27802bbde2a7bd1378033ad614b8e..2c8e177e4af8f2dab07fd42a904cefdea80f6855 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -531,7 +531,7 @@ int kvm_s390_handle_per_event(struct kvm_vcpu *vcpu);
+>  /* support for Basic/Extended SCA handling */
+>  static inline union ipte_control *kvm_s390_get_ipte_control(struct kvm *kvm)
+>  {
+> -	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
+> +	struct esca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
+>  
+>  	return &sca->ipte_control;
+>  }
+> @@ -542,7 +542,7 @@ static inline int kvm_s390_use_sca_entries(void)
+>  	 * might use the entries. By not setting the entries and keeping them
+>  	 * invalid, hardware will not access them but intercept.
+>  	 */
+> -	return sclp.has_sigpif;
+> +	return sclp.has_sigpif && sclp.has_esca;
+>  }
+>  void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
+>  				     struct mcck_volatile_info *mcck_info);
 > 
-> The test would also fail to detect if KVM completely skipped the instruction.
-> 
-> This is not rocket science.  If you can't make your test fail by introducing bugs
-> in what you're testing, then your test is worthless.
-> 
-> No need for a v6, I'm going to do surgery when I apply, this series has dragged
-> on for far too long.
-
-Understood. I agree the test should catch such failures — I’ll take that into account in future work.
-Thanks for the review and for pushing this forward.
-
--Manali
 
 
