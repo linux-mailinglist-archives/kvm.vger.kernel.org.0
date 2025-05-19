@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-47047-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47048-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D05FABCB7A
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 01:32:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBFBDABCB7C
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 01:32:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00E207B0864
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 23:30:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 666407A1206
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 23:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5086C224B01;
-	Mon, 19 May 2025 23:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029D5225768;
+	Mon, 19 May 2025 23:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Uak+riy0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zcece23w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07599224243
-	for <kvm@vger.kernel.org>; Mon, 19 May 2025 23:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868F62248BA
+	for <kvm@vger.kernel.org>; Mon, 19 May 2025 23:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747697316; cv=none; b=A7ouebAIeCU8k/49mgvDQPwkoDUUPzzuYhTl4tRvsEN5MGMfqItSXstnVQ6p2myBRwMOdi/HF4aRLPlsKdz6PB3SxgB4M8q9KrgaVqcIh2+ctid9Gy+SiS8tUIY3+ERgs5XvUE+mBk53+mM77vxzeQT/EavOKkZRr9rRAsuWDX8=
+	t=1747697318; cv=none; b=l/n4i7W5Ah07c43G76RI3KNHS7D5KVxCQV9aseUbGIFVBHZwmuqG1KsNxESyEQBR1iIVhLrFnu9aAbfd8OExZnHTl8CTkinNmV+DsJ6f+vAz8q6ETa4OapCIEXYOo0lUCicuaHMq//3hx2iyKGntYxQkNJuSXaNpsead4ZlG3zU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747697316; c=relaxed/simple;
-	bh=kXdCtkWuECHGgWR2OT6Gy3/nttBLueu1XR40dPgOpQg=;
+	s=arc-20240116; t=1747697318; c=relaxed/simple;
+	bh=qQIM5Tr5nBvDkLCbk46mds4m9dIPyNzVYzD4a6yvVvY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hDu0WBLxak1ydM6bpJg/7AG9+HgyZu2cKSVW04TUz1UFKpdcr3zrLSL7iP14m2Gg5RPilVBqFxlm+vshV7aTtBeh1dHya/uMw558nrjPNm6AsW4lOvqGn/+N+WpNJQAk6FhxQIH5Hi07gIqdVsHiZYDoMfI5RIJmvdyPwhE7V9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Uak+riy0; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=Y1TVzMpNAsDWHuts79+U298agp+p/wJNMb/jYfbYD4auuadl0QDrYMgLZISGWryrB+xm+PSXqs6xVFLzIa2y3tOznohUNX+xfox/DI5Uj7UgeCvA+tqQ7DaX50v6yeTeTGXk5y9bqcWp4D1Ik19YnJECeTdfktmbwTSD5BZBof0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zcece23w; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30a29af28d1so4024206a91.0
-        for <kvm@vger.kernel.org>; Mon, 19 May 2025 16:28:35 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-74292762324so3692489b3a.0
+        for <kvm@vger.kernel.org>; Mon, 19 May 2025 16:28:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747697314; x=1748302114; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747697316; x=1748302116; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=9gLcS+OzRCY/eRWGmdNSRPdTQEpCa40B7+xlZSCIkqg=;
-        b=Uak+riy0pk/lDPBqauIjSQ6y6gTKbo2844R+OrpbLvLBd9K/P8kWdBTPCZT9pFZDzY
-         u7lCpONqecUQjGvGO85+bQSSa66pPhTVPovx0O/UvE3NSesM0ZI624lYgsuq0DbfGwUF
-         tK+NfT/x56sFkKnGnGNXtWHk3nGVdMofRMtE2WBua1avIFiZ4cp6VYRd3y+pVhEV+Mjc
-         ZiFDYDdcaD3WqZHRgYwrjfupuvYrQK10kK/vBY1x4l2xhW8m5eoZrZOC9pqF0rb6Xw3P
-         zGmWd3sNmll6LanF35Ktm/Z29+ZtKXQuZU/L9ALDQtX4VmeWYqK7xBU2pwuE3+fCVPAZ
-         nr/A==
+        bh=jzqljEkDXtAFBsLi8kcGKkXBiNdwCtNEp6kp2mMRpEQ=;
+        b=Zcece23wVKa7V75EID6upDRAziP9YbnhojNHdyIbEHBbvy4AnyVRAU1G2Y9FNSrXhX
+         FjHSTK1ZDRz1yFOxNGuXDT49+q9GdVupeUbiDwes56qZ3p2rPUOhJJTtHUk9ygPqZK2C
+         osgHOOMPnxvo5DWljbjXd/pRmJs4Bzgl30VLn37JNbrvjFFK5G9SE2iWcqkz7ecHXG/r
+         XP5y8lhSDV623bd3HEy5m5j8Bh7aBNx8h+uHx3vkxY9z9X4W4oiEk2b41J5W7mQEBop9
+         g0kMT1bysHu9a8G04eTgmS0YJyvPlAd7OLjbIRHaryK01K48igaFvnJb7kOwQm0yfJGy
+         7Xwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747697314; x=1748302114;
+        d=1e100.net; s=20230601; t=1747697316; x=1748302116;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9gLcS+OzRCY/eRWGmdNSRPdTQEpCa40B7+xlZSCIkqg=;
-        b=W5sxr5vsjqKYEQey97uJxRx8IsiCLhXmkvubStRyNsUaiXq7h434l5Aas0tANssf91
-         ZDOWgAexhDn8YPM5i92SX+NHjHQP2iZobovOi9mLxRtLoC9VLyqemT5gr5Ay33SbphbN
-         lULEMrbh3OS98k4Wi+beATMCI+bx4j6DLSv3894/AUaUI62o90aAM3YrsyEUcGDvj2N6
-         kwqGQt3CJmN76eievi2dPEbEmdxCxMoIlXYQmQC7QBhh7OAipNw7VJmzZCfoj/LyCi+B
-         wX6Djx2y0htMlEUUqhA3BJsKDC4kErtrmM8t4yuzJt1NYtPpK/vySD0lRe0alB3PtQfI
-         bxzg==
-X-Gm-Message-State: AOJu0Yygcp/1f9jix+mJTAOMIZRSEGtMQh/jyddVy7iF+CspEGjp+MtF
-	5vgYCJfns6YcYsn240Sc6aE+TKt/Teil23Pa2NZgjPj3vaQ4QzeHPj7DLBLrp1yia9XrvYFmzZV
-	biJW1kQ==
-X-Google-Smtp-Source: AGHT+IGsS44SKP9udDnxbnYqpNtWDNsH2nu1RdF7aCNajWwjT1ZSWe7ZKUxh/RwFmGOpvKqPfnwHgOPVukI=
-X-Received: from pjbsl15.prod.google.com ([2002:a17:90b:2e0f:b0:2ea:448a:8cd1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1343:b0:30e:9349:2d88
- with SMTP id 98e67ed59e1d1-30e93493309mr24785255a91.12.1747697314420; Mon, 19
- May 2025 16:28:34 -0700 (PDT)
+        bh=jzqljEkDXtAFBsLi8kcGKkXBiNdwCtNEp6kp2mMRpEQ=;
+        b=FIpoBGYjhBNsZ7XiGAVOI+kwZy9HnfaFCEcoVmrHPxWaXp4k/1QcjiKdmKMbCfBG8a
+         M80IrNmkpS8WmZ/UEhefHlp8rJXMezQ8laDC4Mdzyq+xCG/ADAqOp6zBuvdEKo/tDL3X
+         5q0O0QNFF39PU1bmZqHD0sPLzpO0Jq6HCG6rtqLsBx69EV2aVDslDCRRqJGaXhX3wIkS
+         +GV0eobQgJIdsdbO2aZpZfiG8qse/4apde18Ko76XFtjCAvb5LwRAcGtIA0628Pf5kEt
+         Zz3SXhn1r0n0OkCqQqDYA5LGLEr7vcAJxJbXkiIBy6c9jpbQ69Er9kREUsJj/DT8Ty+1
+         J06g==
+X-Gm-Message-State: AOJu0YwbrNAG5WxfpqaxuafwqLAJqtVnUO9npUNSPyHcpfcy23jCSlWZ
+	wg43JjwuQIcoCUVsuEqC7GCvD0rwnYEnQJhdLFvGuepWQET7MyQHeiZXKIt7ENX0L0tfnYo3p1t
+	myuvERg==
+X-Google-Smtp-Source: AGHT+IGYPQHinoGic07rRcLqLfD0l06dUYUgvVqfZvDuAHBo4yxWC/GP7uWYn1Sj/q1GSZLdB0srqGbjfm4=
+X-Received: from pfmy21.prod.google.com ([2002:aa7:8055:0:b0:73e:665:360])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:10c6:b0:736:a540:c9ad
+ with SMTP id d2e1a72fcca58-742a98b833bmr19860524b3a.20.1747697315919; Mon, 19
+ May 2025 16:28:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 19 May 2025 16:28:05 -0700
+Date: Mon, 19 May 2025 16:28:06 -0700
 In-Reply-To: <20250519232808.2745331-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,46 +75,49 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250519232808.2745331-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <20250519232808.2745331-13-seanjc@google.com>
-Subject: [PATCH 12/15] KVM: Squash two CONFIG_HAVE_KVM_IRQCHIP #ifdefs into one
+Message-ID: <20250519232808.2745331-14-seanjc@google.com>
+Subject: [PATCH 13/15] KVM: selftests: Fall back to split IRQ chip if full
+ in-kernel chip is unsupported
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Squash two #idef CONFIG_HAVE_KVM_IRQCHIP regions in KVM's trace events, as
-the only code outside of the #idefs depends on CONFIG_KVM_IOAPIC, and that
-Kconfig only exists for x86, which unconditionally selects HAVE_KVM_IRQCHIP.
-
-No functional change intended.
+Now that KVM x86 allows compiling out support for in-kernel I/O APIC (and
+PIC and PIT) emulation, i.e. allows disabling KVM_CREATE_IRQCHIP for all
+intents and purposes, fall back to a split IRQ chip for x86 if creating
+the full in-kernel version fails with ENOTTY.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/trace/events/kvm.h | 3 ---
- 1 file changed, 3 deletions(-)
+ tools/testing/selftests/kvm/lib/kvm_util.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
-index 1065a81ca57f..0b6b79b1a1bc 100644
---- a/include/trace/events/kvm.h
-+++ b/include/trace/events/kvm.h
-@@ -82,7 +82,6 @@ TRACE_EVENT(kvm_set_irq,
- 	TP_printk("gsi %u level %d source %d",
- 		  __entry->gsi, __entry->level, __entry->irq_source_id)
- );
--#endif /* defined(CONFIG_HAVE_KVM_IRQCHIP) */
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 50edc59cc0ca..53116f4ffe97 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1713,7 +1713,18 @@ void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
+ /* Create an interrupt controller chip for the specified VM. */
+ void vm_create_irqchip(struct kvm_vm *vm)
+ {
+-	vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
++	int r;
++
++	/*
++	 * Allocate a fully in-kernel IRQ chip by default, but fall back to a
++	 * split model (x86 only) if that fails (KVM x86 allows compiling out
++	 * support for KVM_CREATE_IRQCHIP).
++	 */
++	r = __vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
++	if (r && errno == ENOTTY && kvm_has_cap(KVM_CAP_SPLIT_IRQCHIP))
++		vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
++	else
++		TEST_ASSERT_VM_VCPU_IOCTL(!r, KVM_CREATE_IRQCHIP, r, vm);
  
- #ifdef CONFIG_KVM_IOAPIC
- 
-@@ -93,8 +92,6 @@ TRACE_EVENT(kvm_set_irq,
- 
- #endif /* CONFIG_KVM_IOAPIC */
- 
--#if defined(CONFIG_HAVE_KVM_IRQCHIP)
--
- #ifdef kvm_irqchips
- #define kvm_ack_irq_string "irqchip %s pin %u"
- #define kvm_ack_irq_parm  __print_symbolic(__entry->irqchip, kvm_irqchips), __entry->pin
+ 	vm->has_irqchip = true;
+ }
 -- 
 2.49.0.1101.gccaa498523-goog
 
