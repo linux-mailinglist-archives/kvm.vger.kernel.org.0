@@ -1,124 +1,211 @@
-Return-Path: <kvm+bounces-47008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47009-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4A02ABC5E0
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 19:49:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B39EABC5E3
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 19:49:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AB9E3A847F
-	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 17:49:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42B781B644AF
+	for <lists+kvm@lfdr.de>; Mon, 19 May 2025 17:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5022E288C93;
-	Mon, 19 May 2025 17:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB3828934B;
+	Mon, 19 May 2025 17:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="id4UoQBe"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A76189F3B;
-	Mon, 19 May 2025 17:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747676941; cv=none; b=rOrdGkCo7581ocLVkd7pyJ1iq+QGuPPC33JRKIpLUFOkYc0WvXApZtHmWE/MluOtr/nleknkPhY6pX1im4DJQCvHlgeyj5sqHim26eeVn7AV9SbhCmwAJs/mzm9Foae/rVJmRd17kn0nvHhFmPOasON/KDEhVzusqv6gBMHA0Qw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747676941; c=relaxed/simple;
-	bh=VZD7KJH98460RHVflDeZoOG37d286qHkE5BrcmtWmXc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iMGqgX9C2DwqHxZDph1ZuXP3yysXQYztYSLfFVj1+c4hFUDgnpKLfaG0a885gnN2QAqK2hMB2AY0fkcO8CF64yU+t/6ugjYWTIWAT1R7Oa+f1RJ2nBKHMfB5WMXk2RwBGboWQR6O746eCOc0/7HVLzSkGAXfiCvMX0oJQCRYxx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 74F0115A1;
-	Mon, 19 May 2025 10:48:45 -0700 (PDT)
-Received: from [10.57.50.157] (unknown [10.57.50.157])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 441CF3F673;
-	Mon, 19 May 2025 10:48:55 -0700 (PDT)
-Message-ID: <9a09a3fe-c91c-457f-b6da-9fccbf98e649@arm.com>
-Date: Mon, 19 May 2025 18:48:54 +0100
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2088.outbound.protection.outlook.com [40.107.236.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC64210F65;
+	Mon, 19 May 2025 17:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747676943; cv=fail; b=F390k+w7/t6JB/hzHvLolQyBDeCiWeE/t0Zks9POYXfoid/J1Ul08gzfCuHTRvTgmUUq9c2EbBiWi+An1Uw74Lh3HpKPb/mYyjBHZyGQo/M+x+WXTlN/mxx/vc2U/9PrgNrs63F7X7oTTePnR39vZkJtHlLQsjjudXayOGRmRWE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747676943; c=relaxed/simple;
+	bh=bXn9qGrD+QYKOIeyGIFdhn46RxPJuhtFmqGiKScDglU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=rxCoWk6FzPFbwXjF9oG5ot3+pKXJbAHp5DQ/vpNE1VB93G2U86Ymq6c3iaT924dFt/hEZhhEgRArECXrUp7vYVrutsnjYyJ06OU+iIdzlH7MTWt7DEl8gm42rO3ayjO6z0+WacMF0Ci6hR+c6i2c71Yy0NrOMDA7Y7cu4RR3LSM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=id4UoQBe; arc=fail smtp.client-ip=40.107.236.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KFcjVzmG9xvOPZukhD+zAxgS77+uDR8lzN2CT1eYRaS7nFTf6eeK8Sy942/dpg3Plc6sXp3cBdDz70/DjCiV8mWjK/gNqew+m2YNlu6spEsC9fo8EsAopuImiMdykRWC1G6Boy0PXtIO2nhxRoyfG98Rw4FtksswzPYWQvsAuV3Q5tdMCjEMfIUKhk3ju/7ES93EMRj0XUKOXYBEVscYCKN2ezHac8kmkyNhb6JRNqvz4HSlC29KNgLrQQWlNvECEZ7JR7fPvL6L6WctQbERIKuRy1fY/4zYQ1zFCvMMu72R7YCPwEqEeRLm/mGvdgQcq5HNSPRyG/CiXGxNAU+oaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+KJwhrby/eMNwIEDmvgeg7W4JkyF2GiInAXUSJNYjvY=;
+ b=NN/2AR4hbjFMs3tKg28PxsAcmvVCt8rMdQBcJeFk9HbRSNc61DRn1t4HphCjL8xknUdYb6F78EuqYkuaWjdP8CI1QK/sAVn0tb1+U1WpOqABrfWOr7SQ2y+CojxwyahW2mEh/cqOf2GYQUsp7ryMqUEDdFW1D/q2vXoMosVqysJACYuv/G9v8TditnbBcEi6lasxGNFHruZJIHV6J7emQXJG0JYRjav5y2P74ZUfO9TJ8n6cPYTbPgC9mI5i68Caexov6zrCLXINFVhN9YGuu8Qi0oPzDcBCx7RwvsN+KE46MUpgvAYSadVBdBQ5Bh5O7l03PIuNceIIyo6GSnSORg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+KJwhrby/eMNwIEDmvgeg7W4JkyF2GiInAXUSJNYjvY=;
+ b=id4UoQBenMubCXEfnMiSEBTsJehCgmCGncLi3GVAKWOHPhhvUvVfe7Evt/0+rx7FKTRJp6EFgpu1+4wWReaZdZaTg13KluvAQO1zEWfSIkRI+Wz/TSiM0bGbu9VZD443MeWd1u+eP5CXxIY7by8tw6h/0pjNeBRecVmiui/SKaI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by CH1PR12MB9717.namprd12.prod.outlook.com (2603:10b6:610:2b2::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.30; Mon, 19 May
+ 2025 17:48:57 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.8746.030; Mon, 19 May 2025
+ 17:48:57 +0000
+Message-ID: <8a16978a-2f02-a9bb-05b0-368e3ee8e284@amd.com>
+Date: Mon, 19 May 2025 12:48:55 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2 8/8] KVM: SVM: Flush cache only on CPUs running SEV
+ guest
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Zheyun Shen <szy0127@sjtu.edu.cn>,
+ Kevin Loughlin <kevinloughlin@google.com>, Kai Huang <kai.huang@intel.com>,
+ Mingwei Zhang <mizhang@google.com>
+References: <20250516212833.2544737-1-seanjc@google.com>
+ <20250516212833.2544737-9-seanjc@google.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20250516212833.2544737-9-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR18CA0020.namprd18.prod.outlook.com
+ (2603:10b6:5:15b::33) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 21/43] KVM: arm64: Handle realm VCPU load
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>
-References: <20250416134208.383984-1-steven.price@arm.com>
- <20250416134208.383984-22-steven.price@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20250416134208.383984-22-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|CH1PR12MB9717:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9e415860-d1c9-49fe-3883-08dd96fd6dd6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?em1taFNPcFk3djJwOW1pdHdDUnlBQVN5QUw1ZHNTVVFuNm52VnV1U0s0Mkhl?=
+ =?utf-8?B?R1MrUDY1NmgzeDZPRkY1cThCeHN6MXJjWDBaMGNaL0o2NjBqam40bXMvRnU5?=
+ =?utf-8?B?NXFCV3U5MGwzWXBiQnFiSmI5SG9Ld040MTFDOHkrY1ltMzF6NDJWcExBZGNz?=
+ =?utf-8?B?UGQrdndoSlJVVy91SGR0dmF2K3NxZElpZzQ0U1ZIZGprOWpMMDM3RDBnMWlD?=
+ =?utf-8?B?b2dYb0dQcmsvanJsMUxRT2xVTEJ5dGdVcldCM2cyU2I4ZnlXeVh5QVFTRDY5?=
+ =?utf-8?B?eXBORnlON0k3VlQ1OHZ6c2Rxc2FwZS9iUXh0NVRyMEQwMXNJTTdWVkt4b3B1?=
+ =?utf-8?B?NHdCVWI4NEZXQ2pSclFqRVZNTTdGKzRRUU1vTjVQNVV6Q3J2L0hJYzJIZGdy?=
+ =?utf-8?B?eTRCWGtENFBkY29ielR0ellRTGpBQXRrSmk2OGM0ZVQwZkRiR1pvMUF0ODc2?=
+ =?utf-8?B?bFhCeWhKZlB1YzlBTFI2SHNHOFAvUnNOZkhOUWFmaVVYYXBBMld2d1hCSmhj?=
+ =?utf-8?B?bkU2UmVPN1h0Z3pzSWZkMnMyQnVmV0U2RHZ4YXVrMzZleVcvb3JnYUZXeVRn?=
+ =?utf-8?B?REVQTmNTZmUyb1h5Y0ZtcjltVS9sWmhyUHdRMWhzS1oxT3Z0VVRxSFd3T3Bz?=
+ =?utf-8?B?eEVJV2s4ZGRpTG9CejZWWE1QRXluS1JLU0twazhnUW5WVTAxWjZJcElEQ1lB?=
+ =?utf-8?B?YnRaZUI2UDZ2enV0WGx3Qm5CakpDWG1QRjVXRGVTc0tGYk9pZS8yY2ZVaE5r?=
+ =?utf-8?B?TlUyZFIyU2hHa1RjQ1lMYzE0ZDdkenM4YUZxNU1NcVZVRFpkZUFTTlBtb2dC?=
+ =?utf-8?B?bVVZM0ZBdGVZczZGZ24vb05KbUdUVDhwK1JmTHpuU1VYN0ZpNHlSRzNGTHE2?=
+ =?utf-8?B?QldRNW9hWXdUQ21RQmJRUkxra3B3UUVvSlhhc3F5UjJuNXQrUGFhN2N0Smww?=
+ =?utf-8?B?MTFDVmVoTnNZOGpWRUtYWVVVdW9TSEM2eUtjbWo1TEJCakEwRENvTlhBK2pU?=
+ =?utf-8?B?YkR2NWJOK251azMwS1d3ZmUxaGo5SXQxclpIVVEzRTlZQnlzeHBKMzY1a01Q?=
+ =?utf-8?B?cEVZWGtpREtBQi84OElhcURSWFdNL0NCdFV6dVV6d283RkF1Y2hlWDl6aXpp?=
+ =?utf-8?B?L3FQdktzbXR1Y2o0SjRVT0lOa2h6OHdHWmU0TGNnWm43N2ZrZzNTbm1EVml3?=
+ =?utf-8?B?Z2NnNVpDZjFnd0E4M1dYdjFuUFJpSzl1OS84MHU3bzZ5Y1dXWTBkSTNKek45?=
+ =?utf-8?B?WWF2UGVTVStMS2JLUHkzNjNEZ2x4MlRFcEZ3eVBBdWdOQjJLRXJwaU1kWDRl?=
+ =?utf-8?B?OG5Ja0xSNllxaWo0cUtDNGlXZkNURjY3SFhHUzJFbUcvTDlKVDc3MjR4OVN4?=
+ =?utf-8?B?akd5UW12c3cxMUtZUExhOWMxNmlRa0gyVVhCSEZHZVBLUk1GNXk3OEhxVE9k?=
+ =?utf-8?B?Z0N5aU9lVWNpOFk5TjJtbmVsUFpScExhUU9QZmVVUUoxdHZ4cVRiRXJqZ1R5?=
+ =?utf-8?B?QUxLWUFXU1ZOYTRYVXpQQkR3NmhnOTQ3bGQxekN5NisrS011ZmdGV3hvWE9r?=
+ =?utf-8?B?c2tEVVJEaTJSU2tUVXRRU21FSU5MS1ZCa0EvdTVMVHNTb1dNTXNlSGwzUDZr?=
+ =?utf-8?B?OWdPYytiUk1RbHJlK2toS1V1RVJ5Mm5aMnB1UE9sbmFsS3o5Mi9mc3VnLy9x?=
+ =?utf-8?B?bEErRklsdDJRTVYzd2JEaEtWZjlzTkJobWx2Z1YyRjF4RjRoNGVEcGVQY2t2?=
+ =?utf-8?B?OEZzaTZzSU9rZkFwOTFtRGR5N0l4dDRoQ1RCd2N6M0VEdWFFS0RCN0l3dzd2?=
+ =?utf-8?B?MDNkRHlldlkyTDZ2UjBVOTlEZFd2VVBLU3d4UG9QRW9Od0Y3RllhcGRGaGFt?=
+ =?utf-8?B?cWJvVjgrOFNQSUdHUFJTRHVOZWxNb3FzeXozZ0hKbklOcFdrN0V0Y0VxbGhu?=
+ =?utf-8?B?UUtoUWp3RXZINVNMRThCcDI4WW5HaWdtUjVIZUlmcWRrSS9lcDhmRms3Mjc3?=
+ =?utf-8?B?c2FLYzdqdStRPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WDg2dDJEM1ZTWFE5RU5TWUFqYnFvOUJ4dWx2YTdNb3ZMbFBhWTBvMWhUVkt3?=
+ =?utf-8?B?RmthMWY3Q1h3R1hHcVdQQUhqby9OWW1PT0hOQlRWZGt1SFZVRWR6MzJJTkNC?=
+ =?utf-8?B?d0Y0MEhhYmFBRG1pbEhxZGxXdWN5cm9Sb1dWYjFrS0NGSm93eDJJME1lN1Fx?=
+ =?utf-8?B?UGlScno3TGxXMW5ONDFJcHVEWk15clF1YVdla2QyVmQvRENTR3hmSi83eWds?=
+ =?utf-8?B?SGxRLy95dTB5TjJ2bjZSTmdxOGdZc01wUW95VG84ZGxWMWNSOVFITjB5Y0NY?=
+ =?utf-8?B?Ymk1ekJQVUhjRGxVNFp5M1dUVXpTUVZhdnUwMUdCNE5CUjZ2cVI3cm1KY2tn?=
+ =?utf-8?B?Z1JOOXQxQUhJeFJRNEV5dW1YUkJwbWlNdFBSVllpSEE5WDNjcUgydDcyOTdF?=
+ =?utf-8?B?Y3VZMWpHTTdMYWlEOVdkMXNadGhNMXI1bm5aVzZwZ0lsR2tRQ1RHUDhHSWxq?=
+ =?utf-8?B?c045clE3WjBPcE5DNzJJVUJzZzdOZ3B5UnNvRUtaRkVhWHhIY1dFUVMwS0Z6?=
+ =?utf-8?B?ekxkNGR4b0ZiajlMaTJkdFVtdm8rSExqTnI1eGdZOU1waXczemgwb3c4bG5Z?=
+ =?utf-8?B?ZHU2M2sySmhGdFhjdkVhaFNhL2VPU3ZFbFE5VzlWb1dwdkhCbGZqQ1JHTk85?=
+ =?utf-8?B?eHRybjY1L1NndE9TVGJHRk5qUmI2eGpwT0RKSEhTUTJwOW13Q0lnUm5zU29P?=
+ =?utf-8?B?bjhqR0F6Z1hraHdsQkg1ZzRSZGVSSStUd2wrMmFaN24vREN2U3o2YnJyNGsz?=
+ =?utf-8?B?SnlPeFNKeEFTZm1IeEh2Mm5UVFhwTXVRL2p0aUppRGEwbUhNdk9SMUFJaitI?=
+ =?utf-8?B?NE1LdUtXMnZoUXM3OWE0V3dHZHl6cnpvNVBONGpwNTNrSXdTVXFUNUJEOHU2?=
+ =?utf-8?B?eUpyRk1IM3RkeGE2d0pUS3ZqL0dUZWEwS0hNeHUrRnJpckJiaU1ESGc0c1k1?=
+ =?utf-8?B?cDZWMDJZWHByVDdkai9HNkhGT2NMNTNWLzcxc3dTYlBuMjJpMEU2dDV0Z2Ja?=
+ =?utf-8?B?WjhaL1YreU5FL3JtTlZDK2xqSzZjNTZNZ3BodVdCZmRnMVN3cW9ER1g5bkZ0?=
+ =?utf-8?B?bG1yQVNJSEhKWHV5VnNuanNkL1hHeis4L2xWanRPSFNPbG41cEFZQ050YVJD?=
+ =?utf-8?B?cmtpSVpBWkcyNk9XZHFUZVhHRmNzWTBVK210SFR1bUlqUmJmcE1mdGVyT2d3?=
+ =?utf-8?B?MSs5bjkvQVV1MjFxSENpUjErL2RER1lGRmc2dlF0c3ZqZ2xNbmV5aEdrWS93?=
+ =?utf-8?B?ZTg2TmFaTEEwd045NmM2NTJRbnlTQVgwZmNnSmFjZllYTG9Yb3d3emxuVFZI?=
+ =?utf-8?B?UHZUbmIwV1dmVHN0WUVtQmxidldHODVlRXNPQ0x5ZjBhTTQ5cDdaWWR1ZndP?=
+ =?utf-8?B?RXRUSjRmT3dsVVI4eGNJbWUySXA3SzlPbHlVbzVKK0Y1ODNscUxGZnhLbitw?=
+ =?utf-8?B?NlV0K3FTWEE2M1N6UUVtd1MwSHNlM3I1eFB2ckcweFY2NEw1QXk3WS9HclNW?=
+ =?utf-8?B?czk1T3FoUmdjUytRZ1VjZlV0N04wT0ZGL2pabEFRM2ZlS0E1VithTHp6SEtM?=
+ =?utf-8?B?UEk3T1JUWUxLb3dTeFRuSWxOemdSKzVEVzkwcFFsRzJVazRXa25tSXNYVG9v?=
+ =?utf-8?B?R1VMNG1pY0ZLRGJUbzloVFVna0FTVi9VMDNFbFMwbzNWSHpTUGsvVTcrYjk3?=
+ =?utf-8?B?YUNhWUExUkdlbit3RHVXckdpZzdxNGN6Mk9ic3FxSGo5SHJhOWpGLys4TmhC?=
+ =?utf-8?B?K2ZmWHkvZTdRTHMrakpEWWNGM0dNeDcvc1p2Slh6a21xbmhqVnl4S2poQnYw?=
+ =?utf-8?B?VWhnT3I3OFEzQnpTRzdlY2k2azZaSkRKWFd5dHd6VjkyNFFPUm5pb2lSWTQy?=
+ =?utf-8?B?QWpnNEFSczdSemViN1VDZCtTUVJNdjJqNUJtdmxvTXQ5cFU1WEw0NFlhcGd6?=
+ =?utf-8?B?WXJFMEY3RmgyL1k4UGV5dGc4cXBRSFlpQUVMYi9mWEE0NWdIVDBFbWl4Y3po?=
+ =?utf-8?B?WXBSNWx3ajBuSTNkZmJsTndHVEZXeFdDY1hrdmxpd21aODQ4Z09ZSnNoNHlI?=
+ =?utf-8?B?SVZUUFRiQlgvdFE0alM2dTIvWG82UzN4VkVXRlB2TzJ2aXhaL1htSVFnNEc2?=
+ =?utf-8?Q?NLafyca4QrLJXWZB4IujIPFtQ?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e415860-d1c9-49fe-3883-08dd96fd6dd6
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2025 17:48:57.2416
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bUZmr+mtbDg6mipb05rlrWHzeKAauQgC9LtIQwb+bnXIDFH0FwI12XT3RolbxP3iBTAbf7zJ+490rGmlOuui1w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PR12MB9717
 
-On 16/04/2025 14:41, Steven Price wrote:
-> When loading a realm VCPU much of the work is handled by the RMM so only
-> some of the actions are required. Rearrange kvm_arch_vcpu_load()
-> slightly so we can bail out early for a realm guest.
+On 5/16/25 16:28, Sean Christopherson wrote:
+> From: Zheyun Shen <szy0127@sjtu.edu.cn>
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> On AMD CPUs without ensuring cache consistency, each memory page
+> reclamation in an SEV guest triggers a call to do WBNOINVD/WBINVD on all
+> CPUs, thereby affecting the performance of other programs on the host.
+> 
+> Typically, an AMD server may have 128 cores or more, while the SEV guest
+> might only utilize 8 of these cores. Meanwhile, host can use qemu-affinity
+> to bind these 8 vCPUs to specific physical CPUs.
+> 
+> Therefore, keeping a record of the physical core numbers each time a vCPU
+> runs can help avoid flushing the cache for all CPUs every time.
+> 
+> Signed-off-by: Zheyun Shen <szy0127@sjtu.edu.cn>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+
 > ---
->   arch/arm64/kvm/arm.c | 13 +++++++++----
->   1 file changed, 9 insertions(+), 4 deletions(-)
+>  arch/x86/kvm/svm/sev.c | 46 +++++++++++++++++++++++++++++++++++-------
+>  arch/x86/kvm/svm/svm.h |  1 +
+>  2 files changed, 40 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index cf707130ef66..08d5e0d76749 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -644,10 +644,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-
-I think we use the pkvm hook to skip to the nommu goto, to avoid
-the VMID allocation and context flush.
-
-
->   	kvm_timer_vcpu_load(vcpu);
->   	kvm_vgic_load(vcpu);
->   	kvm_vcpu_load_debug(vcpu);
-> -	if (has_vhe())
-> -		kvm_vcpu_load_vhe(vcpu);
-> -	kvm_arch_vcpu_load_fp(vcpu);
-> -	kvm_vcpu_pmu_restore_guest(vcpu);
->   	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
->   		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
-
-We could also move thise pvtime to the bottom too ?
-
->   
-> @@ -671,6 +667,15 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->   			     &vcpu->arch.vgic_cpu.vgic_v3);
->   	}
->   
-> +	/* No additional state needs to be loaded on Realmed VMs */
-> +	if (vcpu_is_rec(vcpu))
-> +		return;
-> +
-> +	if (has_vhe())
-> +		kvm_vcpu_load_vhe(vcpu);
-> +	kvm_arch_vcpu_load_fp(vcpu);
-> +	kvm_vcpu_pmu_restore_guest(vcpu);
-> +
-
-With the above addressed:
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-
->   	if (!cpumask_test_cpu(cpu, vcpu->kvm->arch.supported_cpus))
->   		vcpu_set_on_unsupported_cpu(vcpu);
->   }
-
 
