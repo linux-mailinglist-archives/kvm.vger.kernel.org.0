@@ -1,95 +1,117 @@
-Return-Path: <kvm+bounces-47160-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47161-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0659EABE112
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 18:48:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7928ABE114
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 18:48:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C2FE8C1E1C
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:48:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16F578C39E9
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:48:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B302726D4D5;
-	Tue, 20 May 2025 16:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214BF2798E1;
+	Tue, 20 May 2025 16:48:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ucbEUtwH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MAL9HM2n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A2D22083
-	for <kvm@vger.kernel.org>; Tue, 20 May 2025 16:48:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96E821D3F3
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 16:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747759698; cv=none; b=VpUjfbPz8z1W8V+TcCprh1DJUf27XaqxbYMBLCSM7OdED2ljaNXKg6tN72No/ARNaOnTipV4QYQh1DwFSB2ODjBUYKMDYXZDlnMK5jXiloxEZcRzoydGO1KVy4hEQX63uhVAAOVtYQ4bCDa130ZJj3kJwrVoTAhcV9gwO8wyxR0=
+	t=1747759706; cv=none; b=oTjLRAVf81Xsd66P98g0DWuNWquLEwup8BSlvNK3xD3xm94sGEq0bIATpn3T27Fj9EaYv9MmrLIwYmf4esz4SShfNZtA6L88KWqPPtnm48TzUZCRPGgZEWL1yHaxir4v6lGzP0/tT7oq1P/npZTIYNqhBBeEYeLNvriHZ5TiJ3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747759698; c=relaxed/simple;
-	bh=vaG1AyiwufvK/q6V0BdgNfGV5ktSt1kaK+/KaMzgyxU=;
+	s=arc-20240116; t=1747759706; c=relaxed/simple;
+	bh=VKOLyd+fTgXxi0xSU7seE7QvEy9DHjhT9JyUqMZjDXk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fnDli9eZ+T1Pstq5Cu9z/vgasIgmFuv9vUC903liOoy+ngP8gURV0Ccwx2q3BRK9Vqaa3nROGcg2hj4pxmHQkeU8aF5tdCmpb42PmcAWyAATohjGnjN3h4MdnelPjafGGEM5A7WwPC9aLUFFYPQjths6tbOAZD4WLcYpRt0PJNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ucbEUtwH; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=Yja5wjFqCsZwdeClRvdAVIF3d9w/0d9S9OaSz5uYTsibzNVb1Td25HhGT+eqqNMcwqczk5EuiNFiE6KYh2K7FeqyNq8ovpOSRPZ04zzo7ker3cCdhPt0eLgzSIRnwTREGNrkn3Ulwf+d1wZdf8fdDUjDXsSceoHb3hx/s9TLG74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MAL9HM2n; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b0e5f28841dso4056900a12.2
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 09:48:16 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30ed6bd1b4cso3881697a91.0
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 09:48:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747759696; x=1748364496; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747759704; x=1748364504; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K8+YuUSYlYqZjaqVi8KvARVNCx6CmbgvfMwxteqHVYw=;
-        b=ucbEUtwHFUacrbqMXKkYJF2KNj/F986Jokx3womWSvJLzsdyzIQJhJUAD+xhCIRI6W
-         4pKylJcAkMPcmS5Iji65Vh0ayO2CFCStC4PRwj5vHemWxoB3+i9Dyn84I3rwnytJoQxd
-         W3rzIy1wbIYwjJwihtfDSCkQSAyMQyc8w4dRLeXj3T6P4lvhfunfbmAaJeGl9ybCJmTI
-         8IMyR/s1XradFshsuKwp7Hy97yInB0E6WPONbl9W6wXmCgRZ/JB2fUoSHzazOAakAKJt
-         XPBbsMentzSHMUuJU88Pu/D9/+5nIylmrex3U2UME5znsJYTU2GE9YosuQesyVt2w6Dr
-         RxhQ==
+        bh=wcl6TqUwD54tFkNVg+Ri/3Cun2a33c9FWRAhj6V56jQ=;
+        b=MAL9HM2nG1K00TOdPGQrZMeQdy+sdujtHwdyk8bwp0aI9KalteiNX67XmAIs4Osnnv
+         kGHhYbzi+jamSyQHP+eJ6Rzoc/RMGbmcSw3r2BoTrXHVRvI+IWi42BVnVTHEC1/OKRjK
+         NW1XeGs2QNp73agFaMJtZ2Qru3L2QYP5n3pR70PevR+yW38HV682xxBaYg8q/dhaTj3L
+         uEeFl/I4p7gq/FewAVotkSETtLS87Zho26NA5PfOd36hOuAr73jHQdyz4i6PQGvraYnF
+         FzI/zlktwm8WGshF3G0q9ByYjQVvvNsixDomALSjMCxjtR7JdwbksLdrV4OsLid0RcEh
+         pbZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747759696; x=1748364496;
+        d=1e100.net; s=20230601; t=1747759704; x=1748364504;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K8+YuUSYlYqZjaqVi8KvARVNCx6CmbgvfMwxteqHVYw=;
-        b=MYEVn2cqQfPuHwD66QOiJnvHw08K4G4rjQeIG/mhsArTKeDwkAqDTXmp510So9B+Ku
-         ZrfgztL5nPEGnoAVGnJI11GfpdGTw4V+afnR554al7ega+lxOHMUfwrelMdZm7ZD3dmj
-         Us9LUftGSY4/TtnGD0nbXM4YYToehOvEXISV2N80ufrQ5bRrLfBmr7kf5cH/d8Tqjo5h
-         ay/rSg8DRpt3d7nn2ZqWaA79ibv8DpqZOyywF9ockWo8TAjTjTYWLd/gQJrmo5iv1+hw
-         9i9CaI+PBXeIAk5k5DytSbIwGAXFfQXutgoQ4nsEzSo/HxTxOa72tNO0cOdj0LDMWneP
-         47pw==
-X-Gm-Message-State: AOJu0YwdSDZw1KyWGzBJlsgM8W5HpiyBiNRbqjslGhakFPP4xdD/UYyl
-	KWpC/7urIfNCrm5wBHdDM1RiCpsufNbPnSnFIScejPqXBkgPe/mxtbSPJCk6OmaDrPQq3Sy8d2A
-	C7XNmug==
-X-Google-Smtp-Source: AGHT+IEu/JMVZpzEiP5lovevj2HceA3rlhx10tlMh6Wzo0F+yguDjIYER5h4LnHBtzjgdiGXgmK1YFTBLWk=
-X-Received: from pjbqj14.prod.google.com ([2002:a17:90b:28ce:b0:308:7499:3dfc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2644:b0:309:e195:59d4
- with SMTP id 98e67ed59e1d1-30e7d52b166mr34112928a91.12.1747759695854; Tue, 20
- May 2025 09:48:15 -0700 (PDT)
-Date: Tue, 20 May 2025 09:48:04 -0700
-In-Reply-To: <20250331182703.725214-1-seanjc@google.com>
+        bh=wcl6TqUwD54tFkNVg+Ri/3Cun2a33c9FWRAhj6V56jQ=;
+        b=EYx49aC6tjAJ3nK97NdU6FdukD+hh4kzKK0c+mSTJ68aFhNR9ufbEe3ELtyBn6OEcr
+         moo1Xqp8lU7h/kQ3wiLgtgTpDGk+sT6wjDbD5n8pK5nPcfEjgnjO+kODjT82jls7aO6o
+         CrvjMFxxhwJknxzC4DZT//B3UriKn7HmIwNKkXvl456wsOQj7i/YXM+XduAVJ5Llrktn
+         A7RxWn1bvQK91NQ9EPO1/iWSNj4H24bfMBAaC7nb3XSqkOO/D7k1mHMzzA6Xmolq7XYq
+         uLcEuWu9404eU7i3pKolgCP29mJIF18NjqJv7wRQB0VfLf4Qr9Vaq63d4qoFHuZlCMb2
+         an+A==
+X-Forwarded-Encrypted: i=1; AJvYcCW+QRzAVs4seghRKSEIuSC+drn//liw8rHGLRq1x1VhqnfzH8Tbh3GU0eibsfYMXxfLFnw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPnWGo5X4A8v6IGMmIaeENhl/8kazmcFQn3ZhRHojZHUbf+VXu
+	NKqcUu0ByveWIailo9Wd6nJNBwaJotXZuNZK5fzjGKm+yf5El0+xZZaLWKMHRAhywfkPrpghdhA
+	Rvk8u8A==
+X-Google-Smtp-Source: AGHT+IHWuapVqe0x+t6XHz6AnLhy46gF3CLB1xUoma8BHmFx0DTfNmTB/vRYZiHtoCJbxgU+GsCHbokk230=
+X-Received: from pjbee16.prod.google.com ([2002:a17:90a:fc50:b0:2fa:15aa:4d1e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:33c2:b0:2ff:58b8:5c46
+ with SMTP id 98e67ed59e1d1-30e830f7b18mr26615931a91.8.1747759704142; Tue, 20
+ May 2025 09:48:24 -0700 (PDT)
+Date: Tue, 20 May 2025 09:48:06 -0700
+In-Reply-To: <20250508184649.2576210-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250331182703.725214-1-seanjc@google.com>
+References: <20250508184649.2576210-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <174774841895.2752531.5751818794863605913.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Use kvm_x86_call() instead of manual static_call()
+Message-ID: <174767770635.2666521.3146495513676301743.b4-ty@google.com>
+Subject: Re: [PATCH v4 0/7] KVM: selftests: access_tracking_perf_test fixes
+ for NUMA balancing and MGLRU
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	James Houghton <jthoughton@google.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, mkoutny@suse.com, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>, Yu Zhao <yuzhao@google.com>, 
+	David Matlack <dmatlack@google.com>, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, 31 Mar 2025 11:27:03 -0700, Sean Christopherson wrote:
-> Use KVM's preferred kvm_x86_call() wrapper to invoke static calls related
-> to mirror page tables.
+On Thu, 08 May 2025 18:46:41 +0000, James Houghton wrote:
+> This series fixes some issues with access_tracking_perf_test when MGLRU
+> or NUMA balancing are in use.
 > 
-> No functional change intended.
+> With MGLRU, touching a page doesn't necessarily clear the Idle flag.
+> This has come up in the past, and the recommendation was to use MGLRU
+> generation numbers[1], which this series does.
+> 
+> [...]
 
-Applied to kvm-x86 mmu.
+Applied to kvm-x86 selftests, thanks!
 
-[1/1] KVM: x86/mmu: Use kvm_x86_call() instead of manual static_call()
-      https://github.com/kvm-x86/linux/commit/6a3d704959bd
+[1/7] KVM: selftests: Extract guts of THP accessor to standalone sysfs helpers
+      https://github.com/kvm-x86/linux/commit/d761c14d902e
+[2/7] KVM: selftests: access_tracking_perf_test: Add option to skip the sanity check
+      https://github.com/kvm-x86/linux/commit/26dcdfa01c33
+[3/7] cgroup: selftests: Move memcontrol specific helpers out of common cgroup_util.c
+      https://github.com/kvm-x86/linux/commit/3a7f9e518c6a
+[4/7] cgroup: selftests: Move cgroup_util into its own library
+      https://github.com/kvm-x86/linux/commit/2c754a84ff16
+[5/7] cgroup: selftests: Add API to find root of specific controller
+      https://github.com/kvm-x86/linux/commit/38e1dd578142
+[6/7] KVM: selftests: Build and link selftests/cgroup/lib into KVM selftests
+      https://github.com/kvm-x86/linux/commit/b11fcb51e2b2
+[7/7] KVM: selftests: access_tracking_perf_test: Use MGLRU for access tracking
+      https://github.com/kvm-x86/linux/commit/d166453ebd29
 
 --
 https://github.com/kvm-x86/linux/tree/next
