@@ -1,171 +1,96 @@
-Return-Path: <kvm+bounces-47159-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47160-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCFB2ABE0D3
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 18:35:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0659EABE112
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 18:48:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 157951BA5AA5
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:34:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C2FE8C1E1C
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3198B4B1E5D;
-	Tue, 20 May 2025 16:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B302726D4D5;
+	Tue, 20 May 2025 16:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ktkRFswK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ucbEUtwH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02B322D795;
-	Tue, 20 May 2025 16:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A2D22083
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 16:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747758858; cv=none; b=dTsjmPHwQYKOtQ8mz8bQm+LC3L+zU6NhiDCccCjpJR/p4cdAIa1agdyDmB1CtIpcsJ8mAqr9NlZ8csJN1XcKsSAHp9SG14V0FvFRjT+4XGBO3FAXGZ7uEjNG7qI/5Tj053aF5KaBA8Y5cUOqPEyCcmqemKrxaVdTGqNvIEAz5Hc=
+	t=1747759698; cv=none; b=VpUjfbPz8z1W8V+TcCprh1DJUf27XaqxbYMBLCSM7OdED2ljaNXKg6tN72No/ARNaOnTipV4QYQh1DwFSB2ODjBUYKMDYXZDlnMK5jXiloxEZcRzoydGO1KVy4hEQX63uhVAAOVtYQ4bCDa130ZJj3kJwrVoTAhcV9gwO8wyxR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747758858; c=relaxed/simple;
-	bh=VyyYOhKbGdK6Q4Vh3+ZAnFAI49OgnPA+WshnAQ64g5c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jVYVCvRudql0lrnYMfKbl4oj78Y8p3q9mFMIAG1W5nXlHJdkF1HtReb1qDX1wBuuzqtxzvKN0tnJEA0F4zvFWNTDTEsKZUmfxWk5OYGF2FO/SaieSuUbR5cqk6kKqddyde4jHSIPHwd37PdEWE5WzhcohqItTEnAuitmnNgjNNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ktkRFswK; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4769f3e19a9so39497521cf.0;
-        Tue, 20 May 2025 09:34:16 -0700 (PDT)
+	s=arc-20240116; t=1747759698; c=relaxed/simple;
+	bh=vaG1AyiwufvK/q6V0BdgNfGV5ktSt1kaK+/KaMzgyxU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fnDli9eZ+T1Pstq5Cu9z/vgasIgmFuv9vUC903liOoy+ngP8gURV0Ccwx2q3BRK9Vqaa3nROGcg2hj4pxmHQkeU8aF5tdCmpb42PmcAWyAATohjGnjN3h4MdnelPjafGGEM5A7WwPC9aLUFFYPQjths6tbOAZD4WLcYpRt0PJNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ucbEUtwH; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b0e5f28841dso4056900a12.2
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 09:48:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747758855; x=1748363655; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VyyYOhKbGdK6Q4Vh3+ZAnFAI49OgnPA+WshnAQ64g5c=;
-        b=ktkRFswKT/ch7S2Bayh/huowdTggpYrn+iOIYoShwoyqlTlI1or6q7bezTeWlqtE2u
-         D70UcQoSJIu9xCzl6o9QT6dLJdivoiuEagy2P7YugEP8jucnYsQoOoN+qsj+Hnw7Cm/6
-         jmqrbIH98vcTuFVuvi8OkmlCZX2f8QLZKdDO2WO+PWCPZlimoz4f4RqzFYEKlqiGtIyo
-         zhjQ8RPcShfLUPe1yNWD4UzA1qBr1sXRRTT2opYPAzYQLlFXKXyjP/4tLiy0uv1cGvUU
-         oJYIiS2DeBGqePxDOaA07lKny2rA+o4zPhuBFxw/SC3LDdj6YgFupzGTfA4e7Ult12eG
-         U8Ew==
+        d=google.com; s=20230601; t=1747759696; x=1748364496; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=K8+YuUSYlYqZjaqVi8KvARVNCx6CmbgvfMwxteqHVYw=;
+        b=ucbEUtwHFUacrbqMXKkYJF2KNj/F986Jokx3womWSvJLzsdyzIQJhJUAD+xhCIRI6W
+         4pKylJcAkMPcmS5Iji65Vh0ayO2CFCStC4PRwj5vHemWxoB3+i9Dyn84I3rwnytJoQxd
+         W3rzIy1wbIYwjJwihtfDSCkQSAyMQyc8w4dRLeXj3T6P4lvhfunfbmAaJeGl9ybCJmTI
+         8IMyR/s1XradFshsuKwp7Hy97yInB0E6WPONbl9W6wXmCgRZ/JB2fUoSHzazOAakAKJt
+         XPBbsMentzSHMUuJU88Pu/D9/+5nIylmrex3U2UME5znsJYTU2GE9YosuQesyVt2w6Dr
+         RxhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747758855; x=1748363655;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VyyYOhKbGdK6Q4Vh3+ZAnFAI49OgnPA+WshnAQ64g5c=;
-        b=LFxZECiFFFuj5PaBc0z9AOtUJ0u0ywnA9DA/1ltAaISdiaQPIlN1288C2IOIAvZDJ9
-         dS8ut/ObS3c1qAjjg6KK7jbe4dQ6IKb2lHYHuMGTDYUVM1+idyBc7JGO2ctF7hD5N+sJ
-         4NBP4OYTnLafPWSmcSspZK8LZguQMwEwhzzvIdG6/y9dfUq9090ISLCCbRTDNQOfTiSq
-         3SlwYikoUE30jJ/BicT/Jp6Ta+y72Ge/9sJmFFrprJBlWikwd9IXRssMtn+AlN9YLjbH
-         EigXifkrtvxPqh3lphbWBgIP7bPoaa9WizqQZZLWVlVuuYyX2Z1A43OvgBvGrgrltvvV
-         rM3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVrdfwayBuqJ4TT4U0IKK/1CWMYAXCSPERsuqSUiqk7xt3JoMqEKcu91+z/ticQo6djJzEoxm0rOqiIqW3m@vger.kernel.org, AJvYcCW5jo8IO3qPuH651wiXxvoq2bIr+WSOu5oNd2YyV/McIyXwHAZf0aBZfEQ+XGs/0b7LPX/Z@vger.kernel.org, AJvYcCX66u0VwnPH6lz8UoU2sokGR+h/MxQtMLEXtuR8pNQNS81UGwSEqI//rG9WBDn3IE4IMJXf0A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzW0Qhl1iZQ4vLfllDsr9ojTWZ/kENj9EIXIRjjBCImtrsdahiD
-	ueF+JlxuUWXlu7U9QMJA4Z5v+iuMJW/VckPUMn7muXKuOp9qdOzN1ufW
-X-Gm-Gg: ASbGncscJWfFPj4qfKRtZ1AO7kdTj08/NYLjwzAisz34tnbmogvWi+lCga/sFGRZ6fD
-	zxHx5mqpXcvMoVjPW3c9ZPFK4IkjV7YJLmBiDpWRsPh9Bh9CoZqtKgFdtg4DiUNEMRKuRyqVVqZ
-	dsNMMx7wytvqCG4U069Xz/AaPPAPn6ORPMwjQY86FHQAvVFqhFX9gzBuHRTRn6xpXw9TKVsTmtj
-	whSsJH1iLj0BpCId92GD7JhYdvfERd6uKO3+E+iLXDR69xN0NDBPL+02Y5KFiAvRheewI2B0AfW
-	AbXm5oQhfhLc9Wy0KkTBpgUP6pBG5CL3dOI41ndbVrmmqAtLzClXypajT82Tmg5H4g7QMbCv4aj
-	JsByM675tspMByvVoq10XCKFVNg==
-X-Google-Smtp-Source: AGHT+IHF89vB9sSkJ+0Go8jzkQaq8IlhxufFTHLal/lvGAHMBlLkCEK8kQavtZYLi/oDmSbgOit/iQ==
-X-Received: by 2002:a05:622a:4105:b0:494:a4c2:57fd with SMTP id d75a77b69052e-494ae34b716mr270643771cf.9.1747758855231;
-        Tue, 20 May 2025 09:34:15 -0700 (PDT)
-Received: from worker0.chath-257877.iommu-security-pg0.utah.cloudlab.us ([128.110.220.58])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-494ae3ccf9dsm72118821cf.12.2025.05.20.09.34.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 09:34:14 -0700 (PDT)
-From: Chathura Rajapaksha <chathura.abeyrathne.lk@gmail.com>
-X-Google-Original-From: Chathura Rajapaksha <chath@bu.edu>
-To: paul@paul-moore.com
-Cc: Yunxiang.Li@amd.com,
-	alex.williamson@redhat.com,
-	audit@vger.kernel.org,
-	avihaih@nvidia.com,
-	bhelgaas@google.com,
-	chath@bu.edu,
-	chathura.abeyrathne.lk@gmail.com,
-	eparis@redhat.com,
-	kevin.tian@intel.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	schnelle@linux.ibm.com,
-	xin.zeng@intel.com,
-	xwill@bu.edu,
-	yahui.cao@intel.com,
-	zhangdongdong@eswincomputing.com
-Subject: Re: [PATCH RFC 2/2] audit accesses to unassigned PCI config regions
-Date: Tue, 20 May 2025 10:33:55 -0600
-Message-Id: <20250520163355.13346-1-chath@bu.edu>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <669e1abd542da9fbcfb466d134f01767@paul-moore.com>
-References: <669e1abd542da9fbcfb466d134f01767@paul-moore.com>
+        d=1e100.net; s=20230601; t=1747759696; x=1748364496;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=K8+YuUSYlYqZjaqVi8KvARVNCx6CmbgvfMwxteqHVYw=;
+        b=MYEVn2cqQfPuHwD66QOiJnvHw08K4G4rjQeIG/mhsArTKeDwkAqDTXmp510So9B+Ku
+         ZrfgztL5nPEGnoAVGnJI11GfpdGTw4V+afnR554al7ega+lxOHMUfwrelMdZm7ZD3dmj
+         Us9LUftGSY4/TtnGD0nbXM4YYToehOvEXISV2N80ufrQ5bRrLfBmr7kf5cH/d8Tqjo5h
+         ay/rSg8DRpt3d7nn2ZqWaA79ibv8DpqZOyywF9ockWo8TAjTjTYWLd/gQJrmo5iv1+hw
+         9i9CaI+PBXeIAk5k5DytSbIwGAXFfQXutgoQ4nsEzSo/HxTxOa72tNO0cOdj0LDMWneP
+         47pw==
+X-Gm-Message-State: AOJu0YwdSDZw1KyWGzBJlsgM8W5HpiyBiNRbqjslGhakFPP4xdD/UYyl
+	KWpC/7urIfNCrm5wBHdDM1RiCpsufNbPnSnFIScejPqXBkgPe/mxtbSPJCk6OmaDrPQq3Sy8d2A
+	C7XNmug==
+X-Google-Smtp-Source: AGHT+IEu/JMVZpzEiP5lovevj2HceA3rlhx10tlMh6Wzo0F+yguDjIYER5h4LnHBtzjgdiGXgmK1YFTBLWk=
+X-Received: from pjbqj14.prod.google.com ([2002:a17:90b:28ce:b0:308:7499:3dfc])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2644:b0:309:e195:59d4
+ with SMTP id 98e67ed59e1d1-30e7d52b166mr34112928a91.12.1747759695854; Tue, 20
+ May 2025 09:48:15 -0700 (PDT)
+Date: Tue, 20 May 2025 09:48:04 -0700
+In-Reply-To: <20250331182703.725214-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250331182703.725214-1-seanjc@google.com>
+X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
+Message-ID: <174774841895.2752531.5751818794863605913.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Use kvm_x86_call() instead of manual static_call()
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-Hi Bjorn and Paul,
+On Mon, 31 Mar 2025 11:27:03 -0700, Sean Christopherson wrote:
+> Use KVM's preferred kvm_x86_call() wrapper to invoke static calls related
+> to mirror page tables.
+> 
+> No functional change intended.
 
-Thank you for your comments, and sorry for the late reply.
+Applied to kvm-x86 mmu.
 
-On Mon, Apr 28, 2025 at 11:05 AM Bjorn Helgaas <helgaas@kernel.org> wrote:
-> Add blank line between paragraphs.
+[1/1] KVM: x86/mmu: Use kvm_x86_call() instead of manual static_call()
+      https://github.com/kvm-x86/linux/commit/6a3d704959bd
 
-> Use imperative mood ("Introduce" instead of "This patch introduces
-> ..." and "Add ..." instead of "A new type has been introduced").
-
-> Simplify this patch by adding "blocked" in the first patch.  Then you
-> won't have to touch the permission checking that is unrelated to the
-> audit logging.  Consider adding a helper to do the checking and return
-> "blocked" so it doesn't clutter vfio_config_do_rw().
-
-I will address the above comments in the next revision.
-
-On Fri, May 16, 2025 at 4:41 PM Paul Moore <paul@paul-moore.com> wrote:
-> I try to encourage people to put a sample audit record in the commit
-> description as it helps others, even those not overly familiar with the
-> Linux kernel, know what to expect in the audit log and provide feedback.
-
-> > +static const char * const vfio_audit_str[VFIO_AUDIT_MAX] = {
-> > +     [VFIO_AUDIT_READ]  = "READ",
-> > +     [VFIO_AUDIT_WRITE] = "WRITE",
-> > +};
->
-> We generally don't capitalize things like this in audit, "read" and
-> "write" would be preferred.
-
-I will address the above comments in the next revision.
-The following is the expected audit message when a write is performed
-to an unassigned PCI config region:
-
-  device=0000:01:00.1 access=WRITE offset=0x298 size=1 blocked=0
-
-> In the commit description you talk about a general PCIe device issue
-> in the first paragraph before going into the specifics of the VFIO
-> driver.  That's all well and good, but it makes me wonder if this
-> audit code above is better done as a generic PCI function that other
-> PCI drivers could use if they had similar concerns?  Please correct
-> me if I'm wrong, but other than symbol naming I don't see anyting
-> above which is specific to VFIO.  Thoughts?
-
-While the issue is independent of VFIO, the security and availability
-concerns arise when guests are able to write to unassigned PCI config
-regions on devices passed through using VFIO. That's why we thought it
-would be better to audit these accesses in the VFIO driver. Given this
-context, do you think it would be more appropriate to audit these
-accesses through a generic PCI function instead?
-
-> Beyond that, I might also change the "access=" field to "op=" as we
-> already use the "op=" field name for similar things in audit, it would
-> be good to leverage that familiarity here.  Similarly using "res=",
-> specifically "res=0" for failure/blocked or "res=1" allowed, would
-> better fit with audit conventions.
-
-Thanks for the suggestions, I will address these in the next revision.
-
-Regards,
-Chathura
+--
+https://github.com/kvm-x86/linux/tree/next
 
