@@ -1,187 +1,181 @@
-Return-Path: <kvm+bounces-47199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 244F3ABE821
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 01:39:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56BF9ABE824
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 01:39:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 200A17A3B25
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 23:37:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA7D38A15E7
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 23:39:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6F325E83F;
-	Tue, 20 May 2025 23:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B62825EFBB;
+	Tue, 20 May 2025 23:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VSujWilA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="phYVTxvS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67AD256C7D;
-	Tue, 20 May 2025 23:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9F625D219
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 23:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747784331; cv=none; b=pswJLKd3EuT+y0iwVmOVHF3QR94wSivclkr0Dsr7ZET05ihGm/iTZPMqj3sjL+Xx8P8zVh0fd2QbPyqyXrt/rwQb7glhjv8jpZrg0CHjEqH91L2qhSqp0R76BlT3JNGcPMFGvKZX6Y2sh2dfGHLRDQei8MN6fVQMhUaTIk3OERs=
+	t=1747784356; cv=none; b=KqsvHe8iUkbeAUX6kItV0xtg8WDfumKiws7h8fgJkTcCKCV82rsxKfMDkVUFKI/bW1HLiC/7UUpTnm7a4iCCCs7g4gf5NZymGgXieiVs7aWCW6rsc3HRYIn2xyoctDhpPoAj+KxKYebKOMhPXPC6qprv/ZeC5zoBks3+9w0bAbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747784331; c=relaxed/simple;
-	bh=6k7yATObDw4adb5vnXcEwNXFnoSuP4qFoAizUOImBEw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KGsUShFva/SGjA/FYuMgYslX7nqL5oF2se5Aw6ixAPjY55VCSNckszVxD4uK9+s87x565TUnVCJFtGixSO1P65xWFrSVh1/XOkU92XvPoZWiQWwBpFslnZm2/aAbfWxbl0ZtDMgNd5lQlrhZHOu/59BJgy0XFote+cr02Tlh1sE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VSujWilA; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747784329; x=1779320329;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6k7yATObDw4adb5vnXcEwNXFnoSuP4qFoAizUOImBEw=;
-  b=VSujWilA3ybCRl7Hd7jUQIf+PUvKT15vw7UcgDAB2HXAtSA3FGw4dujG
-   nOW9zrtcFJJxdp8uFQi/t5VvOhiAryKg/5bzGWfockGFVExpp+Cdy6q4z
-   nnLrBezgqFUS7RpcNlXqJZumXpI5Xd1Vwj9Za1P0QDCjcCaQ3AdkIWn+x
-   QzJ/RdS3Gai4qcHmunbGE6Z3WWzlcpLo+dcCflWGj+6z3XGQDZiZcsdBg
-   z/m9pzbNELibjbT3gDpoVixdHB15e2ySYA60sClc9qm5XlJVAHSzAig/r
-   1FDpK1wR9DkZGi7MLkePBveb/daM1WnavSAMuV85Jxn84pASpWvXOwoZS
-   w==;
-X-CSE-ConnectionGUID: ZaCxezxsSmqAfurGTDr9VA==
-X-CSE-MsgGUID: JtsGmn2jTTOPdd0MsuMdZg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11439"; a="60380972"
-X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
-   d="scan'208";a="60380972"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 16:38:48 -0700
-X-CSE-ConnectionGUID: nAe3oT3uTHyMCF3lRzQ6hg==
-X-CSE-MsgGUID: n77WxTsbRF22rRPP9zdLSA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
-   d="scan'208";a="144725084"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 20 May 2025 16:38:46 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uHWXk-000Nfo-1f;
-	Tue, 20 May 2025 23:38:44 +0000
-Date: Wed, 21 May 2025 07:37:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: lizhe.67@bytedance.com, alex.williamson@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lizhe.67@bytedance.com,
-	muchun.song@linux.dev
-Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for huge
- folio
-Message-ID: <202505210701.WY7sKXwU-lkp@intel.com>
-References: <20250520070020.6181-1-lizhe.67@bytedance.com>
+	s=arc-20240116; t=1747784356; c=relaxed/simple;
+	bh=qNW0arWXlRmhF4tOVFZz0ZKha2LDMSjtrVhlYdBNed8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BTioAKS+E8Kk4K2HLfoLaGA5mfOiP2GILl2h8YcHtRre9HvKkxLb0AjkMbxbFS14DN1kbP1Wez8NMVsWf8bcT4CzPhocXmdbm4JvMvz9jcUqvA1LtdDbOcro9sI2t3CjV4UbalvKuMxD2MHQ20WFIOn05Na4W8JpOBTAuuD4j8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=phYVTxvS; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-442f97af707so193325e9.0
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 16:39:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747784352; x=1748389152; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cRuU/m5dc5FtJi/f3Rrw2anhfRohi0i8yf3iq1OlqJ0=;
+        b=phYVTxvSAmpqz/M4n0Rk87yvA4M6W32UAkrZOlT+psyUIysRvKkFuoqSDcX7S/opnV
+         KL1GpAF6jpi8WvDGCdm6/uPZxx04PV/Ec/eimFSmmQcEzU6QlJxack6+QC0ZKphw0QNU
+         icmO0QZFLgXcvOmizZm0nzwJsg/F+tqJIMNq/yOLB83J6WD9Updphm1gva09AyIA6iq7
+         JqZLYj4gII8JO+I/V5Oo0z8XvJJ94Vatwwg9cOVD6VB9kW2jaixtyNHNVR+l6Ejc1/iY
+         tzpeGbsD9iIixVs7zVpE11lv45+lShP3mgpinP4pnyN2SFXJnc5rbdRAF2Ql2Chd/18E
+         vwPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747784352; x=1748389152;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cRuU/m5dc5FtJi/f3Rrw2anhfRohi0i8yf3iq1OlqJ0=;
+        b=RjRkF3KvkFKkn3hVA3onr7pSHTM4Rz83BAcr+L09NnBELGrGBs0qcpgJkkOYu/mGsd
+         zWIak+usZUQ+fRy8O/OONs7rPwb0Q+bFDEab4vZDbhJixi+uTDIQ9LkuGf6BltCvqoif
+         rrmaLVRxPmtCZ06Wp/Gn9SB6HpRiKLUo+d3vG16r7IDBxgMDbbcKicImyAI3lzg9R7ld
+         Q8tr/GK+6Ia4RiNM4polusfJj0/0KMTWwAwW0kYisB7nxzQ6IK0809Id2OZUaw6faXeF
+         XCEdwpEaEbc2pffyTabOwW2TCa/JOlN0nxQKEqYVWsJevvOCC6nMRBrXVACgcvhRMQAn
+         XBBw==
+X-Forwarded-Encrypted: i=1; AJvYcCWfuRSx5DAaLbU05ZE4aWlUMjxSyox5x78L1SNZyjvs6zoolBmm5r4Pub1zeJ6lM1WQTr8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDPUQVGj4kidSZEOumq7/rLObBYo3EclSGIwn8x3VOxJzkW00P
+	httRURfV/y57MitKg2+xW4wtnYoW/PEqcIz/4zDTFLHMHm+Ga9Md6NY3Uawdiytb8hFul9qze66
+	Yevr+9RcLNpl+CM2oDww7UeOYO4dv6UuuRMQsebGM
+X-Gm-Gg: ASbGncs7aZKf+BY+VAvxF9jdd7HRZnncwkIP7Iy6CqzmiLzPhCBss1R35HpV9IYx3eB
+	F6DbNXU0Ee2AcVSx0NBToZj+sQ6tc6ymORstMXxU0br1oANGiCist4e80DdwWzxHFXOuTOuQKL+
+	Ov2upAfprvPIolJb+5LjhUMwodk/L37CcZKje8BpN7FpO5eMqNfURH3c+rTrkdWDEfopKhBTvS
+X-Google-Smtp-Source: AGHT+IEmTo+oS9URXfIuKouUY0B0Y62o5TMKaVmZC8slqtUcsFC1AZMBLwucs8WQvvTTsv5lG6xeERtZDgSchwhBuX8=
+X-Received: by 2002:a05:600c:2e49:b0:439:961d:fc7d with SMTP id
+ 5b1f17b1804b1-443ae3dbdfdmr4250875e9.6.1747784352208; Tue, 20 May 2025
+ 16:39:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250520070020.6181-1-lizhe.67@bytedance.com>
+References: <20250505161412.1926643-1-jiaqiyan@google.com> <20250505161412.1926643-3-jiaqiyan@google.com>
+ <86zffcefk9.wl-maz@kernel.org>
+In-Reply-To: <86zffcefk9.wl-maz@kernel.org>
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Tue, 20 May 2025 16:39:00 -0700
+X-Gm-Features: AX0GCFtfiDim2rVM9--MtRE7iY2zI_cJEhnOXz73-OdjqCpU57FjKEAM9M0zDCo
+Message-ID: <CACw3F52v_WSR=HkmeW7be+YRFkUzA-n-=mVHHw4wvJK7ongkYQ@mail.gmail.com>
+Subject: Re: [PATCH v1 2/6] KVM: arm64: Set FnV for VCPU when FAR_EL2 is invalid
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
+	pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, duenwen@google.com, rananta@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Fri, May 16, 2025 at 8:33=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Mon, 05 May 2025 17:14:08 +0100,
+> Jiaqi Yan <jiaqiyan@google.com> wrote:
+> >
+> > Certain microarchitectures (e.g. Neoverse V2) do not keep track of
+> > the faulting address for a memory load that consumes poisoned data
+> > and results in a synchronous external abort (SEA). This means the
+> > faulting guest physical address is unavailable when KVM handles such
 
-kernel test robot noticed the following build errors:
+Actually this is not relevant to the code, I think it is just
+sufficient to say "This means that FAR_EL2 holds a garbage value and
+therefore kvm_vcpu_get_hfar holds a garbage value too".
 
-[auto build test ERROR on awilliam-vfio/next]
-[also build test ERROR on awilliam-vfio/for-linus linus/master v6.15-rc7 next-20250516]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> > SEA in EL2, and FAR_EL2 just holds a garbage value.
+>
+> I don't understand. FAR_ELx holds a *virtual* address, and never a
+> physical address (that'd be PFAR_ELx).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/lizhe-67-bytedance-com/vfio-type1-optimize-vfio_pin_pages_remote-for-huge-folio/20250520-150123
-base:   https://github.com/awilliam/linux-vfio.git next
-patch link:    https://lore.kernel.org/r/20250520070020.6181-1-lizhe.67%40bytedance.com
-patch subject: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for huge folio
-config: i386-randconfig-013-20250521 (https://download.01.org/0day-ci/archive/20250521/202505210701.WY7sKXwU-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250521/202505210701.WY7sKXwU-lkp@intel.com/reproduce)
+Sorry my writing is misleading. If you are still interested, the
+scenario I meant to describe is
+1. There is a SEA taken by KVM when memory load from the guest
+consumes poisoned data.
+2. The guest physical address (or IPA) of the poisoned data will not
+be available in HPFAR_EL2 per architecture register documentation [1].
+3. Although HPFAR_EL2 is unusable, KVM can still attempt address
+translation with the guest virtual address in FAR_EL2 to get the
+poisoned IPA.
+4. However, FAR_EL2 is not valid on certain microarchitectures (e.g.
+Neoverse V2), so in the end it is just impossible for KVM to know the
+poisoned IPA.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505210701.WY7sKXwU-lkp@intel.com/
+Does this clarify things? But again, it is confusing and will be removed.
 
-All errors (new ones prefixed by >>):
-
-   In file included from <command-line>:
-   drivers/vfio/vfio_iommu_type1.c: In function 'vfio_pin_pages_remote':
->> include/linux/compiler_types.h:542:45: error: call to '__compiletime_assert_499' declared with attribute error: min((long)batch->size, folio_nr_pages(folio) - (({ const struct page *__pg = (batch->pages[batch->offset]); int __sec = page_to_section(__pg); (unsigned long)(__pg - __section_mem_map_addr(__nr_to_section(__sec))); }) - folio_pfn(folio))) signedness error
-     542 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |                                             ^
-   include/linux/compiler_types.h:523:25: note: in definition of macro '__compiletime_assert'
-     523 |                         prefix ## suffix();                             \
-         |                         ^~~~~~
-   include/linux/compiler_types.h:542:9: note: in expansion of macro '_compiletime_assert'
-     542 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^~~~~~~~~~~~~~~~~~
-   include/linux/minmax.h:93:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-      93 |         BUILD_BUG_ON_MSG(!__types_ok(ux, uy),           \
-         |         ^~~~~~~~~~~~~~~~
-   include/linux/minmax.h:98:9: note: in expansion of macro '__careful_cmp_once'
-      98 |         __careful_cmp_once(op, x, y, __UNIQUE_ID(x_), __UNIQUE_ID(y_))
-         |         ^~~~~~~~~~~~~~~~~~
-   include/linux/minmax.h:105:25: note: in expansion of macro '__careful_cmp'
-     105 | #define min(x, y)       __careful_cmp(min, x, y)
-         |                         ^~~~~~~~~~~~~
-   drivers/vfio/vfio_iommu_type1.c:709:36: note: in expansion of macro 'min'
-     709 |                         nr_pages = min((long)batch->size, folio_nr_pages(folio) -
-         |                                    ^~~
---
-   In file included from <command-line>:
-   vfio_iommu_type1.c: In function 'vfio_pin_pages_remote':
->> include/linux/compiler_types.h:542:45: error: call to '__compiletime_assert_499' declared with attribute error: min((long)batch->size, folio_nr_pages(folio) - (({ const struct page *__pg = (batch->pages[batch->offset]); int __sec = page_to_section(__pg); (unsigned long)(__pg - __section_mem_map_addr(__nr_to_section(__sec))); }) - folio_pfn(folio))) signedness error
-     542 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |                                             ^
-   include/linux/compiler_types.h:523:25: note: in definition of macro '__compiletime_assert'
-     523 |                         prefix ## suffix();                             \
-         |                         ^~~~~~
-   include/linux/compiler_types.h:542:9: note: in expansion of macro '_compiletime_assert'
-     542 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^~~~~~~~~~~~~~~~~~
-   include/linux/minmax.h:93:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-      93 |         BUILD_BUG_ON_MSG(!__types_ok(ux, uy),           \
-         |         ^~~~~~~~~~~~~~~~
-   include/linux/minmax.h:98:9: note: in expansion of macro '__careful_cmp_once'
-      98 |         __careful_cmp_once(op, x, y, __UNIQUE_ID(x_), __UNIQUE_ID(y_))
-         |         ^~~~~~~~~~~~~~~~~~
-   include/linux/minmax.h:105:25: note: in expansion of macro '__careful_cmp'
-     105 | #define min(x, y)       __careful_cmp(min, x, y)
-         |                         ^~~~~~~~~~~~~
-   vfio_iommu_type1.c:709:36: note: in expansion of macro 'min'
-     709 |                         nr_pages = min((long)batch->size, folio_nr_pages(folio) -
-         |                                    ^~~
+[1] https://developer.arm.com/documentation/ddi0601/2025-03/AArch64-Registe=
+rs/HPFAR-EL2--Hypervisor-IPA-Fault-Address-Register?lang=3Den
 
 
-vim +/__compiletime_assert_499 +542 include/linux/compiler_types.h
+>
+> >
+> > In case VMM later asks KVM to synchronously inject a SEA into the
+> > guest, KVM should set FnV bit
+> > - in VCPU's ESR_EL1 to let guest kernel know that FAR_EL1 is invalid
+> >   and holds garbage value
+> > - in VCPU's ESR_EL2 to let nested virtualization know that FAR_EL2
+> >   is invalid and holds garbage value
+> >
+> > Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+> > ---
+> >  arch/arm64/kvm/inject_fault.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_faul=
+t.c
+> > index a640e839848e6..b4f9a09952ead 100644
+> > --- a/arch/arm64/kvm/inject_fault.c
+> > +++ b/arch/arm64/kvm/inject_fault.c
+> > @@ -81,6 +81,9 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool =
+is_iabt, unsigned long addr
+> >       if (!is_iabt)
+> >               esr |=3D ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
+> >
+> > +     if (!kvm_vcpu_sea_far_valid(vcpu))
+> > +             esr |=3D ESR_ELx_FnV;
+> > +
+>
+> I don't understand what this has anything to do with the uarch details
+> you talk about in the commit message. If the VMM inject an exception,
+> surely it has populated the exception context itself. I don't even see
+> how we'd end-up here (__kvm_arm_vcpu_set_events? seems unlikely).
+>
 
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  528  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  529  #define _compiletime_assert(condition, msg, prefix, suffix) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  530  	__compiletime_assert(condition, msg, prefix, suffix)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  531  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  532  /**
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  533   * compiletime_assert - break build and emit msg if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  534   * @condition: a compile-time constant condition to check
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  535   * @msg:       a message to emit if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  536   *
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  537   * In tradition of POSIX assert, this macro will break the build if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  538   * supplied condition is *false*, emitting the supplied error message if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  539   * compiler has support to do so.
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  540   */
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  541  #define compiletime_assert(condition, msg) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21 @542  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  543  
+KVM_SET_VCPU_EVENTS is indeed the case this commit wants to fix.
+Instead of populating the exception registers itself, VMM can use
+KVM_SET_VCPU_EVENTS to let KVM do that per existing KVM doc [2], e.g.
+when VMM handles the KVM_EXIT_ARM_SEA introduced in the previous
+commit. The intent is to tell guest, for example, to not use FAR_EL1.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+[2] https://www.kernel.org/doc/html/v5.10/virt/kvm/api.html#id3
+
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
