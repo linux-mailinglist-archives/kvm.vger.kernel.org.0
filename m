@@ -1,87 +1,88 @@
-Return-Path: <kvm+bounces-47165-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47166-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11154ABE1E4
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 19:39:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4587AABE1F2
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 19:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B5834C35FF
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 17:39:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE8E03AEEF0
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 17:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41ABE27FD7A;
-	Tue, 20 May 2025 17:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBB727FD72;
+	Tue, 20 May 2025 17:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AC54gA3M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e2V3gB8Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D19A2580F7
-	for <kvm@vger.kernel.org>; Tue, 20 May 2025 17:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF591A83FB
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 17:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747762732; cv=none; b=AuPf3bvTh4EvKxfhprEpbAfiCgnuSVbk7Mad9FED1+HoXbNJ9p9L/td0YQdSjZm86OvyCdTIOJrlJ/LWrjBLohsmjVJqQqtPfTQO/ZR/LWmuMYYdI2wqEqrX2gl1xCrWDdPmBW7TpieeQHT6Sp2LSjoFK4rz4ura58QNTH2LVgQ=
+	t=1747762886; cv=none; b=FCi/bCDGCr8mAlg5199sGE4DcRxUu+i+FSric3rbswQNNIdTWQLdpaZleHUSD1KhTz9302wjq0gAiZJRby2ftyPw6ir9mVOyhfRJpPrh/y3hp9SQR4zpN1apMffJOJaknZCufIGBTWDyXdllB8ssS64dpin5AyWh4AQDNejZXQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747762732; c=relaxed/simple;
-	bh=adM127C8OavH5jlXjW7zh27SJLJ/bjCHpUPHtojOMUY=;
+	s=arc-20240116; t=1747762886; c=relaxed/simple;
+	bh=37YGEwIZyc38aYygcTWPR7M6+MYC8cK3Os1zr9tPoBk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FwOqpD6Zzy/d8LZYoCcLzoYHFZnidhgx4OUqX0JCsWRzW8I9LDUrXDAN5z3+ZU7875uaZ8BWPJbJxmjK1RCuIXgQkl5p8qIJHP+bibUgiwCCVPxF41DWLoEhbAhEpsgx0i+qoEiVn9dJiPawWUOboWz8q4S+Jx1q7pxuIJvZeYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AC54gA3M; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=SU/eiDnNHkPWtOQGdigef5H86BShSJ7cf/EcFnJ6vK8FQfAaEVkxXzrBZP3dOU8Z1kwpyruDyJDzzQd8QHns/tgCF64PHiWdVcD8QTniV9LLDpk4CQINWgaeMOHczEi0nCzlBm1NqpCQaHoDC9EEH5cIdkyWhw9CXx8CvoWUzOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e2V3gB8Q; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747762729;
+	s=mimecast20190719; t=1747762883;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=U7onMW/FpYfL9q9r/msFUOtFnxJS/Q6jFLBWTk+GRKI=;
-	b=AC54gA3MMtvKl/+TwWF6jNs7Ra39xgPgvhnFvk5k47dwNZUxdBDpq8YI0Za7yWL1e5zLJx
-	wg68Swr0IKk243ZHwdxUlLJsSqYaGJWEes5BzXaLEuBZqqbCfpVtzMy2nXFXM0+fopF9ty
-	YLPw1DTXcdwVFV9g7oggCWjMnmJoAGs=
+	bh=Ysy5nbN//FN9RtI8JoLcFahaJUzYzYV0wTw0kNVJLOQ=;
+	b=e2V3gB8QOLI0mIF2//KMTmNAlU/VzAuQ7b6WQqbrsa76AnHzY6ndmMEpVrnbIKUHdRl+4N
+	rBaaIZ+eW9h4Uszg2IzdcSomcfaSp0PG9zZ7nUy2sSULCUexRc3FyMbsCWgCwy8bgEA2M2
+	mzaJv6VJ4tir6e+g7Kkf7a78JYTzaG0=
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-V5xQteKzOYONRanRrmyLdw-1; Tue, 20 May 2025 13:38:48 -0400
-X-MC-Unique: V5xQteKzOYONRanRrmyLdw-1
-X-Mimecast-MFC-AGG-ID: V5xQteKzOYONRanRrmyLdw_1747762727
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a35bf8377fso3939824f8f.1
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 10:38:47 -0700 (PDT)
+ us-mta-246-4XxIQDSrMry70M92dRkD8Q-1; Tue, 20 May 2025 13:41:21 -0400
+X-MC-Unique: 4XxIQDSrMry70M92dRkD8Q-1
+X-Mimecast-MFC-AGG-ID: 4XxIQDSrMry70M92dRkD8Q_1747762880
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a3696a0ce6so1376646f8f.3
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 10:41:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747762727; x=1748367527;
+        d=1e100.net; s=20230601; t=1747762880; x=1748367680;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=U7onMW/FpYfL9q9r/msFUOtFnxJS/Q6jFLBWTk+GRKI=;
-        b=MitcgG6WN3EgGap3C+gb7znZypk4Q7VACyRPXLabsTy3fqo+lF+lthbeZY+HEw4RyK
-         /Qzt9lCYodff2pkv70BUuNRc9Ozk5Lec0P2aHv9DXmTLCN2KUkNJ7rb7NaA0V6mPiTgC
-         R6/INgn4yNE/vZ9E7HVJpFPE36k5qsiuSfUs9k+wmJ98ygbPp7JXv+M0LeXYKjFWK/S2
-         OGD8rDuYlZaIR5sb7pHw2dgpfdeh5PlyLm2the54tQH77Cg8bRGxO/G2mVy1A+DqjTkp
-         dRVzTF+8fssLfw37UwFHikOt48mP3Uj3zkA6celP0tvM2TwSlyIvNdgGU2+A5n0NzjW4
-         5HGQ==
-X-Gm-Message-State: AOJu0YwzfkVfV1r968uYb2qrmEOI4bcCTTrBREHd2rtKpbnQA8l5zO8h
-	YQk+pZnad0+2zq2J5pRH1bocLmdd9UyL2VddX1kIa+Sf0R0Qopn5q/t8zJ80maVhrpVWdHWyv8o
-	mql9anWaY6rDFc+WyO9ipwXzRyj1ARiEbTtOZkLUdJ0adAWKFbzTZpw==
-X-Gm-Gg: ASbGncuN7kkZRtq/9v5ZEbm2YBXUyoAEVHr7nN6fpb604YScif8Rrdeo/HvwOOvmEoM
-	2G/7XuPqvlvrRN+BbeqfrmGJo3Bmt+rXGUzQJnffn/Fmdgnh1BzZ2NT0AuxNWYAZaUunmSZUdvc
-	VbTRJPbHRAtMNxSsNlWn+OEjdjaXt01qaLC90mx/lPdaqrEbLn7smlxBkqRgjUhy4Rv8Z/qnOZ4
-	or+VVQbdbf5701qeMd0dPpi40HHWAxUr4NfaMmW6EpIddXTm6uF+Luo20juMM6mR/nU5vPYaq6w
-	XGmXhHnOGKWOiy65PNjagit4FU5u36OSvrJqXbcZyZRsuIHL5ZaX4jZpm1bziqnoaqlChZmGhCZ
-	BqvcEA1z6O0nMGY/ZUX9ub9yowkJDXmuxBX8Kprk=
-X-Received: by 2002:a05:6000:400f:b0:3a0:b4f1:8bd5 with SMTP id ffacd0b85a97d-3a35fe67aa7mr13790414f8f.18.1747762726675;
-        Tue, 20 May 2025 10:38:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHilD1QVPZgF2Tu9J05/HFut+8uHCPuoVe/pP7lVX5n8AO1SO1by4RXC8L32oHdmQcAkoJAJQ==
-X-Received: by 2002:a05:6000:400f:b0:3a0:b4f1:8bd5 with SMTP id ffacd0b85a97d-3a35fe67aa7mr13790387f8f.18.1747762726283;
-        Tue, 20 May 2025 10:38:46 -0700 (PDT)
+        bh=Ysy5nbN//FN9RtI8JoLcFahaJUzYzYV0wTw0kNVJLOQ=;
+        b=sB7qaMKT1speBmy6WfI1vPwnDEnyrUM9myP7KMMbtKVI1KaZ9I4F4woB42aVhdDyqq
+         JW2cgiVmoSGzhmOozqaZ90uUwgO+ezP/wASBzzNNWV3cBsyKBf3B5hv21YMy5HOL0OA1
+         x2JOTEP6PnJxdIH6V4vCi/jBCfkfMZcmoqfuUTqnV9YEe7UAx0tximcYk4Zme6SRc0Lx
+         XuO1rDpA/bB5oQQy/vVbx9by26SRph8NqgPB+Y83mcsbeXkMqT9YON/ZTJIaZRZWP8ra
+         Apq/r/n/h4IL37wKnwTeCCl7AAtOkKWLPXPCKPILziQDxw8wzqnObpWHZ/bAShnP66BL
+         O5LQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVf0pP9I3KjQiEs0tQ20FZODczKcqWV9zkNDqbTis/XTuhPIpoHdRY6MLjyxD+WlPgGxXg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP61ahD+pqUqxKYctfg2MnttpSLvhGZtolFjwJBJcOsV2TBkeI
+	5pJnhekZMX9aLgGZsyVMPfJiafwQA+nb8iTcGaPAAHOMyoeTBkj+41sjabZb1TD550LxmzXraxG
+	bpCLpBgmotZTFXu7uZDhsmC+/9k1n01jTGRW16nI6ycYFsQ8q3JSftg==
+X-Gm-Gg: ASbGncukOtbUWIsyQZKHh9Tmmn3j6L6jHvjJwhWxC5ygaY84WiU6c6CrTYAI1Opyot2
+	h9jnbNKeJLPq8HHcmWxz7UuKvniwiGvwEuzXd5MXTfXZVdlhQg0wCTAh1tn3dnvAdMPsYgleI8i
+	KpLGQppakibHgkX4zKlm8POaU8tsnS+9yoJ2x3sZ1bmz07l8RBCwWa0Rf9Hoyl/alH9MG2+iUfX
+	XI84oVkjIbpvW1LVNi7uu8qGLNmG2rgzOLDptyVk0q8RYBhM0ArOVEzELK2Sp7YZke0H7RSBsyA
+	9fw59tL+etdZFBWPsHQ1NtOgwcRkKPhp8j8x2pEbdysCKk1+LYoqo5SqjHVcxJV1AJY9iNJIhG8
+	wpHL/e8GI1gd+rQW38Ank/jk+s3OvxJdE+/+u9o8=
+X-Received: by 2002:a5d:474b:0:b0:3a0:ac96:bd41 with SMTP id ffacd0b85a97d-3a35c84419bmr14536158f8f.27.1747762880574;
+        Tue, 20 May 2025 10:41:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGVar67bZRVSD8PpsU3J5LEAXnwScDfWp/oGgnm9nxCe1Kzs6/m3GZ6q4TndPdxjWM7t3oflw==
+X-Received: by 2002:a5d:474b:0:b0:3a0:ac96:bd41 with SMTP id ffacd0b85a97d-3a35c84419bmr14536148f8f.27.1747762880240;
+        Tue, 20 May 2025 10:41:20 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f28:7c00:a95e:ac49:f2ad:ab84? (p200300d82f287c00a95eac49f2adab84.dip0.t-ipconnect.de. [2003:d8:2f28:7c00:a95e:ac49:f2ad:ab84])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f23bfdd9sm37859685e9.18.2025.05.20.10.38.45
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca4d0fasm17260164f8f.8.2025.05.20.10.41.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 10:38:45 -0700 (PDT)
-Message-ID: <3f51d180-becd-4c0d-a156-7ead8a40975b@redhat.com>
-Date: Tue, 20 May 2025 19:38:45 +0200
+        Tue, 20 May 2025 10:41:19 -0700 (PDT)
+Message-ID: <8bd88c21-4164-4e10-8605-d6a8483d0aeb@redhat.com>
+Date: Tue, 20 May 2025 19:41:19 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,9 +92,12 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for huge
  folio
-To: lizhe.67@bytedance.com, alex.williamson@redhat.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, muchun.song@linux.dev
+To: Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: lizhe.67@bytedance.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, muchun.song@linux.dev
 References: <20250520070020.6181-1-lizhe.67@bytedance.com>
+ <20250520080719.2862017e.alex.williamson@redhat.com>
+ <aCy1AzYFyo4Ma1Z1@x1.local>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -141,138 +145,40 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250520070020.6181-1-lizhe.67@bytedance.com>
+In-Reply-To: <aCy1AzYFyo4Ma1Z1@x1.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 20.05.25 09:00, lizhe.67@bytedance.com wrote:
-> From: Li Zhe <lizhe.67@bytedance.com>
+On 20.05.25 18:59, Peter Xu wrote:
+> Hi, Alex,
+> 
+> On Tue, May 20, 2025 at 08:07:19AM -0600, Alex Williamson wrote:
+>> Peter, David, if you wouldn't mind double checking the folio usage
+>> here, I'd appreciate it.  The underlying assumption used here is that
+>> folios always have physically contiguous pages, so we can increment at
+>> the remainder of the folio_nr_pages() rather than iterate each page.
+> 
+> Yes I think so.  E.g., there's comment above folio definition too:
 
-Subject: "huge folio" -> "large folios"
+It has consecutive PFNs, yes (i.e., pfn++). The "struct page" might not 
+be consecutive (i.e., page++ does not work for larger folios).
 
 > 
-> When vfio_pin_pages_remote() is called with a range of addresses that
-> includes huge folios, the function currently performs individual
-
-Similar, we call it a "large" f
-
-> statistics counting operations for each page. This can lead to significant
-> performance overheads, especially when dealing with large ranges of pages.
+> /**
+>   * struct folio - Represents a contiguous set of bytes.
+>   * ...
+>   * A folio is a physically, virtually and logically contiguous set
+>   * of bytes...
+>   */
 > 
-> This patch optimize this process by batching the statistics counting
-> operations.
-> 
-> The performance test results for completing the 8G VFIO IOMMU DMA mapping,
-> obtained through trace-cmd, are as follows. In this case, the 8G virtual
-> address space has been mapped to physical memory using hugetlbfs with
-> pagesize=2M.
-> 
-> Before this patch:
-> funcgraph_entry:      # 33813.703 us |  vfio_pin_map_dma();
-> 
-> After this patch:
-> funcgraph_entry:      # 15635.055 us |  vfio_pin_map_dma();
-> 
-> Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
-> Changelogs:
-> 
-> v2->v3:
-> - Code simplification.
-> - Fix some issues in comments.
-> 
-> v1->v2:
-> - Fix some issues in comments and formatting.
-> - Consolidate vfio_find_vpfn_range() and vfio_find_vpfn().
-> - Move the processing logic for huge folio into the while(true) loop
->    and use a variable with a default value of 1 to indicate the number
->    of consecutive pages.
-> 
-> v2 patch: https://lore.kernel.org/all/20250519070419.25827-1-lizhe.67@bytedance.com/
-> v1 patch: https://lore.kernel.org/all/20250513035730.96387-1-lizhe.67@bytedance.com/
-> 
->   drivers/vfio/vfio_iommu_type1.c | 48 +++++++++++++++++++++++++--------
->   1 file changed, 37 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 0ac56072af9f..48f06ce0e290 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -319,15 +319,22 @@ static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
->   /*
->    * Helper Functions for host iova-pfn list
->    */
-> -static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
-> +
-> +/*
-> + * Find the first vfio_pfn that overlapping the range
-> + * [iova, iova + PAGE_SIZE * npage) in rb tree.
-> + */
-> +static struct vfio_pfn *vfio_find_vpfn_range(struct vfio_dma *dma,
-> +		dma_addr_t iova, unsigned long npage)
->   {
->   	struct vfio_pfn *vpfn;
->   	struct rb_node *node = dma->pfn_list.rb_node;
-> +	dma_addr_t end_iova = iova + PAGE_SIZE * npage;
->   
->   	while (node) {
->   		vpfn = rb_entry(node, struct vfio_pfn, node);
->   
-> -		if (iova < vpfn->iova)
-> +		if (end_iova <= vpfn->iova)
->   			node = node->rb_left;
->   		else if (iova > vpfn->iova)
->   			node = node->rb_right;
-> @@ -337,6 +344,11 @@ static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
->   	return NULL;
->   }
->   
-> +static inline struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
-> +{
-> +	return vfio_find_vpfn_range(dma, iova, 1);
-> +}
-> +
->   static void vfio_link_pfn(struct vfio_dma *dma,
->   			  struct vfio_pfn *new)
->   {
-> @@ -681,32 +693,46 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->   		 * and rsvd here, and therefore continues to use the batch.
->   		 */
->   		while (true) {
-> +			struct folio *folio = page_folio(batch->pages[batch->offset]);
-> +			long nr_pages;
-> +
->   			if (pfn != *pfn_base + pinned ||
->   			    rsvd != is_invalid_reserved_pfn(pfn))
->   				goto out;
->   
-> +			/*
-> +			 * Note: The current nr_pages does not achieve the optimal
-> +			 * performance in scenarios where folio_nr_pages() exceeds
-> +			 * batch->capacity. It is anticipated that future enhancements
-> +			 * will address this limitation.
-> +			 */
-> +			nr_pages = min((long)batch->size, folio_nr_pages(folio) -
-> +						folio_page_idx(folio, batch->pages[batch->offset]));
-> +			if (nr_pages > 1 && vfio_find_vpfn_range(dma, iova, nr_pages))
-> +				nr_pages = 1;
+> For 1G, I wonder if in the future vfio can also use memfd_pin_folios()
+> internally when possible, e.g. after stumbled on top of a hugetlb folio
+> when filling the batch.
 
+Yeah, or have a better GUP interface that gives us folio ranges instead 
+of individual pages.
 
-You seem to assume that the batch really contains the consecutive pages 
-of that folio.
-
-This is not the case if we obtained the pages through GUP and we have
-
-(a) A MAP_PRIVATE mapping
-
-(b) We span multiple different VMAs
-
-
-Are we sure we can rule out (a) and (b)?
-
-A more future-proof approach would be at least looking whether the 
-pages/pfns are actually consecutive.
+Using memfd directly is obviously better where possible.
 
 -- 
 Cheers,
