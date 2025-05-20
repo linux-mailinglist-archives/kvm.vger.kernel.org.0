@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-47094-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47095-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13669ABD3A3
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 11:41:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30DCFABD3A8
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 11:42:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B0994A220A
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 09:41:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33D341B64C36
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 09:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27190268C42;
-	Tue, 20 May 2025 09:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F2B268C42;
+	Tue, 20 May 2025 09:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9bihbti"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YocNn9Ui"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4623521C9EE;
-	Tue, 20 May 2025 09:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB1021ABB2;
+	Tue, 20 May 2025 09:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747734091; cv=none; b=dtb7oxXaPZedEbSv8miANJr3afIlugeVFIgZUp60TfXSPpCxCwNv+mYO3CA0+QqH7zJ/Y7LIwppn95nslxYS6fgmLznnGvq5QG+UiU6VPFbvlf0Bn1w/frjv6FNotOXavu0tDFxyuXHsx4v4DKYFDNlM80KwUhHk4Qm+Ht7IeF8=
+	t=1747734148; cv=none; b=SJ3aB/CGcADAD8Br4uv52ly7JAgLd2gOkmDfr1AWcda61upJKda0uI3QGnWu6RhoKkI/kY8S/cw1Lg20UIaym/WlxFmxHEnaCVFLxtE8vVeS6qTCUBiFIRgFuSnqsiNJFRrCjCLVDRaOkJkfcz8UK2/r231KAPa18nWUKsaXX6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747734091; c=relaxed/simple;
-	bh=B9V4qKH/i2E6tTGsCihryVv51mK/NkF7DleeEUfylJs=;
+	s=arc-20240116; t=1747734148; c=relaxed/simple;
+	bh=P2lXjR5FEwM/E5SDxoI52GRNlN0blP98CFC+wmmNYJE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ePzKEamhBCOl63yq17+DbQtIq6/Tz4A2cVyd5K3icPbU8mVVGdVUaAFs1FQ1TESiKSCcvsvCAzeF51gHTpj/5srUeseaPfOgtiZ+XjofRl43+IGH5e5BZhFxk4B0yNsN+CVgjV2dOKXSggEO3nBeg6XnBxA5n5RZ0wNsRYzFFbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9bihbti; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F0C7C4CEEB;
-	Tue, 20 May 2025 09:41:26 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=mAjGXposTwTuwyNxLEMNnU8LqAbo1dcQsqw6iuCcPAVAyoteUNyU1WiYqah7EQ6bTCcgSgZoo3wCqV5aQpOiY591gOG/8AuAMjX3Sl3xDMMye2/4V7w9qIpTwrQpn69W7pCIUySMWGGAmQFXwFGY9hgMeChxPhuI7tMjZTyKc8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YocNn9Ui; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E427AC4CEE9;
+	Tue, 20 May 2025 09:42:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747734090;
-	bh=B9V4qKH/i2E6tTGsCihryVv51mK/NkF7DleeEUfylJs=;
+	s=k20201202; t=1747734147;
+	bh=P2lXjR5FEwM/E5SDxoI52GRNlN0blP98CFC+wmmNYJE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z9bihbti/zHkO7bNWfl3FNjyyDAvgGIFI03fN1Zy2940E5kNMtKoZkx9NDQiFRPTs
-	 pOFCN5jDOYRdQwoDSKZEmaS2AMsVaQS+IsuDEbaRCfuNgChUaZOF3SJlmw9StJsrR1
-	 xT4GvbMEZs0a9rFFgFG8Eh2tnbe8VLhqhe/P0882MM2FLPjCv2P37ctawPBaM2ln7r
-	 1vpFDl4TsOm1BgVLibctOaaYHuaHCTezYGO/J3fnsXZWaEB6Dy5KA1I6d1sUuNAlER
-	 sJqhwX4+YFJVGbu1D39rCtcKSgoFWDqUsoY3BmWFU73AddxobgQ1y+zU8JGSd8uLBq
-	 kH3VCQ8TEqD+w==
-Date: Tue, 20 May 2025 11:41:24 +0200
+	b=YocNn9UiAuJhZnt6NBpkhkjIHqg4sjhhumWmN9LAPV5VjzZqPtfuDBox2I783H7Cc
+	 VqZh/z5vTj5uOmlYTVojQS3ezLzQcKcJTgAUtlXKLTn7CGKPqoUjd6rVHUb4sMrfUv
+	 chgHpeh6iEjJuGmZ+Ftd2hTpsplWI40BqnLOFYMiQg5dCPT6ASNlFFxqtXFGw2Hroz
+	 EPksLfrM9kUSfvilGCylSeQjD+ckre9RQguW6C0uYKYyF8CJHyUSNVC6wfFb5fEV3C
+	 Kcl/+gwqNOL0i0I2xAlJ01noW9P7ESOPGLuQin1R+3cYx1xywa+0BPsDMf7D093Hb6
+	 Mm402XHl0mhWg==
+Date: Tue, 20 May 2025 11:42:20 +0200
 From: Ingo Molnar <mingo@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
@@ -57,81 +57,73 @@ Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
 	Tom Lendacky <thomas.lendacky@amd.com>,
 	Kevin Loughlin <kevinloughlin@google.com>,
 	Kai Huang <kai.huang@intel.com>, Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH v2 4/8] x86, lib: Add WBNOINVD helper functions
-Message-ID: <aCxORJga9goyt9N7@gmail.com>
+Subject: Re: [PATCH v2 7/8] x86, lib: Add wbinvd and wbnoinvd helpers to
+ target multiple CPUs
+Message-ID: <aCxOfFSSkHYm-rYS@gmail.com>
 References: <20250516212833.2544737-1-seanjc@google.com>
- <20250516212833.2544737-5-seanjc@google.com>
- <aCgw6sbpE6f42sC_@gmail.com>
- <aCtcqlP8MAqgyTbd@google.com>
+ <20250516212833.2544737-8-seanjc@google.com>
+ <aCg0Xc9fEB2Qn5Th@gmail.com>
+ <aCtdnqqvIbHr-ed5@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aCtcqlP8MAqgyTbd@google.com>
+In-Reply-To: <aCtdnqqvIbHr-ed5@google.com>
 
 
 * Sean Christopherson <seanjc@google.com> wrote:
 
-> > and to point out that the 'invalidate' part of the WBNOINVD name is 
-> > a misnomer, as it doesn't invalidate anything, it only writes back 
-> > dirty cachelines.
+> On Sat, May 17, 2025, Ingo Molnar wrote:
+> > 
+> > * Sean Christopherson <seanjc@google.com> wrote:
+> > 
+> > > From: Zheyun Shen <szy0127@sjtu.edu.cn>
+> > > 
+> > > Extract KVM's open-coded calls to do writeback caches on multiple CPUs to
+> > > common library helpers for both WBINVD and WBNOINVD (KVM will use both).
+> > > Put the onus on the caller to check for a non-empty mask to simplify the
+> > > SMP=n implementation, e.g. so that it doesn't need to check that the one
+> > > and only CPU in the system is present in the mask.
+> > > 
+> > > Signed-off-by: Zheyun Shen <szy0127@sjtu.edu.cn>
+> > > Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> > > Link: https://lore.kernel.org/r/20250128015345.7929-2-szy0127@sjtu.edu.cn
+> > > [sean: move to lib, add SMP=n helpers, clarify usage]
+> > > Acked-by: Kai Huang <kai.huang@intel.com>
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  arch/x86/include/asm/smp.h | 12 ++++++++++++
+> > >  arch/x86/kvm/x86.c         |  8 +-------
+> > >  arch/x86/lib/cache-smp.c   | 12 ++++++++++++
+> > >  3 files changed, 25 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/include/asm/smp.h b/arch/x86/include/asm/smp.h
+> > > index e08f1ae25401..fe98e021f7f8 100644
+> > > --- a/arch/x86/include/asm/smp.h
+> > > +++ b/arch/x86/include/asm/smp.h
+> > > @@ -113,7 +113,9 @@ void native_play_dead(void);
+> > >  void play_dead_common(void);
+> > >  void wbinvd_on_cpu(int cpu);
+> > >  void wbinvd_on_all_cpus(void);
+> > > +void wbinvd_on_many_cpus(struct cpumask *cpus);
+> > >  void wbnoinvd_on_all_cpus(void);
+> > > +void wbnoinvd_on_many_cpus(struct cpumask *cpus);
+> > 
+> > Let's go with the _on_cpumask() suffix:
+> > 
+> >     void wbinvd_on_cpu(int cpu);
+> >    +void wbinvd_on_cpumask(struct cpumask *cpus);
+> >     void wbinvd_on_all_cpus(void);
 > 
-> I wouldn't call it a misnomer, the NO part makes it semantically 
-> accurate.
+> How about wbinvd_on_cpus_mask(), to make it more obvious that it operates on
+> multiple CPUs?  At a glance, wbinvd_on_cpumask() could be mistaken for a masked
+> version of wbinvd_on_cpu().
 
-If only 'NO' in that context was unambiguous: initially I fully read it 
-as some sort of acronym or abbreviation :) Why wasn't it named WBCACHE 
-or so? But I digress.
-
-> [...]  I actually think the mnemonic was well chosen, as it helps 
-> capture the relationships and behaviors of INVD, WBINVD, and 
-> WBNOINVD.
-> 
-> How about this?
-
-Much better!
-
-> +/*
-> + * Write back all modified lines in all levels of cache associated with this
-> + * logical processor to main memory, and then invalidate all caches.  Depending
-> + * on the micro-architecture, WBINVD (and WBNOINVD below) may or may not affect
-> + * lower level caches associated with another logical processor that shares any
-> + * level of this processor’s cache hierarchy.
-> + *
-> + * Note, AMD CPUs enumerate the behavior or WB{NO}{INVD} with respect to other
-> + * logical, non-originating processors in CPUID 0x8000001D.EAX[N:0].
-> + */
->  static __always_inline void wbinvd(void)
->  {
-> +       asm volatile("wbinvd" : : : "memory");
-> +}
-> +
-> +/* Instruction encoding provided for binutils backwards compatibility. */
-> +#define ASM_WBNOINVD _ASM_BYTES(0xf3,0x0f,0x09)
-> +
-> +/*
-> + * Write back all modified lines in all levels of cache associated with this
-> + * logical processor to main memory, but do NOT explicitly invalidate caches,
-> + * i.e. leave all/most cache lines in the hierarchy in non-modified state.
-> + */
-> +static __always_inline void wbnoinvd(void)
-> +{
-> +       /*
-> +        * Explicitly encode WBINVD if X86_FEATURE_WBNOINVD is unavailable even
-> +        * though WBNOINVD is backwards compatible (it's simply WBINVD with an
-> +        * ignored REP prefix), to guarantee that WBNOINVD isn't used if it
-> +        * needs to be avoided for any reason.  For all supported usage in the
-> +        * kernel, WBINVD is functionally a superset of WBNOINVD.
-> +        */
-> +       alternative("wbinvd", ASM_WBNOINVD, X86_FEATURE_WBNOINVD);
->  }
-
-Acked-by: Ingo Molnar <mingo@kernel.org>
+Works for me!
 
 Thanks,
 
