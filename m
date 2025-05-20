@@ -1,201 +1,153 @@
-Return-Path: <kvm+bounces-47183-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47184-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5407ABE645
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 23:49:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF5AABE690
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 23:56:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 803327A7D98
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 21:47:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 688714C4C73
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 21:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C502225E80E;
-	Tue, 20 May 2025 21:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A174525E440;
+	Tue, 20 May 2025 21:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EQBdt9sW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b62RuAFF"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920A7136351
-	for <kvm@vger.kernel.org>; Tue, 20 May 2025 21:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2F5219A71
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 21:56:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747777731; cv=none; b=UaV7+uS5R9R84W19c6A1ayzQxNI1/F4qKF01wFa4nciUay4OpQ6v5KnoUMHpePCy+2SBRbdB1Ur+m4UV56jkVIF45rh4N12uKY7Gmit45un7p6t12LQkbYrGYweU5Wz9QeJdQ5UPGEHw6DsA2bDCLuIwSLndE0YhBA0Q02W/hFU=
+	t=1747778192; cv=none; b=uaDIfRMjOeP4H2IUZ6i5k1fcsc1Mrdvp6DdttiWBrBJnT/2kZ2ja+d1NG7a26s2QFjz2dGQTCIXPhG87jNXTuQI+fB50yOngjvxDWepp3V+xrMmy7yf7g4O6f5wmIt0kUvbuXQBqh9dRlej3oSnDAcxRZYNP4p2bHvBKF2BVAQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747777731; c=relaxed/simple;
-	bh=5LoP3oqgkFKk6ICaoX4/klDyU+9dYXEmA86kg6cSZJA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BNcqLuh4xuiSFABjOwF39oJWL01cAmlWXlqHcYv+cPSVnXkBsIom0uvZOmYp2P9Wq3k7vWUMllggPPH1zygRqy0l7whGmOcOQQKEh2vnXUwmq15QiaLKdsc9u9mt0eysQv2TZKZBgYNJbGCV2w22ZirGk9aL/zfKOD8eiyIWo1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EQBdt9sW; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1747778192; c=relaxed/simple;
+	bh=oWb5hAu/l5YSX8uJ039kggIhfQkxgNS/Ezdx1ZpAoFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R8AVsOA96q+I/hqMdAHWnG2cSrCssT2P7QZN919lU01JOEziLZyq/CaGM/s9SE98Fsce9lOPQElBpRIr7t2Nz+FaF9wH8Q/zJs1RHw90iHwihEAVj1Kg9aTupIJ5uD34YxyUeuf+MCrUxyIeeLDk7D3C4u5GjkgOH/rJE1YOfhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b62RuAFF; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747777728;
+	s=mimecast20190719; t=1747778190;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=EutPvaaVGl0ODINF9E/bZzQuSm+ScWKoBRiRqN3WqE0=;
-	b=EQBdt9sWsqQToJ4TO0fTQltngSKDF90P2D9lJetBSJDQKcTk+J7s8tZudN5/0KW3yGyIFp
-	Aeod+dkTrem55+bh7mitOesdKQTccuYSioGbKczqz9FqAKzMlIYIiq3bXuyiIu9mZ2FbDS
-	kgHSutlh8XgcnmpIVa8Rn9nlyW4GiMY=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=8I/zlDb7KnN1EE0TcCQ0JoPgED/9jrw+qsbSjcDT74Q=;
+	b=b62RuAFF6csILHLe4D14GzQ7hPtaNdHJbT0+VD/nUzO5xz+nLwDM03W4lHt+FRVDlHggeo
+	ABqDvrC/E2dOr0FW07aeDVfzypgs40rV3LgtPwwqplwrCSGYafZP9/oQ17RsOAB9LI9LdL
+	+tDCooxesjeaMvqvPFpxggOg3OPlV94=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-166-m9AElkeSNDOD-qTRuxwfLQ-1; Tue, 20 May 2025 17:48:47 -0400
-X-MC-Unique: m9AElkeSNDOD-qTRuxwfLQ-1
-X-Mimecast-MFC-AGG-ID: m9AElkeSNDOD-qTRuxwfLQ_1747777727
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6f8dd95985dso53154366d6.0
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 14:48:47 -0700 (PDT)
+ us-mta-387-NRQKo9KIPy-fcvtuz9uUVg-1; Tue, 20 May 2025 17:56:28 -0400
+X-MC-Unique: NRQKo9KIPy-fcvtuz9uUVg-1
+X-Mimecast-MFC-AGG-ID: NRQKo9KIPy-fcvtuz9uUVg_1747778188
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-730445c2584so1206519a34.2
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 14:56:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747777726; x=1748382526;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EutPvaaVGl0ODINF9E/bZzQuSm+ScWKoBRiRqN3WqE0=;
-        b=DYbpiCaUVnVja37Mp1C76fLDsI54Bi+/0+uJ77/ODxzGax5I9n8MGbyMGJjP7AFoTl
-         P3pGCYWj8hYZ3n/ndwuMmWDtVNbHlgWNVIoj7l6YP8Bl6tf/A0QgXYCv3Lz41UpJ9TpD
-         7LR17OplY7ggwHOQWr+bsg4XgWnaDtTaHBXbJQ0sPKsTJNlhbdaITTFP6+93Wr+H0+pR
-         qPMj1PUz7oA4GWvIkHAO9U72Ie4Tmj7TOpOgDLmLBwyzY9+VCGMLhkfJYsixg7qPox1O
-         DgMOHzQfMMpzve3eE3lHgiKtBYTzhbZQilqZ46GuCnOpux0+XjZQaxX7kF7iYgiq7Gg0
-         O9AA==
-X-Gm-Message-State: AOJu0Yy/kyIOEza6Eau3btsbp74/RnctS1Tn2aRLaFQrlRTXXBHx3p8w
-	ibC1h1UWKq01FpoUz8E/3UGBcG1N4/x5GsX1YPiuxVPcqAoDp+DRcxfGqXFmUlCpxXnU0iriY9N
-	CUdQ+qBxEPFQFcwwM6RKgIfs7QfY93WsuajI59Y4Ty9l8cI8W/icOeA==
-X-Gm-Gg: ASbGncsZHfs6PyPjVktb3M6FZTRALzFFR52mmo3/R8HYNHI5Tu+ejuqohAcjNLGTVFQ
-	XgABHb34PLwA+1uTj6NQz8qJdi3uRDou2ZflNyNSzsCGF5/YbPGodMxrAOfFdkNq04WuPzC72P4
-	mtMxku/Mim2NAG8MzP2ubPUwM1vckTtU8sq4PD+ZuB6oexF6oP29FKSQ2odlMPcDOUo0LDffY0g
-	tPShztPEDol5SmYbvc5PCJWZh01qAps/WwrYhwmgf767BKFwVPsL4/Gpl6JZa1C8M2Z4j7r/RiL
-	ycAG1gXsMtkfW61X56JEf2BXfm+p84tk7x7yoC/WCFTTNIbeAoRG9UR5mfQ=
-X-Received: by 2002:a05:6214:482:b0:6f2:c88a:50c5 with SMTP id 6a1803df08f44-6f8b2d0d13dmr346107916d6.32.1747777726550;
-        Tue, 20 May 2025 14:48:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHuvUphlpNVXWMjMR0Rm0/W8jolN5rQHYmWgteLlMDTRklWTSbWCq/+mU2Z1OwSeR6pXhISOg==
-X-Received: by 2002:a05:6214:482:b0:6f2:c88a:50c5 with SMTP id 6a1803df08f44-6f8b2d0d13dmr346107576d6.32.1747777726204;
-        Tue, 20 May 2025 14:48:46 -0700 (PDT)
-Received: from ?IPv6:2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38? ([2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f8b096ddb4sm76528256d6.78.2025.05.20.14.48.45
+        d=1e100.net; s=20230601; t=1747778188; x=1748382988;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8I/zlDb7KnN1EE0TcCQ0JoPgED/9jrw+qsbSjcDT74Q=;
+        b=J/xe9ZqMpkrtqHvxCjszJMSFBLi17RPUN8cNtcIMXsuRo+UrdM8E1NG3jodMorkZrt
+         z4vnfqeqizurJQwpB4zU55ZNlWvAgPWSdSFcH6/lN4E8hoegjmphGz1s0dEJ3QIxE50p
+         R08CkvhnlLulxNJrcDDCd8hoEX1TmHWgqHvmnyr7dBQZw9mb3p0fMW6XqKtCUiOA4QI+
+         IZhvcorU6F/AeyJJyBjQKc8n8vlr6RF1XUimlvJGz6RVz2/UzEuuKEjpoZlWmLhS+kK5
+         suyLEg8x56qbyeMjKDl4RF2415ic7QGDSVqt5N/7CGCxrp1BZcB/Bc98PRf7QYkZEKK4
+         pH1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU6KqAuGwoi6Dh2LDK5dyLV23IgDkXSyx5KJufPeNYSDe+w6pVCY/TUPkkCzLjzfKpcphI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3+peSIHwKaK0AV4Chwin8x3+TCz68NujBS8gI6gUQtgvryS2P
+	Ko+2a9paAgPX19CGPxz6PFbafa7MhDHb5IPAUhBygr9S/6GNm3hVyKaoieMDJp1j2OmlOOCePas
+	vGMNTiD+rHYBEb9VTWxRo5UFZQSlS1eUHcDDTWxxVSLCxQtD+ub1YZA==
+X-Gm-Gg: ASbGncvigTNwSzJUEgkx3nrVh0yfjn/pKg7FDGspw7uYiFn+Fj3Yc/+dlTVd/LYpRXx
+	MYAFJBL76tcpdXUaO/ilw6CQQY3NMxfQ2ufIJcP4g6XIDLwBrBIpIiNE0yDV5BTlwQnQX+Wd+dN
+	ptbVkwDFvvY/IfuxYELklLN9WYrrlDdATPjpcqgOZCkokCA9xRaRk0gxoQCcT4aLBIeCTSqaWlO
+	W+4XGFF22KbHgs68+Wh7slCoysHYUgdQ3TgdDdOLfceKtsDIrQKsq1D74mTfenxVPjn6e34W3Ax
+	hGZyQkR23ttJGO4=
+X-Received: by 2002:a05:6830:2b10:b0:727:3b8d:6b2a with SMTP id 46e09a7af769-734f6b91e7emr5189928a34.7.1747778187741;
+        Tue, 20 May 2025 14:56:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFk9JqMhUFPwxwAxuXj2yAnvft1vt3nStZWtHNmFycnDXM5L8C/WRYPVEXsZD3K/2UWIMr5xg==
+X-Received: by 2002:a05:6830:2b10:b0:727:3b8d:6b2a with SMTP id 46e09a7af769-734f6b91e7emr5189917a34.7.1747778187411;
+        Tue, 20 May 2025 14:56:27 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-734f6b3cbb4sm1971038a34.44.2025.05.20.14.56.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 14:48:45 -0700 (PDT)
-Message-ID: <fababe6628c448a4aa96e1ad47ad862eddf90c24.camel@redhat.com>
-Subject: Re: [PATCH v4 3/4] x86: nVMX: check vmcs12->guest_ia32_debugctl
- value given by L2
-From: mlevitsk@redhat.com
-To: Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Sean
- Christopherson <seanjc@google.com>, Borislav Petkov <bp@alien8.de>,
- x86@kernel.org, Ingo Molnar <mingo@redhat.com>, 
- linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Paolo
- Bonzini <pbonzini@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>
-Date: Tue, 20 May 2025 17:48:44 -0400
-In-Reply-To: <d9ea18ac1148c9596755c4df8548cdb8394f2ee0.camel@redhat.com>
-References: <20250515005353.952707-1-mlevitsk@redhat.com>
-	 <20250515005353.952707-4-mlevitsk@redhat.com> <aCaxlS+juu1Rl7Mv@intel.com>
-	 <d9ea18ac1148c9596755c4df8548cdb8394f2ee0.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+        Tue, 20 May 2025 14:56:26 -0700 (PDT)
+Date: Tue, 20 May 2025 15:56:24 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, lizhe.67@bytedance.com,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, muchun.song@linux.dev
+Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for
+ huge folio
+Message-ID: <20250520155624.3d0fdc38.alex.williamson@redhat.com>
+In-Reply-To: <8bd88c21-4164-4e10-8605-d6a8483d0aeb@redhat.com>
+References: <20250520070020.6181-1-lizhe.67@bytedance.com>
+	<20250520080719.2862017e.alex.williamson@redhat.com>
+	<aCy1AzYFyo4Ma1Z1@x1.local>
+	<8bd88c21-4164-4e10-8605-d6a8483d0aeb@redhat.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, 2025-05-16 at 10:50 -0400, mlevitsk@redhat.com wrote:
-> On Fri, 2025-05-16 at 11:31 +0800, Chao Gao wrote:
-> > On Wed, May 14, 2025 at 08:53:52PM -0400, Maxim Levitsky wrote:
-> > > Check the vmcs12 guest_ia32_debugctl value before loading it, to avoi=
-d L2
-> > > being able to load arbitrary values to hardware IA32_DEBUGCTL.
-> > >=20
-> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > ---
-> > > arch/x86/kvm/vmx/nested.c | 4 ++++
-> > > arch/x86/kvm/vmx/vmx.c=C2=A0=C2=A0=C2=A0 | 2 +-
-> > > arch/x86/kvm/vmx/vmx.h=C2=A0=C2=A0=C2=A0 | 2 ++
-> > > 3 files changed, 7 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > > index e073e3008b16..0bda6400e30a 100644
-> > > --- a/arch/x86/kvm/vmx/nested.c
-> > > +++ b/arch/x86/kvm/vmx/nested.c
-> > > @@ -3193,6 +3193,10 @@ static int nested_vmx_check_guest_state(struct=
- kvm_vcpu *vcpu,
-> > > 	=C2=A0=C2=A0=C2=A0=C2=A0 CC((vmcs12->guest_bndcfgs & MSR_IA32_BNDCFG=
-S_RSVD))))
-> > > 		return -EINVAL;
-> > >=20
-> > > +	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) &&
-> > > +	=C2=A0=C2=A0=C2=A0=C2=A0 CC(vmcs12->guest_ia32_debugctl & ~vmx_get_=
-supported_debugctl(vcpu, false)))
-> > > +		return -EINVAL;
-> > > +
-> >=20
-> > How about grouping this check with the one against DR7 a few lines abov=
-e?
->=20
-> Good idea, will do.
+On Tue, 20 May 2025 19:41:19 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Besides the above change, is there anything else to change in this patchset=
-?
-If not I'll sent a new version soon.
+> On 20.05.25 18:59, Peter Xu wrote:
+> > Hi, Alex,
+> > 
+> > On Tue, May 20, 2025 at 08:07:19AM -0600, Alex Williamson wrote:  
+> >> Peter, David, if you wouldn't mind double checking the folio usage
+> >> here, I'd appreciate it.  The underlying assumption used here is that
+> >> folios always have physically contiguous pages, so we can increment at
+> >> the remainder of the folio_nr_pages() rather than iterate each page.  
+> > 
+> > Yes I think so.  E.g., there's comment above folio definition too:  
+> 
+> It has consecutive PFNs, yes (i.e., pfn++). The "struct page" might not 
+> be consecutive (i.e., page++ does not work for larger folios).
 
-Thanks,
-Best regards,
-	Maxim Levitsky
+The former, contiguous PFNs is all we need here.  We're feeding the
+IOMMU mapping, so we're effectively just looking for the largest extent
+of contiguous PFNs for mapping a given IOVA.  The struct page is really
+just for GUP, finding the next pfn, and with this, finding the offset
+into the large folio.
 
+> > /**
+> >   * struct folio - Represents a contiguous set of bytes.
+> >   * ...
+> >   * A folio is a physically, virtually and logically contiguous set
+> >   * of bytes...
+> >   */
+> > 
+> > For 1G, I wonder if in the future vfio can also use memfd_pin_folios()
+> > internally when possible, e.g. after stumbled on top of a hugetlb folio
+> > when filling the batch.  
+> 
+> Yeah, or have a better GUP interface that gives us folio ranges instead 
+> of individual pages.
+> 
+> Using memfd directly is obviously better where possible.
 
+Yeah, we brought up some of these issues during previous reviews.
+Ultimately we want to move to IOMMUFD, which already has these
+features, but it still lacks P2P DMA mapping and isn't as well
+supported by various management stacks.  This leaves some performance
+on the table, but has a pretty high return for a relatively trivial
+change.  Thanks,
 
-
-> >=20
-> > > 	if (nested_check_guest_non_reg_state(vmcs12))
-> > > 		return -EINVAL;
-> > >=20
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 9953de0cb32a..9046ee2e9a04 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -2179,7 +2179,7 @@ static u64 nested_vmx_truncate_sysenter_addr(st=
-ruct kvm_vcpu *vcpu,
-> > > 	return (unsigned long)data;
-> > > }
-> > >=20
-> > > -static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool ho=
-st_initiated)
-> > > +u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_init=
-iated)
-> > > {
-> > > 	u64 debugctl =3D 0;
-> > >=20
-> > > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> > > index 6d1e40ecc024..1b80479505d3 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.h
-> > > +++ b/arch/x86/kvm/vmx/vmx.h
-> > > @@ -413,7 +413,9 @@ static inline void vmx_set_intercept_for_msr(stru=
-ct kvm_vcpu *vcpu, u32 msr,
-> > > 		vmx_disable_intercept_for_msr(vcpu, msr, type);
-> > > }
-> > >=20
-> > > +
-> >=20
-> > stray newline.
-> >=20
-> > > void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
-> > > +u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_init=
-iated);
-> > >=20
-> > > /*
-> > > =C2=A0* Note, early Intel manuals have the write-low and read-high bi=
-tmap offsets
-> > > --=20
-> > > 2.46.0
-> > >=20
-> > >=20
-> >=20
->=20
-> Best regards,
-> 	Maxim Levitsky
+Alex
 
 
