@@ -1,85 +1,40 @@
-Return-Path: <kvm+bounces-47115-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC2D6ABD6B2
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 13:25:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4D0EABD860
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 14:45:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 294F517FE17
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 11:25:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35BC88A3E04
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 12:44:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B82A27CB3D;
-	Tue, 20 May 2025 11:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elDCBclS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21BF51D86FF;
+	Tue, 20 May 2025 12:45:10 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4452C270555
-	for <kvm@vger.kernel.org>; Tue, 20 May 2025 11:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998DB1AF4C1;
+	Tue, 20 May 2025 12:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747740290; cv=none; b=ZZz61h3ugwwqGxROtvpGJeVDrQFFx+cYNC0fgapDu6AJQ7zoumSxZDOWu/+oWAnj+9sJUybHf8SmgEo3ukzgXQglRcEn4mKLYmxJvHNDB0XFdBrsjetYxtROtL/YDEL4xcvs5hO9oC833hbmdVLrwMQrY0EGa7mUjMJx3M9U7A0=
+	t=1747745109; cv=none; b=CfTYxp6Jo2SNsXdcEmlZHx2wfHGIMdGwaHBaAAxfWkTeP2r7CHPsuEG9zFCifkJaMzQcKz7Ftp5Higb3NGBua2vONnF+zTG4/vVvVNR8caGdnSg3Wu46lZMVUXAXkjbdnAI/J7gJYfCwgrJBjE5AFyAhaBdCW4s37QOnvc5m+Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747740290; c=relaxed/simple;
-	bh=TuAIH9bfwGkhs90AUwbat8H9o+RJq1imxYa/lL35UsQ=;
+	s=arc-20240116; t=1747745109; c=relaxed/simple;
+	bh=NzdOdgoQ23Hz5lBHiviB4k5++/DN2bgjc3n42aDFjM0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cfEYYPeA0mtbdJGn1k3PJj98F0FONvJ/GzPzZjxzDyaUv7/z6JBYWvafmfGoJnqpnayC2ZimF65e2u1L4sXkYkzRLsd4cTbgth5Hucx9erefo5UmDfZqWZ39J5Q+vL5VcKdImdC0tQv44phMvMsQR3qh5jCvGwC/JMQuqGfZ3Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=elDCBclS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747740288;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fe9XgeFRrKR14t48Y5t/+VDl1Nkl0xKTWni0QoyTko0=;
-	b=elDCBclSAR6qvQlWcRE9E1wXas1PC4ReG1izfRpYwvxA4/Iw5Mdzmqcz4ViOrPMr3PuhyB
-	ZzwJEfkPDJcyAzfgolvm3ATWd+EXGG9cN02W1IKXlc69wLbXlo3HbfGFxtgiT2kfxg/msu
-	yCS0jGMmUUaidY6HhlKKJufa/GD/yqA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-qeyHNs3XOYaIY_XAygQThg-1; Tue, 20 May 2025 07:24:46 -0400
-X-MC-Unique: qeyHNs3XOYaIY_XAygQThg-1
-X-Mimecast-MFC-AGG-ID: qeyHNs3XOYaIY_XAygQThg_1747740285
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a364394fa8so1702404f8f.0
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 04:24:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747740285; x=1748345085;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fe9XgeFRrKR14t48Y5t/+VDl1Nkl0xKTWni0QoyTko0=;
-        b=L3WoSKzXi02Mx9sUJNc0Mi4Ph8wK3d73rlzumIHsGC6/DloOhKIbZv/j32us8BG7cl
-         Be5In53H5Dv8Np0Md31whZF3Lzx3SMgJreEIbZE0tEqG3R066OXkzttfZm0zpOAgwCTx
-         9nPksjkBG6l8rtCKc5sxqBZJKGFm1ueYAghQiGcPbcddikuGjrYj9438tNWlOCiOUnL0
-         MWcNIMQZmf2ZxUe1dI6TVOR9j67RaipW/P0LAAfLnBET+tl6var6WfR2YlF0do5XzgJb
-         ZjpRf94xYsrSM1QsXJaL6YhNp7uRbZUlOg+DHoM10YTl8DFvj96YtKPhVf0CW/tUEtEv
-         4dfw==
-X-Gm-Message-State: AOJu0YzLqSTPSqh9LnpDu79ojkRQxOFw1/FFjRq2WkHpLxBkxC6cC5nV
-	eH6wJbF2pQMTBLbujJK8R0kJui/efj6L4G/VwIpEb3v0hAaBwYcJAaNwgg00GcHfKERNjBLGHne
-	Pytd8QrUIn2vu5p4lkjXJhGlF+RkJBBukYvdDNxhWawAqurvh3i4iSA==
-X-Gm-Gg: ASbGnctVrPDa6A57kSIQb2VzCwQ++aGqdW91Ev2eywo0qjn5xAZssZ5o4arKbRRJ7LN
-	avBiRCanvj2miJU5l9CFhPEkyyjDu6oONSrm4S1gBAkUOvr23QoLqi2+Aro19SBwFKJTYR4B6ua
-	icNz3O5EWCCwY7gOcC/kRefHE1Ee273tm1eMcQlCHbWFZ2+rp5bm9o2STsGZUTPPSna5T6BksoR
-	QclPNCh93aF553m17c1Xsk/WdJdCBb8mhktAKNeJf3C3PFEZ6WQmNNM8CgbtPF+4VX1/GPpYf0D
-	EEWq5hLQu2SzYBjxJNg=
-X-Received: by 2002:a05:6000:2304:b0:3a0:b521:9525 with SMTP id ffacd0b85a97d-3a35fe65fb8mr12718952f8f.1.1747740285492;
-        Tue, 20 May 2025 04:24:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEofFs1HXEriOPCetmLcj952oc2+OEDOvFvT2d4euNrXMvEB2EHBEoF9oG/uDbOigZv9W8Xdg==
-X-Received: by 2002:a05:6000:2304:b0:3a0:b521:9525 with SMTP id ffacd0b85a97d-3a35fe65fb8mr12718940f8f.1.1747740285150;
-        Tue, 20 May 2025 04:24:45 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:244f:5710::f39? ([2a0d:3344:244f:5710::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca6254bsm16428674f8f.52.2025.05.20.04.24.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 04:24:44 -0700 (PDT)
-Message-ID: <0d3a3a42-4141-4c4d-b25a-3c9181d5842e@redhat.com>
-Date: Tue, 20 May 2025 13:24:43 +0200
+	 In-Reply-To:Content-Type; b=MtDgP+INN2rMgDxxsl6cghSALEsYnj2/qitr9UuQJ6YBZda4Lqgcp9azBdJMvnzD7wQcHs1meyqO7MUhtg89p6fjhuSiYW1mUbBFhHlsAUzxdXO9McUunutZeN6W6exeEQuqMKAUqvKowApycKHxrWyCIjgzxbqF4liwirkBRl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5BE211516;
+	Tue, 20 May 2025 05:44:53 -0700 (PDT)
+Received: from [10.1.36.74] (Suzukis-MBP.cambridge.arm.com [10.1.36.74])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7D77A3F5A1;
+	Tue, 20 May 2025 05:45:03 -0700 (PDT)
+Message-ID: <bfddad3d-b15b-4122-a460-47489af11f24@arm.com>
+Date: Tue, 20 May 2025 13:45:02 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,41 +42,76 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7] selftests/vsock: add initial vmtest.sh for
- vsock
-To: Bobby Eshleman <bobbyeshleman@gmail.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20250515-vsock-vmtest-v7-1-ba6fa86d6c2c@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250515-vsock-vmtest-v7-1-ba6fa86d6c2c@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v8 33/43] arm64: RME: Hide KVM_CAP_READONLY_MEM for realm
+ guests
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-34-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20250416134208.383984-34-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/16/25 12:00 AM, Bobby Eshleman wrote:
-> +tap_prefix() {
-> +	sed -e "s/^/${TAP_PREFIX}/"
-> +}
+On 16/04/2025 14:41, Steven Price wrote:
+> For protected memory read only isn't supported by the RMM. While it may
+> be possible to support read only for unprotected memory, this isn't
+> supported at the present time.
+> 
+> Note that this does mean that ROM (or flash) data cannot be emulated
+> correctly by the VMM as the stage 2 mappings are either always
+> read/write or are trapped as MMIO (so don't support operations where the
+> syndrome information doesn't allow emulation, e.g. load/store pair).
+> 
+> This restriction can be lifted in the future by allowing the stage 2
 
-I think there is no need to the tap prefix to the output you intend to
-'comment out', the kselftest infra should already add the tap prefix
-mark to each line generated by the test,
+minor nit: s/allowing the/allowing the unprotected/
 
-> +
-> +tap_output() {
-> +	if [[ ! -z "$TAP_PREFIX" ]]; then
+> mappings to be made read only.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
 
-AFAICS TAP_PREFIX is a not empty string constant, so this function is
-always a no op. If so it should be dropped.
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Otherwise LGTM, thanks,
-
-Paolo
+> ---
+> Changes since v7:
+>   * Updated commit message to spell out the impact on ROM/flash
+>     emulation.
+> ---
+>   arch/arm64/kvm/arm.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8060e25afbd0..4780e3af1bb9 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -340,7 +340,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_ONE_REG:
+>   	case KVM_CAP_ARM_PSCI:
+>   	case KVM_CAP_ARM_PSCI_0_2:
+> -	case KVM_CAP_READONLY_MEM:
+>   	case KVM_CAP_MP_STATE:
+>   	case KVM_CAP_IMMEDIATE_EXIT:
+>   	case KVM_CAP_VCPU_EVENTS:
+> @@ -355,6 +354,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_COUNTER_OFFSET:
+> +	case KVM_CAP_READONLY_MEM:
+>   	case KVM_CAP_SET_GUEST_DEBUG:
+>   		r = !kvm_is_realm(kvm);
+>   		break;
 
 
