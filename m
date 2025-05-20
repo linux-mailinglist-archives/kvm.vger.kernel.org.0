@@ -1,117 +1,110 @@
-Return-Path: <kvm+bounces-47161-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47162-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7928ABE114
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 18:48:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D57EEABE118
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 18:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16F578C39E9
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:48:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 117873BBBF2
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214BF2798E1;
-	Tue, 20 May 2025 16:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062742701B6;
+	Tue, 20 May 2025 16:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MAL9HM2n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ld+qggO7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96E821D3F3
-	for <kvm@vger.kernel.org>; Tue, 20 May 2025 16:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A6A2571AA
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 16:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747759706; cv=none; b=oTjLRAVf81Xsd66P98g0DWuNWquLEwup8BSlvNK3xD3xm94sGEq0bIATpn3T27Fj9EaYv9MmrLIwYmf4esz4SShfNZtA6L88KWqPPtnm48TzUZCRPGgZEWL1yHaxir4v6lGzP0/tT7oq1P/npZTIYNqhBBeEYeLNvriHZ5TiJ3Y=
+	t=1747759711; cv=none; b=pgXG6Rm89B/MHdgM/sHbFkwO3Nl2Po6mJUWXeh/JW3X1yFFU1zMsgcsj52EG12dwjDt2Lsucv1XGhvfxRSYJYln7Ky7JMJXC/cwDtv3u8zT5ePi4hHSCME2lx6UpfGNrG8qbB4Q4mnCJ5sgZ6VMxnjJ0CXiOCRWeLqUefiXuIfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747759706; c=relaxed/simple;
-	bh=VKOLyd+fTgXxi0xSU7seE7QvEy9DHjhT9JyUqMZjDXk=;
+	s=arc-20240116; t=1747759711; c=relaxed/simple;
+	bh=KlV0RXmqKpJ77CyyCsB0Wo5O3FyVrt7eDZrhGXiZPok=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Yja5wjFqCsZwdeClRvdAVIF3d9w/0d9S9OaSz5uYTsibzNVb1Td25HhGT+eqqNMcwqczk5EuiNFiE6KYh2K7FeqyNq8ovpOSRPZ04zzo7ker3cCdhPt0eLgzSIRnwTREGNrkn3Ulwf+d1wZdf8fdDUjDXsSceoHb3hx/s9TLG74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MAL9HM2n; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=RrVHmPFqisaHnq+sGIMze9flbiHGKwCx+O6f4lwNXvEcKJlP7pdYpTaS12t0ykRjBCKlH4DYSjAUaj88Su9Y8WSjFKECB36XiPExr+4K5bhDxKUAmhJxy9GOv+7gSs+xDtM5wRg3OeSs9deHmKqIogMam9Ge1QD6YrKeYcd1X8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ld+qggO7; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30ed6bd1b4cso3881697a91.0
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 09:48:24 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b0f807421c9so3503565a12.0
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 09:48:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747759704; x=1748364504; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747759709; x=1748364509; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wcl6TqUwD54tFkNVg+Ri/3Cun2a33c9FWRAhj6V56jQ=;
-        b=MAL9HM2nG1K00TOdPGQrZMeQdy+sdujtHwdyk8bwp0aI9KalteiNX67XmAIs4Osnnv
-         kGHhYbzi+jamSyQHP+eJ6Rzoc/RMGbmcSw3r2BoTrXHVRvI+IWi42BVnVTHEC1/OKRjK
-         NW1XeGs2QNp73agFaMJtZ2Qru3L2QYP5n3pR70PevR+yW38HV682xxBaYg8q/dhaTj3L
-         uEeFl/I4p7gq/FewAVotkSETtLS87Zho26NA5PfOd36hOuAr73jHQdyz4i6PQGvraYnF
-         FzI/zlktwm8WGshF3G0q9ByYjQVvvNsixDomALSjMCxjtR7JdwbksLdrV4OsLid0RcEh
-         pbZw==
+        bh=KuJYydDReX9RTl05bbdXTXs3Odmmz9RsQYChmIkMKX8=;
+        b=ld+qggO7zrvfVgzUjwUWUm05Ba+/1u05BO5SrY7ZMAtt+3eXXv6/x62NiTqaRggIOI
+         FViM+a2VIZhMrWy/nhZ6N2XjRzRyJbe0f3Ks29crwYDZZ1WmEoDZO0kJmYRVQoafukR4
+         dFb/lySmEOD3PPWNiD+kxUqL3P9P/HZ7Pucq0qdyHsET9j/bjz5lJWMWb/PDOHXA5EHQ
+         Ikf5rWpMHBw0D7G7dER15/IKjUdJhBbfrxr8in8Z+/mVGgB943synN359wAGQy4kk5jA
+         HAaSt/y1OE1fn/Vj2hx4jFayT01i8SDDgn8SsOxN4xhfYpzkjD+9MFqqxtRBBUKS0Rrv
+         WXyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747759704; x=1748364504;
+        d=1e100.net; s=20230601; t=1747759709; x=1748364509;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wcl6TqUwD54tFkNVg+Ri/3Cun2a33c9FWRAhj6V56jQ=;
-        b=EYx49aC6tjAJ3nK97NdU6FdukD+hh4kzKK0c+mSTJ68aFhNR9ufbEe3ELtyBn6OEcr
-         moo1Xqp8lU7h/kQ3wiLgtgTpDGk+sT6wjDbD5n8pK5nPcfEjgnjO+kODjT82jls7aO6o
-         CrvjMFxxhwJknxzC4DZT//B3UriKn7HmIwNKkXvl456wsOQj7i/YXM+XduAVJ5Llrktn
-         A7RxWn1bvQK91NQ9EPO1/iWSNj4H24bfMBAaC7nb3XSqkOO/D7k1mHMzzA6Xmolq7XYq
-         uLcEuWu9404eU7i3pKolgCP29mJIF18NjqJv7wRQB0VfLf4Qr9Vaq63d4qoFHuZlCMb2
-         an+A==
-X-Forwarded-Encrypted: i=1; AJvYcCW+QRzAVs4seghRKSEIuSC+drn//liw8rHGLRq1x1VhqnfzH8Tbh3GU0eibsfYMXxfLFnw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPnWGo5X4A8v6IGMmIaeENhl/8kazmcFQn3ZhRHojZHUbf+VXu
-	NKqcUu0ByveWIailo9Wd6nJNBwaJotXZuNZK5fzjGKm+yf5El0+xZZaLWKMHRAhywfkPrpghdhA
-	Rvk8u8A==
-X-Google-Smtp-Source: AGHT+IHWuapVqe0x+t6XHz6AnLhy46gF3CLB1xUoma8BHmFx0DTfNmTB/vRYZiHtoCJbxgU+GsCHbokk230=
-X-Received: from pjbee16.prod.google.com ([2002:a17:90a:fc50:b0:2fa:15aa:4d1e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:33c2:b0:2ff:58b8:5c46
- with SMTP id 98e67ed59e1d1-30e830f7b18mr26615931a91.8.1747759704142; Tue, 20
- May 2025 09:48:24 -0700 (PDT)
-Date: Tue, 20 May 2025 09:48:06 -0700
-In-Reply-To: <20250508184649.2576210-1-jthoughton@google.com>
+        bh=KuJYydDReX9RTl05bbdXTXs3Odmmz9RsQYChmIkMKX8=;
+        b=n6AtkoXzFFaAPUhKPWOEjN8h51SrqcXPWcp/5fAtHX+hvw9nDo32DEL2SFYGCqhFSU
+         wTQy95GK9fNGxaEMC0MqI/JupASLww7S5j1oAQ23HT8sG4aAZPiaj0bH6IU4wRyINNnw
+         7LrjLTFYIl8bZljo5xgakfivLVF7gAhxMbO+zwfaKX8sk+wMfT2fosorDhvfq3Ea2rpl
+         IApKaqHoN6lZN9ELdxF5LRptowtyd40mPkmhFkpqqj0PVs1qZtEotxNkFkFzn+YvbcpF
+         iGK1jxM1Z0Fq0VoXnGPqMEFe1dvlmQ+c0OdwzgeezTGE3yTu02BDnZ298iVqiwN56rvz
+         4HwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVFsdDxlA6CDeXYzqRWxfcvIO4Mu4afokT9VkvVTIa5Sx7eNdslh7I8odqU62ehq7YoRx4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzl958K1TZ27pyikpcpW19932fnJPqPZmKzQ5gWUmelOtq3TYjK
+	VTbCN6a6BTRa/d4PMBovi268CWKLDY2GzpQiZLi7xyKKjNaUiAxf1tGkpj98QfkTO/73P5Zf//t
+	GfON3FQ==
+X-Google-Smtp-Source: AGHT+IEGFK1iHgjNql7Jg32erSL4VFEPnjrseOMCWC27oDhyRo6xkoj3Gu6mn3PMHwbhO+N/ywLOodNSFGQ=
+X-Received: from pjbpl16.prod.google.com ([2002:a17:90b:2690:b0:30e:7003:7604])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3846:b0:2ff:6788:cc67
+ with SMTP id 98e67ed59e1d1-30e7d5ceeb4mr22007339a91.34.1747759709435; Tue, 20
+ May 2025 09:48:29 -0700 (PDT)
+Date: Tue, 20 May 2025 09:48:08 -0700
+In-Reply-To: <20250502050346.14274-1-manali.shukla@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250508184649.2576210-1-jthoughton@google.com>
+References: <20250502050346.14274-1-manali.shukla@amd.com>
 X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <174767770635.2666521.3146495513676301743.b4-ty@google.com>
-Subject: Re: [PATCH v4 0/7] KVM: selftests: access_tracking_perf_test fixes
- for NUMA balancing and MGLRU
+Message-ID: <174742194085.2506614.18155306395568716918.b4-ty@google.com>
+Subject: Re: [PATCH v5 0/5] Add support for the Bus Lock Threshold
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	James Houghton <jthoughton@google.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, mkoutny@suse.com, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>, Yu Zhao <yuzhao@google.com>, 
-	David Matlack <dmatlack@google.com>, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Manali Shukla <manali.shukla@amd.com>
+Cc: pbonzini@redhat.com, nikunj@amd.com, bp@alien8.de
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 08 May 2025 18:46:41 +0000, James Houghton wrote:
-> This series fixes some issues with access_tracking_perf_test when MGLRU
-> or NUMA balancing are in use.
-> 
-> With MGLRU, touching a page doesn't necessarily clear the Idle flag.
-> This has come up in the past, and the recommendation was to use MGLRU
-> generation numbers[1], which this series does.
+On Fri, 02 May 2025 05:03:41 +0000, Manali Shukla wrote:
+> Misbehaving guests can cause bus locks to degrade the performance of
+> a system. Non-WB (write-back) and misaligned locked RMW (read-modify-write)
+> instructions are referred to as "bus locks" and require system wide
+> synchronization among all processors to guarantee the atomicity. The bus
+> locks can impose notable performance penalties for all processors within
+> the system.
 > 
 > [...]
 
-Applied to kvm-x86 selftests, thanks!
+Applied to kvm-x86 svm, with a heavily modified test, and the comment typo fix
+for patch 4.
 
-[1/7] KVM: selftests: Extract guts of THP accessor to standalone sysfs helpers
-      https://github.com/kvm-x86/linux/commit/d761c14d902e
-[2/7] KVM: selftests: access_tracking_perf_test: Add option to skip the sanity check
-      https://github.com/kvm-x86/linux/commit/26dcdfa01c33
-[3/7] cgroup: selftests: Move memcontrol specific helpers out of common cgroup_util.c
-      https://github.com/kvm-x86/linux/commit/3a7f9e518c6a
-[4/7] cgroup: selftests: Move cgroup_util into its own library
-      https://github.com/kvm-x86/linux/commit/2c754a84ff16
-[5/7] cgroup: selftests: Add API to find root of specific controller
-      https://github.com/kvm-x86/linux/commit/38e1dd578142
-[6/7] KVM: selftests: Build and link selftests/cgroup/lib into KVM selftests
-      https://github.com/kvm-x86/linux/commit/b11fcb51e2b2
-[7/7] KVM: selftests: access_tracking_perf_test: Use MGLRU for access tracking
-      https://github.com/kvm-x86/linux/commit/d166453ebd29
+[1/5] KVM: x86: Make kvm_pio_request.linear_rip a common field for user exits
+      https://github.com/kvm-x86/linux/commit/e9628b011bbd
+[2/5] x86/cpufeatures: Add CPUID feature bit for the Bus Lock Threshold
+      https://github.com/kvm-x86/linux/commit/faad6645e112
+[3/5] KVM: SVM: Add architectural definitions/assets for Bus Lock Threshold
+      https://github.com/kvm-x86/linux/commit/827547bc3a2a
+[4/5] KVM: SVM: Add support for KVM_CAP_X86_BUS_LOCK_EXIT on SVM CPUs
+      https://github.com/kvm-x86/linux/commit/89f9edf4c69d
+[5/5] KVM: selftests: Add test to verify KVM_CAP_X86_BUS_LOCK_EXIT
+      https://github.com/kvm-x86/linux/commit/72df72e1c6dd
 
 --
 https://github.com/kvm-x86/linux/tree/next
