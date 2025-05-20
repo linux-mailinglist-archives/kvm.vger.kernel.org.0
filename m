@@ -1,153 +1,124 @@
-Return-Path: <kvm+bounces-47184-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47185-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBF5AABE690
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 23:56:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61A37ABE6D3
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 00:20:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 688714C4C73
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 21:56:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 220474C6732
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 22:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A174525E440;
-	Tue, 20 May 2025 21:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC3725F790;
+	Tue, 20 May 2025 22:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b62RuAFF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yPSITkon"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2F5219A71
-	for <kvm@vger.kernel.org>; Tue, 20 May 2025 21:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEC0252906
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 22:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747778192; cv=none; b=uaDIfRMjOeP4H2IUZ6i5k1fcsc1Mrdvp6DdttiWBrBJnT/2kZ2ja+d1NG7a26s2QFjz2dGQTCIXPhG87jNXTuQI+fB50yOngjvxDWepp3V+xrMmy7yf7g4O6f5wmIt0kUvbuXQBqh9dRlej3oSnDAcxRZYNP4p2bHvBKF2BVAQA=
+	t=1747779604; cv=none; b=oWS9qWPcwGAdw5+rpngbm2oDpZXkHWnptpVV3Tnzz89EopPHFkYPHrktpuzNOiJBfQuLd4Rpzqx/3z8KWiTCtCzEnesmKVYFTd59X3nI2YVcL3F0MKlVBxM90/EhKkchJtnmKAtdK82DKINfsLH3bEfMH10UXuuZJg5t4pFM6fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747778192; c=relaxed/simple;
-	bh=oWb5hAu/l5YSX8uJ039kggIhfQkxgNS/Ezdx1ZpAoFo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R8AVsOA96q+I/hqMdAHWnG2cSrCssT2P7QZN919lU01JOEziLZyq/CaGM/s9SE98Fsce9lOPQElBpRIr7t2Nz+FaF9wH8Q/zJs1RHw90iHwihEAVj1Kg9aTupIJ5uD34YxyUeuf+MCrUxyIeeLDk7D3C4u5GjkgOH/rJE1YOfhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b62RuAFF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747778190;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8I/zlDb7KnN1EE0TcCQ0JoPgED/9jrw+qsbSjcDT74Q=;
-	b=b62RuAFF6csILHLe4D14GzQ7hPtaNdHJbT0+VD/nUzO5xz+nLwDM03W4lHt+FRVDlHggeo
-	ABqDvrC/E2dOr0FW07aeDVfzypgs40rV3LgtPwwqplwrCSGYafZP9/oQ17RsOAB9LI9LdL
-	+tDCooxesjeaMvqvPFpxggOg3OPlV94=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-387-NRQKo9KIPy-fcvtuz9uUVg-1; Tue, 20 May 2025 17:56:28 -0400
-X-MC-Unique: NRQKo9KIPy-fcvtuz9uUVg-1
-X-Mimecast-MFC-AGG-ID: NRQKo9KIPy-fcvtuz9uUVg_1747778188
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-730445c2584so1206519a34.2
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 14:56:28 -0700 (PDT)
+	s=arc-20240116; t=1747779604; c=relaxed/simple;
+	bh=yAGEzQUXdc/wVqTOY22PEJhqYz72ZGCmkjww4aZKXSg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ToxYVjptOq8yk+q+jpV5ye4id0QD+bBZyPCYDmB8hTmDY7IShstWlrQoGwv8b7rLVzO581niJr5wTkFMIXTrDNtEl7O18u8sc0XS4W5aZLCXpPe6LGO8cxMz4JOICVK7DlSVnsVhQ6GYndRAbcNgU9K9MV2cY3/8BXci5dxH4F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yPSITkon; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30e9b2e7a34so3152743a91.0
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 15:20:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747779602; x=1748384402; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8HKYrw1mX2rWYU9hhnTeFvSQNlJmWd9SuBazr4xA8xE=;
+        b=yPSITkonmFP/ayz7YCCGBVhCVQUG2m+821CZclbqmtnFUpMXjJMylWsE0Tgc+5QN9j
+         cqTwHYCKEnuGxBrK1c1cFPhpAZLv7xyImcDrIx+VazeSSJjtLPe0H53tEzF8774eZLy9
+         qyN3wA8T2oR66rCn/0e36FioO7VaLMnO4TdISsixaD7zGSr1Vid8m8LhigiMgPuFpgk8
+         qTjUuAsvCl+0xmno/l7HSBB7jgLGyUQuUT3QUQVmdH+2390tQQLaUNat2bc1EpQ7seDG
+         Yy6aSKlWrHMGVQF7En6gUlcaRQUgQoMCw8IK+qZULVUAy54yIQXqvvMiCvckhcFFmeMe
+         sNcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747778188; x=1748382988;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8I/zlDb7KnN1EE0TcCQ0JoPgED/9jrw+qsbSjcDT74Q=;
-        b=J/xe9ZqMpkrtqHvxCjszJMSFBLi17RPUN8cNtcIMXsuRo+UrdM8E1NG3jodMorkZrt
-         z4vnfqeqizurJQwpB4zU55ZNlWvAgPWSdSFcH6/lN4E8hoegjmphGz1s0dEJ3QIxE50p
-         R08CkvhnlLulxNJrcDDCd8hoEX1TmHWgqHvmnyr7dBQZw9mb3p0fMW6XqKtCUiOA4QI+
-         IZhvcorU6F/AeyJJyBjQKc8n8vlr6RF1XUimlvJGz6RVz2/UzEuuKEjpoZlWmLhS+kK5
-         suyLEg8x56qbyeMjKDl4RF2415ic7QGDSVqt5N/7CGCxrp1BZcB/Bc98PRf7QYkZEKK4
-         pH1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU6KqAuGwoi6Dh2LDK5dyLV23IgDkXSyx5KJufPeNYSDe+w6pVCY/TUPkkCzLjzfKpcphI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3+peSIHwKaK0AV4Chwin8x3+TCz68NujBS8gI6gUQtgvryS2P
-	Ko+2a9paAgPX19CGPxz6PFbafa7MhDHb5IPAUhBygr9S/6GNm3hVyKaoieMDJp1j2OmlOOCePas
-	vGMNTiD+rHYBEb9VTWxRo5UFZQSlS1eUHcDDTWxxVSLCxQtD+ub1YZA==
-X-Gm-Gg: ASbGncvigTNwSzJUEgkx3nrVh0yfjn/pKg7FDGspw7uYiFn+Fj3Yc/+dlTVd/LYpRXx
-	MYAFJBL76tcpdXUaO/ilw6CQQY3NMxfQ2ufIJcP4g6XIDLwBrBIpIiNE0yDV5BTlwQnQX+Wd+dN
-	ptbVkwDFvvY/IfuxYELklLN9WYrrlDdATPjpcqgOZCkokCA9xRaRk0gxoQCcT4aLBIeCTSqaWlO
-	W+4XGFF22KbHgs68+Wh7slCoysHYUgdQ3TgdDdOLfceKtsDIrQKsq1D74mTfenxVPjn6e34W3Ax
-	hGZyQkR23ttJGO4=
-X-Received: by 2002:a05:6830:2b10:b0:727:3b8d:6b2a with SMTP id 46e09a7af769-734f6b91e7emr5189928a34.7.1747778187741;
-        Tue, 20 May 2025 14:56:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFk9JqMhUFPwxwAxuXj2yAnvft1vt3nStZWtHNmFycnDXM5L8C/WRYPVEXsZD3K/2UWIMr5xg==
-X-Received: by 2002:a05:6830:2b10:b0:727:3b8d:6b2a with SMTP id 46e09a7af769-734f6b91e7emr5189917a34.7.1747778187411;
-        Tue, 20 May 2025 14:56:27 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-734f6b3cbb4sm1971038a34.44.2025.05.20.14.56.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 14:56:26 -0700 (PDT)
-Date: Tue, 20 May 2025 15:56:24 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, lizhe.67@bytedance.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, muchun.song@linux.dev
-Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for
- huge folio
-Message-ID: <20250520155624.3d0fdc38.alex.williamson@redhat.com>
-In-Reply-To: <8bd88c21-4164-4e10-8605-d6a8483d0aeb@redhat.com>
-References: <20250520070020.6181-1-lizhe.67@bytedance.com>
-	<20250520080719.2862017e.alex.williamson@redhat.com>
-	<aCy1AzYFyo4Ma1Z1@x1.local>
-	<8bd88c21-4164-4e10-8605-d6a8483d0aeb@redhat.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1747779602; x=1748384402;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8HKYrw1mX2rWYU9hhnTeFvSQNlJmWd9SuBazr4xA8xE=;
+        b=sADhUW7NLXTwoJz/aBw2kZZJjafHfYWLhAJuhd5koMITI5pIX2otgNFtg32SUHmwF/
+         gVJ/EWvoxPFT163ByK8Ug/IN7AnJEt2G4vwbP9M6gb4R7PHq26yLBXTCybH+suK74kyW
+         Yzk5aWvMRfninG9giw2+VwhF1vcMUkqsnf23fs4TDxuw3iU0PdvmgCUe7PxlGPqV/WOj
+         q44XQgPW76H6G0QjRoz4udxoIVl2uQMEgH+fxgNlzMaH7rxfK+FgZXzQmLGakJt2nqGi
+         YOxFHEJ1d1EDS0Ep3kpi2HnUOuu0c/R/YINX1GPL+3MqMMKrFiJnnunTtcAk5i0l7WQM
+         fgEg==
+X-Forwarded-Encrypted: i=1; AJvYcCXG9kmbVtirIHpRDD9SdfWP8pD3EGqmC3PgROWS+eSr1Jc52m+1VZaxamU2tFB6EnbMLdM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6LIh4B1AiS+Qm9qjAFE9ZYAx/eF5wkJJWcgFVw7EzHX4+xP+J
+	JHJ46Ad4KFoSPcwgZw3f0r3pNI5A4wIsYxiX5q9F/BI+eiAwLmV6IxQ7DG/7Z/3fp43L2ZiDCUn
+	G0R1kxg==
+X-Google-Smtp-Source: AGHT+IGm0Qd18FrnDfhlG7/JjUl4lMpy15ihv5+w3UyMikyFwPD+eN8+5DcFhlZu44RxRjwOsuD2Z657iBM=
+X-Received: from pjoo5.prod.google.com ([2002:a17:90b:5825:b0:2fc:e37d:85dc])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5188:b0:305:5f28:2d5c
+ with SMTP id 98e67ed59e1d1-30e7d558d26mr28473120a91.15.1747779602268; Tue, 20
+ May 2025 15:20:02 -0700 (PDT)
+Date: Tue, 20 May 2025 15:20:00 -0700
+In-Reply-To: <20250520191816.GJ16434@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250519185514.2678456-1-seanjc@google.com> <20250519185514.2678456-9-seanjc@google.com>
+ <20250520191816.GJ16434@noisy.programming.kicks-ass.net>
+Message-ID: <aC0AEJX0FIMl9lDy@google.com>
+Subject: Re: [PATCH v2 08/12] sched/wait: Drop WQ_FLAG_EXCLUSIVE from add_wait_queue_priority()
+From: Sean Christopherson <seanjc@google.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, K Prateek Nayak <kprateek.nayak@amd.com>, 
+	David Matlack <dmatlack@google.com>, Juergen Gross <jgross@suse.com>, 
+	Stefano Stabellini <sstabellini@kernel.org>, 
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 20 May 2025 19:41:19 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> On 20.05.25 18:59, Peter Xu wrote:
-> > Hi, Alex,
-> > 
-> > On Tue, May 20, 2025 at 08:07:19AM -0600, Alex Williamson wrote:  
-> >> Peter, David, if you wouldn't mind double checking the folio usage
-> >> here, I'd appreciate it.  The underlying assumption used here is that
-> >> folios always have physically contiguous pages, so we can increment at
-> >> the remainder of the folio_nr_pages() rather than iterate each page.  
-> > 
-> > Yes I think so.  E.g., there's comment above folio definition too:  
+On Tue, May 20, 2025, Peter Zijlstra wrote:
+> On Mon, May 19, 2025 at 11:55:10AM -0700, Sean Christopherson wrote:
+> > Drop the setting of WQ_FLAG_EXCLUSIVE from add_wait_queue_priority() to
+> > differentiate it from add_wait_queue_priority_exclusive().  The one and
+> > only user add_wait_queue_priority(), Xen privcmd's irqfd_wakeup(),
+> > unconditionally returns '0', i.e. doesn't actually operate in exclusive
+> > mode.
 > 
-> It has consecutive PFNs, yes (i.e., pfn++). The "struct page" might not 
-> be consecutive (i.e., page++ does not work for larger folios).
-
-The former, contiguous PFNs is all we need here.  We're feeding the
-IOMMU mapping, so we're effectively just looking for the largest extent
-of contiguous PFNs for mapping a given IOVA.  The struct page is really
-just for GUP, finding the next pfn, and with this, finding the offset
-into the large folio.
-
-> > /**
-> >   * struct folio - Represents a contiguous set of bytes.
-> >   * ...
-> >   * A folio is a physically, virtually and logically contiguous set
-> >   * of bytes...
-> >   */
-> > 
-> > For 1G, I wonder if in the future vfio can also use memfd_pin_folios()
-> > internally when possible, e.g. after stumbled on top of a hugetlb folio
-> > when filling the batch.  
+> I find:
 > 
-> Yeah, or have a better GUP interface that gives us folio ranges instead 
-> of individual pages.
+> drivers/hv/mshv_eventfd.c:      add_wait_queue_priority(wqh, &irqfd->irqfd_wait);
+> drivers/xen/privcmd.c:  add_wait_queue_priority(wqh, &kirqfd->wait);
 > 
-> Using memfd directly is obviously better where possible.
+> I mean, it might still be true and all, but hyperv seems to also use
+> this now.
 
-Yeah, we brought up some of these issues during previous reviews.
-Ultimately we want to move to IOMMUFD, which already has these
-features, but it still lacks P2P DMA mapping and isn't as well
-supported by various management stacks.  This leaves some performance
-on the table, but has a pretty high return for a relatively trivial
-change.  Thanks,
+Oh FFS, another "heavily inspired by KVM".  I should have bribed someone to take
+this series when I had the chance.  *sigh*
 
-Alex
+Unfortunately, the Hyper-V code does actually operate in exclusive mode.  Unless
+you have a better idea, I'll tweak the series to:
 
+  1. Drop WQ_FLAG_EXCLUSIVE from add_wait_queue_priority() and have the callers
+     explicitly set the flag, 
+  2. Add a patch to drop WQ_FLAG_EXCLUSIVE from Xen privcmd entirely.
+  3. Introduce add_wait_queue_priority_exclusive() and switch KVM to use it.
+
+That has an added bonus of introducing the Xen change in a dedicated patch, i.e.
+is probably a sequence anyways.
+
+Alternatively, I could rewrite the Hyper-V code a la the KVM changes, but I'm not
+feeling very charitable at the moment (the complete lack of documentation for
+their ioctl doesn't help).
 
