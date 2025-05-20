@@ -1,192 +1,238 @@
-Return-Path: <kvm+bounces-47085-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47086-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B925ABD216
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 10:35:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99D65ABD242
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 10:46:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 880E84A227C
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 08:35:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEE5A1B646DB
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 08:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4972609D6;
-	Tue, 20 May 2025 08:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112F0264A9F;
+	Tue, 20 May 2025 08:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MbIweyuj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g/I3lHaq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403152641F3;
-	Tue, 20 May 2025 08:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECD7213E66
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 08:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747730122; cv=none; b=ucg4oAcTydDdHuRJuelgwrpzgEKL0BCX/BzEytF58iYVn/lMh44ACr5ad5P+2Tl7wGXfkyP68TWsJbmoQjOG2CuHashwAlAwpwAbUoioI0CN9Nm070JW0yZO49cLlKihSJBD4dSUmkHFUV9DXHH6DGhsvftA7u9p68p854M4mh8=
+	t=1747730776; cv=none; b=FAYtycLHdynAsdr71YA26HF1wUGbodwHq3Jw4/qaZLboCHvpsErY/AWkPEPL4/JnaMOAyxEqIb6+x872nOnugpq06R2KwPj5+8FpYDfeHuOq/F59ig3OMTkmOw9QEHKNd1+7xNy4P2TItAawtZDWPaNNIEG0H4hDgkpF6JZRX88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747730122; c=relaxed/simple;
-	bh=DB4MFiNGQ/Yo0KCARdE9N39Tr7wqNyEhs4IY2TbNROY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=eP/biWYD9PBYd44yUQCVkIXjt0tkZOpfE1kO6QgZXGmNVq5ujvncO20tv/9vqEww6K9yovJnxvkkpUhw2z5xPNDFDrZgq4zr++xICSxq5XTI4GHHWiR8MgVNm0paSvdE8l0JFwLuX0kwPtn62txE4K27lU5ZfkOGy3VEHKGH0s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MbIweyuj; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54K7hjHk012339;
-	Tue, 20 May 2025 08:35:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=aDGrGv
-	ajedzdf5vho21QnaZU/wUkszsW/R+3WIn0s9Y=; b=MbIweyujk+73gpSVrvdkuy
-	Fg5fNFSzHGXOwSGCVY6fwbjP+IqaPwk+7daohRnmtnOmrtOcEiUtUtbhE0n7lrRS
-	6d7b3MDrYpLXK6QNFn8catSOeNzSOg246GAZHBWVgD98RaxV4IomDqC4C+YXak7T
-	l6DGOCP/fh+6dO9un/Qs4uf/Cj/TG+VnItnaPheFEjGcCDgI17XxbBdisAqOp96h
-	0Krm7EjDdGwaVe+z2vc/PjmnaxAMj3kkocc4C4oIemL05YMq30HmDnflxVXsAgVC
-	38zgFccm1lFrcIalH5nLCtQAahwyT5R6/Op3RfocR0uqypL3lOwmrlVNZqcnSW5Q
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46rab72xtn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 May 2025 08:35:14 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54K5gex5013843;
-	Tue, 20 May 2025 08:35:13 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 46q4stb5k9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 May 2025 08:35:13 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54K8ZAgY21496160
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 May 2025 08:35:10 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 31CFF20040;
-	Tue, 20 May 2025 08:35:10 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F3B3F2006A;
-	Tue, 20 May 2025 08:35:09 +0000 (GMT)
-Received: from darkmoore (unknown [9.111.66.212])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 20 May 2025 08:35:09 +0000 (GMT)
+	s=arc-20240116; t=1747730776; c=relaxed/simple;
+	bh=8xTFfl67wIQOufxQ/XTxHmawmYTtXy92FH7wmrqBR60=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JWA1CYV8bnJnUG4HzYbvwhnnehDljAXQ2/AB7d2v/TjMUqvwWmsbZlT+A1oN14clcLLYJ0yq7v19tSM6tVpx0Bn2EBmmJXiQgGDhaiXt3+tByYH/cbRs1SK7vDMUBRB5dvpvLHHeZtlAQMDM+Bnubo7463BBHCt85ZrU3xaMjRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g/I3lHaq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747730772;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UOPxyI8xvsODmW2CXsEeAiOYmTmUpftyoQUfAgolB4o=;
+	b=g/I3lHaqgMkL95SxwMON+Yb930f53bDS3ZSrZYvwNKTlrCFzdHtTf7BXzJRVPl/eRUFIWp
+	gkUP1tFS7muVSY21D5+8ZzzICYlpQgLPwxfjmNxoRn54wWwmKWihOWW1WczX6o1GCD05eW
+	vK8tyxgRX8rrmWkhKyP9PzaAqeI8AHo=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-67-s3s8DA1-OoWboaQ-tShwpg-1; Tue, 20 May 2025 04:46:11 -0400
+X-MC-Unique: s3s8DA1-OoWboaQ-tShwpg-1
+X-Mimecast-MFC-AGG-ID: s3s8DA1-OoWboaQ-tShwpg_1747730770
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-acbbb0009aeso95896166b.1
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 01:46:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747730770; x=1748335570;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UOPxyI8xvsODmW2CXsEeAiOYmTmUpftyoQUfAgolB4o=;
+        b=NTj9nTGij6+Qzknc1QQSNYJZgJKUN1LmfPlS0EZz2VShNsPtZm6aA6rxLpEHTcDrVi
+         8M3YaXrEd4LP4/BPw59c6kJnxl3FPBKTRuEmMgHUyEPYn+bN7W62NV7KCxCsQIujTQrt
+         YaHNEllrOpzhLCEADIKM9v6yVhgHUuYk+iIUnAsRwyLc66wtM1etfdXKjw4gTgv47xSa
+         1GvnG1Te46DbWIaH1/nCtLbyDzKUatKZEBDjJV3kUYtWRopfGxG3huPR8aMSIfmX2/X/
+         uQlyU2647uadc9c/f2sc5CY1lHUcpV7jiMoOFQu2YWLWldckk6hFT1y0CHNjr4g1lyCq
+         7eAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFQqDWTDwtmf4ICTZ7mQiKgWB3shDIlb9ad4o6amdK6/gqz8ZSafgY7Za4DVvtMTm6q84=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1NcblQyPYHfzY0pxXpJX2u8h/Ds1v+/l4l+SC8bQSC8hBBDDB
+	XG0iaPef/8heHAUjX8PHAmsCCjDWXc2NShPlv2gVteEEjMCoBI62qMZUH7wqda5gibdu7vse/41
+	vrrV3Qk8nSLq5n1L6C8Nod6E1gNY50Il2+IhZ+2KzhyWPOk8aKp+Nqg==
+X-Gm-Gg: ASbGncvQ5QkfOfhQ2yBimfmdefNSTUkQQ6rr4sbHP8hDG8OgDS04fFljS6Z7Ry1EXVJ
+	v9TOpfm8TLcXnhlPtfDAQej0UkMo30U3SIEUCipl466iRQN40XcgT7gIyo8/rPwkwKP7d5jwsKu
+	BfXSAv6mKe1B1VJG+SRTEIFxUlZhfxGlV/vE1YaYu8+j2eB+Dohy8PDE6Mm3tyKz7aER7EgI3Kn
+	Gh/q4XvUeMrQZgrK7bg4//b9HYeghLJVLqhdOiBKgrajjUDy4rehJxYOUkt1rB9042xSfjajGh2
+	87v2IyodmTLGipDNGqFUoejSKl0zVWJk6L9AKO7xE/hDVrr6iOqythxtxNnb
+X-Received: by 2002:a17:907:d8b:b0:ad5:719d:3e88 with SMTP id a640c23a62f3a-ad5719d5958mr608963866b.44.1747730770008;
+        Tue, 20 May 2025 01:46:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEhQGUr9rfzMJHGnlV8hllI6xbhRlkYFydEwrW3ZoqExjBDhlLpqKETdyFe+3K/njihrbep/Q==
+X-Received: by 2002:a17:907:d8b:b0:ad5:719d:3e88 with SMTP id a640c23a62f3a-ad5719d5958mr608959666b.44.1747730769386;
+        Tue, 20 May 2025 01:46:09 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d06dc99sm702438566b.62.2025.05.20.01.46.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 May 2025 01:46:08 -0700 (PDT)
+Date: Tue, 20 May 2025 10:46:03 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Xuewei Niu <niuxuewei97@gmail.com>
+Cc: mst@redhat.com, fupan.lfp@antgroup.com, pabeni@redhat.com, 
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net, 
+	stefanha@redhat.com, virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Xuewei Niu <niuxuewei.nxw@antgroup.com>
+Subject: Re: [PATCH 2/3] vsock/virtio: Add SIOCINQ support for all virtio
+ based transports
+Message-ID: <ca3jkuttkt3yfdgcevp7s3ejrxx3ngkoyuopqw2k2dtgsqox7w@fhicoics2kiv>
+References: <20250519070649.3063874-1-niuxuewei.nxw@antgroup.com>
+ <20250519070649.3063874-3-niuxuewei.nxw@antgroup.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 20 May 2025 10:35:04 +0200
-Message-Id: <DA0UM5YL6IFH.1KE7UH4H6XBZM@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <linux-s390@vger.kernel.org>,
-        "Christian Borntraeger"
- <borntraeger@linux.ibm.com>,
-        "Janosch Frank" <frankja@linux.ibm.com>,
-        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        "David Hildenbrand"
- <david@redhat.com>,
-        "Heiko Carstens" <hca@linux.ibm.com>,
-        "Vasily Gorbik"
- <gor@linux.ibm.com>,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        "Sven
- Schnelle" <svens@linux.ibm.com>
-To: "Thomas Huth" <thuth@redhat.com>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v2 2/3] KVM: s390: Always allocate esca_block
-X-Mailer: aerc 0.20.1
-References: <20250519-rm-bsca-v2-0-e3ea53dd0394@linux.ibm.com>
- <20250519-rm-bsca-v2-2-e3ea53dd0394@linux.ibm.com>
- <e5f67090-07a4-4818-b83e-33386313b2af@redhat.com>
-In-Reply-To: <e5f67090-07a4-4818-b83e-33386313b2af@redhat.com>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=ELgG00ZC c=1 sm=1 tr=0 ts=682c3ec2 cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=wuLMqWMKSN1-Q7KnnqIA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 5f9jd9YWdhIbfmMFWxGCJhutHNGKyaQa
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIwMDA2NiBTYWx0ZWRfX/eaDk3Sn/Byx cGZvoT3WPCCbdxR/1Mk7dNUiHRE2vUHMb73MbMjW6WhOcPEQh2WRE2kMOkxQXtBiIYcYjwSyVYV Mj7TxAVn8eDLPnJrR4X4dPBR1cFAC2lDltZld9ZbGPHN2YBuzjw2ng0Rv2imxZISDziCg5Rf3Ur
- 5kBVIeAUjscz/hm+RCbbx054ObSC8GVQXIknPQ+JngdJVLe6JUDBiC36ESe6n3S9fdp3hbCygQx 8ibqUKv+ug2RilqbuSRn0zpKH1ifSwUQIz/MpfQ5g6dPqz+18hREgakr+TMacjhqzVJIuSTZtgM uIejPktz04fLd+qNxKaqtlEjoG7DrSDrK1Gro58rInx89dVaTCK/gd+OiXDLTBRLHPEV+yaJNeu
- JxNkjLSjRyNyDl5CbIOaZ5hmjYU28fZ3OASkX2aa/KZ3RztIELveI839fy760oSe6Q5pwpiF
-X-Proofpoint-GUID: 5f9jd9YWdhIbfmMFWxGCJhutHNGKyaQa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-20_03,2025-05-16_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=570
- adultscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0 suspectscore=0
- phishscore=0 priorityscore=1501 impostorscore=0 mlxscore=0 malwarescore=0
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505070000
- definitions=main-2505200066
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250519070649.3063874-3-niuxuewei.nxw@antgroup.com>
 
-On Tue May 20, 2025 at 7:41 AM CEST, Thomas Huth wrote:
-> On 19/05/2025 13.36, Christoph Schlameuss wrote:
->> Instead of allocating a BSCA and upgrading it for PV or when adding the
->> 65th cpu we can always use the ESCA.
->>=20
->> The only downside of the change is that we will always allocate 4 pages
->> for a 248 cpu ESCA instead of a single page for the BSCA per VM.
->> In return we can delete a bunch of checks and special handling depending
->> on the SCA type as well as the whole BSCA to ESCA conversion.
->>=20
->> As a fallback we can still run without SCA entries when the SIGP
->> interpretation facility or ESCA are not available.
->>=20
->> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/kvm_host.h |   1 -
->>   arch/s390/kvm/interrupt.c        |  67 ++++-------------
->>   arch/s390/kvm/kvm-s390.c         | 159 ++++++-------------------------=
---------
->>   arch/s390/kvm/kvm-s390.h         |   4 +-
->>   4 files changed, 42 insertions(+), 189 deletions(-)
+On Mon, May 19, 2025 at 03:06:48PM +0800, Xuewei Niu wrote:
+>The virtio_vsock_sock has a new field called bytes_unread as the return
+>value of the SIOCINQ ioctl.
 >
-> Could you now also remove struct bsca_block from the kvm_host_types.h hea=
-der?
+>Though the rx_bytes exists, we introduce a bytes_unread field to the
+>virtio_vsock_sock struct. The reason is that it will not be updated
+>until the skbuff is fully consumed, which causes inconsistency.
+>
+>The byte_unread is increased by the length of the skbuff when skbuff is
+>enqueued, and it is decreased when dequeued.
+>
+>Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+>---
+> drivers/vhost/vsock.c                   |  1 +
+> include/linux/virtio_vsock.h            |  2 ++
+> net/vmw_vsock/virtio_transport.c        |  1 +
+> net/vmw_vsock/virtio_transport_common.c | 17 +++++++++++++++++
+> net/vmw_vsock/vsock_loopback.c          |  1 +
+> 5 files changed, 22 insertions(+)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index 802153e23073..0f20af6e5036 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -452,6 +452,7 @@ static struct virtio_transport vhost_transport = {
+> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>
+> 		.unsent_bytes             = virtio_transport_unsent_bytes,
+>+		.unread_bytes             = virtio_transport_unread_bytes,
+>
+> 		.read_skb = virtio_transport_read_skb,
+> 	},
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index 0387d64e2c66..0a7bd240113a 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -142,6 +142,7 @@ struct virtio_vsock_sock {
+> 	u32 buf_alloc;
+> 	struct sk_buff_head rx_queue;
+> 	u32 msg_count;
+>+	size_t bytes_unread;
+
+Can we just use `rx_bytes` field we already have?
+
+Thanks,
+Stefano
+
+> };
+>
+> struct virtio_vsock_pkt_info {
+>@@ -195,6 +196,7 @@ s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
+> u32 virtio_transport_seqpacket_has_data(struct vsock_sock *vsk);
+>
+> ssize_t virtio_transport_unsent_bytes(struct vsock_sock *vsk);
+>+ssize_t virtio_transport_unread_bytes(struct vsock_sock *vsk);
+>
+> void virtio_transport_consume_skb_sent(struct sk_buff *skb,
+> 				       bool consume);
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index f0e48e6911fc..917881537b63 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -585,6 +585,7 @@ static struct virtio_transport virtio_transport = {
+> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>
+> 		.unsent_bytes             = virtio_transport_unsent_bytes,
+>+		.unread_bytes             = virtio_transport_unread_bytes,
+>
+> 		.read_skb = virtio_transport_read_skb,
+> 	},
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 7f7de6d88096..11eae88c60fc 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -632,6 +632,7 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> 	free_space = vvs->buf_alloc - fwd_cnt_delta;
+> 	low_rx_bytes = (vvs->rx_bytes <
+> 			sock_rcvlowat(sk_vsock(vsk), 0, INT_MAX));
+>+	vvs->bytes_unread -= total;
+>
+> 	spin_unlock_bh(&vvs->rx_lock);
+>
+>@@ -782,6 +783,7 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+> 		}
+>
+> 		virtio_transport_dec_rx_pkt(vvs, pkt_len);
+>+		vvs->bytes_unread -= pkt_len;
+> 		kfree_skb(skb);
+> 	}
+>
+>@@ -1132,6 +1134,19 @@ ssize_t virtio_transport_unsent_bytes(struct vsock_sock *vsk)
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_unsent_bytes);
+>
+>+ssize_t virtio_transport_unread_bytes(struct vsock_sock *vsk)
+>+{
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+	size_t ret;
+>+
+>+	spin_lock_bh(&vvs->rx_lock);
+>+	ret = vvs->bytes_unread;
+>+	spin_unlock_bh(&vvs->rx_lock);
+>+
+>+	return ret;
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_unread_bytes);
+>+
+> static int virtio_transport_reset(struct vsock_sock *vsk,
+> 				  struct sk_buff *skb)
+> {
+>@@ -1365,6 +1380,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+> 		goto out;
+> 	}
+>
+>+	vvs->bytes_unread += len;
+>+
+> 	if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM)
+> 		vvs->msg_count++;
+>
+>diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>index 6e78927a598e..13a77db2a76f 100644
+>--- a/net/vmw_vsock/vsock_loopback.c
+>+++ b/net/vmw_vsock/vsock_loopback.c
+>@@ -99,6 +99,7 @@ static struct virtio_transport loopback_transport = {
+> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>
+> 		.unsent_bytes             = virtio_transport_unsent_bytes,
+>+		.unread_bytes             = virtio_transport_unread_bytes,
+>
+> 		.read_skb = virtio_transport_read_skb,
+> 	},
+>-- 
+>2.34.1
 >
 
-We still need these to support sigp with bsca in vsie. (Once I have that
-running properly.)
-
-> ...
->> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
->> index 8d3bbb2dd8d27802bbde2a7bd1378033ad614b8e..2c8e177e4af8f2dab07fd42a=
-904cefdea80f6855 100644
->> --- a/arch/s390/kvm/kvm-s390.h
->> +++ b/arch/s390/kvm/kvm-s390.h
->> @@ -531,7 +531,7 @@ int kvm_s390_handle_per_event(struct kvm_vcpu *vcpu)=
-;
->>   /* support for Basic/Extended SCA handling */
->>   static inline union ipte_control *kvm_s390_get_ipte_control(struct kvm=
- *kvm)
->>   {
->> -	struct bsca_block *sca =3D kvm->arch.sca; /* SCA version doesn't matte=
-r */
->> +	struct esca_block *sca =3D kvm->arch.sca; /* SCA version doesn't matte=
-r */
->
-> You might want to adjust/remove the comment here now.
->
-
-Yes. This does not make any sense anymore. But it is already completely rem=
-oved
-along with that whole message in the next patch.
-
->
->
->>   	return &sca->ipte_control;
->>   }
->> @@ -542,7 +542,7 @@ static inline int kvm_s390_use_sca_entries(void)
->>   	 * might use the entries. By not setting the entries and keeping them
->>   	 * invalid, hardware will not access them but intercept.
->>   	 */
->> -	return sclp.has_sigpif;
->> +	return sclp.has_sigpif && sclp.has_esca;
->>   }
->>   void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
->>   				     struct mcck_volatile_info *mcck_info);
->>=20
-
-
---
-Cheers,
-
-Christoph
 
