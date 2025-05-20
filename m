@@ -1,194 +1,361 @@
-Return-Path: <kvm+bounces-47136-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47137-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEFD3ABDD3D
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:35:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2087CABDD5C
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:39:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BF2A4C81FD
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 14:18:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AE2C3B2962
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 14:34:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC7419ABB6;
-	Tue, 20 May 2025 14:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A87D248886;
+	Tue, 20 May 2025 14:34:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TW12Ynjf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hl/BooP/"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2040.outbound.protection.outlook.com [40.107.244.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C041824728B
-	for <kvm@vger.kernel.org>; Tue, 20 May 2025 14:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747750421; cv=fail; b=AErAGsVJQjbj07CVmDEOJpnrOvG6PjAMPi7uiIe2bIAIEo4XgW1iNw+9nokyTDhFkxZPEMKJJpC5q9ISRCcQG91ghmkSUzhsSMp2oHTKC/8+qHpL6j45EU/Ku4WXMXRdUmaU1SHS186OkDopVRXSrVWGu+DbTqniM7xR+U3UyZE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747750421; c=relaxed/simple;
-	bh=+mfazPi0VMhpc4CQTN1e4N3skczLQFKj1QO/gAc9HN0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sdwLsm1fdODvi+GLtLc/GDw5YSUWlKiraz03pyTZFzKYrf0IKwOf8LrXqpeD8GX9mHR9u7DIQxu0bodH892TgI4lYUcLJ1JrOzZRV2SOT0yMt3mZvPdYHBIoNWCDEoRgrU0iGvWuqkfEP2EN8ubqCxn3zGiq0pnhKEXECSXzuWo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TW12Ynjf; arc=fail smtp.client-ip=40.107.244.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ofjDHqvzYn8K/olz45OSPtGGQcukcsQbhoKPpQLnvlg9HDRWqtDdGVVQNGnxFqCEMwwi1Xd1jM4Iah1Budq3wnUXW2L2QRl78TLFQONkIGFUb2PoID7zRwgb9fMn0nOl9oUQh3tUtnWL5vsFr5xNzVHqbjomgeXmyQEBXI44sk/uPU+QokgtY9kTLD3YKicWvfhGvr7OgwpHAzABNfH2jv/kMrjQ+G6YKXdN6hf4eqT5C7idaTTCtrdqyKL2f54BW8CJzSy8axszJMLZQb8toQoQrCRD7KIqjNJO94pWTnq17bxNs6pBZjypFo7WvKH1BoIJ2z2AD4JWCzMeJg92Mw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tQBRjZEoMrS0yTjv8uXOF3Axg9JcjYl/+H9sJDcecaw=;
- b=ASlu+xBWr1bZhmx6dpZ422smqYakpiWlY7+hQz2PnjdexYO2eSuwXGfu99W0W3mscyqgwfVc+Ngm0P2sx/tdeMGzaa8eKR7MMc/+wmuRYb8gkIjz/n6Qah5K/CLLH3gZF/6BrnJ68Rmk7QnWil8uVJM4uykYL64n1KsUItVfyFfJRUVaMyvXZaEx1XuXgAluMoe/FTVzofdyKEki+R9KWDo0Ye5xHn662ucfZ5VK8GFF6Cc21ea1u8evPVxpCiXcrZiqH7wgcmZJp7mDDuos1xxqMKVXKwervbOfXWF812ELfc1o1/w/PV3DFi6h+cY/BVFdVK1le9ahUUucqmF1rg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tQBRjZEoMrS0yTjv8uXOF3Axg9JcjYl/+H9sJDcecaw=;
- b=TW12YnjfSyxwvTsU/ntSunXzr0sDbEpgohvI28O0Ht/BgoBvbi3D5Wepg6s0MJaQxPUScljE7wSFAp+azTPESCxSsYZF8cISDOlW4K3CadMmOPsdahgpFEWHH3Ai6yaH+/xmFlw6Kg4+2U71XfcCc4vO6SuTLZU5EBvYE/krmA8wVvYMuQP60k3emx4RgrOQpOtFAygimoejnNYwCOswufewYDmiwl4WZZKdSEUwD7ERVPtnHrw9G6LjDYjTxyN6Rsn8vzfiga887asQon+joke7BavoFRUcIneexTt2dwGKgGOmvBR0/fzO2/ESUFOODcT8KCxEh9BVB5S9sxXXGw==
-Received: from SA0PR11CA0116.namprd11.prod.outlook.com (2603:10b6:806:d1::31)
- by LV2PR12MB5750.namprd12.prod.outlook.com (2603:10b6:408:17e::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.32; Tue, 20 May
- 2025 14:13:33 +0000
-Received: from SA2PEPF00003F65.namprd04.prod.outlook.com
- (2603:10b6:806:d1:cafe::a3) by SA0PR11CA0116.outlook.office365.com
- (2603:10b6:806:d1::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8746.32 via Frontend Transport; Tue,
- 20 May 2025 14:13:33 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SA2PEPF00003F65.mail.protection.outlook.com (10.167.248.40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8769.18 via Frontend Transport; Tue, 20 May 2025 14:13:32 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 20 May
- 2025 07:13:18 -0700
-Received: from [172.27.58.102] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 20 May
- 2025 07:13:15 -0700
-Message-ID: <ae6d8d55-2af4-4f78-8b33-6a30b075c30b@nvidia.com>
-Date: Tue, 20 May 2025 17:13:11 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767E224503B
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 14:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747751669; cv=none; b=logdLU2kGgzdOJOb7hy+xCOLLH4JRXZ3pEf7yi5FQrt3ABPFS4nEcVRlhpsRLoXxCyk/Tt1gRUOxLLVRip1sJOiZnIAi2hzr5vyGzYh0ERbPc23vJdVrwiGPB4IPDuv7qfuG0WSOPBSWNo0tIT4B5Z5M9K0bD7IVr/J4uGzQ8/E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747751669; c=relaxed/simple;
+	bh=mNFyed1F6DrHqM8zOgSCAdvd/yLPgRuXpu7QQKLIDd0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c8R1KS/CI4YogvG7sE8TBrNs+l18/VesIW+bDMz9izAw6Bf705wLLCQ9yGEkKUN2I1sgcIIMRgMao71JZXcRlO4Rn9mgKYZ6K9mEcI3PM4X2VjoeDlGBDi9//C6IrExw1RBz/Ci0SDKPaKjAebacqeYx568MXgdjYSlbOey6iyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hl/BooP/; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-47666573242so1049091cf.0
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 07:34:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747751666; x=1748356466; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y0P2IqjvcCUOqznaXOXK895YsSeeP/H/xxEi3DHBfCY=;
+        b=Hl/BooP/XqE40sQ83evDyG+lzouhUdaaUFaPFWp5SlwtWrtyExKwE1mgPAFXHy+PaT
+         YkgDiBw+fhHIJSzIJyRWLpQMYXLvULzNcwdZwqJ+m1empL2DAugdGRQAEBbEySdMibVE
+         uHtDY+xpYcY2YoBU9siICqtJnHYLOvVe5K9eztoSxIdErawREqoqAk8bZyCWYGmA8u+6
+         LKcnAUKhrI3+f3nvPnqHJNHmjpL3atOo04KWa8LGRCHPu0yhbI2Mc59GQe8Jn9lgj2IX
+         wzm3kKNWXbDk5qphIwBu1IgsIK5NaNajKOyT8TuCBSm+iglBnRYQAeTFTaixTqtoeeLL
+         Sq/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747751666; x=1748356466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y0P2IqjvcCUOqznaXOXK895YsSeeP/H/xxEi3DHBfCY=;
+        b=v5OlCUMTiq+NNdbC3vm3RX9ileOZslDmm/cJbvYFv4hdwhACTRkUqDA1+TPTfH+No6
+         4l8Fd31QXq+i1aR4iXzGPfCAdEuXvfz6bHAld1Ein4qqM+RkKmwuUE5gBSRZk3cWYn36
+         4XIEe52GZqPdfuNU0dDaE+ypi6KW91xyP5eEvdhWGEUiSv1ygJtG0/T3xvN1RsmV1ZdU
+         tosyYi627+i1VkMYwZafJ8U5rPP/mLhPl9uFu8jeAqV49g86XZQjrEH7Thsx5oM8QwzX
+         h76+yaPMEiixpl9UMTiix23vymqyRHPdKkxaZ3Vm0c18zxoHuYb7T3qxtcMDj/WwfxBM
+         vgiw==
+X-Forwarded-Encrypted: i=1; AJvYcCVpfPC3dvn7UrLkOgNHKzQ8MZLkKTcd52Y3jrv1+NrLLjQzbKNFrDhB5PPWOeUGgq4IHU4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxkv9FQr10Rof7hjkymWn+l3GuqyJR+qBNzZM5s2Xh53DREvOaU
+	Eafm6AmU7tRVuWSMXl2rXY0Q2kwOO30Vo5bOcea0R2u2OcumXeWtes9EfFXsZJJiBynXMixy0QG
+	5GEb0vp1zmAD7207bt14lWxTi0RyWD3NW3qqpZ8wm
+X-Gm-Gg: ASbGncvgLvBjJ8MTFZqXW0TGmEjFMEytCLGnUmUfbhvB1ICBiysI7WYOCBtqWqubSti
+	DVjNgqbljxVZSUxTAZsZQOS1R3TpH/jx3brEcebGikK+wxqJIhzpApUpbaE/uvLBoknCpFHuPHC
+	uEQ4HoXsZb0ZVGZw2UlSqexOwIgTFGoVXDE4h3Qumnb3dQPQ/gzTXjcmu2+W9eIhI+X7TcJHEH
+X-Google-Smtp-Source: AGHT+IFq6QHuKVGpcJOYykEJd+54LhE6lJ5aZDCK7UqOGv7vWK/rlbhRvqzoyV3nEFreQqOalTu7rjwWEpWUr0hZeLw=
+X-Received: by 2002:ac8:5a08:0:b0:47d:4e8a:97f0 with SMTP id
+ d75a77b69052e-4960136a0a5mr10783031cf.29.1747751665479; Tue, 20 May 2025
+ 07:34:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH vfio-next 0/3] mlx5 VFIO PCI DMA conversion
-To: Leon Romanovsky <leon@kernel.org>, Alex Williamson
-	<alex.williamson@redhat.com>
-CC: Marek Szyprowski <m.szyprowski@samsung.com>, <kvm@vger.kernel.org>, "Jason
- Gunthorpe" <jgg@nvidia.com>, Shameer Kolothum
-	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
-	Christoph Hellwig <hch@lst.de>
-References: <cover.1747747694.git.leon@kernel.org>
-Content-Language: en-US
-From: Yishai Hadas <yishaih@nvidia.com>
-In-Reply-To: <cover.1747747694.git.leon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F65:EE_|LV2PR12MB5750:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2cc1588b-5e6a-4d47-31de-08dd97a880cf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QWVzS045cWoyNnIzYTJkV0pNdXdIVFBpWVFvWkZBK000aUg2aVZ5MzNpSUJ4?=
- =?utf-8?B?MHdZR3JseDJuVVpqc1YyWWFKa3oxMnNIZENpa0Z6S00rdDZyY0hFSjdVTU51?=
- =?utf-8?B?YVptck5VWWphcUhPbjV6ZWJTRGlzcU8vK3k1eU5xTkpuT2lMQTFGVHNvUmRx?=
- =?utf-8?B?YkZBdWNUaUx6dytoQ3VEQ3djL3JUamVYNHFzQ3Jvc1lYUUdkeHZsV2F3bkxM?=
- =?utf-8?B?eHhTSW9oa1BJSDdJODdTTXRKWHlReVNnZ2FRRXZzUkE5N3FNWm5GUEFQQUNv?=
- =?utf-8?B?NVp1L3ZHTmd2RGZUS0hTZlYvVXBpK3N1QWJ3TWJZSURMWU9UTkxHSVVXUlF3?=
- =?utf-8?B?OENLMEc4VDcxVzRsQWFUWXA0QWxLc3FDc2tDY20vTm0yUElGbFVEMnJSOWNr?=
- =?utf-8?B?cEhhc2gyRHdXc3UvR2grSmRSVkcyQ3NSVk5ucVlLdUNPOCt6eHhobXdMczdO?=
- =?utf-8?B?M0xQS3oyYjdMeXJzc0NWM1p1bjU1WlNCUDFIOGF0T1lLeTFqNDYrcXdQRlVz?=
- =?utf-8?B?N0RaME9xdVV1bys1UWoxL0hYUTlvREtudGs4Y2toKzFpc1piazRpalE1R2VB?=
- =?utf-8?B?SGNNYUc4aERwVmNRdVQyK2hscDNIcWh1VGtzbmZVN1pkTmNad21ybFlpMnJy?=
- =?utf-8?B?U28zb1Y3bTZGU2xaZkVEdWhOL3VzTHJWWnZZNk5TREo2VEtRSkk0eXZ6UEU5?=
- =?utf-8?B?TWhRL0V6bGF4NnN3MGpacFhiU29vOVBJN2hDczNtTmIrb3pIQkhESnJiemNu?=
- =?utf-8?B?eVJJek9VSUlyUUY2aVg5aE13TEp4am4vYm05bC9tSmd3L3Z0RmN6bktNcVN0?=
- =?utf-8?B?Y0wvRVZJTXlXTjJ1WWhjMHBjKzJxVjJHK2JISlNrb1oyalZmWjNDa214MExH?=
- =?utf-8?B?QlFNVmo0aFl0TDBBMEx2RmxTS3FMZmJ2UTRHYlZzUnlnL0dPbC9OeUpadzFD?=
- =?utf-8?B?RGsxWTFCN1V1Zno1bnQ5TkQvV0UvNURJYUdWMU5DbzBlSzJRck4ydkM4b3Jx?=
- =?utf-8?B?UUs4cWUxUUJMcVowRktRb0M1SjVFMTlsbGlxWXFuNGM0c2lnNERyWFVuTFM3?=
- =?utf-8?B?M1F4djRCZU9NYVA0RjNXeGVJMWJjN09QdTVSWTJmNlhBaDhzUUIwWUtyNVl0?=
- =?utf-8?B?bXFnVkNQZ1lyN29yLzJnQ1l1VWN2bmthMUR1SVpaYzdibnQxYXZZYWpJWm1t?=
- =?utf-8?B?bUR2d0ZVT2hmY1UvbWd3VDJhR051VjhjNlpBd3JFdXBCOW9hYXhsdjNLOUN5?=
- =?utf-8?B?QkhwcmRXMTJwc25PZ1JFS0ExTmt4QzhuTllRUlJ1WUo0SmlRT0hkeTUxYjcv?=
- =?utf-8?B?L2ZmT0dSeUFTQzRPTTExNERxVzVsMHhtR2YyL1FQbit6MVBEcTNRVEJyamJw?=
- =?utf-8?B?VS9WVWlJMlJMVzVKc1MraTBscnljemRsU2VCTUFiWW5WYmlyeENra290Rys4?=
- =?utf-8?B?VjRUY1RwcWp6Y0xjMW1HRGc4UjI1UTNNeEtSRVBoeDZJT1ovZktzMEVLRVdr?=
- =?utf-8?B?YW00TGdPMW04MGNxYndpR01xQVg1WmF6endwemFhc1oralRoT21IeHlBS004?=
- =?utf-8?B?Q0l5enZDRFJqR0s4Z3V3SmRTREU0bWlndzdlZHlKaUYvNU5EVHRjdFJmNytC?=
- =?utf-8?B?cllHNW93U0xMZXBFL2ZwY1R0WmdXNm94eUVlalk5SS9iSjJqaHFRc0NTTDRt?=
- =?utf-8?B?U3dnOXR2Vnp1KzkvVUVzK2d0S1haYXk1VXN1QzRBQTF0cWlEVGEzc1hwM1BK?=
- =?utf-8?B?MlFXeXJ0N044eU90bWhvY0pUT1J0VDc4ekhXS0I4ZjBWR2lxRG8yd3p1MVY1?=
- =?utf-8?B?WUhPcTVVcWNaQ29jOW1GOEs3REZyRTcwcVQxWFY3Y09XOHZRc2YwekwwUGNW?=
- =?utf-8?B?eDdCUU11eEdDTnJJMUJIT2VZZDgydFFRTWlxNEtzNjFjUFdpYk1Ta1ZTZHp4?=
- =?utf-8?B?UW5WRm1UT1Fhc29qd1FLcmhkSWpCSjVwL01sVGF0dEhZS3ArcVJ0bWg1Qm5Q?=
- =?utf-8?B?Y29ld3F0VUhTTVdZdmZXUXA2ZEVxRW1rOGF4OFNlLzZyZlNPTEQxd1dFcFEy?=
- =?utf-8?Q?teKIY7?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2025 14:13:32.6836
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2cc1588b-5e6a-4d47-31de-08dd97a880cf
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F65.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5750
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com> <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+In-Reply-To: <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 20 May 2025 15:33:49 +0100
+X-Gm-Features: AX0GCFt089q6agCPPB7UyDi-PWzBYyB89JwxkyNf6w9tWUw1XGRX3RdPGBlte3M
+Message-ID: <CA+EHjTy7iBNBb9DRdtgq8oYmvgykhSNvZL3FrRV4XF90t3XgBg@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 20/05/2025 16:46, Leon Romanovsky wrote:
-> Hi Alex,
-> 
-> This series presents subset of new DMA-API patchset [1] specific
-> for VFIO subsystem, with some small changes:
-> 1. Change commit message in first patch.
-> 2. Removed WARN_ON_ONCE DMA_NONE checks from third patch.
-> 
-> ------------------------------------------------------------------
-> It is based on Marek's dma-mapping-for-6.16-two-step-api branch, so merging
-> now will allow us to reduce possible rebase errors in mlx5 vfio code and give
-> enough time to start to work on second driver conversion. Such conversion will
-> allow us to generalize the API for VFIO kernel drivers, in similar way that
-> was done for RDMA, HMM and block layers.
-> 
-> Thanks
-> 
-> [1] [PATCH v10 00/24] Provide a new two step DMA mapping API
-> https://lore.kernel.org/all/cover.1745831017.git.leon@kernel.org/
-> 
-> Leon Romanovsky (3):
->    vfio/mlx5: Explicitly use number of pages instead of allocated length
->    vfio/mlx5: Rewrite create mkey flow to allow better code reuse
->    vfio/mlx5: Enable the DMA link API
-> 
->   drivers/vfio/pci/mlx5/cmd.c  | 371 +++++++++++++++++------------------
->   drivers/vfio/pci/mlx5/cmd.h  |  35 ++--
->   drivers/vfio/pci/mlx5/main.c |  87 ++++----
->   3 files changed, 235 insertions(+), 258 deletions(-)
-> 
+Hi Vishal,
 
-The series looks good to me.
+On Tue, 20 May 2025 at 15:11, Vishal Annapurve <vannapurve@google.com> wrot=
+e:
+>
+> On Tue, May 20, 2025 at 6:44=E2=80=AFAM Fuad Tabba <tabba@google.com> wro=
+te:
+> >
+> > Hi Vishal,
+> >
+> > On Tue, 20 May 2025 at 14:02, Vishal Annapurve <vannapurve@google.com> =
+wrote:
+> > >
+> > > On Tue, May 20, 2025 at 2:23=E2=80=AFAM Fuad Tabba <tabba@google.com>=
+ wrote:
+> > > >
+> > > > Hi Ackerley,
+> > > >
+> > > > On Thu, 15 May 2025 at 00:43, Ackerley Tng <ackerleytng@google.com>=
+ wrote:
+> > > > >
+> > > > > The two new guest_memfd ioctls KVM_GMEM_CONVERT_SHARED and
+> > > > > KVM_GMEM_CONVERT_PRIVATE convert the requested memory ranges to s=
+hared
+> > > > > and private respectively.
+> > > >
+> > > > I have a high level question about this particular patch and this
+> > > > approach for conversion: why do we need IOCTLs to manage conversion
+> > > > between private and shared?
+> > > >
+> > > > In the presentations I gave at LPC [1, 2], and in my latest patch
+> > > > series that performs in-place conversion [3] and the associated (by
+> > > > now outdated) state diagram [4], I didn't see the need to have a
+> > > > userspace-facing interface to manage that. KVM has all the informat=
+ion
+> > > > it needs to handle conversions, which are triggered by the guest. T=
+o
+> > > > me this seems like it adds additional complexity, as well as a user
+> > > > facing interface that we would need to maintain.
+> > > >
+> > > > There are various ways we could handle conversion without explicit
+> > > > interference from userspace. What I had in mind is the following (a=
+s
+> > > > an example, details can vary according to VM type). I will use use =
+the
+> > > > case of conversion from shared to private because that is the more
+> > > > complicated (interesting) case:
+> > > >
+> > > > - Guest issues a hypercall to request that a shared folio become pr=
+ivate.
+> > > >
+> > > > - The hypervisor receives the call, and passes it to KVM.
+> > > >
+> > > > - KVM unmaps the folio from the guest stage-2 (EPT I think in x86
+> > > > parlance), and unmaps it from the host. The host however, could sti=
+ll
+> > > > have references (e.g., GUP).
+> > > >
+> > > > - KVM exits to the host (hypervisor call exit), with the informatio=
+n
+> > > > that the folio has been unshared from it.
+> > > >
+> > > > - A well behaving host would now get rid of all of its references
+> > > > (e.g., release GUPs), perform a VCPU run, and the guest continues
+> > > > running as normal. I expect this to be the common case.
+> > > >
+> > > > But to handle the more interesting situation, let's say that the ho=
+st
+> > > > doesn't do it immediately, and for some reason it holds on to some
+> > > > references to that folio.
+> > > >
+> > > > - Even if that's the case, the guest can still run *. If the guest
+> > > > tries to access the folio, KVM detects that access when it tries to
+> > > > fault it into the guest, sees that the host still has references to
+> > > > that folio, and exits back to the host with a memory fault exit. At
+> > > > this point, the VCPU that has tried to fault in that particular fol=
+io
+> > > > cannot continue running as long as it cannot fault in that folio.
+> > >
+> > > Are you talking about the following scheme?
+> > > 1) guest_memfd checks shareability on each get pfn and if there is a
+> > > mismatch exit to the host.
+> >
+> > I think we are not really on the same page here (no pun intended :) ).
+> > I'll try to answer your questions anyway...
+> >
+> > Which get_pfn? Are you referring to get_pfn when faulting the page
+> > into the guest or into the host?
+>
+> I am referring to guest fault handling in KVM.
+>
+> >
+> > > 2) host user space has to guess whether it's a pending refcount or
+> > > whether it's an actual mismatch.
+> >
+> > No need to guess. VCPU run will let it know exactly why it's exiting.
+> >
+> > > 3) guest_memfd will maintain a third state
+> > > "pending_private_conversion" or equivalent which will transition to
+> > > private upon the last refcount drop of each page.
+> > >
+> > > If conversion is triggered by userspace (in case of pKVM, it will be
+> > > triggered from within the KVM (?)):
+> >
+> > Why would conversion be triggered by userspace? As far as I know, it's
+> > the guest that triggers the conversion.
+> >
+> > > * Conversion will just fail if there are extra refcounts and userspac=
+e
+> > > can try to get rid of extra refcounts on the range while it has enoug=
+h
+> > > context without hitting any ambiguity with memory fault exit.
+> > > * guest_memfd will not have to deal with this extra state from 3 abov=
+e
+> > > and overall guest_memfd conversion handling becomes relatively
+> > > simpler.
+> >
+> > That's not really related. The extra state isn't necessary any more
+> > once we agreed in the previous discussion that we will retry instead.
+>
+> Who is *we* here? Which entity will retry conversion?
 
-Acked-by: Yishai Hadas <yishaih@nvidia.com>
+Userspace will re-attempt the VCPU run.
+
+> >
+> > > Note that for x86 CoCo cases, memory conversion is already triggered
+> > > by userspace using KVM ioctl, this series is proposing to use
+> > > guest_memfd ioctl to do the same.
+> >
+> > The reason why for x86 CoCo cases conversion is already triggered by
+> > userspace using KVM ioctl is that it has to, since shared memory and
+> > private memory are two separate pages, and userspace needs to manage
+> > that. Sharing memory in place removes the need for that.
+>
+> Userspace still needs to clean up memory usage before conversion is
+> successful. e.g. remove IOMMU mappings for shared to private
+> conversion. I would think that memory conversion should not succeed
+> before all existing users let go of the guest_memfd pages for the
+> range being converted.
+
+Yes. Userspace will know that it needs to do that on the VCPU exit,
+which informs it of the guest's hypervisor request to unshare (convert
+from shared to private) the page.
+
+> In x86 CoCo usecases, userspace can also decide to not allow
+> conversion for scenarios where ranges are still under active use by
+> the host and guest is erroneously trying to take away memory. Both
+> SNP/TDX spec allow failure of conversion due to in use memory.
+
+How can the guest erroneously try to take away memory? If the guest
+sends a hypervisor request asking for a conversion of memory that
+doesn't belong to it, then I would expect the hypervisor to prevent
+that.
+
+I don't see how having an IOCTL to trigger the conversion is needed to
+allow conversion failure. How is that different from userspace
+ignoring or delaying releasing all references it has for the
+conversion request?
+
+> >
+> > This series isn't using the same ioctl, it's introducing new ones to
+> > perform a task that as far as I can tell so far, KVM can handle by
+> > itself.
+>
+> I would like to understand this better. How will KVM handle the
+> conversion process for guest_memfd pages? Can you help walk an example
+> sequence for shared to private conversion specifically around
+> guest_memfd offset states?
+
+To make sure that we are discussing the same scenario: can you do the
+same as well please --- walk me through an example sequence for shared
+to private conversion specifically around guest_memfd offset states
+With the IOCTLs involved?
+
+Here is an example that I have implemented and tested with pKVM. Note
+that there are alternatives, the flow below is architecture or even
+vm-type dependent. None of this code is code KVM code and the
+behaviour could vary.
+
+
+Assuming the folio is shared with the host:
+
+Guest sends unshare hypercall to the hypervisor
+Hypervisor forwards request to KVM (gmem) (having done due diligence)
+KVM (gmem) performs an unmap_folio(), exits to userspace with
+KVM_EXIT_UNSHARE and all the information about the folio being
+unshared
+
+Case 1:
+Userspace removes any remaining references (GUPs, IOMMU Mappings etc...)
+Userspace calls vcpu_run(): KVM (gmem) sees that there aren't any
+references, sets state to PRIVATE
+
+Case 2 (alternative 1):
+Userspace doesn't release its references
+Userspace calls vcpu_run(): KVM (gmem) sees that there are still
+references, exits back to userspace with KVM_EXIT_UNSHARE
+
+Case 2 (alternative 2):
+Userspace doesn't release its references
+Userspace calls vcpu_run(): KVM (gmem) sees that there are still
+references, unmaps folio from guest, but allows it to run (until it
+tries to fault in the folio)
+Guest tries to fault in folio that still has reference, KVM does not
+allow that (it sees that the folio is shared, and it doesn't fault in
+shared folios to confidential guests)
+KVM exits back to userspace with KVM_EXIT_UNSHARE
+
+As I mentioned, the alternatives above are _not_ set in core KVM code.
+They can vary by architecture of VM type, depending on the policy,
+support, etc..
+
+Now for your example please on how this would work with IOCTLs :)
+
+Thanks,
+/fuad
+
+> >
+> > >  - Allows not having to keep track of separate shared/private range
+> > > information in KVM.
+> >
+> > This patch series is already tracking shared/private range information =
+in KVM.
+> >
+> > >  - Simpler handling of the conversion process done per guest_memfd
+> > > rather than for full range.
+> > >      - Userspace can handle the rollback as needed, simplifying error
+> > > handling in guest_memfd.
+> > >  - guest_memfd is single source of truth and notifies the users of
+> > > shareability change.
+> > >      - e.g. IOMMU, userspace, KVM MMU all can be registered for
+> > > getting notifications from guest_memfd directly and will get notified
+> > > for invalidation upon shareability attribute updates.
+> >
+> > All of these can still be done without introducing a new ioctl.
+> >
+> > Cheers,
+> > /fuad
 
