@@ -1,265 +1,283 @@
-Return-Path: <kvm+bounces-47133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5465ABDBB1
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:14:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C4EEABDC59
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:23:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C68C8C77C1
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 14:07:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34F7B4C5C97
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 14:15:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0F5246775;
-	Tue, 20 May 2025 14:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E31252293;
+	Tue, 20 May 2025 14:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+3QNYYU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="192zBdId"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C581022D7A8
-	for <kvm@vger.kernel.org>; Tue, 20 May 2025 14:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780F9246335
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 14:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747750049; cv=none; b=cHTKZA1JitV3WovdsAIJagG3UUj0HShOn+9esXPfQ6fif9SsYrRFQU2H2Hs4lUBwNYrQom0BhPqXSiv/7Y5M8l5e/2IlFGCiGE+TCnNDBO469fBhZ6OqPMJ3Mao1vV5D3asSH/pLnuL0BBlpcvkBAugU6zbVKImqhXVO0W+ew9E=
+	t=1747750293; cv=none; b=KHeCZ2Enw223J5P/dEI9SxlTWda21UayrKl1aR/Sbg14RNlGXdjGd4draQ7SpRc+1OsZo3wLoZDvaUC0D7KZJSXe6SZJmzfwsxswHT7W8P0oP1Zldb83auHkIQ+/vkUJZUlHQ713bDt0MWlOjDlMx0Lh21xyMbheXH90dy2h4as=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747750049; c=relaxed/simple;
-	bh=3VbsCn/8BDdGAoKRiw85VsmQkWPZarb8OY05EU0n5Xs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ck1fkBo+qyUGsEYbVjY77E6lGQd47IDUe+egD0z2i19GCJ6NfwKpik2mq7SbspDC/ihs4oAh5In9DQV1J+gnJT3cLmcEUAJaWBHHOL6fOKbN1cohDpZdhuqc0McsZWumKgLdMHzmKUO6kfZ0O/VS4hfVUYQLb66J4v3sIRoqdc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R+3QNYYU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747750046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a8m2BRyEw6zS+4OVzo3rpgvhXlNDh0vPuD8aVrI5HC4=;
-	b=R+3QNYYUpZcWHJZJuiYMD0I7wdSUG2bRc0jW5Yg498nMGtakaHHokHa8MvxXh84pMfNt8e
-	D3nppBV4/hThGQoaqtoN5oOwBzZjzULWOiUhFFlXz5Y8eNYTGqfl8ZLcs5S+4juM7HWTRr
-	KAoa5yuG9sx3MYQe4ZInzPVqDMDr1Vk=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-618-Ev7qiHrsOkK6pcpafdZJNQ-1; Tue, 20 May 2025 10:07:25 -0400
-X-MC-Unique: Ev7qiHrsOkK6pcpafdZJNQ-1
-X-Mimecast-MFC-AGG-ID: Ev7qiHrsOkK6pcpafdZJNQ_1747750044
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3da79c57332so4988825ab.0
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 07:07:25 -0700 (PDT)
+	s=arc-20240116; t=1747750293; c=relaxed/simple;
+	bh=IwGc2NrI2G4RtTLHpTIRCtdhQkLKhhGOiCGwGPHrVpo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UVTU/K1lQfzdneemZ6FjPAlD7svIV58Fet6sx66brsiJi/gIJSH5yMVZ4LjbOTq/WFRBNnH5N0U3tDgvcmjLVfCkTbnO1X9MjOaHd1o16OrGcPIhFypwN5BBrzX5rGC5Rk4Ow2oLwxlflMRTCB5ANdbcXBAY4vVg5bfIrNNlESw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=192zBdId; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-231f61dc510so748495ad.0
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 07:11:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747750291; x=1748355091; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W0V2ESEDZyNB2h5dvIwZaMO3TFNNthEGeGHcq7PS6fo=;
+        b=192zBdIdgKxXO2r+y9SsVACeQHKrmHf5fZBcD8sXXtxreRIbAf/kg21Vq/gyyTfIPE
+         lKy6b5FEbIS4bbcPjVqmIWdF5M/9uR7EK0DkILKRmbXRlQ2mGrm8Rbz4tRqx3IaWtX5n
+         h3ooCFON/Fh4P+fw1OLzO39fZEHAYrlhFIi5qL4WVYqRrVq3bMH8H9z5Uetuffg6UaMi
+         OCteukQQJSqJEUbgw7tDXMBdr+1YpXGGdIgmPkr9Bu5JSGFJv8td8ruY/09/vfsPnWSa
+         +0pjeaWYAGfNHLNG3m17UOo4LYWNGXTXuHA07+Bpe4R1xJ6vDF3lMBkP++MoNex+z+Xt
+         1s8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747750044; x=1748354844;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1747750291; x=1748355091;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=a8m2BRyEw6zS+4OVzo3rpgvhXlNDh0vPuD8aVrI5HC4=;
-        b=ICkdwmlNdks3YnuYJXzvSgfuFEV0QpGSOX5tpA6jtDYsxkMBApyzkA5jeOPyPbqqNp
-         QYql0EUwpmYkf9OA/aAnh0YdqEsIYqSTJ/Gn0ESSYXwTdjqV0ITxb6JzwCjenX0XKCfP
-         mcHT5VrjMdGdS+zhxs/f67ro2MC3OP5Cc954J24a/WOpFtdv2seqIhqK0ajWGt9Igmxl
-         8eHkBeD2rPh5xM/wSZDM602/w0RF5/BHJzYqihXnOQlpkK648GxyuyJa0T85HYvt9KyJ
-         9tmOqPbQiru2X6VckLfE4dyXIbGsQd9Um3B2g7GKeWdRFjCAPLaYV+I3uR6iXnKSuthN
-         cg/w==
-X-Gm-Message-State: AOJu0Yy+YMhH6jSO+SnUi+K9RA614l5SP5kqwIarD2j0tgPKdodLPIPt
-	gP+a8ahRpONNpijq+dczMB8TxQ41k+67zp05nCTqoajKBN2rpdblhyEhsyDUNCb5TOcQSiPjqM9
-	yEnFx6iTZvURDB9hd2D6UNyWDOB2t56Yja4lFdp2amEfa/uqbsaylrVUtG2LCZw==
-X-Gm-Gg: ASbGnctYCzGRSIA4DFsys640L9jlZOECZWos0pr7tGCQaxdHR+xzq+4dPmFE20eLrCb
-	mpfZ+eFu9E1259am4W1/ch1Y7K4AyohDOpsBBFPivVoklVXeuIrINb7/G9fE2A8X5iumlA2Ff46
-	IsWX1iGCySHF0oC/tPqnNtF9y7Mb9TDqUwKq7saAtWi+AJg8Gd/qLhvRw+nPi6EhUkmQR0x8+iT
-	mY4KkB4RIERs37z3FCdDIVTymcei1qhk16XkjbUpzN3pJ/MQg5lcho4bJ+TJu9PGrMvtcNFRWd9
-	jJHkeiA6ZvFfDR0=
-X-Received: by 2002:a05:6e02:220d:b0:3d9:6632:d558 with SMTP id e9e14a558f8ab-3db841c9d47mr56884815ab.0.1747750043546;
-        Tue, 20 May 2025 07:07:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2PheKAWR/qCxqwxl2c6DXf4ZDTX/8QqZVzjT+uS1z0BmW9qLjCavouKiqO/6yEvKnuOnhMw==
-X-Received: by 2002:a05:6e02:220d:b0:3d9:6632:d558 with SMTP id e9e14a558f8ab-3db841c9d47mr56884655ab.0.1747750042989;
-        Tue, 20 May 2025 07:07:22 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fbcc4e9147sm2214645173.133.2025.05.20.07.07.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 07:07:21 -0700 (PDT)
-Date: Tue, 20 May 2025 08:07:19 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: lizhe.67@bytedance.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- muchun.song@linux.dev, Peter Xu <peterx@redhat.com>, David Hildenbrand
- <david@redhat.com>
-Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for
- huge folio
-Message-ID: <20250520080719.2862017e.alex.williamson@redhat.com>
-In-Reply-To: <20250520070020.6181-1-lizhe.67@bytedance.com>
-References: <20250520070020.6181-1-lizhe.67@bytedance.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        bh=W0V2ESEDZyNB2h5dvIwZaMO3TFNNthEGeGHcq7PS6fo=;
+        b=G0ilgIKX/hy8alrWTAnwFSVzQozTCWheoJjZN25/cmm0BwgA8BFiZqEnyB/tqhjTBJ
+         EzxZdKfDH5425nrnNvoy8G/4bpzEFX+zB+hwq19A2/fE6XShs+mq55Y+Lya7C/gijT1u
+         Pdul26491FxF8RbCIoYT+XSwkMBxmGpv7MGVAk1vsxkqnD4XIekGjT5KkIULIk8X2qgh
+         sCrM21LO6+RARr+JW3pHM6iiPOTNshzPi82+/QneiYbe+jQYyynwZJ16RW2IBDNs9V9V
+         8UhUJJAb46SqdrE0Bj1rKKS5dNzdKOl2/jV5fDc+dwlsfnLXqM8Yiodryh7HPV3u0Gdg
+         oa+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXabIx5qycmDeCgm6k7Em/ECdTM7IRTONWENXIVuSjapOZ1yUhEheDE78WW7tRvr0w17Nc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4EzD9VFh5lKgU3VDX6NGr2BlSOgOURAj5O6Wbh+nHCzM8Wuwx
+	gmnLdulMVUJS0zBuGYqa3+VZhUypSeiYWEY2QmUV+wXn1ykJvqOSb933dE9gBxheEmb2SMtGShj
+	xt2JwlR0km4ujQB1Gp/5dOXuzQXUFfxQEjPmwa72/RXPuU2Wb95Jpi/+np5c=
+X-Gm-Gg: ASbGncsEFJBthIA9WeYKAznzy9t+/9HCt/aw5PU4pb17lx2pkzKETAgG/6SMEPIKwdo
+	fUNZYTJSPENfITgPsfz9QDCdl+D+wgdF4FYw873I0LZkVu+y/XrHGJM80Xe9lxwWaue1/i4Fle6
+	G9UOQrV7phdTFpc0BhZdlCpASSviM22Xx62uSddM+neUzjjcfQToV6IlIefLVkZuNkxgC+IGOmg
+	9UKI1zcQg/quZo=
+X-Google-Smtp-Source: AGHT+IHZOvULWQMabZ1/iUJRuXlrpoOaAagjIY7TcYaquuzrKcD3XGch+6LvlFv8i9o0JrVmoU1rYJj46EvyHPibmqA=
+X-Received: by 2002:a17:903:1b6c:b0:223:f479:3860 with SMTP id
+ d9443c01a7336-231ffdc5bb1mr8356255ad.18.1747750290129; Tue, 20 May 2025
+ 07:11:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com> <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+In-Reply-To: <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Tue, 20 May 2025 07:11:17 -0700
+X-Gm-Features: AX0GCFsMvcqcyDCpl08egts_Rk9tmZhsChEdmC9Tx1PSj0Hg70TFTxOoW40ga_M
+Message-ID: <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Fuad Tabba <tabba@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 20 May 2025 15:00:20 +0800
-lizhe.67@bytedance.com wrote:
+On Tue, May 20, 2025 at 6:44=E2=80=AFAM Fuad Tabba <tabba@google.com> wrote=
+:
+>
+> Hi Vishal,
+>
+> On Tue, 20 May 2025 at 14:02, Vishal Annapurve <vannapurve@google.com> wr=
+ote:
+> >
+> > On Tue, May 20, 2025 at 2:23=E2=80=AFAM Fuad Tabba <tabba@google.com> w=
+rote:
+> > >
+> > > Hi Ackerley,
+> > >
+> > > On Thu, 15 May 2025 at 00:43, Ackerley Tng <ackerleytng@google.com> w=
+rote:
+> > > >
+> > > > The two new guest_memfd ioctls KVM_GMEM_CONVERT_SHARED and
+> > > > KVM_GMEM_CONVERT_PRIVATE convert the requested memory ranges to sha=
+red
+> > > > and private respectively.
+> > >
+> > > I have a high level question about this particular patch and this
+> > > approach for conversion: why do we need IOCTLs to manage conversion
+> > > between private and shared?
+> > >
+> > > In the presentations I gave at LPC [1, 2], and in my latest patch
+> > > series that performs in-place conversion [3] and the associated (by
+> > > now outdated) state diagram [4], I didn't see the need to have a
+> > > userspace-facing interface to manage that. KVM has all the informatio=
+n
+> > > it needs to handle conversions, which are triggered by the guest. To
+> > > me this seems like it adds additional complexity, as well as a user
+> > > facing interface that we would need to maintain.
+> > >
+> > > There are various ways we could handle conversion without explicit
+> > > interference from userspace. What I had in mind is the following (as
+> > > an example, details can vary according to VM type). I will use use th=
+e
+> > > case of conversion from shared to private because that is the more
+> > > complicated (interesting) case:
+> > >
+> > > - Guest issues a hypercall to request that a shared folio become priv=
+ate.
+> > >
+> > > - The hypervisor receives the call, and passes it to KVM.
+> > >
+> > > - KVM unmaps the folio from the guest stage-2 (EPT I think in x86
+> > > parlance), and unmaps it from the host. The host however, could still
+> > > have references (e.g., GUP).
+> > >
+> > > - KVM exits to the host (hypervisor call exit), with the information
+> > > that the folio has been unshared from it.
+> > >
+> > > - A well behaving host would now get rid of all of its references
+> > > (e.g., release GUPs), perform a VCPU run, and the guest continues
+> > > running as normal. I expect this to be the common case.
+> > >
+> > > But to handle the more interesting situation, let's say that the host
+> > > doesn't do it immediately, and for some reason it holds on to some
+> > > references to that folio.
+> > >
+> > > - Even if that's the case, the guest can still run *. If the guest
+> > > tries to access the folio, KVM detects that access when it tries to
+> > > fault it into the guest, sees that the host still has references to
+> > > that folio, and exits back to the host with a memory fault exit. At
+> > > this point, the VCPU that has tried to fault in that particular folio
+> > > cannot continue running as long as it cannot fault in that folio.
+> >
+> > Are you talking about the following scheme?
+> > 1) guest_memfd checks shareability on each get pfn and if there is a
+> > mismatch exit to the host.
+>
+> I think we are not really on the same page here (no pun intended :) ).
+> I'll try to answer your questions anyway...
+>
+> Which get_pfn? Are you referring to get_pfn when faulting the page
+> into the guest or into the host?
 
-> From: Li Zhe <lizhe.67@bytedance.com>
-> 
-> When vfio_pin_pages_remote() is called with a range of addresses that
-> includes huge folios, the function currently performs individual
-> statistics counting operations for each page. This can lead to significant
-> performance overheads, especially when dealing with large ranges of pages.
-> 
-> This patch optimize this process by batching the statistics counting
-> operations.
-> 
-> The performance test results for completing the 8G VFIO IOMMU DMA mapping,
-> obtained through trace-cmd, are as follows. In this case, the 8G virtual
-> address space has been mapped to physical memory using hugetlbfs with
-> pagesize=2M.
-> 
-> Before this patch:
-> funcgraph_entry:      # 33813.703 us |  vfio_pin_map_dma();
-> 
-> After this patch:
-> funcgraph_entry:      # 15635.055 us |  vfio_pin_map_dma();
+I am referring to guest fault handling in KVM.
 
-It looks like we're using the same numbers since the initial
-implementation, have these results changed?
+>
+> > 2) host user space has to guess whether it's a pending refcount or
+> > whether it's an actual mismatch.
+>
+> No need to guess. VCPU run will let it know exactly why it's exiting.
+>
+> > 3) guest_memfd will maintain a third state
+> > "pending_private_conversion" or equivalent which will transition to
+> > private upon the last refcount drop of each page.
+> >
+> > If conversion is triggered by userspace (in case of pKVM, it will be
+> > triggered from within the KVM (?)):
+>
+> Why would conversion be triggered by userspace? As far as I know, it's
+> the guest that triggers the conversion.
+>
+> > * Conversion will just fail if there are extra refcounts and userspace
+> > can try to get rid of extra refcounts on the range while it has enough
+> > context without hitting any ambiguity with memory fault exit.
+> > * guest_memfd will not have to deal with this extra state from 3 above
+> > and overall guest_memfd conversion handling becomes relatively
+> > simpler.
+>
+> That's not really related. The extra state isn't necessary any more
+> once we agreed in the previous discussion that we will retry instead.
 
-> 
-> Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Who is *we* here? Which entity will retry conversion?
 
-Appreciate the credit, this should probably be Co-developed-by: though.
-In general a sign-off is something that needs to be explicitly given.
+>
+> > Note that for x86 CoCo cases, memory conversion is already triggered
+> > by userspace using KVM ioctl, this series is proposing to use
+> > guest_memfd ioctl to do the same.
+>
+> The reason why for x86 CoCo cases conversion is already triggered by
+> userspace using KVM ioctl is that it has to, since shared memory and
+> private memory are two separate pages, and userspace needs to manage
+> that. Sharing memory in place removes the need for that.
 
-> ---
-> Changelogs:
-> 
-> v2->v3:
-> - Code simplification.
-> - Fix some issues in comments.
-> 
-> v1->v2:
-> - Fix some issues in comments and formatting.
-> - Consolidate vfio_find_vpfn_range() and vfio_find_vpfn().
-> - Move the processing logic for huge folio into the while(true) loop
->   and use a variable with a default value of 1 to indicate the number
->   of consecutive pages.
-> 
-> v2 patch: https://lore.kernel.org/all/20250519070419.25827-1-lizhe.67@bytedance.com/
-> v1 patch: https://lore.kernel.org/all/20250513035730.96387-1-lizhe.67@bytedance.com/
-> 
->  drivers/vfio/vfio_iommu_type1.c | 48 +++++++++++++++++++++++++--------
->  1 file changed, 37 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 0ac56072af9f..48f06ce0e290 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -319,15 +319,22 @@ static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
->  /*
->   * Helper Functions for host iova-pfn list
->   */
-> -static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
-> +
-> +/*
-> + * Find the first vfio_pfn that overlapping the range
-> + * [iova, iova + PAGE_SIZE * npage) in rb tree.
-> + */
-> +static struct vfio_pfn *vfio_find_vpfn_range(struct vfio_dma *dma,
-> +		dma_addr_t iova, unsigned long npage)
->  {
->  	struct vfio_pfn *vpfn;
->  	struct rb_node *node = dma->pfn_list.rb_node;
-> +	dma_addr_t end_iova = iova + PAGE_SIZE * npage;
->  
->  	while (node) {
->  		vpfn = rb_entry(node, struct vfio_pfn, node);
->  
-> -		if (iova < vpfn->iova)
-> +		if (end_iova <= vpfn->iova)
->  			node = node->rb_left;
->  		else if (iova > vpfn->iova)
->  			node = node->rb_right;
-> @@ -337,6 +344,11 @@ static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
->  	return NULL;
->  }
->  
-> +static inline struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
-> +{
-> +	return vfio_find_vpfn_range(dma, iova, 1);
-> +}
-> +
->  static void vfio_link_pfn(struct vfio_dma *dma,
->  			  struct vfio_pfn *new)
->  {
-> @@ -681,32 +693,46 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->  		 * and rsvd here, and therefore continues to use the batch.
->  		 */
->  		while (true) {
-> +			struct folio *folio = page_folio(batch->pages[batch->offset]);
-> +			long nr_pages;
-> +
->  			if (pfn != *pfn_base + pinned ||
->  			    rsvd != is_invalid_reserved_pfn(pfn))
->  				goto out;
->  
-> +			/*
-> +			 * Note: The current nr_pages does not achieve the optimal
-> +			 * performance in scenarios where folio_nr_pages() exceeds
-> +			 * batch->capacity. It is anticipated that future enhancements
-> +			 * will address this limitation.
-> +			 */
-> +			nr_pages = min((long)batch->size, folio_nr_pages(folio) -
-> +						folio_page_idx(folio, batch->pages[batch->offset]));
+Userspace still needs to clean up memory usage before conversion is
+successful. e.g. remove IOMMU mappings for shared to private
+conversion. I would think that memory conversion should not succeed
+before all existing users let go of the guest_memfd pages for the
+range being converted.
 
-We should use min_t() here, otherwise it looks good to me.
+In x86 CoCo usecases, userspace can also decide to not allow
+conversion for scenarios where ranges are still under active use by
+the host and guest is erroneously trying to take away memory. Both
+SNP/TDX spec allow failure of conversion due to in use memory.
 
-Peter, David, if you wouldn't mind double checking the folio usage
-here, I'd appreciate it.  The underlying assumption used here is that
-folios always have physically contiguous pages, so we can increment at
-the remainder of the folio_nr_pages() rather than iterate each page.
-Thanks,
+>
+> This series isn't using the same ioctl, it's introducing new ones to
+> perform a task that as far as I can tell so far, KVM can handle by
+> itself.
 
-Alex
+I would like to understand this better. How will KVM handle the
+conversion process for guest_memfd pages? Can you help walk an example
+sequence for shared to private conversion specifically around
+guest_memfd offset states?
 
-> +			if (nr_pages > 1 && vfio_find_vpfn_range(dma, iova, nr_pages))
-> +				nr_pages = 1;
-> +
->  			/*
->  			 * Reserved pages aren't counted against the user,
->  			 * externally pinned pages are already counted against
->  			 * the user.
->  			 */
-> -			if (!rsvd && !vfio_find_vpfn(dma, iova)) {
-> +			if (!rsvd && (nr_pages > 1 || !vfio_find_vpfn(dma, iova))) {
->  				if (!dma->lock_cap &&
-> -				    mm->locked_vm + lock_acct + 1 > limit) {
-> +				    mm->locked_vm + lock_acct + nr_pages > limit) {
->  					pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n",
->  						__func__, limit << PAGE_SHIFT);
->  					ret = -ENOMEM;
->  					goto unpin_out;
->  				}
-> -				lock_acct++;
-> +				lock_acct += nr_pages;
->  			}
->  
-> -			pinned++;
-> -			npage--;
-> -			vaddr += PAGE_SIZE;
-> -			iova += PAGE_SIZE;
-> -			batch->offset++;
-> -			batch->size--;
-> +			pinned += nr_pages;
-> +			npage -= nr_pages;
-> +			vaddr += PAGE_SIZE * nr_pages;
-> +			iova += PAGE_SIZE * nr_pages;
-> +			batch->offset += nr_pages;
-> +			batch->size -= nr_pages;
->  
->  			if (!batch->size)
->  				break;
-
+>
+> >  - Allows not having to keep track of separate shared/private range
+> > information in KVM.
+>
+> This patch series is already tracking shared/private range information in=
+ KVM.
+>
+> >  - Simpler handling of the conversion process done per guest_memfd
+> > rather than for full range.
+> >      - Userspace can handle the rollback as needed, simplifying error
+> > handling in guest_memfd.
+> >  - guest_memfd is single source of truth and notifies the users of
+> > shareability change.
+> >      - e.g. IOMMU, userspace, KVM MMU all can be registered for
+> > getting notifications from guest_memfd directly and will get notified
+> > for invalidation upon shareability attribute updates.
+>
+> All of these can still be done without introducing a new ioctl.
+>
+> Cheers,
+> /fuad
 
