@@ -1,234 +1,398 @@
-Return-Path: <kvm+bounces-47150-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47151-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA181ABDF9F
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 17:55:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6F26ABDFE1
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 18:03:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E73C81896A1A
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 15:55:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC1FB189DA29
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A802825C6E7;
-	Tue, 20 May 2025 15:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D1D26B085;
+	Tue, 20 May 2025 16:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XiNVxsZl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C3Te78t5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02019261596;
-	Tue, 20 May 2025 15:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EFD25A64D
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 16:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747756494; cv=none; b=OU7LDK3tlZ5vHtGAMVs/owEufqOwAIu4SVl0wfJ/AGuTz7OcAxOpG9ahZ4pfGrQkixNcFZ9ZvUFyqukXJQyFANUv09Cgj/PFVhBHLhpOEZx6VtbT981ZbDpgPN8mrOR2eTj9mCv7X7v6ZryahgceLJ8Rf23BH1TtFodT5IcLlKU=
+	t=1747756985; cv=none; b=i3FRcAeI3zatksIiycbedCiJIjH6QFhpDnMJynsQuc9LO3vB+bnuBETWbL4VxeR3/SDEHu3FmzGd4RvKAg9sDJt5c9MTbT6d1X9gZwrjzf4yR2TKXCm/VXyy3EVLqjI6ES4KEWXO75qQcI/0v7tzSu0WPFI5TUAt9jteCjXvrZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747756494; c=relaxed/simple;
-	bh=khpO6nTdgEs/t+6f2mpbp5mVcH9V/RCYTZNqzcCFOpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Oc5ugXaNInjnbcFzCi+brZ99dOHp4f62ncO6/WFXtBb4HcKcG9xQ9SqsYxPdiGL2qG0EnvQrfn3EQ5H76FZmFEKAA0o1l2NFMDGqsh1ZaUJiHHKPbtBz1NSfzeVyYCvNeOm14Gzq1alHM5aKJD0Y7vKpcwi6uAAzY4mAy+QDnhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XiNVxsZl; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54KDn9Rb014272;
-	Tue, 20 May 2025 15:54:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=wdJ1jw
-	LeaCaXnJQgO3tBJIQWMGl4H2EoSYzh9CBvdn0=; b=XiNVxsZlvaP6AUdLPjj/1Z
-	pZwRwscvLPGeLDxhp3AXf/zq7zDOUSitKESagUOL/ol+eEC8esL91WN4LC/Ko6yg
-	u3EDTpbb+Zg1v4XZV0Nm4EDLcFi3MsTsPVSdbq+UivqiuaP7EQazJEh2XhJxf7LV
-	rQRD6p2wA+iyOBU8Yz7/+3am3XIPyjhIOQ1g1lh9Co7wfSQjwJhzQhP9NnxC86Ez
-	+RLUR/u7g8qDHYEUQzNd4pROQ1KFQGda/sOginb8wNj/rwCReRG8Va44pd+D0dQg
-	9OPOGVz05fDXTP9vVRbZ3pzczrYAAmz6ZNBRedGFzioEDJFl9ZgUL+OO+ztnpjVw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46rty3gqvb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 May 2025 15:54:37 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 54KFg5Ki019123;
-	Tue, 20 May 2025 15:54:36 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46rty3gqv1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 May 2025 15:54:36 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54KDCAuq014262;
-	Tue, 20 May 2025 15:54:35 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 46q4stcy3q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 May 2025 15:54:35 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54KFsVPU50594076
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 May 2025 15:54:31 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 54DEB2004B;
-	Tue, 20 May 2025 15:54:31 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C967020043;
-	Tue, 20 May 2025 15:54:30 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 20 May 2025 15:54:30 +0000 (GMT)
-Date: Tue, 20 May 2025 17:54:28 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-        James Houghton
- <jthoughton@google.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Ignacio Moreno Gonzalez <Ignacio.MorenoGonzalez@kuka.com>,
-        Yang Shi
- <yang@os.amperecomputing.com>,
-        David Hildenbrand <david@redhat.com>,
-        "Liam
- R . Howlett" <Liam.Howlett@oracle.com>,
-        Matthew Wilcox
- <willy@infradead.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko
- Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander
- Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RESEND PATCH] KVM: s390: rename PROT_NONE to PROT_TYPE_DUMMY
-Message-ID: <20250520175428.24ec47b7@p-imbrenda>
-In-Reply-To: <cb0894b6-3c41-4850-a077-2d18f5547d2e@lucifer.local>
-References: <20250519145657.178365-1-lorenzo.stoakes@oracle.com>
-	<20250520171009.49b2bd1b@p-imbrenda>
-	<cb0894b6-3c41-4850-a077-2d18f5547d2e@lucifer.local>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1747756985; c=relaxed/simple;
+	bh=FGGVtwJI+rk7bDClnSBYqIzTUVaLE5OUyLIc/e73RHg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PG6pgQaMh2+11z588w8sRehZuOcLASCt10LnaJvHew+wKEqsBvktUrl8pLTcT8W0aycE+Z2oBn3R3pt3nV0gksGjxqK4d/sFZH4dL0h2WYfrxsgEhx/ZOeNMaX1DIchcG29k2BqXMezt8+abVzivK/Bsl39Xff2oo9fNF5P93ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C3Te78t5; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-231f61dc510so785455ad.0
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 09:03:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747756983; x=1748361783; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LP+IgKh5WuP7/61GoXCSgoWlxqk6ttGptinEY/thQH0=;
+        b=C3Te78t5grg/IDGvwV4ObABC7Hh1KU/U2gtZMO6Y8XLWaa67vjUX2vXM3XTybfIlfF
+         9wmKijKk9t6AqXPbQ/OtSiOYyDobckZOSf2Xdgv3PRCtM43yrTLLtvxf2sCwsAP3jqgx
+         8eXDgagmqd+I38MKinGv8rWREeTxoOJdxPFlWDXb/kxqDGNpQX8SOrbuoNZCcF7jbuuy
+         th1JjRCFmM8LwUsTaFVtUB0Sx555YM1QFpu3GJWl3x1Olz1kBxvvFwPFhNc5hZvu7o56
+         x/p5W9FdwKVl9Bjb9NJDcn0ZFbqrS8+E7e8NwmzWzBQhM4CMx22J56RKNQ+X0Hm6FZrw
+         +NGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747756983; x=1748361783;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LP+IgKh5WuP7/61GoXCSgoWlxqk6ttGptinEY/thQH0=;
+        b=Z+7EhAMcXiYuYEUFhcZHIdpad0DYLlEMX70rci6R9l9xqMjzImNjwBP8i5eOWKDZbG
+         MNwOWHpIpPGGFeYTu5WMdcsrRygLs+uxh5EYJ0/EOXLoydgdmCNrvhsSbihDrQuFZAia
+         hwZl0SgMAIA4oRdBnl2AeV0Y0Qj1jxhPfDAs4JOewy0EVTEDr88ZoqZu+9/9KQ9GsTH1
+         ZTDpSHr6Sel8PAPdA8vzObo2sPwckrQTHsqMAbTyo5S5QqW32em0+1FarRu5Cy/ePBow
+         C9+5mNcqHcAMYSZAoF7SjEqB8BnXLckW3fbgf0hqdfITW5rSsZLP0ujYt6p2JvOhYCgS
+         2OQA==
+X-Forwarded-Encrypted: i=1; AJvYcCX6SJ6Qs9XSfM2x1KrMYqrL3DGFd/sNNdsXBt6lNuMFTvfDoxTXKmiK6jTqMg457ggcqiY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZ/0hUI0l9i1uSGtWx2Z89N+GONNPY0gVwEnAY+ZaW72g5VJ4v
+	I2W6TdqGTvOoUpHa5LpSGIVLQ2GgQEcUvJtnT71AsHlMmjxFhXiipm7ff0PkGhkoDmgNzAwW2+w
+	WR5OBoFpde8+E26hhUsr57MQZBt0bkBfTIMV3rJ48
+X-Gm-Gg: ASbGncug8ClsHUibvHoe9/MUZZf/y4znVBUgPSQO/BnsHWRg27BWqDp0BfOsoosBNHZ
+	VX/SKaLwdSgnCMb8K8CjXvH7YOentYGnz8DBH7vfCGyJ1cE2zctfupziGnnAsmyxA0PRiFePnFr
+	BGluq61V4VnjJRptDm7L/pV6iidJr90gPrgRUspIikbFlvS77pgyrTUNGy+KRSYq2XyC71jwnF/
+	Hx6
+X-Google-Smtp-Source: AGHT+IHIqS2Dqz8t9Kspjt12t3UanzbX0TZpQnWe3Ht48Uo1xURTRGgrxqIt9Z9aa1RVZDHLDUDlIsXJxb1nUq6AGcg=
+X-Received: by 2002:a17:903:4b4f:b0:231:fb83:9c3d with SMTP id
+ d9443c01a7336-231ffdc5e60mr8624145ad.20.1747756982425; Tue, 20 May 2025
+ 09:03:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIwMDEyOCBTYWx0ZWRfX+SmD9pxtFRWL Y1A5CvRO5j3pLbJXgfJ3tYZTv5xTJ2ADxBegmCEskjfRhabnYdPZwMZsYAzewILo2kFo8TrOUs1 rqQklZ9hOB2kjgti7XAoPtboPYftAQT7x+MpZ+fwDgmEsqQ3G2n2EbA7P69GK2+wWYp8Vh/uwu/
- RJvfhG7lfNn/YGLB3Jibr9Lpc38LUjY8AIVRh9Vb41QK9g33sTJ90TAvd39dEie+lbImUQZYZW0 kleqa2qaU1QNXMeeGAgVShdYsJ2bQ6K1og+rvffMapKCP9P7W3RR1VPZdlAyN1DMRcqAMM08St4 hnAeBWDHcYuwv5yE9qGA/Htf+o4mb7hyfCy/WL0Jhe8LDwkUJhslstLenI0aORMJvpvvveGJqYq
- TBBK8tr+yv+pDpofjLYbs9z5QRhcb5GqZAnNVOnGmwV7+FqHIsM7J3QoLnnBTiScT4NuujDM
-X-Proofpoint-ORIG-GUID: NqSYhNXr9uJIwok2XATvZpjkj1adV_zo
-X-Authority-Analysis: v=2.4 cv=DKeP4zNb c=1 sm=1 tr=0 ts=682ca5bd cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8 a=yPCof4ZbAAAA:8 a=TAZUD9gdAAAA:8 a=VnNF1IyMAAAA:8
- a=vzhER2c_AAAA:8 a=20KFwNOVAAAA:8 a=-dfg5vNDZjZ0OaYXpFQA:9 a=CjuIK1q_8ugA:10 a=f1lSKsbWiCfrRWj5-Iac:22 a=0YTRHmU2iG2pZC6F1fw2:22
-X-Proofpoint-GUID: uIm7Ji6apohDdQkSspMSiXzoGwXD6Qz_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-20_06,2025-05-20_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 suspectscore=0 mlxscore=0 impostorscore=0
- malwarescore=0 phishscore=0 bulkscore=0 clxscore=1015 adultscore=0
- spamscore=0 mlxlogscore=999 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505070000
- definitions=main-2505200128
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com> <CA+EHjTy7iBNBb9DRdtgq8oYmvgykhSNvZL3FrRV4XF90t3XgBg@mail.gmail.com>
+In-Reply-To: <CA+EHjTy7iBNBb9DRdtgq8oYmvgykhSNvZL3FrRV4XF90t3XgBg@mail.gmail.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Tue, 20 May 2025 09:02:50 -0700
+X-Gm-Features: AX0GCFsR8m63CkFf_0gOE0SYuixW7eqLNNVHBhmGF8G-ihHN6Drh2TEMsr5J4cg
+Message-ID: <CAGtprH_7jSpwF77j1GW8rjSrbtZZ2OW2iGck5=Wk67+VnF9vjQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Fuad Tabba <tabba@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 20 May 2025 16:24:10 +0100
-Lorenzo Stoakes <lorenzo.stoakes@oracle.com> wrote:
-
-> On Tue, May 20, 2025 at 05:10:09PM +0200, Claudio Imbrenda wrote:
-> > On Mon, 19 May 2025 15:56:57 +0100
-> > Lorenzo Stoakes <lorenzo.stoakes@oracle.com> wrote:
-> >  
-> > > The enum type prot_type declared in arch/s390/kvm/gaccess.c declares an
-> > > unfortunate identifier within it - PROT_NONE.
-> > >
-> > > This clashes with the protection bit define from the uapi for mmap()
-> > > declared in include/uapi/asm-generic/mman-common.h, which is indeed what
-> > > those casually reading this code would assume this to refer to.
-> > >
-> > > This means that any changes which subsequently alter headers in any way
-> > > which results in the uapi header being imported here will cause build
-> > > errors.
-> > >
-> > > Resolve the issue by renaming PROT_NONE to PROT_TYPE_DUMMY.
-> > >
-> > > Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> > > Suggested-by: Ignacio Moreno Gonzalez <Ignacio.MorenoGonzalez@kuka.com>
-> > > Fixes: b3cefd6bf16e ("KVM: s390: Pass initialized arg even if unused")
-> > > Cc: stable@vger.kernel.org
-> > > Reported-by: kernel test robot <lkp@intel.com>
-> > > Closes: https://lore.kernel.org/oe-kbuild-all/202505140943.IgHDa9s7-lkp@intel.com/
-> > > Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-> > > Acked-by: Ignacio Moreno Gonzalez <Ignacio.MorenoGonzalez@kuka.com>
-> > > Acked-by: Yang Shi <yang@os.amperecomputing.com>
-> > > Reviewed-by: David Hildenbrand <david@redhat.com>
-> > > Acked-by: Liam R. Howlett <Liam.Howlett@oracle.com>  
+On Tue, May 20, 2025 at 7:34=E2=80=AFAM Fuad Tabba <tabba@google.com> wrote=
+:
+>
+> Hi Vishal,
+>
+> On Tue, 20 May 2025 at 15:11, Vishal Annapurve <vannapurve@google.com> wr=
+ote:
 > >
-> > if you had put me in CC, you would have gotten this yesterday already:
+> > On Tue, May 20, 2025 at 6:44=E2=80=AFAM Fuad Tabba <tabba@google.com> w=
+rote:
+> > >
+> > > Hi Vishal,
+> > >
+> > > On Tue, 20 May 2025 at 14:02, Vishal Annapurve <vannapurve@google.com=
+> wrote:
+> > > >
+> > > > On Tue, May 20, 2025 at 2:23=E2=80=AFAM Fuad Tabba <tabba@google.co=
+m> wrote:
+> > > > >
+> > > > > Hi Ackerley,
+> > > > >
+> > > > > On Thu, 15 May 2025 at 00:43, Ackerley Tng <ackerleytng@google.co=
+m> wrote:
+> > > > > >
+> > > > > > The two new guest_memfd ioctls KVM_GMEM_CONVERT_SHARED and
+> > > > > > KVM_GMEM_CONVERT_PRIVATE convert the requested memory ranges to=
+ shared
+> > > > > > and private respectively.
+> > > > >
+> > > > > I have a high level question about this particular patch and this
+> > > > > approach for conversion: why do we need IOCTLs to manage conversi=
+on
+> > > > > between private and shared?
+> > > > >
+> > > > > In the presentations I gave at LPC [1, 2], and in my latest patch
+> > > > > series that performs in-place conversion [3] and the associated (=
+by
+> > > > > now outdated) state diagram [4], I didn't see the need to have a
+> > > > > userspace-facing interface to manage that. KVM has all the inform=
+ation
+> > > > > it needs to handle conversions, which are triggered by the guest.=
+ To
+> > > > > me this seems like it adds additional complexity, as well as a us=
+er
+> > > > > facing interface that we would need to maintain.
+> > > > >
+> > > > > There are various ways we could handle conversion without explici=
+t
+> > > > > interference from userspace. What I had in mind is the following =
+(as
+> > > > > an example, details can vary according to VM type). I will use us=
+e the
+> > > > > case of conversion from shared to private because that is the mor=
+e
+> > > > > complicated (interesting) case:
+> > > > >
+> > > > > - Guest issues a hypercall to request that a shared folio become =
+private.
+> > > > >
+> > > > > - The hypervisor receives the call, and passes it to KVM.
+> > > > >
+> > > > > - KVM unmaps the folio from the guest stage-2 (EPT I think in x86
+> > > > > parlance), and unmaps it from the host. The host however, could s=
+till
+> > > > > have references (e.g., GUP).
+> > > > >
+> > > > > - KVM exits to the host (hypervisor call exit), with the informat=
+ion
+> > > > > that the folio has been unshared from it.
+> > > > >
+> > > > > - A well behaving host would now get rid of all of its references
+> > > > > (e.g., release GUPs), perform a VCPU run, and the guest continues
+> > > > > running as normal. I expect this to be the common case.
+> > > > >
+> > > > > But to handle the more interesting situation, let's say that the =
+host
+> > > > > doesn't do it immediately, and for some reason it holds on to som=
+e
+> > > > > references to that folio.
+> > > > >
+> > > > > - Even if that's the case, the guest can still run *. If the gues=
+t
+> > > > > tries to access the folio, KVM detects that access when it tries =
+to
+> > > > > fault it into the guest, sees that the host still has references =
+to
+> > > > > that folio, and exits back to the host with a memory fault exit. =
+At
+> > > > > this point, the VCPU that has tried to fault in that particular f=
+olio
+> > > > > cannot continue running as long as it cannot fault in that folio.
+> > > >
+> > > > Are you talking about the following scheme?
+> > > > 1) guest_memfd checks shareability on each get pfn and if there is =
+a
+> > > > mismatch exit to the host.
+> > >
+> > > I think we are not really on the same page here (no pun intended :) )=
+.
+> > > I'll try to answer your questions anyway...
+> > >
+> > > Which get_pfn? Are you referring to get_pfn when faulting the page
+> > > into the guest or into the host?
 > >
-> > Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>  
-> 
-> Thanks and apologies for not cc-ing you, clearly my mistake.
-> 
-> Though I would suggest your level of grumpiness here is a little over the
-> top under the circumstances :) we maintainers must scale our grumpiness
-> accordingly...
+> > I am referring to guest fault handling in KVM.
+> >
+> > >
+> > > > 2) host user space has to guess whether it's a pending refcount or
+> > > > whether it's an actual mismatch.
+> > >
+> > > No need to guess. VCPU run will let it know exactly why it's exiting.
+> > >
+> > > > 3) guest_memfd will maintain a third state
+> > > > "pending_private_conversion" or equivalent which will transition to
+> > > > private upon the last refcount drop of each page.
+> > > >
+> > > > If conversion is triggered by userspace (in case of pKVM, it will b=
+e
+> > > > triggered from within the KVM (?)):
+> > >
+> > > Why would conversion be triggered by userspace? As far as I know, it'=
+s
+> > > the guest that triggers the conversion.
+> > >
+> > > > * Conversion will just fail if there are extra refcounts and usersp=
+ace
+> > > > can try to get rid of extra refcounts on the range while it has eno=
+ugh
+> > > > context without hitting any ambiguity with memory fault exit.
+> > > > * guest_memfd will not have to deal with this extra state from 3 ab=
+ove
+> > > > and overall guest_memfd conversion handling becomes relatively
+> > > > simpler.
+> > >
+> > > That's not really related. The extra state isn't necessary any more
+> > > once we agreed in the previous discussion that we will retry instead.
+> >
+> > Who is *we* here? Which entity will retry conversion?
+>
+> Userspace will re-attempt the VCPU run.
 
-it was not meant to be grumpy, sorry if it came through that way!
+Then KVM will have to keep track of the ranges that need conversion
+across exits. I think it's cleaner to let userspace make the decision
+and invoke conversion without carrying additional state in KVM about
+guest request.
 
-> 
-> >  
-> > > ---
-> > > Separated out from [0] as problem found in other patch in series.
+>
 > > >
-> > > [0]: https://lore.kernel.org/all/cover.1747338438.git.lorenzo.stoakes@oracle.com/
+> > > > Note that for x86 CoCo cases, memory conversion is already triggere=
+d
+> > > > by userspace using KVM ioctl, this series is proposing to use
+> > > > guest_memfd ioctl to do the same.
 > > >
-> > >  arch/s390/kvm/gaccess.c | 8 ++++----
-> > >  1 file changed, 4 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> > > index f6fded15633a..4e5654ad1604 100644
-> > > --- a/arch/s390/kvm/gaccess.c
-> > > +++ b/arch/s390/kvm/gaccess.c
-> > > @@ -318,7 +318,7 @@ enum prot_type {
-> > >  	PROT_TYPE_DAT  = 3,
-> > >  	PROT_TYPE_IEP  = 4,
-> > >  	/* Dummy value for passing an initialized value when code != PGM_PROTECTION */
-> > > -	PROT_NONE,
-> > > +	PROT_TYPE_DUMMY,
-> > >  };
-> > >
-> > >  static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
-> > > @@ -334,7 +334,7 @@ static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva,
-> > >  	switch (code) {
-> > >  	case PGM_PROTECTION:
-> > >  		switch (prot) {
-> > > -		case PROT_NONE:
-> > > +		case PROT_TYPE_DUMMY:
-> > >  			/* We should never get here, acts like termination */
-> > >  			WARN_ON_ONCE(1);
-> > >  			break;
-> > > @@ -804,7 +804,7 @@ static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
-> > >  			gpa = kvm_s390_real_to_abs(vcpu, ga);
-> > >  			if (!kvm_is_gpa_in_memslot(vcpu->kvm, gpa)) {
-> > >  				rc = PGM_ADDRESSING;
-> > > -				prot = PROT_NONE;
-> > > +				prot = PROT_TYPE_DUMMY;
-> > >  			}
-> > >  		}
-> > >  		if (rc)
-> > > @@ -962,7 +962,7 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
-> > >  		if (rc == PGM_PROTECTION)
-> > >  			prot = PROT_TYPE_KEYC;
-> > >  		else
-> > > -			prot = PROT_NONE;
-> > > +			prot = PROT_TYPE_DUMMY;
-> > >  		rc = trans_exc_ending(vcpu, rc, ga, ar, mode, prot, terminate);
-> > >  	}
-> > >  out_unlock:
-> > > --
-> > > 2.49.0
-> > >  
-> >  
+> > > The reason why for x86 CoCo cases conversion is already triggered by
+> > > userspace using KVM ioctl is that it has to, since shared memory and
+> > > private memory are two separate pages, and userspace needs to manage
+> > > that. Sharing memory in place removes the need for that.
+> >
+> > Userspace still needs to clean up memory usage before conversion is
+> > successful. e.g. remove IOMMU mappings for shared to private
+> > conversion. I would think that memory conversion should not succeed
+> > before all existing users let go of the guest_memfd pages for the
+> > range being converted.
+>
+> Yes. Userspace will know that it needs to do that on the VCPU exit,
+> which informs it of the guest's hypervisor request to unshare (convert
+> from shared to private) the page.
+>
+> > In x86 CoCo usecases, userspace can also decide to not allow
+> > conversion for scenarios where ranges are still under active use by
+> > the host and guest is erroneously trying to take away memory. Both
+> > SNP/TDX spec allow failure of conversion due to in use memory.
+>
+> How can the guest erroneously try to take away memory? If the guest
+> sends a hypervisor request asking for a conversion of memory that
+> doesn't belong to it, then I would expect the hypervisor to prevent
+> that.
 
+Making a range as private is effectively disallowing host from
+accessing those ranges -> so taking away memory.
+
+>
+> I don't see how having an IOCTL to trigger the conversion is needed to
+> allow conversion failure. How is that different from userspace
+> ignoring or delaying releasing all references it has for the
+> conversion request?
+>
+> > >
+> > > This series isn't using the same ioctl, it's introducing new ones to
+> > > perform a task that as far as I can tell so far, KVM can handle by
+> > > itself.
+> >
+> > I would like to understand this better. How will KVM handle the
+> > conversion process for guest_memfd pages? Can you help walk an example
+> > sequence for shared to private conversion specifically around
+> > guest_memfd offset states?
+>
+> To make sure that we are discussing the same scenario: can you do the
+> same as well please --- walk me through an example sequence for shared
+> to private conversion specifically around guest_memfd offset states
+> With the IOCTLs involved?
+>
+> Here is an example that I have implemented and tested with pKVM. Note
+> that there are alternatives, the flow below is architecture or even
+> vm-type dependent. None of this code is code KVM code and the
+> behaviour could vary.
+>
+>
+> Assuming the folio is shared with the host:
+>
+> Guest sends unshare hypercall to the hypervisor
+> Hypervisor forwards request to KVM (gmem) (having done due diligence)
+> KVM (gmem) performs an unmap_folio(), exits to userspace with
+
+For x86 CoCo VM usecases I was talking about, userspace would like to
+avoid unmap_mapping_range() on the range before it's safe to unshare
+the range.
+
+> KVM_EXIT_UNSHARE and all the information about the folio being
+> unshared
+>
+> Case 1:
+> Userspace removes any remaining references (GUPs, IOMMU Mappings etc...)
+> Userspace calls vcpu_run(): KVM (gmem) sees that there aren't any
+> references, sets state to PRIVATE
+>
+> Case 2 (alternative 1):
+> Userspace doesn't release its references
+> Userspace calls vcpu_run(): KVM (gmem) sees that there are still
+> references, exits back to userspace with KVM_EXIT_UNSHARE
+>
+> Case 2 (alternative 2):
+> Userspace doesn't release its references
+> Userspace calls vcpu_run(): KVM (gmem) sees that there are still
+> references, unmaps folio from guest, but allows it to run (until it
+> tries to fault in the folio)
+> Guest tries to fault in folio that still has reference, KVM does not
+> allow that (it sees that the folio is shared, and it doesn't fault in
+> shared folios to confidential guests)
+> KVM exits back to userspace with KVM_EXIT_UNSHARE
+>
+> As I mentioned, the alternatives above are _not_ set in core KVM code.
+> They can vary by architecture of VM type, depending on the policy,
+> support, etc..
+>
+> Now for your example please on how this would work with IOCTLs :)
+>
+> Thanks,
+> /fuad
+>
+> > >
+> > > >  - Allows not having to keep track of separate shared/private range
+> > > > information in KVM.
+> > >
+> > > This patch series is already tracking shared/private range informatio=
+n in KVM.
+> > >
+> > > >  - Simpler handling of the conversion process done per guest_memfd
+> > > > rather than for full range.
+> > > >      - Userspace can handle the rollback as needed, simplifying err=
+or
+> > > > handling in guest_memfd.
+> > > >  - guest_memfd is single source of truth and notifies the users of
+> > > > shareability change.
+> > > >      - e.g. IOMMU, userspace, KVM MMU all can be registered for
+> > > > getting notifications from guest_memfd directly and will get notifi=
+ed
+> > > > for invalidation upon shareability attribute updates.
+> > >
+> > > All of these can still be done without introducing a new ioctl.
+> > >
+> > > Cheers,
+> > > /fuad
 
