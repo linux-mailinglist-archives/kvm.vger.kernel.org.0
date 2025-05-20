@@ -1,325 +1,634 @@
-Return-Path: <kvm+bounces-47154-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47152-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CF3CABE01E
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 18:11:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E05ABE00F
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 18:09:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93D48189AB1F
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:11:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 451C14C416E
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:09:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59EC7270553;
-	Tue, 20 May 2025 16:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C7326C390;
+	Tue, 20 May 2025 16:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Le6dZ6Js";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="KyK+/yo+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZgD7zX6y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8034726A1CC;
-	Tue, 20 May 2025 16:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747757424; cv=fail; b=NB32NbONrWPE/BaqNtCRDUl6G1G7duNu9nb9aPGA5Q/Oi3qydeJyJZv+NIgiU0N3EeEPzBPphDSrLiwyUaUGY9C4uXWqFwCzbntIa+MENU10bUdMcnjEYRtO7oYwBQdoSDy77OWUN3FeMurYdRXS87LeCK1Yn/puQJEJ7l6Z6dA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747757424; c=relaxed/simple;
-	bh=fcWwcirw3yNY0nqIyhMhbQIT5MtabZGQEpTJN6OxwGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=XSAAQ/UjzYayLRnxd46s5iEtohCVwtZk3Y/MOh4oSgpUtC7EcRmFotT/LPDAOXPrpP7noj6IjgfsqFFX6V51jqWDPTMstQkuCCrXqqme1SNm4XuNko7bNYSS7eruDUOsOZQ9sEbZz2x0YyROLYO/VeyD/A3nNVJJc7VSMFfQagM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Le6dZ6Js; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=KyK+/yo+; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54KFN2m7007978;
-	Tue, 20 May 2025 16:10:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2025-04-25; bh=gOlmqV5MZ19T/lfmAe
-	P+i0Ixh9JFXSTFonxlcvHvaBY=; b=Le6dZ6Js5yL+do0Xaq5U0v+WSEzBIZ1t9k
-	j6jmy2BdbBRr8gIVRIwI1wpIz5NIIoA3mKIR62cX6g0v3gzKegvEVO+N1mnBsUbS
-	hClSBiFT1MQDdEoNOUvrenjlh+trI+sdSRt+NKh6surcJQtqPdIUb5SGl+DCOdII
-	Bfx+2nDTPKSNkXXFVsYlgpstZwkkB6SwPf6MzdTI+cw/jDRwqvziqsis0GNfPyJn
-	JRjGHbMLfY9D/OwmDjhSnnfAIXDx21UlgXSIaydbUYZbc4/RYX7Beu+LY07Pflf8
-	3gXjATu3Hi297OzSbrxuAqmSntGj0nkpf36b+N05ip1qISy2pgmg==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46rvahg3fq-32
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 May 2025 16:10:07 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54KFJWFj000848;
-	Tue, 20 May 2025 15:57:31 GMT
-Received: from sn4pr2101cu001.outbound.protection.outlook.com (mail-southcentralusazlp17012015.outbound.protection.outlook.com [40.93.14.15])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 46pgw881kk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 May 2025 15:57:31 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dMXDAVLhzuYxtTvOlpMrdPqsNciQSvhmaR1INAa2v3maeYjzCKlUXh9ss807wR9yu9Ji6+epvJ33DGf9Cjj3rj5rvjZ1wt1w3xgTKvG4keNlZwTJBeHgr8QI8rkXgW2ToPkg0o+/Zj9IAa8Dlqs92hQYpN4SXQN6r+8cKuGTCfbCVnupnAnh++QEOmd+UWfocoqwanDBOBQpoCoO8QdHkbOcEX+rs1RpTprrd0Kqe/NDe/mtDTUNU38MWwv6ASN082DewAAQP2qUZrUEEEmWc+e06xkp3Km9VFAFEwO7T/rKy1LTippExbFIKO1wfP71xgo7cyP/sxSjNIj4QsFe0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gOlmqV5MZ19T/lfmAeP+i0Ixh9JFXSTFonxlcvHvaBY=;
- b=G9KwwmAC+X96TmY64a0ynapBGzJmaMWWTBkK7WH1pJ7SYv41ZObAtEepLn/hFswghRnzI7eRxTU/ftIRMRYQ14ldYdrIzpN6EXhg+nT8RtqFlL5vdfNHs/Dz4MCoqJF6MiJ7d6ev7gRTFDpx7O14B3mBsS8gR9feYYtI9xnEMRyAry0ecy6P/oXqhiWj9n/P1Ieuq6ZsemI3xTUZLEVC6GHbbSLtRNYkWPsal+gEyvRNL4M7DIcz1G68+UBpV9BPbzsCBPNB29FuL512C8XHF2BPFt5ZVR/HSkIfOH5ktijiWeF1wWmfW72L8DGDqzA/Jvp+sCPNzZtUOJRK4Bb0Yg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gOlmqV5MZ19T/lfmAeP+i0Ixh9JFXSTFonxlcvHvaBY=;
- b=KyK+/yo+WHpUb7smdSrCDAQGNd4ruEFGaGAgWPuWgVxEXX/5rZrHO+vLAtBZAJETGBtSG5bn2vphfRzcjJxB0LoiTP4HCAB9Sag32CQf0HhFl7NWc7+Zb++PoouzvcYTbXX4JPsXZpWy90eFv8HBtSrLTV52E9y0MPw1iNQd2dc=
-Received: from DM4PR10MB8218.namprd10.prod.outlook.com (2603:10b6:8:1cc::16)
- by IA4PR10MB8471.namprd10.prod.outlook.com (2603:10b6:208:55e::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.30; Tue, 20 May
- 2025 15:57:28 +0000
-Received: from DM4PR10MB8218.namprd10.prod.outlook.com
- ([fe80::2650:55cf:2816:5f2]) by DM4PR10MB8218.namprd10.prod.outlook.com
- ([fe80::2650:55cf:2816:5f2%5]) with mapi id 15.20.8746.030; Tue, 20 May 2025
- 15:57:28 +0000
-Date: Tue, 20 May 2025 16:57:26 +0100
-From: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-        James Houghton <jthoughton@google.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Ignacio Moreno Gonzalez <Ignacio.MorenoGonzalez@kuka.com>,
-        Yang Shi <yang@os.amperecomputing.com>,
-        David Hildenbrand <david@redhat.com>,
-        "Liam R . Howlett" <Liam.Howlett@oracle.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RESEND PATCH] KVM: s390: rename PROT_NONE to PROT_TYPE_DUMMY
-Message-ID: <e061d09b-f4bf-4fb3-bb16-bd85fc33b644@lucifer.local>
-References: <20250519145657.178365-1-lorenzo.stoakes@oracle.com>
- <20250520171009.49b2bd1b@p-imbrenda>
- <cb0894b6-3c41-4850-a077-2d18f5547d2e@lucifer.local>
- <20250520175428.24ec47b7@p-imbrenda>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250520175428.24ec47b7@p-imbrenda>
-X-ClientProxiedBy: LO2P123CA0017.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:a6::29) To DM4PR10MB8218.namprd10.prod.outlook.com
- (2603:10b6:8:1cc::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30FE24C068;
+	Tue, 20 May 2025 16:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747757351; cv=none; b=cpBcZGk/ota5sNwEVbiO5kTlRM6kNNLBTgvlVxX9Nb/2C6tyB8/2M+mwN5xW1H2GJ4+gvEJ2Fj0G/1kgYaDSkTlt/hokhp6ZqOVSdNOeMVKH3r3jHexmM/IBrEmIdLL0JMRtYlhvlP7xFoHjzhgDTzNxzDcWBhi6PHiYpIcbmrU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747757351; c=relaxed/simple;
+	bh=AeVud6YEDQdemd6oX8m5m+S+pVIKa7Kx3YBOVTpKFqo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AOlQmvzs7zCrRdWtBLWDgQOeskSOA523FIFXtq/z6AcgVX8hq8yb19JwSUa5564CErzPu6yX3y+/xVJmEXVXqCbvqGFaHZK1uegFc8n8Yc0bp2Ud9n+2rRb5O4pAvOZnVeyQc/5pip0YIuEGt4ysRGQE8rXNovkXq+TueW+hK0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZgD7zX6y; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747757349; x=1779293349;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=AeVud6YEDQdemd6oX8m5m+S+pVIKa7Kx3YBOVTpKFqo=;
+  b=ZgD7zX6yqKGbRy3oHs78gwahd11dD7JcFRVaQT2ilFPHojA/efJEO8V6
+   DEoix8V3nJeyFhBAIqbM/1zwjWNua8IM2cqUz0SkWRwoUpzH4iUyI8Ltx
+   0gUVlHQ/JJCR2zkhdi/aysLYZDf+cUQF2YxKWfW66bG7kvmzjrN4jpzxW
+   PElnRY+LOGNOWTw9xAfsd5LAYqCgGrXLyuTtycPlV0+GhtClimaEeND9t
+   uIuy0ExYHkyQLLfPBrGBl+HUEZaS3gTSmkx2kV1kIM7aWnXA7tObktF7Y
+   XZq/mBv85KWcFnZYPnZcrjH1E3MQn9J1GM0bHHBlbrGW57YJvuVi0d5er
+   w==;
+X-CSE-ConnectionGUID: aEg4PXnBQOahIHR/n33Njg==
+X-CSE-MsgGUID: CmgAmiIOTYiLjFwkpD25cg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11439"; a="61043549"
+X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
+   d="scan'208";a="61043549"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 09:09:08 -0700
+X-CSE-ConnectionGUID: YEEdc5hAQTeU1HjQFrvCqg==
+X-CSE-MsgGUID: 79azw0SoTVqoAAoDJAPJCw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
+   d="scan'208";a="144995610"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 09:09:07 -0700
+Received: from [10.246.136.52] (kliang2-mobl1.ccr.corp.intel.com [10.246.136.52])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by linux.intel.com (Postfix) with ESMTPS id 7C0C620B5736;
+	Tue, 20 May 2025 09:11:45 -0700 (PDT)
+Message-ID: <09ed8cb5-707d-4b13-b230-cff4fab02b72@linux.intel.com>
+Date: Tue, 20 May 2025 12:09:02 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR10MB8218:EE_|IA4PR10MB8471:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5e3d561b-4e64-4b61-40f0-08dd97b70592
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?nDKYgxOUmIiJF0UorA4XIl2dAPjP/Tp0ZMZCDUmKAh6YcO6YKKDNQnq7WOXP?=
- =?us-ascii?Q?gj1v5tve7zujwCcogi6W5VT4XBiaHa2lK28vlQXjdFisq2kg27Dw37fL9K3x?=
- =?us-ascii?Q?bmgf83HgyLObfp9eA0WokDMdPiDm2Pmd73/0Us4NQMJomCs+ksGHzcEd+PdO?=
- =?us-ascii?Q?zAY7sye2Jaw51WtUgfsielVz/qTfp5dCWLLp7dn2mNVJLrZZm99z+snBhsuj?=
- =?us-ascii?Q?vQyHP5xGKi3RaY6V/UEoutA1NW6kyjqyNeQy/5tYHzbwUo0CC3vUzmocbvdo?=
- =?us-ascii?Q?0BGUot06GSUGvejAVRVPOd6M9xkkiH44sVJPCOvVys9FL3WkHJzNLlm4vgrB?=
- =?us-ascii?Q?8GS+tBJvLKT0ytUB/yNzQeF65kFb+6/6eyvTCVWk/yq4zsDqC6W2EBreLPxX?=
- =?us-ascii?Q?wOB7BMMmRZOuza7QR+hYxqvYGcD7jYD1mImQMUERb+nsaWMxciM5IvJakIPZ?=
- =?us-ascii?Q?PHiDAODcXoiPiqm55K21GrFoXBXClLZjg0tZU2oXglxHSobB7tEowvRREplc?=
- =?us-ascii?Q?irz/eIbyeiK5sOqxj5ZY563ojk/iC3O4NlX29T3S4GITtCtxJmxDPF4LsOGn?=
- =?us-ascii?Q?PabtlcBSYM2Y4HWcMjtKxT5H1KTifEuj5qMfyQp/ha/kUPnRqkykxBtFHDdw?=
- =?us-ascii?Q?1lCjirgfUhA5q5SRtLlTu6IYbME77zNYnN0dUlUkkmnHruK8HDGcWTSEZBck?=
- =?us-ascii?Q?FPJ/UHmHUFEsV7R2IeWP354ShblJunbU0F1QCduN/3R9BkWGFklix4H9RCUP?=
- =?us-ascii?Q?ysmbn+kRO1kw8REAQtUz7a5g6a1WWId+e1dFZdPVvsXItjBvGtmySBYTvgcA?=
- =?us-ascii?Q?UbuU0RXhTsOvzjF59XSB/p3Ztcut79MWu1YEWMoAPt+Syf2X/wIUO2790esU?=
- =?us-ascii?Q?xhCn810GRY9iljA8rUmtBEH8ELUgCrjnaVzNxKvRC10MnWxPFEWRcTApLpjs?=
- =?us-ascii?Q?3iKoNXRgqa+bemcwkFh+mq6Vwj/Qk3ZHVclRnT/4tcR8u5XWV6q5Pvladq0J?=
- =?us-ascii?Q?usTWJw7KhjPF+qccaKCYxt9B2cD00no2/+4t+YDsN+I+cxkxL1HhtKB+Ao/N?=
- =?us-ascii?Q?Tny2bpFWL8K8ymM7ynDqb/XQIIv0K9f9sjkKxLMSRuXMYoCk0USm8JkO3Vq8?=
- =?us-ascii?Q?RBU4fri3MBDoQZ4c8+D6LOFFI3PnkPX3CSkQmAwZxmOy9bsg6Kw6zAcHh4sc?=
- =?us-ascii?Q?lIPPl6gjJHlYBCKYTC4tzkC9yDKSSxS2Lhy9vG482qpeRKta1vPOenP0kOJz?=
- =?us-ascii?Q?cfgURvj+JeQ1g7sPMYr0n5+e9mVaMohODzp9uer2Uxpko+79qL7Skyb3bl+G?=
- =?us-ascii?Q?wwJg3uWn5aDFmdhDUYXXFMeQK2/cCP8ua2or6jFWAQPik56dpl3v+VFfheyL?=
- =?us-ascii?Q?I+YWWvdCvDW4Cr5DTiQAGwBhkDTU?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB8218.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7Y943EY7OSwXiJ8Hn6/BO+0aq/6OIuZB/5lAvtIOOV6V8B0dMn9+PvCopPrs?=
- =?us-ascii?Q?CP29te8X9wu2KBpuk9wk0ZpZteiHzpMKQS5VFY4OMQfVRXo2uZJ2yStmv/rv?=
- =?us-ascii?Q?DCbmkhN2eyVoYtbta9WcWjyNHEUprOSUjSc0tnoXZfVQGtSBfhSzJeDZUcfW?=
- =?us-ascii?Q?Ny67D1zuogU7yQqD5+JLq50bP3sNGdo9cmdXjduvwnDZZGCqXX4xjqX6Utzr?=
- =?us-ascii?Q?La2/scvU1cKC7qQL6BXe02wYwLvJFm41f37LWUA/ZD8zzcCkDQQ9oFDmvRkc?=
- =?us-ascii?Q?ygz67IfO5Qe2ocJXeoXBOPY+6/ZKGupcRTx/G+jnJSgpKhP4HoIJIzs3rgH7?=
- =?us-ascii?Q?jQbOtOdQzZgoCSjE1ZqNr3BYa5uXHCWcBUE1vF0qaJf3XBLlAE+xV88xesJX?=
- =?us-ascii?Q?gQLGjN0rsPuuPgiwAwvxZeLMYZpuQmRETY950MeKV3pAZuh3bdTFK+5W7kwG?=
- =?us-ascii?Q?GrkCbZf8/0PuKDtfYHl/XP0V6vy0r3cPVhhvng4lvW4H0IwbeY/y1oQAYMs7?=
- =?us-ascii?Q?lMLB1XTLDHWC5lsrf6Yntdxt5NKVURsDWDDPwNbaitOciPt9xvOaME8ENNon?=
- =?us-ascii?Q?3oWpnqG4yDbr+sHv4ieP8tNkYR6O3kdYfVHn255vVhtJYWxHjjN6VKOLCRFE?=
- =?us-ascii?Q?QXBCnEmOR71U418NYrYZMAHkCGziBSevkCiCTgxX5dOpKIFx9Np98EWt+kTk?=
- =?us-ascii?Q?7hGv5FXHfy8l5qpec6tf3ihravQccz+wO92k9r76CJ3xd1licHWsXZUjfwml?=
- =?us-ascii?Q?1ktdoykLRoltqEvZTNQkfo4wjc4CgiipEFyPqtXt/8FbQ2ZIFFO5+W2EVKB4?=
- =?us-ascii?Q?HlzKJ9rsboBTo3IcDYo00MMjSSLRBz78Vv2HZddhIBT9+EtPzL934lQNS2qY?=
- =?us-ascii?Q?1GR2CW/F+uYmabqsfJkhKQKRUZgqWzrui0pfKq4faBD9OLQUAovZRSLu73Pt?=
- =?us-ascii?Q?KqUz6nRJLAZ563puTZyA5+pyhRfx3yJAXBThaNNX1Xwm/qr8JVfe1gLC9WyL?=
- =?us-ascii?Q?I8pX1GqGUY88074VeiSfIv6FqF0ekNFzBU7tZjZWqj1ernoPHTYs+9fm7H8/?=
- =?us-ascii?Q?MhWEMz1X9IJMebcmxN/6xCoQPBw1vl33jXWhmbHsAfL299++bmGlnemXTRpk?=
- =?us-ascii?Q?rqGGKNjtOyTx04FPOPMFszHSJp6ygFGBEuNJfLtMKW5AgKX+QyuKCIEaXrJ4?=
- =?us-ascii?Q?JSI95pURGcvmJNQBiQA5fCbg+UwsdO2FcymJfwNqY3aN8wocWn3rxRJ+4cE6?=
- =?us-ascii?Q?v7ZxdTj9RPrgYqE2XEp1AAYq9XRcVgK0NfbLYAz5k6vp/0fa19H5/+nzihcf?=
- =?us-ascii?Q?uQi3B8kxeKJBkLujDx28IgecY6VzFAKSmOTRgruLsWMY3EW0+kGRNpcjRi8h?=
- =?us-ascii?Q?i+5wMuWlGX+sRIpqzAKZ2vbGYzChAYy+fmYvvEX69UWK1hoOl7ihPhyl8/Ht?=
- =?us-ascii?Q?8cN1a4FNH15HJTzNyfQdfG/+gqyJ7N9Nf6ys0h1uhztkwNh7+ZCSgItyeh4O?=
- =?us-ascii?Q?jVwr1tbXhMZ3luIHMryjm/M3TZF9z5X/BhG5XoYYSt8rUP4lz8pvSe+h0+eT?=
- =?us-ascii?Q?qY1CXwGWgWGDo71oQ4qVKu8+FF/m1ApCdjYIFdMXhy7bp7rRpbnrPSQX8fa0?=
- =?us-ascii?Q?fQ=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	nkLGPk4hKW/xCMf3JXugb3OTN6TUrVnges0VJcDk6cTqhOUnTC+6SV98hU5wI75pJhQvaGbXXDA3v9ZPR3AJ0wvCN9ZAnIlBs2cmKaY5MfPNqdDdiBR7PuQo6xtKvDM2Lr722vZWz/xfEuadE6Q1VF51C9aWK62iJ7hIQMW8fCna3Z+LQyWROFOSoT2Kqx6QEwHka0JToRXmWomn0RTDAzieNMneqixPElNo67tPpK7b+drXcZ1XwmDoPZtMt6T2HSfN/6gjfN8OihC4IiTzYpV5jiy/7FDyIbHUewBoWzTKWVGzfrKW73smfkPnn0fWPuJLGr78c2NhcwOnfdmRN87d9/25cuxq9HYkbofSIr4zjDm9V5pudJBM8LtAlRdOkYP2JpqCtdb74a9dcU9MfRwxTI0rGSYdzhZL9y6ufY5YHbgECCzYE74gUnjWKbJVRAc6CJ65uSqxf2XWw2SYzX4wJNEifUuA5S9uZvhrtV2/O2nQAzwrRAOdrdGe56z3YirpvBnI0oXFWr6lcQQhFwWU17p8wrZ+ux3EPYf8sb3aOmtVoAcvM68xNYww1ecVphVaaLWHWjYKhQ+TNcF6qu7el4Iol5syrOmUmzfXmiE=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e3d561b-4e64-4b61-40f0-08dd97b70592
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB8218.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2025 15:57:28.5481
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZfLI/6SKRxhhVGiWqtTKn0SvsQDorMOxddMlg/OeRcU+4Kyg/KVJQr+NOmSDwoxDluLqSxtVss8HdzNrHyjzcNVXngS8CHkJI0oLasrlVfY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR10MB8471
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-20_06,2025-05-20_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 phishscore=0
- bulkscore=0 adultscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505070000
- definitions=main-2505200130
-X-Proofpoint-ORIG-GUID: grTcoMWbI57xZEH-fkrSH8T-gAR4H3yG
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIwMDEzMyBTYWx0ZWRfX+9sWs7Z2STE/ 3/ZTPTHUm+qasuO4T7OdLsbQutCnfw4PjArnK54IEYvqZT76/nHB/VQgD8+Z4JwqVfpF00Up0ul Y0370d9V+aEKJbJXf08IaYcXBHHBwQvVcmzBjsuppmhVhUkTK+PGkXRvdxujmCCfF161G9jJ6ZU
- kuIyA6jxBQKr+fL26UbacfvIiZ6GZGPFhje1OrgNpZLk/nTNDminq3CAjT6r66/PHtm/S1xd9Ba NIR7XBAjFW3lVtz0EgI3UAsYxOUpT78GfbrjjTq0FqtM8qWBGAAsAxOWUYpBeZEFMVanfDVg/X/ EgSxn7B9Ltp39aONYBa3RDKnnauOA2A5LFSVAyA51IAn5FXM2T234/1YROd1woyifkY843D7SDQ
- OpHKVioucIoLSDgwJHY+/uHElemORM5LzDuqhE/+i3KkhUTtbHePmzo8BGlg1w0j/ccbwRl6
-X-Authority-Analysis: v=2.4 cv=Qupe3Uyd c=1 sm=1 tr=0 ts=682ca95f b=1 cx=c_pps a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8 a=yPCof4ZbAAAA:8 a=TAZUD9gdAAAA:8 a=VnNF1IyMAAAA:8 a=vzhER2c_AAAA:8 a=20KFwNOVAAAA:8 a=Em7mLx9_1gFsGKEg3IkA:9 a=CjuIK1q_8ugA:10
- a=f1lSKsbWiCfrRWj5-Iac:22 a=0YTRHmU2iG2pZC6F1fw2:22 cc=ntf awl=host:14695
-X-Proofpoint-GUID: grTcoMWbI57xZEH-fkrSH8T-gAR4H3yG
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 04/38] perf: Add a EVENT_GUEST flag
+To: Namhyung Kim <namhyung@kernel.org>, Mingwei Zhang <mizhang@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com,
+ "H. Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Yongwei Ma <yongwei.ma@intel.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>, Jim Mattson <jmattson@google.com>,
+ Sandipan Das <sandipan.das@amd.com>, Zide Chen <zide.chen@intel.com>,
+ Eranian Stephane <eranian@google.com>, Shukla Manali
+ <Manali.Shukla@amd.com>, Nikunj Dadhania <nikunj.dadhania@amd.com>
+References: <20250324173121.1275209-1-mizhang@google.com>
+ <20250324173121.1275209-5-mizhang@google.com> <aCrWqhaID9-b_jmr@google.com>
+Content-Language: en-US
+From: "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <aCrWqhaID9-b_jmr@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 20, 2025 at 05:54:28PM +0200, Claudio Imbrenda wrote:
-> On Tue, 20 May 2025 16:24:10 +0100
-> Lorenzo Stoakes <lorenzo.stoakes@oracle.com> wrote:
->
-> > On Tue, May 20, 2025 at 05:10:09PM +0200, Claudio Imbrenda wrote:
-> > > On Mon, 19 May 2025 15:56:57 +0100
-> > > Lorenzo Stoakes <lorenzo.stoakes@oracle.com> wrote:
-> > >
-> > > > The enum type prot_type declared in arch/s390/kvm/gaccess.c declares an
-> > > > unfortunate identifier within it - PROT_NONE.
-> > > >
-> > > > This clashes with the protection bit define from the uapi for mmap()
-> > > > declared in include/uapi/asm-generic/mman-common.h, which is indeed what
-> > > > those casually reading this code would assume this to refer to.
-> > > >
-> > > > This means that any changes which subsequently alter headers in any way
-> > > > which results in the uapi header being imported here will cause build
-> > > > errors.
-> > > >
-> > > > Resolve the issue by renaming PROT_NONE to PROT_TYPE_DUMMY.
-> > > >
-> > > > Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> > > > Suggested-by: Ignacio Moreno Gonzalez <Ignacio.MorenoGonzalez@kuka.com>
-> > > > Fixes: b3cefd6bf16e ("KVM: s390: Pass initialized arg even if unused")
-> > > > Cc: stable@vger.kernel.org
-> > > > Reported-by: kernel test robot <lkp@intel.com>
-> > > > Closes: https://lore.kernel.org/oe-kbuild-all/202505140943.IgHDa9s7-lkp@intel.com/
-> > > > Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-> > > > Acked-by: Ignacio Moreno Gonzalez <Ignacio.MorenoGonzalez@kuka.com>
-> > > > Acked-by: Yang Shi <yang@os.amperecomputing.com>
-> > > > Reviewed-by: David Hildenbrand <david@redhat.com>
-> > > > Acked-by: Liam R. Howlett <Liam.Howlett@oracle.com>
-> > >
-> > > if you had put me in CC, you would have gotten this yesterday already:
-> > >
-> > > Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> >
-> > Thanks and apologies for not cc-ing you, clearly my mistake.
-> >
-> > Though I would suggest your level of grumpiness here is a little over the
-> > top under the circumstances :) we maintainers must scale our grumpiness
-> > accordingly...
->
-> it was not meant to be grumpy, sorry if it came through that way!
 
-Haha no worries, text is a bad medium, I should maybe have inferred a ':P' at
-the end of that line ;)
 
-But absolutely my bad for not cc'in I'm normally good with that... and have
-moaned at people for not cc'ing me before :P
+On 2025-05-19 2:58 a.m., Namhyung Kim wrote:
+> Hello,
+> 
+> On Mon, Mar 24, 2025 at 05:30:44PM +0000, Mingwei Zhang wrote:
+>> From: Kan Liang <kan.liang@linux.intel.com>
+>>
+>> Current perf doesn't explicitly schedule out all exclude_guest events
+>> while the guest is running. There is no problem with the current
+>> emulated vPMU. Because perf owns all the PMU counters. It can mask the
+>> counter which is assigned to an exclude_guest event when a guest is
+>> running (Intel way), or set the corresponding HOSTONLY bit in evsentsel
+>> (AMD way). The counter doesn't count when a guest is running.
+>>
+>> However, either way doesn't work with the introduced passthrough vPMU.
+>> A guest owns all the PMU counters when it's running. The host should not
+>> mask any counters. The counter may be used by the guest. The evsentsel
+>> may be overwritten.
+>>
+>> Perf should explicitly schedule out all exclude_guest events to release
+>> the PMU resources when entering a guest, and resume the counting when
+>> exiting the guest.
+>>
+>> It's possible that an exclude_guest event is created when a guest is
+>> running. The new event should not be scheduled in as well.
+>>
+>> The ctx time is shared among different PMUs. The time cannot be stopped
+>> when a guest is running. It is required to calculate the time for events
+>> from other PMUs, e.g., uncore events. Add timeguest to track the guest
+>> run time. For an exclude_guest event, the elapsed time equals
+>> the ctx time - guest time.
+>> Cgroup has dedicated times. Use the same method to deduct the guest time
+>> from the cgroup time as well.
+>>
+>> Co-developed-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+>> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+>> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+>> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+>> ---
+>>  include/linux/perf_event.h |   6 ++
+>>  kernel/events/core.c       | 209 +++++++++++++++++++++++++++++--------
+>>  2 files changed, 169 insertions(+), 46 deletions(-)
+>>
+>> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+>> index a2fd1bdc955c..7bda1e20be12 100644
+>> --- a/include/linux/perf_event.h
+>> +++ b/include/linux/perf_event.h
+>> @@ -999,6 +999,11 @@ struct perf_event_context {
+>>  	 */
+>>  	struct perf_time_ctx		time;
+>>  
+>> +	/*
+>> +	 * Context clock, runs when in the guest mode.
+>> +	 */
+>> +	struct perf_time_ctx		timeguest;
+> 
+> Why not make it an array as you use it later?
 
-Anyway thanks to you guys for being helpful with this change in general, hoping
-we can land it either in RC7 or if not as a hotpatch for 6.16.
+Do you mean
+struct perf_time_ctx	times[2]?
 
-We shall see :)
+I don't see a big benefit of using times[T_GUEST] VS.timeguest.
 
-Cheers, Lorenzo
+> 
+>> +
+>>  	/*
+>>  	 * These fields let us detect when two contexts have both
+>>  	 * been cloned (inherited) from a common ancestor.
+>> @@ -1089,6 +1094,7 @@ struct bpf_perf_event_data_kern {
+>>   */
+>>  struct perf_cgroup_info {
+>>  	struct perf_time_ctx		time;
+>> +	struct perf_time_ctx		timeguest;
+>>  	int				active;
+>>  };
+>>  
+>> diff --git a/kernel/events/core.c b/kernel/events/core.c
+>> index e38c8b5e8086..7a2115b2c5c1 100644
+>> --- a/kernel/events/core.c
+>> +++ b/kernel/events/core.c
+>> @@ -163,7 +163,8 @@ enum event_type_t {
+>>  	/* see ctx_resched() for details */
+>>  	EVENT_CPU	= 0x10,
+>>  	EVENT_CGROUP	= 0x20,
+>> -	EVENT_FLAGS	= EVENT_CGROUP,
+>> +	EVENT_GUEST	= 0x40,
+> 
+> It's not clear to me if this flag is for events to include guests or
+> exclude them.  Can you please add a comment?
+> 
 
->
-> >
-> > >
-> > > > ---
-> > > > Separated out from [0] as problem found in other patch in series.
-> > > >
-> > > > [0]: https://lore.kernel.org/all/cover.1747338438.git.lorenzo.stoakes@oracle.com/
-> > > >
-> > > >  arch/s390/kvm/gaccess.c | 8 ++++----
-> > > >  1 file changed, 4 insertions(+), 4 deletions(-)
-> > > >
-> > > > diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> > > > index f6fded15633a..4e5654ad1604 100644
-> > > > --- a/arch/s390/kvm/gaccess.c
-> > > > +++ b/arch/s390/kvm/gaccess.c
-> > > > @@ -318,7 +318,7 @@ enum prot_type {
-> > > >  	PROT_TYPE_DAT  = 3,
-> > > >  	PROT_TYPE_IEP  = 4,
-> > > >  	/* Dummy value for passing an initialized value when code != PGM_PROTECTION */
-> > > > -	PROT_NONE,
-> > > > +	PROT_TYPE_DUMMY,
-> > > >  };
-> > > >
-> > > >  static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva, u8 ar,
-> > > > @@ -334,7 +334,7 @@ static int trans_exc_ending(struct kvm_vcpu *vcpu, int code, unsigned long gva,
-> > > >  	switch (code) {
-> > > >  	case PGM_PROTECTION:
-> > > >  		switch (prot) {
-> > > > -		case PROT_NONE:
-> > > > +		case PROT_TYPE_DUMMY:
-> > > >  			/* We should never get here, acts like termination */
-> > > >  			WARN_ON_ONCE(1);
-> > > >  			break;
-> > > > @@ -804,7 +804,7 @@ static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
-> > > >  			gpa = kvm_s390_real_to_abs(vcpu, ga);
-> > > >  			if (!kvm_is_gpa_in_memslot(vcpu->kvm, gpa)) {
-> > > >  				rc = PGM_ADDRESSING;
-> > > > -				prot = PROT_NONE;
-> > > > +				prot = PROT_TYPE_DUMMY;
-> > > >  			}
-> > > >  		}
-> > > >  		if (rc)
-> > > > @@ -962,7 +962,7 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
-> > > >  		if (rc == PGM_PROTECTION)
-> > > >  			prot = PROT_TYPE_KEYC;
-> > > >  		else
-> > > > -			prot = PROT_NONE;
-> > > > +			prot = PROT_TYPE_DUMMY;
-> > > >  		rc = trans_exc_ending(vcpu, rc, ga, ar, mode, prot, terminate);
-> > > >  	}
-> > > >  out_unlock:
-> > > > --
-> > > > 2.49.0
-> > > >
-> > >
->
+/*
+ * There are guest events. The for_each_epc() iteration can
+ * skip those PMUs which doesn't support guest events via the
+ * MEDIATED_VPMU. It is also used to indicate the start/end of
+ * guest events to calculate the guest running time.
+ */
+
+Thanks,
+Kan
+
+> Thanks,
+> Namhyung
+> 
+> 
+>> +	EVENT_FLAGS	= EVENT_CGROUP | EVENT_GUEST,
+>>  	/* compound helpers */
+>>  	EVENT_ALL         = EVENT_FLEXIBLE | EVENT_PINNED,
+>>  	EVENT_TIME_FROZEN = EVENT_TIME | EVENT_FROZEN,
+>> @@ -435,6 +436,7 @@ static atomic_t nr_include_guest_events __read_mostly;
+>>  
+>>  static atomic_t nr_mediated_pmu_vms;
+>>  static DEFINE_MUTEX(perf_mediated_pmu_mutex);
+>> +static DEFINE_PER_CPU(bool, perf_in_guest);
+>>  
+>>  /* !exclude_guest event of PMU with PERF_PMU_CAP_MEDIATED_VPMU */
+>>  static inline bool is_include_guest_event(struct perf_event *event)
+>> @@ -738,6 +740,9 @@ static bool perf_skip_pmu_ctx(struct perf_event_pmu_context *pmu_ctx,
+>>  {
+>>  	if ((event_type & EVENT_CGROUP) && !pmu_ctx->nr_cgroups)
+>>  		return true;
+>> +	if ((event_type & EVENT_GUEST) &&
+>> +	    !(pmu_ctx->pmu->capabilities & PERF_PMU_CAP_MEDIATED_VPMU))
+>> +		return true;
+>>  	return false;
+>>  }
+>>  
+>> @@ -788,6 +793,39 @@ static inline void update_perf_time_ctx(struct perf_time_ctx *time, u64 now, boo
+>>  	WRITE_ONCE(time->offset, time->time - time->stamp);
+>>  }
+>>  
+>> +static_assert(offsetof(struct perf_event_context, timeguest) -
+>> +	      offsetof(struct perf_event_context, time) ==
+>> +	      sizeof(struct perf_time_ctx));
+>> +
+>> +#define T_TOTAL		0
+>> +#define T_GUEST		1
+>> +
+>> +static inline u64 __perf_event_time_ctx(struct perf_event *event,
+>> +					struct perf_time_ctx *times)
+>> +{
+>> +	u64 time = times[T_TOTAL].time;
+>> +
+>> +	if (event->attr.exclude_guest)
+>> +		time -= times[T_GUEST].time;
+>> +
+>> +	return time;
+>> +}
+>> +
+>> +static inline u64 __perf_event_time_ctx_now(struct perf_event *event,
+>> +					    struct perf_time_ctx *times,
+>> +					    u64 now)
+>> +{
+>> +	if (event->attr.exclude_guest && __this_cpu_read(perf_in_guest)) {
+>> +		/*
+>> +		 * (now + times[total].offset) - (now + times[guest].offset) :=
+>> +		 * times[total].offset - times[guest].offset
+>> +		 */
+>> +		return READ_ONCE(times[T_TOTAL].offset) - READ_ONCE(times[T_GUEST].offset);
+>> +	}
+>> +
+>> +	return now + READ_ONCE(times[T_TOTAL].offset);
+>> +}
+>> +
+>>  #ifdef CONFIG_CGROUP_PERF
+>>  
+>>  static inline bool
+>> @@ -824,12 +862,16 @@ static inline int is_cgroup_event(struct perf_event *event)
+>>  	return event->cgrp != NULL;
+>>  }
+>>  
+>> +static_assert(offsetof(struct perf_cgroup_info, timeguest) -
+>> +	      offsetof(struct perf_cgroup_info, time) ==
+>> +	      sizeof(struct perf_time_ctx));
+>> +
+>>  static inline u64 perf_cgroup_event_time(struct perf_event *event)
+>>  {
+>>  	struct perf_cgroup_info *t;
+>>  
+>>  	t = per_cpu_ptr(event->cgrp->info, event->cpu);
+>> -	return t->time.time;
+>> +	return __perf_event_time_ctx(event, &t->time);
+>>  }
+>>  
+>>  static inline u64 perf_cgroup_event_time_now(struct perf_event *event, u64 now)
+>> @@ -838,9 +880,21 @@ static inline u64 perf_cgroup_event_time_now(struct perf_event *event, u64 now)
+>>  
+>>  	t = per_cpu_ptr(event->cgrp->info, event->cpu);
+>>  	if (!__load_acquire(&t->active))
+>> -		return t->time.time;
+>> -	now += READ_ONCE(t->time.offset);
+>> -	return now;
+>> +		return __perf_event_time_ctx(event, &t->time);
+>> +
+>> +	return __perf_event_time_ctx_now(event, &t->time, now);
+>> +}
+>> +
+>> +static inline void __update_cgrp_guest_time(struct perf_cgroup_info *info, u64 now, bool adv)
+>> +{
+>> +	update_perf_time_ctx(&info->timeguest, now, adv);
+>> +}
+>> +
+>> +static inline void update_cgrp_time(struct perf_cgroup_info *info, u64 now)
+>> +{
+>> +	update_perf_time_ctx(&info->time, now, true);
+>> +	if (__this_cpu_read(perf_in_guest))
+>> +		__update_cgrp_guest_time(info, now, true);
+>>  }
+>>  
+>>  static inline void update_cgrp_time_from_cpuctx(struct perf_cpu_context *cpuctx, bool final)
+>> @@ -856,7 +910,7 @@ static inline void update_cgrp_time_from_cpuctx(struct perf_cpu_context *cpuctx,
+>>  			cgrp = container_of(css, struct perf_cgroup, css);
+>>  			info = this_cpu_ptr(cgrp->info);
+>>  
+>> -			update_perf_time_ctx(&info->time, now, true);
+>> +			update_cgrp_time(info, now);
+>>  			if (final)
+>>  				__store_release(&info->active, 0);
+>>  		}
+>> @@ -879,11 +933,11 @@ static inline void update_cgrp_time_from_event(struct perf_event *event)
+>>  	 * Do not update time when cgroup is not active
+>>  	 */
+>>  	if (info->active)
+>> -		update_perf_time_ctx(&info->time, perf_clock(), true);
+>> +		update_cgrp_time(info, perf_clock());
+>>  }
+>>  
+>>  static inline void
+>> -perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx)
+>> +perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx, bool guest)
+>>  {
+>>  	struct perf_event_context *ctx = &cpuctx->ctx;
+>>  	struct perf_cgroup *cgrp = cpuctx->cgrp;
+>> @@ -903,8 +957,12 @@ perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx)
+>>  	for (css = &cgrp->css; css; css = css->parent) {
+>>  		cgrp = container_of(css, struct perf_cgroup, css);
+>>  		info = this_cpu_ptr(cgrp->info);
+>> -		update_perf_time_ctx(&info->time, ctx->time.stamp, false);
+>> -		__store_release(&info->active, 1);
+>> +		if (guest) {
+>> +			__update_cgrp_guest_time(info, ctx->time.stamp, false);
+>> +		} else {
+>> +			update_perf_time_ctx(&info->time, ctx->time.stamp, false);
+>> +			__store_release(&info->active, 1);
+>> +		}
+>>  	}
+>>  }
+>>  
+>> @@ -1104,7 +1162,7 @@ static inline int perf_cgroup_connect(pid_t pid, struct perf_event *event,
+>>  }
+>>  
+>>  static inline void
+>> -perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx)
+>> +perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx, bool guest)
+>>  {
+>>  }
+>>  
+>> @@ -1514,16 +1572,24 @@ static void perf_unpin_context(struct perf_event_context *ctx)
+>>   */
+>>  static void __update_context_time(struct perf_event_context *ctx, bool adv)
+>>  {
+>> -	u64 now = perf_clock();
+>> +	lockdep_assert_held(&ctx->lock);
+>> +
+>> +	update_perf_time_ctx(&ctx->time, perf_clock(), adv);
+>> +}
+>>  
+>> +static void __update_context_guest_time(struct perf_event_context *ctx, bool adv)
+>> +{
+>>  	lockdep_assert_held(&ctx->lock);
+>>  
+>> -	update_perf_time_ctx(&ctx->time, now, adv);
+>> +	/* must be called after __update_context_time(); */
+>> +	update_perf_time_ctx(&ctx->timeguest, ctx->time.stamp, adv);
+>>  }
+>>  
+>>  static void update_context_time(struct perf_event_context *ctx)
+>>  {
+>>  	__update_context_time(ctx, true);
+>> +	if (__this_cpu_read(perf_in_guest))
+>> +		__update_context_guest_time(ctx, true);
+>>  }
+>>  
+>>  static u64 perf_event_time(struct perf_event *event)
+>> @@ -1536,7 +1602,7 @@ static u64 perf_event_time(struct perf_event *event)
+>>  	if (is_cgroup_event(event))
+>>  		return perf_cgroup_event_time(event);
+>>  
+>> -	return ctx->time.time;
+>> +	return __perf_event_time_ctx(event, &ctx->time);
+>>  }
+>>  
+>>  static u64 perf_event_time_now(struct perf_event *event, u64 now)
+>> @@ -1550,10 +1616,9 @@ static u64 perf_event_time_now(struct perf_event *event, u64 now)
+>>  		return perf_cgroup_event_time_now(event, now);
+>>  
+>>  	if (!(__load_acquire(&ctx->is_active) & EVENT_TIME))
+>> -		return ctx->time.time;
+>> +		return __perf_event_time_ctx(event, &ctx->time);
+>>  
+>> -	now += READ_ONCE(ctx->time.offset);
+>> -	return now;
+>> +	return __perf_event_time_ctx_now(event, &ctx->time, now);
+>>  }
+>>  
+>>  static enum event_type_t get_event_type(struct perf_event *event)
+>> @@ -2384,20 +2449,23 @@ group_sched_out(struct perf_event *group_event, struct perf_event_context *ctx)
+>>  }
+>>  
+>>  static inline void
+>> -__ctx_time_update(struct perf_cpu_context *cpuctx, struct perf_event_context *ctx, bool final)
+>> +__ctx_time_update(struct perf_cpu_context *cpuctx, struct perf_event_context *ctx,
+>> +		  bool final, enum event_type_t event_type)
+>>  {
+>>  	if (ctx->is_active & EVENT_TIME) {
+>>  		if (ctx->is_active & EVENT_FROZEN)
+>>  			return;
+>> +
+>>  		update_context_time(ctx);
+>> -		update_cgrp_time_from_cpuctx(cpuctx, final);
+>> +		/* vPMU should not stop time */
+>> +		update_cgrp_time_from_cpuctx(cpuctx, !(event_type & EVENT_GUEST) && final);
+>>  	}
+>>  }
+>>  
+>>  static inline void
+>>  ctx_time_update(struct perf_cpu_context *cpuctx, struct perf_event_context *ctx)
+>>  {
+>> -	__ctx_time_update(cpuctx, ctx, false);
+>> +	__ctx_time_update(cpuctx, ctx, false, 0);
+>>  }
+>>  
+>>  /*
+>> @@ -3405,7 +3473,7 @@ ctx_sched_out(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
+>>  	 *
+>>  	 * would only update time for the pinned events.
+>>  	 */
+>> -	__ctx_time_update(cpuctx, ctx, ctx == &cpuctx->ctx);
+>> +	__ctx_time_update(cpuctx, ctx, ctx == &cpuctx->ctx, event_type);
+>>  
+>>  	/*
+>>  	 * CPU-release for the below ->is_active store,
+>> @@ -3431,7 +3499,18 @@ ctx_sched_out(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
+>>  			cpuctx->task_ctx = NULL;
+>>  	}
+>>  
+>> -	is_active ^= ctx->is_active; /* changed bits */
+>> +	if (event_type & EVENT_GUEST) {
+>> +		/*
+>> +		 * Schedule out all exclude_guest events of PMU
+>> +		 * with PERF_PMU_CAP_MEDIATED_VPMU.
+>> +		 */
+>> +		is_active = EVENT_ALL;
+>> +		__update_context_guest_time(ctx, false);
+>> +		perf_cgroup_set_timestamp(cpuctx, true);
+>> +		barrier();
+>> +	} else {
+>> +		is_active ^= ctx->is_active; /* changed bits */
+>> +	}
+>>  
+>>  	for_each_epc(pmu_ctx, ctx, pmu, event_type)
+>>  		__pmu_ctx_sched_out(pmu_ctx, is_active);
+>> @@ -3926,10 +4005,15 @@ static inline void group_update_userpage(struct perf_event *group_event)
+>>  		event_update_userpage(event);
+>>  }
+>>  
+>> +struct merge_sched_data {
+>> +	int can_add_hw;
+>> +	enum event_type_t event_type;
+>> +};
+>> +
+>>  static int merge_sched_in(struct perf_event *event, void *data)
+>>  {
+>>  	struct perf_event_context *ctx = event->ctx;
+>> -	int *can_add_hw = data;
+>> +	struct merge_sched_data *msd = data;
+>>  
+>>  	if (event->state <= PERF_EVENT_STATE_OFF)
+>>  		return 0;
+>> @@ -3937,13 +4021,22 @@ static int merge_sched_in(struct perf_event *event, void *data)
+>>  	if (!event_filter_match(event))
+>>  		return 0;
+>>  
+>> -	if (group_can_go_on(event, *can_add_hw)) {
+>> +	/*
+>> +	 * Don't schedule in any host events from PMU with
+>> +	 * PERF_PMU_CAP_MEDIATED_VPMU, while a guest is running.
+>> +	 */
+>> +	if (__this_cpu_read(perf_in_guest) &&
+>> +	    event->pmu_ctx->pmu->capabilities & PERF_PMU_CAP_MEDIATED_VPMU &&
+>> +	    !(msd->event_type & EVENT_GUEST))
+>> +		return 0;
+>> +
+>> +	if (group_can_go_on(event, msd->can_add_hw)) {
+>>  		if (!group_sched_in(event, ctx))
+>>  			list_add_tail(&event->active_list, get_event_list(event));
+>>  	}
+>>  
+>>  	if (event->state == PERF_EVENT_STATE_INACTIVE) {
+>> -		*can_add_hw = 0;
+>> +		msd->can_add_hw = 0;
+>>  		if (event->attr.pinned) {
+>>  			perf_cgroup_event_disable(event, ctx);
+>>  			perf_event_set_state(event, PERF_EVENT_STATE_ERROR);
+>> @@ -3962,11 +4055,15 @@ static int merge_sched_in(struct perf_event *event, void *data)
+>>  
+>>  static void pmu_groups_sched_in(struct perf_event_context *ctx,
+>>  				struct perf_event_groups *groups,
+>> -				struct pmu *pmu)
+>> +				struct pmu *pmu,
+>> +				enum event_type_t event_type)
+>>  {
+>> -	int can_add_hw = 1;
+>> +	struct merge_sched_data msd = {
+>> +		.can_add_hw = 1,
+>> +		.event_type = event_type,
+>> +	};
+>>  	visit_groups_merge(ctx, groups, smp_processor_id(), pmu,
+>> -			   merge_sched_in, &can_add_hw);
+>> +			   merge_sched_in, &msd);
+>>  }
+>>  
+>>  static void __pmu_ctx_sched_in(struct perf_event_pmu_context *pmu_ctx,
+>> @@ -3975,9 +4072,9 @@ static void __pmu_ctx_sched_in(struct perf_event_pmu_context *pmu_ctx,
+>>  	struct perf_event_context *ctx = pmu_ctx->ctx;
+>>  
+>>  	if (event_type & EVENT_PINNED)
+>> -		pmu_groups_sched_in(ctx, &ctx->pinned_groups, pmu_ctx->pmu);
+>> +		pmu_groups_sched_in(ctx, &ctx->pinned_groups, pmu_ctx->pmu, event_type);
+>>  	if (event_type & EVENT_FLEXIBLE)
+>> -		pmu_groups_sched_in(ctx, &ctx->flexible_groups, pmu_ctx->pmu);
+>> +		pmu_groups_sched_in(ctx, &ctx->flexible_groups, pmu_ctx->pmu, event_type);
+>>  }
+>>  
+>>  static void
+>> @@ -3994,9 +4091,11 @@ ctx_sched_in(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
+>>  		return;
+>>  
+>>  	if (!(is_active & EVENT_TIME)) {
+>> +		/* EVENT_TIME should be active while the guest runs */
+>> +		WARN_ON_ONCE(event_type & EVENT_GUEST);
+>>  		/* start ctx time */
+>>  		__update_context_time(ctx, false);
+>> -		perf_cgroup_set_timestamp(cpuctx);
+>> +		perf_cgroup_set_timestamp(cpuctx, false);
+>>  		/*
+>>  		 * CPU-release for the below ->is_active store,
+>>  		 * see __load_acquire() in perf_event_time_now()
+>> @@ -4012,7 +4111,23 @@ ctx_sched_in(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
+>>  			WARN_ON_ONCE(cpuctx->task_ctx != ctx);
+>>  	}
+>>  
+>> -	is_active ^= ctx->is_active; /* changed bits */
+>> +	if (event_type & EVENT_GUEST) {
+>> +		/*
+>> +		 * Schedule in the required exclude_guest events of PMU
+>> +		 * with PERF_PMU_CAP_MEDIATED_VPMU.
+>> +		 */
+>> +		is_active = event_type & EVENT_ALL;
+>> +
+>> +		/*
+>> +		 * Update ctx time to set the new start time for
+>> +		 * the exclude_guest events.
+>> +		 */
+>> +		update_context_time(ctx);
+>> +		update_cgrp_time_from_cpuctx(cpuctx, false);
+>> +		barrier();
+>> +	} else {
+>> +		is_active ^= ctx->is_active; /* changed bits */
+>> +	}
+>>  
+>>  	/*
+>>  	 * First go through the list and put on any pinned groups
+>> @@ -4020,13 +4135,13 @@ ctx_sched_in(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
+>>  	 */
+>>  	if (is_active & EVENT_PINNED) {
+>>  		for_each_epc(pmu_ctx, ctx, pmu, event_type)
+>> -			__pmu_ctx_sched_in(pmu_ctx, EVENT_PINNED);
+>> +			__pmu_ctx_sched_in(pmu_ctx, EVENT_PINNED | (event_type & EVENT_GUEST));
+>>  	}
+>>  
+>>  	/* Then walk through the lower prio flexible groups */
+>>  	if (is_active & EVENT_FLEXIBLE) {
+>>  		for_each_epc(pmu_ctx, ctx, pmu, event_type)
+>> -			__pmu_ctx_sched_in(pmu_ctx, EVENT_FLEXIBLE);
+>> +			__pmu_ctx_sched_in(pmu_ctx, EVENT_FLEXIBLE | (event_type & EVENT_GUEST));
+>>  	}
+>>  }
+>>  
+>> @@ -6285,23 +6400,25 @@ void perf_event_update_userpage(struct perf_event *event)
+>>  	if (!rb)
+>>  		goto unlock;
+>>  
+>> -	/*
+>> -	 * compute total_time_enabled, total_time_running
+>> -	 * based on snapshot values taken when the event
+>> -	 * was last scheduled in.
+>> -	 *
+>> -	 * we cannot simply called update_context_time()
+>> -	 * because of locking issue as we can be called in
+>> -	 * NMI context
+>> -	 */
+>> -	calc_timer_values(event, &now, &enabled, &running);
+>> -
+>> -	userpg = rb->user_page;
+>>  	/*
+>>  	 * Disable preemption to guarantee consistent time stamps are stored to
+>>  	 * the user page.
+>>  	 */
+>>  	preempt_disable();
+>> +
+>> +	/*
+>> +	 * compute total_time_enabled, total_time_running
+>> +	 * based on snapshot values taken when the event
+>> +	 * was last scheduled in.
+>> +	 *
+>> +	 * we cannot simply called update_context_time()
+>> +	 * because of locking issue as we can be called in
+>> +	 * NMI context
+>> +	 */
+>> +	calc_timer_values(event, &now, &enabled, &running);
+>> +
+>> +	userpg = rb->user_page;
+>> +
+>>  	++userpg->lock;
+>>  	barrier();
+>>  	userpg->index = perf_event_index(event);
+>> -- 
+>> 2.49.0.395.g12beb8f557-goog
+>>
+> 
+
 
