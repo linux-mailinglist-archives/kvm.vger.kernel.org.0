@@ -1,206 +1,657 @@
-Return-Path: <kvm+bounces-47091-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47092-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97630ABD325
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 11:18:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB5CABD33F
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 11:23:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9ECED188CAD3
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 09:19:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 656DD18913A7
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 09:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B5F264602;
-	Tue, 20 May 2025 09:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9C6266F0D;
+	Tue, 20 May 2025 09:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LJ8ZTSh9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="msaOtU2A"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B7B2135D1
-	for <kvm@vger.kernel.org>; Tue, 20 May 2025 09:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCA225DCF6
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 09:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747732722; cv=none; b=fCNLRq+/rwXWzgz/dgWJuap+zjwFILh9Nt/h5ciMYzMmN4tgucyj7qRBv2hUXnYaR3zWUeYrXoTMteGSWERcIbfgtERMMCmqN5YV4E1D0Bj4SPiOjPBAl2rIj46Nu2IMFeLIocvtbAKEp5zQX9HMcu1TX6I+VNc2iB08IhwRqoY=
+	t=1747732995; cv=none; b=O91ESqZuW4pLNTWjUtA0l2VmRCz2YW3+udN5W1bV7JZzgr+Ic0KV/+ikSu9rsfxE5nz5AWO3QqdXozStRycZAmxm3An/m9X6MpUt+AUwnY6T4kYeV8yJ3KukIUfz/TntMM82r9IbSbKh7Pb13P4+EQ/vXzS/OQMaEfQHff/0D3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747732722; c=relaxed/simple;
-	bh=r+bSdwhoOWSmo9kbZmhnlJ4J6ZQoCdv43wtKV2LA770=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AH2j1+TERyOeTWpZPynYh9UsQl66KwJQ0AxHDLQY1t+QGvxKniwQb5hhfVzVZRR/s6c+oqbmlxhlCjN99RiMS1zyr8ZzDOtJ1XFIofo1n/2yt2lOvoz+m+Irj06MbhbXDBGB3+Qf+sh2rFDjXXDjf7qB+Ih8dfPbAm/yKxEOKhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LJ8ZTSh9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747732719;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=97jEMPgZaTswyxP83cUjw4RDQ8Eatm5vDggHnQqNMvs=;
-	b=LJ8ZTSh9wzm7NGhZz6uNZsCLjD5Ps13NO/i0kW6yM89u7ViyUv93SzxTR8CigR8LF0q+eZ
-	QY4J6i3a6GzpcMw8Zx6RHeWOMmh1cuUzDmx+iZXVPZwGdSTkQlvjtP9B557XzqY2L1/Cpz
-	j6upwCSRphKj0LeOlNlaIq0zqbytl2A=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-mWSWzEvxNjSHzH_F5x3Nnw-1; Tue, 20 May 2025 05:18:38 -0400
-X-MC-Unique: mWSWzEvxNjSHzH_F5x3Nnw-1
-X-Mimecast-MFC-AGG-ID: mWSWzEvxNjSHzH_F5x3Nnw_1747732717
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43d209dc2d3so33855695e9.3
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 02:18:37 -0700 (PDT)
+	s=arc-20240116; t=1747732995; c=relaxed/simple;
+	bh=O0R+4hBrS+DWfxjMiLcCGNdUu4EaPTREGYA4X6FqPPw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WdFYW2IjXaClNtzt/kCht4pvMr8aZXUMOmjueZL2Bfw2wJtko7nhBuZw0yvaGZmWTiTAIyRYn05IHGiP6+W+DwXRCuWgBx4Zvji/dNwFZicGkso7VkQn0dsEwCI9eFBxgRIRF0VacUOdWYUn+HLSBJDpg17BCDiVlTda1N+AMVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=msaOtU2A; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-47666573242so961851cf.0
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 02:23:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747732993; x=1748337793; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=NgRslGgoPUIa9miQEs5PaTdBGnGmWi2fH+uqBrR2JTA=;
+        b=msaOtU2A/ky0WuO7ZzDnV6ki9RTlqFeB5gf7OICZ/rnulHPrJDRvi9NTE2uyZ/ShFr
+         X/mPVWgz+TuxTiYD2oKsqhHPf+3rud4ehklm656fj/o5LkFv3bv0LKXGWqaVi4TDG1UF
+         LE0qh7nZGGQPcaRViWC/Hx24w0aBCpE8FeTmRgi1WAAvF8DZtOUTYifbkqAzIIwOLNDE
+         q+tc9HK4hkiPhO4ZLBbi7N3oaybsVgzX9xfe+JAJo4SrCiwb9SI8ks03opMPG1ZsgiNY
+         OsS77gAcsAgySVPT78Y0Dfux1S1yUqDWDHNkPKQJHBvtRcfcN1+nNsOW+1rtX4eVWO8q
+         uqYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747732717; x=1748337517;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1747732993; x=1748337793;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=97jEMPgZaTswyxP83cUjw4RDQ8Eatm5vDggHnQqNMvs=;
-        b=xFK3lrQ3qSXnQqGxRc/EcfBCv7N1RDol1lunzZH1tu5L6e32peqX24zZPMvAQ2RA6P
-         p64K8BS7ACOy16a/POvz1W/7syt/xjB9DcASKg4+nmDDzmoaZg3Fj9anEHr9whhID1Dc
-         m6Ilfk7v9v+f0XCjH3ezu2R1OcRlK9ouBy6SioE74Qd8ZQMjxyVa49t06FWfxQa0ftfN
-         dX4lESXquZPcX8ECYrkT1VnVq2oefeN8msb8ksRBATe0/36UOQb4CaEDvoRR8oXL9S9m
-         AwJF2hFOkoR60wmlOjEZeRQwvCb2y7jkz6LUDt9VXCAOgydWq672KNQ6+ynhR49ObJKg
-         SzIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXcu8iPjJ4nifQqRXmN6rb7Js6fo6ml807k6yRWlo+Hqdi/QwaLdk3jdbDtnlvlE2RaJ7c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxh1r5aSfEXxKhBtVipG4nAWgKQ7XHviBfGlF0vqK0KuyTKbrx8
-	mhOjcVKu7vYjTPV6xaTHsU9KuUjnCCa68l1B3RKCkbMj5XncH/QKABDtZH9fRMBkQnMx64tb5as
-	DeuUTwHlkjQQLaDhRLdQKlW93RkMgouC6TzY06fWHItmHHhmOcqPn0w==
-X-Gm-Gg: ASbGncv0pqbVrQFkNSFoSSqlMmWza9pWGRGy4Up6y5e01ojO9qsIb2UkvtklfCOlk50
-	Tb0TWZPQ+dBf1kN8uj3w/accBHlND3dPoI/RQCct2vgqe4OY8DHj5YKR2uXGeKXpsoA8ZowRUd+
-	EnE6O+7f8WvP5ZMdXAM4Wm9OpVuGtBdGCncM0wnDgzq5yRl5f9Gb+4n1GDi6hFQp/f+6PnK2rmJ
-	3jhJ9n8jdvhOoLz13qq0PK7eKSeenis8j2lXbSBAGVJJIOZsyvmWzPfADb6HgVrIOad2gOAIdYY
-	4+DF+A4rch0Hj91V+e0OQ9BvM87u26RJ/GUS+MU63II=
-X-Received: by 2002:a05:600c:3114:b0:442:d9f2:ded8 with SMTP id 5b1f17b1804b1-442fd6444c4mr171607705e9.15.1747732716861;
-        Tue, 20 May 2025 02:18:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFD54AHFGMiVgX6dmnUfB8sujP1msuSAvq7Y1e4PaFfIwk3fydgaPVFeKDLBzgK/Yit0aTFpQ==
-X-Received: by 2002:a05:600c:3114:b0:442:d9f2:ded8 with SMTP id 5b1f17b1804b1-442fd6444c4mr171607395e9.15.1747732716411;
-        Tue, 20 May 2025 02:18:36 -0700 (PDT)
-Received: from [192.168.0.7] (ip-109-42-49-201.web.vodafone.de. [109.42.49.201])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca5beccsm15885378f8f.36.2025.05.20.02.18.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 02:18:36 -0700 (PDT)
-Message-ID: <e6174a02-cfb5-4025-9592-4632c5e8e8d1@redhat.com>
-Date: Tue, 20 May 2025 11:18:34 +0200
+        bh=NgRslGgoPUIa9miQEs5PaTdBGnGmWi2fH+uqBrR2JTA=;
+        b=D3yScDOzOknlp54IS2V1N1X6Li4F3P5jO//btFIPS2f7TYi5415IbC+bI3+QH67gAr
+         r+kHbibHhrdX727VLIWL5EpVbBFYD7S7yWNuIriitACdBZd2XF+md0EmRQVpVpJxSrzY
+         qdBZfvcNPAMC1kxEFGQs0UabwMGFOgM9BGMoX7IgG16UGa2fgKbqPdd/JmWDBo7lEyPM
+         JE9Xwn5hkOOWbfMV8VYrRkqXSzauJcXGtBDJnkFhHJHMScTNCaUib1jJN4Jp9IWbpFpF
+         vZiDuxjRbRUqsTpbVI5YALSEsuT/eRWczNbbCvbtAPCd0ua8pNi1vw4+n1K4QUXkSo36
+         SUBw==
+X-Gm-Message-State: AOJu0Yx43jH6CIHSXCf6hYsHJwONJyvd2ZDM5fIUkA7acU8cVvQSxSCU
+	EA1TaP4UrmE6sUxfUHlvM5Ltj+L48we64OZe00woYAIXBwQ3O/pI0ye3vzsLj/J//+9N00Qkl6L
+	bC2DPgqb6d7LpDGKA2E0YWzxRpDBiux5VHUcUZQGXwKkXNrmTHQyS9RJQsc7q67oP
+X-Gm-Gg: ASbGnct6lcxJMTFdmnNeog/vW1q9IKQTRdwGPY3mCMahaS+Eew9uSsUphN+VMTK3Vtj
+	TR3N7HmfxiQDp8y3YAOMMx/m/7agfQuUIZBVt6mr8hIM/yqSKtJteJ/qOFo8Ovtrc7pfiER1H1f
+	wq93AZ9YPnrvjZsHcA1puejPCedAsP4ox43zr0RKymCzqjZkoGuXrLvX6SpewGlVjFtfGnFjG2
+X-Google-Smtp-Source: AGHT+IHqSH0PeJIRquwgzahePpyVteyvanvz6fbvfbuDtvPX6fcluzAS0uk6PdWolQebE/NO+IFyJGyJiFbkj5kTeeE=
+X-Received: by 2002:ac8:7f4c:0:b0:48a:5b89:473b with SMTP id
+ d75a77b69052e-49600c85c06mr9620301cf.7.1747732991941; Tue, 20 May 2025
+ 02:23:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/3] KVM: s390: Always allocate esca_block
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>
-References: <20250519-rm-bsca-v2-0-e3ea53dd0394@linux.ibm.com>
- <20250519-rm-bsca-v2-2-e3ea53dd0394@linux.ibm.com>
- <e5f67090-07a4-4818-b83e-33386313b2af@redhat.com>
- <DA0UM5YL6IFH.1KE7UH4H6XBZM@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <DA0UM5YL6IFH.1KE7UH4H6XBZM@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+In-Reply-To: <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 20 May 2025 10:22:35 +0100
+X-Gm-Features: AX0GCFuad3k_eeLCPfcn12RMV3c4zm88hv51IV1yTlQEhgXZK63kv1Lb7vhRYsI
+Message-ID: <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vannapurve@google.com, vbabka@suse.cz, 
+	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
+	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com, 
+	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
+	zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 20/05/2025 10.35, Christoph Schlameuss wrote:
-> On Tue May 20, 2025 at 7:41 AM CEST, Thomas Huth wrote:
->> On 19/05/2025 13.36, Christoph Schlameuss wrote:
->>> Instead of allocating a BSCA and upgrading it for PV or when adding the
->>> 65th cpu we can always use the ESCA.
->>>
->>> The only downside of the change is that we will always allocate 4 pages
->>> for a 248 cpu ESCA instead of a single page for the BSCA per VM.
->>> In return we can delete a bunch of checks and special handling depending
->>> on the SCA type as well as the whole BSCA to ESCA conversion.
->>>
->>> As a fallback we can still run without SCA entries when the SIGP
->>> interpretation facility or ESCA are not available.
->>>
->>> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->>> ---
->>>    arch/s390/include/asm/kvm_host.h |   1 -
->>>    arch/s390/kvm/interrupt.c        |  67 ++++-------------
->>>    arch/s390/kvm/kvm-s390.c         | 159 ++++++---------------------------------
->>>    arch/s390/kvm/kvm-s390.h         |   4 +-
->>>    4 files changed, 42 insertions(+), 189 deletions(-)
->>
->> Could you now also remove struct bsca_block from the kvm_host_types.h header?
->>
-> 
-> We still need these to support sigp with bsca in vsie. (Once I have that
-> running properly.)
+Hi Ackerley,
 
-Ah, ok!
+On Thu, 15 May 2025 at 00:43, Ackerley Tng <ackerleytng@google.com> wrote:
+>
+> The two new guest_memfd ioctls KVM_GMEM_CONVERT_SHARED and
+> KVM_GMEM_CONVERT_PRIVATE convert the requested memory ranges to shared
+> and private respectively.
 
->> ...
->>> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
->>> index 8d3bbb2dd8d27802bbde2a7bd1378033ad614b8e..2c8e177e4af8f2dab07fd42a904cefdea80f6855 100644
->>> --- a/arch/s390/kvm/kvm-s390.h
->>> +++ b/arch/s390/kvm/kvm-s390.h
->>> @@ -531,7 +531,7 @@ int kvm_s390_handle_per_event(struct kvm_vcpu *vcpu);
->>>    /* support for Basic/Extended SCA handling */
->>>    static inline union ipte_control *kvm_s390_get_ipte_control(struct kvm *kvm)
->>>    {
->>> -	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
->>> +	struct esca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
->>
->> You might want to adjust/remove the comment here now.
->>
-> 
-> Yes. This does not make any sense anymore. But it is already completely removed
-> along with that whole message in the next patch.
+I have a high level question about this particular patch and this
+approach for conversion: why do we need IOCTLs to manage conversion
+between private and shared?
 
-Right, so likely not worth to respin just because of this.
-Thus feel free to add:
+In the presentations I gave at LPC [1, 2], and in my latest patch
+series that performs in-place conversion [3] and the associated (by
+now outdated) state diagram [4], I didn't see the need to have a
+userspace-facing interface to manage that. KVM has all the information
+it needs to handle conversions, which are triggered by the guest. To
+me this seems like it adds additional complexity, as well as a user
+facing interface that we would need to maintain.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+There are various ways we could handle conversion without explicit
+interference from userspace. What I had in mind is the following (as
+an example, details can vary according to VM type). I will use use the
+case of conversion from shared to private because that is the more
+complicated (interesting) case:
 
+- Guest issues a hypercall to request that a shared folio become private.
+
+- The hypervisor receives the call, and passes it to KVM.
+
+- KVM unmaps the folio from the guest stage-2 (EPT I think in x86
+parlance), and unmaps it from the host. The host however, could still
+have references (e.g., GUP).
+
+- KVM exits to the host (hypervisor call exit), with the information
+that the folio has been unshared from it.
+
+- A well behaving host would now get rid of all of its references
+(e.g., release GUPs), perform a VCPU run, and the guest continues
+running as normal. I expect this to be the common case.
+
+But to handle the more interesting situation, let's say that the host
+doesn't do it immediately, and for some reason it holds on to some
+references to that folio.
+
+- Even if that's the case, the guest can still run *. If the guest
+tries to access the folio, KVM detects that access when it tries to
+fault it into the guest, sees that the host still has references to
+that folio, and exits back to the host with a memory fault exit. At
+this point, the VCPU that has tried to fault in that particular folio
+cannot continue running as long as it cannot fault in that folio.
+
+- The host tries a VCPU run again, and the above repeats, i.e., KVM
+checks the refcount, finds that the host still holds references,
+doesn't fault the folio into the guest, and exits back to the host.
+
+- Eventually a well-behaving host releases all its references, and the
+following VCPU run is able to fault the page into the guest, and
+proceed with running it.
+
+In case the guest is destroyed before that happens, we have the whole
+folio_put() callback scenario we had discussed earlier.
+
+In other words, the interface that I had in mind where KVM run exists
+(hyp call, memory fault), as well as VCPU run. Both which already
+exist, and convey the same information. Is there a case where that
+isn't enough or suboptimal?
+
+Thanks,
+/fuad
+
+(*) An alternative suggestion was to block the VCPU from running
+altogether, regardless of whether it wants to fault the unshared page
+immediately, and continually exit to the host until references are
+dropped and the conversion can happen.
+
+[1] https://lpc.events/event/17/contributions/1487/
+[2] https://lpc.events/event/18/contributions/1758/
+[3] https://lore.kernel.org/all/20250328153133.3504118-1-tabba@google.com/
+[4] https://lpc.events/event/18/contributions/1758/attachments/1457/3699/Guestmemfd%20folio%20state%20page_type.pdf
+
+
+> A guest_memfd ioctl is used because shareability is a property of the
+> memory, and this property should be modifiable independently of the
+> attached struct kvm. This allows shareability to be modified even if
+> the memory is not yet bound using memslots.
+>
+> For shared to private conversions, if refcounts on any of the folios
+> within the range are elevated, fail the conversion with -EAGAIN.
+>
+> At the point of shared to private conversion, all folios in range are
+> also unmapped. The filemap_invalidate_lock() is held, so no faulting
+> can occur. Hence, from that point on, only transient refcounts can be
+> taken on the folios associated with that guest_memfd.
+>
+> Hence, it is safe to do the conversion from shared to private.
+>
+> After conversion is complete, refcounts may become elevated, but that
+> is fine since users of transient refcounts don't actually access
+> memory.
+>
+> For private to shared conversions, there are no refcount checks. any
+> transient refcounts are expected to drop their refcounts soon. The
+> conversion process will spin waiting for these transient refcounts to
+> go away.
+>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+>
+> Change-Id: I3546aaf6c1b795de6dc9ba09e816b64934221918
+> ---
+>  include/uapi/linux/kvm.h |  11 ++
+>  virt/kvm/guest_memfd.c   | 357 ++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 366 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index d7df312479aa..5b28e17f6f14 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1577,6 +1577,17 @@ struct kvm_create_guest_memfd {
+>         __u64 reserved[6];
+>  };
+>
+> +#define KVM_GMEM_IO 0xAF
+> +#define KVM_GMEM_CONVERT_SHARED                _IOWR(KVM_GMEM_IO,  0x41, struct kvm_gmem_convert)
+> +#define KVM_GMEM_CONVERT_PRIVATE       _IOWR(KVM_GMEM_IO,  0x42, struct kvm_gmem_convert)
+> +
+> +struct kvm_gmem_convert {
+> +       __u64 offset;
+> +       __u64 size;
+> +       __u64 error_offset;
+> +       __u64 reserved[5];
+> +};
+> +
+>  #define KVM_PRE_FAULT_MEMORY   _IOWR(KVMIO, 0xd5, struct kvm_pre_fault_memory)
+>
+>  struct kvm_pre_fault_memory {
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 590932499eba..f802116290ce 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -30,6 +30,10 @@ enum shareability {
+>  };
+>
+>  static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index);
+> +static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+> +                                     pgoff_t end);
+> +static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
+> +                                   pgoff_t end);
+>
+>  static struct kvm_gmem_inode_private *kvm_gmem_private(struct inode *inode)
+>  {
+> @@ -85,6 +89,306 @@ static struct folio *kvm_gmem_get_shared_folio(struct inode *inode, pgoff_t inde
+>         return kvm_gmem_get_folio(inode, index);
+>  }
+>
+> +/**
+> + * kvm_gmem_shareability_store() - Sets shareability to @value for range.
+> + *
+> + * @mt: the shareability maple tree.
+> + * @index: the range begins at this index in the inode.
+> + * @nr_pages: number of PAGE_SIZE pages in this range.
+> + * @value: the shareability value to set for this range.
+> + *
+> + * Unlike mtree_store_range(), this function also merges adjacent ranges that
+> + * have the same values as an optimization. Assumes that all stores to @mt go
+> + * through this function, such that adjacent ranges are always merged.
+> + *
+> + * Return: 0 on success and negative error otherwise.
+> + */
+> +static int kvm_gmem_shareability_store(struct maple_tree *mt, pgoff_t index,
+> +                                      size_t nr_pages, enum shareability value)
+> +{
+> +       MA_STATE(mas, mt, 0, 0);
+> +       unsigned long start;
+> +       unsigned long last;
+> +       void *entry;
+> +       int ret;
+> +
+> +       start = index;
+> +       last = start + nr_pages - 1;
+> +
+> +       mas_lock(&mas);
+> +
+> +       /* Try extending range. entry is NULL on overflow/wrap-around. */
+> +       mas_set_range(&mas, last + 1, last + 1);
+> +       entry = mas_find(&mas, last + 1);
+> +       if (entry && xa_to_value(entry) == value)
+> +               last = mas.last;
+> +
+> +       mas_set_range(&mas, start - 1, start - 1);
+> +       entry = mas_find(&mas, start - 1);
+> +       if (entry && xa_to_value(entry) == value)
+> +               start = mas.index;
+> +
+> +       mas_set_range(&mas, start, last);
+> +       ret = mas_store_gfp(&mas, xa_mk_value(value), GFP_KERNEL);
+> +
+> +       mas_unlock(&mas);
+> +
+> +       return ret;
+> +}
+> +
+> +struct conversion_work {
+> +       struct list_head list;
+> +       pgoff_t start;
+> +       size_t nr_pages;
+> +};
+> +
+> +static int add_to_work_list(struct list_head *list, pgoff_t start, pgoff_t last)
+> +{
+> +       struct conversion_work *work;
+> +
+> +       work = kzalloc(sizeof(*work), GFP_KERNEL);
+> +       if (!work)
+> +               return -ENOMEM;
+> +
+> +       work->start = start;
+> +       work->nr_pages = last + 1 - start;
+> +
+> +       list_add_tail(&work->list, list);
+> +
+> +       return 0;
+> +}
+> +
+> +static bool kvm_gmem_has_safe_refcount(struct address_space *mapping, pgoff_t start,
+> +                                      size_t nr_pages, pgoff_t *error_index)
+> +{
+> +       const int filemap_get_folios_refcount = 1;
+> +       struct folio_batch fbatch;
+> +       bool refcount_safe;
+> +       pgoff_t last;
+> +       int i;
+> +
+> +       last = start + nr_pages - 1;
+> +       refcount_safe = true;
+> +
+> +       folio_batch_init(&fbatch);
+> +       while (refcount_safe &&
+> +              filemap_get_folios(mapping, &start, last, &fbatch)) {
+> +
+> +               for (i = 0; i < folio_batch_count(&fbatch); ++i) {
+> +                       int filemap_refcount;
+> +                       int safe_refcount;
+> +                       struct folio *f;
+> +
+> +                       f = fbatch.folios[i];
+> +                       filemap_refcount = folio_nr_pages(f);
+> +
+> +                       safe_refcount = filemap_refcount + filemap_get_folios_refcount;
+> +                       if (folio_ref_count(f) != safe_refcount) {
+> +                               refcount_safe = false;
+> +                               *error_index = f->index;
+> +                               break;
+> +                       }
+> +               }
+> +
+> +               folio_batch_release(&fbatch);
+> +       }
+> +
+> +       return refcount_safe;
+> +}
+> +
+> +static int kvm_gmem_shareability_apply(struct inode *inode,
+> +                                      struct conversion_work *work,
+> +                                      enum shareability m)
+> +{
+> +       struct maple_tree *mt;
+> +
+> +       mt = &kvm_gmem_private(inode)->shareability;
+> +       return kvm_gmem_shareability_store(mt, work->start, work->nr_pages, m);
+> +}
+> +
+> +static int kvm_gmem_convert_compute_work(struct inode *inode, pgoff_t start,
+> +                                        size_t nr_pages, enum shareability m,
+> +                                        struct list_head *work_list)
+> +{
+> +       struct maple_tree *mt;
+> +       struct ma_state mas;
+> +       pgoff_t last;
+> +       void *entry;
+> +       int ret;
+> +
+> +       last = start + nr_pages - 1;
+> +
+> +       mt = &kvm_gmem_private(inode)->shareability;
+> +       ret = 0;
+> +
+> +       mas_init(&mas, mt, start);
+> +
+> +       rcu_read_lock();
+> +       mas_for_each(&mas, entry, last) {
+> +               enum shareability current_m;
+> +               pgoff_t m_range_index;
+> +               pgoff_t m_range_last;
+> +               int ret;
+> +
+> +               m_range_index = max(mas.index, start);
+> +               m_range_last = min(mas.last, last);
+> +
+> +               current_m = xa_to_value(entry);
+> +               if (m == current_m)
+> +                       continue;
+> +
+> +               mas_pause(&mas);
+> +               rcu_read_unlock();
+> +               /* Caller will clean this up on error. */
+> +               ret = add_to_work_list(work_list, m_range_index, m_range_last);
+> +               rcu_read_lock();
+> +               if (ret)
+> +                       break;
+> +       }
+> +       rcu_read_unlock();
+> +
+> +       return ret;
+> +}
+> +
+> +static void kvm_gmem_convert_invalidate_begin(struct inode *inode,
+> +                                             struct conversion_work *work)
+> +{
+> +       struct list_head *gmem_list;
+> +       struct kvm_gmem *gmem;
+> +       pgoff_t end;
+> +
+> +       end = work->start + work->nr_pages;
+> +
+> +       gmem_list = &inode->i_mapping->i_private_list;
+> +       list_for_each_entry(gmem, gmem_list, entry)
+> +               kvm_gmem_invalidate_begin(gmem, work->start, end);
+> +}
+> +
+> +static void kvm_gmem_convert_invalidate_end(struct inode *inode,
+> +                                           struct conversion_work *work)
+> +{
+> +       struct list_head *gmem_list;
+> +       struct kvm_gmem *gmem;
+> +       pgoff_t end;
+> +
+> +       end = work->start + work->nr_pages;
+> +
+> +       gmem_list = &inode->i_mapping->i_private_list;
+> +       list_for_each_entry(gmem, gmem_list, entry)
+> +               kvm_gmem_invalidate_end(gmem, work->start, end);
+> +}
+> +
+> +static int kvm_gmem_convert_should_proceed(struct inode *inode,
+> +                                          struct conversion_work *work,
+> +                                          bool to_shared, pgoff_t *error_index)
+> +{
+> +       if (!to_shared) {
+> +               unmap_mapping_pages(inode->i_mapping, work->start,
+> +                                   work->nr_pages, false);
+> +
+> +               if (!kvm_gmem_has_safe_refcount(inode->i_mapping, work->start,
+> +                                               work->nr_pages, error_index)) {
+> +                       return -EAGAIN;
+> +               }
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static int kvm_gmem_convert_range(struct file *file, pgoff_t start,
+> +                                 size_t nr_pages, bool shared,
+> +                                 pgoff_t *error_index)
+> +{
+> +       struct conversion_work *work, *tmp, *rollback_stop_item;
+> +       LIST_HEAD(work_list);
+> +       struct inode *inode;
+> +       enum shareability m;
+> +       int ret;
+> +
+> +       inode = file_inode(file);
+> +
+> +       filemap_invalidate_lock(inode->i_mapping);
+> +
+> +       m = shared ? SHAREABILITY_ALL : SHAREABILITY_GUEST;
+> +       ret = kvm_gmem_convert_compute_work(inode, start, nr_pages, m, &work_list);
+> +       if (ret || list_empty(&work_list))
+> +               goto out;
+> +
+> +       list_for_each_entry(work, &work_list, list)
+> +               kvm_gmem_convert_invalidate_begin(inode, work);
+> +
+> +       list_for_each_entry(work, &work_list, list) {
+> +               ret = kvm_gmem_convert_should_proceed(inode, work, shared,
+> +                                                     error_index);
+> +               if (ret)
+> +                       goto invalidate_end;
+> +       }
+> +
+> +       list_for_each_entry(work, &work_list, list) {
+> +               rollback_stop_item = work;
+> +               ret = kvm_gmem_shareability_apply(inode, work, m);
+> +               if (ret)
+> +                       break;
+> +       }
+> +
+> +       if (ret) {
+> +               m = shared ? SHAREABILITY_GUEST : SHAREABILITY_ALL;
+> +               list_for_each_entry(work, &work_list, list) {
+> +                       if (work == rollback_stop_item)
+> +                               break;
+> +
+> +                       WARN_ON(kvm_gmem_shareability_apply(inode, work, m));
+> +               }
+> +       }
+> +
+> +invalidate_end:
+> +       list_for_each_entry(work, &work_list, list)
+> +               kvm_gmem_convert_invalidate_end(inode, work);
+> +out:
+> +       filemap_invalidate_unlock(inode->i_mapping);
+> +
+> +       list_for_each_entry_safe(work, tmp, &work_list, list) {
+> +               list_del(&work->list);
+> +               kfree(work);
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +static int kvm_gmem_ioctl_convert_range(struct file *file,
+> +                                       struct kvm_gmem_convert *param,
+> +                                       bool shared)
+> +{
+> +       pgoff_t error_index;
+> +       size_t nr_pages;
+> +       pgoff_t start;
+> +       int ret;
+> +
+> +       if (param->error_offset)
+> +               return -EINVAL;
+> +
+> +       if (param->size == 0)
+> +               return 0;
+> +
+> +       if (param->offset + param->size < param->offset ||
+> +           param->offset > file_inode(file)->i_size ||
+> +           param->offset + param->size > file_inode(file)->i_size)
+> +               return -EINVAL;
+> +
+> +       if (!IS_ALIGNED(param->offset, PAGE_SIZE) ||
+> +           !IS_ALIGNED(param->size, PAGE_SIZE))
+> +               return -EINVAL;
+> +
+> +       start = param->offset >> PAGE_SHIFT;
+> +       nr_pages = param->size >> PAGE_SHIFT;
+> +
+> +       ret = kvm_gmem_convert_range(file, start, nr_pages, shared, &error_index);
+> +       if (ret)
+> +               param->error_offset = error_index << PAGE_SHIFT;
+> +
+> +       return ret;
+> +}
+> +
+>  #else
+>
+>  static int kvm_gmem_shareability_setup(struct maple_tree *mt, loff_t size, u64 flags)
+> @@ -186,15 +490,26 @@ static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+>         unsigned long index;
+>
+>         xa_for_each_range(&gmem->bindings, index, slot, start, end - 1) {
+> +               enum kvm_gfn_range_filter filter;
+>                 pgoff_t pgoff = slot->gmem.pgoff;
+>
+> +               filter = KVM_FILTER_PRIVATE;
+> +               if (kvm_gmem_memslot_supports_shared(slot)) {
+> +                       /*
+> +                        * Unmapping would also cause invalidation, but cannot
+> +                        * rely on mmu_notifiers to do invalidation via
+> +                        * unmapping, since memory may not be mapped to
+> +                        * userspace.
+> +                        */
+> +                       filter |= KVM_FILTER_SHARED;
+> +               }
+> +
+>                 struct kvm_gfn_range gfn_range = {
+>                         .start = slot->base_gfn + max(pgoff, start) - pgoff,
+>                         .end = slot->base_gfn + min(pgoff + slot->npages, end) - pgoff,
+>                         .slot = slot,
+>                         .may_block = true,
+> -                       /* guest memfd is relevant to only private mappings. */
+> -                       .attr_filter = KVM_FILTER_PRIVATE,
+> +                       .attr_filter = filter,
+>                 };
+>
+>                 if (!found_memslot) {
+> @@ -484,11 +799,49 @@ EXPORT_SYMBOL_GPL(kvm_gmem_memslot_supports_shared);
+>  #define kvm_gmem_mmap NULL
+>  #endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+>
+> +static long kvm_gmem_ioctl(struct file *file, unsigned int ioctl,
+> +                          unsigned long arg)
+> +{
+> +       void __user *argp;
+> +       int r;
+> +
+> +       argp = (void __user *)arg;
+> +
+> +       switch (ioctl) {
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +       case KVM_GMEM_CONVERT_SHARED:
+> +       case KVM_GMEM_CONVERT_PRIVATE: {
+> +               struct kvm_gmem_convert param;
+> +               bool to_shared;
+> +
+> +               r = -EFAULT;
+> +               if (copy_from_user(&param, argp, sizeof(param)))
+> +                       goto out;
+> +
+> +               to_shared = ioctl == KVM_GMEM_CONVERT_SHARED;
+> +               r = kvm_gmem_ioctl_convert_range(file, &param, to_shared);
+> +               if (r) {
+> +                       if (copy_to_user(argp, &param, sizeof(param))) {
+> +                               r = -EFAULT;
+> +                               goto out;
+> +                       }
+> +               }
+> +               break;
+> +       }
+> +#endif
+> +       default:
+> +               r = -ENOTTY;
+> +       }
+> +out:
+> +       return r;
+> +}
+> +
+>  static struct file_operations kvm_gmem_fops = {
+>         .mmap           = kvm_gmem_mmap,
+>         .open           = generic_file_open,
+>         .release        = kvm_gmem_release,
+>         .fallocate      = kvm_gmem_fallocate,
+> +       .unlocked_ioctl = kvm_gmem_ioctl,
+>  };
+>
+>  static void kvm_gmem_free_inode(struct inode *inode)
+> --
+> 2.49.0.1045.g170613ef41-goog
+>
 
