@@ -1,626 +1,445 @@
-Return-Path: <kvm+bounces-47167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47168-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3B07ABE227
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 19:51:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64693ABE24D
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 20:06:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF6CD1BA5655
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 17:51:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F1CB1BA480D
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 18:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56FC25C6FA;
-	Tue, 20 May 2025 17:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5398128033C;
+	Tue, 20 May 2025 18:06:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SkIyRNNh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NkPcs4a1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA38C1AF4C1;
-	Tue, 20 May 2025 17:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6719327FB25
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 18:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747763473; cv=none; b=ct0NX46HTJSKtXGFbujgcQOdXvQf2asSBcRfeJr472wp38QRKRw/fvpKI4M9pk29o/e+JH7azzJLrG+SrSwQzBI1tqO1Crup9RvY67XqobVxdXvkEN4/qBbSJ/F+PkgXCGL0jhoE2ZFLdAJeU5G+6GTRBaZXp03t+XjFEDnD7ow=
+	t=1747764361; cv=none; b=k+5r2fGu3QNgOjM8Oi0q499bQW1+iq/gtVxwBf8d5bpc0unL1+HK4FvIcCSARI3ZvRIGV5WXJlzK4I8NSy45pIyiz8ZuYWpRRmy/l0yy/gxGUDtRWhwyrOMwy1uQNGwkZGHXgIEQ+/6OvmxyxAwdINCOPBcwYXAz0VGgYVvcG1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747763473; c=relaxed/simple;
-	bh=icRIMGCFwUf4PYy3gJtfYBs3gR3d+hyDymY7inwBUeQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mygj8s69wI5ynR7HMASTbRimtQS2SSOoJ/vU9QMxCM1KWvN1CJ3cO/pLBwl2rHKlQo7dpQdp6nqwnDpgYiaomhC5WYiPWzBv6wh1aOKYRtZJhE9ezuob79CVYdmpot7GNFIakGslbcviuHcKcuuGVIDEIWZXUOuUW4pvVd/tTBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SkIyRNNh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C784C4CEE9;
-	Tue, 20 May 2025 17:51:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747763472;
-	bh=icRIMGCFwUf4PYy3gJtfYBs3gR3d+hyDymY7inwBUeQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SkIyRNNhGBsDKUiWoHaivlBQphpYJi7aQKRy/VJKSIfguHWVO6PTxYCIsDWi66Ns1
-	 d0RGW3mg7+8SGO6BFlIlClwvjNhD5cArIvX7h+kLRhQ1gRyAWI+9dFD0tLOVynS5U6
-	 HGNvEfzt/mQM0D3Xs+QqQa7onZscGLRKNGyxpMlQ14Eg7YXe4FZcjgvfpnlCHHwOSk
-	 BM9c+VCHhFA/QfwTxORFi/UmR5MgBi031AzwyhQlWTzSpUT7sRWRgC1BH0Nc+bJZk8
-	 JVzuhUPpHvAoWsh2tN78doXvEZJfJqk/hDQDdRhCXEV445YD5mpucLtweA7ngS8nch
-	 +C8mtQKLz498A==
-Date: Tue, 20 May 2025 10:51:09 -0700
-From: Namhyung Kim <namhyung@kernel.org>
-To: "Liang, Kan" <kan.liang@linux.intel.com>
-Cc: Mingwei Zhang <mizhang@google.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com,
-	"H. Peter Anvin" <hpa@zytor.com>, linux-perf-users@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Yongwei Ma <yongwei.ma@intel.com>,
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Jim Mattson <jmattson@google.com>,
-	Sandipan Das <sandipan.das@amd.com>,
-	Zide Chen <zide.chen@intel.com>,
-	Eranian Stephane <eranian@google.com>,
-	Shukla Manali <Manali.Shukla@amd.com>,
-	Nikunj Dadhania <nikunj.dadhania@amd.com>
-Subject: Re: [PATCH v4 04/38] perf: Add a EVENT_GUEST flag
-Message-ID: <aCzBDaHdELjiKHfc@google.com>
-References: <20250324173121.1275209-1-mizhang@google.com>
- <20250324173121.1275209-5-mizhang@google.com>
- <aCrWqhaID9-b_jmr@google.com>
- <09ed8cb5-707d-4b13-b230-cff4fab02b72@linux.intel.com>
+	s=arc-20240116; t=1747764361; c=relaxed/simple;
+	bh=tEijWLw113LWR96iE64iBpJTmYXBUT2RkrfOthW2vG0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e4spr+wIt4EsL3ncwbLZSPLTnW2McUilTv0ZNrkLtdgunJ0k56X7upRIzG68ewh0LC9bzCgZt7Mwld510uEJN0QbuaBPzQ7SMst7gUQ5bZ6U9EKkQBHLdBImVfhwvhXm5kY8J0gw+yDqayyclb9Z3CN2+VokJg/GrQEn3sVIbhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NkPcs4a1; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-47e9fea29easo1342531cf.1
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 11:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747764358; x=1748369158; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5F8AFconSLtX/NPzQMDe9nPFlH5MwE2Du+V+6LjrvmQ=;
+        b=NkPcs4a1CP2l1sgDBLe2yRI2OP6J+8FYeMvqku9DAVl0UssYwtPEc6orjLM8AVP1JF
+         0pIu/eU/15KRooTE/DclWb/Jioo5o7+mzsgLlDOs7I6L+pjMP+HjhhuoyzVXJzwSayIm
+         XOLbttQcqQUfQCx2C//Thr8PN3SSp2rzqhw84kvjaLIIA4wjxCLp3SGIe+a+HW+XAOfe
+         3wXqLAlCK8D9EQHtBBGesPaBIcsSXJGiyS+S2lOsCjmwG7xr0HBCnrOrf1nA2PntOru1
+         iWBCrbj63zt9OTDaOt5+MrVzzLfoZsvk4gmQ9aGfvYSy1yZrkNotAnzyGSdhdjzFRJqC
+         QSyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747764358; x=1748369158;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5F8AFconSLtX/NPzQMDe9nPFlH5MwE2Du+V+6LjrvmQ=;
+        b=LkvGpZ2BqBNTCeCzRg02c1zoXfVJG9TpuVxOq3i70W3LcrqtK0f9+dYJ6kUykzx7dO
+         7UJ3R2kVjaMbHvr1mXCL/XcMMVjW2fix4BKtAzWR+e+cPTdolAXaOfpzjJxiX7P8vtyZ
+         DbVJdiv2ZsARYbgjqHrmDe2sBtNBFXiyWoGjZu8Sq5QKFHvkvJamnd0xvv4fVzXNVCRX
+         HbySPCGUyzX8HzB1MQL9JPrw4SU8U3RotikSOEoCAFccMwSzHVrmszwxKp47CezBVTI0
+         jGj/6AZtsV0YS9SVAy5Ve3kMDwudaa3BLP1gyD7UEklYtQZE/VhPwiI4XR8BtCGKmpM6
+         miDA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2dpULyZt4oqcIty1i9q6Z5hgYn4GzUtCJaSGSNpKl330xHKuupsiaCWeyfEraL9KtDv0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0I4sT5LjpSOCG9XFTve6UuPxJi8PTZxNgsYH+bX9dgMWFXIAa
+	q4nq5BoBx8ZQelatL99HR+jaG1EtfRlEm7ldX8nNqkhnYmrZNJ6cUZokpv/nnJYld11xSxSMcJa
+	NH+YDK+OW+7b76YcmaKcol0ArsKfanRqqPQe5UXPA
+X-Gm-Gg: ASbGncuq3m3MrPPIip17WMX1bAsNT0paVQSjK9TYBj3QfxJGGKikNwwMtV5XGkCJ7H5
+	h/V7DcOHvDlQB2y4TtHkIKx2nX34ncQCK4wBuQR4Sv/ykUKKp7/+DclKnWbfw2Ozc2cnr9poFdG
+	2jmkYTnWLmIsyiBVuxujII0w8wztA0VEsnkVjk5KEGeNN3
+X-Google-Smtp-Source: AGHT+IEEkipZt0OxybJVx9mt4Ln4z0SxseWk9zthND56+2gK2l+Yv26CBC8ueNBJ+3EMCIWEBp5ZyDofnXei1I2cFY8=
+X-Received: by 2002:ac8:5a41:0:b0:494:b24f:c6df with SMTP id
+ d75a77b69052e-49601267f27mr11401751cf.25.1747764357678; Tue, 20 May 2025
+ 11:05:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <09ed8cb5-707d-4b13-b230-cff4fab02b72@linux.intel.com>
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <CA+EHjTy7iBNBb9DRdtgq8oYmvgykhSNvZL3FrRV4XF90t3XgBg@mail.gmail.com> <CAGtprH_7jSpwF77j1GW8rjSrbtZZ2OW2iGck5=Wk67+VnF9vjQ@mail.gmail.com>
+In-Reply-To: <CAGtprH_7jSpwF77j1GW8rjSrbtZZ2OW2iGck5=Wk67+VnF9vjQ@mail.gmail.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 20 May 2025 19:05:19 +0100
+X-Gm-Features: AX0GCFtaVo1OQso2b2Ub915ZtA3AkWxho65J0pdDhwf-I6NJzR0_EVjbMI_nFmI
+Message-ID: <CA+EHjTzMhKCoftfJUuL0WUZW4DdqOHgVDcn0Cmf-0r--8rBdbg@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 20, 2025 at 12:09:02PM -0400, Liang, Kan wrote:
-> 
-> 
-> On 2025-05-19 2:58 a.m., Namhyung Kim wrote:
-> > Hello,
-> > 
-> > On Mon, Mar 24, 2025 at 05:30:44PM +0000, Mingwei Zhang wrote:
-> >> From: Kan Liang <kan.liang@linux.intel.com>
-> >>
-> >> Current perf doesn't explicitly schedule out all exclude_guest events
-> >> while the guest is running. There is no problem with the current
-> >> emulated vPMU. Because perf owns all the PMU counters. It can mask the
-> >> counter which is assigned to an exclude_guest event when a guest is
-> >> running (Intel way), or set the corresponding HOSTONLY bit in evsentsel
-> >> (AMD way). The counter doesn't count when a guest is running.
-> >>
-> >> However, either way doesn't work with the introduced passthrough vPMU.
-> >> A guest owns all the PMU counters when it's running. The host should not
-> >> mask any counters. The counter may be used by the guest. The evsentsel
-> >> may be overwritten.
-> >>
-> >> Perf should explicitly schedule out all exclude_guest events to release
-> >> the PMU resources when entering a guest, and resume the counting when
-> >> exiting the guest.
-> >>
-> >> It's possible that an exclude_guest event is created when a guest is
-> >> running. The new event should not be scheduled in as well.
-> >>
-> >> The ctx time is shared among different PMUs. The time cannot be stopped
-> >> when a guest is running. It is required to calculate the time for events
-> >> from other PMUs, e.g., uncore events. Add timeguest to track the guest
-> >> run time. For an exclude_guest event, the elapsed time equals
-> >> the ctx time - guest time.
-> >> Cgroup has dedicated times. Use the same method to deduct the guest time
-> >> from the cgroup time as well.
-> >>
-> >> Co-developed-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> >> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> >> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
-> >> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> >> ---
-> >>  include/linux/perf_event.h |   6 ++
-> >>  kernel/events/core.c       | 209 +++++++++++++++++++++++++++++--------
-> >>  2 files changed, 169 insertions(+), 46 deletions(-)
-> >>
-> >> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-> >> index a2fd1bdc955c..7bda1e20be12 100644
-> >> --- a/include/linux/perf_event.h
-> >> +++ b/include/linux/perf_event.h
-> >> @@ -999,6 +999,11 @@ struct perf_event_context {
-> >>  	 */
-> >>  	struct perf_time_ctx		time;
-> >>  
-> >> +	/*
-> >> +	 * Context clock, runs when in the guest mode.
-> >> +	 */
-> >> +	struct perf_time_ctx		timeguest;
-> > 
-> > Why not make it an array as you use it later?
-> 
-> Do you mean
-> struct perf_time_ctx	times[2]?
+Hi Vishal,
 
-Yep.
+On Tue, 20 May 2025 at 17:03, Vishal Annapurve <vannapurve@google.com> wrot=
+e:
+>
+> On Tue, May 20, 2025 at 7:34=E2=80=AFAM Fuad Tabba <tabba@google.com> wro=
+te:
+> >
+> > Hi Vishal,
+> >
+> > On Tue, 20 May 2025 at 15:11, Vishal Annapurve <vannapurve@google.com> =
+wrote:
+> > >
+> > > On Tue, May 20, 2025 at 6:44=E2=80=AFAM Fuad Tabba <tabba@google.com>=
+ wrote:
+> > > >
+> > > > Hi Vishal,
+> > > >
+> > > > On Tue, 20 May 2025 at 14:02, Vishal Annapurve <vannapurve@google.c=
+om> wrote:
+> > > > >
+> > > > > On Tue, May 20, 2025 at 2:23=E2=80=AFAM Fuad Tabba <tabba@google.=
+com> wrote:
+> > > > > >
+> > > > > > Hi Ackerley,
+> > > > > >
+> > > > > > On Thu, 15 May 2025 at 00:43, Ackerley Tng <ackerleytng@google.=
+com> wrote:
+> > > > > > >
+> > > > > > > The two new guest_memfd ioctls KVM_GMEM_CONVERT_SHARED and
+> > > > > > > KVM_GMEM_CONVERT_PRIVATE convert the requested memory ranges =
+to shared
+> > > > > > > and private respectively.
+> > > > > >
+> > > > > > I have a high level question about this particular patch and th=
+is
+> > > > > > approach for conversion: why do we need IOCTLs to manage conver=
+sion
+> > > > > > between private and shared?
+> > > > > >
+> > > > > > In the presentations I gave at LPC [1, 2], and in my latest pat=
+ch
+> > > > > > series that performs in-place conversion [3] and the associated=
+ (by
+> > > > > > now outdated) state diagram [4], I didn't see the need to have =
+a
+> > > > > > userspace-facing interface to manage that. KVM has all the info=
+rmation
+> > > > > > it needs to handle conversions, which are triggered by the gues=
+t. To
+> > > > > > me this seems like it adds additional complexity, as well as a =
+user
+> > > > > > facing interface that we would need to maintain.
+> > > > > >
+> > > > > > There are various ways we could handle conversion without expli=
+cit
+> > > > > > interference from userspace. What I had in mind is the followin=
+g (as
+> > > > > > an example, details can vary according to VM type). I will use =
+use the
+> > > > > > case of conversion from shared to private because that is the m=
+ore
+> > > > > > complicated (interesting) case:
+> > > > > >
+> > > > > > - Guest issues a hypercall to request that a shared folio becom=
+e private.
+> > > > > >
+> > > > > > - The hypervisor receives the call, and passes it to KVM.
+> > > > > >
+> > > > > > - KVM unmaps the folio from the guest stage-2 (EPT I think in x=
+86
+> > > > > > parlance), and unmaps it from the host. The host however, could=
+ still
+> > > > > > have references (e.g., GUP).
+> > > > > >
+> > > > > > - KVM exits to the host (hypervisor call exit), with the inform=
+ation
+> > > > > > that the folio has been unshared from it.
+> > > > > >
+> > > > > > - A well behaving host would now get rid of all of its referenc=
+es
+> > > > > > (e.g., release GUPs), perform a VCPU run, and the guest continu=
+es
+> > > > > > running as normal. I expect this to be the common case.
+> > > > > >
+> > > > > > But to handle the more interesting situation, let's say that th=
+e host
+> > > > > > doesn't do it immediately, and for some reason it holds on to s=
+ome
+> > > > > > references to that folio.
+> > > > > >
+> > > > > > - Even if that's the case, the guest can still run *. If the gu=
+est
+> > > > > > tries to access the folio, KVM detects that access when it trie=
+s to
+> > > > > > fault it into the guest, sees that the host still has reference=
+s to
+> > > > > > that folio, and exits back to the host with a memory fault exit=
+. At
+> > > > > > this point, the VCPU that has tried to fault in that particular=
+ folio
+> > > > > > cannot continue running as long as it cannot fault in that foli=
+o.
+> > > > >
+> > > > > Are you talking about the following scheme?
+> > > > > 1) guest_memfd checks shareability on each get pfn and if there i=
+s a
+> > > > > mismatch exit to the host.
+> > > >
+> > > > I think we are not really on the same page here (no pun intended :)=
+ ).
+> > > > I'll try to answer your questions anyway...
+> > > >
+> > > > Which get_pfn? Are you referring to get_pfn when faulting the page
+> > > > into the guest or into the host?
+> > >
+> > > I am referring to guest fault handling in KVM.
+> > >
+> > > >
+> > > > > 2) host user space has to guess whether it's a pending refcount o=
+r
+> > > > > whether it's an actual mismatch.
+> > > >
+> > > > No need to guess. VCPU run will let it know exactly why it's exitin=
+g.
+> > > >
+> > > > > 3) guest_memfd will maintain a third state
+> > > > > "pending_private_conversion" or equivalent which will transition =
+to
+> > > > > private upon the last refcount drop of each page.
+> > > > >
+> > > > > If conversion is triggered by userspace (in case of pKVM, it will=
+ be
+> > > > > triggered from within the KVM (?)):
+> > > >
+> > > > Why would conversion be triggered by userspace? As far as I know, i=
+t's
+> > > > the guest that triggers the conversion.
+> > > >
+> > > > > * Conversion will just fail if there are extra refcounts and user=
+space
+> > > > > can try to get rid of extra refcounts on the range while it has e=
+nough
+> > > > > context without hitting any ambiguity with memory fault exit.
+> > > > > * guest_memfd will not have to deal with this extra state from 3 =
+above
+> > > > > and overall guest_memfd conversion handling becomes relatively
+> > > > > simpler.
+> > > >
+> > > > That's not really related. The extra state isn't necessary any more
+> > > > once we agreed in the previous discussion that we will retry instea=
+d.
+> > >
+> > > Who is *we* here? Which entity will retry conversion?
+> >
+> > Userspace will re-attempt the VCPU run.
+>
+> Then KVM will have to keep track of the ranges that need conversion
+> across exits. I think it's cleaner to let userspace make the decision
+> and invoke conversion without carrying additional state in KVM about
+> guest request.
 
-> 
-> I don't see a big benefit of using times[T_GUEST] VS.timeguest.
+I disagree. I think it's cleaner not to introduce a user interface,
+and just to track the reason for the last exit, along with the
+required additional data. KVM is responsible already for handling the
+workflow, why delegate this last part to the VMM?
 
-No big benefits.  But I just think it's natural to make it an array if
-you want to access them as if it's an array. :)
+> >
+> > > >
+> > > > > Note that for x86 CoCo cases, memory conversion is already trigge=
+red
+> > > > > by userspace using KVM ioctl, this series is proposing to use
+> > > > > guest_memfd ioctl to do the same.
+> > > >
+> > > > The reason why for x86 CoCo cases conversion is already triggered b=
+y
+> > > > userspace using KVM ioctl is that it has to, since shared memory an=
+d
+> > > > private memory are two separate pages, and userspace needs to manag=
+e
+> > > > that. Sharing memory in place removes the need for that.
+> > >
+> > > Userspace still needs to clean up memory usage before conversion is
+> > > successful. e.g. remove IOMMU mappings for shared to private
+> > > conversion. I would think that memory conversion should not succeed
+> > > before all existing users let go of the guest_memfd pages for the
+> > > range being converted.
+> >
+> > Yes. Userspace will know that it needs to do that on the VCPU exit,
+> > which informs it of the guest's hypervisor request to unshare (convert
+> > from shared to private) the page.
+> >
+> > > In x86 CoCo usecases, userspace can also decide to not allow
+> > > conversion for scenarios where ranges are still under active use by
+> > > the host and guest is erroneously trying to take away memory. Both
+> > > SNP/TDX spec allow failure of conversion due to in use memory.
+> >
+> > How can the guest erroneously try to take away memory? If the guest
+> > sends a hypervisor request asking for a conversion of memory that
+> > doesn't belong to it, then I would expect the hypervisor to prevent
+> > that.
+>
+> Making a range as private is effectively disallowing host from
+> accessing those ranges -> so taking away memory.
 
-> 
-> > 
-> >> +
-> >>  	/*
-> >>  	 * These fields let us detect when two contexts have both
-> >>  	 * been cloned (inherited) from a common ancestor.
-> >> @@ -1089,6 +1094,7 @@ struct bpf_perf_event_data_kern {
-> >>   */
-> >>  struct perf_cgroup_info {
-> >>  	struct perf_time_ctx		time;
-> >> +	struct perf_time_ctx		timeguest;
-> >>  	int				active;
-> >>  };
-> >>  
-> >> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> >> index e38c8b5e8086..7a2115b2c5c1 100644
-> >> --- a/kernel/events/core.c
-> >> +++ b/kernel/events/core.c
-> >> @@ -163,7 +163,8 @@ enum event_type_t {
-> >>  	/* see ctx_resched() for details */
-> >>  	EVENT_CPU	= 0x10,
-> >>  	EVENT_CGROUP	= 0x20,
-> >> -	EVENT_FLAGS	= EVENT_CGROUP,
-> >> +	EVENT_GUEST	= 0x40,
-> > 
-> > It's not clear to me if this flag is for events to include guests or
-> > exclude them.  Can you please add a comment?
-> > 
-> 
-> /*
->  * There are guest events. The for_each_epc() iteration can
->  * skip those PMUs which doesn't support guest events via the
->  * MEDIATED_VPMU. It is also used to indicate the start/end of
->  * guest events to calculate the guest running time.
->  */
+You said "erroneously" earlier. My question is, how can the guest
+*erroneously* try to take away memory? This is the normal flow of
+guest/host relations. The memory is the guest's: it decides when to
+share it with the host, and it can take it away.
 
-Thanks for the explanation.  So it's for events with !exclude_guest on
-host and to do some operation only for host-only events on mediated
-vPMUs.
+> >
+> > I don't see how having an IOCTL to trigger the conversion is needed to
+> > allow conversion failure. How is that different from userspace
+> > ignoring or delaying releasing all references it has for the
+> > conversion request?
+> >
+> > > >
+> > > > This series isn't using the same ioctl, it's introducing new ones t=
+o
+> > > > perform a task that as far as I can tell so far, KVM can handle by
+> > > > itself.
+> > >
+> > > I would like to understand this better. How will KVM handle the
+> > > conversion process for guest_memfd pages? Can you help walk an exampl=
+e
+> > > sequence for shared to private conversion specifically around
+> > > guest_memfd offset states?
+> >
+> > To make sure that we are discussing the same scenario: can you do the
+> > same as well please --- walk me through an example sequence for shared
+> > to private conversion specifically around guest_memfd offset states
+> > With the IOCTLs involved?
+> >
+> > Here is an example that I have implemented and tested with pKVM. Note
+> > that there are alternatives, the flow below is architecture or even
+> > vm-type dependent. None of this code is code KVM code and the
+> > behaviour could vary.
+> >
+> >
+> > Assuming the folio is shared with the host:
+> >
+> > Guest sends unshare hypercall to the hypervisor
+> > Hypervisor forwards request to KVM (gmem) (having done due diligence)
+> > KVM (gmem) performs an unmap_folio(), exits to userspace with
+>
+> For x86 CoCo VM usecases I was talking about, userspace would like to
+> avoid unmap_mapping_range() on the range before it's safe to unshare
+> the range.
 
-Thanks,
-Namhyung
+Why? There is no harm in userspace unmapping before the memory isn't
+shared. I don't see the problem with that.
 
-> > 
-> >> +	EVENT_FLAGS	= EVENT_CGROUP | EVENT_GUEST,
-> >>  	/* compound helpers */
-> >>  	EVENT_ALL         = EVENT_FLEXIBLE | EVENT_PINNED,
-> >>  	EVENT_TIME_FROZEN = EVENT_TIME | EVENT_FROZEN,
-> >> @@ -435,6 +436,7 @@ static atomic_t nr_include_guest_events __read_mostly;
-> >>  
-> >>  static atomic_t nr_mediated_pmu_vms;
-> >>  static DEFINE_MUTEX(perf_mediated_pmu_mutex);
-> >> +static DEFINE_PER_CPU(bool, perf_in_guest);
-> >>  
-> >>  /* !exclude_guest event of PMU with PERF_PMU_CAP_MEDIATED_VPMU */
-> >>  static inline bool is_include_guest_event(struct perf_event *event)
-> >> @@ -738,6 +740,9 @@ static bool perf_skip_pmu_ctx(struct perf_event_pmu_context *pmu_ctx,
-> >>  {
-> >>  	if ((event_type & EVENT_CGROUP) && !pmu_ctx->nr_cgroups)
-> >>  		return true;
-> >> +	if ((event_type & EVENT_GUEST) &&
-> >> +	    !(pmu_ctx->pmu->capabilities & PERF_PMU_CAP_MEDIATED_VPMU))
-> >> +		return true;
-> >>  	return false;
-> >>  }
-> >>  
-> >> @@ -788,6 +793,39 @@ static inline void update_perf_time_ctx(struct perf_time_ctx *time, u64 now, boo
-> >>  	WRITE_ONCE(time->offset, time->time - time->stamp);
-> >>  }
-> >>  
-> >> +static_assert(offsetof(struct perf_event_context, timeguest) -
-> >> +	      offsetof(struct perf_event_context, time) ==
-> >> +	      sizeof(struct perf_time_ctx));
-> >> +
-> >> +#define T_TOTAL		0
-> >> +#define T_GUEST		1
-> >> +
-> >> +static inline u64 __perf_event_time_ctx(struct perf_event *event,
-> >> +					struct perf_time_ctx *times)
-> >> +{
-> >> +	u64 time = times[T_TOTAL].time;
-> >> +
-> >> +	if (event->attr.exclude_guest)
-> >> +		time -= times[T_GUEST].time;
-> >> +
-> >> +	return time;
-> >> +}
-> >> +
-> >> +static inline u64 __perf_event_time_ctx_now(struct perf_event *event,
-> >> +					    struct perf_time_ctx *times,
-> >> +					    u64 now)
-> >> +{
-> >> +	if (event->attr.exclude_guest && __this_cpu_read(perf_in_guest)) {
-> >> +		/*
-> >> +		 * (now + times[total].offset) - (now + times[guest].offset) :=
-> >> +		 * times[total].offset - times[guest].offset
-> >> +		 */
-> >> +		return READ_ONCE(times[T_TOTAL].offset) - READ_ONCE(times[T_GUEST].offset);
-> >> +	}
-> >> +
-> >> +	return now + READ_ONCE(times[T_TOTAL].offset);
-> >> +}
-> >> +
-> >>  #ifdef CONFIG_CGROUP_PERF
-> >>  
-> >>  static inline bool
-> >> @@ -824,12 +862,16 @@ static inline int is_cgroup_event(struct perf_event *event)
-> >>  	return event->cgrp != NULL;
-> >>  }
-> >>  
-> >> +static_assert(offsetof(struct perf_cgroup_info, timeguest) -
-> >> +	      offsetof(struct perf_cgroup_info, time) ==
-> >> +	      sizeof(struct perf_time_ctx));
-> >> +
-> >>  static inline u64 perf_cgroup_event_time(struct perf_event *event)
-> >>  {
-> >>  	struct perf_cgroup_info *t;
-> >>  
-> >>  	t = per_cpu_ptr(event->cgrp->info, event->cpu);
-> >> -	return t->time.time;
-> >> +	return __perf_event_time_ctx(event, &t->time);
-> >>  }
-> >>  
-> >>  static inline u64 perf_cgroup_event_time_now(struct perf_event *event, u64 now)
-> >> @@ -838,9 +880,21 @@ static inline u64 perf_cgroup_event_time_now(struct perf_event *event, u64 now)
-> >>  
-> >>  	t = per_cpu_ptr(event->cgrp->info, event->cpu);
-> >>  	if (!__load_acquire(&t->active))
-> >> -		return t->time.time;
-> >> -	now += READ_ONCE(t->time.offset);
-> >> -	return now;
-> >> +		return __perf_event_time_ctx(event, &t->time);
-> >> +
-> >> +	return __perf_event_time_ctx_now(event, &t->time, now);
-> >> +}
-> >> +
-> >> +static inline void __update_cgrp_guest_time(struct perf_cgroup_info *info, u64 now, bool adv)
-> >> +{
-> >> +	update_perf_time_ctx(&info->timeguest, now, adv);
-> >> +}
-> >> +
-> >> +static inline void update_cgrp_time(struct perf_cgroup_info *info, u64 now)
-> >> +{
-> >> +	update_perf_time_ctx(&info->time, now, true);
-> >> +	if (__this_cpu_read(perf_in_guest))
-> >> +		__update_cgrp_guest_time(info, now, true);
-> >>  }
-> >>  
-> >>  static inline void update_cgrp_time_from_cpuctx(struct perf_cpu_context *cpuctx, bool final)
-> >> @@ -856,7 +910,7 @@ static inline void update_cgrp_time_from_cpuctx(struct perf_cpu_context *cpuctx,
-> >>  			cgrp = container_of(css, struct perf_cgroup, css);
-> >>  			info = this_cpu_ptr(cgrp->info);
-> >>  
-> >> -			update_perf_time_ctx(&info->time, now, true);
-> >> +			update_cgrp_time(info, now);
-> >>  			if (final)
-> >>  				__store_release(&info->active, 0);
-> >>  		}
-> >> @@ -879,11 +933,11 @@ static inline void update_cgrp_time_from_event(struct perf_event *event)
-> >>  	 * Do not update time when cgroup is not active
-> >>  	 */
-> >>  	if (info->active)
-> >> -		update_perf_time_ctx(&info->time, perf_clock(), true);
-> >> +		update_cgrp_time(info, perf_clock());
-> >>  }
-> >>  
-> >>  static inline void
-> >> -perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx)
-> >> +perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx, bool guest)
-> >>  {
-> >>  	struct perf_event_context *ctx = &cpuctx->ctx;
-> >>  	struct perf_cgroup *cgrp = cpuctx->cgrp;
-> >> @@ -903,8 +957,12 @@ perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx)
-> >>  	for (css = &cgrp->css; css; css = css->parent) {
-> >>  		cgrp = container_of(css, struct perf_cgroup, css);
-> >>  		info = this_cpu_ptr(cgrp->info);
-> >> -		update_perf_time_ctx(&info->time, ctx->time.stamp, false);
-> >> -		__store_release(&info->active, 1);
-> >> +		if (guest) {
-> >> +			__update_cgrp_guest_time(info, ctx->time.stamp, false);
-> >> +		} else {
-> >> +			update_perf_time_ctx(&info->time, ctx->time.stamp, false);
-> >> +			__store_release(&info->active, 1);
-> >> +		}
-> >>  	}
-> >>  }
-> >>  
-> >> @@ -1104,7 +1162,7 @@ static inline int perf_cgroup_connect(pid_t pid, struct perf_event *event,
-> >>  }
-> >>  
-> >>  static inline void
-> >> -perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx)
-> >> +perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx, bool guest)
-> >>  {
-> >>  }
-> >>  
-> >> @@ -1514,16 +1572,24 @@ static void perf_unpin_context(struct perf_event_context *ctx)
-> >>   */
-> >>  static void __update_context_time(struct perf_event_context *ctx, bool adv)
-> >>  {
-> >> -	u64 now = perf_clock();
-> >> +	lockdep_assert_held(&ctx->lock);
-> >> +
-> >> +	update_perf_time_ctx(&ctx->time, perf_clock(), adv);
-> >> +}
-> >>  
-> >> +static void __update_context_guest_time(struct perf_event_context *ctx, bool adv)
-> >> +{
-> >>  	lockdep_assert_held(&ctx->lock);
-> >>  
-> >> -	update_perf_time_ctx(&ctx->time, now, adv);
-> >> +	/* must be called after __update_context_time(); */
-> >> +	update_perf_time_ctx(&ctx->timeguest, ctx->time.stamp, adv);
-> >>  }
-> >>  
-> >>  static void update_context_time(struct perf_event_context *ctx)
-> >>  {
-> >>  	__update_context_time(ctx, true);
-> >> +	if (__this_cpu_read(perf_in_guest))
-> >> +		__update_context_guest_time(ctx, true);
-> >>  }
-> >>  
-> >>  static u64 perf_event_time(struct perf_event *event)
-> >> @@ -1536,7 +1602,7 @@ static u64 perf_event_time(struct perf_event *event)
-> >>  	if (is_cgroup_event(event))
-> >>  		return perf_cgroup_event_time(event);
-> >>  
-> >> -	return ctx->time.time;
-> >> +	return __perf_event_time_ctx(event, &ctx->time);
-> >>  }
-> >>  
-> >>  static u64 perf_event_time_now(struct perf_event *event, u64 now)
-> >> @@ -1550,10 +1616,9 @@ static u64 perf_event_time_now(struct perf_event *event, u64 now)
-> >>  		return perf_cgroup_event_time_now(event, now);
-> >>  
-> >>  	if (!(__load_acquire(&ctx->is_active) & EVENT_TIME))
-> >> -		return ctx->time.time;
-> >> +		return __perf_event_time_ctx(event, &ctx->time);
-> >>  
-> >> -	now += READ_ONCE(ctx->time.offset);
-> >> -	return now;
-> >> +	return __perf_event_time_ctx_now(event, &ctx->time, now);
-> >>  }
-> >>  
-> >>  static enum event_type_t get_event_type(struct perf_event *event)
-> >> @@ -2384,20 +2449,23 @@ group_sched_out(struct perf_event *group_event, struct perf_event_context *ctx)
-> >>  }
-> >>  
-> >>  static inline void
-> >> -__ctx_time_update(struct perf_cpu_context *cpuctx, struct perf_event_context *ctx, bool final)
-> >> +__ctx_time_update(struct perf_cpu_context *cpuctx, struct perf_event_context *ctx,
-> >> +		  bool final, enum event_type_t event_type)
-> >>  {
-> >>  	if (ctx->is_active & EVENT_TIME) {
-> >>  		if (ctx->is_active & EVENT_FROZEN)
-> >>  			return;
-> >> +
-> >>  		update_context_time(ctx);
-> >> -		update_cgrp_time_from_cpuctx(cpuctx, final);
-> >> +		/* vPMU should not stop time */
-> >> +		update_cgrp_time_from_cpuctx(cpuctx, !(event_type & EVENT_GUEST) && final);
-> >>  	}
-> >>  }
-> >>  
-> >>  static inline void
-> >>  ctx_time_update(struct perf_cpu_context *cpuctx, struct perf_event_context *ctx)
-> >>  {
-> >> -	__ctx_time_update(cpuctx, ctx, false);
-> >> +	__ctx_time_update(cpuctx, ctx, false, 0);
-> >>  }
-> >>  
-> >>  /*
-> >> @@ -3405,7 +3473,7 @@ ctx_sched_out(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
-> >>  	 *
-> >>  	 * would only update time for the pinned events.
-> >>  	 */
-> >> -	__ctx_time_update(cpuctx, ctx, ctx == &cpuctx->ctx);
-> >> +	__ctx_time_update(cpuctx, ctx, ctx == &cpuctx->ctx, event_type);
-> >>  
-> >>  	/*
-> >>  	 * CPU-release for the below ->is_active store,
-> >> @@ -3431,7 +3499,18 @@ ctx_sched_out(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
-> >>  			cpuctx->task_ctx = NULL;
-> >>  	}
-> >>  
-> >> -	is_active ^= ctx->is_active; /* changed bits */
-> >> +	if (event_type & EVENT_GUEST) {
-> >> +		/*
-> >> +		 * Schedule out all exclude_guest events of PMU
-> >> +		 * with PERF_PMU_CAP_MEDIATED_VPMU.
-> >> +		 */
-> >> +		is_active = EVENT_ALL;
-> >> +		__update_context_guest_time(ctx, false);
-> >> +		perf_cgroup_set_timestamp(cpuctx, true);
-> >> +		barrier();
-> >> +	} else {
-> >> +		is_active ^= ctx->is_active; /* changed bits */
-> >> +	}
-> >>  
-> >>  	for_each_epc(pmu_ctx, ctx, pmu, event_type)
-> >>  		__pmu_ctx_sched_out(pmu_ctx, is_active);
-> >> @@ -3926,10 +4005,15 @@ static inline void group_update_userpage(struct perf_event *group_event)
-> >>  		event_update_userpage(event);
-> >>  }
-> >>  
-> >> +struct merge_sched_data {
-> >> +	int can_add_hw;
-> >> +	enum event_type_t event_type;
-> >> +};
-> >> +
-> >>  static int merge_sched_in(struct perf_event *event, void *data)
-> >>  {
-> >>  	struct perf_event_context *ctx = event->ctx;
-> >> -	int *can_add_hw = data;
-> >> +	struct merge_sched_data *msd = data;
-> >>  
-> >>  	if (event->state <= PERF_EVENT_STATE_OFF)
-> >>  		return 0;
-> >> @@ -3937,13 +4021,22 @@ static int merge_sched_in(struct perf_event *event, void *data)
-> >>  	if (!event_filter_match(event))
-> >>  		return 0;
-> >>  
-> >> -	if (group_can_go_on(event, *can_add_hw)) {
-> >> +	/*
-> >> +	 * Don't schedule in any host events from PMU with
-> >> +	 * PERF_PMU_CAP_MEDIATED_VPMU, while a guest is running.
-> >> +	 */
-> >> +	if (__this_cpu_read(perf_in_guest) &&
-> >> +	    event->pmu_ctx->pmu->capabilities & PERF_PMU_CAP_MEDIATED_VPMU &&
-> >> +	    !(msd->event_type & EVENT_GUEST))
-> >> +		return 0;
-> >> +
-> >> +	if (group_can_go_on(event, msd->can_add_hw)) {
-> >>  		if (!group_sched_in(event, ctx))
-> >>  			list_add_tail(&event->active_list, get_event_list(event));
-> >>  	}
-> >>  
-> >>  	if (event->state == PERF_EVENT_STATE_INACTIVE) {
-> >> -		*can_add_hw = 0;
-> >> +		msd->can_add_hw = 0;
-> >>  		if (event->attr.pinned) {
-> >>  			perf_cgroup_event_disable(event, ctx);
-> >>  			perf_event_set_state(event, PERF_EVENT_STATE_ERROR);
-> >> @@ -3962,11 +4055,15 @@ static int merge_sched_in(struct perf_event *event, void *data)
-> >>  
-> >>  static void pmu_groups_sched_in(struct perf_event_context *ctx,
-> >>  				struct perf_event_groups *groups,
-> >> -				struct pmu *pmu)
-> >> +				struct pmu *pmu,
-> >> +				enum event_type_t event_type)
-> >>  {
-> >> -	int can_add_hw = 1;
-> >> +	struct merge_sched_data msd = {
-> >> +		.can_add_hw = 1,
-> >> +		.event_type = event_type,
-> >> +	};
-> >>  	visit_groups_merge(ctx, groups, smp_processor_id(), pmu,
-> >> -			   merge_sched_in, &can_add_hw);
-> >> +			   merge_sched_in, &msd);
-> >>  }
-> >>  
-> >>  static void __pmu_ctx_sched_in(struct perf_event_pmu_context *pmu_ctx,
-> >> @@ -3975,9 +4072,9 @@ static void __pmu_ctx_sched_in(struct perf_event_pmu_context *pmu_ctx,
-> >>  	struct perf_event_context *ctx = pmu_ctx->ctx;
-> >>  
-> >>  	if (event_type & EVENT_PINNED)
-> >> -		pmu_groups_sched_in(ctx, &ctx->pinned_groups, pmu_ctx->pmu);
-> >> +		pmu_groups_sched_in(ctx, &ctx->pinned_groups, pmu_ctx->pmu, event_type);
-> >>  	if (event_type & EVENT_FLEXIBLE)
-> >> -		pmu_groups_sched_in(ctx, &ctx->flexible_groups, pmu_ctx->pmu);
-> >> +		pmu_groups_sched_in(ctx, &ctx->flexible_groups, pmu_ctx->pmu, event_type);
-> >>  }
-> >>  
-> >>  static void
-> >> @@ -3994,9 +4091,11 @@ ctx_sched_in(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
-> >>  		return;
-> >>  
-> >>  	if (!(is_active & EVENT_TIME)) {
-> >> +		/* EVENT_TIME should be active while the guest runs */
-> >> +		WARN_ON_ONCE(event_type & EVENT_GUEST);
-> >>  		/* start ctx time */
-> >>  		__update_context_time(ctx, false);
-> >> -		perf_cgroup_set_timestamp(cpuctx);
-> >> +		perf_cgroup_set_timestamp(cpuctx, false);
-> >>  		/*
-> >>  		 * CPU-release for the below ->is_active store,
-> >>  		 * see __load_acquire() in perf_event_time_now()
-> >> @@ -4012,7 +4111,23 @@ ctx_sched_in(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
-> >>  			WARN_ON_ONCE(cpuctx->task_ctx != ctx);
-> >>  	}
-> >>  
-> >> -	is_active ^= ctx->is_active; /* changed bits */
-> >> +	if (event_type & EVENT_GUEST) {
-> >> +		/*
-> >> +		 * Schedule in the required exclude_guest events of PMU
-> >> +		 * with PERF_PMU_CAP_MEDIATED_VPMU.
-> >> +		 */
-> >> +		is_active = event_type & EVENT_ALL;
-> >> +
-> >> +		/*
-> >> +		 * Update ctx time to set the new start time for
-> >> +		 * the exclude_guest events.
-> >> +		 */
-> >> +		update_context_time(ctx);
-> >> +		update_cgrp_time_from_cpuctx(cpuctx, false);
-> >> +		barrier();
-> >> +	} else {
-> >> +		is_active ^= ctx->is_active; /* changed bits */
-> >> +	}
-> >>  
-> >>  	/*
-> >>  	 * First go through the list and put on any pinned groups
-> >> @@ -4020,13 +4135,13 @@ ctx_sched_in(struct perf_event_context *ctx, struct pmu *pmu, enum event_type_t
-> >>  	 */
-> >>  	if (is_active & EVENT_PINNED) {
-> >>  		for_each_epc(pmu_ctx, ctx, pmu, event_type)
-> >> -			__pmu_ctx_sched_in(pmu_ctx, EVENT_PINNED);
-> >> +			__pmu_ctx_sched_in(pmu_ctx, EVENT_PINNED | (event_type & EVENT_GUEST));
-> >>  	}
-> >>  
-> >>  	/* Then walk through the lower prio flexible groups */
-> >>  	if (is_active & EVENT_FLEXIBLE) {
-> >>  		for_each_epc(pmu_ctx, ctx, pmu, event_type)
-> >> -			__pmu_ctx_sched_in(pmu_ctx, EVENT_FLEXIBLE);
-> >> +			__pmu_ctx_sched_in(pmu_ctx, EVENT_FLEXIBLE | (event_type & EVENT_GUEST));
-> >>  	}
-> >>  }
-> >>  
-> >> @@ -6285,23 +6400,25 @@ void perf_event_update_userpage(struct perf_event *event)
-> >>  	if (!rb)
-> >>  		goto unlock;
-> >>  
-> >> -	/*
-> >> -	 * compute total_time_enabled, total_time_running
-> >> -	 * based on snapshot values taken when the event
-> >> -	 * was last scheduled in.
-> >> -	 *
-> >> -	 * we cannot simply called update_context_time()
-> >> -	 * because of locking issue as we can be called in
-> >> -	 * NMI context
-> >> -	 */
-> >> -	calc_timer_values(event, &now, &enabled, &running);
-> >> -
-> >> -	userpg = rb->user_page;
-> >>  	/*
-> >>  	 * Disable preemption to guarantee consistent time stamps are stored to
-> >>  	 * the user page.
-> >>  	 */
-> >>  	preempt_disable();
-> >> +
-> >> +	/*
-> >> +	 * compute total_time_enabled, total_time_running
-> >> +	 * based on snapshot values taken when the event
-> >> +	 * was last scheduled in.
-> >> +	 *
-> >> +	 * we cannot simply called update_context_time()
-> >> +	 * because of locking issue as we can be called in
-> >> +	 * NMI context
-> >> +	 */
-> >> +	calc_timer_values(event, &now, &enabled, &running);
-> >> +
-> >> +	userpg = rb->user_page;
-> >> +
-> >>  	++userpg->lock;
-> >>  	barrier();
-> >>  	userpg->index = perf_event_index(event);
-> >> -- 
-> >> 2.49.0.395.g12beb8f557-goog
-> >>
-> > 
-> 
+You still haven't responded to my question from the previous email:
+can you please return the favor and walk me through an example
+sequence for shared to private conversion specifically around
+guest_memfd offset states with the IOCTLs involved? :D
+
+Thanks!
+/fuad
+
+
+> > KVM_EXIT_UNSHARE and all the information about the folio being
+> > unshared
+> >
+> > Case 1:
+> > Userspace removes any remaining references (GUPs, IOMMU Mappings etc...=
+)
+> > Userspace calls vcpu_run(): KVM (gmem) sees that there aren't any
+> > references, sets state to PRIVATE
+> >
+> > Case 2 (alternative 1):
+> > Userspace doesn't release its references
+> > Userspace calls vcpu_run(): KVM (gmem) sees that there are still
+> > references, exits back to userspace with KVM_EXIT_UNSHARE
+> >
+> > Case 2 (alternative 2):
+> > Userspace doesn't release its references
+> > Userspace calls vcpu_run(): KVM (gmem) sees that there are still
+> > references, unmaps folio from guest, but allows it to run (until it
+> > tries to fault in the folio)
+> > Guest tries to fault in folio that still has reference, KVM does not
+> > allow that (it sees that the folio is shared, and it doesn't fault in
+> > shared folios to confidential guests)
+> > KVM exits back to userspace with KVM_EXIT_UNSHARE
+> >
+> > As I mentioned, the alternatives above are _not_ set in core KVM code.
+> > They can vary by architecture of VM type, depending on the policy,
+> > support, etc..
+> >
+> > Now for your example please on how this would work with IOCTLs :)
+> >
+> > Thanks,
+> > /fuad
+> >
+> > > >
+> > > > >  - Allows not having to keep track of separate shared/private ran=
+ge
+> > > > > information in KVM.
+> > > >
+> > > > This patch series is already tracking shared/private range informat=
+ion in KVM.
+> > > >
+> > > > >  - Simpler handling of the conversion process done per guest_memf=
+d
+> > > > > rather than for full range.
+> > > > >      - Userspace can handle the rollback as needed, simplifying e=
+rror
+> > > > > handling in guest_memfd.
+> > > > >  - guest_memfd is single source of truth and notifies the users o=
+f
+> > > > > shareability change.
+> > > > >      - e.g. IOMMU, userspace, KVM MMU all can be registered for
+> > > > > getting notifications from guest_memfd directly and will get noti=
+fied
+> > > > > for invalidation upon shareability attribute updates.
+> > > >
+> > > > All of these can still be done without introducing a new ioctl.
+> > > >
+> > > > Cheers,
+> > > > /fuad
 
