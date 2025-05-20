@@ -1,128 +1,262 @@
-Return-Path: <kvm+bounces-47163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DBC8ABE16D
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 19:00:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58B2DABE197
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 19:09:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B20F63B2810
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 16:59:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51B3017C903
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 17:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C035027A927;
-	Tue, 20 May 2025 16:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CFF7280334;
+	Tue, 20 May 2025 17:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iUf63vfp"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="QVmjnv5j"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437DD2797B2
-	for <kvm@vger.kernel.org>; Tue, 20 May 2025 16:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC9B27E1AB
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 17:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747760396; cv=none; b=isCuJudOJv4O8+NUrLFeDH/p5bKmzLLFuxT/O2b5JWmCIQExtLDJ5qoyLxaGCQz37lviJEq2jhVHs9t7AY2/PpB+oOtcBdCjHHH+YFyawz4qFTwF+K4DZKF/l/2UYk59+NUXgWGG6ypVwKZUOCyFzH19OKj31cqSUuTJ1XyqbHA=
+	t=1747760905; cv=none; b=NfRWi2bMncJ8nYszXHErkcn7yuM9d3jGSAWW9bbMEMEcMWqqZ+2NJftXmJSn9Ykd5w2iYVVMG0fxmZxhZYHUS1WVV2Z9A52oam5dtlYesfPuPZTG7MDT7l1J7x+jYVrzPkhVEbWOqTqK9nfgxjUeOILly60E2ejsuN/Undiz7+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747760396; c=relaxed/simple;
-	bh=Jh2BvARYgXxOW9h9dO25z5GwMY969hNL4tjAnGB4lfY=;
+	s=arc-20240116; t=1747760905; c=relaxed/simple;
+	bh=p7E1s58bfdKq/W84Pqelq9+BY61nFPwJbfs01hSKOuQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Plv9yDPyIbg+YDilzPnq3KRYE4017HkHq/z7jl3Flin0GpbcT9d8vP+EbPnG3j/UGmpgOO3j4jHAI7T8ym2vcad1n9kLqjxXNDCEONEcaqm3VwSrt32dr1grztQ5ECWyGov3K6NxQVq9RbyElu6KI4zHw53hC8hbw9IVAG3kj6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iUf63vfp; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747760394;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rEMj9V3JwMyZ4OkKJP+U49jj1V+/NAmehjsFGeGy4Gg=;
-	b=iUf63vfp13KaJiaT+HsD+cZmptvVA7Jp7ziFKOmqPQwpdHqvBs++XPMeQPsNGXq3x/igGq
-	CN1I6uNIo6Qd7XImllrrGjPfwB/kqxQ9rizYRf/XANPhQDgBMlpcIR4yR95OUALtKL48YH
-	hATBCnKY8T0SAI6/NS43XwS+/FurhGw=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-595-RyIMRWYoOJuHEP0xN_IQSA-1; Tue, 20 May 2025 12:59:52 -0400
-X-MC-Unique: RyIMRWYoOJuHEP0xN_IQSA-1
-X-Mimecast-MFC-AGG-ID: RyIMRWYoOJuHEP0xN_IQSA_1747760392
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6f8bdefcb39so69137246d6.0
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 09:59:52 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZYsKBd3DwPlL9B/pZy5tAjPCvLRLcXCFVXDWLFnNMQJTOew2EXj6jCqk3yVh0imV1wuznL+XGMXVrAYQGgQdwGeHF/bq0QsYgr6ZzPe1vnDJrhmjgyktYbGY0X8TJV1D7ZFH6eaptkiBe0264AnLgF4mT3O+0jKeFC6WzI+yw0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=QVmjnv5j; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7390d21bb1cso5220058b3a.2
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 10:08:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1747760902; x=1748365702; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=DDjRFmO/FlIqGEtWUGUmfdfKllur189aWobDQoyjRQs=;
+        b=QVmjnv5jrhAjOmnrfodzMvtSxLGgoc9MgeXZfR/IQ1QM/cdFFBH6acGVW0LLOAaaqB
+         wO51w0SuAvJaEMHoZksG4d5edkWcLoyS0cHawjMMzJNBGUkLNDK3dx33puavTOXeFRmG
+         Vi+S+sZCew6BBZZrYKh+HeFG60bXUc4VfDz5gpeM6MK4O8rFG0APl5iaEIIS57nLUhTx
+         rhNS1q1Dx8XY1sMuUyisn5i26OK6y3N9eyFQo1SUHpEuIic1rGgGCw1nL1iKCJWs+JWI
+         hWmgUi/W2i8YOCvrFp23/iyeS/aXXPRuzTzTsPEDm92ajtQGqrPKRwlMiMIBeqJSx1OE
+         JVSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747760392; x=1748365192;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rEMj9V3JwMyZ4OkKJP+U49jj1V+/NAmehjsFGeGy4Gg=;
-        b=tMas+NYrbUfph7IgeQ3jjI4OmejfkmyvdkBh1Fcs3ihxMV8XkC9N2o+eTpRP68N/3J
-         1XCZpnr9twYREzaaA87YLzP5uXo7aB3FcUwg5w4vwTqLiU6F+Py2FvAgMCJmtLcfB0jt
-         jaq57pcKrxKd1+qcw3vrNIEGmj8v+ohAg6HeixYUdRDIqQx2JhhVEQGs8w5NCVaoRx4D
-         8aWHy9RboMJQIyMwmU05DtpOh/17XcBXEoF/oWxDF4ykypRLYDnxJ5HAOp0zPsOwtKmg
-         essJvwzyRxSBx631VA3+5GfRfeLm1yoXcUUIh9vzRSkdgVI6eHPHa2LnRCck5Wpm3Q2N
-         7cMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXXxhvRFoGQAqd9+KQbqenwd0mllyCpVQT9s7Pq3zxkrEEO1JTQBMXFxmW0CcJfwXWsfHY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVKMhM8B3giBO3zLvMBxLHFil6SRdaqoVO14+rwsD6uQl1VI+c
-	ji/DTHfb/76WlkNA4aiuMSpBjVTywSZ/wSZJEsaPTVWSAbCMTapHMIxshhZI4bPV32F3LZ6tQDq
-	cvJHgOxP6nEYZZcaipgV33j2OIeJUlPb534rVlkfQQOvAd2aai7oNQA==
-X-Gm-Gg: ASbGncsVodpk2SM96YPlOKyZ6PHwFqGu7PydbXPssdZgYslx9i5SHvAVQzAN/AcBoB1
-	Ckz+Cka5xlHktjxVARskppt7uHCirWiCn3ivuWZAQa+taEvhD2MhpFbeXbdukO7nUDFecsuyQUm
-	tsFNUfFq10ldm8UZqYtIP5v+5dsbkeR2psijmAsF614k725jN2arQQ3PeayrDNX3CPJs8DMq6eX
-	RFd2nKMwR2WMF6IcA6STvQ9xHvvfW0G2FdOldw1qivM8FJRyX0aD9JVvHT10AmO58Ts2FxPBQz1
-	W/I=
-X-Received: by 2002:a05:6214:33c7:b0:6f8:ca09:d60f with SMTP id 6a1803df08f44-6f8ca09d764mr183451756d6.10.1747760392250;
-        Tue, 20 May 2025 09:59:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH9IfWJXFVUh9zlVq3n1AuEKD6UqJhdqI6hkbwqQIr3nDPfW3C8vHTS4HJ61qbW6AJWrPiEAw==
-X-Received: by 2002:a05:6214:33c7:b0:6f8:ca09:d60f with SMTP id 6a1803df08f44-6f8ca09d764mr183451476d6.10.1747760391869;
-        Tue, 20 May 2025 09:59:51 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f8b08aed47sm73634666d6.50.2025.05.20.09.59.51
+        d=1e100.net; s=20230601; t=1747760902; x=1748365702;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DDjRFmO/FlIqGEtWUGUmfdfKllur189aWobDQoyjRQs=;
+        b=UAoXEeYz2G0RiGTmoh4Z5JqCEAK0DKsQHS/MOnxZxkZuJ3hMDimLqmzOvaCkeo7W4l
+         PY8zR84iyIWDe6ZTVgEUw4XlPuMyublBrWjiHSPoLjhNMTQU48L3aSybgklIrOA687WV
+         2yn1Oj9G1fXlD2nmEVtHLyq0DKL+EFivzRiijNIX3feffkV+Slf45Ju9mzzGt1GhbRp1
+         Yx4ruwWqRNxnogb5/Gb7yxBh2R4MiPP4p2ytykD3fsrbxz4AC9E5JNWLbViwFi1ts13L
+         P+s2rtg0YNxvJz9/UgtXa5RT/qKzqJGa1Aj9Ac92IrdaZeuHGamPV1MIAv4FtHeh+BhQ
+         WK8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXEWuA38+MJb6WSekWdsQHRB1r79H6/5MWg4D7+w7c/IdDgs0pwP+iMyt14foDW7ly+eUM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwN7YOzfo0RBdg9uov2tJHk3BXqNfKSmifRIQbspVgX1YXhArs0
+	kfURvZuFJxL/rIe7HrjT78bADPbCOFBh16t1HVZcWvO4gw47i6y1CovucmjDth7wYYM=
+X-Gm-Gg: ASbGncuq30ttYlGG7MA7ha/NFQpwsp3DdQKCRNUzpjaXM7s1PVn6H9rDX+triLvSFMn
+	4sSTb/OuW6Cb4aLfiETG7wN783n3XNc6sBvfzMd4u8pm8XwURvCHjLesBhcKBL/vM/1WE7CHvwU
+	eiTCDGq+nOkFC2my8Yj/lLuhBgMTmdwyZjH4M0JYERqtYeCvkIJDhFaoRyrAPXmvMZLhQq9X99c
+	5KiaBnuPm7ud5WIJs/goLizPsCT4TPAiVo0utadwNVMExwiUZe2EwL0pFWijMhZZTRFydoSy2r6
+	FzxxFSfPOAgZ+MqXlqNNFV7BSG5t2mZAxtWsMguoYlzZ4I8=
+X-Google-Smtp-Source: AGHT+IHuT79L0+UrgKSwtY58fOb+r5axNp9Bh0rhvhNRM5zmWiTrh0ZXIgCZQR8QM+4Pdq9KGT4FDg==
+X-Received: by 2002:a05:6a20:2d07:b0:1ee:a914:1d64 with SMTP id adf61e73a8af0-216219bd3a5mr27575586637.28.1747760902322;
+        Tue, 20 May 2025 10:08:22 -0700 (PDT)
+Received: from ghost ([2601:647:6700:64d0:17b4:8663:3229:f2dd])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b26eaf96573sm8189882a12.43.2025.05.20.10.08.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 09:59:51 -0700 (PDT)
-Date: Tue, 20 May 2025 12:59:47 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: lizhe.67@bytedance.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, muchun.song@linux.dev,
-	David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for huge
- folio
-Message-ID: <aCy1AzYFyo4Ma1Z1@x1.local>
-References: <20250520070020.6181-1-lizhe.67@bytedance.com>
- <20250520080719.2862017e.alex.williamson@redhat.com>
+        Tue, 20 May 2025 10:08:21 -0700 (PDT)
+Date: Tue, 20 May 2025 10:08:19 -0700
+From: Charlie Jenkins <charlie@rivosinc.com>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org,
+	Samuel Holland <samuel.holland@sifive.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Deepak Gupta <debug@rivosinc.com>
+Subject: Re: [PATCH v7 09/14] riscv: misaligned: move emulated access
+ uniformity check in a function
+Message-ID: <aCy3A6uUbnWoO9uC@ghost>
+References: <20250515082217.433227-1-cleger@rivosinc.com>
+ <20250515082217.433227-10-cleger@rivosinc.com>
+ <aCu_ce-kVQsyjrh5@ghost>
+ <126762fc-17ca-4e9d-94d0-3aed1ae321ff@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250520080719.2862017e.alex.williamson@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <126762fc-17ca-4e9d-94d0-3aed1ae321ff@rivosinc.com>
 
-Hi, Alex,
+On Tue, May 20, 2025 at 10:19:47AM +0200, Clément Léger wrote:
+> 
+> 
+> On 20/05/2025 01:32, Charlie Jenkins wrote:
+> > On Thu, May 15, 2025 at 10:22:10AM +0200, Clément Léger wrote:
+> >> Split the code that check for the uniformity of misaligned accesses
+> >> performance on all cpus from check_unaligned_access_emulated_all_cpus()
+> >> to its own function which will be used for delegation check. No
+> >> functional changes intended.
+> >>
+> >> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> >> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> >> ---
+> >>  arch/riscv/kernel/traps_misaligned.c | 20 ++++++++++++++------
+> >>  1 file changed, 14 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/arch/riscv/kernel/traps_misaligned.c b/arch/riscv/kernel/traps_misaligned.c
+> >> index e551ba17f557..287ec37021c8 100644
+> >> --- a/arch/riscv/kernel/traps_misaligned.c
+> >> +++ b/arch/riscv/kernel/traps_misaligned.c
+> >> @@ -647,6 +647,18 @@ bool __init check_vector_unaligned_access_emulated_all_cpus(void)
+> >>  }
+> >>  #endif
+> >>  
+> >> +static bool all_cpus_unaligned_scalar_access_emulated(void)
+> >> +{
+> >> +	int cpu;
+> >> +
+> >> +	for_each_online_cpu(cpu)
+> >> +		if (per_cpu(misaligned_access_speed, cpu) !=
+> > 
+> > misaligned_access_speed is only defined when
+> > CONFIG_RISCV_SCALAR_MISALIGNED. This function should return false when
+> > !CONFIG_RISCV_SCALAR_MISALIGNED and only use this logic otherwise.
+> 
+> Hi Charlie,
+> 
+> misaligned_access_speed is defined in unaligned_access_speed.c which is
+> compiled based on CONFIG_RISCV_MISALIGNED (ditto for trap_misaligned.c)
+> 
+> obj-$(CONFIG_RISCV_MISALIGNED)	+= unaligned_access_speed.o
+> 
+> However, the declaration for it in the header cpu-feature.h however is
+> under a CONFIG_RISCV_SCALAR_MISALIGNED ifdef. So either the declaration
+> or the definition is wrong but the ifdefery soup makes it quite
+> difficult to understand what's going on.
+> 
+> I would suggest to move the DECLARE_PER_CPU under
+> CONFIG_RISCV_MISALIGNED so that it reduces ifdef in traps_misaligned as
+> well.
 
-On Tue, May 20, 2025 at 08:07:19AM -0600, Alex Williamson wrote:
-> Peter, David, if you wouldn't mind double checking the folio usage
-> here, I'd appreciate it.  The underlying assumption used here is that
-> folios always have physically contiguous pages, so we can increment at
-> the remainder of the folio_nr_pages() rather than iterate each page.
+Here is the patch I am using locally for testing purposes, but if there
+is a way to reduce the number of ifdefs that is probably the better way to go:
 
-Yes I think so.  E.g., there's comment above folio definition too:
+From 18f9a056d3b597934c931abdf72fb6e775ccb714 Mon Sep 17 00:00:00 2001
+From: Charlie Jenkins <charlie@rivosinc.com>
+Date: Mon, 19 May 2025 16:35:51 -0700
+Subject: [PATCH] fixup! riscv: misaligned: move emulated access uniformity
+ check in a function
 
-/**
- * struct folio - Represents a contiguous set of bytes.
- * ...
- * A folio is a physically, virtually and logically contiguous set
- * of bytes...
- */
+---
+ arch/riscv/kernel/traps_misaligned.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-For 1G, I wonder if in the future vfio can also use memfd_pin_folios()
-internally when possible, e.g. after stumbled on top of a hugetlb folio
-when filling the batch.
-
-Thanks,
-
+diff --git a/arch/riscv/kernel/traps_misaligned.c b/arch/riscv/kernel/traps_misaligned.c
+index f3ab84bc4632..1449c6a4ac21 100644
+--- a/arch/riscv/kernel/traps_misaligned.c
++++ b/arch/riscv/kernel/traps_misaligned.c
+@@ -647,6 +647,10 @@ bool __init check_vector_unaligned_access_emulated_all_cpus(void)
+ }
+ #endif
+ 
++#ifdef CONFIG_RISCV_SCALAR_MISALIGNED
++
++static bool unaligned_ctl __read_mostly;
++
+ static bool all_cpus_unaligned_scalar_access_emulated(void)
+ {
+ 	int cpu;
+@@ -659,10 +663,6 @@ static bool all_cpus_unaligned_scalar_access_emulated(void)
+ 	return true;
+ }
+ 
+-#ifdef CONFIG_RISCV_SCALAR_MISALIGNED
+-
+-static bool unaligned_ctl __read_mostly;
+-
+ static void check_unaligned_access_emulated(void *arg __always_unused)
+ {
+ 	int cpu = smp_processor_id();
+@@ -716,6 +716,10 @@ bool unaligned_ctl_available(void)
+ 	return unaligned_ctl;
+ }
+ #else
++static bool all_cpus_unaligned_scalar_access_emulated(void)
++{
++	return false;
++}
+ bool __init check_unaligned_access_emulated_all_cpus(void)
+ {
+ 	return false;
 -- 
-Peter Xu
+2.43.0
 
+
+- Charlie
+
+> 
+> Thanks,
+>
+> Clément
+> 
+> > 
+> > - Charlie
+> > 
+> >> +		    RISCV_HWPROBE_MISALIGNED_SCALAR_EMULATED)
+> >> +			return false;
+> >> +
+> >> +	return true;
+> >> +}
+> >> +
+> >>  #ifdef CONFIG_RISCV_SCALAR_MISALIGNED
+> >>  
+> >>  static bool unaligned_ctl __read_mostly;
+> >> @@ -685,8 +697,6 @@ static int cpu_online_check_unaligned_access_emulated(unsigned int cpu)
+> >>  
+> >>  bool __init check_unaligned_access_emulated_all_cpus(void)
+> >>  {
+> >> -	int cpu;
+> >> -
+> >>  	/*
+> >>  	 * We can only support PR_UNALIGN controls if all CPUs have misaligned
+> >>  	 * accesses emulated since tasks requesting such control can run on any
+> >> @@ -694,10 +704,8 @@ bool __init check_unaligned_access_emulated_all_cpus(void)
+> >>  	 */
+> >>  	on_each_cpu(check_unaligned_access_emulated, NULL, 1);
+> >>  
+> >> -	for_each_online_cpu(cpu)
+> >> -		if (per_cpu(misaligned_access_speed, cpu)
+> >> -		    != RISCV_HWPROBE_MISALIGNED_SCALAR_EMULATED)
+> >> -			return false;
+> >> +	if (!all_cpus_unaligned_scalar_access_emulated())
+> >> +		return false;
+> >>  
+> >>  	unaligned_ctl = true;
+> >>  	return true;
+> >> -- 
+> >> 2.49.0
+> >>
+> >>
+> >> _______________________________________________
+> >> linux-riscv mailing list
+> >> linux-riscv@lists.infradead.org
+> >> http://lists.infradead.org/mailman/listinfo/linux-riscv
+> 
 
