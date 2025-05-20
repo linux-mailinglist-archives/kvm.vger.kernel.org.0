@@ -1,310 +1,158 @@
-Return-Path: <kvm+bounces-47112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FC39ABD5A9
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 12:58:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D390ABD5AD
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 12:58:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D619177B91
-	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 10:58:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D648177A77
+	for <lists+kvm@lfdr.de>; Tue, 20 May 2025 10:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E92275850;
-	Tue, 20 May 2025 10:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15842276022;
+	Tue, 20 May 2025 10:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0kt86n6b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FL/1PXNI"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2087.outbound.protection.outlook.com [40.107.237.87])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234A72571C6;
-	Tue, 20 May 2025 10:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747738677; cv=fail; b=Zjc9AP99grZ6faP7TYXT3sFobaNLxmTzB+6ZitLiIgRJ4K9J+DZeSoMbLhjLksZvK/eNrN1ObqPlOnsoZ3pROdq3BggJuTXVkg1eOCLdClepeDUicoZmW+J4/Jg884PC0XOlpWJGHx6xBM6Uta8YkNFgokOGUXNqCbVFdBP0LLE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747738677; c=relaxed/simple;
-	bh=oVrMptqJsanfyeF2gimxezx4C0MX7J0JxIEX2NcZZ/E=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=q3XA6aJVPcnWpfdebLUqJO7hQV+6bcgePKSHYF9yAIh0DZdde1xbOvFBgRI2FBc3Z/QZ/1K2zzY9a+yUZU4jYvfnbC03xuJJFkk9+TDrSen0CFCuyiiMFhyTMfxlEZ2BrewAiCwG+xDnE9MDMcRxbHA/ybG2FN83DQJmiUL5QDo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0kt86n6b; arc=fail smtp.client-ip=40.107.237.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VX3ljI7aKguWYuWakSrW/6sp1AR5gYS7u3st5twltapIa2FnmNL93RhYL2ED4OindMA6rlRsB1zFEmBLgjXiPJRscamK7Pi2C085ttUOhC1fvuw8yNw71ra9e5/2ZF57HEwweN4NC3lsQC9+x3BPAPsywyRBSi9j5KjmfTb5ygxmmhq/koXWrcM1sf5paPVzDFKdIbba2lNvm/GNb36usZVNnPfSbYSnEFwRdsiNBad+I05K+mJ39Xh9b41rf9IOhMqdquDMyvKxF3vOl+uJJjpJ2wYy833qYxRpCZb8gEOmC9h7G92U/uwWLKgz/qFANgw7+WHei+Tq9ehELbT8bg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=y0EP2Sjc0Capp9VM9ML/hiOrgOiOlbBxWN20e+ROmDA=;
- b=L7ccgnOEaEB5K46xQCgLeKF8QIkbWHcbmdcLSHD98s/JMS2Gvde7GjoBbJXohBHplGGiaOAHaSJH4YAt11w9r+g21ex01yQZqnPRX05Ww6HmqU0fZ+zbGB5JPA+q/3oIWVEc+g+L7facfxS7GIDGe+0nC4BWgtDoKmn3BPU5d8jjJPF2niHf3Y2vn+XbRG1hFMUV1+7VjNc/zXfy23SzvmJhRtgYuEVttPqHoU/hJKvLRBeoNMSNPTiuisoF8lxzJCzVNoSupcTh/fTOxnnqaBKu0KHidITo94WMvxmQTqs2XZjwysC+MlT2EcskJBFQwUOySFsK7jGvFXbUtWLMng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y0EP2Sjc0Capp9VM9ML/hiOrgOiOlbBxWN20e+ROmDA=;
- b=0kt86n6blXMtjFXEjrmRsRQhKrOL+htY9G9ku/k0yQCv+2p7rQ2nSofPzxMpSHdIWWzB2Bt+IneDiGwkLDRvRcq2Vq6U6Yxej4yRfXQj+P3wp6w5IPVwdP6nav9Y/CxVJX7a8ISfHz8xtqjh9o4Rp6sLJUPT5CqFq/VeeT7Du3U=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by SA1PR12MB8919.namprd12.prod.outlook.com (2603:10b6:806:38e::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.30; Tue, 20 May
- 2025 10:57:51 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f%5]) with mapi id 15.20.8746.030; Tue, 20 May 2025
- 10:57:51 +0000
-Message-ID: <3909686a-be14-4b0b-8336-0674667d5159@amd.com>
-Date: Tue, 20 May 2025 20:57:42 +1000
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
-To: Xu Yilun <yilun.xu@linux.intel.com>, Zhi Wang <zhiw@nvidia.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
- christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
- alex.williamson@redhat.com, vivek.kasireddy@intel.com,
- dan.j.williams@intel.com, yilun.xu@intel.com, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
- daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
- zhenzhong.duan@intel.com, tao1.su@intel.com
-References: <c10bf9c2-e073-479d-ad1c-6796c592d333@amd.com>
- <aB3jLmlUKKziwdeG@yilunxu-OptiPlex-7050>
- <aB4tQHmHzHooDeTE@yilunxu-OptiPlex-7050> <20250509184318.GD5657@nvidia.com>
- <aB7Ma84WXATiu5O1@yilunxu-OptiPlex-7050>
- <2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
- <20250512140617.GA285583@nvidia.com>
- <20250513130315.0158a626.zhiw@nvidia.com>
- <aCRmoDupzK9zTqFL@yilunxu-OptiPlex-7050>
- <20250514230502.6b64da7f.zhiw@nvidia.com>
- <aCYsNSFQJZzHVOFI@yilunxu-OptiPlex-7050>
-Content-Language: en-US
-From: Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <aCYsNSFQJZzHVOFI@yilunxu-OptiPlex-7050>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SY5P282CA0058.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:10:20a::17) To CH3PR12MB9194.namprd12.prod.outlook.com
- (2603:10b6:610:19f::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EB9274673
+	for <kvm@vger.kernel.org>; Tue, 20 May 2025 10:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747738707; cv=none; b=Yiaz4MHHQbCxhy518rvjJZmuPOG6CJYMIVeJIx69UDOhpkL+sKoe/8yD2UeJWWidAj1Gb+NQUMKKU3T17yZce2IWjQn4nm0sU9W413tDJq4Rbnre/cLlrmYEbZuYpV3WhM2QiPFLnvd+KNKmhFivFhRbI2XXvUtdtGlAIOtd0YU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747738707; c=relaxed/simple;
+	bh=XCjhuqMISSLiz8GE+zUfY3bVdPUVO6omDyP1PQiJ4QE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U93cx5y3k8KfmWe0/pHM8VwKQUxcV9/0SB0XWFuU4wfCVXGgmYKFN2SupZZFPHp/5CSmbcDz4dm0KfoeE9N7Z94EZZkv6ywRA6Pk77gk0uGCt8/YMlRRmtpzTqALetuNDGYiXCsvWtz+a/XCkJyBkUt5j9hklE4W6jWhrLyQR4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FL/1PXNI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747738703;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D274b/Kowlx4frHiCJWZP9nEutUPctu6wUBTBcBAl+Q=;
+	b=FL/1PXNIhWSeLXnyHnd6L1CGvcIpqOeGjkYUPkenRVJ23R1Fr5eOF/+kkgqWIiBQMRuEGX
+	G/Jz/H50tVl12AC68A+385ys8j6BeQkOTibLyyAq9XeYXVtr89ts7h4+4dAU8lC4/DrsEn
+	Gh6+1SOoStzECLl3V75G9ptC+vIgCHQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-190-ZJkk_o9AP0mSKCya5fAeuw-1; Tue, 20 May 2025 06:58:22 -0400
+X-MC-Unique: ZJkk_o9AP0mSKCya5fAeuw-1
+X-Mimecast-MFC-AGG-ID: ZJkk_o9AP0mSKCya5fAeuw_1747738701
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-442d472cf7fso43772445e9.3
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 03:58:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747738701; x=1748343501;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D274b/Kowlx4frHiCJWZP9nEutUPctu6wUBTBcBAl+Q=;
+        b=UGh3HDBNtSY5JSce4H9XJOIhW/zLhVMfaG7lWfar/WjuMtK3nnITBe5Jij1/x5XYAo
+         iI/AHAQ2SzjrXE0zCDnLUJ5YJVBzinC77OIk0ChCOdTwsbL6JRhlBro9sTzlk45E1x3V
+         d0LIHhDRlLm+UrOSbBuZS8o1+mmcZmqrngXC34GXuRDiYVZEoHSPBSmPKyw971I36BPP
+         JsPsh7gF5Zd2oBoRXdWsBn9Sq21d4TIoAXkWy62sqYEJBp1uaFv1gTIURnUqWkjLolFK
+         76r+O776FLHXrBvz1GJbOfh5vN7exU6bNF5/aZzS8iqpSYcVuaeGYN+vA0x+EDKc9Qow
+         LueA==
+X-Forwarded-Encrypted: i=1; AJvYcCVIdWtdCMNiA4kvP2oNoRvYPwObBiTsdnQQsBVkgcXPmbBcWLZ5grhDgg2OM+6YyoxED5g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOsXidCPVzaM+liznewU+Rw6dTuN4O/z24JunUbnuro8kWla1X
+	hgChFeKPt++eUuyzhsNzG3zbLaaL69TPGXIX6Uj81ZNlpyoWPSzTYkRO4Lou9A8XgYad825BaQP
+	KDi5lPezeWKYn+hRtVrV7vC3i7NaugAzb5TYDVEAsbMXwcbvl/MjHug==
+X-Gm-Gg: ASbGncsrj5bID+HWKeNPDcwcnRb3r3Kwj+8VaFZcVHRGIrXfBHSnEmyBX/TAW66imgA
+	LyJXrq6QmHO81+6NwAxmMoPIP9HL/i/CaNWY4vV3un2urCBQTEJ2earvX+pV+2P9BTHT6R+n7ux
+	oKWgF+NC7g7Ikpup+Zt2uCRHaFgLyNelzUprf9ZLbkDD+9673wu+EzwXnFLqVKbUDeqPaYUMwdR
+	KWcWdXKhXV04wCn6d3RVmNs0nSd6b9zHt6o3/13qJ3f2CBqSxkBQjE9CXlhhV9kc8Nkd2xjrYXo
+	C8D3lkCFSbZSk1Bymn/EgJ2993Gn38VXpOmHh52V9pFAqAWczTa99yqQiII=
+X-Received: by 2002:a05:600c:34c9:b0:43d:fa59:af97 with SMTP id 5b1f17b1804b1-442fd671d12mr138378625e9.32.1747738701185;
+        Tue, 20 May 2025 03:58:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGvQyiml0UoaDF/88g9sn8ucNfch1PfIPLwL2A/DSRiTilof5rRlAsf3z16t0LsF6Ckj58VyA==
+X-Received: by 2002:a05:600c:34c9:b0:43d:fa59:af97 with SMTP id 5b1f17b1804b1-442fd671d12mr138378435e9.32.1747738700827;
+        Tue, 20 May 2025 03:58:20 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:244f:5710:ef42:9a8d:40c2:f2db? ([2a0d:3344:244f:5710:ef42:9a8d:40c2:f2db])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca9417dsm15708833f8f.101.2025.05.20.03.58.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 May 2025 03:58:20 -0700 (PDT)
+Message-ID: <73a4740e-755e-4ba8-8130-df09bd25197a@redhat.com>
+Date: Tue, 20 May 2025 12:58:18 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|SA1PR12MB8919:EE_
-X-MS-Office365-Filtering-Correlation-Id: a959daff-e087-41f6-1410-08dd978d2a2f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NTN2endPTnBtRWVSMWt0MmM1NTJ3NFVlVmZlUGV3Y2lEYWlnSm9UaFRrT09U?=
- =?utf-8?B?M05DZDEyWnY3enlxUDIyc1RJaW03UytWYm44RWxPekRUaTNIMVhQcWVTT0dM?=
- =?utf-8?B?akR4aVROK3hUUHcwZng3WFFENW93MFVEaWxrQUFjblBDbHA2aW9OM25ONkxL?=
- =?utf-8?B?OGliZms5MUFFUGJ1bnJqT3ZhS1lqaUp3NUlRQ0g0WFZkM1ZDamE1OGtCNlV2?=
- =?utf-8?B?SVg5bTNRM3lRSWprQmEzbE0zTWZhWFcrVGp0N28wbCtTaGU4eVpyMzhCUVVp?=
- =?utf-8?B?OHhsRWRhUXo4aGtNM2NuQXlqbytqb1RSeDU0OVBhcHY4dkZhZ0llYU5wZDVJ?=
- =?utf-8?B?Uks3czZHWE5YcDh3R1U4MGpxR05UMEVlTkdVbmxZcjE4V2toSnVmWXEzS1lh?=
- =?utf-8?B?Zm04VlQ1TUJYTVgxQmVqeXpqSUFjYzNtRjVVWWtkdkFLdHRydjhWVUkxaXNn?=
- =?utf-8?B?WWM4SHV3cXZFV2lFYnhqRUpvamhZbnE2dEZoZnNLdzF1RVVkRzFIeCtmU0Zv?=
- =?utf-8?B?YjNtVjY2VWE0SHZOL2V2bXdDbm5kOW1PUFFzdjRWZ3EwMlJlRFJ4Z3oxL0pC?=
- =?utf-8?B?d05MbHpZaHRoOGVDNnBYMHRXRjBYSDRPY01laDV6Zkhmb2VzenloamVXcWxU?=
- =?utf-8?B?bVNEakQ1RmhTN1hUS2JIaWdPMHZ4VWRNS2w5STFlTFdjS203UzkreEdDUHFK?=
- =?utf-8?B?cDdyR3NPTk1QRUlFQUVDRDNGWHRLcTNXUGl4b2FxTDhUMzBjOGhEeGN6Y042?=
- =?utf-8?B?WWNHWGxTN09TL2pMaW5vbVZwSkJpU25iNElGTDFLa0ZyV2ZWL1VTQXMvV3By?=
- =?utf-8?B?RGwxMVI0dWN0YjA2dG9tWEZPam9LM3lnUms2bnhYNlhDeUE1NGplNHF1NStG?=
- =?utf-8?B?bVRWVGRqVzFlUWkrM1hiRmhkNlg3MnIxRVZSMEE1eUZqRzMzWmkxelcvMFRo?=
- =?utf-8?B?aHVqYy9tTmJNL2J1em5ZUHlsTndjdVdDSVp6MUc0Sk1DTFErSU0rK2pGWUNu?=
- =?utf-8?B?aXlCdVRpazFvZEZqekZLanBOSlRrSjFoaGkybTBVZWZoTUhueEpwaW85R3NF?=
- =?utf-8?B?b0lRVE9iRjVxclduNWdxQnUzdk02MTVUYVVHbVRPMmtRSlNRa2dEcDJLMnJr?=
- =?utf-8?B?MHQ0WUlkaGtUUzA1SWtYTkQzdXlqMllHYnhmd1UzeVNJZFFCcnF2ZXVlcTNh?=
- =?utf-8?B?eXdPL1hyQzlPSE5NYU8xWGJhSDMyNnh0QVRjYTg1eFZ5dEhmcW1lM3lmZXYz?=
- =?utf-8?B?YWRiTThXTm1MOUNieUxURkYya25VSXRDRTB4TWJwczlMSWhINWtIWC8xVzFx?=
- =?utf-8?B?by9ud1FldUZOcWk3cm9kM0dHUjdGdE8yUi9kTTl5VU1FNWxlM2Q4Q2hBQWV4?=
- =?utf-8?B?Zkp2eDYySnJKVktITHZtWGJSUkh2Tm5FWjFXZlMzZmVsS3lTRVhjRjNUZmRs?=
- =?utf-8?B?VGxFbDRnb2R0NTNhMU1Na2dZdFYybzMvMzBKVy95TmN0UUJ2RGltd21VV1c5?=
- =?utf-8?B?eFdTN0R2NTUxdm1oU0F4UG5lNVI0MkZBUFNlbHp3VFpnVWtiTklGUjR4ckFl?=
- =?utf-8?B?bUEzV3dPOG0rSjM3UHlHRXE2Zm5pZytlVG9Ga0p0eHE3OW1iZUZQaXpxbkU5?=
- =?utf-8?B?Vi94Z3Z6cVUySEZjeDFsa01McERUb2VkTHlZTEw5RGtMR2VpREx4bHVkN2U4?=
- =?utf-8?B?cUlhQ0ZTdGVVeVV0TzJUUWVHN1pFalZodVA2QmdzUkM4dUdhQ3ZrTGx2VHlR?=
- =?utf-8?B?VG1DalJQVGZPcldtMlRoa2RoVWUweFdJRHAwSGNyc0o2V01tZWNXcS94YXRQ?=
- =?utf-8?B?NCtLaHF4TGY5RzBKWnBYby9hVkxTRnlwcEwrOWZXaGNFVjYyeXk0SnRFK3li?=
- =?utf-8?B?SXQ4UDVIU21YV2F3ZGlXUnV2OENvQ2ZDYVViWGdLZ01YOFEwMFRGSlNwdVhT?=
- =?utf-8?Q?/5EJckV5oTM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?L2J2S2hVa0RUK2ZqOG0vT3NCci9UQXNPb3JlVUx3VVk4U1EyazVvYzQzSzBE?=
- =?utf-8?B?WjFLbkpDTUcwWHNPMkFrdG9HNEN5eFlzQ0ZNdThSa3hkNlVyeXRBNzY5TkVu?=
- =?utf-8?B?VFZsSUlWTEV6M2FsdlR5bCtiSTRZQzlhdTV0bWFRNkVvOVpwcXk1bkNRa3RQ?=
- =?utf-8?B?T3BRRXkrK1JGYmloVFA5ZzZXdkFHTzdCWGNIUFlPRFhiQUpOdjBTT1VEQlVN?=
- =?utf-8?B?LzlEdUs3NXYwbmhUV1JDeHZjbHVZNlgwRUpHY2JwUUJoQmdjUUFjeFZ3Znpq?=
- =?utf-8?B?NFpYM0c0R0lEVHNjaEp3U3l3azdkSlVaMldZTU1TN2ZpV0JJQUlnbzlmSWJP?=
- =?utf-8?B?UUUveDY2RVJ2c255Z0pUaG0zaVQ0eno2VytqeUZPK0tvWFVDbm96cWlZZVI1?=
- =?utf-8?B?dkNnLzZIMEt6MU9yaFo4MnZFTjBXMG9HbHFLNVVMeW10OERaWlkwWUI5dGVy?=
- =?utf-8?B?UENLUTJWUk9oSUJDbnR2cS9FMkMzWGFpanU0aW1aTGx6Ym1PZ0F1bmdxNUF0?=
- =?utf-8?B?QVhFdXpqclJId0pPU0pDY1BPSU9yUVc2NXdkSkQzUjdOaVYvS1puYlp2QnRk?=
- =?utf-8?B?S044b0ljU1dQeTJybjVxeEpKaFFhcWtKM0FaRXFpa2dYTXIxd0FQOThwdmlQ?=
- =?utf-8?B?Q2N4c0JOcEozUEt4K3VjVm1HeTdTd1JtZTVkd2dnS0V4cmhGaVF2UzBUc2tI?=
- =?utf-8?B?c3hIOElaSDZkU2N5N3JHYm9CRkFJMkdYeGRZdHR5RmNPNG1lelZUZUZsdXNB?=
- =?utf-8?B?QXdlZE5pVkhLZWhxclZZc1FxbEliT1VCeWtVZVBWRVZHMkk4N01hTUxkbGVH?=
- =?utf-8?B?Z0hSbVd4SnN5S2hwMWN6SFZVTk50VHhqZG9SYW9seERzVjlEN0YvWU5PYUVa?=
- =?utf-8?B?eEoyRWNBblRWYTE1eE9weUY1MHJpZCtYelVkNlNyTTY1Q29hQ1IybWpoa2hw?=
- =?utf-8?B?ZTJYMkdENzJBMGE2NFVtT0ZMT0tocGhyYXpnTjQ0T0xRYXVnclE3RzVDU2h0?=
- =?utf-8?B?UW9wUWkyVUhtVUFqNGlmdjIxa0VuVHYyMVQxSDdINWkxSFkzRGplMmw2cEo0?=
- =?utf-8?B?S0JxR1RoY0ZqU3oxamI3bm5lR2ZRKys3bnRUWVFDTmt1dVhrbTBTK1JaUGxN?=
- =?utf-8?B?d2lDZ1VFUU9SYmlMYmgxUitTbUNLWlg1MTgxbm5jeUw5aDA1Tkc3M2dET3pB?=
- =?utf-8?B?clJ2c3pDQXAzc2VjVnVJeG5NSGtPbHRoSy84TVIxR2c0QmNiOFdmQ0xQcFpY?=
- =?utf-8?B?WExBbnRaTTNLdUoxanhMMFU4SDBnTm85Snh4ZG9LUDVZNmE2ZjR4SlhjL1FG?=
- =?utf-8?B?OFNTTHh2NEpxczQ0bUp5SGpvRUV5M1lRbUFqak5NK241NCtWZGt4Z3pxVERw?=
- =?utf-8?B?ZmxUMkF3SWViQ1EzTXUxVG4wOFcxMi9tSEwyeUkwckErM3Zubk13M2ZDMW1q?=
- =?utf-8?B?SXloWTErZys3SHNQc2VkYXdnbk5JbHpVKzZ0MFFiei9ZdzBiMXdZdDFzaFRO?=
- =?utf-8?B?ai83ak9sVFh2M0txbDlWUlE3a0FOYjFMNXhHNXdBMFhwcE5YRUtmeVpVTDNG?=
- =?utf-8?B?VmFZWUpGKzJpN0pYcWJJeWk3dlVrRjVHT1JhSnJaN2NrMURvdW1kWjR1c0NJ?=
- =?utf-8?B?OS9iMkFwdlEwRXlvenFrQTFBRXphREtldnNHUFUxaDlHUk1MNXNQbENuSTdP?=
- =?utf-8?B?ZkhKTzhoSFJvbHBldVN2ODBkSyt0cVByZ0pHUlNnM1JxRlFmUGczdWZ2czVH?=
- =?utf-8?B?QkJoTmFMWnlVN0xhT0VmcStGN280M1FlZkhHdENTRTc4YTNiRW5FazhreVI1?=
- =?utf-8?B?dFNvSzZEREtMTys4bVZsQUF4aTRzUlZqNWFzbzRIdGl6bStJRHVmS1ZwcVZT?=
- =?utf-8?B?dTNPUHJGM1Vsa3dsYUR3WCt4MUpRbXFObzV5a2xQRlI2YVNTMGNhRWYzVnc3?=
- =?utf-8?B?MkdDZWxKam1rQ1MrSTh4aDRrSDh5a3V3ODNlQ0R3cHpmejRXZndqNWE3N3pr?=
- =?utf-8?B?UVpsd2hmc3liSGY5SXJkMzJWQVRXaldsdkFKZVBkZXJNR1lqQVhmTmVxZ2ds?=
- =?utf-8?B?LzlOZHZVTndLbmZyOE9iTVVvWmFSc2FZUllmSFBaQXNoQ3QrQVkxdTR1enda?=
- =?utf-8?Q?BMYbw1IzH6AuUErPv19GTre6t?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a959daff-e087-41f6-1410-08dd978d2a2f
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2025 10:57:51.2757
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h5+JfwsgPSxQmeuQLop5eIww856/3V6aB0z5CzwpN4JRU+WvaxJJ4sD14rZIxQkJquPvaYRk4ps0k8wTLuS1jQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8919
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7] selftests/vsock: add initial vmtest.sh for
+ vsock
+To: Stefano Garzarella <sgarzare@redhat.com>,
+ Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20250515-vsock-vmtest-v7-1-ba6fa86d6c2c@gmail.com>
+ <f7dpfvsdupcf4iucmmit2xzgwk53ial6mcl445uxocizw6iow5@rhmh6m2qd3zu>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <f7dpfvsdupcf4iucmmit2xzgwk53ial6mcl445uxocizw6iow5@rhmh6m2qd3zu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 16/5/25 04:02, Xu Yilun wrote:
->> IMHO, I think it might be helpful that you can picture out what are the
->> minimum requirements (function/life cycle) to the current IOMMUFD TSM
->> bind architecture:
+On 5/20/25 10:24 AM, Stefano Garzarella wrote:
+> On Thu, May 15, 2025 at 03:00:48PM -0700, Bobby Eshleman wrote:
+>> This commit introduces a new vmtest.sh runner for vsock.
 >>
->> 1.host tsm_bind (preparation) is in IOMMUFD, triggered by QEMU handling
->> the TVM-HOST call.
->> 2. TDI acceptance is handled in guest_request() to accept the TDI after
->> the validation in the TVM)
-> 
-> I'll try my best to brainstorm and make a flow in ASCII.
-> 
-> (*) means new feature
-> 
-> 
->        Guest          Guest TSM       QEMU           VFIO            IOMMUFD       host TSM          KVM
->        -----          ---------       ----           ----            -------       --------          ---
-> 1.                                                                               *Connect(IDE)
-> 2.                                 Init vdev
-> 3.                                *create dmabuf
-> 4.                                               *export dmabuf
-> 5.                                create memslot
-> 6.                                                                                              *import dmabuf
-> 7.                                setup shared DMA
-> 8.                                                                 create hwpt
-> 9.                                               attach hwpt
-> 10.                                  kvm run
-> 11.enum shared dev
-> 12.*Connect(Bind)
-> 13.                  *GHCI Bind
-> 14.                                  *Bind
-> 15                                                                 CC viommu alloc
-> 16.                                                                vdevice allloc
-> 16.                                              *attach vdev
-
-
-This "attach vdev" - we are still deciding if it goes to IOMMUFD or VFIO, right?
-
-
-> 17.                                                               *setup CC viommu
-> 18                                                                 *tsm_bind
-> 19.                                                                                  *bind
-> 20.*Attest
-> 21.               *GHCI get CC info
-> 22.                                 *get CC info
-> 23.                                                                *vdev guest req
-> 24.                                                                                 *guest req
-> 25.*Accept
-> 26.             *GHCI accept MMIO/DMA
-> 27.                                *accept MMIO/DMA
-> 28.                                                               *vdev guest req
-> 29.                                                                                 *guest req
-> 30.                                                                                              *map private MMIO
-> 31.             *GHCI start tdi
-> 32.                                *start tdi
-> 33.                                                               *vdev guest req
-> 34.                                                                                 *guest req
-
-
-I am not sure I follow the layout here. "start tdi" and "accept MMIO/DMA" are under "QEMU" but QEMU cannot do anything by itself and has to call VFIO or some other driver...
-
-> 35.Workload...
-> 36.*disconnect(Unbind)
-
-Is this a case of PCI hotunplug? Or just killing QEMU/shutting down the VM? Or stopping trusting the device and switching it to untrusted mode, to work with SWIOTLB or DiscardManager?
-
-> 37.              *GHCI unbind
-> 38.                                *Unbind
-> 39.                                            *detach vdev
-> 40.                                                               *tsm_unbind
-> 41.                                                                                 *TDX stop tdi
-> 42.                                                                                 *TDX disable mmio cb
-> 43.                                            *cb dmabuf revoke
-
-
-... like VFIO and hostTSM - "TDX stop tdi" and "cb dmabuf revoke" are not under QEMU.
-
-
-> 44.                                                                                               *unmap private MMIO
-> 45.                                                                                 *TDX disable dma cb
-> 46.                                                              *cb disable CC viommu
-> 47.                                                                                 *TDX tdi free
-> 48.                                                                                 *enable mmio
-> 49.                                            *cb dmabuf recover
-
-
-What is the difference between "cb dmabuf revoke" and "cb dmabuf recover"?
-
-
-> 50.workable shared dev
-> 
-> TSM unbind is a little verbos & specific to TDX Connect, but SEV TSM could
-> ignore these callback. Just implement an "unbind" tsm ops.
-
-
-Well, something need to clear RMP entries, can be done in the TDI unbind or whenever you will do it.
-
-And the chart applies for AMD too, more or less. Thanks,
-
-
-> Thanks,
-> Yilun
-> 
+>> It uses virtme-ng/qemu to run tests in a VM. The tests validate G2H,
+>> H2G, and loopback. The testing tools from tools/testing/vsock/ are
+>> reused. Currently, only vsock_test is used.
 >>
->> and which part/where need to be modified in the current architecture to
->> reach there. Try to fold vendor-specific knowledge as much as possible,
->> but still keep them modular in the TSM driver and let's see how it looks
->> like. Maybe some example TSM driver code to demonstrate together with
->> VFIO dma-buf patch.
+>> VMCI and hyperv support is automatically built, though not used.
 >>
->> If some where is extremely hacky in the TSM driver, let's see how they
->> can be lift to the upper level or the upper call passes more parameters
->> to them.
+>> Only tested on x86.
+>>
+>> To run:
+>>
+>>  $ make -C tools/testing/selftests TARGETS=vsock
+>>  $ tools/testing/selftests/vsock/vmtest.sh
+> 
+> I am a little confused, now we have removed the kernel build step, so 
+> how should I test this? (It's running my fedora kernel, but then ssh 
+> fails to connect)
+> 
+> Would it be better to re-introduce the build phase at least in the 
+> script as optional (not used by selftest, but usable if you want to use 
+> the script directly)?
+> 
+> Or at least I think we should explain that the script launches the 
+> running kernel, because the config file introduced by this patch 
+> confused me. How it's supposed to be used?
 
+This is the usual selftests schema. The user has to build and install
+the kernel including the specified config before running the tests, see
 
+make help |grep kselftest
 
--- 
-Alexey
+Also this is what we do for our CI:
+
+https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+
+@Bobby: AFAICS this now has all the ingredients to fit NIPA integration
+am I correct? the last commit message sentence could possibly be dropped.
+
+Still it could be worthy to re-introduce (behind a command line option)
+the ability to build the kernel as per Stefano request, to fit his
+existing workflow (sorry for the partial back and forth).
+
+Thanks,
+
+Paolo
 
 
