@@ -1,85 +1,88 @@
-Return-Path: <kvm+bounces-47223-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47224-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4CF9ABEBDF
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 08:21:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E535ABEC0A
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 08:36:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15BEF3A6948
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 06:20:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9BFF1B66F20
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 06:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2B9123314B;
-	Wed, 21 May 2025 06:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4AB23372E;
+	Wed, 21 May 2025 06:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C/Bbax8J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DJh3i5Uj"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469E022D788
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 06:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6665332C85
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 06:35:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747808453; cv=none; b=NYgNLVySs8x7JoKzaz3i3ZK392q2QgjDNNVgN2puFNWoRqe2QWkBQUD9x1eBX7KfbBfwYN5g6w+MAw3K1nPq19ORB01Zxtw1FCUXoZCLiI5ooZaHqVCUORYgSz28RMfWbkpqeGSayQuOpm5I4VCAiJjyfIdAFikF1wWNGI1nxyA=
+	t=1747809357; cv=none; b=pT0N+h8NpFptOUald6oBj0gm2iUHCjiLU0zBGwfRzVK3HaOiqOInbFxfCkrzBh0Gj3XSdD+g5am+7ensH2Za/M8WIpG2qeou3YfPsGVWX2QrYpvRuIvC3CIRyH+JR+1TPEaoOF6a1xAz8E6OY/1vONdSwLYuUUWZ7HKChyJDvPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747808453; c=relaxed/simple;
-	bh=YHL1BO9Yw2qVuykoMrFywasyGMLqP7T8KUotdskXsco=;
+	s=arc-20240116; t=1747809357; c=relaxed/simple;
+	bh=zeJrz2cIGvQYNCid0RPshhKyPwK6msxaigm9y8ugIYU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lonpAe5nyTWSgxuXJi1KMxgwpA6kKLLGlN9kGs2HTRgHA+lSTgsDk6DQp3W5btFy1ul0SP5JXE7bEkKR1IcYnEiopoGBFZMcYlPDcO7eu63JpYCg23JobPPYwJUnFdmxYUl2osZ+tb5EgWfG2mK6cJXi22gMGiNM732ncnsv2Dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C/Bbax8J; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=gG3FiSNHSX5ZxMUDcHCKH31l2vV0hAZS/ewRsvmMMrGrGIk7BoDzOAiJhHflKFIX4F2rC1H0IvOKv8itkb3D7BBrNT3LlFTHAZ8reeFRktg5YpYJUUoD725UhPkliIsoc0iPUvo3N0W1KwXt7ttw57FlO6glFhrJ+PCL7Nr5Y8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DJh3i5Uj; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747808451;
+	s=mimecast20190719; t=1747809353;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=27vdWwqXm6Qw7dfKd1dwnOUfre6U0zDeEbDFMcZZEZY=;
-	b=C/Bbax8J2SScAhiRRr4YtJi5E/O/z0bcDu2cdom9dSxE1UF0ZOceBAkLmizMnCM5cIs+Tv
-	0GfF1NxlmpiPuqy+sPxpINy/75+rXT85PL6LAT03VKGjzHS7mfn8AYosCrmkTNZZwr/w6x
-	8YN1cDp2wp5laJr6Hxo1h99JFygffdM=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=UoOgK3uc82K1fFte9dw2t4sOUO1PXKamiT5dfb2kKR4=;
+	b=DJh3i5UjDo+Tw8jMb9KtfGfVgkQgF4A28AZw/Prq7jiay10TfOeRGWrpH6jzZuyVnxbxz6
+	5Zlo+JinQ6NBgtePFKkioGFb4nUj6i05Lr1WAdrJ8pe6A+bljI+vpdF0S0314+1cR725Oj
+	SCey/eARpsAT/nGWw20gk7EP8cp3Rjw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-LTVyVKBUMkmBb1CTcN3wig-1; Wed, 21 May 2025 02:20:49 -0400
-X-MC-Unique: LTVyVKBUMkmBb1CTcN3wig-1
-X-Mimecast-MFC-AGG-ID: LTVyVKBUMkmBb1CTcN3wig_1747808448
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-30e9e81d4b0so5704244a91.3
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 23:20:48 -0700 (PDT)
+ us-mta-647-dn92aW_OMsSJLyZ5ntj0Ew-1; Wed, 21 May 2025 02:35:51 -0400
+X-MC-Unique: dn92aW_OMsSJLyZ5ntj0Ew-1
+X-Mimecast-MFC-AGG-ID: dn92aW_OMsSJLyZ5ntj0Ew_1747809350
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43e9a3d2977so48057775e9.1
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 23:35:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747808448; x=1748413248;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=27vdWwqXm6Qw7dfKd1dwnOUfre6U0zDeEbDFMcZZEZY=;
-        b=AyljRgb6tdcIycQdIuv5D0WPDwdV/pn7c7z5RR8tXovuDEB24XHjF9vV9uuBAa/Qsd
-         J9O5wyegNtswb8Mexis1WoH3yZRXlqXFJFj1DFrvKmV4GbbvTVBE44Vzjm5GXr8jrMKO
-         tKYYbWKBEpb18xX592xnlr/tdD9lNxnfL5FZ7SRR2RM0MgW12tbjiknc0AQSr5BrRxRS
-         W6m4gWvxI5ErQ81b8fb8Jcm2NQCsKgB/G/vYSIIlCAfnRfG0nI0JvI+WWPIFbNV/HUYO
-         gBJBhSXIiO4EZliCVur2hmpz0BocLVjIingRPswi8ZiSeLCbYWoT2TW/v+2HyYDuokmz
-         E9GA==
-X-Gm-Message-State: AOJu0YxUSmrjwJ/Xv9AJ/0C6Z+LZ6grUYyLXACkLV67QHMSgIZ6l3dH3
-	45uvFEtwn+9Y4fvDteiANgC2xm4UFlwvYuiPL/itu0hIIwU9dAiy9Fv1haAuegL5zB42rwJVlja
-	AFMdOAdUZt/SSdSKly2ZZq97lGU4HSMJ77/D4URkxLJYeimeCXT6cww==
-X-Gm-Gg: ASbGncsMH0/zQxso5AZ8mmYifd9X/uiO5mds/wBd533C8atB4uZMUG4jB5aamjs1AY/
-	WGEdkaw62xR4hj5n+JZZbYb3UZWg7iHtGUF/Nsd67YBWmdxMcV3PI/5VW2EtasxG///kNraDQqS
-	er9c/Djg94UDxOO3sUPiRrqW4Ghi3JmhlxQOr3T269/6e2K8SKeorLAZpD8rsliRrzACyjjbMlA
-	Bmk4Vw2WkI5SAFZxaAvaz8+zujw6dO0mrQAPSeqcv2rUH4X/W1pFDmZWOLCOkKE7eq2QEX6Am09
-	6rfLKkSDfONEYco=
-X-Received: by 2002:a17:90b:35ca:b0:2fe:baa3:b8bc with SMTP id 98e67ed59e1d1-30e832258eamr23096812a91.23.1747808447861;
-        Tue, 20 May 2025 23:20:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGCcJqZvem5ZOsw0GUieRAaMuIKN6FQwGBBKSGgLmmfZRpS0KvtQJGPwRUgMl3I4UcNRsWE9Q==
-X-Received: by 2002:a17:90b:35ca:b0:2fe:baa3:b8bc with SMTP id 98e67ed59e1d1-30e832258eamr23096785a91.23.1747808447373;
-        Tue, 20 May 2025 23:20:47 -0700 (PDT)
-Received: from [10.72.116.61] ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30f365b2d8fsm2847557a91.7.2025.05.20.23.20.38
+        d=1e100.net; s=20230601; t=1747809350; x=1748414150;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UoOgK3uc82K1fFte9dw2t4sOUO1PXKamiT5dfb2kKR4=;
+        b=mh9Sg7NrMeaTf4XQbycDBAfgIMYYv2P5NuHdpv8b68N8PrBoxat4pyhpbROX/lx8nT
+         tCMmJpuhh/cqDcUH3BRwWN9kl6lcNh/SWvog0yhXdnEAn+uxfYJRLmfsrG/VOvjJ0GD2
+         mDw0gK2lsvIVUQlWD8Oan1GtNHJSlZF+4yShyo057oYaSFj+7/oY0cXfh/1uBJ9SROUA
+         reuEjRd0aGvBLStQa8qRpLh8ghxV5NesneZvo7TxK0NbOO58IwbQlAY+dK/zMqY9Sk1C
+         gKZmO0DfsKHP7YrG3tX4EisLEIx2c1BJUsTx4zXsttqZH05fhGGGAv6YNSYH4T8QBw4D
+         k92g==
+X-Forwarded-Encrypted: i=1; AJvYcCWAAFlyRUC+5W137DIBmQUMrnMzTP03RwPr9Tw4AeVSItZaiMZ/EidGRbshnPRI9iil+Ps=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAYhsfiGwplFp6MYnZdeN7eJ4aRg1N9vaFk7SyJvJuDGAO8LT3
+	+1q714w3sLJoO6itDffImSyrLCmsLpBCYGdGITAGhP9C3Z1KC1BLwNB3w4C15V+QJf0V3QCcPQ9
+	DGXOhbsweomQ3LHi9wdpimkZrXEcnesXwyTLNmVddg4Rhj30A7R/SUOLRqZt6ZaTx
+X-Gm-Gg: ASbGncvn3x4+kVXjwdSe3aFihGXFynm7C/BAW2+v/XvAO2SchTtvBB++YXLbId7BAPJ
+	Cw9Sk76b2DZrrONYuwlFMRtUE+Cmx18XWOj1ewYmDEexXwkPkXE9x4t/UYwKSqiaNTkmog6zVMc
+	i+rmNt6sOcbVuGlkYXlHG+5z7BwnwEjHfPRymMJPsV01J3N+xQbD63J+IeC8ilaZLZsKfJIvymK
+	SW9TwjqTb0KpPWM4M9eo8X5SaZ14Tjq83iEQDqVFy3UOfAQ2bwDHs5TZ6uS9QZOwvBQEctgCxuz
+	t0SozEtCLCQZExXR4TTeukICcSj7EuUlkhOUlR7mi3nA7CtlC87U1SBmrfhsZqpgZv5AQt+ydL5
+	kg3xZmfowVeMC/C/tD9iTz/ZnPVsGHRlnBDDfmow=
+X-Received: by 2002:a05:600c:3c9b:b0:439:643a:c8d5 with SMTP id 5b1f17b1804b1-442fd5a1e4cmr189209725e9.0.1747809349930;
+        Tue, 20 May 2025 23:35:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGNlbbUx1fIRTCQGIse82izgmuHH0DoTwCEEz3iQgnfsVdiiEf7DtCXYUXAAxR29/Euu8K7Rg==
+X-Received: by 2002:a05:600c:3c9b:b0:439:643a:c8d5 with SMTP id 5b1f17b1804b1-442fd5a1e4cmr189209525e9.0.1747809349440;
+        Tue, 20 May 2025 23:35:49 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f25:9c00:e2c7:6eb5:8a51:1c60? (p200300d82f259c00e2c76eb58a511c60.dip0.t-ipconnect.de. [2003:d8:2f25:9c00:e2c7:6eb5:8a51:1c60])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442ebd8b9absm141773845e9.1.2025.05.20.23.35.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 23:20:46 -0700 (PDT)
-Message-ID: <5b284638-2082-4d85-9e4d-4514ee15e193@redhat.com>
-Date: Wed, 21 May 2025 14:20:37 +0800
+        Tue, 20 May 2025 23:35:49 -0700 (PDT)
+Message-ID: <ff914260-6482-41a5-81f4-9f3069e335da@redhat.com>
+Date: Wed, 21 May 2025 08:35:47 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,139 +90,235 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 16/16] scripts: Enable kvmtool
-To: Alexandru Elisei <alexandru.elisei@arm.com>, andrew.jones@linux.dev,
- eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
- frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
- david@redhat.com, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com,
- maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
-References: <20250507151256.167769-1-alexandru.elisei@arm.com>
- <20250507151256.167769-17-alexandru.elisei@arm.com>
+Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for huge
+ folio
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: lizhe.67@bytedance.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, muchun.song@linux.dev
+References: <20250520070020.6181-1-lizhe.67@bytedance.com>
+ <3f51d180-becd-4c0d-a156-7ead8a40975b@redhat.com>
+ <20250520162125.772d003f.alex.williamson@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20250507151256.167769-17-alexandru.elisei@arm.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250520162125.772d003f.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
-
-On 5/7/25 11:12 PM, Alexandru Elisei wrote:
-> Everything is in place to run the tests using kvmtool:
+On 21.05.25 00:21, Alex Williamson wrote:
+> On Tue, 20 May 2025 19:38:45 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> $ ./configure --target=kvmtool
-> $ make clean && make
-> $ KVMTOOL=<path/to/kvmtool> ./run_tests.sh
+>> On 20.05.25 09:00, lizhe.67@bytedance.com wrote:
+>>> From: Li Zhe <lizhe.67@bytedance.com>
+>>
+>> Subject: "huge folio" -> "large folios"
+>>
+>>>
+>>> When vfio_pin_pages_remote() is called with a range of addresses that
+>>> includes huge folios, the function currently performs individual
+>>
+>> Similar, we call it a "large" f
+>>
+>>> statistics counting operations for each page. This can lead to significant
+>>> performance overheads, especially when dealing with large ranges of pages.
+>>>
+>>> This patch optimize this process by batching the statistics counting
+>>> operations.
+>>>
+>>> The performance test results for completing the 8G VFIO IOMMU DMA mapping,
+>>> obtained through trace-cmd, are as follows. In this case, the 8G virtual
+>>> address space has been mapped to physical memory using hugetlbfs with
+>>> pagesize=2M.
+>>>
+>>> Before this patch:
+>>> funcgraph_entry:      # 33813.703 us |  vfio_pin_map_dma();
+>>>
+>>> After this patch:
+>>> funcgraph_entry:      # 15635.055 us |  vfio_pin_map_dma();
+>>>
+>>> Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
+>>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>>> ---
+>>> Changelogs:
+>>>
+>>> v2->v3:
+>>> - Code simplification.
+>>> - Fix some issues in comments.
+>>>
+>>> v1->v2:
+>>> - Fix some issues in comments and formatting.
+>>> - Consolidate vfio_find_vpfn_range() and vfio_find_vpfn().
+>>> - Move the processing logic for huge folio into the while(true) loop
+>>>     and use a variable with a default value of 1 to indicate the number
+>>>     of consecutive pages.
+>>>
+>>> v2 patch: https://lore.kernel.org/all/20250519070419.25827-1-lizhe.67@bytedance.com/
+>>> v1 patch: https://lore.kernel.org/all/20250513035730.96387-1-lizhe.67@bytedance.com/
+>>>
+>>>    drivers/vfio/vfio_iommu_type1.c | 48 +++++++++++++++++++++++++--------
+>>>    1 file changed, 37 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>>> index 0ac56072af9f..48f06ce0e290 100644
+>>> --- a/drivers/vfio/vfio_iommu_type1.c
+>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>>> @@ -319,15 +319,22 @@ static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
+>>>    /*
+>>>     * Helper Functions for host iova-pfn list
+>>>     */
+>>> -static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
+>>> +
+>>> +/*
+>>> + * Find the first vfio_pfn that overlapping the range
+>>> + * [iova, iova + PAGE_SIZE * npage) in rb tree.
+>>> + */
+>>> +static struct vfio_pfn *vfio_find_vpfn_range(struct vfio_dma *dma,
+>>> +		dma_addr_t iova, unsigned long npage)
+>>>    {
+>>>    	struct vfio_pfn *vpfn;
+>>>    	struct rb_node *node = dma->pfn_list.rb_node;
+>>> +	dma_addr_t end_iova = iova + PAGE_SIZE * npage;
+>>>    
+>>>    	while (node) {
+>>>    		vpfn = rb_entry(node, struct vfio_pfn, node);
+>>>    
+>>> -		if (iova < vpfn->iova)
+>>> +		if (end_iova <= vpfn->iova)
+>>>    			node = node->rb_left;
+>>>    		else if (iova > vpfn->iova)
+>>>    			node = node->rb_right;
+>>> @@ -337,6 +344,11 @@ static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
+>>>    	return NULL;
+>>>    }
+>>>    
+>>> +static inline struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
+>>> +{
+>>> +	return vfio_find_vpfn_range(dma, iova, 1);
+>>> +}
+>>> +
+>>>    static void vfio_link_pfn(struct vfio_dma *dma,
+>>>    			  struct vfio_pfn *new)
+>>>    {
+>>> @@ -681,32 +693,46 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+>>>    		 * and rsvd here, and therefore continues to use the batch.
+>>>    		 */
+>>>    		while (true) {
+>>> +			struct folio *folio = page_folio(batch->pages[batch->offset]);
+>>> +			long nr_pages;
+>>> +
+>>>    			if (pfn != *pfn_base + pinned ||
+>>>    			    rsvd != is_invalid_reserved_pfn(pfn))
+>>>    				goto out;
+>>>    
+>>> +			/*
+>>> +			 * Note: The current nr_pages does not achieve the optimal
+>>> +			 * performance in scenarios where folio_nr_pages() exceeds
+>>> +			 * batch->capacity. It is anticipated that future enhancements
+>>> +			 * will address this limitation.
+>>> +			 */
+>>> +			nr_pages = min((long)batch->size, folio_nr_pages(folio) -
+>>> +						folio_page_idx(folio, batch->pages[batch->offset]));
+>>> +			if (nr_pages > 1 && vfio_find_vpfn_range(dma, iova, nr_pages))
+>>> +				nr_pages = 1;
+>>
+>>
+>> You seem to assume that the batch really contains the consecutive pages
+>> of that folio.
 > 
-> so enable it, and remove ERRATA_FORCE=y when configuring for kvmtool,
-> because the runner will generate and pass the correct environment to
-> kvmtool.
+> I don't think we are.  We're iterating through our batch of pages from
+> GUP to find consecutive pfns.  We use the page to get the pfn, the
+> folio, and immediately above, the offset into the folio.  batch->size is
+> the remaining length of the page array from GUP and batch->offset is our
+> current index into that array.
+
+Let me try again using an example below ....
+
+>   
+>> This is not the case if we obtained the pages through GUP and we have
+>>
+>> (a) A MAP_PRIVATE mapping
+>>
+>> (b) We span multiple different VMAs
+>>
+>>
+>> Are we sure we can rule out (a) and (b)?
+>>
+>> A more future-proof approach would be at least looking whether the
+>> pages/pfns are actually consecutive.
 > 
-> Missing is support for EFI tests. That's because distros don't ship a
+> The unmodified (pfn != *pfn_base + pinned) test is where we verify we
+> have the next consecutive pfn.  Maybe I'm not catching the dependency
+> you're seeing on consecutive pages, I think there isn't one unless
+> we're somehow misusing folio_page_idx() to get the offset into the
+> folio.
 
-Missing should be Nothing?
+Assume our page tables look like this (case (a), a partially mapped 
+large pagecache folio mixed with COW'ed anonymous folios):
 
-> EDK2 binary compiled for kvmtool, and on top of that kvm-unit-tests as
-> an EFI app hasn't been tested to work with kvmtool.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+   + page[0] of folio 0
+   |              + COWed anonymous folio (folio 1)
+   |              |    + page[4] of folio 0
+   |              |    |
+   v              v    v
+F0P0 F0P1 F0P2 F1P0 F0P4 P0P5 F0P6 F0P7
 
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+If we GUP that range, we get exactly these pages, except that the PFNs 
+are not consecutive, because F0P3 was replaced by another page. The 
+large folio is partially mapped.
 
-> ---
->   README.md        | 18 +++++++++++++++++-
->   arm/efi/run      |  5 +++++
->   configure        |  1 -
->   scripts/vmm.bash |  2 +-
->   4 files changed, 23 insertions(+), 3 deletions(-)
-> 
-> diff --git a/README.md b/README.md
-> index be07dc28a094..723ce04cd978 100644
-> --- a/README.md
-> +++ b/README.md
-> @@ -65,6 +65,9 @@ or:
->   
->   to run them all.
->   
-> +All tests can be run using QEMU. On arm and arm64, tests can also be run using
-> +kvmtool.
-> +
->   By default the runner script searches for a suitable QEMU binary in the system.
->   To select a specific QEMU binary though, specify the QEMU=path/to/binary
->   environment variable:
-> @@ -78,12 +81,25 @@ ACCEL=name environment variable:
->   
->   For running tests that involve migration from one QEMU instance to another
->   you also need to have the "ncat" binary (from the nmap.org project) installed,
-> -otherwise the related tests will be skipped.
-> +otherwise the related tests will be skipped. kvmtool does not support migration.
-> +
-> +As for running a test with kvmtool, please configure kvm-unit-tests accordingly
-> +first:
-> +
-> +   ./configure --arch=arm64 --target=kvmtool
-> +
-> +then run the test(s) like with QEMU above.
-> +
-> +To select a kvmtool binary, specify the KVMTOOL=path/to/binary environment
-> +variable. kvmtool supports only kvm as the accelerator.
->   
->   ## Running the tests with UEFI
->   
->   Check [x86/efi/README.md](./x86/efi/README.md).
->   
-> +On arm and arm64, this is only supported with QEMU; kvmtool cannot run the
-> +tests under UEFI.
-> +
->   # Tests configuration file
->   
->   The test case may need specific runtime configurations, for
-> diff --git a/arm/efi/run b/arm/efi/run
-> index 53d71297cc52..0843725ec360 100755
-> --- a/arm/efi/run
-> +++ b/arm/efi/run
-> @@ -15,6 +15,11 @@ source scripts/vmm.bash
->   
->   check_vmm_supported
->   
-> +if [[ $TARGET = "kvmtool" ]]; then
-> +	echo "kvmtool does not support EFI tests."
-> +	exit 2
-> +fi
-> +
->   if [ -f /usr/share/qemu-efi-aarch64/QEMU_EFI.fd ]; then
->   	DEFAULT_UEFI=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd
->   elif [ -f /usr/share/edk2/aarch64/QEMU_EFI.silent.fd ]; then
-> diff --git a/configure b/configure
-> index 8c4400db42bc..d5f9995172f8 100755
-> --- a/configure
-> +++ b/configure
-> @@ -392,7 +392,6 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->           : "${uart_early_addr:=0x9000000}"
->       elif [ "$target" = "kvmtool" ]; then
->           : "${uart_early_addr:=0x1000000}"
-> -        errata_force=1
->       else
->           echo "--target must be one of 'qemu' or 'kvmtool'!"
->           usage
-> diff --git a/scripts/vmm.bash b/scripts/vmm.bash
-> index ef9819f4132c..4ae60c37a6e8 100644
-> --- a/scripts/vmm.bash
-> +++ b/scripts/vmm.bash
-> @@ -159,7 +159,7 @@ declare -A vmm_opts=(
->   function check_vmm_supported()
->   {
->   	case "$TARGET" in
-> -	qemu)
-> +	qemu | kvmtool)
->   		return 0
->   		;;
->   	*)
+
+Maybe I misunderstand that code, but wouldn't we just "jump" over F1P0
+because we assume the batch would contain F1P0, where it really contains 
+F0P4?
 
 -- 
-Shaoqin
+Cheers,
+
+David / dhildenb
 
 
