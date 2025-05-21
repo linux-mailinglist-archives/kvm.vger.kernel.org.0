@@ -1,243 +1,229 @@
-Return-Path: <kvm+bounces-47218-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47219-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A8A2ABEAF3
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 06:25:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF9DDABEB1B
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 07:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 719DF3B588B
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 04:25:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 627227B2A17
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 05:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C8A22F74A;
-	Wed, 21 May 2025 04:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C2F22FAD4;
+	Wed, 21 May 2025 05:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="R/dbI5pt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jDgijrig"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACD941C69
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 04:25:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747801532; cv=none; b=Volnc04YOgsC8cd2x4ipKw1heWnNClGdxLsXs2RDnI3nkau1PCu5scDHThx++E0uMe6lsDnmvwK3mtipkQXFNYj383UVOnplLnkgO9LdcUnxyIRSstoUpOj4PAFH7H8ZETkc5cxZzr4TZSTMuCu58SFIBfDBzq89EvXAT/fAvjI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747801532; c=relaxed/simple;
-	bh=hp2vDBcdaEDXuAq1yTvXyqCsHoGPRwY8JFqBf4PFWdg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T2G9HYZJBP49BGICTQizKKraNGYuOVvF9IDNUbnCGowKT3PyVaWjZUZT+VZ3eRxkTN/fQHY14OF+cuOyoS1vsx/keZt8W5E330HO50/MpCIclSEReMRszwIV/KBxKB8dXWpL0WvG/gjgTluroKmHNkPlqE3D6vbaofIU6QblO/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=R/dbI5pt; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b1396171fb1so3702125a12.2
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 21:25:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1747801529; x=1748406329; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vABuEA7BM6EMbnMrczmzBFOnp0rzRj5DlxMMU8V7wNI=;
-        b=R/dbI5ptQABREzohwY8p0+wmSf6Lmv0yV5Jeu8duohK/LvRRLx4ca0OQQFzX8Vo2dl
-         ho1jXkr/NooRh7URM9ZltBDbLoefR0Qbija1zVAvZMTKJQaZ0NLP1Bo0vG9b44FwZBSf
-         tUQ4DAdPRv7tqPjs+IBVpvNtYdzNufI3srfeBqET4FWCU2KLTmF7nqVnpDn2GxMSAJ8H
-         KdnplGuzDkdsLUvFPJUppAY9Qq5iB6CJMzZM1PO6j8P8A2Nmh02Cy2TW0nTTFuSnVJuU
-         WIG0hi/MSZgk9PCIvRl/cBAFAiBBECzZpS5sAp/1qmsMISv20z1utndvTT0XLFxfqeNT
-         rSUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747801529; x=1748406329;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vABuEA7BM6EMbnMrczmzBFOnp0rzRj5DlxMMU8V7wNI=;
-        b=t8UJiRnHFT6pyap420WPiXxDhhA92VNW2+80n0KLSp4F+3WZDz4QyMvQz2A1drPh9o
-         oBY3hReQHec1uOvVCanoy6khntl5dqN2zk28KZlMeCKMC72Z88gID/cMCKmbi9z/qr6z
-         bVkei/8pFoT5tno+gzIu4tDit0O8J+Kzw504lxtuOT4z1v8Jlz/Udb9g557Olg4P07S9
-         gW/xUY/BLE55ZUwmhNT4R2885pZUYdH7jfBmzyVaT2ly948jJKz2MSTH48z1HX8IqwKQ
-         PgpvFj5y7c0KF4rdTrO83ANR85j9SzNROYh+ionzKLGOSzvMNkONjX8vnLLp7npd4sZ5
-         yFhg==
-X-Forwarded-Encrypted: i=1; AJvYcCWLMFYAQcSEHOQ73nSAZBkbfrZnM68sUtF4C7xhO/8n1onNVqKUQamU8zksAMY7kQQJyXU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQ8gXQaQU/EON0EKxnx1yAPHwRarvWA1ylBiwvBdnW9mVByvzd
-	IYeZAxO9m/uUgru7BxWuQrsMhc6JciG+IrGlqvlcQCSj545Cif9DQFKAfXYK9L8X+60=
-X-Gm-Gg: ASbGncsx06+vV6AnN2iZZE4E7m6rK8Pudd2Q4rgudA7Tzv15foElGC6mpEQFcKh3kOe
-	w80kxJw9M/Sbk/lRQ7/H2rc8EFCUZM09+UeG953nWRoE+Htj6rIA0KocTn0VLiFuVrdxibD3Yjs
-	DHz8DRGDfA9RB5jyNhCzdka5FC1Pdu18yi5WmxtWvEdUxq9h80OpihSMS4NhVwDeJ/IifAlLhyl
-	waGMtTsDjGR9xk3eNR6RTSho3XCZxJ6NTyYVRzIVYQ0PIQACKPLxA8UmZ1HgdLsy6H267YLpOwy
-	uHHfxUms8ucRQD43B8RRkxh9ZucATVpHWVafrxVMi77D6efgThdnTTZiFvYSRMJlopDolAj78rZ
-	y7WI=
-X-Google-Smtp-Source: AGHT+IH6e825nz8KuFGrSjI7GGy7EEog0pBWTY3SAZNW0fc9er2plgBrRRvK0cQUDyD6Q6X6OaSByA==
-X-Received: by 2002:a17:903:25c7:b0:231:e331:b7ca with SMTP id d9443c01a7336-231e331bc48mr157460425ad.3.1747801528777;
-        Tue, 20 May 2025 21:25:28 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231e26d83c6sm80880005ad.47.2025.05.20.21.25.25
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 20 May 2025 21:25:28 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: alex.williamson@redhat.com
-Cc: david@redhat.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	muchun.song@linux.dev,
-	peterx@redhat.com,
-	lizhe.67@bytedance.com
-Subject: [PATCH v4] vfio/type1: optimize vfio_pin_pages_remote() for large folios
-Date: Wed, 21 May 2025 12:25:07 +0800
-Message-ID: <20250521042507.77205-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A83512E5B;
+	Wed, 21 May 2025 05:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747803924; cv=fail; b=m4bfalzRi/SnYhBFXMDlLr1AeJytbu+hZVHz0QBAVI3Vc6LjFf6Tb7ntdiC1USRaTTdc3rSHn8TSH5xle/b7lIOc7crR0OYTucAwzhQMyd1zPqpzofFQCvnxSoWUZWMbOR/8fZ+pvYn+ecQ8sxFz5N7AVr2bjAJ8Q5I7sYI1Vlo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747803924; c=relaxed/simple;
+	bh=h22ZCtfnA+rNMrc81uElV9uY/0KvT6ujlx/MQFeXI+o=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=FS/gx5iSU+AGyGqZu3ljstxGd0yATd/c6immPBE2xghi2UVhbdfpvihJuD+ioAtvfRn64xsEbZB+/OzWCoh8xyKj4JcMJYXIJB3UlVx788KGhFC7lw6ieNKjhmCAB2pqJo2iSXHyWPfxNzIowNEKEwfFlhvc8mYdAUfAPeXmsVo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jDgijrig; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747803922; x=1779339922;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=h22ZCtfnA+rNMrc81uElV9uY/0KvT6ujlx/MQFeXI+o=;
+  b=jDgijrigRFe6W+2G0nNtgymOUPqree5Sk+GvA/6wOADrKNrwP6CpZuEH
+   +feiRllRf9stjrofPM4O++pUaN0y8/b/X+JmMMSsLvfNU/OmblLTo3io9
+   drCK8gn4fN3CeesdM0iL91ADqDbPftCM4KogyqNDxb+zCTapI0pD7JEZt
+   eL3hJcXq0Bv1RYD6qeCNL0dR1HGjZBI4rXCgzRerDzInATPXBVhGlnhDX
+   +Yo1KOanYBRHpuFQBO3lNuMuDuqOjlmub2ahLoN1IzP8QBVRB8o6NAviX
+   l6snyLXyyqvp9S9hl4GtBHb8OR+hDAVlBt28dVF9+C+tvDMsL5UIlryuZ
+   Q==;
+X-CSE-ConnectionGUID: Z/EBAXQ2QkCYvtuLEGyjSg==
+X-CSE-MsgGUID: 7xyVZ5tNSmGfer1tFzT0sA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11439"; a="67182381"
+X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
+   d="scan'208";a="67182381"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 22:05:21 -0700
+X-CSE-ConnectionGUID: OLJD8A3wRcqHa0ZfiK5Rlw==
+X-CSE-MsgGUID: v30wNppcSUW70iDaNxxl1w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
+   d="scan'208";a="143901655"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 22:05:20 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 20 May 2025 22:05:20 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Tue, 20 May 2025 22:05:20 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.172)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Tue, 20 May 2025 22:05:19 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Zz3nvgDi8vIuRmeICxTuKeevAl0oCEakLxVzKsqXG7grY4Kl/3yqXjhZlgFeZ2jhAEq7JLerdrDc14DYIRHQI+KxRMiVO4cgE/uQAgR7VDU8UCpfHJ2p9tanjQhDCmuDRVZW6Jx49Heav2UUYskvApQU5S3fV18sI+8EDpsHJmZa9CCfGTD/C87dAwLZhb6QQezrKQRQrBWPG9vIzhGwuDbSNirNcmwkvI4erRytF2eJR1r7K8od8Hoql97u+AFMpjpVBxcClI1rKW3Hb9nHjUzo9+HJODalHlvdFeBDRb477XtidbozLna1OBsHUSBU7i6sB4cAZZClwe84Tqag5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ScKRrsJF5JOyBjkL8XgP0v8esXPpWgKWnOtPH2MJmWY=;
+ b=bG9/+objvly/ZFa7+g/L3773fXYHXkp6rht32291JOqrClmEy6/mnrKqqVp4E0mN/j8qwXxg9kdBV/Vlk8riwCfY0JY5UJj0QOw2i7z4da6leUaPx3tWpYl9mIgW71d3wSaLpBn6t9owZVDd9sHRQt5kNZZt2pu97lmHXX8YjnoMACx8kMTnGD/iME9DLHJ4wfLfYizYxQIdjgv26A0zUy6v8s5kSJptK8BDkoNN06DzJ9a1M0I6m0dK6al3yQCfWp0Ln0yVdIdZx7nYim8K8WjK+zYrcIc7KrCmHoMLvIuob0Hb0osLWAYz+E0yTRSxuQ052x2aORrf8hvZsVUAQQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ SA3PR11MB7553.namprd11.prod.outlook.com (2603:10b6:806:316::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8769.19; Wed, 21 May 2025 05:05:16 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%2]) with mapi id 15.20.8746.030; Wed, 21 May 2025
+ 05:05:16 +0000
+Date: Wed, 21 May 2025 13:03:02 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+CC: <pbonzini@redhat.com>, <seanjc@google.com>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <x86@kernel.org>,
+	<rick.p.edgecombe@intel.com>, <dave.hansen@intel.com>,
+	<kirill.shutemov@intel.com>, <tabba@google.com>, <ackerleytng@google.com>,
+	<quic_eberman@quicinc.com>, <michael.roth@amd.com>, <david@redhat.com>,
+	<vannapurve@google.com>, <vbabka@suse.cz>, <jroedel@suse.de>,
+	<thomas.lendacky@amd.com>, <pgonda@google.com>, <zhiquan1.li@intel.com>,
+	<fan.du@intel.com>, <jun.miao@intel.com>, <ira.weiny@intel.com>,
+	<isaku.yamahata@intel.com>, <xiaoyao.li@intel.com>, <chao.p.peng@intel.com>
+Subject: Re: [RFC PATCH 20/21] KVM: x86: Force a prefetch fault's max mapping
+ level to 4KB for TDX
+Message-ID: <aC1ehlu1MfKI4J7m@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250424030033.32635-1-yan.y.zhao@intel.com>
+ <20250424030913.535-1-yan.y.zhao@intel.com>
+ <8e11fd2e-d77b-46cc-94c9-e542003c4080@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <8e11fd2e-d77b-46cc-94c9-e542003c4080@linux.intel.com>
+X-ClientProxiedBy: KU2P306CA0039.MYSP306.PROD.OUTLOOK.COM
+ (2603:1096:d10:3c::7) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SA3PR11MB7553:EE_
+X-MS-Office365-Filtering-Correlation-Id: d7180db1-8e05-4fd0-2581-08dd9825130c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?NhMlcWEdqezpz92WHAihZZoA/mmghsxFRIG2yk9hZIRi3ws0RVAUlNMRVS1m?=
+ =?us-ascii?Q?Ipskx+FK0dJUTUz4HeLWsJoG+k58QnEiES99KYT1Q0ux/m9/Fxdd+NXduKCP?=
+ =?us-ascii?Q?/PL5xP1CI0wa9C6C+81/zpsPObAq9btS6qwtktf+w9DQo9ZKpvlKPwBBBQNO?=
+ =?us-ascii?Q?/+ZBpwhNSkYGgFMJQY4Sgl5dQpMHWiMQ2Gk7i83CiDX2YEnKB8aksp70aBUw?=
+ =?us-ascii?Q?4iNZtXoVOZbupxoTNOI5nv0alB+44vdeS4NNFByjQfJ9bgzP8/4qKhm1zZ3h?=
+ =?us-ascii?Q?NAsEGlMkXykKDqEDSC0xwparrtorks09E1BflS8D8reCL+C+wHu9WzxUd2B6?=
+ =?us-ascii?Q?W2t72KDtf3rmFRcovS4PyWw4Hnimy82aPgWYAx6HHiLoMOf99/BVFMeV11eL?=
+ =?us-ascii?Q?w4ACf2TxF7TwNQNNloH2pEwwlG0AKLWcDOhjsGsN7mVszrZCK0luBg6oPbTO?=
+ =?us-ascii?Q?EdHmzErGn7Fufp4t6JS26dS8uxkH45slgUayu+MRiSHReisw6upQL0fpg7S0?=
+ =?us-ascii?Q?dsTasN8w6PrZbP5Fl8vOxM5a055h/l0fn1B2KGE0/ebBzs8mFN1o4/flHfdB?=
+ =?us-ascii?Q?ESDy3I+gx57hdtaYf/WhaUEIlUtdrDKp6xoht0jgJZywjkmLwcQutfRxd7nW?=
+ =?us-ascii?Q?AJXrjBhtBq2HjSfp408tOBFEEzdSyFNIy/WQb3o83EIylnLKZ1VDZT1pA1v5?=
+ =?us-ascii?Q?tbTN0XkEmgdEg5ybdGuUODOxuJEbXL9UkD/kaPpClJ6RivUYFBeyZhe5thSQ?=
+ =?us-ascii?Q?qG/DdYwASfiYphCnbo+x5WK9Bpw6vLtCTacJlB//K1PTf8dcJADxaR8ytFAY?=
+ =?us-ascii?Q?nz9XM38s5KY87E39eFdYYlfQq+P3OKoXd3pSU56Pndhg9xTJRVAiegfiAyD6?=
+ =?us-ascii?Q?KzhbbMnKCDla8Odtzlw+eAkLm6ap8ZrZpbM56hFXYs10VV1ig4dbRq79TgRG?=
+ =?us-ascii?Q?7mpeBjElOQGAIHT4kcrhHcl23u/3WDaAbDIK3YDYhGibfkFga/jOvK9PNCPY?=
+ =?us-ascii?Q?rAINx2tijmaF1dwLnRj3u2g9FV3u7LxTa0gWUHOAJ/u0waboQ0LKgP8BYcqB?=
+ =?us-ascii?Q?pxVjSZeO70Jy15b3SvHnuRPF/1ISj24AQU3Ywt3nQBjF1PVhrHKdYvs5KVxy?=
+ =?us-ascii?Q?q4D+d1CXHZeclgjwvSZvT2jwSim8qrGmRiXnUqTm24MEKZ8oZyolOn7BLxys?=
+ =?us-ascii?Q?eyMGyPBj2ggbIsj7get2tfVQTwsN3JwwLsdjvH5P0an6ezvU6WwQmg5VLnqS?=
+ =?us-ascii?Q?lIAmBh4tElZWqF+w+w7zRPJM6di4V19H3saWbbkk8QZD1iCiuygJEDy+J7jP?=
+ =?us-ascii?Q?X9kLZMHnhAVkU/ooqLuGkQ/7dAJ+JxAouJ5WUVettAATT1ywDLS+WQ6Pfz/R?=
+ =?us-ascii?Q?yP8Q3NR4ASLX3ePM8B6l5aEoeuMD0EYJvIv6zy/AOY8L6RbaXs4ji3aIc6d1?=
+ =?us-ascii?Q?hOImXwhNPj0=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?X1u492Ofr350vSy0OypcFQrkIQZdsC8lFepz38pHC2DZbNU7Nt55Z8zG1/rC?=
+ =?us-ascii?Q?KeLM2Kg5oB91NW0QA5P6QIpIqOaAAxcRqkSreq6I2d80Ifvld5g4E31LUuuQ?=
+ =?us-ascii?Q?lcS5MUX4DziNdiwYiKJrlfMMfqwmNwoFSNw4dHf27fRutpG7d2H9pDZrKbjp?=
+ =?us-ascii?Q?9zYgbGZpP0oR6073e1b7n7OWd15qzVQN94aIAJh0z7+koKfFNnKAmJTrZ5U9?=
+ =?us-ascii?Q?koEiy0VW5ItDymmJd80n03j15D3TEA9eQy7f6BTpSzkqYN/87PfE7gf0jOQs?=
+ =?us-ascii?Q?MxMklVDuFcjv7iV81k78+QPjVv/MS5nGv284AOG7/XXrpe8rG4wy0JAOdysM?=
+ =?us-ascii?Q?b57Z+EIPqBuEz9J5zQSgchZOE0wLUQk39u4gAKsMKCV7kEDXQg6NsyI46Bt+?=
+ =?us-ascii?Q?vqoZg/OOZdk6310W3VyImZG7h/z/bTPZ8NwhgeMoGa+fteLwiEVF/cxV/LyJ?=
+ =?us-ascii?Q?jwCoodnezEnHMxaZlYQiGX29OxXdExLx1gkKBjcE3JgJA1FtINPSyuX0ZdgG?=
+ =?us-ascii?Q?HxI3q0jnSSG7DuarHIxo47u3BjqEk6CtXIbi/pIj2EsN5kJ8QVmgUT+t/t7U?=
+ =?us-ascii?Q?MCrkimKGBDi6TcUJMzV5xDmXM6TlEdmbmR3IF8mIYpbpkTeCYTh9n61mYIY7?=
+ =?us-ascii?Q?StENx8CqiRlpuM181w43Y/xD6bpQk1s6o+Sna2kzlp8CeJ9+GQ9IqxlKGUZ7?=
+ =?us-ascii?Q?vZOWNsbnPGrCKGFgQRzqikuP/IGZMsPqICUBCpTdcVZhfwV8eTClkpr2BjC+?=
+ =?us-ascii?Q?OE7rCFA/p5Kznh4i1AGnlrTS+9oqLq/4N/xCRLc+SGvsUhmW7IseusrlpbcU?=
+ =?us-ascii?Q?nubBf2PVo/ZsWEavG2XYLMfPOUI+nSILIWyrNGjh8jFD/RWvaK1aWcq9GCLX?=
+ =?us-ascii?Q?vCtx9CAM/uhIeMlc2ImN+bEsGwmTV448M4ti5fQ6b095iW6/ByhjWSU47uHf?=
+ =?us-ascii?Q?G92yTO1sUDCiiBX9SDoHTRiHwIIq8ifmS8zLzLqknfuF8mPwilUf9v0f1BqV?=
+ =?us-ascii?Q?+8Vpw/ViYw5D5pa4LDPCwJ0Uf+VOASpcNCMPaXUdMnD+MmNd/We8ae5boJgI?=
+ =?us-ascii?Q?ovqoqQiULlTS6GWs1zCunXIFUbgoy1JDqipiztKi+J+Sbl+hOJqWGI88x1Vt?=
+ =?us-ascii?Q?cqoDrrnAjl5KII/5lbPv7MJesNuUo/nA4NtuaR0X2UUddKBOmfghGVDdA8hn?=
+ =?us-ascii?Q?DbmVuJPRVzhlNE6Xl0qryg8BhfDk/94PiKj8VXSdvR7yTNkwB7ZYtTQChDu7?=
+ =?us-ascii?Q?sZD3qMWjG0egTZK9YiV10LpHqDclBQLJX1hAlUX65vnU3mzssD0q5b9E7Kl9?=
+ =?us-ascii?Q?7CwHQ8baxrRRwbINkZOtQ+FxP8C2FN+n+/sKFjG2+RoqWP6UMxSbvX87uc2y?=
+ =?us-ascii?Q?F72wOjcOc6o0k+4t4M/R6tLfd8MLlXvcY/WDTVhYGAuf8bt9gPSdDWIge3G4?=
+ =?us-ascii?Q?3vCOragPKFhmpvS1qoVWl81kGwOLD3e8I243qvgFA5uBQGCGdDQ5GpFwp8qi?=
+ =?us-ascii?Q?5fAWhj2A3Iv/fW6Mas8GtOba/64foKkOPketvK2CzU95sNt5QDXmP2tawEDg?=
+ =?us-ascii?Q?1Z+dl7XN4E7xcZ7DPwWbbqSGv3vibiHRRRKdUSVN?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7180db1-8e05-4fd0-2581-08dd9825130c
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2025 05:05:15.9081
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: c9cS2lESfKxdu1bsrdTKPmka4vVTPH/u4cXGY3nyeP5Js6m+Hjl7Emn994fylB720Eih1JCB42j0ahrq1u12ng==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7553
+X-OriginatorOrg: intel.com
 
-From: Li Zhe <lizhe.67@bytedance.com>
-
-When vfio_pin_pages_remote() is called with a range of addresses that
-includes large folios, the function currently performs individual
-statistics counting operations for each page. This can lead to significant
-performance overheads, especially when dealing with large ranges of pages.
-
-This patch optimize this process by batching the statistics counting
-operations.
-
-The performance test results for completing the 8G VFIO IOMMU DMA mapping,
-obtained through trace-cmd, are as follows. In this case, the 8G virtual
-address space has been mapped to physical memory using hugetlbfs with
-pagesize=2M.
-
-Before this patch:
-funcgraph_entry:      # 33813.703 us |  vfio_pin_map_dma();
-
-After this patch:
-funcgraph_entry:      # 16071.378 us |  vfio_pin_map_dma();
-
-Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
-Co-developed-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
-Changelogs:
-
-v3->v4:
-- Use min_t() to obtain the step size, rather than min().
-- Fix some issues in commit message and title.
-
-v2->v3:
-- Code simplification.
-- Fix some issues in comments.
-
-v1->v2:
-- Fix some issues in comments and formatting.
-- Consolidate vfio_find_vpfn_range() and vfio_find_vpfn().
-- Move the processing logic for hugetlbfs folio into the while(true) loop
-  and use a variable with a default value of 1 to indicate the number of
-  consecutive pages.
-
-v3 patch: https://lore.kernel.org/all/20250520070020.6181-1-lizhe.67@bytedance.com/
-v2 patch: https://lore.kernel.org/all/20250519070419.25827-1-lizhe.67@bytedance.com/
-v1 patch: https://lore.kernel.org/all/20250513035730.96387-1-lizhe.67@bytedance.com/
-
- drivers/vfio/vfio_iommu_type1.c | 48 +++++++++++++++++++++++++--------
- 1 file changed, 37 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 0ac56072af9f..bd46ed9361fe 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -319,15 +319,22 @@ static void vfio_dma_bitmap_free_all(struct vfio_iommu *iommu)
- /*
-  * Helper Functions for host iova-pfn list
-  */
--static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
-+
-+/*
-+ * Find the first vfio_pfn that overlapping the range
-+ * [iova, iova + PAGE_SIZE * npage) in rb tree.
-+ */
-+static struct vfio_pfn *vfio_find_vpfn_range(struct vfio_dma *dma,
-+		dma_addr_t iova, unsigned long npage)
- {
- 	struct vfio_pfn *vpfn;
- 	struct rb_node *node = dma->pfn_list.rb_node;
-+	dma_addr_t end_iova = iova + PAGE_SIZE * npage;
- 
- 	while (node) {
- 		vpfn = rb_entry(node, struct vfio_pfn, node);
- 
--		if (iova < vpfn->iova)
-+		if (end_iova <= vpfn->iova)
- 			node = node->rb_left;
- 		else if (iova > vpfn->iova)
- 			node = node->rb_right;
-@@ -337,6 +344,11 @@ static struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
- 	return NULL;
- }
- 
-+static inline struct vfio_pfn *vfio_find_vpfn(struct vfio_dma *dma, dma_addr_t iova)
-+{
-+	return vfio_find_vpfn_range(dma, iova, 1);
-+}
-+
- static void vfio_link_pfn(struct vfio_dma *dma,
- 			  struct vfio_pfn *new)
- {
-@@ -681,32 +693,46 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
- 		 * and rsvd here, and therefore continues to use the batch.
- 		 */
- 		while (true) {
-+			struct folio *folio = page_folio(batch->pages[batch->offset]);
-+			long nr_pages;
-+
- 			if (pfn != *pfn_base + pinned ||
- 			    rsvd != is_invalid_reserved_pfn(pfn))
- 				goto out;
- 
-+			/*
-+			 * Note: The current nr_pages does not achieve the optimal
-+			 * performance in scenarios where folio_nr_pages() exceeds
-+			 * batch->capacity. It is anticipated that future enhancements
-+			 * will address this limitation.
-+			 */
-+			nr_pages = min_t(long, batch->size, folio_nr_pages(folio) -
-+						folio_page_idx(folio, batch->pages[batch->offset]));
-+			if (nr_pages > 1 && vfio_find_vpfn_range(dma, iova, nr_pages))
-+				nr_pages = 1;
-+
- 			/*
- 			 * Reserved pages aren't counted against the user,
- 			 * externally pinned pages are already counted against
- 			 * the user.
- 			 */
--			if (!rsvd && !vfio_find_vpfn(dma, iova)) {
-+			if (!rsvd && (nr_pages > 1 || !vfio_find_vpfn(dma, iova))) {
- 				if (!dma->lock_cap &&
--				    mm->locked_vm + lock_acct + 1 > limit) {
-+				    mm->locked_vm + lock_acct + nr_pages > limit) {
- 					pr_warn("%s: RLIMIT_MEMLOCK (%ld) exceeded\n",
- 						__func__, limit << PAGE_SHIFT);
- 					ret = -ENOMEM;
- 					goto unpin_out;
- 				}
--				lock_acct++;
-+				lock_acct += nr_pages;
- 			}
- 
--			pinned++;
--			npage--;
--			vaddr += PAGE_SIZE;
--			iova += PAGE_SIZE;
--			batch->offset++;
--			batch->size--;
-+			pinned += nr_pages;
-+			npage -= nr_pages;
-+			vaddr += PAGE_SIZE * nr_pages;
-+			iova += PAGE_SIZE * nr_pages;
-+			batch->offset += nr_pages;
-+			batch->size -= nr_pages;
- 
- 			if (!batch->size)
- 				break;
--- 
-2.20.1
-
+On Wed, May 21, 2025 at 11:30:42AM +0800, Binbin Wu wrote:
+> 
+> 
+> On 4/24/2025 11:09 AM, Yan Zhao wrote:
+> > Introduce a "prefetch" parameter to the private_max_mapping_level hook and
+> > enforce the max mapping level of a prefetch fault for private memory to be
+> > 4KB. This is a preparation to enable the ignoring huge page splitting in
+> > the fault path.
+> > 
+> > If a prefetch fault results in a 2MB huge leaf in the mirror page table,
+> > there may not be a vCPU available to accept the corresponding 2MB huge leaf
+> > in the S-EPT if the TD is not configured to receive #VE for page
+> > acceptance. Consequently, if a vCPU accepts the page at 4KB level, it will
+> > trigger an EPT violation to split the 2MB huge leaf generated by the
+> > prefetch fault.
+> > 
+> > Since handling the BUSY error from SEAMCALLs for huge page splitting is
+> > more comprehensive in the fault path, which is with kvm->mmu_lock held for
+> > reading, force the max mapping level of a prefetch fault of private memory
+> > to be 4KB to prevent potential splitting.
+> > 
+> > Since prefetch faults for private memory are uncommon after the TD's build
+> > time, enforcing a 4KB mapping level is unlikely to cause any performance
+> > degradation.
+> I am wondering what are the use cases for KVM_PRE_FAULT_MEMORY.
+> Is there an API usage guide to limit that userspace shouldn't use it for a large
+> amount of memory pre-fault? If no, and userspace uses it to pre-fault a lot of
+> memory, this "unlikely to cause any performance degradation" might be not true.
+Currently, there are no known users of KVM_PRE_FAULT_MEMORY.
+We can enable huge page support for prefetch faults (along with allowing
+splitting in the fault path) in the future if performance considerations arise
+for future users.
 
