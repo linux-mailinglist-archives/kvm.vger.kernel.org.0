@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-47271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB25EABF7F8
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 16:38:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01CA6ABF805
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 16:42:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A0AE7AE211
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 14:36:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DCC44E74DA
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 14:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32EB1DB346;
-	Wed, 21 May 2025 14:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9B61DE8B6;
+	Wed, 21 May 2025 14:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fpvYP0KK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cEd/FJqj"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC501D5CF2
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 14:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C501D7999
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 14:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747838278; cv=none; b=GR1gEir7gwfiynFCb+a+4UBnkCk9vh4O93PXI7rCh6PBjtBGCIRT5UAoACKncw6ONSiW+4IMBPxmuYEvlUM0rGcF9F0DgGlHR0dmE/Z2/xbUEsGqp3FxfOvP0Cx168nKmX0a3q2V/eLH46xDY/cOL5aJlkBonWUyxl//fb3le6I=
+	t=1747838506; cv=none; b=QU2GPiVgWVXSkue5Fwd5rEKr9DBbl+3dXsxqTStLlOFibGt5VpndNuEWcZJQEf2TW/RwrwuXPIRAcSCsONseAv65eP/UjvzTJwODFEyG0bHhxs9kP9B6RsL4bw4CGSi97DIeaUROI1v8RCfjfF8DPT/4f6RtjfX6rjKzJEXZ97Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747838278; c=relaxed/simple;
-	bh=GFUbTHLvPIWpijBbnDKGJjSbviGkpIHpV+2P6Mrxv6Q=;
+	s=arc-20240116; t=1747838506; c=relaxed/simple;
+	bh=fJrz4e1Ti/Jt27bWzNcWF73I0K+Q9z0Ka+LDgDGAiMg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bYRvz2D9+hfPqVDgB71yNq1deWgdOJVbod8GZe0QGRZqA/R6kJFFAoPHCbcnWdYDJGyj31jOSQFfTC5YPC+0n9bLQePBzkQMf2VXQxZID1HXm3/EaxeiYvSYm0zf5jl48lILodyfH9cnrzWbbSWbOU8Z69OiWCW3Ic4SfL+PDP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fpvYP0KK; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=XXfMgCSmMjlJJ74Byv096rvP1A5talhsX5N7o4G8Lab5lrNzx8VUiVApP1RmLsj3dj+b033J2r2I0UFDuhg8RAVHtjn8RfC+XK79wwQlKCX8DBSxcnndFtWrZx7bUl80G3t6A08MLP3SiF9saPLCC0u8hqMkEjuPa4Elw75ERJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cEd/FJqj; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747838275;
+	s=mimecast20190719; t=1747838503;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=i+9bOe+sk+QP6ubHHUgYc4TBiMH2pb9AHt05w4STzZg=;
-	b=fpvYP0KK6BnnB9CZsbQd+0j7ryAARJPDxKpvY8ULSvEq4OzQ1XHFjFFEwf1nOPmge7sqsy
-	ZSzG3ATGbuU/aTkC8VIyIrTOai0OZSfWXfUYmO9iBSRaPFwf7j4vl/xZBk2ziKrgl8/MY0
-	M8aFahoxWxFVdO8gHAay1qDfhsBAJJc=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=mDesXKTayHxGjIGY1j8G0o6g9UGYHXMrYuHHOq5gQRI=;
+	b=cEd/FJqjuEwN+FiBB+vAgcFNTKcrRa7ndIC45HqR0iO+wN0X2OJcC2U4HgAdIOsTSBgTF1
+	jWIsZytTPHvrJJ0Q+v8b1MmoDwndSkAmWY07tJJpssOfKltofYXEwvAJ6/1lN65X2a/rom
+	TnypONEuRrap9YkOyNGHDc4exmq1jdA=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-678-jSFKjnR4NuC6KzLS4qdX_Q-1; Wed, 21 May 2025 10:37:54 -0400
-X-MC-Unique: jSFKjnR4NuC6KzLS4qdX_Q-1
-X-Mimecast-MFC-AGG-ID: jSFKjnR4NuC6KzLS4qdX_Q_1747838273
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-acbbb000796so508874566b.2
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 07:37:53 -0700 (PDT)
+ us-mta-308-cqkbuVQBPYqDXxjcV1Cn8g-1; Wed, 21 May 2025 10:41:41 -0400
+X-MC-Unique: cqkbuVQBPYqDXxjcV1Cn8g-1
+X-Mimecast-MFC-AGG-ID: cqkbuVQBPYqDXxjcV1Cn8g_1747838501
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-acf0113e311so605233166b.1
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 07:41:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747838273; x=1748443073;
+        d=1e100.net; s=20230601; t=1747838500; x=1748443300;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i+9bOe+sk+QP6ubHHUgYc4TBiMH2pb9AHt05w4STzZg=;
-        b=s+/+yXy3EdBZPKgrAyuEg0JSfDqfc/KKB4GXDnIB7H3FWxMEYmZZTsbWWT9Llk2O6Q
-         vuQKC3bH0H6BFTmNJK9e8UoJ5Te6H/sQOjXl23Tt+VOZEPKaYvvlQC9ApRovmtQ4aLDU
-         EuefDHXbTualVd3zuqWxtGn4IYnAmnGO8/4XcA/6+6G61gKo3ft3qAmVYObKJv5Y3GTC
-         Z316VwuopacU+NBln4/wrlLxaOiA75zohXYAmIRLftNTgRNBuMSuhrtaoFydTq+5+KC6
-         c942n3yprwY4ZHgb3v73Mum0IyULOfcU1VSsPaY/ra3bY1HYRi3uA8ea4yjl3OO4hNLa
-         QmEA==
-X-Forwarded-Encrypted: i=1; AJvYcCWxQyGBPUu1Ki7fMNiWpt6OPDP3uKkt4TDzE3VNNKF1UG7dv6j8o4NTeDhNr/BNBASry78=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjtJ94EdpMvuNQDZpA5ekQikDDvAGbMev1zF/W1Nrly4eQSdBZ
-	OuC/dnrMxW7cGwUuRfsRirU0y7KV4NoA4HuqsMiUeZD9d230IKZKbDI4SLQYiuOwv+FtOtlN4nc
-	QaX0pBcNR66ao+SfgkjKiEoWzD54DyrJWUnwjqAePzv6lKx4StfMZPQ==
-X-Gm-Gg: ASbGnctnT8b+mDnJYPfYsdlm6nyO7lw1fr10q9nRCQmQOr/W3Qzq05RdC+8k2bVsWPl
-	q0GcjNbveexj1w/K82gH4mYrx6n3eqpillrMJaqnARJM1AD9ysHd0N3dPDNfd1Y4RJBNntqL3K5
-	HzQ1ue6loR3ORgBue6jt4sCV5H3j+FH+HVCgFenVJhlJheRPSt0e6u21hEjxZZUzCaqkADVDcqP
-	PkQqJsOlzuXQjJiG0NJtuett191XNSBz5fRyDtcFkMb0Yu9487U0CpkSEFkexL7FE1F6aEpO2wZ
-	+rlYrzHdEX7WY8lfEIB7D//Mgzd58/LA3El0c/0RbuMZkrlaOVNWqHqO92qB
-X-Received: by 2002:a17:907:928e:b0:ad3:f3dc:e36d with SMTP id a640c23a62f3a-ad536f28227mr1817060966b.50.1747838272781;
-        Wed, 21 May 2025 07:37:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFmBHIw8ATBsd2tGBCezkRlBguAVth09UuV27A0TTDuqx7nQd0qtkGTs7YUjEcenVWi3uB5IA==
-X-Received: by 2002:a17:907:928e:b0:ad3:f3dc:e36d with SMTP id a640c23a62f3a-ad536f28227mr1817056266b.50.1747838272225;
-        Wed, 21 May 2025 07:37:52 -0700 (PDT)
+        bh=mDesXKTayHxGjIGY1j8G0o6g9UGYHXMrYuHHOq5gQRI=;
+        b=Ue3Hj8ovdVjJT3tuN/7uadWK9FWfKbOPRpQNkz/nu4iKdmvyiGqbTTn1U69iL9L9Hg
+         Eu9RxY/xYT+HcMfRtddm0Y2o++i/BrVtO01Go8/hJDxq6DPM4Diyz+MqK9ZMTVal8yQL
+         YoZErkaoQwgiPP0iXPJAGaPhadw+/Ile6hNanQp7KNBsREuT6ecF2gdRXSpclXfORlxc
+         fl6CA0HmBszB0iLy4eul7CXSA7jb0haYuQcK0eHC1A0QrAh4rqmNFGnjkqcTxDwGqpwV
+         VlsYEqZSjiPr0Vq4RawnmheYryRk/NGlwO2mKgHwjiCtzEmju/sB2a+lR/6J9Acs0pOA
+         8gWw==
+X-Forwarded-Encrypted: i=1; AJvYcCXiuTQCDBmYOBX8YH1w0+jCFbjd+pIyLbZJRLKwccBsOOaTSGM6RI5Mrt6cPW7GEOLrOAE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzrfyo215dS+OvBDI23qRNqDZ9azHTd9RA1kJ64YPUB0Zaanulx
+	DkYd+3D8iUX8YVqtXI7ClqrcOVonCAn+PYjSH0LTiXp2XZ0Fsg93zkRpL/0v9LCAHse8PspBZlR
+	8gqdgSn+tgoi8iY279ljz0GeGIXQErrL+kLm8rLgyxWqU1fRKlezdRQ==
+X-Gm-Gg: ASbGncu4ea82KhVXToH2vXif9FOSqtb6b2dvLG6L9MF2l/Tc97gR9G7b3K7kKAvXwLn
+	d36TxfBLPn6NXr25EKw1IPGsHHYwCfnlyYofX01zHnkggq8+gT/qMjWiv0k+mLIGQK9ol9JkkPg
+	Dh4enyQ8mXdCDuUhZKl6ElSkxHwfratOb3rp2b62syUn/SlEJwrFItRlc5NAu6yNG8TBoXEW0k6
+	VfgJKaaIjnmpc+C5TNvB+vXVwGbyF5pjqciajPkDewO0WDEn7oKwH9Pq7TLc32gY4swhxQA8dp/
+	ftmLH7jL5YlO7hnRHXCLFk4xmqlRhK93Ar0y9NewDL0lKvW6Ide4jLi2MP2z
+X-Received: by 2002:a17:907:e916:b0:ace:c59c:1b00 with SMTP id a640c23a62f3a-ad52d42dc34mr1768466466b.5.1747838500576;
+        Wed, 21 May 2025 07:41:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE66RxXKL2W6d/q5voawNHWMt+eYxa0BkwW3PNFANgomMqz2eIeLzBYh2MlVa3aFRZzUSRf1g==
+X-Received: by 2002:a17:907:e916:b0:ace:c59c:1b00 with SMTP id a640c23a62f3a-ad52d42dc34mr1768463566b.5.1747838499992;
+        Wed, 21 May 2025 07:41:39 -0700 (PDT)
 Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d4967c9sm908215766b.129.2025.05.21.07.37.50
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d06dfa4sm914996266b.57.2025.05.21.07.41.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 07:37:51 -0700 (PDT)
-Date: Wed, 21 May 2025 16:37:49 +0200
+        Wed, 21 May 2025 07:41:39 -0700 (PDT)
+Date: Wed, 21 May 2025 16:41:34 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Michal Luczaj <mhal@rbox.co>
 Cc: "David S. Miller" <davem@davemloft.net>, 
@@ -88,11 +88,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
 	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/5] vsock: Move lingering logic to af_vsock
- core
-Message-ID: <iotcme6uict3ny5eztqmrkp2odewv35vtbv2x5hmpyd3rjjrlc@tcv5gf5motsm>
+Subject: Re: [PATCH net-next v5 4/5] vsock/test: Introduce enable_so_linger()
+ helper
+Message-ID: <3uci6mlihjdst7iksimvsabnjggwpgskbhxz2262pmwdnrq3lx@v2dz7lsvpxew>
 References: <20250521-vsock-linger-v5-0-94827860d1d6@rbox.co>
- <20250521-vsock-linger-v5-2-94827860d1d6@rbox.co>
+ <20250521-vsock-linger-v5-4-94827860d1d6@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -101,130 +101,100 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250521-vsock-linger-v5-2-94827860d1d6@rbox.co>
+In-Reply-To: <20250521-vsock-linger-v5-4-94827860d1d6@rbox.co>
 
-On Wed, May 21, 2025 at 12:55:20AM +0200, Michal Luczaj wrote:
->Lingering should be transport-independent in the long run. In preparation
->for supporting other transports, as well as the linger on shutdown(), move
->code to core.
+On Wed, May 21, 2025 at 12:55:22AM +0200, Michal Luczaj wrote:
+>Add a helper function that sets SO_LINGER. Adapt the caller.
 >
->Generalize by querying vsock_transport::unsent_bytes(), guard against the
->callback being unimplemented. Do not pass sk_lingertime explicitly. Pull
->SOCK_LINGER check into vsock_linger().
->
->Flatten the function. Remove the nested block by inverting the condition:
->return early on !timeout.
->
->Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
 >Signed-off-by: Michal Luczaj <mhal@rbox.co>
 >---
-> include/net/af_vsock.h                  |  1 +
-> net/vmw_vsock/af_vsock.c                | 33 +++++++++++++++++++++++++++++++++
-> net/vmw_vsock/virtio_transport_common.c | 23 ++---------------------
-> 3 files changed, 36 insertions(+), 21 deletions(-)
-
-LGTM!
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
+> tools/testing/vsock/util.c       | 13 +++++++++++++
+> tools/testing/vsock/util.h       |  4 ++++
+> tools/testing/vsock/vsock_test.c | 10 +---------
+> 3 files changed, 18 insertions(+), 9 deletions(-)
 >
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 9e85424c834353d016a527070dd62e15ff3bfce1..d56e6e135158939087d060dfcf65d3fdaea53bf3 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -221,6 +221,7 @@ void vsock_for_each_connected_socket(struct vsock_transport *transport,
-> 				     void (*fn)(struct sock *sk));
-> int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk);
-> bool vsock_find_cid(unsigned int cid);
->+void vsock_linger(struct sock *sk);
->
-> /**** TAP ****/
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index fc6afbc8d6806a4d98c66abc3af4bd139c583b08..2e7a3034e965db30b6ee295370d866e6d8b1c341 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1013,6 +1013,39 @@ static int vsock_getname(struct socket *sock,
-> 	return err;
+>diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>index 120277be14ab2f58e0350adcdd56fc18861399c9..41b47f7deadcda68fddc2b22a6d9bb7847cc0a14 100644
+>--- a/tools/testing/vsock/util.c
+>+++ b/tools/testing/vsock/util.c
+>@@ -823,3 +823,16 @@ void enable_so_zerocopy_check(int fd)
+> 	setsockopt_int_check(fd, SOL_SOCKET, SO_ZEROCOPY, 1,
+> 			     "setsockopt SO_ZEROCOPY");
 > }
->
->+void vsock_linger(struct sock *sk)
+>+
+>+void enable_so_linger(int fd)
 >+{
->+	DEFINE_WAIT_FUNC(wait, woken_wake_function);
->+	ssize_t (*unsent)(struct vsock_sock *vsk);
->+	struct vsock_sock *vsk = vsock_sk(sk);
->+	long timeout;
+>+	struct linger optval = {
+>+		.l_onoff = 1,
+>+		.l_linger = LINGER_TIMEOUT
+>+	};
 >+
->+	if (!sock_flag(sk, SOCK_LINGER))
->+		return;
->+
->+	timeout = sk->sk_lingertime;
->+	if (!timeout)
->+		return;
->+
->+	/* Transports must implement `unsent_bytes` if they want to support
->+	 * SOCK_LINGER through `vsock_linger()` since we use it to check when
->+	 * the socket can be closed.
->+	 */
->+	unsent = vsk->transport->unsent_bytes;
->+	if (!unsent)
->+		return;
->+
->+	add_wait_queue(sk_sleep(sk), &wait);
->+
->+	do {
->+		if (sk_wait_event(sk, &timeout, unsent(vsk) == 0, &wait))
->+			break;
->+	} while (!signal_pending(current) && timeout);
->+
->+	remove_wait_queue(sk_sleep(sk), &wait);
+>+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
+>+		perror("setsockopt(SO_LINGER)");
+>+		exit(EXIT_FAILURE);
+>+	}
 >+}
->+EXPORT_SYMBOL_GPL(vsock_linger);
+>diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+>index e307f0d4f6940e984b84a95fd0d57598e7c4e35f..1b3d8eb2c4b3c41c9007584177455c4fa442334c 100644
+>--- a/tools/testing/vsock/util.h
+>+++ b/tools/testing/vsock/util.h
+>@@ -14,6 +14,9 @@ enum test_mode {
+>
+> #define DEFAULT_PEER_PORT	1234
+>
+>+/* Half of the default to not risk timing out the control channel */
+>+#define LINGER_TIMEOUT		(TIMEOUT / 2)
 >+
-> static int vsock_shutdown(struct socket *sock, int mode)
+> /* Test runner options */
+> struct test_opts {
+> 	enum test_mode mode;
+>@@ -80,4 +83,5 @@ void setsockopt_int_check(int fd, int level, int optname, int val,
+> void setsockopt_timeval_check(int fd, int level, int optname,
+> 			      struct timeval val, char const *errmsg);
+> void enable_so_zerocopy_check(int fd);
+>+void enable_so_linger(int fd);
+> #endif /* UTIL_H */
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 4c2c94151070d54d1ed6e6af5a6de0b262a0206e..f401c6a79495bc7fda97012e5bfeabec7dbfb60a 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1813,10 +1813,6 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
+>
+> static void test_stream_linger_client(const struct test_opts *opts)
 > {
-> 	int err;
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index f2f1b166731b1bf2baa3db2854de19aa331128ea..7897fd970dd867bd2c97a2147e3a5c853fb514af 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -1191,25 +1191,6 @@ static void virtio_transport_remove_sock(struct vsock_sock *vsk)
-> 	vsock_remove_sock(vsk);
+>-	struct linger optval = {
+>-		.l_onoff = 1,
+>-		.l_linger = 1
+
+So, we are changing the timeout from 1 to 5, right?
+Should we mention in the commit description?
+
+>-	};
+> 	int fd;
+>
+> 	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+>@@ -1825,11 +1821,7 @@ static void test_stream_linger_client(const struct test_opts *opts)
+> 		exit(EXIT_FAILURE);
+> 	}
+>
+>-	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
+>-		perror("setsockopt(SO_LINGER)");
+>-		exit(EXIT_FAILURE);
+>-	}
+>-
+>+	enable_so_linger(fd);
+
+If you need to resend, I'd pass the timeout as parameter, so the test
+can use whatever they want.
+
+The rest LGTM.
+
+Thanks,
+Stefano
+
+> 	close(fd);
 > }
 >
->-static void virtio_transport_wait_close(struct sock *sk, long timeout)
->-{
->-	if (timeout) {
->-		DEFINE_WAIT_FUNC(wait, woken_wake_function);
->-		struct vsock_sock *vsk = vsock_sk(sk);
->-
->-		add_wait_queue(sk_sleep(sk), &wait);
->-
->-		do {
->-			if (sk_wait_event(sk, &timeout,
->-					  virtio_transport_unsent_bytes(vsk) == 0,
->-					  &wait))
->-				break;
->-		} while (!signal_pending(current) && timeout);
->-
->-		remove_wait_queue(sk_sleep(sk), &wait);
->-	}
->-}
->-
-> static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
-> 					       bool cancel_timeout)
-> {
->@@ -1279,8 +1260,8 @@ static bool virtio_transport_close(struct vsock_sock *vsk)
-> 	if ((sk->sk_shutdown & SHUTDOWN_MASK) != SHUTDOWN_MASK)
-> 		(void)virtio_transport_shutdown(vsk, SHUTDOWN_MASK);
->
->-	if (sock_flag(sk, SOCK_LINGER) && !(current->flags & PF_EXITING))
->-		virtio_transport_wait_close(sk, sk->sk_lingertime);
->+	if (!(current->flags & PF_EXITING))
->+		vsock_linger(sk);
->
-> 	if (sock_flag(sk, SOCK_DONE)) {
-> 		return true;
 >
 >-- 
 >2.49.0
