@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-47238-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47239-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72AD4ABED75
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 10:02:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3E7AABED7F
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 10:04:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F533163ACE
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 08:02:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5663B16F72C
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 08:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73AB2356BE;
-	Wed, 21 May 2025 08:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EE02367BC;
+	Wed, 21 May 2025 08:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yf4328Bw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g3VB0gHn"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6FB1DC9A3
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 08:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007402367A6
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 08:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747814541; cv=none; b=r3pFK9H0UGqxpJJdJ2G9d9GwXL+wliH3J670u9+v6Ju13hhgwdg/TSOJ1hgtSmb7zbEej1N0oij+t0Ibxkr5/vX8geuUzAWuXimMGsjzZsfv1ncsRIogmZjxu2W12TVvdyQLKBG/sJRuhZVZQrl8zXyXTNKAghG0m6wJg2Z+FDk=
+	t=1747814679; cv=none; b=OJqutNcXHd+axnlwVJuCEn8KoJzTNsO2tjNLDGEs4nbvWGgpL8/zxiaIiDHSzWVywXIgLnd3lQMQFxQwRS4xZkeu4USUNuPAMtC6oE/PWH6t8x0rfpuC5T7wo5lowIKyzLgpklvkU8rJVEq+Pb85UQMZulp2WI4vqIih4F6IuFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747814541; c=relaxed/simple;
-	bh=PyVXMfStWqCpLuqw7nBtf0D03dIQE4bCtdUiqNCRoDU=;
+	s=arc-20240116; t=1747814679; c=relaxed/simple;
+	bh=zNKXfchCg+Fj0Yv+AW+0em9S5bOI8DdqTGzO1DyDBeo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gwJe3w+sDkmAVA2h2Qvdwjq6fccqItwb0vvfPLF59mI/UzW4AKB6l/iq+RGkQU2d5PbHAgEObTBrMV4OruTbflLEdzLjMyIrffHAwPMP1UDKx6GuMvxDgjbejC8CwyqlJ+EfbhhrH4ZVUe/3nMLWcX85OcWzFWuu65ATx3VGikY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yf4328Bw; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=WxzBqnQvwBTn88h9Bqbub20dkFHgqj+dOTzu01fSJl0En9L2mGfzEfQ1Y+bSzKSKcQam5EJuhaFqs3Df8faeyOqvj2Oo2VUMBechOZvT3+bN9oS6br8JaitMAA3NNkBMa0BPljCWlNcwsaqizM4T7wDqqJBd5qhmu32dvnXnrw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g3VB0gHn; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747814538;
+	s=mimecast20190719; t=1747814676;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3xHfs293Qivl8FVlWFwMlBweZx9i7kXvtN0753eauSU=;
-	b=Yf4328BwgZoMSZ4NFsJD+7XP/NUIKTAC+Z+82Lta6UqGNBCe6fhyLppd4Zjb1kTYOKNTXI
-	rILb2gqGt7hrDfOau/HxzGNClZKsE4XQPpMQBg8K5tJBjKBSsvFzyoWbylg/75f1mkpIO/
-	lZ1cBZ8YwbbhZD8bu4WTRRsUDAcHjqY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=5MQkatbSq59Hq1aAxd8Kb1/0Y7cTgKXSUnnjVnQplpA=;
+	b=g3VB0gHn/CeYDPeP3Xnkeb6C48SA1362iIDvFhTI/ggV4iNwP8OIV1O1WAKop5w91z+wdJ
+	Hn3Y7+YGrSopnSbiOXH8iHbjg7vcMzUhVIns1TcpIqfgXG9ycmiSqDQcPQKYA3eVcK1XSs
+	zkYMFm5x5wxi6pIMjlJeyMchespKlZ8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-270-KpIhDqRkMSmwT9sxqilo1A-1; Wed, 21 May 2025 04:02:16 -0400
-X-MC-Unique: KpIhDqRkMSmwT9sxqilo1A-1
-X-Mimecast-MFC-AGG-ID: KpIhDqRkMSmwT9sxqilo1A_1747814535
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-442dc6f0138so35824985e9.0
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 01:02:15 -0700 (PDT)
+ us-mta-637-tFDBVch4PjiGATYouhtxZA-1; Wed, 21 May 2025 04:04:35 -0400
+X-MC-Unique: tFDBVch4PjiGATYouhtxZA-1
+X-Mimecast-MFC-AGG-ID: tFDBVch4PjiGATYouhtxZA_1747814674
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a379218f6cso839348f8f.0
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 01:04:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747814535; x=1748419335;
+        d=1e100.net; s=20230601; t=1747814674; x=1748419474;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=3xHfs293Qivl8FVlWFwMlBweZx9i7kXvtN0753eauSU=;
-        b=pIVutIZz19PvdEZRyJCqbTvlq5rTbMzoJ+zx8HkrOoFSTOTXZWseFMz47qfTPU3YpJ
-         gEGnbVDI/jvcqERK1uD29xbu+Wc0J2MjjjKwalpOlSdvV3iwUcXNbNb3oLfYdbhNopPK
-         Zs+KC5V4NlCuQhzex9pXvQx+EoScCr+mihiUkNG9g11CAezrI1iLAPWvp211HKpwVXXI
-         uqH1V4luY7q+L2DgvqGwv+zIskZ8VXXosyLSZPEcBhG0jTpF3zbcIuI3oLYOyyu08fT1
-         TjcDJ0fowR4ycClxn/fVwzy9hhBOQX5E9d7ychPVWNkyu9Yzj6Wspdgl3xVHF6gh+IT9
-         mRjA==
-X-Forwarded-Encrypted: i=1; AJvYcCVHd0XGW0MPB17oXVJ7FCpRgA+ppfgh23/4uu714X2n3J5LSj5B8hkyipJ6BzHvXyMOB64=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIA82MNMHySR0U343TpCvD0xAmWcFydsMDDqItkNuW78yBCGzw
-	oPRj8ARXoJY7HCxG+OG4q4gt1zoiN9tDx7vzz/GpFqrCPIlufS+kErGFBkhE6V8OqFnHM6ROMOK
-	5LtqU6kzAiShAVKy3DYPD9cOiaAOHsPKSQVWwfNu8Wntn+Ek0ltLq5g==
-X-Gm-Gg: ASbGncvtvKNQaIxHabQJExdfhxfM+m6sCLKDG2WYbhqL5mf39WBG/jZ+iiFynUf0LV4
-	+2cEqBOoB15BlmgCaTA1YXhUUd68PUFp/r+m/9M5Z6KwQFKKJtkRtR5gk/V4prKM8Lcf3n7wn3X
-	XNMe1W2aaP1mcfvRT2xyaLJfdDmuA/PaNMjQ1TFPooCZ2Zwpf6k2Gwl/2J3xvueAAVUDrf/aXUD
-	YZIwfiYuH31K2DBcwIzonTs7sCimYqogAwwwPereMT5shD8gdM1u2CMf5HXLewCbxuDhHK6nxUf
-	VoL3dZorRw4b0cLNhHjLYbx0rhI/oSrQv0ySuaioHqBmhXYlatWFnRy0jy/CTH1HPwBA0nlqWKi
-	kxnBfMsXzbAs4AMrxjiYVYIYyOHSSSJVjJJOXVYo=
-X-Received: by 2002:a05:6000:1ac6:b0:3a3:6ab0:8839 with SMTP id ffacd0b85a97d-3a36ab08a62mr11391481f8f.50.1747814534324;
-        Wed, 21 May 2025 01:02:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE+zirtB3bHbsGqyQPE4c1+EzhCT5ukH1B551uJMNhWL/IotOCAJdAxO2khFX8vPJ4iKONKWQ==
-X-Received: by 2002:a05:6000:1ac6:b0:3a3:6ab0:8839 with SMTP id ffacd0b85a97d-3a36ab08a62mr11391336f8f.50.1747814533011;
-        Wed, 21 May 2025 01:02:13 -0700 (PDT)
+        bh=5MQkatbSq59Hq1aAxd8Kb1/0Y7cTgKXSUnnjVnQplpA=;
+        b=EXhKRFQooeHVGUBFVQKeeBPvNMbIl7umQZGWeBPJafZaa4CprN9xnNFVv+FeC9uT8K
+         wT7emeyjrHbUg8/uttX/v3P+cp74/FlEbIcXa3y9JeMEnyzr0pA6UdG/5tIsdWdt6g1p
+         r4dfryo6KENXiFPj4V4h2PHT6firkg6w656g2cO5VNkqanz2RWwqh7wkcAgoYb07JPR9
+         idPBmSX3gtnRSM2mJvjGD/B/7CnFLeIrZM5tql1rm5y4sRpLWG8ol7TOqnqTKb88gm+O
+         nxKHem/YyAvdBEd2t7e586JrLE6oTMpM2gWOeHJxwlFINEXNxjpQXFCxcTpO15q0ypRl
+         VR2g==
+X-Forwarded-Encrypted: i=1; AJvYcCWvx6tG10XFOWXx4Urftkg6ky4LzWH17FerF9N744QDrdi2zLk5avFDSCWMbmaRyPCZLgQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxvd5DMVw8VHFRo9KzDNp49AlFaBHMNBvSC3kfwjEGjYXku2ikc
+	PYmsodoK2NFuaOQviEtvS5QECjCuiMtJB1Gk5HblGhlsLS0sdGDztOuSOViGK8+ELkgPlZCnR2Q
+	kFujnSzBNF7WCpPCsxRc9M/RHRWEx8sQS8JrfPmiHxqvv8PjuWQjx9Q==
+X-Gm-Gg: ASbGnctU+p8a3No91HX7rRTrOoGHNMQiddMU22W8rTJuONE/NwagLWq8DS1fWFVFSDn
+	yAb3ZHmkCi5XeGDIqCVPbdtM8qH7eUAVlCjmCaQM3Mr8/oB+xQLqb5uoGa9SaNiuIg4E1xQ/Ye0
+	GMTh54TAfb2s52YTROC4RjZz7+tZVTc+dqU9mIeB8DVqAqDfwKM8vwojKYyH90c0V4336HDWXqG
+	sZlVRjTFLCybJl6xeagp1HIEb74SlNfLV5ykf3+4b0ORGRtPSQX/kA7EtWtH2tHrxDuuZYsyCAP
+	VWwi4J2IxVKj4EYxkRdSS/N4qLkTc2LvkjOx72Y1eOCsLtgDm1kaHmyhPmM+PFZ9t2ah81tyL5Z
+	ClkHMNVd66SX3U60Wsmn87gxZyUhBjf6IOp449Ok=
+X-Received: by 2002:a05:6000:2306:b0:3a3:6a3f:bc5d with SMTP id ffacd0b85a97d-3a36a3fbdfcmr11584024f8f.1.1747814674327;
+        Wed, 21 May 2025 01:04:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHmnsxYTTDMbLHWYNst4ekZ+8J/GNbwLNU27qz+miwFXAcz4L5MCR40kU1t8uwMKwC84cZwjw==
+X-Received: by 2002:a05:6000:2306:b0:3a3:6a3f:bc5d with SMTP id ffacd0b85a97d-3a36a3fbdfcmr11583944f8f.1.1747814673785;
+        Wed, 21 May 2025 01:04:33 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f25:9c00:e2c7:6eb5:8a51:1c60? (p200300d82f259c00e2c76eb58a511c60.dip0.t-ipconnect.de. [2003:d8:2f25:9c00:e2c7:6eb5:8a51:1c60])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f73d3edcsm61605455e9.20.2025.05.21.01.02.10
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f3dd94f1sm62076685e9.35.2025.05.21.01.04.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 May 2025 01:02:12 -0700 (PDT)
-Message-ID: <3c3dd80e-9884-4623-8d38-89a1f493443b@redhat.com>
-Date: Wed, 21 May 2025 10:02:09 +0200
+        Wed, 21 May 2025 01:04:33 -0700 (PDT)
+Message-ID: <8d6eb79a-a68d-4116-bb42-ed18b0a0d37d@redhat.com>
+Date: Wed, 21 May 2025 10:04:30 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,7 +90,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 12/17] KVM: arm64: Rename variables in user_mem_abort()
+Subject: Re: [PATCH v9 13/17] KVM: arm64: Handle guest_memfd()-backed guest
+ page faults
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -114,7 +115,7 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
  ira.weiny@intel.com
 References: <20250513163438.3942405-1-tabba@google.com>
- <20250513163438.3942405-13-tabba@google.com>
+ <20250513163438.3942405-14-tabba@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -162,20 +163,37 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250513163438.3942405-13-tabba@google.com>
+In-Reply-To: <20250513163438.3942405-14-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 13.05.25 18:34, Fuad Tabba wrote:
-> Guest memory can be backed by guest_memfd or by anonymous memory. Rename
-> vma_shift to page_shift and vma_pagesize to page_size to ease
-> readability in subsequent patches.
+> Add arm64 support for handling guest page faults on guest_memfd
+> backed memslots.
 > 
-> Suggested-by: James Houghton <jthoughton@google.com>
+> For now, the fault granule is restricted to PAGE_SIZE.
+> 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+[...]
+
+> +	if (!is_gmem) {
+
+Should we add a comment somewhere, stating that we don't support VMs 
+with private memory, so if we have a gmem, all faults are routed through 
+that?
+
+> +		mmap_read_lock(current->mm);
+> +		vma = vma_lookup(current->mm, hva);
+> +		if (unlikely(!vma)) {
+> +			kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
+> +			mmap_read_unlock(current->mm);
+> +			return -EFAULT;
+> +		}
+> +
+> +		vfio_allow_any_uc = vma->vm_flags & VM_ALLOW_ANY_UNCACHED;
+> +		mte_allowed = kvm_vma_mte_allowed(vma);
 
 -- 
 Cheers,
