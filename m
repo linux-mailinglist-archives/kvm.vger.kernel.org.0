@@ -1,136 +1,281 @@
-Return-Path: <kvm+bounces-47304-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47305-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7538ABFCB4
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 20:19:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64133ABFCD5
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 20:28:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11FF67A5AD2
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 18:18:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04B321760D2
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 18:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9A028ECEE;
-	Wed, 21 May 2025 18:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41BA28ECFB;
+	Wed, 21 May 2025 18:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ei3xO6w+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uGqykEn0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323D71E3DED
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 18:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335C927CB0D
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 18:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747851565; cv=none; b=ivCBhAzvP1RkX0Gt76nbkz0uhnwn4rsU1OQ+jj1LmJ4BlDoEqFnk/CN1rhFOBB9vA2K1Zm79Cvz0WUXOg+80eRI7zz/EoS6i5CKIs8eRbL9tuxWLKQB59Icmx6wR3EcLYC0sELFpoAXkbwBPVr5omLkA+N0d01u852rXj3ndAQ0=
+	t=1747852119; cv=none; b=brOvfm6pmCJRWuSovFFAgM5SMwnNnnNGcq2CcAiBN+8FK6g7s3u/rF96wFc2Iztpn5ofquMFw5Nb0SAWpw58rKC7wSh2vE5uH3JPaodufnnjkHcVsRIH+I5XXKFHQRIsLzFZixoh//lsoFvsASNmswyJqgRpRN43+XgvgP7Ao/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747851565; c=relaxed/simple;
-	bh=hNOCCsT7WfpiM1b/accfoXI44kJhoT550SBK2E3F0tM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DUJdWkeryfgeFCjH2jdLxcxgqrAgwhmQ6QDZHC4lAIkcduiN5nnQFwMWKj0aIwWrnpiG4ElvplcPI2fTyCnGnLxfQGVBsKzJHfYQKzwYuMDvev8cbVuF3YHoFrma9qjnaEZNJILb3jAg686V/c7n/G7k3qqmgwicpliOzshpNsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ei3xO6w+; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1747852119; c=relaxed/simple;
+	bh=Q4DTrgnzbZNV6UVIr8mJmj9kPEgmhtAOJivglIuEklM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tuu1Lt5WUPoBkDMStKk6NQ03YLq2AbnV+bCNxi0oPk0HVB9UQa0qyz+H5uM5l1mg+XfXegYGKYWDwmA8+vtXqHLynvyWJWgZ/F+ovrV7rd/pGnvO1JPrJhNSQjZsXc9vT8B3VoewDsH5zTzrWh3tAy5q7yi9N3vFZe+b11aOIEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uGqykEn0; arc=none smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2320ffaa4a9so70889935ad.2
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 11:19:21 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-48b7747f881so1573631cf.1
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 11:28:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747851561; x=1748456361; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EpmXi2p97nfKGtbYPsKrqYABLynLWTxDiX5+ukiqgG4=;
-        b=Ei3xO6w+KBdY1VJlYqibocHC+FO477mHl8m86z1QQWmWf2/OQjvrktvHdX0YrA/kQU
-         w3tKexUyTeg0rwk1qBHLD8ZCvWuWMl692b0xVOdX8wKTJlDhG1HG9781NiXn+nyXG3dc
-         R/mBgjKnicelO5NgDT+pGpFUnoUoIDxcgkHbnUJbwZd0iaY4kJHQkJJ8tCxUE/kQ/2k9
-         RxkE2YAuWGf1JEkEpOCKR9Zc0liCGy/KVZ7Xs2KNlB9pmBepGRuuNINNauruUHSm3N51
-         1soSl4WdCLB50Pm/kt7C5jjxxepx+z6jh6nmPSRTsIclAIB0H7uQir1UUwrsCv+D+ThD
-         C8UQ==
+        d=google.com; s=20230601; t=1747852117; x=1748456917; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KE+TGfgZP6vAxjKudjK+avRjPu3u2b6Qn6vlewX0Zww=;
+        b=uGqykEn0p/a/1VSksCpeA22cCceGsV47smVUgAJ+/Uf0464Has8qdvDl5JE6EZROwa
+         usFeY2UIHaATjVCeu9QZPnuiJWKiiIJjfvOZ+RsJVITVz1CAJx/8L+Iw3mOFrBUoI0Vd
+         rKsCb/1VAJ/YljsdJo7Ec2bFPIkLqdXfsmtfhPocdSttwtQtdzYgSLnZMGGARqXnGQeh
+         TUAZ/6v9nDWb3BaYRCwiOTV6c1v0WaAE/CbdxqNgxnnggQ20+p0smdtdESKToWiVwzjU
+         M/CTU8IoBhEK47M4jtGwgCHTrs5KliUEZYzBqxV7CnfCpv6F4i4TnAgkjZjk0/yACL8P
+         oW5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747851561; x=1748456361;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EpmXi2p97nfKGtbYPsKrqYABLynLWTxDiX5+ukiqgG4=;
-        b=n7HtN6xTcJOKaMopjzxOMmeXa473cxJaTcsbhMGHutjwlioRcoO1hD5W6ZSENCigqW
-         ABRVgunScYPHKtF09yUzfBLfUC+TWyMND4Vf9lznvwhXKpZSCn4bj3F7cv1/L9bFp9t+
-         2QkXZHhmxPytJt36zqZwuO4LvIs9xKsk10hUcaF+FErKkChSqNjS62pA4GSs5PXlER3r
-         SgG+dd1PASW+sHHyCBFsRA5wYI8or8pSXDKONDvla2A42dGFxgbzHQbEz5Ms7YrAQzEQ
-         gejmJU1jsp0C2Lhzv2EM5jKbegM9DscxCLdzZfeQc+eEhM76vbX9wO9cGvaw/Yy6oMMB
-         3RcA==
-X-Gm-Message-State: AOJu0YyfEOEgn2racXm1zCwQrMxFOCVKeKZq9L0NgoSsL1PKbIXm2ja2
-	qmki2z1L3YJ6ulXBwxMMLd4zaFp+5hLjpC7wDgzyCtnCIjnJba+B/A1sA+j7clOCiVOJtsgNrM1
-	xXJ53Uw==
-X-Google-Smtp-Source: AGHT+IEVAnp3aJri/4G8yCbjAGvCZIIAYw69WH0s/hXr+QEcz+tLscv1MFZEYlYAAbnwEEtRsZruxVuyc5E=
-X-Received: from plkv11.prod.google.com ([2002:a17:903:1a2b:b0:22e:17e6:898f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1aec:b0:21f:1202:f2f5
- with SMTP id d9443c01a7336-231de351473mr239997055ad.8.1747851561301; Wed, 21
- May 2025 11:19:21 -0700 (PDT)
-Date: Wed, 21 May 2025 11:19:19 -0700
-In-Reply-To: <CAAH4kHai8JStj+=HUiPVxbH9P79GorviG2GykEP7jQ=NB2MbUQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1747852117; x=1748456917;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KE+TGfgZP6vAxjKudjK+avRjPu3u2b6Qn6vlewX0Zww=;
+        b=oYBYjiZSETyWSCNPviCyY58a/ar5xO+aEtzXiPBpP5yIWhWrtCW/NDjr1fu1SdNnXH
+         KQwjo/kPb2x37Ec0+rhehv+YrNwFxIJ/hNUZxGlKivQPNDZIWSWbeTBRoVo1x2ArPTxr
+         foYWwiPHadjC4rMM1H2hm6X3z6+wXCgBPxEnO5ls1sWWdSfO+mpXbr5H9ywW4Xpx2vOl
+         +CURl9LGXXdJr6AP1QNj4DW+tgJWjSgcIYX2aNprC0/Ynd0nnRNOTe8Q3XppmEWi1AuY
+         B2UvNIq0uwS3ZmmOCR9xpX5udTdI54XVdJutSM7XjAdgy8vJImRMjE2a0akVhCUbNwQo
+         +Bxg==
+X-Forwarded-Encrypted: i=1; AJvYcCUeV2/SYrigXSzHrb2gS7SHJev30yJ6kTk8qJRHg5AwGNTor9sWUtyfJtwhMZ7Li14ms7Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDct2jZF6bwFWssjipYjFuWXp24i42KTNmYjCZxR4/V2XbbGB1
+	VGHf4FjEMPpyLkx5m4p41K7Ppc25TgsJFAt39anDCs0PD67+TfChWjhKXZYbYCU4xNHKa0aCssX
+	b4CZUekVETjmAGg7x+aeFwrxHR55VKIkM7GiA4f0J
+X-Gm-Gg: ASbGncvGh8kVdMjnfVYGtinD8S+KBUCGtyMvOdUIRkcmsKNJh4vL0v0j6hHprr6GzQa
+	M8xU0S6Avy1sOFMaKrL0/KcchQwzy4mrkIRkMtQyTxB2/qsjhF3cVPIatP35kcgOuicr60ffnBO
+	/hKOOPb5ar9PtDYlyUbP3sUvHu7oHRO+IgndkszRi35bI=
+X-Google-Smtp-Source: AGHT+IGZid6ZSwp6ECf/sysAwwsVHxmx53LALy1SypT4adky3X6cr5p2m6ZAau9iUxYfvXGZ9udv6VpTLQeFJ9CfCY0=
+X-Received: by 2002:ac8:7d8b:0:b0:49b:72e2:4058 with SMTP id
+ d75a77b69052e-49b72e24109mr5409741cf.11.1747852116701; Wed, 21 May 2025
+ 11:28:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250515220400.1096945-1-dionnaglaze@google.com>
- <20250515220400.1096945-2-dionnaglaze@google.com> <aCZtdN0LhkRqm1Vn@google.com>
- <CAAH4kHai8JStj+=HUiPVxbH9P79GorviG2GykEP7jQ=NB2MbUQ@mail.gmail.com>
-Message-ID: <aC4ZJyRPpX6eLKsC@google.com>
-Subject: Re: [PATCH v5 1/2] kvm: sev: Add SEV-SNP guest request throttling
-From: Sean Christopherson <seanjc@google.com>
-To: Dionna Amalie Glaze <dionnaglaze@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, Thomas Lendacky <Thomas.Lendacky@amd.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <jroedel@suse.de>, Peter Gonda <pgonda@google.com>, 
-	Borislav Petkov <bp@alien8.de>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <CA+EHjTy7iBNBb9DRdtgq8oYmvgykhSNvZL3FrRV4XF90t3XgBg@mail.gmail.com>
+ <CAGtprH_7jSpwF77j1GW8rjSrbtZZ2OW2iGck5=Wk67+VnF9vjQ@mail.gmail.com>
+ <CA+EHjTzMhKCoftfJUuL0WUZW4DdqOHgVDcn0Cmf-0r--8rBdbg@mail.gmail.com>
+ <diqzecwjnk95.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTyY5C1QgkoAqvJ0kHM4nUvKc1e1nQ0Uq+BANtVEnZH90w@mail.gmail.com>
+ <CAGtprH-fE=G923ctBAcq5zFna+2WULhmHDSbXUsZKUrin29b4g@mail.gmail.com>
+ <CA+EHjTxvufYVA8LQWRKEX7zA0gWLQUHVO2LvwKc5JXVu-XAEEA@mail.gmail.com> <CAGtprH_TfKT3oRPCLbh-ojLGXSfOQ2XA39pVhr47gb3ikPtUkw@mail.gmail.com>
+In-Reply-To: <CAGtprH_TfKT3oRPCLbh-ojLGXSfOQ2XA39pVhr47gb3ikPtUkw@mail.gmail.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 21 May 2025 19:27:59 +0100
+X-Gm-Features: AX0GCFvKwIuCerI-UVymdfO2So4kET6He8NY_WhPOEmZF51aoWgYNRN9VC95aCs
+Message-ID: <CA+EHjTxJZ_pb7+chRoZxvkxuib2YjbiHg=_+f4bpRt2xDFNCzQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 16, 2025, Dionna Amalie Glaze wrote:
-> > > @@ -4015,6 +4042,12 @@ static int snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_
-> > >
-> > >       mutex_lock(&sev->guest_req_mutex);
-> > >
-> > > +     if (!__ratelimit(&sev->snp_guest_msg_rs)) {
-> > > +             svm_vmgexit_no_action(svm, SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_BUSY, 0));
-> > > +             ret = 1;
-> > > +             goto out_unlock;
+Hi Vishal,
+
+On Wed, 21 May 2025 at 16:51, Vishal Annapurve <vannapurve@google.com> wrot=
+e:
+>
+> On Wed, May 21, 2025 at 8:22=E2=80=AFAM Fuad Tabba <tabba@google.com> wro=
+te:
 > >
-> > Can you (or anyone) explain what a well-behaved guest will do in in response to
-> > BUSY?  And/or explain why KVM injecting an error into the guest is better than
-> > exiting to userspace.
-> 
-> Ah, I missed this question. The guest is meant to back off and try again
-> after waiting a bit.  This is the behavior added in
-> https://lore.kernel.org/all/20230214164638.1189804-2-dionnaglaze@google.com/
+> > Hi Vishal,
+> >
+> > On Wed, 21 May 2025 at 15:42, Vishal Annapurve <vannapurve@google.com> =
+wrote:
+> > >
+> > > On Wed, May 21, 2025 at 5:36=E2=80=AFAM Fuad Tabba <tabba@google.com>=
+ wrote:
+> > > > ....
+> > > > > When rebooting, the memslots may not yet be bound to the guest_me=
+mfd,
+> > > > > but we want to reset the guest_memfd's to private. If we use
+> > > > > KVM_SET_MEMORY_ATTRIBUTES to convert, we'd be forced to first bin=
+d, then
+> > > > > convert. If we had a direct ioctl, we don't have this restriction=
+.
+> > > > >
+> > > > > If we do the conversion via vcpu_run() we would be forced to hand=
+le
+> > > > > conversions only with a vcpu_run() and only the guest can initiat=
+e a
+> > > > > conversion.
+> > > > >
+> > > > > On a guest boot for TDX, the memory is assumed to be private. If =
+the we
+> > > > > gave it memory set as shared, we'd just have a bunch of
+> > > > > KVM_EXIT_MEMORY_FAULTs that slow down boot. Hence on a guest rebo=
+ot, we
+> > > > > will want to reset the guest memory to private.
+> > > > >
+> > > > > We could say the firmware should reset memory to private on guest
+> > > > > reboot, but we can't force all guests to update firmware.
+> > > >
+> > > > Here is where I disagree. I do think that this is the CoCo guest's
+> > > > responsibility (and by guest I include its firmware) to fix its own
+> > > > state after a reboot. How would the host even know that a guest is
+> > > > rebooting if it's a CoCo guest?
+> > >
+> > > There are a bunch of complexities here, reboot sequence on x86 can be
+> > > triggered using multiple ways that I don't fully understand, but few
+> > > of them include reading/writing to "reset register" in MMIO/PCI confi=
+g
+> > > space that are emulated by the host userspace directly. Host has to
+> > > know when the guest is shutting down to manage it's lifecycle.
+> >
+> > In that case, I think we need to fully understand these complexities
+> > before adding new IOCTLs. It could be that once we understand these
+> > issues, we find that we don't need these IOCTLs. It's hard to justify
+> > adding an IOCTL for something we don't understand.
+> >
+>
+> I don't understand all the ways x86 guest can trigger reboot but I do
+> know that x86 CoCo linux guest kernel triggers reset using MMIO/PCI
+> config register write that is emulated by host userspace.
+>
+> > > x86 CoCo VM firmwares don't support warm/soft reboot and even if it
+> > > does in future, guest kernel can choose a different reboot mechanism.
+> > > So guest reboot needs to be emulated by always starting from scratch.
+> > > This sequence needs initial guest firmware payload to be installed
+> > > into private ranges of guest_memfd.
+> > >
+> > > >
+> > > > Either the host doesn't (or cannot even) know that the guest is
+> > > > rebooting, in which case I don't see how having an IOCTL would help=
+.
+> > >
+> > > Host does know that the guest is rebooting.
+> >
+> > In that case, that (i.e., the host finding out that the guest is
+> > rebooting) could trigger the conversion back to private. No need for
+> > an IOCTL.
+>
+> In the reboot scenarios, it's the host userspace finding out that the
+> guest kernel wants to reboot.
 
-Nice, it's already landed and considered legal VMM behavior.
+How does the host userspace find that out? If the host userspace is
+capable of finding that out, then surely KVM is also capable of
+finding out the same.
 
-> If KVM returns to userspace with an exit type that the guest request was
-> throttled, then what is user space supposed to do with that?
 
-The userspace exit doesn't have to notify userspace that the guest was throttled,
-e.g. KVM could exit on _every_ request and let userspace do its own throttling.
+> >
+> > > > Or somehow the host does know that, i.e., via a hypercall that
+> > > > indicates that. In which case, we could have it so that for that ty=
+pe
+> > > > of VM, we would reconvert its pages to private on a reboot.
+> > >
+> > > This possibly could be solved by resetting the ranges to private when
+> > > binding with a memslot of certain VM type. But then Google also has a
+> > > usecase to support intrahost migration where a live VM and associated
+> > > guest_memfd files are bound to new KVM VM and memslots.
+> > >
+> > > Otherwise, we need an additional contract between userspace/KVM to
+> > > intercept/handle guest_memfd range reset.
+> >
+> > Then this becomes a migration issue to be solved then, not a huge page
+> > support issue. If such IOCTLs are needed for migration, it's too early
+> > to add them now.
+>
+> The guest_memfd ioctl is not needed for migration but to change/reset
+> guest_memfd range attributes. I am saying that migration usecase can
+> conflict with some ways that we can solve resetting guest_memfd range
+> attributes without adding a new IOCTL as migration closely resembles
+> reboot scenario as both of them can/need reusing the same guest memory
+> files but one needs to preserve guest memory state.
+>
+> Reiterating my understanding here, guest memfd ioctl can be used by
+> host userspace to -
+> 1) Change guest memfd range attributes during memory conversion
+>      - This can be handled by KVM hypercall exits in theory as you are
+> suggesting but Ackerley and me are still thinking that this is a
+> memory operation that goes beyond vcpu scope and will involve
+> interaction with IOMMU backend as well, it's cleaner to have a
+> separate guest memfd specific ioctl for this operation as the impact
+> is even beyond KVM.
 
-I have no idea whether or not that's sane/useful, which is why I'm asking.  The
-cover letter, changelog, and documentation are all painfully sparse with respect
-to explaining why *this* uAPI is the right uAPI.
+The IOMMU backend needs to know about the sharing/unsharing, not
+trigger it. The memory is the guest's. We already have a mechanism for
+informing userspace of these kinds of events with KVM exits. This
+doesn't justify adding a new IOCTL.
 
-> It could wait a bit before trying KVM_RUN again, but with the enlightened
-> method, the guest could at least work on other kernel tasks while it waits
-> for its turn to get an attestation report.
+> 2) Reset guest memfd range attributes during guest reboot to allow
+> reusing the same guest memfd files.
+>     - This helps reset the range state to private as needed inline
+> with initial shared/private configuration chosen at the guest memfd
+> creation.
+>     - This also helps reconstitute all the huge pages back to their
+> original state that may have gotten split during the runtime of the
+> guest.
+>   This is a host initiated request for guest memfd memory conversion
+> that we should not be overloading with other KVM interactions in my
+> opinion.
 
-Nothing prevents KVM from providing userspace a way to communicate VMM_ERR_BUSY,
-e.g. as done for KVM_EXIT_SNP_REQ_CERTS:
+Then, we could argue about whether we need a "reset" IOCTL (not that I
+am arguing for that). But still, like I said, if the host becomes
+aware that the confidential guest is rebooting, then surely KVM can be
+made aware.
 
-https://lore.kernel.org/all/20250428195113.392303-2-michael.roth@amd.com
+I wonder if this might be better suited for the biweekly guest_memfd sync.
 
-> Perhaps this is me not understanding the preferred KVM way of doing things.
-
-The only real preference at play is to not end up with uAPI and ABI that doesn't
-fit "everyone's" needs.  It's impossible to fully future-proof KVM's ABI, but we
-can at least perform due diligence to ensure we didn't simply pick the the path
-of least resistance.
-
-The bar gets lowered a tiny bit if we go with a module param (which I think we
-should do), but I'd still like an explanation of why a fairly simple ratelimiting
-mechanism is the best overall approach.
+Cheers,
+/fuad
+> >
+> > Cheers,
+> > /fuad
 
