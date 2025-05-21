@@ -1,304 +1,213 @@
-Return-Path: <kvm+bounces-47285-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47286-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8DD7ABF923
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 17:24:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9FBEABF955
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 17:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA13C4A0253
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 15:24:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F7A99E3FBC
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 15:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2A51DC9B5;
-	Wed, 21 May 2025 15:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5523320E33D;
+	Wed, 21 May 2025 15:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+FCnITc"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y/29+1A0"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB6E1D63DF
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 15:24:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3544C1C8FBA;
+	Wed, 21 May 2025 15:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747841056; cv=none; b=DTFhy4hyRoAUs//3okIeX4BR13GuHdIWMkOqeVQdN1buSIPa7dn3kuBwG6b0tTejTQIxxX1t+EN/eeWqWV/I1T6c5hvNBmCq97Wu1b9dYzOzDyka6m6yQYIzCBIrCD5m2D1wIITMotbwMq7COoJqL1nikdeVKcnDqWTJCPLt76w=
+	t=1747841409; cv=none; b=WlspbWMpbiwFsfVnhkeqAo/lYM8ow9aEJqCNmXLmWJqpjAuk/ubfqAXJoEQvfJWaIyKB4kJVjCNkKkSB1w7j6NukMFu3QnbHZnPDGLAXNkQAvtL+0oehq/pVpO3s01egptz+qkYHgjZGNzsTKWmye5hIiwZUxO0b6qUG3CNb0Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747841056; c=relaxed/simple;
-	bh=7CodgDFGCpMBU+/Bg+diyCYhpTJXE+AvR7xj10i+qZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ok7/VYVp+kf10r4vjmyIx9uoXulV/FOitLtL9+vBuRsnmnEhlfPaJfdZEsRFB6uyBkbTNRGy357iq3yiNXQmd3plveL+kCjC5uOMaK/dpJIg4tWqCNKHc5q9z1Qv0TAQkPwKmBqrj30iMkU9YYeqiJrYjG/VtNhdMp0eXajXioc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H+FCnITc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747841053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8vqJcgtD0m0cV+LRe+RWGRd1MfJDepFj2iZqcJ0qHUQ=;
-	b=H+FCnITc3xVOnmi69/DMoPRxRxdQSIliZq2zXs6HOoeIl0AvxTHtZwKod/4qtjdil/8pOx
-	yr7mW0Et/HbKRmhU/VWdDdbVSRYyxPoBi52wtLUIpZepvgDCjVu6LvyBlDS86V8H/ZJPTN
-	ns8vXlVu3KrTfGNApTvYnCCO1XsW6EY=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-393-UvtWHzEXNYKO5H_cPhT3sQ-1; Wed, 21 May 2025 11:24:11 -0400
-X-MC-Unique: UvtWHzEXNYKO5H_cPhT3sQ-1
-X-Mimecast-MFC-AGG-ID: UvtWHzEXNYKO5H_cPhT3sQ_1747841051
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7c5f3b94827so1114191485a.0
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 08:24:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747841051; x=1748445851;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8vqJcgtD0m0cV+LRe+RWGRd1MfJDepFj2iZqcJ0qHUQ=;
-        b=txDbZjS34/VJ+/gCsM4hU3BcAmXOZysPLKoxBzEj6pEMOsVRZcfaXFvkP2HFVNF5fU
-         1avqMbyTE52UjeirTsq3SN+E915xtJT2+W4u5/6e/5gg04YlhpIhztrKrRceLyblrjOt
-         as7tnhEl8noyyt4tm9iF2MkdLy2ldT16IKyEpIB9oy3flEH20GWzK7HNSCJD7LYfNZAT
-         QugTe8LtIBxRuZj8xaZaVM4SA7mWncbrfOZnIrGq26LhJs8bSy+I8Bol08qtFdcnpRgR
-         8wBvIrkByQ+bZ82TedhMGEMvc4lzZgbSHhVhnaqfXMOfXeKd9XBn5/BZUiLgI7ovDNYi
-         jM+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUwg5Ga+ZNMMRf+IgIHUATl4jDYXbfu5nc196CjZNiIb3KIwFTHN196VWosriPdKWAZawE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwODspgnS68uqq2VAbf2ITLwLBJMLo4LZmL1Kea15ca/ACK6XPz
-	3YHJfxepKKDOnNdL7TR18jXWx1MivGMHBCh+gMwYTjekPc182DL2tXBC3ZpcOCGrSeYxQDb2QRP
-	oGu4DdWYJv/B81vzEK5Q1KONm1fD+jNzjtuKknjixrThKCV8isQDilA==
-X-Gm-Gg: ASbGncvWaavAuxHCYO6rfb4R6tRZPcZNr4RTZpeqQMFZkYK6JvLNLAkXrVt+AWV0sFL
-	OPW8XY78I6+NpjOhJNshX7vVF1HzET5kEF2HW2iDUgWK5EdBmUx56inIo6B6gVXjk28k1/bfmJ+
-	IYj3HKdwNEGsbQdMUcNxUls/5tWEYQJ6jWVRQQhSl4ds6hOStZJDqWCva0iIBGr+8EfEnTvLXio
-	BYMqy1NVccGRz7bue6pthgMhGOWJFoz2NwWiUU2h0UVZoxRYwzyS7cOdV4gH3K/0FVq2+6Hds4n
-	WeY=
-X-Received: by 2002:a05:620a:2994:b0:7c5:3c0a:ab7e with SMTP id af79cd13be357-7cd46707c65mr2827172285a.5.1747841051357;
-        Wed, 21 May 2025 08:24:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGpKCsLZK8fldjDSKpxmr3xZ4LVd50UA3aAZSvoaTqmv4NchFdKg38lljbXixaCEhED3occeQ==
-X-Received: by 2002:a05:620a:2994:b0:7c5:3c0a:ab7e with SMTP id af79cd13be357-7cd46707c65mr2827169685a.5.1747841050957;
-        Wed, 21 May 2025 08:24:10 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cd468cc782sm886213785a.101.2025.05.21.08.24.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 08:24:10 -0700 (PDT)
-Date: Wed, 21 May 2025 11:24:07 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Yan Zhao <yan.y.zhao@intel.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Binbin Wu <binbin.wu@linux.intel.com>,
-	James Houghton <jthoughton@google.com>,
-	Pankaj Gupta <pankaj.gupta@amd.com>
-Subject: Re: [PATCH v3 0/6]  KVM: Dirty ring fixes and cleanups
-Message-ID: <aC3wFwFwFbLlsIft@x1.local>
-References: <20250516213540.2546077-1-seanjc@google.com>
- <aCzUIsn1ZF2lEOJ-@x1.local>
- <aC0NMJIeqlgvq0yL@google.com>
- <aC0VlENyfE9ewuTF@x1.local>
- <aC3oIjkivS2KqKZH@google.com>
+	s=arc-20240116; t=1747841409; c=relaxed/simple;
+	bh=NQVCx8DJz037xdWpUV0+yuxLoft+Vhs4PizmnZq9jk4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=maWFYU95PnRUk0zEERY1VrMohSKaYv3KEOtpryaq7EPS0oeSAJsGd1KxhTlOvhbApkQ7adT7i7LgBv/GL45q3D6lcSyZSB5wpiUaAfMg0DTESwKEH+/Bjn8nL6f+Nx4EnVu/LflsajrHP7uuDL2xzyITnUlbxNkDWslGa9/DtYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Y/29+1A0; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54L6pkip012333;
+	Wed, 21 May 2025 15:30:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=7o0zDT
+	0xvFwHifzeTcpK9xCazj7EiT7zPfeAlLbli7k=; b=Y/29+1A0eOLPcOLFBl0AIt
+	7LkIeiaVuPZz1OcEQB5QLqgak9WxiCfJN0/NJ16gTyZdwIslY7ZFvVYgLc04r5jH
+	fAT/oawMVRHurRLvaqrlPF/almLHe+LIKk1DMRzFWHuv+e28UEGreHVlxVWmrlTj
+	tXuP3llmt8uh7RGSpDU9SW3PQ8DA/Uud7qxabGFkcQdrVimr984r8B9zmbG1vicP
+	qR9LTYg7s1/nfyo/mdc5MWQTOOj4C+0tvh3wtbFXH2DmkhDGAdUKXu0DCuDXv/iS
+	b/ccXNIM2uYj82ejo8ROAJU4lV5VXCYBzSct4YbbVEjRSSCIZs6dkM6FdE5LxvGg
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46rye6mx5k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 May 2025 15:30:04 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54LDlwXM032087;
+	Wed, 21 May 2025 15:30:03 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 46rwnmct4y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 May 2025 15:30:03 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54LFU0Fq57671946
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 21 May 2025 15:30:00 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E7E0E20049;
+	Wed, 21 May 2025 15:29:59 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 89B9B20040;
+	Wed, 21 May 2025 15:29:59 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.152.224.80])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 21 May 2025 15:29:59 +0000 (GMT)
+Message-ID: <d495d17902955839b0d7d092334b47efbdcb55a1.camel@linux.ibm.com>
+Subject: Re: [PATCH v1 4/5] KVM: s390: refactor and split some gmap helpers
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        david@redhat.com, hca@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, gor@linux.ibm.com
+Date: Wed, 21 May 2025 17:30:00 +0200
+In-Reply-To: <20250521171930.2edaaa8a@p-imbrenda>
+References: <20250514163855.124471-1-imbrenda@linux.ibm.com>
+		<20250514163855.124471-5-imbrenda@linux.ibm.com>
+		<277aa125e8edaf55e82ca66a15b26eee6ba3320b.camel@linux.ibm.com>
+	 <20250521171930.2edaaa8a@p-imbrenda>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aC3oIjkivS2KqKZH@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIxMDE0NyBTYWx0ZWRfX/gOQ6auqfxAV P3lAo1ofiZ4ufJ/K2VNmuUjDCkhHqw9oLIaicQFMgY519V3vGUepnvPF5+qAlWQ8genMUKT7Qv6 GijfH10brSXOItj62Sw+UGjwyWxmaRsYmD8CcOdce2zDOIRH2B+7XUP9C09TZ0r2dmn0GFW7rza
+ Tz+G+PJp2QGrMxZSj5zMBp4q7Nh8oH3XSZxbIf4wy8s6jPFCMjx1YGHr0XHhR9eppiA4Y4nzEVl EwLA9SU69HRdIICcHekYyeZRyLfAxFNWAZBWTLRkqYtQfjYalsHhIe7AiSNLcygPI0ySf8kr4c/ JpK/cXbpkpgS6WzffKvOjgLCOc8RGaISOrhzCLfipmFxPy6Jk64m0LAkXhqwWFibFFYWgRyeu79
+ 2hsoC0cn38ZID3wSHkYvTwnXJsVV170D/ZFNpO4ooSqFZPCsUUteycLq2lDYApwJLRmcth+b
+X-Authority-Analysis: v=2.4 cv=esrfzppX c=1 sm=1 tr=0 ts=682df17c cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=UkI2F8NoeH3bRX2lVokA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: c5A_8-G_TcL3NhptZE7JwpUPQ9FFjjkj
+X-Proofpoint-GUID: c5A_8-G_TcL3NhptZE7JwpUPQ9FFjjkj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-21_04,2025-05-20_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ lowpriorityscore=0 impostorscore=0 suspectscore=0 spamscore=0 phishscore=0
+ priorityscore=1501 clxscore=1015 bulkscore=0 mlxscore=0 mlxlogscore=999
+ classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505210147
 
-On Wed, May 21, 2025 at 07:50:10AM -0700, Sean Christopherson wrote:
-> On Tue, May 20, 2025, Peter Xu wrote:
-> > On Tue, May 20, 2025 at 04:16:00PM -0700, Sean Christopherson wrote:
-> > > On Tue, May 20, 2025, Peter Xu wrote:
-> > > > On Fri, May 16, 2025 at 02:35:34PM -0700, Sean Christopherson wrote:
-> > > > > Sean Christopherson (6):
-> > > > >   KVM: Bound the number of dirty ring entries in a single reset at
-> > > > >     INT_MAX
-> > > > >   KVM: Bail from the dirty ring reset flow if a signal is pending
-> > > > >   KVM: Conditionally reschedule when resetting the dirty ring
-> > > > >   KVM: Check for empty mask of harvested dirty ring entries in caller
-> > > > >   KVM: Use mask of harvested dirty ring entries to coalesce dirty ring
-> > > > >     resets
-> > > > >   KVM: Assert that slots_lock is held when resetting per-vCPU dirty
-> > > > >     rings
-> > > > 
-> > > > For the last one, I'd think it's majorly because of the memslot accesses
-> > > > (or CONFIG_LOCKDEP=y should yell already on resets?).  
-> > > 
-> > > No?  If KVM only needed to ensure stable memslot accesses, then SRCU would suffice.
-> > > It sounds like holding slots_lock may have been a somewhat unintentional,  but the
-> > > reason KVM can't switch to SRCU is that doing so would break ordering, not because
-> > > slots_lock is needed to protect the memslot accesses.
-> > 
-> > Hmm.. isn't what you said exactly means a "yes"? :)
-> > 
-> > I mean, I would still expect lockdep to report this ioctl if without the
-> > slots_lock, please correct me if it's not the case.
-> 
-> Yes, one of slots_lock or SRCU needs to be held.
-> 
-> > And if using RCU is not trivial (or not necessary either), so far the
-> > slots_lock is still required to make sure the memslot accesses are legal?
-> 
-> I don't follow this part.  The intent of the comment is to document why slots_lock
-> is required, which is exceptional because memslot access for readers are protected
-> by kvm->srcu.
+On Wed, 2025-05-21 at 17:19 +0200, Claudio Imbrenda wrote:
+> On Wed, 21 May 2025 16:55:18 +0200
+> Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+>=20
+> > On Wed, 2025-05-14 at 18:38 +0200, Claudio Imbrenda wrote:
+> > > Refactor some gmap functions; move the implementation into a separate
+> > > file with only helper functions. The new helper functions work on vm
+> > > addresses, leaving all gmap logic in the gmap functions, which mostly
+> > > become just wrappers.
+> > >=20
+> > > The whole gmap handling is going to be moved inside KVM soon, but the
+> > > helper functions need to touch core mm functions, and thus need to
+> > > stay in the core of kernel.
+> > >=20
+> > > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > > ---
+> > >  MAINTAINERS                          |   2 +
+> > >  arch/s390/include/asm/gmap_helpers.h |  18 ++
+> > >  arch/s390/kvm/diag.c                 |  11 +-
+> > >  arch/s390/kvm/kvm-s390.c             |   3 +-
+> > >  arch/s390/mm/Makefile                |   2 +
+> > >  arch/s390/mm/gmap.c                  |  46 ++---
+> > >  arch/s390/mm/gmap_helpers.c          | 266 +++++++++++++++++++++++++=
+++
+> > >  7 files changed, 307 insertions(+), 41 deletions(-)
+> > >  create mode 100644 arch/s390/include/asm/gmap_helpers.h
+> > >  create mode 100644 arch/s390/mm/gmap_helpers.c
+> > >  =20
+[...]
 
-I always think it's fine to take slots_lock for readers too.  RCU can
-definitely be better in most cases..
+> > > +void __gmap_helper_zap_one(struct mm_struct *mm, unsigned long vmadd=
+r) =20
+> >=20
+> > __gmap_helper_zap_mapping_pte ?
+>=20
+> but I'm not taking a pte as parameter
 
-> The fact that slots_lock also protects memslots is notable only
-> because it makes acquiring kvm->srcu superfluous.  But grabbing kvm->srcu is still
-> safe/legal/ok:
-> 
-> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> index 1ba02a06378c..6bf4f9e2f291 100644
-> --- a/virt/kvm/dirty_ring.c
-> +++ b/virt/kvm/dirty_ring.c
-> @@ -121,18 +121,26 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
->         u64 cur_offset, next_offset;
->         unsigned long mask = 0;
->         struct kvm_dirty_gfn *entry;
-> +       int idx;
->  
->         /*
->          * Ensure concurrent calls to KVM_RESET_DIRTY_RINGS are serialized,
->          * e.g. so that KVM fully resets all entries processed by a given call
-> -        * before returning to userspace.  Holding slots_lock also protects
-> -        * the various memslot accesses.
-> +        * before returning to userspace.
->          */
->         lockdep_assert_held(&kvm->slots_lock);
->  
-> +       /*
-> +        * Holding slots_lock also protects the various memslot accesses, but
-> +        * acquiring kvm->srcu for read here is still safe, just unnecessary.
-> +        */
-> +       idx = srcu_read_lock(&kvm->srcu);
-> +
->         while (likely((*nr_entries_reset) < INT_MAX)) {
-> -               if (signal_pending(current))
-> +               if (signal_pending(current)) {
-> +                       srcu_read_unlock(&kvm->srcu, idx);
->                         return -EINTR;
-> +               }
->  
->                 entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
->  
-> @@ -205,6 +213,8 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
->         if (mask)
->                 kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
->  
-> +       srcu_read_unlock(&kvm->srcu, idx);
-> +
->         /*
->          * The request KVM_REQ_DIRTY_RING_SOFT_FULL will be cleared
->          * by the VCPU thread next time when it enters the guest.
-> --
-> 
-> And unless there are other behaviors that are protected by slots_lock (which is
-> entirely possible), serializing the processing of each ring could be done via a
+The pte being zapped is the one mapping vmaddr, right?
+>=20
+> >=20
+> > > +{
+> > > +	struct vm_area_struct *vma;
+> > > +	spinlock_t *ptl;
+> > > +	pte_t *ptep;
+> > > +
+> > > +	mmap_assert_locked(mm);
+> > > +
+> > > +	/* Find the vm address for the guest address */
+> > > +	vma =3D vma_lookup(mm, vmaddr);
+> > > +	if (!vma || is_vm_hugetlb_page(vma))
+> > > +		return;
+> > > +
+> > > +	/* Get pointer to the page table entry */
+> > > +	ptep =3D get_locked_pte(mm, vmaddr, &ptl);
+> > > +	if (!likely(ptep)) =20
+> >=20
+> > if (unlikely(!ptep)) reads nicer to me.
+>=20
+> ok
+>=20
+> >=20
+> > > +		return;
+> > > +	if (pte_swap(*ptep))
+> > > +		ptep_zap_swap_entry(mm, pte_to_swp_entry(*ptep));
+> > > +	pte_unmap_unlock(ptep, ptl);
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(__gmap_helper_zap_one); =20
+> >=20
+> > Looks reasonable, but I'm not well versed enough in mm code to evaluate
+> > that with confidence.
+> >=20
+> > > +
+> > > +void __gmap_helper_discard(struct mm_struct *mm, unsigned long vmadd=
+r, unsigned long end) =20
+> >=20
+> > Maybe call this gmap_helper_discard_nolock or something.
+>=20
+> maybe __gmap_helper_discard_unlocked?
+>=20
+> the __ prefix often implies lack of locking
 
-Yes, I am not the original author, but when I was working on it I don't
-remember anything relying on that.  However still it's possible it can
-serialize some operations under the hood (which will be true side effect of
-using this lock..).
+_nolock *definitely* implies it :P
 
-> dedicated (for example only, the dedicated mutex could/should be per-vCPU, not
-> global).
-> 
-> This diff in particular shows why I ordered and phrased the comment the way I
-> did.  The blurb about protecting memslot accesses is purely a friendly reminder
-> to readers.  The sole reason for an assert and comment is to call out the need
-> for ordering.
-> 
-> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> index 1ba02a06378c..92ac82b535fe 100644
-> --- a/virt/kvm/dirty_ring.c
-> +++ b/virt/kvm/dirty_ring.c
-> @@ -102,6 +102,8 @@ static inline bool kvm_dirty_gfn_harvested(struct kvm_dirty_gfn *gfn)
->         return smp_load_acquire(&gfn->flags) & KVM_DIRTY_GFN_F_RESET;
->  }
->  
-> +static DEFINE_MUTEX(per_ring_lock);
-> +
->  int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
->                          int *nr_entries_reset)
->  {
-> @@ -121,18 +123,22 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
->         u64 cur_offset, next_offset;
->         unsigned long mask = 0;
->         struct kvm_dirty_gfn *entry;
-> +       int idx;
->  
->         /*
->          * Ensure concurrent calls to KVM_RESET_DIRTY_RINGS are serialized,
->          * e.g. so that KVM fully resets all entries processed by a given call
-> -        * before returning to userspace.  Holding slots_lock also protects
-> -        * the various memslot accesses.
-> +        * before returning to userspace.
->          */
-> -       lockdep_assert_held(&kvm->slots_lock);
-> +       guard(mutex)(&per_ring_lock);
-> +
-> +       idx = srcu_read_lock(&kvm->srcu);
->  
->         while (likely((*nr_entries_reset) < INT_MAX)) {
-> -               if (signal_pending(current))
-> +               if (signal_pending(current)) {
-> +                       srcu_read_unlock(&kvm->srcu, idx);
->                         return -EINTR;
-> +               }
->  
->                 entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
->  
-> @@ -205,6 +211,8 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
->         if (mask)
->                 kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
->  
-> +       srcu_read_unlock(&kvm->srcu, idx);
-> +
->         /*
->          * The request KVM_REQ_DIRTY_RING_SOFT_FULL will be cleared
->          * by the VCPU thread next time when it enters the guest.
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 571688507204..45729a6f6451 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4908,16 +4908,12 @@ static int kvm_vm_ioctl_reset_dirty_pages(struct kvm *kvm)
->         if (!kvm->dirty_ring_size)
->                 return -EINVAL;
->  
-> -       mutex_lock(&kvm->slots_lock);
-> -
->         kvm_for_each_vcpu(i, vcpu, kvm) {
->                 r = kvm_dirty_ring_reset(vcpu->kvm, &vcpu->dirty_ring, &cleared);
->                 if (r)
->                         break;
->         }
->  
-> -       mutex_unlock(&kvm->slots_lock);
-> -
->         if (cleared)
->                 kvm_flush_remote_tlbs(kvm);
-> --
-> 
+[...]
 
-I think we almost agree on each other, and I don't see anything
-controversial.
+> >=20
+> > The stuff below is from arch/s390/mm/gmap.c right?
+> > Are you going to delete it from there?
+>=20
+> not in this series, but the next series will remove mm/gmap.c altogether
 
-It's just that for this path using srcu may have slight risk of breaking
-what used to be serialized as you said.  Said that, I'd be surprised if
-so.. even if aarch64 is normally even trickier and it now also supports the
-rings.  So it's just that it seems unnecessary yet to switch to srcu,
-because we don't expect any concurrent writters anyway.
+Can't you do it with this one?
 
-So totally no strong opinion on how the comment should be laid out in the
-last patch - please feel free to ignore my request.  But I hope I stated
-the fact, that in the current code base the slots_lock is required to
-access memslots safely when rcu isn't around..
 
-Thanks,
-
--- 
-Peter Xu
-
+[...]
+--=20
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Wolfgang Wendt
+Gesch=C3=A4ftsf=C3=BChrung: David Faller
+Sitz der Gesellschaft: B=C3=B6blingen / Registergericht: Amtsgericht Stuttg=
+art, HRB 243294
 
