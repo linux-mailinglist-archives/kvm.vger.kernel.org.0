@@ -1,110 +1,218 @@
-Return-Path: <kvm+bounces-47278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47280-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA03DABF8B3
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 17:04:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 981BBABF893
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 17:01:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C70F61BC7727
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 15:00:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EC2C7A7EB1
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 14:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56C0221700;
-	Wed, 21 May 2025 14:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E3C21D5A9;
+	Wed, 21 May 2025 14:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3j9sLhbj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z4ok8kMb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54BB1EB18A
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 14:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB261DEFFC
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 14:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747839325; cv=none; b=CPnWZ1e4Cg8UCnCGo12xiQIK78VKFISMqeTDHOOY2rClF7FseLL5MO4oRkwS32tFp/nhyfpgp3GlIETEJ4G4yD/RQgLz/bGSOO/frnte+G3wWFi5B45WUSpToxuS6X3feONCFAMS0ruqHbv3rdWozAoFrbwze1RZtNxDAogzvZo=
+	t=1747839380; cv=none; b=cDKEMMtryKqJO64gx62lZl7s0NDY4A/pTxoQe2PFN5/K/3O4IyXfRP/KkUUH31zFTAhLWf73D8HETLsxadgEOEIAfYYAnWpAweXFFxIU3Eg+IJVoaqQZH7i1XpS83kUKO6oySJuYrHcKl/JBkGtuI05quLDE2Km23UctO/NVYEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747839325; c=relaxed/simple;
-	bh=O5sJy0530ExVjxfypTtpMC3Y59Ak4yYgb+R+ZUkl+KQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eERwx9vFezSzJM8zibxvylaNiXkXT66bgEEdLDmAkY5+Fssz25QdHa5L++bQY57QpBWEWZLVbpnI9SgcRbUuLIramjMsv0s0tViDqZXbUFKuIzU8bHB1JWSYb+DIXGvJw/BcqCxksgsgABuM2NJXWV1ZT5pUI3vZERGrXjb+1FE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3j9sLhbj; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b00e4358a34so4163166a12.0
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 07:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747839323; x=1748444123; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bDpXqKhQ4ICuU1Y2giEphwOi7h1njnNeNM+cWlT6WKc=;
-        b=3j9sLhbjfCEI6r5tunaUnJWFjTxYlWCPCQUWso92a+ABJ4hsqRBjzESwVsaNYmDvrY
-         Siw61imsZ91fbHmpcN77HYqcuEb6XjHsDMfJCf7h/UiRpmeFdof+b4ta2Fgvs5z1quvV
-         9Cko/mVZmD1LnRz8EK9nzLZwXrNT34tm3uYjhSGCdTXIAUjTz7P0PQH+7Awc/pCQysPY
-         4g/uUFEOixBd7I+fmt3HA3eBW8SIEYuPOd9hv/WVJ3F6eTtkv5nRfteEVIQcUKJYxNdC
-         f9bk7fL3MCMrTQDkg1h/vbZCzILDF4sk1OAc90KtssKgEwzSxr/9QZ1QBveAUUfN4Yu/
-         zQYA==
+	s=arc-20240116; t=1747839380; c=relaxed/simple;
+	bh=4+Wj4hxdaXN96SjUIAfwiVesd+p9hyy1LELAnrGN8UM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dgvE4mXkho49wAU0SsvxcPqxaabDevZj03vVUR7PGeNfUi70BYukYj3wC8SzPhxH6baglccHB0tFTP2/IUApy0xrCImrD9IsJ0eQsv8gLCmsccYJlBoj509I6xmsGgIjkxZvhNFuw0UHbjuwCTYjLnIuUE4ay4oSzg9b+mnTnqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z4ok8kMb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747839377;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JSCBFcNuY0Goh2S9d5LToDFwcxHuL80JaO8Gh+v1hTQ=;
+	b=Z4ok8kMbqYfNmgLVlMcdUXsC841s18DPkXoA7VRrwciooIk81EgWrz0dH+Hf3lzsHGtF+/
+	Zf9kxXZclokOxjhNqyGkaskSirtsTPct0JRKK+e4Nbp9WUjOF2u5/w+kcd90uzfMDNHmhf
+	HQV58JAxbf+t0zD0I+wC9NpEddY8adI=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-574-gCVVEw-1NAiyiPlkjE9zSA-1; Wed, 21 May 2025 10:56:15 -0400
+X-MC-Unique: gCVVEw-1NAiyiPlkjE9zSA-1
+X-Mimecast-MFC-AGG-ID: gCVVEw-1NAiyiPlkjE9zSA_1747839374
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ad56222a1easo329036466b.1
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 07:56:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747839323; x=1748444123;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bDpXqKhQ4ICuU1Y2giEphwOi7h1njnNeNM+cWlT6WKc=;
-        b=GAFuiT4LWAWGGPCSbXBiXz0TkXnhSgxGhzXxTuX4HyZGwuYteIKoOvactWpTPVd+wi
-         GL2r7d221CSfknPOuYlD6QQhC1nQhfVrAO94enpQCToX0swMijOtlWCb8ECB7ta3otno
-         Sjkywy5g4qehxrFh3s+LcpTP2CIaPLJTeWDwHH67VC5VmM/s9odwCXwAgKwusC0mtLh+
-         761ROsxUykNP3UzdemQIQSUlVpEyQ530bZev8BwjNG+3GLs3nCaqvHNJTth08vWfwfJp
-         uD/N5mnr0UvawRiYn/A2+w0QifeuVysdrlT1cWbtSVfuFfVULtU3WhT4CwPR3Tr41lBy
-         adlw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZuF8rhyqaV+WptIeruecwwpJLaILtGEZing0VYiRd5eb0xNewGVcHv33OajSvLnbWALs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNen2CpuR1U611R7ZjGlU04rr8y1h07HfV7w4vvQimkHA/YtaT
-	klB+A6PdQYII/2J6Mgnxp/FfjH8AoHpqY/jJw3XB9InOQAU3Cq3P0jL64kGr6cHFS2mTiy481tl
-	Uea9bUQ==
-X-Google-Smtp-Source: AGHT+IE14Lmz/nRFNIY20LyDCl9qEUvt6gWN6ZkQVOAJ6+PFcGmygAsOR1CKTNQZzkgN15CZOf2jdexMRXo=
-X-Received: from pjbhl12.prod.google.com ([2002:a17:90b:134c:b0:30a:7da4:f075])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:574c:b0:2f1:2fa5:1924
- with SMTP id 98e67ed59e1d1-30e7d5b6f64mr27777821a91.26.1747839322910; Wed, 21
- May 2025 07:55:22 -0700 (PDT)
-Date: Wed, 21 May 2025 07:55:20 -0700
-In-Reply-To: <aC2Z2U/HR5wAay3s@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1747839374; x=1748444174;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JSCBFcNuY0Goh2S9d5LToDFwcxHuL80JaO8Gh+v1hTQ=;
+        b=s99SGOASBZkcKcM/AQbunlrUHyLs+K7T5fEIw/gDsI+AAZQ/ivP02/EHA97EZSglxB
+         xZ+qHx141Ze7NjmrKq76pazQa1Pe+5SwT+EiyIb95mNcuD1A/O6GwOZ6ufb1R6Oub2pi
+         kvOM5sp2fT+OhBsH9+iz4eaNan8ejAIUULNzUpAQ+7Eoor3QnSs0m3vgz9CbE1ENIYMl
+         d2vSM8Apd8taNpjHVRcnaLXhWcM+u48khaIuGgbMG7ElJi/3NaikHhyFctHFd9unEqUL
+         2m6tJfT2/EVY6dGqK52ZrMOeCwVPP9O7Ix2JHkl2DKJhf1jypvl3vJeJA8EIv8rn6rCn
+         d1gA==
+X-Forwarded-Encrypted: i=1; AJvYcCUmd+Hb57MO8qQBs5yXdv0bgy4ygu9//jCqhPUkYc5F71It5hENCOjhfxoQaxVxXidfKWg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgALHjO0BAGLPnT9eQjbaXwUDdCxDwCQ16LfbMwVS/hOZ2uPJl
+	oIjtNHVgdQlJZspTRHcKURztM6hkpo6yCxT4fM1xQLkAAPNatjZa3jidvoNqWAO3QCgA529p49J
+	/s1+7w/Co0O1GF3yvWLQQ2Ho+4E+jhhFz/vMK+p+ukWrroLGxDfreaA==
+X-Gm-Gg: ASbGncsLhgUZHuHC0RZlrrZryY11Qo9QwK5nYhKfiId/fpzypBtZyGNPHvfL413lyWF
+	UM3ULEMsvjPCQy+2n+iyFCUF+3u/Sz3IWc+3t7HpE77VvJZGRtO7wtHThmoHGudEeCnHrGjcrsZ
+	NPBvVFTLdA2YdOkxriTYD9D3/9/woqBHStBt/ZuMZROCRTn/GI8eKjeVw3YWdIQb/NR+vgIVdCO
+	4jynHUcYAC4Sf8NKtlOrHQ+9yXzQv0rlZ/mQ3IME5KukXopVbkZv/8nJh5JMgEB66hx+2sRo5aS
+	NXv+L4Lfi+cNrAp3hXWwa7lIZvNhaogOU6sqyVwAaQA841vt9TeQKlKPW2Sm
+X-Received: by 2002:a17:907:9495:b0:ace:d710:a8d1 with SMTP id a640c23a62f3a-ad52d4dae84mr1752075366b.24.1747839374465;
+        Wed, 21 May 2025 07:56:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGpoMMbzNscVWDbJ9f7DsJa/QwbA0pdV/T5aW3r3Yle27irZapU6e/PHt7khHjWn7nACqdpnQ==
+X-Received: by 2002:a17:907:9495:b0:ace:d710:a8d1 with SMTP id a640c23a62f3a-ad52d4dae84mr1752071266b.24.1747839373682;
+        Wed, 21 May 2025 07:56:13 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d278290sm905573266b.78.2025.05.21.07.56.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 May 2025 07:56:13 -0700 (PDT)
+Date: Wed, 21 May 2025 16:56:10 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH net-next v5 5/5] vsock/test: Add test for an unexpectedly
+ lingering close()
+Message-ID: <edtepfqev6exbkfdnyzgkdkczif5wnn4oz4t5sxkl6sz64kcaf@f6yztxryvmlq>
+References: <20250521-vsock-linger-v5-0-94827860d1d6@rbox.co>
+ <20250521-vsock-linger-v5-5-94827860d1d6@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250516213540.2546077-1-seanjc@google.com> <20250516213540.2546077-5-seanjc@google.com>
- <aC2Z2U/HR5wAay3s@yzhao56-desk.sh.intel.com>
-Message-ID: <aC3pWOUnMWvsxYWc@google.com>
-Subject: Re: [PATCH v3 4/6] KVM: Check for empty mask of harvested dirty ring
- entries in caller
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Peter Xu <peterx@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, James Houghton <jthoughton@google.com>, 
-	Pankaj Gupta <pankaj.gupta@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250521-vsock-linger-v5-5-94827860d1d6@rbox.co>
 
-On Wed, May 21, 2025, Yan Zhao wrote:
-> On Fri, May 16, 2025 at 02:35:38PM -0700, Sean Christopherson wrote:
-> > @@ -108,15 +105,24 @@ static inline bool kvm_dirty_gfn_harvested(struct kvm_dirty_gfn *gfn)
-> >  int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
-> >  			 int *nr_entries_reset)
-> >  {
-> > +	/*
-> > +	 * To minimize mmu_lock contention, batch resets for harvested entries
-> > +	 * whose gfns are in the same slot, and are within N frame numbers of
-> > +	 * each other, where N is the number of bits in an unsigned long.  For
-> Suppose N is 64,
-> 
-> > +	 * simplicity, process the current set of entries when the next entry
-> > +	 * can't be included in the batch.
-> > +	 *
-> > +	 * Track the current batch slot, the gfn offset into the slot for the
-> > +	 * batch, and the bitmask of gfns that need to be reset (relative to
-> > +	 * offset).  Note, the offset may be adjusted backwards, e.g. so that
-> > +	 * a sequence of gfns X, X-1, ... X-N can be batched.
-> X-N can't be batched, right?
+On Wed, May 21, 2025 at 12:55:23AM +0200, Michal Luczaj wrote:
+>There was an issue with SO_LINGER: instead of blocking until all queued
+>messages for the socket have been successfully sent (or the linger timeout
+>has been reached), close() would block until packets were handled by the
+>peer.
+>
+>Add a test to alert on close() lingering when it should not.
+>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> tools/testing/vsock/vsock_test.c | 49 ++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 49 insertions(+)
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index f401c6a79495bc7fda97012e5bfeabec7dbfb60a..1040503333cf315e52592c876f2c1809b36fdfdb 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1839,6 +1839,50 @@ static void test_stream_linger_server(const struct test_opts *opts)
+> 	close(fd);
+> }
+>
+>+static void test_stream_nolinger_client(const struct test_opts *opts)
+>+{
+>+	bool nowait;
+>+	time_t ns;
+>+	int fd;
+>+
+>+	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	enable_so_linger(fd);
 
-Hah!  Yeah, off-by-one error.
+If we use a parameter for the linger timeout, IMO will be easy to 
+understand this test, defining the timeout in this test, set it and 
+check the value, without defining LINGER_TIMEOUT in util.h.
+
+>+	send_byte(fd, 1, 0); /* Left unread to expose incorrect behaviour. */
+>+	nowait = vsock_wait_sent(fd);
+>+
+>+	ns = current_nsec();
+>+	close(fd);
+>+	ns = current_nsec() - ns;
+>+
+>+	if (nowait) {
+>+		fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
+>+	} else if ((ns + NSEC_PER_SEC - 1) / NSEC_PER_SEC >= LINGER_TIMEOUT) {
+
+Should we define a macro for this conversion?
+
+Or just use DIV_ROUND_UP:
+
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -1831,7 +1831,7 @@ static void test_stream_nolinger_client(const struct test_opts *opts)
+
+         if (nowait) {
+                 fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
+-       } else if ((ns + NSEC_PER_SEC - 1) / NSEC_PER_SEC >= LINGER_TIMEOUT) {
++       } else if (DIV_ROUND_UP(ns, NSEC_PER_SEC) >= LINGER_TIMEOUT) {
+                 fprintf(stderr, "Unexpected lingering\n");
+                 exit(EXIT_FAILURE);
+         }
+
+The rest LGTM.
+
+Thanks,
+Stefano
+
+>+		fprintf(stderr, "Unexpected lingering\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_writeln("DONE");
+>+}
+>+
+>+static void test_stream_nolinger_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_expectln("DONE");
+>+	close(fd);
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -1999,6 +2043,11 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_stream_linger_client,
+> 		.run_server = test_stream_linger_server,
+> 	},
+>+	{
+>+		.name = "SOCK_STREAM SO_LINGER close() on unread",
+>+		.run_client = test_stream_nolinger_client,
+>+		.run_server = test_stream_nolinger_server,
+>+	},
+> 	{},
+> };
+>
+>
+>-- 
+>2.49.0
+>
+
 
