@@ -1,203 +1,184 @@
-Return-Path: <kvm+bounces-47272-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47273-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CA6ABF805
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 16:42:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EACBABF80F
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 16:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DCC44E74DA
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 14:42:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8211173AB7
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 14:42:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9B61DE8B6;
-	Wed, 21 May 2025 14:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4BA1E1E1C;
+	Wed, 21 May 2025 14:42:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cEd/FJqj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yl8rcKfd"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C501D7999
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 14:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368E61D63DF
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 14:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747838506; cv=none; b=QU2GPiVgWVXSkue5Fwd5rEKr9DBbl+3dXsxqTStLlOFibGt5VpndNuEWcZJQEf2TW/RwrwuXPIRAcSCsONseAv65eP/UjvzTJwODFEyG0bHhxs9kP9B6RsL4bw4CGSi97DIeaUROI1v8RCfjfF8DPT/4f6RtjfX6rjKzJEXZ97Q=
+	t=1747838536; cv=none; b=BCAA6gOsuEQJHSKKH6zkrK3Cwq9LRUQ3WfbvaMPf0+UDloBi9a10diwC+4xw8wAWMT8r7BbP/wJ3SI/N1n5bU09MYemWXTKwg3I7GTVOj20AqusFQNKe6/r8JW4sT3vfkNh8HRByGAZctL24+qr7nHFpgvlYnnfff3rIYQH1rV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747838506; c=relaxed/simple;
-	bh=fJrz4e1Ti/Jt27bWzNcWF73I0K+Q9z0Ka+LDgDGAiMg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XXfMgCSmMjlJJ74Byv096rvP1A5talhsX5N7o4G8Lab5lrNzx8VUiVApP1RmLsj3dj+b033J2r2I0UFDuhg8RAVHtjn8RfC+XK79wwQlKCX8DBSxcnndFtWrZx7bUl80G3t6A08MLP3SiF9saPLCC0u8hqMkEjuPa4Elw75ERJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cEd/FJqj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747838503;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mDesXKTayHxGjIGY1j8G0o6g9UGYHXMrYuHHOq5gQRI=;
-	b=cEd/FJqjuEwN+FiBB+vAgcFNTKcrRa7ndIC45HqR0iO+wN0X2OJcC2U4HgAdIOsTSBgTF1
-	jWIsZytTPHvrJJ0Q+v8b1MmoDwndSkAmWY07tJJpssOfKltofYXEwvAJ6/1lN65X2a/rom
-	TnypONEuRrap9YkOyNGHDc4exmq1jdA=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-308-cqkbuVQBPYqDXxjcV1Cn8g-1; Wed, 21 May 2025 10:41:41 -0400
-X-MC-Unique: cqkbuVQBPYqDXxjcV1Cn8g-1
-X-Mimecast-MFC-AGG-ID: cqkbuVQBPYqDXxjcV1Cn8g_1747838501
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-acf0113e311so605233166b.1
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 07:41:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747838500; x=1748443300;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1747838536; c=relaxed/simple;
+	bh=MeIreJ0VzWT2UiLJVYu37D2mNjDEruPiWRZcit3nFDU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V2LseawHxsszI1t6gMU2P1io39fSO0aeuWj1Dgx5AdrGwQTFgEaK+jbmArirIEEDVfPn5+uZLdmjOQ/ZZXh6d7qKIaTaGBHtYPF2/Mkru+ivpA1ZkmsLqCOnVs7TTwKGHLOz8BPz8pmWxIPJViAOFIoj0fVQaxtzGoQkxTw7ttY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yl8rcKfd; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-231f61dc510so1047695ad.0
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 07:42:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747838534; x=1748443334; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mDesXKTayHxGjIGY1j8G0o6g9UGYHXMrYuHHOq5gQRI=;
-        b=Ue3Hj8ovdVjJT3tuN/7uadWK9FWfKbOPRpQNkz/nu4iKdmvyiGqbTTn1U69iL9L9Hg
-         Eu9RxY/xYT+HcMfRtddm0Y2o++i/BrVtO01Go8/hJDxq6DPM4Diyz+MqK9ZMTVal8yQL
-         YoZErkaoQwgiPP0iXPJAGaPhadw+/Ile6hNanQp7KNBsREuT6ecF2gdRXSpclXfORlxc
-         fl6CA0HmBszB0iLy4eul7CXSA7jb0haYuQcK0eHC1A0QrAh4rqmNFGnjkqcTxDwGqpwV
-         VlsYEqZSjiPr0Vq4RawnmheYryRk/NGlwO2mKgHwjiCtzEmju/sB2a+lR/6J9Acs0pOA
-         8gWw==
-X-Forwarded-Encrypted: i=1; AJvYcCXiuTQCDBmYOBX8YH1w0+jCFbjd+pIyLbZJRLKwccBsOOaTSGM6RI5Mrt6cPW7GEOLrOAE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzrfyo215dS+OvBDI23qRNqDZ9azHTd9RA1kJ64YPUB0Zaanulx
-	DkYd+3D8iUX8YVqtXI7ClqrcOVonCAn+PYjSH0LTiXp2XZ0Fsg93zkRpL/0v9LCAHse8PspBZlR
-	8gqdgSn+tgoi8iY279ljz0GeGIXQErrL+kLm8rLgyxWqU1fRKlezdRQ==
-X-Gm-Gg: ASbGncu4ea82KhVXToH2vXif9FOSqtb6b2dvLG6L9MF2l/Tc97gR9G7b3K7kKAvXwLn
-	d36TxfBLPn6NXr25EKw1IPGsHHYwCfnlyYofX01zHnkggq8+gT/qMjWiv0k+mLIGQK9ol9JkkPg
-	Dh4enyQ8mXdCDuUhZKl6ElSkxHwfratOb3rp2b62syUn/SlEJwrFItRlc5NAu6yNG8TBoXEW0k6
-	VfgJKaaIjnmpc+C5TNvB+vXVwGbyF5pjqciajPkDewO0WDEn7oKwH9Pq7TLc32gY4swhxQA8dp/
-	ftmLH7jL5YlO7hnRHXCLFk4xmqlRhK93Ar0y9NewDL0lKvW6Ide4jLi2MP2z
-X-Received: by 2002:a17:907:e916:b0:ace:c59c:1b00 with SMTP id a640c23a62f3a-ad52d42dc34mr1768466466b.5.1747838500576;
-        Wed, 21 May 2025 07:41:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE66RxXKL2W6d/q5voawNHWMt+eYxa0BkwW3PNFANgomMqz2eIeLzBYh2MlVa3aFRZzUSRf1g==
-X-Received: by 2002:a17:907:e916:b0:ace:c59c:1b00 with SMTP id a640c23a62f3a-ad52d42dc34mr1768463566b.5.1747838499992;
-        Wed, 21 May 2025 07:41:39 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d06dfa4sm914996266b.57.2025.05.21.07.41.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 07:41:39 -0700 (PDT)
-Date: Wed, 21 May 2025 16:41:34 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v5 4/5] vsock/test: Introduce enable_so_linger()
- helper
-Message-ID: <3uci6mlihjdst7iksimvsabnjggwpgskbhxz2262pmwdnrq3lx@v2dz7lsvpxew>
-References: <20250521-vsock-linger-v5-0-94827860d1d6@rbox.co>
- <20250521-vsock-linger-v5-4-94827860d1d6@rbox.co>
+        bh=MeIreJ0VzWT2UiLJVYu37D2mNjDEruPiWRZcit3nFDU=;
+        b=yl8rcKfdmTnA2glzI6CDGMGJzJw8woIbVZ8oU12U1HYxR0M+dHGBOg1/oZBPgw3taM
+         q78cYU+YditqGcWoM4IZaarAIrEjwctqzPzWgsUhbjNrGBs+n9KUsnlWAJG0Qyss1Lhh
+         faaymkhMilJAab4/EkZWaqAQ0h58S4Qj4ANwc1nixAp88y1gR4Y6Bz3CJP9OoXhge9ru
+         r/mvEKPlouRMG8uQwGCODWs/WZoUM38cZqMEWGZWB3SsrnKQVjirPvE4g78Pjfb/rcGi
+         /3EaG2O5vDGOxlD/gfhLE89kSCVbpHVpNhHdnV4luS3eOBp/SRS3RZdK3dOUWQWy4Qag
+         h9AA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747838534; x=1748443334;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MeIreJ0VzWT2UiLJVYu37D2mNjDEruPiWRZcit3nFDU=;
+        b=iHzjtRtobfFXSm3zROrSykIL5fu7IYyiHfr+5gxT0jWzejNeMz7pIFhGEAAoyO8RGi
+         vrxX3uMZZ2FCc76DIASmVGYk3rAmGvehoQF8oUri1Ryk24gCG+kdKInrq/ruzbfgqjmj
+         35+qTlILBTRon96FWuJ7MrsegpeAGx//EJWJYpVN072PRr8SpbkPbNfSRsqUso/by5XG
+         shaRqqwlrv++49gs1CJyxTMXXMdH1qU5y/uQ7a0H2xsbGyhwnV9XxzSO50wpn8PL0/WQ
+         Wnf+X6yplDTkRRKjVQjdzt68gQDVyJecjbJ9dPHXEy3tmlwIBPXo/qpwpFE9phPK/vv9
+         kZgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWSmbjSQLj4amXZ9fBr/xxYo9WT8v3v1dTwkigz9/VseX0GOLXuCR1DOaGqzZxDyLJWh60=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHj/B0TkJ+bSB/DckUV8OlQt5LqQSksYyZc53HDsVu7pVUWtk5
+	w0n7ZfmnQRC1MsWLIHptUKEKuzbs7fy2Rk8GJ9fW7UdLOEkqhlZyYHCodl4Pgoo7BP8DxfgaUTZ
+	F7A9/2t9Z6OleI3d/iIgbqM5qYjz/X+Q6CrMh7PRV
+X-Gm-Gg: ASbGncs2VbD83MGJrzlga21bL3mAeDIONweANU54kFRaswHZ0W7VTO0WRH+r474Qv8x
+	kAIbqgLkpZEnnj1LlaO98OZmCiymlYsSt5oRjdIpZkAITyYhfd/LbujRuTZM4Mw8d5V31CdLBsD
+	HkdD2ABwrcZBtclfZhpwOdHprOmR9k0E3TntB7yWS5GF69q6s5SQPFbr05Mmbkr2s/C4p4lF7KW
+	sw=
+X-Google-Smtp-Source: AGHT+IG2dIYCeOz3RfprKj5ASeFAdVUkomyHxXDYNyHo+nRE69+av8tpRMQ+wxHyswC7YgfpsfFFUwky7GIhiFkkWlc=
+X-Received: by 2002:a17:902:cecd:b0:231:d7cf:cf18 with SMTP id
+ d9443c01a7336-23203eee503mr11647135ad.1.1747838533592; Wed, 21 May 2025
+ 07:42:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250521-vsock-linger-v5-4-94827860d1d6@rbox.co>
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <CA+EHjTy7iBNBb9DRdtgq8oYmvgykhSNvZL3FrRV4XF90t3XgBg@mail.gmail.com>
+ <CAGtprH_7jSpwF77j1GW8rjSrbtZZ2OW2iGck5=Wk67+VnF9vjQ@mail.gmail.com>
+ <CA+EHjTzMhKCoftfJUuL0WUZW4DdqOHgVDcn0Cmf-0r--8rBdbg@mail.gmail.com>
+ <diqzecwjnk95.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTyY5C1QgkoAqvJ0kHM4nUvKc1e1nQ0Uq+BANtVEnZH90w@mail.gmail.com>
+In-Reply-To: <CA+EHjTyY5C1QgkoAqvJ0kHM4nUvKc1e1nQ0Uq+BANtVEnZH90w@mail.gmail.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 21 May 2025 07:42:01 -0700
+X-Gm-Features: AX0GCFtAT9R_Oe05rYdzQPFgRH8-_eDMLizxCLAk0K-mKF9SD9rgeSxLsWR73nE
+Message-ID: <CAGtprH-fE=G923ctBAcq5zFna+2WULhmHDSbXUsZKUrin29b4g@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Fuad Tabba <tabba@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 21, 2025 at 12:55:22AM +0200, Michal Luczaj wrote:
->Add a helper function that sets SO_LINGER. Adapt the caller.
+On Wed, May 21, 2025 at 5:36=E2=80=AFAM Fuad Tabba <tabba@google.com> wrote=
+:
+> ....
+> > When rebooting, the memslots may not yet be bound to the guest_memfd,
+> > but we want to reset the guest_memfd's to private. If we use
+> > KVM_SET_MEMORY_ATTRIBUTES to convert, we'd be forced to first bind, the=
+n
+> > convert. If we had a direct ioctl, we don't have this restriction.
+> >
+> > If we do the conversion via vcpu_run() we would be forced to handle
+> > conversions only with a vcpu_run() and only the guest can initiate a
+> > conversion.
+> >
+> > On a guest boot for TDX, the memory is assumed to be private. If the we
+> > gave it memory set as shared, we'd just have a bunch of
+> > KVM_EXIT_MEMORY_FAULTs that slow down boot. Hence on a guest reboot, we
+> > will want to reset the guest memory to private.
+> >
+> > We could say the firmware should reset memory to private on guest
+> > reboot, but we can't force all guests to update firmware.
 >
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> tools/testing/vsock/util.c       | 13 +++++++++++++
-> tools/testing/vsock/util.h       |  4 ++++
-> tools/testing/vsock/vsock_test.c | 10 +---------
-> 3 files changed, 18 insertions(+), 9 deletions(-)
->
->diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->index 120277be14ab2f58e0350adcdd56fc18861399c9..41b47f7deadcda68fddc2b22a6d9bb7847cc0a14 100644
->--- a/tools/testing/vsock/util.c
->+++ b/tools/testing/vsock/util.c
->@@ -823,3 +823,16 @@ void enable_so_zerocopy_check(int fd)
-> 	setsockopt_int_check(fd, SOL_SOCKET, SO_ZEROCOPY, 1,
-> 			     "setsockopt SO_ZEROCOPY");
-> }
->+
->+void enable_so_linger(int fd)
->+{
->+	struct linger optval = {
->+		.l_onoff = 1,
->+		.l_linger = LINGER_TIMEOUT
->+	};
->+
->+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
->+		perror("setsockopt(SO_LINGER)");
->+		exit(EXIT_FAILURE);
->+	}
->+}
->diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index e307f0d4f6940e984b84a95fd0d57598e7c4e35f..1b3d8eb2c4b3c41c9007584177455c4fa442334c 100644
->--- a/tools/testing/vsock/util.h
->+++ b/tools/testing/vsock/util.h
->@@ -14,6 +14,9 @@ enum test_mode {
->
-> #define DEFAULT_PEER_PORT	1234
->
->+/* Half of the default to not risk timing out the control channel */
->+#define LINGER_TIMEOUT		(TIMEOUT / 2)
->+
-> /* Test runner options */
-> struct test_opts {
-> 	enum test_mode mode;
->@@ -80,4 +83,5 @@ void setsockopt_int_check(int fd, int level, int optname, int val,
-> void setsockopt_timeval_check(int fd, int level, int optname,
-> 			      struct timeval val, char const *errmsg);
-> void enable_so_zerocopy_check(int fd);
->+void enable_so_linger(int fd);
-> #endif /* UTIL_H */
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 4c2c94151070d54d1ed6e6af5a6de0b262a0206e..f401c6a79495bc7fda97012e5bfeabec7dbfb60a 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -1813,10 +1813,6 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
->
-> static void test_stream_linger_client(const struct test_opts *opts)
-> {
->-	struct linger optval = {
->-		.l_onoff = 1,
->-		.l_linger = 1
+> Here is where I disagree. I do think that this is the CoCo guest's
+> responsibility (and by guest I include its firmware) to fix its own
+> state after a reboot. How would the host even know that a guest is
+> rebooting if it's a CoCo guest?
 
-So, we are changing the timeout from 1 to 5, right?
-Should we mention in the commit description?
+There are a bunch of complexities here, reboot sequence on x86 can be
+triggered using multiple ways that I don't fully understand, but few
+of them include reading/writing to "reset register" in MMIO/PCI config
+space that are emulated by the host userspace directly. Host has to
+know when the guest is shutting down to manage it's lifecycle.
 
->-	};
-> 	int fd;
+x86 CoCo VM firmwares don't support warm/soft reboot and even if it
+does in future, guest kernel can choose a different reboot mechanism.
+So guest reboot needs to be emulated by always starting from scratch.
+This sequence needs initial guest firmware payload to be installed
+into private ranges of guest_memfd.
+
 >
-> 	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
->@@ -1825,11 +1821,7 @@ static void test_stream_linger_client(const struct test_opts *opts)
-> 		exit(EXIT_FAILURE);
-> 	}
->
->-	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
->-		perror("setsockopt(SO_LINGER)");
->-		exit(EXIT_FAILURE);
->-	}
->-
->+	enable_so_linger(fd);
+> Either the host doesn't (or cannot even) know that the guest is
+> rebooting, in which case I don't see how having an IOCTL would help.
 
-If you need to resend, I'd pass the timeout as parameter, so the test
-can use whatever they want.
+Host does know that the guest is rebooting.
 
-The rest LGTM.
+> Or somehow the host does know that, i.e., via a hypercall that
+> indicates that. In which case, we could have it so that for that type
+> of VM, we would reconvert its pages to private on a reboot.
 
-Thanks,
-Stefano
+This possibly could be solved by resetting the ranges to private when
+binding with a memslot of certain VM type. But then Google also has a
+usecase to support intrahost migration where a live VM and associated
+guest_memfd files are bound to new KVM VM and memslots.
 
-> 	close(fd);
-> }
->
->
->-- 
->2.49.0
->
-
+Otherwise, we need an additional contract between userspace/KVM to
+intercept/handle guest_memfd range reset.
 
