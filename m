@@ -1,118 +1,145 @@
-Return-Path: <kvm+bounces-47214-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47215-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 386A3ABEA75
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 05:31:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4449BABEA79
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 05:35:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCC0C179AA2
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 03:31:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA33B4A171D
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 03:35:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B872722DA00;
-	Wed, 21 May 2025 03:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE6422DFA8;
+	Wed, 21 May 2025 03:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KsnxplBA"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="KXhLhxjG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DDC428E7;
-	Wed, 21 May 2025 03:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11683B66E
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 03:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747798251; cv=none; b=syTfR54ePSke8ADiwxxBs4hAPJW+i2rGJmGwbgrdLP3qSK1A+f6h/3BHYA2kR32eClq9C3M1QZIJoeb2AFUK0aAujlB55NFp2cCl+C6L+mD0RiHRlBNhY9/qd3sDKjqME5292/CDC2GU4k7IlXvy0K3g9xWNxKdnObROEfjN0GQ=
+	t=1747798490; cv=none; b=nQWX/Q5Sog6sSduYfzWeNbHIVdX6e2dCEbRimAh2iegJQfzId6AYuXZzZGEh3iNDQk1uFHr1FViFLZuy0Z/y1bpJF1al/ym04zh4Dwp3zG6VoMM3msiHyWe4pBgnFfkiNI//Nj7WNiT0QjofMAuW2J4jFwC89g0WIqdOFmnjk2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747798251; c=relaxed/simple;
-	bh=6xcSYYrwRQcoLSrWNX+CBzb07UaJT/rmtXR/2L9OTJc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ruBQbQN4ZcagoO955nkmtXn0wx+/do0FS+8VpoaPo/cHb+HcZ0HwCc5rrhHOM1VMc6p7ShZRx4g2S0mhWoq9EpjOb/9arhxlA0aRMFuPYbXXykwbXNBAyb3hRjnjej4IJdoXk7Xa71IkYoc9vZLc0F/J/fbyr8ZzkHm/Q5Sr1TI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KsnxplBA; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747798250; x=1779334250;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6xcSYYrwRQcoLSrWNX+CBzb07UaJT/rmtXR/2L9OTJc=;
-  b=KsnxplBABR43sFyv4+ipBbbVeLI5i92iiK7qllTdR9ynsdJ59BnpUh1I
-   hdz9SWGH/nUxZB0rQHzsBT5bz/cCBYLRz2pgCB/rNBIIGLXYioouQ92YZ
-   TPdGTg0mhX59Tnx97B88zhtEdo74/CvkwvrxukNRorQiGHKojK5CpoSta
-   p1LL979aF6DwowzHJS+GRTul0BDnfdA+oZG7/xWv+IUiOJdbuanFnJNVA
-   lxDcsKYT+RGKxU7CqCxF3sIuJjHZrZQuyKCc48//wJR93IMkamhEEvSVy
-   mFNtxKIZ5kuvauIsCWFqtlZWvTUHLUaEkd3pYYczTL+GFZo0nIIL5CgTy
-   w==;
-X-CSE-ConnectionGUID: 3KLFB+5QR7Wszf0ACdVT9Q==
-X-CSE-MsgGUID: Ms1DhPKoQY+u8WNb66S/ag==
-X-IronPort-AV: E=McAfee;i="6700,10204,11439"; a="53422797"
-X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
-   d="scan'208";a="53422797"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 20:30:49 -0700
-X-CSE-ConnectionGUID: 8y0c0cNGTKSaccsUV6HyPw==
-X-CSE-MsgGUID: bN+RWkfxTHy0RbTVidTswA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
-   d="scan'208";a="145140186"
-Received: from unknown (HELO [10.238.12.207]) ([10.238.12.207])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 20:30:44 -0700
-Message-ID: <8e11fd2e-d77b-46cc-94c9-e542003c4080@linux.intel.com>
-Date: Wed, 21 May 2025 11:30:42 +0800
+	s=arc-20240116; t=1747798490; c=relaxed/simple;
+	bh=Zk66fyEM2zx49X5y0UFZoranSZ+jdhIWtz5HJh7HXr8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XNTh7LE/DlsQ35fHWBi65ATqHl8WcEHDivBHKQSpv1gxXX+N7HwXQ/2gHi8Omu4Xd9o1od29/n9HxZ7vMyiNZYZacJbB55ieRcVU1A/TN1CjrC85PQXKWpv4aSA53Vo0YPIKf3nUXVGwL2Yr+EqPmSbDLv1h1FEgC6RFBAAEz+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=KXhLhxjG; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-742c9563fd9so2834944b3a.3
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 20:34:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1747798487; x=1748403287; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QrF20aYmOuDjKY3rsnSXTn3j3mYCZ/2UIOF9yf2b/qU=;
+        b=KXhLhxjG6MvuKO6HUXN+WOnBBAp4V6OaGCdpG/iDobBMJLqnVjQN3tY7L3ojtKQ/yy
+         wsWDHW2HCM6Q+JQqW5DqpTx8fKIA7oRDIFPS6HZW/NF+ozRZtpdmv9ALTBInhsIi9xdR
+         wqR2qbW5R+G14XsgmLrrqHhw4P0cTe7xXwqD0ftNq8/ducJbiSe71UI26WC9gkxJ46xY
+         PzV4wysT+1si6XRnGr8kjIsTBukbrdiW7SDfv8Fg7r1+YTttSQUXJzRFFjgK4p/Nk7+B
+         PH5tpwbSN7QOJ9ZLcAqYRIYWTOOXEkeNeRzve+hoWzpb2s+ZIV+ohCRegg3PXPlrbo4e
+         VT5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747798487; x=1748403287;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QrF20aYmOuDjKY3rsnSXTn3j3mYCZ/2UIOF9yf2b/qU=;
+        b=nFwBvr1c7yb38e4UymOf+dcbe2rV3bFihAb1s6ni5n8RZNhvefqRfByVjwqZEta5YD
+         6OCbq8dSW1IwWarFgoUx9NhACGxe8bXxrXLhgt+RtGbzUmxWduLLe1dmg+3DiYM4EOKl
+         JUaydtZbSPkyQg+a5pMd48ybMweSgQv2QWfXukzwxlPwX4OPE8JxOIpA0OGeYvLtkWuo
+         v/XUUGV04J/cy+KPR2MZbghYcGAZwXgjN4Wki854uR2x/YNy6aS4/S0DLWwaJgf5u5vU
+         JKHg9Wrg1RjwOU/moJ1JKmNBMCSQU1Og9v3z7Gvn/zc6V+ufPpieY6cPv/7KcyDUJOkg
+         GQog==
+X-Forwarded-Encrypted: i=1; AJvYcCXNWbXYjj6vhc5gX1cyMBV6irb3LHqFhlPQv+r70GUEWqQUd9OL1HM+gAclHgLiF9a5iHk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyf8PSLksT4AIH7X6kSRj1exd1us2gRnws2UjEtYEZeAnOJKTsY
+	H7KVBAOtyNuQkScxQBr2r8qVpBUOv1nHpPS4l4pusKKd//WJ9lLm5FMXVf0Q/IMat3M=
+X-Gm-Gg: ASbGncu7NmR9eUWD/OrTGUC4CwS6u2x6H5WB05mXEpV1GqH5293E5NGw9v+At9QCEXW
+	0AHZ/QC/iKHAe/7Hm/e+BKTyQDVsKjM/jSCnOUx6ASnv8c0X/6UlP/twRTuh58du06wJepFw0gV
+	XZ3OrHnqBauWS9D1DtLVr6cYzMrQiozQF86Z1A/T2mfELoV5/LiwImzWqOTCacdSxiFAPqzUV7H
+	y6KKgyu2+aREryDfpcecstcHtP2ZZIl3794d8CzuLmSg1Qqc8Mk8FowBhIz/0bzozie/2tv2kOG
+	y52UhDRQnpAUfkTIiojHhMR1gA4wFHYEbXOGrBngOcGLm3oyB7y3QmmG8u7oOsVpPX200T3YgqR
+	H+h4=
+X-Google-Smtp-Source: AGHT+IE0BDXpgbrb6T16TX0bUZrcxSHGXSW4xi9rTQEqrY/nzVnAq9tlVCT/3bjK+FISbu389N58cw==
+X-Received: by 2002:a05:6a00:858f:b0:73e:1566:5960 with SMTP id d2e1a72fcca58-742acd507c1mr24045768b3a.19.1747798487243;
+        Tue, 20 May 2025 20:34:47 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.11])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a9709293sm8604835b3a.37.2025.05.20.20.34.44
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 20 May 2025 20:34:46 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: alex.williamson@redhat.com
+Cc: david@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lizhe.67@bytedance.com,
+	muchun.song@linux.dev,
+	peterx@redhat.com
+Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for huge folio
+Date: Wed, 21 May 2025 11:34:40 +0800
+Message-ID: <20250521033440.72577-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250520080719.2862017e.alex.williamson@redhat.com>
+References: <20250520080719.2862017e.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 20/21] KVM: x86: Force a prefetch fault's max mapping
- level to 4KB for TDX
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com,
- dave.hansen@intel.com, kirill.shutemov@intel.com, tabba@google.com,
- ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com,
- david@redhat.com, vannapurve@google.com, vbabka@suse.cz, jroedel@suse.de,
- thomas.lendacky@amd.com, pgonda@google.com, zhiquan1.li@intel.com,
- fan.du@intel.com, jun.miao@intel.com, ira.weiny@intel.com,
- isaku.yamahata@intel.com, xiaoyao.li@intel.com, chao.p.peng@intel.com
-References: <20250424030033.32635-1-yan.y.zhao@intel.com>
- <20250424030913.535-1-yan.y.zhao@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250424030913.535-1-yan.y.zhao@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+On Tue, 20 May 2025 08:07:19 -0600, alex.williamson@redhat.com wrote:
 
-
-On 4/24/2025 11:09 AM, Yan Zhao wrote:
-> Introduce a "prefetch" parameter to the private_max_mapping_level hook and
-> enforce the max mapping level of a prefetch fault for private memory to be
-> 4KB. This is a preparation to enable the ignoring huge page splitting in
-> the fault path.
+>> Before this patch:
+>> funcgraph_entry:      # 33813.703 us |  vfio_pin_map_dma();
+>> 
+>> After this patch:
+>> funcgraph_entry:      # 15635.055 us |  vfio_pin_map_dma();
 >
-> If a prefetch fault results in a 2MB huge leaf in the mirror page table,
-> there may not be a vCPU available to accept the corresponding 2MB huge leaf
-> in the S-EPT if the TD is not configured to receive #VE for page
-> acceptance. Consequently, if a vCPU accepts the page at 4KB level, it will
-> trigger an EPT violation to split the 2MB huge leaf generated by the
-> prefetch fault.
->
-> Since handling the BUSY error from SEAMCALLs for huge page splitting is
-> more comprehensive in the fault path, which is with kvm->mmu_lock held for
-> reading, force the max mapping level of a prefetch fault of private memory
-> to be 4KB to prevent potential splitting.
->
-> Since prefetch faults for private memory are uncommon after the TD's build
-> time, enforcing a 4KB mapping level is unlikely to cause any performance
-> degradation.
-I am wondering what are the use cases for KVM_PRE_FAULT_MEMORY.
-Is there an API usage guide to limit that userspace shouldn't use it for a large
-amount of memory pre-fault? If no, and userspace uses it to pre-fault a lot of
-memory, this "unlikely to cause any performance degradation" might be not true.
+>It looks like we're using the same numbers since the initial
+>implementation, have these results changed?
 
+Before the release of each version of the patch, I have conducted
+performance test, and the results have consistently been in
+close proximity to this value. Consequently, I decided there was
+no need to update. I will include the latest test results in the
+next version.
 
+>> Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
+>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>
+>Appreciate the credit, this should probably be Co-developed-by: though.
+>In general a sign-off is something that needs to be explicitly given.
+
+Thank you for the reminder. I will correct this error in the next
+version.
+
+>> +			/*
+>> +			 * Note: The current nr_pages does not achieve the optimal
+>> +			 * performance in scenarios where folio_nr_pages() exceeds
+>> +			 * batch->capacity. It is anticipated that future enhancements
+>> +			 * will address this limitation.
+>> +			 */
+>> +			nr_pages = min((long)batch->size, folio_nr_pages(folio) -
+>> +						folio_page_idx(folio, batch->pages[batch->offset]));
+>
+>We should use min_t() here, otherwise it looks good to me.
+
+Thank you once again for your review! I will correct this error in
+the next version.
+
+By the way, using min_t() also resolved the build error
+reported by the kernel test robot[1].
+
+[1]: https://lore.kernel.org/all/202505210701.WY7sKXwU-lkp@intel.com/
+
+Thanks,
+Zhe
 
