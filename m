@@ -1,86 +1,85 @@
-Return-Path: <kvm+bounces-47212-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47213-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8B46ABEA09
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 04:47:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 896F3ABEA66
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 05:22:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 226BE3BB860
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 02:47:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C62F4E29C0
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 03:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1F922B8AD;
-	Wed, 21 May 2025 02:47:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DFB22E41C;
+	Wed, 21 May 2025 03:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Do81MbLt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bp3cVJU4"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610D1148827
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 02:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DBEBA36
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 03:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747795643; cv=none; b=ZF2QBVZK2QHeU/73VG2l3i8k6MMpm0jcPfXgK1gpWgziInEQ+632buJ325wrVemO2TRou4s/BVrqpkdkUov7G1725PDavrQCRJCEBPO0cmvkftq6Qr+dpwnXv8PKPJouKLYL/SycyN9a9prC2myv2AXQtBSh4JWnuJMbcyhRGmI=
+	t=1747797705; cv=none; b=An4C3QeFhEJRN0zTkf8dM5VtcwdmxnbjUqg2fHQkKQpy7lpHfmddPyKAeePqowcbGjVmOJrfmpLqTVF46T0Wzpr3U9wDrqltDEgQKp84mr1l930m4dih3Sd04TXvNuU/GdOmo9hY1/IY+IQ5qySTnR9qKBLMfG8IQYnbtcs552U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747795643; c=relaxed/simple;
-	bh=vxbtc1EDqSXR3qS6Mh7hkJsbnUOQ20m1M8ob4WnjGJQ=;
+	s=arc-20240116; t=1747797705; c=relaxed/simple;
+	bh=2GJVJSHxG7TNTDIWEF3lOgcb68A6g+jAddK5dW3eqKw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o+ki7nECy5/q1uPxfULh5/MrObKr4omOF0pd87I25+EMcWmanuaqTRhbjJTbAA1tjSuhz7nxZCQ0/y/WkHnvgs5cwx2NDqNnoPgLKW3MG/6W2RnIKRjG/NFFOWS+2VBt5ILEn+5b2qifOYL1CTONywT41YsF9BtJzB9zlrDTCNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Do81MbLt; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=Fj/LeMdkLvd8EWWAD2z/NezXp5t0PVXMkb0vSbIsSZTe5obJtRXp+Dxk1gAXY6CgWeVolbcRCdN6OBXrsnHqe9wn9vPNQmBQ7aCwyw0/p4woZxutTwAl/vnxPO0Mv1ItyRVjgnouXEgEphU7IrrcFSZcheO/mPpzKj3xusKT3Nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bp3cVJU4; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747795640;
+	s=mimecast20190719; t=1747797702;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uu12XEh7AToGw+jGxDZjXo2gU6G0yYISDzb3cxuu9wE=;
-	b=Do81MbLtMMQDGYt3zqgy3JWb7oNSmtlaTzBwtGpjUtbt5NsGrcRD+8bVFVUp8AKNmeLokq
-	YPLmGzI7BEXMquIf3gJgZHF6Yq08zYzUGHYDEcyBO6ak4FfUSCcKC0XbI76F+RtD7/tbXM
-	w1fi50iOlw6ziWE8odhV7rEoNaFJoH0=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=jUSOmA0/3Qa3aXRPXfKpDedwfKwE88WYumy/XPPRjQc=;
+	b=bp3cVJU4BUvAJZ/Qshaah+dQJN7LAIosPqQ+T/aNiSN7C5J4GM9MJhaLpyFiMOTrkuugzg
+	P1r/sg/jesM89h+kFHTyjsJQiRZRyui+FHuuKdCXoC2/f5hcc3I/QzUvlplkNdRlGlJkz6
+	VlkbTd+8z0WWxOQ8PvSJSxhFRmwI6Yo=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-0d_ta3vFOqK3euW7a3t-aA-1; Tue, 20 May 2025 22:47:18 -0400
-X-MC-Unique: 0d_ta3vFOqK3euW7a3t-aA-1
-X-Mimecast-MFC-AGG-ID: 0d_ta3vFOqK3euW7a3t-aA_1747795637
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-742c03c0272so4702246b3a.1
-        for <kvm@vger.kernel.org>; Tue, 20 May 2025 19:47:17 -0700 (PDT)
+ us-mta-320-PKD9iWwLMHSZCITT99KGZg-1; Tue, 20 May 2025 23:21:40 -0400
+X-MC-Unique: PKD9iWwLMHSZCITT99KGZg-1
+X-Mimecast-MFC-AGG-ID: PKD9iWwLMHSZCITT99KGZg_1747797699
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2322a7b0735so45954345ad.3
+        for <kvm@vger.kernel.org>; Tue, 20 May 2025 20:21:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747795637; x=1748400437;
+        d=1e100.net; s=20230601; t=1747797699; x=1748402499;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uu12XEh7AToGw+jGxDZjXo2gU6G0yYISDzb3cxuu9wE=;
-        b=mTfpOxvua82786QtmpHvG5G73/rTHiFt2tTzFd44n62kmzaba7TVUR7C6jciunhBhH
-         icLUUqjmcZlaEn5eC+7YLbjxByawJ3v1GXa3kci8zylMrDLqYya7joMVT0/HADIahWEA
-         qRHpaxFZ84g6LZ/LIjWEaIz4bKuf1XfNGJ1UqQbBaBDP3t2LvpOQEtWy27Ig45/wkW2K
-         61xvqU/Km3Vn4XdGEgiLuZDSajv1R9yTprAPc2u/g7qdKLBX1PjFdnUmKSWxQrAOHZAS
-         7S7OhlT473ZretA94fOsnNixK9CNCxM51fx6oq20lqEM4hPoOYLKxpJrZiuq4STp1bc2
-         3f/g==
-X-Forwarded-Encrypted: i=1; AJvYcCVF5VLn5O0mLRwZwUmaJecbi/CdTxmQwobEJWziUxN1ZDC9bnEq44lpXErin69kf34mmko=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIDEZHzcb2epC3W9z1l2McmqRKqYOpRYrjCenSI/dA8POA8zZK
-	FwjZYggRdvLLxe3ulrhcBuptZ5zi4CC5KhpFo07428FfAxGuqqYl4BKvlN4KDLstW9vtMMoHHyG
-	WcrOUsProPjyOPgCeA64APBEGzgVWu9Z6ZIyqrUeQG+d7jxgbC5njRw==
-X-Gm-Gg: ASbGncsa7gf9vAYSt1Voxv5ToX8QE6YDwqkFIUpOJ1s/Jfq5SrO5IcdNmEZpRJe2l8C
-	sFanomqkZUqEX+EgroARugHOaYEFR3AbF3XWYgoMDlmoeB5jABI7xM0haxcFyasU7fwDLDrrv+v
-	IjuFSsgMRS3IFwUSutPxuBXtAzfJFS5vqfCIA6Ej1QuprZHX0VMvJgmSBq2wQ7kvyMbli8lg1N7
-	lYjAcjWiHkYuyUV97TAcOdS3vT6yWbDydBOHJeRS14sEFrstVbCNISLNPKnPT9NUZAA7jrYp/37
-	B8YHLIkwyyXJ
-X-Received: by 2002:aa7:8e8a:0:b0:742:b3a6:db09 with SMTP id d2e1a72fcca58-742b3a6dbdbmr19583181b3a.16.1747795637093;
-        Tue, 20 May 2025 19:47:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFzkHF4ER+v9r//dGWI45mzF35nZdjti9WpLsYuT60Xr9ICzKlggdIDgLPRs9dM7JzLT2yOBw==
-X-Received: by 2002:aa7:8e8a:0:b0:742:b3a6:db09 with SMTP id d2e1a72fcca58-742b3a6dbdbmr19583136b3a.16.1747795636622;
-        Tue, 20 May 2025 19:47:16 -0700 (PDT)
-Received: from [192.168.68.51] ([180.233.125.65])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a970d1b2sm8941786b3a.66.2025.05.20.19.46.56
+        bh=jUSOmA0/3Qa3aXRPXfKpDedwfKwE88WYumy/XPPRjQc=;
+        b=YhA3qCn6qMkqF6/Vvx6pErCzYCKVAMoNC8/SNyfyOVGESaMjVFuq7fF9+ms2qJAnQ5
+         Yzq+mkvlaC8EiNejIfPEtNYAQ4vA8GyvOTxabg7ohx/YDBWq4C2Uc/1jf6TZeneCxOKv
+         kbN5d9esO2IWA0GvBPrzyXAXZyvWKoaEJLS17mKw3UZQj9vRZP0R/Ph9AnCcy08TrDne
+         y/HVwiO7mvnusFc3amiDGCLmj0O/mBONnLWswagoryf5IJXb1mDsu6jHEGDQsn4IxARM
+         9bKx3nc2XRPhsriXhDzCS1hC7RiKkSAKCUt4gmU63Y+LGe2V7m6mV+ygwtbiVgkpiCBt
+         Lwow==
+X-Gm-Message-State: AOJu0YxvuFa6Q1K8MPb0HyOrPFzI4wdQrYSj8x+GjdmD8agLbKPGXwOB
+	XXdxiVQmzeOgBJe0kXzsmm2KrvaUKH8BW57Nsj9HRiIWI4YnsJDDRvyIE4Ze9TU6aKZKjxfW4LU
+	+Bdg+tksfhpXjFbWVZLGJ4eJtnH0pOZGcEejEy+K8PUx0Ay065zK9mA==
+X-Gm-Gg: ASbGncvkDxqsv8ck+NhLUD7icHP3n9mJAVn3NM+rQYN3X1cgt46z+KrIH5VCQORnLU+
+	fcquqJEn67ajdU0f2NoDBg1aPmHE+ROHDPTLiUgZdj4inpurGWx+kvDPAnnFupeNftVPBLMz+h/
+	jHhGeAw+rpKIT/x0oAkUKiyI9oCZhjwu3TtNsNKj2qIB1uGrIzHJw8Hdk3bk54kP/Dinb1v4MvR
+	KR3rxN+jAntqt1jDXazR6UxPg6hCzVkf1fLYGKTEOyxcgL8S8aUNIDPHqQXKDCWR7yE2urzNRA9
+	Hs3y9vZVNrfo/O0=
+X-Received: by 2002:a17:902:d481:b0:232:4f8c:1b01 with SMTP id d9443c01a7336-2324f8c1cb2mr137961505ad.43.1747797699252;
+        Tue, 20 May 2025 20:21:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHlhvOC0UNtRC7lIlfulUbJxFqkdOC7pIWuh5IMs24BhyaPmpuqy0MrBWfWyaOHGCOUkRmRPA==
+X-Received: by 2002:a17:902:d481:b0:232:4f8c:1b01 with SMTP id d9443c01a7336-2324f8c1cb2mr137961065ad.43.1747797698773;
+        Tue, 20 May 2025 20:21:38 -0700 (PDT)
+Received: from [10.72.116.61] ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4e9784bsm83924955ad.113.2025.05.20.20.21.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 19:47:15 -0700 (PDT)
-Message-ID: <498765f6-c20e-48f2-98e4-4134bfe150a3@redhat.com>
-Date: Wed, 21 May 2025 12:46:55 +1000
+        Tue, 20 May 2025 20:21:38 -0700 (PDT)
+Message-ID: <79d7ee71-a68a-4cde-8796-fb42df59cfce@redhat.com>
+Date: Wed, 21 May 2025 11:21:28 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,95 +87,167 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 15/17] KVM: Introduce the KVM capability
- KVM_CAP_GMEM_SHARED_MEM
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250513163438.3942405-1-tabba@google.com>
- <20250513163438.3942405-16-tabba@google.com>
+Subject: Re: [kvm-unit-tests PATCH v3 10/16] scripts: Add default arguments
+ for kvmtool
+To: Alexandru Elisei <alexandru.elisei@arm.com>, andrew.jones@linux.dev,
+ eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+ frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+ david@redhat.com, pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, will@kernel.org, julien.thierry.kdev@gmail.com,
+ maz@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
+References: <20250507151256.167769-1-alexandru.elisei@arm.com>
+ <20250507151256.167769-11-alexandru.elisei@arm.com>
 Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250513163438.3942405-16-tabba@google.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20250507151256.167769-11-alexandru.elisei@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Fuad,
 
-On 5/14/25 2:34 AM, Fuad Tabba wrote:
-> This patch introduces the KVM capability KVM_CAP_GMEM_SHARED_MEM, which
-> indicates that guest_memfd supports shared memory (when enabled by the
-> flag). This support is limited to certain VM types, determined per
-> architecture.
+
+On 5/7/25 11:12 PM, Alexandru Elisei wrote:
+> kvmtool, unless told otherwise, will do its best to make sure that a kernel
+> successfully boots in a virtual machine. It does things like automatically
+> creating a rootfs and adding extra parameters to the kernel command line.
+> This is actively harmful to kvm-unit-tests, because some tests parse the
+> kernel command line and they will fail if they encounter the options added
+> by kvmtool.
 > 
-> This patch also updates the KVM documentation with details on the new
-> capability, flag, and other information about support for shared memory
-> in guest_memfd.
+> Fortunately for us, kvmtool commit 5613ae26b998 ("Add --nodefaults command
+> line argument") addded the --nodefaults kvmtool parameter which disables
+> all the implicit virtual machine configuration that cannot be disabled by
+> using other parameters, like modifying the kernel command line. So always
+> use --nodefaults to allow a test to run.
 > 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+> kvmtool can also be too verbose when running a virtual machine, and this is
+> controlled by several parameters. Add those to the default kvmtool command
+> line to reduce this verbosity to a minimum.
+> 
+> Before:
+> 
+> $ vm run arm/selftest.flat --cpus 2 --mem 256 --params "setup smp=2 mem=256"
+> Info: # lkvm run -k arm/selftest.flat -m 256 -c 2 --name guest-5035
+> Unknown subtest
+> 
+> EXIT: STATUS=127
+> Warning: KVM compatibility warning.
+>      virtio-9p device was not detected.
+>      While you have requested a virtio-9p device, the guest kernel did not initialize it.
+>      Please make sure that the guest kernel was compiled with CONFIG_NET_9P_VIRTIO=y enabled in .config.
+> Warning: KVM compatibility warning.
+>      virtio-net device was not detected.
+>      While you have requested a virtio-net device, the guest kernel did not initialize it.
+>      Please make sure that the guest kernel was compiled with CONFIG_VIRTIO_NET=y enabled in .config.
+> Info: KVM session ended normally.
+> 
+> After:
+> 
+> $ vm run arm/selftest.flat --nodefaults --network mode=none --loglevel=warning --cpus 2 --mem 256 --params "setup smp=2 mem=256"
+> PASS: selftest: setup: smp: number of CPUs matches expectation
+> INFO: selftest: setup: smp: found 2 CPUs
+> PASS: selftest: setup: mem: memory size matches expectation
+> INFO: selftest: setup: mem: found 256 MB
+> SUMMARY: 2 tests
+> 
+> EXIT: STATUS=1
+> 
+> Note that KVMTOOL_DEFAULT_OPTS can be overwritten by an environment
+> variable with the same name, but it's not documented in the help string for
+> run_tests.sh. This has been done on purpose, since overwritting
+> KVMTOOL_DEFAULT_OPTS should only be necessary for debugging or development
+> purposes.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->   Documentation/virt/kvm/api.rst | 18 ++++++++++++++++++
->   include/uapi/linux/kvm.h       |  1 +
->   virt/kvm/kvm_main.c            |  4 ++++
->   3 files changed, 23 insertions(+)
+>   scripts/common.bash | 10 +++++-----
+>   scripts/vmm.bash    | 13 +++++++++++++
+>   2 files changed, 18 insertions(+), 5 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 47c7c3f92314..86f74ce7f12a 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6390,6 +6390,24 @@ most one mapping per page, i.e. binding multiple memory regions to a single
->   guest_memfd range is not allowed (any number of memory regions can be bound to
->   a single guest_memfd file, but the bound ranges must not overlap).
+> diff --git a/scripts/common.bash b/scripts/common.bash
+> index 0645235d8baa..ee0ae71948c2 100644
+> --- a/scripts/common.bash
+> +++ b/scripts/common.bash
+> @@ -56,7 +56,7 @@ function for_each_unittest()
+>   			# because qemu interprets the first argument after
+>   			# -append as a kernel parameter.
+>   			test_args=""
+> -			opts=""
+> +			opts="${vmm_opts[$TARGET:default_opts]}"
+>   			groups=""
+>   			arch=""
+>   			machine=""
+> @@ -70,13 +70,13 @@ function for_each_unittest()
+>   		elif [[ $line =~ ^test_args\ *=\ *(.*)$ ]]; then
+>   			test_args="${vmm_opts[$TARGET:args]} ${BASH_REMATCH[1]}"
+>   		elif [[ $TARGET = "qemu" ]] && [[ $line =~ ^(extra_params|qemu_params)\ *=\ *'"""'(.*)$ ]]; then
+> -			opts=$(parse_opts ${BASH_REMATCH[2]}$'\n' $fd)
+> +			opts="${vmm_opts[$TARGET:default_opts]} $(parse_opts ${BASH_REMATCH[2]}$'\n' $fd)"
+>   		elif [[ $TARGET  = "qemu" ]] && [[ $line =~ ^(extra_params|qemu_params)\ *=\ *(.*)$ ]]; then
+> -			opts=${BASH_REMATCH[2]}
+> +			opts="${vmm_opts[$TARGET:default_opts]} ${BASH_REMATCH[2]}"
+>   		elif [[ $TARGET = "kvmtool" ]] && [[ $line =~ ^kvmtool_params\ *=\ *'"""'(.*)$ ]]; then
+> -			opts=$(parse_opts ${BASH_REMATCH[1]}$'\n' $fd)
+> +			opts="${vmm_opts[$TARGET:default_opts]} $(parse_opts ${BASH_REMATCH[1]}$'\n' $fd)"
+>   		elif [[ $TARGET = "kvmtool" ]] && [[ $line =~ ^kvmtool_params\ *=\ *(.*)$ ]]; then
+> -			opts=${BASH_REMATCH[1]}
+> +			opts="${vmm_opts[$TARGET:default_opts]} ${BASH_REMATCH[1]}"
+>   		elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
+>   			groups=${BASH_REMATCH[1]}
+>   		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
+> diff --git a/scripts/vmm.bash b/scripts/vmm.bash
+> index 20968f2e6b10..d24a4c4b8713 100644
+> --- a/scripts/vmm.bash
+> +++ b/scripts/vmm.bash
+> @@ -1,5 +1,16 @@
+>   source config.mak
 >   
-> +When the capability KVM_CAP_GMEM_SHARED_MEM is supported, the 'flags' field
-> +supports GUEST_MEMFD_FLAG_SUPPORT_SHARED.  Setting this flag on guest_memfd
-> +creation enables mmap() and faulting of guest_memfd memory to host userspace.
-> +
-> +When the KVM MMU performs a PFN lookup to service a guest fault and the backing
-> +guest_memfd has the GUEST_MEMFD_FLAG_SUPPORT_SHARED set, then the fault will
-> +always be consumed from guest_memfd, regardless of whether it is a shared or a
-> +private fault.
-> +
-> +For these memslots, userspace_addr is checked to be the mmap()-ed view of the
-> +same range specified using gmem.pgoff.  Other accesses by KVM, e.g., instruction
-> +emulation, go via slot->userspace_addr.  The slot->userspace_addr field can be
-> +set to 0 to skip this check, which indicates that KVM would not access memory
-> +belonging to the slot via its userspace_addr.
-> +
+> +# The following parameters are enabled by default when running a test with
+> +# kvmtool:
+> +# --nodefaults: suppress VM configuration that cannot be disabled otherwise
+> +#               (like modifying the supplied kernel command line). Tests that
+> +#               use the command line will fail without this parameter.
 
-This paragraph needs to be removed if PATCH[08/17] is going to be dropped.
+Maybe change it to below is better? (Put the 'Otherwise' to the next 
+paragraph)
 
-[PATCH v9 08/17] KVM: guest_memfd: Check that userspace_addr and fd+offset refer to same range
+# --nodefaults: suppress VM configuration that cannot be disabled
+#               (like modifying the supplied kernel command line). 	# 
+            Otherwise tests that use the command line will fail
+#               without this parameter.
 
-> +The use of GUEST_MEMFD_FLAG_SUPPORT_SHARED will not be allowed for CoCo VMs.
-> +This is validated when the guest_memfd instance is bound to the VM.
+Others looks good to me.
+
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+
+> +# --network mode=none: do not create a network device. kvmtool tries to help the
+> +#               user by automatically create one, and then prints a warning
+> +#               when the VM terminates if the device hasn't been initialized.
+> +# --loglevel=warning: reduce verbosity
+> +: "${KVMTOOL_DEFAULT_OPTS:="--nodefaults --network mode=none --loglevel=warning"}"
 > +
->   See KVM_SET_USER_MEMORY_REGION2 for additional details.
+>   ##############################################################################
+>   # qemu_fixup_return_code translates the ambiguous exit status in Table1 to that
+>   # in Table2.  Table3 simply documents the complete status table.
+> @@ -87,12 +98,14 @@ declare -A vmm_opts=(
+>   	[qemu:kernel]='-kernel'
+>   	[qemu:args]='-append'
+>   	[qemu:initrd]='-initrd'
+> +	[qemu:default_opts]=''
+>   	[qemu:fixup_return_code]=qemu_fixup_return_code
+>   
+>   	[kvmtool:nr_cpus]='--cpus'
+>   	[kvmtool:kernel]='--kernel'
+>   	[kvmtool:args]='--params'
+>   	[kvmtool:initrd]='--initrd'
+> +	[kvmtool:default_opts]="$KVMTOOL_DEFAULT_OPTS"
+>   	[kvmtool:fixup_return_code]=kvmtool_fixup_return_code
+>   )
 >   
 
-[...]
-
-Thanks,
-Gavin
+-- 
+Shaoqin
 
 
