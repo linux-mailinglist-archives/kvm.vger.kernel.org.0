@@ -1,156 +1,118 @@
-Return-Path: <kvm+bounces-47260-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79347ABF279
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 13:11:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C6EEABF324
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 13:42:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3246A7B39E0
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 11:10:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 584593BF07B
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 11:42:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFBB2620EE;
-	Wed, 21 May 2025 11:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08EB826461F;
+	Wed, 21 May 2025 11:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4JBxJzie"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="J+ZA1LkN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107FF2609DB
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 11:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571BE22B8B1;
+	Wed, 21 May 2025 11:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747825876; cv=none; b=JYD5KBbTbXX9X5JONJaX/1Nrk5V9quMoN+gY+iL/8C17bbOy0J53eUFKFGx77LFCva57tMoIs9MO3Sa3hyKCMJXklmaaeYwPArgJc6H4ztpZQTeeUzcAjskGYKoLxHfGJUZ9+TzAbyqO2p10HGUkL9UGXAHPNPjrYdNCzUGVyaw=
+	t=1747827763; cv=none; b=HImsbcJVselinqpCoTyUrGKtbvQf59aSEZMKju42YQ8HilnZ54WQEbmiwDaF1TLZF7pAH/OWeVGh/2u+N+zBjG44EbzUIQokSq2MyF/tS4SHUXyGXDqTRXbJHJSFCAh8huowD5356njkIoNXSXUzIpCzHoMTWTCVnB+5Kwdh9Lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747825876; c=relaxed/simple;
-	bh=tQ/q7iXtF5UPGh8+ohOv6KaZ9+fEVRStSIj96suCIB4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R9DaHsV9NIiPbAT90sBbmYGOqvrUO0GbSVIBvfX8JtCFt716h7kbupG1RXR0AYV/ZrBGzeBzXXl6P0brAxfgqt/uXC8TTZniWCU0xrI/470AV3cOn66wHJux1viOKc7idxUy/GthsRBBmbiP0T55CNeXPE2WNstARtvjhIAwmTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4JBxJzie; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-47e9fea29easo1646811cf.1
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 04:11:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747825874; x=1748430674; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ctqvgl2a53wbdaZxWTIiQHG1DssGpGTbCqmvno6TQ2s=;
-        b=4JBxJzieXV4M+/XM1CzLtAPCSME2CcMGJZsxWzk2sHqB7d6VuoNX764w3qez8pln27
-         3atpkGykCF03eq88vqbRkPvZL35ytjfSJuJpJ9kjm5Q2d4J1zQYiBLEffXUtY5MK+TkW
-         fXXOLaVKkmLz5l1Ixaxh1WDwfBEFNKnntHMu0VXrP7QJr8TxO7QqmY1N1ftkqilWBUyQ
-         7cehPPOnlwd/4/daATpNIWG9Rh4WNNc4Frj4gmKvjgk9GwNrVtq30Ftjgaxfg7c+s5T3
-         FBqIIL9IhJIpeZf+oTy2lvbhd8BvoL3OlbgT3oAsjEhG6iXg4rqjlj8fsbobdDRtgB94
-         LCmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747825874; x=1748430674;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ctqvgl2a53wbdaZxWTIiQHG1DssGpGTbCqmvno6TQ2s=;
-        b=tj20RRbJXAsZFchzurPisHa+JvK52i375o+3jYVlWnb2PE2xNN6BxrbF5fwTPFtzhh
-         qw+fSZyKsdQOLUCJQuP1WDKJ3NClusIDrAbWpi9bJJpsdJxqwEQ5KIrLDm9z0rpySijP
-         7yPaLDDiuWM+DZw75MIi8xV+gFWPxAcSfgx3YBawZ6P6swKEeRGRWRqqKVnk4u2wHdsD
-         xzdcIDHtr8ux0iumIF6Yye1GgwXTKWBFffEopQBL8SRtFnYhwte/paL9vP+Q6XCR7O5f
-         ATtRPoHib6zBHVs4ezJtHafWMVptQ7u9pZ0JgXhulD790767Q0EU+SpV8rfq2oadM6x/
-         ZFQA==
-X-Gm-Message-State: AOJu0YzGWlbOdCxHUPB8TQzOwaySYDyVIiuNhMMqHpGvc3/6/Ydb4yet
-	iHzjWSkwOUGhzmMTxo5NmVH5Lg7Fwscg4KOU+FILLlMr4VjA9NZUZUrmZ7xlq+ZrJ+D8K61AOpr
-	2BPKxflH1Vp77y38BCfygpp+RcvgvFLju+lCOgkrZ
-X-Gm-Gg: ASbGncupJoBDfk5DOla/m11JIdDp/d+Fv7cAFG0BHBx3a+THPNlW/dl+HMZDc/S/6f+
-	pu01TlOgrsxDmrvBj2PtOFfGfG54q98EJEVSDtwhLgwFRhiRKgFjXTgEak/JQ8bP3mdORTB7bIP
-	9w+LNEHpdndf2nviztAtRCOZ/x83qq8Xy/a8h2Ian43B9h6aGcrssNfxqJ9Iaf6u9TEl1mHs0x
-X-Google-Smtp-Source: AGHT+IG9JRLddwi7FWo7PGi8OFQqYZvIkWzFiMZ2eJyY+7GX2T8rNZIySJy/QKfkLbtNb5b9H6nducMJim1V/SX7ZEE=
-X-Received: by 2002:a05:622a:13cd:b0:47b:3a5:8380 with SMTP id
- d75a77b69052e-49595c5d9f6mr15353851cf.28.1747825873334; Wed, 21 May 2025
- 04:11:13 -0700 (PDT)
+	s=arc-20240116; t=1747827763; c=relaxed/simple;
+	bh=BBLaqALTYPrcSvGY4FSvdax+qvgZN3k55RMHh1U2OpI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BHY56iR6eTMoTOE3qRu2+2HVhTHl6YX2c1eZDgrJUpBA2/ftcf9WcI5xFuJwYnySV6uaQE2xdSow6LE0dafQ+ZUH30ErhC1VfVDKDYd37ZdMwD+WuEA34LHiJZxhvt0PrIWlB4zNCXEKuceKyV2nLuCgHxUiJBQJqYUCGEjasaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=J+ZA1LkN; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=+KOoH+QcbNIcFt9a+edbvuTeUreK6auzBcTQsLb2atU=; b=J+ZA1LkNIZvB2wt5zV0IUe5eaO
+	GhuaqpVSmOn9urMlfTUl+99lOTpOO+f/pKPDMPFnU/NqePPiHuAxDYGupA+8qh8qXhRmbs6tX5hE8
+	u6dkqBqpoh9TKIkQUILB0b5bVr+1imyLQj2jeTKmC7U4WmTqUpYnlhopptqDp7qC8cUMr6p90Zm69
+	nettF2xLWVUEiEI+dsK0hKGlo+GYUn+gXM7kr0szlrZOAI+qdeOvSb5knGoIDiA2s70Jaf8XMvICI
+	XanMgNn2dhRd352C3mtDH/+o4D/POcJxcolPn7egKhWx163FR8YjlkoLPFs9VpXbLQOF2bZ3QVm88
+	+pS+1Drg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.1 #2 (Red Hat Linux))
+	id 1uHhqE-00000000vno-2rKA;
+	Wed, 21 May 2025 11:42:34 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id C9BC1300348; Wed, 21 May 2025 13:42:33 +0200 (CEST)
+Date: Wed, 21 May 2025 13:42:33 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sean Christopherson <seanjc@google.com>, mhklinux@outlook.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, K Prateek Nayak <kprateek.nayak@amd.com>,
+	David Matlack <dmatlack@google.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+Subject: Re: [PATCH v2 08/12] sched/wait: Drop WQ_FLAG_EXCLUSIVE from
+ add_wait_queue_priority()
+Message-ID: <20250521114233.GC39944@noisy.programming.kicks-ass.net>
+References: <20250519185514.2678456-1-seanjc@google.com>
+ <20250519185514.2678456-9-seanjc@google.com>
+ <20250520191816.GJ16434@noisy.programming.kicks-ass.net>
+ <aC0AEJX0FIMl9lDy@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250513163438.3942405-1-tabba@google.com> <20250513163438.3942405-14-tabba@google.com>
- <8d6eb79a-a68d-4116-bb42-ed18b0a0d37d@redhat.com>
-In-Reply-To: <8d6eb79a-a68d-4116-bb42-ed18b0a0d37d@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 21 May 2025 12:10:36 +0100
-X-Gm-Features: AX0GCFsGsg3FxndHSZGJf7TgUxTEca7xqtxeGk7gRA7wW8yw3Stt3ibiefTaF9w
-Message-ID: <CA+EHjTyPp0OzbvvwG6AB+GJ9nSXroeJ6M2EnmERqvQ+sO+4E+Q@mail.gmail.com>
-Subject: Re: [PATCH v9 13/17] KVM: arm64: Handle guest_memfd()-backed guest
- page faults
-To: David Hildenbrand <david@redhat.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
-	pankaj.gupta@amd.com, ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aC0AEJX0FIMl9lDy@google.com>
 
-Hi David,
+On Tue, May 20, 2025 at 03:20:00PM -0700, Sean Christopherson wrote:
+> On Tue, May 20, 2025, Peter Zijlstra wrote:
+> > On Mon, May 19, 2025 at 11:55:10AM -0700, Sean Christopherson wrote:
+> > > Drop the setting of WQ_FLAG_EXCLUSIVE from add_wait_queue_priority() to
+> > > differentiate it from add_wait_queue_priority_exclusive().  The one and
+> > > only user add_wait_queue_priority(), Xen privcmd's irqfd_wakeup(),
+> > > unconditionally returns '0', i.e. doesn't actually operate in exclusive
+> > > mode.
+> > 
+> > I find:
+> > 
+> > drivers/hv/mshv_eventfd.c:      add_wait_queue_priority(wqh, &irqfd->irqfd_wait);
+> > drivers/xen/privcmd.c:  add_wait_queue_priority(wqh, &kirqfd->wait);
+> > 
+> > I mean, it might still be true and all, but hyperv seems to also use
+> > this now.
+> 
+> Oh FFS, another "heavily inspired by KVM".  I should have bribed someone to take
+> this series when I had the chance.  *sigh*
+> 
+> Unfortunately, the Hyper-V code does actually operate in exclusive mode.  Unless
+> you have a better idea, I'll tweak the series to:
+> 
+>   1. Drop WQ_FLAG_EXCLUSIVE from add_wait_queue_priority() and have the callers
+>      explicitly set the flag, 
+>   2. Add a patch to drop WQ_FLAG_EXCLUSIVE from Xen privcmd entirely.
+>   3. Introduce add_wait_queue_priority_exclusive() and switch KVM to use it.
+> 
+> That has an added bonus of introducing the Xen change in a dedicated patch, i.e.
+> is probably a sequence anyways.
+> 
+> Alternatively, I could rewrite the Hyper-V code a la the KVM changes, but I'm not
+> feeling very charitable at the moment (the complete lack of documentation for
+> their ioctl doesn't help).
 
-On Wed, 21 May 2025 at 09:04, David Hildenbrand <david@redhat.com> wrote:
->
-> On 13.05.25 18:34, Fuad Tabba wrote:
-> > Add arm64 support for handling guest page faults on guest_memfd
-> > backed memslots.
-> >
-> > For now, the fault granule is restricted to PAGE_SIZE.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
->
-> [...]
->
-> > +     if (!is_gmem) {
->
-> Should we add a comment somewhere, stating that we don't support VMs
-> with private memory, so if we have a gmem, all faults are routed through
-> that?
-
-I guess this is related to the other thread we had. This would handle
-private memory correctly. It's just that for arm64 as it is, having
-private memory isn't that useful.
-
-There might be a use-case where a user would create a
-guest_memfd-backed slot that supports private memory, and one that
-doesn't, which only the guest would use. I doubt that that's actually
-useful, but it would work and behave as expected.
-
-Cheers,
-/fuad
-
-> > +             mmap_read_lock(current->mm);
-> > +             vma = vma_lookup(current->mm, hva);
-> > +             if (unlikely(!vma)) {
-> > +                     kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
-> > +                     mmap_read_unlock(current->mm);
-> > +                     return -EFAULT;
-> > +             }
-> > +
-> > +             vfio_allow_any_uc = vma->vm_flags & VM_ALLOW_ANY_UNCACHED;
-> > +             mte_allowed = kvm_vma_mte_allowed(vma);
->
-> --
-> Cheers,
->
-> David / dhildenb
->
+Works for me. Michael is typically very responsive wrt hyperv (but you
+probably know this).
 
