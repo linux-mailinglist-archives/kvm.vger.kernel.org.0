@@ -1,167 +1,281 @@
-Return-Path: <kvm+bounces-47253-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47254-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4EE4ABF11D
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 12:13:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FDEDABF158
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 12:19:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AFDD8E12E3
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 10:13:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C8491896A75
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 10:19:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B308C25B1FC;
-	Wed, 21 May 2025 10:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89DEE25CC77;
+	Wed, 21 May 2025 10:18:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hFGQbFua"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hVFuP53K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549B725C71B
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 10:13:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA47F25C818
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 10:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747822397; cv=none; b=CrVZtXokvT0sLWODX8ogMIOtSqlWDgy+6oxL3ZTkGhzF/VlTs6Kw0AtpE8VNnTqEZKO9sZqHLtVTS0pNXZZu2gNhP7uYHNFF/BsKu+Frul+OB2qSZEkyFOcNGJUJ866qPItcSnYDRT3Hyz4xsYaj6191vpzW11JlzsqxxHWNGCU=
+	t=1747822735; cv=none; b=CE0wL69YLQ5iR9hANASx4IXb2v1cB73uAcgdI5eNkZRLq/u65Ofxc9w9tbQL3di5hHfK3n+XpGApHbJhQhRFwjQUUgHdYYIIVUfjg3ZP/5LmmUNjjZ13aUM6lfyzuPR18PqK7QctRw2qW1ZZ299njJUo9PyJ3/sAGadRTxSuOAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747822397; c=relaxed/simple;
-	bh=m83btPvFhxbMayVbe9ilisXmcIu5rZKCaqS5e/Ewk9E=;
+	s=arc-20240116; t=1747822735; c=relaxed/simple;
+	bh=G2C/vaLVIGf5Sn3ZTJtBtbGUyELBtVoL+tbLzbXjUPs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A7+9tOECOJtDsTxn6RPf/ub8FLlkLm9q5TbeDj60PIRKbMeYyYEVXkRJjtQDQ52Rq2DdaDwyfWSaNF91NnToJA9nT8bKElsKutVVbYEuIianTvIFahwRyOyMqg+JbbXeQSyzYAEBL4HOjlA0tQar6rq3pQPA9tUI2x/L90BSqG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hFGQbFua; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-47e9fea29easo1628201cf.1
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 03:13:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747822395; x=1748427195; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=d5QSndPkKAQ5vtrh+loQIW/5wevzzB6SrBoHRCKbDvk=;
-        b=hFGQbFua/9mHiQlDSpGBT6Q0/mr3vnnP1nJAygPkwpsVAdclFbyVJ4/iS2xhJxCjwu
-         GArUgUgyCjVBU37FmM5ZQadHlB8WQKtWrqHnDUBmy5W5ZVGF0lfhmTjIV71ySbjBoYH2
-         3zn2+aaGS48JPTe+Z6S3toUaKe2qxOgMKxkXHXq0R1fVTaNoouz3MeEhqWyUyS5H3qHf
-         VPCPpTbwdAp2WU96BQxSF2KpHnnJ6uu2M03AbjoDIeOzcx08ig/s9iUkE4G6Sg7kdmvK
-         az2nNLJHKQtXMYPOCQxMApUxKPj2H42dt76wtjrE39MSRWUoSGzKWS2oTX5oZdA3jPsP
-         I0gw==
+	 To:Cc:Content-Type; b=THA5p6HzpynfkbYDfFasjSUtlqMdN24eh5xWAOV89C5G4VMuFXZ4O8vbo4TpT7KnDd0GWvb5MtaneL8E8hjWzwd1EQEcJXqSXudXDBV0q2Zk1riqi4KdX41TrYMUpq0oTPl2wD6mixw5aTVwR4H+MO2ofE+kSsQ9pjllU6ajrAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hVFuP53K; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747822732;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bEmm1K7VIDJNPL/omES0vryrXyRIIJHN/GsrqOXkJmk=;
+	b=hVFuP53KLO4nhMWBYfXcxhWe3lJ6CHcIqx95TZhsTuBUfcbpOMxXNT6lGg7BlLU7uq3oCt
+	aA/Fo+JZtsplBwX6HiQ5uBjDuxVT1CSS6fVu0LEqWqkAT9JKATisbpeW+Xq2oK3HiUsWpX
+	h4NMTB7Hwhg36LBgzUzxPxQy+fjDpgI=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-572-ee2GGeGTM12ONouET_I5tA-1; Wed, 21 May 2025 06:18:51 -0400
+X-MC-Unique: ee2GGeGTM12ONouET_I5tA-1
+X-Mimecast-MFC-AGG-ID: ee2GGeGTM12ONouET_I5tA_1747822731
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-703d7a66d77so101637677b3.0
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 03:18:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747822395; x=1748427195;
+        d=1e100.net; s=20230601; t=1747822731; x=1748427531;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=d5QSndPkKAQ5vtrh+loQIW/5wevzzB6SrBoHRCKbDvk=;
-        b=wQkBnIDrS3GAdypDvLL76k3QjnzaV27w7uZ+fvimjA48QVN7j0T8Z8U8l/6yfblRM+
-         C8E7ZBgBLLIZQky78TFG1B3rKf5BQs2Q3CzHYU3fjmojjszD/ezMRbf/4RYss1XorrYz
-         a/ie/LutI8KbY1ZSkeSdFaaf5QbR9pX4ewjzVQ7munymYTMX3zMTQSKsteebYT/Yez0i
-         PunSFcKB4mDW/O7w99bsuMyJhTj6JHjWu/XirGsXgGCw1oeKMqouDKZq3Z2koqknepEz
-         UnldKyR2z13RhiSjWczFLTwRL1IO1MNO+Yw7NrqxyAA3GQ30+H92WgFavH2oVyahPDlP
-         TgDA==
-X-Gm-Message-State: AOJu0YxrNXI88NP0RBuHsxvw2fpmFF+Lvw19oFxbUndI8Jax7UQ7IZyW
-	3SISLiE0oeAtQPdYkZFxHz7OFXQkTNt8FXs/HSJ2gPPCnyihih1uj+tsqSAhdgi2WV8uAWViEf5
-	B0iw0k8jwjv8e4Bz5nOIgzhKyEbsXsGsoqT6feCn1
-X-Gm-Gg: ASbGnctdt5wKjlKcybBxDWogqkx8t8G7LvT2HnddYcc0iRY8uQVU0im1DgbpOYJtnA5
-	CCtfeTylweVepAbj1rg7JSuQb9zWQC6hfA2ty8XeMpm3zl7hDcpcnSIi/+QuRvG6rH5yhxaPv3k
-	beJUx5H/gU8bFnwmZhnDvEXtQbP1nY4ehsRJd0X3C174m/uF1mYCVDYfbReB+QZxnRreyy3VYD
-X-Google-Smtp-Source: AGHT+IFBSwGTdaQw/b8ps6ywr/tb178e/gz6GEZe1xfE1CXyjCsW9YbGLGngSw4suyfsuW4AGbCdMTzW2uSsF1TF0qk=
-X-Received: by 2002:a05:622a:1826:b0:494:af4b:59fd with SMTP id
- d75a77b69052e-49595d52c6emr16768151cf.18.1747822394826; Wed, 21 May 2025
- 03:13:14 -0700 (PDT)
+        bh=bEmm1K7VIDJNPL/omES0vryrXyRIIJHN/GsrqOXkJmk=;
+        b=YSdB9/nofXWY7QBEve5Jt0Kh6hnED7riQAHNyLVexqBHf/0yGjqGZQdwk7BfmSv4+R
+         TxBxb7aK+hj21ZYZz4Cirv+DYmlT977hyRyAXL7hz4KvA9bhJua0ZA9A9ZWJOFSrhh+b
+         x9YxPLHVJPqIt7graflOXQB+aY1Pn7nIoX5PT1fdtnYCWpP5icP3E65lxenZHFoqpl+D
+         oWjzQbF7rzMPuU5+vSGIzN/TstxJYHGK9EX5aiel67lj/rrbJFAFQkfKUuuJhsiM0VGi
+         CaXtvvyHaEjixGnkOIX0aeYfLn3upAtmPmsrwjnhWzYLGMy+UjbZKneq0JgdllorbAE9
+         7o4w==
+X-Forwarded-Encrypted: i=1; AJvYcCUMmYzwq0VHu0gsPIIF4kuAauRFo7LBUG5O94qbPHNdlIYpGd7vep/+hHm4klBrtrszMf0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yysx1Hozmt0ynq0NTjiHIArjmUovGYPPyo/nRw3LMFsoCNUAIjG
+	HrHMmvdjs3DXa4fyRVG3nV7XcPwMimTLpksF45taoKsyAMqWQzx5RpPTgUNEZ5zH2WnfK8KZk05
+	fisTRxb4oOfToNIP8yAcdAl5rHhm/jXfG/E1WIj1JFd7PlkRx1LoIRPnn6l6M6LnRAzbW1CQPDU
+	s9RpR3U35ZVsRC2n2PW4CaNQCFwghw
+X-Gm-Gg: ASbGncv1KkSAAsoFc9HUO3/D8quVy9rGFe4ARTAZieUBJo6pRwznP87vDnt8NcgW3qE
+	X6Khuv9UahePTvm8R91JfC97J1HGbismMRzKpNwZmOUe3NrHFMaDCYGmRcbrOofGJGGU=
+X-Received: by 2002:a05:690c:660e:b0:70d:fee8:87e8 with SMTP id 00721157ae682-70dfee88b52mr2598737b3.0.1747822731071;
+        Wed, 21 May 2025 03:18:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFo/AGgZgcakUhuZa9G4tlVWe+9b7a9Oxaj8NHUHWRUFm/WLAzDoPKDPvKri4IzERrGNFly6mnELDLQHw5udBQ=
+X-Received: by 2002:a05:690c:660e:b0:70d:fee8:87e8 with SMTP id
+ 00721157ae682-70dfee88b52mr2598337b3.0.1747822730682; Wed, 21 May 2025
+ 03:18:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250513163438.3942405-1-tabba@google.com> <20250513163438.3942405-15-tabba@google.com>
- <2084504e-2a11-404a-bbe8-930384106f53@redhat.com>
-In-Reply-To: <2084504e-2a11-404a-bbe8-930384106f53@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 21 May 2025 11:12:37 +0100
-X-Gm-Features: AX0GCFs6mm4R5LsozR4hLz8YIdTF39WQ3BoVlZqAx_u_jdRTh6jdrQkuKqVFCts
-Message-ID: <CA+EHjTyz4M4wGCTBzFwHLB_0LUJHq6J135f=DVOhGKQE4thrtQ@mail.gmail.com>
-Subject: Re: [PATCH v9 14/17] KVM: arm64: Enable mapping guest_memfd in arm64
-To: David Hildenbrand <david@redhat.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
-	pankaj.gupta@amd.com, ira.weiny@intel.com
+References: <ca3jkuttkt3yfdgcevp7s3ejrxx3ngkoyuopqw2k2dtgsqox7w@fhicoics2kiv>
+ <20250521020613.3218651-1-niuxuewei.nxw@antgroup.com> <bbn4lvdwh42m2zvi3rdyws66y5ulew32rchtz3kxirqlllkr63@7toa4tcepax3>
+ <CAGxU2F78hGUarnzz8Mf1UUOHPQin_Mf4U=wX0nASzmNTr1A6+g@mail.gmail.com>
+In-Reply-To: <CAGxU2F78hGUarnzz8Mf1UUOHPQin_Mf4U=wX0nASzmNTr1A6+g@mail.gmail.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Wed, 21 May 2025 12:18:39 +0200
+X-Gm-Features: AX0GCFvGkeN0YcM0yUqZLHsBlmv0460wnmptILSO66jr0DvtrKzFA-olh-MssLA
+Message-ID: <CAGxU2F4k-K+nvF4re8kQwdMfPZ=a6KLvgj-ntAPZVxyQKv6E_w@mail.gmail.com>
+Subject: Re: [PATCH 2/3] vsock/virtio: Add SIOCINQ support for all virtio
+ based transports
+To: Xuewei Niu <niuxuewei97@gmail.com>, Krasnov Arseniy <Oxffffaa@gmail.com>
+Cc: davem@davemloft.net, fupan.lfp@antgroup.com, jasowang@redhat.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com, 
+	niuxuewei.nxw@antgroup.com, pabeni@redhat.com, stefanha@redhat.com, 
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hi David,
-
-On Wed, 21 May 2025 at 09:05, David Hildenbrand <david@redhat.com> wrote:
+On Wed, 21 May 2025 at 10:58, Stefano Garzarella <sgarzare@redhat.com> wrote:
 >
-> On 13.05.25 18:34, Fuad Tabba wrote:
-> > Enable mapping guest_memfd in arm64. For now, it applies to all
-> > VMs in arm64 that use guest_memfd. In the future, new VM types
-> > can restrict this via kvm_arch_gmem_supports_shared_mem().
+> Forgot to CC Arseniy.
+>
+> On Wed, 21 May 2025 at 10:57, Stefano Garzarella <sgarzare@redhat.com> wrote:
 > >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >   arch/arm64/include/asm/kvm_host.h | 10 ++++++++++
-> >   arch/arm64/kvm/Kconfig            |  1 +
-> >   2 files changed, 11 insertions(+)
+> > On Wed, May 21, 2025 at 10:06:13AM +0800, Xuewei Niu wrote:
+> > >> On Mon, May 19, 2025 at 03:06:48PM +0800, Xuewei Niu wrote:
+> > >> >The virtio_vsock_sock has a new field called bytes_unread as the return
+> > >> >value of the SIOCINQ ioctl.
+> > >> >
+> > >> >Though the rx_bytes exists, we introduce a bytes_unread field to the
+> > >> >virtio_vsock_sock struct. The reason is that it will not be updated
+> > >> >until the skbuff is fully consumed, which causes inconsistency.
+> > >> >
+> > >> >The byte_unread is increased by the length of the skbuff when skbuff is
+> > >> >enqueued, and it is decreased when dequeued.
+> > >> >
+> > >> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+> > >> >---
+> > >> > drivers/vhost/vsock.c                   |  1 +
+> > >> > include/linux/virtio_vsock.h            |  2 ++
+> > >> > net/vmw_vsock/virtio_transport.c        |  1 +
+> > >> > net/vmw_vsock/virtio_transport_common.c | 17 +++++++++++++++++
+> > >> > net/vmw_vsock/vsock_loopback.c          |  1 +
+> > >> > 5 files changed, 22 insertions(+)
+> > >> >
+> > >> >diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > >> >index 802153e23073..0f20af6e5036 100644
+> > >> >--- a/drivers/vhost/vsock.c
+> > >> >+++ b/drivers/vhost/vsock.c
+> > >> >@@ -452,6 +452,7 @@ static struct virtio_transport vhost_transport = {
+> > >> >            .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+> > >> >
+> > >> >            .unsent_bytes             = virtio_transport_unsent_bytes,
+> > >> >+           .unread_bytes             = virtio_transport_unread_bytes,
+> > >> >
+> > >> >            .read_skb = virtio_transport_read_skb,
+> > >> >    },
+> > >> >diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > >> >index 0387d64e2c66..0a7bd240113a 100644
+> > >> >--- a/include/linux/virtio_vsock.h
+> > >> >+++ b/include/linux/virtio_vsock.h
+> > >> >@@ -142,6 +142,7 @@ struct virtio_vsock_sock {
+> > >> >    u32 buf_alloc;
+> > >> >    struct sk_buff_head rx_queue;
+> > >> >    u32 msg_count;
+> > >> >+   size_t bytes_unread;
+> > >>
+> > >> Can we just use `rx_bytes` field we already have?
+> > >>
+> > >> Thanks,
+> > >> Stefano
+> > >
+> > >I perfer not. The `rx_bytes` won't be updated until the skbuff is fully
+> > >consumed, causing inconsistency issues. If it is acceptable to you, I'll
+> > >reuse the field instead.
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 08ba91e6fb03..2514779f5131 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -1593,4 +1593,14 @@ static inline bool kvm_arch_has_irq_bypass(void)
-> >       return true;
+> > I think here we found a little pre-existing issue that should be related
+> > also to what Arseniy (CCed) is trying to fix (low_rx_bytes).
+> >
+> > We basically have 2 counters:
+> > - rx_bytes, which we use internally to see if there are bytes to read
+> >    and for sock_rcvlowat
+> > - fwd_cnt, which we use instead for the credit mechanism and informing
+> >    the other peer whether we have space or not
+> >
+> > These are updated with virtio_transport_dec_rx_pkt() and
+> > virtio_transport_inc_rx_pkt()
+> >
+> > As far as I can see, from the beginning, we call
+> > virtio_transport_dec_rx_pkt() only when we consume the entire packet.
+> > This makes sense for `fwd_cnt`, because we still have occupied space in
+> > memory and we don't want to update the credit until we free all the
+> > space, but I think it makes no sense for `rx_bytes`, which is only used
+> > internally and should reflect the current situation of bytes to read.
+> >
+> > So in my opinion we should fix it this way (untested):
+> >
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index 11eae88c60fc..ee70cb114328 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -449,10 +449,10 @@ static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
 > >   }
 > >
-> > +static inline bool kvm_arch_supports_gmem(struct kvm *kvm)
-> > +{
-> > +     return IS_ENABLED(CONFIG_KVM_GMEM);
-> > +}
-> > +
-> > +static inline bool kvm_arch_vm_supports_gmem_shared_mem(struct kvm *kvm)
-> > +{
-> > +     return IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM);
-> > +}
-> > +
-> >   #endif /* __ARM64_KVM_HOST_H__ */
-> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> > index 096e45acadb2..8c1e1964b46a 100644
-> > --- a/arch/arm64/kvm/Kconfig
-> > +++ b/arch/arm64/kvm/Kconfig
-> > @@ -38,6 +38,7 @@ menuconfig KVM
-> >       select HAVE_KVM_VCPU_RUN_PID_CHANGE
-> >       select SCHED_INFO
-> >       select GUEST_PERF_EVENTS if PERF_EVENTS
-> > +     select KVM_GMEM_SHARED_MEM
-> >       help
-> >         Support hosting virtualized guest machines.
+> >   static void virtio_transport_dec_rx_pkt(struct virtio_vsock_sock *vvs,
+> > -                                       u32 len)
+> > +                                       u32 bytes_read, u32 bytes_dequeued)
+> >   {
+> > -       vvs->rx_bytes -= len;
+> > -       vvs->fwd_cnt += len;
+> > +       vvs->rx_bytes -= bytes_read;
+> > +       vvs->fwd_cnt += bytes_dequeued;
+> >   }
 > >
->
-> Do we have to reject somewhere if we are given a guest_memfd that was
-> *not* created using the SHARED flag? Or will existing checks already
-> reject that?
+> >   void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct sk_buff *skb)
+> > @@ -581,11 +581,11 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> >                                    size_t len)
+> >   {
+> >         struct virtio_vsock_sock *vvs = vsk->trans;
+> > -       size_t bytes, total = 0;
+> >         struct sk_buff *skb;
+> >         u32 fwd_cnt_delta;
+> >         bool low_rx_bytes;
+> >         int err = -EFAULT;
+> > +       size_t total = 0;
+> >         u32 free_space;
+> >
+> >         spin_lock_bh(&vvs->rx_lock);
+> > @@ -597,6 +597,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> >         }
+> >
+> >         while (total < len && !skb_queue_empty(&vvs->rx_queue)) {
+> > +               size_t bytes, dequeued = 0;
+> > +
+> >                 skb = skb_peek(&vvs->rx_queue);
+> >
+> >                 bytes = min_t(size_t, len - total,
+> > @@ -620,12 +622,12 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> >                 VIRTIO_VSOCK_SKB_CB(skb)->offset += bytes;
+> >
+> >                 if (skb->len == VIRTIO_VSOCK_SKB_CB(skb)->offset) {
+> > -                       u32 pkt_len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
+> > -
+> > -                       virtio_transport_dec_rx_pkt(vvs, pkt_len);
+> > +                       dequeued = le32_to_cpu(virtio_vsock_hdr(skb)->len);
+> >                         __skb_unlink(skb, &vvs->rx_queue);
+> >                         consume_skb(skb);
+> >                 }
+> > +
+> > +               virtio_transport_dec_rx_pkt(vvs, bytes, dequeued);
+> >         }
+> >
+> >         fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
+> > @@ -782,7 +784,7 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+> >                                 msg->msg_flags |= MSG_EOR;
+> >                 }
+> >
+> > -               virtio_transport_dec_rx_pkt(vvs, pkt_len);
+> > +               virtio_transport_dec_rx_pkt(vvs, pkt_len, pkt_len);
+> >                 vvs->bytes_unread -= pkt_len;
+> >                 kfree_skb(skb);
+> >         }
+> > @@ -1752,6 +1754,7 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+> >         struct sock *sk = sk_vsock(vsk);
+> >         struct virtio_vsock_hdr *hdr;
+> >         struct sk_buff *skb;
+> > +       u32 pkt_len;
+> >         int off = 0;
+> >         int err;
+> >
+> > @@ -1769,7 +1772,8 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+> >         if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM)
+> >                 vvs->msg_count--;
+> >
+> > -       virtio_transport_dec_rx_pkt(vvs, le32_to_cpu(hdr->len));
+> > +       pkt_len = le32_to_cpu(hdr->len);
+> > +       virtio_transport_dec_rx_pkt(vvs, pkt_len, pkt_len);
+> >         spin_unlock_bh(&vvs->rx_lock);
+> >
+> >         virtio_transport_send_credit_update(vsk);
+> >
+> > @Arseniy WDYT?
+> > I will test it and send a proper patch.
+> >
+> > @Xuewei with that fixed, I think you can use `rx_bytes`, right?
 
-We don't reject, but I don't think we need to. A user can create a
-guest_memfd that's private in arm64, it would just be useless.
+If it's true, can we just use `vsock_stream_has_data()` return value
+instead of adding a new transport's callback?
 
-Cheers,
-/fuad
-> --
-> Cheers,
->
-> David / dhildenb
->
+Thanks,
+Stefano
+
+> >
+> > Also because you missed for example `virtio_transport_read_skb()` used
+> > by ebpf (see commit 3543152f2d33 ("vsock: Update rx_bytes on
+> > read_skb()")).
+> >
+> > Thanks,
+> > Stefano
+
 
