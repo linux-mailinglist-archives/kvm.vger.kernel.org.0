@@ -1,207 +1,304 @@
-Return-Path: <kvm+bounces-47284-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47285-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DEE8ABF91A
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 17:22:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8DD7ABF923
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 17:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 249CF1BA0052
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 15:22:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA13C4A0253
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 15:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E611EDA2E;
-	Wed, 21 May 2025 15:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2A51DC9B5;
+	Wed, 21 May 2025 15:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wz/dvelT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+FCnITc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C935E1DE896
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 15:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB6E1D63DF
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 15:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747840947; cv=none; b=VmWRSwZW+kPhx8Pgqj3wmkaVIt3h8UTb0gRPtStFD/PKCdwX8Ovm6tocvD48c3z6eZBjn/AekAkaJJgKS/AdJ0aKZdHS2ceHGL6lNOTPktNjZTZqM9JEfSEkFQqsEcsea3eIoFeStBpmhw3LrB5mkV+iKG4VDv1qmIafVhuZ1Fc=
+	t=1747841056; cv=none; b=DTFhy4hyRoAUs//3okIeX4BR13GuHdIWMkOqeVQdN1buSIPa7dn3kuBwG6b0tTejTQIxxX1t+EN/eeWqWV/I1T6c5hvNBmCq97Wu1b9dYzOzDyka6m6yQYIzCBIrCD5m2D1wIITMotbwMq7COoJqL1nikdeVKcnDqWTJCPLt76w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747840947; c=relaxed/simple;
-	bh=cyorVbV+bvd3pMFT0Pcn7XPfJZwPAhId89v8L031Ymo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JUaKBKIEtlD6shIjyznEWT03vA/EQWwYlfvViBezm6zo8pKG6no1Ay3pSEll/1GipypoqTpov+W1Uv+/9zJjsy8C0G/A50AZ2sY+DzmoXwzWqraEpiJow+VtBtaJpxBLYLeh9czAJrxrn2afy4G9NEqtMapPiltCs6En6GxKHHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wz/dvelT; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-48b7747f881so1488601cf.1
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 08:22:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747840944; x=1748445744; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cyorVbV+bvd3pMFT0Pcn7XPfJZwPAhId89v8L031Ymo=;
-        b=wz/dvelTbEq7Aiu/k2VyQ2d5GdHjoH0Qv3Suw8HGNvOm89E/ZiNXe5ARoIf6mRR4Zo
-         jRaIKCPBCCJ/quBLD6RvXi+fJkBmOqnY1G75ili4y3YHsgo9Dx1pJsNxydlptHhRjR9P
-         B1wAHk9PQGZXoyYyREL/x/5qf4fK61xdA0mP1Xyw5goEnowds+xa2sh/U43jM/bawv99
-         fL3+moPXP8Y9cNCGy5hvqubX2b3SC9SGZV3xDax6uo1MZNj9+PQB9DX3Hh0DeO3DRVFS
-         nMCj2vYU+pv4t/mnICalk1ChBtUAzx1WjZ7Wi5v/zeNEXtw0ryEblBKRcwcQA1OKJ5FB
-         xfww==
+	s=arc-20240116; t=1747841056; c=relaxed/simple;
+	bh=7CodgDFGCpMBU+/Bg+diyCYhpTJXE+AvR7xj10i+qZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ok7/VYVp+kf10r4vjmyIx9uoXulV/FOitLtL9+vBuRsnmnEhlfPaJfdZEsRFB6uyBkbTNRGy357iq3yiNXQmd3plveL+kCjC5uOMaK/dpJIg4tWqCNKHc5q9z1Qv0TAQkPwKmBqrj30iMkU9YYeqiJrYjG/VtNhdMp0eXajXioc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H+FCnITc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747841053;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8vqJcgtD0m0cV+LRe+RWGRd1MfJDepFj2iZqcJ0qHUQ=;
+	b=H+FCnITc3xVOnmi69/DMoPRxRxdQSIliZq2zXs6HOoeIl0AvxTHtZwKod/4qtjdil/8pOx
+	yr7mW0Et/HbKRmhU/VWdDdbVSRYyxPoBi52wtLUIpZepvgDCjVu6LvyBlDS86V8H/ZJPTN
+	ns8vXlVu3KrTfGNApTvYnCCO1XsW6EY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-393-UvtWHzEXNYKO5H_cPhT3sQ-1; Wed, 21 May 2025 11:24:11 -0400
+X-MC-Unique: UvtWHzEXNYKO5H_cPhT3sQ-1
+X-Mimecast-MFC-AGG-ID: UvtWHzEXNYKO5H_cPhT3sQ_1747841051
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7c5f3b94827so1114191485a.0
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 08:24:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747840944; x=1748445744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cyorVbV+bvd3pMFT0Pcn7XPfJZwPAhId89v8L031Ymo=;
-        b=IjK3dTXwmXnANNbJTrmtX/n2y68JqkOV/ZNx8rFgYweiOhjszjp5oGz52EbdNt4EAY
-         7fsbnHnK4VY/GKVpFw3u+NbHkSsiNvrhwfWyw+tXplaSpKL1rUGi6zihZxxJtNDQwDQ7
-         yXCuFXBM4NknAS0NFHdQPGHpcyXJ+hYF1kAfGv35WNOAUX48Zvd2vRLxzUbHlV9SANOH
-         Ibc5Qs4AN1Z9n5XJBClqkYwpkN0jXU8dezkGLN1FyRhV3SfVrAsvGN2LAJAMxmQOr/y5
-         7b7dqvAzHTQlDsfzy7KrFSAbuWJ11++wz0KDNcHjEpWavKDCiBtagcCJWRRD4M8mzO/T
-         lDig==
-X-Forwarded-Encrypted: i=1; AJvYcCWTX76PuV52rtD4IXujpG8b5QgFBpgY+4LlszaEPtkunlPunkKUFm3+yuKqzjbfU1e3aHE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzW8k8Y4cr1KPhqJCYfKS8Ey7W2t7o/Z2nySNmnk4UBamjDn4JU
-	5lsI2Vv8zH1sCQZHCIhy2uVT5A1QOwHYGkfCZSzmSc6oi84fWBaq+Ge8BjxlrNpWYl3mgc51NZv
-	wG4YcKtqOnvpL9SD4JfLnBpD5qqCVaSg4TD6vJPYs
-X-Gm-Gg: ASbGncvRZgU9vHF79d8vOl4xF9zpUKO1L4oCLeRTK2Vs3F/bsy0NNa9QrLagLRlYIuZ
-	/ZNtIRRLvYd+gMsh/0pJu++EuIINCFlL37NrYK0xf6JWG95IebISJFiZ/TxDsRQmRYuyLiltvaJ
-	8jumABDccxt4jW0dfG1sjuWCK1vmzGKESNMQRdQsuFT7R2ocohwTafsA==
-X-Google-Smtp-Source: AGHT+IE9sWx0eO9CaSEERbSlz8WHSAH0nRVx3exSAXfCOfLTtTCtFAKZo3qwXtV1LJJtoEI1TnqjZGTpW4mH4zrZQIM=
-X-Received: by 2002:a05:622a:449:b0:48a:42fa:78fa with SMTP id
- d75a77b69052e-4958cd26812mr16408901cf.2.1747840944231; Wed, 21 May 2025
- 08:22:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747841051; x=1748445851;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8vqJcgtD0m0cV+LRe+RWGRd1MfJDepFj2iZqcJ0qHUQ=;
+        b=txDbZjS34/VJ+/gCsM4hU3BcAmXOZysPLKoxBzEj6pEMOsVRZcfaXFvkP2HFVNF5fU
+         1avqMbyTE52UjeirTsq3SN+E915xtJT2+W4u5/6e/5gg04YlhpIhztrKrRceLyblrjOt
+         as7tnhEl8noyyt4tm9iF2MkdLy2ldT16IKyEpIB9oy3flEH20GWzK7HNSCJD7LYfNZAT
+         QugTe8LtIBxRuZj8xaZaVM4SA7mWncbrfOZnIrGq26LhJs8bSy+I8Bol08qtFdcnpRgR
+         8wBvIrkByQ+bZ82TedhMGEMvc4lzZgbSHhVhnaqfXMOfXeKd9XBn5/BZUiLgI7ovDNYi
+         jM+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUwg5Ga+ZNMMRf+IgIHUATl4jDYXbfu5nc196CjZNiIb3KIwFTHN196VWosriPdKWAZawE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwODspgnS68uqq2VAbf2ITLwLBJMLo4LZmL1Kea15ca/ACK6XPz
+	3YHJfxepKKDOnNdL7TR18jXWx1MivGMHBCh+gMwYTjekPc182DL2tXBC3ZpcOCGrSeYxQDb2QRP
+	oGu4DdWYJv/B81vzEK5Q1KONm1fD+jNzjtuKknjixrThKCV8isQDilA==
+X-Gm-Gg: ASbGncvWaavAuxHCYO6rfb4R6tRZPcZNr4RTZpeqQMFZkYK6JvLNLAkXrVt+AWV0sFL
+	OPW8XY78I6+NpjOhJNshX7vVF1HzET5kEF2HW2iDUgWK5EdBmUx56inIo6B6gVXjk28k1/bfmJ+
+	IYj3HKdwNEGsbQdMUcNxUls/5tWEYQJ6jWVRQQhSl4ds6hOStZJDqWCva0iIBGr+8EfEnTvLXio
+	BYMqy1NVccGRz7bue6pthgMhGOWJFoz2NwWiUU2h0UVZoxRYwzyS7cOdV4gH3K/0FVq2+6Hds4n
+	WeY=
+X-Received: by 2002:a05:620a:2994:b0:7c5:3c0a:ab7e with SMTP id af79cd13be357-7cd46707c65mr2827172285a.5.1747841051357;
+        Wed, 21 May 2025 08:24:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGpKCsLZK8fldjDSKpxmr3xZ4LVd50UA3aAZSvoaTqmv4NchFdKg38lljbXixaCEhED3occeQ==
+X-Received: by 2002:a05:620a:2994:b0:7c5:3c0a:ab7e with SMTP id af79cd13be357-7cd46707c65mr2827169685a.5.1747841050957;
+        Wed, 21 May 2025 08:24:10 -0700 (PDT)
+Received: from x1.local ([85.131.185.92])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cd468cc782sm886213785a.101.2025.05.21.08.24.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 May 2025 08:24:10 -0700 (PDT)
+Date: Wed, 21 May 2025 11:24:07 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Yan Zhao <yan.y.zhao@intel.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Binbin Wu <binbin.wu@linux.intel.com>,
+	James Houghton <jthoughton@google.com>,
+	Pankaj Gupta <pankaj.gupta@amd.com>
+Subject: Re: [PATCH v3 0/6]  KVM: Dirty ring fixes and cleanups
+Message-ID: <aC3wFwFwFbLlsIft@x1.local>
+References: <20250516213540.2546077-1-seanjc@google.com>
+ <aCzUIsn1ZF2lEOJ-@x1.local>
+ <aC0NMJIeqlgvq0yL@google.com>
+ <aC0VlENyfE9ewuTF@x1.local>
+ <aC3oIjkivS2KqKZH@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
- <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
- <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
- <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
- <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
- <CA+EHjTy7iBNBb9DRdtgq8oYmvgykhSNvZL3FrRV4XF90t3XgBg@mail.gmail.com>
- <CAGtprH_7jSpwF77j1GW8rjSrbtZZ2OW2iGck5=Wk67+VnF9vjQ@mail.gmail.com>
- <CA+EHjTzMhKCoftfJUuL0WUZW4DdqOHgVDcn0Cmf-0r--8rBdbg@mail.gmail.com>
- <diqzecwjnk95.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTyY5C1QgkoAqvJ0kHM4nUvKc1e1nQ0Uq+BANtVEnZH90w@mail.gmail.com>
- <CAGtprH-fE=G923ctBAcq5zFna+2WULhmHDSbXUsZKUrin29b4g@mail.gmail.com>
-In-Reply-To: <CAGtprH-fE=G923ctBAcq5zFna+2WULhmHDSbXUsZKUrin29b4g@mail.gmail.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 21 May 2025 16:21:46 +0100
-X-Gm-Features: AX0GCFunsX4s_S9rg-xVdpk--w8XHiF75FQSZUzqMS7j0X8kX-1qix4ZgGpOcAc
-Message-ID: <CA+EHjTxvufYVA8LQWRKEX7zA0gWLQUHVO2LvwKc5JXVu-XAEEA@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
- KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
-To: Vishal Annapurve <vannapurve@google.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
-	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
-	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
-	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
-	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
-	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
-	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
-	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
-	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aC3oIjkivS2KqKZH@google.com>
 
-Hi Vishal,
+On Wed, May 21, 2025 at 07:50:10AM -0700, Sean Christopherson wrote:
+> On Tue, May 20, 2025, Peter Xu wrote:
+> > On Tue, May 20, 2025 at 04:16:00PM -0700, Sean Christopherson wrote:
+> > > On Tue, May 20, 2025, Peter Xu wrote:
+> > > > On Fri, May 16, 2025 at 02:35:34PM -0700, Sean Christopherson wrote:
+> > > > > Sean Christopherson (6):
+> > > > >   KVM: Bound the number of dirty ring entries in a single reset at
+> > > > >     INT_MAX
+> > > > >   KVM: Bail from the dirty ring reset flow if a signal is pending
+> > > > >   KVM: Conditionally reschedule when resetting the dirty ring
+> > > > >   KVM: Check for empty mask of harvested dirty ring entries in caller
+> > > > >   KVM: Use mask of harvested dirty ring entries to coalesce dirty ring
+> > > > >     resets
+> > > > >   KVM: Assert that slots_lock is held when resetting per-vCPU dirty
+> > > > >     rings
+> > > > 
+> > > > For the last one, I'd think it's majorly because of the memslot accesses
+> > > > (or CONFIG_LOCKDEP=y should yell already on resets?).  
+> > > 
+> > > No?  If KVM only needed to ensure stable memslot accesses, then SRCU would suffice.
+> > > It sounds like holding slots_lock may have been a somewhat unintentional,  but the
+> > > reason KVM can't switch to SRCU is that doing so would break ordering, not because
+> > > slots_lock is needed to protect the memslot accesses.
+> > 
+> > Hmm.. isn't what you said exactly means a "yes"? :)
+> > 
+> > I mean, I would still expect lockdep to report this ioctl if without the
+> > slots_lock, please correct me if it's not the case.
+> 
+> Yes, one of slots_lock or SRCU needs to be held.
+> 
+> > And if using RCU is not trivial (or not necessary either), so far the
+> > slots_lock is still required to make sure the memslot accesses are legal?
+> 
+> I don't follow this part.  The intent of the comment is to document why slots_lock
+> is required, which is exceptional because memslot access for readers are protected
+> by kvm->srcu.
 
-On Wed, 21 May 2025 at 15:42, Vishal Annapurve <vannapurve@google.com> wrot=
-e:
->
-> On Wed, May 21, 2025 at 5:36=E2=80=AFAM Fuad Tabba <tabba@google.com> wro=
-te:
-> > ....
-> > > When rebooting, the memslots may not yet be bound to the guest_memfd,
-> > > but we want to reset the guest_memfd's to private. If we use
-> > > KVM_SET_MEMORY_ATTRIBUTES to convert, we'd be forced to first bind, t=
-hen
-> > > convert. If we had a direct ioctl, we don't have this restriction.
-> > >
-> > > If we do the conversion via vcpu_run() we would be forced to handle
-> > > conversions only with a vcpu_run() and only the guest can initiate a
-> > > conversion.
-> > >
-> > > On a guest boot for TDX, the memory is assumed to be private. If the =
-we
-> > > gave it memory set as shared, we'd just have a bunch of
-> > > KVM_EXIT_MEMORY_FAULTs that slow down boot. Hence on a guest reboot, =
-we
-> > > will want to reset the guest memory to private.
-> > >
-> > > We could say the firmware should reset memory to private on guest
-> > > reboot, but we can't force all guests to update firmware.
-> >
-> > Here is where I disagree. I do think that this is the CoCo guest's
-> > responsibility (and by guest I include its firmware) to fix its own
-> > state after a reboot. How would the host even know that a guest is
-> > rebooting if it's a CoCo guest?
->
-> There are a bunch of complexities here, reboot sequence on x86 can be
-> triggered using multiple ways that I don't fully understand, but few
-> of them include reading/writing to "reset register" in MMIO/PCI config
-> space that are emulated by the host userspace directly. Host has to
-> know when the guest is shutting down to manage it's lifecycle.
+I always think it's fine to take slots_lock for readers too.  RCU can
+definitely be better in most cases..
 
-In that case, I think we need to fully understand these complexities
-before adding new IOCTLs. It could be that once we understand these
-issues, we find that we don't need these IOCTLs. It's hard to justify
-adding an IOCTL for something we don't understand.
+> The fact that slots_lock also protects memslots is notable only
+> because it makes acquiring kvm->srcu superfluous.  But grabbing kvm->srcu is still
+> safe/legal/ok:
+> 
+> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> index 1ba02a06378c..6bf4f9e2f291 100644
+> --- a/virt/kvm/dirty_ring.c
+> +++ b/virt/kvm/dirty_ring.c
+> @@ -121,18 +121,26 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
+>         u64 cur_offset, next_offset;
+>         unsigned long mask = 0;
+>         struct kvm_dirty_gfn *entry;
+> +       int idx;
+>  
+>         /*
+>          * Ensure concurrent calls to KVM_RESET_DIRTY_RINGS are serialized,
+>          * e.g. so that KVM fully resets all entries processed by a given call
+> -        * before returning to userspace.  Holding slots_lock also protects
+> -        * the various memslot accesses.
+> +        * before returning to userspace.
+>          */
+>         lockdep_assert_held(&kvm->slots_lock);
+>  
+> +       /*
+> +        * Holding slots_lock also protects the various memslot accesses, but
+> +        * acquiring kvm->srcu for read here is still safe, just unnecessary.
+> +        */
+> +       idx = srcu_read_lock(&kvm->srcu);
+> +
+>         while (likely((*nr_entries_reset) < INT_MAX)) {
+> -               if (signal_pending(current))
+> +               if (signal_pending(current)) {
+> +                       srcu_read_unlock(&kvm->srcu, idx);
+>                         return -EINTR;
+> +               }
+>  
+>                 entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
+>  
+> @@ -205,6 +213,8 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
+>         if (mask)
+>                 kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+>  
+> +       srcu_read_unlock(&kvm->srcu, idx);
+> +
+>         /*
+>          * The request KVM_REQ_DIRTY_RING_SOFT_FULL will be cleared
+>          * by the VCPU thread next time when it enters the guest.
+> --
+> 
+> And unless there are other behaviors that are protected by slots_lock (which is
+> entirely possible), serializing the processing of each ring could be done via a
 
-> x86 CoCo VM firmwares don't support warm/soft reboot and even if it
-> does in future, guest kernel can choose a different reboot mechanism.
-> So guest reboot needs to be emulated by always starting from scratch.
-> This sequence needs initial guest firmware payload to be installed
-> into private ranges of guest_memfd.
->
-> >
-> > Either the host doesn't (or cannot even) know that the guest is
-> > rebooting, in which case I don't see how having an IOCTL would help.
->
-> Host does know that the guest is rebooting.
+Yes, I am not the original author, but when I was working on it I don't
+remember anything relying on that.  However still it's possible it can
+serialize some operations under the hood (which will be true side effect of
+using this lock..).
 
-In that case, that (i.e., the host finding out that the guest is
-rebooting) could trigger the conversion back to private. No need for
-an IOCTL.
+> dedicated (for example only, the dedicated mutex could/should be per-vCPU, not
+> global).
+> 
+> This diff in particular shows why I ordered and phrased the comment the way I
+> did.  The blurb about protecting memslot accesses is purely a friendly reminder
+> to readers.  The sole reason for an assert and comment is to call out the need
+> for ordering.
+> 
+> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> index 1ba02a06378c..92ac82b535fe 100644
+> --- a/virt/kvm/dirty_ring.c
+> +++ b/virt/kvm/dirty_ring.c
+> @@ -102,6 +102,8 @@ static inline bool kvm_dirty_gfn_harvested(struct kvm_dirty_gfn *gfn)
+>         return smp_load_acquire(&gfn->flags) & KVM_DIRTY_GFN_F_RESET;
+>  }
+>  
+> +static DEFINE_MUTEX(per_ring_lock);
+> +
+>  int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
+>                          int *nr_entries_reset)
+>  {
+> @@ -121,18 +123,22 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
+>         u64 cur_offset, next_offset;
+>         unsigned long mask = 0;
+>         struct kvm_dirty_gfn *entry;
+> +       int idx;
+>  
+>         /*
+>          * Ensure concurrent calls to KVM_RESET_DIRTY_RINGS are serialized,
+>          * e.g. so that KVM fully resets all entries processed by a given call
+> -        * before returning to userspace.  Holding slots_lock also protects
+> -        * the various memslot accesses.
+> +        * before returning to userspace.
+>          */
+> -       lockdep_assert_held(&kvm->slots_lock);
+> +       guard(mutex)(&per_ring_lock);
+> +
+> +       idx = srcu_read_lock(&kvm->srcu);
+>  
+>         while (likely((*nr_entries_reset) < INT_MAX)) {
+> -               if (signal_pending(current))
+> +               if (signal_pending(current)) {
+> +                       srcu_read_unlock(&kvm->srcu, idx);
+>                         return -EINTR;
+> +               }
+>  
+>                 entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
+>  
+> @@ -205,6 +211,8 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
+>         if (mask)
+>                 kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+>  
+> +       srcu_read_unlock(&kvm->srcu, idx);
+> +
+>         /*
+>          * The request KVM_REQ_DIRTY_RING_SOFT_FULL will be cleared
+>          * by the VCPU thread next time when it enters the guest.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 571688507204..45729a6f6451 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4908,16 +4908,12 @@ static int kvm_vm_ioctl_reset_dirty_pages(struct kvm *kvm)
+>         if (!kvm->dirty_ring_size)
+>                 return -EINVAL;
+>  
+> -       mutex_lock(&kvm->slots_lock);
+> -
+>         kvm_for_each_vcpu(i, vcpu, kvm) {
+>                 r = kvm_dirty_ring_reset(vcpu->kvm, &vcpu->dirty_ring, &cleared);
+>                 if (r)
+>                         break;
+>         }
+>  
+> -       mutex_unlock(&kvm->slots_lock);
+> -
+>         if (cleared)
+>                 kvm_flush_remote_tlbs(kvm);
+> --
+> 
 
-> > Or somehow the host does know that, i.e., via a hypercall that
-> > indicates that. In which case, we could have it so that for that type
-> > of VM, we would reconvert its pages to private on a reboot.
->
-> This possibly could be solved by resetting the ranges to private when
-> binding with a memslot of certain VM type. But then Google also has a
-> usecase to support intrahost migration where a live VM and associated
-> guest_memfd files are bound to new KVM VM and memslots.
->
-> Otherwise, we need an additional contract between userspace/KVM to
-> intercept/handle guest_memfd range reset.
+I think we almost agree on each other, and I don't see anything
+controversial.
 
-Then this becomes a migration issue to be solved then, not a huge page
-support issue. If such IOCTLs are needed for migration, it's too early
-to add them now.
+It's just that for this path using srcu may have slight risk of breaking
+what used to be serialized as you said.  Said that, I'd be surprised if
+so.. even if aarch64 is normally even trickier and it now also supports the
+rings.  So it's just that it seems unnecessary yet to switch to srcu,
+because we don't expect any concurrent writters anyway.
 
-Cheers,
-/fuad
+So totally no strong opinion on how the comment should be laid out in the
+last patch - please feel free to ignore my request.  But I hope I stated
+the fact, that in the current code base the slots_lock is required to
+access memslots safely when rcu isn't around..
+
+Thanks,
+
+-- 
+Peter Xu
+
 
