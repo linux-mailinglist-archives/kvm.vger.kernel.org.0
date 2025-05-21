@@ -1,281 +1,201 @@
-Return-Path: <kvm+bounces-47305-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47306-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64133ABFCD5
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 20:28:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A892FABFCF9
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 20:43:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04B321760D2
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 18:28:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35C841B651AB
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 18:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41BA28ECFB;
-	Wed, 21 May 2025 18:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C14628F523;
+	Wed, 21 May 2025 18:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uGqykEn0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NRYOmvSS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335C927CB0D
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 18:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D1B6EB79
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 18:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747852119; cv=none; b=brOvfm6pmCJRWuSovFFAgM5SMwnNnnNGcq2CcAiBN+8FK6g7s3u/rF96wFc2Iztpn5ofquMFw5Nb0SAWpw58rKC7wSh2vE5uH3JPaodufnnjkHcVsRIH+I5XXKFHQRIsLzFZixoh//lsoFvsASNmswyJqgRpRN43+XgvgP7Ao/g=
+	t=1747853009; cv=none; b=JWF8UhuXAqsMrHKh6b4g0a3ogPrjNa3Enms4olr3Z5He8KoS3CH4W1+Q82bY/2W5yyxVHLwN6NCTtQPeOFw7nnQ7vTRLiOXlep4oSlGEExYa/ib1gg/u4di4AR8uWGYq1RvrIJF/SaT6Q2j3vZVJMAwSy3cmVslyGm392gj59xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747852119; c=relaxed/simple;
-	bh=Q4DTrgnzbZNV6UVIr8mJmj9kPEgmhtAOJivglIuEklM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tuu1Lt5WUPoBkDMStKk6NQ03YLq2AbnV+bCNxi0oPk0HVB9UQa0qyz+H5uM5l1mg+XfXegYGKYWDwmA8+vtXqHLynvyWJWgZ/F+ovrV7rd/pGnvO1JPrJhNSQjZsXc9vT8B3VoewDsH5zTzrWh3tAy5q7yi9N3vFZe+b11aOIEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uGqykEn0; arc=none smtp.client-ip=209.85.160.172
+	s=arc-20240116; t=1747853009; c=relaxed/simple;
+	bh=l9hm75yhfpKOgU+9IKCqQB1osT3ELi9nMlq987rTA8Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LJb562CnZJ1kqJqTarla2gw2sOqFBLuxOeJ6d7qOVAt9Dqdlj5nMRpqjxNgcDak4GyunLii6MuazeE644jCw86rNOoF2yD6oP2uckFsqLlBnN5SXIk+LA0Z7mG7/WBoPnojHNjEReZ+q/5uOYgCaq2yeeEYKbqucsaR6HFw/2hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NRYOmvSS; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-48b7747f881so1573631cf.1
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 11:28:37 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3108d5156e8so1335744a91.1
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 11:43:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747852117; x=1748456917; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KE+TGfgZP6vAxjKudjK+avRjPu3u2b6Qn6vlewX0Zww=;
-        b=uGqykEn0p/a/1VSksCpeA22cCceGsV47smVUgAJ+/Uf0464Has8qdvDl5JE6EZROwa
-         usFeY2UIHaATjVCeu9QZPnuiJWKiiIJjfvOZ+RsJVITVz1CAJx/8L+Iw3mOFrBUoI0Vd
-         rKsCb/1VAJ/YljsdJo7Ec2bFPIkLqdXfsmtfhPocdSttwtQtdzYgSLnZMGGARqXnGQeh
-         TUAZ/6v9nDWb3BaYRCwiOTV6c1v0WaAE/CbdxqNgxnnggQ20+p0smdtdESKToWiVwzjU
-         M/CTU8IoBhEK47M4jtGwgCHTrs5KliUEZYzBqxV7CnfCpv6F4i4TnAgkjZjk0/yACL8P
-         oW5w==
+        d=google.com; s=20230601; t=1747853007; x=1748457807; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1uvnzAtGqqihUzW/r4zpFQWHLi2txWfCNzgNR6sDzto=;
+        b=NRYOmvSStwUW2BHH+mDk5SgLEjhPit5UPdgYXm3djeBThxgRPjxyJQQ+QnjYtKhTu1
+         j2yjE4xkpjSYoUrL83vNn+p4l7givh5wjSt9dqkQXbJqq/BficW0Iof7nDtvUgp7kixP
+         ZMjyj/EzuTlWbmAzq8yk3ut9V4SdB5tI/Zxb3vLzKGscRtrjA3HpyMjYDr9f2X2+xVc0
+         eemrUYPX+eWmOF7fG4lxRe+q4uYelo35Bc7Xze/NOLrF0EUzpFtS8JL/Djm57vKKUXqL
+         zMuySh+cUo6hmhjPKuuGJOqppRj4yR85H4ZUdtTi5d9F6wwY7bUBa7f2NlWCQVMlEung
+         n9IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747852117; x=1748456917;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KE+TGfgZP6vAxjKudjK+avRjPu3u2b6Qn6vlewX0Zww=;
-        b=oYBYjiZSETyWSCNPviCyY58a/ar5xO+aEtzXiPBpP5yIWhWrtCW/NDjr1fu1SdNnXH
-         KQwjo/kPb2x37Ec0+rhehv+YrNwFxIJ/hNUZxGlKivQPNDZIWSWbeTBRoVo1x2ArPTxr
-         foYWwiPHadjC4rMM1H2hm6X3z6+wXCgBPxEnO5ls1sWWdSfO+mpXbr5H9ywW4Xpx2vOl
-         +CURl9LGXXdJr6AP1QNj4DW+tgJWjSgcIYX2aNprC0/Ynd0nnRNOTe8Q3XppmEWi1AuY
-         B2UvNIq0uwS3ZmmOCR9xpX5udTdI54XVdJutSM7XjAdgy8vJImRMjE2a0akVhCUbNwQo
-         +Bxg==
-X-Forwarded-Encrypted: i=1; AJvYcCUeV2/SYrigXSzHrb2gS7SHJev30yJ6kTk8qJRHg5AwGNTor9sWUtyfJtwhMZ7Li14ms7Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDct2jZF6bwFWssjipYjFuWXp24i42KTNmYjCZxR4/V2XbbGB1
-	VGHf4FjEMPpyLkx5m4p41K7Ppc25TgsJFAt39anDCs0PD67+TfChWjhKXZYbYCU4xNHKa0aCssX
-	b4CZUekVETjmAGg7x+aeFwrxHR55VKIkM7GiA4f0J
-X-Gm-Gg: ASbGncvGh8kVdMjnfVYGtinD8S+KBUCGtyMvOdUIRkcmsKNJh4vL0v0j6hHprr6GzQa
-	M8xU0S6Avy1sOFMaKrL0/KcchQwzy4mrkIRkMtQyTxB2/qsjhF3cVPIatP35kcgOuicr60ffnBO
-	/hKOOPb5ar9PtDYlyUbP3sUvHu7oHRO+IgndkszRi35bI=
-X-Google-Smtp-Source: AGHT+IGZid6ZSwp6ECf/sysAwwsVHxmx53LALy1SypT4adky3X6cr5p2m6ZAau9iUxYfvXGZ9udv6VpTLQeFJ9CfCY0=
-X-Received: by 2002:ac8:7d8b:0:b0:49b:72e2:4058 with SMTP id
- d75a77b69052e-49b72e24109mr5409741cf.11.1747852116701; Wed, 21 May 2025
- 11:28:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747853007; x=1748457807;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1uvnzAtGqqihUzW/r4zpFQWHLi2txWfCNzgNR6sDzto=;
+        b=VrQPhug+0Z82l5ZvEKbwskkTrSsSGQlf8MYi/UBCtT1ceH0mT54DtQsLjD1c70tgSV
+         oVatOgfFZgxNgabL3qGNbiAWXXjclrxGnbNbhMgp4ED+rvjd7y4uNQj825Y5m2jUd/g3
+         pUtwyEajBZCvaPYIxeCCZ3TZ2w2LTdTEHykQ3YRa5TnmnniFz8nWJDPJtzjqdMvBXaFH
+         r/sVyn8bkeeK845fAm4R1BrFFeaUaCflStEihJcRFvgogiOZExbMvoMUXmqJKGW1O86V
+         c2KlM6ffh0SsoEOM/zcW11kF/IVVQY0DMLvi09FNKoJkR0Hqa1NxaA/9jdXLJZ2EbQx1
+         9Ilw==
+X-Forwarded-Encrypted: i=1; AJvYcCWVrQ/xSi6/+SeQOa1uLzPkyhM/7gsew6cySHTANFcVBR911FkCvH/hlaJoK3Jp+TE2tXI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRE7ZfLiAGx2muOGQiR5sniQw1FePPvftT7qDh8QAZcY2jEvo/
+	LBiluQVKo0Gue434e2gaeUMvvXpCDBF1UvVT2WMC1AlglLqRhPfQ1MRNLIdS+BUouYF4sfr5Af3
+	tbKc+Ng==
+X-Google-Smtp-Source: AGHT+IGncHV/5i3Y3ABZHLp8TXbERrxZ+ADd5PUtj9jxbItkw8Bb/dtD2z+ZUy9jx9X+TqnA9jiY57WslHY=
+X-Received: from pjtu7.prod.google.com ([2002:a17:90a:c887:b0:2ea:29de:af10])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c09:b0:310:8d9a:95b6
+ with SMTP id 98e67ed59e1d1-3108d9ae7eemr5602447a91.25.1747853007278; Wed, 21
+ May 2025 11:43:27 -0700 (PDT)
+Date: Wed, 21 May 2025 11:43:25 -0700
+In-Reply-To: <1d024d71-0b02-4481-a0d4-f1786313c1e7@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
- <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
- <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
- <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
- <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
- <CA+EHjTy7iBNBb9DRdtgq8oYmvgykhSNvZL3FrRV4XF90t3XgBg@mail.gmail.com>
- <CAGtprH_7jSpwF77j1GW8rjSrbtZZ2OW2iGck5=Wk67+VnF9vjQ@mail.gmail.com>
- <CA+EHjTzMhKCoftfJUuL0WUZW4DdqOHgVDcn0Cmf-0r--8rBdbg@mail.gmail.com>
- <diqzecwjnk95.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTyY5C1QgkoAqvJ0kHM4nUvKc1e1nQ0Uq+BANtVEnZH90w@mail.gmail.com>
- <CAGtprH-fE=G923ctBAcq5zFna+2WULhmHDSbXUsZKUrin29b4g@mail.gmail.com>
- <CA+EHjTxvufYVA8LQWRKEX7zA0gWLQUHVO2LvwKc5JXVu-XAEEA@mail.gmail.com> <CAGtprH_TfKT3oRPCLbh-ojLGXSfOQ2XA39pVhr47gb3ikPtUkw@mail.gmail.com>
-In-Reply-To: <CAGtprH_TfKT3oRPCLbh-ojLGXSfOQ2XA39pVhr47gb3ikPtUkw@mail.gmail.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 21 May 2025 19:27:59 +0100
-X-Gm-Features: AX0GCFvKwIuCerI-UVymdfO2So4kET6He8NY_WhPOEmZF51aoWgYNRN9VC95aCs
-Message-ID: <CA+EHjTxJZ_pb7+chRoZxvkxuib2YjbiHg=_+f4bpRt2xDFNCzQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
- KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
-To: Vishal Annapurve <vannapurve@google.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
-	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
-	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
-	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
-	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
-	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
-	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
-	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
-	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20250324173121.1275209-1-mizhang@google.com> <20250324173121.1275209-15-mizhang@google.com>
+ <aCUwvXPKD0ANKFb7@google.com> <1d024d71-0b02-4481-a0d4-f1786313c1e7@linux.intel.com>
+Message-ID: <aC4ezRH8msD6yUhC@google.com>
+Subject: Re: [PATCH v4 14/38] KVM: x86/pmu: Introduce enable_mediated_pmu
+ global parameter
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Mingwei Zhang <mizhang@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com, 
+	Kan <kan.liang@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Yongwei Ma <yongwei.ma@intel.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
+	Jim Mattson <jmattson@google.com>, Sandipan Das <sandipan.das@amd.com>, 
+	Zide Chen <zide.chen@intel.com>, Eranian Stephane <eranian@google.com>, 
+	Shukla Manali <Manali.Shukla@amd.com>, Nikunj Dadhania <nikunj.dadhania@amd.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Vishal,
+On Thu, May 15, 2025, Dapeng Mi wrote:
+> On 5/15/2025 8:09 AM, Sean Christopherson wrote:
+> > On Mon, Mar 24, 2025, Mingwei Zhang wrote:
+> >> +	return vcpu->kvm->arch.enable_pmu &&
+> > This is superfluous, pmu->version should never be non-zero without the =
+PMU being
+> > enabled at the VM level.
+>=20
+> Strictly speaking, "arch.enable_pmu" and pmu->version doesn't indicates
+> fully same thing.=C2=A0 "arch.enable_pmu" indicates whether PMU function =
+is
+> enabled in KVM, but the "pmu->version" comes from user space configuratio=
+n.
+> In theory user space could configure a "0"=C2=A0 PMU version just like
+> pmu_counters_test does. Currently I'm not sure if the check for
+> "pmu->version" can be removed, let me have a double check.
 
-On Wed, 21 May 2025 at 16:51, Vishal Annapurve <vannapurve@google.com> wrot=
-e:
->
-> On Wed, May 21, 2025 at 8:22=E2=80=AFAM Fuad Tabba <tabba@google.com> wro=
-te:
-> >
-> > Hi Vishal,
-> >
-> > On Wed, 21 May 2025 at 15:42, Vishal Annapurve <vannapurve@google.com> =
-wrote:
-> > >
-> > > On Wed, May 21, 2025 at 5:36=E2=80=AFAM Fuad Tabba <tabba@google.com>=
- wrote:
-> > > > ....
-> > > > > When rebooting, the memslots may not yet be bound to the guest_me=
-mfd,
-> > > > > but we want to reset the guest_memfd's to private. If we use
-> > > > > KVM_SET_MEMORY_ATTRIBUTES to convert, we'd be forced to first bin=
-d, then
-> > > > > convert. If we had a direct ioctl, we don't have this restriction=
-.
-> > > > >
-> > > > > If we do the conversion via vcpu_run() we would be forced to hand=
-le
-> > > > > conversions only with a vcpu_run() and only the guest can initiat=
-e a
-> > > > > conversion.
-> > > > >
-> > > > > On a guest boot for TDX, the memory is assumed to be private. If =
-the we
-> > > > > gave it memory set as shared, we'd just have a bunch of
-> > > > > KVM_EXIT_MEMORY_FAULTs that slow down boot. Hence on a guest rebo=
-ot, we
-> > > > > will want to reset the guest memory to private.
-> > > > >
-> > > > > We could say the firmware should reset memory to private on guest
-> > > > > reboot, but we can't force all guests to update firmware.
-> > > >
-> > > > Here is where I disagree. I do think that this is the CoCo guest's
-> > > > responsibility (and by guest I include its firmware) to fix its own
-> > > > state after a reboot. How would the host even know that a guest is
-> > > > rebooting if it's a CoCo guest?
-> > >
-> > > There are a bunch of complexities here, reboot sequence on x86 can be
-> > > triggered using multiple ways that I don't fully understand, but few
-> > > of them include reading/writing to "reset register" in MMIO/PCI confi=
-g
-> > > space that are emulated by the host userspace directly. Host has to
-> > > know when the guest is shutting down to manage it's lifecycle.
-> >
-> > In that case, I think we need to fully understand these complexities
-> > before adding new IOCTLs. It could be that once we understand these
-> > issues, we find that we don't need these IOCTLs. It's hard to justify
-> > adding an IOCTL for something we don't understand.
-> >
->
-> I don't understand all the ways x86 guest can trigger reboot but I do
-> know that x86 CoCo linux guest kernel triggers reset using MMIO/PCI
-> config register write that is emulated by host userspace.
->
-> > > x86 CoCo VM firmwares don't support warm/soft reboot and even if it
-> > > does in future, guest kernel can choose a different reboot mechanism.
-> > > So guest reboot needs to be emulated by always starting from scratch.
-> > > This sequence needs initial guest firmware payload to be installed
-> > > into private ranges of guest_memfd.
-> > >
-> > > >
-> > > > Either the host doesn't (or cannot even) know that the guest is
-> > > > rebooting, in which case I don't see how having an IOCTL would help=
-.
-> > >
-> > > Host does know that the guest is rebooting.
-> >
-> > In that case, that (i.e., the host finding out that the guest is
-> > rebooting) could trigger the conversion back to private. No need for
-> > an IOCTL.
->
-> In the reboot scenarios, it's the host userspace finding out that the
-> guest kernel wants to reboot.
+Gah, sorry, my comment was vague and confusing.  What I was trying to say i=
+s that
+the vcpu->kvm->arch.enable_pmu check is superfluous and can be dropped.
 
-How does the host userspace find that out? If the host userspace is
-capable of finding that out, then surely KVM is also capable of
-finding out the same.
+> >> +	kvm->arch.enable_pmu =3D enable_pmu && !enable_mediated_pmu;
+> > So I tried to run a QEMU with this and it failed, because QEMU expected=
+ the PMU
+> > to be enabled and tried to write to PMU MSRs.  I haven't dug through th=
+e QEMU
+> > code, but I assume that QEMU rightly expects that passing in PMU in CPU=
+ID when
+> > KVM_GET_SUPPORTED_CPUID says its supported will result in the VM having=
+ a PMU.
+>=20
+> As long as the module parameter "enable_mediated_pmu" is enabled, qemu
+> needs below extra code to enable mediated vPMU, otherwise PMU is disabled
+> in KVM.
+>=20
+> https://lore.kernel.org/all/20250324123712.34096-1-dapeng1.mi@linux.intel=
+.com/
+>=20
+> > I.e. by trying to get cute with backwards compatibility, I think we bro=
+ke backwards
+> > compatiblity.  At this point, I'm leaning toward making the module para=
+m off-by-default,
+> > but otherwise not messing with the behavior of kvm->arch.enable_pmu.  N=
+ot sure if
+> > that has implications for KVM_PMU_CAP_DISABLE though.
+>=20
+> I'm not sure if it's a kind of break for backwards compatibility.=C2=A0 A=
+s long
+> as "enable_mediated_pmu" is not enabled, the qemu doesn't need any change=
+s,
+> the legacy vPMU can still be enabled by old qemu version. But if user wan=
+t
+> to enable mediated vPMU, so they should use the new version qemu which ha=
+s
+> the capability to enable mediated vPMU, it sounds reasonable for me.
 
+I agree it's reasonable to require a userspace update to take advantage of =
+new
+features, what I don't like is what happens if userspace _hasn't_ been upda=
+ted.
+I also don't love that forcing a userspace update in this case is more than=
+ a bit
+contrived.  It's very doable to let existing userspace utilize the mediated=
+ PMU,
+forcing KVM_CAP_PMU_CAPABILITY is essentially KVM punting a problem to user=
+space.
 
-> >
-> > > > Or somehow the host does know that, i.e., via a hypercall that
-> > > > indicates that. In which case, we could have it so that for that ty=
-pe
-> > > > of VM, we would reconvert its pages to private on a reboot.
-> > >
-> > > This possibly could be solved by resetting the ranges to private when
-> > > binding with a memslot of certain VM type. But then Google also has a
-> > > usecase to support intrahost migration where a live VM and associated
-> > > guest_memfd files are bound to new KVM VM and memslots.
-> > >
-> > > Otherwise, we need an additional contract between userspace/KVM to
-> > > intercept/handle guest_memfd range reset.
-> >
-> > Then this becomes a migration issue to be solved then, not a huge page
-> > support issue. If such IOCTLs are needed for migration, it's too early
-> > to add them now.
->
-> The guest_memfd ioctl is not needed for migration but to change/reset
-> guest_memfd range attributes. I am saying that migration usecase can
-> conflict with some ways that we can solve resetting guest_memfd range
-> attributes without adding a new IOCTL as migration closely resembles
-> reboot scenario as both of them can/need reusing the same guest memory
-> files but one needs to preserve guest memory state.
->
-> Reiterating my understanding here, guest memfd ioctl can be used by
-> host userspace to -
-> 1) Change guest memfd range attributes during memory conversion
->      - This can be handled by KVM hypercall exits in theory as you are
-> suggesting but Ackerley and me are still thinking that this is a
-> memory operation that goes beyond vcpu scope and will involve
-> interaction with IOMMU backend as well, it's cleaner to have a
-> separate guest memfd specific ioctl for this operation as the impact
-> is even beyond KVM.
+And the complications with the mediated PMU don't really have anything to d=
+o with
+the VMM, they're more about all the other tasks and daemons running on the =
+system,
+e.g. that might be using perf.
 
-The IOMMU backend needs to know about the sharing/unsharing, not
-trigger it. The memory is the guest's. We already have a mechanism for
-informing userspace of these kinds of events with KVM exits. This
-doesn't justify adding a new IOCTL.
+Thinking more about this, the problem isn't so much that enabling mediated =
+PMUs
+by default is undesirable, it's that giving userspace a binary choise doesn=
+'t
+provide enough flexibility.  E.g. for single-user QEMU-based use cases (inc=
+luding
+my use of QEMU), requiring a new QEMU is painful and annoying, and so havin=
+g an
+on-by-default option would be nice.
 
-> 2) Reset guest memfd range attributes during guest reboot to allow
-> reusing the same guest memfd files.
->     - This helps reset the range state to private as needed inline
-> with initial shared/private configuration chosen at the guest memfd
-> creation.
->     - This also helps reconstitute all the huge pages back to their
-> original state that may have gotten split during the runtime of the
-> guest.
->   This is a host initiated request for guest memfd memory conversion
-> that we should not be overloading with other KVM interactions in my
-> opinion.
+But for use cases that already utilize KVM_CAP_PMU_CAPABILITY, e.g. to expl=
+icitly
+disable PMUs for a subset of VMs, on-by-default is very undesirable, e.g. w=
+ould
+require KVM to support KVM_PMU_CAP_DISABLE, and would generate unnecessary =
+noise
+and contention in perf.
 
-Then, we could argue about whether we need a "reset" IOCTL (not that I
-am arguing for that). But still, like I said, if the host becomes
-aware that the confidential guest is rebooting, then surely KVM can be
-made aware.
+So, what if we simply make enable_mediated_pmu a tri-state of sorts?
 
-I wonder if this might be better suited for the biweekly guest_memfd sync.
+  0   =3D=3D disabled
+  > 0 =3D=3D enabled for all VMs (no opt-in or opt-out supported)
+  < 0 =3D=3D enabled, but off by default (requires opt-in)
 
-Cheers,
-/fuad
-> >
-> > Cheers,
-> > /fuad
+Then use cases like my personal usage of QEMU can run with enable_mediated_=
+pmu=3D1,
+while use cases like Google Cloud can run with enable_mediated_pmu=3D-1, an=
+d everyone
+is happy (hopefully), without too much added complexity in KVM.
 
