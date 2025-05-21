@@ -1,341 +1,287 @@
-Return-Path: <kvm+bounces-47315-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47316-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91114ABFE0A
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 22:44:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF4B8ABFFE8
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 00:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F3E17A1495
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 20:42:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69BF67A951A
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 22:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB11129CB39;
-	Wed, 21 May 2025 20:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC9B23A9AD;
+	Wed, 21 May 2025 22:43:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z6SetwoO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I33kF1xw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF04129C355
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 20:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747860215; cv=none; b=ZDh9L2jBtoE0pT05QzM99X326XU3oqHaEe+X/fhWSUEnkxZtW8N703jI8/TRtcVHb7gkxdFVWF8Une63Zm7ceH8nTIeBJYndagQhL2kCJKxHHcqv44uT0Xy6ZMl2L68d7shZhTIF2JwQHy+nqcoSnOpxpb8tXDZAi4f15Vdm2I4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747860215; c=relaxed/simple;
-	bh=0ceGMOHptUyIy0ypOVSOmofHrFvCX+ASufP889K450c=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Z7QYAIfWsX4kkir27caz8lwnLJA6ZkuqmlBjAz0O88caawSJtr22sPte52YC9QjrgzdSPxZmwIbImP09RPqigAZWyo6uC5zTEZUv1mFGKQowxaCK/0+NRsofiOR0v/wPTPm1SE3UYDMkpM+7JJReQDXtJEfVH3WDvWdvu4ducDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z6SetwoO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747860212;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5QhVuiYHXnMKTT9hZMGdfVh8tHp1Qoyqf1HjxLRFKog=;
-	b=Z6SetwoO/4hNQ8tNcddDmiJISK5Qq6g9nmSMYm0fvJ3MjrTgRg7JRjAV7vaAuInTPKhboA
-	Xs041XFsWsxhwclO68BbiN78m10px9bo0S5HDZwxxNQEiKn0TAd0PKk6DAUyTRIVmy2Nfr
-	JFhO1gfGRPrqtdt5VwVy+qA/OErEzI8=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-665-zbglCbMSMh-HKfK-_A_Y4A-1; Wed, 21 May 2025 16:43:28 -0400
-X-MC-Unique: zbglCbMSMh-HKfK-_A_Y4A-1
-X-Mimecast-MFC-AGG-ID: zbglCbMSMh-HKfK-_A_Y4A_1747860208
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7c9255d5e8cso1228156285a.1
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 13:43:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747860208; x=1748465008;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5QhVuiYHXnMKTT9hZMGdfVh8tHp1Qoyqf1HjxLRFKog=;
-        b=bRI2u2rGR9cLgkhebzfS7BS4o3SD1XWdzkC15RvfJB3U03f3uf3DirxxekkoazSeWO
-         wKr+8NeRGhK3xHzB1yBUYC5TsJFeeNkodgMHVC6VstStl3AuKNzXGBku1j4E4KR1Skj6
-         A2IzcUYJFrQHG6FFK90hFoo+3drb7xCoI3/9P0SUrNaZQbZq9D+/uIT/K/5WCbfaSVBQ
-         E3QZ5oSNZwWVfOmLqx4iZQRJ0+HUvboqOkk1tjYS7fnLlam3Q1eLXlQV5JkEG/0Dma2C
-         XhdZQ6hx/OaYG07DRY0aNnhLcQvE1VyGwb+OK3bwTIeUUdGGp13ZZwThCNGSBtvanH+S
-         IWVw==
-X-Gm-Message-State: AOJu0Yzyj3mw3qWjDvBkOWoVDi+6fRNJYhz5cCUEDXduKngamAzyy/TK
-	tr8XY2F8TCX0AOOhwZlyh5CciPs2jYxbyDjZ/4qX2eKmpkkkMbdV1BoXJRC/IEeVFHpNBoGI+UV
-	57hi444QhJWWgedSTx44uljoDSzBd63jZpx1kNrp/kKaE9wU+C7aAvg==
-X-Gm-Gg: ASbGnct9vcDo0YhKw+irTVauhlKn8wOxiCJt8SQr4jWbWKawQvTviJluzW0vvw9E0Er
-	6p3YkzkQ4tmOyeZ5obtWrxHthJ6FkcflnLyBUZcSGFzPEswZZSXdtWevjz5eUHEi2owYqGir5Rq
-	XBwMaR9w+Aai43ihLxz6HMMUzy/b/g/Ekt18ZPDet9oeL2RYa1Gw7KgMQWDlD1TfLK4UCIiZUQQ
-	bTE9/xPxHAjTv8LJGd6klRfCM+OH4AZHSHF1NvZrMT3e5AiKUcMOsvsdYoBt/jsHaKzHwobgDVM
-	Jgy6M+meJ2oo2E6epK8jtdkmJlrwoiJ+zSYaAUZHHgm2YAII1w7FZY0KUAg=
-X-Received: by 2002:a05:620a:454b:b0:7ca:f41d:ce06 with SMTP id af79cd13be357-7cd4673c0acmr3595566885a.31.1747860207940;
-        Wed, 21 May 2025 13:43:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/vUkExQdWyMJBBGahe35PDZUdiPaA5CMO+SY75XRIorypUiCDgVaDI/XRxEABMXS/iSSM5g==
-X-Received: by 2002:a05:620a:454b:b0:7ca:f41d:ce06 with SMTP id af79cd13be357-7cd4673c0acmr3595563885a.31.1747860207591;
-        Wed, 21 May 2025 13:43:27 -0700 (PDT)
-Received: from ?IPv6:2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38? ([2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cd467bc2dbsm927205385a.15.2025.05.21.13.43.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 13:43:27 -0700 (PDT)
-Message-ID: <24c39bb2f1e97ef2e6207894cb62e456bededce0.camel@redhat.com>
-Subject: Re: [PATCH v4 4/4] x86: KVM: VMX: preserve DEBUGCTLMSR_FREEZE_IN_SMM
-From: mlevitsk@redhat.com
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Borislav
- Petkov <bp@alien8.de>, x86@kernel.org, Ingo Molnar <mingo@redhat.com>, 
- linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Paolo
- Bonzini <pbonzini@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>
-Date: Wed, 21 May 2025 16:43:26 -0400
-In-Reply-To: <aC0IwYfNvuo_vUDU@google.com>
-References: <20250515005353.952707-1-mlevitsk@redhat.com>
-	 <20250515005353.952707-5-mlevitsk@redhat.com> <aC0IwYfNvuo_vUDU@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A119239E85;
+	Wed, 21 May 2025 22:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747867438; cv=fail; b=DGSvXkzWt8krOdBwJ7VGew7GRqedc7sA/RVeOxHsBBCWrzNyB9g0IPXI7Jpo0IH/Rd9ga84J/nYcIG854lRBw3aqyPDuUfEYs1UAgse8qQjJgFYtqX353KERnsrwfWEJYUuyeT/YdWdeyoRDXUKbavPtUc94bGqghX4Tz3lTyLE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747867438; c=relaxed/simple;
+	bh=ad7nYHEvA3FiFoL5sChx8Ylju+Hu8BNf4UUWOrXQ6Cw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gCtYJLs7e43026KajH4tFed7pCnq1mmM5T+mscBfdwVTSZ/vXq8Wx/k8UKoACpYhojHyUFaX34lA2qY/FjMBFgnj7N4KZ/7sFm/MCJr09D53tiOSy+P8yPT2VGgMTdrExiUdSu1iFjnxvxLy8FoohRNf74r7Non7cAjtj4lGN1c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I33kF1xw; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747867437; x=1779403437;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=ad7nYHEvA3FiFoL5sChx8Ylju+Hu8BNf4UUWOrXQ6Cw=;
+  b=I33kF1xwXYe0CUnFlHAX9FKPcBFl34FBAJooNil8ll7LCpNZufmA6dfr
+   F2/72Il5eOt/5LMnD8LAOGQ7hRI9UpI4twWQQzxvLCHK+lRAAQ4AUAqUp
+   lJl9r+t8EEIVdoo2IAdrGyLvsJSbsyb7HT6dU+cIGfq5V3zY1RDAmtwdp
+   DHCrKCGgGnwT6jS4W70SwwhWwrf2wG4G9G4UP5qSWqSiFFbVfq4kDTgr+
+   HLkRHjjODkgLoeJ+xkgYFX6AJXP40DeUC+WbSRABqsmbamawEqysOANsG
+   cii1NFMkU9OQ67GrIYCv9R7E+qTJaanzalF/mWv8JJDtvls0LaM4DpBFY
+   w==;
+X-CSE-ConnectionGUID: Cu8qMPlhTV61+2P7pcinaA==
+X-CSE-MsgGUID: 2kcF1Lp2SdSL5W9c9iAagg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="48991751"
+X-IronPort-AV: E=Sophos;i="6.15,304,1739865600"; 
+   d="scan'208";a="48991751"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 15:43:56 -0700
+X-CSE-ConnectionGUID: FvBiXP7STCCxX6wRYWJnVQ==
+X-CSE-MsgGUID: oE91ROeWRtigOC/lbfENrw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,304,1739865600"; 
+   d="scan'208";a="171158828"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 15:43:55 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 21 May 2025 15:43:55 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 21 May 2025 15:43:55 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Wed, 21 May 2025 15:43:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cjOXWbbeLVOJq9MMT0L5yQ/nr/iL+5wTs8XqpYuzTahNk6Qz12mVn9wQzSy7W4wJMTXoJKsWIRd4exe+H+e5qIi0GTXeOROVar33xKL6B6tP1sG5RILpQR3Cx0Ejna1NqrWZBsp+J0NaLFvTFtytelhWfWgky0Dz0i65ZT91b9YjpwNrnIPaI9v84PGN4so7LVDDrM8M+M3oFMyl7tusMpNKBDPAHF4aQa59kIdpcVMOLBWkEiOOztl9+X+me69i/Pw5ZFcYioJbNmzJJK60FR1hmzZr8r71szZ6vesEaKfAWvqao7sfZUvwG3Rb1g8hAeJw0R5G9u1Dmb91/sXKLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ad7nYHEvA3FiFoL5sChx8Ylju+Hu8BNf4UUWOrXQ6Cw=;
+ b=AqUVKtO9TDgjIgtBj2f27N6XW35O/KcH7EXPSFHkyU+xAxhr3j6wENx0j0ZASssv0F4NWv7Bqe9zWPyqTZNXyY13FrGDcVUAAKUINSNtm5JH40GBfvAsCm0Gc8h6gsB4HPborJ+bscA92W6DZb5GLw/I0g9Uxx4d56kkYq8ROOV36UEbFDVvYmh8ipzn8szwUoETlv1KDquhujY7gVuzE8/YlOUzxTVHCGynbAjHYZoa9QEU4mhOr1w8Chlq9rVzH6LzpLeuNdMx+M0i1/hrbMlTU1G4za6B9pUKI07gTlg0VdPA7M/lahtACB+eLMxiFvFXBDc83nnRLf5ZpflEAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5525.namprd11.prod.outlook.com (2603:10b6:208:31f::10)
+ by MN2PR11MB4726.namprd11.prod.outlook.com (2603:10b6:208:269::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.31; Wed, 21 May
+ 2025 22:43:53 +0000
+Received: from BL1PR11MB5525.namprd11.prod.outlook.com
+ ([fe80::1a2f:c489:24a5:da66]) by BL1PR11MB5525.namprd11.prod.outlook.com
+ ([fe80::1a2f:c489:24a5:da66%4]) with mapi id 15.20.8746.031; Wed, 21 May 2025
+ 22:43:53 +0000
+From: "Huang, Kai" <kai.huang@intel.com>
+To: "seanjc@google.com" <seanjc@google.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "vipinsh@google.com" <vipinsh@google.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 2/3] KVM: x86: Use kvzalloc() to allocate VM struct
+Thread-Topic: [PATCH v3 2/3] KVM: x86: Use kvzalloc() to allocate VM struct
+Thread-Index: AQHbxq0+OB9mwly9vEqEwiQpLwdhbLPWwyGAgANXzYCAAgqsAIAABhSAgAAM2QCAASEUgIAAXKwA
+Date: Wed, 21 May 2025 22:43:53 +0000
+Message-ID: <918715044bf0aa6fb51ce511667bf7bb4ccbabea.camel@intel.com>
+References: <20250516215422.2550669-1-seanjc@google.com>
+	 <20250516215422.2550669-3-seanjc@google.com>
+	 <219b6bd5-9afe-4d1c-aaab-03e5c580ce5c@redhat.com>
+	 <aCtQlanun-Kaq4NY@google.com>
+	 <dca247173aace1269ce8512ae2d3797289bb1718.camel@intel.com>
+	 <aC0MIUOTQbb9-a7k@google.com>
+	 <5546ad0e36f667a6b426ef47f1f40aee8d83efc9.camel@intel.com>
+	 <aC4JZ4ztJiFGVMkB@google.com>
+In-Reply-To: <aC4JZ4ztJiFGVMkB@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.56.1 (3.56.1-1.fc42) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5525:EE_|MN2PR11MB4726:EE_
+x-ms-office365-filtering-correlation-id: aa256570-efee-4957-e847-08dd98b8f670
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?WUVRUi9TQTFWUmlVazN6VW9Od1hBMElWS1VHMHpnbE5HYXlvTEZjRnRxejU4?=
+ =?utf-8?B?d3haMXlqL1htK2tBcys1Tmt2Q3gwU3cxbWk3WTY1emVBVytOdGFLOEdMWDFY?=
+ =?utf-8?B?SURrejRwcy9oUVVwOVU2YkJnZTJLMW9QUk9qbTcvR01wR2syOXpQWXE4TlRp?=
+ =?utf-8?B?dlR4aDNQUzVkVXlZSlJiWVprZ1NpQ2MzaVRHZUVHbm1ReXFwYno0QlZBRnlP?=
+ =?utf-8?B?MEQ4V1JTMG0vd2ZpY3NoN2NSSDkxZE5ZKzRhdUVMY0FnWkU4RTNPUVpEN1VQ?=
+ =?utf-8?B?NkQwWDlsSGFEL3hKSi9FUDlnYWVseTE0ZXNUY3dXSW0wU2lpSGJrU0p3UjE0?=
+ =?utf-8?B?UzYzeFZ3VWpaZ3k5bjk5L21QaVpqcG1Za0dVbStlL2tZZ0FZbmlaRFdINHVa?=
+ =?utf-8?B?RWcvQ0gxLys3VlZRenVrTkUyVm5xRWZGenRnMGMrc1BBVVBsMHI1K0xBMVg5?=
+ =?utf-8?B?WVJhRkFKckZGcVlHLzZsek1BbEIrdjZHSFI3c2c2V0x5OFJ5OWsySWZMaEtv?=
+ =?utf-8?B?Y005dC9wTUE4U1k0QW1OUVVWRHdWbkpGVW9PVkhKellLQXpYYUg0elJtaFE3?=
+ =?utf-8?B?Nkpvanl4YzBkK3QzUFdYa2xrVlROWVpsUlZYZFNzYUR2b0Jrb0orVXZ3bloy?=
+ =?utf-8?B?aE9kcGs0M1ZUVHkrZWhPdnYxdmhTOVpOQTJPcnROdnZkQWZHNzdSbzdxTEVa?=
+ =?utf-8?B?WFE0RlpyaVlldTFORXVWb2ozMEptQ3E0SXBUWUZEU0NEVHVHenNvV2xrL3Fa?=
+ =?utf-8?B?UHVFUjA1cVptTmxBZVIrTnhWcjhucFlQMWl2K29DQ2VHWVEwbDhSMkI2K2R3?=
+ =?utf-8?B?YXBhVmlyQjlra21iQ3BVZE1YU2toZGZoQXd6THRyTlZhTEdUbkx4QU05VWUr?=
+ =?utf-8?B?dmdVZUM2c2VZTFl3Z096ejY0TmJ4V0M1aStCc2RpdVVuZWl3eGVFdWZlQ2R2?=
+ =?utf-8?B?TjZCRkJoclNMOGhxMDVoQlZmb0lrT0VpT1UzQjJ5Q3Nlajh2SnFISm5tMXgy?=
+ =?utf-8?B?Tzllc1dmRm1yS1hhdXdqQ2Q1U2RPS0puTkJ1UC9BZkVLSzZHV2dSb3FvUEM1?=
+ =?utf-8?B?S2laS1BsL0doTzJtRE5lZUlRVDBPdWs1WW5KdVdKdmZaQmdEamcxN3BSR3J0?=
+ =?utf-8?B?ZjVrV2xWYzZ2TCtlaUVlSi9GbEtOcDRWanNHcW9XZnIvemJkTmlHZlQxM28x?=
+ =?utf-8?B?QWpEZ21nR1JHcG9QZ3d6NU9xRnByWDdJbG9GdDJRd0RLNUJWNFVtc1lmUytv?=
+ =?utf-8?B?Q2FWcS94bzB3cDJ2WHBncW84QkYrMkY3QmFqSUlYd2k1NU10aFBSUFN5eUZp?=
+ =?utf-8?B?YWs2Nyt5RGVzWjJVdEp6bXRUTXp6ZS9URmduNGdzbGIwSmJBNnhpMTNXekVs?=
+ =?utf-8?B?Q3RLT1F6R1FXb2FGTkxCU1Y5VTNkYkVjaGpPOUlYMzJreXppTXF4ZzRiOEEx?=
+ =?utf-8?B?cVlSd3FuNjNEVXQwaW1icExiN01NYysveDFyblRreVRlRVZBN1pTUGdDNGt5?=
+ =?utf-8?B?NjZCRnVWQWkwSXpjVWFpSmhweWphM0VQeFh5Z3JsYXJrSTcyNWsyQXRURkp6?=
+ =?utf-8?B?S1R1SWpnNzFlVlYwVHJubXNMNG92SVBCcCtDYlpSS1NvR3U4L2lQeldaNmNi?=
+ =?utf-8?B?UTFMRnFiVjlicmNOWkNZb0xWaVlVQVlFSTd2NFIzVDdhR0VyQ3lZMUl1ZW96?=
+ =?utf-8?B?RFJ2MGI2c1ZnOVJnakZuSkZZdmFubUFRc0ZpRWU1MTV6anpCNzRYaHozdzVo?=
+ =?utf-8?B?TkRSWkdXMnNTWllSRzM4ckxORytEZ1JWNlJXUjIwNW4zc0NTcEZ5QWtUbmtw?=
+ =?utf-8?B?Z0RkOGxSc3U1cW5SbXpLMjZkSWx5eERlSUZGZktleEREWll1RG1XUUwraEpu?=
+ =?utf-8?B?QVRsSkxZVHNtWDVqbCtTcjQ5TlBINWpncERYMytoOHpUSGdrQ2wrRDBydmFk?=
+ =?utf-8?B?UjN0d0xLbG9QSlNuVTlxLzFYcHd0R2RhbkVyalNkeEIvL2luVTIrRys0SW1C?=
+ =?utf-8?B?YTFDbDNjYmR3PT0=?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5525.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WjhVVVI0b3I0RGVPcDF6aHBINjlWcGRQVzJhL0U4ekVmdGVKaTltUG5UY2pP?=
+ =?utf-8?B?SzVqeEt5bWVWRlI5SzI2bzNjRENKanZ4SWZDOVVSUEJuSUVRL1JRVXV4ZDB1?=
+ =?utf-8?B?anA1c1pzcDVxLytOZTVFdDd4Lzg5VUhDTlNBMlpFTUs4TnpvUDlYVEY0ZWhv?=
+ =?utf-8?B?VFZQMWtHN2xNTkZqMnVOaXFTcmgvQUNtTDlHdzZIOEpqWTVvRGYyUnAvUFBn?=
+ =?utf-8?B?Q3NrTlU2T2QyQzh4bXA2eFcvcG1KMzdISEFzaDNjVWNNeEFVWUw0UDdsaHBL?=
+ =?utf-8?B?ZFltOXBjYTRPdUJlVlRuVmJ3OG8wVnlEUUZFNGFvWUJUbnF2NEhLVldzSHM0?=
+ =?utf-8?B?R21NOUJDV243L1dpSTlSaWVMOHpkeTdnQkhzRmd0bkpYaFFmeE9oajlha01R?=
+ =?utf-8?B?UW1TZ1lQeVpGVnhOZkRjakxSazdBT1VVbUJ1MkVjZy85L1AwS09xVnZqelpp?=
+ =?utf-8?B?cXovZ3NjWlZoamdXVEZMc3c3T3Jxb2NrdGpUN0QxeG53UzNzMnBlamZmOGZ3?=
+ =?utf-8?B?YUI2NGZZT0VLb3hQenF2MEVjZkZtR2JSaUJ0a08wNEROZ0wwS1NxUjdkNzRH?=
+ =?utf-8?B?L0MxN0lOSVlNWnRpVzdUakZacXFqUW5vRDZBRGh3MlM2cVl3dXVsbzNhZlND?=
+ =?utf-8?B?TEhUQmNycDdOVU1vL0xhTWxVNDdNR0hRQzhsQUpZdmRKWEVvN1hMcWVoV1lL?=
+ =?utf-8?B?Sit2MUxFblZ2eDhETWpXMThkQ3JLWVdnVGMwdzNtUUE2R1NQNjFFclRXUVBy?=
+ =?utf-8?B?bkY1UmkvVVIydDVVTDJUU1RWeVZGK2xWMnFxaVdhNXh2b2UvYTBUOEVDZEJr?=
+ =?utf-8?B?Y3RXbzFuT3hKT1FMVFlHQ21yN0RDVm5uUjdaMjQxTURYWnJ3YjR2ODk2M1JQ?=
+ =?utf-8?B?Z3RMb3BPZlR3VE5GZXR1SWwyQXVrMmYvWWVYaENVWEp3VWR4SVZZZHpBaTRl?=
+ =?utf-8?B?QXErYmhGWmdqcDVMODM1dGZBQjlWY0Y4OVdDYU5pQ2dpMVI0azd3eFdsdUg0?=
+ =?utf-8?B?RUhwTllmYStIVGRDQ09jbzAzKzgwOGt5VzdoK29YazRvdlp3VkptWWdVMkl1?=
+ =?utf-8?B?cW9YdkdxQ1V2L2Q1Tzl3MWMxNUcyMVA3bHladElHRjNadkF2OTBET2g2a2k4?=
+ =?utf-8?B?Z0JYVnZ4QTY3SzFTOHhiUTRZaTdPaVQvRGkvSHpSZXcycDhzRmhCckxQK0ZO?=
+ =?utf-8?B?SlBpZmRCWitRQW1ianJHU1NDc2I1aTNpeS9CMVBSVUlmN1pQaEpQeDdFdTNY?=
+ =?utf-8?B?OHNDYmRxRjh5U2k1YUNNYTNVcHE2bFQwdk8zQVJNZmZSQjM0SWd5MTFOMkpm?=
+ =?utf-8?B?NytRVGpuMGpBazlqcVYrOU5CUVZxa090MjhyT2RKQWFtaGVrdW9vcHJJYnV2?=
+ =?utf-8?B?WjZWVG5JeFhWY3N3RlNmekttN3Q4blZOTXlGamUvdzhxdlFrYVRLcE9hMm1n?=
+ =?utf-8?B?OHhVd0hCeC9NNHkrNERrekNYZkFvMnhicGlldTdsUUlEYmdZaTlvdUtnNzVl?=
+ =?utf-8?B?eFh1ejVsdThYZzJxOWhyS3UwQVpURFNxdS9iY1htdmUrbmFQSjRGbFFlUks2?=
+ =?utf-8?B?WXZkanVNK2hpb2NyejdHa1JtQXBjRDN4YWNTOUtRdEQwY09kSUMyeUhvRkhR?=
+ =?utf-8?B?R0RFd1dnNlpEWXlERWlnT05vdzdWQlcvVHV4cnltbTk5d09rU2pkbzM1ZkN6?=
+ =?utf-8?B?bm9EalVRMjJObHdWY21MQjE5MC9vYVBoRzZ2RVhuNmptZnlKd094bTRZcUhq?=
+ =?utf-8?B?ZEl5ZWV5UjB4VU56amxlS1c0STJzeHBVelIrY1hYRFVkV0Iwa0NSUS9qeHA5?=
+ =?utf-8?B?Z21teVhubXM3UGVqakNFUGJMVzg4Njc3dnFBNGJoR0lUTnVkQW96N2ZkWWFu?=
+ =?utf-8?B?WGdXMVYwR3BQaWNhZHBSTVlIZnhaeUlqclFFOC9RWmd3SXBJMjVtbElFaUo2?=
+ =?utf-8?B?c1UzMzdsNGN2RUE0b0F5MUtnOFJzZUpsMHE3K0l2MVZZb3ExdlZOM04zSWFl?=
+ =?utf-8?B?Y0x4b2lDMjhsWjlKc2M5dzA2SElSNnBpTjdGdGthaHNzeGxKd014VXhvSFNR?=
+ =?utf-8?B?YXFrcC9QOW8weGdtUXlOREVtQ1ZQaTlhVUxzTEcxQnYySUxvejRwZlRabEtt?=
+ =?utf-8?Q?Hq8gJvcx9m1zGKVn4pViHI1we?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9E8F0AEF24A1C24C9DCCE0194C0871B1@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5525.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa256570-efee-4957-e847-08dd98b8f670
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 May 2025 22:43:53.2045
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mknIaFqC6aJKJjGUpWgxZt5qCXo5HeN+06jG/owXDYxXp8RJrjlwiRCO7O43eY8B7sKxsWMuszBkStIfUg5R2Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4726
+X-OriginatorOrg: intel.com
 
-On Tue, 2025-05-20 at 15:57 -0700, Sean Christopherson wrote:
-> KVM: VMX:
->=20
-> On Wed, May 14, 2025, Maxim Levitsky wrote:
-> > Pass through the host's DEBUGCTL.DEBUGCTLMSR_FREEZE_IN_SMM to the guest
-> > GUEST_IA32_DEBUGCTL without the guest seeing this value.
-> >=20
-> > Since the value of the host DEBUGCTL can in theory change between VM ru=
-ns,
-> > check if has changed, and if yes, then reload the GUEST_IA32_DEBUGCTL w=
-ith
-> > the new value.
->=20
-> Please split this into two patches.=C2=A0 Add vmx_guest_debugctl_{read,wr=
-ite}(), then
-> land the FREEZE_IN_SMM change on top.=C2=A0 Adding the helpers should be =
-a nop and
-> thus trivial to review, and similarly the DEBUGCTLMSR_FREEZE_IN_SMM chang=
-e is
-> actually pretty small.=C2=A0 But combined, this patch is annoying to revi=
-ew because
-> there's a lot of uninteresting diff to wade through to get at the FREEZE_=
-IN_SMM
-> logic.
-
-No problem.
-
->=20
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> > =C2=A0arch/x86/include/asm/kvm_host.h |=C2=A0 1 +
-> > =C2=A0arch/x86/kvm/vmx/nested.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0 4 ++--
-> > =C2=A0arch/x86/kvm/vmx/vmx.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | 22 +++++++++++++++++++---
-> > =C2=A0arch/x86/kvm/vmx/vmx.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 2 ++
-> > =C2=A0arch/x86/kvm/x86.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 7 +++++--
-> > =C2=A05 files changed, 29 insertions(+), 7 deletions(-)
-> >=20
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index d2ad31a1628e..2e7e4a8b392e 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1673,6 +1673,7 @@ static inline u16 kvm_lapic_irq_dest_mode(bool de=
-st_mode_logical)
-> > =C2=A0enum kvm_x86_run_flags {
-> > =C2=A0	KVM_RUN_FORCE_IMMEDIATE_EXIT	=3D BIT(0),
-> > =C2=A0	KVM_RUN_LOAD_GUEST_DR6		=3D BIT(1),
-> > +	KVM_RUN_LOAD_DEBUGCTL		=3D BIT(2),
-> > =C2=A0};
-> > =C2=A0
-> > =C2=A0struct kvm_x86_ops {
->=20
-> ...
->=20
-> > @@ -7368,6 +7381,9 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u6=
-4 run_flags)
-> > =C2=A0	if (run_flags & KVM_RUN_LOAD_GUEST_DR6)
-> > =C2=A0		set_debugreg(vcpu->arch.dr6, 6);
-> > =C2=A0
-> > +	if (run_flags & KVM_RUN_LOAD_DEBUGCTL)
-> > +		vmx_guest_debugctl_write(vcpu, vmx_guest_debugctl_read());
-> > +
-> > =C2=A0	/*
-> > =C2=A0	 * Refresh vmcs.HOST_CR3 if necessary.=C2=A0 This must be done i=
-mmediately
-> > =C2=A0	 * prior to VM-Enter, as the kernel may load a new ASID (PCID) a=
-ny time
-> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> > index 1b80479505d3..5ddedf73392b 100644
-> > --- a/arch/x86/kvm/vmx/vmx.h
-> > +++ b/arch/x86/kvm/vmx/vmx.h
-> > @@ -416,6 +416,8 @@ static inline void vmx_set_intercept_for_msr(struct=
- kvm_vcpu *vcpu, u32 msr,
-> > =C2=A0
-> > =C2=A0void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
-> > =C2=A0u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_i=
-nitiated);
-> > +void vmx_guest_debugctl_write(struct kvm_vcpu *vcpu, u64 val);
-> > +u64 vmx_guest_debugctl_read(void);
->=20
-> I vote to make these static inlines, I don't see any reason to bury them =
-in vmx.c
-
-No problem as well.
-
->=20
-> > =C2=A0/*
-> > =C2=A0 * Note, early Intel manuals have the write-low and read-high bit=
-map offsets
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 684b8047e0f2..a85078dfa36d 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -10752,7 +10752,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vc=
-pu)
-> > =C2=A0		dm_request_for_irq_injection(vcpu) &&
-> > =C2=A0		kvm_cpu_accept_dm_intr(vcpu);
-> > =C2=A0	fastpath_t exit_fastpath;
-> > -	u64 run_flags;
-> > +	u64 run_flags, host_debug_ctl;
-> > =C2=A0
-> > =C2=A0	bool req_immediate_exit =3D false;
-> > =C2=A0
-> > @@ -11024,7 +11024,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *v=
-cpu)
-> > =C2=A0		set_debugreg(0, 7);
-> > =C2=A0	}
-> > =C2=A0
-> > -	vcpu->arch.host_debugctl =3D get_debugctlmsr();
-> > +	host_debug_ctl =3D get_debugctlmsr();
->=20
-> This can probably just be debug_ctl to shorten the lines, I don't see a s=
-trong
-> need to clarify it's the host's value since all accesses are clustered to=
-gether.
->=20
-> > +	if (host_debug_ctl !=3D vcpu->arch.host_debugctl)
-> > +		run_flags |=3D KVM_RUN_LOAD_DEBUGCTL;
-> > +	vcpu->arch.host_debugctl =3D host_debug_ctl;
->=20
-> Argh, the TDX series didn't get refreshed (or maybe it got poorly rebased=
-), and
-> now there's a redundant and confusing "host_debugctlmsr" field in vcpu_vt=
-.=C2=A0 Can
-> you slot in the below?=C2=A0 It's not urgent enough to warrant posting se=
-parately,
-> and handling TDX in this series would get a bit wonky if TDX uses a diffe=
-rent
-> snapshot.
->=20
-> The reason I say that TDX will get wonky is also why I think the "are bit=
-s
-> changing?" check in x86.c needs to be precise.=C2=A0 KVM_RUN_LOAD_DEBUGCT=
-L should
-> *never* be set for TDX and SVM, and so they should WARN instead of silent=
-ly
-> doing nothing.=C2=A0 But to do that without generating false positives, t=
-he common
-> check needs to be precise.
->=20
-> I was going to say we could throw a mask in kvm_x86_ops, but TDX throws a=
- wrench
-> in that idea.=C2=A0 Aha!=C2=A0 Actually, we can still use kvm_x86_ops.=C2=
-=A0 TDX can be exempted
-> via guest_state_protected.=C2=A0 E.g. in common x86:
->=20
-> 	debug_ctl =3D get_debugctlmsr();
-> 	if (((debug_ctl ^ vcpu->arch.host_debugctl) & kvm_x86_ops.HOST_DEBUGCTL_=
-MASK) &&
-> 	=C2=A0=C2=A0=C2=A0 !vcpu->arch.guest_state_protected)
-> 		run_flags |=3D KVM_RUN_LOAD_DEBUGCTL;
-> 	vcpu->arch.host_debugctl =3D debug_ctl;
-
-Makes sense. I need to remember that TDX has arrived so I have to take it
-in the account from now on.
-
-All right, thanks for the review, I will post a new patch series soon.
-
-
-Best regards,
-	Maxim Levitsky
-
->=20
-> --
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Tue, 20 May 2025 15:37:41 -0700
-> Subject: [PATCH] KVM: TDX: Use kvm_arch_vcpu.host_debugctl to restore the
-> =C2=A0host's DEBUGCTL
->=20
-> Use the kvm_arch_vcpu.host_debugctl snapshot to restore DEBUGCTL after
-> running a TD vCPU.=C2=A0 The final TDX series rebase was mishandled, like=
-ly due
-> to commit fb71c7959356 ("KVM: x86: Snapshot the host's DEBUGCTL in common
-> x86") deleting the same line of code from vmx.h, i.e. creating a semantic
-> conflict of sorts, but no syntactic conflict.
->=20
-> Using the version in kvm_vcpu_arch picks up the ulong =3D> u64 fix (which
-> isn't relevant to TDX) as well as the IRQ fix from commit 189ecdb3e112
-> ("KVM: x86: Snapshot the host's DEBUGCTL after disabling IRQs").
->=20
-> Link: https://lore.kernel.org/all/20250307212053.2948340-10-pbonzini@redh=
-at.com
-> Cc: Adrian Hunter <adrian.hunter@intel.com>
-> Fixes: 8af099037527 ("KVM: TDX: Save and restore IA32_DEBUGCTL")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> =C2=A0arch/x86/kvm/vmx/common.h | 2 --
-> =C2=A0arch/x86/kvm/vmx/tdx.c=C2=A0=C2=A0=C2=A0 | 6 ++----
-> =C2=A02 files changed, 2 insertions(+), 6 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-> index 8f46a06e2c44..66454bead202 100644
-> --- a/arch/x86/kvm/vmx/common.h
-> +++ b/arch/x86/kvm/vmx/common.h
-> @@ -53,8 +53,6 @@ struct vcpu_vt {
-> =C2=A0#ifdef CONFIG_X86_64
-> =C2=A0	u64		msr_host_kernel_gs_base;
-> =C2=A0#endif
-> -
-> -	unsigned long	host_debugctlmsr;
-> =C2=A0};
-> =C2=A0
-> =C2=A0#ifdef CONFIG_KVM_INTEL_TDX
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 7dbfad28debc..84b2922b8119 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -778,8 +778,6 @@ void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcp=
-u)
-> =C2=A0	else
-> =C2=A0		vt->msr_host_kernel_gs_base =3D read_msr(MSR_KERNEL_GS_BASE);
-> =C2=A0
-> -	vt->host_debugctlmsr =3D get_debugctlmsr();
-> -
-> =C2=A0	vt->guest_state_loaded =3D true;
-> =C2=A0}
-> =C2=A0
-> @@ -1056,8 +1054,8 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, u64 =
-run_flags)
-> =C2=A0
-> =C2=A0	tdx_vcpu_enter_exit(vcpu);
-> =C2=A0
-> -	if (vt->host_debugctlmsr & ~TDX_DEBUGCTL_PRESERVED)
-> -		update_debugctlmsr(vt->host_debugctlmsr);
-> +	if (vcpu->arch.host_debugctl & ~TDX_DEBUGCTL_PRESERVED)
-> +		update_debugctlmsr(vcpu->arch.host_debugctl);
-> =C2=A0
-> =C2=A0	tdx_load_host_xsave_state(vcpu);
-> =C2=A0	tdx->guest_entered =3D true;
->=20
-> base-commit: 475a02020ac2de6b10e85de75e79833139b556e0
-> --
->=20
-
+T24gV2VkLCAyMDI1LTA1LTIxIGF0IDEwOjEyIC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBPbiBUdWUsIE1heSAyMCwgMjAyNSwgS2FpIEh1YW5nIHdyb3RlOg0KPiA+IE9uIFR1
+ZSwgMjAyNS0wNS0yMCBhdCAxNjoxMSAtMDcwMCwgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90ZToN
+Cj4gPiA+IE9uIFR1ZSwgTWF5IDIwLCAyMDI1LCBLYWkgSHVhbmcgd3JvdGU6DQo+ID4gPiA+IE9u
+IE1vbiwgMjAyNS0wNS0xOSBhdCAwODozOSAtMDcwMCwgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90
+ZToNCj4gPiA+ID4gPiArc3RhdGljIGludCB0ZHhfc2VwdF9yZW1vdmVfcHJpdmF0ZV9zcHRlKHN0
+cnVjdCBrdm0gKmt2bSwgZ2ZuX3QgZ2ZuLA0KPiA+ID4gPiA+ICsJCQkJCWVudW0gcGdfbGV2ZWwg
+bGV2ZWwsIGt2bV9wZm5fdCBwZm4pDQo+ID4gPiA+ID4gIHsNCj4gPiA+ID4gPiAgCXN0cnVjdCBw
+YWdlICpwYWdlID0gcGZuX3RvX3BhZ2UocGZuKTsNCj4gPiA+ID4gPiAgCWludCByZXQ7DQo+ID4g
+PiA+ID4gQEAgLTM1MDcsMTAgKzM1MDcsMTQgQEAgaW50IF9faW5pdCB0ZHhfYnJpbmd1cCh2b2lk
+KQ0KPiA+ID4gPiA+ICAJciA9IF9fdGR4X2JyaW5ndXAoKTsNCj4gPiA+ID4gPiAgCWlmIChyKSB7
+DQo+ID4gPiA+ID4gIAkJLyoNCj4gPiA+ID4gPiAtCQkgKiBEaXNhYmxlIFREWCBvbmx5IGJ1dCBk
+b24ndCBmYWlsIHRvIGxvYWQgbW9kdWxlIGlmDQo+ID4gPiA+ID4gLQkJICogdGhlIFREWCBtb2R1
+bGUgY291bGQgbm90IGJlIGxvYWRlZC4gIE5vIG5lZWQgdG8gcHJpbnQNCj4gPiA+ID4gPiAtCQkg
+KiBtZXNzYWdlIHNheWluZyAibW9kdWxlIGlzIG5vdCBsb2FkZWQiIGJlY2F1c2UgaXQgd2FzDQo+
+ID4gPiA+ID4gLQkJICogcHJpbnRlZCB3aGVuIHRoZSBmaXJzdCBTRUFNQ0FMTCBmYWlsZWQuDQo+
+ID4gPiA+ID4gKwkJICogRGlzYWJsZSBURFggb25seSBidXQgZG9uJ3QgZmFpbCB0byBsb2FkIG1v
+ZHVsZSBpZiB0aGUgVERYDQo+ID4gPiA+ID4gKwkJICogbW9kdWxlIGNvdWxkIG5vdCBiZSBsb2Fk
+ZWQuICBObyBuZWVkIHRvIHByaW50IG1lc3NhZ2Ugc2F5aW5nDQo+ID4gPiA+ID4gKwkJICogIm1v
+ZHVsZSBpcyBub3QgbG9hZGVkIiBiZWNhdXNlIGl0IHdhcyBwcmludGVkIHdoZW4gdGhlIGZpcnN0
+DQo+ID4gPiA+ID4gKwkJICogU0VBTUNBTEwgZmFpbGVkLiAgRG9uJ3QgYm90aGVyIHVud2luZGlu
+ZyB0aGUgUy1FUFQgaG9va3Mgb3INCj4gPiA+ID4gPiArCQkgKiB2bV9zaXplLCBhcyBrdm1feDg2
+X29wcyBoYXZlIGFscmVhZHkgYmVlbiBmaW5hbGl6ZWQgKGFuZCBhcmUNCj4gPiA+ID4gPiArCQkg
+KiBpbnRlbnRpb25hbGx5IG5vdCBleHBvcnRlZCkuICBUaGUgUy1FUFQgY29kZSBpcyB1bnJlYWNo
+YWJsZSwNCj4gPiA+ID4gPiArCQkgKiBhbmQgYWxsb2NhdGluZyBhIGZldyBtb3JlIGJ5dGVzIHBl
+ciBWTSBpbiBhIHNob3VsZC1iZS1yYXJlDQo+ID4gPiA+ID4gKwkJICogZmFpbHVyZSBzY2VuYXJp
+byBpcyBhIG5vbi1pc3N1ZS4NCj4gPiA+ID4gPiAgCQkgKi8NCj4gPiA+ID4gPiAgCQlpZiAociA9
+PSAtRU5PREVWKQ0KPiA+ID4gPiA+ICAJCQlnb3RvIHN1Y2Nlc3NfZGlzYWJsZV90ZHg7DQo+ID4g
+PiA+ID4gQEAgLTM1MjQsMyArMzUyOCwxOSBAQCBpbnQgX19pbml0IHRkeF9icmluZ3VwKHZvaWQp
+DQo+ID4gPiA+ID4gIAllbmFibGVfdGR4ID0gMDsNCj4gPiA+ID4gPiAgCXJldHVybiAwOw0KPiA+
+ID4gPiA+ICB9DQo+ID4gPiA+ID4gKw0KPiA+ID4gPiA+ICsNCj4gPiA+ID4gPiArdm9pZCBfX2lu
+aXQgdGR4X2hhcmR3YXJlX3NldHVwKHZvaWQpDQo+ID4gPiA+ID4gK3sNCj4gPiA+ID4gPiArCS8q
+DQo+ID4gPiA+ID4gKwkgKiBOb3RlLCBpZiB0aGUgVERYIG1vZHVsZSBjYW4ndCBiZSBsb2FkZWQs
+IEtWTSBURFggc3VwcG9ydCB3aWxsIGJlDQo+ID4gPiA+ID4gKwkgKiBkaXNhYmxlZCBidXQgS1ZN
+IHdpbGwgY29udGludWUgbG9hZGluZyAoc2VlIHRkeF9icmluZ3VwKCkpLg0KPiA+ID4gPiA+ICsJ
+ICovDQo+ID4gPiA+IA0KPiA+ID4gPiBUaGlzIGNvbW1lbnQgc2VlbXMgYSBsaXR0bGUgYml0IHdl
+aXJkIHRvIG1lLiAgSSB0aGluayB3aGF0IHlvdSBtZWFudCBoZXJlIGlzIHRoZQ0KPiA+ID4gPiBA
+dm1fc2l6ZSBhbmQgdGhvc2UgUy1FUFQgb3BzIGFyZSBub3QgdW53b3VuZCB3aGlsZSBURFggY2Fu
+bm90IGJlIGJyb3VnaHQgdXAgYnV0DQo+ID4gPiA+IEtWTSBpcyBzdGlsbCBsb2FkZWQuDQo+ID4g
+PiANCj4gPiA+IFRoaXMgY29tbWVudCBpcyB3ZWlyZD8gIE9yIHRoZSBvbmUgaW4gdGR4X2JyaW5n
+dXAoKSBpcyB3ZWlyZD8gwqANCj4gPiA+IA0KPiA+IA0KPiA+IEkgZGVmaW5pdGVseSBhZ3JlZSB0
+ZHhfYnJpbmd1cCgpIGlzIHdlaXJkIDotKQ0KPiA+IA0KPiA+ID4gVGhlIHNvbGUgaW50ZW50IG9m
+IF90aGlzXyBjb21tZW50IGlzIHRvIGNsYXJpZnkgdGhhdCBLVk0gY291bGQgc3RpbGwgZW5kIHVw
+DQo+ID4gPiBydW5uaW5nIGxvYWQgd2l0aCBURFggZGlzYWJsZWQuIMKgDQo+ID4gPiANCj4gPiAN
+Cj4gPiBCdXQgdGhpcyBiZWhhdmlvdXIgaXRzZWxmIGRvZXNuJ3QgbWVhbiBhbnl0aGluZywNCj4g
+DQo+IEkgZGlzYWdyZWUuICBUaGUgb3ZlcndoZWxtaW5nIG1ham9yaXR5IG9mIGNvZGUgaW4gS1ZN
+IGV4cGVjdHMgdGhhdCBlaXRoZXIgdGhlDQo+IGFzc29jaWF0ZWQgZmVhdHVyZSB3aWxsIGJlIGZ1
+bGx5IGVuYWJsZWQsIG9yIEtWTSB3aWxsIGFib3J0IHRoZSBvdmVyYWxsIGZsb3csDQo+IGUuZy4g
+cmVmdXNlIHRvIGxvYWQsIGZhaWwgdkNQVS9WTSBjcmVhdGlvbiwgZXRjLg0KPiANCj4gQ29udGlu
+dWluZyBvbiBpcyB2ZXJ5IGV4Y2VwdGlvbmFsIElNTywgYW5kIHdhcnJhbnRzIGEgY29tbWVudC4N
+Cg0KSSBzZWUuDQoNCj4gDQo+ID4gZS5nLiwgaWYgd2UgZXhwb3J0IGt2bV94ODZfb3BzLCB3ZSBj
+b3VsZCB1bndpbmQgdGhlbS4NCj4gDQo+IE1hYWF5YmUuICBJIG1lYW4sIHllcywgd2UgY291bGQg
+ZnVsbHkgdW53aW5kIGt2bV94ODZfb3BzLCBidXQgZG9pbmcgc28gd291bGQgbWFrZQ0KPiB0aGUg
+b3ZlcmFsbCBjb2RlIGZhciBtb3JlIGJyaXR0bGUuICBFLmcuIHNpbXBseSB1cGRhdGluZyBrdm1f
+eDg2X29wcyB3b24ndCBzdWZmaWNlLA0KPiBhcyB0aGUgc3RhdGljX2NhbGxzIGFsc28gbmVlZCB0
+byBiZSBwYXRjaGVkLCBhbmQgd2Ugd291bGQgaGF2ZSB0byBiZSB2ZXJ5IGNhcmVmdWwNCj4gbm90
+IHRvIHRvdWNoIGFueXRoaW5nIGluIGt2bV94ODZfb3BzIHRoYXQgbWlnaHQgaGF2ZSBiZWVuIGNv
+bnN1bWVkIGJldHdlZW4gaGVyZQ0KPiBhbmQgdGhlIGNhbGwgdG8gdGR4X2JyaW5ndXAoKS4NCg0K
+UmlnaHQuICBNYXliZSBleHBvcnRpbmcga3ZtX29wc191cGRhdGUoKSBpcyBiZXR0ZXIuDQoNCj4g
+DQo+ID4gU28gd2l0aG91dCBtZW50aW9uaW5nICJ0aG9zZSBhcmUgbm90IHVud291bmQiLCBpdCBk
+b2Vzbid0IHNlZW0gdXNlZnVsIHRvIG1lLg0KPiA+IA0KPiA+IEJ1dCBpdCBkb2VzIGhhdmUgIihz
+ZWUgdGR4X2JyaW5ndXAoKSkiIGF0IHRoZSBlbmQsIHNvIE9LIHRvIG1lLiAgSSBndWVzcyBJIGp1
+c3QNCj4gPiB3aXNoIGl0IGNvdWxkIGJlIG1vcmUgdmVyYm9zZS4NCj4gDQo+IFllYWgsIHJlZGly
+ZWN0aW5nIHRvIGFub3RoZXIgY29tbWVudCBpc24ndCBhIGdyZWF0IGV4cGVyaWVuY2UgZm9yIHJl
+YWRlcnMsIGJ1dCBJDQo+IGRvbid0IHdhbnQgdG8gZHVwbGljYXRlIHRoZSBleHBsYW5hdGlvbiBh
+bmQgZGV0YWlscyBiZWNhdXNlIHRoYXQgcmlza3MgY3JlYXRpbmcNCj4gc3RhbGUgYW5kL29yIGNv
+bnRyYWRpY3RpbmcgY29tbWVudHMgaW4gdGhlIGZ1dHVyZSwgYW5kIGluIGdlbmVyYWwgaW5jcmVh
+c2VzIHRoZQ0KPiBtYWludGVuYW5jZSBjb3N0IChzbWFsbCB0aG91Z2ggaXQgc2hvdWxkIGJlIGlu
+IHRoaXMgY2FzZSkuDQoNClN1cmUgOi0pDQo=
 
