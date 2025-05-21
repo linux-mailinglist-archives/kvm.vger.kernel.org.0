@@ -1,124 +1,185 @@
-Return-Path: <kvm+bounces-47301-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47302-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C4AABFBDE
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 19:01:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75CE9ABFC0A
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 19:12:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EB8F502519
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 17:01:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B31078C7AF0
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 17:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84FDE28983E;
-	Wed, 21 May 2025 16:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26716263F32;
+	Wed, 21 May 2025 17:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PrDXzSNx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G80VNuhl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7BD289822
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 16:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D088917C21B
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 17:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747846794; cv=none; b=Y4ewKGPn2wSHPdq6QDhYE/UvawzHjVvGW2m5jrvurvmq5W6TBLaXnBipZVMV+UkNdxjFmVd94IBthQRC/Cpu+BU06VDu3ZIYFz0ejAXtNrPip7lk4eqQDNaD7SQfjPJcJ/FTIUMWjyeSC3nOsqb0UyBXK4bNtrQYDloHLNgfWaY=
+	t=1747847531; cv=none; b=Y9QT+EaGBOcGz4dqoRrRWqrSLHf/gBKYEUQqtkMLR1wz/xXtwi9FyY3s1xqKd9aq+n0wNoUgg0F5uGDbznOvyEV8xnPxX5lVS22rqEEabNLyitvjowNvIBRX6zFzF7mPlIvQ+tPZrjrHKrTL71XxME4E4sLRUi2kbQBiTCrFDIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747846794; c=relaxed/simple;
-	bh=y0v3mpA4u0yZ8hVDzPt7b0GP7skmvPxgwdsGFyF72PA=;
+	s=arc-20240116; t=1747847531; c=relaxed/simple;
+	bh=d78K/Ch8eyzrP9+AsaFGDE7EsISxi0Ne4K7nZRV1XIw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=t35FxCs11EYnPU7l/qoisyRm7zs7BbiCwRUS+F1xlhk8ucyYIWDi+Z5QDF54yEbuCap15mP3LR9azsH46+EcRlbh/BxZOffKOVm8UC7uFz+fLdhiMuc/UL9XAVjNKvPA2DFdhqRP8HIm1Wc7It5uutwff4TB4Y1rIPGDlbtT2kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PrDXzSNx; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=i8MUhBDI/97XS/CXvM7kzdoYTdBrjD9CjTfcgGBBJR4k3078iMz7bpK7j87MKcEAu/UsBSHHzAnAc1du2ADncpvKMQ5UqGjQljjk8Kv8o1m9DK18ILM7Di/HzJeKT2BfV0MG08hT5H8eT8N04U7LfmD6UiPEuKsRslq/QCNkBY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G80VNuhl; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30ec5cc994eso3553087a91.2
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 09:59:53 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-231d4e36288so53460835ad.2
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 10:12:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747846792; x=1748451592; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nn5fm8k2Ml1brz+kg+Xc6EKFqD1WyZfu8AZFfGZAdFU=;
-        b=PrDXzSNxPBQ2P0BVCmg25kUgoAJQ9K3vJ4AkgHzl99eMXAZzbPSamcxgoguTmzZ+Bw
-         9/ygqaI4MGQERA6AkbgV7vmrgu6YEfwRp+8Xvbi2OYv7tsk3jq5IESyZd8kB9Vk8CLIQ
-         Ik2VtHG/v9/yQG9Fc/ZQz3vvcoN0GEKWEfT/criEP15AwhyQzvOcCW54W7DAXsLY5ka4
-         lV0uyGDueX6BVTSgDUBIyBY4J4l6IQovTp90aV92s8PUnBeo6sQQSAo/ZQZ0Ed6RU7/O
-         45yWARheb/dCMuWjkMqEP7pcDcNTquL2VjmK3Tf9gU8iSM+9Hla6UqIoCUaKfnBwIbZG
-         WfEQ==
+        d=google.com; s=20230601; t=1747847529; x=1748452329; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/jNOuCCyzTb1XsnW2HWyWlahXwvYtOlPi+YMKNdC9nY=;
+        b=G80VNuhlJpjIMnCZtmZFHxKhE6RYrRJe+IqbLVaeT2BPEEpAj5K7YJ2PXT8cD+dKrM
+         y3f9Rs8IkRfGV7hj/hwN5vN3gdAk5cZiJNo9zwU8AO6dzQz6edW9KYOshIz3I/kR/JUP
+         iahD866WssIAbiIH9umYuh1a7fHrhdo+A6qE67aAr2VVg1DCTx2rCAr/DkPMZdeLn8Xg
+         c1RGXIVEcQ+lk1XQe94tFkHW9czOBOiJojGqnl106Eaj/7Wpk95D8Pf5BLdAswvzKzcn
+         HR2iWnATPNyDQj9y+2DhY4toxB8tid45G7tDbqmrOIWbfFUPVdE+57HPp3efDixhcf3b
+         Hl2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747846792; x=1748451592;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nn5fm8k2Ml1brz+kg+Xc6EKFqD1WyZfu8AZFfGZAdFU=;
-        b=QCM0PxSHq8GMrgpP/AdYHCePJQm+pY1oaBo5JcfAWgOFHmRwzyc1FMBsWLoQB3d6Lf
-         BQ5moyYDZJzCIdVwl/gI0/Fk2aWFIPlHA+UTI+uatmy1/lIzDtELiprqsjULts/88Ap9
-         /6snjGf7MFOPLiCxVF+2P//blIzLgDY+RUeJXwvkHl0WYIH53yDsBiBxIGLCS/BCZMOk
-         Btu57M3bYQhXao/ew0nudAksanDl2RubwRxH0qre5vOcj/ZIe8q2XpHknrVHX1/vvP9H
-         zQvQ5PV11VOopcYuJR155EfjGDCqORTxN7lZwZghDghOjO5hhgAP178ptT5OTl0wQW2M
-         JeiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXTy+kkBWScRGGAvRhLanHM+bSfZFV3JU8xNzUaecF3O1KRRm3ZKorc237eEjDl0GgzW4c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1kVaVgVanI52QI9Qo9nspN3kI38/m14DQAyEAujYUGI2Rn2Jj
-	WMQL8TAffkwwjqprFAU3gCF1DC9p3AweW+Fn7crsXycrLQhMpdZ6SJ3wTv1yBjTTTuveasIW1rt
-	xuAP5gA==
-X-Google-Smtp-Source: AGHT+IG6dBlWQxswmpzRlpBNWMeMsVzFwgqg9N/lMiD/6PEBD2Bv2fiNQRCTifMOfGMxFV8XX1aGvjOU8lY=
-X-Received: from pjbsn4.prod.google.com ([2002:a17:90b:2e84:b0:2fc:aac:e580])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1dd1:b0:2ff:784b:ffe
- with SMTP id 98e67ed59e1d1-30e7d522171mr38492906a91.11.1747846792524; Wed, 21
- May 2025 09:59:52 -0700 (PDT)
-Date: Wed, 21 May 2025 09:59:51 -0700
-In-Reply-To: <aC0c4U6tsVif+M4H@intel.com>
+        d=1e100.net; s=20230601; t=1747847529; x=1748452329;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/jNOuCCyzTb1XsnW2HWyWlahXwvYtOlPi+YMKNdC9nY=;
+        b=GWkoel0e7mP/K/X1gG3vi7B3sAXwaPBiF9un9Zn0OKU67DfYACx0MQmURCluj+9iG0
+         a+Lo42JM/ji7hVN144qtbdAa/SrnbKg/4SjAT0xeMf02Oj7SujYPIKT/kGwbCF35xUnm
+         yAIMMfkLE8i6DZla41rlfVa5+oblf9u8kYUF1uq51DXYqIGD+ig19snzQbpmx1U4g4I5
+         IiQBk4s+QaMAuxk0CvznMCL/nlfFHGap+3kU3ug7PN2byBPnL0wA9wMN0cXttqHpqI7s
+         8JN19kTq2q3uJtQuPcKZlVndCxKDoLyLFq3FiZYSZNOug0hq93jj8urOi2a6EUtuki6U
+         PO1w==
+X-Gm-Message-State: AOJu0Yy/IfcEUWYOtY9aWk5/Pf8FZkpCubweB78ZBVoNJrIqR/WColcA
+	pam4p6WeXvqdVle59upI+IvR4v5K2gZeqD/VT6nyrCig9uiqqc2c8HBC66/DXr/0GqmLT98b+CI
+	A9xKUVg==
+X-Google-Smtp-Source: AGHT+IETbMHTy/wN84eri4+XJ0dfgyM1nswfh9RHqUQIPWwj4IQFkSc004LmUCE4Wu6BrDmB0awj2qSQ5PU=
+X-Received: from ploy13.prod.google.com ([2002:a17:903:1b2d:b0:22e:5728:685d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d483:b0:232:17d8:486
+ with SMTP id d9443c01a7336-23217d81153mr249809655ad.22.1747847529062; Wed, 21
+ May 2025 10:12:09 -0700 (PDT)
+Date: Wed, 21 May 2025 10:12:07 -0700
+In-Reply-To: <5546ad0e36f667a6b426ef47f1f40aee8d83efc9.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250512085735.564475-1-chao.gao@intel.com> <aCYLMY00dKbiIfsB@gmail.com>
- <ed3adddc-50a9-4538-9928-22dea0583e24@intel.com> <aC0c4U6tsVif+M4H@intel.com>
-Message-ID: <aC4Gh0YMxFzNVws1@google.com>
-Subject: Re: [PATCH v7 0/6] Introduce CET supervisor state support
+References: <20250516215422.2550669-1-seanjc@google.com> <20250516215422.2550669-3-seanjc@google.com>
+ <219b6bd5-9afe-4d1c-aaab-03e5c580ce5c@redhat.com> <aCtQlanun-Kaq4NY@google.com>
+ <dca247173aace1269ce8512ae2d3797289bb1718.camel@intel.com>
+ <aC0MIUOTQbb9-a7k@google.com> <5546ad0e36f667a6b426ef47f1f40aee8d83efc9.camel@intel.com>
+Message-ID: <aC4JZ4ztJiFGVMkB@google.com>
+Subject: Re: [PATCH v3 2/3] KVM: x86: Use kvzalloc() to allocate VM struct
 From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Dave Hansen <dave.hansen@intel.com>, Ingo Molnar <mingo@kernel.org>, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de, 
-	pbonzini@redhat.com, peterz@infradead.org, rick.p.edgecombe@intel.com, 
-	weijiang.yang@intel.com, john.allen@amd.com, bp@alien8.de, 
-	chang.seok.bae@intel.com, xin3.li@intel.com, 
-	Aruna Ramakrishna <aruna.ramakrishna@oracle.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Eric Biggers <ebiggers@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
-	Kees Cook <kees@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Mitchell Levy <levymitchell0@gmail.com>, Nikolay Borisov <nik.borisov@suse.com>, 
-	Oleg Nesterov <oleg@redhat.com>, Samuel Holland <samuel.holland@sifive.com>, 
-	Sohil Mehta <sohil.mehta@intel.com>, Stanislav Spassov <stanspas@amazon.de>, 
-	Uros Bizjak <ubizjak@gmail.com>, Vignesh Balasubramanian <vigbalas@amd.com>, Zhao Liu <zhao1.liu@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Kai Huang <kai.huang@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"vipinsh@google.com" <vipinsh@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 21, 2025, Chao Gao wrote:
-> On Fri, May 16, 2025 at 08:20:54AM -0700, Dave Hansen wrote:
-> >On 5/15/25 08:41, Ingo Molnar wrote:
-> >> * Chao Gao <chao.gao@intel.com> wrote:
-> >>> I kindly request your consideration for merging this series. Most of 
-> >>> patches have received Reviewed-by/Acked-by tags.
-> >> I don't see anything objectionable in this series.
-> >> 
-> >> The upcoming v6.16 merge window is already quite crowded in terms of 
-> >> FPU changes, so I think at this point we are looking at a v6.17 merge, 
-> >> done shortly after v6.16-rc1 if everything goes well. Dave, what do you 
-> >> think?
-> >
-> >It's getting into shape, but it has a slight shortage of reviews. For
-> >now, it's an all-Intel patch even though I _thought_ AMD had this
-> >feature too. It's also purely for KVM and has some suggested-by's from
-> >Sean, but no KVM acks on it.
-> >
-> >Sean is not exactly the quiet type about things, but it always warms me
-> >heart to see an acked-by accompanying a suggested-by because it
-> >indicates that the suggestion was heard and implemented properly.
-> 
-> Hi Sean, John,
-> 
-> Based on Dave's feedback, could you please review this series and provide your
-> reviewed-by/acked-by if appropriate?
+On Tue, May 20, 2025, Kai Huang wrote:
+> On Tue, 2025-05-20 at 16:11 -0700, Sean Christopherson wrote:
+> > On Tue, May 20, 2025, Kai Huang wrote:
+> > > On Mon, 2025-05-19 at 08:39 -0700, Sean Christopherson wrote:
+> > > > +static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn=
+,
+> > > > +					enum pg_level level, kvm_pfn_t pfn)
+> > > >  {
+> > > >  	struct page *page =3D pfn_to_page(pfn);
+> > > >  	int ret;
+> > > > @@ -3507,10 +3507,14 @@ int __init tdx_bringup(void)
+> > > >  	r =3D __tdx_bringup();
+> > > >  	if (r) {
+> > > >  		/*
+> > > > -		 * Disable TDX only but don't fail to load module if
+> > > > -		 * the TDX module could not be loaded.  No need to print
+> > > > -		 * message saying "module is not loaded" because it was
+> > > > -		 * printed when the first SEAMCALL failed.
+> > > > +		 * Disable TDX only but don't fail to load module if the TDX
+> > > > +		 * module could not be loaded.  No need to print message saying
+> > > > +		 * "module is not loaded" because it was printed when the first
+> > > > +		 * SEAMCALL failed.  Don't bother unwinding the S-EPT hooks or
+> > > > +		 * vm_size, as kvm_x86_ops have already been finalized (and are
+> > > > +		 * intentionally not exported).  The S-EPT code is unreachable,
+> > > > +		 * and allocating a few more bytes per VM in a should-be-rare
+> > > > +		 * failure scenario is a non-issue.
+> > > >  		 */
+> > > >  		if (r =3D=3D -ENODEV)
+> > > >  			goto success_disable_tdx;
+> > > > @@ -3524,3 +3528,19 @@ int __init tdx_bringup(void)
+> > > >  	enable_tdx =3D 0;
+> > > >  	return 0;
+> > > >  }
+> > > > +
+> > > > +
+> > > > +void __init tdx_hardware_setup(void)
+> > > > +{
+> > > > +	/*
+> > > > +	 * Note, if the TDX module can't be loaded, KVM TDX support will =
+be
+> > > > +	 * disabled but KVM will continue loading (see tdx_bringup()).
+> > > > +	 */
+> > >=20
+> > > This comment seems a little bit weird to me.  I think what you meant =
+here is the
+> > > @vm_size and those S-EPT ops are not unwound while TDX cannot be brou=
+ght up but
+> > > KVM is still loaded.
+> >=20
+> > This comment is weird?  Or the one in tdx_bringup() is weird? =C2=A0
+> >=20
+>=20
+> I definitely agree tdx_bringup() is weird :-)
+>=20
+> > The sole intent of _this_ comment is to clarify that KVM could still en=
+d up
+> > running load with TDX disabled. =C2=A0
+> >=20
+>=20
+> But this behaviour itself doesn't mean anything,
 
-The initialization of default features is a bit gnarly and I think can be improved
-without too much fuss, but otherwise this looks good.
+I disagree.  The overwhelming majority of code in KVM expects that either t=
+he
+associated feature will be fully enabled, or KVM will abort the overall flo=
+w,
+e.g. refuse to load, fail vCPU/VM creation, etc.
+
+Continuing on is very exceptional IMO, and warrants a comment.
+
+> e.g., if we export kvm_x86_ops, we could unwind them.
+
+Maaaybe.  I mean, yes, we could fully unwind kvm_x86_ops, but doing so woul=
+d make
+the overall code far more brittle.  E.g. simply updating kvm_x86_ops won't =
+suffice,
+as the static_calls also need to be patched, and we would have to be very c=
+areful
+not to touch anything in kvm_x86_ops that might have been consumed between =
+here
+and the call to tdx_bringup().
+
+> So without mentioning "those are not unwound", it doesn't seem useful to =
+me.
+>=20
+> But it does have "(see tdx_bringup())" at the end, so OK to me.  I guess =
+I just
+> wish it could be more verbose.
+
+Yeah, redirecting to another comment isn't a great experience for readers, =
+but I
+don't want to duplicate the explanation and details because that risks crea=
+ting
+stale and/or contradicting comments in the future, and in general increases=
+ the
+maintenance cost (small though it should be in this case).
 
