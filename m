@@ -1,197 +1,252 @@
-Return-Path: <kvm+bounces-47292-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47293-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 112F8ABFA50
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 17:56:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8F3ABFA7E
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 18:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B1BF9E67D6
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 15:49:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE7694A5448
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 16:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBBC221F10;
-	Wed, 21 May 2025 15:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E77220F36;
+	Wed, 21 May 2025 15:51:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KAHkfWdQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ErpZ0DhC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890511EB18D;
-	Wed, 21 May 2025 15:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036352206AA
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 15:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747842416; cv=none; b=RbcpGhQmShYkfgGTr2NH9P5F3uNAV9ngWDhRs09Cx+iUB8dxSPLHK+jnWyF18At0aS3PsfEv9JJwzeZO08OWv2RC92Y5UYQjOqXAo3lmW8Rm7MNYYDKkW0NygCSC7tJq/Cg82Foc+rO72WS0IyJXgvqRi0FHIhd4Q0lus4dZTdc=
+	t=1747842700; cv=none; b=rb3z+X1lQqFaVy1ryWEna/jY+MR97XJNYbToaJ3xlA8lmIGyTrct97AeKwtT3ZZhgRxe8/eNnERyO4SWNBb5FGSzjeKAYwNofwXSNx/7s2xqL/N/U8dmbuj0wuzelfcUvs1cu6Ju1vcaChmu5mEW7sIYaiYTAD5EFWNRinrJ0YY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747842416; c=relaxed/simple;
-	bh=xs6MyiJsl4816VLbkiYJIjZ52nVBNYDg6IflP+yXM5o=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ozyabUKB9ceBH35oSMyqlLIgBFFobE5D496v196aZWNE6ky5jWR0naXCttl6PY+MiDfc4SEIWnrgviCB0bivTOLxMkng7ACibcZAFkoZcFdVDTE602THaTHqSQm7S6Np2Gjo7PFEHgU/nF/axysWeUVc6I/fgvKMn+mRnzA9hzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KAHkfWdQ; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54LDnJmq006706;
-	Wed, 21 May 2025 15:46:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Wx1Lgm
-	ZxF+Xwm4tlerhs5YqUIvIJlk0ChbGGpQkmSYs=; b=KAHkfWdQZKB4cbteFbtz8V
-	Ex11MQzhuBFamyqER/nkOQ/MauwI77DW+qYZ99McBOsljKu1a+be6TXhWp9NtFpV
-	E29jRXfNEWkrwWqsw0qzLMFY+filt+GqOO5tqvpa8mhF6qxHZ3v/L1WwyEqNI2t7
-	epxbY/Pyh7KVpU3yh0OHQ3lYUK6XJYwqLQ/xMR72duwd/jiphwZiLGMEqgqAOULC
-	9mkikP/HC7oaLVc71+wocKIotZVUZj9ciu4dvV5qSywMEjFtcgc2S5/4SB9nN0mu
-	q6oDGFDvgkNZsX7Gjq2DA/fHFD2TQsIEwAaVb0Tz6seNflsUtORmrVrLpVvnKouQ
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46sg230m3d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 May 2025 15:46:50 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54LDu4Oj015444;
-	Wed, 21 May 2025 15:46:50 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 46rwnncv3j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 May 2025 15:46:49 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54LFkkhn19136806
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 21 May 2025 15:46:46 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F366A20043;
-	Wed, 21 May 2025 15:46:45 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8E1B620040;
-	Wed, 21 May 2025 15:46:45 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.152.224.80])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 21 May 2025 15:46:45 +0000 (GMT)
-Message-ID: <bfec98c2f53cc71603445b0339f53111cbf86e9e.camel@linux.ibm.com>
-Subject: Re: [PATCH v1 4/5] KVM: s390: refactor and split some gmap helpers
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        david@redhat.com, hca@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, gor@linux.ibm.com
-Date: Wed, 21 May 2025 17:46:46 +0200
-In-Reply-To: <20250521174137.5b2baaf6@p-imbrenda>
-References: <20250514163855.124471-1-imbrenda@linux.ibm.com>
-		<20250514163855.124471-5-imbrenda@linux.ibm.com>
-		<277aa125e8edaf55e82ca66a15b26eee6ba3320b.camel@linux.ibm.com>
-		<20250521171930.2edaaa8a@p-imbrenda>
-		<d495d17902955839b0d7d092334b47efbdcb55a1.camel@linux.ibm.com>
-	 <20250521174137.5b2baaf6@p-imbrenda>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1 (3.56.1-1.fc42) 
+	s=arc-20240116; t=1747842700; c=relaxed/simple;
+	bh=8sepo7ZUTMdBYzRonwxMcnqAgDClXDq596T2GjQ7rZo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nbgWoVbPmLOju1CsA+pq1wMNWElDlNC6ozrLAzJlIuWfTgFkS/n7u35h7kh8tOlqDbFYgPG0XZoezo7PQT+uNt4FCh6nn2e2NC4bw3MjSRLhb2AsK4GQdfAS4u3SANqO/1iYIhPwLP9VGW8IH4jUb4e21u0V01n5mQ60OMIaldA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ErpZ0DhC; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-231f37e114eso1028865ad.1
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 08:51:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747842698; x=1748447498; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yWPZpU6WFSpfS6hmxyh7KpM+vXuIKyk4x1JorSsjETc=;
+        b=ErpZ0DhCeoUaQ4pHOYArnXE1iMEoOMcHD8tEETcGGMx4Qop42AU/Mnnq6JeRVyAeZz
+         p11USJBf5jpgzAmmb3cEo21g/+Uutx712owqexmw24J4++DpwK33dwWtDOTm/y02mpGo
+         UFuR0MgBkzyvi2qC/15yjW94rFNv8XleOPbLGgx5IkmhoUBXixo/kSrQc8lpy7UAVpFI
+         6Ix6ApWVrQweFzqYCJd5zrVNiTN4SB4txyBOgdYzKRS+QOrU900Hkw6vBB5abJxa6w7J
+         Ri20scOZpOzWx+dX+xONikKTKIlapHX3Wl1iTAFyox7KV4cIHrDYoQlVIfZ7W148CLkf
+         COKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747842698; x=1748447498;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yWPZpU6WFSpfS6hmxyh7KpM+vXuIKyk4x1JorSsjETc=;
+        b=VEzaNv78d3ySFtBop7MMhbUrEouj/l65z44JZSjC/KUsxp+UJs0h3JG9zxMRyRoRUq
+         v9zuABVpRtCgI1eYpvsC/93tzZVMePH129iZSL7Yyl3GGOQnhZJo09+gKNGxPTs3M/qK
+         drg8FhJpzQOBx46ibuRHug0wYuSrfjhxv3nKkxrrvhJfyWD8Gvn5LZJEcz4BlQbOPeiB
+         /A+KmHO6oerNkiWcwzraRTc5s0DxncKbIl8RGL8pXTxon3fx5V4WNB42ikrHKLqH9y7G
+         gdLNml741pBzYytZpkCVAsn6JQCUbQOuSFZzXnCxQf/1qsXIXXdTq3t4aYOwgyrNqrES
+         cptA==
+X-Forwarded-Encrypted: i=1; AJvYcCUntDhZhrx0eNtiWlHzSVtPYTK/BpO6KHshvPaMzn1dASGawSJcIKetGzBBWQ761Pgf6RM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywkyv/zLoTkaIKdONEndSFvgJqjEykyImfURXg6+z+nHo/U3sB/
+	TEnJOuslCKXz7w/YbgZhFgUUgPGBA0osM1QsNcyzlLmqbA9eFQznNK+0WK0YLdyeTnwDQsr0ggq
+	m3xTCoDD1h9k0pRdr3RvQuylKxUanBg628AEmpcUA
+X-Gm-Gg: ASbGncsG1uvrERWaLGxpjh+9thuPMlb+KXAF7xDSwdSsyuRoGdduU3a5qhJ0b22geQf
+	8S/yQx4vF0c5nvH/HmBhivbf123HqhSCDaPzXzokNygm8z5LKydm1fxJet3LVrN4w2CimgUA2FW
+	nReuFmU8lE7Pgd+gJoVxcPlKNqJKB8RLhH7FawiTRMxDor5uXTDqhDQ+pgJgWaB9kE9lgx6WUE+
+	yw=
+X-Google-Smtp-Source: AGHT+IFSOrNxCp8s0BP2r14v02zKIVmyd2WKvXsGYKjroHCU10VHEe96vUn3gv/Pkk2x5Yo5Ut2ufH8Ox+PjEmVUtJY=
+X-Received: by 2002:a17:902:da85:b0:223:7f8f:439b with SMTP id
+ d9443c01a7336-23204175c4fmr11681965ad.29.1747842697619; Wed, 21 May 2025
+ 08:51:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Hq-FJRa7WzcXG0d_ztc0OJq8XzVcwHOx
-X-Authority-Analysis: v=2.4 cv=RPmzH5i+ c=1 sm=1 tr=0 ts=682df56a cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=TZB5Y_STSF-BKAUI658A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIxMDE1MyBTYWx0ZWRfX2h2c5+cRJedL Btxuig7rXmaT4u4xFJsmDoQZsnvLG2JRPPiwN4wj85jOWRnEVYnGgYQOle6D9dspSwxihNiDiru hBy3ESEcCJ9fR19MwT5fl1JoOy/RjWeScK5GSs2RSnWgykrPV12/jWA55wbEkqvvQDv2D5cWNOE
- zSE41r0GpqUNYZ+278mp4SriXauIS5ljvGr4tKaGGnHCkOgOkrl+kRzNm/dUMtzsZ+LLuWZ+4DV o4vBxGSnG6w73pTaQ0RtI69jPnmBjj+E/hASyrzD4fdrsy4az9P6hIYwiNcLRPYP7EYqVZKRour xZ4gIiEdkNCeUpqvLg7dgw9KmX2QC1xcdeMnk7aPR/e0zlUrNFRNAOYZS+RcbJe2MRmx1H7EE9e
- exykHny+ksWE7iCnEmwCcj9+mEr84d+0B8KZsfd0ed5Ln/kvMfe+fL0fJZ7vVMhW3VvcyCbX
-X-Proofpoint-GUID: Hq-FJRa7WzcXG0d_ztc0OJq8XzVcwHOx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-21_05,2025-05-20_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 impostorscore=0 adultscore=0 priorityscore=1501
- bulkscore=0 phishscore=0 mlxscore=0 malwarescore=0 spamscore=0
- mlxlogscore=999 suspectscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505160000 definitions=main-2505210153
+References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+ <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
+ <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
+ <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
+ <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
+ <CA+EHjTy7iBNBb9DRdtgq8oYmvgykhSNvZL3FrRV4XF90t3XgBg@mail.gmail.com>
+ <CAGtprH_7jSpwF77j1GW8rjSrbtZZ2OW2iGck5=Wk67+VnF9vjQ@mail.gmail.com>
+ <CA+EHjTzMhKCoftfJUuL0WUZW4DdqOHgVDcn0Cmf-0r--8rBdbg@mail.gmail.com>
+ <diqzecwjnk95.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTyY5C1QgkoAqvJ0kHM4nUvKc1e1nQ0Uq+BANtVEnZH90w@mail.gmail.com>
+ <CAGtprH-fE=G923ctBAcq5zFna+2WULhmHDSbXUsZKUrin29b4g@mail.gmail.com> <CA+EHjTxvufYVA8LQWRKEX7zA0gWLQUHVO2LvwKc5JXVu-XAEEA@mail.gmail.com>
+In-Reply-To: <CA+EHjTxvufYVA8LQWRKEX7zA0gWLQUHVO2LvwKc5JXVu-XAEEA@mail.gmail.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 21 May 2025 08:51:25 -0700
+X-Gm-Features: AX0GCFv_OcRDXXTTFCAqZtA9lE-fYkL67Fg0315KprRAbyvEL7EBvd9v52zlvyg
+Message-ID: <CAGtprH_TfKT3oRPCLbh-ojLGXSfOQ2XA39pVhr47gb3ikPtUkw@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Fuad Tabba <tabba@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
+	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2025-05-21 at 17:41 +0200, Claudio Imbrenda wrote:
-> On Wed, 21 May 2025 17:30:00 +0200
-> Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
->=20
-> > On Wed, 2025-05-21 at 17:19 +0200, Claudio Imbrenda wrote:
-> > > On Wed, 21 May 2025 16:55:18 +0200
-> > > Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
-> > >  =20
-> > > > On Wed, 2025-05-14 at 18:38 +0200, Claudio Imbrenda wrote: =20
-> > > > > Refactor some gmap functions; move the implementation into a sepa=
-rate
-> > > > > file with only helper functions. The new helper functions work on=
- vm
-> > > > > addresses, leaving all gmap logic in the gmap functions, which mo=
-stly
-> > > > > become just wrappers.
-> > > > >=20
-> > > > > The whole gmap handling is going to be moved inside KVM soon, but=
- the
-> > > > > helper functions need to touch core mm functions, and thus need t=
-o
-> > > > > stay in the core of kernel.
-> > > > >=20
-> > > > > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > > > > ---
-> > > > >  MAINTAINERS                          |   2 +
-> > > > >  arch/s390/include/asm/gmap_helpers.h |  18 ++
-> > > > >  arch/s390/kvm/diag.c                 |  11 +-
-> > > > >  arch/s390/kvm/kvm-s390.c             |   3 +-
-> > > > >  arch/s390/mm/Makefile                |   2 +
-> > > > >  arch/s390/mm/gmap.c                  |  46 ++---
-> > > > >  arch/s390/mm/gmap_helpers.c          | 266 +++++++++++++++++++++=
-++++++
-> > > > >  7 files changed, 307 insertions(+), 41 deletions(-)
-> > > > >  create mode 100644 arch/s390/include/asm/gmap_helpers.h
-> > > > >  create mode 100644 arch/s390/mm/gmap_helpers.c
-> > > > >    =20
-> > [...]
-> >=20
-> > > > > +void __gmap_helper_zap_one(struct mm_struct *mm, unsigned long v=
-maddr)   =20
-> > > >=20
-> > > > __gmap_helper_zap_mapping_pte ? =20
-> > >=20
-> > > but I'm not taking a pte as parameter =20
-> >=20
-> > The pte being zapped is the one mapping vmaddr, right?
->=20
-> I don't know, _pte kinda sounds to me as the function would be taking a
-> pte as parameter
+On Wed, May 21, 2025 at 8:22=E2=80=AFAM Fuad Tabba <tabba@google.com> wrote=
+:
+>
+> Hi Vishal,
+>
+> On Wed, 21 May 2025 at 15:42, Vishal Annapurve <vannapurve@google.com> wr=
+ote:
+> >
+> > On Wed, May 21, 2025 at 5:36=E2=80=AFAM Fuad Tabba <tabba@google.com> w=
+rote:
+> > > ....
+> > > > When rebooting, the memslots may not yet be bound to the guest_memf=
+d,
+> > > > but we want to reset the guest_memfd's to private. If we use
+> > > > KVM_SET_MEMORY_ATTRIBUTES to convert, we'd be forced to first bind,=
+ then
+> > > > convert. If we had a direct ioctl, we don't have this restriction.
+> > > >
+> > > > If we do the conversion via vcpu_run() we would be forced to handle
+> > > > conversions only with a vcpu_run() and only the guest can initiate =
+a
+> > > > conversion.
+> > > >
+> > > > On a guest boot for TDX, the memory is assumed to be private. If th=
+e we
+> > > > gave it memory set as shared, we'd just have a bunch of
+> > > > KVM_EXIT_MEMORY_FAULTs that slow down boot. Hence on a guest reboot=
+, we
+> > > > will want to reset the guest memory to private.
+> > > >
+> > > > We could say the firmware should reset memory to private on guest
+> > > > reboot, but we can't force all guests to update firmware.
+> > >
+> > > Here is where I disagree. I do think that this is the CoCo guest's
+> > > responsibility (and by guest I include its firmware) to fix its own
+> > > state after a reboot. How would the host even know that a guest is
+> > > rebooting if it's a CoCo guest?
+> >
+> > There are a bunch of complexities here, reboot sequence on x86 can be
+> > triggered using multiple ways that I don't fully understand, but few
+> > of them include reading/writing to "reset register" in MMIO/PCI config
+> > space that are emulated by the host userspace directly. Host has to
+> > know when the guest is shutting down to manage it's lifecycle.
+>
+> In that case, I think we need to fully understand these complexities
+> before adding new IOCTLs. It could be that once we understand these
+> issues, we find that we don't need these IOCTLs. It's hard to justify
+> adding an IOCTL for something we don't understand.
+>
 
-__gmap_helper_zap_pte_mapping_addr ?
+I don't understand all the ways x86 guest can trigger reboot but I do
+know that x86 CoCo linux guest kernel triggers reset using MMIO/PCI
+config register write that is emulated by host userspace.
 
-IMO __gmap_helper_zap_one is rather vague. Zap one? Which one?
+> > x86 CoCo VM firmwares don't support warm/soft reboot and even if it
+> > does in future, guest kernel can choose a different reboot mechanism.
+> > So guest reboot needs to be emulated by always starting from scratch.
+> > This sequence needs initial guest firmware payload to be installed
+> > into private ranges of guest_memfd.
+> >
+> > >
+> > > Either the host doesn't (or cannot even) know that the guest is
+> > > rebooting, in which case I don't see how having an IOCTL would help.
+> >
+> > Host does know that the guest is rebooting.
+>
+> In that case, that (i.e., the host finding out that the guest is
+> rebooting) could trigger the conversion back to private. No need for
+> an IOCTL.
 
-[...]
+In the reboot scenarios, it's the host userspace finding out that the
+guest kernel wants to reboot.
 
-> > >=20
-> > > > The stuff below is from arch/s390/mm/gmap.c right?
-> > > > Are you going to delete it from there? =20
-> > >=20
-> > > not in this series, but the next series will remove mm/gmap.c altoget=
-her =20
-> >=20
-> > Can't you do it with this one?
->=20
-> if you mean removing mm/gmap.c, no. I would need to push the whole gmap
-> rewrite series, which is not ready yet.
->=20
-> if you mean removing the redundant functions... I guess I could
+>
+> > > Or somehow the host does know that, i.e., via a hypercall that
+> > > indicates that. In which case, we could have it so that for that type
+> > > of VM, we would reconvert its pages to private on a reboot.
+> >
+> > This possibly could be solved by resetting the ranges to private when
+> > binding with a memslot of certain VM type. But then Google also has a
+> > usecase to support intrahost migration where a live VM and associated
+> > guest_memfd files are bound to new KVM VM and memslots.
+> >
+> > Otherwise, we need an additional contract between userspace/KVM to
+> > intercept/handle guest_memfd range reset.
+>
+> Then this becomes a migration issue to be solved then, not a huge page
+> support issue. If such IOCTLs are needed for migration, it's too early
+> to add them now.
 
-The latter. I think that would be cleaner.
->=20
-> >=20
-> >=20
-> > [...]
+The guest_memfd ioctl is not needed for migration but to change/reset
+guest_memfd range attributes. I am saying that migration usecase can
+conflict with some ways that we can solve resetting guest_memfd range
+attributes without adding a new IOCTL as migration closely resembles
+reboot scenario as both of them can/need reusing the same guest memory
+files but one needs to preserve guest memory state.
 
---=20
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen / Registergericht: Amtsgericht Stuttg=
-art, HRB 243294
+Reiterating my understanding here, guest memfd ioctl can be used by
+host userspace to -
+1) Change guest memfd range attributes during memory conversion
+     - This can be handled by KVM hypercall exits in theory as you are
+suggesting but Ackerley and me are still thinking that this is a
+memory operation that goes beyond vcpu scope and will involve
+interaction with IOMMU backend as well, it's cleaner to have a
+separate guest memfd specific ioctl for this operation as the impact
+is even beyond KVM.
+
+2) Reset guest memfd range attributes during guest reboot to allow
+reusing the same guest memfd files.
+    - This helps reset the range state to private as needed inline
+with initial shared/private configuration chosen at the guest memfd
+creation.
+    - This also helps reconstitute all the huge pages back to their
+original state that may have gotten split during the runtime of the
+guest.
+  This is a host initiated request for guest memfd memory conversion
+that we should not be overloading with other KVM interactions in my
+opinion.
+
+>
+> Cheers,
+> /fuad
 
