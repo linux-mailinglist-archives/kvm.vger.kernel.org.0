@@ -1,673 +1,256 @@
-Return-Path: <kvm+bounces-47263-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47264-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C164ABF469
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 14:37:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9B81ABF497
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 14:44:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8EEA189F052
-	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 12:37:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8DC51BA5625
+	for <lists+kvm@lfdr.de>; Wed, 21 May 2025 12:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFDC526658A;
-	Wed, 21 May 2025 12:36:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8071513BAF1;
+	Wed, 21 May 2025 12:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GzN+Anh9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sny3Avxc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DDF25D8FC
-	for <kvm@vger.kernel.org>; Wed, 21 May 2025 12:36:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CEE1DA21
+	for <kvm@vger.kernel.org>; Wed, 21 May 2025 12:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747831012; cv=none; b=m/kRkmIzxuIqcHpsc+z0/kkZFRkXEsCkDTsgRvPDkDdyq2+r4a4NC4BpVANU1a5q65Mn0A2tO4m20MSt4nO1hDpGBlW2sf4brVoBexOECfTCpr8ga+dDWCib+iZm5Doq9Im01RbamtR48IxSXJQij/sDhlkXoMxaHaww1g6iSCc=
+	t=1747831475; cv=none; b=Nn23IPuiz1PqqZZW9pC5CUmfS8JslL5AmAr0W2QMCe8za6rLyMKD2tLoQRkW81vYoUr1flGhgRnJcSiYJct+A2x6kPQc05u06V2kY3fSEDk3Nj85n8Fld9Jd5WRi0lFD93L28FRsDLoaZ6y06retkiPVrHvEpRLvwCVPns1slgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747831012; c=relaxed/simple;
-	bh=7oL7SEGEv+GubdsDb4WaQtWC2EFyMsHMPBvDifCrwI0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IdXVrXq5RG80K96UlHvPUh8gnWu+0RO+h6xPCYWAld9HpMu21ylrh686oJQY0lSu0b/PZXOsKDuJlvqIsULuMCwU/sRSyEQl79dJJyTPgz9R5bzRRg1iSdW5GOc65jSgpnidCDxrZtfsA4JGjrCheOTDIABm65IWNppQ8UdJ71o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GzN+Anh9; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-48b7747f881so1422241cf.1
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 05:36:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747831008; x=1748435808; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dhOxX7GZJR1nMVA/99p6GgBY9LCpqb0ybHQEVY3+G+8=;
-        b=GzN+Anh9SXPNBu4+K8GKCmiHQ8csgan2MFidBcWFs/I1AFWAb5ndrh2LgFo8B8NPu9
-         1b130xBvpF8H7ZO4LC15W/RHk+fMFCoqqIYThZum2zre0FsOYT5MeM0wfhSgU+SWaDYy
-         R5LOGHmSlkr9/pysKpriMzshFx1icFpGXRaWa8K49Jr8uz4R4H9983p23HRAypNq6h/y
-         tmBnvGcDKaSLU52Bucg6icSQaHQ7QMFFPMPrPdw4F3POyQJVENzp5pc2wxprIPNDmgzW
-         Sv4S+RphTxKbjbkkUOrOWF76Z4pke572SU6M4tt9ytPyb8lKVBtqJDP+w+RkRVfeI6eD
-         3UyQ==
+	s=arc-20240116; t=1747831475; c=relaxed/simple;
+	bh=nZQEo25wsge/rVLKg6UdaB+Zx36Bg8YTJJe/s56dghs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sdok2H7uAT0/PXIF1GJaxgvkgmUj2HdIBpUavAcc3hfbm8MYKn67WWDj1CdQoB+RI13oVXgBeOkX879lxCrO3x4wdp0BxgGfAfzXsbYdjgecJztUYWVJ/ApS7GEAwQxdsaG5KwrArfzgiRt2sv+ENpXVyoKDUcpToExe8lFs3Oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sny3Avxc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747831472;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=dfMtP0fNrxnFvwlqSIfNPzwYZOz1mEiM52H6ym5fSmQ=;
+	b=Sny3AvxcK17/th7SU2LREn3Ls5AMFH4vHk7zzFXjjub3i7qe7rpqs9kJoQBM52YD6mqwgC
+	lfzraSCejc6lsw26x3SfyvkOFGG175fMExp/APbgIXmdMg9/pREaWd6kKohWQpMJWGqir2
+	QfuIXMtKY4ebnN9CGj5UQK07VZpf+6U=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-_TWSnpiLM4SNqLpPlcPkpA-1; Wed, 21 May 2025 08:44:31 -0400
+X-MC-Unique: _TWSnpiLM4SNqLpPlcPkpA-1
+X-Mimecast-MFC-AGG-ID: _TWSnpiLM4SNqLpPlcPkpA_1747831470
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a370309e5cso2295491f8f.3
+        for <kvm@vger.kernel.org>; Wed, 21 May 2025 05:44:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747831008; x=1748435808;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dhOxX7GZJR1nMVA/99p6GgBY9LCpqb0ybHQEVY3+G+8=;
-        b=v857qKc3+xH24aBThXDvHVev6wPK52nAQWzUhbmh3Fb3hgwGIcOjJ2hZas80mVVRPu
-         PW0E4spDp3ghmw97A2+xPeuwwxhEaYIm6jH3qSyKfh6hqp44NP5HLLr2gcWJVE8rnp94
-         fEkxCgqubmETax+uqb5VQNFacqsrojFfWhBvNlYBS4OXW89iivx64Hvokxag52g8ouIv
-         uXmBGBOR6I39yvv+/FCzx2s9z9GGjZebYH3SZMVipuJbcQmVq7qjq+dWDVmqZMKjZ8jh
-         abQ2MIMwXQu4u4kmAd3qRxiAVt5EcDvG838hmZAUFhzYKW+zA0DdUEmfmFo0AqZeZ765
-         xJ4w==
-X-Forwarded-Encrypted: i=1; AJvYcCW/VkWjPbw9/3MJoUUBzvFCRTvlFTlqPaw92vMfUmTEXg12gMDdDzWtA+6yLHD8r4hUtxk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxyMYA44LyrJNy7Loue+R+H/STxKyBenDk9wZgeyC8tyye6H8x
-	la74wtG5qfSmXLHbApohcWJ3BlegLG6MCx7cfk6RoxqNzPk6etyuzPJd1kSGvFpvFBH2vFC8mUw
-	O+J9MNKUfPxEBtFh2RPDJvkRqxJHwyLjyZ8iRqibR
-X-Gm-Gg: ASbGncvAO6ds4PV0zE+yPqpRmLrLJKVwGbn0QE3MR/Kjs1JroeB3lSJtTfQ+YkTlwGe
-	TuZTJwdYemeobYLf7IL63k1ZKmWti2cHjeJ2AoVnK9zKHxfG4v72Y6xKWfr3Hom4SilI6/h2MrE
-	Aur3vEQi0+2YQe65RWy0grYL2WSnKkD5V/UEW5WH/GpzCMNO6t5fHpRLZVe6ZTPirfbevljDlN
-X-Google-Smtp-Source: AGHT+IFY66dlLlKuFxZkep1OQ65CB781Xtkbpoye4R8cp7mOpqmlNk1HCRlIz+wlZqXNcRJ+H29kF9yeLtsiq9TDuRw=
-X-Received: by 2002:ac8:5ac3:0:b0:467:8416:d99e with SMTP id
- d75a77b69052e-49601270e7amr14952771cf.21.1747831007773; Wed, 21 May 2025
- 05:36:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747831470; x=1748436270;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dfMtP0fNrxnFvwlqSIfNPzwYZOz1mEiM52H6ym5fSmQ=;
+        b=CfIxHDHGTwG5gH6oDw66I2FlEboogUAlFeEH5NweR8U+1IxZFo3CRpF/S1yYFZIus+
+         5rUNgeRQmuYbWmBAnn/oUbI9CkcZ6+IF+XsXT1zuVT9sXqGlCBWgsWqdxZqTaH3+U6Vs
+         Vq24q6GbgKkM+FCBUEtRR7+rgBOqUkRhyIW3XPt/y2Fhg8jWqgnl/kT4C/2Ng4Kz8h65
+         b6Ke/UgcYisnguHJvoqbfHknpDt5P/gg0ob8RxCtW1yyMYjheits9/qdnWt7iWitgKyG
+         TN/FwXEaWRSCpYej6POPfi5neBlWm6Q4ZqEu2fDjMRotH/xX+i8szqvSbWkO3m5SwnJ/
+         08qQ==
+X-Gm-Message-State: AOJu0Yz9ZlQBGY/Az+IjB/l5ATVx47Y58E0KojQMjEm2FYc6P4mF+buM
+	WdOP4aMNaJlGK19OWOkVUWCwHvGFsn5At03cmdDCU1cn2ApJg9dZAUGqx0w+dKHw8O2BCiGWkLP
+	jHOGlVwB0Jn7Mb3nr14+IGHQ+qToLuKIypIgDKjjcEyJ/Dhu5geRjbw==
+X-Gm-Gg: ASbGncsjsoo44CWAMcKVlk3mi2KCGGJ8txCcA7YZYfVOuslB4CqVGZmBLn3pDefzTQ5
+	HFFDKO9xr1RnGWJ9hEPHHBzkOmotb8PSjDvtcj3zkklk9pwCDPhjJ4zD7FkXWnOnywnTaijeHQs
+	j4cNmSOXeDOqe8Skt7r82Vjkg6hTBmMam25tVR09i6G/NQTzMNSUqNOSOqZB37diB/4NMlbzw49
+	8OEkR4O0sSM4hx8r2mqwvTFYD7PKOZZJW64mWErgi+cQmwS+4WkH7P5rSl7P7K296eabNSULosV
+	lAdZeS/dZ7SKscb7nVZoqzG20c9YGruZvrTGyaOu2RRvELE1r1IOn6O94FVvTIxnWcEg62qqgLw
+	pShfKsR+ihYt0YVEE+B4CfVkgwpMDI9BjYuI7+qY=
+X-Received: by 2002:a05:6000:2210:b0:3a3:7ba5:a22e with SMTP id ffacd0b85a97d-3a37ba5a4fdmr5963440f8f.24.1747831470293;
+        Wed, 21 May 2025 05:44:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGH+J8TGtPNcZ4xBkyUwd91Cg2aqf9qA31MTdzbJPaUGEZx41mKY7JELEjXf41mYWwZMTeCYQ==
+X-Received: by 2002:a05:6000:2210:b0:3a3:7ba5:a22e with SMTP id ffacd0b85a97d-3a37ba5a4fdmr5963370f8f.24.1747831469726;
+        Wed, 21 May 2025 05:44:29 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f25:9c00:e2c7:6eb5:8a51:1c60? (p200300d82f259c00e2c76eb58a511c60.dip0.t-ipconnect.de. [2003:d8:2f25:9c00:e2c7:6eb5:8a51:1c60])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca5a84csm19693528f8f.31.2025.05.21.05.44.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 May 2025 05:44:29 -0700 (PDT)
+Message-ID: <f6005b96-d408-450c-ad80-6241e35c6d26@redhat.com>
+Date: Wed, 21 May 2025 14:44:26 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
- <CA+EHjTxtHOgichL=UvAzczoqS1608RSUNn5HbmBw2NceO941ng@mail.gmail.com>
- <CAGtprH8eR_S50xDnnMLHNCuXrN2Lv_0mBRzA_pcTtNbnVvdv2A@mail.gmail.com>
- <CA+EHjTwjKVkw2_AK0Y0-eth1dVW7ZW2Sk=73LL9NeQYAPpxPiw@mail.gmail.com>
- <CAGtprH_Evyc7tLhDB0t0fN+BUx5qeqWq8A2yZ5-ijbJ5UJ5f-g@mail.gmail.com>
- <CA+EHjTy7iBNBb9DRdtgq8oYmvgykhSNvZL3FrRV4XF90t3XgBg@mail.gmail.com>
- <CAGtprH_7jSpwF77j1GW8rjSrbtZZ2OW2iGck5=Wk67+VnF9vjQ@mail.gmail.com>
- <CA+EHjTzMhKCoftfJUuL0WUZW4DdqOHgVDcn0Cmf-0r--8rBdbg@mail.gmail.com> <diqzecwjnk95.fsf@ackerleytng-ctop.c.googlers.com>
-In-Reply-To: <diqzecwjnk95.fsf@ackerleytng-ctop.c.googlers.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 21 May 2025 13:36:11 +0100
-X-Gm-Features: AX0GCFvnLnxUGWsMjAJTYI2xsyes-uz3yow7QxS80ZGJNCBU78AJ08LLOHU0p3Q
-Message-ID: <CA+EHjTyY5C1QgkoAqvJ0kHM4nUvKc1e1nQ0Uq+BANtVEnZH90w@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
- KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Vishal Annapurve <vannapurve@google.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
-	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
-	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
-	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
-	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
-	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
-	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
-	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
-	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 14/17] KVM: arm64: Enable mapping guest_memfd in arm64
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
+ roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250513163438.3942405-1-tabba@google.com>
+ <20250513163438.3942405-15-tabba@google.com>
+ <2084504e-2a11-404a-bbe8-930384106f53@redhat.com>
+ <CA+EHjTyz4M4wGCTBzFwHLB_0LUJHq6J135f=DVOhGKQE4thrtQ@mail.gmail.com>
+ <d5983511-6de3-42cb-9c2f-4a0377ea5e2d@redhat.com>
+ <CA+EHjTxhirJDCR4hdTt4-FJ+vo9986PE-CGwikN8zN_1H1q5jQ@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <CA+EHjTxhirJDCR4hdTt4-FJ+vo9986PE-CGwikN8zN_1H1q5jQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Ackerley,
+On 21.05.25 12:29, Fuad Tabba wrote:
+> On Wed, 21 May 2025 at 11:26, David Hildenbrand <david@redhat.com> wrote:
+>>
+>> On 21.05.25 12:12, Fuad Tabba wrote:
+>>> Hi David,
+>>>
+>>> On Wed, 21 May 2025 at 09:05, David Hildenbrand <david@redhat.com> wrote:
+>>>>
+>>>> On 13.05.25 18:34, Fuad Tabba wrote:
+>>>>> Enable mapping guest_memfd in arm64. For now, it applies to all
+>>>>> VMs in arm64 that use guest_memfd. In the future, new VM types
+>>>>> can restrict this via kvm_arch_gmem_supports_shared_mem().
+>>>>>
+>>>>> Signed-off-by: Fuad Tabba <tabba@google.com>
+>>>>> ---
+>>>>>     arch/arm64/include/asm/kvm_host.h | 10 ++++++++++
+>>>>>     arch/arm64/kvm/Kconfig            |  1 +
+>>>>>     2 files changed, 11 insertions(+)
+>>>>>
+>>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>>>> index 08ba91e6fb03..2514779f5131 100644
+>>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>>> @@ -1593,4 +1593,14 @@ static inline bool kvm_arch_has_irq_bypass(void)
+>>>>>         return true;
+>>>>>     }
+>>>>>
+>>>>> +static inline bool kvm_arch_supports_gmem(struct kvm *kvm)
+>>>>> +{
+>>>>> +     return IS_ENABLED(CONFIG_KVM_GMEM);
+>>>>> +}
+>>>>> +
+>>>>> +static inline bool kvm_arch_vm_supports_gmem_shared_mem(struct kvm *kvm)
+>>>>> +{
+>>>>> +     return IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM);
+>>>>> +}
+>>>>> +
+>>>>>     #endif /* __ARM64_KVM_HOST_H__ */
+>>>>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>>>>> index 096e45acadb2..8c1e1964b46a 100644
+>>>>> --- a/arch/arm64/kvm/Kconfig
+>>>>> +++ b/arch/arm64/kvm/Kconfig
+>>>>> @@ -38,6 +38,7 @@ menuconfig KVM
+>>>>>         select HAVE_KVM_VCPU_RUN_PID_CHANGE
+>>>>>         select SCHED_INFO
+>>>>>         select GUEST_PERF_EVENTS if PERF_EVENTS
+>>>>> +     select KVM_GMEM_SHARED_MEM
+>>>>>         help
+>>>>>           Support hosting virtualized guest machines.
+>>>>>
+>>>>
+>>>> Do we have to reject somewhere if we are given a guest_memfd that was
+>>>> *not* created using the SHARED flag? Or will existing checks already
+>>>> reject that?
+>>>
+>>> We don't reject, but I don't think we need to. A user can create a
+>>> guest_memfd that's private in arm64, it would just be useless.
+>>
+>> But the arm64 fault routine would not be able to handle that properly, no?
+> 
+> Actually it would. The function user_mem_abort() doesn't care whether
+> it's private or shared. It would fault it into the guest correctly
+> regardless.
 
-On Tue, 20 May 2025 at 20:40, Ackerley Tng <ackerleytng@google.com> wrote:
->
-> Fuad Tabba <tabba@google.com> writes:
->
-> Let me try to bridge the gap here beginning with the flow we were
-> counting on for a shared to private conversion, for TDX:
->
-> 1. Guest sends unshare hypercall to the hypervisor
->
-> 2. (For x86 IIUC hypervisor is the same as KVM) KVM forwards the request
->    to userspace via a KVM_EXIT_HYPERCALL, with KVM_HC_MAP_GPA_RANGE as
->    the hypercall number.
->
->    KVM also records that the guest wanted a shared to private
->    conversion, the gpa and size of the request (no change from now, KVM
->    already records that information in struct kvm_run) [1]
->
-> 3. Userspace will do necessary coordination in userspace, then call the
->    conversion ioctl, passing the parameters along to the ioctl.
->
-> 4. Ioctl goes to guest_memfd, guest_memfd unmaps the pages, checks
->    refcounts. If there's anything unexpected, error out to userspace. If
->    all is well, flip shareability, exit to userspace with success.
->
-> 5. Userspace calls vcpu_run() again, the handler for
->    KVM_HC_MAP_GPA_RANGE will tell the guest that userspace was able to
->    fulfill guest request with hypercall.ret set to 0 and then the guest
->    will continue.
->
-> 6. On the next fault guest_memfd will allow the private fault from the
->    guest.
->
->
-> The flow you're proposing works too, with some changes, but it's
-> probably okay for x86 to have a slightly different flow anyway: (I
-> refactored the steps you outlined)
->
-> > 1. Guest sends unshare hypercall to the hypervisor
->
-> Same
->
-> > 2. Hypervisor forwards request to KVM (gmem) (having done due diligence=
-)
->
-> For x86 IIUC hypervisor is the same as KVM, so there's no forwarding to K=
-VM.
->
-> > 3. KVM (gmem) performs an unmap_folio(), exits to userspace with
-> >    KVM_EXIT_UNSHARE and all the information about the folio being unsha=
-red
->
-> The KVM_EXIT_UNSHARE here would correspond to x86's
-> KVM_HC_MAP_GPA_RANGE.
->
-> Unmapping before exiting with KVM_EXIT_UNSHARE here might be a little
-> premature since userspace may have to do some stuff before permitting
-> the conversion. For example, the memory may be mapped into another
-> userspace driver process, which needs to first be stopped.
->
-> But no issue though, as long as we don't flip shareability, if the host
-> uses the memory, the kvm_gmem_fault_shared() will just happen again,
-> nullifying the unmapping.
->
-> We could just shift the unmapping till after vcpu_run() is called
-> again.
->
-> > 4. Userspace will do necessary coordination in userspace, then do
-> >    vcpu_run()
->
-> There's another layer here, at least for x86, as to whether the
-> coordination was successful. For x86's KVM_HC_MAP_GPA_RANGE, userspace
-> can indicate a non-zero hypercall.ret for error.
->
-> For unsuccessful coordinations, userspace sets hypercall.ret to error
-> and the vcpu_run() handler doesn't try the conversion. Guest is informed
-> of hypercall error and guest will figure it out.
->
-> > 5. Successful coordination, case 1: vcpu_run() knows the last exit was
-> >    KVM_EXIT_UNSHARE and will set state to PRIVATE
->
-> For case 1, userspace will set hypercall.ret =3D=3D 0, guest_memfd will d=
-o
-> the conversion, basically calling the same function that the ioctl calls
-> within guest_memfd.
->
-> > 5. Successful coordination, case 2, alternative 1: vcpu_run() knows
-> >    the last exit was KVM_EXIT_UNSHARE
->
-> Exit to userspace with KVM_EXIT_MEMORY_FAULT.
->
-> > 5. Successful coordination, case 2, alternative 2: vcpu_run() knows
-> >    the last exit was KVM_EXIT_UNSHARE
->
-> Forward hypercall.ret =3D=3D 0 to the guest. Since the conversion was not
-> performed, the next fault will be mismatched and there will be a
-> KVM_EXIT_MEMORY_FAULT.
 
-So far so good. With regard to the flow, in the code that I had, all
-the specific details were arm64, and even pKVM specific. None of it
-was baked into core KVM code, since of course, different
-architectures, and even different VM types, will vary significantly.
-Arm CCA for example is closer to TDX than it is to pKVM. Moreover, it
-was just a hack at getting something reasonable that works, as a proof
-of concept.
+I think what I meant is that: if it's !shared (private only), shared 
+accesses (IOW all access without CoCo) should be taken from the user 
+space mapping.
 
-This is one of the reasons I'm not a fan of having a userspace IOCTL
-as an additional required step as part of this protocol. KVM exits
-already exist (*), and we need them anyway here. The flow above is
-VM-type specific, and since much of it isn't exposed to the user: it's
-easy (and likely) to change. Having an IOCTL and adding another step
-in the process makes it more difficult to change things later.
+But user_mem_abort() would blindly go to kvm_gmem_get_pfn() because 
+"is_gmem = kvm_slot_has_gmem(memslot) = true".
 
-(*) Try saying that ten times fast! Note: first word is exit, second
-word is exist :)
+In other words, arm64 would have to *ignore* guest_memfd that does not 
+support shared?
 
-> > Hi Vishal,
-> >
-> > On Tue, 20 May 2025 at 17:03, Vishal Annapurve <vannapurve@google.com> =
-wrote:
-> >>
-> >> On Tue, May 20, 2025 at 7:34=E2=80=AFAM Fuad Tabba <tabba@google.com> =
-wrote:
-> >> >
-> >> > Hi Vishal,
-> >> >
-> >> > On Tue, 20 May 2025 at 15:11, Vishal Annapurve <vannapurve@google.co=
-m> wrote:
-> >> > >
-> >> > > On Tue, May 20, 2025 at 6:44=E2=80=AFAM Fuad Tabba <tabba@google.c=
-om> wrote:
-> >> > > >
-> >> > > > Hi Vishal,
-> >> > > >
-> >> > > > On Tue, 20 May 2025 at 14:02, Vishal Annapurve <vannapurve@googl=
-e.com> wrote:
-> >> > > > >
-> >> > > > > On Tue, May 20, 2025 at 2:23=E2=80=AFAM Fuad Tabba <tabba@goog=
-le.com> wrote:
-> >> > > > > >
-> >> > > > > > Hi Ackerley,
-> >> > > > > >
-> >> > > > > > On Thu, 15 May 2025 at 00:43, Ackerley Tng <ackerleytng@goog=
-le.com> wrote:
-> >> > > > > > >
-> >> > > > > > > The two new guest_memfd ioctls KVM_GMEM_CONVERT_SHARED and
-> >> > > > > > > KVM_GMEM_CONVERT_PRIVATE convert the requested memory rang=
-es to shared
-> >> > > > > > > and private respectively.
-> >> > > > > >
-> >> > > > > > I have a high level question about this particular patch and=
- this
-> >> > > > > > approach for conversion: why do we need IOCTLs to manage con=
-version
-> >> > > > > > between private and shared?
-> >> > > > > >
-> >> > > > > > In the presentations I gave at LPC [1, 2], and in my latest =
-patch
-> >> > > > > > series that performs in-place conversion [3] and the associa=
-ted (by
-> >> > > > > > now outdated) state diagram [4], I didn't see the need to ha=
-ve a
-> >> > > > > > userspace-facing interface to manage that. KVM has all the i=
-nformation
-> >> > > > > > it needs to handle conversions, which are triggered by the g=
-uest. To
-> >> > > > > > me this seems like it adds additional complexity, as well as=
- a user
-> >> > > > > > facing interface that we would need to maintain.
-> >> > > > > >
-> >> > > > > > There are various ways we could handle conversion without ex=
-plicit
-> >> > > > > > interference from userspace. What I had in mind is the follo=
-wing (as
-> >> > > > > > an example, details can vary according to VM type). I will u=
-se use the
-> >> > > > > > case of conversion from shared to private because that is th=
-e more
-> >> > > > > > complicated (interesting) case:
-> >> > > > > >
-> >> > > > > > - Guest issues a hypercall to request that a shared folio be=
-come private.
-> >> > > > > >
-> >> > > > > > - The hypervisor receives the call, and passes it to KVM.
-> >> > > > > >
-> >> > > > > > - KVM unmaps the folio from the guest stage-2 (EPT I think i=
-n x86
-> >> > > > > > parlance), and unmaps it from the host. The host however, co=
-uld still
-> >> > > > > > have references (e.g., GUP).
-> >> > > > > >
-> >> > > > > > - KVM exits to the host (hypervisor call exit), with the inf=
-ormation
-> >> > > > > > that the folio has been unshared from it.
-> >> > > > > >
-> >> > > > > > - A well behaving host would now get rid of all of its refer=
-ences
-> >> > > > > > (e.g., release GUPs), perform a VCPU run, and the guest cont=
-inues
-> >> > > > > > running as normal. I expect this to be the common case.
-> >> > > > > >
-> >> > > > > > But to handle the more interesting situation, let's say that=
- the host
-> >> > > > > > doesn't do it immediately, and for some reason it holds on t=
-o some
-> >> > > > > > references to that folio.
-> >> > > > > >
-> >> > > > > > - Even if that's the case, the guest can still run *. If the=
- guest
-> >> > > > > > tries to access the folio, KVM detects that access when it t=
-ries to
-> >> > > > > > fault it into the guest, sees that the host still has refere=
-nces to
-> >> > > > > > that folio, and exits back to the host with a memory fault e=
-xit. At
-> >> > > > > > this point, the VCPU that has tried to fault in that particu=
-lar folio
-> >> > > > > > cannot continue running as long as it cannot fault in that f=
-olio.
-> >> > > > >
-> >> > > > > Are you talking about the following scheme?
-> >> > > > > 1) guest_memfd checks shareability on each get pfn and if ther=
-e is a
-> >> > > > > mismatch exit to the host.
-> >> > > >
-> >> > > > I think we are not really on the same page here (no pun intended=
- :) ).
-> >> > > > I'll try to answer your questions anyway...
-> >> > > >
-> >> > > > Which get_pfn? Are you referring to get_pfn when faulting the pa=
-ge
-> >> > > > into the guest or into the host?
-> >> > >
-> >> > > I am referring to guest fault handling in KVM.
-> >> > >
-> >> > > >
-> >> > > > > 2) host user space has to guess whether it's a pending refcoun=
-t or
-> >> > > > > whether it's an actual mismatch.
-> >> > > >
-> >> > > > No need to guess. VCPU run will let it know exactly why it's exi=
-ting.
-> >> > > >
-> >> > > > > 3) guest_memfd will maintain a third state
-> >> > > > > "pending_private_conversion" or equivalent which will transiti=
-on to
-> >> > > > > private upon the last refcount drop of each page.
-> >> > > > >
-> >> > > > > If conversion is triggered by userspace (in case of pKVM, it w=
-ill be
-> >> > > > > triggered from within the KVM (?)):
-> >> > > >
-> >> > > > Why would conversion be triggered by userspace? As far as I know=
-, it's
-> >> > > > the guest that triggers the conversion.
-> >> > > >
-> >> > > > > * Conversion will just fail if there are extra refcounts and u=
-serspace
-> >> > > > > can try to get rid of extra refcounts on the range while it ha=
-s enough
-> >> > > > > context without hitting any ambiguity with memory fault exit.
-> >> > > > > * guest_memfd will not have to deal with this extra state from=
- 3 above
-> >> > > > > and overall guest_memfd conversion handling becomes relatively
-> >> > > > > simpler.
-> >> > > >
-> >> > > > That's not really related. The extra state isn't necessary any m=
-ore
-> >> > > > once we agreed in the previous discussion that we will retry ins=
-tead.
-> >> > >
-> >> > > Who is *we* here? Which entity will retry conversion?
-> >> >
-> >> > Userspace will re-attempt the VCPU run.
-> >>
-> >> Then KVM will have to keep track of the ranges that need conversion
-> >> across exits. I think it's cleaner to let userspace make the decision
-> >> and invoke conversion without carrying additional state in KVM about
-> >> guest request.
-> >
-> > I disagree. I think it's cleaner not to introduce a user interface,
-> > and just to track the reason for the last exit, along with the
-> > required additional data. KVM is responsible already for handling the
-> > workflow, why delegate this last part to the VMM?
-> >
->
-> I believe Fuad's concern is the complexity of adding and maintaining
-> another ioctl, as opposed to having vcpu_run() do the conversions.
->
-> I think the two options are basically the same in that both are actually
-> adding some form of user contract, just in different places.
->
-> For the ioctl approach, in this RFCv2 I added a error_offset field so
-> that userspace has a hint of where the conversion had an issue. the
-> ioctl also returns errors to indicate what went wrong, like -EINVAL or
-> -ENOMEM if perhaps splitting the page required memory and there wasn't
-> any, or the kernel ran out of memory trying to update mappability.
->
-> If we want to provide the same level of error information for the
-> vcpu_run() approach, we should probably add error_offset to
-> KVM_EXIT_MEMORY_FAULT so that on a conversion failure we could re-exit
-> to userspace with more information about the error_offset.
->
->
-> So what we're really comparing is two ways to perform the conversion (1)
-> via a direct ioctl and (2) via vcpu_run().
+That's why I was wondering whether we should just immediately refuse 
+such guest_memfds.
 
-That's exactly right.
 
-> I think having a direct ioctl is cleaner because it doesn't involve
-> vCPUs for a memory operation.
->
-> Conceptually, the conversion is a memory operation belonging to memory
-> in the guest_memfd. Hence, the conversion operation is better addressed
-> directly to the memory via a direct ioctl.
->
-> For this same reason, we didn't want to do the conversion via the
-> KVM_SET_MEMORY_ATTRIBUTES ioctl. KVM_SET_MEMORY_ATTRIBUTES is an
-> operation for KVM's view of guest_memfd, which is linked to but not
-> directly the same as a memory operation.
->
-> By having a direct ioctl over using KVM_SET_MEMORY_ATTRIBUTES, we avoid
-> having a dependency where memslots must first be bound to guest_memfd
-> for the conversion to work.
->
-> When rebooting, the memslots may not yet be bound to the guest_memfd,
-> but we want to reset the guest_memfd's to private. If we use
-> KVM_SET_MEMORY_ATTRIBUTES to convert, we'd be forced to first bind, then
-> convert. If we had a direct ioctl, we don't have this restriction.
->
-> If we do the conversion via vcpu_run() we would be forced to handle
-> conversions only with a vcpu_run() and only the guest can initiate a
-> conversion.
->
-> On a guest boot for TDX, the memory is assumed to be private. If the we
-> gave it memory set as shared, we'd just have a bunch of
-> KVM_EXIT_MEMORY_FAULTs that slow down boot. Hence on a guest reboot, we
-> will want to reset the guest memory to private.
->
-> We could say the firmware should reset memory to private on guest
-> reboot, but we can't force all guests to update firmware.
-
-Here is where I disagree. I do think that this is the CoCo guest's
-responsibility (and by guest I include its firmware) to fix its own
-state after a reboot. How would the host even know that a guest is
-rebooting if it's a CoCo guest?
-
-Either the host doesn't (or cannot even) know that the guest is
-rebooting, in which case I don't see how having an IOCTL would help.
-Or somehow the host does know that, i.e., via a hypercall that
-indicates that. In which case, we could have it so that for that type
-of VM, we would reconvert its pages to private on a reboot.
-
-Additionally, we could introduce range operations for
-sharing/unsharing, to avoid having to have an exit for every one.
-
-> >> >
-> >> > > >
-> >> > > > > Note that for x86 CoCo cases, memory conversion is already tri=
-ggered
-> >> > > > > by userspace using KVM ioctl, this series is proposing to use
-> >> > > > > guest_memfd ioctl to do the same.
-> >> > > >
-> >> > > > The reason why for x86 CoCo cases conversion is already triggere=
-d by
-> >> > > > userspace using KVM ioctl is that it has to, since shared memory=
- and
-> >> > > > private memory are two separate pages, and userspace needs to ma=
-nage
-> >> > > > that. Sharing memory in place removes the need for that.
-> >> > >
-> >> > > Userspace still needs to clean up memory usage before conversion i=
-s
-> >> > > successful. e.g. remove IOMMU mappings for shared to private
-> >> > > conversion. I would think that memory conversion should not succee=
-d
-> >> > > before all existing users let go of the guest_memfd pages for the
-> >> > > range being converted.
-> >> >
-> >> > Yes. Userspace will know that it needs to do that on the VCPU exit,
-> >> > which informs it of the guest's hypervisor request to unshare (conve=
-rt
-> >> > from shared to private) the page.
-> >> >
-> >> > > In x86 CoCo usecases, userspace can also decide to not allow
-> >> > > conversion for scenarios where ranges are still under active use b=
-y
-> >> > > the host and guest is erroneously trying to take away memory. Both
-> >> > > SNP/TDX spec allow failure of conversion due to in use memory.
-> >> >
-> >> > How can the guest erroneously try to take away memory? If the guest
-> >> > sends a hypervisor request asking for a conversion of memory that
-> >> > doesn't belong to it, then I would expect the hypervisor to prevent
-> >> > that.
-> >>
-> >> Making a range as private is effectively disallowing host from
-> >> accessing those ranges -> so taking away memory.
-> >
-> > You said "erroneously" earlier. My question is, how can the guest
-> > *erroneously* try to take away memory? This is the normal flow of
-> > guest/host relations. The memory is the guest's: it decides when to
-> > share it with the host, and it can take it away.
-> >
->
-> See above, it's not really erroneous as long as we
-> kvm_gmem_fault_shared() can still happen, since after unmapping, any
-> host access will just fault the page again.
-
-I was confused by the word "erroneous", as you would expect that for a
-CoCo guest, the host wouldn't (or shouldn't) know the intention behind
-a CoCo guest's access. I would expect that erroneous guest accesses
-would be handled by the hypervisor. But I think we're on the same page
-now.
-
-> >> >
-> >> > I don't see how having an IOCTL to trigger the conversion is needed =
-to
-> >> > allow conversion failure. How is that different from userspace
-> >> > ignoring or delaying releasing all references it has for the
-> >> > conversion request?
-> >> >
-> >> > > >
-> >> > > > This series isn't using the same ioctl, it's introducing new one=
-s to
-> >> > > > perform a task that as far as I can tell so far, KVM can handle =
-by
-> >> > > > itself.
-> >> > >
-> >> > > I would like to understand this better. How will KVM handle the
-> >> > > conversion process for guest_memfd pages? Can you help walk an exa=
-mple
-> >> > > sequence for shared to private conversion specifically around
-> >> > > guest_memfd offset states?
-> >> >
-> >> > To make sure that we are discussing the same scenario: can you do th=
-e
-> >> > same as well please --- walk me through an example sequence for shar=
-ed
-> >> > to private conversion specifically around guest_memfd offset states
-> >> > With the IOCTLs involved?
-> >> >
-> >> > Here is an example that I have implemented and tested with pKVM. Not=
-e
-> >> > that there are alternatives, the flow below is architecture or even
-> >> > vm-type dependent. None of this code is code KVM code and the
-> >> > behaviour could vary.
-> >> >
-> >> >
-> >> > Assuming the folio is shared with the host:
-> >> >
-> >> > Guest sends unshare hypercall to the hypervisor
-> >> > Hypervisor forwards request to KVM (gmem) (having done due diligence=
-)
-> >> > KVM (gmem) performs an unmap_folio(), exits to userspace with
-> >>
-> >> For x86 CoCo VM usecases I was talking about, userspace would like to
-> >> avoid unmap_mapping_range() on the range before it's safe to unshare
-> >> the range.
-> >
-> > Why? There is no harm in userspace unmapping before the memory isn't
-> > shared. I don't see the problem with that.
-> >
->
-> Yes, no harm done, just possible remapping after unmapping.
->
-> > You still haven't responded to my question from the previous email:
-> > can you please return the favor and walk me through an example
-> > sequence for shared to private conversion specifically around
-> > guest_memfd offset states with the IOCTLs involved? :D
-> >
->
-> Right at the top :)
-
-Thank you Ackerley!
-
+-- 
 Cheers,
-/fuad
 
->
-> > Thanks!
-> > /fuad
-> >
-> >
-> >> > KVM_EXIT_UNSHARE and all the information about the folio being
-> >> > unshared
-> >> >
-> >> > Case 1:
-> >> > Userspace removes any remaining references (GUPs, IOMMU Mappings etc=
-...)
-> >> > Userspace calls vcpu_run(): KVM (gmem) sees that there aren't any
-> >> > references, sets state to PRIVATE
-> >> >
-> >> > Case 2 (alternative 1):
-> >> > Userspace doesn't release its references
-> >> > Userspace calls vcpu_run(): KVM (gmem) sees that there are still
-> >> > references, exits back to userspace with KVM_EXIT_UNSHARE
-> >> >
-> >> > Case 2 (alternative 2):
-> >> > Userspace doesn't release its references
-> >> > Userspace calls vcpu_run(): KVM (gmem) sees that there are still
-> >> > references, unmaps folio from guest, but allows it to run (until it
-> >> > tries to fault in the folio)
-> >> > Guest tries to fault in folio that still has reference, KVM does not
-> >> > allow that (it sees that the folio is shared, and it doesn't fault i=
-n
-> >> > shared folios to confidential guests)
-> >> > KVM exits back to userspace with KVM_EXIT_UNSHARE
-> >> >
-> >> > As I mentioned, the alternatives above are _not_ set in core KVM cod=
-e.
-> >> > They can vary by architecture of VM type, depending on the policy,
-> >> > support, etc..
-> >> >
-> >> > Now for your example please on how this would work with IOCTLs :)
-> >> >
-> >> > Thanks,
-> >> > /fuad
-> >> >
-> >> > > >
-> >> > > > >  - Allows not having to keep track of separate shared/private =
-range
-> >> > > > > information in KVM.
-> >> > > >
-> >> > > > This patch series is already tracking shared/private range infor=
-mation in KVM.
-> >> > > >
-> >> > > > >  - Simpler handling of the conversion process done per guest_m=
-emfd
-> >> > > > > rather than for full range.
-> >> > > > >      - Userspace can handle the rollback as needed, simplifyin=
-g error
-> >> > > > > handling in guest_memfd.
-> >> > > > >  - guest_memfd is single source of truth and notifies the user=
-s of
-> >> > > > > shareability change.
-> >> > > > >      - e.g. IOMMU, userspace, KVM MMU all can be registered fo=
-r
-> >> > > > > getting notifications from guest_memfd directly and will get n=
-otified
-> >> > > > > for invalidation upon shareability attribute updates.
-> >> > > >
-> >> > > > All of these can still be done without introducing a new ioctl.
-> >> > > >
-> >> > > > Cheers,
-> >> > > > /fuad
+David / dhildenb
+
 
