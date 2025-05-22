@@ -1,100 +1,52 @@
-Return-Path: <kvm+bounces-47339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC38CAC026C
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 04:18:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 138AEAC02B3
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 05:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE7CB4E2E88
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 02:18:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F7E83B0D91
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 03:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26AD684D34;
-	Thu, 22 May 2025 02:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aNt++kvn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D65A1494D9;
+	Thu, 22 May 2025 03:07:15 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC44B1854;
-	Thu, 22 May 2025 02:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09ED827718;
+	Thu, 22 May 2025 03:07:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747880278; cv=none; b=bILhnpm0XQusiNiqFVCBMAoLv0AboScpH16POeG/e9tTOmaGzVdPySEDaR4A4VrmCTtABc1Wxc0vz72yN7RcbFe9ayXZwlfd9sMeFnkUb306lgNfB9L5j0LMfwOW8Cp4fWZei9fQpkqP2bzTX+L18iMEypvD2Oa6SfV2dfPu3IY=
+	t=1747883235; cv=none; b=p0GNGCWF6/dX6l54xIfndYz0s1dPFdDuxQ5NIK7+zZoXJEyizf64ecg6cMvu5Iee4yQOzokxvzojkwGQkxLaIVDA7QtGwqOtr/UpgchvXNqua3L7jhYVBkHOU30OfwSWNFyCaAgR88yW2mjRD5cq2vwNwBV+BbcUW7+1vuZ48J0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747880278; c=relaxed/simple;
-	bh=ZKHlp2Nech7ncXIlk7l+RizijugHYBco9l6vR+ZotRU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jto2EkQm2pNXW+8mjdD54p6XgdUcAZzrXPlgRfg+HZ9gRotpTXnPhUkfeqMI6hW5UGi1PyhuEq5J5uDVgnAD8TwIeFpdDUw7x5kRDdznIswIQW6GJVIKpKbvMKenW/jZkjej8d6YST0d5rht31ph/lYr9tXgLxGmJV0rQL6ZnvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aNt++kvn; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-742c9563fd9so3813711b3a.3;
-        Wed, 21 May 2025 19:17:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747880276; x=1748485076; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D921nCJ6FrC9kndO6rYQP/8DUS7TGpst7yDOrwd7H6w=;
-        b=aNt++kvnpZKH9dAipVCX7H3aRwL9BR0ngtuNjb+KjI3tEuxk/oHPkQ+TIIGZqShY07
-         Z3cYwKN8hSryHmVrSO1wN6LxD1AJtW5SgYI/vCgAxK4L2uQN8DMQaeHpKOMekcT3zNW1
-         cGOjXgd2zIsKVGiM0kD0qcKan1mcuS1f3IG4Q8SeYxn7UkYuwRIeiRyG2DCnpPhkzmeM
-         zNVRHXJBGfen9vWiIPtc2IMK/OY6riWo83lT4lLQQrbAh1wFcODkJIbqqGpExO0ukkEd
-         Ot/NtD7nPjIyQc3NZ0zwcSfpFTwyqe6ld9StU77j/PozydhI/bSbuvO5GfXroCUXj0aL
-         /48g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747880276; x=1748485076;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D921nCJ6FrC9kndO6rYQP/8DUS7TGpst7yDOrwd7H6w=;
-        b=qbjbq3GA8OCSnFUKttSMG/ZByDfhu1BXEiyq764+XQvNy+j4Q+8Rc2z9WUe4F3lUjG
-         rVpqbpH+somqAXEwGln3pugMVa9zJ67zdjGSMeX9yVarISc1U9wzyeH3dV8z3bDwHbgw
-         SzlLmgUoiWX7c/9HwFc3yg0o69chTe11+dnbmzYSpxbRac5TjkGBXCkFdBqdwClM4iSy
-         JmyU0tORdBlQwMgsGpwFkObHM+2AtITMc94yF1giiHSV1GQs/97u4TpkeBI4UieYiWVa
-         89uMkQvFYSDqLrW+/AyNwY99G5BtZ9vwSwIRQkNwpn1DpkNLYlt6CsFbn2tUxW3nYTc1
-         8eeA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEIbWpHD2a9yqiczihoE0zO+45/ipE3OM1tqifbhZgreCYxiDSdQFI+dS6lPDHVBl4IvqMp9pVzC20FoWx@vger.kernel.org, AJvYcCXKX9gyAZlurSJqYtxjXIBN8RthpzTJUwaycmZ+R9Gh7WVRHsuI7DENWOThQuRntgEzbTE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPa+br2J91ux2pMps8byKWE3OFnLXeAomJ0v4uSSFD03mLjfmk
-	76EoHOmocd68Te4HLn1+aeqaVcEkN5UZ0XH05msfcal6NmUyk5Fqlgvn1+aMQkep61M=
-X-Gm-Gg: ASbGnctqCITzWJkBvOucgY//daSsgtleZ5p+CRvGtszT4b//xmEb8JL7vw6S7ZECmM2
-	FUEWsdIafDAXXUJrNFiqF8cD/e7os5WTTfmTr7KDHUQ3sbool0XOSMk9Xz3cTFkFLL7HVHqd7cJ
-	nWgPn0loZ80I/M62jTIFr8w7IBmCza42LEoH8dhWQ5GVUCVczifqLhaAlC11lYdvpDTo6XZWYWR
-	ykwjnO7nZY89oxmhdQ1/1ETVJBVQMObgNGj4Jx2iOR4MEdQ0I9de8+56XmKZw6aTxQVMx5PpcnJ
-	cnBgJ1JpN3yTQjChPib1JjpDkaVXJfAuF7IgFftRvoUInNvnqycDK84oG3RzZ8Y+yeRTOdt5FA=
-	=
-X-Google-Smtp-Source: AGHT+IHZzsGo8/7lkBUgo0SExevzjPKhKdaR3FROnQpsvJA4S96qjNIpAkDzf1CO5av9nl8PYHKI/A==
-X-Received: by 2002:a05:6a00:e0e:b0:730:9946:5973 with SMTP id d2e1a72fcca58-742acc8da9fmr27434635b3a.5.1747880275746;
-        Wed, 21 May 2025 19:17:55 -0700 (PDT)
-Received: from devant.antgroup-inc.local ([47.89.83.0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a96e2106sm10542863b3a.17.2025.05.21.19.17.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 May 2025 19:17:55 -0700 (PDT)
-From: Xuewei Niu <niuxuewei97@gmail.com>
-X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-To: sgarzare@redhat.com
-Cc: Oxffffaa@gmail.com,
-	davem@davemloft.net,
-	fupan.lfp@antgroup.com,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
+	s=arc-20240116; t=1747883235; c=relaxed/simple;
+	bh=/tFrh5QqKOL4ygIBBWFi3Vw9SPY03/r3IMgvMlztlNg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=He+0ocS8kcu9dQ3xzp3W3947suoo3a5aoAcKSQgZ0r2fxUL62hh2gpwTEEVICAylhx3EspFXzPjc5cf4ZR6ooG573AngrJQ978uwMTC3zsx8kIOC6HCjbEwH83+UyPs6dHNOExZIpcK7QIzjjVqQYXbnN/7n0K89PUC52eTid3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.69.3])
+	by gateway (Coremail) with SMTP id _____8CxLGvWlC5oo9v1AA--.4475S3;
+	Thu, 22 May 2025 11:07:02 +0800 (CST)
+Received: from localhost.localdomain (unknown [223.64.69.3])
+	by front1 (Coremail) with SMTP id qMiowMDxesTIlC5orADnAA--.58454S2;
+	Thu, 22 May 2025 11:06:59 +0800 (CST)
+From: Huacai Chen <chenhuacai@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>
+Cc: kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	niuxuewei.nxw@antgroup.com,
-	niuxuewei97@gmail.com,
-	pabeni@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH 2/3] vsock/virtio: Add SIOCINQ support for all virtio based transports
-Date: Thu, 22 May 2025 10:17:39 +0800
-Message-Id: <20250522021739.3363194-1-niuxuewei.nxw@antgroup.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CAGxU2F4k-K+nvF4re8kQwdMfPZ=a6KLvgj-ntAPZVxyQKv6E_w@mail.gmail.com>
-References: <CAGxU2F4k-K+nvF4re8kQwdMfPZ=a6KLvgj-ntAPZVxyQKv6E_w@mail.gmail.com>
+	Xuerui Wang <kernel@xen0n.name>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>,
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: [GIT PULL] LoongArch KVM changes for v6.16
+Date: Thu, 22 May 2025 11:06:28 +0800
+Message-ID: <20250522030628.1924833-1-chenhuacai@loongson.cn>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -102,191 +54,76 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMDxesTIlC5orADnAA--.58454S2
+X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxAFy7Gr4rZr47Kr4kCFyrXwc_yoW5GrWUp3
+	WSvrn3Kr18KF17Ar97J34kXryft3WkGr4Iv3Waqry8Cr1jyry8Jr1xKF95Aa43Z395XryF
+	va4xGwn8WF1UJacCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvKb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	GcCE3s1ln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
+	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
+	McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr4
+	1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_
+	JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17
+	CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0
+	I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I
+	8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU
+	0xZFpf9x07j5xhLUUUUU=
 
-> On Wed, 21 May 2025 at 10:58, Stefano Garzarella <sgarzare@redhat.com> wrote:
-> >
-> > Forgot to CC Arseniy.
-> >
-> > On Wed, 21 May 2025 at 10:57, Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > >
-> > > On Wed, May 21, 2025 at 10:06:13AM +0800, Xuewei Niu wrote:
-> > > >> On Mon, May 19, 2025 at 03:06:48PM +0800, Xuewei Niu wrote:
-> > > >> >The virtio_vsock_sock has a new field called bytes_unread as the return
-> > > >> >value of the SIOCINQ ioctl.
-> > > >> >
-> > > >> >Though the rx_bytes exists, we introduce a bytes_unread field to the
-> > > >> >virtio_vsock_sock struct. The reason is that it will not be updated
-> > > >> >until the skbuff is fully consumed, which causes inconsistency.
-> > > >> >
-> > > >> >The byte_unread is increased by the length of the skbuff when skbuff is
-> > > >> >enqueued, and it is decreased when dequeued.
-> > > >> >
-> > > >> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-> > > >> >---
-> > > >> > drivers/vhost/vsock.c                   |  1 +
-> > > >> > include/linux/virtio_vsock.h            |  2 ++
-> > > >> > net/vmw_vsock/virtio_transport.c        |  1 +
-> > > >> > net/vmw_vsock/virtio_transport_common.c | 17 +++++++++++++++++
-> > > >> > net/vmw_vsock/vsock_loopback.c          |  1 +
-> > > >> > 5 files changed, 22 insertions(+)
-> > > >> >
-> > > >> >diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > > >> >index 802153e23073..0f20af6e5036 100644
-> > > >> >--- a/drivers/vhost/vsock.c
-> > > >> >+++ b/drivers/vhost/vsock.c
-> > > >> >@@ -452,6 +452,7 @@ static struct virtio_transport vhost_transport = {
-> > > >> >            .notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
-> > > >> >
-> > > >> >            .unsent_bytes             = virtio_transport_unsent_bytes,
-> > > >> >+           .unread_bytes             = virtio_transport_unread_bytes,
-> > > >> >
-> > > >> >            .read_skb = virtio_transport_read_skb,
-> > > >> >    },
-> > > >> >diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-> > > >> >index 0387d64e2c66..0a7bd240113a 100644
-> > > >> >--- a/include/linux/virtio_vsock.h
-> > > >> >+++ b/include/linux/virtio_vsock.h
-> > > >> >@@ -142,6 +142,7 @@ struct virtio_vsock_sock {
-> > > >> >    u32 buf_alloc;
-> > > >> >    struct sk_buff_head rx_queue;
-> > > >> >    u32 msg_count;
-> > > >> >+   size_t bytes_unread;
-> > > >>
-> > > >> Can we just use `rx_bytes` field we already have?
-> > > >>
-> > > >> Thanks,
-> > > >> Stefano
-> > > >
-> > > >I perfer not. The `rx_bytes` won't be updated until the skbuff is fully
-> > > >consumed, causing inconsistency issues. If it is acceptable to you, I'll
-> > > >reuse the field instead.
-> > >
-> > > I think here we found a little pre-existing issue that should be related
-> > > also to what Arseniy (CCed) is trying to fix (low_rx_bytes).
-> > >
-> > > We basically have 2 counters:
-> > > - rx_bytes, which we use internally to see if there are bytes to read
-> > >    and for sock_rcvlowat
-> > > - fwd_cnt, which we use instead for the credit mechanism and informing
-> > >    the other peer whether we have space or not
-> > >
-> > > These are updated with virtio_transport_dec_rx_pkt() and
-> > > virtio_transport_inc_rx_pkt()
-> > >
-> > > As far as I can see, from the beginning, we call
-> > > virtio_transport_dec_rx_pkt() only when we consume the entire packet.
-> > > This makes sense for `fwd_cnt`, because we still have occupied space in
-> > > memory and we don't want to update the credit until we free all the
-> > > space, but I think it makes no sense for `rx_bytes`, which is only used
-> > > internally and should reflect the current situation of bytes to read.
-> > >
-> > > So in my opinion we should fix it this way (untested):
-> > >
-> > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > > index 11eae88c60fc..ee70cb114328 100644
-> > > --- a/net/vmw_vsock/virtio_transport_common.c
-> > > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > > @@ -449,10 +449,10 @@ static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
-> > >   }
-> > >
-> > >   static void virtio_transport_dec_rx_pkt(struct virtio_vsock_sock *vvs,
-> > > -                                       u32 len)
-> > > +                                       u32 bytes_read, u32 bytes_dequeued)
-> > >   {
-> > > -       vvs->rx_bytes -= len;
-> > > -       vvs->fwd_cnt += len;
-> > > +       vvs->rx_bytes -= bytes_read;
-> > > +       vvs->fwd_cnt += bytes_dequeued;
-> > >   }
-> > >
-> > >   void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct sk_buff *skb)
-> > > @@ -581,11 +581,11 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> > >                                    size_t len)
-> > >   {
-> > >         struct virtio_vsock_sock *vvs = vsk->trans;
-> > > -       size_t bytes, total = 0;
-> > >         struct sk_buff *skb;
-> > >         u32 fwd_cnt_delta;
-> > >         bool low_rx_bytes;
-> > >         int err = -EFAULT;
-> > > +       size_t total = 0;
-> > >         u32 free_space;
-> > >
-> > >         spin_lock_bh(&vvs->rx_lock);
-> > > @@ -597,6 +597,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> > >         }
-> > >
-> > >         while (total < len && !skb_queue_empty(&vvs->rx_queue)) {
-> > > +               size_t bytes, dequeued = 0;
-> > > +
-> > >                 skb = skb_peek(&vvs->rx_queue);
-> > >
-> > >                 bytes = min_t(size_t, len - total,
-> > > @@ -620,12 +622,12 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> > >                 VIRTIO_VSOCK_SKB_CB(skb)->offset += bytes;
-> > >
-> > >                 if (skb->len == VIRTIO_VSOCK_SKB_CB(skb)->offset) {
-> > > -                       u32 pkt_len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
-> > > -
-> > > -                       virtio_transport_dec_rx_pkt(vvs, pkt_len);
-> > > +                       dequeued = le32_to_cpu(virtio_vsock_hdr(skb)->len);
-> > >                         __skb_unlink(skb, &vvs->rx_queue);
-> > >                         consume_skb(skb);
-> > >                 }
-> > > +
-> > > +               virtio_transport_dec_rx_pkt(vvs, bytes, dequeued);
-> > >         }
-> > >
-> > >         fwd_cnt_delta = vvs->fwd_cnt - vvs->last_fwd_cnt;
-> > > @@ -782,7 +784,7 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
-> > >                                 msg->msg_flags |= MSG_EOR;
-> > >                 }
-> > >
-> > > -               virtio_transport_dec_rx_pkt(vvs, pkt_len);
-> > > +               virtio_transport_dec_rx_pkt(vvs, pkt_len, pkt_len);
-> > >                 vvs->bytes_unread -= pkt_len;
-> > >                 kfree_skb(skb);
-> > >         }
-> > > @@ -1752,6 +1754,7 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
-> > >         struct sock *sk = sk_vsock(vsk);
-> > >         struct virtio_vsock_hdr *hdr;
-> > >         struct sk_buff *skb;
-> > > +       u32 pkt_len;
-> > >         int off = 0;
-> > >         int err;
-> > >
-> > > @@ -1769,7 +1772,8 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
-> > >         if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM)
-> > >                 vvs->msg_count--;
-> > >
-> > > -       virtio_transport_dec_rx_pkt(vvs, le32_to_cpu(hdr->len));
-> > > +       pkt_len = le32_to_cpu(hdr->len);
-> > > +       virtio_transport_dec_rx_pkt(vvs, pkt_len, pkt_len);
-> > >         spin_unlock_bh(&vvs->rx_lock);
-> > >
-> > >         virtio_transport_send_credit_update(vsk);
-> > >
-> > > @Arseniy WDYT?
-> > > I will test it and send a proper patch.
-> > >
-> > > @Xuewei with that fixed, I think you can use `rx_bytes`, right?
-> 
-> If it's true, can we just use `vsock_stream_has_data()` return value
-> instead of adding a new transport's callback?
-> 
-> Thanks,
-> Stefano
+The following changes since commit a5806cd506af5a7c19bcd596e4708b5c464bfd21:
 
-Nice catch! Will do.
+  Linux 6.15-rc7 (2025-05-18 13:57:29 -0700)
 
-Thanks,
-Xuewei
+are available in the Git repository at:
 
-> > >
-> > > Also because you missed for example `virtio_transport_read_skb()` used
-> > > by ebpf (see commit 3543152f2d33 ("vsock: Update rx_bytes on
-> > > read_skb()")).
-> > >
-> > > Thanks,
-> > > Stefano
+  git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.git tags/loongarch-kvm-6.16
+
+for you to fetch changes up to a867688c8cbb1b83667a6665362d89e8c762e820:
+
+  KVM: selftests: Add supported test cases for LoongArch (2025-05-20 20:20:26 +0800)
+
+----------------------------------------------------------------
+LoongArch KVM changes for v6.16
+
+1. Don't flush tlb if HW PTW supported.
+2. Add LoongArch KVM selftests support.
+
+----------------------------------------------------------------
+Bibo Mao (7):
+      LoongArch: KVM: Add ecode parameter for exception handlers
+      LoongArch: KVM: Do not flush tlb if HW PTW supported
+      KVM: selftests: Add VM_MODE_P47V47_16K VM mode
+      KVM: selftests: Add KVM selftests header files for LoongArch
+      KVM: selftests: Add core KVM selftests support for LoongArch
+      KVM: selftests: Add ucall test support for LoongArch
+      KVM: selftests: Add supported test cases for LoongArch
+
+ MAINTAINERS                                        |   2 +
+ arch/loongarch/include/asm/kvm_host.h              |   2 +-
+ arch/loongarch/include/asm/kvm_vcpu.h              |   2 +-
+ arch/loongarch/kvm/exit.c                          |  37 +--
+ arch/loongarch/kvm/mmu.c                           |  15 +-
+ tools/testing/selftests/kvm/Makefile               |   2 +-
+ tools/testing/selftests/kvm/Makefile.kvm           |  17 +
+ tools/testing/selftests/kvm/include/kvm_util.h     |   6 +
+ .../kvm/include/loongarch/kvm_util_arch.h          |   7 +
+ .../selftests/kvm/include/loongarch/processor.h    | 141 +++++++++
+ .../selftests/kvm/include/loongarch/ucall.h        |  20 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c         |   3 +
+ .../selftests/kvm/lib/loongarch/exception.S        |  59 ++++
+ .../selftests/kvm/lib/loongarch/processor.c        | 346 +++++++++++++++++++++
+ tools/testing/selftests/kvm/lib/loongarch/ucall.c  |  38 +++
+ .../testing/selftests/kvm/set_memory_region_test.c |   2 +-
+ 16 files changed, 674 insertions(+), 25 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
+
 
