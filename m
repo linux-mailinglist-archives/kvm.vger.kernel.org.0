@@ -1,131 +1,120 @@
-Return-Path: <kvm+bounces-47393-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47394-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 021AEAC12AD
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 19:52:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E79B1AC12B7
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 19:54:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99EF416BF11
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 17:52:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E15EBA4143D
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 17:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 892091991BF;
-	Thu, 22 May 2025 17:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4BB19D8AC;
+	Thu, 22 May 2025 17:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PKVqY05x"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IzggNKZv"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B7C1EA84
-	for <kvm@vger.kernel.org>; Thu, 22 May 2025 17:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B43191F7F
+	for <kvm@vger.kernel.org>; Thu, 22 May 2025 17:54:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747936360; cv=none; b=pCTLZiZIuLswH5RwZty5UXtfyTYU19YvTXdBwcaJgok6Wf6NEFWIBzRC+KjpoA3iw0+wRtlKJ2sxI7VWMmCwJUaUZsiv6l1TcPTo6v5RS1yAAY89Wmoa+MoLsVWmbClikZrkBWD9MrI9as8xUC7DqOuBw3gl68IsF2YANIJcb34=
+	t=1747936454; cv=none; b=FWPytAzxTP5nLcPumlPdOY9XX5vShkKJ8pUdcPNO6oZUPm2KzbKcFOGzhwNdB0enzzsmFukUBwdvXacf0kym6qw/oyfbwqWZvpWnMywEiFqSxZtpBK6QFasXcStwG65O0YdtSE6O2W5POy5ps/x75fraKjO/5xs1n4RX27Tpk38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747936360; c=relaxed/simple;
-	bh=33shT5yeyG4GlN8jGmN8cxW02rgQnzlcfRYf0PWvCkY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g5VR2ehsSV9/cIDCBOwWH570y5QXd9r9a1CY6Ho+3a81nzLnG95S6rmkV19/4OIVUpiFbG1gqlbovlXLFuEhxZVXueYgxYUEXdRXYA7yMLbhyd4aF1jRUYPsAWVzjmhaR9Y0yHI3z0sJ+DyN1A3lMgmsXsxktCAtp8pYpiWG5gI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PKVqY05x; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747936357;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qCFC7svM4JZpb/vXhsBX/8srNOTogK7PWQN0WLRIUJo=;
-	b=PKVqY05x9DEwwEgtfUifnwdZpltqC5ZX83TI9u0eH8DY4nvLFvBbIf9mx3hPKm6cxICp8r
-	knxbIcy6HZsBSQawNbKlOP97D5wrdc841dtXcgggkXg8bxXdObIPdKXBzbaapRn0J39guB
-	54Zz80l/f/d7ajNJQRRJ7cbVRFtu1Xw=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-457-7-15UOdZPVaj6JWdlWcuVw-1; Thu, 22 May 2025 13:52:36 -0400
-X-MC-Unique: 7-15UOdZPVaj6JWdlWcuVw-1
-X-Mimecast-MFC-AGG-ID: 7-15UOdZPVaj6JWdlWcuVw_1747936355
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-86cab5d8ccaso10159739f.0
-        for <kvm@vger.kernel.org>; Thu, 22 May 2025 10:52:36 -0700 (PDT)
+	s=arc-20240116; t=1747936454; c=relaxed/simple;
+	bh=A9YtGBnfYXBmKsazP3aoG07lV5AvVekJPWQUW/Wlt+s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=mIiZa/H9ECiVtJS55n+4czwp3SUEKJN+fSH8SwXxTTANvMzY6Q3u+v3RY9pUbFtY6JWeSzJitb6Hfx9OdCJ4H+9wti5S5L43kN1GoQnZ3oA2msACEZa9L+5dli3EPKdxvMBb0c1LVUf6rmxc+uu5bA2pkl9u7g19QrQogcYoGiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IzggNKZv; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-310c5c2c38cso1255151a91.1
+        for <kvm@vger.kernel.org>; Thu, 22 May 2025 10:54:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747936452; x=1748541252; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jYTKGMCXf+T08o3CH6Pdo/aVmKCBvpZJKlu4AEtbneA=;
+        b=IzggNKZv07/b+r4korOJ2DfH5OAOISiyfJ8IY8EiIHCPRuO/H7Bl0hec0U/o0Jxuad
+         OduEi6RAVNIojWKfe/rZaR3xJvGVuL43z8DaaVCPX+NO6jcYbBrelm20+UdmeHeGZqaG
+         RanakhX+oSvefwDoq6Tc5YzUcqU0FrfUm0M0yQgH+Qg2gjJiZ/7CbnPNEJgKyn/35XRS
+         dDrd5d7UBt+60n+F9m9v4FRj6LMlGyY7aEZ5IS65sBJ7EPGtn9Wzgrpeg1/s2UB9ConK
+         raMBP3UAdDKLsdjh4UYdVTtK1InruQdvsI0HzBY6cHCJC3t1DDJszZ2XjbT+HzanA49c
+         eCMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747936355; x=1748541155;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qCFC7svM4JZpb/vXhsBX/8srNOTogK7PWQN0WLRIUJo=;
-        b=ku81cHynQWZSGPPQUdiLPonaxNJ++eu98Lc/vgdZpjS7fzyZdrzICzzun8jyk26/+C
-         6TpKy4ban03yvYZyzMT0CTtj279GBxtDXjplVVxe7ZAuAyUIAo4IcW7/fcU07lsPQGQA
-         7uSQ+GsnceSmEYkRgK4hrMUKhbAD/11wpkZSW1lXejH9PCzbHJYTLqYgjfihJJoAvjJR
-         7YUjcpFcTON51CcALagrRLQM6E4mfMFTIPdOD28eeseSI6QFltJ0ju/84NcahTSSt24f
-         NiOQzZs65el6AkA7lfjtPRT/pPRIMIUm4wPYchnNoKIXOH04lI1dIeh8vIVeZ78NVMLd
-         srDw==
-X-Forwarded-Encrypted: i=1; AJvYcCUy0CH7FEev8RK4VnmtT7LgHtUTDHs+9QNS/klTtN3/Q2R4mp+//gbW137TOXOx+Zr2AK8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxriHsCbrxC4G9tyKPmES1zXZ+7dTOftYQiEJZ4lx3S1tHbUZT9
-	imt91XNcCYLLs9NuDbmauCvWUegrR/063dBtymI9fdoIbWrxGnY7e1wzJh0Kdm0MsHpz3lHCUfB
-	6vPdoZ/x2T4ibTdEUvc65S5nRMjJvK5V8VZgDAbk9xzoMiLkM1rvDCw==
-X-Gm-Gg: ASbGncvZEhuzjiYd+2nBlHsoUL4fQDxQcd2uPhf8C3oFMXBRkVIKRoIQpAj+iiYLMgT
-	6Uz5D2GqwwUIPIzBWXllQdrj4wVSrAdq7cJypTifJXXvW9EkZoq/nM9y41xRGPHAO+IcjMCOLJ+
-	H71NPMKpu3vu8+S1jLG7VWb33vHEuCesIl1IxbjtZZoFcSDgmWv9rJQAbvMcvOq6ylBe4zRMGLY
-	GUTQ252zad0GOrcDDhTIRhKZN+1G+MJWh/SbU1YmUfGZVwwEr8pVjKcuMGAIGuQMq6iw4rh+BNI
-	cL785ObAXwS5j0Y=
-X-Received: by 2002:a05:6e02:4901:b0:3dc:8075:ccc4 with SMTP id e9e14a558f8ab-3dc8085148cmr26949195ab.3.1747936355326;
-        Thu, 22 May 2025 10:52:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEXoXfZvws0L1W7xZChiVtBXB0ueiTvpjJifRiy6I6C2ZywtlKUHJyc9rf8zT1q87w+pM5CSw==
-X-Received: by 2002:a05:6e02:4901:b0:3dc:8075:ccc4 with SMTP id e9e14a558f8ab-3dc8085148cmr26949045ab.3.1747936354959;
-        Thu, 22 May 2025 10:52:34 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dc89bfeebfsm7228115ab.68.2025.05.22.10.52.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 May 2025 10:52:33 -0700 (PDT)
-Date: Thu, 22 May 2025 11:52:31 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Li,Rongqing" <lirongqing@baidu.com>
-Cc: "kwankhede@nvidia.com" <kwankhede@nvidia.com>, "yan.y.zhao@intel.com"
- <yan.y.zhao@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [????] Re: [PATCH] vfio/type1: fixed rollback in
- vfio_dma_bitmap_alloc_all()
-Message-ID: <20250522115231.729dad0c.alex.williamson@redhat.com>
-In-Reply-To: <64e1bbd6b7e94aa0b5bc4556d5d335a6@baidu.com>
-References: <20250521034647.2877-1-lirongqing@baidu.com>
-	<20250521140034.35648fde.alex.williamson@redhat.com>
-	<64e1bbd6b7e94aa0b5bc4556d5d335a6@baidu.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1747936452; x=1748541252;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jYTKGMCXf+T08o3CH6Pdo/aVmKCBvpZJKlu4AEtbneA=;
+        b=jcxzC/RJjjj8F3rDe4tpdfr8SgpOtUV42bVPO+eVUt+6QgCzTAXxIHQKS/fgs2nXNr
+         uCGZGSrdy5f6mRy1kP+OwM/fHRu42T3Dv91xfSh6yUhmmL7T9uxXjHejCyYsQ2XPKqnp
+         iN4LE/FbtbLsoTjMKq9q1UfteX0DBBf7fTpBFB+MNXWP0iX8MX0TegR8DFK6JhVEar8k
+         KjjC937jcCbNk4zZFNdFzZYqo3jLlyObXNdz0j60UxVfh0wYD2pN6XxurPj3O0JBIQkg
+         NR6WleybFoAaJ+6a4XHXVkdzANdT9lpgzTX2qwxFnKYkCclbRwt5tkTq3cp6LBmf/D0h
+         /DwA==
+X-Gm-Message-State: AOJu0YyF9HC5nGjmjkSiVCIeDpsSOcP+lY5rVgItbSRRbb3oxXWBgdHx
+	X2IJ6AWSfCVCI3SWuez4Ko8oNsPs9fk+X2Th/PJV5wkNxKUId05Fn5G5gkt5jXdmAu+OXjVjAg7
+	9i2Ssaw==
+X-Google-Smtp-Source: AGHT+IHuhEsqFWFlAH8y96+h2FL09Ry9K1MrokTzgmXWNLTYISdJwQxN+5eloQ0CtjDqiEDKckc9GYUnN5I=
+X-Received: from pjl13.prod.google.com ([2002:a17:90b:2f8d:b0:2ff:5344:b54])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2751:b0:2fe:afbc:cd53
+ with SMTP id 98e67ed59e1d1-30e8321595cmr38620501a91.28.1747936451886; Thu, 22
+ May 2025 10:54:11 -0700 (PDT)
+Date: Thu, 22 May 2025 10:54:10 -0700
+In-Reply-To: <20250522005555.55705-6-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250522005555.55705-1-mlevitsk@redhat.com> <20250522005555.55705-6-mlevitsk@redhat.com>
+Message-ID: <aC9kwukxBtH4vawX@google.com>
+Subject: Re: [PATCH v5 5/5] KVM: VMX: preserve DEBUGCTLMSR_FREEZE_IN_SMM
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 22 May 2025 01:53:48 +0000
-"Li,Rongqing" <lirongqing@baidu.com> wrote:
-
-> >     vfio/type1: Fix error unwind in migration dirty bitmap allocation
-> > 
-> >     When setting up dirty page tracking at the vfio IOMMU backend for
-> >     device migration, if an error is encountered allocating a tracking
-> >     bitmap, the unwind loop fails to free previously allocated tracking
-> >     bitmaps.  This occurs because the wrong loop index is used to
-> >     generate the tracking object.  This results in unintended memory
-> >     usage for the life of the current DMA mappings where bitmaps were
-> >     successfully allocated.
-> > 
-> >     Use the correct loop index to derive the tracking object for
-> >     freeing during unwind.
-> >   
+On Wed, May 21, 2025, Maxim Levitsky wrote:
+> Pass through the host's DEBUGCTL.DEBUGCTLMSR_FREEZE_IN_SMM to the guest
+> GUEST_IA32_DEBUGCTL without the guest seeing this value.
 > 
-> Your changelog is extremely detailed and highly accurate.
+> Since the value of the host DEBUGCTL can in theory change between VM runs,
+> check if has changed, and if yes, then reload the GUEST_IA32_DEBUGCTL with
+> the new value.
 > 
-> Please directly incorporate this patch with your changelog
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 1 +
+>  arch/x86/kvm/vmx/vmx.c          | 6 +++++-
+>  arch/x86/kvm/x86.c              | 7 +++++--
+>  3 files changed, 11 insertions(+), 3 deletions(-)
 
-Applied to vfio next branch for v6.16 with updated changelog.  Thanks,
+SVM and TDX definitely should WARN (though TDX can simply reuse the WARN on a
+non-zero run_fags), if only to document that KVM isn't buggy.
 
-Alex
+> @@ -7380,6 +7381,9 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
+>  	if (run_flags & KVM_RUN_LOAD_GUEST_DR6)
+>  		set_debugreg(vcpu->arch.dr6, 6);
+>  
+> +	if (run_flags & KVM_RUN_LOAD_DEBUGCTL)
+> +		vmx_guest_debugctl_write(vcpu, vmx_guest_debugctl_read());
 
+There's a rather amusing and subtle nested VMX bug.  On a VM-Fail that is missed
+by KVM, KVM will have done vcpu_enter_guest() => vmx_vcpu_run() with vmcs02,
+i.e. will have updated the host_debugctl snapshot, but won't explicitly write
+vmcs01 because nested_vmx_restore_host_state() doesn't emulate a VM-Exit (it mostly
+restores state that KVM shoved into its software model).
+
+I mention that here, because I was already wondering if it made sense to add a
+helper to perform the VMWRITE if and only if necessary.  I was leaning "no",
+because for this path, it should always be necessary.  But with the nested VM-Fail
+path in play, it will often be unnecessary.
 
