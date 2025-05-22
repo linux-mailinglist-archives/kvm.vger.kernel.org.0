@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-47423-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2CB1AC1819
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 01:37:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AC6EAC1821
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 01:38:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50211A40048
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 23:37:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68F0117A40C
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 23:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D302271A73;
-	Thu, 22 May 2025 23:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB632BFC75;
+	Thu, 22 May 2025 23:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SkXKFSYA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k24CJp0P"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3496A2494F5
-	for <kvm@vger.kernel.org>; Thu, 22 May 2025 23:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC651271A78
+	for <kvm@vger.kernel.org>; Thu, 22 May 2025 23:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747957065; cv=none; b=Ke1V2h8TKAdCgTw4EqW62cwOn7IMKz2Fguu46UzELM5WRE6ElopnuHPFO1Dh7Fcj2skJLHS6SgKtuMwitVY1Hd2xt9afzmXDggaDC8VWTIDe+FMGb1JhwIppCEruxgfEoFguYc1camxSWVgSxsDeFFKig642e/JD+BDYqlJYHUQ=
+	t=1747957068; cv=none; b=c2GiVE53hBG9aw5BA62OG0L0walqkfysQpl7o4Em0j8/u+NQQiLwBIhC3qMfd/VUIYeAv2Srn8EYRXOCKOwha06obbKwhvbJ/uH2XlnoLU+z9RaPmwsa2BeJgXUtfXkxbrgDPCzitQJUWEavbrgtjFS9qzWiPPpxIv/fw8AJeF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747957065; c=relaxed/simple;
-	bh=7HznakEWAX3QxiOzowEE528i6qDkLEzzGNrvSoNsN9c=;
+	s=arc-20240116; t=1747957068; c=relaxed/simple;
+	bh=Cf+rTiT37xWtJra2of8I2bzpA8nA/Gdxil8f28LKGj8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F/2rPVTXRLKi0XWnUqWz0R3nXfpYPaq47siOEqqf6fMfKxJr6EUsBqJogGHGAnzUfb3guWwAm/JHtn/42XzSJh0d9YaQwEjluPl6Vgoe9LwrRFrNzu4aWggos99JhQTbzzeaI5ORTL+Y12gwl33tovkx1mbwZEzq8/RupwfY7Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SkXKFSYA; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=Ofmi0zmgqCdRFO5VgJSoI48K12esdNST2l7NUqKHY4unuLkwgyqYfii+f7x2RnO6txa9raynVcZmK+s8Ujl5x4WgIyOZrOTh1EeHDVdVhKZEXjx0tZgYBIr05Fmo3mjVOT0OHjHT7BO6CN9tScnHkUhxzKTD97L+YSMi1afxKtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k24CJp0P; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30e78145dc4so9496046a91.2
-        for <kvm@vger.kernel.org>; Thu, 22 May 2025 16:37:43 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30eac9886ffso4599535a91.1
+        for <kvm@vger.kernel.org>; Thu, 22 May 2025 16:37:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747957063; x=1748561863; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747957065; x=1748561865; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=uPxUrn14vuCfCMnKXPuJKpCi+RnH/dlPI+aSAjTgJIQ=;
-        b=SkXKFSYApdsPjWpIPz5B9XNLdQ+eWKcQiy0NvTTO3iNZqGZGZopPabFBd65HjlaWYB
-         LOUSA3Uy0CijsNzYm9CcHH10rWoaK4Ge9UckmZndNmFjBBC39AU27wXZq0pdKrssiBuO
-         MRWCydZQFtPJVR5CHBsIwGdOBRVAo5ZOezsoTed+IKQ3oEjBfzIi0iHgCjrC4mS3jdXn
-         eFlJmq+UsK/oxPEMiQh9C6TQds++hzaLO3vYiDw4JZ7EpPlYFjen2Ohre3l2CGsUO0Pd
-         B/0l+RIg+qaqijPZ79zzJ0EO8uAcirnw4CoLiN1Ms120Uo627BKikUL0tT4c4/fkth76
-         E1qg==
+        bh=bZZENoThSq2WPUG3cA9ljTtD8JyVh5aqU2sA4XXQXGM=;
+        b=k24CJp0PVCjvkhOg15+EM8LEYadnBZg4C6kkBB2UqoyY/k+6yZ6KJQdmnfk0Hwi2cY
+         9AUQAuhkEpRCcmmbuVpgSJdqb1VR00ciLK85kQ5qLvTNRj4PjCOKaKdW585KeHz/ogxt
+         CQm5W+xxVgnOMMkFmYPJRWZ42/RJ4G9eZXnu+mlPFMe/HfSFC0iSKI3FO/upHnRxhZEy
+         ouPITCUHD42WF/O7Ia4cJjeDFqLJeM6X3CR2KBw0+T/dzc+skLPAyoPtHCCSeHSSLQ0a
+         Ta4T18RBYOSIE5Hz63/qU9uvOFto+5q8mMSaB3n+3BLi3ASChk2hIXFFAnNGcPhNsC1m
+         Vcjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747957063; x=1748561863;
+        d=1e100.net; s=20230601; t=1747957065; x=1748561865;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uPxUrn14vuCfCMnKXPuJKpCi+RnH/dlPI+aSAjTgJIQ=;
-        b=HvrnkUU3JbpnKaiI0UuHdPbLeE6MP3Rh6h8/6o4PiUODbNUl85NaPOZfr7jXCU9lDR
-         AylVapk6R08zdpRLz6lIHlNwAqQr5rsNDCZJj/kcAULpKBie2sV9kmXaCZxLY92j9x1t
-         Vkrd8PfeTmBRkBUaUuO6AQlz1pDBZLDl4YOUIK5yx0nZT1IfZYEuD7GDolCnaoG66kDY
-         QA1DZZ33u265lx8f9OtzE1vmW3TkYrZRjVaOnsbk7m1t3FnpwiVdGkpsg/7IZJ5v+1e9
-         XyWQeelUdTraRTHnlmvaU0RKbDW0yrQHLdhgCLheLkNNCAG7+5vIgbuhufZ3yzqRVKi6
-         Bwkw==
-X-Forwarded-Encrypted: i=1; AJvYcCWzcI3dCN02F/8EIsoUsRjVXa6KWKw1eOX7PTrRaqfUA9lSMWVyqbljQIS4Yw54HI41EgU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWCJ9A7BQ5y4J/SdUYjNAib5tm8Sa2SrW19hPhjxYelcVDLCT3
-	eaoEF/VypU5eoUeTCWDapWf+ezEsbF9jqj5i4cyD5Nzs4I72U2x3MfJzj6Gq0h1Fmg1ZoXCkL6M
-	92zcRbg==
-X-Google-Smtp-Source: AGHT+IGI69KyPY1At0pbvO9taKFOli2nLHw8tUa/zK4co4eocqDHMTFbGsbKlwZf9ojX+OImaEWTLGTboac=
-X-Received: from pjbsw15.prod.google.com ([2002:a17:90b:2c8f:b0:301:4260:4d23])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2c8c:b0:2fe:8c22:48b0
- with SMTP id 98e67ed59e1d1-30e7d555a3bmr38071711a91.15.1747957063457; Thu, 22
- May 2025 16:37:43 -0700 (PDT)
+        bh=bZZENoThSq2WPUG3cA9ljTtD8JyVh5aqU2sA4XXQXGM=;
+        b=I2AnhAEdiNLwc2uOoeKU8DRwdDeov/UgYyE2HOXHSQY97hmMDIgsstpQh/hySkAprF
+         euHhc4FV6DUtJozYTf4S2qOyrHoDDIOgvqZLVDLr+5QebOOEluVLm9FqKrPzbeXNeUHJ
+         xobp6gGSPL41y9HoWqdHslXGmuYwuzr6fP+flDaFejfxfVsKzNRWT5wsIOAMFRaWmzQR
+         /KZnIEy2fRIGltvuXNrr1ICyxFbxSzgrwUenZj4zQvHf7oP92d4Vi+eBRrnUn+huYz5B
+         nlam60jWe6VSREAEjMJlPCymnrRDEP2YqZVv5EuZ0R3xJFrAkm3IrhsTGzI09QGnzc9p
+         dKig==
+X-Forwarded-Encrypted: i=1; AJvYcCU/ejNLP1DymDiEplLfVKgkw5s5VwCJKPy6R/W2zocENULHZtO7/5DkhyxC+YD19LUk/eQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi21KJMC5pXELaHW/8Py3p+NPEqdunLnGeuwvtSCKCMsoUCSNh
+	JtCrzzO4/ESUWFEOVI2EOtYKrxshDTH4/xh4YfbuyU4wm3K7Oxp1b/GFpxHu4Y9PlgjeoYRLDV7
+	pILCqxw==
+X-Google-Smtp-Source: AGHT+IFExGJrdJE3NdFkvdN8xCuUi0nMv/3Dpb1wQbh8E9OJ+IjqmD6ZkqC1r2VP7vreaPIjC/XPdl8z9gU=
+X-Received: from pjbok18.prod.google.com ([2002:a17:90b:1d52:b0:30e:7f04:f467])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d44e:b0:2ee:d63f:d8f
+ with SMTP id 98e67ed59e1d1-310e96c9598mr1434238a91.13.1747957065045; Thu, 22
+ May 2025 16:37:45 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 22 May 2025 16:37:25 -0700
+Date: Thu, 22 May 2025 16:37:26 -0700
 In-Reply-To: <20250522233733.3176144-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250522233733.3176144-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1151.ga128411c76-goog
-Message-ID: <20250522233733.3176144-2-seanjc@google.com>
-Subject: [PATCH v3 1/8] drm/gpu: Remove dead checks on wbinvd_on_all_cpus()'s
- return value
+Message-ID: <20250522233733.3176144-3-seanjc@google.com>
+Subject: [PATCH v3 2/8] x86, lib: Drop the unused return value from wbinvd_on_all_cpus()
 From: Sean Christopherson <seanjc@google.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -92,50 +91,55 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Mingwei Zhang <mizhang@google.com>, Francesco Lavra <francescolavra.fl@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Remove the checks and associated pr_err() on wbinvd_on_all_cpus() failure,
-as the helper has unconditionally returned 0/success since commit
-caa759323c73 ("smp: Remove smp_call_function() and on_each_cpu() return
-values").
+Drop wbinvd_on_all_cpus()'s return value; both the "real" version and the
+stub always return '0', and none of the callers check the return.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/gpu/drm/drm_cache.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ arch/x86/include/asm/smp.h | 5 ++---
+ arch/x86/lib/cache-smp.c   | 3 +--
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/gpu/drm/drm_cache.c b/drivers/gpu/drm/drm_cache.c
-index 7051c9c909c2..ea1d2d5d2c66 100644
---- a/drivers/gpu/drm/drm_cache.c
-+++ b/drivers/gpu/drm/drm_cache.c
-@@ -93,8 +93,7 @@ drm_clflush_pages(struct page *pages[], unsigned long num_pages)
- 		return;
- 	}
+diff --git a/arch/x86/include/asm/smp.h b/arch/x86/include/asm/smp.h
+index 0c1c68039d6f..028f126018c9 100644
+--- a/arch/x86/include/asm/smp.h
++++ b/arch/x86/include/asm/smp.h
+@@ -112,7 +112,7 @@ void __noreturn hlt_play_dead(void);
+ void native_play_dead(void);
+ void play_dead_common(void);
+ void wbinvd_on_cpu(int cpu);
+-int wbinvd_on_all_cpus(void);
++void wbinvd_on_all_cpus(void);
  
--	if (wbinvd_on_all_cpus())
--		pr_err("Timed out waiting for cache flush\n");
-+	wbinvd_on_all_cpus();
+ void smp_kick_mwait_play_dead(void);
+ void __noreturn mwait_play_dead(unsigned int eax_hint);
+@@ -148,10 +148,9 @@ static inline struct cpumask *cpu_l2c_shared_mask(int cpu)
  
- #elif defined(__powerpc__)
- 	unsigned long i;
-@@ -139,8 +138,7 @@ drm_clflush_sg(struct sg_table *st)
- 		return;
- 	}
+ #else /* !CONFIG_SMP */
+ #define wbinvd_on_cpu(cpu)     wbinvd()
+-static inline int wbinvd_on_all_cpus(void)
++static inline void wbinvd_on_all_cpus(void)
+ {
+ 	wbinvd();
+-	return 0;
+ }
  
--	if (wbinvd_on_all_cpus())
--		pr_err("Timed out waiting for cache flush\n");
-+	wbinvd_on_all_cpus();
- #else
- 	WARN_ONCE(1, "Architecture has no drm_cache.c support\n");
- #endif
-@@ -172,8 +170,7 @@ drm_clflush_virt_range(void *addr, unsigned long length)
- 		return;
- 	}
+ static inline struct cpumask *cpu_llc_shared_mask(int cpu)
+diff --git a/arch/x86/lib/cache-smp.c b/arch/x86/lib/cache-smp.c
+index 7af743bd3b13..079c3f3cd32c 100644
+--- a/arch/x86/lib/cache-smp.c
++++ b/arch/x86/lib/cache-smp.c
+@@ -14,9 +14,8 @@ void wbinvd_on_cpu(int cpu)
+ }
+ EXPORT_SYMBOL(wbinvd_on_cpu);
  
--	if (wbinvd_on_all_cpus())
--		pr_err("Timed out waiting for cache flush\n");
-+	wbinvd_on_all_cpus();
- #else
- 	WARN_ONCE(1, "Architecture has no drm_cache.c support\n");
- #endif
+-int wbinvd_on_all_cpus(void)
++void wbinvd_on_all_cpus(void)
+ {
+ 	on_each_cpu(__wbinvd, NULL, 1);
+-	return 0;
+ }
+ EXPORT_SYMBOL(wbinvd_on_all_cpus);
 -- 
 2.49.0.1151.ga128411c76-goog
 
