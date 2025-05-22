@@ -1,155 +1,143 @@
-Return-Path: <kvm+bounces-47364-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47365-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72051AC0C43
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 15:08:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC73EAC0C91
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 15:22:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A59A1BA3CF4
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 13:08:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3479B1B62B0E
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 13:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA9C28BAB4;
-	Thu, 22 May 2025 13:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88BD828BAAB;
+	Thu, 22 May 2025 13:22:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gSt6E3mI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CH1euaTH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6544928BA90;
-	Thu, 22 May 2025 13:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5193E28BA84
+	for <kvm@vger.kernel.org>; Thu, 22 May 2025 13:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747919291; cv=none; b=eG/8qENf1N+820eUIjqF29T0acmNv2EVJLZ3VFIcWczt4er2p9hv0Z2eNgJoERhInKHqLWHjruAMpqF9ThSITPlF+01d1vIn2Y8IZzVKUocTARg9aYuoyokF2YPyd5D6pJqvQpou4X5rAT1jjFkqeH6mzb7bQS0RUMnrEkkWpJc=
+	t=1747920126; cv=none; b=Qf7ic/6/TEIOyDcD/gydrRwztUv6ua/prSKUuwpGYETZxOrML7azazpfiOv3Xj3rQF0C5z3tPaqumfWdxvRyZo3QGwcCJR4q94ukX6cVjUgwhBXHg09SjCx98YKv9dl6MmELUXB9IJoe0tqblBGVTy8avw6yXrdMXIBzkjnBjs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747919291; c=relaxed/simple;
-	bh=l8HXL9p+A1M840vmWGJ1KJR/EkP2XHaRqGHpfbYpV4Q=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=PL2k7V4NqW+gaTp/tPWe2YTM9ln2cW2ixuKFslHMMUirMdCUohYMh+brRKyggP5VubjKfWnA39DDBo3Q5iyYEiYDfNihXiOVB087zGIu5DagSdZuStTSt8q7dAdzGM3yRoTjG8qiffkJ0lz+ks5iYRMssOo+vq+COZ2OzeF/fe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gSt6E3mI; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54M7LsMP002913;
-	Thu, 22 May 2025 13:08:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Qc/XmQ
-	KL5cf4nyq86sqlMA33WVDvG+VQcZjU7doInTg=; b=gSt6E3mIxCIqSy0aYey30T
-	OOkLJswLLEK2ixZreov9IZeeDz/xdyP6pTeBMc/cT6Ib3lY/2FW7PE3sY4TK+PdT
-	Qq5UieQgz+iTWvKBvLaOkBaOAhDTYmFbpblIL1efT9SSKSlRkvpagsoKSI3C1FHg
-	xQ/8Aos4aF2oyb2f+9kGE4ESY0Z9oahTiO9KP8bI95KW/LhfLZWDk0erUv+AbqdJ
-	p2SR0NpJe4zvFwtNnJfPNqJNih7kvxuAxbQElyZ3jy+teWyfL70fY57czIEyo71g
-	4bZVlmOUu7qrH9KoaFpirdnhTf3/BiNnTzFluuyPRYZh495QM1phRBSf7vHfHIow
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46smh747m6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 May 2025 13:08:06 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54M9xe8p032117;
-	Thu, 22 May 2025 13:08:06 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 46rwnmhgrr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 May 2025 13:08:06 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54MD828j51380570
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 May 2025 13:08:02 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4597F2004D;
-	Thu, 22 May 2025 13:08:02 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2DC3B20040;
-	Thu, 22 May 2025 13:08:02 +0000 (GMT)
-Received: from darkmoore (unknown [9.155.210.150])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 22 May 2025 13:08:02 +0000 (GMT)
+	s=arc-20240116; t=1747920126; c=relaxed/simple;
+	bh=x/s5Tu+PGnUXA98VDqjtzL0ituy1J+k3bmvekwoIDsM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=htMN4qNTdJ4EaymTemOz420YY0DLD1hXu/tjKtncMn1nxUryc2mgpmsJ7XEwPhQWqAd5Dbb+G8WN51HbQ4doan51Lx9S2Hg+E//C4dU3RJKxvQSeTUkLolL1tl9YZCQA+aDEvFgyr8c/lboGVymp8HsePPHp+dgM/BrIX5+80vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CH1euaTH; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30ed0017688so4349100a91.2
+        for <kvm@vger.kernel.org>; Thu, 22 May 2025 06:22:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747920124; x=1748524924; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QKBJvgUrVambsJ2yzaELSbkjwfKz5UacuDjs6ycUHMM=;
+        b=CH1euaTHvwWq6gPxnRV5vfXk+76htBcSYSxqYUE0THVZ7kjADztpjlrCJYqJoPJ7bT
+         qBg4bQIYkXXXs92tia6de+FKItpU3F1zLAua/hRW1e6p7gFtem0Pa7efttPzNcZRCh9N
+         7ZzyiaKLFZFPY3IPQWfO5S/3IVebFZiPaCqb8ZtORAkjydZZVSZxQP4/q0naxLzk1DlH
+         j1itKL7ZfyaGGzQ491XikTGMYgesTOS1fS+0+CUggJaX7ZaEBWwUl31aqqvijAXPZesO
+         xgVnlFZI1VnfTSpBugd1jLtpBUZ7J4oQ1fDgwspJ+1HHIewO09BPvIYylG3BsDey8e/d
+         A/Ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747920124; x=1748524924;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QKBJvgUrVambsJ2yzaELSbkjwfKz5UacuDjs6ycUHMM=;
+        b=ei4JegMQx4Erk9kwg5u6DbClzVU8YEFOCFjceey13ImCY3YR//uji+ULaS5TcdKhC4
+         NKwFIA1nj++XOvR5UTJvNXPI82AvUge1NqbTzubSv13+X9476OrJ+q3/F88httHRxCsA
+         0MwE5VL0w/goSO8dMXduKGPbX8HwxHH/xn1n04T92LqFEyhhpsRcwiEmLaVCexX2Qz0H
+         c4/UhSP5OhSSCPtvxBvWc7doJ8W0B3iW1G4Weo0Fh7GTxzrYR+Cm+tvXNiklFhPfH2iy
+         nS5Ogc7Cp5Q+aumRc2GCnkfrU02pwSMiMj7ZoTCdd+OFvzMbrqcmPbxTWdQnIFr+QW1u
+         AdRA==
+X-Forwarded-Encrypted: i=1; AJvYcCWTfWGnH6Ded/49h9nMDorbdG0Wzfg9Nj6XZSa1+M4slZ674kjdBdwpjjqlI08ooWy7ECg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrzwskEd7i3PqFzen7nlu9bHgkPYy0IpRbjKEobdFb17xRIi1w
+	aGF1ueyc0mEcP2AIwyd7dF4Crm31KxkZBn+vEcgjlKwDSlnLyJbpuyGd4hYZeCqZ8MoRAOuJTlP
+	JLxSsMQ==
+X-Google-Smtp-Source: AGHT+IHBr96gW4/tfNbtVKC4wgxsh6Adq1N7ekH0d54ukQBy3Bjy1fOomuwXDQTE4PYbogSQYirL+L39Ifk=
+X-Received: from pjbee16.prod.google.com ([2002:a17:90a:fc50:b0:2fa:15aa:4d1e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:6ce:b0:2ff:58e1:2bb4
+ with SMTP id 98e67ed59e1d1-30e7d5a93aemr30697955a91.22.1747920124403; Thu, 22
+ May 2025 06:22:04 -0700 (PDT)
+Date: Thu, 22 May 2025 06:22:02 -0700
+In-Reply-To: <diqzcyc18odo.fsf@ackerleytng-ctop.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 22 May 2025 15:07:57 +0200
-Message-Id: <DA2PO6KCE168.39FQQB8HX0A5D@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <frankja@linux.ibm.com>, <borntraeger@de.ibm.com>,
-        <seiden@linux.ibm.com>, <nsg@linux.ibm.com>, <nrb@linux.ibm.com>,
-        <david@redhat.com>, <hca@linux.ibm.com>, <agordeev@linux.ibm.com>,
-        <svens@linux.ibm.com>, <gor@linux.ibm.com>
-To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 2/5] KVM: s390: remove unneeded srcu lock
-X-Mailer: aerc 0.20.1
-References: <20250520182639.80013-1-imbrenda@linux.ibm.com>
- <20250520182639.80013-3-imbrenda@linux.ibm.com>
-In-Reply-To: <20250520182639.80013-3-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIyMDEzMyBTYWx0ZWRfX8RciIEJAVdcM jMk7926/rddypM652bWrONWZI05gd9FB/4UCm0TduLeA45f5noznWDxZ+0949iwyiEDq6R9n19P O3eXejr/SudPd6MBVUq/amFTGysmy/od4Azn1AES2l6VoLqyR9W4oLr03GpAhCH6XG/ECzTMZ0h
- i6Epqq702DMAi4gG3D9PwNJU9ilYk5F1CfhQRYAvdRzPyM+q6qKKsGTg6TC3GLeUJUxZPrsh34a jJLTqTTylvINkObYHl5kPmwb1bowu+LlLp4IduCjcsdKZ0FDRWfG/pozYmwq+EhNzCeWfJzOY7l 28vzKXX+9ztqkk9jLfDkgL6ysJGQCiYWf73EEMY6op/qw9CbbN4xUK5/JKLlfNem2x7QS4kvoUo
- Xya+zSRr/6RZ26oJiVxraf7JpNR2r330EBVOCUe1wU1uFfMNRENiuYP968tpCzTM1q3pqanw
-X-Proofpoint-GUID: pl2oOFwhwFTXyeF_GMPGb6uNOm0t2Yk9
-X-Proofpoint-ORIG-GUID: pl2oOFwhwFTXyeF_GMPGb6uNOm0t2Yk9
-X-Authority-Analysis: v=2.4 cv=EdfIQOmC c=1 sm=1 tr=0 ts=682f21b6 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=oh86K7MTI85CMi4h8AQA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-22_06,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 adultscore=0 mlxscore=0 lowpriorityscore=0 malwarescore=0
- phishscore=0 priorityscore=1501 bulkscore=0 clxscore=1015 mlxlogscore=806
- spamscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505220133
+References: <5ace54d1-800b-4122-8c05-041aa0ee12a1@redhat.com> <diqzcyc18odo.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <aC8k-uJ1JV1wh8fZ@google.com>
+Subject: Re: [PATCH v9 10/17] KVM: x86: Compute max_mapping_level with input
+ from guest_memfd
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: David Hildenbrand <david@redhat.com>, tabba@google.com, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
+	pankaj.gupta@amd.com, ira.weiny@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue May 20, 2025 at 8:26 PM CEST, Claudio Imbrenda wrote:
-> All paths leading to handle_essa() already hold the kvm->srcu.
-> Remove unneeded srcu locking from handle_essa().
-> Add lockdep assertion to make sure we will always be holding kvm->srcu
-> when entering handle_essa().
->
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+On Wed, May 21, 2025, Ackerley Tng wrote:
+> >> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> >> index de7b46ee1762..f9bb025327c3 100644
+> >> --- a/include/linux/kvm_host.h
+> >> +++ b/include/linux/kvm_host.h
+> >> @@ -2560,6 +2560,7 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> >>   int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+> >>   		     gfn_t gfn, kvm_pfn_t *pfn, struct page **page,
+> >>   		     int *max_order);
+> >> +int kvm_gmem_mapping_order(const struct kvm_memory_slot *slot, gfn_t gfn);
+> >>   #else
+> >>   static inline int kvm_gmem_get_pfn(struct kvm *kvm,
+> >>   				   struct kvm_memory_slot *slot, gfn_t gfn,
+> >> @@ -2569,6 +2570,12 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
+> >>   	KVM_BUG_ON(1, kvm);
+> >>   	return -EIO;
+> >>   }
+> >> +static inline int kvm_gmem_mapping_order(const struct kvm_memory_slot *slot,
+> >> +					 gfn_t gfn)
+> >
+> > Probably should indent with two tabs here.
+> 
+> Yup!
 
-Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+Nope!  :-)
 
-> ---
->  arch/s390/kvm/priv.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-> index 1a49b89706f8..9253c70897a8 100644
-> --- a/arch/s390/kvm/priv.c
-> +++ b/arch/s390/kvm/priv.c
-> @@ -1248,6 +1248,8 @@ static inline int __do_essa(struct kvm_vcpu *vcpu, =
-const int orc)
-> =20
->  static int handle_essa(struct kvm_vcpu *vcpu)
->  {
-> +	lockdep_assert_held(&vcpu->kvm->srcu);
-> +
->  	/* entries expected to be 1FF */
->  	int entries =3D (vcpu->arch.sie_block->cbrlo & ~PAGE_MASK) >> 3;
->  	unsigned long *cbrlo;
-> @@ -1297,12 +1299,8 @@ static int handle_essa(struct kvm_vcpu *vcpu)
->  		/* Retry the ESSA instruction */
->  		kvm_s390_retry_instr(vcpu);
->  	} else {
-> -		int srcu_idx;
-> -
->  		mmap_read_lock(vcpu->kvm->mm);
-> -		srcu_idx =3D srcu_read_lock(&vcpu->kvm->srcu);
->  		i =3D __do_essa(vcpu, orc);
-> -		srcu_read_unlock(&vcpu->kvm->srcu, srcu_idx);
->  		mmap_read_unlock(vcpu->kvm->mm);
->  		if (i < 0)
->  			return i;
+In KVM, please align the indentation as you did.
 
+ : Yeah, that way of indenting is rather bad practice. Especially for new
+ : code we're adding or when we touch existing code, we should just use two
+ : tabs.
+
+ : That way, we can fit more stuff into a single line, and when doing
+ : simple changes, such as renaming the function or changing the return
+ : type, we won't have to touch all the parameters.
+
+At the cost of readability, IMO.  The number of eyeballs that read the code is
+orders of magnitude greater than the number of times a function's parameters end
+up being shuffled around.  Sacrificing readability and consistenty to avoid a
+small amount of rare churn isn't a good tradeoff.
 
