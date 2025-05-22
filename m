@@ -1,80 +1,88 @@
-Return-Path: <kvm+bounces-47344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47345-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B24AC04CF
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 08:49:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3B3CAC0574
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 09:17:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC07C3B636A
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 06:49:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE9753B10A1
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 07:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A20D9221F33;
-	Thu, 22 May 2025 06:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8034A176ADE;
+	Thu, 22 May 2025 07:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="h2yatspl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hY37rOfe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B76221719
-	for <kvm@vger.kernel.org>; Thu, 22 May 2025 06:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8C52CCA5
+	for <kvm@vger.kernel.org>; Thu, 22 May 2025 07:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747896588; cv=none; b=Fy3PdxDWQ33x3NU/Y9TZHR25U1cUFn9z/1anoucjz7OTm4ljAXToxUxjmpHjLdtnMLlBJFemm0+IUEiCKESuhlS+LTKQPl1coYvbGiA2Ubn70j09sWsv5CQlu1tX8uGGcDnSpYIfXgUYUFnT+LQOa4qS+Co9P6xS2L4toAm1Nh8=
+	t=1747898214; cv=none; b=JvekOpywylQjV20plLYL8QFKNJBQxIcodHkXBq26cLI1TRgPSM4FBqhzF8VYGks+lQSt+VCI7KDuQQ9BUwndYvVftr67su3f0t+P8AF8hMXEng94zZhcFNWB4Ty6oemj78zt9xZfFKFJjX9Ghav14LbCyLDPWH5BHhLoEIMCZeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747896588; c=relaxed/simple;
-	bh=NN18PvERwtDdoTCnb8dTOMXJOoITZnwSQBbXNQA7a0Q=;
+	s=arc-20240116; t=1747898214; c=relaxed/simple;
+	bh=Dd3DbyBoUBtX+alT+PnASUiEyMpPfJwmsEuFbZmBDW8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GMnN1EU389WdWcV/yXAEOpXHoCQb4EoRwnREjSB7jJoE/XGMcgIb4C3QNgVKzfOz3INOVdi/E8w7bKJjVGqNs0K5ees6ZRHanCN+frxJ2BwDwit9gKZmQZGftj/hQX0EeGShmsE9Ga+PPB68pgvstJU1CLt7yR4WRjuEQUU2d74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=h2yatspl; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-441d437cfaaso47445235e9.1
-        for <kvm@vger.kernel.org>; Wed, 21 May 2025 23:49:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1747896584; x=1748501384; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mSfZsD4God9Ts/HLONlfHOWEtM7BhkFonFKtAqIE5Mk=;
-        b=h2yatspl14MsY6LqiXygHE0cZu/D0s7+Fwtp37NKiq43zLuVrS7EyQrIpZdKrEwA5Z
-         3OkjgQ8uFHAA16JzoSAM2WpHJ/vTXryyIsdHmW/dujtGIgcwXcOU0LAh2r8DcqaIg65o
-         O37E4sGvn3nNFoBLMYtZM69dk49IFsU2rFp6CJ/P4GaNUEgtebOV4LfuvWtV/EsuNKcl
-         tIRpk0OWE1pgkYRpOzufx69hWN6WWUIFfux/5KB9pyv2HP4cRWD3B0HCPAH9zkbk6892
-         0Eulj5wmVyX/UeCTt9zWBZ3lFUrlwr4VSvesTMJz6WrY7y6rJzqgP63Aya+jjE1DPKxv
-         OqmQ==
+	 In-Reply-To:Content-Type; b=THfXdcxWWNsyyxUzOs8Qu+Wy9wZmpdZO33I4OihjANVlwfnZjyoN+TxOwob6VYxzmi4tFFsPDVWmxwOnii2/4r3aQEjWa1I1+cllZoNENOZ8ncwQ3VYQ+MLWvmBMwzGOxAX029mof7wsgJlU79qyUUvN00AThn/8EkzIcIKMA6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hY37rOfe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747898212;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=BH+e353hd9ecWEwiDlpqwL0IFGKEl/jOjgPJnF+I8Kk=;
+	b=hY37rOfeEM+d5/YxFCEgksbeA9bXrmhnJi+/1wbM6j8Pa+ITeXEc8/jZDhbAO+sotqXwr6
+	0/o4IbNtrs57NVijqszojc0zBv6P2Afvg/yF4HUOQZnECPNRNngAtl/OTDhLyFzO+tw1Dk
+	aQfCHLhnqPcnb3TWKVs2EzwYzttN3NE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-464-mkfcsQ2GMO6a9hBx5hfcgg-1; Thu, 22 May 2025 03:16:50 -0400
+X-MC-Unique: mkfcsQ2GMO6a9hBx5hfcgg-1
+X-Mimecast-MFC-AGG-ID: mkfcsQ2GMO6a9hBx5hfcgg_1747898209
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-442cdf07ad9so42921545e9.2
+        for <kvm@vger.kernel.org>; Thu, 22 May 2025 00:16:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747896584; x=1748501384;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mSfZsD4God9Ts/HLONlfHOWEtM7BhkFonFKtAqIE5Mk=;
-        b=ZQ25MfJT9e6MOvUrO0TyloW4KeTTK33Ik6kYLW0+iuXSDS7Q1O8EnVV5XYGm2hQnC/
-         Gk0H9Wzk6Oxzj5kbamMwt4n0COEmlTt/50miLpWdKxOeIsTtjc0j766PNh2waMuWa6OF
-         mgqpzCOpLfOG8BOy8bE+d9PAFjrfUCm6UFz7hmGCcUnUE8knVXrRMYtwpUB2QbCnjxp/
-         H0fbsUhuPD47D4gdQN1hZA6i+zjLPJX5yHycBbCL3E+LYLKEximLtWKYHHYFIZ7ci+b3
-         H3WibyjohmtikyYABni5l2Ak8r2JledUBV6Pd/YkLFvMSEhEirPLMtl77QqHtfCAX0j+
-         NqAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVLWpKFO9XmzKq7BO46Vxy2IfjOymfAl4iPLo9U+PQ/8QA3VnQt31Q71pvnN9JQBObzk+I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxavbkg/Ecs9GLy3lEvlCnackcw4A0J0EgUgHGjUDUPLp3Pi5iJ
-	KhK1vnZbr0CcuSJGEZimO2T0uobT8YTKIp2Y9vdAPsH1ssA47H7BumaIqacexg9Gma4=
-X-Gm-Gg: ASbGncs/uzszm5vQxQSZxaOvHNJsHh4y+UnZHIgM0JaoaNCXwXPoL+UpA7CC1h48G9O
-	ZJkSE5D5CLJkIm3A17Hz9e+OJx0A0WWwsK68QppWXG9jbA4Cu+hOOGiximFcJOjZddOqkh1p6cI
-	l01i/EyMMW3+Bc//nUt/2n/E94T5qzliFc22tKNPfrFr6VKRfDlX1sBzPpLLhOJl602t9Y3hV6v
-	bn+IKKj9VWX+wVxlv3qbt31KKEZcd7jEpBKcaWqK6+TflLuK6jFB0G5DG9RnwaEzeWKh2X2/wFv
-	VgMFKVpI+rHZCFRuy8WyCc6GFHVgtpF09ic3rIziXtURyuehAqOMEqBHCx5nLG+VI/b2xLJqNsX
-	H/+hFSM3t0xq2OHV9wOjM
-X-Google-Smtp-Source: AGHT+IHcBrXU/Fz3UA3Men54JBGMvR7rPmgEKbKc+z1Guu78ah8GEwVQySPOphDeLouhsLRO/zwPHg==
-X-Received: by 2002:a05:600c:3c87:b0:442:d9f2:c6ef with SMTP id 5b1f17b1804b1-442fefd5f98mr249592835e9.2.1747896583771;
-        Wed, 21 May 2025 23:49:43 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f78b2f19sm90646175e9.32.2025.05.21.23.49.42
+        d=1e100.net; s=20230601; t=1747898209; x=1748503009;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BH+e353hd9ecWEwiDlpqwL0IFGKEl/jOjgPJnF+I8Kk=;
+        b=OSas87yx3Ol6Xu26TqKXSH66hh4SYZxOMbfiPoyQdgoioyt3vZ1O2CHrtvWAMOG3y3
+         TX72jzCycN0HqMdmh0CeWm8vxzs2Zt1iRpuc36wrgjtbX5C+RNV1s2cTV+2qspNEEHtm
+         P+uPvPqqxbf7VShc5+vSRN4sq+PKqICHW396ed98lFFdQ91nOECYvplEQyvgR0wjJQIt
+         oMh/jvFfDoOVA9Kcg7RsrAWM3xZJfeglzW2nBEvVWdUp08cm1CkvnP27WEOfotOGAHKW
+         hFQgxRr48EPyarha6SxsFyOQ8hBO9goCqBE1PF+HqOUS+qYOg4j5b8Tot2Fp3aWOLpYs
+         xjKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYXfpbqcOCUjt5BDHCdNekPUWcIt0E1lJxHJtyhJLkMbeyOBQD6QP4eut1quzWZk/CqSs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycyXS+wreK/qiK+oZIsE0MHufYBILcYyUL/oeN35g3qFsOpaKc
+	wXkBsXZJ/Iz/mrXx53E3ONjlPMr/5zvreTErMXYqE4/SGvH6DdEBpYVJNQN5Ma15ft2zqfxstQZ
+	LI5ZW4ZuMHER5srK3w5jR9VwjoHuxoICgPp+2s51lhmG7yNicGQ2GiA==
+X-Gm-Gg: ASbGncufzxCVXzsRcf/uUsAlc2SCHeqRv8wJxI8gUjpfUsc/yO4/0KNtwx74SpBR40P
+	zDjxsUXqsmttBNmvREkoathSQnmOpO5gc919KkhAAxdaOtoEn0ig8V4aK5EkccbY7TzR4dZn+2m
+	Rhd8itXUwX2IQyqyPX4Bv+Hm/ORrZqWCRSFm8mAcwRs3m0XALaGO4o92MXhcUfoh/Toog8yPL12
+	b7NiwNLNGQVU5fh6QDlq6HCnfeKMcAAAaCS0MYJ1XA8TwAeZndwdUSuiEdceKUyoq1PElZ4VyQK
+	aY+Y87/D09bbgpRIDYqeYb/8yD3eS8jDHOiPGaRSXMF9hfj0A2DgAa3f32Yoy0aOw75s27dOEDv
+	yfVTjW7BGUmvbEyB8DmGiRQxDr9GQTMi1co8wW1k=
+X-Received: by 2002:a05:600c:468a:b0:43d:47e:3205 with SMTP id 5b1f17b1804b1-442fefee29dmr207377815e9.11.1747898209325;
+        Thu, 22 May 2025 00:16:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IERsnp5vdfOsS6mxmuIJhy4WAK73gHgEMsN+dQIzRCBXHLhRJwj8waV3OBrGIlt2Y9USPyTuQ==
+X-Received: by 2002:a05:600c:468a:b0:43d:47e:3205 with SMTP id 5b1f17b1804b1-442fefee29dmr207377475e9.11.1747898208875;
+        Thu, 22 May 2025 00:16:48 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f22:2e00:6e71:238a:de9f:e396? (p200300d82f222e006e71238ade9fe396.dip0.t-ipconnect.de. [2003:d8:2f22:2e00:6e71:238a:de9f:e396])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca889a7sm22248682f8f.72.2025.05.22.00.16.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 May 2025 23:49:43 -0700 (PDT)
-Message-ID: <957c479e-6233-4294-ac03-ac20b87dfacd@rivosinc.com>
-Date: Thu, 22 May 2025 08:49:42 +0200
+        Thu, 22 May 2025 00:16:48 -0700 (PDT)
+Message-ID: <56e17793-efa2-44ea-9491-3217a059d3f3@redhat.com>
+Date: Thu, 22 May 2025 09:16:45 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,139 +90,183 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 09/14] riscv: misaligned: move emulated access
- uniformity check in a function
-To: Charlie Jenkins <charlie@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Samuel Holland <samuel.holland@sifive.com>,
- Andrew Jones <ajones@ventanamicro.com>, Deepak Gupta <debug@rivosinc.com>
-References: <20250515082217.433227-1-cleger@rivosinc.com>
- <20250515082217.433227-10-cleger@rivosinc.com> <aCu_ce-kVQsyjrh5@ghost>
- <126762fc-17ca-4e9d-94d0-3aed1ae321ff@rivosinc.com> <aCy3A6uUbnWoO9uC@ghost>
+Subject: Re: [PATCH v9 09/17] KVM: x86/mmu: Handle guest page faults for
+ guest_memfd with shared memory
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: tabba@google.com, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org,
+ mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com,
+ viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
+ akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+ chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+ dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
+ roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <diqzfrgx8olt.fsf@ackerleytng-ctop.c.googlers.com>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <aCy3A6uUbnWoO9uC@ghost>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <diqzfrgx8olt.fsf@ackerleytng-ctop.c.googlers.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-
-On 20/05/2025 19:08, Charlie Jenkins wrote:
-> On Tue, May 20, 2025 at 10:19:47AM +0200, Clément Léger wrote:
+>>> + * shared (i.e., non-CoCo VMs).
+>>> + */
+>>>    static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>>>    {
+>>> -	return IS_ENABLED(CONFIG_KVM_GMEM) &&
+>>> -	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+>>> +	struct kvm_memory_slot *slot;
+>>> +
+>>> +	if (!IS_ENABLED(CONFIG_KVM_GMEM))
+>>> +		return false;
+>>> +
+>>> +	slot = gfn_to_memslot(kvm, gfn);
+>>> +	if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shared(slot)) {
+>>> +		/*
+>>> +		 * For now, memslots only support in-place shared memory if the
+>>> +		 * host is allowed to mmap memory (i.e., non-Coco VMs).
+>>> +		 */
 >>
+>> Not accurate: there is no in-place conversion support in this series,
+>> because there is no such itnerface. So the reason is that all memory is
+>> shared for there VM types?
 >>
->> On 20/05/2025 01:32, Charlie Jenkins wrote:
->>> On Thu, May 15, 2025 at 10:22:10AM +0200, Clément Léger wrote:
->>>> Split the code that check for the uniformity of misaligned accesses
->>>> performance on all cpus from check_unaligned_access_emulated_all_cpus()
->>>> to its own function which will be used for delegation check. No
->>>> functional changes intended.
->>>>
->>>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->>>> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
->>>> ---
->>>>  arch/riscv/kernel/traps_misaligned.c | 20 ++++++++++++++------
->>>>  1 file changed, 14 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/arch/riscv/kernel/traps_misaligned.c b/arch/riscv/kernel/traps_misaligned.c
->>>> index e551ba17f557..287ec37021c8 100644
->>>> --- a/arch/riscv/kernel/traps_misaligned.c
->>>> +++ b/arch/riscv/kernel/traps_misaligned.c
->>>> @@ -647,6 +647,18 @@ bool __init check_vector_unaligned_access_emulated_all_cpus(void)
->>>>  }
->>>>  #endif
->>>>  
->>>> +static bool all_cpus_unaligned_scalar_access_emulated(void)
->>>> +{
->>>> +	int cpu;
->>>> +
->>>> +	for_each_online_cpu(cpu)
->>>> +		if (per_cpu(misaligned_access_speed, cpu) !=
+> 
+> True that there's no in-place conversion yet.
+> 
+> In this patch series, guest_memfd memslots support shared memory only
+> for specific VM types (on x86, that would be KVM_X86_DEFAULT_VM and
+> KVM_X86_SW_PROTECTED_VMs).
+> 
+> How about this wording:
+> 
+> Without conversion support, if the guest_memfd memslot supports shared
+> memory, all memory must be used as not private (implicitly shared).
+> 
+
+LGTM
+
+>>> +		return false;
+>>> +	}
+>>> +
+>>> +	return kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+>>>    }
+>>>    #else
+>>>    static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>>> index 2f499021df66..fe0245335c96 100644
+>>> --- a/virt/kvm/guest_memfd.c
+>>> +++ b/virt/kvm/guest_memfd.c
+>>> @@ -388,6 +388,23 @@ static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
 >>>
->>> misaligned_access_speed is only defined when
->>> CONFIG_RISCV_SCALAR_MISALIGNED. This function should return false when
->>> !CONFIG_RISCV_SCALAR_MISALIGNED and only use this logic otherwise.
+>>>    	return 0;
+>>>    }
+>>> +
+>>> +bool kvm_gmem_memslot_supports_shared(const struct kvm_memory_slot *slot)
+>>> +{
+>>> +	struct file *file;
+>>> +	bool ret;
+>>> +
+>>> +	file = kvm_gmem_get_file((struct kvm_memory_slot *)slot);
+>>> +	if (!file)
+>>> +		return false;
+>>> +
+>>> +	ret = kvm_gmem_supports_shared(file_inode(file));
+>>> +
+>>> +	fput(file);
+>>> +	return ret;
 >>
->> Hi Charlie,
+>> Would it make sense to cache that information in the memslot, to avoid
+>> the get/put?
 >>
->> misaligned_access_speed is defined in unaligned_access_speed.c which is
->> compiled based on CONFIG_RISCV_MISALIGNED (ditto for trap_misaligned.c)
+>> We could simply cache when creating the memslot I guess.
 >>
->> obj-$(CONFIG_RISCV_MISALIGNED)	+= unaligned_access_speed.o
->>
->> However, the declaration for it in the header cpu-feature.h however is
->> under a CONFIG_RISCV_SCALAR_MISALIGNED ifdef. So either the declaration
->> or the definition is wrong but the ifdefery soup makes it quite
->> difficult to understand what's going on.
->>
->> I would suggest to move the DECLARE_PER_CPU under
->> CONFIG_RISCV_MISALIGNED so that it reduces ifdef in traps_misaligned as
->> well.
 > 
-> Here is the patch I am using locally for testing purposes, but if there
-> is a way to reduce the number of ifdefs that is probably the better way to go:
+> When I wrote it I was assuming that to ensure correctness we should
+> check with guest memfd, like what if someone closed the gmem file in the
+> middle of the fault path?
 > 
+> But I guess after the discussion at the last call, since the faulting
+> process is long and racy, if this check passed and we go to guest memfd
+> and the file was closed, it would just fail so I guess caching is fine.
 
-Hi Charlie,
+Yes, that would be my assumption. I mean, we also msut make sure that if 
+the user does something stupid like that, that we won't trigger other 
+undesired code paths (like, suddenly the guest_memfd being !shared).
 
-I have another way to do so which indeed reduces the number of
-ifdef/duplicated functions. I'll submit that.
-
-Thanks,
-
-Clément
-
-> From 18f9a056d3b597934c931abdf72fb6e775ccb714 Mon Sep 17 00:00:00 2001
-> From: Charlie Jenkins <charlie@rivosinc.com>
-> Date: Mon, 19 May 2025 16:35:51 -0700
-> Subject: [PATCH] fixup! riscv: misaligned: move emulated access uniformity
->  check in a function
 > 
-> ---
->  arch/riscv/kernel/traps_misaligned.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+>> As an alternative ... could we simple get/put when managing the memslot?
 > 
-> diff --git a/arch/riscv/kernel/traps_misaligned.c b/arch/riscv/kernel/traps_misaligned.c
-> index f3ab84bc4632..1449c6a4ac21 100644
-> --- a/arch/riscv/kernel/traps_misaligned.c
-> +++ b/arch/riscv/kernel/traps_misaligned.c
-> @@ -647,6 +647,10 @@ bool __init check_vector_unaligned_access_emulated_all_cpus(void)
->  }
->  #endif
->  
-> +#ifdef CONFIG_RISCV_SCALAR_MISALIGNED
-> +
-> +static bool unaligned_ctl __read_mostly;
-> +
->  static bool all_cpus_unaligned_scalar_access_emulated(void)
->  {
->  	int cpu;
-> @@ -659,10 +663,6 @@ static bool all_cpus_unaligned_scalar_access_emulated(void)
->  	return true;
->  }
->  
-> -#ifdef CONFIG_RISCV_SCALAR_MISALIGNED
-> -
-> -static bool unaligned_ctl __read_mostly;
-> -
->  static void check_unaligned_access_emulated(void *arg __always_unused)
->  {
->  	int cpu = smp_processor_id();
-> @@ -716,6 +716,10 @@ bool unaligned_ctl_available(void)
->  	return unaligned_ctl;
->  }
->  #else
-> +static bool all_cpus_unaligned_scalar_access_emulated(void)
-> +{
-> +	return false;
-> +}
->  bool __init check_unaligned_access_emulated_all_cpus(void)
->  {
->  	return false;
+> What does a simple get/put mean here?
+
+s/simple/simply/
+
+So when we create the memslot, we'd perform the get, and when we destroy 
+the memslot, we'd do the put.
+
+Just an idea.
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
