@@ -1,79 +1,84 @@
-Return-Path: <kvm+bounces-47422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF701AC1813
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 01:37:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2CB1AC1819
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 01:37:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 204EF1C02DFD
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 23:38:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50211A40048
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 23:37:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1312494FC;
-	Thu, 22 May 2025 23:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D302271A73;
+	Thu, 22 May 2025 23:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3gVqDZtO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SkXKFSYA"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4802494F2
-	for <kvm@vger.kernel.org>; Thu, 22 May 2025 23:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3496A2494F5
+	for <kvm@vger.kernel.org>; Thu, 22 May 2025 23:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747957063; cv=none; b=n9+8orBg7hLh6tjwsv7Z618ERtflcR6NN+fJVi3OTq0xuw6zj/726GdKEcKzSTGFbCpC2bgZlqtSG3q9+THlkNasdC7A4OVw6PGKi6vgGWlsn95M/kVWAyP47gm0EVp/dnnt4sEWozZ2Tn5YfFeMLtPNHVW85E2J927kKvBHPnU=
+	t=1747957065; cv=none; b=Ke1V2h8TKAdCgTw4EqW62cwOn7IMKz2Fguu46UzELM5WRE6ElopnuHPFO1Dh7Fcj2skJLHS6SgKtuMwitVY1Hd2xt9afzmXDggaDC8VWTIDe+FMGb1JhwIppCEruxgfEoFguYc1camxSWVgSxsDeFFKig642e/JD+BDYqlJYHUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747957063; c=relaxed/simple;
-	bh=oTVlWh1gcp7bCeYlpUYBQDd7wlE8+qcbqgWaxSnQVpY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nhSnB3XggvFBFwy5Xoy9JST+1txEgzSgR5JUA1bCJ+vUoH1eIta5tnhwxzld9SlQFM7DG0Bv7q8SRqfwBREC8y6skGO8mGy66xAMTF9idG2XPcdK1bb16+7kSMtTavV1stXyGGnRXnGe21xcikEh9YlxYCpWoGG1GJo0qdWS2W0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3gVqDZtO; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1747957065; c=relaxed/simple;
+	bh=7HznakEWAX3QxiOzowEE528i6qDkLEzzGNrvSoNsN9c=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=F/2rPVTXRLKi0XWnUqWz0R3nXfpYPaq47siOEqqf6fMfKxJr6EUsBqJogGHGAnzUfb3guWwAm/JHtn/42XzSJh0d9YaQwEjluPl6Vgoe9LwrRFrNzu4aWggos99JhQTbzzeaI5ORTL+Y12gwl33tovkx1mbwZEzq8/RupwfY7Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SkXKFSYA; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30e9b2e7a34so4903292a91.0
-        for <kvm@vger.kernel.org>; Thu, 22 May 2025 16:37:42 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30e78145dc4so9496046a91.2
+        for <kvm@vger.kernel.org>; Thu, 22 May 2025 16:37:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747957062; x=1748561862; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C/GMxUFWnxczBclfWAPbx8KCz76D46/EtIUMIe5GBKE=;
-        b=3gVqDZtOgtdATAJrdcPO+6cdstCqUb9ZL/W8G6gTxdZyWGmb6VO7m7J9sr32vlgvOJ
-         qWCPc73CWvk8u0DwJOK3NiM5cDDq0eYPbst3OiiiR69XLhmq9cwba9hYlKSzIe9cRmk+
-         0k5v58Ab1/Re82sN+FnWQS0mB6bvudt8yAZ7oHSvAEoumP08qslNKY4S85dQhKPxxnEr
-         NhO/tirC1WbGxTYTqLJN48NsrQGXLyfrcbJ/iEIU9QFgJ5HYzRtbwX+1QsjJ48e6yLPc
-         +NH/6lvR0lxz3nbiqKU8uGH65R928caoVExgyrwkkprRW2nDSrfRuvkulLGWq8I/Sn60
-         eTWQ==
+        d=google.com; s=20230601; t=1747957063; x=1748561863; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=uPxUrn14vuCfCMnKXPuJKpCi+RnH/dlPI+aSAjTgJIQ=;
+        b=SkXKFSYApdsPjWpIPz5B9XNLdQ+eWKcQiy0NvTTO3iNZqGZGZopPabFBd65HjlaWYB
+         LOUSA3Uy0CijsNzYm9CcHH10rWoaK4Ge9UckmZndNmFjBBC39AU27wXZq0pdKrssiBuO
+         MRWCydZQFtPJVR5CHBsIwGdOBRVAo5ZOezsoTed+IKQ3oEjBfzIi0iHgCjrC4mS3jdXn
+         eFlJmq+UsK/oxPEMiQh9C6TQds++hzaLO3vYiDw4JZ7EpPlYFjen2Ohre3l2CGsUO0Pd
+         B/0l+RIg+qaqijPZ79zzJ0EO8uAcirnw4CoLiN1Ms120Uo627BKikUL0tT4c4/fkth76
+         E1qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747957062; x=1748561862;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C/GMxUFWnxczBclfWAPbx8KCz76D46/EtIUMIe5GBKE=;
-        b=e5q5qpgu+v/4vsu9R1PRGh/uSNVrsmFP/2xIby59WONmzWJ1iP7hRGA7pvzTV3k3U+
-         a1H4yi/6HaHq9LZ3irT5jJMlpVK2s2796BdM84iTurrbSvbWuZQpBlB5Wk4YQ2yJGS/6
-         YXCi2yQTZ7mm3sNI0xNakcD1xVNWYN77Y3GmkGj60AKBDc7AadX8Ckd1EttW8HLiOe1x
-         hvMqYLtgFkVd2GTQkoiakOZp85l5Tg5ZQ+vgIe+va5ZqIhrfHf7mbiCmpymuxSgpiyuw
-         9wiq/Vj8RgPmqZE3Ks59a9S29VWbAIQ5+KN0qqATXNH7sSNkYtZCHgIF+cdCcg+3uOhD
-         BFxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVDxay33fD4j/hwM9ue7enbQ3Cg50Ty69QgMD4VBX8FwG7q/C9jjS0fX2q/T9H8SpDAUSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweVYN/C8o6kOBs6nX5fBusgFwElV2bNjiLfsGSSUPCqWXUxbhR
-	Erir4N+RoCIFRoeWvwSEOnIawHle2xnC4RX5gZXn5LbcDAVoUi3KZtivp16RQ6DK7Y7o2ZEDqMR
-	MdUGXdg==
-X-Google-Smtp-Source: AGHT+IHSm7sbPUijyvF+pKq3GN2bRkSA6Knc8QK9FotWZGxL3nppVXhwWnhjgzynzLIZ6YqOyGWjDyGpsjI=
-X-Received: from pjbsw4.prod.google.com ([2002:a17:90b:2c84:b0:2fc:c98:ea47])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5143:b0:310:cf8f:6724
- with SMTP id 98e67ed59e1d1-310e9740405mr1477484a91.30.1747957061777; Thu, 22
- May 2025 16:37:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747957063; x=1748561863;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uPxUrn14vuCfCMnKXPuJKpCi+RnH/dlPI+aSAjTgJIQ=;
+        b=HvrnkUU3JbpnKaiI0UuHdPbLeE6MP3Rh6h8/6o4PiUODbNUl85NaPOZfr7jXCU9lDR
+         AylVapk6R08zdpRLz6lIHlNwAqQr5rsNDCZJj/kcAULpKBie2sV9kmXaCZxLY92j9x1t
+         Vkrd8PfeTmBRkBUaUuO6AQlz1pDBZLDl4YOUIK5yx0nZT1IfZYEuD7GDolCnaoG66kDY
+         QA1DZZ33u265lx8f9OtzE1vmW3TkYrZRjVaOnsbk7m1t3FnpwiVdGkpsg/7IZJ5v+1e9
+         XyWQeelUdTraRTHnlmvaU0RKbDW0yrQHLdhgCLheLkNNCAG7+5vIgbuhufZ3yzqRVKi6
+         Bwkw==
+X-Forwarded-Encrypted: i=1; AJvYcCWzcI3dCN02F/8EIsoUsRjVXa6KWKw1eOX7PTrRaqfUA9lSMWVyqbljQIS4Yw54HI41EgU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWCJ9A7BQ5y4J/SdUYjNAib5tm8Sa2SrW19hPhjxYelcVDLCT3
+	eaoEF/VypU5eoUeTCWDapWf+ezEsbF9jqj5i4cyD5Nzs4I72U2x3MfJzj6Gq0h1Fmg1ZoXCkL6M
+	92zcRbg==
+X-Google-Smtp-Source: AGHT+IGI69KyPY1At0pbvO9taKFOli2nLHw8tUa/zK4co4eocqDHMTFbGsbKlwZf9ojX+OImaEWTLGTboac=
+X-Received: from pjbsw15.prod.google.com ([2002:a17:90b:2c8f:b0:301:4260:4d23])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2c8c:b0:2fe:8c22:48b0
+ with SMTP id 98e67ed59e1d1-30e7d555a3bmr38071711a91.15.1747957063457; Thu, 22
+ May 2025 16:37:43 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 22 May 2025 16:37:24 -0700
+Date: Thu, 22 May 2025 16:37:25 -0700
+In-Reply-To: <20250522233733.3176144-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250522233733.3176144-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1151.ga128411c76-goog
-Message-ID: <20250522233733.3176144-1-seanjc@google.com>
-Subject: [PATCH v3 0/8] x86, KVM: Optimize SEV cache flushing
+Message-ID: <20250522233733.3176144-2-seanjc@google.com>
+Subject: [PATCH v3 1/8] drm/gpu: Remove dead checks on wbinvd_on_all_cpus()'s
+ return value
 From: Sean Christopherson <seanjc@google.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -87,59 +92,50 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Mingwei Zhang <mizhang@google.com>, Francesco Lavra <francescolavra.fl@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This is the combination of Kevin's WBNOINVD series[1] with Zheyun's targeted
-flushing series[2].  The combined goal is to use WBNOINVD instead of WBINVD
-when doing cached maintenance to prevent data corruption due to C-bit aliasing,
-and to reduce the number of cache invalidations by only performing flushes on
-CPUs that have entered the relevant VM since the last cache flush.
+Remove the checks and associated pr_err() on wbinvd_on_all_cpus() failure,
+as the helper has unconditionally returned 0/success since commit
+caa759323c73 ("smp: Remove smp_call_function() and on_each_cpu() return
+values").
 
-All of the non-KVM patches are frontloaded and based on v6.15-rc7, so that
-they can go through the tip tree (in a stable branch, please :-) ).
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ drivers/gpu/drm/drm_cache.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-v3:
- - Move the non-KVM patches to the front. [Ingo]
- - Add comments to document WBINVD vs. WBNOINVD. [Ingo]
- - Collect acks/reviews. [Ingo, Tom]
- - Rename xx_wbinvd_on_many_cpus() to xx_on_cpus_mask(). [Ingo]
- - Fix a repeated "be" in a comment. [Francesco]
-
-v2:
- - https://lore.kernel.org/all/20250516212833.2544737-1-seanjc@google.com
- - Add a missing -ENOMEM in __sev_guest_init(). [Tom]
- - Collect reviews. [Kai, Tom]
- - Fix stub prototypes. [Zheyun]
- - Kill off dead pr_err() code on DRM's wbinvd_on_all_cpus() usage.
-
-v1: https://lore.kernel.org/all/20250227014858.3244505-1-seanjc@google.com
-
-[1] https://lore.kernel.org/all/20250201000259.3289143-1-kevinloughlin@google.com
-[2] https://lore.kernel.org/all/20250128015345.7929-1-szy0127@sjtu.edu.cn
-
-Kevin Loughlin (2):
-  x86, lib: Add WBNOINVD helper functions
-  KVM: SEV: Prefer WBNOINVD over WBINVD for cache maintenance efficiency
-
-Sean Christopherson (3):
-  drm/gpu: Remove dead checks on wbinvd_on_all_cpus()'s return value
-  x86, lib: Drop the unused return value from wbinvd_on_all_cpus()
-  KVM: x86: Use wbinvd_on_cpu() instead of an open-coded equivalent
-
-Zheyun Shen (3):
-  x86, lib: Add wbinvd and wbnoinvd helpers to target multiple CPUs
-  KVM: SVM: Remove wbinvd in sev_vm_destroy()
-  KVM: SVM: Flush cache only on CPUs running SEV guest
-
- arch/x86/include/asm/smp.h           | 23 +++++++-
- arch/x86/include/asm/special_insns.h | 32 ++++++++++-
- arch/x86/kvm/svm/sev.c               | 85 +++++++++++++++++++---------
- arch/x86/kvm/svm/svm.h               |  1 +
- arch/x86/kvm/x86.c                   | 11 +---
- arch/x86/lib/cache-smp.c             | 26 ++++++++-
- drivers/gpu/drm/drm_cache.c          |  9 +--
- 7 files changed, 140 insertions(+), 47 deletions(-)
-
-
-base-commit: a5806cd506af5a7c19bcd596e4708b5c464bfd21
+diff --git a/drivers/gpu/drm/drm_cache.c b/drivers/gpu/drm/drm_cache.c
+index 7051c9c909c2..ea1d2d5d2c66 100644
+--- a/drivers/gpu/drm/drm_cache.c
++++ b/drivers/gpu/drm/drm_cache.c
+@@ -93,8 +93,7 @@ drm_clflush_pages(struct page *pages[], unsigned long num_pages)
+ 		return;
+ 	}
+ 
+-	if (wbinvd_on_all_cpus())
+-		pr_err("Timed out waiting for cache flush\n");
++	wbinvd_on_all_cpus();
+ 
+ #elif defined(__powerpc__)
+ 	unsigned long i;
+@@ -139,8 +138,7 @@ drm_clflush_sg(struct sg_table *st)
+ 		return;
+ 	}
+ 
+-	if (wbinvd_on_all_cpus())
+-		pr_err("Timed out waiting for cache flush\n");
++	wbinvd_on_all_cpus();
+ #else
+ 	WARN_ONCE(1, "Architecture has no drm_cache.c support\n");
+ #endif
+@@ -172,8 +170,7 @@ drm_clflush_virt_range(void *addr, unsigned long length)
+ 		return;
+ 	}
+ 
+-	if (wbinvd_on_all_cpus())
+-		pr_err("Timed out waiting for cache flush\n");
++	wbinvd_on_all_cpus();
+ #else
+ 	WARN_ONCE(1, "Architecture has no drm_cache.c support\n");
+ #endif
 -- 
 2.49.0.1151.ga128411c76-goog
 
