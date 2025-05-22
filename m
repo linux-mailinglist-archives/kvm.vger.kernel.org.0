@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-47350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E85AC067D
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 10:05:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB7AAC0683
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 10:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B1DE4E4A8D
-	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 08:05:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79F073AD28D
+	for <lists+kvm@lfdr.de>; Thu, 22 May 2025 08:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97EE261589;
-	Thu, 22 May 2025 08:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1140B2620C9;
+	Thu, 22 May 2025 08:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aymg8Yts"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LI6bwfy9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8137C2609EE
-	for <kvm@vger.kernel.org>; Thu, 22 May 2025 08:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CF8261580
+	for <kvm@vger.kernel.org>; Thu, 22 May 2025 08:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747901114; cv=none; b=OHhyHsfhtNkiXAZVcCl4gQyML9nSJt1JSyxqFqeZ43NBtdmY8Df/fKMG/1xyyAp56T5TlhgTvGb9bsX+4SpsO7b8Ohy9K0gKi3SMsYhmGGIGHI90rQTxTTxSn1QkABFvqbzTVx4tuuzP+0+ft0CnGAxCopHKkOVsv/ovDvxp4n0=
+	t=1747901136; cv=none; b=bugF8iZ6dovidxetZKPS/xVkpna58aqXJzZhgBDcUD7wEjCxsg663ykKZJK/MEnqAAH/wrAeq0VlBkkQc6PB3mME4RtmdzzNC0To0bXQCiHA2wYmVfO/SmqqNP8b8kuXZNlURKJM/AFxaPh6oRFEeXWVoHes32ZR+rN1f240RS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747901114; c=relaxed/simple;
-	bh=wxs7csRE3XeEa2HaCc9AcyuRKeM0KTS4eqAyS8l8t9E=;
+	s=arc-20240116; t=1747901136; c=relaxed/simple;
+	bh=XB1DMlWvcWPFzBP+Imok5+hdMej12hjrOWoDR2YlK1g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l1FfIOohmwO3qs/PIRBu7WpcHurqsLRhTI9EnqgOhBx9xnwjeZxgSzwYkLCywmPh6ZapzeMU4RVO5V+yGV9yuGSJCxSVb55wiB9RDoICqXE36ATiOi+QJI/2Zbl8zrA4a1UWCniOoXEwhF0EeS+iwBUmUTRKvoO4cqU5TUeEwNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Aymg8Yts; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=ToPETyGZtdmWsioCJcHntIR5DLDAB8VPOQCknmu8LdJrg8VkctZ5PitkdsvzaLB8DY8OwPfqf+PMD7cPW0SaOwSbfIFQ3EaNgCQS//SZbHVEf+pzj6AbGOY2inqor2sFEyag+CuGkE9N78GHoEznc0Tu6k0bPz2bkmeYO2LcN7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LI6bwfy9; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747901111;
+	s=mimecast20190719; t=1747901133;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=A2ioWDY4VnaW+8IoK+nfxRztpprRUfPENEYGqc38imY=;
-	b=Aymg8YtssMegXch83jypoxYBWRjC81gA+W+2JrCZoH4KB3hmt4t7T3e3tFrvEFoPRZce5A
-	dDGrFkNWdja1qgOE/TSa4iu7nZW+5Pgsb8pMswTLd1fhwWBTpLm91IIeoHZfHyMcd/s2Cp
-	CqfX20qu0CtXFArtlviRWToClQCVIMw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7k5iTkA7yVBLFLMB+U1JSV+k17S5HvwfFdvLDBIgyTc=;
+	b=LI6bwfy9f04rDvcn20p/leJGOJ8zvh/h2J90WiLQf6m4Mpbe0v5tHUGrfESfTNHtfGBcHc
+	4KR5c4rjgfzAc6QPbE6Ucz6gInH4SeM8KtqyyI87ozfKzpI3DoVIbHDOgjcLqO3HnZfN8u
+	6WASutCzzgP00VOoYiTvkPfw7NmO8cc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-534-615pVpCcN7y_n2Bh6NrOpA-1; Thu, 22 May 2025 04:05:09 -0400
-X-MC-Unique: 615pVpCcN7y_n2Bh6NrOpA-1
-X-Mimecast-MFC-AGG-ID: 615pVpCcN7y_n2Bh6NrOpA_1747901108
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a36416aef2so2452112f8f.1
-        for <kvm@vger.kernel.org>; Thu, 22 May 2025 01:05:09 -0700 (PDT)
+ us-mta-487-Nbrk1Q5BPvmC8ZMO_7M-vg-1; Thu, 22 May 2025 04:05:29 -0400
+X-MC-Unique: Nbrk1Q5BPvmC8ZMO_7M-vg-1
+X-Mimecast-MFC-AGG-ID: Nbrk1Q5BPvmC8ZMO_7M-vg_1747901129
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43ceeaf1524so41481215e9.1
+        for <kvm@vger.kernel.org>; Thu, 22 May 2025 01:05:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747901108; x=1748505908;
+        d=1e100.net; s=20230601; t=1747901129; x=1748505929;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A2ioWDY4VnaW+8IoK+nfxRztpprRUfPENEYGqc38imY=;
-        b=vXXkX1Tf1f3/Ofgyfy/X/rD+FG+XduQ9idCibnEzUSVtGT3dhqPs1I5c14lG04bRL1
-         0C/cs2WFfoPvTGSwZ209+BuVwC61zMlBftyAcQOzzUkFzPk7zUJF7/2XE2LLbmLwKYWw
-         bzfj1pORiwJpNWlNhDUrG8ep3iknuDW8ZXXIuMUa/x3W0uRWygaS/XxjATqih7xMMFoe
-         YK/S+wAse6ewY9Y4ofa9lCbh6UL8tEVyXLAs7qtg1D/9nBUIytAdh/OvYWSm44KNg4rm
-         4097n7MmoNr5wAyRm6xrUDXcktcs556HeejJMWgXlsx/Cw3pt6/Di+nxtDA2IFWsCWBg
-         BwVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWvJbYjThP4RRyHIMHy7z23fBikdc6t1UTPELuFN3W4g/0/5VJeridEYcOcawYB9/yl++Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywlbj8lb8nUm2LZIaTtQ0Tc0B/JJEWXquJYPq1mXwrhBXo8DByG
-	8ZUQduU4xsQzRRWQQ5MDJneRonbJbmnBzNNYWMXEuZghbrc8AlvlMvin/asWWu72jdJEVLsnW4o
-	KQG4kHOBqSOzz2ejdmdioQkK+5k3YHWfIdVA+wVBI8Qf8bursVfF/Ww==
-X-Gm-Gg: ASbGncuiNw4QYyDZrMYkzu6VsgD47w6j/RVdPPAA4rvY3YlrmHy9Y5z/tMw8Vbv67/7
-	M1yWvCNOnKRDHd5TtGpn5fYBLv1jqBr2qnXo/0WpBiUuflqKSeI09cpwTz+iPTN1ec9as4xAWEL
-	OzqL/P3uqK09zvIhH6nVJrCvcjjUAMoUred2Dz5LsFazhWIzOk+Ta9/0LqVSSPHjoM/oMSJLf8T
-	azUY87aseil11XqTL2yloX7NeaCI5U4v74xpujUznkqBwPFBWPjH95ZKCZpw2XJOJhf83904VDC
-	wNiqU5S+6skuRQre6hJ6Vw6jySG7gbtKihh0ftDjXlsp4xB8oNdy2YaxVua6
-X-Received: by 2002:a5d:5888:0:b0:3a4:7373:7179 with SMTP id ffacd0b85a97d-3a47373741fmr5304193f8f.21.1747901108283;
-        Thu, 22 May 2025 01:05:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IET+BoZdLjjXwzK++Hg7tw0FGXknQcCMl4uWniUd2z+PpZjOknS9vNZNNh286EYaTyLr1a3Ag==
-X-Received: by 2002:a5d:5888:0:b0:3a4:7373:7179 with SMTP id ffacd0b85a97d-3a47373741fmr5304163f8f.21.1747901107793;
-        Thu, 22 May 2025 01:05:07 -0700 (PDT)
+        bh=7k5iTkA7yVBLFLMB+U1JSV+k17S5HvwfFdvLDBIgyTc=;
+        b=vFTE8/1VpZ64E57QCwlI6wDr2v3P2orHXkmn9t7PaZzRUZHHXETwJS1hr2TX+AYPSY
+         RQjOP9t0fcb/qpXwLRqjXEeEfzlhnMCP0MBtJaBw+fzyGswK7awIkzedyZaMAxhvms/p
+         PaZcc5HG37TmDI0Zt99Skq7eYq638LDW1BOlkpIbGy4zOmB9YtFZO96+itHCD+aYI2L9
+         M8smMlLZDx4b6GkdBjiRhKhE1QgVPCgziuIBVZGftcHEUvUQp/Y0DxGeSH9wp7T9kWxx
+         S9xFtVkAklAU5ZkygNi0tgfiYw2Q/1VoiSdj55RFcztIdYbGz7aF2SQTX/8dcAPoOqM+
+         QEbw==
+X-Forwarded-Encrypted: i=1; AJvYcCW5q/DLt9xty8B4Maah8TUu9Fcg76VMxCxwpMboCKeT7n00UtHKDRy3tg8yJSJPJJ1+Td4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxX0SJ6XiE3NZmwfhrj24yZ9CH4uc0QdATcOg83AELUnXMMQPu
+	fhg0R5P9co+tvdERXNIjeXXJPWxJylLqNwBY4F36UbPm81B7fmmYdj6xmqZ8a8sG66L0xwCbS7W
+	VYp49W+JtYS4npyKi/HdbELnLvzi18b7nsfSxZ0urAgzqb86Pmw9j6w==
+X-Gm-Gg: ASbGncsd9L2zMI0lH6nkzURX3gCnpORNzkocjtDtqcSu4AiTA/KOYetBker/zNUZ/HE
+	7ShSlVxmJ4dUllbbWEVjqtLrnCsiuWonyenEjSmlxn0/sH+JWjQJefmE7E6g83JihYv6HkEmjYQ
+	tCienh1FeYsBt/UJZAKdObHhNne94pPZj6ZcvxEAjwBi1b+L8LB8+s+Db0UuWQ38jPtkBhA7AL5
+	VEwYRibOogvQDHtvqXYTo5xQvIvBhuGbutM5EIJa42oPmDygQXO6Qh4osRv9SYfAP/K05RBmQbe
+	lNec+6YEL343fAI2MKAoYURv2peWsHNlHC3m3w1RQaXi7oFcQY7KDKnlY+VC
+X-Received: by 2002:a05:600c:821b:b0:43b:bfa7:c7d with SMTP id 5b1f17b1804b1-442f84c2008mr257388745e9.2.1747901128584;
+        Thu, 22 May 2025 01:05:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGOJr/dg0WH1mCD/vKgYtxTFY+fPT/s3TzPpEZ0P+tVyaywIvhuNO5rWcBUW3o5S0oEleDuOw==
+X-Received: by 2002:a05:600c:821b:b0:43b:bfa7:c7d with SMTP id 5b1f17b1804b1-442f84c2008mr257388275e9.2.1747901128132;
+        Thu, 22 May 2025 01:05:28 -0700 (PDT)
 Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca62204sm21800704f8f.42.2025.05.22.01.05.06
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442ebd46aa4sm203871645e9.1.2025.05.22.01.05.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 May 2025 01:05:07 -0700 (PDT)
-Date: Thu, 22 May 2025 10:05:02 +0200
+        Thu, 22 May 2025 01:05:27 -0700 (PDT)
+Date: Thu, 22 May 2025 10:05:25 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Michal Luczaj <mhal@rbox.co>
 Cc: "David S. Miller" <davem@davemloft.net>, 
@@ -88,11 +88,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
 	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v6 3/5] vsock/test: Introduce vsock_wait_sent()
+Subject: Re: [PATCH net-next v6 4/5] vsock/test: Introduce enable_so_linger()
  helper
-Message-ID: <foo7xlczou4dl45qblliqfru4yaglxsudqbaejpnc27ocqmc5x@fdevtzvtdfwb>
+Message-ID: <hzkiu4tq7bxucsvjtc6pz2mkm2eoeoeqcygjtykuuo2jcfnbpv@2blkh2sdcp27>
 References: <20250522-vsock-linger-v6-0-2ad00b0e447e@rbox.co>
- <20250522-vsock-linger-v6-3-2ad00b0e447e@rbox.co>
+ <20250522-vsock-linger-v6-4-2ad00b0e447e@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -101,123 +101,77 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250522-vsock-linger-v6-3-2ad00b0e447e@rbox.co>
+In-Reply-To: <20250522-vsock-linger-v6-4-2ad00b0e447e@rbox.co>
 
-On Thu, May 22, 2025 at 01:18:23AM +0200, Michal Luczaj wrote:
->Distill the virtio_vsock_sock::bytes_unsent checking loop (ioctl SIOCOUTQ)
->and move it to utils. Tweak the comment.
+On Thu, May 22, 2025 at 01:18:24AM +0200, Michal Luczaj wrote:
+>Add a helper function that sets SO_LINGER. Adapt the caller.
 >
 >Signed-off-by: Michal Luczaj <mhal@rbox.co>
 >---
-> tools/testing/vsock/util.c       | 25 +++++++++++++++++++++++++
+> tools/testing/vsock/util.c       | 13 +++++++++++++
 > tools/testing/vsock/util.h       |  1 +
-> tools/testing/vsock/vsock_test.c | 23 ++++++-----------------
-> 3 files changed, 32 insertions(+), 17 deletions(-)
+> tools/testing/vsock/vsock_test.c | 10 +---------
+> 3 files changed, 15 insertions(+), 9 deletions(-)
 
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 >
 >diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->index de25892f865f07672da0886be8bd1a429ade8b05..4427d459e199f643d415dfc13e071f21a2e4d6ba 100644
+>index 4427d459e199f643d415dfc13e071f21a2e4d6ba..0c7e9cbcbc85cde9c8764fc3bb623cde2f6c77a6 100644
 >--- a/tools/testing/vsock/util.c
 >+++ b/tools/testing/vsock/util.c
->@@ -17,6 +17,7 @@
-> #include <assert.h>
-> #include <sys/epoll.h>
-> #include <sys/mman.h>
->+#include <linux/sockios.h>
->
-> #include "timeout.h"
-> #include "control.h"
->@@ -96,6 +97,30 @@ void vsock_wait_remote_close(int fd)
-> 	close(epollfd);
+>@@ -823,3 +823,16 @@ void enable_so_zerocopy_check(int fd)
+> 	setsockopt_int_check(fd, SOL_SOCKET, SO_ZEROCOPY, 1,
+> 			     "setsockopt SO_ZEROCOPY");
 > }
->
->+/* Wait until transport reports no data left to be sent.
->+ * Return false if transport does not implement the unsent_bytes() callback.
->+ */
->+bool vsock_wait_sent(int fd)
+>+
+>+void enable_so_linger(int fd, int timeout)
 >+{
->+	int ret, sock_bytes_unsent;
+>+	struct linger optval = {
+>+		.l_onoff = 1,
+>+		.l_linger = timeout
+>+	};
 >+
->+	timeout_begin(TIMEOUT);
->+	do {
->+		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
->+		if (ret < 0) {
->+			if (errno == EOPNOTSUPP)
->+				break;
->+
->+			perror("ioctl(SIOCOUTQ)");
->+			exit(EXIT_FAILURE);
->+		}
->+		timeout_check("SIOCOUTQ");
->+	} while (sock_bytes_unsent != 0);
->+	timeout_end();
->+
->+	return !ret;
+>+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
+>+		perror("setsockopt(SO_LINGER)");
+>+		exit(EXIT_FAILURE);
+>+	}
 >+}
->+
-> /* Create socket <type>, bind to <cid, port> and return the file descriptor. */
-> int vsock_bind(unsigned int cid, unsigned int port, int type)
-> {
 >diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index d1f765ce3eeeed8f738630846bb47c4f3f6f946f..91f9df12f26a0858777e1a65456f8058544a5f18 100644
+>index 91f9df12f26a0858777e1a65456f8058544a5f18..5e2db67072d5053804a9bb93934b625ea78bcd7a 100644
 >--- a/tools/testing/vsock/util.h
 >+++ b/tools/testing/vsock/util.h
->@@ -54,6 +54,7 @@ int vsock_stream_listen(unsigned int cid, unsigned int port);
-> int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
-> 			   struct sockaddr_vm *clientaddrp);
-> void vsock_wait_remote_close(int fd);
->+bool vsock_wait_sent(int fd);
-> void send_buf(int fd, const void *buf, size_t len, int flags,
-> 	      ssize_t expected_ret);
-> void recv_buf(int fd, void *buf, size_t len, int flags, ssize_t expected_ret);
+>@@ -80,4 +80,5 @@ void setsockopt_int_check(int fd, int level, int optname, int val,
+> void setsockopt_timeval_check(int fd, int level, int optname,
+> 			      struct timeval val, char const *errmsg);
+> void enable_so_zerocopy_check(int fd);
+>+void enable_so_linger(int fd, int timeout);
+> #endif /* UTIL_H */
 >diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 9ea33b78b9fcb532f4f9616b38b4d2b627b04d31..9d3a77be26f4eb5854629bb1fce08c4ef5485c84 100644
+>index 9d3a77be26f4eb5854629bb1fce08c4ef5485c84..b3258d6ba21a5f51cf4791514854bb40451399a9 100644
 >--- a/tools/testing/vsock/vsock_test.c
 >+++ b/tools/testing/vsock/vsock_test.c
->@@ -21,7 +21,6 @@
-> #include <poll.h>
-> #include <signal.h>
-> #include <sys/ioctl.h>
->-#include <linux/sockios.h>
-> #include <linux/time64.h>
+>@@ -1813,10 +1813,6 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
 >
-> #include "vsock_test_zerocopy.h"
->@@ -1280,7 +1279,7 @@ static void test_unsent_bytes_server(const struct test_opts *opts, int type)
-> static void test_unsent_bytes_client(const struct test_opts *opts, int type)
+> static void test_stream_linger_client(const struct test_opts *opts)
 > {
-> 	unsigned char buf[MSG_BUF_IOCTL_LEN];
->-	int ret, fd, sock_bytes_unsent;
->+	int fd;
+>-	struct linger optval = {
+>-		.l_onoff = 1,
+>-		.l_linger = 1
+>-	};
+> 	int fd;
 >
-> 	fd = vsock_connect(opts->peer_cid, opts->peer_port, type);
-> 	if (fd < 0) {
->@@ -1297,22 +1296,12 @@ static void test_unsent_bytes_client(const struct test_opts *opts, int type)
-> 	/* SIOCOUTQ isn't guaranteed to instantly track sent data. Even though
-> 	 * the "RECEIVED" message means that the other side has received the
-> 	 * data, there can be a delay in our kernel before updating the "unsent
->-	 * bytes" counter. Repeat SIOCOUTQ until it returns 0.
->+	 * bytes" counter. vsock_wait_sent() will repeat SIOCOUTQ until it
->+	 * returns 0.
-> 	 */
->-	timeout_begin(TIMEOUT);
->-	do {
->-		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
->-		if (ret < 0) {
->-			if (errno == EOPNOTSUPP) {
->-				fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
->-				break;
->-			}
->-			perror("ioctl");
->-			exit(EXIT_FAILURE);
->-		}
->-		timeout_check("SIOCOUTQ");
->-	} while (sock_bytes_unsent != 0);
->-	timeout_end();
->+	if (!vsock_wait_sent(fd))
->+		fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
->+
+> 	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+>@@ -1825,11 +1821,7 @@ static void test_stream_linger_client(const struct test_opts *opts)
+> 		exit(EXIT_FAILURE);
+> 	}
+>
+>-	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
+>-		perror("setsockopt(SO_LINGER)");
+>-		exit(EXIT_FAILURE);
+>-	}
+>-
+>+	enable_so_linger(fd, 1);
 > 	close(fd);
 > }
 >
