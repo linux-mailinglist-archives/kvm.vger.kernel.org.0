@@ -1,144 +1,174 @@
-Return-Path: <kvm+bounces-47609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47610-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4246FAC296B
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 20:17:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB1DBAC29CF
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 20:31:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E28831C04FDA
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 18:17:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A77317F5DB
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 18:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280A82989BC;
-	Fri, 23 May 2025 18:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE74E29B23C;
+	Fri, 23 May 2025 18:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J7aZHV8T"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="rhEIa+hf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1E9296FCE;
-	Fri, 23 May 2025 18:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681752989A5
+	for <kvm@vger.kernel.org>; Fri, 23 May 2025 18:30:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748024224; cv=none; b=mzY7zhnIg/RVCeag+g2/g2TK8kuj8/YOE5eA2jAt8UHWDxdyThXHqOLmtJxYgIEjuo6ZILQ0HkUEMMZEbMBTEHeyyFXmxgyloE26n4XCSYXFTMUx1jwWXCIiclO/o1Wz6g0mwMzC4sJCyRXLQybZGKN8psZDiBU7GKWL7pow2L4=
+	t=1748025051; cv=none; b=a5PBGok3G5QCWv8svecI+GbxYLHgFvDgWd6My/mensqjbQJc6OU3Tlo5ATiwTmdAU9+EG1AbT7yCQcg4d/97YGpPCKe1WdDzLuBVARdVoBX7/CaH3gtK4OyBRmP3wnZgEJfbhPbRwtF0UVwz0J6Q3P/BbQlBM0va1b5QcfqC7vI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748024224; c=relaxed/simple;
-	bh=0ojk3OmS08CSe+W0zcrgYl9JC/vymBwmSPVtv8lHsZg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BKtpMjtFkg9FnVIijUKz6c+MF2H9nB+MUvV0xQJZlBZtuNPOhxrDkA90Nye5xvhqHedHwoMpjd0MUFz1KsJUBE0VIaIv/a8g+zLOkCo2swzRTACVnxBmITE2pNjfTmqSn3T2m+CnFvXR4WnRpW2N0+z1LizR6SQGqZgtOLancGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J7aZHV8T; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3110807523aso207224a91.1;
-        Fri, 23 May 2025 11:17:02 -0700 (PDT)
+	s=arc-20240116; t=1748025051; c=relaxed/simple;
+	bh=JbUIjDHozqFZ2+ZIIgiUMiStVmYqgccKErpZffZ0FfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i6VLdJkrJBuqrNC+8j1QVBSB9ayeEbASIT7hnl/mS2xTUCNaSjD1dWpuegCj4k3aTtnF6tABr7GboM8MtkxxYkQh2ixxWgFB74WKN79cvkVldH3kKHTJDgWA72wDHEsSFkz6qoEYDckxt4i8mGjQT9GMQokfL+ch8Etll/RcAxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=rhEIa+hf; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b1f7357b5b6so106966a12.0
+        for <kvm@vger.kernel.org>; Fri, 23 May 2025 11:30:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748024222; x=1748629022; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zw/MOjfFz4K8rbGZR8XgD40DBGzetjJhkkywW+GhA0c=;
-        b=J7aZHV8T9b7/KtW7JRfEG1MgrVdO+WDYOHolzAU7NDfrxR5TfE2OZBHmgdu6471kAP
-         wn9/9Fj5W9gkV4e/YL07x3Bmfmlvlr8QFKEQbIw9E769wbIwKKTDkA+XMHZqutEP5Otl
-         tJoReaWDZgU5vE0V/l71K1pUmt3xTfww+LmrP1LH8OxkwlDenxu3TX9JSOfKYkbk1Td4
-         +/gmQ6q8P6eS5aov6hjMSX5d0r9ejrhiEEGTpcjx5Y7DT6eicaa75U9piAcLC4ogTB8b
-         wBpz/jpZ/bp2vVXezeBd4OuVy5bRFdA4rU4Dp+VHhELo9Uwo0WzA69oGftP9eRaEf3lC
-         VphA==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1748025047; x=1748629847; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gWbUHPNgvAgT5G9XCmvjzlBHTlpN3kX1yERm+5eFQko=;
+        b=rhEIa+hf27Y0eogw4f14fmL/RUgsPCjErP4boL5tqlV8qiJU5oNRGebUrW3BfBg/pl
+         HcXzZRCbqoSNCxHmt5M/FEFoY1vQIAA6gMLKstDImwuioj4yJOyHcPMujIPE8CuC3Rk4
+         lkWcWTRYa1V5brIK/1fGVlHa7Bhyqf5ZHS4762XOzAg9nL1gAkAbunOSfhjyz2FMTimR
+         9WHgPUMo+OOTOGAxDz4nXBQflbBr40xR1HDB2OB6DAkp0RfSjT/F3wE8KXMMvXV/43wD
+         5f0TZVNHIaevd7EJhxS7SD3x+qXkh4caexYLB3t/x5pf92rZqDsiWfotAhwq/uEtN45Q
+         8IOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748024222; x=1748629022;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Zw/MOjfFz4K8rbGZR8XgD40DBGzetjJhkkywW+GhA0c=;
-        b=bdpmu9gz4/4FzseEzYor/uvzlexepbU0QiPUG5cg7FIZYtc9GjUPDK+o7QjTYdmGIs
-         WlGP5EViDO5L1nNvQsUNQ9vPYmckXmtwjs/pufqZAcvpLJTHhjLb7DbBn6Kk7+itKu9B
-         ztOkGVQ7ReVkRqhLpDyX9+t86Y9BxEBAZAJ/5eTGC2oxU/Uz9BlC2Suo6yhTLg8GqnTf
-         02X/l4BTe8Wg6KQSZDd5fA62qaXKAex6UecFsbhiAQ4du1t8+A34HRiLAaxGLyYWel0O
-         uIrCm4d8jCaZViCrSXTqEKDISMEQHQHb0eKS9IH5hWdjKgZrZlLWIZnAcYAtDDzgaof6
-         ffKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVlzvYc794/YGkqqZMaluyIIYpbYi6rJUhUtyPDdZg6zIAqheWGgOHH4hQ9w2q7gJN3CHih4vsB+KTUJPtd@vger.kernel.org, AJvYcCXVeRVCQEUmE1/YSsQjmVo9M7Aa0JErMfLiEFYIsH7I1EEFbNY0+iMBep8P1ECSaYOmA0GdizcCzy5trnfS8FcQ@vger.kernel.org, AJvYcCXx8wpI6PyMB3Gv3lp5/76qbvlGLSV6/OpKvVKhIBnjqaM41uzviqA46T7fPNVja05oFJ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIVu2h3fpnntfE1KgamxUPyVikEm7yp/TEeQod6CdX95aAMCyv
-	wPmMNJpia57UC5Un6ocFKvnQoscdtOpyR9UZwb9YbA4Iku0Wq1GY3f1foRc4myIW
-X-Gm-Gg: ASbGncvQczIwmCTkL+8icheuxc8Qn/d77L1ExNF2Mg6awhvk+B8Nl2KO3q6+ZgVEi+R
-	H3t6iAb354b2KmT/jdkNYLsa0LJI0gJRdNMA+kbyHjyUc6WCO1ux1SG/oTnGDuTxcL/iwjBK2H0
-	OwyF0Z4IM0IByRkYgqSfvxuB6A9gyWIYkv6M5dK8wGyGKJlM43WCNUt/w6onDnvojPEsE3wqNQw
-	AZtVmum1hULVAJ729AGIUp4p6kR6WuSh+JZNq7LN29fXB8Lil4BKd1ylGaoq9nD6k0lgE1Il/wZ
-	eBExuUkwBZeJNHT2U91Awj1BlBcilIQyASmUIA4rlQOHp+66cX3WF0FUXavHhzQhgw==
-X-Google-Smtp-Source: AGHT+IEf1S7LbaPSzHV8k2IFf3PpHso3pvVQ+QAzZW4pDP/WKfKC7oWmOUIpUklfFxvE82AfwB0DEA==
-X-Received: by 2002:a17:90b:33cc:b0:30e:9349:2d83 with SMTP id 98e67ed59e1d1-311102ca4f8mr86444a91.5.1748024211490;
-        Fri, 23 May 2025 11:16:51 -0700 (PDT)
-Received: from rahul-mintos.ban-spse ([165.204.156.251])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30f365e5bd3sm7633099a91.37.2025.05.23.11.16.49
+        d=1e100.net; s=20230601; t=1748025047; x=1748629847;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gWbUHPNgvAgT5G9XCmvjzlBHTlpN3kX1yERm+5eFQko=;
+        b=OmkGu9D9H7mqO0ulk6yQ3yfPM2oExvNioeqRIurZMwwR+epgBMbq1DGgk5AQkqxJxQ
+         0nyTTSnhGz1YFHKEKGqMf3PUt02U75ALjX/JE4pEE+PM52OBdPITtRV8inDS7V6hQ9EN
+         OKE9dnyp2HdE+62FmImieDQGTpva2ofYf/4vsRKjqeiFjPxep2XHRUwjtwYwFSystJ1W
+         ZfJoa7nRpeiAmkPFoxiick9bY0q1W7xSzlURC8KwLJYWv7okXhizAjZ2FjXUCmlmtRVd
+         /vG5eZc8iHCLZQ/3ztljVULndA/rlNvrtIlkq472jgBedZtWKJJnCAFhNj+Jt/a4/CCK
+         XgQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWUI8V6aHADipxs3MWIbT3VargMUikzKaAlmGAjHBqBC4VLx6cUrQz9wlN6TsCQ7U5hsag=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywb/UtIsYA10GkUPOHbM9l0vlhlsnVf2pLOHj3Mo5KgMOLFh5ig
+	sVHhIOCtUnMpM2IfO3Oe20iiNd/w+cvCYyZHmdkLbf6w0etQf6XtaJHulMa6ONpizb0=
+X-Gm-Gg: ASbGncuIi8X87cEhYxIrWAa205KRL0LjFNkzTWX0t42lf7oNfAty/VVgaEyV+mvmQiv
+	9EpsQ0QTL76ZcTXjh8T6npQBWkswE0ViA33T4hyP0CNNAi4vv1uGCxJ1rpEG7dtVdv1l2IT4jHs
+	0xMoW3ZBKhsl6LtdcKPrEPM141RmsXuVR36F8HxuSmX9WLZce/lom6yJpj0cwf0gLFwCEuI5KBy
+	4qR9ekHlIl99Uw+FMgL5t9RY7Einqv3N50jxNDDihJxPNdhUlkXDGhedtKkwne9esUZCMnDoLOW
+	5nXMsJbzHAMAjvqfyk92Zm6FYMThyPAqC2Xd6KXoomfInt4=
+X-Google-Smtp-Source: AGHT+IF6EgWK2eUC5Xu5iRop7pXN3/Fhxf1IfDgAGTEelKq535OUbR+gaTA3ptsvLBrT9R7jy18zfQ==
+X-Received: by 2002:a17:90b:17c1:b0:310:c46c:ee6b with SMTP id 98e67ed59e1d1-31111a4c866mr121461a91.33.1748025046448;
+        Fri, 23 May 2025 11:30:46 -0700 (PDT)
+Received: from ghost ([2601:647:6700:64d0:bb2c:c7d9:9014:13ab])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-310f7eb53a9sm1014559a91.12.2025.05.23.11.30.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 May 2025 11:16:51 -0700 (PDT)
-From: Rahul Kumar <rk0006818@gmail.com>
-To: skhan@linuxfoundation.org
-Cc: pbonzini@redhat.com,
+        Fri, 23 May 2025 11:30:45 -0700 (PDT)
+Date: Fri, 23 May 2025 11:30:42 -0700
+From: Charlie Jenkins <charlie@rivosinc.com>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
 	linux-kselftest@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev,
-	rk0006818@gmail.com
-Subject: [PATCH] selftests: kvm: Fix spelling of 'occurrences' in sparsebit.c comments
-Date: Fri, 23 May 2025 23:43:52 +0530
-Message-ID: <20250523181606.568320-1-rk0006818@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Samuel Holland <samuel.holland@sifive.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Deepak Gupta <debug@rivosinc.com>
+Subject: Re: [PATCH v8 09/14] riscv: misaligned: move emulated access
+ uniformity check in a function
+Message-ID: <aDC-0qe5STR7ow4m@ghost>
+References: <20250523101932.1594077-1-cleger@rivosinc.com>
+ <20250523101932.1594077-10-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250523101932.1594077-10-cleger@rivosinc.com>
 
-Corrected two instances of the misspelled word 'occurences' to
-'occurrences' in comments explaining node invariants in sparsebit.c.
-These comments describe core behavior of the data structure and
-should be clear.
+On Fri, May 23, 2025 at 12:19:26PM +0200, Clément Léger wrote:
+> Split the code that check for the uniformity of misaligned accesses
+> performance on all cpus from check_unaligned_access_emulated_all_cpus()
+> to its own function which will be used for delegation check. No
+> functional changes intended.
+> 
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  arch/riscv/kernel/traps_misaligned.c | 20 ++++++++++++++------
+>  1 file changed, 14 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/riscv/kernel/traps_misaligned.c b/arch/riscv/kernel/traps_misaligned.c
+> index f1b2af515592..7ecaa8103fe7 100644
+> --- a/arch/riscv/kernel/traps_misaligned.c
+> +++ b/arch/riscv/kernel/traps_misaligned.c
+> @@ -645,6 +645,18 @@ bool __init check_vector_unaligned_access_emulated_all_cpus(void)
+>  }
+>  #endif
+>  
+> +static bool all_cpus_unaligned_scalar_access_emulated(void)
+> +{
+> +	int cpu;
+> +
+> +	for_each_online_cpu(cpu)
+> +		if (per_cpu(misaligned_access_speed, cpu) !=
+> +		    RISCV_HWPROBE_MISALIGNED_SCALAR_EMULATED)
+> +			return false;
+> +
+> +	return true;
+> +}
 
-Signed-off-by: Rahul Kumar <rk0006818@gmail.com>
----
- tools/testing/selftests/kvm/lib/sparsebit.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This ends up wasting time when !CONFIG_RISCV_SCALAR_MISALIGNED since it
+will always return false in that case. Maybe there is a way to simplify
+the ifdefs and still have performant code, but I don't think this is a
+big enough problem to prevent this patch from merging.
 
-diff --git a/tools/testing/selftests/kvm/lib/sparsebit.c b/tools/testing/selftests/kvm/lib/sparsebit.c
-index cfed9d26cc71..a99188f87a38 100644
---- a/tools/testing/selftests/kvm/lib/sparsebit.c
-+++ b/tools/testing/selftests/kvm/lib/sparsebit.c
-@@ -116,7 +116,7 @@
-  *
-  *   + A node with all mask bits set only occurs when the last bit
-  *     described by the previous node is not equal to this nodes
-- *     starting index - 1.  All such occurences of this condition are
-+ *     starting index - 1.  All such occurrences of this condition are
-  *     avoided by moving the setting of the nodes mask bits into
-  *     the previous nodes num_after setting.
-  *
-@@ -592,7 +592,7 @@ static struct node *node_split(struct sparsebit *s, sparsebit_idx_t idx)
-  *
-  *   + A node with all mask bits set only occurs when the last bit
-  *     described by the previous node is not equal to this nodes
-- *     starting index - 1.  All such occurences of this condition are
-+ *     starting index - 1.  All such occurrences of this condition are
-  *     avoided by moving the setting of the nodes mask bits into
-  *     the previous nodes num_after setting.
-  */
--- 
-2.43.0
+Reviewed-by: Charlie Jenkins <charlie@rivosinc.com>
+Tested-by: Charlie Jenkins <charlie@rivosinc.com>
 
-
-
-
-
-This patch fixes two misspellings of the word 'occurrences' in comments within sparsebit.c used by the KVM selftests.
-
-Fixing the spelling improves readability and clarity of the documented behavior.  
-Only comment text has been changed â€” there are no modifications to the functional logic of the tests.
-
-I would appreciate your review and any feedback you may have.
-
-Thank you for your time and support.
-
-Best regards,  
-Rahul Kumar
+> +
+>  #ifdef CONFIG_RISCV_SCALAR_MISALIGNED
+>  
+>  static bool unaligned_ctl __read_mostly;
+> @@ -683,8 +695,6 @@ static int cpu_online_check_unaligned_access_emulated(unsigned int cpu)
+>  
+>  bool __init check_unaligned_access_emulated_all_cpus(void)
+>  {
+> -	int cpu;
+> -
+>  	/*
+>  	 * We can only support PR_UNALIGN controls if all CPUs have misaligned
+>  	 * accesses emulated since tasks requesting such control can run on any
+> @@ -692,10 +702,8 @@ bool __init check_unaligned_access_emulated_all_cpus(void)
+>  	 */
+>  	on_each_cpu(check_unaligned_access_emulated, NULL, 1);
+>  
+> -	for_each_online_cpu(cpu)
+> -		if (per_cpu(misaligned_access_speed, cpu)
+> -		    != RISCV_HWPROBE_MISALIGNED_SCALAR_EMULATED)
+> -			return false;
+> +	if (!all_cpus_unaligned_scalar_access_emulated())
+> +		return false;
+>  
+>  	unaligned_ctl = true;
+>  	return true;
+> -- 
+> 2.49.0
+> 
 
