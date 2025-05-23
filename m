@@ -1,179 +1,109 @@
-Return-Path: <kvm+bounces-47531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 356C7AC1E4B
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 10:09:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3EC6AC1F58
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 11:09:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9DD817FC4F
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 08:09:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC0D07B5294
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 09:08:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E9E289812;
-	Fri, 23 May 2025 08:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420731487FE;
+	Fri, 23 May 2025 09:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="RD4QDQF3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mb2RyrUU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BFE284B5A
-	for <kvm@vger.kernel.org>; Fri, 23 May 2025 08:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979F022422F
+	for <kvm@vger.kernel.org>; Fri, 23 May 2025 09:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747987723; cv=none; b=gWzQ6SLoVx7nKJyTo8WFe8+trHbC4Q5f/BXEGlRK4lTZhrief5sJ9isUXiVKJvg3had7K5cUY1xPrKszyEhGvX50f5MdIR/vOHGgikvFyPRloO4RH3UibAu4kJk9z3u1K3BdC4je/auV/tx1Zk/YPmKav63dan8kCKZ7N5j4RaQ=
+	t=1747991362; cv=none; b=jtfJNfuxOjKqx5RxNQ/qV7fJyIV18AMn6hIbT6DPwNhhE0AbGkIK28bi4dfthr3mm6wg1l6vMUen9K4iC+P5ZmnDoErlViADykQOVVvthGbPycc7GpZQHCiCSAgHhkj8uBaCCicMWsLJboz+DE5XCsNRfjOiGygDwswwvYn7E+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747987723; c=relaxed/simple;
-	bh=Kt+RxnY5pPOUYQ7akI1IF5qpab3LUOao0bxzBmS+RxA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DvNHjg7M+9WPy+RaUj50CN/ClBDaxZB8olX78Iz1621ey+vuK/RgYIZmdh80bzocjKuOKImVJJPwxoD7KTYSyD5b2MZ7RbrKmnwycsHFZVmCfc/hP/m4w8YoY6ye0VO1sV1XE1xZN0IB/BRObhN1NTbuoSuwbR8AdGvY6+5oCsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=RD4QDQF3; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-329107e3f90so61091091fa.3
-        for <kvm@vger.kernel.org>; Fri, 23 May 2025 01:08:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1747987720; x=1748592520; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dypiNcBVG4OJMnXknsT6VxHNsIlokeB6DjiUVywy6W8=;
-        b=RD4QDQF3B4dm8aFADRsFpZ+bsz2mjkJHQq6KIQlYncKw6E3yhvkG2T2CkElSw406mS
-         TbTDCWwQHKQBhxgKE+VzUnQ4ouM1wngyZLIKu6+2MO1NxL/O3C//0EZEnC0c5fKKTpHM
-         vOEzLtzfhtzGdUlW1iLNQN+htF/LPG+Mda9VH5Wxp18WPqtdJ2EiKXWBLL7E3yJ/arXC
-         pwE5lC7Ul60MKOo7VqxOVqeqMp4xHYJwfAHLk/TnXxkfY29uebJxSNeCAjAw1EoKYCTJ
-         M0viOZTJNwCzpRFCWNGoReDzh1lRkHyjdq7UtXOzQ+DIR4PUKe+CqkpVpEVH/5R5CbcD
-         +EXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747987720; x=1748592520;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dypiNcBVG4OJMnXknsT6VxHNsIlokeB6DjiUVywy6W8=;
-        b=X/Q/voCiK6hzKIkxsS/V6USwH4UH0dtE/UIodsIWeSSl9TMeRvgPEZ0IF8kEl5fiBC
-         u6oy7hkf+SMh3yf7SeuNdVeRM106ZRlU0VVbek5MFFlaRRtryEiCmMNRUH4BdAjH7hhL
-         rOH8Ch48UXYxgkmArQVy3JRQU0EKbgELqfCx5HXBHek4J2t3bz2jgMTN24rlSoJ85CkM
-         zRbfwjCzY9WMOCip2hHSp6IL3E3EIWXNE4oTkoiSUo+wn32biTQ/7dgopHWMoL2qopwo
-         /WOcWx2b8w1PVn6713JFodMTcbbKg4d30Cu+TaXezbBVTZSBRIbN7ZbMkoe68v4+XD3q
-         JBRg==
-X-Forwarded-Encrypted: i=1; AJvYcCUBxbxDIyG+zAzZ+hWJy/Rc0rhoTC7/97+8JPsuAT/L1aEBGC3DQH3L1VIfPa8vA8m+X74=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcD329UDmkKxZFGG/qqFpT3DIFXImrgmpY2Y2WN/yAOH/45zYJ
-	pcwLnqGPHmMxW3R0J1xmSRvJCBnlZc59xjFW+umRriFdtZYw95uC+hrXxhBuwVSpl+8ivwFaXoD
-	QIbAy5FfxASwQNc6Niokd0I+s6lMPbqP8KU6xY+9TgQ==
-X-Gm-Gg: ASbGncuNdGD8fjnweCwfGBYMtzUDNuVOkXJWU0h6nORSLDbFatzhW8KBzwnaHVR/XjM
-	aaFmIbKaeaHVB8KvWIa18XTZ6ZMZ4ihGT3XkMZqijGXMTlU7UoW3NmUQu14NSIH/MaOxsYJ7nG4
-	4KnISsOx5fbmRCkRwB0raCtVZOkifPOB46
-X-Google-Smtp-Source: AGHT+IGBWGbvTx7BQMeoVdfMzTjiV714zLjub63DnKd4CcjGSz5Rh79IxGXRhtq0036FNv1p8KYTEfYuBPB1oZQn9Xs=
-X-Received: by 2002:a05:651c:e18:b0:30b:f775:bb25 with SMTP id
- 38308e7fff4ca-328097a7fd4mr82948211fa.36.1747987719490; Fri, 23 May 2025
- 01:08:39 -0700 (PDT)
+	s=arc-20240116; t=1747991362; c=relaxed/simple;
+	bh=CyAL8nGngyYPTPj/RyM0cG7AD5W56Xn51of35A6VfoY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QSh3dJJ0XEuaDxo+GIqI3q+8ImvjhxCCiIVHUuq3ub2Ibi8s42SwM+Bls6yAlPV/UNLZjyjg4UuJpqPFch0eCcGm3VxiO0OGASLfDQYe+3+ZqeF3j95AkYZMAKrA0fJihj1BDuDRWF5AfzGIvYT7p9/53eGAnFiAORQ9NmcBAUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mb2RyrUU; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747991360; x=1779527360;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=CyAL8nGngyYPTPj/RyM0cG7AD5W56Xn51of35A6VfoY=;
+  b=Mb2RyrUU02wE35xvPCPuu4OY26dSrz3C07mvmyIAZs+jivwsFz+Hq6A5
+   ZsvgpTmj3YQnNYDxmYmlznM9MUbuTuqYHdM8SsKWyt+Tk8kcc2bEi5bDL
+   Ar5xoKCSfAknSKmXo0ELyQvtiuHuxqxZ5XAbsoT2UT8a/RD2zb5qDTmDB
+   yx/AwzdztWCb40xBj+CIb3C6yJftSuJpctIZ1MT8Kh3XGcG9PNLFWJsAp
+   N4RwMdXWuyPfr7woxkemxVi+F8VXbczqo4XlABHAvbrYkrXrabTj5txe6
+   qBknv411RBFgPb20PxZMCFGgtz3i98NjtICljnIAh/w6FYSRUQQbgzPgR
+   g==;
+X-CSE-ConnectionGUID: rm50F+hARcSAR+n01iFr4g==
+X-CSE-MsgGUID: OBhXvhYKSaO32GwkwaXvtA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="67606273"
+X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
+   d="scan'208";a="67606273"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 02:09:20 -0700
+X-CSE-ConnectionGUID: //UJc5PXQB2PnkvugmWJrA==
+X-CSE-MsgGUID: sRYeCB40Q3O2bE8ZF/n6fA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
+   d="scan'208";a="141482016"
+Received: from emr-bkc.sh.intel.com ([10.112.230.82])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 02:09:17 -0700
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Chenyi Qiang <chenyi.qiang@intel.com>,
+	kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] nVMX: Fix testing failure for canonical checks when forced emulation is not available
+Date: Fri, 23 May 2025 17:08:31 +0800
+Message-ID: <20250523090848.16133-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515143723.2450630-4-rkrcmar@ventanamicro.com>
- <1a7a81fd-cf15-4b54-a805-32d66ced4517@linux.dev> <DA3CUGMQXZNW.2BF5WWE4ANFS0@ventanamicro.com>
-In-Reply-To: <DA3CUGMQXZNW.2BF5WWE4ANFS0@ventanamicro.com>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Fri, 23 May 2025 13:38:26 +0530
-X-Gm-Features: AX0GCFue-dsAlqCUbca0f2FbyJ1Uuu3t8ikYPvU9ghMwoHzDApFhc1zUuloECeE
-Message-ID: <CAK9=C2Xi3=9JL5f=0as2nEYKuRVTtJoL6Vdt_y2E06ta6G_07A@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] RISC-V: KVM: VCPU reset fixes
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: Atish Patra <atish.patra@linux.dev>, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Andrew Jones <ajones@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 23, 2025 at 12:47=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcm=
-ar@ventanamicro.com> wrote:
->
-> 2025-05-22T14:43:40-07:00, Atish Patra <atish.patra@linux.dev>:
-> > On 5/15/25 7:37 AM, Radim Kr=C3=84m=C3=83=C2=A1=C3=85 wrote:
-> >> Hello,
-> >>
-> >> the design still requires a discussion.
-> >>
-> >> [v3 1/2] removes most of the additional changes that the KVM capabilit=
-y
-> >> was doing in v2.  [v3 2/2] is new and previews a general solution to t=
-he
-> >> lack of userspace control over KVM SBI.
-> >>
-> >
-> > I am still missing the motivation behind it. If the motivation is SBI
-> > HSM suspend, the PATCH2 doesn't achieve that as it forwards every call
-> > to the user space. Why do you want to control hsm start/stop from the
-> > user space ?
->
-> HSM needs fixing, because KVM doesn't know what the state after
-> sbi_hart_start should be.
-> For example, we had a discussion about scounteren and regardless of what
-> default we choose in KVM, the userspace might want a different value.
-> I don't think that HSM start/stop is a hot path, so trapping to
-> userspace seems better than adding more kernel code.
+Use the _safe() variant instead of _fep_safe() to avoid failure if the
+forced emulated is not available.
 
-There are no implementation specific S-mode CSR reset values
-required at the moment. Whenever the need arises, we will extend
-the ONE_REG interface so that user space can specify custom
-CSR reset values at Guest/VM creation time. We don't need to
-forward SBI HSM calls to user space for custom S-mode CSR
-reset values.
+Fixes: 05fbb364b5b2 ("nVMX: add a test for canonical checks of various host state vmcs12 fields")
+Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+---
+ x86/vmx_tests.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
->
-> Forwarding all the unimplemented SBI ecalls shouldn't be a performance
-> issue, because S-mode software would hopefully learn after the first
-> error and stop trying again.
->
-> Allowing userspace to fully implement the ecall instruction one of the
-> motivations as well -- SBI is not a part of RISC-V ISA, so someone might
-> be interested in accelerating a different M-mode software with KVM.
->
-> I'll send v4 later today -- there is a missing part in [2/2], because
-> userspace also needs to be able to emulate the base SBI extension.
->
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 2f178227..01a15b7c 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -10881,12 +10881,11 @@ static int set_host_value(u64 vmcs_field, u64 value)
+ 	case HOST_BASE_GDTR:
+ 		sgdt(&dt_ptr);
+ 		dt_ptr.base = value;
+-		lgdt(&dt_ptr);
+-		return lgdt_fep_safe(&dt_ptr);
++		return lgdt_safe(&dt_ptr);
+ 	case HOST_BASE_IDTR:
+ 		sidt(&dt_ptr);
+ 		dt_ptr.base = value;
+-		return lidt_fep_safe(&dt_ptr);
++		return lidt_safe(&dt_ptr);
+ 	case HOST_BASE_TR:
+ 		/* Set the base and clear the busy bit */
+ 		set_gdt_entry(FIRST_SPARE_SEL, value, 0x200, 0x89, 0);
+-- 
+2.43.5
 
-Emulating entire SBI in user space has may challenges, here
-are few:
-
-1) SBI IPI in userspace will require an ioctl to trigger VCPU local
-interrupt which does not exist. We only have KVM ioctls to trigger
-external interrupts and MSIs.
-
-2) SBI RFENCE in userspace will requires HFENCE operation in
-user space which is not allowed by RISC-V ISA.
-
-3) SBI PMU uses Linux perf framework APIs to share counters
-between host and guest. The Linux perf APIs for guest perf events
-are not available to userspace as syscall or ioctl.
-
-4) SBI STA uses sched_info.run_delay which I am sure is not
-available to user space.
-
-5) SBI NACL when implemented will be using tons of HS-mode
-functionality (HS-mode CSRs, HFENCEs, etc.) to achieve the
-nested world-switch and none of these are accessible to userspace.
-
-6) SBI FWFT may require programming hstateenX CSRs which
-are not accessible to userspace.
-
-7) SBI DBTR requires direct coordination between the KVM RISC-V
-and kernel hw_breakpoint driver to share the debug triggers.
-
-... and so on ...
-
-Based on the above, emulating the entire SBI in user space is
-a non-starter. The best approach is to selectively forward SBI
-calls to user space where needed (e.g. SBI system reset,
-SBI system suspend, SBI debug console, etc.).
-
-Regards,
-Anup
 
