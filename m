@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-47505-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47506-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50FE5AC197E
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 03:16:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38C0BAC1980
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 03:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B6E2A465D0
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 01:15:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC68EA47BE0
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 01:15:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF906271441;
-	Fri, 23 May 2025 01:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411EB27146C;
+	Fri, 23 May 2025 01:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XltjOMjb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pQkE3iQA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600D82E62A8
-	for <kvm@vger.kernel.org>; Fri, 23 May 2025 01:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8443D2E62D8
+	for <kvm@vger.kernel.org>; Fri, 23 May 2025 01:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747962104; cv=none; b=CVIahVldG58S4VY0aEao7cRnudzBiGu7/EjoM4uf+8TaiZTTSn7/C+L81d0NnmfXKHm0tfDgwThxlWvSLgEmjTu/pZqB+vN+TC7PqQdMmE47fkRw3ccltb0TGHxA67LNe4uduXg2nuslLlRnVj2ce9DhmvYNOt39VL7gyZ/Pvp4=
+	t=1747962107; cv=none; b=Oht1UviUtNl2+Th5ZfAafwgH2cqNK1yKQ4biiUfNtRy9+q/SXQiVPH8Mfg7z34ftVeYxgO3U2XNNoHfn/5/4dyujXJp3/jG9NnUr+9sVxlIKhYBnehJIIP0UFWsDPVB1WkxfSUOOzJpt99FXzfwRAWw8m30UK6802ZkSPtGH3kM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747962104; c=relaxed/simple;
-	bh=KsfYh+dTBbuGfYNIW3ziFqaFVeYMMEL6fm+SPmkC5dI=;
+	s=arc-20240116; t=1747962107; c=relaxed/simple;
+	bh=2QBb5/XIqsfvIc456zHCbrENEH2By/61zuGLujz3Rzg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tgnVZg9YpozHh+Zn2ft3v4JlHX3NvZalKHulDZK9U1sbAnWiYiRA1rqfV22dmYLBfqmqwmKT+cxUPz9SsImxFkotNmXRG80kqRmdHeKKKnVKjTCI/PjKG8/ltEVOKgsQApkotXxRZPJ9unejDn1deUgrMmPCzhvwRJAsJ+on7XU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XltjOMjb; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=PYZ9RxfCzPJLeTiwawprMGiMVXEf+2Mp8IA6yRu3osvsVZxNnpcxGsQ8TuCPV7aOVIf0gOvPSE4ck0o2JHmFB7QZrvjd4BqJ0HH0IIMvF2NA0/818RjjukNfvMHTUAAjxW5b+ji6qkhgJCHt98eDs64bXjGQM2WysdO2F637Ook=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pQkE3iQA; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b115fb801bcso9189464a12.3
-        for <kvm@vger.kernel.org>; Thu, 22 May 2025 18:01:43 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b26e33ae9d5so8987272a12.1
+        for <kvm@vger.kernel.org>; Thu, 22 May 2025 18:01:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747962103; x=1748566903; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747962105; x=1748566905; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=R3ZFTLMU7HrPafLz7H8LY3RnxdvA+oHT6/HRYUM5hWg=;
-        b=XltjOMjb80WtYODBfejwxyX6buXksMHJ2vSyKU4N4HzI4wy1jRkX6IYdkK/YeBmhTY
-         0JKRPeicGVM5RRUB/AjA1pw2H454fl8Jf0l8d/3GGFRintXUsQfVpI8IIkhXNEv0nMm3
-         tP583wf55gAp92pAUQ15u4RsMxoRJXwuVn4pCnfj/DOu7KmVOR9u0bRcQd4WZAmRgapy
-         MF772Wr+Fo7A7EBLoVnTcyMqrH4reh7wjkT6BOCaM7Yz2zm+wiqnPhuLpF2cOZEHyj57
-         Bukvvzs7PT13PPeCSskbxR468rfkCpO/j0bwQctOVldNzs1qelVdoWL7E2Ptf/RHIybu
-         qEOA==
+        bh=/e9UYgTv1sZ7z5b1x8uYjd+06D7YFK/4pMDs1/TTKKw=;
+        b=pQkE3iQArSS8676fsw9Byw4I9Ma85rO5TXZ49manscyXA0joGlJDS7LqxBaviiRKPG
+         gIZlxPD3gsq5VYSrJcGeUu75quB7OCVEnPM2oDQ0a8sMIMx8i2Lwu/XPtJ/Tw5VrPwv+
+         uxlRz5Kyd3IVBXAnMGtuzumfIsZ16p4DcdZ918Bw6qI+RQpwl/E+uZaRDk9M0KAybhSx
+         6RXVvDrRasxb578YifH6y2u5UkUuevmQx94MsuXymZh5Nk3cRowaNyKaISJSVy2ADBzI
+         HfsuejliHUPkCMzCz9rVa521xb6avAFmChGHlIszJkrA1c8b17b+oVAV5S8q3q2W7byl
+         dakA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747962103; x=1748566903;
+        d=1e100.net; s=20230601; t=1747962105; x=1748566905;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=R3ZFTLMU7HrPafLz7H8LY3RnxdvA+oHT6/HRYUM5hWg=;
-        b=TzVfcPN/gwBRxqaVC3uKwUNCUWO/AIHXho2ZYyQBV5gip1yGgvm3R4gUfcL3KuXkMY
-         /qCEE0EKaX39ML+UzaRfYPJV3LlCYRh7qxQKAmCCQ8+XasVLVXOFIIxZ2kqqu449Uml2
-         LC/C+Ndhok0FE2Dy+Jz6NuCwAlpxjF1dkfibxqtKSgyAV0+7LXZ9FSHLeDX+mREjzn4J
-         xfVAprE0O0lE9D6UT/oDEzpiu0z2fdSu4IuEQToMIwiCtqg+mwy1I5FBNs2h+N+8b1zY
-         uJ/TxfxkTvX9lb7f77dq7wskkhJIf0ka5SmAQR9xuTdTYJXvvcQ58RWWAKT0ZNzMcaii
-         62DQ==
-X-Gm-Message-State: AOJu0Yy9RfLMo4wN/aGSebYGaD89XNz3vHCbP1ZOWF3Ic0rycTHcn6x5
-	BWT074bT//eBgp5hLiq4GYRekvNLO7LsWTsVRM2g3UVHSHpDHzIJHFQp+0zQN7sS5LFz6MaGh2N
-	/2zYb1Q==
-X-Google-Smtp-Source: AGHT+IEtGHV3UU5r6+on0Bi3QnTx914rosO/P/5CGIo8zL7GgKodqhGaDH9iis1m/ryoELkyNhSi6H+FbVI=
-X-Received: from pjbsi6.prod.google.com ([2002:a17:90b:5286:b0:2fc:1158:9fe5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f4c:b0:2ee:5958:828
- with SMTP id 98e67ed59e1d1-30e7d522155mr46027060a91.9.1747962102833; Thu, 22
- May 2025 18:01:42 -0700 (PDT)
+        bh=/e9UYgTv1sZ7z5b1x8uYjd+06D7YFK/4pMDs1/TTKKw=;
+        b=AJ9TOuUQHr1rz+qXawz3Pwer7EEoxqzmVV8nq9GhJHhgad6bww1X+cyQskrB5xIlOc
+         IyvfHLxG5v/+ZxL/QARoLg57HyUuQG2WcPh4I99YBBe2/gdlJZfMpmqbifA+pCsnoHMP
+         TkVoM7jER23vxCP0ICe1IdDBvxlKZ9vj4ZA2qWnBym7YFdgXFBTSbQ3iltERa0PrhztY
+         m70dhI8cTOfThiu28lKF9SaaTkuIfJC3Do/nvJs3HpwLTa4sWwLd/hyRZhKvqrrXutF1
+         gP4E3x5dAu8nUZPlsAe9Ugt4+EAMmdm+FxBrsYVEBx49Gy2fuPB65sCtmWhMOKXKmSk+
+         8djQ==
+X-Gm-Message-State: AOJu0YxGnLFNVw9n+/6Za4xgcs6PuYMZ2UCOBz1Iim2DBbjbUdLng9eW
+	rVvsLnI+sKndfIr03vS29amWF4z1+L/5mSTEpHjRYWDjMgrrl8fWzRqo5jB61Ke2uS/789UMIL0
+	TkNzsiQ==
+X-Google-Smtp-Source: AGHT+IEQRYTnAxDbAwwyPpwl8BUMXr/CByqDWtsE69Ozfi2WC7I9F1/uYDQUgOID+Lp8MTwFn4NoVPso1aA=
+X-Received: from pgbcz10.prod.google.com ([2002:a05:6a02:230a:b0:b0d:967f:23de])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:a103:b0:218:6dc8:2cb
+ with SMTP id adf61e73a8af0-2186dc802cfmr5175120637.0.1747962104546; Thu, 22
+ May 2025 18:01:44 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 22 May 2025 18:00:00 -0700
+Date: Thu, 22 May 2025 18:00:01 -0700
 In-Reply-To: <20250523010004.3240643-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250523010004.3240643-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1151.ga128411c76-goog
-Message-ID: <20250523010004.3240643-56-seanjc@google.com>
-Subject: [PATCH v2 55/59] KVM: SVM: Fold avic_set_pi_irte_mode() into its sole caller
+Message-ID: <20250523010004.3240643-57-seanjc@google.com>
+Subject: [PATCH v2 56/59] KVM: SVM: Don't check vCPU's blocking status when
+ toggling AVIC on/off
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>, 
@@ -87,96 +88,140 @@ Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
 	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Fold avic_set_pi_irte_mode() into avic_refresh_apicv_exec_ctrl() in
-anticipation of moving the __avic_vcpu_{load,put}() calls into the
-critical section, and because having a one-off helper with a name that's
-easily confused with avic_pi_update_irte() is unnecessary.
+Don't query a vCPU's blocking status when toggling AVIC on/off; barring
+KVM bugs, the vCPU can't be blocking when refreshing AVIC controls.  And
+if there are KVM bugs, ensuring the vCPU and its associated IRTEs are in
+the correct state is desirable, i.e. well worth any overhead in a buggy
+scenario.
 
-No functional change intended.
+Isolating the "real" load/put flows will allow moving the IOMMU IRTE
+(de)activation logic from avic_refresh_apicv_exec_ctrl() to
+avic_update_iommu_vcpu_affinity(), i.e. will allow updating the vCPU's
+physical ID entry and its IRTEs in a common path, under a single critical
+section of ir_list_lock.
 
 Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/avic.c | 52 ++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 29 deletions(-)
+ arch/x86/kvm/svm/avic.c | 65 +++++++++++++++++++++++------------------
+ 1 file changed, 37 insertions(+), 28 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index bb74705d6cfd..9ddec6f3ad41 100644
+index 9ddec6f3ad41..1e6e5d1f6b4e 100644
 --- a/arch/x86/kvm/svm/avic.c
 +++ b/arch/x86/kvm/svm/avic.c
-@@ -728,34 +728,6 @@ void avic_apicv_post_state_restore(struct kvm_vcpu *vcpu)
- 	avic_handle_ldr_update(vcpu);
+@@ -828,7 +828,7 @@ static void avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu)
+ 		WARN_ON_ONCE(amd_iommu_update_ga(cpu, irqfd->irq_bypass_data));
  }
  
--static void avic_set_pi_irte_mode(struct kvm_vcpu *vcpu, bool activate)
--{
--	int apic_id = kvm_cpu_get_apicid(vcpu->cpu);
--	unsigned long flags;
--	struct vcpu_svm *svm = to_svm(vcpu);
--	struct kvm_kernel_irqfd *irqfd;
--
--	/*
--	 * Here, we go through the per-vcpu ir_list to update all existing
--	 * interrupt remapping table entry targeting this vcpu.
--	 */
--	spin_lock_irqsave(&svm->ir_list_lock, flags);
--
--	if (list_empty(&svm->ir_list))
--		goto out;
--
--	list_for_each_entry(irqfd, &svm->ir_list, vcpu_list) {
--		void *data = irqfd->irq_bypass_data;
--
--		if (activate)
--			WARN_ON_ONCE(amd_iommu_activate_guest_mode(data, apic_id));
--		else
--			WARN_ON_ONCE(amd_iommu_deactivate_guest_mode(data));
--	}
--out:
--	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
--}
--
- static void svm_ir_list_del(struct kvm_kernel_irqfd *irqfd)
+-void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
++static void __avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
  {
- 	struct kvm_vcpu *vcpu = irqfd->irq_bypass_vcpu;
-@@ -990,6 +962,10 @@ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu)
- void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
- {
- 	bool activated = kvm_vcpu_apicv_active(vcpu);
-+	int apic_id = kvm_cpu_get_apicid(vcpu->cpu);
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	struct kvm_kernel_irqfd *irqfd;
-+	unsigned long flags;
- 
- 	if (!enable_apicv)
+ 	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
+ 	int h_physical_id = kvm_cpu_get_apicid(cpu);
+@@ -844,16 +844,6 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	if (WARN_ON_ONCE(vcpu->vcpu_id * sizeof(entry) >= PAGE_SIZE))
  		return;
-@@ -1001,7 +977,25 @@ void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
- 	else
- 		avic_vcpu_put(vcpu);
  
--	avic_set_pi_irte_mode(vcpu, activated);
-+	/*
-+	 * Here, we go through the per-vcpu ir_list to update all existing
-+	 * interrupt remapping table entry targeting this vcpu.
-+	 */
-+	spin_lock_irqsave(&svm->ir_list_lock, flags);
-+
-+	if (list_empty(&svm->ir_list))
-+		goto out;
-+
-+	list_for_each_entry(irqfd, &svm->ir_list, vcpu_list) {
-+		void *data = irqfd->irq_bypass_data;
-+
-+		if (activated)
-+			WARN_ON_ONCE(amd_iommu_activate_guest_mode(data, apic_id));
-+		else
-+			WARN_ON_ONCE(amd_iommu_deactivate_guest_mode(data));
-+	}
-+out:
-+	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
+-	/*
+-	 * No need to update anything if the vCPU is blocking, i.e. if the vCPU
+-	 * is being scheduled in after being preempted.  The CPU entries in the
+-	 * Physical APIC table and IRTE are consumed iff IsRun{ning} is '1'.
+-	 * If the vCPU was migrated, its new CPU value will be stuffed when the
+-	 * vCPU unblocks.
+-	 */
+-	if (kvm_vcpu_is_blocking(vcpu))
+-		return;
+-
+ 	/*
+ 	 * Grab the per-vCPU interrupt remapping lock even if the VM doesn't
+ 	 * _currently_ have assigned devices, as that can change.  Holding
+@@ -888,31 +878,33 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
  }
  
- void avic_vcpu_blocking(struct kvm_vcpu *vcpu)
+-void avic_vcpu_put(struct kvm_vcpu *vcpu)
++void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
++{
++	/*
++	 * No need to update anything if the vCPU is blocking, i.e. if the vCPU
++	 * is being scheduled in after being preempted.  The CPU entries in the
++	 * Physical APIC table and IRTE are consumed iff IsRun{ning} is '1'.
++	 * If the vCPU was migrated, its new CPU value will be stuffed when the
++	 * vCPU unblocks.
++	 */
++	if (kvm_vcpu_is_blocking(vcpu))
++		return;
++
++	__avic_vcpu_load(vcpu, cpu);
++}
++
++static void __avic_vcpu_put(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	unsigned long flags;
+-	u64 entry;
++	u64 entry = svm->avic_physical_id_entry;
+ 
+ 	lockdep_assert_preemption_disabled();
+ 
+ 	if (WARN_ON_ONCE(vcpu->vcpu_id * sizeof(entry) >= PAGE_SIZE))
+ 		return;
+ 
+-	/*
+-	 * Note, reading the Physical ID entry outside of ir_list_lock is safe
+-	 * as only the pCPU that has loaded (or is loading) the vCPU is allowed
+-	 * to modify the entry, and preemption is disabled.  I.e. the vCPU
+-	 * can't be scheduled out and thus avic_vcpu_{put,load}() can't run
+-	 * recursively.
+-	 */
+-	entry = svm->avic_physical_id_entry;
+-
+-	/* Nothing to do if IsRunning == '0' due to vCPU blocking. */
+-	if (!(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK))
+-		return;
+-
+ 	/*
+ 	 * Take and hold the per-vCPU interrupt remapping lock while updating
+ 	 * the Physical ID entry even though the lock doesn't protect against
+@@ -932,7 +924,24 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
+ 		WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
+ 
+ 	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
++}
+ 
++void avic_vcpu_put(struct kvm_vcpu *vcpu)
++{
++	/*
++	 * Note, reading the Physical ID entry outside of ir_list_lock is safe
++	 * as only the pCPU that has loaded (or is loading) the vCPU is allowed
++	 * to modify the entry, and preemption is disabled.  I.e. the vCPU
++	 * can't be scheduled out and thus avic_vcpu_{put,load}() can't run
++	 * recursively.
++	 */
++	u64 entry = to_svm(vcpu)->avic_physical_id_entry;
++
++	/* Nothing to do if IsRunning == '0' due to vCPU blocking. */
++	if (!(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK))
++		return;
++
++	__avic_vcpu_put(vcpu);
+ }
+ 
+ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu)
+@@ -973,9 +982,9 @@ void avic_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
+ 	avic_refresh_virtual_apic_mode(vcpu);
+ 
+ 	if (activated)
+-		avic_vcpu_load(vcpu, vcpu->cpu);
++		__avic_vcpu_load(vcpu, vcpu->cpu);
+ 	else
+-		avic_vcpu_put(vcpu);
++		__avic_vcpu_put(vcpu);
+ 
+ 	/*
+ 	 * Here, we go through the per-vcpu ir_list to update all existing
 -- 
 2.49.0.1151.ga128411c76-goog
 
