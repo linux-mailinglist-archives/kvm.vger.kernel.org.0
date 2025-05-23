@@ -1,208 +1,301 @@
-Return-Path: <kvm+bounces-47521-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47522-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01028AC1AC7
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 05:49:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C513AC1B30
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 06:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19E393B1A54
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 03:49:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36459A42252
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 04:39:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF84B223335;
-	Fri, 23 May 2025 03:49:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DC922DF8A;
+	Fri, 23 May 2025 04:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VrG+HFJM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qlCKyVVK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BA01519A0;
-	Fri, 23 May 2025 03:49:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05BF1547F2;
+	Fri, 23 May 2025 04:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747972149; cv=none; b=A0vX/MpFbE0KvFWZbyj6H6FxJIw12tapgU/HguL+uU/JOx62dui5N/kB7aDysQOjmbCoKf7qcRsxfw9LvAbTxywiC/zK/KiUzpuhFUXB2KuK5jEvqz9vNQF6YYsizA1CP9B923kQiiFvcuZ8BHnJzE8o1YhT+kBzjtp+sfpc8Rw=
+	t=1747975179; cv=none; b=mK/qWrv8+QhDppD82jepqE+W30f2r4Yus6Bo8QUuIpAJf4Q7vF/L3vM7y1uYVgzvwkbOatSeszyXFG5CqBBn6jJyiuahdK5pkM/azcqtyQnXo05tbRIyoB6vaQ/V1j97aJOAiCmom7yg/6Fks5Scme02rutTNMlRg40jNI79B/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747972149; c=relaxed/simple;
-	bh=W0I1h/EFOaXWHoneVKr55BZEEapiZElQ6WMainFSWps=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kZvOpb1LPVQPP28KiDftXSj1FcMAHrw9rqu/IoOHA4V+GX3AIC4nr5oAJv3qGIigjwegLU0STmfY2LDBDCENWZEIlTNEAmj/4RkCk2RTNbIsgqOFzi7gmkdeLp0kCsw9kZfXKXJu7+iB1hdpK7T8FHQdwRJOuTh7GzfUBJj+kDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VrG+HFJM; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747972147; x=1779508147;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=W0I1h/EFOaXWHoneVKr55BZEEapiZElQ6WMainFSWps=;
-  b=VrG+HFJM91OCsbD6N9+HLYS3XnDpXuLdP6ll4N+DqJZEzElPR9XhT1EV
-   lmA+QNLHGN95GRAkmjFVvJkx0BBwwyt7oIY9E1/M1O5naca8DHLTJtTRR
-   cewSfhF8ElS1vVHAi4Q23pbJjo2gg53C439VYOBAydCqp/XLcPZDZQQ35
-   O8bI8mvtZNFrxYtH/zeiS/JERhN1Eci4W4lRiFSERjSmApyyAslUz3Jnw
-   f8Zq0nVcZ+77pR7/MJy8GXO1wPUYPtDk5BhbRZaii2S8kbfVI0Ho3Xmox
-   UeuqBQvumPVwQohKALtjase5wQoXU9V4puhwzqI6URcteAT5/O5NulpK+
-   g==;
-X-CSE-ConnectionGUID: LAsLKR51SjSmMAXOw9wqBA==
-X-CSE-MsgGUID: d+eFs/pyRQavSbLtqYvkWg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="49915778"
-X-IronPort-AV: E=Sophos;i="6.15,307,1739865600"; 
-   d="scan'208";a="49915778"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2025 20:49:06 -0700
-X-CSE-ConnectionGUID: dkunbL94RdmQJVUYFsoLtw==
-X-CSE-MsgGUID: 2AmUQwVESvaXiXzhANKj0w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,307,1739865600"; 
-   d="scan'208";a="140747623"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 22 May 2025 20:49:02 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uIJP2-000PzW-0E;
-	Fri, 23 May 2025 03:49:00 +0000
-Date: Fri, 23 May 2025 11:48:20 +0800
-From: kernel test robot <lkp@intel.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-	borntraeger@de.ibm.com, seiden@linux.ibm.com, nsg@linux.ibm.com,
-	nrb@linux.ibm.com, david@redhat.com, hca@linux.ibm.com,
-	agordeev@linux.ibm.com, svens@linux.ibm.com, gor@linux.ibm.com,
-	schlameuss@linux.ibm.com
-Subject: Re: [PATCH v3 3/4] KVM: s390: refactor and split some gmap helpers
-Message-ID: <202505231158.TssIVgKH-lkp@intel.com>
-References: <20250522132259.167708-4-imbrenda@linux.ibm.com>
+	s=arc-20240116; t=1747975179; c=relaxed/simple;
+	bh=NLp+yNLHFbt0GV+WqSgZP5Jpw7SgnlmemsBZjPqNKQ0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=B4UU44tPgzEwmMyrmeylv4DMVBJy+qpmXqRhUpKFO48dAcHCPEgRf1tiA99OUMUt28Ejyl4xePWyP8PgsthHoSrTyX37PJVGL7DQ8zURsnDhP5umqjZD0db8mUrVGAhtAFHqP6UhhbSTFq659/a1+YSy9U5ZeMOzf4PWcI948Dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qlCKyVVK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B20AC4AF0D;
+	Fri, 23 May 2025 04:39:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747975178;
+	bh=NLp+yNLHFbt0GV+WqSgZP5Jpw7SgnlmemsBZjPqNKQ0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=qlCKyVVKLEZ335sLpg+xeLE2/qJ62IS1vyetoyVip+Yyuu60s5XnBtQe5q0zKHjkY
+	 etIn1cA5kgQZxhhqM+nSxGwqYnlKxif2/cg4HxcmNEaoJHzj2/Pcc2IIer9ePMC4cd
+	 uGYmI/++s2hmct2fKbHy78u8wyTDLJ9Qr3pbUq4On2urBYfO/BnItaRSZDMTze51z2
+	 9SqS6uc8MgyJZ7iZNxcJfybotHxmcUdOg9IQMoBb5yyyEv89ZE92csR4rfVug2cgbq
+	 pJXOOhWsQy2pRnAaCatN/HP5mgoiLLeblf2rFZpESNcCsQJC/We44mKVQiW8lD++UD
+	 FomvAY7ZOyPhQ==
+From: Kees Cook <kees@kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Kees Cook <kees@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+	Hans de Goede <hdegoede@redhat.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Mike Rapoport <rppt@kernel.org>,
+	Michal Wilczynski <michal.wilczynski@intel.com>,
+	Juergen Gross <jgross@suse.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Roger Pau Monne <roger.pau@citrix.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Usama Arif <usama.arif@bytedance.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Brian Gerst <brgerst@gmail.com>,
+	kvm@vger.kernel.org,
+	ibm-acpi-devel@lists.sourceforge.net,
+	platform-driver-x86@vger.kernel.org,
+	linux-acpi@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-efi@vger.kernel.org,
+	linux-mm@kvack.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Marco Elver <elver@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-kernel@vger.kernel.org,
+	kasan-dev@googlegroups.com,
+	linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [PATCH v2 04/14] x86: Handle KCOV __init vs inline mismatches
+Date: Thu, 22 May 2025 21:39:14 -0700
+Message-Id: <20250523043935.2009972-4-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250523043251.it.550-kees@kernel.org>
+References: <20250523043251.it.550-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250522132259.167708-4-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6526; i=kees@kernel.org; h=from:subject; bh=NLp+yNLHFbt0GV+WqSgZP5Jpw7SgnlmemsBZjPqNKQ0=; b=owGbwMvMwCVmps19z/KJym7G02pJDBn6v3/M6Lj0TL3UZvEPryO2U1XiwmeUWRnm7Ltu8Tv7T fejWHWxjhIWBjEuBlkxRZYgO/c4F4+37eHucxVh5rAygQxh4OIUgIncPMDIMF2RL/S7vLKpfM2M t8x3m+UdDqwvS9xyTbb4p4asf8qChQw/nnGmzL67VZLb8E8Q7+r/36asCDud1Su0ufrUxFOvRAJ YAA==
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-Hi Claudio,
+When KCOV is enabled all functions get instrumented, unless the
+__no_sanitize_coverage attribute is used. To prepare for
+__no_sanitize_coverage being applied to __init functions, we have to
+handle differences in how GCC's inline optimizations get resolved. For
+x86 this means forcing several functions to be inline with
+__always_inline.
 
-kernel test robot noticed the following build errors:
+Signed-off-by: Kees Cook <kees@kernel.org>
+---
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: <x86@kernel.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
+Cc: Hans de Goede <hdegoede@redhat.com>
+Cc: "Ilpo Järvinen" <ilpo.jarvinen@linux.intel.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Len Brown <lenb@kernel.org>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: Mike Rapoport <rppt@kernel.org>
+Cc: Michal Wilczynski <michal.wilczynski@intel.com>
+Cc: Juergen Gross <jgross@suse.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc: Roger Pau Monne <roger.pau@citrix.com>
+Cc: David Woodhouse <dwmw@amazon.co.uk>
+Cc: Usama Arif <usama.arif@bytedance.com>
+Cc: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Brian Gerst <brgerst@gmail.com>
+Cc: <kvm@vger.kernel.org>
+Cc: <ibm-acpi-devel@lists.sourceforge.net>
+Cc: <platform-driver-x86@vger.kernel.org>
+Cc: <linux-acpi@vger.kernel.org>
+Cc: <linux-trace-kernel@vger.kernel.org>
+Cc: <linux-efi@vger.kernel.org>
+Cc: <linux-mm@kvack.org>
+---
+ arch/x86/include/asm/acpi.h          | 4 ++--
+ arch/x86/include/asm/realmode.h      | 2 +-
+ include/linux/acpi.h                 | 4 ++--
+ include/linux/bootconfig.h           | 2 +-
+ include/linux/efi.h                  | 2 +-
+ include/linux/memblock.h             | 2 +-
+ arch/x86/kernel/kvm.c                | 2 +-
+ drivers/platform/x86/thinkpad_acpi.c | 4 ++--
+ 8 files changed, 11 insertions(+), 11 deletions(-)
 
-[auto build test ERROR on kvms390/next]
-[also build test ERROR on s390/features kvm/queue kvm/next mst-vhost/linux-next linus/master v6.15-rc7 next-20250522]
-[cannot apply to kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Claudio-Imbrenda/s390-remove-unneeded-includes/20250522-212623
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git next
-patch link:    https://lore.kernel.org/r/20250522132259.167708-4-imbrenda%40linux.ibm.com
-patch subject: [PATCH v3 3/4] KVM: s390: refactor and split some gmap helpers
-config: s390-randconfig-001-20250523 (https://download.01.org/0day-ci/archive/20250523/202505231158.TssIVgKH-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250523/202505231158.TssIVgKH-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505231158.TssIVgKH-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   arch/s390/mm/gmap_helpers.c: In function 'ptep_zap_swap_entry':
->> arch/s390/mm/gmap_helpers.c:26:7: error: implicit declaration of function 'non_swap_entry'; did you mean 'init_wait_entry'? [-Werror=implicit-function-declaration]
-     if (!non_swap_entry(entry))
-          ^~~~~~~~~~~~~~
-          init_wait_entry
->> arch/s390/mm/gmap_helpers.c:28:11: error: implicit declaration of function 'is_migration_entry'; did you mean 'list_first_entry'? [-Werror=implicit-function-declaration]
-     else if (is_migration_entry(entry))
-              ^~~~~~~~~~~~~~~~~~
-              list_first_entry
->> arch/s390/mm/gmap_helpers.c:29:33: error: implicit declaration of function 'pfn_swap_entry_folio'; did you mean 'filemap_dirty_folio'? [-Werror=implicit-function-declaration]
-      dec_mm_counter(mm, mm_counter(pfn_swap_entry_folio(entry)));
-                                    ^~~~~~~~~~~~~~~~~~~~
-                                    filemap_dirty_folio
-   arch/s390/mm/gmap_helpers.c:29:33: warning: passing argument 1 of 'mm_counter' makes pointer from integer without a cast [-Wint-conversion]
-      dec_mm_counter(mm, mm_counter(pfn_swap_entry_folio(entry)));
-                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-   In file included from arch/s390/mm/gmap_helpers.c:9:
-   include/linux/mm.h:2725:44: note: expected 'struct folio *' but argument is of type 'int'
-    static inline int mm_counter(struct folio *folio)
-                                 ~~~~~~~~~~~~~~^~~~~
->> arch/s390/mm/gmap_helpers.c:30:2: error: implicit declaration of function 'free_swap_and_cache'; did you mean 'free_pgd_range'? [-Werror=implicit-function-declaration]
-     free_swap_and_cache(entry);
-     ^~~~~~~~~~~~~~~~~~~
-     free_pgd_range
-   arch/s390/mm/gmap_helpers.c: In function 'gmap_helper_zap_one_page':
->> arch/s390/mm/gmap_helpers.c:60:27: error: implicit declaration of function 'pte_to_swp_entry'; did you mean 'ptep_zap_swap_entry'? [-Werror=implicit-function-declaration]
-      ptep_zap_swap_entry(mm, pte_to_swp_entry(*ptep));
-                              ^~~~~~~~~~~~~~~~
-                              ptep_zap_swap_entry
->> arch/s390/mm/gmap_helpers.c:60:27: error: incompatible type for argument 2 of 'ptep_zap_swap_entry'
-      ptep_zap_swap_entry(mm, pte_to_swp_entry(*ptep));
-                              ^~~~~~~~~~~~~~~~~~~~~~~
-   arch/s390/mm/gmap_helpers.c:24:67: note: expected 'swp_entry_t' {aka 'struct <anonymous>'} but argument is of type 'int'
-    static void ptep_zap_swap_entry(struct mm_struct *mm, swp_entry_t entry)
-                                                          ~~~~~~~~~~~~^~~~~
-   cc1: some warnings being treated as errors
-
-
-vim +26 arch/s390/mm/gmap_helpers.c
-
-    14	
-    15	/**
-    16	 * ptep_zap_swap_entry() - discard a swap entry.
-    17	 * @mm: the mm
-    18	 * @entry: the swap entry that needs to be zapped
-    19	 *
-    20	 * Discards the given swap entry. If the swap entry was an actual swap
-    21	 * entry (and not a migration entry, for example), the actual swapped
-    22	 * page is also discarded from swap.
-    23	 */
-    24	static void ptep_zap_swap_entry(struct mm_struct *mm, swp_entry_t entry)
-    25	{
-  > 26		if (!non_swap_entry(entry))
-    27			dec_mm_counter(mm, MM_SWAPENTS);
-  > 28		else if (is_migration_entry(entry))
-  > 29			dec_mm_counter(mm, mm_counter(pfn_swap_entry_folio(entry)));
-  > 30		free_swap_and_cache(entry);
-    31	}
-    32	
-    33	/**
-    34	 * gmap_helper_zap_one_page() - discard a page if it was swapped.
-    35	 * @mm: the mm
-    36	 * @vmaddr: the userspace virtual address that needs to be discarded
-    37	 *
-    38	 * If the given address maps to a swap entry, discard it.
-    39	 *
-    40	 * Context: needs to be called while holding the mmap lock.
-    41	 */
-    42	void gmap_helper_zap_one_page(struct mm_struct *mm, unsigned long vmaddr)
-    43	{
-    44		struct vm_area_struct *vma;
-    45		spinlock_t *ptl;
-    46		pte_t *ptep;
-    47	
-    48		mmap_assert_locked(mm);
-    49	
-    50		/* Find the vm address for the guest address */
-    51		vma = vma_lookup(mm, vmaddr);
-    52		if (!vma || is_vm_hugetlb_page(vma))
-    53			return;
-    54	
-    55		/* Get pointer to the page table entry */
-    56		ptep = get_locked_pte(mm, vmaddr, &ptl);
-    57		if (unlikely(!ptep))
-    58			return;
-    59		if (pte_swap(*ptep))
-  > 60			ptep_zap_swap_entry(mm, pte_to_swp_entry(*ptep));
-    61		pte_unmap_unlock(ptep, ptl);
-    62	}
-    63	EXPORT_SYMBOL_GPL(gmap_helper_zap_one_page);
-    64	
-
+diff --git a/arch/x86/include/asm/acpi.h b/arch/x86/include/asm/acpi.h
+index 5ab1a4598d00..a03aa6f999d1 100644
+--- a/arch/x86/include/asm/acpi.h
++++ b/arch/x86/include/asm/acpi.h
+@@ -158,13 +158,13 @@ static inline bool acpi_has_cpu_in_madt(void)
+ }
+ 
+ #define ACPI_HAVE_ARCH_SET_ROOT_POINTER
+-static inline void acpi_arch_set_root_pointer(u64 addr)
++static __always_inline void acpi_arch_set_root_pointer(u64 addr)
+ {
+ 	x86_init.acpi.set_root_pointer(addr);
+ }
+ 
+ #define ACPI_HAVE_ARCH_GET_ROOT_POINTER
+-static inline u64 acpi_arch_get_root_pointer(void)
++static __always_inline u64 acpi_arch_get_root_pointer(void)
+ {
+ 	return x86_init.acpi.get_root_pointer();
+ }
+diff --git a/arch/x86/include/asm/realmode.h b/arch/x86/include/asm/realmode.h
+index f607081a022a..e406a1e92c63 100644
+--- a/arch/x86/include/asm/realmode.h
++++ b/arch/x86/include/asm/realmode.h
+@@ -78,7 +78,7 @@ extern unsigned char secondary_startup_64[];
+ extern unsigned char secondary_startup_64_no_verify[];
+ #endif
+ 
+-static inline size_t real_mode_size_needed(void)
++static __always_inline size_t real_mode_size_needed(void)
+ {
+ 	if (real_mode_header)
+ 		return 0;	/* already allocated. */
+diff --git a/include/linux/acpi.h b/include/linux/acpi.h
+index e72100c0684f..ae76c8915000 100644
+--- a/include/linux/acpi.h
++++ b/include/linux/acpi.h
+@@ -759,13 +759,13 @@ int acpi_arch_timer_mem_init(struct arch_timer_mem *timer_mem, int *timer_count)
+ #endif
+ 
+ #ifndef ACPI_HAVE_ARCH_SET_ROOT_POINTER
+-static inline void acpi_arch_set_root_pointer(u64 addr)
++static __always_inline void acpi_arch_set_root_pointer(u64 addr)
+ {
+ }
+ #endif
+ 
+ #ifndef ACPI_HAVE_ARCH_GET_ROOT_POINTER
+-static inline u64 acpi_arch_get_root_pointer(void)
++static __always_inline u64 acpi_arch_get_root_pointer(void)
+ {
+ 	return 0;
+ }
+diff --git a/include/linux/bootconfig.h b/include/linux/bootconfig.h
+index 3f4b4ac527ca..25df9260d206 100644
+--- a/include/linux/bootconfig.h
++++ b/include/linux/bootconfig.h
+@@ -290,7 +290,7 @@ int __init xbc_get_info(int *node_size, size_t *data_size);
+ /* XBC cleanup data structures */
+ void __init _xbc_exit(bool early);
+ 
+-static inline void xbc_exit(void)
++static __always_inline void xbc_exit(void)
+ {
+ 	_xbc_exit(false);
+ }
+diff --git a/include/linux/efi.h b/include/linux/efi.h
+index 7d63d1d75f22..e3776d9cad07 100644
+--- a/include/linux/efi.h
++++ b/include/linux/efi.h
+@@ -1334,7 +1334,7 @@ struct linux_efi_initrd {
+ 
+ bool xen_efi_config_table_is_usable(const efi_guid_t *guid, unsigned long table);
+ 
+-static inline
++static __always_inline
+ bool efi_config_table_is_usable(const efi_guid_t *guid, unsigned long table)
+ {
+ 	if (!IS_ENABLED(CONFIG_XEN_EFI))
+diff --git a/include/linux/memblock.h b/include/linux/memblock.h
+index bb19a2534224..b96746376e17 100644
+--- a/include/linux/memblock.h
++++ b/include/linux/memblock.h
+@@ -463,7 +463,7 @@ static inline void *memblock_alloc_raw(phys_addr_t size,
+ 					  NUMA_NO_NODE);
+ }
+ 
+-static inline void *memblock_alloc_from(phys_addr_t size,
++static __always_inline void *memblock_alloc_from(phys_addr_t size,
+ 						phys_addr_t align,
+ 						phys_addr_t min_addr)
+ {
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 921c1c783bc1..72f13d643fca 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -420,7 +420,7 @@ static u64 kvm_steal_clock(int cpu)
+ 	return steal;
+ }
+ 
+-static inline void __set_percpu_decrypted(void *ptr, unsigned long size)
++static __always_inline void __set_percpu_decrypted(void *ptr, unsigned long size)
+ {
+ 	early_set_memory_decrypted((unsigned long) ptr, size);
+ }
+diff --git a/drivers/platform/x86/thinkpad_acpi.c b/drivers/platform/x86/thinkpad_acpi.c
+index e7350c9fa3aa..0518d5b1f4ec 100644
+--- a/drivers/platform/x86/thinkpad_acpi.c
++++ b/drivers/platform/x86/thinkpad_acpi.c
+@@ -559,12 +559,12 @@ static unsigned long __init tpacpi_check_quirks(
+ 	return 0;
+ }
+ 
+-static inline bool __pure __init tpacpi_is_lenovo(void)
++static __always_inline bool __pure tpacpi_is_lenovo(void)
+ {
+ 	return thinkpad_id.vendor == PCI_VENDOR_ID_LENOVO;
+ }
+ 
+-static inline bool __pure __init tpacpi_is_ibm(void)
++static __always_inline bool __pure tpacpi_is_ibm(void)
+ {
+ 	return thinkpad_id.vendor == PCI_VENDOR_ID_IBM;
+ }
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
 
