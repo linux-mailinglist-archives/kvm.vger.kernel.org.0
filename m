@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-47529-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47530-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 295F7AC1DF6
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 09:55:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B441DAC1DF7
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 09:55:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDE5F4E704E
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 07:55:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 616804E7038
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 07:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8277B28467A;
-	Fri, 23 May 2025 07:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459C6286425;
+	Fri, 23 May 2025 07:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="LZ3GNq01"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="BnvbzteU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C2617A30F
-	for <kvm@vger.kernel.org>; Fri, 23 May 2025 07:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D2E28369A
+	for <kvm@vger.kernel.org>; Fri, 23 May 2025 07:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747986909; cv=none; b=ZbasHcb9zNB1HHJPefBTghkxBD1m9o6V8plnWPwbB++icx4/lqOVyScEzv7TCU+LTjEtuc2SxFysZ1eMWmpjzlQSXIlto1AJcWR6eZpeG0M/qsu9//fV05ZBs3nOoCD76klzS3nDrJTsOKTJeiEkE3H6Jf9YWID9e7eluEbtEXM=
+	t=1747986914; cv=none; b=oOtVoZWFzpNjilick6fw0e1gmNLMNa9kyCsH4ZIiNn/CShM4PKK0Nj00A3N3gGOjMHJbYGjbCXjnaFuKS3QCQo1vVsMsQSm5CsFZucByLDYt36ygERjOn+hrnKmkowB+O77hxgfGn8JDJ3zZfSOuImJLyzOvGSwrBSRTL4sOO3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747986909; c=relaxed/simple;
-	bh=v/eU5jGg9rZ8RkTAxtzmxVdLSHFuEH3fRJlu/EIrGL4=;
+	s=arc-20240116; t=1747986914; c=relaxed/simple;
+	bh=h0qBN3wboDfmA8JNgMgjqZsUmuvhvXgWljcJd/JmLXM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gd3uFf/MuwPOtGd9khwnSHCxuDfe6cqrQwPjhUqJZDuqXH0ZuQIS+Knm18yzw6Lu8DnV2wcSDsTTnbXkoyqzKWPGdVm0BSQqtDXJhwgIRSdLb9ZHn0S0EwZalZ2odkQ8z7K3oM2MrDm4ZPQZg7BZL3iJ1KNmiPPgf9TmBpQaHKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=LZ3GNq01; arc=none smtp.client-ip=209.85.216.47
+	 MIME-Version:Content-Type; b=WPFKzQRz1ebrgHZLRO3dNwbow92jcra7Qqu5/ABDCKcznZidSsBgjzhK81gSQEM5ZTc8RtA0SdN31ONtVaJWaAO3DUaafqD9lnbpSdsW9lA0mDhCejhsi2bG5NykoqpVXP9vFLPWCqdvbsojw5VWBZkw9lltNRAe2Lvo/nmzo1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=BnvbzteU; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-30e8feb1830so5870988a91.0
-        for <kvm@vger.kernel.org>; Fri, 23 May 2025 00:55:07 -0700 (PDT)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-231c86bffc1so90158135ad.0
+        for <kvm@vger.kernel.org>; Fri, 23 May 2025 00:55:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1747986907; x=1748591707; darn=vger.kernel.org;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1747986911; x=1748591711; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Wkz5btPSakbSGWg9/hz+J+zFRiWVxpXranSpFqzg2V4=;
-        b=LZ3GNq01G3KRnwlrkU1jCGN2/gbg/vs8dE2arXiN92GjhzQS+HmzqRoSIRjcRd7SlA
-         f+R838+cqN7yssiL4gLBQwU3JBf34w5SR2ca2dHF3g7UYbh0HOJqBJBAukTkmNgkZwCM
-         67obX3V2V2SPYMbtWOqNunkmAeZxSPNTaaYRo273CV21O062/oQiQqfXFZs0zPDt8hmd
-         FFhz88vpOkSbfgWuMHltTOcEX0wuyu22pKhza6TfjHrOTTecVjq+YEhRX/zBotMy/QuJ
-         KQcVTmD3Nf3mlpM+9jIVm2uGTVfKzFIAWrZKv9KPlJU4dsvU6sSUv+MN0RGB67XK6atG
-         EnOQ==
+        bh=nxzqQKMOJ7+1lap2SHx+5+EMFITY8vpqy2IDV73v588=;
+        b=BnvbzteU0ls+GRGrRWWqn1w7ECBDlaZQyrILdxsZnhBfYDhQRkmhHgJ0rlI8RsiSmt
+         6WN98pE8eQKEU15dZeM0DzhGbSnHfd741UdhBzIlrqoe26SsG6YJLAFnFPPm4GgAEwvO
+         PbqxkQIw04w6nwCl4tgYLzyW18y5liAvfZnrD5S07phLaGuTFaOan/na6Dvjj1Lwxmw3
+         UWsOpGAFg+9Uxemxa53FeY1rCt8h6X/oCZA+xdjf2mjoMprg7X/VIvewEsQYaaPWa4hn
+         hw+TgUbYBrjMmJ74GJadtq7C72sMBSqkYj1kHt7+PosXRETb8uM5uaLTL8nwsqU4hZnp
+         4xhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747986907; x=1748591707;
+        d=1e100.net; s=20230601; t=1747986911; x=1748591711;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Wkz5btPSakbSGWg9/hz+J+zFRiWVxpXranSpFqzg2V4=;
-        b=WQcMuar3ER0JH22wgZ84qGcwqfaJD2ESbPU9TWPrp0P6tStvrzB1syiAvL/7QNMu8b
-         cT+JHbAZTpVrWTFCDCRtOfO8FcXz7Wfh/CmKEhMS9+4UGjlYZ65a2SEpc7XYMVQaIv3A
-         DWCeOBbq8SkWmdkUnbLkYLYc8vfKztysjEFa9ntbxGyO6hBbATtrLt/1F8pC3EOWzvL5
-         45rtW2jltnF68+4zL2IyLRDQFqXt7xeJRDMPYts4rQSCTwDAFsH0gasDml8e5ztc8oLR
-         BiiGneRlVZHwT0greMOeKQ+tdE2eK4U7L/Kr10kC/LBvGjY1vI99tzlkpRdKW6xsJYdR
-         XiLg==
-X-Gm-Message-State: AOJu0YycmrfsrtZDSYG/oLefl3IBcEFBGBq9Sp67qN22XrbQ9U1g4KQp
-	UNXMCFq3xQqQAyCCUGpRiU7tKPaE0kP6F/mgiXDo12HqguweUJ4ymctGhnJzffmmcZ0zAUS0LmU
-	UO/NVym4=
-X-Gm-Gg: ASbGncsVAkNPq/XdRtBVwopk0GVK4F4BHki4qX8lDZWwskVgEDj+k7f3KncTOSWQ6Hz
-	8hybrMqLSUkvDnZ4Ja9XmyPKdZ6UaiGifkpHKYeiVXC/32sZIGZW+ic3jNonywds7gh+YSltpUT
-	9IHVfiah9GMVpum8K8dcmSw/KZ34Eo0yrh9aH5+2JFMw+7VRYosYXEEChs7GQHmeJQryJeGYCX8
-	vdaI+pzHvVqpkC1mKIXNw1SF19dvYFezajYQv1AKV1Edqk5soN5ZB7I798q2suZiQgoIudqgPAm
-	/DLPGweNDj1kxpmx2zhLN1HK1rm2fD5wkQaGGUFZFBnbGjfQShaNQbQrTVzwI+o=
-X-Google-Smtp-Source: AGHT+IEPFnlMv+SphSbT2qlgzvzr5e4D7932gMeT71Z7fVhumTSN0YsgZG5uZjC/arGCx/5gT/nsCQ==
-X-Received: by 2002:a17:90b:1ccc:b0:30e:823f:ef3a with SMTP id 98e67ed59e1d1-30e823ff012mr42546168a91.30.1747986906641;
-        Fri, 23 May 2025 00:55:06 -0700 (PDT)
+        bh=nxzqQKMOJ7+1lap2SHx+5+EMFITY8vpqy2IDV73v588=;
+        b=viYDSIA29StJOaYV7Jp1ouagiu3NxUUEztYStVQABiomEuTqF0uGR/36pZSiJBAV2q
+         v7uUt+gO89uli6iWefAvKQ/iShXt3j6c3INTbUx4xS0UciD2Y4klHb9E/4wbgZokjwFE
+         PBJksv/rQgDGrGfFezcPsR/ZPFWXgcybR8/HItA+Yc0DtwgfGMDF8HzZV8dI/xi3KZ7v
+         ZS4SuOjz3lL/gknqPlnMfFhl/ycp3vl1IMdyFXfiwU+Bogy4WxbEQNWA/O/qaeeQ7qMA
+         99maX/BHaxaIedLCBNEGv1EPcdiGWEmDGeGZvavVVtAZnA1SzKRUAjHOhnGI2JnhCri3
+         10PQ==
+X-Gm-Message-State: AOJu0Yz32i6epsb6MQ6baKzRaDvrzeV5DnjP/+SQOQquYmwJKPTBIbsx
+	0c5dF5/vFRkk3cKioNm/8zHfU73AJqrnv2iYb1ZCQC3j6ToIhHfdlOKSgLo+qqokv1yPEdqPxbs
+	1Q8sgrYc=
+X-Gm-Gg: ASbGnctDTqihjYz+TRqlNqJtsgdLphi28zZIb3n1rq+hYT59OIERminAmGiJ4X8+3Fb
+	1VE+rzsR5S4YkUbW1/tdwlSCAUxfXmP9OKwyoL3rSz+SfP8ghmYPjtAhjydU7QAV4W0zFAFHOPI
+	xE5Xl4QsY6vFIosg5Sx/JabYj02GSXiAZglONy0VHuOz6ch5cYiYxvJ8WnCZ2W9aofjqEGKtVU0
+	lkdsm3Ha3Revg1W1f+bN+KcjyoKc4PsYAG4do1YsiY3/MHRRwcAqcvau6MvqwQjw3mbYdVI2bxx
+	7Nn9fjDF5VOhVEsXqBaofvrF6Q2O8gU640BU1gJEYiYsS2XfNPLqTdp6CouyEuk=
+X-Google-Smtp-Source: AGHT+IFsCaQmmtn/D65KR060IPvzSK50zSGXf48LGomWrpC+b3XUenXh9CU65SIwoVkuKdwTJQU3NA==
+X-Received: by 2002:a17:903:2284:b0:22e:663f:c4b with SMTP id d9443c01a7336-231de36bb60mr361017045ad.26.1747986911225;
+        Fri, 23 May 2025 00:55:11 -0700 (PDT)
 Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30f36513bb7sm6767204a91.46.2025.05.23.00.55.02
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30f36513bb7sm6767204a91.46.2025.05.23.00.55.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 May 2025 00:55:06 -0700 (PDT)
+        Fri, 23 May 2025 00:55:10 -0700 (PDT)
 From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org
 Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
 	Andrew Jones <ajones@ventanamicro.com>,
 	Ved Shanbhogue <ved@rivosinc.com>
-Subject: [PATCH 2/3] lib/riscv: clear SDT when entering exception handling
-Date: Fri, 23 May 2025 09:53:09 +0200
-Message-ID: <20250523075341.1355755-3-cleger@rivosinc.com>
+Subject: [PATCH 3/3] riscv: Add ISA double trap extension testing
+Date: Fri, 23 May 2025 09:53:10 +0200
+Message-ID: <20250523075341.1355755-4-cleger@rivosinc.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250523075341.1355755-1-cleger@rivosinc.com>
 References: <20250523075341.1355755-1-cleger@rivosinc.com>
@@ -93,56 +93,265 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-In order to avoid taking double trap once we have entered a trap and
-saved everything, clear SDT at the end of entry. This is not exactly
-required when double trap is disabled (probably most of the time), but
-that's not harmful.
+This test allows to test the double trap implementation of hardware as
+well as the SBI FWFT and SSE support for double trap. The tests will try
+to trigger double trap using various sequences and will test to receive
+the SSE double trap event if supported.
 
+It is provided as a separate test from the SBI one for two reasons:
+- It isn't specifically testing SBI "per se".
+- It ends up by trying to crash into in M-mode.
+
+Currently, the test uses a page fault to raise a trap programatically.
+Some concern was raised by a github user on the original branch [1]
+saying that the spec doesn't mandate any trap to be delegatable and that
+we would need a way to detect which ones are delegatable. I think we can
+safely assume that PAGE FAULT is delagatable and if a hardware that does
+not have support comes up then it will probably be the vendor
+responsibility to provide a way to do so.
+
+Link: https://github.com/clementleger/kvm-unit-tests/issues/1 [1]
 Signed-off-by: Clément Léger <cleger@rivosinc.com>
 ---
- riscv/cstart.S | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ riscv/Makefile      |   1 +
+ lib/riscv/asm/csr.h |   1 +
+ riscv/isa-dbltrp.c  | 189 ++++++++++++++++++++++++++++++++++++++++++++
+ riscv/unittests.cfg |   5 ++
+ 4 files changed, 196 insertions(+)
+ create mode 100644 riscv/isa-dbltrp.c
 
-diff --git a/riscv/cstart.S b/riscv/cstart.S
-index 575f929b..a86f97f0 100644
---- a/riscv/cstart.S
-+++ b/riscv/cstart.S
-@@ -212,14 +212,15 @@ secondary_entry:
- 	REG_S	t6, PT_T6(a0)			// x31
- 	csrr	a1, CSR_SEPC
- 	REG_S	a1, PT_EPC(a0)
--	csrr	a1, CSR_SSTATUS
--	REG_S	a1, PT_STATUS(a0)
- 	csrr	a1, CSR_STVAL
- 	REG_S	a1, PT_BADADDR(a0)
- 	csrr	a1, CSR_SCAUSE
- 	REG_S	a1, PT_CAUSE(a0)
- 	REG_L	a1, PT_ORIG_A0(a0)
- 	REG_S	a1, PT_A0(a0)
-+	li t0, 	SR_SDT
-+	csrrc 	a1, CSR_SSTATUS, t0
-+	REG_S	a1, PT_STATUS(a0)
- .endm
+diff --git a/riscv/Makefile b/riscv/Makefile
+index 11e68eae..d71c9d2e 100644
+--- a/riscv/Makefile
++++ b/riscv/Makefile
+@@ -14,6 +14,7 @@ tests =
+ tests += $(TEST_DIR)/sbi.$(exe)
+ tests += $(TEST_DIR)/selftest.$(exe)
+ tests += $(TEST_DIR)/sieve.$(exe)
++tests += $(TEST_DIR)/isa-dbltrp.$(exe)
  
- /*
-@@ -227,6 +228,8 @@ secondary_entry:
-  * Also restores a0.
-  */
- .macro restore_context
-+	REG_L	a1, PT_STATUS(a0)
-+	csrw	CSR_SSTATUS, a1
- 	REG_L	ra, PT_RA(a0)			// x1
- 	REG_L	sp, PT_SP(a0)			// x2
- 	REG_L	gp, PT_GP(a0)			// x3
-@@ -260,8 +263,6 @@ secondary_entry:
- 	REG_L	t6, PT_T6(a0)			// x31
- 	REG_L	a1, PT_EPC(a0)
- 	csrw	CSR_SEPC, a1
--	REG_L	a1, PT_STATUS(a0)
--	csrw	CSR_SSTATUS, a1
- 	REG_L	a1, PT_BADADDR(a0)
- 	csrw	CSR_STVAL, a1
- 	REG_L	a1, PT_CAUSE(a0)
+ all: $(tests)
+ 
+diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+index 3e4b5fca..6a8e0578 100644
+--- a/lib/riscv/asm/csr.h
++++ b/lib/riscv/asm/csr.h
+@@ -18,6 +18,7 @@
+ 
+ #define SR_SIE			_AC(0x00000002, UL)
+ #define SR_SPP			_AC(0x00000100, UL)
++#define SR_SDT			_AC(0x01000000, UL) /* Supervisor Double Trap */
+ 
+ /* Exception cause high bit - is an interrupt if set */
+ #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
+diff --git a/riscv/isa-dbltrp.c b/riscv/isa-dbltrp.c
+new file mode 100644
+index 00000000..174aee2a
+--- /dev/null
++++ b/riscv/isa-dbltrp.c
+@@ -0,0 +1,189 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * SBI verification
++ *
++ * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
++ */
++#include <alloc.h>
++#include <alloc_page.h>
++#include <libcflat.h>
++#include <stdlib.h>
++
++#include <asm/csr.h>
++#include <asm/page.h>
++#include <asm/processor.h>
++#include <asm/ptrace.h>
++#include <asm/sbi.h>
++
++#include <sbi-tests.h>
++
++static bool double_trap;
++static bool set_sdt = true;
++
++#define GEN_TRAP()								\
++do {										\
++	void *ptr = NULL;							\
++	unsigned long value = 0;						\
++	asm volatile(								\
++	"	.option push\n"							\
++	"	.option arch,-c\n"						\
++	"	sw %0, 0(%1)\n"							\
++	"	.option pop\n"							\
++	: : "r"(value), "r"(ptr) : "memory");					\
++} while (0)
++
++static void syscall_trap_handler(struct pt_regs *regs)
++{
++	if (set_sdt)
++		csr_set(CSR_SSTATUS, SR_SDT);
++
++	if (double_trap) {
++		double_trap = false;
++		GEN_TRAP();
++	}
++
++	/* Skip trapping instruction */
++	regs->epc += 4;
++}
++
++static bool sse_dbltrp_called;
++
++static void sse_dbltrp_handler(void *data, struct pt_regs *regs, unsigned int hartid)
++{
++	struct sbiret ret;
++	unsigned long flags;
++	unsigned long expected_flags = SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP |
++				       SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SDT;
++
++	ret = sbi_sse_read_attrs(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP, SBI_SSE_ATTR_INTERRUPTED_FLAGS, 1,
++				 &flags);
++	sbiret_report_error(&ret, SBI_SUCCESS, "Get double trap event flags");
++	report(flags == expected_flags, "SSE flags == 0x%lx", expected_flags);
++
++	sse_dbltrp_called = true;
++
++	/* Skip trapping instruction */
++	regs->epc += 4;
++}
++
++static void sse_double_trap(void)
++{
++	struct sbiret ret;
++
++	struct sbi_sse_handler_arg handler_arg = {
++		.handler = sse_dbltrp_handler,
++		.stack = alloc_page() + PAGE_SIZE,
++	};
++
++	report_prefix_push("sse");
++
++	ret = sbi_sse_hart_unmask();
++	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE hart unmask ok"))
++		goto out;
++
++	ret = sbi_sse_register(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP, &handler_arg);
++	if (ret.error == SBI_ERR_NOT_SUPPORTED) {
++		report_skip("SSE double trap event is not supported");
++		goto out;
++	}
++	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap register");
++
++	ret = sbi_sse_enable(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
++	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap enable"))
++		goto out_unregister;
++
++	/*
++	 * Generate a double crash so that an SSE event should be generated. The SPEC (ISA nor SBI)
++	 * does not explicitly tell that if supported it should generate an SSE event but that's
++	 * a reasonable assumption to do so if both FWFT and SSE are supported.
++	 */
++	set_sdt = true;
++	double_trap = true;
++	GEN_TRAP();
++
++	report(sse_dbltrp_called, "SSE double trap event generated");
++
++	ret = sbi_sse_disable(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
++	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap disable");
++out_unregister:
++	ret = sbi_sse_unregister(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
++	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap unregister");
++
++out:
++	sbi_sse_hart_mask();
++	free_page(handler_arg.stack - PAGE_SIZE);
++
++	report_prefix_pop();
++}
++
++static void check_double_trap(void)
++{
++	struct sbiret ret;
++
++	/* Disable double trap */
++	ret = sbi_fwft_set(SBI_FWFT_DOUBLE_TRAP, 0, 0);
++	sbiret_report_error(&ret, SBI_SUCCESS, "Set double trap enable feature value == 0");
++	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
++	sbiret_report(&ret, SBI_SUCCESS, 0, "Get double trap enable feature value == 0");
++
++	install_exception_handler(EXC_STORE_PAGE_FAULT, syscall_trap_handler);
++
++	double_trap = true;
++	GEN_TRAP();
++	report_pass("Double trap disabled, trap first time ok");
++
++	/* Enable double trap */
++	ret = sbi_fwft_set(SBI_FWFT_DOUBLE_TRAP, 1, 1);
++	sbiret_report_error(&ret, SBI_SUCCESS, "Set double trap enable feature value == 1");
++	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
++	if (!sbiret_report(&ret, SBI_SUCCESS, 1, "Get double trap enable feature value == 1"))
++		return;
++
++	/* First time, clear the double trap flag (SDT) so that it doesn't generate a double trap */
++	set_sdt = false;
++	double_trap = true;
++	GEN_TRAP();
++	report_pass("Trapped twice allowed ok");
++
++	if (sbi_probe(SBI_EXT_SSE))
++		sse_double_trap();
++	else
++		report_skip("SSE double trap event will not be tested, extension is not available");
++
++	/*
++	 * Second time, keep the double trap flag (SDT) and generate another trap, this should
++	 * generate a double trap. Since there is no SSE handler registered, it should crash to
++	 * M-mode.
++	 */
++	set_sdt = true;
++	double_trap = true;
++	report_info("Should generate a double trap and crash !");
++	GEN_TRAP();
++	report_fail("Should have crashed !");
++}
++
++int main(int argc, char **argv)
++{
++	struct sbiret ret;
++
++	report_prefix_push("dbltrp");
++
++	if (!sbi_probe(SBI_EXT_FWFT)) {
++		report_skip("FWFT extension is not available, can not enable double traps");
++		goto out;
++	}
++
++	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
++	if (ret.value == SBI_ERR_NOT_SUPPORTED) {
++		report_skip("SBI_FWFT_DOUBLE_TRAP is not supported !");
++		goto out;
++	}
++
++	if (sbiret_report_error(&ret, SBI_SUCCESS, "SBI_FWFT_DOUBLE_TRAP get value"))
++		check_double_trap();
++
++out:
++	report_prefix_pop();
++
++	return report_summary();
++}
+diff --git a/riscv/unittests.cfg b/riscv/unittests.cfg
+index 2eb760ec..757e6027 100644
+--- a/riscv/unittests.cfg
++++ b/riscv/unittests.cfg
+@@ -18,3 +18,8 @@ groups = selftest
+ file = sbi.flat
+ smp = $MAX_SMP
+ groups = sbi
++
++[dbltrp]
++file = isa-dbltrp.flat
++smp = $MAX_SMP
++groups = isa
 -- 
 2.49.0
 
