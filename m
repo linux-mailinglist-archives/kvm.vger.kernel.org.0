@@ -1,174 +1,355 @@
-Return-Path: <kvm+bounces-47533-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47534-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51B90AC1FA4
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 11:20:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AD8EAC1FEC
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 11:43:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE6D14A5FF4
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 09:20:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E0D67AC412
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 09:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF48223DF1;
-	Fri, 23 May 2025 09:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77781225788;
+	Fri, 23 May 2025 09:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Vy4Hcxtr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lGuDO/M6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550B422579B
-	for <kvm@vger.kernel.org>; Fri, 23 May 2025 09:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DEC225791;
+	Fri, 23 May 2025 09:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747992025; cv=none; b=GfpX1HBEq4xOul8GKUs1TtCOErHbAhcMhl8MtK4iT6ZsgBBN2WTMCQUdhdZZOWY3K/VxNj30+uQYUtsivcDfbYCAO/zYEemP0OjafAs8olLM/94X67Uj+e2qZAngh8vmC8irFrGl8+5q7vxUszYUz2aewMU/NkiIWwIgt9OeIew=
+	t=1747993360; cv=none; b=M1NEjrGbs11SkcVezBFGBLu3a9We59yJIxjJcEDSDDANJ+WmubCFs0lfrVKRo7T1VRUfqDv58KfbHdIruge793DTYLUZPhdMeeGFkFtLBfHKvhKtPn+EkqV/YAlCYt7lPviVzQgaGJHfsUv6xpkZrlCpJtuWda6+p715a8IKoTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747992025; c=relaxed/simple;
-	bh=H6jCMhovcKvXnJaFVFncaQ9ZSSarjarBVGBLD/TKfc0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
-	 References:In-Reply-To; b=uJAVoP3pGn6DT7UINZiggAZ1VpIEO4BINGA8M0ewbmp7UsbtEVfjMVmCN8ESJQ25FqGMbDdRkoQHe5SF090d6HfSfp72Bn3QBU4KI47IxBMOjekPyxYkaLSCJDaLPDnZUa1/qfxca9hvMpCyVIemt7XeMw3OS53QCHQu5E6Bzm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Vy4Hcxtr; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a4c2e42ce0so55712f8f.3
-        for <kvm@vger.kernel.org>; Fri, 23 May 2025 02:20:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1747992021; x=1748596821; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:from:to:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KpJiR9jmmCdIglXVSKgEoS5Pv74wpHne5sRyii9bqBU=;
-        b=Vy4Hcxtrp8hQ2cNP7NAW9PdfyqoK9R/tauaN3UB2Qru69KzJ90JmOD0fsw9A4kZPxc
-         y74HJ7cxIUBsBXIbPinFV930kJuc0vIz6boQYQpyY9h0OHBMd0qNl5N0GUKcPf+329MZ
-         DB4jtvAj7BE0CBHl0vLMm0agDyEt89Y11l7uSKaS23/ceoA2wymvO0PTistrghgxIps1
-         fGDMyeMVBwMtKATHpnjfouWX0HYi1t6B0eaKLtAevXcLNsF3GwO0sQw6pEl8aVpPLYV6
-         zed7h+WQNKJ0pCrFdLhqs8lWRjcUUJGQHIz9wJc5xImRpaQusBHyLab72O2liSdIdXo2
-         D6Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747992021; x=1748596821;
-        h=in-reply-to:references:subject:from:to:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KpJiR9jmmCdIglXVSKgEoS5Pv74wpHne5sRyii9bqBU=;
-        b=t2QvYQN6tqzpX2Uc18f1wdwKaRLRVOULrcVw9Np8heXsVYHhLxxkKrLgQDcO+cZZJQ
-         ABoZW3TT+dw48DsGTv2dVkTZz/zwyU5t6EHesfdOrQ7MSv3/ncar6dTUKxgT4jWIEw4h
-         eEmp49JAZpdcispG+YFqx5iOQomRHXHLJuW3viAq80tZtPfojwwlhVPf5xtWsSoEY8Ub
-         M2yKgtbw0tLXdv91I7xq5xsEqiuX5zEpYKXA4QB4PiiDB43TNH+DMnTxncHFjr9ZSCGk
-         oLtQdNU1TXeoee1wLNWXdH6b8Jw2FQRE8m2BIBFzilQa5x13ElDCmgDeuQQT2Efso4ox
-         AVJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVp+b3C1MQWEZZw1doBXd3X28ey7bpMXD5xVKEV6X4iRfXgRrO35/1sJ4FiJmAtFDWwYYU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPw36PnuuDMv84+T72rrXzcrytXd5tFlaIUazu6iy9sBHfiz8o
-	oKfj15q1ncYz43qEcbuwvTz5CKl+WSlfuoxtIZl2vibVw3yPvf7iVxWzawgnqv6layQ=
-X-Gm-Gg: ASbGncuaZlJhnpWikuei53ggjPjvvv2FxjslmMmc3sHel9Y3GEGiWaWPewFtOj1G1Z1
-	P2CFUCq26vWdYZ1uAPKenD7fCtpIToFL8UaKYuUOVtUk/xImUg5OK50jisHJqbzireAN9BA7gNp
-	ISg8CVE+4+/y2mNOmDoWg2DgRQ03LTCkFt9NSn/QCURQvMVC+mvtpJuPq3VwEt1GkMn9WlqopBK
-	dGixmIVvyWPQYP7uYG6IjKZci3TK5irhaor3IEwv5LPLvcTfIX0YdMUvuH74LSB5WZJj4iESuto
-	SKG5ZkDmKwSZ9S6ihkDFbSRaWRV2G51xNbcVjp0T0TsXvn90t6TXu82q5JDZybkY5i/CgQ==
-X-Google-Smtp-Source: AGHT+IEMU9a6aZGz+kLhPKpDgsPP465aof0p3jZZCP5dmiHATC63+CKThZDo4xy3NUbvdUIjkoiEdw==
-X-Received: by 2002:a05:600c:4f8e:b0:439:a1c7:7b3a with SMTP id 5b1f17b1804b1-442fd60ee47mr80699975e9.1.1747992021455;
-        Fri, 23 May 2025 02:20:21 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200:be84:d9ad:e5e6:f60b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f1ef0aadsm132780315e9.12.2025.05.23.02.20.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 May 2025 02:20:21 -0700 (PDT)
+	s=arc-20240116; t=1747993360; c=relaxed/simple;
+	bh=HTv5n/07yQDXRcvHu7hgHboQDCuLAObub0zu/q5SUpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f9KkHMJ8hzdiQtiM0QNMrjOgr9xXHIrllrlnJatJ+jTTTHyXx1TBEnX6h6ibbfGkLKw7KW6r/pIqdlKnqa1SUT8D68lhhhxBzwmBiUOFRu28Q/3+UioROni1oif5qdUl/8lCbPqoAcD3HlLvnLSHoPdGtcMvNanl3FEH9+EXmxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lGuDO/M6; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747993358; x=1779529358;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HTv5n/07yQDXRcvHu7hgHboQDCuLAObub0zu/q5SUpQ=;
+  b=lGuDO/M6dPmMtmal2h1az0bXDpHY3e2mF9Yb5/MaxZZ5AlmxksMOjjYl
+   zUKbOiv54Z4hqaFTuV+QnUUNyFQP1Cz+zUl6Fy0qUNLSseGbLy662lde/
+   j8K7TIGlPF4AA3MrDPxgw0mK4XvOcIsKeaTIDsAFGAU0fP3oLtYUhRSHd
+   zS4SWYhcUuf2Yk9MzNuHu0VLvEk6hFi1SrP9hRtrv3aDNV5VnaEJsa3CP
+   h3w+XUNRVJwLPc+r9O4Kw+wIE0LBv4/u59my3i+uMawQOBE+AcuaHLW6l
+   7PulollS2+SxkwuoVXQf2nnuCqDLKNyumdEaPJEVNhJckS5TVpF0K3viL
+   g==;
+X-CSE-ConnectionGUID: ZLA8p51sSH+kXcQpvvC4iw==
+X-CSE-MsgGUID: 5Trn/YZhSryEbUzw7k2m5w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="53708209"
+X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
+   d="scan'208";a="53708209"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 02:42:33 -0700
+X-CSE-ConnectionGUID: hOxvX2gASa28jbO31Jgjcg==
+X-CSE-MsgGUID: TyN87VgmSxKXY9jL14NPig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
+   d="scan'208";a="145907308"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmviesa005.fm.intel.com with ESMTP; 23 May 2025 02:42:29 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+	id CB8491F6; Fri, 23 May 2025 12:42:27 +0300 (EEST)
+Date: Fri, 23 May 2025 12:42:27 +0300
+From: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"seanjc@google.com" <seanjc@google.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, 
+	"bp@alien8.de" <bp@alien8.de>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, 
+	"x86@kernel.org" <x86@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"Zhao, Yan Y" <yan.y.zhao@intel.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, 
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC, PATCH 05/12] KVM: TDX: Add tdx_pamt_get()/put() helpers
+Message-ID: <xjl4nloxtmp7jrfus5rnij6xz6ut6p7riixj7mwt32zlkc7k27@xvallgw2ei7r>
+References: <20250502130828.4071412-1-kirill.shutemov@linux.intel.com>
+ <20250502130828.4071412-6-kirill.shutemov@linux.intel.com>
+ <55c1c173bfb13d897eaaabcc04f38d010608a7e3.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 23 May 2025 11:20:20 +0200
-Message-Id: <DA3FGGI5PEZG.3T26KJXT2QO8M@ventanamicro.com>
-Cc: "Atish Patra" <atish.patra@linux.dev>, <kvm-riscv@lists.infradead.org>,
- <kvm@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
- <linux-kernel@vger.kernel.org>, "Anup Patel" <anup@brainfault.org>, "Atish
- Patra" <atishp@atishpatra.org>, "Paul Walmsley" <paul.walmsley@sifive.com>,
- "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
- "Alexandre Ghiti" <alex@ghiti.fr>, "Andrew Jones" <ajones@ventanamicro.com>
-To: "Anup Patel" <apatel@ventanamicro.com>
-From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
-Subject: Re: [PATCH v3 0/2] RISC-V: KVM: VCPU reset fixes
-References: <20250515143723.2450630-4-rkrcmar@ventanamicro.com>
- <1a7a81fd-cf15-4b54-a805-32d66ced4517@linux.dev>
- <DA3CUGMQXZNW.2BF5WWE4ANFS0@ventanamicro.com>
- <CAK9=C2Xi3=9JL5f=0as2nEYKuRVTtJoL6Vdt_y2E06ta6G_07A@mail.gmail.com>
-In-Reply-To: <CAK9=C2Xi3=9JL5f=0as2nEYKuRVTtJoL6Vdt_y2E06ta6G_07A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <55c1c173bfb13d897eaaabcc04f38d010608a7e3.camel@intel.com>
 
-2025-05-23T13:38:26+05:30, Anup Patel <apatel@ventanamicro.com>:
-> On Fri, May 23, 2025 at 12:47=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkr=
-cmar@ventanamicro.com> wrote:
->>
->> 2025-05-22T14:43:40-07:00, Atish Patra <atish.patra@linux.dev>:
->> > On 5/15/25 7:37 AM, Radim Kr=C3=84m=C3=83=C2=A1=C3=85 wrote:
->> >> Hello,
->> >>
->> >> the design still requires a discussion.
->> >>
->> >> [v3 1/2] removes most of the additional changes that the KVM capabili=
-ty
->> >> was doing in v2.  [v3 2/2] is new and previews a general solution to =
-the
->> >> lack of userspace control over KVM SBI.
->> >>
->> >
->> > I am still missing the motivation behind it. If the motivation is SBI
->> > HSM suspend, the PATCH2 doesn't achieve that as it forwards every call
->> > to the user space. Why do you want to control hsm start/stop from the
->> > user space ?
->>
->> HSM needs fixing, because KVM doesn't know what the state after
->> sbi_hart_start should be.
->> For example, we had a discussion about scounteren and regardless of what
->> default we choose in KVM, the userspace might want a different value.
->> I don't think that HSM start/stop is a hot path, so trapping to
->> userspace seems better than adding more kernel code.
->
-> There are no implementation specific S-mode CSR reset values
-> required at the moment.
+On Mon, May 05, 2025 at 12:44:26PM +0000, Huang, Kai wrote:
+> On Fri, 2025-05-02 at 16:08 +0300, Kirill A. Shutemov wrote:
+> > Introduce a pair of helpers to allocate and free memory for a given 2M
+> > range. The range is represented by struct page for any memory in the
+> > range and the PAMT memory by a list of pages.
+> > 
+> > Use per-2M refcounts to detect when PAMT memory has to be allocated and
+> > when it can be freed.
+> > 
+> > pamt_lock spinlock serializes against races between multiple
+> > tdx_pamt_add() as well as tdx_pamt_add() vs tdx_pamt_put().
+> 
+> Maybe elaborate a little bit on _why_ using spinlock?
+> 
+> > 
+> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > ---
+> >  arch/x86/include/asm/tdx.h   |   2 +
+> >  arch/x86/kvm/vmx/tdx.c       | 123 +++++++++++++++++++++++++++++++++++
+> >  arch/x86/kvm/vmx/tdx_errno.h |   1 +
+> >  3 files changed, 126 insertions(+)
+> > 
+> > diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+> > index 8091bf5b43cc..42449c054938 100644
+> > --- a/arch/x86/include/asm/tdx.h
+> > +++ b/arch/x86/include/asm/tdx.h
+> > @@ -135,6 +135,8 @@ static inline int tdx_nr_pamt_pages(const struct tdx_sys_info *sysinfo)
+> >  	return sysinfo->tdmr.pamt_4k_entry_size * PTRS_PER_PTE / PAGE_SIZE;
+> >  }
+> >  
+> > +atomic_t *tdx_get_pamt_refcount(unsigned long hpa);
+> > +
+> 
+> This at least needs to be in the same patch which exports it.  But as replied to
+> patch 2, I think we should just move the code in this patch to TDX core code.
+> 
+> >  int tdx_guest_keyid_alloc(void);
+> >  u32 tdx_get_nr_guest_keyids(void);
+> >  void tdx_guest_keyid_free(unsigned int keyid);
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index b952bc673271..ea7e2d93fb44 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -207,6 +207,10 @@ static bool tdx_operand_busy(u64 err)
+> >  	return (err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY;
+> >  }
+> >  
+> > +static bool tdx_hpa_range_not_free(u64 err)
+> > +{
+> > +	return (err & TDX_SEAMCALL_STATUS_MASK) == TDX_HPA_RANGE_NOT_FREE;
+> > +}
+> >  
+> >  /*
+> >   * A per-CPU list of TD vCPUs associated with a given CPU.
+> > @@ -276,6 +280,125 @@ static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
+> >  	vcpu->cpu = -1;
+> >  }
+> >  
+> > +static DEFINE_SPINLOCK(pamt_lock);
+> > +
+> > +static void tdx_free_pamt_pages(struct list_head *pamt_pages)
+> > +{
+> > +	struct page *page;
+> > +
+> > +	while ((page = list_first_entry_or_null(pamt_pages, struct page, lru))) {
+> > +		list_del(&page->lru);
+> > +		__free_page(page);
+> > +	}
+> > +}
+> > +
+> > +static int tdx_alloc_pamt_pages(struct list_head *pamt_pages)
+> > +{
+> > +	for (int i = 0; i < tdx_nr_pamt_pages(tdx_sysinfo); i++) {
+> > +		struct page *page = alloc_page(GFP_KERNEL);
+> > +		if (!page)
+> > +			goto fail;
+> > +		list_add(&page->lru, pamt_pages);
+> > +	}
+> > +	return 0;
+> > +fail:
+> > +	tdx_free_pamt_pages(pamt_pages);
+> > +	return -ENOMEM;
+> > +}
+> > +
+> > +static int tdx_pamt_add(atomic_t *pamt_refcount, unsigned long hpa,
+> > +			struct list_head *pamt_pages)
+> > +{
+> > +	u64 err;
+> > +
+> > +	hpa = ALIGN_DOWN(hpa, SZ_2M);
+> > +
+> > +	spin_lock(&pamt_lock);
+> 
+> Just curious, Can the lock be per-2M-range?
+> 
+> > +
+> > +	/* Lost race to other tdx_pamt_add() */
+> > +	if (atomic_read(pamt_refcount) != 0) {
+> > +		atomic_inc(pamt_refcount);
+> > +		spin_unlock(&pamt_lock);
+> > +		tdx_free_pamt_pages(pamt_pages);
+> 
+> It's unfortunate multiple caller of tdx_pamt_add() needs to firstly allocate
+> PAMT pages by the caller out of the spinlock and then free them here.
+> 
+> I am thinking if we make tdx_pamt_add() return:
+> 
+> 	* > 0: PAMT pages already added (another tdx_pamt_add() won)
+> 	* = 0: PAMT pages added successfully
+> 	* < 0: error code
+> 
+> .. then we at least could move tdx_free_pamt_pages() to the caller too.
+> 
+> > +		return 0;
+> > +	}
+> > +
+> > +	err = tdh_phymem_pamt_add(hpa | TDX_PS_2M, pamt_pages);
+> > +
+> > +	if (err)
+> > +		tdx_free_pamt_pages(pamt_pages);
+> 
+> Seems we are calling tdx_free_pamt_pages() within spinlock, which is not
+> consistent with above when another tdx_pamt_add() has won the race.
+> 
+> > +
+> > +	/*
+> > +	 * tdx_hpa_range_not_free() is true if current task won race
+> > +	 * against tdx_pamt_put().
+> > +	 */
+> > +	if (err && !tdx_hpa_range_not_free(err)) {
+> > +		spin_unlock(&pamt_lock);
+> > +		pr_tdx_error(TDH_PHYMEM_PAMT_ADD, err);
+> > +		return -EIO;
+> > +	}
+> 
+> I had hard time to figure out why we need to handle tdx_hpa_range_not_free()
+> explicitly.  IIUC, it is because atomic_dec_and_test() is used in
+> tdx_pamt_put(), in which case the atomic_t can reach to 0 outside of the
+> spinlock thus tdh_phymem_pamt_add() can be called when there's still PAMT pages
+> populated.
+> 
+> But ...
+> 
+> > +
+> > +	atomic_set(pamt_refcount, 1);
+> > +	spin_unlock(&pamt_lock);
+> > +	return 0;
+> > +}
+> > +
+> > +static int tdx_pamt_get(struct page *page)
+> > +{
+> > +	unsigned long hpa = page_to_phys(page);
+> > +	atomic_t *pamt_refcount;
+> > +	LIST_HEAD(pamt_pages);
+> > +
+> > +	if (!tdx_supports_dynamic_pamt(tdx_sysinfo))
+> > +		return 0;
+> > +
+> > +	pamt_refcount = tdx_get_pamt_refcount(hpa);
+> > +	WARN_ON_ONCE(atomic_read(pamt_refcount) < 0);
+> > +
+> > +	if (atomic_inc_not_zero(pamt_refcount))
+> > +		return 0;
+> 
+> ... if we set the initial value of pamt_refcount to -1, and use
+> atomic_inc_unless_negetive() here:
+> 
+> 	if (atomic_inc_unless_negative(pamt_refcount))
+> 		return 0;
+> 
+> 	if (tdx_alloc_pamt_pages(&pamt_pages))
+> 		return -ENOMEM;
+> 
+> 	spin_lock(&pamt_lock);
+> 	ret = tdx_pamt_add(hpa, &pamt_pages);
+> 	if (ret >= 0)
+> 		atomic_inc(pamt_refcount, 0);
+> 	spin_unlock(&pamt_lock);
+> 	
+> 	/*
+> 	 * If another tdx_pamt_get() won the race, or in case of
+> 	 * error, PAMT pages are not used and can be freed.
+> 	 */
+> 	if (ret)
+> 		tdx_free_pamt_pages(&pamt_pages);
+> 
+> 	return ret >= 0 ? 0 : ret;
+> 
+> and ...
+> 
+> > +
+> > +	if (tdx_alloc_pamt_pages(&pamt_pages))
+> > +		return -ENOMEM;
+> > +
+> > +	return tdx_pamt_add(pamt_refcount, hpa, &pamt_pages);
+> > +}
+> > +
+> > +static void tdx_pamt_put(struct page *page)
+> > +{
+> > +	unsigned long hpa = page_to_phys(page);
+> > +	atomic_t *pamt_refcount;
+> > +	LIST_HEAD(pamt_pages);
+> > +	u64 err;
+> > +
+> > +	if (!tdx_supports_dynamic_pamt(tdx_sysinfo))
+> > +		return;
+> > +
+> > +	hpa = ALIGN_DOWN(hpa, SZ_2M);
+> > +
+> > +	pamt_refcount = tdx_get_pamt_refcount(hpa);
+> > +	if (!atomic_dec_and_test(pamt_refcount))
+> > +		return;
+> 
+> ... use atomic_dec_if_possible() here, we should be able to avoid the special
+> handling of tdx_hpa_range_not_free() in tdx_pamt_get().  Someething like:
+> 
+> 	if (atomic_dec_if_positive(pamt_refcount) >= 0)
+> 		return;
+> 
+> 	spin_lock(&pamt_lock);
+> 	
+> 	/* tdx_pamt_get() called more than once */
+> 	if (atomic_read(pamt_refcount) > 0) {
 
-Jessica mentioned that BSD requires scounteren to be non-zero, so
-userspace should be able to provide that value.
+This check would do nothing to protect you against parallel increase of
+the counter as we get here with pamt_refcount == 0 the parallel
+atomic_inc_unless_negative() is free to bump the counter in the fast path
+without taking the lock just after this condition.
 
-I would prefer if KVM could avoid getting into those discussions.
-We can just just let userspace be as crazy as it wants.
+So, the code below will free PAMT memory when there is still user.
 
->                         Whenever the need arises, we will extend
-> the ONE_REG interface so that user space can specify custom
-> CSR reset values at Guest/VM creation time. We don't need to
-> forward SBI HSM calls to user space for custom S-mode CSR
-> reset values.
+> 		spin_unlock(&pamt_lock);
+> 		return;
+> 	}
+> 
+> 	err = tdh_phymem_pamt_remove(hpa | TDX_PS_2M, &pamt_pages);
+> 	atomic_set(pamt_refcount, -1);
+> 	spin_unlock(&pamt_lock);
+> 
+> 	tdx_free_pamt_pages(&pamt_pages);
+> 
+> Hmm.. am I missing anything?
+> 			
+> > +
+> > +	spin_lock(&pamt_lock);
+> > +
+> > +	/* Lost race against tdx_pamt_add()? */
+> > +	if (atomic_read(pamt_refcount) != 0) {
+> > +		spin_unlock(&pamt_lock);
+> > +		return;
+> > +	}
+> > +
+> > +	err = tdh_phymem_pamt_remove(hpa | TDX_PS_2M, &pamt_pages);
+> > +	spin_unlock(&pamt_lock);
+> > +
+> > +	if (err) {
+> > +		pr_tdx_error(TDH_PHYMEM_PAMT_REMOVE, err);
+> > +		return;
+> > +	}
+> > +
+> > +	tdx_free_pamt_pages(&pamt_pages);
+> > +}
+> > +
+> 
 
-The benefits of adding a new ONE_REG interface seem very small compared
-to the drawbacks of having extra kernel code.
-
-If userspace would want to reset or setup new multi-VCPUs VMs often, we
-could add an interface that loads the whole register state from
-userspace in a single IOCTL, because ONE_REG is not the best interface
-for bulk data transfer either.
-
->> Forwarding all the unimplemented SBI ecalls shouldn't be a performance
->> issue, because S-mode software would hopefully learn after the first
->> error and stop trying again.
->>
->> Allowing userspace to fully implement the ecall instruction one of the
->> motivations as well -- SBI is not a part of RISC-V ISA, so someone might
->> be interested in accelerating a different M-mode software with KVM.
->>
->> I'll send v4 later today -- there is a missing part in [2/2], because
->> userspace also needs to be able to emulate the base SBI extension.
->>
->
-> [...]          The best approach is to selectively forward SBI
-> calls to user space where needed (e.g. SBI system reset,
-> SBI system suspend, SBI debug console, etc.).
-
-That is exactly what my proposal does, it's just that the userspace says
-what is "needed".
-
-If we started with this mechanism, KVM would not have needed to add
-SRST/SUSP/DBCN SBI emulation at all -- they would be forwarded as any
-other unhandled ecall.
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
