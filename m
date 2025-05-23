@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-47481-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47482-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CA16AC1943
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 03:09:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 256C9AC1950
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 03:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDF511C05CE3
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 01:09:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89E0AA46574
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 01:09:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6F7286D5E;
-	Fri, 23 May 2025 01:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F48927D77B;
+	Fri, 23 May 2025 01:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WxrI960j"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F6oWaVrY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C02227F178
-	for <kvm@vger.kernel.org>; Fri, 23 May 2025 01:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADB227FB02
+	for <kvm@vger.kernel.org>; Fri, 23 May 2025 01:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747962065; cv=none; b=U9rMF5WIWJKfOcOzEB/75yO7QtwO7Xc16vHUZardPFvme5987JcoHwi7ToMp1PtAeoDqguM8V6jS0EvpyvOeeft8LA5EM8/zjrRDokA8/a7NAvqfdjC9IpSkDiS7vG35gdreddxzF4/L3no75Dje8KFb9J5TM275vlWbChcNto0=
+	t=1747962066; cv=none; b=hJPI2Iva04mGhVRH54wAaEnvCjOmfOTP7MM0VF7gy46IXV4Ng09i4EZpZxWZesVMPsyjj66ulT0vPCqr8SeV+UqDOeDyDtQ6WrjsGbX42xqVcv9wRo6Nl+lDFmG35mlRbXC7uDhOK4hELYuIkM1srZwMxqlvLWKbFKTtZghUu0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747962065; c=relaxed/simple;
-	bh=myxsKIMu9z2uOdqZo9sjfpCseSVPuh0CYv0CumURj6M=;
+	s=arc-20240116; t=1747962066; c=relaxed/simple;
+	bh=lF7pC8sohabNgcaIb1E8HB/O7nTwbIatU6uqVNQw5dg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ULNN0exFKEYwoS9z2aDx39ii1Wg8+ww32LCZMbvU+Gmh7fCs0TtfGlA8PtNVb/3OiQ2gKZsYGlehYeNAAcV5NGiWJUd9T1gw5N5WpjsUur9RIman0ABWTG5c0tnsfheKazHt9scryR3z1t8fWakTGyQTSiZBUCBNWvm36emgLHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WxrI960j; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=DRHHGZZdv61rEQbDulNFCgmz0EtLbakvD3xbRBuaWe4SrHhA50NeWRX33acIRLNc2diq5A45h5qD7FhLc01JpouVtc675zksPzp8LB7EHfdBbw3HrViNv5/amKwBMzeRe8i7/qngeeThUPJ4iz319vhM+ByQhJ23RuT73BTBwRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F6oWaVrY; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30a59538b17so7880686a91.3
-        for <kvm@vger.kernel.org>; Thu, 22 May 2025 18:01:03 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b26e33ae9d5so8986422a12.1
+        for <kvm@vger.kernel.org>; Thu, 22 May 2025 18:01:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747962063; x=1748566863; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747962064; x=1748566864; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z6qJrl8moJt7bfJRd6rO8Y2MTdMUnxYZYEX7kVfA4zY=;
-        b=WxrI960jyZ6SxgFMcPlvfOPhWWcpQcZ8rNwoiMFkS1ofqeoAPzb2uF7fCnV1Q6+XlH
-         KqcBI/U1KC5ndGSWLSX+oAOTcQ0EWz00n+pUFFYgIuT982olZaxT36FFwQRBOMWoYxbN
-         jIRMMFp+WLPjqDdpYcrzU+4vUGwpeEXJ1mwO4/HJFBQXCRK5c8RKbR4LIQdzlrwlK3cH
-         ZaQJY9+qiiPomtADVDuTE2AH7fA0aBbqqoT730LkJxDh6KCtxM3rYPyeE0P21oewYnNe
-         cQuE9jvAkdyfc7iTOC0DqHx8FEOuaxF3XklAoHsNR4fnE8oS8aK3h17XLUqVXMGip5aG
-         9kpA==
+        bh=VEEMumgPPOxuu5AKa6Opm2ERFPwrtqEfeM08GKoEFwc=;
+        b=F6oWaVrYaVXLtdfVpgmSmF+lqbZFv3xWF3l9OcfkamoAEi3o6ABXB2eVhwo4RgOAvz
+         /zxu+wBzoLoCdsNI5p9UOriY0tUA4PyQA0Hj1IzhyWZJNmQlBZEFeiOa47cpLIyKQYlJ
+         t+KTWQspbYa/us7Q83VMfToKUgiz8ALSHgtuincC3Uwo6BxRmC81vJ/sqVnQLvSMrnnS
+         YqWeHHiRiZMMMXAj2eiGMLgjvA7fqUBCZxUBxrCnlac2AyRXk9TwAq2i/pW2B+AIE7cI
+         cwIaQjNa7gFod/JpBBe839ssb8uvwkOKMUePGzYvst2ZLxyoOUm9r9Y10esNVLkN5mbn
+         aSwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747962063; x=1748566863;
+        d=1e100.net; s=20230601; t=1747962064; x=1748566864;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Z6qJrl8moJt7bfJRd6rO8Y2MTdMUnxYZYEX7kVfA4zY=;
-        b=wObwY5eLTXjZ2ITWeMYGA+/Z3nwEoZoAro9d+hFFCcACru35lV52oR0Z3zJexIBDZV
-         JdAGZpM+8HAu0XUYIMhKT4WnaYMNh14sdZcOV3VE6gLfyd8Vj6JWrlEc9+DIXfa1rmye
-         WOEUcWz8wEjIXF4PrEN26Q/VKvWm2Gp/OEExEffTuoCrWSotvqliCMNiMeKry55+2CLq
-         c901IXWA69cYlcjPKCDZKCo4DKtLTb0Y2Y22vdm0kOXJEu/w1Oz2EZ58goTPy0bmMl07
-         FS15lR0JsygiGc75yA9Ul6XZx5u4nV+AWVlXrrR9MderGfj+bqOeVtJCD9dpwtyHV4is
-         htcQ==
-X-Gm-Message-State: AOJu0Yyx3i1Qsv4hGdU16tXmBxXyyouHo8u10Vpa3m+OW1Tx51c0whh8
-	CXFzToaIcJecGIXap9VhJYE5z0Gch9Fi330030jeeEtwnKFhDfvhLHk5XRvuN12Y8HAVEBkgM2F
-	fTtyo8A==
-X-Google-Smtp-Source: AGHT+IHGd9AMcPRaXLw73jWmjjZZ11tSRCThxeyCURZKAbhkOZc/Mi2j9RJn55Hndx07vxGEYk1l0sThWdQ=
-X-Received: from pjb7.prod.google.com ([2002:a17:90b:2f07:b0:2ff:6132:8710])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f8c:b0:2fc:3264:3666
- with SMTP id 98e67ed59e1d1-30e7d5be34bmr41066961a91.30.1747962062808; Thu, 22
- May 2025 18:01:02 -0700 (PDT)
+        bh=VEEMumgPPOxuu5AKa6Opm2ERFPwrtqEfeM08GKoEFwc=;
+        b=c6sm0GIhJDZuUdKCDIs1HQKr1mZwQC4mKNK21sKTS5EBIUz6VkyLystNugHvY6Lwkg
+         g+HTejsVnxAy18E6YNqmlHt15+5x2VS9K/gP8MAVsyCRK9Y7aJcEWWG5ycs7Gd1eCfhs
+         riKVnAPjfzlNsIgZXNN7ono9Fnd/NKx62l3SIBMpaCDb8LSBvKIFe/nmNDmLPzdAwmEJ
+         msc9l2Z05sWnhZWyrtQh/0g/+BTOwyUsO4IVeqLby71PZZm9qWqGzbPzw/PN5y9APGap
+         U17KqFC/wIhkKpj/zySHD2u3ngDIhkRIbXU2ThcmQwoyTU5/CiqS5nPfqoVuJnqJescI
+         GbrQ==
+X-Gm-Message-State: AOJu0YxCQuOO9j3K2inJcXXqzDOlil3Jb7iX2vvqzmSjeC1DJ0+w8EsO
+	R2puFn2FMzEP39jwFpma3nob98cKEi87DBU8soDbGbXS0ITGnPs1DxaMZRiKlhudrMzxPMRvegi
+	+VbopNg==
+X-Google-Smtp-Source: AGHT+IETqKO87aMFsUZqxCg0LdZa+zJR5n+2fRyhOgSEe0vCrHKlfeYquaUmcKRaIo3hs3+dxPHGjYw4zFc=
+X-Received: from pgbfq25.prod.google.com ([2002:a05:6a02:2999:b0:b26:e54d:d7dd])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a129:b0:1f5:8e54:9f10
+ with SMTP id adf61e73a8af0-2170cde51b5mr47706400637.34.1747962064242; Thu, 22
+ May 2025 18:01:04 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 22 May 2025 17:59:36 -0700
+Date: Thu, 22 May 2025 17:59:37 -0700
 In-Reply-To: <20250523010004.3240643-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250523010004.3240643-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1151.ga128411c76-goog
-Message-ID: <20250523010004.3240643-32-seanjc@google.com>
-Subject: [PATCH v2 31/59] KVM: Fold kvm_arch_irqfd_route_changed() into kvm_arch_update_irqfd_routing()
+Message-ID: <20250523010004.3240643-33-seanjc@google.com>
+Subject: [PATCH v2 32/59] KVM: x86: Track irq_bypass_vcpu in common x86 code
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>, 
@@ -87,82 +87,63 @@ Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
 	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Fold kvm_arch_irqfd_route_changed() into kvm_arch_update_irqfd_routing().
-Calling arch code to know whether or not to call arch code is absurd.
+Track the vCPU that is being targeted for IRQ bypass, a.k.a. for a posted
+IRQ, in common x86 code.  This will allow for additional consolidation of
+the SVM and VMX code.
 
+Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/irq.c       | 15 +++++----------
- include/linux/kvm_host.h |  2 --
- virt/kvm/eventfd.c       | 10 +---------
- 3 files changed, 6 insertions(+), 21 deletions(-)
+ arch/x86/kvm/irq.c      | 7 ++++++-
+ arch/x86/kvm/svm/avic.c | 4 ----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
-index b3ce870d1d91..582fc17ae02b 100644
+index 582fc17ae02b..3a0f28e98429 100644
 --- a/arch/x86/kvm/irq.c
 +++ b/arch/x86/kvm/irq.c
-@@ -610,15 +610,10 @@ void kvm_arch_update_irqfd_routing(struct kvm_kernel_irqfd *irqfd,
- 				   struct kvm_kernel_irq_routing_entry *old,
- 				   struct kvm_kernel_irq_routing_entry *new)
- {
-+	if (old->type == KVM_IRQ_ROUTING_MSI &&
-+	    new->type == KVM_IRQ_ROUTING_MSI &&
-+	    !memcmp(&old->msi, &new->msi, sizeof(new->msi)))
-+		return;
+@@ -544,8 +544,13 @@ static int kvm_pi_update_irte(struct kvm_kernel_irqfd *irqfd,
+ 
+ 	r = kvm_x86_call(pi_update_irte)(irqfd, irqfd->kvm, host_irq, irqfd->gsi,
+ 					 vcpu, irq.vector);
+-	if (r)
++	if (r) {
++		WARN_ON_ONCE(irqfd->irq_bypass_vcpu && !vcpu);
++		irqfd->irq_bypass_vcpu = NULL;
+ 		return r;
++	}
 +
- 	kvm_pi_update_irte(irqfd, new);
- }
--
--bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *old,
--				  struct kvm_kernel_irq_routing_entry *new)
--{
--	if (old->type != KVM_IRQ_ROUTING_MSI ||
--	    new->type != KVM_IRQ_ROUTING_MSI)
--		return true;
--
--	return !!memcmp(&old->msi, &new->msi, sizeof(new->msi));
--}
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index ee79b1167e02..706f2402ae8e 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2409,8 +2409,6 @@ void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *);
- void kvm_arch_update_irqfd_routing(struct kvm_kernel_irqfd *irqfd,
- 				   struct kvm_kernel_irq_routing_entry *old,
- 				   struct kvm_kernel_irq_routing_entry *new);
--bool kvm_arch_irqfd_route_changed(struct kvm_kernel_irq_routing_entry *,
--				  struct kvm_kernel_irq_routing_entry *);
- #endif /* CONFIG_HAVE_KVM_IRQ_BYPASS */
++	irqfd->irq_bypass_vcpu = vcpu;
  
- #ifdef CONFIG_HAVE_KVM_INVALID_WAKEUPS
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index a4f80fe8a5f3..defc2c04d241 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -291,13 +291,6 @@ void __weak kvm_arch_update_irqfd_routing(struct kvm_kernel_irqfd *irqfd,
+ 	trace_kvm_pi_irte_update(host_irq, vcpu, irqfd->gsi, irq.vector, !!vcpu);
+ 	return 0;
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index 6085a629c5e6..97b747e82012 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -767,22 +767,18 @@ static void svm_ir_list_del(struct kvm_kernel_irqfd *irqfd)
+ 	spin_lock_irqsave(&to_svm(vcpu)->ir_list_lock, flags);
+ 	list_del(&irqfd->vcpu_list);
+ 	spin_unlock_irqrestore(&to_svm(vcpu)->ir_list_lock, flags);
+-
+-	irqfd->irq_bypass_vcpu = NULL;
+ }
+ 
+ static int svm_ir_list_add(struct vcpu_svm *svm,
+ 			   struct kvm_kernel_irqfd *irqfd,
+ 			   struct amd_iommu_pi_data *pi)
  {
+-	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 	unsigned long flags;
+ 	u64 entry;
  
- }
--
--bool __attribute__((weak)) kvm_arch_irqfd_route_changed(
--				struct kvm_kernel_irq_routing_entry *old,
--				struct kvm_kernel_irq_routing_entry *new)
--{
--	return true;
--}
- #endif
+ 	if (WARN_ON_ONCE(!pi->ir_data))
+ 		return -EINVAL;
  
- static int
-@@ -617,8 +610,7 @@ void kvm_irq_routing_update(struct kvm *kvm)
- 		irqfd_update(kvm, irqfd);
+-	irqfd->irq_bypass_vcpu = vcpu;
+ 	irqfd->irq_bypass_data = pi->ir_data;
  
- #if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
--		if (irqfd->producer &&
--		    kvm_arch_irqfd_route_changed(&old, &irqfd->irq_entry))
-+		if (irqfd->producer)
- 			kvm_arch_update_irqfd_routing(irqfd, &old, &irqfd->irq_entry);
- #endif
- 	}
+ 	spin_lock_irqsave(&svm->ir_list_lock, flags);
 -- 
 2.49.0.1151.ga128411c76-goog
 
