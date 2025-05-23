@@ -1,406 +1,256 @@
-Return-Path: <kvm+bounces-47576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 341F2AC21F1
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 13:22:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3D13AC21FB
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 13:31:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF67C7BA182
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 11:19:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D51467B1D59
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 11:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FE222D79F;
-	Fri, 23 May 2025 11:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D53B22DFE8;
+	Fri, 23 May 2025 11:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZyIm82a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AQVynea5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0CF22A7EF;
-	Fri, 23 May 2025 11:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747999222; cv=none; b=Wqp3bqRv68XmvFkilmdnkwGAGsTg12KgCzRc5IeBOHf2ADUlAeY6swTM1vkdTaCvcAePhPInk6M4wFg1frSXxO+CNXj2mhM6+IY1rt1B0OJQ41gGqnE7oxtsOrwHccWOVWF4OVO3HWEOVGvjYQeFvfqjvAXVN2RwTBX0GQVyuS4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747999222; c=relaxed/simple;
-	bh=RcGgqAaZk/0SBkr2MlLXSc+3IGGjsNtTpWGSzez2kbo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pbpzoAhgSYj/VT2C8DjLc8aWGfx/AsQHkUiW0ARVYHGY9ICjHFidtHAkxlBiNuialU53sNWUSznHdUR4Y2qmgG9BTektLosJVwFZZ5DDamKFuMkl+aMbsHCP/dN8WYRCXRRlOQGe6Jsj10bGniZNomib88Gli0u5pn8efY0lx5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dZyIm82a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2038FC4CEE9;
-	Fri, 23 May 2025 11:20:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747999221;
-	bh=RcGgqAaZk/0SBkr2MlLXSc+3IGGjsNtTpWGSzez2kbo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=dZyIm82aQXDdo6EOb1ugTEhsZkUun0NAW086/fsm2q9OmMrxKp/+LL9IY1XH/s4CB
-	 zKjXnaCiQiABlLFARP4oMEcx/pWKTxBvrT+nDmaukavRfr++Z7nirpNFrDdfWwFTvv
-	 7RtWjSuEmihODGp5nQrVykpIs9KKM5jVbzZ0Q3kezzDSiBqXUVo71lzaXDz4vrF6tr
-	 8g+MEyKsLI82W6ITWKOr7R8mkEX4Hy/NMydpXtmpV8RsQJFyHTO/tt/JvbxDz/KShA
-	 hu9Pg4nICQbleEJYHQ405CbmaiIuMbHizzWx2pnRIKV7JV7qhOS7Utue6VdMQ9Iuu7
-	 l+b6+6dsudWDA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uIQRm-00HYuf-P2;
-	Fri, 23 May 2025 12:20:18 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	D Scott Phillips <scott@os.amperecomputing.com>,
-	Fuad Tabba <tabba@google.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Kees Cook <kees@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Quentin Perret <qperret@google.com>,
-	Seongsu Park <sgsu.park@samsung.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [GIT PULL] KVM/arm64 updates for 6.16
-Date: Fri, 23 May 2025 12:20:15 +0100
-Message-Id: <20250523112015.146300-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727DC262BE;
+	Fri, 23 May 2025 11:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747999890; cv=fail; b=ZdnKvCnLgbfKBU876fg3rD6gWtuxw8zoo7rnhba06DEcI/QwogNLVrxGukBRho6RO/qX20x3VwWAZWuLOe0Z6O8wQSyiemmiJQ9N3R/5xiFf8wMtRFfOgsyzOK//6fQTtWLi4Mok8eufkqUe6SZgMXsOrL8RPFVFE2W/dpeyXFY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747999890; c=relaxed/simple;
+	bh=tgluCeSf9jZ5nocPiD3OBLSWftroB3JLQtR+bkt1seM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qdcC2qZ81LIiufxuvRRaRsBR9L0MN81Tqbl3FRdg9gKhj527D8N4L5MXt5sV87tWCJpsGxnL+yxN5K7u6fZEONxQWj+aSlkJB/p8Mq9dQpxocq/yyuNHVTrLGfwZzWBSyJBmXTPanGn3PCjrvvsisgvU9WLwamotyQfTE3vzUYI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AQVynea5; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747999888; x=1779535888;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=tgluCeSf9jZ5nocPiD3OBLSWftroB3JLQtR+bkt1seM=;
+  b=AQVynea56hpLZVQR9/DM2NoG35V0QZ8t8MbTJe0LpY9ZiTsxDBo8aWuA
+   14K3OFkIUqqmDHB+GD+5bQd9nEXHMP4XqUjfScb6dgfhRKYmAQuInBIm0
+   gIthNj/QW0QHFFZIFuBlGwgugveYHWOgKlkp/zpGMLPwWm6B1jHQNwB30
+   5wsPVscX4ogf5hsrtX1nypTDAuVExQxMzIwoQgqB1FpPHtkvGr5XUnlI2
+   gvj8Wj0rUXB4/IoFfHH9iTqaHTfmotbsTgYC/0uakQVLUrDv0aVSOzECX
+   3gjKdWSURbWff90Mb+Pufe/WnlEEHvaamLn6rkHpKmg43gOUF50iFWNKN
+   A==;
+X-CSE-ConnectionGUID: op8tdS49S+S9oHOLMTjyXQ==
+X-CSE-MsgGUID: FT0TqwOIT1KOlpSsWf/WrA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11441"; a="60690627"
+X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
+   d="scan'208";a="60690627"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 04:31:27 -0700
+X-CSE-ConnectionGUID: fufhf1TyTCqOjym27MMPtw==
+X-CSE-MsgGUID: Of5r7sZKS1WbRsvPIWOe3A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,308,1739865600"; 
+   d="scan'208";a="140985438"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2025 04:31:27 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 23 May 2025 04:31:27 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Fri, 23 May 2025 04:31:27 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.41)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Fri, 23 May 2025 04:31:26 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mDUZvrVnm0rk1CR1DRS5pjPWSsgzuyeVcP/X01kJ/BvbN7dooHaQd2uId1f/xxAFmv46/CSP46zH7JQK58TnE41I1UBQ/Ze+wvu0dadwnRsCEJOBqTitI8qIV6wc2MmjSULKznsmB+VaLEh7cuZEjiuRqmPC958D3VhxyGsmyfxWNZhkv9YJYHBNY6qpHJprqJXExDWxLCeU5V/XY6YC9becHqZgeX9V7y/IIFCnQrLqHMniEkPPbyjsufQCY0cx3kvGZOcMx1MUz+rFXjFJWCM9kXghKEe4IUG6kbilNAdrWWpppWr0Rmblt8kG4D1bvarvQf3ahjT+gbNQAFfoXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tgluCeSf9jZ5nocPiD3OBLSWftroB3JLQtR+bkt1seM=;
+ b=MnrlYElofz/I4hRi5JZYCjAYMUH2JxinqEjELiuzHVCvEB0gZYLp/YoeudEou20z6JY7I5OU0vOcsoN+NJm3+ymkpRj1/F93aSB2nqaVulQ7Xxf+L7ij4iaSGGjSgGxNk5lnTQ4ct43Sqn+/8taJyve3RAXmw9LRGa8T3P8gamMvX1dKCpeo5UD2y8i1YKLqETd8Mm7Dbw/OBPT8HpzW+zBPYgMQRMwaf7ZnwyM3AjaFKWy751/9bXWQd6WV9k0xfeG2JpZttkN+YDw0r9v0yqhDANQ+xeuARqcTkyzQLMV9zh+E55jXwC88AR3UwsUU20X78GfwgL3eKrg1BpQJ2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5525.namprd11.prod.outlook.com (2603:10b6:208:31f::10)
+ by BL1PR11MB5255.namprd11.prod.outlook.com (2603:10b6:208:31a::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.22; Fri, 23 May
+ 2025 11:31:10 +0000
+Received: from BL1PR11MB5525.namprd11.prod.outlook.com
+ ([fe80::1a2f:c489:24a5:da66]) by BL1PR11MB5525.namprd11.prod.outlook.com
+ ([fe80::1a2f:c489:24a5:da66%4]) with mapi id 15.20.8769.021; Fri, 23 May 2025
+ 11:31:10 +0000
+From: "Huang, Kai" <kai.huang@intel.com>
+To: "seanjc@google.com" <seanjc@google.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "vipinsh@google.com" <vipinsh@google.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 2/3] KVM: x86: Use kvzalloc() to allocate VM struct
+Thread-Topic: [PATCH v3 2/3] KVM: x86: Use kvzalloc() to allocate VM struct
+Thread-Index: AQHbxq0+OB9mwly9vEqEwiQpLwdhbLPWwyGAgANXzYCAAgqsAIAABhSAgAAM2QCAASEUgIAAXKwAgAD6g4CAAW40gA==
+Date: Fri, 23 May 2025 11:31:10 +0000
+Message-ID: <572c0f5ce627384b6441b64b9fa036b202d430b7.camel@intel.com>
+References: <20250516215422.2550669-1-seanjc@google.com>
+	 <20250516215422.2550669-3-seanjc@google.com>
+	 <219b6bd5-9afe-4d1c-aaab-03e5c580ce5c@redhat.com>
+	 <aCtQlanun-Kaq4NY@google.com>
+	 <dca247173aace1269ce8512ae2d3797289bb1718.camel@intel.com>
+	 <aC0MIUOTQbb9-a7k@google.com>
+	 <5546ad0e36f667a6b426ef47f1f40aee8d83efc9.camel@intel.com>
+	 <aC4JZ4ztJiFGVMkB@google.com>
+	 <918715044bf0aa6fb51ce511667bf7bb4ccbabea.camel@intel.com>
+	 <aC8pSfEBdHZW9Ze7@google.com>
+In-Reply-To: <aC8pSfEBdHZW9Ze7@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.56.1 (3.56.1-1.fc42) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5525:EE_|BL1PR11MB5255:EE_
+x-ms-office365-filtering-correlation-id: 3f72bc3a-751e-4add-f66f-08dd99ed5138
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?Z1dVSE03eWYrdkNiY3dvMk13UDJpcWR2NlNVZ3lGTkVqb0lyWHNZWHowb1Ny?=
+ =?utf-8?B?SXlBbGhDeUtEMmU1YUxvNDFJaFZvZDdOcEpvUzNMSlBHZEhxR0o3S0U2dmhO?=
+ =?utf-8?B?Q25ySkwzR2Z5NWJ1L0puSlVhZGh6NDVtWlJwUjdIMDNPQ0pVVi9BUUZRT1E3?=
+ =?utf-8?B?dUVTSkp6MEV2Smd1Mm1OdCtHWEY5UnVNSGkwdTVYbDFLVXBTODZOWC9XVWJa?=
+ =?utf-8?B?YnluSWtZaE1BY1BXa1V0dGlYdzBoRG1LVG95MGtpSnVrUVRGYWU1YlcrOUhq?=
+ =?utf-8?B?ZFlqSUM3OXRBWnBMRVpLTldHeDV6N0taZmVWZ080anNLUU5uMWpwSjJlUXYv?=
+ =?utf-8?B?eUkvSmpSaDN1Y2pKeERuS3o2ZE9HcHA2TklRaHRicjJQeG5IdFd4V2VwcFFp?=
+ =?utf-8?B?VHh0RkFhQXJXQThsOG1qSnRyQkRRdFVYZTlnZlBrekZGZ2U5aDAzUFFMUkZP?=
+ =?utf-8?B?TUk5VVhjLzdpZUJpRVdLTGliNlZOYjZ6N3FCQWt3RjA4TzhoL29sbC9lbnpr?=
+ =?utf-8?B?MWQ4SmcvN0RYTEFDTjQ5eFc0am9oNVZuMlRncmZuOEZVNHN3TGFqV2VpR0xu?=
+ =?utf-8?B?eWdCUXh3ZUtraVRaOVpRZUU4U0pmMitETEVvaEh6bDJYL3h0SCtGK0gzcmkx?=
+ =?utf-8?B?V3RWSGxmcmRmbTRiRDRSTHQ2Z295ODAveGo4QkFnRFQ0eFpzcXNLZmJncHBE?=
+ =?utf-8?B?L2Z4ZUJVZElocHpWSUdMaTZTMWU3RjhFanRJcFJSNFF0NzlxWjVrTjYzTE54?=
+ =?utf-8?B?OEhINEZaTXpCa29YUVZwNXFBTU43NERIWEVXNnFDSndvcmZmS0NQRTV1K0FJ?=
+ =?utf-8?B?NFRyZUhNcnZCT1dzV2NlUC9NY0dtUUdubHcyTlRaYkYxcThiVE4yZFFZSjRm?=
+ =?utf-8?B?TVpna0xaSWhFcTJzOGZuUk1KZHN6OVRqVUN4MFB2TzBLWGVncUk2dnRkT1Zx?=
+ =?utf-8?B?N0I3OXg0dFgyak1lK2FjcnZaSVZyTnJXbndyendUWk9wQmROOTlQbE4rVE4x?=
+ =?utf-8?B?MVV3RkJIUGFFWTBHby8rKzc4VDhqVTNJTDd6c1JGRGNiMmdWZ1N5ZDByMEU4?=
+ =?utf-8?B?dS9NZjlJY1I3Rnp3bGtEcEMvWG5wUWtLTFo0Q1EvUnNHNWVZMk1hUG4zQjdq?=
+ =?utf-8?B?eDlXWXBZUjMxWjUybXVVa3A2QW5zZ2p1ckRHYUdPS1Awem44SzEwRDlWbENm?=
+ =?utf-8?B?d1EwR1FLT2dsQjh0Rjk1UUtLQWZuTnZvUE5GdUJXTy9zZjZlMlBWdTlVa2li?=
+ =?utf-8?B?d3c2ZElMY2d2aVZBU3U5TmtRdjBpaGxLaU9rcUNIaTEzcGlSZk5hbXBUd3pX?=
+ =?utf-8?B?OHZmTjdkS3MrVE1mNUdjMy84Mi95aUdCK1hERklqdlJtd21VeWxObnArMmpa?=
+ =?utf-8?B?cm9tZDJTM2o2aEJpNzZ3QXJOL3k2eGVuTkdjWm51dmE1a1pjSnF1UmJ6Nmtl?=
+ =?utf-8?B?Nk5Nb1A3QnlldWpuVElJdmVCQWU5WlRINmFwVkh1RTgreHdTc0tYNnhXd1JO?=
+ =?utf-8?B?em9sWXFPdmxTd3RzNHZGcjMzTm4wRFBZdFM3WE1IQnVzS2xvdVJTKzNpeGRv?=
+ =?utf-8?B?RE1rUFJsSEQ3VjgzL0QxSXNJMitpaEdDRDBTaFJZTnZZNS9EcTE1RDMzaVVW?=
+ =?utf-8?B?STB5dDNXVlZwd3lsZDY4QWUwZHl5Vld2K010SVYveWVCYkVrSU5wZlE2ZGUz?=
+ =?utf-8?B?ZmQycGtnbnNYMURxR2c4ZHJyUFowd3dML0dUeFJoWjZRQ1ZwMnRaVFRPUlRK?=
+ =?utf-8?B?SlJ6NmFWSlRTYzN4d2RqcFB6aDZBT2x3TlRiZkdIL0JqT3A1UW9LaU9CRDAr?=
+ =?utf-8?B?bEhScytUdytaSlYyeVBSSVMyUDFJY1I5U1AzQTJSL0hQNzVEcEY1d1ZxdzFw?=
+ =?utf-8?B?NEMxN2ljS0dLNDkxVnoxNUt6RGl3MGFWVnI0Z2RqRDZyNlJ4TWdxdjNZODVB?=
+ =?utf-8?Q?XDcWroUr5yU=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5525.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?QmN0SVhERDc3ajhSUkxNY2s2TEVSNGY5TWNoS2NmU1ExOWtobVh2d2l4L0JX?=
+ =?utf-8?B?NEQ1cTdmTFFEcDlDRU1LSjJ1aXdXZGxXbHZrN0pJLzB1bEczZXBzanpZQ0pY?=
+ =?utf-8?B?TW84OFR0bVQ4UGdJeXNvakdWNXp3QWNLWEtTLzA5SW54TEY4cG02ODdHMUxT?=
+ =?utf-8?B?ZlBEaW41WkFodkVNeFl5QWNHU2lQOXVNUGJ1alJoZkJzZEVaV3YrYVVJZjk4?=
+ =?utf-8?B?NUlhVFRFR1BRbGlOcUd0bjdkV0Z4Vmc3TFBPV3Rqc0dwUTFOb0NwcDJJY2N5?=
+ =?utf-8?B?YjlZTldZOUVIdVBpYUMrTnlqcUhyTkhtZmo3ZnBOVTZURi9YbVZxMXZWUUpk?=
+ =?utf-8?B?dDhJWWpYQzVaY0N5bG9PZExFQStBV0E1WFY2RlpkUE9CZ0tFU0h5MGI5eTRK?=
+ =?utf-8?B?eE5TaHBrMTgrb0ZtTHZLS0NNVVJVL2R0RnprOUVWMUF0RHN3cU56Z0k5d1Nx?=
+ =?utf-8?B?SHFlbEloQUl5Rjg1YUNwTjVXV05UTUoxeUpvbFdLZ3o1S3dJMDMyOHZvcCtR?=
+ =?utf-8?B?WWJrSFV5QUhmSW5aNDB0clJEWXBzdnoyTVhaYWE5Mk5nY3lOOGhWRng5WGVx?=
+ =?utf-8?B?M1BtTFJzckw0Nk1HaE04NWt2dDl6OFNzQStmRVg2SmFaclNXOTlMTjBSSWNV?=
+ =?utf-8?B?cXVRdmMwOGp4RUk0MWU4WVBFY1E2eEZVSlB3VUFkOWVZV0t1OTVubzNWSXcw?=
+ =?utf-8?B?Rm1UUE5IdlpkalFYMEZsam5xNytHS0lpWjM0ZFRNbjk3ak5hU3FJRlV1aVpF?=
+ =?utf-8?B?enRRbGs1MmtGTGhxVHdLUnBBM1lyanRnS0oraHF2K0c4VW1VdXZpY1B4YjYy?=
+ =?utf-8?B?dkxOMEpEMWxzSGJTVXNSbEdscEk0Snp2L3VQNzZ5ZjdnMHhOa3ExbGdyMDd1?=
+ =?utf-8?B?YTJzM0RtMXR0aHlFSEdUNkowTUw5Q3pRMi95cTVheUZHWmRGNlNwNXNsQkJZ?=
+ =?utf-8?B?TkxjbjYzNXV4dlJscUd0WlpwNjEzNmpra1dIQ1NqeFErNGxDeGVuTmF6U1o0?=
+ =?utf-8?B?bkVoVVhtUzBGUTB0ZTA4UWhaZ1ZsWFBCbzl3ZDl1VGRxbkVqRmNLRWcxWXJo?=
+ =?utf-8?B?OXQ5RlJ4Qk85Rm9EenNMcWR1Y3Y0L2NJQTJ4ZDNBS0F2NnBWRUI4SnI2V25C?=
+ =?utf-8?B?RnJ2UGtQQjJ0dWljM0Rwbm5Rb2VnaWJsbHFuTGJXZklNWFBTcTdhS2xJWFo3?=
+ =?utf-8?B?WGpodWthVzYzTUFzQzVQLzBjd05DSGR4QlN5U1dQNjBCaFVPOVdxdlhMYWxP?=
+ =?utf-8?B?UG40d2doVlNFTUtOdmxPZURaUCtZSlFtYnBIZVNtd0l1Y21YQUJJZ2ZGTGMv?=
+ =?utf-8?B?UjZKc3poY01JN1VHQ0lPTnBOS1VmeURjaWJLOENFK2RUWmgvR2xDYkY4Zi9m?=
+ =?utf-8?B?UUV2U0V2VUNLWXQyTzJYQ2pvZGFXWnJnOFVsZURGS2VIalMrYXdFNmFZZElj?=
+ =?utf-8?B?NkFGeG5KVW54bVF2MCtYbGM3OXY2VmswSnBJVVdqOGNEOXNWdVlCTUpnUkF3?=
+ =?utf-8?B?aXBOL1VLOTZkV2dDUUNJZ080MXFGMldBR1R6TGkxblJQa2tQbGpGQjJ6TGZk?=
+ =?utf-8?B?M1JITmZhaWhOdkNtUFZwTVBIdDM0UmpNc3VvdHE5TzJqWWJ2U1BqUnc3ZHdC?=
+ =?utf-8?B?bkNPblhFTGlXeHliN0tUOXVLYUdpV3VBa1hXS0xXZmxCQjhlYzBKWkVVWFZU?=
+ =?utf-8?B?dW9WSDNKUTh3RGJNRjlVQ3lWOTVQSnhSY1NNUXJDQjBjaGJtRVFtb3NEMFFh?=
+ =?utf-8?B?S2Ryc0l6NGdxdE9JejF5VVFHcHA1diswdXJyOXhhTUQvVHNsdVVZOS9jOWhJ?=
+ =?utf-8?B?ZlZFR1poUW92N05kOS9vY1F4OU1QMFliSjh5dnM3RlhqMzRtRXRnekhRWEh5?=
+ =?utf-8?B?N0VuODhJTFBZK1IwNm9NNXNlVkk4MUo0Z0FQRTZVczdiRU1hT2V5Qi9UU2Va?=
+ =?utf-8?B?WDcrajk0QXJCSEI2bVNlRDNmb2VxWVBxT0ZMS0g4aUZWMFd1SVhhd01jbHhQ?=
+ =?utf-8?B?VitwQzlaQkYzL1M5NGw0ZURRT3VBUlRzNTlhMzBTWEpjNVdhNDA4NjN2akNt?=
+ =?utf-8?B?YkhrZ1k0WUlTbGdiSit1QzZwQTU4d2dqTW1wdzg4YmNBcXF5RFJQTGxUUWhG?=
+ =?utf-8?Q?xy+Xl9uNhTwJS4SjInpKGd1YL?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <BB8C6F85C5E69949A2160FB7BFFD4347@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, anshuman.khandual@arm.com, ben.horgan@arm.com, catalin.marinas@arm.com, scott@os.amperecomputing.com, tabba@google.com, gankulkarni@os.amperecomputing.com, gshan@redhat.com, jingzhangos@google.com, joey.gouly@arm.com, kees@kernel.org, broonie@kernel.org, mark.rutland@arm.com, smostafa@google.com, oliver.upton@linux.dev, qperret@google.com, sgsu.park@samsung.com, vdonnefort@google.com, r09922117@csie.ntu.edu.tw, will@kernel.org, yuzenghui@huawei.com, eric.auger@redhat.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5525.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f72bc3a-751e-4add-f66f-08dd99ed5138
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 May 2025 11:31:10.5036
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +shgWcHTwC6onIU+W8//gbt9eqiN/PlaLf3Xfa3AFq/zZvc/OcLY+XrwDaC6iflJBWveH8o0l2qNgmm1vyNQMA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5255
+X-OriginatorOrg: intel.com
 
-Paolo,
-
-Here's the initial set of updates for 6.16.
-
-The largest change is actually not a functional one, as it "only"
-reworks the way the guest feature set applies to trap bits and
-register sanitising. This translates into another (generated) set of
-large tables describing the architecture, which is I hope easier to
-deal with than ad-hoc code trying to do the same thing.
-
-On the functional front, pKVM gains THP and UBSAN support as well as
-some page ownership optimisations, we workaround a couple of really
-bad issues on the AmpereOne hardware, and we finally switch on nested
-virtualisation support.
-
-This last bit has been a long time coming, and I would like to express
-my thanks to Christoffer, Jintack, Oliver, Eric and everyone else who
-helped me getting this monstrosity across the finishing line. Except
-it's never really finished!
-
-As usual, details in the tag below.
-
-Please pull,
-
-	M.
-
-The following changes since commit b4432656b36e5cc1d50a1f2dc15357543add530e:
-
-  Linux 6.15-rc4 (2025-04-27 15:19:23 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-6.16
-
-for you to fetch changes up to 1b85d923ba8c9e6afaf19e26708411adde94fba8:
-
-  Merge branch kvm-arm64/misc-6.16 into kvmarm-master/next (2025-05-23 10:59:43 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 updates for 6.16
-
-* New features:
-
-  - Add large stage-2 mapping support for non-protected pKVM guests,
-    clawing back some performance.
-
-  - Add UBSAN support to the standalone EL2 object used in nVHE/hVHE and
-    protected modes.
-
-  - Enable nested virtualisation support on systems that support it
-    (yes, it has been a long time coming), though it is disabled by
-    default.
-
-* Improvements, fixes and cleanups:
-
-  - Large rework of the way KVM tracks architecture features and links
-    them with the effects of control bits. This ensures correctness of
-    emulation (the data is automatically extracted from the published
-    JSON files), and helps dealing with the evolution of the
-    architecture.
-
-  - Significant changes to the way pKVM tracks ownership of pages,
-    avoiding page table walks by storing the state in the hypervisor's
-    vmemmap. This in turn enables the THP support described above.
-
-  - New selftest checking the pKVM ownership transition rules
-
-  - Fixes for FEAT_MTE_ASYNC being accidentally advertised to guests
-    even if the host didn't have it.
-
-  - Fixes for the address translation emulation, which happened to be
-    rather buggy in some specific contexts.
-
-  - Fixes for the PMU emulation in NV contexts, decoupling PMCR_EL0.N
-    from the number of counters exposed to a guest and addressing a
-    number of issues in the process.
-
-  - Add a new selftest for the SVE host state being corrupted by a
-    guest.
-
-  - Keep HCR_EL2.xMO set at all times for systems running with the
-    kernel at EL2, ensuring that the window for interrupts is slightly
-    bigger, and avoiding a pretty bad erratum on the AmpereOne HW.
-
-  - Add workaround for AmpereOne's erratum AC04_CPU_23, which suffers
-    from a pretty bad case of TLB corruption unless accesses to HCR_EL2
-    are heavily synchronised.
-
-  - Add a per-VM, per-ITS debugfs entry to dump the state of the ITS
-    tables in a human-friendly fashion.
-
-  - and the usual random cleanups.
-
-----------------------------------------------------------------
-Ben Horgan (3):
-      arm64/sysreg: Expose MTE_frac so that it is visible to KVM
-      KVM: arm64: Make MTE_frac masking conditional on MTE capability
-      KVM: selftests: Confirm exposing MTE_frac does not break migration
-
-D Scott Phillips (1):
-      arm64: errata: Work around AmpereOne's erratum AC04_CPU_23
-
-David Brazdil (1):
-      KVM: arm64: Add .hyp.data section
-
-Fuad Tabba (1):
-      KVM: arm64: Track SVE state in the hypervisor vcpu structure
-
-Gavin Shan (1):
-      KVM: arm64: Drop sort_memblock_regions()
-
-Jing Zhang (1):
-      KVM: arm64: vgic-its: Add debugfs interface to expose ITS tables
-
-Marc Zyngier (84):
-      KVM: arm64: Repaint pmcr_n into nr_pmu_counters
-      KVM: arm64: Fix MDCR_EL2.HPMN reset value
-      KVM: arm64: Contextualise the handling of PMCR_EL0.P writes
-      KVM: arm64: Allow userspace to limit the number of PMU counters for EL2 VMs
-      KVM: arm64: Don't let userspace write to PMCR_EL0.N when the vcpu has EL2
-      KVM: arm64: Handle out-of-bound write to MDCR_EL2.HPMN
-      KVM: arm64: Let kvm_vcpu_read_pmcr() return an EL-dependent value for PMCR_EL0.N
-      Merge branch kvm-arm64/nv-pmu-fixes into kvmarm-master/next
-      KVM: arm64: Force HCR_EL2.xMO to 1 at all times in VHE mode
-      arm64: sysreg: Add ID_AA64ISAR1_EL1.LS64 encoding for FEAT_LS64WB
-      arm64: sysreg: Update ID_AA64MMFR4_EL1 description
-      arm64: sysreg: Add layout for HCR_EL2
-      arm64: sysreg: Replace HFGxTR_EL2 with HFG{R,W}TR_EL2
-      arm64: sysreg: Update ID_AA64PFR0_EL1 description
-      arm64: sysreg: Update PMSIDR_EL1 description
-      arm64: sysreg: Update TRBIDR_EL1 description
-      arm64: sysreg: Update CPACR_EL1 description
-      arm64: sysreg: Add registers trapped by HFG{R,W}TR2_EL2
-      arm64: sysreg: Add registers trapped by HDFG{R,W}TR2_EL2
-      arm64: sysreg: Add system instructions trapped by HFGIRT2_EL2
-      arm64: Remove duplicated sysreg encodings
-      arm64: tools: Resync sysreg.h
-      arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
-      arm64: Add FEAT_FGT2 capability
-      KVM: arm64: Tighten handling of unknown FGT groups
-      KVM: arm64: Simplify handling of negative FGT bits
-      KVM: arm64: Handle trapping of FEAT_LS64* instructions
-      KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_LS64_ACCDATA being disabled
-      KVM: arm64: Don't treat HCRX_EL2 as a FGT register
-      KVM: arm64: Plug FEAT_GCS handling
-      KVM: arm64: Compute FGT masks from KVM's own FGT tables
-      KVM: arm64: Add description of FGT bits leading to EC!=0x18
-      KVM: arm64: Use computed masks as sanitisers for FGT registers
-      KVM: arm64: Propagate FGT masks to the nVHE hypervisor
-      KVM: arm64: Use computed FGT masks to setup FGT registers
-      KVM: arm64: Remove hand-crafted masks for FGT registers
-      KVM: arm64: Use KVM-specific HCRX_EL2 RES0 mask
-      KVM: arm64: Handle PSB CSYNC traps
-      KVM: arm64: Switch to table-driven FGU configuration
-      KVM: arm64: Validate FGT register descriptions against RES0 masks
-      KVM: arm64: Fix PAR_EL1.{PTW,S} reporting on AT S1E*
-      KVM: arm64: Teach address translation about access faults
-      KVM: arm64: Don't feed uninitialised data to HCR_EL2
-      arm64: sysreg: Add layout for VNCR_EL2
-      KVM: arm64: nv: Allocate VNCR page when required
-      KVM: arm64: nv: Extract translation helper from the AT code
-      KVM: arm64: nv: Snapshot S1 ASID tagging information during walk
-      KVM: arm64: nv: Move TLBI range decoding to a helper
-      KVM: arm64: nv: Don't adjust PSTATE.M when L2 is nesting
-      KVM: arm64: nv: Add pseudo-TLB backing VNCR_EL2
-      KVM: arm64: nv: Add userspace and guest handling of VNCR_EL2
-      KVM: arm64: nv: Handle VNCR_EL2-triggered faults
-      KVM: arm64: nv: Handle mapping of VNCR_EL2 at EL2
-      KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU notifiers
-      KVM: arm64: nv: Program host's VNCR_EL2 to the fixmap address
-      KVM: arm64: nv: Add S1 TLB invalidation primitive for VNCR_EL2
-      KVM: arm64: nv: Plumb TLBI S1E2 into system instruction dispatch
-      KVM: arm64: nv: Remove dead code from ERET handling
-      KVM: arm64: Allow userspace to request KVM_ARM_VCPU_EL2*
-      KVM: arm64: Document NV caps and vcpu flags
-      KVM: arm64: Use FGT feature maps to drive RES0 bits
-      KVM: arm64: Allow kvm_has_feat() to take variable arguments
-      KVM: arm64: Use HCRX_EL2 feature map to drive fixed-value bits
-      KVM: arm64: Use HCR_EL2 feature map to drive fixed-value bits
-      KVM: arm64: Add FEAT_FGT2 registers to the VNCR page
-      KVM: arm64: Add sanitisation for FEAT_FGT2 registers
-      KVM: arm64: Add trap routing for FEAT_FGT2 registers
-      KVM: arm64: Add context-switch for FEAT_FGT2 registers
-      KVM: arm64: Allow sysreg ranges for FGT descriptors
-      KVM: arm64: Add FGT descriptors for FEAT_FGT2
-      KVM: arm64: Handle TSB CSYNC traps
-      KVM: arm64: nv: Hold mmu_lock when invalidating VNCR SW-TLB before translating
-      KVM: arm64: nv: Handle TLBI S1E2 for VNCR invalidation with mmu_lock held
-      KVM: arm64: nv: Release faulted-in VNCR page from mmu_lock critical section
-      Merge branch kvm-arm64/pkvm-6.16 into kvm-arm64/pkvm-np-thp-6.16
-      Merge branch kvm-arm64/pkvm-selftest-6.16 into kvm-arm64/pkvm-np-thp-6.16
-      KVM: arm64: Fix documentation for vgic_its_iter_next()
-      Merge branch kvm-arm64/pkvm-np-thp-6.16 into kvmarm-master/next
-      Merge branch kvm-arm64/ubsan-el2 into kvmarm-master/next
-      Merge branch kvm-arm64/mte-frac into kvmarm-master/next
-      Merge branch kvm-arm64/fgt-masks into kvmarm-master/next
-      Merge branch kvm-arm64/at-fixes-6.16 into kvmarm-master/next
-      Merge branch kvm-arm64/nv-nv into kvmarm-master/next
-      Merge branch kvm-arm64/misc-6.16 into kvmarm-master/next
-
-Mark Brown (1):
-      KVM: arm64: selftests: Add test for SVE host corruption
-
-Mark Rutland (1):
-      KVM: arm64: Unconditionally configure fine-grain traps
-
-Mostafa Saleh (4):
-      arm64: Introduce esr_is_ubsan_brk()
-      ubsan: Remove regs from report_ubsan_failure()
-      KVM: arm64: Introduce CONFIG_UBSAN_KVM_EL2
-      KVM: arm64: Handle UBSAN faults
-
-Quentin Perret (11):
-      KVM: arm64: Fix pKVM page-tracking comments
-      KVM: arm64: Use 0b11 for encoding PKVM_NOPAGE
-      KVM: arm64: Introduce {get,set}_host_state() helpers
-      KVM: arm64: Move hyp state to hyp_vmemmap
-      KVM: arm64: Defer EL2 stage-1 mapping on share
-      KVM: arm64: Unconditionally cross check hyp state
-      KVM: arm64: Don't WARN from __pkvm_host_share_guest()
-      KVM: arm64: Selftest for pKVM transitions
-      KVM: arm64: Extend pKVM selftest for np-guests
-      KVM: arm64: Convert pkvm_mappings to interval tree
-      KVM: arm64: Add a range to pkvm_mappings
-
-Seongsu Park (1):
-      KVM: arm64: Replace ternary flags with str_on_off() helper
-
-Vincent Donnefort (8):
-      KVM: arm64: Handle huge mappings for np-guest CMOs
-      KVM: arm64: Introduce for_each_hyp_page
-      KVM: arm64: Add a range to __pkvm_host_share_guest()
-      KVM: arm64: Add a range to __pkvm_host_unshare_guest()
-      KVM: arm64: Add a range to __pkvm_host_wrprotect_guest()
-      KVM: arm64: Add a range to __pkvm_host_test_clear_young_guest()
-      KVM: arm64: Stage-2 huge mappings for np-guests
-      KVM: arm64: np-guest CMOs with PMD_SIZE fixmap
-
-Wei-Lin Chang (1):
-      KVM: arm64: nv: Remove clearing of ICH_LR<n>.EOI if ICH_LR<n>.HW == 1
-
- Documentation/arch/arm64/silicon-errata.rst     |    2 +
- Documentation/virt/kvm/api.rst                  |   14 +-
- Documentation/virt/kvm/devices/vcpu.rst         |   24 +
- arch/arm64/Kconfig                              |   17 +
- arch/arm64/include/asm/el2_setup.h              |   16 +-
- arch/arm64/include/asm/esr.h                    |   17 +-
- arch/arm64/include/asm/fixmap.h                 |    6 +
- arch/arm64/include/asm/hardirq.h                |    4 +-
- arch/arm64/include/asm/kvm_arm.h                |  188 ++--
- arch/arm64/include/asm/kvm_host.h               |   88 +-
- arch/arm64/include/asm/kvm_nested.h             |  100 +++
- arch/arm64/include/asm/kvm_pgtable.h            |    7 +-
- arch/arm64/include/asm/kvm_pkvm.h               |    8 +
- arch/arm64/include/asm/sections.h               |    1 +
- arch/arm64/include/asm/sysreg.h                 |   53 +-
- arch/arm64/include/asm/vncr_mapping.h           |    5 +
- arch/arm64/include/uapi/asm/kvm.h               |    9 +-
- arch/arm64/kernel/cpu_errata.c                  |   14 +
- arch/arm64/kernel/cpufeature.c                  |    8 +
- arch/arm64/kernel/hyp-stub.S                    |    2 +-
- arch/arm64/kernel/image-vars.h                  |    2 +
- arch/arm64/kernel/traps.c                       |    4 +-
- arch/arm64/kernel/vmlinux.lds.S                 |   18 +-
- arch/arm64/kvm/Makefile                         |    2 +-
- arch/arm64/kvm/arm.c                            |   30 +
- arch/arm64/kvm/at.c                             |  186 ++--
- arch/arm64/kvm/config.c                         | 1085 +++++++++++++++++++++++
- arch/arm64/kvm/emulate-nested.c                 |  590 +++++++-----
- arch/arm64/kvm/handle_exit.c                    |   84 ++
- arch/arm64/kvm/hyp/include/hyp/switch.h         |  160 ++--
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h   |   14 +-
- arch/arm64/kvm/hyp/include/nvhe/memory.h        |   58 +-
- arch/arm64/kvm/hyp/include/nvhe/mm.h            |    4 +-
- arch/arm64/kvm/hyp/nvhe/Makefile                |    6 +
- arch/arm64/kvm/hyp/nvhe/host.S                  |    2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S              |    4 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c              |   20 +-
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S               |    2 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c           |  510 ++++++++---
- arch/arm64/kvm/hyp/nvhe/mm.c                    |   97 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                  |   47 +-
- arch/arm64/kvm/hyp/nvhe/setup.c                 |   27 +-
- arch/arm64/kvm/hyp/nvhe/switch.c                |   14 +-
- arch/arm64/kvm/hyp/pgtable.c                    |    6 -
- arch/arm64/kvm/hyp/vgic-v3-sr.c                 |   44 +-
- arch/arm64/kvm/hyp/vhe/switch.c                 |   48 +-
- arch/arm64/kvm/hyp/vhe/tlb.c                    |    4 +-
- arch/arm64/kvm/mmu.c                            |    6 +-
- arch/arm64/kvm/nested.c                         |  846 +++++++++++++-----
- arch/arm64/kvm/pkvm.c                           |  150 ++--
- arch/arm64/kvm/pmu-emul.c                       |   60 +-
- arch/arm64/kvm/reset.c                          |    2 +
- arch/arm64/kvm/sys_regs.c                       |  273 +++---
- arch/arm64/kvm/trace_arm.h                      |    6 +-
- arch/arm64/kvm/vgic/vgic-debug.c                |  224 +++++
- arch/arm64/kvm/vgic/vgic-its.c                  |   39 +-
- arch/arm64/kvm/vgic/vgic-v3-nested.c            |    3 -
- arch/arm64/kvm/vgic/vgic.h                      |   33 +
- arch/arm64/tools/cpucaps                        |    2 +
- arch/arm64/tools/sysreg                         | 1012 ++++++++++++++++++++-
- arch/x86/kernel/traps.c                         |    2 +-
- include/linux/ubsan.h                           |    6 +-
- include/uapi/linux/kvm.h                        |    2 +
- lib/Kconfig.ubsan                               |    9 +
- lib/ubsan.c                                     |    8 +-
- scripts/Makefile.ubsan                          |    5 +-
- tools/arch/arm64/include/asm/sysreg.h           |   65 +-
- tools/testing/selftests/kvm/Makefile.kvm        |    1 +
- tools/testing/selftests/kvm/arm64/host_sve.c    |  127 +++
- tools/testing/selftests/kvm/arm64/set_id_regs.c |   77 +-
- 70 files changed, 5370 insertions(+), 1239 deletions(-)
- create mode 100644 arch/arm64/kvm/config.c
- create mode 100644 tools/testing/selftests/kvm/arm64/host_sve.c
+T24gVGh1LCAyMDI1LTA1LTIyIGF0IDA2OjQwIC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBPbiBXZWQsIE1heSAyMSwgMjAyNSwgS2FpIEh1YW5nIHdyb3RlOg0KPiA+IE9uIFdl
+ZCwgMjAyNS0wNS0yMSBhdCAxMDoxMiAtMDcwMCwgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90ZToN
+Cj4gPiA+ID4gZS5nLiwgaWYgd2UgZXhwb3J0IGt2bV94ODZfb3BzLCB3ZSBjb3VsZCB1bndpbmQg
+dGhlbS4NCj4gPiA+IA0KPiA+ID4gTWFhYXliZS4gIEkgbWVhbiwgeWVzLCB3ZSBjb3VsZCBmdWxs
+eSB1bndpbmQga3ZtX3g4Nl9vcHMsIGJ1dCBkb2luZyBzbyB3b3VsZCBtYWtlDQo+ID4gPiB0aGUg
+b3ZlcmFsbCBjb2RlIGZhciBtb3JlIGJyaXR0bGUuICBFLmcuIHNpbXBseSB1cGRhdGluZyBrdm1f
+eDg2X29wcyB3b24ndCBzdWZmaWNlLA0KPiA+ID4gYXMgdGhlIHN0YXRpY19jYWxscyBhbHNvIG5l
+ZWQgdG8gYmUgcGF0Y2hlZCwgYW5kIHdlIHdvdWxkIGhhdmUgdG8gYmUgdmVyeSBjYXJlZnVsDQo+
+ID4gPiBub3QgdG8gdG91Y2ggYW55dGhpbmcgaW4ga3ZtX3g4Nl9vcHMgdGhhdCBtaWdodCBoYXZl
+IGJlZW4gY29uc3VtZWQgYmV0d2VlbiBoZXJlDQo+ID4gPiBhbmQgdGhlIGNhbGwgdG8gdGR4X2Jy
+aW5ndXAoKS4NCj4gPiANCj4gPiBSaWdodC4gIE1heWJlIGV4cG9ydGluZyBrdm1fb3BzX3VwZGF0
+ZSgpIGlzIGJldHRlci4NCj4gDQo+IEEgYml0LCBidXQgS1ZNIHdvdWxkIHN0aWxsIG5lZWQgdG8g
+YmUgY2FyZWZ1bCBub3QgdG8gbW9kaWZ5IHRoZSBwYXJ0cyBvZg0KPiB2dF94ODZfb3BzIHRoYXQg
+aGF2ZSBhbHJlYWR5IGJlZW4gY29uc3VtZWQuDQo+IA0KPiBXaGlsZSBJIGFncmVlIHRoYXQgbGVh
+dmluZyBURFggYnJlYWRjcnVtYnMgaW4ga3ZtX3g4Nl9vcHMgd2hlbiBURFggaXMgZGlzYWJsZWQg
+aXMNCj4gdW5kZXNpcmFibGUsIHRoZSBiZWhhdmlvciBpcyBrbm93biwgaS5lLiB3ZSBrbm93IGV4
+YWN0bHkgd2hhdCBURFggc3RhdGUgaXMgYmVpbmcNCj4gbGVmdCBiZWhpbmQuICBBbmQgZmFpbHVy
+ZSB0byBsb2FkIHRoZSBURFggTW9kdWxlIHNob3VsZCBiZSB2ZXJ5LCB2ZXJ5IHJhcmUgZm9yDQo+
+IGFueSBzZXR1cCB0aGF0IGlzIGFjdHVhbGx5IHRyeWluZyB0byBlbmFibGUgVERYLg0KDQpUaGlz
+IGlzIHRydWUuICBBZ3JlZWQuDQoNCj4gDQo+IFdoZXJlYXMgcHJvdmlkaW5nIGEgd2F5IHRvIG1v
+ZGlmeSBrdm1feDg2X29wcyBjcmVhdGVzIHRoZSBwb3NzaWJpbGl0eSBmb3IgImJhZCINCj4gdXBk
+YXRlcy4gIEtWTSdzIGluaXRpYWxpemF0aW9uIGNvZGUgaXMgYSBsb3QgbGlrZSB0aGUga2VybmVs
+J3MgYm9vdCBjb2RlIChhbmQNCj4gcHJvYmFibHkgbW9zdCBib290c3RyYXBwaW5nIGNvZGUpOiBp
+dCdzIGluaGVyZW50bHkgZnJhZ2lsZSBiZWNhdXNlIGF2b2lkaW5nDQo+IGRlcGVuZGVuY2llcyBp
+cyBwcmFjdGljYWxseSBpbXBvc3NpYmxlLg0KPiANCj4gRS5nLiBJIHJhbiBpbnRvIGEgcmVsZXZh
+bnQgb3JkZXJpbmcgcHJvYmxlbVsqXSBqdXN0IGEgZmV3IGRheXMgYWdvLCB3aGVyZSBjaGVja2lu
+Zw0KPiBmb3IgVk1YIGNhcGFiaWxpdGllcyBkdXJpbmcgUE1VIGluaXRpYWxpemF0aW9uIGFsd2F5
+cyBmYWlsZWQgYmVjYXVzZSB0aGUgVk1DUw0KPiBjb25maWcgaGFkbid0IHlldCBiZWVuIHBhcnNl
+ZC4gIFRob3NlIHR5cGVzIG9mIGJ1Z3MgYXJlIGVzcGVjaWFsbHkgZGFuZ2Vyb3VzDQo+IGJlY2F1
+c2UgdGhleSdyZSB2ZXJ5IGVhc3kgdG8gb3Zlcmxvb2sgd2hlbiBtb2RpZnlpbmcgZXhpc3Rpbmcg
+Y29kZSwgZS5nLiB0aGUNCj4gb25seSBzaWduIHRoYXQgYW55dGhpbmcgaXMgYnJva2VuIGlzIGFu
+IG9wdGlvbmFsIGZlYXR1cmUgYmVpbmcgbWlzc2luZy4NCj4gDQo+IFsqXSBodHRwczovL2xvcmUu
+a2VybmVsLm9yZy9hbGwvYUNVMllFcFUwZE9rN1JUa0Bnb29nbGUuY29tDQoNClJpZ2h0LiAgTm8g
+YXJndW1lbnQgYXJvdW5kIHRoaXMuICBJIGFncmVlIGlmIHRoZXJlIGFyZSBtdWx0aXBsZSBmZWF0
+dXJlcyB3YW50aW5nDQp0byB1cGRhdGUgdGhlbiBpdCBjb3VsZCBiZSBkYW5nZXJvdXMuICBUaGFu
+a3MgZm9yIHRoZSBpbnNpZ2h0IDotKQ0K
 
