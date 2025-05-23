@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-47500-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47501-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CEE1AC1969
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 03:14:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D96DEAC196D
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 03:14:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A52021C05FF6
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 01:14:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DEC51C06059
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 01:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8871D2DFA24;
-	Fri, 23 May 2025 01:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336C02DFA43;
+	Fri, 23 May 2025 01:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZnwnUHdS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T7cx3MkF"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027432D8DA0
-	for <kvm@vger.kernel.org>; Fri, 23 May 2025 01:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA9E2D8DCE
+	for <kvm@vger.kernel.org>; Fri, 23 May 2025 01:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747962096; cv=none; b=Opgle5+C+r2FXVAa74qGlh72xThaMk1MN2bjR2uKT7XoVXzJtUOf4T2ss7xtykVdFQlsX1ICBqAuqXEsu1l3ew4OTxt8jmk/HGOGBY2PmxypXvOx+aDels4BcMhdnUXc1F4W0xy3bKYo8v/w9aJm4PUvZPuLCfOH+gjtznYJCgE=
+	t=1747962098; cv=none; b=sDg39+0gpQCP/u8yBbuI/Muk8HW0DwezGAsoGBTtmyw3IQhsm68J6oNoQhacc+Ejonfi+8LuR8RiSsG1Sn2WNSH2FPJhcr92EvKR8Am0Ta2wrGFlOeKhyqUeCu9qR81Xf3k5JO2Y9c706zKstrb7gF16km/R3XlM1ZqIeJKxdns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747962096; c=relaxed/simple;
-	bh=WVXURqeG3/UNWGnPr4lCT0UQc8N7VixIfadV+aR9WaQ=;
+	s=arc-20240116; t=1747962098; c=relaxed/simple;
+	bh=Fn7KiHU3iwTubBKYwKGiV6sXLcq7ApYRqC3g9dRrbxA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Nu9j0NfX5pdW4UuEwDMsvKs/c9ZUj0qv0rnhlNUWpv5jXpUC6Ic6bMPyDX47u8R9gT+E0ObXm9zofm9EbdMRpaKu4xdI8MhLBZdhzt7s5nQMJ1zvH/7yM2bw5MlZk35ssdnL+5PugqD6TK2ZhYr7kq8SRllIspMnML/OnI8175k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZnwnUHdS; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=f6p5mkGP6FAia/3y3alwugTjV0nBGOeLfsmGayceNkP2M3tBByfE01m6btLyCi41o7XRE7hsMbBW5gi/jHvSqFzglc10OTzRDowpoa08qIyw8wBfPY+KFwx4dxBzy7EjZGpUIIbh9zh2eEbnc82L+foqAsDR/EQjkD5V0X6REwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T7cx3MkF; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30e895056f0so9232144a91.3
-        for <kvm@vger.kernel.org>; Thu, 22 May 2025 18:01:35 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-310a3196132so1833055a91.3
+        for <kvm@vger.kernel.org>; Thu, 22 May 2025 18:01:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747962094; x=1748566894; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747962096; x=1748566896; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=cN9xzWmJm1SC3MYFl35NGHuTlOxpMSXq5/uxL1rDnZU=;
-        b=ZnwnUHdSYOTeFZUfySr8NnzGRb4mgH6SojtAPcPQSmFU0k16bwxdGGUEaCxghBN9+N
-         f2C/AY3Ldw/O4SrPcPLltKhL/vW5t7r0jb5WjkRhIHp8WenEqSmFmPvLied7ztUm3VdA
-         WAj5lhXP1HC386y0k3ld+kEsgchqEtmjxN2Y1ZPGxkWrOVqJvpETWLinAJhNVuOqhiBh
-         v0IJDA9+cIYWlMuJaVVKEEyG8N1sv758C3uHiRSjVjwtQ8ojsq1tGdVCUB1j0aJLjace
-         kCMMOsphCYZ+i+wRYDqoUPvIEO55Net2irl0O908GpO0QUPY8B/d2IISjciyBeKb6ehi
-         N2Vw==
+        bh=2sXU5NirlWI4vXwO4O+/fMttYQH02wVCGMPtDp7+cuU=;
+        b=T7cx3MkFa4HMkaJu6JgdZuYCTwhsWJjAjX8ep4O2dCj4Xan0j/LvkgLfGx23cJeRAW
+         n0B/+DuQasfeFqHPEaqfK6XYiSCGtDZYDfIoWMmG+HI8IXBabwlxoB4MKEJG5D8PxW1n
+         EM8ujuMsSvA+beEPFUImplfrp9qmoyoiVw3qSAoj6e2POdof2Mhr/846d0CyL7l0bzxi
+         7EYwtGxGMmKgG6z3/XOgKd2eFj2jURZ6MrMcKyjGSiVQHbHCgeNrC9zea3aaEY0kASjf
+         UJB+ljy1Emh6zGzMyaXDsP+N2zc/cVjzV1rjS8WN3u4VdadOpmi7TRRXbRi5vcjOhfAv
+         uNqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747962094; x=1748566894;
+        d=1e100.net; s=20230601; t=1747962096; x=1748566896;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cN9xzWmJm1SC3MYFl35NGHuTlOxpMSXq5/uxL1rDnZU=;
-        b=HEKJYePPxxp7u8vTRW4HAmOUoDbC3UYoSi7A0kcjs4sAeOeiSGNIbzVuL0H1ZnX8no
-         or5CC7GhpI8lkwX/mWWJzWxe35+6tfS7i5ZvRGV+DCf6TUvNat5p5Zp7+gl4b8sbqzvK
-         m4q8ssD20t3f7TXw25MABfT9RFemrZ4pG8YWMniMP19G5w/yRatrQcjmpFzIk6599BG7
-         DEzoxpgFUvg/jSjVmcHZ4itmWGCBZWkmRFK2WJ8N7s6YbJPCUZFwX88dZaqsDz0SKf55
-         fLZYDX/CXS0vGN5FaOxOVJagAbgXde71OHaYgG1qUn3ec74JRzLb7J/IQA4svHs2oS1U
-         PODQ==
-X-Gm-Message-State: AOJu0YyYffKPoMjLCbl4jbUWUHBiQufqX2PTj9YEYfkcB2HVbzIQVXK9
-	fqqGQf2kMDArcv/erHpXlYIuroFoMqIwY9Tk2cDiIMq2bive9b1pGt8diUH7ritzQ2HntJ9dqF2
-	7XH1gew==
-X-Google-Smtp-Source: AGHT+IFprTymTRANY7N/PSfhfS9BlgTEeP5l7IBzmCyjwM1JbIF1IL97OX8WDdXl0zNwJCd+TJHfF3OvfiE=
-X-Received: from pjbnc5.prod.google.com ([2002:a17:90b:37c5:b0:30e:5bd5:880d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3bc8:b0:2ee:c291:765a
- with SMTP id 98e67ed59e1d1-310e96c5a47mr1898327a91.8.1747962094614; Thu, 22
- May 2025 18:01:34 -0700 (PDT)
+        bh=2sXU5NirlWI4vXwO4O+/fMttYQH02wVCGMPtDp7+cuU=;
+        b=PWydjFx6gmJdLi94Y/5Jw1wad93EIgr8S8MF3X1lSCY+xGU0VQiwd+a0r3NQdiABgJ
+         QlBH+Q37sjOWruf11AX6QlVN//Rx0qdK1WDa6Qq+lBoK0F9Z4beE17Hja6idffK9E793
+         nMsGOtpXB6lMNpdko3aB1SO2es+xzhzMValb3Pra8krAPPZbl8Yg8w7Qr4duhLllFXQj
+         +3pnjT+ulOZ/HzTjm27aufjbpIU9Pp5MJne1ZVCwcpiop3/AjDsXAHzLYJ/Btpbu+2BY
+         j5FvyJOvHQFmuy3LJWEkMkSwcRIHMuhDCrcBhHcN98s/isvB4i5FN3kDszL9guWmUxZ6
+         5ACA==
+X-Gm-Message-State: AOJu0YypzbJWRdeE4uJAABU+qC9TaV6FMt2OTiB4RKPPhJ9LHqSUVGSP
+	dwJuvQ36cszeRxmNHlvc6btvC9GSti1gSFKKuTi4im3oeBPldA+cC0wvoQf/gvvCMFaEwglI27H
+	05uaBHQ==
+X-Google-Smtp-Source: AGHT+IGiMys227SN7kU9jYy897MYWWwW5oyGCez8BLejTJH7O2I8eA/lDZQP1siXEpwe3ZlPz5yF5IFZSwI=
+X-Received: from pjbph7.prod.google.com ([2002:a17:90b:3bc7:b0:30a:9cb5:7622])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1645:b0:310:8d9a:ede1
+ with SMTP id 98e67ed59e1d1-310e96b6007mr1848663a91.4.1747962096179; Thu, 22
+ May 2025 18:01:36 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 22 May 2025 17:59:55 -0700
+Date: Thu, 22 May 2025 17:59:56 -0700
 In-Reply-To: <20250523010004.3240643-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250523010004.3240643-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1151.ga128411c76-goog
-Message-ID: <20250523010004.3240643-51-seanjc@google.com>
-Subject: [PATCH v2 50/59] KVM: SVM: WARN if ir_list is non-empty at vCPU free
+Message-ID: <20250523010004.3240643-52-seanjc@google.com>
+Subject: [PATCH v2 51/59] KVM: x86: Decouple device assignment from IRQ bypass
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>, 
@@ -87,54 +87,170 @@ Cc: kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
 	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that AVIC IRTE tracking is in a mostly sane state, WARN if a vCPU is
-freed with ir_list entries, i.e. if KVM leaves a dangling IRTE.
+Use a dedicated counter to track the number of IRQs that can utilize IRQ
+bypass instead of piggybacking the assigned device count.  As evidenced by
+commit 2edd9cb79fb3 ("kvm: detect assigned device via irqbypass manager"),
+it's possible for a device to be able to post IRQs to a vCPU without said
+device being assigned to a VM.
 
-Initialize the per-vCPU interrupt remapping list and its lock even if AVIC
-is disabled so that the WARN doesn't hit false positives (and so that KVM
-doesn't need to call into AVIC code for a simple sanity check).
+Leave the calls to kvm_arch_{start,end}_assignment() alone for the moment
+to avoid regressing the MMIO stale data mitigation.  KVM is abusing the
+assigned device count when applying mmio_stale_data_clear, and it's not at
+all clear if vDPA devices rely on this behavior.  This will hopefully be
+cleaned up in the future, as the number of assigned devices is a terrible
+heuristic for detecting if a VM has access to host MMIO.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/avic.c | 5 +++--
- arch/x86/kvm/svm/svm.c  | 2 ++
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  2 +-
+ arch/x86/include/asm/kvm_host.h    |  4 +++-
+ arch/x86/kvm/irq.c                 |  9 ++++++++-
+ arch/x86/kvm/vmx/main.c            |  2 +-
+ arch/x86/kvm/vmx/posted_intr.c     | 16 ++++++++++------
+ arch/x86/kvm/vmx/posted_intr.h     |  2 +-
+ arch/x86/kvm/x86.c                 |  3 +--
+ 7 files changed, 25 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index d1f7b35c1b02..c55cbb0610b4 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -704,6 +704,9 @@ int avic_init_vcpu(struct vcpu_svm *svm)
- 	int ret;
- 	struct kvm_vcpu *vcpu = &svm->vcpu;
- 
-+	INIT_LIST_HEAD(&svm->ir_list);
-+	spin_lock_init(&svm->ir_list_lock);
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 8d50e3e0a19b..8897f509860c 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -112,7 +112,7 @@ KVM_X86_OP_OPTIONAL(update_cpu_dirty_logging)
+ KVM_X86_OP_OPTIONAL(vcpu_blocking)
+ KVM_X86_OP_OPTIONAL(vcpu_unblocking)
+ KVM_X86_OP_OPTIONAL(pi_update_irte)
+-KVM_X86_OP_OPTIONAL(pi_start_assignment)
++KVM_X86_OP_OPTIONAL(pi_start_bypass)
+ KVM_X86_OP_OPTIONAL(apicv_pre_state_restore)
+ KVM_X86_OP_OPTIONAL(apicv_post_state_restore)
+ KVM_X86_OP_OPTIONAL_RET0(dy_apicv_has_pending_interrupt)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index c722adfedd96..01edcefbd937 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1382,6 +1382,8 @@ struct kvm_arch {
+ 	atomic_t noncoherent_dma_count;
+ #define __KVM_HAVE_ARCH_ASSIGNED_DEVICE
+ 	atomic_t assigned_device_count;
++	unsigned long nr_possible_bypass_irqs;
 +
- 	if (!enable_apicv || !irqchip_in_kernel(vcpu->kvm))
- 		return 0;
+ #ifdef CONFIG_KVM_IOAPIC
+ 	struct kvm_pic *vpic;
+ 	struct kvm_ioapic *vioapic;
+@@ -1855,7 +1857,7 @@ struct kvm_x86_ops {
+ 	int (*pi_update_irte)(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
+ 			      unsigned int host_irq, uint32_t guest_irq,
+ 			      struct kvm_vcpu *vcpu, u32 vector);
+-	void (*pi_start_assignment)(struct kvm *kvm);
++	void (*pi_start_bypass)(struct kvm *kvm);
+ 	void (*apicv_pre_state_restore)(struct kvm_vcpu *vcpu);
+ 	void (*apicv_post_state_restore)(struct kvm_vcpu *vcpu);
+ 	bool (*dy_apicv_has_pending_interrupt)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+index b6263ab4b18d..7586cf6f1215 100644
+--- a/arch/x86/kvm/irq.c
++++ b/arch/x86/kvm/irq.c
+@@ -570,10 +570,15 @@ int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
+ 	spin_lock_irq(&kvm->irqfds.lock);
+ 	irqfd->producer = prod;
  
-@@ -711,8 +714,6 @@ int avic_init_vcpu(struct vcpu_svm *svm)
- 	if (ret)
- 		return ret;
++	if (!kvm->arch.nr_possible_bypass_irqs++)
++		kvm_x86_call(pi_start_bypass)(kvm);
++
+ 	if (irqfd->irq_entry.type == KVM_IRQ_ROUTING_MSI) {
+ 		ret = kvm_pi_update_irte(irqfd, &irqfd->irq_entry);
+-		if (ret)
++		if (ret) {
++			kvm->arch.nr_possible_bypass_irqs--;
+ 			kvm_arch_end_assignment(irqfd->kvm);
++		}
+ 	}
+ 	spin_unlock_irq(&kvm->irqfds.lock);
  
--	INIT_LIST_HEAD(&svm->ir_list);
--	spin_lock_init(&svm->ir_list_lock);
- 	svm->dfr_reg = APIC_DFR_FLAT;
+@@ -606,6 +611,8 @@ void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
+ 	}
+ 	irqfd->producer = NULL;
  
- 	return ret;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 56d11f7b4bef..2cd991062acb 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1497,6 +1497,8 @@ static void svm_vcpu_free(struct kvm_vcpu *vcpu)
++	kvm->arch.nr_possible_bypass_irqs--;
++
+ 	spin_unlock_irq(&kvm->irqfds.lock);
+ 
+ 
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index d1e02e567b57..a986fc45145e 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -1014,7 +1014,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.nested_ops = &vmx_nested_ops,
+ 
+ 	.pi_update_irte = vmx_pi_update_irte,
+-	.pi_start_assignment = vmx_pi_start_assignment,
++	.pi_start_bypass = vmx_pi_start_bypass,
+ 
+ #ifdef CONFIG_X86_64
+ 	.set_hv_timer = vt_op(set_hv_timer),
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index 3a23c30f73cb..5671d59a6b6d 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -146,8 +146,13 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ static bool vmx_can_use_vtd_pi(struct kvm *kvm)
  {
- 	struct vcpu_svm *svm = to_svm(vcpu);
++	/*
++	 * Note, reading the number of possible bypass IRQs can race with a
++	 * bypass IRQ being attached to the VM.  vmx_pi_start_bypass() ensures
++	 * blockng vCPUs will see an elevated count or get KVM_REQ_UNBLOCK.
++	 */
+ 	return irqchip_in_kernel(kvm) && kvm_arch_has_irq_bypass() &&
+-	       kvm_arch_has_assigned_device(kvm);
++	       READ_ONCE(kvm->arch.nr_possible_bypass_irqs);
+ }
  
-+	WARN_ON_ONCE(!list_empty(&svm->ir_list));
-+
- 	svm_leave_nested(vcpu);
- 	svm_free_nested(svm);
+ /*
+@@ -285,12 +290,11 @@ bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu)
+ 
+ 
+ /*
+- * Bail out of the block loop if the VM has an assigned
+- * device, but the blocking vCPU didn't reconfigure the
+- * PI.NV to the wakeup vector, i.e. the assigned device
+- * came along after the initial check in vmx_vcpu_pi_put().
++ * Kick all vCPUs when the first possible bypass IRQ is attached to a VM, as
++ * blocking vCPUs may scheduled out without reconfiguring PID.NV to the wakeup
++ * vector, i.e. if the bypass IRQ came along after vmx_vcpu_pi_put().
+  */
+-void vmx_pi_start_assignment(struct kvm *kvm)
++void vmx_pi_start_bypass(struct kvm *kvm)
+ {
+ 	if (!kvm_arch_has_irq_bypass())
+ 		return;
+diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
+index 94ed66ea6249..a4af39948cf0 100644
+--- a/arch/x86/kvm/vmx/posted_intr.h
++++ b/arch/x86/kvm/vmx/posted_intr.h
+@@ -17,7 +17,7 @@ bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu);
+ int vmx_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
+ 		       unsigned int host_irq, uint32_t guest_irq,
+ 		       struct kvm_vcpu *vcpu, u32 vector);
+-void vmx_pi_start_assignment(struct kvm *kvm);
++void vmx_pi_start_bypass(struct kvm *kvm);
+ 
+ static inline int pi_find_highest_vector(struct pi_desc *pi_desc)
+ {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3966801bcb0d..3969e439a6bb 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13563,8 +13563,7 @@ bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_start_assignment(struct kvm *kvm)
+ {
+-	if (atomic_inc_return(&kvm->arch.assigned_device_count) == 1)
+-		kvm_x86_call(pi_start_assignment)(kvm);
++	atomic_inc(&kvm->arch.assigned_device_count);
+ }
+ EXPORT_SYMBOL_GPL(kvm_arch_start_assignment);
  
 -- 
 2.49.0.1151.ga128411c76-goog
