@@ -1,281 +1,350 @@
-Return-Path: <kvm+bounces-47556-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47557-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB1C2AC20AF
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 12:13:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E4F6AC20CF
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 12:21:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD5A3179206
-	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 10:12:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E89CB7B6F02
+	for <lists+kvm@lfdr.de>; Fri, 23 May 2025 10:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9799227B8E;
-	Fri, 23 May 2025 10:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F9F227E89;
+	Fri, 23 May 2025 10:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w3EMGKi+"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="eBd8ii3c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8F62253A9
-	for <kvm@vger.kernel.org>; Fri, 23 May 2025 10:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01548227B88
+	for <kvm@vger.kernel.org>; Fri, 23 May 2025 10:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747995163; cv=none; b=bPi2ORtSIDPEULvsonyB+xz0G7lJRlllj75sKdMKkZod52IK7OS2T7uA3DASLyoPyaU4+5ACdMkETLN0Rvk+8lsAlbmsAVLtSoaQSx+cFSJourEvFowHp33RWza6GiWp3Ac8Qa9Oxzu7ezjSlcaB4RrWVX+HxBN+mHS0L8G4B6I=
+	t=1747995650; cv=none; b=PHEo7drwKCZroWNZIiltqygQeGyuzZ+xmGNZIByEZ4x161DGCn7cvg/uOWMQmmltY/XFaIRIE5PQ6e/f86dkVsQavZCNXhCUMXDj1AuepP5jQ/jCvh/8PXo2Z8CgQT6MExwCYKZFDYwM9Iw5q1i5MrlcHRC1yaqTJCi1RCCc2og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747995163; c=relaxed/simple;
-	bh=Pji3pOrxIsdrF6N7TOopnNprznlfL8393By8J52sO2Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bJGV8Z6Wgg9SMhw2cuCy672RkaSXGLDNEpUj6aB8hofoNKSqrb4QuOPCiXKFoIe4NFZ0zuLlu7Hz2QIjqoCWI8B/cHb4kgvcp4xHTFZwL5JUXR/qSPQNDEe2za+GomzHJsC/zcdzgeiFEneKQiSnjE0VffmyiB/fgNCbnkkivXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w3EMGKi+; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-48b7747f881so208471cf.1
-        for <kvm@vger.kernel.org>; Fri, 23 May 2025 03:12:41 -0700 (PDT)
+	s=arc-20240116; t=1747995650; c=relaxed/simple;
+	bh=Zvy0yjeXuo37Rz8IuRQUNYpVX0oiQaA/jdiqrd6rLCU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=K/btcXdnjh+Ii7QVuJKRgh+cMjAZll16xerDzCXwWB97UcDlWplMYBJ30kJwyPmlQdSzfEkEgHf9ItNqBl6V6ZHjtGiQPFssoPVBgIeLc8GiOy1FcD/nUGI4GIqGHZLRsi+qstYTY4hyrb24SwvALRLxuHqxUxULwzdrfCJS4RE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=eBd8ii3c; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-73972a54919so8182903b3a.3
+        for <kvm@vger.kernel.org>; Fri, 23 May 2025 03:20:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747995161; x=1748599961; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tb9MyJc2bCS8IIcbG5oS2rW0sKmwPpiIghmBwRh5La8=;
-        b=w3EMGKi+cPpivPfkOuNZpDjyCE4PYW/26YgPlZJ9U49NwUHRnLT4p7EH3AB691RTB6
-         Hui6Fjk8JOQCGT+3wAC+ee7MPe3lsEY2mzjUJ/W8nUiNfeRU5gxgQ8byLqnLtIDl8/Xu
-         lEE3BogGlx8bO6MVuqXdSTl0Sd/koXACB01BKPLFYFaw+U981kPu7YDSVU/LJXBAPLfH
-         Y987L5MwGido5hQzcinE3kYxVAKRToIakGaClJDe7sCi78hwQZFnQO+910jfUdusplkh
-         kYImnw9yq/95UfvHbguON+AZmXfoygNlbZ6PBuG9ASF4b2HMRQR5tlMwGdu8/Z7pWYIq
-         YjYA==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1747995646; x=1748600446; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PcccdexedjdJTtFmXwsVUsVKEhg4QFkUCYHYRVB4dvk=;
+        b=eBd8ii3c4s9ywyZKB/YzNGKTlbbx5HJIPyNcr7RS0/ncCakNivk++z32kfRL4W044A
+         +2rmjH0g5g8Jodrpq0VG5XlH+HUZnWdLVqKanrGKkrWFeUSxBkU9h8+LHxgyGMWOKVKJ
+         Hxoc8BcDOGcF5VtM/x6KIFE7ORihThHavI/BkXAsOFcw3VLTacaxlcwzQTuDNEq/zbOz
+         AHnFVl6NqWdQvjzbDjwzF1F7553TiMKeQnb+PWStWMrBrSTX1IzUAUHCLpRl2ui4oUQZ
+         3Zs7WUdVZsx0RxREbB0Y+7jtP3yvZxvB5tIF0phEzEGiRliz8VygIoEdhnsBX9yhrGc4
+         bSXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747995161; x=1748599961;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1747995646; x=1748600446;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tb9MyJc2bCS8IIcbG5oS2rW0sKmwPpiIghmBwRh5La8=;
-        b=MXNVRwulyYVCCWsJ+Kw0RpYuswzSDcjoYdCjDpZP1sMzVRN/7AX1vQi8dZNe6EY0qu
-         wj3Oa2o+wagxK+Io5UWu2R9Ikod5eUbCrAk+f0af2hNateVO6YEUqDIG0RuoVThkf6D9
-         juplkVNztnttPiJi1mec3RMJZDK4K0+RG29q+r3KUXSIoyNz1nhLlMzhHI30HDwSNqHt
-         Eiv+uEHNXUhPre/DNnfZiqlFNVFkxWr5rgHJent6PoH6wSOfA0W0hkkO4tUG8ogi57pd
-         KXmUpB8MF3hAmwpZk1vSDiDzRnDK8PeHktmjRRBi0zhJw/tq3kRc+pGyORmYZw5IExXb
-         dGhg==
-X-Forwarded-Encrypted: i=1; AJvYcCUYtKvQxaj63ScQl5EO4oVfUmoN79NGmmIwiSDWAY1isi5uW8VfLTd8nneFRy6i6zrcZoc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk+r4R258HKjCON8NmIDog/pL2WT3t9EjzU6oQlz5CfdwQSIK/
-	51kJ8gsihyO8SQ+1KYK24CVb6tRHMy04FJbiOfCAox4z9vCX2lt1cr0+C/ItORyed/tg4RzUg6w
-	odl6HpL/D7itQRMkl01QehuEpcAKuecegxbXG7oB7
-X-Gm-Gg: ASbGncunsT7T9em4ZCrpmx6ko/AfJseayWWLqTGtmXfzfLVKw4DJcLdGgdhPpAIbQMZ
-	qk5ktOawTspgV3S/nRpDOGVOiTJjC2kLVzl/jBgkxicF6bHFm8Fyg7eh3YHVHs4QZPcZY6pq3FM
-	BXtbR56r1rG3DkHCvZZ8KT6tDE/Vl3p/woxbalj8SpxHM=
-X-Google-Smtp-Source: AGHT+IEkIIS4aNjnOZldCQ1+78h6aJmwPwAW5h7vR8N5+0fx6Rl0x1SYbJYgMD0+JUZ/omAoMfiFpgjWvd8MxNA8Oqo=
-X-Received: by 2002:a05:622a:5cf:b0:47d:4e8a:97f0 with SMTP id
- d75a77b69052e-49e35da50e0mr2300641cf.29.1747995160362; Fri, 23 May 2025
- 03:12:40 -0700 (PDT)
+        bh=PcccdexedjdJTtFmXwsVUsVKEhg4QFkUCYHYRVB4dvk=;
+        b=wcW9fPOugWimYJcL3Lb0INPSu+0yOGRe2bEnkWbjsTwA5sQi2E2qj6pYDKW4RJefOg
+         P/jk2HA+mPyfUcLkFGRUmqBwL5RPLlub1rrgVGewi7SvUV/ANey+kBYBL/9RpDySfusK
+         4BcuHATMYYiGq7LQqyY6GsoWRcBPSCRA1lY6rty9/2O50PD/+WW3/eBEwX2LyjU+ypPe
+         MrUosC3uzvwh2wdaqlSqxJ3ZU45t1XTG6IPFS4YQTIcc/DMSyIyiuz9jIcqIQt6wOoDV
+         zikXyEMmCnL2Z5afGGRjYmTlecO2PWDpctDeHrNQ4fPoUdjC0SbTslDgxOU8qy1WkBn7
+         A9UA==
+X-Forwarded-Encrypted: i=1; AJvYcCUw/xVWrLQAHoDm35MNmH3be458qpCZXKYdIG29T2w8oRWSmYlasFpEF1TzAib9Ox/p0U0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHmpv5WDi8hqTP4iTTaYUNHKG8AiTwVj6kySsS25RVktecZARJ
+	oJoJX/yeIllEvXDQz8JRC3hS9GiYVFNqxV/boIs4XcNQ6j3rQ01B+RZ5hmpaFc+Jz3Q=
+X-Gm-Gg: ASbGncsLnkt9cjlAKrhmr79JEFhqq6jceCE2wJdXfNeNIcNJhOsEars/rha5+m3y2HV
+	eaFslHBrP9ZB80W73fHSjsmKzbOQZYHumo5T5LJdAp/DAL+eQXgkKAP5DJTHXM4HE48kyp0pPqz
+	dgXG0z7c/s2FuKVWJmnpzUnfikhsinIx83+wi52U97/m0RO/4tbWouyReaMSaE3ANAZRAYh84dW
+	HwxPgly49Ls9OAWrTPLdK0O/2Hld6645KD5l3SyIQrW3xpVvGP48jV3dns2Aq62P3VfjDqZC9NC
+	kfaHAZ4Ef5T6x9Oko3n15Ex0aN5k9K7RyZ12nP0DCVBIjBCUSe4e
+X-Google-Smtp-Source: AGHT+IGW5MQq2RPWnXafJRg+YIczQ4DhpPwC8Bknbai+r2sLMAlywyZ0F0gvby/uq/dGmtRTBiBSXA==
+X-Received: by 2002:a05:6a00:4fd6:b0:736:41ec:aaad with SMTP id d2e1a72fcca58-745ed87cdc4mr3458465b3a.14.1747995646026;
+        Fri, 23 May 2025 03:20:46 -0700 (PDT)
+Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a9829ce8sm12466688b3a.118.2025.05.23.03.20.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 May 2025 03:20:45 -0700 (PDT)
+From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
+To: Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org
+Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Deepak Gupta <debug@rivosinc.com>,
+	Charlie Jenkins <charlie@rivosinc.com>
+Subject: [PATCH v8 00/14] riscv: add SBI FWFT misaligned exception delegation support
+Date: Fri, 23 May 2025 12:19:17 +0200
+Message-ID: <20250523101932.1594077-1-cleger@rivosinc.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGtprH_7jSpwF77j1GW8rjSrbtZZ2OW2iGck5=Wk67+VnF9vjQ@mail.gmail.com>
- <CA+EHjTzMhKCoftfJUuL0WUZW4DdqOHgVDcn0Cmf-0r--8rBdbg@mail.gmail.com>
- <diqzecwjnk95.fsf@ackerleytng-ctop.c.googlers.com> <CA+EHjTyY5C1QgkoAqvJ0kHM4nUvKc1e1nQ0Uq+BANtVEnZH90w@mail.gmail.com>
- <CAGtprH-fE=G923ctBAcq5zFna+2WULhmHDSbXUsZKUrin29b4g@mail.gmail.com>
- <CA+EHjTxvufYVA8LQWRKEX7zA0gWLQUHVO2LvwKc5JXVu-XAEEA@mail.gmail.com>
- <CAGtprH_TfKT3oRPCLbh-ojLGXSfOQ2XA39pVhr47gb3ikPtUkw@mail.gmail.com>
- <CA+EHjTxJZ_pb7+chRoZxvkxuib2YjbiHg=_+f4bpRt2xDFNCzQ@mail.gmail.com>
- <aC86OsU2HSFZkJP6@google.com> <CA+EHjTxjt-mb_WbtVymaBvCb1EdJAVMV_uGb4xDs_ewg4k0C4g@mail.gmail.com>
- <aC9QPoEUw_nLHhV4@google.com>
-In-Reply-To: <aC9QPoEUw_nLHhV4@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 23 May 2025 11:12:03 +0100
-X-Gm-Features: AX0GCFsTSgoQuYeHe63NUWNK_TXQp_3mL71CbShDN1o-eae1QjvK7sqPLnnLNQo
-Message-ID: <CA+EHjTzMYSHKuxMJbpMx594RsL64aph1dWj06zx_01=ZuQU+Bg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
- KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
-To: Sean Christopherson <seanjc@google.com>
-Cc: Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	linux-fsdevel@vger.kernel.org, aik@amd.com, ajones@ventanamicro.com, 
-	akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com, 
-	anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com, 
-	binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com, 
-	chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com, 
-	david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk, 
-	erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com, 
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
-	usama.arif@bytedance.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, 
-	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com, 
-	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Sean,
+The SBI Firmware Feature extension allows the S-mode to request some
+specific features (either hardware or software) to be enabled. This
+series uses this extension to request misaligned access exception
+delegation to S-mode in order to let the kernel handle it. It also adds
+support for the KVM FWFT SBI extension based on the misaligned access
+handling infrastructure.
 
+FWFT SBI extension is part of the SBI V3.0 specifications [1]. It can be
+tested using the qemu provided at [2] which contains the series from
+[3]. Upstream kvm-unit-tests can be used inside kvm to tests the correct
+delegation of misaligned exceptions. Upstream OpenSBI can be used.
 
-On Thu, 22 May 2025 at 17:26, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, May 22, 2025, Fuad Tabba wrote:
-> > On Thu, 22 May 2025 at 15:52, Sean Christopherson <seanjc@google.com> wrote:
-> > > On Wed, May 21, 2025, Fuad Tabba wrote:
-> > > > How does the host userspace find that out? If the host userspace is capable
-> > > > of finding that out, then surely KVM is also capable of finding out the same.
-> > >
-> > > Nope, not on x86.  Well, not without userspace invoking a new ioctl, which would
-> > > defeat the purpose of adding these ioctls.
-> > >
-> > > KVM is only responsible for emulating/virtualizing the "CPU".  The chipset, e.g.
-> > > the PCI config space, is fully owned by userspace.  KVM doesn't even know whether
-> > > or not PCI exists for the VM.  And reboot may be emulated by simply creating a
-> > > new KVM instance, i.e. even if KVM was somehow aware of the reboot request, the
-> > > change in state would happen in an entirely new struct kvm.
-> > >
-> > > That said, Vishal and Ackerley, this patch is a bit lacking on the documentation
-> > > front.  The changelog asserts that:
-> > >
-> > >   A guest_memfd ioctl is used because shareability is a property of the memory,
-> > >   and this property should be modifiable independently of the attached struct kvm
-> > >
-> > > but then follows with a very weak and IMO largely irrelevant justification of:
-> > >
-> > >   This allows shareability to be modified even if the memory is not yet bound
-> > >   using memslots.
-> > >
-> > > Allowing userspace to change shareability without memslots is one relatively minor
-> > > flow in one very specific use case.
-> > >
-> > > The real justification for these ioctls is that fundamentally, shareability for
-> > > in-place conversions is a property of a guest_memfd instance and not a struct kvm
-> > > instance, and so needs to owned by guest_memfd.
-> >
-> > Thanks for the clarification Sean. I have a couple of followup
-> > questions/comments that you might be able to help with:
-> >
-> > From a conceptual point of view, I understand that the in-place conversion is
-> > a property of guest_memfd. But that doesn't necessarily mean that the
-> > interface between kvm <-> guest_memfd is a userspace IOCTL.
->
-> kvm and guest_memfd aren't the communication endpoints for in-place conversions,
-> and more importantly, kvm isn't part of the control plane.  kvm's primary role
-> (for guest_memfd with in-place conversions) is to manage the page tables to map
-> memory into the guest.
->
-> kvm *may* also explicitly provide a communication channel between the guest and
-> host, e.g. when conversions are initiated via hypercalls, but in some cases the
-> communication channel may be created through pre-existing mechanisms, e.g. a
-> shared memory buffer or emulated I/O (such as the PCI reset case).
->
->   guest => kvm (dumb pipe) => userspace => guest_memfd => kvm (invalidate)
->
-> And in other cases, kvm might not be in that part of the picture at all, e.g. if
-> the userspace VMM provides an interface to the VM owner (which could also be the
-> user running the VM) to reset the VM, then the flow would look like:
->
->   userspace => guest_memfd => kvm (invalidate)
->
-> A decent comparison is vCPUs.  KVM _could_ route all ioctls through the VM, but
-> that's unpleasant for all parties, as it'd be cumbersome for userspace, and
-> unnecessarily complex and messy for KVM.  Similarly, routing guest_memfd state
-> changes through KVM_SET_MEMORY_ATTRIBUTES is awkward from both design and mechanical
-> perspectives.
->
-> Even if we disagree on how ugly/pretty routing conversions through kvm would be,
-> which I'll allow is subjective, the bigger problem is that bouncing through
-> KVM_SET_MEMORY_ATTRIBUTES would create an unholy mess of an ABI.
->
-> Today, KVM_SET_MEMORY_ATTRIBUTES is handled entirely within kvm, and any changes
-> take effect irrespective of any memslot bindings.  And that didn't happen by
-> chance; preserving and enforcing attribute changes independently of memslots was
-> a key design requirement, precisely because memslots are ephemeral to a certain
-> extent.
->
-> Adding support for in-place guest_memfd conversion will require new ABI, and so
-> will be a "breaking" change for KVM_SET_MEMORY_ATTRIBUTES no matter what.  E.g.
-> KVM will need to reject KVM_MEMORY_ATTRIBUTE_PRIVATE for VMs that elect to use
-> in-place guest_memfd conversions.  But very critically, KVM can cripsly enumerate
-> the lack of KVM_MEMORY_ATTRIBUTE_PRIVATE via KVM_CAP_MEMORY_ATTRIBUTES, the
-> behavior will be very straightforward to document (e.g. CAP X is mutually excusive
-> with KVM_MEMORY_ATTRIBUTE_PRIVATE), and it will be opt-in, i.e. won't truly be a
-> breaking change.
->
-> If/when we move shareability to guest_memfd, routing state changes through
-> KVM_SET_MEMORY_ATTRIBUTES will gain a subtle dependency on userspace having to
-> create memslots in order for state changes to take effect.  That wrinkle would be
-> weird and annoying to document, e.g. "if CAP X is enabled, the ioctl ordering is
-> A => B => C, otherwise the ordering doesn't matter", and would create many more
-> conundrums:
->
->   - If a memslot needs to exist in order for KVM_SET_MEMORY_ATTRIBUTES to take effect,
->     what should happen if that memslot is deleted?
->   - If a memslot isn't found, should KVM_SET_MEMORY_ATTRIBUTES fail and report
->     an error, or silently do nothing?
->   - If KVM_SET_MEMORY_ATTRIBUTES affects multiple memslots that are bound to
->     multiple guest_memfd, how does KVM guarantee atomicity?  What happens if one
->     guest_memfd conversion succeeds, but a later fails?
->
-> > We already communicate directly between the two. Other, even less related
-> > subsystems within the kernel also interact without going through userspace.
-> > Why can't we do the same here? I'm not suggesting it not be owned by
-> > guest_memfd, but that we communicate directly.
->
-> I'm not concerned about kvm communicating with guest_memfd, as you note it's all
-> KVM.  As above, my concerns are all about KVM's ABI and who owns/controls what.
->
-> > From a performance point of view, I would expect the common case to be that
-> > when KVM gets an unshare request from the guest, it would be able to unmap
-> > those pages from the (cooperative) host userspace, and return back to the
-> > guest. In this scenario, the host userspace wouldn't even need to be
-> > involved.
->
-> Hard NAK, at least from an x86 perspective.  Userspace is the sole decision maker
-> with respect to what memory is state of shared vs. private, full stop.  The guest
-> can make *requests* to convert memory, but ultimately it's host userspace that
-> decides whether or not to honor the request.
->
-> We've litigated this exact issue multiple times.  All state changes must be
-> controlled by userspace, because userspace is the only entity that can gracefully
-> handle exceptions and edge cases, and is the only entity with (almost) full
-> knowledge of the system.  We can discuss this again if necessary, but I'd much
-> prefer to not rehash all of those conversations.
->
-> > Having a userspace IOCTL as part of this makes that trip unnecessarily longer
-> > for the common case.
->
-> I'm very skeptical that an exit to userspace is going to even be measurable in
-> terms of the cost to convert memory.  Conversion is going to require multiple
-> locks, modifications to multiple sets of page tables with all the associated TLB
-> maintenance, possibly cache maintenance, and probably a few other things I'm
-> forgetting.  The cost of a few user<=>kernel transitions is likely going to be a
-> drop in the bucket.
->
-> If I'm wrong, and there are flows where the user<=>kernel transitions are the
-> long pole, then we could certainly exploring adding a way for userspace to opt
-> into a "fast path" conversion.  But it would need to be exactly that, an optional
-> fast path that can fall back to the "slow" userspace-driven conversion as needed.
+Note: Since SBI V3.0 is not yet ratified, FWFT extension API is split
+between interface only and implementation, allowing to pick only the
+interface which do not have hard dependencies on SBI.
 
-Thanks for this very thorough explanation. I know that we have
-litigated this issue, but not this _exact_ issue. My understanding was
-that the main reason for using IOCTLs for memory attributes is that
-userspace needs to manage private and shared memory seperately,
-including allocation and punching holes where necessary.
+The tests can be run using the kselftest from series [4].
 
-That said, no need to discuss this again. If it turns out that
-user<->kernel transitions are a bottleneck we could look into an
-opt-in fast path as you said.
+$ qemu-system-riscv64 \
+	-cpu rv64,trap-misaligned-access=true,v=true \
+	-M virt \
+	-m 1024M \
+	-bios fw_dynamic.bin \
+	-kernel Image
+ ...
 
-Cheers,
-/fuad
+ # ./misaligned
+ TAP version 13
+ 1..23
+ # Starting 23 tests from 1 test cases.
+ #  RUN           global.gp_load_lh ...
+ #            OK  global.gp_load_lh
+ ok 1 global.gp_load_lh
+ #  RUN           global.gp_load_lhu ...
+ #            OK  global.gp_load_lhu
+ ok 2 global.gp_load_lhu
+ #  RUN           global.gp_load_lw ...
+ #            OK  global.gp_load_lw
+ ok 3 global.gp_load_lw
+ #  RUN           global.gp_load_lwu ...
+ #            OK  global.gp_load_lwu
+ ok 4 global.gp_load_lwu
+ #  RUN           global.gp_load_ld ...
+ #            OK  global.gp_load_ld
+ ok 5 global.gp_load_ld
+ #  RUN           global.gp_load_c_lw ...
+ #            OK  global.gp_load_c_lw
+ ok 6 global.gp_load_c_lw
+ #  RUN           global.gp_load_c_ld ...
+ #            OK  global.gp_load_c_ld
+ ok 7 global.gp_load_c_ld
+ #  RUN           global.gp_load_c_ldsp ...
+ #            OK  global.gp_load_c_ldsp
+ ok 8 global.gp_load_c_ldsp
+ #  RUN           global.gp_load_sh ...
+ #            OK  global.gp_load_sh
+ ok 9 global.gp_load_sh
+ #  RUN           global.gp_load_sw ...
+ #            OK  global.gp_load_sw
+ ok 10 global.gp_load_sw
+ #  RUN           global.gp_load_sd ...
+ #            OK  global.gp_load_sd
+ ok 11 global.gp_load_sd
+ #  RUN           global.gp_load_c_sw ...
+ #            OK  global.gp_load_c_sw
+ ok 12 global.gp_load_c_sw
+ #  RUN           global.gp_load_c_sd ...
+ #            OK  global.gp_load_c_sd
+ ok 13 global.gp_load_c_sd
+ #  RUN           global.gp_load_c_sdsp ...
+ #            OK  global.gp_load_c_sdsp
+ ok 14 global.gp_load_c_sdsp
+ #  RUN           global.fpu_load_flw ...
+ #            OK  global.fpu_load_flw
+ ok 15 global.fpu_load_flw
+ #  RUN           global.fpu_load_fld ...
+ #            OK  global.fpu_load_fld
+ ok 16 global.fpu_load_fld
+ #  RUN           global.fpu_load_c_fld ...
+ #            OK  global.fpu_load_c_fld
+ ok 17 global.fpu_load_c_fld
+ #  RUN           global.fpu_load_c_fldsp ...
+ #            OK  global.fpu_load_c_fldsp
+ ok 18 global.fpu_load_c_fldsp
+ #  RUN           global.fpu_store_fsw ...
+ #            OK  global.fpu_store_fsw
+ ok 19 global.fpu_store_fsw
+ #  RUN           global.fpu_store_fsd ...
+ #            OK  global.fpu_store_fsd
+ ok 20 global.fpu_store_fsd
+ #  RUN           global.fpu_store_c_fsd ...
+ #            OK  global.fpu_store_c_fsd
+ ok 21 global.fpu_store_c_fsd
+ #  RUN           global.fpu_store_c_fsdsp ...
+ #            OK  global.fpu_store_c_fsdsp
+ ok 22 global.fpu_store_c_fsdsp
+ #  RUN           global.gen_sigbus ...
+ [12797.988647] misaligned[618]: unhandled signal 7 code 0x1 at 0x0000000000014dc0 in misaligned[4dc0,10000+76000]
+ [12797.988990] CPU: 0 UID: 0 PID: 618 Comm: misaligned Not tainted 6.13.0-rc6-00008-g4ec4468967c9-dirty #51
+ [12797.989169] Hardware name: riscv-virtio,qemu (DT)
+ [12797.989264] epc : 0000000000014dc0 ra : 0000000000014d00 sp : 00007fffe165d100
+ [12797.989407]  gp : 000000000008f6e8 tp : 0000000000095760 t0 : 0000000000000008
+ [12797.989544]  t1 : 00000000000965d8 t2 : 000000000008e830 s0 : 00007fffe165d160
+ [12797.989692]  s1 : 000000000000001a a0 : 0000000000000000 a1 : 0000000000000002
+ [12797.989831]  a2 : 0000000000000000 a3 : 0000000000000000 a4 : ffffffffdeadbeef
+ [12797.989964]  a5 : 000000000008ef61 a6 : 626769735f6e0000 a7 : fffffffffffff000
+ [12797.990094]  s2 : 0000000000000001 s3 : 00007fffe165d838 s4 : 00007fffe165d848
+ [12797.990238]  s5 : 000000000000001a s6 : 0000000000010442 s7 : 0000000000010200
+ [12797.990391]  s8 : 000000000000003a s9 : 0000000000094508 s10: 0000000000000000
+ [12797.990526]  s11: 0000555567460668 t3 : 00007fffe165d070 t4 : 00000000000965d0
+ [12797.990656]  t5 : fefefefefefefeff t6 : 0000000000000073
+ [12797.990756] status: 0000000200004020 badaddr: 000000000008ef61 cause: 0000000000000006
+ [12797.990911] Code: 8793 8791 3423 fcf4 3783 fc84 c737 dead 0713 eef7 (c398) 0001
+ #            OK  global.gen_sigbus
+ ok 23 global.gen_sigbus
+ # PASSED: 23 / 23 tests passed.
+ # Totals: pass:23 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+With kvm-tools:
+
+ # lkvm run -k sbi.flat -m 128
+  Info: # lkvm run -k sbi.flat -m 128 -c 1 --name guest-97
+  Info: Removed ghost socket file "/root/.lkvm//guest-97.sock".
+
+ ##########################################################################
+ #    kvm-unit-tests
+ ##########################################################################
+
+ ... [test messages elided]
+ PASS: sbi: fwft: FWFT extension probing no error
+ PASS: sbi: fwft: get/set reserved feature 0x6 error == SBI_ERR_DENIED
+ PASS: sbi: fwft: get/set reserved feature 0x3fffffff error == SBI_ERR_DENIED
+ PASS: sbi: fwft: get/set reserved feature 0x80000000 error == SBI_ERR_DENIED
+ PASS: sbi: fwft: get/set reserved feature 0xbfffffff error == SBI_ERR_DENIED
+ PASS: sbi: fwft: misaligned_deleg: Get misaligned deleg feature no error
+ PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature invalid value error
+ PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature invalid value error
+ PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value no error
+ PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value 0
+ PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value no error
+ PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value 1
+ PASS: sbi: fwft: misaligned_deleg: Verify misaligned load exception trap in supervisor
+ SUMMARY: 50 tests, 2 unexpected failures, 12 skipped
+
+This series is available at [5].
+
+Link: https://github.com/riscv-non-isa/riscv-sbi-doc/releases/download/vv3.0-rc2/riscv-sbi.pdf [1]
+Link: https://github.com/rivosinc/qemu/tree/dev/cleger/misaligned [2]
+Link: https://lore.kernel.org/all/20241211211933.198792-3-fkonrad@amd.com/T/ [3]
+Link: https://lore.kernel.org/linux-riscv/20250414123543.1615478-1-cleger@rivosinc.com [4]
+Link: https://github.com/rivosinc/linux/tree/dev/cleger/fwft [5]
+---
+
+V8:
+ - Move misaligned_access_speed under CONFIG_RISCV_MISALIGNED and add a
+   separate commit for that.
+
+V7:
+ - Fix ifdefery build problems
+ - Move sbi_fwft_is_supported with fwft_set_req struct
+ - Added Atish Reviewed-by
+ - Updated KVM vcpu cfg hedeleg value in set_delegation
+ - Changed SBI ETIME error mapping to ETIMEDOUT
+ - Fixed a few typo reported by Alok
+
+V6:
+ - Rename FWFT interface to remove "_local"
+ - Fix test for MEDELEG values in KVM FWFT support
+ - Add __init for unaligned_access_init()
+ - Rebased on master
+
+V5:
+ - Return ERANGE as mapping for SBI_ERR_BAD_RANGE
+ - Removed unused sbi_fwft_get()
+ - Fix kernel for sbi_fwft_local_set_cpumask()
+ - Fix indentation for sbi_fwft_local_set()
+ - Remove spurious space in kvm_sbi_fwft_ops.
+ - Rebased on origin/master
+ - Remove fixes commits and sent them as a separate series [4]
+
+V4:
+ - Check SBI version 3.0 instead of 2.0 for FWFT presence
+ - Use long for kvm_sbi_fwft operation return value
+ - Init KVM sbi extension even if default_disabled
+ - Remove revert_on_fail parameter for sbi_fwft_feature_set().
+ - Fix comments for sbi_fwft_set/get()
+ - Only handle local features (there are no globals yet in the spec)
+ - Add new SBI errors to sbi_err_map_linux_errno()
+
+V3:
+ - Added comment about kvm sbi fwft supported/set/get callback
+   requirements
+ - Move struct kvm_sbi_fwft_feature in kvm_sbi_fwft.c
+ - Add a FWFT interface
+
+V2:
+ - Added Kselftest for misaligned testing
+ - Added get_user() usage instead of __get_user()
+ - Reenable interrupt when possible in misaligned access handling
+ - Document that riscv supports unaligned-traps
+ - Fix KVM extension state when an init function is present
+ - Rework SBI misaligned accesses trap delegation code
+ - Added support for CPU hotplugging
+ - Added KVM SBI reset callback
+ - Added reset for KVM SBI FWFT lock
+ - Return SBI_ERR_DENIED_LOCKED when LOCK flag is set
+
+Clément Léger (14):
+  riscv: sbi: add Firmware Feature (FWFT) SBI extensions definitions
+  riscv: sbi: remove useless parenthesis
+  riscv: sbi: add new SBI error mappings
+  riscv: sbi: add FWFT extension interface
+  riscv: sbi: add SBI FWFT extension calls
+  riscv: misaligned: request misaligned exception from SBI
+  riscv: misaligned: use on_each_cpu() for scalar misaligned access
+    probing
+  riscv: misaligned: declare misaligned_access_speed under
+    CONFIG_RISCV_MISALIGNED
+  riscv: misaligned: move emulated access uniformity check in a function
+  riscv: misaligned: add a function to check misalign trap delegability
+  RISC-V: KVM: add SBI extension init()/deinit() functions
+  RISC-V: KVM: add SBI extension reset callback
+  RISC-V: KVM: add support for FWFT SBI extension
+  RISC-V: KVM: add support for SBI_FWFT_MISALIGNED_DELEG
+
+ arch/riscv/include/asm/cpufeature.h        |  14 +-
+ arch/riscv/include/asm/kvm_host.h          |   5 +-
+ arch/riscv/include/asm/kvm_vcpu_sbi.h      |  12 +
+ arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |  29 +++
+ arch/riscv/include/asm/sbi.h               |  60 +++++
+ arch/riscv/include/uapi/asm/kvm.h          |   1 +
+ arch/riscv/kernel/sbi.c                    |  81 ++++++-
+ arch/riscv/kernel/traps_misaligned.c       | 112 ++++++++-
+ arch/riscv/kernel/unaligned_access_speed.c |   8 +-
+ arch/riscv/kvm/Makefile                    |   1 +
+ arch/riscv/kvm/vcpu.c                      |   4 +-
+ arch/riscv/kvm/vcpu_sbi.c                  |  54 +++++
+ arch/riscv/kvm/vcpu_sbi_fwft.c             | 257 +++++++++++++++++++++
+ arch/riscv/kvm/vcpu_sbi_sta.c              |   3 +-
+ 14 files changed, 620 insertions(+), 21 deletions(-)
+ create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+ create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
+
+-- 
+2.49.0
+
 
