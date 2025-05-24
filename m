@@ -1,229 +1,151 @@
-Return-Path: <kvm+bounces-47655-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47656-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F85CAC2EA7
-	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 11:59:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBD57AC2FAE
+	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 14:13:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 733F51BA6DC0
-	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 10:00:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B91929E5007
+	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 12:13:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC61199938;
-	Sat, 24 May 2025 09:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 135E31E5218;
+	Sat, 24 May 2025 12:13:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="PeegiFVn"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="J8aoAztF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184EC189F57
-	for <kvm@vger.kernel.org>; Sat, 24 May 2025 09:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54EA2744D;
+	Sat, 24 May 2025 12:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748080781; cv=none; b=HHfZB24d8BIhhb/XyNNK7c0zTmA+csit+k1VGUuzWI0MiTmDpyD1ajboUjRFBnCiFzsLNlND1rhLxaNGEW/54WqGeorungd8LFKIgX+I+EhyOuuv4sddThE7yaDz1Nl4H6n6u0GBlNws2NwOzmupK68G2w6lOTtOhkdR/yZLbZE=
+	t=1748088801; cv=none; b=rdk159OepW9r9wcXDjeKZ0qzWURQgS3SCqn2AbidvVGSMnxkMkiNYcGMDEMDoA3V4tPc8W0GGCPv8LriIFKemROEOKrBcREJ+ghxSl/pLl4PfsFvtWoUH0G9tmI4vLUtZpYnRFGtfwCY2t8u+56xW1fvTTLI2FPHyt9Q/RfmkBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748080781; c=relaxed/simple;
-	bh=1+ccjy4J6ssUAnWhBMooJBSNzGxpchE41YxEikSYJuM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m55og4s/zohKJO8/XoyUcH+Zl0dUFWNozTc7G2AgtqSX+K6eQVpTRpdGFgOREJS+waNcPJ48OkxvMt1rxNAt9dweXE8eeSPniU91m0M9kINrH3QsIFTyIzsrKnxErWMBEXU9+aymxVHpyW2GzwO0cCtrZxNPmuoe50XE4qdz3T8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=PeegiFVn; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-32909637624so7202041fa.1
-        for <kvm@vger.kernel.org>; Sat, 24 May 2025 02:59:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1748080777; x=1748685577; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qwk0CPkVmc1YZ0kia1s+sTbANdHsNTOd/9lbjHB/VFE=;
-        b=PeegiFVnWf5Ts2uH6v3hI9G/2NFDJ2te2HcYumJXAJyj891pgTi5cV5FiiRmrZyfHi
-         qAKuFfYug+ZtDPqSwUzk0fptCWjZsSWtzdlHQu8QKLYJPbSv3rfeeDXb3iWkr2mOh5bd
-         5kRhZ3bvbij8GTVBu5IHmYk2jfobUiqOY3SRLZa3GvuEOnrFFqQm4/rSggRC0i3+egdw
-         o3UagTgAxLCyz+h3IYmQPcPJ/ppOCifbJxWH94t24AseD0QAPGog6rGwnLmawQOZWCoi
-         xWdhK2EEPsorSpyIbG1bTcCDRePMK9ZFK5HZssmfUnDKbaOMgRqkXRRk67CrAJJlnWxg
-         sWzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748080777; x=1748685577;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qwk0CPkVmc1YZ0kia1s+sTbANdHsNTOd/9lbjHB/VFE=;
-        b=bLwyJpJyf/ndBiZRxQYGNDXTMRTZpUjy0q/YwRpwLbaXcmK2k7ifaEBDJvAqRFjUDu
-         UM1NK/N/L9dIrwQlAR/YPl2pgpoUMEsLUdq7Uldb0LvsD8v0k8j72NTHAUG1SfU8eJHh
-         MLJqjPNk1UU9IM3Yu8wjiGs067xPMlkuWrKK7dH5kxr3Fl/qbQMFSTe+XrxH61jQkEkH
-         T+e8weRMbkjvTkp4MoyguestjNTXwec8ZrS4QZ0b4nw9Q9uHL+KNlIYOtpncO+J1wt6z
-         88FefSISOuDO87EiSO6w6muoQIF/se8KZX7DxRCTdR6+nfr/RMuNAwFH6g3ENKRMBNEx
-         3vXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWGjeZJ0yZxaxFpgiQp0pDxRwxOTXSJCM0EbhhY86UsKB6aj+b/mFE4sxKplhiJONY+5s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMrExx4REoJZnbXtdPCvTMMCsVCHPIn0GlJosy7pVacAGHopxD
-	hwZ0mZCDbXXti/3g08X6h0D4YPyWSXMYEE80VzTT9Ii9PMqOYVsCNL8h77Ms42NlmQ49Sx8FSuj
-	emGvcbPW9Otn7onoNrH8/yZ+PS80iRRo0COeIO8D3oQ==
-X-Gm-Gg: ASbGncvAsFCpKGVozgt/QvoHKBblWPVqrBqzwtTNyS3jDAtwESdpNBsLahx6IevV5Bb
-	BqTM+OOdHQYmZ6+DQUHwvaoC6QHMVGHCAm8kW6IbSm++5G5qTXM7Uzr4T/UHRZDeKqL1PU/HADK
-	Vlfgvdtc55bAJAxDHI+57H8mkRh4o+52t9
-X-Google-Smtp-Source: AGHT+IHjgrohb9C7yK1DIb8LPLEOKiD2vUkC6Rdz0ITXvpl70EQUPs/0DeMIVSzjubHDmyPSRoXujAeKMH9X0LsH5zI=
-X-Received: by 2002:a05:651c:1508:b0:329:23c5:6408 with SMTP id
- 38308e7fff4ca-3295b9c6db5mr5687001fa.16.1748080777039; Sat, 24 May 2025
- 02:59:37 -0700 (PDT)
+	s=arc-20240116; t=1748088801; c=relaxed/simple;
+	bh=/Il4/ysOexZBrcONrJ3Jjm1DGmZgOmJ7/HOesP15zac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EIRYavNl1Ty/RhXSpKTMY3sTC2a+s8Gb3jmNYP4y0VZN2K4xvQq2iMpZZXAEGeZZRrLX/wFlvufYUOVdN6K+pyp14bzpMPzqK0ojT1Imup+8dWE7mN2gCPyDGWGVaZLGloXvO7uyECZVw4vLT0+q1JhwZ5lYFFwU3rn84K53ADw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=J8aoAztF; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6484440E0238;
+	Sat, 24 May 2025 12:13:16 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id J0UUjnVWcI0a; Sat, 24 May 2025 12:13:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1748088791; bh=i5jzlN9kOMMW5iYxcC8RI5s3TLYz+RAqWBa4RmwqDqI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=J8aoAztFr7Lwl1F3u8eOnOEU1niJH+u12xVHPSgNvswEbejYe0ors3gqqYfKOANba
+	 xESNcdtsIKyaql4wxUzn5bmFDpkynyouNz1pXbV3n6faLW7nfmgTY/cd0m0Tn85y/K
+	 xaqWglio6n993YCeR56c/WLb9C3mPrkN37kiD/H9KuENRRNakK+46HfV5SVPLum6ZV
+	 Mvoj4qh3MY5KMSTsgXk4w0jKk2AX3B8L+WsvQNvteB8S46TTPFrQ22+Xs70mttbAiv
+	 Aa16U7nrz0dyezMX1uudqFKcj6eDnJaPCQs3XQVYbROmcuJWOSc8fi741To2A/5GFa
+	 ONayCY3SbFFtv1RX0/keulVhumzWzBRqC84QzDd+DXtoZTaum69z5bKcNO/NYnUY2z
+	 0SYq0JuRyRTGmfuGmG8i1ofxMnOIWksZlOQ/DcKDHuNBXt0qG2vLnj/PpTkNB0j+Nl
+	 vZKhnPUozubm9bRWtHXctsvlPs3yK6SkFJ/DML+V0ntCzUmGhoc9lvFLRCqWkFX2hm
+	 WbyN1hITpytziMPbgfb++nDzvfTaU2OAr0Zof51EEaavbvCOOzhpRf9Zu3wbGHO10x
+	 JgzDCfnx2WaXBHGmKLiEQvHXjq5xWskN8crhhzrZD5TNXxoism9nvsFF2nvc0/0n4y
+	 pFUqL2kc+EFxA6nd8L0Lrl0E=
+Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7475640E0192;
+	Sat, 24 May 2025 12:12:49 +0000 (UTC)
+Date: Sat, 24 May 2025 14:12:41 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com,
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com,
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org,
+	hpa@zytor.com, peterz@infradead.org, seanjc@google.com,
+	pbonzini@redhat.com, kvm@vger.kernel.org,
+	kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
+	naveen.rao@amd.com, francescolavra.fl@gmail.com,
+	tiala@microsoft.com
+Subject: Re: [RFC PATCH v6 07/32] KVM: x86: apic_test_vector() to common code
+Message-ID: <20250524121241.GKaDG3uWICZGPubp-k@fat_crate.local>
+References: <20250514071803.209166-1-Neeraj.Upadhyay@amd.com>
+ <20250514071803.209166-8-Neeraj.Upadhyay@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515143723.2450630-4-rkrcmar@ventanamicro.com>
- <1a7a81fd-cf15-4b54-a805-32d66ced4517@linux.dev> <DA3CUGMQXZNW.2BF5WWE4ANFS0@ventanamicro.com>
- <CAK9=C2Xi3=9JL5f=0as2nEYKuRVTtJoL6Vdt_y2E06ta6G_07A@mail.gmail.com> <DA3FGGI5PEZG.3T26KJXT2QO8M@ventanamicro.com>
-In-Reply-To: <DA3FGGI5PEZG.3T26KJXT2QO8M@ventanamicro.com>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Sat, 24 May 2025 15:29:24 +0530
-X-Gm-Features: AX0GCFvjN4tLJf931vhSTBQcQ-Oi7hhKwuha27TH5Ttck32Fq0uFOwLQ8zCE2Zw
-Message-ID: <CAK9=C2Xbx-bHUwXXUM4oVvOhnzhK80ygvTzfMNu0-DkcLx_8Og@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] RISC-V: KVM: VCPU reset fixes
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: Atish Patra <atish.patra@linux.dev>, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Andrew Jones <ajones@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250514071803.209166-8-Neeraj.Upadhyay@amd.com>
 
-On Fri, May 23, 2025 at 2:50=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcma=
-r@ventanamicro.com> wrote:
->
-> 2025-05-23T13:38:26+05:30, Anup Patel <apatel@ventanamicro.com>:
-> > On Fri, May 23, 2025 at 12:47=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <r=
-krcmar@ventanamicro.com> wrote:
-> >>
-> >> 2025-05-22T14:43:40-07:00, Atish Patra <atish.patra@linux.dev>:
-> >> > On 5/15/25 7:37 AM, Radim Kr=C3=84m=C3=83=C2=A1=C3=85 wrote:
-> >> >> Hello,
-> >> >>
-> >> >> the design still requires a discussion.
-> >> >>
-> >> >> [v3 1/2] removes most of the additional changes that the KVM capabi=
-lity
-> >> >> was doing in v2.  [v3 2/2] is new and previews a general solution t=
-o the
-> >> >> lack of userspace control over KVM SBI.
-> >> >>
-> >> >
-> >> > I am still missing the motivation behind it. If the motivation is SB=
-I
-> >> > HSM suspend, the PATCH2 doesn't achieve that as it forwards every ca=
-ll
-> >> > to the user space. Why do you want to control hsm start/stop from th=
-e
-> >> > user space ?
-> >>
-> >> HSM needs fixing, because KVM doesn't know what the state after
-> >> sbi_hart_start should be.
-> >> For example, we had a discussion about scounteren and regardless of wh=
-at
-> >> default we choose in KVM, the userspace might want a different value.
-> >> I don't think that HSM start/stop is a hot path, so trapping to
-> >> userspace seems better than adding more kernel code.
-> >
-> > There are no implementation specific S-mode CSR reset values
-> > required at the moment.
->
-> Jessica mentioned that BSD requires scounteren to be non-zero, so
-> userspace should be able to provide that value.
->
-> I would prefer if KVM could avoid getting into those discussions.
-> We can just just let userspace be as crazy as it wants.
+On Wed, May 14, 2025 at 12:47:38PM +0530, Neeraj Upadhyay wrote:
+> Move apic_test_vector() to apic.h in order to reuse it in the
+> Secure AVIC guest APIC driver in later patches to test vector
+> state in the APIC backing page.
+> 
+> No function changes intended.
+> 
+> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+> ---
+> Changes since v5:
+> 
+>  - New change.
+> 
+>  arch/x86/include/asm/apic.h | 5 +++++
+>  arch/x86/kvm/lapic.c        | 5 -----
+>  2 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
+> index ef5b1be5eeab..d7377615d93a 100644
+> --- a/arch/x86/include/asm/apic.h
+> +++ b/arch/x86/include/asm/apic.h
+> @@ -557,6 +557,11 @@ static inline void apic_set_vector(int vec, void *bitmap)
+>  	set_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), (bitmap) + APIC_VECTOR_TO_REG_OFFSET(vec));
+>  }
+>  
+> +static inline int apic_test_vector(int vec, void *bitmap)
+> +{
+> +	return test_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), (bitmap) + APIC_VECTOR_TO_REG_OFFSET(vec));
+> +}
+> +
+>  /*
+>   * Warm reset vector position:
+>   */
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 25fd4ad72554..8ecc3e960121 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -96,11 +96,6 @@ static __always_inline void kvm_lapic_set_reg64(struct kvm_lapic *apic,
+>  	apic_set_reg64(apic->regs, reg, val);
+>  }
+>  
+> -static inline int apic_test_vector(int vec, void *bitmap)
+> -{
+> -	return test_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
+> -}
+> -
+>  bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector)
+>  {
+>  	struct kvm_lapic *apic = vcpu->arch.apic;
+> -- 
 
-The supervisor OS must not expect a particular state of S-mode
-CSRs other than what is defined in the boot protocol or the SBI
-specification.
+The previous patch is moving those *_POS() macros to arch/x86/kvm/lapic.c, now
+this patch is doing rename-during-move to the new macros.
 
-Like mentioned before, scounteren setup in KVM RISC-V and
-OpenSBI is a HACK for buggy OSes which don't set up scounteren
-CSR correctly when a HART comes-up. Even KVM user space
-should not entertain such HACKs.
+Why can't you simply do the purely mechanical moves first and then do the
+renames? Didn't I explain it the last time? Or is it still unclear?
 
->
-> >                         Whenever the need arises, we will extend
-> > the ONE_REG interface so that user space can specify custom
-> > CSR reset values at Guest/VM creation time. We don't need to
-> > forward SBI HSM calls to user space for custom S-mode CSR
-> > reset values.
->
-> The benefits of adding a new ONE_REG interface seem very small compared
-> to the drawbacks of having extra kernel code.
+-- 
+Regards/Gruss,
+    Boris.
 
-Forwarding HSM stop to userspace will slow down CPU hotplug
-on Guest side. Further, this directly impacts SBI system suspend
-performance for Guest because Guest is supposed to turn-off all
-VCPUs except one before entering the SBI system suspend state.
-
->
-> If userspace would want to reset or setup new multi-VCPUs VMs often, we
-> could add an interface that loads the whole register state from
-> userspace in a single IOCTL, because ONE_REG is not the best interface
-> for bulk data transfer either.
-
-Instead of inventing a new interface, we can simply improve the
-ONE_REG interface to allow bulk read/write of multiple ONE_REG
-registers which will benefit other architectures as well.
-
-If required in the future, this bulk ONE_REG read/write interface
-can also be used to load reset state of VCPU CSRs.
-
->
-> >> Forwarding all the unimplemented SBI ecalls shouldn't be a performance
-> >> issue, because S-mode software would hopefully learn after the first
-> >> error and stop trying again.
-> >>
-> >> Allowing userspace to fully implement the ecall instruction one of the
-> >> motivations as well -- SBI is not a part of RISC-V ISA, so someone mig=
-ht
-> >> be interested in accelerating a different M-mode software with KVM.
-> >>
-> >> I'll send v4 later today -- there is a missing part in [2/2], because
-> >> userspace also needs to be able to emulate the base SBI extension.
-> >>
-> >
-> > [...]          The best approach is to selectively forward SBI
-> > calls to user space where needed (e.g. SBI system reset,
-> > SBI system suspend, SBI debug console, etc.).
->
-> That is exactly what my proposal does, it's just that the userspace says
-> what is "needed".
-
-Nope, the approach taken by your patch is problematic because
-for example userspace might disable SBI RFENCE or SBI PMU
-with no means to implement these SBI extensions in user space.
-
-We can't blindly forward an SBI extension to userspace when
-userspace lacks the capability to implement this extension.
-
->
-> If we started with this mechanism, KVM would not have needed to add
-> SRST/SUSP/DBCN SBI emulation at all -- they would be forwarded as any
-> other unhandled ecall.
-
-SBI SRST extension is implemented in kernel space because
-we are re-using the existing KVM_EXIT_SYSTEM_EVENT so
-that we can also re-use existing KVM_EXIT_SYSTEM_EVENT
-related code on userspace side.
-
-SBI SUSP and DBCN are already forward to user space and
-we only have a minimal code in kernel space to ensure that:
-1) In-kernel SBI BASE extension is aware of these extensions
-2) These are forwarded to userspace only when userspace
-    enables these extensions.
-
-In addition to the above, we are blindly forwarding SBI
-experimental and vendor extensions to user space so
-user space can do its own thing by implementing these
-extensions.
-
-Regards,
-Anup
+https://people.kernel.org/tglx/notes-about-netiquette
 
