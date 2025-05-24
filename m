@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-47657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3000AC2FB0
-	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 14:15:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 047BDAC2FB2
+	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 14:16:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19159A21937
-	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 12:14:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDC78A21937
+	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 12:15:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A9371E5219;
-	Sat, 24 May 2025 12:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59501A0B0E;
+	Sat, 24 May 2025 12:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Q18JpVPa"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ei3fvW3Y"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0BF1487C3;
-	Sat, 24 May 2025 12:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9488964D;
+	Sat, 24 May 2025 12:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748088895; cv=none; b=WZGY/O0BGmv8w89e2fKzGEAuqTkX9Q4wS+hSuDokNJ/uoxaVtljMUjdLfN0aFPvUzN1Mp4Tpt1bjSBea2KkVBNdNid8cu86SKbeWg7TmXqlEHOxF//hXfRdvSfVEeI8duaPe+YDjw/a/40o5+nFw5d7w5siahx1mN7xDg8kxumk=
+	t=1748088967; cv=none; b=RGQODZ+61aJwGPaGob4+RxHNeEp8g2IQMPUHnBhOWPrE9DAYjIOtlJlxqBubKY98VOYhZ2bQTI2dMbZOWyFEXhrAgVdR3gVfJ71bW6hFku2tH1WIRdzax6brZJIVBS+LARGxI576Xi8B1lksdvKxFRj/52SmpQM/+vlj8o3oOBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748088895; c=relaxed/simple;
-	bh=4whVl0z2Ad7XRfDwAyiAEfeNQuHy0HAzymD8hPCXlkk=;
+	s=arc-20240116; t=1748088967; c=relaxed/simple;
+	bh=4ZNTnv+X7aLB9eh6U9G1II3rkSEXnfaarUYE/GfJY70=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sijN5SLsZWi+pmWAO+0fUYTy7bqHoWcTNFVkYc26ts+dCL7dyuPo83VPnPqPfEcTBCokfU/RQoCZTvHStx+jI5WO3XfwL5pr+UIu6JH1RCiljahjXO5NIZmSpQqme9d6offmWE6IDFrM+OGw87yJ61Mgp36ZisEv+aIAoj9ekw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Q18JpVPa; arc=none smtp.client-ip=65.109.113.108
+	 Content-Type:Content-Disposition:In-Reply-To; b=ibjLoNb0IwP9Q0/rP9ikAVLRw2GpwGETpN72EznFcmTRs89JdyBuxSlgAyt6Ku9rP1Y0HKPvj+ZrDNrpVM4Km2HyPkkhFuQV2MNyO44yvvByZKpXzQ0ffle+n5Z/l99MDDcJzjSgOyFtZZcBt1FDk7YcQ34sg6dc4+yAyNdE3j4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=ei3fvW3Y; arc=none smtp.client-ip=65.109.113.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id E001740E0241;
-	Sat, 24 May 2025 12:14:50 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A89E940E0192;
+	Sat, 24 May 2025 12:16:03 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
 Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
 	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id eOyrbSqdcFV4; Sat, 24 May 2025 12:14:47 +0000 (UTC)
+	with ESMTP id MYDVwJK-B1LQ; Sat, 24 May 2025 12:16:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1748088886; bh=AUFbiQsSpZZvYTtkasoFK0TgyFER+wnqGtzAj4dHeGg=;
+	t=1748088960; bh=G04Bsu13NY7VxO/c0Bho72SUtXBpCGutnQt1yuNIxsY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q18JpVPa9tEwG2HxoLyoOQizs8tDI1AliG0fISHlkHxJGiUs/01atlBtyhD98OFMu
-	 BMVere0QFt7vo7PWGLWvSNYkw9uezUBDLFNMdTe4WaXFcsIZ4HS2IU9noftEyXDJ1n
-	 49FWoluSlf/U8dygVpprr4OEsjAdMEbtMhljIzJxDjyJfW6Q8VNCZ4r8h7NX/OOJ0I
-	 R2JOYAGcwTVM4N5WmtQYgAfgXWPHb16hr1A9z0GajT/G78/byruUf75Dfgg07yUYvE
-	 A0OeefBaWPuqIjhzUzHyJnL6Iq9OlFjv0WYYxXZr1WjW9XKUbjfJV2MfV10U0rW3UW
-	 IBXmZ3brEk4Mhx+d+WKkfhwakqaBeD+Q1KMKhWv4mGnSF5E+/VHsXjbfFkPMuxqVlc
-	 L1EODp2icYD1kGm3wGjkk4V0nhzhxLE1YjFvScJen0zVpeUL97Ra4xFsfKK2zUtbRY
-	 bjiXJIyN7KBAOuXwyhTLRl2hPDlbKvr/pExsblDoxsmp32uGlSVNr83JmMEMk2TQBp
-	 IhAS8dU2QflpG0rnC+KJNFzmCTj19UdAMYe4JknsxQ7OOlepVtpzp8HgNGvulGC25s
-	 NxUXUCV2JruXmoyo/fUOwlAYQ1rTEz16cBL6dHvQ6kjGSDByhh6tjqdCRxUzhOhUh6
-	 7IPd9dBLUngOtQszPAtx5jBI=
+	b=ei3fvW3YMoyy7LoosELZ9OYefkHk9AHqN/PAEIskaKnMkCn8SWnXTseEQxn4s6Gmz
+	 Ybi914HCFcj1P/I2uoOqF4eQbcODncF+5qfzzTS1ey16sPI8V3xyECQ+A4tDSl+2ST
+	 9Lj6q/jepOYhUxqIo8cDH5DqQGrDvpYJBiGIuznScs1nBsi2+/vCAzUzspqlUc7iH1
+	 u1Qxh9FQ3qcqN3gaHVBGEwNa8xkHScbBzDPDgjgox3CzO5A+IdWogBwWlT8oB2A1Yx
+	 iw8p4YgoGo8PgMeoUoi2V0jdHiR9TD3kDwOJbFKON4/pjzUfyZlcvuFfvm2pgTWvA1
+	 HzseszgOUyzyhEUFVo6nDBqArV8yCYG3Kf3i77XoCxCIocczZKcwhwmOJ1XmErmquG
+	 4gGfb22SOKscA5mxLgLiORKHEnBb+UT5csKp8wmXHfX2qAOSNMANO8sjoHThwSlrAC
+	 F/SWb48PRg1ZHhgtE5/GUCKkUeccLDz9pSrRR/VWrcZ0I+faLOGjUPyzD8pVdFCQVc
+	 Pi7r8KblSQaWwhY50hR0rsLninHlCnywRZvY2LXd0SnyDZpu2Ce9a1pgJjRBiCZr43
+	 0nMSrctiH9s9QRUgruGEmf1mRZt0JJVnjSYTQhFG5gRpdv7yZA4crv6IaNDb65Txgb
+	 I3yFd0kwp+kazwnS6myWO0Us=
 Received: from zn.tnic (p57969c58.dip0.t-ipconnect.de [87.150.156.88])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8912540E0264;
-	Sat, 24 May 2025 12:14:24 +0000 (UTC)
-Date: Sat, 24 May 2025 14:14:23 +0200
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2C1FC40E0266;
+	Sat, 24 May 2025 12:15:38 +0000 (UTC)
+Date: Sat, 24 May 2025 14:15:37 +0200
 From: Borislav Petkov <bp@alien8.de>
 To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
@@ -72,11 +72,11 @@ Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
 	kirill.shutemov@linux.intel.com, huibo.wang@amd.com,
 	naveen.rao@amd.com, francescolavra.fl@gmail.com,
 	tiala@microsoft.com
-Subject: Re: [RFC PATCH v6 08/32] x86/apic: Remove redundant parentheses
- around 'bitmap'
-Message-ID: <20250524121423.GLaDG4H7R2-QVygIXa@fat_crate.local>
+Subject: Re: [RFC PATCH v6 10/32] x86/apic: Change apic_*_vector() vector
+ param to unsigned
+Message-ID: <20250524121537.GMaDG4adGsxaPFT7DX@fat_crate.local>
 References: <20250514071803.209166-1-Neeraj.Upadhyay@amd.com>
- <20250514071803.209166-9-Neeraj.Upadhyay@amd.com>
+ <20250514071803.209166-11-Neeraj.Upadhyay@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,53 +85,36 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250514071803.209166-9-Neeraj.Upadhyay@amd.com>
+In-Reply-To: <20250514071803.209166-11-Neeraj.Upadhyay@amd.com>
 
-On Wed, May 14, 2025 at 12:47:39PM +0530, Neeraj Upadhyay wrote:
-> When doing pointer arithmetic in apic_{clear|set|test}_vector(),
-> remove the unnecessary parentheses surrounding the 'bitmap'
-> parameter.
+On Wed, May 14, 2025 at 12:47:41PM +0530, Neeraj Upadhyay wrote:
+> Change vector parameter of apic_{set|clear|test}_vector to
+> unsigned int to optimize code generation for modulo operation.
 > 
-> No functional changes intended.
+> On gcc-14.2, code generation for below C statement is given
+> after it.
 > 
-> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-> ---
-> Changes since v5:
+> long nr = APIC_VECTOR_TO_BIT_NUMBER(vec);
 > 
->  - New change.
+> * Without change:
 > 
->  arch/x86/include/asm/apic.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  mov    eax,edi
+>  sar    eax,0x1f
+>  shr    eax,0x1b
+>  add    edi,eax
+>  and    edi,0x1f
+>  sub    edi,eax
+>  movsxd rdi,edi
+>  mov    QWORD PTR [rsp-0x8],rdi
 > 
-> diff --git a/arch/x86/include/asm/apic.h b/arch/x86/include/asm/apic.h
-> index d7377615d93a..fb0efd297066 100644
-> --- a/arch/x86/include/asm/apic.h
-> +++ b/arch/x86/include/asm/apic.h
-> @@ -549,17 +549,17 @@ static __always_inline void apic_set_reg64(char *regs, int reg, u64 val)
->  
->  static inline void apic_clear_vector(int vec, void *bitmap)
->  {
-> -	clear_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), (bitmap) + APIC_VECTOR_TO_REG_OFFSET(vec));
-> +	clear_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), bitmap + APIC_VECTOR_TO_REG_OFFSET(vec));
->  }
->  
->  static inline void apic_set_vector(int vec, void *bitmap)
->  {
-> -	set_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), (bitmap) + APIC_VECTOR_TO_REG_OFFSET(vec));
-> +	set_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), bitmap + APIC_VECTOR_TO_REG_OFFSET(vec));
->  }
->  
->  static inline int apic_test_vector(int vec, void *bitmap)
->  {
-> -	return test_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), (bitmap) + APIC_VECTOR_TO_REG_OFFSET(vec));
-> +	return test_bit(APIC_VECTOR_TO_BIT_NUMBER(vec), bitmap + APIC_VECTOR_TO_REG_OFFSET(vec));
->  }
->  
->  /*
-> -- 
+> * With change:
+> 
+>  and    edi,0x1f
+>  mov    QWORD PTR [rsp-0x8],rdi
 
-This change needs to go first so that it gets picked up first since it is
-a cleanup.
+AT&T assembly please.
+
+This change needs to go first too.
 
 -- 
 Regards/Gruss,
