@@ -1,138 +1,171 @@
-Return-Path: <kvm+bounces-47659-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47660-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D4AEAC3060
-	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 17:59:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 864CAAC3080
+	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 18:53:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB092189DA2F
-	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 15:59:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93A317A11FB
+	for <lists+kvm@lfdr.de>; Sat, 24 May 2025 16:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675D41EDA2C;
-	Sat, 24 May 2025 15:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168D21EF39A;
+	Sat, 24 May 2025 16:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="nZNQhSnD"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="eY4uQTWI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E7D18DB0E
-	for <kvm@vger.kernel.org>; Sat, 24 May 2025 15:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C199823BE
+	for <kvm@vger.kernel.org>; Sat, 24 May 2025 16:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748102346; cv=none; b=F/Y4m4mfCJG2RX/DQCXhrLfDHq9qL+Z0qRL+Gf2RBr/y5RTTmk8A2vSU8YUYVFYquogz1fhuKgZBkbiL7UpIyNDjNB+V7WevAAIlpC33xeZHiXQlaTQlEw1VeggoXxaJlNeG8tqPmcjPY9FEWnRsUPZ4GtvRkwL6Wvao13yjXNg=
+	t=1748105613; cv=none; b=LcJRo5m09ZdBjh3GTkztNyJVEcJUNMAnGVRqV5sZTLnaf8cJhXdtIctJ0/weqBwofPlzdAWmM4rQQ5CpzMRJFCq115rP5/AC22sndV4nTjmjK8FmKxi2WJPr4Wt1iffvTb/pMdIlOBPz58sjpfxsLLxjKD2umdcqLSsDUTeBVsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748102346; c=relaxed/simple;
-	bh=h1Or4FuMdPhjJt5IdwmBVjxYZwDeDm1BFV7SyAA9a3U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pKJJPBHEhJ3VIBGGJgCI6Dsrpi6qJWolFr686WeX4XLoaG3SzdEbCVZMjUEokSGOhBrZnIbCDsj6/gqt5tzNU6AmSWM8PYQ+TVwNvmydX+rvSv37Ckt1al2eq/hWVVnmidfvtcdoULpe20x8da9s7uwGKVJQCEtVNxr/1kJHATo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=nZNQhSnD; arc=none smtp.client-ip=209.85.166.174
+	s=arc-20240116; t=1748105613; c=relaxed/simple;
+	bh=Uu6hrwLmRSZi/RYBApTxXJqTp9Im7qqvmuCz0t5+a6A=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=R7fnsKZNSYu1ts8tZyqh/NN5eLufs6nXF3I9GXuTF9T9NQRu/H3UUiNLcN5ILds0H8DhTIoxhCpaOMRy+LtxWCG2pwGvUYxamZdQqHLOZuxYlqvISakEEkeG+J9A7yUxSGSqM4v6IEiOS+inPR+UrcmV9MSb1dCzaNuWneO3kVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=eY4uQTWI; arc=none smtp.client-ip=209.85.166.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3dc75fe4e9bso6166275ab.0
-        for <kvm@vger.kernel.org>; Sat, 24 May 2025 08:59:04 -0700 (PDT)
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3dc8265b9b5so7899905ab.1
+        for <kvm@vger.kernel.org>; Sat, 24 May 2025 09:53:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1748102344; x=1748707144; darn=vger.kernel.org;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1748105611; x=1748710411; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F2yr9tnKn9TqlbBE9wxEbTUU2i1OSmwquvIPpcnGXAE=;
-        b=nZNQhSnDUzArTqABSSNsXcqCSLaDIohrac9y3ZYLz7lnzul7ksSh0z8xUs2aaFQLF7
-         D+FL/EdeFNd3Md1qEyoT5rq+ZqNCIkYtn14olPQ3M1OZTxtLpg5K+poiVJBdn9+FydCv
-         +I3HqxdkpVmWwrCDnbpa/RB+oAjoKM4lD0nKEjI+i0uY0LptKhsdGop3FBgp7JvdAZ+i
-         DthHyKbwPpt8dKxGph4HVHy+9QxRlDP8nHr6PGSSDkF4iMtjblBIWIp+7EV2okR4H8kN
-         sllepQQjoWt9cAuVy9GfCkHPZZyJbAnXp0+hiqw36WV0sYOqau3eKGHu7R2Z2Wx9NC2n
-         sfJA==
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=OwKoML0MAYDTPVb8TPExeUIOI27H3gCygqp9HjGFNzY=;
+        b=eY4uQTWIXJPFzwPNgMATICQpRk7MOzjwiqX4iWblndIdeOdIKzNoDu/kjkllXc8lr6
+         aAt4qZo/XJEdy/XqKlFbEmAWEVLClKtg81VhtoVhalMGqOiSmhYT0VIC9bus1QKgM8dQ
+         PHwKZJfSdmHzg46d7BCRZUH3OKt/fhKh26ZUmCRVZ7FogHXZrzpFAifOuhDbsnHwghIU
+         Hwt2qjq4ucYSg+k2vv5rqHfjiXdE4XoH8ciLGiiNOup9RHLZSzlFc9/AJspVljGj+4zg
+         lGJXysl9szz0k5ucaBrLhfInApa/CCRt56f/vhiNozZ4dPtUj1z+4jcE0BQVulwyrWSa
+         Xrqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748102344; x=1748707144;
+        d=1e100.net; s=20230601; t=1748105611; x=1748710411;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F2yr9tnKn9TqlbBE9wxEbTUU2i1OSmwquvIPpcnGXAE=;
-        b=r563zpbiNi4rzroY4Iq8De8JwdKSeHVEaZs/Ja9DZRk1C0RITWLxSLp+IMwlPWsR+G
-         Yy0RGz6kM2fRN76Yp4hYimN2am019atSjiWzIMtCUe0f/kuh6PT3w3Ggb+ZaFt554PPQ
-         hHjYSLW9fklUDwMM4k5ibclZ/Hm9lkAcaS/A4ZRS9u8/E689YKHIYogk1ONOJ/Bw5IT1
-         VNHz0reVGhALRtwfpkEiQGl+P0rYT+nZ78g8fwR44L4/NNzZtup3q3AyARpUT81IqAe3
-         RZRo8cdMBiirmaNGTVbVHcq0Q4Evg1zyi75VB/JcPm03FOAFVnoygFE9fm3mkazopqBz
-         GZaw==
-X-Forwarded-Encrypted: i=1; AJvYcCUYc9eDmXOU1aLiu1fl++EIZ7yupA+u0N5VfyWj7lfVDHJVqHSquzkLTf3E7vsXqDTVO60=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygMc3NgZ/BQ4kTvmiuJcapWPdljeDkzsSdMVEOhUMhg2GT3SjY
-	gCiOk1q8FnbJu3mHCa1ROSWIHLLaVuDTK0Y73f4Ool3b56B5z9OWJCs9hmjmFMaTa4EizGgA0Rk
-	OP0SOV72Gtroa9zijP8ks82uXuAXgURh8XNQbisNOmw==
-X-Gm-Gg: ASbGncsveKy4pnFXcuiuKjwpFSUZjw2FT3fBSW4XRQrWtvO9m/CjabhhQE9Zd8x9Rg6
-	o7H5752wv1DIu8VZ5DUsucThPt2WBSuWB5RchRLH+ugCsXHP+Y444m2gxLbAlSoW/6NVxi2W62s
-	LTyenuxF7n46g90phuW+QaHc1sKdyO5IQg
-X-Google-Smtp-Source: AGHT+IEV4eb+rq7jqSPU1O3ArOm2/AotMQitLIc1b82BqLuQmpgD0sL2W5ul1eYPBn+JqoU3IEelxgq8AvLf22NB40g=
-X-Received: by 2002:a05:6e02:3993:b0:3dc:8e8b:42af with SMTP id
- e9e14a558f8ab-3dc9ae6add9mr28247415ab.7.1748102343954; Sat, 24 May 2025
- 08:59:03 -0700 (PDT)
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OwKoML0MAYDTPVb8TPExeUIOI27H3gCygqp9HjGFNzY=;
+        b=VhW/+GUiw1Wk/DIN0EicG3MsXNaQ+Wx1X9jysqqd3lFO+4nGrl883ZRXfAAXZbpb1+
+         FIJq6JMjsWxtgWd813G5vRXVdOWvujgFwc4fUM/ajVoJdA4PHu8Ds6fSwg93GbbBT6Vb
+         8BAvarD3W2DrYTY4p7UWQknki30hBbx4lfEKaLWqqxNAbeIAGGPpE5trVe2Draf16itV
+         20cczZILxPVnwJlQjxRphhjf4ZzuMNbMk4EFeMYLQxSzaK2j/9uttqkGAPnIpqn6UlLj
+         eWnOUoYuhESVjWQB+pOAHWdcZl04cNNEwQ4Qs3hObrKcD6YNu2TUz2MmRucGXlMeM/bA
+         vdEw==
+X-Forwarded-Encrypted: i=1; AJvYcCWaIhh1BlaravXIFdwyNAplHD84K9akGk5rCnOdrH/miCrtmYTCFtPO79rIMQR5X9yazKo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSm7cNEzZNBqP9uLJicm+yoe4RT66VONfkxddbVpKaTePPMuUZ
+	TMQZtVOtx8ji5LDdTamQAeguxrWJaaLv7EmOZ26H4xJvF/MZTeVabRdtJY4z1gWuO8LK2Pp0EfY
+	0xAYZJssb0oLiq4qlN4itqefTHNTtmrHWdCiVrrotSg==
+X-Gm-Gg: ASbGncu62hxXhF4zwoEhO3Y+VjQ2f/U/BE5IWNamUtg7t44yDOX9IBA2DvVsQ53n+/7
+	fbC+Wqjy3p8Wipn0rha6luyQkiDrRozOPkRs/RazaDM1rN8PepXDKgaujJfjtJqBp7NmPF1kqxC
+	5QEtJFkjfaanZGo8x/V3OhrFUuKWLhnfP1MvNWnwk7wfc=
+X-Google-Smtp-Source: AGHT+IG3vP7Okat+L0gtmmsR6qLRW5AcyZWw1gZgeAT1V7lWH3wF+08plur/vF9mezTOpwDjrxhK9jtoeEUsTU2WJM8=
+X-Received: by 2002:a05:6e02:3981:b0:3dc:79e5:e696 with SMTP id
+ e9e14a558f8ab-3dc9b6a1243mr30239315ab.11.1748105610710; Sat, 24 May 2025
+ 09:53:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250523104725.2894546-4-rkrcmar@ventanamicro.com>
-In-Reply-To: <20250523104725.2894546-4-rkrcmar@ventanamicro.com>
 From: Anup Patel <anup@brainfault.org>
-Date: Sat, 24 May 2025 21:28:51 +0530
-X-Gm-Features: AX0GCFtOMEl61Vu092B4vlrmT3A99i4MJFIakv747HMx06wfCiv1EtyVxeD1GV0
-Message-ID: <CAAhSdy0M8ozHyR1mfW1u4-w=4xZm404jR4iqLRL0FtDh7RRvAg@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: lock the correct mp_state during reset
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Date: Sat, 24 May 2025 22:23:19 +0530
+X-Gm-Features: AX0GCFvRi28me7s3_9LFe9PyWAhydowqCM3SLbjRgOwG-lz7Nf5u5s4_a-20sKE
+Message-ID: <CAAhSdy0H6GEBaY1NfCyF5O1PsHAmuxgW4mQyoC47bVFmMjqk-Q@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv changes for 6.16
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Palmer Dabbelt <palmer@rivosinc.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>, 
+	Atish Patra <atish.patra@linux.dev>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 23, 2025 at 4:22=E2=80=AFPM Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcma=
-r@ventanamicro.com> wrote:
->
-> We're writing to *tmp, but locking *vcpu.
->
-> Fixes: 2121cadec45a ("RISCV: KVM: Introduce mp_state_lock to avoid lock i=
-nversion")
-> Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@ventanamicro.com>
+Hi Paolo,
 
-LGTM.
+We have the following KVM RISC-V changes for 6.16:
+1) Add vector registers to get-reg-list selftest
+2) VCPU reset related improvements
+3) Remove scounteren initialization from VCPU reset
+4) Support VCPU reset from userspace using set_mpstate() ioctl
+    (NOTE: we have re-used KVM_MP_STATE_INIT_RECEIVED
+     for this purpose since it is a temporary state. This way of
+     VCPU reset only resets the register state and does not
+     affect the actual VCPU MP_STATE. This new mechanism
+     of VCPU reset can be used by KVM user space upon
+     SBI system reset to reset the register state of the VCPU
+     initiating SBI system reset. )
 
-Reviewed-by: Anup Patel <anup@brainfault.org>
+Please pull.
 
-Improved commit description at the time of queuing.
-
-Queued this patch for Linux-6.16
-
-Thanks,
+Regards,
 Anup
 
-> ---
->  arch/riscv/kvm/vcpu_sbi.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index 31fd3cc98d66..6e09b518a5d1 100644
-> --- a/arch/riscv/kvm/vcpu_sbi.c
-> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> @@ -143,9 +143,9 @@ void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu =
-*vcpu,
->         struct kvm_vcpu *tmp;
->
->         kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
-> -               spin_lock(&vcpu->arch.mp_state_lock);
-> +               spin_lock(&tmp->arch.mp_state_lock);
->                 WRITE_ONCE(tmp->arch.mp_state.mp_state, KVM_MP_STATE_STOP=
-PED);
-> -               spin_unlock(&vcpu->arch.mp_state_lock);
-> +               spin_unlock(&tmp->arch.mp_state_lock);
->         }
->         kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
->
-> --
-> 2.49.0
->
+The following changes since commit 87ec7d5249bb8ebf40261420da069fa238c21789=
+:
+
+  KVM: RISC-V: reset smstateen CSRs (2025-05-01 18:26:14 +0530)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.16-1
+
+for you to fetch changes up to 7917be170928189fefad490d1a1237fdfa6b856f:
+
+  RISC-V: KVM: lock the correct mp_state during reset (2025-05-24
+21:30:47 +0530)
+
+----------------------------------------------------------------
+KVM/riscv changes for 6.16
+
+- Add vector registers to get-reg-list selftest
+- VCPU reset related improvements
+- Remove scounteren initialization from VCPU reset
+- Support VCPU reset from userspace using set_mpstate() ioctl
+
+----------------------------------------------------------------
+Atish Patra (5):
+      KVM: riscv: selftests: Align the trap information wiht pt_regs
+      KVM: riscv: selftests: Decode stval to identify exact exception type
+      KVM: riscv: selftests: Add vector extension tests
+      RISC-V: KVM: Remove experimental tag for RISC-V
+      RISC-V: KVM: Remove scounteren initialization
+
+Radim Kr=C4=8Dm=C3=A1=C5=99 (5):
+      KVM: RISC-V: refactor vector state reset
+      KVM: RISC-V: refactor sbi reset request
+      KVM: RISC-V: remove unnecessary SBI reset state
+      RISC-V: KVM: add KVM_CAP_RISCV_MP_STATE_RESET
+      RISC-V: KVM: lock the correct mp_state during reset
+
+ Documentation/virt/kvm/api.rst                     |  11 ++
+ arch/riscv/include/asm/kvm_aia.h                   |   3 -
+ arch/riscv/include/asm/kvm_host.h                  |  17 ++-
+ arch/riscv/include/asm/kvm_vcpu_sbi.h              |   3 +
+ arch/riscv/include/asm/kvm_vcpu_vector.h           |   6 +-
+ arch/riscv/kernel/head.S                           |  10 ++
+ arch/riscv/kvm/Kconfig                             |   2 +-
+ arch/riscv/kvm/aia_device.c                        |   4 +-
+ arch/riscv/kvm/vcpu.c                              |  64 +++++-----
+ arch/riscv/kvm/vcpu_sbi.c                          |  32 ++++-
+ arch/riscv/kvm/vcpu_sbi_hsm.c                      |  13 +-
+ arch/riscv/kvm/vcpu_sbi_system.c                   |  10 +-
+ arch/riscv/kvm/vcpu_vector.c                       |  13 +-
+ arch/riscv/kvm/vm.c                                |  13 ++
+ include/uapi/linux/kvm.h                           |   1 +
+ .../selftests/kvm/include/riscv/processor.h        |  23 +++-
+ tools/testing/selftests/kvm/lib/riscv/handlers.S   | 139 +++++++++++------=
+----
+ tools/testing/selftests/kvm/lib/riscv/processor.c  |   2 +-
+ tools/testing/selftests/kvm/riscv/arch_timer.c     |   2 +-
+ tools/testing/selftests/kvm/riscv/ebreak_test.c    |   2 +-
+ tools/testing/selftests/kvm/riscv/get-reg-list.c   | 132 +++++++++++++++++=
+++
+ tools/testing/selftests/kvm/riscv/sbi_pmu_test.c   |  24 +++-
+ 22 files changed, 374 insertions(+), 152 deletions(-)
 
