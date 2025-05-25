@@ -1,45 +1,46 @@
-Return-Path: <kvm+bounces-47661-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47662-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E141AAC32C5
-	for <lists+kvm@lfdr.de>; Sun, 25 May 2025 09:49:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39B9DAC32C6
+	for <lists+kvm@lfdr.de>; Sun, 25 May 2025 09:49:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEF493B9E05
-	for <lists+kvm@lfdr.de>; Sun, 25 May 2025 07:49:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03D021701D7
+	for <lists+kvm@lfdr.de>; Sun, 25 May 2025 07:49:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F5817B50F;
-	Sun, 25 May 2025 07:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC3C19CD16;
+	Sun, 25 May 2025 07:49:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HJOJw7T3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+ZXCe9B"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FDF2DCBF7
-	for <kvm@vger.kernel.org>; Sun, 25 May 2025 07:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A4A2DCBF7
+	for <kvm@vger.kernel.org>; Sun, 25 May 2025 07:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748159378; cv=none; b=ipI0lzxvBPe0DZxmwGQWuqr2+WBXpQJBaeCMvZwIhX+gcQX6fYOaoIvtNqyohQSKVuIrcrQ3K9JaVMINeH882xHDWMwjp8flk8rMvi8Kbv6BGnKu8SUsG87yrhcg+Le+kJOfljxZetHen3S/fXWqV7afksfuOiYfFpDb1IyW950=
+	t=1748159382; cv=none; b=iZrdns6GlXfs/tzUgDIwJHZlLfazG6t1CscjmPUFkYjOElnyWv5Va2Vd4Jcw04zpUrMPVOe870T+BAVMI+UiT+E3DxU8dD+Vimw0ViLr3UFg/pFyxVARr/iLJ67/tOB6A44CmIahE7M1cWnXPh0DACzxCQ6n2l3scEX1i/guJhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748159378; c=relaxed/simple;
-	bh=+kgv0ieRAs1DLuTnrmkcE4js63cQBWKGd04j1Q7RAWc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VGaayI8pa9BgkMINBl76dGM+u1m79laGSYLFZf9UfcfcHFkLjflO64/C/oiSZ9wgyFvbjCGvdytbfh0Xcj2naY1vO/hKSy0gx8J6OwTKvZEqKhCXejBvC2d73QGS4Oyngtbzahh/8xCw9pje2MkMRqae5ZWMwROI3UTruOMTfMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HJOJw7T3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F7AAC4CEEA;
-	Sun, 25 May 2025 07:49:34 +0000 (UTC)
+	s=arc-20240116; t=1748159382; c=relaxed/simple;
+	bh=RR29guoYi/u4ZXoLMPjMoscoBTZis3uzfWmE3DlEO0A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BVdXCSGEPemOMrzJARZyRzvNKo9LCFiBcbJHa0aHKc9hMWBPsS9yHuUO6FRqWw7DSjkPUukQrHxqzoO33t+BT7Qqymu1U+GmYuYGEVpZWkbsqToD3DVlrhln5aIo24hINzwg24ornzl6v5dZveUZQ2pg/1BlNV59ca2bZCn0vHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+ZXCe9B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 598CBC4CEEF;
+	Sun, 25 May 2025 07:49:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748159377;
-	bh=+kgv0ieRAs1DLuTnrmkcE4js63cQBWKGd04j1Q7RAWc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HJOJw7T3FCj5c7BQjA3FU/tr5bpL2KyRlWuOIzbPLQFL2SClAB8Mb8rXK7AzwW3E9
-	 0OOWXkSEgX+vnBAGd8xg6iaAPYU8cZCy6cDk8g+fadjTLyj40wc/R94CoYXXR8Up/n
-	 hUCwpiSBF63EjGErnqrj+M3UkTASCSYY9xKeMh7uG3HJRGBn4Qzvw6qsZmnLX4Hz3m
-	 7jx5dCEisW6O0+0O6/THEVnEOgplpx7KHLFLzDQXYITbteOitTwfpY4w/wNIycJ/CC
-	 RtrQWAL+zfo0q5FRkX4/P0TcsCF1XpV/Y/v/mOHq/ZvYbAeiZJt38MiPX6zwEpNg+4
-	 sSiJiNyCXMFVQ==
+	s=k20201202; t=1748159380;
+	bh=RR29guoYi/u4ZXoLMPjMoscoBTZis3uzfWmE3DlEO0A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Z+ZXCe9BhoG3w8lZ2wMCFjD1n3z2gN3eL7dhQyQ4RFpbugb0+Mkrk11nLbzeqglij
+	 u6dBLuIZUdaTQtfjjsVVXRB3sDoe1rMgHPzr2Q249lj9QLWbST29KXvtgUIWMqwKAH
+	 ry/rkIEdCaX0TUBTx0uOlSjaKtw2ENZbBbYWsGKOZ58MUbzK6mJ1bu/nwLpuWvnp6H
+	 Xn+YkqZDw1LI1gww0lhns4Oy2HnPhHN87Q9TilqQ/VIPhnXDC7hKkQ6qyGJqAQML5p
+	 fvv7rLCXilEY9iw5wbP66AwT+3mQSEfe5+7JX8sbccKy6cRrSXrgExnQmd/kXrAGCB
+	 gTDqk9ugAEjqQ==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: kvm@vger.kernel.org
 Cc: Suzuki K Poulose <Suzuki.Poulose@arm.com>,
@@ -47,10 +48,12 @@ Cc: Suzuki K Poulose <Suzuki.Poulose@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
 	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Subject: [RFC PATCH kvmtool 01/10] vfio: Associate vm instance with vfio fd
-Date: Sun, 25 May 2025 13:19:07 +0530
-Message-ID: <20250525074917.150332-1-aneesh.kumar@kernel.org>
+Subject: [RFC PATCH kvmtool 02/10] vfio: Rename some functions
+Date: Sun, 25 May 2025 13:19:08 +0530
+Message-ID: <20250525074917.150332-2-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250525074917.150332-1-aneesh.kumar@kernel.org>
+References: <20250525074917.150332-1-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -59,63 +62,129 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is needed for followup patches
+We will add iommufd support in later patches. Rename the old vfio
+method as legacy vfio.
 
 Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
 ---
- vfio/core.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+ vfio/core.c | 31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
 
 diff --git a/vfio/core.c b/vfio/core.c
-index 3ff2c0b075df..c6b305c30cf7 100644
+index c6b305c30cf7..424dc4ed3aef 100644
 --- a/vfio/core.c
 +++ b/vfio/core.c
-@@ -9,6 +9,7 @@
- #define IOMMU_GROUP_DIR		"/sys/kernel/iommu_groups"
+@@ -282,7 +282,7 @@ void vfio_unmap_region(struct kvm *kvm, struct vfio_region *region)
+ 	}
+ }
  
- static int vfio_container;
-+static int kvm_vfio_device;
- static LIST_HEAD(vfio_groups);
- static struct vfio_device *vfio_devices;
+-static int vfio_configure_device(struct kvm *kvm, struct vfio_device *vdev)
++static int legacy_vfio_configure_device(struct kvm *kvm, struct vfio_device *vdev)
+ {
+ 	int ret;
+ 	struct vfio_group *group = vdev->group;
+@@ -340,12 +340,12 @@ err_close_device:
+ 	return ret;
+ }
  
-@@ -437,8 +438,19 @@ static int vfio_configure_groups(struct kvm *kvm)
- 		ret = vfio_configure_reserved_regions(kvm, group);
+-static int vfio_configure_devices(struct kvm *kvm)
++static int legacy_vfio_configure_devices(struct kvm *kvm)
+ {
+ 	int i, ret;
+ 
+ 	for (i = 0; i < kvm->cfg.num_vfio_devices; ++i) {
+-		ret = vfio_configure_device(kvm, &vfio_devices[i]);
++		ret = legacy_vfio_configure_device(kvm, &vfio_devices[i]);
  		if (ret)
  			return ret;
--	}
+ 	}
+@@ -429,7 +429,7 @@ static int vfio_configure_reserved_regions(struct kvm *kvm,
+ 	return ret;
+ }
  
-+		struct kvm_device_attr attr = {
-+			.group = KVM_DEV_VFIO_FILE,
-+			.attr = KVM_DEV_VFIO_FILE_ADD,
-+			.addr = (__u64)&group->fd,
-+		};
-+
-+		if (ioctl(kvm_vfio_device, KVM_SET_DEVICE_ATTR, &attr)) {
-+			pr_err("Failed KVM_SET_DEVICE_ATTR for KVM_DEV_VFIO_FILE");
-+			return -ENODEV;
-+		}
-+
-+	}
+-static int vfio_configure_groups(struct kvm *kvm)
++static int legacy_vfio_configure_groups(struct kvm *kvm)
+ {
+ 	int ret;
+ 	struct vfio_group *group;
+@@ -454,7 +454,7 @@ static int vfio_configure_groups(struct kvm *kvm)
  	return 0;
  }
  
-@@ -656,6 +668,16 @@ static int vfio__init(struct kvm *kvm)
- 	if (!vfio_devices)
- 		return -ENOMEM;
+-static struct vfio_group *vfio_group_create(struct kvm *kvm, unsigned long id)
++static struct vfio_group *legacy_vfio_group_create(struct kvm *kvm, unsigned long id)
+ {
+ 	int ret;
+ 	struct vfio_group *group;
+@@ -512,10 +512,11 @@ static void vfio_group_exit(struct kvm *kvm, struct vfio_group *group)
+ 	if (--group->refs != 0)
+ 		return;
  
-+	struct kvm_create_device device = {
-+		.type = KVM_DEV_TYPE_VFIO,
-+	};
-+
-+	if (ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &device)) {
-+		pr_err("Failed KVM_CREATE_DEVICE ioctl");
-+		return -ENODEV;
+-	ioctl(group->fd, VFIO_GROUP_UNSET_CONTAINER);
+-
+ 	list_del(&group->list);
+-	close(group->fd);
++	if (group->fd != -1) {
++		ioctl(group->fd, VFIO_GROUP_UNSET_CONTAINER);
++		close(group->fd);
 +	}
-+	kvm_vfio_device = device.fd;
-+
- 	ret = vfio_container_init(kvm);
+ 	free(group);
+ }
+ 
+@@ -559,14 +560,14 @@ vfio_group_get_for_dev(struct kvm *kvm, struct vfio_device *vdev)
+ 		}
+ 	}
+ 
+-	group = vfio_group_create(kvm, group_id);
++	group = legacy_vfio_group_create(kvm, group_id);
+ 
+ out_close:
+ 	close(dirfd);
+ 	return group;
+ }
+ 
+-static int vfio_device_init(struct kvm *kvm, struct vfio_device *vdev)
++static int legacy_vfio_device_init(struct kvm *kvm, struct vfio_device *vdev)
+ {
+ 	int ret;
+ 	char dev_path[PATH_MAX];
+@@ -610,7 +611,7 @@ static void vfio_device_exit(struct kvm *kvm, struct vfio_device *vdev)
+ 	free(vdev->sysfs_path);
+ }
+ 
+-static int vfio_container_init(struct kvm *kvm)
++static int legacy_vfio_container_init(struct kvm *kvm)
+ {
+ 	int api, i, ret, iommu_type;;
+ 
+@@ -638,7 +639,7 @@ static int vfio_container_init(struct kvm *kvm)
+ 	for (i = 0; i < kvm->cfg.num_vfio_devices; ++i) {
+ 		vfio_devices[i].params = &kvm->cfg.vfio_devices[i];
+ 
+-		ret = vfio_device_init(kvm, &vfio_devices[i]);
++		ret = legacy_vfio_device_init(kvm, &vfio_devices[i]);
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -678,15 +679,15 @@ static int vfio__init(struct kvm *kvm)
+ 	}
+ 	kvm_vfio_device = device.fd;
+ 
+-	ret = vfio_container_init(kvm);
++	ret = legacy_vfio_container_init(kvm);
  	if (ret)
  		return ret;
+ 
+-	ret = vfio_configure_groups(kvm);
++	ret = legacy_vfio_configure_groups(kvm);
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = vfio_configure_devices(kvm);
++	ret = legacy_vfio_configure_devices(kvm);
+ 	if (ret)
+ 		return ret;
+ 
 -- 
 2.43.0
 
