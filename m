@@ -1,109 +1,143 @@
-Return-Path: <kvm+bounces-47706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03AEBAC3E4D
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 13:07:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74FFBAC3E57
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 13:14:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BDCC3B9C77
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 11:07:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CA641896BE0
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 11:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E081F8744;
-	Mon, 26 May 2025 11:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEED1F8ADD;
+	Mon, 26 May 2025 11:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Jfhx1B3P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069201F9F70
-	for <kvm@vger.kernel.org>; Mon, 26 May 2025 11:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8560A72600
+	for <kvm@vger.kernel.org>; Mon, 26 May 2025 11:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748257649; cv=none; b=F7BA5qYLhkDlNVwl9mt15256KsHsmkLkHw2VR4dIHma78JANC92wBfEXwllZJsah8lhPoL1bAE78TpxTD9Sk63wSQKvIwWmDEhfzCxu+t04B7A/LwdXcU4c9rokd+T/HFOIlwImn4vPNfJEud9OpTRJdGrI9KjgKNTahWy42qdw=
+	t=1748258045; cv=none; b=X2NHjW0rc7zw49dzHqD9DYEL8pz+hBQQjw0u8eMFsxnPuRofI4bZcuSWEEa9s728qLXr7L/9t8BBjIcnl4quEziWax/amJq0hRuYwtn76Ynjny8Vy9GEgETNvazQwe6l6zEli4HpCg2mPsI8kp3wp7c6uYVuNGIpSM3z+ewmCYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748257649; c=relaxed/simple;
-	bh=eLlTCJIRE/RO6kjebWn2knKMyHtL/Q3krWiIXjG5yDM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QUwclBO8YXGgFlnMC9WhEZqSCX6jvOLpiDQQbcF3r1v34kyX3+4ShUlvRuK3II8yL6uxLEjHWj6GqnMu8rjFP0aR5gz/6asT5kD1tIU/EkTcfpf5L85EmCWuXPhinFOJAbP3ZFoh/hRpCIiSUzWNHnl6CZAATW2/771sgBvTrJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1748257637-1eb14e386d34be70001-HEqcsx
-Received: from ZXSHMBX1.zhaoxin.com (ZXSHMBX1.zhaoxin.com [10.28.252.163]) by mx2.zhaoxin.com with ESMTP id ePyeVfIWlE4kHRXn (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Mon, 26 May 2025 19:07:17 +0800 (CST)
-X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by ZXSHMBX1.zhaoxin.com
- (10.28.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Mon, 26 May
- 2025 19:07:16 +0800
-Received: from ZXSHMBX1.zhaoxin.com ([::1]) by ZXSHMBX1.zhaoxin.com
- ([fe80::2c07:394e:4919:4dc1%7]) with mapi id 15.01.2507.044; Mon, 26 May 2025
- 19:07:16 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.163
-Received: from [192.168.31.91] (10.28.66.62) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Mon, 26 May
- 2025 18:52:42 +0800
-Message-ID: <c3ecc32c-badd-487e-a2df-0594661bc65e@zhaoxin.com>
-Date: Mon, 26 May 2025 18:52:41 +0800
+	s=arc-20240116; t=1748258045; c=relaxed/simple;
+	bh=VnAgd0ZQRivApTR3Ldr5WYwHCJLxJNgqjBaNl5DS1Ws=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hVQd/z5q8ZJN54aVIw3bb0uMH4ju77PNqZ0U3aCpY2Ia4vxn04YQbVFCyAOAsOfDcEgPKqRtSICl1Fi//xKOkcIxOD8awvCoWzFAzhhncqtkqb2elzIywYnUOT7Xw+1QgJQLzFf/RgV192src6tpDwtuCS4CmAmj6fsLawl27yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Jfhx1B3P; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a365a6804eso1246772f8f.3
+        for <kvm@vger.kernel.org>; Mon, 26 May 2025 04:14:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1748258042; x=1748862842; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1qGPkkOzz/AvcHXID85KRR2dfTKt6dbyAQOGmEwhnXA=;
+        b=Jfhx1B3Pvz7gQ9A4b1+ihmbbCLVcUEkJPx5tG1uy9QiKB5QDFmZDLkAi19eUTuLlfx
+         9Rd5+1lkrMHCL4xe9d7xVaF3oXL31FMnONihOSqEMm9WDGA08cj5XoZkFDbzW+/jTk8S
+         Fvtkt0uh1kj8u9ZVDgjY/NRgC+k4KGoZrKDyFW22ILBY/8GJClANav3y9U6ZVBE+OLZ+
+         zcPrH/QjG31aEirRja5RLoxdupCqTa+zcuGU25JmCmu7pZbDAVgXm0EptTSpr5tg9/o6
+         Hx+GUu1iI/mIfMJpMxpctROQCAzEdWGrUoOqV9CFQ+R+EWgRQmCLVysZrzXOBo5OTRde
+         3FqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748258042; x=1748862842;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1qGPkkOzz/AvcHXID85KRR2dfTKt6dbyAQOGmEwhnXA=;
+        b=jvG8lIvCMfL/DXPtW/iXxmj6T2Tmtz/6ZzMH/hJSX+PO+plXPF/oYrwtD5FukSFgsl
+         /C3tLG38b5ONbo8550X3oda3bkrjqx1KW7AxZekmFu6LCAoJiGNJr0raPIt/syxt0qmW
+         07tygaU3RwOg3uWi4NHHvqiuRF39W5z6VPDUXnAOdTuPYlziQDst9jykYcVwQc1RGW7N
+         4SPCQ+osExOVk2oIG4x8Euc6J6R6BLqBSGwm66DCigAYq/zvnj1lHEPhEbNf727qiw29
+         VcxBdXmDUGk9t8KqERzRiKqYKtfPj5QiCYc0EHS/6AZhcjc92HOhcT6OXo3eFvuFZORJ
+         4X0A==
+X-Forwarded-Encrypted: i=1; AJvYcCWvhhIvG+wjDvtlnHdJdeg4t0SmngVv55HNV1H0Wo67ZmCj2SZelb8M6xLDUPjvRnF0fdM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxenG1QLVJnTSJKLbuo5Xy6OVtvy5R9Kb4SMGJ0PMMRzp9NXxWw
+	ZUJMzNgsoFT4v/Jp6jJsTVUlYHJwbHxeDL/3Adp/6Bq3/kR6iXVZEvevYVaBHeIWE00=
+X-Gm-Gg: ASbGncu3ejbQQeGxXj2tfl2+ryU8Zx7MFrrGkrI6Y0YKrviWOOM9bm01gp3+n2H+hWp
+	lZeftTlipOjcda+zRDc9VzJpfmvwV8u8WgpyTLYFZEtE2ldIjuRjPn4jfwsdcYpn/N0lh4ID2ZV
+	POh2IbGvXoWub9bv6Rru6mGZNqqHukGUXDPJExwMduOQZc6KjTAvAcx1CiTQ17zdhIEe+P/UifL
+	lFhkZme7f6tqDoOJY2sQaJT5h6Dj+7ZbhjhCs6Rcw9qOkXNxePo4KCM4b8r2RAajHCXzHKVjPbx
+	Uu0corAMxvn74HpJJbexC/IJfduhgFa6z5eLtMJcOAfNPsV9b2x15W2SE68vC9ooISqWUHe5QHU
+	3tLYi
+X-Google-Smtp-Source: AGHT+IEohXUMBSqO1qFUGi+04cLdFeL8i/QAY/ZQ64aMi3jtMK4s6/6493H521FOcUTuehMxIQIXpg==
+X-Received: by 2002:a05:6000:40d9:b0:3a4:c2e4:11b with SMTP id ffacd0b85a97d-3a4cb4a962amr7086907f8f.51.1748258041562;
+        Mon, 26 May 2025 04:14:01 -0700 (PDT)
+Received: from localhost (cst2-173-28.cust.vodafone.cz. [31.30.173.28])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4cc932836sm7397037f8f.39.2025.05.26.04.14.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 May 2025 04:14:01 -0700 (PDT)
+Date: Mon, 26 May 2025 13:13:59 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
+Cc: Atish Patra <atish.patra@linux.dev>, Anup Patel <anup@brainfault.org>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>, linux-riscv@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Palmer Dabbelt <palmer@rivosinc.com>, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv <linux-riscv-bounces@lists.infradead.org>
+Subject: Re: [PATCH v3 9/9] RISC-V: KVM: Upgrade the supported SBI version to
+ 3.0
+Message-ID: <20250526-224478e15ee50987124a47ac@orel>
+References: <20250522-pmu_event_info-v3-0-f7bba7fd9cfe@rivosinc.com>
+ <20250522-pmu_event_info-v3-9-f7bba7fd9cfe@rivosinc.com>
+ <DA3KSSN3MJW5.2CM40VEWBWDHQ@ventanamicro.com>
+ <61627296-6f94-45ea-9410-ed0ea2251870@linux.dev>
+ <DA5YWWPPVCQW.22VHONAQHOCHE@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 00/10] i386/cpu: Cache CPUID fixup, Intel cache model & topo
- CPUID enhencement
-To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
-	<berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-X-ASG-Orig-Subj: Re: [RFC 00/10] i386/cpu: Cache CPUID fixup, Intel cache model & topo
- CPUID enhencement
-CC: Babu Moger <babu.moger@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, "Tejus
- GK" <tejus.gk@nutanix.com>, Jason Zeng <jason.zeng@intel.com>, Manish Mishra
-	<manish.mishra@nutanix.com>, Tao Su <tao1.su@intel.com>,
-	<qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-References: <20250423114702.1529340-1-zhao1.liu@intel.com>
-From: Ewan Hai <ewanhai-oc@zhaoxin.com>
-In-Reply-To: <20250423114702.1529340-1-zhao1.liu@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-X-Moderation-Data: 5/26/2025 7:07:15 PM
-X-Barracuda-Connect: ZXSHMBX1.zhaoxin.com[10.28.252.163]
-X-Barracuda-Start-Time: 1748257637
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 734
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.141943
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DA5YWWPPVCQW.22VHONAQHOCHE@ventanamicro.com>
 
+On Mon, May 26, 2025 at 11:00:30AM +0200, Radim Krčmář wrote:
+> 2025-05-23T10:16:11-07:00, Atish Patra <atish.patra@linux.dev>:
+> > On 5/23/25 6:31 AM, Radim Krčmář wrote:
+> >> 2025-05-22T12:03:43-07:00, Atish Patra <atishp@rivosinc.com>:
+> >>> Upgrade the SBI version to v3.0 so that corresponding features
+> >>> can be enabled in the guest.
+> >>>
+> >>> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> >>> ---
+> >>> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> >>> -#define KVM_SBI_VERSION_MAJOR 2
+> >>> +#define KVM_SBI_VERSION_MAJOR 3
+> >> I think it's time to add versioning to KVM SBI implementation.
+> >> Userspace should be able to select the desired SBI version and KVM would
+> >> tell the guest that newer features are not supported.
 
+We need new code for this, but it's a good idea.
 
-On 4/23/25 7:46 PM, Zhao Liu wrote:
-> Hi all,
+> >
+> > We can achieve that through onereg interface by disabling individual SBI 
+> > extensions.
+> > We can extend the existing onereg interface to disable a specific SBI 
+> > version directly
+> > instead of individual ones to save those IOCTL as well.
 > 
-> (Since patches 1 and 2 involve changes to x86 vendors other than Intel,
-> I have also cc'd friends from AMD and Zhaoxin.)
-> 
-> These are the ones I was going to clean up a long time ago:
->   * Fixup CPUID 0x80000005 & 0x80000006 for Intel (and Zhaoxin now).
->   * Add cache model for Intel CPUs.
->   * Enable 0x1f CPUID leaf for specific Intel CPUs, which already have
->     this leaf on host by default.
+> Yes, I am all in favor of letting userspace provide all values in the
+> BASE extension.
 
-If you run into vendor specific branches while refactoring the topology-related 
-code, please feel free to treat Intel and Zhaoxin as one class. For every 
-topology CPUID leaf(0x0B, 0x1F, ...) so far, Zhaoxin has followed the Intel SDM 
-definition exactly.
+This is covered by your recent patch that provides userspace_sbi.
+With that, userspace can disable all extensions that aren't
+supported by a given spec version, disable BASE and then provide
+a BASE that advertises the version it wants. The new code is needed
+for extensions that userspace still wants KVM to accelerate, but then
+KVM needs to be informed it should deny all functions not included in
+the selected spec version.
+
+Thanks,
+drew
 
