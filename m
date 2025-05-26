@@ -1,136 +1,136 @@
-Return-Path: <kvm+bounces-47686-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47687-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72E4EAC3C2C
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 10:58:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4290FAC3C30
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 10:59:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 141F27A16DD
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 08:57:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10FFB174E04
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 08:59:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C488D1E9B0B;
-	Mon, 26 May 2025 08:58:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7281E7C05;
+	Mon, 26 May 2025 08:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XAQvMSDH"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="nBfqjNff"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F212AEFE
-	for <kvm@vger.kernel.org>; Mon, 26 May 2025 08:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9306E1E633C
+	for <kvm@vger.kernel.org>; Mon, 26 May 2025 08:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748249914; cv=none; b=a1GQwW/6VfEMpnBU4JBdVg12R0ALUSCoKm5QtL+gH1HmulrL1FzTzCCtxutX7MsdZ3BVx3KlA0w+RgNx0j73IYamWXpppDrJlLzsmEisMpA3rJ3FOfsA2a2usrIRbRd72iet5uHlF3KL/C0WuXXbUmZ1ySKRfKKk6ygjbIFBclU=
+	t=1748249931; cv=none; b=b8DB1o9CpZWdcq6K9QWm7g72dScjDjCTB9QHaAq4zf5AY9wpj5RP07KuHvJrMIeMf1oxLH3hP4zig7UvznZgScQ/jEAzETywqhL0DR0Nu9u8WLRlwliTIgWs2vU3mwp7GWM/OQfxmteriRIfQjUYIThxSh7PSW6rf34tdB1mVsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748249914; c=relaxed/simple;
-	bh=aJXOIB3PXjfdQVTBSrdtBYKMKi5Eb/XdWBg0BVS4qug=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=gHOWGK72//ItSxeu4k/iyt0N+pAF138VospTQsOr4rvLmmMG5WotrbILD8kXy1w4NcctHmDgFHMY7YhG8YLoRYPww5wY33MUWb8shN10aFWEYeyrl88TGWa4sbHb8KHdGfXkyQ/09NdgQV84XBTGOSeovZoH26stHcvuEhv7LYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XAQvMSDH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748249910;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jzzd0Z2q7oavj1TygOVzuj6Z/b/VFUvuYV5UB2zwGk4=;
-	b=XAQvMSDHXO8JgseeO9xPAV1I+hl5FXoOvKMX/zlp8KgxGm2HFmlGFYSIFveyQsT96jwMW9
-	p9pMq+fYHj90/qaJb29B4rFmNM8n1Hrsopqbpriw2qYTJ9gBAMUCedBxDdx9yMqohW3w5l
-	1qYjBDNKIBrGXmG1h//BpyXKOiskUAw=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-78-gabRBkCUN3ihfu9bwQcvGg-1; Mon,
- 26 May 2025 04:58:28 -0400
-X-MC-Unique: gabRBkCUN3ihfu9bwQcvGg-1
-X-Mimecast-MFC-AGG-ID: gabRBkCUN3ihfu9bwQcvGg_1748249905
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 19EB81956095;
-	Mon, 26 May 2025 08:58:24 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.45.242.2])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4244F1956095;
-	Mon, 26 May 2025 08:58:22 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id CA91B21E66C3; Mon, 26 May 2025 10:58:19 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Mark Cave-Ayland <mark.caveayland@nutanix.com>,  Daniel P. =?utf-8?Q?B?=
- =?utf-8?Q?errang=C3=A9?=
- <berrange@redhat.com>,  Peter Maydell <peter.maydell@linaro.org>,  Thomas
- Huth <thuth@redhat.com>,  Zhao Liu <zhao1.liu@intel.com>,  Xiaoyao Li
- <xiaoyao.li@intel.com>,  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>,
-  Paolo Bonzini <pbonzini@redhat.com>,  qemu-devel@nongnu.org,  Richard
- Henderson <richard.henderson@linaro.org>,  kvm@vger.kernel.org,  Gerd
- Hoffmann <kraxel@redhat.com>,  Laurent Vivier <lvivier@redhat.com>,
-  Jiaxun Yang <jiaxun.yang@flygoat.com>,  Yi Liu <yi.l.liu@intel.com>,
-  "Michael S. Tsirkin" <mst@redhat.com>,  Eduardo Habkost
- <eduardo@habkost.net>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-  Alistair Francis <alistair.francis@wdc.com>,  Daniel Henrique Barboza
- <dbarboza@ventanamicro.com>,  Marcelo Tosatti <mtosatti@redhat.com>,
-  qemu-riscv@nongnu.org,  Weiwei Li <liwei1518@gmail.com>,  Amit Shah
- <amit@kernel.org>,  Yanan Wang <wangyanan55@huawei.com>,  Helge Deller
- <deller@gmx.de>,  Palmer Dabbelt <palmer@dabbelt.com>,  Ani Sinha
- <anisinha@redhat.com>,  Igor Mammedov <imammedo@redhat.com>,  Fabiano
- Rosas <farosas@suse.de>,  Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-  =?utf-8?Q?Cl=C3=A9ment?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
-  qemu-arm@nongnu.org,  =?utf-8?Q?Marc-Andr=C3=A9?= Lureau
- <marcandre.lureau@redhat.com>,
-  Huacai Chen <chenhuacai@kernel.org>,  Jason Wang <jasowang@redhat.com>
-Subject: Re: How to mark internal properties
-In-Reply-To: <60cd3ba8-2ab1-74ac-54ea-5e3b309788a1@eik.bme.hu> (BALATON
-	Zoltan's message of "Tue, 13 May 2025 11:26:31 +0200 (CEST)")
-References: <20250508133550.81391-1-philmd@linaro.org>
-	<20250508133550.81391-13-philmd@linaro.org>
-	<23260c74-01ba-45bc-bf2f-b3e19c28ec8a@intel.com>
-	<aB2vjuT07EuO6JSQ@intel.com>
-	<2f526570-7ab0-479c-967c-b3f95f9f19e3@redhat.com>
-	<CAFEAcA-kuHvxjuV_cMh-Px3C-k2Gd51jFqhwndO52vm++M_jAA@mail.gmail.com>
-	<aCG6MuDLrQpoTqpg@redhat.com> <87jz6mqeu5.fsf@pond.sub.org>
-	<eedd1fa2-5856-41b8-8e6b-38bd5c98ce8f@nutanix.com>
-	<87ecwshqj4.fsf@pond.sub.org>
-	<60cd3ba8-2ab1-74ac-54ea-5e3b309788a1@eik.bme.hu>
-Date: Mon, 26 May 2025 10:58:19 +0200
-Message-ID: <874ix792ac.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1748249931; c=relaxed/simple;
+	bh=A07uMUlAiHODBnye6U6+ZYgmI+z5BqjupTHEKb1apD0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=WN6TlWrBi2cB2mLW2ptcaoxxeBHfUUxW4wyvMu0C2skmD3hJWf7wuhf6IcyDfkASJtFAIw14MJ288rWUDxEoh3k763qfwYfoV2txVkfjb0KG2mbAjdWicN+poDtP9VULOm0Zp5KyTo+mUTREMQhGzqzXwvRUxHS4QVll9OfW6f0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=nBfqjNff; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43cee550af2so418045e9.1
+        for <kvm@vger.kernel.org>; Mon, 26 May 2025 01:58:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1748249928; x=1748854728; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7XUa5QDzySuu6U8WB9K8OF+ZIZj9kEnHYCZp+dCaCR0=;
+        b=nBfqjNffw48hNkVyyQHtfWhCWLtfYgFnYlWzQxkgwUg1QVgDUfH9XpKxk+cOUvnn3g
+         IO4NuFbH15/FllezFedzKyq6v4jZkTFrzMIVGMorT1c/7reVH0HMY8Nz0YuVR5bcVmbb
+         2cYsdaUWh1i8uj+KivWANTASq1cxKAOyKd9hA6RY0Yh0COw9BO2AN9tbP4tIXopmWdOr
+         vd8Md2mx+PAJyt+XKTBrUa4maEOyVzugxAHU1ZQ8PjDSXzn4RTmGYVmL2OPWbec3tK7s
+         dOhESPB4+SQSYcav2M8frCWMcUsa5so2Kxplu5y0B8Tw/fsgpHC44Bnf6Ce9Gec8edEn
+         UqSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748249928; x=1748854728;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7XUa5QDzySuu6U8WB9K8OF+ZIZj9kEnHYCZp+dCaCR0=;
+        b=NWYICl3+coC9Bu2ZX1DqLx8LoPwhYoXtmYmBG5WuQPtSqZEheMmKUtfSclGU49rOQO
+         JZglWNm6MG48tHI9tdrtoYeM0vIH8XWt/qeHkeqOLNwGMV7ZMmPu2AR1p4IescJ9eW7c
+         Ryvodae1Kt50jchzKJbJsMsJpdh576eaY/Oj52UsuTCUDTO+SpjG6oN2tUx2dpmQrJ+g
+         PitSoqq+6mqM0O8g8q38VwC/Jtf7IQM/jA5cvhD8oqn5H/f6BHDr21DFORI8elY+xHoq
+         BvuZu0fxIeZjtmN8cgY/VoO4Nduyi5Kv+Hk/h2rM3pAXA/om07zCu6P9Z1mQdcNiWfkN
+         32ig==
+X-Forwarded-Encrypted: i=1; AJvYcCUfeX5EmxLJvVSkMb36xZXEOLYzdYkmmLhgXISp8tSsG5tKPc2AeB60UkyqRLpRaRX9fCM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/l4rqSDL/SFqE694ddXIpzvubySKtSBP6BdLKyKCkD4C+QU9/
+	XNO7jXbVYIoDxyE7/BACiW6CDFe9YyNbwNe4a6xVqiC62gKGM+LrBOArJidvwq4WHiM=
+X-Gm-Gg: ASbGncsSKLFKo61hbD479cbHCfh4VaFXNQS1nDQGqEMPzMja/BLhX2BwQGZpBBBi5oU
+	EO2fOUVry6rcVsOKdd85Iv/Zh0PeUnNYrHkPVBUwXDx3hSezYAMabrQmHUZ6BOpFkRYmrMUEBGC
+	SzMOMC6cbhlewwV2SQT+lEa91GPMqnfzthCzymAendRxsMUfU0Rqzv0NfWBefXDQiV2fgG7/PGc
+	np4azIqsf5n+UX3KsKFI2pVHVj3tArEGkflGvDw0NjFiMigfIxC+dn/98E5mgjobrgw9lUkZ79B
+	6RVtq2he4Yf3LUFAKPXdUGjRAMwQ3b+GeSeFHvfw940P8LRBEHuEH7nwxjw=
+X-Google-Smtp-Source: AGHT+IEdx9Lxmxr6Jj4a/VtrbY6n55+AjozaESSFCcKKfyGvvRTO9hEvIbHH5Dnsj/C495VBfSOibw==
+X-Received: by 2002:a05:600c:1c24:b0:439:9ec5:dfa with SMTP id 5b1f17b1804b1-44c938cb1e6mr27073595e9.7.1748249927727;
+        Mon, 26 May 2025 01:58:47 -0700 (PDT)
+Received: from localhost ([2a02:8308:a00c:e200:b85a:a7d4:fa4e:bb11])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4d007bbccsm5654781f8f.89.2025.05.26.01.58.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 May 2025 01:58:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 26 May 2025 10:58:46 +0200
+Message-Id: <DA5YVKW682V3.2DODRY4EDL3IW@ventanamicro.com>
+Subject: Re: [PATCH v8 13/14] RISC-V: KVM: add support for FWFT SBI
+ extension
+Cc: "Samuel Holland" <samuel.holland@sifive.com>, "Andrew Jones"
+ <ajones@ventanamicro.com>, "Deepak Gupta" <debug@rivosinc.com>, "Charlie
+ Jenkins" <charlie@rivosinc.com>, "linux-riscv"
+ <linux-riscv-bounces@lists.infradead.org>
+To: "Atish Patra" <atish.patra@linux.dev>,
+ =?utf-8?q?Cl=C3=A9ment_L=C3=A9ger?= <cleger@rivosinc.com>, "Paul Walmsley"
+ <paul.walmsley@sifive.com>, "Palmer Dabbelt" <palmer@dabbelt.com>, "Anup
+ Patel" <anup@brainfault.org>, "Atish Patra" <atishp@atishpatra.org>, "Shuah
+ Khan" <shuah@kernel.org>, "Jonathan Corbet" <corbet@lwn.net>,
+ <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
+ <kvm-riscv@lists.infradead.org>, <linux-kselftest@vger.kernel.org>
+From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
+References: <20250523101932.1594077-1-cleger@rivosinc.com>
+ <20250523101932.1594077-14-cleger@rivosinc.com>
+ <DA3K95ZYJ52S.1K6O3LN6WEI0N@ventanamicro.com>
+ <9f9e2869-725d-4590-887a-9b0ef091472e@rivosinc.com>
+ <DA3OJ7WWUGLT.35AVP0QQDJRZV@ventanamicro.com>
+ <5dd587b3-8c04-41d1-b677-5b07266cfec5@linux.dev>
+In-Reply-To: <5dd587b3-8c04-41d1-b677-5b07266cfec5@linux.dev>
 
-BALATON Zoltan <balaton@eik.bme.hu> writes:
-
-> On Tue, 13 May 2025, Markus Armbruster wrote:
->> Mark Cave-Ayland <mark.caveayland@nutanix.com> writes:
->>> On a related note this also brings us back to the discussion as to the relationship between qdev and QOM: at one point I was under the impression that qdev properties were simply QOM properties that were exposed externally, i.e on the commmand line for use with -device.
->>>
->>> Can you provide an update on what the current thinking is in this area, in particular re: scoping of qdev vs QOM properties?
->>
->> qdev is a leaky layer above QOM.
->>
->> qdev properties are also QOM properties.
->>
->> All device properties are exposed externally.
+2025-05-23T11:02:11-07:00, Atish Patra <atish.patra@linux.dev>:
+> On 5/23/25 9:27 AM, Radim Kr=C3=84m=C3=83=C2=A1=C3=85 wrote:
+>> 2025-05-23T17:29:49+02:00, Cl=C3=A9ment L=C3=A9ger <cleger@rivosinc.com>=
+:
+>>> Is this something blocking though ? We'd like to merge FWFT once SBI 3.=
+0
+>>> is ratified so that would be nice not delaying it too much. I'll take a
+>>> look at it to see if it isn't too long to implement.
+>>=20
+>> Not blocking, but I would at least default FWFT to disabled, because
+>> current userspace cannot handle [14/14].  (Well... save/restore was
+>> probably broken even before, but let's try to not make it worse. :])
+>>=20
 >
-> That was clear but the question was if QOM properties (that are not qdev properties) exist and if so are they also exposed? If not exposed it may be used for internal properties (where simpler solutions aren't convenient) but maybe qdev also adds easier definition of properties that's why they used instead of QOM properties?
+> User space can not enable or disable misaligned access delegation as=20
+> there is no interface for now rightly pointed by you.
 
-I'm afraid we haven't answered your question clearly, yet.  The answer
-is yes, QOM properties that are not qdev properties do exist.  The first
-one that comes along: ich9_pm_add_properties() adds a bunch to device
-ICH9-LPC.  They are exposted externally.  To see them, try
+I mean setting default_disabled=3Dtrue and just disabling FWFT for the
+guest unless userspace explicitly enables the incomplete extension.
+We would blame the user for wanting mutually exclusive features.
 
-    $ qemu-system-x86_64 -device ICH9-LPC,help
+>                                                       I guess supporting=
+=20
+> that would be quicker than fixing the broader guest save/restore=20
+> anyways. Isn't it ?
 
-[...]
-
+Yes.  The save/restore for FWFT is simple (if we disregard the
+discussions), but definitely more than a single line.
 
