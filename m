@@ -1,126 +1,135 @@
-Return-Path: <kvm+bounces-47730-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47731-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EE35AC445B
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 22:20:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DB07AC4460
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 22:21:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AE823BBCC5
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 20:19:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE81F179523
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 20:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550372405F8;
-	Mon, 26 May 2025 20:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864EE24166D;
+	Mon, 26 May 2025 20:21:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="EWSfJNH2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FEHdm/O+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194B5202C3E
-	for <kvm@vger.kernel.org>; Mon, 26 May 2025 20:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB381A254C
+	for <kvm@vger.kernel.org>; Mon, 26 May 2025 20:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748290800; cv=none; b=TdVEwjlVpiaIPOwAhsajSIbUuSk+5DRNPKKHVQZfgYMwZtbCLdZuYlBNgslF9/hRpqylgo46LqJQ3774g2c/fcJXedrEY9cOe3IEZ6eJ7IIMAlGiNJU2gM7PwIu+aVcBOLb5YoRBcuo7y3wrpgYnaPKITGfIZRtlsE+fFndpaeQ=
+	t=1748290886; cv=none; b=WIcX90/ARbxS0KG+XwordjG8LOlRmk1QWMqXNEf4nB04Sd1+FvQOedsTappycLu7Butddb/0g0J+IjX0zACB7EyzmhhvjGmzHqZrLOiE7DIr+jMZ75Eiv9KNaSuKWLdv7BTUKfJpxK3Kdioci8AD9vis0DRZY00vASXOJe01dTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748290800; c=relaxed/simple;
-	bh=o5gQ5x0CBQ2LeBkPQqD92Vnk0YT48zi3/abof9Kr7J8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uVoPYoBD4Es7vZf6sUHYrr6NT0LuxDwoF/7BcOY5V6ck2hI0xUXOljk/IUknaqUHvNxaxxQWME7GynKgW+69XGiSzGOxhPVVtm2FL2jzP08FTQyXbTHAupzggXzjsDEAgpDZEQiRcpXDbz5h1lIzM8IqdDbJWg9cDeiwK7u5MXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=EWSfJNH2; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6f8b2682d61so35271826d6.0
-        for <kvm@vger.kernel.org>; Mon, 26 May 2025 13:19:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1748290797; x=1748895597; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hLps+JNcyParOfDXS9JzFuLbkraKablpTP/PpVjY8aw=;
-        b=EWSfJNH2OS7eXS5AadrkMnsUFh4lfgsS+45mZ83t54Fzu6KNdTFO6TCrrx5XVwMA8r
-         uatDdgZ2wRrNfxzXezYm8lCtBF92o5BzvjNoMEh7s0kziKRX5YUh28B5qmDzXSP68Dlg
-         1xlAjsuEbpaxgnPX4CCItTarHTgRu3VlpBAeWtTkOiWMEvEUDpp2iacOXFOCf7QWTtGT
-         8qa8Lcw9KioNrV+LTz8fRLz1OeHF9Q6hLYb+ScKLVc431nu1oQ2VHfg977Tbw6QD8Tn+
-         Pn+4qsNY/0KUQ0ZPf2iqHq2wUj7hWXU/rYkEit12XeodDJ5TV6hLtFjWNw5vyUvGvfFA
-         v8ug==
+	s=arc-20240116; t=1748290886; c=relaxed/simple;
+	bh=6O+HULtQ2zQfibnl8FSMfuNYNOIwOeOtgHCiLFy2uks=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aanP2YTkZpoORh0+JJ6buykwXvXqzghxOXGPF7PgDHC4jwYSr34DVVpQAOcGe/REvOKHZ7DAhbDj1rF8s+3Y7k0I/rzmQgxRlsJC1PV3U+MwUNAIOUpanWXqY/BEMpuUPzx33OtzcVI0yBPhAitBe9vy1pq5LVqok7zX64Y8o1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FEHdm/O+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748290884;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6O+HULtQ2zQfibnl8FSMfuNYNOIwOeOtgHCiLFy2uks=;
+	b=FEHdm/O+qBe9auS6E2hiZuKm3uEJvsWK6q2zvB01uuyNPYPdjmmUilwui+g8MMBhmg9MiE
+	ibXThrOWH6wVxeDMXYSBl2lLI39mUu5Nqpt8DwgoRkipXAa43PrQJ7Ohu2PxdzjAoVcOh8
+	ImwXYR6nB16ZaHCUu/9v67DyV7oMCJU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-65-zEo9tRM9P8Sq2gAS4egr-g-1; Mon, 26 May 2025 16:21:22 -0400
+X-MC-Unique: zEo9tRM9P8Sq2gAS4egr-g-1
+X-Mimecast-MFC-AGG-ID: zEo9tRM9P8Sq2gAS4egr-g_1748290882
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a3561206b3so1067249f8f.2
+        for <kvm@vger.kernel.org>; Mon, 26 May 2025 13:21:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748290797; x=1748895597;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hLps+JNcyParOfDXS9JzFuLbkraKablpTP/PpVjY8aw=;
-        b=BhRmNPtH3rSEEwAyVb5vd2W3K5alkb9JVdJ5QsNQ4WKjDc7uKAutSJn+zEmtDgOnhg
-         GJ1gx7LBD8eDx8QVRjEMKZckzUJl8qDIRB1DDgJy2tqNsmigYx9j3PAAtCx+WKRRUqb6
-         63GZkUjiUAAruFr1AHFi4MLWKJke6dfL7KAwps9KB6pRqJ0X10K0NaDIh5rTAgKWy20Y
-         wUjQNE27vvNO335D9PwGJM7uwU+OsfSbiSH5baW927p7Prp4JPNbRAoG5n3d3WZQJp2v
-         p2PawcERev64Yw5pskIiS5UeMLun+fNRM1ApAA+NYuNGUZO4D6rzn9IHunb46m5dwKGs
-         wu0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXqgek2KxZPexuzUdOkpIxsB9h/79msjp9Az2hjueay9LqXa7rcUfCAjqdLCB/bvC1BqtI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5NvCmClyWT/avlBYk0ij0Y4ZbSuLbXWuNmOpAlxf91cxPWDnU
-	zFDrBTV5tHutxW4gLbsNOfnXyIu+qhltbAz71aSP751DiOmIlbHHdCpAlTR6LemDiEs=
-X-Gm-Gg: ASbGncubsFJUuCpLfoIQ49eiKv/tx2lXCD7ctvpO7AgFxO+97c/zJPG+z6iBHR3q6n7
-	k58M7boRwETYwuPPVF1FJli86eWYTvzRaDJrXI93k8lDreQKTK2Sj7AzwexHTPeJZ7JD6bJdioa
-	7/FX8EjmcVajRjGFqtffk70dcW96m8lWKt3dTcSld0KBIs9QD8tj4wbcWbKT7s4nlq34K3ZGHir
-	vfKFGyyDs8Il02n9VmqRFz75iG2ZKD8d9aqWzGKoFtL6zmdemadK+KzNpt81C05B1+2liOwB0e6
-	3Jg8rWCFXiUNoJHnHM8zlNuGNcLXNwuTZYD43+gDre+L4Y7lpBJVbsILTuppc4pLuLcI1im4o64
-	KNkCpkyHv7wmSMVUFLwr0Uh7/ZWY=
-X-Google-Smtp-Source: AGHT+IGgTwiyg5eiY7T72449r0+RVPoXtu68z9yqpkDUhC5jnCxOtecB9Azj5gEYa//3ikcBXT1glg==
-X-Received: by 2002:a05:6214:f09:b0:6fa:a5bf:2595 with SMTP id 6a1803df08f44-6faa5bf281dmr99808036d6.16.1748290796961;
-        Mon, 26 May 2025 13:19:56 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-56-70.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.56.70])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fa9a3dbd2asm45191276d6.48.2025.05.26.13.19.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 May 2025 13:19:56 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1uJeId-00000000UuV-48LG;
-	Mon, 26 May 2025 17:19:55 -0300
-Date: Mon, 26 May 2025 17:19:55 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, lizhe.67@bytedance.com,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	muchun.song@linux.dev
-Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for huge
- folio
-Message-ID: <20250526201955.GI12328@ziepe.ca>
-References: <20250520070020.6181-1-lizhe.67@bytedance.com>
- <3f51d180-becd-4c0d-a156-7ead8a40975b@redhat.com>
- <20250520162125.772d003f.alex.williamson@redhat.com>
- <ff914260-6482-41a5-81f4-9f3069e335da@redhat.com>
- <20250521105512.4d43640a.alex.williamson@redhat.com>
+        d=1e100.net; s=20230601; t=1748290881; x=1748895681;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6O+HULtQ2zQfibnl8FSMfuNYNOIwOeOtgHCiLFy2uks=;
+        b=A5VyOG7vQpXDGaG7DzH3Cbwfx+GJg0XTXt74tNxnzhRwB6XwGlfoJCZQCSBZ2hjziV
+         v3BSP6yT6cSARjB3nmbb0RtUebz8q/yykPMmcXQm08Z4sG2inMmbLRDh5knwweAZSFxZ
+         /WT5gXsQc9zrCpKfFbt3TBj9j2HU78WjGI57Z1A8sJuN0MKD8xG7VHpRHDBpkyZR1Zmb
+         JBxOCHlXfDA0ngkrBUmhP5h7irMg6RxFYLtvGriaNaEUgBQtu6dTXgDYfik3nc94fh/l
+         ZD+cl2SURTS0QOd3NcByItnGw/LWyRWb+Jtb4+GpOICXMAnHnqMvB+qjqyBuSatoCUg4
+         aDyg==
+X-Forwarded-Encrypted: i=1; AJvYcCXBS3SozDnt+QopUXXQ7+gyYOzr9FkbKBZpYhPBOXJcSWTEIJtCn/ha3IYGXLmV5v4snLI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwII7h0L56q8PJT6Qo5r6dTrxU0NJXQu3G3L9Eq9UzvkEQl23PM
+	llqRZKmTNcRSCiYI03LTODvO5bITbogcUWNwntUF2E9UXajNAYIYc3yqBFb2ZAJ/bqpol1q4tMA
+	WV2oZNlMz2+d91iRl4+S27Q09PYzfonxnJO9lwSh3BsF7FkFw+xlq8NKcD5tBioXKsEKo2u1diQ
+	PPy0F5TinorhYnGBdgaU1XD/mTz1Rx
+X-Gm-Gg: ASbGncsc12HkQplQQirUW7JI+DEt6Xa1K2innj2J1DsxmyYRJ/2BEx/ruNosGUle+iv
+	pFZ7DMtVO9Kbw0++EEk6ELV+ulbDMue2/lAYJh+F7BrDCieoOxt7jYYROdxe4jjlC+Sk=
+X-Received: by 2002:a05:6000:188e:b0:3a4:d4e5:498a with SMTP id ffacd0b85a97d-3a4d4e549f4mr4549107f8f.42.1748290881571;
+        Mon, 26 May 2025 13:21:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFPfGkLNrDWsuMBcvBhphCxIvU3GI8PzuGzZDpGUJKW1wSG80qF2SscvPTAo9oEnA5hoBADF7+zA/YXDDS9O04=
+X-Received: by 2002:a05:6000:188e:b0:3a4:d4e5:498a with SMTP id
+ ffacd0b85a97d-3a4d4e549f4mr4549074f8f.42.1748290881218; Mon, 26 May 2025
+ 13:21:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250521105512.4d43640a.alex.williamson@redhat.com>
+References: <20250523112015.146300-1-maz@kernel.org>
+In-Reply-To: <20250523112015.146300-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 26 May 2025 22:21:09 +0200
+X-Gm-Features: AX0GCFszvJZwa7StoX7JqXeC8eM3B-BChUPaDxpaOnMqsQR84k4snxyVAo-DiDU
+Message-ID: <CABgObfbAD9W8dFzAPhyayBwohNW+9MpBnHfT5A-KVs+7RDQ9ew@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.16
+To: Marc Zyngier <maz@kernel.org>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, D Scott Phillips <scott@os.amperecomputing.com>, 
+	Fuad Tabba <tabba@google.com>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	Gavin Shan <gshan@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Kees Cook <kees@kernel.org>, Mark Brown <broonie@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Mostafa Saleh <smostafa@google.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Quentin Perret <qperret@google.com>, 
+	Seongsu Park <sgsu.park@samsung.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>, Will Deacon <will@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Eric Auger <eric.auger@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 21, 2025 at 10:55:12AM -0600, Alex Williamson wrote:
+On Fri, May 23, 2025 at 1:20=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> Paolo,
+>
+> Here's the initial set of updates for 6.16.
+>
+> The largest change is actually not a functional one, as it "only"
+> reworks the way the guest feature set applies to trap bits and
+> register sanitising. This translates into another (generated) set of
+> large tables describing the architecture, which is I hope easier to
+> deal with than ad-hoc code trying to do the same thing.
+>
+> On the functional front, pKVM gains THP and UBSAN support as well as
+> some page ownership optimisations, we workaround a couple of really
+> bad issues on the AmpereOne hardware, and we finally switch on nested
+> virtualisation support.
+>
+> This last bit has been a long time coming, and I would like to express
+> my thanks to Christoffer, Jintack, Oliver, Eric and everyone else who
+> helped me getting this monstrosity across the finishing line. Except
+> it's never really finished!
+>
+> As usual, details in the tag below.
 
-> This optimization does rely on an assumption of consecutive _pages_ in
-> the array returned from GUP.  If we cannot assume the next array index
-> is the next page from the same folio (which afaict we have no basis to
-> do), we cannot use the folio as the basis for any optimization.
+Pulled, thanks!
 
-Right! I was wondering why this code was messing with folios, it
-really can't learn anything from folios. The only advantage to folios
-is during unpinning where we can batch the atomics for all the folio
-sub pages, which the core mm helpers are doing.
+Paolo
 
-Which brings me back to my first remark - this is all solved in
-iommufd, in a much better way :( I continue to think we should just
-leave this type1 stuff as-is upstream and encourage people to move
-forward.
-
-Lots of CSPs are running iommufd now. There is a commonly used OOT
-patch to add the insecure P2P support like VFIO. I know lots of folks
-have backported iommufd.. No idea about libvirt, but you can run it in
-compatibility mode and then you don't need to change libvirt.
-
-Jason
 
