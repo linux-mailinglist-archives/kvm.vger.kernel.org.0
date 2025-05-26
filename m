@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-47690-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47691-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3005EAC3C4C
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 11:03:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CAD5AC3C59
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 11:06:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AC263AC0DD
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 09:02:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A4787A4D45
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 09:05:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22911E834B;
-	Mon, 26 May 2025 09:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728001E834B;
+	Mon, 26 May 2025 09:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJrZniAt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a+bPj0Wz"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659551E1A33
-	for <kvm@vger.kernel.org>; Mon, 26 May 2025 09:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F981D63C0
+	for <kvm@vger.kernel.org>; Mon, 26 May 2025 09:06:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748250189; cv=none; b=MsqrNKJ5eQ7qMMlNgWXhHHvQGG6cQ97U/OB9PZorLfR/s0zhD3mpoL7lrqY1dZ/j0yTKeZ1tSRe0u9tMZehdrzvj2rwjwPnYs+h6l4DamORll0WCw38DsEPq45abvFX4Eo1JvKxRu2io0pc3jmCmDwNg0oLJtEDbzXMcU5JoMdg=
+	t=1748250378; cv=none; b=UcMg6MkwYgxw/NTL9VHOj8SlJRe7ZFyKuF+ZCXJZkXHhjdGeinSN1hxk6GJB1Fn2GtUm209EtlST3kca9Tn++ygRKnJtycde2do3N6ZNLyyx4KunJ8xGyZSqQv8grxV4kFgOJoKUeAAFF0+9vAhc6Hb/jQbL5ZLh4bVAh8G4K+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748250189; c=relaxed/simple;
-	bh=x92kz8fZgZyy9vPuu+xjQHIFQrbdVOlV/aOlatonfBE=;
+	s=arc-20240116; t=1748250378; c=relaxed/simple;
+	bh=yf5k6vkSJ0YQzn0dRtbvc2hxgxqy+ulxY0L/qu36frs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mA4Wwd0d5l6wQtbkkTR/29ngbFdMkAyTR/4UTdDm9QoRzvMabfIrzJby9iYLOIbbqp49xjhT74HPZIVU/UJQuIGF2WhkWfpUuxJuepfNLk+Hms5/KctrI+FRwOdkcURm+7egUVbLoOoLunxez6QScMiXT+gj3x30j6MzOQ/lKHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BJrZniAt; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=pz0+7Z1EbxT12YK8eLSwCetU/pd711vpm7vVXf5t2yvPDO3werqJr9KkNbhFlfaVEVpIg61fWsJZWvZ/gER54mvJuq+nA2katrXzSi9uWWLKfkPr8DDQzO1A8B0LEc34dEUcVIHn1LczdsOUiHzjUvESWkPCZJWCLrz+ii2bs9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a+bPj0Wz; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748250186;
+	s=mimecast20190719; t=1748250375;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=W8Sf1Q1EHOlydNpyyMjYCFB8msCORH2a4E6iY0Ef1R8=;
-	b=BJrZniAtrkSYvJ+nVUfufFkhoSPE5RDG7rQT/iO11zWRayAhz8NMsOSjhiYKOuhrmRWF7I
-	JrRrM7id8THnfISLe4f1fU8PrNsOrdlEm/ujUN5VAehuc2tF3IkRIS+LC3x6WYctrfUy8U
-	k28eYEonfyABZHclHtDcKCUgzY7hLKU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ETfJt7uNoG4312JPyvmiSg2Go85laadRukbqwKIKcNo=;
+	b=a+bPj0WzYnfA3FTbpEG6BWRvGVkYCamNXImQIhGzPK7UMxTl/Pihb548zrvvW1mx4spVp0
+	eTHixS/pprGjKc+BcMMChxBb8UdPdB0oXVcR4MVunprYr3AdfhLZJryYBDIfV6KU4p6iMF
+	62+na9n/Efr4qjngbKl6oOQMCKjD6jg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-177-_2IcqtKNNlySXpHo9Oplxw-1; Mon, 26 May 2025 05:02:32 -0400
-X-MC-Unique: _2IcqtKNNlySXpHo9Oplxw-1
-X-Mimecast-MFC-AGG-ID: _2IcqtKNNlySXpHo9Oplxw_1748250151
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a367b3bb78so996361f8f.1
-        for <kvm@vger.kernel.org>; Mon, 26 May 2025 02:02:31 -0700 (PDT)
+ us-mta-479--dElRPRnORqPazTCKMFrZA-1; Mon, 26 May 2025 05:06:13 -0400
+X-MC-Unique: -dElRPRnORqPazTCKMFrZA-1
+X-Mimecast-MFC-AGG-ID: -dElRPRnORqPazTCKMFrZA_1748250373
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-442dc6f0138so9271015e9.0
+        for <kvm@vger.kernel.org>; Mon, 26 May 2025 02:06:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748250151; x=1748854951;
+        d=1e100.net; s=20230601; t=1748250373; x=1748855173;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=W8Sf1Q1EHOlydNpyyMjYCFB8msCORH2a4E6iY0Ef1R8=;
-        b=iQVXGvLjGUEI08zOFV4AgjY/QN2I8ri3w5Yi1KfWHHHo3hqZe7GfGSZ/LcGkkCcJO4
-         3oxHZcE3eUqUwDUHdOOcRlWhxVP6VBqb1c+N4Py0sG1MpxPsNTRhwYMqMTUl2zNCO1nV
-         5RnYFtyuuIboQL3jg8awMnFBWPL7PrGgVBD+AarbVhnNvLyhPPD3SYgLadbFjgZqh2vU
-         se6WfrnXL8pnH8zKRu3a46FF0WZ8u3sAX2OemX/mIUgxMwfWXlXK0JdBCY/kJHtEQQb9
-         SjBFUIi1saoMjQGKQ8hrmVa4UWEzLVdcooHsSvA/LCzaHWMfVJi/sHdBiJdWiu8Fs/bU
-         taHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXR5fmynK/c3J9BGCPxcQYk+NBC0B5joiIzzRcPjJn2TmS6m/08ibU6aTrP6tR7fErwENA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySSY34gE4LjnVDHrjNqFaKsqRmmTz79nU8H/J0wP5n3jlqQKHr
-	ucZm5qikR2reOniFbveuEX5zpgBfl8k+pSyI8ZDvFt7g2uEK0nRUd9E00UFmB5wOvc35LJksLpE
-	emXa+HxV8UZEl2JDeZmGFr3LP1XJjWHR/Ay8GtSCQ9jphgM5IdOENRw==
-X-Gm-Gg: ASbGncsmk5ZHl6/EDdqPdnC4kyW5pgXpuMf6XUmVRrN6thLgudezrXhKT5JNoh0ICea
-	zTvauyz6gexkp+yAn/+4U2HHL/Mgd6kv/+8L0BmehMhjAdfsfCgb3D9900tckvBEmn4TDoknIgO
-	rZVQmrHqu4/d2/2McO0MHgRF4NLJRxs8Bxy0cxuQ7GmXK71wlCygar9MgcL0C1hvHG7illy98Hf
-	j1Pus2xMH7a4DITT83nL9BqVj+47DXqZUZAu2VI+LJSNVMQTxizhI/dV+FVDEB0iRUHBDlwD5nO
-	vlqbO57fhZ3coQd19mgUwzAmJu47ZIIaWQy56+nb+DUl8smpLLrOl0gKsmsSWHrlD8QaBB7EuId
-	a3qKEcItd6YTW0RTXrhpFL8m7Zmsm4crXpkjM+N8=
-X-Received: by 2002:a05:6000:2481:b0:3a4:d738:f98c with SMTP id ffacd0b85a97d-3a4d738fb73mr2313836f8f.30.1748250150845;
-        Mon, 26 May 2025 02:02:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEFjV4M1AIjTPUqHzek2iW3vn2zmGxBCMtVSIzmXN788TDCibtHuIdIIC4kDphSNCdhCBOv/g==
-X-Received: by 2002:a05:6000:2481:b0:3a4:d738:f98c with SMTP id ffacd0b85a97d-3a4d738fb73mr2313806f8f.30.1748250150388;
-        Mon, 26 May 2025 02:02:30 -0700 (PDT)
+        bh=ETfJt7uNoG4312JPyvmiSg2Go85laadRukbqwKIKcNo=;
+        b=tTm+GjxRReJutgROJaHdeWKPzNCw7DaOsxAP5Ljj1h0F6P3YNw3uOyeNOKKdqh8YEq
+         XvYFjGUHxNE+ZXot5+gjBxA3KTiSz830l1UFH47FPYuhphAogvMbbnH5A3lhTZmhAuMj
+         cY78p1rbWbgkH2jzi12ozQ6e8lRPkYCXnRr/YuMVWveQOwI3RPXxlgjuVFE4A1UzoVWJ
+         o1uWn6sWQuHvcIvtIMitTEoRU01/I5QD48MpbVrGvr0bGFZ8FSKmiOACM6TOIK199Anl
+         l38mT8LdzdovZOVrog3K98ap3ifpwQvulrrJiOXuGUW7wp/K2JzM0HOlMFGDqlUGy4uj
+         5Q6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXWoe2KPsqRzmV1C4/a6qXyxNBuQwZRIkWhKrxkUF7mAAjhLxAzurrAwI0/KH6tvM4s00g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxp0iyVKafB2Pk46UGs+JRyeVXyL2t2DhanQ3Ot1OM+bmh1P9g3
+	dlAJ686NxOcr5Chiy5FbbLHcqT+jToBkrikfVXvdtObUlW8gdhhtbVOqBHvgQ0kUIFa/fK8aLbe
+	UuGns1giDwqbQRpaD8k3KNVUuXGpIMUn0u1S5JW23V5rU57Cl7B6h/g==
+X-Gm-Gg: ASbGncvv79i0DAiH3NmrzGhnjkDASKqgcnTwjz6AhNla/8FP67WGCSBUEknGad97Zur
+	n+gUrA/msnBmomNMoctVzheaWFf5J+yHbHWvYTNDth8TRbVVG/evcwdvwMHkwrrHHTys3GtStqe
+	6xTNl+9jmUFLmRxL4Gh0w91hS+aVoui43q0ublZVaVrwpYMABBGEKerR9p/GJFFjTZe0StCORD1
+	JPFq6XwAiDEmQwGwZyX2PdzZw4P/YMiBBE7MJiuc+ieRr35c1P4DN7cYxaLZKyi+PCcMzyQ72JS
+	wD+Nmb8pVmSPNprsjNMVvTodSVS0iWInasY3RAOCXS0tRxxD4k6HsuVhgMI9NTwa6QPEx9RqxSH
+	jHwOpt/JQ/3RMi2PXfhoQCTtC8qIMDdlJKkpJpY4=
+X-Received: by 2002:a05:600c:22c1:b0:442:dc6e:b9a6 with SMTP id 5b1f17b1804b1-44c91dcc104mr58685685e9.17.1748250372649;
+        Mon, 26 May 2025 02:06:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEQajF7W8Ky0PnIT7msrygsvDZEux0zYBVRLwzJpWPDsN6a9kDdML90ZGzqQbLcEjqC9qLnlg==
+X-Received: by 2002:a05:600c:22c1:b0:442:dc6e:b9a6 with SMTP id 5b1f17b1804b1-44c91dcc104mr58685415e9.17.1748250372190;
+        Mon, 26 May 2025 02:06:12 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f19:6500:e1c1:8216:4c25:efe4? (p200300d82f196500e1c182164c25efe4.dip0.t-ipconnect.de. [2003:d8:2f19:6500:e1c1:8216:4c25:efe4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4c5360a13sm9178781f8f.96.2025.05.26.02.02.29
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f7d975f4sm228362635e9.39.2025.05.26.02.06.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 May 2025 02:02:29 -0700 (PDT)
-Message-ID: <5cce0547-79de-4765-9797-093639c430ed@redhat.com>
-Date: Mon, 26 May 2025 11:02:28 +0200
+        Mon, 26 May 2025 02:06:11 -0700 (PDT)
+Message-ID: <d22512b9-d5f0-4e0f-9a4c-530767953f3c@redhat.com>
+Date: Mon, 26 May 2025 11:06:10 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,8 +90,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 05/10] ram-block-attribute: Introduce a helper to
- notify shared/private state changes
+Subject: Re: [PATCH v5 06/10] memory: Attach RamBlockAttribute to
+ guest_memfd-backed RAMBlocks
 To: Chenyi Qiang <chenyi.qiang@intel.com>, Alexey Kardashevskiy
  <aik@amd.com>, Peter Xu <peterx@redhat.com>,
  Gupta Pankaj <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -102,7 +102,7 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
  Baolu Lu <baolu.lu@linux.intel.com>, Gao Chao <chao.gao@intel.com>,
  Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
 References: <20250520102856.132417-1-chenyi.qiang@intel.com>
- <20250520102856.132417-6-chenyi.qiang@intel.com>
+ <20250520102856.132417-7-chenyi.qiang@intel.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -150,46 +150,104 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250520102856.132417-6-chenyi.qiang@intel.com>
+In-Reply-To: <20250520102856.132417-7-chenyi.qiang@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 20.05.25 12:28, Chenyi Qiang wrote:
-> A new state_change() helper is introduced for RamBlockAttribute
-> to efficiently notify all registered RamDiscardListeners, including
-> VFIO listeners, about memory conversion events in guest_memfd. The VFIO
-> listener can dynamically DMA map/unmap shared pages based on conversion
-> types:
-> - For conversions from shared to private, the VFIO system ensures the
->    discarding of shared mapping from the IOMMU.
-> - For conversions from private to shared, it triggers the population of
->    the shared mapping into the IOMMU.
+> A new field, ram_shared, was introduced in RAMBlock to link to a
+> RamBlockAttribute object, which centralizes all guest_memfd state
+> information (such as fd and shared_bitmap) within a RAMBlock.
 > 
-> Currently, memory conversion failures cause QEMU to quit instead of
-> resuming the guest or retrying the operation. It would be a future work
-> to add more error handling or rollback mechanisms once conversion
-> failures are allowed. For example, in-place conversion of guest_memfd
-> could retry the unmap operation during the conversion from shared to
-> private. However, for now, keep the complex error handling out of the
-> picture as it is not required:
+> Create and initialize the RamBlockAttribute object upon ram_block_add().
+> Meanwhile, register the object in the target RAMBlock's MemoryRegion.
+> After that, guest_memfd-backed RAMBlock is associated with the
+> RamDiscardManager interface, and the users will execute
+> RamDiscardManager specific handling. For example, VFIO will register the
+> RamDiscardListener as expected. The live migration path needs to be
+> avoided since it is not supported yet in confidential VMs.
 > 
-> - If a conversion request is made for a page already in the desired
->    state, the helper simply returns success.
-> - For requests involving a range partially in the desired state, there
->    is no such scenario in practice at present. Simply return error.
-> - If a conversion request is declined by other systems, such as a
->    failure from VFIO during notify_to_populated(), the failure is
->    returned directly. As for notify_to_discard(), VFIO cannot fail
->    unmap/unpin, so no error is returned.
-> 
-> Note that the bitmap status is updated before callbacks, allowing
-> listeners to handle memory based on the latest status.
+> Additionally, use the ram_block_attribute_state_change() helper to
+> notify the registered RamDiscardListener of these changes.
 > 
 > Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 > ---
+> Changes in v5:
+>      - Revert to use RamDiscardManager interface.
+>      - Move the object_new() into the ram_block_attribute_create()
+>        helper.
+>      - Add some check in migration path.
+> 
+> Changes in v4:
+>      - Remove the replay operations for attribute changes which will be
+>        handled in a listener in following patches.
+>      - Add some comment in the error path of realize() to remind the
+>        future development of the unified error path.
+> 
+> Changes in v3:
+>      - Use ram_discard_manager_reply_populated/discarded() to set the
+>        memory attribute and add the undo support if state_change()
+>        failed.
+>      - Didn't add Reviewed-by from Alexey due to the new changes in this
+>        commit.
+> 
+> Changes in v2:
+>      - Introduce a new field memory_attribute_manager in RAMBlock.
+>      - Move the state_change() handling during page conversion in this patch.
+>      - Undo what we did if it fails to set.
+>      - Change the order of close(guest_memfd) and memory_attribute_manager cleanup.
+> ---
+>   accel/kvm/kvm-all.c |  9 +++++++++
+>   migration/ram.c     | 28 ++++++++++++++++++++++++++++
+>   system/physmem.c    | 14 ++++++++++++++
+>   3 files changed, 51 insertions(+)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 51526d301b..2d7ecaeb6a 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -3089,6 +3089,15 @@ int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+>       addr = memory_region_get_ram_ptr(mr) + section.offset_within_region;
+>       rb = qemu_ram_block_from_host(addr, false, &offset);
+>   
+> +    ret = ram_block_attribute_state_change(RAM_BLOCK_ATTRIBUTE(mr->rdm),
+> +                                           offset, size, to_private);
+> +    if (ret) {
+> +        error_report("Failed to notify the listener the state change of "
+> +                     "(0x%"HWADDR_PRIx" + 0x%"HWADDR_PRIx") to %s",
+> +                     start, size, to_private ? "private" : "shared");
+> +        goto out_unref;
+> +    }
+> +
+>       if (to_private) {
+>           if (rb->page_size != qemu_real_host_page_size()) {
+>               /*
+> diff --git a/migration/ram.c b/migration/ram.c
+> index c004f37060..69c9a42f16 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -890,6 +890,13 @@ static uint64_t ramblock_dirty_bitmap_clear_discarded_pages(RAMBlock *rb)
+>   
+>       if (rb->mr && rb->bmap && memory_region_has_ram_discard_manager(rb->mr)) {
+>           RamDiscardManager *rdm = memory_region_get_ram_discard_manager(rb->mr);
+> +
+> +        if (object_dynamic_cast(OBJECT(rdm), TYPE_RAM_BLOCK_ATTRIBUTE)) {
+> +            error_report("%s: Live migration for confidential VM is not "
+> +                         "supported yet.", __func__);
+> +            exit(1);
+> +        }
+>
 
-I think this should be squashed into the previous patch: I fail to see 
-why the split makes sense.
+These checks seem conceptually wrong.
+
+I think if we were to special-case specific implementations, we should 
+do so using a different callback.
+
+But why should we bother at all checking basic live migration handling 
+("unsupported for confidential VMs") on this level, and even just 
+exit()'ing the process?
+
+All these object_dynamic_cast() checks in this patch should be dropped.
 
 -- 
 Cheers,
