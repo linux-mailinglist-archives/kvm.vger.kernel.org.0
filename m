@@ -1,355 +1,266 @@
-Return-Path: <kvm+bounces-47703-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47704-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A85B4AC3DC3
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 12:22:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79693AC3DE9
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 12:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 664E93AD257
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 10:21:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48084175A36
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 10:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975D41F4631;
-	Mon, 26 May 2025 10:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444331F4706;
+	Mon, 26 May 2025 10:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X1U7wzhy"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="arg5mIRZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A361E5B7D
-	for <kvm@vger.kernel.org>; Mon, 26 May 2025 10:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748254931; cv=fail; b=P3nP7Wa4bAPdcDFUo2soZDZ68muBgCmhIEGKxk8FelRT25vHx9rpsDrsUWed1YsrMysICRXDumo7M9REXXDlWEmjq17OzDsCYkFNjZzYpkAVOBzG9rvSv602GgCacg5qjFwU9LXbxSrM6ptAmzCwf3UvCUPAAr/ypKUSJG4UwCo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748254931; c=relaxed/simple;
-	bh=L3eOz5qtm9KR+K7vRCGqwaItQHT65Ctnwfw88SnKogM=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=H0Xhas3r/FYie9nB/6xofGlwn/wCFf2bQUu/ieAwr3RegOrMFdYyroIDRswMMi9HdlDIoiGwx5cbCWYovKBoDaSJMmu7fRlU/RG5AVtJnJyvhQpzXoKwDry2uSmfj5gXoHcbU0T7SiBtlVF6d3LQN07l0Ukeiv8QpKFpTEIXg9Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X1U7wzhy; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748254930; x=1779790930;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=L3eOz5qtm9KR+K7vRCGqwaItQHT65Ctnwfw88SnKogM=;
-  b=X1U7wzhyCvDXU2WiMN86+QBkNvS31duLN9HsLKe458vVb1JspOH/wt9I
-   bz752k/zym3H2+k0Cuyj00Am11HrLUVSI+x5qNKtznYwn23dcAtDIRJbj
-   NHLXVQe4XMn15/+jkI5XthkrdFpdAbkktcQNgkpICWMgur4FzDOyRsAoo
-   kq8n4OgWEWg1vzh3HvWNkv7l8fEepTIOnIt95WkMZlnsBtvUQkScdHkf/
-   ewdtSs+n0HdIfEhDicPpc6NQMoi1OqfD20jYt6L8+ElPhwvCMc42ed4qj
-   kjXSrGHPeik/IFZQN2MRdbPdT26DGK9D+KVGGRiqBD8T5Ivhe3ypmj8Xp
-   Q==;
-X-CSE-ConnectionGUID: 9FA+o1VETmSzlXRxnlN3PA==
-X-CSE-MsgGUID: Sf554XzRSc+4PgElSqt+ig==
-X-IronPort-AV: E=McAfee;i="6700,10204,11444"; a="67635524"
-X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
-   d="scan'208";a="67635524"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 03:22:09 -0700
-X-CSE-ConnectionGUID: oQ/RNkOrRC6GSa5JhBwIPQ==
-X-CSE-MsgGUID: 26v7HLneQoCcSP81N4ptDA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
-   d="scan'208";a="147076354"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 03:22:09 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 26 May 2025 03:22:08 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Mon, 26 May 2025 03:22:08 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.86)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.55; Mon, 26 May 2025 03:22:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=y9+RVlKeLmMooyQZiHTkwwbp6gC/mYHpHv9JvRYn7emheIkyzZLe41OCwKC5nCW1F5RTFjI3xTvbnwgG1Boh2yT/NRh9KjHfjFdqtqmaM3pxeSG0i2SknkRn3Bdcq4Wcvpz07J4ENoOKpvO/l3+P0wC3zrbilUpQq/KTBZg0ZCinW4hKZ/HMf5l9hVTnZI9HChtvPK0bppoLG5jwiAefSj6wgL+jT5xAbjTQTT1e93LCdcAGcRN8MMEOwIBsQ7bm2ryulWtm8En8gINZjD6wqZJ3RyucJXRqWn2uD4tagE96UiducnRfFs1B9tIYuo8ZiOI30J88YJ+XuaOmQLVLVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aLP54ku+DeeMcK05tHW2tqfeZdJhXvC3eCcKZ4u+INI=;
- b=G5dR62GeT0aE/kbSXDaPU9koy5JTHJWkMyDyI0cQrSWqYnaWm3DJIsYp0dgQ9vXWpfPa8hfeKFHZhbt9lAi4XZSbHMNOhau3yNQ5VkB0ZDA1rTHfsOkP5zjaMC6EwfVfmH7pHb1EI+3j0IHZECvWDtlLs/XlkL46nICRXhPs8cAvsV1/PvuX/jEI90QNl7EMBxUhdE7zG4hgyWuzg23K52CpuzGhII5ylm2N9Cd52LbS4GUuud/EXTayn7r02yuWERCsxxVmyF9ityGeMxB5RVaLqGCgcX8O6AYZQZmXfOB5pWbeQsuqLVC3xUzkmjluNMY5ot/aGfAO2p0tsEUJZg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
- CH3PR11MB8315.namprd11.prod.outlook.com (2603:10b6:610:17e::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8769.24; Mon, 26 May 2025 10:22:06 +0000
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95%4]) with mapi id 15.20.8769.022; Mon, 26 May 2025
- 10:22:06 +0000
-Message-ID: <b7bc6ce6-fdf4-43f7-b4b3-de0b3924f0fc@intel.com>
-Date: Mon, 26 May 2025 18:21:55 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 03/10] memory: Unify the definiton of
- ReplayRamPopulate() and ReplayRamDiscard()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>, "David
- Hildenbrand" <david@redhat.com>, Alexey Kardashevskiy <aik@amd.com>, Peter Xu
-	<peterx@redhat.com>, Gupta Pankaj <pankaj.gupta@amd.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, Michael Roth <michael.roth@amd.com>
-CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, Williams Dan J
-	<dan.j.williams@intel.com>, Zhao Liu <zhao1.liu@intel.com>, Baolu Lu
-	<baolu.lu@linux.intel.com>, Gao Chao <chao.gao@intel.com>, Xu Yilun
-	<yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
-References: <20250520102856.132417-1-chenyi.qiang@intel.com>
- <20250520102856.132417-4-chenyi.qiang@intel.com>
- <dca6ed89-e704-44ce-b9f1-deb3c6dd8dc3@linaro.org>
-Content-Language: en-US
-From: Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <dca6ed89-e704-44ce-b9f1-deb3c6dd8dc3@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: KL1P15301CA0056.APCP153.PROD.OUTLOOK.COM
- (2603:1096:820:3d::9) To DM3PR11MB8735.namprd11.prod.outlook.com
- (2603:10b6:0:4b::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3DB41C64;
+	Mon, 26 May 2025 10:36:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748255772; cv=none; b=fVQeLUdHQ4bQ2Q+hhiaV4QV1vsLykuxSovJCkIdC3Dkv6BhIm2ajSW4aAc04RvBdjzUKsQJfOJBGRb+ZADel7GIkA4fFJ8Q2e8YUDYJ2VtGSQgT7IsJiyS/6ywLV3pcRhP11TWvcK4WZi6Z+c5g7FhuZUWV0vd62UpAqi3fXCeQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748255772; c=relaxed/simple;
+	bh=v2ot0JcQJgQ2MawloZld+SCZWxXEa00cSsDt2/xFgEc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LV1BlPTPsre3cVlBPqYgEXZ+q+AwgIMMZsroJpSe+BkNQGez8rUr/UW+zguKSEkYceUUo00IpKJhQODh5i1Cm8trT2qDtWo6wdSNDL7cpSEXZSz6uVHCwjcO9D9acIrl5Cqz7bK+JSS8PVBAOu8d5SpgxsFQWwFp7U/JYLtti/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=arg5mIRZ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54QA2PaN003346;
+	Mon, 26 May 2025 10:36:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=WqoxIf
+	QWMfow3ZCWy7O0757ylIHWV6IVOxUQikGz9Ec=; b=arg5mIRZBDr/kDm+ncDq9r
+	uMWXY2+bNwHUYgGD1hTVIPSjEkBYuzPc43sqrAhpoKE0oAWNaAj8ghf6GxZZ+b/0
+	in+9Qf4ixx3kftr4ExmSIGTPc3SCMZWk2GFbSt9xcDY0BseJjQnDdrxXUe86HaH5
+	eHNaeuBCrZsmbLE4lOQSrWthHR13EjCBwZCMMbRk7CO+6dJ64iu3kBnjARKNebGT
+	UVnVmJTKPv3Ufvj+oI970NK+woPPCE7a3zSonLs6/80AqctEy0UVgpwL9kWi0ItA
+	cyYu6cfjbooNPFKjNJzYzpHw0UB10VZ1ul9A7Dd/eouplI4aXyI2HazDPaO1Zi5w
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46u3hrs2dm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 May 2025 10:36:08 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54Q89C0i010570;
+	Mon, 26 May 2025 10:36:07 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46usepns2m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 May 2025 10:36:07 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54QAa3jk15925648
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 26 May 2025 10:36:03 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3FFAB20043;
+	Mon, 26 May 2025 10:36:03 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B08CE20040;
+	Mon, 26 May 2025 10:36:02 +0000 (GMT)
+Received: from [9.111.82.242] (unknown [9.111.82.242])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 26 May 2025 10:36:02 +0000 (GMT)
+Message-ID: <609a3511-4dae-47b8-a6a6-45b8f3b989a8@linux.ibm.com>
+Date: Mon, 26 May 2025 12:36:02 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|CH3PR11MB8315:EE_
-X-MS-Office365-Filtering-Correlation-Id: 74aa65ad-0391-4053-d3c1-08dd9c3f29fe
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?eVRUNnFWb2VTT1pHb3RLZkJKMnVtd09Ca2FhcnZ4YjU0ck95WXlJeXFGN2lq?=
- =?utf-8?B?OEJWdC9yMWIrZk9XSzR3dE0xU0RhTElJM3crR1A1UjBPQXZtTlQ1a0l3S1Rv?=
- =?utf-8?B?ZHBZZHZTclRSN3JMcEcvZEJ6SzI0ZjdYeXNCejV1TDJBa1JzWUNocFBXRkxu?=
- =?utf-8?B?OVIrbjAzaVZ5R01LUm1OQVlSR1pkU042NHJYMldmZ05ISW0zR3hIYnBtSk45?=
- =?utf-8?B?ZzNBd01iWXhBbHFXbEl3d2FES3NsZWc4d1lBUXZwVUM1RFoyOU1VMnU3aEtl?=
- =?utf-8?B?NXgwUnE3eEtlN2NZWTV5bDZuRk1lQnNod2dTTTBxVHRUVnBzanVRRWxMUzRB?=
- =?utf-8?B?Y2tvczAxYVo3Y2Q1ekE4NkxYQjduWGF3c0o1eEc2WTRLUko0dllPU2thK0tw?=
- =?utf-8?B?bUJ1Z1hEenBlWVJDYThtQXRlZ1EzUGdxRDJWWTFUOEpEbGV1K3p0bktxdEJ5?=
- =?utf-8?B?QUlnM2N6SERjT1VNbW1Iem5vb2tFTmJWdFhMNmNwWFBXdkRrOWdiTytZSjRn?=
- =?utf-8?B?R25nT2R0QWFDU0lzRUpMYTl6R1IwcGpZeXpOYTBaUUkzKzJIcGlGTmdBUUUv?=
- =?utf-8?B?YjQwZFVEb3BsbUJTNElMemRFcUM4clljV000S2NQOEZGamRPaDhVVGV0QTcy?=
- =?utf-8?B?RDdGYXY0U0tMdnkzTy8zMityL0xleU1nQS9EVllWRVJnQXZrdFZjejRDQ2Qy?=
- =?utf-8?B?dmhPR3ZYV2VHSFg4UmhDbjNKS1c5OHZJbHJXQjhSbUlyUldjSHlMODc5dXpz?=
- =?utf-8?B?VHdxN0tlQ0V2YkNvMXNsRGxhV3VHZUppM3VHd29iMkR5VlRLdnJ6dEJuWTdN?=
- =?utf-8?B?UGxHMGhReHk5TXk0Wi8xQytRbU5BcjNoYUIrSVVIbjdrK2J6OXBtYXhJUkwr?=
- =?utf-8?B?cDl1NFdrWklWUEdFbHZZRWRVK3hWbDhtMFhnakhaVmY2bVl5NXVVTTE1bk5h?=
- =?utf-8?B?NkUwZzZiZVB6ZlQwNGNTdVN4TjAvQk9DU0JvWVc5cDAvOHdkc25HSHpLVEJw?=
- =?utf-8?B?SkdPUEZWTVNKUmdqT3B6NUZ4aUladnp2d0duM21rb0I5SFJRc0tpZVlWUFM2?=
- =?utf-8?B?NE9pd2hxdVFXaG9tcWhPd3VTTnJqeDBPcENhbEpSTDVIR09KVjMvOUg3dVZS?=
- =?utf-8?B?RWwzZ01KVUFuR1JWUVg5b3NCRHJZM1k3NHZ3N2dkZ3lSeDg5NVhWZUwyaWFx?=
- =?utf-8?B?QkQ1V0dCVGdraFc1M2lVY2h2Wk9qa2haaG5LcVowNDRBYld5L0Q0bGZBQlJv?=
- =?utf-8?B?TTE1eXBsZVIrNTQrNlIzcVE4OU1hSzhXeVpDY3VjcXk1MnVoSEFwRlcrSVlx?=
- =?utf-8?B?WVN3dFpzaVdnbDNhNllSNzYyTWprMTJIT2ZLOU5pWDRtM1J0aWwzYnkvMkla?=
- =?utf-8?B?VjJhVU9INnZzT0JJcmJ5OThHWEF2U2p6ZnI1aDhDdHJKVytuT05oYWVLS3VC?=
- =?utf-8?B?U1AySnBzc3JzdFNpWE1VeVd1ZTVXc1NZV1JYNmxZSkVxUTI3S01Yc2hHMlkx?=
- =?utf-8?B?Z3NJTk1zYmlNSFM0NDFxcEovbVRaTlJpbkczSjNwSE9yM0wvUDZRRHkxaSs5?=
- =?utf-8?B?YUMvWVg4VHJTRGdlbjRvazFEMTFRUDcwUVVkcll2WkNHek1JeDZLamw1ajRJ?=
- =?utf-8?B?R1JnRVBwZHAzSy9WZkorNTNsVUJBeXhxbHZzV05nU1M1OXprcDBaREFHYXo4?=
- =?utf-8?B?dzRFKzdaVFBlODJuRzVRZ0d1RHBQaEk0bnI5aWZmdW9rb1pWclFPYWFVeGVp?=
- =?utf-8?B?OENZZFlMMDlqQlRuVC9WNSsvWTRSemN0NXpZdmw4Zi9vSUhXUUxaTm9JZktk?=
- =?utf-8?B?ZVhlZUw5MXR3b1g4Tm8xZjczYjBpYmY0cWx1OHdzdU1CcGlnRXlPck9uMjEz?=
- =?utf-8?B?QUhLVmtSaExaTVFiNWhXWTl5c25ZTEt0R2xyREFNeWl2UVZ4NlNJRklhbGN3?=
- =?utf-8?Q?/8PZgOBspPM=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TjFSa2pMZ1ZSdGM1RTdDbUV0b2o0UW9Jc2dQY3lqOThvY3NEa3RocDdvQ0VJ?=
- =?utf-8?B?ZC9Tdk5kMHVDNjI2TURGVG1NaHBjRWJEcUxjY2hFK2laY1pwK2w3UCtMTmFO?=
- =?utf-8?B?V2FObVBLd2VmTnVteDc1b0ZFZXVQZVV3c3loYjFWVlJNTXRFZXhkTFFiT0hS?=
- =?utf-8?B?QUh2QmJ4R3NXVjZZWExlTFV6cUlxTDZJYU53MXArblo1YUhJaXdqbUtLWWNm?=
- =?utf-8?B?aTZpV29qUDhvYTVTbTk1anJleERNZWtnSUxzdlAyNFFkRVE3UHJZbWY5T1l1?=
- =?utf-8?B?S3pzTFVyMzJyKzhZOEZKUG5URFhzaW5vUFlZVitnQUljaTljd0NzdGx4SHNV?=
- =?utf-8?B?NkJUbVBUcmVQWVZwOEdvQTIzd0hrVTh0VTUyNDNkWXBOR1JYUzR4ZnV6N056?=
- =?utf-8?B?clBIS3Vuc3pHZkliZjd5WEVBYWVtd3V6MC9RZE1qZ25nbDJ3R0F6QW9PNWNa?=
- =?utf-8?B?MjJPeFYxVnJScW1sMVJ0cFk5Y2NTaCtZK0daaEM1c1hYbGNwQUh6bDdoVEdE?=
- =?utf-8?B?cEdVZEhOMTZzQTBISEJQNGFBOWp3QndzWDNJTSt0VTNjczJZQ2g3TW5zSFhp?=
- =?utf-8?B?aHBLWUdHKzA1R3pGZTNTNmpTQlhGb0tnNE43UC9laGJZNW45YWdBNVlGSXZx?=
- =?utf-8?B?dkF3cVA1alpUODZCdTNuL1VrYm52QmxjbjdqUjBqYTZOaEdFRk50a1dTWlFS?=
- =?utf-8?B?RDYzZWptbGhFYXUvQW9GWVVtdVBGTkphYjNIVStoc0N1QmdpSWJkblZyWGdL?=
- =?utf-8?B?eTlsM2UxWFBzKyttUFN1WGpaZWZLQXBELzIwSXI3Ryt6YTgyamg5NDF2TjBp?=
- =?utf-8?B?T0J5djBKUUxyYituemo5WFNDR1dnUFNvRC9zSEtEa1pQajJxUHhQRGh3N2hm?=
- =?utf-8?B?ZWxUZVdoSVAvY1BxYlpxY2JNL1RudVcvY0d0NFZ2eUM5YUdPMk5EcDNXcmRR?=
- =?utf-8?B?T1pBVm43ZnZOenNNTnF0QmY2QlRhekExRFRKM2VRbGliSUlxRm45L1lVSXlC?=
- =?utf-8?B?a2JEbDNzTU1tSGFWZEZ6MHlxeWZrZStXTDJGK3lNOVZrZE8zQmFITThEWVJQ?=
- =?utf-8?B?SER6bnVHQklIVTdjVDk2bXdGVnhVQ1Fsa0Zhb3UvSlZaVmNpKzFXVWcrZm5u?=
- =?utf-8?B?WXd2eG9yRnZPRlVWS2ppZUF4dEZsaGtlVENzT3RSQjl1UVdEQU93VFZJV0Z3?=
- =?utf-8?B?U1BQUEdMbjgxRENJNTZURmtNSCtJUTY3UkNnclZuNDl4SVRSb0t3Q2tUVFFB?=
- =?utf-8?B?VWQrM1VpMkJGRTBML1VSamZZWGdrQ0FxVE8wUFRzaXR6K1ZwK2N6YklmUUJE?=
- =?utf-8?B?eEw2Y3ZGVlpiTXVWcTYxelhQTThFdWpsR1puY3lxbkM5K2RLeWEzcnhheGlK?=
- =?utf-8?B?WWVBbDdWOGUxN1JpZW9jLzNLZnRsRHl0UHFIYWdkY2VheDNiWVFDblorNWVt?=
- =?utf-8?B?M1Z2eXlUYVgyKzBSZjBHLzg0SEhEZVhyMUoyL0Z6aW9KVmNlK09nUzd5WGNq?=
- =?utf-8?B?d09DN3dIT05aKys1clBpa3V4MmlrSkZyL3lqa0VrUVhCc0s4dlFnZjBBV3Aw?=
- =?utf-8?B?b3JJTlRnWE5naHlqSWh2SlJ6bFcwWktXZHdmSFVrSUpkMWhEUkU4Q0pVbFRa?=
- =?utf-8?B?ZWk4Z2txaHpqS1BPRElxOWtIaXdZREQzUEcyM2Ura0lRTHJNWG9ucjBtQWM2?=
- =?utf-8?B?NG1pcUxZOEtScVZwZ1l4eUNlMUxFa1Q0bkNSN1BlWU5lTHJIWGdUaEdsK3hm?=
- =?utf-8?B?SHRyY1ZIRXNzYVVOVWpNWGcydDNKUGlyT1J6U2RKczJtZER0eHgwWTFSa0Qx?=
- =?utf-8?B?a3N0UXY3Vm1vVDlYdFRvOUprODRIclFVRDQ5VG5KME9OMld3akZDZFZ2dzk4?=
- =?utf-8?B?ZFJibEVPNnBiWjdIUXNld3poVzBmb2RnSytVR3NjdFBnSXppREdDbXliK2d5?=
- =?utf-8?B?cWxGM3R1OXJhTUp3enMrSjdOL2M2bWM4TDhTVzhrRExhUmlZQ3EyWkxUMDd0?=
- =?utf-8?B?N3QvenVlZ3UxYXc1UjZkN1ltNytJbjJVZmVIblZDL2dpbVBoclRqdk1xTXhZ?=
- =?utf-8?B?ZklEdDdpMkpaZlhmRjE4Q3B0RE9VQnVGYmFYaTB6Q3hJZkpzc3JFTVZDVHNr?=
- =?utf-8?B?NFVWa1dpU0hpR29Xa25tNEVTd0d1cWJ1c1ZXK3RlSnJSSmhyMWEyeml5WENL?=
- =?utf-8?B?Vmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74aa65ad-0391-4053-d3c1-08dd9c3f29fe
-X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2025 10:22:06.1229
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6yJgtO8JqGx6OufqyFe8krXuy5OpJsAW0OM5j3za68D0a9b6n9lswJO0yj7j8Mefvniw4hKbcip06UxkehAOZQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8315
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/3] KVM: s390: Always allocate esca_block
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+References: <20250522-rm-bsca-v3-0-51d169738fcf@linux.ibm.com>
+ <20250522-rm-bsca-v3-2-51d169738fcf@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250522-rm-bsca-v3-2-51d169738fcf@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=AOOMbaiN c=1 sm=1 tr=0 ts=68344418 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=Nht_sg-W_4d_RaGhDA8A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: 7OfBPDgFMme-oQ1W_vOD5PVhYIbrckU4
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI2MDA4OSBTYWx0ZWRfXwOUVdFRdTFwm haewGcf/C2cnQQL4uDqa0y3F277AAlcbx5ieBbsjz7gxLDiQd7baoCip64O5h7A/IEhpSZy0Hsr Iz7SXQaShfB0Bg8s0YQvuEjkBYMzmBKI0BIwnUcB758fUH22f8ZTlXhFeZCB/jQRBw1rI50vo69
+ 0rX5T+Aue6zb6wDPq1nr3UcQX+v040p6pmgM5uobQ2H2fFUmRoABtTz4nkivWkr1rT7DUyEfPC2 /dG+rwz1kCUlnoZWpQ20ibIHZZ3HykXoJ4xBrnUH4Q/vbtO1417BC/ZTPN1fOJw+0ddxsbDsbFe V30uTVLupanL4C03HjfOUZoFrJTPWx+oLILlGiX7WSIegj3djXDUulzSVQA2N4wrg6w5UdOgvm9
+ EQALPnzEV63MKWPOE+UKWNQaewkrHv2o/hINyp1jXrkU23tbN8FoXWPvg5XVSxbpRX5FXFDr
+X-Proofpoint-GUID: 7OfBPDgFMme-oQ1W_vOD5PVhYIbrckU4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-26_05,2025-05-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 adultscore=0 bulkscore=0 mlxscore=0 spamscore=0
+ impostorscore=0 mlxlogscore=999 malwarescore=0 lowpriorityscore=0
+ phishscore=0 clxscore=1011 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505260089
 
-
-
-On 5/26/2025 5:35 PM, Philippe Mathieu-Daudé wrote:
-> Hi Chenyi Qiang,
+On 5/22/25 11:31 AM, Christoph Schlameuss wrote:
+> Instead of allocating a BSCA and upgrading it for PV or when adding the
+> 65th cpu we can always use the ESCA.
 > 
-> On 20/5/25 12:28, Chenyi Qiang wrote:
->> Update ReplayRamDiscard() function to return the result and unify the
->> ReplayRamPopulate() and ReplayRamDiscard() to ReplayRamDiscardState() at
->> the same time due to their identical definitions. This unification
->> simplifies related structures, such as VirtIOMEMReplayData, which makes
->> it cleaner.
->>
->> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> ---
->> Changes in v5:
->>      - Rename ReplayRamStateChange to ReplayRamDiscardState (David)
->>      - return data->fn(s, data->opaque) instead of 0 in
->>        virtio_mem_rdm_replay_discarded_cb(). (Alexey)
->>
->> Changes in v4:
->>      - Modify the commit message. We won't use Replay() operation when
->>        doing the attribute change like v3.
->>
->> Changes in v3:
->>      - Newly added.
->> ---
->>   hw/virtio/virtio-mem.c  | 21 ++++++++++-----------
->>   include/system/memory.h | 36 +++++++++++++++++++-----------------
->>   migration/ram.c         |  5 +++--
->>   system/memory.c         | 12 ++++++------
->>   4 files changed, 38 insertions(+), 36 deletions(-)
+> The only downside of the change is that we will always allocate 4 pages
+> for a 248 cpu ESCA instead of a single page for the BSCA per VM.
+> In return we can delete a bunch of checks and special handling depending
+> on the SCA type as well as the whole BSCA to ESCA conversion.
 > 
+> As a fallback we can still run without SCA entries when the SIGP
+> interpretation facility or ESCA are not available.
 > 
->> diff --git a/include/system/memory.h b/include/system/memory.h
->> index 896948deb1..83b28551c4 100644
->> --- a/include/system/memory.h
->> +++ b/include/system/memory.h
->> @@ -575,8 +575,8 @@ static inline void
->> ram_discard_listener_init(RamDiscardListener *rdl,
->>       rdl->double_discard_supported = double_discard_supported;
->>   }
->>   -typedef int (*ReplayRamPopulate)(MemoryRegionSection *section, void
->> *opaque);
->> -typedef void (*ReplayRamDiscard)(MemoryRegionSection *section, void
->> *opaque);
->> +typedef int (*ReplayRamDiscardState)(MemoryRegionSection *section,
->> +                                     void *opaque);
+> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_host.h |   1 -
+>   arch/s390/kvm/interrupt.c        |  71 +++++------------
+>   arch/s390/kvm/kvm-s390.c         | 161 ++++++---------------------------------
+>   arch/s390/kvm/kvm-s390.h         |   4 +-
+>   4 files changed, 45 insertions(+), 192 deletions(-)
 > 
-> While changing this prototype, please add a documentation comment.
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index f51bac835260f562eaf4bbfd373a24bfdbc43834..d03e354a63d9c931522c1a1607eba8685c24527f 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -631,7 +631,6 @@ struct kvm_s390_pv {
+>   
 
 [...]
 
-> 
->>   /*
->>    * RamDiscardManagerClass:
->> @@ -650,36 +650,38 @@ struct RamDiscardManagerClass {
->>       /**
->>        * @replay_populated:
->>        *
->> -     * Call the #ReplayRamPopulate callback for all populated parts
->> within the
->> -     * #MemoryRegionSection via the #RamDiscardManager.
->> +     * Call the #ReplayRamDiscardState callback for all populated
->> parts within
->> +     * the #MemoryRegionSection via the #RamDiscardManager.
->>        *
->>        * In case any call fails, no further calls are made.
->>        *
->>        * @rdm: the #RamDiscardManager
->>        * @section: the #MemoryRegionSection
->> -     * @replay_fn: the #ReplayRamPopulate callback
->> +     * @replay_fn: the #ReplayRamDiscardState callback
->>        * @opaque: pointer to forward to the callback
->>        *
->>        * Returns 0 on success, or a negative error if any notification
->> failed.
->>        */
->>       int (*replay_populated)(const RamDiscardManager *rdm,
->>                               MemoryRegionSection *section,
->> -                            ReplayRamPopulate replay_fn, void *opaque);
->> +                            ReplayRamDiscardState replay_fn, void
->> *opaque);
->>         /**
->>        * @replay_discarded:
->>        *
->> -     * Call the #ReplayRamDiscard callback for all discarded parts
->> within the
->> -     * #MemoryRegionSection via the #RamDiscardManager.
->> +     * Call the #ReplayRamDiscardState callback for all discarded
->> parts within
->> +     * the #MemoryRegionSection via the #RamDiscardManager.
->>        *
->>        * @rdm: the #RamDiscardManager
->>        * @section: the #MemoryRegionSection
->> -     * @replay_fn: the #ReplayRamDiscard callback
->> +     * @replay_fn: the #ReplayRamDiscardState callback
->>        * @opaque: pointer to forward to the callback
->> +     *
->> +     * Returns 0 on success, or a negative error if any notification
->> failed.
->>        */
->> -    void (*replay_discarded)(const RamDiscardManager *rdm,
->> -                             MemoryRegionSection *section,
->> -                             ReplayRamDiscard replay_fn, void *opaque);
->> +    int (*replay_discarded)(const RamDiscardManager *rdm,
->> +                            MemoryRegionSection *section,
->> +                            ReplayRamDiscardState replay_fn, void
->> *opaque);
->>         /**
->>        * @register_listener:
->> @@ -722,13 +724,13 @@ bool ram_discard_manager_is_populated(const
->> RamDiscardManager *rdm,
->>     int ram_discard_manager_replay_populated(const RamDiscardManager
->> *rdm,
->>                                            MemoryRegionSection *section,
->> -                                         ReplayRamPopulate replay_fn,
->> +                                         ReplayRamDiscardState
->> replay_fn,
->>                                            void *opaque);
->>   -void ram_discard_manager_replay_discarded(const RamDiscardManager
->> *rdm,
->> -                                          MemoryRegionSection *section,
->> -                                          ReplayRamDiscard replay_fn,
->> -                                          void *opaque);
->> +int ram_discard_manager_replay_discarded(const RamDiscardManager *rdm,
->> +                                         MemoryRegionSection *section,
->> +                                         ReplayRamDiscardState
->> replay_fn,
->> +                                         void *opaque);
-> 
-> Similar for ram_discard_manager_replay_populated() and
-> ram_discard_manager_replay_discarded(), since you understood
-> what they do :)
+>   int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   {
+> -	gfp_t alloc_flags = GFP_KERNEL_ACCOUNT;
+> -	int i, rc;
+> +	gfp_t alloc_flags = GFP_KERNEL_ACCOUNT | __GFP_ZERO;
+>   	char debug_name[16];
+> -	static unsigned long sca_offset;
+> +	int i, rc;
+>   
+>   	rc = -EINVAL;
+>   #ifdef CONFIG_KVM_S390_UCONTROL
+> @@ -3358,17 +3341,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   	if (!sclp.has_64bscao)
+>   		alloc_flags |= GFP_DMA;
+>   	rwlock_init(&kvm->arch.sca_lock);
+> -	/* start with basic SCA */
+> -	kvm->arch.sca = (struct bsca_block *) get_zeroed_page(alloc_flags);
+> -	if (!kvm->arch.sca)
+> -		goto out_err;
+>   	mutex_lock(&kvm_lock);
+> -	sca_offset += 16;
+> -	if (sca_offset + sizeof(struct bsca_block) > PAGE_SIZE)
+> -		sca_offset = 0;
+> -	kvm->arch.sca = (struct bsca_block *)
+> -			((char *) kvm->arch.sca + sca_offset);
+> +
+> +	kvm->arch.sca = alloc_pages_exact(sizeof(*kvm->arch.sca), alloc_flags);
 
-Sure, will do. Thanks!
+kvm->arch.sca is (void *) at the point of this patch, which makes this a 
+very bad idea. Granted, you fix that up in the next patch but this is 
+still wrong.
 
-> 
-> Thanks!
-> 
-> Phil.
+Any reason why you have patch #3 at all?
+We could just squash it and avoid this problem?
+
+>   	mutex_unlock(&kvm_lock);
+> +	if (!kvm->arch.sca)
+> +		goto out_err;
+>   
+>   	sprintf(debug_name, "kvm-%u", current->pid);
+>   
+
+[...]
+
+>   /* needs disabled preemption to protect from TOD sync and vcpu_load/put */
+> @@ -3919,7 +3808,7 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
+>   		vcpu->arch.sie_block->eca |= ECA_IB;
+>   	if (sclp.has_siif)
+>   		vcpu->arch.sie_block->eca |= ECA_SII;
+> -	if (sclp.has_sigpif)
+> +	if (kvm_s390_use_sca_entries())
+>   		vcpu->arch.sie_block->eca |= ECA_SIGPI;
+>   	if (test_kvm_facility(vcpu->kvm, 129)) {
+>   		vcpu->arch.sie_block->eca |= ECA_VX;
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 8d3bbb2dd8d27802bbde2a7bd1378033ad614b8e..2c8e177e4af8f2dab07fd42a904cefdea80f6855 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -531,7 +531,7 @@ int kvm_s390_handle_per_event(struct kvm_vcpu *vcpu);
+>   /* support for Basic/Extended SCA handling */
+>   static inline union ipte_control *kvm_s390_get_ipte_control(struct kvm *kvm)
+>   {
+> -	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
+> +	struct esca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
+
+Remove the comment as well please
+
+>   
+>   	return &sca->ipte_control;
+>   }
+> @@ -542,7 +542,7 @@ static inline int kvm_s390_use_sca_entries(void)
+>   	 * might use the entries. By not setting the entries and keeping them
+>   	 * invalid, hardware will not access them but intercept.
+>   	 */
+> -	return sclp.has_sigpif;
+> +	return sclp.has_sigpif && sclp.has_esca;
+>   }
+>   void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
+>   				     struct mcck_volatile_info *mcck_info);
 > 
 
 
