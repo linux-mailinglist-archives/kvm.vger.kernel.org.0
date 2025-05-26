@@ -1,122 +1,260 @@
-Return-Path: <kvm+bounces-47712-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47713-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4E38AC3EFF
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 13:59:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C95E0AC3F0F
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 14:10:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3CDE16D617
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 11:59:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 843F3174FA0
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 12:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5461FC0ED;
-	Mon, 26 May 2025 11:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130A61FDA9B;
+	Mon, 26 May 2025 12:10:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ikAI/jXo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDSUbvmN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F891917F4;
-	Mon, 26 May 2025 11:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601371FC7D2
+	for <kvm@vger.kernel.org>; Mon, 26 May 2025 12:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748260783; cv=none; b=kevbb0M3rBbFwkuGD05rm/ZNzxbU4M0cwVkLw18XZ0tXvfHJl43Kpvv7lZdo9DMXfqVYN0G6rZM07OVbG5aa1VxOGLcT2lKsIStv+YIvR/1vGXhn0JpxvG3p9VhMAxxURK2dvNWhEuGQ8L9zyDhOZpPqHf3a8bU4cYM0xM8D1kU=
+	t=1748261408; cv=none; b=OhUtJUeLXDCUIgUJSBOPAuHP1Lp1OSUlacAO88tCEMOL5inXhHsbvvHg/0i2GGUKCzfF5100jtMPvRHnvOwq+kkASJMikvgB1WrExP6VHeG48mjrktr5cwuIHCQHlCvzIsTVBOUX3kuRJqqfkhDN5nfBwvXeceipLRm00gJ8xD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748260783; c=relaxed/simple;
-	bh=MnHpRjPvW3aq1b/uS80zhdjWa9KR/tq+IPd/wUVedkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GGsE/luxuYL2zQWiaUUvjJCwbbzZrCmFqSQBh1LjvrVrmCiopm0LmE1RUyxraJ2uHl4SGsAfpGfSQEYzDstEnbRYd1SVQnmHCVqXhksizchL9hzopWYSi7xLqVgX7UEuhOIF1l0k0GXYJfuq7syYa/zJS6Oi44Oncd7i0TgFwrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ikAI/jXo; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54Q94jqD003410;
-	Mon, 26 May 2025 11:59:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=qEcsi4sugToy0puC4SQ6ejY5Nd4Qv8
-	pEwggNDelhiwE=; b=ikAI/jXoBAXdrLhqfWEengQNog0rmVjRbsGUYtqo7gSyTh
-	N6aMMiQqh6QzmYhAsKTyT/z+EJ+4T4egr2tdq5I7gCinwmk8zOSpNMLOGUVmBGst
-	K3sxuPUoI+J7YgstD0YiaDB6UAQWGnx8qSH2li9kSuOXi6Fdt2xrt0q/IEA5/cNh
-	EjO+/oACNA1ug7uwyX0qcfiKo820SSAYP6694P8GIcjaX1QUFoxQMYD/QY9+kthQ
-	sxMl0DrxDk8OOz8lcJwrVRk5YRU24fVWaLzCsGDDNq2az4nNjRjkWtNp2F0Dkg+S
-	xri9oEl0fSiYzmT/kseKTHa5sKqj3ukvdwVDPdLQ==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46u4hn938m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 May 2025 11:59:38 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54Q7kSQZ010727;
-	Mon, 26 May 2025 11:59:37 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46uru0e46n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 May 2025 11:59:37 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54QBxX2S29491904
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 26 May 2025 11:59:33 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8EC2520043;
-	Mon, 26 May 2025 11:59:33 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DFEF220040;
-	Mon, 26 May 2025 11:59:32 +0000 (GMT)
-Received: from osiris (unknown [9.111.60.222])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 26 May 2025 11:59:32 +0000 (GMT)
-Date: Mon, 26 May 2025 13:59:31 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        borntraeger@de.ibm.com, seiden@linux.ibm.com, nsg@linux.ibm.com,
-        nrb@linux.ibm.com, david@redhat.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, gor@linux.ibm.com, schlameuss@linux.ibm.com
-Subject: Re: [PATCH v2 4/5] KVM: s390: refactor and split some gmap helpers
-Message-ID: <20250526115931.13937Ce7-hca@linux.ibm.com>
-References: <20250520182639.80013-1-imbrenda@linux.ibm.com>
- <20250520182639.80013-5-imbrenda@linux.ibm.com>
- <5e058fd1-ccee-43c3-92eb-ad72d2dbc1f3@linux.ibm.com>
+	s=arc-20240116; t=1748261408; c=relaxed/simple;
+	bh=moF0IQ2rO67KpCSP6WDey4hHJ1Upq3MjGmq9ovgCilU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B3RlhdcHV6aFOGQuc33AlH/y5bESM8bNdi8Fd/0jCI4aFHyzV6Tpx+xfe7fLH+5ApAg9jZ2OC2NiZSDJbj63M+LezSl4AWJ782/+TDc4coDBrjIyKubBmAMk0TGJlVGPML4LtlNNSKxmyVZkMSudY3WejCk/uPhFx5ViKZemVQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YDSUbvmN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748261405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2Wk87Cm7jjBBm8iiBlCN+GurF/4VqzUoHWzk9TpnoUU=;
+	b=YDSUbvmNkUU6wg513O6EbQP8hz9jFy/J3DITAlr1N/0RRzFaWnt0S11A1p+9PbkcBQcaxf
+	O6JrGwi3p6GiIVEhxkxBeIeuYxKwlY1c4ZZIFeJCK+ZhBn6hVLQCnm3LSi/vN5gXobCJwP
+	3ioFqCwSB5b4ihRg7uSIh9wNrTCp4PE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-103-oBewJTVZOtaMYWVseQXjHg-1; Mon, 26 May 2025 08:10:03 -0400
+X-MC-Unique: oBewJTVZOtaMYWVseQXjHg-1
+X-Mimecast-MFC-AGG-ID: oBewJTVZOtaMYWVseQXjHg_1748261403
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43e9b0fd00cso11365925e9.0
+        for <kvm@vger.kernel.org>; Mon, 26 May 2025 05:10:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748261403; x=1748866203;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2Wk87Cm7jjBBm8iiBlCN+GurF/4VqzUoHWzk9TpnoUU=;
+        b=YxdGtj7Dl0ijIbcofkFEIutjN5HGXwzMeCcapKZ+YP8KnOvy8JYskRq4RIbufVDapH
+         +wLPRKlXWu/5BPAKj4ij2gCd37yHplkH+EqVvY1Xui92yA41cijaj4Jw3BP3Wpdg42eu
+         LiE+xG6G7QaCAdyL0DxfwxLm7lo6XlE35v0sa23DRjnexXS+CfwZ1H8tyNkLIXtAnazt
+         IoeO7I2qU/c8g7/B9GW43O26S6BOJLDSfcih56/KGQt23ehmAWsB7q5zYY57U5/hdYXO
+         GVUpNg+EqzWz2r+JJ8V9EVzKw+36slHr6y75y48mZveF8TcY0bLs0JtEB6HObP+hRdie
+         6VOg==
+X-Forwarded-Encrypted: i=1; AJvYcCUoSGPLl+MJwW5d+qLFE6EBvVhcrCdRjTpPblUuUaTFqYQ45ub3EfNLahTEQjjH8ErH8Fw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxisRMgD8h0b4IuY9qkpWeF1BnMg3oZ2AwG2LSSfoqzhjNtZEM6
+	VVHnE6x7r+i0c8b1ntom0RbgrJbQAN44k90PxXjCZcC2FBMm0fNivQTCFYOb/rFCxH25MUMJWmm
+	w10PtdOVJkv7zSTkhO9Y1iFuHbyxhLj1ItKIN0qjD7uK49nskvo/dkw==
+X-Gm-Gg: ASbGnctZfXKptzkdWKHeRIFp1lQz30fRpC/qLmoFHAsrpIuO4G8lOpWBusUIrrC5ueh
+	qsBQ36UtdNWDiULcwIoVI/EbP0N+hyGXauPUGxKRPi4G1VSca44zzI5lNa6PX1focjHM/v6fD9U
+	WlfSgFizXmONebBa6z/jkhbyowMsmJ72PDJ/3K6PYp9g7U9qR8PpBGkxlERRISg6y7GFu4nKPji
+	D4BNgPnU0XLNmlIFonc+YsO9jWg+AiGbjfGPjZbtu2NyflvF+Bkg+N5+rAwBtCJgh/2OBJtK25G
+	xnp4gj9FDiIfxUDKJN03he+AVkHnNPM4nM0fBD4mDUQ=
+X-Received: by 2002:a05:600c:3588:b0:442:f904:1305 with SMTP id 5b1f17b1804b1-44c7aa382c7mr80905445e9.6.1748261402624;
+        Mon, 26 May 2025 05:10:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGuXOWKXwKh3t9jsw1KbvqY/91/N1BDZCPncjgfrfmKEI0om76KSci+fI8LxzWcVgWgV7QZGQ==
+X-Received: by 2002:a05:600c:3588:b0:442:f904:1305 with SMTP id 5b1f17b1804b1-44c7aa382c7mr80905135e9.6.1748261402211;
+        Mon, 26 May 2025 05:10:02 -0700 (PDT)
+Received: from [192.168.3.141] (p57a1aec8.dip0.t-ipconnect.de. [87.161.174.200])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f23bfd54sm244727325e9.17.2025.05.26.05.10.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 May 2025 05:10:01 -0700 (PDT)
+Message-ID: <f2e8c15a-cbb9-4d17-9ee2-87567e36e8ea@redhat.com>
+Date: Mon, 26 May 2025 14:10:00 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e058fd1-ccee-43c3-92eb-ad72d2dbc1f3@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=HvB2G1TS c=1 sm=1 tr=0 ts=683457aa cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=M7XJmygFYX4lr_Cfcu8A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: 1pBigA7jbHTWY1yjCHMM0voVyFDbOolU
-X-Proofpoint-ORIG-GUID: 1pBigA7jbHTWY1yjCHMM0voVyFDbOolU
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI2MDA5OCBTYWx0ZWRfX/3m1et90QLGw t/3b1/zXdsMNMmT0GOYTl/yn8WRsG0OBD9oRmDL9oe8Nf/ODe4sfpQ531OL1Ayfgt3ev3CpK/cN 34366jWsRR9yQF75ixyX6s0+JAJvv24I1lW/+3mWwBqg7JjrfpOA3b1M64MPYj6varTn1ETgtEP
- /ZFNrBBP7H20qrp7B9FQMqOuP6yGuym82vu2O/kwsrtIMU9yhehuLu3VE+8ebh200H76aw3dgJn IBZx7/jEE7UpbaFxwcH2ZM3ISadA63t8FR9KYUD9zJ0NripIxEcGDq277bUTWUXk3uMDJQ1WVwm mX69mhPP48LD4G8tCIg84xvshWd+LLwG7dq8Z1RvF15u/nhf/TjKjU+Cs46EnJ1WCadeagrMy16
- 73NeUrkQna5arvegPGJH7TYHZsioeNH7IO/h3WThNcNkqJnBL8iY49y49JVi+7XTmj+UeaQf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-26_06,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 bulkscore=0 lowpriorityscore=0 phishscore=0
- clxscore=1015 malwarescore=0 mlxlogscore=730 impostorscore=0 spamscore=0
- mlxscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505260098
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 10/10] ram-block-attribute: Add more error handling
+ during state changes
+To: Chenyi Qiang <chenyi.qiang@intel.com>, Alexey Kardashevskiy
+ <aik@amd.com>, Peter Xu <peterx@redhat.com>,
+ Gupta Pankaj <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Michael Roth <michael.roth@amd.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Williams Dan J <dan.j.williams@intel.com>, Zhao Liu <zhao1.liu@intel.com>,
+ Baolu Lu <baolu.lu@linux.intel.com>, Gao Chao <chao.gao@intel.com>,
+ Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
+References: <20250520102856.132417-1-chenyi.qiang@intel.com>
+ <20250520102856.132417-11-chenyi.qiang@intel.com>
+ <6b5957fa-8036-40b6-b79d-db5babb5f7b9@redhat.com>
+ <1674a16c-e4fb-4702-a21d-9c4923528b2f@intel.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <1674a16c-e4fb-4702-a21d-9c4923528b2f@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 26, 2025 at 01:17:35PM +0200, Janosch Frank wrote:
-> On 5/20/25 8:26 PM, Claudio Imbrenda wrote:
-> > +
-> > +obj-$(subst m,y,$(CONFIG_KVM))	+= gmap_helpers.o
+On 26.05.25 12:19, Chenyi Qiang wrote:
 > 
-> So gmap.o depends on PGSTE but gmap_helpers.o depends on KVM.
-> Yes, PGSTE is Y if KVM is set, but this looks really strange.
 > 
-> @Heiko:
-> Can we move away from CONFIG_PGSTE and start using CONFIG_KVM instead?
-> Well, maybe this goes away with Claudio's rework anyway.
+> On 5/26/2025 5:17 PM, David Hildenbrand wrote:
+>> On 20.05.25 12:28, Chenyi Qiang wrote:
+>>> The current error handling is simple with the following assumption:
+>>> - QEMU will quit instead of resuming the guest if kvm_convert_memory()
+>>>     fails, thus no need to do rollback.
+>>> - The convert range is required to be in the desired state. It is not
+>>>     allowed to handle the mixture case.
+>>> - The conversion from shared to private is a non-failure operation.
+>>>
+>>> This is sufficient for now as complext error handling is not required.
+>>> For future extension, add some potential error handling.
+>>> - For private to shared conversion, do the rollback operation if
+>>>     ram_block_attribute_notify_to_populated() fails.
+>>> - For shared to private conversion, still assert it as a non-failure
+>>>     operation for now. It could be an easy fail path with in-place
+>>>     conversion, which will likely have to retry the conversion until it
+>>>     works in the future.
+>>> - For mixture case, process individual blocks for ease of rollback.
+>>>
+>>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+>>> ---
+>>>    system/ram-block-attribute.c | 116 +++++++++++++++++++++++++++--------
+>>>    1 file changed, 90 insertions(+), 26 deletions(-)
+>>>
+>>> diff --git a/system/ram-block-attribute.c b/system/ram-block-attribute.c
+>>> index 387501b569..0af3396aa4 100644
+>>> --- a/system/ram-block-attribute.c
+>>> +++ b/system/ram-block-attribute.c
+>>> @@ -289,7 +289,12 @@ static int
+>>> ram_block_attribute_notify_to_discard(RamBlockAttribute *attr,
+>>>            }
+>>>            ret = rdl->notify_discard(rdl, &tmp);
+>>>            if (ret) {
+>>> -            break;
+>>> +            /*
+>>> +             * The current to_private listeners (VFIO dma_unmap and
+>>> +             * KVM set_attribute_private) are non-failing operations.
+>>> +             * TODO: add rollback operations if it is allowed to fail.
+>>> +             */
+>>> +            g_assert(ret);
+>>>            }
+>>>        }
+>>>    
+>>
+>> If it's not allowed to fail for now, then patch #8 does not make sense
+>> and should be dropped :)
+> 
+> It was intended for future extension as in-place conversion to_private
+> allows it to fail. So I add the patch #8.
+> 
+> But as you mentioned, since the conversion path is changing, and maybe
+> it is easier to handle from KVM code directly. Let me drop patch #8 and
+> wait for the in-place conversion to mature.
 
-Sure, I'd appreciate if we can get rid of config options.
+Makes sense. I'm afraid it might all be a bit complicated to handle: 
+vfio can fail private -> shared conversion and KVM the shared -> private 
+conversion.
+
+So recovering ... will not be straight forward once multiple pages are 
+converted.
+
+> 
+>>
+>> The implementations (vfio) should likely exit() instead on unexpected
+>> errors when discarding.
+> 
+> After drop patch #8, maybe keep vfio discard handling as it was. Adding
+> an additional exit() is also OK to me since it's non-fail case.
+> 
+>>
+>>
+>>
+>> Why not squash all the below into the corresponding patch? Looks mostly
+>> like handling partial conversions correctly (as discussed previously)?
+> 
+> I extract these two handling 1) mixture conversion; 2) operation
+> rollback into this individual patch because they are not the practical
+> cases and are untested.
+> 
+> For 1), I still don't see any real case which will convert a range with
+> mixture attributes.
+
+Okay. I thought we were not sure if the guest could trigger that?
+
+I think it would be better to just include the "mixture" handling in the 
+original patch.
+
+> 
+> For 2), current failure of memory conversion (as seen in kvm_cpu_exec()
+> ->kvm_convert_memory()) will cause the QEMU to quit instead of resuming
+> guest. Doing the rollback seems useless at present.
+
+Makes sense.
+
+-- 
+Cheers,
+
+David / dhildenb
+
 
