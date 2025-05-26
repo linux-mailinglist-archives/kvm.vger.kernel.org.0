@@ -1,94 +1,91 @@
-Return-Path: <kvm+bounces-47677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD409AC39B7
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 08:15:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2991AC3A7E
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 09:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EA023AABA8
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 06:15:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 736283AEF09
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 07:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F721D90A5;
-	Mon, 26 May 2025 06:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C381E3762;
+	Mon, 26 May 2025 07:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ttrD6hLL"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ky5nhlmh"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2045.outbound.protection.outlook.com [40.107.237.45])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2087.outbound.protection.outlook.com [40.107.223.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C74D5383;
-	Mon, 26 May 2025 06:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4492F1DF26B;
+	Mon, 26 May 2025 07:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.87
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748240148; cv=fail; b=K82x8qGqLTA0IoWhJVuYGNyHaMJ1Qs0Trs41UDMSZMAndQX9s4S307LGnZYOBIZ8gSh0d97crk1FfbAxDVRY9CTRfERgC9hta8Y5BIhsWtJwuIIUGZohPIKjdgCLzhKgCh3tWySfJzo8lFBns7V2sPOT5mJwMjXDV/rLkBDw+b0=
+	t=1748243941; cv=fail; b=PLaBEt/S0iLSj3nE01kQdC1wJmKBUj/acOZbfcce2bGmR4fWlboepOpZDjaumNSDfakapG+kuXNCdFBboedUtLI5LHH1hDwwNmEb3/nyEWTawIWVxK/AYx8Xqw0nHyALBtH/l9NG3C8g37jiDkco6d9/cnBx6ILeMrj70xxw7Nc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748240148; c=relaxed/simple;
-	bh=L+cFMZYrxnW81Yg8tkXE90SU4u4qivREBB90A2HZa3U=;
+	s=arc-20240116; t=1748243941; c=relaxed/simple;
+	bh=/5K2BOSvauhZb/AklWHUZuBLrRKTZ8cl+GknmrpMizI=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=pXzdl55qu95ZdzctpiZJDwPzLbiFBVBEJ4Uo148j6U+oX6JyOTCcs6zzdB1ncFp2fIO3O5OeX/Y3Tmpq2OIdcPCDq8npblf/rWfUTR9QuPu0bBV2xLfa0PEUwfBprK27NxjQ29MnJj8K4y9cIIVxzniJopc23EeADbox6e+dz04=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ttrD6hLL; arc=fail smtp.client-ip=40.107.237.45
+	 Content-Type:MIME-Version; b=NDBKve4qpZvWIA8QEJ714GkUyhtGRsS26xKKoIgOS6RVFZkD/gdD/3EDkcIomeHJ5M/cewsY4c/UAP7+M1F0xIrGHW8fTYBG4MHTNit6opFT0EXXzBRROzyBKL719aq3z+XJeYAtDO/dU3oPN5TB2Z+/uWZma71xHZsHOJ/s26w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ky5nhlmh; arc=fail smtp.client-ip=40.107.223.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GxCvrzgXjOfhK2nVyiEUE0Vg//ozYvgHk9Ia1ratnEb9MOwjkQngzOW0meR8sEvfSz9K6s0dr1qYTCdtXJ+Vm/E0rOtvMRUEl8pYifvq1WF2pnvIKjScf8KApa4cIgGc4fccRJ9R238yuN+RZ9UFBt82KW6GbLYPI3ttn3EJA4UvNv7zLktHmKb0EUd1a/r2lnEARNsPd7IWwl6G1W9I1PL1lhUVwBaIBgB5dEzjPtTGX5eszMwzzB3J8HUmsMRFC3GtS47yTnzsl4CWQrKjrY9073yPluaA4Qz/ykKkTHa5GPlbmcB58y2ALRXdST9Jktk0UugSwT5jAUnEW/C01Q==
+ b=I6EdXznEUMggS0q2fowvJ5CIp5qxj//9FN14ct3t2KAwaPBu8FxJnde7AAD0gAPQryrBYjYyLhVxktpQi9NBmoAeLeVnNePHLVlHe9UX3/WSmu9osL5ug/pc5cgXHQ8CsHaagfjkX7kMefNhu7qG8HxWcOP9y4muzR4hwUSurazwQNc/quZcBdFWOfImMvSWFYQime03lzVxCphLbGe+ccVYx8jQwAH/6lOMBQOAcdD4UDNWoWV0cIoV+xbrTifHeoo+cX652jH8s4266gVcq0pD1yXxP1KHK1aUHzFL/Q/UZ8H/XFDWQOMaL9iqOJVmqEnGcMDz/UDNA5X8i42smw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=29Oa+x7Nx4DtsQxq5AM9YgroY6ey57+hpklbnYmzQrg=;
- b=lTJ+J0y23rCIbmHMWhm/l0qN0Ss/pPSoKoamK04Y0K3g01NbxvWNXTuOiBV91RhadAN4EJT0S685PVLQgMmPauBOpnNnoqnFDB13Nbx3uLqriFvraBWXXAJYdimw5BoxTu47GEcdz1uPz8++22iuWRhaomNh5jyrrItNmYq8lkA+oUCs+OrjSxlEfsJcWH5lpzGtzfthppYxiu4l8gSt6sZf6tONbmu60H193XKNUX1Cxx49C7BY4MVdaI8ynt3xg3QLucE4Ojbh6c5wTOH8Cw+D6Ia8wZiDbJVTzSH48lYS9zsX+9YOUnQx+CSNavdEPP18y3bdPIMaUEgnnID1eA==
+ bh=lhaddvfsM4HixVuHMuEybmJtu9/lVCcRrjCgpzziCh8=;
+ b=h6YpnEfbNC1oRYrILDhJwswV0u17Ow8bo2O17hhvGFB9RIaaNtMe6ccjnFuhkWnWHT9DGOd9alD47qqlpkIs56qEHwmEtryAWGG0+yi9jgk8vLdjZtVZzcitZKlxeO14b0yCRabqNVnuI2zYymqMEHJAiizN2fX7oPTH6J0FnPlmGFNlliWMHFFyppd+fqmMPXeJQMuLuLctIuSCEyn/UjIFpmiixklLhBtrhb+3i/rCGzPRUC9Gf1HzFkjs1+aGIZ8RWGpziJe5QlbyhNFJqxp5IlmiRo+Y9PNDZJcyd3dkHdJTT2nYdEF1KHTSmFxJtIVxldUiACFPklREuK3UuA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=29Oa+x7Nx4DtsQxq5AM9YgroY6ey57+hpklbnYmzQrg=;
- b=ttrD6hLLFHxBhQ4MwBxPAxtyy/ihk8g6YoNC8rjLGpFPm2jF/kPh3BI+3FleThiHWp0OulvrIygBvlm19WLgDMERfrWChflq4dGlx0WM/pS+C58dj2KMy1kABxg+MA9hmdOl2yJcZCr0fuiujRwnAEikxA58HZlnE0pzkR7zijU=
+ bh=lhaddvfsM4HixVuHMuEybmJtu9/lVCcRrjCgpzziCh8=;
+ b=ky5nhlmhR41OTOXG6EZAs0TE25sHyhiecmsmzKluP1+bwk/iwfrZicYRAFNEZHXlQKv3lc6mTlz8aEHFDp1Mss22pWk2MnzimiymTIIkq79oONpnyEPN8sYPgTb4UtKfMghodAXNJpJBtVq3bhdeYp5TKESb5J8t96Ip7AZbyWo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN0PR12MB5713.namprd12.prod.outlook.com (2603:10b6:208:370::18)
- by PH0PR12MB7792.namprd12.prod.outlook.com (2603:10b6:510:281::21) with
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by CH3PR12MB9169.namprd12.prod.outlook.com (2603:10b6:610:1a0::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.20; Mon, 26 May
- 2025 06:15:40 +0000
-Received: from MN0PR12MB5713.namprd12.prod.outlook.com
- ([fe80::bbe0:a58f:b02c:1427]) by MN0PR12MB5713.namprd12.prod.outlook.com
- ([fe80::bbe0:a58f:b02c:1427%5]) with mapi id 15.20.8769.021; Mon, 26 May 2025
- 06:15:37 +0000
-Message-ID: <a700ab4c-0e8d-499d-be71-f24c4a6439cf@amd.com>
-Date: Mon, 26 May 2025 11:45:24 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 20/38] KVM: x86/pmu: Check if mediated vPMU can
- intercept rdpmc
-To: Mingwei Zhang <mizhang@google.com>, Peter Zijlstra
- <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, Liang@google.com,
- Kan <kan.liang@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Yongwei Ma <yongwei.ma@intel.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>, Jim Mattson <jmattson@google.com>,
- Zide Chen <zide.chen@intel.com>, Eranian Stephane <eranian@google.com>,
- Shukla Manali <Manali.Shukla@amd.com>,
- Nikunj Dadhania <nikunj.dadhania@amd.com>
-References: <20250324173121.1275209-1-mizhang@google.com>
- <20250324173121.1275209-21-mizhang@google.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.26; Mon, 26 May
+ 2025 07:18:56 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f%5]) with mapi id 15.20.8769.022; Mon, 26 May 2025
+ 07:18:56 +0000
+Message-ID: <ae16db07-5fca-4369-aa67-cbe2e0fd60fd@amd.com>
+Date: Mon, 26 May 2025 17:18:48 +1000
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+ christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
+ alex.williamson@redhat.com, vivek.kasireddy@intel.com,
+ dan.j.williams@intel.com, yilun.xu@intel.com, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+ daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
+ zhenzhong.duan@intel.com, tao1.su@intel.com
+References: <aB3jLmlUKKziwdeG@yilunxu-OptiPlex-7050>
+ <aB4tQHmHzHooDeTE@yilunxu-OptiPlex-7050> <20250509184318.GD5657@nvidia.com>
+ <aB7Ma84WXATiu5O1@yilunxu-OptiPlex-7050>
+ <2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
+ <20250512140617.GA285583@nvidia.com> <aCRAHRCKP1s0Oi0c@yilunxu-OptiPlex-7050>
+ <20250514163339.GD382960@nvidia.com> <aCYQdDrYYZRAgsen@yilunxu-OptiPlex-7050>
+ <9dea400f-a57b-43be-a2e4-24a9f51e6ba0@amd.com>
+ <aDE5SPzOAU0sNIt+@yilunxu-OptiPlex-7050>
 Content-Language: en-US
-From: Sandipan Das <sandipan.das@amd.com>
-In-Reply-To: <20250324173121.1275209-21-mizhang@google.com>
-Content-Type: text/plain; charset=UTF-8
+From: Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <aDE5SPzOAU0sNIt+@yilunxu-OptiPlex-7050>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN4PR01CA0012.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:272::15) To MN0PR12MB5713.namprd12.prod.outlook.com
- (2603:10b6:208:370::18)
+X-ClientProxiedBy: SY6PR01CA0021.ausprd01.prod.outlook.com
+ (2603:10c6:10:eb::8) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -96,309 +93,337 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR12MB5713:EE_|PH0PR12MB7792:EE_
-X-MS-Office365-Filtering-Correlation-Id: c5f17b3a-772d-4ee8-f264-08dd9c1cbad3
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|CH3PR12MB9169:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2d15fc76-9f25-4551-da12-08dd9c2593af
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|7053199007;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?eCtEcml2eTBkRWpqWnJEbWtuNGZla3k4dnozeDdYS2JYekFDc1hYWVZmMCtL?=
- =?utf-8?B?aTVMUG9KaHE1ODVYVkFCLzhXeXlFMXU1aWpsVGVzZEs2UlRRbEMwVnlNUC9j?=
- =?utf-8?B?Yk9vS0JYaGpTZy9laUlNUXhVUnNoZllWSitRS0FqbndWZVhHUEZNTVpFODNx?=
- =?utf-8?B?VXM1T0UvRHJWb0RGNys5RVphZDB3b0w1ang5b2RwSDNwbDg4Zi9LMHpGRXpv?=
- =?utf-8?B?WnlMcHNiWU53YVU1VTU5Y3ZhTWJYc1AxT3lRSFRPYWRjRWdaSUNMV3RuV0FT?=
- =?utf-8?B?WjNaK1hUMlFKbVk1UTZyUU84ZTJQOElrb0UvTmIzK0RrMGtHOUsvNVJBaGRZ?=
- =?utf-8?B?YW5QTGtFMW5UZTZ5LzhsMnduM0VKVEgwWUx6WnZZKzVXbUIzdG1JdGtremRQ?=
- =?utf-8?B?bDNjSUU3RnpXa2JpQ3BGRnVWNXlUcVpnU2VBZWZDeTZkMlIwSHY4VU1XeUg0?=
- =?utf-8?B?amZUaFN2RHBVa2dpM0JrT2RQZmJRdENPREFuNDFJUHBaVUNuQm5JTHc1NnJa?=
- =?utf-8?B?Q2pVbnIyRDd0RXNDUDhJcG9HanUzMVdCTUE0WVpwWllWSUpuRXNnck1yeFEy?=
- =?utf-8?B?TzlkUlVxRnlzbnBheDNrQUdyRk4raGVIQjNkUWtUMmF6a0Z2cURKUnI4TlNZ?=
- =?utf-8?B?dEpiUmwrWldkalVDZm56K1BxNlNNQUVKb0dOVS9lMlpLWFFpUE1UYTVkb3M0?=
- =?utf-8?B?bWtGelVaeWtIOVBsYWphOXBwZ2dQSW9WN0pCcFQvUTlTdXRvMk1RZER0T1JZ?=
- =?utf-8?B?VXpSZFRpcG5OU3JxYm1KU2g0REZrYTZqWlIydnNKRlBZUC9UeFhCaVJlbThI?=
- =?utf-8?B?bHZEQUVZQ1RGeWwwcVdGcEZ3R21BOWhCVFpyWEUvaTRYVFVOL2d5UVdVZjVm?=
- =?utf-8?B?Y2M0Y3RKK0tFSVA4Sm5sWWErS2hzNEVaWWt6blRmRXBIM1U1STNDOHU4TVhB?=
- =?utf-8?B?dFBPNEQ5SVRPUHFSZUZaRzBJVU5FZS9JMDB4a1J0dzRBL2dZR25oWmduMDhV?=
- =?utf-8?B?ZU9VTGozbDY2QURZZjl5Z0wwSVVOL0pGYW5mRUlHd0ZSczdUVkRKN2lCUTlh?=
- =?utf-8?B?cVJyTWVwZk9MN01UTXBxOTFXV3hZdnhoaDlBanp6YWlhYXVPMDhhdE1VUkJj?=
- =?utf-8?B?MVFnSU9Ea1B6THBxdWdMakpISU1ISXU2TWZwSVdSRHNQN2ZWQWEwZGtUcmsv?=
- =?utf-8?B?RXFrNUFJR2F3TVlNSk4vREhadE8rVUxOL1dyeDBmejZtclpZSjZ0VEs5QmFU?=
- =?utf-8?B?ak9xNzhEOC9sQm1aSnppOElRRVlyWUZOckhSNFJxNDN3dHZsOG9CMjQrb3F6?=
- =?utf-8?B?NDAxNFBJOFpSQjRTa3lQZ2w0SU1uWjhGS1hBTnNpdzVjMTNxRlk0Qml0VUxm?=
- =?utf-8?B?T3U2dDRDa2lBajdWLzl5cVo1RmVHV3JUcEU3RFl0cFdJVUhCcDdibW5UZ2JW?=
- =?utf-8?B?L1l4VEIrR25yb3cwcFYrSHpjNDlkdFVudHN0aDQ3enFqa2ZNS3NkMHd0Z3hl?=
- =?utf-8?B?cDB5bk1XT1RuOERHWENJS1BqWHkyUjZTaXdSNXM4a0krdDNKRUFZRnhaTkZy?=
- =?utf-8?B?NzBlRzNDUVdTSUZQUHRucWpaZG9XRWxSVXBSdGlzYzJBbXdVTGkyeWJ2QzJv?=
- =?utf-8?B?RWlSTWQ5bDhKYWgxK0IvTkpSM0tjT0x6MmRMamt6eUdyc1I5T29tU2prK0tW?=
- =?utf-8?B?aWsvYnZ1VjlibGZQQ1dTdGU3MHpRWkxlTHBaM21LRjVFQUVSVi9PaitMMFBp?=
- =?utf-8?B?THFuQStKYXJqLzhaWFkydkdjeGhDb1RJYk01SWVhT1RJYk9WWmNLS3VsTkFR?=
- =?utf-8?B?M203dFYzczFRM1lCcXNoaXorODgzVlJWMVU3dmhLVkNnTHpPUFdQNjIybDRD?=
- =?utf-8?B?SVlqZFc2YXlNV2NiZ0k2Y1hxbmUvL3B2M1NJTitwZGpCdVRkcERMQlYxWnZp?=
- =?utf-8?Q?zjjgHb7sxKM=3D?=
+	=?utf-8?B?STlZL3pzT2pWZ1ZpTGY1WWdnOXVXQzJRVUJ3Mm0rVDJiTzErVmo3NGYzZVdI?=
+ =?utf-8?B?TjVhazdwTHE4aE1aNXNYdDdCdlB4czhQc0NhYTIzM1U4dzliNVBMKzJsbmNu?=
+ =?utf-8?B?bDBaQjhLQWVDTnI5RW5nMytibHhMbTBVdzcyUUhLa2E1ZS96Rk00MVJ2SFJR?=
+ =?utf-8?B?SEZEN2k5KzZ6K1d2TFBWY0g1WVZkeDBRVXRCS25UMW1mY2xLRVRWQ2NqbEdP?=
+ =?utf-8?B?VExDMkVSK09LY2VBYUJJZTFKbldsOHhVdFNwczlUV3ZiVTJrZWRpR21BQkQw?=
+ =?utf-8?B?V3QrcGhZbGcyTjVyTVFYOVZ3UlFvekEvalpLK1I5NkRpaWo5MWN0L052QnI3?=
+ =?utf-8?B?K3dPU3BGSEZ6RytqRnZuSUlIWkl1TWN1eFVGc3JNcThuWmtQVGd2cit1cmxu?=
+ =?utf-8?B?aC9iVFVmdkxDM0VXZXQzS3ZFcCt2anZFcHdKeG9kZFEvTmwzclVIWGdNaGRE?=
+ =?utf-8?B?OGYxNjdGSGNsMEljVTNpMGRqclFCNTJ4dEh4aWc3dW1aNVpVcnp0TloxbWcy?=
+ =?utf-8?B?RGpaOEJidGRRams3VHZFTyt6eXUyMjhrajJDMUJxSENGbkREYnBUVUZNRDhq?=
+ =?utf-8?B?djlkdGlyVWRsRjJ5VERXZEZPUmNyVHYxWlYwZDZsVjZXUkxjNVFMdmhYc2hC?=
+ =?utf-8?B?MlFNMGNZOEFFMlQ3bEp6eTVhNzJobmI0dmd1WFhXbWtEU0ZPb0s0UytCWWo3?=
+ =?utf-8?B?TklnU0VZcXlmL1NiY3lJL05FY3Z3alh0OTNGQkEzdWV1UXQ2TzV4S3o3NXRr?=
+ =?utf-8?B?Q3lvZUpyQXNNTjNYSlhpaUpiSWZJYnNLS292dVhzVjhGK0YyVE1PRkR6cU5w?=
+ =?utf-8?B?UWt0T2pTMExweWpKMW9vVkRnYWs1MGV3bFZpWm1PYUh3cjZHSTBNS0kwbGs3?=
+ =?utf-8?B?ZVkwUkE5WGNPMFdQaUdueVN6aG0vUlMyclVnWEtHbk5VU0ZhL1JOUWlhZ3p2?=
+ =?utf-8?B?dVhuMldBV2pnbDFjYkVVMEJPODBwU2RYcm82LzFLek5obm9kcG9iaXRqTzZ6?=
+ =?utf-8?B?QlNDcS9OTWhIc2pyTlNjWUEzc0N1dGZYMGJXS0w1alRVRGpEZ0tCZXIzTGZH?=
+ =?utf-8?B?Z2Z6K3V6OGlnc0hlY3NMc2xNcEY2aW9NekFJeTkxZUFBSWZ5eXAyc2kyRTdG?=
+ =?utf-8?B?WC9CaXl2OEUzSzhmT2NRN2pVNFdxQU9lQnM2SHU0WTVOUjBCM2Q4S1o2WHlC?=
+ =?utf-8?B?QWpTQmVLNWgyMk1HTWE4bytXYVNraG44Q2hwWHVMTUpSVmU5aklxbmQ5WUZ3?=
+ =?utf-8?B?eXRBUDlXMFM1L3JSTzNkcjlzVTEyNC95ekZ2bm9YbnAvWFdPTm9oTXoxZzYr?=
+ =?utf-8?B?WmlFUEoyR0duZ0k1RWpxQzhFN0RiYmtmaUswZWV5aDFzS0Frak1RQTVPenlR?=
+ =?utf-8?B?NVZsaDA1TGIvcEVCdk5QMkhvZiswbld2SjdST1p4RDFhamp6a2FocVo2V215?=
+ =?utf-8?B?MElaQjJKeVhGK1FaMkJJYWJMTHNXSm5BVFI0c05uMk1mTlA2Y1BrcVo0ZlpG?=
+ =?utf-8?B?dmN1MzlhcW9xVnFDZHhxUldDV3d0TGM1SlJodEROWHlMYjdmWjlCY055M0dW?=
+ =?utf-8?B?Slk2aUcxWmJKamRWVmJtWW5pdE1uQjUxb0xFdlZ6M2gwTG5DTkFnUS95NFMz?=
+ =?utf-8?B?ZGR3ejVONlZadVZQVUZ2MC9pTk5WVmJlOGEwY1daMUdKb29PaStiSHUrRmxH?=
+ =?utf-8?B?Nkw5NnNqMkhaelVPWExtR0d6ZThsbnJkZ2ZRMXhvNnVrWFVjYlVtelRZc2Zi?=
+ =?utf-8?B?b0dSOGNGTGY5NitOcktHclFRVlpKVHZZSmNRTEVNV3R5TTBwd05EMmZFZ2lW?=
+ =?utf-8?B?MlRsVVpKT29SM3hEYndvMzRRT0lwdXpSNWlMdmhmblJHV0hsMUI3OHFuMWwy?=
+ =?utf-8?B?MkFCdTlDNWpERWhPeGxQSnd2NnFlckpJRU1BTkZydGxPbTlBRWF5WWRJQk1U?=
+ =?utf-8?Q?fkpkTI+b1kE=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB5713.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eGZ5aFcwbmRxdFpxSWZZTkxvMWl1RFJnNzR0V00zTWM4d1pYYkdKL0RWaXZn?=
- =?utf-8?B?L0lKN2hXMVFyUDhhdFJDdndXcmFZZFJHWEZ2SEFTWm1BandqUCs3TURSZ3JL?=
- =?utf-8?B?VUhFMkhicll1cWpYRDJwdS9YWGZSU1NOOHhWOVcyRVA3YmxpeHc5alBwR1Vn?=
- =?utf-8?B?WVBTSDJJaXZXSjYrWTYvMTM1RUxjeW5FSVVEaWVxL1dSNlkrUE9JUmR0ZDZR?=
- =?utf-8?B?OGdvaFRKMkNrUGFYc0ViTndnS1huanhuTlpHWnI2NGhhWm9iR2FjR051Nlo2?=
- =?utf-8?B?bXJxUnd6bmVvWlBuZTNsUk8zV2M4VTJMRVhhTVdKU2d6TllYZUYzRmpFcUIv?=
- =?utf-8?B?MS9PTVYzK0pMKzhIUlJpakZaU3kvNzJYMGRmeXdJd08wLys5SFgxZ3NvYW9t?=
- =?utf-8?B?OGFnUk1NbmhlWVZpSlRHSVJQQVFJQmRqLzROMW82Y2lnQkFZRURpYXJTejNJ?=
- =?utf-8?B?UWsvU0dPNk4yZm9jZjNOaVFrZExNa0ZiWi8wTUtvd1VOZUZwY3g1VGhvR2tv?=
- =?utf-8?B?T05WWFFCNDhIVUFHSFlYV09VdUxCZk1pWjYxdlFyL1FNUjBTOEE0Tzc5ZXZ6?=
- =?utf-8?B?SC9xQStVUmJrSWZtZE9zYlZxNnl3QWljYlh6c0xGQ01jMmwvNTBkWkZabTBZ?=
- =?utf-8?B?TVFiaDE2czR5Z3RnNE95dkhhdlg1czZ2L2xTeldxNGJER2x0T2tDMnUyTWJL?=
- =?utf-8?B?dHg4TTdvMFdkclg4endYaldVZnVOdHYrL1NhNnNFdWh1akJ3dE9NRGl2YmRT?=
- =?utf-8?B?cy9NS0grV3VhQTVhVXBwenBOVFowZkJqclcvUFBxVGplWE81a3BzT3JJYmta?=
- =?utf-8?B?bGlnbkw1KzBqWmpna2lnYnFXR3h5TDI4UTlVUnZQYlBiV0M5RGxITWVGRDNT?=
- =?utf-8?B?dzVpczczUHhYZXVMQzRrSlJwWXRYTzFRRWpTR3VMdlVIbGlsaGNzSk1lVmlL?=
- =?utf-8?B?aC9CcHFRS3JISmtxTFdFSVZ6M0tZZHpWNkkvWG5CV2QraWRPcnhmQTg5aHNj?=
- =?utf-8?B?bDIyZjJwNUx4cWU1OTNIYzZkRXRkQzg0L2J6VU40N3BXMXVDMmVqMXRyVUVq?=
- =?utf-8?B?aHNFY3V5ZUtNNmg3M1FDYjhxS0FKZUFYaUMxVzdFQkt3TzhnOGhhSjVETzN6?=
- =?utf-8?B?V1VmY1VBOG1IZmpTaXphMzg5VTg0N0NyeVJkVUt0by8wSnZJR1BIcVdZZzUx?=
- =?utf-8?B?UHoyb3d2QnQzcXdhQlZKQzZ1REF6K05jcDhlNWZ4V3loZG1rRVBqeUcvQ0dG?=
- =?utf-8?B?YlgzdFVrSEtVYithcGxrdW05OWE2T1VwcUNkQjhUdjdCZFJtRzhMQks0L0pa?=
- =?utf-8?B?K3Y1UW11c0dOa3poa3BWNm16VitOREhxTjVZMlJrdnc0MkJTTzk1V0ovWGJD?=
- =?utf-8?B?dk5aTjF3UzVGY1ZVcGpCd3U4Q0hGV016ZmxyS21rQlBFbUxUOXhmZlo0N0ZV?=
- =?utf-8?B?L28zMm9aSzNxY2dCRTJYL2IydWg4eHJNNVNqRjduSWp3ZUtEMzJlVzFmRTkz?=
- =?utf-8?B?bmVSZHpSR2tZWTBZK3dLRm5NekNxMkMyZnd5Y0MzWXRzTmNmWWNxck5XUjZX?=
- =?utf-8?B?TnV6M1RFSGZxZDFUdkMzNU9HS01IZ2VPZEUzbDQybXcxQXM1eUhiNE0wLzVG?=
- =?utf-8?B?WUpHb0g2b01SMWtqL0c4OW16VFVKQmdmRS9kU1ZHUTk0Qk9PUVFrVER0amRr?=
- =?utf-8?B?SDQwQTVGU3N6RmRDWGVHZ3kvLzJ5bk5NY2VyQnBqN3p6Z0Nrc3U4QzY0S2VE?=
- =?utf-8?B?NlI2M0l1M2FqSUo5TFgyTTlxdU80QVR1bGdmbGlBRFBDTnRLTmVvbjNvb2Fo?=
- =?utf-8?B?QStKZWVDSEozN3V4UHFXVWlCYWpyUDVKVFZXZTJEdU1uZGFWZ1pNaUsvUlB4?=
- =?utf-8?B?NFN1VWRKSmZWWTBiZnFVNFFUb2pZL3lVRzFZUkZzWGdKUkkwR2Y2SU5jb21W?=
- =?utf-8?B?c3NSMDhLcVN4TG9iTHlSc1EzNHNOWG41UHZMWnJNN1RBUUIwOHdwU1FUL2lL?=
- =?utf-8?B?ZHdIdHBOWWl1SjJUVm8yR1h5TW1IYTdoYWpXb3FXcTB1SVNmcTIrK1lWc0hH?=
- =?utf-8?B?YWpYMFErbjgzd1BodnllL2RwemhQeVdWaXkwY0haSjdDVFMrcTBnT09JMjlP?=
- =?utf-8?Q?m8mPdj0FkqGUKzPACS/eXaTZW?=
+	=?utf-8?B?UVJ5bytkZERWVE4yaDlpNW1lMUd0MEo3VDZOb2FGRDJFTXhQK0N1WHc1SjZX?=
+ =?utf-8?B?dXpKQWVOQWc1MFhFbUpEdkxoQlhmNXZKSFlIREFSZ01EWmxHckwrVDVWenJW?=
+ =?utf-8?B?TnhoSmtGUEVodG5YTFpYZm4yakQvWUpFOW1JMXpSNXBpcWdzNEtpTjZrWk9P?=
+ =?utf-8?B?bnNxcVljWFZSQVByVHF0ZTcvcW1Ic2U3SWtKYi8ydGVVSVVsTHhYb1VGaHV0?=
+ =?utf-8?B?VFBsbXJZZitGU3RaRnI1Z0orSEZlU2xJNzJCQXdTN3VpMnNrTEdJRHA1cHNH?=
+ =?utf-8?B?bzhDaWFvWmpqZ0RMa280UDBTZWNKbjVNNHZ4bysya083TTBEbnU0TTNRdTA0?=
+ =?utf-8?B?cUhWbS93RWlWUkFyQjRubnBpT2RDbTJZZTViTnV1MmQ4Z1FhWWRGTWlxT25H?=
+ =?utf-8?B?OSsyZXZWK0F4ejNuajJGbDUyNGx1K0lpWWJva2xyNVZsUW5JOElKTFBidmhZ?=
+ =?utf-8?B?TXdEMDYwaitIUmlkeVl5dFVQNGZzMEl2VERrNk1Ic2FOUWJJNjl6c1lUZy9s?=
+ =?utf-8?B?QkJrdGdFcmVKU1czcnBSSExKVk9MSjlXZmxSUXV6SGR3Z1BvK1lxUGY4Yy9E?=
+ =?utf-8?B?UlZNSUZJYXdobkM3T1d1OVpObzVDczNEMnlMOVJTS1lzSndNM3NLcVhEMXRt?=
+ =?utf-8?B?VGR4VDVjV1M0NExOTXJCNXpaQy9oWmRoRXdLRmZyVU1FcHFVdE5GM3pvZDVQ?=
+ =?utf-8?B?SHZobjlieXY0ZFFvM3FBOXJaZ3VCWk0rVnJnRDdRaFpyMW11ME81eTFlY0Fv?=
+ =?utf-8?B?OUw0c3g5VmVKY1hjQWpwa0lHNlpqbXZVT3Z6N2hFTElCczRiNFluUHlmVHdK?=
+ =?utf-8?B?RXhwQ0RSWnZLMTM2NHV0cCt2RWd6Q2FiV1FITDhxeG1mcno0N3FzeGFjdWVD?=
+ =?utf-8?B?a2JkQlMxNEFkWU9QanpBb25UV3hUYjNiZi9VUnB6UlhoZFYvZEFKcXpIMGx1?=
+ =?utf-8?B?ekJjZXN6RmxBQVJzTDZHdlJnb1ZuRllqVUdBVFZWRWZLcUQrMVRmeDZBcU1l?=
+ =?utf-8?B?NlhaTHpoc1JseWZoemlyd3BMVlcrb1J0ZG1oOU5pcTJ3L2tXa1NIUzhPWHdS?=
+ =?utf-8?B?b3oraW1DN3F5b01QNEt5SWNvdUlaN0h2aUxPUDFWcWpqTjg2dHpPQXpiTmVS?=
+ =?utf-8?B?TXJnV0doVElTUWhpY0VKTXRPTDU3cDV0QitabVAzN29sSkhjc2RkendLdjRi?=
+ =?utf-8?B?Lys1ZTNIMWc4RldDcHZ5K3k2M2dmNXZwSXFEV2RzMUt5dmljOTVDN3lmSTlm?=
+ =?utf-8?B?Qis3eEU4dk53em03SUlqMzVoT0FoYlM5ckN0bkZFcWM0b01TaDR1Y2U2RjNa?=
+ =?utf-8?B?eE4yOTA3eFNScEpMWEFDSC9ubVh2VDV6bWNVVVhFMVQzTi9wbkt3a3Z1dFBo?=
+ =?utf-8?B?bTVtQkNndUNrQmZxaHBuZEFMcXY4NjNGNGs3V0pjcW5XKzRtVFB0eGpFVXd2?=
+ =?utf-8?B?ek5FRUZvVndGMzM3eTBXdWhTclIwVWNmSGlsSlRRckV1Vzd3a1FJWmdjSzFi?=
+ =?utf-8?B?SGZWazlrUkJiTjhTRzVYZllueGNTMmg1Vmt0alZnaGpTVHpiT2M4SlVyMW9w?=
+ =?utf-8?B?K3MrZm9MT2pCc3l0dTJRMXg2S3l6WlFpbkdzZTdZYlNleDZJL2piaitldzJF?=
+ =?utf-8?B?QUNNRG4wYSt1ckU2eDVXQWRtK002N2swYTREWnFEU3UvaUpneHpWSzBHNmMw?=
+ =?utf-8?B?ZCtaUlEwSjNEcXhhRHlJZWo1a3JWTzBsYmJKQ3ZhOFZWRzNkWGFiQlQ4YkJH?=
+ =?utf-8?B?YUhhVmVyOGUzYW00bDRnQ2txSnBreVJ4TGE3Mm9keTc3azVpaWxvZjVPSEJu?=
+ =?utf-8?B?dVE5S2xIdW1kaXJiRW8vZUpRb2tJUXlhMnduUnF2OUlGa000MnZZMDFGcXpB?=
+ =?utf-8?B?bFNJWFdUMXlMS2NoQzdPR0ltK2pEaWhOaWVZQm1DVHVEV0NFTER6Q3FxY0hq?=
+ =?utf-8?B?L0MyWkZobk10emZNckpQMHZRN1JRZFpvSkg3RFI2YlpkV09wZTNIeTBDbjdP?=
+ =?utf-8?B?Vi8zcFg3anM0YWZ5R1RkYk8xOCt2V1lQaDgxdWdFNWxQRnZ0NGNud013eTcv?=
+ =?utf-8?B?TTc3UjdIOE04djhPcEx6a1ZKWFM5SXlmSGdIMzhZY2NZUlpsZGdxa1BIQ25i?=
+ =?utf-8?Q?6weALENgY57ZtrudmSwN82VYH?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5f17b3a-772d-4ee8-f264-08dd9c1cbad3
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB5713.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d15fc76-9f25-4551-da12-08dd9c2593af
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2025 06:15:37.0656
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2025 07:18:56.5366
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VKMfimcxWEm2ss4rGvgD0ElRU+eqG1YXFDb51pfuTTZ6Y3+RvtBETqjbdnCYRW6Cf64QJ0UGWpxiu1af0Xpx9w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7792
+X-MS-Exchange-CrossTenant-UserPrincipalName: 11kxop4AtYD9c8YrbFp15HgnOsewfVhEx2msWtyt34RqNQrsQlu1jAqc7chSFdrZ5Nff6zU8oNk3D3EA6W5rBw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9169
 
-On 3/24/2025 11:01 PM, Mingwei Zhang wrote:
-> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+
+
+On 24/5/25 13:13, Xu Yilun wrote:
+> On Thu, May 22, 2025 at 01:45:57PM +1000, Alexey Kardashevskiy wrote:
+>>
+>>
+>> On 16/5/25 02:04, Xu Yilun wrote:
+>>> On Wed, May 14, 2025 at 01:33:39PM -0300, Jason Gunthorpe wrote:
+>>>> On Wed, May 14, 2025 at 03:02:53PM +0800, Xu Yilun wrote:
+>>>>>> We have an awkward fit for what CCA people are doing to the various
+>>>>>> Linux APIs. Looking somewhat maximally across all the arches a "bind"
+>>>>>> for a CC vPCI device creation operation does:
+>>>>>>
+>>>>>>    - Setup the CPU page tables for the VM to have access to the MMIO
+>>>>>
+>>>>> This is guest side thing, is it? Anything host need to opt-in?
+>>>>
+>>>> CPU hypervisor page tables.
+>>>>
+>>>>>>    - Revoke hypervisor access to the MMIO
+>>>>>
+>>>>> VFIO could choose never to mmap MMIO, so in this case nothing to do?
+>>>>
+>>>> Yes, if you do it that way.
+>>>>>>    - Setup the vIOMMU to understand the vPCI device
+>>>>>>    - Take over control of some of the IOVA translation, at least for T=1,
+>>>>>>      and route to the the vIOMMU
+>>>>>>    - Register the vPCI with any attestation functions the VM might use
+>>>>>>    - Do some DOE stuff to manage/validate TDSIP/etc
+>>>>>
+>>>>> Intel TDX Connect has a extra requirement for "unbind":
+>>>>>
+>>>>> - Revoke KVM page table (S-EPT) for the MMIO only after TDISP
+>>>>>     CONFIG_UNLOCK
+>>>>
+>>>> Maybe you could express this as the S-EPT always has the MMIO mapped
+>>>> into it as long as the vPCI function is installed to the VM?
+>>>
+>>> Yeah.
+>>>
+>>>> Is KVM responsible for the S-EPT?
+>>>
+>>> Yes.
+>>>
+>>>>
+>>>>> Another thing is, seems your term "bind" includes all steps for
+>>>>> shared -> private conversion.
+>>>>
+>>>> Well, I was talking about vPCI creation. I understand that during the
+>>>> vPCI lifecycle the VM will do "bind" "unbind" which are more or less
+>>>> switching the device into a T=1 mode. Though I understood on some
+>>>
+>>> I want to introduce some terms about CC vPCI.
+>>>
+>>> 1. "Bind", guest requests host do host side CC setup & put device in
+>>> CONFIG_LOCKED state, waiting for attestation. Any further change which
+>>> has secuity concern breaks "bind", e.g. reset, touch MMIO, physical MSE,
+>>> BAR addr...
+>>>
+>>> 2. "Attest", after "bind", guest verifies device evidences (cert,
+>>> measurement...).
+>>>
+>>> 3. "Accept", after successful attestation, guest do guest side CC setup &
+>>> switch the device into T=1 mode (TDISP RUN state)
+>>
+>> (implementation note)
+>> AMD SEV moves TDI to RUN at "Attest" as a guest still can avoid encrypted MMIO access and the PSP keeps IOMMU blocked until the guest enables it.
+>>
 > 
-> Check if rdpmc can be intercepted for mediated vPMU. Simply speaking,
-> if guest own all PMU counters in mediated vPMU, then rdpmc interception
-> should be disabled to mitigate the performance impact, otherwise rdpmc
-> has to be intercepted to avoid guest obtain host counter's data via
-> rdpmc instruction.
+> Good to know. That's why we have these SW defined verbs rather than
+> reusing TDISP terms.
 > 
-> Co-developed-by: Mingwei Zhang <mizhang@google.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> Co-developed-by: Sandipan Das <sandipan.das@amd.com>
-> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
-> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> ---
->  arch/x86/include/asm/msr-index.h |  1 +
->  arch/x86/kvm/pmu.c               | 34 ++++++++++++++++++++++++++++++++
->  arch/x86/kvm/pmu.h               | 19 ++++++++++++++++++
->  arch/x86/kvm/svm/pmu.c           | 14 ++++++++++++-
->  arch/x86/kvm/vmx/pmu_intel.c     | 18 ++++++++---------
->  5 files changed, 76 insertions(+), 10 deletions(-)
+>>> 4. "Unbind", guest requests host put device in CONFIG_UNLOCK state +
+>>> remove all CC setup.
+>>>
+>>>> arches this was mostly invisible to the hypervisor?
+>>>
+>>> Attest & Accept can be invisible to hypervisor, or host just help pass
+>>> data blobs between guest, firmware & device.
+>>
+>> No, they cannot.
 > 
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index ca70846ffd55..337f4b0a2998 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -312,6 +312,7 @@
->  #define PERF_CAP_PEBS_FORMAT		0xf00
->  #define PERF_CAP_FW_WRITES		BIT_ULL(13)
->  #define PERF_CAP_PEBS_BASELINE		BIT_ULL(14)
-> +#define PERF_CAP_PERF_METRICS		BIT_ULL(15)
->  #define PERF_CAP_PEBS_MASK		(PERF_CAP_PEBS_TRAP | PERF_CAP_ARCH_REG | \
->  					 PERF_CAP_PEBS_FORMAT | PERF_CAP_PEBS_BASELINE)
->  
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 92c742ead663..6ad71752be4b 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -604,6 +604,40 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
->  	return 0;
->  }
->  
-> +inline bool kvm_rdpmc_in_guest(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +
-> +	if (!kvm_mediated_pmu_enabled(vcpu))
-> +		return false;
-> +
-> +	/*
-> +	 * VMware allows access to these Pseduo-PMCs even when read via RDPMC
-> +	 * in Ring3 when CR4.PCE=0.
-> +	 */
-> +	if (enable_vmware_backdoor)
-> +		return false;
-> +
-> +	/*
-> +	 * FIXME: In theory, perf metrics is always combined with fixed
-> +	 *	  counter 3. it's fair enough to compare the guest and host
-> +	 *	  fixed counter number and don't need to check perf metrics
-> +	 *	  explicitly. However kvm_pmu_cap.num_counters_fixed is limited
-> +	 *	  KVM_MAX_NR_FIXED_COUNTERS (3) as fixed counter 3 is not
-> +	 *	  supported now. perf metrics is still needed to be checked
-> +	 *	  explicitly here. Once fixed counter 3 is supported, the perf
-> +	 *	  metrics checking can be removed.
-> +	 */
-> +	return pmu->nr_arch_gp_counters == kvm_pmu_cap.num_counters_gp &&
-> +	       pmu->nr_arch_fixed_counters == kvm_pmu_cap.num_counters_fixed &&
-> +	       vcpu_has_perf_metrics(vcpu) == kvm_host_has_perf_metrics() &&
-> +	       pmu->counter_bitmask[KVM_PMC_GP] ==
-> +				(BIT_ULL(kvm_pmu_cap.bit_width_gp) - 1) &&
-> +	       pmu->counter_bitmask[KVM_PMC_FIXED] ==
-> +				(BIT_ULL(kvm_pmu_cap.bit_width_fixed) - 1);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_rdpmc_in_guest);
-> +
->  void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
->  {
->  	if (lapic_in_kernel(vcpu)) {
-> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index e1d0096f249b..509c995b7871 100644
-> --- a/arch/x86/kvm/pmu.h
-> +++ b/arch/x86/kvm/pmu.h
-> @@ -271,6 +271,24 @@ static inline bool pmc_is_globally_enabled(struct kvm_pmc *pmc)
->  	return test_bit(pmc->idx, (unsigned long *)&pmu->global_ctrl);
->  }
->  
-> +static inline u64 vcpu_get_perf_capabilities(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_PDCM))
-> +		return 0;
-> +
-> +	return vcpu->arch.perf_capabilities;
-> +}
-> +
-> +static inline bool vcpu_has_perf_metrics(struct kvm_vcpu *vcpu)
-> +{
-> +	return !!(vcpu_get_perf_capabilities(vcpu) & PERF_CAP_PERF_METRICS);
-> +}
-> +
-> +static inline bool kvm_host_has_perf_metrics(void)
-> +{
-> +	return !!(kvm_host.perf_capabilities & PERF_CAP_PERF_METRICS);
-> +}
-> +
->  void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
->  void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
->  int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
-> @@ -287,6 +305,7 @@ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel);
->  bool vcpu_pmu_can_enable(struct kvm_vcpu *vcpu);
->  
->  bool is_vmware_backdoor_pmc(u32 pmc_idx);
-> +bool kvm_rdpmc_in_guest(struct kvm_vcpu *vcpu);
->  
->  extern struct kvm_pmu_ops intel_pmu_ops;
->  extern struct kvm_pmu_ops amd_pmu_ops;
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index c8b9fd9b5350..153972e944eb 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -173,7 +173,7 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  	return 1;
->  }
->  
-> -static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
-> +static void __amd_pmu_refresh(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->  	union cpuid_0x80000022_ebx ebx;
-> @@ -212,6 +212,18 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->  	bitmap_set(pmu->all_valid_pmc_idx, 0, pmu->nr_arch_gp_counters);
->  }
->  
-> +static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	__amd_pmu_refresh(vcpu);
-> +
-> +	if (kvm_rdpmc_in_guest(vcpu))
-> +		svm_clr_intercept(svm, INTERCEPT_RDPMC);
-> +	else
-> +		svm_set_intercept(svm, INTERCEPT_RDPMC);
-> +}
-> +
+> MM.. TSM driver is the agent of trusted firmware in the OS, so I
+> excluded it from "hypervisor". TSM driver could parse data blobs and do
+> whatever requested by trusted firmware.
+> 
+> I want to justify the general guest_request interface, explain why
+> VIFO/IOMMUFD don't have to maintain the "attest", "accept" states.
+> 
+>>
+>>> Bind cannot be host agnostic, host should be aware not to touch device
+>>> after Bind.
+>>
+>> Bind actually connects a TDI to a guest, the guest could not possibly do that alone as it does not know/have access to the physical PCI function#0 to do the DOE/SecSPDM messaging, and neither does the PSP.
+>>
+>> The non-touching clause (or, more precisely "selectively touching") is about "Attest" and "Accept" when the TDI is in the CONFIG_LOCKED or RUN state. Up to the point when we rather want to block the config space and MSIX BAR access after the TDI is CONFIG_LOCKED/RUN to prevent TDI from going to the ERROR state.
+>>
+>>
+>>>>
+>>>>> But in my mind, "bind" only includes
+>>>>> putting device in TDISP LOCK state & corresponding host setups required
+>>>>> by firmware. I.e "bind" means host lockes down the CC setup, waiting for
+>>>>> guest attestation.
+>>>>
+>>>> So we will need to have some other API for this that modifies the vPCI
+>>>> object.
+>>>
+>>> IIUC, in Alexey's patch ioctl(iommufd, IOMMU_VDEVICE_TSM_BIND) does the
+>>> "Bind" thing in host.
+>>
+>>
+>> I am still not sure what "vPCI" means exactly, a passed through PCI device? Or a piece of vIOMMU handling such device?
+>>
+> 
+> My understanding is both. When you "Bind" you modifies the physical
+> device, you may also need to setup a piece of vIOMMU for private
+> assignement to work.
+> 
+>>
+>>>> It might be reasonable to have VFIO reach into iommufd to do that on
+>>>> an already existing iommufd VDEVICE object. A little weird, but we
+>>>> could probably make that work.
+>>>
+>>> Mm, Are you proposing an uAPI in VFIO, and a kAPI from VFIO -> IOMMUFD like:
+>>>
+>>>    ioctl(vfio_fd, VFIO_DEVICE_ATTACH_VDEV, vdev_id)
+>>>    -> iommufd_device_attach_vdev()
+>>>       -> tsm_tdi_bind()
+>>>
+>>>>
+>>>> But you have some weird ordering issues here if the S-EPT has to have
+>>>> the VFIO MMIO then you have to have a close() destruction order that
+>>>
+>>> Yeah, by holding kvm reference.
+>>>
+>>>> sees VFIO remove the S-EPT and release the KVM, then have iommufd
+>>>> destroy the VDEVICE object.
+>>>
+>>> Regarding VM destroy, TDX Connect has more enforcement, VM could only be
+>>> destroyed after all assigned CC vPCI devices are destroyed.
+>>
+>> Can be done by making IOMMUFD/vdevice holding the kvm pointer to ensure tsm_tdi_unbind() is not called before the guest disappeared from the firmware. I seem to be just lucky with the current order of things being destroyed, hmm.
+>>
+> 
+> tsm_tdi_unbind() *should* be called before guest disappear. For TDX
+> Connect that is the enforcement. Holding KVM pointer is the effective
+> way.
+> 
+>>
+>>> Nowadays, VFIO already holds KVM reference, so we need
+>>>
+>>> close(vfio_fd)
+>>> -> iommufd_device_detach_vdev()
+>>>      -> tsm_tdi_unbind()
+>>>         -> tdi stop
+>>>         -> callback to VFIO, dmabuf_move_notify(revoke)
+>>>            -> KVM unmap MMIO
+>>>         -> tdi metadata remove
+>>> -> kvm_put_kvm()
+>>>      -> kvm_destroy_vm()
+>>>
+>>>
+>>>>
+>>>>>> It doesn't mean that iommufd is suddenly doing PCI stuff, no, that
+>>>>>> stays in VFIO.
+>>>>>
+>>>>> I'm not sure if Alexey's patch [1] illustates your idea. It calls
+>>>>> tsm_tdi_bind() which directly does device stuff, and impacts MMIO.
+>>>>> VFIO doesn't know about this.
+>>
+>> VFIO knows about this enough as we asked it to share MMIO via dmabuf's fd and not via mmap(), otherwise it is the same MMIO, exactly where it was, BARs do not change.
+>>
+> 
+> Yes, if you define a SW "lock down" in boarder sense than TDISP LOCKED.
+> But seems TDX Connect failed to adapt to this solution because it still
+> needs to handle MMIO invalidation before FLR, see below.
+> 
+>>>>>
+>>>>> I have to interpret this as VFIO firstly hand over device CC features
+>>>>> and MMIO resources to IOMMUFD, so VFIO never cares about them.
+>>>>>
+>>>>> [1] https://lore.kernel.org/all/20250218111017.491719-15-aik@amd.com/
+>>>>
+>>>> There is also the PCI layer involved here and maybe PCI should be
+>>>> participating in managing some of this. Like it makes a bit of sense
+>>>> that PCI would block the FLR on platforms that require this?
+>>>
+>>> FLR to a bound device is absolutely fine, just break the CC state.
+>>> Sometimes it is exactly what host need to stop CC immediately.
+>>> The problem is in VFIO's pre-FLR handling so we need to patch VFIO, not
+>>> PCI core.
+>>
+>> What is a problem here exactly?
+>> FLR by the host which equals to any other PCI error? The guest may or may not be able to handle it, afaik it does not handle any errors now, QEMU just stops the guest.
+> 
+> It is about TDX Connect.
+> 
+> According to the dmabuf patchset, the dmabuf needs to be revoked before
+> FLR. That means KVM unmaps MMIOs when the device is in LOCKED/RUN state.
+> That is forbidden by TDX Module and will crash KVM.
 
-After putting kprobes on kvm_pmu_rdpmc(), I noticed that RDPMC instructions were
-getting intercepted for the secondary vCPUs. This happens because when secondary
-vCPUs come up, kvm_vcpu_reset() gets called after guest CPUID has been updated.
-While RDPMC interception is initially disabled in the kvm_pmu_refresh() path, it
-gets re-enabled in the kvm_vcpu_reset() path as svm_vcpu_reset() calls init_vmcb().
-We should consider adding the following change to avoid that.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 6f9142063cc4..1c9c183092f3 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1354,7 +1354,6 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
-                svm_set_intercept(svm, INTERCEPT_SMI);
+FLR is something you tell the device to do, how/why would TDX know about it? Or it check the TDI state on every map/unmap (unlikely)?
 
-        svm_set_intercept(svm, INTERCEPT_SELECTIVE_CR0);
--       svm_set_intercept(svm, INTERCEPT_RDPMC);
-        svm_set_intercept(svm, INTERCEPT_CPUID);
-        svm_set_intercept(svm, INTERCEPT_INVD);
-        svm_set_intercept(svm, INTERCEPT_INVLPG);
 
->  static void amd_pmu_init(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index fc017e9a6a0c..2a5f79206b02 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -108,14 +108,6 @@ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
->  	return &counters[array_index_nospec(idx, num_counters)];
->  }
->  
-> -static inline u64 vcpu_get_perf_capabilities(struct kvm_vcpu *vcpu)
-> -{
-> -	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_PDCM))
-> -		return 0;
-> -
-> -	return vcpu->arch.perf_capabilities;
-> -}
-> -
->  static inline bool fw_writes_is_enabled(struct kvm_vcpu *vcpu)
->  {
->  	return (vcpu_get_perf_capabilities(vcpu) & PERF_CAP_FW_WRITES) != 0;
-> @@ -456,7 +448,7 @@ static void intel_pmu_enable_fixed_counter_bits(struct kvm_pmu *pmu, u64 bits)
->  		pmu->fixed_ctr_ctrl_rsvd &= ~intel_fixed_bits_by_idx(i, bits);
->  }
->  
-> -static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
-> +static void __intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->  	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
-> @@ -564,6 +556,14 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> +static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
-> +{
-> +	__intel_pmu_refresh(vcpu);
-> +
-> +	exec_controls_changebit(to_vmx(vcpu), CPU_BASED_RDPMC_EXITING,
-> +				!kvm_rdpmc_in_guest(vcpu));
-> +}
-> +
->  static void intel_pmu_init(struct kvm_vcpu *vcpu)
->  {
->  	int i;
+> So the safer way is
+> to unbind the TDI first, then revoke MMIOs, then do FLR.
+> 
+> I'm not sure when p2p dma is involved AMD will have the same issue.
+
+On AMD, the host can "revoke" at any time, at worst it'll see RMP events from IOMMU. Thanks,
+
+
+> Cause in that case, MMIOs would also be mapped in IOMMU PT and revoke
+> MMIOs means IOMMU mapping drop. The root cause of the concern is secure
+> firmware should monitor IOMMU mapping integrity for private assignement
+> or hypervisor could silently drop trusted DMA writting.
+> 
+> TDX Connect has the wider impact on this issue cause it uses the same
+> table for KVM S-EPT and Secure IOMMU PT.
+> 
+> Thanks,
+> Yilun
+> 
+>> Or FLR by the guest? Then it knows it needs to do the dance with attest/accept, again.
+>>
+>> Thanks,
+>>
+>>>
+>>> Thanks,
+>>> Yilun
+>>>
+>>>>
+>>>> Jason
+>>
+>> -- 
+>> Alexey
+>>
+
+-- 
+Alexey
 
 
