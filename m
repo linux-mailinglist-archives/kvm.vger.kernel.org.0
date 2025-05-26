@@ -1,137 +1,322 @@
-Return-Path: <kvm+bounces-47680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE790AC3BB7
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 10:29:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49A03AC3BFC
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 10:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5674B1895336
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 08:29:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09BA61750E8
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 08:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 512A91E520F;
-	Mon, 26 May 2025 08:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dP0lau5M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136D81EFF96;
+	Mon, 26 May 2025 08:50:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx1.zhaoxin.com (MX1.ZHAOXIN.COM [210.0.225.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C421198E81;
-	Mon, 26 May 2025 08:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D3A1D799D
+	for <kvm@vger.kernel.org>; Mon, 26 May 2025 08:50:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.0.225.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748248131; cv=none; b=QFPdvUx7Ax71zHJQLjWcF7Yhg7ib8zQOEGbGHL737DGoGe3p5hHMqfLKyxTfHOy6uqKUSZMWh8Mv0o/idkJ+JpG8a2esYrSt3NZqudnYrHJTv5uKpmgV8BHsWlmecUWOynqLkZVLe8hz9RQFRO+S+3PQX8KvV6y44OYpPKbCxz0=
+	t=1748249419; cv=none; b=QyMeAoZbByvqWMG82knqfLlK+03iYG3QMzLoABNWW4l6SsIZP76L4nDNqSAWQghqGoGY6R9b7FYEpI36m1LhoOD1+xf5N3RQYSxsSnt0ahDsQKiKCsONxKV1UYwkTkUwBv31fpi/c0XNPRlxFjU1PXx7rBVKOdCotqM8xbTWrlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748248131; c=relaxed/simple;
-	bh=R/mh6Zul9ir7yyGc3dY7ZlTq7zWtuvIib1tyCskeWX8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SlkdPPqFhkSdF1tmOzyWC+6Yv7XKQxY4R+rsNN5mr4y24huPQtBNsAbBD+6D1LQp3BFOWnEIPvWsRtJBIggonzzLqHFeZii9KRZ8giDOHyIqeURAb69ZbX/robQHMk5EKtesRnjLZJxwQr7OxFV52SFzRSlZ4rcYuGF1drlytRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dP0lau5M; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54PNIw2x004992;
-	Mon, 26 May 2025 08:28:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=UfGDp6cM5QSoaUR5RyKlw8Qo+AeCPo
-	zfCu0VyqhsXJk=; b=dP0lau5MFoIUozB3UZt+1X04xRY1KNVTsk2+C6lK0zeoSL
-	F4HgzxG2izg1J2KtxapEX2cufdKwJC9AZqpNZOzYix2r+fefcSHhSRa9k9rA5pmV
-	oCGUxba/KkMGTUILea//yA2v/bLjTnDQpemfHDULgFXWYpfTNqumgOXNzD0m4Cqo
-	hUKAg/f85841UHbYMSfVN5cLgQ7ysYbnNW6DxaPOXIJ+4NkIVCmN4ltEg6ryiF18
-	KKqiIHl1i8KquF2f4uyFPrmkuc8ZKg6KLm8LeHnqv0hD9jVjznYO5tT32aHviDHP
-	no5ue3ZiKrFcJ8K7p8P3wUG6AAxnTfs7ToM5xvEQ==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46u5t0g3pj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 May 2025 08:28:47 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54Q7lwZV010712;
-	Mon, 26 May 2025 08:28:45 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46uru0den1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 May 2025 08:28:45 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54Q8Sfp639452968
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 26 May 2025 08:28:42 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D7C5820049;
-	Mon, 26 May 2025 08:28:41 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 28DAB20040;
-	Mon, 26 May 2025 08:28:41 +0000 (GMT)
-Received: from osiris (unknown [9.111.60.222])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 26 May 2025 08:28:41 +0000 (GMT)
-Date: Mon, 26 May 2025 10:28:39 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, seiden@linux.ibm.com, nsg@linux.ibm.com,
-        nrb@linux.ibm.com, david@redhat.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, gor@linux.ibm.com, schlameuss@linux.ibm.com
-Subject: Re: [PATCH v4 1/4] s390: remove unneeded includes
-Message-ID: <20250526082839.13937B8b-hca@linux.ibm.com>
-References: <20250523130348.247446-1-imbrenda@linux.ibm.com>
- <20250523130348.247446-2-imbrenda@linux.ibm.com>
+	s=arc-20240116; t=1748249419; c=relaxed/simple;
+	bh=AkVXVSjB4O6tRFyqff1i6EhpGWPXQ8T2shh8iEytb7o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=gA4B4P0ZsCfX3P8NuKDRhnFcFkOhfNiUy6t2dCoLpHsN1HEFvgfnJgc0cpBU0IQaIUwfTaB/8D33isX2hsl0kiar1iRKpuZ4QYiHvBcgUIE9LxBt4Yvv3Hwg6KXHgcwylZ2juiz2rus1M3vKtoWg9MTpoS5svyap9G+nCnwb47Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=210.0.225.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+X-ASG-Debug-ID: 1748249404-086e236c19149820001-HEqcsx
+Received: from ZXSHMBX2.zhaoxin.com (ZXSHMBX2.zhaoxin.com [10.28.252.164]) by mx1.zhaoxin.com with ESMTP id 91fihcvXfPo7Av6h (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Mon, 26 May 2025 16:50:04 +0800 (CST)
+X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
+Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by ZXSHMBX2.zhaoxin.com
+ (10.28.252.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Mon, 26 May
+ 2025 16:50:04 +0800
+Received: from ZXSHMBX1.zhaoxin.com ([::1]) by ZXSHMBX1.zhaoxin.com
+ ([fe80::2c07:394e:4919:4dc1%7]) with mapi id 15.01.2507.044; Mon, 26 May 2025
+ 16:50:04 +0800
+X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
+Received: from [192.168.31.91] (10.28.66.62) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.44; Mon, 26 May
+ 2025 16:35:54 +0800
+Message-ID: <fa16f7a8-4917-4731-9d9f-7d4c10977168@zhaoxin.com>
+Date: Mon, 26 May 2025 16:35:52 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250523130348.247446-2-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI2MDA2MiBTYWx0ZWRfX5RLdyH5SEKvp 6UVaPuqxdpG+j92dOLnaHsGk1ZcyEVKpH8L0IDYZMlCejwdZq9780syCEqXE0xOwDKzvy1XqJIL 1SQW86scc62OKci4P3ku1SCeD/1u8vouIGOK+UD09n08iRBNYKwfARRB68JUfGc5pD0LTwzvfWN
- rKu9CC5S8y+IxBBYfceDf3j8Hp0Xzt01XWpKLC+CvENaBMnoni9Gj8Fn7dFDnoDpKAOUfBdNEAT 4Wv0WsQavA51G4KQRTp8t/h8MpZ8BsFsXhgivlp4KCSVbnn2Oi5fA97R/GQM9qSCFNgsmt8HSoM tDQ9VXZ7a+CUOAcpUf6yjBPa9lEbpEkpNGpdPqereJfli0sJGp5ozZw8CpubHOLvyBoESkt1VJe
- IrOiDRHF7NiL581n9yZ/tEecOJPPNbbvFKGystaYnacpFLSqhjuFU0IMx0dwXW6xNKqBQZ2r
-X-Authority-Analysis: v=2.4 cv=INACChvG c=1 sm=1 tr=0 ts=6834263f cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=BorKYyAo29sJGMwN-gMA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: Hk57UNPgzIm7SiruqINlBRreqaQVUxcc
-X-Proofpoint-GUID: Hk57UNPgzIm7SiruqINlBRreqaQVUxcc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-26_04,2025-05-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- clxscore=1015 phishscore=0 mlxscore=0 malwarescore=0 impostorscore=0
- suspectscore=0 adultscore=0 mlxlogscore=637 priorityscore=1501
- lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505260062
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
+ Intel
+To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
+	<berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+X-ASG-Orig-Subj: Re: [RFC 01/10] i386/cpu: Mark CPUID[0x80000005] as reserved for
+ Intel
+CC: Babu Moger <babu.moger@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>, "Tejus
+ GK" <tejus.gk@nutanix.com>, Jason Zeng <jason.zeng@intel.com>, Manish Mishra
+	<manish.mishra@nutanix.com>, Tao Su <tao1.su@intel.com>,
+	<qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+References: <20250423114702.1529340-1-zhao1.liu@intel.com>
+ <20250423114702.1529340-2-zhao1.liu@intel.com>
+From: Ewan Hai <ewanhai-oc@zhaoxin.com>
+In-Reply-To: <20250423114702.1529340-2-zhao1.liu@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
+X-Moderation-Data: 5/26/2025 4:50:02 PM
+X-Barracuda-Connect: ZXSHMBX2.zhaoxin.com[10.28.252.164]
+X-Barracuda-Start-Time: 1748249404
+X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
+X-Barracuda-URL: https://10.28.252.35:4443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at zhaoxin.com
+X-Barracuda-Scan-Msg-Size: 8731
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.141939
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------------------------
 
-On Fri, May 23, 2025 at 03:03:45PM +0200, Claudio Imbrenda wrote:
-> Many files don't need to include asm/tlb.h or asm/gmap.h.
-> On the other hand, asm/tlb.h does need to include asm/gmap.h.
+
+
+On 4/23/25 7:46 PM, Zhao Liu wrote:
 > 
-> Remove all unneeded includes so that asm/tlb.h is not directly used by
-> s390 arch code anymore. Remove asm/gmap.h from a few other files as
-> well, so that now only KVM code, mm/gmap.c, and asm/tlb.h include it.
+> Per SDM, 0x80000005 leaf is reserved for Intel CPU, and its current
+> "assert" check blocks adding new cache model for non-AMD CPUs.
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+> Therefore, check the vendor and encode this leaf as all-0 for Intel
+> CPU. And since Zhaoxin mostly follows Intel behavior, apply the vendor
+> check for Zhaoxin as well.
+> 
+> Note, for !vendor_cpuid_only case, non-AMD CPU would get the wrong
+> information, i.e., get AMD's cache model for Intel or Zhaoxin CPUs.
+> For this case, there is no need to tweak for non-AMD CPUs, because
+> vendor_cpuid_only has been turned on by default since PC machine v6.1.
+> 
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 > ---
->  arch/s390/include/asm/tlb.h | 1 +
->  arch/s390/include/asm/uv.h  | 1 -
->  arch/s390/kvm/intercept.c   | 1 +
->  arch/s390/mm/fault.c        | 1 -
->  arch/s390/mm/gmap.c         | 1 -
->  arch/s390/mm/init.c         | 1 -
->  arch/s390/mm/pgalloc.c      | 2 --
->  arch/s390/mm/pgtable.c      | 1 -
->  8 files changed, 2 insertions(+), 7 deletions(-)
+>   target/i386/cpu.c | 16 ++++++++++++++--
+>   1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 1b64ceaaba46..8fdafa8aedaf 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -7248,11 +7248,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>           *edx = env->cpuid_model[(index - 0x80000002) * 4 + 3];
+>           break;
+>       case 0x80000005:
+> -        /* cache info (L1 cache) */
+> -        if (cpu->cache_info_passthrough) {
+> +        /*
+> +         * cache info (L1 cache)
+> +         *
+> +         * For !vendor_cpuid_only case, non-AMD CPU would get the wrong
+> +         * information, i.e., get AMD's cache model. It doesn't matter,
+> +         * vendor_cpuid_only has been turned on by default since
+> +         * PC machine v6.1.
+> +         */
+> +        if (cpu->vendor_cpuid_only &&
+> +            (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))) {
+> +            *eax = *ebx = *ecx = *edx = 0;
+> +            break;
+> +        } else if (cpu->cache_info_passthrough) {
+>               x86_cpu_get_cache_cpuid(index, 0, eax, ebx, ecx, edx);
+>               break;
+>           }
+> +
+>           *eax = (L1_DTLB_2M_ASSOC << 24) | (L1_DTLB_2M_ENTRIES << 16) |
+>                  (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
+>           *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) |
 
-Please change the subject so the first character after "s390: " is an
-upper case character, like it is supposed to be the case for all s390
-related patches. For "KVM: s390:" there seems to be no consistent
-rule, but that's your playground.
+I've reviewed the cache-related CPUID path and noticed an oddity: every AMD vCPU 
+model still reports identical hard-coded values for the L1 ITLB and L1 DTLB 
+fields in leaf 0x8000_0005. Your patch fixes this for Intel(and Zhaoxin), but 
+all AMD models continue to receive the same constants in EAX/EBX.
 
-Anyway:
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
+Do you know the reason for this choice? Is the guest expected to ignore those L1 
+TLB numbers? If so, I'll prepare a patch that adjusts only the Zhaoxin defaults 
+in leaf 0x8000_0005 like below, matching real YongFeng behaviour in ecx and edx, 
+but keep eax and ebx following AMD's behaviour.
+
+## Notes
+1. Changes tied to "-machine smp-cache xxx" (mainly 
+x86_cpu_update_smp_cache_topo()) are not included here.
+2. Do you think I need Zhaoxin-specific legacy_l1d/l1i/l2/l3_cache helpers? If 
+yes, I'll add them with YongFeng sillicon topology data.
+
+--- patch prototype start ---
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 7b223642ba..8a17e5ffe9 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2726,6 +2726,66 @@ static const CPUCaches xeon_srf_cache_info = {
+      },
+  };
+
++static const CPUCaches yongfeng_cache_info = {
++    .l1d_cache = &(CPUCacheInfo) {
++        .type = DATA_CACHE,
++        .level = 1,
++        .size = 32 * KiB,
++        .line_size = 64,
++        .associativity = 8,
++        .partitions = 1,
++        .sets = 64,
++        .lines_per_tag = 1,
++        .inclusive = false,
++        .self_init = true,
++        .no_invd_sharing = false,
++        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
++    },
++    .l1i_cache = &(CPUCacheInfo) {
++        .type = INSTRUCTION_CACHE,
++        .level = 1,
++        .size = 64 * KiB,
++        .line_size = 64,
++        .associativity = 16,
++        .partitions = 1,
++        .sets = 64,
++        .lines_per_tag = 1,
++        .inclusive = false,
++        .self_init = true,
++        .no_invd_sharing = false,
++        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
++    },
++    .l2_cache = &(CPUCacheInfo) {
++        .type = UNIFIED_CACHE,
++        .level = 2,
++        .size = 256 * KiB,
++        .line_size = 64,
++        .associativity = 8,
++        .partitions = 1,
++        .sets = 512,
++        .lines_per_tag = 1,
++        .inclusive = true,
++        .self_init = true,
++        .no_invd_sharing = false,
++        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
++    },
++    .l3_cache = &(CPUCacheInfo) {
++        .type = UNIFIED_CACHE,
++        .level = 3,
++        .size = 8 * MiB,
++        .line_size = 64,
++        .associativity = 16,
++        .partitions = 1,
++        .sets = 8192,
++        .lines_per_tag = 1,
++        .self_init = true,
++        .inclusive = true,
++        .no_invd_sharing = true,
++        .complex_indexing = false,
++        .share_level = CPU_TOPOLOGY_LEVEL_DIE,
++    },
++};
++
+  /* The following VMX features are not supported by KVM and are left out in the
+   * CPU definitions:
+   *
+@@ -5928,6 +5988,15 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+                      { /* end of list */ }
+                  }
+              },
++            {
++                .version = 3,
++                .note = "wiith the correct model number and cache info",
++                .props = (PropValue[]) {
++                    { "model", "0x5b" },
++                    { /* end of list */ }
++                },
++                .cache_info = &yongfeng_cache_info
++            },
+              { /* end of list */ }
+          }
+      },
+@@ -7565,8 +7634,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, 
+uint32_t count,
+           * vendor_cpuid_only has been turned on by default since
+           * PC machine v6.1.
+           */
+-        if (cpu->vendor_cpuid_only &&
+-            (IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env))) {
++        if (cpu->vendor_cpuid_only && IS_INTEL_CPU(env)) {
+              *eax = *ebx = *ecx = *edx = 0;
+              break;
+          } else if (cpu->cache_info_passthrough) {
+@@ -7578,8 +7646,21 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, 
+uint32_t count,
+                 (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
+          *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) |
+                 (L1_ITLB_4K_ASSOC <<  8) | (L1_ITLB_4K_ENTRIES);
+-        *ecx = encode_cache_cpuid80000005(env->cache_info_amd.l1d_cache);
+-        *edx = encode_cache_cpuid80000005(env->cache_info_amd.l1i_cache);
++
++        if (IS_AMD_CPU(env)) {
++            *ecx = encode_cache_cpuid80000005(env->cache_info_amd.l1d_cache);
++            *edx = encode_cache_cpuid80000005(env->cache_info_amd.l1i_cache);
++            break;
++        }
++        /* Zhaoxin follows AMD behaviour on leaf 0x8000_0005 */
++        if (IS_ZHAOXIN_CPU(env)) {
++            *ecx = encode_cache_cpuid80000005(env->cache_info_zhaoxin.l1d_cache);
++            *edx = encode_cache_cpuid80000005(env->cache_info_zhaoxin.l1i_cache);
++            break;
++        }
++
++        /* Other vendors */
++        *eax = *ebx = *ecx = *edx = 0;
+          break;
+      case 0x80000006:
+          /* cache info (L2 cache) */
+@@ -8638,7 +8719,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+              return;
+          }
+          env->cache_info_cpuid2 = env->cache_info_cpuid4 = env->cache_info_amd =
+-            *cache_info;
++            env->cache_info_zhaoxin = *cache_info;
+      } else {
+          /* Build legacy cache information */
+          env->cache_info_cpuid2.l1d_cache = &legacy_l1d_cache;
+@@ -8655,6 +8736,11 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+          env->cache_info_amd.l1i_cache = &legacy_l1i_cache_amd;
+          env->cache_info_amd.l2_cache = &legacy_l2_cache_amd;
+          env->cache_info_amd.l3_cache = &legacy_l3_cache;
++
++        env->cache_info_zhaoxin.l1d_cache = &legacy_l1d_cache;
++        env->cache_info_zhaoxin.l1i_cache = &legacy_l1i_cache;
++        env->cache_info_zhaoxin.l2_cache = &legacy_l2_cache;
++        env->cache_info_zhaoxin.l3_cache = &legacy_l3_cache;
+      }
+
+  #ifndef CONFIG_USER_ONLY
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index d98c9ba282..46bfd6f6b0 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -2062,6 +2062,7 @@ typedef struct CPUArchState {
+       * with old QEMU versions.
+       */
+      CPUCaches cache_info_cpuid2, cache_info_cpuid4, cache_info_amd;
++    CPUCaches cache_info_zhaoxin;
+
+      /* MTRRs */
+      uint64_t mtrr_fixed[11];
+
+
+
+
 
