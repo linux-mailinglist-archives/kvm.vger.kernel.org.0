@@ -1,164 +1,126 @@
-Return-Path: <kvm+bounces-47729-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47730-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75BEAC444B
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 22:13:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EE35AC445B
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 22:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF544177394
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 20:13:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AE823BBCC5
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 20:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8266F23F439;
-	Mon, 26 May 2025 20:13:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550372405F8;
+	Mon, 26 May 2025 20:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YvcVXe33"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="EWSfJNH2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5AE23F294
-	for <kvm@vger.kernel.org>; Mon, 26 May 2025 20:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194B5202C3E
+	for <kvm@vger.kernel.org>; Mon, 26 May 2025 20:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748290397; cv=none; b=Fc+3lvJTBVpHFmfu+ZCw1rm551u5XR3mgGSmBGvjgiw6WKuR+v9hD6Gi8RM8XRuaagWZaae3n2yLYTLXSDKyF1i1x36K7EP/NdFGnoB74bmcmyuLQO8+AcP/xFyOyHXGkmWVoA86tsaA5P8HJQN8wYqwRvi/Yo+G24NdyQq5jtM=
+	t=1748290800; cv=none; b=TdVEwjlVpiaIPOwAhsajSIbUuSk+5DRNPKKHVQZfgYMwZtbCLdZuYlBNgslF9/hRpqylgo46LqJQ3774g2c/fcJXedrEY9cOe3IEZ6eJ7IIMAlGiNJU2gM7PwIu+aVcBOLb5YoRBcuo7y3wrpgYnaPKITGfIZRtlsE+fFndpaeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748290397; c=relaxed/simple;
-	bh=udre1uGBOac6motS58as4+M/iSTXL1UBy24ANEE9bs4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XSjg61HEpr/pfpf/Ts/zdclybqvfA3/G4BrQcuHh7mda1B9W/xmPH4lTVEUlr+pDgDUw2br5ha5KO7dK10IeCJH2rHG47hgmJBxTX6+87GjCmBQsXiuLBYPKShutUh8zTcCrdk0m3BjjhZI2Kd+3fiBYDoP9/9AEfYkCZJCsqHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YvcVXe33; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748290394;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hM8pOHSOHM6og3y9wbI886KhOM4ZVpJTZ9nEg3CMFeQ=;
-	b=YvcVXe33egBPVNlnLTlKyPXKK18anlMQq7uZnhVsYLFVTdpUjjGn7eFH/bjn292OfDkncQ
-	Eseyos9q1prSegBMx42kOYj0OmTufItNtQtnDrhOyz+PVE4E01uj+SRIIrsKJMabqVrFKb
-	R9sNptzi0ZcDyFhif3dws6yJ4SorhZc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-588-uVs65y3dNxKZO67jn2hnFg-1; Mon, 26 May 2025 16:13:13 -0400
-X-MC-Unique: uVs65y3dNxKZO67jn2hnFg-1
-X-Mimecast-MFC-AGG-ID: uVs65y3dNxKZO67jn2hnFg_1748290392
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-445135eb689so16302695e9.2
-        for <kvm@vger.kernel.org>; Mon, 26 May 2025 13:13:13 -0700 (PDT)
+	s=arc-20240116; t=1748290800; c=relaxed/simple;
+	bh=o5gQ5x0CBQ2LeBkPQqD92Vnk0YT48zi3/abof9Kr7J8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uVoPYoBD4Es7vZf6sUHYrr6NT0LuxDwoF/7BcOY5V6ck2hI0xUXOljk/IUknaqUHvNxaxxQWME7GynKgW+69XGiSzGOxhPVVtm2FL2jzP08FTQyXbTHAupzggXzjsDEAgpDZEQiRcpXDbz5h1lIzM8IqdDbJWg9cDeiwK7u5MXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=EWSfJNH2; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6f8b2682d61so35271826d6.0
+        for <kvm@vger.kernel.org>; Mon, 26 May 2025 13:19:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1748290797; x=1748895597; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hLps+JNcyParOfDXS9JzFuLbkraKablpTP/PpVjY8aw=;
+        b=EWSfJNH2OS7eXS5AadrkMnsUFh4lfgsS+45mZ83t54Fzu6KNdTFO6TCrrx5XVwMA8r
+         uatDdgZ2wRrNfxzXezYm8lCtBF92o5BzvjNoMEh7s0kziKRX5YUh28B5qmDzXSP68Dlg
+         1xlAjsuEbpaxgnPX4CCItTarHTgRu3VlpBAeWtTkOiWMEvEUDpp2iacOXFOCf7QWTtGT
+         8qa8Lcw9KioNrV+LTz8fRLz1OeHF9Q6hLYb+ScKLVc431nu1oQ2VHfg977Tbw6QD8Tn+
+         Pn+4qsNY/0KUQ0ZPf2iqHq2wUj7hWXU/rYkEit12XeodDJ5TV6hLtFjWNw5vyUvGvfFA
+         v8ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748290392; x=1748895192;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hM8pOHSOHM6og3y9wbI886KhOM4ZVpJTZ9nEg3CMFeQ=;
-        b=Dff6PDqDXhZccmLRpoPjmq/SPyA5tt6k+qB7FUM01FsCnYfVp8VPB0FYba5K7bAQEY
-         KZrl1U9hnpqQ+Qc0mAe/uwaL0JWRJhTKUZ37jVYChVEObBZ8x7AWLN1oH/oK7Ty8mbQM
-         gck6Thx3DlyG0HYwv3af3qQ45Krt6HbUYIpnwOozkhrvWga5jNOfJRPencML8zxJbcYS
-         GOdK5+7IPIZRLIQyUhg6fSyWhfeUbtWTG2r+PXfjtqRscXDumS7WDpR9loxIihsw0eIP
-         h+us/ry5gIUug0w6/WBFQdnz8X+LsKr2LzAKJO3KbpnvQXFS4llzD5vL1m5xJDxbEr6F
-         nZXw==
-X-Forwarded-Encrypted: i=1; AJvYcCWnMX7mFybUgB8q72C3HVmMRdnnqTyTK6AtwAunJ7Y1Y3v3ArUF1V88kFnnzL1lgnkeRZY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpVuws1JHO9S0Eq4yVGVDDpXnA/7iESuYB0yr24SZRa8cbcC+N
-	KGNrNl9HvyrVPPN5Sm6C4ght21i1IvF9gpdGfn0VVAEQJgjQJkUssDpwD2P8lfvCWivJmhYL7lb
-	eTDQUTKMqyv1EyxNKauX61Bx7VqIgl1E50btqpw3TuKn/2gNuclIvJioPl5uHYAytQTMEmptMn+
-	GItBLKXcH7wWVIumSNp1mTntn7PteA
-X-Gm-Gg: ASbGncsf7i+WGZJPXPpV4ohgia5ID6Xc96bcqf/Nx4P/6zEickNACULSpLPtWV37Xip
-	LHodV/zPpZ/cwyIu7iPx/B8qUcUUBCjYc5AJ+DkdbhsH7yTAzcnXztHv68Z6CsucR6GA=
-X-Received: by 2002:a05:6000:40da:b0:3a3:698a:973 with SMTP id ffacd0b85a97d-3a4cb49fa3bmr8695100f8f.59.1748290392169;
-        Mon, 26 May 2025 13:13:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF0+AxXJPizTpP9QoO5IXtFAO01qqghm8BjYyQ+skkTbjCSgR/3ySaxc11xbULNV7xS2YBFBlH2xIjzip8xtKo=
-X-Received: by 2002:a05:6000:40da:b0:3a3:698a:973 with SMTP id
- ffacd0b85a97d-3a4cb49fa3bmr8695090f8f.59.1748290391828; Mon, 26 May 2025
- 13:13:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748290797; x=1748895597;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hLps+JNcyParOfDXS9JzFuLbkraKablpTP/PpVjY8aw=;
+        b=BhRmNPtH3rSEEwAyVb5vd2W3K5alkb9JVdJ5QsNQ4WKjDc7uKAutSJn+zEmtDgOnhg
+         GJ1gx7LBD8eDx8QVRjEMKZckzUJl8qDIRB1DDgJy2tqNsmigYx9j3PAAtCx+WKRRUqb6
+         63GZkUjiUAAruFr1AHFi4MLWKJke6dfL7KAwps9KB6pRqJ0X10K0NaDIh5rTAgKWy20Y
+         wUjQNE27vvNO335D9PwGJM7uwU+OsfSbiSH5baW927p7Prp4JPNbRAoG5n3d3WZQJp2v
+         p2PawcERev64Yw5pskIiS5UeMLun+fNRM1ApAA+NYuNGUZO4D6rzn9IHunb46m5dwKGs
+         wu0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXqgek2KxZPexuzUdOkpIxsB9h/79msjp9Az2hjueay9LqXa7rcUfCAjqdLCB/bvC1BqtI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5NvCmClyWT/avlBYk0ij0Y4ZbSuLbXWuNmOpAlxf91cxPWDnU
+	zFDrBTV5tHutxW4gLbsNOfnXyIu+qhltbAz71aSP751DiOmIlbHHdCpAlTR6LemDiEs=
+X-Gm-Gg: ASbGncubsFJUuCpLfoIQ49eiKv/tx2lXCD7ctvpO7AgFxO+97c/zJPG+z6iBHR3q6n7
+	k58M7boRwETYwuPPVF1FJli86eWYTvzRaDJrXI93k8lDreQKTK2Sj7AzwexHTPeJZ7JD6bJdioa
+	7/FX8EjmcVajRjGFqtffk70dcW96m8lWKt3dTcSld0KBIs9QD8tj4wbcWbKT7s4nlq34K3ZGHir
+	vfKFGyyDs8Il02n9VmqRFz75iG2ZKD8d9aqWzGKoFtL6zmdemadK+KzNpt81C05B1+2liOwB0e6
+	3Jg8rWCFXiUNoJHnHM8zlNuGNcLXNwuTZYD43+gDre+L4Y7lpBJVbsILTuppc4pLuLcI1im4o64
+	KNkCpkyHv7wmSMVUFLwr0Uh7/ZWY=
+X-Google-Smtp-Source: AGHT+IGgTwiyg5eiY7T72449r0+RVPoXtu68z9yqpkDUhC5jnCxOtecB9Azj5gEYa//3ikcBXT1glg==
+X-Received: by 2002:a05:6214:f09:b0:6fa:a5bf:2595 with SMTP id 6a1803df08f44-6faa5bf281dmr99808036d6.16.1748290796961;
+        Mon, 26 May 2025 13:19:56 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-167-56-70.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.56.70])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fa9a3dbd2asm45191276d6.48.2025.05.26.13.19.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 May 2025 13:19:56 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1uJeId-00000000UuV-48LG;
+	Mon, 26 May 2025 17:19:55 -0300
+Date: Mon, 26 May 2025 17:19:55 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, lizhe.67@bytedance.com,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	muchun.song@linux.dev
+Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for huge
+ folio
+Message-ID: <20250526201955.GI12328@ziepe.ca>
+References: <20250520070020.6181-1-lizhe.67@bytedance.com>
+ <3f51d180-becd-4c0d-a156-7ead8a40975b@redhat.com>
+ <20250520162125.772d003f.alex.williamson@redhat.com>
+ <ff914260-6482-41a5-81f4-9f3069e335da@redhat.com>
+ <20250521105512.4d43640a.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250522030628.1924833-1-chenhuacai@loongson.cn>
-In-Reply-To: <20250522030628.1924833-1-chenhuacai@loongson.cn>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 26 May 2025 22:13:00 +0200
-X-Gm-Features: AX0GCFvALzV40Zi8ewJWNPzDDkxsciCzCRalOrRxez99t8YObAZ1GdsLNkTkCX8
-Message-ID: <CABgObfadeF0Er+M7Lv0kB0O1bugDk+_3jbwKU38Ju63YO7NZhQ@mail.gmail.com>
-Subject: Re: [GIT PULL] LoongArch KVM changes for v6.16
-To: Huacai Chen <chenhuacai@loongson.cn>
-Cc: Huacai Chen <chenhuacai@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>, 
-	Jiaxun Yang <jiaxun.yang@flygoat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250521105512.4d43640a.alex.williamson@redhat.com>
 
-On Thu, May 22, 2025 at 5:07=E2=80=AFAM Huacai Chen <chenhuacai@loongson.cn=
-> wrote:
->
-> The following changes since commit a5806cd506af5a7c19bcd596e4708b5c464bfd=
-21:
->
->   Linux 6.15-rc7 (2025-05-18 13:57:29 -0700)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson=
-.git tags/loongarch-kvm-6.16
->
-> for you to fetch changes up to a867688c8cbb1b83667a6665362d89e8c762e820:
->
->   KVM: selftests: Add supported test cases for LoongArch (2025-05-20 20:2=
-0:26 +0800)
+On Wed, May 21, 2025 at 10:55:12AM -0600, Alex Williamson wrote:
 
-Pulled, thanks.
+> This optimization does rely on an assumption of consecutive _pages_ in
+> the array returned from GUP.  If we cannot assume the next array index
+> is the next page from the same folio (which afaict we have no basis to
+> do), we cannot use the folio as the basis for any optimization.
 
-Paolo
+Right! I was wondering why this code was messing with folios, it
+really can't learn anything from folios. The only advantage to folios
+is during unpinning where we can batch the atomics for all the folio
+sub pages, which the core mm helpers are doing.
 
-> ----------------------------------------------------------------
-> LoongArch KVM changes for v6.16
->
-> 1. Don't flush tlb if HW PTW supported.
-> 2. Add LoongArch KVM selftests support.
->
-> ----------------------------------------------------------------
-> Bibo Mao (7):
->       LoongArch: KVM: Add ecode parameter for exception handlers
->       LoongArch: KVM: Do not flush tlb if HW PTW supported
->       KVM: selftests: Add VM_MODE_P47V47_16K VM mode
->       KVM: selftests: Add KVM selftests header files for LoongArch
->       KVM: selftests: Add core KVM selftests support for LoongArch
->       KVM: selftests: Add ucall test support for LoongArch
->       KVM: selftests: Add supported test cases for LoongArch
->
->  MAINTAINERS                                        |   2 +
->  arch/loongarch/include/asm/kvm_host.h              |   2 +-
->  arch/loongarch/include/asm/kvm_vcpu.h              |   2 +-
->  arch/loongarch/kvm/exit.c                          |  37 +--
->  arch/loongarch/kvm/mmu.c                           |  15 +-
->  tools/testing/selftests/kvm/Makefile               |   2 +-
->  tools/testing/selftests/kvm/Makefile.kvm           |  17 +
->  tools/testing/selftests/kvm/include/kvm_util.h     |   6 +
->  .../kvm/include/loongarch/kvm_util_arch.h          |   7 +
->  .../selftests/kvm/include/loongarch/processor.h    | 141 +++++++++
->  .../selftests/kvm/include/loongarch/ucall.h        |  20 ++
->  tools/testing/selftests/kvm/lib/kvm_util.c         |   3 +
->  .../selftests/kvm/lib/loongarch/exception.S        |  59 ++++
->  .../selftests/kvm/lib/loongarch/processor.c        | 346 +++++++++++++++=
-++++++
->  tools/testing/selftests/kvm/lib/loongarch/ucall.c  |  38 +++
->  .../testing/selftests/kvm/set_memory_region_test.c |   2 +-
->  16 files changed, 674 insertions(+), 25 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/include/loongarch/kvm_uti=
-l_arch.h
->  create mode 100644 tools/testing/selftests/kvm/include/loongarch/process=
-or.h
->  create mode 100644 tools/testing/selftests/kvm/include/loongarch/ucall.h
->  create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
->  create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
->  create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
->
+Which brings me back to my first remark - this is all solved in
+iommufd, in a much better way :( I continue to think we should just
+leave this type1 stuff as-is upstream and encourage people to move
+forward.
 
+Lots of CSPs are running iommufd now. There is a commonly used OOT
+patch to add the insecure P2P support like VFIO. I know lots of folks
+have backported iommufd.. No idea about libvirt, but you can run it in
+compatibility mode and then you don't need to change libvirt.
+
+Jason
 
