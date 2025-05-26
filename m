@@ -1,220 +1,535 @@
-Return-Path: <kvm+bounces-47693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47692-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82A1BAC3C67
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 11:08:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D68F8AC3C60
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 11:08:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3A4B1896E09
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 09:09:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2A6C16AA96
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 09:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B7A1F3B83;
-	Mon, 26 May 2025 09:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660351EFF9A;
+	Mon, 26 May 2025 09:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OwTWoZpZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YqcnSqxO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14041F099C
-	for <kvm@vger.kernel.org>; Mon, 26 May 2025 09:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748250503; cv=none; b=fEy5B34YwW4i9mMrLz6ahW+If28VDg63HRVph79bQn6Ck3oWKGEPps+1m1jSlfncG4Let7bmYSjJEANwn/2FWzOwzaGn6AOeAhIZfkdj0viQmF3tFYMQCYpK6cNLBnmVEnlUSuw3fk6KclwVT0JS9mmG9atnhuIGGFEUjKxWLzo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748250503; c=relaxed/simple;
-	bh=LaOoOuum53zSM/sg8L0CA7QpQCvdV+tHLGG+vx57rmg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bfGPtrT0L/F5DWELMtWKG3fwaKHlMU5emOdHwh7Gk9wuiXv7lDy81XUfCZGpk5m0Z25rT04Fg/Zmaw0R6tGLTH5TkCinV3togZT8IV3Pe0bOCU9cZfRN5cAnRma7irgWIxelkItFqOX+0xilJSLLf2HH8lu2u0RLvNB8XK1imx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OwTWoZpZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748250500;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=LQxCWuutrhRX1ozeQ1hSnlARkYaLf5Pk8UUtSEwfD18=;
-	b=OwTWoZpZ77JnNatUVn1bRMtjroFzVnswUTPGLNDg0ej1LnZRJG/2E9wh1rG4bgr9vi4wlN
-	FNvLzzVKqW6XLDPqmEVGwRrs1eBmfzVKZyXtihYbtsP1Z1LzHdxaekNXTFmRQDsNTwoy03
-	zlxmp9yj4JVFxtzA0rf9l6Cvugl9sxo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-31-1iWvgYG0PJy8sEa4ils-XA-1; Mon, 26 May 2025 05:08:19 -0400
-X-MC-Unique: 1iWvgYG0PJy8sEa4ils-XA-1
-X-Mimecast-MFC-AGG-ID: 1iWvgYG0PJy8sEa4ils-XA_1748250498
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-442cd12d151so16816835e9.1
-        for <kvm@vger.kernel.org>; Mon, 26 May 2025 02:08:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748250498; x=1748855298;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LQxCWuutrhRX1ozeQ1hSnlARkYaLf5Pk8UUtSEwfD18=;
-        b=PkbgLyyUCB8PjHy2/dRjlBGQy04EloLrIRURkMdhTR2xYENkAFMZ5a6PaknwQPORRv
-         lYL2r+Z0CaU3I8yKiVB6zubU5I4XtoAnG80Y1h8+q2fotEGME3olQ+a9fr3UXBujCqmp
-         mDSqIs16ac/QkoQVeWgY7n9UjwJN6c7u0riDY7tmSZtjxvdrThdAfuuprYWUqyodbzDt
-         U7mMBAoCKsC70SNYdWfWj8EhCBL3fjvUvZVHffO3DYqeDOS7Q0s9c3U7gKasCE0q2Sp3
-         BuX5fNv2Ni7R8ZpQ9OgI8zUrA4Xq5bUOM7UQzQWfCdAbikZ757h3Su3fVeGSXnR2BIiF
-         NpnA==
-X-Forwarded-Encrypted: i=1; AJvYcCWbdjC/0LqGo6POFmyO5eeeGn5H9FB8qFaW3MNl7nCq11hr/3TjbHGd8Brdz06PoxjZHfg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+FM9EfGSbN4L6xGk/p1xcXVujZKZ/klI71CWeS4508DM8jNgl
-	TdSUfc4hGaOAq7se89vKgwtEU9RaIlNJmuu82tYM81XGsWtGgtN3/pOdPn7lqyVtfmLBc55A5qS
-	2gCC6Kl5NKWuI/Ft8xEjqZ6cFc0r0koc9w6uALOZeD/29q8oRNH1b4Q==
-X-Gm-Gg: ASbGncs558M4Pe07tOiZ6Fi1OvP2UnVywy/7BwaPPXFEaKU4LjCq44R1J9zNV9z7wuD
-	8s+N43ZnhQ42iSXo8zNY2e8WHY3QVvsOO10SZynCP7VsLBxn2KBAoWeLBXAedP5y5gXnd4bxFmg
-	vixYnwrc3XsGqlGgn7UjIIC6FhuURcOngc0QbWa++NpgtjK6nFF+LlBab6akRggRkXK0YXQMVnB
-	UYmocklURfymI1KnBw+C6vjkX2KGLV1EHUpEHx3TJ1P+oIXafmA8JhIAeGH/HiT6TU2RKzm11RL
-	M3WiJEhYhu4ZTefL1+ZbidTWRYBHv4soGSTJSCH2YWeeM5VbcGg+f1m4ZVMUyizbFAuJfnVTPlj
-	g2yQKq2Djp+M0ly2QUzBl1Aqb6zWrpjcRKQeMSHs=
-X-Received: by 2002:a05:600c:5286:b0:43b:c0fa:f9cd with SMTP id 5b1f17b1804b1-44c91ad6c06mr67951065e9.7.1748250497717;
-        Mon, 26 May 2025 02:08:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEBNQlYC1hvLZSSmh6Jjv2kh2e5AJrTyiKyxY21nmxjLlkOjxliRfA3Bxef5aUzhLswspqfqQ==
-X-Received: by 2002:a05:600c:5286:b0:43b:c0fa:f9cd with SMTP id 5b1f17b1804b1-44c91ad6c06mr67950705e9.7.1748250497280;
-        Mon, 26 May 2025 02:08:17 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f19:6500:e1c1:8216:4c25:efe4? (p200300d82f196500e1c182164c25efe4.dip0.t-ipconnect.de. [2003:d8:2f19:6500:e1c1:8216:4c25:efe4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f73d3edcsm236811905e9.20.2025.05.26.02.08.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 May 2025 02:08:16 -0700 (PDT)
-Message-ID: <7af3f5c9-7385-432f-aad6-7c25db2fafe2@redhat.com>
-Date: Mon, 26 May 2025 11:08:15 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423621DFDBB;
+	Mon, 26 May 2025 09:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748250471; cv=fail; b=t/2j0FfCJs182ZmuOi/FXUDZ1NnbX9hWmFoLHANIM8Mawu8VD8TiDCZ9YVRoyLsf1G1oZhyLFXkJgT51W8eEvVHNaeHVxxHrtgNOJsqEDQkVmPzeHcYABg3bylbXfPjtjZQVMK5bjihmO3i9EJMkNE9uEZYnVbAWy/1Zz+9eZYM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748250471; c=relaxed/simple;
+	bh=LWP9QfdB/l3McTolMVK+1wxg9IJWAgcrTqLVc7ztkuA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=gGsoZgRTZRHmeAsqShJcOjQXr6hrs+NkT0Yn+8y4pfq3s7CKS0pz31Yy/2xXy1OpBDsj/w39tjBp4qt6DViFIYYXhJCRvtgxOkUzZUci8tVUG367LlW1YmG15q4EiwkDKzCRNMuHj7AKx45AJMEghIzNdq6/Wk3ODcPVZW3RPmo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YqcnSqxO; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748250469; x=1779786469;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=LWP9QfdB/l3McTolMVK+1wxg9IJWAgcrTqLVc7ztkuA=;
+  b=YqcnSqxOtpTHvTmlmq4VGx5ZvfOvKI17Y0HT3zN1MLj83PHVaMvAAWuW
+   2ZCC2sd+EChX17OPGnwu9mOVPxMmuob2L52xDl+ubf1SEuiQaZEVBdFx4
+   GsX5Tw+Kdj7ixMfCtQijDIEDyj4/SjW0e+hATYCgBbDF6lx/ldkzFSXwb
+   WSPvFDKzjeXAJfWCRG0FHDzGpdBldMJhKGeAZjQS1D1GEYP23h23TCWMJ
+   K1zZzUfst0zIt3HepUaV42KqhBLZxLczYbQP+yTwmsL08+w/L4rMHII4d
+   Tdkph1Qs8+X2mhmVopw0xd+qa1t7LWCLJUvRqE59yITFcqQIQzxodPVao
+   g==;
+X-CSE-ConnectionGUID: n3Nq2NoQQ+q6FigczK4mkA==
+X-CSE-MsgGUID: ItAlfvOCSZGUsn5dHUvdhQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11444"; a="49332914"
+X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
+   d="scan'208";a="49332914"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 02:06:46 -0700
+X-CSE-ConnectionGUID: dKDtuu1FS3qZTviOkpX25Q==
+X-CSE-MsgGUID: DESbDpi2Rm2b2SS6qIZh4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,315,1739865600"; 
+   d="scan'208";a="173209310"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 02:06:45 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 26 May 2025 02:06:44 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 26 May 2025 02:06:44 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.81)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Mon, 26 May 2025 02:06:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iSKQ7ywPYtgzYav331i5tiEIuQNC0w0VQoz0SASqREHtfFHQ+BcIeCB93vcGzB/oahUjLDhFTAzUrJ+VKBb3JObC3Nva4INyAaTG1OpFzTE5GsgYwNPqaXQ1xx+3XlDGvoTOHAaIOC4vH5eOrXuWthaEcnJo4L8TawAk6IhlJm2zAJKKu5J1N00FK7Kl3N7FiW6q5kzaZAUOiBO6HofZIWAaqZuRdueUfJbAEO7PZ4n9ZOyWhHFpqxGcMS4Q2gVDdboLgDD36l6KeW7uA3hn9J8bnCtRF7nPbH7P3iugsX8cyLD3m+4mLWOGFTvBEZ+Vexd8+nKyscUZyxL7s+YARg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5L+QQFICxXtJxMPX04R4NZ7wbirIq0ZPJVMgyJkBaGY=;
+ b=VoPWIbyluPpZZjat075/Irc/nIO+XZLymf9r8R7kHL19sj6Yk7uM3+zRnt0wOWiwHblYg7MQqD8Bgzs1PuIifYp68yF4qaO49CyXtrcGBRuivTegfJWq0XUMd9/6QQNIYMGoLIUYBQuhxBGacCKkmYIm8kuJUufFT+RysqFIir9hc47qv5xJZ6YLvteDdSlJd+hfcBnRBaHM1xe1G04uizt7g6mVoXhGDEl1bKeKi+urLUK901kI6PXgVjRecjF0IdhLRKfWQS4KyWwW0Jw2Lw4hXMve2nznvfD+Chh6EiyyG1BiAyl8yUmfQjUKsE9bINY1v9eztrz5LtG1vzu0HA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by CY5PR11MB6487.namprd11.prod.outlook.com (2603:10b6:930:31::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.22; Mon, 26 May
+ 2025 09:06:26 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a%3]) with mapi id 15.20.8769.019; Mon, 26 May 2025
+ 09:06:26 +0000
+Message-ID: <a2149117-7b52-4d18-8eb0-baf14e80ee06@intel.com>
+Date: Mon, 26 May 2025 17:12:26 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 00/33] vfio: Introduce selftests for VFIO
+To: David Matlack <dmatlack@google.com>, Alex Williamson
+	<alex.williamson@redhat.com>
+CC: Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, "Vinod
+ Koul" <vkoul@kernel.org>, Fenghua Yu <fenghua.yu@intel.com>, "Masami
+ Hiramatsu (Google)" <mhiramat@kernel.org>, Adhemerval Zanella
+	<adhemerval.zanella@linaro.org>, Jiri Olsa <jolsa@kernel.org>, "Andrii
+ Nakryiko" <andrii@kernel.org>, Wei Yang <richard.weiyang@gmail.com>, "Bjorn
+ Helgaas" <bhelgaas@google.com>, Takashi Iwai <tiwai@suse.de>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, Pierre-Louis Bossart
+	<pierre-louis.bossart@linux.dev>, Andy Shevchenko
+	<andriy.shevchenko@linux.intel.com>, FUJITA Tomonori
+	<fujita.tomonori@gmail.com>, WangYuli <wangyuli@uniontech.com>, "Sean
+ Christopherson" <seanjc@google.com>, Andrew Jones <ajones@ventanamicro.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Eric Auger
+	<eric.auger@redhat.com>, Josh Hilke <jrhilke@google.com>,
+	<linux-kselftest@vger.kernel.org>, <kvm@vger.kernel.org>, Jason Gunthorpe
+	<jgg@nvidia.com>, Kevin Tian <kevin.tian@intel.com>, Vipin Sharma
+	<vipinsh@google.com>, Pasha Tatashin <pasha.tatashin@soleen.com>, "Saeed
+ Mahameed" <saeedm@nvidia.com>, Adithya Jayachandran
+	<ajayachandra@nvidia.com>, Parav Pandit <parav@nvidia.com>, Leon Romanovsky
+	<leonro@nvidia.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>, Dave
+ Jiang <dave.jiang@intel.com>, Dan Williams <dan.j.williams@intel.com>
+References: <20250523233018.1702151-1-dmatlack@google.com>
+Content-Language: en-US
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <20250523233018.1702151-1-dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI2PR01CA0023.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:192::17) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 07/10] RAMBlock: Make guest_memfd require coordinate
- discard
-To: Chenyi Qiang <chenyi.qiang@intel.com>, Alexey Kardashevskiy
- <aik@amd.com>, Peter Xu <peterx@redhat.com>,
- Gupta Pankaj <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Michael Roth <michael.roth@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Williams Dan J <dan.j.williams@intel.com>, Zhao Liu <zhao1.liu@intel.com>,
- Baolu Lu <baolu.lu@linux.intel.com>, Gao Chao <chao.gao@intel.com>,
- Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
-References: <20250520102856.132417-1-chenyi.qiang@intel.com>
- <20250520102856.132417-8-chenyi.qiang@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250520102856.132417-8-chenyi.qiang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|CY5PR11MB6487:EE_
+X-MS-Office365-Filtering-Correlation-Id: ecd8ef89-e368-4f6e-aeea-08dd9c349855
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?bWNteWtUQnlZWTJoWGdxRnF1dStDaW1WcjZtOTNRUzBTZlBSQ3VjdmJEam9M?=
+ =?utf-8?B?UjN5aEkvL2JwMnZJaDV0djFDczZ5T3duUkZUcGtydEVRL2NJQmFNcmdua3B4?=
+ =?utf-8?B?cGJJbEp0bVNZV3VISkhLZDdXYkQwUkZTclViRDJWdWRWdVhRdDk4NUQ0KzJR?=
+ =?utf-8?B?S1M2Q0lzU0I4NjVXZTRQLysySVNvOWlNRTk0ckxZd05JbHgyendPOUlKbHVW?=
+ =?utf-8?B?dHdOQ3NOclhzUmFBdUNBMGY0YjRCMy9Pd0JGUTV2R1V2TEZHWjROSWQwVHpo?=
+ =?utf-8?B?S1BDVEk3THJhOWFQK2lnS0xkYlJUczdJU1dobEk4dFY3Y294Z3ZoUXR1elpv?=
+ =?utf-8?B?MTUvWGF2SHk5am5WQTFYOG9mWStXRXZJYzF5N1g4V3Q1K3cvTzYzMlB2aER3?=
+ =?utf-8?B?bkR3bU9xTCs1TzRKbGRqcU5aRnoyQmx1T2phVUpTR0dqMU9nUGNkSHJCT1Y4?=
+ =?utf-8?B?UWhrZlovME5wc3JJZEpmemxsSEhqZFNXRXR5cmErVkx1SGRpd2pueGxEaFk2?=
+ =?utf-8?B?bkUrUU1qck03eVROdnNQU3Y4OFNRbWtGYTh1S3MvRzBXQmhmV290Q3pDWjZs?=
+ =?utf-8?B?S1pUZU0xdEZsZnVoMlVKeFNlVFVhWjN2WDRrTklJTWRBOENaU2JScldrb2p6?=
+ =?utf-8?B?Ri9qUkVwSG51RGlSYXNHWk1kczdGL1dOYUprc1RMWFVVMVROczk0cWNrV3Rv?=
+ =?utf-8?B?eU1FeWl0N2l3Yko0TTlNOEtsWFBOcURLR2NXVmZTREJtRlFSNTl1K0k4aXFz?=
+ =?utf-8?B?ME9PdUI0SVVaaWFjZWh6Q2VjNitMY2ovMnU4bjIvVDZMYkIrZDJHTkxNM0R5?=
+ =?utf-8?B?UERhVTJqb1UvVVJmbDVQRm1FeHM3ME5MWTdFZU1UMS9zNDhuaFZudWQ2bTRI?=
+ =?utf-8?B?TDAwRnFVSEJsb0kwZWhYSUpNQWZQVjByZUp0ZEM3eUJkT0hpNzBVMldYalR2?=
+ =?utf-8?B?aWZVaEYyN2tORHZGRUp1dktVUFBmN1Q1QkM5R05sQWdWM1ZZZ2lUNDhFaCtJ?=
+ =?utf-8?B?aE9idkNYS2srZ2YwQUZnc0pKWUlOTERZY2tzVkdNdXNleGIvQkZlWWhHOHA0?=
+ =?utf-8?B?bTRRZzJyaTViYmZGaVZoakUvQmdkRDBsdGdnQisrdVJzU0M1czQ2R1FUYnZK?=
+ =?utf-8?B?bmRUTDM0ZHg3UytJN0JteURPK05DeDZvNWxRNEFySmVnZFZJSXRRYzlPU0tJ?=
+ =?utf-8?B?aldwd0lTaHRjelViZ25sN0ZmU0ROQm5HSUhTUlJObWxZTjF0NWd1T0d4ak5o?=
+ =?utf-8?B?NTlIWXA2QW8zRWlIYWZtaHZNK3djRzRCemo3clVHMDlqVWdPOWdBNDA0OGxD?=
+ =?utf-8?B?Q1I0Z2RkaGdCK3M2b0ZNaUZEM0g0UWFGYVBPcnlKQzdPa3lhREhLaC9QRGxD?=
+ =?utf-8?B?RGw3MXM3MXYxdXBVVmpBWmJ5SW9ocGo5ekZmaFNod3hyTHJkMllqQVBzOWx0?=
+ =?utf-8?B?emdzM0RReG04TmMvMEM4RU9Wd3JuMHQ5bmYxMUp6UitsTTd2RGZxTjgvc1lR?=
+ =?utf-8?B?WVZ4SDA3ektIaFBIMFRzQzNrdjUwTUt1enJnUElaL0cyaDAySERMOVhjcGJq?=
+ =?utf-8?B?L2RCZ0JSWmhrQlRZb2xGMlFxVHVaYVhMSitIV0UvaGpxY3hFamxpMzQ3Y0JF?=
+ =?utf-8?B?NytJS2xUcWQ4TUd1M0dHSGhFelIrWEI0VmJVWGk3M1FodWF0NGtKWXVJWS95?=
+ =?utf-8?B?QjF4eG1wdGlLaHdHZVREb0dpeWRCZDEvWjhqUW1wSmtBb0lTS1JHUElaT0lx?=
+ =?utf-8?B?V3RxdXZ0R0JiUlI1WHUzdEl1YjNCMEJJd0cxbDlmcmVFbmVpS0pObDYza0xu?=
+ =?utf-8?B?b3I0SklxV2dBTFV3S0FzR3E2K0h6NTlReGpGL0ZVSmxRWWVYS1YrYm9ZUisz?=
+ =?utf-8?B?ZkMvZVQvV2Y3UTBaWlF6QkN2LyttN0Izd3RwT1ZPWmxNendkUHZUTHU5N2do?=
+ =?utf-8?Q?+6rFhgPbLVaFgMud3MHPWrQnvN2SWoJl?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Rm9FbVR4ZENseDU4NVNXQ1ZHeHBNL0duWTZ4NjZvL0loaGFMWWZlbWcrcXdB?=
+ =?utf-8?B?eC9xbTh5TmlvdkRHc2NqZ2RSQ2YwaFlNTEtOWXRZZzlIekhWQTNqSXdqSGly?=
+ =?utf-8?B?Y0k1M0Y2VUJLcElvRTNheHNTb1VUcG5DUzJpeUhOSGsyUXJHaWYwVGN6NFFB?=
+ =?utf-8?B?NE9sbGVRSHpETXdmYkpPb2NIU2c5Ylh0cjk5Tm5GaXVVTVZLSXUwbHpRZjNn?=
+ =?utf-8?B?d21XUWcxNDRNWm01Q0NueHh5Qk41cWQzTkdKRVpxRnJhZE1mVlZtYzA1R2Fq?=
+ =?utf-8?B?d2lCYUhta0c2cThwV1BhS1pmR0pzbFFZYVVueDdpMmZnKzF1dnFMWE9XV3Ax?=
+ =?utf-8?B?aXNqTlIxcnpQUDNnYTRhZ250ZTRwOE1wM2FJUnE1cVFXZ3VXOFhoS0h4OWcv?=
+ =?utf-8?B?cXVDRkQ2cUQ1b3gxNzVzVjN0U1lJdCtObEN4b3ZyUHJ6eHJQSEFXVHE1OWNC?=
+ =?utf-8?B?bVNaYTBjT0pKWGlRUUE3NjBxc0xMVTB6RTd4SWFhUXRtSkg4OFpUNGloem1q?=
+ =?utf-8?B?OWJDMkFQMDQ2T1JkU1NFZFZwK1pwY1RPSVdFUnN5RDRLaUZJRmJoTkpmMUwy?=
+ =?utf-8?B?QjBiV0xhb3pDa2EyS1RDbU9RcXAwaU92OXZXZWZjcmxyUVBldXBTV2M4Q29z?=
+ =?utf-8?B?WjdGYUYraTNzYTBBVTFrZjRJVk8va3o3c0RVMTVQek9OUWYvbkRaS09paGJJ?=
+ =?utf-8?B?bDYwaEMzcUdRU3hFN0EvRm5wTXd0WTZnbzUzajNkdHE0VElPSVptOWxnOUl4?=
+ =?utf-8?B?MmFBVjdvalpvdFFQL056SHFWNnc3NndxS1RQZy9iRUhwUUZzQU1BMUwzS25W?=
+ =?utf-8?B?NTR4QkdySCtFaXI3cGFOQXBsN2Z0b0k4VXV5ZzVTTkJOMzZrNjhPdEV4V01k?=
+ =?utf-8?B?S3FnN2YzeUs2VzhSMVZkdjRCVHo5V1NPN2NFRFpDMnd3QytvZHdSL3AvNlJO?=
+ =?utf-8?B?RFk2c2tDTHR2L0h5SzExUW1NRTNRbWhGdDYyNTlDMVN5V1dtM1NRd0lzalVj?=
+ =?utf-8?B?djJUR29NaStiVzVCOGZXTG9xZXg3alRKUWlqd2FCUDhlM04wK0ZGZHB1L2tu?=
+ =?utf-8?B?b0UvRnd0VzFWc1FGeG8vbUhQQWIzUnQrWVJyMUUxeGNhVithRXBSbzZFeGx0?=
+ =?utf-8?B?SU1DcmxCRXBaMU0xTXVsZEtYWkpzWHdTbnBldWRRN0kzb0pHZ2pBa2RTQURG?=
+ =?utf-8?B?amxzMkR2WjNGUUxlMmJFZE8zS1g1QjlRRGhvMVZLZWoxSnRObWtKSG1FdkhX?=
+ =?utf-8?B?cFBpYVdFWVpBVFE2bnlxU2ZxZXBwQ3pGTjBDSk1LYTlDRUNZelhiRll4cVVQ?=
+ =?utf-8?B?bG1oQUlLNEZwM3ZvcjdxdGVybXlKc3d4UlJkdHFTTFRpc0V0OWNOUTlaZGpV?=
+ =?utf-8?B?VlNVd0I3U1pqVFd6SWQ3YWcwM29RdTAvSzFHbktKZkxBblhXRDBWNVdKcmEw?=
+ =?utf-8?B?YVh6ZlhidEllVWxDeHR0OG9ZZmtVUHhSVGZOK05vVE1YY3NWZ25VdUIvN0Vp?=
+ =?utf-8?B?L1pOaFFUcHRwMTVDbWVzaFEvSDcwdWxtWldWMlVDWTcrY1ZHTi9UZTU2TFhZ?=
+ =?utf-8?B?ZDhvTmlYb092UG1XZmJzMTVOb0I2VXBDZ0dhc21TQU0ybG5UVDNlRkI5L3V2?=
+ =?utf-8?B?dCt2cXZ2VzQwdjZJdlVYcFJ6M0cxSjBkditHbCtUUGNORWh5eXI3eGFoNU1m?=
+ =?utf-8?B?YVU0VFlOb2d1VS9ObExPVitEUVpXdFVwUVhnRlZrbERlc3FkTDQ4c21rTm1a?=
+ =?utf-8?B?MW9iNXNVRkxTU3VqaWpFdnczZ1RXUkRINmJtRVk5akM2UGxteSs5cTU4U0Z1?=
+ =?utf-8?B?amJSSFRVUkNqT1JSYi9TSFc4Y1hpbEo4Vzg1aUR4S1RGQVMybFdsK3hraGUv?=
+ =?utf-8?B?Rk9LTVRxUFNaTzdjQXgzSzV2SjNJd1RRMWhuNExqSXZhM1M1L3g2WDNFM3Zx?=
+ =?utf-8?B?dXhhdVJ0OU9YK0M4NzY3MVZDUTZ5UThhVjVzbzB5WjBoeGRtL3VjMlNnUktH?=
+ =?utf-8?B?TDJ2T2dtVmptVi8xMlRlU2lTbkFHRTZldVp6a0Q3VVFab1M3bGJzdFJZbWI3?=
+ =?utf-8?B?aGg3Q0N6UFp3d2ZTdU1heDhwd0pQckxWQU1xV3liMDFZbXFpOGpVL0ljNjZB?=
+ =?utf-8?Q?+/gV2YeKYrFoqJRYTNaBAddeO?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ecd8ef89-e368-4f6e-aeea-08dd9c349855
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 May 2025 09:06:26.7474
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gO3CLW6eJPyhbFkQ4yXgWecoCzv6ToGOwCuiBz+0TyJyWtBRjjNaovBGcyQpHQxhruLSUdPvq/ANND9geIp44g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6487
+X-OriginatorOrg: intel.com
 
-On 20.05.25 12:28, Chenyi Qiang wrote:
-> As guest_memfd is now managed by RamBlockAttribute with
-> RamDiscardManager, only block uncoordinated discard.
+On 2025/5/24 07:29, David Matlack wrote:
+> This series introduces VFIO selftests, located in
+> tools/testing/selftests/vfio/.
 > 
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> ---
-> Changes in v5:
->      - Revert to use RamDiscardManager.
+> VFIO selftests aim to enable kernel developers to write and run tests
+> that take the form of userspace programs that interact with VFIO and
+> IOMMUFD uAPIs. VFIO selftests can be used to write functional tests for
+> new features, regression tests for bugs, and performance tests for
+> optimizations.
 > 
-> Changes in v4:
->      - Modify commit message (RamDiscardManager->PrivateSharedManager).
+> These tests are designed to interact with real PCI devices, i.e. they do
+> not rely on mocking out or faking any behavior in the kernel. This
+> allows the tests to exercise not only VFIO but also IOMMUFD, the IOMMU
+> driver, interrupt remapping, IRQ handling, etc.
 > 
-> Changes in v3:
->      - No change.
-> 
-> Changes in v2:
->      - Change the ram_block_discard_require(false) to
->        ram_block_coordinated_discard_require(false).
-> ---
->   system/physmem.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/system/physmem.c b/system/physmem.c
-> index f05f7ff09a..58b7614660 100644
-> --- a/system/physmem.c
-> +++ b/system/physmem.c
-> @@ -1916,7 +1916,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
->           }
->           assert(new_block->guest_memfd < 0);
->   
-> -        ret = ram_block_discard_require(true);
-> +        ret = ram_block_coordinated_discard_require(true);
->           if (ret < 0) {
->               error_setg_errno(errp, -ret,
->                                "cannot set up private guest memory: discard currently blocked");
-> @@ -1939,7 +1939,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
->                * ever develops a need to check for errors.
->                */
->               close(new_block->guest_memfd);
-> -            ram_block_discard_require(false);
-> +            ram_block_coordinated_discard_require(false);
->               qemu_mutex_unlock_ramlist();
->               goto out_free;
->           }
-> @@ -2302,7 +2302,7 @@ static void reclaim_ramblock(RAMBlock *block)
->       if (block->guest_memfd >= 0) {
->           ram_block_attribute_destroy(block->ram_shared);
->           close(block->guest_memfd);
-> -        ram_block_discard_require(false);
-> +        ram_block_coordinated_discard_require(false);
->       }
->   
->       g_free(block);
+> We chose selftests to host these tests primarily to enable integration
+> with the existing KVM selftests. As explained in the next section,
+> enabling KVM developers to test the interaction between VFIO and KVM is
+> one of the motivators of this series.
 
+interesting. Two quick questions:
+1) does this selftest support all the vfio iommu drivers (typ1 and 
+spapr_tce)? Maybe also the iommufd vfio_compat as well.
+2) I know Alex has a test suit as the below. Has this series referred
+    it?
 
-I think this patch should be squashed into the previous one, then the 
-story in that single patch is consistent.
+https://github.com/awilliam/tests/commits/for-clg/
+
+> Motivation
+> -----------------------------------------------------------------------
+> 
+> The main motivation for this series is upcoming development in the
+> kernel to support Hypervisor Live Updates [1][2]. Live Update is a
+> specialized reboot process where selected devices are kept operational
+> and their kernel state is preserved and recreated across a kexec. For
+> devices, DMA and interrupts may continue during the reboot. VFIO-bound
+> devices are the main target, since the first usecase of Live Updates is
+> to enable host kernel upgrades in a Cloud Computing environment without
+> disrupting running customer VMs.
+> 
+> To prepare for upcoming support for Live Updates in VFIO, IOMMUFD, IOMMU
+> drivers, the PCI layer, etc., we'd like to first lay the ground work for
+> exercising and testing VFIO from kernel selftests. This way when we
+> eventually upstream support for Live Updates, we can also upstream tests
+> for those changes, rather than purely relying on Live Update integration
+> tests which would be hard to share and reproduce upstream.
+> 
+> But even without Live Updates, VFIO and IOMMUFD are becoming an
+> increasingly critical component of running KVM-based VMs in cloud
+> environments. Virtualized networking and storage are increasingly being
+> offloaded to smart NICs/cards, and demand for high performance
+> networking, storage, and AI are also leading to NICs, SSDs, and GPUs
+> being directly attached to VMs via VFIO.
+> 
+> VFIO selftests increases our ability to test in several ways.
+> 
+>   - It enables developers sending VFIO, IOMMUFD, etc. commits upstream to
+>     test their changes against all existing VFIO selftests, reducing the
+>     probability of regressions.
+> 
+>   - It enables developers sending VFIO, IOMMUFD, etc. commits upstream to
+>     include tests alongside their changes, increasing the quality of the
+>     code that is merged.
+> 
+>   - It enables testing the interaction between VFIO and KVM. There are
+>     some paths in KVM that are only exercised through VFIO, such as IRQ
+>     bypass. VFIO selftests provides a helper library to enable KVM
+>     developers to write KVM selftests to test those interactions [3].
+> 
+> Design
+> -----------------------------------------------------------------------
+> 
+> VFIO selftests are designed around interacting with with VFIO-managed PCI
+> devices. As such, the core data struture is struct vfio_pci_device, which
+> represents a single PCI device.
+> 
+>    struct vfio_pci_device *device;
+> 
+>    device = vfio_pci_device_init("0000:6a:01.0", iommu_mode);
+> 
+>    ...
+> 
+>    vfio_pci_device_cleanup(device);
+> 
+> vfio_pci_device_init() sets up a container or iommufd, depending on the
+> iommu_mode argument, to manage DMA mappings, fetches information about
+> the device and what interrupts it supports from VFIO and caches it, and
+> mmap()s all mappable BARs for the test to use.
+> 
+> There are helper methods that operate on struct vfio_pci_device to do
+> things like read and write to PCI config space, enable/disable IRQs, and
+> map memory for DMA,
+> 
+> struct vfio_pci_device and its methods do not care about what device
+> they are actually interacting with. It can be a GPU, a NIC, an SSD, etc.
+> 
+> To keep things simple initially, VFIO selftests only support a single
+> device per group and per container/iommufd. But it should be possible to
+> relax those restrictions in the future, e.g. to enable testing with
+> multiple devices in the same container/iommufd.
+> 
+> Driver Framework
+> -----------------------------------------------------------------------
+> 
+> In order to support VFIO selftests where a device is generating DMA and
+> interrupts on command, the VFIO selftests supports a driver framework.
+> 
+> This framework abstracts away device-specific details allowing VFIO
+> selftests to be written in a generic way, and then run against different
+> devices depending on what hardware developers have access to.
+> 
+> The framework also aims to support carrying drivers out-of-tree, e.g.
+> so that companies can run VFIO selftests with custom/test hardware.
+> 
+> Drivers must implement the following methods:
+> 
+>   - probe():        Check if the driver supports a given device.
+>   - init():         Initialize the driver.
+>   - remove():       Deinitialize the driver and reset the device.
+>   - memcpy_start(): Kick off a series of repeated memcpys (DMA reads and
+>                     DMA writes).
+>   - memcpy_wait():  Wait for a memcpy operation to complete.
+>   - send_msi():     Make the device send an MSI interrupt.
+> 
+> memcpy_start/wait() are for generating DMA. We separate the operation
+> into 2 steps so that tests can trigger a long-running DMA operation. We
+> expect to use this to stress test Live Updates by kicking off a
+> long-running mempcy operation and then performing a Live Update. These
+> methods are required to not generate any interrupts.
+> 
+> send_msi() is used for testing MSI and MSI-x interrupts. The driver
+> tells the test which MSI it will be using via device->driver.msi.
+> 
+> It's the responsibility of the test to set up a region of memory
+> and map it into the device for use by the driver, e.g. for in-memory
+> descriptors, before calling init().
+> 
+> A demo of the driver framework can be found in
+> tools/testing/selftests/vfio/vfio_pci_driver_test.c.
+> 
+> In addition, this series introduces a new KVM selftest to demonstrate
+> delivering a device MSI directly into a guest, which can be found in
+> tools/testing/selftests/kvm/vfio_pci_device_irq_test.c.
+> 
+> Tests
+> -----------------------------------------------------------------------
+> 
+> There are 5 tests in this series, mostly to demonstrate as a
+> proof-of-concept:
+> 
+>   - tools/testing/selftests/vfio/vfio_pci_device_test.c
+>   - tools/testing/selftests/vfio/vfio_pci_driver_test.c
+>   - tools/testing/selftests/vfio/vfio_iommufd_setup_test.c
+>   - tools/testing/selftests/vfio/vfio_dma_mapping_test.c
+>   - tools/testing/selftests/kvm/vfio_pci_device_irq_test.c
+> 
+> Integrating with KVM selftests
+> -----------------------------------------------------------------------
+> 
+> To support testing the interactions between VFIO and KVM, the VFIO
+> selftests support sharing its library with the KVM selftest. The patches
+> at the end of this series demonstrate how that works.
+> 
+> Essentially, we allow the KVM selftests to build their own copy of
+> tools/testing/selftests/vfio/lib/ and link it into KVM selftests
+> binaries. This requires minimal changes to the KVM selftests Makefile.
+> 
+> Future Areas of Development
+> -----------------------------------------------------------------------
+> 
+> Library:
+> 
+>   - Driver support for devices that can be used on AMD, ARM, and other
+>     platforms.
+>   - Driver support for a device available in QEMU VMs.
+>   - Support for tests that use multiple devices.
+>   - Support for IOMMU groups with multiple devices.
+>   - Support for multiple devices sharing the same container/iommufd.
+>   - Sharing TEST_ASSERT() macros and other common code between KVM
+>     and VFIO selftests.
+> 
+> Tests:
+> 
+>   - DMA mapping performance tests for BARs/HugeTLB/etc.
+>   - Live Update selftests.
+>   - Porting Sean's KVM selftest for posted interrupts to use the VFIO
+>     selftests library [3]
+> 
+> This series can also be found on GitHub:
+> 
+>    https://github.com/dmatlack/linux/tree/vfio/selftests/rfc
+> 
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Vipin Sharma <vipinsh@google.com>
+> Cc: Josh Hilke <jrhilke@google.com>
+> Cc: Pasha Tatashin <pasha.tatashin@soleen.com>
+> Cc: Saeed Mahameed <saeedm@nvidia.com>
+> Cc: Saeed Mahameed <saeedm@nvidia.com>
+> Cc: Adithya Jayachandran <ajayachandra@nvidia.com>
+> Cc: Parav Pandit <parav@nvidia.com>
+> Cc: Leon Romanovsky <leonro@nvidia.com>
+> Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> Cc: Dave Jiang <dave.jiang@intel.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> 
+> [1] https://lore.kernel.org/all/f35359d5-63e1-8390-619f-67961443bfe1@google.com/
+> [2] https://lore.kernel.org/all/20250515182322.117840-1-pasha.tatashin@soleen.com/
+> [3] https://lore.kernel.org/kvm/20250404193923.1413163-68-seanjc@google.com/
+> 
+> David Matlack (28):
+>    selftests: Create tools/testing/selftests/vfio
+>    vfio: selftests: Add a helper library for VFIO selftests
+>    vfio: selftests: Introduce vfio_pci_device_test
+>    tools headers: Add stub definition for __iomem
+>    tools headers: Import asm-generic MMIO helpers
+>    tools headers: Import x86 MMIO helper overrides
+>    tools headers: Import iosubmit_cmds512()
+>    tools headers: Import drivers/dma/ioat/{hw.h,registers.h}
+>    tools headers: Import drivers/dma/idxd/registers.h
+>    tools headers: Import linux/pci_ids.h
+>    vfio: selftests: Keep track of DMA regions mapped into the device
+>    vfio: selftests: Enable asserting MSI eventfds not firing
+>    vfio: selftests: Add a helper for matching vendor+device IDs
+>    vfio: selftests: Add driver framework
+>    vfio: sefltests: Add vfio_pci_driver_test
+>    vfio: selftests: Add driver for Intel CBDMA
+>    vfio: selftests: Add driver for Intel DSA
+>    vfio: selftests: Move helper to get cdev path to libvfio
+>    vfio: selftests: Encapsulate IOMMU mode
+>    vfio: selftests: Add [-i iommu_mode] option to all tests
+>    vfio: selftests: Add vfio_type1v2_mode
+>    vfio: selftests: Add iommufd_compat_type1{,v2} modes
+>    vfio: selftests: Add iommufd mode
+>    vfio: selftests: Make iommufd the default iommu_mode
+>    vfio: selftests: Add a script to help with running VFIO selftests
+>    KVM: selftests: Build and link sefltests/vfio/lib into KVM selftests
+>    KVM: selftests: Test sending a vfio-pci device IRQ to a VM
+>    KVM: selftests: Use real device MSIs in vfio_pci_device_irq_test
+> 
+> Josh Hilke (5):
+>    vfio: selftests: Test basic VFIO and IOMMUFD integration
+>    vfio: selftests: Move vfio dma mapping test to their own file
+>    vfio: selftests: Add test to reset vfio device.
+>    vfio: selftests: Use command line to set hugepage size for DMA mapping
+>      test
+>    vfio: selftests: Validate 2M/1G HugeTLB are mapped as 2M/1G in IOMMU
+> 
+>   MAINTAINERS                                   |    7 +
+>   tools/arch/x86/include/asm/io.h               |  101 +
+>   tools/arch/x86/include/asm/special_insns.h    |   27 +
+>   tools/include/asm-generic/io.h                |  482 +++
+>   tools/include/asm/io.h                        |   11 +
+>   tools/include/drivers/dma/idxd/registers.h    |  601 +++
+>   tools/include/drivers/dma/ioat/hw.h           |  270 ++
+>   tools/include/drivers/dma/ioat/registers.h    |  251 ++
+>   tools/include/linux/compiler.h                |    4 +
+>   tools/include/linux/io.h                      |    4 +-
+>   tools/include/linux/pci_ids.h                 | 3212 +++++++++++++++++
+>   tools/testing/selftests/Makefile              |    1 +
+>   tools/testing/selftests/kvm/Makefile.kvm      |    6 +-
+>   .../testing/selftests/kvm/include/kvm_util.h  |    4 +
+>   tools/testing/selftests/kvm/lib/kvm_util.c    |   21 +
+>   .../selftests/kvm/vfio_pci_device_irq_test.c  |  173 +
+>   tools/testing/selftests/vfio/.gitignore       |    7 +
+>   tools/testing/selftests/vfio/Makefile         |   20 +
+>   .../testing/selftests/vfio/lib/drivers/dsa.c  |  416 +++
+>   .../testing/selftests/vfio/lib/drivers/ioat.c |  235 ++
+>   .../selftests/vfio/lib/include/vfio_util.h    |  271 ++
+>   tools/testing/selftests/vfio/lib/libvfio.mk   |   26 +
+>   .../selftests/vfio/lib/vfio_pci_device.c      |  573 +++
+>   .../selftests/vfio/lib/vfio_pci_driver.c      |  126 +
+>   tools/testing/selftests/vfio/run.sh           |  110 +
+>   .../selftests/vfio/vfio_dma_mapping_test.c    |  239 ++
+>   .../selftests/vfio/vfio_iommufd_setup_test.c  |  133 +
+>   .../selftests/vfio/vfio_pci_device_test.c     |  195 +
+>   .../selftests/vfio/vfio_pci_driver_test.c     |  256 ++
+>   29 files changed, 7780 insertions(+), 2 deletions(-)
+>   create mode 100644 tools/arch/x86/include/asm/io.h
+>   create mode 100644 tools/arch/x86/include/asm/special_insns.h
+>   create mode 100644 tools/include/asm-generic/io.h
+>   create mode 100644 tools/include/asm/io.h
+>   create mode 100644 tools/include/drivers/dma/idxd/registers.h
+>   create mode 100644 tools/include/drivers/dma/ioat/hw.h
+>   create mode 100644 tools/include/drivers/dma/ioat/registers.h
+>   create mode 100644 tools/include/linux/pci_ids.h
+>   create mode 100644 tools/testing/selftests/kvm/vfio_pci_device_irq_test.c
+>   create mode 100644 tools/testing/selftests/vfio/.gitignore
+>   create mode 100644 tools/testing/selftests/vfio/Makefile
+>   create mode 100644 tools/testing/selftests/vfio/lib/drivers/dsa.c
+>   create mode 100644 tools/testing/selftests/vfio/lib/drivers/ioat.c
+>   create mode 100644 tools/testing/selftests/vfio/lib/include/vfio_util.h
+>   create mode 100644 tools/testing/selftests/vfio/lib/libvfio.mk
+>   create mode 100644 tools/testing/selftests/vfio/lib/vfio_pci_device.c
+>   create mode 100644 tools/testing/selftests/vfio/lib/vfio_pci_driver.c
+>   create mode 100755 tools/testing/selftests/vfio/run.sh
+>   create mode 100644 tools/testing/selftests/vfio/vfio_dma_mapping_test.c
+>   create mode 100644 tools/testing/selftests/vfio/vfio_iommufd_setup_test.c
+>   create mode 100644 tools/testing/selftests/vfio/vfio_pci_device_test.c
+>   create mode 100644 tools/testing/selftests/vfio/vfio_pci_driver_test.c
+> 
+> 
+> base-commit: a11a72229881d8ac1d52ea727101bc9c744189c1
+> prerequisite-patch-id: 3bae97c9e1093148763235f47a84fa040b512d04
 
 -- 
-Cheers,
-
-David / dhildenb
-
+Regards,
+Yi Liu
 
