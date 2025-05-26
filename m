@@ -1,262 +1,209 @@
-Return-Path: <kvm+bounces-47695-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47696-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99286AC3C91
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 11:22:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9593AC3C94
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 11:23:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AA8F188D86F
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 09:22:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DCFD1895C81
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 09:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5931F09AD;
-	Mon, 26 May 2025 09:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A1DC1DED51;
+	Mon, 26 May 2025 09:23:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Jo2bkt3k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bR2tZM/5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8832CCDB
-	for <kvm@vger.kernel.org>; Mon, 26 May 2025 09:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947FD481A3
+	for <kvm@vger.kernel.org>; Mon, 26 May 2025 09:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748251339; cv=none; b=S4Q92vPAVP4050MBx5Wycdk/5YBU6zyGJAL8WY7gxABqSjR2CPlxnMjWaXd+Gv4KdUDhpmqPzBBItHysUJW7Cpc8i1zM+mpHibL+gnnBNF+2ghnrxMPvQvFF6nLNRWE7Nwx9i6vJGE4ZIbbdcnWVUC9MEwwnbhZF2QiS3GedEZg=
+	t=1748251391; cv=none; b=RdQkzunkMYzExKucChJAf8j0XoMiV9upBg+88NGj92ozochtJtCOJRqa7nZ/u6iGYHTNtkqHeG7abQdPMv09KSXZhEA6u8X3ul4B6c7Q5cwGYsCBD3u1QACaTIy+dgN8mrSVvSYF0etBwD4HZL9dtC8o4+90Xdu5++EGt4g0XqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748251339; c=relaxed/simple;
-	bh=v7yS7OXgu3hum6RTQqAlKfS4MyVozx6fNgU7cA4xzbs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qHrA5FgmG5fIYxykDrLgW9eS8YH3jnQd699Zl37u7uQxFNkx8eQ+Ky3ExrAO0Gen+R29aUA5nxIU7J46OFbWoNPrX2mdlwvEriGmyoRc4YdYA+qR5z2naaFV27pK0dO6SBBclLBR2dKwrKbgRp5CllJel1iiESUD8E0ReDpawm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Jo2bkt3k; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-442ea341570so14429055e9.1
-        for <kvm@vger.kernel.org>; Mon, 26 May 2025 02:22:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1748251335; x=1748856135; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kVB1vMEDILwI7yDAI9DCK169GFiMbj0azQ2wkTKfU94=;
-        b=Jo2bkt3kIR6RlLEsE6p03VMwZsfRdrhbXPO53gOh9ZonWeENh6saDjAXxzWITSODP+
-         wL8nxlQ3az+aCYAM/wVh888QFHBrHmGHOf1bDNZvlMXHvFA2i0YhLmV8xYNnm9paRyxN
-         S83BfBImElCMUpUApAcu1nLkT2Kc0CFVKEoVUFhP/2ZNoKAp1qXttm0ykYR/Aa8eNTVg
-         jmG0XjloZugo7jlKP3Mdx1sdEvSHd5IChxj/4GleVNHBxuW1dCQaSI/2z+zWa4jqy40C
-         W5rWkJwvHwSoCijMVwhFwN5d1n5gF2f/685S6ggUIaQqnPllVDE5huCZHSfsVI8VBP7M
-         X9ww==
+	s=arc-20240116; t=1748251391; c=relaxed/simple;
+	bh=JCaBnUpSAIcktj+lWMB2Nrj/aH7F/mF2WGfyLJ13KJ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Lz9ZpSCvf4uZ8pw5RTZESciN4kQ8k+nCRbBhQA8O+zkHuAXh4uPHcXV6C4kGN/q0GX5PxAlIcnhb1GYVT11bTFBZptQvtf77tpYVTfnh0nqcN/tD1lN9R6ivxRPaBwH7FBzNJ8Px6wHmChgNEYIbwXXgoTYyjohzlBk69Eyg1SM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bR2tZM/5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748251388;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=phTdJj0KAJyBPbCCmlZgtPAAFKe+8e9lUlf5Yjatomc=;
+	b=bR2tZM/5f+6exUzYb1UzM/pSlm38LdjR81fpo5fylrPq9/xPfqwJs+VSiD00cPNrg9aKfO
+	HgQ8ruUMpHDkbtiNDhhr/OwFwOyV3TnPIkTWAAhpx88/AX89omNJ7cspHrEs/bPEhgbzF4
+	rFQm9ReL/AfzPHG/whu5Lq2x2R8eZxs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-438-3LUvEXIfNJ-w6GHsRHQ0Dg-1; Mon, 26 May 2025 05:23:07 -0400
+X-MC-Unique: 3LUvEXIfNJ-w6GHsRHQ0Dg-1
+X-Mimecast-MFC-AGG-ID: 3LUvEXIfNJ-w6GHsRHQ0Dg_1748251382
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a4cfda0ab8so517924f8f.3
+        for <kvm@vger.kernel.org>; Mon, 26 May 2025 02:23:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748251335; x=1748856135;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kVB1vMEDILwI7yDAI9DCK169GFiMbj0azQ2wkTKfU94=;
-        b=Gqm2aXpv4rGS++11ImR1nUnWqor+OmaNQqQXMItHPcGpkupPuht0Z1j0gxo0ootQOb
-         25YjrHMZSDpRP4kn/h2NVlcEiQp9giWsTbvTYepqG6kiUAzykRxT06Mcd/Lf8gZusNKC
-         nkZpPRKOxe5NUPOkRzedDllwbBM8p2L04k+CgZARuFn3e9YQjvT4r83payH8NJZJ2k6y
-         jUwiqfYZ4gjBgIwVp5f1Ww7V86++6jrvOnEQc/TpVBPxZzC7eo2IP8xniJ07+HyvuN4Z
-         FxtiSzwKjRzDulP0bCj4ZyJbitygE7DNzJRi8IcTl8Ny+eNLhJK6pRrQe9SHKkKWHVxy
-         F8kw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWZJdJZCBRV39dOKfjhpnyJIkKCTz4FXBW0TKvUcafLMyfueT8E7YdER8YaEGoyMeAcvk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoKwfWyBG0e7aZy+dkePDg6wNeHVhhMBvqMG8gBXHCiNIX20oG
-	p7RL277dFnA7bpt0g3WpYAGIiWbRwC40YR2e1TwC5Z9WffpeeOdxLH1gvpfbYvf5Z94=
-X-Gm-Gg: ASbGncuLoQk/DpKuEh38y23zxjXMaykpq6I8vsXxvrjeFv9O5bdlFe/ZqdfPcu6plTU
-	MYviXSB/C03oV3qN7S2PWCiWQJFOCNYrbYpaD6SwrcKDJnvkVCe/i4t2LWk5HtrX7564yeFUVmk
-	INnvFOK2wXC9x/vOf66DJF+Ap/PIjS/DhdYDiKEbhIAxYbOh3W16yJFZLoUfgKBTwEZRcSSW+Hk
-	iXNyI2yXZPVmLco/8ZVGxE2wxFRX0/838hJbGwNqSDk8P9D8XCoiYYp90lBQARkTLmkmZe5QIQH
-	xLikGTiUgqMk7eEgz+K5jTPnAwFr6j3aeBV/vlEAfTFNZ51rcWsesBXbe3PCDHvc6OrX8Sn2mL4
-	CJ4Zo
-X-Google-Smtp-Source: AGHT+IEGcjh7xBCh+DfeG8xrQT+wvABD+WF/Eu3axSyNQAacMD1k0+ulmhfWAKZW9jVFPAOFjD/p3g==
-X-Received: by 2002:a05:6000:2407:b0:3a3:6f26:5813 with SMTP id ffacd0b85a97d-3a4cb442ea4mr5934699f8f.25.1748251335337;
-        Mon, 26 May 2025 02:22:15 -0700 (PDT)
-Received: from localhost (cst2-173-28.cust.vodafone.cz. [31.30.173.28])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4cd0cf5ccsm6703658f8f.8.2025.05.26.02.22.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 May 2025 02:22:14 -0700 (PDT)
-Date: Mon, 26 May 2025 11:22:14 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>
-Subject: Re: [PATCH v4] RISC-V: KVM: add KVM_CAP_RISCV_USERSPACE_SBI
-Message-ID: <20250526-e67c64d52c84a8ad7cb519c4@orel>
-References: <20250523113347.2898042-3-rkrcmar@ventanamicro.com>
+        d=1e100.net; s=20230601; t=1748251381; x=1748856181;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=phTdJj0KAJyBPbCCmlZgtPAAFKe+8e9lUlf5Yjatomc=;
+        b=eJvs3XxFp35dJW9XBsL+suipzNfNsjsPeAWBXWHpX8IyrjyN2kk2PGWDV4u5QmlWxD
+         6s5Q1is4/aO9kZA1Bn1f//hucyY62NTITia7ruNFigmMBv4DwMLY9KPCkl2CKEH8HqqB
+         Y5/HlO2gSdynesNbLQABJ7viXh3LNk5Vh5oepWdn6VE3aLpLH9YsTt9nUSKNM/K+d1xm
+         kfoHxUOC5ZyOhk3cTE2aDQ72NkiLIVCHGEE5YnhjIJ2QfUbX3E4EQ+NX/8hFXsIgvYWr
+         /QyWZbNpo7alxULf3bOAUiGgqTIJnFu/IIlKj1JytF7BS9zVgYgLRTl1ciS0KrqefbZU
+         0aeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWU1R1dUDkrAM9tQqgwhldCzJCyYIs0HR+srx4umKnax0H/F49TGn68t2+RAsogFFPv78U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaJsT7OoSz6ztKME7KFiOxoUICzp26cBAs4AOthU5Ld8NIMgUB
+	jgbWxO6oviHLBTrcOQw8KwvIv7cIZXiWq/907s+5xj0SlSaCMLTCWFnrnhV1mnkUVwM0eLrNTRQ
+	u/1YX4uz/biEHWHo8S+k94uJ4ZXYL6DBynQm5WKnqehXLmaDeCUwtFw==
+X-Gm-Gg: ASbGncvORQ362Nl5SdtWGnXKux4AcZnzlAahlRcdSpLKYKBqwzCD9msTP0rR4JUKU31
+	7qmjwCHsJc0YVhA9jGU7TtM6Ozs6t55IWKRzYHYF9ZL25RIAxaY/YgGndXz8cxSPjcrCAjlCqaY
+	5d3KqpSfINEB5NcSRjEvjbMFFXXOkSgJQk6R+UY50T/xtlHT7Rzl1FtCq4vUKFf8OxKPnW2Bs6X
+	0Ri32EWJ6EgsbaUNf2Lg85ziCTkgT4Sj/D+CcUCTwuK9/xseDGSnm6VZ4GJyyZbFmZmCTZJ7+ix
+	BiqbTfGNf+pc3WhlB78wN6WT6dNuNioLa+AEz8jSd0SwSd5Admw6lxkl6iVZdR4y19f2fTC3gk7
+	qWrqz22Q2SG8J2JBvIFXHhm99FZTlmfg+B49Fnxk=
+X-Received: by 2002:a05:6000:2082:b0:3a1:f68b:57c9 with SMTP id ffacd0b85a97d-3a4cb407b33mr5416593f8f.6.1748251381641;
+        Mon, 26 May 2025 02:23:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF0Iy+mETN512dlt1DljBDoAYB1upu7FTX113bm5Gtwq9OByr75EkOWODGpn6zZkGn10wi9vg==
+X-Received: by 2002:a05:6000:2082:b0:3a1:f68b:57c9 with SMTP id ffacd0b85a97d-3a4cb407b33mr5416576f8f.6.1748251381293;
+        Mon, 26 May 2025 02:23:01 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f19:6500:e1c1:8216:4c25:efe4? (p200300d82f196500e1c182164c25efe4.dip0.t-ipconnect.de. [2003:d8:2f19:6500:e1c1:8216:4c25:efe4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4cdde6415sm6767370f8f.60.2025.05.26.02.23.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 May 2025 02:23:00 -0700 (PDT)
+Message-ID: <ccb81d9b-1c89-45e4-86b0-1d30a8e94930@redhat.com>
+Date: Mon, 26 May 2025 11:22:59 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250523113347.2898042-3-rkrcmar@ventanamicro.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 09/10] KVM: Introduce RamDiscardListener for attribute
+ changes during memory conversions
+To: Chenyi Qiang <chenyi.qiang@intel.com>, Alexey Kardashevskiy
+ <aik@amd.com>, Peter Xu <peterx@redhat.com>,
+ Gupta Pankaj <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Michael Roth <michael.roth@amd.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Williams Dan J <dan.j.williams@intel.com>, Zhao Liu <zhao1.liu@intel.com>,
+ Baolu Lu <baolu.lu@linux.intel.com>, Gao Chao <chao.gao@intel.com>,
+ Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
+References: <20250520102856.132417-1-chenyi.qiang@intel.com>
+ <20250520102856.132417-10-chenyi.qiang@intel.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250520102856.132417-10-chenyi.qiang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 23, 2025 at 01:33:49PM +0200, Radim Krčmář wrote:
-> The new capability allows userspace to implement SBI extensions that KVM
-> does not handle.  This allows userspace to implement any SBI ecall as
-> userspace already has the ability to disable acceleration of selected
-> SBI extensions.
-> The base extension is made controllable as well, but only with the new
-> capability, because it was previously handled specially for some reason.
-> *** The related compatibility TODO in the code needs addressing. ***
+On 20.05.25 12:28, Chenyi Qiang wrote:
+> With the introduction of the RamBlockAttribute object to manage
+> RAMBlocks with guest_memfd, it is more elegant to move KVM set attribute
+> into a RamDiscardListener.
 > 
-> This is a VM capability, because userspace will most likely want to have
-> the same behavior for all VCPUs.  We can easily make it both a VCPU and
-> a VM capability if there is demand in the future.
+> The KVM attribute change RamDiscardListener is registered/unregistered
+> for each memory region section during kvm_region_add/del(). The listener
+> handler performs attribute change upon receiving notifications from
+> ram_block_attribute_state_change() calls. After this change, the
+> operations in kvm_convert_memory() can be removed.
 > 
-> Signed-off-by: Radim Krčmář <rkrcmar@ventanamicro.com>
+> Note that, errors can be returned in
+> ram_block_attribute_notify_to_discard() by KVM attribute changes,
+> although it is currently unlikely to happen. With in-place conversion
+> guest_memfd in the future, it would be more likely to encounter errors
+> and require error handling. For now, simply return the result, and
+> kvm_convert_memory() will cause QEMU to quit if any issue arises.
+> 
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 > ---
-> v4:
-> * forward base extension as well
-> * change the id to 242, because 241 is already taken in linux-next
-> * QEMU example: https://github.com/radimkrcmar/qemu/tree/mp_state_reset
-> v3: new
-> ---
->  Documentation/virt/kvm/api.rst    | 11 +++++++++++
->  arch/riscv/include/asm/kvm_host.h |  3 +++
->  arch/riscv/include/uapi/asm/kvm.h |  1 +
->  arch/riscv/kvm/vcpu_sbi.c         | 17 ++++++++++++++---
->  arch/riscv/kvm/vm.c               |  5 +++++
->  include/uapi/linux/kvm.h          |  1 +
->  6 files changed, 35 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index e107694fb41f..c9d627d13a5e 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8507,6 +8507,17 @@ given VM.
->  When this capability is enabled, KVM resets the VCPU when setting
->  MP_STATE_INIT_RECEIVED through IOCTL.  The original MP_STATE is preserved.
->  
-> +7.44 KVM_CAP_RISCV_USERSPACE_SBI
-> +--------------------------------
-> +
-> +:Architectures: riscv
-> +:Type: VM
-> +:Parameters: None
-> +:Returns: 0 on success, -EINVAL if arg[0] is not zero
-> +
-> +When this capability is enabled, KVM forwards ecalls from disabled or unknown
-> +SBI extensions to userspace.
-> +
->  8. Other capabilities.
->  ======================
->  
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> index 85cfebc32e4c..6f17cd923889 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -122,6 +122,9 @@ struct kvm_arch {
->  
->  	/* KVM_CAP_RISCV_MP_STATE_RESET */
->  	bool mp_state_reset;
-> +
-> +	/* KVM_CAP_RISCV_USERSPACE_SBI */
-> +	bool userspace_sbi;
->  };
->  
->  struct kvm_cpu_trap {
-> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-> index 5f59fd226cc5..dd3a5dc53d34 100644
-> --- a/arch/riscv/include/uapi/asm/kvm.h
-> +++ b/arch/riscv/include/uapi/asm/kvm.h
-> @@ -204,6 +204,7 @@ enum KVM_RISCV_SBI_EXT_ID {
->  	KVM_RISCV_SBI_EXT_DBCN,
->  	KVM_RISCV_SBI_EXT_STA,
->  	KVM_RISCV_SBI_EXT_SUSP,
-> +	KVM_RISCV_SBI_EXT_BASE,
->  	KVM_RISCV_SBI_EXT_MAX,
->  };
->  
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index 31fd3cc98d66..497d5b023153 100644
-> --- a/arch/riscv/kvm/vcpu_sbi.c
-> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> @@ -39,7 +39,7 @@ static const struct kvm_riscv_sbi_extension_entry sbi_ext[] = {
->  		.ext_ptr = &vcpu_sbi_ext_v01,
->  	},
->  	{
-> -		.ext_idx = KVM_RISCV_SBI_EXT_MAX, /* Can't be disabled */
-> +		.ext_idx = KVM_RISCV_SBI_EXT_BASE,
->  		.ext_ptr = &vcpu_sbi_ext_base,
->  	},
->  	{
-> @@ -217,6 +217,11 @@ static int riscv_vcpu_set_sbi_ext_single(struct kvm_vcpu *vcpu,
->  	if (!sext || scontext->ext_status[sext->ext_idx] == KVM_RISCV_SBI_EXT_STATUS_UNAVAILABLE)
->  		return -ENOENT;
->  
-> +	// TODO: probably remove, the extension originally couldn't be
-> +	// disabled, but it doesn't seem necessary
-> +	if (!vcpu->kvm->arch.userspace_sbi && sext->ext_id == KVM_RISCV_SBI_EXT_BASE)
-> +		return -ENOENT;
-> +
 
-I agree that we don't need to babysit userspace and it's even conceivable
-to have guests that don't need SBI. KVM should only need checks in its
-UAPI to protect itself from userspace and to enforce proper use of the
-API. It's not KVM's place to ensure userspace doesn't violate the SBI spec
-or create broken guests (userspace is the boss, even if it's a boss that
-doesn't make sense)
+[...]
 
-So, I vote we drop the check.
+>   static void kvm_region_commit(MemoryListener *listener)
+> @@ -3077,15 +3140,6 @@ int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+>           goto out_unref;
+>       }
+>   
+> -    if (to_private) {
+> -        ret = kvm_set_memory_attributes_private(start, size);
+> -    } else {
+> -        ret = kvm_set_memory_attributes_shared(start, size);
+> -    }
+> -    if (ret) {
+> -        goto out_unref;
+> -    }
+> -
 
->  	scontext->ext_status[sext->ext_idx] = (reg_val) ?
->  			KVM_RISCV_SBI_EXT_STATUS_ENABLED :
->  			KVM_RISCV_SBI_EXT_STATUS_DISABLED;
-> @@ -471,8 +476,14 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  #endif
->  		ret = sbi_ext->handler(vcpu, run, &sbi_ret);
->  	} else {
-> -		/* Return error for unsupported SBI calls */
-> -		cp->a0 = SBI_ERR_NOT_SUPPORTED;
-> +		if (vcpu->kvm->arch.userspace_sbi) {
-> +			next_sepc = false;
-> +			ret = 0;
-> +			kvm_riscv_vcpu_sbi_forward(vcpu, run);
-> +		} else {
-> +			/* Return error for unsupported SBI calls */
-> +			cp->a0 = SBI_ERR_NOT_SUPPORTED;
-> +		}
->  		goto ecall_done;
->  	}
->  
-> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> index b27ec8f96697..0b6378b83955 100644
-> --- a/arch/riscv/kvm/vm.c
-> +++ b/arch/riscv/kvm/vm.c
-> @@ -217,6 +217,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
->  			return -EINVAL;
->  		kvm->arch.mp_state_reset = true;
->  		return 0;
-> +	case KVM_CAP_RISCV_USERSPACE_SBI:
-> +		if (cap->flags)
-> +			return -EINVAL;
-> +		kvm->arch.userspace_sbi = true;
-> +		return 0;
->  	default:
->  		return -EINVAL;
->  	}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 454b7d4a0448..bf23deb6679e 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -931,6 +931,7 @@ struct kvm_enable_cap {
->  #define KVM_CAP_X86_GUEST_MODE 238
->  #define KVM_CAP_ARM_WRITABLE_IMP_ID_REGS 239
->  #define KVM_CAP_RISCV_MP_STATE_RESET 240
-> +#define KVM_CAP_RISCV_USERSPACE_SBI 242
->  
->  struct kvm_irq_routing_irqchip {
->  	__u32 irqchip;
-> -- 
-> 2.49.0
->
+I wonder if it's best to leave that out for now. With in-place 
+conversion it will all get a bit more tricky, because we'd need to call 
+in different orders ...
 
-Otherwise,
+e.g., do private -> shared before mapping to vfio, but to shared 
+->private after unmapping from vfio.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+That can be easier handled when doing the calls from KVM code directly.
+
+-- 
+Cheers,
+
+David / dhildenb
+
 
