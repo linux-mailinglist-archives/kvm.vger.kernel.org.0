@@ -1,181 +1,204 @@
-Return-Path: <kvm+bounces-47681-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47682-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBD0EAC3BD9
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 10:41:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25ECBAC3BDC
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 10:41:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CA7C18955D4
-	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 08:41:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3124B3A5964
+	for <lists+kvm@lfdr.de>; Mon, 26 May 2025 08:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C711E990E;
-	Mon, 26 May 2025 08:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1EEC1EA7DF;
+	Mon, 26 May 2025 08:41:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UC1TkN0/"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="IS2wliyk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219991DFDB9
-	for <kvm@vger.kernel.org>; Mon, 26 May 2025 08:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC010158DD4
+	for <kvm@vger.kernel.org>; Mon, 26 May 2025 08:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748248867; cv=none; b=oS+ArBiZ67iGeg8JagcvhQ4mnN7Ea3/+13DpuoZsMJImFuq1OfomJxBGqRdt/z3waUUYTuQHO97m6l7QLTM/72aylY1o/ECubAUlAmGOKEsGVU2tIRzdUOdxvU8TOuNieQIsbWzhyFwjbq1E7RvWTAkcsDqpKETlBNLxJbPW+b4=
+	t=1748248898; cv=none; b=XDNPS7jI1Q6+2NQF0PWRPPJNwyLcV2QF3FNd4W1bY3X4IISs9KHBI5H5bMfYBnqNRy7tVl910vc8ZsnkiKdcwIcHmieTV+U27FwNn4667eO9udTKBHXdXpAonjnHzIDeq3sYN4fs2LoWtX59t82aehNVbA+hAIRj2t1RtTZ0WNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748248867; c=relaxed/simple;
-	bh=RM9w2GB5PustMhTtUEFtQgzDYegYWrx4oF+aPu3tkrk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hN3ZFBTde8cRYM4OMPGWWYfpSby1YUzfy/XyBmp7ZxmSCr4RuUv1NXYbpgpXDH39i+1X3jpptCEklD1Zt38ccPqHWUPdt2oZN5YxloVlPezMz1wWLb2B4u4y5ieykQ/qC4lGA3jfpJPz6ZG079TnO8LKlpvD/PLyXhT6P6Tj+sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UC1TkN0/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748248863;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ZpcUBhTst15dsBOEnXLvH1gi6TvxGnz3SV2jdOZSxv0=;
-	b=UC1TkN0/qCRm6/dHWW278fFQRYLNc3L3HGpymtXvjhpUEcBqSntf4HjV5UXgYeNzFXgc0r
-	edCIpPHR+HNWbF+yIIoW0whKKh0T9vTMzrCoFkj+zxjkkD0u7SC66wCYpvyXik/y6jnD5F
-	H8MOCsFtwq6HO3Q4rCMuOK8km/viRS4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-121-P2AKRccOM0qAfNlXHeMTgA-1; Mon, 26 May 2025 04:41:01 -0400
-X-MC-Unique: P2AKRccOM0qAfNlXHeMTgA-1
-X-Mimecast-MFC-AGG-ID: P2AKRccOM0qAfNlXHeMTgA_1748248860
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43d734da1a3so11771415e9.0
-        for <kvm@vger.kernel.org>; Mon, 26 May 2025 01:41:01 -0700 (PDT)
+	s=arc-20240116; t=1748248898; c=relaxed/simple;
+	bh=AfxOAmXX1HdyQc0nVIo6KqK7evO8C9QirK7XVJr4/KY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bjc5u82hGop6LfLiD8C39QRRJAAsKfApterCX2Q/4+GD9U4CJNafNTIw1k/bs0JbglyhMqwO8V6qV1RIHfVuddKwIQYFm2wjC2NbVOYcD67FocyQQs5RaBLU6KaMRsjj9Gx+VTpiQjhbT+tfxKmbv7t+SQE/DYMqf31+aVlA/zA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=IS2wliyk; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-602e203db66so2672161a12.1
+        for <kvm@vger.kernel.org>; Mon, 26 May 2025 01:41:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1748248895; x=1748853695; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lgi+BI+UxQxxje7YEG6nl3Jn6VhfFhFL9BZoJyhkgXs=;
+        b=IS2wliykKG0JexCU4dAuudzmJDVbE//5gSgXk16sewo1lWnES+4bQtkGITnENjAUtu
+         Q83sWWdR+5JmPjg/k6zDofVl3ZAL88VJq8AzewWF8IUMLizCdOmAunLIpV5udJGxjquZ
+         yGVjlFfNGx2c5cnhprO+f3zZXGzieiDPl0EYohxwcl8yaCxNH58gFpcmRV24cwIKQvLd
+         2HsCk5vKoe6hcjNl1Le08FUTAsaYFe1/p4sj2xB2ACkvcHo0RktKonXTtHBfbo3qsvlm
+         oKnB9zwYhXDCWC+XtrB4SIliiI9aE0sx/VZpD1c/baDa3ci1WdmPThLHu63aPRr6UauO
+         FMEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748248860; x=1748853660;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ZpcUBhTst15dsBOEnXLvH1gi6TvxGnz3SV2jdOZSxv0=;
-        b=BO18hkE47FPfYIOIHzHZulQAg4vetayidtbaQIKnuwQPEwokQIBwcI7vBVroT6MW4q
-         ms1jl/2GZNGE2Ns+cLJcrx+bCq5DM4CDvliOj+aG+03Gm8JTTDSKGQDGXoIaI3vMkR74
-         nJERJT3ZSHsPbA70SO8Gs4XW9G2BbQsGbSXeOuADV83+wtX0CrJzrGgXUn8l2ueAbh19
-         /40ovvhgvoapSqDxY8eceh8nxN3bgP2UJXKVam4qBu/GkLJB6J9TBKlB7nt6TrbINBx9
-         8ToLrS4X4YA9MI0ERH3jn/CQcs+ovutIMZy/kMpxOuHzIm9I3lVWMGW5klBENAN0sRDR
-         C6Jw==
-X-Forwarded-Encrypted: i=1; AJvYcCXAl9trY8ukrQ3diIeKs6qVoP2N01gncAm+FtGK/UR+A9a3suSYQ3lvE2TQWFbi8UGXjc0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7ELmT80h5aHIukNnrhXqLv3bO8Edb4CDZIWBRQ/brTPsXR+2q
-	zLzAaQtC0cmrltiYxHwnAoqtLVc/EJTb8xO+VSmGOrvybedZ/b7UOudKT3TlXYBi2Yo+fVZcT1I
-	4hakQ+/y0IpKQp+lAxQEdK4hn3svYCIrzQXzXiv7waTOXiBDYp1fXow==
-X-Gm-Gg: ASbGncsmFVuvSg2uLrZBdgmQ0aJMTsQToKx/wsEe64/2+IK0HjCyQnrNN5hBxqa4ZsZ
-	hjFm8EzmyzvQ5SnYwEqUyTOWuOJHqGrRdLbDAnmRbcw6afovA18SWmCyWGZM92niPBA1oEZDZEa
-	Q4i2tEyusjWeY+0xfIIBpFlehd5JlovOBC5ceB68iNcuKYM8Ez1J3fA3uKQL1xtmMCBQRfPRyJf
-	AwcKUuHMbQZe+kOcGyIfwEvsMRBc+VMQYVkk+RqTotFvQnNT2ExmBXxscM/R1cYXKSL9bggwi5L
-	O+g2+wco9vwSkRD6kEWMy3YJVMHG9k1RAZKUxEENuTbNSqhOhK3yqyLOuVt9vrT6FY/d1qjQ/lL
-	L22viVvaK31I5CymyPOKMtVtFhqr4c9sJTvYLp+I=
-X-Received: by 2002:a05:6000:430c:b0:3a4:de13:2a25 with SMTP id ffacd0b85a97d-3a4de132a86mr410806f8f.45.1748248860485;
-        Mon, 26 May 2025 01:41:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFOT0PRDQkw2BbtqS6ln5FEsK4w1cAtNG/jx5p3gGTCCdC12E+iPVZbLd1eljg2uUrCLTNfHg==
-X-Received: by 2002:a05:6000:430c:b0:3a4:de13:2a25 with SMTP id ffacd0b85a97d-3a4de132a86mr410776f8f.45.1748248860127;
-        Mon, 26 May 2025 01:41:00 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f19:6500:e1c1:8216:4c25:efe4? (p200300d82f196500e1c182164c25efe4.dip0.t-ipconnect.de. [2003:d8:2f19:6500:e1c1:8216:4c25:efe4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4d7a5d224sm2962324f8f.41.2025.05.26.01.40.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 May 2025 01:40:59 -0700 (PDT)
-Message-ID: <87d5e6c8-01c8-4981-98e5-f92e29157240@redhat.com>
-Date: Mon, 26 May 2025 10:40:58 +0200
+        d=1e100.net; s=20230601; t=1748248895; x=1748853695;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lgi+BI+UxQxxje7YEG6nl3Jn6VhfFhFL9BZoJyhkgXs=;
+        b=Mt1fLNDJOYNSH3bX0K+nqhe62WfFeFD0BXCTBR2dJURMS4zhuDWiDynBAJmZaclV1k
+         Cupit/5E5FIXrc6COSKkDBQKUJOodCvMkT9QT1bYtoM57P+sABHGBLkWYDMlGRKtp9pf
+         uL598G8ztBcipSOle6FTPH8CjO8j0luZjggacunaWVGCVY5aDiwrelnXIom7Y0m1DGIt
+         AIWvcA1Jp2LAZSseYZH7YYUnuEqk1aLhcQT+k47NFvLTUjRO/qzAmDUhacvnQhppr5oS
+         ijpSN2O2qPl4XMV5+/oRdymN6+/uE8YLTt9VJxmJmrr/3N5M8X6IPL/MKzFquUIeJ7Vf
+         W5ew==
+X-Forwarded-Encrypted: i=1; AJvYcCXt1Pr8zyrK56+vIdXfXw2s95UAvjUesnbsUj7/WQq+MHWXALgS+alyNbnwXDaJT12hdAs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbra3NAMV2QvqYeDnRKUUms34fYX+mYukx0tuxyBXrVbVEo1tM
+	JOJMO/j9+KzGaiESk5EeTpdik2ct9E5x4aIz6h42VtqAd8KdWnHWZC6umFG+G46oIiU=
+X-Gm-Gg: ASbGncsqrJH/r89ABJC0+Ay+GDl3oqAjfNj1Mw4nsNWbIF6ghzVY9t0fmBKxOWtdon5
+	SrpPyQ2KAQIezB1WfUIY9MLWU6H3dKQQp5HuGqrsVCB4z0ITWBAvByEDQGNQ/Q5PDziJf5mu516
+	b33K12eJilOFIgZ67B4eRM8UNq+n+skIDXll1bgNbxgrBYinOb9JHp3sU4Rnzwq0yTZHfZ9dCJ7
+	D/5v8o30bq0Sgo96cdv8EK/oHG5QqNZsKH3+Y2EogGjPMWf20Nhc+46SjxcZIJHV02dV/1x+CE0
+	VF1Ox+qHnUz7TTGM9NHPIVqrBYbDEklaAqFYt0nCnEBzWv7Pfz2tWhboWKRfCqqd9lDJeap5AGB
+	LTSKj
+X-Google-Smtp-Source: AGHT+IG8/VYDbfxt/MCOP+EaLwsXzbrnjfrXlbSUZYq06meSDTM4WfgPl2nsylybH23Wd9Lf5xvIZg==
+X-Received: by 2002:a05:6402:4404:b0:602:1b8b:2902 with SMTP id 4fb4d7f45d1cf-602d9bf086amr6150523a12.15.1748248894652;
+        Mon, 26 May 2025 01:41:34 -0700 (PDT)
+Received: from localhost (cst2-173-28.cust.vodafone.cz. [31.30.173.28])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-604b79dc22fsm1148466a12.14.2025.05.26.01.41.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 May 2025 01:41:34 -0700 (PDT)
+Date: Mon, 26 May 2025 10:41:33 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: Charlie Jenkins <charlie@rivosinc.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	Samuel Holland <samuel.holland@sifive.com>, Deepak Gupta <debug@rivosinc.com>
+Subject: Re: [PATCH v8 09/14] riscv: misaligned: move emulated access
+ uniformity check in a function
+Message-ID: <20250526-baaca3f03adcac2b6488f040@orel>
+References: <20250523101932.1594077-1-cleger@rivosinc.com>
+ <20250523101932.1594077-10-cleger@rivosinc.com>
+ <aDC-0qe5STR7ow4m@ghost>
+ <b2afb9c7-a3d2-4bf6-bfaa-d804358ccd88@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 02/10] memory: Change
- memory_region_set_ram_discard_manager() to return the result
-To: Chenyi Qiang <chenyi.qiang@intel.com>, Alexey Kardashevskiy
- <aik@amd.com>, Peter Xu <peterx@redhat.com>,
- Gupta Pankaj <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Michael Roth <michael.roth@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Williams Dan J <dan.j.williams@intel.com>, Zhao Liu <zhao1.liu@intel.com>,
- Baolu Lu <baolu.lu@linux.intel.com>, Gao Chao <chao.gao@intel.com>,
- Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
-References: <20250520102856.132417-1-chenyi.qiang@intel.com>
- <20250520102856.132417-3-chenyi.qiang@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250520102856.132417-3-chenyi.qiang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b2afb9c7-a3d2-4bf6-bfaa-d804358ccd88@rivosinc.com>
 
-On 20.05.25 12:28, Chenyi Qiang wrote:
-> Modify memory_region_set_ram_discard_manager() to return -EBUSY if a
-> RamDiscardManager is already set in the MemoryRegion. The caller must
-> handle this failure, such as having virtio-mem undo its actions and fail
-> the realize() process. Opportunistically move the call earlier to avoid
-> complex error handling.
+On Fri, May 23, 2025 at 09:21:51PM +0200, Clément Léger wrote:
 > 
-> This change is beneficial when introducing a new RamDiscardManager
-> instance besides virtio-mem. After
-> ram_block_coordinated_discard_require(true) unlocks all
-> RamDiscardManager instances, only one instance is allowed to be set for
-> one MemoryRegion at present.
 > 
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> ---
+> On 23/05/2025 20:30, Charlie Jenkins wrote:
+> > On Fri, May 23, 2025 at 12:19:26PM +0200, Clément Léger wrote:
+> >> Split the code that check for the uniformity of misaligned accesses
+> >> performance on all cpus from check_unaligned_access_emulated_all_cpus()
+> >> to its own function which will be used for delegation check. No
+> >> functional changes intended.
+> >>
+> >> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> >> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> >> ---
+> >>  arch/riscv/kernel/traps_misaligned.c | 20 ++++++++++++++------
+> >>  1 file changed, 14 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/arch/riscv/kernel/traps_misaligned.c b/arch/riscv/kernel/traps_misaligned.c
+> >> index f1b2af515592..7ecaa8103fe7 100644
+> >> --- a/arch/riscv/kernel/traps_misaligned.c
+> >> +++ b/arch/riscv/kernel/traps_misaligned.c
+> >> @@ -645,6 +645,18 @@ bool __init check_vector_unaligned_access_emulated_all_cpus(void)
+> >>  }
+> >>  #endif
+> >>  
+> >> +static bool all_cpus_unaligned_scalar_access_emulated(void)
+> >> +{
+> >> +	int cpu;
+> >> +
+> >> +	for_each_online_cpu(cpu)
+> >> +		if (per_cpu(misaligned_access_speed, cpu) !=
+> >> +		    RISCV_HWPROBE_MISALIGNED_SCALAR_EMULATED)
+> >> +			return false;
+> >> +
+> >> +	return true;
+> >> +}
+> > 
+> > This ends up wasting time when !CONFIG_RISCV_SCALAR_MISALIGNED since it
+> > will always return false in that case. Maybe there is a way to simplify
+> > the ifdefs and still have performant code, but I don't think this is a
+> > big enough problem to prevent this patch from merging.
+> 
+> Yeah I though of that as well but the amount of call to this function is
+> probably well below 10 times so I guess it does not really matters in
+> that case to justify yet another ifdef ?
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Would it need an ifdef? Or can we just do
 
--- 
-Cheers,
+ if (!IS_ENABLED(CONFIG_RISCV_SCALAR_MISALIGNED))
+    return false;
 
-David / dhildenb
+at the top of the function?
 
+While the function wouldn't waste much time since it's not called much and
+would return false on the first check done in the loop, since it's a
+static function, adding the IS_ENABLED() check would likely allow the
+compiler to completely remove it and all the branches depending on it.
+
+Thanks,
+drew
+
+> 
+> > 
+> > Reviewed-by: Charlie Jenkins <charlie@rivosinc.com>
+> > Tested-by: Charlie Jenkins <charlie@rivosinc.com>
+> 
+> Thanks,
+> 
+> Clément
+> 
+> > 
+> >> +
+> >>  #ifdef CONFIG_RISCV_SCALAR_MISALIGNED
+> >>  
+> >>  static bool unaligned_ctl __read_mostly;
+> >> @@ -683,8 +695,6 @@ static int cpu_online_check_unaligned_access_emulated(unsigned int cpu)
+> >>  
+> >>  bool __init check_unaligned_access_emulated_all_cpus(void)
+> >>  {
+> >> -	int cpu;
+> >> -
+> >>  	/*
+> >>  	 * We can only support PR_UNALIGN controls if all CPUs have misaligned
+> >>  	 * accesses emulated since tasks requesting such control can run on any
+> >> @@ -692,10 +702,8 @@ bool __init check_unaligned_access_emulated_all_cpus(void)
+> >>  	 */
+> >>  	on_each_cpu(check_unaligned_access_emulated, NULL, 1);
+> >>  
+> >> -	for_each_online_cpu(cpu)
+> >> -		if (per_cpu(misaligned_access_speed, cpu)
+> >> -		    != RISCV_HWPROBE_MISALIGNED_SCALAR_EMULATED)
+> >> -			return false;
+> >> +	if (!all_cpus_unaligned_scalar_access_emulated())
+> >> +		return false;
+> >>  
+> >>  	unaligned_ctl = true;
+> >>  	return true;
+> >> -- 
+> >> 2.49.0
+> >>
+> 
 
