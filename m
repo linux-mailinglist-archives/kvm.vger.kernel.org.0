@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-47748-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47744-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6270AC476D
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 07:15:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 861B3AC4731
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 06:17:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 897877A4C60
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 05:14:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EF1C7A9B25
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 04:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335441B4F0A;
-	Tue, 27 May 2025 05:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68681D5165;
+	Tue, 27 May 2025 04:16:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="wjRfKXCn"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=debian.org header.i=@debian.org header.b="yYnS8vmN"
 X-Original-To: kvm@vger.kernel.org
-Received: from out203-205-221-236.mail.qq.com (out203-205-221-236.mail.qq.com [203.205.221.236])
+Received: from mx2.netfort.gr.jp (mx2.netfort.gr.jp [153.126.132.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2434323A6
-	for <kvm@vger.kernel.org>; Tue, 27 May 2025 05:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.236
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748322916; cv=none; b=E3Vem7qviIHbf+nCMvbkAK4w5BTNhI49T0DU5jlB6lbCdv3Hnf+z+2X66PoFGqG0kZVxccWTnLO2k8cElTqR0e0dIrR6N24N3AkM7f3K9shX8qeOFiuTEt5cPM8NvyZ1JmEHOZseuT3Dufl0X00xEkXsjyf+p/XJVUfGv6qDTi8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748322916; c=relaxed/simple;
-	bh=iIhYXxZiXzP1nOmODNSrHuhwjAVawSq7mltuOEeOpLI=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=OwtcdsGC7k9lMzQ7O4J7hn7Yil/YB5ms+sQjkb7E3PEOE9W6ChEAe2uAexLGqGaym6YjPjVVdhGczNviBqE/oKesUmYIpFktbH8EVwoVNZTdRGexzHd4WMlnPILRRDnLbnN9VCuCEu9FGMOM+w3N++hlMrwUn8NNHObwEAzvJRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=wjRfKXCn; arc=none smtp.client-ip=203.205.221.236
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1748322603; bh=HEP8M2++02Q2nGa/KrIRO1wnBG+GhLuBDildhfq5FJ8=;
-	h=From:To:Cc:Subject:Date;
-	b=wjRfKXCngjRXqp+ywIRjx8z2qtAAItBDjYKH8BQiNrImtxJyzi0uaj7Ij93rfnNIb
-	 qBUb/E8zDaOBI52T2cctxolgRQNCg0Cmo3+E1TS7Yf6fMMi5DC+Cmfx4lR/GMwc6IV
-	 Df09posjfeQkCFxPUN5feu9Czj6KWeqS24jPZeHQ=
-Received: from pek-lxu-l1.corp.ad.wrs.com ([111.198.228.63])
-	by newxmesmtplogicsvrszc13-0.qq.com (NewEsmtp) with SMTP
-	id B5D2FA08; Tue, 27 May 2025 11:45:29 +0800
-X-QQ-mid: xmsmtpt1748317529tcvff8lxm
-Message-ID: <tencent_27A451976AF76E66DF1379C3604976A3A505@qq.com>
-X-QQ-XMAILINFO: M3vv73qU6a4uejIKGc9BXxeApuz7c/+QvRfcumYJyl+UYV7/OWQkZ+N1K7rnJE
-	 IMb3bxs0SYYtEEtlJVuZZtCuMOHB2fY4tbMAB6brpaysGwS1n178ja3qMOB6/dYbAntTIQxhyApR
-	 DfdZfWF/hb7UgL2kqhLuW4oeBdUgsR9/wgrLIxHukiBYDrvvLFgxFitIN5aTm84XySybcwnaEoOC
-	 r5N4szUYp9vhGrTbINdh94ZGYt2eaRGAEmeDAUcUiyqu6GH+605vnnjxNrvd5k4Wo2Of/yPxX5IH
-	 YQao9JY2yQHM5XwqOxmwHiie7xuNqzY1aX2NK/za05icVhfjRtMIk/sRNHZZydJMH4qZjIu74FKo
-	 MhxNbDeP80E0k2MJJVDY3EjXsLTfKDKyUEAJtTR7B5YgjW0GSbLcdqsfuebU8Z7B3GKMr9st1QSY
-	 25RcUP7leAT9M5/WOlV7/1T/CvQMbJULCwiS2som+ccSNcCrVZopKhEn6buHML8JPZHGdB/YA6CB
-	 9D8ss5s7YiSEwTLx/9Zvi9dVNqTHzvuDg3Wv/SQgQmfUK6GVqmxV0J9kFNl0s12xfnQG+8D0nyZN
-	 eOA6azqfbCpRCtksOhqHaKMT7YggejLBR9Gf4gfgGo8WQ59A3sD3wwbxS70ZCucUpCLfGUdFgtSj
-	 NAipMmThc2+ya6JXEFSd/40sGtfwhjS4kvfUIBK1CbRfx8T019dS9OEO3pRUQ7kmzhA2J805fV4Q
-	 t0CT1nLYXTn+JiHazHx1f8wMWC9l5cpFi7AzNyEp1XJoMPAEoCBYSjPqfUvp3aS6G0AASXyTRdGK
-	 +ac+MGSc9ZgUX0STx4UAuy1XxrBCLz8LoEt2HzwcJ9WMVZqwhbLpqh3mX4l2OGoAP/MvNNqd/n4W
-	 rLyqI/v16tafQPnHyTDRoAlZ60+oLSlX6NQE+cr2nU9hj4YY3UOvAt7iJVam8r+Q==
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: seanjc@google.com
-Cc: pbonzini@redhat.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	binbin.wu@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH next] KVM: VMX: add noinstr for is_td_vcpu and is_td
-Date: Tue, 27 May 2025 11:45:16 +0800
-X-OQ-MSGID: <20250527034515.1569758-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103BD5464E;
+	Tue, 27 May 2025 04:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=153.126.132.118
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748319407; cv=fail; b=WtjpwN/DtPOZUP7uJJ5Muw40i7JOufkKCDltc4JswifVhzruwjelNKv2wWq5H5LQLpQVyLh7sPnWQJqv/PZu2sJpjDCKF/Y/PYJ47DncHCoQvgu7yEvvha9wHQmsq+yWUQiTzi3K25aITbVDew4ATi5GFi8S4WhKYganHUBnwj8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748319407; c=relaxed/simple;
+	bh=ziaQqO1A9/1mMs/3cBHQUsKCE4UzRmUMuEss55hv/nw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZQlr0hU7bZvdYScllquKWtq/L3yzzBdqs6rrriGeJYm6bg3OjiE+rb4/yGI8jzXI+b9jJddAncHUoCZbRKIBZAEEre839yMSvQcekjUc5MtCj9XVeL63u+dVPVCMOSxzZMI+fakma1dQS+tc2dsTyAN0Eyhq7YtgG/KP3oN7/ec=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=fail (0-bit key) header.d=debian.org header.i=@debian.org header.b=yYnS8vmN reason="key not found in DNS"; arc=fail smtp.client-ip=153.126.132.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+Received: from localhost.localdomain (localhost [IPv6:::1])
+	by mx2.netfort.gr.jp (Postfix) with ESMTP id 3FD1B5FACE;
+	Tue, 27 May 2025 13:11:25 +0900 (JST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=debian.org; s=selector1;
+	t=1748319085;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3v7be1f/CX26xwm33bkMhE4PM2rqH6kLl8sWw3wQMng=;
+	b=yYnS8vmNPhh6e4ObGS8nOaNmgubtvDv3hyYS9NbQFe1oAfmImln9146Buas7qEAdwd7o8W
+	IdeJIfkc0GzML5Gv9o09wdkAfUrOPsnFhxnbhS7jnkXzO99rSmz+LxfepsC6E4ipxG8Qp1
+	BVN+sOZ6maEiDjo/SlY1/IdaImYeS8s=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=debian.org;
+	s=selector1; t=1748319085;
+	h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=3v7be1f/CX26xwm33bkMhE4PM2rqH6kLl8sWw3wQMng=;
+	b=JYClznlIQ7csvSvFJ3NaFAADvvywCvtVBgCMb1GnITrwb21qkWlquWot/baXhE2EhV5FHp
+	7jJa4zYZ/gdlmERx0G9pqeozJgK+hlovRrj3DfZia6Ei/xuMpecryCMjRIRbeVXF0Noyl7
+	Gm937LIte9S3JTHLxS8IVhU5VjHr+G8=
+ARC-Authentication-Results: i=1;
+	mx2.netfort.gr.jp;
+	none
+ARC-Seal: i=1; s=selector1; d=debian.org; t=1748319085; a=rsa-sha256;
+	cv=none;
+	b=jT2pSYX+oNqT0xrqXfCfTd5QfZoLdU0lTXT+TL5Y3Yb0GN6gukNJWHZ4H0+aq5fEighz06
+	2q4qvxU/ZPafxak8Azrc5wWVyeTUGm3pR4nNowQjXgg8jeSpk1yauWpAni11sIdcVcG4tU
+	A0XC/amUvDK3L+K/lw8XtaPEZ6Gzi9I=
+From: dancer@debian.org
+To: mst@redhat.com
+Cc: qemu-devel@nongnu.org,
+	adelva@google.com,
+	uekawa@chromium.org,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: [PATCH] Fix comment for virtio-9p
+Date: Tue, 27 May 2025 13:11:23 +0900
+Message-Id: <20250527041123.840063-1-dancer@debian.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,49 +79,31 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-is_td() and is_td_vcpu() run in no instrumentation, so they are need
-noinstr.
+From: Junichi Uekawa <uekawa@chromium.org>
 
-[1]
-vmlinux.o: error: objtool: vmx_handle_nmi+0x47:
-        call to is_td_vcpu.isra.0() leaves .noinstr.text section
+virtio-9p is not a console protocol, it's a file sharing protocol. Seems
+like an artifact of old copy-and-paste error.
 
-Fixes: 7172c753c26a ("KVM: VMX: Move common fields of struct vcpu_{vmx,tdx} to a struct")
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Fixes: 3ca4f5ca7305 ("virtio: add virtio IDs file")
+Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
 ---
- arch/x86/kvm/vmx/common.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/uapi/linux/virtio_ids.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-index 8f46a06e2c44..70e0879c58f6 100644
---- a/arch/x86/kvm/vmx/common.h
-+++ b/arch/x86/kvm/vmx/common.h
-@@ -59,20 +59,20 @@ struct vcpu_vt {
- 
- #ifdef CONFIG_KVM_INTEL_TDX
- 
--static __always_inline bool is_td(struct kvm *kvm)
-+static noinstr __always_inline bool is_td(struct kvm *kvm)
- {
- 	return kvm->arch.vm_type == KVM_X86_TDX_VM;
- }
- 
--static __always_inline bool is_td_vcpu(struct kvm_vcpu *vcpu)
-+static noinstr __always_inline bool is_td_vcpu(struct kvm_vcpu *vcpu)
- {
- 	return is_td(vcpu->kvm);
- }
- 
- #else
- 
--static inline bool is_td(struct kvm *kvm) { return false; }
--static inline bool is_td_vcpu(struct kvm_vcpu *vcpu) { return false; }
-+static noinstr bool is_td(struct kvm *kvm) { return false; }
-+static noinstr bool is_td_vcpu(struct kvm_vcpu *vcpu) { return false; }
- 
- #endif
- 
+diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
+index 7aa2eb766205..deb9dfa52944 100644
+--- a/include/uapi/linux/virtio_ids.h
++++ b/include/uapi/linux/virtio_ids.h
+@@ -37,7 +37,7 @@
+ #define VIRTIO_ID_IOMEM			6 /* virtio ioMemory */
+ #define VIRTIO_ID_RPMSG			7 /* virtio remote processor messaging */
+ #define VIRTIO_ID_SCSI			8 /* virtio scsi */
+-#define VIRTIO_ID_9P			9 /* 9p virtio console */
++#define VIRTIO_ID_9P			9 /* virtio 9p */
+ #define VIRTIO_ID_MAC80211_WLAN		10 /* virtio WLAN MAC */
+ #define VIRTIO_ID_RPROC_SERIAL		11 /* virtio remoteproc serial link */
+ #define VIRTIO_ID_CAIF			12 /* Virtio caif */
 -- 
-2.43.0
+2.49.0.1164.gab81da1b16-goog
 
 
