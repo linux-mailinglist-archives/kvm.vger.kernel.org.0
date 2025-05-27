@@ -1,300 +1,156 @@
-Return-Path: <kvm+bounces-47759-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47760-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED2B6AC48F4
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 09:01:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B597AC492D
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 09:18:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A95FE189D3B3
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 07:01:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60A791727BC
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 07:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 132B0205ABB;
-	Tue, 27 May 2025 06:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E68220F46;
+	Tue, 27 May 2025 07:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="F2WAm7iL"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ViYhpYcx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D872C1FCF41
-	for <kvm@vger.kernel.org>; Tue, 27 May 2025 06:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E750721D5A4;
+	Tue, 27 May 2025 07:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748329131; cv=none; b=PU5/TEnOf1gJ7zQNsZkpnuKy0Eho0x0W8w61rQUYzZt6TvvyqVXZx/ulJ8nepu0qThuhxoTS62Er5pqkcWwa6U6JIRC8a2ZRTEYWjCfcz01sC9e1u1MX+YbWXhhbAfePUp539SzXXP4ZNIV5JPgKFMNiNxPe+k5j1R0jEHEBvpQ=
+	t=1748330294; cv=none; b=jyUYJZo5sZn5i4w/izoKW2FJ++xb8CuchlD1MIazgP33/dm9kfqH88izPbhvq3bQ8RTueumNmfXb1TUhpN+XosoXFMX2R3ibIbmlpYSWXaT1YbPMr9ppIMGhnDHZS/sgv4GiZ/SurubGce2a2DgjsZ9yh1L1gBi9Wdqe7McCJdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748329131; c=relaxed/simple;
-	bh=fpkvLBVuTAYEIEPT7LlEGWQ8NMvC1E1BlUqUR0CtrAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qZ36KHh7KbdSklC+re4l8I28WnKrRLrNGST+JQkBx3k1Pq8SmPehI0i14ylfwx0si7BVLnqeIPoFDZgeapW62Xn7yWJx7bA4dF8uMcsURRwMQnJ4UsGuDVY++kvbZrrt5wXBoQv8eUtUVWWTgrNuR6ELw4W4AQNoOvcYnerexHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=F2WAm7iL; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-442f5b3c710so28396215e9.1
-        for <kvm@vger.kernel.org>; Mon, 26 May 2025 23:58:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1748329127; x=1748933927; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=IvHPnEqJkHaFg0addX5NNhxyCN45o5Itm5HB4I862Ls=;
-        b=F2WAm7iLTNwvr7YT3hZnTrSWtLPXNGjGP35J0b6cUh4iLHdQ/Y+CfZqQqRYmQNc7nm
-         BFcCaj5ZJsyGkClZEo4TYKMK2ljUp31Hgv5THJN0RqgB94NpTE7nZ5lNTPJdkSqH1xAw
-         A7zfl95cRSo+uNJdA/pRNjaGrpJDOleSgQUarCf7A3OoEmQdnvc9AUNbZ6MVlG0eKL2e
-         laZoG6FpegTy5m44NNeu6nrvqq9HbaH+YREXmOiCxTjiRSD59H8I9FJKQfJsQGF9RjUk
-         Da9k3R9L/gLWexytW9jUwEOGwxuvlm6swrP7N5gA6kRxrzKEjgC2NujtgunJsDVXdoHu
-         yAtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748329127; x=1748933927;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IvHPnEqJkHaFg0addX5NNhxyCN45o5Itm5HB4I862Ls=;
-        b=bcA8eBRLy9HZ/VS0s+q2mAPAzDRpPImGezXo6DbUNeJuR/TXFIBrF5cR7JSn1hcig8
-         3R2DbW252h5ZADgO47nbT2AiIjtpmg9E2fbskV/PwNPHuxn65I149U2OHqeUMlacW3bM
-         gIOI2/AFApUawya6xMhj83yzt/ajrGLJ7gW/GjHfUcBmy8PjXt0orRVWA+b7+tydrLrz
-         qIieNo1ddE9EMgA6Vc71ZjDjfJkkTfSi+3UhbctwoZKaHHNxkQ/iIygNt4+5a/Zz5DoU
-         /IazYL7yBhEppKoht/05p1MjskqAdudojjByaO4PH27ELpxPfuCMpl3mLi+ryTDOuNko
-         Zzxg==
-X-Forwarded-Encrypted: i=1; AJvYcCUIGhRCT20I5LM0ieluRycCySrx/E9MbC5c1NRgEwJC3vaZEZYlawTYwBiIylznYII2Q/s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyE82yKjazMZIGRg0JhrgmgUuCmN12/E9KQJovHl3zjuxuaJpxi
-	HD/kRdVD61THTXcNGMDcHJGfMIcUFKwnKcYEu7tMHxE+yW2SM8VlsHMH0Cp/w2SLkw8=
-X-Gm-Gg: ASbGnctozQjTZ8+Mwn4nGyiJpBssZJHWvMZbUiBKfHNEOt2T2ayy9LZphiynHw65FM7
-	cY4aV9g9mc0DEbZu7I8rKG2ALiNZ3xXQGlQ+66OJFZtFqlD7PzGEUZdMZaVB1l5RljsJg1Hh452
-	Rzv3qsaZUXgQMoNt6WIARog3p1bSItwsMgfNjiz+AOyn0oQ/6CB3wAKm/UkDJ7I26Tcpq8J8ptn
-	zTp2kqHOG1lbLO4G49gPLw1pyfVtwuVJrAjGYc/KTb5uOCKmGM4Jy0yZIgBM9RbRUoxgWiJDvJ1
-	khGZVzTq3kTWOgOlaP+5SwZFrcJMXRKduKEednc59ZnmP8dfig==
-X-Google-Smtp-Source: AGHT+IEHhQQL0VEBdNls3pWCu2J/RUKzb/9Co2PPyCShUceoxcl4MXQDtgi0OraHyJERFxo/xRNOZA==
-X-Received: by 2002:a05:600c:1d96:b0:440:6a1a:d89f with SMTP id 5b1f17b1804b1-44c916071a2mr114369435e9.4.1748329126908;
-        Mon, 26 May 2025 23:58:46 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200::ce80])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4dc1172ecsm4127292f8f.48.2025.05.26.23.58.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 May 2025 23:58:46 -0700 (PDT)
-Date: Tue, 27 May 2025 08:58:45 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Anup Patel <anup@brainfault.org>
-Cc: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>
-Subject: Re: [PATCH v4] RISC-V: KVM: add KVM_CAP_RISCV_USERSPACE_SBI
-Message-ID: <20250527-10d0318cf26e3602948545db@orel>
-References: <20250523113347.2898042-3-rkrcmar@ventanamicro.com>
- <20250526-e67c64d52c84a8ad7cb519c4@orel>
- <CAAhSdy1wtuLm2O7EwfVzCT7wgKf7-n9q9_DxfpA6kQA1oSoZoQ@mail.gmail.com>
- <20250526-c5be5322d773143825948b8b@orel>
- <CAAhSdy0uX9dEPdGiMgDcYbR6WS+Nc=V3rLvK_TEoA=fzeD9wBg@mail.gmail.com>
+	s=arc-20240116; t=1748330294; c=relaxed/simple;
+	bh=f4Hx8Tpui0PKRNM7Z+70KH3fALemtKbbPYlfhdi1ilc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=URYX1Js542lN1XumDQtD74NVJ0p6Nx1gWZ0cuMvSg4F2N8mJ6QLjb/zOkxa1qHtTuRaF/ThQbBw++bS/DCME+y0H+UtFpwDZAvi6KUORuUPIoMxjJZ8fdyEtpf/SOTP6KEkBCMK5+t2R71jnRzzWLs/S0G4E9anZciFLNOamgek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ViYhpYcx; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54R2U6UE032558;
+	Tue, 27 May 2025 07:18:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=opYd4H
+	OG5d2/EA2ZMhabVToKW7wW7XkK5OwqUHeJdEA=; b=ViYhpYcxsrDnpC2Al8UVDK
+	PetRGcNbaDNVJjig7a1NPcWA4zg4/8dyDmdB1IacZqC8dppI7eg3CCn29kiWq+zJ
+	Fm7/bmN+WqZqkmNv8sIpV38wIX+4KhOzW3BaKZqQGqBVDKzWHta9wk4ayhY7jLHx
+	DS7g4nsehaV+Z+2nVq5dXOuduqrefdYHREQ/HZRuz9OsRRKjkkjVBsk33iAv+FBD
+	uJPQyJ1iDkE9prH8tOPfjVE1JkApSVSeq8AYeXNCCFkJJd+rHpQMvLSqlQwjJ15U
+	yC62AfdLMBlt66iTffO4asIELz+n5RNmMTHWV4r0b1EBI6721IUJ1BRzBJ2XQLHA
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46u3hrw75h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 27 May 2025 07:18:10 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54R74F3H010750;
+	Tue, 27 May 2025 07:18:06 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46uru0hq5m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 27 May 2025 07:18:05 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54R7I2LK35520932
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 27 May 2025 07:18:02 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0A5142004E;
+	Tue, 27 May 2025 07:18:02 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5076B20040;
+	Tue, 27 May 2025 07:18:01 +0000 (GMT)
+Received: from t14-nrb (unknown [9.87.142.254])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 27 May 2025 07:18:01 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAhSdy0uX9dEPdGiMgDcYbR6WS+Nc=V3rLvK_TEoA=fzeD9wBg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 27 May 2025 09:18:01 +0200
+Message-Id: <DA6RCZ7FOBOS.1U1CX5REWAGTN@linux.ibm.com>
+Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        <frankja@linux.ibm.com>, <borntraeger@de.ibm.com>,
+        <seiden@linux.ibm.com>, <nsg@linux.ibm.com>, <david@redhat.com>,
+        <hca@linux.ibm.com>, <agordeev@linux.ibm.com>, <svens@linux.ibm.com>,
+        <gor@linux.ibm.com>, <schlameuss@linux.ibm.com>
+Subject: Re: [PATCH v2 3/5] KVM: s390: refactor some functions in priv.c
+From: "Nico Boehr" <nrb@linux.ibm.com>
+To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+        <linux-kernel@vger.kernel.org>
+X-Mailer: aerc 0.20.1
+References: <20250520182639.80013-1-imbrenda@linux.ibm.com>
+ <20250520182639.80013-4-imbrenda@linux.ibm.com>
+In-Reply-To: <20250520182639.80013-4-imbrenda@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=AOOMbaiN c=1 sm=1 tr=0 ts=68356732 cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=R0-nb_ruKWFPPYddgEsA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: _bFAT-T7cIq5VrWfdSN6tW9kmVHCpUgr
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI3MDA1NSBTYWx0ZWRfX2sIR4aWwn1/l kzPWbutHOie+M9vJQzJHePAaTgXdzA8NVbGRU2mgNhGCk5Pfcn7nMsGK3LBV/IYuJI7RfXoyavq nYvEUc/kiNfESZBeR8QTZrnbiwDwMlkB9XnUMs06U3VTU2tUSSdQorCMj0wJTr/ltqHKhSoqqXT
+ EGIjfffO/bakDsAXIV3c8TBmczNPzq3KvgwWkRHhJlubeEJmfepu3BkqDonn0h4e17if88YR6Je ggaE6VN7bQTIxYMeCi5QRuJ+VvS4wq5mpWJ8myctN/EYDjNi3LHtUnsP++HA9CGoC5iT/E/uPUJ acCE1QfLdKXf7FYYumE3X21B4s7TelhFaKPtE49fjCBehpivoa03oHIi7WUQa+sTXNyQNow6ZTt
+ TKrZijIYFqN2DxjRehDVOSibIfnL/N/0enkZvG0Ckud2lBf64/feYInDELH5O9tWrsvyJNea
+X-Proofpoint-GUID: _bFAT-T7cIq5VrWfdSN6tW9kmVHCpUgr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-27_03,2025-05-26_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 adultscore=0 bulkscore=0 mlxscore=0 spamscore=0
+ impostorscore=0 mlxlogscore=605 malwarescore=0 lowpriorityscore=0
+ phishscore=0 clxscore=1011 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505270055
 
-On Tue, May 27, 2025 at 09:23:05AM +0530, Anup Patel wrote:
-> On Mon, May 26, 2025 at 8:09 PM Andrew Jones <ajones@ventanamicro.com> wrote:
-> >
-> > On Mon, May 26, 2025 at 06:12:19PM +0530, Anup Patel wrote:
-> > > On Mon, May 26, 2025 at 2:52 PM Andrew Jones <ajones@ventanamicro.com> wrote:
-> > > >
-> > > > On Fri, May 23, 2025 at 01:33:49PM +0200, Radim Krčmář wrote:
-> > > > > The new capability allows userspace to implement SBI extensions that KVM
-> > > > > does not handle.  This allows userspace to implement any SBI ecall as
-> > > > > userspace already has the ability to disable acceleration of selected
-> > > > > SBI extensions.
-> > > > > The base extension is made controllable as well, but only with the new
-> > > > > capability, because it was previously handled specially for some reason.
-> > > > > *** The related compatibility TODO in the code needs addressing. ***
-> > > > >
-> > > > > This is a VM capability, because userspace will most likely want to have
-> > > > > the same behavior for all VCPUs.  We can easily make it both a VCPU and
-> > > > > a VM capability if there is demand in the future.
-> > > > >
-> > > > > Signed-off-by: Radim Krčmář <rkrcmar@ventanamicro.com>
-> > > > > ---
-> > > > > v4:
-> > > > > * forward base extension as well
-> > > > > * change the id to 242, because 241 is already taken in linux-next
-> > > > > * QEMU example: https://github.com/radimkrcmar/qemu/tree/mp_state_reset
-> > > > > v3: new
-> > > > > ---
-> > > > >  Documentation/virt/kvm/api.rst    | 11 +++++++++++
-> > > > >  arch/riscv/include/asm/kvm_host.h |  3 +++
-> > > > >  arch/riscv/include/uapi/asm/kvm.h |  1 +
-> > > > >  arch/riscv/kvm/vcpu_sbi.c         | 17 ++++++++++++++---
-> > > > >  arch/riscv/kvm/vm.c               |  5 +++++
-> > > > >  include/uapi/linux/kvm.h          |  1 +
-> > > > >  6 files changed, 35 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > > > > index e107694fb41f..c9d627d13a5e 100644
-> > > > > --- a/Documentation/virt/kvm/api.rst
-> > > > > +++ b/Documentation/virt/kvm/api.rst
-> > > > > @@ -8507,6 +8507,17 @@ given VM.
-> > > > >  When this capability is enabled, KVM resets the VCPU when setting
-> > > > >  MP_STATE_INIT_RECEIVED through IOCTL.  The original MP_STATE is preserved.
-> > > > >
-> > > > > +7.44 KVM_CAP_RISCV_USERSPACE_SBI
-> > > > > +--------------------------------
-> > > > > +
-> > > > > +:Architectures: riscv
-> > > > > +:Type: VM
-> > > > > +:Parameters: None
-> > > > > +:Returns: 0 on success, -EINVAL if arg[0] is not zero
-> > > > > +
-> > > > > +When this capability is enabled, KVM forwards ecalls from disabled or unknown
-> > > > > +SBI extensions to userspace.
-> > > > > +
-> > > > >  8. Other capabilities.
-> > > > >  ======================
-> > > > >
-> > > > > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> > > > > index 85cfebc32e4c..6f17cd923889 100644
-> > > > > --- a/arch/riscv/include/asm/kvm_host.h
-> > > > > +++ b/arch/riscv/include/asm/kvm_host.h
-> > > > > @@ -122,6 +122,9 @@ struct kvm_arch {
-> > > > >
-> > > > >       /* KVM_CAP_RISCV_MP_STATE_RESET */
-> > > > >       bool mp_state_reset;
-> > > > > +
-> > > > > +     /* KVM_CAP_RISCV_USERSPACE_SBI */
-> > > > > +     bool userspace_sbi;
-> > > > >  };
-> > > > >
-> > > > >  struct kvm_cpu_trap {
-> > > > > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-> > > > > index 5f59fd226cc5..dd3a5dc53d34 100644
-> > > > > --- a/arch/riscv/include/uapi/asm/kvm.h
-> > > > > +++ b/arch/riscv/include/uapi/asm/kvm.h
-> > > > > @@ -204,6 +204,7 @@ enum KVM_RISCV_SBI_EXT_ID {
-> > > > >       KVM_RISCV_SBI_EXT_DBCN,
-> > > > >       KVM_RISCV_SBI_EXT_STA,
-> > > > >       KVM_RISCV_SBI_EXT_SUSP,
-> > > > > +     KVM_RISCV_SBI_EXT_BASE,
-> > > > >       KVM_RISCV_SBI_EXT_MAX,
-> > > > >  };
-> > > > >
-> > > > > diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> > > > > index 31fd3cc98d66..497d5b023153 100644
-> > > > > --- a/arch/riscv/kvm/vcpu_sbi.c
-> > > > > +++ b/arch/riscv/kvm/vcpu_sbi.c
-> > > > > @@ -39,7 +39,7 @@ static const struct kvm_riscv_sbi_extension_entry sbi_ext[] = {
-> > > > >               .ext_ptr = &vcpu_sbi_ext_v01,
-> > > > >       },
-> > > > >       {
-> > > > > -             .ext_idx = KVM_RISCV_SBI_EXT_MAX, /* Can't be disabled */
-> > > > > +             .ext_idx = KVM_RISCV_SBI_EXT_BASE,
-> > > > >               .ext_ptr = &vcpu_sbi_ext_base,
-> > > > >       },
-> > > > >       {
-> > > > > @@ -217,6 +217,11 @@ static int riscv_vcpu_set_sbi_ext_single(struct kvm_vcpu *vcpu,
-> > > > >       if (!sext || scontext->ext_status[sext->ext_idx] == KVM_RISCV_SBI_EXT_STATUS_UNAVAILABLE)
-> > > > >               return -ENOENT;
-> > > > >
-> > > > > +     // TODO: probably remove, the extension originally couldn't be
-> > > > > +     // disabled, but it doesn't seem necessary
-> > > > > +     if (!vcpu->kvm->arch.userspace_sbi && sext->ext_id == KVM_RISCV_SBI_EXT_BASE)
-> > > > > +             return -ENOENT;
-> > > > > +
-> > > >
-> > > > I agree that we don't need to babysit userspace and it's even conceivable
-> > > > to have guests that don't need SBI. KVM should only need checks in its
-> > > > UAPI to protect itself from userspace and to enforce proper use of the
-> > > > API. It's not KVM's place to ensure userspace doesn't violate the SBI spec
-> > > > or create broken guests (userspace is the boss, even if it's a boss that
-> > > > doesn't make sense)
-> > > >
-> > > > So, I vote we drop the check.
-> > > >
-> > > > >       scontext->ext_status[sext->ext_idx] = (reg_val) ?
-> > > > >                       KVM_RISCV_SBI_EXT_STATUS_ENABLED :
-> > > > >                       KVM_RISCV_SBI_EXT_STATUS_DISABLED;
-> > > > > @@ -471,8 +476,14 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> > > > >  #endif
-> > > > >               ret = sbi_ext->handler(vcpu, run, &sbi_ret);
-> > > > >       } else {
-> > > > > -             /* Return error for unsupported SBI calls */
-> > > > > -             cp->a0 = SBI_ERR_NOT_SUPPORTED;
-> > > > > +             if (vcpu->kvm->arch.userspace_sbi) {
-> > > > > +                     next_sepc = false;
-> > > > > +                     ret = 0;
-> > > > > +                     kvm_riscv_vcpu_sbi_forward(vcpu, run);
-> > > > > +             } else {
-> > > > > +                     /* Return error for unsupported SBI calls */
-> > > > > +                     cp->a0 = SBI_ERR_NOT_SUPPORTED;
-> > > > > +             }
-> > > > >               goto ecall_done;
-> > > > >       }
-> > > > >
-> > > > > diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> > > > > index b27ec8f96697..0b6378b83955 100644
-> > > > > --- a/arch/riscv/kvm/vm.c
-> > > > > +++ b/arch/riscv/kvm/vm.c
-> > > > > @@ -217,6 +217,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> > > > >                       return -EINVAL;
-> > > > >               kvm->arch.mp_state_reset = true;
-> > > > >               return 0;
-> > > > > +     case KVM_CAP_RISCV_USERSPACE_SBI:
-> > > > > +             if (cap->flags)
-> > > > > +                     return -EINVAL;
-> > > > > +             kvm->arch.userspace_sbi = true;
-> > > > > +             return 0;
-> > > > >       default:
-> > > > >               return -EINVAL;
-> > > > >       }
-> > > > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > > > > index 454b7d4a0448..bf23deb6679e 100644
-> > > > > --- a/include/uapi/linux/kvm.h
-> > > > > +++ b/include/uapi/linux/kvm.h
-> > > > > @@ -931,6 +931,7 @@ struct kvm_enable_cap {
-> > > > >  #define KVM_CAP_X86_GUEST_MODE 238
-> > > > >  #define KVM_CAP_ARM_WRITABLE_IMP_ID_REGS 239
-> > > > >  #define KVM_CAP_RISCV_MP_STATE_RESET 240
-> > > > > +#define KVM_CAP_RISCV_USERSPACE_SBI 242
-> > > > >
-> > > > >  struct kvm_irq_routing_irqchip {
-> > > > >       __u32 irqchip;
-> > > > > --
-> > > > > 2.49.0
-> > > > >
-> > > >
-> > > > Otherwise,
-> > > >
-> > > > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> > >
-> > > We are not going ahead with this approach for the reasons
-> > > mentioned in v3 series [1].
-> >
-> > IIUC, the main concern in that thread is that userspace won't know what to
-> > do with some of the exits it gets or that it'll try to take control of
-> > extensions that it can't emulate. I feel like not exiting to userspace in
-> > those cases is trying to second guess it, i.e. KVM is trying to enforce a
-> > policy on userspace. But, KVM shouldn't be doing that, as userspace should
-> > be the policy maker. If userspace uses this capability to opt into getting
-> > all the SBI exits (which it doesn't want KVM to handle), then it should be
-> > allowed to get them -- and, if userspace doesn't know what it's doing,
-> > then it can keep all the pieces.
-> 
-> The userspace already has a mechanism to opt-in for select SBI exits
-> which it can implement such as SBI DBCN and SBI SUSP. With SBI v3.0,
-> userspace will be able implement SBI MPXY but SBI SSE, FWFT, and
-> DBTR will be in kernel space due to reasons mentioned in the v3 series.
-> 
-> There is no point in forwarding all SBI exits to userspace when userspace
-> has no mechanism to implement many critical SBI extensions.
+On Tue May 20, 2025 at 8:26 PM CEST, Claudio Imbrenda wrote:
+[...]
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index 9253c70897a8..15843e7e57e6 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+[...]
+> +static int skeys_common_checks(struct kvm_vcpu *vcpu, struct skeys_ops_s=
+tate *state)
+> +{
+> +	int rc;
+> +
+> +	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE) {
+> +		rc =3D kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+> +		return rc ? rc : -EAGAIN;
 
-Userspace can implement all truly disabled extensions, it just returns
-not-supported. So, while I may be contriving this example a bit, enabling
-userspace to log attempts to use disabled extensions would be one reason
-to forward them.
+What has changed that
 
-Thanks,
-drew
+return kvm_s390_inject_program_int()
+
+is not sufficient any more?
+
+[...]
+> +	get_regs_rre_ptr(vcpu, &state->reg1, &state->reg2, &state->r1, &state->=
+r2);
+> +
+> +	state->effective =3D vcpu->run->s.regs.gprs[state->reg2] & PAGE_MASK;
+
+*state->r2?
+
+[...]
+>  static int handle_pfmf(struct kvm_vcpu *vcpu)
+>  {
+[...]
+> +	if (r1.fsc) {
+> +		end =3D kvm_s390_logical_to_effective(vcpu, end);
+> +		if (kvm_s390_is_amode_64(vcpu))
+> +			replace_selected_bits(r2, PAGE_MASK, end);
+> +		else
+> +			replace_selected_bits(r2, 0xfffff000, end);
+
+Maybe I'm missing something, but I don't get why you need replace_selected_=
+bits
+here.  kvm_s390_logical_to_effective() already does the neccesary masking, =
+no?
 
