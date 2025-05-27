@@ -1,180 +1,193 @@
-Return-Path: <kvm+bounces-47794-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47795-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A34DAC5139
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 16:47:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E01AC51E0
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 17:22:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD2E1188E33A
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 14:47:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68EE13B29ED
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 15:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9C627B4ED;
-	Tue, 27 May 2025 14:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D5A27A926;
+	Tue, 27 May 2025 15:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SkJg5R/6"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="rcEtGqvT"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from outbound.ms.icloud.com (p-west3-cluster6-host7-snip4-10.eps.apple.com [57.103.75.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A95619E7F9
-	for <kvm@vger.kernel.org>; Tue, 27 May 2025 14:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67221E48A
+	for <kvm@vger.kernel.org>; Tue, 27 May 2025 15:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.75.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748357178; cv=none; b=frJaOu9bxwoY8N3Tlo4t6fM1h2gVQTrL9cgNX2fB9eNx7XFe3P8smhqLhWCweuHM6UY3KWZp32ibIphp6OO/lFxTKJZvxbzbQof6mGs7/Ge+eD0wYxC4DgU7sBHGob9Ha43AB9PawNcJ1v6fHs7DFsKPDBNoE0rXA2MrkULT/kA=
+	t=1748359346; cv=none; b=oUad+AvgtSiwotMJm36Y62mU7L/H/wM8m4oH+xm71lNLQTGUzM+mowyDs8sTVU3YyKsXASdgg0cZrc5/pVtJStoiQFq5OUw1dgFziwTp4EIFbAt6UNpKRYEJoHyN3Fb90wDxlY2GgayBqR6ZMqTvJIiyV1/gckI+57ILFo1EzS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748357178; c=relaxed/simple;
-	bh=UQp09avFH8xgeYerTkwf4UoPXmwKxzIXnY83QqUxR54=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=luVfRDaDDBVYb+Y/zE/Ty82nGafa8X41eafG6BcnL4An3BrqAhS1BCDA9mR2jUAsZnmA3B3HtgazamomMvo1FtC5n7B8jJ5ySlwxrKIhcTjCb9ZckD3bOXjOo3giQSx89rWgJkeTAEJKXEZ4ZAtpR+Urd0LJ/ZZ7v3Rh14eoJS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SkJg5R/6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748357173;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sa/wIGm5nRAZlTb1UlvruTlcCiWXHo8pM4cZQoZaSZU=;
-	b=SkJg5R/6eE01OAdewVcD4RUxX68km4xlFGMYLRhUJxA/axTBw66pruko4Z+pKSbKz+ci2O
-	cLbGXBSyNpC1R/hCJrjulePLjA/0rrplCcbdGx3gtnXCe+DM5QEPj5Sv+2nkQ06yXwA6ry
-	qd3Bxi9BW4rXySrNh4sGrMlUqLXN03w=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-246-2LoxhscaOcCIARcKL32Hjw-1; Tue,
- 27 May 2025 10:46:09 -0400
-X-MC-Unique: 2LoxhscaOcCIARcKL32Hjw-1
-X-Mimecast-MFC-AGG-ID: 2LoxhscaOcCIARcKL32Hjw_1748357167
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6144D1955D88;
-	Tue, 27 May 2025 14:46:07 +0000 (UTC)
-Received: from dobby.home.kraxel.org (unknown [10.45.226.108])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7E33C18003FC;
-	Tue, 27 May 2025 14:46:03 +0000 (UTC)
-Received: by dobby.home.kraxel.org (Postfix, from userid 1000)
-	id 4D2CC44FBC4; Tue, 27 May 2025 16:46:01 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ard Biesheuvel <ardb@kernel.org>
-Cc: kvm@vger.kernel.org,
-	linux-coco@lists.linux.dev,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	linux-efi@vger.kernel.org
-Subject: [PATCH 2/2] x86/sev: let sev_es_efi_map_ghcbs map the caa pages too
-Date: Tue, 27 May 2025 16:45:45 +0200
-Message-ID: <20250527144546.42981-2-kraxel@redhat.com>
-In-Reply-To: <20250527144546.42981-1-kraxel@redhat.com>
-References: <20250527144546.42981-1-kraxel@redhat.com>
+	s=arc-20240116; t=1748359346; c=relaxed/simple;
+	bh=1wnjxghz1VyaDYZG1OJx1HqawgRnMvLbQcHMrh119h0=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=cGkMnaAKrwhnD3BfdeVqaPFePceX1wd6DqdzxnJE8WfYxJV2SfJG1i0zj58hMiwdonAawta4VqyM8bUzjtpAkyLsTulywSgOa29HOZc8BsqW12dF/KumWLECfoUTEdXLJ5D894X6Yl3qHjXzYeJmn5HiZkEi1JS4PuvNiAtVbEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=rcEtGqvT; arc=none smtp.client-ip=57.103.75.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; bh=qpWNtoHpHDvcf7sMaFf0EMW/jeoBO90YBaJzoFKooAs=;
+	h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To:x-icloud-hme;
+	b=rcEtGqvTtzwsHj8owtLFiUrWNKFNbo8odUblv7G56UbqAlk/Q2QkrO+cEP/3gmXS9
+	 i/morm79L5ByVqgxYCsvY5BeBGLSFyzF0qyjaREUT9Ym45hlyLhgySVnuXnkTv3ySy
+	 EOaaGLJoLYm5gOlHCXK2B4UVD7uPzA7nfhz+HqpfHmZBxNo7sx7rV1bqzQGssWRm+e
+	 zhw1EZkCyg4Pt/sQ4x4YJ+52zcUJ0wMIoBRW3JmTyrWlmBO6lA6WSPza+j0lC13aov
+	 fCSrsTAa13exJkGPTQwJOj/Ttp9znPBh8CyJS9U/etU6cbcVE0JyR15k36a1iASqT8
+	 2lAb3KhMO3WBQ==
+Received: from outbound.ms.icloud.com (localhost [127.0.0.1])
+	by outbound.ms.icloud.com (Postfix) with ESMTPS id 1EA5C180028F;
+	Tue, 27 May 2025 15:22:22 +0000 (UTC)
+Received: from smtpclient.apple (unknown [17.57.154.37])
+	by outbound.ms.icloud.com (Postfix) with ESMTPSA id 4A91418002B8;
+	Tue, 27 May 2025 15:22:21 +0000 (UTC)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: Re: [PATCH v7 0/6] target/i386: Update EPYC CPU models for Cache
+ property, RAS, SVM feature and add EPYC-Turin CPU model
+From: Jon Kohler <jonmkohler@icloud.com>
+In-Reply-To: <cover.1746734284.git.babu.moger@amd.com>
+Date: Tue, 27 May 2025 11:22:08 -0400
+Cc: pbonzini@redhat.com,
+ zhao1.liu@intel.com,
+ qemu-devel@nongnu.org,
+ kvm@vger.kernel.org,
+ davydov-max@yandex-team.ru
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <75B808AB-38DC-4B5B-9A7D-F4D0AD3225CB@icloud.com>
+References: <cover.1746734284.git.babu.moger@amd.com>
+To: Babu Moger <babu.moger@amd.com>
+X-Mailer: Apple Mail (2.3826.600.51.1.1)
+X-Proofpoint-ORIG-GUID: eqgXYJnvJmEg47ijZppIX0S4nFlJs1Mm
+X-Proofpoint-GUID: eqgXYJnvJmEg47ijZppIX0S4nFlJs1Mm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-27_07,2025-05-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ suspectscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 spamscore=0
+ phishscore=0 mlxscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.22.0-2503310001 definitions=main-2505270127
 
-OVMF EFI firmware needs access to the CAA page to do SVSM protocol
-calls.  So add that to sev_es_efi_map_ghcbs and also rename the function
-to reflect the additional job it is doing now.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- arch/x86/coco/sev/core.c       | 14 ++++++++++++--
- arch/x86/include/asm/sev.h     |  4 ++--
- arch/x86/platform/efi/efi_64.c |  2 +-
- 3 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
-index 145f594d7e6b..1cf2a8757ad6 100644
---- a/arch/x86/coco/sev/core.c
-+++ b/arch/x86/coco/sev/core.c
-@@ -1466,11 +1466,13 @@ int __init sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
-  * This is needed by the OVMF UEFI firmware which will use whatever it finds in
-  * the GHCB MSR as its GHCB to talk to the hypervisor. So make sure the per-cpu
-  * runtime GHCBs used by the kernel are also mapped in the EFI page-table.
-+ *
-+ * When running under SVSM the CCA page is needed too, so map it as well.
-  */
--int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
-+int __init sev_es_efi_map_ghcbs_caas(pgd_t *pgd)
- {
- 	struct sev_es_runtime_data *data;
--	unsigned long address, pflags;
-+	unsigned long address, pflags, pflags_enc;
- 	int cpu;
- 	u64 pfn;
- 
-@@ -1478,6 +1480,7 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
- 		return 0;
- 
- 	pflags = _PAGE_NX | _PAGE_RW;
-+	pflags_enc = cc_mkenc(pflags);
- 
- 	for_each_possible_cpu(cpu) {
- 		data = per_cpu(runtime_data, cpu);
-@@ -1487,6 +1490,13 @@ int __init sev_es_efi_map_ghcbs(pgd_t *pgd)
- 
- 		if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags))
- 			return 1;
-+
-+		address = per_cpu(svsm_caa_pa, cpu);
-+		if (address) {
-+			pfn = address >> PAGE_SHIFT;
-+			if (kernel_map_pages_in_pgd(pgd, pfn, address, 1, pflags_enc))
-+				return 1;
-+		}
- 	}
- 
- 	return 0;
-diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index ba7999f66abe..6b4f8b55e214 100644
---- a/arch/x86/include/asm/sev.h
-+++ b/arch/x86/include/asm/sev.h
-@@ -410,7 +410,7 @@ static __always_inline void sev_es_nmi_complete(void)
- 	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
- 		__sev_es_nmi_complete();
- }
--extern int __init sev_es_efi_map_ghcbs(pgd_t *pgd);
-+extern int __init sev_es_efi_map_ghcbs_caas(pgd_t *pgd);
- extern void sev_enable(struct boot_params *bp);
- 
- /*
-@@ -491,7 +491,7 @@ static inline void sev_es_ist_enter(struct pt_regs *regs) { }
- static inline void sev_es_ist_exit(void) { }
- static inline int sev_es_setup_ap_jump_table(struct real_mode_header *rmh) { return 0; }
- static inline void sev_es_nmi_complete(void) { }
--static inline int sev_es_efi_map_ghcbs(pgd_t *pgd) { return 0; }
-+static inline int sev_es_efi_map_ghcbs_caas(pgd_t *pgd) { return 0; }
- static inline void sev_enable(struct boot_params *bp) { }
- static inline int pvalidate(unsigned long vaddr, bool rmp_psize, bool validate) { return 0; }
- static inline int rmpadjust(unsigned long vaddr, bool rmp_psize, unsigned long attrs) { return 0; }
-diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
-index a4b4ebd41b8f..1136c576831f 100644
---- a/arch/x86/platform/efi/efi_64.c
-+++ b/arch/x86/platform/efi/efi_64.c
-@@ -215,7 +215,7 @@ int __init efi_setup_page_tables(unsigned long pa_memmap, unsigned num_pages)
- 	 * When SEV-ES is active, the GHCB as set by the kernel will be used
- 	 * by firmware. Create a 1:1 unencrypted mapping for each GHCB.
- 	 */
--	if (sev_es_efi_map_ghcbs(pgd)) {
-+	if (sev_es_efi_map_ghcbs_caas(pgd)) {
- 		pr_err("Failed to create 1:1 mapping for the GHCBs!\n");
- 		return 1;
- 	}
--- 
-2.49.0
+> On May 8, 2025, at 3:57=E2=80=AFPM, Babu Moger <babu.moger@amd.com> =
+wrote:
+>=20
+> Following changes are implemented in this series.
+>=20
+> 1. Fixed the cache(L2,L3) property details in all the EPYC models.
+> 2. Add RAS feature bits (SUCCOR, McaOverflowRecov) on all EPYC models
+> 3. Add missing SVM feature bits required for nested guests on all EPYC =
+models
+> 4. Add the missing feature bit fs-gs-base-ns(WRMSR to =
+{FS,GS,KERNEL_G}S_BASE is
+>   non-serializing). This bit is added in EPYC-Genoa and EPYC-Turin =
+models.
+> 5. Add RAS, SVM, fs-gs-base-ns and perfmon-v2 on EPYC-Genoa and =
+EPYC-Turin models.
+> 6. Add support for EPYC-Turin.=20
+>   (Add all the above feature bits and few additional bits movdiri, =
+movdir64b,
+>    avx512-vp2intersect, avx-vnni, prefetchi, sbpb, ibpb-brtype, =
+srso-user-kernel-no).
+>=20
+> Link: =
+https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/progr=
+ammer-references/57238.zip
+> Link: =
+https://www.amd.com/content/dam/amd/en/documents/corporate/cr/speculative-=
+return-stack-overflow-whitepaper.pdf
+> ---
+> v7: Rebased on top latest 57b6f8d07f14 (upstream/master) Merge tag =
+'pull-target-arm-20250506'
+>    Added new feature bit PREFETCHI. KVM support for the bit is added =
+recently.
+>    https://github.com/kvm-x86/linux/commit/d88bb2ded2ef
+>    Paolo, These patches have been pending for a while. Please consider =
+merging when you get a chance.
+>=20
+> v6: Initialized the boolean feature bits to true where applicable.
+>    Added Reviewed-by tag from Zhao.
+>=20
+> v5: Add EPYC-Turin CPU model
+>    Dropped ERAPS and RAPSIZE bits from EPYC-Turin models as kernel =
+support for
+>    these bits are not done yet. Users can still use the options =
++eraps,+rapsize
+>    to test these featers.
+>    Add Reviewed-by tag from Maksim for the patches already reviewed.
+>=20
+> v4: Some of the patches in v3 are already merged. Posting the rest of =
+the patches.
+>    Dropped EPYC-Turin model for now. Will post them later.
+>    Added SVM feature bit as discussed in
+>    =
+https://lore.kernel.org/kvm/b4b7abae-669a-4a86-81d3-d1f677a82929@redhat.co=
+m/
+>    Fixed the cache property details as discussed in
+>    =
+https://lore.kernel.org/kvm/20230504205313.225073-8-babu.moger@amd.com/
+>    Thanks to Maksim and Paolo for their feedback.
+>=20
+> v3: Added SBPB, IBPB_BRTYPE, SRSO_USER_KERNEL_NO, ERAPS and RAPSIZE =
+bits
+>    to EPYC-Turin.
+>    Added new patch(1) to fix a minor typo.
+>=20
+> v2: Fixed couple of typos.
+>    Added Reviewed-by tag from Zhao.
+>    Rebased on top of 6d00c6f98256 ("Merge tag 'for-upstream' of =
+https://repo.or.cz/qemu/kevin into staging")
+>=20
+> Previous revisions:
+> v6: =
+https://lore.kernel.org/kvm/cover.1740766026.git.babu.moger@amd.com/
+> v5: =
+https://lore.kernel.org/kvm/cover.1738869208.git.babu.moger@amd.com/
+> v4: =
+https://lore.kernel.org/kvm/cover.1731616198.git.babu.moger@amd.com/
+> v3: =
+https://lore.kernel.org/kvm/cover.1729807947.git.babu.moger@amd.com/
+> v2: =
+https://lore.kernel.org/kvm/cover.1723068946.git.babu.moger@amd.com/
+> v1: =
+https://lore.kernel.org/qemu-devel/cover.1718218999.git.babu.moger@amd.com=
+/
+>=20
+> Babu Moger (6):
+>  target/i386: Update EPYC CPU model for Cache property, RAS, SVM
+>    feature bits
+>  target/i386: Update EPYC-Rome CPU model for Cache property, RAS, SVM
+>    feature bits
+>  target/i386: Update EPYC-Milan CPU model for Cache property, RAS, SVM
+>    feature bits
+>  target/i386: Add couple of feature bits in CPUID_Fn80000021_EAX
+>  target/i386: Update EPYC-Genoa for Cache property, perfmon-v2, RAS =
+and
+>    SVM feature bits
+>  target/i386: Add support for EPYC-Turin model
+>=20
+> target/i386/cpu.c | 439 +++++++++++++++++++++++++++++++++++++++++++++-
+> target/i386/cpu.h |   4 +
+> 2 files changed, 441 insertions(+), 2 deletions(-)
+
+Hey Babu and Paolo,
+Is there anything outstanding on this series? I didn=E2=80=99t see any
+further comments.=20
+
+Anyhow, I did step thru this patch by patch, LGTM:
+
+Reviewed-By: Jon Kohler <jon@nutanix.com <mailto:jon@nutanix.com>>
 
 
