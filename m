@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-47786-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47787-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB291AC4D12
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 13:20:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C49B9AC4D15
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 13:21:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 746323BFC24
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 11:19:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 864CF17DD98
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 11:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05001253350;
-	Tue, 27 May 2025 11:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39AB4257440;
+	Tue, 27 May 2025 11:21:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KR+wdLVK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fNZIY//T"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7ACC1EF0A6
-	for <kvm@vger.kernel.org>; Tue, 27 May 2025 11:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D461E43ABC
+	for <kvm@vger.kernel.org>; Tue, 27 May 2025 11:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748344811; cv=none; b=WsQONoYHo8NWkNIVlyh1AH7o1j4IURbD8jykYOiYSib4hF0RI+WP5XcvMX10nUpMxou8oXnor3/93t4jQ65KKPelocvS9+CU8UF99C4Kx7rl7kIWexWFkLy1rKanxiH1TrkDjCqSCliX+AYmCyZ8nL+hUKSucofIxEP8/gRmKL8=
+	t=1748344897; cv=none; b=CUR5kB6CfK8tZLVpdB/WC4Ay1tSQ+u7wNjjp761bMzF1ob/GTR0ZYZTVASm7oKupXODSq4PDX6Lz1kFOAUwIAFkFMAAAbblNgoscOXtPHg2VISNv0K7oMWB9JmNx8kOE43grAL2Y3EqliRyQ+iVag0A/4jKwYe7oAote6zmIubU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748344811; c=relaxed/simple;
-	bh=i9zs3MNgLyaLMfszNlqEQ6848Cr3zKyVT+K6o0LhT5Q=;
+	s=arc-20240116; t=1748344897; c=relaxed/simple;
+	bh=QcCxQKvPBWrkcRX2SE9dq5/kuP2a1X39ZhE3AnH/3Sc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tMSCItJ+nlV2twGaggQCWtxCHFioXmIfMljd+CxFbw5AITGkN646NRZ/mEYfQBlu0T70OPYuVOiEv5s52DdX9u16bdAs+Q8BrO4POoHH4iPxHZcdO/1lVv1hQm19IY+1d6D+PNUmQz8/U97Nu21pkIfbtFawHDDIhXPe6dTsMss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KR+wdLVK; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Qiq1zFGDHjmpvGzlilQBDlAH36W0w2NnLZvUTm48D361y/K8xiHwX0nO+CvZqcHXpFqskpoLnLU8ng18yWfKMi9PKbB7flVLl32oi4nvPY+bmQJBoK1JCLG+ekNO187emBF7xmgl4uHgjdzCANhscnmlhU3kpsktBu/TwvDx6Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fNZIY//T; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748344807;
+	s=mimecast20190719; t=1748344894;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=YKNVYFC2IcMe1Fm7SeSy11DsiVXZP+F286iJgXwsNUQ=;
-	b=KR+wdLVK4fEomeF0ld1+3nstlw3dOYx4N7GZ3NBzlBfv717sHPK/h2BiXidMVGsDx8F2g4
-	lba7/VX8JJYklMQi1saCNwo3qiXksvIvl5TLEoZ22DVOp6rIMzLbdjw8AOa6TH9+TwsKLJ
-	4xBnyQK7Mn9S6sfbS5kk6TcYJaZ/hkA=
+	bh=EW/uzus/41RnnKKkSo0Ol8kuHO90+skVAb2RILvJGYc=;
+	b=fNZIY//TEG0eC9m5HbnCGNh99zcaCvZoNJfC3OZf7fuoqGJjlSl0VU/60l6Czawf2XaFkl
+	T64chMyuZodvWpdVrheLT2LdcrQeOGt1/htysdNlV9aVfHqM2plnXimJqy7eMsHiczID3W
+	ova8+g67SXpZGeUnNbSz8MQrLtwmJlU=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-49-DqBa3wd-N-SS9561Xsxe1Q-1; Tue, 27 May 2025 07:20:06 -0400
-X-MC-Unique: DqBa3wd-N-SS9561Xsxe1Q-1
-X-Mimecast-MFC-AGG-ID: DqBa3wd-N-SS9561Xsxe1Q_1748344805
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43d734da1a3so18927455e9.0
-        for <kvm@vger.kernel.org>; Tue, 27 May 2025 04:20:06 -0700 (PDT)
+ us-mta-413-cVhlC4h9MmSpTYAjs1ONLQ-1; Tue, 27 May 2025 07:21:33 -0400
+X-MC-Unique: cVhlC4h9MmSpTYAjs1ONLQ-1
+X-Mimecast-MFC-AGG-ID: cVhlC4h9MmSpTYAjs1ONLQ_1748344892
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-441c96c1977so19033255e9.0
+        for <kvm@vger.kernel.org>; Tue, 27 May 2025 04:21:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748344805; x=1748949605;
+        d=1e100.net; s=20230601; t=1748344892; x=1748949692;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=YKNVYFC2IcMe1Fm7SeSy11DsiVXZP+F286iJgXwsNUQ=;
-        b=ZOeUgqF1wc6QBtZcZK4HKfSEJiI6jvGLqvdH9EH057TtY68YrpeT4s7hyDZ/zco6XW
-         IJHgSpsVvU7X+TjMv7Dmg8slc9+2358KY1c4KpjDxG/MC7HzXVLPEziXGdVa3FEZMOtP
-         CLp40+aOW2TRRwJSjJDdYH600WL4i3MYWrwXhGuNAUmF+X7HMIP8lISP7tQOO5U7heU+
-         mTvH2zw9ziEpsd3ezKqEdHaDTcMV6iF0DdP9TIB4P2Wcy70aVRel0NlJulSp9v3CG4ym
-         fob5GG/JmZKP9TeTwURWRDI8XFthBhTpLc2nlPHFRwcwkqYydwBtLnYF722iuS9t8C06
-         G3BA==
-X-Forwarded-Encrypted: i=1; AJvYcCUQKF8x/LQQ9CENj72h/BQoCIJXYVPMcPb++y2Ij2Xy4Td0DrggeulExYlQTUnZUS4MveU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFgO6o25BRg7g6ceXOJDC2Hx3YvOFFpks/hiyddPcLcvTsXh8T
-	f8JmDW6K+2WiycxpbCj1eFeeF1F91J0aGMVgG84/9WHh0w9nLPIWP0uZZT/7B8XGc7b0Cd0qNuP
-	bXlPywzybxzc/sxjm5Vav659hvUvLYwq0I0ICw6X3rl+CHY4i/9lt3Q==
-X-Gm-Gg: ASbGnct4wS59MVVMi+SlkQVhsaRHpolVGVLT0+lMNb9jwXDW+5sat+lN8AWIPG9GuCo
-	ARd6ZPf63g21aQKDJdigtRx4as1QCwZbjtYm172gOfb3VJ9zkW+rq1EJr1EGXyYRtmB9BobIuZi
-	nXLPPCCTRjme2Dd3Syn1pJc1NWUaQOV4EZHgfckCaJyA8x+wLDxS3rSGC6kUKhIzF0Q9xNPVP3p
-	LylrZoaEN8qE1L0smE2cY5IhTkKYMvDxD3xGi+y4JuDyIA4KGIOcwMN5gvLU+XXjJUTvmB5t/OD
-	uldZT2PFNOlObRvdp3YG81Q2epq0ZuVBtHJ93coBy7Re
-X-Received: by 2002:a05:600c:1547:b0:440:54ef:dfdc with SMTP id 5b1f17b1804b1-44c935dca2emr106324085e9.8.1748344805160;
-        Tue, 27 May 2025 04:20:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGlyickPkgs/njo2SCri2jqrG0yQeRWlByYHp0iamN4soyrSABHNsEoh0+qGZMhx4sYPUWZCA==
-X-Received: by 2002:a05:600c:1547:b0:440:54ef:dfdc with SMTP id 5b1f17b1804b1-44c935dca2emr106323715e9.8.1748344804691;
-        Tue, 27 May 2025 04:20:04 -0700 (PDT)
+        bh=EW/uzus/41RnnKKkSo0Ol8kuHO90+skVAb2RILvJGYc=;
+        b=r9+4JV0BbnLcpMLgE+U8Cmv8k3uk9z4xcTEsXJvuTVBuloD8GzMCgaJthme8ljqm7N
+         qvX0qpX/+oHX88QjdyD1I4hoADG3E+1oNxl1RyNNFCFV7xQPQ+rrLROJsSsd5+puiAhr
+         CHZrKadlJr1UghrdHmQPuv1j/4LGiHytyGs+DqTHubLpud6Iu5bBCijQiEGZ7DqdTeef
+         ZWIx/jjX4GfEQ2AEF6Gq6cQKe/L1uBaVx2VCKvUD3ieuT2BF0reN1rDHrelioX0PRxDf
+         iPc/tTSFgMcYPr64PvLaQBaVK/+1AyDSAD7fsBxyjn5gbnE5hwBACL6m20H58CYIrQEj
+         PMxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlGRNNgwZ+rw+41Qeh2owyiIjO0QbgfzwuLTRQ8ocMXDNR+8PqY4W+jjxtshZORum07IE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2NOGTcYmkSsdCpuE+EgzpD7kpDoJOsyVDG5gFIWWaG6IooBsy
+	sOAMcHACCFggR0ZxRAcOHMtL2osCcXJkpYCm2yfUcMFaGDOmyxn8YK3I+p8QGkydE7h+uywZMAn
+	Ri7qU0BaHsWyVvCsJZvZelGardOCjcLaNIqwamX/NSGXIFUFBUB4mUw==
+X-Gm-Gg: ASbGncss/xNHDnWLgsOcCxJObz85QBW1KPbqcpqLbesf8GZm+G5cu+czf1k9QGXJo6Q
+	V6CG1mzqSBneZjSBD8gpZlPDfZnOU/0YzkvA23+BQgTLgvljofZj48V7bYPSyIyO53FeEB6jrOX
+	21jXimmiemq2Cm7Ynb/4AxzNkKRvpIMY03HESeWhe2kLkP2LU95zMZiQth2wQ5NU6kDJ9Bvt7El
+	X5UrhDoScgQZ623avc5o9wk9cHck04JmPenn0wkPecGecGsButG2p7ywZCW6u8qoYnlIpNzsnDR
+	esDdyT/82FHYGu27O9KX15vdsMBtTozNJzWHnYW5nnA2
+X-Received: by 2002:a05:6000:2503:b0:3a4:d048:125c with SMTP id ffacd0b85a97d-3a4d04813ffmr9814855f8f.35.1748344892296;
+        Tue, 27 May 2025 04:21:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHerjQyTu06pnjsk/Y5G1dSbQUFhMGxFGP+lBATkWwRdfx8/UsyMG4cL4H76zCjaTbN/cEfOA==
+X-Received: by 2002:a05:6000:2503:b0:3a4:d048:125c with SMTP id ffacd0b85a97d-3a4d04813ffmr9814818f8f.35.1748344891872;
+        Tue, 27 May 2025 04:21:31 -0700 (PDT)
 Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4d17266d5sm8387859f8f.68.2025.05.27.04.20.03
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4d53ce0b4sm7271868f8f.37.2025.05.27.04.21.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 May 2025 04:20:04 -0700 (PDT)
-Message-ID: <e187cd31-09b4-48da-88ea-20582023e5d8@redhat.com>
-Date: Tue, 27 May 2025 13:20:03 +0200
+        Tue, 27 May 2025 04:21:31 -0700 (PDT)
+Message-ID: <1a6e36a4-d280-495c-b39d-dbca3fb818e3@redhat.com>
+Date: Tue, 27 May 2025 13:21:30 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,8 +89,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 07/10] RAMBlock: Make guest_memfd require coordinate
- discard
+Subject: Re: [PATCH v5 10/10] ram-block-attribute: Add more error handling
+ during state changes
 To: Chenyi Qiang <chenyi.qiang@intel.com>, Alexey Kardashevskiy
  <aik@amd.com>, Peter Xu <peterx@redhat.com>,
  Gupta Pankaj <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -101,9 +101,9 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
  Baolu Lu <baolu.lu@linux.intel.com>, Gao Chao <chao.gao@intel.com>,
  Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
 References: <20250520102856.132417-1-chenyi.qiang@intel.com>
- <20250520102856.132417-8-chenyi.qiang@intel.com>
- <7af3f5c9-7385-432f-aad6-7c25db2fafe2@redhat.com>
- <cf9a8d77-c80f-459f-8a4b-d8b015418b98@intel.com>
+ <20250520102856.132417-11-chenyi.qiang@intel.com>
+ <c6013cd5-a202-4bd9-a181-0384ddc305ab@amd.com>
+ <475254ca-6da3-4216-8e88-858d42724958@intel.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -151,86 +151,27 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <cf9a8d77-c80f-459f-8a4b-d8b015418b98@intel.com>
+In-Reply-To: <475254ca-6da3-4216-8e88-858d42724958@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 27.05.25 07:47, Chenyi Qiang wrote:
-> 
-> 
-> On 5/26/2025 5:08 PM, David Hildenbrand wrote:
->> On 20.05.25 12:28, Chenyi Qiang wrote:
->>> As guest_memfd is now managed by RamBlockAttribute with
->>> RamDiscardManager, only block uncoordinated discard.
->>>
->>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->>> ---
->>> Changes in v5:
->>>       - Revert to use RamDiscardManager.
->>>
->>> Changes in v4:
->>>       - Modify commit message (RamDiscardManager->PrivateSharedManager).
->>>
->>> Changes in v3:
->>>       - No change.
->>>
->>> Changes in v2:
->>>       - Change the ram_block_discard_require(false) to
->>>         ram_block_coordinated_discard_require(false).
->>> ---
->>>    system/physmem.c | 6 +++---
->>>    1 file changed, 3 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/system/physmem.c b/system/physmem.c
->>> index f05f7ff09a..58b7614660 100644
->>> --- a/system/physmem.c
->>> +++ b/system/physmem.c
->>> @@ -1916,7 +1916,7 @@ static void ram_block_add(RAMBlock *new_block,
->>> Error **errp)
->>>            }
->>>            assert(new_block->guest_memfd < 0);
->>>    -        ret = ram_block_discard_require(true);
->>> +        ret = ram_block_coordinated_discard_require(true);
->>>            if (ret < 0) {
->>>                error_setg_errno(errp, -ret,
->>>                                 "cannot set up private guest memory:
->>> discard currently blocked");
->>> @@ -1939,7 +1939,7 @@ static void ram_block_add(RAMBlock *new_block,
->>> Error **errp)
->>>                 * ever develops a need to check for errors.
->>>                 */
->>>                close(new_block->guest_memfd);
->>> -            ram_block_discard_require(false);
->>> +            ram_block_coordinated_discard_require(false);
->>>                qemu_mutex_unlock_ramlist();
->>>                goto out_free;
->>>            }
->>> @@ -2302,7 +2302,7 @@ static void reclaim_ramblock(RAMBlock *block)
->>>        if (block->guest_memfd >= 0) {
->>>            ram_block_attribute_destroy(block->ram_shared);
->>>            close(block->guest_memfd);
->>> -        ram_block_discard_require(false);
->>> +        ram_block_coordinated_discard_require(false);
->>>        }
->>>          g_free(block);
+
 >>
->>
->> I think this patch should be squashed into the previous one, then the
->> story in that single patch is consistent.
+>> If something went wrong... well, on my AMD machine this usually means
+>> the fw is really unhappy and recovery is hardly possible and the machine
+>> needs reboot. Probably stopping the VM would make more sense for now (or
+>> stop the device so the user could save work from the VM, dunno).
 > 
-> I think this patch is a gate to allow device assignment with guest_memfd
-> and want to make it separately. Can we instead add some commit message
-> in previous one? like:
+> My current plan (in next version) is to squash the mixture handling in
+> previous patch to always run the code for "unexpected mix", and return
+> error without rollback if it fails in kvm_convert_memory(), which will
+> cause QEMU to quit. I think it can meet what you want.
 > 
-> "Using guest_memfd with vfio is still blocked via
-> ram_block_discard_disable()/ram_block_discard_require()."
+> As for the rollback handling, maybe keep it as an attached patch for
+> future reference or just remove it.
 
-For the title it should probably be something like:
-
-"physmem: support coordinated discarding of RAM with guest_memdfd"
-
-Then explain how we install the RAMDiscardManager that will notify 
-listeners (esp. vfio).
+probably best to remove it for now. The patch is in the mailing list 
+archives for future reference :)
 
 -- 
 Cheers,
