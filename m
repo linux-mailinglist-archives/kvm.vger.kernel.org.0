@@ -1,150 +1,117 @@
-Return-Path: <kvm+bounces-47750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47751-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F02CAC47A6
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 07:31:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 408FEAC47AF
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 07:39:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EF433B5A31
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 05:31:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E16353B8F3A
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 05:39:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A731BC07A;
-	Tue, 27 May 2025 05:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AD91D63F2;
+	Tue, 27 May 2025 05:39:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rp31qdJU"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Q+hZRb0q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2042F29;
-	Tue, 27 May 2025 05:31:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BE5288DB;
+	Tue, 27 May 2025 05:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748323881; cv=none; b=maCO93Y8eEbcU8+t4ohYpEN7m59ajpJAgjMw0ttsYjCQJeUbDHzKSU4Sy5ymgqnFEXHpBsuprDYhnCymy5xe5R/FB6Q9uHgSPk1VdcEA9WlxV9wHs62r4FwkzrY0WydIdrQO2aSZK6m/NbX0h334Kpto5rNTpLwnDjFObDuMFOQ=
+	t=1748324387; cv=none; b=IUdgvlIW5C3JuM48QhlSJLTxApn3fWzSVHVFlwaTFrckM5Ivm0KhmBje4AUvbvxCGiXnqx5sA4SrtH+sHNoLm1QvSJYQ1ovfi67G8i+GIT7G+J/GvjgwQW35T3kDqjalJsg049CX4YLCu7w7uYUnjNdASAVlt6hnx48Z3LxRCUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748323881; c=relaxed/simple;
-	bh=5Now6IaadWLsxbSUmrNOd36MeABQBTNVzr7aeuW41gk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CoafkTdvBn91lPZd8yDomxtibkBqtxGMqn9yGwmFUxYxNWsXdmbgCdc+Cd324tKQNy0TP4n2NY5xJ10AmVQjE359JOUlWDGapw5QVjveYT2cG9eGOQOFMGBDPgrT9YQx/p+L5denl7Egz6Edz8NRs7h6D2drjJlrOinFtkAx6wY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rp31qdJU; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748323879; x=1779859879;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=5Now6IaadWLsxbSUmrNOd36MeABQBTNVzr7aeuW41gk=;
-  b=Rp31qdJUYa/gy75NxWIl7JcdfWncpyI7vineNTrRDdaTsMxAWLW/IhP3
-   2GFOhFdnFar8uN8F8vL/tJdVx7jStcXD6ACx4oozt+i06Hlhl/ymEjHnq
-   3Zz0z/JwZhp5lPZsnJi/hsd3N1oXAVgV4iKd/6F19tj9oTvvmDAKY9jf3
-   kqv6gMEo0UiqchNj9gVWv3EHsGrkpI1EJhtMJeF7oYPmnKY1OUQv/xd9G
-   470qcOAW6ndmN93fR/DfXSO1yRH091NXCgGLFnsnJf726YRc36O0zIxs4
-   q9f2Gl8/HvnuKFCrZKM/i58hMZqzdjnIHGismXHdgUbCqi8nHxpz09pcz
-   A==;
-X-CSE-ConnectionGUID: 8S+KDsAnTCevXxsrpbMwDQ==
-X-CSE-MsgGUID: 00lxM4cbRXyDQsTxif1Skg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11445"; a="50221079"
-X-IronPort-AV: E=Sophos;i="6.15,317,1739865600"; 
-   d="scan'208";a="50221079"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 22:31:18 -0700
-X-CSE-ConnectionGUID: NV8NkFIJSPKBvHazeySFjA==
-X-CSE-MsgGUID: TtvnsP17QA+HmpSJgbuR0w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,317,1739865600"; 
-   d="scan'208";a="142629388"
-Received: from unknown (HELO [10.238.11.3]) ([10.238.11.3])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2025 22:31:16 -0700
-Message-ID: <58339ba1-d7ac-45dd-9d62-1a023d528f50@linux.intel.com>
-Date: Tue, 27 May 2025 13:31:12 +0800
+	s=arc-20240116; t=1748324387; c=relaxed/simple;
+	bh=JCFELZchaFfcJLufSBNxjnOuDrNJRz/rxss5QU+zBKo=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=KlTAlzLQqOzfhfssZpptimVia1/9uscaiOJbIKmAOS0MWIwOQghDbSjj97okJTGskU9fiodYvmVK/lGgWjeB1mMfqQ3efeUCuVF0Op4k2kVZ5yx9GQ/QJ+ArDfGxJO2nxJRyilKyGVyOYLRr6jipNt8IAxNwhthHZbnH0IFUUXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=Q+hZRb0q; arc=none smtp.client-ip=162.62.57.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1748324361; bh=XRx5croEO105UnrtvQ18h1ZACkdqJq5uSEbMB1ZkDsA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Q+hZRb0q+iESdQwX0RaKZc/J2gplMb5TyzLsCD+muqbeolvRqQxf0VFGVBoVEoXVL
+	 XJU5uDS0UszBEYg18Q548Is3kJml/wvUjW432BEHVBWPmB8TQ0CaYf0ZKOTazK2AGb
+	 XZjH2INEXtG3ynYuEoK6aeYF/MlKiPVgq8eQSYz4=
+Received: from pek-lxu-l1.corp.ad.wrs.com ([111.198.228.63])
+	by newxmesmtplogicsvrszgpua8-0.qq.com (NewEsmtp) with SMTP
+	id 9D214897; Tue, 27 May 2025 13:39:18 +0800
+X-QQ-mid: xmsmtpt1748324358tpjxhpn9g
+Message-ID: <tencent_69BAA5BB0A332E9E391B034B761B7425E608@qq.com>
+X-QQ-XMAILINFO: NsLYjltVP0elzjyx2d9ngApaBBXjuj/fhJHAl+KxYOzpPDLzZSrSjmCfDFhcDc
+	 1z4Xm4z3DtdN1suqGH4lVhtHasVKc4Ylk/30eE8M0XXWuFLXi66K9StjQJlZaLZaFdHXoR82VeqE
+	 7XT8pvQo7Cue5UD4lPU27xcxL0ucAkTMGMbmiZeYTM/bXWdTz4mMKqCcyXX9W2cH3VgMAVS/cafa
+	 9mkOXaiOHxFruJH74lBjq5Y6DdGjHtP6N4E6jBm1WVB4lQew+8kbbUA+XZM3ODmFORutKJH6aHoQ
+	 q4agaokpzwOFkIPzn2gpg9AREsZXGi1l3j2EhIwrYGvtUp29gOZcZ3CWDvqKRtJWzf/DtXIzRsq9
+	 yiJwQuHDcitq3Jo/dGC+EtiClpa1HM+hgITzjB7IuhgoV+ZjGyiT+EO8YGDptfFyHJwEkrJHLy8r
+	 woGyVgmIXN3qyqBqY8HeHKkykRT7HKcFaRkbqBRs7pDtC5fGSj4l5X6T4K4RYcPHZjDtuHeYKAcO
+	 SBpkBobtrPuw5FkLNY62y1mJz/4Xhu7SEz5EXRlRxgKkRjRZUHQ5cF6En/CN9PYuJphunTAG9OYs
+	 GXBdTwDphU5sTLfyJ8IoNxoE3oW/lk9v8/tAe5YvH/zsu0Q+f0XS6ezkNB4edXDvTN0Bb/HkGCTz
+	 GNkR4WQbifJJe1KAd+G54kQSjZM4EXyo9UwkV/CZWCL/VjUTVNCYbOEDrqtyNbBkuQMpvYVv1c74
+	 8ePp82+v0+4dkxRjRLUUzAuPeBtO6KxB+zjPIuvfSwVaF513CmpTrys2E7X+s6+YiHJTox+lzJsK
+	 WingFI04HcbO9tNm3WMR9DGBuIc2Hidu+slx5fgRfyvAOq6pXoHcH3OFh7rkWEw7t+ybJ9LcMRT9
+	 /H7WEC6kNxkPMpSGU9iCub/C3xG2Eh9paV3+mv9rwwVW/bJSH3Lu23uUlCy5g95R7v/vyekZbiRN
+	 lhnFPR9s0czP+DOD1Qb9G0c1iRKuAeIgROCdj1mO8=
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+From: Edward Adam Davis <eadavis@qq.com>
+To: binbin.wu@linux.intel.com
+Cc: bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	eadavis@qq.com,
+	hpa@zytor.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mingo@redhat.com,
+	pbonzini@redhat.com,
+	seanjc@google.com,
+	tglx@linutronix.de,
+	x86@kernel.org
+Subject: Re: [PATCH next] KVM: VMX: add noinstr for is_td_vcpu and is_td
+Date: Tue, 27 May 2025 13:39:05 +0800
+X-OQ-MSGID: <20250527053904.1669268-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <58339ba1-d7ac-45dd-9d62-1a023d528f50@linux.intel.com>
+References: <58339ba1-d7ac-45dd-9d62-1a023d528f50@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH next] KVM: VMX: add noinstr for is_td_vcpu and is_td
-To: Edward Adam Davis <eadavis@qq.com>, seanjc@google.com
-Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <tencent_27A451976AF76E66DF1379C3604976A3A505@qq.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <tencent_27A451976AF76E66DF1379C3604976A3A505@qq.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-
-
-On 5/27/2025 11:45 AM, Edward Adam Davis wrote:
-> is_td() and is_td_vcpu() run in no instrumentation, so they are need
-> noinstr.
->
-> [1]
-> vmlinux.o: error: objtool: vmx_handle_nmi+0x47:
->          call to is_td_vcpu.isra.0() leaves .noinstr.text section
->
-> Fixes: 7172c753c26a ("KVM: VMX: Move common fields of struct vcpu_{vmx,tdx} to a struct")
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> ---
->   arch/x86/kvm/vmx/common.h | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
->
+On Tue, 27 May 2025 13:31:12 +0800, Binbin Wu wrote:
+> noinstr is not needed when the functions are __always_inline.
+Right.
+> 
+> >   
+> >   #else
+> >   
+> > -static inline bool is_td(struct kvm *kvm) { return false; }
+> > -static inline bool is_td_vcpu(struct kvm_vcpu *vcpu) { return false; }
+> > +static noinstr bool is_td(struct kvm *kvm) { return false; }
+> > +static noinstr bool is_td_vcpu(struct kvm_vcpu *vcpu) { return false; }
+> 
+> Oops, overlooked the !CONFIG_KVM_INTEL_TDX case.
+> 
+> How about:
+> 
 > diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-> index 8f46a06e2c44..70e0879c58f6 100644
+> index 8f46a06e2c44..a0c5e8781c33 100644
 > --- a/arch/x86/kvm/vmx/common.h
 > +++ b/arch/x86/kvm/vmx/common.h
-> @@ -59,20 +59,20 @@ struct vcpu_vt {
->   
->   #ifdef CONFIG_KVM_INTEL_TDX
->   
-> -static __always_inline bool is_td(struct kvm *kvm)
-> +static noinstr __always_inline bool is_td(struct kvm *kvm)
->   {
->   	return kvm->arch.vm_type == KVM_X86_TDX_VM;
->   }
->   
-> -static __always_inline bool is_td_vcpu(struct kvm_vcpu *vcpu)
-> +static noinstr __always_inline bool is_td_vcpu(struct kvm_vcpu *vcpu)
->   {
->   	return is_td(vcpu->kvm);
->   }
-
-noinstr is not needed when the functions are __always_inline.
-
->   
+> @@ -71,8 +71,8 @@ static __always_inline bool is_td_vcpu(struct kvm_vcpu *vcpu)
+> 
 >   #else
->   
+> 
 > -static inline bool is_td(struct kvm *kvm) { return false; }
 > -static inline bool is_td_vcpu(struct kvm_vcpu *vcpu) { return false; }
-> +static noinstr bool is_td(struct kvm *kvm) { return false; }
-> +static noinstr bool is_td_vcpu(struct kvm_vcpu *vcpu) { return false; }
-
-Oops, overlooked the !CONFIG_KVM_INTEL_TDX case.
-
-How about:
-
-diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-index 8f46a06e2c44..a0c5e8781c33 100644
---- a/arch/x86/kvm/vmx/common.h
-+++ b/arch/x86/kvm/vmx/common.h
-@@ -71,8 +71,8 @@ static __always_inline bool is_td_vcpu(struct kvm_vcpu *vcpu)
-
-  #else
-
--static inline bool is_td(struct kvm *kvm) { return false; }
--static inline bool is_td_vcpu(struct kvm_vcpu *vcpu) { return false; }
-+static __always_inline bool is_td(struct kvm *kvm) { return false; }
-+static __always_inline bool is_td_vcpu(struct kvm_vcpu *vcpu) { return false; }
-
-
->   
->   #endif
->   
+> +static __always_inline bool is_td(struct kvm *kvm) { return false; }
+> +static __always_inline bool is_td_vcpu(struct kvm_vcpu *vcpu) { return false; }
+Looks good.
 
 
