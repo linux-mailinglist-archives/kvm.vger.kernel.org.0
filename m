@@ -1,215 +1,404 @@
-Return-Path: <kvm+bounces-47796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47797-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08DBBAC5243
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 17:42:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3CC1AC5264
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 17:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3712616BA1C
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 15:42:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17305189E0FA
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 15:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5739927CB1A;
-	Tue, 27 May 2025 15:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F72F27CB1A;
+	Tue, 27 May 2025 15:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fyWLGxtn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aptwLjIz"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A2027AC22
-	for <kvm@vger.kernel.org>; Tue, 27 May 2025 15:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7310D182D7
+	for <kvm@vger.kernel.org>; Tue, 27 May 2025 15:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748360562; cv=none; b=g0EVhr1WPn0fRzddvNvr9iXNHneczCJn4kDeWpm+X94/e3nCTZMfftknp8qq7aqC/Oq0HE5SE5hGLfe2YHgy0xqcWGXHY+7BaoxUlK19aSL+Q7ui5oH4ZdXpzBgS6s/4Xx9IdwAq8HLBBma4JaVEUsUingB4TA0je5ibMuOhyYA=
+	t=1748361325; cv=none; b=mR50Dgch9Ip1MzXcHnrmtvR1mLFqEEa5vlanECfPcmanHHop3ug5DO2/jf//7NU4cOEZ3uGWRR1Bphz/fd921JcKjqgNoEffAbPujfGF1tXUKiKi1mNpLhA8ERGJ0IctnGsH769jUfjqJE62pwshFVTi7DcrfGIxt3w0aZHg6T8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748360562; c=relaxed/simple;
-	bh=GSg/k2f/qylUwlRyZi86GomfDTD43zp+xmhJiVZfTog=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qNMB+kCex52Z4qIPeRkTmVIRdV0EPoFyTTpy55d22qvWK3slZpIdQy9z+4IvyUq79126AvOzyHBBTot/MWXU1zgEG07YGqInfCZP0Wr0+msmiD2o2xGua0Yk2dh++2moZ1of7l9hrhoSEAA3seUtRhsWxx8qh4ybJILGOGfS3LA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fyWLGxtn; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1748361325; c=relaxed/simple;
+	bh=IooNweYioThGUT8ZOiX1XzvjjfrhAJn0Sd6ftIx9E+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g5xIAkMj5+wWk55e0LHqmhQualkx8HBjTCW8AIdWYOugmEJTQn09nPSOxHROmmIUiz764dOtvP+SN9tKV2nCZd8ECqJ0GwlOi/EexN/wblDA0SsgAAwxpDceFnXax8wcgbQn0iaz2RnxlKLUfBNZI2M4v/ODgjJNf1iEE2pCIvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aptwLjIz; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748360559;
+	s=mimecast20190719; t=1748361322;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=GYjzf1at/wubZxWng6gwod5nngx9YBoemHxwSWxJDjU=;
-	b=fyWLGxtnjYV7jXDdIRUyDYUmxGwMa7DwUuw3RsGHMtTDN3ZN4xqbFpYCVaVYGMs3NmQfVr
-	VsTanfIASwcZGMOmkotRlHxm95esp5/txvQ95K0Bw481ohrWMH4sj57qnPEAJsWfgP7wIs
-	zUQd1o+9Pt9doOJ8eKMVHi5SQd/+gYg=
+	 in-reply-to:in-reply-to:references:references;
+	bh=wb8/uzIi16fAJXtQ9hucGUiGMDmIuuatlVp8gYmB16c=;
+	b=aptwLjIzZvVn64JztSEj6Of+hR9D6AE4VDiDHTb+GY/SaD0w9Q+C6OgjKxa3PLVn+oF5QV
+	WbEPgH1ePhbJN4WuoLXPlanLu2Gdm8Uu2Gm3OpoiJDPJjmzpSIEZ4G5A4KT3RlYCe+nFaV
+	noP8mBlvBjmKYCTr4MdAvratndxbjxc=
 Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
  [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-225-QqV21LB1MMO67Ldjxyj9mg-1; Tue, 27 May 2025 11:42:37 -0400
-X-MC-Unique: QqV21LB1MMO67Ldjxyj9mg-1
-X-Mimecast-MFC-AGG-ID: QqV21LB1MMO67Ldjxyj9mg_1748360557
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-6045875e52fso2105685a12.2
-        for <kvm@vger.kernel.org>; Tue, 27 May 2025 08:42:37 -0700 (PDT)
+ us-mta-196-k0wKiQDcMLOn39fjyxo9SA-1; Tue, 27 May 2025 11:55:20 -0400
+X-MC-Unique: k0wKiQDcMLOn39fjyxo9SA-1
+X-Mimecast-MFC-AGG-ID: k0wKiQDcMLOn39fjyxo9SA_1748361320
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-6047edc5cebso2699391a12.1
+        for <kvm@vger.kernel.org>; Tue, 27 May 2025 08:55:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748360556; x=1748965356;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GYjzf1at/wubZxWng6gwod5nngx9YBoemHxwSWxJDjU=;
-        b=UWE/8ncfscZ33iuVFSeya7cD6Wl93D7ql3fWbIlBS/brRJ/WrlBXk4KauofTVkfmJ2
-         WZH58DhIBkm9FnGdDgTDlZBHs/7UGU6C++/0A32egJPvXZOM0eEaVT7rp9/3kMbwHIdf
-         y3/vOSbC4Im63cVNzufzpmKdxnq5nF4EJg8nIxv8RoivdyF6Ll/1bXuL1vGVFlHxE11v
-         XKkrYAtfYyUcNL8cPtw+upEHKLLOA3SKPLVYAeTe63wNQ+lxK88/1WjmGKZMCdfq97C1
-         9GWkEmrQdGJAVO5BkmnCMo1zmtOhttriHx8Dgn05ghTEY5yT91O62o92IBBSe8dumI1S
-         hPKA==
-X-Forwarded-Encrypted: i=1; AJvYcCW75XNURr3buQVZQDbmfk3TdRylyYwk0RI1FiGaOLTlr4ob9rzyGRmI1Q4XsBtp8grDvaU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkrP0Pn78qHXBPraGiN9p+prwV2bHLDYdySmd2ZqTcBzVaM9Oj
-	oWcCrx/auU2P7n+RTQkaq+BrDcKx3viWhjmJ5LzPuz7KVRagckL9bRaEfXbsxr9HFz11/Bl0PRW
-	rM0TOzoqQ1YkFSKU72hYp21cVnlp/bKMk/9W59gvQjQlmVBazPYd58g==
-X-Gm-Gg: ASbGncuYUvKCMATXRb/WpdtblalWKzZZt8XzhyD4SzJChvpnohOk7gakiMjv0PvYgtz
-	IPb0ee+0NG+M3k/BK6mN26C468SrQLRDMwz+eTJKAcVmQWaYQdFBJfDkJj8NsTJZmKvmr8a6pxR
-	vLoP351WynF1Yt6yY8wbiPb0gFs+mmKe1y5/VO5FcQ0aMTae2j1IZuapatpxWRcarxUDwu+TSey
-	G2bzqiEhOnpzp/v/VNxbEYdeE7vVWup9JTYl5QTV4w5ayXqdeMqlriUgBT2iOJEhnt2bMNCYpmi
-	W0DQ4h8mlBaqTw==
-X-Received: by 2002:a05:6402:26c1:b0:601:d9f4:eac6 with SMTP id 4fb4d7f45d1cf-602da407b05mr9682387a12.21.1748360556435;
-        Tue, 27 May 2025 08:42:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEegxgAG/pZUT5UobRfnKytKcy4UOj5G7CA/Z5+y7WjCTMgwf4Db1IDF2kQYfIv6uzrtVUh/A==
-X-Received: by 2002:a05:6402:26c1:b0:601:d9f4:eac6 with SMTP id 4fb4d7f45d1cf-602da407b05mr9682369a12.21.1748360556004;
-        Tue, 27 May 2025 08:42:36 -0700 (PDT)
-Received: from [192.168.10.27] ([151.95.46.79])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-6045b95d2d1sm4498742a12.24.2025.05.27.08.42.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 May 2025 08:42:35 -0700 (PDT)
-Message-ID: <1a5cfe89-f7e2-4e3a-862b-5d5f761e145d@redhat.com>
-Date: Tue, 27 May 2025 17:42:34 +0200
+        d=1e100.net; s=20230601; t=1748361319; x=1748966119;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wb8/uzIi16fAJXtQ9hucGUiGMDmIuuatlVp8gYmB16c=;
+        b=u9MVIhhzWhS5VSKavfvCQ4DwR68VOVY++nPE6fzB2iSc+SJfT1/iAiOvae7z66pPvd
+         7r2ri7nM80g7oW6rDldLWrKH1O4L7bK4SDZcFVl9R2OIXXEpWb/FPibu5+pTwx7ss9eB
+         cxGgG/FKKD3MZyesuOVuf4HMuE//IHJTlNtyC1O8LPk/PWmqSZw2S+I4HjpEk++CTSjg
+         IsXxHwV/+pJyZ0yTW51JayyW5HxU19Y1sJELI4d7x4gYn49ufxz9tLtqMkAVzQpvuBhj
+         pns2PLppKLCkBN0eDaB/fc/EFrk93pj755jIoZ8Bk6VWD3ufkxLKnaChtI1s8OoAYpsw
+         34Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCUZ/03/XQ/CI+v9mRKJPZYE9tCKWjPdMmvfPfzVvo5TP4EfIbq2LrZWkWNveSyYUfK48qk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi7U5fRRMERpiL+ON+8imO9LqssfDou+Q2a3Vuipzdn7itYWq9
+	iL82F05MhOkVCNkqPLktsPPcyZi6Pt247snHHmex9Ljt4mRViLZ2qL3WS3y9PKUUaTvbkezuZdp
+	JCzTtavkKN5xI6ElA0fE/PIZSsRIGB9GYe51TP81hrYWMZnXt3sKGWw==
+X-Gm-Gg: ASbGncs+RtOO0Zuq/Wb9vISMEObHRC2yxg1YErZru/a1M02I+EV/9slOJN+zpLP9NRI
+	3oIhCbfCAsrXCg49sbsvSj1O5u4FTke+ehn9l97wJpfpSFlfkxNQyIbucVa0jpwnj93OGoQ7+mw
+	3TmLEelumPSQNKZNQSMNApWgzRN7G8gtyjxN/3hfSPoFcoewvGsGobqG5LVevf/pE55S9D6unr1
+	swI4jxy1Fpscj+ChkjCqiD2dm12Rujux1IVxQqZEdBZ+zzeUii6p6v0PdukeQ6Vb/sdck5zkWBb
+	ihGQ/6UGmeGSnwN1E1xwKwk/DroY6CNcbwTxS8MvMciTgngX0uUsZr+WqBJn
+X-Received: by 2002:a17:907:2ce4:b0:ad5:7234:e4a9 with SMTP id a640c23a62f3a-ad85b1300d0mr1255525666b.28.1748361319394;
+        Tue, 27 May 2025 08:55:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IENGDDVZ4asqZqtXTsQ2gw0NrLKQ1ZAzCAtVfopIjbSKMMjc6DGQBSFxH6caBgoySG+L0hShQ==
+X-Received: by 2002:a17:907:2ce4:b0:ad5:7234:e4a9 with SMTP id a640c23a62f3a-ad85b1300d0mr1255520566b.28.1748361318653;
+        Tue, 27 May 2025 08:55:18 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad8977b36a9sm53081366b.70.2025.05.27.08.55.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 08:55:18 -0700 (PDT)
+Date: Tue, 27 May 2025 17:55:13 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v8] selftests/vsock: add initial vmtest.sh for
+ vsock
+Message-ID: <tabqpll3r76jhx2ujayry25a7ujfsikm7tejv5sviayyojlmwz@amcchbc5xiqp>
+References: <20250522-vsock-vmtest-v8-1-367619bef134@gmail.com>
+ <ta2ub5v7txhobccgvpnwsz7cyzcnx6aw74cjlcviosjetuwfhh@7gdahptdpbnd>
+ <aDXMhbqhhUAMe0Oz@devbig793.prn5.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 0/6] target/i386: Update EPYC CPU models for Cache
- property, RAS, SVM feature and add EPYC-Turin CPU model
-To: Babu Moger <babu.moger@amd.com>
-Cc: zhao1.liu@intel.com, qemu-devel@nongnu.org, kvm@vger.kernel.org,
- davydov-max@yandex-team.ru
-References: <cover.1746734284.git.babu.moger@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <cover.1746734284.git.babu.moger@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <aDXMhbqhhUAMe0Oz@devbig793.prn5.facebook.com>
 
-On 5/8/25 21:57, Babu Moger wrote:
-> 
-> Following changes are implemented in this series.
-> 
-> 1. Fixed the cache(L2,L3) property details in all the EPYC models.
-> 2. Add RAS feature bits (SUCCOR, McaOverflowRecov) on all EPYC models
-> 3. Add missing SVM feature bits required for nested guests on all EPYC models
-> 4. Add the missing feature bit fs-gs-base-ns(WRMSR to {FS,GS,KERNEL_G}S_BASE is
->     non-serializing). This bit is added in EPYC-Genoa and EPYC-Turin models.
-> 5. Add RAS, SVM, fs-gs-base-ns and perfmon-v2 on EPYC-Genoa and EPYC-Turin models.
-> 6. Add support for EPYC-Turin.
->     (Add all the above feature bits and few additional bits movdiri, movdir64b,
->      avx512-vp2intersect, avx-vnni, prefetchi, sbpb, ibpb-brtype, srso-user-kernel-no).
+On Tue, May 27, 2025 at 07:30:29AM -0700, Bobby Eshleman wrote:
+>On Mon, May 26, 2025 at 01:18:18PM +0200, Stefano Garzarella wrote:
+>> On Thu, May 22, 2025 at 09:59:07PM -0700, Bobby Eshleman wrote:
+>> > This commit introduces a new vmtest.sh runner for vsock.
+>> >
+>> > It uses virtme-ng/qemu to run tests in a VM. The tests validate G2H,
+>> > H2G, and loopback. The testing tools from tools/testing/vsock/ are
+>> > reused. Currently, only vsock_test is used.
+>> >
+>> > VMCI and hyperv support is included in the config file to be built with
+>> > the -b option, though not used in the tests.
+>> >
+>> > Only tested on x86.
+>> >
+>> > To run:
+>> >
+>> >  $ make -C tools/testing/selftests TARGETS=vsock
+>> >  $ tools/testing/selftests/vsock/vmtest.sh
+>> >
+>> > or
+>> >
+>> >  $ make -C tools/testing/selftests TARGETS=vsock run_tests
+>> >
+>> > Example runs (after make -C tools/testing/selftests TARGETS=vsock):
+>> >
+>> > $ ./tools/testing/selftests/vsock/vmtest.sh
+>> > 1..3
+>> > ok 0 vm_server_host_client
+>> > ok 1 vm_client_host_server
+>> > ok 2 vm_loopback
+>> > SUMMARY: PASS=3 SKIP=0 FAIL=0
+>> > Log: /tmp/vsock_vmtest_m7DI.log
+>> >
+>> > $ ./tools/testing/selftests/vsock/vmtest.sh vm_loopback
+>> > 1..1
+>> > ok 0 vm_loopback
+>> > SUMMARY: PASS=1 SKIP=0 FAIL=0
+>> > Log: /tmp/vsock_vmtest_a1IO.log
+>> >
+>> > $ mkdir -p ~/scratch
+>> > $ make -C tools/testing/selftests install TARGETS=vsock INSTALL_PATH=~/scratch
+>> > [... omitted ...]
+>> > $ cd ~/scratch
+>> > $ ./run_kselftest.sh
+>> > TAP version 13
+>> > 1..1
+>> > # timeout set to 300
+>> > # selftests: vsock: vmtest.sh
+>> > # 1..3
+>> > # ok 0 vm_server_host_client
+>> > # ok 1 vm_client_host_server
+>> > # ok 2 vm_loopback
+>> > # SUMMARY: PASS=3 SKIP=0 FAIL=0
+>> > # Log: /tmp/vsock_vmtest_svEl.log
+>> > ok 1 selftests: vsock: vmtest.sh
+>> >
+>> > Future work can include vsock_diag_test.
+>> >
+>> > Because vsock requires a VM to test anything other than loopback, this
+>> > patch adds vmtest.sh as a kselftest itself. This is different than other
+>> > systems that have a "vmtest.sh", where it is used as a utility script to
+>> > spin up a VM to run the selftests as a guest (but isn't hooked into
+>> > kselftest).
+>> >
+>> > Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+>> > ---
+>> > Changes in v8:
+>> > - remove NIPA comment from commit msg
+>> > - remove tap_* functions and TAP_PREFIX
+>> > - add -b for building kernel
+>> > - Link to v7: https://lore.kernel.org/r/20250515-vsock-vmtest-v7-1-ba6fa86d6c2c@gmail.com
+>> >
+>> > Changes in v7:
+>> > - fix exit code bug when ran is kselftest: use cnt_total instead of KSFT_NUM_TESTS
+>> > - updated commit message with updated output
+>> > - updated commit message with commands for installing/running as
+>> >  kselftest
+>> > - Link to v6: https://lore.kernel.org/r/20250515-vsock-vmtest-v6-1-9af1cc023900@gmail.com
+>> >
+>> > Changes in v6:
+>> > - add make cmd in commit message in vmtest.sh example (Stefano)
+>> > - check nonzero size of QEMU_PIDFILE using -s conditional (Stefano)
+>> > - display log file path after tests so it is easier to find amongst other random names
+>> > - cleanup qemu pidfile if qemu is unable to remove it
+>> > - make oops/warning failures more obvious with 'FAIL' prefix in log
+>> >  (simply saying 'detected' wasn't clear enough to identify failing
+>> >  condition)
+>> > - Link to v5: https://lore.kernel.org/r/20250513-vsock-vmtest-v5-1-4e75c4a45ceb@gmail.com
+>> >
+>> > Changes in v5:
+>> > - make log file a tmpfile (Paolo)
+>> > - make sure both default and user defined QEMU gets handled by the dependency check (Paolo)
+>> > - increased VM boot up timeout from 1m to 3m for slow hosts (Paolo)
+>> > - rename vm_setup -> vm_start (Paolo)
+>> > - derive wait_for_listener from selftests/net/net_helper.sh to removes ss usage
+>> > - Remove unused 'unset IFS' line (Paolo)
+>> > - leave space after variable declarations (Paolo)
+>> > - make QEMU_PIDFILE a tmp file (Paolo)
+>> > - make everything readonly that is only read (Paolo)
+>> > - source ktap_helpers.sh for KSFT_PASS and friends (Paolo)
+>> > - don't check for timeout util (Paolo)
+>> > - add missing usage string for -q qemu arg
+>> > - add tap prefix to SUMMARY line since it isn't part of TAP protocol
+>> > - exit with the correct status code based on failure/pass counts
+>> > - Link to v4: https://lore.kernel.org/r/20250507-vsock-vmtest-v4-1-6e2a97262cd6@gmail.com
+>> >
+>> > Changes in v4:
+>> > - do not use special tab delimiter for help string parsing (Stefano + Paolo)
+>> > - fix paths for when installing kselftest and running out-of-tree (Paolo)
+>> > - change vng to using running kernel instead of compiled kernel (Paolo)
+>> > - use multi-line string for QEMU_OPTS (Stefano)
+>> > - change timeout to 300s (Paolo)
+>> > - skip if tools are not found and use kselftests status codes (Paolo)
+>> > - remove build from vmtest.sh (Paolo)
+>> > - change 2222 -> SSH_HOST_PORT (Stefano)
+>> > - add tap-format output
+>> > - add vmtest.log to gitignore
+>> > - check for vsock_test binary and remind user to build it if missing
+>> > - create a proper build in makefile
+>> > - style fixes
+>> > - add ssh, timeout, and pkill to dependency check, just in case
+>> > - fix numerical comparison in conditionals
+>> > - check qemu pidfile exists before proceeding (avoid wasting time waiting for ssh)
+>> > - fix tracking of pass/fail bug
+>> > - fix stderr redirection bug
+>> > - Link to v3: https://lore.kernel.org/r/20250428-vsock-vmtest-v3-1-181af6163f3e@gmail.com
+>> >
+>> > Changes in v3:
+>> > - use common conditional syntax for checking variables
+>> > - use return value instead of global rc
+>> > - fix typo TEST_HOST_LISTENER_PORT -> TEST_HOST_PORT_LISTENER
+>> > - use SIGTERM instead of SIGKILL on cleanup
+>> > - use peer-cid=1 for loopback
+>> > - change sleep delay times into globals
+>> > - fix test_vm_loopback logging
+>> > - add test selection in arguments
+>> > - make QEMU an argument
+>> > - check that vng binary is on path
+>> > - use QEMU variable
+>> > - change <tab><backslash> to <space><backslash>
+>> > - fix hardcoded file paths
+>> > - add comment in commit msg about script that vmtest.sh was based off of
+>> > - Add tools/testing/selftest/vsock/Makefile for kselftest
+>> > - Link to v2: https://lore.kernel.org/r/20250417-vsock-vmtest-v2-1-3901a27331e8@gmail.com
+>> >
+>> > Changes in v2:
+>> > - add kernel oops and warnings checker
+>> > - change testname variable to use FUNCNAME
+>> > - fix spacing in test_vm_server_host_client
+>> > - add -s skip build option to vmtest.sh
+>> > - add test_vm_loopback
+>> > - pass port to vm_wait_for_listener
+>> > - fix indentation in vmtest.sh
+>> > - add vmci and hyperv to config
+>> > - changed whitespace from tabs to spaces in help string
+>> > - Link to v1: https://lore.kernel.org/r/20250410-vsock-vmtest-v1-1-f35a81dab98c@gmail.com
+>> > ---
+>> > MAINTAINERS                              |   1 +
+>> > tools/testing/selftests/vsock/.gitignore |   2 +
+>> > tools/testing/selftests/vsock/Makefile   |  16 ++
+>> > tools/testing/selftests/vsock/config     | 114 ++++++++
+>> > tools/testing/selftests/vsock/settings   |   1 +
+>> > tools/testing/selftests/vsock/vmtest.sh  | 460 +++++++++++++++++++++++++++++++
+>> > 6 files changed, 594 insertions(+)
+>> >
+>> > diff --git a/MAINTAINERS b/MAINTAINERS
+>> > index 657a67f9031ef7798c19ac63e6383d4cb18a9e1f..3fbdd7bbfce7196a3cc7db70203317c6bd0e51fd 100644
+>> > --- a/MAINTAINERS
+>> > +++ b/MAINTAINERS
+>> > @@ -25751,6 +25751,7 @@ F:	include/uapi/linux/vm_sockets.h
+>> > F:	include/uapi/linux/vm_sockets_diag.h
+>> > F:	include/uapi/linux/vsockmon.h
+>> > F:	net/vmw_vsock/
+>> > +F:	tools/testing/selftests/vsock/
+>> > F:	tools/testing/vsock/
+>> >
+>> > VMALLOC
+>> > diff --git a/tools/testing/selftests/vsock/.gitignore b/tools/testing/selftests/vsock/.gitignore
+>> > new file mode 100644
+>> > index 0000000000000000000000000000000000000000..9c5bf379480f829a14713d5f5dc7d525bc272e84
+>> > --- /dev/null
+>> > +++ b/tools/testing/selftests/vsock/.gitignore
+>> > @@ -0,0 +1,2 @@
+>> > +vmtest.log
+>> > +vsock_test
+>> > diff --git a/tools/testing/selftests/vsock/Makefile b/tools/testing/selftests/vsock/Makefile
+>> > new file mode 100644
+>> > index 0000000000000000000000000000000000000000..7ab4970e5e8a019be33f96a36f95c00573d7bfcf
+>> > --- /dev/null
+>> > +++ b/tools/testing/selftests/vsock/Makefile
+>> > @@ -0,0 +1,16 @@
+>> > +# SPDX-License-Identifier: GPL-2.0
+>> > +
+>> > +CURDIR := $(abspath .)
+>> > +TOOLSDIR := $(abspath ../../..)
+>> > +
+>> > +$(OUTPUT)/vsock_test: $(TOOLSDIR)/testing/vsock/vsock_test
+>> > +	install -m 755 $< $@
+>> > +
+>> > +$(TOOLSDIR)/testing/vsock/vsock_test:
+>> > +	$(MAKE) -C $(TOOLSDIR)/testing/vsock vsock_test
+>> > +
+>> > +TEST_PROGS += vmtest.sh
+>> > +TEST_GEN_FILES := vsock_test
+>> > +
+>> > +include ../lib.mk
+>> > +
+>>
+>> I had modified the tests, but I noticed that they were not copied,
+>> in fact we have no dependencies on the test sources.
+>>
+>> This may not be a problem in the selftest environment, but locally I
+>> think it is.
+>>
+>> We can either use .PHONY and call `$(MAKE) -C ...` each time, or do
+>> something like this (which solved my problem):
+>>
+>> diff --git a/tools/testing/selftests/vsock/Makefile b/tools/testing/selftests/vsock/Makefile
+>> index 7ab4970e5e8a..d1bb1f63a9d1 100644
+>> --- a/tools/testing/selftests/vsock/Makefile
+>> +++ b/tools/testing/selftests/vsock/Makefile
+>> @@ -3,11 +3,14 @@
+>>  CURDIR := $(abspath .)
+>>  TOOLSDIR := $(abspath ../../..)
+>> -$(OUTPUT)/vsock_test: $(TOOLSDIR)/testing/vsock/vsock_test
+>> +VSOCK_TEST_DIR := $(TOOLSDIR)/testing/vsock
+>> +VSOCK_TEST_SRCS := $(wildcard $(VSOCK_TEST_DIR)/*.c $(VSOCK_TEST_DIR)/*.h)
+>> +
+>> +$(OUTPUT)/vsock_test: $(VSOCK_TEST_DIR)/vsock_test
+>>         install -m 755 $< $@
+>> -$(TOOLSDIR)/testing/vsock/vsock_test:
+>> -       $(MAKE) -C $(TOOLSDIR)/testing/vsock vsock_test
+>> +$(VSOCK_TEST_DIR)/vsock_test: $(VSOCK_TEST_SRCS)
+>> +       $(MAKE) -C $(VSOCK_TEST_DIR) vsock_test
+>>  TEST_PROGS += vmtest.sh
+>>  TEST_GEN_FILES := vsock_test
+>>
+>>
+>
+>Makes sense!
+>
+>> > +
+>> > +# virtme-ng offers a netdev for ssh when using "--ssh", but we also need a
+>> > +# control port forwarded for vsock_test.  Because virtme-ng doesn't support
+>> > +# adding an additional port to forward to the device created from "--ssh" and
+>> > +# virtme-init mistakenly sets identical IPs to the ssh device and additional
+>> > +# devices, we instead opt out of using --ssh, add the device manually, and also
+>> > +# add the kernel cmdline options that virtme-init uses to setup the interface.
+>>
+>> This version of the script doesn't work for me, the VM starts, but I
+>> can't connect in ssh. After spending some time debugging, I saw that
+>> `sshd` was not being launched inside the VM.
+>>
+>> I think it depends on the version of vng (maybe recently updated on my
+>> Fedora 41); here I have:
+>> $ vng --version
+>> virtme-ng 1.36
+>>
+>> Playing around with `vng`, I found that it now also supports ssh on
+>> vsock (I think it is now default). By forcing it to use tcp
+>> (`vng ... --ssh --ssh-tcp`), it adds another parameter to my cmdline:
+>> `virtme_ssh_channel=tcp`.
+>>
+>> And indeed this change fixed my issues:
+>> --- a/tools/testing/selftests/vsock/vmtest.sh
+>> +++ b/tools/testing/selftests/vsock/vmtest.sh
+>> @@ -39,7 +39,7 @@ readonly QEMU_OPTS="\
+>>          -device vhost-vsock-pci,guest-cid=${VSOCK_CID} \
+>>          --pidfile ${QEMU_PIDFILE} \
+>>  "
+>> -readonly KERNEL_CMDLINE="virtme.dhcp net.ifnames=0 biosdevname=0 virtme.ssh virtme_ssh_user=$USER"
+>> +readonly KERNEL_CMDLINE="virtme.dhcp net.ifnames=0 biosdevname=0 virtme.ssh virtme_ssh_channel=tcp virtme_ssh_user=$USER"
+>>  readonly LOG=$(mktemp /tmp/vsock_vmtest_XXXX.log)
+>>  readonly TEST_NAMES=(vm_server_host_client vm_client_host_server vm_loopback)
+>>  readonly TEST_DESCS=(
+>>
+>> That said, I'm concerned about the weakness of assuming the cmdlines
+>> supported by vng (which do not seem stable to me at this point).
+>>
+>> Should we check the version of vng and at least print a warning to say
+>> that this script is not tested on that version?
+>>
+>> Thanks,
+>> Stefano
+>>
+>
+>I'm also not a big fan of assuming cmdlines and I think adding the
+>version warning sounds good. I have been using 1.33. One thought I'm
+>having is that I should probably submit a PR to vng to either fix the
+>multi-NIC setup in virtme-ng or add a hostfwd option... then restrict
+>our assumptions here to only prior versions.
 
-Queued, thanks.
+Yes, that would be great, but anyway for now I would say let's go with 
+this since we're supposed to support these current versions I guess, and 
+this hack at the end I think is doable.
 
-Paolo
-
-> Link: https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/programmer-references/57238.zip
-> Link: https://www.amd.com/content/dam/amd/en/documents/corporate/cr/speculative-return-stack-overflow-whitepaper.pdf
-> ---
-> v7: Rebased on top latest 57b6f8d07f14 (upstream/master) Merge tag 'pull-target-arm-20250506'
->      Added new feature bit PREFETCHI. KVM support for the bit is added recently.
->      https://github.com/kvm-x86/linux/commit/d88bb2ded2ef
->      Paolo, These patches have been pending for a while. Please consider merging when you get a chance.
-> 
-> v6: Initialized the boolean feature bits to true where applicable.
->      Added Reviewed-by tag from Zhao.
-> 
-> v5: Add EPYC-Turin CPU model
->      Dropped ERAPS and RAPSIZE bits from EPYC-Turin models as kernel support for
->      these bits are not done yet. Users can still use the options +eraps,+rapsize
->      to test these featers.
->      Add Reviewed-by tag from Maksim for the patches already reviewed.
-> 
-> v4: Some of the patches in v3 are already merged. Posting the rest of the patches.
->      Dropped EPYC-Turin model for now. Will post them later.
->      Added SVM feature bit as discussed in
->      https://lore.kernel.org/kvm/b4b7abae-669a-4a86-81d3-d1f677a82929@redhat.com/
->      Fixed the cache property details as discussed in
->      https://lore.kernel.org/kvm/20230504205313.225073-8-babu.moger@amd.com/
->      Thanks to Maksim and Paolo for their feedback.
-> 
-> v3: Added SBPB, IBPB_BRTYPE, SRSO_USER_KERNEL_NO, ERAPS and RAPSIZE bits
->      to EPYC-Turin.
->      Added new patch(1) to fix a minor typo.
-> 
-> v2: Fixed couple of typos.
->      Added Reviewed-by tag from Zhao.
->      Rebased on top of 6d00c6f98256 ("Merge tag 'for-upstream' of https://repo.or.cz/qemu/kevin into staging")
-> 
-> Previous revisions:
-> v6: https://lore.kernel.org/kvm/cover.1740766026.git.babu.moger@amd.com/
-> v5: https://lore.kernel.org/kvm/cover.1738869208.git.babu.moger@amd.com/
-> v4: https://lore.kernel.org/kvm/cover.1731616198.git.babu.moger@amd.com/
-> v3: https://lore.kernel.org/kvm/cover.1729807947.git.babu.moger@amd.com/
-> v2: https://lore.kernel.org/kvm/cover.1723068946.git.babu.moger@amd.com/
-> v1: https://lore.kernel.org/qemu-devel/cover.1718218999.git.babu.moger@amd.com/
-> 
-> Babu Moger (6):
->    target/i386: Update EPYC CPU model for Cache property, RAS, SVM
->      feature bits
->    target/i386: Update EPYC-Rome CPU model for Cache property, RAS, SVM
->      feature bits
->    target/i386: Update EPYC-Milan CPU model for Cache property, RAS, SVM
->      feature bits
->    target/i386: Add couple of feature bits in CPUID_Fn80000021_EAX
->    target/i386: Update EPYC-Genoa for Cache property, perfmon-v2, RAS and
->      SVM feature bits
->    target/i386: Add support for EPYC-Turin model
-> 
->   target/i386/cpu.c | 439 +++++++++++++++++++++++++++++++++++++++++++++-
->   target/i386/cpu.h |   4 +
->   2 files changed, 441 insertions(+), 2 deletions(-)
-> 
+BTW, thanks again for this useful work!
+Stefano
 
 
