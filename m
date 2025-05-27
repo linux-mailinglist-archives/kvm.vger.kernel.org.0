@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-47761-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47762-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80EE5AC495E
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 09:35:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 859C8AC496E
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 09:42:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18DA218969DA
-	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 07:35:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0C221894329
+	for <lists+kvm@lfdr.de>; Tue, 27 May 2025 07:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA29248865;
-	Tue, 27 May 2025 07:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2FF24887A;
+	Tue, 27 May 2025 07:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="op68rUkg"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wdCsdyC0"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2044.outbound.protection.outlook.com [40.107.237.44])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2058.outbound.protection.outlook.com [40.107.94.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A382AF10
-	for <kvm@vger.kernel.org>; Tue, 27 May 2025 07:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588252475F2
+	for <kvm@vger.kernel.org>; Tue, 27 May 2025 07:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.58
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748331329; cv=fail; b=XSfGEk3xIkjTQ4VRLpVMlQOQ6k4cxR0EPErUbwR4V+WkEALPSQUp9NBkykiu92rTSQYqaKiJZvYO9f8NjiTsymHikgATqTmiee9rZwacx4Hlo6EKZYqXEoOO32W0F+bMEJT6BV9l5LFDU3E1z723RLAZBibAjyL+vE7ztAnHXWc=
+	t=1748331741; cv=fail; b=cg1E05wWqVXEfY0bh2baKrQfGMyvi+/0x628oy2g2HcKqutkBCq4REKw3JwCCij/HLMD2wUj7zfMDfUcLp2ybMDlxGaQKiJBGS/yOnBD2cVWp3hUzKIQDUiwfX3XRvs8n5vkgZFK0kupt+cMzzceHK99le2LU3KiCe5d3ZKL4ZQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748331329; c=relaxed/simple;
-	bh=dYGjV6kBOFsA3Q8jUX1q109uZ8FCC6RVWQAN6Tr1LfQ=;
+	s=arc-20240116; t=1748331741; c=relaxed/simple;
+	bh=XgdGVAwZF7ersYYczEH5PkjMhH2wfoT0LsihLEa5Scs=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Xangr7EId4bg1RFK8rbs2BX0cS3YuxU18pWhFLY/zu0eXAVdhCbJ2gIfcjKkGmws+nsB/IPOY9T4BXNuViXuLg4h3aUk5SQP2rBRP8/FxLhoRnX6GhUKmgeGIo68RH3CpH/AgqFi1DML8q+u//4U9Duau49G5qymOezF5zNOS04=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=op68rUkg; arc=fail smtp.client-ip=40.107.237.44
+	 Content-Type:MIME-Version; b=A+XpKpkBLpRWgtXI85DxRwfZabrTRcIbA2Ctuj0EJiTcNp7jreIb8Kdeb1IZJhB9Kbq1sUHOJDYZt32o/zXSpaVtNZFYNTzBOJOmN4EXidQ0FeixhBb0cXnO0DrnjRaN+c8+cEWJFwPeOjTgfrmgpddVtVYCCsnK5n45PE3ZLIE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wdCsdyC0; arc=fail smtp.client-ip=40.107.94.58
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SxtYmj7Psh/nnpp8sjJ+16qWiIDKxT/rif+CHRM59Tvc+IC83XNp8uo6rG4f9SlsjqtfiBQKzFzQ7o0C246zU67pbGRRdivFroUKC+0DBQSYpVkCsh2ub0MSyjBw7QfTfjcl/CV0DVXFnQb6vZkIpkLTUzF8WqfZib/qHUfeYcMS5pjpgzWEp0CL8n5ivFGGH4nsmHrQfe7zJ5wyeo8dPJZabPr2SftzBglD2FVo4GcQKRUa8+ZchCmkPcGzbLZYZxV6T3NHOMjiZHtMq3Ss30h7XtqfYGZ+g1gtMivrWpejQGzltqlNObjqDUHnt1o2CxEFK96AhCXxzB4WVV7pTQ==
+ b=MMBtQgPvY6zEEh2sybkklD6VWDcuHrWmD//w8R26fwArsEVPe7F9KTpSCoPhAsRKkA9kVYIPuRkViAoiUl9eSYICYcPPKPk25rpIZ8ZYF+y24d1tDcqUZhCszs0+9gZlk7hgJoxlsmpRcxJkJiB7uCflq/qWVnPWEC+TMQ1eHw2Y4qfxHhtWXVWX0CX7Bjf4UF6n3NnCCMbpxfN805QVb+CaiPPfiuNHnMn5ghFrhbBXSXARb1lmXCyV6M9gQ98KkxCGHRclnDmC4qyM8+xMQkc2PMDIvDZwdvIv3lhumi5EQvUTUiXDUJdsZILqUjm1CZUa+I2gob8tOiB8dJ0vww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4eoDLy0iJyZXL+O8ZBi/qDcZFcLFNR5JlRPtMOqhQTM=;
- b=GOnajJbsus3TnEpG5gvNEwKfbZEcTy5Hn7zm2hxmvwmstdj7KqyiyMAVwE9RxGXHTBVQTkxK1uzFKlWaXPV11PfCDDG++Vi/waMJyi+qGvp/3dIdfh4O63mpMrpO8H1yNSO6hFP1v93CsSD+YmA+uQNESgvFxOhR46D9vATfk5TiKkwdEjRMGyor4p48x7ruJnQsekLNHvNGVJp2UPgr36pqvqUYJiv/EB9APl2EG5eIPryh6dtPZhssM/aeu2OZno2/EMcckfIFvZWmNwtV0nlkJtAI0q7pGOZT55847mOaKqPehcvrtvY1Rq+iPguZ4WWNL53MSmHBkEL8cA9x4A==
+ bh=wEL88e3JEduLu7dLN/rsHyzXybjgUcqectbfVVMiPCc=;
+ b=OYxcH8ESblaVah90iRs3jzndpeOVBsK+EdQau/yyXkQLqitrT16tYvMFkw1G3VxF+dKqIlGBjbS65yTOUItZ3HT2zSgBnZlv3dYBT/wgaepASZbihTeZKX8UtRidOLTvKSK0ebwH7jQKfGsoPtGe9pKRvVoksdFl/dfPA/5rScktCdp73GGRFkvaVIcbJp43lbn+qFjYN2qCviDRU2CS5gMJdlRcoBRFQ9m3hL82/sQ7YwjUK1eleP8OrAfB6SoU4k9yuOoPHkxPyhQfiJUg2GeKb5iW1wqN3TNzihpxD75ftEC3ZTKG/2g4Pb90FiTyDmsehkyFYJ3ya6j+FafJQg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4eoDLy0iJyZXL+O8ZBi/qDcZFcLFNR5JlRPtMOqhQTM=;
- b=op68rUkg/ywjQbkO1lJTTAGnYWOzAfQ6T7GjRo69D/1DH+qiK9upMPyQYWzA/HfTFrP+sDVhqbubEL82NSe3TGs0i+1SUonZW1xesYVGpFzdWjEnYMpL44izLGa/Qr4a6oo+wiWT5Du/2xfoqOfF/WR2qdqU0+hJ/OZfYEV+8+E=
+ bh=wEL88e3JEduLu7dLN/rsHyzXybjgUcqectbfVVMiPCc=;
+ b=wdCsdyC0ouxW+RB9ToefMq02N/pRHjPf8iAy+P+y99570DG4YBXlrgyHT7yg9nCR8WNtzz6ir/xVte9D6YL1f3TPXnffhK30AKCpDBwG7h6mobM5SM3vpZv8Z/kWdWimEe3ly6J0QALhvLgQmtc5ULsYmGnqGrmJlsyd+ve9anY=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by SA1PR12MB7175.namprd12.prod.outlook.com (2603:10b6:806:2b2::19) with
+ by DM6PR12MB4089.namprd12.prod.outlook.com (2603:10b6:5:213::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.28; Tue, 27 May
- 2025 07:35:22 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.25; Tue, 27 May
+ 2025 07:42:17 +0000
 Received: from CH3PR12MB9194.namprd12.prod.outlook.com
  ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
  ([fe80::53fb:bf76:727f:d00f%5]) with mapi id 15.20.8769.022; Tue, 27 May 2025
- 07:35:21 +0000
-Message-ID: <952ff8ef-815e-484f-a319-3416dd3c03e8@amd.com>
-Date: Tue, 27 May 2025 17:35:14 +1000
+ 07:42:17 +0000
+Message-ID: <2e7df939-e50d-45e7-97d1-f90396db98b6@amd.com>
+Date: Tue, 27 May 2025 17:42:10 +1000
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v5 05/10] ram-block-attribute: Introduce a helper to
- notify shared/private state changes
+Subject: Re: [PATCH v5 07/10] RAMBlock: Make guest_memfd require coordinate
+ discard
 To: Chenyi Qiang <chenyi.qiang@intel.com>,
  David Hildenbrand <david@redhat.com>, Peter Xu <peterx@redhat.com>,
  Gupta Pankaj <pankaj.gupta@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -71,14 +71,17 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
  Baolu Lu <baolu.lu@linux.intel.com>, Gao Chao <chao.gao@intel.com>,
  Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
 References: <20250520102856.132417-1-chenyi.qiang@intel.com>
- <20250520102856.132417-6-chenyi.qiang@intel.com>
+ <20250520102856.132417-8-chenyi.qiang@intel.com>
+ <7af3f5c9-7385-432f-aad6-7c25db2fafe2@redhat.com>
+ <cf9a8d77-c80f-459f-8a4b-d8b015418b98@intel.com>
 Content-Language: en-US
 From: Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <20250520102856.132417-6-chenyi.qiang@intel.com>
+In-Reply-To: <cf9a8d77-c80f-459f-8a4b-d8b015418b98@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SYAPR01CA0034.ausprd01.prod.outlook.com (2603:10c6:1:1::22)
- To CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MW4PR04CA0173.namprd04.prod.outlook.com
+ (2603:10b6:303:85::28) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,357 +89,178 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|SA1PR12MB7175:EE_
-X-MS-Office365-Filtering-Correlation-Id: a4319c44-9707-4cbe-b9ce-08dd9cf10955
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|DM6PR12MB4089:EE_
+X-MS-Office365-Filtering-Correlation-Id: db9131b0-ac40-44b2-61e0-08dd9cf200e2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?OXd5L3dHVmRjUnQrUFZ1VUJaaDR4TGc0dUZMRHZYWHh4ZWt5OGtUbTVubGNn?=
- =?utf-8?B?NXFIamFFYnlxSk5XcWwzYzRSN0xvZDZMYzFUMW1qN0FINmNqS1NVbkFlanc4?=
- =?utf-8?B?anBEWEgrN3ZHd3Z2K1VlbGxuNER6MGx0TU0zUmxobGhFbktJSkJNVUlNWEdT?=
- =?utf-8?B?OGRRVHdHTDFUcXB5eVd4VnBsOG54MDdqdzk5OGVvZjhoQ2VxaDNWeTBreCtu?=
- =?utf-8?B?dHRHV3JuVCtlbTgxVjdhMytra3Z2ZnpIbmdCUlBJWXlYYkprazRwL0twOE9P?=
- =?utf-8?B?Z21Yc2Y4Q2VoRDBxMUZnY2JUV0ZqSWlNRWlmM3lCcGRLdXVRNG1OTXB0WHpj?=
- =?utf-8?B?cHQvU2RPZ0VzK2d4R1BtN1JUUzd5L1lIU1gwelQzajloQ2ZqVlVHYldndG5w?=
- =?utf-8?B?OVBRbTJiQmU2NEpMdnpDT0IrQTdvbkxLTDZIQm1RSmhGVFM0QXYwanVOd3pa?=
- =?utf-8?B?ZzBKWnJsck5DM3lmYm1VOWpRamZFbi9FaTBMOU8yUFdPSk5WQnphdXlWd2Rz?=
- =?utf-8?B?cTJGWHlGVHJvWUR1SVBSU0dlQ2dyN3JoOGlCcUk0UWJ1S0hBQWJhOTJmeXZn?=
- =?utf-8?B?NWFXd1dFVVFyM2NtbHExb3Y5eGRKdHE5bEN0S0lId3V4Um5mZ2pTZDdjVm9M?=
- =?utf-8?B?SGxQM1lBbTNid1VCSTJ2V2hBdWw5K0xscml3STYxZ1ZGYlE1VklndlNudDdv?=
- =?utf-8?B?THVGMFVjZXVwMnIxeE5kL1VNRlY2RHpkNnZjcTBxWUVwTmt0MGpGWXlCcFY5?=
- =?utf-8?B?SVJkMHl2OHQ3K1RiTTRvdWp3aEMrQWFHOEZFYi83SVVmWU5waU9Dc0dpMThJ?=
- =?utf-8?B?RjJiejEwN1ZrUFBnL2FuUFJpNGh0NDlzZ3ZETUE2bFB1QmVJbHBxbTViUzRq?=
- =?utf-8?B?bXhOL2QwWm82UDMwRUJhS0hHbjV5emxaRGRxQjMvOTV2UjJqQTJTeGdjYzVy?=
- =?utf-8?B?QytDUzZWeDdYdXFzRzl5b2U1eW9xK1JScWtoaDlhMHFFV1A0ZGhoZGlETnM2?=
- =?utf-8?B?VlA2MzN1ZWdwK2J6dlhUYkJTUG9LWFpUWWxKc2lmcDZIUHYwYnp4RGlxblds?=
- =?utf-8?B?MXpETGhtS0pYUG9FNmwvaHgvZVA1LzFZZ3BBekp5a2szWUQ4Sk9YRmwxb0kr?=
- =?utf-8?B?RmZtbFNLbndtZWY0VlJldktLRVIzYlBNVzlxaFg3ajlmNERPWjZicDVIS1dS?=
- =?utf-8?B?VlJoQWs2RDJBN1dmdERDekp3aEo5aUxPUFFudEI2eUZvRlJIY0YvTDIzdFpx?=
- =?utf-8?B?dU41U3BaMStrcS82YlFQNXZQQi9hMWY1L1JaWFFvSGdWV2ZDKzFpV3FwZ2Ni?=
- =?utf-8?B?djVmNnpKMXd3STFXNEMwZ1VETDZTamM4SGI5Q2kvVGxVb0JJNWh2eXJNVVhQ?=
- =?utf-8?B?blJEeEVpTmlqUG9kT2krZStiVlBUK1JtRnVwTDVxcXN3M2VGZjRVTEhGVlNK?=
- =?utf-8?B?b1UyUDRNKzhPQ1VzZ0liWDg2S2hmZnoxSFpWeWovZkM5aDNZNVlDVk9SaEFn?=
- =?utf-8?B?b0JvZk1hcnJpS2p1ZisyakJOSVMzTDZyK21OeWs4aVlGT0ptT0lEcWxQMGNy?=
- =?utf-8?B?WWtzS2RjNWZVT3hMZ3RhS2JIdFowNnBtQXNOd2JNbDR4bzdzWGRURDl1VkE5?=
- =?utf-8?B?QUtna2pONmZWeStBTmdJM2NRUnBiT3FEVGV0YVJCMDNUZGJmREpmY2YySlFo?=
- =?utf-8?B?MnR3Rk5uVnUzalMxUzAvbThNMzhIeDVSc0RET0xtUzNYdU5ySEVMY3h6Ri9B?=
- =?utf-8?B?ZDRJb1RPUkQzaVptQktaRnpZeG9FRGhmVXpxNlVSNkFxakc3RkNMTU01azBv?=
- =?utf-8?B?SFBYWmEvcXhHY0YyYXo4akpsRVIvTXNOZWNqRkg2Nld4YzFKcmVqM2h4Y0FR?=
- =?utf-8?Q?Oi4J9VqW5FFHo?=
+	=?utf-8?B?emNNRHVQTElDc29uLzJnTHREMEFDZi9KazRqQ3hEQnhLWldoT2NpMndPY0hD?=
+ =?utf-8?B?M3lwM3ZSdjBhei9ncnQ3SmZKUk1tM01LaWNBb1g5SlkxZzZHUUR6Q0doS2hj?=
+ =?utf-8?B?SlFRK3Y0RUsyMk1oaGNZV29JQ3R5VytBdWdreVBmaXJWelI1QTJTQkFxVHVp?=
+ =?utf-8?B?SFdWKzVIdnBIQUUrc0g4a3hWcFdjeXhRMlFjRlMxQ09VT3dMeUZ3T3hKbjlN?=
+ =?utf-8?B?US9qOUR6aitlUzN4OWhHeEYzYlJDR3hGTzR4UkhpaEFFMUNqS3dYVnNSWWdk?=
+ =?utf-8?B?TTZBUmt3L1VFbUdwT3FoMzZ3OHprMXVDeFB2SWtIa3hGTXgvVGdnNnorYStP?=
+ =?utf-8?B?dlljQWJIa2MrL2YrOXljSng5a2M0S3pyelVWWW9RajZIMFBieWM4N2Y3MC9T?=
+ =?utf-8?B?MDROeE53YWdmWUlGRWF6b2ttb3ZaVXZieEFlY0pOWTdkdVdIU0NYM2FyUzZ0?=
+ =?utf-8?B?MDdJcHBYR1RFTVUycFArbFJseVhWS3A2L1BCT3VIM2QwWTlySTZ1TTU1end3?=
+ =?utf-8?B?MVN5c3BNdkhCSGhTbURrVjNER0doQXk3QkpxellTNGpqSVdlczRZNXB6NzRR?=
+ =?utf-8?B?bVJheXRCbGM0a0xJV0s0UGkxb0FQdW9uelEzNVJhR1Q5dU1WbXR3UENza1VO?=
+ =?utf-8?B?dnVnY2pOYTZUQ1pTVDNYekRCSVNWWmxDSW5RTzFDeXRDa2xyYXlra1ZQczZm?=
+ =?utf-8?B?TkYrTitxVmhoZVNUTDdqMjI5N1hIWVJjcCtIRGg2aDZBb3Y5THBaazl0czFt?=
+ =?utf-8?B?T0pOUTFNY0NyeTJlemZEdVFjbDVjUVlTeDJHSnFqNTdQZkJObjhFRkhXZGVz?=
+ =?utf-8?B?enprUXpHZHI3STVVK21oRTRLQnBOREhTcHdtYmpDK3ZjL3BNLzd4K1Z3d3RG?=
+ =?utf-8?B?UkR2YytqYW1HM1IwUks4elE3NXZCZm1FRUtrUnl3eTNVY0hHV1FOTk5MM1JY?=
+ =?utf-8?B?QmM0TTF0ZmlNeEVIT2N0cXI2LzJXSEZva0NNZVRyMFk1YTlVcmw2T3FsamNt?=
+ =?utf-8?B?aGdVRW1BV1VOOUtCMTI0WkVPbDEvaVNkaEd3UWJCM3JFZjR3SEtnbVV6Slo5?=
+ =?utf-8?B?ejhlbklDODZRYitYRFF6aDV3Q3g0UUN2MmpPTEtFZllWU21iVnJYbnZvMU9G?=
+ =?utf-8?B?eCtHTnBqcmZrMzZ4YXYvT24zNklscHJMVngvUTBrVnRKaDBaWEphT3NxTUlS?=
+ =?utf-8?B?UHdPQXprMi9UQjZlVE1ncWNLRytmTk91Njl3KzUwV3VaWjAzb2hPclpzN0ZP?=
+ =?utf-8?B?REVkdGxMckV6cVRvRGQvNU83YnQ3NkxjY1BSZG0zVElmMkJ0NmNJOHlMMS9p?=
+ =?utf-8?B?NE9FRGYxYmNCYVVaKzNmTis3Wk45S1lqWUJ4S3JzamQzbnZ3UHkzamhPQkZj?=
+ =?utf-8?B?VHA0ZFpQT0RYTWlUTUR6Tlhlc1QwMTRVWVVUVE9vdVVYTjNTeTVWWDZxK3cy?=
+ =?utf-8?B?aUppdWVhNmJmcEY3SHlaSVdmRWpFVG4vM0FUeS8vVFpBeUkwTlNkT1BXNThO?=
+ =?utf-8?B?dnhVbW9jWVYrRTZPbnVPT3B2djdEYWErN1kxRUdkQ1grNDdRTEFxNEppYVlh?=
+ =?utf-8?B?VXJWUm8ybTJTSmIyaGMzNWRVNjNmWDYxMGhYMnJmUmJMY3VLSW15UkNwcFNq?=
+ =?utf-8?B?aExNVDk2dU4rSGk3ZW5YQXZkMW55K0IxRVZFNTJIU05kUS9mS1B0U1dhVnUr?=
+ =?utf-8?B?OG5NMnNpVGp5WlR2WlNxZFpkcDBPUkExQzBCR1pod1ZacW5lNHlJWVp0V2FF?=
+ =?utf-8?B?SmtsWUZyc0dCSkdiQ3lZMWw2VHgwMlNvejd0MGtna2J4WTdpY2c1Rk1CY29v?=
+ =?utf-8?B?eXMrcEtnKzAyWEsvYVFybTJiQnp0TUp2MzZvNnRsd0ZhWHlLUmlodiszSWVr?=
+ =?utf-8?B?cCsydzVtSVozbTFJc3lCamNoUkJ1VDRIaDFDamw1WGl2amNuQlRnZmNmSUs1?=
+ =?utf-8?Q?OQwjgq258K4=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YkpUbnRjaWhYQUI1MWVSTy9BaE9ncVFMNDNHaVVqQ2xrVmRncVNXTTY5c2Vi?=
- =?utf-8?B?d3VFSDN1VEJuQ1A3eEpNN29yaDlYZUlYK0s0V3IyZmt4czQ2MGphZitJRmN3?=
- =?utf-8?B?KzlPRFVJZjBpMDdENjFoZ205ZFJ3QmJmZmRWZ3JEeVJHcEtQYlJHM2tHdi9D?=
- =?utf-8?B?Z2xHYUFHUkE1WmpOZlJXb3c5S3lPTjdYZmVMd0t6aHNHTzgxS0Fna21IWEhq?=
- =?utf-8?B?ZFlhM20yVUVHNFBQSGJCWnllUDFzNzlpMlhtRmRhTWZGbFdzeWhERlg2c09Z?=
- =?utf-8?B?NDRwNFFhbmVwRFBRcWVhY0g3eUg5RXdEWDRxMmZweTNEd3g2R2tpL3VCclZO?=
- =?utf-8?B?K2FZbXUxOXdERnJuVzBmQ3UyTFBwNDdGdk5Yc3VIZ3R4NVBrUWl3aVRIcjJ5?=
- =?utf-8?B?bG04RTRTN2JvZERacGdJdFRick9LRUsvVWhXOGFSSGJ6NFdVSWpmSG9PQXBs?=
- =?utf-8?B?NXI5eFpNSWlXSklRQlJBZC82Zm8rN0lCdTAwN2NZc0pHVjFvK0J4SGpmazhS?=
- =?utf-8?B?TzZidWppYi9MSWVsVjhPQnY3aVREN0t1dFBjNWl2OWtuUVo0L3ZOeEpIQmFR?=
- =?utf-8?B?TDJiVWxMMXZWWFE3allLbVhFMSsxdEZTZ3ZmZjRSeFRMU080YWpqU093QlJl?=
- =?utf-8?B?QkNRSDFxWVpGZGN5cGh4WWxiRjhKZU5CTjdzK0Y2TVpHTW1ackxwb3NvaFE1?=
- =?utf-8?B?UlZhTEsvUTFhYTNQTlhva0JyTGxVclpsMU5mSnFNM2VMR1VTY0hRMTBrT0Nt?=
- =?utf-8?B?UU5vWFAvOEl2RnJxdkdyOEc4R2tKV1l3cDFkV3dDUzh1WGkxMEgxWER4T1VI?=
- =?utf-8?B?bTNWSGxoemJFT0dUYU9EcEJPSDRwR0xvcG50WkJwdVN5SnlhRzUzOE5JMGo5?=
- =?utf-8?B?MGlOU3YxcmRKYWlGVzVNejI2OEE3SU9XT0Q4YXV4bmZCeDNBNGE4bzYzamJH?=
- =?utf-8?B?NzNOcFFBcGsrSE9qcDNBS1E2VXpzU3hmK1BwTHV3ajZFSFYxeDFDT29BT3JU?=
- =?utf-8?B?a2dpOVN6cXhXSldzNC8zREFoOS9oUTFOS3B0cDkveVlseGFDa2JMMmhBSGN0?=
- =?utf-8?B?MWVCVURzUWhKaUdZbUFJTWpQcUdLQ0c0MEFIODlvSUs0ckVXdGdpSUo5ZzI3?=
- =?utf-8?B?U29jcmZNcTJRTWU1MTh0Q3JKUFZXK1dmK1FkL1QwbHJ6NTFRSTJ5UzZ6WFFy?=
- =?utf-8?B?RTJXeGtFd1BpTTdLOEVvb0lvdU0rc24zUVRDQ3VVbHZRcGpjQTZHYUJnemxE?=
- =?utf-8?B?ZzlMQzhPaVlJb2tNcG1CNEV1b1J6YUY3b3MxbGh2REZ0YkxaZlYxZjAyNERw?=
- =?utf-8?B?eVdXSkFyOWNQQkJwWHV4di9nOU03bzhGRHJKdlhlR01WVll2d3Y3eDI1UVha?=
- =?utf-8?B?Nkx0QTFWcVZ5M2VlRE13VVVJODlFL3p3UGdNUXVsSGJRZldidFVrNjluc0ZF?=
- =?utf-8?B?SFJOQ3haOTk4SkpNWjQyNmgrV0FQc3VWbGRaOG1ON3NKQ1lEd0ZrSFpMOTQw?=
- =?utf-8?B?aVBjUllldWxzWG9BczlVbHdMOXlia3JOY2Z5R1RrcVBXQkVPTFBITHpVWWtw?=
- =?utf-8?B?QkZUZ2dNTitwQUFzb2lGdjl3akFjd25jejNGOWZyMzU0Mk9HOVQvUXFOYWdp?=
- =?utf-8?B?UDAxU2JwOVpTdlE4UFdTRDFjSk1aZFlEUllqOGFQTUhsMENuZ1RORXJGeG1q?=
- =?utf-8?B?blc0NTRlSUJXbHNHbUFEN3NIcFUzNXVMMEtldjRmeHJJZ2xkazEyRE5OeFFM?=
- =?utf-8?B?bTVjM3MvcmFWbm1ZMTNlRG9BN1BnVlI1eUcwL2h3RExzTCszMXNxRzVvbHdW?=
- =?utf-8?B?YTBSTGZQY2FYM2Yvd1M2N1FGNk9mMzJLUUl2VWZLZmpLNVB0dUdJYWVrZjdt?=
- =?utf-8?B?VkdMNEh0VnhWYmZydHNoVTJMWDVtY0xhSm9OaVlWbkQ4M0JHY24waFZiVGov?=
- =?utf-8?B?cXhUbHdIMEt2RmxGam9yQWpNVS94RmdKZkxvTHBNOFBWMDJ4a0FYNFRIdytX?=
- =?utf-8?B?YkJNY0JtNjBDbldBaE1Hbmx1ZjJ6TUpUc0JXVEMxazFaYlpJeG5KMllnZS9F?=
- =?utf-8?B?R0twSmgzd29tY2NHMWtPTzFCbmhVa2ZCSERibnpTd0gzbU1OQnhBMkY4TkQy?=
- =?utf-8?Q?9SG6mBkTRPqkgjluToENJqryF?=
+	=?utf-8?B?M2Q0N1lBbGpPZWlBRXd1SkhvMytKemIvYmdKZjdpdFd5ZXZCNDZObFJXVnI1?=
+ =?utf-8?B?cUFiVzRyUndWcVVxL3RoNUttK0ZleGFjYWs5SHdYSzBiWlRZU3p6MFVScGMr?=
+ =?utf-8?B?ekZ1YU1Za1BvaStZSUhucHJWdFByS2pIZG9vTXg5aXdBaUpGVzh1YURqaGsx?=
+ =?utf-8?B?eXE2ZzZHTXl6RjdkYXd5Wm9FYkNUVnoyQnhrdk90NEJnRC96ZWNvYUI3M09Y?=
+ =?utf-8?B?Z1hoV2NpTGduTmZjN2E1N2ppWnIrUThGRUVIUjRQSFpYSU02bXg1UzZDb1hY?=
+ =?utf-8?B?NjA3WWZNVnlIUUFhaEhkZVNmMXZSS2gxOWlDUDR0aDcyaDVvQUgxSFhkdUFZ?=
+ =?utf-8?B?WTRJWDZSOEJyTEcxRlBkNGdXUHNDemIzaERibW4vbVpjZmxSbXRqZ29qVHJG?=
+ =?utf-8?B?T3B3TVpUQVF2NVBTSGJ3aFFtTTAvU2wzMHBkbzg5bDFzSHhHZGluc2FOdWZy?=
+ =?utf-8?B?Wlh1V1R4My9UQmJseVdyY2o5U0F0cXVQeUlZOUYwemh5SzZUTC8yTFZyUG9r?=
+ =?utf-8?B?Q3VNK2RuLzdJbUR6QVB6NWpHcFoxQXJzdnRVSUJZemVGY096ZkIrc0UwbWlT?=
+ =?utf-8?B?K1VXS1JydzdkWGQvcFQwS25UN2s0bFNWdHZCNURCZmhqcW1EcWFlMGZMQ2NE?=
+ =?utf-8?B?RXVWTkxCZ2MrNG43YSsxTk9UZkIzSEQxV1U5bGdtVDE1QnNtOU1PYXpuV0pU?=
+ =?utf-8?B?WVkvSzVJYXppSUFtSzc3VHZ0bG5hTkNHa2RxUUhFelhKT1JjVnp6eit4d1VQ?=
+ =?utf-8?B?S1hoRzJtWUhEL3JFYS9CNk12dHBJMVJIazhLUmNQaXgrTUVUR296ckVDL0Vm?=
+ =?utf-8?B?eExtQVdobExBSXFpU2UzbEw3K09RS1BpRGQwbHFabFFQd3QrNHc4ZnROVXFh?=
+ =?utf-8?B?MFBISUJBS2VKUWVFVjRwWEFiUzcwR3kvSTNMM2hiY1Z5NmhWVW9xcGcxUFV0?=
+ =?utf-8?B?NDlSb1Rob2xabTErSXFOOFA3V3R3eWh2NWtXU2JmaGxzOENrcXBlT1VOdmN2?=
+ =?utf-8?B?K2YzUVFRTFhMRHQ4cHVYb1JFV0dDS0hRcjdBZmNFd1NXdGtIdWd6NEEyblJh?=
+ =?utf-8?B?cDcyOUZBdmNXcml3eDhYTXZBNXRXODlXRjI5a2N3Mm1nTHVXQjhsVlNkZWFq?=
+ =?utf-8?B?K01VaWRacXIwSnZCZm93RGl5aDJOWkpRK2xEdUhuamtTVU1YLzZYZk1XOFdI?=
+ =?utf-8?B?R0dRejBxeVZvdDVkaFYzdlpwOTNGaU44OW1nK3pGcDAvQSszT3dRd3dlb25m?=
+ =?utf-8?B?bEFDR2NROHd1RHF3YjYwME9wN2liQzJwYThod2Y2dlR3SXp4NjU0S05sUDdh?=
+ =?utf-8?B?RzFZb3JPV1h2MDQwZHJxQWs0VS9OTitrTDQ1MDF2Z1dSRHVnT2M0bk1RWmdw?=
+ =?utf-8?B?VzRBd3BjbEtiRVJuaFQ3YVVqZkowcHQzbm1YTDJEWWR6b0ZzcUhkcEtZd0xH?=
+ =?utf-8?B?dkRHNFhJeUxOZzRWZ2tJTHV1UFpCanVkY1Vhbm9EUHl5VTV1elduRXpxaVB6?=
+ =?utf-8?B?eWxlcVRvTFBOVmhlL1AwWHRaWVlOSG1xMkhBTjVRbm1RQ1VaNjVndHhsZ1Jw?=
+ =?utf-8?B?Y1VvTWIrbDVMclB5ZXJnMk4wd1cxY3VvL2hQaVV2eDJuY25hcDN5a2U0SkVp?=
+ =?utf-8?B?U2FPME5DbWU3RGhweW5zZ3hwWUN6ckVGTEVud3RFcFM1UWhtdEpoV0V2MmFq?=
+ =?utf-8?B?UTk0S0NwMG9ZN1g3SUVRcjJCZmVlTEJjZnZWZWNreGZKek1tdXAwVEhQMWZl?=
+ =?utf-8?B?TmtFV2xFSGIwREtaTVp2eWlTYWhKK0hKWFJ1OEFITDZ0YW1LdC9zZ2pBM1BT?=
+ =?utf-8?B?ZVFvSkF4Rk5wcGdPRGhLdlFIL1JXMnc5N1Q2ZTVHVDBuQ2E2Y3VOTFJqcU9N?=
+ =?utf-8?B?NnlXMEY5bVdkc3RZVml5VjczOHhkc1pEdFhWcUVMUXVaOTBwMGFVTmpHQ1Vl?=
+ =?utf-8?B?azcwSlR1VG1IVUdta05Yd3hsZkNmNjdPOTlRMjVYTmphYW5nVmszT0E1akRM?=
+ =?utf-8?B?ZXF1bGV6cUR4Z1BZVDVEUFNuSVA1Rnc2Z0Z0Njh0R1Qxc2dreWFtR3ZJYzlI?=
+ =?utf-8?B?L2hVV1VZZDc3bFdWODFmbGxzUVlXOUJLNmZxT0V0eGNwM2R6eVNIbDNWd2Y4?=
+ =?utf-8?Q?4e30UoY3HeFE0NNgkmyuR9PqN?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a4319c44-9707-4cbe-b9ce-08dd9cf10955
+X-MS-Exchange-CrossTenant-Network-Message-Id: db9131b0-ac40-44b2-61e0-08dd9cf200e2
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2025 07:35:21.7594
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2025 07:42:17.0097
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 27ch86IyCEkd54H0kX8uA2Q701+4QSenk0Rii5bpWjrNS5IKRC48i5Xf0JbWZDkt/0GvbkFRhkl3vhsZ/ksQ4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7175
+X-MS-Exchange-CrossTenant-UserPrincipalName: N1+iJURyegyJuANncWuulGvlMx0BXfKNzMQJOiuqisg6P0fgfndrq2rvc//W8GD6rFE2xv/sXP44b7F69oIEPQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4089
 
 
 
-On 20/5/25 20:28, Chenyi Qiang wrote:
-> A new state_change() helper is introduced for RamBlockAttribute
-> to efficiently notify all registered RamDiscardListeners, including
-> VFIO listeners, about memory conversion events in guest_memfd. The VFIO
-> listener can dynamically DMA map/unmap shared pages based on conversion
-> types:
-> - For conversions from shared to private, the VFIO system ensures the
->    discarding of shared mapping from the IOMMU.
-> - For conversions from private to shared, it triggers the population of
->    the shared mapping into the IOMMU.
+On 27/5/25 15:47, Chenyi Qiang wrote:
 > 
-> Currently, memory conversion failures cause QEMU to quit instead of
-> resuming the guest or retrying the operation. It would be a future work
-> to add more error handling or rollback mechanisms once conversion
-> failures are allowed. For example, in-place conversion of guest_memfd
-> could retry the unmap operation during the conversion from shared to
-> private. However, for now, keep the complex error handling out of the
-> picture as it is not required:
 > 
-> - If a conversion request is made for a page already in the desired
->    state, the helper simply returns success.
-> - For requests involving a range partially in the desired state, there
->    is no such scenario in practice at present. Simply return error.
-> - If a conversion request is declined by other systems, such as a
->    failure from VFIO during notify_to_populated(), the failure is
->    returned directly. As for notify_to_discard(), VFIO cannot fail
->    unmap/unpin, so no error is returned.
+> On 5/26/2025 5:08 PM, David Hildenbrand wrote:
+>> On 20.05.25 12:28, Chenyi Qiang wrote:
+>>> As guest_memfd is now managed by RamBlockAttribute with
+>>> RamDiscardManager, only block uncoordinated discard.
+>>>
+>>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+>>> ---
+>>> Changes in v5:
+>>>       - Revert to use RamDiscardManager.
+>>>
+>>> Changes in v4:
+>>>       - Modify commit message (RamDiscardManager->PrivateSharedManager).
+>>>
+>>> Changes in v3:
+>>>       - No change.
+>>>
+>>> Changes in v2:
+>>>       - Change the ram_block_discard_require(false) to
+>>>         ram_block_coordinated_discard_require(false).
+>>> ---
+>>>    system/physmem.c | 6 +++---
+>>>    1 file changed, 3 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/system/physmem.c b/system/physmem.c
+>>> index f05f7ff09a..58b7614660 100644
+>>> --- a/system/physmem.c
+>>> +++ b/system/physmem.c
+>>> @@ -1916,7 +1916,7 @@ static void ram_block_add(RAMBlock *new_block,
+>>> Error **errp)
+>>>            }
+>>>            assert(new_block->guest_memfd < 0);
+>>>    -        ret = ram_block_discard_require(true);
+>>> +        ret = ram_block_coordinated_discard_require(true);
+>>>            if (ret < 0) {
+>>>                error_setg_errno(errp, -ret,
+>>>                                 "cannot set up private guest memory:
+>>> discard currently blocked");
+>>> @@ -1939,7 +1939,7 @@ static void ram_block_add(RAMBlock *new_block,
+>>> Error **errp)
+>>>                 * ever develops a need to check for errors.
+>>>                 */
+>>>                close(new_block->guest_memfd);
+>>> -            ram_block_discard_require(false);
+>>> +            ram_block_coordinated_discard_require(false);
+>>>                qemu_mutex_unlock_ramlist();
+>>>                goto out_free;
+>>>            }
+>>> @@ -2302,7 +2302,7 @@ static void reclaim_ramblock(RAMBlock *block)
+>>>        if (block->guest_memfd >= 0) {
+>>>            ram_block_attribute_destroy(block->ram_shared);
+>>>            close(block->guest_memfd);
+>>> -        ram_block_discard_require(false);
+>>> +        ram_block_coordinated_discard_require(false);
+>>>        }
+>>>          g_free(block);
+>>
+>>
+>> I think this patch should be squashed into the previous one, then the
+>> story in that single patch is consistent.
 > 
-> Note that the bitmap status is updated before callbacks, allowing
-> listeners to handle memory based on the latest status.
+> I think this patch is a gate to allow device assignment with guest_memfd
+> and want to make it separately. 
+
+It is not good for bisecability - whatever problem 06/10 may have - git bisect will point to this one.
+And it is confusing when within the same patchset lines are added and then removed.
+And 06/10 (especially after removing LiveMigration checks) and 07/10 are too small and too related to separate. Thanks,
+
+> Can we instead add some commit message
+> in previous one? like:
 > 
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
-> ---
-> Change in v5:
->      - Move the state_change() back to a helper instead of a callback of
->        the class since there's no child for the RamBlockAttributeClass.
->      - Remove the error handling and move them to an individual patch for
->        simple management.
+> "Using guest_memfd with vfio is still blocked via
+> ram_block_discard_disable()/ram_block_discard_require()."
 > 
-> Changes in v4:
->      - Add the state_change() callback in PrivateSharedManagerClass
->        instead of the RamBlockAttribute.
+>>
 > 
-> Changes in v3:
->      - Move the bitmap update before notifier callbacks.
->      - Call the notifier callbacks directly in notify_discard/populate()
->        with the expectation that the request memory range is in the
->        desired attribute.
->      - For the case that only partial range in the desire status, handle
->        the range with block_size granularity for ease of rollback
->        (https://lore.kernel.org/qemu-devel/812768d7-a02d-4b29-95f3-fb7a125cf54e@redhat.com/)
-> 
-> Changes in v2:
->      - Do the alignment changes due to the rename to MemoryAttributeManager
->      - Move the state_change() helper definition in this patch.
-> ---
->   include/system/ramblock.h    |   2 +
->   system/ram-block-attribute.c | 134 +++++++++++++++++++++++++++++++++++
->   2 files changed, 136 insertions(+)
-> 
-> diff --git a/include/system/ramblock.h b/include/system/ramblock.h
-> index 09255e8495..270dffb2f3 100644
-> --- a/include/system/ramblock.h
-> +++ b/include/system/ramblock.h
-> @@ -108,6 +108,8 @@ struct RamBlockAttribute {
->       QLIST_HEAD(, RamDiscardListener) rdl_list;
->   };
->   
-> +int ram_block_attribute_state_change(RamBlockAttribute *attr, uint64_t offset,
-> +                                     uint64_t size, bool to_private);
-
-Not sure about the "to_private" name. I'd think private/shared is something KVM operates with and here, in RamBlock, it is discarded/populated.
-
->   RamBlockAttribute *ram_block_attribute_create(MemoryRegion *mr);
->   void ram_block_attribute_destroy(RamBlockAttribute *attr);
->   
-> diff --git a/system/ram-block-attribute.c b/system/ram-block-attribute.c
-> index 8d4a24738c..f12dd4b881 100644
-> --- a/system/ram-block-attribute.c
-> +++ b/system/ram-block-attribute.c
-> @@ -253,6 +253,140 @@ ram_block_attribute_rdm_replay_discard(const RamDiscardManager *rdm,
->                                               ram_block_attribute_rdm_replay_cb);
->   }
->   
-> +static bool ram_block_attribute_is_valid_range(RamBlockAttribute *attr,
-> +                                               uint64_t offset, uint64_t size)
-> +{
-> +    MemoryRegion *mr = attr->mr;
-> +
-> +    g_assert(mr);
-> +
-> +    uint64_t region_size = memory_region_size(mr);
-> +    int block_size = ram_block_attribute_get_block_size(attr);
-
-It is size_t, not int.
-
-> +
-> +    if (!QEMU_IS_ALIGNED(offset, block_size)) {
-
-Does not the @size have to be aligned too?
-
-> +        return false;
-> +    }
-> +    if (offset + size < offset || !size) {
-
-This could be just (offset + size <= offset).
-(these overflow checks always blow up my little brain)
-
-> +        return false;
-> +    }
-> +    if (offset >= region_size || offset + size > region_size) {
-
-Just (offset + size > region_size) should do.
-
-> +        return false;
-> +    }
-> +    return true;
-> +}
-> +
-> +static void ram_block_attribute_notify_to_discard(RamBlockAttribute *attr,
-> +                                                  uint64_t offset,
-> +                                                  uint64_t size)
-> +{
-> +    RamDiscardListener *rdl;
-> +
-> +    QLIST_FOREACH(rdl, &attr->rdl_list, next) {
-> +        MemoryRegionSection tmp = *rdl->section;
-> +
-> +        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
-> +            continue;
-> +        }
-> +        rdl->notify_discard(rdl, &tmp);
-> +    }
-> +}
-> +
-> +static int
-> +ram_block_attribute_notify_to_populated(RamBlockAttribute *attr,
-> +                                        uint64_t offset, uint64_t size)
-> +{
-> +    RamDiscardListener *rdl;
-> +    int ret = 0;
-> +
-> +    QLIST_FOREACH(rdl, &attr->rdl_list, next) {
-> +        MemoryRegionSection tmp = *rdl->section;
-> +
-> +        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
-> +            continue;
-> +        }
-> +        ret = rdl->notify_populate(rdl, &tmp);
-> +        if (ret) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    return ret;
-> +}
-> +
-> +static bool ram_block_attribute_is_range_populated(RamBlockAttribute *attr,
-> +                                                   uint64_t offset,
-> +                                                   uint64_t size)
-> +{
-> +    const int block_size = ram_block_attribute_get_block_size(attr);
-
-size_t.
-
-> +    const unsigned long first_bit = offset / block_size;
-> +    const unsigned long last_bit = first_bit + (size / block_size) - 1;
-> +    unsigned long found_bit;
-> +
-> +    /* We fake a shorter bitmap to avoid searching too far. */
-
-What is "fake" about it? We truthfully check here that every bit in [first_bit, last_bit] is set.
-
-> +    found_bit = find_next_zero_bit(attr->bitmap, last_bit + 1,
-> +                                   first_bit);
-> +    return found_bit > last_bit;
-> +}
-> +
-> +static bool
-> +ram_block_attribute_is_range_discard(RamBlockAttribute *attr,
-> +                                     uint64_t offset, uint64_t size)
-> +{
-> +    const int block_size = ram_block_attribute_get_block_size(attr);
-
-size_t.
-
-> +    const unsigned long first_bit = offset / block_size;
-> +    const unsigned long last_bit = first_bit + (size / block_size) - 1;
-> +    unsigned long found_bit;
-> +
-> +    /* We fake a shorter bitmap to avoid searching too far. */
-> +    found_bit = find_next_bit(attr->bitmap, last_bit + 1, first_bit);
-> +    return found_bit > last_bit;
-> +}
-> +
-> +int ram_block_attribute_state_change(RamBlockAttribute *attr, uint64_t offset,
-> +                                     uint64_t size, bool to_private)
-> +{
-> +    const int block_size = ram_block_attribute_get_block_size(attr);
-
-size_t.
-
-> +    const unsigned long first_bit = offset / block_size;
-> +    const unsigned long nbits = size / block_size;
-> +    int ret = 0;
-> +
-> +    if (!ram_block_attribute_is_valid_range(attr, offset, size)) {
-> +        error_report("%s, invalid range: offset 0x%lx, size 0x%lx",
-> +                     __func__, offset, size);
-> +        return -1;
-
-May be -EINVAL?
-
-> +    }
-> +
-> +    /* Already discard/populated */
-> +    if ((ram_block_attribute_is_range_discard(attr, offset, size) &&
-> +         to_private) ||
-> +        (ram_block_attribute_is_range_populated(attr, offset, size) &&
-> +         !to_private)) {
-
-A tracepoint would be useful here imho.
-
-> +        return 0;
-> +    }
-> +
-> +    /* Unexpected mixture */
-> +    if ((!ram_block_attribute_is_range_populated(attr, offset, size) &&
-> +         to_private) ||
-> +        (!ram_block_attribute_is_range_discard(attr, offset, size) &&
-> +         !to_private)) {
-> +        error_report("%s, the range is not all in the desired state: "
-> +                     "(offset 0x%lx, size 0x%lx), %s",
-> +                     __func__, offset, size,
-> +                     to_private ? "private" : "shared");
-> +        return -1;
-
--EBUSY?
-
-> +    }
-> +
-> +    if (to_private) {
-> +        bitmap_clear(attr->bitmap, first_bit, nbits);
-> +        ram_block_attribute_notify_to_discard(attr, offset, size);
-> +    } else {
-> +        bitmap_set(attr->bitmap, first_bit, nbits);
-> +        ret = ram_block_attribute_notify_to_populated(attr, offset, size);
-> +    }
-
-and a successful tracepoint here may be?
-
-> +
-> +    return ret;
-> +}
-> +
->   RamBlockAttribute *ram_block_attribute_create(MemoryRegion *mr)
->   {
->       uint64_t bitmap_size;
 
 -- 
 Alexey
