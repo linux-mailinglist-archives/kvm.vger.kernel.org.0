@@ -1,179 +1,120 @@
-Return-Path: <kvm+bounces-47844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40E02AC60C6
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 06:21:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0610DAC6144
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 07:28:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50B7A3AA430
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 04:21:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F0851BC2F69
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 05:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40371EE017;
-	Wed, 28 May 2025 04:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D5D20458A;
+	Wed, 28 May 2025 05:28:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="cMaRMSv7"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="dvdNXzEO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E4B1922F4
-	for <kvm@vger.kernel.org>; Wed, 28 May 2025 04:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BA6F9E8;
+	Wed, 28 May 2025 05:28:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748406093; cv=none; b=djPJ7yAppEnqo4gjg6AVdbvAAO8T2fkioRazxlIsFq77uAZOCBQsGD75YkYQvrzB0T1d6+ylPNxX1ORAeRIjITXviecgYXQ87PAS9OjecyJ6E1mQvYwqKKHsAfjNoIiSAbZRZk81cCPKNo4TGKSFpFuexlbsWrsWygMDtbaby6w=
+	t=1748410122; cv=none; b=GbcCV5Rng5kGIZQNAfY0EacK1yxqKVhiygi5Iwe2S5EWvsh3I6eRGozfmkXT3XgcJ8FRp69ptyc4FiOHafVcNahSLJ7CRs86htpRuzGlzY7htvdlkibp1ZfCvpipPIUCq++eXatBgG113zDt/R7BXLAhK3n+ue2FRZT3NHhGZaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748406093; c=relaxed/simple;
-	bh=gYpAGN+5M5Rw7wA5/nO5pYmaDLAbaV/Yvvl8IIn+E24=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XWPkQDHpS8fdrwIpT36VSv9h+0vjOK6avLbbIzshmpaRgX8suS99L7KPwB8C6AZKHW90MTPMHAfun1ozD8HARX2cBH+66qMe6lZkqraAx/gGpNFJ5LqMcoXdnMPXX94/7+Ea7eu8iYWQ4lFFWwgJD+CbIWT/6vgOouwldgpHoPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=cMaRMSv7; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3110807523aso3859883a91.1
-        for <kvm@vger.kernel.org>; Tue, 27 May 2025 21:21:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1748406091; x=1749010891; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WV/qvSPB6WEwErKAsMTVFQ4E7hjPgAfhVGUmnDRBrnE=;
-        b=cMaRMSv7Pv/ROGY6fkrh8+RygvTG+PBrbMUdzrkz8Jd1tT330v7WgNmlTHmPKx+g44
-         9zOtCZJeZoojIXs2CAJT+2WcWUw+GV9cUYL0XlGyeSq2OHHp/tOQR646tAwY7vZUht6j
-         Dl+j580Zz7mEPq+Rvf+Bi4hHrfy3DeEnKXh1ym994GgFdk3aLrllakjoJyH2yV7swjS/
-         bKi/tQ/u6oM4EyRzkAqyb2vaGAMpehrklZKggvmsWxQ9ZjBjDsS3dFsUtEs3bsfk6iLq
-         9t00N2te20tNUoabKnvifMU6HYq7KO97B6jH3ojcpZJdnR9zenGHVmBx1kgjDEJ5DcTi
-         ZWrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748406091; x=1749010891;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WV/qvSPB6WEwErKAsMTVFQ4E7hjPgAfhVGUmnDRBrnE=;
-        b=utE20Ex97SW2IESKT/WnKR8IiQlNOPjdPsqKXrULzddU/rEagA4X7CVpCTvCpqdj7A
-         lXXTMVC0WYkcAF3rbZgnyMj9tAqqOrn8JXKHF1bWqyBScU35gDIfDrQvJ5pGv+Xwvx8Y
-         WV0CF32vYTnAZQIT8PfH9m0vBaPzdchfXcEvJ0u0hhCUMwQ5ueHypoqvGvjxfHKy4Nqt
-         I8egth7R9+jYOdaPenbpWy/aRWy4ERnwPtD67c//EkPaXFobgjwjUdw8fF5oGHBLc4N4
-         f/ww+BsnU1OxtN8ZrcFn0hNaYj++bCyp00hES5HXNrWu0zZHpXhg9JWIPD6oLdayqy/9
-         7QFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU1Qz9Q2ilq+k+cAfLw/txtl3Hzsguxuzu83kChuh8gGeDEPDvJPAlc/9cu10jEEKblQSM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJHmy4t2C/uSTERsXk+cgzY0/YwLirBIhjT7lodvi/QspTsasE
-	K+rhLL+10Rtkn06QnyA92bFVGU5t2mDZVPILSlxfREKovkOAiGWvvirqFGlHqCzEFok=
-X-Gm-Gg: ASbGnctHOz3NVHEaE0LwjLlXp/ircekYgeIKG1sY0HS6s1W/5JLpS/YDzdYaExt5LHf
-	3aanrMkvM77+N1yawAeKoCgJSF9I9sMczZ18WwWxDfVocS5YLw+enw6awzei9ezVDPb6VOze01E
-	Tcz6UpMBKmLldlbGopqo0Nw/P8/le3ZyX32dFy+ZOExrtuceAXYEac/M4jrKZ5B/LCEOQ2lnp81
-	M0jcjCxOcJEajyiRCtDuf0ARudiydX7hbQv2lLT6Tma95GtY2PGFraPAH2ZZ1xSHzZSLCyjUIqR
-	8crXbldiz63au+Bb9bzQ24zTycLCJbwO0YRn32pZivssQjXxjNOTBwz+j9c9wq/ORJ3LIF2CBLA
-	8Yg==
-X-Google-Smtp-Source: AGHT+IHqceBKN3JoBv7Ps32UTkuJjeTI+o1YYmCxSCNbbdszAchYvVphd4HyUAYDLsrNEZRQGzutlA==
-X-Received: by 2002:a17:90b:38c3:b0:311:df4b:4b91 with SMTP id 98e67ed59e1d1-311df4b4de7mr2403223a91.7.1748406091267;
-        Tue, 27 May 2025 21:21:31 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-311e9b7f444sm285956a91.24.2025.05.27.21.21.28
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 27 May 2025 21:21:30 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: alex.williamson@redhat.com
-Cc: david@redhat.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lizhe.67@bytedance.com,
-	muchun.song@linux.dev,
-	peterx@redhat.com
-Subject: Re: [PATCH v4] vfio/type1: optimize vfio_pin_pages_remote() for large folio
-Date: Wed, 28 May 2025 12:21:24 +0800
-Message-ID: <20250528042124.69827-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250527131450.7e961373.alex.williamson@redhat.com>
-References: <20250527131450.7e961373.alex.williamson@redhat.com>
+	s=arc-20240116; t=1748410122; c=relaxed/simple;
+	bh=+czCOGVe7tz4injuv9NQuV3PobqsvGxJ4nyQ4ioD9lU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=crgcdlsD5+jaonViCvZJO4SHhXl9Y4rSCo2VTN37ra1+AxGFiu+Qklf/CGeanjOwO/KCmTmMvgAJUSnUvmQdJOcKJ0Tn1kct89orFtRqZeGbOKc+Sc8Pk8dmkMnC5K8oWs1tQOoApV+4rmcWANqZtDN/PXsFjMKwV4Lrkzzr0qU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=dvdNXzEO; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1748410113;
+	bh=Aw4qnLvSGZ8usqlOGUUgSD3mt1Ujj0x7KJRUzlUoK7c=;
+	h=Date:From:To:Cc:Subject:From;
+	b=dvdNXzEO1HAzj20noz92SNalzzXW1fWHv9ew1+Ra+4wgDqZfK8D+XIKTNIo/qjz3+
+	 amLl6Pb9KfVIi/4Djx3q0AawkkK1/SAwnkQGhgNiALJgXMFZsvD5ZXhWpxRKpbAokB
+	 x3wdiZQWV0/2bvKGl08ksdURt9qYoR/E4dq9J0XAmjQqPbpZ4VDV1TZJzDpqPK57w9
+	 P/LVH4hXgMv0G+kPPtwJ1qYDt8GXXpoxzr68RI2Fth0hbFHb4SJ9AFOe3xxIHmaw5+
+	 ybvtKsx6gYpvwRsKv1PdaIfhj5wSbppUDmvzh3ziThwmpjKDW0AnH3Myvba9KNkwFx
+	 WsskEWBLesifw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4b6dMP1XDKz4wcD;
+	Wed, 28 May 2025 15:28:33 +1000 (AEST)
+Date: Wed, 28 May 2025 15:28:32 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, KVM <kvm@vger.kernel.org>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the kvm tree
+Message-ID: <20250528152832.3ce43330@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/8t7IU+J+lsYfCXpYhoZ7cvV";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Tue, 27 May 2025 13:14:50 -0600, alex.williamson@redhat.com wrote: 
+--Sig_/8t7IU+J+lsYfCXpYhoZ7cvV
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> > The utilization of the function vpfn_pages() is undoubtedly a
-> > good idea. It can swiftly determine the num of vpfn pages
-> > within a specified range, which will evidently expedite the
-> > process of vfio_pin_pages_remote(). Given that the function
-> > vfio_find_vpfn_range() returns the "top" node in the rb tree
-> > that satisfies the condition within the range
-> > [iova_start, iova_end), might we consider implementing the
-> > functionality of vpfn_pages() using the following approach?
-> > 
-> > +static long _vpfn_pages(struct vfio_pfn *vpfn,
-> > +               dma_addr_t iova_start, dma_addr_t iova_end)
-> > +{
-> > +       struct vfio_pfn *left;
-> > +       struct vfio_pfn *right;
-> > +
-> > +       if (!vpfn)
-> > +               return 0;
-> > +
-> > +       left = vpfn->node.rb_left ?
-> > +               rb_entry(vpfn->node.rb_left, struct vfio_pfn, node) : NULL;
-> > +       right = vpfn->node.rb_right ?
-> > +               rb_entry(vpfn->node.rb_right, struct vfio_pfn, node) : NULL;
-> > +
-> > +       if ((vpfn->iova >= iova_start) && (vpfn->iova < iova_end))
-> > +               return 1 + _vpfn_pages(left, iova_start, iova_end) +
-> > +                               _vpfn_pages(right, iova_start, iova_end);
-> > +
-> > +       if (vpfn->iova >= iova_end)
-> > +               return _vpfn_pages(left, iova_start, iova_end);
-> > +
-> > +       return _vpfn_pages(right, iova_start, iova_end);
-> > +}
-> 
-> Recursion doesn't seem like a good fit here, the depth is practically
-> unbounded.  Why not just use the new range function to find the highest
-> point in the tree that intersects, then search each direction in
-> separate loops (rb_next/rb_prev), counting additional entries within
-> the range?  Thanks,
-> 
-> Alex
+Hi all,
 
-Oh, I see what you mean. So the implementation of vpfn_pages() might be
-something like this.
+After merging the kvm tree, today's linux-next build (x86_64 allmodconfig)
+failed like this:
 
-+static long vpfn_pages(struct vfio_dma *dma,
-+               dma_addr_t iova_start, long nr_pages)
-+{
-+       dma_addr_t iova_end = iova_start + (nr_pages << PAGE_SHIFT);
-+       struct vfio_pfn *top = vfio_find_vpfn_range(dma, iova_start, iova_end);
-+       long ret = 1;
-+       struct vfio_pfn *vpfn;
-+       struct rb_node *prev;
-+       struct rb_node *next;
-+
-+       if (likely(!top))
-+               return 0;
-+
-+       prev = next = &top->node;
-+
-+       while ((prev = rb_prev(prev))) {
-+               vpfn = rb_entry(prev, struct vfio_pfn, node);
-+               if (vpfn->iova < iova_start)
-+                       break;
-+               ret++;
-+       }
-+
-+       while ((next = rb_next(next))) {
-+               vpfn = rb_entry(next, struct vfio_pfn, node);
-+               if (vpfn->iova >= iova_end)
-+                       break;
-+               ret++;
-+       }
-+
-+       return ret;
-+}
+error[E0425]: cannot find function `mutex_trylock` in crate `bindings`
+   --> rust/kernel/sync/lock/mutex.rs:129:41
+    |
+129 |         let result =3D unsafe { bindings::mutex_trylock(ptr) };
+    |                                         ^^^^^^^^^^^^^ help: a functio=
+n with a similar name exists: `mutex_lock`
+    |
+   ::: /home/sfr/next/x86_64_allmodconfig/rust/bindings/bindings_helpers_ge=
+nerated.rs:265:5
+    |
+265 |     pub fn mutex_lock(lock: *mut mutex);
+    |     ------------------------------------ similarly named function `mu=
+tex_lock` defined here
 
-Thanks,
-Zhe
+error: aborting due to 1 previous error
 
+For more information about this error, try `rustc --explain E0425`.
+
+Caused by commit
+
+  c5b6ababd21a ("locking/mutex: implement mutex_trylock_nested")
+
+I have used the kvm tree from next-20250527 for today.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/8t7IU+J+lsYfCXpYhoZ7cvV
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmg2nwAACgkQAVBC80lX
+0GwOxAf7BhoRonJStMXDeDSttM4k2vUAwApF0geAwTRkbwalc/2QqAGn57sV2HMs
+NWvsRrA5MD6aPTK4TzL0T+1bNMkH1VRWrTshRpoYqpC1vfuZSHdb4Xkg0yDpq8IW
+6P88GtpeMSl1qsOhytq+ARAEH+uB3G0w8g8yTIuosCwb1NFMIlMmmEWBQR5UKIEu
+j4xa/MG/Q2Y8PF4I6RLB4z77UxKz/u16/K6rzxVzkc8OdrBAaLmCLMP6uGqaD3jJ
+puwvayXPtk2zJYi5cy6jR84XpV9gzP3GzAjxIY4eWT7ikulT6T/y1Cel4+7yTEOw
+FwHKDdWR5SQtzufClQzSr1xkaSa0VA==
+=ADQx
+-----END PGP SIGNATURE-----
+
+--Sig_/8t7IU+J+lsYfCXpYhoZ7cvV--
 
