@@ -1,79 +1,82 @@
-Return-Path: <kvm+bounces-47893-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47892-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 372BEAC6DBC
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 18:17:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7EF4AC6DB8
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 18:17:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9500CA24A94
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 16:17:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE7004E225C
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 16:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C3328D8E5;
-	Wed, 28 May 2025 16:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7483728CF7A;
+	Wed, 28 May 2025 16:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="njVbXHry"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oNq48NfY"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDD728C5A6;
-	Wed, 28 May 2025 16:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2602874E0;
+	Wed, 28 May 2025 16:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748449015; cv=none; b=kndJIFIFcvqzy3PcnK26ZXMeawHpGqXIWMsZdUUd5qKzpnRx6+1KV/VP4IHXQz1+9okS1uQs78bFKyZj3W3vYc4nXn9BLG9gZtvVN9iX0VuG3jcLuHdRh0BSz0x+MyxCNxxUS1QM7rqafLBvAQIBZExNQvnTb+hbUKbJGdSp8mY=
+	t=1748449014; cv=none; b=F/yo3bbyxPdA3BpUVvCUoLhiJ4xnsdhWIUVCHWxrHt5GzXMjzXEw7fUd1sJvvFgtviym4zzlYD6FhFMtqm2GFNQezXfQc45XE6/V8JApUzUqQQU9r+NVA7hdCWOU0DFCD+Y6MdNO9mbWTHRT0tX7SfitgQkcwYxhiKgBnWNwsDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748449015; c=relaxed/simple;
-	bh=4C/qgM8ewvDh80NuAA/pJldhZN2gQzE9q1EJ+adOGlo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tikLMvXaad4b5Z/m55HzxtaaCxl9IZqOhK9oS6sOL+K9ABL1D/Lo186x2779k/5biP6rPJTUkbno0LT6uSN2l6N3aclyULjHwWjONmDAB/doIdBFWNiTbw8Lt1ujB3nEurRPC3MqaABTMIxGcxizGUcYLSCk7I73RZ2tY/bdOKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=njVbXHry; arc=none smtp.client-ip=148.163.156.1
+	s=arc-20240116; t=1748449014; c=relaxed/simple;
+	bh=qqwoqiY+PkmxZAOOT5oERTLVKSgjAD1ubBoDHdJMh3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BiyJ4PoZS517SDeeNXOK7STf4sIbENwPeb/WeoWohOMiyqpayULPCjm2aHOu3Ayp3KYfRot99wSns+kNbeGhEukyO/DEktssO0lPAnvglt7rgF08hVgwp96nMVK/mva/5qltEY3pFkFF0jvdky16nMHXz60xkTS7CVkLPjDyOUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oNq48NfY; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54SE9XXQ032017;
-	Wed, 28 May 2025 16:16:51 GMT
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54SE9lZm018466;
+	Wed, 28 May 2025 16:16:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=IE9J5sR8L+vcgV6mQoHdHxyI+RrX/jwPojdG3ehAR
-	Y4=; b=njVbXHry0e6S2MFPkeO8iSK1LOQb40mRofxnIuHsrTOF6Qk+wfEEyDGU7
-	tuS5ORZiiLH2UASKeytoui3IMJexjpaWP0jUxk5MbqXuyRTg8BAGu2R6pwhDm7yZ
-	g666I7/dhIY9LNnaqw+AfZyFPGFGa0Q9ydguCf01GXsYNKiLlnU7Os1cdYz5q/wD
-	ROWym4FSARwFhU/cQYNSdxWEaOS1ag00to3Xjpf0Emnkf6CrPbtksGRB+81SqsBB
-	65X3ynCtnTNQjgzWZ6KOXNYT5qeU174pc14/8sFi0AG2MqNhazo4uB5LrgTU6b5L
-	PM3jWZako4Q4IgTHElonhjfD5nEwg==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46x40jrpnm-1
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=9rbmBX28N8S1GsFFI
+	k0mSVvSli42qcynagHl94Uh1wE=; b=oNq48NfY4AyEmqduwl+/iqDDWbCuuKQJT
+	8NjuAQxDjtXAiVomwprgIvIxWTYcKCD8y/GcB+J0lqhUWpfDKvLttB+DuYKOO2CK
+	PhN/En/2NUxdhgmxCKqtC5YzZBJYXZWxsrApeBHzO3wnTxP9SJFielpGEpnftLEi
+	oNjU1msk7lKJBIgj0glYC9cAD/jP66fgWxLEKRyU89Dg8pKaB0TzPvo1h+ggoz9L
+	NuQasaIRrK0IjP22mV8EQMR9qeG10ZiLBiHqkxiGOsPFs+yIIMhXqSoFNPCbtZRi
+	FqUVU12hv3+ZlqakxXfnPUEUknyUUHPPioIUKX1QBsClB/m4YXueg==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46x40hgpyj-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 28 May 2025 16:16:50 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54SF1t4L028909;
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54SEq9d9021346;
 	Wed, 28 May 2025 16:16:49 GMT
 Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46useq08x1-1
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 46utnmr2g5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 28 May 2025 16:16:49 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54SGGjOM55443914
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54SGGjve55443916
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Wed, 28 May 2025 16:16:45 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2504E20049;
+	by IMSVA (Postfix) with ESMTP id 8ADF220049;
 	Wed, 28 May 2025 16:16:45 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C589E20040;
-	Wed, 28 May 2025 16:16:44 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 372E520040;
+	Wed, 28 May 2025 16:16:45 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.111.56.81])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 28 May 2025 16:16:44 +0000 (GMT)
+	Wed, 28 May 2025 16:16:45 +0000 (GMT)
 From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: pbonzini@redhat.com
 Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, frankja@linux.ibm.com,
         borntraeger@de.ibm.com, david@redhat.com
-Subject: [GIT PULL v1 0/7] KVM: s390: A fix and some refactoring
-Date: Wed, 28 May 2025 18:16:29 +0200
-Message-ID: <20250528161636.280717-1-imbrenda@linux.ibm.com>
+Subject: [GIT PULL v1 1/7] s390/uv: Don't return 0 from make_hva_secure() if the operation was not successful
+Date: Wed, 28 May 2025 18:16:30 +0200
+Message-ID: <20250528161636.280717-2-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250528161636.280717-1-imbrenda@linux.ibm.com>
+References: <20250528161636.280717-1-imbrenda@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,96 +85,69 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=SdL3duRu c=1 sm=1 tr=0 ts=683736f2 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=mIUbo4bBOdFWAsOasuAA:9
-X-Proofpoint-GUID: 48wB08JM3CN3rngp5u8_b8q6yBwgkxQ7
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI4MDEzOSBTYWx0ZWRfX8t08jpQ/1GEq pMqB4Gppv23TIkBM+9FnzYOvyYuFlGY1xp6ZGl54yUbDXp6Ro1HT1AsRWy4T0hidignbocVIUkq y5NTRuZDz7Ikqvz8w3DpC6V9zdleggNJyUcjZRwU5lDo2NiBfJcyuOJK6mwt2gdmJJBLrIu0hpI
- 07OJ61N1KBrUMsj+eROl8rfeD3PA/bn3Up5NiXWfgGOPg92s+RnYxSyAxuQJNbPfOuNBUtfMIU/ u++5PkB+aU++yoS4f++ubpZrIz02sCIwa7ONKIJG7jUREsJN/VK6potkKypPEESbI/TFeG7Yryf uCY2BV3lBS56SO+CcboG1U5PIZ2eLDYAG+GEuW+AVDc0f6EZw3gwwN3zYikl0B7AiRuDI0YEz47
- ZryF+mu77sn74yiHKVra8eANWxku+BBJEswjcHwgnqX5CdQ2O+jgvr7WUOrTBUc/X9e6CX+R
-X-Proofpoint-ORIG-GUID: 48wB08JM3CN3rngp5u8_b8q6yBwgkxQ7
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI4MDEzNCBTYWx0ZWRfX1+GNHBUppdwp SUFCAPGlWEA902CjvU0FQvusY7sLzVMR3ivbjTOfnskxKgeRRr+dYJIcQtoQoQ7NQGPtCCMyqGK HhO+j07NkjYukBEU2mHJBYiOaXy3/MMb44GdfFKlnNYgPEfPTHROHlOOroE9+03eJAWBsR60Rq2
+ XID+xN5pQ192Z/V+fwUHix0iu/tTSp2iOQnfMaphtzuFuMjiC+oNRvoXzT9fCAWOfhsO6/jtrsQ ChvlwUdv5+fyo5SDVbcq/WKO8SYCH9sbmNI+8Md2h3oz6gItiuOk9q4DngEA6HHV16TtTOZBJlT oojXcuO1pUzLXJ9fkORM0y0A07mJNems5zwH9l1MFhzX3Oma0fSnQwZZf10G4qJoOHH7453iu66
+ 7Lw6ciR/5cESMUqZAKkMp4vmgC7JEsfgxNpIHBkzO4riqvAOVeCDe6YCuNYGb6njX7hOAq+U
+X-Proofpoint-GUID: HNW834naVDyBENZrwviYekHpuNygMLea
+X-Authority-Analysis: v=2.4 cv=WOd/XmsR c=1 sm=1 tr=0 ts=683736f2 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=07g3GG6zAUHADp5N:21 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8 a=aOG7VxYrwdY-fDjLD2EA:9
+X-Proofpoint-ORIG-GUID: HNW834naVDyBENZrwviYekHpuNygMLea
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-28_08,2025-05-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- lowpriorityscore=0 mlxscore=0 adultscore=0 priorityscore=1501
- impostorscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0 bulkscore=0
- spamscore=0 clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
+ definitions=2025-05-28_07,2025-05-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ bulkscore=0 lowpriorityscore=0 suspectscore=0 mlxlogscore=999
+ impostorscore=0 clxscore=1015 malwarescore=0 priorityscore=1501
+ adultscore=0 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505280139
+ definitions=main-2505280134
 
-Ciao Paolo,
+From: David Hildenbrand <david@redhat.com>
 
-In this pull request you find a fix by David and some refactoring in
-preparation for a bigger upcoming series (hopefully 6.17, but might end
-up being 6.18)
+If s390_wiggle_split_folio() returns 0 because splitting a large folio
+succeeded, we will return 0 from make_hva_secure() even though a retry
+is required. Return -EAGAIN in that case.
 
-David's patches fix an issue with the interaction between protected
-guests and some filesystems. The issue was due to how those
-filesystems handled large folios, which with the existing code could
-not be split and led to hanging. David's fix allows those large folios
-to be split, thus solving the hangs.
+Otherwise, we'll return 0 from gmap_make_secure(), and consequently from
+unpack_one(). In kvm_s390_pv_unpack(), we assume that unpacking
+succeeded and skip unpacking this page. Later on, we run into issues
+and fail booting the VM.
 
-My cleanup / refactoring patches are in preparation for a bigger
-series where gmap handling will be moved entirely within kvm. Since
-these patches are good enough on their own, I figured I could send them
-out now and have a smaller series later.
+So far, this issue was only observed with follow-up patches where we
+split large pagecache XFS folios. Maybe it can also be triggered with
+shmem?
 
+We'll cleanup s390_wiggle_split_folio() a bit next, to also return 0
+if no split was required.
 
-The following changes since commit 8ffd015db85fea3e15a77027fda6c02ced4d2444:
+Fixes: d8dfda5af0be ("KVM: s390: pv: fix race when making a page secure")
+Cc: stable@vger.kernel.org
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Link: https://lore.kernel.org/r/20250516123946.1648026-2-david@redhat.com
+Message-ID: <20250516123946.1648026-2-david@redhat.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+---
+ arch/s390/kernel/uv.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-  Linux 6.15-rc2 (2025-04-13 11:54:49 -0700)
+diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+index 9a5d5be8acf4..2cc3b599c7fe 100644
+--- a/arch/s390/kernel/uv.c
++++ b/arch/s390/kernel/uv.c
+@@ -393,8 +393,11 @@ int make_hva_secure(struct mm_struct *mm, unsigned long hva, struct uv_cb_header
+ 	folio_walk_end(&fw, vma);
+ 	mmap_read_unlock(mm);
+ 
+-	if (rc == -E2BIG || rc == -EBUSY)
++	if (rc == -E2BIG || rc == -EBUSY) {
+ 		rc = s390_wiggle_split_folio(mm, folio, rc == -E2BIG);
++		if (!rc)
++			rc = -EAGAIN;
++	}
+ 	folio_put(folio);
+ 
+ 	return rc;
+-- 
+2.49.0
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-next-6.16-1
-
-for you to fetch changes up to d6c8097803cbc3bb8d875baef542e6d77d10c203:
-
-  KVM: s390: Simplify and move pv code (2025-05-28 17:48:04 +0200)
-
-----------------------------------------------------------------
-* Fix interaction between some filesystems and Secure Execution
-* Some cleanups and refactorings, preparing for an upcoming big series
-
-----------------------------------------------------------------
-Claudio Imbrenda (4):
-      s390: Remove unneeded includes
-      KVM: s390: Remove unneeded srcu lock
-      KVM: s390: Refactor and split some gmap helpers
-      KVM: s390: Simplify and move pv code
-
-David Hildenbrand (3):
-      s390/uv: Don't return 0 from make_hva_secure() if the operation was not successful
-      s390/uv: Always return 0 from s390_wiggle_split_folio() if successful
-      s390/uv: Improve splitting of large folios that cannot be split while dirty
-
- MAINTAINERS                          |   2 +
- arch/s390/include/asm/gmap.h         |   2 -
- arch/s390/include/asm/gmap_helpers.h |  15 +++
- arch/s390/include/asm/tlb.h          |   1 +
- arch/s390/include/asm/uv.h           |   1 -
- arch/s390/kernel/uv.c                |  97 ++++++++++++---
- arch/s390/kvm/Makefile               |   2 +-
- arch/s390/kvm/diag.c                 |  30 ++++-
- arch/s390/kvm/gaccess.c              |   3 +-
- arch/s390/kvm/gmap-vsie.c            |   1 -
- arch/s390/kvm/gmap.c                 | 121 -------------------
- arch/s390/kvm/gmap.h                 |  39 -------
- arch/s390/kvm/intercept.c            |   9 +-
- arch/s390/kvm/kvm-s390.c             |  10 +-
- arch/s390/kvm/kvm-s390.h             |  42 +++++++
- arch/s390/kvm/priv.c                 |   6 +-
- arch/s390/kvm/pv.c                   |  61 +++++++++-
- arch/s390/kvm/vsie.c                 |  19 ++-
- arch/s390/mm/Makefile                |   2 +
- arch/s390/mm/fault.c                 |   1 -
- arch/s390/mm/gmap.c                  | 185 +----------------------------
- arch/s390/mm/gmap_helpers.c          | 221 +++++++++++++++++++++++++++++++++++
- arch/s390/mm/init.c                  |   1 -
- arch/s390/mm/pgalloc.c               |   2 -
- arch/s390/mm/pgtable.c               |   1 -
- 25 files changed, 482 insertions(+), 392 deletions(-)
- create mode 100644 arch/s390/include/asm/gmap_helpers.h
- delete mode 100644 arch/s390/kvm/gmap.c
- delete mode 100644 arch/s390/kvm/gmap.h
- create mode 100644 arch/s390/mm/gmap_helpers.c
 
