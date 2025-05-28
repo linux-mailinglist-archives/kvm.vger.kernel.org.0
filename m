@@ -1,73 +1,78 @@
-Return-Path: <kvm+bounces-47851-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47852-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 125A2AC6330
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 09:38:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E3F3AC6347
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 09:45:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9DDD16CD64
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 07:38:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C59087A6658
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 07:44:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6462459C4;
-	Wed, 28 May 2025 07:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920CE246348;
+	Wed, 28 May 2025 07:45:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rr4la10C"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LsgC/GyR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BFF244678
-	for <kvm@vger.kernel.org>; Wed, 28 May 2025 07:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5B719B3EC;
+	Wed, 28 May 2025 07:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748417917; cv=none; b=HRp4G5oa825dfbuneEGtYNwA2X/7GblbQiXf0IBiGTfNPK50OOALsWe76uNWB6QxV5V5pxMvnp6/adSqPnXhH+k5TQT7ZA/76RA6sTqoVbghqZfCygDerYm9iXfmyiRwWMX75dpqQwdem54J8BLcLzC3jkv8COfJXLx43aXdvk8=
+	t=1748418313; cv=none; b=h5JdJEiZl9TdDR7s+Zy9TJiF3Bbtndlay09kwKYmG6Gk+P2I5Ci4u9h1xZIVqTBqDA5tgYOmD8hvlz+tp/zxpfcFFq/hRMn2QPz4ZJ2J0octJdJi0YQZBSOlpj612uqrODuJ2qCiMBxyH1fgfXr/BTgLSHDuhMLQU9XXDvhtl3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748417917; c=relaxed/simple;
-	bh=EH+F4iRJI7anYHX3NynlYUSDaVIlMgqBZ6Ur6WFXNAQ=;
+	s=arc-20240116; t=1748418313; c=relaxed/simple;
+	bh=iafivI8V/MTAg4QPelROK6ZjF73rLhrtzNbr40jE06Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YrdT7rsBRrPdWeuliMV68rxUDrKkTG2z43njVCiZfbmoE9fnLzSqc78aU+VzRESuklkBLs8g5u280pP9SiNvW7T5afc5GPcf8ew1Sd9CIkftj0/SBrEKA4H4JBhcN2Vc4adsiZ7yWnYwrFtfwC/DK+MGLI3fNksWxN4r9z/nxmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rr4la10C; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748417914;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nIttIbYMTmu8/eguOayC3dSJD20KFYU/EvDlBxz1bX8=;
-	b=Rr4la10CtJneAF19D8vtUN4PLCnI9xIN9Bk4//BRlDMOGhcs4KTG7DJNO3yII+IXPpFqfS
-	l8uSeSdugvqsqI+uk+N+T5FGHvQJ9PKFmYDKMWyLowLO86BhcXXWItPxXIwMViCzHlupAx
-	DmKrFYEE1LSKbOd2fQDuC0Sg/qUqgPU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-424-qlHoU7GUPsGgzsvwWcraWw-1; Wed,
- 28 May 2025 03:38:31 -0400
-X-MC-Unique: qlHoU7GUPsGgzsvwWcraWw-1
-X-Mimecast-MFC-AGG-ID: qlHoU7GUPsGgzsvwWcraWw_1748417909
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9EC6A1956086;
-	Wed, 28 May 2025 07:38:28 +0000 (UTC)
-Received: from dobby.home.kraxel.org (unknown [10.45.224.91])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 07335180049D;
-	Wed, 28 May 2025 07:38:27 +0000 (UTC)
-Received: by dobby.home.kraxel.org (Postfix, from userid 1000)
-	id D532F4507BC; Wed, 28 May 2025 09:38:24 +0200 (CEST)
-Date: Wed, 28 May 2025 09:38:24 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] x86/sev/vc: fix efi runtime instruction emulation
-Message-ID: <77hywpberfkulac3q3hpupdmdpw2xbmlvzin4ks7xypikravkj@xjpi7gqscs6a>
-References: <20250527144546.42981-1-kraxel@redhat.com>
- <20250527162151.GAaDXmn8O3f_HYgRju@fat_crate.local>
+	 Content-Type:Content-Disposition:In-Reply-To; b=m9Sv/yLhJbCvFuxCARs75HcJ4smRtmmtmSSDqiYIp3ApoF5qsox0IDZDwk14D17eZRBeqAW3ujNHmCPq8rYR8XYjvS4Atrh856Apesj66lmqpxyhqKYxbXiLhQmq1dBWYXgaBUflryVQjJgeIJ0Z77gOxKqsRYi+kDkpVHnfack=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LsgC/GyR; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=iafivI8V/MTAg4QPelROK6ZjF73rLhrtzNbr40jE06Q=; b=LsgC/GyR5rTERHl0o7UzTubCfZ
+	AJh7GZltqv7gxIf2314J6nKbqBoaTeQhbu6/bPN7yAzvTtCaqAH3Uq5SxT7OUamehRbcZCXpn7KBM
+	D2NwnVgTmQSEqrPC02BXOilRVb4cUMw5qz12MS4FDMZcOEVU85lACRniDOt4uzVFCsooqqwSmwAw4
+	dhxUoNrSvFoEvCsD5A+TCba/7u5qCsm7wBu2SCJio0AMODUc2ftmiQ5pA4uvrD1drrKLnfZzdVkP8
+	S47F5d+REC77oIN8pLOiENDsJVYxGk4In1LZXRTlkYbYFLDsSJoE+0qFMilT1q6u6/VthQckhRsIq
+	TiUi/m3A==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uKBT6-0000000DMJR-0nhG;
+	Wed, 28 May 2025 07:44:56 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 60707300472; Wed, 28 May 2025 09:44:52 +0200 (CEST)
+Date: Wed, 28 May 2025 09:44:52 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kys@microsoft.com,
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, pbonzini@redhat.com, ardb@kernel.org,
+	kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
+	gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-efi@vger.kernel.org, samitolvanen@google.com,
+	ojeda@kernel.org, xin@zytor.com
+Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
+ in __nocfi functions
+Message-ID: <20250528074452.GU39944@noisy.programming.kicks-ass.net>
+References: <20250501103038.GB4356@noisy.programming.kicks-ass.net>
+ <20250501153844.GD4356@noisy.programming.kicks-ass.net>
+ <aBO9uoLnxCSD0UwT@google.com>
+ <20250502084007.GS4198@noisy.programming.kicks-ass.net>
+ <aBUiwLV4ZY2HdRbz@google.com>
+ <20250503095023.GE4198@noisy.programming.kicks-ass.net>
+ <p6mkebfvhxvtqyz6mtohm2ko3nqe2zdawkgbfi6h2rfv2gxbuz@ktixvjaj44en>
+ <20250506073100.GG4198@noisy.programming.kicks-ass.net>
+ <20250506133234.GH4356@noisy.programming.kicks-ass.net>
+ <vukrlmb4kbpcol6rtest3tsw4y6obopbrwi5hcb5iwzogsopgt@sokysuzxvehi>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,46 +81,16 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250527162151.GAaDXmn8O3f_HYgRju@fat_crate.local>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <vukrlmb4kbpcol6rtest3tsw4y6obopbrwi5hcb5iwzogsopgt@sokysuzxvehi>
 
-On Tue, May 27, 2025 at 06:21:51PM +0200, Borislav Petkov wrote:
-> On Tue, May 27, 2025 at 04:45:44PM +0200, Gerd Hoffmann wrote:
-> > In case efi_mm is active go use the userspace instruction decoder which
-> > supports fetching instructions from active_mm.  This is needed to make
-> > instruction emulation work for EFI runtime code, so it can use cpuid
-> > and rdmsr.
-> > 
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> > ---
-> >  arch/x86/coco/sev/core.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> Can you pls explain what the use cases for this and your next patch are?
+On Tue, May 06, 2025 at 12:18:49PM -0700, Josh Poimboeuf wrote:
 
-Use case is coconut-svsm providing an uefi variable store and edk2
-runtime code doing svsm protocol calls to send requests to the svsm
-variable store.  edk2 needs a caa page mapping and a working rdmsr
-instruction for that.
+> Weird, I'm not seeing that.
 
-Another less critical but useful case is edk2 debug logging to qemu
-debugcon port.  That needs a working cpuid instruction because edk2
-uses that to figure whenever sev is active and adapt ioport access
-accordingly.
+I Ate'nt Crazeh...
 
-> We'd like to add them to our test pile.
+https://lore.kernel.org/all/202505280410.2qfTQCRt-lkp@intel.com/T/#u
 
-That is a bit difficult right now because there are a number of pieces
-which need to fall into place before this is easily testable.  You need:
-
- * host kernel with vmplanes patch series (for snp vmpl support).
- * coconut svsm with uefi variable store patches.
- * edk2 patches so it talks to svsm for variable access.
- * igvm support patches for qemu.
-
-Hope I didn't forgot something ...
-
-take care,
-  Gerd
-
+I'll go poke at it, see if today is the day I can figure out WTF
+happens.
 
