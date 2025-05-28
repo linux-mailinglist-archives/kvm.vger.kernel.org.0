@@ -1,75 +1,75 @@
-Return-Path: <kvm+bounces-47876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47877-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00DD6AC6836
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 13:14:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E11CAC6881
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 13:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B593B17E92D
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 11:14:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19AC3188436F
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 11:42:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E8F27AC59;
-	Wed, 28 May 2025 11:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31202283C90;
+	Wed, 28 May 2025 11:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VKZjC7P7"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sN5EW3IL"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46D82798EB;
-	Wed, 28 May 2025 11:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C93F6A33B;
+	Wed, 28 May 2025 11:41:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748430836; cv=none; b=e2Ii3hBei75OjInuFIfKRuoQljLOw5GWHqxGyYp9hPQZou0fTwtzDHoPWPTyBaJaVP+tlOpmddYfB6ubYXbpyrvf8SIompp890ry49JldZEBt0CGIXAK7MIIj+W9tDgtZvbhBGUt/ExX1E4f6ID4pdgcy9rnmu5aIjVeLbbP++k=
+	t=1748432501; cv=none; b=REoaOSSfeNzzCdmE/KY7auXMCPd5xN5R8ZqAN8epIJzklqRJx3N3Iu5Z3AUyvdCarUNwzdje7IJukMhTEx7DL+RNBRBPFseHs6jG+V1JgC1aC/8/9KF12eJ6oWldMzXsXlddcnfsCLkVjrnIxLTMKAU2FV7dPrGqr8HUAZSIdvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748430836; c=relaxed/simple;
-	bh=q4pDeqvmknk6BUyvDqV/gDKkrIjPTaEHjTTd/qByT+4=;
+	s=arc-20240116; t=1748432501; c=relaxed/simple;
+	bh=jfVipnFX8c+CXKIXIAfOUvdKSEC5JiBHwcVxFEtgUxw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VK0IJKAkC1PqksSbT43EoaAO2mgPwPasqPUDA6t/cDKW1rOBIeWkxRdktPQmqLzRNSy9/rAAKhF7lq7bY8ZKvyXQfplBye+MIF0dU3DeAmL7ZNN+oHlQc39cmBNcYgpudSM70pkE1BoGdm1FZlxd7xyoO3V7fMbu3hTW/4E4GUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VKZjC7P7; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=ov6gPi0veK1J2VvlDkKVgPIP4KZ30bwV6oR6Bet0utYdGFHXfav6gRt4+Wzl9iH63eCoOliQsjyDTJ8xNU702TcRfGcjjS5Is6KMRKwdKDKBxEzvcBumkwDXWRBR4jtULko0TRCswjLVxl5cojOeeNorItfhcjtAPpDh0GE9+C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sN5EW3IL; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54S8el6u003502;
-	Wed, 28 May 2025 11:13:51 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54S8f3iG003702;
+	Wed, 28 May 2025 11:41:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=1Lx/4C
-	jKYtiNRDZNQd3z50mB61o1eTDgqgasjndZiW8=; b=VKZjC7P7Bf8C3lgDWaz7vK
-	Acr1Ehg7oy3VnpnIDCJjteh7IH5YISywCAKysRcZ4DtV5KUTA9DehpfOaTartEU9
-	KwpblqwaYZ+kd+Zrlwe+CDkzRtsGm6187+GGBBqKAGk5OtF6ilryHPC7lx2UzUCZ
-	GqPCjiuHLdCLA7kd34YbZ4u2uwkjxAdCTSxVf4Lvso2ErblJizMSkQBPbRTSolgT
-	sUG3PPO7MiqLqeTNtUEha+FEfO5n3n7niQmcIYmk3DZjC4E7z6oRPRavr5Iff+Nq
-	Cvog5NlubVk+3R9/6c3boJ71ATT/pQhFTpNZtP5yTpvmkJ/QLBpSvVFYLv75mQWQ
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ToOHKu
+	yEJOxIMByz7C7sQFI0iWmp+FFoh1aU9Y1+yRk=; b=sN5EW3ILA6g0oukm92IWuE
+	Zd3MbV/q5HF7YLjgoMXdEoJRY5stRvLelrURjmLhkr/e55YmAmPGzPd8jSDQ0OYP
+	3Rf9XkE8Umv3T2EKT5DEHClSbgp5QciuDby3/vR4chtadETKtELOInYSN9Vi00bO
+	SXjEWy3JgddJ2rmDoRWPz+clIp0YzwjLuZOzACwZBj0JXz+bHYZK39EGLoXsinHt
+	cum0oood6dNgUVs2caI6fxjzgPZdmyM9L07SoQrRCs9P6fZFbzX4ImBCjYxH7af+
+	DejoW39yM/m+r0QjArvYFwDDx/FwYM1CjTEyDOXtWjPB9DaJxoHSlklUHXkRHr4g
 	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46wy690p9d-1
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46wy690std-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 May 2025 11:13:51 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54SAsLNY028941;
-	Wed, 28 May 2025 11:13:50 GMT
+	Wed, 28 May 2025 11:41:37 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54SB6G6A021310;
+	Wed, 28 May 2025 11:41:36 GMT
 Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46usepy7g8-1
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 46utnmq30q-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 May 2025 11:13:50 +0000
+	Wed, 28 May 2025 11:41:36 +0000
 Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54SBDkkZ55509304
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54SBfWtW48038172
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 28 May 2025 11:13:46 GMT
+	Wed, 28 May 2025 11:41:32 GMT
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7B1BD20043;
-	Wed, 28 May 2025 11:13:46 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 81B2720043;
+	Wed, 28 May 2025 11:41:32 +0000 (GMT)
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1F47420040;
-	Wed, 28 May 2025 11:13:46 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id BF43720040;
+	Wed, 28 May 2025 11:41:31 +0000 (GMT)
 Received: from [9.87.152.254] (unknown [9.87.152.254])
 	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 28 May 2025 11:13:46 +0000 (GMT)
-Message-ID: <2706494c-a033-4956-bf72-d9acf3b6d89b@linux.ibm.com>
-Date: Wed, 28 May 2025 13:13:45 +0200
+	Wed, 28 May 2025 11:41:31 +0000 (GMT)
+Message-ID: <3ad77cfa-ab86-4bd0-92f8-04ef484dc3ac@linux.ibm.com>
+Date: Wed, 28 May 2025 13:41:31 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,14 +77,14 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 1/2] s390x: diag10: Fence tcg and pv
- environments
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, nrb@linux.ibm.com
-References: <20250528091412.19483-1-frankja@linux.ibm.com>
- <20250528091412.19483-2-frankja@linux.ibm.com>
- <20250528114102.569905dd@p-imbrenda>
+Subject: Re: [PATCH v5 3/4] KVM: s390: Refactor and split some gmap helpers
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        seiden@linux.ibm.com, nsg@linux.ibm.com, nrb@linux.ibm.com,
+        david@redhat.com, hca@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, gor@linux.ibm.com, schlameuss@linux.ibm.com
+References: <20250528095502.226213-1-imbrenda@linux.ibm.com>
+ <20250528095502.226213-4-imbrenda@linux.ibm.com>
 Content-Language: en-US
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
@@ -129,16 +129,16 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20250528114102.569905dd@p-imbrenda>
+In-Reply-To: <20250528095502.226213-4-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=UP3dHDfy c=1 sm=1 tr=0 ts=6836efef cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=bWdG-pU3ksr55fOdNFsA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: gF05PaDXzrlMg6k03s1beb7sV2P9D8Oo
-X-Proofpoint-ORIG-GUID: gF05PaDXzrlMg6k03s1beb7sV2P9D8Oo
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI4MDA5NyBTYWx0ZWRfX4pUc7FEW1/0G zmMhwrQK1D5D1bgzRRuxI31XVfIqqK4T+pnz7MSwSKYLcBASBHblvvCx8imvj4JGQ+2r3d+KtjK WXAXd2HibQYA14cZMUws0/lh3ueHHXDFQRqOtpsWqrfpmEzXOQ4QI9ONRjspX/jRs8YtAVOvrOD
- GMjSDA05Q3LGhYf80vLHbocpbE1mndDfrwVPXD8AeZ+hYP6OrRkKOfHVoC+THiyLA9yEukcrT1g IGXWz5jhy1cx+Kcz7R/SNy29+PsILdAWMg9o/WkXjqsyP/xfFbmLrZ9pBVHmjhCzCeCpeRltehR AiKfggWVQVrNQpTarE/6spCUGMV7cv9P5HK0m8wx1avX+FczYUoADALKCkqZ6lIdn5Q78jjbRsF
- 4xrwt+LBig6qyL+WycxSBWWs+E/NDP3Zyt0w0OUT5e+ls259Wn61aEMk9r3BIYM0vml7HzaQ
+X-Authority-Analysis: v=2.4 cv=UP3dHDfy c=1 sm=1 tr=0 ts=6836f671 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=fDxGR4FE8qlWS1JHXvMA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: -rS7SLqujL_3Nxu3YGodEo-SUuLEUo8K
+X-Proofpoint-ORIG-GUID: -rS7SLqujL_3Nxu3YGodEo-SUuLEUo8K
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI4MDEwMSBTYWx0ZWRfXw2SxJPiHt+jd k9F3caGAVkPww9eE0BOAacdRCBqGRnKifLi9iVHi3158L5rQPlFz0H4pIPzsDzOK0a50H4wPWLp SsqGGyoaapwbOAnUo71CplkHhARk7zEgFJJfOOpd5XMwrz4XhZoRj79Th21Op4sE6aPhSa2uojm
+ c1Q5AExF9VlKtuHDAfnpNk1ZEVf6s7bLDZMpEnx05Hn7MObRHE6iuQIoTyr9mOXMxIdJyswWtXp 08sfu1RWN1IU3tUd+1YsNpmc42z8sAyLCP4G02yWghu95bEagKKyHJAGmJMhz4e1MXyM+zAV9iL taDHAynw1+QcuZ0agHVAqRS3ldViZMhwDcsSIrIyw0HW8t+JaflhQbjLWNfq2UzK2kNB/xsKJ3T
+ er3Ef97HkBTczNQsYZ+qx0IoD7nbohEDkyWsBDVHsITYSkh453LOH3Cb9zHYzTgwBBtW3+a0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-05-28_05,2025-05-27_01,2025-03-28_01
@@ -147,37 +147,59 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultsc
  mlxlogscore=999 clxscore=1015 priorityscore=1501 bulkscore=0 phishscore=0
  spamscore=0 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505280097
+ definitions=main-2505280101
 
-On 5/28/25 11:41 AM, Claudio Imbrenda wrote:
-> On Wed, 28 May 2025 09:13:49 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
+On 5/28/25 11:55 AM, Claudio Imbrenda wrote:
+> Refactor some gmap functions; move the implementation into a separate
+> file with only helper functions. The new helper functions work on vm
+> addresses, leaving all gmap logic in the gmap functions, which mostly
+> become just wrappers.
 > 
->> Diag10 isn't supported under either of these environments so let's
->> make sure that the test bails out accordingly.
+> The whole gmap handling is going to be moved inside KVM soon, but the
+> helper functions need to touch core mm functions, and thus need to
+> stay in the core of kernel.
 > 
-> does KVM always implement diag10?
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+> Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> ---
 
-It was introduced October of 2011 and there's no way of disabling it 
-that I can see.
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
+>   MAINTAINERS                          |   2 +
+>   arch/s390/include/asm/gmap.h         |   2 -
+>   arch/s390/include/asm/gmap_helpers.h |  15 ++
+>   arch/s390/kvm/diag.c                 |  30 +++-
+>   arch/s390/kvm/kvm-s390.c             |   5 +-
+>   arch/s390/mm/Makefile                |   2 +
+>   arch/s390/mm/gmap.c                  | 184 +---------------------
+>   arch/s390/mm/gmap_helpers.c          | 221 +++++++++++++++++++++++++++
+>   8 files changed, 274 insertions(+), 187 deletions(-)
+>   create mode 100644 arch/s390/include/asm/gmap_helpers.h
+>   create mode 100644 arch/s390/mm/gmap_helpers.c
 > 
-> is there no other way to check whether diag10 is available?
 
-The z/VM CP programming services doesn't specify a feature bit or any 
-other way to check as far as I can see.
+[...]
 
-> 
-> we could, for example, try to run it "correctly" and see whether we get
-> a Specification exception, and then fence.
+> +#endif /* _ASM_S390_GMAP_HELPERS_H */
+> diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
+> index 74f73141f9b9..53233dec8cad 100644
+> --- a/arch/s390/kvm/diag.c
+> +++ b/arch/s390/kvm/diag.c
+> @@ -11,12 +11,30 @@
+>   #include <linux/kvm.h>
+>   #include <linux/kvm_host.h>
+>   #include <asm/gmap.h>
+> +#include <asm/gmap_helpers.h>
+>   #include <asm/virtio-ccw.h>
+>   #include "kvm-s390.h"
+>   #include "trace.h"
+>   #include "trace-s390.h"
+>   #include "gaccess.h"
+>   
+> +static void do_discard_gfn_range(struct kvm_vcpu *vcpu, gfn_t gfn_start, gfn_t gfn_end)
+> +{
 
-We could move the content test to the top and bail out if there's a 
-spec. That would allow us to handle the addition of diag10 support for 
-TCG without a test change.
+A helper function for your helper function :)
 
-But:
-How likely is it that we want to implement diag10 in TCG?
-My guess is that adding it to PV is even less likely.
-Not running them under PV and TCG gives us back some CI time although 
-it's likely minuscule.
 
