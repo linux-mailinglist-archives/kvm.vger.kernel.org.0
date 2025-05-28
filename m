@@ -1,129 +1,347 @@
-Return-Path: <kvm+bounces-47901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7A92AC6E19
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 18:36:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8E2CAC6E24
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 18:39:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4DE31C002E2
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 16:36:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A8721BC312D
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 16:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072B928CF7F;
-	Wed, 28 May 2025 16:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D7328D8FF;
+	Wed, 28 May 2025 16:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CI3whra/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EaCfKUID"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671EB79FE;
-	Wed, 28 May 2025 16:36:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F1C286880
+	for <kvm@vger.kernel.org>; Wed, 28 May 2025 16:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748450168; cv=none; b=k42Fw8lyOAPeneoy+uUnfXgUvCJZ1zwE5ER88629KVGwx7nCA3dypsHYpSv+km+Ow6xYm1quKiIylhVrE9zmddkqvQJ5Y7WYF09+1pQUTMDrICQVjEsn76XBMj2s2RLc0fF5w/aXEDHEqqavdjjHlfFPV3FuHdnZKpbJH5nB70s=
+	t=1748450380; cv=none; b=ofDqOLz7WwXLszSs/lkzt2o/Sba9sybpamN4wu6PfIGB9ZsKxlEkKT4FFa8tiD2rI1iGJWkkvk/V71ubXIEGlJIIhlhitDMCMsYXRnrxgMLRJkgWAp3dJJszSga3nA7Si6bgklQ+lD1NtKXFoHcEeMmUHk0QNnQwFrR6C3mcqI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748450168; c=relaxed/simple;
-	bh=8tkCt7P4+2Itg5B4iyjr2bnz0MD5gJmHFsKamVWzmY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LKGtkAy+7jrPN5LT+oRVwjTsPanUVKfUP8WhOfcfcV1+ro1OCiTumsAxRUQNt1t1UuyzihovvLVHSWxudab3vYYj3TAdzS0WietNsQeWT7aG2RagfdBk7gefmEjsFlmjVIroYHG/vFpMCLL+ZzhbtyCbHKkEeRuMzmpC9zpI2gU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CI3whra/; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=568UXfg09DhGtkTDBYV5iMDI+b3lSxDAU/RR+HqOCYA=; b=CI3whra/FNKgPC6/MrrW3/7oAv
-	gJ5A/lFJJfDNjjvOWVxWPYcIaNKO5GhQHKgKeQBfWXQ5KsbRarMDrQ+JT3DIIXQ2qkBV1LtduiLLO
-	WHtwhFJlmkqQ1lexDv8Sw2MAzPE9g4AlHH3iaSQEuIRMd2BLFruRjyBtdpwUjQlQEPbisK3s2IO4S
-	ktBd+DGQuegeItaFJsTX+0XvLscXM7mt1HEashHGAGbUHkx4nIVJPzYzcSj5bVnJpMYfDqlE2ZSAb
-	426Hsd8fujIAwPu2cXH1c210B8lEDyUDFp4VIzVaxWbIgO/xhBKefAc/BYjqYzcMZZRYb+b8b52DV
-	6rqvJ3tg==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uKJl0-0000000Dr3Y-1soE;
-	Wed, 28 May 2025 16:35:58 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 05D793005AF; Wed, 28 May 2025 18:35:58 +0200 (CEST)
-Date: Wed, 28 May 2025 18:35:57 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kys@microsoft.com,
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, pbonzini@redhat.com, ardb@kernel.org,
-	kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-efi@vger.kernel.org, samitolvanen@google.com,
-	ojeda@kernel.org, xin@zytor.com
-Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
- in __nocfi functions
-Message-ID: <20250528163557.GI31726@noisy.programming.kicks-ass.net>
-References: <aBO9uoLnxCSD0UwT@google.com>
- <20250502084007.GS4198@noisy.programming.kicks-ass.net>
- <aBUiwLV4ZY2HdRbz@google.com>
- <20250503095023.GE4198@noisy.programming.kicks-ass.net>
- <p6mkebfvhxvtqyz6mtohm2ko3nqe2zdawkgbfi6h2rfv2gxbuz@ktixvjaj44en>
- <20250506073100.GG4198@noisy.programming.kicks-ass.net>
- <20250506133234.GH4356@noisy.programming.kicks-ass.net>
- <vukrlmb4kbpcol6rtest3tsw4y6obopbrwi5hcb5iwzogsopgt@sokysuzxvehi>
- <20250528074452.GU39944@noisy.programming.kicks-ass.net>
- <20250528163035.GH31726@noisy.programming.kicks-ass.net>
+	s=arc-20240116; t=1748450380; c=relaxed/simple;
+	bh=9ZFIKNoaGAoZluGUowCky6Ngnpz41IO5N/0CSvVPfsU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZSo4lvx440EblPFzuErfdZFu6/pRVqzRpYD99635KL0GY5r6fQimFymrQl+E757gBZbcw142rH7o79AkYtGJTLQlEY7zdygqHBroqi1E06VP5LwOWTSr2pYTWo8Yd4GzU2VA1bHB7PID73xlmPJZDtCZK+5a/1NYjTVH7nTkvmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EaCfKUID; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-234906c5e29so446315ad.0
+        for <kvm@vger.kernel.org>; Wed, 28 May 2025 09:39:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748450377; x=1749055177; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ug/rSTqNkaK2DiSNfaEAiTgoamlZ5in/WoXI2qFgjt4=;
+        b=EaCfKUIDMqq78MjqgxE6vs6E9C91Gx7CFpQCpGpiESrnK4wBxmJOVtUbyE1cTU1C8Z
+         nBKetPvfOsnUXH+LhEcbIUaSY/e9Fd7kkQ9XeRnU+q9x9GmirTjjLz4ja6hsf3iunBpW
+         uzhY1k27QVWNZnG0kyNMuI3tK8ZnnTAtgYKvih61T96IJKIGVoB/L3lqq/PNL8MekqvI
+         9+cf1eIGnBJKX0NCeSv7vBGDPwhy/w5N7N3GxIHRJSC9/enQKMP/9HHCcXY1RwthE2Gc
+         VdGUfEuvc0+rj/Uqhea/h1ytjdiJ6amJveLUzs5c5EURcHd0MQwHDyFLgAqURyn4Uc9U
+         x5mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748450377; x=1749055177;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ug/rSTqNkaK2DiSNfaEAiTgoamlZ5in/WoXI2qFgjt4=;
+        b=CrEPxo2x+39LOM1IAvX617g7WlPgX7876ObIGQhJH0SlqkcLoI+/wpErjVaPaohC0X
+         p3MZJo6no5KkZQBttkq+bPYw1k4kMcz1OVW5ip+kZH0TSeyCNxGsGfA7lA0eBlQoB501
+         eoiLQljHtK9ldjrdiBTefOHggkgyT403p43y0SivY323vppza+YRfrcbA9JciYdHnLT2
+         a+pnZYhaZRM1w53fvNBcjg1OUE+XLjDNZU/Sdh1Razvw08WgxgFGdY25JCyFWAbFoaYa
+         Y5xlcgInmaLhwa6Yobr2uYot2Tj7hy11T03I3xcpVbFNFm12u9IxOQCNpvIRkMhIo9/z
+         r57Q==
+X-Gm-Message-State: AOJu0Yyflvb3DdCo41/BdpvPS0bjjLeQXMKaBEPvgAOwMVOT+SDsQUs1
+	rxLCrUUsct69Rko38CbmxVhpS12hLvEnVoiGN1LohNLCrocJLSKNYEZGHETLqKzsOCazI7ypuNE
+	362DBDcVPRb1Cspoho4NVEy5xmA==
+X-Google-Smtp-Source: AGHT+IFNpKZD9lN4cOQmrQeE/v6mJ+Aez5Zu8/h2NScD8jBwFV5IrxK/YzUb/E+mnOr3jMtt3fLdteDpb1Js1lKinQ==
+X-Received: from plhs4.prod.google.com ([2002:a17:903:3204:b0:223:5693:a4e9])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:1a67:b0:234:d7b2:2ac2 with SMTP id d9443c01a7336-234d7b22c20mr46594455ad.22.1748450376728;
+ Wed, 28 May 2025 09:39:36 -0700 (PDT)
+Date: Wed, 28 May 2025 09:39:35 -0700
+In-Reply-To: <aDbswJwGRe5a4Lzf@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250528163035.GH31726@noisy.programming.kicks-ass.net>
+Mime-Version: 1.0
+References: <cover.1747264138.git.ackerleytng@google.com> <625bd9c98ad4fd49d7df678f0186129226f77d7d.1747264138.git.ackerleytng@google.com>
+ <aDbswJwGRe5a4Lzf@yzhao56-desk.sh.intel.com>
+Message-ID: <diqz34co8zaw.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v2 39/51] KVM: guest_memfd: Merge and truncate on fallocate(PUNCH_HOLE)
+From: Ackerley Tng <ackerleytng@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
+	zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, May 28, 2025 at 06:30:35PM +0200, Peter Zijlstra wrote:
-> On Wed, May 28, 2025 at 09:44:52AM +0200, Peter Zijlstra wrote:
-> > On Tue, May 06, 2025 at 12:18:49PM -0700, Josh Poimboeuf wrote:
-> > 
-> > > Weird, I'm not seeing that.
-> > 
-> > I Ate'nt Crazeh...
-> > 
-> > https://lore.kernel.org/all/202505280410.2qfTQCRt-lkp@intel.com/T/#u
-> > 
-> > I'll go poke at it, see if today is the day I can figure out WTF
-> > happens.
-> 
-> It manages to trip the CFI_UNDEFINED case in op->dest.reg == cfa->base
-> in update_cfi_state().
-> 
-> I figured it ought to tickle the regular 'mov %rbp, %rsp' case above
-> there, but it doesn't, for some reason it has cfa.base == SP at this
-> point.
-> 
-> This happens... /me looks in scrollback ... at POP_REGS 'pop
-> %rbp'. ARGH!!
-> 
-> 
-> So the sequence of fail is:
-> 
-> 	push %rbp
-> 	mov %rsp, %rbp	# cfa.base = BP
-> 
-> 	SAVE
-> 	...
-> 	push %rbp
-> 	...
-> 	pop %rbp	# cfa.base = SP
+Yan Zhao <yan.y.zhao@intel.com> writes:
 
-This is the POP !drap and dest==base case.
+> On Wed, May 14, 2025 at 04:42:18PM -0700, Ackerley Tng wrote:
+>> Merge and truncate on fallocate(PUNCH_HOLE), but if the file is being
+>> closed, defer merging to folio_put() callback.
+>> 
+>> Change-Id: Iae26987756e70c83f3b121edbc0ed0bc105eec0d
+>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+>> ---
+>>  virt/kvm/guest_memfd.c | 76 +++++++++++++++++++++++++++++++++++++-----
+>>  1 file changed, 68 insertions(+), 8 deletions(-)
+>> 
+>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> index cb426c1dfef8..04b1513c2998 100644
+>> --- a/virt/kvm/guest_memfd.c
+>> +++ b/virt/kvm/guest_memfd.c
+>> @@ -859,6 +859,35 @@ static int kvm_gmem_restructure_folios_in_range(struct inode *inode,
+>>  	return ret;
+>>  }
+>>  
+>> +static long kvm_gmem_merge_truncate_indices(struct inode *inode, pgoff_t index,
+>> +					   size_t nr_pages)
+>> +{
+>> +	struct folio *f;
+>> +	pgoff_t unused;
+>> +	long num_freed;
+>> +
+>> +	unmap_mapping_pages(inode->i_mapping, index, nr_pages, false);
+>> +
+>> +	if (!kvm_gmem_has_safe_refcount(inode->i_mapping, index, nr_pages, &unused))
 
-> 	...
-> 	mov %rbp, %rsp  # UNDEF
-> 	nop		# FAIL
-> 	RESTORE
-> 
-> Note that the MOV+NOP is the 4 bytes ERETS needs.
+Yan, thank you for your reviews!
+
+> Why is kvm_gmem_has_safe_refcount() checked here, but not in
+> kvm_gmem_zero_range() within kvm_gmem_truncate_inode_range() in patch 33?
+>
+
+The contract for guest_memfd with HugeTLB pages is that if holes are
+punched in any ranges less than a full huge page, no pages are removed
+from the filemap. Those ranges are only zeroed.
+
+In kvm_gmem_zero_range(), we never remove any folios, and so there is no
+need to merge. If there's no need to merge, then we don't need to check
+for a safe refcount, and can just proceed to zero.
+
+kvm_gmem_merge_truncate_indices() is only used during hole punching and
+not when the file is closed. Hole punch vs file closure is checked using
+mapping_exiting(inode->i_mapping).
+
+During a hole punch, we will only allow truncation if there are no
+unexpected refcounts on any subpages, hence this
+kvm_gmem_has_safe_refcount() check.
+
+>> +		return -EAGAIN;
+>> +
+>
+> Rather than merging the folios, could we simply call kvm_gmem_truncate_indices()
+> instead?
+>
+> num_freed = kvm_gmem_truncate_indices(inode->i_mapping, index, nr_pages);
+> return num_freed;
+>
+
+We could do this too, but then that would be deferring the huge page
+merging to the folio_put() callback and eventually the kernel worker
+thread.
+
+My goal here is to try to not to defer merging and freeing as much as
+possible so that most of the page/memory operations are
+synchronous, because synchronous operations are more predictable.
+
+As an example of improving predictability, in one of the selftests, I do
+a hole punch and then try to allocate again. Because the merging and
+freeing of the HugeTLB page sometimes takes too long, the allocation
+sometimes fails: the guest_memfd's subpool hadn't yet received the freed
+page back. With a synchronous truncation, the truncation may take
+longer, but the selftest predictably passes.
+
+>> +	f = filemap_get_folio(inode->i_mapping, index);
+>> +	if (IS_ERR(f))
+>> +		return 0;
+>> +
+>> +	/* Leave just filemap's refcounts on the folio. */
+>> +	folio_put(f);
+>> +
+>> +	WARN_ON(kvm_gmem_merge_folio_in_filemap(inode, f));
+>> +
+>> +	num_freed = folio_nr_pages(f);
+>> +	folio_lock(f);
+>> +	truncate_inode_folio(inode->i_mapping, f);
+>> +	folio_unlock(f);
+>> +
+>> +	return num_freed;
+>> +}
+>> +
+>>  #else
+>>  
+>>  static inline int kvm_gmem_try_split_folio_in_filemap(struct inode *inode,
+>> @@ -874,6 +903,12 @@ static int kvm_gmem_restructure_folios_in_range(struct inode *inode,
+>>  	return 0;
+>>  }
+>>  
+>> +static long kvm_gmem_merge_truncate_indices(struct inode *inode, pgoff_t index,
+>> +					   size_t nr_pages)
+>> +{
+>> +	return 0;
+>> +}
+>> +
+>>  #endif
+>>  
+>>  #else
+>> @@ -1182,8 +1217,10 @@ static long kvm_gmem_truncate_indices(struct address_space *mapping,
+>>   *
+>>   * Removes folios beginning @index for @nr_pages from filemap in @inode, updates
+>>   * inode metadata.
+>> + *
+>> + * Return: 0 on success and negative error otherwise.
+>>   */
+>> -static void kvm_gmem_truncate_inode_aligned_pages(struct inode *inode,
+>> +static long kvm_gmem_truncate_inode_aligned_pages(struct inode *inode,
+>>  						  pgoff_t index,
+>>  						  size_t nr_pages)
+>>  {
+>> @@ -1191,19 +1228,34 @@ static void kvm_gmem_truncate_inode_aligned_pages(struct inode *inode,
+>>  	long num_freed;
+>>  	pgoff_t idx;
+>>  	void *priv;
+>> +	long ret;
+>>  
+>>  	priv = kvm_gmem_allocator_private(inode);
+>>  	nr_per_huge_page = kvm_gmem_allocator_ops(inode)->nr_pages_in_folio(priv);
+>>  
+>> +	ret = 0;
+>>  	num_freed = 0;
+>>  	for (idx = index; idx < index + nr_pages; idx += nr_per_huge_page) {
+>> -		num_freed += kvm_gmem_truncate_indices(
+>> -			inode->i_mapping, idx, nr_per_huge_page);
+>> +		if (mapping_exiting(inode->i_mapping) ||
+>> +		    !kvm_gmem_has_some_shared(inode, idx, nr_per_huge_page)) {
+>> +			num_freed += kvm_gmem_truncate_indices(
+>> +				inode->i_mapping, idx, nr_per_huge_page);
+>> +		} else {
+>> +			ret = kvm_gmem_merge_truncate_indices(inode, idx,
+>> +							      nr_per_huge_page);
+>> +			if (ret < 0)
+>> +				break;
+>> +
+>> +			num_freed += ret;
+>> +			ret = 0;
+>> +		}
+>>  	}
+>>  
+>>  	spin_lock(&inode->i_lock);
+>>  	inode->i_blocks -= (num_freed << PAGE_SHIFT) / 512;
+>>  	spin_unlock(&inode->i_lock);
+>> +
+>> +	return ret;
+>>  }
+>>  
+>>  /**
+>> @@ -1252,8 +1304,10 @@ static void kvm_gmem_zero_range(struct address_space *mapping,
+>>   *
+>>   * Removes full (huge)pages from the filemap and zeroing incomplete
+>>   * (huge)pages. The pages in the range may be split.
+>> + *
+>> + * Return: 0 on success and negative error otherwise.
+>>   */
+>> -static void kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
+>> +static long kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
+>>  					  loff_t lend)
+>>  {
+>>  	pgoff_t full_hpage_start;
+>> @@ -1263,6 +1317,7 @@ static void kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
+>>  	pgoff_t start;
+>>  	pgoff_t end;
+>>  	void *priv;
+>> +	long ret;
+>>  
+>>  	priv = kvm_gmem_allocator_private(inode);
+>>  	nr_per_huge_page = kvm_gmem_allocator_ops(inode)->nr_pages_in_folio(priv);
+>> @@ -1279,10 +1334,11 @@ static void kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
+>>  		kvm_gmem_zero_range(inode->i_mapping, start, zero_end);
+>>  	}
+>>  
+>> +	ret = 0;
+>>  	if (full_hpage_end > full_hpage_start) {
+>>  		nr_pages = full_hpage_end - full_hpage_start;
+>> -		kvm_gmem_truncate_inode_aligned_pages(inode, full_hpage_start,
+>> -						      nr_pages);
+>> +		ret = kvm_gmem_truncate_inode_aligned_pages(
+>> +			inode, full_hpage_start, nr_pages);
+>>  	}
+>>  
+>>  	if (end > full_hpage_end && end > full_hpage_start) {
+>> @@ -1290,6 +1346,8 @@ static void kvm_gmem_truncate_inode_range(struct inode *inode, loff_t lstart,
+>>  
+>>  		kvm_gmem_zero_range(inode->i_mapping, zero_start, end);
+>>  	}
+>> +
+>> +	return ret;
+>>  }
+>>  
+>>  static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
+>> @@ -1298,6 +1356,7 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
+>>  	pgoff_t start = offset >> PAGE_SHIFT;
+>>  	pgoff_t end = (offset + len) >> PAGE_SHIFT;
+>>  	struct kvm_gmem *gmem;
+>> +	long ret;
+>>  
+>>  	/*
+>>  	 * Bindings must be stable across invalidation to ensure the start+end
+>> @@ -1308,8 +1367,9 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
+>>  	list_for_each_entry(gmem, gmem_list, entry)
+>>  		kvm_gmem_invalidate_begin_and_zap(gmem, start, end);
+>>  
+>> +	ret = 0;
+>>  	if (kvm_gmem_has_custom_allocator(inode)) {
+>> -		kvm_gmem_truncate_inode_range(inode, offset, offset + len);
+>> +		ret = kvm_gmem_truncate_inode_range(inode, offset, offset + len);
+>>  	} else {
+>>  		/* Page size is PAGE_SIZE, so use optimized truncation function. */
+>>  		truncate_inode_pages_range(inode->i_mapping, offset, offset + len - 1);
+>> @@ -1320,7 +1380,7 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
+>>  
+>>  	filemap_invalidate_unlock(inode->i_mapping);
+>>  
+>> -	return 0;
+>> +	return ret;
+>>  }
+>>  
+>>  static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
+>> -- 
+>> 2.49.0.1045.g170613ef41-goog
+>> 
 
