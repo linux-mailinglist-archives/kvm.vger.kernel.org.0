@@ -1,197 +1,176 @@
-Return-Path: <kvm+bounces-47905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDE4DAC70E3
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 20:25:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8581FAC7175
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 21:22:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76AC31C0131A
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 18:26:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27291189190F
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 19:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B272A217F35;
-	Wed, 28 May 2025 18:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA4721CC4E;
+	Wed, 28 May 2025 19:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gSb6Q8lw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y/V3rbzm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1863B28E573
-	for <kvm@vger.kernel.org>; Wed, 28 May 2025 18:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3065421CC41
+	for <kvm@vger.kernel.org>; Wed, 28 May 2025 19:22:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748456739; cv=none; b=JruIAv0AtBDqLyLS0gpf3uOkRmCJuoqbIC2I1VrQGPGLCBMS52MUJFhrdkX+fPGwMAS/T7ynam7slZFJgSfE56rfaZoCzCXqhW9oIn1MwgywghOlSk3noCclv3pgZ45ntzbuTBd8R6SpVyv6zk7t0n/3UpfKle8647uqdaHBOM8=
+	t=1748460132; cv=none; b=QzGSabAWfjBkRnQIlIBjMED5r64WYvE3j7+htBoVDg2qZ/1jEp4xubiWXDMmVgiumPFTuHYiIDtaA/7l72wtIdhgMJViIBrxf6cC8r3rAp/EOQAc75x23a/lhxdnhfV+biL7R8po1FufZ+mKikxEEPlHMwDOv+e+Sty1c7pwOdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748456739; c=relaxed/simple;
-	bh=TrwTeeb3eSq6peBGpyS2fjLOHTgsDFfooNNEDI35gec=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RN3RZG7+piJM5dG9wN0A+YgJ40OdSAVwjb4ssqW9x/XGuucu7unssZi13l+OhJiqtcVcIywkWsWkrvVeMMMOtU1HsqX9bafoR19/Jn/daJRO7VrVPjJ0XHbGB87HqHL0b0ghWs/cw5Pg5lQ27q9roZz9uOUGr5HAiAiNvIru7jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gSb6Q8lw; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b0db0b6a677so121328a12.2
-        for <kvm@vger.kernel.org>; Wed, 28 May 2025 11:25:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748456737; x=1749061537; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lVVqFr1BE8q6eml8zA1z0lK7aGNcSUfClXnZn98OgHk=;
-        b=gSb6Q8lw7pXUBBIqXjElAS7OXbzu82FDWVRV3vh6FJWCWMqO45j0aiu9z7xaVFKrPr
-         K9mfYHPbGDYrShdyVXl2hTdJQIw5THDggbaiK8U1FREaSToTACTR4Swjbps8QxZgW854
-         cO/+7Q2Cevo+4StQO+zeeSq6RuILwl7zKGk3DBm7ng4mwaSGOf14GX6vvjzfPo+NiJ7w
-         qgxL253czsdTsjp6p36f13uW0ojgCeGPSwztettCeRJSPzT97SWTp++FwuL6CAyS9zyV
-         7Py6Y09VAIQpiNsze0f8IS7B1D+JR76kAbe6GE6CiTMlZq4gLCqqHhObh9pqjwamfjXW
-         Svag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748456737; x=1749061537;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lVVqFr1BE8q6eml8zA1z0lK7aGNcSUfClXnZn98OgHk=;
-        b=Z8rKQjctSyrnZxSnPFoo/G173q0aj0gWomTnKDsZfmrJrnnWNkrhNankBOGV2ZZwGQ
-         oq5CsIjuPnP88mY3sUz5/vVIN3YZK1bZS6SxRDzj55+LSMnLjfgutkk8Ex5TCGPelg+i
-         O2THXYQ/JmSEQPm9ItJ0AyVKD6XghAv41KtdAhylw/VX7INt1V8YVAdTnph/XiEvl9OL
-         OZQ5kSeyKrgvOrvk/Ey1qpN5UuLKzwoXwidhS/Npyeu0drGcMdCrqN0HK0J8VkbI0jZg
-         ROPQiU0RDVbsjU0c75/385W5Y9+vr8j4I+rAL5p5YraB22wjBQmZdZMr0MlTwKQCZzFw
-         +t2A==
-X-Gm-Message-State: AOJu0YzarBvIlxiR/zrEfiTfqHqNueTcJhTQ67FyGbzpRPT0x1jthxMV
-	vnFRWcDaKDYnlBFuqn1VXf4JuJrNWqIfeXYZ6FbKyRkE1sz9w9naSji8hnbUo1ljgOlPoGsSB3l
-	rolnBNmevblCVKoz3Pfml6+n82GZT7PPhyj3gZ+lY
-X-Gm-Gg: ASbGncvEFuTsp0BvCeuGWIwK63P8vvhnm/k/6XJCmFlkB3EPQkphKkH8xGgYkTfM/4V
-	hqYGubEiMnlllyD/rMGjOtwuV4WzMRExWdZsrHgz88yry/HW0yTtwqVQr2Rl3Y1AbUDCOgHfM5n
-	K/rEPYKhPZLPRtrNfDCOhyHyq03CleZFvuY1Ty56etoLibIWiAXv7v1qCWIBAAdU6cDGuJqgf1N
-	A==
-X-Google-Smtp-Source: AGHT+IFijwOh+awYdgO4HAk/X8m/A4OWZUBHS7nOP52Vw8xKVE09sTMEC6FE21p5hEzwxtb4ty4X3loZKiHFU1jBNbA=
-X-Received: by 2002:a17:90b:3852:b0:30e:8c5d:8ed with SMTP id
- 98e67ed59e1d1-3110f31a4fbmr26532549a91.19.1748456737021; Wed, 28 May 2025
- 11:25:37 -0700 (PDT)
+	s=arc-20240116; t=1748460132; c=relaxed/simple;
+	bh=sXTnlvs0SF+o+xjwS3jb0zB0h8XaidUlvbp38Pk9CE8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t2e+H61KvJ1nen8qsRsb5kSYzwTNS6o/x0VMC1/GtiMFLjp0kVfr0voTCqAEd+nRwWUJ0R7Sz/y5p//YyoRtKz0deFeho4ZcyqKakGt8/M+BI6FpP065kZQ/e4CjT7mNyiUmb2frYMvzMVbtA4I/pKZfayWAd/qDUYS3SoDcX4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y/V3rbzm; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <1169138f-8445-4522-94dd-ad008524c600@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748460126;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pRNcAmNAMd2i0MLLlt89PMZctaigyBtb9U8DRb8tnes=;
+	b=Y/V3rbzm4Kc9GHC/hoAkMCQsFBHVy3OclJnu3ppfO3zfqqimuwUCgdJDcjwGNfNBwuNpWz
+	mx5ipTPzaOOv3koMm64vnvxqPbJZMLGE6Iqei5daLPV+lF6nEEDkb4csAQLWtHVygsBTqF
+	LzCBgfPjzjVxe8TaWjbdhnXsx4THqaI=
+Date: Wed, 28 May 2025 12:21:59 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515220400.1096945-1-dionnaglaze@google.com>
- <20250515220400.1096945-2-dionnaglaze@google.com> <aCZtdN0LhkRqm1Vn@google.com>
- <CAAH4kHai8JStj+=HUiPVxbH9P79GorviG2GykEP7jQ=NB2MbUQ@mail.gmail.com> <aC4ZJyRPpX6eLKsC@google.com>
-In-Reply-To: <aC4ZJyRPpX6eLKsC@google.com>
-From: Dionna Amalie Glaze <dionnaglaze@google.com>
-Date: Wed, 28 May 2025 11:25:23 -0700
-X-Gm-Features: AX0GCFte05v61MvXwGYneIeTEvRS5b_Es3A7BflZae2g4_6rbG1Vveaf5-F60xY
-Message-ID: <CAAH4kHZkuD4UsXRGED6qecfAkeFpd8sLc+0osDhnKP4T5VmSYQ@mail.gmail.com>
-Subject: Re: [PATCH v5 1/2] kvm: sev: Add SEV-SNP guest request throttling
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, Thomas Lendacky <Thomas.Lendacky@amd.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <jroedel@suse.de>, Peter Gonda <pgonda@google.com>, 
-	Borislav Petkov <bp@alien8.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3 9/9] RISC-V: KVM: Upgrade the supported SBI version to
+ 3.0
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>,
+ Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Mayuresh Chitale <mchitale@ventanamicro.com>,
+ linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org,
+ linux-riscv <linux-riscv-bounces@lists.infradead.org>
+References: <20250522-pmu_event_info-v3-0-f7bba7fd9cfe@rivosinc.com>
+ <20250522-pmu_event_info-v3-9-f7bba7fd9cfe@rivosinc.com>
+ <DA3KSSN3MJW5.2CM40VEWBWDHQ@ventanamicro.com>
+ <61627296-6f94-45ea-9410-ed0ea2251870@linux.dev>
+ <DA5YWWPPVCQW.22VHONAQHOCHE@ventanamicro.com>
+ <20250526-224478e15ee50987124a47ac@orel>
+ <ace8be22-3dba-41b0-81f0-bf6d661b4343@linux.dev>
+ <20250528-ff9f6120de39c3e4eefc5365@orel>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Atish Patra <atish.patra@linux.dev>
+In-Reply-To: <20250528-ff9f6120de39c3e4eefc5365@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, May 21, 2025 at 11:19=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Fri, May 16, 2025, Dionna Amalie Glaze wrote:
-> > > > @@ -4015,6 +4042,12 @@ static int snp_handle_guest_req(struct vcpu_=
-svm *svm, gpa_t req_gpa, gpa_t resp_
-> > > >
-> > > >       mutex_lock(&sev->guest_req_mutex);
-> > > >
-> > > > +     if (!__ratelimit(&sev->snp_guest_msg_rs)) {
-> > > > +             svm_vmgexit_no_action(svm, SNP_GUEST_ERR(SNP_GUEST_VM=
-M_ERR_BUSY, 0));
-> > > > +             ret =3D 1;
-> > > > +             goto out_unlock;
-> > >
-> > > Can you (or anyone) explain what a well-behaved guest will do in in r=
-esponse to
-> > > BUSY?  And/or explain why KVM injecting an error into the guest is be=
-tter than
-> > > exiting to userspace.
-> >
-> > Ah, I missed this question. The guest is meant to back off and try agai=
-n
-> > after waiting a bit.  This is the behavior added in
-> > https://lore.kernel.org/all/20230214164638.1189804-2-dionnaglaze@google=
-.com/
->
-> Nice, it's already landed and considered legal VMM behavior.
->
-> > If KVM returns to userspace with an exit type that the guest request wa=
-s
-> > throttled, then what is user space supposed to do with that?
->
-> The userspace exit doesn't have to notify userspace that the guest was th=
-rottled,
-> e.g. KVM could exit on _every_ request and let userspace do its own throt=
-tling.
->
-> I have no idea whether or not that's sane/useful, which is why I'm asking=
-.  The
-> cover letter, changelog, and documentation are all painfully sparse with =
-respect
-> to explaining why *this* uAPI is the right uAPI.
->
-> > It could wait a bit before trying KVM_RUN again, but with the enlighten=
-ed
-> > method, the guest could at least work on other kernel tasks while it wa=
-its
-> > for its turn to get an attestation report.
->
-> Nothing prevents KVM from providing userspace a way to communicate VMM_ER=
-R_BUSY,
-> e.g. as done for KVM_EXIT_SNP_REQ_CERTS:
->
-> https://lore.kernel.org/all/20250428195113.392303-2-michael.roth@amd.com
->
-> > Perhaps this is me not understanding the preferred KVM way of doing thi=
-ngs.
->
-> The only real preference at play is to not end up with uAPI and ABI that =
-doesn't
-> fit "everyone's" needs.  It's impossible to fully future-proof KVM's ABI,=
- but we
-> can at least perform due diligence to ensure we didn't simply pick the th=
-e path
-> of least resistance.
->
-> The bar gets lowered a tiny bit if we go with a module param (which I thi=
-nk we
-> should do), but I'd still like an explanation of why a fairly simple rate=
-limiting
-> mechanism is the best overall approach.
+<Removing Palmer's rivos email address to avoid bouncing>
 
-Before I send out a revised patchset with changed commit text, what do
-you think about the following
+On 5/28/25 8:09 AM, Andrew Jones wrote:
+> On Wed, May 28, 2025 at 07:16:11AM -0700, Atish Patra wrote:
+>> On 5/26/25 4:13 AM, Andrew Jones wrote:
+>>> On Mon, May 26, 2025 at 11:00:30AM +0200, Radim Krčmář wrote:
+>>>> 2025-05-23T10:16:11-07:00, Atish Patra <atish.patra@linux.dev>:
+>>>>> On 5/23/25 6:31 AM, Radim Krčmář wrote:
+>>>>>> 2025-05-22T12:03:43-07:00, Atish Patra <atishp@rivosinc.com>:
+>>>>>>> Upgrade the SBI version to v3.0 so that corresponding features
+>>>>>>> can be enabled in the guest.
+>>>>>>>
+>>>>>>> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+>>>>>>> ---
+>>>>>>> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+>>>>>>> -#define KVM_SBI_VERSION_MAJOR 2
+>>>>>>> +#define KVM_SBI_VERSION_MAJOR 3
+>>>>>> I think it's time to add versioning to KVM SBI implementation.
+>>>>>> Userspace should be able to select the desired SBI version and KVM would
+>>>>>> tell the guest that newer features are not supported.
+>>> We need new code for this, but it's a good idea.
+>>>
+>>>>> We can achieve that through onereg interface by disabling individual SBI
+>>>>> extensions.
+>>>>> We can extend the existing onereg interface to disable a specific SBI
+>>>>> version directly
+>>>>> instead of individual ones to save those IOCTL as well.
+>>>> Yes, I am all in favor of letting userspace provide all values in the
+>>>> BASE extension.
+>> We already support vendorid/archid/impid through one reg. I think we just
+>> need to add the SBI version support to that so that user space can set it.
+>>
+>>> This is covered by your recent patch that provides userspace_sbi.
+>> Why do we need to invent new IOCTL for this ? Once the user space sets the
+>> SBI version, KVM can enforce it.
+> If an SBI spec version provides an extension that can be emulated by
+> userspace, then userspace could choose to advertise that spec version,
+> implement a BASE probe function that advertises the extension, and
+> implement the extension, even if the KVM version running is older
+> and unaware of it. But, in order to do that, we need KVM to exit to
+> userspace for all unknown SBI calls and to allow BASE to be overridden
+You mean only the version field in BASE - Correct ?
 
-    The AMD-SP is a precious resource that doesn't have a scheduler other
-    than a mutex lock queue. To avoid customers from causing a DoS, a
-    kernel module parameter for rate limiting guest requests is added.
-[Addition:]
-    The kernel module parameter is a lower bound kernel-imposed rate limit
-    for any SEV-SNP VM-initiated guest request. This does not preclude the
-    addition of a new KVM exit type for SEV-SNP guest requests for
-    userspace to impose any additional throttling logic. The default value =
-of
-    0 maintains the previous behavior that there is no imposed rate limit o=
-n
-    guest requests.
+We already support vendorid/archid/impid through one reg. I don't see the
+point of overriding SBI implementation ID & version.
 
+> by userspace. The new KVM CAP ioctl allows opting into that new behavior.
 
-We could still ask Michael to change KVM_EXIT_SNP_REQ_CERTS  to
-KVM_EXIT_SNP_GUEST_REQ
-and for the exit structure to include msg_type as well as the
-gfn+npages when the kind is an extended request for an attestation
-report so that we don't need to have two exit types.
+But why we need a new IOCTL for that ? We can achieve that with existing
+one reg interface with improvements.
 
-Regardless of that change for additional throttling opportunities, I
-think the system-wide imposed lower bound is important for quelling
-noisy neighbors to some degree.
+> The old KVM with new VMM configuration isn't totally far-fetched. While
+> host kernels tend to get updated regularly to include security fixes,
+> enterprise kernels tend to stop adding features at some point in order
+> to maximize stability. While enterprise VMMs would also eventually stop
+> adding features, enterprise consumers are always free to use their own
+> VMMs (at their own risk). So, there's a real chance we could have
 
+I think we are years away from that happening (if it happens). My 
+suggestion was not to
+try to build a world where no body lives ;). When we get to that 
+scenario, the default KVM
+shipped will have many extension implemented. So there won't be much 
+advantage to
+reimplement them in the user space. We can also take an informed 
+decision at that time
+if the current selective forwarding approach is better or we need to 
+blindly forward any
+unknown SBI calls to the user space.
 
---=20
--Dionna Glaze, PhD, CISSP, CCSP (she/her)
+> deployments with older, stable KVM where users want to enable later SBI
+> extensions, and, in some cases, that should be possible by just updating
+> the VMM -- but only if KVM is only acting as an SBI implementation
+> accelerator and not as a userspace SBI implementation gatekeeper.
+
+But some of the SBI extensions are so fundamental that it must be 
+implemented in KVM
+for various reasons pointed by Anup on other thread.
+
+> Thanks,
+> drew
+>
+>>> With that, userspace can disable all extensions that aren't
+>>> supported by a given spec version, disable BASE and then provide
+>>> a BASE that advertises the version it wants. The new code is needed
+>>> for extensions that userspace still wants KVM to accelerate, but then
+>>> KVM needs to be informed it should deny all functions not included in
+>>> the selected spec version.
+>>>
+>>> Thanks,
+>>> drew
+>>>
+>>> _______________________________________________
+>>> linux-riscv mailing list
+>>> linux-riscv@lists.infradead.org
+>>> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
