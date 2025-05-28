@@ -1,172 +1,170 @@
-Return-Path: <kvm+bounces-47912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 971FDAC7309
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 23:53:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C2B6AC7473
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 01:20:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECE053A4CDC
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 21:53:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ECBFA437C8
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 23:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0FB12206BC;
-	Wed, 28 May 2025 21:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CD7221561;
+	Wed, 28 May 2025 23:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1zkKyjhC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f8eOGPjS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A06A20CCD0
-	for <kvm@vger.kernel.org>; Wed, 28 May 2025 21:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D732236EB;
+	Wed, 28 May 2025 23:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748469206; cv=none; b=OcgnvIv/mMlF98LSIYJ3qbXsEwakVSNg/D3LF8+iqtXxzWYxks4/SHhzSlY0F6XCifsNPFytjSXFK35so3T2fahXHwx66bB+C9eeqQX0uuFg1VFUl0wh95l62RuiGwS/eOv/0JxoKtQ9o6AznP/5Sgl29gATtykeehzX7LUcknc=
+	t=1748474292; cv=none; b=m4XuyGpvJ6kYQcUMIjsxprBOKARiG0YdP54v2gkbMr9qOs5uZUojvpcZauDuQbXkwCxTJQjYuVcvAWFBoyijOdMfkXOrtg4nWjyamWgFBYrVIveY4LH/L07jrXcCfUbLbptoDK+iMSYdo0/bQcvKN05py4CPCuH/1MrA3X1Bgwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748469206; c=relaxed/simple;
-	bh=dE2naAwQ+nEe3fk06JoC1XB+hpjLPW4DBoK7fhvH22c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bVm7ia9hatHAqty2nbuE5Ot2NOjDjBqnxYRFEhkCLOTx11ro4Flsin8kDQCpv2yFp/Zcj2DxRzD9LgsBUtZjxoIA2pyoh6EsRhk2E7CkWj51nZSdJ7EsawfbXTIUcTNeFYK8Noev8XJ4hQobyhqM8L+IIFxVNdsPG60xORMpP2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1zkKyjhC; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-54d98aa5981so313846e87.0
-        for <kvm@vger.kernel.org>; Wed, 28 May 2025 14:53:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748469202; x=1749074002; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dE2naAwQ+nEe3fk06JoC1XB+hpjLPW4DBoK7fhvH22c=;
-        b=1zkKyjhCcVobB3tpGp6FcxhdBzpzXEiCxlOT/RBXbKDz1g4uboCgya9r9+S+OItg+w
-         ZOl4k5if6xxsDHSxkO7FBgAschn4fCfYdbaS2nb0UdncH77acT+enrV3sF6oMnCjephS
-         eDiKDssJ6jZLbp81lSA1JTf+xtsEIwMB0nLQs11MVPAPq8o7Z0Qmo24Jy7+3P800htjE
-         KA78iQ7uCGFS2HTwvTU2qzqFdpAoL4N8K4/KWkUhBOWB810j8liQ3p/lcnrnUXYyMNsS
-         0zy9eT3P5Smg/klLicKqDGjzp/6ACZmBfrYuUOKbO9d5f747OJion5Xt9jz3fbzt4IVt
-         9uCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748469202; x=1749074002;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dE2naAwQ+nEe3fk06JoC1XB+hpjLPW4DBoK7fhvH22c=;
-        b=odetFHLseSIHw9M78aLN+IOu2RpLMmUDrWfGpsCbcBRLJc0ZrK+9Sgl49oqJJ+pAKv
-         lNdIIVjJ0Q43mrD+XQac9YwGdWOBa+Lce94cJCZd0Uhvo/kXe7mXH5E8tVjbPDxWUzE/
-         dCAXvi1LXsWxGTWbxQQW93RbTr6O0QvTispfmfl98Z8YltIQc2eUAm8v4RXgTJPvpcY4
-         YNMJMZMBxP36lv7xuDG43n+rceb/M5TRWSOlb1+qUNN1R7MaeNFxzSvPhwuZZcmalE8h
-         nzlamZd3Vj/1wvj1UP8AgMXtI1LbBET1s79pYZEaT5cwSBS4i8Devh5+Aa4UC0OMyAfc
-         JkIw==
-X-Forwarded-Encrypted: i=1; AJvYcCXQP0jqheE5xJFZ5+wUjXrNbCZezfmySDY7i5It9yhB+XNF2ZyEojRLUP1xkKFfR+HwTm8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+iYlxKhS8yEWgMlyHaltR/uBKDpmhExaTHMo54tGCrCuf6bXj
-	DiyZ3qShegpDRIErMPQ+iFqDFaZg3FeqQ2rdSR7sZKVtcQ4SxtYb/CIM7XabttAKDzUhzPD5EGW
-	KVVUttSbXzHQvS8nIm+o0IBohJmA5ygrRH4TxiOta
-X-Gm-Gg: ASbGncucI6AH/oxvfRBtmFpNXXx3FBdn02TTyycU15uTiH+kPPgayuYbT5YqX1vVUwR
-	XvPsXF2PEv1kTHCRHjm7gYr41k06N95UL9vrFUSNVkeAWDQzgkONEUHpr41zcKzahlUbvK1/Jnv
-	YhANeqgCb03kDrlSJF6Py6SCjcPDPk96FW+fbA/auKeQw=
-X-Google-Smtp-Source: AGHT+IF0IOnstNefATVPO7zdAb9WfmxFCxy7ZlLSsaOo6r/VQ030eWw6hYz7T3B72tn3wPt6Wdt2okeo16V8Yx0kvEU=
-X-Received: by 2002:a05:6512:6404:b0:553:27cb:a0f with SMTP id
- 2adb3069b0e04-55327cb0b4fmr2344728e87.57.1748469202021; Wed, 28 May 2025
- 14:53:22 -0700 (PDT)
+	s=arc-20240116; t=1748474292; c=relaxed/simple;
+	bh=jTXbawS0IX96rFwszkT9kCM9dGjFANXvjb9fYEZEKIQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gtwsH9imMGnuBYdm2+qAwf05fYEzQ4XVJFCcuD9bIKufUKb1zUmAF3BQDPqfDg5oBbmYPh+uWv7n6/V2pmSOyk0ut4q4GodBE5cjdhPJEO+r+9GneB9SX0dD7jLUyU5T2QueeKOC7W4FVUrIRNbGDTVqaAw773iEPKSbIebtjxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f8eOGPjS; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748474291; x=1780010291;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jTXbawS0IX96rFwszkT9kCM9dGjFANXvjb9fYEZEKIQ=;
+  b=f8eOGPjSPTxQsZcYW+2cSt1VC9rX8gQbewPAl3VE0eu4wK/a4Hw32b3e
+   mkdinDiPykmpZ2jzBI+NyqUVs89VwH5VCoLr6MEPyKgD4w1SjsOjrGPS2
+   Ihx1I2gpH6ZVWAwCxBFSXu/T7+HZc3yYCDeGRasYXn49RnJXxm/sbnVB0
+   jP6YLGCLQ1DCg6ZA0RE27RwZ/p7eI1BX3ZmkfxbbEVZKKfqTbOS6jdp06
+   dUF4jaM7uNoEg4I5DAa9bGeQuCItzHyz/r4008OXik13At0hQWbV1lONY
+   s8FNlonTWrfJfaC8dXG+PzjBhkNStEJwg9ZeAdbqh/Pv1/9ts+EipulL9
+   Q==;
+X-CSE-ConnectionGUID: vZhFyn+RTyav2PIAa9rb7w==
+X-CSE-MsgGUID: jo+/F0D8SGasLRiwktzsIQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11447"; a="53145989"
+X-IronPort-AV: E=Sophos;i="6.15,322,1739865600"; 
+   d="scan'208";a="53145989"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2025 16:18:09 -0700
+X-CSE-ConnectionGUID: iwficSJmT/qS3pdcAJGGYg==
+X-CSE-MsgGUID: N7yDre9XSIaIrg+kwGzUcQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,322,1739865600"; 
+   d="scan'208";a="148155222"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 28 May 2025 16:18:01 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uKQ23-000W9E-17;
+	Wed, 28 May 2025 23:17:59 +0000
+Date: Thu, 29 May 2025 07:17:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
+Cc: oe-kbuild-all@lists.linux.dev, pbonzini@redhat.com,
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	willy@infradead.org, akpm@linux-foundation.org,
+	xiaoyao.li@intel.com, yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net,
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
+	wei.w.wang@intel.com
+Subject: Re: [PATCH v10 08/16] KVM: guest_memfd: Allow host to map
+ guest_memfd pages
+Message-ID: <202505290736.HR4GYiOF-lkp@intel.com>
+References: <20250527180245.1413463-9-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250523233018.1702151-1-dmatlack@google.com> <20250526170951.GD61950@nvidia.com>
- <CALzav=f_12DE4iJ4XxU+jsaEcP2LZioVfuVwGMnK8a=JJbA0JA@mail.gmail.com> <20250528001103.GP61950@nvidia.com>
-In-Reply-To: <20250528001103.GP61950@nvidia.com>
-From: David Matlack <dmatlack@google.com>
-Date: Wed, 28 May 2025 14:52:53 -0700
-X-Gm-Features: AX0GCFuqnqY6O-kioyenpdkhVNaSef52QxbcsQW99CUsQ8JBu8SV_o1TY3dA1AQ
-Message-ID: <CALzav=c5Xvzw+A_yWipzc1RyFwjP3TyAwtey7HOOOiepKf7dow@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/33] vfio: Introduce selftests for VFIO
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Joel Granados <joel.granados@kernel.org>, Alex Williamson <alex.williamson@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
-	Fenghua Yu <fenghua.yu@intel.com>, "Masami Hiramatsu (Google)" <mhiramat@kernel.org>, 
-	Adhemerval Zanella <adhemerval.zanella@linaro.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Wei Yang <richard.weiyang@gmail.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Takashi Iwai <tiwai@suse.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, WangYuli <wangyuli@uniontech.com>, 
-	Sean Christopherson <seanjc@google.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Josh Hilke <jrhilke@google.com>, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, 
-	Kevin Tian <kevin.tian@intel.com>, Vipin Sharma <vipinsh@google.com>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Adithya Jayachandran <ajayachandra@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Dan Williams <dan.j.williams@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250527180245.1413463-9-tabba@google.com>
 
-On Tue, May 27, 2025 at 5:11=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
->
-> On Tue, May 27, 2025 at 04:01:52PM -0700, David Matlack wrote:
-> > > A reusable mini-driver framework that can trigger DMA is a huge leap
-> > > forward.
-> >
-> > How broad do you think the reusability should go?
-> >
-> > I structured the library (which includes the driver framework and
-> > drivers) so that it is reusable across other selftests (i.e. not just
-> > in tools/testing/selftests/vfio). The last 3 patches in this series
-> > show it being used in KVM selftests for example. IOMMU-focused tests
-> > in tools/testing/selftests/iommu could also use it.
->
-> I think having it as a usable library within selftests is a good place
-> to start at least. It shows it has a clean API boundary at least.
->
-> > But it's not reusable outside of selftests, or outside of the kernel
-> > source tree. My intuition is the former wouldn't be too hard to
-> > support, but the latter would be challenging.
->
-> And then we can see if there is interest to move it outside.
+Hi Fuad,
 
-Sounds good to me.
+kernel test robot noticed the following build errors:
 
-> > I was also thinking of using NVMe for this (cheap, broadly available),
-> > but I'm a little worried someone might accidentally corrupt their boot
-> > disk if they accidentally pass in the wrong BDF :)
->
-> Yeah, you can't do memcpy on NVMe without being destructive.
->
-> You'd want an alternative stimulus API that was more like 'DMA write
-> something random to X", then you could DMA READ from the media and use
-> that as a non-destructive test.
+[auto build test ERROR on 0ff41df1cb268fc69e703a08a57ee14ae967d0ca]
 
-Yeah we would need a different driver API. Intel DSA supports a Memory
-Fill operation, which would be similar. But the nice thing about
-memcpy is you can validate that the contents of memory are "correct"
-after the DMA. With NVMe we wouldn't be able to have any guarantees
-about what exactly would get written.
+url:    https://github.com/intel-lab-lkp/linux/commits/Fuad-Tabba/KVM-Rename-CONFIG_KVM_PRIVATE_MEM-to-CONFIG_KVM_GMEM/20250528-020608
+base:   0ff41df1cb268fc69e703a08a57ee14ae967d0ca
+patch link:    https://lore.kernel.org/r/20250527180245.1413463-9-tabba%40google.com
+patch subject: [PATCH v10 08/16] KVM: guest_memfd: Allow host to map guest_memfd pages
+config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20250529/202505290736.HR4GYiOF-lkp@intel.com/config)
+compiler: powerpc64-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250529/202505290736.HR4GYiOF-lkp@intel.com/reproduce)
 
-If mlx5 HW is truly cheap and broadly available then maybe we just
-align on that for baremetal tests and not worry about NVMe. That way
-we can keep the memcpy API and be able to validate the contents of
-DMAs.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505290736.HR4GYiOF-lkp@intel.com/
 
-For running these tests in VMs, Joel's pci-ats-testdev [1] looks like
-a good option.
+All errors (new ones prefixed by >>):
 
-[1] https://github.com/Joelgranados/qemu/blob/pcie-testdev/hw/misc/pcie-ats=
--testdev.c
+   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c: In function '__kvm_gmem_create':
+   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:487:14: error: implicit declaration of function 'get_unused_fd_flags' [-Wimplicit-function-declaration]
+     487 |         fd = get_unused_fd_flags(0);
+         |              ^~~~~~~~~~~~~~~~~~~
+   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:524:9: error: implicit declaration of function 'fd_install'; did you mean 'fs_initcall'? [-Wimplicit-function-declaration]
+     524 |         fd_install(fd, file);
+         |         ^~~~~~~~~~
+         |         fs_initcall
+   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:530:9: error: implicit declaration of function 'put_unused_fd'; did you mean 'put_user_ns'? [-Wimplicit-function-declaration]
+     530 |         put_unused_fd(fd);
+         |         ^~~~~~~~~~~~~
+         |         put_user_ns
+   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c: In function 'kvm_gmem_create':
+>> arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:540:13: error: implicit declaration of function 'kvm_arch_supports_gmem_shared_mem' [-Wimplicit-function-declaration]
+     540 |         if (kvm_arch_supports_gmem_shared_mem(kvm))
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c: In function 'kvm_gmem_bind':
+   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:564:16: error: implicit declaration of function 'fget'; did you mean 'sget'? [-Wimplicit-function-declaration]
+     564 |         file = fget(fd);
+         |                ^~~~
+         |                sget
+   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:564:14: error: assignment to 'struct file *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+     564 |         file = fget(fd);
+         |              ^
+   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:614:9: error: implicit declaration of function 'fput'; did you mean 'iput'? [-Wimplicit-function-declaration]
+     614 |         fput(file);
+         |         ^~~~
+         |         iput
 
->
-> > Do you think mlx5 HW could support the current driver API?
->
-> I think it can do memcpy. It would require copying a lot of code but
-> it is "straightforward" to setup a loopback QP and then issue RDMA
-> WRITE operations to memcpy data. It would act almost the same as IDXD.
->
-> There are examples doing this in the kernel, and we have examples in
-> rdma-core how to boot the device under VFIO.
 
-Good to know. I'd need some help from someone from Nvidia to write the
-driver though, or it might take a while.
+vim +/kvm_arch_supports_gmem_shared_mem +540 arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c
+
+   533	
+   534	int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+   535	{
+   536		loff_t size = args->size;
+   537		u64 flags = args->flags;
+   538		u64 valid_flags = 0;
+   539	
+ > 540		if (kvm_arch_supports_gmem_shared_mem(kvm))
+   541			valid_flags |= GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+   542	
+   543		if (flags & ~valid_flags)
+   544			return -EINVAL;
+   545	
+   546		if (size <= 0 || !PAGE_ALIGNED(size))
+   547			return -EINVAL;
+   548	
+   549		return __kvm_gmem_create(kvm, size, flags);
+   550	}
+   551	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
