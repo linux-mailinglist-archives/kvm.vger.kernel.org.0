@@ -1,176 +1,199 @@
-Return-Path: <kvm+bounces-47906-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47907-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8581FAC7175
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 21:22:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC9DBAC71F9
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 22:14:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27291189190F
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 19:22:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5D6D1882B66
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 20:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA4721CC4E;
-	Wed, 28 May 2025 19:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A00220F30;
+	Wed, 28 May 2025 20:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y/V3rbzm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dqHtSf8t"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3065421CC41
-	for <kvm@vger.kernel.org>; Wed, 28 May 2025 19:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA6D21A453
+	for <kvm@vger.kernel.org>; Wed, 28 May 2025 20:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748460132; cv=none; b=QzGSabAWfjBkRnQIlIBjMED5r64WYvE3j7+htBoVDg2qZ/1jEp4xubiWXDMmVgiumPFTuHYiIDtaA/7l72wtIdhgMJViIBrxf6cC8r3rAp/EOQAc75x23a/lhxdnhfV+biL7R8po1FufZ+mKikxEEPlHMwDOv+e+Sty1c7pwOdQ=
+	t=1748462989; cv=none; b=hUQXFDmlweqZ/9AfgjSlqH58Li0dlOMGEctYDKcwInh98d2I3BY2c7vwciF+ElJU5Oluomvu1bEckfbzvUDSxE0B5TdSeV/FjgNGBO8OomJKUxd+dAicExnaodDP7e36dg1UJIHyryVPh4ozuUkA/NSh2LTNbEXYHx1KuQyfEyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748460132; c=relaxed/simple;
-	bh=sXTnlvs0SF+o+xjwS3jb0zB0h8XaidUlvbp38Pk9CE8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t2e+H61KvJ1nen8qsRsb5kSYzwTNS6o/x0VMC1/GtiMFLjp0kVfr0voTCqAEd+nRwWUJ0R7Sz/y5p//YyoRtKz0deFeho4ZcyqKakGt8/M+BI6FpP065kZQ/e4CjT7mNyiUmb2frYMvzMVbtA4I/pKZfayWAd/qDUYS3SoDcX4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y/V3rbzm; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <1169138f-8445-4522-94dd-ad008524c600@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748460126;
+	s=arc-20240116; t=1748462989; c=relaxed/simple;
+	bh=OYjwPIs0TzQA0aRsuoivWOqjA0CM0zUZyAIfgw/GceY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kzbmOjkAcNMtLNI+5a3noeWNLbWR+jTReuubkrcMpDgR65PS9h/HKivengKpebMZ4/Q8DLmY4ogGqVXsXvOMoIhNVqUcl7/r1Tp6NRd2IuQ73M/dcooH6N1oCzbl3zfJygUBq4bcBrbxC5x8DmYgjYmgsdR79rlbsyOEH7VTWWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dqHtSf8t; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748462986;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pRNcAmNAMd2i0MLLlt89PMZctaigyBtb9U8DRb8tnes=;
-	b=Y/V3rbzm4Kc9GHC/hoAkMCQsFBHVy3OclJnu3ppfO3zfqqimuwUCgdJDcjwGNfNBwuNpWz
-	mx5ipTPzaOOv3koMm64vnvxqPbJZMLGE6Iqei5daLPV+lF6nEEDkb4csAQLWtHVygsBTqF
-	LzCBgfPjzjVxe8TaWjbdhnXsx4THqaI=
-Date: Wed, 28 May 2025 12:21:59 -0700
+	bh=4epIKwRgyQTi3ZuIRLGasK2wDW5JnSiHLO3mysT8gAQ=;
+	b=dqHtSf8tBrvedYBu8uY/+qw34dVANYyb1jIVe4Tt/rzWA4j/bDJfZogH3qPQze1xUKuGI8
+	cQPyp1VE1bsHssVVJVfBd9cu3RErVEAz5DQiJmFmQ83tGYPyXuDV4waCNEfz9ktyUOxVCr
+	2AH0YJZahPqWpuQ9gCWQvBWZYluZvLA=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-85-cUIPTxJ6OCmnaNJhQIJIbA-1; Wed, 28 May 2025 16:09:45 -0400
+X-MC-Unique: cUIPTxJ6OCmnaNJhQIJIbA-1
+X-Mimecast-MFC-AGG-ID: cUIPTxJ6OCmnaNJhQIJIbA_1748462985
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3dd75e22e38so334075ab.1
+        for <kvm@vger.kernel.org>; Wed, 28 May 2025 13:09:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748462984; x=1749067784;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4epIKwRgyQTi3ZuIRLGasK2wDW5JnSiHLO3mysT8gAQ=;
+        b=lZ+O3GtLERvdEs5d8LA09S4plaPQYn9wfdJQ6rMmKP8BW6eSGPi+ncaYyXpHB6lSqc
+         Bmlw338YS1jAp19+NvgxhUPV4CwpiMKTJxSWWw0eDaE7qJhrBlGUmIXVaAswZGlFzKBo
+         FRS7NdPsEElL0Otj8cDCBnURswHYlS5vcaxsteP6w5XE6W4UbhTKpDvPqZV2/Lk2Vnwg
+         6vno9YdH1PeOMRna0QYAKt8sdMz5ohSAu/5ytSY0f9qB+R5iiLyD0bwPQZrwpToK/I9E
+         zYsaQOmYxPndgFpN+dkuRSBOG6UnTzWlf7iZ1tzBYAN/PPccC36trWBWzqmogTEgyXg7
+         vEgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWhrSg8r7GNOty0PyuXJ/bvzKl2CUxvT1/DqTcJC5QQ62OzcqeSBgEcXPH2bg6m1NzQXmY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQuJ+3RD/CJzTZMFy+SynEC/rtsCzB2YqUViseDlNjmjIziO35
+	lNheYf/hzCc6g7TestiCpN46uDkkH+q6LZvt/dOz05EDnXIUSxXBeS4NJ7QC6p3PPbpkh7AlsBD
+	XGlKPMaeUB4WG0T0EI9KIiXdT2WXEnQoNr1h/wpuw5AC2Inevs+6HvA==
+X-Gm-Gg: ASbGncuSg3NHRS3g1SGSdIQ6MYOIOijcCuSgMP61Yn874/18H+8kBkMlyEqf4HvlTXl
+	VJgFP8M4rS1rQukefY/mPLGjNJTPZtQqeRHZudh9KIjDwnNgoiT1VVo3c2jRLWfBp8CpGlu204F
+	7fWj5soE3Uv/DCoS7zSgcBaECZQ5IV7jQ54xpvg2nVf/DR7jtCSE4eOKrH6vnaJZ92XIzoWQpn6
+	iAPXVTR1t89DjVl9jByIJXjk1kuAKYO8UfXDFRKaaoQiveFAvW9eHqagezsRuMwhiqOtiE5cJXw
+	ehfAGN4pcfHlveA=
+X-Received: by 2002:a05:6602:2c0d:b0:85a:e406:5836 with SMTP id ca18e2360f4ac-86cbb8f7c9emr552148839f.5.1748462984653;
+        Wed, 28 May 2025 13:09:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE1rOZ6iMvniSbx4lNRjQibyiCEt0/JnaW+E8wRrzAONFdZ6+X4ew43SDLHpA7p0VVeDyESaA==
+X-Received: by 2002:a05:6602:2c0d:b0:85a:e406:5836 with SMTP id ca18e2360f4ac-86cbb8f7c9emr552147839f.5.1748462984263;
+        Wed, 28 May 2025 13:09:44 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fdbd4cc665sm369599173.71.2025.05.28.13.09.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 May 2025 13:09:43 -0700 (PDT)
+Date: Wed, 28 May 2025 14:09:41 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: David Hildenbrand <david@redhat.com>, lizhe.67@bytedance.com,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, muchun.song@linux.dev
+Subject: Re: [PATCH v3] vfio/type1: optimize vfio_pin_pages_remote() for
+ huge folio
+Message-ID: <20250528140941.151b2f70.alex.williamson@redhat.com>
+In-Reply-To: <20250527234627.GB146260@ziepe.ca>
+References: <20250520070020.6181-1-lizhe.67@bytedance.com>
+	<3f51d180-becd-4c0d-a156-7ead8a40975b@redhat.com>
+	<20250520162125.772d003f.alex.williamson@redhat.com>
+	<ff914260-6482-41a5-81f4-9f3069e335da@redhat.com>
+	<20250521105512.4d43640a.alex.williamson@redhat.com>
+	<20250526201955.GI12328@ziepe.ca>
+	<20250527135252.7a7cfe21.alex.williamson@redhat.com>
+	<20250527234627.GB146260@ziepe.ca>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 9/9] RISC-V: KVM: Upgrade the supported SBI version to
- 3.0
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>,
- Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Mayuresh Chitale <mchitale@ventanamicro.com>,
- linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org,
- linux-riscv <linux-riscv-bounces@lists.infradead.org>
-References: <20250522-pmu_event_info-v3-0-f7bba7fd9cfe@rivosinc.com>
- <20250522-pmu_event_info-v3-9-f7bba7fd9cfe@rivosinc.com>
- <DA3KSSN3MJW5.2CM40VEWBWDHQ@ventanamicro.com>
- <61627296-6f94-45ea-9410-ed0ea2251870@linux.dev>
- <DA5YWWPPVCQW.22VHONAQHOCHE@ventanamicro.com>
- <20250526-224478e15ee50987124a47ac@orel>
- <ace8be22-3dba-41b0-81f0-bf6d661b4343@linux.dev>
- <20250528-ff9f6120de39c3e4eefc5365@orel>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Atish Patra <atish.patra@linux.dev>
-In-Reply-To: <20250528-ff9f6120de39c3e4eefc5365@orel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-<Removing Palmer's rivos email address to avoid bouncing>
+On Tue, 27 May 2025 20:46:27 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-On 5/28/25 8:09 AM, Andrew Jones wrote:
-> On Wed, May 28, 2025 at 07:16:11AM -0700, Atish Patra wrote:
->> On 5/26/25 4:13 AM, Andrew Jones wrote:
->>> On Mon, May 26, 2025 at 11:00:30AM +0200, Radim Krčmář wrote:
->>>> 2025-05-23T10:16:11-07:00, Atish Patra <atish.patra@linux.dev>:
->>>>> On 5/23/25 6:31 AM, Radim Krčmář wrote:
->>>>>> 2025-05-22T12:03:43-07:00, Atish Patra <atishp@rivosinc.com>:
->>>>>>> Upgrade the SBI version to v3.0 so that corresponding features
->>>>>>> can be enabled in the guest.
->>>>>>>
->>>>>>> Signed-off-by: Atish Patra <atishp@rivosinc.com>
->>>>>>> ---
->>>>>>> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
->>>>>>> -#define KVM_SBI_VERSION_MAJOR 2
->>>>>>> +#define KVM_SBI_VERSION_MAJOR 3
->>>>>> I think it's time to add versioning to KVM SBI implementation.
->>>>>> Userspace should be able to select the desired SBI version and KVM would
->>>>>> tell the guest that newer features are not supported.
->>> We need new code for this, but it's a good idea.
->>>
->>>>> We can achieve that through onereg interface by disabling individual SBI
->>>>> extensions.
->>>>> We can extend the existing onereg interface to disable a specific SBI
->>>>> version directly
->>>>> instead of individual ones to save those IOCTL as well.
->>>> Yes, I am all in favor of letting userspace provide all values in the
->>>> BASE extension.
->> We already support vendorid/archid/impid through one reg. I think we just
->> need to add the SBI version support to that so that user space can set it.
->>
->>> This is covered by your recent patch that provides userspace_sbi.
->> Why do we need to invent new IOCTL for this ? Once the user space sets the
->> SBI version, KVM can enforce it.
-> If an SBI spec version provides an extension that can be emulated by
-> userspace, then userspace could choose to advertise that spec version,
-> implement a BASE probe function that advertises the extension, and
-> implement the extension, even if the KVM version running is older
-> and unaware of it. But, in order to do that, we need KVM to exit to
-> userspace for all unknown SBI calls and to allow BASE to be overridden
-You mean only the version field in BASE - Correct ?
+> On Tue, May 27, 2025 at 01:52:52PM -0600, Alex Williamson wrote:
+> 
+> > > Lots of CSPs are running iommufd now. There is a commonly used OOT
+> > > patch to add the insecure P2P support like VFIO. I know lots of folks
+> > > have backported iommufd.. No idea about libvirt, but you can run it in
+> > > compatibility mode and then you don't need to change libvirt.  
+> > 
+> > For distributions that don't have an upstream first policy, sure, they
+> > can patch whatever they like.  I can't recommend that solution though.  
+> 
+> I appreciate that, and we are working on it.. The first round of
+> patches for DMA API improvements that Christoph asked for were sent as
+> a PR yesterday.
+> 
+> > Otherwise the problem with compatibility mode is that it's a compile
+> > time choice.  
+> 
+> The compile time choice is not the compatability mode.
+> 
+> Any iommufd, even if opened from /dev/iommu, is usable as a VFIO
+> container in the classic group based ioctls.
+> 
+> The group path in VFIO calls vfio_group_ioctl_set_container() ->
+> iommufd_ctx_from_file() which works with iommufd from any source.
+> 
+> The type 1 emulation ioctls are also always available on any iommufd.
+> After set container VFIO does iommufd_vfio_compat_ioas_create() to
+> setup the default compatability stuff.
+> 
+> All the compile time option does is replace /dev/vfio/vfio with
+> /dev/iommu, but they have *exactly* the same fops:
+> 
+> static struct miscdevice iommu_misc_dev = {
+> 	.minor = MISC_DYNAMIC_MINOR,
+> 	.name = "iommu",
+> 	.fops = &iommufd_fops,
+> 
+> static struct miscdevice vfio_misc_dev = {
+> 	.minor = VFIO_MINOR,
+> 	.name = "vfio",
+> 	.fops = &iommufd_fops,
+> 
+> So you can have libvirt open /dev/iommu, or you can have the admin
+> symlink /dev/iommu to /dev/vfio/vfio and opt in on a case by case
+> basis.
 
-We already support vendorid/archid/impid through one reg. I don't see the
-point of overriding SBI implementation ID & version.
+Yes, I'd forgotten we added this.  It's QEMU opening /dev/vfio/vfio and
+QEMU already has native iommufd support, so a per VM hack could be done
+via qemu:args or a QEMU wrapper script to instantiate an iommufd object
+in the VM xml, or as noted, a system-wide change could be done
+transparently via 'ln -sf /dev/iommu /dev/vfio/vfio'.
 
-> by userspace. The new KVM CAP ioctl allows opting into that new behavior.
+To be fair to libvirt, we'd really like libvirt to make use of iommufd
+whenever it's available, but without feature parity this would break
+users.  And without feature parity, it's not clear how libvirt should
+probe for feature parity.  Things get a lot easier for libvirt if we
+can switch the default at a point where we expect no regressions.
 
-But why we need a new IOCTL for that ? We can achieve that with existing
-one reg interface with improvements.
+> The compile time choice is really just a way to make testing easier
+> and down the road if a distro decides they don't want to support both
+> code bases then can choose to disable the type 1 code entirely and
+> still be uAPI compatible, but I think that is down the road a ways
+> still.
 
-> The old KVM with new VMM configuration isn't totally far-fetched. While
-> host kernels tend to get updated regularly to include security fixes,
-> enterprise kernels tend to stop adding features at some point in order
-> to maximize stability. While enterprise VMMs would also eventually stop
-> adding features, enterprise consumers are always free to use their own
-> VMMs (at their own risk). So, there's a real chance we could have
+Yep.
+ 
+> > A single kernel binary cannot interchangeably provide
+> > either P2P DMA with legacy vfio or better IOMMUFD improvements without
+> > P2P DMA.  
+> 
+> See above, it can, and it was deliberately made easy to do without
+> having to change any applications.
+> 
+> The idea was you can sort of incrementally decide which things to move
+> over. For instance you can keep all the type 1 code and vfio
+> group/container stuff unchanged but use a combination of
+> IOMMU_VFIO_IOAS_GET and then IOMMUFD_CMD_IOAS_MAP_FILE to map a memfd.
 
-I think we are years away from that happening (if it happens). My 
-suggestion was not to
-try to build a world where no body lives ;). When we get to that 
-scenario, the default KVM
-shipped will have many extension implemented. So there won't be much 
-advantage to
-reimplement them in the user space. We can also take an informed 
-decision at that time
-if the current selective forwarding approach is better or we need to 
-blindly forward any
-unknown SBI calls to the user space.
+Right, sorry, it'd slipped my mind that we'd created the "soft"
+compatibility mode too.
 
-> deployments with older, stable KVM where users want to enable later SBI
-> extensions, and, in some cases, that should be possible by just updating
-> the VMM -- but only if KVM is only acting as an SBI implementation
-> accelerator and not as a userspace SBI implementation gatekeeper.
+Zhe, so if you have no dependencies on P2P DMA within your device
+assignment VMs, the options above may be useful or at least a data
+point for comparison of type1 vs IOMMUFD performance.  Thanks,
 
-But some of the SBI extensions are so fundamental that it must be 
-implemented in KVM
-for various reasons pointed by Anup on other thread.
+Alex
 
-> Thanks,
-> drew
->
->>> With that, userspace can disable all extensions that aren't
->>> supported by a given spec version, disable BASE and then provide
->>> a BASE that advertises the version it wants. The new code is needed
->>> for extensions that userspace still wants KVM to accelerate, but then
->>> KVM needs to be informed it should deny all functions not included in
->>> the selected spec version.
->>>
->>> Thanks,
->>> drew
->>>
->>> _______________________________________________
->>> linux-riscv mailing list
->>> linux-riscv@lists.infradead.org
->>> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
