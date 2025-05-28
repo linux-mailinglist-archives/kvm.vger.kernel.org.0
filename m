@@ -1,132 +1,115 @@
-Return-Path: <kvm+bounces-47882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F08AAC6B8A
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 16:16:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F079AC6C40
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 16:50:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C55A23BBE53
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 14:16:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 358221886606
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 14:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DDB22A81C;
-	Wed, 28 May 2025 14:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BE228B4E0;
+	Wed, 28 May 2025 14:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qjpKfob7"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qGXWbgjY"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F26427A108
-	for <kvm@vger.kernel.org>; Wed, 28 May 2025 14:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CE42836AF;
+	Wed, 28 May 2025 14:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748441785; cv=none; b=mlfYBjKNkBwD8knnhrJp6FxLmt2cnhubO/MK0xIiOYbuwjd3aeS9AkCzfMj5PpIVmthC/h8L3j6WsFZkpPBVrebnfYkVB2BKOJ1T1tRZd7TOnu+7mVqOSsqpEQ3wBvU4p1OMUf7VRKHtFWcWJw6JUdTqsa4P9yJRgEPJrtwLf8U=
+	t=1748443812; cv=none; b=bcZFxUNrYvNMMbK89KIED4Ouo+3hIf6o8XYCWVCCTeepRUObi+LxMU8OGXxcTwt4pNK4L3E93wBC5xPJihV9yqqhJ24Y65Z8IoWIDu5ahR+iDf2FhJTTJfPX0hLAiLVO165ZIHlgX3XHKXVkBvYIRI+6hDDQ9lkhkfvHaeIQTtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748441785; c=relaxed/simple;
-	bh=BaZazWUNwzpYDJYIgR7YjT89yC060LzmEBjX/G4NG70=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wu+9c0KlF3i6Hy7hbnb4iVWAjugA2tfWLKQV4HeSe7OY9F5r1ScThmOA7V4tSQGN3GuLHwfmz2xegyXo8GcbP8zp0tcQbE+9kovQu0vDtN42HcBvTepRFXdHtU0/xYBauzJOeASc/s/IQOs5vzqcKewJcYPkfmIHfY3/NqUdL3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qjpKfob7; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ace8be22-3dba-41b0-81f0-bf6d661b4343@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748441779;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=c5mLYhkH15cgSjxuuv6l4kYe/fzzBQUwpR9u2pfZOy8=;
-	b=qjpKfob7Z9nwJXoxx5GUB/npEZom5q2cVoX+WSrhUvhCp38miksFI15n7HED2ElCpa+Gzh
-	rMarA3QV5uYksrG/9PUOkqwZt07frFarx52lcp28KkCgCK6TwCddvcYR3TQi0qP59jouqi
-	jrs60IDKyBiuILyERrfCfy38ldk8MHk=
-Date: Wed, 28 May 2025 07:16:11 -0700
+	s=arc-20240116; t=1748443812; c=relaxed/simple;
+	bh=tRgqoMa2o8jxjSsYlU/+gQdzsrtdUeNnvraDI0tGGXs=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=I/d+mt6shgpvnsyTi2mHa+bjGPMjtq7W2hnJunnhihbNeeBaSm6+SoYbHIfQzEbr6+a3bEdqZNcFNsGIiFd0J4cZBj/dwpBEv+9di1hsmsu81NmuxpOoJtoI81C9earah0aGk28+L4CLfXI/xdRibSJAQ1izLWR+tsu4twefrC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qGXWbgjY; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54SE9QDD022123;
+	Wed, 28 May 2025 14:50:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=tRgqoM
+	a2o8jxjSsYlU/+gQdzsrtdUeNnvraDI0tGGXs=; b=qGXWbgjYSo7EwMIbCa1D8W
+	lmt2tRG/C5ZADsw/9U+Wti+rzBt3GmVC0jgZOfMYDq7S+rs3aJT9sZ/WjTXbuJXu
+	i3powHBxRPrK35+buyjBiUMTdNZpRa+Q5pQCNLkePiJPXrtjqCjtbqiqf7qMst/o
+	iYjmp6xhSsKJcFCPKpanoPnzaWnL9USCC2mXtO3Ilgv3Xz9ofcWVxB/zefMu4g37
+	kIyxvAzBIHw7vZjGzKnvXR2q9SfNjokRzAC1j20KyT+dTKxb4QhT02T+3LF3aTgu
+	fQjbek2ezxi7v1bF2GAqg1UGs6gzDQ0R64Q8W7ep6SgNVahFjVQQPKs596sTL0YQ
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46x40k87wx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 28 May 2025 14:50:08 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54SEle8v016130;
+	Wed, 28 May 2025 14:50:07 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 46ureug5mx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 28 May 2025 14:50:07 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54SEo3N155640322
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 28 May 2025 14:50:03 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D569320043;
+	Wed, 28 May 2025 14:50:03 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 836D520040;
+	Wed, 28 May 2025 14:50:03 +0000 (GMT)
+Received: from t14-nrb (unknown [9.152.224.43])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 28 May 2025 14:50:03 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH v3 9/9] RISC-V: KVM: Upgrade the supported SBI version to
- 3.0
-To: Andrew Jones <ajones@ventanamicro.com>,
- =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>
-Cc: Atish Patra <atish.patra@linux.dev>, Anup Patel <anup@brainfault.org>,
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Mayuresh Chitale <mchitale@ventanamicro.com>,
- linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv <linux-riscv-bounces@lists.infradead.org>
-References: <20250522-pmu_event_info-v3-0-f7bba7fd9cfe@rivosinc.com>
- <20250522-pmu_event_info-v3-9-f7bba7fd9cfe@rivosinc.com>
- <DA3KSSN3MJW5.2CM40VEWBWDHQ@ventanamicro.com>
- <61627296-6f94-45ea-9410-ed0ea2251870@linux.dev>
- <DA5YWWPPVCQW.22VHONAQHOCHE@ventanamicro.com>
- <20250526-224478e15ee50987124a47ac@orel>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Atish Patra <atish.patra@linux.dev>
-In-Reply-To: <20250526-224478e15ee50987124a47ac@orel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 28 May 2025 16:50:03 +0200
+Message-Id: <DA7VLMMJG2EV.98H3YW6IV260@linux.ibm.com>
+Cc: <linux-s390@vger.kernel.org>, <imbrenda@linux.ibm.com>, <thuth@redhat.com>,
+        <david@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 1/2] s390x: diag10: Fence tcg and pv
+ environments
+From: "Nico Boehr" <nrb@linux.ibm.com>
+To: "Janosch Frank" <frankja@linux.ibm.com>, <kvm@vger.kernel.org>
+X-Mailer: aerc 0.20.1
+References: <20250528091412.19483-1-frankja@linux.ibm.com>
+ <20250528091412.19483-2-frankja@linux.ibm.com>
+In-Reply-To: <20250528091412.19483-2-frankja@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: RwfEFUPaLpibL0R-gk5Q5m4U1xDb-JKA
+X-Authority-Analysis: v=2.4 cv=fuPcZE4f c=1 sm=1 tr=0 ts=683722a0 cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=UjHN_1uCSV4EKeS2Re8A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: RwfEFUPaLpibL0R-gk5Q5m4U1xDb-JKA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI4MDEyNyBTYWx0ZWRfX9QwDi4xMj+hu 72JlY7V6WNURsffxmgX/qDbgh3XU7QNzFp0wZtPF7kaPAt0uQIHepaRLweSzN1rTaNPPNoX6XEJ Wf1dG/kGruN+6APjooxzQ/qhjnTMy0ymR0s6Ep7XrqsmOnext7VwpRWZQTP/wjWt80cUaZDE3Lj
+ /WuNOluVhfilqPbGfYFz0KzJ53/TSdqIEENEe3Zi6SmjuVCOQ6VXvRC1rO1hDs/2nL9pezDdD4G XhXw9eux8CPmTBs6WkCeI2KKA5YkVuMIb2DMH0yYsytJbQGSj8eGyDpBtg6S+WH2fyEyT/RFESl 4o4ZfAdy+iufn0j9gUXZHY2iE2rWaQRDTpSi8NH216IPErKtaMKlEnpThRyjUDPBxCBjdOiBb/8
+ gHAuFgcbkj42D/r4c7ceHighIc9Kp4n1HvzFKwxPtkQ+vxcK3zamT0fAjO8tU1hMYbwF4OyH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-28_07,2025-05-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ mlxlogscore=905 priorityscore=1501 malwarescore=0 mlxscore=0 phishscore=0
+ impostorscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 adultscore=0
+ classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505280127
 
-On 5/26/25 4:13 AM, Andrew Jones wrote:
-> On Mon, May 26, 2025 at 11:00:30AM +0200, Radim Krčmář wrote:
->> 2025-05-23T10:16:11-07:00, Atish Patra <atish.patra@linux.dev>:
->>> On 5/23/25 6:31 AM, Radim Krčmář wrote:
->>>> 2025-05-22T12:03:43-07:00, Atish Patra <atishp@rivosinc.com>:
->>>>> Upgrade the SBI version to v3.0 so that corresponding features
->>>>> can be enabled in the guest.
->>>>>
->>>>> Signed-off-by: Atish Patra <atishp@rivosinc.com>
->>>>> ---
->>>>> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
->>>>> -#define KVM_SBI_VERSION_MAJOR 2
->>>>> +#define KVM_SBI_VERSION_MAJOR 3
->>>> I think it's time to add versioning to KVM SBI implementation.
->>>> Userspace should be able to select the desired SBI version and KVM would
->>>> tell the guest that newer features are not supported.
-> 
-> We need new code for this, but it's a good idea.
-> 
->>>
->>> We can achieve that through onereg interface by disabling individual SBI
->>> extensions.
->>> We can extend the existing onereg interface to disable a specific SBI
->>> version directly
->>> instead of individual ones to save those IOCTL as well.
->>
->> Yes, I am all in favor of letting userspace provide all values in the
->> BASE extension.
-> 
+On Wed May 28, 2025 at 11:13 AM CEST, Janosch Frank wrote:
+> Diag10 isn't supported under either of these environments so let's
+> make sure that the test bails out accordingly.
+>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
-We already support vendorid/archid/impid through one reg. I think we 
-just need to add the SBI version support to that so that user space can 
-set it.
-
-> This is covered by your recent patch that provides userspace_sbi.
-
-Why do we need to invent new IOCTL for this ? Once the user space sets 
-the SBI version, KVM can enforce it.
-
-> With that, userspace can disable all extensions that aren't
-> supported by a given spec version, disable BASE and then provide
-> a BASE that advertises the version it wants. The new code is needed
-> for extensions that userspace still wants KVM to accelerate, but then
-> KVM needs to be informed it should deny all functions not included in
-> the selected spec version.
-> 
-> Thanks,
-> drew
-> 
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
-
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 
