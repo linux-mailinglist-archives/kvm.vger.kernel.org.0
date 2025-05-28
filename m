@@ -1,123 +1,121 @@
-Return-Path: <kvm+bounces-47835-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47836-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF895AC5E34
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 02:29:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBEC5AC5E3B
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 02:29:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FFA94C08E5
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 00:29:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E0AC4C0F06
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 00:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B41613A3F7;
-	Wed, 28 May 2025 00:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF8718DB03;
+	Wed, 28 May 2025 00:29:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JkIPGz9b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A3xTTPGl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520CB1367;
-	Wed, 28 May 2025 00:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1321367;
+	Wed, 28 May 2025 00:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748392138; cv=none; b=ZheBHDnlHTgTad/A1hJWFstt2h4fG9mmpVKfIhvoBrysDukzuRbH70n4P5zyykOhVb50IDZf08uplQSdGHnibktbkN287AwN6DgBgKOhLYE+FrxGB7ZAUnamaveVmiKzTOiwAUWfkIy+b3ippVI5kRDYUsdVc73KbCrFAZlNxpY=
+	t=1748392148; cv=none; b=jZ00bmgBs2PZH0GdmuxKtk37AwJcrrq/nM2WrhNevVPOT9K203iM2ms7WkCaKKb+IW91pLqOa666CSLSHw8KIqdDPnsSTrehwTOyf3eiDMUs3AtB0RelF9lj8c+Key/ry7faVbVMjCkNwPJXI9+i4jA5poP32iNE8gAit496oF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748392138; c=relaxed/simple;
-	bh=2O/eZ+PVqKQBD9BOUwMNiGwOsrD5/Jy7inCLCeOdak4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cKde3buE+HyZwmZEaYnFhVnK1dInaE2BdEm86kn+RShMidqWPPI6lQZPgt3fbUN74FE10NLvvKEB6eLNNNQ2860oM+LydeaNf8oGVGs6lHQTUDa2Tv8MsZLupDdNDhLHK5jFJ+GfGnwhtW5tE8UsyyOtu1vHzN0mSEjY8aEPQuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JkIPGz9b; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748392136; x=1779928136;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2O/eZ+PVqKQBD9BOUwMNiGwOsrD5/Jy7inCLCeOdak4=;
-  b=JkIPGz9bTPfmcyRiWJiodS/Z1w+yTJQmLN+Whb1HCGn8aK7CBBdUtKY5
-   GXg4DOPDeMrOE5Rfe9e7cTb+o+1+MdnYoYfzPZMnB57Y7lhUjQXc7XPCO
-   r+Vp1xsw8a2cfn5luWvtgT5ecKfGaQLa9RzVKzIPID17UK3D7dXz3Sg27
-   xHIl5+D10Jw+ZEURvb8/sCC8jdUTjSEPauHuEbcADc8deMqWMJT9VabV9
-   08wtaEV/u0lqkgPA8QUoL4lXjfwRnTMmsljetwM1hLkvTBS66c5Y9PmS2
-   uep3uVrAgCzb7biHADSOAVX7Uge4ZYruMtDRJLIRe6YWdlDSIIdcjrC5b
-   w==;
-X-CSE-ConnectionGUID: HBVKAv5RThec4eAfKYtZFQ==
-X-CSE-MsgGUID: /ot979yaSgm09pTZ06asGw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11446"; a="60654368"
-X-IronPort-AV: E=Sophos;i="6.15,319,1739865600"; 
-   d="scan'208";a="60654368"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 17:28:55 -0700
-X-CSE-ConnectionGUID: 7P55cVC7S6qpcgjZkfLlHA==
-X-CSE-MsgGUID: 9Dp6lqIESwG0hpuXqum9lA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,319,1739865600"; 
-   d="scan'208";a="148072599"
-Received: from unknown (HELO [10.238.3.95]) ([10.238.3.95])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 17:28:53 -0700
-Message-ID: <63dab0c1-b4b4-4da2-8366-59faaa42cc8e@linux.intel.com>
-Date: Wed, 28 May 2025 08:28:50 +0800
+	s=arc-20240116; t=1748392148; c=relaxed/simple;
+	bh=nMSI5ZivnZZiPS/FxHmijcxahzyz2FLO5lWtTyhEHmY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ogaq70If2Yi2maalB8LGGy/TQ/zG2Po7n+qJdQD1Wd22q9CWOBwECxPHOD5LA6fBoHlGM41f2+vTE1OBsPu6f9FlgZjPiRS4Kxaluf8OWWLImuPcaqSroi8w+dRy0iwvzddccGPc+1ouABRLgkvns2a6kJE1IqjnLu58HPHZMfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A3xTTPGl; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-234ade5a819so10429115ad.1;
+        Tue, 27 May 2025 17:29:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748392146; x=1748996946; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SdHZEyPpnejSK4kS7CITMiqXsuO0ubtElhjRk0W2zlc=;
+        b=A3xTTPGlOsKR3cANTrsLabM5rSwq9s8RdQo5CereHgxs5/clmoVti/KRKI8vnh2ptg
+         cbFOXLPdtgvut9VJAkZo7Z7+3i2vpWPUA4Vnk/EVaskS+TQBVm9wHDtaBXZFDrHntm+l
+         uAgQAH+o2NP/SP0Of95VPXYV9M3Xjk8zZmCQSBDNYHr+ELKkt4v1ENaT4jbZFTWNC8nT
+         B68Y4pjM+00xf44vqILhjGeYg9yHi6Hn1XB3zzMgZvikQs18nTrRCsp7kvR2O2fCrBYV
+         BIiQZQy5emrFpUTrCCd+5ByLQ/h9CApJZUUfJyoZl18jb0Vh0qJqbR7ltL/s65h3ECjS
+         KfeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748392146; x=1748996946;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SdHZEyPpnejSK4kS7CITMiqXsuO0ubtElhjRk0W2zlc=;
+        b=Tv9eylSyPulQ2gUjZ3QpidGv9UIwZOrXws0rUS4nbG8AvBRJHMaAO0ZNt3uoTi0Mqw
+         aDwIBz0uh9sMFVMaL0X+/e+72cbUPP5DJ+r1SP1QQyW8O4wyOGQcbvtndVLoZcW+RiLO
+         g7KMIhIEl2chXl/+W2HznjQVVWwTlXwzn8OCLQ+hAiWIInhBsM713fpjgK/r9tbgApFm
+         HObBgoMp2RT/u3SPTjhgv80Y/noeS9o/vz1VvCfAfn4ts3ut1cCFZMAX0S2KDm4bOt7U
+         F1pUfpUk1AyiJXbhKk5lLUZBAoH1bhziN/EMVmyo23cMohiMzYpwVdlfNq08CcyJmeRg
+         GjOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUcTKukE9SD51U17UbQsKSsvbJvwgbpQbZWgRjX7tJVfqokdCMiO2BGIaQ0c3qxxSlFY5aRUg51rqxKjlt4@vger.kernel.org, AJvYcCV49XwFb5IxcKHl71uPZEKQPzljYHHLbNmKf5ON6vVO4BCnsQrf83MdkuHMxLAY0fLKJ06qf4J2/0vWl+HhaVsE@vger.kernel.org, AJvYcCWYoO/0Ir3dAsnoYKbkaTsNrOe7zWu9lYBXknScHqBvawl6s7CrSVcNmQYdCsbES9rVblAY6mbb@vger.kernel.org, AJvYcCXrY/Air1FxhEnNLC+n/1sJLhLBtOPkABHpCrATFku2A9zLWXoR5KaZKv12bD64v27fFJA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcEInt9/mh4Dlq+DOZEIFaXS35lNJ5Qlnigq0MJL2/Cncqwk2d
+	rym/4kaWEglG+yJSabDag/HU3rsai0x8rZQ0nbjY72QpRFCbcOSUF7XJ
+X-Gm-Gg: ASbGncvGdNhiWjfxMSw0kQAaDvbPmYZt88CFGMcdwf7GbcmIcDHi+2lNyccEQnFkduB
+	csDx9ABIOq3WidFldCQtmPXCHnpr/uaa/M/2teA0IqgeV19dwYY+PIF8rdvLGkg32VvORWeka0C
+	LsHrhpZvKDMxuedL9danGGwhBaCT4WuupV4g9xR3dSRJ4IrYsMrORWhGnX76j0m3Wy35Rqaccbg
+	8ovwvStr8bOyQfnNIbi0C1RYfTFDf85PeFwxgKB0qtUCq08m0gN9oRW5SDodN2nyAQr/jMtA81K
+	UZZve5E9gPd8wc89njLXXYP9krCkSSgDRKqR4gVnDCcM7vbCb0kIwQBfe2zDvQzXyX1kf6Y=
+X-Google-Smtp-Source: AGHT+IEXiNShvrkwb0WLAlppJy482Bihy90a51Ds7tKinQx6TREEDLNScb5DULzgA/mguTbEfCZWog==
+X-Received: by 2002:a17:903:1a06:b0:234:c22:c65b with SMTP id d9443c01a7336-23414f5b33amr235147555ad.14.1748392146386;
+        Tue, 27 May 2025 17:29:06 -0700 (PDT)
+Received: from devbig793.prn5.facebook.com ([2a03:2880:ff:5::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-234d35bce89sm63895ad.217.2025.05.27.17.29.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 May 2025 17:29:05 -0700 (PDT)
+Date: Tue, 27 May 2025 17:29:03 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v8] selftests/vsock: add initial vmtest.sh for
+ vsock
+Message-ID: <aDZYzxEOKKY5kKcD@devbig793.prn5.facebook.com>
+References: <20250522-vsock-vmtest-v8-1-367619bef134@gmail.com>
+ <ta2ub5v7txhobccgvpnwsz7cyzcnx6aw74cjlcviosjetuwfhh@7gdahptdpbnd>
+ <aDXMhbqhhUAMe0Oz@devbig793.prn5.facebook.com>
+ <tabqpll3r76jhx2ujayry25a7ujfsikm7tejv5sviayyojlmwz@amcchbc5xiqp>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH next V2] KVM: VMX: use __always_inline for is_td_vcpu and
- is_td
-To: "Huang, Kai" <kai.huang@intel.com>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "eadavis@qq.com" <eadavis@qq.com>
-Cc: "seanjc@google.com" <seanjc@google.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "hpa@zytor.com" <hpa@zytor.com>, "mingo@redhat.com" <mingo@redhat.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>, "x86@kernel.org"
- <x86@kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <58339ba1-d7ac-45dd-9d62-1a023d528f50@linux.intel.com>
- <tencent_1A767567C83C1137829622362E4A72756F09@qq.com>
- <c281170eeeda8974eb0e0f755b55c998ba01b7a2.camel@intel.com>
- <18b805fbe1de59f45b0d61667933f5301cea4f86.camel@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <18b805fbe1de59f45b0d61667933f5301cea4f86.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tabqpll3r76jhx2ujayry25a7ujfsikm7tejv5sviayyojlmwz@amcchbc5xiqp>
 
+On Tue, May 27, 2025 at 05:55:13PM +0200, Stefano Garzarella wrote:
+> On Tue, May 27, 2025 at 07:30:29AM -0700, Bobby Eshleman wrote:
+> > On Mon, May 26, 2025 at 01:18:18PM +0200, Stefano Garzarella wrote:
+> > > On Thu, May 22, 2025 at 09:59:07PM -0700, Bobby Eshleman wrote:
+> 
+> Yes, that would be great, but anyway for now I would say let's go with this
+> since we're supposed to support these current versions I guess, and this
+> hack at the end I think is doable.
+> 
 
+sgtm!
 
-On 5/28/2025 5:48 AM, Huang, Kai wrote:
-> On Tue, 2025-05-27 at 17:53 +0000, Edgecombe, Rick P wrote:
->> On Tue, 2025-05-27 at 16:44 +0800, Edward Adam Davis wrote:
->>> is_td() and is_td_vcpu() run in no instrumentation, so use __always_inline
->>> to replace inline.
->>>
->>> [1]
->>> vmlinux.o: error: objtool: vmx_handle_nmi+0x47:
->>>          call to is_td_vcpu.isra.0() leaves .noinstr.text section
->>>
->>> Fixes: 7172c753c26a ("KVM: VMX: Move common fields of struct vcpu_{vmx,tdx} to a struct")
->>> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
->>> ---
->>> V1 -> V2: using __always_inline to replace noinstr
->> Argh, for some reason the original report was sent just to Paolo and so I didn't
->> see this until now:
->> https://lore.kernel.org/oe-kbuild-all/202505071640.fUgzT6SF-lkp@intel.com/
->>
->> You (or Paolo) might want to add that link for [1]. Fix looks good.
->>
->> Tested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Also,
->
-> Reviewed-by: Kai Huang <kai.huang@intel.com>
-Also,
+> BTW, thanks again for this useful work!
+> Stefano
+> 
 
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+No problem, happy to help!
 
-
+Best,
+Bobby
 
