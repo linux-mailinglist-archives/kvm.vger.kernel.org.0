@@ -1,198 +1,128 @@
-Return-Path: <kvm+bounces-47858-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47859-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D4DFAC64E5
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 10:56:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43FADAC6575
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 11:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27BBE16DCB0
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 08:56:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF8653A8665
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 09:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC007274FCF;
-	Wed, 28 May 2025 08:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C8212750F0;
+	Wed, 28 May 2025 09:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kb9z1b/B"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oUzVzA5B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003112459D9;
-	Wed, 28 May 2025 08:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5ACC274FFC;
+	Wed, 28 May 2025 09:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748422528; cv=none; b=ExnoOR+00L4zicL/K+Na8eElHW4+sam2dHpgIEN1XCY1mPLKeRWqjnReNe8s9m0SYJEChnjPTEAp853c3S6ZbNNh/w3aokZEAGUdEfoz+KBRt65FI/4osVqhfN1AEI0dZmfvl2NxSACAa9VlsjfuwKngcYonDMNp0EIXbXvYdjM=
+	t=1748423698; cv=none; b=iT/TVGh9rnlKFANa+WDKyh0UR630JcMbdnfxJnW4fn+lo4fL1FQTbhhwJMuvfQs+AmY/rvvCzeyCq4YVoqzkI/+aw0HeKnbqthDj5qpjdLrNtDNiycBdJqKiL6XAWPDMO6zh+NPK//+P4LwZKqljOylOEse3x/1Fx2yCkdiC8hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748422528; c=relaxed/simple;
-	bh=o/IBf/bL4uUQfqfko7CVRmw6Pl3VESZqBWXrtTbKLHg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f6bVmoaG2Zue6EhVB61zFqqS0E/GRoiUml8PprsByYg7twoFp890DFjNaHebvCPXaQ6kpzvh0ScgnklL1FHdpyhIecxga72PD03ACGF9tFiAVyirC35f6YAHNR/dHvk71h5fgiNc2hlaOY1GEV3d8SMJ3/LDLPGqLC9+x805Mi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kb9z1b/B; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748422527; x=1779958527;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=o/IBf/bL4uUQfqfko7CVRmw6Pl3VESZqBWXrtTbKLHg=;
-  b=Kb9z1b/Be7vgBgT3nxMLgZpNH8w24y1kZKjH8ruWxRf9AM7HXq2Anijl
-   sVkd8YQY7m6eX7a4HKw7bmtdJd3gyIUSpBClWkOpvyNkJyApu1Mp6NVqt
-   C9dJU+NHnyH2n+LBY2OGveyuDtLF14bfLZU/34FmTY8p+Woi2f/ix8Xzg
-   LCUNaF8hLATTy3X1KYrW+vJPm6kTu6CsAt/JrigfPbrXBiDYZeL4yinOl
-   mmyy3GxTcgVS7uPwIR+YosvI5eutfl4NH10WHiKc5gWUuzQh3yJS2Y9r0
-   dkZqYmZgAI8ic8vGwSEAdmszwirTE6Ma7RARTCGF2adOTEmX+7Xk3xDfc
-   Q==;
-X-CSE-ConnectionGUID: TqxAGj1wSda+VGBajRT0aQ==
-X-CSE-MsgGUID: 5b9Wh10cQtOTLPyMz/GCyA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11446"; a="61098598"
-X-IronPort-AV: E=Sophos;i="6.15,320,1739865600"; 
-   d="scan'208";a="61098598"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2025 01:55:26 -0700
-X-CSE-ConnectionGUID: 1yTLA9bhTNGc1WfrftagLg==
-X-CSE-MsgGUID: YJGTweprTPmbgT0LpLaE6Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,320,1739865600"; 
-   d="scan'208";a="166357521"
-Received: from unknown (HELO [10.238.3.95]) ([10.238.3.95])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2025 01:55:08 -0700
-Message-ID: <ad77da83-0e6e-47a1-abe7-8cfdfce8b254@linux.intel.com>
-Date: Wed, 28 May 2025 16:55:05 +0800
+	s=arc-20240116; t=1748423698; c=relaxed/simple;
+	bh=7Dk3zmErUKZlJgxAcY+StxJwW4GQveQR445ku3WDVjw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cWLuUcf+gvR8PAc1hbd5lnI0nQnp216yVhTPIOjKw0z+Kk7dwsLa5YVyK12LapVPIzRVF8uaivWGwdLpVmQ6TaNZ7zahjQKVjchcm+UYhbL957EgHPNgmu7e9rHtOMcCSqTSemjwhj5MqtbLvZhdepV0IjpBVPEe076bKGNabXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oUzVzA5B; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54S8ebuq003189;
+	Wed, 28 May 2025 09:14:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=9ALM3yCJhqSPs4OCeRMCLjrqPRQIc90Ugcj/JJP3W
+	/4=; b=oUzVzA5BZJzhxx/TZtE/qeWQay/C+GgeMoMYXzEsNseC3NvVaR5/X60WR
+	nY2KyuWR0hrvG6JEOZXyv2184f7nJM+xwhEmGiS1nBkcLG3k3Aw1PwOAfEMXKQxF
+	pqXnp7RqqxtAjfOllHcGrzu9Q9kjfOaCwUSfUKbKCwndms5Yx0r/633e79bpa9R1
+	0ZB5gGjY5wVeJ3lYWb48jOrkHIO23kFCpIMuvoKHxv16I7DhiNFXJDzo1yE0MhGB
+	o0ftjPOx3YlKQFuNJthlrdy8XiscDU4WoE+1nYqHBL5lFf7RWkqJJs0rfNMNMJHn
+	Kz69dLh91yV9XMcB+aXZoKwXCSFzQ==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46wy69054f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 28 May 2025 09:14:54 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54S62EHS016212;
+	Wed, 28 May 2025 09:14:53 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46uru0px8v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 28 May 2025 09:14:53 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54S9EnSW23134472
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 28 May 2025 09:14:49 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7447720043;
+	Wed, 28 May 2025 09:14:49 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 33BBA20040;
+	Wed, 28 May 2025 09:14:49 +0000 (GMT)
+Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 28 May 2025 09:14:49 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com, nrb@linux.ibm.com
+Subject: [kvm-unit-tests PATCH 0/2] s390x: diag10: Fixup
+Date: Wed, 28 May 2025 09:13:48 +0000
+Message-ID: <20250528091412.19483-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 16/51] mm: hugetlb: Consolidate interpretation of
- gbl_chg within alloc_hugetlb_folio()
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com,
- ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com,
- anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu,
- bfoster@redhat.com, brauner@kernel.org, catalin.marinas@arm.com,
- chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com,
- david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk,
- erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com,
- haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
- ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
- james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com,
- jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
- jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
- kent.overstreet@linux.dev, kirill.shutemov@intel.com,
- liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
- mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
- michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
- nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
- palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
- pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
- pgonda@google.com, pvorel@suse.cz, qperret@google.com,
- quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
- quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com,
- richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com,
- roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com, shuah@kernel.org,
- steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com,
- tabba@google.com, thomas.lendacky@amd.com, usama.arif@bytedance.com,
- vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
- vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
- willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com,
- yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
-References: <cover.1747264138.git.ackerleytng@google.com>
- <8548af334e01401a776aae37a0e9f30f9ffbba8c.1747264138.git.ackerleytng@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <8548af334e01401a776aae37a0e9f30f9ffbba8c.1747264138.git.ackerleytng@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=UP3dHDfy c=1 sm=1 tr=0 ts=6836d40e cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=dt9VzEwgFbYA:10 a=YbkSLyDRy1wxu5pb_RcA:9
+X-Proofpoint-GUID: oBiJ6PvbGtXnDGns6I46HKfi0SsKEyen
+X-Proofpoint-ORIG-GUID: oBiJ6PvbGtXnDGns6I46HKfi0SsKEyen
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI4MDA3OCBTYWx0ZWRfX42yw3zAH5dAI HzNw/DEVa1Pgwq7tG0vRFElbhbqwBZdpqfELlhIKDdy+bLpVnHHR7/PP3fxcOXpF2AY8XPPdFWj 2o+aWowMit5OjzU/QW1wHs1JtuLDU3rbS9oBRgfpMCdfVbC9EOpY6uS3E4pg5BATqkxEkGnWAla
+ OQJJtyHV3cOJYqSZKY4EbIXu+cI1m0oOZw0JyZCsNc4U51ydgRFuCMz9PEdPgDm7UgcXMocaC8/ RGkPX4KUjHSoaxqA9gN3+jpMvP4sg/yt89lSZH3ZAToK6Eg7/F0Iaq7t/2fbAemHEuhgVxIvqY4 G5mw32dnr47+MeLoDmgugUW5U7BE2JJ7fQA2pRqhRmDpt0QRHAQbhU/JHxaHj0bhNbJat63pJgY
+ GSr+02KdLUh6zIIa0Nb1aooS3tR7HWBaUOX1OgaqBPvJeucMDDEi0xOYi2ONvxHovponeZfa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-28_04,2025-05-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 suspectscore=0 malwarescore=0 impostorscore=0
+ mlxlogscore=835 clxscore=1015 priorityscore=1501 bulkscore=0 phishscore=0
+ spamscore=0 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505280078
+
+While reviewing Claudio's patch set I found a problem that should've
+been caught by the diag10 test but wasn't.
+
+Not only does the test never check the good case but it also doesn't
+fence against environments where diag10 is not available. The part
+that makes this problematic is the fact that this test only tests priv
+and spec PGMs. These PGMs are presented even if no diag10 support is
+provided since they are also part of the base diagnose architecture.
+
+The tests currently succeed in TCG emulation and PV, both of which do
+not implement this specific diagnose.
+
+Therefore this series fences TCG & PV as well as adding a check if the page has
+really been cleared.
 
 
+Janosch Frank (2):
+  s390x: diag10: Fence tcg and pv environments
+  s390x: diag10: Check page clear
 
-On 5/15/2025 7:41 AM, Ackerley Tng wrote:
-> Previously, gbl_chg was passed from alloc_hugetlb_folio() into
-> dequeue_hugetlb_folio_vma(), leaking the concept of gbl_chg into
-> dequeue_hugetlb_folio_vma().
->
-> This patch consolidates the interpretation of gbl_chg into
-> alloc_hugetlb_folio(), also renaming dequeue_hugetlb_folio_vma() to
-> dequeue_hugetlb_folio() so dequeue_hugetlb_folio() can just focus on
-> dequeuing a folio.
->
-> Change-Id: I31bf48af2400b6e13b44d03c8be22ce1a9092a9c
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> ---
->   mm/hugetlb.c | 28 +++++++++++-----------------
->   1 file changed, 11 insertions(+), 17 deletions(-)
->
-> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-> index 6ea1be71aa42..b843e869496f 100644
-> --- a/mm/hugetlb.c
-> +++ b/mm/hugetlb.c
-> @@ -1364,9 +1364,9 @@ static unsigned long available_huge_pages(struct hstate *h)
->   	return h->free_huge_pages - h->resv_huge_pages;
->   }
->   
-> -static struct folio *dequeue_hugetlb_folio_vma(struct hstate *h,
-> -				struct vm_area_struct *vma,
-> -				unsigned long address, long gbl_chg)
-> +static struct folio *dequeue_hugetlb_folio(struct hstate *h,
-> +					   struct vm_area_struct *vma,
-> +					   unsigned long address)
+ s390x/diag10.c      | 26 ++++++++++++++++++++++++++
+ s390x/unittests.cfg |  1 +
+ 2 files changed, 27 insertions(+)
 
-The rename seems not needed in this patch, since the function still takes vma
-and uses it. May be better to move the rename to a later patch.
-
->   {
->   	struct folio *folio = NULL;
->   	struct mempolicy *mpol;
-> @@ -1374,13 +1374,6 @@ static struct folio *dequeue_hugetlb_folio_vma(struct hstate *h,
->   	nodemask_t *nodemask;
->   	int nid;
->   
-> -	/*
-> -	 * gbl_chg==1 means the allocation requires a new page that was not
-> -	 * reserved before.  Making sure there's at least one free page.
-> -	 */
-> -	if (gbl_chg && !available_huge_pages(h))
-> -		goto err;
-> -
->   	gfp_mask = htlb_alloc_mask(h);
->   	nid = huge_node(vma, address, gfp_mask, &mpol, &nodemask);
->   
-> @@ -1398,9 +1391,6 @@ static struct folio *dequeue_hugetlb_folio_vma(struct hstate *h,
->   
->   	mpol_cond_put(mpol);
->   	return folio;
-> -
-> -err:
-> -	return NULL;
->   }
->   
->   /*
-> @@ -3074,12 +3064,16 @@ struct folio *alloc_hugetlb_folio(struct vm_area_struct *vma,
->   		goto out_uncharge_cgroup_reservation;
->   
->   	spin_lock_irq(&hugetlb_lock);
-> +
->   	/*
-> -	 * glb_chg is passed to indicate whether or not a page must be taken
-> -	 * from the global free pool (global change).  gbl_chg == 0 indicates
-> -	 * a reservation exists for the allocation.
-> +	 * gbl_chg == 0 indicates a reservation exists for the allocation - so
-> +	 * try dequeuing a page. If there are available_huge_pages(), try using
-> +	 * them!
->   	 */
-> -	folio = dequeue_hugetlb_folio_vma(h, vma, addr, gbl_chg);
-> +	folio = NULL;
-> +	if (!gbl_chg || available_huge_pages(h))
-> +		folio = dequeue_hugetlb_folio(h, vma, addr);
-> +
->   	if (!folio) {
->   		spin_unlock_irq(&hugetlb_lock);
->   		folio = alloc_buddy_hugetlb_folio_with_mpol(h, vma, addr);
+-- 
+2.48.1
 
 
