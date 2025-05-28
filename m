@@ -1,159 +1,140 @@
-Return-Path: <kvm+bounces-47884-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47885-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 138F6AC6C45
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 16:51:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88A00AC6C57
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 16:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8D843A7A82
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 14:51:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55A791716DC
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 14:56:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8722F28B50C;
-	Wed, 28 May 2025 14:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDE8A28B4FD;
+	Wed, 28 May 2025 14:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJ5eHxn7"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ewSQBIPJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4611E193077;
-	Wed, 28 May 2025 14:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B31C1B043C;
+	Wed, 28 May 2025 14:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748443886; cv=none; b=LsG43MGZA32eJ7/bvDAueQES8+gpj5vLsMweDhu5VmNBSqtBBSMnb1vYwq+qrumi78WAzmRB0DEozfoAFlhOyAPi1szy2il6r6KRE5E4e4vUUglLqkCXLAPRta0KHwWtc5bYE25qDhDZwPAiQQFUzdGKwjMqbAUxZTRfSNhr/SE=
+	t=1748444202; cv=none; b=Dw4lt+pmf6rJDQ6utIhv7+bXfyqVdmEfOhNtyB+9HgyV7KtR4lD+D12jKopJmMC4Csu8IynlNjRLfCTzWaqAVcfylt3Am4DqjHJ9GEjNWMpSOo0QcYlqBT3xgAd5ByQSXs/BDDGjSSG3eaBxWmP8GxZMs+qtdd7KouJsFtftOzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748443886; c=relaxed/simple;
-	bh=CaNlGgqQCzHq8F3U49dwDdVi1yyeghj6F8AwiQKBM94=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U77Unxwy8PihXRfERVjD/JNyaF+95Xi+2iZl9q6c1nAaQ0PCMJDRr2bpJYfae9dd9EEfDqPoNLAfk4TjXh8wdw47FQa0zLwucA4nB1RC/9uqs5CD31wWaDPiT5MCphpAUkG6A6JLbd89H+80IXaZyxcA1H600mxz34y2W4MDTGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kJ5eHxn7; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c54a9d3fcaso418773785a.2;
-        Wed, 28 May 2025 07:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1748443884; x=1749048684; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:feedback-id
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=m4HPI+uUoKdBGuZtoY9CPzya8qdmq+5VMevK83oBeE8=;
-        b=kJ5eHxn7ZqojhY0EYtsJP38TYQ6YXNrGJSFsZl8c8elXeRFHElYWDrKVPDwIgDXPyf
-         ub/R+iElEkVVkrYsGLowqes07rfTZGmGrBBd+yewScjusA355GsXtdCJOYdzBhYFrG9w
-         Ni15rl26i0aZ1ejq73Vy/BMd3lMXcA61VNr+5FxXz/UZzYWHqetg1xZOBN3UTo02hrXe
-         Icr22qjCLhj+jiyuWTsGXblmJsTnPLhn2/w6BgHXgPOcmT1bA6T/w6q7g3q8A54zyHaC
-         BTUpcAAcAXiy66I6GdESKC+ZWbpXjAt3AYKe12cR8vEHOiqCYF9u9uMT+vlrmg/6AW6f
-         ULkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748443884; x=1749048684;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:feedback-id
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m4HPI+uUoKdBGuZtoY9CPzya8qdmq+5VMevK83oBeE8=;
-        b=h+y9Dwm8S+wtSUHWgp1tnOigsEoHJt1yyaJKXaEBRE/Giw0mkLkWz1na9huD19hXEt
-         l+/1kM54fputPH6f+P/exm3l0hlkvztX+QIEu5IVZrRPhl3q3vNSyky5/XpGcc4hGTkl
-         I1eCKMiR4bnJWfXOctszvdhqQn7dH97NIi3mrOyWfJXMTGxX3tX2Dpgj07Woow4uTmsR
-         Il1t2xfs74BOH+KLyXR15kS/tu8q8U8xZLIXSg2eEvZwZBkSD+Sy0KqyAD9XsrWRbWi4
-         pA5PoOmcUFrU7ZfM72ZEsy6jtAw0wKPsPPBPbpkauuYOyTovMdmXhLwHWGY6r85T+8Xo
-         Jr+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUJH7S//i4/4dnk/G/8jkboBf5tqHVUw55jSNCTFhyaBHHyrA1waDDJ1D04tyRfoPSoVWbsjpJxJ9QreymC@vger.kernel.org, AJvYcCUUBV6E9apM5iLfm2lrh7Dn/sssDWbaWG+84xYV+LUEoREVll+kgLMz4Elv1oEdxIMZ21I=@vger.kernel.org, AJvYcCVkzj+G5UNnP26zUGbJZ7TdA3yBeQbZXsM9k+lTFBF4qPPvHKcqrpwQqPx/Q/38HgIuj/7p/Qd8VQRf04l+uug=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZrAw4MB1aCqBzkrYjqoO/9v26MKCZNQ7mgNdKiaLv7YOduSLd
-	Bkwxo5UMBeduEPZe0u9Lq7m0PY2GvH9IZyNbX6E6i9IcoGFzd72zFKVx
-X-Gm-Gg: ASbGncuKnkqdxtgt2KaIpT/G3NafiKTz2ScHcbeYEUNEU5mF6Ct/m7IdPCk0K3zK20U
-	6QcCKLfaNLNGMGaFq22Vbai0WtNSyFogOQenebXyIAfZmMQgC74So/APG+BUcAiuRUKmC+nYyta
-	kgKgruoTabcAHa9UeFAJhwqinHHpSIKi6zcx57GTo3nA1SEaQSe+uq7HQ1XGKCqAksLjWv9b+3F
-	awPVTsxdhUDmL4sWM1Y5A8D66Ayn//9Uy8IacBRLB3saakOL7g5ifn1U1QamM80fDHzuWzJE7+o
-	QrA2tWaKHsZ1o3eQS4vXwlPuZhtQR/k1r4Sb8z67b8INMkoSJB0VFrP81qAM12owyMz89QKOwCg
-	Vq1On23YloRcnCLRCHwy+yx4DeBY7+YabNe+/7jNHTzodj8gXxEjq
-X-Google-Smtp-Source: AGHT+IFiFNSqe6X/cs8W0Ae+kpNzm5s01ff7TiY9jBksJfOfSzABXvHKKUK9dRrwKFB8WycQwR+gKA==
-X-Received: by 2002:a05:620a:a901:b0:7cf:15a:7fb1 with SMTP id af79cd13be357-7cf015a8019mr815186385a.10.1748443883994;
-        Wed, 28 May 2025 07:51:23 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cfb82002c8sm79166185a.5.2025.05.28.07.51.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 May 2025 07:51:23 -0700 (PDT)
-Message-ID: <683722eb.050a0220.3d9475.2b4a@mx.google.com>
-X-Google-Original-Message-ID: <aDci6Dz7u6gEUnwr@winterfell.>
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 049FB1200043;
-	Wed, 28 May 2025 10:51:23 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-10.internal (MEProxy); Wed, 28 May 2025 10:51:23 -0400
-X-ME-Sender: <xms:6iI3aCvUg_433TA6Z04ZQJ5CUJlEID6pYkGhaiZFjC0QpN5B1yx_Ng>
-    <xme:6iI3aHcUWvjkUQ1Lkxo14ldf_hl1UClxv-D4cuWjZahIkEQ8WjXtDT2SL7HoMVGsm
-    fdx2hl3SUTcY2d5NQ>
-X-ME-Received: <xmr:6iI3aNz40bMwHYPOXQQ-cY0ChGjuyYw3-BQk1dee1EvJd7wISfsJ_kMfAMJ5Ug>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgddvfeehheculddtuddrgeefvddrtd
-    dtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggft
-    fghnshhusghstghrihgsvgdpuffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftd
-    dtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhf
-    gggtugfgjgesthekredttddtjeenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqh
-    hunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrghtthgvrhhnpeejhfeikeek
-    ffejgeegueevffdtgeefudetleegjeelvdffteeihfelfeehvdegkeenucffohhmrghinh
-    epkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehm
-    rghilhhfrhhomhepsghoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthi
-    dqieelvdeghedtieegqddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghi
-    lhdrtghomhesfhhigihmvgdrnhgrmhgvpdhnsggprhgtphhtthhopeekpdhmohguvgepsh
-    hmthhpohhuthdprhgtphhtthhopehmihhguhgvlhdrohhjvggurgdrshgrnhguohhnihhs
-    sehgmhgrihhlrdgtohhmpdhrtghpthhtohepphgsohhniihinhhisehrvgguhhgrthdrtg
-    homhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
-    htoheprhhushhtqdhfohhrqdhlihhnuhigsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhr
-    tghpthhtohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhfrhestg
-    grnhgsrdgruhhughdrohhrghdrrghupdhrtghpthhtohepsghoqhhunhesfhhigihmvgdr
-    nhgrmhgv
-X-ME-Proxy: <xmx:6iI3aNMJsK1ql7yT3mKpSUP7SZOLDBeDnenZ4yWk60LWDJaa7_fwwg>
-    <xmx:6iI3aC-Fj2Fq2ptvcevwPq6UtT0nI53Kr5JR-hY4-3nVoY36s5SfPA>
-    <xmx:6iI3aFWL_oXdb9C6pAs-4YUR3OrOpkiFqKhfDVQE_hZDd2Rs8KIjOA>
-    <xmx:6iI3aLdCiVmesyv198D8wTu7kzypEbLsnMeWqV_d8LP6NMdEI5caDw>
-    <xmx:6iI3aMeexqz7gsyEaSa2P4lke1avl9wWdzzB33eO-RIV_OSt2l9DW3HC>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 28 May 2025 10:51:22 -0400 (EDT)
-Date: Wed, 28 May 2025 07:51:20 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	ojeda@kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [PATCH] rust: add helper for mutex_trylock
-References: <20250528083431.1875345-1-pbonzini@redhat.com>
- <CANiq72nwM79eGSAt8FjKgoYCJd-bLeTojaQAtg3SECE28uByQQ@mail.gmail.com>
+	s=arc-20240116; t=1748444202; c=relaxed/simple;
+	bh=SCjFxV7DRhYT96XnLNL4doQAQylPnnal991GszSA+uo=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=KUBvJP8pOV/9TT4MLxYhUsoC59BiwPut+3enInSf932VYKJ8V4S6F3BhhTciBhXGMBHrBO9yTPhGW8l1Ox0+VIiyeqWF6Cry9TWaOeqg0BGGVsGXTd0UL6b9gCwJofSrgKhT7y07qKcdLlNDNs8FsohWohVgCIjwFH5ftrTwvkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ewSQBIPJ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54SE9JCo032092;
+	Wed, 28 May 2025 14:56:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=eq85do
+	RDjRzy/Cw0PdNFOEyNJqv98vYq1aKo8ImVJnk=; b=ewSQBIPJNXBHx+SpCWwXv8
+	rCUGg18owxsM97zqTSHyu1CD2WnOmqrBTObMoMMa82l36VSae3u9lY+95j32T12t
+	KMwEKLnMH8pbLRK2K4dw5ORAPYPwPJz6aOBsV/e/gnzjqnWs8nnS8lAWTnkHP13c
+	rWOPlka4TCH3oU1OJzE7W6VSXhuuqN7xT3V+4aa5a0PhG+Ekkt6ER/1folRwQG1h
+	2bkB7Ob6r6n7+1Esg931WvsNqtXKErvwq/Q3uKk0QEhOZIQLS8aT2xFTrAPVqPRn
+	xw7MHRjvuoK/z65Zxjrkt4oK577aSWClc1zguHpnT3CPZevDZq2/w2fEYepWZI1w
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46x40gg9ce-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 28 May 2025 14:56:37 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54SAlHPL026424;
+	Wed, 28 May 2025 14:56:37 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 46usxmyx4q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 28 May 2025 14:56:37 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54SEuXIG52691220
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 28 May 2025 14:56:33 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 75ADF20049;
+	Wed, 28 May 2025 14:56:33 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4A4A720040;
+	Wed, 28 May 2025 14:56:33 +0000 (GMT)
+Received: from t14-nrb (unknown [9.152.224.43])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 28 May 2025 14:56:33 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72nwM79eGSAt8FjKgoYCJd-bLeTojaQAtg3SECE28uByQQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 28 May 2025 16:56:33 +0200
+Message-Id: <DA7VQLOWWTUJ.P37SCGP032T3@linux.ibm.com>
+From: "Nico Boehr" <nrb@linux.ibm.com>
+To: "Janosch Frank" <frankja@linux.ibm.com>, <kvm@vger.kernel.org>
+Cc: <linux-s390@vger.kernel.org>, <imbrenda@linux.ibm.com>, <thuth@redhat.com>,
+        <david@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 2/2] s390x: diag10: Check page clear
+X-Mailer: aerc 0.20.1
+References: <20250528091412.19483-1-frankja@linux.ibm.com>
+ <20250528091412.19483-3-frankja@linux.ibm.com>
+In-Reply-To: <20250528091412.19483-3-frankja@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zQuP73n3wxLvxjO3YBhD0q4fr-eRXa9S
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI4MDEyNyBTYWx0ZWRfX6P9sy2iZpRgT NwTRBR/NvqfnDjMF3pZD3dL1cZ9G6OwjTLONdv3BxlEEhUG2QIaBRL7oOW5AoWEG5tRMLrg5ps3 l359PsN7uvlMng5PFNNIb1bjuTkOVy1Kvx6/giCfvGnD+YOpItuxdGBqUy9R4vwOiZEPvWCIpnf
+ SbyE3Ae15vVISlA2/K/v58BZtLHfTFqv/CzNxRRqEQ5w+9PGenau5JC+/omSpiRWOiuBtb4MIll K3xE2YsFpJ5eG97MZ5YwE/5awF1feu76njGpOSj0kbA+03ZDSi7Y1PqlrAUIaMmYm44BEHaoW6J q+Cs0FSmiaV+RuVe7hYkRzfRRD/hzXZ9SJ9UIAjiCXWygBJgWGtJMveQRp84dVQKHTxDEtc0kL7
+ cVmNMB06KWbfU4HiWgvysui6WHJfdTzHMuna6JBj0MRRSpIac5L+PG5Zb94LIhd5HfBC1fPz
+X-Proofpoint-ORIG-GUID: zQuP73n3wxLvxjO3YBhD0q4fr-eRXa9S
+X-Authority-Analysis: v=2.4 cv=UflRSLSN c=1 sm=1 tr=0 ts=68372425 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=icPLxu_JyErhSN4pVxMA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-28_07,2025-05-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 suspectscore=0 mlxscore=0 priorityscore=1501 adultscore=0
+ spamscore=0 impostorscore=0 phishscore=0 bulkscore=0 malwarescore=0
+ mlxlogscore=999 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
+ definitions=main-2505280127
 
-On Wed, May 28, 2025 at 11:39:12AM +0200, Miguel Ojeda wrote:
-> On Wed, May 28, 2025 at 10:34 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> >         Ok to apply to the KVM tree?
-> 
-> Yeah, looks good to me, thanks!
-> 
-> Acked-by: Miguel Ojeda <ojeda@kernel.org>
-> 
-> Cc'ing Boqun just in case and so that he is aware. Boqun: this fixes a
-> Rust build error on the kvm branch which failed on merging into -next:
-> 
->     https://lore.kernel.org/linux-next/20250528152832.3ce43330@canb.auug.org.au/
-> 
+On Wed May 28, 2025 at 11:13 AM CEST, Janosch Frank wrote:
+> We should get a new page after we discarded the page.
+> So let's check for that.
+>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/diag10.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/s390x/diag10.c b/s390x/diag10.c
+> index 00725f58..b68481ad 100644
+> --- a/s390x/diag10.c
+> +++ b/s390x/diag10.c
+> @@ -94,6 +94,16 @@ static void test_priv(void)
+>  	report_prefix_pop();
+>  }
+> =20
+> +static void test_content(void)
+> +{
+> +	report_prefix_push("content");
+> +	memset((void *)page0, 0x42, PAGE_SIZE);
+> +	memset((void *)page1, 0, PAGE_SIZE);
+> +	diag10(page0, page0);
+> +	report(!memcmp((void *)page0, (void *)page1, PAGE_SIZE), "Page cleared"=
+);
+> +	report_prefix_pop();
+> +}
 
-Thank you both!
+Would be nice to test that we don't clear too much, but this is clearly bet=
+ter
+than what we had before so:
 
-Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
-
-Regards,
-Boqun
-
-> Cheers,
-> Miguel
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 
