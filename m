@@ -1,85 +1,221 @@
-Return-Path: <kvm+bounces-47839-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47841-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89B8AAC5F2B
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 04:16:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 091CCAC5FEC
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 05:16:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F41E23BC9A8
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 02:16:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 397654A39C0
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 03:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEAB1CB31D;
-	Wed, 28 May 2025 02:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586DD1DE8BF;
+	Wed, 28 May 2025 03:16:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sccMv1rn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HTt291Fe"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F8AD53C;
-	Wed, 28 May 2025 02:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925001FB3;
+	Wed, 28 May 2025 03:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748398599; cv=none; b=LxyPm2W/F9S9WCDiHBLgZpkq/0KTfRnyo+VRh4idBtZnTWwChjhHNuQ/GrSZcFZq1xIoYY9hl8yqxGHoC4RJ7ha+ud8h8Vy3jl/xiX0UectPjJz7lFN47ICpp5v0uCSvEEZUQ4X3L7lVTuOWVWWJomuzOqEw2WOzJnAhXUjtjkI=
+	t=1748402199; cv=none; b=dAykcCJpO95fW6P5rtRJ9yjga0dk7hy9kkCZ3TVPGXzegWS8Ci4bGNgqWKiONGQawXu9D/bupXuThw7qtAxfAuA++SuONIlpLyIsC2h1qfD9WAExrk+jeSXFAVqzQ2vDH/mYBx1Sq0PiYL0hzjywW5iWjA48AmQadNdGIBIIuRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748398599; c=relaxed/simple;
-	bh=HEau1pyiee5cWgzZViwY0o1ycTcxX+DgaCx3BHxoJOo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qZVYm/q5H+6vigyMK0kjp0kmETburlWaB+maHoYqyX5Eki9VMBUgRa/F0yL1Hk53eWpYY/TqprMDjcd0LudTRY0W4Wx4z9dh9L2huJgqMX/P/b1L5T8+8Kt0JrGg3hXb4m/i7sCIOqGySYrDq9JYtMTmPLGMdi76hWrVIo/+SPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sccMv1rn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D0FCC4CEE9;
-	Wed, 28 May 2025 02:16:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748398598;
-	bh=HEau1pyiee5cWgzZViwY0o1ycTcxX+DgaCx3BHxoJOo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sccMv1rnjJ3U4KKB52lNHKFoFk2zK3BUFctep9wyyfX6gA+L1cXk2J7Ze3lhbIi1U
-	 /LP7A4YTVvHiR2DdaK8GbcVwefYsZf8lL3JoMfLYoccb5jx+zYRjUCwLFawPKxnMNd
-	 YvifufS4PEZp+GfPvxI56/sWdvtjKaI2IeMGMlyBxN7ROGKGyY+dMxcROeJbAXllq+
-	 6hVrDCU//YffT31UTgtY4l9UqHakj63HuMkRECyIPqt+pS3KPgRIvCO3LwVsVP5DKI
-	 YdaPnppqVEAzc2HHdaGjp6aF7ohpICcQBOqI5WvNBIJB+k1v7kYsdn3ccJfwNLmm8y
-	 mjR7zB+gexVNw==
-Date: Tue, 27 May 2025 19:16:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Stefan Hajnoczi
- <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v9] selftests/vsock: add initial vmtest.sh for
- vsock
-Message-ID: <20250527191637.1c0b996a@kernel.org>
-In-Reply-To: <20250527-vsock-vmtest-v9-1-24eaeec6fa55@gmail.com>
-References: <20250527-vsock-vmtest-v9-1-24eaeec6fa55@gmail.com>
+	s=arc-20240116; t=1748402199; c=relaxed/simple;
+	bh=ol3hrreomk92oy/dMrcK8dYkcWIBmCK1VoFKv2uei8c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ph8d0TDQRMQDLVSHOVu5WY5QOpLVJREhhBrcd+EVY4+4R/wgMJhTguy4gCAASukDHYB8odkvfX+jpAQ6pAkFJlL/EMmQAjO8J876f3F9zEvbBtpeuHxFL2cAk/iczVNRxiInQI3cmLoyrjMF+bDMgbAYLe/BGOsCwkaUUpBRjfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HTt291Fe; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748402198; x=1779938198;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ol3hrreomk92oy/dMrcK8dYkcWIBmCK1VoFKv2uei8c=;
+  b=HTt291Fe+YtU65/udhiMWmevCn2SeppDnx/gfX1r4c2l0T/iKJdth7tw
+   LMgwWoqkWtdwBy2ICnxPkdN5kKgB1bzoYTAcSmVeLaTGcAzZgrDPzh9FE
+   bBmhqreblzNKBq55S2Berw7IedPJfQumUFPlbSBenrmgvEPnEKeX2bnoa
+   +pBSldhxdSIU50k4MjueCGHaHJpsLB706rnZdtcVPb/hLKYZgbL8k6oTc
+   bCbxf+NZyoQcs/sHHnopFWkjMWRPWI5syWJg1VOBVs+G/eyH3tebSstoT
+   4qPvG9RDRPuoJ4Uu6U73i02BbuyqdfOAjwCzoxgeBv/6KCCl5Wr2MMBVx
+   Q==;
+X-CSE-ConnectionGUID: cy9YoWHmRVqK8ypMiw/ceA==
+X-CSE-MsgGUID: W/2exfmVSw2NsCHMJg9D/A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11446"; a="75803180"
+X-IronPort-AV: E=Sophos;i="6.15,320,1739865600"; 
+   d="scan'208";a="75803180"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 20:16:36 -0700
+X-CSE-ConnectionGUID: qT1plBtYR2uKqedJ4Wk7ng==
+X-CSE-MsgGUID: o4JH+FVTTm+OuGV88pruRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,320,1739865600"; 
+   d="scan'208";a="146961192"
+Received: from unknown (HELO [10.238.3.95]) ([10.238.3.95])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 20:16:18 -0700
+Message-ID: <b66c38ba-ca16-44c5-b498-7c8eb533d805@linux.intel.com>
+Date: Wed, 28 May 2025 11:16:15 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
+ KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com,
+ ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com,
+ anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu,
+ bfoster@redhat.com, brauner@kernel.org, catalin.marinas@arm.com,
+ chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com,
+ david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk,
+ erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com,
+ haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
+ ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
+ james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com,
+ jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
+ jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
+ kent.overstreet@linux.dev, kirill.shutemov@intel.com,
+ liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
+ mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
+ michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
+ nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
+ palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
+ pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
+ pgonda@google.com, pvorel@suse.cz, qperret@google.com,
+ quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com,
+ richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com,
+ roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com, shuah@kernel.org,
+ steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com,
+ tabba@google.com, thomas.lendacky@amd.com, usama.arif@bytedance.com,
+ vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
+ vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
+ willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com,
+ yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+References: <cover.1747264138.git.ackerleytng@google.com>
+ <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Tue, 27 May 2025 17:36:54 -0700 Bobby Eshleman wrote:
-> This commit introduces a new vmtest.sh runner for vsock.
 
-## Form letter - net-next-closed
 
-The merge window for v6.16 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations.
+On 5/15/2025 7:41 AM, Ackerley Tng wrote:
 
-Please repost when net-next reopens after June 9th.
+[...]
+> +
+> +static int kvm_gmem_convert_range(struct file *file, pgoff_t start,
+> +				  size_t nr_pages, bool shared,
+> +				  pgoff_t *error_index)
+> +{
+> +	struct conversion_work *work, *tmp, *rollback_stop_item;
+> +	LIST_HEAD(work_list);
+> +	struct inode *inode;
+> +	enum shareability m;
+> +	int ret;
+> +
+> +	inode = file_inode(file);
+> +
+> +	filemap_invalidate_lock(inode->i_mapping);
+> +
+> +	m = shared ? SHAREABILITY_ALL : SHAREABILITY_GUEST;
+> +	ret = kvm_gmem_convert_compute_work(inode, start, nr_pages, m, &work_list);
+> +	if (ret || list_empty(&work_list))
+> +		goto out;
+> +
+> +	list_for_each_entry(work, &work_list, list)
+> +		kvm_gmem_convert_invalidate_begin(inode, work);
+> +
+> +	list_for_each_entry(work, &work_list, list) {
+> +		ret = kvm_gmem_convert_should_proceed(inode, work, shared,
+> +						      error_index);
 
-RFC patches sent for review only are obviously welcome at any time.
+Since kvm_gmem_invalidate_begin() begins to handle shared memory,
+kvm_gmem_convert_invalidate_begin() will zap the table.
+The shared mapping could be zapped in kvm_gmem_convert_invalidate_begin() even
+when kvm_gmem_convert_should_proceed() returns error.
+The sequence is a bit confusing to me, at least in this patch so far.
 
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
--- 
-pw-bot: defer
-pv-bot: closed
-
+> +		if (ret)
+> +			goto invalidate_end;
+> +	}
+> +
+> +	list_for_each_entry(work, &work_list, list) {
+> +		rollback_stop_item = work;
+> +		ret = kvm_gmem_shareability_apply(inode, work, m);
+> +		if (ret)
+> +			break;
+> +	}
+> +
+> +	if (ret) {
+> +		m = shared ? SHAREABILITY_GUEST : SHAREABILITY_ALL;
+> +		list_for_each_entry(work, &work_list, list) {
+> +			if (work == rollback_stop_item)
+> +				break;
+> +
+> +			WARN_ON(kvm_gmem_shareability_apply(inode, work, m));
+> +		}
+> +	}
+> +
+> +invalidate_end:
+> +	list_for_each_entry(work, &work_list, list)
+> +		kvm_gmem_convert_invalidate_end(inode, work);
+> +out:
+> +	filemap_invalidate_unlock(inode->i_mapping);
+> +
+> +	list_for_each_entry_safe(work, tmp, &work_list, list) {
+> +		list_del(&work->list);
+> +		kfree(work);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+[...]
+> @@ -186,15 +490,26 @@ static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+>   	unsigned long index;
+>   
+>   	xa_for_each_range(&gmem->bindings, index, slot, start, end - 1) {
+> +		enum kvm_gfn_range_filter filter;
+>   		pgoff_t pgoff = slot->gmem.pgoff;
+>   
+> +		filter = KVM_FILTER_PRIVATE;
+> +		if (kvm_gmem_memslot_supports_shared(slot)) {
+> +			/*
+> +			 * Unmapping would also cause invalidation, but cannot
+> +			 * rely on mmu_notifiers to do invalidation via
+> +			 * unmapping, since memory may not be mapped to
+> +			 * userspace.
+> +			 */
+> +			filter |= KVM_FILTER_SHARED;
+> +		}
+> +
+>   		struct kvm_gfn_range gfn_range = {
+>   			.start = slot->base_gfn + max(pgoff, start) - pgoff,
+>   			.end = slot->base_gfn + min(pgoff + slot->npages, end) - pgoff,
+>   			.slot = slot,
+>   			.may_block = true,
+> -			/* guest memfd is relevant to only private mappings. */
+> -			.attr_filter = KVM_FILTER_PRIVATE,
+> +			.attr_filter = filter,
+>   		};
+>   
+>   		if (!found_memslot) {
+> @@ -484,11 +799,49 @@ EXPORT_SYMBOL_GPL(kvm_gmem_memslot_supports_shared);
+>   #define kvm_gmem_mmap NULL
+>   #endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+>   
+[...]
 
