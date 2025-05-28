@@ -1,146 +1,105 @@
-Return-Path: <kvm+bounces-47842-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47843-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A85BCAC6054
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 05:51:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2F1DAC60A3
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 06:18:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1E2C3A28E6
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 03:51:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E5D29E25A0
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 04:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D17120FA85;
-	Wed, 28 May 2025 03:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 746D41F3FED;
+	Wed, 28 May 2025 04:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mP7q0S07"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="alb3yn0w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2153320AF9A;
-	Wed, 28 May 2025 03:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831AE170826;
+	Wed, 28 May 2025 04:18:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748404193; cv=none; b=XvZRRpTakiwju+gcF08EcG2ApQFvyZGVgvPglbnzRLrwF2bi8gOSrFjBoPqRse6AFd7Id6LNr+vur0VTSk/zeN1rmxrVqzgt7wXhNqOxiHbVWTX6tJDluR1WMmXdv5O6Tj2UrYxpwbgF7IN7HIdZEzfLCKli2f3Y/fkdJUsvDPU=
+	t=1748405902; cv=none; b=VrSfIX4EAhclANHPAhCwWl12EBMbXOjeviV/9zc0hhLGb/HwSIT4Z8SsqhqZiJBP7tEO9Lh/H3NP8UFqcb54EYqxaMstnLnNlU5SkkgUdd0/9odJo8QqriyYo6E9SGuhYJNaD2FYXlfybkPrcnWG6gS4jK6obCB1mIyaTjIA/mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748404193; c=relaxed/simple;
-	bh=SStq2Kg36LwwImXTfsqwBrWtQT75EeqyD8rTkP6l/2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pGKUiwwZW8R7PVcDlqqngZOLcl3C2BibCm7UXYaSKuV7HjCXfzsmfKiefmNo59oW0HulavCL/5y9AFhs58Mq29tuUmy+YWTwmyHzxaU4u1ASdNjEjBs+0jCNf9RxQfcWtU36LCRNM3sxP+QSoHfT6EPjyaCmE1mVONe5EM63wms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mP7q0S07; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748404192; x=1779940192;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=SStq2Kg36LwwImXTfsqwBrWtQT75EeqyD8rTkP6l/2U=;
-  b=mP7q0S07UhK3bwLgYe2/SMoKo4vK0DlVZdquoMASlRHeMKP2+1Km3iKC
-   BF4+Fb4/7FeOejGMFS7GT+I73dxTUwctN0fK2farVW+fwC5Kd3nUPDWVK
-   AOmR9LKvlIIkmLIkw9N6qsN1xDVR4dOHAqlWRCul9EC2UYyoYrfuTe3a6
-   wUJQq12d/MqnipAVdrSz9mNUbYyJM1KmZA7Fw/yZ0bjPX+2ehRuInmkqz
-   ZsS75J1g54h+dcqoLg+mEm8SZ9j/jwtFo4LA4wfGB/VLNsR2yJEbWffDS
-   izVj3G5EYHOShvw594+PweyqO7l/Bj9mnIS12H9h17kBiZmOKc9BpBEyo
-   w==;
-X-CSE-ConnectionGUID: ixD6mfJOS/+/pSDlCWHgYg==
-X-CSE-MsgGUID: 3aqZBTNiRMGe8k4Mh0vFXg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11446"; a="38036375"
-X-IronPort-AV: E=Sophos;i="6.15,320,1739865600"; 
-   d="scan'208";a="38036375"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 20:49:51 -0700
-X-CSE-ConnectionGUID: WZ3w0+xfTH+yxStttC2htA==
-X-CSE-MsgGUID: X5XLgWTTQhi8D5droaSxpQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,320,1739865600"; 
-   d="scan'208";a="148227554"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2025 20:49:49 -0700
-Message-ID: <b9c47a7d-80fc-49c7-9bda-3626f72a70a9@intel.com>
-Date: Wed, 28 May 2025 11:49:46 +0800
+	s=arc-20240116; t=1748405902; c=relaxed/simple;
+	bh=MvDl/MzUY3KR7w+lIeq0zd5B/vOkndPxkmobsRTItJo=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=qcCTS1OaNSSasDEskFPtiKY5g/OUvPep71kOoRnDGKOaqkRaoVwpgmruetAL0VjZz/f/3f1OfyNRDANZ9MJSXDGnmSN+380YrGhgS3gaFZIzevB4JxwgeAeZ+V3SOMvtyZhQkLuwmaOn0Jdti81m3vQe6EmX7gVNnKifoBTcxM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=alb3yn0w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59D19C4CEE7;
+	Wed, 28 May 2025 04:18:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1748405902;
+	bh=MvDl/MzUY3KR7w+lIeq0zd5B/vOkndPxkmobsRTItJo=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=alb3yn0wMusQUv4YwGNPIm6FzSS2ST5UdxBnUGpCrAbNeb8Cy6airS8dgB9fruFU1
+	 ya6pU7Hwb5xBfz5QDzs3VunO9e9iHV+pyLyYhAYUWRF8bQ/PxmJGsvlme+y2bPBh3P
+	 B7Xgrr9oEpeBSNHmiTlpx4pg0EqtOgQufQbRWPQmlRZc463NFOp/rJOdMUmPzTogL9
+	 Sty0ZONiehdMt1auZD9OUdOrZABiFxKkfl7wxHe+NRQXomLgC4fYQMqVBjfZtf0zre
+	 fgBQcJnXeROouVuVS7g4EC+ixPZVGeUgTyqAOUDTABUTxCIJFjC0MFASwi4AoxjHBK
+	 KaO/p4kzXG+QA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE2813822D1A;
+	Wed, 28 May 2025 04:18:57 +0000 (UTC)
+Subject: Re: [GIT PULL] dma-mapping update for Linux 6.16
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250526121105.434835-1-m.szyprowski@samsung.com>
+References: <CGME20250526121111eucas1p277b74b79fe4ae4323fc687a06039044d@eucas1p2.samsung.com> <20250526121105.434835-1-m.szyprowski@samsung.com>
+X-PR-Tracked-List-Id: <linux-rdma.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250526121105.434835-1-m.szyprowski@samsung.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mszyprowski/linux.git tags/dma-mapping-6.16-2025-05-26
+X-PR-Tracked-Commit-Id: 3ee7d9496342246f4353716f6bbf64c945ff6e2d
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 23022f545610cceacd765bcd6c19102fa11755e0
+Message-Id: <174840593625.1893196.9279627536721857456.pr-tracker-bot@kernel.org>
+Date: Wed, 28 May 2025 04:18:56 +0000
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+	Jake Edge <jake@lwn.net>, Jonathan Corbet <corbet@lwn.net>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-nvme@lists.infr, adead.org@web.codeaurora.org,
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Kanchan Joshi <joshi.k@samsung.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] x86/tdx: Always inline tdx_tdvpr_pa()
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, lkp@intel.com,
- kai.huang@intel.com, seanjc@google.com, x86@kernel.org, dave.hansen@intel.com
-References: <20250527220453.3107617-1-rick.p.edgecombe@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250527220453.3107617-1-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 5/28/2025 6:04 AM, Rick Edgecombe wrote:
-> In some cases tdx_tdvpr_pa() is not fully inlined into tdh_vp_enter(),
-> which causes the following warning:
-> 
->    vmlinux.o: warning: objtool: tdh_vp_enter+0x8: call to tdx_tdvpr_pa() leaves .noinstr.text section
-> 
-> tdh_vp_enter() is marked noinstr and so can't accommodate the function
-> being outlined. Previously this didn't cause issues because the compiler
-> inlined the function. However, newer Clang compilers are deciding to
-> outline it.
-> 
-> So mark the function __always_inline to force it to be inlined. This
-> would leave the similar function tdx_tdr_pa() looking a bit asymmetric
-> and odd, as it is marked inline but actually doesn't need to be inlined.
-> So somewhat opportunistically remove the inline from tdx_tdr_pa() so that
-> it is clear that it does not need to be inlined, unlike tdx_tdvpr_pa().
-> 
-> tdx_tdvpr_pa() uses page_to_phys() which can make further calls to
-> outlines functions, but not on x86 following commit cba5d9b3e99d
-> ("x86/mm/64: Make SPARSEMEM_VMEMMAP the only memory model").
-> 
-> Fixes: 69e23faf82b4 ("x86/virt/tdx: Add SEAMCALL wrapper to enter/exit TDX guest")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202505240530.5KktQ5mX-lkp@intel.com/
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Reviewed-by: Kai Huang <kai.huang@intel.com>
+The pull request you sent on Mon, 26 May 2025 14:11:05 +0200:
 
-Reviewed-by: Xiaoyao Li <Xiaoyao.li@intel.com>
+> https://git.kernel.org/pub/scm/linux/kernel/git/mszyprowski/linux.git tags/dma-mapping-6.16-2025-05-26
 
-> ---
-> Previous discussion here:
-> https://lore.kernel.org/kvm/20250526204523.562665-1-pbonzini@redhat.com/
-> 
-> FWIW, I'm ok with the flatten version of the fix too, but posting this
-> just to speed things along in case.
-> 
-> And note, for full correctness, this and the flatten fix will depend on
-> the queued tip commit:
-> https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/commit/?id=cba5d9b3e99d6268d7909a65c2bd78f4d195aead
-> 
-> ---
->   arch/x86/virt/vmx/tdx/tdx.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index f5e2a937c1e7..626cc2f37dec 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -1496,12 +1496,12 @@ void tdx_guest_keyid_free(unsigned int keyid)
->   }
->   EXPORT_SYMBOL_GPL(tdx_guest_keyid_free);
->   
-> -static inline u64 tdx_tdr_pa(struct tdx_td *td)
-> +static u64 tdx_tdr_pa(struct tdx_td *td)
->   {
->   	return page_to_phys(td->tdr_page);
->   }
->   
-> -static inline u64 tdx_tdvpr_pa(struct tdx_vp *td)
-> +static __always_inline u64 tdx_tdvpr_pa(struct tdx_vp *td)
->   {
->   	return page_to_phys(td->tdvpr_page);
->   }
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/23022f545610cceacd765bcd6c19102fa11755e0
 
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
