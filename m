@@ -1,144 +1,108 @@
-Return-Path: <kvm+bounces-47861-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47862-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DE02AC6579
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 11:15:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C4ABAC6624
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 11:39:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E7773A86F1
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 09:14:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BE601BA58D5
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 09:40:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF062750FB;
-	Wed, 28 May 2025 09:15:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C630827933E;
+	Wed, 28 May 2025 09:39:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jI6NMTXa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rz0ddtiF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231212750ED;
-	Wed, 28 May 2025 09:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B99A278E60;
+	Wed, 28 May 2025 09:39:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748423700; cv=none; b=AiaSuuUOyEuzRrIRfgcKsZ+5vsculXon/BPCsIPYSZGeGJYgaPNPnzut59n/xwH2hRkG5zf98CIafJK+7Y0+1dxwI68fgX8+bkT/eHHaQbRx8IowaBoMujdG7sAJyQnovJxxbSovdl7O82gEbTUvmxeJCjyGJMq4X8GmxpXhBws=
+	t=1748425167; cv=none; b=q07Fr2DQPrXSHnNBudaU5zU7+2lcvrNoSLcQ89Xs02a0eRBlh4L6BVBxWHGpm+FrfiltRs0+RUTYQas9PmEw3jac6WNV3pEMiaFRlOeqVLByeLZ/lK6sVol2M9mEq/W2fF6YAz37SeKt7maQc0VlgJ/UBsIkSYOkHGsdNqjFWuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748423700; c=relaxed/simple;
-	bh=Uomc4IpoLoW1FTWjVKwfNUz2/qNymFeJ2lQpSZEcklc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dbbnQ4seEoETNAoSJaAzjeHxSiWCGMVFwCOIRfdE+rg69GeV6ddnngTIbw+S114OKl1HQOO5no6pV0XMmv5b0sMrS8f9flUxQlhfCNgDi1QkWh9a/XBSaN9u2aIu5N0KTISw996ii2moOO8zfS4k0n016s9OVNvjhFv3BUDioys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jI6NMTXa; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54S2CAJS017195;
-	Wed, 28 May 2025 09:14:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=D6QeAt5OvXJRsvmA8
-	scbiN3dfQsetPcARGUkZIvtbOU=; b=jI6NMTXak2YUsS8Vta329r+WVz9eVQ1tt
-	/McCVxoXN2FJe5JYFVq0MCoHlygfZs6Mj8D3VaCsQ+MTpU9kf92YHVez0NYi5bIf
-	o87fQAL7034oyP1vvzCw6pZIcp4LOFDeSHr1D+9CFmIUPCdsjMY3NOVKoM5qRo2d
-	ycgmp9ZIqs+qCD9DS736nORYdoLzpYgzZ3Bu4QRBfnESp5BsVcxt3LQ7+iFQL7i3
-	n5W7AgEEj62jRyznG9lsAylDIR/FIN5OPIB7EH9G4F56q1MnabwyaT6wBCDHuL9r
-	lkJQ/VnDI1avhnwBfOgLzKAdDTgn1HVK1A1N+rfifbCYSozdwkxAA==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46wgsgkvbm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 May 2025 09:14:54 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 54S6CVTu021333;
-	Wed, 28 May 2025 09:14:53 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 46utnmpky7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 May 2025 09:14:53 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 54S9EoY845810084
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 28 May 2025 09:14:50 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1322120040;
-	Wed, 28 May 2025 09:14:50 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C910420043;
-	Wed, 28 May 2025 09:14:49 +0000 (GMT)
-Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 28 May 2025 09:14:49 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
-        david@redhat.com, nrb@linux.ibm.com
-Subject: [kvm-unit-tests PATCH 2/2] s390x: diag10: Check page clear
-Date: Wed, 28 May 2025 09:13:50 +0000
-Message-ID: <20250528091412.19483-3-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250528091412.19483-1-frankja@linux.ibm.com>
-References: <20250528091412.19483-1-frankja@linux.ibm.com>
+	s=arc-20240116; t=1748425167; c=relaxed/simple;
+	bh=y4NzMxD9tmogr+AetKOa3VXWiWOLUF+6spJ2YgI8RsY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d/jOcDncrth8A9PXbDWjJn4Ta6u9QeF4PExu46N0fJw+9KxvLQ2nNPWIRUFrencDU5Bhw/bEEWNcBuMpDIcgHOHiesQx3fT40CQLwM8uLR5HRoifkQrmlCftY1zPlhWy1zqJIOhE4LS031BzKbKWLsgyuVMIqk395gp5RwwJjik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rz0ddtiF; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-311f6be42f1so37547a91.0;
+        Wed, 28 May 2025 02:39:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748425165; x=1749029965; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZQBoysENhIbgW5/kLFhu2v5G6iCydX7mEkkhpaN14T0=;
+        b=Rz0ddtiF85FovreUueojk0HHigqQKTsz06tTQa32/Sq9vmZnp/LxnW+L8dYn6zhrh1
+         awWf3hm7MTwiTaGVPIuoifcvaadmsxL2ZWJe12TJDbM1xDfGew1h8h60YdBbRyUniHXx
+         v8gDTz3K3eVvDScswnZP2/NhksvgRXx3HGknM4yo9HsWk5Q89Yi6yP+E52xbFsEROAMd
+         IPHfCwxCx+uCV9Wne/tG1SdNzFbhApvPsMZsPMrHCpP3LaMmkPuKIDTbX0ovrL4yT6wn
+         14n316aYxgaBMwEtuFrWdQVkamNxKs4Z+4dcJAy0Vwn5n0BBewLgeCj1JDnwV1+vwEo7
+         AcKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748425165; x=1749029965;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZQBoysENhIbgW5/kLFhu2v5G6iCydX7mEkkhpaN14T0=;
+        b=kHijPsgQeEtHWaK+hC5aVdtMqAJaaL20yxv4lq25hmBon5DIyOCfRQ4aZ3qmUvbIu7
+         Yagpv0bOFUIQsAFQWd5xe4V9xAnlVDTLP6PwHgTyczd7iWTy7dYX4T2GSXnNIYQwPq4L
+         hfzZO3oEg9DqPmBJvkxN4CiXNCutKtJtxS9C7iejPiAocMbzWtkuLAggKBTzA15Wl6TM
+         ufNea0iqOZnkFDYgpzIF3Lb8rKrbi/IwCbkvfoYk1MYMGC4Fhid0b7gK0bc1WxfYNSIk
+         kKutEInZRHwsG1PDHvJRWS+ENaK7HdT2myrE7fc+WJt2wbxW2vxkjiHgspuG9FZMGXMc
+         bf4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWIBczkzF24amG7+kZnVa5Qer7V1XH6E2wKqtNKuUFCeLeI30czmKXwowZnn6YbhVN/Sz8=@vger.kernel.org, AJvYcCWJJr8QHfo7vnfF3ZQ+fc48wDSRcPSTmzIWLBnAUjjIdo0bi4nC+l9eETRFc1Q3X50olvawvoXlFShTndF0LdA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMclseVYDs8yXfqQJm1OjDeBRANAZwph3SGICLbj85aqRrLIfl
+	ISrNwl6NP777R6FCBBwzcKvYgRRurQsy+Qibgq5pZ6OyN6i6tYIlet2RUbOv7yRV7kf6iy5Hg1i
+	ThGjj9+Xrnfcy4LWpxLS2gmcvqdiZheU=
+X-Gm-Gg: ASbGncs5ck6SgfmBs0DqZB1qGxenep35fiwpI7b+Q9Tr1gc6AMbYbPVHtH9KMbg7DJ9
+	qJFccVVw1cUsE0Cj/BZtTgruvVqBz3D2PmzvVJnT1yA8kKK+uV6euP64Q1KxALoB1mHR/X/MxPU
+	8EtcjxPQKvqMNNE/1qGzP5Fr+Zwe5GXZde
+X-Google-Smtp-Source: AGHT+IES7Q+itUfT5wFGMqq1cdttplKaNdUc32Nx59Bv5rwPOYXCpDB88AGK9vWYeBz/+WcV0xKa7x6/E1mxh1Z7838=
+X-Received: by 2002:a17:90b:1e10:b0:311:488:f506 with SMTP id
+ 98e67ed59e1d1-311e1a122b4mr1202559a91.6.1748425164739; Wed, 28 May 2025
+ 02:39:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2p5-rgYA2GPCDPnFs6WWmpfFjD9Og0Ad
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTI4MDA3OCBTYWx0ZWRfX/xtlbBLXcs5C EBeMLq/JD166c28G3Q2M+RT3sRF0pR7mhnZwJx6Thw4TDxyE7i5H0UAXDxq2fduRItPoHkka2iu uz6pMoZpNlZvTrMHAps89TLvPooZTq4SnhCWpS+3urXjGTIKO4F2ZqcApSbxqfOr9eeusKppZRH
- MhvyvtLNRxjbY3noBEuOFwQBSQ6vCzqgkSC6zSMS88SyhBYe2avpKG2B5dae4smoVmdNvxHx1Yr QZAGGR7cg9kqCXL+k1q7MRD557cMn6be/pFO7lpXHcW2Iomv8wVpl+7j9JdA1UQIqBO69WhEU4H mj+PB1QKGwH3j/bPLeh5UZO6F0xs3sX3G34G12I+uE29j4Lxta7IahL4RWwKZSjtqcXaCijm6zg
- il+EwHsl0031U6P+Ec94aFhfhyz1rLB5WstrKxX6aBRad9HDt+RRehrTspM0S/Czvyim5+WR
-X-Authority-Analysis: v=2.4 cv=bZRrUPPB c=1 sm=1 tr=0 ts=6836d40e cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=hFFYQovYn3O7A-klem4A:9
-X-Proofpoint-GUID: 2p5-rgYA2GPCDPnFs6WWmpfFjD9Og0Ad
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-28_04,2025-05-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- mlxscore=0 suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 mlxlogscore=956 malwarescore=0 spamscore=0
- priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2505280078
+References: <20250528083431.1875345-1-pbonzini@redhat.com>
+In-Reply-To: <20250528083431.1875345-1-pbonzini@redhat.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 28 May 2025 11:39:12 +0200
+X-Gm-Features: AX0GCFvBLnlzWD65XoPoEaCqR8aQRkKJqxadBtl2y6UrWx3JHjZf3XpuLM3RmeQ
+Message-ID: <CANiq72nwM79eGSAt8FjKgoYCJd-bLeTojaQAtg3SECE28uByQQ@mail.gmail.com>
+Subject: Re: [PATCH] rust: add helper for mutex_trylock
+To: Paolo Bonzini <pbonzini@redhat.com>, Boqun Feng <boqun.feng@gmail.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, ojeda@kernel.org, 
+	Stephen Rothwell <sfr@canb.auug.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We should get a new page after we discarded the page.
-So let's check for that.
+On Wed, May 28, 2025 at 10:34=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
+>
+>         Ok to apply to the KVM tree?
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- s390x/diag10.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Yeah, looks good to me, thanks!
 
-diff --git a/s390x/diag10.c b/s390x/diag10.c
-index 00725f58..b68481ad 100644
---- a/s390x/diag10.c
-+++ b/s390x/diag10.c
-@@ -94,6 +94,16 @@ static void test_priv(void)
- 	report_prefix_pop();
- }
- 
-+static void test_content(void)
-+{
-+	report_prefix_push("content");
-+	memset((void *)page0, 0x42, PAGE_SIZE);
-+	memset((void *)page1, 0, PAGE_SIZE);
-+	diag10(page0, page0);
-+	report(!memcmp((void *)page0, (void *)page1, PAGE_SIZE), "Page cleared");
-+	report_prefix_pop();
-+}
-+
- int main(void)
- {
- 	report_prefix_push("diag10");
-@@ -110,6 +120,7 @@ int main(void)
- 	test_prefix();
- 	test_params();
- 	test_priv();
-+	test_content();
- 
- out:
- 	report_prefix_pop();
--- 
-2.48.1
+Acked-by: Miguel Ojeda <ojeda@kernel.org>
 
+Cc'ing Boqun just in case and so that he is aware. Boqun: this fixes a
+Rust build error on the kvm branch which failed on merging into -next:
+
+    https://lore.kernel.org/linux-next/20250528152832.3ce43330@canb.auug.or=
+g.au/
+
+Cheers,
+Miguel
 
