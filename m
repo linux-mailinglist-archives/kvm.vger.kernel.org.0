@@ -1,147 +1,215 @@
-Return-Path: <kvm+bounces-47847-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47848-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CE9EAC6250
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 08:47:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB5F7AC6287
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 09:02:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1A8CA20A8C
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 06:46:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2463A1BC3628
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 07:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A869D2580FF;
-	Wed, 28 May 2025 06:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6B0243969;
+	Wed, 28 May 2025 07:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="r8EFuGRB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BiiIIB0b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1AF24678D;
-	Wed, 28 May 2025 06:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D461A23A6;
+	Wed, 28 May 2025 07:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748414655; cv=none; b=T1NsgWfwXRrxcRJeOJmzGyV2rF2R2HDtOQNT8EG5MoY2uZeHr0kZJRSeR1fBCvznALDuqk+UPPU3t40FZBxscJG03DCx0+nHN16TJgYnIxb/hTG7BAPZuut/2W582rhA4DrYdSfktodIPb/jLqkJKTOcUw+xk6Y337BaMsVugyA=
+	t=1748415716; cv=none; b=GGtMVbikouvXDVHq1VTpEGNAU/S341wtRzhwoYKkrPnIdTIUarwJPSBFx+vwMLKfm5ZSAJOFZOwjAM2LSd9ttefskiAyU/mTIu+X+ZuBK2xHrff3/y2oSCY+1iRy0Ewu2qPv+WMPVqTqwoPKlUxs4IDaOZVO7BbPYZHToWc7ukw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748414655; c=relaxed/simple;
-	bh=i/IPBsRRQzA/LSTE9msuNs7+guqvJN7NuTau9LEEuis=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=llS7Ycq+YPadKlltYKzR+VoZ/IreqYpKgfs85P9xG7dqdD23Y2lOX67oxCmC237s6ZkMJwWsUITomSi7j3rgQ+lQb320CYg1vWuIyADU31uK/ouOTvew8XKY1aVluci2Uir9nWMw6bsSHwa1T74YbzCUiKEK7MVl6V6+4CraZjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=r8EFuGRB; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1748414648;
-	bh=WvPbx51UEfdYoAoEDuqVeZqZrLagzgnwzW0OdKATt9E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r8EFuGRBg5Lg4KLSqw677Yk2Rm3v/LggXuyUr5cknbdyxjGCAR/I4EK8taXpbgfSO
-	 UUZ6XXqOR4Yov+RWB1KJnXzkXzhs49toVPhJe4oGohuPrUsCDfsFov0dtnIWBIOsAP
-	 cbHpNC/2liziQbUnU9m//QBrrunZKhaEDnpaSYZQjNe1/Y0JqWYQJLXdzeYgRlRYTl
-	 W1N2zR4xP6Hp6DYmMGuUE0AxgJBP5cTHrU83E7HclHIKTpIFygylIm9f+2fS6EB7fF
-	 KjSL+KRHvx2eWTg+AKHS6hZ9Q0bvV+c3nt5hEzZ8t0nyqP/uU1B+IT20aagSFCNVpP
-	 7IGZtvQtoftKQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4b6g2c41Hwz4x8Z;
-	Wed, 28 May 2025 16:44:08 +1000 (AEST)
-Date: Wed, 28 May 2025 16:44:07 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>,
- KVM <kvm@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the kvm tree
-Message-ID: <20250528164407.1d8d3948@canb.auug.org.au>
-In-Reply-To: <CABgObfbCg1wiZJmnXFihmRLvPiJq2bCQH3MNVMfiUJphz4JW3g@mail.gmail.com>
-References: <20250528152832.3ce43330@canb.auug.org.au>
-	<CABgObfbCg1wiZJmnXFihmRLvPiJq2bCQH3MNVMfiUJphz4JW3g@mail.gmail.com>
+	s=arc-20240116; t=1748415716; c=relaxed/simple;
+	bh=F/OH2byaWIb39+LvX14LmWOV3JG5wy+sTXzFUhj4ogI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ya4rhUcmqZ0ghJOqXHYfUGGXvvuRJtTkDRV1tz/woVnJl1DXormVGPtX8YB6XT3t7pA4YVD1Kmkcn6n7hySlC93FMEvOD1j3RJ5FgYxjlc3tcuofKZKTayat4fQ3v0pu252PhTXwvqhSNobzuzBU/O0h1UCtCqPqh/vpCp+vTJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BiiIIB0b; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748415715; x=1779951715;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=F/OH2byaWIb39+LvX14LmWOV3JG5wy+sTXzFUhj4ogI=;
+  b=BiiIIB0b+MDLWemHViCUf1tYA71vjUHu9kC1Kz+j12MIvsK56hit2/Jt
+   Jiro5llJJaQMQ0HbK2kNwJKfZNP16mWiw/x9QZKCSN/XgGJa+l1UroNxK
+   9YvXjsoce2vms2Evrc2iPhipAqT9ltZs9IklCAxUrOJIIMmLnpxDO0crR
+   OpHx2PELsIpIIdcwHOeJ0sPO3txLQ+C4IexyfP3xA4V98QDKSoxGvjToR
+   IesWxQDK9Y+sUBFCCkg7WqB4pS3SanqJXWJhUvARPTDUKuJ7/yZp/xoDL
+   bL8wD8jnzbIrvA/b/sU+uB65lurCJA+7MkJpTmu0TViPkgbfFRxLIk2wG
+   Q==;
+X-CSE-ConnectionGUID: PYChIjCbQsKMihv8+/Ud5A==
+X-CSE-MsgGUID: H/fseoArT42maVjVt50cOg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11446"; a="61058292"
+X-IronPort-AV: E=Sophos;i="6.15,320,1739865600"; 
+   d="scan'208";a="61058292"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2025 00:01:52 -0700
+X-CSE-ConnectionGUID: wmW7fVgDR2+XxtYJ87FHnw==
+X-CSE-MsgGUID: 6tDCCgNVQZqzAr6aeJPyjA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,320,1739865600"; 
+   d="scan'208";a="148016015"
+Received: from unknown (HELO [10.238.3.95]) ([10.238.3.95])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2025 00:01:33 -0700
+Message-ID: <21b9b151-6e4f-47b8-9c6b-73eeb0c20165@linux.intel.com>
+Date: Wed, 28 May 2025 15:01:31 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/RZdYClXNIns397zIJYDIAX7";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 05/51] KVM: guest_memfd: Skip LRU for guest_memfd
+ folios
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com,
+ ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com,
+ anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu,
+ bfoster@redhat.com, brauner@kernel.org, catalin.marinas@arm.com,
+ chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com,
+ david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk,
+ erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com,
+ haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
+ ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
+ james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com,
+ jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
+ jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
+ kent.overstreet@linux.dev, kirill.shutemov@intel.com,
+ liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
+ mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
+ michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
+ nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
+ palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
+ pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
+ pgonda@google.com, pvorel@suse.cz, qperret@google.com,
+ quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com,
+ richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com,
+ roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com, shuah@kernel.org,
+ steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com,
+ tabba@google.com, thomas.lendacky@amd.com, usama.arif@bytedance.com,
+ vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
+ vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
+ willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com,
+ yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+References: <cover.1747264138.git.ackerleytng@google.com>
+ <37f60bbd7d408cf6d421d0582462488262c720ab.1747264138.git.ackerleytng@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <37f60bbd7d408cf6d421d0582462488262c720ab.1747264138.git.ackerleytng@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---Sig_/RZdYClXNIns397zIJYDIAX7
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo,
 
-On Wed, 28 May 2025 07:37:57 +0200 Paolo Bonzini <pbonzini@redhat.com> wrot=
-e:
+On 5/15/2025 7:41 AM, Ackerley Tng wrote:
+> filemap_add_folio(), called from filemap_grab_folio(), adds the folio
+> onto some LRU list, which is not necessary for guest_memfd since
+> guest_memfd folios don't participate in any swapping.
 >
-> On Wed, May 28, 2025 at 7:28=E2=80=AFAM Stephen Rothwell <sfr@canb.auug.o=
-rg.au> wrote:
-> >
-> > After merging the kvm tree, today's linux-next build (x86_64 allmodconf=
-ig)
-> > failed like this:
-> >
-> > error[E0425]: cannot find function `mutex_trylock` in crate `bindings` =
-=20
-> >    --> rust/kernel/sync/lock/mutex.rs:129:41 =20
-> >     |
-> > 129 |         let result =3D unsafe { bindings::mutex_trylock(ptr) };
-> >     |                                         ^^^^^^^^^^^^^ help: a fun=
-ction with a similar name exists: `mutex_lock`
-> >     |
-> >    ::: /home/sfr/next/x86_64_allmodconfig/rust/bindings/bindings_helper=
-s_generated.rs:265:5
-> >     |
-> > 265 |     pub fn mutex_lock(lock: *mut mutex);
-> >     |     ------------------------------------ similarly named function=
- `mutex_lock` defined here
-> >
-> > error: aborting due to 1 previous error =20
->=20
-> I thought that since Rust failures wouldn't have to be fixed by
-> non-Rust maintainers, they wouldn't block merging of non-Rust trees in
-> linux-next?
+> This patch reimplements part of filemap_add_folio() to avoid adding
+> allocated guest_memfd folios to the filemap.
 
-I am sorry, but I am not sure how that is supposed to work.  (Do I
-disable RUST in my builds - thereby possibly missing other build
-problems?)  In this case you can probably not even do an allmodconfig
-build of the kvm tree alone if you have rustc etc installed, right?
+filemap -> LRU list?
 
-BTW, the only bit of the kvm tree not merged into linux-next today is
-the kvm-lockdep-common topic branch that was merged overnight (my time).
+>
+> With shared to private conversions dependent on refcounts, avoiding
+> usage of LRU ensures that LRU lists no longer take any refcounts on
+> guest_memfd folios and significantly reduces the chance of elevated
+> refcounts during conversion.
+>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Change-Id: Ia2540d9fc132d46219e6e714fd42bc82a62a27fa
+> ---
+>   mm/filemap.c           |  1 +
+>   mm/memcontrol.c        |  2 +
+>   virt/kvm/guest_memfd.c | 91 ++++++++++++++++++++++++++++++++++++++----
+>   3 files changed, 86 insertions(+), 8 deletions(-)
+>
+[...]
+>   /*
+>    * Returns a locked folio on success.  The caller is responsible for
+>    * setting the up-to-date flag before the memory is mapped into the guest.
+> @@ -477,8 +509,46 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>    */
+>   static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
+>   {
+> +	struct folio *folio;
+> +	gfp_t gfp;
+> +	int ret;
+> +
+> +repeat:
+> +	folio = filemap_lock_folio(inode->i_mapping, index);
+> +	if (!IS_ERR(folio))
+> +		return folio;
+> +
+> +	gfp = mapping_gfp_mask(inode->i_mapping);
+> +
+>   	/* TODO: Support huge pages. */
+> -	return filemap_grab_folio(inode->i_mapping, index);
+> +	folio = filemap_alloc_folio(gfp, 0);
+> +	if (!folio)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	ret = mem_cgroup_charge(folio, NULL, gfp);
+> +	if (ret) {
+> +		folio_put(folio);
+> +		return ERR_PTR(ret);
+> +	}
+> +
+> +	ret = kvm_gmem_filemap_add_folio(inode->i_mapping, folio, index);
+> +	if (ret) {
+> +		folio_put(folio);
+> +
+> +		/*
+> +		 * There was a race, two threads tried to get a folio indexing
+> +		 * to the same location in the filemap. The losing thread should
+> +		 * free the allocated folio, then lock the folio added to the
+> +		 * filemap by the winning thread.
 
-> In this case it's not a problem to fix it up at all (I'll send a patch
-> to Miguel as soon as I've taken the little guy to school); it's just
-> to understand what's to expect.
+How about changing
+“then lock the folio added to the filemap by the winning thread”
+to
+"the winning thread locks the folio added to the filemap"?
 
-That patch needs to go into your tree (with Miguel's Ack if necessary)
-otherwise as soon as Linus merges your tree, his allmodconfig build
-will be broken and he will (probably) unmerge your tree and let you
-know (and wonder why I didn't pick it up).
+> +		 */
+> +		if (ret == -EEXIST)
+> +			goto repeat;
+> +
+> +		return ERR_PTR(ret);
+> +	}
+> +
+> +	__folio_set_locked(folio);
+> +	return folio;
+>   }
+>   
+>   static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+> @@ -956,23 +1026,28 @@ static int kvm_gmem_error_folio(struct address_space *mapping, struct folio *fol
+>   }
+>   
+>   #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE
+> +static void kvm_gmem_invalidate(struct folio *folio)
+> +{
+> +	kvm_pfn_t pfn = folio_pfn(folio);
+> +
+> +	kvm_arch_gmem_invalidate(pfn, pfn + folio_nr_pages(folio));
+> +}
+> +#else
+> +static inline void kvm_gmem_invalidate(struct folio *folio) {}
 
-I don't know what to tell you about expectations, sorry.
---=20
-Cheers,
-Stephen Rothwell
+No need to tag a local static function with "inline".
 
---Sig_/RZdYClXNIns397zIJYDIAX7
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmg2sLcACgkQAVBC80lX
-0GzLRwgAmeVTbPm1XBE0JnDMQuwmj6lX0bnhI0YU9CFzbEwCYJ7S8TQiqhAqnbpi
-a3pkfykkmATvcA7M2lrGa3nmRmDgoH0soOIkotGO1ZHA14IdvXaFWvRBUOqL8wOn
-Y3IVV0GYrfZA++KR5MT1oqOics71su/nL2Us93ig97yQLhqv6BaR913NDY1HPW+1
-6ZQeu+0ZycPQ4ExZFZS3Jj8NC6pd5ezR/r9lcgvITWtIy8eQBBIPMbw6/6zbRUTv
-nnpE4eYNtoaIkTDxhjPE4kPJOjSFu6SBQzF27DmnCdLZqCkVSzWTJfnmBTLbZdUh
-qxb9PbqpliB0c13ZOZySNZGpq4biaQ==
-=HZKP
------END PGP SIGNATURE-----
-
---Sig_/RZdYClXNIns397zIJYDIAX7--
+> +#endif
+> +
+[...]
 
