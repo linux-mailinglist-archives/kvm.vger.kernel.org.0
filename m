@@ -1,188 +1,157 @@
-Return-Path: <kvm+bounces-47890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E0DFAC6D31
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 17:49:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29E3DAC6D81
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 18:08:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CD89A2350D
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 15:48:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC4134E2EC9
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 16:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7C528C864;
-	Wed, 28 May 2025 15:48:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0008128C867;
+	Wed, 28 May 2025 16:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hXy6SQQu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DTP6sStv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D050C1CF96
-	for <kvm@vger.kernel.org>; Wed, 28 May 2025 15:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9652C28C011
+	for <kvm@vger.kernel.org>; Wed, 28 May 2025 16:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748447329; cv=none; b=qMZG8oIjLMtJD+zlCKMjGR/qdh8cxDFUIhho9hbXMwbG4WTxHAHFjE81lB15syIYTRI/Y2JOqEBHhH0rBhdHb+Av91nYZnJFCpSYtC49PxH0RkGw5OMXxNV/cm0xkND3BN12y7JrXRuCylGeygbjY+0RUMeDj0jyK3gTZvQp5Hs=
+	t=1748448510; cv=none; b=YD0w7FO960JQN4avh7zsdSyP+UA97bbuEBPN4bXkLZKt5kCJt2gexivGTgOYZfjJEDLal31Bh8r8ytig9GTS4mSNut6CrMxo+eIg9RNbEb7fSdThzsTZU4Sgx0LSEU2gZ2oat4jhtYiXMfKGxBaQYKev6/Fs3CPtVDRUPElX3qQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748447329; c=relaxed/simple;
-	bh=WIlV51wEuAd2rtYOVeO8B1eFmuqdgn/T2swun7fdn7M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mRUw12wnSxfFD2mbNMNA4gZrMg/GepwXattQZJ7EMOn5Mw31ManEE/SQn2jACCLWQlFPNxvOWDBdYqsT+jicnIKxxHlR8bbvihafnhnOVSx3VJ/Hi3/79LxpNrxMEJEbkXbFlXyiWd+ZE1Du1eGLF4MeqfwY0hMJKaD8Jpld1ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hXy6SQQu; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-70e4043c5b7so178767b3.1
-        for <kvm@vger.kernel.org>; Wed, 28 May 2025 08:48:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748447326; x=1749052126; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qJhBrTcV/2KTHPEGx8A5eIEZm9bF8mIMQSTTxnrKh3w=;
-        b=hXy6SQQumd1hR4Cxd/fcVSFX4ZnarGLP7uHEpYqyvSPteonbXsnrjc1+pLD20UYR3b
-         sw/lDk8cdH9JOfHmPMLmLPnXi31u+TJK1cKirGWbG96no6Aj5EgHVpDXju1ep5UM3rkW
-         ESX6oZBgV4Ai1C4apsx0LG7qiHUqG0MfFMWKusoYVjza7tpgkYTv2jNuoDE0QUP28TsX
-         PEqg/ym3/+fbH0RH+ljlim3nenW6LOpGtwekBKBuvZguluUojAdzEJ0vKtBIAMdZwobV
-         lpvv13JqRCd78j3rz9R4BbsFraLladzbT8QMqMIezqFs3OT9NWpfwTZRfKrmsDkLjBlS
-         53kA==
+	s=arc-20240116; t=1748448510; c=relaxed/simple;
+	bh=LibnRIxltzpbANK+z/ZCNtTGSZsFrtMBHyUPR93lW28=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZaAfV1OTAu1hQmyQI2BhwFRoHF21fYoT4f//JCx33En1Up744HVVqnPAmdvHSfJb8i4fGTKPbS3LgzguMgmvvDrXswPIo8YR9ZZacuOYAiGYnkAJ92QvXWxc2TcmCBuWfTVixoie0YWPjCzPgSkfphOZ11GZ/qnCRRlPLdJ4Oz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DTP6sStv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748448507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ELCjKD+gxUuR3aRJg9A9JbOeDRYY9q3dgElqJB30ab4=;
+	b=DTP6sStvhnHjYESwgyTmF0GG2suoJ3+RMxOQTNERnl+bzK/BONvH4ML3HpR7zqu4b//hBx
+	zTmYt095F80Ywm+X7wjc7dnjJpssjlgmzjxCIKPSLNY/a9dHs2SQUDBxW2w2MuihwzATSD
+	rlVx9I046oTc+bGKVqmpa0OHWW0Z5eg=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-344-h2QocfjOMWaOdEvQjPydwg-1; Wed, 28 May 2025 12:08:26 -0400
+X-MC-Unique: h2QocfjOMWaOdEvQjPydwg-1
+X-Mimecast-MFC-AGG-ID: h2QocfjOMWaOdEvQjPydwg_1748448506
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7c5f876bfe0so756570585a.3
+        for <kvm@vger.kernel.org>; Wed, 28 May 2025 09:08:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748447326; x=1749052126;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qJhBrTcV/2KTHPEGx8A5eIEZm9bF8mIMQSTTxnrKh3w=;
-        b=W6ozrHriWwlwCLCQfMU6taGk8w5DVcySR+A9hCYtPWJFWpMTo25wf+D8D1yXzFsVhd
-         rDUEguB9i6WiqgD9jmIOLgm0PcrQOR4+DP+mNe1krh8zNFsxolzcbnZPY/RqOJAF1m3z
-         T4U5yfb+PgNck3e/h5t/QOEyEJYDIKi8jAibWEo5EhzkIP3xdwnAD35XN+Y/9UJKjZGG
-         D6vGnj8op7Z6mxONQDZLMODGRGR3JklaxaIK110/nETXjlRDUHlgvH1TFfrrFGMdPcDm
-         4HeSevmMcBMaUH1n4N9pXVZ4HHs4rvGOTmqclW/NJ6B9g1/QQ7bNoaJP8UuJa8IQtXr+
-         yX0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUw0oxO4Oq8Nu1+lOKkogy5nFcSBr3BgWlH47otZdeA86+HJHVVUubWC8SSGCpYoj4nWyw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGGzTEZ8QHyKuoCUN0mdBkFtv8hL25zk03LPa2Kr1rmPkm08rl
-	yuseF0jqFsfkx4wRwTUoi8O0Wy1ZQhXfsP0OzmeIuWUPloYZLSlCBl0Oh8QyR2FNGurVl1XcJ0Z
-	pW33V1CRmevIC2vvOIjKSWDN4N86r9t2UINsDSkJU
-X-Gm-Gg: ASbGnctCI/6RZkNOwWz3E7Nc+/gwoWYqvS0kDZW++eKEnx7Px0VaIWsZOUCHjEHuG9X
-	zKcwUGc8NN/PiBguBPPIKlyntw1pPdLyCUcz5sPe4AUYmss0NMazUwLvXickD1nLcBDoJ45Tb6M
-	Kqt2B1c+4ScucQ+audW/YJtMbtwuDNOrDzDQXNAScnJIpxuMy7y8yo6gCOsZ95zX98EZQAePh9B
-	M5t3g==
-X-Google-Smtp-Source: AGHT+IELfFCth5Pbkc2q+fs3hGfuRfgdVh0Gdule7jkxxm4LWUKEs85HrAmHhTzH2guxXlvKX1XFjzs03oe3LxVeaz0=
-X-Received: by 2002:a05:690c:c02:b0:6fb:9280:5bf4 with SMTP id
- 00721157ae682-70e2da69ba1mr219329397b3.30.1748447325426; Wed, 28 May 2025
- 08:48:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748448505; x=1749053305;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ELCjKD+gxUuR3aRJg9A9JbOeDRYY9q3dgElqJB30ab4=;
+        b=te+6DApL7wrV1gpDyC/aSDVKdzEksY50K1xmznji0FJ5Lz8VZH/8H4kY7ZhyKDhNIR
+         0nVQ0PhNhItJyRqa4eWeeXYLvIRcw4sIfhzEPWc5mp9snFoi7wwxcHsFRJShl6S8Q+l4
+         kRTbaN1HdeT5EUYcu5hZyBbCzOV4zswC8TIv0isZwRfuajTwpa693pvFL2xCN8o5/sYL
+         vJYnL2o7oRXBaSnKpObHeRchVXTJ6vHoBsU8vaZfYA2uv2uIg36iv8i/J3ILB93hFfEE
+         9Z7Wll07ODCVMCtXYvYr5NAQ5HTLLADT2BQ3JvBJFe5bbP0ESRtsF22VPdTl2+UemQ4H
+         Lvjw==
+X-Forwarded-Encrypted: i=1; AJvYcCUH1ck2Y7m7kNo5HzDNRaK2ogtMT9u9JXSf+1xi0n+belyapulGXqru9yQNQJWvHBOL4Sw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAK4N103D4cFCAd+pbp1pvb9YXgwV/g5jR9XuAFC4h1BKlVJHB
+	KFpSdVUVr6nTs7jvSBGp0EADjR7PDZTPcsPqTp9B3KM5tCuwFEsuZyIe2XW54uVGtFlmYMw+DHJ
+	wugIuNl0Cw/907qouNZ1M7XwX1Tm31ETHJCdD+qrID67KpbD1JqXfgA==
+X-Gm-Gg: ASbGncuhw93qbZY7o7t3CSffFICwfYGs3mHlymIP2a6hR/NyfgNJgtC7pys0Tx6pFih
+	IZFBb1PzGRm0CE6IoAEZXPrzg/8Aa1fnyi6UQmaPcY3tsWp2ikngoqk0dnsnT1NxdpD6q0NYtIn
+	bAeOe6OpW6j4DHX/mGHMhlEjpMk2mQ3Q2DRNZ7H1VQRfko1w0P1QZnxWKnOHRauaHH9muCB0YWX
+	MszCSncb3/zKSNgRcOauNT1JHMbbw5v1c74PsE7xIZmQ+i/+TyUbgMtOM2A8V0/y4iWCRvdQGcL
+	qAysrVOynu5u+jglZ9+Bjw2EVOhDmugzMh1+Yo8rJYiPbhTkjJ3bFvxxZ6s=
+X-Received: by 2002:a05:620a:424d:b0:7c5:962b:e87c with SMTP id af79cd13be357-7ceecc296f9mr2823529485a.44.1748448505401;
+        Wed, 28 May 2025 09:08:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGwBg64uo0z4Bgibxmg+9R08YonGSy0ylNwRuFxVQIAkQT9OnjwXxcnU1GDcfo/I0jNy+NrwQ==
+X-Received: by 2002:a05:620a:424d:b0:7c5:962b:e87c with SMTP id af79cd13be357-7ceecc296f9mr2823520385a.44.1748448504590;
+        Wed, 28 May 2025 09:08:24 -0700 (PDT)
+Received: from ?IPv6:2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38? ([2607:fea8:fc01:8d8d:5c3d:ce6:f389:cd38])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cfb8210270sm87017585a.31.2025.05.28.09.08.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 May 2025 09:08:24 -0700 (PDT)
+Message-ID: <fadc8e044c3b18984b0ca4a88ef214feb779034d.camel@redhat.com>
+Subject: Re: [PATCH] rust: add helper for mutex_trylock
+From: mlevitsk@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Cc: rust-for-linux@vger.kernel.org, ojeda@kernel.org, Stephen Rothwell
+	 <sfr@canb.auug.org.au>
+Date: Wed, 28 May 2025 12:08:23 -0400
+In-Reply-To: <20250528083431.1875345-1-pbonzini@redhat.com>
+References: <20250528083431.1875345-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109204929.1106563-1-jthoughton@google.com> <aBqlkz1bqhu-9toV@google.com>
-In-Reply-To: <aBqlkz1bqhu-9toV@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Wed, 28 May 2025 11:48:09 -0400
-X-Gm-Features: AX0GCFuLPsZ5TxH5z7efpKpwgvPpjgQZqJBp0wjKrKAAM8LNrge9ZlG7omP9Ut0
-Message-ID: <CADrL8HXjLjVyFiFee9Q58TQ9zBfXiO+VG=25Rw4UD+fbDmxQFg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/13] KVM: Introduce KVM Userfault
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Nikita Kalyazin <kalyazin@amazon.com>, Anish Moorthy <amoorthy@google.com>, 
-	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>, 
-	David Matlack <dmatlack@google.com>, wei.w.wang@intel.com, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	Jiaqi Yan <jiaqiyan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 6, 2025 at 8:13=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Thu, Jan 09, 2025, James Houghton wrote:
-> >   KVM: Add KVM_MEM_USERFAULT memslot flag and bitmap
-> >   KVM: Add KVM_MEMORY_EXIT_FLAG_USERFAULT
-> >   KVM: Allow late setting of KVM_MEM_USERFAULT on guest_memfd memslot
-> >   KVM: Advertise KVM_CAP_USERFAULT in KVM_CHECK_EXTENSION
-> >   KVM: x86/mmu: Add support for KVM_MEM_USERFAULT
-> >   KVM: arm64: Add support for KVM_MEM_USERFAULT
-> >   KVM: selftests: Fix vm_mem_region_set_flags docstring
-> >   KVM: selftests: Fix prefault_mem logic
-> >   KVM: selftests: Add va_start/end into uffd_desc
-> >   KVM: selftests: Add KVM Userfault mode to demand_paging_test
-> >   KVM: selftests: Inform set_memory_region_test of KVM_MEM_USERFAULT
-> >   KVM: selftests: Add KVM_MEM_USERFAULT + guest_memfd toggle tests
-> >   KVM: Documentation: Add KVM_CAP_USERFAULT and KVM_MEM_USERFAULT
-> >     details
-> >
-> >  Documentation/virt/kvm/api.rst                |  33 +++-
-> >  arch/arm64/kvm/Kconfig                        |   1 +
-> >  arch/arm64/kvm/mmu.c                          |  26 +++-
-> >  arch/x86/kvm/Kconfig                          |   1 +
-> >  arch/x86/kvm/mmu/mmu.c                        |  27 +++-
-> >  arch/x86/kvm/mmu/mmu_internal.h               |  20 ++-
-> >  arch/x86/kvm/x86.c                            |  36 +++--
-> >  include/linux/kvm_host.h                      |  19 ++-
-> >  include/uapi/linux/kvm.h                      |   6 +-
-> >  .../selftests/kvm/demand_paging_test.c        | 145 ++++++++++++++++--
-> >  .../testing/selftests/kvm/include/kvm_util.h  |   5 +
-> >  .../selftests/kvm/include/userfaultfd_util.h  |   2 +
-> >  tools/testing/selftests/kvm/lib/kvm_util.c    |  42 ++++-
-> >  .../selftests/kvm/lib/userfaultfd_util.c      |   2 +
-> >  .../selftests/kvm/set_memory_region_test.c    |  33 ++++
-> >  virt/kvm/Kconfig                              |   3 +
-> >  virt/kvm/kvm_main.c                           |  54 ++++++-
-> >  17 files changed, 419 insertions(+), 36 deletions(-)
->
-> I didn't look at the selftests changes, but nothing in this series scares=
- me.  We
-> bikeshedded most of this death this in the "exit on missing" series, so f=
-or me at
-> least, the only real question is whether or not we want to add the uAPI. =
- AFAIK,
-> this is best proposal for post-copy guest_memfd support (and not just bec=
-ause it's
-> the only proposal :-D).
+On Wed, 2025-05-28 at 10:34 +0200, Paolo Bonzini wrote:
+> After commit c5b6ababd21a ("locking/mutex: implement mutex_trylock_nested=
+",
+> currently in the KVM tree) mutex_trylock() will be a macro when lockdep i=
+s
+> enabled.=C2=A0 Rust therefore needs the corresponding helper.=C2=A0 Just =
+add it and
+> the rust/bindings/bindings_helpers_generated.rs Makefile rules will do
+> their thing.
+>=20
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-The only thing that I want to call out again is that this UAPI works
-great for when we are going from userfault --> !userfault. That is, it
-works well for postcopy (both for guest_memfd and for standard
-memslots where userfaultfd scalability is a concern).
 
-But there is another use case worth bringing up: unmapping pages that
-the VMM is emulating as poisoned.
+Hi,
+Sorry for that.=C2=A0
 
-Normally this can be handled by mm (e.g. with UFFDIO_POISON), but for
-4K poison within a HugeTLB-backed memslot (if the HugeTLB page remains
-mapped in userspace), KVM Userfault is the only option (if we don't
-want to punch holes in memslots). This leaves us with three problems:
+Next time I'll check rust bindings as well, I never had to deal with them b=
+efore.
 
-1. If using KVM Userfault to emulate poison, we are stuck with small
-pages in stage 2 for the entire memslot.
-2. We must unmap everything when toggling on KVM Userfault just to
-unmap a single page.
-3. If KVM Userfault is already enabled, we have no choice but to
-toggle KVM Userfault off and on again to unmap the newly poisoned
-pages (i.e., there is no ioctl to scan the bitmap and unmap
-newly-userfault pages).
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-All of these are non-issues if we emulate poison by removing memslots,
-and I think that's possible. But if that proves too slow, we'd need to
-be a little bit more clever with hugepage recovery and with unmapping
-newly-userfault pages, both of which I think can be solved by adding
-some kind of bitmap re-scan ioctl. We can do that later if the need
-arises.
+Best regards,
+	Maxim Levitsky
 
-> So... yes?
 
-Thanks Sean!
+> ---
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Ok to apply to the KVM tree?
+>=20
+> =C2=A0rust/helpers/mutex.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 =
+5 +++++
+> =C2=A01 files changed, 5 insertions(+)
+>=20
+> diff a/rust/helpers/mutex.c b/rust/helpers/mutex.c
+> index 06575553eda5,06575553eda5..9ab29104bee1
+> --- a/rust/helpers/mutex.c
+> +++ b/rust/helpers/mutex.c
+> @@ -7,6 +7,11 @@ void rust_helper_mutex_lock(struct mute
+> =C2=A0	mutex_lock(lock);
+> =C2=A0}
+> =C2=A0
+> +int rust_helper_mutex_trylock(struct mutex *lock)
+> +{
+> +	return mutex_trylock(lock);
+> +}
+> +
+> =C2=A0void rust_helper___mutex_init(struct mutex *mutex, const char *name=
+,
+> =C2=A0			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct lock_class_key *key)
+> =C2=A0{
+>=20
+>=20
 
-> Attached are a variation on the series using the common "struct kvm_page_=
-fault"
-> idea.  The documentation change could be squashed with the final enableme=
-nt patch.
->
-> Compile tested only.  I would not be the least bit surprised if I complet=
-ely
-> butchered something.
-
-Looks good! The new selftests work just fine.
 
