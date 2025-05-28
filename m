@@ -1,170 +1,178 @@
-Return-Path: <kvm+bounces-47913-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C2B6AC7473
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 01:20:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 787C1AC747E
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 01:25:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ECBFA437C8
-	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 23:19:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 367CE4E215C
+	for <lists+kvm@lfdr.de>; Wed, 28 May 2025 23:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CD7221561;
-	Wed, 28 May 2025 23:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 495D1230BF9;
+	Wed, 28 May 2025 23:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f8eOGPjS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qvPhFn5C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D732236EB;
-	Wed, 28 May 2025 23:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE582230BFF
+	for <kvm@vger.kernel.org>; Wed, 28 May 2025 23:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748474292; cv=none; b=m4XuyGpvJ6kYQcUMIjsxprBOKARiG0YdP54v2gkbMr9qOs5uZUojvpcZauDuQbXkwCxTJQjYuVcvAWFBoyijOdMfkXOrtg4nWjyamWgFBYrVIveY4LH/L07jrXcCfUbLbptoDK+iMSYdo0/bQcvKN05py4CPCuH/1MrA3X1Bgwc=
+	t=1748474727; cv=none; b=NBsyI3r70ysgT/6heBmogZd+nxx2rr8oz4TVECcsEsQ3hkvVhU9spgI2rX9gwLOv5gr/5kxpqFTmjLLDwWEHqC4HgIvtsqeCvp1DmMxTRorYHOeM49ZvCxjYhQMVV4hs+kZmywq3K2n2+UI9eXhGVyGvnZM72HkIB71cOOKU8s4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748474292; c=relaxed/simple;
-	bh=jTXbawS0IX96rFwszkT9kCM9dGjFANXvjb9fYEZEKIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gtwsH9imMGnuBYdm2+qAwf05fYEzQ4XVJFCcuD9bIKufUKb1zUmAF3BQDPqfDg5oBbmYPh+uWv7n6/V2pmSOyk0ut4q4GodBE5cjdhPJEO+r+9GneB9SX0dD7jLUyU5T2QueeKOC7W4FVUrIRNbGDTVqaAw773iEPKSbIebtjxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f8eOGPjS; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748474291; x=1780010291;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jTXbawS0IX96rFwszkT9kCM9dGjFANXvjb9fYEZEKIQ=;
-  b=f8eOGPjSPTxQsZcYW+2cSt1VC9rX8gQbewPAl3VE0eu4wK/a4Hw32b3e
-   mkdinDiPykmpZ2jzBI+NyqUVs89VwH5VCoLr6MEPyKgD4w1SjsOjrGPS2
-   Ihx1I2gpH6ZVWAwCxBFSXu/T7+HZc3yYCDeGRasYXn49RnJXxm/sbnVB0
-   jP6YLGCLQ1DCg6ZA0RE27RwZ/p7eI1BX3ZmkfxbbEVZKKfqTbOS6jdp06
-   dUF4jaM7uNoEg4I5DAa9bGeQuCItzHyz/r4008OXik13At0hQWbV1lONY
-   s8FNlonTWrfJfaC8dXG+PzjBhkNStEJwg9ZeAdbqh/Pv1/9ts+EipulL9
-   Q==;
-X-CSE-ConnectionGUID: vZhFyn+RTyav2PIAa9rb7w==
-X-CSE-MsgGUID: jo+/F0D8SGasLRiwktzsIQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11447"; a="53145989"
-X-IronPort-AV: E=Sophos;i="6.15,322,1739865600"; 
-   d="scan'208";a="53145989"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2025 16:18:09 -0700
-X-CSE-ConnectionGUID: iwficSJmT/qS3pdcAJGGYg==
-X-CSE-MsgGUID: N7yDre9XSIaIrg+kwGzUcQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,322,1739865600"; 
-   d="scan'208";a="148155222"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 28 May 2025 16:18:01 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uKQ23-000W9E-17;
-	Wed, 28 May 2025 23:17:59 +0000
-Date: Thu, 29 May 2025 07:17:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: oe-kbuild-all@lists.linux.dev, pbonzini@redhat.com,
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
-	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	willy@infradead.org, akpm@linux-foundation.org,
-	xiaoyao.li@intel.com, yilun.xu@intel.com,
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net,
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
-	wei.w.wang@intel.com
-Subject: Re: [PATCH v10 08/16] KVM: guest_memfd: Allow host to map
- guest_memfd pages
-Message-ID: <202505290736.HR4GYiOF-lkp@intel.com>
-References: <20250527180245.1413463-9-tabba@google.com>
+	s=arc-20240116; t=1748474727; c=relaxed/simple;
+	bh=HgABNnq1PWhhK0FklJ/SVzoi8Z+ONJI1riVy8DoPDxc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kKEoANnng3TzML4oz5D5Fs3qGVCtx7Dmna6zxpPjQIxr6RXU2SCig+gnXXgNa9pAfi1sL1FjSMxlSosncuchcftXKEkIkpa3+qabEKAlP0b8BLj0Kp38l92SowUmbgUbafUUVuCsIS2uuUJlkrR8WNm7RheKedhEQryEa900T9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qvPhFn5C; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-747adea6ddbso183761b3a.0
+        for <kvm@vger.kernel.org>; Wed, 28 May 2025 16:25:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748474725; x=1749079525; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gcxQaHt9YO/4vp8lHIwRWi8ySYcHIjzznVMdx4yu7+k=;
+        b=qvPhFn5C7xkIsZMR74eG1/yGyBDLzHvm0ki039CDhMZMtrTYu9xtTbWIonU4QFFrRy
+         P7P6vvexlvwz8jI0hYou3l8HRum86xYAq+oOawt+8fhC6YXPGMPIzFyerjH49NRfWSuN
+         5lFkIxd10awpvxrNt2PJMf6YpTaFZLMVMdehAV4neX2uNDaNEWneELyxLLXG3JNMlVhf
+         gcbleUICbeO28+7a52ckZNwrbSf3rciEZRRUMbOM9U3CL7sv+Muc6GDl40Nbfz92OBBU
+         fqjrmoUr3ggY4SYmzbid5kI/PuT+y8P2BQmdqu+uBBj5tb1ujfcijxVrxPa1hm7/wNzF
+         CGNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748474725; x=1749079525;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gcxQaHt9YO/4vp8lHIwRWi8ySYcHIjzznVMdx4yu7+k=;
+        b=rFXrfbO6DNIj8wFmN5VyZczyJkkkTq29cZQA+43MatgTtoWYFOSQbaGriR7idngfiw
+         FzkoJRUGg5zrNFuSFA3K7pnsAt/inTdLT0kKKnt3MawempI/JShyGCoCZ/7KilPPYBCF
+         ognusPKRqsWa7YnuyEHmNQz9Il4LFlUnTNRCbpPbF9qNRMcidB89u70BFK859YrKu7RG
+         ehk1Dz7oqvXIh1ui3bRARNakQuy8d1hBlRyQFE+e2cuKbeagliHXtBO9gY05Iw2pIkR0
+         PjrGfxwrSPg37wVPKPJ7/zNxPxjK/4HZZdmH3BPQi+pGaUKvJEk/To0Nh3L92bomW8wB
+         Os+w==
+X-Forwarded-Encrypted: i=1; AJvYcCVoPCPgFxe4BMypRSrFIWz1WQdc8GDG3iIy2IzpXuHYF9mhdYiLv87+igVLhkHb8PWE5Co=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYlsjlT94chpx8BkCU8o2AQRQYjXXWomrKcOlOsQ229wUuRcE/
+	z0JswiUn1YIiYbqLWrQDBV5LIrvrx48bGspEOSw60wdS190nEPvoHgOLoZjTCZkq8u9liNG8Xh1
+	affZRWA==
+X-Google-Smtp-Source: AGHT+IErw9co+DcBT121540SfwKH6gZVIzfkdn9B2d2kwxMAwaFIuqhkwNuL6Huhgc39bFpmxXdGbf8i9Ig=
+X-Received: from pgdu5.prod.google.com ([2002:a05:6a02:2f45:b0:b2e:c392:14f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:699:b0:218:cdcf:106b
+ with SMTP id adf61e73a8af0-21aad7827femr6695431637.9.1748474725210; Wed, 28
+ May 2025 16:25:25 -0700 (PDT)
+Date: Wed, 28 May 2025 16:25:24 -0700
+In-Reply-To: <20250528201756.36271-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250527180245.1413463-9-tabba@google.com>
+Mime-Version: 1.0
+References: <aDdILHOu9g-m5hSm@google.com> <20250528201756.36271-1-jthoughton@google.com>
+Message-ID: <aDebZD1Kmmg15zs7@google.com>
+Subject: Re: [PATCH v2 06/13] KVM: arm64: Add support for KVM_MEM_USERFAULT
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: amoorthy@google.com, corbet@lwn.net, dmatlack@google.com, 
+	kalyazin@amazon.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
+	pbonzini@redhat.com, peterx@redhat.com, pgonda@google.com, 
+	wei.w.wang@intel.com, yan.y.zhao@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Fuad,
+On Wed, May 28, 2025, James Houghton wrote:
+> On Wed, May 28, 2025 at 1:30=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index c5d21bcfa3ed4..f1db3f7742b28 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2127,15 +2131,23 @@ void kvm_arch_commit_memory_region(struct kvm *kv=
+m,
+>  				   const struct kvm_memory_slot *new,
+>  				   enum kvm_mr_change change)
+>  {
+> -	bool log_dirty_pages =3D new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
+> +	u32 old_flags =3D old ? old->flags : 0;
+> +	u32 new_flags =3D new ? new->flags : 0;
+> +
+> +	/*
+> +	 * If only changing flags, nothing to do if not toggling
+> +	 * dirty logging.
+> +	 */
+> +	if (change =3D=3D KVM_MR_FLAGS_ONLY &&
+> +	    !((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES))
+> +		return;
+> =20
+>  	/*
+>  	 * At this point memslot has been committed and there is an
+>  	 * allocated dirty_bitmap[], dirty pages will be tracked while the
+>  	 * memory slot is write protected.
+>  	 */
+> -	if (log_dirty_pages) {
+> -
+> +	if (new_flags & KVM_MEM_LOG_DIRTY_PAGES) {
+>  		if (change =3D=3D KVM_MR_DELETE)
+>  			return;
+> =20
+>=20
+> So we need to bail out early if we are enabling KVM_MEM_USERFAULT but
+> KVM_MEM_LOG_DIRTY_PAGES is already enabled, otherwise we'll be
+> write-protecting a bunch of PTEs that we don't need or want to WP.
+>=20
+> When *disabling* KVM_MEM_USERFAULT, we definitely don't want to WP
+> things, as we aren't going to get the unmap afterwards anyway.
+>=20
+> So the check we started with handles this:
+> > > > > + =C2=A0 =C2=A0 =C2=A0 u32 old_flags =3D old ? old->flags : 0;
+> > > > > + =C2=A0 =C2=A0 =C2=A0 u32 new_flags =3D new ? new->flags : 0;
+> > > > > +
+> > > > > + =C2=A0 =C2=A0 =C2=A0 /* Nothing to do if not toggling dirty log=
+ging. */
+> > > > > + =C2=A0 =C2=A0 =C2=A0 if (!((old_flags ^ new_flags) & KVM_MEM_LO=
+G_DIRTY_PAGES))
+> > > > > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
+>=20
+> So why also check for `change =3D=3D KVM_MR_FLAGS_ONLY` as well? Everythi=
+ng I just
+> said doesn't really apply when the memslot is being created, moved, or
+> destroyed. Otherwise, consider the case where we never enable dirty loggi=
+ng:
+>=20
+>  - Memslot deletion would be totally broken; we'll see that
+>    KVM_MEM_LOG_DIRTY_PAGES is not getting toggled and then bail out, skip=
+ping
+>    some freeing.
 
-kernel test robot noticed the following build errors:
+No, because @new and thus new_flags will be 0.  If dirty logging wasn't ena=
+bled,
+then there's nothing to be done.
 
-[auto build test ERROR on 0ff41df1cb268fc69e703a08a57ee14ae967d0ca]
+>  - Memslot creation would be broken in a similar way; we'll skip a bunch =
+of
+>    setup work.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Fuad-Tabba/KVM-Rename-CONFIG_KVM_PRIVATE_MEM-to-CONFIG_KVM_GMEM/20250528-020608
-base:   0ff41df1cb268fc69e703a08a57ee14ae967d0ca
-patch link:    https://lore.kernel.org/r/20250527180245.1413463-9-tabba%40google.com
-patch subject: [PATCH v10 08/16] KVM: guest_memfd: Allow host to map guest_memfd pages
-config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20250529/202505290736.HR4GYiOF-lkp@intel.com/config)
-compiler: powerpc64-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250529/202505290736.HR4GYiOF-lkp@intel.com/reproduce)
+No, because @old and thus old_flags will be 0.  If dirty logging isn't bein=
+g
+enabled, then there's nothing to be done.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505290736.HR4GYiOF-lkp@intel.com/
+>  - For memslot moving, the only case that we could possibly be leaving
+>    KVM_MEM_LOG_DIRTY_PAGES set without the change being KVM_MR_FLAGS_ONLY=
+,
+>    I think we still need to do the split and WP stuff.
 
-All errors (new ones prefixed by >>):
+No, because KVM invokes kvm_arch_flush_shadow_memslot() on the memslot and =
+marks
+it invalid prior to installing the new, moved memslot.  See kvm_invalidate_=
+memslot().
 
-   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c: In function '__kvm_gmem_create':
-   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:487:14: error: implicit declaration of function 'get_unused_fd_flags' [-Wimplicit-function-declaration]
-     487 |         fd = get_unused_fd_flags(0);
-         |              ^~~~~~~~~~~~~~~~~~~
-   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:524:9: error: implicit declaration of function 'fd_install'; did you mean 'fs_initcall'? [-Wimplicit-function-declaration]
-     524 |         fd_install(fd, file);
-         |         ^~~~~~~~~~
-         |         fs_initcall
-   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:530:9: error: implicit declaration of function 'put_unused_fd'; did you mean 'put_user_ns'? [-Wimplicit-function-declaration]
-     530 |         put_unused_fd(fd);
-         |         ^~~~~~~~~~~~~
-         |         put_user_ns
-   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c: In function 'kvm_gmem_create':
->> arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:540:13: error: implicit declaration of function 'kvm_arch_supports_gmem_shared_mem' [-Wimplicit-function-declaration]
-     540 |         if (kvm_arch_supports_gmem_shared_mem(kvm))
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c: In function 'kvm_gmem_bind':
-   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:564:16: error: implicit declaration of function 'fget'; did you mean 'sget'? [-Wimplicit-function-declaration]
-     564 |         file = fget(fd);
-         |                ^~~~
-         |                sget
-   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:564:14: error: assignment to 'struct file *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-     564 |         file = fget(fd);
-         |              ^
-   arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c:614:9: error: implicit declaration of function 'fput'; did you mean 'iput'? [-Wimplicit-function-declaration]
-     614 |         fput(file);
-         |         ^~~~
-         |         iput
-
-
-vim +/kvm_arch_supports_gmem_shared_mem +540 arch/powerpc/kvm/../../../virt/kvm/guest_memfd.c
-
-   533	
-   534	int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
-   535	{
-   536		loff_t size = args->size;
-   537		u64 flags = args->flags;
-   538		u64 valid_flags = 0;
-   539	
- > 540		if (kvm_arch_supports_gmem_shared_mem(kvm))
-   541			valid_flags |= GUEST_MEMFD_FLAG_SUPPORT_SHARED;
-   542	
-   543		if (flags & ~valid_flags)
-   544			return -EINVAL;
-   545	
-   546		if (size <= 0 || !PAGE_ALIGNED(size))
-   547			return -EINVAL;
-   548	
-   549		return __kvm_gmem_create(kvm, size, flags);
-   550	}
-   551	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+So I'm still not seeing what's buggy.
 
