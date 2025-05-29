@@ -1,127 +1,116 @@
-Return-Path: <kvm+bounces-48064-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48037-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13299AC8545
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 01:47:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0985FAC8513
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 01:40:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1ADB4E6534
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 23:47:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C96854E4A24
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 23:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06DAC26D4D8;
-	Thu, 29 May 2025 23:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D9F2586C8;
+	Thu, 29 May 2025 23:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sWtxPjhy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kQWi7Skc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A284C26B94E
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 23:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818D9230BFF;
+	Thu, 29 May 2025 23:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748562067; cv=none; b=TzHSfv0XO/XVVjV/t4HqWDYUBvgdk/M+zC0rolBL93WtW9Ej1DQuu7toBI0LBXrvpNXSYwaZejxiA7gSdRHI/SwS8xGPKqBadQr8i4NFdj46dJqmhBuGeXZWML+zA/x7Bg/uHlbkRTLgRAxIrEXqykVG87eFdRavCG3eO1khbCk=
+	t=1748562022; cv=none; b=t/Whc6LcRiPcgteFcMfuCdZFRHlii8uR94PPxrGeuPVc6RUoAKWd13SS295RKIVQ18YfIG34qM66c87av+kUIj8wj99jreC44x+LZnYxAThF6+TKPdZLFCJhzz0wftLT68rCKTjC55lkxL6hZUUSoCUSKeK9jvnOMdLT1r+dj/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748562067; c=relaxed/simple;
-	bh=oPSfAtIATZQ8+qjKJYNi2UiBRx/9GSId3SQECpQ3XcM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kYlxqlJl+3B7cF1yz3UG4oY0IWTpr0IokgmB+DZv4PURUyKc4dN+X/+wUCPkKfxsBOcMQnd8Y0NmKsTR5d8wzEiSATil/vpIrtNm7Zx3/ew3l0ypqSaHTCTuTKF1lPUn6aMKnSjnijphUX+6pgBoeha4knwkt8OyrgvLt6N9Uno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sWtxPjhy; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b26e33ae9d5so1619065a12.1
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 16:41:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748562065; x=1749166865; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=D1w9eruoa/+h1y+kxAKN4nRm8YX18Xo+mwrCh9wmFfY=;
-        b=sWtxPjhy+90GwC16Zi7TyRC/+NOdShGwJDbqSiycPijQN7kEL+nMbh/1QD6cE9Tymd
-         qsYwesgvbwpzU6V8SMTtdU3HIMtfxaHSZaHJ7TUYSOt0/pes1bg2eV4DvhfzMoEhKKvh
-         8vN0TAJOT8LcO/tP+QfhrxqaxqCBdWry1/Eyou8EaOAWghG+Qn8vYylLvAPOE0OoqJZr
-         pXQZfH1mXN38LZQqF7rNChTuSKJC8g1aW91dac15Duvo9Fh/7Rw0Gw/Bm2FJsI12AE9Q
-         xCaGD5pso/2cO0pLJvfFeUOoRWS7ar8i5KL0aCjeS4SLBOfar8/Ld+JCrKqpsaluj9H8
-         C11Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748562065; x=1749166865;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D1w9eruoa/+h1y+kxAKN4nRm8YX18Xo+mwrCh9wmFfY=;
-        b=ROXBC00LNlwyJzpNzaAl3mkT7qawgncmvyuqyvCEW33UrgiNotT/ohghntvPy9QdbI
-         6hHbSzXxdcLHMTtMqDejds13tQPEfIko5j3GwETkLcJcg+ufEuIWKIfF6hCXTYEU3BMS
-         KpbLeUhYUJRaEIEjejzo5ErDkC3pGd/DNf/1UeSwt2c0HJe0UpgsH38zHlv0/CQFUrNQ
-         uzV/9PUyRkHJq0NOfnTjUG/GH57jQcxtqHQBn0ayQ1/TZ1uGdyjQYF1T0fb3nnuEWNJ9
-         +YL6ZauwnIIlkqkoofRo5CAM6GcFv0CpZIgn3sOP+4TLtbq2ee7pQXkaBUVcU59qUSrx
-         RLvA==
-X-Gm-Message-State: AOJu0YyxBoPdT5y/TYLp+ELluTzrw7bCkDeU0NwjfOJYhWucilwPeU/Y
-	GDLOMNLCcP2ZCHh5YnlE4loPkZHODmvdtEpfsG9Q4xH+cdFglyg6xx3lNvSQbFofWVRCkncAUak
-	hBh39Sg==
-X-Google-Smtp-Source: AGHT+IHW019t6bOh5r2+n8eqSR6m7pMK/T98B2/buD8Ya8XZUgrDevK8/xH/YgciZlXidl8e6363cIkMFQE=
-X-Received: from pgbcs3.prod.google.com ([2002:a05:6a02:4183:b0:b2e:b47d:8dc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:12c3:b0:215:f519:e2dc
- with SMTP id adf61e73a8af0-21adff8a5famr337694637.14.1748562064661; Thu, 29
- May 2025 16:41:04 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
+	s=arc-20240116; t=1748562022; c=relaxed/simple;
+	bh=yqH8SLmi/6XiYcSNKAYKUwI0eWIHT5QDJJgdXPJj83c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FBbJTvrXlVrNW+P4elGStAvkpmC49kDRmy1OnLNcOxBsmHDJTM43gvYy8/WmvypfBo0R4IohEpVfYiGImjGL5stoQgGNNyPVCUHSr/THdTpnTav1dibkzIcuVXXNPoX9puTF8wg7J5e+D7lTSWjCg1vodgB7NPrzEFtGjNFmsnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kQWi7Skc; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748562020; x=1780098020;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yqH8SLmi/6XiYcSNKAYKUwI0eWIHT5QDJJgdXPJj83c=;
+  b=kQWi7SkctHwBDByLod4E0tRgm40CzP9pQ5oggwNf2oZ6KM3oWjzUQwfC
+   /uNpnl5QmkZX5o/t5pbUCrnn7D92ZULUCG/IUPeb9Q6klafIR1bN+NpOd
+   +ilNlkFoVhDoP+U92lAwtSyteo0Q7uIKp/8pOwZyN77Tf2YoivLwQBlsA
+   UbwBzF6cXipwqSdfo/FwFJ5pneAGEEgkb0u75dIc1phamEiL5rJi8AkMI
+   pWdxtzFAyDwU/kB9J2oKq3zh8Abx/MM+qiFbuS4K4n0tH2WKcWr3OjBja
+   0O4oDAbjeppHMEqpCwwEsmbqJXXqUtaRgT7yzqDqijh/AVcRPJ/Ql3hcK
+   Q==;
+X-CSE-ConnectionGUID: a2SNQvPaQyuXj8pNOGgH0A==
+X-CSE-MsgGUID: RZs7CO2hRtSL3EJ+QjRA5A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11448"; a="50793286"
+X-IronPort-AV: E=Sophos;i="6.16,194,1744095600"; 
+   d="scan'208";a="50793286"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2025 16:40:19 -0700
+X-CSE-ConnectionGUID: htUU3XhpSGm8Cxkw/0yJQw==
+X-CSE-MsgGUID: 2RIZPymESWaI95yBmG/FXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,194,1744095600"; 
+   d="scan'208";a="143740009"
+Received: from drlynch-mobl1.amr.corp.intel.com (HELO desk) ([10.125.146.32])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2025 16:40:18 -0700
 Date: Thu, 29 May 2025 16:40:13 -0700
-In-Reply-To: <20250529234013.3826933-1-seanjc@google.com>
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+	Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH 3/5] KVM: VMX: Apply MMIO Stale Data mitigation if KVM
+ maps MMIO into the guest
+Message-ID: <20250529234013.fbxruxq44wpfh5w4@desk>
+References: <20250523011756.3243624-1-seanjc@google.com>
+ <20250523011756.3243624-4-seanjc@google.com>
+ <20250529042710.crjcc76dqpiak4pn@desk>
+ <aDjdagbqcesTcnhc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250529234013.3826933-1-seanjc@google.com>
-X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <20250529234013.3826933-29-seanjc@google.com>
-Subject: [PATCH 28/28] KVM: selftests: Verify KVM disable interception (for
- userspace) on filter change
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Borislav Petkov <bp@alien8.de>, Xin Li <xin@zytor.com>, Chao Gao <chao.gao@intel.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aDjdagbqcesTcnhc@google.com>
 
-Re-read MSR_{FS,GS}_BASE after restoring the "allow everything" userspace
-MSR filter to verify that KVM stops forwarding exits to userspace.  This
-can also be used in conjunction with manual verification (e.g. printk) to
-ensure KVM is correctly updating the MSR bitmaps consumed by hardware.
+On Thu, May 29, 2025 at 03:19:22PM -0700, Sean Christopherson wrote:
+> On Wed, May 28, 2025, Pawan Gupta wrote:
+> > On Thu, May 22, 2025 at 06:17:54PM -0700, Sean Christopherson wrote:
+> > > @@ -7282,7 +7288,7 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+> > >  	if (static_branch_unlikely(&vmx_l1d_should_flush))
+> > >  		vmx_l1d_flush(vcpu);
+> > >  	else if (static_branch_unlikely(&mmio_stale_data_clear) &&
+> > > -		 kvm_arch_has_assigned_device(vcpu->kvm))
+> > > +		 (flags & VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO))
+> > >  		mds_clear_cpu_buffers();
+> > 
+> > I think this also paves way for buffer clear for MDS and MMIO to be done at
+> > a single place. Please let me know if below is feasible:
+> 
+> It's definitely feasible (this thought crossed my mind as well), but because
+> CLEAR_CPU_BUFFERS emits VERW iff X86_FEATURE_CLEAR_CPU_BUF is enabled, the below
+> would do nothing for the MMIO case (either that, or I'm missing something).
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Thats right, CLEAR_CPU_BUFFERS needs rework too.
 
-diff --git a/tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c
-index 32b2794b78fe..8463a9956410 100644
---- a/tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c
-+++ b/tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c
-@@ -343,6 +343,12 @@ static void guest_code_permission_bitmap(void)
- 	data = test_rdmsr(MSR_GS_BASE);
- 	GUEST_ASSERT(data == MSR_GS_BASE);
- 
-+	/* Access the MSRs again to ensure KVM has disabled interception.*/
-+	data = test_rdmsr(MSR_FS_BASE);
-+	GUEST_ASSERT(data != MSR_FS_BASE);
-+	data = test_rdmsr(MSR_GS_BASE);
-+	GUEST_ASSERT(data != MSR_GS_BASE);
-+
- 	GUEST_DONE();
- }
- 
-@@ -682,6 +688,8 @@ KVM_ONE_VCPU_TEST(user_msr, msr_permission_bitmap, guest_code_permission_bitmap)
- 		    "Expected ucall state to be UCALL_SYNC.");
- 	vm_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter_gs);
- 	run_guest_then_process_rdmsr(vcpu, MSR_GS_BASE);
-+
-+	vm_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter_allow);
- 	run_guest_then_process_ucall_done(vcpu);
- }
- 
--- 
-2.49.0.1204.g71687c7c1d-goog
+> We could obviously rework CLEAR_CPU_BUFFERS, I'm just not sure that's worth the
+> effort at this point.  I'm definitely not opposed to it though.
 
+My goal with this is to have 2 separate controls for user-kernel and
+guest-host. Such that MDS/TAA/RFDS gets finer controls to only enable
+user-kernel or guest-host mitigation. This would play well with the Attack
+vector series by David:
+
+https://lore.kernel.org/lkml/20250509162839.3057217-1-david.kaplan@amd.com/
+
+For now this patch is fine as is. I will send update separately including
+the CLEAR_CPU_BUFFERS rework.
 
