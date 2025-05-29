@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-48028-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48029-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B9BAC841C
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 00:21:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CE51AC841E
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 00:21:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43B3F3BC3FF
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 22:21:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 561D91BA5EBB
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 22:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7A721FF51;
-	Thu, 29 May 2025 22:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C642586E0;
+	Thu, 29 May 2025 22:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zq9OksZ/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OOy9L0uP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF8B2571C6
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 22:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF912571C5
+	for <kvm@vger.kernel.org>; Thu, 29 May 2025 22:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748557208; cv=none; b=fnrsoRGZ2nC76+ubFvYLfwz9XWjNGPNwSVJlPtqZfesWqCPkqOKRykbSEc86Me+hsxJ6B7I7mgCZxqH8Ynawrxvo6/3tHfkidhc9Bkq22sgR0m/fbB7o0TWtDPNeigO5Q3yeaxXYiazCJKOKH/UhtS2tr+5FwzeHnBxaqJdk9XE=
+	t=1748557209; cv=none; b=BoaZbYj8YSTNlFEjPTRqM+lZ7TF7/QojEledEFo4Aax64GfkXWZEjuzLMwe7oX7GYJQs2Sismn6zHPNGp0Rc/OyR+6xVGFP6HjMBGn33+yohWN6BGBEivCI2DQKwYU2PGv/HpyLwZ73b5wa4bU3Ckj8mIQ/mpM4zC24P7+cOcWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748557208; c=relaxed/simple;
-	bh=6LGtEcNOSPo2DoHznVZ3dUZFP79Eew/LCbvwQtOKmHs=;
+	s=arc-20240116; t=1748557209; c=relaxed/simple;
+	bh=RvX2iZNZlxxVlbsJrrFpRWGiCNBMJyjPqyAtCV5bQdw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ikQmMB0tT8oAXA/4dwLFqZLTVR6A2sZmZSaMy3J25g5YlqShwo9mf9zjPdNPlaIcD9crvpqS3Ew6gbnvniMAkCoZ8abNeOC/Zt2ntjoT5ocfXxU2+Xi3tdAhJZWL/MCNjAd6s4/3qHvb8B2VXSVygvbtQqadtTVtJedhiL4BVYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zq9OksZ/; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=EvkT8Qct41igZttiCKvWmpfkIT0ybVMGAQN6+px1WU1wH1z9/tw+z+Q6kElUeUwgRw+dNOFrKnWGU009q+Zl3AbmeAYSN1Z6/8zjcTYqgsWjfiEgkD6Yjy3/ZItExGTZFvEbAuJReRdiAQssAnUCowi2gyAjw9/Cbhh/eIiyqGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OOy9L0uP; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-742cc20e11eso953511b3a.1
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 15:20:06 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b26e120e300so1223168a12.1
+        for <kvm@vger.kernel.org>; Thu, 29 May 2025 15:20:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748557206; x=1749162006; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748557207; x=1749162007; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=6ecWAsuLWk8WolZhf3FVD8zH2KTmGRghOSDHe/J8+gA=;
-        b=zq9OksZ/8SVxe57LU34jqP2IIs0WLmDelQONWk+0aPHuvxdxPWCZgt9WhW832QNHcJ
-         8JVpC8zZb2CoQQ6JgX8agL3uG2Tew7g6eEz2NUpQ6BRdD3VzElI1rlDs15S0ugvSJWQD
-         +aHXUBBXt3K/nYhJQJ5Tapth0Js4GSzcYxnM8BNyDJTyWmeaS72XZj3O7EQzjeOTqTbd
-         ccZig3xL/5MEEqK7Eqac8RqgHGien38qjnl3kbghQhllF7Pgv7ZexnrSSTUCIJUm5Zyg
-         o/oXtzjuDyJcgHfyBQ2HSJHd2XSgbEoYW6UNhTdtJtO15A1bk58jJiD2kwvIikOFt4rj
-         nXAQ==
+        bh=NK0WfiQ6dMxac+ln2k79b2QCfH8r8iVJ+iQJS1T9rfM=;
+        b=OOy9L0uPmyWNJMZVK6z6aj6pAaLTKE9Qq4573Ni0dSm6Tl+i+MgotFkKLzo3KCDihF
+         ICbNPqWMhj5d7J8MpxQKpkBfgFWeZg45EtobHmTQXpkjpqM9OiXmRflvkWHxw8UWpuLL
+         fn5RyESyqjhmn+WJPszMjpWjhd9sFmGbuFIvLzPu61XXHvXzK85W6K6PPzUZCr2R7h2I
+         0j1cCkLaBHSTmsff4VyG85f7Kha8Mz0hZCK7Idqdc1Fa5BYChSbbro5tW5DeJVmlpoTs
+         gaLQTIXAQmC7LAjQ7KYl02FmCErD0SUUyCO7bd3yMCKST/WbB1oODZqr/beqM9YMcEuK
+         9p1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748557206; x=1749162006;
+        d=1e100.net; s=20230601; t=1748557207; x=1749162007;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6ecWAsuLWk8WolZhf3FVD8zH2KTmGRghOSDHe/J8+gA=;
-        b=EK5z7lurx4ndH+dIbQBm045cW7PqnV3d55vP+VO01T0fXXph8UibZXic9gtubr74yA
-         1u4a+DvzyNYQCHkkHoAsWTpWsHLi0661NHaha8+J+mHfIfUljAgzsfTvC6/1mwln50uR
-         R68T/zj9IwhHN+YURuLL5dZ0Q0WVdmzZU4z0EvSX35pZVYza/mRspzQ3D9te3+TdFW/B
-         p9NzcPwacV6jmyQnTDRl4bzU7RNvIxFpQfw00ObVzjdaL04I8jnx8TgGCdsfiZ8O65tw
-         coyVGRwzuajSHw1yOkiFzTEEYxz1J8SJCdQtpZeaS9yLMRz/SySrgKLXvRrsZG+j1DOb
-         cbdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXTs9qNJ+ICgcIYR+9bacgW7KmIMaelgqR3TOu5tTdIUqOuP4rson18kHLUjaoa+zgmWi8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6Q4o6gyzfSLF5tYhk0CR27Pz/iOHBG0BQ5IGENy1FxwbsDvz4
-	Db3eQXIyjScuN7BJIzsIIgjoB+lQ4tss1+lgaG2iF09EAk7Cb4I9C2H1ACxsyGOMmA8B80CKO34
-	fys4PWg==
-X-Google-Smtp-Source: AGHT+IGqdlQWraG/z6hu1nUR7A5tPeMrZxdUjf3SOgtsQ8w8e/wxZYYVtAEj8FDmoGPeh69VqlnpQFBPrIg=
-X-Received: from pfly12.prod.google.com ([2002:a62:f24c:0:b0:740:5196:b63a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2d03:b0:73f:e8c:1aac
- with SMTP id d2e1a72fcca58-747bd968a6cmr1447650b3a.2.1748557206151; Thu, 29
- May 2025 15:20:06 -0700 (PDT)
+        bh=NK0WfiQ6dMxac+ln2k79b2QCfH8r8iVJ+iQJS1T9rfM=;
+        b=PCbhRtmmOe8OmYpchGYarrWWMVW4nFAMeAeyaQsBO+B5fahKPJnP8XAJdy6zh7ffDg
+         suHHNSv7ouAH1+rlmpusz/BnIBRDpLCC0HGUWXNC1sLkoAhVI1+GE/HmAnGepyKvZ3ku
+         DPNZ2pekVMV+L9E3aQLl10D15Obga2wl18iKOR2H3E9tWOBV/3g+osyyKEXkLTWMrffZ
+         uzsZ9TkVqMVvQbyy/I9cgobXzhbwvimnt7ge8W5HK6B1BlOL4VZYWScNdEeyWO+g3KzC
+         rVjwIMpIQI/apyBXt2Y5TqQAL3BwcnGJhQ7ruPOkYwEbQPs2l0G2047KUDixGJJn8pYO
+         VBJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJXrInZPV0SnWChTqukG7T+T63vlhNNj2iK6XzXEDtJuN6UCnssCkmk9gdyV6qg88pwDc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRd8rJwBtdCVBd+4oO4ASSSWi6dhENeYx0QegPOapVO3BIXSlM
+	lpY9BpGWMpFxX7gVShNN3kYu2s/4mU92YMOGLq+6TJ8Xfopxa6uE7vbEDmoGNCtggoadm4wcW3a
+	5lVnCUw==
+X-Google-Smtp-Source: AGHT+IFrtz3sUzxuEz8YBbvvRR3+9tjsalY/Vak8TsELyOUfiAWzp5Y7ZOMIrESTx91f0Vlh2H9ZLU4kNZc=
+X-Received: from pjyp7.prod.google.com ([2002:a17:90a:e707:b0:312:4274:c4ce])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1e09:b0:311:9c1f:8516
+ with SMTP id 98e67ed59e1d1-31241518d5cmr1855970a91.15.1748557207601; Thu, 29
+ May 2025 15:20:07 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 29 May 2025 15:19:28 -0700
+Date: Thu, 29 May 2025 15:19:29 -0700
 In-Reply-To: <20250529221929.3807680-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250529221929.3807680-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <20250529221929.3807680-16-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 15/16] x86/sev: Use amd_sev_es_enabled() to
- detect if SEV-ES is enabled
+Message-ID: <20250529221929.3807680-17-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 16/16] x86: Move SEV MSR definitions to msr.h
 From: Sean Christopherson <seanjc@google.com>
 To: Andrew Jones <andrew.jones@linux.dev>, Janosch Frank <frankja@linux.ibm.com>, 
 	Claudio Imbrenda <imbrenda@linux.ibm.com>, "=?UTF-8?q?Nico=20B=C3=B6hr?=" <nrb@linux.ibm.com>, 
@@ -87,44 +86,96 @@ Cc: kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
 	kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use amd_sev_es_enabled() in the SEV string I/O test instead manually
-checking the SEV_STATUS MSR.
+Move the SEV MSR definitions to msr.h so that they're available for non-EFI
+builds.  There is nothing EFI specific about the architectural definitions.
+
+Opportunistically massage the names to align with existing style.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/amd_sev.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+ lib/x86/amd_sev.c |  8 ++++----
+ lib/x86/amd_sev.h | 14 --------------
+ lib/x86/msr.h     |  6 ++++++
+ 3 files changed, 10 insertions(+), 18 deletions(-)
 
-diff --git a/x86/amd_sev.c b/x86/amd_sev.c
-index 4ec45543..7c207a07 100644
---- a/x86/amd_sev.c
-+++ b/x86/amd_sev.c
-@@ -19,15 +19,6 @@
+diff --git a/lib/x86/amd_sev.c b/lib/x86/amd_sev.c
+index 416e4423..7c6d2804 100644
+--- a/lib/x86/amd_sev.c
++++ b/lib/x86/amd_sev.c
+@@ -24,8 +24,8 @@ bool amd_sev_enabled(void)
+ 	if (!initialized) {
+ 		initialized = true;
  
- static char st1[] = "abcdefghijklmnop";
- 
--static void test_sev_es_activation(void)
--{
--	if (rdmsr(MSR_SEV_STATUS) & SEV_ES_ENABLED_MASK) {
--		printf("SEV-ES is enabled.\n");
--	} else {
--		printf("SEV-ES is not enabled.\n");
--	}
--}
--
- static void test_stringio(void)
- {
- 	int st1_len = sizeof(st1) - 1;
-@@ -52,7 +43,8 @@ int main(void)
- 		goto out;
+-		sev_enabled = this_cpu_has(X86_FEATURE_SEV)
+-			      rdmsr(MSR_SEV_STATUS) & SEV_ENABLED_MASK);
++		sev_enabled = this_cpu_has(X86_FEATURE_SEV) &&
++			      rdmsr(MSR_SEV_STATUS) & SEV_STATUS_SEV_ENABLED;
  	}
  
--	test_sev_es_activation();
-+	printf("SEV-ES is %senabled.\n", amd_sev_es_enabled() ? "" : "not");
-+
- 	test_stringio();
+ 	return sev_enabled;
+@@ -52,7 +52,7 @@ bool amd_sev_es_enabled(void)
  
- out:
+ 		sev_es_enabled = amd_sev_enabled() &&
+ 				 this_cpu_has(X86_FEATURE_SEV_ES) &&
+-				 rdmsr(MSR_SEV_STATUS) & SEV_ES_ENABLED_MASK;
++				 rdmsr(MSR_SEV_STATUS) & SEV_STATUS_SEV_ES_ENABLED;
+ 	}
+ 
+ 	return sev_es_enabled;
+@@ -100,7 +100,7 @@ void setup_ghcb_pte(pgd_t *page_table)
+ 	pteval_t *pte;
+ 
+ 	/* Read the current GHCB page addr */
+-	ghcb_addr = rdmsr(SEV_ES_GHCB_MSR_INDEX);
++	ghcb_addr = rdmsr(MSR_SEV_ES_GHCB);
+ 
+ 	/* Search Level 1 page table entry for GHCB page */
+ 	pte = get_pte_level(page_table, (void *)ghcb_addr, 1);
+diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
+index daa33a05..9d587e2d 100644
+--- a/lib/x86/amd_sev.h
++++ b/lib/x86/amd_sev.h
+@@ -19,23 +19,9 @@
+ #include "asm/page.h"
+ #include "efi.h"
+ 
+-/*
+- * AMD Programmer's Manual Volume 2
+- *   - Section "SEV_STATUS MSR"
+- */
+-#define MSR_SEV_STATUS      0xc0010131
+-#define SEV_ENABLED_MASK    0b1
+-#define SEV_ES_ENABLED_MASK 0b10
+-
+ bool amd_sev_enabled(void);
+ efi_status_t setup_amd_sev(void);
+ 
+-/*
+- * AMD Programmer's Manual Volume 2
+- *   - Section "GHCB"
+- */
+-#define SEV_ES_GHCB_MSR_INDEX 0xc0010130
+-
+ bool amd_sev_es_enabled(void);
+ efi_status_t setup_amd_sev_es(void);
+ void setup_ghcb_pte(pgd_t *page_table);
+diff --git a/lib/x86/msr.h b/lib/x86/msr.h
+index 658d237f..ccfd6bdd 100644
+--- a/lib/x86/msr.h
++++ b/lib/x86/msr.h
+@@ -523,4 +523,10 @@
+ #define MSR_VM_IGNNE                    0xc0010115
+ #define MSR_VM_HSAVE_PA                 0xc0010117
+ 
++#define MSR_SEV_STATUS			0xc0010131
++#define SEV_STATUS_SEV_ENABLED		BIT(0)
++#define SEV_STATUS_SEV_ES_ENABLED	BIT(1)
++
++#define MSR_SEV_ES_GHCB			0xc0010130
++
+ #endif /* _X86_MSR_H_ */
 -- 
 2.49.0.1204.g71687c7c1d-goog
 
