@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-48025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54F2CAC8416
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 00:21:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73EC2AC8418
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 00:21:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99DF03BCC78
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 22:20:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DF041BA755B
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 22:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4DD2571B6;
-	Thu, 29 May 2025 22:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FC12571DA;
+	Thu, 29 May 2025 22:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TCPlUSB4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nv4jRjr9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90E32566E6
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 22:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6DD25487E
+	for <kvm@vger.kernel.org>; Thu, 29 May 2025 22:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748557203; cv=none; b=EhDKkRxaEvTmFuugttcag7wtvGK+DYM+nhcV1oGzOtE2Q/wsCEa6ExAYWEYao+4jzlKg560CEYYUe5ExGu4+eP5i/r1eAeg7MXjOGzAlHsRhXhe6CDLd122gY96gAPuY9fOzrhLUciOi9gtqrZuoU1TPXFNiU+hyj42NlQXxauE=
+	t=1748557205; cv=none; b=UoGQ8XeStio8dNSQ51aHC9n4rai0BE3818ggzOkXkwrv3ZtqlL12CbHvlq6Gxuz+t3mtCQQY2RP7x4ea1HDRI5l7FhGmuipmrN61nBuBk8QpEaJ0dVdKDLr2eHVFs6xaNBtzWSeqEnZMSjHtPOU8tlSSXYMXeVFbwZTRKYlytl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748557203; c=relaxed/simple;
-	bh=u5iff4gYUfJbV7gg7JGjHZ3YNRLHSbfTUIqRJoKJYyc=;
+	s=arc-20240116; t=1748557205; c=relaxed/simple;
+	bh=Lyl3vewjVix2xPFAB4EoOJOuA3lhOivqiAsQEY0yo0Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LxeiqagcPzLTWJqmQr3AlTsu+V/Cp/LjAEl6RjehJCexaiSiVfsS/DlPQ3UKgVxJyoV08Rt3kR56+KuiNTSiXVB9uJgoY6UjgQM/ZNlTqZ7jNeAahORMoMIUlj+e5qXJPMve97JwdNYFgpIunnkuMkbRTNUUkhwqk7fIxVVNJ5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TCPlUSB4; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=PcSo0DZ7E7ZM8nZ1ZyKYCSvh0PGiekZIiGk7DLR+1swV15gSu/ZS6AkuRmp81EHgtlJg88Sz5xLm/kyuFJ+ej7NLhkOSVmbWB7wG/4cc8QASw/rjqvLqquwzoOTxryvN+DuU8PpUcofA83XPrsrI72QtQIPOiwpwUWjt6xLrXk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nv4jRjr9; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-23425b537aeso11017655ad.3
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 15:20:01 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2c38df7ed2so1031113a12.3
+        for <kvm@vger.kernel.org>; Thu, 29 May 2025 15:20:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748557201; x=1749162001; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748557203; x=1749162003; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=h+zxmynRuus8JTcz4oQ0nDPY5j7Ch469QosRqaeXlg8=;
-        b=TCPlUSB4AfzyENxs8SDs4BVl7Pkpnzl4WlVAw4U9toSx+JQ3vvkDSLEmS4bjXBUysS
-         ArVBsvMt/FIOVWl0uz9225DQouYxR9hQ/Ck+0NHE9J/w9Mm8U5mMDDJpLVZAluDRfzFG
-         N2eJJw3IlIF18TaQmL+JO2WQVOfscLPx8kzd02Ue9AafkqrNvI82K9qaCILoqbeNhdzY
-         okyu/TuLaQ4SZu9StgGHYJbCr1oPMenJ7cZOT/GW2/FAXfBgEhNmT+df5//DWIGL6xR4
-         j/SNCzkYmLJNzN3xkLeYfxrJzYCWmTMQ8Ymf7H9R8p2mdmOzgmhy+xnibdMggvMtsnYs
-         BpQA==
+        bh=F2d3FMlUAt4L7Za+Jh9OinkPv4ozyteBA1ro5arBIes=;
+        b=nv4jRjr9luv6nTlH4PeNdUtcBdNJUqi9zy2OeMMtDsw7KQFxDTKsLk7Cp563MfvSFT
+         GLiSnpXlp7RwiD9YBMemZCyyfxWNIRcj4xXq6UbAdFnAvQFhYJEXdPlTFBMsXCsBImFF
+         URFkAEUEJEgBvcbOwpiembGAjR1q+PBLqqg410bnwuYcjQIQP45gMI5dES4HZM+cwOax
+         AV+p2x8Owolm9gKnk/ykujsQNQrblNsgooTNGqC/8i7Ip63sQ25ahGA24NVz7Kz8G7JC
+         vVn1BqCYKSayBQCHDuMD9DJdcC5jYVVNYbgS6CAfQBHeGvU9HOcZQdwekidcxplaV9zV
+         hEeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748557201; x=1749162001;
+        d=1e100.net; s=20230601; t=1748557203; x=1749162003;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=h+zxmynRuus8JTcz4oQ0nDPY5j7Ch469QosRqaeXlg8=;
-        b=RPPYVhiF6GJSeQ9MiE4S25Qc2/JG/JmQNK4FtlWNvHqN9DKuOy4YIgUXGt/IAFcTBF
-         yvavfEOX/xHVb8a2TFiT/sFk0OB0IFptzvEZ/GLixVb3umdFu6qpxI4YNnAamiTUIg60
-         i8f/kEFzxgCRKO1/4W6SWCNE1RnaBcrr2ZA6FK3BI2rF+GjNCyKU62O0TRg7lU/j9Yaj
-         pBst17m2+q11YpdD9fNgDnREyHEaEG1NRrpkL109lcoMtDRtzSCVZlIx135+9pitJnBV
-         48JfVaL04ApeYbCwUuLW42OheUSHtMRCnZK8gc2l3knZNloFG9tPUhRtBYndmRhEhlNq
-         7nAg==
-X-Forwarded-Encrypted: i=1; AJvYcCU552USmcvprOy5aL+J3DddvcBS4sh1QXkAKZh3YMb4ByalaVC0ICbkK2eLxu8FadoAWms=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxl+nM3wYL75soMZh8c8DX3DqQXmqJ6ZoAGzoUwR5kSQ5nGYDYG
-	t1iwofA4hid3QEOOabCSiQ/H6xGCh/DzuJFwoTVWeojqoW6dFNqyseZM8k9CgZdmmCCwMhVpHzQ
-	/DZiGNA==
-X-Google-Smtp-Source: AGHT+IGkWRHpejvhd2ldNGU9YUglc3/C3NmA+k/oaq+HdU4jZaE1V6i6HKiDHjwmfVv91+C2M/Od+vROETo=
-X-Received: from plblh14.prod.google.com ([2002:a17:903:290e:b0:234:d2a4:ddf])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:fc8f:b0:234:cc7c:d2fc
- with SMTP id d9443c01a7336-23529a0f482mr14516585ad.27.1748557201422; Thu, 29
- May 2025 15:20:01 -0700 (PDT)
+        bh=F2d3FMlUAt4L7Za+Jh9OinkPv4ozyteBA1ro5arBIes=;
+        b=iOT3Twb6AT1j0L2GZdpsRNjbrujTDNP3pcX+AtsK58FKEKbI0mgIdeUYdD3aK/gDys
+         w+7a9BWVEqW/BHZptvpT9P8BaSX6oPorKa7JJerKFZ1wmqd7UgCeOMMz0ExBLjRZZt49
+         g6OBWrFQSlF0EezfxoslXRkZ5gOFXzPtHf1POz+2vnwmzevvGw5QPwyuRGwwATmjNFuD
+         o6UUctK73/UnrLQs95QhYUBp7JV6S8l9Aj1F3D0tqGSqr/cLOHMpGDVQWo8bY3CEAT8M
+         fhJvLeNLq4jU/sYV8PHzHYyoXLcgPi9SrxVW7gz2LGyd9iHXxZuk+a+jUViZ6KO52dC3
+         zCUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHYOLS5ntuE2KO+FsacyfEJSzF/31UshOGYQgMz10cH3pmozAzPaOrQBpo3K62UsgBGBQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEOhul8DTwuBo3XU7Ze8Hq2h35pBF4uRybzE9Z85ItIwcFenUn
+	so0lWUn7k7Kf416QjgsEEMI2tOqvN0GCskGIbdl+11Hueqey1VpjfcC6g2QGgqGUK7I2TsbAFPd
+	faRyrhQ==
+X-Google-Smtp-Source: AGHT+IGoB/vbp1vJwFtNq0D8Lm/f9YbFu83f0096VeeEb6qVMP4bkif1kVwjiObKHv+nfsOeM8aSdayaAmU=
+X-Received: from pjbsv7.prod.google.com ([2002:a17:90b:5387:b0:311:e7e6:6d4d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2dcb:b0:312:e9d:3ff2
+ with SMTP id 98e67ed59e1d1-3124150da88mr1962364a91.7.1748557202894; Thu, 29
+ May 2025 15:20:02 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 29 May 2025 15:19:25 -0700
+Date: Thu, 29 May 2025 15:19:26 -0700
 In-Reply-To: <20250529221929.3807680-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250529221929.3807680-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <20250529221929.3807680-13-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 12/16] x86/sev: Skip the AMD SEV test if SEV is unsupported/disabled
+Message-ID: <20250529221929.3807680-14-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 13/16] x86/sev: Define and use X86_FEATURE_*
+ flags for CPUID 0x8000001F
 From: Sean Christopherson <seanjc@google.com>
 To: Andrew Jones <andrew.jones@linux.dev>, Janosch Frank <frankja@linux.ibm.com>, 
 	Claudio Imbrenda <imbrenda@linux.ibm.com>, "=?UTF-8?q?Nico=20B=C3=B6hr?=" <nrb@linux.ibm.com>, 
@@ -86,91 +87,112 @@ Cc: kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
 	kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Skip the AMD SEV test if SEV is unsupported, as KVM-Unit-Tests typically
-don't report failures if feature is missing.
-
-Opportunistically use amd_sev_enabled() instead of duplicating all of its
-functionality.
+Define proper X86_FEATURE_* flags for CPUID 0x8000001F, and use them
+instead of open coding equivalent checks in amd_sev_{,es_}enabled().
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/amd_sev.c | 51 +++++++--------------------------------------------
- 1 file changed, 7 insertions(+), 44 deletions(-)
+ lib/x86/amd_sev.c   | 32 +++++---------------------------
+ lib/x86/amd_sev.h   |  3 ---
+ lib/x86/processor.h |  9 +++++++++
+ 3 files changed, 14 insertions(+), 30 deletions(-)
 
-diff --git a/x86/amd_sev.c b/x86/amd_sev.c
-index 7757d4f8..4ec45543 100644
---- a/x86/amd_sev.c
-+++ b/x86/amd_sev.c
-@@ -15,51 +15,10 @@
- #include "x86/amd_sev.h"
- #include "msr.h"
+diff --git a/lib/x86/amd_sev.c b/lib/x86/amd_sev.c
+index 6c0a66ac..4e89c84c 100644
+--- a/lib/x86/amd_sev.c
++++ b/lib/x86/amd_sev.c
+@@ -17,31 +17,15 @@ static unsigned short amd_sev_c_bit_pos;
  
--#define EXIT_SUCCESS 0
--#define EXIT_FAILURE 1
--
- #define TESTDEV_IO_PORT 0xe0
- 
- static char st1[] = "abcdefghijklmnop";
- 
--static int test_sev_activation(void)
--{
+ bool amd_sev_enabled(void)
+ {
 -	struct cpuid cpuid_out;
--	u64 msr_out;
--
--	printf("SEV activation test is loaded.\n");
--
--	/* Tests if CPUID function to check SEV is implemented */
--	cpuid_out = cpuid(CPUID_FN_LARGEST_EXT_FUNC_NUM);
--	printf("CPUID Fn8000_0000[EAX]: 0x%08x\n", cpuid_out.a);
--	if (cpuid_out.a < CPUID_FN_ENCRYPT_MEM_CAPAB) {
--		printf("CPUID does not support FN%08x\n",
--		       CPUID_FN_ENCRYPT_MEM_CAPAB);
--		return EXIT_FAILURE;
--	}
--
--	/* Tests if SEV is supported */
--	cpuid_out = cpuid(CPUID_FN_ENCRYPT_MEM_CAPAB);
--	printf("CPUID Fn8000_001F[EAX]: 0x%08x\n", cpuid_out.a);
--	printf("CPUID Fn8000_001F[EBX]: 0x%08x\n", cpuid_out.b);
--	if (!(cpuid_out.a & SEV_SUPPORT_MASK)) {
--		printf("SEV is not supported.\n");
--		return EXIT_FAILURE;
--	}
--	printf("SEV is supported\n");
--
--	/* Tests if SEV is enabled */
--	msr_out = rdmsr(MSR_SEV_STATUS);
--	printf("MSR C001_0131[EAX]: 0x%08lx\n", msr_out & 0xffffffff);
--	if (!(msr_out & SEV_ENABLED_MASK)) {
--		printf("SEV is not enabled.\n");
--		return EXIT_FAILURE;
--	}
--	printf("SEV is enabled\n");
--
--	return EXIT_SUCCESS;
--}
--
- static void test_sev_es_activation(void)
- {
- 	if (rdmsr(MSR_SEV_STATUS) & SEV_ES_ENABLED_MASK) {
-@@ -88,10 +47,14 @@ static void test_stringio(void)
+ 	static bool sev_enabled;
+ 	static bool initialized = false;
  
- int main(void)
- {
--	int rtn;
--	rtn = test_sev_activation();
--	report(rtn == EXIT_SUCCESS, "SEV activation test.");
-+	if (!amd_sev_enabled()) {
-+		report_skip("AMD SEV not enabled\n");
-+		goto out;
-+	}
-+
- 	test_sev_es_activation();
- 	test_stringio();
-+
-+out:
- 	return report_summary();
- }
+ 	/* Check CPUID and MSR for SEV status and store it for future function calls. */
+ 	if (!initialized) {
+-		sev_enabled = false;
+ 		initialized = true;
+ 
+-		/* Test if we can query SEV features */
+-		cpuid_out = cpuid(CPUID_FN_LARGEST_EXT_FUNC_NUM);
+-		if (cpuid_out.a < CPUID_FN_ENCRYPT_MEM_CAPAB) {
+-			return sev_enabled;
+-		}
+-
+-		/* Test if SEV is supported */
+-		cpuid_out = cpuid(CPUID_FN_ENCRYPT_MEM_CAPAB);
+-		if (!(cpuid_out.a & SEV_SUPPORT_MASK)) {
+-			return sev_enabled;
+-		}
+-
+-		/* Test if SEV is enabled */
+-		if (rdmsr(MSR_SEV_STATUS) & SEV_ENABLED_MASK) {
+-			sev_enabled = true;
+-		}
++		sev_enabled = this_cpu_has(X86_FEATURE_SEV)
++			      rdmsr(MSR_SEV_STATUS) & SEV_ENABLED_MASK);
+ 	}
+ 
+ 	return sev_enabled;
+@@ -72,17 +56,11 @@ bool amd_sev_es_enabled(void)
+ 	static bool initialized = false;
+ 
+ 	if (!initialized) {
+-		sev_es_enabled = false;
+ 		initialized = true;
+ 
+-		if (!amd_sev_enabled()) {
+-			return sev_es_enabled;
+-		}
+-
+-		/* Test if SEV-ES is enabled */
+-		if (rdmsr(MSR_SEV_STATUS) & SEV_ES_ENABLED_MASK) {
+-			sev_es_enabled = true;
+-		}
++		sev_es_enabled = amd_sev_enabled() &&
++				 this_cpu_has(X86_FEATURE_SEV_ES) &&
++				 rdmsr(MSR_SEV_STATUS) & SEV_ES_ENABLED_MASK;
+ 	}
+ 
+ 	return sev_es_enabled;
+diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
+index ca7216d4..defcda75 100644
+--- a/lib/x86/amd_sev.h
++++ b/lib/x86/amd_sev.h
+@@ -21,12 +21,9 @@
+ 
+ /*
+  * AMD Programmer's Manual Volume 3
+- *   - Section "Function 8000_0000h - Maximum Extended Function Number and Vendor String"
+  *   - Section "Function 8000_001Fh - Encrypted Memory Capabilities"
+  */
+-#define CPUID_FN_LARGEST_EXT_FUNC_NUM 0x80000000
+ #define CPUID_FN_ENCRYPT_MEM_CAPAB    0x8000001f
+-#define SEV_SUPPORT_MASK              0b10
+ 
+ /*
+  * AMD Programmer's Manual Volume 2
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 3b02a966..b656ebf6 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -320,6 +320,15 @@ struct x86_cpu_feature {
+ #define X86_FEATURE_PFTHRESHOLD		X86_CPU_FEATURE(0x8000000A, 0, EDX, 12)
+ #define	X86_FEATURE_VGIF		X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
+ #define X86_FEATURE_VNMI		X86_CPU_FEATURE(0x8000000A, 0, EDX, 25)
++#define X86_FEATURE_SME			X86_CPU_FEATURE(0x8000001F, 0, EAX,  0)
++#define X86_FEATURE_SEV			X86_CPU_FEATURE(0x8000001F, 0, EAX,  1)
++#define X86_FEATURE_VM_PAGE_FLUSH	X86_CPU_FEATURE(0x8000001F, 0, EAX,  2)
++#define X86_FEATURE_SEV_ES		X86_CPU_FEATURE(0x8000001F, 0, EAX,  3)
++#define X86_FEATURE_SEV_SNP		X86_CPU_FEATURE(0x8000001F, 0, EAX,  4)
++#define X86_FEATURE_V_TSC_AUX		X86_CPU_FEATURE(0x8000001F, 0, EAX,  9)
++#define X86_FEATURE_SME_COHERENT	X86_CPU_FEATURE(0x8000001F, 0, EAX, 10)
++#define X86_FEATURE_DEBUG_SWAP		X86_CPU_FEATURE(0x8000001F, 0, EAX, 14)
++#define X86_FEATURE_SVSM		X86_CPU_FEATURE(0x8000001F, 0, EAX, 28)
+ #define	X86_FEATURE_AMD_PMU_V2		X86_CPU_FEATURE(0x80000022, 0, EAX, 0)
+ 
+ /*
 -- 
 2.49.0.1204.g71687c7c1d-goog
 
