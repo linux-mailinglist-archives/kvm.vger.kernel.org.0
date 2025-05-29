@@ -1,201 +1,173 @@
-Return-Path: <kvm+bounces-48034-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48035-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B94B1AC84D1
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 01:08:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ABB6AC850F
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 01:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82028A2020F
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 23:07:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 105C39E573D
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 23:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F98F22D9F4;
-	Thu, 29 May 2025 23:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0232512C3;
+	Thu, 29 May 2025 23:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zW94CmwE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S0Eoln1R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E053221D584
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 23:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6A1B67F
+	for <kvm@vger.kernel.org>; Thu, 29 May 2025 23:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748560091; cv=none; b=qmc0wtdpYEFY4w/QsXZqYg8SrZQy+/YN1IZNIQudgieyj1lszEunDjFM6zXeIrad+JGl3ULBXz1RnWHpBom5ihG2hMb7q7M4hxZ7u3FRb6GMJm840mJadU2yOT+sQNl48llyvpqOzkqAgSDRYTje1OWFa5IGvTxpcwAYZt0NejY=
+	t=1748562019; cv=none; b=sUwVD6zYTHmB1iFh/0vM6acNeFOiAxmRJ7YqBRt3/i16DNIsIwMp4gdQ6ktN/F2quzTH0MWQNsN+Sa7qAJpOQVhFjQcHk1h/hHDKUGCTVn+1ffSWGV81Qfm8CiCRJsF2C9KfG2xJDe5s8Q8a4l/DyZ1L+0c0lcnOP5MSvpSLHHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748560091; c=relaxed/simple;
-	bh=Ga4ixeHjWc0kl5EHrAQUHylI16bJElehK1WrCsTnH38=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nfLzPCUkX9vMvOFKJZKfMoAHEO1+kNpNbUgPT7ADWg33yZ7x2bRiqZu4IB88Zn1MfMPIzAXmgH9VwuUL+DiEgmG1k4knm83WQ2fxIbnhOkOlvWgnYyH221fFW2l92O3rIm1Dc8a6NfkcLnLVhKo3iIXOCs7q8mY7LcQVw0uLaeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zW94CmwE; arc=none smtp.client-ip=209.85.210.202
+	s=arc-20240116; t=1748562019; c=relaxed/simple;
+	bh=PDS2qaPz76/rL/8fzCsxocQ9r12lDo+B0Vgg4H7FjFQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jHPorNAb1p3aHUlMY596RrYC2nhY/goiOSk7LPKL4hAEXNAnSFns5EdPBxZJ3mCfeUGT/hp8F7LtUYJDZOvATEa5bfNMnyR/pAu53u81J0lieTMWM4r+W6tNDPqPCtHcHjlx9qWsPWoGAqK9Lf3XIQFE2LifXAl1sHJ35a/Czjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S0Eoln1R; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7401179b06fso1079151b3a.1
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 16:08:09 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2c3e576201so2154752a12.0
+        for <kvm@vger.kernel.org>; Thu, 29 May 2025 16:40:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748560089; x=1749164889; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WWQT92vYYiaC+lxmNKagAXWxRs8ao22U9MaAqLN+cH4=;
-        b=zW94CmwEubGV1ZKeyaorWKjffjDpZSGa8hzyw767n3DW2hsqHLgBN/ESh3SAEM5u/S
-         mxYEKXp8En1dvo7KZhjPfqEDoQuEiwgtNwFvybWqbs/qNz6U9tf/3iSaI/TlyOWcaUSs
-         I1EuVWrwWdnFMz/bffe4WASpq8plE4KglJ8qZxu7oSYKWCQfaUwJ51RuHClYY2Nxwcf9
-         8620HaZWOx09SfYI37z02ULzbJRrIxo4pLxCU11pO49Qjh7kiJ5k8eLHm3j761QLpAAR
-         liW8Jc8XweqvM4iFlNphtCJQRQ3bZ7MdXdOiNG3XcYbvKQpckxW1fbxcV7OaK1eALLVX
-         fahg==
+        d=google.com; s=20230601; t=1748562017; x=1749166817; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z8ins+AFrutQNW4d+L4Q+xsrhhfuXindJQZTPvefHTk=;
+        b=S0Eoln1RNnGPhycC0QHLe1NMdh+wHAqbbqByqijQgmZTL9cdaKNNmVXT0zDlYsYAsE
+         xaKyQfbBbad51xYRKcwY+rrL0uUD2b9quNWE7bMyxcMeEZa+B/tYvtfZxPnusy8u+T2u
+         7FfRARrDEo76SlHG3Pn9j2joY2lIrM1w06vGq52Qszp1qcrKAUgervP4AD5HrAo8KPGP
+         Z5pB0M15L6RH/yZLgtX7kt1PZfQQVAs7UiuXBCXikD7hQ7SyfZY1t+/ZjJRqtUrv2s6Y
+         LmXd7Oee6RVcyB1DwdqzmDXbXVSrz/udpa/fL/yi2rhw3WFXC19JKIpi6TgsmStk8J0c
+         JfWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748560089; x=1749164889;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WWQT92vYYiaC+lxmNKagAXWxRs8ao22U9MaAqLN+cH4=;
-        b=M0gH14qdpfy/Rr4nNeXjR+YCsrIXBesC1CHQ4qGVeaOOTSUyjm0gjvbZm5kAJ4kboG
-         r8WzCyF/eNJ9sDdJ9zJtI0MVWKiADniwZe99GyDb2FotfrWC8zo2gD4+gUQk67tJsdTE
-         Ynl2qVk1TZTOg9o3akLVGANsdry+gNBVUX5YNIDQIWHpSP41gbICrV/Ad83GMfPjYzhe
-         GJ7U2WzveNlo8DiL+DjwU16uVssqbRmGbyBQd0R1YLh2trwuyY6oDP+5ZJLFs7fPQOqg
-         ewraEWkiUHkWadJazAqI1O78WkefNWX6X3ZeXOlFNjoM47ig5HsflLoBQ/o7J2/y55A0
-         VIVw==
-X-Gm-Message-State: AOJu0YyB9p2Z+h5wIIq/4WguFwOqGY8vCTNVEEwX7P6HEuVed4M44Au7
-	QhJ9Rsdj6r7BO/FAaoyAnzOIVKYQr6H7GqmkQ0807OweSq5d5+Syqv3Fmx55YVJWiKVVobbJ3Y1
-	UfVFpzw==
-X-Google-Smtp-Source: AGHT+IFyNnF3N9qo+8t5isM7o5tVxkSUB9ncohiiPZsNdoq3EI2z81ANG4JC82ouNV+RJVlSKp7aEnxQiq0=
-X-Received: from pfbhb7.prod.google.com ([2002:a05:6a00:8587:b0:746:2d5e:7936])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b43:b0:742:a4e0:6476
- with SMTP id d2e1a72fcca58-747bd954bd2mr1627939b3a.4.1748560088942; Thu, 29
- May 2025 16:08:08 -0700 (PDT)
-Date: Thu, 29 May 2025 16:08:07 -0700
-In-Reply-To: <58a580b0f3274f6a7bba8431b2a6e6fef152b237.camel@intel.com>
+        d=1e100.net; s=20230601; t=1748562017; x=1749166817;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z8ins+AFrutQNW4d+L4Q+xsrhhfuXindJQZTPvefHTk=;
+        b=mz+1USwej6oIVnTZ/lPpPV1YdRD/UUBT4ZeNxflUdjENK7Z5Uxb+lYcp7zLgaKRWGC
+         AfAmcVYjh+sosKHeSk0TjAOdHcE8xCQx1LkTi3PZcjonNzhyW+OPKzOEOonAT+bs/xo/
+         e+EAFDe3kDcJe+LfgXZK2mDIuncs9hDaFaWpJu7cSDhxE8LUi9AmGQkngK/F3gRI/rzU
+         jvZiLadc8GCO4mInm/p9zGACih9lI61NupMpbvcb0pYU2wr7OG38DvEIdfmbr/+L4xjt
+         ZIkm0vSuA5L71pNfp0GQiE6fx0Uk6w2mOTuOZXPWREJcmrhCAxKjMMPDfSgkA8OKWkvf
+         8a+w==
+X-Gm-Message-State: AOJu0YwuLGrN8m4w2tzHJHVGk6HIMHHy55XzA13/FR6GaR2uSZjg9RQ+
+	C15RBwsK3NZoOnC66avaG9DvohRomYgqUKE7VYnKP045rQIIpZRlRDgKgFZvESvFzPJnpvXGWWZ
+	jNg4+DA==
+X-Google-Smtp-Source: AGHT+IELDvqIvkwAMZ+l7mRtTzo+VDBNlRpRZprs/F6/pvcARu7BOCi6An4uuHdaY7TFr3dgcElfJf2vr6E=
+X-Received: from pjyd8.prod.google.com ([2002:a17:90a:dfc8:b0:311:ff0f:6962])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:164b:b0:310:8d4a:4a97
+ with SMTP id 98e67ed59e1d1-31214ee68f2mr8068080a91.15.1748562017484; Thu, 29
+ May 2025 16:40:17 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 29 May 2025 16:39:45 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250519232808.2745331-1-seanjc@google.com> <20250519232808.2745331-12-seanjc@google.com>
- <d131524927ffe1ec70300296343acdebd31c35b3.camel@intel.com>
- <019c1023c26e827dc538f24d885ec9a8530ad4af.camel@intel.com>
- <aDhvs1tXH6pv8MxN@google.com> <58a580b0f3274f6a7bba8431b2a6e6fef152b237.camel@intel.com>
-Message-ID: <aDjo16EcJiWx9Nfa@google.com>
-Subject: Re: [PATCH 11/15] KVM: x86: Add CONFIG_KVM_IOAPIC to allow disabling
- in-kernel I/O APIC
+X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
+Message-ID: <20250529234013.3826933-1-seanjc@google.com>
+Subject: [PATCH 00/28] KVM: x86: Clean up MSR interception code
 From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "vkuznets@redhat.com" <vkuznets@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Borislav Petkov <bp@alien8.de>, Xin Li <xin@zytor.com>, Chao Gao <chao.gao@intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, May 29, 2025, Kai Huang wrote:
-> On Thu, 2025-05-29 at 07:31 -0700, Sean Christopherson wrote:
-> > On Thu, May 29, 2025, Kai Huang wrote:
-> > > On Thu, 2025-05-29 at 23:55 +1200, Kai Huang wrote:
-> > > > On Mon, 2025-05-19 at 16:28 -0700, Sean Christopherson wrote:
-> > > > > Add a Kconfig to allowing building KVM without support for emulat=
-ing an
-> > > > 		   ^
-> > > > 		   allow
-> > > >=20
-> > > > > I/O APIC, PIC, and PIT, which is desirable for deployments that e=
-ffectively
-> > > > > don't support a fully in-kernel IRQ chip, i.e. never expect any V=
-MM to
-> > > > > create an in-kernel I/O APIC. =C2=A0
-> > > >=20
-> > > > Do you happen to know what developments don't support a full in-ker=
-nel IRQ chip?
-> >=20
-> > Google Cloud, for one.  I suspect/assume many/most CSPs don't utilize a=
-n in-kernel
-> > I/O APIC.
-> >=20
-> > > > Do they only support userspace IRQ chip, or not support any IRQ chi=
-p at all?
-> >=20
-> > The former, only userspace I/O APIC (and associated devices), though so=
-me VM
-> > shapes, e.g. TDX, don't provide an I/O APIC or PIC.
->=20
-> Thanks for the info.
->=20
-> Just wondering what's the benefit of using userspace IRQCHIP instead of
-> emulating in the kernel?
+Clean up KVM's MSR interception code (especially the SVM code, which is all
+kinds of ugly).  The main goals are to:
 
-Reduced kernel attack surface (this was especially true years ago, before K=
-VM's
-I/O APIC emulation was well-tested) and more flexibility (e.g. shipping use=
-rspace
-changes is typically easier than shipping new kernels.  I'm pretty sure the=
-re's
-one more big one that I'm blanking on at the moment.
+ - Make the SVM and VMX APIs consistent (and sane; the current SVM APIs have
+   inverted polarity).
 
-> I thought one should either use in-kernel IRQCHIP or doesn't use any.
->=20
-> >=20
-> > > Forgot to ask:
-> > >=20
-> > > Since this new Kconfig option is not only for IOAPIC but also include=
-s PIC and
-> > > PIT, is CONFIG_KVM_IRQCHIP a better name?
-> >=20
-> > I much prefer IOAPIC, because IRQCHIP is far too ambiguous and confusin=
-g, e.g.
-> > just look at KVM's internal APIs, where these:
-> >=20
-> >   irqchip_in_kernel()
-> >   irqchip_kernel()
-> >=20
-> > are not equivalent.  In practice, no modern guest kernel is going to ut=
-ilize the
-> > PIC, and the PIT isn't an IRQ chip, i.e. isn't strictly covered by IRQC=
-HIP either.
->=20
-> Right.
->=20
-> Maybe it is worth to further have dedicated Kconfig for PIC, PIT and IOAP=
-IC?
+ - Eliminate the shadow bitmaps that are used to determine intercepts on
+   userspace MSR filter update.
 
-Nah.  PIC and I/O APIC can't be split (without new uAPI and non-trivial com=
-plexity),
-and I highly doubt there is any use case that would want an in-kernel I/O A=
-PIC
-with a userspace PIT.  I.e. in practice, the threealmost always come as a g=
-roup;
-either a setup wants all, or a setup wants none.
+Folks that are explicitly Cc'd, my plan/hope is to apply this in advance
+of landing the CET virtualization and mediated PMU series, so that we don't
+need to deal with extended the shadow bitmaps.  Any reviews/testing you can
+provide to help make that happen would be greatly appreciated.
 
-> But hmm, I am not sure whether emulating IOAPIC has more value than PIC.
+Note, this is a spiritual successor to the "Unify MSR intercepts in x86"
+series that was posted last year[*], but I started the versioning back at
+v1 as very, very little of the code actually survived, and there's obviously
+no true unification in this series.  That series also had several bugs (that
+were never pointed out on list), so I wanted to make a clean break.
 
-AIUI, it's not really an either or, since most software expects both an I/O=
- APIC
-and PIC.  Any remotely modern kernel will definitely prefer the I/O APIC, b=
-ut I
-don't think it's something that can be guaranteed.
+FWIW, I still like the _idea_ of unified code, but with the shadow bitmaps
+gone, it's not actually that much code, and the logic isn't all that complex.
+In the end, I couldn't convince myself that unifying that small amount of
+logic was worth taking on the complexity of generating and passing around bit
+numbers and bitmap pointers to common code (or adding 4 more kvm_x86_ops hooks).
 
-> For modern guests all emulated/assigned devices should just use MSI/MSI-X=
-?
+[*] https://lore.kernel.org/kvm/20241127201929.4005605-1-aaronlewis@google.com
 
-Not all emulated devices, since some legacy hang off the I/O APIC, i.e. are=
-n't
-capable of generating MISs.
+Sean Christopherson (28):
+  KVM: SVM: Don't BUG if setting up the MSR intercept bitmaps fails
+  KVM: SVM: Tag MSR bitmap initialization helpers with __init
+  KVM: SVM: Use ARRAY_SIZE() to iterate over direct_access_msrs
+  KVM: SVM: Kill the VM instead of the host if MSR interception is buggy
+  KVM: x86: Use non-atomic bit ops to manipulate "shadow" MSR intercepts
+  KVM: SVM: Massage name and param of helper that merges vmcb01 and
+    vmcb12 MSRPMs
+  KVM: SVM: Clean up macros related to architectural MSRPM definitions
+  KVM: nSVM: Use dedicated array of MSRPM offsets to merge L0 and L1
+    bitmaps
+  KVM: nSVM: Omit SEV-ES specific passthrough MSRs from L0+L1 bitmap
+    merge
+  KVM: nSVM: Don't initialize vmcb02 MSRPM with vmcb01's "always
+    passthrough"
+  KVM: SVM: Add helpers for accessing MSR bitmap that don't rely on
+    offsets
+  KVM: SVM: Implement and adopt VMX style MSR intercepts APIs
+  KVM: SVM: Pass through GHCB MSR if and only if VM is an SEV-ES guest
+  KVM: SVM: Drop "always" flag from list of possible passthrough MSRs
+  KVM: x86: Move definition of X2APIC_MSR() to lapic.h
+  KVM: VMX: Manually recalc all MSR intercepts on userspace MSR filter
+    change
+  KVM: SVM: Manually recalc all MSR intercepts on userspace MSR filter
+    change
+  KVM: x86: Rename msr_filter_changed() => recalc_msr_intercepts()
+  KVM: SVM: Rename init_vmcb_after_set_cpuid() to make it intercepts
+    specific
+  KVM: SVM: Fold svm_vcpu_init_msrpm() into its sole caller
+  KVM: SVM: Merge "after set CPUID" intercept recalc helpers
+  KVM: SVM: Drop explicit check on MSRPM offset when emulating SEV-ES
+    accesses
+  KVM: SVM: Move svm_msrpm_offset() to nested.c
+  KVM: SVM: Store MSRPM pointer as "void *" instead of "u32 *"
+  KVM: nSVM: Access MSRPM in 4-byte chunks only for merging L0 and L1
+    bitmaps
+  KVM: SVM: Return -EINVAL instead of MSR_INVALID to signal out-of-range
+    MSR
+  KVM: nSVM: Merge MSRPM in 64-bit chunks on 64-bit kernels
+  KVM: selftests: Verify KVM disable interception (for userspace) on
+    filter change
 
-> > So I think/hope the vast majority of users/readers will be able to intu=
-it that
-> > CONFIG_KVM_IOAPIC also covers the PIC and PIT.
->=20
-> Sure.
->=20
-> Btw, I also find irqchip_in_kernel() and irqchip_kernel() confusing.  I a=
-m not
-> sure the value of having irqchip_in_kernel() in fact.  The guest should a=
-lways
-> have an in-kernel APIC for modern guests.  I am wondering whether we can =
-get rid
-> of it completely (the logic will be it is always be true), or we can have=
- a
-> Kconfig to only build it when user truly wants it.
+ arch/x86/include/asm/kvm-x86-ops.h            |   2 +-
+ arch/x86/include/asm/kvm_host.h               |   2 +-
+ arch/x86/kvm/lapic.h                          |   2 +
+ arch/x86/kvm/svm/nested.c                     | 128 +++--
+ arch/x86/kvm/svm/sev.c                        |  29 +-
+ arch/x86/kvm/svm/svm.c                        | 449 ++++++------------
+ arch/x86/kvm/svm/svm.h                        | 107 ++++-
+ arch/x86/kvm/vmx/main.c                       |   6 +-
+ arch/x86/kvm/vmx/vmx.c                        | 179 ++-----
+ arch/x86/kvm/vmx/vmx.h                        |   9 -
+ arch/x86/kvm/vmx/x86_ops.h                    |   2 +-
+ arch/x86/kvm/x86.c                            |   8 +-
+ .../kvm/x86/userspace_msr_exit_test.c         |   8 +
+ 13 files changed, 408 insertions(+), 523 deletions(-)
 
-For better or worse, an in-kernel local APIC is still optional.  I do hope/=
-want
-to make it mandatory, but that's not a small ABI change.
+
+base-commit: 3f7b307757ecffc1c18ede9ee3cf9ce8101f3cc9
+-- 
+2.49.0.1204.g71687c7c1d-goog
+
 
