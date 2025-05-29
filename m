@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-48058-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48059-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B95E8AC853A
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 01:46:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0CE5AC853E
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 01:46:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83C5E17A395
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 23:46:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 992681C0093D
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 23:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B3C269AFB;
-	Thu, 29 May 2025 23:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5DC526A0C7;
+	Thu, 29 May 2025 23:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="txM9L/Qp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DkEmLBI/"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C9E2690D4
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 23:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C4E2690C8
+	for <kvm@vger.kernel.org>; Thu, 29 May 2025 23:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748562056; cv=none; b=VocfK6fkyqNpFwfLVHQABG9vVI4+M03tOigPuiByuKcDi1BLzG6cx/8EG9nedpGumkUyf4Ul0dIg6kOUwUgVki219H2IgDuHzRj0Kdz9bbTB1OyCqaGVRxJ33ccTrY2T208XKhtAvoWHd+yIRhOnCDDsDng6cg3wXwgURfX+fPk=
+	t=1748562058; cv=none; b=pQAs51rz+ATVNBGFZgGMTqmjUV5EFQ2fWrZHtlA0/vLGZZ+z2cMryj5kpuD22beswQsG3GsFmINYz1SHdDlf0QD4N3h2UjCMzLkqEgFbDZ8H5DHuaUE8kBXmbqYQkd76Pi3V9MF3vmmrZiUIo1KDpnhZFx0uREIdi25zcxuggVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748562056; c=relaxed/simple;
-	bh=SoD0Hcit0b3Q2X0664j5BC/XwufKuxL0p4SDIiBBwuI=;
+	s=arc-20240116; t=1748562058; c=relaxed/simple;
+	bh=wiSfnvg+3ob6BZ0Eu3gekeRK967P9Nv3tIdvcIcKxQ0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=azgIVQMNrhFARspwdMzZ9ma8suNSDqCDH/vZCpNyYoPZB37TPtNbR0esgyFZgk0NCOHWE8JUhXvGL2vO1i85wtv++aZCJtS1MO2HGfeeGcdF0XDOs0GC6R5mXITH8oym7aHH4OdxgVrhTBYr4JxK0J93SaND/amODJHWldKycoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=txM9L/Qp; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=FOF7c1HWPPddH63RirNAM11+BboLGwcsOvhuOL1h+y3SLe8IkagMhv4e/NUbXPrHrN9Fdhu/8B7f/8Uw+1uK5xssh4xGg7SjBhk08QApT2O9az1wWUMSJ5ghR9OpvmSGjio9bg2oDLLF5PEml/nuXlx6DD5gQfBzNXZPCyfnMKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DkEmLBI/; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-311c5d9307eso1639315a91.2
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 16:40:55 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-310efe825ccso1375116a91.3
+        for <kvm@vger.kernel.org>; Thu, 29 May 2025 16:40:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748562055; x=1749166855; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748562056; x=1749166856; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ma79OxOfbFz3TgRT1+ArAbLyQaoHvlTGS7OlgEQow6Q=;
-        b=txM9L/QpogytWeQoiYOOveFZq7bV54bAIxcfdQCdwv+MYK8Tc2nojInZ0pS0kdRkp+
-         F9mO+j9Xb5aBKtfiI1I+8mRboNnzYq5xUgOZsSSfennflJJ3xwnbTQ0rQaOp3Yxu3OqM
-         D99bIx1LE9SFl0KvK6aI5urL1uj4O3xhi+vQkRet8cXhvhBh6oGCpfhXLK98pgX5SHeI
-         OWvyRQfvvqwZUiaC7I7UmZkWlG7rIK5HUJ6TvcmXqaMLVs++pqron9vR4/pGjuyTPhtw
-         pcTMEG1Ajw0YYau0DQXqcx+m2qzEABF2vSSRblPq36I5NPx0UuanmR3vSTO0n74Ihtul
-         zp9Q==
+        bh=+CgyWByAaHVV85PeVC13Q9ehun1/Wd3oFQ4GzRhsXCQ=;
+        b=DkEmLBI/LEgYd2QJSbA27/HwX3AD0dc6dmG+tJ6rveX4K/IKKAfIlDZ1erOfPsICPv
+         6vqm41i1/74DNCm/p8vtbWRb1Jci6r0UokkM/zYM6+/Pmn+cnlSCEyhSiBxuzGfrOfBm
+         4rnQA1VxotQ58nk03g6Q6WY8h6AeIAdw+XOCQjvw1IP4vlCc05pdUN/d+uQEaXiesOHt
+         esXM0ioW9sAOWt5y4CO2WfactTjOXtW+5rXsECHRlq/4caGcd2+ClKZQXvFIoyy6V58z
+         /T3HCnISGnJy1/6yrnth5mxutGF8rEvTa09VwD2cJN2ms5WrhVFpH/ruD5n2SmEb7+xu
+         x/RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748562055; x=1749166855;
+        d=1e100.net; s=20230601; t=1748562056; x=1749166856;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ma79OxOfbFz3TgRT1+ArAbLyQaoHvlTGS7OlgEQow6Q=;
-        b=ZdohoXDHe71MHjvtY4BlAGuG+KfJK7cBVMUVcVhcfnnzFZkzcAEvKMXQPnmEYe20u2
-         D50kZv7ezqlXmuetSsi/0WT8ZMDIMinWqH4+4Kan4a13MHstD588opkEqNolrD4dsO3J
-         Sq+WtY7VBlbq1MRy0T63rLB/3rrTfimqTC5cnCAQuvEcvOMTHgib8kjz17nJfuLBXoUA
-         WfNG8tfStbk6gELY1+w/ZBgXpqbFziSxJmLwW9bclN5RaJYIBAAOEkB6rCGD1d3a/cwH
-         nzDj8WEsYI0vbE8RLnBZRInQcSK/kNDQ4sreXCN69CBWWmJ30lb7t0RFQ2irKaFQNzWJ
-         U7Hw==
-X-Gm-Message-State: AOJu0Yz0sOW8r1T9CAZcFRplqgqT4xguEh9Ze+PlT1uWIPTlAABvs+Aw
-	9ldZRIzmn/dTI92gTo1tgkOB7Q1QfLt+pd1aKukS2pTzu3WSWuzdEFA74isrye+bqtkitbYzQDt
-	8vZmr6g==
-X-Google-Smtp-Source: AGHT+IHkbdZTK3P5HLHYM5AwmXLymCJ0QLixXG2jn4Ae152nUnpVjDZhnL8AuCnVXKZgkEkLTE0sz/Z5ACw=
-X-Received: from pjbsc15.prod.google.com ([2002:a17:90b:510f:b0:301:1bf5:2f07])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2701:b0:311:c939:c84a
- with SMTP id 98e67ed59e1d1-312416340bamr2391836a91.15.1748562054868; Thu, 29
- May 2025 16:40:54 -0700 (PDT)
+        bh=+CgyWByAaHVV85PeVC13Q9ehun1/Wd3oFQ4GzRhsXCQ=;
+        b=pZPouPCQabdWL8hP3aFq4HqIVJaXUqAvvjT+tTmc/1Z5aNyKecezj/pqHGGmlKNW7K
+         2IQ4tejsTh9yf9slLRF0/p6HFm1jIAi6ndpMLjovkdqIbN1MVjj2RF7aZ4saukQCCFrM
+         vuNrkmy0YMu0FlN3DxWA8obdLT3SP+lz0k+wwCUalERRBNExhRGktC9amTNoezWozimi
+         vpAprqsvDJsMdDSI2+cz1sR7wHvwHo5a21bysgXVNWRWbCCLwfVILTuHui3UHcfYMNGV
+         zy/LipQfM5l/AnAQ8XMWS8ZtTKpAFGJK8vY2L55A9Y9kXakVnnDisEBP4qeXvuCGc+aw
+         ENUA==
+X-Gm-Message-State: AOJu0YzsFgWQ2XQ7hknZKnSMToIkPcizEklsnhiMaWfeb1Lgob+xyfIB
+	c6XYz++De6tF2+nrECT1r8QmRkx3J1Bb8lOyeUzd7H3VIVFmZrtOz+nacjP3QzTko4Kji9R2UJr
+	3tSwe7A==
+X-Google-Smtp-Source: AGHT+IGo71TMXPlGjlEtx+9KCFpk1shtfB/J83ECXF+TfIzjn3vXYzFl65S88oW17CFw5334ijpYDq8c4lw=
+X-Received: from pjp3.prod.google.com ([2002:a17:90b:55c3:b0:312:a03:ef54])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f4b:b0:311:c939:c851
+ with SMTP id 98e67ed59e1d1-312413f92e6mr2030455a91.4.1748562056573; Thu, 29
+ May 2025 16:40:56 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 29 May 2025 16:40:07 -0700
+Date: Thu, 29 May 2025 16:40:08 -0700
 In-Reply-To: <20250529234013.3826933-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250529234013.3826933-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <20250529234013.3826933-23-seanjc@google.com>
-Subject: [PATCH 22/28] KVM: SVM: Drop explicit check on MSRPM offset when
- emulating SEV-ES accesses
+Message-ID: <20250529234013.3826933-24-seanjc@google.com>
+Subject: [PATCH 23/28] KVM: SVM: Move svm_msrpm_offset() to nested.c
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,38 +84,106 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that msr_write_intercepted() defaults to true, i.e. accurately reflects
-hardware behavior for out-of-range MSRs, and doesn't WARN (or BUG) on an
-out-of-range MSR, drop sev_es_prevent_msr_access()'s svm_msrpm_offset()
-check that guarded against calling msr_write_intercepted() with a "bad"
-index.
+Move svm_msrpm_offset() from svm.c to nested.c now that all usage of the
+u32-index offsets is nested virtualization specific.
 
-Opportunistically clean up the helper's formatting.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/nested.c | 27 +++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.c    | 27 ---------------------------
+ arch/x86/kvm/svm/svm.h    |  1 -
+ 3 files changed, 27 insertions(+), 28 deletions(-)
 
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 0026d2adb809..5d6525627681 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -187,6 +187,33 @@ void recalc_intercepts(struct vcpu_svm *svm)
+ static int nested_svm_msrpm_merge_offsets[6] __ro_after_init;
+ static int nested_svm_nr_msrpm_merge_offsets __ro_after_init;
+ 
++static const u32 msrpm_ranges[] = {
++	SVM_MSRPM_RANGE_0_BASE_MSR,
++	SVM_MSRPM_RANGE_1_BASE_MSR,
++	SVM_MSRPM_RANGE_2_BASE_MSR
++};
++
++static u32 svm_msrpm_offset(u32 msr)
++{
++	u32 offset;
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(msrpm_ranges); i++) {
++		if (msr < msrpm_ranges[i] ||
++		    msr >= msrpm_ranges[i] + SVM_MSRS_PER_RANGE)
++			continue;
++
++		offset  = (msr - msrpm_ranges[i]) / SVM_MSRS_PER_BYTE;
++		offset += (i * SVM_MSRPM_BYTES_PER_RANGE);  /* add range offset */
++
++		/* Now we have the u8 offset - but need the u32 offset */
++		return offset / 4;
++	}
++
++	/* MSR not in any range */
++	return MSR_INVALID;
++}
++
+ int __init nested_svm_init_msrpm_merge_offsets(void)
+ {
+ 	const u32 merge_msrs[] = {
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2ebac30a337a..9d01776d82d4 100644
+index 9d01776d82d4..fa2df1c869db 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -2771,12 +2771,11 @@ static int svm_get_feature_msr(u32 msr, u64 *data)
- 	return 0;
- }
+@@ -195,33 +195,6 @@ static DEFINE_MUTEX(vmcb_dump_mutex);
+  */
+ static int tsc_aux_uret_slot __read_mostly = -1;
  
--static bool
--sev_es_prevent_msr_access(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-+static bool sev_es_prevent_msr_access(struct kvm_vcpu *vcpu,
-+				      struct msr_data *msr_info)
+-static const u32 msrpm_ranges[] = {
+-	SVM_MSRPM_RANGE_0_BASE_MSR,
+-	SVM_MSRPM_RANGE_1_BASE_MSR,
+-	SVM_MSRPM_RANGE_2_BASE_MSR
+-};
+-
+-u32 svm_msrpm_offset(u32 msr)
+-{
+-	u32 offset;
+-	int i;
+-
+-	for (i = 0; i < ARRAY_SIZE(msrpm_ranges); i++) {
+-		if (msr < msrpm_ranges[i] ||
+-		    msr >= msrpm_ranges[i] + SVM_MSRS_PER_RANGE)
+-			continue;
+-
+-		offset  = (msr - msrpm_ranges[i]) / SVM_MSRS_PER_BYTE;
+-		offset += (i * SVM_MSRPM_BYTES_PER_RANGE);  /* add range offset */
+-
+-		/* Now we have the u8 offset - but need the u32 offset */
+-		return offset / 4;
+-	}
+-
+-	/* MSR not in any range */
+-	return MSR_INVALID;
+-}
+-
+ static int get_npt_level(void)
  {
- 	return sev_es_guest(vcpu->kvm) &&
- 	       vcpu->arch.guest_state_protected &&
--	       svm_msrpm_offset(msr_info->index) != MSR_INVALID &&
- 	       !msr_write_intercepted(vcpu, msr_info->index);
- }
+ #ifdef CONFIG_X86_64
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 23e1e3ae30b0..d146c35b9bd2 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -673,7 +673,6 @@ BUILD_SVM_MSR_BITMAP_HELPERS(void, set, __set)
+ /* svm.c */
+ extern bool dump_invalid_vmcb;
  
+-u32 svm_msrpm_offset(u32 msr);
+ u32 *svm_vcpu_alloc_msrpm(void);
+ void svm_vcpu_free_msrpm(u32 *msrpm);
+ void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb);
 -- 
 2.49.0.1204.g71687c7c1d-goog
 
