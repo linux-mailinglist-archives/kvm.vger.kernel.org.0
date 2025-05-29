@@ -1,225 +1,227 @@
-Return-Path: <kvm+bounces-47993-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47994-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D375AC8221
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 20:26:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1551AC8247
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 20:45:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEBD41BC73E5
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 18:26:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 119A61BC7807
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 18:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4837230BFF;
-	Thu, 29 May 2025 18:26:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4217F231831;
+	Thu, 29 May 2025 18:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4xbphVhH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t6mBC+6V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E6A1DA5F
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 18:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58342AD31
+	for <kvm@vger.kernel.org>; Thu, 29 May 2025 18:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748543183; cv=none; b=YpBsnqxhfisR5Z5RaBRst46tL2IvpB/Z4Amwjhf1gvb4we2AVSMofBepoLOpGbHMeUEoJG9ikMDRTNorSh6bSsfg06xP4mIWRfwGKuN/dhmFwqU2fXIA2oNjelbxHN4dWrhfu3RSnd/89SlBTHtF9fp9iAIk77MJZSnhdll/eOU=
+	t=1748544301; cv=none; b=Ca/2qBhPwx9cORL0aqaIYHI8E6OGK0OFJduEbuhDyu71x0bX8VWM3sOzS4IdxjbT7bYsz6FKDZm8bnB7Ap9D5VTkU7IjP7GXlF5VhrlURRPGsvrWkmp/QJupOHniwgxnHE6t4ogTHYokoq1/i7Lsu3fDR3HjTl1KKoV07Kv6HME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748543183; c=relaxed/simple;
-	bh=HRPOn1meoE3XwDlWZS9bRRz1m47Q+lkEUYw+u1TxoQ4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nfs2FtzgJAk1brNibjdgzUZMvk3sa8EFXmutNTcFUfv1Q+y8e0icPQ4IHqihlIKP0qT8kAOD76fvCvU6VJLqNkzLW/6BebHz6RiZva8QOan6hhhUUnwuVHRhw1coerAqIu/qisIN3jzQTn+fen4Ue8WVbBSj5t/vcZrUyaNmgV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4xbphVhH; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-742c7227d7dso942018b3a.2
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 11:26:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748543181; x=1749147981; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lIz4VHixxBnPERxzo7x/dFPIiGKuMB366F2mMctZln0=;
-        b=4xbphVhHNXA6yZbetoaVij+4KNPK54hyCUs/hpeo7rdcXAnr3JDi0nhmSUqGZQTvlR
-         EZAjsY0mZoosFQ/QFMHhSBzO3veeYhHPV16GUGjxLnvJiqXP7mjO003D66gsMES7P08/
-         rFglmdTGrJ0UFYeusyqVe5ncDZ9axlvJnUozo0rjPjJXyC7QIxxQo3a/Xa+GX8Cplkhb
-         2XL1ywqYpfKq84OsPTI5kFSKdBDhXvPnpiBlAOAoBtzzeJYheXrPHFUr8slhBnjAVlV4
-         WQQPrmedUrCW6X81UOZdcMQq1pT+0Lpowoh7hPLo292VVFjtqNEfV5wIIdDMXClJI4NB
-         mqQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748543181; x=1749147981;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lIz4VHixxBnPERxzo7x/dFPIiGKuMB366F2mMctZln0=;
-        b=Ep2nRHLl8ZXEkSc4XX41VzbjXofgxVagWz0LektHwrZwri66ZcxRbqpp7jUVkcbMet
-         9DDu6qhNlzkMlnbTx0mQ1RvBVNwXDEgr+IvLQLjJejebwB11yOPIiYv/8svUZIQrdLcM
-         nOF0ISgDAiTjBCajzuQsFtSlI1z61x4H4uaOEznPbAQiRzQkyahGRb63nkXsk/SudKwE
-         7nSt0D5Ys5ffn9VFUD3BTeMyvm7ImScF9EJpIeTlYL+Z3GGtrYO4CA4E/2uyfc9BSUDz
-         Z+t6Vxr8OrOuY8uFFBdAt3QJnvLxvJTkE5jt9VHw58hx1QKK5OglWaDZLgy32UfhhyEB
-         2SkQ==
-X-Gm-Message-State: AOJu0YzWb4glqSkPkjABrRV3Lu3DmbeIaH3pUVUsnib77YjD7sH3F6vf
-	WFCbIc0YLCGw0MMZ00SHXAVCOm4gOjaoTr6MZkEwCzd+bKMEMx/9ARvdFx3Vyirbc33MYB+r6l0
-	ova8i7yL1yU4KowTRXh903r2P8w==
-X-Google-Smtp-Source: AGHT+IGjY0JDCBO+9ghg+QzLazgbH2ijeDdvz/kcUyol+8Id7VYmeYH8PDj4sd4Uw3Qudd2dyxDoTCTFkpAd+/2KBw==
-X-Received: from pfve9.prod.google.com ([2002:a05:6a00:1a89:b0:73c:26eb:39b0])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:4fc9:b0:742:8d52:62f1 with SMTP id d2e1a72fcca58-747bd97d3abmr694232b3a.8.1748543180604;
- Thu, 29 May 2025 11:26:20 -0700 (PDT)
-Date: Thu, 29 May 2025 11:26:19 -0700
-In-Reply-To: <9483e9e3-9b29-49c6-adcc-04fe45ac28fd@linux.intel.com>
+	s=arc-20240116; t=1748544301; c=relaxed/simple;
+	bh=xiqUhpB4KuUz8/jc+y5yuABJB9UUxpWPRhy2iybY4KQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V68OdpOnqqPyZkn1fBUUdJu8hOrNaH9vpTBnZ+x8Udc7gL7/ZtA4w2Q54Tla0+UIC58i9/047awR3SrQYYc0p17A8m8wHc4MdE7kLsuUERiNUAPe6YaWfnPbwRnMeUF/EYW6jh89DwYiRKWkJLga/BeVdDjfmluHH/YUxnBe/QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t6mBC+6V; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2bac252c-883c-4f8a-9ae1-283660991520@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748544285;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D/pRYWDTxiG5vCNFI6iYMlgTAzPGEOIy86Z1rIh0MtM=;
+	b=t6mBC+6Vi9P2ogn7IGSjVpOGG1D0PLvPIsnclmwguKD8GZzY2EEBw/0/oi4M/Egs3o+WNK
+	HH1NOZh09QJrVEtpDa095Akv9MrBQAzRDOB0r2l/HaMNV1G8fR9FrQ3JwJG9336cGDa+IH
+	hJYSzpx0d4G0hPc4CWp7pb1SJGYRCiM=
+Date: Thu, 29 May 2025 11:44:38 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <b784326e9ccae6a08388f1bf39db70a2204bdc51.1747264138.git.ackerleytng@google.com>
- <9483e9e3-9b29-49c6-adcc-04fe45ac28fd@linux.intel.com>
-Message-ID: <diqz7c1z6zp0.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH v2 02/51] KVM: guest_memfd: Introduce and use
- shareability to guard faulting
-From: Ackerley Tng <ackerleytng@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
-	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
-	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
-	bfoster@redhat.com, brauner@kernel.org, catalin.marinas@arm.com, 
-	chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com, 
-	david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk, 
-	erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com, 
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
-	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
-	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Subject: Re: [PATCH v3 9/9] RISC-V: KVM: Upgrade the supported SBI version to
+ 3.0
+To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>,
+ Andrew Jones <ajones@ventanamicro.com>
+Cc: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Mayuresh Chitale <mchitale@ventanamicro.com>,
+ linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org,
+ linux-riscv <linux-riscv-bounces@lists.infradead.org>
+References: <20250522-pmu_event_info-v3-0-f7bba7fd9cfe@rivosinc.com>
+ <20250522-pmu_event_info-v3-9-f7bba7fd9cfe@rivosinc.com>
+ <DA3KSSN3MJW5.2CM40VEWBWDHQ@ventanamicro.com>
+ <61627296-6f94-45ea-9410-ed0ea2251870@linux.dev>
+ <DA5YWWPPVCQW.22VHONAQHOCHE@ventanamicro.com>
+ <20250526-224478e15ee50987124a47ac@orel>
+ <ace8be22-3dba-41b0-81f0-bf6d661b4343@linux.dev>
+ <20250528-ff9f6120de39c3e4eefc5365@orel>
+ <1169138f-8445-4522-94dd-ad008524c600@linux.dev>
+ <DA8KL716NTCA.2QJX4EW2OI6AL@ventanamicro.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Atish Patra <atish.patra@linux.dev>
+In-Reply-To: <DA8KL716NTCA.2QJX4EW2OI6AL@ventanamicro.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Binbin Wu <binbin.wu@linux.intel.com> writes:
 
-> On 5/15/2025 7:41 AM, Ackerley Tng wrote:
->> Track guest_memfd memory's shareability status within the inode as
->> opposed to the file, since it is property of the guest_memfd's memory
->> contents.
->>
->> Shareability is a property of the memory and is indexed using the
->> page's index in the inode. Because shareability is the memory's
->> property, it is stored within guest_memfd instead of within KVM, like
->> in kvm->mem_attr_array.
->>
->> KVM_MEMORY_ATTRIBUTE_PRIVATE in kvm->mem_attr_array must still be
->> retained to allow VMs to only use guest_memfd for private memory and
->> some other memory for shared memory.
->>
->> Not all use cases require guest_memfd() to be shared with the host
->> when first created. Add a new flag, GUEST_MEMFD_FLAG_INIT_PRIVATE,
->> which when set on KVM_CREATE_GUEST_MEMFD, initializes the memory as
->> private to the guest, and therefore not mappable by the
->> host. Otherwise, memory is shared until explicitly converted to
->> private.
->>
->> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->> Co-developed-by: Vishal Annapurve <vannapurve@google.com>
->> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
->> Co-developed-by: Fuad Tabba <tabba@google.com>
->> Signed-off-by: Fuad Tabba <tabba@google.com>
->> Change-Id: If03609cbab3ad1564685c85bdba6dcbb6b240c0f
->> ---
->>   Documentation/virt/kvm/api.rst |   5 ++
->>   include/uapi/linux/kvm.h       |   2 +
->>   virt/kvm/guest_memfd.c         | 124 ++++++++++++++++++++++++++++++++-
->>   3 files changed, 129 insertions(+), 2 deletions(-)
->>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index 86f74ce7f12a..f609337ae1c2 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -6408,6 +6408,11 @@ belonging to the slot via its userspace_addr.
->>   The use of GUEST_MEMFD_FLAG_SUPPORT_SHARED will not be allowed for CoCo VMs.
->>   This is validated when the guest_memfd instance is bound to the VM.
->>   
->> +If the capability KVM_CAP_GMEM_CONVERSIONS is supported, then the 'flags' field
->> +supports GUEST_MEMFD_FLAG_INIT_PRIVATE.
+On 5/29/25 3:24 AM, Radim Krčmář wrote:
+> I originally gave up on the idea, but I feel kinda bad for Drew now, so
+> trying again:
+
+I am sorry if some of my replies came across in the wrong way. That was 
+never
+the intention.
+
+
+> 2025-05-28T12:21:59-07:00, Atish Patra <atish.patra@linux.dev>:
+>> On 5/28/25 8:09 AM, Andrew Jones wrote:
+>>> On Wed, May 28, 2025 at 07:16:11AM -0700, Atish Patra wrote:
+>>>> On 5/26/25 4:13 AM, Andrew Jones wrote:
+>>>>> On Mon, May 26, 2025 at 11:00:30AM +0200, Radim Krčmář wrote:
+>>>>>> 2025-05-23T10:16:11-07:00, Atish Patra <atish.patra@linux.dev>:
+>>>>>>> On 5/23/25 6:31 AM, Radim Krčmář wrote:
+>>>>>>>> 2025-05-22T12:03:43-07:00, Atish Patra <atishp@rivosinc.com>:
+>>>>>>>>> Upgrade the SBI version to v3.0 so that corresponding features
+>>>>>>>>> can be enabled in the guest.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+>>>>>>>>> ---
+>>>>>>>>> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+>>>>>>>>> -#define KVM_SBI_VERSION_MAJOR 2
+>>>>>>>>> +#define KVM_SBI_VERSION_MAJOR 3
+>>>>>>>> I think it's time to add versioning to KVM SBI implementation.
+>>>>>>>> Userspace should be able to select the desired SBI version and KVM would
+>>>>>>>> tell the guest that newer features are not supported.
+>>>>> We need new code for this, but it's a good idea.
+>>>>>
+>>>>>>> We can achieve that through onereg interface by disabling individual SBI
+>>>>>>> extensions.
+>>>>>>> We can extend the existing onereg interface to disable a specific SBI
+>>>>>>> version directly
+>>>>>>> instead of individual ones to save those IOCTL as well.
+>>>>>> Yes, I am all in favor of letting userspace provide all values in the
+>>>>>> BASE extension.
+>>>> We already support vendorid/archid/impid through one reg. I think we just
+>>>> need to add the SBI version support to that so that user space can set it.
+>>>>
+>>>>> This is covered by your recent patch that provides userspace_sbi.
+>>>> Why do we need to invent new IOCTL for this ? Once the user space sets the
+>>>> SBI version, KVM can enforce it.
+>>> If an SBI spec version provides an extension that can be emulated by
+>>> userspace, then userspace could choose to advertise that spec version,
+>>> implement a BASE probe function that advertises the extension, and
+>>> implement the extension, even if the KVM version running is older
+>>> and unaware of it. But, in order to do that, we need KVM to exit to
+>>> userspace for all unknown SBI calls and to allow BASE to be overridden
+>> You mean only the version field in BASE - Correct ?
+> No, "BASE probe function" is the sbi_probe_extension() ecall.
 >
-> It seems that the sentence is stale?
-> Didn't find the definition of KVM_CAP_GMEM_CONVERSIONS.
+>>> by userspace. The new KVM CAP ioctl allows opting into that new behavior.
+>> But why we need a new IOCTL for that ? We can achieve that with existing
+>> one reg interface with improvements.
+> It's an existing IOCTL with a new data payload, but I can easily use
+> ONE_REG if you want to do everything through that.
 >
-
-Thanks. This should read
-
-If the capability KVM_CAP_GMEM_SHARED_MEM is supported, and
-GUEST_MEMFD_FLAG_SUPPORT_SHARED is specified, then the 'flags' field
-supports GUEST_MEMFD_FLAG_INIT_PRIVATE.
-
->> Setting GUEST_MEMFD_FLAG_INIT_PRIVATE
->> +will initialize the memory for the guest_memfd as guest-only and not faultable
->> +by the host.
->> +
-> [...]
->>   
->>   static int kvm_gmem_init_fs_context(struct fs_context *fc)
->> @@ -549,12 +645,26 @@ static const struct inode_operations kvm_gmem_iops = {
->>   static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
->>   						      loff_t size, u64 flags)
->>   {
->> +	struct kvm_gmem_inode_private *private;
->>   	struct inode *inode;
->> +	int err;
->>   
->>   	inode = alloc_anon_secure_inode(kvm_gmem_mnt->mnt_sb, name);
->>   	if (IS_ERR(inode))
->>   		return inode;
->>   
->> +	err = -ENOMEM;
->> +	private = kzalloc(sizeof(*private), GFP_KERNEL);
->> +	if (!private)
->> +		goto out;
->> +
->> +	mt_init(&private->shareability);
+> KVM doesn't really need any other IOCTL than ONE_REGs, it's just
+> sometimes more reasonable to use a different IOCTL, like ENABLE_CAP.
 >
-> shareability is defined only when CONFIG_KVM_GMEM_SHARED_MEM enabled, should be done within CONFIG_KVM_GMEM_SHARED_MEM .
+>>> The old KVM with new VMM configuration isn't totally far-fetched. While
+>>> host kernels tend to get updated regularly to include security fixes,
+>>> enterprise kernels tend to stop adding features at some point in order
+>>> to maximize stability. While enterprise VMMs would also eventually stop
+>>> adding features, enterprise consumers are always free to use their own
+>>> VMMs (at their own risk). So, there's a real chance we could have
+>> I think we are years away from that happening (if it happens). My
+>> suggestion was not to
+>> try to build a world where no body lives ;). When we get to that
+>> scenario, the default KVM
+>> shipped will have many extension implemented. So there won't be much
+>> advantage to
+>> reimplement them in the user space. We can also take an informed
+>> decision at that time
+>> if the current selective forwarding approach is better
+> Please don't repeat the design of SUSP/SRST/DBCN.
+> Seeing them is one of the reasons why I proposed the new interface.
 >
+> "Blindly" forwarding DBCN to userspace is even a minor optimization. :)
 >
+>>                                                         or we need to
+>> blindly forward any
+>> unknown SBI calls to the user space.
+> Yes, KVM has to do what userpace configures it to do.
+>
+> I don't think that implementing unsupported SBI extensions in KVM is
+> important -- they should not be a hot path.
+>
+>>> deployments with older, stable KVM where users want to enable later SBI
+>>> extensions, and, in some cases, that should be possible by just updating
+>>> the VMM -- but only if KVM is only acting as an SBI implementation
+>>> accelerator and not as a userspace SBI implementation gatekeeper.
+>> But some of the SBI extensions are so fundamental that it must be
+>> implemented in KVM
+>> for various reasons pointed by Anup on other thread.
+> No, SBI does not have to be implemented in KVM at all.
+>
+> We do have a deep disagreement on what is virtualization and the role of
+> KVM in it.  I think that userspace wants a generic ISA accelerator.
 
-Yes, thank you! Will also update this to only initialize shareability if
-(flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED).
+I think the disagreement is the role of SBI in KVM virtualization rather 
+than
+a generic virtualization and the role of KVM in it. I completely agree 
+that KVM should act as an accelerator and defer the control to the user 
+space in most of the cases
+such e.g I/O operations or system related functionalities. However, SBI 
+specification solves
+much wider problems than those. Broadly we can categorize SBI 
+functionalities into the following
+areas
 
->> +	inode->i_mapping->i_private_data = private;
->> +
->> +	err = kvm_gmem_shareability_setup(private, size, flags);
->> +	if (err)
->> +		goto out;
->> +
->>   	inode->i_private = (void *)(unsigned long)flags;
->>   	inode->i_op = &kvm_gmem_iops;
->>   	inode->i_mapping->a_ops = &kvm_gmem_aops;
->> @@ -566,6 +676,11 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
->>   	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
->>   
->>   	return inode;
->> +
->> +out:
->> +	iput(inode);
->> +
->> +	return ERR_PTR(err);
->>   }
->>   
->>
-> [...]
+1. Bridging ISA GAP
+2. Higher Privilege Assistance
+3. Virtualization
+4. Platform abstraction
+5. Confidential computing
+
+For #1, #3 and #5, I believe user space shouldn't be involved in 
+implementation
+some of them are in hot path as well. For #4 and #2, there are some 
+opportunities which
+can be implemented in user space depending on the exact need. I am still 
+not clear what is the exact
+motivation /right now/ to pursue such a path. May be I missed something.
+As per my understanding from our discussion threads, there are two use 
+cases possible
+
+1. userspace wants to update more states in HSM. What are the states 
+user space should care about scounteren (fixed already in usptream) ?
+2. VMM vs KVM version difference - this may be true in the future 
+depending on the speed of RISC-V virtualization adoption in the industry.
+But we are definitely not there yet. Please let me know if I 
+misunderstood any use cases.
+
+> Even if userspace wants SBI for the M-mode interface, security minded
+This is probably a 3rd one ? Why we want M-mode interface in the user 
+space ?
+> userspace aims for as little kernel code as possible.
+
+We trust VMM code more than KVM code ?
+
+> Userspace might want to accelerate some SBI extension in KVM, but it
+> should not be KVM who decides what userspace wants.
 
