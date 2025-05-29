@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-48020-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48021-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49809AC840C
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 00:20:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 868BDAC840E
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 00:20:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 305777A825F
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 22:19:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 508DC165493
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 22:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C412524729F;
-	Thu, 29 May 2025 22:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E00E242928;
+	Thu, 29 May 2025 22:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q0Z1uG23"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T+AUPhT1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABAC230BC4
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 22:19:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291CF244673
+	for <kvm@vger.kernel.org>; Thu, 29 May 2025 22:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748557194; cv=none; b=IOFHPnJuLI4f7KOwZGDTztweoRLJX1veI5BIxZZg6kVrZQtROiF+37OZ83hgfGSDQg6ZciNoA3MKuuMZB5Czvs1LJTlSLKUgDPqF5AAXkG1pi60e5O5VbBCd4mD0OtqQgqzKjaiFptuAUJdwEa/sfTwW2cjCPpH0fEoOIHh1UV8=
+	t=1748557196; cv=none; b=IjHsXfnm9uXb3ix68WCiDP5LZV5QaxgT2HAPrsBOmiz2Ru4vNwH/MyuTNzyb7h4rqdLErJdVy12OcUcHZIfxeax1fohIwMIfA8P3U/4yzYCtoYdE8mV00GkWWaXhluYY6BiBW2Gy0gTXXh+kwFjvhSLuz+Hnzwq81WqriweVskU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748557194; c=relaxed/simple;
-	bh=mFlDg8wOG1PRZBUzQS0fkbB1ud//ZEmy7lh+SfMWkKU=;
+	s=arc-20240116; t=1748557196; c=relaxed/simple;
+	bh=A4LFvqZ5ENWY34mGIemBrERpDHvc2DqMGrkrdUc+6to=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=O3OuH1qLHnWaE4KDlOAUcZkyX7xzzwMQNSQ3K236h/vcwQZ/I/yu3dT6s2JIKKVvOnwuVHuJVcHl+BJZR02cmzKxj1fxHZAr/rl3SA6eonFGvTKECjMWKwE8wgzEWCtXMH8XUXRd0vY/jS2dENXmpBeqnZw89A7c44vlhuYNWBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q0Z1uG23; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=RjIMcopGcJHk10lMDJjmjyicPgEjND/vk3ID4MbA4cug5Ze2FXlMukYETcOvBzyslB63JWpX43IVJ/mKsbqgaaGjZZzml8UE9el7oQL1Kk7quOVlaIkyuWaCWkl2myaBzfkKp4B6RQiUwBNVJqvrGVDgXeYiqZ4KHRuzmPL2UAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T+AUPhT1; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b26e120e300so1222984a12.1
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 15:19:53 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7394772635dso957193b3a.0
+        for <kvm@vger.kernel.org>; Thu, 29 May 2025 15:19:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748557192; x=1749161992; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748557194; x=1749161994; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ckYpwhp6Hm+pvfi+Cbdt++fTIeJjtPKhaMoLpXy5DIw=;
-        b=Q0Z1uG23DnvTzRLZiLEgtgVwWN8oObbtmYNQv7XLiwXXfs95j8JSG1qYNPon3TBuNB
-         /IBnNT92Qypm4Q8WDKQEr1NMVSyjEQ2hRWo6qkCx5z+WyoGXt6qF+PYRh3oWd6W3Okj0
-         LBI48aFJoRL6xw2QqPS7neUxbN3jtrdi/br11kWWStZNNJkrP69XQK417xAFparlWpHX
-         Ukaz1lO8ni0jWUDP1KirPL01d08YqdS9LDFx242EDDmyDyhB+7VBbr+lmQvtwIqnKima
-         rscJ8v5DnWd4PXk+3VmW5QfqQ2egXUNYecXdzIsuKnE6OwzCybZ8A1yBA2snSBoSvN38
-         G3Uw==
+        bh=nX98HJbRuSQ6xNdc0MwlmdF7eZrXWtOe+GKwLLWx4iA=;
+        b=T+AUPhT1snCB9zW1C3cw9aF0FwU5iVrWGUbe+WRjw2l2nUQueDMl2mKWuEg0N9tgPX
+         Uw94XsFoiFlrF/qqbzjRRPOCUwOduKKlUJ5QAI/JCMbo+5wWw+3bg0WTHW+OIoahO+FK
+         XQiZVOhQ5Gg7DFUjx45bp6/NwtQi3OSehPqa4vJhIa3QNxISiU3Ahw8ex4+3a2X60Bbw
+         PpHcmXjKJUgqxxOz1KR4ykaQXzIus44rP/nqBC3pLJrskHZNMwER6ETYhjDr9b2Ql1MD
+         DbQRzqsE67BffYGljZ49fELQ5udE8DLKjzws2g9L6v+NEP7hGZNDgk7ZQaj/DB47SXaR
+         UiwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748557192; x=1749161992;
+        d=1e100.net; s=20230601; t=1748557194; x=1749161994;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ckYpwhp6Hm+pvfi+Cbdt++fTIeJjtPKhaMoLpXy5DIw=;
-        b=w6xBGBMNZytq+ZXPBIl8uu/Y6q0ysB0ti5MRXzNjHsE+aiAA24LSn9Yo960rKoX1LO
-         hbY0/Yger4VQi8GmQRFzOElfEtBqyzMZ4286pj1gEWQXvKIRFKWLuKeVF3UdWp780LEu
-         7/N2wFCIo0eXgQLjFWKp3podFDpk6Hvbu4qx//s1RWggIlPuT7v2HcgRWi/cnkNo1Rfl
-         IeUpoLol2Y1HFx87DJV+yQnSP14/sjj6mIA8PiaO3OPjqjhhRyP6tG0jDUfYzqGQadj7
-         J6b6aYw+VSKl3/hoQZbG5z1FrUCsdd0yPfBKFi+zyisfnCCuwiWZSbO8gWuos9BhXSBG
-         4gYA==
-X-Forwarded-Encrypted: i=1; AJvYcCXfQJPJ4tF0lne/Um/EFlELg5c3j5erP1HhLIEB4c2JUTmVILIAEK1JfS4K6s69295Dmbs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymrYppJW0CCYdsdD5mf90rrcpz874d1NQQj772oOcn/YoXruz8
-	vgSd42bzzSt6bm9XdF2ocCxp9iLCb5Sy0QlroD4UJPRfS14uhErF4UR1DdP0ycXRO08AkjCAyB9
-	MG1KP2g==
-X-Google-Smtp-Source: AGHT+IHG+BQc7caU6eHEAk61KexpAoTaK0e3VVheD8QYsGdTSLRbNUsZ4bpQdlnwNDmTfVxJjIrhBb554GM=
-X-Received: from pfwz39.prod.google.com ([2002:a05:6a00:1da7:b0:746:1eb5:7f3e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:2d8c:b0:20d:d31c:cd28
- with SMTP id adf61e73a8af0-21ad94e216amr2088378637.7.1748557192502; Thu, 29
- May 2025 15:19:52 -0700 (PDT)
+        bh=nX98HJbRuSQ6xNdc0MwlmdF7eZrXWtOe+GKwLLWx4iA=;
+        b=noIYW12yqadar6vj0coYHvaEqY37JzqMxgjFEV+OMFxy7uIxlVrp+fyCm0Z9HwqvMC
+         FjRpE8oxCfu25QAbCYZMwJrWd+qpuYSc4KvrwOgPDdh4AAUYgTkhUiAL8pMb/7L9ei4C
+         vGAKWFyFbA6eMDw9VwQAfoYMvTxpRx6DsmystT5+oAw5dLg20Yiuv+468/D2V0fjX5KF
+         LCy/4xPG2iiZFoRtoHVucr7f2TSnx885sfoZVv7GZNcqFGBjaraWTOzbHxE7dxDVvUr1
+         GUiqmkv1YpSAT/4un/x39ETBaqUratdrH1DJ65iHlq5xJ32TSrF2W/FdFoPg4q3rVnaw
+         84DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8FckwBEmkFllwG0n/+2VdK0McDFHMScQwezynUCYXU1oO4UiS6NmPzpgsZkXp4eBPtZI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySWYeKD5zneSntAzPyt/D9QkwxCsgrodgNojockRZFrQoLj6+j
+	Mf+k0HogT4GUJdj/e9byknrqmNifffr3zMhKBUdyk3nnQbq/NOfGmwuhLl8B+3KL69bqlIuM6vK
+	7fX33aA==
+X-Google-Smtp-Source: AGHT+IEBKjriVgxGk+BKu71J524sscOYWEh1dyyHEKyqWyY/JG1UDmL2b6mDtP1ardICqkEsw3RhMdZ0TiQ=
+X-Received: from pfjg6.prod.google.com ([2002:a05:6a00:b86:b0:747:a049:d575])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:928a:b0:740:4fd8:a2bc
+ with SMTP id d2e1a72fcca58-747bd958bb5mr1298997b3a.5.1748557194299; Thu, 29
+ May 2025 15:19:54 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 29 May 2025 15:19:20 -0700
+Date: Thu, 29 May 2025 15:19:21 -0700
 In-Reply-To: <20250529221929.3807680-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250529221929.3807680-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <20250529221929.3807680-8-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 07/16] x86/pmu: Rename pmu_gp_counter_is_available()
- to pmu_arch_event_is_available()
+Message-ID: <20250529221929.3807680-9-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 08/16] x86/pmu: Rename gp_counter_mask_length
+ to arch_event_mask_length
 From: Sean Christopherson <seanjc@google.com>
 To: Andrew Jones <andrew.jones@linux.dev>, Janosch Frank <frankja@linux.ibm.com>, 
 	Claudio Imbrenda <imbrenda@linux.ibm.com>, "=?UTF-8?q?Nico=20B=C3=B6hr?=" <nrb@linux.ibm.com>, 
@@ -87,97 +87,67 @@ Cc: kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
 	kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rename pmu_gp_counter_is_available() to pmu_arch_event_is_available() to
-reflect what the field and helper actually track.  The availablity of
-architectural events has nothing to do with the GP counters themselves.
+Rename gp_counter_mask_length to arch_event_mask_length to reflect what
+the field actually tracks.  The availablity of architectural events has
+nothing to do with the GP counters themselves.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
  lib/x86/pmu.c | 4 ++--
- lib/x86/pmu.h | 6 +++---
- x86/pmu.c     | 6 +++---
- 3 files changed, 8 insertions(+), 8 deletions(-)
+ lib/x86/pmu.h | 2 +-
+ x86/pmu.c     | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
-index d06e9455..599168ac 100644
+index 599168ac..b97e2c4a 100644
 --- a/lib/x86/pmu.c
 +++ b/lib/x86/pmu.c
-@@ -21,7 +21,7 @@ void pmu_init(void)
- 		pmu.gp_counter_mask_length = (cpuid_10.a >> 24) & 0xff;
+@@ -18,7 +18,7 @@ void pmu_init(void)
+ 
+ 		pmu.nr_gp_counters = (cpuid_10.a >> 8) & 0xff;
+ 		pmu.gp_counter_width = (cpuid_10.a >> 16) & 0xff;
+-		pmu.gp_counter_mask_length = (cpuid_10.a >> 24) & 0xff;
++		pmu.arch_event_mask_length = (cpuid_10.a >> 24) & 0xff;
  
  		/* CPUID.0xA.EBX bit is '1' if a counter is NOT available. */
--		pmu.gp_counter_available = ~cpuid_10.b;
-+		pmu.arch_event_available = ~cpuid_10.b;
- 
- 		if (this_cpu_has(X86_FEATURE_PDCM))
- 			pmu.perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
-@@ -51,7 +51,7 @@ void pmu_init(void)
+ 		pmu.arch_event_available = ~cpuid_10.b;
+@@ -50,7 +50,7 @@ void pmu_init(void)
+ 			pmu.msr_gp_event_select_base = MSR_K7_EVNTSEL0;
  		}
  		pmu.gp_counter_width = PMC_DEFAULT_WIDTH;
- 		pmu.gp_counter_mask_length = pmu.nr_gp_counters;
--		pmu.gp_counter_available = (1u << pmu.nr_gp_counters) - 1;
-+		pmu.arch_event_available = (1u << pmu.nr_gp_counters) - 1;
+-		pmu.gp_counter_mask_length = pmu.nr_gp_counters;
++		pmu.arch_event_mask_length = pmu.nr_gp_counters;
+ 		pmu.arch_event_available = (1u << pmu.nr_gp_counters) - 1;
  
  		if (this_cpu_has_perf_global_status()) {
- 			pmu.msr_global_status = MSR_AMD64_PERF_CNTR_GLOBAL_STATUS;
 diff --git a/lib/x86/pmu.h b/lib/x86/pmu.h
-index f07fbd93..d0ad280a 100644
+index d0ad280a..c7dc68c1 100644
 --- a/lib/x86/pmu.h
 +++ b/lib/x86/pmu.h
-@@ -64,7 +64,7 @@ struct pmu_caps {
+@@ -63,7 +63,7 @@ struct pmu_caps {
+ 	u8 fixed_counter_width;
  	u8 nr_gp_counters;
  	u8 gp_counter_width;
- 	u8 gp_counter_mask_length;
--	u32 gp_counter_available;
-+	u32 arch_event_available;
+-	u8 gp_counter_mask_length;
++	u8 arch_event_mask_length;
+ 	u32 arch_event_available;
  	u32 msr_gp_counter_base;
  	u32 msr_gp_event_select_base;
- 
-@@ -110,9 +110,9 @@ static inline bool this_cpu_has_perf_global_status(void)
- 	return pmu.version > 1;
- }
- 
--static inline bool pmu_gp_counter_is_available(int i)
-+static inline bool pmu_arch_event_is_available(int i)
- {
--	return pmu.gp_counter_available & BIT(i);
-+	return pmu.arch_event_available & BIT(i);
- }
- 
- static inline u64 pmu_lbr_version(void)
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 8cf26b12..0ce34433 100644
+index 0ce34433..63eae3db 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -436,7 +436,7 @@ static void check_gp_counters(void)
- 	int i;
+@@ -992,7 +992,7 @@ int main(int ac, char **av)
+ 	printf("PMU version:         %d\n", pmu.version);
+ 	printf("GP counters:         %d\n", pmu.nr_gp_counters);
+ 	printf("GP counter width:    %d\n", pmu.gp_counter_width);
+-	printf("Mask length:         %d\n", pmu.gp_counter_mask_length);
++	printf("Event Mask length:   %d\n", pmu.arch_event_mask_length);
+ 	printf("Fixed counters:      %d\n", pmu.nr_fixed_counters);
+ 	printf("Fixed counter width: %d\n", pmu.fixed_counter_width);
  
- 	for (i = 0; i < gp_events_size; i++)
--		if (pmu_gp_counter_is_available(i))
-+		if (pmu_arch_event_is_available(i))
- 			check_gp_counter(&gp_events[i]);
- 		else
- 			printf("GP event '%s' is disabled\n",
-@@ -463,7 +463,7 @@ static void check_counters_many(void)
- 	int i, n;
- 
- 	for (i = 0, n = 0; n < pmu.nr_gp_counters; i++) {
--		if (!pmu_gp_counter_is_available(i))
-+		if (!pmu_arch_event_is_available(i))
- 			continue;
- 
- 		cnt[n].ctr = MSR_GP_COUNTERx(n);
-@@ -902,7 +902,7 @@ static void set_ref_cycle_expectations(void)
- 	uint64_t t0, t1, t2, t3;
- 
- 	/* Bit 2 enumerates the availability of reference cycles events. */
--	if (!pmu.nr_gp_counters || !pmu_gp_counter_is_available(2))
-+	if (!pmu.nr_gp_counters || !pmu_arch_event_is_available(2))
- 		return;
- 
- 	if (this_cpu_has_perf_global_ctrl())
 -- 
 2.49.0.1204.g71687c7c1d-goog
 
