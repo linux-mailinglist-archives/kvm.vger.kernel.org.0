@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-48059-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48060-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0CE5AC853E
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 01:46:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6238DAC8540
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 01:46:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 992681C0093D
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 23:46:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5448B7B45B3
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 23:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5DC526A0C7;
-	Thu, 29 May 2025 23:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CF626A1CC;
+	Thu, 29 May 2025 23:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DkEmLBI/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WGaDQCPB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C4E2690C8
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 23:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1906A26A087
+	for <kvm@vger.kernel.org>; Thu, 29 May 2025 23:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748562058; cv=none; b=pQAs51rz+ATVNBGFZgGMTqmjUV5EFQ2fWrZHtlA0/vLGZZ+z2cMryj5kpuD22beswQsG3GsFmINYz1SHdDlf0QD4N3h2UjCMzLkqEgFbDZ8H5DHuaUE8kBXmbqYQkd76Pi3V9MF3vmmrZiUIo1KDpnhZFx0uREIdi25zcxuggVk=
+	t=1748562060; cv=none; b=YzLfhwTDIA3lrVriOeaJYyQawTI/Z2DAleXnf2drLwvxl3rx55fk/l3kwzRndgd0rzTYQ16s5YkKyD2vI1dZXs/fQ1p+qcMo3LefXrbIiAp+qZo6c9yo+LnZqYGXYdjFKPW+XGRxAhAFlweOsPIdOvvO8vGJOlqXbqM/7hyYqko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748562058; c=relaxed/simple;
-	bh=wiSfnvg+3ob6BZ0Eu3gekeRK967P9Nv3tIdvcIcKxQ0=;
+	s=arc-20240116; t=1748562060; c=relaxed/simple;
+	bh=WSoaNu660Zd2LHE7vtRJTDYgkU/FHIlWHCtZt9PFxFk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FOF7c1HWPPddH63RirNAM11+BboLGwcsOvhuOL1h+y3SLe8IkagMhv4e/NUbXPrHrN9Fdhu/8B7f/8Uw+1uK5xssh4xGg7SjBhk08QApT2O9az1wWUMSJ5ghR9OpvmSGjio9bg2oDLLF5PEml/nuXlx6DD5gQfBzNXZPCyfnMKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DkEmLBI/; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=aTMHkSyq0sFnnNKiTbv9JFCkzNcbPbSTi9vThz7kZe0IFh4qigFXOut/HsGZOYFN7fdvoAqq+gsm+pkhNdkVJBHFhtWetSxcdy0W9vEFqIiW23KVjq8Y0EeM7sHdIPrLhsimbPKhKgdOE5MRYigEzaKWT3BmJPGDP7EnwNVdj1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WGaDQCPB; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-310efe825ccso1375116a91.3
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 16:40:57 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-23536f7c2d7so636895ad.2
+        for <kvm@vger.kernel.org>; Thu, 29 May 2025 16:40:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748562056; x=1749166856; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748562058; x=1749166858; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=+CgyWByAaHVV85PeVC13Q9ehun1/Wd3oFQ4GzRhsXCQ=;
-        b=DkEmLBI/LEgYd2QJSbA27/HwX3AD0dc6dmG+tJ6rveX4K/IKKAfIlDZ1erOfPsICPv
-         6vqm41i1/74DNCm/p8vtbWRb1Jci6r0UokkM/zYM6+/Pmn+cnlSCEyhSiBxuzGfrOfBm
-         4rnQA1VxotQ58nk03g6Q6WY8h6AeIAdw+XOCQjvw1IP4vlCc05pdUN/d+uQEaXiesOHt
-         esXM0ioW9sAOWt5y4CO2WfactTjOXtW+5rXsECHRlq/4caGcd2+ClKZQXvFIoyy6V58z
-         /T3HCnISGnJy1/6yrnth5mxutGF8rEvTa09VwD2cJN2ms5WrhVFpH/ruD5n2SmEb7+xu
-         x/RA==
+        bh=knshc8Ro6b23sXzG4OhMtI9xEOuGTz+THWgQsoLQKOM=;
+        b=WGaDQCPBLIa6mYd0E5T8Kpd8cEZ5WCGWw8IRz4hOukf5y5GpmAOsxA+LH/mPgGGL2a
+         DTua2UPz6vy6wtjJDR0yT1N4dUfabGH7ZTHFN/XouJ6KrGBEkn8Do6Oh8x4G5a2taMIg
+         yIzvqr/8F8StLeKOvHMoRWkadPLrz7JWDpm9FXmbRZ7Ewu4vXey5URZZ/je/yriAtSv9
+         nlLXbXzNQi2VuhHMlQhRLjVldZe8Z32xL276mmvainCNkm7NEqqnFL6mbRH5b93t4/n/
+         5e4v48n7opL6DsSqx5r5slFDJL1IPM1OpQbPo+8FJI+SzsVHLhtC7nVX/JCfohfn+K3r
+         pDRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748562056; x=1749166856;
+        d=1e100.net; s=20230601; t=1748562058; x=1749166858;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+CgyWByAaHVV85PeVC13Q9ehun1/Wd3oFQ4GzRhsXCQ=;
-        b=pZPouPCQabdWL8hP3aFq4HqIVJaXUqAvvjT+tTmc/1Z5aNyKecezj/pqHGGmlKNW7K
-         2IQ4tejsTh9yf9slLRF0/p6HFm1jIAi6ndpMLjovkdqIbN1MVjj2RF7aZ4saukQCCFrM
-         vuNrkmy0YMu0FlN3DxWA8obdLT3SP+lz0k+wwCUalERRBNExhRGktC9amTNoezWozimi
-         vpAprqsvDJsMdDSI2+cz1sR7wHvwHo5a21bysgXVNWRWbCCLwfVILTuHui3UHcfYMNGV
-         zy/LipQfM5l/AnAQ8XMWS8ZtTKpAFGJK8vY2L55A9Y9kXakVnnDisEBP4qeXvuCGc+aw
-         ENUA==
-X-Gm-Message-State: AOJu0YzsFgWQ2XQ7hknZKnSMToIkPcizEklsnhiMaWfeb1Lgob+xyfIB
-	c6XYz++De6tF2+nrECT1r8QmRkx3J1Bb8lOyeUzd7H3VIVFmZrtOz+nacjP3QzTko4Kji9R2UJr
-	3tSwe7A==
-X-Google-Smtp-Source: AGHT+IGo71TMXPlGjlEtx+9KCFpk1shtfB/J83ECXF+TfIzjn3vXYzFl65S88oW17CFw5334ijpYDq8c4lw=
-X-Received: from pjp3.prod.google.com ([2002:a17:90b:55c3:b0:312:a03:ef54])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f4b:b0:311:c939:c851
- with SMTP id 98e67ed59e1d1-312413f92e6mr2030455a91.4.1748562056573; Thu, 29
- May 2025 16:40:56 -0700 (PDT)
+        bh=knshc8Ro6b23sXzG4OhMtI9xEOuGTz+THWgQsoLQKOM=;
+        b=mEm95iRiMmvS1sramTnb7tSxBmiADqAcwyFBAgSYYFEFSv12q7jrbLUZOo6eTEBW0O
+         VTCwCKqB3+hm4yUczQlP5SIXWxe/3RsrFESG3wMpvFT4wp/SzIpogUH4ZM2WChOHQ8kq
+         gH79vTtwBX1Vpa0L3Eqd/Mujp66B1kE5qFblcljA6uMsxoZyaGwA2jl4tj4rmt7bDyqI
+         AqiZ3MRAIt3/8+41da/++jZTmqSReFJlC2zBy6+2o3Cfyzzx1ytrg6GZ9iflhttK49H/
+         Mrky5e0c4JAE4cMRRDBFI49SruXEkEzivTbEF00SYbkTaXCBpohPKkc3T2kCo/14mLlh
+         GR7w==
+X-Gm-Message-State: AOJu0YzkAisbXDh4LLgjLkSVJK/pe0bX9CSq4wyOZlUW2YEAcXdZmLCT
+	5WvQtJ9rarAk3uI2Ks6lOxBCUz5PoL9IMLj8MUAGCcZlhcYFi/amDLRu75cSrPQx98/dxlqBmhX
+	ve0t8JQ==
+X-Google-Smtp-Source: AGHT+IEKYGN3bgz9PNv8hfea1DfB0n41Fsnd40ZBScCazZ4iIJMrBbN2fDYm5QFjqceqs1filEr1ra9Jymg=
+X-Received: from pjbsl12.prod.google.com ([2002:a17:90b:2e0c:b0:311:be10:7246])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ea11:b0:235:1966:93a9
+ with SMTP id d9443c01a7336-235291e7dcbmr16997285ad.3.1748562058357; Thu, 29
+ May 2025 16:40:58 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 29 May 2025 16:40:08 -0700
+Date: Thu, 29 May 2025 16:40:09 -0700
 In-Reply-To: <20250529234013.3826933-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250529234013.3826933-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <20250529234013.3826933-24-seanjc@google.com>
-Subject: [PATCH 23/28] KVM: SVM: Move svm_msrpm_offset() to nested.c
+Message-ID: <20250529234013.3826933-25-seanjc@google.com>
+Subject: [PATCH 24/28] KVM: SVM: Store MSRPM pointer as "void *" instead of
+ "u32 *"
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -84,106 +85,116 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move svm_msrpm_offset() from svm.c to nested.c now that all usage of the
-u32-index offsets is nested virtualization specific.
+Store KVM's MSRPM pointers as "void *" instead of "u32 *" to guard against
+directly accessing the bitmaps outside of code that is explicitly written
+to access the bitmaps with a specific type.
 
-No functional change intended.
+Opportunistically use svm_vcpu_free_msrpm() in svm_vcpu_free() instead of
+open coding an equivalent.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/nested.c | 27 +++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c    | 27 ---------------------------
- arch/x86/kvm/svm/svm.h    |  1 -
- 3 files changed, 27 insertions(+), 28 deletions(-)
+ arch/x86/kvm/svm/nested.c |  4 +++-
+ arch/x86/kvm/svm/svm.c    |  8 ++++----
+ arch/x86/kvm/svm/svm.h    | 13 ++++++++-----
+ 3 files changed, 15 insertions(+), 10 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 0026d2adb809..5d6525627681 100644
+index 5d6525627681..e07e10fb52a5 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -187,6 +187,33 @@ void recalc_intercepts(struct vcpu_svm *svm)
- static int nested_svm_msrpm_merge_offsets[6] __ro_after_init;
- static int nested_svm_nr_msrpm_merge_offsets __ro_after_init;
- 
-+static const u32 msrpm_ranges[] = {
-+	SVM_MSRPM_RANGE_0_BASE_MSR,
-+	SVM_MSRPM_RANGE_1_BASE_MSR,
-+	SVM_MSRPM_RANGE_2_BASE_MSR
-+};
-+
-+static u32 svm_msrpm_offset(u32 msr)
-+{
-+	u32 offset;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(msrpm_ranges); i++) {
-+		if (msr < msrpm_ranges[i] ||
-+		    msr >= msrpm_ranges[i] + SVM_MSRS_PER_RANGE)
-+			continue;
-+
-+		offset  = (msr - msrpm_ranges[i]) / SVM_MSRS_PER_BYTE;
-+		offset += (i * SVM_MSRPM_BYTES_PER_RANGE);  /* add range offset */
-+
-+		/* Now we have the u8 offset - but need the u32 offset */
-+		return offset / 4;
-+	}
-+
-+	/* MSR not in any range */
-+	return MSR_INVALID;
-+}
-+
- int __init nested_svm_init_msrpm_merge_offsets(void)
+@@ -271,6 +271,8 @@ int __init nested_svm_init_msrpm_merge_offsets(void)
+ static bool nested_svm_merge_msrpm(struct kvm_vcpu *vcpu)
  {
- 	const u32 merge_msrs[] = {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
++	u32 *msrpm02 = svm->nested.msrpm;
++	u32 *msrpm01 = svm->msrpm;
+ 	int i;
+ 
+ 	/*
+@@ -305,7 +307,7 @@ static bool nested_svm_merge_msrpm(struct kvm_vcpu *vcpu)
+ 		if (kvm_vcpu_read_guest(vcpu, offset, &value, 4))
+ 			return false;
+ 
+-		svm->nested.msrpm[p] = svm->msrpm[p] | value;
++		msrpm02[p] = msrpm01[p] | value;
+ 	}
+ 
+ 	svm->nested.force_msr_bitmap_recalc = false;
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 9d01776d82d4..fa2df1c869db 100644
+index fa2df1c869db..6f99031c2926 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -195,33 +195,6 @@ static DEFINE_MUTEX(vmcb_dump_mutex);
-  */
- static int tsc_aux_uret_slot __read_mostly = -1;
+@@ -731,11 +731,11 @@ void svm_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
+ 	svm->nested.force_msr_bitmap_recalc = true;
+ }
  
--static const u32 msrpm_ranges[] = {
--	SVM_MSRPM_RANGE_0_BASE_MSR,
--	SVM_MSRPM_RANGE_1_BASE_MSR,
--	SVM_MSRPM_RANGE_2_BASE_MSR
--};
--
--u32 svm_msrpm_offset(u32 msr)
--{
--	u32 offset;
--	int i;
--
--	for (i = 0; i < ARRAY_SIZE(msrpm_ranges); i++) {
--		if (msr < msrpm_ranges[i] ||
--		    msr >= msrpm_ranges[i] + SVM_MSRS_PER_RANGE)
--			continue;
--
--		offset  = (msr - msrpm_ranges[i]) / SVM_MSRS_PER_BYTE;
--		offset += (i * SVM_MSRPM_BYTES_PER_RANGE);  /* add range offset */
--
--		/* Now we have the u8 offset - but need the u32 offset */
--		return offset / 4;
--	}
--
--	/* MSR not in any range */
--	return MSR_INVALID;
--}
--
- static int get_npt_level(void)
+-u32 *svm_vcpu_alloc_msrpm(void)
++void *svm_vcpu_alloc_msrpm(void)
  {
- #ifdef CONFIG_X86_64
+ 	unsigned int order = get_order(MSRPM_SIZE);
+ 	struct page *pages = alloc_pages(GFP_KERNEL_ACCOUNT, order);
+-	u32 *msrpm;
++	void *msrpm;
+ 
+ 	if (!pages)
+ 		return NULL;
+@@ -809,7 +809,7 @@ void svm_set_x2apic_msr_interception(struct vcpu_svm *svm, bool intercept)
+ 	svm->x2avic_msrs_intercepted = intercept;
+ }
+ 
+-void svm_vcpu_free_msrpm(u32 *msrpm)
++void svm_vcpu_free_msrpm(void *msrpm)
+ {
+ 	__free_pages(virt_to_page(msrpm), get_order(MSRPM_SIZE));
+ }
+@@ -1353,7 +1353,7 @@ static void svm_vcpu_free(struct kvm_vcpu *vcpu)
+ 	sev_free_vcpu(vcpu);
+ 
+ 	__free_page(__sme_pa_to_page(svm->vmcb01.pa));
+-	__free_pages(virt_to_page(svm->msrpm), get_order(MSRPM_SIZE));
++	svm_vcpu_free_msrpm(svm->msrpm);
+ }
+ 
+ #ifdef CONFIG_CPU_MITIGATIONS
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 23e1e3ae30b0..d146c35b9bd2 100644
+index d146c35b9bd2..77287c870967 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -673,7 +673,6 @@ BUILD_SVM_MSR_BITMAP_HELPERS(void, set, __set)
+@@ -189,8 +189,11 @@ struct svm_nested_state {
+ 	u64 vmcb12_gpa;
+ 	u64 last_vmcb12_gpa;
+ 
+-	/* These are the merged vectors */
+-	u32 *msrpm;
++	/*
++	 * The MSR permissions map used for vmcb02, which is the merge result
++	 * of vmcb01 and vmcb12
++	 */
++	void *msrpm;
+ 
+ 	/* A VMRUN has started but has not yet been performed, so
+ 	 * we cannot inject a nested vmexit yet.  */
+@@ -271,7 +274,7 @@ struct vcpu_svm {
+ 	 */
+ 	u64 virt_spec_ctrl;
+ 
+-	u32 *msrpm;
++	void *msrpm;
+ 
+ 	ulong nmi_iret_rip;
+ 
+@@ -673,8 +676,8 @@ BUILD_SVM_MSR_BITMAP_HELPERS(void, set, __set)
  /* svm.c */
  extern bool dump_invalid_vmcb;
  
--u32 svm_msrpm_offset(u32 msr);
- u32 *svm_vcpu_alloc_msrpm(void);
- void svm_vcpu_free_msrpm(u32 *msrpm);
+-u32 *svm_vcpu_alloc_msrpm(void);
+-void svm_vcpu_free_msrpm(u32 *msrpm);
++void *svm_vcpu_alloc_msrpm(void);
++void svm_vcpu_free_msrpm(void *msrpm);
  void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb);
+ void svm_enable_lbrv(struct kvm_vcpu *vcpu);
+ void svm_update_lbrv(struct kvm_vcpu *vcpu);
 -- 
 2.49.0.1204.g71687c7c1d-goog
 
