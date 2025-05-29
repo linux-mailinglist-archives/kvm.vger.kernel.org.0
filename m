@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-47985-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A5CCAC7FEA
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 16:57:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8377AC804A
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 17:28:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADC414A7085
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 14:57:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8DFA4A1928
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 15:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED53522B8BF;
-	Thu, 29 May 2025 14:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3184C22D4F1;
+	Thu, 29 May 2025 15:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hyXLQnv7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2osmZqIY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9073040BF5
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 14:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF50E22CBF3
+	for <kvm@vger.kernel.org>; Thu, 29 May 2025 15:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748530614; cv=none; b=sYNtXS4vaKzJGd01LVa6VS/JvXd6SH18RXAXpcSYsnkttTKJsYKFMyHkaUL8aREdNETd3OZEQoo7ZUwg05ROkMtAnviEDck7nCOklp51YPEvzTt4H0Pnh3+BSe291JSSgycTmKMt6DgPQGk8/+oRfHWYIPDiCssJ5k3QM27ZRyw=
+	t=1748532510; cv=none; b=QzV9vNndlEH16Qy2D1ZB6f+Wt9Qk4xotPWUMHytvFvlpeDNpZw5bxfUv+XPTKPe5So5Uu/u42S8EN4c1/A1tHTGl131IIX4H39KSQoCy3q80TnLPN666fseKvUTkVVDgVD9vB6yYNi9hHa4KtV1+XIr2878yRpbZfggK6aU5tT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748530614; c=relaxed/simple;
-	bh=B1zsO3xLB87dBpNzAoGuj+8RJlTANU2xKvOZOU1twOU=;
+	s=arc-20240116; t=1748532510; c=relaxed/simple;
+	bh=8uxml1kMzoiWO8d4mb5zk+neEveN0f+NthT2SxLL2HU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sNqyf3HLg/WCziaFt38YWruUcmvBGxa/xvKqDBpktYLiCW76SgoraLjoTqBxjrjz8rZnv+gvjrQdt7SSA1M+yJxvOSEnbMB0hbJkK0iUdy01G+u5L73ANvuRLUJJNPGnVkHYVE76n3NUWPlueMy2tPUw2vPpE/Pf8NoTeswpYR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hyXLQnv7; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=EVvwyPjIo8uZRbihpzFYfOxVPC9CuNRV/irDGubN7LvxBP+BRFxK/vWOesC+WpcwbYqlhvN5RGuTHIUJ5NYYT07LgV0QvaFT2PM79DjqJEwJlNoeh/CoYh9+1k895v0ZRy32zLKDYZBb2X+eo9kQWapANIepYAwAegcVLSGFDUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2osmZqIY; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31226d9d604so418480a91.1
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 07:56:52 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31171a736b2so1692401a91.1
+        for <kvm@vger.kernel.org>; Thu, 29 May 2025 08:28:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748530612; x=1749135412; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748532508; x=1749137308; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wtc8z1lt0l7J7qwleBMoPVIkOE4MKmf5AJAUWp638/g=;
-        b=hyXLQnv7oXEntBAzMTAPyUhwAnRTHCci3ptm+H6vpNjcZ1SBsaYZSIS29rQ37BWRpM
-         nKzmyry1m8ComuGB7/wEP6B9vDah1u8dqm/H3gOFh3VDFjK+ZSlbcGMOtKXMiDAiiZku
-         lFOo3WOLxA5IzhFi5bgUXGTJ9TwfWXvBU+aLki3q/k4yE2nNC9zwlpZtzd2ekdFrrr6F
-         lxP5/6WNKc8IgRWY+EBOE9ZCn2LQW90EoDlj3uMzQsRSgqXilJEdL7hiMmIHjMHoxxUT
-         4w/Hetq61CgISID1WKgCiGeboNyuxjhIplPTnToCLy1X9M/Rxgqn181FNyXpnmzxy1RM
-         miwQ==
+        bh=WU9RnG3prte+XfxV/XkwbzM4ROyF/nnLjJ6rboFsA7o=;
+        b=2osmZqIYu5rrYH5Rypis9rvLcc2g4P4UBgrR3ayNk4RwYi0int9wJFFUiFXiwWfSJA
+         1OVFNQBq9TagdbSJs8+947v+vs0geQRTA+MiyTI/ufq5bgyt3tzMDkdN4OgS+vRIcJcY
+         Lpc35sXKKkxq0Ddfit8skIW5uxwsdsRuKR9Xu9jQ0fQnQOH5DCq9J/9U8UcmsPiFNSLo
+         FiZhp0Hzx+OeLLCEHhDWUmVlSd3mVsSlbO9l1uLnTJk6YmP9hqLvNW6ZVpQf8YdvAHZC
+         IGOAml+i25YCViSCPx5wUnOGz1ZG0ogcfxwk3ZnIMFGMpa/qINjb8iJtJHOeZlR6p2Ve
+         gHDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748530612; x=1749135412;
+        d=1e100.net; s=20230601; t=1748532508; x=1749137308;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wtc8z1lt0l7J7qwleBMoPVIkOE4MKmf5AJAUWp638/g=;
-        b=rE709alIHeT4+azqXJmVEonT950E3a+pHMOd919CktYJDOAuWFUk2tv1jGmYxpc9d0
-         4mRpzFzJAESWj/33FVRqCWz0NvIv+VbdQ6JqhLAqCqhET7HvlL7f8kirCSNrAQkQRFxR
-         LQ+dfC1/yyFjW6w2mJsL0lMFyUYFNob1pvqzCakDD+MM3W3UR9YhdupOI0SMnjo0miqD
-         oPyeut5M9yp1MmBShVUVHAvzPNHlzamNeUMUJy4HINGPhSgGyWMVbcdSbYrwDGr/r0p0
-         y4PFvzow8CTm75ioqVqECvpLHTUPV8J2LDXFudiSwkzUC2VLhjxjfmoWRZxNHpFYXJ19
-         SQEg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGqYaq7JR5YR/MZQSeC8ltJPgdjTB0VUKIJT5Ou759KFKuPQGecPzQOmMxM4vON33Ca3c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq2Kw29SiiL0jtvgQIDO69yPf1FKkR0lpC2qCJMxLhNAPHRr6h
-	BkFrTeAGhcBrK/LO+s7m+Y3wke5+Vd1/VPAGPv+QoZZq9TEiYtr2nyhidKwr7Ptf8jQczYZ+55L
-	Ecj3mWQ==
-X-Google-Smtp-Source: AGHT+IEOksNt6WLBVwwH9cCjd/EZtQ2Y3bLCTU4Al9fuM3w6GA9Cf3/1B4op9exa2/CpdjOTCglkD0RIbFs=
-X-Received: from pjbpq14.prod.google.com ([2002:a17:90b:3d8e:b0:311:2c1f:b0d8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c09:b0:30c:4b1d:330
- with SMTP id 98e67ed59e1d1-311e7460123mr9878567a91.27.1748530611851; Thu, 29
- May 2025 07:56:51 -0700 (PDT)
-Date: Thu, 29 May 2025 07:56:50 -0700
-In-Reply-To: <aDd-lbrJAX62UQLn@google.com>
+        bh=WU9RnG3prte+XfxV/XkwbzM4ROyF/nnLjJ6rboFsA7o=;
+        b=TM7YnHwNoKGxl279HIeQdoXLF8vCD1UJtod+9Q6GXzhc1ti4Yb1rNU5p3ZSLLDALYJ
+         qlNmWK+cJZ4BJIVmupL/rtRvUUiw476pKTuZi91S3I43d6YGwvIvpJXdXG9o/hc4UvTk
+         xDKARUTRcPB3kgv+9Sd7AHAKmjjGe0U1ArUEH9dy1v2BedtOnSQhNjRCb0FWVkdyCkWW
+         D46W9g6AQjadyzoOrDxM3P8k0zogw0Hk1Hx2+QOM36vvNJYpVaC6FJ8CwH2BLqBJV0dA
+         WqUOHg2STu2oBMN3/BEbrRlR015IfZo2Il7+urzsF/bLVytzcKUX5i073Ilt6QfWtXy1
+         CfeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXwSYvvMkX/K50zow7aiCsZzgqL2kGRp2Mn2DqzyY8fD1g4d0Jo6gtD8uFZR7/mtnYp4Bw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGlyLVh1q+vUHvH93sOHsGi4szHmX9hU+gUdy12YX5Z/0B+AfV
+	lrtXtXec2y0Od0vYDHn84Zn303SQvqJWuCU8/c+wHNMUxhukwBH7hSVavPOpNJM6vgT+EtaKVrN
+	WNPMuDA==
+X-Google-Smtp-Source: AGHT+IHbtuprtUf3WXvE9In2+LJbs9yJtttrgnsqC0Q6ZRBKRVcjg83ZBIKBGMMJVz/hhN7+gaivfNuenbM=
+X-Received: from pjbpx18.prod.google.com ([2002:a17:90b:2712:b0:311:8076:14f1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1dce:b0:312:26d9:d5a0
+ with SMTP id 98e67ed59e1d1-312413f60famr66406a91.3.1748532508047; Thu, 29 May
+ 2025 08:28:28 -0700 (PDT)
+Date: Thu, 29 May 2025 08:28:26 -0700
+In-Reply-To: <CADrL8HXjLjVyFiFee9Q58TQ9zBfXiO+VG=25Rw4UD+fbDmxQFg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,77 +73,79 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250109204929.1106563-1-jthoughton@google.com>
- <20250109204929.1106563-6-jthoughton@google.com> <aBqj3s8THH9SFzLO@google.com>
- <aDdwXrbAHmVqu0kA@linux.dev> <aDd-lbrJAX62UQLn@google.com>
-Message-ID: <aDh1sgc5oAYDfGnF@google.com>
-Subject: Re: [PATCH v2 05/13] KVM: x86/mmu: Add support for KVM_MEM_USERFAULT
+ <aBqlkz1bqhu-9toV@google.com> <CADrL8HXjLjVyFiFee9Q58TQ9zBfXiO+VG=25Rw4UD+fbDmxQFg@mail.gmail.com>
+Message-ID: <aDh9GtncjlVvvVJ1@google.com>
+Subject: Re: [PATCH v2 00/13] KVM: Introduce KVM Userfault
 From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: James Houghton <jthoughton@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Yan Zhao <yan.y.zhao@intel.com>, 
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Yan Zhao <yan.y.zhao@intel.com>, 
 	Nikita Kalyazin <kalyazin@amazon.com>, Anish Moorthy <amoorthy@google.com>, 
 	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>, 
 	David Matlack <dmatlack@google.com>, wei.w.wang@intel.com, kvm@vger.kernel.org, 
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	Jiaqi Yan <jiaqiyan@google.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, May 28, 2025, Sean Christopherson wrote:
-> On Wed, May 28, 2025, Oliver Upton wrote:
-> > On Tue, May 06, 2025 at 05:05:50PM -0700, Sean Christopherson wrote:
-> > > > +	if ((old_flags ^ new_flags) & KVM_MEM_USERFAULT &&
-> > > > +	    (change == KVM_MR_FLAGS_ONLY)) {
-> > > > +		if (old_flags & KVM_MEM_USERFAULT)
-> > > > +			kvm_mmu_recover_huge_pages(kvm, new);
-> > > > +		else
-> > > > +			kvm_arch_flush_shadow_memslot(kvm, old);
-> > > 
-> > > The call to kvm_arch_flush_shadow_memslot() should definitely go in common code.
-> > > The fancy recovery logic is arch specific, but blasting the memslot when userfault
-> > > is toggled on is not.
-> > 
-> > Not like anything in KVM is consistent but sprinkling translation
-> > changes / invalidations between arch and generic code feels
-> > error-prone.
+On Wed, May 28, 2025, James Houghton wrote:
+> The only thing that I want to call out again is that this UAPI works
+> great for when we are going from userfault --> !userfault. That is, it
+> works well for postcopy (both for guest_memfd and for standard
+> memslots where userfaultfd scalability is a concern).
 > 
-> Eh, leaving critical operations to arch code isn't exactly error free either :-)
+> But there is another use case worth bringing up: unmapping pages that
+> the VMM is emulating as poisoned.
 > 
-> > Especially if there isn't clear ownership of a particular flag, e.g. 0 -> 1
-> > transitions happen in generic code and 1 -> 0 happens in arch code.
+> Normally this can be handled by mm (e.g. with UFFDIO_POISON), but for
+> 4K poison within a HugeTLB-backed memslot (if the HugeTLB page remains
+> mapped in userspace), KVM Userfault is the only option (if we don't
+> want to punch holes in memslots). This leaves us with three problems:
 > 
-> The difference I see is that removing access to the memslot on 0=>1 is mandatory,
-> whereas any action on 1=>0 is not.  So IMO it's not arbitrary sprinkling of
-> invalidations, it's deliberately putting the common, mandatory logic in generic
-> code, while leaving optional performance tweaks to arch code.
+> 1. If using KVM Userfault to emulate poison, we are stuck with small
+> pages in stage 2 for the entire memslot.
+> 2. We must unmap everything when toggling on KVM Userfault just to
+> unmap a single page.
+> 3. If KVM Userfault is already enabled, we have no choice but to
+> toggle KVM Userfault off and on again to unmap the newly poisoned
+> pages (i.e., there is no ioctl to scan the bitmap and unmap
+> newly-userfault pages).
 > 
-> > Even in the case of KVM_MEM_USERFAULT, an architecture could potentially
-> > preserve the stage-2 translations but reap access permissions without
-> > modifying page tables / TLBs.
-> 
-> Yes, but that wouldn't be strictly unique to KVM_MEM_USERFAULT.
-> 
-> E.g. for NUMA balancing faults (or rather, the PROT_NONE conversions), KVM could
-> handle the mmu_notifier invalidations by removing access while keeping the PTEs,
-> so that faulting the memory back would be a lighter weight operation.  Ditto for
-> reacting to other protection changes that come through mmu_notifiers.
-> 
-> If we want to go down that general path, my preference would be to put the control
-> logic in generic code, and then call dedicated arch APIs for removing protections.
-> 
-> > I'm happy with arch interfaces that clearly express intent (make this
-> > memslot inaccessible), then the architecture can make an informed
-> > decision about how to best achieve that. Otherwise we're always going to
-> > use the largest possible hammer potentially overinvalidate.
-> 
-> Yeah, definitely no argument there given x86's history in this area.  Though if
-> we want to tackle that problem straightaway, I think I'd vote to add the
-> aforementioned dedicated APIs for removing protections, with a generic default
-> implementation that simply invokes kvm_arch_flush_shadow_memslot().
+> All of these are non-issues if we emulate poison by removing memslots,
+> and I think that's possible. But if that proves too slow, we'd need to
+> be a little bit more clever with hugepage recovery and with unmapping
+> newly-userfault pages, both of which I think can be solved by adding
+> some kind of bitmap re-scan ioctl. We can do that later if the need
+> arises.
 
-Alternatively, we could punt on this issue entirely by not allowing userspace to
-set KVM_MEM_USERFAULT on anything but KVM_MR_CREATE.  I.e. allow a FLAGS_ONLY
-update to clear USERFAULT, but not set USERFAULT.
+Hmm.
 
-Other than emulating poisoned pages, is there a (potential) use case for setting
-KVM_MEM_USERFAULT after a VM has been created?
+On the one hand, punching a hole in a memslot is generally gross, e.g. requires
+deleting the entire memslot and thus unmapping large swaths of guest memory (or
+all of guest memory for most x86 VMs).
+
+On the other hand, unless userspace sets KVM_MEM_USERFAULT from time zero, KVM
+will need to unmap guest memory (or demote the mapping size a la eager page
+splitting?) when KVM_MEM_USERFAULT is toggled from 0=>1.
+
+One thought would be to change the behavior of KVM's processing of the userfault
+bitmap, such that KVM doesn't infer *anything* about the mapping sizes, and instead
+give userspace more explicit control over the mapping size.  However, on non-x86
+architectures, implementing such a control would require a non-trivial amount of
+code and complexity, and would incur overhead that doesn't exist today (i.e. we'd
+need to implement equivalent infrastructure to x86's disallow_lpage tracking).
+
+And IIUC, another problem with KVM Userfault is that it wouldn't Just Work for
+KVM accesses to guest memory.  E.g. if the HugeTLB page is still mapped into
+userspace, then depending on the flow that gets hit, I'm pretty sure that emulating
+an access to the poisoned memory would result in KVM_EXIT_INTERNAL_ERROR, whereas
+punching a hole in a memslot would result in a much more friendly KVM_EXIT_MMIO.
+
+All in all, given that KVM needs to correctly handle hugepage vs. memslot
+alignment/size issues no matter what, and that KVM has well-established behavior
+for handling no-memslot accesses, I'm leaning towards saying userspace should
+punch a hole in the memslot in order to emulate a poisoned page.  The only reason
+I can think of for preferring a different approach is if userspace can't provide
+the desired latency/performance characteristics when punching a hole in a memslot.
+Hopefully reacting to a poisoned page is a fairly slow path?
 
