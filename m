@@ -1,220 +1,187 @@
-Return-Path: <kvm+bounces-47988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-47989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 040DFAC80C8
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 18:18:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DF27AC80E0
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 18:29:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01D3EA2656F
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 16:17:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 246A21BC03EB
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 16:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A7E22D9F9;
-	Thu, 29 May 2025 16:17:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00DA22DA06;
+	Thu, 29 May 2025 16:29:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WSo3BFXe"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jOt5bVy8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2085.outbound.protection.outlook.com [40.107.102.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09CB22B8CF
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 16:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748535467; cv=none; b=q3fxc37DruRyC6mmkQLvXc7sBCcaXRLJWKoOeEOKGNR1T6dEI3S4ZZQJzPb3OyPIS3qT+/z1eHFvxs9V4hpS014AjLxQgMdugRyIVD/TGz0AxPXZYfxvzrRslNbVxhlcaLshWjYKvLqOjUAimDbcUOsOFNizOT1M51lpQJ5MCk8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748535467; c=relaxed/simple;
-	bh=qdz6hBl1zKNtjJs9q/5z5I8Zm2mnRaEEneEX4tmGMvo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B4ZdelE86CFQc7a3dW4vAW76ZcWt9P8icDk4jCNKn2Wb+rRMO145Xi2baKHlKLQd/zbGtafTr64iFWYCE9TSMvGJbKxVNahl3J0vEXm1RsXn2McRxnzojjW2QnlNcp+CgfWW0zWrORz118TonQCjY9kYVRhCY7cvEy6N/kAMBYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WSo3BFXe; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e7da03bb0cdso750592276.3
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 09:17:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748535465; x=1749140265; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nFXz1a5AzZ0BGVhwiRYx2U+xdcfYzrs9yjeyMb/mIK4=;
-        b=WSo3BFXe2njQAne/kwJ26wC+OeLiKtjPMZuIHtg3pB0p1wc+1m7vlSZaAB4OIX1OJe
-         QaHk9kNc+q0VgEdJNA8j4AMnszIHzQZmeq/1IIVpYVE7jX7LcNBeYVu/oHjkRmrIuYFq
-         dgFBuwcjBhWQt3cKF1KUIsBzmlevQ4dPCbOlgJgPy11LWEWQZLo1WeuZpeNCmh/N6oS7
-         53J/CYEYiTJGMLpFKUPRciyI06/n+GmBiMl3kD+VtAe+uyMHWP3E2fFzDhRMQ+n98NXg
-         /xMCc1mFpk8P/DEdfhg7FPjCZEIZAWSzqqoOBp2tMN/2I1iZYwFMwfBXifZB7YCJUNYs
-         V+BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748535465; x=1749140265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nFXz1a5AzZ0BGVhwiRYx2U+xdcfYzrs9yjeyMb/mIK4=;
-        b=vNNUTM++HtQXj9gAhqaUWKsQEnZboAyri08kGxNJy0PkekIeAik0NaqAmIA+21y8qw
-         uR1LjOHplKzmBA/JijeEsBCuzzlSjuWnHsXckTJqIA8WdBT5yaARCV5d6N8eWNOb8+93
-         /rlJgFV0czgGpdmkD/mcJy7p5dz+dhWk56dtwFkOJHRarmx4yt77+OFoQaPIVpu4iyGV
-         lvWt3NnCpMvRIGRdED0eJPeSJiSAYaSeYSQhzWaToU9oDayDQ88jcYmkJOEo9dFqArXV
-         pGd2JhEyqlvAtYDPohBHUlkHEQK7yVmwukAYXBfE9QrBsGcQ8BKHUOVRivH3/EGVi1ao
-         5I1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUKz3PdYTaIvpyZoi71cpKsK8h684m1x+3d+iZ/l1hEEGS5X1EQ83/iWc5AW0pu8xZ1/GM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzz80uo6DXfR1j+giRemYmvilzk5dnlShW7AFylPWTczzgrm/eV
-	+RHFnyJRvIJ7nFKL0z9BV7JVDYBz+81flLZoBC0+pjUoZgI2Lf3B5YgMFdff5zJDhAwrSQxvbKJ
-	0htUmY43mxuY3Gj7YjUx7P/pwrZnsQXBBTXXk4RKj
-X-Gm-Gg: ASbGncv/bO1RHKXKxb2D9jWgdhucGrjrC+vCf0oymG0E8akSs2pWsjWrvdRr6Bl9iIl
-	xC3QIqEwOWi2XFkjSu7wJDkddH7WKHI8AusrYWJohABZQzEL3+RS0xqhvRUMHZT/jwI731HJL/G
-	sNMVF8MLLlAW0Gvwx7KFr9NsqIt0k3oyCymRd4tUgYftKu2oJuctJv4h/QtBNsDe+Hiiu45mT45
-	yjAYA==
-X-Google-Smtp-Source: AGHT+IF2r9KlCyWj26WmElOEW91mfbdAeVcd/eA82K9ZIcXgbLmgmEn0mrSZRnVH71gS/1JkigbmLcuptMyfDe0ic3c=
-X-Received: by 2002:a05:6902:2b10:b0:e7a:b37b:725e with SMTP id
- 3f1490d57ef6-e7f81e54c0bmr349501276.24.1748535464377; Thu, 29 May 2025
- 09:17:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6019D4315C;
+	Thu, 29 May 2025 16:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748536171; cv=fail; b=kXP+4s//+NOBkZ9deBtIk5nP9LhRzVo3oAFSl0SFGDMbALAGufsUOOlI0BrppQC8VaWgG61YPq+PgThgQcAbBKRKHy3+Chw2zmSlJ0qJkymKAZYPyJBeI4ePFOuvhevJzhEMwX+deH9V5AvJ0uaJvb+geSZH6+fqAshrzU1kPeo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748536171; c=relaxed/simple;
+	bh=PocuNlaeSftiFnzuo0y8yeNyzSU4YpFno7FmOwhIxwA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=H1S0GaJFnHFRqtnHOyoIYMcpYmgDKxRlZJTjeN11WHZ1ruyeOlD5r+yai9DLui6CMofj7iQdexOSyyb3IRvvog7MjmTZeQlTmqrPiqoB52DN3p1yNXwp8z1jONAVmTug6YTGcsg6i30huwn+GLm4y3fhyMstg450SWWjlbnecH8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=jOt5bVy8; arc=fail smtp.client-ip=40.107.102.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VnxL18NGHkrfpmzBwZFIXnuJIw/lLArrO6gaI2vU+/1IuQ2PO4/KR3FKkagpI5x0JZYPrmtjjyC2TT2f1FdDxUuJoeWf9Clu16XouhaoKeVlXyirBF3UZbz7rskapUT9y6nbT4XT/BbSMhUoDrjguMHiIRSi6C6+mz4kBmeSORgMrqd1aPFz+w6Qc0fBRocNvOw/r50jEJNlkP3DXjVpeycHKkkpkWzyJBDD3KGmvp0fvb6EYvaiJU10RGW4hcdo14rnEUKVbx0fnhIqZL1zrLU9EK1MDg3H4O2+uLvM07j//HqcaRBlokAA7CoJpViPeRNj3+vgBNm8qoPMpF+wtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pFlEEalp4xeEz4zQ4ReUwP4mkRuPIUmhaLfWuP2imt4=;
+ b=YoevzW+7g3/3lydFmCJdBETj7JsLBnF8JEPrFXzTFQa+fmJmUBvR8VBzjG17RFScrmh2y8/LpIRSsCMccnitZgXMkO6tLzYIssnPTG+N/ry5ffPoHSgp1NbtXThCEYhCZZ78h3q0Dc6HW6m5FedfZq6U0M7xSPZL6+aN4OoXVxlDT1lwTVvlMHSI5gIVbiBm0Ki9yyhyP7PW8rafBGziEM61K7B3wrWPHSZTGUQC1jcFbcFL1KK06li0JlfkZ55ePT7IKouPaQa1x0AK7RAq0aBx+PuOxbYttsKA0gY9hNU7CGmubu4nnhXzwjuDjiKw+KlCQA9WvZtmVzzSOXr0YA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pFlEEalp4xeEz4zQ4ReUwP4mkRuPIUmhaLfWuP2imt4=;
+ b=jOt5bVy8TdJ4Li/ajUOQsxPT8utAgiQyj+8xT2Nas471Z3JVftpohgjuCObf5eqR8NGgGyMcBFko6xbx4WYToWXOdGXc/4xlBPiaXLyvQrARM1cn9a3HW2JUcH8YcLI2+q7mK/B9E0xlDO8ennxM8DLG9y/8zB8YnWwqRkicbgMYcW1/9/VcIQ/RqKqfTeEO/JOgZB7RWR3LmWVursfDkYXXfHbyC/FFW74Wm2YZBWlfvFYpCKWVPoErDdp7c7EYka3ZCawdtBL5qF3aOOKkQW6j/yVu47z5J02zG7YhNoVwZNVm/Gyrt/nc57IFOcb//IOTR6P/+py/Nzpwn9+auA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by LV8PR12MB9135.namprd12.prod.outlook.com (2603:10b6:408:18c::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.27; Thu, 29 May
+ 2025 16:29:24 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%6]) with mapi id 15.20.8769.022; Thu, 29 May 2025
+ 16:29:24 +0000
+Date: Thu, 29 May 2025 13:29:23 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+	christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
+	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
+	dan.j.williams@intel.com, yilun.xu@intel.com,
+	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	lukas@wunner.de, yan.y.zhao@intel.com, daniel.vetter@ffwll.ch,
+	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
+Message-ID: <20250529162923.GH192531@nvidia.com>
+References: <aB7Ma84WXATiu5O1@yilunxu-OptiPlex-7050>
+ <2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
+ <20250512140617.GA285583@nvidia.com>
+ <aCRAHRCKP1s0Oi0c@yilunxu-OptiPlex-7050>
+ <20250514163339.GD382960@nvidia.com>
+ <aCYQdDrYYZRAgsen@yilunxu-OptiPlex-7050>
+ <9dea400f-a57b-43be-a2e4-24a9f51e6ba0@amd.com>
+ <aDE5SPzOAU0sNIt+@yilunxu-OptiPlex-7050>
+ <ae16db07-5fca-4369-aa67-cbe2e0fd60fd@amd.com>
+ <aDhyC73r149syMpc@yilunxu-OptiPlex-7050>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aDhyC73r149syMpc@yilunxu-OptiPlex-7050>
+X-ClientProxiedBy: MN0P220CA0011.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:52e::23) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109204929.1106563-1-jthoughton@google.com>
- <aBqlkz1bqhu-9toV@google.com> <CADrL8HXjLjVyFiFee9Q58TQ9zBfXiO+VG=25Rw4UD+fbDmxQFg@mail.gmail.com>
- <aDh9GtncjlVvvVJ1@google.com>
-In-Reply-To: <aDh9GtncjlVvvVJ1@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Thu, 29 May 2025 12:17:07 -0400
-X-Gm-Features: AX0GCFtfh9MpZ-FDeJh2HrOczvbP9Hqyb2MdkVjRGdhWtHrFMpUcFHJvfRdVctg
-Message-ID: <CADrL8HUVf0wekmZHfZeb59w1j1=gFhs6oRZgNkufB3gOL-TENQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/13] KVM: Introduce KVM Userfault
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Nikita Kalyazin <kalyazin@amazon.com>, Anish Moorthy <amoorthy@google.com>, 
-	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>, 
-	David Matlack <dmatlack@google.com>, wei.w.wang@intel.com, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	Jiaqi Yan <jiaqiyan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|LV8PR12MB9135:EE_
+X-MS-Office365-Filtering-Correlation-Id: bbdd1bee-6937-4960-e79b-08dd9ecdf959
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?fWRhKAmy5OXgrX2WLZqqyiGsjHs4MfUZVCdn9TSvmrXIfSg8tLyuHLThkZOb?=
+ =?us-ascii?Q?WoVAVLQ4/EvK8bkBbYLHyaqthXtAzhHG4BStkyTkEKaLw2mTorpF70tnsqqB?=
+ =?us-ascii?Q?Wimt7b6IPbe9sOArrdFjLPXbsisXLFlff9GFHPiMQJKbubMqwTnasUPRn9Qu?=
+ =?us-ascii?Q?NfKoA4q8BQ8kb0EAsJKOGHh4S/jfyOKKZUBtllkKVVYFpHxomoEeT46NrefM?=
+ =?us-ascii?Q?DNqOqOnHLqHzENYfgbYbRi/coKZnzixLiyUJDON+jY3B2P8qLcf9QukLAM2I?=
+ =?us-ascii?Q?hqkbnurrNQNRKK0EasX2pMSyrpGUzNvpjxDGhlCx9X8xxBv5fMgAad70Dgzq?=
+ =?us-ascii?Q?DJY+KRjUNIOaONsUAqR31nA2hrMoiAviFYC2jMw8y/aMxCNdIXIYS5gUPsN9?=
+ =?us-ascii?Q?AuXYsiECK2ZPpl44PFOPEJlxaBtSRKFl3N6FiWQkPovAjc0WR81MmRj2HTct?=
+ =?us-ascii?Q?iJZlkwWc5QTa2AdeG18UDQ0vAbaf/FKxLQJrAIz+tSaY+ARfE3RxjXMjWAD5?=
+ =?us-ascii?Q?YTc+Bn7ZMOB3WHmqqBHeMOw9jySRNWap4LW66X5izFaUebEyooFhGnXgYHzl?=
+ =?us-ascii?Q?sgpzxRd9tb3U7CNTWPqGZUkZC8cvK0UAHFNpEBK3fLnMq9Mm8smZOoHyVDf9?=
+ =?us-ascii?Q?ZPlzTJ/9wZ8pkR2d5nq2sUP9Jr9qM0bKlYXs6pCcUscE9+/p1pQTZOlhUl5z?=
+ =?us-ascii?Q?StuabvhDsfpQ8EZt3mI3JpEOdpyYbbdUkUmHRN3uvJd/VJDgXzVS8gFkNzH8?=
+ =?us-ascii?Q?OhDGydIizcV5na1qicq2Tt5h8MBprCpNzzr6jJBCtQbGr8BeiCAhyvRGXzoU?=
+ =?us-ascii?Q?c/diY2V4GdtC2Xkiff0lQ84Gd8ZhJOmkXglv5vOczv+SBLgPsKb7KCdZPfg+?=
+ =?us-ascii?Q?GPrD6yT8hD7UQSaorIp8Qkn5pPCBZos723tjsrYzNx4Kw92YyOMf+oLI8fJs?=
+ =?us-ascii?Q?090S30l9FXmpWftBai3+rtdKPoHLJwecxI0TRnHKELI/kLy7rTqJ8uRpCPv/?=
+ =?us-ascii?Q?zj0yjIz3nv7a4ueTiTrFuVoRSpxlgiXqeANsqGXu1k/vqURkQw+eofGXgr/c?=
+ =?us-ascii?Q?bFvQUvlZprh50rx465JybycS2QZTkxQSw7SisBUn5WdwlR+y1392zWH+4KUp?=
+ =?us-ascii?Q?N8Y/0j/WmJHIKnzqQF3LU3RDzH93fYgymZfmv7Ce1HXY5aLqtLmp6hk2OP/F?=
+ =?us-ascii?Q?z9tnhQKL6QkeB5SBodfWHGgj/q+flGG0J55925JVZis+21zLIbz4syW+LOwu?=
+ =?us-ascii?Q?ioMclU7MccKyLurTDxd0r2CFNri5CxzLVlV/c9W18ExoZJnyTiU1liDmMyVg?=
+ =?us-ascii?Q?PcZ2HSAcBc/9v9R5OmnddgqzzVUKKsRpgzpvfMCC742tzdfk8Ds+glCxim1z?=
+ =?us-ascii?Q?rSfFwKCjk0nrNNX8+I63OlXCuTJ8SoA0+O9q+oaoratN3SxrUA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?amT4X8uLWB+qU6OgnGbvJ9YWoh4Fteg8kr/eRWm7/ufuc44Qf2NEIbewCm3I?=
+ =?us-ascii?Q?QAz/wDFFonxoT/UmxxbN97CYB6lqae+1n0opaVUhl7+y6ojt8fTjqsg9AYli?=
+ =?us-ascii?Q?vF4OHEFFI69XmB2WYQPo1x0u8qxRtczg0pnRF+zWBbj2iZx6whampSJkXknE?=
+ =?us-ascii?Q?+Jh0RPobvlKICTCa1MQ72RGsVQfXpBqHxDxkGkuQX/QKMZxzvYhjoa7OQcXe?=
+ =?us-ascii?Q?0tROyqpo46szVMeg0ORvoYW5BDI+uTheBI7Oz9poZcp9AQ+JUwva3HvXj0cB?=
+ =?us-ascii?Q?321tdEfFDobwmRM4UpWIf9OQwrMDya7P3ogw3JZbSPDPsrCjE4iiEmWAzEdl?=
+ =?us-ascii?Q?JkiwgfMumDsf/VoRAyGskM60snr7eiMn1hfu85u0uTCGIYl1saywxy+RpCfJ?=
+ =?us-ascii?Q?tsgY3i6Cyltg0p3NMdOA2lNMPJ6prMA6jZC3Y56OxEhNnrm5POBfe9NOUY+Y?=
+ =?us-ascii?Q?PSz1VXcCSTjhmXKx1A6WChE2558WBZDz+RSUd0D+W3oRXFB2vhpHC3Nuz39K?=
+ =?us-ascii?Q?xm3iT5BIMsjWOKvUT38yPCa9Emu95vXbQ1MIIDxSOk5cmTziOnJEKxDWFjIo?=
+ =?us-ascii?Q?WB9PttDB5LNUKSUQFhT0VcGo9u5PvGJm/o9UIDghRri9qWhbGXyIBlgjRSNw?=
+ =?us-ascii?Q?lzihs7P1xRsp+TTowkWXF/b68KxUqwNP9N0tNf+djItrtqkLGgT7DJJ2jNQW?=
+ =?us-ascii?Q?kdU4cSopqsBKOHPwXmR3SfiwWUtJj/9vNxlpZbsQChlwmJGiF7njgjK/M1S5?=
+ =?us-ascii?Q?MXsT2gzD/gqa6qNnZkc+P8TDyUgd8+V6YXs0mgY0ZukO6Akrbt5vikr9R5+C?=
+ =?us-ascii?Q?L8F8FY8C10oXcDe4vhGd+GAPemwoNGn/JUO7RVE1b2zTgKC22v6qPalA+rrM?=
+ =?us-ascii?Q?snaRTp1JEqOKe7HOX+zIm7A8dXoFpBLv/Kn1i3RqjKj55iFfNqrdwvfm3Xgn?=
+ =?us-ascii?Q?Q9oN2umdk2ODvmJxDDNGglPJV6OqOaN3P0UvsLGyOzbj0kdW1Yup+aW5UOAb?=
+ =?us-ascii?Q?KH1DJYXGuwD+BCnR7btQeNOtHY+cXzN2h4UYVxXbwy4f/uxITUKGz2JbtJKi?=
+ =?us-ascii?Q?ftpMrYelgHAimeEuePhGl2QpmffS/6gzp557WjnuZdZXRq80Icb9orlP88Ip?=
+ =?us-ascii?Q?vJx0hEeb5vTooEyUoaBK0cKuCBERUwne0InrjP7mTrAcJG0Iz5dyyWCjIcjb?=
+ =?us-ascii?Q?q/bIqv3OMf+uDfSTT4uXc3Uo7RfB2xzUCuEf9zlTIHCOd4x2TSrYRnq8cHD6?=
+ =?us-ascii?Q?ZnlRGDLn8PnHIe94SBGoirD9GWxzx81e91H9Wg6idUOW4vUdxyHZVIHo0Awu?=
+ =?us-ascii?Q?S1IViGNJgLGbG5HIdmfA8qzQWodBkgyI/WWG5znzgd+V6+NQoOGYv/4ujCHI?=
+ =?us-ascii?Q?Jhg8swQBNruvhCEsDA2ymLi/ky5bBHq2Nyf0yHb3J8fK2YR2jD6bjCVpFDSC?=
+ =?us-ascii?Q?U28IH89azyVNqm2VGNzTNTdBp0i3KpezytFgeDfcGS6Lr9xtZybeY9WNwCBY?=
+ =?us-ascii?Q?gh2eR3Mz1bCvKbHzmfeJmIXeKbxPIILtdDcAEAR/2E5vVrKwB7Ogs5LcdF3M?=
+ =?us-ascii?Q?8GANtRnpIbZwaCiziPAcJINoWmsixTWqnqxuE9yy?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bbdd1bee-6937-4960-e79b-08dd9ecdf959
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2025 16:29:24.6867
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HsgbXcLrvQKsshpuIeuqmZAzUFE4k/Ho1S+B51PzCXKwfanHTUeyWjjTCiVhxP47
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9135
 
-On Thu, May 29, 2025 at 11:28=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Wed, May 28, 2025, James Houghton wrote:
-> > The only thing that I want to call out again is that this UAPI works
-> > great for when we are going from userfault --> !userfault. That is, it
-> > works well for postcopy (both for guest_memfd and for standard
-> > memslots where userfaultfd scalability is a concern).
-> >
-> > But there is another use case worth bringing up: unmapping pages that
-> > the VMM is emulating as poisoned.
-> >
-> > Normally this can be handled by mm (e.g. with UFFDIO_POISON), but for
-> > 4K poison within a HugeTLB-backed memslot (if the HugeTLB page remains
-> > mapped in userspace), KVM Userfault is the only option (if we don't
-> > want to punch holes in memslots). This leaves us with three problems:
-> >
-> > 1. If using KVM Userfault to emulate poison, we are stuck with small
-> > pages in stage 2 for the entire memslot.
-> > 2. We must unmap everything when toggling on KVM Userfault just to
-> > unmap a single page.
-> > 3. If KVM Userfault is already enabled, we have no choice but to
-> > toggle KVM Userfault off and on again to unmap the newly poisoned
-> > pages (i.e., there is no ioctl to scan the bitmap and unmap
-> > newly-userfault pages).
-> >
-> > All of these are non-issues if we emulate poison by removing memslots,
-> > and I think that's possible. But if that proves too slow, we'd need to
-> > be a little bit more clever with hugepage recovery and with unmapping
-> > newly-userfault pages, both of which I think can be solved by adding
-> > some kind of bitmap re-scan ioctl. We can do that later if the need
-> > arises.
->
-> Hmm.
->
-> On the one hand, punching a hole in a memslot is generally gross, e.g. re=
-quires
-> deleting the entire memslot and thus unmapping large swaths of guest memo=
-ry (or
-> all of guest memory for most x86 VMs).
->
-> On the other hand, unless userspace sets KVM_MEM_USERFAULT from time zero=
-, KVM
-> will need to unmap guest memory (or demote the mapping size a la eager pa=
-ge
-> splitting?) when KVM_MEM_USERFAULT is toggled from 0=3D>1.
->
-> One thought would be to change the behavior of KVM's processing of the us=
-erfault
-> bitmap, such that KVM doesn't infer *anything* about the mapping sizes, a=
-nd instead
-> give userspace more explicit control over the mapping size.  However, on =
-non-x86
-> architectures, implementing such a control would require a non-trivial am=
-ount of
-> code and complexity, and would incur overhead that doesn't exist today (i=
-.e. we'd
-> need to implement equivalent infrastructure to x86's disallow_lpage track=
-ing).
->
-> And IIUC, another problem with KVM Userfault is that it wouldn't Just Wor=
-k for
-> KVM accesses to guest memory.  E.g. if the HugeTLB page is still mapped i=
-nto
-> userspace, then depending on the flow that gets hit, I'm pretty sure that=
- emulating
-> an access to the poisoned memory would result in KVM_EXIT_INTERNAL_ERROR,=
- whereas
-> punching a hole in a memslot would result in a much more friendly KVM_EXI=
-T_MMIO.
+On Thu, May 29, 2025 at 10:41:15PM +0800, Xu Yilun wrote:
 
-Oh, yes, of course. KVM Userfault is not enough for memory poison
-emulation for non-guest-memfd memslots. Like how for these memslots we
-need userfaultfd to do post-copy properly, for memory poison, we still
-need userfaultfd (so 4K emulated poison within a HugeTLB memslot is
-not possible).
+> > On AMD, the host can "revoke" at any time, at worst it'll see RMP
+> > events from IOMMU. Thanks,
+> 
+> Is the RMP event firstly detected by host or guest? If by host,
+> host could fool guest by just suppress the event. Guest thought the
+> DMA writting is successful but it is not and may cause security issue.
 
-So yeah in this case (4K poison in a still-mapped HugeTLB page), we
-would need to punch a hole and get KVM_EXIT_MMIO. SGTM.
+Is that in scope of the threat model though? Host must not be able to
+change DMAs or target them to different memory, but the host can stop
+DMA and loose it, surely?
 
-For guest_memfd memslots, we can handle uaccess to emulated poison
-like tmpfs: with UFFDIO_POISON (Nikita has already started on
-UFFDIO_CONTINUE support[1]). We *could* make the gmem page fault
-handler (what Fuad is implementing) respect KVM Userfault, but that
-isn't necessary (and would look quite like a reimplementation of
-userfaultfd).
+Host controls the PCI memory enable bit, doesn't it?
 
-[1]: https://lore.kernel.org/kvm/20250404154352.23078-1-kalyazin@amazon.com=
-/
-
-> All in all, given that KVM needs to correctly handle hugepage vs. memslot
-> alignment/size issues no matter what, and that KVM has well-established b=
-ehavior
-> for handling no-memslot accesses, I'm leaning towards saying userspace sh=
-ould
-> punch a hole in the memslot in order to emulate a poisoned page.  The onl=
-y reason
-> I can think of for preferring a different approach is if userspace can't =
-provide
-> the desired latency/performance characteristics when punching a hole in a=
- memslot.
-> Hopefully reacting to a poisoned page is a fairly slow path?
-
-In general, yes it is. Memory poison is rare.
-
-For non-HugeTLB (tmpfs or guest_memfd), I don't think we need to punch
-a hole, so that's good. For HugeTLB, there are two circumstances that
-are perhaps concerning:
-
-1. Learning about poison during post-copy? This should be vanishingly
-rare, as most poison is discovered in the first pre-copy pass. If we
-didn't do *any* pre-copy passes, then it could be a concern.
-2. Learning about poison during pre-copy after shattering? If doing
-lazy page splitting with incremental dirty log clearing, this isn't a
-*huge* problem, otherwise it could be.
-
-I think userspace has two ways out: (1) don't make super large
-memslots, or (2) don't use HugeTLB.
-
-Just to be clear, this isn't really an issue with KVM Userfault -- in
-its current form (not preventing KVM's uaccess), it cannot help here.
+Jason
 
