@@ -1,80 +1,84 @@
-Return-Path: <kvm+bounces-48013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D60CEAC83FE
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 00:19:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BF44AC8400
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 00:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C4E53BA1B4
-	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 22:19:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D75101BA738C
+	for <lists+kvm@lfdr.de>; Thu, 29 May 2025 22:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81BC421E08B;
-	Thu, 29 May 2025 22:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C1921FF21;
+	Thu, 29 May 2025 22:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cHf1GyFw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fvXz8Hbv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D4721CC79
-	for <kvm@vger.kernel.org>; Thu, 29 May 2025 22:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28C421D5A4
+	for <kvm@vger.kernel.org>; Thu, 29 May 2025 22:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748557182; cv=none; b=tmW0/0u7gL1Zu+ZbrD4GZRfsUg6zqrkbkaPqX+Q8Fw9e8Wx82lMQ0eN6IZsCQBgd7Sph9mcDYz+OxOUu1XxqyvJFfEV02VVzOFT7AwuoubEHrT27D8qme3mFavVDsLg0UbJbQWIJ7N75qB7dAqTXrc7eKVzFCpCKWzNP4xpiHSg=
+	t=1748557184; cv=none; b=YO9ICHiCymUTEiRK27I6eBWEiIKDcMlm8QAUnQ5p3r+bJesiT2h2znTIhXLTMMAYjL13DzcsDXIqcx9Jt4hPXhzNIPs2aPr83HuXYwLEM2W9QSy6E92rhy+8GPQq0/VZOp/4m57D6y3AOFW9RzbOSqNdqEMnkH46uiKbB21ZsW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748557182; c=relaxed/simple;
-	bh=KbEcLrZyNHW1ZbQGmI3ZdoR7aGESto+rOYcZmQV/p0Y=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=V/OgvD/CtQ5C5pp1rjfhRpn7mKuZ8YqbTvJqflvcMFjw3gqbEnR14TEBxr4/e8MYYAEXaaggmyzhlX2fL+1jTyHdyqHSNmE4vyusMHkeBEax2U1BQSdO3aF1CTArPPdJGXmu85Ep8LWl6iKCwUqiimY0BpZG2lrbxWGUXrDDINg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cHf1GyFw; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1748557184; c=relaxed/simple;
+	bh=R5SmfkwxyjvbLpRjEAybIaAQLpf9mthHqTuwr4++6oE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=RxbCr46h8fKaUhKUz8acDD4SeOzSflKs75bnBnfBD8UZh+fXN3vNlzsBBcbWEr362G5gE5/YFeYqnV1LyMSqA3LdXWHP7OsVTbgggBdQZJam9HJrhsYy65tGgDDMOcz/16oyQ0t4ULzfnP0KendutMBZBLV0xZr7/clrOISg2NE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fvXz8Hbv; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22c31b55ac6so20000005ad.0
-        for <kvm@vger.kernel.org>; Thu, 29 May 2025 15:19:40 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-30ea0e890ccso1274331a91.2
+        for <kvm@vger.kernel.org>; Thu, 29 May 2025 15:19:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748557180; x=1749161980; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2WiZvL65gJWBhQxETywMJkkZAmvBLGCJuVJmqPemzNU=;
-        b=cHf1GyFwbCd5C9NXoLSQgJ/4YjvMkijMTzk6+b4gDCRwaoNT8cb2P0LoMyILiyfpB/
-         DQxAUKVX6dubTGXlCu0o14T5X11EqbwPXxRSDiIK5AxOU/Y0cDB9qxZ08bXM/lR2r0dy
-         1qvxXe4+kUCI1RJ7EcwKRKTrv81NqGXnE1zHbZQUNVcIhk9UYgsWntcZC1UPk/13sxvb
-         GAArsjiGvqKMflFZDoQ5EV0FzdC7vckKYJykLZrarUWHR3eW6CLieP+/NCiqRiWRHyW2
-         m/6RIN4Gm9S7M/o156MhipBwyQuzxBKL8FI6rXQFKBs2Y6DdLjz1XjWlb/nC0PPq05Fr
-         VwGw==
+        d=google.com; s=20230601; t=1748557182; x=1749161982; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=rpZO/SNMSsOcnIVwvmjBs9Kka2MdSZSqrGAzddRxVBc=;
+        b=fvXz8Hbv89UxSet92pFYHa8TVanX4NiXWffsIWTV7IC6C6uFNU9P58FqwENNVdvS9J
+         YuyBkejAM4wqZpl1cVrBn94i1TOKik8og1pjjGns3ElyaBu3+jfRol47CxM7HnNBAVhR
+         RXbTXWgm+L/kJ1T7WjbEsbS9OvcXhITX+dPVFdBPr+iJzSneHANuuDR+6UIlXHIFU/gb
+         wZz7nA49i6HJu+Z0v1ykElmtkh17WrcLuuf2Bd8oXuYbSluUJkAnapoAd1B4sFGtT8Ku
+         9ImngV/07Yb4trmKieFukBg4DtJS8XDdoDOEMhqcZ89VF4zWsQnBnThUNeP1ttgbe6zC
+         nOFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748557180; x=1749161980;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2WiZvL65gJWBhQxETywMJkkZAmvBLGCJuVJmqPemzNU=;
-        b=IsXPIWE+2XIhXjpMvoHJ0Cue923dzfHfCHltAePmdrWoRP8vw6ZEenR/pile+zAJc+
-         eSzQBNaRqRen6So7nJO9l4yxQFBLEQyIPgwpDFT9tkRkHAxrqGSBsLAw5xrVQ1wyLyG8
-         BsDUNBrgVPmgRw5DUdjhBKvih3AXF6yOOtCoYfENeS8XTzd+Vkj8+Fk1obBM4MVhtEZI
-         2eMd7BkR2APygXvbTV5/dUgPya2AmhJnyc3ohssEinL3gGPci3XgE3Cy2HTeNL6mdyIx
-         02hIuEnqqSRHI15sLU2yITz3vXQkGDKpwZ+nAzxnL4YRFUR+fIvdfKdsxWAAmW6Ltd65
-         OzFg==
-X-Forwarded-Encrypted: i=1; AJvYcCVs1mDH+MQlm583DMsCt1nwzpW7KE8gEDj6f67v8MoQ98XUGFAuEyqm5p2CADxtNcei/v8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxziIgqWUkMFC4fyaq/Z4ctTkkyQtoc5i/4SrhUcjusFriiX83j
-	JBQGffuudLeA54ufTKeoFxt6JAc2YysNjfiTbJ0bPyEdEAv/OuXelC3RDEj48LCzovZhlAckObv
-	+m1YwnQ==
-X-Google-Smtp-Source: AGHT+IE/KnIFPcTR33Ni+A0ag2QlB6J3OqTksKtrH9lZLuske3p06HrhdBLvdwE6B6sOh/7FJilM1pbp4Qk=
-X-Received: from plhc1.prod.google.com ([2002:a17:903:2341:b0:234:d7c5:a0e3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:19cb:b0:234:f1ac:c036
- with SMTP id d9443c01a7336-23529a1357amr17181895ad.50.1748557180372; Thu, 29
- May 2025 15:19:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1748557182; x=1749161982;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rpZO/SNMSsOcnIVwvmjBs9Kka2MdSZSqrGAzddRxVBc=;
+        b=YjAE4EyXCoRDPuCAkjyxDjkWMaFF+ZoxuVbguCg0vtr37vRTwugS/mhTHyFRrGiVVe
+         tMYIW55wEGQaldrl1q9i21zh0iSy5LwonJYjQJDGMGpE0KSE6VcBdE25zos5UJ+sb/BB
+         2oqMnrUcOVw0usVYVa4ihH9sqkIiv24CrN6CDmT3gxWkS0teIwK7xtz5750+jYbBPckI
+         qvU/ZRUruW7papzNQ4Z3XKcpq6KOhAFjd+xyTy3Pzp8f5I1F05bF4N5jLctIKnk7MVpO
+         BBRvqYWCAMCbNTxPQlrzVwO3m3T9vigpWTQCbQlwsK8LhQgMJNl9KtDwyTKUxCq3pZ1v
+         tc4w==
+X-Forwarded-Encrypted: i=1; AJvYcCUOwLj6xDVyuuhkuk/Q/1TeKYVgAQ9kNgP3XvNrL2cue/QEMlER3/adKf1YYprxzspjl1s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxhsr+6Bfn/oEYvdsTC+LutfXucFUJvSpUb9jZ5wFzj3bkYAuQU
+	pkr1K8cO/r44NfX4MUq2FPaYIuSIs3ZAAPqrpfM2EwDZkdxlHu0TxaB/zpd2MMK9WNPrOmgaAIQ
+	4xSAfnw==
+X-Google-Smtp-Source: AGHT+IEFFQIS9pAD1OtOGGAF6xmOZ0qMis9t3+vFz2wQSGrnYMTgXB8pN/6JJfuvmcH9p/ci+jWPOkR4qYg=
+X-Received: from pjtq15.prod.google.com ([2002:a17:90a:c10f:b0:311:e9bb:f8d4])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:510c:b0:311:e8cc:4264
+ with SMTP id 98e67ed59e1d1-3124152923amr1943106a91.12.1748557182148; Thu, 29
+ May 2025 15:19:42 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 29 May 2025 15:19:13 -0700
+Date: Thu, 29 May 2025 15:19:14 -0700
+In-Reply-To: <20250529221929.3807680-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250529221929.3807680-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <20250529221929.3807680-1-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 00/16] x86: Add CPUID properties, clean up
- related code
+Message-ID: <20250529221929.3807680-2-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 01/16] lib: Add and use static_assert()
+ convenience wrappers
 From: Sean Christopherson <seanjc@google.com>
 To: Andrew Jones <andrew.jones@linux.dev>, Janosch Frank <frankja@linux.ibm.com>, 
 	Claudio Imbrenda <imbrenda@linux.ibm.com>, "=?UTF-8?q?Nico=20B=C3=B6hr?=" <nrb@linux.ibm.com>, 
@@ -83,57 +87,134 @@ Cc: kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
 	kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Copy KVM selftests' X86_PROPERTY_* infrastructure (multi-bit CPUID
-fields), and use the properties to clean up various warts.  The SEV code
-is particular makes things much harder than they need to be (I went down
-this rabbit hole purely because the stupid MSR_SEV_STATUS definition was
-buried behind CONFIG_EFI=y, *sigh*).
+Add static_assert() to wrap _Static_assert() with stringification of the
+tested expression as the assert message.  In most cases, the failed
+expression is far more helpful than a human-generated message (usually
+because the developer is forced to add _something_ for the message).
 
-The first patch is a common change to add static_assert() as a wrapper
-to _Static_assert().  Forcing code to provide an error message just leads
-to useless error messages.
+For API consistency, provide a double-underscore variant for specifying a
+custom message.
 
-Compile tested on arm64, riscv64, and s390x.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ lib/riscv/asm/isa.h      | 4 +++-
+ lib/s390x/asm/arch_def.h | 6 ++++--
+ lib/s390x/fault.c        | 3 ++-
+ lib/util.h               | 3 +++
+ x86/lam.c                | 4 ++--
+ 5 files changed, 14 insertions(+), 6 deletions(-)
 
-Sean Christopherson (16):
-  lib: Add and use static_assert() convenience wrappers
-  x86: Encode X86_FEATURE_* definitions using a structure
-  x86: Add X86_PROPERTY_* framework to retrieve CPUID values
-  x86: Use X86_PROPERTY_MAX_VIRT_ADDR in is_canonical()
-  x86: Implement get_supported_xcr0() using
-    X86_PROPERTY_SUPPORTED_XCR0_{LO,HI}
-  x86: Add and use X86_PROPERTY_INTEL_PT_NR_RANGES
-  x86/pmu: Rename pmu_gp_counter_is_available() to
-    pmu_arch_event_is_available()
-  x86/pmu: Rename gp_counter_mask_length to arch_event_mask_length
-  x86/pmu: Mark all arch events as available on AMD
-  x86/pmu: Use X86_PROPERTY_PMU_* macros to retrieve PMU information
-  x86/sev: Use VC_VECTOR from processor.h
-  x86/sev: Skip the AMD SEV test if SEV is unsupported/disabled
-  x86/sev: Define and use X86_FEATURE_* flags for CPUID 0x8000001F
-  x86/sev: Use X86_PROPERTY_SEV_C_BIT to get the AMD SEV C-bit location
-  x86/sev: Use amd_sev_es_enabled() to detect if SEV-ES is enabled
-  x86: Move SEV MSR definitions to msr.h
-
- lib/riscv/asm/isa.h      |   4 +-
- lib/s390x/asm/arch_def.h |   6 +-
- lib/s390x/fault.c        |   3 +-
- lib/util.h               |   3 +
- lib/x86/amd_sev.c        |  48 ++----
- lib/x86/amd_sev.h        |  29 ----
- lib/x86/msr.h            |   6 +
- lib/x86/pmu.c            |  22 ++-
- lib/x86/pmu.h            |   8 +-
- lib/x86/processor.h      | 312 ++++++++++++++++++++++++++++-----------
- x86/amd_sev.c            |  63 ++------
- x86/la57.c               |   2 +-
- x86/lam.c                |   4 +-
- x86/pmu.c                |   8 +-
- x86/xsave.c              |  11 +-
- 15 files changed, 284 insertions(+), 245 deletions(-)
-
-
-base-commit: 72d110d8286baf1b355301cc8c8bdb42be2663fb
+diff --git a/lib/riscv/asm/isa.h b/lib/riscv/asm/isa.h
+index df874173..fb3af67d 100644
+--- a/lib/riscv/asm/isa.h
++++ b/lib/riscv/asm/isa.h
+@@ -1,7 +1,9 @@
+ /* SPDX-License-Identifier: GPL-2.0-only */
+ #ifndef _ASMRISCV_ISA_H_
+ #define _ASMRISCV_ISA_H_
++
+ #include <bitops.h>
++#include <util.h>
+ #include <asm/setup.h>
+ 
+ /*
+@@ -14,7 +16,7 @@ enum {
+ 	ISA_SSTC,
+ 	ISA_MAX,
+ };
+-_Static_assert(ISA_MAX <= __riscv_xlen, "Need to increase thread_info.isa");
++__static_assert(ISA_MAX <= __riscv_xlen, "Need to increase thread_info.isa");
+ 
+ static inline bool cpu_has_extension(int cpu, int ext)
+ {
+diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+index 03adcd3c..4c11df74 100644
+--- a/lib/s390x/asm/arch_def.h
++++ b/lib/s390x/asm/arch_def.h
+@@ -8,6 +8,8 @@
+ #ifndef _ASMS390X_ARCH_DEF_H_
+ #define _ASMS390X_ARCH_DEF_H_
+ 
++#include <util.h>
++
+ struct stack_frame {
+ 	struct stack_frame *back_chain;
+ 	uint64_t reserved;
+@@ -62,7 +64,7 @@ struct psw {
+ 	};
+ 	uint64_t	addr;
+ };
+-_Static_assert(sizeof(struct psw) == 16, "PSW size");
++static_assert(sizeof(struct psw) == 16);
+ 
+ #define PSW(m, a) ((struct psw){ .mask = (m), .addr = (uint64_t)(a) })
+ 
+@@ -194,7 +196,7 @@ struct lowcore {
+ 	uint8_t		pad_0x1400[0x1800 - 0x1400];	/* 0x1400 */
+ 	uint8_t		pgm_int_tdb[0x1900 - 0x1800];	/* 0x1800 */
+ } __attribute__ ((__packed__));
+-_Static_assert(sizeof(struct lowcore) == 0x1900, "Lowcore size");
++static_assert(sizeof(struct lowcore) == 0x1900);
+ 
+ extern struct lowcore lowcore;
+ 
+diff --git a/lib/s390x/fault.c b/lib/s390x/fault.c
+index a882d5d9..ad5a5f66 100644
+--- a/lib/s390x/fault.c
++++ b/lib/s390x/fault.c
+@@ -9,6 +9,7 @@
+  */
+ #include <libcflat.h>
+ #include <bitops.h>
++#include <util.h>
+ #include <asm/arch_def.h>
+ #include <asm/page.h>
+ #include <fault.h>
+@@ -40,7 +41,7 @@ static void print_decode_pgm_prot(union teid teid)
+ 			"LAP",
+ 			"IEP",
+ 		};
+-		_Static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES, "ESOP2 prot codes");
++		static_assert(ARRAY_SIZE(prot_str) == PROT_NUM_CODES);
+ 		int prot_code = teid_esop2_prot_code(teid);
+ 
+ 		printf("Type: %s\n", prot_str[prot_code]);
+diff --git a/lib/util.h b/lib/util.h
+index f86af6d3..00d0b47d 100644
+--- a/lib/util.h
++++ b/lib/util.h
+@@ -8,6 +8,9 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+ 
++#define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
++#define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
++
+ /*
+  * parse_keyval extracts the integer from a string formatted as
+  * string=integer. This is useful for passing expected values to
+diff --git a/x86/lam.c b/x86/lam.c
+index a1c98949..ad91deaf 100644
+--- a/x86/lam.c
++++ b/x86/lam.c
+@@ -13,6 +13,7 @@
+ #include "libcflat.h"
+ #include "processor.h"
+ #include "desc.h"
++#include <util.h>
+ #include "vmalloc.h"
+ #include "alloc_page.h"
+ #include "vm.h"
+@@ -236,8 +237,7 @@ static void test_lam_user(void)
+ 	 * address for both LAM48 and LAM57.
+ 	 */
+ 	vaddr = alloc_pages_flags(0, AREA_NORMAL);
+-	_Static_assert((AREA_NORMAL_PFN & GENMASK(63, 47)) == 0UL,
+-			"Identical mapping range check");
++	static_assert((AREA_NORMAL_PFN & GENMASK(63, 47)) == 0UL);
+ 
+ 	/*
+ 	 * Note, LAM doesn't have a global control bit to turn on/off LAM
 -- 
 2.49.0.1204.g71687c7c1d-goog
 
