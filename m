@@ -1,111 +1,150 @@
-Return-Path: <kvm+bounces-48111-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48112-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29F6AAC93BA
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 18:40:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A200AC93EE
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 18:51:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 076DE1C21277
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 16:40:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 625557AA628
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 16:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6FA1D5150;
-	Fri, 30 May 2025 16:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB1F235068;
+	Fri, 30 May 2025 16:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vfl1qtty"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q6PDeIiW"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380807080C
-	for <kvm@vger.kernel.org>; Fri, 30 May 2025 16:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FEF1DD9AB
+	for <kvm@vger.kernel.org>; Fri, 30 May 2025 16:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748623193; cv=none; b=OxpYlK93C1vk7zX7pzrl3U0qQliyiQIsRBX76l/FbJRooki7Ou/0VNYgOv44UDtFhHK99QrkheecDrU0QrRexMUYUSI9YQXlfAHgN3ATSql6kX9rFecZ/NV5useurtgp0xAEV2gE1v5cX/WxHTBEwYlB+TV5iZsQ/CE7/CE3rBI=
+	t=1748623855; cv=none; b=OFqD3TvDHKoVZmntRt+rIyKxQ1/8srFosXORrsR9+wj/b6746DEywSrtIFQuopvw/ittWoqKOh6z77VpiNhF6NMgXpI738tcBhVtQ6KTvuMR52M/JQCPrSktyzCvQYlOxt/+G0Z1LbUD4KNw7Bi/5qQGoWBhysO765MidKo/qaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748623193; c=relaxed/simple;
-	bh=z3hPZi3N1DTOwIoncmrDyWZZH+E/MgDHlyYMzOv+/iI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QfZ2z/Ry9AAIYYo7k/zVw9lYtWw4o1bcZEwEEaOVeZVvESxt7gq88q5fDAW+U+M9IgyI0w9xcFp4xV/kd6MJB7O5IjT+yjwP/jkpiR3HAz3IM4S2ao3pKLz7kI5nOpI2B0aUpsICyuLCsvcHvHTVvZ2+Oim9JIZEv+iOvR5T/+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vfl1qtty; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 30 May 2025 18:39:31 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748623183;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kgIxipEXWbgU+HN+yj2I/XOYpk/trnybihtvfZOvTeM=;
-	b=vfl1qtty+SpCQsgvOvl4Z+h/IvpfEyw+eE1zyepn3ZcYAdHKaaKPTtWUHU6UKKNaY5dNkj
-	6oDBocR7WhvfJJGzO6DrrFno+pfHCeBDqU+k7ZoAAO7SfGMHiiQ9WOheA2XEa93qoLGbsx
-	VnZV1taGh09n44YpmiyoxwXtVoKty6Y=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] travis.yml: Remove the aarch64 job
-Message-ID: <20250530-61a88b355b5b9621a26f7e1f@orel>
-References: <20250530115214.187348-1-thuth@redhat.com>
+	s=arc-20240116; t=1748623855; c=relaxed/simple;
+	bh=2+cjl77WXCZ4p6bxVEQbI5IcDMznMf/N4VmdR3nvii8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TKC8cdc7djjylC1Ue32McTeGkb+ND/xcse1KyjNNQUUHG5kcaEbaNauaDlTNF6pXYazWxxL2rFNIcw6wvLVH9b8c1gGUuYoU2EVyiQD9UTdo9E2eTq1dG2efjpTtodeAdqBqkPiIAx7ykDG/sAvM9fuAursHwACHiXsbkHNc0Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q6PDeIiW; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-54e816aeca6so2995110e87.2
+        for <kvm@vger.kernel.org>; Fri, 30 May 2025 09:50:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748623851; x=1749228651; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2+cjl77WXCZ4p6bxVEQbI5IcDMznMf/N4VmdR3nvii8=;
+        b=Q6PDeIiW044/XckxXHZRDiz26lWUfLfvbJWGvZhiXaTL9T7VnKUrzlUUNRJXw0dobn
+         5irg77QFVkadbeUNtwFNERDtPG5dlS0zzL1iw+22mQGg6Sv6V3kl5j2WiHdk8e//2Uac
+         pIU8XAlge36aGph39ubOPf/KCQ4rhsNwEZk5yzv08Nfd2tx/9B+99jo9Z16YHONCu2ux
+         NQYhQCnKG+hA+tbKNAJrSCA8tYcBhUwiYAXK6OTWX6YL8Wyx7jc4S2Ep4P6RouDAravB
+         MBFRGCGlJx9IDsmbg/2ORjpUnbsxfQp/9i+5S0j17AbuUMy7YcHXoXnpKH3eGnZMepVq
+         ztBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748623851; x=1749228651;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2+cjl77WXCZ4p6bxVEQbI5IcDMznMf/N4VmdR3nvii8=;
+        b=EwWJR/kwRl2iRcnQRAYD35JMoJd/qA1hhL72XvjrdPtijonwA1p73BKJ6E0j/7Ofmu
+         nCNQ4HOJC+RXMKRwwozFUKDZPJqsUCjjMj5+JAmT1SE9Ybn87vVZ6xBbyDuhJHxq+/fs
+         GsND3BWUuI0krcA3n13QAJzLU0WKOd66fp8JcJFWdQIeOQ33ghsKHDDclqBqjp2ds6zp
+         rOfCcjNuVh6aC6kMWIBO5G+xuOjC88sK/VV/JFa0MY73HCgfVC5K9yrMtR8VsoF6ONWP
+         gyfYxiMK3o9lF/2TrybPpgm2suJ/ppsnYoHi0qcaoZCfvL1IjfJ005evOVpIjVlgT6Jp
+         8YTg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJSs6khcpGnU4qDM5ouech4F0nu+31MVVgMjJwJ8J3qz9xyKvt28aC5vU5tjrPKWFZHFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybH/gJTp6o4MOP+BhA14321cCH/rjf1WN77pXv8eX+5lfLyZMC
+	H0Nd0zbOWg6B/1ZzuzEKIjKzcD2mlL072JS0LbZFubNhdYg6srDmJdP7wsFCC62FsuBMYYkmVG8
+	rzkhMfRPzRlehWYZS3DjRLIoQVDrhN2T79nw5iRVP
+X-Gm-Gg: ASbGncvKuUax+KHqiyNDLWcGLmzvmtxT1/1p8AmEYHPlsgrFwwC8IUxbwDiPr7ubl9D
+	jZfj8gQP6VwqDoV1P8z1CMOQF3yGdRRgWNONX27YTKGVDmn0F3+bFwyPyzLK5yrd9uBF7VBk4fe
+	PbP//qkgq29YtavW3711p3Aphg+wqLLM4ZQPwYyXOa78k=
+X-Google-Smtp-Source: AGHT+IHimJ4jcNAnxaHaH7vQUd+BjyeBByThX68wANK7ddQ0p2woqDaT91hjePjY9eAS39Ve41QvnefVlzjP98/IXk0=
+X-Received: by 2002:a05:6512:3ba3:b0:553:2034:802b with SMTP id
+ 2adb3069b0e04-5533b8e0985mr1411650e87.1.1748623851132; Fri, 30 May 2025
+ 09:50:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250530115214.187348-1-thuth@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20250523233018.1702151-1-dmatlack@google.com> <20250523233018.1702151-8-dmatlack@google.com>
+ <20250526171501.GE61950@nvidia.com>
+In-Reply-To: <20250526171501.GE61950@nvidia.com>
+From: David Matlack <dmatlack@google.com>
+Date: Fri, 30 May 2025 09:50:22 -0700
+X-Gm-Features: AX0GCFsDqdkJqWWyN7GBVzNghKThUWF60JxiIEesPEIzPKPt0qvOZkfVyPO5fo0
+Message-ID: <CALzav=fxvZNY=nBhDKZP=MGEDx5iGqCi-noDRo3q7eENJ5XBWw@mail.gmail.com>
+Subject: Re: [RFC PATCH 07/33] vfio: selftests: Use command line to set
+ hugepage size for DMA mapping test
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+	Fenghua Yu <fenghua.yu@intel.com>, "Masami Hiramatsu (Google)" <mhiramat@kernel.org>, 
+	Adhemerval Zanella <adhemerval.zanella@linaro.org>, Jiri Olsa <jolsa@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Wei Yang <richard.weiyang@gmail.com>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Takashi Iwai <tiwai@suse.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, WangYuli <wangyuli@uniontech.com>, 
+	Sean Christopherson <seanjc@google.com>, Andrew Jones <ajones@ventanamicro.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Eric Auger <eric.auger@redhat.com>, 
+	Josh Hilke <jrhilke@google.com>, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, 
+	Kevin Tian <kevin.tian@intel.com>, Vipin Sharma <vipinsh@google.com>, 
+	Pasha Tatashin <pasha.tatashin@soleen.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Adithya Jayachandran <ajayachandra@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
+	Dave Jiang <dave.jiang@intel.com>, Dan Williams <dan.j.williams@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 30, 2025 at 01:52:14PM +0200, Thomas Huth wrote:
-> From: Thomas Huth <thuth@redhat.com>
-> 
-> According to:
-> 
->  https://docs.travis-ci.com/user/billing-overview/#partner-queue-solution
-> 
-> only s390x and ppc64le are still part of the free OSS tier in Travis.
-> aarch64 has been removed sometime during the last year. Thus remove
-> the aarch64 job from our .travis.yml file now to avoid that someone
-> burns non-OSS CI credits with this job by accident now.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  .travis.yml | 10 ----------
->  1 file changed, 10 deletions(-)
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> index 99d55c5f..799a186b 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -8,16 +8,6 @@ git:
->  jobs:
->    include:
->  
-> -    - arch: arm64
-> -      addons:
-> -        apt_packages: qemu-system-aarch64
-> -      env:
-> -      - CONFIG="--arch=arm64 --cc=clang"
-> -      - TESTS="cache gicv2-active gicv2-ipi gicv3-active gicv3-ipi
-> -          pci-test pmu-cycle-counter pmu-event-counter-config pmu-sw-incr
-> -          selftest-setup selftest-smp selftest-vectors-kernel
-> -          selftest-vectors-user timer"
-> -
->      - arch: ppc64le
->        addons:
->          apt_packages: clang qemu-system-ppc
-> -- 
-> 2.49.0
+On Mon, May 26, 2025 at 10:15=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> w=
+rote:
 >
+> On Fri, May 23, 2025 at 11:29:52PM +0000, David Matlack wrote:
+> > From: Josh Hilke <jrhilke@google.com>
+> >
+> > Add a command line arg to vfio_dma_mapping_test to choose the size of
+> > page which is mapped in VFIO.
+>
+> This doesn't seem right..
+>
+> Tests should run automously, test all possible sizes using a fixture.
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+This test uses a fixture already. I assume you're referring to
+FIXTURE_VARIANT()?
 
-With gitlab-ci, I'm not even sure who still looks at Travis, so maybe
-nobody will notice that arm64 is getting dropped...
+I'll explore doing this. For a single dimension this looks possible.
+But for multiple dimensions (e.g. cross product of iommu_mode and
+backing_src) I don't see a clear way to do it. But that's just after a
+cursory look.
 
-Thanks,
-drew
+For context, the pattern of passing in test configuration via flags
+rather than automatically testing all combinations is something
+inherited from KVM selftests. That's the common pattern there. There's
+some work happening there to encode configurations at a higher level
+using testcase files and a runner [1].
+
+There are also some challenges with making VFIO selftests (or any
+selftest that uses tools/testing/selftests/vfio/lib) truly autonomous:
+
+ - The library needs to know which device to use. In this RFC that
+works by the user passing in BDF as a positional argument to each
+test.
+ - For tests that use HugeTLB (like this one), the test requires the
+user to have already allocated HugeTLB memory for it to use.
+
+One idea would be to have tests test all possible iommu_modes by
+default (with the ability to override and pick a specific mode) and
+then let everything else be driven by flags.
+
+[1] https://lore.kernel.org/kvm/20250222005943.3348627-1-vipinsh@google.com=
+/
 
