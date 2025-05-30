@@ -1,79 +1,87 @@
-Return-Path: <kvm+bounces-48078-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48079-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02657AC87CE
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 07:23:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F016EAC881C
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 08:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C8634E0771
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 05:23:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DBE44E2EA2
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 06:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6B21E8323;
-	Fri, 30 May 2025 05:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA621F875C;
+	Fri, 30 May 2025 06:04:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EQN3ylPM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KwCSC3mc"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A1D186A;
-	Fri, 30 May 2025 05:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342F91EF09C
+	for <kvm@vger.kernel.org>; Fri, 30 May 2025 06:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748582595; cv=none; b=uYyDJqFtpeTSt+gn5iF+nYi2QJGbXxTrQqjrZnK+j+6qOHYU083HtQP+lUK+SrecAmmt0Lv+wpukae15wGmhQWyuW8oF8EGRetz3hrpxl+k40KXvkPgL175mqvx0wsRlmhvlCLo3OPt/8Tr1Q+9DtCBnBrLzR+0fZmsLuqrzSOw=
+	t=1748585043; cv=none; b=EL3GvgA/IyuLhOA516ZSce5CPNx0IrvpSF0fv6ojmfV6l3aieyNPKzFYQFdOgFS6JsUAhw3MvDWK8+sKC16gEjtdHxrZkSeAewSDxX+d77QqyKPhIeZfN40h/wvhcdWipzQHlHF91fsO22mIxhXvAl0oc/N2pf+vd0/EgoLFG5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748582595; c=relaxed/simple;
-	bh=UUSQVyHtUMB0ilUAqR1Rlf0jpDZeu+aMdADtiW9AjRg=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=MgOwcBfhfzvqVYNUJqw7b2xtyCsrgr7wElpTYPnSkILLDIESZcGJU6ITmIYzG0COTH13iWSTv7X6ZRyB4NkjP/6Sh6DOUZdxDBoYdEQd9mrmUHKCmfEA8s/AEqjUILu93v7Rb7HToJgAOOTCbnzFoRcWQepTVi3OrDJ0Ys2VGWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EQN3ylPM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE68DC4CEE9;
-	Fri, 30 May 2025 05:23:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748582595;
-	bh=UUSQVyHtUMB0ilUAqR1Rlf0jpDZeu+aMdADtiW9AjRg=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=EQN3ylPMk6L+RQBbKDNzD5lyjR1EuIOP0zJsqimNHN+PrE/qgGcit3uoeGPqakenx
-	 A2M2Wf55qsM9e3N4GNHy1Y+3q9K8aF7arvh1tbvknrK0qxym14g1+MJ3nG+Om8s05x
-	 q4vZDm+ZlIAsL9jbveFxCQrtXiz4woKV3d69ZockYv6VZ11VubCtLUryJVcOcoBMjo
-	 S9tvDTxRGUxxQCjHUKT11+cAgbSmcb5RQ03wEys0506UYIRQZM/tMW6a9wvSXi0AAl
-	 l3X1cSLDYmQaU8Ek89vvU6+lMVWv6O+SMDdwyBfqEOgADnQZYtO2TBpSkC6tK0SWRC
-	 08esfnMGqk9FQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70FC939F1DEE;
-	Fri, 30 May 2025 05:23:50 +0000 (UTC)
-Subject: Re: [GIT PULL] VFIO updates for v6.16-rc1
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250529144851.1ce2ce66.alex.williamson@redhat.com>
-References: <20250529144851.1ce2ce66.alex.williamson@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250529144851.1ce2ce66.alex.williamson@redhat.com>
-X-PR-Tracked-Remote: https://github.com/awilliam/linux-vfio.git tags/vfio-v6.16-rc1
-X-PR-Tracked-Commit-Id: 4518e5a60c7fbf0cdff393c2681db39d77b4f87e
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3536049822060347c8cb5a923186a8d65a8f7a48
-Message-Id: <174858262905.3833287.15899806792991622129.pr-tracker-bot@kernel.org>
-Date: Fri, 30 May 2025 05:23:49 +0000
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+	s=arc-20240116; t=1748585043; c=relaxed/simple;
+	bh=Mr5ab+RNAEooPaLWh/kq0l7aF/f2frfB3WGbkt1h4xs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d1KSAxoN2dE9WUAL2YSjUbcDe1Vw+VggxUVa4U9ylPb/q4saqfslMkavmBlzjRYg5KfW89Iz/cAo7wZYsHr/TQGrAuIYS1DaNTpMzzxjpwx4HYGeHIjMgTEpayh4ZntGYE/8E4T3IotRIhyN9PZN1htFJfleGrlsGvLXF0BVrEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KwCSC3mc; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 30 May 2025 08:03:55 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748585039;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Kt+Vc3qTvvhvRuKl8DLuOB5hRxkIZdLx7zBcCNyOWIg=;
+	b=KwCSC3mc9hChL91h8ijG31sFo6JZLkOHVU3kPqunRa9nvZkRj9H/0XekGqrcYFI8mMTOXx
+	74DS+TacKbnBgQ57OMcvSQ3yCBOT18ruxjWgXZ40tWNPnWyApnUZEyw3Xde839qzuQPDpx
+	/dKeHpvhzaPHRVmJGD1AfWNgR1Pj3zQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Nico =?utf-8?B?QsO2aHI=?= <nrb@linux.ibm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 01/16] lib: Add and use static_assert()
+ convenience wrappers
+Message-ID: <20250530-02c84c0db9cd2199b2cf6d28@orel>
+References: <20250529221929.3807680-1-seanjc@google.com>
+ <20250529221929.3807680-2-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250529221929.3807680-2-seanjc@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-The pull request you sent on Thu, 29 May 2025 14:48:51 -0600:
+On Thu, May 29, 2025 at 03:19:14PM -0700, Sean Christopherson wrote:
+> Add static_assert() to wrap _Static_assert() with stringification of the
+> tested expression as the assert message.  In most cases, the failed
+> expression is far more helpful than a human-generated message (usually
+> because the developer is forced to add _something_ for the message).
+> 
+> For API consistency, provide a double-underscore variant for specifying a
+> custom message.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  lib/riscv/asm/isa.h      | 4 +++-
+>  lib/s390x/asm/arch_def.h | 6 ++++--
+>  lib/s390x/fault.c        | 3 ++-
+>  lib/util.h               | 3 +++
+>  x86/lam.c                | 4 ++--
+>  5 files changed, 14 insertions(+), 6 deletions(-)
+>
 
-> https://github.com/awilliam/linux-vfio.git tags/vfio-v6.16-rc1
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3536049822060347c8cb5a923186a8d65a8f7a48
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 
