@@ -1,218 +1,215 @@
-Return-Path: <kvm+bounces-48087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81E0FAC89F6
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 10:34:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F674AC8A1B
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 10:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B65581BC124B
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 08:34:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DE401BA69F0
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 08:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD11219A81;
-	Fri, 30 May 2025 08:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FE921B9F4;
+	Fri, 30 May 2025 08:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YhwX70xi"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NUyr/C87"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2064.outbound.protection.outlook.com [40.107.101.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BD021882B
-	for <kvm@vger.kernel.org>; Fri, 30 May 2025 08:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748594064; cv=none; b=rBUX55lF7QWdSSwtRFRQaMoVi+bai9ozOYEk+j2LGy5Xwa5ln+5cX1vDMziboLyr+xvt7wTX1mbYwLmu4nT8sNdOBkRfuPRHR2eWnHbI+GejqwusWdTa9dbfQTnQy50rpAD5g1NeYpQIOMrN3agMBR/QpY3k9j1+Q24I2yesRAc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748594064; c=relaxed/simple;
-	bh=GrMUBFtn4Dj0h+vdvqfh8N4b0D8OE9P2jqndkfBDheM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PwcK2+KmQ05vHZclmWQ+opHi29a/zFXoHWTp1gWlZnh+Iv+TrX9H9C+dxZ3yei0EscBDeOIsm2gxfguqsXQjjtIVz/SVykK4aGYyWykaMajiTETngrOtVF51qgBWQgizwX2SwGfwV6KyDUDfX5xzA5oSoUI+KDcyqfAWx+BkLpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YhwX70xi; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748594062; x=1780130062;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=GrMUBFtn4Dj0h+vdvqfh8N4b0D8OE9P2jqndkfBDheM=;
-  b=YhwX70xibfsIWpPKFJpWI2qqySupc3pL4DP8EpXd3BiMHsjbkJydkV5J
-   O8zWWk2yNR6NWrAJOgVXTSNt5J/ttXFjtU8IOKvOybzsayla5SpTqw5Mb
-   boYZzMkiJZ1qnO5wVng4tcrgjDeoyXIilocFp2Lad7I1o+SCQbnKOTBJB
-   0xtQUzsv2WebLMzRDoKtNh2eND0ArC2kl/bBwwcE9DMwyk2QGmJ1eoG3x
-   7txK8TigHtWmLQG+ItmRsACX9IGisPI94BHP4Y/5aDCU0bgRXpbbVUWDb
-   8t5YEk0JBJt0JoL9kfFmzcnZw2IMvQ5FhsVxe5V+16vNt+nND/p31pUpN
-   w==;
-X-CSE-ConnectionGUID: Ob19TFdRQ0O7lS+NIBqRDg==
-X-CSE-MsgGUID: 8ieQgiJ0Qz+tMcdtcRERWQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11448"; a="62081560"
-X-IronPort-AV: E=Sophos;i="6.16,195,1744095600"; 
-   d="scan'208";a="62081560"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2025 01:34:19 -0700
-X-CSE-ConnectionGUID: Re9g73xaSBWt9qMaEXbiKQ==
-X-CSE-MsgGUID: 74+hMB1AQIqNLDnEk4JeOg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,195,1744095600"; 
-   d="scan'208";a="144453800"
-Received: from emr-bkc.sh.intel.com ([10.112.230.82])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2025 01:34:15 -0700
-From: Chenyi Qiang <chenyi.qiang@intel.com>
-To: David Hildenbrand <david@redhat.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Peter Xu <peterx@redhat.com>,
-	Gupta Pankaj <pankaj.gupta@amd.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Michael Roth <michael.roth@amd.com>
-Cc: Chenyi Qiang <chenyi.qiang@intel.com>,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	Williams Dan J <dan.j.williams@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Baolu Lu <baolu.lu@linux.intel.com>,
-	Gao Chao <chao.gao@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Li Xiaoyao <xiaoyao.li@intel.com>,
-	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
-	Alex Williamson <alex.williamson@redhat.com>
-Subject: [PATCH v6 5/5] physmem: Support coordinated discarding of RAM with guest_memfd
-Date: Fri, 30 May 2025 16:32:54 +0800
-Message-ID: <20250530083256.105186-6-chenyi.qiang@intel.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250530083256.105186-1-chenyi.qiang@intel.com>
-References: <20250530083256.105186-1-chenyi.qiang@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4F0202981;
+	Fri, 30 May 2025 08:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748594723; cv=fail; b=swenskiMn5jLrK5pciZIPKwYPEFuh7/D1p8NYZ5GE3beEx9L4jygStwe0ZBBKSb3+jJ4xb9n3SIjDTH2cNMd8KJzmP3Bk/2HrAT2fYUMHcwTDy8mXEwCJ0pG/QnSSd8QS8B/O3bf2OR1Ubu6RmVXPnOfl5NKysvZwbG5v5GRYto=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748594723; c=relaxed/simple;
+	bh=gvSwIdKhxUfX0QsllPkgAKUbeM2UvYlJJLE9XARdlAk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=nkrP2OXWpQGBwkJNZjQcOWuY/nBtx6VFKClJji9ycSeN/lCGeFaoVpetCFNm9VDdkY78vmHEjJPKIfazDh4u+92khApHZIL/eGp2blhLyY86vt6tRgWIXV/dPj+dy2pDwmQj9K/GUxet28Vy5LGnUrNp22HwORTMqamhXA1mg0s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NUyr/C87; arc=fail smtp.client-ip=40.107.101.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=G65CawLKlkmTAWs4ATPRuktivlLtj6UIXy7rGJ1eWNBfi1u7YPLZ6NpOBg7PtKjux095x/2w/6iQPoUwD8EDg1YXvjFK9eT3XctsyTeFPwctcSW8EsjFS0obPtYnDayHJZZIqMOJ5I7IgZ6BIlCPEmHTL4tAQlvozgMiMt6WHIdr5KJwjZ+efiaZmltoKVoyT96oSVBK2n10TGjxg1KmGpIeDcPKheMO2Y0Sn20LOSMzSpwsYdOvaXuswndTy85bfFiUPz+JwMVY7ogYMSdxnJ70eULgZoC5hYRwNVynoKvsfoWsgAIybSTfg8qWLsJsGAD2TqMQedzWwuYOHwU9vQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PMP7gSJSsWqHr1SBIYZPTVQ/6RbTbRWAcWpitNSmsIQ=;
+ b=uT1bg+cxOEadHOOonlS0Qgaqyn/atXL/rOez94sOiveCGx9K4Hb94JPJ2kRuZN0pxsrwDGzNLrCTsvIGZLrPbSPwRcqCfPLkrPcR1XMoX4F0uPFtBK8auIV8tiHffseylYqukwe+dLlURWmf2c5gbsv6piLmAFbVnO8LgZWvphjM6lZA8cy7VSz7zVEQNuMDZKoPMaYIgwCsv31+uT64SVbkKluPEdT4rCK6PmQTGhSAZCJxbw9iLC2+V3bd9QdUqsezf6aVIo4TPdCvT+FUwRMmuOpAsQ7GPeNdwdMmZYijE/QGx12G6Mdy2QNLgHZG8PIKe5GpJxZ2GNTZ7L3cpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PMP7gSJSsWqHr1SBIYZPTVQ/6RbTbRWAcWpitNSmsIQ=;
+ b=NUyr/C871gFE0aK10Di/yrataN5P3Al7IoZjBthOYP9ubgF+xcDExbTr/jgSdKC5N7fuxS9Nbe1vaMhq4RmDap2v7YxcH5Y/FDstnBX0pWsoyhaNjfsOB3m19c+uxb5bCiqL1w77gKvjRIQGo3vVSBqoaUYE7Vvi463ixUH/rxw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB8658.namprd12.prod.outlook.com (2603:10b6:610:175::8)
+ by SA3PR12MB9131.namprd12.prod.outlook.com (2603:10b6:806:395::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.31; Fri, 30 May
+ 2025 08:45:19 +0000
+Received: from CH3PR12MB8658.namprd12.prod.outlook.com
+ ([fe80::d5cc:cc84:5e00:2f42]) by CH3PR12MB8658.namprd12.prod.outlook.com
+ ([fe80::d5cc:cc84:5e00:2f42%7]) with mapi id 15.20.8769.022; Fri, 30 May 2025
+ 08:45:19 +0000
+Message-ID: <fbe816ac-8fe2-430e-aa68-15737da98ec5@amd.com>
+Date: Fri, 30 May 2025 14:15:08 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 08/13] sched/wait: Add a waitqueue helper for fully
+ exclusive priority waiters
+To: Sean Christopherson <seanjc@google.com>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Juergen Gross <jgross@suse.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>, Shuah Khan <shuah@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, David Matlack <dmatlack@google.com>
+References: <20250522235223.3178519-1-seanjc@google.com>
+ <20250522235223.3178519-9-seanjc@google.com>
+Content-Language: en-US
+From: K Prateek Nayak <kprateek.nayak@amd.com>
+In-Reply-To: <20250522235223.3178519-9-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BMXPR01CA0078.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:54::18) To CH3PR12MB8658.namprd12.prod.outlook.com
+ (2603:10b6:610:175::8)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8658:EE_|SA3PR12MB9131:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56852ec3-8af5-467f-d3cf-08dd9f564e76
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?czMzbnZMVzJMaW9pRHBmRUU0QnN5Nm5XcWFSS0pFeDVDcWZjbSsvbGhURUlO?=
+ =?utf-8?B?RWdySEI2UUpOMS92RzNRU1lVU1JxOW9GcDh2anZsUWo4SE0vQ3NUMWUwR0da?=
+ =?utf-8?B?dXRvYWFyZ1cvMDJ1VUpqR2NSSFd0TmlHZlA0TW5renhqUlU3Q1ZBb24raUQ2?=
+ =?utf-8?B?NnFBRWQ4cEFQYVFNdnp4STVBZ2Y0MnUyRVJCaG9zOFFPVlMrN3FhNjhZU2s4?=
+ =?utf-8?B?ZGpQdkFlRzhVdnY1R2poMlBqODR1Z0RxbXJrQjFvVUIrQXpPWDJTN3pUNVVv?=
+ =?utf-8?B?UjBNRXcrS0tXY2VDdS9GcnJxZGV5MExuS2RRT1ZCVHhPckkwT2QvRHlIalJ5?=
+ =?utf-8?B?SG1EdmFyUkNrT1FOMytmN1kyY3QwWXJvbXZ3cE5tYTNWWkY0dHdUc1dRaFRI?=
+ =?utf-8?B?VmlIZzZLRitCWFVOOXp3akIvd29CZnZHazFxMENOSm1yUWtsb1hIdWVKVjlo?=
+ =?utf-8?B?TFp5U0lMVFFsOXdVMWNHRDVlSkJxTFhRR2M4VUxzWjJXb3pvTkJmY2h5NFVl?=
+ =?utf-8?B?eUZtT2twaXhOVW5CeUpTT1pXbXo2dUFHa0VRcWxsc1RCSHlBYXcxWVh1QmtC?=
+ =?utf-8?B?blEvbVlrUjdRYWVsdnV1L3hWdzZ3bTJRdGgwYitwRHlQS2htK1hSK1BONFNm?=
+ =?utf-8?B?VEoxaXRmVFZBSEswdjJEYnppaS9hZFRnUFppU3lWMDNGRVB4TUE0N2dQMWVj?=
+ =?utf-8?B?NzJGaFpMaXAxWUVkL2p0a0NtLzFFc3o4SGFzK09vUlpVMElFUGx0eURUcjZW?=
+ =?utf-8?B?a0ZuMXRTRUJ0aEEvYUJhMnpld0xEbmZSdGpRQVZWR0JuNUZkUkUxUVRBWUhK?=
+ =?utf-8?B?NUtSMkdIV285OVdjMjAxUit1c2NydkJkcTlPUjBPYndZTkh1cHFMWjFRcFcr?=
+ =?utf-8?B?V1JmR2l1QWF0WGkva2U1K0ZLQlBpelpLYU1NYlBoVzJ1VERGbzhhOEpPTFVn?=
+ =?utf-8?B?ZFV5eDcwcWh2Y1VxRDZqc0ROZDEzWEJNWUREc3hSME5PMkdDRjVHdzdjZGRl?=
+ =?utf-8?B?Rk1TNGFhbm1BZGloK1FNbld3RUFBcHNjTjFEeXZhZithb1NxTlpxK1hCUTJR?=
+ =?utf-8?B?YUR3OXh6MHFjazZCZURoRzljNjliajBzQnpDL0NydFpVR2l4aS9VUmZGNEg4?=
+ =?utf-8?B?b3I0b1hWS3lSL0RYYUlVMHZHMERNbGl0VFNiVHhSSjFqVmtOMS9pbDI4TlpP?=
+ =?utf-8?B?YTJpQ2tlQVAxSlFGV2diYjVPQW5JK2JrNFlCQWQxa0VwMVZWOWtZT000TzBx?=
+ =?utf-8?B?YkYra0RiZndsTVVodWQyTjBrVFBxVUkwd016bVlUYzkxQ29RSW9mV3pTdDRX?=
+ =?utf-8?B?WVVnczJWRE96OU1XVW9tVzdVYTNuRDk4Tjc4eCt2emdVT2k0bkdzL3pwZisz?=
+ =?utf-8?B?MUhTeWdqYStqTERPaU1zaVI3ZXNLZEJHd05PSGtzZzllYnFqS2Z3QU5sMnBl?=
+ =?utf-8?B?ZEorSnpTbzVqaWVxSWM0bkQxSWRza1hvVWtuM04vUHlXNk81Szl4cFY3Y3lj?=
+ =?utf-8?B?RlhVNm9PNDZYSE5PMzJzMS96QXFKeXhrR3hNS3ltMHhIMi90eG9FTUVZUG5T?=
+ =?utf-8?B?VUNWRTVudlFZakJGOXRhdzIwYmw0ejVkTjN3NyttYS9Bc0hDMW5QU2x6VGQ3?=
+ =?utf-8?B?Zlc2TGtJdmVGK3VPYmJtc3N2Y2VXS3dFekJCd3hhK0JQQ05jS2hoL28vYU5i?=
+ =?utf-8?B?dVp6MUw1L3dwRDdQSlJmT3F2YzJ2STZZc05PaFNRYWV0WHEwOWNVSkRVWGdJ?=
+ =?utf-8?B?SmNERHhkdzlQQVZWQkVTaitYZmYzRFVkeE15ZWJOQWkyeHNSSDhCZGNCbHJr?=
+ =?utf-8?B?QmxhMHJVUnM2Tkx1bWtOWFBlcDdWMkYvTXZVTFZBZ2I0S0RPdlppSXlUR1d3?=
+ =?utf-8?B?VkFZZ2dVblk3cENHSFlMc21aWmEwSWJTTzZwbVFwS09yWEMwV3U2N1kxY3gv?=
+ =?utf-8?B?WFc4czJuT0hzaWswMWpTRkVWRFl5b01ZYUJOQTJvUDJOa1FPemsreXk2Zm5O?=
+ =?utf-8?B?aFJIQm5aVk1BPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8658.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OFFLTUJhT0ZBbWhyV1UwWHRPWTZMY0RIb0IveWlPR2hKWmxINDNtbCtoZk9t?=
+ =?utf-8?B?Wm91c280bTdtL2M2bnNtc1JhRURxd3FpSDVPU2ZuMUJPM254QlJxOUIwSEVj?=
+ =?utf-8?B?amlIRDhPWHlRUTJQSnRkOWZac2FqS3VXNGJuUE1tcXRHejk3MlUwUSttL1ZP?=
+ =?utf-8?B?a2FPbG9CZTRLaDFLUXNDN2FBNWk1UXdkbWZRUEdYenFYSnA1c0VQNkNTbllX?=
+ =?utf-8?B?SktldDdFeGc1QVdzeXA0TzZ6clI3L1VXSGpZdjZQVHdJTHpUQjNKMUhsRVRo?=
+ =?utf-8?B?SE54V0twRzRSOFJ1Z1VpVlYxdDI2L0FOcVFvMXVHbTlhK081MlVRenZkNFYy?=
+ =?utf-8?B?MHVuNWhzdzVPN0YrVERBMlFZUDErN2xoaGEzcGh3Uko5UGc0RUMreW1uN0F3?=
+ =?utf-8?B?MFdjR25adUt0R2U2OTJrM3ZtSVpNSzRTMWJCTzliazFtT0V0KzNXOWZkRHlz?=
+ =?utf-8?B?WTNjUlNqT2lsRGVwcEg5Q29MVDcxY3R4bFg3cG1ZZnI3VGNmeUI1WHd4Nk5F?=
+ =?utf-8?B?YWY0bWY3RndYMmw3SDFtbTJlbURhWU1aOEQ3eWpqM2VMVVExMEh1RmlHT0JH?=
+ =?utf-8?B?QlU3ekFhaHpxNm5RTkJmdDZVY1pUNTJDb3dZUkRvdkhpYnZzd0lmRE9Tc1ph?=
+ =?utf-8?B?VTJyUnE5YlcwTmVQM1l1L0NzUFU3aGd6R3N3Y1RiSGxKL0djVzVvT29pdVF5?=
+ =?utf-8?B?aFA1RldBMmdBUWg2MmVkdDN3aG0vN2Zzc1hMeWxJUlhWLzdCNlZGTTdmZWh0?=
+ =?utf-8?B?WnF4MmFXS0NyOUhtUWl1SUVySEdVWEZtZHUvOFcvMk9wSDV2UE9YYlJGWDFk?=
+ =?utf-8?B?Y29kaUtYVnlUSmd1NEF4KzZvbExRWU4ycUVDZXdMeWIvUTVKNE5QcXRwSUYv?=
+ =?utf-8?B?Z1hhTHV1eTB2Z0hHVlk4clgwYkwzR3RJL2xkdE1GQ1NMdTF1T011OTR2ekJT?=
+ =?utf-8?B?K0U3MEQwNWhIc0ZRdHhJT2dwMC9SdlpaV21zakpDU3lScmZJWWJYYTgwYWxY?=
+ =?utf-8?B?RmJXeHhHNXJCVWtyWW12UWswWW45VTVQSkRQTTBZV3ptTXlmMnc1SHNYOURv?=
+ =?utf-8?B?MjJrekFOT2pKSlZPK0h5d3F5Unh1aERrc1RIZzFzSVpDeWtTaGJxVGV4d2Ji?=
+ =?utf-8?B?MDVPbTVNTE5TUUFMSHlpaWtJdTdMMlRPQnNJMXA5VGJZVUlxRExCZmhCZGFU?=
+ =?utf-8?B?TDVVZncyWGlzVXlkbDJ4VUNMSUpBMTMva1BMTEdTOEgraWRLQ1lLcWpMb052?=
+ =?utf-8?B?MnNkUFRiU1BHOEoxU2FCendTMDFOcWVaemF5U2RoYjMwMThhUnZ1QjBIdUdC?=
+ =?utf-8?B?NE1yOHUzL2loVUpoN24zMjJyeDRwR0xWTisxaERrZHczak5Ja01lckRlUnFt?=
+ =?utf-8?B?Skh3OFM5ODRURWI4YlcvOXJjZy9oRjdFR1dxNmY3OHJSa05wUWhsRHJPQTZ6?=
+ =?utf-8?B?RXFRSHYzNGV6bW8vbFlaQlArS1pFenJUdWc4QmhlSllmdU50R2QvVDE2Mnl3?=
+ =?utf-8?B?RzR6ZDhLNXl6dXdkbWNGME9Sb0wvWE83LzlVRmRtRC85b1FQY2VKK29mWGFa?=
+ =?utf-8?B?SXQwSjNrZmVEbVpIS3F1T0pmYWNDbmJoNGUrQmZSbm5sMjEwU0crN24wQzBK?=
+ =?utf-8?B?TGxQWktGVTlOQURpdEh0Um5iWWJvUi9Ud2tYVEVmanc3KzJaVVhqMFBxTS9Q?=
+ =?utf-8?B?QW1RYlBvbk1lV1pzMEY2UHhnSlRrUUk3cklYNjBnUlFEZXNzUExwRXYwNGdB?=
+ =?utf-8?B?cy93QWYrdlBzd3VBZWJkUXBMcGhtS3d3c3kzYlRpZDVldytXNllMRkM3dngv?=
+ =?utf-8?B?bE5Hb0l5V3Q3S0pyLzNENnBqUkEyemlqLytUdjRDbWVYazQ2RlJlRmRYdlFi?=
+ =?utf-8?B?clFPMkNSbHNKbTVYNWZ0eTFkQ2htZEw5L1lmTURsNzhOVlJJMUdoT1pVcjB0?=
+ =?utf-8?B?cUFhTWtoUGcwY0FPZEQxT3F1ZWVCNnE5bHl6eXdQbHdtd2M3Ukx3YW9mNGZH?=
+ =?utf-8?B?d0tQU3RhZ3AycDRMRWp0cmFwK1JXWFpZUlhJSURBM0pEQTV2Q2JoKzRqYTdZ?=
+ =?utf-8?B?ZVdEM09yOVhHNnlaVEx4MjNkK0ZMM1pSdnRUVVNia0cyaW0vSVlLMVNia1dO?=
+ =?utf-8?Q?vH5FtqQfxQ9V8Ov0mSYkhqVy6?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56852ec3-8af5-467f-d3cf-08dd9f564e76
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8658.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2025 08:45:19.2735
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: N6n2535z9vp3dMWkFTucuYD+obMnbYTuQ9MZFLHZeIIwDp6qO9dfg2n0euE1pQuMpyqqdvIwY5EZpIJrUzT/2w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9131
 
-A new field, attributes, was introduced in RAMBlock to link to a
-RamBlockAttributes object, which centralizes all guest_memfd related
-information (such as fd and shared bitmap) within a RAMBlock.
+Hello Sean,
 
-Create and initialize the RamBlockAttributes object upon ram_block_add().
-Meanwhile, register the object in the target RAMBlock's MemoryRegion.
-After that, guest_memfd-backed RAMBlock is associated with the
-RamDiscardManager interface, and the users can execute RamDiscardManager
-specific handling. For example, VFIO will register the
-RamDiscardListener and get notifications when the state_change() helper
-invokes.
+On 5/23/2025 5:22 AM, Sean Christopherson wrote:
+> Add a waitqueue helper to add a priority waiter that requires exclusive
+> wakeups, i.e. that requires that it be the _only_ priority waiter.  The
+> API will be used by KVM to ensure that at most one of KVM's irqfds is
+> bound to a single eventfd (across the entire kernel).
+> 
+> Open code the helper instead of using __add_wait_queue() so that the
+> common path doesn't need to "handle" impossible failures.
+> 
+> Cc: K Prateek Nayak <kprateek.nayak@amd.com>
 
-As coordinate discarding of RAM with guest_memfd is now supported, only
-block uncoordinated discard.
+Feel free to include:
 
-Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
----
-Changes in v6:
-    - Squash the unblocking of cooridnate discard into this commit.
-    - Remove the checks in migration path.
+Reviewed-by: K Prateek Nayak <kprateek.nayak@amd.com>
 
-Changes in v5:
-    - Revert to use RamDiscardManager interface.
-    - Move the object_new() into the ram_block_attribute_create()
-      helper.
-    - Add some check in migration path.
-
-Changes in v4:
-    - Remove the replay operations for attribute changes which will be
-      handled in a listener in following patches.
-    - Add some comment in the error path of realize() to remind the
-      future development of the unified error path.
-
-Changes in v3:
-    - Use ram_discard_manager_reply_populated/discarded() to set the
-      memory attribute and add the undo support if state_change()
-      failed.
-    - Didn't add Reviewed-by from Alexey due to the new changes in this
-      commit.
----
- accel/kvm/kvm-all.c       |  9 +++++++++
- include/system/ramblock.h |  1 +
- system/physmem.c          | 18 ++++++++++++++++--
- 3 files changed, 26 insertions(+), 2 deletions(-)
-
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 51526d301b..3b390bbb09 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -3089,6 +3089,15 @@ int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
-     addr = memory_region_get_ram_ptr(mr) + section.offset_within_region;
-     rb = qemu_ram_block_from_host(addr, false, &offset);
- 
-+    ret = ram_block_attributes_state_change(RAM_BLOCK_ATTRIBUTES(mr->rdm),
-+                                            offset, size, to_private);
-+    if (ret) {
-+        error_report("Failed to notify the listener the state change of "
-+                     "(0x%"HWADDR_PRIx" + 0x%"HWADDR_PRIx") to %s",
-+                     start, size, to_private ? "private" : "shared");
-+        goto out_unref;
-+    }
-+
-     if (to_private) {
-         if (rb->page_size != qemu_real_host_page_size()) {
-             /*
-diff --git a/include/system/ramblock.h b/include/system/ramblock.h
-index 1bab9e2dac..87e847e184 100644
---- a/include/system/ramblock.h
-+++ b/include/system/ramblock.h
-@@ -46,6 +46,7 @@ struct RAMBlock {
-     int fd;
-     uint64_t fd_offset;
-     int guest_memfd;
-+    RamBlockAttributes *attributes;
-     size_t page_size;
-     /* dirty bitmap used during migration */
-     unsigned long *bmap;
-diff --git a/system/physmem.c b/system/physmem.c
-index a8a9ca309e..1f1217fa0a 100644
---- a/system/physmem.c
-+++ b/system/physmem.c
-@@ -1916,7 +1916,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
-         }
-         assert(new_block->guest_memfd < 0);
- 
--        ret = ram_block_discard_require(true);
-+        ret = ram_block_coordinated_discard_require(true);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret,
-                              "cannot set up private guest memory: discard currently blocked");
-@@ -1931,6 +1931,19 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
-             goto out_free;
-         }
- 
-+        new_block->attributes = ram_block_attributes_create(new_block);
-+        if (!new_block->attributes) {
-+            error_setg(errp, "Failed to create ram block attribute");
-+            /*
-+             * The error path could be unified if the rest of ram_block_add()
-+             * ever develops a need to check for errors.
-+             */
-+            close(new_block->guest_memfd);
-+            ram_block_coordinated_discard_require(false);
-+            qemu_mutex_unlock_ramlist();
-+            goto out_free;
-+        }
-+
-         /*
-          * Add a specific guest_memfd blocker if a generic one would not be
-          * added by ram_block_add_cpr_blocker.
-@@ -2287,8 +2300,9 @@ static void reclaim_ramblock(RAMBlock *block)
-     }
- 
-     if (block->guest_memfd >= 0) {
-+        ram_block_attributes_destroy(block->attributes);
-         close(block->guest_memfd);
--        ram_block_discard_require(false);
-+        ram_block_coordinated_discard_require(false);
-     }
- 
-     g_free(block);
 -- 
-2.43.5
+Thanks and Regards,
+Prateek
+
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   include/linux/wait.h |  2 ++
+>   kernel/sched/wait.c  | 18 ++++++++++++++++++
+>   2 files changed, 20 insertions(+)
+> [..snip..]
 
 
