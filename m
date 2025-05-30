@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-48126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94858AC9833
-	for <lists+kvm@lfdr.de>; Sat, 31 May 2025 01:38:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0FC3AC9876
+	for <lists+kvm@lfdr.de>; Sat, 31 May 2025 01:48:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDF03A459BD
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 23:38:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 447961C0541D
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 23:48:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB4C28C86C;
-	Fri, 30 May 2025 23:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4797A28C868;
+	Fri, 30 May 2025 23:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="mA1rzIBL"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="LCVpake5"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13AB421772B;
-	Fri, 30 May 2025 23:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF315F4E2;
+	Fri, 30 May 2025 23:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748648330; cv=none; b=WO0EbNiFiIUbeCSjLv8BZrgGnGhPilJsJfgXT7eLyem/o83dTSz7PH0OxZ+fNusiTcC3M2WLNAzYlTXlOFTKb8vyWg3UwYchKItdq64mA8tLCSpmWHjD7IHlAUMOL23jBEfOp9emASM6vA/jN9tCabfZAifWlApPtsMsa9odVYE=
+	t=1748648897; cv=none; b=lLN+R02U4yw4LVrspXvOsTWML71gTGhIal5vjCAbqF16z+zY3g1upkuvOEksuCOSiJenOF0ID+Z4zGJE0QjwcDkva5zKPrgwvf9ZOtk/UArsZR0z/WZovEZn3/qDIWfLlV/GUl2/E5p3+lt0ABxiL3zYFqGMJl0NQ/ptcWQDLxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748648330; c=relaxed/simple;
-	bh=Bnmh/dAY6eRBoePr4rFBhIDN7bYULVheR4frTt6jZ2c=;
+	s=arc-20240116; t=1748648897; c=relaxed/simple;
+	bh=OZITbcfUk62xAFOv+ESSVnGYPYICuavRFP4UNT0hEXA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qVUZ+zlYEA0C48KRa7406UZcpK51ZbnPV3yC8phNme8kaf4i/R5H3KqpUKjL5I4G0B5yUyvsUV9f1MnQW/dGCc1s7gjKUpBjEPE30ClRXfwVjpy0P0FxEdu4XSbCWnRli4gIAjG88UhJdBY5OLd+hE0zHuFk3UjHVXoBI+dMSKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=mA1rzIBL; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=bAL4lnTju6UFL+4JZbBTcyEzLR7L/bm2O4pf4EWTXiQX776yeb4Ie+l58CWiN72VBzSj9Ryg82tLs6ajNIbOqqiqqAGSlSR28s/rqTTfotQ8DEoFx5nUCi3cuoWwzam57l2ua4mRcxamiKkVW1XX2I+nLOENE2eHWNdR4pekcxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=LCVpake5; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 54UNcOYe2536046
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 54UNlpvJ2539266
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 30 May 2025 16:38:25 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 54UNcOYe2536046
+	Fri, 30 May 2025 16:47:51 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 54UNlpvJ2539266
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025052101; t=1748648305;
-	bh=OAz+XFES4XvKjugunJeITNkDCOGM7BToNv+VQUPI56c=;
+	s=2025052101; t=1748648872;
+	bh=MOS+EC5Dlk7EYsK0YRGrkbjqrcr1E03kzaHpwpyIQps=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mA1rzIBLKvwp4EqOxYIxvoMUjYqnj6lX1PuFo4elMilH5OqbjNOc5KKiGTe/p/FbE
-	 QD4Wsqi1MxMRfO1TVQJXu4SPzp7/IjhCBcgPMmr5zRnryL2u8UJXs4eAC1WNEcBHQD
-	 g9YSTaZixthf6RAVM2isaL7TgFBT5qdG34sE07C99o8/ASgsuKIHbCPeBZdRZDUR51
-	 e2EAC2uw+9XH7E4ySqx6fbehYjFuH2dgNiV2n1hJLTfmoadSH7EQT0REk02Iao38do
-	 G2CZiL7nFJFu2i6OYlgxYe2Oz+uAwHv4RDDvAdhv/JnVmeNyPqUovwNuziGHdK9Yih
-	 KdhFMD+iUY9ZQ==
-Message-ID: <04e4c088-46f9-41fe-a681-cf494bdbdb03@zytor.com>
-Date: Fri, 30 May 2025 16:38:23 -0700
+	b=LCVpake5hz9fkhzw/3SsSNiZjvN1zcO1NCRotklRGpsokSJ3eBc7DaP5yotG/44Gn
+	 oG0L7dvHKG5Qy5JXlA8bzJ4m/SQGllUUACQNBT+vFy4v1Par7ZDfXrnN+tBePJSxO0
+	 Uh3CDStmhGc92Q8ngjldWOHMc6BzQlNd8y3xVaRcJxt6iobONIpLLNLBsyQQ5vGVNt
+	 lGTWidwztVlGAIONUX7F/luy5TcwhmQ+ouWAuoZpXsRh1yVStbBJhm7i+UCDhG9Sh1
+	 NCn+e/mve0hGEMo+qzYxwoxVBghvEKuJuSG5hFm0CwNQ0iF29FBuJI8St6gVPJ2mPZ
+	 6XwMoNyRWTUWg==
+Message-ID: <6d1f1a2e-5b11-4513-b063-482483d16834@zytor.com>
+Date: Fri, 30 May 2025 16:47:50 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,15 +56,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 16/28] KVM: VMX: Manually recalc all MSR intercepts on
- userspace MSR filter change
+Subject: Re: [PATCH 18/28] KVM: x86: Rename msr_filter_changed() =>
+ recalc_msr_intercepts()
 To: Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Borislav Petkov <bp@alien8.de>, Chao Gao <chao.gao@intel.com>,
         Dapeng Mi <dapeng1.mi@linux.intel.com>
 References: <20250529234013.3826933-1-seanjc@google.com>
- <20250529234013.3826933-17-seanjc@google.com>
+ <20250529234013.3826933-19-seanjc@google.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -101,113 +101,28 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <20250529234013.3826933-17-seanjc@google.com>
+In-Reply-To: <20250529234013.3826933-19-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 On 5/29/2025 4:40 PM, Sean Christopherson wrote:
-> On a userspace MSR filter change, recalculate all MSR intercepts using the
-> filter-agnostic logic instead of maintaining a "shadow copy" of KVM's
-> desired intercepts.  The shadow bitmaps add yet another point of failure,
-> are confusing (e.g. what does "handled specially" mean!?!?), an eyesore,
-> and a maintenance burden.
+> Rename msr_filter_changed() to recalc_msr_intercepts() and drop the
+> trampoline wrapper now that both SVM and VMX use a filter-agnostic recalc
+> helper to react to the new userspace filter.
 > 
-> Given that KVM *must* be able to recalculate the correct intercepts at any
-> given time, and that MSR filter updates are not hot paths, there is zero
-> benefit to maintaining the shadow bitmaps.
-
-+1
-
-To me, this patch does simplify the logic by removing the bitmap state 
-management.
-
-
-Just one very minor comment below — other than that:
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson<seanjc@google.com>
+> ---
+>   arch/x86/include/asm/kvm-x86-ops.h | 2 +-
+>   arch/x86/include/asm/kvm_host.h    | 2 +-
+>   arch/x86/kvm/svm/svm.c             | 8 +-------
+>   arch/x86/kvm/vmx/main.c            | 6 +++---
+>   arch/x86/kvm/vmx/vmx.c             | 7 +------
+>   arch/x86/kvm/vmx/x86_ops.h         | 2 +-
+>   arch/x86/kvm/x86.c                 | 8 +++++++-
+>   7 files changed, 15 insertions(+), 20 deletions(-)
 
 Reviewed-by: Xin Li (Intel) <xin@zytor.com>
 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 8f7fe04a1998..6ffa2b2b85ce 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4159,35 +4074,59 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
->   	}
->   }
->   
-> -void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
-> +static void vmx_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
->   {
-> -	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> -	u32 i;
-> -
->   	if (!cpu_has_vmx_msr_bitmap())
->   		return;
->   
-> -	/*
-> -	 * Redo intercept permissions for MSRs that KVM is passing through to
-> -	 * the guest.  Disabling interception will check the new MSR filter and
-> -	 * ensure that KVM enables interception if usersepace wants to filter
-> -	 * the MSR.  MSRs that KVM is already intercepting don't need to be
-> -	 * refreshed since KVM is going to intercept them regardless of what
-> -	 * userspace wants.
-> -	 */
-> -	for (i = 0; i < ARRAY_SIZE(vmx_possible_passthrough_msrs); i++) {
-> -		u32 msr = vmx_possible_passthrough_msrs[i];
-> -
-> -		if (!test_bit(i, vmx->shadow_msr_intercept.read))
-> -			vmx_disable_intercept_for_msr(vcpu, msr, MSR_TYPE_R);
-> -
-> -		if (!test_bit(i, vmx->shadow_msr_intercept.write))
-> -			vmx_disable_intercept_for_msr(vcpu, msr, MSR_TYPE_W);
-> +	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_TSC, MSR_TYPE_R);
-> +#ifdef CONFIG_X86_64
-> +	vmx_disable_intercept_for_msr(vcpu, MSR_FS_BASE, MSR_TYPE_RW);
-> +	vmx_disable_intercept_for_msr(vcpu, MSR_GS_BASE, MSR_TYPE_RW);
-> +	vmx_disable_intercept_for_msr(vcpu, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
-> +#endif
-> +	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
-> +	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
-> +	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
-> +	if (kvm_cstate_in_guest(vcpu->kvm)) {
-> +		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C1_RES, MSR_TYPE_R);
-> +		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
-> +		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
-> +		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
->   	}
->   
->   	/* PT MSRs can be passed through iff PT is exposed to the guest. */
->   	if (vmx_pt_mode_is_host_guest())
->   		pt_update_intercept_for_msr(vcpu);
-> +
-> +	if (vcpu->arch.xfd_no_write_intercept)
-> +		vmx_disable_intercept_for_msr(vcpu, MSR_IA32_XFD, MSR_TYPE_RW);
-> +
-> +
-> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_SPEC_CTRL, MSR_TYPE_RW,
-> +				  !to_vmx(vcpu)->spec_ctrl);
-> +
-> +	if (kvm_cpu_cap_has(X86_FEATURE_XFD))
-> +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_XFD_ERR, MSR_TYPE_R,
-> +					  !guest_cpu_cap_has(vcpu, X86_FEATURE_XFD));
-> +
-> +	if (boot_cpu_has(X86_FEATURE_IBPB))
-
-I think Boris prefers using cpu_feature_enabled() instead — maybe this
-is a good opportunity to update this occurrence?
-
-> +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PRED_CMD, MSR_TYPE_W,
-> +					  !guest_has_pred_cmd_msr(vcpu));
-> +
-> +	if (boot_cpu_has(X86_FEATURE_FLUSH_L1D))
-
-Ditto.
-
-> +		vmx_set_intercept_for_msr(vcpu, MSR_IA32_FLUSH_CMD, MSR_TYPE_W,
-> +					  !guest_cpu_cap_has(vcpu, X86_FEATURE_FLUSH_L1D));
-> +
-> +	/*
-> +	 * x2APIC and LBR MSR intercepts are modified on-demand and cannot be
-> +	 * filtered by userspace.
-> +	 */
-> +}
 
