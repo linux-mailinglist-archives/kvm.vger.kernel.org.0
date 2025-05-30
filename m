@@ -1,126 +1,199 @@
-Return-Path: <kvm+bounces-48120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21F4CAC9621
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 21:33:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14A9AAC962E
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 21:44:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABC721C21B2A
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 19:32:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40F1FA20458
+	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 19:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F9B28134A;
-	Fri, 30 May 2025 19:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B5127CCF2;
+	Fri, 30 May 2025 19:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qejIatAl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YczEaYC1"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD138280338
-	for <kvm@vger.kernel.org>; Fri, 30 May 2025 19:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23D826F461
+	for <kvm@vger.kernel.org>; Fri, 30 May 2025 19:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748633392; cv=none; b=H75OpD5+f8OaPC3eA3oS1fH2tPA53TbvowgFl2VjI6sisT+fEKinCSmxH3CMOcUwWn6GSvnw5dUJeRly3IazWR5GkmPpz8XtujxJvx9g2jV63Z4wHM9qP0zCC2H6VcUd1Aln10YxjSsHKP2zMBLoqqLWzueQKRJiYdQEWyiaJVM=
+	t=1748634256; cv=none; b=RPrYqdxoBTu/fqoaSnJjXabpGkf/QH3owTJuxfwGUOu3FQfctRcwcuIWHgvcEXvJWx0fk1EmKXuad55x2oV90Pn2nLM7uQ/FEjMnaYxs+1T0abwOuZy4+4A3Nu4/VS4FYkxv0pfGGIxBhzkIpTXSpacTsxTuBYa6AK30djo/7aU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748633392; c=relaxed/simple;
-	bh=VHN1sgts+2xB2xrF6P1F1g5v6UKe5rxGHeCV1L66Wxo=;
+	s=arc-20240116; t=1748634256; c=relaxed/simple;
+	bh=oNUxAqiIERM1ixZom4CABLQ6R42AZAYfillFy57IOyw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IFEd0Rt6EFnP4B46ujNuqvjBRMDPLsykPK6I3p3zx8cKIBCGUt2rgXCWMwW2ndsXe9MkfY67D5e69QAzv7sjAqS/oPf1+XeL35aPvx4ETqERijIj9SPlH1uAYPViW2Zfv8l3qtH39Azf5PqV9fvq68B66ctcANjwlcDGZdSV6NE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qejIatAl; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <0dcd01cd-419f-4225-b22c-cbaf82718235@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748633376;
+	 In-Reply-To:Content-Type; b=b21Aghi+Qr4cjhI0mQMv8tMClZWAm93/ZHFhgg4fQNLnfiLVtwL1yyPmMHNLc17yzVt254GfVvuPoZ7oTVStAU673I7q4hHsGxDtIFfOmCMwW1A4GadrSnKWismocyouCQn8pi1Fs/VWqoCMGM5jV4BAwdffltzOEAJxhBxBVkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YczEaYC1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748634253;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tkiGcg9Pp6HB9HenrxwiWzm/IMuLvXwvBc2ohIpTcuU=;
-	b=qejIatAl3IVBpVjd5b1sjdObGZ7rJABj1bGentvPoaT9Gk2nMpl/NODNwtlNVuxD7mIwiW
-	xTQUdOt6Gu3DaCC7BjJCdrWEHh521evt/yWAJJhiesYDNH5GuqToxdnr9DVQXVDc4uDjZ3
-	Hq4CVYV8tCgSZSBhWUbuMlqAshgB7wA=
-Date: Fri, 30 May 2025 12:29:30 -0700
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=XVMMDq/i9mPb9hw3hbmTldOmiaSNRmJmSEUQ9+dOxxE=;
+	b=YczEaYC16a/G/6prQV8ZtbHa9hJWmXNln4XBFyBUGl37ebR9bT9I8JDuZZIWC87jHpNR7G
+	ZawCddOADNF/bA5uD04tcnycb73kENv70JTDdDvKqueYo15RC+2+hOfGj0h7SSy8G997BN
+	w7c2Eewh/eutOlWfOHA0aQPALzeZP8U=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-410-8lYpSgI7N3y3jyXWpli4TQ-1; Fri, 30 May 2025 15:44:11 -0400
+X-MC-Unique: 8lYpSgI7N3y3jyXWpli4TQ-1
+X-Mimecast-MFC-AGG-ID: 8lYpSgI7N3y3jyXWpli4TQ_1748634251
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-605a2dab6b8so305897a12.2
+        for <kvm@vger.kernel.org>; Fri, 30 May 2025 12:44:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748634250; x=1749239050;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XVMMDq/i9mPb9hw3hbmTldOmiaSNRmJmSEUQ9+dOxxE=;
+        b=Aldy0ogVNRFTDXh9lGoS40LLzZM9u2ByDEvk6AF35LnKynu8QBlu5mK1KV+nOIPgqL
+         62Tgb1E+xa/Otd4K4ABLgiAeLAvAirQjxaPjDlpepvutDcwNKGRPUdWG3BflirOMvHeU
+         uQ+wUuzCQaHawHy0Am2UnfYhn3mHYJ9CUSYr9sos/7UKhYJFQgIhhN6D4WMmiGpvnIiK
+         1XKRv4FDDWNVNmBi/smabC8b9igtjhUle/URh9gCwR1tlc2xEuWttlmIs9ymK8wCM974
+         gnwv2ALT6TUML4QY52dhxOXx/93syscM69bc6IC2ODXeXGZ4c7U5zMcN/N8ul6iSo+Zj
+         a9bw==
+X-Gm-Message-State: AOJu0YwYvpKxn0XM95DmOJVL4wqA3f786yd3+E5Cs3Py+1FYPpGMYQtT
+	WKRvayK9cnRqicObFH+WYinWvyYRRLO9QQYY3IM2L0TCYxAzmm7/875U5Soxb/lQK1QALjGLyZg
+	xELU/sIbuub3ZI/XNiBQFIfviGTGhHiJHQ664cs0p0RoHz4n7o7CxTg==
+X-Gm-Gg: ASbGncuR/veDuvJ7KciDY7iMtQXpdqXLz3gxPXafe/W+i+ygj5VA9vB8PLpeCMvjgx8
+	Bp2V2tmXlj/4SaUygodRZFMVcZp6JTHLlnlIvku+RNWhvDbrIsBVQTEa3qTSMarv8lqxBHOudRi
+	bwWd4LlCKhzLdZSUb9c8+TaQ+JCPi9R/oGtTxuEBMN1058dIi/uAIOP696iqTC55bw+NK6S7n4K
+	RM/npe4Cs6WILI8LrQifutp7Wf3FDNIY9vsYl3pGUytBVdRP/prrcwdQgi0/rdyWL4PHbD3qvTe
+	Cixf1EOSAkPfi+4ksKcPQMCKPwTbHvrWeGFY30CX5Tm8KtXjQ329Uto/peOnW3Y=
+X-Received: by 2002:a05:6402:2811:b0:5ff:f72e:f494 with SMTP id 4fb4d7f45d1cf-6057c63cae7mr3239387a12.31.1748634249642;
+        Fri, 30 May 2025 12:44:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFk4D8hDp4cKoczBgWeubJwTqnctNQdGTAcE/pvA30+nmmu+zu8uyt5dvX9NbUpT+z5nt+STQ==
+X-Received: by 2002:a05:6402:2811:b0:5ff:f72e:f494 with SMTP id 4fb4d7f45d1cf-6057c63cae7mr3239375a12.31.1748634249288;
+        Fri, 30 May 2025 12:44:09 -0700 (PDT)
+Received: from [192.168.0.7] (ltea-047-064-112-237.pools.arcor-ip.net. [47.64.112.237])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60566c5b6e9sm2123231a12.23.2025.05.30.12.44.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 May 2025 12:44:08 -0700 (PDT)
+Message-ID: <7d1d7262-0b59-4432-b75e-3c411a8d7e1c@redhat.com>
+Date: Fri, 30 May 2025 21:44:07 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 9/9] RISC-V: KVM: Upgrade the supported SBI version to
- 3.0
-To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>,
- Andrew Jones <ajones@ventanamicro.com>
-Cc: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Mayuresh Chitale <mchitale@ventanamicro.com>,
- linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org,
- linux-riscv <linux-riscv-bounces@lists.infradead.org>
-References: <20250522-pmu_event_info-v3-0-f7bba7fd9cfe@rivosinc.com>
- <20250522-pmu_event_info-v3-9-f7bba7fd9cfe@rivosinc.com>
- <DA3KSSN3MJW5.2CM40VEWBWDHQ@ventanamicro.com>
- <61627296-6f94-45ea-9410-ed0ea2251870@linux.dev>
- <DA5YWWPPVCQW.22VHONAQHOCHE@ventanamicro.com>
- <20250526-224478e15ee50987124a47ac@orel>
- <ace8be22-3dba-41b0-81f0-bf6d661b4343@linux.dev>
- <20250528-ff9f6120de39c3e4eefc5365@orel>
- <1169138f-8445-4522-94dd-ad008524c600@linux.dev>
- <DA8KL716NTCA.2QJX4EW2OI6AL@ventanamicro.com>
- <2bac252c-883c-4f8a-9ae1-283660991520@linux.dev>
- <DA9G60UI0ZLC.1KIWBXCTX0427@ventanamicro.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH] travis.yml: Remove the aarch64 job
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20250530115214.187348-1-thuth@redhat.com>
+ <20250530-61a88b355b5b9621a26f7e1f@orel>
+From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Atish Patra <atish.patra@linux.dev>
-In-Reply-To: <DA9G60UI0ZLC.1KIWBXCTX0427@ventanamicro.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20250530-61a88b355b5b9621a26f7e1f@orel>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 7bit
 
+On 30/05/2025 18.39, Andrew Jones wrote:
+> On Fri, May 30, 2025 at 01:52:14PM +0200, Thomas Huth wrote:
+>> From: Thomas Huth <thuth@redhat.com>
+>>
+>> According to:
+>>
+>>   https://docs.travis-ci.com/user/billing-overview/#partner-queue-solution
+>>
+>> only s390x and ppc64le are still part of the free OSS tier in Travis.
+>> aarch64 has been removed sometime during the last year. Thus remove
+>> the aarch64 job from our .travis.yml file now to avoid that someone
+>> burns non-OSS CI credits with this job by accident now.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>   .travis.yml | 10 ----------
+>>   1 file changed, 10 deletions(-)
+>>
+>> diff --git a/.travis.yml b/.travis.yml
+>> index 99d55c5f..799a186b 100644
+>> --- a/.travis.yml
+>> +++ b/.travis.yml
+>> @@ -8,16 +8,6 @@ git:
+>>   jobs:
+>>     include:
+>>   
+>> -    - arch: arm64
+>> -      addons:
+>> -        apt_packages: qemu-system-aarch64
+>> -      env:
+>> -      - CONFIG="--arch=arm64 --cc=clang"
+>> -      - TESTS="cache gicv2-active gicv2-ipi gicv3-active gicv3-ipi
+>> -          pci-test pmu-cycle-counter pmu-event-counter-config pmu-sw-incr
+>> -          selftest-setup selftest-smp selftest-vectors-kernel
+>> -          selftest-vectors-user timer"
+>> -
+>>       - arch: ppc64le
+>>         addons:
+>>           apt_packages: clang qemu-system-ppc
+>> -- 
+>> 2.49.0
+>>
+> 
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> 
+> With gitlab-ci, I'm not even sure who still looks at Travis, so maybe
+> nobody will notice that arm64 is getting dropped...
 
-On 5/30/25 4:09 AM, Radim Krčmář wrote:
-> 2025-05-29T11:44:38-07:00, Atish Patra <atish.patra@linux.dev>:
->> On 5/29/25 3:24 AM, Radim Krčmář wrote:
->>> I originally gave up on the idea, but I feel kinda bad for Drew now, so
->>> trying again:
->> I am sorry if some of my replies came across in the wrong way. That was
->> never
->> the intention.
-> I didn't mean to accuse you, my apologies.  I agree with Drew's
-> positions, so to expand on a question that wasn't touched in his mail:
->
->>> Even if userspace wants SBI for the M-mode interface, security minded
->> This is probably a 3rd one ? Why we want M-mode interface in the user
->> space ?
-> It is about turning KVM into an ISA accelerator.
->
-> A guest thinks it is running in S/HS-mode.
-> The ecall instruction traps to M-mode.  RISC-V H extension doesn't
-> accelerate M-mode, so we have to emulate the trap in software.
-We don't need to accelerate M-mode. That's the beauty of the RISC-V H 
-extension.
-The ISA is designed in such a way that the SBI is the interface between 
-the supervisor environment (VS/HS)
-and the supervisor execution environment (HS/M).
+I guess I'm currently the only one who's using it ... so far, it was still a 
+nice way to test automatically on non-x86 hosts, but seems like these 
+options are also removed again bit by bit ... let's see how long ppc64le and 
+s390x still survive there...
 
-
->
-> The ISA doesn't say that M-mode means SBI.  We try really hard to have
-> SBI on all RISC-V, but I think KVM is taking it a bit too far.
->
-> We can discuss how best to describe SBI, so userspace can choose to
-> accelerate the M-mode in KVM, but I think that the ability to emulate
-> M-mode in userspace should be provided.
-I am still trying to understand the advantages of emulating the M-mode 
-in the user space.
-Can you please elaborate ?
-I am assuming you are not hinting Nested virtualization which can be 
-achieved with existing
-ISA provided mechanisms and accelerated by SBI NACL.
-
+  Thomas
 
 
