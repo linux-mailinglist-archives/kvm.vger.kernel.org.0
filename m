@@ -1,128 +1,174 @@
-Return-Path: <kvm+bounces-48127-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48128-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0FC3AC9876
-	for <lists+kvm@lfdr.de>; Sat, 31 May 2025 01:48:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0181DAC9983
+	for <lists+kvm@lfdr.de>; Sat, 31 May 2025 08:08:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 447961C0541D
-	for <lists+kvm@lfdr.de>; Fri, 30 May 2025 23:48:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49F207B40A6
+	for <lists+kvm@lfdr.de>; Sat, 31 May 2025 06:07:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4797A28C868;
-	Fri, 30 May 2025 23:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7062C22D781;
+	Sat, 31 May 2025 06:08:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="LCVpake5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eDG4Wmeo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF315F4E2;
-	Fri, 30 May 2025 23:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54A91F0E4F
+	for <kvm@vger.kernel.org>; Sat, 31 May 2025 06:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748648897; cv=none; b=lLN+R02U4yw4LVrspXvOsTWML71gTGhIal5vjCAbqF16z+zY3g1upkuvOEksuCOSiJenOF0ID+Z4zGJE0QjwcDkva5zKPrgwvf9ZOtk/UArsZR0z/WZovEZn3/qDIWfLlV/GUl2/E5p3+lt0ABxiL3zYFqGMJl0NQ/ptcWQDLxU=
+	t=1748671691; cv=none; b=bumomPE57nXtD8WvEl7odBMDk0aZW0Lbz/Ys2pMwEVp7AvYffM2Rcch8GKMBJTFtzZDtbkk49gCcC2F9KiSIuI3seT+TtPdVTHhGi4oWN6Am5c5Hlp1d3eMCxrk+fGBBg0XYrvIK0AHDvlfIBVXueQWZICs1ZOPXXT/hrwLjv+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748648897; c=relaxed/simple;
-	bh=OZITbcfUk62xAFOv+ESSVnGYPYICuavRFP4UNT0hEXA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bAL4lnTju6UFL+4JZbBTcyEzLR7L/bm2O4pf4EWTXiQX776yeb4Ie+l58CWiN72VBzSj9Ryg82tLs6ajNIbOqqiqqAGSlSR28s/rqTTfotQ8DEoFx5nUCi3cuoWwzam57l2ua4mRcxamiKkVW1XX2I+nLOENE2eHWNdR4pekcxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=LCVpake5; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 54UNlpvJ2539266
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 30 May 2025 16:47:51 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 54UNlpvJ2539266
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025052101; t=1748648872;
-	bh=MOS+EC5Dlk7EYsK0YRGrkbjqrcr1E03kzaHpwpyIQps=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=LCVpake5hz9fkhzw/3SsSNiZjvN1zcO1NCRotklRGpsokSJ3eBc7DaP5yotG/44Gn
-	 oG0L7dvHKG5Qy5JXlA8bzJ4m/SQGllUUACQNBT+vFy4v1Par7ZDfXrnN+tBePJSxO0
-	 Uh3CDStmhGc92Q8ngjldWOHMc6BzQlNd8y3xVaRcJxt6iobONIpLLNLBsyQQ5vGVNt
-	 lGTWidwztVlGAIONUX7F/luy5TcwhmQ+ouWAuoZpXsRh1yVStbBJhm7i+UCDhG9Sh1
-	 NCn+e/mve0hGEMo+qzYxwoxVBghvEKuJuSG5hFm0CwNQ0iF29FBuJI8St6gVPJ2mPZ
-	 6XwMoNyRWTUWg==
-Message-ID: <6d1f1a2e-5b11-4513-b063-482483d16834@zytor.com>
-Date: Fri, 30 May 2025 16:47:50 -0700
+	s=arc-20240116; t=1748671691; c=relaxed/simple;
+	bh=SFlrWWfG74B6exhPjuCqn0hBLGYXiSjGf/EbvYaaAVs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mt61IguVCgXBUrA5od/qYMeaN/cHh9XpBqL3/rU9M3K2ranOgmWCJuQJwQ40MV4dcMS1bTbOiDM+lNoI2ixMyrAzZGF53Cv67aR/8ejdI6dwIYXor7zJ0sZZQKK2uWlqwU0/NdRNa35vsRe92n2wB9MRX8v4hIZhZJvlSFyC3kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eDG4Wmeo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748671688;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Mi36qKJqcFRPx400y/HtJCcteAnaWg5UTYhGBt/SiY8=;
+	b=eDG4WmeooP6qcM5MDMndGnQA0+hmoCYn8xlSSe+f1B+hEiCzizfksinLA9mXD2hUDk5TCo
+	yRRUliuP8jmruFZBdKW15lIfgx7mICh99v8nrfl/iOGq7SJ8PdM167kGDO9bfGyXSZE3vZ
+	F39ibfxTS+frZ73M6ytjYmr1O73XBvQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-531-OxWsT9zqM4SBTVYQ970Fcg-1; Sat,
+ 31 May 2025 02:07:59 -0400
+X-MC-Unique: OxWsT9zqM4SBTVYQ970Fcg-1
+X-Mimecast-MFC-AGG-ID: OxWsT9zqM4SBTVYQ970Fcg_1748671679
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7F9F0180045C;
+	Sat, 31 May 2025 06:07:58 +0000 (UTC)
+Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EE6C21954191;
+	Sat, 31 May 2025 06:07:56 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: mlevitsk@redhat.com,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH v2] rtmutex_api: provide correct extern functions
+Date: Sat, 31 May 2025 02:07:56 -0400
+Message-ID: <20250531060756.130554-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 18/28] KVM: x86: Rename msr_filter_changed() =>
- recalc_msr_intercepts()
-To: Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Borislav Petkov <bp@alien8.de>, Chao Gao <chao.gao@intel.com>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>
-References: <20250529234013.3826933-1-seanjc@google.com>
- <20250529234013.3826933-19-seanjc@google.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <20250529234013.3826933-19-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 5/29/2025 4:40 PM, Sean Christopherson wrote:
-> Rename msr_filter_changed() to recalc_msr_intercepts() and drop the
-> trampoline wrapper now that both SVM and VMX use a filter-agnostic recalc
-> helper to react to the new userspace filter.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson<seanjc@google.com>
-> ---
->   arch/x86/include/asm/kvm-x86-ops.h | 2 +-
->   arch/x86/include/asm/kvm_host.h    | 2 +-
->   arch/x86/kvm/svm/svm.c             | 8 +-------
->   arch/x86/kvm/vmx/main.c            | 6 +++---
->   arch/x86/kvm/vmx/vmx.c             | 7 +------
->   arch/x86/kvm/vmx/x86_ops.h         | 2 +-
->   arch/x86/kvm/x86.c                 | 8 +++++++-
->   7 files changed, 15 insertions(+), 20 deletions(-)
+Commit fb49f07ba1d9 ("locking/mutex: implement mutex_lock_killable_nest_lock")
+changed the set of functions that mutex.c defines when CONFIG_DEBUG_LOCK_ALLOC
+is set.
 
-Reviewed-by: Xin Li (Intel) <xin@zytor.com>
+- it removed the "extern" declaration of mutex_lock_killable_nested from
+  include/linux/mutex.h, and replaced it with a macro since it could be
+  treated as a special case of _mutex_lock_killable.  It also removed a
+  definition of the function in kernel/locking/mutex.c.
+
+- likewise, it replaced mutex_trylock() with the more generic
+  mutex_trylock_nest_lock() and replaced mutex_trylock() with a macro.
+
+However, it left the old definitions in place in kernel/locking/rtmutex_api.c,
+which causes failures when building with CONFIG_RT_MUTEXES=y.  Bring over
+the changes.
+
+Fixes: fb49f07ba1d9 ("locking/mutex: implement mutex_lock_killable_nest_lock")
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+	This time, with brain connected.
+
+ kernel/locking/rtmutex_api.c | 33 +++++++++++++++++++++------------
+ 1 file changed, 21 insertions(+), 12 deletions(-)
+
+diff --git a/kernel/locking/rtmutex_api.c b/kernel/locking/rtmutex_api.c
+index 191e4720e546..f21e59a0525e 100644
+--- a/kernel/locking/rtmutex_api.c
++++ b/kernel/locking/rtmutex_api.c
+@@ -544,12 +544,12 @@ int __sched mutex_lock_interruptible_nested(struct mutex *lock,
+ }
+ EXPORT_SYMBOL_GPL(mutex_lock_interruptible_nested);
+ 
+-int __sched mutex_lock_killable_nested(struct mutex *lock,
+-					    unsigned int subclass)
++int __sched _mutex_lock_killable(struct mutex *lock, unsigned int subclass,
++				 struct lockdep_map *nest_lock)
+ {
+-	return __mutex_lock_common(lock, TASK_KILLABLE, subclass, NULL, _RET_IP_);
++	return __mutex_lock_common(lock, TASK_KILLABLE, subclass, nest_lock, _RET_IP_);
+ }
+-EXPORT_SYMBOL_GPL(mutex_lock_killable_nested);
++EXPORT_SYMBOL_GPL(_mutex_lock_killable);
+ 
+ void __sched mutex_lock_io_nested(struct mutex *lock, unsigned int subclass)
+ {
+@@ -563,6 +563,21 @@ void __sched mutex_lock_io_nested(struct mutex *lock, unsigned int subclass)
+ }
+ EXPORT_SYMBOL_GPL(mutex_lock_io_nested);
+ 
++int __sched _mutex_trylock_nest_lock(struct mutex *lock,
++				     struct lockdep_map *nest_lock)
++{
++	int ret;
++
++	if (IS_ENABLED(CONFIG_DEBUG_RT_MUTEXES) && WARN_ON_ONCE(!in_task()))
++		return 0;
++
++	ret = __rt_mutex_trylock(&lock->rtmutex);
++	if (ret)
++		mutex_acquire_nest(&lock->dep_map, 0, 1, nest_lock, _RET_IP_);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(_mutex_trylock_nest_lock);
+ #else /* CONFIG_DEBUG_LOCK_ALLOC */
+ 
+ void __sched mutex_lock(struct mutex *lock)
+@@ -591,22 +606,16 @@ void __sched mutex_lock_io(struct mutex *lock)
+ 	io_schedule_finish(token);
+ }
+ EXPORT_SYMBOL(mutex_lock_io);
+-#endif /* !CONFIG_DEBUG_LOCK_ALLOC */
+ 
+ int __sched mutex_trylock(struct mutex *lock)
+ {
+-	int ret;
+-
+ 	if (IS_ENABLED(CONFIG_DEBUG_RT_MUTEXES) && WARN_ON_ONCE(!in_task()))
+ 		return 0;
+ 
+-	ret = __rt_mutex_trylock(&lock->rtmutex);
+-	if (ret)
+-		mutex_acquire(&lock->dep_map, 0, 1, _RET_IP_);
+-
+-	return ret;
++	return __rt_mutex_trylock(&lock->rtmutex);
+ }
+ EXPORT_SYMBOL(mutex_trylock);
++#endif /* !CONFIG_DEBUG_LOCK_ALLOC */
+ 
+ void __sched mutex_unlock(struct mutex *lock)
+ {
+-- 
+2.43.5
 
 
