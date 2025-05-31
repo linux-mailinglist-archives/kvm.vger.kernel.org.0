@@ -1,165 +1,125 @@
-Return-Path: <kvm+bounces-48130-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48131-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F19D6AC9B68
-	for <lists+kvm@lfdr.de>; Sat, 31 May 2025 16:55:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62E55AC9BAD
+	for <lists+kvm@lfdr.de>; Sat, 31 May 2025 18:18:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9C4F4A038E
-	for <lists+kvm@lfdr.de>; Sat, 31 May 2025 14:55:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46DD918986BA
+	for <lists+kvm@lfdr.de>; Sat, 31 May 2025 16:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A6E23A9A3;
-	Sat, 31 May 2025 14:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668DE17A301;
+	Sat, 31 May 2025 16:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="ltwYBkG0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IVSQ+vYl"
 X-Original-To: kvm@vger.kernel.org
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2732515442C
-	for <kvm@vger.kernel.org>; Sat, 31 May 2025 14:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DEC117E0;
+	Sat, 31 May 2025 16:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748703350; cv=none; b=gsDgLfG2HT+90aHAp9DZL7ekB/nYZj2fo4Rs7gXJc36WgTkndzJNu5aj82e5Cpoz+nf+vueFEAECIE5OlRUb9O8fcyFmss9MC7ttxDS/jHYVa6x3+N5cHA5bmlEfNG0Mh2ixix8sHrxHxvz6NQw+4hk8avLW2Zdy9lkWqNbu4vE=
+	t=1748708323; cv=none; b=RBsj6Kts9bANKdLiVW/Q+SLOsd8JciFW1qF2DcQDPhS06QvUrm9rY5dWAZ4Dvf2NRXHHEDEcG6elrn/j4Qx1baoID8kWDPk9hwFX7MxuERIGsRqLvFeH7FxxgjVh7OdjK2Kaln1OT8ZOwNpXgnZndaTiz2Lm2Rm3vxIwJU0YwuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748703350; c=relaxed/simple;
-	bh=p6BmCRjVDDsF1AIJIfZSgZ9h6XfSxUXFKJbG7dwMxD4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=BsqxPR9oSin4K4/yfgA4alnh0iCImZrl8v0Q/stbjYpu2LfFlBijLEOJENBL6PqwgFWBIEcNf8NOqNbu4S7XeUMp6Hlapqpkrr+UVzA1K+8K/cEpFSwXnjLD+StBaQ5BbAatQYuJ8Q1jSjjZtIjsVgmOrsmTfOGn1/HHAXcL+sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=ltwYBkG0 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
-Received: from [192.168.10.111] (p865013-ipoe.ipoe.ocn.ne.jp [153.242.222.12])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 54VED0ol067517
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 31 May 2025 23:13:07 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=UkwKDJFg/2nSSMYcw1889kv5A0ScloG0EqY5LY7JDfs=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=From:Date:Subject:Message-Id:To;
-        s=rs20250326; t=1748700787; v=1;
-        b=ltwYBkG0Qc8Sl2niNXO+7jf7CRes01PkK8BZctGJy4pRV1TPwfF8izuB5ImDRB0Z
-         fYsciEZfW9BlltCyZFPYBb07JC0FxTL9lcH3ECYXBj80l6/VjV5hfKScGt/p/yUt
-         +eZ7dKyKuqdAT1GMlvjzR+ubDa2Tq40KoGG8/1dH5qhDW6o3jsFOJYgQYSZBECuz
-         XSc2qBuvUiO6ymWTPjLUZ86PL/vTLXOh4UNFSTgSySH5acBdCTTR5uYl7bMLoEw9
-         gObkoFiJuoBAKEW5Mee7HaZ1C0U3Ok+f2mGXScwk8uHaFtTTyGDCfUuX//YYO/Ib
-         EFXuC4b+/ONRVgvj0dOWIQ==
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Date: Sat, 31 May 2025 23:12:56 +0900
-Subject: [PATCH v6] target/arm: Always add pmu property for host
+	s=arc-20240116; t=1748708323; c=relaxed/simple;
+	bh=pWx0JtByz5bQLz9/8RlWnYuB53qfTidcpdVzrM66O4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pQGbqLZjrZ8V+ZfcsD8ijrw8gCk8ads0qyCrvtHnvazUFRCNvhzfCaPU0UfeYevB3QqVAXAxBfU1evobWcNgYKNkvDXirLMWlXALdCN8EHu0wBgu+rBomo9L61BiBGo+EpksHv9gAKuO+fx5ij8rHKi3yx+i7yTgGr0+u7UFSvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IVSQ+vYl; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3a4ebfaa623so415002f8f.1;
+        Sat, 31 May 2025 09:18:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748708319; x=1749313119; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7amG+fgm0XQ6pvWnBFAM72MHD6qJuia+zLfGed4C86Q=;
+        b=IVSQ+vYlcFg3eyhB+sCJuyWO+BE4vtXbGja140pTM/IShoctUALwd/roFZggtRMgMB
+         tXnRvwo02iM7iQfi0ryO4Vo2tIIM/SZIfaG4a+foU9mgMdwrQ9Ar66yEEelq1/O6+p79
+         i/qgx3lZXTzMmw5NbzUrksee9Jhzl/e+j1za0lysgLmylIWHlebNePTwWI4F4GaYs6JE
+         2JpJy437F1Tw8K0Qq3Htje8ILSop80yQtnUM5weSVx3iVc8GKACAdLC0d+vBxks3uy7k
+         p3YSt+4N9dnAUMVpYI0AkQoucFjQ0EqD6yBogfBNDBkpz86pFRKj6JuWAcXcur6nNwJG
+         UQUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748708319; x=1749313119;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7amG+fgm0XQ6pvWnBFAM72MHD6qJuia+zLfGed4C86Q=;
+        b=FAY3yFSScX2ei4PzEAct8OkdmRxFa5XH40bTwYuQdhXD5CPmI93++5xDSA0dVGvpEd
+         OB1yNEMRzfkLFhE6QLdKebOHgyw5D6js7mlLEmWhLjESnEkiaXeZxZ5JjuqPs4wOYAqz
+         gg/4edWww5LhEJvtYiAA9Y4OMFeY3k5P7W4/W0ZvIxM81kZbDsQt1mptSKwgr43HEeUs
+         GtY31r51w5jVAMDbqb6iMoplNaF1QDyvJor3RXRKP3Xv4hGGVv4XcxN8jIc9bnlJgodg
+         6U03bBpHZyV3KF3ISoGcKXVrWfOVR3axOha2p2VHnNI48Hr57aiXcWrnG+IQRv97GR98
+         AytA==
+X-Forwarded-Encrypted: i=1; AJvYcCWfMizWRoI86dxSY0fm3WIWX3iAVYnKDAoTfHxlOgJ87dPAc4sf6pcz9S4bHdc1bl0xDdc=@vger.kernel.org, AJvYcCXbz7ZdCyo1c9EAhePWV+nMBm7p4L/2irOx5jv3gi3HP0zbX5qf6E8lNctasMOP/e3pdjb5uGhmok0vyfJF@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz16GcTPR/kOQw3s/BQCZNpydtY1RKsZ0PsxASo0FjsoNwC0eTq
+	kgBo0GD9cPsMrAMTgnNsiGar0HO1lJZ4SHtKbLkWv+RFSETsMbfa5VM=
+X-Gm-Gg: ASbGncududfVtxTxOZBmgJlBFnuHP7xhrtp3lSdXdCfgGvJD6eZd3c51dthBIVfQGoU
+	9XS7WbIp6d2k2WVxLNLYmPBuThhPHJUnH0cJDj0xDpU1n3B4K6xX5/KJtMcJ43hz61jOoccPvPy
+	pfr2CUmN95SRXAdeBHzsMOzpMUYP9sNK1IU4kJ++yezbPOjhEXYnMq8RrOVYs9RZq45vu2sGz5m
+	HrOSoytR3oVgELCKzPfkcBr///JNIKE4N7OIrHIB3XV7Yv+T/7wRR/byXmpLkzFSaXb+5Wm230Y
+	hsXtEfZnmpcp7+LABhJ3qppzDTS6xuRU7tvezR8oDtoZjMkdFCztP6AftI7K4i+oJIJ/sQxl6ZZ
+	NHcIQLfp7M93P44k=
+X-Google-Smtp-Source: AGHT+IF9bBR1PKckeUO+MJfzEpp1rgDSET7GZgiUK6KY0LN83z9QYZ1kxXD3RKW2wAP2M4isY2TISA==
+X-Received: by 2002:a5d:64ed:0:b0:3a4:e8c8:fba1 with SMTP id ffacd0b85a97d-3a4f897ee54mr1918196f8f.10.1748708319258;
+        Sat, 31 May 2025 09:18:39 -0700 (PDT)
+Received: from localhost (131.red-80-39-31.staticip.rima-tde.net. [80.39.31.131])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe73f22sm8367944f8f.43.2025.05.31.09.18.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 31 May 2025 09:18:37 -0700 (PDT)
+From: Xose Vazquez Perez <xose.vazquez@gmail.com>
+To: 
+Cc: Xose Vazquez Perez <xose.vazquez@gmail.com>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	KVM ML <kvm@vger.kernel.org>,
+	KERNEL ML <linux-kernel@vger.kernel.org>
+Subject: [PATCH] samples: vfio-mdev: mtty.c: delete MODULE_VERSION
+Date: Sat, 31 May 2025 18:18:36 +0200
+Message-ID: <20250531161836.102346-1-xose.vazquez@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250531-pmu-v6-1-2bb6c828ade3@rsg.ci.i.u-tokyo.ac.jp>
-X-B4-Tracking: v=1; b=H4sIAGcOO2gC/23My07DMBCF4VepvMbIHl9mwor3qLrwZUy9aFIlE
- LWq8u64jRBUYXlG8/03MfFYeRJvu5sYea5THfo2/MtOpGPoP1jW3LYABVZ56OT59CVDdsUjQ3J
- ZifZ5HrnUy6OyP7R9rNPnMF4f0Vnfr89+1lJJBN9pMJEo2Pccrn29vKbhJO6BGX4Rar8iaKgYN
- mwjZJPdBpl/kGmIEiZNjgIAbpD9g0CtyDYEASJQ8VFR2SD3g5zSyq7ISS0jd4kQMSH5J7Qsyzc
- Aqv+XawEAAA==
-X-Change-ID: 20240629-pmu-ad5f67e2c5d0
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        devel@daynix.com, Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-X-Mailer: b4 0.15-dev-edae6
+X-Patchwork-Bot: notify
+Content-Transfer-Encoding: 8bit
 
-kvm-steal-time and sve properties are added for KVM even if the
-corresponding features are not available. Always add pmu property for
-"host".
+Reminiscence of ancient times when modules were developed outside the kernel.
 
-Note that we still don't add the property for other CPUs that lack PMU.
-This is because we do not know what a PMU version should be enabled
-when the user sets the property to true while it is defined as an
-an error for the "host" CPU when the host doesn't have a PMU.
-
-This fixes qtest-aarch64/arm-cpu-features on the hosts that supports
-KVM but doesn't support PMU emulation.
-
-Signed-off-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: KVM ML <kvm@vger.kernel.org>
+Cc: KERNEL ML <linux-kernel@vger.kernel.org>
 ---
-kvm-steal-time and sve properties are added for KVM even if the
-corresponding features are not available. Always add pmu property for
-"host".
+ samples/vfio-mdev/mtty.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Note that we still don't add the property for other CPUs that lack PMU.
-This is because we do not know what a PMU version should be enabled
-when the user sets the property to true while it is defined as an
-an error for the "host" CPU when the host doesn't have a PMU.
----
-Changes in v6:
-- Limited the scope of the change to the "host" CPU.
-- Link to v5: https://lore.kernel.org/r/20250104-pmu-v5-1-be9c8777c786@daynix.com
-
-Changes in v5:
-- Rebased.
-- Link to v4: https://lore.kernel.org/r/20240720-pmu-v4-0-2a2b28f6b08f@daynix.com
-
-Changes in v4:
-- Split patch "target/arm/kvm: Fix PMU feature bit early" into
-  "target/arm/kvm: Set PMU for host only when available" and
-  "target/arm/kvm: Do not silently remove PMU".
-- Changed to define PMU also for Armv7.
-- Changed not to define PMU for M.
-- Extracted patch "hvf: arm: Raise an exception for sysreg by default"
-  from "hvf: arm: Properly disable PMU".
-- Rebased.
-- Link to v3: https://lore.kernel.org/r/20240716-pmu-v3-0-8c7c1858a227@daynix.com
-
-Changes in v3:
-- Dropped patch "target/arm: Do not allow setting 'pmu' for hvf".
-- Dropped patch "target/arm: Allow setting 'pmu' only for host and max".
-- Dropped patch "target/arm/kvm: Report PMU unavailability".
-- Added patch "target/arm/kvm: Fix PMU feature bit early".
-- Added patch "hvf: arm: Do not advance PC when raising an exception".
-- Added patch "hvf: arm: Properly disable PMU".
-- Changed to check for Armv8 before adding PMU property.
-- Link to v2: https://lore.kernel.org/r/20240716-pmu-v2-0-f3e3e4b2d3d5@daynix.com
-
-Changes in v2:
-- Restricted writes to 'pmu' to host and max.
-- Prohibited writes to 'pmu' for hvf.
-- Link to v1: https://lore.kernel.org/r/20240629-pmu-v1-0-7269123b88a4@daynix.com
----
- target/arm/cpu.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index ca5ed7892e4e..c99d65e9bf05 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1716,6 +1716,7 @@ static void arm_cpu_propagate_feature_implications(ARMCPU *cpu)
- void arm_cpu_post_init(Object *obj)
- {
-     ARMCPU *cpu = ARM_CPU(obj);
-+    ARMCPUClass *acc = ARM_CPU_GET_CLASS(obj);
+diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+index 59eefe2fed10..f9f7472516c9 100644
+--- a/samples/vfio-mdev/mtty.c
++++ b/samples/vfio-mdev/mtty.c
+@@ -35,7 +35,6 @@
+  * #defines
+  */
  
-     /*
-      * Some features imply others. Figure this out now, because we
-@@ -1767,6 +1768,9 @@ void arm_cpu_post_init(Object *obj)
+-#define VERSION_STRING  "0.1"
+ #define DRIVER_AUTHOR   "NVIDIA Corporation"
  
-     if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
-         cpu->has_pmu = true;
-+    }
-+
-+    if (cpu->has_pmu || !strcmp(acc->info->name, "host")) {
-         object_property_add_bool(obj, "pmu", arm_get_pmu, arm_set_pmu);
-     }
+ #define MTTY_CLASS_NAME "mtty"
+@@ -2057,5 +2056,4 @@ module_exit(mtty_dev_exit)
  
-
----
-base-commit: f0737158b483e7ec2b2512145aeab888b85cc1f7
-change-id: 20240629-pmu-ad5f67e2c5d0
-
-Best regards,
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("Test driver that simulate serial port over PCI");
+-MODULE_VERSION(VERSION_STRING);
+ MODULE_AUTHOR(DRIVER_AUTHOR);
 -- 
-Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+2.49.0
 
 
