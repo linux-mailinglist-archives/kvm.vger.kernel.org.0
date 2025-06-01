@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-48149-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48150-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02914AC9F39
-	for <lists+kvm@lfdr.de>; Sun,  1 Jun 2025 17:54:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D101AC9F4E
+	for <lists+kvm@lfdr.de>; Sun,  1 Jun 2025 18:12:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEA503A65ED
-	for <lists+kvm@lfdr.de>; Sun,  1 Jun 2025 15:53:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A86F3AF5BB
+	for <lists+kvm@lfdr.de>; Sun,  1 Jun 2025 16:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5D71E5B9D;
-	Sun,  1 Jun 2025 15:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E681EE02F;
+	Sun,  1 Jun 2025 16:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="acgzUuCW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FDIpp2r7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E491DDA1E
-	for <kvm@vger.kernel.org>; Sun,  1 Jun 2025 15:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7842DCBE3
+	for <kvm@vger.kernel.org>; Sun,  1 Jun 2025 16:12:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748793235; cv=none; b=Ti6M2fH1qBJi9HBFghX0kUow1wjgFgTDAQUlYSga4PiCaxSDAm9Uw4U0uLLYOLHDvQaDgBdT/VJCePtzYzf8Vtyjnl9qutRZ6/FoRhByAZCohNCVFI+GytGe4sSjLSS1L6NNlLhuf4J+kikQXAV2mt57AZR2toxbkMRmvYNufRs=
+	t=1748794363; cv=none; b=me/Iu3nTsCNLlrnH4zfPLjLLSN4u4uaaBb3vJHQ2EEyZGRUqU85+KJjzOp1d675byabzTvWRY1vfIxLk1JnGGRump3urgnsaqJvGIkTXPz5D0aOFOSZBTVnZfhGKoWEMhO70pFuvygZDonE2X6VN4i5m7uU0iCx6J/1ays4S7Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748793235; c=relaxed/simple;
-	bh=a+rsVvs42P6P6HnIX16lnuDZ8+2PuELJSaeSCvUQPDU=;
+	s=arc-20240116; t=1748794363; c=relaxed/simple;
+	bh=uhTtleqo95gO/Gi5XU8tDu5c2ETuSOVKc9aFuBKmNyY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pXKcIH5mJ7wO02VO9BzYERWZoPDGDksuLe+6kLP4T1407zHsF0VYpkiE9JRMBmtl4wzYvZDhVzjq8bKfI97kelmKzEYsSXW3JiNVNSsNqNBJTjHiFEflY/nrTuR0fQag5R4P0NU8prWZeHWDWsZkbbB2gWNkMV0CEhpujvDet78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=acgzUuCW; arc=none smtp.client-ip=192.198.163.10
+	 In-Reply-To:Content-Type; b=QubNnO5A76QyrB6BpT6xdVs5INYp1m5OvM+PiFfSrGDxBZcnUi5eqfq8JRKLxSy4Y3wZ8G26FfO5qRCio0o0UP+1Y7Th2TpF+iMwxv4tQU/exJdBnbRsW8N5tEVtREQGZhd64C2kPjkwwN/YNxl1t0swiew6OYGC10cPNFRC1fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FDIpp2r7; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748793233; x=1780329233;
+  t=1748794361; x=1780330361;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=a+rsVvs42P6P6HnIX16lnuDZ8+2PuELJSaeSCvUQPDU=;
-  b=acgzUuCWgMm0jzHxWCFBAQocgkA1Fpv7knABQfTyadacdumHlf2ngYmq
-   43081TW/UlXS/fAKEM09Ftr+LR6KP+9NBFJvJPclOIffq3v9TO/HibmmS
-   GEy7FhHylU7ZtGSQbxKirJEG9TgWGxXzyfUg2Y4JhiCPegiJneskIjjai
-   IOIoYfcuXLnC5zTevVvwxfssy2wFoK8UwA1923JzRfLNYaQ1asce4mf3K
-   4pw+UUdw4l/bIxP3GsofGyaUsAE7hwyDzM7Cc1dSkC7BuHk9Tkvv57dNp
-   xOk7IF6njMRbRJM2udjzr0oLoz3++Q/61nPb7I/sUCwzO+gUYMbiLlyza
-   A==;
-X-CSE-ConnectionGUID: Qec5X55MSIix8QRxrPGSMQ==
-X-CSE-MsgGUID: ZZ/zCHeaTDa8oxz9vZ7ZEg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11450"; a="62168622"
+  bh=uhTtleqo95gO/Gi5XU8tDu5c2ETuSOVKc9aFuBKmNyY=;
+  b=FDIpp2r7QQQ4gCAESMaqRxWIVR26TNeHhqLO9P9dD7D0hSBDIsR0cy4F
+   813OuvXJtEa2nJMt64byDbDMemv8xG3X5gluIMHtC3GwBAHo6Jxb/BgL/
+   riUBiU9GKoCUckwPygz7Uft+rgpy6I5xFgcODQB41xiGQWspVKsddjJsa
+   mNFX0fIgAWgDwZ4mFbU7BfYEhwvFRFKrFfqLRKUG3lJU96vVhZLvMSWvC
+   DPPHid+GiDEBOKJOMUYuPT5H2izvmKbtvzAvuDfYs6VyPhc12kHI9BWOM
+   2Q3pn4ahUbbzZgwKQd5TJtZcWFVvpyjvp38bBhsiWmQ3QbsIHFIRjNrea
+   Q==;
+X-CSE-ConnectionGUID: d7A9IdsPTIuAGH3bCvIlnQ==
+X-CSE-MsgGUID: 4oqlfMw7QRqQu7vWmTV9fA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11450"; a="54618084"
 X-IronPort-AV: E=Sophos;i="6.16,201,1744095600"; 
-   d="scan'208";a="62168622"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2025 08:53:51 -0700
-X-CSE-ConnectionGUID: XMtRHrsaQS+W0lNbolr6dg==
-X-CSE-MsgGUID: cK9aRdw0QnWkSgkcFQidbg==
+   d="scan'208";a="54618084"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2025 09:12:41 -0700
+X-CSE-ConnectionGUID: aIHRi0hFR/+is+cp14Hs7g==
+X-CSE-MsgGUID: EVbOSF0hTB6B6ezHVXDTcA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,201,1744095600"; 
-   d="scan'208";a="144306076"
+   d="scan'208";a="144653807"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2025 08:53:47 -0700
-Message-ID: <ad5f550b-5d74-4635-996e-1b1d754e727f@intel.com>
-Date: Sun, 1 Jun 2025 23:53:43 +0800
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2025 09:12:36 -0700
+Message-ID: <e2046aa5-13cd-456d-a093-b021a9182532@intel.com>
+Date: Mon, 2 Jun 2025 00:12:33 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 2/5] memory: Change
- memory_region_set_ram_discard_manager() to return the result
+Subject: Re: [PATCH v6 3/5] memory: Unify the definiton of ReplayRamPopulate()
+ and ReplayRamDiscard()
 To: Chenyi Qiang <chenyi.qiang@intel.com>,
  David Hildenbrand <david@redhat.com>, Alexey Kardashevskiy <aik@amd.com>,
  Peter Xu <peterx@redhat.com>, Gupta Pankaj <pankaj.gupta@amd.com>,
@@ -81,27 +81,20 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
  Xu Yilun <yilun.xu@intel.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
  <clg@kaod.org>, Alex Williamson <alex.williamson@redhat.com>
 References: <20250530083256.105186-1-chenyi.qiang@intel.com>
- <20250530083256.105186-3-chenyi.qiang@intel.com>
+ <20250530083256.105186-4-chenyi.qiang@intel.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250530083256.105186-3-chenyi.qiang@intel.com>
+In-Reply-To: <20250530083256.105186-4-chenyi.qiang@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 5/30/2025 4:32 PM, Chenyi Qiang wrote:
-> Modify memory_region_set_ram_discard_manager() to return -EBUSY if a
-> RamDiscardManager is already set in the MemoryRegion. The caller must
-> handle this failure, such as having virtio-mem undo its actions and fail
-> the realize() process. Opportunistically move the call earlier to avoid
-> complex error handling.
+> Update ReplayRamDiscard() function to return the result and unify the
+> ReplayRamPopulate() and ReplayRamDiscard() to ReplayRamDiscardState() at
+> the same time due to their identical definitions. This unification
+> simplifies related structures, such as VirtIOMEMReplayData, which makes
+> it cleaner.
 > 
-> This change is beneficial when introducing a new RamDiscardManager
-> instance besides virtio-mem. After
-> ram_block_coordinated_discard_require(true) unlocks all
-> RamDiscardManager instances, only one instance is allowed to be set for
-> one MemoryRegion at present.
-> 
-> Suggested-by: David Hildenbrand<david@redhat.com>
 > Reviewed-by: David Hildenbrand<david@redhat.com>
 > Signed-off-by: Chenyi Qiang<chenyi.qiang@intel.com>
 
