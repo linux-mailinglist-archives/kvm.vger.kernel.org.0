@@ -1,250 +1,327 @@
-Return-Path: <kvm+bounces-48156-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48157-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91861ACAB4E
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 11:24:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4E8CACABB6
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 11:44:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 705353BBD23
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 09:24:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B5AE7AA788
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 09:43:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CC61DF721;
-	Mon,  2 Jun 2025 09:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538D31EFFA2;
+	Mon,  2 Jun 2025 09:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UHLppZaa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="etCmQvSJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FC91D516F;
-	Mon,  2 Jun 2025 09:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E14E1E411C
+	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 09:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748856289; cv=none; b=BEXK7S/1JnIf4bxVIJ7wVwBcGm2IhvO5nYfxpm8f5NwyR/LjZ+hXOgLU8bzm/HDfgApwgHVlmy8xdOSk2SWiVVgBlSrli5NVwWk0HoqZd5FC2Fn3eaQ3KQpipyFfjxmziUh6ax24OjzaJEcuXXnqJ/TIVRF1HozXJrl+SMhi5+s=
+	t=1748857426; cv=none; b=O7jdFsnYdBdK4TQSPncdjszdU35JWjQGnWTT3bBSXybQrfmjkeoOTij3qDoNjzS+qlCwFSb2ygFVvgHULTsBudDc6/oxYEXG51VwHkIUYDK+4vcGxC7Mx/zR7/nB6RBRRwn+uLlPMRJxY9AgDPTYHEpP8oxEWs2oh+geC4ZiFP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748856289; c=relaxed/simple;
-	bh=0MJrTG0AIvkwugChi+McuCSaHdDoHbP30WWs0aFxFck=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=HUzl0oLICCW65WNWokWkQ8Gymz3SJCuF0N7lhE09VP/wYyNpxMyq9dMwcN7917Zn+6sykEcQeslgiyMwKJOCnMdRbwonPN2J0/FFzoWsnd//8RZ1XWGChCMe/4feqha/084u04RHsxnu46cAG/x0qPXJ2zRLVdz2l5mRWiVu4LI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UHLppZaa; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5523jb7X026824;
-	Mon, 2 Jun 2025 09:24:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=McNrdU
-	DjPTSMsOb7FRfFlWB3rFg2R0cVQwd1Ssz9TKw=; b=UHLppZaaG7CVEE/kubluV+
-	atLt0BgX4OEDRa7c0aH9F8qjxF4jGIUsqgG6qE9o4I6fhR1RybJUi6HhE7Rr9vGv
-	cCmbzfdlubhydPnOR5qKyWIBG0usIxhowS0wUfBWlCyOdrxNaSQ+nCYnmF8+ike4
-	H1jx/l/AATD3WNTpx/UxEaZ/QkzWmhZeHhfKFIYtrFaVG/5YAUjmu8rYIdo/v6i6
-	pjUHAEVxHTSAoi5tBh2H85NIHMKz0fja52Mhz+ZeXpxpMZvcYt9rQp+KYIPPIXD2
-	zIRuD4FGfaQwTQaz9z8IUWzGgkTJjnoUZgYLM+cTYyLfkm1UyPtVPHPvy6GOQGTg
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46yr6p8ca4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Jun 2025 09:24:45 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5528UfTs014640;
-	Mon, 2 Jun 2025 09:24:44 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470dkm5exf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Jun 2025 09:24:44 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5529Oegg52167052
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 2 Jun 2025 09:24:40 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 69C0A20043;
-	Mon,  2 Jun 2025 09:24:40 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3B2FD20040;
-	Mon,  2 Jun 2025 09:24:40 +0000 (GMT)
-Received: from darkmoore (unknown [9.111.39.121])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  2 Jun 2025 09:24:40 +0000 (GMT)
+	s=arc-20240116; t=1748857426; c=relaxed/simple;
+	bh=REBUgI6WvAgg7qhQ4s6VTIr8/bnIQiY5sJ0c/scjknM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=scbI4sxKkkQCUB6cDEPZnPcOecq+uCi388QaS6vEPkWiloYRgJtFmW6q47qyZHLoawrVaPURz6dZyqmStdmqVLf2Ft95p1W4TAKcChT07sNFA3g0MDGpk6Vvbcr51XwxBA/5w1Fw6LTXM4I5A5CPGeBpDUxd7d5iU4HiEutOb5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=etCmQvSJ; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4a58ef58a38so132721cf.0
+        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 02:43:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748857422; x=1749462222; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=uo8mvfVOCPKDzB6phw0TdqUcAgsJs18ujFhEA6TPVZg=;
+        b=etCmQvSJUliKtsynHnnpq/r08LS0yJTn7ODhGfTyCLOEhbd4POBqJp3xsAzIzlTSXr
+         fPklFwpmGOFRT2fXc3VuUi0n4/Gr2c/Ts+bgryPjDX/i/LhWQsSJ5D5F4eCBKOQ5U3t1
+         bwkGFPF6zyHbtLlZrAOC3XDdSTbAD4lPMD4qOzr/mU6CCknvB7MULe+ZkkM6PFADauOs
+         03gmfEMY7JlON23z7KZcs/9zzE1rsHTw3I5ToKz7bDwbk05WMVPjB4XsUEyH86ZG4qyu
+         zjA1XPbVCLx/idQ6epH5UECBYIQkbCKE5/5M77cdyiPVlzKKHRwookjvFKlY1io7p1nj
+         6pLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748857422; x=1749462222;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uo8mvfVOCPKDzB6phw0TdqUcAgsJs18ujFhEA6TPVZg=;
+        b=fYMpprA55jiLOqfO5ETbBCuN6brjyeVq1P3tGCR6LlWzVmJW1OKZJbNaOuEqdPKgI5
+         C34QEDJTnR8tg7FY9eD5+h7an/5a0BcZJD+Q1QTS89uP9rPemlg9hQ+Mk9D8bHrxs4Nk
+         ZPyIm+u+k/qed3RubduPumkgxnGCTB+5UJDD5ceQCEZYSmxJJ5wOU6/PFcH27p6eJPzh
+         /E2zMGJTW0lS253KOswbHWSK3HVVhQmQcpJdkMKTXPd8Jy0BFRpfTgkB5s4rO1StEoli
+         W0Bh/IDzIBX4c1Z5Ti6M+c8MLYfrhibSODmn2DYTNFmBZ3BSvUYvNbLj0Se7D3vX6Lnx
+         cgwg==
+X-Forwarded-Encrypted: i=1; AJvYcCVDUtSdTVXiTLjkE8VA+RZvwu+BJ+O6wh+ClKxoNI3S6wo2+al5+pDK4oKvrHw5fDHshqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3xTRgAJNWiDVK86z/5VZlGAfxDMXUAwRvkpWjsHKNJjSOxzP7
+	Mr/bd+7KBH5mxWFkAq7de0xmZpEYtYdh5RSpdEaVT55vTL16Tw9JRolHUgIjHzaPR25Say0kdaT
+	qS3pVUcxAVUZ7bJdsNcn+w4Wt1p4ausazkT07dYxw
+X-Gm-Gg: ASbGnct9K7sPLJJNz1qdf3aITLwd9XpOVUuybqiraH35Akc413tF3fPMLKYbzuExC3/
+	jpNB+JHCtKYVJZl/fYzKjXbtuR7tOOACFFW4kujwtcYVrHq4DcUe8szqOwHbZgMrG+izZsZRfv4
+	/Y87a3AvN+G+wqzEMwkQbPlQgB+JQu8EdjfqBO2Z4YQDo=
+X-Google-Smtp-Source: AGHT+IGWihVD4pfolVqs4guDDc40fFZEGkU6C3Ax5Qsx3Qx9MhC6Q8kpj0Q3hgKeQLjhU0Zcd4NAEFjvR2PgYiaFuH4=
+X-Received: by 2002:a05:622a:2288:b0:494:b833:aa42 with SMTP id
+ d75a77b69052e-4a45815ef5cmr4822181cf.5.1748857421902; Mon, 02 Jun 2025
+ 02:43:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 02 Jun 2025 11:24:34 +0200
-Message-Id: <DABXT5G4XDH2.36Y0Z944ORJCQ@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <linux-s390@vger.kernel.org>,
-        "Christian Borntraeger"
- <borntraeger@linux.ibm.com>,
-        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        "David Hildenbrand" <david@redhat.com>,
-        "Heiko Carstens"
- <hca@linux.ibm.com>,
-        "Vasily Gorbik" <gor@linux.ibm.com>,
-        "Alexander
- Gordeev" <agordeev@linux.ibm.com>,
-        "Sven Schnelle" <svens@linux.ibm.com>,
-        "Thomas Huth" <thuth@redhat.com>
-To: "Janosch Frank" <frankja@linux.ibm.com>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v3 2/3] KVM: s390: Always allocate esca_block
-X-Mailer: aerc 0.20.1
-References: <20250522-rm-bsca-v3-0-51d169738fcf@linux.ibm.com>
- <20250522-rm-bsca-v3-2-51d169738fcf@linux.ibm.com>
- <609a3511-4dae-47b8-a6a6-45b8f3b989a8@linux.ibm.com>
-In-Reply-To: <609a3511-4dae-47b8-a6a6-45b8f3b989a8@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjAyMDA3NyBTYWx0ZWRfX5ia+JkJgjIL7 8hj6MaeBIWa3vrj12eMjyhkmyUBK6RyUoDQJEMW0NGnu85VADAEsNSL4bNTCkdzZrEKNM8fg7n3 KjDqOq2M+PFqcf4ZjQZbNrU+QOGYINj+VRtpTovWYxnZ+X2UlzyX0FTuJMVxXz0wbqW9/2+dAoS
- n3ohxcVJ7RzYGx6cQ56gAdEr/YezP5gJArBX7cz1ARhcxl9n73qQBlE2E7BFJiuAQfyRzAKu9zH U30okLMrPJC5Vdk9oochLTdYTR+uVOulCJ80o2oBwNAGGCIvULiiP+LbnvAPKtRTAtGOyZhiwMw lwfteG/PH+XIBSlCtgOSaHfCcaRcZguOoSwMhp+2okBp5jvWHdNSHnSy6GX9X/2M8vKG/vHSpyk
- pxYcN8qMzwYUYg4Jq1PoY7XgEzGAu8JZSUYUaaWt7HVGJS78FmWUc4V5mkZzwJs9R/gybKY0
-X-Proofpoint-ORIG-GUID: c9Uit-S1SVv8_MvAw67rZ3O8-MUKgkH4
-X-Proofpoint-GUID: c9Uit-S1SVv8_MvAw67rZ3O8-MUKgkH4
-X-Authority-Analysis: v=2.4 cv=V4l90fni c=1 sm=1 tr=0 ts=683d6ddd cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=L1-7jygj_eJouCaRcvEA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-02_03,2025-05-30_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- adultscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0 clxscore=1015
- suspectscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999
- priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505160000
- definitions=main-2506020077
+MIME-Version: 1.0
+References: <cover.1747264138.git.ackerleytng@google.com> <b784326e9ccae6a08388f1bf39db70a2204bdc51.1747264138.git.ackerleytng@google.com>
+ <aDU3eL7qQYrXkE3T@yzhao56-desk.sh.intel.com> <CA+EHjTxgO4LmdYY83a+uzBshvFf8EcJzY58Rovvz=pZgyO2yow@mail.gmail.com>
+ <diqzzfeu54rf.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzzfeu54rf.fsf@ackerleytng-ctop.c.googlers.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 2 Jun 2025 10:43:05 +0100
+X-Gm-Features: AX0GCFs1Ed5_8o-cI-u2zHzfuVBCp-xOIalJ6ir71J27GefrvJtgoWToLCCKlFs
+Message-ID: <CA+EHjTyv9KsRsbf6ec9u5mLjBbcnNti9k8hPi9Do59Mw7ayYqw@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 02/51] KVM: guest_memfd: Introduce and use
+ shareability to guard faulting
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
+	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
+	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
+	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, thomas.lendacky@amd.com, 
+	usama.arif@bytedance.com, vannapurve@google.com, vbabka@suse.cz, 
+	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
+	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com, 
+	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon May 26, 2025 at 12:36 PM CEST, Janosch Frank wrote:
-> On 5/22/25 11:31 AM, Christoph Schlameuss wrote:
->> Instead of allocating a BSCA and upgrading it for PV or when adding the
->> 65th cpu we can always use the ESCA.
->>=20
->> The only downside of the change is that we will always allocate 4 pages
->> for a 248 cpu ESCA instead of a single page for the BSCA per VM.
->> In return we can delete a bunch of checks and special handling depending
->> on the SCA type as well as the whole BSCA to ESCA conversion.
->>=20
->> As a fallback we can still run without SCA entries when the SIGP
->> interpretation facility or ESCA are not available.
->>=20
->> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/kvm_host.h |   1 -
->>   arch/s390/kvm/interrupt.c        |  71 +++++------------
->>   arch/s390/kvm/kvm-s390.c         | 161 ++++++-------------------------=
---------
->>   arch/s390/kvm/kvm-s390.h         |   4 +-
->>   4 files changed, 45 insertions(+), 192 deletions(-)
->>=20
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kv=
-m_host.h
->> index f51bac835260f562eaf4bbfd373a24bfdbc43834..d03e354a63d9c931522c1a16=
-07eba8685c24527f 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -631,7 +631,6 @@ struct kvm_s390_pv {
->>  =20
->
-> [...]
->
->>   int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->>   {
->> -	gfp_t alloc_flags =3D GFP_KERNEL_ACCOUNT;
->> -	int i, rc;
->> +	gfp_t alloc_flags =3D GFP_KERNEL_ACCOUNT | __GFP_ZERO;
->>   	char debug_name[16];
->> -	static unsigned long sca_offset;
->> +	int i, rc;
->>  =20
->>   	rc =3D -EINVAL;
->>   #ifdef CONFIG_KVM_S390_UCONTROL
->> @@ -3358,17 +3341,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned l=
-ong type)
->>   	if (!sclp.has_64bscao)
->>   		alloc_flags |=3D GFP_DMA;
->>   	rwlock_init(&kvm->arch.sca_lock);
->> -	/* start with basic SCA */
->> -	kvm->arch.sca =3D (struct bsca_block *) get_zeroed_page(alloc_flags);
->> -	if (!kvm->arch.sca)
->> -		goto out_err;
->>   	mutex_lock(&kvm_lock);
->> -	sca_offset +=3D 16;
->> -	if (sca_offset + sizeof(struct bsca_block) > PAGE_SIZE)
->> -		sca_offset =3D 0;
->> -	kvm->arch.sca =3D (struct bsca_block *)
->> -			((char *) kvm->arch.sca + sca_offset);
->> +
->> +	kvm->arch.sca =3D alloc_pages_exact(sizeof(*kvm->arch.sca), alloc_flag=
-s);
->
-> kvm->arch.sca is (void *) at the point of this patch, which makes this a=
-=20
-> very bad idea. Granted, you fix that up in the next patch but this is=20
-> still wrong.
->
-> Any reason why you have patch #3 at all?
-> We could just squash it and avoid this problem?
->
+Hi Ackerley,
 
-Yes, I can just roll that up into a single patch. Just thought it would be =
-a bit
-easier to review this way.
-
->>   	mutex_unlock(&kvm_lock);
->> +	if (!kvm->arch.sca)
->> +		goto out_err;
->>  =20
->>   	sprintf(debug_name, "kvm-%u", current->pid);
->>  =20
+On Fri, 30 May 2025 at 19:32, Ackerley Tng <ackerleytng@google.com> wrote:
 >
-> [...]
+> Fuad Tabba <tabba@google.com> writes:
 >
->>   /* needs disabled preemption to protect from TOD sync and vcpu_load/pu=
-t */
->> @@ -3919,7 +3808,7 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vc=
-pu)
->>   		vcpu->arch.sie_block->eca |=3D ECA_IB;
->>   	if (sclp.has_siif)
->>   		vcpu->arch.sie_block->eca |=3D ECA_SII;
->> -	if (sclp.has_sigpif)
->> +	if (kvm_s390_use_sca_entries())
->>   		vcpu->arch.sie_block->eca |=3D ECA_SIGPI;
->>   	if (test_kvm_facility(vcpu->kvm, 129)) {
->>   		vcpu->arch.sie_block->eca |=3D ECA_VX;
->> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
->> index 8d3bbb2dd8d27802bbde2a7bd1378033ad614b8e..2c8e177e4af8f2dab07fd42a=
-904cefdea80f6855 100644
->> --- a/arch/s390/kvm/kvm-s390.h
->> +++ b/arch/s390/kvm/kvm-s390.h
->> @@ -531,7 +531,7 @@ int kvm_s390_handle_per_event(struct kvm_vcpu *vcpu)=
-;
->>   /* support for Basic/Extended SCA handling */
->>   static inline union ipte_control *kvm_s390_get_ipte_control(struct kvm=
- *kvm)
->>   {
->> -	struct bsca_block *sca =3D kvm->arch.sca; /* SCA version doesn't matte=
-r */
->> +	struct esca_block *sca =3D kvm->arch.sca; /* SCA version doesn't matte=
-r */
+> > Hi,
+> >
+> > .. snip..
+> >
+> >> I noticed that in [1], the kvm_gmem_mmap() does not check the range.
+> >> So, the WARN() here can be hit when userspace mmap() an area larger than the
+> >> inode size and accesses the out of band HVA.
+> >>
+> >> Maybe limit the mmap() range?
+> >>
+> >> @@ -1609,6 +1620,10 @@ static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+> >>         if (!kvm_gmem_supports_shared(file_inode(file)))
+> >>                 return -ENODEV;
+> >>
+> >> +       if (vma->vm_end - vma->vm_start + (vma->vm_pgoff << PAGE_SHIFT) > i_size_read(file_inode(file)))
+> >> +               return -EINVAL;
+> >> +
+> >>         if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
+> >>             (VM_SHARED | VM_MAYSHARE)) {
+> >>                 return -EINVAL;
+> >>
+> >> [1] https://lore.kernel.org/all/20250513163438.3942405-8-tabba@google.com/
+> >
+> > I don't think we want to do that for a couple of reasons. We catch
+> > such invalid accesses on faulting, and, by analogy, afaikt, neither
+> > secretmem nor memfd perform a similar check on mmap (nor do
+> > memory-mapped files in general).
+> >
+> > There are also valid reasons why a user would want to deliberately
+> > mmap more memory than the backing store, knowing that it's only going
+> > to fault what it's going to use, e.g., alignment.
+> >
 >
-> Remove the comment as well please
+> This is a good point.
 >
+> I think there's no check against the inode size on faulting now though?
+> v10's [1] kvm_gmem_fault_shared() calls kvm_gmem_get_folio()
+> straightaway.
+>
+> We should add a check like [2] to kvm_gmem_fault_shared().
 
-That's also fully removed in patch 3 along with he whole method.
+Yes! I mistakenly thought that kvm_gmem_get_folio() had such a check,
+I just verified that it doesn't. I have added the check, as well as a
+new selftest to make sure we don't miss it in the future.
 
->>  =20
->>   	return &sca->ipte_control;
->>   }
->> @@ -542,7 +542,7 @@ static inline int kvm_s390_use_sca_entries(void)
->>   	 * might use the entries. By not setting the entries and keeping them
->>   	 * invalid, hardware will not access them but intercept.
->>   	 */
->> -	return sclp.has_sigpif;
->> +	return sclp.has_sigpif && sclp.has_esca;
->>   }
->>   void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
->>   				     struct mcck_volatile_info *mcck_info);
->>=20
+Thanks!
+/fuad
 
+> [1] https://lore.kernel.org/all/20250513163438.3942405-8-tabba@google.com/
+> [2] https://github.com/torvalds/linux/blob/8477ab143069c6b05d6da4a8184ded8b969240f5/mm/filemap.c#L3373
+>
+> > Cheers,
+> > /fuad
+> >
+> >
+> >> > +     return xa_to_value(entry);
+> >> > +}
+> >> > +
+> >> > +static struct folio *kvm_gmem_get_shared_folio(struct inode *inode, pgoff_t index)
+> >> > +{
+> >> > +     if (kvm_gmem_shareability_get(inode, index) != SHAREABILITY_ALL)
+> >> > +             return ERR_PTR(-EACCES);
+> >> > +
+> >> > +     return kvm_gmem_get_folio(inode, index);
+> >> > +}
+> >> > +
+> >> > +#else
+> >> > +
+> >> > +static int kvm_gmem_shareability_setup(struct maple_tree *mt, loff_t size, u64 flags)
+> >> > +{
+> >> > +     return 0;
+> >> > +}
+> >> > +
+> >> > +static inline struct folio *kvm_gmem_get_shared_folio(struct inode *inode, pgoff_t index)
+> >> > +{
+> >> > +     WARN_ONCE("Unexpected call to get shared folio.")
+> >> > +     return NULL;
+> >> > +}
+> >> > +
+> >> > +#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+> >> > +
+> >> >  static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+> >> >                                   pgoff_t index, struct folio *folio)
+> >> >  {
+> >> > @@ -333,7 +404,7 @@ static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+> >> >
+> >> >       filemap_invalidate_lock_shared(inode->i_mapping);
+> >> >
+> >> > -     folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> >> > +     folio = kvm_gmem_get_shared_folio(inode, vmf->pgoff);
+> >> >       if (IS_ERR(folio)) {
+> >> >               int err = PTR_ERR(folio);
+> >> >
+> >> > @@ -420,8 +491,33 @@ static struct file_operations kvm_gmem_fops = {
+> >> >       .fallocate      = kvm_gmem_fallocate,
+> >> >  };
+> >> >
+> >> > +static void kvm_gmem_free_inode(struct inode *inode)
+> >> > +{
+> >> > +     struct kvm_gmem_inode_private *private = kvm_gmem_private(inode);
+> >> > +
+> >> > +     kfree(private);
+> >> > +
+> >> > +     free_inode_nonrcu(inode);
+> >> > +}
+> >> > +
+> >> > +static void kvm_gmem_destroy_inode(struct inode *inode)
+> >> > +{
+> >> > +     struct kvm_gmem_inode_private *private = kvm_gmem_private(inode);
+> >> > +
+> >> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> >> > +     /*
+> >> > +      * mtree_destroy() can't be used within rcu callback, hence can't be
+> >> > +      * done in ->free_inode().
+> >> > +      */
+> >> > +     if (private)
+> >> > +             mtree_destroy(&private->shareability);
+> >> > +#endif
+> >> > +}
+> >> > +
+> >> >  static const struct super_operations kvm_gmem_super_operations = {
+> >> >       .statfs         = simple_statfs,
+> >> > +     .destroy_inode  = kvm_gmem_destroy_inode,
+> >> > +     .free_inode     = kvm_gmem_free_inode,
+> >> >  };
+> >> >
+> >> >  static int kvm_gmem_init_fs_context(struct fs_context *fc)
+> >> > @@ -549,12 +645,26 @@ static const struct inode_operations kvm_gmem_iops = {
+> >> >  static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+> >> >                                                     loff_t size, u64 flags)
+> >> >  {
+> >> > +     struct kvm_gmem_inode_private *private;
+> >> >       struct inode *inode;
+> >> > +     int err;
+> >> >
+> >> >       inode = alloc_anon_secure_inode(kvm_gmem_mnt->mnt_sb, name);
+> >> >       if (IS_ERR(inode))
+> >> >               return inode;
+> >> >
+> >> > +     err = -ENOMEM;
+> >> > +     private = kzalloc(sizeof(*private), GFP_KERNEL);
+> >> > +     if (!private)
+> >> > +             goto out;
+> >> > +
+> >> > +     mt_init(&private->shareability);
+> >> Wrap the mt_init() inside "#ifdef CONFIG_KVM_GMEM_SHARED_MEM" ?
+> >>
+> >> > +     inode->i_mapping->i_private_data = private;
+> >> > +
+> >> > +     err = kvm_gmem_shareability_setup(private, size, flags);
+> >> > +     if (err)
+> >> > +             goto out;
+> >> > +
+> >> >       inode->i_private = (void *)(unsigned long)flags;
+> >> >       inode->i_op = &kvm_gmem_iops;
+> >> >       inode->i_mapping->a_ops = &kvm_gmem_aops;
+> >> > @@ -566,6 +676,11 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+> >> >       WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+> >> >
+> >> >       return inode;
+> >> > +
+> >> > +out:
+> >> > +     iput(inode);
+> >> > +
+> >> > +     return ERR_PTR(err);
+> >> >  }
+> >> >
+> >> >  static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
+> >> > @@ -654,6 +769,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+> >> >       if (kvm_arch_vm_supports_gmem_shared_mem(kvm))
+> >> >               valid_flags |= GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> >> >
+> >> > +     if (flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED)
+> >> > +             valid_flags |= GUEST_MEMFD_FLAG_INIT_PRIVATE;
+> >> > +
+> >> >       if (flags & ~valid_flags)
+> >> >               return -EINVAL;
+> >> >
+> >> > @@ -842,6 +960,8 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+> >> >       if (!file)
+> >> >               return -EFAULT;
+> >> >
+> >> > +     filemap_invalidate_lock_shared(file_inode(file)->i_mapping);
+> >> > +
+> >> >       folio = __kvm_gmem_get_pfn(file, slot, index, pfn, &is_prepared, max_order);
+> >> >       if (IS_ERR(folio)) {
+> >> >               r = PTR_ERR(folio);
+> >> > @@ -857,8 +977,8 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+> >> >               *page = folio_file_page(folio, index);
+> >> >       else
+> >> >               folio_put(folio);
+> >> > -
+> >> >  out:
+> >> > +     filemap_invalidate_unlock_shared(file_inode(file)->i_mapping);
+> >> >       fput(file);
+> >> >       return r;
+> >> >  }
+> >> > --
+> >> > 2.49.0.1045.g170613ef41-goog
+> >> >
+> >> >
 
