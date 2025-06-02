@@ -1,78 +1,81 @@
-Return-Path: <kvm+bounces-48187-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48188-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32DB6ACBB6E
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 21:19:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87006ACBB68
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 21:18:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C806A1700FB
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 19:18:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAF9B7AA267
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 19:17:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4667226CF0;
-	Mon,  2 Jun 2025 19:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B2F22A4E4;
+	Mon,  2 Jun 2025 19:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kQHtEaU0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aFlY5ySW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7892A22301
-	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 19:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56449227E95
+	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 19:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748891889; cv=none; b=M5wiWlSv+YxI1nCkB5h0OJZm7sJoQDe8gEnc9v1FMtCBLIZcz79vjrwsyVfIb2iAbfwhkESHHrnO3Tl7emefHGsMgghVIm69v8FJFiw+vPYVjz3KFDGaEm8TTqd1kWd5gacTDN8TA2PfKJPVKu3iRm+6ZzBh2bEFs3v8HZS0AjQ=
+	t=1748891892; cv=none; b=qovYEp61W3KIAz+SPoC7My1ivCbVerfIDF+S/gBpIkBKh8gm23nvc31AMcBq1v8+mOxQuaEN17Tsf/CNnaz6cMH6e/Rn97BGH/yhjJlOO9Gl1LshfhX2O1Kn9XFV5EoEolPnlyAq0DyN6Q5Lm8PVqA1n74bUXA+OyFU/9LWz0lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748891889; c=relaxed/simple;
-	bh=12/Gd93aaTA83c1HNtC1zFmn672vDmey9gAStWrKOoY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XGRQXKIX2tWec7g//CGEVCwwvuNqBHfxor5ghSUn4TIUMX+YldZSFotOdOPJqrTAOHXVu3eSVXxipCmISJtfwqG85Ug3cRbuGRpRrI4iiHaeRKuuiZAVxV5riki1bvg4SgMsbn30LFH1RDzFZHWa1mAqdD7eBUK1BJZbLNMHMWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kQHtEaU0; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1748891892; c=relaxed/simple;
+	bh=Kk4G9OjSA5hI8BLupzEnDWGdQPbbgM19H/mBxXD+AwQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=IwruOIFZLUYrYfq+h2Jgb8lqXXmBwS0e/0rj6gDcNSTQ+q/CbF5RLwUmvm/yVNhLzLPHCCo69W64cr/a6uJC+AY0hVsWgJZNk2Fq6zzFIIMxDEu4hxzTVyfmAfGdbH/ACKqSphTDq8b6ToObZIEDhxEnwTIyheT2Xql8/GBjZfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aFlY5ySW; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2c00e965d0so3132524a12.2
-        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 12:18:08 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-742c03c0272so5714866b3a.1
+        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 12:18:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748891888; x=1749496688; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FJKFQqx9UM1AGUF2AcszFEpAtqC30YGJfsyhTo68y9A=;
-        b=kQHtEaU02gUFZI7kQZpS2D4kUyFrmcfBxzys+8Du5J/cOVsN9JbvM6p3Y+tHjZacBW
-         YJTwQ/VXzCZTzBK05Xanvcuz0eG2SeC8P77/9969rEkp5HXW5JwUmm1HI2QwUJE04Eh1
-         ZyQaFjjGNbTj65r9uMh7Hxk7UwEbnYZFF1Xz36ALRwVtyrdWRqLxCvPRc+/TGNhwMcYA
-         05l0Ix9xgbkIgYnuBOwuI0kU/0Jb4v192ZbCrXOjwodVXVUW6tjaZwY8UuEQyGlc/EdJ
-         y5z6NGJHzvjwSIJyaH5+yrdX8QgaVyDWNlwKMqoJXDOlBlUhrqWMzo23sRP2Xag5eWGp
-         k58A==
+        d=google.com; s=20230601; t=1748891889; x=1749496689; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gC27xGN+OZxYxd8x3HPELSRtz95EF1fMjoET+WlkV5U=;
+        b=aFlY5ySWQyoPc1s+gut3HKnEuw19gZOGXVjHcUk4OtxVfu5h2RXuh99Ya/653K2xwS
+         283iF8bBznmq/1nG3BbT6JDnJaHkHKqWB7Dbd4NusV5hPo2ZhsiTzjegg9HwN0KE9AkZ
+         KVOUznD0Sh+0PsMNjbjG+XC9J0fQN6S7L203WTYXBr0caJH05ZohV3Hxf0ptPH6pidtO
+         /2CNTSIUGYwv3jqHvY7D5xhOif/tuSsWWdYlPnf8FCcIftZJRcI6gW8Q+6BaRr++eDqV
+         W7aaZ2SL3qo32lgZr5jgujxGKvCeu4+JUzhR/QhyR1Jhv1gbHa6dRW0bFqlG+lVglRNL
+         akcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748891888; x=1749496688;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FJKFQqx9UM1AGUF2AcszFEpAtqC30YGJfsyhTo68y9A=;
-        b=c2D0Q9VuVMVX3V2o50jfRk8biYEX5u9gHFQvJDIHnLd8oxMi7ms8KzJiZeDkKj7wnT
-         cSTtuWtVENLQQKG0Ws0zCJ5+IPi2rovhKWXzSefEf0IxWO+6Kr6JogbSXRYaEoQGrTRt
-         jXNf7ORz3Ps8YUjol4n++7/oDOvjOgOZRu/yTvYQy81BIrW28zB6ajVOls/WQNI+iTZi
-         Qi3UfHlNPu9sLIHbzO4qugbyxce15j57eMMgDwKQAilMs32WEdQRC5FZ3pUngxgSoUwE
-         av0mSB0Ldg3mAAY2JfQapnaSzCnhbyU3kM417xj3iEUX4O4t5WlKcrMU2W0wqWhWT0Er
-         cpBg==
-X-Gm-Message-State: AOJu0YyCNIywchURDfbsK8q7RzxX5ciOdGz6nEJID3Kvg5F6tsgu7Ymi
-	Hkh4PSfK8I0bXBwddvL1f0jMyRTfzdSkeucSXxQURQYN8boztfHY9yHVtI3SBgxhBO7vXKqA+6K
-	13ikOnuPp7DrofbZCpcD5O+UzZDBEXz2crCMG3iAL9qyAVpnoveL+telnZTY2Wru6IDJd4BBCaU
-	LoiFzjTIV8JoRPm6mXOI+//VaacLnLzsR5gei8kTvcY/SQmmjSBPfCmMh8rZQ=
-X-Google-Smtp-Source: AGHT+IGq+MKdUzduCIrTwDf5QIgX09YLMJA7ZELTYRvBBkbWv4Z283ky9bfc20mR5vbgJYZFPZLaDF55ZVFFrEdiWw==
-X-Received: from pgbfe22.prod.google.com ([2002:a05:6a02:2896:b0:b2e:c47e:345a])
+        d=1e100.net; s=20230601; t=1748891889; x=1749496689;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gC27xGN+OZxYxd8x3HPELSRtz95EF1fMjoET+WlkV5U=;
+        b=G1UU6vxLoZRgqoSr9HVpckJfzxNsPw8KwdwGQKTICOHxbRjDPU8JBRhJV7hmDTeskO
+         2wV0RVoSy4iGf8Gfyv+MOYyQ2aRVoc9lp73nRNqIDaaiLKU0uWjFt59zAH/BJIVEQWLZ
+         74ntWD96OsyqmHprYrim8ZefmsNkzV5qA6jDGbJkNbJshXNMZaU/dAx4ysPyqVae/Qsh
+         MsciTiTYsyxDVsGIxs0H80EA2st3WpxZ0Jx1ycOtOo8MByi8TwGT7y6VjI2TvZeJLRSL
+         +D/DQAIE3mjbayCsj9Jr5vd8wyrVoKzswN2vT0ieenA+eRbf6KMa+9vyBf4FTcIA3Q2g
+         LjXQ==
+X-Gm-Message-State: AOJu0YybdTRD8xOxDWXdOvQAW4mZY2QsPfPAGK2zRbx30M6uv1wQmD5F
+	TBWrSyU9nt0ZKb18hBfK0CKggqAThNWE5ySks0DKvzZbRbaOb9rRVykLFgDrKdu4ZrFNQ2oukzj
+	L8ais40R+OO/tKh2llTHbcJJve+KGZE+8AtTuuTtlN5xdc91Yjv/8+yYus0vgFSOuQIgyKPNwTu
+	03vNs7I1OskB6X8Bm2iTLeUTO7whYji5Gn91VxYD327WBImZjUJv8+QDrr8OA=
+X-Google-Smtp-Source: AGHT+IEZUo9EMXuhRCwoaNc5hwobX/60MfpH4lGs/P6VHbaKIkRHWpm212b2a7KnBe+VwVfAYZRtTQUZPJL+sgEDqQ==
+X-Received: from pfblu7.prod.google.com ([2002:a05:6a00:7487:b0:747:a97f:513f])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:7484:b0:218:5954:1293 with SMTP id adf61e73a8af0-21ad97f95b5mr27557841637.34.1748891887220;
- Mon, 02 Jun 2025 12:18:07 -0700 (PDT)
-Date: Mon,  2 Jun 2025 12:17:53 -0700
+ 2002:a05:6a00:3cc5:b0:740:595a:f9bf with SMTP id d2e1a72fcca58-747bd9510fbmr21737179b3a.3.1748891888859;
+ Mon, 02 Jun 2025 12:18:08 -0700 (PDT)
+Date: Mon,  2 Jun 2025 12:17:54 -0700
+In-Reply-To: <cover.1748890962.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <cover.1748890962.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <cover.1748890962.git.ackerleytng@google.com>
-Subject: [PATCH 0/2] Use guest mem inodes instead of anonymous inodes
+Message-ID: <c03fbe18c3ae90fb3fa7c71dc0ee164e6cc12103.1748890962.git.ackerleytng@google.com>
+Subject: [PATCH 1/2] fs: Provide function that allocates a secure anonymous inode
 From: Ackerley Tng <ackerleytng@google.com>
 To: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
 	x86@kernel.org, linux-fsdevel@vger.kernel.org
@@ -108,38 +111,109 @@ Cc: ackerleytng@google.com, aik@amd.com, ajones@ventanamicro.com,
 	zhiquan1.li@intel.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+The new function, alloc_anon_secure_inode(), returns an inode after
+running checks in security_inode_init_security_anon().
 
-This small patch series makes guest_memfd use guest mem inodes instead
-of anonymous inodes and also includes some refactoring to expose a new
-function that allocates an inode and runs security checks.
+Also refactor secretmem's file creation process to use the new
+function.
 
-This patch series will serve as a common base for some in-flight series:
+Suggested-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+---
+ fs/anon_inodes.c   | 22 ++++++++++++++++------
+ include/linux/fs.h |  1 +
+ mm/secretmem.c     |  9 +--------
+ 3 files changed, 18 insertions(+), 14 deletions(-)
 
-* Add NUMA mempolicy support for KVM guest-memfd [1]
-* New KVM ioctl to link a gmem inode to a new gmem file [2]
-* Restricted mapping of guest_memfd at the host and arm64 support [3]
-  aka shared/private conversion support for guest_memfd
+diff --git a/fs/anon_inodes.c b/fs/anon_inodes.c
+index 583ac81669c2..4c3110378647 100644
+--- a/fs/anon_inodes.c
++++ b/fs/anon_inodes.c
+@@ -55,17 +55,20 @@ static struct file_system_type anon_inode_fs_type = {
+ 	.kill_sb	= kill_anon_super,
+ };
 
-[1] https://lore.kernel.org/all/20250408112402.181574-1-shivankg@amd.com/
-[2] https://lore.kernel.org/lkml/cover.1747368092.git.afranji@google.com/
-[3] https://lore.kernel.org/all/20250328153133.3504118-1-tabba@google.com/
+-static struct inode *anon_inode_make_secure_inode(
+-	const char *name,
+-	const struct inode *context_inode)
++static struct inode *anon_inode_make_secure_inode(struct super_block *s,
++		const char *name, const struct inode *context_inode,
++		bool fs_internal)
+ {
+ 	struct inode *inode;
+ 	int error;
 
-Ackerley Tng (2):
-  fs: Provide function that allocates a secure anonymous inode
-  KVM: guest_memfd: Use guest mem inodes instead of anonymous inodes
+-	inode = alloc_anon_inode(anon_inode_mnt->mnt_sb);
++	inode = alloc_anon_inode(s);
+ 	if (IS_ERR(inode))
+ 		return inode;
+-	inode->i_flags &= ~S_PRIVATE;
++
++	if (!fs_internal)
++		inode->i_flags &= ~S_PRIVATE;
++
+ 	error =	security_inode_init_security_anon(inode, &QSTR(name),
+ 						  context_inode);
+ 	if (error) {
+@@ -75,6 +78,12 @@ static struct inode *anon_inode_make_secure_inode(
+ 	return inode;
+ }
 
- fs/anon_inodes.c           |  22 ++++--
- include/linux/fs.h         |   1 +
- include/uapi/linux/magic.h |   1 +
- mm/secretmem.c             |   9 +--
- virt/kvm/guest_memfd.c     | 134 +++++++++++++++++++++++++++++++------
- virt/kvm/kvm_main.c        |   7 +-
- virt/kvm/kvm_mm.h          |   9 ++-
- 7 files changed, 143 insertions(+), 40 deletions(-)
++struct inode *alloc_anon_secure_inode(struct super_block *s, const char *name)
++{
++	return anon_inode_make_secure_inode(s, name, NULL, true);
++}
++EXPORT_SYMBOL_GPL(alloc_anon_secure_inode);
++
+ static struct file *__anon_inode_getfile(const char *name,
+ 					 const struct file_operations *fops,
+ 					 void *priv, int flags,
+@@ -88,7 +97,8 @@ static struct file *__anon_inode_getfile(const char *name,
+ 		return ERR_PTR(-ENOENT);
 
+ 	if (make_inode) {
+-		inode =	anon_inode_make_secure_inode(name, context_inode);
++		inode = anon_inode_make_secure_inode(anon_inode_mnt->mnt_sb,
++						     name, context_inode, false);
+ 		if (IS_ERR(inode)) {
+ 			file = ERR_CAST(inode);
+ 			goto err;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 016b0fe1536e..0fded2e3c661 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -3550,6 +3550,7 @@ extern int simple_write_begin(struct file *file, struct address_space *mapping,
+ extern const struct address_space_operations ram_aops;
+ extern int always_delete_dentry(const struct dentry *);
+ extern struct inode *alloc_anon_inode(struct super_block *);
++extern struct inode *alloc_anon_secure_inode(struct super_block *, const char *);
+ extern int simple_nosetlease(struct file *, int, struct file_lease **, void **);
+ extern const struct dentry_operations simple_dentry_operations;
 
-base-commit: a5806cd506af5a7c19bcd596e4708b5c464bfd21
+diff --git a/mm/secretmem.c b/mm/secretmem.c
+index 1b0a214ee558..c0e459e58cb6 100644
+--- a/mm/secretmem.c
++++ b/mm/secretmem.c
+@@ -195,18 +195,11 @@ static struct file *secretmem_file_create(unsigned long flags)
+ 	struct file *file;
+ 	struct inode *inode;
+ 	const char *anon_name = "[secretmem]";
+-	int err;
+
+-	inode = alloc_anon_inode(secretmem_mnt->mnt_sb);
++	inode = alloc_anon_secure_inode(secretmem_mnt->mnt_sb, anon_name);
+ 	if (IS_ERR(inode))
+ 		return ERR_CAST(inode);
+
+-	err = security_inode_init_security_anon(inode, &QSTR(anon_name), NULL);
+-	if (err) {
+-		file = ERR_PTR(err);
+-		goto err_free_inode;
+-	}
+-
+ 	file = alloc_file_pseudo(inode, secretmem_mnt, "secretmem",
+ 				 O_RDWR, &secretmem_fops);
+ 	if (IS_ERR(file))
 --
 2.49.0.1204.g71687c7c1d-goog
 
