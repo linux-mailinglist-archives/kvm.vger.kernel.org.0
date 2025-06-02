@@ -1,399 +1,240 @@
-Return-Path: <kvm+bounces-48189-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48190-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2115BACBB6C
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 21:19:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AE94ACBB87
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 21:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DE9318913B9
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 19:19:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D666116F0C1
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 19:29:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3860822AE5D;
-	Mon,  2 Jun 2025 19:18:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C563227574;
+	Mon,  2 Jun 2025 19:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g7EMk3qK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XDrZYzTf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA4F228CA9
-	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 19:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3567B1991CF
+	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 19:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748891896; cv=none; b=WNI//E0nrV68uZCEV1If3IqhHG0SnwVjJIXR3XU+sKov5thyG37L8/iRXXwMMDypqnxkiipM7vCCa8dd2TcYNhf9bOVdPG8U2ecyqlchEs1m5ppEWztF3j/MBuWdqiR3O/nBHYaTRXiTuAej/6Q2MEEoP3I5C5EO3qff+f7LE1Q=
+	t=1748892540; cv=none; b=qtrH9y+sYzoGB7T8uWc/MNqZZabWsKpGfGSBZBUWV7aJBeZk6mWuFyBY8MOiG7uGewo7DMkIAIXtYMAdv5loKxGiO472woyD7BQM0GhSruCMIeEHmEzUB18EBWHRd2WGRek0vFPjEqvap3+ekur1LmEocL0cXOJ6oJdP0xzWHYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748891896; c=relaxed/simple;
-	bh=uob5dPHELISa2eBCv6uj+1AuIK4K9rtFBcnduREVRwU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CtlzHw3IDMfA0GC0FyxKYcxh6WuWpYQ0JwmTDf9VK/SCIGBQCLQwdZDRCd+7QhPG9mNs2qtEzUlo8DPTlCrXCzMPs2gXabLA67oQNV1QW7hSJU4EmlxtxO5KOzB269dzuJKDxvvyoUEfnBlepS/QCgdKiDUd5icpzcq1WfIONGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g7EMk3qK; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1748892540; c=relaxed/simple;
+	bh=Bkp+RHmq5Zb8XC8EbWlPhlhfVe8QwDCY3ZtSkb5UPso=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=aRJeMCez69I5zeC/d4R2uuUFAwXRgr3TzKGQ3La3Gc471qlVaZ0nOqahA+eDQSQfEqfKNRI5k3rbYAsCCkjt8mqkppUh+EHTWpu1JX3K/Jpe8xiAgYkA5xbnxY303d6xP5WN6qusXqOTQLEtozET2EJa5VdmPHuiDAPR7XQ12LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XDrZYzTf; arc=none smtp.client-ip=209.85.166.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b26e38174e5so4916942a12.1
-        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 12:18:11 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3ddb4a7b36dso11239935ab.2
+        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 12:28:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748891891; x=1749496691; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZnfgUZmf8OAS/bgXEs2qdTQcvNpZfKjnQrP7dUxeEks=;
-        b=g7EMk3qKhaEO50Eaa9FrbVLhlRbm0CQpGUcBFr1mNehJwPcHfAQCO3bSPtEpz39ASR
-         fgXG85714VPTeQLEc5rYtS1EAF+m/YrYDnjn4FWV11447a8guLj6fQ/KBb4AMo9z9k2f
-         TdlYy/T1whfezGh5bJjSVvoOkM9DYzCfYrQV9PmNxUYHSvuns49mzD63JPmO3d8m/1pL
-         3t3OJR2KK4geOtkgMXD23yXS22YCJ3mKICehk9jivYJ/BQYpakStYHvKRJ2KyfUX9A8D
-         25oljdy7hFI5Tb+P3OqitDB9ELwKc116DgzdjqSVPZ7gfnQROWPj6R5hYJd7DAoFb7Fr
-         p9JA==
+        d=google.com; s=20230601; t=1748892537; x=1749497337; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XDqE8mFNSY/ZirLnr+lInzWb5qO4cUyD2wakE3p29r0=;
+        b=XDrZYzTfUvfcveiV/2SQ3WvdQeceqlug2ytLntPdDuPPTnoTrNaYRh6IRYgh70BxJn
+         G47KoGTrpJjSvRjiOBFHdgUhd2vjt0cbJZdDJLl2bu+2BeTgZ8YXnWeysk8346CeYH5b
+         vQnRmtDS6ZPDIjzZlunD/tSRQ6FugEnoOqSoDAMZ0D62yS4MuRJizK0IrMQZC+FtHBVB
+         ZrDUQcfO+Bh4uU3OfDCioGBfoGIG9eNmFcPFxphi7Ew0KKPrZ80Wm0peBY9chO2hPaWn
+         tngZne7iGzJ6LAR972Ppv7mIhuaiTUcDzRWjoobQYGtPtg3X9UccCbM5g22B86+LIphx
+         iFMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748891891; x=1749496691;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZnfgUZmf8OAS/bgXEs2qdTQcvNpZfKjnQrP7dUxeEks=;
-        b=VgIvnlR6/4a/040MIBww2C41i3KV8+ouL5oJpUywTWOfYXly3quo/LT0vjMZdizluf
-         JIe5sHZ/+2Ev7Ta+9ldYp8ONPwq8k2PWTJub2yaccVrETJ630HhZEJYJi9HrE31V3Wge
-         4E00PAYFjDr/iX3SHpL++fYnnV9KpcoL6xQRk7Fv7Znm0wZLOtWT7gdGvI7UZNnn3AlR
-         TL5OyotCo9SLt1dQvKiB917IDyXluCmaWOwcUZtL+gVpFgYacC7Vkz/0Rh+PSn8/nsLU
-         enX7tumQc8FBMwAxfwOj3P68RWRKW9yjhyz+75HaEWxEfBQtS0WZLVqg2ZObEkG3hUt8
-         4zrQ==
-X-Gm-Message-State: AOJu0Yx+OVXHuLp69m6WjYfbwLWpvkO+lBL9791JIuC6Attf177iB5Uw
-	p48UI++qfFkr0fiKvXu3i0O8GQPI+dSuOwmowckZCgaWq7opHMsivQ/jDZAON8LBfk9VQVryAZ+
-	xvjvyLa4ob2ROsb0cuM23zFWWe0xLgspcl0ddLSI4zhEFLFVwBUlnGaYcu4Zy+Dijt8LFbkG6sq
-	4W6mSHSnx6iSCvWaXjgePM8KF/vO8LTAe2iO1rr+utkwnOvYpuCygRiOg53Jc=
-X-Google-Smtp-Source: AGHT+IH9pb2nOAVzd+tT3ShmCTFFviJ+5ZlU2s7fnOIWaU7dRI+FLtSvZUReomAAqqXsrjcDFUQgssBhev3ROJLBjg==
-X-Received: from pgct17.prod.google.com ([2002:a05:6a02:5291:b0:af9:8f44:d7ec])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:394b:b0:21a:de8e:44a9 with SMTP id adf61e73a8af0-21bad1e8773mr14639083637.37.1748891890493;
- Mon, 02 Jun 2025 12:18:10 -0700 (PDT)
-Date: Mon,  2 Jun 2025 12:17:55 -0700
-In-Reply-To: <cover.1748890962.git.ackerleytng@google.com>
+        d=1e100.net; s=20230601; t=1748892537; x=1749497337;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XDqE8mFNSY/ZirLnr+lInzWb5qO4cUyD2wakE3p29r0=;
+        b=htSwbnICqehH2AZlMCuzwG/bknIrHuLjtM9fLwAuTQXzU3B+VNmwhllpkhBhQ3YUxr
+         4SlTMiGhXPew3rP0XLUUMF+MqSLL+k6pY0MZZ+PuWInMLMwHZuij/C6UJbMxN7Ifzcu/
+         TrvpxGHrsYTre1IsGe4hSObyFEb4XdqgfmvMtp5Rn+raNZeJvja57C9et7Ppo8FFOhIH
+         bKJBaEn0dChc+hoC/zL7Ej+dounSnhjuetF2r579OlD4PjJo95g9uM2ZF6P0mZllKejE
+         WZEQQJ5SojLhMxKuyLHNo7+D/uC+4Cj/m9VFs0P9scBUJqKpk7vQoQjPmekNdqalubj7
+         YV1Q==
+X-Gm-Message-State: AOJu0YzWWtw6FzXZkG9aPu1N94R1ehXortJ41QuhakAYaiDKb5oKb5Dk
+	t9bzdtltlI57op6a82+CSOz167oiG9WjtjaoNLL4MrNRDuks+dLLlKxzsLKCuvafF0zvQqZkRar
+	hwcEIDF2j+nfGo2bWS0iF2b5XtJcZUpP3g1QhUX3MquGfX3adhQ/LARcqx+UOm0CNlj6kwLcBQf
+	n82EluCGdLK1X9aOrPbqPcFlfoS7Ar4bRx/U+LdM80Wn7ta9m5ms4bau9ness=
+X-Google-Smtp-Source: AGHT+IFxeHQ76hpwbia1zMeQqWVTlfaiwmMC2Ena7lOl4cpvV3skj0sAcuon/x4Imo4A5kPFT2TaGxeLGLjA5Bo9DQ==
+X-Received: from ilbby12.prod.google.com ([2002:a05:6e02:260c:b0:3dd:b4dc:eb43])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6e02:194b:b0:3dc:787f:2bc8 with SMTP id e9e14a558f8ab-3dda3363f25mr100622585ab.12.1748892537342;
+ Mon, 02 Jun 2025 12:28:57 -0700 (PDT)
+Date: Mon,  2 Jun 2025 19:26:45 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1748890962.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
-Message-ID: <425cd410403e8913b42552d892add6ca543ec869.1748890962.git.ackerleytng@google.com>
-Subject: [PATCH 2/2] KVM: guest_memfd: Use guest mem inodes instead of
- anonymous inodes
-From: Ackerley Tng <ackerleytng@google.com>
-To: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, linux-fsdevel@vger.kernel.org
-Cc: ackerleytng@google.com, aik@amd.com, ajones@ventanamicro.com, 
-	akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com, 
-	anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com, 
-	binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com, 
-	chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com, 
-	david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk, 
-	erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com, 
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, vannapurve@google.com, vbabka@suse.cz, 
-	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
-	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com, 
-	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
-	zhiquan1.li@intel.com
+Message-ID: <20250602192702.2125115-1-coltonlewis@google.com>
+Subject: [PATCH 00/17] ARM64 PMU Partitioning
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-guest_memfd's inode represents memory the guest_memfd is
-providing. guest_memfd's file represents a struct kvm's view of that
-memory.
+Overview:
 
-Using a custom inode allows customization of the inode teardown
-process via callbacks. For example, ->evict_inode() allows
-customization of the truncation process on file close, and
-->destroy_inode() and ->free_inode() allow customization of the inode
-freeing process.
+This series implements a new PMU scheme on ARM, a partitioned PMU
+that exists alongside the existing emulated PMU and may be enabled by
+the kernel command line kvm.reserved_host_counters or by the vcpu
+ioctl KVM_ARM_PARTITION_PMU. This is a continuation of the RFC posted
+earlier this year. [1]
 
-Customizing the truncation process allows flexibility in management of
-guest_memfd memory and customization of the inode freeing process
-allows proper cleanup of memory metadata stored on the inode.
+The high level overview and reason for the name is that this
+implementation takes advantage of recent CPU features to partition the
+PMU counters into a host-reserved set and a guest-reserved set. Guests
+are allowed untrapped hardware access to the most frequently used PMU
+registers and features for the guest-reserved counters only.
 
-Memory metadata is more appropriately stored on the inode (as opposed
-to the file), since the metadata is for the memory and is not unique
-to a specific binding and struct kvm.
+This untrapped hardware access significantly reduces the overhead of
+using performance monitoring capabilities such as the `perf` tool
+inside a guest VM. Register accesses that aren't trapping to KVM mean
+less time spent in the host kernel and more time on the workloads
+guests care about. This optimization especially shines during high
+`perf` sample rates or large numbers of events that require
+multiplexing hardware counters.
 
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- include/uapi/linux/magic.h |   1 +
- virt/kvm/guest_memfd.c     | 134 +++++++++++++++++++++++++++++++------
- virt/kvm/kvm_main.c        |   7 +-
- virt/kvm/kvm_mm.h          |   9 ++-
- 4 files changed, 125 insertions(+), 26 deletions(-)
+Performance:
 
-diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
-index bb575f3ab45e..638ca21b7a90 100644
---- a/include/uapi/linux/magic.h
-+++ b/include/uapi/linux/magic.h
-@@ -103,5 +103,6 @@
- #define DEVMEM_MAGIC		0x454d444d	/* "DMEM" */
- #define SECRETMEM_MAGIC		0x5345434d	/* "SECM" */
- #define PID_FS_MAGIC		0x50494446	/* "PIDF" */
-+#define GUEST_MEMFD_MAGIC	0x474d454d	/* "GMEM" */
+For example, the following tests were carried out on identical ARM
+machines with 10 general purpose counters with identical guest images
+run on QEMU, the only difference being my PMU implementation or the
+existing one. Some arguments have been simplified here to clarify the
+purpose of the test:
 
- #endif /* __LINUX_MAGIC_H__ */
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index b2aa6bf24d3a..1283b85aeb44 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -1,12 +1,16 @@
- // SPDX-License-Identifier: GPL-2.0
-+#include <linux/anon_inodes.h>
- #include <linux/backing-dev.h>
- #include <linux/falloc.h>
-+#include <linux/fs.h>
- #include <linux/kvm_host.h>
-+#include <linux/pseudo_fs.h>
- #include <linux/pagemap.h>
--#include <linux/anon_inodes.h>
+1) time perf record -e ${FIFTEEN_HW_EVENTS} -F 1000 -- \
+   gzip -c tmpfs/random.64M.img >/dev/null
 
- #include "kvm_mm.h"
+On emulated PMU this command took 4.143s real time with 0.159s system
+time. On partitioned PMU this command took 3.139s real time with
+0.110s system time, runtime reductions of 24.23% and 30.82%.
 
-+static struct vfsmount *kvm_gmem_mnt;
-+
- struct kvm_gmem {
- 	struct kvm *kvm;
- 	struct xarray bindings;
-@@ -318,9 +322,51 @@ static struct file_operations kvm_gmem_fops = {
- 	.fallocate	= kvm_gmem_fallocate,
- };
+2) time perf stat -dd -- \
+   automated_specint2017.sh
 
--void kvm_gmem_init(struct module *module)
-+static const struct super_operations kvm_gmem_super_operations = {
-+	.statfs		= simple_statfs,
-+};
-+
-+static int kvm_gmem_init_fs_context(struct fs_context *fc)
-+{
-+	struct pseudo_fs_context *ctx;
-+
-+	if (!init_pseudo(fc, GUEST_MEMFD_MAGIC))
-+		return -ENOMEM;
-+
-+	ctx = fc->fs_private;
-+	ctx->ops = &kvm_gmem_super_operations;
-+
-+	return 0;
-+}
-+
-+static struct file_system_type kvm_gmem_fs = {
-+	.name		 = "kvm_guest_memory",
-+	.init_fs_context = kvm_gmem_init_fs_context,
-+	.kill_sb	 = kill_anon_super,
-+};
-+
-+static int kvm_gmem_init_mount(void)
-+{
-+	kvm_gmem_mnt = kern_mount(&kvm_gmem_fs);
-+
-+	if (WARN_ON_ONCE(IS_ERR(kvm_gmem_mnt)))
-+		return PTR_ERR(kvm_gmem_mnt);
-+
-+	kvm_gmem_mnt->mnt_flags |= MNT_NOEXEC;
-+	return 0;
-+}
-+
-+int kvm_gmem_init(struct module *module)
- {
- 	kvm_gmem_fops.owner = module;
-+
-+	return kvm_gmem_init_mount();
-+}
-+
-+void kvm_gmem_exit(void)
-+{
-+	kern_unmount(kvm_gmem_mnt);
-+	kvm_gmem_mnt = NULL;
- }
+On emulated PMU this benchmark completed in 3789.16s real time with
+224.45s system time and a final benchmark score of 4.28. On
+partitioned PMU this benchmark completed in 3525.67s real time with
+15.98s system time and a final benchmark score of 4.56. That is a
+6.95% reduction in runtime, 92.88% reduction in system time, and
+6.54% improvement in overall benchmark score.
 
- static int kvm_gmem_migrate_folio(struct address_space *mapping,
-@@ -402,11 +448,71 @@ static const struct inode_operations kvm_gmem_iops = {
- 	.setattr	= kvm_gmem_setattr,
- };
+Seeing these improvements on something as lightweight as perf stat is
+remarkable and implies there would have been a much greater
+improvement with perf record. I did not test that because I was not
+confident it would even finish in a reasonable time on the emulated
+PMU
 
-+static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
-+						      loff_t size, u64 flags)
-+{
-+	struct inode *inode;
-+
-+	inode = alloc_anon_secure_inode(kvm_gmem_mnt->mnt_sb, name);
-+	if (IS_ERR(inode))
-+		return inode;
-+
-+	inode->i_private = (void *)(unsigned long)flags;
-+	inode->i_op = &kvm_gmem_iops;
-+	inode->i_mapping->a_ops = &kvm_gmem_aops;
-+	inode->i_mode |= S_IFREG;
-+	inode->i_size = size;
-+	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-+	mapping_set_inaccessible(inode->i_mapping);
-+	/* Unmovable mappings are supposed to be marked unevictable as well. */
-+	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
-+
-+	return inode;
-+}
-+
-+static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
-+						  u64 flags)
-+{
-+	static const char *name = "[kvm-gmem]";
-+	struct inode *inode;
-+	struct file *file;
-+	int err;
-+
-+	err = -ENOENT;
-+	if (!try_module_get(kvm_gmem_fops.owner))
-+		goto err;
-+
-+	inode = kvm_gmem_inode_make_secure_inode(name, size, flags);
-+	if (IS_ERR(inode)) {
-+		err = PTR_ERR(inode);
-+		goto err_put_module;
-+	}
-+
-+	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR,
-+				 &kvm_gmem_fops);
-+	if (IS_ERR(file)) {
-+		err = PTR_ERR(file);
-+		goto err_put_inode;
-+	}
-+
-+	file->f_flags |= O_LARGEFILE;
-+	file->private_data = priv;
-+
-+out:
-+	return file;
-+
-+err_put_inode:
-+	iput(inode);
-+err_put_module:
-+	module_put(kvm_gmem_fops.owner);
-+err:
-+	file = ERR_PTR(err);
-+	goto out;
-+}
-+
- static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- {
--	const char *anon_name = "[kvm-gmem]";
- 	struct kvm_gmem *gmem;
--	struct inode *inode;
- 	struct file *file;
- 	int fd, err;
+Test 3 was slightly different, I ran the workload in a VM with a
+single VCPU pinned to a physical CPU and analyzed from the host where
+the physical CPU spent its time using mpstat.
 
-@@ -420,32 +526,16 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- 		goto err_fd;
- 	}
+3) perf record -e ${FIFTEEN_HW_EVENTS} -F 4000 -- \
+   stress-ng --cpu 0 --timeout 30
 
--	file = anon_inode_create_getfile(anon_name, &kvm_gmem_fops, gmem,
--					 O_RDWR, NULL);
-+	file = kvm_gmem_inode_create_getfile(gmem, size, flags);
- 	if (IS_ERR(file)) {
- 		err = PTR_ERR(file);
- 		goto err_gmem;
- 	}
+Over a period of 30s the cpu running with the emulated PMU spent
+34.96% of the time in the host kernel and 55.85% of the time in the
+guest. The cpu running the partitioned PMU spent 0.97% of its time in
+the host kernel and 91.06% of its time in the guest.
 
--	file->f_flags |= O_LARGEFILE;
--
--	inode = file->f_inode;
--	WARN_ON(file->f_mapping != inode->i_mapping);
--
--	inode->i_private = (void *)(unsigned long)flags;
--	inode->i_op = &kvm_gmem_iops;
--	inode->i_mapping->a_ops = &kvm_gmem_aops;
--	inode->i_mode |= S_IFREG;
--	inode->i_size = size;
--	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
--	mapping_set_inaccessible(inode->i_mapping);
--	/* Unmovable mappings are supposed to be marked unevictable as well. */
--	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
--
- 	kvm_get_kvm(kvm);
- 	gmem->kvm = kvm;
- 	xa_init(&gmem->bindings);
--	list_add(&gmem->entry, &inode->i_mapping->i_private_list);
-+	list_add(&gmem->entry, &file_inode(file)->i_mapping->i_private_list);
+Taken together, these tests represent a remarkable performance
+improvement for anything perf related using this new PMU
+implementation.
 
- 	fd_install(fd, file);
- 	return fd;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index e85b33a92624..094cc0ad31fb 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -6420,7 +6420,9 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 	if (WARN_ON_ONCE(r))
- 		goto err_vfio;
+Caveats:
 
--	kvm_gmem_init(module);
-+	r = kvm_gmem_init(module);
-+	if (r)
-+		goto err_gmem;
+Because the most consistent and performant thing to do was untrap
+PMCR_EL0, the number of counters visible to the guest via PMCR_EL0.N
+is always equal to the value KVM sets for MDCR_EL2.HPMN. Previously
+allowed writes to PMCR_EL0.N via {GET,SET}_ONE_REG no longer affect
+the guest.
 
- 	r = kvm_init_virtualization();
- 	if (r)
-@@ -6441,6 +6443,8 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- err_register:
- 	kvm_uninit_virtualization();
- err_virt:
-+	kvm_gmem_exit();
-+err_gmem:
- 	kvm_vfio_ops_exit();
- err_vfio:
- 	kvm_async_pf_deinit();
-@@ -6472,6 +6476,7 @@ void kvm_exit(void)
- 	for_each_possible_cpu(cpu)
- 		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
- 	kmem_cache_destroy(kvm_vcpu_cache);
-+	kvm_gmem_exit();
- 	kvm_vfio_ops_exit();
- 	kvm_async_pf_deinit();
- 	kvm_irqfd_exit();
-diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
-index acef3f5c582a..dcacb76b8f00 100644
---- a/virt/kvm/kvm_mm.h
-+++ b/virt/kvm/kvm_mm.h
-@@ -68,17 +68,20 @@ static inline void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
- #endif /* HAVE_KVM_PFNCACHE */
+These improvements come at a cost to 7-35 new registers that must be
+swapped at every vcpu_load and vcpu_put if the feature is enabled. I
+have been informed KVM would like to avoid paying this cost when
+possible.
 
- #ifdef CONFIG_KVM_PRIVATE_MEM
--void kvm_gmem_init(struct module *module);
-+int kvm_gmem_init(struct module *module);
-+void kvm_gmem_exit(void);
- int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args);
- int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
- 		  unsigned int fd, loff_t offset);
- void kvm_gmem_unbind(struct kvm_memory_slot *slot);
- #else
--static inline void kvm_gmem_init(struct module *module)
-+static inline int kvm_gmem_init(struct module *module)
- {
--
-+	return 0;
- }
+One solution is to make the trapping changes and context swapping lazy
+such that the trapping changes and context swapping only take place
+after the guest has actually accessed the PMU so guests that never
+access the PMU never pay the cost.
 
-+static inline void kvm_gmem_exit(void) {};
-+
- static inline int kvm_gmem_bind(struct kvm *kvm,
- 					 struct kvm_memory_slot *slot,
- 					 unsigned int fd, loff_t offset)
+This is not done here because it is not crucial to the primary
+functionality and I thought review would be more productive as soon as
+I had something complete enough for reviewers to easily play with.
+
+However, this or any better ideas are on the table for inclusion in
+future re-rolls.
+
+[1] https://lore.kernel.org/kvmarm/20250213180317.3205285-1-coltonlewis@google.com/
+
+Colton Lewis (16):
+  arm64: cpufeature: Add cpucap for HPMN0
+  arm64: Generate sign macro for sysreg Enums
+  arm64: cpufeature: Add cpucap for PMICNTR
+  KVM: arm64: Reorganize PMU functions
+  KVM: arm64: Introduce method to partition the PMU
+  perf: arm_pmuv3: Generalize counter bitmasks
+  perf: arm_pmuv3: Keep out of guest counter partition
+  KVM: arm64: Set up FGT for Partitioned PMU
+  KVM: arm64: Writethrough trapped PMEVTYPER register
+  KVM: arm64: Use physical PMSELR for PMXEVTYPER if partitioned
+  KVM: arm64: Writethrough trapped PMOVS register
+  KVM: arm64: Context switch Partitioned PMU guest registers
+  perf: pmuv3: Handle IRQs for Partitioned PMU guest counters
+  KVM: arm64: Inject recorded guest interrupts
+  KVM: arm64: Add ioctl to partition the PMU when supported
+  KVM: arm64: selftests: Add test case for partitioned PMU
+
+Marc Zyngier (1):
+  KVM: arm64: Cleanup PMU includes
+
+ Documentation/virt/kvm/api.rst                |  16 +
+ arch/arm/include/asm/arm_pmuv3.h              |  24 +
+ arch/arm64/include/asm/arm_pmuv3.h            |  36 +-
+ arch/arm64/include/asm/kvm_host.h             | 208 +++++-
+ arch/arm64/include/asm/kvm_pmu.h              |  82 +++
+ arch/arm64/kernel/cpufeature.c                |  15 +
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/arm.c                          |  24 +-
+ arch/arm64/kvm/debug.c                        |  13 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  65 +-
+ arch/arm64/kvm/pmu-emul.c                     | 629 +----------------
+ arch/arm64/kvm/pmu-part.c                     | 358 ++++++++++
+ arch/arm64/kvm/pmu.c                          | 630 ++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c                     |  54 +-
+ arch/arm64/tools/cpucaps                      |   2 +
+ arch/arm64/tools/gen-sysreg.awk               |   1 +
+ arch/arm64/tools/sysreg                       |   6 +-
+ drivers/perf/arm_pmuv3.c                      |  55 +-
+ include/kvm/arm_pmu.h                         | 199 ------
+ include/linux/perf/arm_pmu.h                  |  15 +-
+ include/linux/perf/arm_pmuv3.h                |  14 +-
+ include/uapi/linux/kvm.h                      |   4 +
+ tools/include/uapi/linux/kvm.h                |   2 +
+ .../selftests/kvm/arm64/vpmu_counter_access.c |  40 +-
+ virt/kvm/kvm_main.c                           |   1 +
+ 25 files changed, 1616 insertions(+), 879 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_pmu.h
+ create mode 100644 arch/arm64/kvm/pmu-part.c
+ delete mode 100644 include/kvm/arm_pmu.h
+
+
+base-commit: 1b85d923ba8c9e6afaf19e26708411adde94fba8
 --
 2.49.0.1204.g71687c7c1d-goog
 
