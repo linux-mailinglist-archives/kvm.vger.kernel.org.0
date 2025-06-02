@@ -1,85 +1,85 @@
-Return-Path: <kvm+bounces-48226-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48227-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ACFBACBDA0
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 01:08:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21C4CACBDA2
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 01:08:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E1471893764
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 23:08:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E75DE3A4085
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 23:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558B0221739;
-	Mon,  2 Jun 2025 23:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD346221F38;
+	Mon,  2 Jun 2025 23:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2HBt0ZS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfw3+feS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8919146B8
-	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 23:08:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776A31F758F
+	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 23:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748905691; cv=none; b=dcTCzRP3cZJBkB2HqjE3pgj7p2NTigZPX6SKQKCf0fWvMOAkHH//HpvlHd+OWrytnsHrqAneOaCUWEHKCiqWbMzVYl4sP2pzqZPFhcQBNWOJ88jEfNaBjaDarHiErHp81ASlaLjc99V3LduozibzUp/nDAejXem+PE43GrQNzxQ=
+	t=1748905728; cv=none; b=ZVwhfTZ1uN7QoYivPksyPoIR3+FEHXfqMsqnMPdYS8dB6oeKR0hNOZe0fwwfRK1GbAUoQi/t7cVT2TDkR6d0KuP+HxD4+VMb0Ghrs/In09VRllNik4uXD3UaB9unySHqd8XHSGx1Yfm+JfYBbpCxZOUYePubN7e9XSCtbvW2jgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748905691; c=relaxed/simple;
-	bh=4M/M5WQqG5s1lrRiEYVr2bXVi+IMy8tfhsRTCu06Qyc=;
+	s=arc-20240116; t=1748905728; c=relaxed/simple;
+	bh=y7CK+CHQ4DIFwaUvhwVJaZwpnA7dYLCzJMncn8f3CIw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ukCHkgMhWbxKerqqScSm0VySKsVr0AMsaKihanJaIEOUxCJLgRTdztXH6BizMEmY1yY6ybbmb8Ue2Qg8DwkNTv9fcvgal9lGjieI47dHbsm7wT+rd3FqNrQmIqyKYN64eSUifWvFasxzulAblTQHNjao7fPZvy/woar3I0ksCDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B2HBt0ZS; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=f2rFbH4G6QFwkIO/36XoRXw6lx3Bewr5yQBxwBoTiolNDWhPmGQiV86iCLwKPMnCuWObAuNW0LzaoNsTnn8kIorUufALUd7yu/pzMWOzy5KmjLyDq8tQ8dhBXBvDox6WAXFvmF7r1h4SXqxTNHdyfBQQ+erBsg1buuUHB1DIVus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dfw3+feS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748905687;
+	s=mimecast20190719; t=1748905725;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=S/EsVOWnpMJ6iYDXJnG9LHLh+Zoc/oiL7FCABJxLDFM=;
-	b=B2HBt0ZSy2FEFh7elef2KodN3Kc29PrHuoXW454yTSiCw4KryKo7Ob/rDTGViMm2h/cFKt
-	Wdx3X/Asw8DQlvnfJTKe+LsGgQEVLp5t3XrxlDOPUq0LT8kGnJ5FyIqHyQmgQC3QAR+QLn
-	ldcplb0IzL1LsRRHF+/iDjQ6A0PANuE=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=iW7eQbhNtrqZPgemUDJnWAZIpC6bLn6AnaOnx0AQ+H8=;
+	b=dfw3+feSP85+zyng+xBHX0mT+vzNjVsw90HqWOzVBw587VlmmDsi+0q14MtiSS+dM+sS2U
+	H0D9TzqDtYD1qyfpSWcl+wp/T5X0qZK717HwyNNBmHVIgj9Mxpgqm0DDha9Pf1zDjeldlb
+	ec6KNwGbjLCDdPJiBMmDKhtS7x7s4eI=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-56-Q94VUumSPGK5U3KQ_yiI-Q-1; Mon, 02 Jun 2025 19:08:06 -0400
-X-MC-Unique: Q94VUumSPGK5U3KQ_yiI-Q-1
-X-Mimecast-MFC-AGG-ID: Q94VUumSPGK5U3KQ_yiI-Q_1748905685
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3dda747db59so3939665ab.0
-        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 16:08:06 -0700 (PDT)
+ us-mta-619-IupI0QBQM_mJ3OfU6UNFsg-1; Mon, 02 Jun 2025 19:08:44 -0400
+X-MC-Unique: IupI0QBQM_mJ3OfU6UNFsg-1
+X-Mimecast-MFC-AGG-ID: IupI0QBQM_mJ3OfU6UNFsg_1748905724
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-86cab5d8ccaso34040439f.0
+        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 16:08:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748905685; x=1749510485;
+        d=1e100.net; s=20230601; t=1748905723; x=1749510523;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=S/EsVOWnpMJ6iYDXJnG9LHLh+Zoc/oiL7FCABJxLDFM=;
-        b=jeZt5/Wk/Bu7p6Ybu0velOUlBjae0/QPJyn4AobAIIs4kNCs3MFX4ITT6Vm2E83EOP
-         X0wjp+roepDK7uvxfpYhluGgYjbABSNfU8HxhLjHokfUV6BeNHmhxMmauuQnTMr3NHr6
-         iDiKwQEENgzEod12tVWX0UsaehzttP8hho2mNCwru/qvHXb32xAAtdaKda3daupm2A8v
-         dD66xK5A9E/xcKIarEiw6Ob0E2TFpmRJGrcsjsZj/bpmI8PIDTmGs2ixodz7PsRdykc1
-         IuKQ8Cx3RfaWgobtyS/7M/HOx78+Ju9CdIaPn6J0O+u6luHfaVFUJW3AqGqTSBzzDu3x
-         5kXw==
-X-Forwarded-Encrypted: i=1; AJvYcCUEJs8+uyXKkLT44CQ86bB8mwejSQ3GMW5+TFS5IavIR99JRrT0cjFBH1c8Vqoz/kojs/Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsLvTPobo+cKY/L1HU2T9nz4aaXpThrlzq9QJP7ooI3/6p36xe
-	maoHCoCZZx4lhBfKDNu8/PI4nTXr9hrz4z704kSRrLEy7R2s/4tQl/PuBl1Pr1GAtZBg3NMrNXq
-	8Zeb1jKKYl9R0VHY4C/sizNM0mgeDbrECcCWZUjmVzdHJ93KwoQlxcg==
-X-Gm-Gg: ASbGncuXKXnOSEHgp3RG61t/EIesGZyx0TNVXInHSYuofXTBBMI4cswB7z0SMqTqn69
-	cB/3ALCbz65TKy51Y780b61ctc3TKtR0mMnWNCS6+rPMdFNLbZDNKgIfj3SWR1fMcf2uC2weM+z
-	SwkjMTogO4fshL4GnSQbP5M0x4/g3rpsaScNt9MPU9TW+XLtijf/Xas92p9pO2C5sUSQlxg0ftE
-	cpqHUdV/eAxOTCim7uEX1WYEaX3gjEY1KfbvztAat2rxGOgIKherymHHZlR2cHsSK9V7SUsOA08
-	lAjpUTMfAxhweu8=
-X-Received: by 2002:a05:6e02:198d:b0:3dd:990b:83e3 with SMTP id e9e14a558f8ab-3dd9b9daa07mr45691675ab.0.1748905685458;
-        Mon, 02 Jun 2025 16:08:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG14zzzU64KAl3giOhOLlTEbtKncAHiKq2onatleAUwdaqT/+RfXpXY1f6avnBFReEvfEkfJQ==
-X-Received: by 2002:a05:6e02:198d:b0:3dd:990b:83e3 with SMTP id e9e14a558f8ab-3dd9b9daa07mr45691305ab.0.1748905685037;
-        Mon, 02 Jun 2025 16:08:05 -0700 (PDT)
+        bh=iW7eQbhNtrqZPgemUDJnWAZIpC6bLn6AnaOnx0AQ+H8=;
+        b=pqAHX6LQhpCFxDw81Dbx1G44uipsn9yUbCaeqCV4dAMXHhyUYl0NjI9ewh5VhPkXOO
+         w8ghijRqRaCu1l4CP4ujdLmppOa8SX0Zefuq7Bbf2Ue+Z9MQZDIeqlUyGh8zZsO2OP2U
+         bhUPmlExF23As3Fp9Psym2R49GrX+5pHwqb9i77UuzTZzHuDGiCzG5r/iQ1W+4A8l99f
+         46WZMXP6SfJ3RBicFPax7zBfspSH25FMbagLH8xeHrXDUMquynBK4J/EcSSTYsZW52Z2
+         3/8iM9OcxgUaPTMrqDuQkM6VUU9mvWnGGsVgtUFyLHVrrGJYr8oa4Aa+VHDLWddXRNZV
+         UMNw==
+X-Forwarded-Encrypted: i=1; AJvYcCWacaHX46FZw1GovsyjtcezokHJJvLhN0wEof4C70mgpiNZlh+KiWoXd4ieJ1o3699HmIc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVl21aU4zrtzWN8qQaGuvAFix3UAcIlFuRaOW5MuDQYfpd87gx
+	feGhagGSYXvECAk3L7yzFb4dg0zNOPadQ8AiriNZFOXOTUt4cJ5OIOMLdinMOmHUTxRWn4NwzU1
+	psWdaUwNObPFRitOVFNZCAwEjUKjgZr4URzSHqafGO4eKi6UsmkB3sA==
+X-Gm-Gg: ASbGncuguh9t7SAc6AM7XId8DqTCdUl1ALlq2UFQCDwuaWzNYwQT8G9qhAoWCOmUnPH
+	N8ld3HbYlcEnzTgHk5Zpa+7OzHEVMugvjEokEYzio7Lydl7/NLMJogzvxOkNVhSvebvnxik8BAg
+	vMsEQuSHarV1DDvl0IPaKa3uPAsVTHgKXkBqDUZqT/2vL3f33Dl77xmM5KMPecZpci7FVwdp24T
+	f7GulI5Mw6+MN5u3pjtLD0AweRMvMMk2IqwACdjlJKRxCNqTAxaTZGL2/GfOpcHsKNbxSt02Dh4
+	QlNIThQneCZOR3oyxALKjQpJ6g==
+X-Received: by 2002:a05:6e02:104e:b0:3dd:b4b5:5c8a with SMTP id e9e14a558f8ab-3ddb4b55d51mr8685775ab.6.1748905723638;
+        Mon, 02 Jun 2025 16:08:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHGvUb6ER8Q4QD7RqCJtOiVCn3ySFqrXy3Hx1BKfIFFt0szxNE8YsrkqbCvLqmMnmnDTAvuqw==
+X-Received: by 2002:a05:6e02:104e:b0:3dd:b4b5:5c8a with SMTP id e9e14a558f8ab-3ddb4b55d51mr8685645ab.6.1748905723308;
+        Mon, 02 Jun 2025 16:08:43 -0700 (PDT)
 Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dd93535841sm23749985ab.4.2025.06.02.16.08.01
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dd935a7aa4sm24182885ab.71.2025.06.02.16.08.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jun 2025 16:08:03 -0700 (PDT)
-Date: Mon, 2 Jun 2025 17:07:59 -0600
+        Mon, 02 Jun 2025 16:08:41 -0700 (PDT)
+Date: Mon, 2 Jun 2025 17:08:39 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
 To: David Matlack <dmatlack@google.com>
 Cc: Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -102,12 +102,12 @@ Cc: Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
  <ajayachandra@nvidia.com>, Parav Pandit <parav@nvidia.com>, Leon Romanovsky
  <leonro@nvidia.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>, Dave
  Jiang <dave.jiang@intel.com>, Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [RFC PATCH 30/33] vfio: selftests: Add a script to help with
- running VFIO selftests
-Message-ID: <20250602170759.6031b4f4.alex.williamson@redhat.com>
-In-Reply-To: <20250523233018.1702151-31-dmatlack@google.com>
+Subject: Re: [RFC PATCH 04/33] vfio: selftests: Test basic VFIO and IOMMUFD
+ integration
+Message-ID: <20250602170839.4fe2a914.alex.williamson@redhat.com>
+In-Reply-To: <20250523233018.1702151-5-dmatlack@google.com>
 References: <20250523233018.1702151-1-dmatlack@google.com>
-	<20250523233018.1702151-31-dmatlack@google.com>
+	<20250523233018.1702151-5-dmatlack@google.com>
 X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -118,204 +118,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 23 May 2025 23:30:15 +0000
+On Fri, 23 May 2025 23:29:49 +0000
 David Matlack <dmatlack@google.com> wrote:
+> +int main(int argc, char *argv[])
+> +{
+> +	char *bdf;
+> +
+> +	if (argc != 2) {
+> +		printf("Usage: %s bus:device:function\n", argv[0]);
 
-> Introduce run.sh, a script to help with running VFIO selftests. The
-> script is intended to be used for both humans manually running VFIO
-> selftests, and to incorporate into test automation where VFIO selftests
-> may run alongside other tests. As such the script aims to be hermetic,
-> returning the system to the state it was before the test started.
-> 
-> The script takes as input the BDF of a device to use and a command to
-> run (typically the command would be a VFIO selftest). e.g.
-> 
->   $ ./run.sh -d 0000:6a:01.0 ./vfio_pci_device_test
-> 
->  or
-> 
->   $ ./run.sh -d 0000:6a:01.0 -- ./vfio_pci_device_test
-> 
-> The script then handles unbinding device 0000:6a:01.0 from its current
-> driver, binding it to vfio-pci, running the test, unbinding from
-> vfio-pci, and binding back to the original driver.
-> 
-> When run.sh runs the provided test, it does so by appending the BDF as
-> the last parameter. For example:
-> 
->   $ ./run.sh -d 0000:6a:01.0 -- echo hello
-> 
-> Results in the following being printed to stdout:
-> 
->   hello 0000:6a:01.0
-> 
-> The script also supports a mode where it can break out into a shell so
-> that multiple tests can be run manually.
-> 
->   $ ./run.sh -d 0000:6a:01.0 -s
->   ... bind to vfio-pci and launch $SHELL ...
->   $ echo $BDF
->   0000:6a:01.0
->   $ ./vfio_pci_device_test $BDF
->   ...
->   $ exit
->   ... unbind from vfio-pci ...
->   $
-> 
-> Choosing which device to use is up to the user.
-> 
-> In the future this script should be extensible to tests that want to use
-> multiple devices. The script can support accepting -d BDF multiple times
-> and parse them into an array, setup all the devices, pass the list of
-> BDFs to the test, and then cleanup all the devices.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  tools/testing/selftests/vfio/Makefile |   1 +
->  tools/testing/selftests/vfio/run.sh   | 110 ++++++++++++++++++++++++++
->  2 files changed, 111 insertions(+)
->  create mode 100755 tools/testing/selftests/vfio/run.sh
-> 
-> diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
-> index 21fb1809035e..2ab86bd930b0 100644
-> --- a/tools/testing/selftests/vfio/Makefile
-> +++ b/tools/testing/selftests/vfio/Makefile
-> @@ -3,6 +3,7 @@ TEST_GEN_PROGS_EXTENDED += vfio_dma_mapping_test
->  TEST_GEN_PROGS_EXTENDED += vfio_iommufd_setup_test
->  TEST_GEN_PROGS_EXTENDED += vfio_pci_device_test
->  TEST_GEN_PROGS_EXTENDED += vfio_pci_driver_test
-> +TEST_PROGS_EXTENDED := run.sh
->  include ../lib.mk
->  include lib/libvfio.mk
->  
-> diff --git a/tools/testing/selftests/vfio/run.sh b/tools/testing/selftests/vfio/run.sh
-> new file mode 100755
-> index 000000000000..b461cc1b2f11
-> --- /dev/null
-> +++ b/tools/testing/selftests/vfio/run.sh
-> @@ -0,0 +1,110 @@
-> +# SPDX-License-Identifier: GPL-2.0-or-later
-> +
-> +readonly VFIO_PCI_DRIVER=/sys/bus/pci/drivers/vfio-pci
-> +
-> +function bind() {
-> +	echo "Binding ${1} to ${2}"
-> +	echo "${1}" > "${2}/bind"
-> +}
-> +
-> +function unbind() {
-> +	echo "Unbinding ${1} from ${2}"
-> +	echo "${1}" > "${2}/unbind"
-> +}
-> +
-> +function set_sriov_numvfs() {
-> +	echo "Setting ${1} sriov_numvfs to ${2}"
-> +	echo ${2} > /sys/bus/pci/devices/${1}/sriov_numvfs
-> +}
-> +
-> +function add_id() {
-> +	if echo $(echo ${1} | tr : ' ') > ${2}/new_id 2> /dev/null; then
-> +		echo "Added ${1} to ${2}"
-> +		return 0
-> +	fi
-> +
-> +	return 1
-> +}
+segment:bus:device.function?
 
-I'd suggest using the newer driver_override mechanism rather than
-new_id/remove_id.
+> +		return 1;
 
-I appreciate the work here, I think this could be really useful.  As
-Jason notes a few times, I'd also like to see this automatically
-iterate through all the combinations of options.  Maybe we could also
-think about whether we can define some build environment options to
-specify devices to use and this could all be run automatically from
-'make kselftest'.  Thanks,
+1 or KSFT_FAIL?  Thanks,
 
 Alex
 
+> +	}
 > +
-> +function remove_id() {
-> +	echo "Removing ${1} from ${2}"
-> +	echo $(echo ${1} | tr : ' ') > ${2}/remove_id
+> +	bdf = argv[1];
+> +	set_cdev_path(bdf);
+> +	printf("Using cdev device %s\n", cdev_path);
+> +
+> +	return test_harness_run(1, argv);
 > +}
-> +
-> +function cleanup() {
-> +	if [ "${new_driver}" ]; then unbind ${bdf} ${new_driver} ; fi
-> +	if [ "${new_id}"     ]; then remove_id ${device_id} ${VFIO_PCI_DRIVER} ; fi
-> +	if [ "${old_driver}" ]; then bind ${bdf} ${old_driver} ; fi
-> +	if [ "${old_numvfs}" ]; then set_sriov_numvfs ${bdf} ${old_numvfs} ; fi
-> +}
-> +
-> +function usage() {
-> +	echo "usage: $0 [-d segment:bus:device.function] [-s] [-h] [cmd ...]" >&2
-> +	echo >&2
-> +	echo "  -d: The BDF of the device to use for the test (required)" >&2
-> +	echo "  -h: Show this help message" >&2
-> +	echo "  -s: Drop into a shell rather than running a command" >&2
-> +	echo >&2
-> +	echo "   cmd: The command to run and arguments to pass to it." >&2
-> +	echo "        Required when not using -s. The SBDF will be " >&2
-> +	echo "        appended to the argument list." >&2
-> +	exit 1
-> +}
-> +
-> +function main() {
-> +	while getopts "d:hs" opt; do
-> +		case $opt in
-> +			d) bdf="$OPTARG" ;;
-> +			s) shell=true ;;
-> +			*) usage ;;
-> +		esac
-> +	done
-> +
-> +	# Shift past all optional arguments.
-> +	shift $((OPTIND - 1))
-> +
-> +	# Check that the user passed in the command to run.
-> +	[ ! "${shell}" ] && [ $# = 0 ] && usage
-> +
-> +	# Check that the user passed in a BDF.
-> +	[ "${bdf}" ] || usage
-> +
-> +	trap cleanup EXIT
-> +	set -e
-> +
-> +	test -d /sys/bus/pci/devices/${bdf}
-> +
-> +	device_id=$(lspci -s ${bdf} -n | cut -d' ' -f3)
-> +
-> +	if [ -f /sys/bus/pci/devices/${bdf}/sriov_numvfs ]; then
-> +		old_numvfs=$(cat /sys/bus/pci/devices/${bdf}/sriov_numvfs)
-> +		set_sriov_numvfs ${bdf} 0
-> +	fi
-> +
-> +	if [ -L /sys/bus/pci/devices/${bdf}/driver ]; then
-> +		old_driver=$(readlink -m /sys/bus/pci/devices/${bdf}/driver)
-> +		unbind ${bdf} ${old_driver}
-> +	fi
-> +
-> +	# Add the device ID to vfio-pci. If it hasn't already been added, this will
-> +	# succeed and bind the device to vfio-pci. If it has already been added, this
-> +	# will fail and we have to manually bind the device.
-> +	if add_id ${device_id} ${VFIO_PCI_DRIVER}; then
-> +		new_id=true
-> +	else
-> +		bind ${bdf} ${VFIO_PCI_DRIVER}
-> +	fi
-> +
-> +	new_driver=${VFIO_PCI_DRIVER}
-> +
-> +	echo
-> +	if [ "${shell}" ]; then
-> +		echo "Dropping into ${SHELL} with BDF=${bdf}"
-> +		BDF=${bdf} ${SHELL}
-> +	else
-> +		"$@" ${bdf}
-> +	fi
-> +	echo
-> +}
-> +
-> +main "$@"
 
 
