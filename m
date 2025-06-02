@@ -1,183 +1,176 @@
-Return-Path: <kvm+bounces-48184-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48185-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51770ACBA32
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 19:24:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 734C0ACBB49
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 20:55:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 228443AAE65
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 17:24:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10F14175651
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 18:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBAD022541B;
-	Mon,  2 Jun 2025 17:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E5B227E9B;
+	Mon,  2 Jun 2025 18:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0rLGLYsh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XVULdCes"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2043.outbound.protection.outlook.com [40.107.237.43])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA051FDD;
-	Mon,  2 Jun 2025 17:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748885078; cv=fail; b=Jf8TLFEkN6+/suup4geWvX4VHMXy/2+8aBk2VuQZA0kykUE3nc1C9mfxAm4g0Jnd0fIs/RA0PqJMx1HJ4FABTyLrLghEBNie3PJcmGPGWfAUbC86rD8HMXKOpxTFconZhyZhqwos8iiJzfTVVukKut6urOPJHC8opwhHK1YCT/4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748885078; c=relaxed/simple;
-	bh=DRNqqY/4AbwEXk39Qpozbu8P5EAIZabKiLzaa9WA7b4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Fgb+qXMjGVDHQnSel2BoP9ERCdD5EqD8oqMBtWAcaNOQnTtQh3n0bUwpfzmDlmvOXokNnyQEDC4IEJGLJoiK3InZY4queCqAZ44qAwKuxHRJo7dlZnizyiEl4EbOPvlQ0Uo25v+bEOmTkgKRD0qRTrQ9l1tQCD0iLgboUsj1+v0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0rLGLYsh; arc=fail smtp.client-ip=40.107.237.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oiKRVJ+qgX7wPALitek08DjdQnMmQlfVnqq6gHbUfrO5M5IWWWo1X+cXXLdBQfwL1fmiOLuebMsDgjB2AwAvbjVujY7bfxaC2NCtaTnp6lD7vELc77MPGAHixj+v7Tj/sQuRPmqysz7B4wdS7dY6tqqMBmqMAVe4oQBwITMdSZwPLOXReaT45K+pcG05K7x11N0bhkW82/sEkenYKuvIYN7YwCJeW0SPcocUm/J6BTK+W5IvLpGXGMFR432IWT5cDs8NeGB0PXHohYiKI/2bPPe6iEyjtDNSxJr8Vi+FLc0o6/MQ0chMHYGcoiwsuzDjmShn94y8JzZjpLP/Fh1csw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BT2T0QlTF8VdJkmgsjHsUXxMZ+xsLLu8f1BG8wh9onM=;
- b=pNazwb8ezWvwQ7gvlE9SsXDobxsRSBOL7k3OHLQHwVafrPLj4y9138Ex6sG0/70szI4Tqth/vhYDKrCvP0HNNbWPIe+5+yg+HqDDHMPTJIOx9cEfwcB8ui0hZLHZdD4lhykRxJ2tKr+DRlh01JkFtiK2jjOeel/zAkCmR7Vf30YxTJo236z+vcd5JbmYkgRJn2r5L19IoA6NpNy+KWIVzWerywd2rTL0tUXx/0kp+rNupRUpBEuUT+i02MeiKBZ8O0+hlIamUOfD1UjSylEwoRloJjdieV5vYs56MstYpQwlpn/CXgT031GT60NV52HjV/54lzw+BJvMF1nmu3q8JQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BT2T0QlTF8VdJkmgsjHsUXxMZ+xsLLu8f1BG8wh9onM=;
- b=0rLGLYsh8zpAIsfJTUpnpwzcoeYlWjXtuvMpT20k93xEZsXOL/McJRkVHRsq+lvzj18SawsnT96NnhVuxuI276U39yZwxwqPHD1tfyA1maWYZHU6wcj8GNuc+26sHM9f34H30CrDh+20uVxwjYI0DfA/EeO63sjdWEqn2sukFx8=
-Received: from DS7PR03CA0069.namprd03.prod.outlook.com (2603:10b6:5:3bb::14)
- by CY8PR12MB8412.namprd12.prod.outlook.com (2603:10b6:930:6f::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.33; Mon, 2 Jun
- 2025 17:24:11 +0000
-Received: from DS3PEPF000099DF.namprd04.prod.outlook.com
- (2603:10b6:5:3bb:cafe::fa) by DS7PR03CA0069.outlook.office365.com
- (2603:10b6:5:3bb::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8769.18 via Frontend Transport; Mon,
- 2 Jun 2025 17:24:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS3PEPF000099DF.mail.protection.outlook.com (10.167.17.202) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8792.29 via Frontend Transport; Mon, 2 Jun 2025 17:24:11 +0000
-Received: from kaveri.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 2 Jun
- 2025 12:24:08 -0500
-From: Shivank Garg <shivankg@amd.com>
-To: <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <shivankg@amd.com>, <bharata@amd.com>, <tabba@google.com>,
-	<ackerleytng@google.com>
-Subject: [PATCH] KVM: guest_memfd: Remove redundant kvm_gmem_getattr implementation
-Date: Mon, 2 Jun 2025 17:23:18 +0000
-Message-ID: <20250602172317.10601-1-shivankg@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2421FDA6D
+	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 18:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748890490; cv=none; b=KVOyeWzTOCRVgc3UJy0SlU90aiq95rD/gByTyIR/xPhFzMr8Rzb89KqUh349MWcxOSP2GvQ66Hhn4H5wrK4mrNb2UkxWa1Z0y9usWuleHZ43402ztT8Mwc41aqSw7Psk8xsBv2X2JLFPOjPm1qNacPzd/EzubZ7M+cLDCvrounE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748890490; c=relaxed/simple;
+	bh=ADW9xya+1oa2cmviacIcm+dB4kYEr+YRKtM/wxWuyc4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V0hPsJoG7kGz/7cLEb3ckrQhGB4B3+My5bC+jQqsSAYRHuVaXGAa9vx9EDSFdfSFOIUV0dKNhe0csLWoklWJLdBXJb9A0t0AAR5/jmLfmdEmDsudugHxiKUXf2AmKi1uyLluI41L8RLV6iLen346iJOYkjMJhKDaFYlrrWC0TWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XVULdCes; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748890487;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6C/P1ic66cDx0vo/JBziwVz7kRWsMBGoIIf4HEtYsGQ=;
+	b=XVULdCesiDBOHgkMpNnXAJTBQlmj67y+PwfAapVb4Hqb9s7FLcyQyBYHYG/EgTe2XGmUo7
+	jj+aNFBTfzORiT6KO6Inacia4KS+k91IE/ae6llLVVuwq+1brw3vPPbG/cuO3K5kdT/Mt1
+	k8yjlWeSRm1IAKZXyzsUVtT7UY5fnxE=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-180-xoaV8K8ZNy6YzzgI-K06-A-1; Mon, 02 Jun 2025 14:54:46 -0400
+X-MC-Unique: xoaV8K8ZNy6YzzgI-K06-A-1
+X-Mimecast-MFC-AGG-ID: xoaV8K8ZNy6YzzgI-K06-A_1748890485
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-86cf7803786so21254539f.1
+        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 11:54:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748890485; x=1749495285;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6C/P1ic66cDx0vo/JBziwVz7kRWsMBGoIIf4HEtYsGQ=;
+        b=t8rVEUuAB4Faekx5aa+bvE3sTBVvG2PVmiroKIAS8yiI7jY41T7fQ4JmbXpab/K+tN
+         Zp+AsJJOAo2+nTVIW/BZGBQZKoSpkCovCQa3aC618k8ogKkM3CUVYHsUK2WPj+TTwkSz
+         NayNHYwu7gyM1cH4ANkuJSzOgWiaSIiwarWXWWgfLZ/E21xP0a1JdZ+/yCTH0IYFHoJw
+         SDcGEdU+GB7pyFNaLiv4d8c8Gp9eftrud6xM7GpzkC6HXq0K4Vp/ljq9VFpVHoyLmcb8
+         umhnZgYNQoLbNmCF71vxw/i6tuBbTk84bmlHa0Gibgn0IPhKq99n5j24ezz2tClgF4Vy
+         Apzg==
+X-Forwarded-Encrypted: i=1; AJvYcCXs6pjydYv+AH7vvk7Jkt4uU8wfIXx3Eeef7vZs0Rnn862rwsyNvDd1NjLqmUmHZmatT6w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxse1XfkXYET4JLhE3zcTw2/UlbJUdprSTOjF74c5WOGpcGoHAk
+	2bHlkHBkKOU9y4MMtbadqGP2VCK+vFxzW8XD/xQLYCfptxPuRt/k1VYbF6DUL8m30GkbAifLdxe
+	1kf/JCFSTq4V0JntMg7Tc03LvNm45GcApVhDMYqM6xE0CVvCALzd/OQ==
+X-Gm-Gg: ASbGncttsAV8eZNtpz5Nqq2qjjet0PFcVFclvuqDta7a6pCcJ9BrYtpXafn3eh3ZggI
+	82yoZaCRNhWOsGgtr0wu9IhQQhySGwvRQVDczeDZJS6pWRCuJlJMqQnLEiGCbpAb8yxkiSVcLnY
+	50y2MMl45RnDWXNQkH/QnT1q+VZ6c8zTg/mj/vRYFHe6Ax2tadwtOo3ildny70FkF5f9LQiLvji
+	vO7YVKbnV2VNJKKRxh/mUXpNK2mAsr+OPrWD3ISo2sx02e7VwQD8CwbztfW8HGRCo0rj25Ba0Zv
+	b5C/NNfQaCmZAVs=
+X-Received: by 2002:a05:6e02:258a:b0:3dd:869e:d1d9 with SMTP id e9e14a558f8ab-3dd9bb04986mr43707945ab.4.1748890485378;
+        Mon, 02 Jun 2025 11:54:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDB2BJKvNT8wrVq77BTo5j1RKq7jCh6zygyLgk4tNvo1VWUIo2Syvkw5u3DYlSjqc4/evPNg==
+X-Received: by 2002:a05:6e02:258a:b0:3dd:869e:d1d9 with SMTP id e9e14a558f8ab-3dd9bb04986mr43707735ab.4.1748890484945;
+        Mon, 02 Jun 2025 11:54:44 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3dd93534293sm23059685ab.13.2025.06.02.11.54.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Jun 2025 11:54:44 -0700 (PDT)
+Date: Mon, 2 Jun 2025 12:54:42 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>, Oliver
+ Upton <oliver.upton@linux.dev>, David Matlack <dmatlack@google.com>, Like
+ Xu <like.xu.linux@gmail.com>, Binbin Wu <binbin.wu@linux.intel.com>, Yong
+ He <alexyonghe@tencent.com>
+Subject: Re: [PATCH v2 0/8] irqbypass: Cleanups and a perf improvement
+Message-ID: <20250602125442.19d41098.alex.williamson@redhat.com>
+In-Reply-To: <20250516230734.2564775-1-seanjc@google.com>
+References: <20250516230734.2564775-1-seanjc@google.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DF:EE_|CY8PR12MB8412:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3e46b5c8-88d3-4507-14af-08dda1fa4a28
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?DJSt4GIP9nrbh8XvMHuaOXw+QyRDy+JPvNpH+zvrO2ove7IXXF9vXlYo0e0N?=
- =?us-ascii?Q?Yyv19/T50oOyeWnGetyC6JKLT1eBWPluBx42Bkr7KVH6BS7H9ZmIhbA33BbQ?=
- =?us-ascii?Q?T4W56M29lZcV3RWiPSBsD9Kyb6FAGYvq/X6VVrFlABdzxC99tPyrDJ8Xvjyg?=
- =?us-ascii?Q?EClcqVnmK2pQD+e5ECIJxLRUlC6ob+q9hYG9+wSmAaeH0WVcpD4hwl9VPwHv?=
- =?us-ascii?Q?upt2o9h57lc2d/LiPOdx9l7t0ePWooaUpx6UrZZ4+ZPvEsQYSVyXGr4L4oR+?=
- =?us-ascii?Q?LkjlwE6q6L1C6EbxuTnRF4DoB5UZ+iNV6hTyGfGGsEOP9z8rOqXOgSSARv/O?=
- =?us-ascii?Q?1cFDqyrzRhYt14ucagppzfJaG0BvtWkQ9vHfbVRm31JYgfsyDzcUwGlsndp2?=
- =?us-ascii?Q?FJCx8imPX8YB0WElPHRARXm1hc/UBT+gK5iMmOqayZ6kctWRR1KyVda3U95X?=
- =?us-ascii?Q?QNTyrHCwnf9W4QpsaaVaeFOVUQH/ea1LkZ3M5iJaz/xGJzKNTnBpll3iWtFn?=
- =?us-ascii?Q?nrwnq27ohVfet7Bq9f+/3hougrgndUEy0aDOZjcYo3XS4Y5+nWk0gd8snmkN?=
- =?us-ascii?Q?qdzzi4YPedvpDrC78gis2KvZsJr57zhHPcXt0Qrtc7StDVnVrccqfwXbSSQO?=
- =?us-ascii?Q?z8uHw0iLdH/52ce42imYj32QCr924UZfGGiEso9SSAqx5DWwQx78heAdK3kh?=
- =?us-ascii?Q?ZN6+zNb1etpj6orrsFfO5fpyl+Vw7ED4lijJjIBr5cKdl+gKdEJPRgnhDX2B?=
- =?us-ascii?Q?q+sVUyiv8AzQy8wNwlofIzQh6U5udqnqGpeYbSmwZFbSZXc5WHcv+clla0Kf?=
- =?us-ascii?Q?QtgXgnrp7CZyYZjqti6lv7AD8PKT4oJiWZSCJkd6BpYynr1CvTDkEuaP/m9T?=
- =?us-ascii?Q?MMgW/fO4xUD+m9NqaY+iscyL1F3EIPfcqHmX9D0W+Dar/wj+A6yyleeSj+lj?=
- =?us-ascii?Q?1iEcUGg42CBREKys6y8BE2m5UxzGXKXFuSuEHXILRk65rCEx3IeqqQ6DB9pR?=
- =?us-ascii?Q?/JUdRQGrjark2cNfKZwINc+ieMZ3ZS5htmnzdBfkunwEeYS1paXdWPkqT8nd?=
- =?us-ascii?Q?xsVqtsNdu+FfK76Z/qd7EUITlVWAIJXsWekdCQwUvKRaY/dqR2mjoIePULED?=
- =?us-ascii?Q?oodXnx1B+ddIwF50DHJ19Xopng1cjYjDByWi5RrFLbdu9yNHUS3w3tlwAsvB?=
- =?us-ascii?Q?Rytg0g6wsnOZ83lI61YER0vUqMqzO/TKz47Hy9DY1WFxX29hYLj8BVxp9iUQ?=
- =?us-ascii?Q?fkK7sU6NbWsl6hccYOYu+Hka8waCP+BJtrYUecYgoRmuJOu2ozrmf5BzIF2D?=
- =?us-ascii?Q?O85EgSx6aMyj2UK6IwAXVu89Vc1uVnVf1xqzv8nP5C84TZW5yP1IoLGotfmw?=
- =?us-ascii?Q?eC7lRrmDekKKZBGph9JhnDE1jUbHNBSoiDh2iZdlzDDjg9M9z7AzRAJ5aPPC?=
- =?us-ascii?Q?tOYS8wxqeEPmWjcXvqwXn/AD9bFyw/fi6Bm7BaXz7iBrD2AlPTmvB3QEv10A?=
- =?us-ascii?Q?vpcQ6vmPiEV7279bvsFR4vkYsIrd8eK39Cbg?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2025 17:24:11.3702
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e46b5c8-88d3-4507-14af-08dda1fa4a28
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099DF.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8412
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Remove the redundant kvm_gmem_getattr() implementation that simply calls
-generic_fillattr() without any special handling. The VFS layer
-(vfs_getattr_nosec()) will call generic_fillattr() by default when no
-custom getattr operation is provided in the inode_operations structure.
+On Fri, 16 May 2025 16:07:26 -0700
+Sean Christopherson <seanjc@google.com> wrote:
 
-This is a cleanup with no functional change.
+> The two primary goals of this series are to make the irqbypass concept
+> easier to understand, and to address the terrible performance that can
+> result from using a list to track connections.
+> 
+> For the first goal, track the producer/consumer "tokens" as eventfd context
+> pointers instead of opaque "void *".  Supporting arbitrary token types was
+> dead infrastructure when it was added 10 years ago, and nothing has changed
+> since.  Taking an opaque token makes a very simple concept (device signals
+> eventfd; KVM listens to eventfd) unnecessarily difficult to understand.
+> 
+> Burying that simple behind a layer of obfuscation also makes the overall
+> code more brittle, as callers can pass in literally anything. I.e. passing
+> in a token that will never be paired would go unnoticed.
+> 
+> For the performance issue, use an xarray.  I'm definitely not wedded to an
+> xarray, but IMO it doesn't add meaningful complexity (even requires less
+> code), and pretty much Just Works.  Like tried this a while back[1], but
+> the implementation had undesirable behavior changes and stalled out.
+> 
+> Note, I want to do more aggressive cleanups of irqbypass at some point,
+> e.g. not reporting an error to userspace if connect() fails is awful
+> behavior for environments that want/need irqbypass to always work.  And
+> KVM shold probably have a KVM_IRQFD_FLAG_NO_IRQBYPASS if a VM is never going
+> to use device posted interrupts.  But those are future problems.
+> 
+> v2:
+>  - Collect reviews. [Kevin, Michael]
+>  - Track the pointer as "struct eventfd_ctx *eventfd" instead of "void *token".
+>    [Alex]
+>  - Fix typos and stale comments. [Kevin, Binbin]
+>  - Use "trigger" instead of the null token/eventfd pointer on failure in
+>    vfio_msi_set_vector_signal(). [Kevin]
+>  - Drop a redundant "tmp == consumer" check from patch 3. [Kevin]
+>  - Require producers to pass in the line IRQ number.
+> 
+> v1: https://lore.kernel.org/all/20250404211449.1443336-1-seanjc@google.com
+> 
+> [1] https://lore.kernel.org/all/20230801115646.33990-1-likexu@tencent.com
+> [2] https://lore.kernel.org/all/20250401161804.842968-1-seanjc@google.com
+> 
+> Sean Christopherson (8):
+>   irqbypass: Drop pointless and misleading THIS_MODULE get/put
+>   irqbypass: Drop superfluous might_sleep() annotations
+>   irqbypass: Take ownership of producer/consumer token tracking
+>   irqbypass: Explicitly track producer and consumer bindings
+>   irqbypass: Use paired consumer/producer to disconnect during
+>     unregister
+>   irqbypass: Use guard(mutex) in lieu of manual lock+unlock
+>   irqbypass: Use xarray to track producers and consumers
+>   irqbypass: Require producers to pass in Linux IRQ number during
+>     registration
+> 
+>  arch/x86/kvm/x86.c                |   4 +-
+>  drivers/vfio/pci/vfio_pci_intrs.c |  10 +-
+>  drivers/vhost/vdpa.c              |  10 +-
+>  include/linux/irqbypass.h         |  46 ++++----
+>  virt/kvm/eventfd.c                |   7 +-
+>  virt/lib/irqbypass.c              | 190 +++++++++++-------------------
+>  6 files changed, 107 insertions(+), 160 deletions(-)
+> 
+> 
+> base-commit: 7ef51a41466bc846ad794d505e2e34ff97157f7f
 
-Signed-off-by: Shivank Garg <shivankg@amd.com>
----
- virt/kvm/guest_memfd.c | 11 -----------
- 1 file changed, 11 deletions(-)
+Sorry for the delay.  Do you intend to take this through your trees?
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index b2aa6bf24d3a..7d85cc33c0bb 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -382,23 +382,12 @@ static const struct address_space_operations kvm_gmem_aops = {
- #endif
- };
- 
--static int kvm_gmem_getattr(struct mnt_idmap *idmap, const struct path *path,
--			    struct kstat *stat, u32 request_mask,
--			    unsigned int query_flags)
--{
--	struct inode *inode = path->dentry->d_inode;
--
--	generic_fillattr(idmap, request_mask, inode, stat);
--	return 0;
--}
--
- static int kvm_gmem_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
- 			    struct iattr *attr)
- {
- 	return -EINVAL;
- }
- static const struct inode_operations kvm_gmem_iops = {
--	.getattr	= kvm_gmem_getattr,
- 	.setattr	= kvm_gmem_setattr,
- };
- 
--- 
-2.34.1
+Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
 
 
