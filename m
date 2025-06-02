@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-48209-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48210-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 011A3ACBC17
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 22:02:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2856CACBC2C
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 22:13:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEA8E3A2E73
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 20:02:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE4153A3E28
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 20:13:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C751FBCAA;
-	Mon,  2 Jun 2025 20:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC48223DFA;
+	Mon,  2 Jun 2025 20:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FO6H4VbW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtfJMFb6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BA52C3253
-	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 20:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E701624E1
+	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 20:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748894533; cv=none; b=ZAz8+r6oN6Yh4a6HHLBMgBle7ellMaNSPE1NwhijQHGoSmHRVm/C7B9nFSy7l0TMC1d5Z6gUc4a93L/7nAqz/hm9iQUVCwyReeFBu1Ak7+lf6uPpuyTAVJHiIqaRCskd0t/AWC22imzHJNlAMa7tpE/OBCEuAXPyVi8t8Vv9Q6g=
+	t=1748895202; cv=none; b=ciDvedjv+qVGirHjvxfLhwaMmJfsa7Jx4IVV1TH56N61ajgppoiHAL4aUCOYi4Tc5j1LG/QDxe/vODn8/23Kj/hQEQWxj0YjOYcdt1d/uKwhUl6C231jz9/PXYqMRXyfLSi2U7Wb1UDnnSVJ0bU+g1ifpLQkaxPxkoVu4v+MeKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748894533; c=relaxed/simple;
-	bh=/xOHjhw56CdE7pwo3f8+yn8eHn8TaevxVaRTPiHlxv4=;
+	s=arc-20240116; t=1748895202; c=relaxed/simple;
+	bh=dYgH6l3af5qbaadPI2dscgIuE+H0ARXJ2qgwrm+ADmI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QFd46hHWpaTi1tu7GwtwuUisk6oGLP8pQb9V9GcAqkwn5FmsJ6qN/rDUKTZd8/GybtMmLnDi1FNj4zd3RtJF9XyjxUH1qtqljlNrb0WvwlrAOcNpPhCNJZ4bdGncfMg0bkVnjNA87Y+jWjWzVYNdfyXV6h2z7Szll7p0qIZ+bmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FO6H4VbW; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=EFKc17tT2rclOVDXGBzJ3UH/JKlwPvYj9G4CWOUIROFCO4VcyksoYWcNqeVqQF1F9e0/pIYvcxzKz596SB+4CXGT8FRVtT1Wh8v7RJ/+0TCA6wI75pOAiZUsvYuA+hvM/LqYvAxZT/3iOFiqjZaBY2KqCRcjjef3L+vjMNM6bvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AtfJMFb6; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1748894530;
+	s=mimecast20190719; t=1748895199;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9xzihvSeycwCfHC3PxVJC/qLoV2NCc2qE9/A+8gZl7Q=;
-	b=FO6H4VbWCv4+e3iw+wYwAMZjBicuvvRgmlNqv20wCbphSdIweNiFOlBzE1yRzEaIZNmaZY
-	3vB2tUg2HBYRZ4QSmKsdluaL/umDUaUB12PQElzSMAY2dR1kQUBTvxsqDYgurPBCw8/KFz
-	Wo8tHGyd8CRr/xlwLZ6XMe1fr4qV90Y=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=L2fRzpvIq9Ro64GdJ8k47s16Damg2UH127tvBjvm2hA=;
+	b=AtfJMFb6LidzKpE/FbZuS4BeKkojis/FvWI2YpHqj/AbzpgijDOQocpZzaII6EzgOouakb
+	hEdo/H8/FtWSJGZLpFhFsNs+ukon7RtyxzxLKI9DPAT/PhzFkUxiwPO2qGHTYI+q6qoj1e
+	PqpiRXNzuJD7riwIo0misfo5crvgIOI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-144-CzuqPbj7MIqePsQdLG8PQw-1; Mon, 02 Jun 2025 16:02:09 -0400
-X-MC-Unique: CzuqPbj7MIqePsQdLG8PQw-1
-X-Mimecast-MFC-AGG-ID: CzuqPbj7MIqePsQdLG8PQw_1748894528
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a4f85f31d9so1326013f8f.1
-        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 13:02:09 -0700 (PDT)
+ us-mta-587-fQvdcYWROcKxv6r_DYhx-Q-1; Mon, 02 Jun 2025 16:13:18 -0400
+X-MC-Unique: fQvdcYWROcKxv6r_DYhx-Q-1
+X-Mimecast-MFC-AGG-ID: fQvdcYWROcKxv6r_DYhx-Q_1748895198
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-450d9f96f61so25677445e9.1
+        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 13:13:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748894528; x=1749499328;
+        d=1e100.net; s=20230601; t=1748895197; x=1749499997;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=9xzihvSeycwCfHC3PxVJC/qLoV2NCc2qE9/A+8gZl7Q=;
-        b=C0ZLbdHLDSFEqoecFjQYegWTSNgYocgZLJhv89gtRCbBwmiNadNDEIjrQmaYCOLNE2
-         L8RTr9CG4TY540W55FmBuyvn0zRJnk+QJuM5P9gVAqK7aMKbN+ETDquVArl5pCs51njG
-         SUkoVFENiljsHPsPV29ExiYDH/xzNVO+W5ZG1rZyYnHiwzU/vkff189HYtrBYC+Z634D
-         1i7hI+Gq9/+T0ESXep6q6Hm0oTmTuKfB6E79vx8dH91/bQpxij4pmq775eP0nGANiNPD
-         O8kU/Duo+PR1bMLy8zY54E6zfHMOQ4f61ruOk5UDN1sdtls/OhIbqhffRpdPn/G7vR5F
-         fqUA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIXXyWTlsa9Rtq1iyH4AGKPgrvfT/XMvkQAwFg0vSo6qfDHtG+9j31DmuKP1nLMCv8Dgw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwblTPFFuQY9f4Pg1pqn8CQxGwef/HUJcrkTwxhvo7lyD91cExN
-	q4ZD8O3Wa+VwPnYwh+NLwCxtEt0uicbo7Xlt88ctNDc12NFw+npr4DBfl4EBRInMM2g0D8isaYX
-	BR3EoWsWsR21gIA9FV+AYAn1sKoUIYMLbEmvboimjFQKuBiLey0PgQQ==
-X-Gm-Gg: ASbGncuGQLBFTo2k3JMiXq+ljnyuye+lNc9RbPCePD62kQaHZbAmvInJOsdwyQq+GE7
-	ezmyuQ0bSjJUtAdFlLJ5PHef2bepkhd4aNUWtKA3iPi+SrilOKYp+PysfEZOn2K5zCJzB+oWnDn
-	RHrSxE04keAIQNeqQBfAxM7X4nB9pbSpEof6VWLQZFsdUpqew7BHDxHX+ovQtj/cfCK0WxqMIM1
-	LSrzSNFOeZs+xB/63h0uhQ2MKZB8dcUn+jjsz4bOcMk48K8/wdUqn/Wga8nSwlNB0bewQ77hhWc
-	8f+QRnIHuW44/khCHt2IPQOIn7UUS6S9qGQqZZI8P0xbm5ZqOU+xpuG45SJ32rRCjRBHpkOzzOX
-	cIIu2EwYaH/Rf+vAIhW/7SA1TUpxCO+LHxnVpyZ0=
-X-Received: by 2002:a05:6000:220b:b0:3a4:eec5:443d with SMTP id ffacd0b85a97d-3a4f89ddde0mr10414330f8f.29.1748894527817;
-        Mon, 02 Jun 2025 13:02:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGBUEUfgzZ55JxvWPbzPB5n+xzGAXY+W1aSHd2mFpVCFS79hDcYZsKiTQk7PvOWDfF0CXIE9Q==
-X-Received: by 2002:a05:6000:220b:b0:3a4:eec5:443d with SMTP id ffacd0b85a97d-3a4f89ddde0mr10414272f8f.29.1748894527305;
-        Mon, 02 Jun 2025 13:02:07 -0700 (PDT)
+        bh=L2fRzpvIq9Ro64GdJ8k47s16Damg2UH127tvBjvm2hA=;
+        b=DCSpcQse8ujtfm/fgl5R4ZxNA/X7o8O7nPGENkFQPkHZZpTxemBMXYE54rRDgwNPhR
+         ppPdfkz9yHwBAAJ2j3mOBouhvMTvEfyrUK/0aMUJ+VBn9O+9imbMx4rakBB4ELzEicMW
+         SdgcWauEADg8L7W7i2xu0EsbEwuDOp/Kun5W/ZF06H2fCYhRDv75cyNwhmrJ0O825HPI
+         9gzdeINBNkk4bo5Sbkl+iY/Dio2MGdIk8VV5vAs5DE2QgQ/LAYF0nYJYnbJHDD8Qa5y5
+         KHB76RXHc3u3zkdAPectdmeaRJfXdOWN25Pn3ZP9ZDLYZhE+M1eikH+FgOLre9uiPYtf
+         aYxA==
+X-Forwarded-Encrypted: i=1; AJvYcCWibz5yTGSaazDXVeMAGL7aVTGXUpIipyu5CzrkszPNQh0jfnqW0Uxyoyexgk1XTDrYt9o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzv7Z1GbUhJ6IPLU3bDrCbPW8bKOfAp3kK18+ZvFDzLoVIEYV9y
+	R2iGsyzzTyaYFDCNtEpnO62gNHuSfHYcAsC0yg01GRc7hgKcm0G9AxWpdAoPfjETcxxDKnXz4dQ
+	e81Ht6vW7JVt9ebUA6gdF9ilGE7qsd4mhdMM9aeJ33XGrmXB+mk6i+g==
+X-Gm-Gg: ASbGncvDObSIe6hEcTmyerBCO0h/CNhWiUq5P8SpgqCBaiViglnA1OObqbDuYSochje
+	Aozye0f94Au9vyYJUzKH2um4Ag6AN5fgpEiFv5OiAvtc/uHLF1qrFpl707ozAj/tH+fJxKbpWWG
+	iGVgR9L1xoh5Zpji7uSF8W1Apyl32PgVNDINDQZ4rPFb2WWuizfaT897Uwr0v3Y7vBeoF/7KEOr
+	6W9ngBT6aYvW5JOoZ2HoXj6b7Nb43RgSMeChhVTBqGnGFUpKQILawMmC3Sd6nr8U3U1ZUhHCIVc
+	aWBraADilYpk8CvUFFdaYLLULzxLJ8XXGzi3P2o3dQFiOpSaAvtddoFocDTxF8nKI7tpRWWJqsW
+	yl2cRTq273ALMa/pcrTSdNnU0q1Us3B7+PnVv7jJMRZN2SewndA==
+X-Received: by 2002:a05:600c:34cc:b0:441:a715:664a with SMTP id 5b1f17b1804b1-450d657fc48mr128062815e9.20.1748895197197;
+        Mon, 02 Jun 2025 13:13:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH11BXrDuMAIzEqX9WuHxTziGBMSqS8kYX6yOgI2wQ1XPSqok/pAnnVfe2f25ZB0Lml2ZGfRQ==
+X-Received: by 2002:a05:600c:34cc:b0:441:a715:664a with SMTP id 5b1f17b1804b1-450d657fc48mr128061835e9.20.1748895196755;
+        Mon, 02 Jun 2025 13:13:16 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f34:a300:1c2c:f35e:e8e5:488e? (p200300d82f34a3001c2cf35ee8e5488e.dip0.t-ipconnect.de. [2003:d8:2f34:a300:1c2c:f35e:e8e5:488e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe6ca46sm16277263f8f.31.2025.06.02.13.02.03
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-450d8000d8csm134568095e9.24.2025.06.02.13.13.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Jun 2025 13:02:06 -0700 (PDT)
-Message-ID: <e2ca2dab-9dfa-49e7-901d-f5999c1f8f6a@redhat.com>
-Date: Mon, 2 Jun 2025 22:02:02 +0200
+        Mon, 02 Jun 2025 13:13:15 -0700 (PDT)
+Message-ID: <42226b18-7cf5-41e4-8a0b-5b35ee50f119@redhat.com>
+Date: Mon, 2 Jun 2025 22:13:10 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,8 +90,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] fs: Provide function that allocates a secure
- anonymous inode
+Subject: Re: [PATCH 2/2] KVM: guest_memfd: Use guest mem inodes instead of
+ anonymous inodes
 To: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
  linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org,
  linux-fsdevel@vger.kernel.org
@@ -126,7 +126,7 @@ Cc: aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org,
  xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com,
  yuzenghui@huawei.com, zhiquan1.li@intel.com
 References: <cover.1748890962.git.ackerleytng@google.com>
- <c03fbe18c3ae90fb3fa7c71dc0ee164e6cc12103.1748890962.git.ackerleytng@google.com>
+ <425cd410403e8913b42552d892add6ca543ec869.1748890962.git.ackerleytng@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -174,27 +174,118 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <c03fbe18c3ae90fb3fa7c71dc0ee164e6cc12103.1748890962.git.ackerleytng@google.com>
+In-Reply-To: <425cd410403e8913b42552d892add6ca543ec869.1748890962.git.ackerleytng@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 02.06.25 21:17, Ackerley Tng wrote:
-> The new function, alloc_anon_secure_inode(), returns an inode after
-> running checks in security_inode_init_security_anon().
+> guest_memfd's inode represents memory the guest_memfd is
+> providing. guest_memfd's file represents a struct kvm's view of that
+> memory.
 > 
-> Also refactor secretmem's file creation process to use the new
-> function.
+> Using a custom inode allows customization of the inode teardown
+> process via callbacks. For example, ->evict_inode() allows
+> customization of the truncation process on file close, and
+> ->destroy_inode() and ->free_inode() allow customization of the inode
+> freeing process.
 > 
-> Suggested-by: David Hildenbrand <david@redhat.com>
+> Customizing the truncation process allows flexibility in management of
+> guest_memfd memory and customization of the inode freeing process
+> allows proper cleanup of memory metadata stored on the inode.
+> 
+> Memory metadata is more appropriately stored on the inode (as opposed
+> to the file), since the metadata is for the memory and is not unique
+> to a specific binding and struct kvm.
+> 
 > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+
+The trailing SOB from Fuag is likely wrong. Probably you wnat
+
+Co-developed-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+
+
 > ---
+>   include/uapi/linux/magic.h |   1 +
+>   virt/kvm/guest_memfd.c     | 134 +++++++++++++++++++++++++++++++------
+>   virt/kvm/kvm_main.c        |   7 +-
+>   virt/kvm/kvm_mm.h          |   9 ++-
+>   4 files changed, 125 insertions(+), 26 deletions(-)
+> 
+> diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
+> index bb575f3ab45e..638ca21b7a90 100644
+> --- a/include/uapi/linux/magic.h
+> +++ b/include/uapi/linux/magic.h
+> @@ -103,5 +103,6 @@
+>   #define DEVMEM_MAGIC		0x454d444d	/* "DMEM" */
+>   #define SECRETMEM_MAGIC		0x5345434d	/* "SECM" */
+>   #define PID_FS_MAGIC		0x50494446	/* "PIDF" */
+> +#define GUEST_MEMFD_MAGIC	0x474d454d	/* "GMEM" */
+> 
+>   #endif /* __LINUX_MAGIC_H__ */
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index b2aa6bf24d3a..1283b85aeb44 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -1,12 +1,16 @@
+>   // SPDX-License-Identifier: GPL-2.0
+> +#include <linux/anon_inodes.h>
+>   #include <linux/backing-dev.h>
+>   #include <linux/falloc.h>
+> +#include <linux/fs.h>
+>   #include <linux/kvm_host.h>
+> +#include <linux/pseudo_fs.h>
+>   #include <linux/pagemap.h>
+> -#include <linux/anon_inodes.h>
+> 
+>   #include "kvm_mm.h"
+> 
+> +static struct vfsmount *kvm_gmem_mnt;
+> +
+>   struct kvm_gmem {
+>   	struct kvm *kvm;
+>   	struct xarray bindings;
+> @@ -318,9 +322,51 @@ static struct file_operations kvm_gmem_fops = {
+>   	.fallocate	= kvm_gmem_fallocate,
+>   };
+> 
+> -void kvm_gmem_init(struct module *module)
+> +static const struct super_operations kvm_gmem_super_operations = {
+> +	.statfs		= simple_statfs,
+> +};
+> +
+> +static int kvm_gmem_init_fs_context(struct fs_context *fc)
+> +{
+> +	struct pseudo_fs_context *ctx;
+> +
+> +	if (!init_pseudo(fc, GUEST_MEMFD_MAGIC))
+> +		return -ENOMEM;
+> +
+> +	ctx = fc->fs_private;
+> +	ctx->ops = &kvm_gmem_super_operations;
+> +
+> +	return 0;
+> +}
+> +
+> +static struct file_system_type kvm_gmem_fs = {
+> +	.name		 = "kvm_guest_memory",
+> +	.init_fs_context = kvm_gmem_init_fs_context,
+> +	.kill_sb	 = kill_anon_super,
+> +};
+> +
+> +static int kvm_gmem_init_mount(void)
+> +{
+> +	kvm_gmem_mnt = kern_mount(&kvm_gmem_fs);
+> +
+> +	if (WARN_ON_ONCE(IS_ERR(kvm_gmem_mnt)))
+> +		return PTR_ERR(kvm_gmem_mnt);
 
-Not sure about the subject, "secure anon inode" is misleading, it's an 
-anon inode where we gave security callbacks a chance to intervene, right?
+Hmm, is this WARN_ON_ONCE really warrented?
 
-maybe simply "fs: factor out anon inode creation + init security"
 
-Acked-by: David Hildenbrand <david@redhat.com>
+Nothing else jumped at me. I hope some fs experts can take a look as well.
 
 -- 
 Cheers,
