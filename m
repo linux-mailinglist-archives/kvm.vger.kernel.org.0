@@ -1,125 +1,130 @@
-Return-Path: <kvm+bounces-48232-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48233-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B3BEACBDC2
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 01:45:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3619ACBDC6
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 01:49:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15F4C1704E9
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 23:45:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A23A6188B6DC
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 23:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A72C1E885A;
-	Mon,  2 Jun 2025 23:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDBA1C1F13;
+	Mon,  2 Jun 2025 23:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="swVWxGjS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VTLstTQm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A4513D2B2
-	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 23:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FA6EEA8
+	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 23:48:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748907917; cv=none; b=CKBe1o5/CZjGkQPlRQEXspJt4yFbNgvzzQiG7zM+Lnjzc/wRrUAaZwWBJQSOgolV+oxYvA4jxK6Caaa5NnP/8OBN3eoJiEItNQBuTZZmsyt8R/fykw1eryknNwPBP54Li92O9ano3K9soznW99R8Fb4jSo1WFiYiJMxawAwD+to=
+	t=1748908136; cv=none; b=IjDbgQ8lkcS+S/Yq+IcB+AuzncDokUqHkm6Nnu34oVuaWlpyQN3ZzdgnEBtT+1U1N8ZB6/KDwpnxePgOE86XyDkKOZe0lAVJ5DM3K/XZfpNpIy9bYFXyQCgSlquMSiIZggcKVBv4MrkSsaq2AqCfECPF6XHsd/0J0SQ4OAdywm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748907917; c=relaxed/simple;
-	bh=/bWJ2fGp0Et7U/W2JVN+6U5ujNjjLBDXeMSAu0EFhbE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cCNnRRYb3pZj4SNozJ/gK8JiLfse3aRBjaXeJzuXqsijmHajmobl/nlB9uwWy38EeJHsUVaonBEIc0Vc8Wma16W/cjBVUj/C7IP1u6MqsRdoa6tukDqiTM+YOJX8hyaBB4VYgXm1WrWNmTRYvfBbZ/mB59sLyz3aJB9NqgXP+Ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=swVWxGjS; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1748908136; c=relaxed/simple;
+	bh=gsy3eEjSnbYMBE0wUJXrbHDurn+rASnYkoRk/QpGGew=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kB776yOPY+K+/LIUjlL+eYKtq4lPgrLnTajXoUVrByOXMI/y91U/qjYQD6UXNKUECs/ho2A/cwaydeJtV6n0QHBfUtjU15owSJquvYJ//7NQTdLLzCvWtN9PVIHsC1EUw+C4kbUG/R1a0j97tH2kifcLyyfcdvbC93jRvTED0Zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VTLstTQm; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-747d125bb9eso948480b3a.1
-        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 16:45:15 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b26e0fee53eso2965515a12.1
+        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 16:48:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748907915; x=1749512715; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GkQR60PQIrxeQGEctk2O7uEeUdi3LKrDj0MxkXt3OGQ=;
-        b=swVWxGjS2pzkKi15+O6ADFSzLBhCHiAVr5JB9c+GW9yqIfb8i+jLgHfTHAaM3vVobH
-         OYKXKiCYopBiqjwUTXE0y3cVnhvpAwKp/nkEjcD+5l/U7o1jSjQwwWS2TKBUp2tJqFRK
-         P+pkQqIMRdoQ6WBILt9MUNnB7P2VLDd0blk05FC2uyJPvYya48sJjtK3emoLbVyWwh20
-         6AnPOHTyuGEwtQgzXSmUCqadYNbmm6zIhYgDNau2Tt11U/tGLEx/EX4N/WEFfBbqRVe6
-         a8BeTC7FMftyETw/kBSAiHw/8Eu6mTcgD16eOgsY6tBpvcKrKHQ3K8qhZtc5kYnm3iOG
-         v+8w==
+        d=google.com; s=20230601; t=1748908135; x=1749512935; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L3aXcom7K3AYa+uBZzM5ecHbi/BcH+kyA4Qs4DNsym0=;
+        b=VTLstTQmmrY8u5H2pqRt6125jQdrj2VfgmSBpNCUHnHtEKBiQyQ+nhge42EI6oEmq2
+         hx9pL+U2dsf6xjqKbXVL2uFEdSzZQY28q4u+IMbrtbBRaDS7BFuxiIOOKUI7rC8G9aRH
+         EfLQ83iFrzcoZNv3tr7CZBwyQz7G94yXJl15rhg3I0YB1wuD8L0iZDEjqTGKvxc11wot
+         LjFarISx+3LaUA/6XATPHizIFJfVn7MIU49ArC9QtXmFVvLq6T072T/Oa1YmqYKtPZ0H
+         fPN6o4EgHySvPaKF8q9GYx4wFoayM4UlcdrZne6g8KhSoVM64mdQbyFmtpL7xmPe0odc
+         z1EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748907915; x=1749512715;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GkQR60PQIrxeQGEctk2O7uEeUdi3LKrDj0MxkXt3OGQ=;
-        b=Ze57Zz7zKrVbuQ16h5WuUDmm9HzDi/dKL2IA0r+tvFPd5J0k8aIUW80gS2nk8r9SOp
-         SGTJO1rPW46rq9wwVvqaLYWQbG4sSNnvnh93pmttQudMhbyWSDQiMj3inMOaEpa6Vg+a
-         lxyL1UOr6RlAtDA4cb5vLpcE514FOfuz+rG3ImKBWWSU8j31dWouWM1bxZEx2l+Yp7yI
-         bklgyNqvnsXntUxWt8HiO7Rz6u0v0U2hSJANy8d3IIVBSailnifThsqRlfm8IEg+KoYM
-         RAWPxnOM1Pnl/DLa9xWPboco5CeFtd6wJp0xpLrxnhhC7eA77cHvLnUSvlmcICHhtl2R
-         /1Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCVn08J8Y0pH8cRg5pRK9B0/rkvC0Ep5WxPPLSKfj5ZTZgogfI2aXzl26Q9+mQi8839bRUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8WEIt0wFw+05ZqRyDgpX3eXP+sT2lyXbZk19m9z76U0XYV8zt
-	Zef4wwGYfJcjgIlFiZ+52Sc7oie+K3TSz1s9a3OqfwG82pLDkOgII4i7uRSiDoMikIIwqlhdMZF
-	9Bnv3jw==
-X-Google-Smtp-Source: AGHT+IEbM7rkSZXQh/W0Dm0Y3uOmV7bU4LP2HEoAjHJ2xpVVJGKMsen91jAMHkuzTnZiPUaHiCrdtEUnDkY=
-X-Received: from pfhx4.prod.google.com ([2002:a05:6a00:1884:b0:746:22b3:4c0d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:885:b0:736:54c9:df2c
- with SMTP id d2e1a72fcca58-747c1bfacf3mr16034894b3a.15.1748907915213; Mon, 02
- Jun 2025 16:45:15 -0700 (PDT)
-Date: Mon, 2 Jun 2025 16:45:13 -0700
-In-Reply-To: <20250529234013.fbxruxq44wpfh5w4@desk>
+        d=1e100.net; s=20230601; t=1748908135; x=1749512935;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L3aXcom7K3AYa+uBZzM5ecHbi/BcH+kyA4Qs4DNsym0=;
+        b=uSaC/BdLR9jd86Ghnh6tOhMAnnqW+MiemKe1jdgJwOpuXsz4tBKajR1Yho1031Pb4y
+         vzzEy4U9EaBRcdstcQOv++HzH7s7ZPUHSoGfNkh4ewqcU5S4473UkVBmek9KeVxb4uqW
+         aqAz9b6AuDSWxQf/vqsUjp+w/dhr8UYqLHOX0oI3H992KHTV1E7BBuCWi1WFKVB+ttHx
+         imL6FK/0ec/XrGL8Re+Oj0m+A9GqUzt2rIuj5HRCImxbLNvIBuWPMrI8rPHIVFftkeUe
+         g/lDN9vrOIC3EcYuG9O6KuDoJls6SjmcNe88d1wS20SawrpQYdNfFn7Nc7Kmwe6tP6Iu
+         mKDw==
+X-Gm-Message-State: AOJu0YwKveGSOHaPL/i0hpaaCHwhGH6zr8JRvWQM1pzEwTIc1YvSEkvI
+	TvFGl+9gUzOQ+yulflisaqG5MlCOJlRFAf1B/tt5Fb7IVT4hhPds61gbOcS1Li17liL8DOuSzFh
+	B0zElmg==
+X-Google-Smtp-Source: AGHT+IHrW8lgam5hMs+q8Q41nDdQP7VjrdcQXqaqPJtcR+BjM+THP2Toplhq44lorb8g4sT9CHMEgvpWbMs=
+X-Received: from plgo5.prod.google.com ([2002:a17:902:d4c5:b0:223:225b:3d83])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:41c6:b0:235:225d:30a2
+ with SMTP id d9443c01a7336-23539715c69mr214408135ad.48.1748908134726; Mon, 02
+ Jun 2025 16:48:54 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Mon,  2 Jun 2025 16:48:51 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250523011756.3243624-1-seanjc@google.com> <20250523011756.3243624-4-seanjc@google.com>
- <20250529042710.crjcc76dqpiak4pn@desk> <aDjdagbqcesTcnhc@google.com> <20250529234013.fbxruxq44wpfh5w4@desk>
-Message-ID: <aD43icQolCvESIpc@google.com>
-Subject: Re: [PATCH 3/5] KVM: VMX: Apply MMIO Stale Data mitigation if KVM
- maps MMIO into the guest
+X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
+Message-ID: <20250602234851.54573-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86/mmu: Exempt nested EPT page tables from !USER,
+ CR0.WP=0 logic
 From: Sean Christopherson <seanjc@google.com>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Borislav Petkov <bp@alien8.de>, Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jon Kohler <jon@nutanix.com>, Sergey Dyasli <sergey.dyasli@nutanix.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, May 29, 2025, Pawan Gupta wrote:
-> On Thu, May 29, 2025 at 03:19:22PM -0700, Sean Christopherson wrote:
-> > On Wed, May 28, 2025, Pawan Gupta wrote:
-> > > On Thu, May 22, 2025 at 06:17:54PM -0700, Sean Christopherson wrote:
-> > > > @@ -7282,7 +7288,7 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-> > > >  	if (static_branch_unlikely(&vmx_l1d_should_flush))
-> > > >  		vmx_l1d_flush(vcpu);
-> > > >  	else if (static_branch_unlikely(&mmio_stale_data_clear) &&
-> > > > -		 kvm_arch_has_assigned_device(vcpu->kvm))
-> > > > +		 (flags & VMX_RUN_CLEAR_CPU_BUFFERS_FOR_MMIO))
-> > > >  		mds_clear_cpu_buffers();
-> > > 
-> > > I think this also paves way for buffer clear for MDS and MMIO to be done at
-> > > a single place. Please let me know if below is feasible:
-> > 
-> > It's definitely feasible (this thought crossed my mind as well), but because
-> > CLEAR_CPU_BUFFERS emits VERW iff X86_FEATURE_CLEAR_CPU_BUF is enabled, the below
-> > would do nothing for the MMIO case (either that, or I'm missing something).
-> 
-> Thats right, CLEAR_CPU_BUFFERS needs rework too.
-> 
-> > We could obviously rework CLEAR_CPU_BUFFERS, I'm just not sure that's worth the
-> > effort at this point.  I'm definitely not opposed to it though.
-> 
-> My goal with this is to have 2 separate controls for user-kernel and
-> guest-host. Such that MDS/TAA/RFDS gets finer controls to only enable
-> user-kernel or guest-host mitigation. This would play well with the Attack
-> vector series by David:
-> 
-> https://lore.kernel.org/lkml/20250509162839.3057217-1-david.kaplan@amd.com/
-> 
-> For now this patch is fine as is. I will send update separately including
-> the CLEAR_CPU_BUFFERS rework.
+Exempt nested EPT shadow pages tables from the CR0.WP=0 handling of
+supervisor writes, as EPT doesn't have a U/S bit and isn't affected by
+CR0.WP (or CR4.SMEP in the exception to the exception).
 
-Sounds good.
+Opportunistically refresh the comment to explain what KVM is doing, as
+the only record of why KVM shoves in WRITE and drops USER is buried in
+years-old changelogs.
 
-Ah, and the s/mmio_stale_data_clear/cpu_buf_vm_clear rename already landed for
-6.16-rc1, so we don't have to overthink about the ordering with respect to that
-change. :-)
+Cc: Jon Kohler <jon@nutanix.com>
+Cc: Sergey Dyasli <sergey.dyasli@nutanix.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/paging_tmpl.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 68e323568e95..ed762bb4b007 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -804,9 +804,12 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	if (r != RET_PF_CONTINUE)
+ 		return r;
+ 
++#if PTTYPE != PTTYPE_EPT
+ 	/*
+-	 * Do not change pte_access if the pfn is a mmio page, otherwise
+-	 * we will cache the incorrect access into mmio spte.
++	 * Treat the guest PTE protections as writable, supervisor-only if this
++	 * is a supervisor write fault and CR0.WP=0 (supervisor accesses ignore
++	 * PTE.W if CR0.WP=0).  Don't change the access type for emulated MMIO,
++	 * otherwise KVM will cache incorrect access information in the SPTE.
+ 	 */
+ 	if (fault->write && !(walker.pte_access & ACC_WRITE_MASK) &&
+ 	    !is_cr0_wp(vcpu->arch.mmu) && !fault->user && fault->slot) {
+@@ -822,6 +825,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 		if (is_cr4_smep(vcpu->arch.mmu))
+ 			walker.pte_access &= ~ACC_EXEC_MASK;
+ 	}
++#endif
+ 
+ 	r = RET_PF_RETRY;
+ 	write_lock(&vcpu->kvm->mmu_lock);
+
+base-commit: 3f7b307757ecffc1c18ede9ee3cf9ce8101f3cc9
+-- 
+2.49.0.1204.g71687c7c1d-goog
+
 
