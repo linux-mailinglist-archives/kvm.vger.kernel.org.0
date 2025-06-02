@@ -1,221 +1,198 @@
-Return-Path: <kvm+bounces-48176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E9B7ACB60F
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 17:13:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C411ACB878
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 17:42:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A04CF1947750
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 14:57:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3AF7402EC4
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 15:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFFCC239570;
-	Mon,  2 Jun 2025 14:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gAxGSIiR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D63D22D9E7;
+	Mon,  2 Jun 2025 15:14:54 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394D2231C87;
-	Mon,  2 Jun 2025 14:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D526122D780;
+	Mon,  2 Jun 2025 15:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748875839; cv=none; b=QugAXskoUdlVX0Zok5GPAbic1uABWipBpraotpqsXFUcheSrB8heSRMm9bBemhbfcaxQNj1czC/lpfgPWZplQVtxBM4TAidkGFPG3tj1+t3AyF8O57LJ3YxHYzAPr9Jtoa1Sfi56ufhGJyZbRWPsK/vaRR9V0JSNF/EjjE7c7OU=
+	t=1748877293; cv=none; b=fV9a6BlVTvCMrBqUXmvklbxvvNcp5uU6ydgpvEsN3VrjwlVg1/HnYi8ehPgZBpUoG+0AtQi+TCHcrD/9ZARyiB6Te4I2Oz4G1CB4rPM34A1AeNmVcIDzq+dDv6HXIZfXrdolYKP6rBBUIu70AADawt/gtQvDjZtJ7aWG/S8oFq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748875839; c=relaxed/simple;
-	bh=gvltXEjxatA7cwXbM1ySU6qvzw0guFizH5e5rJ906Jg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IKCfVUdZiMe18+TtAoepz4+Ug90Zc+TeLuL4VOT5f3BuNGTh5tqa+g9dULfPxvBbszwje2XpGCI/KRwje75CHNm2q7ONU53ts1TuD9A+rvzxYiVaIhGISjQwAtTf2LFOOdDsnaU1YuSu/2yUHCnpULiT9IIeg8GCVHHkFmwCOhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gAxGSIiR; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748875837; x=1780411837;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gvltXEjxatA7cwXbM1ySU6qvzw0guFizH5e5rJ906Jg=;
-  b=gAxGSIiRmPNfF74z2v8p2uVMdrDvB4Jsrq8ai5zQsR3qVdx0+/uPq/Mt
-   GBDj5QJNgPR2vrvyfmggDnZrV9zJODB3shZWed6D32t/XVl55+bhylPaZ
-   wZAp1xnOOe8qMqLneoPW9lZKWGCQ2/25KeRXi5lUMrvSUGe4/vCuTkJtR
-   xQGaXzZAvA8LjKP+0mEu1VF1gviAgLn6FwJGrTD/w2tViWVAjMYLq0O/b
-   zqOiH82efqUBRaFhBUCWqbU/8sZE07+rrXcMSpAPvT2B17Yi3Y45FNLt5
-   BW2ok61D1J1aIyKeh0xaXPF2N8lL/l3wRGnzU1MKiOZdget/V+kKInIRP
-   A==;
-X-CSE-ConnectionGUID: bONEmGf5SUC+7oJCVuxPAw==
-X-CSE-MsgGUID: u2QuODLRRcCkredeVqk/lw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11451"; a="68435605"
-X-IronPort-AV: E=Sophos;i="6.16,203,1744095600"; 
-   d="scan'208";a="68435605"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2025 07:50:36 -0700
-X-CSE-ConnectionGUID: bSyumsRCQFaHieW5WnNEIw==
-X-CSE-MsgGUID: ORB/JHGpRB2A/q6o48Pqug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,203,1744095600"; 
-   d="scan'208";a="144592177"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa009.jf.intel.com with ESMTP; 02 Jun 2025 07:50:30 -0700
-Date: Mon, 2 Jun 2025 22:43:59 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: kvm@vger.kernel.org, sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	jgg@nvidia.com, dan.j.williams@intel.com, aik@amd.com,
-	linux-coco@lists.linux.dev, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	vivek.kasireddy@intel.com, yilun.xu@intel.com,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
-	zhenzhong.duan@intel.com, tao1.su@intel.com,
-	linux-pci@vger.kernel.org, zhiw@nvidia.com, simona.vetter@ffwll.ch,
-	shameerali.kolothum.thodi@huawei.com, iommu@lists.linux.dev,
-	kevin.tian@intel.com
-Subject: Re: [RFC PATCH 19/30] vfio/pci: Add TSM TDI bind/unbind IOCTLs for
- TEE-IO support
-Message-ID: <aD24r44v0g1NgeZs@yilunxu-OptiPlex-7050>
-References: <20250529053513.1592088-1-yilun.xu@linux.intel.com>
- <20250529053513.1592088-20-yilun.xu@linux.intel.com>
- <yq5aplfn210z.fsf@kernel.org>
+	s=arc-20240116; t=1748877293; c=relaxed/simple;
+	bh=Szo9uGF0rg5w3SBDMgWbGMqvVdF5MMEJIQ0W/n76qhE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i0gq/WByOk20mvmZ4Fw4EwTboOmlEWZNb6ftMoISz03JBBrtk8JfQAUpWDdPx8OG9hiDlgrMOhBdslCURLrHG2jqr6bG8gaPHcU3oFvvjObNVWCHYzO17Z7v3rt5DtZGC0YU2KmNV4CKLpmh4yyIYbpZAYqqoXgmm4en2CDfbF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABBED1424;
+	Mon,  2 Jun 2025 08:14:34 -0700 (PDT)
+Received: from [10.57.64.248] (unknown [10.57.64.248])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 22FDA3F5A1;
+	Mon,  2 Jun 2025 08:14:46 -0700 (PDT)
+Message-ID: <673853c4-b7b0-4a7f-915e-37646ae8cf6f@arm.com>
+Date: Mon, 2 Jun 2025 16:14:45 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq5aplfn210z.fsf@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 16/43] arm64: RME: Handle realm enter/exit
+To: "Emi Kisanuki (Fujitsu)" <fj0570is@fujitsu.com>,
+ "'kvm@vger.kernel.org'" <kvm@vger.kernel.org>,
+ "'kvmarm@lists.linux.dev'" <kvmarm@lists.linux.dev>
+Cc: 'Catalin Marinas' <catalin.marinas@arm.com>,
+ 'Marc Zyngier' <maz@kernel.org>, 'Will Deacon' <will@kernel.org>,
+ 'James Morse' <james.morse@arm.com>, 'Oliver Upton'
+ <oliver.upton@linux.dev>, 'Suzuki K Poulose' <suzuki.poulose@arm.com>,
+ 'Zenghui Yu' <yuzenghui@huawei.com>,
+ "'linux-arm-kernel@lists.infradead.org'"
+ <linux-arm-kernel@lists.infradead.org>,
+ "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
+ 'Joey Gouly' <joey.gouly@arm.com>,
+ 'Alexandru Elisei' <alexandru.elisei@arm.com>,
+ 'Christoffer Dall' <christoffer.dall@arm.com>,
+ 'Fuad Tabba' <tabba@google.com>,
+ "'linux-coco@lists.linux.dev'" <linux-coco@lists.linux.dev>,
+ 'Ganapatrao Kulkarni' <gankulkarni@os.amperecomputing.com>,
+ 'Gavin Shan' <gshan@redhat.com>,
+ 'Shanker Donthineni' <sdonthineni@nvidia.com>,
+ 'Alper Gun' <alpergun@google.com>,
+ "'Aneesh Kumar K . V'" <aneesh.kumar@kernel.org>
+References: <20250416134208.383984-1-steven.price@arm.com>
+ <20250416134208.383984-17-steven.price@arm.com>
+ <TYCPR01MB11463D8002D90705A7F860B85C366A@TYCPR01MB11463.jpnprd01.prod.outlook.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <TYCPR01MB11463D8002D90705A7F860B85C366A@TYCPR01MB11463.jpnprd01.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jun 01, 2025 at 04:15:32PM +0530, Aneesh Kumar K.V wrote:
-> Xu Yilun <yilun.xu@linux.intel.com> writes:
+On 29/05/2025 05:52, Emi Kisanuki (Fujitsu) wrote:
+> Hello, I comment below.
+
+Hi Emi,
+
+>> Subject: [PATCH v8 16/43] arm64: RME: Handle realm enter/exit
+>>
+>> Entering a realm is done using a SMC call to the RMM. On exit the exit-codes
+>> need to be handled slightly differently to the normal KVM path so define our own
+>> functions for realm enter/exit and hook them in if the guest is a realm guest.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+
+[..]
+
+>> +/*
+>> + * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason)
+>> +on
+>> + * proper exit to userspace.
+>> + */
+>> +int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret) {
+>> +	struct realm_rec *rec = &vcpu->arch.rec;
+>> +	u8 esr_ec = ESR_ELx_EC(rec->run->exit.esr);
+>> +	unsigned long status, index;
+>> +
+>> +	status = RMI_RETURN_STATUS(rec_run_ret);
+>> +	index = RMI_RETURN_INDEX(rec_run_ret);
+>> +
+>> +	/*
+>> +	 * If a PSCI_SYSTEM_OFF request raced with a vcpu executing, we
+>> might
+>> +	 * see the following status code and index indicating an attempt to run
+>> +	 * a REC when the RD state is SYSTEM_OFF.  In this case, we just need
+>> to
+>> +	 * return to user space which can deal with the system event or will try
+>> +	 * to run the KVM VCPU again, at which point we will no longer attempt
+>> +	 * to enter the Realm because we will have a sleep request pending on
+>> +	 * the VCPU as a result of KVM's PSCI handling.
+>> +	 */
+>> +	if (status == RMI_ERROR_REALM && index == 1) {
+>> +		vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
+>> +		return 0;
+>> +	}
+> Running kvm-unit-tests-cca selftest(smp) test in quick succession may trigger these conditions, resulting in the following error logs.
+>  Error: KVM exit reason: 0 ("KVM_EXIT_UNKNOWN")
 > 
-> > Add new IOCTLs to do TSM based TDI bind/unbind. These IOCTLs are
-> > expected to be called by userspace when CoCo VM issues TDI bind/unbind
-> > command to VMM. Specifically for TDX Connect, these commands are some
-> > secure Hypervisor call named GHCI (Guest-Hypervisor Communication
-> > Interface).
-> >
-> > The TSM TDI bind/unbind operations are expected to be initiated by a
-> > running CoCo VM, which already have the legacy assigned device in place.
-> > The TSM bind operation is to request VMM make all secure configurations
-> > to support device work as a TDI, and then issue TDISP messages to move
-> > the TDI to CONFIG_LOCKED or RUN state, waiting for guest's attestation.
-> >
-> > Do TSM Unbind before vfio_pci_core_disable(), otherwise will lead
-> > device to TDISP ERROR state.
-> >
-> 
-> Any reason these need to be a vfio ioctl instead of iommufd ioctl?
-> For ex: https://lore.kernel.org/all/20250529133757.462088-3-aneesh.kumar@kernel.org/
+> Since KVM_EXIT_UNKNOWN is used when no specific exit reason applies, I think it would be better to make it identifiable as an error.
+> How about adding and setting a new ARM64 exit_reason value to indicate that the PSCI_SYSTEM_OFF request is conflicting with a running vcpu?
 
-A general reason is, the device driver - VFIO should be aware of the
-bound state, and some operations break the bound state. VFIO should also
-know some operations on bound may crash kernel because of platform TSM
-firmware's enforcement. E.g. zapping MMIO, because private MMIO mapping
-in secure page tables cannot be unmapped before TDI STOP [1].
-
-Specifically, for TDX Connect, the firmware enforces MMIO unmapping in
-S-EPT would fail if TDI is bound. For AMD there seems also some
-requirement about this but I need Alexey's confirmation.
-
-[1] https://lore.kernel.org/all/aDnXxk46kwrOcl0i@yilunxu-OptiPlex-7050/
-
-> 
-> >
-> > Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> > Signed-off-by: Wu Hao <hao.wu@intel.com>
-> > Signed-off-by: Xu Yilun <yilun.xu@linux.intel.com>
-> > ---
-> >  drivers/vfio/iommufd.c           | 22 ++++++++++
-> >  drivers/vfio/pci/vfio_pci_core.c | 74 ++++++++++++++++++++++++++++++++
-> >  include/linux/vfio.h             |  7 +++
-> >  include/linux/vfio_pci_core.h    |  1 +
-> >  include/uapi/linux/vfio.h        | 42 ++++++++++++++++++
-> >  5 files changed, 146 insertions(+)
-> >
-> > diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
-> > index 3441d24538a8..33fd20ffaeee 100644
-> > --- a/drivers/vfio/iommufd.c
-> > +++ b/drivers/vfio/iommufd.c
-> > @@ -297,3 +297,25 @@ void vfio_iommufd_emulated_detach_ioas(struct vfio_device *vdev)
-> >  	vdev->iommufd_attached = false;
-> >  }
-> >  EXPORT_SYMBOL_GPL(vfio_iommufd_emulated_detach_ioas);
-> > +
-> > +int vfio_iommufd_tsm_bind(struct vfio_device *vdev, u32 vdevice_id)
-> > +{
-> > +	lockdep_assert_held(&vdev->dev_set->lock);
-> > +
-> > +	if (WARN_ON(!vdev->iommufd_device))
-> > +		return -EINVAL;
-> > +
-> > +	return iommufd_device_tsm_bind(vdev->iommufd_device, vdevice_id);
-> > +}
-> > +EXPORT_SYMBOL_GPL(vfio_iommufd_tsm_bind);
-> > +
-> > +void vfio_iommufd_tsm_unbind(struct vfio_device *vdev)
-> > +{
-> > +	lockdep_assert_held(&vdev->dev_set->lock);
-> > +
-> > +	if (WARN_ON(!vdev->iommufd_device))
-> > +		return;
-> > +
-> > +	iommufd_device_tsm_unbind(vdev->iommufd_device);
-> > +}
-> > +EXPORT_SYMBOL_GPL(vfio_iommufd_tsm_unbind);
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> > index 116964057b0b..92544e54c9c3 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -692,6 +692,13 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
-> >  #if IS_ENABLED(CONFIG_EEH)
-> >  	eeh_dev_release(vdev->pdev);
-> >  #endif
-> > +
-> > +	if (vdev->is_tsm_bound) {
-> > +		vfio_iommufd_tsm_unbind(&vdev->vdev);
-> > +		pci_release_regions(vdev->pdev);
-> > +		vdev->is_tsm_bound = false;
-> > +	}
-> > +
-> >  	vfio_pci_core_disable(vdev);
-> >  
-> >  	vfio_pci_dma_buf_cleanup(vdev);
-> > @@ -1447,6 +1454,69 @@ static int vfio_pci_ioctl_ioeventfd(struct vfio_pci_core_device *vdev,
-> >  				  ioeventfd.fd);
-> >  }
-> >  
-> > +static int vfio_pci_ioctl_tsm_bind(struct vfio_pci_core_device *vdev,
-> > +				   void __user *arg)
-> > +{
-> > +	unsigned long minsz = offsetofend(struct vfio_pci_tsm_bind, vdevice_id);
-> > +	struct vfio_pci_tsm_bind tsm_bind;
-> > +	struct pci_dev *pdev = vdev->pdev;
-> > +	int ret;
-> > +
-> > +	if (copy_from_user(&tsm_bind, arg, minsz))
-> > +		return -EFAULT;
-> > +
-> > +	if (tsm_bind.argsz < minsz || tsm_bind.flags)
-> > +		return -EINVAL;
-> > +
-> > +	mutex_lock(&vdev->vdev.dev_set->lock);
-> > +
-> > +	/* To ensure no host side MMIO access is possible */
-> > +	ret = pci_request_regions_exclusive(pdev, "vfio-pci-tsm");
-> > +	if (ret)
-> > +		goto out_unlock;
-> >
-> 
-> This should be part of pci_tsm_bind() ? 
-
-I'm not quite sure. My feelig is this method is specific for VFIO
-driver. Many other drivers just request regions on probe(), they can
-never bind successfully if pci tsm hide this implementation internally.
+Aneesh pointed this out to me off-list. We agreed that KVM_EXIT_SHUTDOWN
+was more appropriate here. I'll make the change for v9.
 
 Thanks,
-Yilun
+Steve
+
+> Best Regards,
+> Emi Kisanuki
+>> +
+>> +	if (rec_run_ret)
+>> +		return -ENXIO;
+>> +
+>> +	vcpu->arch.fault.esr_el2 = rec->run->exit.esr;
+>> +	vcpu->arch.fault.far_el2 = rec->run->exit.far;
+>> +	vcpu->arch.fault.hpfar_el2 = rec->run->exit.hpfar;
+>> +
+>> +	update_arch_timer_irq_lines(vcpu);
+>> +
+>> +	/* Reset the emulation flags for the next run of the REC */
+>> +	rec->run->enter.flags = 0;
+>> +
+>> +	switch (rec->run->exit.exit_reason) {
+>> +	case RMI_EXIT_SYNC:
+>> +		return rec_exit_handlers[esr_ec](vcpu);
+>> +	case RMI_EXIT_IRQ:
+>> +	case RMI_EXIT_FIQ:
+>> +		return 1;
+>> +	case RMI_EXIT_PSCI:
+>> +		return rec_exit_psci(vcpu);
+>> +	case RMI_EXIT_RIPAS_CHANGE:
+>> +		return rec_exit_ripas_change(vcpu);
+>> +	}
+>> +
+>> +	kvm_pr_unimpl("Unsupported exit reason: %u\n",
+>> +		      rec->run->exit.exit_reason);
+>> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> +	return 0;
+>> +}
+>> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c index
+>> 33eb793d8bdb..bee9dfe12e03 100644
+>> --- a/arch/arm64/kvm/rme.c
+>> +++ b/arch/arm64/kvm/rme.c
+>> @@ -863,6 +863,25 @@ void kvm_destroy_realm(struct kvm *kvm)
+>>  	kvm_free_stage2_pgd(&kvm->arch.mmu);
+>>  }
+>>
+>> +int kvm_rec_enter(struct kvm_vcpu *vcpu) {
+>> +	struct realm_rec *rec = &vcpu->arch.rec;
+>> +
+>> +	switch (rec->run->exit.exit_reason) {
+>> +	case RMI_EXIT_HOST_CALL:
+>> +	case RMI_EXIT_PSCI:
+>> +		for (int i = 0; i < REC_RUN_GPRS; i++)
+>> +			rec->run->enter.gprs[i] = vcpu_get_reg(vcpu, i);
+>> +		break;
+>> +	}
+>> +
+>> +	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_ACTIVE)
+>> +		return -EINVAL;
+>> +
+>> +	return rmi_rec_enter(virt_to_phys(rec->rec_page),
+>> +			     virt_to_phys(rec->run));
+>> +}
+>> +
+>>  static void free_rec_aux(struct page **aux_pages,
+>>  			 unsigned int num_aux)
+>>  {
+>> --
+>> 2.43.0
+>>
+> 
+
 
