@@ -1,186 +1,125 @@
-Return-Path: <kvm+bounces-48158-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48159-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E01BACAC33
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 12:02:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53CB6ACAC3A
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 12:05:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4D91189DDFC
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 10:02:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 322407A6A37
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 10:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F251EDA02;
-	Mon,  2 Jun 2025 10:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C843E1F8751;
+	Mon,  2 Jun 2025 10:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iIRgcOEh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ehp23+Sj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11AF13AA31;
-	Mon,  2 Jun 2025 10:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAAE1DD889
+	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 10:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748858523; cv=none; b=jHnfQ1/pDxXaWtcXpN6NMampAileN/z0uJ7+wjYnNFpYSS9SIh+2nt/OWrb3n0+tgt1FfYnLr0B1YjGCeACGDuEy07mflK7b5/zvbhPswI8vlunxs7OuPfR7Jto4H7FlGBB2ZLtDvaEHwccjQX299MG99l19g8FWNsP2CzGXOsc=
+	t=1748858706; cv=none; b=acCupABf7C3RBzMEj2PBVc5X6YQpKs/ViIg8JdF+6lbRxxZojFZ+NZAV66436ePnAslNALvvG3U2XQzYI7NQMiGjD7TMYhjRj4b1v+xikeX2EZmmAlP0KfWIdpzIJoKiaHrHbAkGxm2DLlB3/0jrOzXLJw8nkPznrZrFN28KO2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748858523; c=relaxed/simple;
-	bh=nEZ6BMzvDaj9htHiiB4l9xLXLONZDHjM6y0KMH9aMjw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=V+VePPOA55FXzsazEnRArFOl94xvyKCU9l1CG025tvTM5At1BL6JRSv1sMx5Sdgs8KoYucYeJlA/Fq3ela1qmr145Se1kmPNahcN7mUmZiDSdTY4cS3iZGCbjA/QAv5Z4JiWAra06GRYKJ2HdXFCVm+qxURzg+g+SLGH5t3BJvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iIRgcOEh; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5528mXUv016058;
-	Mon, 2 Jun 2025 10:01:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=B4thrF
-	eqnvJufZJQyQpfG5Q2il431CtCmXDBCEhV/UY=; b=iIRgcOEhq7u/yzyHpVEkFR
-	ZYfdUjwDY4QV7zkIDpI3qvHuuH6BShzW58T6+jXEelc0AvzXruIj+Zqp91kbI9g5
-	FZ/sNIoNgjjovvSi/fmtrjM5Pj4Dt8hnBVR9OZ5jhQDsq7fh0Tsieq3tjsr7FcHo
-	YFxIgnHjHNTTyyIN0vbxto8saMDQRUDUAGdMloYPlhC4qYOed/9s7ydkPr3TdsNC
-	Wye5boeOdc+4WZzX+sErSAd2qCHrL3wdAPusWlNUUvTOUYvJzixQQYHGAIhFNjBj
-	F3jvVls2DOYvlTfQjsDxrhYN8Y17T5M/jT/Zq3GmthyAErBcN5Ub+EP+80c3LavA
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46yxqq7p6t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Jun 2025 10:01:58 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5529PKiR020246;
-	Mon, 2 Jun 2025 10:01:34 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 470et25b3b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Jun 2025 10:01:33 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 552A1UMm19530130
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 2 Jun 2025 10:01:30 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 257C320074;
-	Mon,  2 Jun 2025 10:01:30 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E720C20073;
-	Mon,  2 Jun 2025 10:01:29 +0000 (GMT)
-Received: from darkmoore (unknown [9.111.39.121])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  2 Jun 2025 10:01:29 +0000 (GMT)
+	s=arc-20240116; t=1748858706; c=relaxed/simple;
+	bh=Bk83LNbALxmPewRbnvWWB1M1iYIqeINndHZy9xJXc2s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DBH3newh8kzKWNgp3qElybv02Pjti1UMN9asf6BbXEfkAT9rU6ayYCXLgf/5q/I0K7OqHSaR1Dva31ErWppH9O5ceN+N7ZRWRenJ/rYFAWry1XhJU/tB4btw/0hA29BsQxnSnKZMun+VMK9mLiMeXydFx/uSNiElJIz6BOEQG4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ehp23+Sj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1748858703;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fep9/GB0cJfqKQgmfJB5i+bPko2YtosdytfWWu6bHc0=;
+	b=Ehp23+SjjuDmf1yLykzad/dv6dMrfffR3WYhsBGK4L4WAtF1ZQx10oihiQYPanamYay1QR
+	+zh9Dz2tjkt0e9kXgmc6VrCN8T5dxFg7nnc/Smcnxlzy9PmAZ1Z3uMmotJMVeO6jfT3L5W
+	7tq0QdXrptQFHo4aZDD163R/8kPUBBw=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-463-_suG_kkxPXeNbI9vYQ_TtQ-1; Mon,
+ 02 Jun 2025 06:05:00 -0400
+X-MC-Unique: _suG_kkxPXeNbI9vYQ_TtQ-1
+X-Mimecast-MFC-AGG-ID: _suG_kkxPXeNbI9vYQ_TtQ_1748858698
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CFA7F18003FC;
+	Mon,  2 Jun 2025 10:04:57 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.45.224.29])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA4DB19560A3;
+	Mon,  2 Jun 2025 10:04:56 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 0A07C1800609; Mon, 02 Jun 2025 12:04:54 +0200 (CEST)
+Date: Mon, 2 Jun 2025 12:04:53 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] x86/sev/vc: fix efi runtime instruction emulation
+Message-ID: <763uanqowqaxiv3dzi7kndwpd3s2fxa3sm2fruynqsj5elld2e@lxk7v7bksyjw>
+References: <20250527144546.42981-1-kraxel@redhat.com>
+ <20250527162151.GAaDXmn8O3f_HYgRju@fat_crate.local>
+ <77hywpberfkulac3q3hpupdmdpw2xbmlvzin4ks7xypikravkj@xjpi7gqscs6a>
+ <20250529230233.GEaDjniaXGlxAU0NzA@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 02 Jun 2025 12:01:24 +0200
-Message-Id: <DABYLCKX9E7Q.25CHFIS5HVA47@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <linux-s390@vger.kernel.org>,
-        "Christian Borntraeger"
- <borntraeger@linux.ibm.com>,
-        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        "David Hildenbrand" <david@redhat.com>,
-        "Heiko Carstens"
- <hca@linux.ibm.com>,
-        "Vasily Gorbik" <gor@linux.ibm.com>,
-        "Alexander
- Gordeev" <agordeev@linux.ibm.com>,
-        "Sven Schnelle" <svens@linux.ibm.com>,
-        "Thomas Huth" <thuth@redhat.com>
-To: "Janosch Frank" <frankja@linux.ibm.com>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v3 2/3] KVM: s390: Always allocate esca_block
-X-Mailer: aerc 0.20.1
-References: <20250522-rm-bsca-v3-0-51d169738fcf@linux.ibm.com>
- <20250522-rm-bsca-v3-2-51d169738fcf@linux.ibm.com>
- <7ca1e834-a501-4c91-9458-63d5e0e2ec79@linux.ibm.com>
-In-Reply-To: <7ca1e834-a501-4c91-9458-63d5e0e2ec79@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=AZ2xH2XG c=1 sm=1 tr=0 ts=683d7697 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=wuLMqWMKSN1-Q7KnnqIA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjAyMDA4NiBTYWx0ZWRfX0ulUZrFGmoj9 BbLMLJkHgN2+sQyD/sx67Z2yBPUrSbo8AVma39R+zPwYKJiYdxKyOWe5kF0E48RXh+DXk0Eg3U+ 2p4Zj7QFdY3W3RfXuZ3OnsokGsjuMyEPLHG6NzIDkqYMGc9xb9mYiUKXiOWwn1HbVzlGAXjkA9j
- bmYqTKmcIsrCxci/G9Qv1pEax5YKeW9QAyjeHs/G0dY5ss3Kb7GEEV7ohqg17c/Aryrl+Xoc5j7 eLXa/vJYjTnTkERi5lxjBrBirTiD+Egob7D4TPOogt/T6i52ybNAm9AhGz08a5N1ahjvgqH0rHG sKWJQ3D2fQSivTG+qrMI8I6N+uhY4jZKCABfwZZOl3FJ+PwHeJRK0M2gIN7+zBF7ZbUvVh2Rkl6
- CaQxlCQ5tZ27MS0we7a5Xho90PMNQfEJNRibgtmBnL1iVm8ZvyFxK42iP2FBSv2M5pFzS5iR
-X-Proofpoint-ORIG-GUID: yABHLQwQTYbghNCXwUNpMNwVUlJUljEn
-X-Proofpoint-GUID: yABHLQwQTYbghNCXwUNpMNwVUlJUljEn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-02_04,2025-05-30_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 spamscore=0 mlxscore=0 bulkscore=0 mlxlogscore=488
- clxscore=1015 adultscore=0 malwarescore=0 impostorscore=0
- priorityscore=1501 phishscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505160000 definitions=main-2506020086
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250529230233.GEaDjniaXGlxAU0NzA@fat_crate.local>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Mon May 26, 2025 at 10:22 AM CEST, Janosch Frank wrote:
-> On 5/22/25 11:31 AM, Christoph Schlameuss wrote:
->> Instead of allocating a BSCA and upgrading it for PV or when adding the
->> 65th cpu we can always use the ESCA.
->>=20
->> The only downside of the change is that we will always allocate 4 pages
->> for a 248 cpu ESCA instead of a single page for the BSCA per VM.
->> In return we can delete a bunch of checks and special handling depending
->> on the SCA type as well as the whole BSCA to ESCA conversion.
->>=20
->> As a fallback we can still run without SCA entries when the SIGP
->> interpretation facility or ESCA are not available.
->>=20
->> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/kvm_host.h |   1 -
->>   arch/s390/kvm/interrupt.c        |  71 +++++------------
->>   arch/s390/kvm/kvm-s390.c         | 161 ++++++-------------------------=
---------
->>   arch/s390/kvm/kvm-s390.h         |   4 +-
->>   4 files changed, 45 insertions(+), 192 deletions(-)
->
-> [...]
->
->> @@ -80,33 +70,17 @@ static int sca_inject_ext_call(struct kvm_vcpu *vcpu=
-, int src_id)
->>  =20
->>   	BUG_ON(!kvm_s390_use_sca_entries());
->>   	read_lock(&vcpu->kvm->arch.sca_lock);
->> -	if (vcpu->kvm->arch.use_esca) {
->> -		struct esca_block *sca =3D vcpu->kvm->arch.sca;
->> -		union esca_sigp_ctrl *sigp_ctrl =3D
->> -			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
->> -		union esca_sigp_ctrl new_val =3D {0}, old_val;
->> -
->> -		old_val =3D READ_ONCE(*sigp_ctrl);
->> -		new_val.scn =3D src_id;
->> -		new_val.c =3D 1;
->> -		old_val.c =3D 0;
->> -
->> -		expect =3D old_val.value;
->> -		rc =3D cmpxchg(&sigp_ctrl->value, old_val.value, new_val.value);
->> -	} else {
->> -		struct bsca_block *sca =3D vcpu->kvm->arch.sca;
->> -		union bsca_sigp_ctrl *sigp_ctrl =3D
->> -			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
->> -		union bsca_sigp_ctrl new_val =3D {0}, old_val;
->> +	struct esca_block *sca =3D vcpu->kvm->arch.sca;
->> +	union esca_sigp_ctrl *sigp_ctrl =3D &sca->cpu[vcpu->vcpu_id].sigp_ctrl=
-;
->> +	union esca_sigp_ctrl new_val =3D {0}, old_val;
->
->
-> Since we don't have a need for inline declarations anymore, could you=20
-> move those to the beginning of the function?
+On Fri, May 30, 2025 at 01:02:33AM +0200, Borislav Petkov wrote:
+> On Wed, May 28, 2025 at 09:38:24AM +0200, Gerd Hoffmann wrote:
+> > Use case is coconut-svsm providing an uefi variable store and edk2
+> > runtime code doing svsm protocol calls to send requests to the svsm
+> > variable store.  edk2 needs a caa page mapping and a working rdmsr
+> > instruction for that.
+> > 
+> > Another less critical but useful case is edk2 debug logging to qemu
+> > debugcon port.  That needs a working cpuid instruction because edk2
+> > uses that to figure whenever sev is active and adapt ioport access
+> > accordingly.
+> 
+> Yeah, I'd like for those justifications be in the commit messages please.
 
-That would mean moving the sca access here out of the read lock. So I would
-rather include that in a patch removing the sca_lock completely.
+Ok
 
->
-> @Christian @Claudio:
-> Another interesting question is locking.
-> The SCA RW lock protected against the bsca->esca switch which never=20
-> happens after this patch.
->
-> Can't we rip out that lock and maybe get a bit of performance and even=20
-> less code? (In another patch set to limit the destructive potential)
+> > > We'd like to add them to our test pile.
+> > 
+> > That is a bit difficult right now because there are a number of pieces
+> > which need to fall into place before this is easily testable.  You need:
+> > 
+> >  * host kernel with vmplanes patch series (for snp vmpl support).
+> >  * coconut svsm with uefi variable store patches.
+> >  * edk2 patches so it talks to svsm for variable access.
+> >  * igvm support patches for qemu.
+> > 
+> > Hope I didn't forgot something ...
+> 
+> So why are you sending those for the kernel now is so many other things are
+> still moving?
+> 
+> What if something in those things change? Then you need to touch those
+> again...
+
+Well, the need for instruction emulation to work for uefi runtime code
+and the need to have access to the caa page is not going to change even
+if details of edk2 <=> svsm protocol communication will be updated.
+
+take care,
+  Gerd
 
 
