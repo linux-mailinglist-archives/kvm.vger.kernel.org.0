@@ -1,377 +1,145 @@
-Return-Path: <kvm+bounces-48186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60114ACBB5A
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 21:13:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32DB6ACBB6E
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 21:19:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D16DD1760F5
-	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 19:13:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C806A1700FB
+	for <lists+kvm@lfdr.de>; Mon,  2 Jun 2025 19:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C812253FE;
-	Mon,  2 Jun 2025 19:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4667226CF0;
+	Mon,  2 Jun 2025 19:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TM68QHcL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kQHtEaU0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081E9DDAB;
-	Mon,  2 Jun 2025 19:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748891584; cv=fail; b=kHPOrH4sS9G33uBoUUsxG8j5Wu0ON+XjHPfK8V2O+oCSUMLj7fesMcd6izO4JTI96DG7uM5zy3Mhts+RSlyNVK44SsSKHZyUYa3anin05CpkmYQC7ClVgxOJ9YINDq+0Lsp1Tb+vHGi0pFjf27Ph+YHaBqv4wgERBejtykcYdH4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748891584; c=relaxed/simple;
-	bh=WAcdIxn851zkz+e8lOxoxnkATWKgLX1B5GZHgjPNSY8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=cXXBMc+rBh5crjufoYHTNw9Pwez5GGCD0NcOn6v99KXFSmzPunqHjQIKxMEXVWdWdVNFXYi57r4yX9lDDgxF+t2BGX2Rsm2tiZstjB2S/UGdb5u/nFYuO68nSnaLFg5Un1MYKDiYFa2BXsMuAmyPuC/SFv1ybkAfgtgoLqpL2vg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TM68QHcL; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748891582; x=1780427582;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=WAcdIxn851zkz+e8lOxoxnkATWKgLX1B5GZHgjPNSY8=;
-  b=TM68QHcLVtfQl+okQbs77t7uF9rzJWpK2W8m79+XK5p5pqsMY1ZGeOvo
-   KOcApY7iqMq5vjBXPqpBPH7mvDH5BdJVBst4nr/WnmDOPWr1XbHCSn8qx
-   7TtodRtbr9UV7Rs2HFuM2H7FlQOabFT9O8pmf1dVjsSdSNl1XYKGgHPTl
-   bQxdlHR7//PuN7jlS+gz9Uaa8zx6Kwd8UMgHoGXz1PsJXz92LOEabDDZW
-   QfIU1Y0kA9xDqd2OoMgKnNBT5rIKcQ4b4q1RtpzSOedN+4nhNM7Z+tov0
-   R9ge377RyAjZXEEuCVdIZ2ziMbDlWra5QLb7nJjwMOdRw3sEStP9+lGTF
-   A==;
-X-CSE-ConnectionGUID: fq/mvSWlRpmkCos+RRELwA==
-X-CSE-MsgGUID: OfVqozRaQbmm8kGQxY8mxQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11451"; a="50828636"
-X-IronPort-AV: E=Sophos;i="6.16,204,1744095600"; 
-   d="scan'208";a="50828636"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2025 12:13:00 -0700
-X-CSE-ConnectionGUID: S1IFaZ9MQpuxDAaK2ehJdw==
-X-CSE-MsgGUID: y82H4+mGS2mTlfCVyZSh/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,204,1744095600"; 
-   d="scan'208";a="149897694"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2025 12:12:59 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 2 Jun 2025 12:12:59 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Mon, 2 Jun 2025 12:12:59 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.65)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.55; Mon, 2 Jun 2025 12:12:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X/9OrWRAO33zuh8WApZ9wNAUvc/a621Zc0Ah9wbNpFSwJNVIBQh75M3nzbICli8zj4cVBIxheJjVCrP9tsDbnIxnq7I3nOvV0ihgE+6jWZOoukkAVop0GoJCQehl1aXrtNf0yIZ6OfcUBmlXTsF38ZuF0Ufwd35vinqhPTVvCVHwHKPPZh3wmA9q+4KuK/Ln/68ycDiwfadCs6UpL24MNkHtS90/xSiGRewDFwRXa0plQSKvFiuJkZtaLoAEmrZwFBA8CCcoKo4rGV2ttmiOSpvzUpmRjSA+bpVy3CCtmQ2DWXJGLEamPXr0zbztZ3vABm+OEFsQiR2ioMgLErY+1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Hx4laB9823YjXcFKaGXmpyFlC8BUZ9Wp2xG6ve8KXZM=;
- b=ay+rsTdfAgxHAgRl0Ihcl0G2VshwNKzcR44Q8PftANdn/6B7fRUuqNxbfMWgJGD6HOnZ/aMWnbRrBg0/j4x0RSwmq6AfL+StOjgD7oWVAfbYj2JBW06ls1ZYycVYPHucVPFtHt6uXkoQaepQsdV+13/EbPCZWfdwOAnW9jqa4N0qCm8BX0bItII03mmi215NES9cOt4/W0E9Fr/wv95mDf+4fT/qGoaiThTUNO9RzHpqO1y1SyD9fkCZS7dxS9k84Qzl6o0oqlDJuft3FyGksyZ6gSUhNMmwKULzypPAC8RhUVV5OLMt1nSn0NsOFKDgNsHatLzAD/xI0ZcRXvsAXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7925.namprd11.prod.outlook.com (2603:10b6:8:f8::18) by
- DS0PR11MB6448.namprd11.prod.outlook.com (2603:10b6:8:c3::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8769.37; Mon, 2 Jun 2025 19:12:55 +0000
-Received: from DS0PR11MB7925.namprd11.prod.outlook.com
- ([fe80::b1ef:c95b:554d:19c9]) by DS0PR11MB7925.namprd11.prod.outlook.com
- ([fe80::b1ef:c95b:554d:19c9%6]) with mapi id 15.20.8769.029; Mon, 2 Jun 2025
- 19:12:55 +0000
-Message-ID: <434810d9-1b36-496d-a10d-41c6c068375e@intel.com>
-Date: Mon, 2 Jun 2025 12:12:51 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 0/6] Introduce CET supervisor state support
-To: Chao Gao <chao.gao@intel.com>, Dave Hansen <dave.hansen@intel.com>
-CC: Sean Christopherson <seanjc@google.com>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <tglx@linutronix.de>,
-	<pbonzini@redhat.com>, <peterz@infradead.org>, <rick.p.edgecombe@intel.com>,
-	<weijiang.yang@intel.com>, <john.allen@amd.com>, <bp@alien8.de>,
-	<xin3.li@intel.com>, Dave Hansen <dave.hansen@linux.intel.com>, Eric Biggers
-	<ebiggers@google.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar
-	<mingo@redhat.com>, Kees Cook <kees@kernel.org>, Maxim Levitsky
-	<mlevitsk@redhat.com>, Mitchell Levy <levymitchell0@gmail.com>, "Nikolay
- Borisov" <nik.borisov@suse.com>, Oleg Nesterov <oleg@redhat.com>, Sohil Mehta
-	<sohil.mehta@intel.com>, Stanislav Spassov <stanspas@amazon.de>, "Vignesh
- Balasubramanian" <vigbalas@amd.com>
-References: <20250522151031.426788-1-chao.gao@intel.com>
- <aDCo_SczQOUaB2rS@google.com>
- <f575567b-0d1f-4631-ad48-1ef5aaca1f75@intel.com> <aDWbctO/RfTGiCg3@intel.com>
-Content-Language: en-US
-From: "Chang S. Bae" <chang.seok.bae@intel.com>
-In-Reply-To: <aDWbctO/RfTGiCg3@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR03CA0343.namprd03.prod.outlook.com
- (2603:10b6:a03:39c::18) To DS0PR11MB7925.namprd11.prod.outlook.com
- (2603:10b6:8:f8::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7892A22301
+	for <kvm@vger.kernel.org>; Mon,  2 Jun 2025 19:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748891889; cv=none; b=M5wiWlSv+YxI1nCkB5h0OJZm7sJoQDe8gEnc9v1FMtCBLIZcz79vjrwsyVfIb2iAbfwhkESHHrnO3Tl7emefHGsMgghVIm69v8FJFiw+vPYVjz3KFDGaEm8TTqd1kWd5gacTDN8TA2PfKJPVKu3iRm+6ZzBh2bEFs3v8HZS0AjQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748891889; c=relaxed/simple;
+	bh=12/Gd93aaTA83c1HNtC1zFmn672vDmey9gAStWrKOoY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XGRQXKIX2tWec7g//CGEVCwwvuNqBHfxor5ghSUn4TIUMX+YldZSFotOdOPJqrTAOHXVu3eSVXxipCmISJtfwqG85Ug3cRbuGRpRrI4iiHaeRKuuiZAVxV5riki1bvg4SgMsbn30LFH1RDzFZHWa1mAqdD7eBUK1BJZbLNMHMWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kQHtEaU0; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b2c00e965d0so3132524a12.2
+        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 12:18:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748891888; x=1749496688; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FJKFQqx9UM1AGUF2AcszFEpAtqC30YGJfsyhTo68y9A=;
+        b=kQHtEaU02gUFZI7kQZpS2D4kUyFrmcfBxzys+8Du5J/cOVsN9JbvM6p3Y+tHjZacBW
+         YJTwQ/VXzCZTzBK05Xanvcuz0eG2SeC8P77/9969rEkp5HXW5JwUmm1HI2QwUJE04Eh1
+         ZyQaFjjGNbTj65r9uMh7Hxk7UwEbnYZFF1Xz36ALRwVtyrdWRqLxCvPRc+/TGNhwMcYA
+         05l0Ix9xgbkIgYnuBOwuI0kU/0Jb4v192ZbCrXOjwodVXVUW6tjaZwY8UuEQyGlc/EdJ
+         y5z6NGJHzvjwSIJyaH5+yrdX8QgaVyDWNlwKMqoJXDOlBlUhrqWMzo23sRP2Xag5eWGp
+         k58A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748891888; x=1749496688;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FJKFQqx9UM1AGUF2AcszFEpAtqC30YGJfsyhTo68y9A=;
+        b=c2D0Q9VuVMVX3V2o50jfRk8biYEX5u9gHFQvJDIHnLd8oxMi7ms8KzJiZeDkKj7wnT
+         cSTtuWtVENLQQKG0Ws0zCJ5+IPi2rovhKWXzSefEf0IxWO+6Kr6JogbSXRYaEoQGrTRt
+         jXNf7ORz3Ps8YUjol4n++7/oDOvjOgOZRu/yTvYQy81BIrW28zB6ajVOls/WQNI+iTZi
+         Qi3UfHlNPu9sLIHbzO4qugbyxce15j57eMMgDwKQAilMs32WEdQRC5FZ3pUngxgSoUwE
+         av0mSB0Ldg3mAAY2JfQapnaSzCnhbyU3kM417xj3iEUX4O4t5WlKcrMU2W0wqWhWT0Er
+         cpBg==
+X-Gm-Message-State: AOJu0YyCNIywchURDfbsK8q7RzxX5ciOdGz6nEJID3Kvg5F6tsgu7Ymi
+	Hkh4PSfK8I0bXBwddvL1f0jMyRTfzdSkeucSXxQURQYN8boztfHY9yHVtI3SBgxhBO7vXKqA+6K
+	13ikOnuPp7DrofbZCpcD5O+UzZDBEXz2crCMG3iAL9qyAVpnoveL+telnZTY2Wru6IDJd4BBCaU
+	LoiFzjTIV8JoRPm6mXOI+//VaacLnLzsR5gei8kTvcY/SQmmjSBPfCmMh8rZQ=
+X-Google-Smtp-Source: AGHT+IGq+MKdUzduCIrTwDf5QIgX09YLMJA7ZELTYRvBBkbWv4Z283ky9bfc20mR5vbgJYZFPZLaDF55ZVFFrEdiWw==
+X-Received: from pgbfe22.prod.google.com ([2002:a05:6a02:2896:b0:b2e:c47e:345a])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:7484:b0:218:5954:1293 with SMTP id adf61e73a8af0-21ad97f95b5mr27557841637.34.1748891887220;
+ Mon, 02 Jun 2025 12:18:07 -0700 (PDT)
+Date: Mon,  2 Jun 2025 12:17:53 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7925:EE_|DS0PR11MB6448:EE_
-X-MS-Office365-Filtering-Correlation-Id: 75e839c7-1854-458b-5994-08dda2097a9d
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?TEZ4aFdLcWpXR1hXY1ZFZkZBZVlRdnloNXNLbGpKMW9XTXN0M3VoSE5TdWx4?=
- =?utf-8?B?eFlNV2taTlFIMUpzVW40VDgvcENqZTJmNWVQQWt4TEN1b1IwWEpEZWZTN25r?=
- =?utf-8?B?bGE3M0Npc3JrNXl5OWJHU3h5MHRRWS81WWJBTVhTcmJhNEowS2dLdmF3N3k0?=
- =?utf-8?B?WlBqTkxaczNHSVBmR2VXY3kraDc4cVB4bHhHeFhqNm52ZmJaUGhtdjlaTTI3?=
- =?utf-8?B?MkczUi9md2Y1cVNmYTBLRDVxVGtMNVRIOVJkcktzS2RVeHZpdk5hR25kMWc4?=
- =?utf-8?B?a0pTVTdSWVJyZnE2eEsxRTNrR0pRWTZPVXhIcTdUOXBnK0haek1aMmpMTGx5?=
- =?utf-8?B?eDNpKy93NFVoKzhlZlhLRFE5Ly96a0RKYXRjZ3o3bGh2RTRlT1VLOEkrbnRo?=
- =?utf-8?B?NDlQNGdhNUpuWmphcWtmZE9xK1Fsb3RLVVMyWVJmVzJrVmkwOWNlNUFDcmw5?=
- =?utf-8?B?YnpqU0szSHlHWTR3YklRVTFWOG1OdForM2ZkN2krckcyN2QzRmhjVjFKeSt2?=
- =?utf-8?B?U0N0SWMraWJFUkNnY0VTWmdCTXE0WnhMNFFSblk4MkhRMmV5eHRUSHI0TSth?=
- =?utf-8?B?Z1NVZGxSWXhPMTlrUzY4M1Rna0FQQXE5MmxMbXpEWnYzWXhTMDRyVFZLYTZp?=
- =?utf-8?B?eEpialp1cDd2M3c4azVzU3E1VDBlK1lOUXVualh3bXIvb1pRZ3dLTTJRZ2Vw?=
- =?utf-8?B?VDFVWGhmUDlaWmsvUEZlbzU1N0pJRlB2RElmRWp4VmJpSlBzTndtRHAvTVZV?=
- =?utf-8?B?OG1aYU5aaG1TQ3ZnUFNYczFzMXQvZnpEZHdqcG9pbnhTSy9MMFJwWTcvdGRt?=
- =?utf-8?B?VzZJbExRcHRXRlNsV2VMbXBIQjZOYW44QlNJQk5hQjhCenc1SEw0QUNTaGJ0?=
- =?utf-8?B?R1UrNE5ubHpkNUhhVFczZllGYVl2S0p4NWlrbk81MHhtdkE3S2d5Z0xiMEtP?=
- =?utf-8?B?amlYNHpwbCs4OHR3Vk1IWU1XRHIxTXBlNnhNUDZpSm9FbVViQ1h4Nm1aYzFX?=
- =?utf-8?B?NklrdmpDWkhDUkZpTnFxRkR2S2hJazN0L3pBdG1OdHQ1Q3BHZWxVY1E1VWZW?=
- =?utf-8?B?NzNjaUJHQlZVcHhyWjlSZXVaa1Z3aSt6TGliOC92YmYxSjJRQ2VGNktIaFE2?=
- =?utf-8?B?L2ZNT2diNGF3VHRFR3krMEN3ZjJlOHFNbkpvMm9BekJiY1AxZkJYeXBEWC9w?=
- =?utf-8?B?alhRQjdnMGZBaDJOZFM0UlBVcmJvaHJZa0o1c2x5QzlvUzhyZk9rWXRqYkND?=
- =?utf-8?B?UVRCeUc5RWwyVngxZkh6WTNrWmpNckprUjhDNTNGdWhlWDlKVW1pRlYvOW03?=
- =?utf-8?B?WnNkUlBYM1J3d0lkR25zWWdqZHRpZlp5T0F6bmNZK0lnQ1ZuK212aDc4TTVw?=
- =?utf-8?B?NWppYmxsR0VTRVpKditBbnVFVklOVzVqNmlxSVlyZWFhN0ozUEtFRkFqMlR1?=
- =?utf-8?B?NGZxRldKdk9vZldDbzB1ODdlaDQwaC9OYlpJZEJwL09nLzU3dmlvdklGa0lp?=
- =?utf-8?B?dmJhUEdmQ0xVejhUc0F5Y3JENFhGUUoxM3B6SHUzTXVRQkh3ZytQK1l1TUxa?=
- =?utf-8?B?aHcxNXRwQUxDTXNMc3BjTnR6S0xJRGZHU1htOUdJVEV5by9jVmxjbkkwdkUy?=
- =?utf-8?B?UlhMcXFEdE8ybkFpRWY1WEd5MGNQQkw5V1RmOXViam5sVUs4UjdiYTZ1S2lT?=
- =?utf-8?B?OU1JamFkajFKRGRYSVdzaUIxaG12U3FrckcvVVBiZXRnblNZdGk4QnZWM3Bh?=
- =?utf-8?B?bFk4QXhiS3dIa004NUVKSzcxS0tPZit3alo2TjVHY3kxOGNDQWZhaW14eXky?=
- =?utf-8?B?WXFHcGtRRmxId24zc1J1dTZKUldIcEhKWVhPemNIRGNyRU1oRm41MlNSZ0wr?=
- =?utf-8?B?QkpOUVRIUWRnRnZvNzJEcW54ZmNhMHZwdTJ6ejVxNDZmbldIc1FHeCtWT1ht?=
- =?utf-8?Q?zGgYqynLhww=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7925.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dHQ4Y1JIbzc1bEZiVEl0T2MxRXh6M3c4QkZSOUVYYnFaeGd6RHQ1TkkxWTFL?=
- =?utf-8?B?eXcyU2JNbzgwVTR5MEtHbFJMUW1JbEtIaG9GL3NIWXA4R0s4UDN1T0h0STJt?=
- =?utf-8?B?eFdrYzBRS1c2N0RWQzE4cmJRVGgxRzZYUjUrZDV6OXVWbE0yMVRHOUgweWdU?=
- =?utf-8?B?VjBOaVE0NDlSZkVTUTNManB5REVMaWRRV3ZqY3BwMGRxczJrNGpzRDRBMUlR?=
- =?utf-8?B?T0xOM2RRTmQ0V0VobkttNmhvZkxxd0xmdWEzQmtpcW5lQkVCQzcySHd0T1BI?=
- =?utf-8?B?SE5PdjRZTmRxanlLTURjVGt6VjhGTEJiQm9VNDJzYUdGVlF0WHF5VDlQZnhP?=
- =?utf-8?B?dVRHd2sraURQUHJ4K1ZxeHltOHV5U01veW84WGlzOUdkT1J0bG9ER0g4MkRO?=
- =?utf-8?B?RGJobnZnVWNmazBQNHFMTjJ0b0xOM1ZrRFc0NnBMVmdXdTBzQ3VaQzU1YmdY?=
- =?utf-8?B?Yk5Hbk5jazhWekdZRFlXaVFXMHgzV2t4V0M3TFJKeTVzUnFQOUhqWDhucytV?=
- =?utf-8?B?bFNZbkxXSy9NWUNzUWpaVFlISk9sZHowditmZXZKbHFzNzZNUlVqaEJWbkhZ?=
- =?utf-8?B?NEo3ODZmUnVMNjFrU0NjU08xWmZUaUN2ejZOQTZwSXBKdklzZXMvdlBMNVZJ?=
- =?utf-8?B?Z0FCaUxvWVhha0tCTk9aamxoL3I4eE4xMDgyOVNrT3NaRlhmK1Z0NVo5cVFU?=
- =?utf-8?B?eHdmcmhzZjZwbUdrcDY5ZzRJZlhMSDZYYmRpbEdvcEl5VXVzNVgzQlNGMmRS?=
- =?utf-8?B?S21zdUU5VThIWHhPbGpSY1FIdmtwTG1FWS9nVUpDUzBQemtEUGhoR1lpdSta?=
- =?utf-8?B?bUUwZWNQQXJYU3EyZmdoU3NkN1c4VEtGTGsvTFZnekxUWXN2azlFWUpVV2JD?=
- =?utf-8?B?bTYrRGRDUUgvcTFDaVVtR2tDWmNPU3ZnSXlacDRFTWpKRlRneFhjcXZYNFNN?=
- =?utf-8?B?WG5MdWZrZ3JNaU5ES29DOXRtdVd4d2xyZjl0WjJSV2N2YlovVnFnNUZCZkkz?=
- =?utf-8?B?bmxOWms4YmNxSG1QNEtjbW45ZFN5TGxwdmpBWU9zZE9NcFdnbk9jTnEzYWlj?=
- =?utf-8?B?Y0x0UFl1Zmxpc1lPODhZYzhXNFgyVW1YL2gzaXZVRjgyVjhLRFFlQnN3QmE1?=
- =?utf-8?B?ejhVeThJd054VitCUGRVTjlHTlFpU1FKd1Z2eUxHdmo0WkJCRnV6M3ZqaTJT?=
- =?utf-8?B?QzZiOVluNDFsL1VucVdVQ3V5bG5PK0pPVERXN3VJaGVDT0E4dG9Hb01yUmlX?=
- =?utf-8?B?dm1vRFR2bnVzUGZhek03L0VscXJvZUt4bCtJSXBiNys4aVlSUHBiektOMTF2?=
- =?utf-8?B?YTROVit2OTBpMTFGa2QySCtMRmErcWdFNGZYMm51bDUybXVqamR1QXFmenE1?=
- =?utf-8?B?NmdSZFcxeElPbjVjUkJOTjJOeENvN2NDNGhJNXpjQ2EzOUFIdlVvZXpvSU4y?=
- =?utf-8?B?ODEyWjV4VGp3VElIdkl1ekRzNkJtY1NyMWNnZ2lHaGZGNFFHYkZrQmc5ZXdq?=
- =?utf-8?B?empteFNqWGFHL293WXZSaWtqMTNEUzhjTFF4VWZFbjhBSTlNb2RHdzJwenlr?=
- =?utf-8?B?U2NhVE9WWGtyYXZrTTdPVmRHTDVJM2NmZWJRcUw5b2FsV0h4ZEhiVENBekN0?=
- =?utf-8?B?cmw1YjJPeHN5bk1rbWxHVVRPTTliZG5JeU0yR2pIU25Hazl3OVpzdVc2TUls?=
- =?utf-8?B?UENkdVBTQWVlczJJV2llbWhKTUVXZUkzQzlGVHh6YUdEeXQ5cklaaHM2WlRh?=
- =?utf-8?B?aGZqbzZ5VG9adzJHNjhYekpkaWRXMHZoRWoydWVWNE5vajQwVEdwcXp4bW1Y?=
- =?utf-8?B?REZ6ODhiQzRCTzk4WVhWb1B2bWxncWlXNU5wSkgxcEpjR0xyMUo3cDRXaUJo?=
- =?utf-8?B?THEyWEQxbVo2c3FVaWFxaTQxS2VpRlBleUNkK2ltUW5WS1kxOG44Nngya2FE?=
- =?utf-8?B?blBZbUtCZnRoUXFCemJVRW8xYTVFaFlzMUdER00zM2dHaTlkdDRuU1BqY2dP?=
- =?utf-8?B?ZEdsMXlaazNtUDFHTWpWQ3FKejFwSnVxYllmMXVQK08zdHpJc1ZkT1UvZFQy?=
- =?utf-8?B?V1hsWnVpMG9La3hvMm1pUGtqeVMvYW1ESUJoRDNPU00wZmpZRmFoY3I4dHpk?=
- =?utf-8?B?aUJub004TVV4ZE5uTHcvd3RyNTd3N2JZSkppR0EzNFEyWGlkNi94Nm5QYjRx?=
- =?utf-8?B?c1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75e839c7-1854-458b-5994-08dda2097a9d
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7925.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2025 19:12:55.5390
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FbvnGSNQsqxJezwj6o21D9oRLkjKO6cn2nxP9h1ZjsgwRYSwf/+1A6hFntk5QC+mPqDypghPdaQsVnsV8wVLqoY4hP7mieRdAEVB3pCy7IM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6448
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.1204.g71687c7c1d-goog
+Message-ID: <cover.1748890962.git.ackerleytng@google.com>
+Subject: [PATCH 0/2] Use guest mem inodes instead of anonymous inodes
+From: Ackerley Tng <ackerleytng@google.com>
+To: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org
+Cc: ackerleytng@google.com, aik@amd.com, ajones@ventanamicro.com, 
+	akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com, 
+	anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com, 
+	binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com, 
+	chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com, 
+	david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk, 
+	erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com, 
+	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
+	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
+	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
+	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
+	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
+	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
+	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
+	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
+	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
+	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, vannapurve@google.com, vbabka@suse.cz, 
+	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
+	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com, 
+	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
+	zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 5/27/2025 4:01 AM, Chao Gao wrote:
-> 
-> *: https://lore.kernel.org/all/88cb75d3-01b9-38ea-e29f-b8fefb548573@intel.com/
-> 
-> The issue arises because the XFD MSR retains the value (i.e., 0, indicating
-> AMX enabled) from the previous process, while both the passed-in fpstate
-> (init_fpstate) and the current fpstate have AMX disabled.
-> 
-> To reproduce this issue, compile the kernel with CONFIG_PREEMPT=y, apply the
-> attached diff to the amx selftest and run:
-> 
-> # numactl -C 1 ./tools/testing/selftests/x86/amx_64
-> 
-> diff --git a/tools/testing/selftests/x86/amx.c b/tools/testing/selftests/x86/amx.c
-> index 40769c16de1b..4d533d1a530d 100644
-> --- a/tools/testing/selftests/x86/amx.c
-> +++ b/tools/testing/selftests/x86/amx.c
-> @@ -430,6 +430,10 @@ static inline void validate_tiledata_regs_changed(struct xsave_buffer *xbuf)
-> 		fatal_error("TILEDATA registers did not change");
->   }
->   
-> +static void dummy_handler(int sig)
-> +{
-> +}
-> +
->   /* tiledata inheritance test */
->   
->   static void test_fork(void)
-> @@ -444,6 +448,10 @@ static void test_fork(void)
-> 		/* fork() succeeded.  Now in the parent. */
-> 		int status;
->   
-> +		req_xtiledata_perm();
-> +		load_rand_tiledata(stashed_xsave);
-> +		while(1);
-> +
-> 		wait(&status);
-> 		if (!WIFEXITED(status) || WEXITSTATUS(status))
-> 			fatal_error("fork test child");
-> @@ -452,7 +460,9 @@ static void test_fork(void)
-> 	/* fork() succeeded.  Now in the child. */
-> 	printf("[RUN]\tCheck tile data inheritance.\n\tBefore fork(), load tiledata\n");
->   
-> -	load_rand_tiledata(stashed_xsave);
-> +	signal(SIGSEGV, dummy_handler);
-> +	while(1)
-> +		raise(SIGSEGV);
->   
-> 	grandchild = fork();
-> 	if (grandchild < 0) {
-> @@ -500,9 +510,6 @@ int main(void)
->   
-> 	test_dynamic_state();
->   
-> -	/* Request permission for the following tests */
-> -	req_xtiledata_perm();
-> -
-> 	test_fork();
->   
-> 	/*
+Hi,
 
-The test case creates two processes -- the first uses AMX (task #1), and 
-the other continuously sends signals without using AMX (task #2).
+This small patch series makes guest_memfd use guest mem inodes instead
+of anonymous inodes and also includes some refactoring to expose a new
+function that allocates an inode and runs security checks.
 
-This leads to task #2 being preempted by task #1.
+This patch series will serve as a common base for some in-flight series:
 
-This behavior aligns with Sean’s report. From my investigation, the 
-issue appears to have existed for quite some time and is not related to 
-the changes in this series.
+* Add NUMA mempolicy support for KVM guest-memfd [1]
+* New KVM ioctl to link a gmem inode to a new gmem file [2]
+* Restricted mapping of guest_memfd at the host and arm64 support [3]
+  aka shared/private conversion support for guest_memfd
 
-Here’s a summary of my findings:
+[1] https://lore.kernel.org/all/20250408112402.181574-1-shivankg@amd.com/
+[2] https://lore.kernel.org/lkml/cover.1747368092.git.afranji@google.com/
+[3] https://lore.kernel.org/all/20250328153133.3504118-1-tabba@google.com/
 
-== Preempt Case ==
+Ackerley Tng (2):
+  fs: Provide function that allocates a secure anonymous inode
+  KVM: guest_memfd: Use guest mem inodes instead of anonymous inodes
 
-To illustrate how the XFD MSR state becomes incorrect in this scenario:
+ fs/anon_inodes.c           |  22 ++++--
+ include/linux/fs.h         |   1 +
+ include/uapi/linux/magic.h |   1 +
+ mm/secretmem.c             |   9 +--
+ virt/kvm/guest_memfd.c     | 134 +++++++++++++++++++++++++++++++------
+ virt/kvm/kvm_main.c        |   7 +-
+ virt/kvm/kvm_mm.h          |   9 ++-
+ 7 files changed, 143 insertions(+), 40 deletions(-)
 
-  task #1 (fpstate->xfd=0)  task #2 (fpstate->xfd=0x80000)
-  ========================  ==============================
-                            handle_signal()
-                            -> setup_rt_frame()
-                               -> get_siframe()
-                                  -> copy_fpstate_to_sigframe()
-                                     -> fpregs_unlock()
-                                  ...
-   ...
-   switch_fpu_return()
-   -> fpregs_restore_userregs()
-      -> restore_fpregs_from_fpstate()
-         -> xfd_write_state()
-            ^ IA32_XFD_MSR = 0
-   ...
-                                  ...
-                               -> fpu__clear_user_states()
-                                  -> fpregs_lock()
-                                  -> restore_fpregs_from_init_fpstate()
-                                     -> os_rstor()
-                                        -> xfd_validate_state()
-                                           ^ IA32_XFD_MSR != fpstate->xfd
-                                  -> fpregs_mark_active()
-                                  -> fpregs_unlock()
 
-Since fpu__clear_user_states() marks the FPU state as valid in the end, 
-an XFD MSR sync-up was clearly missing.
-
-== Return-to-Userspace Path ==
-
-Both tasks at that moment are on the return-to-userspace path, but at 
-different points in IRQ state:
-
-   * task #2 is inside handle_signal() and already re-enabled IRQs.
-   * task #1 is after IRQ is disabled again when calling
-     switch_fpu_return().
-
-   local_irq_disable_exit_to_user()
-   exit_to_user_mode_prepare()
-   -> exit_to_user_mode_loop()
-      -> local_irq_enable_exit_to_user()
-         -> arch_do_signal_or_restart()
-            -> handle_signal()
-      -> local_irq_disable_exit_to_user()
-   -> arch_exit_user_mode_prepare()
-      -> arch_exit_work()
-         -> switch_fpu_return()
-
-This implies that fpregs_lock()/fpregs_unlock() is necessary inside 
-handle_signal() when XSAVE instructions are invoked.
-
-But, it should be okay for switch_fpu_return() to call 
-fpregs_restore_userregs() without fpregs_lock().
-
-== XFD Sanity Checker ==
-
-The XFD sanity checker -- xfd_op_valid() -- correctly caught this issue 
-in the test case. However, it may have a false negative when AMX usage 
-was flipped between the two tasks.
-
-Despite that, I don't think extending its coverage is worthwhile, as it 
-would complicate the logic. The current logic and documentation seem 
-sound.
-
-== Fix Consideration ==
-
-I think the fix is straightforward: resynchronize the IA32_XFD MSR in 
-fpu__clear_user_states().
-
-The existing xfd_update_state() function is self-contained and already 
-performs feature checks and conditional MSR updates. Thus, it is not 
-necessary to check the TIF_NEED_FPU_LOAD flag for this.
-
-On the other hand, the sigreturn path already performs the XFD resync 
-introduced by this commit:
-
-   672365477ae8a ("x86/fpu: Update XFD state where required")
-
-But I think that change was supposed to cover _both_ signal return and 
-signal delivery paths. Sorry, it seems I had overlooked the latter
-before.
-
-Thanks,
-Chang
+base-commit: a5806cd506af5a7c19bcd596e4708b5c464bfd21
+--
+2.49.0.1204.g71687c7c1d-goog
 
