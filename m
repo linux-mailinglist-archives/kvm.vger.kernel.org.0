@@ -1,83 +1,93 @@
-Return-Path: <kvm+bounces-48250-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48249-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A319ACBF6B
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 06:57:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28510ACBF64
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 06:52:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 863BB16F7A0
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 04:57:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3464A3A50A7
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 04:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4211F4CAA;
-	Tue,  3 Jun 2025 04:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02991F3D54;
+	Tue,  3 Jun 2025 04:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q4uLpHRZ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="B3P8Y2kD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0EF139B;
-	Tue,  3 Jun 2025 04:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271DD139B;
+	Tue,  3 Jun 2025 04:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748926612; cv=none; b=U/MpZxWWjsbbJgiJ83y4UTudxnGXzAC2mzM3D/VEmi6+Ap2mJTdExrpE7HEO+dc2oNMzgPMw/cGdmz9ihxVpyXivKRzGpJtj4pAGpW7sNk3NJ6ffB9/8s5emWM0LZ0Bco5c4PJVZAzPKuRCs77q+aIza399C/AeYZiBEv718EOk=
+	t=1748926348; cv=none; b=qPsagJyIpqTBZtDPcqzqiQ6Veo5YWiAqPz7jXK4tv80rgW7poE8j3vMIfq1UJxraITJhs7azBBHmEKsW/w+87Vm6C7kpsMHqatUwLuz9X+YudlD6L2ejAetTxSF0EkRupLzuwYNbjdRwBoPbuXHtDbu98FMRSMr4r6hGkfWdzQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748926612; c=relaxed/simple;
-	bh=p6Uliwjeb9aiPXavhCVIq0Xv1uYAO1wNjq9ELL7jF9s=;
+	s=arc-20240116; t=1748926348; c=relaxed/simple;
+	bh=9JfipAlH31/Nfl/rtapCnYoip2jYXWlwbar7ZO14jI8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=enXiSjK5j8pUSneOuFqVMgNKsI+wnh4OudDfWQDPw701ZiF3EdBCpOrjRMgKJWfcBmpERNWCL19M5lI82qlWEdLOrlx6CDAsPPGlVgBh0DEkRQcfe4k4+qzwTmzFd1NsCxJ3rGB1B57FOXF31nvdt8QZ/STB0J//c2+HB2LRELc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q4uLpHRZ; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748926609; x=1780462609;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=p6Uliwjeb9aiPXavhCVIq0Xv1uYAO1wNjq9ELL7jF9s=;
-  b=Q4uLpHRZu/t0o7QfJOdhDhV6k/mFl3qIOzhhkyWbZxaZ34sx1pVIXwB9
-   j0wyzqnhM1W5Ry+uYaPGz8bxBKEzLUy3Gy/1eB8Ol1ou2aRat3itAMMLN
-   rAj87AJfHTFylEuLUsIV+CqdPNKUnVUPXCKu1iWc1TeYyqg4wtPIl0iz4
-   AxDRKdtdoNfSXxHn08T2L8Ahfn4HBixK/ODtOh4UyVAtG5zjQ0jR9iPp7
-   7YPC07LgXHPhu3qAWXQn0QF7tGwjGXFRrbbWl/gY/be8fYRiO7SLAowS4
-   vZGqhfW5OG7Dp+S1/jjY7LO1NvUlFRO5JY0kKem2BYUkQdNgVPi1nBEL9
-   g==;
-X-CSE-ConnectionGUID: 2B4IGweST1Snt6Qjn5bTgA==
-X-CSE-MsgGUID: QYbOKG0KT7i0KBVsbntu2w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11451"; a="62004247"
-X-IronPort-AV: E=Sophos;i="6.16,205,1744095600"; 
-   d="scan'208";a="62004247"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2025 21:56:48 -0700
-X-CSE-ConnectionGUID: +R3KxD5fSay5O/7fDmdhSg==
-X-CSE-MsgGUID: JbKyM8ULSPaqs7NuuQafDA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,205,1744095600"; 
-   d="scan'208";a="175593681"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa001.fm.intel.com with ESMTP; 02 Jun 2025 21:56:43 -0700
-Date: Tue, 3 Jun 2025 12:50:10 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>
-Cc: kvm@vger.kernel.org, sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	jgg@nvidia.com, dan.j.williams@intel.com, aik@amd.com,
-	linux-coco@lists.linux.dev, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	vivek.kasireddy@intel.com, yilun.xu@intel.com,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
-	zhenzhong.duan@intel.com, tao1.su@intel.com,
-	linux-pci@vger.kernel.org, zhiw@nvidia.com, simona.vetter@ffwll.ch,
-	shameerali.kolothum.thodi@huawei.com, iommu@lists.linux.dev,
-	kevin.tian@intel.com
-Subject: Re: [RFC PATCH 20/30] vfio/pci: Do TSM Unbind before zapping bars
-Message-ID: <aD5/AjaQQOKydUWz@yilunxu-OptiPlex-7050>
-References: <20250529053513.1592088-1-yilun.xu@linux.intel.com>
- <20250529053513.1592088-21-yilun.xu@linux.intel.com>
- <yq5ar002jlao.fsf@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=efoI0vzT3xjuqbWkTbKYsJUvnckfd1uwtD1570L62jzsh1yOAJU69dLiYgf0PsjyspZq3TXzKgBR9bIvdDa0ZALn8ZwfRXkC9YTDWIxbGEOhuWYM/EyNgTTfi18MbDAjFrAZ5XMLFHIuDBcizix8dAm/euwaxql7kZuUhCf4RHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=B3P8Y2kD; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=2HXdpwNFEIc5X8bhVnayNQJw7eGMBpc7Yo7s6dM4VOc=; b=B3P8Y2kDHXidjM2mVVCC4kBNNF
+	Qz89tdzXTMecebZG7XmRmDmZwVxd749GOy/SzyY/EpmsmfsqSNw/cnSgrpSTVCApUquqkhPfVkAc8
+	kieG2QRArS7d2eif4k5WqxYt4D0T0IvW8HLaOTbXkSr40XTEVz8CgyPpGf052cciIXiuAonVHjKp5
+	ca8tnKvTKMeAP4pWA1TQQgCniiO5gADuWYcy575ZsQpE9t3qic8U9fIg53T2QtSkg9Caxfp7AVxdf
+	qRln17kTFNcHJEKM2R61la51Q5Mz0A+L2g/j3ozbDXhSHyJ/Sl2JQG5pkhq4oDDJmJzkj4ZENkv79
+	jz/R5CFQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uMJdM-00000009izV-3hPv;
+	Tue, 03 Jun 2025 04:52:20 +0000
+Date: Mon, 2 Jun 2025 21:52:20 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com,
+	ajones@ventanamicro.com, akpm@linux-foundation.org,
+	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org,
+	aou@eecs.berkeley.edu, bfoster@redhat.com,
+	binbin.wu@linux.intel.com, brauner@kernel.org,
+	catalin.marinas@arm.com, chao.p.peng@intel.com,
+	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
+	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
+	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
+	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
+	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca,
+	jgowans@amazon.com, jhubbard@nvidia.com, jroedel@suse.de,
+	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com,
+	keirf@google.com, kent.overstreet@linux.dev,
+	kirill.shutemov@intel.com, liam.merwick@oracle.com,
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name,
+	maz@kernel.org, mic@digikod.net, michael.roth@amd.com,
+	mpe@ellerman.id.au, muchun.song@linux.dev, nikunj@amd.com,
+	nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com,
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com,
+	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com,
+	pvorel@suse.cz, qperret@google.com, quic_cvanscha@quicinc.com,
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com,
+	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com,
+	rientjes@google.com, roypat@amazon.co.uk, rppt@kernel.org,
+	seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com,
+	thomas.lendacky@amd.com, vannapurve@google.com, vbabka@suse.cz,
+	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com,
+	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com,
+	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com,
+	zhiquan1.li@intel.com
+Subject: Re: [PATCH 1/2] fs: Provide function that allocates a secure
+ anonymous inode
+Message-ID: <aD5_hL-caOZjSk8x@infradead.org>
+References: <cover.1748890962.git.ackerleytng@google.com>
+ <c03fbe18c3ae90fb3fa7c71dc0ee164e6cc12103.1748890962.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,57 +96,23 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yq5ar002jlao.fsf@kernel.org>
+In-Reply-To: <c03fbe18c3ae90fb3fa7c71dc0ee164e6cc12103.1748890962.git.ackerleytng@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Jun 02, 2025 at 07:30:15PM +0530, Aneesh Kumar K.V wrote:
-> Xu Yilun <yilun.xu@linux.intel.com> writes:
-> 
-> > When device is TSM Bound, some of its MMIO regions are controlled by
-> > secure firmware. E.g. TDX Connect would require these MMIO regions
-> > mappeed in S-EPT and never unmapped until device Unbound. Zapping bars
-> > irrespective of TSM Bound state may cause unexpected secure firmware
-> > errors. It is always safe to do TSM Unbind first, transiting the device
-> > to shared, then do whatever needed as before.
-> >
-> > Signed-off-by: Xu Yilun <yilun.xu@linux.intel.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_config.c |  4 +++
-> >  drivers/vfio/pci/vfio_pci_core.c   | 41 +++++++++++++++++++-----------
-> >  drivers/vfio/pci/vfio_pci_priv.h   |  3 +++
-> >  3 files changed, 33 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-> > index 7ac062bd5044..4ffe661c9e59 100644
-> > --- a/drivers/vfio/pci/vfio_pci_config.c
-> > +++ b/drivers/vfio/pci/vfio_pci_config.c
-> > @@ -590,6 +590,7 @@ static int vfio_basic_config_write(struct vfio_pci_core_device *vdev, int pos,
-> >  		new_mem = !!(new_cmd & PCI_COMMAND_MEMORY);
-> >  
-> >  		if (!new_mem) {
-> > +			vfio_pci_tsm_unbind(vdev);
-> >  			vfio_pci_zap_and_down_write_memory_lock(vdev);
-> >  			vfio_pci_dma_buf_move(vdev, true);
-> >
-> 
-> For a secure device mmio range instead of vfio_pci_zap_and_down_write_memory_lock()
-> -> unmap_mapping_range() we want the vfio_pci_dma_buf_move right?
+On Mon, Jun 02, 2025 at 12:17:54PM -0700, Ackerley Tng wrote:
+> +struct inode *alloc_anon_secure_inode(struct super_block *s, const char *name)
+> +{
+> +	return anon_inode_make_secure_inode(s, name, NULL, true);
+> +}
+> +EXPORT_SYMBOL_GPL(alloc_anon_secure_inode);
 
-Yes.
+What is "secure" about this inode?
 
-> Also is that expected to get called twice as below?
+A kerneldoc explaining that would probably help.
 
-Yes for TDX Connect. First time zap the private MMIOs during unbind.
-Second time block all mmio mapping.
+> +extern struct inode *alloc_anon_secure_inode(struct super_block *, const char *);
 
-Other platforms don't need these tsm handlers. They don't have this
-awkwardness.
+No need for the extern here.  Spelling out the parameter names in
+protypes is nice, though. (and fix the long line while you're at it).
 
-Thanks,
-Yilun
-
-> 
-> vfio_pci_tsm_unbind-> pci_tsm_unbind -> tdx_tsm_unbind ->
-> tsm_handler->disable_mmio() -> vfio_pci_core_tsm_disable_mmio -> vfio_pci_dma_buf_move(vdev, true);
-> 
-> -aneesh
 
