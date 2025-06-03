@@ -1,455 +1,274 @@
-Return-Path: <kvm+bounces-48281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48282-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18C49ACC34B
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 11:39:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE7CAACC367
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 11:46:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE9E416C2B5
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 09:39:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC4AE7A7361
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 09:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C0E2820A7;
-	Tue,  3 Jun 2025 09:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C6C01B414E;
+	Tue,  3 Jun 2025 09:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="p+mse9Y5"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BawkTc2K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2070.outbound.protection.outlook.com [40.107.237.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE147262D
-	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 09:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748943582; cv=none; b=PP+EhLaF2Ji0eLjxcd0i+j/oEC5Bk2r9rxCIZgqiks6BBmQwLQL06LwLMTE0YZfcStAMe3S191BfDyIJd7aWRGVYRQlO9UuRW5+p4jLHqJmuPVCK6FLnGOAIBma6OsUfYzJS4v5z4xWSbGr3agD0B0VdIuKDl5UMlHUQ+7m/Vlk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748943582; c=relaxed/simple;
-	bh=G1pjibmREa2t/341lEP+G0FLennuhhvknePe/rNydS4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W//zKyN8Cpf3UUIYCePZIpknhd2zEItkaafy0Xdtcm/LZCpY/MjSUu4zkPZKVkVClcbUKJY/OKj1TciZeG6D9uSMkNTdrHz+0gqw+x6tLpICHsrkln5I8Mt7JNMPC9JQBwmDquODSWQZDKhaYl4IXCRnPlSJVxSm5XIXZ5b+2xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=p+mse9Y5; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3a50956e5d3so1667596f8f.1
-        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 02:39:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1748943578; x=1749548378; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ayLqPCugi//yFqn+B/ihiY+QIzVCkAIVDSi6CRkF8vA=;
-        b=p+mse9Y5Ao+IMdOW7vm6X1vm37udHFtLX5xPosd2Yn4VDp9/zNDUqYUumjju3q6rkM
-         ApokxEX9Q+vWXVYEDdqtETB+3YznlWeq3dFN0UmjJxWJlP/7m1BgBR9m0RamxbfF3ZXO
-         OzpMFPSOAT+Kvu1avsYzLSyKZILFc+5KE6Qc6j+X08AG0jd1uY0YrebQTwCFLTJCVKmL
-         0LfybcN2VLfQ7Lc14QGRgk5wD7PYTCUB+n3qAyl178hawp6+nqBwUwhvE3M7WjQK1o8B
-         9rySeVndQN78yxVIwtqw9EjqvN86ebrA3vYK/WUgEXNX7C0sKOMYUeZXdYkYKwCin6QI
-         GErA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748943578; x=1749548378;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ayLqPCugi//yFqn+B/ihiY+QIzVCkAIVDSi6CRkF8vA=;
-        b=QHHUFZHTR2ZkiwA4OKfeS4rOd8siLKuRIFsnFQcvZHyR2GiHfcovLIp+BjzeDbpKqO
-         OK66zY9D9POC/psbLm3a7sAJBml0txHIBd2dbZZUUFV7rHccfRFXfp2LPC7ljC1UEmje
-         NV0tOCoyzZw2zBeVnLI4YUhJwwu/k9kJleKqOXTW5NRYlPQWI8xJVqlevelm7MFSKkJW
-         EAaOXk+wxmh8DLkSacnOKO5h6eOSuYJbX6FYHvANrs/aUqTuXNBIt5H5o1sj6LKaYmgH
-         b37gRWSUGTkW4pDJ7upOcYx/RLTIt30fTdwWw3NWFC1LnBzhlnUfEKDuEjpiLCfB5Fwl
-         f+oQ==
-X-Gm-Message-State: AOJu0YzNUDf4+Th0hbWU7txTc8oO8kIbSuqHvOIsp+xNlocwMahUouA7
-	pLNm8TPyCnL5bMb+q1N6btXd3l6RL4qU8sf9HJqCAM1i293hvJ8RXluekPhSJCbrGSE8TG80kj4
-	EUTJu50E=
-X-Gm-Gg: ASbGncs02BgxGmjA9bEt2A5Q/PATuGm6RtZofde4znjJ3sq3sNP7uR3ouOMcTg8k4np
-	kCWOVrJyQeAP4wdj6IM/oC5ec/LG3zRHSjTZn97g5IiiuJZMicA5xxVTHXU3I0lEABBN+kUzgST
-	JXFqvenrn1CqYZY/0TSublGP++hXQ6BBISgthGWgwyllfOqQSiQUgMVI2ekNzdGfMdYo3SRG0dk
-	XSh30nV5Xyvshkw516uvEVig5pJm9TP1yc0kCMDZ8ZM3yuTOorC0UZtj3guFMu9COdtBHLP7ZQJ
-	j7aom2pISUsPFYOxV74uq6a7G9h6HxarY4X2XSFsXRJcIXjJoT5wv/79CiT4GyEfxpmRbcgmM/y
-	Rljyrb6Gawvg0mmBfyC7L
-X-Google-Smtp-Source: AGHT+IFcea6hN76MOIQI/+9F3NsPsMXQ4LSnJaMZ0puhT/uVpcczwGPv9UZv0RfeI7sq7BJnHJCv2A==
-X-Received: by 2002:a5d:5846:0:b0:3a0:7d39:c23f with SMTP id ffacd0b85a97d-3a4f7a4d6b8mr12923490f8f.21.1748943578293;
-        Tue, 03 Jun 2025 02:39:38 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe6c4f2sm17444573f8f.22.2025.06.03.02.39.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Jun 2025 02:39:37 -0700 (PDT)
-Message-ID: <032926ca-ee2c-4483-bd5f-196c83de9a7b@rivosinc.com>
-Date: Tue, 3 Jun 2025 11:39:37 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8862C3271
+	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 09:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748943974; cv=fail; b=ZzcCpcJR9CqJI7xEHGOxsETIeP/joPFq4gmPVw93lKkDU7s8Ef/tc4w2Bsdd3vvAak5wmdtC2eFhpWNk5J4uC7OpBFiwiORzawej1HLubdMdsonRtHpEpA76iTfbQoxCrz9rzqmHhNrgKOmPZX4DAx9turpPAgZPb/xNFqa0gDY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748943974; c=relaxed/simple;
+	bh=+lkZyJVq/HiVHhfvVq3wWm+n5Nye8g3J3TAkh6qnDoo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=QwpEGlSbQi86Llf/Jx9bclaGYTblBe+tCqaaqNmQBZPpgYyrINPPzGcfaCBcfJCmyWhTs8YJdj1zwq1zhv9f8xE7R5bRYTgC4YuUnvMuKwL6vwnpfgQTB4ydylcm/DMQTgMHoIVw8qQIBhA4PKWAuzBzwYtVjZYVpnBc1TpouYo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BawkTc2K; arc=fail smtp.client-ip=40.107.237.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PzCEnfwE3sdvoArnJPpB+fniFi6YJVqG6pW7EgytKHmzxwvK4RMcF9Onb4kVt5fjIGbYkW1waPpq0ztugfMv9zu00smIQLEL3CBjpmkr2TIhX1SVItzbxjpqkA/86us8cIL/2Fbe0RtnN6q+bsPTfjlUHZN2k8vh2kjuTTDS+CN+o8jYJo/DRnbbMk9q+u3u7Lwe3HhLYemG6KtwtiJyIDOyyyGRXOMSnorNKub9kOvTtptH/QUhoX4vwyAVDVpVSgQVwNqVgstO3y2ksOZlPYCMZxQjbyq+s/YZCbOyQ26oyKjvrULjP4Ew+ejC1m80e2JUZhg8rLZpSfoZROuGgw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=n8TUcoCnCRPbsS2q3LDm1mTQDyrG9Feu7z04+5AqtMA=;
+ b=t8SSXLYOPu3kNLfmA5lPT1B+zBwAqH+zasatNi7neqqbg4E9sHq+amH89Ui5p5oBU3gZoPLcbSeZRCDHEu/Ck4LI7mmuQ6pe7OIlIq87Z7WOgTBu+iL5QD5EDj4ekYQt5EO+tt/1KVXkVMt/yU7meOgI7mEW1KzSEdt56llRh7dtlb4V5vv+YzY6jlp/s+iQ3G5jSp5q3nqU2by7ZmTrzCnRtuU/gNRcc5Exytti710dHbuaUDVfA4pwnpdIV2xI+DRP6Z0ae4/cRyLPBKAQDOAc03svQCIjq/FPsG38qkKpfMR6esmpXSDDW9LVSEml2XXm2CTq+6A5xz3dhQsYwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n8TUcoCnCRPbsS2q3LDm1mTQDyrG9Feu7z04+5AqtMA=;
+ b=BawkTc2K3TR0cWcvPgjVL2yS77aELXOkRQJWhaT2JgSEaakA9H+SMx17WBGrD6jJlht2vkrAJ4Nao57P/VoHz+vHfanHymbWl04LlaIKeou6L9Bi+EEP+sGW+TrxiXy1PRFJfu0p0HhGMZvvDVom6evzxAU0CYC8BC4QcAOtr1U=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com (2603:10b6:208:3f0::13)
+ by SN7PR12MB7249.namprd12.prod.outlook.com (2603:10b6:806:2a9::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Tue, 3 Jun
+ 2025 09:46:09 +0000
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48]) by IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48%4]) with mapi id 15.20.8769.031; Tue, 3 Jun 2025
+ 09:46:07 +0000
+Message-ID: <93d48fc1-9515-40a8-b323-d3e479d30444@amd.com>
+Date: Tue, 3 Jun 2025 11:45:53 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 4/5] ram-block-attributes: Introduce RamBlockAttributes
+ to manage RAMBlock with guest_memfd
+To: David Hildenbrand <david@redhat.com>,
+ Chenyi Qiang <chenyi.qiang@intel.com>, Alexey Kardashevskiy <aik@amd.com>,
+ Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Michael Roth <michael.roth@amd.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Williams Dan J <dan.j.williams@intel.com>, Zhao Liu <zhao1.liu@intel.com>,
+ Baolu Lu <baolu.lu@linux.intel.com>, Gao Chao <chao.gao@intel.com>,
+ Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "Lindgren, Tony" <tony.lindgren@intel.com>,
+ "Maloor, Kishen" <kishen.maloor@intel.com>
+References: <20250530083256.105186-1-chenyi.qiang@intel.com>
+ <20250530083256.105186-5-chenyi.qiang@intel.com>
+ <4105d9ad-176e-423a-9b4f-8308205fe204@amd.com>
+ <9a9bb6bb-f8c0-4849-afb0-7cf5a409dab0@intel.com>
+ <d0d1bed2-c1ee-4ae7-afaf-fbd07975f52c@amd.com>
+ <c646012a-b993-4f37-ac31-d2447c7e9ab8@intel.com>
+ <219c32d8-4a5e-4a74-add0-aee56b8dc78b@amd.com>
+ <828fa7bb-8519-4e3f-a334-c1b4ea27fee3@redhat.com>
+Content-Language: en-US
+From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
+In-Reply-To: <828fa7bb-8519-4e3f-a334-c1b4ea27fee3@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CP7P275CA0009.ZAFP275.PROD.OUTLOOK.COM
+ (2603:1086:100:42::6) To IA1PR12MB8189.namprd12.prod.outlook.com
+ (2603:10b6:208:3f0::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] riscv: Add ISA double trap extension testing
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- Andrew Jones <ajones@ventanamicro.com>, Ved Shanbhogue <ved@rivosinc.com>
-References: <20250523075341.1355755-1-cleger@rivosinc.com>
- <20250523075341.1355755-4-cleger@rivosinc.com>
- <20250603-46e84d5167307b38c90a06b5@orel>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20250603-46e84d5167307b38c90a06b5@orel>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB8189:EE_|SN7PR12MB7249:EE_
+X-MS-Office365-Filtering-Correlation-Id: 794c885b-8e98-474d-ee85-08dda2837644
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TEtiYlYzbDVVUjQ2RUpJSTQ4NzJFdTRzbGdBVGpGMm9TbFc5TkorbER6VUlF?=
+ =?utf-8?B?d2NKNTdJa2RwdjFicEdpN0VVRTdVQ3F1WWZEdjhud0ozL3EvZlZoRWV3NEZt?=
+ =?utf-8?B?OTdTNTU5Yjk5VzVhamFoMUNlbFhSOWhOZHdUZkhXRFQvamtQeFRSQ0FXZ1pS?=
+ =?utf-8?B?NThFa0hRRnBuRlZ6WDdwbTlTaU5KcUhGaW56UXkzK0M2TTNja3l5ODNqbHMv?=
+ =?utf-8?B?K08vVG5Wc3FESGU4ZnQwMWhLUDNRZUIzeW1rTE1XUmhvNWFxaFFxTkJjbTk1?=
+ =?utf-8?B?TWJOMWFyUVpSUWFTeHk4ZDJwYWREMkVSblRST01VZ1U4YkJ6QlRNNERIUXB6?=
+ =?utf-8?B?cGJNVSt4MnJLN0l4a2ZuUVBqbzd0eG9mVXNmTFR4eFBqZFFSMnRPcXZkTFRE?=
+ =?utf-8?B?V05rSFVSWlJUUHpJUHpLYkZWaDhzd3JGcFBmNHIvd29hUzZUNk9TdlI0WlZD?=
+ =?utf-8?B?TmRROVlreEZtN3lxOVBKVUppNXRjUm54bngveTRvUkJMeFhLWEZSOGNtRkcr?=
+ =?utf-8?B?N1AxaytBMThNaVhVTlU3azJjQ2d1cnRNTk53WStPSXBjMFB0MHJxVWw0OUt3?=
+ =?utf-8?B?Q3FTcDdvTzl3Ni9rZldmUlBzRzF6TEpPZjE2TWRpRjNqM0tkRHpWMnY3K3FG?=
+ =?utf-8?B?SHZzVktnd0ZEbHJESHhRR1NvSitmY1hreTl4VFdUNWJJbWNUdzNQY2dtYnVZ?=
+ =?utf-8?B?OXFCU3RPSmFlZGNxTTJnT2dWY240YTBiVTFsV1JWVmJGY3VGaTFITDdBT05t?=
+ =?utf-8?B?NXRBeW5obkVCUllKbTNlNmhYUS9RRHdBbStSM011SXdUaHdDbWY1VTQ5ckRv?=
+ =?utf-8?B?TEl3dldHemNFbFovN0JQNXptSkZjZ3lMQ1FKT1YzcXFONHkwakVtSk1OdGMy?=
+ =?utf-8?B?anhjejVkcGdRelFQdWNDL2ZST2JXa29kSFBFNUlpUDNXamR2clBNMkVQSi9l?=
+ =?utf-8?B?Njg1Sy9CYlpXMXdWVkQwMW1CM1ZxMWhwNzBUWm0raUxieWdvZjBOUHpXU0Jx?=
+ =?utf-8?B?c3NkZWxOMUUrTXd4QUJOWXIrelhHRUJ0OGxGR29IdUlpaC94TkVtazYyQ25R?=
+ =?utf-8?B?WHl4aUVBZm9HNU5rVEx4YUwydUx3TEZrQnJSaWxMQUJGRTIwMGRWMnZFZE5p?=
+ =?utf-8?B?SXh3Z0EzVGRJU2RNTnZFWEhHbnFDQTVsN3I0SVdNMmpUS0N3dDg3T3hpdnlK?=
+ =?utf-8?B?c0NaS1YvTmF3MHh0TENxKzZkVGJGRng2WkRWY3ROc1NuNFVjeW9LZGdqUGNT?=
+ =?utf-8?B?RHB4WDUyWkNNb3BianVRckYrOTkwMnpZWnIySW9OaTkzSHloQnRGNWJnMU56?=
+ =?utf-8?B?YWFLbzNyU003WC9oRW0zY05STTI1RHMreFovRlo4cm9XU3pTYlhqTVo1a21n?=
+ =?utf-8?B?dUxCdENZTVNtY05WUjBGSHJIRnZpeWwvWHFhN1l6NUlKS0RSTnpMRWMxRzBF?=
+ =?utf-8?B?dWtxOEFWOHhOM3Q2eklUSnBGVjlXUzRHTlhoZW12QkJycDRnUDRXZWJtTFBE?=
+ =?utf-8?B?eWozWDhlVThUekc3NVk5N25XdVBQcmhOTXZ6ZEhFK3ZNMWpCUk9YaURhUHM0?=
+ =?utf-8?B?TkJVa1hDSGdKU0lINDZGb1R3bWhBbmdETTFkVXBpNDhKRjR0R285RGVMZnJX?=
+ =?utf-8?B?V0lKN0xXSVExVk5RZ09ZUlNQUEtKeTVrNEJtdEY4VStJL3c3RW92ZzJNTmx5?=
+ =?utf-8?B?Tjh6NklzeWt4VmdqNnNGNGFBU1ZPeHJZaTRDVmg2VldNekRsK2JUNUVvSm5I?=
+ =?utf-8?B?NHJFNUQwZWdaUGpCOHVsaTZqQmNvVDUyb0puamFrSTQ3Q3BneEtYREhBcWpR?=
+ =?utf-8?B?bWM5NjFpdjRoNjNsbEE4akVOMzlyOVFYSWRQb3RaRjZwRkM4LzFRMU9nNThu?=
+ =?utf-8?B?TDBMSkZwSk1UR0Z6bUtjUzIzQjVtNng5ZjhLcEczZ0J0Tm1XbFpxTXlhdGxv?=
+ =?utf-8?Q?yKTMMY9qdrI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dVBnM24vTmR2UU1uZndlTWx0TjNBU2ZrdHBNYm9tWGExcmRZWmd0RnluWW83?=
+ =?utf-8?B?V3M3MVhMWU1ZbXRzcGJBd2FLYXU0clE3cnY2YVBaZHVia0RZZ1ltK3RGRGty?=
+ =?utf-8?B?VFVadlBHMDVoRlIvNjZrcFFCN052TU9IL3ZnM2ZJVmhYQjJoRWNvLzduUzl3?=
+ =?utf-8?B?RXgxNWc4U2RIdHNrVkxMUnUzRU1MNUwzeFRPNTczSjhDSjN0ZzdoeFM5TnRk?=
+ =?utf-8?B?L3Y3KzZSZit5TGRUWmh0Q2VQbSt0N1BzWW1TaFFkdUVRc084SThjcjdONWZI?=
+ =?utf-8?B?SHlFSUNUdzBaQTVkNXVYU0ltb05JKzEyWnFMRnZnWWY2R1ZvYmhtTXh2QU9s?=
+ =?utf-8?B?QnkvZFk2R21OTjRaQk9JWWlOaE4weDhMekswa2dpT2grOTZ2N3FxaVVpWVlI?=
+ =?utf-8?B?d1lURk13RFo4Y3dtQlNyWlpMdHpxYkFWQU1uSGlWQ3luVGo5dWpSY2ozUjFv?=
+ =?utf-8?B?NlpFNmNLcmtmTm5XSkZnK01ScUkrQVlXWm1oY1dLeWR1KzFPOFhlNGYxWGxs?=
+ =?utf-8?B?Nk44T1NQdzl2bUtsa2swWGR1cmhsVTVhcXZDNlJnbXdoa0RDaEVhRUpCUmE5?=
+ =?utf-8?B?NVlCTlFSTEZ5ZWx1Zk42aWw4QnJuaVJWY3hDVFpwVUhjdXJFOGVJT3h6WTE3?=
+ =?utf-8?B?V2o3bWJIVXB6NkRxTy9LVHNxekFhU295YjhJNDZybkI0MURrZHBwSWd0VWp3?=
+ =?utf-8?B?STJ0WXFQSnZER20rZEQvTk5xamo4MG1aYnBuSmFrV3lLb1ZuWHBnU0prajJU?=
+ =?utf-8?B?c0hSaWdueFFvc3dvL2d1dkkwazlkSG5jTnNCREVDUk9raEMvVk5HNTJYTVNt?=
+ =?utf-8?B?OXo5YVAyM2lqSW9QY1hKSCt5c0d4TjRmVkFmdDBGa1pLb0RHdkpnaUxWQ1lm?=
+ =?utf-8?B?NDBXMmo1dTNDSHkxcWhXKzJJT1NWZndMSzUzbjVHcU9BZ0VNSnFwSWR0Y3FQ?=
+ =?utf-8?B?aW9GRFA1aXFueTY5RERhTnVTSnR1MnpsdC94Y29yZHNQZTFVRVV5VVRyRUpp?=
+ =?utf-8?B?RmRJeE9Kdk9xTjN0bG9JS1QzNGE5Nnoyb09MNFZJaHVzb2xtMnU0WGJtUWxP?=
+ =?utf-8?B?bG1tOTBhZk15YVBUWnA4TkROL0tmMzZzUmVKQ0dBNnpxZkQ1ZGRXa0V3S0lh?=
+ =?utf-8?B?VnRJL1g2dUVCa0dWWWoxUndFdlV0b0NkTkx6SzVVdjA3c3BialRsdks3TVlk?=
+ =?utf-8?B?T2VkRHhxTm1tNk01clMxeE9mKzdQWmMyNkszZ2hKMjNHSmN4a1VPY2NFc09Q?=
+ =?utf-8?B?WDBrODFNa3NqN0hWd2ZISFN4eVhydlZpZ1VsNFlyU0N1SVYyK1ZaV0xOeERk?=
+ =?utf-8?B?RzgyYXhRUmVXeHhQNFFvMXVRMlJUNmtLK1dnZ3djYTM0ZDlrK1YzNC94M242?=
+ =?utf-8?B?bmZWL3BHb094SzNTRlFpTHY5TXpqOFhPRkxBV1pJU0tpbDZGa1FCa2Z2NWY3?=
+ =?utf-8?B?eTRoYWFyakRpRE1kR2J5MXRONzRNRTFVcGF4ditLZlRUUHFrVlhVWUNqT2hq?=
+ =?utf-8?B?UE94ZU5tYmJNZjNwb0lVVzRLUkIrUk96SFFRekdyRUVzTnhiank2OGFWSmpk?=
+ =?utf-8?B?akkyL3c4eVA5V2VMZjFzVEZWL2hYbCsyakhPNStzZDFMT2pMZnJYc3VrTHUz?=
+ =?utf-8?B?eEJmaGo1WStUeWVjak4yUXJGNG9aS1VwTmVrbXliQWlGUnBWNENkUlJGaURZ?=
+ =?utf-8?B?emRhRDBnVUNrdDJuVUlxbGduMFc1U3p3ek9ja2ZmMUFPZU8rOHFVWVd5amVH?=
+ =?utf-8?B?ZStkL01qMFZ5Qm02UlkvZzRTQlhOVXhyeXZra09udk5WdXhTT2pYTHZ6enZy?=
+ =?utf-8?B?Z3htMHBaOE5mR3pUOE1EMkxWMmw2enlWZTBzVWFlMW5XNHdmTmtHcVFteFFB?=
+ =?utf-8?B?ZlJLUjNXNC92dWw4OVM1YXYvVzN0OGZFRUNWQlNYbmJRYTFxV0NFM0d2NXhP?=
+ =?utf-8?B?MkRDbHF3L2hPYU1jNEZ1SHBjUUtBaHppb254RXUxbTFaWjR0VGFubHV2YjEy?=
+ =?utf-8?B?RUFJSVpNVGNUN1pZQy9JNWVmRENWSkprUWZEbTRvazNiZVZkUFlFSmM1RHFP?=
+ =?utf-8?B?SUMxd3A3c0szamxUVGhnVGd3RFJBdEU4ZFFhdHMvbDdyVEJrZ0FsbEhGZHpU?=
+ =?utf-8?Q?O01bF1uu5Nwn4roFLs3/RsCw2?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 794c885b-8e98-474d-ee85-08dda2837644
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8189.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2025 09:46:06.9335
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: p4GtZMNUEyZ3bWMTwNej6b5AiEUWB0ZgkY4Ur9Yl7rVxhsMDTM5ih+9LQz64JYs+GtcX/w+4DZ1oOjeuGG3NKw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7249
 
-
-
-On 03/06/2025 11:09, Andrew Jones wrote:
-> On Fri, May 23, 2025 at 09:53:10AM +0200, Clément Léger wrote:
->> This test allows to test the double trap implementation of hardware as
->> well as the SBI FWFT and SSE support for double trap. The tests will try
->> to trigger double trap using various sequences and will test to receive
->> the SSE double trap event if supported.
+On 6/3/2025 9:41 AM, David Hildenbrand wrote:
+> On 03.06.25 09:17, Gupta, Pankaj wrote:
+>> +CC Tony & Kishen
 >>
->> It is provided as a separate test from the SBI one for two reasons:
->> - It isn't specifically testing SBI "per se".
->> - It ends up by trying to crash into in M-mode.
+>>>>>> In this patch series we are only maintaining the bitmap for Ram 
+>>>>>> discard/
+>>>>>> populate state not for regular guest_memfd private/shared?
+>>>>>
+>>>>> As mentioned in changelog, "In the context of RamDiscardManager, 
+>>>>> shared
+>>>>> state is analogous to populated, and private state is signified as
+>>>>> discarded." To keep consistent with RamDiscardManager, I used the ram
+>>>>> "populated/discareded" in variable and function names.
+>>>>>
+>>>>> Of course, we can use private/shared if we rename the 
+>>>>> RamDiscardManager
+>>>>> to something like RamStateManager. But I haven't done it in this 
+>>>>> series.
+>>>>> Because I think we can also view the bitmap as the state of shared
+>>>>> memory (shared discard/shared populate) at present. The VFIO user only
+>>>>> manipulate the dma map/unmap of shared mapping. (We need to 
+>>>>> consider how
+>>>>> to extend the RDM framwork to manage the shared/private/discard states
+>>>>> in the future when need to distinguish private and discard states.)
+>>>>
+>>>> As function name 'ram_block_attributes_state_change' is generic. Maybe
+>>>> for now metadata update for only two states (shared/private) is enough
+>>>> as it also aligns with discard vs populate states?
+>>>
+>>> Yes, it is enough to treat the shared/private states align with
+>>> populate/discard at present as the only user is VFIO shared mapping.
+>>>
+>>>>
+>>>> As we would also need the shared vs private state metadata for other
+>>>> COCO operations e.g live migration, so wondering having this metadata
+>>>> already there would be helpful. This also will keep the legacy 
+>>>> interface
+>>>> (prior to in-place conversion) consistent (As memory-attributes 
+>>>> handling
+>>>> is generic operation anyway).
+>>>
+>>> When live migration in CoCo VMs is introduced, I think it needs to
+>>> distinguish the difference between the states of discard and private. It
+>>> cannot simply skip the discard parts any more and needs special handling
+>>> for private parts. So still, we have to extend the interface if have to
+>>> make it avaiable in advance.
 >>
->> Currently, the test uses a page fault to raise a trap programatically.
->> Some concern was raised by a github user on the original branch [1]
->> saying that the spec doesn't mandate any trap to be delegatable and that
->> we would need a way to detect which ones are delegatable. I think we can
->> safely assume that PAGE FAULT is delagatable and if a hardware that does
->> not have support comes up then it will probably be the vendor
->> responsibility to provide a way to do so.
->>
->> Link: https://github.com/clementleger/kvm-unit-tests/issues/1 [1]
->> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->> ---
->>  riscv/Makefile      |   1 +
->>  lib/riscv/asm/csr.h |   1 +
->>  riscv/isa-dbltrp.c  | 189 ++++++++++++++++++++++++++++++++++++++++++++
->>  riscv/unittests.cfg |   5 ++
->>  4 files changed, 196 insertions(+)
->>  create mode 100644 riscv/isa-dbltrp.c
->>
->> diff --git a/riscv/Makefile b/riscv/Makefile
->> index 11e68eae..d71c9d2e 100644
->> --- a/riscv/Makefile
->> +++ b/riscv/Makefile
->> @@ -14,6 +14,7 @@ tests =
->>  tests += $(TEST_DIR)/sbi.$(exe)
->>  tests += $(TEST_DIR)/selftest.$(exe)
->>  tests += $(TEST_DIR)/sieve.$(exe)
->> +tests += $(TEST_DIR)/isa-dbltrp.$(exe)
->>  
->>  all: $(tests)
->>  
->> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
->> index 3e4b5fca..6a8e0578 100644
->> --- a/lib/riscv/asm/csr.h
->> +++ b/lib/riscv/asm/csr.h
->> @@ -18,6 +18,7 @@
->>  
->>  #define SR_SIE			_AC(0x00000002, UL)
->>  #define SR_SPP			_AC(0x00000100, UL)
->> +#define SR_SDT			_AC(0x01000000, UL) /* Supervisor Double Trap */
->>  
->>  /* Exception cause high bit - is an interrupt if set */
->>  #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
->> diff --git a/riscv/isa-dbltrp.c b/riscv/isa-dbltrp.c
->> new file mode 100644
->> index 00000000..174aee2a
->> --- /dev/null
->> +++ b/riscv/isa-dbltrp.c
->> @@ -0,0 +1,189 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * SBI verification
->> + *
->> + * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
->> + */
->> +#include <alloc.h>
->> +#include <alloc_page.h>
->> +#include <libcflat.h>
->> +#include <stdlib.h>
->> +
->> +#include <asm/csr.h>
->> +#include <asm/page.h>
->> +#include <asm/processor.h>
->> +#include <asm/ptrace.h>
->> +#include <asm/sbi.h>
->> +
->> +#include <sbi-tests.h>
->> +
->> +static bool double_trap;
->> +static bool set_sdt = true;
->> +
->> +#define GEN_TRAP()								\
->> +do {										\
->> +	void *ptr = NULL;							\
->> +	unsigned long value = 0;						\
->> +	asm volatile(								\
->> +	"	.option push\n"							\
->> +	"	.option arch,-c\n"						\
->> +	"	sw %0, 0(%1)\n"							\
->> +	"	.option pop\n"							\
->> +	: : "r"(value), "r"(ptr) : "memory");					\
+>> You mean even the discard and private would need different handling
 > 
-> nit: need some spaces
+> I am pretty sure they would in any case? Shared memory, you can simply 
+> copy, private memory has to be extracted + placed differently.
 > 
->  "r" (value), "r" (ptr)
-> 
->> +} while (0)
->> +
->> +static void syscall_trap_handler(struct pt_regs *regs)
-> 
-> This is a page fault handler, not a syscall.
-> >> +{
->> +	if (set_sdt)
->> +		csr_set(CSR_SSTATUS, SR_SDT);
->> +
->> +	if (double_trap) {
->> +		double_trap = false;
->> +		GEN_TRAP();
->> +	}
->> +
->> +	/* Skip trapping instruction */
->> +	regs->epc += 4;
->> +}
->> +
->> +static bool sse_dbltrp_called;
->> +
->> +static void sse_dbltrp_handler(void *data, struct pt_regs *regs, unsigned int hartid)
->> +{
->> +	struct sbiret ret;
->> +	unsigned long flags;
->> +	unsigned long expected_flags = SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP |
->> +				       SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SDT;
->> +
->> +	ret = sbi_sse_read_attrs(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP, SBI_SSE_ATTR_INTERRUPTED_FLAGS, 1,
->> +				 &flags);
->> +	sbiret_report_error(&ret, SBI_SUCCESS, "Get double trap event flags");
->> +	report(flags == expected_flags, "SSE flags == 0x%lx", expected_flags);
->> +
->> +	sse_dbltrp_called = true;
->> +
->> +	/* Skip trapping instruction */
->> +	regs->epc += 4;
->> +}
->> +
->> +static void sse_double_trap(void)
->> +{
->> +	struct sbiret ret;
->> +
->> +	struct sbi_sse_handler_arg handler_arg = {
->> +		.handler = sse_dbltrp_handler,
->> +		.stack = alloc_page() + PAGE_SIZE,
->> +	};
->> +
->> +	report_prefix_push("sse");
->> +
->> +	ret = sbi_sse_hart_unmask();
->> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE hart unmask ok"))
->> +		goto out;
-> 
-> The unmasking failed, but the out label takes us to a mask.
+> If we run into problems with live-migration, we can investigate how to 
+> extend the current approach.
 
-Hi Drew,
+Not problems. My understanding was: newly introduced per RAM BLock 
+bitmap gets maintained for RAMBlock corresponding shared <-> private 
+conversions in addition to VFIO discard <-> populate conversions.
+Since per RAMBlock bitmap set is disjoint for both the above cases,
+so can be reused for live migration use-case as well when deciding which 
+page is private vs shared.
 
-Yeah masking it even if unmask wasn't so important since it's the boot
-state. I'll add a separate label though.
+Seems it was part of the series till v3 & v4(in a different design), not 
+anymore though. Of-course it can be added later :)
 
 > 
->> +
->> +	ret = sbi_sse_register(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP, &handler_arg);
->> +	if (ret.error == SBI_ERR_NOT_SUPPORTED) {
->> +		report_skip("SSE double trap event is not supported");
->> +		goto out;
->> +	}
->> +	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap register");
->> +
->> +	ret = sbi_sse_enable(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
->> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap enable"))
->> +		goto out_unregister;
->> +
->> +	/*
->> +	 * Generate a double crash so that an SSE event should be generated. The SPEC (ISA nor SBI)
->> +	 * does not explicitly tell that if supported it should generate an SSE event but that's
->> +	 * a reasonable assumption to do so if both FWFT and SSE are supported.
+> Just like with memory hotplug / virtio-mem, I shared some ideas on how 
+> to make it work, but holding up this work when we don't even know what 
+> exactly we will exactly need for other future use cases does not sound 
+> too plausible.
 > 
-> This is something to raise in a tech-prs call, because it sounds like we
-> need another paragraph for FWFT which states when DOUBLE_TRAP is enabled
-> and SSE is supported that SSE local double trap events will be raised. Or,
-> we need another FWFT feature that allows S-mode to request that behavior
-> be enabled/disabled when SSE is supported (and M-mode can decide yes/no
-> to that request).
 
-That's a good point, I'll submit a patch to modify the SBI doc in that way.
+Of-course we should not hold this series. But Thanks  'Chenyi Qiang' for
+your efforts for trying different implementation based on information we 
+had!
 
+With or w/o shared <-> private bitmap update. Feel free to add:
 
-> 
->> +	 */
->> +	set_sdt = true;
->> +	double_trap = true;
-> 
-> WRITE_ONCE(set_sdt, true);
-> WRITE_ONCE(double_trap, true);
-> 
->> +	GEN_TRAP();
->> +
->> +	report(sse_dbltrp_called, "SSE double trap event generated");
-> 
-> READ_ONCE(sse_dbltrp_called)
-> 
->> +
->> +	ret = sbi_sse_disable(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
->> +	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap disable");
->> +out_unregister:
->> +	ret = sbi_sse_unregister(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
->> +	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap unregister");
->> +
->> +out:
->> +	sbi_sse_hart_mask();
->> +	free_page(handler_arg.stack - PAGE_SIZE);
->> +
->> +	report_prefix_pop();
->> +}
->> +
->> +static void check_double_trap(void)
->> +{
->> +	struct sbiret ret;
->> +
->> +	/* Disable double trap */
->> +	ret = sbi_fwft_set(SBI_FWFT_DOUBLE_TRAP, 0, 0);
->> +	sbiret_report_error(&ret, SBI_SUCCESS, "Set double trap enable feature value == 0");
->> +	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
->> +	sbiret_report(&ret, SBI_SUCCESS, 0, "Get double trap enable feature value == 0");
->> +
->> +	install_exception_handler(EXC_STORE_PAGE_FAULT, syscall_trap_handler);
->> +
->> +	double_trap = true;
-> 
-> WRITE_ONCE(double_trap, true);
-> 
->> +	GEN_TRAP();
->> +	report_pass("Double trap disabled, trap first time ok");
->> +
->> +	/* Enable double trap */
->> +	ret = sbi_fwft_set(SBI_FWFT_DOUBLE_TRAP, 1, 1);
-> 
-> Why lock it?
+Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
 
-That's a mistake.
-
-> 
->> +	sbiret_report_error(&ret, SBI_SUCCESS, "Set double trap enable feature value == 1");
->> +	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
->> +	if (!sbiret_report(&ret, SBI_SUCCESS, 1, "Get double trap enable feature value == 1"))
->> +		return;
->> +
->> +	/* First time, clear the double trap flag (SDT) so that it doesn't generate a double trap */
->> +	set_sdt = false;
->> +	double_trap = true;
-> 
-> WRITE_ONCE(set_sdt, true);
-> WRITE_ONCE(double_trap, true);
-> 
->> +	GEN_TRAP();
->> +	report_pass("Trapped twice allowed ok");
->> +
->> +	if (sbi_probe(SBI_EXT_SSE))
->> +		sse_double_trap();
->> +	else
->> +		report_skip("SSE double trap event will not be tested, extension is not available");
->> +
->> +	/*
->> +	 * Second time, keep the double trap flag (SDT) and generate another trap, this should
-> 
-> Third time if we did the SSE test.
-> 
->> +	 * generate a double trap. Since there is no SSE handler registered, it should crash to
->> +	 * M-mode.
-> 
-> No SSE handler that we know of... sse_double_trap() should return
-> some error if it fails to unregister and then we should skip this
-> test in that case.
-
-Indeed, good catch.
-
-> 
->> +	 */
->> +	set_sdt = true;
->> +	double_trap = true;
-> 
-> WRITE_ONCE(set_sdt, true);
-> WRITE_ONCE(double_trap, true);
-> 
->> +	report_info("Should generate a double trap and crash !");
->> +	GEN_TRAP();
->> +	report_fail("Should have crashed !");
-> 
-> nit: Put the '!' next to the last word.
-> 
-> I think this M-mode crash test should be optional. We can make it optional
-> on an environment variable since we already use environment variables for
-> other optional tests. We even have env_or_skip() in riscv/sbi-tests.h for
-> that purpose.
-
-Acked, I'll use env_or_skip().
 
 Thanks,
-
-Clément
-
-> 
->> +}
->> +
->> +int main(int argc, char **argv)
->> +{
->> +	struct sbiret ret;
->> +
->> +	report_prefix_push("dbltrp");
->> +
->> +	if (!sbi_probe(SBI_EXT_FWFT)) {
->> +		report_skip("FWFT extension is not available, can not enable double traps");
->> +		goto out;
->> +	}
->> +
->> +	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
->> +	if (ret.value == SBI_ERR_NOT_SUPPORTED) {
->> +		report_skip("SBI_FWFT_DOUBLE_TRAP is not supported !");
-> 
-> nit: Put the '!' next to the last word.
-> 
->> +		goto out;
->> +	}
->> +
->> +	if (sbiret_report_error(&ret, SBI_SUCCESS, "SBI_FWFT_DOUBLE_TRAP get value"))
->> +		check_double_trap();
->> +
->> +out:
->> +	report_prefix_pop();
->> +
->> +	return report_summary();
->> +}
->> diff --git a/riscv/unittests.cfg b/riscv/unittests.cfg
->> index 2eb760ec..757e6027 100644
->> --- a/riscv/unittests.cfg
->> +++ b/riscv/unittests.cfg
->> @@ -18,3 +18,8 @@ groups = selftest
->>  file = sbi.flat
->>  smp = $MAX_SMP
->>  groups = sbi
->> +
->> +[dbltrp]
->> +file = isa-dbltrp.flat
->> +smp = $MAX_SMP
-> 
-> The test doesn't appear to require multiple harts.
-> 
->> +groups = isa
-> 
-> groups = isa sbi
-> 
->> -- 
->> 2.49.0
->>
-> 
-> Thanks,
-> drew
-
+Pankaj
 
