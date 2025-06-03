@@ -1,60 +1,65 @@
-Return-Path: <kvm+bounces-48344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48345-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EE84ACCF8C
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 00:02:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 158CBACCFD9
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 00:23:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E5B01896E9F
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 22:02:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2F83164563
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 22:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1FE226863;
-	Tue,  3 Jun 2025 22:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB6FA2253F2;
+	Tue,  3 Jun 2025 22:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dk4b4e0r"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eRimniX8"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEE91A8405
-	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 22:02:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D0824DD06
+	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 22:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748988147; cv=none; b=uNK9fzF0WAQGmvNL+VOa6n9jGl3gOStyfdPuTtFwH/YN68pxQN0AavnMY8CKXV51EAMtcz0WQwGPXPpITY7ZhyDyYmVtrtDovSmt8kDPS6iEOzefDcp2iJNRKWAXF72I0fs0FQvnNe8gxgsLP4qSoPkSFdfs6j4CFsPyv7HME0c=
+	t=1748989416; cv=none; b=DjMRUvQ/4m1iPy+56Ignx42KhuCF1nATGca+ekqAtgNZ9sTqBASAfXZ9z256ndKa0q2o2jGMY9vQlX06vuZ3yAKSjRmhHBJdcV4C6+v1MA6rDVvkr1VPWg9gD2/QZ/s3xZLu21NyIjmX2WHBpKVfT7tbL732qnoWeGRq0Nl9Ru4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748988147; c=relaxed/simple;
-	bh=5t6pSx2u95X5YcFVdkNUKGb9rqXxwfBLn0vDa4U2GyM=;
+	s=arc-20240116; t=1748989416; c=relaxed/simple;
+	bh=/MhTDh1qESFrZExtR+SCTFFsKrkDxVGO6OCMPivcISk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UDNpsEw5l+Y/nkOpBk1wj0eyBaxdgK8cMX7tg1pkIrEG3Rovz/fmJRVQib7Dj3OspCdMIrjeimlVv/Xf3CjhS/qr7uWQsEjbtNP9RVxT1YsTW0xvTFD3ai8C6XX+WYWAzHz8QqGDgoJo5pwqbvvajx+1FTx0SiIHPmcxKpnsnao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dk4b4e0r; arc=none smtp.client-ip=95.215.58.186
+	 Content-Type:Content-Disposition:In-Reply-To; b=Da6Gc4Q0B1/p+Ugb9SXxbFtSB06Ae1+HNZqJymdLeFR5FpPXrV/PPG3KJBjkwGCDT0lwAej6B2xcYES3d3AsqTGwk9fccAwwTngFHDW00jNGAj1nTy3WQavvqQJNkhzhB96I1vDBdypRgBF3ghypfAoOalAuxDiNF2++1ytulL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eRimniX8; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 3 Jun 2025 15:02:04 -0700
+Date: Tue, 3 Jun 2025 15:22:54 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748988138;
+	t=1748989402;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MYBLN18ggSpU1/ZnBt64YliW65vABIyi5xIBnaUOp24=;
-	b=dk4b4e0rO/wW9aCyG+NXQO6YRkCVUwQVLI4dYbglDpsOngGTqtDeLAsdEzAtU+ic9J/Mvb
-	/2ypH0EAxpXsVG6x9gO1djeyijHbtjQcP+aDQutvZ22djAlBhSfTubZLHVBjvyEHNpOhKt
-	lxfK2PTtvCJu2SG/k6dddNR+CoTrIfY=
+	bh=niaSUpNhBQ89KPyB0pVEOrY4XFpNCP0lf6WviOejFww=;
+	b=eRimniX8eSc5OSQy+LM1nI6Dhv3MYnIr4b0Kj8coGDibHna3u81l7v23qFFDHdwinARZa8
+	xMuELseQUnvc+hrp9LYmF5h20GBKCGCcaLBq7LdbJM3ZbJB56zDxKeEoegbVsE5HltYeQg
+	j/YwAqMYBnAAtov23jZAIUGTZntaGa8=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
-	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org,
-	maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org,
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>,
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 06/17] KVM: arm64: Introduce method to partition the PMU
-Message-ID: <aD9w3Kj4-YoizKv5@linux.dev>
-References: <aD4llDZwb_sC_Ptj@linux.dev>
- <gsnt4iww3406.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 10/17] KVM: arm64: Writethrough trapped PMEVTYPER register
+Message-ID: <aD91vp8QXdIjs1Nh@linux.dev>
+References: <20250602192702.2125115-1-coltonlewis@google.com>
+ <20250602192702.2125115-11-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,150 +68,99 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <gsnt4iww3406.fsf@coltonlewis-kvm.c.googlers.com>
+In-Reply-To: <20250602192702.2125115-11-coltonlewis@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jun 03, 2025 at 09:32:41PM +0000, Colton Lewis wrote:
-> Oliver Upton <oliver.upton@linux.dev> writes:
+On Mon, Jun 02, 2025 at 07:26:55PM +0000, Colton Lewis wrote:
+> With FGT in place, the remaining trapped registers need to be written
+> through to the underlying physical registers as well as the virtual
+> ones. Failing to do this means delaying when guest writes take effect.
 > 
-> > On Mon, Jun 02, 2025 at 07:26:51PM +0000, Colton Lewis wrote:
-> > >   static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
-> > >   {
-> > > +	u8 hpmn = vcpu->kvm->arch.arm_pmu->hpmn;
-> > > +
-> > >   	preempt_disable();
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 27 +++++++++++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
 > 
-> > >   	/*
-> > >   	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
-> > >   	 * to disable guest access to the profiling and trace buffers
-> > >   	 */
-> > > -	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
-> > > -					 *host_data_ptr(nr_event_counters));
-> > > -	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
-> > > +	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN, hpmn);
-> > > +	vcpu->arch.mdcr_el2 |= (MDCR_EL2_HPMD |
-> > > +				MDCR_EL2_TPM |
-> 
-> > This isn't safe, as there's no guarantee that kvm_arch::arm_pmu is
-> > pointing that the PMU for this CPU. KVM needs to derive HPMN from some
-> > per-CPU state, not anything tied to the VM/vCPU.
-> 
-> I'm confused. Isn't this function preparing to run the vCPU on this
-> CPU? Why would it be pointing at a different PMU?
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index d368eeb4f88e..afd06400429a 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -18,6 +18,7 @@
+>  #include <linux/printk.h>
+>  #include <linux/uaccess.h>
+>  #include <linux/irqchip/arm-gic-v3.h>
+> +#include <linux/perf/arm_pmu.h>
+>  #include <linux/perf/arm_pmuv3.h>
+>  
+>  #include <asm/arm_pmuv3.h>
+> @@ -942,7 +943,11 @@ static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
+>  {
+>  	u64 pmcr, val;
+>  
+> -	pmcr = kvm_vcpu_read_pmcr(vcpu);
+> +	if (kvm_vcpu_pmu_is_partitioned(vcpu))
+> +		pmcr = read_pmcr();
 
-Because arm64 is a silly ecosystem and system designers can glue
-together heterogenous CPU implementations. The arm_pmu that KVM is
-pointing at might only match a subset of CPUs, but vCPUs migrate at the
-whim of the scheduler (and userspace).
+Reading PMCR_EL0 from EL2 is not going to have the desired effect.
+PMCR_EL0.N only returns HPMN when read from the guest.
 
-> And HPMN is something that we only want set when running a vCPU, so
-> there isn't any per-CPU state saying it should be anything but the
-> default value (number of counters) outside that context.
+> +	else
+> +		pmcr = kvm_vcpu_read_pmcr(vcpu);
+> +
+>  	val = FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+>  	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
+>  		kvm_inject_undefined(vcpu);
+> @@ -1037,6 +1042,22 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static void writethrough_pmevtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +				   u64 reg, u64 idx)
+> +{
+> +	u64 evmask = kvm_pmu_evtyper_mask(vcpu->kvm);
+> +	u64 val = p->regval & evmask;
+> +
+> +	__vcpu_sys_reg(vcpu, reg) = val;
+> +
+> +	if (idx == ARMV8_PMU_CYCLE_IDX)
+> +		write_pmccfiltr(val);
+> +	else if (idx == ARMV8_PMU_INSTR_IDX)
+> +		write_pmicfiltr(val);
+> +	else
+> +		write_pmevtypern(idx, val);
+> +}
+> +
+
+How are you preventing the VM from configuring an event counter to count
+at EL2?
+
+I see that you're setting MDCR_EL2.HPMD (which assumes FEAT_PMUv3p1) but
+due to an architecture bug there's no control to prohibit the cycle
+counter until FEAT_PMUv3p5 (MDCR_EL2.HCCD).
+
+Since you're already trapping PMCCFILTR you could potentially configure
+the hardware value in such a way that it filters EL2.
+
+>  static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  			       const struct sys_reg_desc *r)
+>  {
+> @@ -1063,7 +1084,9 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	if (!pmu_counter_idx_valid(vcpu, idx))
+>  		return false;
+>  
+> -	if (p->is_write) {
+> +	if (kvm_vcpu_pmu_is_partitioned(vcpu) && p->is_write) {
+> +		writethrough_pmevtyper(vcpu, p, reg, idx);
+
+What about the vPMU event filter?
+
+> +	} else if (p->is_write) {
+>  		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
+>  		kvm_vcpu_pmu_restore_guest(vcpu);
+>  	} else {
+> -- 
+> 2.49.0.1204.g71687c7c1d-goog
 > 
-> Unless you just mean I should check the number of counters again and
-> make sure HPMN is not an invalid value.
-
-As you've implemented it the host cannot schedule events in the guest
-range of counters regardless of context. You need to reconcile that
-global limit with the desires of the VMM on how many counters it wants
-presented to this particular guest.
-
-> > > +/**
-> > > + * kvm_pmu_partition() - Partition the PMU
-> > > + * @pmu: Pointer to pmu being partitioned
-> > > + * @host_counters: Number of host counters to reserve
-> > > + *
-> > > + * Partition the given PMU by taking a number of host counters to
-> > > + * reserve and, if it is a valid reservation, recording the
-> > > + * corresponding HPMN value in the hpmn field of the PMU and clearing
-> > > + * the guest-reserved counters from the counter mask.
-> > > + *
-> > > + * Passing 0 for @host_counters has the effect of disabling
-> > > partitioning.
-> > > + *
-> > > + * Return: 0 on success, -ERROR otherwise
-> > > + */
-> > > +int kvm_pmu_partition(struct arm_pmu *pmu, u8 host_counters)
-> > > +{
-> > > +	u8 nr_counters;
-> > > +	u8 hpmn;
-> > > +
-> > > +	if (!kvm_pmu_reservation_is_valid(host_counters))
-> > > +		return -EINVAL;
-> > > +
-> > > +	nr_counters = *host_data_ptr(nr_event_counters);
-> > > +	hpmn = kvm_pmu_hpmn(host_counters);
-> > > +
-> > > +	if (hpmn < nr_counters) {
-> > > +		pmu->hpmn = hpmn;
-> > > +		/* Inform host driver of available counters */
-> > > +		bitmap_clear(pmu->cntr_mask, 0, hpmn);
-> > > +		bitmap_set(pmu->cntr_mask, hpmn, nr_counters);
-> > > +		clear_bit(ARMV8_PMU_CYCLE_IDX, pmu->cntr_mask);
-> > > +		if (pmuv3_has_icntr())
-> > > +			clear_bit(ARMV8_PMU_INSTR_IDX, pmu->cntr_mask);
-> > > +
-> > > +		kvm_debug("Partitioned PMU with HPMN %u", hpmn);
-> > > +	} else {
-> > > +		pmu->hpmn = nr_counters;
-> > > +		bitmap_set(pmu->cntr_mask, 0, nr_counters);
-> > > +		set_bit(ARMV8_PMU_CYCLE_IDX, pmu->cntr_mask);
-> > > +		if (pmuv3_has_icntr())
-> > > +			set_bit(ARMV8_PMU_INSTR_IDX, pmu->cntr_mask);
-> > > +
-> > > +		kvm_debug("Unpartitioned PMU");
-> > > +	}
-> > > +
-> > > +	return 0;
-> > > +}
-> 
-> > Hmm... Just in terms of code organization I'm not sure I like having KVM
-> > twiddling with *host* support for PMUv3. Feels like the ARM PMU driver
-> > should own partitioning and KVM just takes what it can get.
-> 
-> Okay. I can move the code.
-> 
-> > > @@ -239,6 +245,13 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
-> > >   	if (!pmuv3_implemented(kvm_arm_pmu_get_pmuver_limit()))
-> > >   		return;
-> 
-> > > +	if (reserved_host_counters) {
-> > > +		if (kvm_pmu_partition_supported())
-> > > +			WARN_ON(kvm_pmu_partition(pmu, reserved_host_counters));
-> > > +		else
-> > > +			kvm_err("PMU Partition is not supported");
-> > > +	}
-> > > +
-> 
-> > Hasn't the ARM PMU been registered with perf at this point? Surely the
-> > driver wouldn't be very pleased with us ripping counters out from under
-> > its feet.
-> 
-> AFAICT nothing in perf registration cares about the number of counters
-> the PMU has. The PMUv3 driver tracks its own available counters through
-> cntr_mask and I modify that during partition.
-> 
-> Since this is still initialization of the PMU, I don't believe anything
-> has had a chance to use a counter yet that will be ripped away.
-
-Given that kvm_pmu_partition() is called from an ioctl, it is entirely
-possible that events have been scheduled prior to applying the
-partition.
-
-> Aesthetically It makes since to change this if I move the partitioning
-> code to the PMUv3 driver, but I think it's inconsequential to the
-> function.
-
-There are two *very* distinct functions w.r.t. partitioning:
-
- 1) Partitioning of a particular arm_pmu that says how many counters the
- host can use
-
- 2) VMM intentions to present a subset of the KVM-owned counter
- partition to its guest
-
-#1 is modifying *global* state, we really can't mess with that in the
-context of a single VM...
 
 Thanks,
 Oliver
