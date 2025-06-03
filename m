@@ -1,93 +1,84 @@
-Return-Path: <kvm+bounces-48249-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48252-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28510ACBF64
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 06:52:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF8EEACBF7A
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 07:11:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3464A3A50A7
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 04:52:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB194188A770
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 05:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02991F3D54;
-	Tue,  3 Jun 2025 04:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B2A202984;
+	Tue,  3 Jun 2025 05:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="B3P8Y2kD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WAP6lHRJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271DD139B;
-	Tue,  3 Jun 2025 04:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752E81F7060;
+	Tue,  3 Jun 2025 05:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748926348; cv=none; b=qPsagJyIpqTBZtDPcqzqiQ6Veo5YWiAqPz7jXK4tv80rgW7poE8j3vMIfq1UJxraITJhs7azBBHmEKsW/w+87Vm6C7kpsMHqatUwLuz9X+YudlD6L2ejAetTxSF0EkRupLzuwYNbjdRwBoPbuXHtDbu98FMRSMr4r6hGkfWdzQU=
+	t=1748927485; cv=none; b=GusWUzXwSF8sJdS7MM7gc1dQt4+z9weXHuFc4wQdFDtb0dBAeCP6nh00LUXCSR8JBypQr72FT0K4FtTX39zuugrB+Egs1NpPurNvN2Eh5z+E4G6IOXz0vbl9FKzKK3gQjx0+Hk+gQAYzy2kTb/jGg7W8wS68Il+UPIyd6/2hZKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748926348; c=relaxed/simple;
-	bh=9JfipAlH31/Nfl/rtapCnYoip2jYXWlwbar7ZO14jI8=;
+	s=arc-20240116; t=1748927485; c=relaxed/simple;
+	bh=A4LDdea+SqFvSsp7QIZfn63yvE0Iup0Y5Vmq4FjSSs8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=efoI0vzT3xjuqbWkTbKYsJUvnckfd1uwtD1570L62jzsh1yOAJU69dLiYgf0PsjyspZq3TXzKgBR9bIvdDa0ZALn8ZwfRXkC9YTDWIxbGEOhuWYM/EyNgTTfi18MbDAjFrAZ5XMLFHIuDBcizix8dAm/euwaxql7kZuUhCf4RHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=B3P8Y2kD; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=2HXdpwNFEIc5X8bhVnayNQJw7eGMBpc7Yo7s6dM4VOc=; b=B3P8Y2kDHXidjM2mVVCC4kBNNF
-	Qz89tdzXTMecebZG7XmRmDmZwVxd749GOy/SzyY/EpmsmfsqSNw/cnSgrpSTVCApUquqkhPfVkAc8
-	kieG2QRArS7d2eif4k5WqxYt4D0T0IvW8HLaOTbXkSr40XTEVz8CgyPpGf052cciIXiuAonVHjKp5
-	ca8tnKvTKMeAP4pWA1TQQgCniiO5gADuWYcy575ZsQpE9t3qic8U9fIg53T2QtSkg9Caxfp7AVxdf
-	qRln17kTFNcHJEKM2R61la51Q5Mz0A+L2g/j3ozbDXhSHyJ/Sl2JQG5pkhq4oDDJmJzkj4ZENkv79
-	jz/R5CFQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uMJdM-00000009izV-3hPv;
-	Tue, 03 Jun 2025 04:52:20 +0000
-Date: Mon, 2 Jun 2025 21:52:20 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com,
-	ajones@ventanamicro.com, akpm@linux-foundation.org,
-	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org,
-	aou@eecs.berkeley.edu, bfoster@redhat.com,
-	binbin.wu@linux.intel.com, brauner@kernel.org,
-	catalin.marinas@arm.com, chao.p.peng@intel.com,
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
-	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca,
-	jgowans@amazon.com, jhubbard@nvidia.com, jroedel@suse.de,
-	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com,
-	keirf@google.com, kent.overstreet@linux.dev,
-	kirill.shutemov@intel.com, liam.merwick@oracle.com,
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name,
-	maz@kernel.org, mic@digikod.net, michael.roth@amd.com,
-	mpe@ellerman.id.au, muchun.song@linux.dev, nikunj@amd.com,
-	nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com,
-	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com,
-	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com,
-	pvorel@suse.cz, qperret@google.com, quic_cvanscha@quicinc.com,
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com,
-	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com,
-	rientjes@google.com, roypat@amazon.co.uk, rppt@kernel.org,
-	seanjc@google.com, shuah@kernel.org, steven.price@arm.com,
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com,
-	thomas.lendacky@amd.com, vannapurve@google.com, vbabka@suse.cz,
-	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com,
-	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com,
-	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com,
-	zhiquan1.li@intel.com
-Subject: Re: [PATCH 1/2] fs: Provide function that allocates a secure
- anonymous inode
-Message-ID: <aD5_hL-caOZjSk8x@infradead.org>
-References: <cover.1748890962.git.ackerleytng@google.com>
- <c03fbe18c3ae90fb3fa7c71dc0ee164e6cc12103.1748890962.git.ackerleytng@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BSYc9MW3FP2VaZlIkzueRtWLCn7u9Z9d1QjI8r6ZnGKd2vTfFH1LzvbfXFZxg4gUfpdMIhvRAKgJH5wa6jk2/QEI8bDKQACzRRAk204ewf7taWstsrF8nnEbeEZ/qcInMCxVTG+QUa/vXqOBeCRnLepkTLhpIDvpiwQCnYbCBtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WAP6lHRJ; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748927484; x=1780463484;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=A4LDdea+SqFvSsp7QIZfn63yvE0Iup0Y5Vmq4FjSSs8=;
+  b=WAP6lHRJULfGwaBDordXZjf8BQRcOsFCpCjS30/1/tg88ILkEolyAecG
+   bWiH2FUOXr/QexAX+IQNsFUQBYnBCIXHbCSI245y5bPdDxTiPVVWbwDAN
+   DK+TGCG8jgOPpPuM5zHjfcuN4UANoJML80aBI2A6n67GUdFsoVQ3dskgV
+   VTeM11hlCdOI1AKRbO086hufp7JJ3ZRSfPqD4UNJqefDQ7Bgd1GVciGeh
+   7qQSK6KOzbEziCgD97ank7yWwu9Eha9LKnjapxzsRdFy/UcbYbiKcuOEb
+   Gle4ApLMQIenXhXIheqRWr+LZgDITGV3Vwkd3rYd6YmqdV6bfy6XLzAM/
+   A==;
+X-CSE-ConnectionGUID: bn3wGxucQx6Ju6oRqw7VvA==
+X-CSE-MsgGUID: NkivxYQTTmS3dVmg5AgLtg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11451"; a="62007039"
+X-IronPort-AV: E=Sophos;i="6.16,205,1744095600"; 
+   d="scan'208";a="62007039"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2025 22:07:47 -0700
+X-CSE-ConnectionGUID: vMpLU8zvR5e2O0JVHMgjXg==
+X-CSE-MsgGUID: glbqWyGzSAW042M4b3+m5Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,205,1744095600"; 
+   d="scan'208";a="175700501"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa002.jf.intel.com with ESMTP; 02 Jun 2025 22:07:41 -0700
+Date: Tue, 3 Jun 2025 13:01:09 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: kvm@vger.kernel.org, sumit.semwal@linaro.org, christian.koenig@amd.com,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	dan.j.williams@intel.com, aik@amd.com, linux-coco@lists.linux.dev,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, vivek.kasireddy@intel.com,
+	yilun.xu@intel.com, linux-kernel@vger.kernel.org, lukas@wunner.de,
+	yan.y.zhao@intel.com, daniel.vetter@ffwll.ch, leon@kernel.org,
+	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com, linux-pci@vger.kernel.org, zhiw@nvidia.com,
+	simona.vetter@ffwll.ch, shameerali.kolothum.thodi@huawei.com,
+	aneesh.kumar@kernel.org, iommu@lists.linux.dev,
+	kevin.tian@intel.com
+Subject: Re: [RFC PATCH 10/30] vfio/pci: Export vfio dma-buf specific info
+ for importers
+Message-ID: <aD6BlXfuCGCOw4PM@yilunxu-OptiPlex-7050>
+References: <20250529053513.1592088-1-yilun.xu@linux.intel.com>
+ <20250529053513.1592088-11-yilun.xu@linux.intel.com>
+ <20250602133009.GC233377@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -96,23 +87,30 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c03fbe18c3ae90fb3fa7c71dc0ee164e6cc12103.1748890962.git.ackerleytng@google.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20250602133009.GC233377@nvidia.com>
 
-On Mon, Jun 02, 2025 at 12:17:54PM -0700, Ackerley Tng wrote:
-> +struct inode *alloc_anon_secure_inode(struct super_block *s, const char *name)
-> +{
-> +	return anon_inode_make_secure_inode(s, name, NULL, true);
-> +}
-> +EXPORT_SYMBOL_GPL(alloc_anon_secure_inode);
+On Mon, Jun 02, 2025 at 10:30:09AM -0300, Jason Gunthorpe wrote:
+> On Thu, May 29, 2025 at 01:34:53PM +0800, Xu Yilun wrote:
+> > Export vfio dma-buf specific info by attaching vfio_dma_buf_data in
+> > struct dma_buf::priv. Provide a helper vfio_dma_buf_get_data() for
+> > importers to fetch these data. Exporters identify VFIO dma-buf by
+> > successfully getting these data.
+> > 
+> > VFIO dma-buf supports disabling host access to these exported MMIO
+> > regions when the device is converted to private. Exporters like KVM
+> > need to identify this type of dma-buf to decide if it is good to use.
+> > KVM only allows host unaccessible MMIO regions been mapped in private
+> > roots.
+> > 
+> > Export struct kvm * handler attached to the vfio device. This
+> > allows KVM to do another sanity check. MMIO should only be assigned to
+> > a CoCo VM if its owner device is already assigned to the same VM.
+> 
+> This doesn't seem right, it should be encapsulated into the standard
+> DMABUF API in some way.
 
-What is "secure" about this inode?
+OK.
 
-A kerneldoc explaining that would probably help.
-
-> +extern struct inode *alloc_anon_secure_inode(struct super_block *, const char *);
-
-No need for the extern here.  Spelling out the parameter names in
-protypes is nice, though. (and fix the long line while you're at it).
-
+> 
+> Jason
 
