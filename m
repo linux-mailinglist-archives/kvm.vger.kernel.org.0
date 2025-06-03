@@ -1,129 +1,137 @@
-Return-Path: <kvm+bounces-48347-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48348-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86941ACCFF6
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 00:44:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52637ACD036
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 01:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21EE83A45F0
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 22:44:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C97E3177057
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 23:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43889253932;
-	Tue,  3 Jun 2025 22:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3061D253F1A;
+	Tue,  3 Jun 2025 23:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lzCIQEGZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OsGv9NSK"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7843A4B5AE
-	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 22:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE019225768
+	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 23:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748990666; cv=none; b=QONgwSnzC49HFETiFh3LuWSWm/9KmbMNisd5eWiAiyYpAgFSoZXaJ3suHiZ2dPTwQt0xiPCzWMMHYoRN8YhQUf2qJrhPqV2UAWtDewbwvAbT/iEjQN/rm+olCDZZkbpal5t+1HCoXC5CUBm0j9yf6AMD3fGl77agjWf3kcFpR4I=
+	t=1748992826; cv=none; b=K+Hd7w7Teo5db88XoDwsHu0yI4OrvZaO9ULRMswkhGs66RrhCsUADQkQghEBmvL+ZYe85xh9VdfPtMQHOWaRGTGS/HK/Zonk9wffGscMKIKP6j8FjK2KycDW0qSYVLnCqCZ2xPy4fUfzMM6Cr/bWhPyCp54OjBE1M+SCpDVIMuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748990666; c=relaxed/simple;
-	bh=LLoqeM/UCB0mh20l/3/Xv9BmLg+WjY+M+SHRDQyeuwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z3PkbgCh8X5D82EeWPtmK/NSqt0TZK9El0g9LVJkeyGv45itopwj4xhB8F68kgjGFn3+hd9X9trCFC9KQ4vpNAgPjW1XIPYuv155ZUIhxso/eeE5qg2YSzQ0p/shoXuzmNmsVRoEJPEJq1HLQ6bi9PYPo1EfqfiXx82fiSLK54Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lzCIQEGZ; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 3 Jun 2025 15:43:58 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1748990654;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GoKlMc1lHrduXpDbBbVFy4M8aj5m5zbNDdssxMr5tdc=;
-	b=lzCIQEGZ9FI8wt89dqHEjgAakygFlEyD4l9ip53qVy9LfjTGPS95wVhPcy/2qmUyOYVAjE
-	JRaFapvUKpqg/O3lcUMMPEcYcp7ibaVQc7D6mRAMyy7cTKnSFcjae5MS7anwW9DSr5vcUV
-	rFDNBe0JSQRHTY/ygvKnzMkxuvVGfU8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 00/17] ARM64 PMU Partitioning
-Message-ID: <aD96rn78BSUDbEu1@linux.dev>
-References: <20250602192702.2125115-1-coltonlewis@google.com>
+	s=arc-20240116; t=1748992826; c=relaxed/simple;
+	bh=j58Q16s6XP7YOP/lfHW/QjY9sHrr3GPqeCXlnplz2WY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Z5FFBf/EAAARkmzFOyeAEm7tOStbkQpYJC1qCiAXi5JOV+eJkC7P7+xsnVqkQExjku+Emxl3AolnjKXE16wiVNHmFFiXCMvesXl+der7rfq01MhGekA//dJDCxhxXct/9297OjGjIfeS2PFp6ubSZkp44UgI0/1I0iPAAbrnT20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OsGv9NSK; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b240fdc9c20so6273839a12.3
+        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 16:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748992824; x=1749597624; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/1NQnWbd4TNjgXbBu1YELa+Y+x9/lksnJYJWgYujMTY=;
+        b=OsGv9NSKrOWHJTqRBYFZ1ORrnrgdl+fW1X/Rg7DLM2YAcP1etrPvE7IsmdUBLq3ozw
+         RGrK+l4dCvA4mOV1dDdlTgbGlD0zdWDdLJhh8Rmt/Hzi7qiePVwkTDVheL5KxjYEy+CO
+         bYBfG/vvbbSFDOXS8409Ilwc5NyYwGBCGnur9eEK3LRGKyj0i/j/ShSFHc6dcKLKawmR
+         I0jydmettrA3v6eirHWyuByR3MuhSNpAWH2pc/jXCEZS/dkeZp5y8EBbUTYnB4SRPv+y
+         gztsi/Uluph9OWDjUVttI5UgdhMjoh3Spgg1oNVH6Bu9tAI9sj3lLsM5lVtg1jDxJWlE
+         OEJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748992824; x=1749597624;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/1NQnWbd4TNjgXbBu1YELa+Y+x9/lksnJYJWgYujMTY=;
+        b=ZufpEJxd4IfCrnZMwYv3kcbJLz5nVExzkoHGA9gpXCc7JPcFzF7LKTqUGHJWi9RCzC
+         BwiAQRhM1ZsKaEPkEDX0Fj5WLXYngsSOR5G/T6LHjK5JZw17Km15hs9q79VKnuZoblhR
+         Qmf/BKx24MoAncK0UUblVYUS++gEFbTRjmKs3dRR0e/ShwOv4pN78qPnBrUebRn3DXkU
+         Wto1KTofdnbkRgfOABJRBoZ6wXACv2VZVfZwT5usyDTLUiMnxH7iiev2ThVsis+rRUgR
+         tcnxPHlYNaTTcFXsnatCQ3o3Off4r+xXUld74YGz58r0GthoPOOZLIwgW95fKEOTlpQ6
+         MtXg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0WZpgex7FUay93Hwm93m0kIpGFw4Sc/Xo7gwvo6Bn8wLX3f4Simp27IF4poxENS4KN3w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywquagezBTAulqfckEl6WfiK50uIrRxXIpdfUyMXW/XtR78h26
+	kapX9sX+fMq516X4CivOtNN6IoHEK3oERmzYKGKPQr2NA7mnfiqoyaIXd7KPmcQVXgl+XfqcuBu
+	pVgFpFQ==
+X-Google-Smtp-Source: AGHT+IHDEuV55HfI3KJOeebKilLhgQC1SPNfNkKoXqJ0hnYG38Ky2DmjXchOknyXiLB0Cqp9sCaPJzM173I=
+X-Received: from pgbdp1.prod.google.com ([2002:a05:6a02:f01:b0:b2c:4bbc:1ed5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3949:b0:1f5:8262:2c0b
+ with SMTP id adf61e73a8af0-21d22adc9a3mr1089443637.2.1748992824067; Tue, 03
+ Jun 2025 16:20:24 -0700 (PDT)
+Date: Tue, 3 Jun 2025 16:20:22 -0700
+In-Reply-To: <20250523090848.16133-1-chenyi.qiang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250602192702.2125115-1-coltonlewis@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250523090848.16133-1-chenyi.qiang@intel.com>
+Message-ID: <aD-DNn6ZnAAK4TmH@google.com>
+Subject: Re: [kvm-unit-tests PATCH] nVMX: Fix testing failure for canonical
+ checks when forced emulation is not available
+From: Sean Christopherson <seanjc@google.com>
+To: Chenyi Qiang <chenyi.qiang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jun 02, 2025 at 07:26:45PM +0000, Colton Lewis wrote:
-> Caveats:
+On Fri, May 23, 2025, Chenyi Qiang wrote:
+> Use the _safe() variant instead of _fep_safe() to avoid failure if the
+> forced emulated is not available.
 > 
-> Because the most consistent and performant thing to do was untrap
-> PMCR_EL0, the number of counters visible to the guest via PMCR_EL0.N
-> is always equal to the value KVM sets for MDCR_EL2.HPMN. Previously
-> allowed writes to PMCR_EL0.N via {GET,SET}_ONE_REG no longer affect
-> the guest.
+> Fixes: 05fbb364b5b2 ("nVMX: add a test for canonical checks of various host state vmcs12 fields")
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> ---
+>  x86/vmx_tests.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 > 
-> These improvements come at a cost to 7-35 new registers that must be
-> swapped at every vcpu_load and vcpu_put if the feature is enabled. I
-> have been informed KVM would like to avoid paying this cost when
-> possible.
-> 
-> One solution is to make the trapping changes and context swapping lazy
-> such that the trapping changes and context swapping only take place
-> after the guest has actually accessed the PMU so guests that never
-> access the PMU never pay the cost.
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 2f178227..01a15b7c 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -10881,12 +10881,11 @@ static int set_host_value(u64 vmcs_field, u64 value)
+>  	case HOST_BASE_GDTR:
+>  		sgdt(&dt_ptr);
+>  		dt_ptr.base = value;
+> -		lgdt(&dt_ptr);
+> -		return lgdt_fep_safe(&dt_ptr);
+> +		return lgdt_safe(&dt_ptr);
+>  	case HOST_BASE_IDTR:
+>  		sidt(&dt_ptr);
+>  		dt_ptr.base = value;
+> -		return lidt_fep_safe(&dt_ptr);
+> +		return lidt_safe(&dt_ptr);
 
-You should try and model this similar to how we manage the debug
-breakpoints/watchpoints. In that case the debug register context is
-loaded if either:
+Hmm, the main purpose of this particular test is to verify KVM's emulation of the
+canonical checks, so it probably makes sense to force emulation when possible.
 
- (1) Self-hosted debug is actively in use by the guest, or
+It's not the most performant approach, but how about this?
 
- (2) The guest has accessed a debug register since the last vcpu_load()
-
-> This is not done here because it is not crucial to the primary
-> functionality and I thought review would be more productive as soon as
-> I had something complete enough for reviewers to easily play with.
-> 
-> However, this or any better ideas are on the table for inclusion in
-> future re-rolls.
-
-One of the other things that I'd like to see is if we can pare down the
-amount of CPU feature dependencies for a partitioned PMU. Annoyingly,
-there aren't a lot of machines out there with FEAT_FGT yet, and you
-should be able to make all of this work in VHE + FEAT_PMUv3p1.
-
-That "just" comes at the cost of extra traps (leaving TPM and
-potentially TPMCR set). You can mitigate the cost of this by emulating
-accesses in the fast path that don't need to go out to a kernel context
-to be serviced. Same goes for requiring FEAT_HPMN0 to expose 0 event
-counters, we can fall back to TPM traps if needed.
-
-Taking perf out of the picture should still give you a significant
-reduction vPMU overheads.
-
-Last thing, let's table guest support for FEAT_PMUv3_ICNTR for the time
-being. Yes, it falls in the KVM-owned range, but we can just handle it
-with a fine-grained undef for now. Once the core infrastructure has
-landed upstream we can start layering new features into the partitioned
-implementation.
-
-Thanks,
-Oliver
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 2f178227..fe53e989 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -10881,12 +10881,13 @@ static int set_host_value(u64 vmcs_field, u64 value)
+        case HOST_BASE_GDTR:
+                sgdt(&dt_ptr);
+                dt_ptr.base = value;
+-               lgdt(&dt_ptr);
+-               return lgdt_fep_safe(&dt_ptr);
++               return is_fep_available() ? lgdt_fep_safe(&dt_ptr) :
++                                           lgdt_safe(&dt_ptr);
+        case HOST_BASE_IDTR:
+                sidt(&dt_ptr);
+                dt_ptr.base = value;
+-               return lidt_fep_safe(&dt_ptr);
++               return is_fep_available() ? lidt_fep_safe(&dt_ptr) :
++                                           lidt_safe(&dt_ptr);
+        case HOST_BASE_TR:
+                /* Set the base and clear the busy bit */
+                set_gdt_entry(FIRST_SPARE_SEL, value, 0x200, 0x89, 0);
 
