@@ -1,130 +1,93 @@
-Return-Path: <kvm+bounces-48315-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48316-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3602BACCAA5
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 17:54:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DCAEACCB09
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 18:12:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A32B416DCC6
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 15:54:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 380C83A873B
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 16:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2744F23D2A5;
-	Tue,  3 Jun 2025 15:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29D523D29A;
+	Tue,  3 Jun 2025 16:12:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N/sStnC0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OU1gqu/X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D078723D29C
-	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 15:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6337B231833
+	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 16:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748966062; cv=none; b=AK0ltizk/WJ13t2qy6FWRT7szETFwH/ppO8zpXRl9NErY694UYHTPFjGkAIQS/85Ytj4VqHgAoJpn3Oz8Zx0eQbCBqWW/uIiciw+NO9zguzd4qOa5N8yqCsZxU+xu64xBZPQAGs8123Ykw/qIZ71ZAyhINf1WKe961q2J+E1HK0=
+	t=1748967145; cv=none; b=AkW5u+B6SJ6YF3JEdOozLZT6cNFxL8eOFp9pU/uYp6rLIxCSYcJqyk+gQMtE1Wfzbg5582EHjT2m5nbgGpiejUN6kkeDdaKg5DR7J8w60h4V5AePrm0A9X/fV3ehsqxHG7QvxPmCuodGXC/zY2v5vhKNfaniRLgIpSPFUvhnxgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748966062; c=relaxed/simple;
-	bh=qFqprFvAKfB/OKMTmvNTxYccsPSFdh5FzV8/GVSqpUg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XmktGcLOcpc3tT+0kI4tH4IcDpQq57K9uXeJiBCXBbJ0PgzY/cgadGxi/P81rEbr4wdkQ+8DhWpJGaYL+uF6WF3bLFOWjMMzSA7fhHqMTW9X9TCbCuDb6p2t3m6NPwNeRL7WtkSSQBypDQMIeqe0Ef+gyPhc9Mx4HifZkfnU5A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N/sStnC0; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-55324062ea8so7399799e87.3
-        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 08:54:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748966059; x=1749570859; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QvOEkCm3v+LAEGTcWi2djmfPGG6iSEXp+wGe+oeXEzo=;
-        b=N/sStnC0IHtrTK/ZDmXCzwJqqk4nu3Xi/YODY/G9qlhj6+FijIunQkN89LYWE9UKsP
-         /LcHk0uD+AcRXQU8Og9VGTdj7aQ4i/L3zDmogZoBBCGTbFfYt06Mmf7IyFBx4G6+1dpF
-         pjUb8Z8YXDyx8+bPA3zudrFPk6j+cUAx8KSMgYeDexOVIL5tMAFNzr5Ub43Nsk6o8ad6
-         xy1bR8YzsZdTMskRzwraOeZnJHRUa8KzxQSGKUFf/dDWVZes8zL77CE2Ya+5p48op6TP
-         Wz028FPYlzaF1FRcOrVvgp4xFtfS5eoFXDRzcCo5N2O+9C4Nk8/vjueb0BaYmsD1zq2L
-         T/rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748966059; x=1749570859;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QvOEkCm3v+LAEGTcWi2djmfPGG6iSEXp+wGe+oeXEzo=;
-        b=cmhokdVIqBeob/1TJSyo3O8WZmND0Ri//nT9joaRlf27LxmPD94lXeVHLhOAGvfI0g
-         Ov9HstnJanHWBnh5pjhaTnIsjPdcooCwWEp8x0uSZt75YGNasK7idNzn3hcSvn9bpq8L
-         apbgpUci2IEoI9qCJomVgT60mB0y8aHRgHBooxADpH0f4p8LxRZqhJjDQXKZmDgx+1fa
-         b27SsaFvM00md17qq6c1CokDKisDXDXG5JDyVNMgUI954cihsa3a+RLfGffvHd1hPIi1
-         jy9wEYakgpcZG71uYHNWUCZmSVzPtZumd/nhD0Pu4U8izS4//60L7SP5taEerVJl2RQw
-         OA+A==
-X-Forwarded-Encrypted: i=1; AJvYcCXENOlgXXHh5mjYgNU4zTWgE3yZAD87SbX6gqbqEY40IZHSDoL8E/QbbVEIOgAH/Eo+3M4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSGuvgpkgUlOWcosCfNsjeRnVSA6s6MIhcU217bsQeph2Ql9di
-	RSk3Su0fAcYnFQ/R+UIgpVd8TqSMgJNU1zqyeS0Gfvn1zzSKbS0W7uxZ5zAhwAVjWEKVns7vxmf
-	5qW6voCoOZY3MUZsDYtIipj3iI5B8A8/9nhsrZja7
-X-Gm-Gg: ASbGncvusukrTQbpsqINWN6yh8isRuPHCeQIbskKNjNHOEg7kmwinjIXNGfUVHVd43Z
-	gCjE0xNYyCoqa3HI5WYMogAHVgdXq15MNAVriSltzcF4wdabTLcebrXlRv+Z0f09h/BeMVFcj3w
-	VqZUUI1ii3/8QjZLrQD6BPo3m6b+juLw062GhqvMJtvVo=
-X-Google-Smtp-Source: AGHT+IEcwJYEAUWD09Yo0OuV1+RJiGZ1saPwpSYKdVT3gzIP7Lf/cIwTKSYvYRwzLtaPSJ4jt7ofzlMJ3EZ1CeH19yE=
-X-Received: by 2002:a05:6512:6082:b0:553:2868:6358 with SMTP id
- 2adb3069b0e04-55342f931cbmr3618117e87.35.1748966058809; Tue, 03 Jun 2025
- 08:54:18 -0700 (PDT)
+	s=arc-20240116; t=1748967145; c=relaxed/simple;
+	bh=WOKLrG800JsNYDuenjSSGG1iYsq0yhwwkhv7Zpy4AB0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Mrpx0B7b27ZAH/riIRThpOD1JoJdUO7CnwpRtpuTXEY6+d7UfhBrKMZI4qUqbS1uXnuadQjpY3NDbB/XaQSpllyTOKowZgvFs8c3jJAGiI979bDpa4Yr4xTSJ9LQsHxaQ0jBefQbtlVtY/fbUEsykNcOrrLeAHbtwM/SvMYYHKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OU1gqu/X; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748967144; x=1780503144;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=WOKLrG800JsNYDuenjSSGG1iYsq0yhwwkhv7Zpy4AB0=;
+  b=OU1gqu/XsbRemwaogyiKgEMDnp8yvc75U2SlUdnGCM1d+3qKWqydmicc
+   62q2CJCeny7sDrQaGM8DCtIerQkrl6883wiCeLk0soHo14v2FQh1shRqC
+   fLYNAq2JLcJpJFQVvWzky2R4NzSvv4vrPW7/faic5eUkZHHFMBOZiQer1
+   jAoqrBR1j3Uxk/ATuX6yrWKqAKOecOA8L3V4NkiDapn+nnxsVefj6f3fC
+   jMnFWiDd7Ln3ygPp5zZUBCpNTHCR8w8MIlCCVc6+zioBLgXXt3MQZjykt
+   xxYoBhEqXfr44Ca9MjOdpyRXHPMyQOeU1d83quEmep9sBdz1i8gBJKKb9
+   w==;
+X-CSE-ConnectionGUID: z7TmrasuQF22/cP+bZ8PVA==
+X-CSE-MsgGUID: nM/xqSdbRCOL1TH3yDfH0w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11453"; a="61677741"
+X-IronPort-AV: E=Sophos;i="6.16,206,1744095600"; 
+   d="scan'208";a="61677741"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 09:12:22 -0700
+X-CSE-ConnectionGUID: 3jX03g1PRp2jMHqq3bZA9w==
+X-CSE-MsgGUID: qrbiEWqZQAmxVHi+a8m/5Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,206,1744095600"; 
+   d="scan'208";a="150191559"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 09:12:20 -0700
+Message-ID: <e8a4148d-9e3e-4884-8b3c-e49bb7a4cdf5@intel.com>
+Date: Wed, 4 Jun 2025 00:12:17 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250523233018.1702151-1-dmatlack@google.com> <20250523233018.1702151-5-dmatlack@google.com>
- <20250602170839.4fe2a914.alex.williamson@redhat.com>
-In-Reply-To: <20250602170839.4fe2a914.alex.williamson@redhat.com>
-From: David Matlack <dmatlack@google.com>
-Date: Tue, 3 Jun 2025 08:53:51 -0700
-X-Gm-Features: AX0GCFvBjyqDrnSF5q6u_nhoxQExxlMuYYL8C4x8fVDpC5F07VxheF08Pu0HP1w
-Message-ID: <CALzav=c2yBuUwsqDaAQPG1FkG+XWNrn2PfRKGJ-wk=Ddgnsa=w@mail.gmail.com>
-Subject: Re: [RFC PATCH 04/33] vfio: selftests: Test basic VFIO and IOMMUFD integration
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
-	Fenghua Yu <fenghua.yu@intel.com>, "Masami Hiramatsu (Google)" <mhiramat@kernel.org>, 
-	Adhemerval Zanella <adhemerval.zanella@linaro.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Wei Yang <richard.weiyang@gmail.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Takashi Iwai <tiwai@suse.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, WangYuli <wangyuli@uniontech.com>, 
-	Sean Christopherson <seanjc@google.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Josh Hilke <jrhilke@google.com>, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, 
-	Jason Gunthorpe <jgg@nvidia.com>, Kevin Tian <kevin.tian@intel.com>, Vipin Sharma <vipinsh@google.com>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Adithya Jayachandran <ajayachandra@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
-	Dave Jiang <dave.jiang@intel.com>, Dan Williams <dan.j.williams@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] i386/kvm: Prefault memory on page state change
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org
+Cc: Marcelo Tosatti <mtosatti@redhat.com>, Michael Roth <michael.roth@amd.com>
+References: <f5411c42340bd2f5c14972551edb4e959995e42b.1743193824.git.thomas.lendacky@amd.com>
+ <4a757796-11c2-47f1-ae0d-335626e818fd@intel.com>
+ <cc2dc418-8e33-4c01-9b8a-beca0a376400@intel.com>
+ <d0983ba3-383b-4c81-9cfd-b5b0d26a5d17@redhat.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <d0983ba3-383b-4c81-9cfd-b5b0d26a5d17@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 2, 2025 at 4:08=E2=80=AFPM Alex Williamson
-<alex.williamson@redhat.com> wrote:
->
-> On Fri, 23 May 2025 23:29:49 +0000
-> David Matlack <dmatlack@google.com> wrote:
-> > +int main(int argc, char *argv[])
-> > +{
-> > +     char *bdf;
-> > +
-> > +     if (argc !=3D 2) {
-> > +             printf("Usage: %s bus:device:function\n", argv[0]);
->
-> segment:bus:device.function?
+On 6/3/2025 11:00 PM, Paolo Bonzini wrote:
+> I'm applying Tom's patch to get it out of his queue, but will delay sending
+> a pull request until the Linux-side fix is accepted.
 
-Oops, yes. Will fix in the next version.
+BTW, for the patch itself.
 
->
-> > +             return 1;
->
-> 1 or KSFT_FAIL?
-
-Yeah KSFT_FAIL is probably the better option.
-
-Thanks.
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Tested-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
