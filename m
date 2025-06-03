@@ -1,198 +1,328 @@
-Return-Path: <kvm+bounces-48297-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48298-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78F7ACC662
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 14:22:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A411ACC6BE
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 14:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D412188C074
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 12:22:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9E20171EA9
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 12:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0732822FF59;
-	Tue,  3 Jun 2025 12:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E2D822DA0A;
+	Tue,  3 Jun 2025 12:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NkFjPMdM"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dVculq2A"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2047.outbound.protection.outlook.com [40.107.237.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9CC1E480;
-	Tue,  3 Jun 2025 12:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748953315; cv=fail; b=ex39WhkX+8DjNb4R1aB3TCbD+MDSx1c/yaKa11BOPfMn8Iwx6qI8gAkS3U3WZ3pToTbTWkixswLDtu7GvTYMhDkui1ocXekfFj94j8DIamayyOSlt5U3P9mKs+LX19q8L/7b4oKDXvoXOOPTsBL/asonZS2ZQa2Dkgjrv1APATc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748953315; c=relaxed/simple;
-	bh=+pYYGx5S3kypw3FxRhjjTfJs1+Q/ILFaeQ2sXz3Us7M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=qJVBtjIO3vivh+/p3SUdHMxn+Yhk4U51FluQHJVIl3mdNXaKUKrojdXWUFvEHRx4tgexgo79aR8E3YQYkB/V9dAg3kcQGLqcAGOIY8PpgU+cTXPE6zJ4odadh2DV5bzjL0GI0Bf4umEo0VDwz7TuiceDhsaJ8CmweCvMO9z5yzo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NkFjPMdM; arc=fail smtp.client-ip=40.107.237.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Jh9gkua29LZJGNoZ58FSa3cr8iWmxlriuTFRCQUdxznPvp3RzL/n9lii1pncuMp3scnLoTtijZWzQyAG+6fMRL51ed7tDjyTzHhTgzFpa2Oyoi7g7VtVOt93IvC6znR9mgc1UU0mrTEX/Wirm3JXxwN3LYzTc/HRlTtS2vZe4b7Itifmw7rJVW30FFJ5fhld/u857n+coB+0AGt5kGgLZkAhc+sDhwwqHctRzeevR4OONcRQ1CZkEFwf3e0y0bRGUHXMm6rfomNgdX9bEF5FkRhI+HTRgygrTII/IgO1lWpdk9N9KzpjufaLqeIUfeDztpA98JFrFb3wxoLg6zfbLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eclabr97XJTSzw3uZDSXRFmwfvNHB4pPDCaL69rXd7M=;
- b=h0wEycZaNj3ZcNf96b+P2su48DLu5pwfIzsIPJiEVJyGdffLkmrZvzwtXK3zaiDQshM2jDLxPmG448tl9AHKwiEVHceinLQIeFTYo+Nt+GnKBLar7CjpOSBGTWxQynZCkek8q94SBu62RgarH+wLw1HOz7LadprHumh39P4vcFYuBEF9Udln+Iatmc0uWD+Vm9F2tvRUS78GtBo9AUi2mzuvDuq9xZbQo3EM/5N7ZL1chUM5wSGl8Gq7c9yD2f/J64Q259N6vumj/oohEHCt96ECTv/N0pqOTizMXmM2ZTgksdNHKPNei1sjKefXsOZctO014kMEo3GX4hOX35KRJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eclabr97XJTSzw3uZDSXRFmwfvNHB4pPDCaL69rXd7M=;
- b=NkFjPMdM3Im3emwF0ek7a01KbcKAsagnLwa4uejEnLWKTXOS1p9+WlKIpudo3wRZI9lSDOzvZtXTcSxGEPojoZMvStcWBOPatb//3bsc/etmrTUmz5W8bue4oIwmCQYB95rpqKZo1HU7CGOSqfYIytF08IJev0UTErXcOJM/Cxqx3VW/cwyrO4ecHjNybXy9KOL2eSmFiT8av1xEztWuy1cZ32gG/9CEOiSAj8YrrfdgVx/SXsJP0zkN3CRgGtxs4j25arzlu4B7bIIbhw8xIptLumTCubYParENuemqtjaRGWk7QiKrgTF03nrHW6QE6srFq96rLQ6gPX8va8zxtQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by SN7PR12MB7936.namprd12.prod.outlook.com (2603:10b6:806:347::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.26; Tue, 3 Jun
- 2025 12:21:50 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%6]) with mapi id 15.20.8792.034; Tue, 3 Jun 2025
- 12:21:50 +0000
-Date: Tue, 3 Jun 2025 09:21:49 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
-	sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	dan.j.williams@intel.com, aik@amd.com, linux-coco@lists.linux.dev,
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, vivek.kasireddy@intel.com,
-	yilun.xu@intel.com, linux-kernel@vger.kernel.org, lukas@wunner.de,
-	yan.y.zhao@intel.com, daniel.vetter@ffwll.ch, leon@kernel.org,
-	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com, linux-pci@vger.kernel.org, zhiw@nvidia.com,
-	simona.vetter@ffwll.ch, shameerali.kolothum.thodi@huawei.com,
-	iommu@lists.linux.dev, kevin.tian@intel.com
-Subject: Re: [RFC PATCH 17/30] iommufd/device: Add TSM Bind/Unbind for TIO
- support
-Message-ID: <20250603122149.GH376789@nvidia.com>
-References: <20250529053513.1592088-1-yilun.xu@linux.intel.com>
- <20250529053513.1592088-18-yilun.xu@linux.intel.com>
- <yq5awm9ujouz.fsf@kernel.org>
- <aD6UQy4KwKcdSvVE@yilunxu-OptiPlex-7050>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aD6UQy4KwKcdSvVE@yilunxu-OptiPlex-7050>
-X-ClientProxiedBy: BLAPR05CA0015.namprd05.prod.outlook.com
- (2603:10b6:208:36e::15) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4374B1E50E
+	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 12:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748954202; cv=none; b=pz+VJyjquXDB31JiywhzDzwvLX87EnMScflI2h0zIFUR1vhgWIL9Ath+5zFcn8RZQtAJa/6zhnN+DoslbkB7wg0NsVqe8l9+Ip0rjyrdJ0U/+vGMGZkG6n4IVJlJ3vyhI4irg2Kuuy6HFW/bxiO8LfuGcW55YL4dc6ifQbwFsYE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748954202; c=relaxed/simple;
+	bh=LzLCbIVcH2zYcLtVoHxYEUbzvgGPV0xknpcXcZKIK54=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UKjt22VVYqp/Ca4K+2rDLhZ7tUbAyOwPoRrWOHlOniMkhrbwbhNj12xdcWmG0vOehHp3Niq/B4Xuf4/eKUL1kPoDbdnABx2Z6XZsTmUg+XZq5J23eCw/gqPHkpal2rx/gO1O4WnBN3dw/W6CLwvmd8a7YWuEFGQSgxi59haZ/1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dVculq2A; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a367ec7840so3836967f8f.2
+        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 05:36:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1748954198; x=1749558998; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2xViAWrRX5U+Z+Z6xznZc5dX8EHIRo93p2in+GG+LQ0=;
+        b=dVculq2ADloIoqS9foCMfcV6srXmn5SXT6Srv5LVb3+Ukw3UEsRrgFIN/d/bP4rzBZ
+         TdtSBddF5I3yDw3f8RJQqCRR3jhSR/Zjz2YBRYKR4LcprJb4iVqj52XX/TMlQxiUazjV
+         ygVrp9M8HO6qdR8I35VULIPsesvxuLNMnbYubzswZdg8vUUBg7dsdULIwM7TnzreTL89
+         yuqkMzIzA9CDxXa8RjBWcihzTK9/k9h/VjIJloyp0fTNpxFz2Nm3s5FQP/AEK1/6qAoV
+         YMecdDDOi9I3vFtJWcjDmI69mumLZAKcduiWML8qjwJEIk51S1wuG347P8J7sou3G02R
+         Z7tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748954198; x=1749558998;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2xViAWrRX5U+Z+Z6xznZc5dX8EHIRo93p2in+GG+LQ0=;
+        b=bOVkexvdEyt5iXEEV9w79ifrzE45qVC4vRmrGcWmPFkNlZ4hXAQUqaPUTCQ8MI1cos
+         4rsbLso/OOA1KTkzh8enCxj+aNnAWIoDeeVYN2SYDIqmw4/Xqopl0X8W/Fbn8qsMKMjj
+         1uhdTJOP/loR5ofWIYcMJTSdcdPdhsFEo5Mt3dNWgdzlq6FQCSZvAcIZmGHKbDbkEADt
+         2U+KM0qS1UFndwiLERsPKSIgnyhM6qjaFq47ZOSVOzR9Amcp4DKP9wYZwDiminZ8+GPM
+         xt2tLnTGPF9o6l1GL7jKf7Mkslkq2dwALpocpgLunYZBvQXBwoBsxXPoB2MRVx88/5c6
+         94Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCVhkDffNH1lCd8HaUhAsN1gC4mR3n4LUCVNO1rvFfen2QS60b3JpzekFQPuy0i/hHXkyXE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqHjWNznIkQ+o2AxhE75hM0fZkEVnhZi0eTW+Wg19LCm7jnZYb
+	QmRfmDaa4lmgxbxMFC9g33TFwWoUXorRudaf4fLQpSKH51x7s6RhicSLZY1qWOQP0xw=
+X-Gm-Gg: ASbGnctjtfa13imLjznY/QSYwlBslz5Vti3zlZMRWPQinTLXjVo2L9cnlXJpeV8q+7r
+	7DKXvx3NoFSsRjhyFdd/xFyfGYw3IkSRwHJIUDEQ7QScHbwMp9jB9WtyET+YvRhw25GU/MMD7h+
+	XVuYdP/9qKR7sfDS64OHt+cRA8ZtNw8Ffun7NV9NrA10QtV/6l7Gfw8xdu1zn4hbaILe9eHum1c
+	HxuJ77AVvi830RIQk6inTDJ0P8XvF1IF/JKPm5kXSXgdoIYYAkTQqZBo64XGRCzYRnuJfS+1fcD
+	Ue0dUS9Tdv+7+JX3Rd1Whcj2hWXQflCNk/oEOge/2y0Ay40UOqDOwLgG
+X-Google-Smtp-Source: AGHT+IEmSuB7VBhtVy5m9A6RQJKCKnY6TvtFiP4Koiz2XhTPlIPNcYTYt8gFZ1pj9vkQeovJQwl6tA==
+X-Received: by 2002:a5d:6205:0:b0:3a4:f902:3845 with SMTP id ffacd0b85a97d-3a4f9023860mr9622830f8f.21.1748954198308;
+        Tue, 03 Jun 2025 05:36:38 -0700 (PDT)
+Received: from [192.168.0.20] ([212.21.159.167])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a4efe73eadsm17911159f8f.41.2025.06.03.05.36.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Jun 2025 05:36:37 -0700 (PDT)
+Message-ID: <1f6956aa-5fa4-404f-bce4-3ddf87c50114@suse.com>
+Date: Tue, 3 Jun 2025 15:36:36 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|SN7PR12MB7936:EE_
-X-MS-Office365-Filtering-Correlation-Id: d40958fa-22c1-4156-39d3-08dda2993771
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V3dPd3BUamZzMVNlbWl4MzdNZkRlWXozUTY2TzVMcGg0blVTVUJqUEJkbTlz?=
- =?utf-8?B?eEk2VldraUV1Z2k0a2dGclRGSDZ4OE5ORkJHdGh2NTVNL1dSY3l4YWRoOEtG?=
- =?utf-8?B?VmZYN2VUSkZYZFg1SUdadnRDTTJxc3BzcDV6YkZSeFVjWnU3SW93amg4NVpL?=
- =?utf-8?B?djY1MHBUbVJNQjBQMmYxV2tIVW42dHdtQUpVNlBTYk5nN2xWUGtJczF5T3Zr?=
- =?utf-8?B?ejJzTy9qSDNKbmVBVzhKdkxaclY3Sm93Ry9vcmVZOVVHbVVmRW1PTUV1Nmg3?=
- =?utf-8?B?T2I2VWRucHZWckNzalZRaHFkSXR0ZTFKZVVWQ09PcUU5Njh4S3dkYW01bElP?=
- =?utf-8?B?TlphUFBremkwUC9qS3J6MzBIYnZYMDhJd3pBMTN5YitLNDlpTUF2SUpWbVFZ?=
- =?utf-8?B?OGJsaXI0YlFmWVJwYkNTclhxUGRYeENJY2k2RHhRdGE1R1RBSVNSTU5Yblc5?=
- =?utf-8?B?cnpUaW1vMEFGM21JZnJ0SnB0SGxQQmN4Rm5hZDB4dGQwTHZtNWNzbFlIZW5O?=
- =?utf-8?B?blRhV1daRzg3dFVrUmZWSWJ4TmIxdmRUK215ZS9vRklQUWVhSmdJNmgwQTdI?=
- =?utf-8?B?Ti9lQ2NtTkl0ZVN1RGtKQ3FnTTlPNFYzK0VaYXFUMVNqZCtDUmZYQitKUDR0?=
- =?utf-8?B?cERGaVIzd2dZcU9tSnZza1Nid1VYY0EzaUZMY094V1hKanBjK3ZpMlRSaE1m?=
- =?utf-8?B?Y3UrWmlyNUl6VFBWWGFEUHVWdGJvL3FlOFVTbFRqdTVDdllTUUI0bExvTk12?=
- =?utf-8?B?cWJ3VXQzaEFEcDN1R1grSkdSOFJZZWkrMUUwRENIcWVqUkk4cWV5UHd0a25W?=
- =?utf-8?B?QWVEY2w5RmNqTnZTbEhRaTNRWXYyZlVwcS93QXdCUW9vVHZTeXd0SllmYkFG?=
- =?utf-8?B?Wk1STVhVblV6M0xaZlJONzI1VFFmYWNLUThiRnVibFV3Um1UemM3eTMvTWZU?=
- =?utf-8?B?OE4vZ0hEQjhBK0Y1cyt1dXcwQXJjVGZBODZqOG14NVdtKzlhelJjcU5WSGVO?=
- =?utf-8?B?ZGZyRHR3V1h0bDFIcWpJeUZMa0VwbHZKZ2h4RjB0MmxwNkxLN3JuZVNEVHo2?=
- =?utf-8?B?OUpyYXg4bjRUVm9jdjlBWU5OOWIrT2RIVEJQcThkbHJka1JhYmtkYStFb01q?=
- =?utf-8?B?MHBoa2RmcEoreCs2MEU3MEoxdHVqRG5ER3lSZytSQm5nR2lUTWUyK2xGOTlD?=
- =?utf-8?B?V0pWRjAxKzYrMEx0Q1ZCRUQ4MlBTemU4MkQ1NDY4OEdkaTlteWYzYng5U1lS?=
- =?utf-8?B?ejBPeWxHQWhheEhIMlJZZ3h3TFFIMEJ5d0hiZ2JnUS9CcmppR1BGQ1hHRmE2?=
- =?utf-8?B?MUlSV1lKY0V1MFVUVFByNTBtUzJxUGEvUnJScXd0OHB3YTVCTlF1TjV3cGI2?=
- =?utf-8?B?a2E2U2E3TlB0eExTbmw3djIxRHR3d1RIS2xUWGpxM0ZlSnZ6d2toaWxEY2Fm?=
- =?utf-8?B?QnF5YjdJUWM0L2RCLy9CYXFVQjN3SDhIYVZYNnMrcVBQYml6TWR0eFpUMGFz?=
- =?utf-8?B?M1BXSXRtQVBobktFVVk3bjhSRk1vbUNZQjE4Unp1eEJxQy9ZSE5jbStjRW1u?=
- =?utf-8?B?UmdhQi92TmZhY2ZpV3lWSUI0RUM5clRINUMxTldVaDdYQmJhdkFWMGR3Q21j?=
- =?utf-8?B?U2kvSXBlNFVQVTdMNm10RnRYZFRVbGprR0tLVStTdHQxR2tzYURtdC9FU3ZO?=
- =?utf-8?B?L09ocEthQkRxVmdiUjFLY1dsa2RwNFhhOE83ZDN0WnZJNDlNNlZlemx4cUty?=
- =?utf-8?B?dmMyb2gwa3JvVFFWcFQ4VGpkZ05aU1ZDNmVRcXM4SjBQL083Nm5aN0M1U053?=
- =?utf-8?B?c3BOZ28rMitxTng1WXE1RkRWMkhpK1dOWVl1M0Jrak5pOTBldkpNNXBCcy9o?=
- =?utf-8?B?Ynp2OXd2dnczcnYzd3BLMkpSOFJYOXNILzVQUHRPS2ZvYlE9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?V012R0pXT2JlVEN5TTFicm8wZnFnRXR2TjhvMDVjTGV2TDBiaWR4N1JHNTB5?=
- =?utf-8?B?VlFTWHhBSVFmUDZFWmVoTUlPSFJFWTJTMXFDa3o0VFdSVS9QMlA4WXhuS3N1?=
- =?utf-8?B?NGo3MDhIYmVMYXNyR0xQdjBXclg3SDBoU3YvQ05BWGNKbFUzN3M1VE8wOVUz?=
- =?utf-8?B?YkpwN3YwMTIwWEk3NXhNTG5jVnNRWTZLMVpFdVFUWE9NcGpnQnBJNXRSRHVH?=
- =?utf-8?B?b214cVFZQ3NFRXNVNzYzMFEzeit5bnUvSlVmUElCTGpWWUpKTVMvQ2tVQVA1?=
- =?utf-8?B?YlZDTzRyYjBHeGcrT09ubVUzQ2lJREJ2S3RxUFVEY2J1N0k5MHp0RnNIQVBW?=
- =?utf-8?B?Y2pVMUxaQ1ZlVFZ0MitvTHlsUEhPT3RpYmZPK091L3dlNCtyZkVMSUZLbmpw?=
- =?utf-8?B?RnlmSWx2S1FwUXBuNzZCeHdBdjBFNFZyMHl6dGFUT2ZHSDZUbXNzZjR5OTdk?=
- =?utf-8?B?NXVuK2VkcHhKQWcvVFE2Zmc3QUJvTG5kOTRnWkhTVVpYR3pjRWVxL0ZWSmh5?=
- =?utf-8?B?UnkvNVhiWGI3UXNJTHcwYWhwTk1OR1pmMjNJdkEweE5IQlVWa0VadkNzSHFy?=
- =?utf-8?B?ejhJb3FGVHBkazdzUTJzUzlxM3dZeU1rVXZqK3BOZVM4QmNDWnBEVTVXancv?=
- =?utf-8?B?dk1GbVA5OFhua0l1WlA0RkVFS1M5SHdMbktLUUNMUVNZYUdRTGgvS0xYa2Mr?=
- =?utf-8?B?ZXM4dXZyN1BJRUdJeWt2Q0wwVW9Keko2MC9vOVN2TkhzV3lOOENRcmtuQTQ5?=
- =?utf-8?B?TjFVR0ZLdUlnUE8vc3RCK0tQRWd4dGJDZlQvbEZUdldxczI2dUF2NmQrbEpj?=
- =?utf-8?B?S2QvN21HdWxNV1Q3YVU5N2s3ZFRxQ3EzbEdZSmJuUEZZdVF1N09ieW9HTEVU?=
- =?utf-8?B?Z1JsbXFBR21XRUx4OUVnV1lkbUhBUHFQVEdrWjN3aWZMeTVGNGhoQVBSNTZV?=
- =?utf-8?B?WHVndG85bk43aUNqSHNIc0xaOWZoUHluQXA1ZklEQWh0amxkNlNvemIzbHRF?=
- =?utf-8?B?aWtGTGNGdks1b1hmb0swUkhUZnpNV25NanYySXpFVkI2Y21TQ3R5N1pFRWJr?=
- =?utf-8?B?NzNtUE9TcXc1V29XeG95cXB2S2hVUnU3RWdoME16TWx4eTd4TlJSb0NzY0d3?=
- =?utf-8?B?bjlBQzBrU255V3ZGN0lsRUdDSm50ZjJocFZKSDFESzZjZm9NZXlPVHJ6N1VC?=
- =?utf-8?B?SGF4RTVpbGIrK0NCK1pvN2FyWm1iUVo2VXFGdlVRaFdsZXo4Mjg0YmlWUm1a?=
- =?utf-8?B?MnY5QlE1OEFzNW9lZ3Q5Mk81dk5YdndsZE54a0wwUDZBVEZCL1IwSkdTSzhW?=
- =?utf-8?B?L2NOV2VDc21mMU1WaXN6eW9XTkordFZuam9yZjJmMWlpaHp3a1lHNEgzOENK?=
- =?utf-8?B?VE12SVBtTit1d2llMWdaOCtoZFJOUlJuL3g4TXhsSkJ6ZnZ1MENtOGhaaGJ2?=
- =?utf-8?B?bjVBVWVWN08zN2JtRmtaSHI2c3dXMEhNVTlBMWxWcmdyVE9vbWx4VmFjQmVy?=
- =?utf-8?B?TjhmaTlUL0JNN0tFckI4d1ZKMU8wRE5vc3FKV1dBY3Y2R0Mrc0VrdVZhczM0?=
- =?utf-8?B?V1FyY3NJaVFqTFMzMURMUzB0MjZoOWtKR3RkVHNCVnNMeDU1R3VpbjNaK0FY?=
- =?utf-8?B?WTBTSmJHL0hyRmpYRmEvSVIvOUlQdGhMaWcvM1lJRUYwMHlRTUxUS3BJU0Ft?=
- =?utf-8?B?NTF6SzNORkVRL2NUemN3dnA1UnFMUkdHaUxFcmQxeHZmMzByQ3hWN0JnQ2s1?=
- =?utf-8?B?TmJPOTVTODFZMEFLSXJHMnFmVklKaG1zS1UwY21qVlVkU2szOTNDdjVLQ3V3?=
- =?utf-8?B?YVNWelBRanpTNlhpZzM5NStrVFluclVGb1JCM3lLZUJwc0ZyMWZ0TU5mMU16?=
- =?utf-8?B?U1NjS0hRc2M0ZitvczZBL25BY25nUnpUeFcyV3ZVbDlSc2c3NnFaZjVsRk5j?=
- =?utf-8?B?bDRMb21mcC81TGduYnZIRzAzYzRyYW5CWVYzVTNYTlZRUkxoUW4yV2lrMTI5?=
- =?utf-8?B?RnJ0czlpK1ZhOFpPclNoKzRkR1N1YU1Eem9PbFNCMnFPRzVXYmsvWHVVVHZq?=
- =?utf-8?B?K3NZWktkYlNWb2VVZUEwUURMR0RQUm1panlzUGpXWXUzdmw2WnMyNlRkK1p0?=
- =?utf-8?Q?UvgKM6enu1i95faHWT5OfSh+X?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d40958fa-22c1-4156-39d3-08dda2993771
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2025 12:21:50.2509
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tcnIoSY757mTICCqGocFfChmVnMnfjxCbO1iDHW0W3Li17ef9/VV9Ik7VG44RwJD
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7936
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 12/20] x86/virt/seamldr: Shut down the current TDX
+ module
+To: Chao Gao <chao.gao@intel.com>, linux-coco@lists.linux.dev,
+ x86@kernel.org, kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, eddie.dong@intel.com,
+ kirill.shutemov@intel.com, dave.hansen@intel.com, dan.j.williams@intel.com,
+ kai.huang@intel.com, isaku.yamahata@intel.com, elena.reshetova@intel.com,
+ rick.p.edgecombe@intel.com, Farrah Chen <farrah.chen@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+ linux-kernel@vger.kernel.org
+References: <20250523095322.88774-1-chao.gao@intel.com>
+ <20250523095322.88774-13-chao.gao@intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+Content-Language: en-US
+Autocrypt: addr=nik.borisov@suse.com; keydata=
+ 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
+In-Reply-To: <20250523095322.88774-13-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 03, 2025 at 02:20:51PM +0800, Xu Yilun wrote:
-> > Wouldn’t it be simpler to skip the reference count increment altogether
-> > and just call tsm_unbind in the virtual device’s destroy callback?
-> > (iommufd_vdevice_destroy())
+
+
+On 5/23/25 12:52, Chao Gao wrote:
+> TD-Preserving updates request shutting down the existing TDX module.
+> During this shutdown, the module generates hand-off data, which captures
+> the module's states essential for preserving running TDs. The new TDX
+> module can utilize this hand-off data to establish its states.
 > 
-> The vdevice refcount is the main concern, there is also an IOMMU_DESTROY
-> ioctl. User could just free the vdevice instance if no refcount, while VFIO
-> is still in bound state. That seems not the correct free order.
+> Invoke the TDH_SYS_SHUTDOWN API on one CPU to perform the shutdown. This
+> API requires a hand-off module version. Use the module's own hand-off
+> version, as it is the highest version the module can produce and is more
+> likely to be compatible with new modules.
+> 
+> Changes to tdx_global_metadata.{hc} are auto-generated by following the
+> instructions detailed in [1], after adding the following section to the
+> tdx.py script:
+> 
+>      "handoff": [
+>         "MODULE_HV",
+>      ],
+> 
+> Add a check to ensure that module_hv is guarded by the TDX module's
+> support for TD-Preserving.
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Tested-by: Farrah Chen <farrah.chen@intel.com>
+> Link: https://lore.kernel.org/kvm/20250226181453.2311849-12-pbonzini@redhat.com/ [1]
+> ---
+>   arch/x86/include/asm/tdx_global_metadata.h  |  5 +++++
+>   arch/x86/virt/vmx/tdx/seamldr.c             | 11 +++++++++++
+>   arch/x86/virt/vmx/tdx/tdx.c                 | 18 ++++++++++++++++++
+>   arch/x86/virt/vmx/tdx/tdx.h                 |  4 ++++
+>   arch/x86/virt/vmx/tdx/tdx_global_metadata.c | 13 +++++++++++++
+>   5 files changed, 51 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/tdx_global_metadata.h b/arch/x86/include/asm/tdx_global_metadata.h
+> index ce0370f4a5b9..a2011a3575ff 100644
+> --- a/arch/x86/include/asm/tdx_global_metadata.h
+> +++ b/arch/x86/include/asm/tdx_global_metadata.h
+> @@ -40,12 +40,17 @@ struct tdx_sys_info_td_conf {
+>   	u64 cpuid_config_values[128][2];
+>   };
+>   
+> +struct tdx_sys_info_handoff {
+> +	u16 module_hv;
+> +};
+> +
+>   struct tdx_sys_info {
+>   	struct tdx_sys_info_versions versions;
+>   	struct tdx_sys_info_features features;
+>   	struct tdx_sys_info_tdmr tdmr;
+>   	struct tdx_sys_info_td_ctrl td_ctrl;
+>   	struct tdx_sys_info_td_conf td_conf;
+> +	struct tdx_sys_info_handoff handoff;
+>   };
+>   
+>   #endif
+> diff --git a/arch/x86/virt/vmx/tdx/seamldr.c b/arch/x86/virt/vmx/tdx/seamldr.c
+> index 9d0d37a92bfd..11c0c5a93c32 100644
+> --- a/arch/x86/virt/vmx/tdx/seamldr.c
+> +++ b/arch/x86/virt/vmx/tdx/seamldr.c
+> @@ -241,6 +241,7 @@ static struct seamldr_params *init_seamldr_params(const u8 *data, u32 size)
+>   
+>   enum tdp_state {
+>   	TDP_START,
+> +	TDP_SHUTDOWN,
+>   	TDP_DONE,
+>   };
+>   
+> @@ -281,8 +282,12 @@ static void ack_state(void)
+>   static int do_seamldr_install_module(void *params)
+>   {
+>   	enum tdp_state newstate, curstate = TDP_START;
+> +	int cpu = smp_processor_id();
+> +	bool primary;
+>   	int ret = 0;
+>   
+> +	primary = !!(cpumask_first(cpu_online_mask) == cpu);
 
-Freeing the vdevice should automatically unbind it..
+nit: the !! is not needed here, as the check is clearly boolean.
 
-Jason
+ > +>   	do {
+>   		/* Chill out and ensure we re-read tdp_data. */
+>   		cpu_relax();
+> @@ -291,6 +296,12 @@ static int do_seamldr_install_module(void *params)
+>   		if (newstate != curstate) {
+>   			curstate = newstate;
+>   			switch (curstate) {
+> +			case TDP_SHUTDOWN:
+> +				if (!primary)
+> +					break;
+> +
+> +				ret = tdx_module_shutdown();
+> +				break;
+>   			default:
+>   				break;
+>   			}
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index 22ffc15b4299..fa6b3f1eb197 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -295,6 +295,11 @@ static int read_sys_metadata_field(u64 field_id, u64 *data)
+>   	return 0;
+>   }
+>   
+> +static bool tdx_has_td_preserving(void)
+> +{
+> +	return tdx_sysinfo.features.tdx_features0 & TDX_FEATURES0_TD_PRESERVING;
+> +}
+> +
+>   #include "tdx_global_metadata.c"
+>   
+>   static int check_features(struct tdx_sys_info *sysinfo)
+> @@ -1341,6 +1346,19 @@ int tdx_enable(void)
+>   }
+>   EXPORT_SYMBOL_GPL(tdx_enable);
+>   
+> +int tdx_module_shutdown(void)
+> +{
+> +	struct tdx_module_args args = {};
+> +
+> +	/*
+> +	 * Shut down TDX module and prepare handoff data for the next TDX module.
+> +	 * Following a successful TDH_SYS_SHUTDOWN, further TDX module APIs will
+> +	 * fail.
+> +	 */
+> +	args.rcx = tdx_sysinfo.handoff.module_hv;
+> +	return seamcall_prerr(TDH_SYS_SHUTDOWN, &args);
+> +}
+> +
+>   static bool is_pamt_page(unsigned long phys)
+>   {
+>   	struct tdmr_info_list *tdmr_list = &tdx_tdmr_list;
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+> index 48c0a850c621..3830dee4da91 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.h
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -48,6 +48,7 @@
+>   #define TDH_PHYMEM_PAGE_WBINVD		41
+>   #define TDH_VP_WR			43
+>   #define TDH_SYS_CONFIG			45
+> +#define TDH_SYS_SHUTDOWN		52
+>   
+>   /*
+>    * SEAMCALL leaf:
+> @@ -87,6 +88,7 @@ struct tdmr_info {
+>   } __packed __aligned(TDMR_INFO_ALIGNMENT);
+>   
+>   /* Bit definitions of TDX_FEATURES0 metadata field */
+> +#define TDX_FEATURES0_TD_PRESERVING	BIT(1)
+>   #define TDX_FEATURES0_NO_RBP_MOD	BIT(18)
+>   
+>   /*
+> @@ -122,4 +124,6 @@ struct tdmr_info_list {
+>   
+>   int seamldr_prerr(u64 fn, struct tdx_module_args *args);
+>   
+> +int tdx_module_shutdown(void);
+> +
+>   #endif
+> diff --git a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+> index 088e5bff4025..a17cbb82e6b8 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+> @@ -100,6 +100,18 @@ static int get_tdx_sys_info_td_conf(struct tdx_sys_info_td_conf *sysinfo_td_conf
+>   	return ret;
+>   }
+>   
+> +static int get_tdx_sys_info_handoff(struct tdx_sys_info_handoff *sysinfo_handoff)
+> +{
+> +	int ret = 0;
+> +	u64 val;
+> +
+> +	if (!ret && tdx_has_td_preserving() &&
+
+nit: That first !ret is redundant since it's always true.
+
+<snip>
+
 
