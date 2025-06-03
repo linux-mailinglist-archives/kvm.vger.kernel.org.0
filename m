@@ -1,137 +1,132 @@
-Return-Path: <kvm+bounces-48348-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48349-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52637ACD036
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 01:20:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C4C6ACD068
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 01:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C97E3177057
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 23:20:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF61D3A3E6E
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 23:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3061D253F1A;
-	Tue,  3 Jun 2025 23:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE11122D790;
+	Tue,  3 Jun 2025 23:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OsGv9NSK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KXySehKp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE019225768
-	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 23:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2181B85C5
+	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 23:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748992826; cv=none; b=K+Hd7w7Teo5db88XoDwsHu0yI4OrvZaO9ULRMswkhGs66RrhCsUADQkQghEBmvL+ZYe85xh9VdfPtMQHOWaRGTGS/HK/Zonk9wffGscMKIKP6j8FjK2KycDW0qSYVLnCqCZ2xPy4fUfzMM6Cr/bWhPyCp54OjBE1M+SCpDVIMuw=
+	t=1748994832; cv=none; b=L1WGYBW4uYEw76wjp2VYcsGRZcH2e2rn76OAd7YxfH8zpZ6p36Otk2IDmWMxv6X9D6Xkcylzk7gw3N/W64Q/SYI9IqX29VtHrzdrhHJZJ6tHKBF01VFMT40tLwW92YShvmMjGrjQ4PKS+x5eBqKgRz8nFHzBDk+yCt/cOQD8KPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748992826; c=relaxed/simple;
-	bh=j58Q16s6XP7YOP/lfHW/QjY9sHrr3GPqeCXlnplz2WY=;
+	s=arc-20240116; t=1748994832; c=relaxed/simple;
+	bh=vuo5DjzJDnf/gmSDRw+wRmKxlc7dsUXRL4VBTi9xf48=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z5FFBf/EAAARkmzFOyeAEm7tOStbkQpYJC1qCiAXi5JOV+eJkC7P7+xsnVqkQExjku+Emxl3AolnjKXE16wiVNHmFFiXCMvesXl+der7rfq01MhGekA//dJDCxhxXct/9297OjGjIfeS2PFp6ubSZkp44UgI0/1I0iPAAbrnT20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OsGv9NSK; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=t4OqNgVstfDFS0hC8DG0f04x3Ag8Pkwk+rCBi7hN9cKaDa214RRdXK9aHXHKJGnaA3q/cRIuqf+ch55b1PEWnPpsqQzKLW0kvjpdwPhvthq3vTRc2hOxOcYeLQ/AXH4BaGkSKBciHVVjriDpVejoMG20mxJrbXhOlN6TnmGh71U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KXySehKp; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b240fdc9c20so6273839a12.3
-        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 16:20:24 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7398d70abbfso8763607b3a.2
+        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 16:53:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748992824; x=1749597624; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1748994830; x=1749599630; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/1NQnWbd4TNjgXbBu1YELa+Y+x9/lksnJYJWgYujMTY=;
-        b=OsGv9NSKrOWHJTqRBYFZ1ORrnrgdl+fW1X/Rg7DLM2YAcP1etrPvE7IsmdUBLq3ozw
-         RGrK+l4dCvA4mOV1dDdlTgbGlD0zdWDdLJhh8Rmt/Hzi7qiePVwkTDVheL5KxjYEy+CO
-         bYBfG/vvbbSFDOXS8409Ilwc5NyYwGBCGnur9eEK3LRGKyj0i/j/ShSFHc6dcKLKawmR
-         I0jydmettrA3v6eirHWyuByR3MuhSNpAWH2pc/jXCEZS/dkeZp5y8EBbUTYnB4SRPv+y
-         gztsi/Uluph9OWDjUVttI5UgdhMjoh3Spgg1oNVH6Bu9tAI9sj3lLsM5lVtg1jDxJWlE
-         OEJA==
+        bh=iO4lvFVzPRIoByznTzPvRR/1CVOQS5/ueegQ4wE+dkc=;
+        b=KXySehKpIsjVMsD1wY8ZtLyHdBKnxwEHad2ThJUC/IWccteofqG7jMZnUZnwh1r2G7
+         +CCAKg/Yy1iPHQzdq8p3hqqaY8j47imU9zzaDUHknaQpsJViopitTiEpm8UQA4F967lh
+         nDxGxX4mGzu/L1p0QHMijnpsVEacK5xA2bFGagle+YQLkroTqYGBc1hJOY+NtWa6DSTz
+         E9HbZkI80KNSY7WHtuZ/zzV+MTBjrQ2UgWI5rYoyk+et1cOIadT9bmeBHAam/S5tahFm
+         /cS1cg1PsL42cV69a/VJfc8cdlgHin2j1PL7+qreSOaMnzcQm9W52L7PakV+i7SolPHc
+         RBkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748992824; x=1749597624;
+        d=1e100.net; s=20230601; t=1748994830; x=1749599630;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/1NQnWbd4TNjgXbBu1YELa+Y+x9/lksnJYJWgYujMTY=;
-        b=ZufpEJxd4IfCrnZMwYv3kcbJLz5nVExzkoHGA9gpXCc7JPcFzF7LKTqUGHJWi9RCzC
-         BwiAQRhM1ZsKaEPkEDX0Fj5WLXYngsSOR5G/T6LHjK5JZw17Km15hs9q79VKnuZoblhR
-         Qmf/BKx24MoAncK0UUblVYUS++gEFbTRjmKs3dRR0e/ShwOv4pN78qPnBrUebRn3DXkU
-         Wto1KTofdnbkRgfOABJRBoZ6wXACv2VZVfZwT5usyDTLUiMnxH7iiev2ThVsis+rRUgR
-         tcnxPHlYNaTTcFXsnatCQ3o3Off4r+xXUld74YGz58r0GthoPOOZLIwgW95fKEOTlpQ6
-         MtXg==
-X-Forwarded-Encrypted: i=1; AJvYcCX0WZpgex7FUay93Hwm93m0kIpGFw4Sc/Xo7gwvo6Bn8wLX3f4Simp27IF4poxENS4KN3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywquagezBTAulqfckEl6WfiK50uIrRxXIpdfUyMXW/XtR78h26
-	kapX9sX+fMq516X4CivOtNN6IoHEK3oERmzYKGKPQr2NA7mnfiqoyaIXd7KPmcQVXgl+XfqcuBu
-	pVgFpFQ==
-X-Google-Smtp-Source: AGHT+IHDEuV55HfI3KJOeebKilLhgQC1SPNfNkKoXqJ0hnYG38Ky2DmjXchOknyXiLB0Cqp9sCaPJzM173I=
-X-Received: from pgbdp1.prod.google.com ([2002:a05:6a02:f01:b0:b2c:4bbc:1ed5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3949:b0:1f5:8262:2c0b
- with SMTP id adf61e73a8af0-21d22adc9a3mr1089443637.2.1748992824067; Tue, 03
- Jun 2025 16:20:24 -0700 (PDT)
-Date: Tue, 3 Jun 2025 16:20:22 -0700
-In-Reply-To: <20250523090848.16133-1-chenyi.qiang@intel.com>
+        bh=iO4lvFVzPRIoByznTzPvRR/1CVOQS5/ueegQ4wE+dkc=;
+        b=s0jt9WKOan0DJPpTFvGlHeekLno21JMkMcapFmexUq5E8KhXffYDEIyS4GluMOjoRN
+         ivNQkZT1i+W9Fd1As9XSAbG7cZCTmmBBewQC2fhWD7TV500GdvqqKs/yx77HBxkEGBaN
+         lh80DnwDzNFEyqwtlCpoF/YSi2kpZa6C3orkh4sR0cGYuF0XXO2THxZHeuVFkJarczro
+         aGxBWzmOZHVRTcW8Lqvjzj/OH4VVabLmyjp42gqehjzm9jk5PidUbi1A3A8A2XdtEwgl
+         hXj45N0SszwkXr7BiEULk5Pp13RN0JNxjAZjzqkKWoMNXi2CR6opi27HzFfpvayQWNEy
+         4o5A==
+X-Gm-Message-State: AOJu0YwxI4L4vICandfqA+L7I8bCPC+r4Sf6ULWxvxGnR4c7lME/vDnZ
+	t/wNnpx5352Exln0mBFjkVEvynPzJWWmuYcpp+fguZ73UbTYR+8GS/REnN5UxKKhRjhg1Ylx2VU
+	KpVG2PQ==
+X-Google-Smtp-Source: AGHT+IEIAijtpogO5kRFWihWWBXBQcALRLnXuAaMxLTmjYVQIFzh7JMWDfPtlEpr3CmLM5HVWTzkjyjCxgI=
+X-Received: from pfvx14.prod.google.com ([2002:a05:6a00:270e:b0:747:9faf:ed39])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3cd6:b0:73d:b1ff:c758
+ with SMTP id d2e1a72fcca58-7480b41eddemr1222496b3a.18.1748994829920; Tue, 03
+ Jun 2025 16:53:49 -0700 (PDT)
+Date: Tue, 3 Jun 2025 16:53:48 -0700
+In-Reply-To: <6aba109b9ac7e883d00b74d084e58f37acd805e3.1740479886.git.naveen@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250523090848.16133-1-chenyi.qiang@intel.com>
-Message-ID: <aD-DNn6ZnAAK4TmH@google.com>
-Subject: Re: [kvm-unit-tests PATCH] nVMX: Fix testing failure for canonical
- checks when forced emulation is not available
+References: <cover.1740479886.git.naveen@kernel.org> <6aba109b9ac7e883d00b74d084e58f37acd805e3.1740479886.git.naveen@kernel.org>
+Message-ID: <aD-LDPPQ6elCrDdH@google.com>
+Subject: Re: [RFC kvm-unit-tests PATCH 2/4] x86/apic: Disable PIT for x2apic
+ test to allow SVM AVIC to be tested
 From: Sean Christopherson <seanjc@google.com>
-To: Chenyi Qiang <chenyi.qiang@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+To: "Naveen N Rao (AMD)" <naveen@kernel.org>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, 
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, May 23, 2025, Chenyi Qiang wrote:
-> Use the _safe() variant instead of _fep_safe() to avoid failure if the
-> forced emulated is not available.
+On Tue, Feb 25, 2025, Naveen N Rao (AMD) wrote:
+> SVM AVIC is inhibited if kvm-pit is enabled in the default "reinject"
+> mode. Commit f5cfdd33cb21 ("x86/apic: Add test config to allow running
+> apic tests against SVM's AVIC") disabled PIT in xapic test to allow AVIC
+> to be tested. However, since then, AVIC has been enabled to work in
+> x2apic mode, but still requires PIT to either be disabled or set to
+> "discard".
 > 
-> Fixes: 05fbb364b5b2 ("nVMX: add a test for canonical checks of various host state vmcs12 fields")
-> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> Update x2apic test to disable PIT so that AVIC can be exercized with
+> x2apic.
+> 
+> Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
 > ---
->  x86/vmx_tests.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+>  x86/unittests.cfg | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 2f178227..01a15b7c 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -10881,12 +10881,11 @@ static int set_host_value(u64 vmcs_field, u64 value)
->  	case HOST_BASE_GDTR:
->  		sgdt(&dt_ptr);
->  		dt_ptr.base = value;
-> -		lgdt(&dt_ptr);
-> -		return lgdt_fep_safe(&dt_ptr);
-> +		return lgdt_safe(&dt_ptr);
->  	case HOST_BASE_IDTR:
->  		sidt(&dt_ptr);
->  		dt_ptr.base = value;
-> -		return lidt_fep_safe(&dt_ptr);
-> +		return lidt_safe(&dt_ptr);
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 8d046e6d7356..35fb88c3cb79 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -14,10 +14,11 @@ extra_params = -cpu qemu64,+x2apic,+tsc-deadline -machine kernel_irqchip=split
+>  arch = x86_64
+>  groups = apic
+>  
+> +# Don't create a Programmable Interval Timer (PIT, a.k.a 8254) to allow testing SVM's AVIC
+>  [x2apic]
+>  file = apic.flat
+>  smp = 2
+> -extra_params = -cpu qemu64,+x2apic,+tsc-deadline
+> +extra_params = -cpu qemu64,+x2apic,+tsc-deadline -machine pit=off
 
-Hmm, the main purpose of this particular test is to verify KVM's emulation of the
-canonical checks, so it probably makes sense to force emulation when possible.
+Similar to the split IRQ chip, playing whack-a-mole to disable the PIT in every
+test where (x2)AVIC might be interesting is rather silly.  The realmode test
+uses the PIT, but AFAICT it doesn't need re-injection, i.e. we can simply disable
+re-injection mode to get the same effect, e.g.
 
-It's not the most performant approach, but how about this?
+    qemu-429929  [233] ...1. 16531.028284: kvm_apicv_inhibit_changed: set reason=9, inhibits=0x200 PIT_REINJ
+    qemu-429929  [233] ...1. 16531.028311: kvm_apicv_inhibit_changed: cleared reason=9, inhibits=0x0
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 2f178227..fe53e989 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -10881,12 +10881,13 @@ static int set_host_value(u64 vmcs_field, u64 value)
-        case HOST_BASE_GDTR:
-                sgdt(&dt_ptr);
-                dt_ptr.base = value;
--               lgdt(&dt_ptr);
--               return lgdt_fep_safe(&dt_ptr);
-+               return is_fep_available() ? lgdt_fep_safe(&dt_ptr) :
-+                                           lgdt_safe(&dt_ptr);
-        case HOST_BASE_IDTR:
-                sidt(&dt_ptr);
-                dt_ptr.base = value;
--               return lidt_fep_safe(&dt_ptr);
-+               return is_fep_available() ? lidt_fep_safe(&dt_ptr) :
-+                                           lidt_safe(&dt_ptr);
-        case HOST_BASE_TR:
-                /* Set the base and clear the busy bit */
-                set_gdt_entry(FIRST_SPARE_SEL, value, 0x200, 0x89, 0);
+I'll send a patch.
+
+>  arch = x86_64
+>  timeout = 30
+>  groups = apic
+> -- 
+> 2.48.1
+> 
 
