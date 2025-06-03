@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-48326-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48327-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 075A9ACCBB8
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 19:08:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5185DACCBF5
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 19:24:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 726CF169D2D
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 17:08:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BF7316BA62
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 17:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56A11DA60D;
-	Tue,  3 Jun 2025 17:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6706F1F461D;
+	Tue,  3 Jun 2025 17:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jJRdeQ4X"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GNCTI63l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C716D155C82;
-	Tue,  3 Jun 2025 17:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAF61DDC1B;
+	Tue,  3 Jun 2025 17:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748970473; cv=none; b=VjIu9sAa/Va2+QVbP3p3tl21MjHCFG8hFonuZ72dZ6XVubyzstLtVcsFpAzJJIYrz3d2scTUtG5QVdSPf/q/UA5xPljs9x0q33bRfywVbiGJ38yb9Ux3VYEMVRuRQtxOEeLTsD+8kJ8VawzrL4apwAh83mFmnqJ5dq5bUo1Mfuc=
+	t=1748971427; cv=none; b=MM6qG87FFRvIDW9TzAnlhM/A5pzBIhoGXXdeQAK9N77/ZXwaR8QcwiyaADmZgUfy5k2OGTXvkcJkAAwST6cXx+LgNfBccHl3Mcf5Zw6FsOWc3GrGZMOtUS7CrOJvhvWF5Zvgc4suZjove0c7kzjoN7iZZ1IoDsM4r8fRDaCTyvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748970473; c=relaxed/simple;
-	bh=+DB0mxrZZMUvHAUjI7p/moYZ49j0gRoVv0Nn2O8YIuM=;
+	s=arc-20240116; t=1748971427; c=relaxed/simple;
+	bh=ykRV1XB+sX7MH5kcVruHvL5nbqKZ9uJBNgkXjg3a0Uc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HyU8+3r5LBV5fpPaf7HUT3jFKvBt54AP0LnBtA3gJiRljA0ts4t28IJ6+T9B/0bwA4YOwchBOf+W8rWNuafm73Jx+70qy0+aIjigLyHmjvgwM+b231Sg99ABxQTp4WRpIgDTCstozzWnBuB63ClZGT14hyhB+YbtryrKMFPaQus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jJRdeQ4X; arc=none smtp.client-ip=198.175.65.9
+	 In-Reply-To:Content-Type; b=R7mgXuUJ2W/0IupA5DIbHX0FPwnkWKX0iY6t2qVo09YedCrFlaJldCfdKuhPiNeO24cN9rUP2JYmszSjOfS1mZ+EvsyMIf5cvowjUx52P2iOsAMWMhyvrx8ReqXhqJru2DmGzMLYxrtETH4BZicPOULSJy9c466hfXxSmZVBeqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GNCTI63l; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748970472; x=1780506472;
+  t=1748971426; x=1780507426;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=+DB0mxrZZMUvHAUjI7p/moYZ49j0gRoVv0Nn2O8YIuM=;
-  b=jJRdeQ4X3Ym/TLHjSG96OkKqgdTZ1ZxXRQgOe/WK9yXsDqL4jf2Mjb7E
-   NkPcq3NmK9VicFgmRs9Q9w+V0Y1lYBN/u0Fh+9MISfbzn1Dykuti6L+MF
-   dlL6RtBNO3azgO0IbKOBrl4w7ACrRltW0qrSG4ylcoLwS1dNXA4sfwo54
-   7W5D53qZWhiEsnPpE2zWVTvkSsHL8JmUTWhc+xwXMsXxhUnTbJYqnRgZ7
-   24iBiRAeKwHmkFsiX9w3Cn2bwe6WdxkyR7EmWg9l8hsXitLpwC+jRRab4
-   WcbgqreiKykX8MHwbOIAHZE3pPxu2WGM4lHuOGHZ6LTNEzJgC7dG4tRan
-   w==;
-X-CSE-ConnectionGUID: PQ6Kg8BLSKah1WJNxJCRyg==
-X-CSE-MsgGUID: /1O3xSJbTlmNDT+bM0w9jA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11453"; a="73555095"
+  bh=ykRV1XB+sX7MH5kcVruHvL5nbqKZ9uJBNgkXjg3a0Uc=;
+  b=GNCTI63lGRAZuFKToOAejqGwTaMhsOIhCd3/Fe5MAj7XFJ39uEiTKPl4
+   6sEAXxO6CupEV3dRI21XWWsFv+P46SpbVa1VgQRHaqOE2vM4mtmP408Fi
+   QDii969VCjlwOI6ipdZGqYiLbUfyQlYCguu4qcAavjpJpI63qxdX/1h9v
+   7uwX+IMunNoAr3HmXcPVWQXv05jqC+Ew1itMlVL8xqQnzGIsVY3qmlLvB
+   MqwnmmAUGh/Vv6pw7So4z6rObZ4DVa/WijadZ2fH/1r/ratQg4pEpMP/W
+   x9yInz4faHm5sK7DvZF2uuMGCeOgJU6aGwbT4Z4YKDimy8khmGwBI4ttw
+   Q==;
+X-CSE-ConnectionGUID: x87llKXERJSh+ZvxA0H2gA==
+X-CSE-MsgGUID: pv6N2tdpR0OIyhx66sJTkg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11453"; a="51026312"
 X-IronPort-AV: E=Sophos;i="6.16,206,1744095600"; 
-   d="scan'208";a="73555095"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 10:07:50 -0700
-X-CSE-ConnectionGUID: J7OMdvPOSp+KdA9Vvb9Y7w==
-X-CSE-MsgGUID: a6kIBABuRuSJK6KkXqCFwA==
+   d="scan'208";a="51026312"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 10:23:45 -0700
+X-CSE-ConnectionGUID: +jupPwAMSmi3S1ZMzj0aFQ==
+X-CSE-MsgGUID: HjEGz8wES9amMdwHKlvgLg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,206,1744095600"; 
-   d="scan'208";a="149699332"
+   d="scan'208";a="175789786"
 Received: from tjmaciei-mobl5.ger.corp.intel.com (HELO [10.125.110.192]) ([10.125.110.192])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 10:07:48 -0700
-Message-ID: <4e6d865c-597f-4281-a07b-94aeffe938d6@intel.com>
-Date: Tue, 3 Jun 2025 10:07:47 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 10:23:43 -0700
+Message-ID: <e978e1fb-d88e-4789-bd33-367281dfa0ad@intel.com>
+Date: Tue, 3 Jun 2025 10:23:42 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/9] x86/nmi: Extend the registration interface to
- include the NMI-source vector
+Subject: Re: [PATCH v6 4/9] x86/nmi: Assign and register NMI-source vectors
 To: Sohil Mehta <sohil.mehta@intel.com>, x86@kernel.org,
  linux-kernel@vger.kernel.org
 Cc: Xin Li <xin@zytor.com>, "H . Peter Anvin" <hpa@zytor.com>,
@@ -88,7 +87,7 @@ Cc: Xin Li <xin@zytor.com>, "H . Peter Anvin" <hpa@zytor.com>,
  kvm@vger.kernel.org, linux-pm@vger.kernel.org,
  linux-trace-kernel@vger.kernel.org
 References: <20250513203803.2636561-1-sohil.mehta@intel.com>
- <20250513203803.2636561-4-sohil.mehta@intel.com>
+ <20250513203803.2636561-5-sohil.mehta@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -134,44 +133,61 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250513203803.2636561-4-sohil.mehta@intel.com>
+In-Reply-To: <20250513203803.2636561-5-sohil.mehta@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 5/13/25 13:37, Sohil Mehta wrote:
-> --- a/drivers/watchdog/hpwdt.c
-> +++ b/drivers/watchdog/hpwdt.c
-> @@ -242,13 +242,13 @@ static int hpwdt_init_nmi_decoding(struct pci_dev *dev)
->  	/*
->  	 * Only one function can register for NMI_UNKNOWN
->  	 */
-> -	retval = register_nmi_handler(NMI_UNKNOWN, hpwdt_pretimeout, 0, "hpwdt");
-> +	retval = register_nmi_handler(NMI_UNKNOWN, hpwdt_pretimeout, 0, "hpwdt", 0);
->  	if (retval)
->  		goto error;
-> -	retval = register_nmi_handler(NMI_SERR, hpwdt_pretimeout, 0, "hpwdt");
-> +	retval = register_nmi_handler(NMI_SERR, hpwdt_pretimeout, 0, "hpwdt", 0);
->  	if (retval)
->  		goto error1;
-> -	retval = register_nmi_handler(NMI_IO_CHECK, hpwdt_pretimeout, 0, "hpwdt");
-> +	retval = register_nmi_handler(NMI_IO_CHECK, hpwdt_pretimeout, 0, "hpwdt", 0);
->  	if (retval)
+...
+> + * Vector 2 is reserved for external NMIs related to the Local APIC -
+> + * LINT1. Some third-party chipsets may send NMI messages with a
+> + * hardcoded vector of 2, which would result in bit 2 being set in the
+> + * NMI-source bitmap.
 
-Could we get rid of all these random 0's, please? (or at least try to
-keep them from proliferating).
+This doesn't actually say what problem this causes. Is this better?
 
-Either do a:
+	Third-party chipsets send NMI messages with a fixed vector of 2.
+	Using vector 2 for some other purpose would cause confusion
+	between those Local APIC messages and the other purpose. Avoid
+	using it.
 
-	register_nmi_handler_source()
+> + * The vectors are in no particular priority order. Add new vector
+> + * assignments sequentially in the list below.
+> + */
+> +#define NMIS_VECTOR_NONE	0	/* Reserved - Set for all unidentified sources */
+> +#define NMIS_VECTOR_TEST	1	/* NMI selftest */
+> +#define NMIS_VECTOR_EXTERNAL	2	/* Reserved - Match External NMI vector 2 */
+> +#define NMIS_VECTOR_SMP_STOP	3	/* Panic stop CPU */
+> +#define NMIS_VECTOR_BT		4	/* CPU backtrace */
+> +#define NMIS_VECTOR_KGDB	5	/* Kernel debugger */
+> +#define NMIS_VECTOR_MCE		6	/* MCE injection */
+> +#define NMIS_VECTOR_PMI		7	/* PerfMon counters */
+> +
+> +#define NMIS_VECTORS_MAX	16	/* Maximum number of NMI-source vectors */
 
-that takes a source and leave
+Would an enum fit here?
 
-	register_nmi_handler()
+You could also add a:
 
-in place and not take a source. Or, do this:
+	NMIS_VECTOR_COUNT
 
-	retval = register_nmi_handler(NMI_IO_CHECK, hpwdt_pretimeout,
-				      0, "hpwdt", NMI_NO_SOURCE);
+as the last entry and then just:
 
-where the 0 is at least given a symbolic name.
+	BUILD_BUG_ON(NMIS_VECTOR_COUNT >= 16);
+
+somewhere.
+
+I guess it's a little annoying that you need NMIS_VECTOR_EXTERNAL to
+have a fixed value of 2, but I do like way the enum makes the type explicit.
+
+
+>  static int __init register_nmi_cpu_backtrace_handler(void)
+>  {
+> -	register_nmi_handler(NMI_LOCAL, nmi_cpu_backtrace_handler, 0, "arch_bt", 0);
+> +	register_nmi_handler(NMI_LOCAL, nmi_cpu_backtrace_handler, 0, "arch_bt", NMIS_VECTOR_BT);
+>  	return 0;
+>  }
+
+... Oh you replaced _most_ of the random 0's in this patch. That helps
+for sure.
 
