@@ -1,296 +1,397 @@
-Return-Path: <kvm+bounces-48279-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48280-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D67DBACC261
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 10:48:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9346FACC2AE
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 11:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09CE218919B2
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 08:48:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BA36171F23
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 09:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43D61917ED;
-	Tue,  3 Jun 2025 08:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B460280CE7;
+	Tue,  3 Jun 2025 09:09:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kj4C9eWc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KCT0BjQj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEA426ADD;
-	Tue,  3 Jun 2025 08:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F132C324E
+	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 09:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748940500; cv=none; b=ReFGPKIV9sYG4CMHgnNkiDVKfN5d1QTL+OsJ8HRDslypDvDRIMiB+nj7fyBGkro2KT28qK+JPBLE/PdzWbxc0UOZfoL9ye3kVcqA9CLrOECVAtIBCV1DFWpcpZXa80BNNmPVQ1zQFvykC/LHYhFHZ3eAUA0HjBzjQsUJYH7oKRc=
+	t=1748941780; cv=none; b=QYpmZ6fg8eJYevTaW2oTrI/aGW9GIGrouvD4Q8RXSYEzK9l3ELibqLG3iDZrRKA8AGEk2pileR5cbKjnlz2ix1TPL0I1Z1I/fI6QHdBY8JgvRGmB2uJqaSTa/weNH96sUeZ+MxDrTvgIpW4kT/TYE0SJcyZPftRNBEVn80d75kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748940500; c=relaxed/simple;
-	bh=yaZR3tuQixU0UHqFOOf0bigijIaN27fn690ctCKTkFM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LtRYHIZP3o2Lg8tjr5O27hnBkBj8C9nW5g9YRrsadLZtSXucWIuqwxq8kpM4F8LQR5vpVSpmOe3+0wotiSEt1ScAh8T6sZtae9mkf3iNFRqJZcrobW7U3SvDFnlYBrmSehduq2Efqxfu1EOo8tjEB/Xyfj6FovJhL51dk648bV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kj4C9eWc; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5535f8Mf020238;
-	Tue, 3 Jun 2025 08:48:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=27xia/
-	7nl+MOoJN3RGOCYnVmlNQBCCZEDjNeoa/FPAk=; b=kj4C9eWcy5Adx3TpiKAMr2
-	t81fwhgDLaIUiF9cMkgDjIrbuU8KiqWc8FhBWraLveIJhcz4Vs31IB3ddM+w2w9i
-	R4RI4BpzvKVGz11yrxD0uaqOkeeXo4tNZJnjhXyF7At6cY+hFaWThJCTERp1If0l
-	zEmhDW/WRsiuWeRWExDJ5m4qVQUpO1z4cHzt4d/wWWlcjDmFKkRW8vIzak2KmWY2
-	vkEsHLk+D5bvuCg2BGK7ijwXtDmu023THikTlw2bGf/6U7UM8LHn0iv7cq506LlO
-	9kAAL0+ti7rTIcleXEqlBdIIP3a+7fsmkLfdw1dchZsL16hsV8RPQwJnQVm8ZGLQ
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471geyk822-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Jun 2025 08:48:14 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5535ZmOd028431;
-	Tue, 3 Jun 2025 08:48:13 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 470eak9q7c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Jun 2025 08:48:13 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5538m9Ud43122976
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 3 Jun 2025 08:48:10 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DC6AB20049;
-	Tue,  3 Jun 2025 08:48:09 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 701EA20040;
-	Tue,  3 Jun 2025 08:48:09 +0000 (GMT)
-Received: from [9.111.36.10] (unknown [9.111.36.10])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  3 Jun 2025 08:48:09 +0000 (GMT)
-Message-ID: <9ad4aabc-45cb-413f-9899-9b7ffab8f4fe@linux.ibm.com>
-Date: Tue, 3 Jun 2025 10:48:09 +0200
+	s=arc-20240116; t=1748941780; c=relaxed/simple;
+	bh=vTL0Fhdjb+NX+uKBJaQ9PxfeKvTQrjcPx2VRXz36ZDg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=guWZtpQMIUPzkNUesPCwep+D85QXI9je3nGWs2cK9yVzHFQyzy6Nw6bqoOHBfk6YzIELsrx4nXBR1YKfXWP0S+1m54KNvME+Ro55Negcr7fEJJMgOwtjvn7IELjquwPq+QRbY8d3fbaZH79NGwINwEq1rIMTta5NgWma4uUx4uI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KCT0BjQj; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 3 Jun 2025 11:09:33 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748941775;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HosKKhKaeAxS0BiblgoplCxniIg8FN66wGDmGUgRL0s=;
+	b=KCT0BjQjtCVrutQNA760Pedbb11ZG6XjGVOCuAczocX6KAEUJyT273u3DiHowXFp8hnIKx
+	gbNDhJKE6Gca+oVUrcCAVzTw+oAcMOLyeji4xJyCzlpyUIeIOyTCt8EmzFrxJk2lHegR+9
+	tFXXrr2FbM+wWYF6oM35ZXzxphbenYo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	Andrew Jones <ajones@ventanamicro.com>, Ved Shanbhogue <ved@rivosinc.com>
+Subject: Re: [PATCH 3/3] riscv: Add ISA double trap extension testing
+Message-ID: <20250603-46e84d5167307b38c90a06b5@orel>
+References: <20250523075341.1355755-1-cleger@rivosinc.com>
+ <20250523075341.1355755-4-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] KVM: s390: Use ESCA instead of BSCA at VM init
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-References: <20250602-rm-bsca-v4-1-67c09d1ee835@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20250602-rm-bsca-v4-1-67c09d1ee835@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: lD2kIGYQd_2rmP6PSW8k1LyXhR6SHTWo
-X-Authority-Analysis: v=2.4 cv=DYMXqutW c=1 sm=1 tr=0 ts=683eb6ce cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=JobuCeQLhHgRNSiRUEsA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: lD2kIGYQd_2rmP6PSW8k1LyXhR6SHTWo
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjAzMDA3NCBTYWx0ZWRfX1mghxl8x0/zv CMtPtPQEZkjTLQYbHg++gkNxwUqZhxW+fiCPsAJdrWs2IqoOOIYcuisD8DtPkqGe99QW+ruTBQc aUd26rytQzJ4BmwSj6I2om9/70ON+1yNZglTJxL6zBkNu2UMucDt7eHOIhINtdPhDHke14IO/JC
- 89OSNolvgWM58lwD6DLDIWdGZlV6CAaG37PQQh3+W9nHbA48nKDYllZhgiQapDazRnSGJyc7FyV /gCErT55IOVVKWPTM9pgzRnwArNYQGptFc1nWt34t0GcfLhjoFJjuMSLivYxr8S8k5ohbuCQbxB V0k97URQzboRb7+saPuM948abYrPJbhG69KfgSFFDVNhJmfu6EqSWst572/4rsllbbZqOWdDgGm
- ZB9mkiEd9EDm8ngMZppIFYBG8WSF6oUQqthSDG2pd5fu2bEB3nE1LjSCM45Bc9iggUbfWIvK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-03_01,2025-06-02_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0
- priorityscore=1501 clxscore=1015 phishscore=0 mlxlogscore=999 adultscore=0
- malwarescore=0 bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506030074
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250523075341.1355755-4-cleger@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 6/2/25 6:34 PM, Christoph Schlameuss wrote:
-> All modern IBM Z and Linux One machines do offer support for the
-> Extended System Control Area (ESCA). The ESCA is available since the
-> z114/z196 released in 2010.
-> KVM needs to allocate and manage the SCA for guest VMs. Prior to this
-> change the SCA was setup as Basic SCA only supporting a maximum of 64
-> vCPUs when initializing the VM. With addition of the 65th vCPU the SCA
-> was needed to be converted to a ESCA.
+On Fri, May 23, 2025 at 09:53:10AM +0200, Clément Léger wrote:
+> This test allows to test the double trap implementation of hardware as
+> well as the SBI FWFT and SSE support for double trap. The tests will try
+> to trigger double trap using various sequences and will test to receive
+> the SSE double trap event if supported.
 > 
-> Instead of allocating a BSCA and upgrading it for PV or when adding the
-> 65th cpu we can always allocate the ESCA directly upon VM creation
-> simplifying the code in multiple places as well as completely removing
-> the need to convert an existing SCA.
+> It is provided as a separate test from the SBI one for two reasons:
+> - It isn't specifically testing SBI "per se".
+> - It ends up by trying to crash into in M-mode.
 > 
-> In cases where the ESCA is not supported (z10 and earlier) the use of
-> the SCA entries and with that SIGP interpretation are disabled for VMs.
-> This increases the number of exits from the VM in multiprocessor
-> scenarios and thus decreases performance.
-> The same is true for VSIE where SIGP is currently disabled and thus no
-> SCA entries are used.
+> Currently, the test uses a page fault to raise a trap programatically.
+> Some concern was raised by a github user on the original branch [1]
+> saying that the spec doesn't mandate any trap to be delegatable and that
+> we would need a way to detect which ones are delegatable. I think we can
+> safely assume that PAGE FAULT is delagatable and if a hardware that does
+> not have support comes up then it will probably be the vendor
+> responsibility to provide a way to do so.
 > 
-> The only downside of the change is that we will always allocate 4 pages
-> for a 248 cpu ESCA instead of a single page for the BSCA per VM.
-> In return we can delete a bunch of checks and special handling depending
-> on the SCA type as well as the whole BSCA to ESCA conversion.
-> 
-> With that behavior change we are no longer referencing a bsca_block in
-> kvm->arch.sca. This will always be esca_block instead.
-> By specifying the type of the sca as esca_block we can simplify access
-> to the sca and get rid of some helpers while making the code clearer.
-> 
-> KVM_MAX_VCPUS is also moved to kvm_host_types to allow using this in
-> future type definitions.
-> 
-> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> Link: https://github.com/clementleger/kvm-unit-tests/issues/1 [1]
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
 > ---
-> Changes in v4:
-> - Squash patches into single patch
-> - Revert KVM_CAP_MAX_VCPUS to return KVM_CAP_MAX_VCPU_ID (255) again
-> - Link to v3: https://lore.kernel.org/r/20250522-rm-bsca-v3-0-51d169738fcf@linux.ibm.com
+>  riscv/Makefile      |   1 +
+>  lib/riscv/asm/csr.h |   1 +
+>  riscv/isa-dbltrp.c  | 189 ++++++++++++++++++++++++++++++++++++++++++++
+>  riscv/unittests.cfg |   5 ++
+>  4 files changed, 196 insertions(+)
+>  create mode 100644 riscv/isa-dbltrp.c
 > 
-> Changes in v3:
-> - do not enable sigp for guests when kvm_s390_use_sca_entries() is false
->    - consistently use kvm_s390_use_sca_entries() instead of sclp.has_sigpif
-> - Link to v2: https://lore.kernel.org/r/20250519-rm-bsca-v2-0-e3ea53dd0394@linux.ibm.com
-> 
-> Changes in v2:
-> - properly apply checkpatch --strict (Thanks Claudio)
-> - some small comment wording changes
-> - rebased
-> - Link to v1: https://lore.kernel.org/r/20250514-rm-bsca-v1-0-6c2b065a8680@linux.ibm.com
-> ---
->   arch/s390/include/asm/kvm_host.h       |   7 +-
->   arch/s390/include/asm/kvm_host_types.h |   2 +
->   arch/s390/kvm/gaccess.c                |  10 +-
->   arch/s390/kvm/interrupt.c              |  71 ++++----------
->   arch/s390/kvm/kvm-s390.c               | 167 ++++++---------------------------
->   arch/s390/kvm/kvm-s390.h               |   9 +-
->   6 files changed, 58 insertions(+), 208 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index cb89e54ada257eb4fdfe840ff37b2ea639c2d1cb..2a2b557357c8e40c82022eb338c3e98aa8f03a2b 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -27,8 +27,6 @@
->   #include <asm/isc.h>
->   #include <asm/guarded_storage.h>
->   
-> -#define KVM_MAX_VCPUS 255
-> -
->   #define KVM_INTERNAL_MEM_SLOTS 1
->   
->   /*
-> @@ -631,9 +629,8 @@ struct kvm_s390_pv {
->   	struct mmu_notifier mmu_notifier;
->   };
->   
-> -struct kvm_arch{
-> -	void *sca;
-> -	int use_esca;
-> +struct kvm_arch {
-> +	struct esca_block *sca;
->   	rwlock_t sca_lock;
->   	debug_info_t *dbf;
->   	struct kvm_s390_float_interrupt float_int;
-> diff --git a/arch/s390/include/asm/kvm_host_types.h b/arch/s390/include/asm/kvm_host_types.h
-> index 1394d3fb648f1e46dba2c513ed26e5dfd275fad4..9697db9576f6c39a6689251f85b4b974c344769a 100644
-> --- a/arch/s390/include/asm/kvm_host_types.h
-> +++ b/arch/s390/include/asm/kvm_host_types.h
-> @@ -6,6 +6,8 @@
->   #include <linux/atomic.h>
->   #include <linux/types.h>
->   
-> +#define KVM_MAX_VCPUS 256
+> diff --git a/riscv/Makefile b/riscv/Makefile
+> index 11e68eae..d71c9d2e 100644
+> --- a/riscv/Makefile
+> +++ b/riscv/Makefile
+> @@ -14,6 +14,7 @@ tests =
+>  tests += $(TEST_DIR)/sbi.$(exe)
+>  tests += $(TEST_DIR)/selftest.$(exe)
+>  tests += $(TEST_DIR)/sieve.$(exe)
+> +tests += $(TEST_DIR)/isa-dbltrp.$(exe)
+>  
+>  all: $(tests)
+>  
+> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+> index 3e4b5fca..6a8e0578 100644
+> --- a/lib/riscv/asm/csr.h
+> +++ b/lib/riscv/asm/csr.h
+> @@ -18,6 +18,7 @@
+>  
+>  #define SR_SIE			_AC(0x00000002, UL)
+>  #define SR_SPP			_AC(0x00000100, UL)
+> +#define SR_SDT			_AC(0x01000000, UL) /* Supervisor Double Trap */
+>  
+>  /* Exception cause high bit - is an interrupt if set */
+>  #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
+> diff --git a/riscv/isa-dbltrp.c b/riscv/isa-dbltrp.c
+> new file mode 100644
+> index 00000000..174aee2a
+> --- /dev/null
+> +++ b/riscv/isa-dbltrp.c
+> @@ -0,0 +1,189 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * SBI verification
+> + *
+> + * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
+> + */
+> +#include <alloc.h>
+> +#include <alloc_page.h>
+> +#include <libcflat.h>
+> +#include <stdlib.h>
+> +
+> +#include <asm/csr.h>
+> +#include <asm/page.h>
+> +#include <asm/processor.h>
+> +#include <asm/ptrace.h>
+> +#include <asm/sbi.h>
+> +
+> +#include <sbi-tests.h>
+> +
+> +static bool double_trap;
+> +static bool set_sdt = true;
+> +
+> +#define GEN_TRAP()								\
+> +do {										\
+> +	void *ptr = NULL;							\
+> +	unsigned long value = 0;						\
+> +	asm volatile(								\
+> +	"	.option push\n"							\
+> +	"	.option arch,-c\n"						\
+> +	"	sw %0, 0(%1)\n"							\
+> +	"	.option pop\n"							\
+> +	: : "r"(value), "r"(ptr) : "memory");					\
 
-Why are we doing the whole 256 - 1 game?
+nit: need some spaces
+
+ "r" (value), "r" (ptr)
+
+> +} while (0)
+> +
+> +static void syscall_trap_handler(struct pt_regs *regs)
+
+This is a page fault handler, not a syscall.
+
+> +{
+> +	if (set_sdt)
+> +		csr_set(CSR_SSTATUS, SR_SDT);
+> +
+> +	if (double_trap) {
+> +		double_trap = false;
+> +		GEN_TRAP();
+> +	}
+> +
+> +	/* Skip trapping instruction */
+> +	regs->epc += 4;
+> +}
+> +
+> +static bool sse_dbltrp_called;
+> +
+> +static void sse_dbltrp_handler(void *data, struct pt_regs *regs, unsigned int hartid)
+> +{
+> +	struct sbiret ret;
+> +	unsigned long flags;
+> +	unsigned long expected_flags = SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP |
+> +				       SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SDT;
+> +
+> +	ret = sbi_sse_read_attrs(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP, SBI_SSE_ATTR_INTERRUPTED_FLAGS, 1,
+> +				 &flags);
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "Get double trap event flags");
+> +	report(flags == expected_flags, "SSE flags == 0x%lx", expected_flags);
+> +
+> +	sse_dbltrp_called = true;
+> +
+> +	/* Skip trapping instruction */
+> +	regs->epc += 4;
+> +}
+> +
+> +static void sse_double_trap(void)
+> +{
+> +	struct sbiret ret;
+> +
+> +	struct sbi_sse_handler_arg handler_arg = {
+> +		.handler = sse_dbltrp_handler,
+> +		.stack = alloc_page() + PAGE_SIZE,
+> +	};
+> +
+> +	report_prefix_push("sse");
+> +
+> +	ret = sbi_sse_hart_unmask();
+> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE hart unmask ok"))
+> +		goto out;
+
+The unmasking failed, but the out label takes us to a mask.
 
 > +
->   #define KVM_S390_BSCA_CPU_SLOTS 64
+> +	ret = sbi_sse_register(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP, &handler_arg);
+> +	if (ret.error == SBI_ERR_NOT_SUPPORTED) {
+> +		report_skip("SSE double trap event is not supported");
+> +		goto out;
+> +	}
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap register");
+> +
+> +	ret = sbi_sse_enable(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
+> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap enable"))
+> +		goto out_unregister;
+> +
+> +	/*
+> +	 * Generate a double crash so that an SSE event should be generated. The SPEC (ISA nor SBI)
+> +	 * does not explicitly tell that if supported it should generate an SSE event but that's
+> +	 * a reasonable assumption to do so if both FWFT and SSE are supported.
 
-Can't you remove that now?
+This is something to raise in a tech-prs call, because it sounds like we
+need another paragraph for FWFT which states when DOUBLE_TRAP is enabled
+and SSE is supported that SSE local double trap events will be raised. Or,
+we need another FWFT feature that allows S-mode to request that behavior
+be enabled/disabled when SSE is supported (and M-mode can decide yes/no
+to that request).
 
->   #define KVM_S390_ESCA_CPU_SLOTS 248
->   
-> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> index f6fded15633ad87f6b02c2c42aea35a3c9164253..ee37d397d9218a4d33c7a33bd877d0b974ca9003 100644
-> --- a/arch/s390/kvm/gaccess.c
-> +++ b/arch/s390/kvm/gaccess.c
-> @@ -112,7 +112,7 @@ int ipte_lock_held(struct kvm *kvm)
->   		int rc;
->   
->   		read_lock(&kvm->arch.sca_lock);
-> -		rc = kvm_s390_get_ipte_control(kvm)->kh != 0;
-> +		rc = kvm->arch.sca->ipte_control.kh != 0;
->   		read_unlock(&kvm->arch.sca_lock);
->   		return rc;
->   	}
+> +	 */
+> +	set_sdt = true;
+> +	double_trap = true;
 
-[...]
+WRITE_ONCE(set_sdt, true);
+WRITE_ONCE(double_trap, true);
 
-> -static int sca_switch_to_extended(struct kvm *kvm);
->   
->   static void kvm_clock_sync_scb(struct kvm_s390_sie_block *scb, u64 delta)
->   {
-> @@ -631,11 +630,13 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_NR_VCPUS:
->   	case KVM_CAP_MAX_VCPUS:
->   	case KVM_CAP_MAX_VCPU_ID:
-> -		r = KVM_S390_BSCA_CPU_SLOTS;
-> +		/*
-> +		 * Return the same value for KVM_CAP_MAX_VCPUS and
-> +		 * KVM_CAP_MAX_VCPU_ID to pass the kvm_create_max_vcpus selftest.
-> +		 */
-> +		r = KVM_S390_ESCA_CPU_SLOTS;
+> +	GEN_TRAP();
+> +
+> +	report(sse_dbltrp_called, "SSE double trap event generated");
 
-We're not doing this to pass the test, we're doing this to adhere to the 
-KVM API. Yes, the API document explains it with one indirection but it 
-is in there.
+READ_ONCE(sse_dbltrp_called)
 
-The whole KVM_CAP_MAX_VCPU_ID problem will pop up in the future since we 
-can't change the caps name. We'll have to live with it.
+> +
+> +	ret = sbi_sse_disable(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap disable");
+> +out_unregister:
+> +	ret = sbi_sse_unregister(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap unregister");
+> +
+> +out:
+> +	sbi_sse_hart_mask();
+> +	free_page(handler_arg.stack - PAGE_SIZE);
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static void check_double_trap(void)
+> +{
+> +	struct sbiret ret;
+> +
+> +	/* Disable double trap */
+> +	ret = sbi_fwft_set(SBI_FWFT_DOUBLE_TRAP, 0, 0);
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "Set double trap enable feature value == 0");
+> +	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
+> +	sbiret_report(&ret, SBI_SUCCESS, 0, "Get double trap enable feature value == 0");
+> +
+> +	install_exception_handler(EXC_STORE_PAGE_FAULT, syscall_trap_handler);
+> +
+> +	double_trap = true;
+
+WRITE_ONCE(double_trap, true);
+
+> +	GEN_TRAP();
+> +	report_pass("Double trap disabled, trap first time ok");
+> +
+> +	/* Enable double trap */
+> +	ret = sbi_fwft_set(SBI_FWFT_DOUBLE_TRAP, 1, 1);
+
+Why lock it?
+
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "Set double trap enable feature value == 1");
+> +	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
+> +	if (!sbiret_report(&ret, SBI_SUCCESS, 1, "Get double trap enable feature value == 1"))
+> +		return;
+> +
+> +	/* First time, clear the double trap flag (SDT) so that it doesn't generate a double trap */
+> +	set_sdt = false;
+> +	double_trap = true;
+
+WRITE_ONCE(set_sdt, true);
+WRITE_ONCE(double_trap, true);
+
+> +	GEN_TRAP();
+> +	report_pass("Trapped twice allowed ok");
+> +
+> +	if (sbi_probe(SBI_EXT_SSE))
+> +		sse_double_trap();
+> +	else
+> +		report_skip("SSE double trap event will not be tested, extension is not available");
+> +
+> +	/*
+> +	 * Second time, keep the double trap flag (SDT) and generate another trap, this should
+
+Third time if we did the SSE test.
+
+> +	 * generate a double trap. Since there is no SSE handler registered, it should crash to
+> +	 * M-mode.
+
+No SSE handler that we know of... sse_double_trap() should return
+some error if it fails to unregister and then we should skip this
+test in that case.
+
+> +	 */
+> +	set_sdt = true;
+> +	double_trap = true;
+
+WRITE_ONCE(set_sdt, true);
+WRITE_ONCE(double_trap, true);
+
+> +	report_info("Should generate a double trap and crash !");
+> +	GEN_TRAP();
+> +	report_fail("Should have crashed !");
+
+nit: Put the '!' next to the last word.
+
+I think this M-mode crash test should be optional. We can make it optional
+on an environment variable since we already use environment variables for
+other optional tests. We even have env_or_skip() in riscv/sbi-tests.h for
+that purpose.
+
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	struct sbiret ret;
+> +
+> +	report_prefix_push("dbltrp");
+> +
+> +	if (!sbi_probe(SBI_EXT_FWFT)) {
+> +		report_skip("FWFT extension is not available, can not enable double traps");
+> +		goto out;
+> +	}
+> +
+> +	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
+> +	if (ret.value == SBI_ERR_NOT_SUPPORTED) {
+> +		report_skip("SBI_FWFT_DOUBLE_TRAP is not supported !");
+
+nit: Put the '!' next to the last word.
+
+> +		goto out;
+> +	}
+> +
+> +	if (sbiret_report_error(&ret, SBI_SUCCESS, "SBI_FWFT_DOUBLE_TRAP get value"))
+> +		check_double_trap();
+> +
+> +out:
+> +	report_prefix_pop();
+> +
+> +	return report_summary();
+> +}
+> diff --git a/riscv/unittests.cfg b/riscv/unittests.cfg
+> index 2eb760ec..757e6027 100644
+> --- a/riscv/unittests.cfg
+> +++ b/riscv/unittests.cfg
+> @@ -18,3 +18,8 @@ groups = selftest
+>  file = sbi.flat
+>  smp = $MAX_SMP
+>  groups = sbi
+> +
+> +[dbltrp]
+> +file = isa-dbltrp.flat
+> +smp = $MAX_SMP
+
+The test doesn't appear to require multiple harts.
+
+> +groups = isa
+
+groups = isa sbi
+
+> -- 
+> 2.49.0
+>
+
+Thanks,
+drew
 
