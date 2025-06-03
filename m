@@ -1,126 +1,160 @@
-Return-Path: <kvm+bounces-48342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48343-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D6F6ACCF3E
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 23:47:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BBF5ACCF68
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 23:54:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18E0F3A50AA
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 21:46:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95F3618913F3
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 21:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2270A24A069;
-	Tue,  3 Jun 2025 21:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851C724DD05;
+	Tue,  3 Jun 2025 21:54:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bi3hxfIg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EY7WQ6Ux"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94C8233704
-	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 21:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF761C3BEB;
+	Tue,  3 Jun 2025 21:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748987217; cv=none; b=GVoZ718aT6zF2o61HjpJo4jw1AxpBWygKH+XSJCu3Lu4850O94uZ6cpgvKs10/DUqmeQ9cvGSWxrEEoS6NvQaCpOoZsfI31887N9t9VkU6//oP0bbFSVBNSH+y/5prSKQ5neM2cFCJylDa0R7uK2MBOYXDyKrbuAsj38eSqVuD8=
+	t=1748987647; cv=none; b=JzUJp2/S0UfMPVeXl9JHolXXvyp5A1qB6NNkcAxjSfbqNufK4F8IOnFd3jzshGtyQnzS9LsE4Ukw0lt2vWpUR1vaFb8aWFzkDeJTqP9EBcBR8sUAOFfrSPJh8eDe4lX6Rs32WZ73bLvuiLBzvxJ3XUqHO32vAKs9KzaUGa5VV/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748987217; c=relaxed/simple;
-	bh=7OkVmia+kAhC2psjz5g/UQyEwFQL6hlzlynJfKibJrY=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=SOhJiIJ64DuSnbWuL5PF4dZ8QPC9WC0kGaxYowad2PVe9FrUJ7ynRhKeFxkb9088YLtJ4OK18/rHEC3Yt7DDqUjOGoZ4uiG/aNNlP5/geYtiCdSffYcIw6f6g1VKxA7jVCh3zDu2uNuB/qn64XkyTQiZ9wr29eqCROl2wV+0hfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bi3hxfIg; arc=none smtp.client-ip=209.85.210.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-735b135988eso2893964a34.1
-        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 14:46:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748987215; x=1749592015; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LccXvjPYPBUKmolpHX2IrRx+++KKrUgiEoyHX8qZbOw=;
-        b=Bi3hxfIgHRRST+ts6mfaolap226t0NctWhE6kDXuMLdh9p7VCLfiUh54mQOMVBdPjM
-         H0S8Oe4ctU4zeJ4WkQvBD1axE9ErDgf05eVYRpbsX1g9/9XX6x2Q6WQMukvKVHIplJkc
-         k/+kDNvsy2kXUHA+FE/F9SU1K+JFUWObFpVQBUdWy5rNaoY8kRoZ8Ej4uqJZtMyAcDvp
-         YFkfttFGdyptJMZ/P30qbgY7DDbfMDyyXPI/9iXhnakAxZyDOaYxVrZcwy8S0sKYgLxF
-         94XoWkPTGfJhE+bim2J2zpq6Zw31Px4q4uhsqHyktsGyL6R/pauQbnSrmZ5p9Y/Wf8gy
-         t/yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748987215; x=1749592015;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LccXvjPYPBUKmolpHX2IrRx+++KKrUgiEoyHX8qZbOw=;
-        b=Z9+8gZilz+eJYQTVpi4GxeW8fw5Arl6HMB0wDmbCDohsHIkBe3wuKTxv+yFhnvQfhT
-         nz23BJwC6p2TnP89wlCQd41fbwvtrMrhkPWqUjR0Sk/HpoHN3TIKBSrXEknuv4wQE6jL
-         z9xTsErdJTQUDsvPdWTaOa5V5j3HPqFEKGMdNtn4ZJtkIpBn/ZwHfZh9Jww9hncNBEPi
-         1f3arx1Ic01td0p7AST95EZ6DzdRbWUuMu7f+NB/CHVgC+yXZerkgrsirH0WQhVOQHJy
-         BynOMwYVacYti8f67Pr1t+HIfjF4GE3PQBp5dhdmeg5hQkfEZWKyvLyewm9eDEccP+1E
-         xeGA==
-X-Gm-Message-State: AOJu0Yykc0BHb/nTL0kDEDF7pP1ZQTmN9kAcmCuDB/Kn/i0XhUrVtRA7
-	p1CzZS99NFB/UejBqS2Y2y+sQmsx/t9IsnHD+rlGYpdZR/jqxxHEmGmF3kjdxqN3bVsYQSowvpM
-	bff/bfR5JwpAtjRvd5f+UQqee5Q==
-X-Google-Smtp-Source: AGHT+IGVKt5ILqjSdW8OtKLqE/y3WeywMj3vX4/DzsQoxvrjy7RrNHS3PkxJz64AV7HAzQffHQulShSVI5b7iylTEA==
-X-Received: from oobdi8.prod.google.com ([2002:a05:6820:1e88:b0:60f:868:60e1])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6830:4882:b0:735:ebf8:b241 with SMTP id 46e09a7af769-73869d7c158mr529938a34.14.1748987214770;
- Tue, 03 Jun 2025 14:46:54 -0700 (PDT)
-Date: Tue, 03 Jun 2025 21:46:54 +0000
-In-Reply-To: <aD4oS1_tnMPlgDJ6@linux.dev> (message from Oliver Upton on Mon, 2
- Jun 2025 15:40:11 -0700)
+	s=arc-20240116; t=1748987647; c=relaxed/simple;
+	bh=r3bIn50CZlFg0yKKfQuYn8XClw3UnJCKvqITw9wTRWU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qTAIHEF71ee9OP8K/bLjlc4u8g53KnYmmaDlq3zaC5qG6zPv9iu+xVjKW2K53pg8JWmNnTzK92WIvNoo8evsegubngoi5Uo0XPOVSYMpA504nnw5k5oWj5rch7740RiXldJwd1kROkGfBOOusz8+gFxhX0ZlNSWR29Vn25BKCM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EY7WQ6Ux; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1748987647; x=1780523647;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=r3bIn50CZlFg0yKKfQuYn8XClw3UnJCKvqITw9wTRWU=;
+  b=EY7WQ6UxllJfZ635kB8k8/Ioz1IP8ZHVvvPUR9KYqut3G/w+T9ezhF9j
+   MOfQd8jdYo2DGJH68dWTXo7irblpmfaXmy8Ccy9PbJXUoAzdmLxk2wxHK
+   2NmuTrx5f3VM2EhGL4AyZUF9TMIuO3wMzq3HQlB+92+IbJrKJF4L0ffWP
+   yxEvjZt2xoWYbUx5DMqqOmbg3Dcx58Q2PP2v8Ei/CYbWHOhb07+bMu3eO
+   9YSfty4eaJHRQgYrG+RwHhkFXfOSgMltjJJPUWq9j6xelaqrYVbouV1GX
+   CrpbbsW1Axahss0PUFZXzJATzFTel13IYz8pF31SLYYk2VZ1xt3YJm1Wr
+   A==;
+X-CSE-ConnectionGUID: qNJkiQBsTDuqa4WqFSakcg==
+X-CSE-MsgGUID: xfIcJXWWTH6asACVyeniMA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11453"; a="61312773"
+X-IronPort-AV: E=Sophos;i="6.16,207,1744095600"; 
+   d="scan'208";a="61312773"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 14:54:06 -0700
+X-CSE-ConnectionGUID: UEci+pVFSu+y+DJb8D1Vqg==
+X-CSE-MsgGUID: Z+6iJUqGSZaKwEs2b41ixw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,207,1744095600"; 
+   d="scan'208";a="145307933"
+Received: from tjmaciei-mobl5.ger.corp.intel.com (HELO [10.125.110.192]) ([10.125.110.192])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 14:54:04 -0700
+Message-ID: <58556be3-0516-4204-b19d-11cba7b21423@intel.com>
+Date: Tue, 3 Jun 2025 14:54:03 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsnt1ps033ch.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 16/17] KVM: arm64: Add ioctl to partition the PMU when supported
-From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
-	maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 4/9] x86/nmi: Assign and register NMI-source vectors
+To: Sohil Mehta <sohil.mehta@intel.com>, x86@kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Xin Li <xin@zytor.com>, "H . Peter Anvin" <hpa@zytor.com>,
+ Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Peter Zijlstra <peterz@infradead.org>,
+ Sean Christopherson <seanjc@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>,
+ Kan Liang <kan.liang@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
+ Zhang Rui <rui.zhang@intel.com>, Steven Rostedt <rostedt@goodmis.org>,
+ Andrew Cooper <andrew.cooper3@citrix.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+ Jacob Pan <jacob.pan@linux.microsoft.com>, Andi Kleen <ak@linux.intel.com>,
+ Kai Huang <kai.huang@intel.com>, Sandipan Das <sandipan.das@amd.com>,
+ linux-perf-users@vger.kernel.org, linux-edac@vger.kernel.org,
+ kvm@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20250513203803.2636561-1-sohil.mehta@intel.com>
+ <20250513203803.2636561-5-sohil.mehta@intel.com>
+ <e978e1fb-d88e-4789-bd33-367281dfa0ad@intel.com>
+ <67683e00-48fa-4aa8-91ff-8726a5374675@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <67683e00-48fa-4aa8-91ff-8726a5374675@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Oliver Upton <oliver.upton@linux.dev> writes:
+On 6/3/25 13:22, Sohil Mehta wrote:
+> With an enum, it's harder to figure out the exact sources when let's say
+> the source bitmap is printed as 0x0090.
 
-> On Mon, Jun 02, 2025 at 07:27:01PM +0000, Colton Lewis wrote:
->> +	case KVM_ARM_PARTITION_PMU: {
+Uhh, then don't print a bitmap. ;)
 
-> This should be a vCPU attribute similar to the other PMUv3 controls we
-> already have. Ideally a single attribute where userspace tells us it
-> wants paritioning and specifies the PMU ID to use. None of this can be
-> changed after INIT'ing the PMU.
+/proc/cpuinfo doesn't print out CPUID leaves, it prints out bits mapped
+to strings.
 
-Okay
+Look at the kmalloc trace points:
 
->> +		struct arm_pmu *pmu;
->> +		u8 host_counters;
->> +
->> +		if (unlikely(!kvm_vcpu_initialized(vcpu)))
->> +			return -ENOEXEC;
->> +
->> +		if (!kvm_pmu_partition_supported())
->> +			return -EPERM;
->> +
->> +		if (copy_from_user(&host_counters, argp, sizeof(host_counters)))
->> +			return -EFAULT;
->> +
->> +		pmu = vcpu->kvm->arch.arm_pmu;
->> +		return kvm_pmu_partition(pmu, host_counters);
+            Xorg-4589    [003] ..... 1568557.823993: kmalloc: ...
+gfp_flags=GFP_KERNEL
+            Xorg-4589    [003] ..... 1568557.823993: kmalloc: ...
+gfp_flags=GFP_KERNEL
 
-> Yeah, we really can't be changing the counters available to the ARM PMU
-> driver at this point. What happens to host events already scheduled on
-> the CPU?
-
-Okay. I remember talking about this before.
-
-> Either the partition of host / KVM-owned counters needs to be computed
-> up front (prior to scheduling events) or KVM needs a way to direct perf
-> to reschedule events on the PMU based on the new operating constraints.
-
-Yes. I will think about it.
+gfp_flags are a bitmap, yet they're mapped out with strings and symbolic
+names.
 
