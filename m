@@ -1,807 +1,343 @@
-Return-Path: <kvm+bounces-48254-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48255-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EA93ACBF8B
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 07:26:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84F6BACBF98
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 07:31:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25ED73A39EE
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 05:26:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EAAA7A0626
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 05:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6904C1F2B8D;
-	Tue,  3 Jun 2025 05:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8981F869F;
+	Tue,  3 Jun 2025 05:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EHZm0tJ3"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="PNGtP1v9"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2043.outbound.protection.outlook.com [40.107.94.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D201519BC
-	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 05:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748928403; cv=fail; b=og/ZBiAp3lmfJlZsqSCzhy/6S/W0Q7tcXhPgT6FjH0NKEYp/uzUDw5l5DDlGu91pspTKi7dkpxg7GaiWDhW23XPR/AFfOeLbgmPdlhOH3aaMxTg+40D8TOsWW9JwmaHltBCCd9qSK0viIQvv55FAukMgEkjJTV0SVJYE7ywnpJQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748928403; c=relaxed/simple;
-	bh=FcRST+InCsErgnt02/+iC0cSEh901uAEuAl1SxqwfFM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=SNMcb3c8PFE8msZ2OQMgQUjL6JdcBMhEBkI7g/6VZkxKd9MHfjKBF5/VptbFEvQ3MdNmZ2IpDHLwyUfvbhmT1VWm2ip2AWRIQZEHaS2+DcrswaW+MZBDQSkJ2nn9PGO2Lxn5tgfHoydEUu1f+kQSHI64/hJOztzZvWnkWLZfBEc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EHZm0tJ3; arc=fail smtp.client-ip=40.107.94.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qv6L3rJ/4vM4AQ84HURyq1WSWMYpekw3/zCnyoMKAhpz2l7y9Ew8dDm1ypPW18TOYpNxmi5GZsUjYjjLOCqgjc+rwHSpiARiKjCTu6W+tai7Rkfjt/X5HuaN3O3L5gB9NyN7wy1sBLqxBhMkH4Rs9DSFUBHTyGgc36dvgKm0eWW9gom+cVlBkBQQ7bIVa79wNSl46WoB7icJwSwdYxsEuafdeXd3ck+2M847YvA+GufSW0AVGLP2zI6OACoLqySFZ/60g598tII16iKqW/eHgggQPpNd1j9Lpj+y0wRmIGAjjaPmQfFT/OyHgfLMEQmbtckMGT2PqLvScHcechFRYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D42YUzZte7AxNrwFkcYMoKO/UgQPuK2ahlA9X05Ug5k=;
- b=lhL45nlxitWMxocHOZNPXspCBXCKugg1LCG9ivCsItrvHjFYO55752+l7rJVxn+CAvV/rxR+SgnJmDv1aPlrtHPmrG5VZ4MKa7uqdIiVi4oqWf3m89UpIJ7/XBxkG++oTqa0v2kHTJDLM+b0B53bLJ706bfKyNMMUJhuAjf5mb0UCsZEtcIDCaS4gxmmtoIH0w+EtDr0NS87weUMtbde1fqgYV7EzL3IXzC6561363cr+XZabBwIki2JVKRo3aiG4fooQelxyq9XI2oQ97YANyeiwWsLSvmmoiRrxSz20jeZGG262m0qQVQvwejz5MxoC/xZ/xK5WgBRSjXGvMtuTw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D42YUzZte7AxNrwFkcYMoKO/UgQPuK2ahlA9X05Ug5k=;
- b=EHZm0tJ3AdC19FEHRX7eVRHyc9Bx43IxmNivu9eNjag1YnOO0vHSEF2hLfEXcjf+EBmXB8d+dH+BKlIwfq2UMmKW8QCBBuaHgexsF1Hynu6GR8iTJL3O4jEr1gvKaXTOsa0p1DoMQXHL4Yf90I3RzVoeBLVxfHaoxQccrqLru3I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA1PR12MB8189.namprd12.prod.outlook.com (2603:10b6:208:3f0::13)
- by LV8PR12MB9642.namprd12.prod.outlook.com (2603:10b6:408:295::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.37; Tue, 3 Jun
- 2025 05:26:38 +0000
-Received: from IA1PR12MB8189.namprd12.prod.outlook.com
- ([fe80::193b:bbfd:9894:dc48]) by IA1PR12MB8189.namprd12.prod.outlook.com
- ([fe80::193b:bbfd:9894:dc48%4]) with mapi id 15.20.8769.031; Tue, 3 Jun 2025
- 05:26:38 +0000
-Message-ID: <d0d1bed2-c1ee-4ae7-afaf-fbd07975f52c@amd.com>
-Date: Tue, 3 Jun 2025 07:26:33 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 4/5] ram-block-attributes: Introduce RamBlockAttributes
- to manage RAMBlock with guest_memfd
-To: Chenyi Qiang <chenyi.qiang@intel.com>,
- David Hildenbrand <david@redhat.com>, Alexey Kardashevskiy <aik@amd.com>,
- Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Michael Roth <michael.roth@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Williams Dan J <dan.j.williams@intel.com>, Zhao Liu <zhao1.liu@intel.com>,
- Baolu Lu <baolu.lu@linux.intel.com>, Gao Chao <chao.gao@intel.com>,
- Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Alex Williamson <alex.williamson@redhat.com>
-References: <20250530083256.105186-1-chenyi.qiang@intel.com>
- <20250530083256.105186-5-chenyi.qiang@intel.com>
- <4105d9ad-176e-423a-9b4f-8308205fe204@amd.com>
- <9a9bb6bb-f8c0-4849-afb0-7cf5a409dab0@intel.com>
-Content-Language: en-US
-From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <9a9bb6bb-f8c0-4849-afb0-7cf5a409dab0@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ZR0P278CA0141.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:40::20) To IA1PR12MB8189.namprd12.prod.outlook.com
- (2603:10b6:208:3f0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A532AE7F
+	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 05:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1748928694; cv=none; b=WLwfV30xwMxFoSwA8YaPDwhyE+yJ4Kty90edZyacauzlFU7XuERr9ffm9X0CRd39Df1TLmr+HrFECnTdN75mv5ndwhexDYE66y/n0aZ2nWkzKINm9eGKuwSIzSeJFt4aQZNukL3wSUdgrejLNBdaEnlvt2KsgVZN+cq5eD94bgI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1748928694; c=relaxed/simple;
+	bh=ned500yeZ+fotJTle6hKqUkOI4+MtDNWmZ73eMxCpM0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UwGVjektd0BEJPYHJz67bRV5X1BGcqOp+frnLHfBX3KflJ4USQd3m+Rln3rdfaG0KFaFRyNGbr3CRnZeeNnsRDZwgTUVbq6QJuV1LZWt4BW8Lrh2y9EllSwiISxgu4ty6A3KigPNA0k/5Lp6vsbbe4lsFjF4CzJpuX4uos8AZuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=PNGtP1v9; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-234f17910d8so48867305ad.3
+        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 22:31:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1748928690; x=1749533490; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Th/HvjGvwZaAq8NqcJZl3dUrBp6q2rEKCyly2o0Sv+A=;
+        b=PNGtP1v9hG5Crayx1GpMFQ5ZxHbTGVbIZc+9ZKUtOSCBz5Xk44A+ABS9e/m2nnOFU0
+         nZSVCn1kPNkDgKhHYyKvSOAf75Al9fAhVlU/3jEcpSsLrsMn0CTDzGSlEIRV+rAsq1P2
+         G8xoM+ArrsEpTbz2b+Hfhvf703+BOdFGMgs1rjPP+BVE8XWnf4nU+X/ZWUiZ71GCoNFL
+         xXp5+5Lwgoc4+vxRpA/1mNvgljWRc/0TiI0jwfWA57emGdpJZgQc2QVPZ0RXiZb571JJ
+         Nhe1pGOjPeMpHRMjjqdFhkZHdGYQnnU9Uc/3iqbnlMrHAfisHxno4YC9MVhUYGm5Wt88
+         hHjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748928690; x=1749533490;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Th/HvjGvwZaAq8NqcJZl3dUrBp6q2rEKCyly2o0Sv+A=;
+        b=VgSYdY/oGMuOcjKNzF2mGO4lzAruj6Hdyzq7ZGj2oa1sSLduNdryiJ08x4orJmSf/v
+         CI4WXp9Y5ZrarPn0nNshNS8c6YtfMxZ0XZozEKix3KYrebEXvjRJ7kBvWzBf+sfP/yjX
+         iu4OpKwlGpClLEYO6yDAaDplXC81Qk5Mj5uCpFhFFCUCCNwEKLZFMeLUBy0wgh4f0QX/
+         wsSMNuFLzcyyyf51gIAGV9tUukq3OV7PImQpx4McNOpIDlJ8l223922iXd4lPJSbWhys
+         R4frhy9oLUOH8FmyK4xRB9tD5UWkZWrawWD/n9sDtCLXtm+X5KASwVzsWnAfd5lTjYdS
+         KKqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUh8yM+1T+1jncUy0Jdqh5MEU8MBrz8D4WDqAofmrIouFI5U003FAiTibkLnqp21j2z3BE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFozH2OeeEAHqHEg4hXQwZYZ5fnnOi3zFfl0ZalrcDXIz3g8pI
+	Ri8LnH1YAdmo+7tTXyF9RWVSlUhvWE5xaPWZkt7hpqU83joBn8FZwN6s/2tBRcLtbnA=
+X-Gm-Gg: ASbGncsNTLfGhQno0Z1bb8gG8l43ifN0oF8sCfauJfSzPMBht6gr08+UScWcLpw+x6W
+	wI0tokuES78LNIdULb2MN4rDRTCxjSucRxBoiWbecLf14J/8yQSU/Ulcz858ZimIM3NdWTsJg8G
+	6JVC6BXO47isb62kZjUIuo6+IU6W0JmKUerD4m136TL9cis0Q/JKIpq6/JTVf+PSQ1GvpcElFIy
+	6bdjX7byycyWYJavz8GknFN76DDwVBL+QPb3m/ml3D/FAimz9uw0byADzlDoeW6JXrKIWdY2FO4
+	+r2M1FrZnmKm6YrzHegE1eQ6yE5nIGVkkmndVhZmTWnof8Qga1JX64d3457mDQ==
+X-Google-Smtp-Source: AGHT+IHQJUSAAIT0Fv7mF4IgGNvQJWS+3RmfojKIUZALdSibOD1WAD0IIfhREMwYdds3jC/NKwKN/Q==
+X-Received: by 2002:a17:903:60b:b0:234:f580:9fe with SMTP id d9443c01a7336-23539647997mr154749915ad.49.1748928690493;
+        Mon, 02 Jun 2025 22:31:30 -0700 (PDT)
+Received: from [10.100.116.185] ([157.82.128.1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-235c99ea09esm5054615ad.226.2025.06.02.22.31.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Jun 2025 22:31:30 -0700 (PDT)
+Message-ID: <95cb2640-570d-4f51-8775-af5248c6bc5a@daynix.com>
+Date: Tue, 3 Jun 2025 14:31:24 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB8189:EE_|LV8PR12MB9642:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0bbc8031-2f4a-41e2-a3d3-08dda25f3684
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UlRtekxCZGJQOWFubkZsTkNVREJGS05DVWNUUTFlNlQ5T0s4MU54QlNFV2ll?=
- =?utf-8?B?ZzVaRlVjRXJwV2l4MVg4ZG5YVUlVUkpwZkRmNTViR3JTT0FxWU1CN2x4RWs4?=
- =?utf-8?B?bDd3MG5kamVTdnR5UkZGOXQxbnFYb2lsTFI0MDJjd2VkNnFaMEhhc2RMdUg2?=
- =?utf-8?B?N0hFZnRLSk9ySUZRbnhTdXJxWFpvcWV1aUZuOFBvME1waDdFM3VnQTJqUFY2?=
- =?utf-8?B?QWluOXV1WmlkRlQ3bFAzend0Y05kbnR5emlLVXh0a2x4ajVQaldoSkorR09h?=
- =?utf-8?B?dGtoN0V3cTE5bE9WRWk5bE1JT21TZm1SQkNaU0dSTDBSbDBkKzdrQ3ZXSHpp?=
- =?utf-8?B?VTE2d1pRVkVOY3VRcE8yOThBcHhQYTRJVnRwNit4ZllSRjVBTmNZZC9sVG9Y?=
- =?utf-8?B?QXJpbERiNHlzZ1NLL2FGY25tTlZ3NWhTUzc4SHNEc093cjR2UUcrVEZqVTRs?=
- =?utf-8?B?bGxRWVhxdTdTeGlNZG9wWVd2ZDdoNU9qb1U3QWhFQjV2bUV3dWs2aHlKM0R1?=
- =?utf-8?B?TU1lSFUzRkhyeEZvSDRyQVZ4NEZLU3c4c2ZPdGwxV2tpZ1NBQlplZnd6eGs3?=
- =?utf-8?B?ZkhaMjRhaU9IRGo1bmJpK2NUaElSaFY5bWthQnZNdW9DMk5OdVRpdVB6N2M1?=
- =?utf-8?B?UWM0N2tJcENBYi9jWFVFd2NKWDJJMVV0OTFiSjRmdnlGQmNRZjVpWmtrWWtR?=
- =?utf-8?B?UmlxUXVWaE9xZXVLMGR6ZEk4aHRyTmt3ZE9leno5eVNKN3JYbmRSY29vSHFF?=
- =?utf-8?B?dE8vRXBqZ3pkeVZlbUVNSFA0a1hMUUZLcWJDZDl0U0w1M1ptakczRkI3cWxh?=
- =?utf-8?B?TEZLZDZ4L1JYV3FOeWdOSXBlTjVKY2Jhd2UvK2lTSUJPU2VTQXR0RXRsZ2Jn?=
- =?utf-8?B?T2Fzd2NuVUpDRmtLdUVYUEVOOTJNT1RaVklwSHRaQmw4ZVRHNVRxM1Via1Jw?=
- =?utf-8?B?TkgyS09hVmVnQm9COFcwMEhzNGJKc1dPZmZLRlBNYjgyRzlWWTg4RXA5TC9P?=
- =?utf-8?B?YjJCcGpPMmRKaUlOL1BzWlVIMmhRb2NSVlpWeVJDSkRZM1BmY0N0ZndnT01I?=
- =?utf-8?B?dk8xOE1rZkRRWnJEYkRvQXdVOElNekhTNXk0OFhpVkI4a3cvaGpwU2Ixaktm?=
- =?utf-8?B?cXEvb3ZJdnJ5bWZUNEg2S3FuY0x6VG5PRVY5aytHcXRmVnNUMVVVbzI4V3N2?=
- =?utf-8?B?aXJWclkrSDBNUE4yQkJKelhqSlFpenVZUDZPR0IxZ1FhUHk2QTR6dkJaT1lF?=
- =?utf-8?B?NnhiNDgycWtVWVBrT0gvNWNRczVEWWlZRjBaNzJVYzdlUlhFZzFwbVNmNy80?=
- =?utf-8?B?azd4SEorTCs3K1NyZTI3QkR3N1RVeklEb2NGYkVqclRWRWlXaXdvUitmcnZO?=
- =?utf-8?B?TnRsRWVvcXJacFFLK0FobTBkRzhIK0g3eU9jMXZIcWRrVDNVaDdCR0t2S2Vy?=
- =?utf-8?B?cnFkR3ZlbFNWOXFiU09zd2NkTkVxcWl3WDZYdjFneUhYN1N0V004K3BILzVY?=
- =?utf-8?B?anJJZmVpMVlOMzR0b1h2ZjZjbVVQemxyVlowWUptc2ZjTTB3SEl5K2U0b2NM?=
- =?utf-8?B?OFJhSmZ2UXJNUWVSWEVlSStpVFR0SGNZL0l2SUtsc1RPNTUrZ1BuNUUyOEhx?=
- =?utf-8?B?MlZQMml5YjJDTERaT2VKb0NLYjRNOW0xVERLMUl1TzlpWjFJOWF3NTFlTmty?=
- =?utf-8?B?Q002RXdDbDhqdVFOWUdUT3BDdEwvZDJpMWU5WVRsU3Z6ZGtXU05qOEYyaHBO?=
- =?utf-8?B?NUxHQm9uOWpZTkppTG52eC9IQTZFSFdONUozVGRlbVR6dW5hMUhNWUVyVDhP?=
- =?utf-8?B?VUVTbjM4TkwzQmt3RVB4aVovZWE4enFiK3NrZFZPblJubmR6VjVTWDI3N3c4?=
- =?utf-8?B?dFZtdU1kZE85MkNoSS9mSjJHeVdSN0d6NWpsMFQ4b05oTjk0dDBnN2d4TDJi?=
- =?utf-8?Q?NcFD6yI3fpE=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MWg4M09MTklsZEw4VmRXYXNtR1VXT1o2MlNITDNIZCtPclY3Tmp5eXRRcHl3?=
- =?utf-8?B?d25mZ09RVCtMdW03eE1uV0EvSHc0NTlwdUtxdHVMOFkrT0cvUkM3SkEwR3NK?=
- =?utf-8?B?YkprMWlSc1pUTzhaQm9SOHVhTVlnbHJnak5BbWRQTEJteG1Fd2p5a1Rxb2J4?=
- =?utf-8?B?WVBUUVhaaGlTQUhPdE1JdWJIQ2U0SE1nalhaalRQSE15Y3Y0TnJhdnFIcGV0?=
- =?utf-8?B?eDlNTDFJNHNRK1crczNkWUhzcTVjckxDNzFtblBRaXRkaVNMRTlIMi82bTBS?=
- =?utf-8?B?RUlrVVhud05Jdk8xRUdERUJ6Ti94UFNhaXhiM3FDa1lab1I5cC9FeTNxV1NI?=
- =?utf-8?B?WmF5akZRSVFGU2JIMlZKZnhwNTNYc2xqWGY2cmJvOG9xRTlLcmtZWHVXcmNX?=
- =?utf-8?B?WGthMW9zWHRaQys3ZzJEWjJrbU9QQ2JrMDFaNnlZaHRlKzBjSGgrRzVrK1Ru?=
- =?utf-8?B?OVdGampCQjlQMVJYVHlEWjN4alUxUEJ3RlVyZnhmY1JzcjlITjRUVHZaQ1pJ?=
- =?utf-8?B?eDhXN2tqaXVKSUx0QzZlUThRMDlaOU5PblpibnJLenV6UXpmT3RCZXRhOUw1?=
- =?utf-8?B?K28wRjR5aVI5Q01KRGNLdlNlN3JSRktQVjNqcVFhdWcvRjZWT2t4a2ovMHpU?=
- =?utf-8?B?WkNhTVR0YzFUaEt5OVJ5Ym5EeVFxSGx1eUNyV2ppNi9ubk5iemRXZDhWNDJl?=
- =?utf-8?B?Snc0Vmc4eTVxRW9XaGd3LzVRQlFBNmJTUGxJRktXdVFkZG1wMUFWU3ZoRzB2?=
- =?utf-8?B?djFxelEvb2Y2STFIZUNJbitsRUJDUDRVRlIrZFRKMHFkY21JRVpuYjRkL2tk?=
- =?utf-8?B?ZWplOTNIbXEwdjFoZk0rSThmK0FCTC9SS1lMSThYb20yVThsbk03M3UyS1lE?=
- =?utf-8?B?VDhkREc4YVlpek4yTVJqdFJVNUljWW5sc3g1TDRnZWh1SjB6TEcvcmo3K0pj?=
- =?utf-8?B?K3JNRlBPc3Y4eFpjODlUMGxPZWxHUFpxdVRwTEpWYWdqZGNTUkRCNnBoWFdO?=
- =?utf-8?B?RkhBTnhWaDl4Rk0vamhGQWMwRzVUbkExWEp1YjBlMkNwcjBIMG52aXJ5dWhT?=
- =?utf-8?B?Y0dzRm41Y3RSWGJDUzg0OTNvc2pqc0llaW83akltOHFtcis1SUN6RmZ4WkF6?=
- =?utf-8?B?cjlDV3RwVkEyNG0zZkNFTkM1Zm9TWmRpcjR0alJMeU1ndGcrSjdVUWZiWWQy?=
- =?utf-8?B?QmRhVXpCR2FrL2FWWmlPUXgwOFZMQmZkS1BXZE5QbHpoTHd4bCtJWC9oZnFh?=
- =?utf-8?B?c1V3c1RiUEdnZko1YzlseThEZnU2LyswcTFiVEJ2dHVoZEp1aEpxZlZRRld2?=
- =?utf-8?B?WE83YmxqTlZ6eUQzUXpxYXFHTC9qc0hqWGQ2QlZTVG4zSUVaMm9yalNOc21u?=
- =?utf-8?B?MXZQRmJFZ0cyY1NMNG4rZFI5RHg3N3dnQ1FhUXJDVVNBcHViclQyTlNYT216?=
- =?utf-8?B?L2JPMjFVRVRRYWEwaHVaQWZmVGRHT1dyMi8wSWswZ05kNlVFcWJXRWwzMFc3?=
- =?utf-8?B?bzZud0N4VW1SeEVyenpIYVpNUG5VTlRlaEVqV0g1NjdueFUzUUJ1ZkhrajZU?=
- =?utf-8?B?UXRrdFBSYkxVT3VsT3NlejFDUFArYm1xazUwZXQxZEZoNVJRZXhYT0trQ0ts?=
- =?utf-8?B?b0tCMlZ0NUJMTXhCNWZnKzVhM2YwVk9kMGFqM3NJQkV1SFFuU1dZdGhRbld3?=
- =?utf-8?B?UnB0aVdWd0R0RkJ5WUJCQjVyeG5nNktCL0pjcnl1dm9sRXRJbk5KUHFseDZS?=
- =?utf-8?B?N3FKK1RWSW94K0hWVGN6WlVjMzk5Um1JU0lkQmUweDZDWHF6UzZiQ3NiMzFq?=
- =?utf-8?B?K3hMbWFnQUJsc0JNT3E5TjcwRXAxTmw3b3YyQW1jaVFIaDkvV05DWHdsZy83?=
- =?utf-8?B?K3cwS3NXQ3NURnlBNUhRS1NVa1gzUmlJUzBKdGtWczVneURGOTJ2WTVrSjg1?=
- =?utf-8?B?VkV1NGU1bHRPQUdVd0pDK2RnNElhL1dpWWwyS2hqOXVYTVp6QzhmeEVsVGdX?=
- =?utf-8?B?UldvM0toWEVXb2d3aEpNOXVEd2lmSURnNGJnai9QSjgyZnp6WU1qT3BQY1Ji?=
- =?utf-8?B?d1dTbi9VV2dEWnM2cjhkSUtQcUd3dlRXbWhDaDhkVHArejk2eERUTGJPNDhx?=
- =?utf-8?Q?ucs1dD9rfrUwCiHCXzuN0b6vf?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0bbc8031-2f4a-41e2-a3d3-08dda25f3684
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8189.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2025 05:26:38.1267
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FlNp8n+AI5UR90SknRqlNWIqinRobe+bjr5EpHpeMdqM10IKtOoK1ZCjeSMeIeiHaO2FiQX5pCo2OOhHcoxZIA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9642
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 01/10] virtio_net: Add functions for hashing
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20250530-rss-v12-0-95d8b348de91@daynix.com>
+ <20250530-rss-v12-1-95d8b348de91@daynix.com>
+ <CACGkMEufffSj1GQMqwf598__-JgNtXRpyvsLtjSbr3angLmJXg@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEufffSj1GQMqwf598__-JgNtXRpyvsLtjSbr3angLmJXg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 6/3/2025 3:26 AM, Chenyi Qiang wrote:
-> 
-> 
-> On 6/1/2025 5:58 PM, Gupta, Pankaj wrote:
->> On 5/30/2025 10:32 AM, Chenyi Qiang wrote:
->>> Commit 852f0048f3 ("RAMBlock: make guest_memfd require uncoordinated
->>> discard") highlighted that subsystems like VFIO may disable RAM block
->>> discard. However, guest_memfd relies on discard operations for page
->>> conversion between private and shared memory, potentially leading to
->>> the stale IOMMU mapping issue when assigning hardware devices to
->>> confidential VMs via shared memory. To address this and allow shared
->>> device assignement, it is crucial to ensure the VFIO system refreshes
->>> its IOMMU mappings.
->>>
->>> RamDiscardManager is an existing interface (used by virtio-mem) to
->>> adjust VFIO mappings in relation to VM page assignment. Effectively page
->>> conversion is similar to hot-removing a page in one mode and adding it
->>> back in the other. Therefore, similar actions are required for page
->>> conversion events. Introduce the RamDiscardManager to guest_memfd to
->>> facilitate this process.
->>>
->>> Since guest_memfd is not an object, it cannot directly implement the
->>> RamDiscardManager interface. Implementing it in HostMemoryBackend is
->>> not appropriate because guest_memfd is per RAMBlock, and some RAMBlocks
->>> have a memory backend while others do not. Notably, virtual BIOS
->>> RAMBlocks using memory_region_init_ram_guest_memfd() do not have a
->>> backend.
->>>
->>> To manage RAMBlocks with guest_memfd, define a new object named
->>> RamBlockAttributes to implement the RamDiscardManager interface. This
->>> object can store the guest_memfd information such as bitmap for shared
->>> memory and the registered listeners for event notification. In the
->>> context of RamDiscardManager, shared state is analogous to populated, and
->>> private state is signified as discarded. To notify the conversion events,
->>> a new state_change() helper is exported for the users to notify the
->>> listeners like VFIO, so that VFIO can dynamically DMA map/unmap the
->>> shared mapping.
->>>
->>> Note that the memory state is tracked at the host page size granularity,
->>> as the minimum conversion size can be one page per request and VFIO
->>> expects the DMA mapping for a specific iova to be mapped and unmapped
->>> with the same granularity. Confidential VMs may perform partial
->>> conversions, such as conversions on small regions within larger ones.
->>> To prevent such invalid cases and until DMA mapping cut operation
->>> support is available, all operations are performed with 4K granularity.
->>>
->>> In addition, memory conversion failures cause QEMU to quit instead of
->>> resuming the guest or retrying the operation at present. It would be
->>> future work to add more error handling or rollback mechanisms once
->>> conversion failures are allowed. For example, in-place conversion of
->>> guest_memfd could retry the unmap operation during the conversion from
->>> shared to private. For now, keep the complex error handling out of the
->>> picture as it is not required.
->>>
->>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->>> ---
->>> Changes in v6:
->>>       - Change the object type name from RamBlockAttribute to
->>>         RamBlockAttributes. (David)
->>>       - Save the associated RAMBlock instead MemoryRegion in
->>>         RamBlockAttributes. (David)
->>>       - Squash the state_change() helper introduction in this commit as
->>>         well as the mixture conversion case handling. (David)
->>>       - Change the block_size type from int to size_t and some cleanup in
->>>         validation check. (Alexey)
->>>       - Add a tracepoint to track the state changes. (Alexey)
->>>
->>> Changes in v5:
->>>       - Revert to use RamDiscardManager interface instead of introducing
->>>         new hierarchy of class to manage private/shared state, and keep
->>>         using the new name of RamBlockAttribute compared with the
->>>         MemoryAttributeManager in v3.
->>>       - Use *simple* version of object_define and object_declare since the
->>>         state_change() function is changed as an exported function instead
->>>         of a virtual function in later patch.
->>>       - Move the introduction of RamBlockAttribute field to this patch and
->>>         rename it to ram_shared. (Alexey)
->>>       - call the exit() when register/unregister failed. (Zhao)
->>>       - Add the ram-block-attribute.c to Memory API related part in
->>>         MAINTAINERS.
->>>
->>> Changes in v4:
->>>       - Change the name from memory-attribute-manager to
->>>         ram-block-attribute.
->>>       - Implement the newly-introduced PrivateSharedManager instead of
->>>         RamDiscardManager and change related commit message.
->>>       - Define the new object in ramblock.h instead of adding a new file.
->>> ---
->>>    MAINTAINERS                   |   1 +
->>>    include/system/ramblock.h     |  21 ++
->>>    system/meson.build            |   1 +
->>>    system/ram-block-attributes.c | 480 ++++++++++++++++++++++++++++++++++
->>>    system/trace-events           |   3 +
->>>    5 files changed, 506 insertions(+)
->>>    create mode 100644 system/ram-block-attributes.c
->>>
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index 6dacd6d004..8ec39aa7f8 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -3149,6 +3149,7 @@ F: system/memory.c
->>>    F: system/memory_mapping.c
->>>    F: system/physmem.c
->>>    F: system/memory-internal.h
->>> +F: system/ram-block-attributes.c
->>>    F: scripts/coccinelle/memory-region-housekeeping.cocci
->>>      Memory devices
->>> diff --git a/include/system/ramblock.h b/include/system/ramblock.h
->>> index d8a116ba99..1bab9e2dac 100644
->>> --- a/include/system/ramblock.h
->>> +++ b/include/system/ramblock.h
->>> @@ -22,6 +22,10 @@
->>>    #include "exec/cpu-common.h"
->>>    #include "qemu/rcu.h"
->>>    #include "exec/ramlist.h"
->>> +#include "system/hostmem.h"
->>> +
->>> +#define TYPE_RAM_BLOCK_ATTRIBUTES "ram-block-attributes"
->>> +OBJECT_DECLARE_SIMPLE_TYPE(RamBlockAttributes, RAM_BLOCK_ATTRIBUTES)
->>>      struct RAMBlock {
->>>        struct rcu_head rcu;
->>> @@ -91,4 +95,21 @@ struct RAMBlock {
->>>        ram_addr_t postcopy_length;
->>>    };
->>>    +struct RamBlockAttributes {
->>> +    Object parent;
->>> +
->>> +    RAMBlock *ram_block;
->>> +
->>> +    /* 1-setting of the bitmap represents ram is populated (shared) */
->>> +    unsigned bitmap_size;
->>> +    unsigned long *bitmap;
->>> +
->>> +    QLIST_HEAD(, RamDiscardListener) rdl_list;
->>> +};
->>> +
->>> +RamBlockAttributes *ram_block_attributes_create(RAMBlock *ram_block);
->>> +void ram_block_attributes_destroy(RamBlockAttributes *attr);
->>> +int ram_block_attributes_state_change(RamBlockAttributes *attr,
->>> uint64_t offset,
->>> +                                      uint64_t size, bool to_discard);
->>> +
->>>    #endif
->>> diff --git a/system/meson.build b/system/meson.build
->>> index c2f0082766..2747dbde80 100644
->>> --- a/system/meson.build
->>> +++ b/system/meson.build
->>> @@ -17,6 +17,7 @@ libsystem_ss.add(files(
->>>      'dma-helpers.c',
->>>      'globals.c',
->>>      'ioport.c',
->>> +  'ram-block-attributes.c',
->>>      'memory_mapping.c',
->>>      'memory.c',
->>>      'physmem.c',
->>> diff --git a/system/ram-block-attributes.c b/system/ram-block-
->>> attributes.c
->>> new file mode 100644
->>> index 0000000000..514252413f
->>> --- /dev/null
->>> +++ b/system/ram-block-attributes.c
->>> @@ -0,0 +1,480 @@
->>> +/*
->>> + * QEMU ram block attributes
->>> + *
->>> + * Copyright Intel
->>> + *
->>> + * Author:
->>> + *      Chenyi Qiang <chenyi.qiang@intel.com>
->>> + *
->>> + * This work is licensed under the terms of the GNU GPL, version 2 or
->>> later.
->>> + * See the COPYING file in the top-level directory
->>> + *
->>> + */
->>> +
->>> +#include "qemu/osdep.h"
->>> +#include "qemu/error-report.h"
->>> +#include "system/ramblock.h"
->>> +#include "trace.h"
->>> +
->>> +OBJECT_DEFINE_SIMPLE_TYPE_WITH_INTERFACES(RamBlockAttributes,
->>> +                                          ram_block_attributes,
->>> +                                          RAM_BLOCK_ATTRIBUTES,
->>> +                                          OBJECT,
->>> +                                          { TYPE_RAM_DISCARD_MANAGER },
->>> +                                          { })
->>> +
->>> +static size_t
->>> +ram_block_attributes_get_block_size(const RamBlockAttributes *attr)
->>> +{
->>> +    /*
->>> +     * Because page conversion could be manipulated in the size of at
->>> least 4K
->>> +     * or 4K aligned, Use the host page size as the granularity to
->>> track the
->>> +     * memory attribute.
->>> +     */
->>> +    g_assert(attr && attr->ram_block);
->>> +    g_assert(attr->ram_block->page_size == qemu_real_host_page_size());
->>> +    return attr->ram_block->page_size;
->>> +}
->>> +
->>> +
->>> +static bool
->>> +ram_block_attributes_rdm_is_populated(const RamDiscardManager *rdm,
->>> +                                      const MemoryRegionSection
->>> *section)
->>> +{
->>> +    const RamBlockAttributes *attr = RAM_BLOCK_ATTRIBUTES(rdm);
->>> +    const size_t block_size = ram_block_attributes_get_block_size(attr);
->>> +    const uint64_t first_bit = section->offset_within_region /
->>> block_size;
->>> +    const uint64_t last_bit = first_bit + int128_get64(section-
->>>> size) / block_size - 1;
->>> +    unsigned long first_discarded_bit;
->>> +
->>> +    first_discarded_bit = find_next_zero_bit(attr->bitmap, last_bit + 1,
->>> +                                           first_bit);
->>> +    return first_discarded_bit > last_bit;
->>> +}
->>> +
->>> +typedef int (*ram_block_attributes_section_cb)(MemoryRegionSection *s,
->>> +                                               void *arg);
->>> +
->>> +static int
->>> +ram_block_attributes_notify_populate_cb(MemoryRegionSection *section,
->>> +                                        void *arg)
->>> +{
->>> +    RamDiscardListener *rdl = arg;
->>> +
->>> +    return rdl->notify_populate(rdl, section);
->>> +}
->>> +
->>> +static int
->>> +ram_block_attributes_notify_discard_cb(MemoryRegionSection *section,
->>> +                                       void *arg)
->>> +{
->>> +    RamDiscardListener *rdl = arg;
->>> +
->>> +    rdl->notify_discard(rdl, section);
->>> +    return 0;
->>> +}
->>> +
->>> +static int
->>> +ram_block_attributes_for_each_populated_section(const
->>> RamBlockAttributes *attr,
->>> +                                                MemoryRegionSection
->>> *section,
->>> +                                                void *arg,
->>> +
->>> ram_block_attributes_section_cb cb)
->>> +{
->>> +    unsigned long first_bit, last_bit;
->>> +    uint64_t offset, size;
->>> +    const size_t block_size = ram_block_attributes_get_block_size(attr);
->>> +    int ret = 0;
->>> +
->>> +    first_bit = section->offset_within_region / block_size;
->>> +    first_bit = find_next_bit(attr->bitmap, attr->bitmap_size,
->>> +                              first_bit);
->>> +
->>> +    while (first_bit < attr->bitmap_size) {
->>> +        MemoryRegionSection tmp = *section;
->>> +
->>> +        offset = first_bit * block_size;
->>> +        last_bit = find_next_zero_bit(attr->bitmap, attr->bitmap_size,
->>> +                                      first_bit + 1) - 1;
->>> +        size = (last_bit - first_bit + 1) * block_size;
->>> +
->>> +        if (!memory_region_section_intersect_range(&tmp, offset,
->>> size)) {
->>> +            break;
->>> +        }
->>> +
->>> +        ret = cb(&tmp, arg);
->>> +        if (ret) {
->>> +            error_report("%s: Failed to notify RAM discard listener:
->>> %s",
->>> +                         __func__, strerror(-ret));
->>> +            break;
->>> +        }
->>> +
->>> +        first_bit = find_next_bit(attr->bitmap, attr->bitmap_size,
->>> +                                  last_bit + 2);
->>> +    }
->>> +
->>> +    return ret;
->>> +}
->>> +
->>> +static int
->>> +ram_block_attributes_for_each_discarded_section(const
->>> RamBlockAttributes *attr,
->>> +                                                MemoryRegionSection
->>> *section,
->>> +                                                void *arg,
->>> +
->>> ram_block_attributes_section_cb cb)
->>> +{
->>> +    unsigned long first_bit, last_bit;
->>> +    uint64_t offset, size;
->>> +    const size_t block_size = ram_block_attributes_get_block_size(attr);
->>> +    int ret = 0;
->>> +
->>> +    first_bit = section->offset_within_region / block_size;
->>> +    first_bit = find_next_zero_bit(attr->bitmap, attr->bitmap_size,
->>> +                                   first_bit);
->>> +
->>> +    while (first_bit < attr->bitmap_size) {
->>> +        MemoryRegionSection tmp = *section;
->>> +
->>> +        offset = first_bit * block_size;
->>> +        last_bit = find_next_bit(attr->bitmap, attr->bitmap_size,
->>> +                                 first_bit + 1) - 1;
->>> +        size = (last_bit - first_bit + 1) * block_size;
->>> +
->>> +        if (!memory_region_section_intersect_range(&tmp, offset,
->>> size)) {
->>> +            break;
->>> +        }
->>> +
->>> +        ret = cb(&tmp, arg);
->>> +        if (ret) {
->>> +            error_report("%s: Failed to notify RAM discard listener:
->>> %s",
->>> +                         __func__, strerror(-ret));
->>> +            break;
->>> +        }
->>> +
->>> +        first_bit = find_next_zero_bit(attr->bitmap,
->>> +                                       attr->bitmap_size,
->>> +                                       last_bit + 2);
->>> +    }
->>> +
->>> +    return ret;
->>> +}
->>> +
->>> +static uint64_t
->>> +ram_block_attributes_rdm_get_min_granularity(const RamDiscardManager
->>> *rdm,
->>> +                                             const MemoryRegion *mr)
->>> +{
->>> +    const RamBlockAttributes *attr = RAM_BLOCK_ATTRIBUTES(rdm);
->>> +
->>> +    g_assert(mr == attr->ram_block->mr);
->>> +    return ram_block_attributes_get_block_size(attr);
->>> +}
->>> +
->>> +static void
->>> +ram_block_attributes_rdm_register_listener(RamDiscardManager *rdm,
->>> +                                           RamDiscardListener *rdl,
->>> +                                           MemoryRegionSection *section)
->>> +{
->>> +    RamBlockAttributes *attr = RAM_BLOCK_ATTRIBUTES(rdm);
->>> +    int ret;
->>> +
->>> +    g_assert(section->mr == attr->ram_block->mr);
->>> +    rdl->section = memory_region_section_new_copy(section);
->>> +
->>> +    QLIST_INSERT_HEAD(&attr->rdl_list, rdl, next);
->>> +
->>> +    ret = ram_block_attributes_for_each_populated_section(attr,
->>> section, rdl,
->>> +
->>> ram_block_attributes_notify_populate_cb);
->>> +    if (ret) {
->>> +        error_report("%s: Failed to register RAM discard listener: %s",
->>> +                     __func__, strerror(-ret));
->>> +        exit(1);
->>> +    }
->>> +}
->>> +
->>> +static void
->>> +ram_block_attributes_rdm_unregister_listener(RamDiscardManager *rdm,
->>> +                                             RamDiscardListener *rdl)
->>> +{
->>> +    RamBlockAttributes *attr = RAM_BLOCK_ATTRIBUTES(rdm);
->>> +    int ret;
->>> +
->>> +    g_assert(rdl->section);
->>> +    g_assert(rdl->section->mr == attr->ram_block->mr);
->>> +
->>> +    if (rdl->double_discard_supported) {
->>> +        rdl->notify_discard(rdl, rdl->section);
->>> +    } else {
->>> +        ret = ram_block_attributes_for_each_populated_section(attr,
->>> +                rdl->section, rdl,
->>> ram_block_attributes_notify_discard_cb);
->>> +        if (ret) {
->>> +            error_report("%s: Failed to unregister RAM discard
->>> listener: %s",
->>> +                         __func__, strerror(-ret));
->>> +            exit(1);
->>> +        }
->>> +    }
->>> +
->>> +    memory_region_section_free_copy(rdl->section);
->>> +    rdl->section = NULL;
->>> +    QLIST_REMOVE(rdl, next);
->>> +}
->>> +
->>> +typedef struct RamBlockAttributesReplayData {
->>> +    ReplayRamDiscardState fn;
->>> +    void *opaque;
->>> +} RamBlockAttributesReplayData;
->>> +
->>> +static int ram_block_attributes_rdm_replay_cb(MemoryRegionSection
->>> *section,
->>> +                                              void *arg)
->>> +{
->>> +    RamBlockAttributesReplayData *data = arg;
->>> +
->>> +    return data->fn(section, data->opaque);
->>> +}
->>> +
->>> +static int
->>> +ram_block_attributes_rdm_replay_populated(const RamDiscardManager *rdm,
->>> +                                          MemoryRegionSection *section,
->>> +                                          ReplayRamDiscardState
->>> replay_fn,
->>> +                                          void *opaque)
->>> +{
->>> +    RamBlockAttributes *attr = RAM_BLOCK_ATTRIBUTES(rdm);
->>> +    RamBlockAttributesReplayData data = { .fn = replay_fn, .opaque =
->>> opaque };
->>> +
->>> +    g_assert(section->mr == attr->ram_block->mr);
->>> +    return ram_block_attributes_for_each_populated_section(attr,
->>> section, &data,
->>> +
->>> ram_block_attributes_rdm_replay_cb);
->>> +}
->>> +
->>> +static int
->>> +ram_block_attributes_rdm_replay_discarded(const RamDiscardManager *rdm,
->>> +                                          MemoryRegionSection *section,
->>> +                                          ReplayRamDiscardState
->>> replay_fn,
->>> +                                          void *opaque)
->>> +{
->>> +    RamBlockAttributes *attr = RAM_BLOCK_ATTRIBUTES(rdm);
->>> +    RamBlockAttributesReplayData data = { .fn = replay_fn, .opaque =
->>> opaque };
->>> +
->>> +    g_assert(section->mr == attr->ram_block->mr);
->>> +    return ram_block_attributes_for_each_discarded_section(attr,
->>> section, &data,
->>> +
->>> ram_block_attributes_rdm_replay_cb);
->>> +}
->>> +
->>> +static bool
->>> +ram_block_attributes_is_valid_range(RamBlockAttributes *attr,
->>> uint64_t offset,
->>> +                                    uint64_t size)
->>> +{
->>> +    MemoryRegion *mr = attr->ram_block->mr;
->>> +
->>> +    g_assert(mr);
->>> +
->>> +    uint64_t region_size = memory_region_size(mr);
->>> +    const size_t block_size = ram_block_attributes_get_block_size(attr);
->>> +
->>> +    if (!QEMU_IS_ALIGNED(offset, block_size) ||
->>> +        !QEMU_IS_ALIGNED(size, block_size)) {
->>> +        return false;
->>> +    }
->>> +    if (offset + size <= offset) {
->>> +        return false;
->>> +    }
->>> +    if (offset + size > region_size) {
->>> +        return false;
->>> +    }
->>> +    return true;
->>> +}
->>> +
->>> +static void ram_block_attributes_notify_discard(RamBlockAttributes
->>> *attr,
->>> +                                                uint64_t offset,
->>> +                                                uint64_t size)
->>> +{
->>> +    RamDiscardListener *rdl;
->>> +
->>> +    QLIST_FOREACH(rdl, &attr->rdl_list, next) {
->>> +        MemoryRegionSection tmp = *rdl->section;
->>> +
->>> +        if (!memory_region_section_intersect_range(&tmp, offset,
->>> size)) {
->>> +            continue;
->>> +        }
->>> +        rdl->notify_discard(rdl, &tmp);
->>> +    }
->>> +}
->>> +
->>> +static int
->>> +ram_block_attributes_notify_populate(RamBlockAttributes *attr,
->>> +                                     uint64_t offset, uint64_t size)
->>> +{
->>> +    RamDiscardListener *rdl;
->>> +    int ret = 0;
->>> +
->>> +    QLIST_FOREACH(rdl, &attr->rdl_list, next) {
->>> +        MemoryRegionSection tmp = *rdl->section;
->>> +
->>> +        if (!memory_region_section_intersect_range(&tmp, offset,
->>> size)) {
->>> +            continue;
->>> +        }
->>> +        ret = rdl->notify_populate(rdl, &tmp);
->>> +        if (ret) {
->>> +            break;
->>> +        }
->>> +    }
->>> +
->>> +    return ret;
->>> +}
->>> +
->>> +static bool
->>> ram_block_attributes_is_range_populated(RamBlockAttributes *attr,
->>> +                                                    uint64_t offset,
->>> +                                                    uint64_t size)
->>> +{
->>> +    const size_t block_size = ram_block_attributes_get_block_size(attr);
->>> +    const unsigned long first_bit = offset / block_size;
->>> +    const unsigned long last_bit = first_bit + (size / block_size) - 1;
->>> +    unsigned long found_bit;
->>> +
->>> +    found_bit = find_next_zero_bit(attr->bitmap, last_bit + 1,
->>> +                                   first_bit);
->>> +    return found_bit > last_bit;
->>> +}
->>> +
->>> +static bool
->>> +ram_block_attributes_is_range_discarded(RamBlockAttributes *attr,
->>> +                                        uint64_t offset, uint64_t size)
->>> +{
->>> +    const size_t block_size = ram_block_attributes_get_block_size(attr);
->>> +    const unsigned long first_bit = offset / block_size;
->>> +    const unsigned long last_bit = first_bit + (size / block_size) - 1;
->>> +    unsigned long found_bit;
->>> +
->>> +    found_bit = find_next_bit(attr->bitmap, last_bit + 1, first_bit);
->>> +    return found_bit > last_bit;
->>> +}
->>> +
->>> +int ram_block_attributes_state_change(RamBlockAttributes *attr,
->>> +                                      uint64_t offset, uint64_t size,
->>> +                                      bool to_discard)
->>> +{
->>> +    const size_t block_size = ram_block_attributes_get_block_size(attr);
->>> +    const unsigned long first_bit = offset / block_size;
->>> +    const unsigned long nbits = size / block_size;
->>> +    bool is_range_discarded, is_range_populated;
->>> +    const uint64_t end = offset + size;
->>> +    unsigned long bit;
->>> +    uint64_t cur;
->>> +    int ret = 0;
->>> +
->>> +    if (!ram_block_attributes_is_valid_range(attr, offset, size)) {
->>> +        error_report("%s, invalid range: offset 0x%lx, size 0x%lx",
->>> +                     __func__, offset, size);
->>> +        return -EINVAL;
->>> +    }
->>> +
->>> +    is_range_discarded =
->>> ram_block_attributes_is_range_discarded(attr, offset,
->>> +                                                                 size);
->>> +    is_range_populated =
->>> ram_block_attributes_is_range_populated(attr, offset,
->>> +                                                                 size);
->>> +
->>> +    trace_ram_block_attributes_state_change(offset, size,
->>> +                                            is_range_discarded ?
->>> "discarded" :
->>> +                                            is_range_populated ?
->>> "populated" :
->>> +                                            "mixture",
->>> +                                            to_discard ? "discarded" :
->>> +                                            "populated");
->>> +    if (to_discard) {
->>> +        if (is_range_discarded) {
->>> +            /* Already private */
->>> +        } else if (is_range_populated) {
->>> +            /* Completely shared */
->>> +            bitmap_clear(attr->bitmap, first_bit, nbits);
->>> +            ram_block_attributes_notify_discard(attr, offset, size);
+On 2025/06/03 12:19, Jason Wang wrote:
+> On Fri, May 30, 2025 at 12:50 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 >>
->> In this patch series we are only maintaining the bitmap for Ram discard/
->> populate state not for regular guest_memfd private/shared?
+>> They are useful to implement VIRTIO_NET_F_RSS and
+>> VIRTIO_NET_F_HASH_REPORT.
+>>
+>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>> Tested-by: Lei Yang <leiyang@redhat.com>
+>> ---
+>>   include/linux/virtio_net.h | 188 +++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 188 insertions(+)
+>>
+>> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+>> index 02a9f4dc594d..426f33b4b824 100644
+>> --- a/include/linux/virtio_net.h
+>> +++ b/include/linux/virtio_net.h
+>> @@ -9,6 +9,194 @@
+>>   #include <uapi/linux/tcp.h>
+>>   #include <uapi/linux/virtio_net.h>
+>>
+>> +struct virtio_net_hash {
+>> +       u32 value;
+>> +       u16 report;
+>> +};
+>> +
+>> +struct virtio_net_toeplitz_state {
+>> +       u32 hash;
+>> +       const u32 *key;
+>> +};
+>> +
+>> +#define VIRTIO_NET_SUPPORTED_HASH_TYPES (VIRTIO_NET_RSS_HASH_TYPE_IPv4 | \
+>> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv4 | \
+>> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv4 | \
+>> +                                        VIRTIO_NET_RSS_HASH_TYPE_IPv6 | \
+>> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv6 | \
+>> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv6)
+>> +
+>> +#define VIRTIO_NET_RSS_MAX_KEY_SIZE 40
+>> +
+>> +static inline void virtio_net_toeplitz_convert_key(u32 *input, size_t len)
+>> +{
+>> +       while (len >= sizeof(*input)) {
+>> +               *input = be32_to_cpu((__force __be32)*input);
+>> +               input++;
+>> +               len -= sizeof(*input);
+>> +       }
+>> +}
+>> +
+>> +static inline void virtio_net_toeplitz_calc(struct virtio_net_toeplitz_state *state,
+>> +                                           const __be32 *input, size_t len)
+>> +{
+>> +       while (len >= sizeof(*input)) {
+>> +               for (u32 map = be32_to_cpu(*input); map; map &= (map - 1)) {
+>> +                       u32 i = ffs(map);
+>> +
+>> +                       state->hash ^= state->key[0] << (32 - i) |
+>> +                                      (u32)((u64)state->key[1] >> i);
+>> +               }
+>> +
+>> +               state->key++;
+>> +               input++;
+>> +               len -= sizeof(*input);
+>> +       }
+>> +}
+>> +
+>> +static inline u8 virtio_net_hash_key_length(u32 types)
+>> +{
+>> +       size_t len = 0;
+>> +
+>> +       if (types & VIRTIO_NET_HASH_REPORT_IPv4)
+>> +               len = max(len,
+>> +                         sizeof(struct flow_dissector_key_ipv4_addrs));
+>> +
+>> +       if (types &
+>> +           (VIRTIO_NET_HASH_REPORT_TCPv4 | VIRTIO_NET_HASH_REPORT_UDPv4))
+>> +               len = max(len,
+>> +                         sizeof(struct flow_dissector_key_ipv4_addrs) +
+>> +                         sizeof(struct flow_dissector_key_ports));
+>> +
+>> +       if (types & VIRTIO_NET_HASH_REPORT_IPv6)
+>> +               len = max(len,
+>> +                         sizeof(struct flow_dissector_key_ipv6_addrs));
+>> +
+>> +       if (types &
+>> +           (VIRTIO_NET_HASH_REPORT_TCPv6 | VIRTIO_NET_HASH_REPORT_UDPv6))
+>> +               len = max(len,
+>> +                         sizeof(struct flow_dissector_key_ipv6_addrs) +
+>> +                         sizeof(struct flow_dissector_key_ports));
+>> +
+>> +       return len + sizeof(u32);
+>> +}
+>> +
+>> +static inline u32 virtio_net_hash_report(u32 types,
+>> +                                        const struct flow_keys_basic *keys)
+>> +{
+>> +       switch (keys->basic.n_proto) {
+>> +       case cpu_to_be16(ETH_P_IP):
+>> +               if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT)) {
+>> +                       if (keys->basic.ip_proto == IPPROTO_TCP &&
+>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv4))
+>> +                               return VIRTIO_NET_HASH_REPORT_TCPv4;
+>> +
+>> +                       if (keys->basic.ip_proto == IPPROTO_UDP &&
+>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv4))
+>> +                               return VIRTIO_NET_HASH_REPORT_UDPv4;
+>> +               }
+>> +
+>> +               if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv4)
+>> +                       return VIRTIO_NET_HASH_REPORT_IPv4;
+>> +
+>> +               return VIRTIO_NET_HASH_REPORT_NONE;
+>> +
+>> +       case cpu_to_be16(ETH_P_IPV6):
+>> +               if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT)) {
+>> +                       if (keys->basic.ip_proto == IPPROTO_TCP &&
+>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv6))
+>> +                               return VIRTIO_NET_HASH_REPORT_TCPv6;
+>> +
+>> +                       if (keys->basic.ip_proto == IPPROTO_UDP &&
+>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv6))
+>> +                               return VIRTIO_NET_HASH_REPORT_UDPv6;
+>> +               }
+>> +
+>> +               if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv6)
+>> +                       return VIRTIO_NET_HASH_REPORT_IPv6;
+>> +
+>> +               return VIRTIO_NET_HASH_REPORT_NONE;
+>> +
+>> +       default:
+>> +               return VIRTIO_NET_HASH_REPORT_NONE;
+>> +       }
+>> +}
+>> +
+>> +static inline void virtio_net_hash_rss(const struct sk_buff *skb,
+>> +                                      u32 types, const u32 *key,
+>> +                                      struct virtio_net_hash *hash)
+>> +{
+>> +       struct virtio_net_toeplitz_state toeplitz_state = { .key = key };
+>> +       struct flow_keys flow;
+>> +       struct flow_keys_basic flow_basic;
+>> +       u16 report;
+>> +
+>> +       if (!skb_flow_dissect_flow_keys(skb, &flow, 0)) {
+>> +               hash->report = VIRTIO_NET_HASH_REPORT_NONE;
+>> +               return;
+>> +       }
+>> +
+>> +       flow_basic = (struct flow_keys_basic) {
+>> +               .control = flow.control,
+>> +               .basic = flow.basic
+>> +       };
+>> +
+>> +       report = virtio_net_hash_report(types, &flow_basic);
+>> +
+>> +       switch (report) {
+>> +       case VIRTIO_NET_HASH_REPORT_IPv4:
+>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>> +                                        (__be32 *)&flow.addrs.v4addrs,
+>> +                                        sizeof(flow.addrs.v4addrs));
+>> +               break;
+>> +
+>> +       case VIRTIO_NET_HASH_REPORT_TCPv4:
+>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>> +                                        (__be32 *)&flow.addrs.v4addrs,
+>> +                                        sizeof(flow.addrs.v4addrs));
+>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
+>> +                                        sizeof(flow.ports.ports));
+>> +               break;
+>> +
+>> +       case VIRTIO_NET_HASH_REPORT_UDPv4:
+>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>> +                                        (__be32 *)&flow.addrs.v4addrs,
+>> +                                        sizeof(flow.addrs.v4addrs));
+>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
+>> +                                        sizeof(flow.ports.ports));
+>> +               break;
+>> +
+>> +       case VIRTIO_NET_HASH_REPORT_IPv6:
+>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>> +                                        (__be32 *)&flow.addrs.v6addrs,
+>> +                                        sizeof(flow.addrs.v6addrs));
+>> +               break;
+>> +
+>> +       case VIRTIO_NET_HASH_REPORT_TCPv6:
+>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>> +                                        (__be32 *)&flow.addrs.v6addrs,
+>> +                                        sizeof(flow.addrs.v6addrs));
+>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
+>> +                                        sizeof(flow.ports.ports));
+>> +               break;
+>> +
+>> +       case VIRTIO_NET_HASH_REPORT_UDPv6:
+>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>> +                                        (__be32 *)&flow.addrs.v6addrs,
+>> +                                        sizeof(flow.addrs.v6addrs));
+>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
+>> +                                        sizeof(flow.ports.ports));
+>> +               break;
+>> +
+>> +       default:
+>> +               hash->report = VIRTIO_NET_HASH_REPORT_NONE;
+>> +               return;
 > 
-> As mentioned in changelog, "In the context of RamDiscardManager, shared
-> state is analogous to populated, and private state is signified as
-> discarded." To keep consistent with RamDiscardManager, I used the ram
-> "populated/discareded" in variable and function names.
+> So I still think we need a comment here to explain why this is not an
+> issue if the device can report HASH_XXX_EX. Or we need to add the
+> support, since this is the code from the driver side, I don't think we
+> need to worry about the device implementation issues.
+
+This is on the device side, and don't report HASH_TYPE_XXX_EX.
+
 > 
-> Of course, we can use private/shared if we rename the RamDiscardManager
-> to something like RamStateManager. But I haven't done it in this series.
-> Because I think we can also view the bitmap as the state of shared
-> memory (shared discard/shared populate) at present. The VFIO user only
-> manipulate the dma map/unmap of shared mapping. (We need to consider how
-> to extend the RDM framwork to manage the shared/private/discard states
-> in the future when need to distinguish private and discard states.)
+> For the issue of the number of options, does the spec forbid fallback
+> to VIRTIO_NET_HASH_REPORT_NONE? If not, we can do that.
 
-As function name 'ram_block_attributes_state_change' is generic. Maybe 
-for now metadata update for only two states (shared/private) is enough 
-as it also aligns with discard vs populate states?
+5.1.6.4.3.4 "IPv6 packets with extension header" says:
+ > If VIRTIO_NET_HASH_TYPE_TCP_EX is set and the packet has a TCPv6
+ > header, the hash is calculated over the following fields:
+ > - Home address from the home address option in the IPv6 destination
+ >   options header. If the extension header is not present, use the
+ >   Source IPv6 address.
+ > - IPv6 address that is contained in the Routing-Header-Type-2 from the
+ >   associated extension header. If the extension header is not present,
+ >   use the Destination IPv6 address.
+ > - Source TCP port
+ > - Destination TCP port
 
-As we would also need the shared vs private state metadata for other 
-COCO operations e.g live migration, so wondering having this metadata 
-already there would be helpful. This also will keep the legacy interface 
-(prior to in-place conversion) consistent (As memory-attributes handling 
-is generic operation anyway).
+Therefore, if VIRTIO_NET_HASH_TYPE_TCP_EX is set, the packet has a TCPv6 
+and an home address option in the IPv6 destination options header is 
+present, the hash is calculated over the home address. If the hash is 
+not calculated over the home address in such a case, the device is 
+contradicting with this section and violating the spec. The same goes 
+for the other HASH_TYPE_XXX_EX types and Routing-Header-Type-2.
 
-I saw you had it in previous versions(v3) but removed later?
-
-https://lore.kernel.org/qemu-devel/20250310081837.13123-6-chenyi.qiang@intel.com/ 
-
-
-Best regards,
-Pankaj
-
-
+Regards,
+Akihiko Odaki
 
