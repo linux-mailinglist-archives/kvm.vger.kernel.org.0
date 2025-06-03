@@ -1,251 +1,237 @@
-Return-Path: <kvm+bounces-48236-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48237-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEE9AACBE04
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 02:54:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABC4BACBE0A
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 03:05:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0006B3A4F9E
-	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 00:54:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F7F21712D6
+	for <lists+kvm@lfdr.de>; Tue,  3 Jun 2025 01:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7944612BF24;
-	Tue,  3 Jun 2025 00:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A983C7082A;
+	Tue,  3 Jun 2025 01:05:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FsQDUsaT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2uyqwEG2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC664372;
-	Tue,  3 Jun 2025 00:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E1FA937
+	for <kvm@vger.kernel.org>; Tue,  3 Jun 2025 01:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748912075; cv=none; b=gcCfKICEnkO4Z0Kpya4rp4/+OdPAbMc6r88uC/nUZnG6ySRHHdv2Ay3aL5X2Gi3rR9cfyieRoS8uBMDYgu8sjrzde2ugGZEovb9v+SE5X+bY7OmeeeRvcMHblO9KJ7mgU5CmdfKA4buou1Egp31dDPFcEX0GVA4IhK4pszKUx+I=
+	t=1748912747; cv=none; b=U6acEV+bQdTarbtfiwJwLCJIAyyvYoT2OyWO4c7YN3UdV0AVRXE5s+hhqpHwuEcqwU+LsXRkDHlocPN9jb2NRRyYokPEafZs8UhGL9DJfXo7nnG19Ng5/KbazGvUi0fpuLrJb9igxfOKMGoV3VFrGeJyAtFaqTyaC7ryN0SpnEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748912075; c=relaxed/simple;
-	bh=7+gygiq5R8sUDs1GPqrVEdunqF5B0n8zpsyKw46Jr7A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nFqJMLyICRphiHQC5F6RHL0Ow/VVCjMG8nATMdVa7BmSbukC79pRcEDxpnpoabJFPcLy9cFNtOvF4X1UsWL4xjjO/0nqCtUn8RQioxmEtS2KohwW4StPi+sweGEvjvrFi+5xZlNmp589bjNNmqd+T7/+F8XD4ZIj9CxKia9Rq7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FsQDUsaT; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1748912073; x=1780448073;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7+gygiq5R8sUDs1GPqrVEdunqF5B0n8zpsyKw46Jr7A=;
-  b=FsQDUsaT88c4dI22KkQt9r1j6YPTOoVvEgOhye2zNcgfR7vHJL6wc7vj
-   FhAjLNCfcO3n6svlrTGzkigEE3Vl67UIQ2+XhUVYplE6U4l7xXHxoKwDM
-   E5qNz8e77uJ77TH6Y8aslgFMtZw07EPqzgTJamBh6gwplasA4/vCfdv9D
-   Q0GKEkALIOZeocsKsj550Zr5/UPUpYBl07m/GPiPFl9A9xRU0eGHNoPt+
-   bOuUFfHeWXM4E4YHTZuFy3kickzvlNv1oL2JjnUi21tc9M5k+QIXPJQru
-   VQCjgziFoJqqP6E3TGf+AUqKyj7YrmS1HlX2RC11Om/F3gmB1Df2m9rrC
-   Q==;
-X-CSE-ConnectionGUID: avbSuSSMTkeoAftThURGoQ==
-X-CSE-MsgGUID: VxlXLfF7QTWafoOWiZOIcw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11451"; a="50631035"
-X-IronPort-AV: E=Sophos;i="6.16,204,1744095600"; 
-   d="scan'208";a="50631035"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2025 17:54:32 -0700
-X-CSE-ConnectionGUID: /oRaHirXSbWuZ1E+mJ7q3w==
-X-CSE-MsgGUID: 0kNnjuy9RZyvuctCxrOqng==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,204,1744095600"; 
-   d="scan'208";a="175649909"
-Received: from unknown (HELO [10.238.0.239]) ([10.238.0.239])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2025 17:54:10 -0700
-Message-ID: <923d57f1-55f1-411f-b659-9fe4fafa734a@linux.intel.com>
-Date: Tue, 3 Jun 2025 08:54:07 +0800
+	s=arc-20240116; t=1748912747; c=relaxed/simple;
+	bh=I8IwxSho+6YXNOBnfXRszVbVX0OXf2eoTv3BfCDsssc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=etccf7IPd7UMib0CHQpoQX/VOAENXo/UEUnRLooFWis7l3Lit7LTj8gYPbOpmwOLD7t80uOoEmIk2+rU0Z5MVuWjSGuhKw4RKALjX2IcdHZMOMMdrkkYhvzahYsQpqZhqTwKjINIueQ4ZEyk9LdftsR+CPtq7FqsVFFyDS4uMaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2uyqwEG2; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-235ca5eba8cso30315ad.0
+        for <kvm@vger.kernel.org>; Mon, 02 Jun 2025 18:05:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1748912745; x=1749517545; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3zA8i3SvMx3WliW0WUY0TLhornaCo9nNs4r4P4DLJp8=;
+        b=2uyqwEG2r8mJchNjr4laJd+L760xa0+3qP/yREnuVg2XyzVDoiDdkxycC05hUZ+FeD
+         MPOnw1ygnUL52mUnK9mPFfeIYMt0qf7Zm8iB5WRdrvg1BqW0xuvQhPaOn65eEWlqSK0U
+         7zzv6H1zgUOYKvnFHgV7ILox0wLIq7+epMjlaXvfZzt66WFujre/jJUwVbSzZxW4BwU0
+         37uHV/n6TdOTNmYp0nmcG45hUqK5WVKE2JP79XO8ToP/PeYyv9fSTy9G6TGJIQ9K8mlq
+         aWN5VQj7Og6ch9BiX6EVIdqbQRZbR+kYo56uCVbuv0drNcwN/sUHgMRx4xm38TUZZ1pQ
+         kDCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748912745; x=1749517545;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3zA8i3SvMx3WliW0WUY0TLhornaCo9nNs4r4P4DLJp8=;
+        b=dAchu0pNfoGKQJxrz1o+3YgjYf6sh3qqwvfPLtQac2CMT3Cd5l/TJMId+vCMoBzJHs
+         lR/XEekA+QyRxW0EUdbQ7UBBTUWooLmBr9uZopaHi+IRHIYbkpaMaTcHT7Hoq/1PXPDj
+         Veg22asD9b70ZZ69FpoxPQeHuI6H7uYpvpdE7Vu0K2dnqNh2/j9w9krLAKOrOE7qNIQL
+         23ctRv6QpBSs2THCJvH0z3x8NPgHnacVFWKBaPmbIEAy2JpF3ViEWry/4ndo5c+BQf9k
+         xwi8DxfvFGk4KRufMdZsvcp63MgppqvCz6kpabi0NLZSJUuWUNIOh1Vcdg7Uv7tc3nMo
+         U9pg==
+X-Forwarded-Encrypted: i=1; AJvYcCVFR0yFQR59zTdT9AaydPLpxZxmEHdWxlrrqkMFo0ZMv388ZOYZn55Od+hVyuWketCJCEg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmCbiQQQVhqVGwpQGpSYZwpracXSpLNgRnHP0Jxdi6UFqS1Cgq
+	CZcb/AbOe/ge5e5BjqcV7hiIrAXtvI580HNm+4eGs/7XmiDkPrQyO/yFI2kAblQC2+fPYItw2Do
+	9+67uJjEj1dKiu5mctBAtvc0MC+eQBFC93vbBi44Y
+X-Gm-Gg: ASbGnctObMuSAxFQCifFuc06AK5PLQ4NzvNEvXpaM96qQYqbp3ipqfLLOP/+t285pcO
+	z3LWBPex5e1YQLESf1XH4ECUUV7x3+8qNCUjEBadSybSVUfmPXNxgxX4HR01u7H2Iem26Yz+v7g
+	zJ1rc17hZVsMNS7aNNERzXeUoyqvgdEnZfKUj792+V83fQWYwQMIbHc7QY5tXaon9kYGSF/nQO/
+	A==
+X-Google-Smtp-Source: AGHT+IF8Jp/U2+xc+07146dXlpTbASvoteEnNJEFuewV+ucbySXUxWAeNEdlDnnAVbVMzXVfjIYziZx78rbAmXvzJ98=
+X-Received: by 2002:a17:902:ec90:b0:234:c2e7:a0e7 with SMTP id
+ d9443c01a7336-235c83a1796mr1458355ad.4.1748912745102; Mon, 02 Jun 2025
+ 18:05:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 04/51] KVM: guest_memfd: Introduce
- KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com,
- ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com,
- anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu,
- bfoster@redhat.com, brauner@kernel.org, catalin.marinas@arm.com,
- chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com,
- david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk,
- erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com,
- haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
- ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
- james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com,
- jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
- jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
- kent.overstreet@linux.dev, kirill.shutemov@intel.com,
- liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
- mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
- michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
- nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
- palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
- pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
- pgonda@google.com, pvorel@suse.cz, qperret@google.com,
- quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
- quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com,
- richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com,
- roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com, shuah@kernel.org,
- steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com,
- tabba@google.com, thomas.lendacky@amd.com, vannapurve@google.com,
- vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com,
- wei.w.wang@intel.com, will@kernel.org, willy@infradead.org,
- xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com,
- yuzenghui@huawei.com, zhiquan1.li@intel.com
-References: <cover.1747264138.git.ackerleytng@google.com>
- <d3832fd95a03aad562705872cbda5b3d248ca321.1747264138.git.ackerleytng@google.com>
- <b66c38ba-ca16-44c5-b498-7c8eb533d805@linux.intel.com>
- <diqzsekl6esc.fsf@ackerleytng-ctop.c.googlers.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <diqzsekl6esc.fsf@ackerleytng-ctop.c.googlers.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <diqzjz7azkmf.fsf@ackerleytng-ctop.c.googlers.com>
+ <diqz8qmsfs5u.fsf@ackerleytng-ctop.c.googlers.com> <aC1221wU6Mby3Lo3@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aC1221wU6Mby3Lo3@yzhao56-desk.sh.intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Mon, 2 Jun 2025 18:05:32 -0700
+X-Gm-Features: AX0GCFtnJZatjpGKUUpgyUTxkmXtEoTmNaLkinCtwBCaHY9YrfWtQsfvQRQkcEw
+Message-ID: <CAGtprH_chB5_D3ba=yqgg-ZGGE2ONpoMdB=4_O4S6k7jXcoHHw@mail.gmail.com>
+Subject: Re: [PATCH 3/5] KVM: gmem: Hold filemap invalidate lock while
+ allocating/preparing folios
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, michael.roth@amd.com, kvm@vger.kernel.org, 
+	linux-coco@lists.linux.dev, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	jroedel@suse.de, thomas.lendacky@amd.com, pbonzini@redhat.com, 
+	seanjc@google.com, vbabka@suse.cz, amit.shah@amd.com, 
+	pratikrajesh.sampat@amd.com, ashish.kalra@amd.com, liam.merwick@oracle.com, 
+	david@redhat.com, quic_eberman@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, May 20, 2025 at 11:49=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wr=
+ote:
+>
+> On Mon, May 19, 2025 at 10:04:45AM -0700, Ackerley Tng wrote:
+> > Ackerley Tng <ackerleytng@google.com> writes:
+> >
+> > > Yan Zhao <yan.y.zhao@intel.com> writes:
+> > >
+> > >> On Fri, Mar 14, 2025 at 05:20:21PM +0800, Yan Zhao wrote:
+> > >>> This patch would cause host deadlock when booting up a TDX VM even =
+if huge page
+> > >>> is turned off. I currently reverted this patch. No further debug ye=
+t.
+> > >> This is because kvm_gmem_populate() takes filemap invalidation lock,=
+ and for
+> > >> TDX, kvm_gmem_populate() further invokes kvm_gmem_get_pfn(), causing=
+ deadlock.
+> > >>
+> > >> kvm_gmem_populate
+> > >>   filemap_invalidate_lock
+> > >>   post_populate
+> > >>     tdx_gmem_post_populate
+> > >>       kvm_tdp_map_page
+> > >>        kvm_mmu_do_page_fault
+> > >>          kvm_tdp_page_fault
+> > >>       kvm_tdp_mmu_page_fault
+> > >>         kvm_mmu_faultin_pfn
+> > >>           __kvm_mmu_faultin_pfn
+> > >>             kvm_mmu_faultin_pfn_private
+> > >>               kvm_gmem_get_pfn
+> > >>                 filemap_invalidate_lock_shared
+> > >>
+> > >> Though, kvm_gmem_populate() is able to take shared filemap invalidat=
+ion lock,
+> > >> (then no deadlock), lockdep would still warn "Possible unsafe lockin=
+g scenario:
+> > >> ...DEADLOCK" due to the recursive shared lock, since commit e9181886=
+11f0
+> > >> ("locking: More accurate annotations for read_lock()").
+> > >>
+> > >
+> > > Thank you for investigating. This should be fixed in the next revisio=
+n.
+> > >
+> >
+> > This was not fixed in v2 [1], I misunderstood this locking issue.
+> >
+> > IIUC kvm_gmem_populate() gets a pfn via __kvm_gmem_get_pfn(), then call=
+s
+> > part of the KVM fault handler to map the pfn into secure EPTs, then
+> > calls the TDX module for the copy+encrypt.
+> >
+> > Regarding this lock, seems like KVM'S MMU lock is already held while TD=
+X
+> > does the copy+encrypt. Why must the filemap_invalidate_lock() also be
+> > held throughout the process?
+> If kvm_gmem_populate() does not hold filemap invalidate lock around all
+> requested pages, what value should it return after kvm_gmem_punch_hole() =
+zaps a
+> mapping it just successfully installed?
+>
+> TDX currently only holds the read kvm->mmu_lock in tdx_gmem_post_populate=
+() when
+> CONFIG_KVM_PROVE_MMU is enabled, due to both slots_lock and the filemap
+> invalidate lock being taken in kvm_gmem_populate().
 
-
-On 5/31/2025 4:10 AM, Ackerley Tng wrote:
-> Binbin Wu <binbin.wu@linux.intel.com> writes:
->
->> On 5/15/2025 7:41 AM, Ackerley Tng wrote:
->>
->> [...]
->>> +
->>> +static int kvm_gmem_convert_range(struct file *file, pgoff_t start,
->>> +				  size_t nr_pages, bool shared,
->>> +				  pgoff_t *error_index)
->>> +{
->>> +	struct conversion_work *work, *tmp, *rollback_stop_item;
->>> +	LIST_HEAD(work_list);
->>> +	struct inode *inode;
->>> +	enum shareability m;
->>> +	int ret;
->>> +
->>> +	inode = file_inode(file);
->>> +
->>> +	filemap_invalidate_lock(inode->i_mapping);
->>> +
->>> +	m = shared ? SHAREABILITY_ALL : SHAREABILITY_GUEST;
->>> +	ret = kvm_gmem_convert_compute_work(inode, start, nr_pages, m, &work_list);
->>> +	if (ret || list_empty(&work_list))
->>> +		goto out;
->>> +
->>> +	list_for_each_entry(work, &work_list, list)
->>> +		kvm_gmem_convert_invalidate_begin(inode, work);
->>> +
->>> +	list_for_each_entry(work, &work_list, list) {
->>> +		ret = kvm_gmem_convert_should_proceed(inode, work, shared,
->>> +						      error_index);
->> Since kvm_gmem_invalidate_begin() begins to handle shared memory,
->> kvm_gmem_convert_invalidate_begin() will zap the table.
->> The shared mapping could be zapped in kvm_gmem_convert_invalidate_begin() even
->> when kvm_gmem_convert_should_proceed() returns error.
->> The sequence is a bit confusing to me, at least in this patch so far.
->>
-> It is true that zapping of pages from the guest page table will happen
-> before we figure out whether conversion is allowed.
->
-> For a shared-to-private conversion, we will definitely unmap from the
-> host before checking if conversion is allowed, and there's no choice
-> there since conversion is allowed if there are no unexpected refcounts,
-> and the way to eliminate expected refcounts is to unmap from the host.
->
-> Since we're unmapping before checking if conversion is allowed, I
-> thought it would be fine to also zap from guest page tables before
-> checking if conversion is allowed.
->
-> Conversion is not meant to happen very regularly, and even if it is
-> unmapped or zapped, the next access will fault in the page anyway, so
-> there is a performance but not a functionality impact.
-Yes, it's OK for shared mapping.
+Does TDX need kvm_gmem_populate path just to ensure SEPT ranges are
+not zapped during tdh_mem_page_add and tdh_mr_extend operations? Would
+holding KVM MMU read lock during these operations sufficient to avoid
+having to do this back and forth between TDX and gmem layers?
 
 >
-> Hope that helps.
-
-It helped, thanks!
-
-> Is it still odd to zap before checking if conversion
-> should proceed?
+> Looks sev_gmem_post_populate() does not take kvm->mmu_lock either.
 >
->>> +		if (ret)
->>> +			goto invalidate_end;
->>> +	}
->>> +
->>> +	list_for_each_entry(work, &work_list, list) {
->>> +		rollback_stop_item = work;
->>> +		ret = kvm_gmem_shareability_apply(inode, work, m);
->>> +		if (ret)
->>> +			break;
->>> +	}
->>> +
->>> +	if (ret) {
->>> +		m = shared ? SHAREABILITY_GUEST : SHAREABILITY_ALL;
->>> +		list_for_each_entry(work, &work_list, list) {
->>> +			if (work == rollback_stop_item)
->>> +				break;
->>> +
->>> +			WARN_ON(kvm_gmem_shareability_apply(inode, work, m));
->>> +		}
->>> +	}
->>> +
->>> +invalidate_end:
->>> +	list_for_each_entry(work, &work_list, list)
->>> +		kvm_gmem_convert_invalidate_end(inode, work);
->>> +out:
->>> +	filemap_invalidate_unlock(inode->i_mapping);
->>> +
->>> +	list_for_each_entry_safe(work, tmp, &work_list, list) {
->>> +		list_del(&work->list);
->>> +		kfree(work);
->>> +	}
->>> +
->>> +	return ret;
->>> +}
->>> +
->> [...]
->>> @@ -186,15 +490,26 @@ static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
->>>    	unsigned long index;
->>>    
->>>    	xa_for_each_range(&gmem->bindings, index, slot, start, end - 1) {
->>> +		enum kvm_gfn_range_filter filter;
->>>    		pgoff_t pgoff = slot->gmem.pgoff;
->>>    
->>> +		filter = KVM_FILTER_PRIVATE;
->>> +		if (kvm_gmem_memslot_supports_shared(slot)) {
->>> +			/*
->>> +			 * Unmapping would also cause invalidation, but cannot
->>> +			 * rely on mmu_notifiers to do invalidation via
->>> +			 * unmapping, since memory may not be mapped to
->>> +			 * userspace.
->>> +			 */
->>> +			filter |= KVM_FILTER_SHARED;
->>> +		}
->>> +
->>>    		struct kvm_gfn_range gfn_range = {
->>>    			.start = slot->base_gfn + max(pgoff, start) - pgoff,
->>>    			.end = slot->base_gfn + min(pgoff + slot->npages, end) - pgoff,
->>>    			.slot = slot,
->>>    			.may_block = true,
->>> -			/* guest memfd is relevant to only private mappings. */
->>> -			.attr_filter = KVM_FILTER_PRIVATE,
->>> +			.attr_filter = filter,
->>>    		};
->>>    
->>>    		if (!found_memslot) {
->>> @@ -484,11 +799,49 @@ EXPORT_SYMBOL_GPL(kvm_gmem_memslot_supports_shared);
->>>    #define kvm_gmem_mmap NULL
->>>    #endif /* CONFIG_KVM_GMEM_SHARED_MEM */
->>>    
->> [...]
-
+> I think kvm_gmem_populate() needs to hold the filemap invalidate lock at =
+least
+> around each __kvm_gmem_get_pfn(), post_populate() and kvm_gmem_mark_prepa=
+red().
+>
+> > If we don't have to hold the filemap_invalidate_lock() throughout,
+> >
+> > 1. Would it be possible to call kvm_gmem_get_pfn() to get the pfn
+> >    instead of calling __kvm_gmem_get_pfn() and managing the lock in a
+> >    loop?
+> >
+> > 2. Would it be possible to trigger the kvm fault path from
+> >    kvm_gmem_populate() so that we don't rebuild the get_pfn+mapping
+> >    logic and reuse the entire faulting code? That way the
+> >    filemap_invalidate_lock() will only be held while getting a pfn.
+> The kvm fault path is invoked in TDX's post_populate() callback.
+> I don't find a good way to move it to kvm_gmem_populate().
+>
+> > [1] https://lore.kernel.org/all/cover.1747264138.git.ackerleytng@google=
+.com/T/
+> >
+> > >>> > @@ -819,12 +827,16 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struc=
+t kvm_memory_slot *slot,
+> > >>> >         pgoff_t index =3D kvm_gmem_get_index(slot, gfn);
+> > >>> >         struct file *file =3D kvm_gmem_get_file(slot);
+> > >>> >         int max_order_local;
+> > >>> > +       struct address_space *mapping;
+> > >>> >         struct folio *folio;
+> > >>> >         int r =3D 0;
+> > >>> >
+> > >>> >         if (!file)
+> > >>> >                 return -EFAULT;
+> > >>> >
+> > >>> > +       mapping =3D file->f_inode->i_mapping;
+> > >>> > +       filemap_invalidate_lock_shared(mapping);
+> > >>> > +
+> > >>> >         /*
+> > >>> >          * The caller might pass a NULL 'max_order', but internal=
+ly this
+> > >>> >          * function needs to be aware of any order limitations se=
+t by
+> > >>> > @@ -838,6 +850,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct =
+kvm_memory_slot *slot,
+> > >>> >         folio =3D __kvm_gmem_get_pfn(file, slot, index, pfn, &max=
+_order_local);
+> > >>> >         if (IS_ERR(folio)) {
+> > >>> >                 r =3D PTR_ERR(folio);
+> > >>> > +               filemap_invalidate_unlock_shared(mapping);
+> > >>> >                 goto out;
+> > >>> >         }
+> > >>> >
+> > >>> > @@ -845,6 +858,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct =
+kvm_memory_slot *slot,
+> > >>> >                 r =3D kvm_gmem_prepare_folio(kvm, file, slot, gfn=
+, folio, max_order_local);
+> > >>> >
+> > >>> >         folio_unlock(folio);
+> > >>> > +       filemap_invalidate_unlock_shared(mapping);
+> > >>> >
+> > >>> >         if (!r)
+> > >>> >                 *page =3D folio_file_page(folio, index);
+> > >>> > --
+> > >>> > 2.25.1
+> > >>> >
+> > >>> >
+> >
 
