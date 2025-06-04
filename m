@@ -1,228 +1,209 @@
-Return-Path: <kvm+bounces-48361-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48362-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A654ACD743
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 06:43:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBD5FACD75A
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 07:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E63C1895B27
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 04:43:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 846ED18982E0
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 05:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315E42620E5;
-	Wed,  4 Jun 2025 04:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F6C262FD7;
+	Wed,  4 Jun 2025 05:09:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="am5feQLD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OkYH/epC"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2089.outbound.protection.outlook.com [40.107.223.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AB117548;
-	Wed,  4 Jun 2025 04:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749012195; cv=fail; b=FjsRKeiJjfn6UhgVMtXNdoofq6YXMK0JgYPydlMrP5q5ArFoElUkiviNo6uzwV+j/AmgouMH+MCowd6hRFDMIfZY3EvYJSgJtJ94IrW1tu5pva03k3D6pUKBkhL62e6B5yYA088VNWxY3rU98q1f0RRvKsnHowtxw8/rFeoU240=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749012195; c=relaxed/simple;
-	bh=bK/MoGOjXCvBkHERg4LwslVhgU5MU4YJKDd8gomd4vk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=sRfRlriWLhfUxgOeogeKw9luLDHfepQIpnTM1uewr0g4nWcflV/RE6UNuiXD0JxnASzmp4nIZoPYTKTScMcn11Fld9lmGuakxWLDbhh8xQjGpmzjytN3OC+5iXt+7YhrfBp+Xls6KmLalSNS/Z1qzw+P/K3QQBSZMhtMjoPFX7s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=am5feQLD; arc=fail smtp.client-ip=40.107.223.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CcUM65RyCWxtueTestfBJUd22JAqpFcXOFLfwWG12KpEkZAD2ahIDAcSDZ5leBdfvaW8Jymphpli4hEXpLfnRC4lffX+ZwxLEMIz0nWV1asbNpvnSmSpvRKLogj7tQybvG1StlCkff7yb7xoXaKaO8ZAfqp7VC7xx6K9pmqWDk4bgj9+dSKggerEEIS7hMkFPW8vRCCGcwMTTjVSYkAUyzn3ppyARDgkVH06ytHd6vohvfSvhez7N3XRMFykHF9H8qO+DZPzIkoK+ajnOXJwz0eEf06X+wFP+YJ9ZKdbeYTzrTLiVqtlbnK27VYbnsGN5IG+w+0umKLgkV2sxrfCiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YAUf7hMHq3F+gwARGHNbOuXPM++2dXUD5MMfyI8PRfI=;
- b=HhrqrMkrTBPYKkrcDG8Q3os/k6vIKpZrXjk/3ZT43VLPQz3bVqXrzPHt02/awRxh6j+0X0LASURRyCxsxs4W9r2uJ3OXM9UECS7SqhcnxNknu5LTG8oJ3B/Lxh3qAncn6XBC6xAKcPYnvmJ4KfrXMjaLSnIYW6Uo/+1NXiF2DUIv3D3jlMFfGIeOd+qXaHid9NfgmlbXlwAwkJz/I9nLGUDaQWD7PnM7tBUKjJwOY4ip3QNVFsvbVavynE5ufuPE9WzbC/wkrakAVM6e08KGGCS6kBV1D+bWtl6jlw60/QNkG5CIGtFpoeHUYjWvWMYxYIz0LFZs3DXnjDKuq/wJYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YAUf7hMHq3F+gwARGHNbOuXPM++2dXUD5MMfyI8PRfI=;
- b=am5feQLDb4l6F8gJSNdvfdZCW74eII4q1EHU0xcSsOWACpo3v+6VdKME13exdvE1W3ZokpwfotVhx68vvF0B1uurRY2UG/wAPZEVm2SWUMw1O/0vyJ5Jq9c4Yg4kqCt5k3bPko118A98tSww8q8eYu7SMQ1MgecQXbt4wkmmI7I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- CH1PPF5A8F51299.namprd12.prod.outlook.com (2603:10b6:61f:fc00::60f) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.23; Wed, 4 Jun
- 2025 04:43:09 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb%3]) with mapi id 15.20.8769.037; Wed, 4 Jun 2025
- 04:43:08 +0000
-Message-ID: <c65b0cf9-a3cb-4e62-a40c-a69a14ea2255@amd.com>
-Date: Wed, 4 Jun 2025 10:13:02 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 28/28] KVM: selftests: Verify KVM disable interception
- (for userspace) on filter change
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Borislav Petkov <bp@alien8.de>, Xin Li <xin@zytor.com>,
- Chao Gao <chao.gao@intel.com>, "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-References: <20250529234013.3826933-1-seanjc@google.com>
- <20250529234013.3826933-29-seanjc@google.com>
- <83d8cd7d-0e7a-4d01-bff9-4c05815474ae@linux.intel.com>
-Content-Language: en-US
-From: Manali Shukla <manali.shukla@amd.com>
-In-Reply-To: <83d8cd7d-0e7a-4d01-bff9-4c05815474ae@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0036.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:22::11) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65265148830
+	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 05:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749013748; cv=none; b=tSyEX7jipt1AezA0h9wkAMBNi0Myt53BmKWVST7ATcT6+dIJm0pay477CKd4BATjPg0CXaJY+xp7/tNC/ynBacQ53wO96oTMhSm4t89HhZPekC5XfvWTHrTDXmxgYRCHs7qGxhu9vZu5K5uvvzMqFuef8DIt/z/0VsL7x3bumSY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749013748; c=relaxed/simple;
+	bh=bXYb3Fv57WgD098ckyuMFMuLy5/rfO9F4rSK52NJVXg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kOm+VMf3DeQey+lBrRgq9wQkPfWn3njg6oTufLDv/jRe8QSTL7+JqyezkgDTK4iZ2qAcjvCwGQ9HSTbvOymph8o9hjOZiVfZ5Np1BNq6VbtOyvVuc26UPKiPsRxb69yY9yUEIF5EF8h2b1tB/A4/VW3jB3BbhpzUq+IQiNjGO0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OkYH/epC; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-747dd44048cso2806789b3a.3
+        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 22:09:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749013745; x=1749618545; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NrHVO1JlSwACRF1JM0S/mT4335rXAQlO0tShDIgF4kg=;
+        b=OkYH/epChKHPPZlfS6IyUjrdvLMKQLJK/RyuLYoK96W2E+E3txL6+LRnjMAxfCWzgm
+         1jQXEesJgnVbkT7bZCw1PDculuyhLrRyXWl+Z6BzfMrzC3qXqe/gRtuc0qpSldk2JQqs
+         C+Etgb17ZSJtd0/NdlLwI7EpyErRcEjYnE1QkPs6R73saUIfNW7yXqPamz/xGwNP5z/i
+         H7zFEBudGw1w2lNVHotFtsr4B/G5yNFKnr3oHmHND2nZbiais0inya1MymC1AGKtfaOY
+         h7bIWzcnx7vnTkHOy0hnsJPeglPMHkwM6NrqnbuFEbdWzhgFM+1zePMcRwfK85T+N3wc
+         83Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749013745; x=1749618545;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NrHVO1JlSwACRF1JM0S/mT4335rXAQlO0tShDIgF4kg=;
+        b=qrT2heEMEEEwWkdx24WFeGrCQ87KqFTDodaE2HhHiYtcE+M1aiYgdKm6rFF7mK9TCL
+         u0PzkMA+d+PC1zcpOABoLasUE8Sff9dJxrumiG6q+Hz87SKfy4w02DavCTdQKpeIE121
+         40do01AJlWV5DjM914KW20HMaOKfq9ujjCOsrRCK6wAKqzxlJQKr7mmNt49ro+fT1Tzr
+         ktG5jkrjuUKDjBYC8bYSkYf7XFqOc9aMSzCV0fI6hqtL9HSVW0uyCij3PcVxPziVo3VL
+         n8F3USaedojDTfrK9t4ZNRdemeOEpva+nOtNP07WR+g0kHQUePAFon8mqMtOoUoNsLQk
+         IVQg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIIVLsAkOmslOR43sgphrmWysFzgsncCBJA8OueyWG+DpcSibR1tehnVo2c+8aFP6aU88=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3zx+AinPSQGDuupkk2hmniZieXnY9OTbh9JSOlL59bMvv00QP
+	4wxzlNPmy8139HSBAEz/GQN1khZjr7sbDrjdwzKz1n8mmo4u6TGB3WnCKB0r/Ml1BBO47RrCdaW
+	Fa9U7FLSgUJygvA==
+X-Google-Smtp-Source: AGHT+IEABKtEFFU5liXpEXSptkYGDpsy283hDhs01hedhxVkwnKMuF3CclWqZbgRuZmc+jHI4P4dRe8JCJ2ZzQ==
+X-Received: from pgbcq2.prod.google.com ([2002:a05:6a02:4082:b0:b2d:249f:ea07])
+ (user=jiaqiyan job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:1586:b0:1f5:8e94:2e81 with SMTP id adf61e73a8af0-21d22a6ca78mr2158789637.9.1749013744670;
+ Tue, 03 Jun 2025 22:09:04 -0700 (PDT)
+Date: Wed,  4 Jun 2025 05:08:55 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|CH1PPF5A8F51299:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5cbd26c7-e61b-4067-e946-08dda3224d8c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?L1pBb2h3QldrL0Fwa0UzUzk0REVFZjl6VkhiM1FCekRTTDJjVEYwQTUxdngy?=
- =?utf-8?B?dytQLzUxN1hqdGRkVm9XTmN5YmdELzh6UlpYRDRBSktka3p1bkkrWk9ycFRP?=
- =?utf-8?B?NUtjaFR4ZVU2TW5zNE80TEtpN2lGclVldVN1WFZDbWd5bHE2RVRmRjREbWhY?=
- =?utf-8?B?WnZGZG13aWZtMjRVSTdleGpuRXFnZnBNclRVTXUzQlZrR1dibmFmdThld0o3?=
- =?utf-8?B?SjZydS9PY3NTVGE2N1YzWXU4TkVYTHo2TWFZckNjZXg0SGpKcE9aclVMcU5K?=
- =?utf-8?B?NUlGcE9BdUhlblNUdWhhQzRjU3RLbDVmT3NCUTM0R2ZBR250emdNUEhWdWxM?=
- =?utf-8?B?QVhITFRJSHVVcEdEZlJkSGU3aTRXY29iYThtSFROYTlXTlZTNWk0QnRmQlZi?=
- =?utf-8?B?YmhaeDdKc09xKzZPaHJzSG9CdFY0dEdwL3p1TXR1UzNtSVBQc2tPK0JRT2Nj?=
- =?utf-8?B?bWZVVTVoTFc4UkIyZncrZTJEbEhjT0JqZkd4YUNVYXpObG11L3dob2tPOTdT?=
- =?utf-8?B?QnFjY09MZE04UTJQdzlhdmxvQ1lZN2I5eWVlMFpBajZ3UllYR2d6N3dqZXIr?=
- =?utf-8?B?bGtSRURwZEFBelAxc0lLbnJyQVRFaWVQZkpoTko4c2prY3pLUzluNUlUT0Qw?=
- =?utf-8?B?MVRBM2NUQUFMVHlhZ1hLc1YwdktXTUNjYVZXRzBtOVc1VW90WWhOTVlsbkxV?=
- =?utf-8?B?aUh4cExja0lER2ZoUFN3L2JjczNIaW9aUzhlVXM4M0RUNVhZalRxM3NrZS8y?=
- =?utf-8?B?RTJDdHAzbmd2L2VTY295emM4V28rSnhyeWlSWEx6dUJiMDNrK3B4empCaWI4?=
- =?utf-8?B?SGU1QWFzY1hTbnBlbzhkVTVULzJNUnlwdXhZTDFDR0lIMTkydjhjVFQzeVgx?=
- =?utf-8?B?RmI4cnlQZE1OSngwOEFkSmxib0JMc1NNdnJvZ0ZEZzBWUHllUkpaVTkxQ3ht?=
- =?utf-8?B?UERDREphZ01acUcrT3AveGc4eE1qS1JnZmxXbEUxUU9UcTRQL21Jb1lXRGNM?=
- =?utf-8?B?RGtRajJVVHdnQlE0R0NsdWZlMXBaYXA0TTBlMTJFR3VFRTA5QzFMNzQ2SXJ3?=
- =?utf-8?B?SUZ5MGhZMVJlT1A3MHh2a2NKdC90WGxyWWJiK2dXY2o5YVRLVHpVWjRTSWZT?=
- =?utf-8?B?Y1lPVXZFMkJFajNuQXFIUlV4b0dndW1ldzBkVS94ZXRCczdaQXpxVWhtZkw2?=
- =?utf-8?B?bHArUGlaTXNOV2l0ZGlldWZBbGhhcDFYVmNBb1Zvb2ViWC80VWI5K2FqSUs4?=
- =?utf-8?B?VFg3enRPWDRWZm5scUl0TGN2TERNR2NvU2ZRS2ZsUEd6SGo0OWttREZ4Zlo0?=
- =?utf-8?B?YkJjdmN5ZGhlL1RleVpjTzhBLzBjVlZESE1KSWt1MFlkRFRzbG1MUVc5bjJl?=
- =?utf-8?B?eUFSZ2NYSFh3RlZCQ3N6eFEvT2ZmVGMrZGZNMmVETC9EdjhjeGEzd2VDNGFQ?=
- =?utf-8?B?b3hlL1lMSDNsV2NFWXJybElPKzI0dXplU3MwZXlmY2FYVnp5SWpxWXd5UVQ3?=
- =?utf-8?B?L2ozSEZ5azNWbHhvUWpRT0ZYTUV5aVZObWtKVjNSVXR0MEpyZWZQTUZyTTJl?=
- =?utf-8?B?Q1NZQVJnZkNuYk15UlF4ZUI4SnRJSmFjTWJ5T0RET2J3ZlBSQVZZZmhKZW1D?=
- =?utf-8?B?ajlwU0ZsaG82eXhTN2ZEV3dvR3JWMWFvTDhXQTM3aWNUT3l0N014bStYOWYw?=
- =?utf-8?B?NC9qRWI3cmlRUUFFMXBWVUpWY1A1QTNKQ0F5eFJiNHhWV0RDR29WdDZBaHVV?=
- =?utf-8?B?amJQT0xBQ25oOCtrLytsd3FzTTVpdWhqcU56NklVOG5PV0pUVDc3dmt4dTVn?=
- =?utf-8?B?dGs5d0dZamxjWDFIMVBsT2E1Z1FKWTlQWTdJTWJOWDcycHl3c2NvalVEWTVR?=
- =?utf-8?B?YVNXd2F2NDVYUlEwL2cxTDFva3VEdE1peENxL3RRemRlYTU2NktCczhqWE9W?=
- =?utf-8?Q?45WKBDq9Fng=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YlprSGhkRi90T2I3WDllVGtLczl0aW5XNTNXWjhmK0N2RTRjQ0JaR0J0STV6?=
- =?utf-8?B?eHlZdXNMQnB4dXZMYXRKZlorSUc4c1VLWHdJa2xDQUxoekd5SEFTWkNGVXZ2?=
- =?utf-8?B?dWxMWjgyZnJlTDBGUDlKZ2NueWhKd0FwK0tiZC9oZ01BM3FVeXZ6bDg4anR4?=
- =?utf-8?B?V1RycWF0M1p6WUozLzA1V0JXQW43ZU5GR1FNWnAwOWRTVmhTOVhiZ1JEQjVy?=
- =?utf-8?B?MmlwNVRIZnRZbHdqOUQ5dlJNUmYzajdndmFtdVVreFVYU2p2VG5GTVFGdjNr?=
- =?utf-8?B?WjU5MWhJZWFmSDhFVzUzbWw1cElrQU1jYUZzalFKQVFYR0pUa1RDWVhYV1hM?=
- =?utf-8?B?SWFFYyt5THBOck55aFo4aXlvZkNhdDVqK1NCbEpwaUdxZ3Y5WEk3bWRkNmRx?=
- =?utf-8?B?YmVpQ3B6b1pjNEJFUkNzQUp5TW1VTVpWbHVBYllpK05rcndOMUMzdjViZEdi?=
- =?utf-8?B?YVV6RXU0c21xOStEQkdCNXhOTXRzT3M4a3NtZFJyMjBSeTNFZk1NdU5kaEJH?=
- =?utf-8?B?ZEsxdS82d2UwRmxUTzRoa3ZuWW5yQ3dPL0cyWXJRaFdqb3hHdEtNMXBmQmN6?=
- =?utf-8?B?YTRWSThrQUZrSUtRNXZ4YjVNUGxpNVZROWdTdEp2ZHNrQTgvdi9Fc2kwZXJ5?=
- =?utf-8?B?bjVFM3BiekNSWkZZRGtTV0h4OUhRWFNqSGdIRXBPY1JFM0hGRGFrS1kvWVEw?=
- =?utf-8?B?RkZFSmFvNFB5dXBtcUU3Q3k1V1VVVEJqTy9JaWdVVHlzR2R3Q08yS255Q1RS?=
- =?utf-8?B?N25ZcWI2ajUxRFVReXdJOXZ1a3A4a1VrcVFuYWlOa0xJUTcvN3JIczBwYXkr?=
- =?utf-8?B?bTJxaE9DTWtaRWFTN0hDZUoyMitKUFhHc3FtLyswZDVaTHk2NnV6QllxZzRX?=
- =?utf-8?B?Wnp0RldTbndHWVYrOXByMDhnQ2EzeW1XeWNUL1pnckw1V0RIMC90eWIrcEgz?=
- =?utf-8?B?eWF0YUpPZTkyYTg5cjNrSFFBU0x4cE5aeWN5REtBaTRNRkpvZnB4eWtsejUz?=
- =?utf-8?B?R2RCcE5nbXN4UUJJZXdoVXppREExSHdCb2Ntb1ZHNnlUdFlmR3FIRWJkckFw?=
- =?utf-8?B?akcveXVHYzBTVFRIblZBNWlrUk5ObXlFM0JaRXg1Qnd1bGVrTXg2TUhGOXpY?=
- =?utf-8?B?RTFKVVJSaGsybVBZLy84OG5xVUtBL2RZRnVqaktiNk9Sa3RpdTVIcDBCTWtP?=
- =?utf-8?B?ZFI0WWJ5Y0IrYlRKb0wzQ21NUWdIVEs4Q0xnbUdkVHNIYmlkZys2OUZiMGln?=
- =?utf-8?B?b2tMR2NCdWE2Q3lFdXBDMnVkL1lSTW9sQ1dQeGRjRTNUQnRNZi90R1Z0R1Fs?=
- =?utf-8?B?OGw2UitNZlEvMDJyV2lwTENUSGlNVVJMUFFLa3p3OHJkQkdSZTRDTVhDanVG?=
- =?utf-8?B?YWZrcS9yTEgwMGk1Z0dnTDN2R3VEbSsrY0FEMHp3K2VrQ1BUdmNuZjcyUWp3?=
- =?utf-8?B?a1pOb0pRS2NsUlBjY24yR1ErVWRWNDdLL1RibG1RNFh0aVlYM1F2OC9RQUJo?=
- =?utf-8?B?UUN2bXhsazNGaFhicmtYeklFNnZwelY5UnRvd0lPR3JLa1FobjlKdGRGejJK?=
- =?utf-8?B?MVNrbkdaSzh3NDFQVnJicEhMSEhOdjVQKzNxelJnR3hkZ092UEtJenBoaUJE?=
- =?utf-8?B?VThTdG9uc1RmTUVXdno4Rk5CQkVtTlhhZnpWWlliRlpteXo3S01mWkF0UFZi?=
- =?utf-8?B?Y1gxQnd0eCtaS2k2R1Yvc1ljN2tESmRrd0FzVGJ4VWJuSUhmSndrUzhURkRn?=
- =?utf-8?B?U01EMHZ2cTN4QWlyTU5CUjBLb2NDUkZXNU4rSm5qaHZxaWpGbWY2WG5KUE5C?=
- =?utf-8?B?QnVsTjRtckFMdUcxYUJZRkY3Vi9rZDRzWThRWlJkRXVIVE14cWVSTUt5aytM?=
- =?utf-8?B?QUFZTlQxY0VqaU1IQzFRMC92SVBvWDRUMCtDMmZENlFrZlgxMHZkemViWit4?=
- =?utf-8?B?TGpselk4b3Z0SFp6dUx6aHJUL2hwTU8wQk51KytsMjJ2b0F4MlFpaTRQUTB5?=
- =?utf-8?B?M0t4R2JaVUZRQnl6WEFiRnlSZkw1eFp2a1ozQzJxc01lZ29rb1QzZXZEbWJl?=
- =?utf-8?B?djNHcjBueUlrenpMTXRQRENKWExkaGp5R25abGthRXlWd3VzWkdYWUxtVVB3?=
- =?utf-8?Q?eJvNIeq5hG1oCvGmQN5ic9M+w?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5cbd26c7-e61b-4067-e946-08dda3224d8c
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2025 04:43:08.5705
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IcB76ozIN2B4rt+ZXVh12pEKnSgtvAom3DaxnR45RSpkV8oof8Ga4xhGKD6M4ia1jU4THds8ZcMTWH29kPbzoQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PPF5A8F51299
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.rc0.604.gd4ff7b7c86-goog
+Message-ID: <20250604050902.3944054-1-jiaqiyan@google.com>
+Subject: [PATCH v2 0/6] VMM can handle guest SEA via KVM_EXIT_ARM_SEA
+From: Jiaqi Yan <jiaqiyan@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev
+Cc: joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	shuah@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	duenwen@google.com, rananta@google.com, jthoughton@google.com, 
+	Jiaqi Yan <jiaqiyan@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 6/3/2025 11:17 AM, Mi, Dapeng wrote:
-> 
-> On 5/30/2025 7:40 AM, Sean Christopherson wrote:
->> Re-read MSR_{FS,GS}_BASE after restoring the "allow everything" userspace
->> MSR filter to verify that KVM stops forwarding exits to userspace.  This
->> can also be used in conjunction with manual verification (e.g. printk) to
->> ensure KVM is correctly updating the MSR bitmaps consumed by hardware.
->>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> ---
->>  tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->>
->> diff --git a/tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c
->> index 32b2794b78fe..8463a9956410 100644
->> --- a/tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c
->> +++ b/tools/testing/selftests/kvm/x86/userspace_msr_exit_test.c
->> @@ -343,6 +343,12 @@ static void guest_code_permission_bitmap(void)
->>  	data = test_rdmsr(MSR_GS_BASE);
->>  	GUEST_ASSERT(data == MSR_GS_BASE);
->>  
->> +	/* Access the MSRs again to ensure KVM has disabled interception.*/
->> +	data = test_rdmsr(MSR_FS_BASE);
->> +	GUEST_ASSERT(data != MSR_FS_BASE);
->> +	data = test_rdmsr(MSR_GS_BASE);
->> +	GUEST_ASSERT(data != MSR_GS_BASE);
->> +
->>  	GUEST_DONE();
->>  }
->>  
->> @@ -682,6 +688,8 @@ KVM_ONE_VCPU_TEST(user_msr, msr_permission_bitmap, guest_code_permission_bitmap)
->>  		    "Expected ucall state to be UCALL_SYNC.");
->>  	vm_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter_gs);
->>  	run_guest_then_process_rdmsr(vcpu, MSR_GS_BASE);
->> +
->> +	vm_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter_allow);
->>  	run_guest_then_process_ucall_done(vcpu);
->>  }
->>  
-> 
-> Test passes on Intel platform (Sapphire Rapids).
-> 
-> Tested-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> 
-> 
+Problem
+=======
 
-This test passes on AMD platform (Genoa)
+When host APEI is unable to claim synchronous external abort (SEA)
+during stage-2 guest abort, today KVM directly injects an async SError
+into the VCPU then resumes it. The injected SError usually results in
+unpleasant guest kernel panic.
 
-Tested-by: Manali Shukla <Manali.Shukla@amd.com>
+One of the major situation of guest SEA is when VCPU consumes recoverable
+uncorrected memory error (UER), which is not uncommon at all in modern
+datacenter servers with large amounts of physical memory. Although SError
+and guest panic is sufficient to stop the propagation of corrupted memory
+there is room to recover from an UER in a more graceful manner.
+
+Proposed Solution
+=================
+
+Alternatively KVM can replay the SEA to the faulting VCPU, via existing
+KVM_SET_VCPU_EVENTS API. If the memory poison consumption or the fault
+that cause SEA is not from guest kernel, the blast radius can be limited
+to the consuming or faulting guest userspace process, so the VM can keep
+running.
+
+In addition, instead of doing under the hood without involving userspace,
+there are benefits to redirect the SEA to VMM:
+
+- VM customers care about the disruptions caused by memory errors, and
+  VMM usually has the responsibility to start the process of notifying
+  the customers of memory error events in their VMs. For example some
+  cloud provider emits a critical log in their observability UI [1], and
+  provides playbook for customers on how to mitigate disruptions to
+  their workloads.
+
+- VMM can protect future memory error consumption by unmapping the poisoned
+  pages from stage-2 page table with KVM userfault, or by splitting the
+  memslot that contains the poisoned guest pages [2].
+
+- VMM can keep track of SEA events in the VM. When VMM thinks the status
+  on the host or the VM is bad enough, e.g. number of distinct SEAs
+  exceeds a threshold, it can restart the VM on another healthy host.
+
+- Behavior parity with x86 architecture. When machine check exception
+  (MCE) is caused by VCPU, kernel or KVM signals userspace SIGBUS to
+  let VMM either recover from the MCE, or terminate itself with VM.
+  The prior RFC proposes to implement SIGBUS on arm64 as well, but
+  Marc preferred VCPU exit over signal [3]. However, implementation
+  aside, returning SEA to VMM is on par with returning MCE to VMM.
+
+Once SEA is redirected to VMM, among other actions, VMM is encouraged
+to inject external aborts into the faulting VCPU, which is already
+supported by KVM on arm64. We notice injecting instruction abort is not
+fully supported by KVM_SET_VCPU_EVENTS. Complement it in the patchset.
+
+New UAPIs
+=========
+
+This patchset introduces following userspace-visiable changes to empower
+VMM to control what happens next for SEA on guest memory:
+
+- KVM_CAP_ARM_SEA_TO_USER. While taking SEA, if userspace has enabled
+  this new capability at VM creation, and the SEA is not caused by
+  memory allocated for stage-2 translation table, instead of injecting
+  SError, return KVM_EXIT_ARM_SEA to userspace.
+
+- KVM_EXIT_ARM_SEA. This is the VM exit reason VMM gets. The details
+  about the SEA is provided in arm_sea as much as possible, including
+  sanitized ESR value at EL2, if guest virtual and physical addresses
+  (GPA and GVA) are available and the values if available.
+
+- KVM_CAP_ARM_INJECT_EXT_IABT. VMM today can inject external data abort
+  to VCPU via KVM_SET_VCPU_EVENTS API. However, in case of instruction
+  abort, VMM cannot inject it via KVM_SET_VCPU_EVENTS.
+  KVM_CAP_ARM_INJECT_EXT_IABT is just a natural extend to
+  KVM_CAP_ARM_INJECT_EXT_DABT that tells VMM KVM_SET_VCPU_EVENTS now
+  supports external instruction abort.
+
+
+* From v1 [4]:
+  - Rebased on commit 4d62121ce9b5 ("KVM: arm64: vgic-debug: Avoid
+    dereferencing NULL ITE pointer").
+  - Sanitize ESR_EL2 before reporting it to userspace.
+  - Do not do KVM_EXIT_ARM_SEA when SEA is caused by memory allocated to
+    stage-2 translation table.
+
+[1] https://cloud.google.com/solutions/sap/docs/manage-host-errors
+[2] https://lore.kernel.org/kvm/20250109204929.1106563-1-jthoughton@google.com
+[3] https://lore.kernel.org/kvm/86pljbqqh0.wl-maz@kernel.org
+[4] https://lore.kernel.org/kvm/20250505161412.1926643-1-jiaqiyan@google.com
+
+Jiaqi Yan (5):
+  KVM: arm64: VM exit to userspace to handle SEA
+  KVM: arm64: Set FnV for VCPU when FAR_EL2 is invalid
+  KVM: selftests: Test for KVM_EXIT_ARM_SEA and KVM_CAP_ARM_SEA_TO_USER
+  KVM: selftests: Test for KVM_CAP_INJECT_EXT_IABT
+  Documentation: kvm: new uAPI for handling SEA
+
+Raghavendra Rao Ananta (1):
+  KVM: arm64: Allow userspace to inject external instruction aborts
+
+ Documentation/virt/kvm/api.rst                | 128 ++++++-
+ arch/arm64/include/asm/kvm_emulate.h          |  67 ++++
+ arch/arm64/include/asm/kvm_host.h             |   8 +
+ arch/arm64/include/asm/kvm_ras.h              |   2 +-
+ arch/arm64/include/uapi/asm/kvm.h             |   3 +-
+ arch/arm64/kvm/arm.c                          |   6 +
+ arch/arm64/kvm/guest.c                        |  13 +-
+ arch/arm64/kvm/inject_fault.c                 |   3 +
+ arch/arm64/kvm/mmu.c                          |  59 ++-
+ include/uapi/linux/kvm.h                      |  12 +
+ tools/arch/arm64/include/asm/esr.h            |   2 +
+ tools/arch/arm64/include/uapi/asm/kvm.h       |   3 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   2 +
+ .../testing/selftests/kvm/arm64/inject_iabt.c |  98 +++++
+ .../testing/selftests/kvm/arm64/sea_to_user.c | 340 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
+ 16 files changed, 718 insertions(+), 29 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/arm64/inject_iabt.c
+ create mode 100644 tools/testing/selftests/kvm/arm64/sea_to_user.c
+
+-- 
+2.49.0.1266.g31b7d2e469-goog
 
 
