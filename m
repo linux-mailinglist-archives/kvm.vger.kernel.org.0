@@ -1,94 +1,157 @@
-Return-Path: <kvm+bounces-48413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48414-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E560ACE0E5
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 17:03:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86A13ACE125
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 17:23:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22D8C173E5B
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 15:03:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF12B3A831D
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 15:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB8F29117B;
-	Wed,  4 Jun 2025 15:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9011940A1;
+	Wed,  4 Jun 2025 15:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WtLmQ0ld"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="FrpnwNfA"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332F91DFF8
-	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 15:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFDE32F56;
+	Wed,  4 Jun 2025 15:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749049409; cv=none; b=Jz3zjCt1R3+yIwmT0Qo03dP7wMAGH7n1XqFlbUh4M/xNJIXiy/QcS3Cm6kOTZ0rBPw7/+Jyi5ARMTqCD71KUuiEUeMN0vmmS/dJmqcTwJYvEwlaPWq6NXAOCch5joXS5oslyeQKlwB05CUNiIObbPY4l3K74gNRB9slIL1suVqs=
+	t=1749050596; cv=none; b=m3xUZzLG/KKbuUk0A3a4NIIiQFEDDd4KKB4PXMd19xKb3s8V0rIIGy+ESEfU+PiIReSfrgGdZ6Su5rkC5gogY5Ou+UnE8NvWbJzMRl3guy49AAzZU6ccIXa+grsO8Qtq/1DKwbtIQFlAbUO4oNYnb2UQsCTH+eiDrHGsMJNaC8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749049409; c=relaxed/simple;
-	bh=yZamUpIFal5nw66NRf7rgkuy6A1R9zrovwo6WC6VP8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q9Ed5L5UtHxkyQ/ghzgQk8XlWlyoBdglIGkUenBDF5Iy7XYOttsJGQBOd4bKGHge6ZImRAfdWV7dehVLm5GVGR22ICIkv+xbEouz/BoMWoeRrfo7xJEFpNSNDVnobBY0ztExN3aantJv9QsRhEN+6lp6gDwvIaxWs+qxpYoYSAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WtLmQ0ld; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749049407;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gawt0Z5YbMu+KACcLKD/dbA+4ZYdaJgyH6JYKKp/+E0=;
-	b=WtLmQ0ldvzIDb8fpycqtGYSMxzlV50HxUUP5mqEr0dBu7vZRR8BKfCNBIm56QF4oifKI45
-	uq0GguGRHEV+xLz67TFax35k6N5XJoxZnP8FKz9eEIoBlJt9i/irWHv9tuTyNrfhKtQiv4
-	x0w7JcBGMu4bXw7MnZkxbMDAy9uDrbM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-kSGeFmi3OQmUCPyMpc-ttA-1; Wed,
- 04 Jun 2025 11:03:23 -0400
-X-MC-Unique: kSGeFmi3OQmUCPyMpc-ttA-1
-X-Mimecast-MFC-AGG-ID: kSGeFmi3OQmUCPyMpc-ttA_1749049402
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3C885180047F;
-	Wed,  4 Jun 2025 15:03:22 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1BCB11955D82;
-	Wed,  4 Jun 2025 15:03:20 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alexander Potapenko <glider@google.com>,
-	James Houghton <jthoughton@google.com>,
-	Peter Gonda <pgonda@google.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 0/2] KVM: SVM: Fix a NULL VMSA deref with MOVE_ENC_CONTEXT
-Date: Wed,  4 Jun 2025 11:02:43 -0400
-Message-ID: <20250604150242.137563-2-pbonzini@redhat.com>
-In-Reply-To: <20250602224459.41505-1-seanjc@google.com>
-References: 
+	s=arc-20240116; t=1749050596; c=relaxed/simple;
+	bh=+lJcxQsjxseXi30qNXRxLB/y4R9OszpeMs9veRimWYg=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=S3EuJH0cFS3iFjGR8OuOEgU1Yva3OFQxtqD1qtiKSdwnDPWYCXuFKJ6JXuZKy82LRxvaAlYI6YckCIkndnOBRobAvYtkJgO1OpttS6MIjKD9yVFc3rQZ8RB6MsazK5GeWr4ie2kTklh1NV3HgHFNM7ikjax95iCc+lxWw51VPWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=FrpnwNfA; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 554FMJIY076049
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 4 Jun 2025 08:22:20 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 554FMJIY076049
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025052101; t=1749050541;
+	bh=NH2ltXtujZBqPJip4ancgNjYxroWFHWZyGX2p6NKPXc=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=FrpnwNfA/rikkJwUqKavu+F3qP9DFDYIsBfs2A92z5aoMEvnWjkzfYojMhs98JXRn
+	 coeiXRhu75/wIJvdUSGvYY6BwK9I1KouJwNAN9odFoW5uUFHS1MptMWQREGT0rX2f8
+	 f6g6Q+cKIDEwQr8ORjzbF/t8oAIDaV9I+VMh75ax64t/EXUvl1y9/YnGNaWTT3lOUj
+	 2eXE0GUVgUxeIwkM/KBWkZkei92+bxbvFBLoD15xH8xydiCwjaggxg4UL8HaEoDOUz
+	 9ubB5Ku2C0uIWI1JSB4rzj+lfkQJeNqgS7twCkpv4PK+6euX/WeKwfNCvb4OXiSErp
+	 ZqMFdhLraiD6A==
+Date: Wed, 04 Jun 2025 08:22:19 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Dave Hansen <dave.hansen@intel.com>, Sohil Mehta <sohil.mehta@intel.com>,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+CC: Xin Li <xin@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
+        Zhang Rui <rui.zhang@intel.com>, Steven Rostedt <rostedt@goodmis.org>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Jacob Pan <jacob.pan@linux.microsoft.com>,
+        Andi Kleen <ak@linux.intel.com>, Kai Huang <kai.huang@intel.com>,
+        Sandipan Das <sandipan.das@amd.com>, linux-perf-users@vger.kernel.org,
+        linux-edac@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 4/9] x86/nmi: Assign and register NMI-source vectors
+User-Agent: K-9 Mail for Android
+In-Reply-To: <e978e1fb-d88e-4789-bd33-367281dfa0ad@intel.com>
+References: <20250513203803.2636561-1-sohil.mehta@intel.com> <20250513203803.2636561-5-sohil.mehta@intel.com> <e978e1fb-d88e-4789-bd33-367281dfa0ad@intel.com>
+Message-ID: <31DB6043-44B2-43C1-B312-9B0DEC23C500@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Fix a NULL VMSA deref bug (which is probably the tip of the iceberg with
-> respect to what all can go wrong) due to a race between KVM_CREATE_VCPU and
-> KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM, where a non-SEV-ES vCPU can be created in
-> an SEV-ES VM.
+On June 3, 2025 10:23:42 AM PDT, Dave Hansen <dave=2Ehansen@intel=2Ecom> wr=
+ote:
+>On 5/13/25 13:37, Sohil Mehta wrote:
+>=2E=2E=2E
+>> + * Vector 2 is reserved for external NMIs related to the Local APIC -
+>> + * LINT1=2E Some third-party chipsets may send NMI messages with a
+>> + * hardcoded vector of 2, which would result in bit 2 being set in the
+>> + * NMI-source bitmap=2E
 >
-> Found by running syzkaller on a bare metal SEV-ES host.  C repro below.
+>This doesn't actually say what problem this causes=2E Is this better?
+>
+>	Third-party chipsets send NMI messages with a fixed vector of 2=2E
+>	Using vector 2 for some other purpose would cause confusion
+>	between those Local APIC messages and the other purpose=2E Avoid
+>	using it=2E
+>
+>> + * The vectors are in no particular priority order=2E Add new vector
+>> + * assignments sequentially in the list below=2E
+>> + */
+>> +#define NMIS_VECTOR_NONE	0	/* Reserved - Set for all unidentified sour=
+ces */
+>> +#define NMIS_VECTOR_TEST	1	/* NMI selftest */
+>> +#define NMIS_VECTOR_EXTERNAL	2	/* Reserved - Match External NMI vector=
+ 2 */
+>> +#define NMIS_VECTOR_SMP_STOP	3	/* Panic stop CPU */
+>> +#define NMIS_VECTOR_BT		4	/* CPU backtrace */
+>> +#define NMIS_VECTOR_KGDB	5	/* Kernel debugger */
+>> +#define NMIS_VECTOR_MCE		6	/* MCE injection */
+>> +#define NMIS_VECTOR_PMI		7	/* PerfMon counters */
+>> +
+>> +#define NMIS_VECTORS_MAX	16	/* Maximum number of NMI-source vectors */
+>
+>Would an enum fit here?
+>
+>You could also add a:
+>
+>	NMIS_VECTOR_COUNT
+>
+>as the last entry and then just:
+>
+>	BUILD_BUG_ON(NMIS_VECTOR_COUNT >=3D 16);
+>
+>somewhere=2E
+>
+>I guess it's a little annoying that you need NMIS_VECTOR_EXTERNAL to
+>have a fixed value of 2, but I do like way the enum makes the type explic=
+it=2E
+>
+>
+>>  static int __init register_nmi_cpu_backtrace_handler(void)
+>>  {
+>> -	register_nmi_handler(NMI_LOCAL, nmi_cpu_backtrace_handler, 0, "arch_b=
+t", 0);
+>> +	register_nmi_handler(NMI_LOCAL, nmi_cpu_backtrace_handler, 0, "arch_b=
+t", NMIS_VECTOR_BT);
+>>  	return 0;
+>>  }
+>
+>=2E=2E=2E Oh you replaced _most_ of the random 0's in this patch=2E That =
+helps
+>for sure=2E
 
-Queued, thanks (with EBUSY instead of EINVAL).
+The "may" here is important=2E *Most* sources are expected to send these a=
+s either a programmable MSI or as LINT1, which is programmable in the APIC,=
+ but since the vector hasn't mattered, we can't rule out that some hardware=
+ might have been built to send an MSI with a hard-coded vector, in which ca=
+se it is most likely they send either 0, 2 or 255=2E 0 and 255 will set the=
+ unknown source bit (0), but 2 is a legitimate source so it is defensive pr=
+ogramming to leave it fallow=2E
 
-Paolo
-
-
+Note also that although the current implementation is limited to 15 source=
+s (+ the unknown/lost source bit), the architecture allows for up to 63=2E
 
