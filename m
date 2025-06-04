@@ -1,275 +1,452 @@
-Return-Path: <kvm+bounces-48453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C46EEACE610
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 23:14:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B286FACE6D6
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 00:52:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E1527A3133
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 21:12:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CB953A9454
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 22:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6F821D018;
-	Wed,  4 Jun 2025 21:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817C71F3D54;
+	Wed,  4 Jun 2025 22:52:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="J48ZOjUs"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uCxKOeQQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2078.outbound.protection.outlook.com [40.107.96.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F3E111BF
-	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 21:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749071630; cv=none; b=SFb8qQPBLXN9LMrVsCb6RM9rZKadnSVQzpDZcoZsGmmAvgI57dbT0qYZ+ypzc1mQbgVnTe6mGdxipYtN28m6BsRATGO06IKFBS4fxGZFbSUU8tdT2mLrwdrZyBR3OFLtF/i2hyMwzc7j3DyO9VFVtotsAEhXvHgDvLVMr3WOiJ4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749071630; c=relaxed/simple;
-	bh=sWOJA7v7Ov16Q2lLF9qoja13SWcCS3EU3H+3Y0lbZz8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f5TFxJx84SbVaBz4+VHldWW/NisoCF5LWtiDf+NdT8e/5oxFJloUFLSIQvbisGToCofK0HgwfjlinZAgVP0RnIiA5+D7di1zU6evlaXzvTI9il8vkYslqeW/U5b+4yWAhX0RNFfh6fvlxiE1zgZ1AyC0XgdiKPbkbxLQBNjGYDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=J48ZOjUs; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e7d8eb10c06so299234276.0
-        for <kvm@vger.kernel.org>; Wed, 04 Jun 2025 14:13:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1749071627; x=1749676427; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RFILvALIoE88+amXnoIecD1FsclDUOa9FdnGICXctS8=;
-        b=J48ZOjUs0gsj1gujKn+DBWQnSptDO5yRJ16jdvn4uPtU3S3UZPfZwMAVcfgXv+j/f/
-         ALk6LRWyNA+CakxXcVJx2dlmjB41IXZmSRtRRrIdt3oXwPdBWmiebEfcywF6GyZLUdyp
-         D2SmzhGHh/zSxeHGLDqdnLJCzGsLrPDfXfrF76pF5ZoyWFO2htuTzJqDCILONYKufjdS
-         eXY28de8CiPJiT8ola9UaGLNnJqtpY5M9y/qWPutXkIVXpBjW7s3jNnyc5tAsOw5zY0b
-         DN7NeSufe1nUM2cXLlW8koJwvxtNMGRKTJj8hash7GuvLSPcsAYEvd+3a0c8ApvrZegy
-         E7lA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749071627; x=1749676427;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RFILvALIoE88+amXnoIecD1FsclDUOa9FdnGICXctS8=;
-        b=Kb5ujcqlRW3Fva+TyzXF/ZlhWsk8cQH1KTeU3PV/4vS5KM5xVcdQlNAyW4EYn9gnNM
-         MlHwwI+zoiY3Zgb559S/6W9zRkc+3xEAhjn43NWGUFQeRBAoX084nU1KCo2lQzOIfX62
-         2c99S/tP4OIqaqW7gCFCm3Pa2HOmHIISwotSAfV0g5UReaAGttsCPUAqskwKOAujnCEs
-         LB8hwEybwLzUpMjXYItdKZp5B4oPOgu2hwI2uELQJP2NgYQIhC/WuQBcN0ulAFZpmy1H
-         vW/yZeQTJKdWULISFJ/MmVmxKssZ2E2YQ1N8avvbjuUtoCmpgJHnQBG4zOwx4f+iLE5z
-         8Lpw==
-X-Forwarded-Encrypted: i=1; AJvYcCVHDzMCkpyLQLV9ov4pCJeL0wd7ia+JngcBcWqxv9AgK77ytVOWoJr8jMpEPoqhqn7VjGA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRNZZH/5tJjoZssj+eMDPNCKsNroRUfWpXiZXX5KYxaCMVqAFB
-	2nn1kMsQ4qKfIal47RA7hgQnwFQoqfswXWqafCPcN83Ekv/VTKs3phN8iopJ85weUCTjw+8HV//
-	ZgCSAz3K6m6J+ZM5UhEKnt/lsnthTGnpJ4X4ck3BE
-X-Gm-Gg: ASbGnctmIQyhOQHgJBiSgk/8KwTMOPYY1RtVGkBPbrJe50XK6y92c2aPjcAVmCWJEIG
-	6wnT06o75mSz5+m+/RGjxNUS2W+pNwOIUixsPzBQs7RVUzk0nc/v9c4xYGkSMV242oMi69XRPa1
-	pl5PNQOy5G5eawi7E4JTIZHCUeal+Ql0H0MB1H9n1MR88=
-X-Google-Smtp-Source: AGHT+IEzd3OT8v9HoRUzTyFAkQerHkAukxjDsy8RjmPaJTovfL79YwQkPcrXXduheAqGSFN+2XKJ11JKw/rxJLleniI=
-X-Received: by 2002:a05:6902:100c:b0:e7f:7352:bb31 with SMTP id
- 3f1490d57ef6-e8179d82fc0mr6218584276.39.1749071626412; Wed, 04 Jun 2025
- 14:13:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9EAC16F8E9;
+	Wed,  4 Jun 2025 22:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749077540; cv=fail; b=HDlXaidOMIBpJ/U1sS2xiYOZjVP0g36+nWaY1qJaE68XR6e2NlHTc4mfk+YB3oYr95/V0RNI0O1aVl7cnyq9/ReBGpCW7BF3CKXLlTu88nL6EPGkg3+gUgH8IO2pCrsWRBQAz/yJbguDbDcVFP8Y6jizDs6pCOirE00EEOrQbyc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749077540; c=relaxed/simple;
+	bh=HvWsJWNLe6T+yx1XCxO6wDyU5Y/mpz22IttelTVpgBU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JUs9MijqoQ+wtJY+2nFnUUebudQ3nKOVvXJkbTrlkgLdzfqT6me0zIokzU7lDlr1LtZ0cUW4it7rYyodp/yUBrj1EZpjAtj727OPuK939su4GkmBrqD88y6ykpG2eG04sI1UztSNZ1wBxckvmZL9pnyTU0LaVxT/4WLPaV1UXSU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uCxKOeQQ; arc=fail smtp.client-ip=40.107.96.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Qq+0op1durp9OqOQ+sY2b6oWH4DKxtpl7VzKtsl9Z3hkN4eh9orEfuscl7g0nORy+NddyIy1smZGJ88+8LmRHTAyChGePJ4bcLS7g0ns1U966KoMR47DlclJRSKh9dIot9GtdWoqwcP4QlujNiiKC7+q2VKe0KTnRq27wxLuzshagSA5scDNnBWWn9G8Qhk/bkh5Au6i+OQNzMevZPbjsQ0s/ZhV9hOt0lEQ1DMlKTsCeDUIu7wGFAVcXDOFqnJcRL4DAQR9iTlaTQEUJWYWKuMFV6sOpu+hO4QjiRn0u6OnohI79GQ7eq3d/+hf9TWwYUQvZ5vLF4ql8WWkqNBWtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jB1M24go/uFZITp6mgEy7JJ2wgqE7b73QuVKrc7puSU=;
+ b=YFsck2mZiwB4l6F+EaLeabDwF3/me3WMLIfeL0w3x1/8J+PY6bXdPS5wpV6BWrB3Be9c0DjldASDpvNvh5QRl6M50nL2BB8FFwCS83Mx4hBTcP63y+JCFiTMFsk5/ao3iocbgO0T+W4USQgu22bx69Lyp7SOo8CusZlBDTc42c8+NHUYR1/NBjaRUWoK3Pd92XcooENeZvKaTSxgYlmj8vKs3+8uHyKN9smsemVOAbNne+u0YW+JRliuoWijjWc+udk77xasNsETHypP0fWw7kaXwpfVatDIUL/U/xs4mEWD9MN8CeKFAGKimbOKmawb2dXQEbnB91+Oe2nzhfMGGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jB1M24go/uFZITp6mgEy7JJ2wgqE7b73QuVKrc7puSU=;
+ b=uCxKOeQQGI2yA/DSEFuUY1/UcTFbP3hUaY5VQxTzA/attWrqPT13FQG5hQk9yr2UjcfToIVtEzaWXBPkTnPC/g8c5WeTsW0u8iHlFrXcjfMM72+z1bRbp4/QNumcBLJsoFAfkQ1nVJ8EDVni/TLhj0UFKKbt8qbcOyPMUowPtVc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by BL1PR12MB5876.namprd12.prod.outlook.com (2603:10b6:208:398::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.34; Wed, 4 Jun
+ 2025 22:52:15 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::c170:6906:9ef3:ecef%5]) with mapi id 15.20.8792.034; Wed, 4 Jun 2025
+ 22:52:15 +0000
+Message-ID: <9af40b3b-91d5-4758-abee-070fbf3ff52f@amd.com>
+Date: Wed, 4 Jun 2025 17:52:12 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/5] crypto: ccp: Add support for SNP_FEATURE_INFO
+ command
+To: Tom Lendacky <thomas.lendacky@amd.com>, seanjc@google.com,
+ pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, hpa@zytor.com, herbert@gondor.apana.org.au
+Cc: x86@kernel.org, john.allen@amd.com, davem@davemloft.net,
+ michael.roth@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+References: <cover.1747696092.git.ashish.kalra@amd.com>
+ <61fb0b9d9cae7d02476b8973cc72c8f2fe7a499a.1747696092.git.ashish.kalra@amd.com>
+ <295dd551-522e-1990-4313-03543d22635e@amd.com>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <295dd551-522e-1990-4313-03543d22635e@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA1P222CA0172.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c3::28) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1748890962.git.ackerleytng@google.com> <c03fbe18c3ae90fb3fa7c71dc0ee164e6cc12103.1748890962.git.ackerleytng@google.com>
- <aD_8z4pd7JcFkAwX@kernel.org>
-In-Reply-To: <aD_8z4pd7JcFkAwX@kernel.org>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 4 Jun 2025 17:13:35 -0400
-X-Gm-Features: AX0GCFtyTLCLuG24EDdI8wKdQSrU3K8jUJ6RM6t9O342c2DffUvgfnmfuwj20Jg
-Message-ID: <CAHC9VhQczhrVx4YEGbXbAS8FLi0jaV1RB0kb8e4rPsUOXYLqtA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] fs: Provide function that allocates a secure
- anonymous inode
-To: Mike Rapoport <rppt@kernel.org>, Ackerley Tng <ackerleytng@google.com>
-Cc: linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
-	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
-	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
-	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
-	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
-	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
-	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
-	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, vannapurve@google.com, vbabka@suse.cz, 
-	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
-	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com, 
-	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
-	zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|BL1PR12MB5876:EE_
+X-MS-Office365-Filtering-Correlation-Id: 84ae81e8-8845-42ef-3a0b-08dda3ba7371
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RWl2cUVtU3hWNGdvall4cEQ2aG5vdkRBNFhQQUpxblhXOXNnbFNOdWR1VEI5?=
+ =?utf-8?B?UzVncytUUGd3UW5zUjFadVY3b3l2anlzamVZcUw3SWdteGdNUG5RWmRKc0pE?=
+ =?utf-8?B?RXVyc1ljWS9mdXFDdW4wQUQ1OENJU1dQeW1FbUF0NTk1akw1WU9IdEk5SUs4?=
+ =?utf-8?B?N3dSUGVQd1Bna3BnNDdwUmJrYVB2Q2pENHo3QkdiQUljdzdlYTlFYlU3b3NB?=
+ =?utf-8?B?WDVaMlpTSXB3UFJFR3lSVU5ZU3ZvbE1aNHA5NWxyZUJoNEtuUXl4eURIeEJP?=
+ =?utf-8?B?bUlJUU1zaksrT1U4RW1LWGlCVEVDd3ZZNm11MVhDelFnTFh6VDFxNGFBYkY2?=
+ =?utf-8?B?ZFhXR1RWRy9weWt4L2FSa1hzY29uQnVXd1FkeGViWGtmVmhBWHQ1aWVtenlC?=
+ =?utf-8?B?aEdjbTZWUGM1Qkh1eFZldStRM1BXYm9XNVBDV3ovSVdJOUlLOSs4R3lsQ1Ay?=
+ =?utf-8?B?QTl2L3VKUXhsS1lWV3JhTVZmQzR3YmVESTRpbWVtL0lmZm8yQk5zWElaSWZP?=
+ =?utf-8?B?cm5aNXdiZGpwK3BSRnREV3IwNm1ZeTVhVlBDMXdxQmdCY2tpT1ZpTmpRNm42?=
+ =?utf-8?B?ampQNVNiQXpMamFkMVVqK1AwamV1dnUvRkNpMnhrSTJFQjV5NHBmUFBpS0Zx?=
+ =?utf-8?B?UEkyRVVWeTNqSklWcXRJVHkrLzRvYnpJZExRT3BLZ1pORjF1TU53My9VcHJJ?=
+ =?utf-8?B?T1N3SlVoZjdGSDVHbmZ6bXVJZFFhVVkxTUtOUldMQkRZekJMY0o3SG0xZFZG?=
+ =?utf-8?B?bUNQbCs4Z0xhTy9XSlprUnRBMzdWMXJmejVlMTV6YzliS3JIcXF1YTVEbXNN?=
+ =?utf-8?B?NnhYVHpZWGRzZHd1cHpJYjArdTlublRWeFN4Rys1VjlVdGpQblRBV3NrdXB3?=
+ =?utf-8?B?bXh0NVB3NDFqN1BId1pJenQ2L0xCWFJaYkZuTFhPOUxuM2ZvTlVNVkduUzl4?=
+ =?utf-8?B?NmwyTER5bUpHMktXcURNdTcyMGlYTE9TMklzU1hLZ3RhL0h1MFNPR0VhaERK?=
+ =?utf-8?B?ZnRtb0w4NE5mdjNJQS9hd0xFbHF5RGFvdjJzTGZUdUlyd0FCK1M4Ym4vUGxK?=
+ =?utf-8?B?L2lQVy84WVdqbGFvWEcwMnp3eFVhUUtyVGp4V20rZHlpWjRoMzJQSDRjUzFT?=
+ =?utf-8?B?blcwNEdJU285dlpLZVVpeWNHVlVCa3plbW1QNDNwb3BRNmdFVldCRjh1czFG?=
+ =?utf-8?B?OTFoVkxWS1NBdWd3NC90ZkN5T3FwejFVTGFlbTV2RWZ5ZWFSdVpXUnV6L3VH?=
+ =?utf-8?B?L3dqc3lGbG5WcTNCUGhmU0J4UzVEZ2N0OFVpRUlrcmlQWDVXdGQ1ZXIvVTNI?=
+ =?utf-8?B?L2pNcUp6cU0xZDl6ZHZscnBkODFjaWJ4Si9abVkycnhlRnFBU3JZTWp6SFRx?=
+ =?utf-8?B?c25Sd0NsRWs2a08xWDhJNXFoK1dzZDRkQWRaZ3llVkJWa1NXYys0Yk1odDN4?=
+ =?utf-8?B?MUVOUVMwTE5nb29kYlRyVng5MGs2d2JXb1lGSVdDZ0NWL0d4ZUxnM3RMdDNM?=
+ =?utf-8?B?OUxIZGpKVW9VYXNVN1BLSXBXeWRPQ1l3YWdCNFpxZUVFeDU4cWhua2xNTzVl?=
+ =?utf-8?B?YzlPdnRtcTlEYTgzRnFjZXdqbko5K281U2x2OWFnYzh3RWw0MHFiYnRqN0c5?=
+ =?utf-8?B?dnVQMGYycXpaaG9zNEFPeFA1ZXc5N2I2QkxSYmlyZ015ZEgramVONitKc1ZU?=
+ =?utf-8?B?MGtDQ2JrMW1TSW1IZW9KbFB5TFRCQW5FLzdMYWxEQ1dCSjBFa005akhiK0Vr?=
+ =?utf-8?B?a1kzVlhQYWtuN1hVZ0NiUFR4NVYzZFduMDJsUlRRR21kcXRBblB1NDkxN2pF?=
+ =?utf-8?B?RS9ZblU4Z1hjL2d4UGRRSEZQOGJSVUczMTA4K01DcEh2Slc0dHNMSUt0RUUv?=
+ =?utf-8?B?VVZLeXZUU2FFTXVxN2U0eGFqNjRIdEphQzB6RURnWjJMWENkRmE4MVdHMzAv?=
+ =?utf-8?Q?Zt6c7KXu0Yw=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?amg2cVo2UGZhK3J4bnlOSFFIbzJ2ZTA1K0I3TXVTeWhKSElWVW9IbGl3bERQ?=
+ =?utf-8?B?UC9DTHNKQitlcFVlamtiRnpTdTJBa1VhazhGanE1ZkltNlFRcDZ4OHJmblNp?=
+ =?utf-8?B?ZFM1UzlMajhEZGVuaGtkQlVlc1dmZ0V0ejd3KytOUk05MHN1ekJFMkxJY05i?=
+ =?utf-8?B?WkI5bUltK0M4b3p5bmwwenMvdDd1TllIdVpYZE5lNXVPV05NSDNFL0JYOWUz?=
+ =?utf-8?B?aUNOaFcyUjNtYnRTaW5kMmNiTjRJTVZ1dGxJYzhJKzB1azQrcERVS2VqaDZB?=
+ =?utf-8?B?VERTazdjSjMxOVhtVm9mY055YmFUMjYvZ0V2M3pmV3grNFJiTWhOWTVMRVZz?=
+ =?utf-8?B?ZTN6RW40UURzYjJURDY3NmZGTHJ6aHUyalZpbzBad0NzYWkxdHJpT09ERXBm?=
+ =?utf-8?B?VTNnSlVrejRXVGNUZnM2VDY1aXBRNXBzMEZGL3RQQi81ZGpscXVFVWxtbklz?=
+ =?utf-8?B?NGt1cFEyUUJ5VEdrYkpjV0R6SXRlRmUreUNVbW1GU2FiVkVwYWZzaythcVJx?=
+ =?utf-8?B?L3dTM3JKM1NJRVhLQithY1JCMWwvRFM3TjVMVmxrbTkvK3RFcUQ4Y0hZMjZ4?=
+ =?utf-8?B?SzVhSTJ0ekIwRXFGRHh1aTEwNW9jM3lmbkI0T1F0alYyck55bE9TbXQ0eVU1?=
+ =?utf-8?B?YWV2QnNtd2haMGx4ZE1wMndMUFJ6S0srWndva2JJUnJQZUorRHFuM3FCOUlz?=
+ =?utf-8?B?azZveW1UVjF5UXMxVXFDd2RlTDdURWl6d2F6ZWZYWnFPMmZQSnlCOXRtWFpu?=
+ =?utf-8?B?M1NYaXFOdSsvNk1INlZYZzdEZlprMUpZQXY0clhBb2tuVkRrS3NubjlGTWc3?=
+ =?utf-8?B?d21raGRZNXI1QzJQL0FKSTZVSk1pQ1l3WGdCMC9CU3M0V21sUXhOeUZKRjls?=
+ =?utf-8?B?aFEwL3RNTG5td2ZmYkJkNllGQUdibEtjT1VlOFdnQUhtTnFqZXNUUEVVQnlw?=
+ =?utf-8?B?TzVGQUF6TjlNV0krdlA1eTRXZjlZeEwxK1N5UGNHRGhBczJ1SCtEbnhyYklw?=
+ =?utf-8?B?LzBsNmpEK090Q3ZpTWFNMzVUSUU3ZWJBVGEvVktzRnh6YWRhbVhaVGpGMUNE?=
+ =?utf-8?B?OVRyT3RrK2JaTnkrWWIvRUVVMGFyUjkyN2R5b1l6L3NyKzVzOW4rTmRvdDNv?=
+ =?utf-8?B?dXJyWnNrNENGNXNFY05DNG9Gdkt3OEdpTG5kTUVCRzZVdW92eEREbnA4MDVz?=
+ =?utf-8?B?dmxkT2trMkp3STZxQy94Wjk3YzFzR1dUQkVmS2tUcFJRVURtTWduYlBpN2lV?=
+ =?utf-8?B?T0JEdC9KcFJkcGsxdHE5M2pKeStnZjEwRmxNenBOUHZOYjZHMWZEbVl3cXN3?=
+ =?utf-8?B?UloxV3lyRUZ5MFVUMlFUa0RzMGN1c1FFVUwyYVQrYmNueUFnSXk1Q3VkMjZ1?=
+ =?utf-8?B?RWgwcEV4aWk0OURPL2w1VDNCQUpkOTFweThOejMrc2ljTGc2OE80RnZtc0ds?=
+ =?utf-8?B?a3BYdlE5ZGRZQ3BvOU5yUXROUkRXVkZKcjNFVUtuYzB0NnNlWUhMUm1hRHd0?=
+ =?utf-8?B?WnBGQkVmN2ZwR0lOK0EvSkxwTC9GOHVKWHhlZXNRVUQrdGdGeVZuZUVUdnRq?=
+ =?utf-8?B?TnZDeHJDQll4cnQ4bXJHb1h6TU9MWkowKzFNOVFCNEllNWd2MTY5RFhSTXZC?=
+ =?utf-8?B?YjZKVWdsMnEvNlErUXE2OWRMdTVWUWF6MmFrN00vZDZVL2RIYXdjWTJCKzY4?=
+ =?utf-8?B?Ym0wekFYOHNkRUpBTkwwQU81SThuV1FaQVVidE8yOEpINjhwMDlwYU05bEtI?=
+ =?utf-8?B?ditDTVVaNmtxS3NGWE5yUmU0ZVpPVTZ6VGhXT3Zzdmd4V2dKK05BaVRxZ1Ra?=
+ =?utf-8?B?Z1pFTWZTdGMxMTNKbnBObW1PRVp2TTIvbThpU1JVdE5ISmhyaG8zbDhnYi9q?=
+ =?utf-8?B?NUc2TVorcEJ2aEZVdVdVOXRRSXpUSzMvWERmbjdzQXkyT2dJbzVhWkpzdmpP?=
+ =?utf-8?B?ZmdqMlNjaWRQZWxkYmNlRktNRHhyaSsvcTZoWFVOUVNldFZTb3hvMVdYVFh0?=
+ =?utf-8?B?TEdiYkYyRTZHV2o4Ry9PYVMzMHBYaVdvVmYxZHRaOXg4L2N4ZlJpOTNrRWRN?=
+ =?utf-8?B?UDdFZ2NtVDFmTjJYbWZoVURGWFlFZ3lLSnptS3dWVXp4N1h5bmwwejQ0aS9R?=
+ =?utf-8?Q?ZNBTAXikFUyQW+dm24DXZ0ipW?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 84ae81e8-8845-42ef-3a0b-08dda3ba7371
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2025 22:52:15.4455
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QCAqXXjvbTgWNaFr4bVmFttQtLr9dVNLf8XT5Kj+G7HgWM8INr7E4UYjM+pZqGAy4iERbKw5+uVBgVRdT6X4Hw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5876
 
-On Wed, Jun 4, 2025 at 3:59=E2=80=AFAM Mike Rapoport <rppt@kernel.org> wrot=
-e:
+Hello Tom,
+
+On 6/3/2025 10:21 AM, Tom Lendacky wrote:
+> On 5/19/25 18:56, Ashish Kalra wrote:
+>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>
+>> The FEATURE_INFO command provides host and guests a programmatic means
+> 
+> s/provides host and guests/provides hypervisors/
+> 
+>> to learn about the supported features of the currently loaded firmware.
+>> FEATURE_INFO command leverages the same mechanism as the CPUID instruction.
+>> Instead of using the CPUID instruction to retrieve Fn8000_0024,
+>> software can use FEATURE_INFO.
+>>
+>> The hypervisor may provide Fn8000_0024 values to the guest via the CPUID
+>> page in SNP_LAUNCH_UPDATE. As with all CPUID output recorded in that page,
+>> the hypervisor can filter Fn8000_0024. The firmware will examine
+>> Fn8000_0024 and apply its CPUID policy.
+> 
+> This paragraph has nothing to do with this patch, please remove it.
+
+Ok.
+
+> 
+>>
+>> Switch to using SNP platform status instead of SEV platform status if
+>> SNP is enabled and cache SNP platform status and feature information
+>> from CPUID 0x8000_0024, sub-function 0, in the sev_device structure.
+> 
+> Since the SEV platform status and SNP platform status differ, I think this
+> patch should be split into two separate patches.
+> 
+> The first first patch would cache the current SEV platform status return
+> structure and eliminate the separate state field (as state is unique
+> between SEV and SNP).
+
+Eliminate the state field ? 
+
+But isn't the sev_device->state field used also as driver's internal state information
+and not directly mapped to platform status, except the initial state is the platform state 
+on module load, so why to remove the field altogether ?
+
+> The api_major/api_minor/build can probably remain,
+> since the same value *should* be reported for both SNP and SEV platform
+> status command.
+> 
+
+Ok. 
+
+> The second patch would cache the SNP platform status and feature info
+> data, with this status data being used for the api_major/api_minor/build.
+> 
+
+Ok. 
+
+>>
+>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>> ---
+>>  drivers/crypto/ccp/sev-dev.c | 81 ++++++++++++++++++++++++++++++++++++
+>>  drivers/crypto/ccp/sev-dev.h |  3 ++
+>>  include/linux/psp-sev.h      | 29 +++++++++++++
+>>  3 files changed, 113 insertions(+)
+>>
+>> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+>> index 3451bada884e..b642f1183b8b 100644
+>> --- a/drivers/crypto/ccp/sev-dev.c
+>> +++ b/drivers/crypto/ccp/sev-dev.c
+>> @@ -233,6 +233,7 @@ static int sev_cmd_buffer_len(int cmd)
+>>  	case SEV_CMD_SNP_GUEST_REQUEST:		return sizeof(struct sev_data_snp_guest_request);
+>>  	case SEV_CMD_SNP_CONFIG:		return sizeof(struct sev_user_data_snp_config);
+>>  	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
+>> +	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
+>>  	default:				return 0;
+>>  	}
+>>  
+>> @@ -1073,6 +1074,69 @@ static void snp_set_hsave_pa(void *arg)
+>>  	wrmsrq(MSR_VM_HSAVE_PA, 0);
+>>  }
+>>  
+>> +static int snp_get_platform_data(struct sev_user_data_status *status, int *error)
+>> +{
+>> +	struct sev_data_snp_feature_info snp_feat_info;
+>> +	struct sev_device *sev = psp_master->sev_data;
+>> +	struct snp_feature_info *feat_info;
+>> +	struct sev_data_snp_addr buf;
+>> +	struct page *page;
+>> +	int rc;
+>> +
+>> +	/*
+>> +	 * The output buffer must be firmware page if SEV-SNP is
+>> +	 * initialized.
+>> +	 */
+> 
+> This comment should be expanded and say that this function is intended to
+> be called when SNP is not initialized or you make this work for both
+> situations.
 >
-> (added Paul Moore for selinux bits)
 
-Thanks Mike.
+Ok, i believe i will simply make it work for the case when SNP is not initialized, as that
+is the way it is being called. 
+ 
+>> +	if (sev->snp_initialized)
+>> +		return -EINVAL;
+>> +
+>> +	buf.address = __psp_pa(&sev->snp_plat_status);
+>> +	rc = __sev_do_cmd_locked(SEV_CMD_SNP_PLATFORM_STATUS, &buf, error);
+>> +
+> 
+> Remove blank line.
+> 
+>> +	if (rc) {
+>> +		dev_err(sev->dev, "SNP PLATFORM_STATUS command failed, ret = %d, error = %#x\n",
+>> +			rc, *error);
+>> +		return rc;
+>> +	}
+>> +
+>> +	status->api_major = sev->snp_plat_status.api_major;
+>> +	status->api_minor = sev->snp_plat_status.api_minor;
+>> +	status->build = sev->snp_plat_status.build_id;
+>> +	status->state = sev->snp_plat_status.state;
+> 
+> This may need to be moved based on how the patches lay out.
+> 
+>> +
+>> +	/*
+>> +	 * Do feature discovery of the currently loaded firmware,
+>> +	 * and cache feature information from CPUID 0x8000_0024,
+>> +	 * sub-function 0.
+>> +	 */
+>> +	if (sev->snp_plat_status.feature_info) {
+>> +		/*
+>> +		 * Use dynamically allocated structure for the SNP_FEATURE_INFO
+>> +		 * command to handle any alignment and page boundary check
+>> +		 * requirements.
+>> +		 */
+>> +		page = alloc_page(GFP_KERNEL);
+>> +		if (!page)
+>> +			return -ENOMEM;
+> 
+> Add a blank line.
+> 
+>> +		feat_info = page_address(page);
+>> +		snp_feat_info.length = sizeof(snp_feat_info);
+>> +		snp_feat_info.ecx_in = 0;
+>> +		snp_feat_info.feature_info_paddr = __psp_pa(feat_info);
+>> +
+>> +		rc = __sev_do_cmd_locked(SEV_CMD_SNP_FEATURE_INFO, &snp_feat_info, error);
+>> +
+> 
+> Remove blank line.
+> 
+>> +		if (!rc)
+>> +			sev->feat_info = *feat_info;
+>> +		else
+>> +			dev_err(sev->dev, "SNP FEATURE_INFO command failed, ret = %d, error = %#x\n",
+>> +				rc, *error);
+>> +
+>> +		__free_page(page);
+>> +	}
+>> +
+>> +	return rc;
+>> +}
+>> +
+>>  static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+>>  {
+>>  	struct sev_data_range_list *range_list = arg;
+>> @@ -1597,6 +1661,23 @@ static int sev_get_api_version(void)
+>>  	struct sev_user_data_status status;
+>>  	int error = 0, ret;
+>>  
+>> +	/*
+>> +	 * Use SNP platform status if SNP is enabled and cache
+>> +	 * SNP platform status and SNP feature information.
+>> +	 */
+>> +	if (cc_platform_has(CC_ATTR_HOST_SEV_SNP)) {
+>> +		ret = snp_get_platform_data(&status, &error);
+>> +		if (ret) {
+>> +			dev_err(sev->dev,
+>> +				"SEV-SNP: failed to get status. Error: %#x\n", error);
+>> +			return 1;
+>> +		}
+>> +	}
+>> +
+>> +	/*
+>> +	 * Fallback to SEV platform status if SNP is not enabled
+>> +	 * or SNP platform status fails.
+>> +	 */
+> 
+> I think this comment is incorrect, aren't you calling this on success of
+> snp_get_platform_data() and returning on error?
 
-I'm adding the LSM and SELinux lists too since there are others that
-will be interested as well.
+Yes. 
 
-> On Mon, Jun 02, 2025 at 12:17:54PM -0700, Ackerley Tng wrote:
-> > The new function, alloc_anon_secure_inode(), returns an inode after
-> > running checks in security_inode_init_security_anon().
-> >
-> > Also refactor secretmem's file creation process to use the new
-> > function.
-> >
-> > Suggested-by: David Hildenbrand <david@redhat.com>
-> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> > ---
-> >  fs/anon_inodes.c   | 22 ++++++++++++++++------
-> >  include/linux/fs.h |  1 +
-> >  mm/secretmem.c     |  9 +--------
-> >  3 files changed, 18 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/fs/anon_inodes.c b/fs/anon_inodes.c
-> > index 583ac81669c2..4c3110378647 100644
-> > --- a/fs/anon_inodes.c
-> > +++ b/fs/anon_inodes.c
-> > @@ -55,17 +55,20 @@ static struct file_system_type anon_inode_fs_type =
-=3D {
-> >       .kill_sb        =3D kill_anon_super,
-> >  };
-> >
-> > -static struct inode *anon_inode_make_secure_inode(
-> > -     const char *name,
-> > -     const struct inode *context_inode)
-> > +static struct inode *anon_inode_make_secure_inode(struct super_block *=
-s,
-> > +             const char *name, const struct inode *context_inode,
-> > +             bool fs_internal)
-> >  {
-> >       struct inode *inode;
-> >       int error;
-> >
-> > -     inode =3D alloc_anon_inode(anon_inode_mnt->mnt_sb);
-> > +     inode =3D alloc_anon_inode(s);
-> >       if (IS_ERR(inode))
-> >               return inode;
-> > -     inode->i_flags &=3D ~S_PRIVATE;
-> > +
-> > +     if (!fs_internal)
-> > +             inode->i_flags &=3D ~S_PRIVATE;
-> > +
-> >       error =3D security_inode_init_security_anon(inode, &QSTR(name),
-> >                                                 context_inode);
-> >       if (error) {
-> > @@ -75,6 +78,12 @@ static struct inode *anon_inode_make_secure_inode(
-> >       return inode;
-> >  }
-> >
-> > +struct inode *alloc_anon_secure_inode(struct super_block *s, const cha=
-r *name)
-> > +{
-> > +     return anon_inode_make_secure_inode(s, name, NULL, true);
-> > +}
-> > +EXPORT_SYMBOL_GPL(alloc_anon_secure_inode);
-> > +
-> >  static struct file *__anon_inode_getfile(const char *name,
-> >                                        const struct file_operations *fo=
-ps,
-> >                                        void *priv, int flags,
-> > @@ -88,7 +97,8 @@ static struct file *__anon_inode_getfile(const char *=
-name,
-> >               return ERR_PTR(-ENOENT);
-> >
-> >       if (make_inode) {
-> > -             inode =3D anon_inode_make_secure_inode(name, context_inod=
-e);
-> > +             inode =3D anon_inode_make_secure_inode(anon_inode_mnt->mn=
-t_sb,
-> > +                                                  name, context_inode,=
- false);
-> >               if (IS_ERR(inode)) {
-> >                       file =3D ERR_CAST(inode);
-> >                       goto err;
-> > diff --git a/include/linux/fs.h b/include/linux/fs.h
-> > index 016b0fe1536e..0fded2e3c661 100644
-> > --- a/include/linux/fs.h
-> > +++ b/include/linux/fs.h
-> > @@ -3550,6 +3550,7 @@ extern int simple_write_begin(struct file *file, =
-struct address_space *mapping,
-> >  extern const struct address_space_operations ram_aops;
-> >  extern int always_delete_dentry(const struct dentry *);
-> >  extern struct inode *alloc_anon_inode(struct super_block *);
-> > +extern struct inode *alloc_anon_secure_inode(struct super_block *, con=
-st char *);
-> >  extern int simple_nosetlease(struct file *, int, struct file_lease **,=
- void **);
-> >  extern const struct dentry_operations simple_dentry_operations;
-> >
-> > diff --git a/mm/secretmem.c b/mm/secretmem.c
-> > index 1b0a214ee558..c0e459e58cb6 100644
-> > --- a/mm/secretmem.c
-> > +++ b/mm/secretmem.c
-> > @@ -195,18 +195,11 @@ static struct file *secretmem_file_create(unsigne=
-d long flags)
-> >       struct file *file;
-> >       struct inode *inode;
-> >       const char *anon_name =3D "[secretmem]";
-> > -     int err;
-> >
-> > -     inode =3D alloc_anon_inode(secretmem_mnt->mnt_sb);
-> > +     inode =3D alloc_anon_secure_inode(secretmem_mnt->mnt_sb, anon_nam=
-e);
-> >       if (IS_ERR(inode))
-> >               return ERR_CAST(inode);
->
-> I don't think we should not hide secretmem and guest_memfd inodes from
-> selinux, so clearing S_PRIVATE for them is not needed and you can just dr=
-op
-> fs_internal parameter in anon_inode_make_secure_inode()
+> 
+> You want both platform status outputs cached. So the above behavior is
+> correct, I believe, that we error out on SNP platform status failure.
+> 
 
-It's especially odd since I don't see any comments or descriptions
-about why this is being done.  The secretmem change is concerning as
-this is user accessible and marking the inode with S_PRIVATE will
-bypass a number of LSM/SELinux access controls, possibly resulting in
-a security regression (one would need to dig a bit deeper to see what
-is possible with secretmem and which LSM/SELinux code paths would be
-affected).
+Why do we want to cache *both* SEV and SNP platform status, as of now only api_major & minor, build and state
+fields are used from SEV platform status --- is this just for future use cases ?
 
-I'm less familiar with guest_memfd, but generally speaking if
-userspace can act on the inode/fd then we likely don't want the
-S_PRIVATE flag stripped from the anon_inode.
+Thanks,
+Ashish
 
-Ackerley can you provide an explanation about why the change in
-S_PRIVATE was necessary?
+> Thanks,
+> Tom
+> 
+>>  	ret = sev_platform_status(&status, &error);
+>>  	if (ret) {
+>>  		dev_err(sev->dev,
+>> diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+>> index 3e4e5574e88a..1c1a51e52d2b 100644
+>> --- a/drivers/crypto/ccp/sev-dev.h
+>> +++ b/drivers/crypto/ccp/sev-dev.h
+>> @@ -57,6 +57,9 @@ struct sev_device {
+>>  	bool cmd_buf_backup_active;
+>>  
+>>  	bool snp_initialized;
+>> +
+>> +	struct sev_user_data_snp_status snp_plat_status;
+>> +	struct snp_feature_info feat_info;
+>>  };
+>>  
+>>  int sev_dev_init(struct psp_device *psp);
+>> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+>> index 0b3a36bdaa90..0149d4a6aceb 100644
+>> --- a/include/linux/psp-sev.h
+>> +++ b/include/linux/psp-sev.h
+>> @@ -107,6 +107,7 @@ enum sev_cmd {
+>>  	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX = 0x0CA,
+>>  	SEV_CMD_SNP_COMMIT		= 0x0CB,
+>>  	SEV_CMD_SNP_VLEK_LOAD		= 0x0CD,
+>> +	SEV_CMD_SNP_FEATURE_INFO	= 0x0CE,
+>>  
+>>  	SEV_CMD_MAX,
+>>  };
+>> @@ -812,6 +813,34 @@ struct sev_data_snp_commit {
+>>  	u32 len;
+>>  } __packed;
+>>  
+>> +/**
+>> + * struct sev_data_snp_feature_info - SEV_SNP_FEATURE_INFO structure
+>> + *
+>> + * @length: len of the command buffer read by the PSP
+>> + * @ecx_in: subfunction index
+>> + * @feature_info_paddr : SPA of the FEATURE_INFO structure
+>> + */
+>> +struct sev_data_snp_feature_info {
+>> +	u32 length;
+>> +	u32 ecx_in;
+>> +	u64 feature_info_paddr;
+>> +} __packed;
+>> +
+>> +/**
+>> + * struct feature_info - FEATURE_INFO structure
+>> + *
+>> + * @eax: output of SNP_FEATURE_INFO command
+>> + * @ebx: output of SNP_FEATURE_INFO command
+>> + * @ecx: output of SNP_FEATURE_INFO command
+>> + * #edx: output of SNP_FEATURE_INFO command
+>> + */
+>> +struct snp_feature_info {
+>> +	u32 eax;
+>> +	u32 ebx;
+>> +	u32 ecx;
+>> +	u32 edx;
+>> +} __packed;
+>> +
+>>  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+>>  
+>>  /**
 
-> > -     err =3D security_inode_init_security_anon(inode, &QSTR(anon_name)=
-, NULL);
-> > -     if (err) {
-> > -             file =3D ERR_PTR(err);
-> > -             goto err_free_inode;
-> > -     }
-> > -
-> >       file =3D alloc_file_pseudo(inode, secretmem_mnt, "secretmem",
-> >                                O_RDWR, &secretmem_fops);
-> >       if (IS_ERR(file))
-> > --
-> > 2.49.0.1204.g71687c7c1d-goog
-
---=20
-paul-moore.com
 
