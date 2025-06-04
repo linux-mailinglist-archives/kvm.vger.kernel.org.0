@@ -1,149 +1,170 @@
-Return-Path: <kvm+bounces-48352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48353-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A677ACD07B
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 02:10:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C74DACD0B0
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 02:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC6381897516
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 00:10:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A10253A4D31
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 00:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079B329A2;
-	Wed,  4 Jun 2025 00:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90A5EAF1;
+	Wed,  4 Jun 2025 00:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zCSvPv4q"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WEPUnmjl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A36376
-	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 00:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9259BB661
+	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 00:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748995820; cv=none; b=hu8ARgahT7hDXWe7gxKR3P0HbbXxyA4QqyGz3gqRNNhf/3OBHJdygkvQUCzzWnPmbKxNjEoX4jOvinjNvnu1K6kHS6v4x95TLWwDtmoyvBdqC3sjOBsWWuj9MTfCKVfCrSqMr/tvidrMKb5+TLrXvDXc7yu+f56dcuwtB5RQA4U=
+	t=1748997008; cv=none; b=MerdzArA09xTTF5cmuLOuoQS/ybFCd6NebTuvbhQxo9EuBqVrhEYB38oCYLAay/s7bQCuYFWnnLUfbGvq82bwcnA3BIXs0MHADEwVb3JPEW800YBg/xI8dj4FaZBXGElZcaX2qiwl3DlF3rlBU5b3aUDWcxNgXpObPsK8K/wXRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748995820; c=relaxed/simple;
-	bh=euBdrbs6b7CGc1XbpBBv0ZF6753p4h21n3PSCsN5nIg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=czV79oydD9Dn45H6C0bZMqx7nq+hg1qrojere2C/sx21r+ZEiKC8PlR+7o/5gqFgkSxHiCMKnQhWJwyMmHZU41LkwcBRuUinZAKEg8WR1WFIL/NLNt8BJfmhRTFbGTQ/nlR1VZBbLGWnMvHs/Wn6TaMYQm5BsaSbUDI26RxPLYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zCSvPv4q; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2ede156ec4so4380402a12.0
-        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 17:10:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1748995818; x=1749600618; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gOfI6BunB5EjpKnjOgGcW4vcCGSHarmNLnezDicVUWU=;
-        b=zCSvPv4qyQ17ood9k/tU9nf+TW75qc+Xnk8RI/WGdcYW+/KWo94R+Fp+53QctMwZPH
-         DkZH4PywKbyqnsnpaxg9NOEu36MtxqUalkrt+9tgI87IC0thk6MdtbMDxkl9nB3yAbUL
-         ucDyDCLtNyKklQjez/jdo4bXBrHQC5Aa1nLRnXimOwVaHKnP2REL5ycIpJfho+K643Jx
-         QGyFZj+1SyCPV6sCNLRkb2c9Bbq2iu6cFNFKB3VczbQgV/QAq4858OjHM24sxlLcQmR3
-         5kQG4qthn3eUV/Tmjrnvf8bIQIHBdXJei3B6qZYWGcDYQt9S8MURWscCgAVcRWqP1xOt
-         3rlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1748995818; x=1749600618;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gOfI6BunB5EjpKnjOgGcW4vcCGSHarmNLnezDicVUWU=;
-        b=MErVDEZMutHfxKOc3I19UdkO+Vqx0h+GZ5i42ez/V4SHe00C7VP/HG/VKnE1vai6M3
-         RHcUcig4ddIR5kSRRdZOsjqsWu0REoTi/H5qe4JyOBPYeGR5pG40n3jOsJeWT+Lido2K
-         JhZcKdRprGqnFyPTT+NhgYYvDOygj6apfqDsAYfHtDVV/WkhfyEC+xk6uA7sHNV+Lr4u
-         r4fAZJMeDh99XqVNDb/1iUxGLd0T8LL7x+/zt2+viFcfnGEKGBYBzFtU0eMiVSyWWaPg
-         W3JhQ6DqulJZCccBryCd8cp7tU4Yx31s/nJwLV8y/lOvDJp0CFJ2a0c0Yc85gj2M4hJ1
-         izMA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4gCWBiCrbplLa1WpftsOsneLz/0rj4cU3hJmFjq7EB7rikDm/07ke9TKuWU+XEXID1TY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGrnmsuxIWw54YXS/Gb4GM8BQqCChvpfBi6lVMMMPs61g2h7c0
-	ryqWyqxSxRz+01Z3HwRl454C60GDBJqoZ/n6Gmm9+yIFyYAivjT/G5WIFtTS3sUCN3CcFr5F1uH
-	8Pg50rA==
-X-Google-Smtp-Source: AGHT+IEZyiSLy8Ge+hshHc76Ex2llg0LkSoj5004GpA5PILdPk6C5xY+TyGEuIWbmybjXt5bCyuflXVgFX4=
-X-Received: from pgbfy27.prod.google.com ([2002:a05:6a02:2a9b:b0:b2c:433b:f32b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9190:b0:21a:c058:9b8e
- with SMTP id adf61e73a8af0-21d22bcd433mr1259933637.34.1748995818077; Tue, 03
- Jun 2025 17:10:18 -0700 (PDT)
-Date: Tue, 3 Jun 2025 17:10:16 -0700
-In-Reply-To: <20250401161106.790710-3-pbonzini@redhat.com>
+	s=arc-20240116; t=1748997008; c=relaxed/simple;
+	bh=f4c6fEeLwQa0PlBjC7pBJS6ckl1xuWN5vfHmd22qkEI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FC6oJOdsK6g3Z0imaSwjVzPhPM1P0UuFG2yuKZNFdIIPF34DF0Bwq7lb/cmGoq0ZMZ/uhHe1ys+4xrCc0exRDmfx33jfkhpfEFEhfOvmeHyuvYhxNz0YcbEgFQNI63PrGzDxtZR8vGAFofKu5u1fDms+wQd3/Y/5J/CVXt2zglg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WEPUnmjl; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6138a043-5b5b-46af-ba8b-01dac55dee23@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1748997001;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8MZYMhTjyXQwSFJY/e0Bg+aJ/DYLC4LmKmte6yFXBpM=;
+	b=WEPUnmjl01eoxpfj2bo/wjnCnhorQhBLZ1U6kM9OBHA8kNJHz74sZvC5bbf9Xq5wG8FEwv
+	2RVwYAOiBOU0zVcu1kuuJpmJnm5Ki55YySE0AfXWX4gcRbFoRZDZsm2tjcyYXSTjjwAR5F
+	F+e/j1567odazU5Fm1OHqh6K6+KqGGI=
+Date: Tue, 3 Jun 2025 17:29:55 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250401161106.790710-1-pbonzini@redhat.com> <20250401161106.790710-3-pbonzini@redhat.com>
-Message-ID: <aD-O6EBMqPwLzgd_@google.com>
-Subject: Re: [PATCH 02/29] KVM: API definitions for plane userspace exit
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, roy.hopkins@suse.com, 
-	thomas.lendacky@amd.com, ashish.kalra@amd.com, michael.roth@amd.com, 
-	jroedel@suse.de, nsaenz@amazon.com, anelkz@amazon.de, 
-	James.Bottomley@hansenpartnership.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Subject: Re: [PATCH v3 9/9] RISC-V: KVM: Upgrade the supported SBI version to
+ 3.0
+To: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@ventanamicro.com>,
+ Andrew Jones <ajones@ventanamicro.com>
+Cc: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Mayuresh Chitale <mchitale@ventanamicro.com>,
+ linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org,
+ linux-riscv <linux-riscv-bounces@lists.infradead.org>
+References: <20250522-pmu_event_info-v3-0-f7bba7fd9cfe@rivosinc.com>
+ <20250522-pmu_event_info-v3-9-f7bba7fd9cfe@rivosinc.com>
+ <DA3KSSN3MJW5.2CM40VEWBWDHQ@ventanamicro.com>
+ <61627296-6f94-45ea-9410-ed0ea2251870@linux.dev>
+ <DA5YWWPPVCQW.22VHONAQHOCHE@ventanamicro.com>
+ <20250526-224478e15ee50987124a47ac@orel>
+ <ace8be22-3dba-41b0-81f0-bf6d661b4343@linux.dev>
+ <20250528-ff9f6120de39c3e4eefc5365@orel>
+ <1169138f-8445-4522-94dd-ad008524c600@linux.dev>
+ <DA8KL716NTCA.2QJX4EW2OI6AL@ventanamicro.com>
+ <2bac252c-883c-4f8a-9ae1-283660991520@linux.dev>
+ <DA9G60UI0ZLC.1KIWBXCTX0427@ventanamicro.com>
+ <0dcd01cd-419f-4225-b22c-cbaf82718235@linux.dev>
+ <DACVBRLJ5MMV.1COZ83HBMUD6A@ventanamicro.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Atish Patra <atish.patra@linux.dev>
+In-Reply-To: <DACVBRLJ5MMV.1COZ83HBMUD6A@ventanamicro.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Apr 01, 2025, Paolo Bonzini wrote:
-> Copy over the uapi definitions from the Documentation/ directory.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  include/uapi/linux/kvm.h | 25 +++++++++++++++++++++++--
->  1 file changed, 23 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 1e0a511c43d0..b0cca93ebcb3 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -135,6 +135,16 @@ struct kvm_xen_exit {
->  	} u;
->  };
->  
-> +struct kvm_plane_event_exit {
-> +#define KVM_PLANE_EVENT_INTERRUPT    1
-> +	__u16 cause;
-> +	__u16 pending_event_planes;
-> +	__u16 target;
-> +	__u16 padding;
-> +	__u32 flags;
-> +	__u64 extra[8];
-> +};
-> +
->  struct kvm_tdx_exit {
->  #define KVM_EXIT_TDX_VMCALL     1
->          __u32 type;
-> @@ -262,7 +272,8 @@ struct kvm_tdx_exit {
->  #define KVM_EXIT_NOTIFY           37
->  #define KVM_EXIT_LOONGARCH_IOCSR  38
->  #define KVM_EXIT_MEMORY_FAULT     39
-> -#define KVM_EXIT_TDX              40
-> +#define KVM_EXIT_PLANE_EVENT      40
-> +#define KVM_EXIT_TDX              41
->  
->  /* For KVM_EXIT_INTERNAL_ERROR */
->  /* Emulate instruction failed. */
-> @@ -295,7 +306,13 @@ struct kvm_run {
->  	/* in */
->  	__u8 request_interrupt_window;
->  	__u8 HINT_UNSAFE_IN_KVM(immediate_exit);
-> -	__u8 padding1[6];
-> +
-> +	/* in/out */
-> +	__u8 plane;
 
-We should add padding before or after "plane"; there's a 1-byte hole here that's
-hard to spot at first glance (ran pahole just to verify my eyeballs):
+On 6/3/25 4:40 AM, Radim Krčmář wrote:
+> 2025-05-30T12:29:30-07:00, Atish Patra <atish.patra@linux.dev>:
+>> On 5/30/25 4:09 AM, Radim Krčmář wrote:
+>>> 2025-05-29T11:44:38-07:00, Atish Patra <atish.patra@linux.dev>:
+>>>> On 5/29/25 3:24 AM, Radim Krčmář wrote:
+>>>>> I originally gave up on the idea, but I feel kinda bad for Drew now, so
+>>>>> trying again:
+>>>> I am sorry if some of my replies came across in the wrong way. That was
+>>>> never
+>>>> the intention.
+>>> I didn't mean to accuse you, my apologies.  I agree with Drew's
+>>> positions, so to expand on a question that wasn't touched in his mail:
+>>>
+>>>>> Even if userspace wants SBI for the M-mode interface, security minded
+>>>> This is probably a 3rd one ? Why we want M-mode interface in the user
+>>>> space ?
+>>> It is about turning KVM into an ISA accelerator.
+>>>
+>>> A guest thinks it is running in S/HS-mode.
+>>> The ecall instruction traps to M-mode.  RISC-V H extension doesn't
+>>> accelerate M-mode, so we have to emulate the trap in software.
+>> We don't need to accelerate M-mode. That's the beauty of the RISC-V H
+>> extension.
+> (It is a gap to me. :])
+RISC-V H extension is designed to virtualize S-mode and U-mode. Not M-mode.
+I don't think retrofitting M-mode virtualization has absolutely any 
+benefit. It has
+many challenges that will probably result in poor performance. It can be 
+a hobby project
+but I am not sure if it can be adopted in production.
 
-  struct kvm_run {
-	__u8                       request_interrupt_window; /*     0     1 */
-	__u8                       immediate_exit__unsafe; /*     1     1 */
-	__u8                       plane;                /*     2     1 */
+Are there any similar use cases in other ISAs ? Does anybody support 
+virtualizaing EL3 in ARM64 ?
 
-	/* XXX 1 byte hole, try to pack */
+>> The ISA is designed in such a way that the SBI is the interface between
+>> the supervisor environment (VS/HS)
+>> and the supervisor execution environment (HS/M).
+> The ISA says nothing about the implementation of said interface.
+>
+> Returning 42 in x21 as a response to an ecall with 0x10 in a7 and 0x3 in
+> a6 is perfectly valid RISC-V implementation that KVM currently cannot
+> virtualize.
 
-	__u16                      suspended_planes;     /*     4     2 */
-	__u16                      req_exit_planes;      /*     6     2 */
-  }
+If the concern is only supporting an older version of SBI version, we 
+can support that with onereg
+interface today. I think I already agreed on that earlier in this thread 
+and revise this series to have
+it ready for review.
 
-Probably pad before, so that "plane" is just before the xxx_planes fields?
+
+>>> The ISA doesn't say that M-mode means SBI.  We try really hard to have
+>>> SBI on all RISC-V, but I think KVM is taking it a bit too far.
+>>>
+>>> We can discuss how best to describe SBI, so userspace can choose to
+>>> accelerate the M-mode in KVM, but I think that the ability to emulate
+>>> M-mode in userspace should be provided.
+>> I am still trying to understand the advantages of emulating the M-mode
+>> in the user space.
+>> Can you please elaborate ?
+> This thread already has a lot of them, so to avoid repeating them, I
+> have to go into quite niche use-cases:
+> When developing M-mode software on RISC-V (when RISC-V has more useful
+> implementations than QEMU), a developer might want to accelerate the
+> S/U-modes in KVM.
+> It is also simpler to implement an old SBI interface (especially with
+> bugs/quirks) if virtualization just executes the old M-mode binary.
+>
+> Why must KVM prevent userspace from virtualizing RISC-V?
+
+If there is a valid use case that can be put into production or
+if you have any prototype that it has better performance then we can 
+have it.
+In absence of either, isn't it better to spend our energy on things that 
+actually matter
+right now and improve RISC-V virtualization performance rather than 
+something that
+may or may not be possible in the very far future.
+
+>> I am assuming you are not hinting Nested virtualization which can be
+>> achieved with existing
+>> ISA provided mechanisms and accelerated by SBI NACL.
+> Right, I am talking about virtualization of RISC-V, because I don't have
+> a crystal ball to figure out what users will want.
 
