@@ -1,292 +1,146 @@
-Return-Path: <kvm+bounces-48427-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48428-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25006ACE263
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 18:44:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7CDCACE269
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 18:49:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 563FB18977F7
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 16:44:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44F3E1722E2
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 16:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C0D1E885A;
-	Wed,  4 Jun 2025 16:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C1171E5714;
+	Wed,  4 Jun 2025 16:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBXRqseM"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nNoswRFS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095FF1DE4E6
-	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 16:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0087C1487F6;
+	Wed,  4 Jun 2025 16:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749055442; cv=none; b=FqKFqUITnlNgFG5Vuj/nkOymlEkcv453p0JW7995fEv1OUoIg7mB91lfNuDmdvcEDiQD1wN+aCpcMwqyoTlnbbYIlCS9rFrViUNnUpMhhGhUKg/11BSWRU/R8x1eexw5Ok75pavhUlh8i2ECJG3gliZUtnUXPJF84GSwMNN0Hmk=
+	t=1749055747; cv=none; b=PaKPpL+dF8Ul4GWFClyuvoT5uE50KMctcbslEXuXobWJtoZmJjJKPtVjTKlL1HYO/iEVFajmb3AquQsOgFX1YC5tHWy85JdJnWf+Gm4B/T3wE+K0mJW1eOS10nJfJTT/NBviS1b63jSQQGGbtN+X2XmA4+TwAnnZ+azNbMykJHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749055442; c=relaxed/simple;
-	bh=D+aWTJlBR5Z1dDFyEuWrqwhKgcw6YgC3O9B89j9DBdM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TgzB+m0yHvu51wN0MF9DnYrKQhSOuEuhGR8vgR5VjknnnD8NEBcSoCcK3PeuGZuBSsxZJ8TpuwmZBgqTMMXKbzqTbgIoRD0yBZL9PjLTMVS5IPIS6JxgjUmAp6p4078fpSSvPS/CqC1X/QotRt7hfNqj1Y8/ZbxK1EV7r60jKOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GBXRqseM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749055436;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=5uX+RcrMuYZZlT9e7PZl8kq+9gKjyZrSElVvecqGEe0=;
-	b=GBXRqseMSTyFZOcntX+I+AwRzNJIVeogCjE8t1WcuJcZeHwnUwbyda626S31us7peOTCKG
-	OkH2WDWcGx0JOGCGq3kPAhYt8h5ugE6h5BZzmP/54DnZYtMA4fY5HnF8pIRcqp64jVRusu
-	2TgJUEpzi8lFxLPs8iWWnpwiUrEUxYw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-683-akaDOl3cPFSAjXKkJQM6DA-1; Wed, 04 Jun 2025 12:43:55 -0400
-X-MC-Unique: akaDOl3cPFSAjXKkJQM6DA-1
-X-Mimecast-MFC-AGG-ID: akaDOl3cPFSAjXKkJQM6DA_1749055434
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a3696a0d3aso6970f8f.2
-        for <kvm@vger.kernel.org>; Wed, 04 Jun 2025 09:43:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749055434; x=1749660234;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5uX+RcrMuYZZlT9e7PZl8kq+9gKjyZrSElVvecqGEe0=;
-        b=f3XAtXs3JNZbPtN+We2429HQCl3ro6tqVpypEGzKwNiuOkXcLIKv2GzCilH98kCBkG
-         /BmkdiCuJXGNHkf1DwYH7D+Pi0nUXlONBsfm0ADeWTyC6Qjw84HNqE+5yEoYijhTR+4e
-         BBjJoHBj1HAgzJe3ZvsLliI5lLzcTHJ7k7bW1jt6BLkTzsnbLgHxTrTqk8W5EDDvEUXM
-         LA0ylnHM27raDMst1ivJ+6NLyn/kh+AzbDYr+8KS8lL8JbMg/WwMKnlr0ibqTlk8G9jq
-         HgN3NPx0kBUQE0ZndBwJWln/OIiEDt3a/TpoLVPscr4ByNq1D57tM8AW52n53EbM4isk
-         o9GQ==
-X-Gm-Message-State: AOJu0Yw77Y0wXa7L8dnJ4PJ2+6CuJQNLXlbS3Kh+vAPZF4c7U7xjnwXP
-	Lrxm6Ijnrg3zXD0ZAGhlsx5iulUux9iuMpa8XCx3ArZ9dvstHqXLsgtVe0yFcfHI0Fy7ZgYqZJ2
-	nWdmF+YJW01q3HkQhuoxUPACxxe3y2vJbx8A+N+EA99kmjUVgOR28Tg==
-X-Gm-Gg: ASbGnctVgkIk0uuxE9UBTLiDTjur63zhL0t4Lz8O9Pz/Y1Gjl+flu/eItjU1vPQCqIs
-	Kru+k8SI+5Wgq/pQt5Dcw65WQhLrALgVeJTnzoaJr9L1zhNhX0zph7fDXMnMbH1y1mNWp3PjTlH
-	Xsy/o8/humoApV9q3DfXI4u3jYeJCeFVxEnn+fZYHfekMMp928stv22kfJq29SMGQsYwfvmyT75
-	JbFupcAQ4GKXna0+z6uoYa8nU8DutEHJt+GGkwcbdEaUGFwBntT0kuFSpeJPwR6TWgEGZ7t3XWH
-	rsE0YLOKC+mQjw==
-X-Received: by 2002:a05:6000:400d:b0:3a4:db94:2cfc with SMTP id ffacd0b85a97d-3a51d97b8c9mr3072853f8f.43.1749055433848;
-        Wed, 04 Jun 2025 09:43:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGCntt0U7ekMD/3TwxfttPyNya1EiPp8j8ZDG5E1tlDGzx3/ONAjY/WPQcKTOr2WSgewAeoZQ==
-X-Received: by 2002:a05:6000:400d:b0:3a4:db94:2cfc with SMTP id ffacd0b85a97d-3a51d97b8c9mr3072830f8f.43.1749055433447;
-        Wed, 04 Jun 2025 09:43:53 -0700 (PDT)
-Received: from [192.168.10.81] ([151.49.64.79])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a4f009748fsm21929578f8f.80.2025.06.04.09.43.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Jun 2025 09:43:52 -0700 (PDT)
-Message-ID: <e84bd556-38db-49eb-9ea1-f30ea84f2d3a@redhat.com>
-Date: Wed, 4 Jun 2025 18:43:51 +0200
+	s=arc-20240116; t=1749055747; c=relaxed/simple;
+	bh=n11zh9YiiUxBI/UWsmUihybLUSm6s7qq0XhQ8nMz0RY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XbAAuzjB2oTelcLy/PlfYOD8Z5z1chrWU90YRvKFAqHmwVTF3lD+dZXIJAN3hZyNsSrr9U7DgFuWovUver1iHlv4cYJNXHJgFjkAqSmnkIRzwVQXuhtoB3+T76j9A9toCq2SJ1lR/C7dENMAGR76OPeA4Z+CBTFGMzKbcj6Uwhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nNoswRFS; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 554Cd8Ev029660;
+	Wed, 4 Jun 2025 16:49:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=oUOEtN
+	vQ8pY/J5z+Im9aP1U/jEGj+Nn/6nZ08QyR1gg=; b=nNoswRFSofGj6jiH1f+Wp2
+	vpU6dQkl75KAOnoD25ItFzb3xLveZU5sXvlvwpeox6IbPqqn1a4+LWv+wu8TehmL
+	AbR4xbYWUMIGucF/A2v56j83WkcDcUx6tLQwyBpLKg6CkInm9KJqrf/3AxFzky+d
+	oLhTFxdHbsoYVY7a/zn9Lsby+yM9IrEHAgiXOlW6IfzP2BuJymMumlgmEjvMxOFu
+	YTGJHjWyxxIs35sq1T9b4yFhqJv2omSg+XAr9SI+BC6oY4UCLcypnQvz+FfzGAMa
+	ABXYtZrrOh/IbWU98nOzmpsVO0Owo+cCpKCb5EWocnE7ZazUJY87v8xpBZvmmseg
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471geyv1jh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Jun 2025 16:49:03 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 554FX1W2019937;
+	Wed, 4 Jun 2025 16:49:02 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470d3p0r88-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Jun 2025 16:49:01 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 554GmvoO59310456
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 4 Jun 2025 16:48:57 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C395A20043;
+	Wed,  4 Jun 2025 16:48:57 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 71DCE20040;
+	Wed,  4 Jun 2025 16:48:57 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  4 Jun 2025 16:48:57 +0000 (GMT)
+Date: Wed, 4 Jun 2025 18:48:55 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>, Janosch Frank
+ <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] s390/mm: Fix in_atomic() handling in
+ do_secure_storage_access()
+Message-ID: <20250604184855.44793208@p-imbrenda>
+In-Reply-To: <aEB0BfLG9yM3Gb4u@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20250603134936.1314139-1-hca@linux.ibm.com>
+	<aEB0BfLG9yM3Gb4u@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/15] KVM: x86: Fold kvm_setup_default_irq_routing() into
- kvm_ioapic_init()
-To: Sean Christopherson <seanjc@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250519232808.2745331-1-seanjc@google.com>
- <20250519232808.2745331-6-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20250519232808.2745331-6-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: G2iT3uC2J9R6Zm1NoMnzWw990neAQgQs
+X-Authority-Analysis: v=2.4 cv=DYMXqutW c=1 sm=1 tr=0 ts=684078ff cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=oF2f3jwwvDOvwd7SqYoA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: G2iT3uC2J9R6Zm1NoMnzWw990neAQgQs
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA0MDEyNiBTYWx0ZWRfXwt/clli9/hF6 +v/8tZHdYnY4AUwQ0xxWArvChe+H33lBTUjgU/+/ePA50Jq3gK6CmRJ5vM4gR7k7NSCN1ME88dt YMbLabE9fQOCzwOwaWToSSWCdBzBSHeWgLl2VRz+beSYYHVibAcEOSXDtM1uKCkdDNUZm7wYJlM
+ 2Tt037ogMksfnTn1DGlBCh/r0i44a3XB2nJ0VzHR1DVlICtsiwctZEq8WmBm+85nn4+NVpOmtcX ngC/qC0vi9ZNthAADC801UT/jzvwJPaDZiTQclcIcKrsafF00HhUTBGeOy/JtRbjnE+9dianOl6 4on0HEUe1o+8xVxxagc2j0393l+1lXchYp8eRPahHrl90Q6AF3FDlvc00YP10JslOt62vNOcdf4
+ u1Mp0EV+IZm/bKw4hbi8AhOV/If59xn74KMm08Q9bnb//KFDLQnWBqBTJEfQJbmAZPMXw2b8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-04_03,2025-06-03_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0
+ priorityscore=1501 clxscore=1015 phishscore=0 mlxlogscore=596 adultscore=0
+ malwarescore=0 bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506040126
 
-On 5/20/25 01:27, Sean Christopherson wrote:
-> Move the default IRQ routing table used for in-kernel I/O APIC routing to
-> ioapic.c where it belongs, and fold the call to kvm_set_irq_routing() into
-> kvm_ioapic_init() (the call via kvm_setup_default_irq_routing() is done
-> immediately after kvm_ioapic_init()).
+On Wed, 4 Jun 2025 18:27:49 +0200
+Alexander Gordeev <agordeev@linux.ibm.com> wrote:
+
+> On Tue, Jun 03, 2025 at 03:49:36PM +0200, Heiko Carstens wrote:
+> > diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+> > index 3829521450dd..e1ad05bfd28a 100644
+> > --- a/arch/s390/mm/fault.c
+> > +++ b/arch/s390/mm/fault.c
+> > @@ -441,6 +441,8 @@ void do_secure_storage_access(struct pt_regs *regs)
+> >  		if (rc)
+> >  			BUG();
+> >  	} else {
+> > +		if (faulthandler_disabled())
+> > +			return handle_fault_error_nolock(regs, 0);
+> >  
 > 
-> In addition to making it more obvious that the so called "default" routing
-> only applies to an in-kernel I/O APIC, getting it out of irq_comm.c will
-> allow removing irq_comm.c entirely, and will also allow for guarding KVM's
-> in-kernel I/O APIC emulation with a Kconfig with minimal #ifdefs.
+> This could trigger WARN_ON_ONCE() in handle_fault_error_nolock():
 > 
-> No functional change intended.
-
-Well, it also applies to the PIC.  Even though the IOAPIC and PIC (and 
-PIT) do come in a bundle, it's a bit weird to have the PIC routing 
-entries initialized by kvm_ioapic_init().  Please keep 
-kvm_setup_default_irq_routine() a separate function.
-
-Paolo
-
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/ioapic.c   | 32 ++++++++++++++++++++++++++++++++
->   arch/x86/kvm/irq.h      |  1 -
->   arch/x86/kvm/irq_comm.c | 32 --------------------------------
->   arch/x86/kvm/x86.c      |  6 ------
->   4 files changed, 32 insertions(+), 39 deletions(-)
+> 		if (WARN_ON_ONCE(!si_code))
+> 			si_code = SEGV_MAPERR;
 > 
-> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-> index 8c8a8062eb19..dc45ea9f5b9c 100644
-> --- a/arch/x86/kvm/ioapic.c
-> +++ b/arch/x86/kvm/ioapic.c
-> @@ -710,6 +710,32 @@ static const struct kvm_io_device_ops ioapic_mmio_ops = {
->   	.write    = ioapic_mmio_write,
->   };
->   
-> +#define IOAPIC_ROUTING_ENTRY(irq) \
-> +	{ .gsi = irq, .type = KVM_IRQ_ROUTING_IRQCHIP,	\
-> +	  .u.irqchip = { .irqchip = KVM_IRQCHIP_IOAPIC, .pin = (irq) } }
-> +#define ROUTING_ENTRY1(irq) IOAPIC_ROUTING_ENTRY(irq)
-> +
-> +#define PIC_ROUTING_ENTRY(irq) \
-> +	{ .gsi = irq, .type = KVM_IRQ_ROUTING_IRQCHIP,	\
-> +	  .u.irqchip = { .irqchip = SELECT_PIC(irq), .pin = (irq) % 8 } }
-> +#define ROUTING_ENTRY2(irq) \
-> +	IOAPIC_ROUTING_ENTRY(irq), PIC_ROUTING_ENTRY(irq)
-> +
-> +static const struct kvm_irq_routing_entry default_routing[] = {
-> +	ROUTING_ENTRY2(0), ROUTING_ENTRY2(1),
-> +	ROUTING_ENTRY2(2), ROUTING_ENTRY2(3),
-> +	ROUTING_ENTRY2(4), ROUTING_ENTRY2(5),
-> +	ROUTING_ENTRY2(6), ROUTING_ENTRY2(7),
-> +	ROUTING_ENTRY2(8), ROUTING_ENTRY2(9),
-> +	ROUTING_ENTRY2(10), ROUTING_ENTRY2(11),
-> +	ROUTING_ENTRY2(12), ROUTING_ENTRY2(13),
-> +	ROUTING_ENTRY2(14), ROUTING_ENTRY2(15),
-> +	ROUTING_ENTRY1(16), ROUTING_ENTRY1(17),
-> +	ROUTING_ENTRY1(18), ROUTING_ENTRY1(19),
-> +	ROUTING_ENTRY1(20), ROUTING_ENTRY1(21),
-> +	ROUTING_ENTRY1(22), ROUTING_ENTRY1(23),
-> +};
-> +
->   int kvm_ioapic_init(struct kvm *kvm)
->   {
->   	struct kvm_ioapic *ioapic;
-> @@ -731,8 +757,14 @@ int kvm_ioapic_init(struct kvm *kvm)
->   	if (ret < 0) {
->   		kvm->arch.vioapic = NULL;
->   		kfree(ioapic);
-> +		return ret;
->   	}
->   
-> +	ret = kvm_set_irq_routing(kvm, default_routing,
-> +				  ARRAY_SIZE(default_routing), 0);
-> +	if (ret)
-> +		kvm_ioapic_destroy(kvm);
-> +
->   	return ret;
->   }
->   
-> diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
-> index 33dd5666b656..f6134289523e 100644
-> --- a/arch/x86/kvm/irq.h
-> +++ b/arch/x86/kvm/irq.h
-> @@ -107,7 +107,6 @@ void __kvm_migrate_timers(struct kvm_vcpu *vcpu);
->   
->   int apic_has_pending_timer(struct kvm_vcpu *vcpu);
->   
-> -int kvm_setup_default_irq_routing(struct kvm *kvm);
->   int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
->   			     struct kvm_lapic_irq *irq,
->   			     struct dest_map *dest_map);
-> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-> index b85e4be2ddff..998c4a34d87c 100644
-> --- a/arch/x86/kvm/irq_comm.c
-> +++ b/arch/x86/kvm/irq_comm.c
-> @@ -334,38 +334,6 @@ bool kvm_intr_is_single_vcpu(struct kvm *kvm, struct kvm_lapic_irq *irq,
->   }
->   EXPORT_SYMBOL_GPL(kvm_intr_is_single_vcpu);
->   
-> -#define IOAPIC_ROUTING_ENTRY(irq) \
-> -	{ .gsi = irq, .type = KVM_IRQ_ROUTING_IRQCHIP,	\
-> -	  .u.irqchip = { .irqchip = KVM_IRQCHIP_IOAPIC, .pin = (irq) } }
-> -#define ROUTING_ENTRY1(irq) IOAPIC_ROUTING_ENTRY(irq)
-> -
-> -#define PIC_ROUTING_ENTRY(irq) \
-> -	{ .gsi = irq, .type = KVM_IRQ_ROUTING_IRQCHIP,	\
-> -	  .u.irqchip = { .irqchip = SELECT_PIC(irq), .pin = (irq) % 8 } }
-> -#define ROUTING_ENTRY2(irq) \
-> -	IOAPIC_ROUTING_ENTRY(irq), PIC_ROUTING_ENTRY(irq)
-> -
-> -static const struct kvm_irq_routing_entry default_routing[] = {
-> -	ROUTING_ENTRY2(0), ROUTING_ENTRY2(1),
-> -	ROUTING_ENTRY2(2), ROUTING_ENTRY2(3),
-> -	ROUTING_ENTRY2(4), ROUTING_ENTRY2(5),
-> -	ROUTING_ENTRY2(6), ROUTING_ENTRY2(7),
-> -	ROUTING_ENTRY2(8), ROUTING_ENTRY2(9),
-> -	ROUTING_ENTRY2(10), ROUTING_ENTRY2(11),
-> -	ROUTING_ENTRY2(12), ROUTING_ENTRY2(13),
-> -	ROUTING_ENTRY2(14), ROUTING_ENTRY2(15),
-> -	ROUTING_ENTRY1(16), ROUTING_ENTRY1(17),
-> -	ROUTING_ENTRY1(18), ROUTING_ENTRY1(19),
-> -	ROUTING_ENTRY1(20), ROUTING_ENTRY1(21),
-> -	ROUTING_ENTRY1(22), ROUTING_ENTRY1(23),
-> -};
-> -
-> -int kvm_setup_default_irq_routing(struct kvm *kvm)
-> -{
-> -	return kvm_set_irq_routing(kvm, default_routing,
-> -				   ARRAY_SIZE(default_routing), 0);
-> -}
-> -
->   void kvm_scan_ioapic_irq(struct kvm_vcpu *vcpu, u32 dest_id, u16 dest_mode,
->   			 u8 vector, unsigned long *ioapic_handled_vectors)
->   {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f9f798f286ce..4a9c252c9dab 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7118,12 +7118,6 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->   			goto create_irqchip_unlock;
->   		}
->   
-> -		r = kvm_setup_default_irq_routing(kvm);
-> -		if (r) {
-> -			kvm_ioapic_destroy(kvm);
-> -			kvm_pic_destroy(kvm);
-> -			goto create_irqchip_unlock;
-> -		}
->   		/* Write kvm->irq_routing before enabling irqchip_in_kernel. */
->   		smp_wmb();
->   		kvm->arch.irqchip_mode = KVM_IRQCHIP_KERNEL;
+> Would this warning be justified in this case (aka user_mode(regs) ==
+> true)?
+
+I think so, because if we are in usermode, we should never trigger
+faulthandler_disabled()
+
+> 
+> >  		mm = current->mm;
+> >  		mmap_read_lock(mm);
+> >  		vma = find_vma(mm, addr);  
 
 
