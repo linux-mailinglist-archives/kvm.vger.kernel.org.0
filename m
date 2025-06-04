@@ -1,132 +1,112 @@
-Return-Path: <kvm+bounces-48425-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48426-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28B54ACE236
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 18:28:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E2ACACE238
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 18:28:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBF30174F57
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 16:28:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 804DD1742E7
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 16:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276EB1DFDBB;
-	Wed,  4 Jun 2025 16:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A5E1DFE12;
+	Wed,  4 Jun 2025 16:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GGDTKJDd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P+brBL3G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B52339A1;
-	Wed,  4 Jun 2025 16:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521291DED66
+	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 16:28:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749054481; cv=none; b=QAXyggpiP8zzhH1Y2jaMd1geg0irfAjBAGIMMxCEl8Z6bIFDsRXabo3EAKTsMqaD9TlvUz+mEoi88RKmt4AYwbY0dJ708iaG8PUWlFBN6QjxUWH7iJFzg4Hf53ocWOGtZPSlKbUufPCBwEDL4CAjdaDPzxDmjMAYc/oPJYgv4Ac=
+	t=1749054505; cv=none; b=QfPUnFyPzyyLESUTd0enYMMDaFHh15UiUONNSK0nFmJdCltQuXVPFtLuNOzSo6Xz7FnYWxT+tE+Ix3YObLoZYd/qzzg4QtofZxhxm804hKGAJdrJPoys3Evkl8KtxlxPJYrtbrXurP/0hXw+ehYW5bkOk32YCxii6poOk8OSwkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749054481; c=relaxed/simple;
-	bh=M5CwoT9fT6WRXkVfDF7hfLXgzn+49k9G+Q1xlBia7Ck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KCtwYVxTIP8R7gzv3upjjA0g4rNd9lPWNP0jGl+htZ6k7nVtep7UnFqhX51LtmGVnjXBg8xQKtJJOcl0Yz6dq4pknOIwknFQtaDVgq7DDayxLh7tfcFVUaMvROfFFgnVcvJ9lKOnwqv5KXfaU19WghA85lyCjRUuTxAiFTp72eU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GGDTKJDd; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 554C8Fku031727;
-	Wed, 4 Jun 2025 16:27:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=odV9eqRZtddxv8cXsVKaJfeGVY72dp
-	B5o5Jyqa1hHPg=; b=GGDTKJDdyFUUgdnHT8bHLAcvAeBZC4sdD4sUduWm8Ix9pZ
-	BQqhb8GrMiPX7KIGcZGd5Jvzsy6GYWVKN9YlLeMInYeSwVR/5vwHKG5zC8Odi00X
-	crkOyaKJNd7h8L5IZYpHjjRUTAlVzzlzk6Zk8E43zUp4q8KFsjxgf1JDZRQPnqrE
-	F/dL59kjCNkCDsRY5gC0jxMHBfws3dNaIc8vw+TOs5juMtnOHp4U54UjFTzXU44u
-	mHeeLuWLmT/yI9On8PDHLRB6aOSpBXunQUeovxITEHxVeKm57MiLTUv31VtuJ1pj
-	761wnilUJPkjhFn/c3DYQdJGFiXnBNBft5JnJMoQ==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471geyushx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Jun 2025 16:27:55 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 554FgW7s024914;
-	Wed, 4 Jun 2025 16:27:55 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470dkmgjc9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Jun 2025 16:27:55 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 554GRpRZ48234854
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 4 Jun 2025 16:27:51 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3A2182004E;
-	Wed,  4 Jun 2025 16:27:51 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E0EED20040;
-	Wed,  4 Jun 2025 16:27:50 +0000 (GMT)
-Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.155.204.135])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed,  4 Jun 2025 16:27:50 +0000 (GMT)
-Date: Wed, 4 Jun 2025 18:27:49 +0200
-From: Alexander Gordeev <agordeev@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] s390/mm: Fix in_atomic() handling in
- do_secure_storage_access()
-Message-ID: <aEB0BfLG9yM3Gb4u@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-References: <20250603134936.1314139-1-hca@linux.ibm.com>
+	s=arc-20240116; t=1749054505; c=relaxed/simple;
+	bh=ZJyIckFTExpj1Y90auHWc4FV90jywqVwpSKCRNl8zVM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ivpLboILITFsfy/mZBX7fDypL4Z8IP/CExWr9xRptL1yb/iIBjtbpKvmwsJkYRrPSgFgmS2DW4hGDVLEOczuAZeibsTn3/4cgmyFEDMvfdWRT8H9y9pu/bTQUl/oxMGkCB7zPAnFls+3QDjFAPf8/rnxdLGmyb4X1jGz0EHcimA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P+brBL3G; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-312436c2224so55109a91.0
+        for <kvm@vger.kernel.org>; Wed, 04 Jun 2025 09:28:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749054503; x=1749659303; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1/PzlSGATB5QLnfIO/9xMz9wdcBK9gS0k4KlE7K+2X4=;
+        b=P+brBL3GL+WkCqCZG73OPSkr1aeaFNiXEruGWSKDXLPmxdiJxBfu+xZmMeMYQDOBrN
+         yvWoBMvhf/SjodiTb13kEGg2iIDG584yORArRgQH+6CoLI19I2RV4d4xtdB5u/F2ofvI
+         bUlWii+utYBh0MBoiBqrZdFPijc4gPRPGFtcS/bsHY9oLzPKdK3YHlQAFT1OYD4ujQjV
+         hKOcDzPyEKp0N4kjG6bHYhk1gAXCnsRiYgfQs1nP0Fc3dx2BHPiwqMFbYoRONDWoaAwh
+         hQQCjMbDCE/yck5DLAi33NsXJzp/w0xPVznk10EgLQB9PfgBxE9JAM3f8kvl4/AXkY+A
+         o9Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749054503; x=1749659303;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1/PzlSGATB5QLnfIO/9xMz9wdcBK9gS0k4KlE7K+2X4=;
+        b=OFFZlYdpDCrIbhOu4c69zJGwF+5i+Z06ANXYVpTqel+rE1Mv43rIpwQYZpaJAr/YVn
+         UXepUsjdQXxeumMcXNA1jTns7M1oXoBwc1pjQRYgz1gAWJBFJ3TC+59dFZc81e5V0U9q
+         5Xc/eRSpWdxgXp6TKoblzwbL71HC7ol44lbRttsmdRru47nURvpi9XY12Za32MIUyjgN
+         NK1iOPHeIFCWUyne5XNi6zyeBxHLUu+NuKvJPgPvLA31K+uP/G5htr4DUUj8cZttQNe0
+         +DN0JXtbjhsEa0stNk+L2snZZhykJfomX9Rqt+XXvnsLTv0qyacXBasWtI2nag3GjFRs
+         PGrA==
+X-Gm-Message-State: AOJu0YyGTxgxcxmhagIsBPb01GpTtdBEsTEmtAtqS5+ISzipQpS04HkN
+	kxqWyAjrrjygtzSDxX5e2tVbqAXzI9dJMlUbV/+8pDPObM40oYQmdx/sA0X7h53gdrmX3zPkpHW
+	f4OfK4w==
+X-Google-Smtp-Source: AGHT+IEKjmRcgY92eBfv/tMGluyG//CiEtS2rija0phY6qR/oNwBHkY8e9r7FMkUXjtbaeAfSjA+T/QL5JE=
+X-Received: from pfjt21.prod.google.com ([2002:a05:6a00:21d5:b0:747:a97f:513f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:a24b:b0:1f5:a577:dd10
+ with SMTP id adf61e73a8af0-21d22c86371mr6166950637.36.1749054503567; Wed, 04
+ Jun 2025 09:28:23 -0700 (PDT)
+Date: Wed, 4 Jun 2025 09:28:21 -0700
+In-Reply-To: <a9f3f64c-2f82-40b0-80c0-ed1482861dc2@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250603134936.1314139-1-hca@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XXR5RXs-nmhHCVi5aTsnkL_WPjZgyPqb
-X-Proofpoint-ORIG-GUID: XXR5RXs-nmhHCVi5aTsnkL_WPjZgyPqb
-X-Authority-Analysis: v=2.4 cv=X4dSKHTe c=1 sm=1 tr=0 ts=6840740b cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=kcu79PlnQnCj__8gWF0A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA0MDEyMiBTYWx0ZWRfXxreFWSEaAFdM Kw0yp+1C5a0AEsyRQYizXnAiu+q38eNgrMQQ2PUS0RKCGgd4C7fc3rsHaGA9DePfqQLwfpzECXV zAxTy6cf2i5VLAL74qupbQUbV6NwUXV6QS/uNgcffN2LPCUq/YHWtWbFq7IP3mjI3yT8fKnKhnt
- EhDrSmG9B++U55a4YudEJSBQFCb7exFxa5m1xQwvBJTynvBVnMm7nmGe+WxaCl/8UBECCQlfPau dYfbJM1sGI5XUN55AQpdMCYhB+fvQzeDbxcIJp9u1FkvmiIS4PkXKJ5f9K1efGCT8+SzohJ4LsE tRwPZFuZ579S7lQdgSByQmHy3lLH3d+jkZS7Vd+V/PbtKNy4jMI2iv4cZwGP8GQj6M4wXRJhhe/
- 2GAyXj/Q1cW5GRt9G//o8Ma8stXgit0BhErvd3IZbdZnSK5OhOC1Tgn9whdaA3+7wW+O23Gg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-04_03,2025-06-03_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=627 adultscore=0 clxscore=1011 phishscore=0 bulkscore=0
- malwarescore=0 spamscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506040122
+Mime-Version: 1.0
+References: <20250529234013.3826933-1-seanjc@google.com> <20250529234013.3826933-26-seanjc@google.com>
+ <a9f3f64c-2f82-40b0-80c0-ed1482861dc2@redhat.com>
+Message-ID: <aEB0JZJNs3dDZWJx@google.com>
+Subject: Re: [PATCH 25/28] KVM: nSVM: Access MSRPM in 4-byte chunks only for
+ merging L0 and L1 bitmaps
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Borislav Petkov <bp@alien8.de>, Xin Li <xin@zytor.com>, Chao Gao <chao.gao@intel.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jun 03, 2025 at 03:49:36PM +0200, Heiko Carstens wrote:
-> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-> index 3829521450dd..e1ad05bfd28a 100644
-> --- a/arch/s390/mm/fault.c
-> +++ b/arch/s390/mm/fault.c
-> @@ -441,6 +441,8 @@ void do_secure_storage_access(struct pt_regs *regs)
->  		if (rc)
->  			BUG();
->  	} else {
-> +		if (faulthandler_disabled())
-> +			return handle_fault_error_nolock(regs, 0);
+On Wed, Jun 04, 2025, Paolo Bonzini wrote:
+> On 5/30/25 01:40, Sean Christopherson wrote:
+> > @@ -1363,8 +1357,9 @@ void svm_leave_nested(struct kvm_vcpu *vcpu)
+> >   static int nested_svm_exit_handled_msr(struct vcpu_svm *svm)
+> >   {
+> > -	u32 offset, msr, value;
+> > -	int write, mask;
+> > +	u32 offset, msr;
+> > +	int write;
+> > +	u8 value;
+> >   	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
+> >   		return NESTED_EXIT_HOST;
+> > @@ -1372,18 +1367,15 @@ static int nested_svm_exit_handled_msr(struct vcpu_svm *svm)
+> >   	msr    = svm->vcpu.arch.regs[VCPU_REGS_RCX];
+> >   	offset = svm_msrpm_offset(msr);
+> >   	write  = svm->vmcb->control.exit_info_1 & 1;
+> > -	mask   = 1 << ((2 * (msr & 0xf)) + write);
+> 
+> This is wrong.  The bit to read isn't always bit 0 or bit 1, therefore mask
+> needs to remain.
 
-This could trigger WARN_ON_ONCE() in handle_fault_error_nolock():
+/facepalm
 
-		if (WARN_ON_ONCE(!si_code))
-			si_code = SEGV_MAPERR;
-
-Would this warning be justified in this case (aka user_mode(regs) == true)?
-
->  		mm = current->mm;
->  		mmap_read_lock(mm);
->  		vma = find_vma(mm, addr);
+Duh.  I managed to forget that multiple MSRs are packed into a byte.  Hrm, which
+means our nSVM test is even more worthless than I thought.  I'll see if I can get
+it to detect this bug.
 
