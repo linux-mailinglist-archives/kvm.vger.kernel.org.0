@@ -1,142 +1,185 @@
-Return-Path: <kvm+bounces-48371-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48372-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DE62ACD7BC
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 08:06:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD6E0ACD7D8
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 08:29:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F335D170241
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 06:06:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B7801636D6
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 06:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E42262FF8;
-	Wed,  4 Jun 2025 06:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E24262D1D;
+	Wed,  4 Jun 2025 06:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eWlEeDv7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hliPEkC6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D37023817A
-	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 06:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9FF230BC9
+	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 06:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749017154; cv=none; b=WhJ81j6zcgwt5Yv6Gm80VI2f20iSDyYJmmSqszHw6t9SJnkm8qQqFdcZEiSwSo54vCuMcqaTS1jT3W7+qr88UgHjeqyVVv1m4pfmRhcbnn1sH0tLM3+Dr0HhFkOzzcUZ6fnQMuWhdXjjI6fks1RMkCzNUjq2Gbx7faBA+LO8N9g=
+	t=1749018530; cv=none; b=r70AZH2FcKm+USuzlGFbMRGGP+jgeW/g6TAuBrL2oB+gWw663XnzOXhksAPE2QnrjCAeRgOWAF5CwMNQSwWvS+VCvNwtxaF9UJOMoGGj3IJSd5WIXrh1JJzzKTvH0TxcHz3z6TEWNX/BYExjXwvmBwovsDw2CoFMCqM10EppzlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749017154; c=relaxed/simple;
-	bh=+DmDA8gTVDEKW+xZT5XGMWbGqnwbVuk5pqFDvuYEQ68=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K3SHfxHmxj7CnME/0uPCeJ7Ttfx9RLxLWxPzxkZdPRYN7IAN5nOnXGxPMNiDp/r7HRcHDKbQRE7npAGGEKQdliJt40eC8Y/saREv7+CBkKnEtDQ8btTl9IDn/Iawsl2dMpJVGmv7CJitM9pm7QUTRyUsHCyOOWTn23ptqt098Xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eWlEeDv7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749017151;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/ltLi5ra24Jsb0STBHkenR2Lb1EgkF/r4FbLJPR1eTI=;
-	b=eWlEeDv76/X/+FjRwZdVg1vLj+o9J7Tkaf1bZVjy1XBVzCYCTwhVkvmrb3ecUXYTgTnCIX
-	wUTOI82AxM/4yDH9HxoM/aYgvOYn4KN/TdHR+Yb20et9fpIEAnaBnSMg9o4ZPaJAgVslri
-	MMks1mh4AILJMPOBk3vvbQUv+DNVPTM=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-595-h5g9L8HKO_qa87fE3cteWQ-1; Wed, 04 Jun 2025 02:05:49 -0400
-X-MC-Unique: h5g9L8HKO_qa87fE3cteWQ-1
-X-Mimecast-MFC-AGG-ID: h5g9L8HKO_qa87fE3cteWQ_1749017149
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-7480c9bcfdbso419883b3a.0
-        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 23:05:49 -0700 (PDT)
+	s=arc-20240116; t=1749018530; c=relaxed/simple;
+	bh=81I27BGU8mhubZTMywMowsvZkPwGka40pBc2bYczHzc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HffMHpH/eabVm8EfoDT5u6HfylUcGQ7F8eyku+Nq555pIvwOUi0+buE7d3yJVKovnVB4/oBaV4ILEohcWYuvd4OTEo3on1FJau3k6sdYStI2rI76vvHVdZzAzVH49gm/GCHfxaMREjHYoGzNrEtNbsL1S/pMm8Hy+Vcq1esZVlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hliPEkC6; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-235ca5eba8cso141815ad.0
+        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 23:28:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749018528; x=1749623328; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mR2Zn0MW6e4k4Z0HY1GhfsYb4tFjSsp0sytwXaGW+TI=;
+        b=hliPEkC6xvUSQSTrr8Fy3sFH2lr2tAYLGxOfrIpRzPGBfRosFEaohVtgN6167yDhvM
+         WD2Xapi9Jcvjis5DrQ3BOecr9yhVliYPeUEpabgh9xOmAyiYD0HuWRckh5Ssf8Ii/FOM
+         8ve9+pr7VcUWTQTvXP+E675XXe8OMZeryiZG4FXl/TMdjxWDVbPaSDjWWJvIowIbJQVs
+         lTqEmNSdXG6yBjOQRq83j6lE1CWQnMl1ATm/HEIQ2EOkQRgJT2TFod9PNUvzTvgmGMvh
+         KlA4XLWQvqnj7XuTGPkzFSSopb0ZYoOKK9Irr6QUFlZXNgWVSPv+a4+1ADdp2jyoRWW3
+         jfeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749017148; x=1749621948;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/ltLi5ra24Jsb0STBHkenR2Lb1EgkF/r4FbLJPR1eTI=;
-        b=Rudl8+feKLANu9gAYL318Uh41eKt1d9QuJqp8ia/+3Vw2wWcftGmdeEw2v/t8crm0j
-         OBUoVl7bHRovVq/SeiuNB28N9QsrxJhknIrZjt0/Kdgx1sYhS/Tz7EFtlIDKCPnIkpor
-         vPYjTHC3mhYAEXQLf5bfD9YzNOp2SVl7YK0GKV3U6hxDIfEJA/4uCEyHbZQSW2HphWUc
-         YvvT/hwAFYe4zJeIOcGJa52PkRTdlfBMD43WMOy0ciKYa9d+c6riPBwWHs54jh4D4a07
-         Gy+MbnbWqH5418beySm9+p+VCWA5/tNRdguV2P72RsdS8MpUOFZtFA37HrWfcgVQUhea
-         LUkg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5CtJG9m7mRF9kx3m7W90+qqbc8/1FwBdkRJyvytt6N8t9mmzDX/BUSMHWr3OFLVomy4E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGPA/M2JY49iQ5/iWj4ZpTqTfefNliKV9KefFeUd/CFzYOMaL2
-	9jEMMcj4i8vwzw9VJr1YAVDR/cA3IHSj73/QS0+pUZiWAqIcsEqaccKkTZe3DZ9tYrQt8SWpRWO
-	A7N5jtq1j8K5xONL2Qlmqyc9d6c3FKq1Vsy7cT7G4Mqe5RKGhAezs0A==
-X-Gm-Gg: ASbGnctvXA1CSUomdR7+uOEpsB0ip12TnYzmvKiye/g/tP4/4ZaktpP3T9dNAv4lH/Q
-	p8uIhDIuYnxpaQ1+PO654snLNu+KPUjE0VKiNvSof+Rg5iGtme5DzOYAJvnxDjm0B5OOQ86m0Wz
-	YP0/P26DG4iDrMnSTzuTwJKpEVOKEaHcwA5Rgm/ZSgValhGC/djW9QS/nYh4wGuaJDfhuOJYe8H
-	NETxcPJy8ZvwdOm0Wxmx+e/f+QnRMMA1uKM/DTTL6qy5xejDQ04bHNFssW3OeljjJ1EUNW0lBJs
-	Vx2kRQL6tPpwYjd6eKe0JCpDBNQv1Y/zPkF0FOUnw7aEZdQiWNB6NxWAt7o/Kw==
-X-Received: by 2002:a05:6a00:1488:b0:742:a91d:b2f6 with SMTP id d2e1a72fcca58-7480b41ed78mr2603727b3a.13.1749017148471;
-        Tue, 03 Jun 2025 23:05:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEBsfgsaAmGId0zrYF9y6DFo02h+riK2t8uOhUFLQymVW6YzwyhCaemYYcLF8v0T3nQ6io34Q==
-X-Received: by 2002:a05:6a00:1488:b0:742:a91d:b2f6 with SMTP id d2e1a72fcca58-7480b41ed78mr2603694b3a.13.1749017148117;
-        Tue, 03 Jun 2025 23:05:48 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2eceb0a005sm6938285a12.7.2025.06.03.23.05.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Jun 2025 23:05:47 -0700 (PDT)
-Message-ID: <19aa8bb5-7133-4005-a808-8cdc8a7acfc7@redhat.com>
-Date: Wed, 4 Jun 2025 16:05:27 +1000
+        d=1e100.net; s=20230601; t=1749018528; x=1749623328;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mR2Zn0MW6e4k4Z0HY1GhfsYb4tFjSsp0sytwXaGW+TI=;
+        b=O0qabTy4gTIl9/jOl119YAWb1NSsdbK4DpS3jDcGQjV4caNJ4yj4q+RjvnjeVUvCBY
+         Y8h7Qa/DY7mRSRWbUqCXSyX1SAwJZ5o1S8o6nOhatRBNeztCt44v/misxSnWeKePdHGh
+         P5IO3k9/hoQwkVeWJ27iOM3XY83/VlAKhv1Mhk4sEqUGcu7LpS/CZ6lHazJ5ZV8R6PDg
+         pIlD2exqI/c0PsYGFZJIWZq5G3PACYqeNybPTEOvy/12anUDgVKMjEju1uu2Yd6aXqWL
+         iGqIoReMD4r3JHy5rAMc57WVTnnK/QdlAm0cT+IjakGaxtyybkAPYHRtEk3he0Iu8iud
+         WNTw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6mBuJMoiysZFpoSyEgoiz5TU9qt/LN13nXKTV0ca9fR5aj6pvee9vDv3rA/ykEacXpyI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxE/t6xXDhQ1QjWcv7JobfZgMfoDyvh6VCDtoZMeP3Gtc91kf3/
+	rpzHDcGnrLrLKapCsICSP1omf+ckcjZVtpMbGDmTIFZk027NJB1L175GFpuV36ur3iXFFpfdeTp
+	hGP+TgmjJtXDEFexNsx0mDoKGVDqGPcOEq3yTb4mC
+X-Gm-Gg: ASbGnctfPBl+GnGIjIvdgTaMGPKjLLNJFx4UhXMXblNY4oiWL5ytRQpYLn5G+ogLQ3U
+	+7Z+3HEE4NAaok94tyzJKaej7yd4QMVG7YzyonI7rKHaA15in2uhmKV24elOBxYh+rBaIlKjRHV
+	1ftaturmGOrYe4fhLkXP578zL/iEHVi701zhVU7EM=
+X-Google-Smtp-Source: AGHT+IF4xC9qzv5BpN6gxJKh5AXqy9touHIS+Fp9PpnqdXrV7B50j8vZ0rrHhe6vndq71OXKlvYGh3n31yPiGriIJPI=
+X-Received: by 2002:a17:902:e5c7:b0:234:b441:4d4c with SMTP id
+ d9443c01a7336-235e15dfc0emr1475605ad.5.1749018527397; Tue, 03 Jun 2025
+ 23:28:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 12/16] KVM: arm64: Refactor user_mem_abort()
- calculation of force_pte
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250527180245.1413463-1-tabba@google.com>
- <20250527180245.1413463-13-tabba@google.com>
-Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250527180245.1413463-13-tabba@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <diqzjz7azkmf.fsf@ackerleytng-ctop.c.googlers.com>
+ <diqz8qmsfs5u.fsf@ackerleytng-ctop.c.googlers.com> <aC1221wU6Mby3Lo3@yzhao56-desk.sh.intel.com>
+ <CAGtprH_chB5_D3ba=yqgg-ZGGE2ONpoMdB=4_O4S6k7jXcoHHw@mail.gmail.com> <aD5QVdH0pJeAn3+r@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aD5QVdH0pJeAn3+r@yzhao56-desk.sh.intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Tue, 3 Jun 2025 23:28:35 -0700
+X-Gm-Features: AX0GCFuaJpGd_WyvZx6tH5AycHCVm09gZ2trd8iERU8A_mfPXViA5zVANtPv3SM
+Message-ID: <CAGtprH_XFpnBf_ZtEAs2MiZNJYhs4i+kJpmAj0QRVhcqWBqDsQ@mail.gmail.com>
+Subject: Re: [PATCH 3/5] KVM: gmem: Hold filemap invalidate lock while
+ allocating/preparing folios
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, michael.roth@amd.com, kvm@vger.kernel.org, 
+	linux-coco@lists.linux.dev, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	jroedel@suse.de, thomas.lendacky@amd.com, pbonzini@redhat.com, 
+	seanjc@google.com, vbabka@suse.cz, amit.shah@amd.com, 
+	pratikrajesh.sampat@amd.com, ashish.kalra@amd.com, liam.merwick@oracle.com, 
+	david@redhat.com, quic_eberman@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/28/25 4:02 AM, Fuad Tabba wrote:
-> To simplify the code and to make the assumptions clearer,
-> refactor user_mem_abort() by immediately setting force_pte to
-> true if the conditions are met. Also, remove the comment about
-> logging_active being guaranteed to never be true for VM_PFNMAP
-> memslots, since it's not actually correct.
-> 
-> No functional change intended.
-> 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->   arch/arm64/kvm/mmu.c | 13 ++++---------
->   1 file changed, 4 insertions(+), 9 deletions(-)
-> 
+On Mon, Jun 2, 2025 at 6:34=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wrot=
+e:
+>
+> On Mon, Jun 02, 2025 at 06:05:32PM -0700, Vishal Annapurve wrote:
+> > On Tue, May 20, 2025 at 11:49=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com=
+> wrote:
+> > >
+> > > On Mon, May 19, 2025 at 10:04:45AM -0700, Ackerley Tng wrote:
+> > > > Ackerley Tng <ackerleytng@google.com> writes:
+> > > >
+> > > > > Yan Zhao <yan.y.zhao@intel.com> writes:
+> > > > >
+> > > > >> On Fri, Mar 14, 2025 at 05:20:21PM +0800, Yan Zhao wrote:
+> > > > >>> This patch would cause host deadlock when booting up a TDX VM e=
+ven if huge page
+> > > > >>> is turned off. I currently reverted this patch. No further debu=
+g yet.
+> > > > >> This is because kvm_gmem_populate() takes filemap invalidation l=
+ock, and for
+> > > > >> TDX, kvm_gmem_populate() further invokes kvm_gmem_get_pfn(), cau=
+sing deadlock.
+> > > > >>
+> > > > >> kvm_gmem_populate
+> > > > >>   filemap_invalidate_lock
+> > > > >>   post_populate
+> > > > >>     tdx_gmem_post_populate
+> > > > >>       kvm_tdp_map_page
+> > > > >>        kvm_mmu_do_page_fault
+> > > > >>          kvm_tdp_page_fault
+> > > > >>       kvm_tdp_mmu_page_fault
+> > > > >>         kvm_mmu_faultin_pfn
+> > > > >>           __kvm_mmu_faultin_pfn
+> > > > >>             kvm_mmu_faultin_pfn_private
+> > > > >>               kvm_gmem_get_pfn
+> > > > >>                 filemap_invalidate_lock_shared
+> > > > >>
+> > > > >> Though, kvm_gmem_populate() is able to take shared filemap inval=
+idation lock,
+> > > > >> (then no deadlock), lockdep would still warn "Possible unsafe lo=
+cking scenario:
+> > > > >> ...DEADLOCK" due to the recursive shared lock, since commit e918=
+188611f0
+> > > > >> ("locking: More accurate annotations for read_lock()").
+> > > > >>
+> > > > >
+> > > > > Thank you for investigating. This should be fixed in the next rev=
+ision.
+> > > > >
+> > > >
+> > > > This was not fixed in v2 [1], I misunderstood this locking issue.
+> > > >
+> > > > IIUC kvm_gmem_populate() gets a pfn via __kvm_gmem_get_pfn(), then =
+calls
+> > > > part of the KVM fault handler to map the pfn into secure EPTs, then
+> > > > calls the TDX module for the copy+encrypt.
+> > > >
+> > > > Regarding this lock, seems like KVM'S MMU lock is already held whil=
+e TDX
+> > > > does the copy+encrypt. Why must the filemap_invalidate_lock() also =
+be
+> > > > held throughout the process?
+> > > If kvm_gmem_populate() does not hold filemap invalidate lock around a=
+ll
+> > > requested pages, what value should it return after kvm_gmem_punch_hol=
+e() zaps a
+> > > mapping it just successfully installed?
+> > >
+> > > TDX currently only holds the read kvm->mmu_lock in tdx_gmem_post_popu=
+late() when
+> > > CONFIG_KVM_PROVE_MMU is enabled, due to both slots_lock and the filem=
+ap
+> > > invalidate lock being taken in kvm_gmem_populate().
+> >
+> > Does TDX need kvm_gmem_populate path just to ensure SEPT ranges are
+> > not zapped during tdh_mem_page_add and tdh_mr_extend operations? Would
+> > holding KVM MMU read lock during these operations sufficient to avoid
+> > having to do this back and forth between TDX and gmem layers?
+> I think the problem here is because in kvm_gmem_populate(),
+> "__kvm_gmem_get_pfn(), post_populate(), and kvm_gmem_mark_prepared()"
+> must be wrapped in filemap invalidate lock (shared or exclusive), right?
+>
+> Then, in TDX's post_populate() callback, the filemap invalidate lock is h=
+eld
+> again by kvm_tdp_map_page() --> ... ->kvm_gmem_get_pfn().
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-
+I am contesting the need of kvm_gmem_populate path altogether for TDX.
+Can you help me understand what problem does kvm_gmem_populate path
+help with for TDX?
 
