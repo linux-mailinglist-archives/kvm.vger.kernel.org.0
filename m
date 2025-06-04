@@ -1,314 +1,355 @@
-Return-Path: <kvm+bounces-48369-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48370-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0173FACD785
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 07:43:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D821DACD7B6
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 08:03:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6DC6165A97
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 05:43:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33BB5176942
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 06:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7C3262FC1;
-	Wed,  4 Jun 2025 05:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DADC262FD9;
+	Wed,  4 Jun 2025 06:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VJv0+SZv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OwMIDZ50"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE229139B;
-	Wed,  4 Jun 2025 05:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749015802; cv=fail; b=LfCNl9K+jRWTr1HxNPFH68L75zzoWN6CJrlI1f6bGbMa9JciRN4yIb6w9NhU8wr/N+qwfCtwKrqzSqQVRYFCCBzEUg45z6j1b5wOytBTQOP4PWqF0U1uMNd6G++c7dK5qPj8lQChiSKAQ8NbidZ9+OjbgDoafWE554XvapU2al4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749015802; c=relaxed/simple;
-	bh=MPHw25y4DmUAgp23TMA8uwg+FMpH3wMAc7BegigXDlw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=OThQTSMBHvrhFNym6mpi4kWqQY5bR/AAB7vcIbB7XVRrm8AT4RR3FNb3RNSC8lTjAgBSQnvigEMohZ2VdILQbW8SZvYmCwnKFU33eCyXKP+cBnPvLJq0IGDp8jApq476wV/IdjjdOPcE4Dv6LwcupDI/a4RGPAtQ8L4FjTeKVRM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VJv0+SZv; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749015801; x=1780551801;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=MPHw25y4DmUAgp23TMA8uwg+FMpH3wMAc7BegigXDlw=;
-  b=VJv0+SZvq9AcnDA2ubNOA9dPkXzL7oNQ+HkTRYzCggqUk0cxF/KBMlQP
-   GjvWhmE+X1wWU3jHizLvXDdOY98yiVCNtt3WiIny/rTzIhsEh6VIOi7QG
-   VVtzhrQIWjIvTtUCSyfnzK10dtVTli3By5O5hxCQfgQ8CBnWbPbHmk8TH
-   NLNEhj/zaAAVHXe21dqB3i299Za0POiSbKVsaAtK0aepJxolDyT9NMOkn
-   MfKG4RfzDDjWgL7rsOcXiei34Hhuf4Pw/8bgykFSbJMw4FcVAYLYvZUGO
-   AUZ+YV4gj8L56jtOkrYPBUWD0lCqrP1fQ8kh7czm2KAuQHfwjr56b/IE9
-   Q==;
-X-CSE-ConnectionGUID: N4hZJ+oxRk2L+eQowAemuw==
-X-CSE-MsgGUID: e1NdSYTwRRComnzYsivWwQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11453"; a="50774428"
-X-IronPort-AV: E=Sophos;i="6.16,208,1744095600"; 
-   d="scan'208";a="50774428"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 22:43:20 -0700
-X-CSE-ConnectionGUID: PC0XtmGuTdGLgJTvMz8ErA==
-X-CSE-MsgGUID: enmYR96eRwm5R7JGteSNmg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,208,1744095600"; 
-   d="scan'208";a="145045886"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 22:43:19 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 3 Jun 2025 22:43:18 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Tue, 3 Jun 2025 22:43:18 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.83)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.55; Tue, 3 Jun 2025 22:43:17 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BgiPgSp47NvlmSJb2vaYGEIcL5NKqEidoPuzKO02ps6ASgkCCzX2rl74KseQlbXSQ+j9dZBYDpSrGsu6LEVtXtRy8w7mx1OqZ7DX1nCpRcRm4GauQzHLcnvDH2Da741GER8UHZRS9UKO0SNCIqPucnEZ1orZ7Dt4CSiLD3vZ1b5ESK37/vU3OTbkzFX3n8I5uhZR1SbPBKkYouma6rkojvgh4ejyptRrPxmotqr3RFsEdmCFCXROeLbI49K8dqKLKZMAcT4nP6es1ttRO2FV9OoQiWrspilvDXLPsO6xNugj/+gOJejciZJizfCGiVJnXZHF8FBAY9pcV1XfydYi9g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bsWqvCZ+PpdzGloWkeLf2h6E8QlNG43zHQO2bO6Tk8g=;
- b=BKnTMeEjAHonb83scM3q3W+6sRV8Je/RXZ2ZCXwv7QTSVPE13IORsS/gwr0qRnln3OUNKnmqgdFzJAHALq1gFlKbOwbVpQHvkPge3S1gO42gghBBS8QGRnbINCLwjJgD0L0lHkWQdUZaDGfaMxQNCOy4xon3m38OYLnTYbs8HA0bm7xidTwURMn0wz94VhJju8BwvvsAEkBDcTivyS7lKBKlgSgBTF5J3AX3xBZfqkvYDjzHQ1Am0uzKBH0Nsyv/ykB8ZKlC3Z/hAVTVaBfImwbmNCLCJrIcnmW2Ah4siEaMYHyrZgEGtYwPwxhXmse5GWfaz5kytv8l24b2aARjaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by PH0PR11MB5031.namprd11.prod.outlook.com (2603:10b6:510:33::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.32; Wed, 4 Jun
- 2025 05:43:15 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.8769.031; Wed, 4 Jun 2025
- 05:43:14 +0000
-Date: Wed, 4 Jun 2025 13:43:05 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, Xin Li
-	<xin@zytor.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: Re: [PATCH 08/28] KVM: nSVM: Use dedicated array of MSRPM offsets to
- merge L0 and L1 bitmaps
-Message-ID: <aD/c6RZvE7a1KSqk@intel.com>
-References: <20250529234013.3826933-1-seanjc@google.com>
- <20250529234013.3826933-9-seanjc@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250529234013.3826933-9-seanjc@google.com>
-X-ClientProxiedBy: SG2P153CA0025.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c7::12)
- To CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603DE199FAB
+	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 06:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749016972; cv=none; b=SVgVtzLPSieKhqGW2HmdLpKGjGfxKvz5tGr7rRwgxN8xiSOKHR1WRd6mhMEukFado2azQp6w0l7G3Bac3HbI0vXC5sReKM3oYkMr09rhnLI5EJ/QJhqh4t/tFPBZe3dSsek2fgbzPwAo9LSlp+w1uyRIv5dCHhebmoCYhOTSIXQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749016972; c=relaxed/simple;
+	bh=0S+zKM1VTG03hJ7FkjXHPl1Q2BTrRfNEHJufTC1rUYQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rIFmoPAlnhhTVDLavNYKdceuB+Z0CCYaA2zGEMevdckf1/STs3UogvwPKS5iZPNXJ2TbnE8Zj39UlZavP8ci0QHZXyFeRX2bzDepsY9MTMMJbfYKkaPBYRb8CTNz5u8QpCkOpUgTHJfaeqfXNX4LoadyNvrXvp39yKSMnBtPvkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OwMIDZ50; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749016969;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k5uLUF947dFAnsNE7++/VYYbP4qG+tIlvwWDVTd+HiU=;
+	b=OwMIDZ50HYW3sxUHziLdQpd12urGmS9AHGAK5Fj2YahpDVhnr1ocq4VxNEiqnKCumdJaT6
+	ZF2RIL3ruZFmWC+2OV6F8TUPsNH6dPuOo+AiYAQhYmxJ0QbNVFwI9+mxrc5wOnvIxljHDm
+	u/c27Qxr0UcKY4vkUFPPoCUhnNbYH3M=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-426-R-qvp6Z3PP2reO7IXJBUkw-1; Wed, 04 Jun 2025 02:02:47 -0400
+X-MC-Unique: R-qvp6Z3PP2reO7IXJBUkw-1
+X-Mimecast-MFC-AGG-ID: R-qvp6Z3PP2reO7IXJBUkw_1749016966
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-740774348f6so5475962b3a.1
+        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 23:02:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749016966; x=1749621766;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k5uLUF947dFAnsNE7++/VYYbP4qG+tIlvwWDVTd+HiU=;
+        b=MCubtJ7obQapIgfM/BDAd2eIalrUJZqPxN2OMzEeP1+KrUqN0FXs8COyfeqtVCin0C
+         4Fs0jhUVXXXkaJb7oshTndrR50zwSsfrjbDvnF+rOpraICWr2ZcavuUg6Zx0zpWfTtwm
+         ZhZ3QPtTNRSJvrsKbyYI7ut33VHXaSOTRS50neVF4nqwCch3s1fa5vVIcxQ/Iq65bnCX
+         ptl2H7JkppIvElcRPPv1UZlnW6389IvwGlIM9ypovwc10sz4jxzTeoFsLJpbqgLf0rsp
+         RVLfdJPXlepabSKBkuIrJ6b2pV+pLzpdN5lXkjUx96BL68eQVnp9T1GFZATKcHJCasQv
+         nsjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUbSQkJx4grd8iySES3j/91TLRkxC4FsO/MzbTB3gacj9GCbHfcoBicuSlu/Yz3BLzrxJc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzL1N/Gm8u5UULWiEXvtI0hLaMtNY18KrkjbgAPol1WvU0eOA5D
+	GKFb6EaapyWRp0Y6BRdgbT+kutwAmDTXRy8HgE44hJDLVmjn5cpgs3NqxSC9R7U2xYVsr4dJQoQ
+	fmk7yB4SAhWWiqnlUipgRk4j/WLe0XD4j+sH4+7MIzPjbnZ1KxdwahA==
+X-Gm-Gg: ASbGncskHd0GQm4DJQDN8AvOZ8n93X7FQxQjz/mygScau20+UgxobED5oZ5y6fiYhu8
+	Co04wn7EzeGf1JHhD1ibASPg0DfcCvq8Jf4FruR2Tc+OKdwB1j6UtNFsMbFfGLbMK95dt8yjQO9
+	MqcosA2d4Odg+Ob6GKQyeroG5F6LXLvvst+gYIDFjLOcLLbugG78GbJ1oAIXtxxh5zivUt6WPz3
+	6jBkeXeaUTYRPtnskzfS/6L9PA95ZRszyZ1V7Uis2iHjcPXW6Xppuju1O6Vdb9qmkFGdM4mD3cg
+	+iQdAoU+MGexMab5HvFF1wRO9PPnhQP1DXhULQq+Eyd/V39VEoSiBNmt32EyNQ==
+X-Received: by 2002:a05:6a21:4cc1:b0:1f3:2e85:c052 with SMTP id adf61e73a8af0-21d22b7f532mr2763342637.35.1749016966106;
+        Tue, 03 Jun 2025 23:02:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEbPgoAdH13lfHhim2/QFoHMd+Hf9TCaoInZNikaO5lQ5+Ego2tu4vOwUsU7zQXeW98WoOuzw==
+X-Received: by 2002:a05:6a21:4cc1:b0:1f3:2e85:c052 with SMTP id adf61e73a8af0-21d22b7f532mr2763286637.35.1749016965618;
+        Tue, 03 Jun 2025 23:02:45 -0700 (PDT)
+Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2eceb96f74sm7965235a12.62.2025.06.03.23.02.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Jun 2025 23:02:45 -0700 (PDT)
+Message-ID: <e1ce3a20-4edb-475e-8401-d3af1b8967b8@redhat.com>
+Date: Wed, 4 Jun 2025 16:02:23 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|PH0PR11MB5031:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5d1875b-f743-4729-21a4-08dda32ab2ef
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?uq1PqCRHzysYKdHgsfr7qMaOndcS3apdDLwsFvAiSA//9Ebz6gypkfbOiw8h?=
- =?us-ascii?Q?WLZsulzZ0gRM75qMrtD9olcHDsUy4BL9xuXimS1n6JJn/ttaRPT7Vz93cZaf?=
- =?us-ascii?Q?ljTx+HqwycR2dbJ7UwPme/uvNjmDaoaciCSr7X5oWVSMA27kMjQWow3dZ7BK?=
- =?us-ascii?Q?ilagS8vaTTXA9GvTy08Rrf+zMljXca2dm3ncGo2govH0efj8nz7qvGQ5kjgT?=
- =?us-ascii?Q?8Ec6/s7EBrYh1Hj003w0DbBQYIwPJMPY0lftrUtGbV7VGwoJilWX8mLuR+vt?=
- =?us-ascii?Q?i7pULxY2aoSh30kDjTQVRXnSnM0/q6ofTHbsTqZ7wmAe5cwsU8Z1cBPUJcHY?=
- =?us-ascii?Q?e70wU3+LStoEKiOTb8paj+yIAf7Y4HQXNi+PWwI8VBMdbAfGiLhHGvJLXSVF?=
- =?us-ascii?Q?k2RriatbhJVlJIo21QqWv/edcLGkLXJ+lUyQxTEPqmrq8OfY5OlUczFlX+fv?=
- =?us-ascii?Q?+UA9cypSV38g3LvlKmMz5iw/vMTWgo2wIFsI/E9eFNaXlx6UOx68MF6w7bbz?=
- =?us-ascii?Q?PlMtKbraLjIJbWOUdbmEqAPX0NPUcvqvK6UxukZ5PCjT+qnhlKr+9AOuwpEV?=
- =?us-ascii?Q?pgtA4UUfEF3mGVn9R75rBqf+I8FWymCPd0zngFNtzlLN9gmYo0MZbDWog5rD?=
- =?us-ascii?Q?f5ajru8nOKhjfo4DW5O98IY6hqP6a6PKzu5gfsjIgBFxLU04ztK0+JEThKIe?=
- =?us-ascii?Q?UkhbjbE9Ht6YboUXrAf2sqV/AgcSxfIjoRaU3P+sawsw8vLAqEBeYv3O24pa?=
- =?us-ascii?Q?9xx6Cml9U0olxih9qKNKUA47z+HLP7Yn3TtJ1w03mSjP1HQuVkYCvZTwvqrh?=
- =?us-ascii?Q?eeLGCjVzchhjwcaJD8mnUypaL5Fo3Tdmg26WqlYPaAcG8hXpuBK7utlRO9rN?=
- =?us-ascii?Q?h5Sk0ojeoirzw4eVulnqZ/Qslgt2R86Y2Sdh0JcoFKccdkv1xWA3ld+cTnUw?=
- =?us-ascii?Q?NqyyORF7oBPGvv6X1La3VGbPkrgU5q4Px7ywl9indW1c6HMhj+BrPZ9iQOZ+?=
- =?us-ascii?Q?dFsI6Gnch5nx7QAJiGbLlznIpnXous56Z5oXF1vEGYPRwaiP5+fwOgvKwC+O?=
- =?us-ascii?Q?+uILbjqVBl8tPXyJk8NrLSf8xjpTpUD7UATrB2ehfEXN3C3kaLoxyo1qNy2G?=
- =?us-ascii?Q?JgK6feDOz6MMStd8n93LUK2Z2Gh6aP0TOwGNR+qJDhFywsk2UgMy90LpDeR/?=
- =?us-ascii?Q?ZAuuAM/LUYlIbdJB0IAiAGUtMAqaFtMAsyZS6MwvayYcviA6aVbKhUr5Wjct?=
- =?us-ascii?Q?zvacU/AG+ooVAplFFYPqC1REQdC6L3fRTMcPWmhB3ouVjDhoSCkMaFi/gwMQ?=
- =?us-ascii?Q?9cmU6vHlZIoaXJ9WXnFJULgJBj733iZOPxa5pU5t3fFKxU+BTeZS/o3+OLjE?=
- =?us-ascii?Q?jd6O0h+mXIr0HMCYydm5q9fLzlcHpNl7pIcw5zlUzyOVPrPj65uo1NmLGLEh?=
- =?us-ascii?Q?zDmr+NI9rb4=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qKRJQrdqNVcYZeIg7/yiLVHcs+qIiaOjDCClUyNHeUCJ9ZsHv+NdEY2Y+oHd?=
- =?us-ascii?Q?ydVijiZKh7Wjc+w6KYj0t0pWUiX6sf48TmLcBSnb88azz1KP/QqFO/iXO4va?=
- =?us-ascii?Q?8bgKtTkerSdCpmPwXyCmevFgdyn1iPhRSxfTvkRwW19Cwh90dGzsUXXx70Lr?=
- =?us-ascii?Q?tjkFHO2BWRaY4hFKdX2rqSIPaekQoM5ZLKPkcoj7nE8jXfKMgpg35NMwE2dg?=
- =?us-ascii?Q?+VB+dlhHfmZ2GxWR1glNw6XfvkvZiZirRTw50dNj7LKpslJMRDYaxcJqSwr0?=
- =?us-ascii?Q?MEhX9NTARfaGRVLrJRUiHlMrypBl8MB1M6yX/JTMoqxAY5Upp9zGiLzWIzQc?=
- =?us-ascii?Q?We+wHd5wXNlnjO++QOBYAH8ze2h6bqx6FCx5vOvSP1vaWqPnY5vp1MBtBvJb?=
- =?us-ascii?Q?zxFHhMySCgPx5w6ZltmoTq2OPyvqQryFScrQOhFcFilPvCaHoxsY9AraeEQt?=
- =?us-ascii?Q?3erdCpl0i4zvXkFBkNpHgflekX71nJyXA/qb1nYGlyumfmrtUiQzkAluPfZF?=
- =?us-ascii?Q?EF4P/lPTHgaUyThk+DY0k55z5iWLf18767gRDNIsWvyXSAeqzfnHI3/m2Lki?=
- =?us-ascii?Q?y05+tuNDHJ6JBW+LtYYIQRcOrIBgiSR/NK1OLJC42tKipxpuXZ9BjT/1qozB?=
- =?us-ascii?Q?AGTHuye9zbOZCakGueSOL0gXptAom4qOkswfTdXN9A/o/F55gEiFicp8wFqL?=
- =?us-ascii?Q?2r3ndu3HuJOmDnEpxhvJEXrAY6hGrqr4eHh35TqNmGC6+OLkgJb2beQqr4Zo?=
- =?us-ascii?Q?+bYvD5cKX7q1GMMPAbMJ8PaZ/OX0V+VZ6/CK6VswxFxmS0386mt2111iRq1Q?=
- =?us-ascii?Q?Uw4jaBGTsuZMnxQJm/homPzd4tx1IfG13t57iJ4MYG4jDWzVbAmG/4hiHWwv?=
- =?us-ascii?Q?HVper2SWtMAYFPcmKgrQwf9d7s4Osw5YsjtRbBpx79aJVuSJPanlFav7RL/P?=
- =?us-ascii?Q?WrAu9eXisq3TMXw42kvtwcaDfllYe/3q2zN7V+LPPhQFQ4K/gJ5eFuN4SNnk?=
- =?us-ascii?Q?REyTx2ZQoL/ElGp3nV7Ofcf0WFn0hxqmL0S0TznLcD18i1jyjLJrC72wy0FY?=
- =?us-ascii?Q?/uH5lGKlh3MUlyizKi9aGt4Vy/E0yRdFeaVURvyhv54uWD4FxV3oVcxkpCNQ?=
- =?us-ascii?Q?z/B8DPPLlJch9UvBA9XBRxA7jrktRyJ3lRMkSK7GuoqdHP+hjChuaog4SFs4?=
- =?us-ascii?Q?3wzhP6Oz7fpTMt9xYK3Ri0RSnDMwq1P6kZ4QaClIfjmNsh2Cz/mgarB+NY6N?=
- =?us-ascii?Q?4mJkOMTpMX7IEIYz1utPv+5UCdBX1v95zaxVdS15IKuohnK9EMKxgY49lz/K?=
- =?us-ascii?Q?wVjlxZoUiIfwPBw782wvU9OPEZxqvRx/qPlT0LyiCIUUcrGj7dCxIaOFDHO8?=
- =?us-ascii?Q?L0X+hh1FiztHKp8VDdH0XzHrVsdpldVzCxoHDqAg+i3pazJxTO8phXNH7R9q?=
- =?us-ascii?Q?61ODvpCzNWrqT4ZrWF/F7QC3YIbGzlsubHTXJ10RjX7jXvCNfge+2x54LPIp?=
- =?us-ascii?Q?5uHktkYcFsJSlVIrUpy7AWFDCj9bQrFhbO9slIXBUi4RqrRqboYXcpOR4SDd?=
- =?us-ascii?Q?NDJKZpmZvPejeQY/NUf2DWpUV7hlO8pPAJEj5OQN?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5d1875b-f743-4729-21a4-08dda32ab2ef
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2025 05:43:14.5080
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NPZZlGcGN5blfBTRsnvK7fBrgG0fuS2E9QVrRJQDKzCBTq+c1tOKQHMOAqghpjcVQGD/WpTKZlcC6UnK79KkZg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5031
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 08/16] KVM: guest_memfd: Allow host to map guest_memfd
+ pages
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250527180245.1413463-1-tabba@google.com>
+ <20250527180245.1413463-9-tabba@google.com>
+Content-Language: en-US
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20250527180245.1413463-9-tabba@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 29, 2025 at 04:39:53PM -0700, Sean Christopherson wrote:
->Use a dedicated array of MSRPM offsets to merge L0 and L1 bitmaps, i.e. to
->merge KVM's vmcb01 bitmap with L1's vmcb12 bitmap.  This will eventually
->allow for the removal of direct_access_msrs, as the only path where
->tracking the offsets is truly justified is the merge for nested SVM, where
->merging in chunks is an easy way to batch uaccess reads/writes.
->
->Opportunistically omit the x2APIC MSRs from the merge-specific array
->instead of filtering them out at runtime.
->
->Note, disabling interception of XSS, EFER, PAT, GHCB, and TSC_AUX is
->mutually exclusive with nested virtualization, as KVM passes through the
->MSRs only for SEV-ES guests, and KVM doesn't support nested virtualization
->for SEV+ guests.  Defer removing those MSRs to a future cleanup in order
->to make this refactoring as benign as possible.
->
->Signed-off-by: Sean Christopherson <seanjc@google.com>
->---
-> arch/x86/kvm/svm/nested.c | 72 +++++++++++++++++++++++++++++++++------
-> arch/x86/kvm/svm/svm.c    |  4 +++
-> arch/x86/kvm/svm/svm.h    |  2 ++
-> 3 files changed, 67 insertions(+), 11 deletions(-)
->
->diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->index 89a77f0f1cc8..e53020939e60 100644
->--- a/arch/x86/kvm/svm/nested.c
->+++ b/arch/x86/kvm/svm/nested.c
->@@ -184,6 +184,64 @@ void recalc_intercepts(struct vcpu_svm *svm)
-> 	}
-> }
+Hi Fuad,
+
+On 5/28/25 4:02 AM, Fuad Tabba wrote:
+> This patch enables support for shared memory in guest_memfd, including
+> mapping that memory at the host userspace. This support is gated by the
+> configuration option KVM_GMEM_SHARED_MEM, and toggled by the guest_memfd
+> flag GUEST_MEMFD_FLAG_SUPPORT_SHARED, which can be set when creating a
+> guest_memfd instance.
 > 
->+static int nested_svm_msrpm_merge_offsets[9] __ro_after_init;
-
-I understand how the array size (i.e., 9) was determined :). But, adding a
-comment explaining this would be quite helpful 
-
->+static int nested_svm_nr_msrpm_merge_offsets __ro_after_init;
->+
->+int __init nested_svm_init_msrpm_merge_offsets(void)
->+{
->+	const u32 merge_msrs[] = {
->+		MSR_STAR,
->+		MSR_IA32_SYSENTER_CS,
->+		MSR_IA32_SYSENTER_EIP,
->+		MSR_IA32_SYSENTER_ESP,
->+	#ifdef CONFIG_X86_64
->+		MSR_GS_BASE,
->+		MSR_FS_BASE,
->+		MSR_KERNEL_GS_BASE,
->+		MSR_LSTAR,
->+		MSR_CSTAR,
->+		MSR_SYSCALL_MASK,
->+	#endif
->+		MSR_IA32_SPEC_CTRL,
->+		MSR_IA32_PRED_CMD,
->+		MSR_IA32_FLUSH_CMD,
-
-MSR_IA32_DEBUGCTLMSR is missing, but it's benign since it shares the same
-offset as MSR_IA32_LAST* below.
-
-I'm a bit concerned that we might overlook adding new MSRs to this array in the
-future, which could lead to tricky bugs. But I have no idea how to avoid this.
-Removing this array and iterating over direct_access_msrs[] directly is an
-option but it contradicts this series as one of its purposes is to remove
-direct_access_msrs[].
-
->+		MSR_IA32_LASTBRANCHFROMIP,
->+		MSR_IA32_LASTBRANCHTOIP,
->+		MSR_IA32_LASTINTFROMIP,
->+		MSR_IA32_LASTINTTOIP,
->+
->+		MSR_IA32_XSS,
->+		MSR_EFER,
->+		MSR_IA32_CR_PAT,
->+		MSR_AMD64_SEV_ES_GHCB,
->+		MSR_TSC_AUX,
->+	};
-
-
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h | 10 ++++
+>   arch/x86/kvm/x86.c              |  3 +-
+>   include/linux/kvm_host.h        | 13 ++++++
+>   include/uapi/linux/kvm.h        |  1 +
+>   virt/kvm/Kconfig                |  5 ++
+>   virt/kvm/guest_memfd.c          | 81 +++++++++++++++++++++++++++++++++
+>   6 files changed, 112 insertions(+), 1 deletion(-)
 > 
-> 		if (kvm_vcpu_read_guest(vcpu, offset, &value, 4))
->diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->index 1c70293400bc..84dd1f220986 100644
->--- a/arch/x86/kvm/svm/svm.c
->+++ b/arch/x86/kvm/svm/svm.c
->@@ -5689,6 +5689,10 @@ static int __init svm_init(void)
-> 	if (!kvm_is_svm_supported())
-> 		return -EOPNOTSUPP;
-> 
->+	r = nested_svm_init_msrpm_merge_offsets();
->+	if (r)
->+		return r;
->+
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 709cc2a7ba66..ce9ad4cd93c5 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2255,8 +2255,18 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+>   
+>   #ifdef CONFIG_KVM_GMEM
+>   #define kvm_arch_supports_gmem(kvm) ((kvm)->arch.supports_gmem)
+> +
+> +/*
+> + * CoCo VMs with hardware support that use guest_memfd only for backing private
+> + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping enabled.
+> + */
+> +#define kvm_arch_supports_gmem_shared_mem(kvm)			\
+> +	(IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM) &&			\
+> +	 ((kvm)->arch.vm_type == KVM_X86_SW_PROTECTED_VM ||		\
+> +	  (kvm)->arch.vm_type == KVM_X86_DEFAULT_VM))
+>   #else
+>   #define kvm_arch_supports_gmem(kvm) false
+> +#define kvm_arch_supports_gmem_shared_mem(kvm) false
+>   #endif
+>   
+>   #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 035ced06b2dd..2a02f2457c42 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12718,7 +12718,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   		return -EINVAL;
+>   
+>   	kvm->arch.vm_type = type;
+> -	kvm->arch.supports_gmem = (type == KVM_X86_SW_PROTECTED_VM);
+> +	kvm->arch.supports_gmem =
+> +		type == KVM_X86_DEFAULT_VM || type == KVM_X86_SW_PROTECTED_VM;
+>   	/* Decided by the vendor code for other VM types.  */
+>   	kvm->arch.pre_fault_allowed =
+>   		type == KVM_X86_DEFAULT_VM || type == KVM_X86_SW_PROTECTED_VM;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 80371475818f..ba83547e62b0 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -729,6 +729,19 @@ static inline bool kvm_arch_supports_gmem(struct kvm *kvm)
+>   }
+>   #endif
+>   
+> +/*
+> + * Returns true if this VM supports shared mem in guest_memfd.
+> + *
+> + * Arch code must define kvm_arch_supports_gmem_shared_mem if support for
+> + * guest_memfd is enabled.
+> + */
+> +#if !defined(kvm_arch_supports_gmem_shared_mem) && !IS_ENABLED(CONFIG_KVM_GMEM)
+> +static inline bool kvm_arch_supports_gmem_shared_mem(struct kvm *kvm)
+> +{
+> +	return false;
+> +}
+> +#endif
+> +
+>   #ifndef kvm_arch_has_readonly_mem
+>   static inline bool kvm_arch_has_readonly_mem(struct kvm *kvm)
+>   {
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index b6ae8ad8934b..c2714c9d1a0e 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1566,6 +1566,7 @@ struct kvm_memory_attributes {
+>   #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+>   
+>   #define KVM_CREATE_GUEST_MEMFD	_IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
+> +#define GUEST_MEMFD_FLAG_SUPPORT_SHARED	(1ULL << 0)
+>   
+>   struct kvm_create_guest_memfd {
+>   	__u64 size;
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 559c93ad90be..df225298ab10 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -128,3 +128,8 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+>   config HAVE_KVM_ARCH_GMEM_INVALIDATE
+>          bool
+>          depends on KVM_GMEM
+> +
+> +config KVM_GMEM_SHARED_MEM
+> +       select KVM_GMEM
+> +       bool
+> +       prompt "Enable support for non-private (shared) memory in guest_memfd"
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 6db515833f61..5d34712f64fc 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -312,7 +312,81 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+>   	return gfn - slot->base_gfn + slot->gmem.pgoff;
+>   }
+>   
+> +static bool kvm_gmem_supports_shared(struct inode *inode)
+> +{
+> +	u64 flags;
+> +
+> +	if (!IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM))
+> +		return false;
+> +
+> +	flags = (u64)inode->i_private;
+> +
+> +	return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> +}
+> +
+> +
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+> +{
+> +	struct inode *inode = file_inode(vmf->vma->vm_file);
+> +	struct folio *folio;
+> +	vm_fault_t ret = VM_FAULT_LOCKED;
+> +
+> +	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> +	if (IS_ERR(folio)) {
+> +		int err = PTR_ERR(folio);
+> +
+> +		if (err == -EAGAIN)
+> +			return VM_FAULT_RETRY;
+> +
+> +		return vmf_error(err);
+> +	}
+> +
+> +	if (WARN_ON_ONCE(folio_test_large(folio))) {
+> +		ret = VM_FAULT_SIGBUS;
+> +		goto out_folio;
+> +	}
+> +
+> +	if (!folio_test_uptodate(folio)) {
+> +		clear_highpage(folio_page(folio, 0));
+> +		kvm_gmem_mark_prepared(folio);
+> +	}
+> +
+> +	vmf->page = folio_file_page(folio, vmf->pgoff);
+> +
+> +out_folio:
+> +	if (ret != VM_FAULT_LOCKED) {
+> +		folio_unlock(folio);
+> +		folio_put(folio);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static const struct vm_operations_struct kvm_gmem_vm_ops = {
+> +	.fault = kvm_gmem_fault_shared,
+> +};
+> +
+> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+> +{
+> +	if (!kvm_gmem_supports_shared(file_inode(file)))
+> +		return -ENODEV;
+> +
+> +	if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
+> +	    (VM_SHARED | VM_MAYSHARE)) {
+> +		return -EINVAL;
+> +	}
+> +
+> +	vma->vm_ops = &kvm_gmem_vm_ops;
+> +
+> +	return 0;
+> +}
+> +#else
+> +#define kvm_gmem_mmap NULL
+> +#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+> +
 
-If the offset array is used for nested virtualization only, how about guarding
-this with nested virtualization? For example, in svm_hardware_setup():
+nit: The hunk of code doesn't have to be guarded by CONFIG_KVM_GMEM_SHARED_MEM.
+With the guard removed, we run into error (-ENODEV) returned by kvm_gmem_mmap()
+for non-sharable (or non-mapped) file, same effect as to "kvm_gmem_fops.mmap = NULL".
 
-	if (nested) {
-		r = nested_svm_init_msrpm_merge_offsets();
-		if (r)
-			goto err;
+I may have missed other intentions to have this guard here.
 
-		pr_info("Nested Virtualization enabled\n");
-		kvm_enable_efer_bits(EFER_SVME | EFER_LMSLE);
-	}
+>   static struct file_operations kvm_gmem_fops = {
+> +	.mmap		= kvm_gmem_mmap,
+>   	.open		= generic_file_open,
+>   	.release	= kvm_gmem_release,
+>   	.fallocate	= kvm_gmem_fallocate,
+> @@ -463,6 +537,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+>   	u64 flags = args->flags;
+>   	u64 valid_flags = 0;
+>   
+> +	if (kvm_arch_supports_gmem_shared_mem(kvm))
+> +		valid_flags |= GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> +
+>   	if (flags & ~valid_flags)
+>   		return -EINVAL;
+>   
+> @@ -501,6 +578,10 @@ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+>   	    offset + size > i_size_read(inode))
+>   		goto err;
+>   
+> +	if (kvm_gmem_supports_shared(inode) &&
+> +	    !kvm_arch_supports_gmem_shared_mem(kvm))
+> +		goto err;
+> +
 
+This check looks unnecessary if I'm not missing anything. The file (inode) can't be created
+by kvm_gmem_create(GUEST_MEMFD_FLAG_SUPPORT_SHARED) on !kvm_arch_supports_gmem_shared_mem().
+It means "kvm_gmem_supports_shared(inode) == true" is indicating "kvm_arch_supports_gmem_shared_mem(kvm) == true".
+In this case, we won't never break the check? :-)
 
-> 	r = kvm_x86_vendor_init(&svm_init_ops);
-> 	if (r)
-> 		return r;
->diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
->index 909b9af6b3c1..0a8041d70994 100644
->--- a/arch/x86/kvm/svm/svm.h
->+++ b/arch/x86/kvm/svm/svm.h
->@@ -686,6 +686,8 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
-> 	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
-> }
-> 
->+int __init nested_svm_init_msrpm_merge_offsets(void);
->+
-> int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
-> 			 u64 vmcb_gpa, struct vmcb *vmcb12, bool from_vmrun);
-> void svm_leave_nested(struct kvm_vcpu *vcpu);
->-- 
->2.49.0.1204.g71687c7c1d-goog
->
+>   	filemap_invalidate_lock(inode->i_mapping);
+>   
+>   	start = offset >> PAGE_SHIFT;
+
+Thanks,
+Gavin
+
 
