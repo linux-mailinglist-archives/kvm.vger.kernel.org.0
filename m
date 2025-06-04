@@ -1,65 +1,86 @@
-Return-Path: <kvm+bounces-48443-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48444-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0723AACE47E
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 20:46:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 600ABACE4AF
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 21:13:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 402C117767A
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 18:46:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D12B03A8E1E
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 19:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744091FF1C4;
-	Wed,  4 Jun 2025 18:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAEB3202F87;
+	Wed,  4 Jun 2025 19:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X7+UYnXH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VstnK9hE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3697440C;
-	Wed,  4 Jun 2025 18:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6EC0320F
+	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 19:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749062757; cv=none; b=ehQ5JfiYiDJFpLLAIwXorIFN6a+6+0yRtEZODQPDkCJE/bhigPGsRcQHd0DCuN70rdj3ntWeLbQowt+pzmBgIsIUuxXcjONz+QBaTDfg93D19ESS6AsybU+Gns9ByuD9j1mNRvxxrdTifXKzFeQF1P2gC+uMmTrGgXiACmL7bss=
+	t=1749064408; cv=none; b=iP1GKr083K0CB68kVeFLdjwwQrE0EDO4l3ijmOP5GYi6pXlOT1xj1jvkJ0pwim4p5NdycItN8lfro6Q66H1dYRg6j5n2EM1aRF7FQAztbxb/sJqdkF7eRiV1Ix44Lev5X9dzTQ8TB4NDOnukxqIMDbA3LOIA57as1XIDigGe+4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749062757; c=relaxed/simple;
-	bh=gUiPdu88U079tUvhIDDSrfJd45DnCHI40z4srI8P3aI=;
+	s=arc-20240116; t=1749064408; c=relaxed/simple;
+	bh=Db2JDrEUFmXYyu/uDF6PlGRgyfAd3kmhH7T21wqyCzo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZLNycnyKR5oP8/+7k6JdL2kk7SJmtIYE4wYtzC31OUYNkDJJHltv0IDs4JCeqQZvXlv9lIjEjOrzPYOHGe36SpMVpaTARqbSp1+TpN9Rg+5V5WDSAVcoxlDAcKEvySbQ9TGGC81lArvLHI+XNLdl+wzgyBCmdV9fRCIzYF8vJhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X7+UYnXH; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749062756; x=1780598756;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=gUiPdu88U079tUvhIDDSrfJd45DnCHI40z4srI8P3aI=;
-  b=X7+UYnXHlPslxKmtf0W97rAx+YMz9D50065sIoYPYE7G93G/STu2UWbF
-   Gnxpt9BJSRrUJZvRPbODElIXEWVNJYMnjmyxgxl13qm8jkGGVz+OUU96j
-   xpwz5ChaF+iBYh1Kzx+6wRMsvIXqR/zTgEazoUSWzp8+I+qFZfAPxoMvE
-   SueMVKJ0jD5WHCxKnQS515ZeRVlTH3Us0mDxr7cW9fWNNzl3007G+m5YL
-   rhNsYYX+v9+1BpJu44rQwE/YHVJm7oEKO2cqQ6Fd+7w/jVFCYm90uVtF1
-   J0swReDrhHAZ6P4a8vN9ChRkXuVglIUagU6Rfo4nX7j60ozrkAv5y2JAH
-   A==;
-X-CSE-ConnectionGUID: pwmMWkRnRWGQNJsZqk6v6w==
-X-CSE-MsgGUID: kGzXnxW7Q8eyudHiwD+EkQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11454"; a="51231841"
-X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
-   d="scan'208";a="51231841"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 11:45:55 -0700
-X-CSE-ConnectionGUID: HCyK7ksfRburl64kIzc/0g==
-X-CSE-MsgGUID: 7dFytqEuSEir+ISGjDlhcw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,209,1744095600"; 
-   d="scan'208";a="146209963"
-Received: from puneetse-mobl.amr.corp.intel.com (HELO [10.125.110.229]) ([10.125.110.229])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 11:45:54 -0700
-Message-ID: <a2639c00-ddbb-4e74-afd4-2ab74f6d3397@intel.com>
-Date: Wed, 4 Jun 2025 11:45:53 -0700
+	 In-Reply-To:Content-Type; b=jopHi1gYGt0s4ZIDMq83rCDpVHNgG77tzo+R8i6tThiJlqddW55tcJCxJLie8k2xHgN8kyRf1ZYMDy4e4+uy9SZuTatAieqXo9BRCDSKCu8cPUF9t6+//P0jaUAYex2F3GtdQV2OLCfup/Dcuj85SLcZCGvpwcy+mzKRg0z7o8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VstnK9hE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749064405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=burzST/eJ5Z7UGznQOvQVsG6FQZbixtkHRYAS7pvlM8=;
+	b=VstnK9hEZWfdSpfV6ykV89QRGFp/IA+9h/IjdarTwzjRFp8Sq0KddsosM/YX0g7+p8BF7N
+	Tet3Ym90MqC9kE/o48VOxynqLo8Qh3pTcbItkz6O3gOb1Nmlr3brVzwz7AjgeveqL6HF6S
+	gqFtffW0FxPRzgDXJrWKaeBPNuMLOCI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-594-5XzVr6v-NqOUM96xWWpfhQ-1; Wed, 04 Jun 2025 15:13:24 -0400
+X-MC-Unique: 5XzVr6v-NqOUM96xWWpfhQ-1
+X-Mimecast-MFC-AGG-ID: 5XzVr6v-NqOUM96xWWpfhQ_1749064403
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-450d57a0641so840155e9.3
+        for <kvm@vger.kernel.org>; Wed, 04 Jun 2025 12:13:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749064403; x=1749669203;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=burzST/eJ5Z7UGznQOvQVsG6FQZbixtkHRYAS7pvlM8=;
+        b=DderQDgqOQ17M+ISl8v/YksoayIZPCQh0R7nEJ3orcTPKV80hLazCTabPv5u6UM5vw
+         YY6Pg+8yp0SFpyCgPI3WY7ejNXfeDqitASElklklIUIuVE5lbtet+iYUwuZrLgyhMh0C
+         hWjBGmkFcUwGn2GLiKp9sc1M+KVh+G9MHhePIM4QPCEg6CEwKj0cdUWhS/b2oA4cDoPb
+         I12/Y4OpeC4Ftp4sxL10rXs7y/e9ISE5vslOBykYwTA7kEmsdlT7btDNurQ0BBnfJsB9
+         8foBI4yPjtoW2gXbLB5GPIU3T0l7r5W1FtHaDI453OWoeXPuO2PhnVTzfGUaLz/Qv3AX
+         pRwA==
+X-Gm-Message-State: AOJu0YybvhRIJuSLCg26H6hKFcDsea1NIyEcSccK0egBDBLJ1kWkHZ7u
+	zMuoCPRKvTFiyStI/g3ar3Wvsigq+XhGJSatDgRt+aPKZRUauL+lnL5516cpBlIqYAttqq7l7T9
+	RcnYfq6ZTdYeejKtFW+BgQU/pc1Rujfe32SSYoXelLsaviBL0ywV0bQ==
+X-Gm-Gg: ASbGncuc1th9OfGyepPc/1Eyai7r07aBR5bJuV37q4ikkjx/DzdhY//dcpI9rX4ylD1
+	u2ht8Swnk0W92dVhJsetutH7uTNzOtjuF60XNkmqs1e/GruKiNcBCXXuksfme3/YdJ+sgnIvcEP
+	Zl06uuFq2fJrPp5SL5hd4SHiJl9DEDP0oMcr2pYBGel9ZJCmjG/iqarG5XLqqtzYhIkVie9p1io
+	PYmmbjYXHWLMmcz3Jc7DXoPV/ByAdbHdPJjWkQIW9100VXN/4H1e1TaDcrOL7ds73zAgS/5iLb+
+	97NMgdFn8p5hHIRALiMSJuJx
+X-Received: by 2002:a05:600c:8b58:b0:442:e9ec:4654 with SMTP id 5b1f17b1804b1-451f0a9b604mr37174605e9.8.1749064403032;
+        Wed, 04 Jun 2025 12:13:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGBnAuhK8aMrK4WTMzaAHJs7iK560ZZF9epfXYo6P3+2qPcCX8WKi9YUFiOzsz53nW/hgwS+Q==
+X-Received: by 2002:a05:600c:8b58:b0:442:e9ec:4654 with SMTP id 5b1f17b1804b1-451f0a9b604mr37174415e9.8.1749064402563;
+        Wed, 04 Jun 2025 12:13:22 -0700 (PDT)
+Received: from [192.168.10.81] ([151.49.64.79])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a4f009fdbasm22133731f8f.85.2025.06.04.12.13.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Jun 2025 12:13:21 -0700 (PDT)
+Message-ID: <c48de0c5-7dd4-4c3d-9f15-3cf0714793b9@redhat.com>
+Date: Wed, 4 Jun 2025 21:13:20 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,100 +88,152 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 0/6] Introduce CET supervisor state support
-To: Chao Gao <chao.gao@intel.com>, x86@kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
- seanjc@google.com, pbonzini@redhat.com
-Cc: peterz@infradead.org, rick.p.edgecombe@intel.com,
- weijiang.yang@intel.com, john.allen@amd.com, bp@alien8.de,
- chang.seok.bae@intel.com, xin3.li@intel.com,
- Dave Hansen <dave.hansen@linux.intel.com>, Eric Biggers
- <ebiggers@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Ingo Molnar <mingo@redhat.com>, Kees Cook <kees@kernel.org>,
- Maxim Levitsky <mlevitsk@redhat.com>, Mitchell Levy
- <levymitchell0@gmail.com>, Nikolay Borisov <nik.borisov@suse.com>,
- Oleg Nesterov <oleg@redhat.com>, Sohil Mehta <sohil.mehta@intel.com>,
- Stanislav Spassov <stanspas@amazon.de>,
- Vignesh Balasubramanian <vigbalas@amd.com>
-References: <20250522151031.426788-1-chao.gao@intel.com>
- <aD+ZrBoJcrGRzjy0@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH 11/28] KVM: SVM: Add helpers for accessing MSR bitmap that
+ don't rely on offsets
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Borislav Petkov <bp@alien8.de>, Xin Li <xin@zytor.com>,
+ Chao Gao <chao.gao@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
+References: <20250529234013.3826933-1-seanjc@google.com>
+ <20250529234013.3826933-12-seanjc@google.com>
+ <1392db34-0c37-49db-8ece-68c02ff3520d@redhat.com>
+ <aECD09sxnFAA2Te5@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <aD+ZrBoJcrGRzjy0@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <aECD09sxnFAA2Te5@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 6/3/25 17:56, Chao Gao wrote:
-> On Thu, May 22, 2025 at 08:10:03AM -0700, Chao Gao wrote:
->> Dear maintainers and reviewers,
+On 6/4/25 19:35, Sean Christopherson wrote:
+> On Wed, Jun 04, 2025, Paolo Bonzini wrote:
+>> Replying here for patches 11/25/26.  None of this is needed, just write a
+>> function like this:
 >>
->> I kindly request your consideration for merging this series. Most of
->> patches have received Reviewed-by/Acked-by tags.
-> Looks like we now have AMD RB and the other issue (reported by Sean) was
-> pre-existing. x86 maintainers, please consider applying.
+>> static inline u32 svm_msr_bit(u32 msr)
+>> {
+>> 	u32 msr_base = msr & ~(SVM_MSRS_PER_RANGE - 1);
+> 
+> Ooh, clever.
+> 
+>> 	if (msr_base == SVM_MSRPM_RANGE_0_BASE_MSR)
+>> 		return SVM_MSRPM_BIT_NR(0, msr);
+>> 	if (msr_base == SVM_MSRPM_RANGE_1_BASE_MSR)
+>> 		return SVM_MSRPM_BIT_NR(1, msr);
+>> 	if (msr_base == SVM_MSRPM_RANGE_2_BASE_MSR)
+>> 		return SVM_MSRPM_BIT_NR(2, msr);
+>> 	return MSR_INVALID;
+> 
+> I initially had something like this, but I don't like the potential for typos,
+> e.g. to fat finger something like:
+> 
+> 	if (msr_base == SVM_MSRPM_RANGE_2_BASE_MSR)
+> 		return SVM_MSRPM_BIT_NR(1, msr);
+> 
+> Which is how I ended up with the (admittedly ugly) CASE macros.  [...]
+> Actually, better idea!  Hopefully.  With your masking trick, there's no need to
+> do subtraction to get the offset within a range, which means getting the bit/byte
+> number for an MSR can be done entirely programmatically. And if we do that, then> the SVM_MSRPM_RANGE_xxx_BASE_MSR defines can go away, and the (very 
+trivial)
+> copy+paste that I dislike also goes away.
+> 
+> Completely untested, but how about this?
+> 
+> 	#define SVM_MSRPM_OFFSET_MASK (SVM_MSRS_PER_RANGE - 1)
+> 
+> 	static __always_inline int svm_msrpm_bit_nr(u32 msr)
 
-Hi Chao,
+(yeah, after hitting send I noticed that msr->msrpm would have been better)
 
-You might want to take a look at this:
+> 	{
+> 		int range_nr;
+> 
+> 		switch (msr & ~SVM_MSRPM_OFFSET_MASK) {
+> 		case 0:
+> 			range_nr = 0;
+> 			break;
+> 		case 0xc0000000:
+> 			range_nr = 1;
+> 			break;
+> 		case 0xc0010000:
+> 			range_nr = 2;
+> 			break;
+> 		default:
+> 			return -EINVAL;
+> 		}
 
-https://docs.kernel.org/process/maintainer-tip.html#merge-window
+I actually was going to propose something very similar, I refrained only 
+because I wasn't sure if there would be other remaining uses of 
+SVM_MSRPM_RANGE_?_BASE_MSR.  The above is nice.
 
-Specifically:
+> 		return range_nr * SVM_MSRPM_BYTES_PER_RANGE * BITS_PER_BYTE +
+> 		       (msr & SVM_MSRPM_OFFSET_MASK) * SVM_BITS_PER_MSR)
 
-> Please do not expect patches to be reviewed or merged by tip
-> maintainers around or during the merge window. The trees are closed
-> to all but urgent fixes during this time. They reopen once the merge
-> window closes and a new -rc1 kernel has been released.
+Or this too:
 
-In other words, your mail to ask us to consider applying is going to get
-ignored for at least a week. Best case, it gets put on one of our lists
-to go look at later.
+   return ((range_nr * SVM_MSRS_PER_RANGE)
+           + (msr & SVM_MSRPM_OFFSET_MASK)) * SVM_BITS_PER_MSR;
 
-My suggestion to you and all other submitters of non-critical fixes is
-to spend the time between now and -rc1 reviewing *others* code and
-making sure yours is 100% ready once -rc1 is released. The week after
-the -rc1 release is a great time to send these emails, not now.
+depending on personal taste.  A few less macros, a few more parentheses.
+
+That removes the enjoyment of seeing everything collapse into a single 
+LEA instruction (X*2+CONST), as was the case with SVM_MSRPM_BIT_NR.  But 
+I agree that these versions are about as nice as the code can be made.
+
+> The open coded literals aren't pretty, but VMX does the same thing, precisely
+> because I didn't want any code besides the innermost helper dealing with the
+> msr => offset math.
+
+>>> +#define BUILD_SVM_MSR_BITMAP_HELPERS(ret_type, action, bitop)			\
+>>> +	__BUILD_SVM_MSR_BITMAP_HELPER(ret_type, action, bitop, read,  0)	\
+>>> +	__BUILD_SVM_MSR_BITMAP_HELPER(ret_type, action, bitop, write, 1)
+>>> +
+>>> +BUILD_SVM_MSR_BITMAP_HELPERS(bool, test, test)
+>>> +BUILD_SVM_MSR_BITMAP_HELPERS(void, clear, __clear)
+>>> +BUILD_SVM_MSR_BITMAP_HELPERS(void, set, __set)
+>> Yes it's a bit duplication, but no need for the nesting, just do:
+> 
+> I don't have a super strong preference, but I do want to be consistent between
+> VMX and SVM, and VMX has the nesting (unsurprisingly, also written by me).  And
+> for that, the nested macros add a bit more value due to reads vs writes being in
+> entirely different areas of the bitmap.
+
+Yeah, fair enough.  Since it's copied from VMX it makes sense.
+
+Paolo
+
 
