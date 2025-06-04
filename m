@@ -1,193 +1,239 @@
-Return-Path: <kvm+bounces-48407-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48408-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5923ACDFA1
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 15:53:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44560ACDFA3
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 15:56:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB09918828B4
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 13:53:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DA4C167271
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 13:56:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE7C28FAB9;
-	Wed,  4 Jun 2025 13:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 622DA2900BD;
+	Wed,  4 Jun 2025 13:56:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Uje3IDdS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KPd/cZ7n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0DB42A87;
-	Wed,  4 Jun 2025 13:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F086328F935
+	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 13:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749045216; cv=none; b=tkExubze3aT58s8LnMaDpKmSl7/Xep4o8eRiN8cQdTn7HeFWjzLOnBtHS/pFUFaVBuPd3ooRa2fG8YXXU/xv/qF7JoBzrfx7NKUaIwOURBSShEORztJxP+x7kGtUFT6ghDFduZiooXjfZ9ZmGyn1U+hHpnL2u2oNh0t3bAWg+fU=
+	t=1749045366; cv=none; b=L+u26G57gaJKPmLSOT0lXwem/wOR+/E8Fae+yvOy7ZdZQoin9ioVO5Lh2pyEQ63FU25djsO29+DfdwcoPZz8ru9huS9PGGETb5qfc089IdxFRJoiGM+KzUTM/tAHsIybOc8AvJnyL0Hv9XLFPvKNfKWQo+dGa2L+4bgchEhnX/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749045216; c=relaxed/simple;
-	bh=gEaec+r6HaRvOWsI9UxPmbcF79etZ2qgODjTDrDOwyI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cT89hcU1kNR5rIZHMHrcde+L6qFBgTh7kwSLNYQAoh7V6E3MSzz64zcFS2z/mmTdBKSNDsbzelT2g4O72Gmk5ke6qLXrM3qmpGToZzbW5Kob5Bd3FPZ1i40zbggsAWGbC1s8i5GDk/yKpEIR+yPb0GbmQpHMR2oSXnV60ngU/JI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Uje3IDdS; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 554Cr7Ys027917;
-	Wed, 4 Jun 2025 13:53:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=mTxob+
-	3AN6+5NNCmHiHdX7KGjxH7xfoNmONml4Cdnx0=; b=Uje3IDdSEkqrUrvRBdZcCt
-	nBT7CYFlz6nwIvCvEmjtNZkTuc/cRw3vxpTqErq1jV4om+g4MhCtNfxHrWswwyF5
-	12bRc+xV1VVnXHNvZs9Ed5BShuDXaJjFZ9I2qG5TDrLpuRvqZKaJ44HkQbvTr1DV
-	mCTWgJ3MpcXFYnNdjbhpNU4YjZfYp8IMkFjBtzZRPQJEkEj6xLPNrgpG7pB3rATz
-	aPx3QX+vZJi/vvxi0/5ia5t7rAL/GibOdihYA1Ikj3MMNaD7JoeOAyMAWTJ/Uifb
-	qFcNpPr9goZ1W/YqlqvjCkkhG2PLky7rTFJtn5zx8jQzbZAfpQG4phGB2t06Kd/w
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471geyb1gt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Jun 2025 13:53:29 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 554Bx5aw031700;
-	Wed, 4 Jun 2025 13:53:28 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470cg003u3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Jun 2025 13:53:28 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 554DrOR151511664
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 4 Jun 2025 13:53:24 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 68AE620043;
-	Wed,  4 Jun 2025 13:53:24 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D96A420040;
-	Wed,  4 Jun 2025 13:53:23 +0000 (GMT)
-Received: from [9.111.35.118] (unknown [9.111.35.118])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  4 Jun 2025 13:53:23 +0000 (GMT)
-Message-ID: <618a014d-5deb-4d66-b2d9-cea930f8f050@linux.ibm.com>
-Date: Wed, 4 Jun 2025 15:53:23 +0200
+	s=arc-20240116; t=1749045366; c=relaxed/simple;
+	bh=Jd4bOTdufN+SkQt/Ld5ULZ9ZL5hW/b1y0IEOOcTR0w4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nih6bClLXNaeOX7Was+0ZAc0mXfKXT+OZ4MUzSmnwYViH0lwXyJE+1CfGL69D6nDlBZFYuhCXeSr+iCfaGXIw8bAkhO6ODA8UzZ6SeZPJsBOxaGmujlNv6QiJ03ksT33lu68WqKbeqvLASS8U8tMtmAhYyRRwtqIr9V/TosZmSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KPd/cZ7n; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-312eaf676b3so2710907a91.3
+        for <kvm@vger.kernel.org>; Wed, 04 Jun 2025 06:56:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749045364; x=1749650164; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9BF4BQWYCffwCvEcJneONMaK8DNln+FUa3w2saRVlU0=;
+        b=KPd/cZ7nryauGsNL/ig4YIq3aAnStFT+gMXWWmH8GF/RAliGoOHzMd6Jve/8+BDor2
+         +P3L/1kzMIMvG1XOQKMBcK2WdSPl+op5Osq5ZEaOJ0C3NqzoETvW8qsaoNIdUnY60BLU
+         tof2I5/iOMc+q0tNVcx6Db9T1PhG6QD+sJT0zNM7bU4jwtsxNraGBD+KxEuwR+AD/LX6
+         cqz1ZI9Ge242Eu7AJgRJhmGjJ4ft4W9RUzi6SqPIF+AkCJZQUCdF2dONA0HhGOg+2wb7
+         wSTjMjKw81Jxwz1mBfzjF6qH/+FmTW375DEEAQcK2zfRn6GxUdcznBj7W6KSLqLAAFmq
+         W3VQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749045364; x=1749650164;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9BF4BQWYCffwCvEcJneONMaK8DNln+FUa3w2saRVlU0=;
+        b=f/UxOMQ9LMqL9HCC0gIWN6pUKEmxSpeXdx19yLRsuClRZlk7UKM4RIMR9/67pT3YQI
+         bYYi3zfz+n2qbLlW6bRKfmLD5ZtK7ZqxplfSCbv9o84956Dx4xTvrqOGgWfN0jb/yPUj
+         pZqIdwdbT76IfMEaOrSkdnHe9ler3OsqJkGyA6sKmNeLB8BJ2leD9Lz7urm+aREr6yaS
+         L2Gil3a7bEE0Igkb2JBZIXBGAgMzFMJOhjElC32j+VdYwJq+beXX95M+l1+AWOPMIjSy
+         mSDK5+UNsqjcqMuMDMr/26iDAtc+ibUXfrexXge54rlfYWIMRZfZz07BHTA2emTOEvDZ
+         s8zw==
+X-Forwarded-Encrypted: i=1; AJvYcCU+oV3XBPq3+sT8lGZ3bekHwWDI2WWUdzI0T84m44TLm3qBjjFFrEwDnmlngWPvdH4zUUU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDlWBlu/I+/2OPSCEjyz/+WtNplswXCJ7NJZ42iacMc2Eq7gMD
+	NoZ/YvZKmcMhw1kwpI0TeS4NIQwe+MvTP9q1xxxHv9frPpaiVwE9FqYYtOotp2U7YKLl6uUqCHx
+	75aK3cQ==
+X-Google-Smtp-Source: AGHT+IHnjDcLBr5/b5vVMhOX9FYYeTjBdgbqUz02Tjf48qTrSCQ4pB6Rh8rX4c6lQeoe9Fsflp0vIM3e6wo=
+X-Received: from pjbsb6.prod.google.com ([2002:a17:90b:50c6:b0:312:1dae:6bf0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ace:b0:312:f88d:260b
+ with SMTP id 98e67ed59e1d1-3130ccd51d5mr4706762a91.14.1749045364124; Wed, 04
+ Jun 2025 06:56:04 -0700 (PDT)
+Date: Wed, 4 Jun 2025 06:56:02 -0700
+In-Reply-To: <aD/c6RZvE7a1KSqk@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5] KVM: s390: Use ESCA instead of BSCA at VM init
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-References: <20250603-rm-bsca-v5-1-f691288ada5c@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20250603-rm-bsca-v5-1-f691288ada5c@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=ea09f6EH c=1 sm=1 tr=0 ts=68404fda cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=aytlwjwg4dCizeVP_UwA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: MVw8LoSiXmCwLMQF8LVry3anz_Ll0GlP
-X-Proofpoint-ORIG-GUID: MVw8LoSiXmCwLMQF8LVry3anz_Ll0GlP
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA0MDEwMyBTYWx0ZWRfX+6oTeaE2wR4S sXnShZdCtl42YiJbkVvsaTY09fbg+rV0VxsxuK4Ixnuu++KqYTFPdwQ4Up4JO6AgO34+ekzmQUq lCx4bvj9i7ScvquIk815zDpp5saJhDBmY6Z/7K+MH+8Bw5TU5rJUyvRrGVqmAt+5qCYq3Mczk+O
- H2M34dMdjDwxFaEZugkdu2e4B7iPaaE7LhBmOl60GrhppMPPWWxV25q+sMeBW0COey6fD5t6Liu K6kU9oHrKGoInnB4tRUViH4lhG0BVPC/502djw3tZoTzbygs///w6FJG1gZcShC/yJNn9mxZ/IH lDUMMSaF/ugjASPmYxshO+LLT9nP7wKK+xH+ERQT1V7WBDZ08lyF91+2tayIO1uR5EL0v4ETFPE
- k0jvwByJvzvFOzx+v5+oVSjiAUgiNda4g0ROYgycrJWXs6//P5Un2WOrSXFBWe9XqJs5wHok
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-04_03,2025-06-03_02,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=717 bulkscore=0
- spamscore=0 suspectscore=0 lowpriorityscore=0 malwarescore=0
- impostorscore=0 phishscore=0 mlxscore=0 adultscore=0 clxscore=1015
- priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506040103
+Mime-Version: 1.0
+References: <20250529234013.3826933-1-seanjc@google.com> <20250529234013.3826933-9-seanjc@google.com>
+ <aD/c6RZvE7a1KSqk@intel.com>
+Message-ID: <aEBQchT0cpCKkmQ6@google.com>
+Subject: Re: [PATCH 08/28] KVM: nSVM: Use dedicated array of MSRPM offsets to
+ merge L0 and L1 bitmaps
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Borislav Petkov <bp@alien8.de>, Xin Li <xin@zytor.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 6/3/25 6:35 PM, Christoph Schlameuss wrote:
-> All modern IBM Z and Linux One machines do offer support for the
-> Extended System Control Area (ESCA). The ESCA is available since the
-> z114/z196 released in 2010.
-> KVM needs to allocate and manage the SCA for guest VMs. Prior to this
-> change the SCA was setup as Basic SCA only supporting a maximum of 64
-> vCPUs when initializing the VM. With addition of the 65th vCPU the SCA
-> was needed to be converted to a ESCA.
+On Wed, Jun 04, 2025, Chao Gao wrote:
+> >diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> >index 89a77f0f1cc8..e53020939e60 100644
+> >--- a/arch/x86/kvm/svm/nested.c
+> >+++ b/arch/x86/kvm/svm/nested.c
+> >@@ -184,6 +184,64 @@ void recalc_intercepts(struct vcpu_svm *svm)
+> > 	}
+> > }
+> > 
+> >+static int nested_svm_msrpm_merge_offsets[9] __ro_after_init;
 > 
-> Instead of allocating a BSCA and upgrading it for PV or when adding the
-> 65th cpu we can always allocate the ESCA directly upon VM creation
-> simplifying the code in multiple places as well as completely removing
-> the need to convert an existing SCA.
-> 
-> In cases where the ESCA is not supported (z10 and earlier) the use of
-> the SCA entries and with that SIGP interpretation are disabled for VMs.
-> This increases the number of exits from the VM in multiprocessor
-> scenarios and thus decreases performance.
-> The same is true for VSIE where SIGP is currently disabled and thus no
-> SCA entries are used.
-> 
-> The only downside of the change is that we will always allocate 4 pages
-> for a 248 cpu ESCA instead of a single page for the BSCA per VM.
-> In return we can delete a bunch of checks and special handling depending
-> on the SCA type as well as the whole BSCA to ESCA conversion.
-> 
-> With that behavior change we are no longer referencing a bsca_block in
-> kvm->arch.sca. This will always be esca_block instead.
-> By specifying the type of the sca as esca_block we can simplify access
-> to the sca and get rid of some helpers while making the code clearer.
-> 
-> KVM_MAX_VCPUS is also moved to kvm_host_types to allow using this in
-> future type definitions.
-> 
+> I understand how the array size (i.e., 9) was determined :). But, adding a
+> comment explaining this would be quite helpful 
 
-Thanks for taking care of this, it makes the code a lot nicer to read.
+Yeah, I'll write a comment explaining what all is going on.
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> >+static int nested_svm_nr_msrpm_merge_offsets __ro_after_init;
+> >+
+> >+int __init nested_svm_init_msrpm_merge_offsets(void)
+> >+{
+> >+	const u32 merge_msrs[] = {
+> >+		MSR_STAR,
+> >+		MSR_IA32_SYSENTER_CS,
+> >+		MSR_IA32_SYSENTER_EIP,
+> >+		MSR_IA32_SYSENTER_ESP,
+> >+	#ifdef CONFIG_X86_64
+> >+		MSR_GS_BASE,
+> >+		MSR_FS_BASE,
+> >+		MSR_KERNEL_GS_BASE,
+> >+		MSR_LSTAR,
+> >+		MSR_CSTAR,
+> >+		MSR_SYSCALL_MASK,
+> >+	#endif
+> >+		MSR_IA32_SPEC_CTRL,
+> >+		MSR_IA32_PRED_CMD,
+> >+		MSR_IA32_FLUSH_CMD,
+> 
+> MSR_IA32_DEBUGCTLMSR is missing, but it's benign since it shares the same
+> offset as MSR_IA32_LAST* below.
+
+Gah.  Once all is said and done, it's not supposed to be in this list because its
+only passed through for SEV-ES guests, but my intent was to keep it in this patch,
+and then removeit along with XSS, EFER, PAT, GHCB, and TSC_AUX in the next.
+
+This made me realize that merging in chunks has a novel flaw: if there is an MSR
+that KVM *doesn't* want to give L2 access to, then KVM needs to ensure its offset
+isn't processed, i.e. that there isn't a "collision" with another MSR.  I don't
+think it's a major concern, because the x2APIC MSRs are nicely isolated, and off
+the top of my head I can't think of any MSRs that fall into that bucket.  But it's
+something worth calling out in a comment, at least.
+
+> I'm a bit concerned that we might overlook adding new MSRs to this array in the
+> future, which could lead to tricky bugs. But I have no idea how to avoid this.
+
+Me either.  One option would be to use wrapper macros for the interception helpers
+to fill an array at compile time (similar to how kernel exception fixup works),
+but (a) it requires modifications to the linker scripts to generate the arrays,
+(b) is quite confusing/complex, and (c) it doesn't actually solve the problem,
+it just inverts the problem.  Because as above, there are MSRs we *don't* want
+to expose to L2, and so we'd need to add yet more code to filter those out.
+
+And the failure mode for the inverted case would be worse, because if we missed
+an MSR, KVM would incorrectly give L2 access to an MSR.  Whereas with the current
+approach, a missed MSR simply means L2 gets a slower path; but functionally, it's
+fine (and it has to be fine, because KVM can't force L1 to disable interception).
+
+> Removing this array and iterating over direct_access_msrs[] directly is an
+> option but it contradicts this series as one of its purposes is to remove
+> direct_access_msrs[].
+
+Using direct_access_msrs[] wouldn't solve the problem either, because nothing
+ensures _that_ array is up-to-date either.
+
+The best idea I have is to add a test that verifies the MSRs that are supposed
+to be passed through actually are passed through.  It's still effectively manual
+checking, but it would require us to screw up twice, i.e. forget to update both
+the array and the test.  The problem is that there's no easy and foolproof way to
+verify that an MSR is passed through in a selftest.
+
+E.g. it would be possible to precisely detect L2 => L0 MSR exits via a BPF program,
+but incorporating a BPF program into a KVM selftest just to detect exits isn't
+something I'm keen on doing (or maintaining).
+
+Using the "exits" stat isn't foolproof due to NMIs (IRQs can be accounted for via
+"irq_exits", and to a lesser extent page faults (especially if shadow paging is
+in use).
+
+If KVM provided an "msr_exits" stats, it would be trivial to verify interception
+via a selftest, but I can't quite convince myself that MSR exits are interesting
+enough to warrant their own stat.
+
+> >+		MSR_IA32_LASTBRANCHFROMIP,
+> >+		MSR_IA32_LASTBRANCHTOIP,
+> >+		MSR_IA32_LASTINTFROMIP,
+> >+		MSR_IA32_LASTINTTOIP,
+> >+
+> >+		MSR_IA32_XSS,
+> >+		MSR_EFER,
+> >+		MSR_IA32_CR_PAT,
+> >+		MSR_AMD64_SEV_ES_GHCB,
+> >+		MSR_TSC_AUX,
+> >+	};
+> 
+> 
+> > 
+> > 		if (kvm_vcpu_read_guest(vcpu, offset, &value, 4))
+> >diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> >index 1c70293400bc..84dd1f220986 100644
+> >--- a/arch/x86/kvm/svm/svm.c
+> >+++ b/arch/x86/kvm/svm/svm.c
+> >@@ -5689,6 +5689,10 @@ static int __init svm_init(void)
+> > 	if (!kvm_is_svm_supported())
+> > 		return -EOPNOTSUPP;
+> > 
+> >+	r = nested_svm_init_msrpm_merge_offsets();
+> >+	if (r)
+> >+		return r;
+> >+
+> 
+> If the offset array is used for nested virtualization only, how about guarding
+> this with nested virtualization? For example, in svm_hardware_setup():
+
+Good idea, I'll do that in the next version.
+
+> 	if (nested) {
+> 		r = nested_svm_init_msrpm_merge_offsets();
+> 		if (r)
+> 			goto err;
+> 
+> 		pr_info("Nested Virtualization enabled\n");
+> 		kvm_enable_efer_bits(EFER_SVME | EFER_LMSLE);
+> 	}
+> 
+> 
+> > 	r = kvm_x86_vendor_init(&svm_init_ops);
+> > 	if (r)
+> > 		return r;
+> >diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> >index 909b9af6b3c1..0a8041d70994 100644
+> >--- a/arch/x86/kvm/svm/svm.h
+> >+++ b/arch/x86/kvm/svm/svm.h
+> >@@ -686,6 +686,8 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
+> > 	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
+> > }
+> > 
+> >+int __init nested_svm_init_msrpm_merge_offsets(void);
+> >+
+> > int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
+> > 			 u64 vmcb_gpa, struct vmcb *vmcb12, bool from_vmrun);
+> > void svm_leave_nested(struct kvm_vcpu *vcpu);
+> >-- 
+> >2.49.0.1204.g71687c7c1d-goog
+> >
 
