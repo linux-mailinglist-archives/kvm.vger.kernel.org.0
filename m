@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-48438-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48439-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D49B1ACE467
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 20:36:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69436ACE46A
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 20:36:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A6BD1896803
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 18:36:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06DF63A8812
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 18:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734B720459A;
-	Wed,  4 Jun 2025 18:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA91205AD7;
+	Wed,  4 Jun 2025 18:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="usNegfJz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YBPXMnZr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A11C202961
-	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 18:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2853203710
+	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 18:36:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749062190; cv=none; b=sPs9Ab7Vm2f8/4iOZEDOljvY95H577Y/2Ld0D3qtZJSytbw3vi6PK3ezDOnMYJERw4Ab2twfrn9j6gWTN69aekxDeuyZHMFu4yl1Gd7+eo979XBvOAlc/kFvcPbTp6wKEShgdvz3yS16JlB6sfnkGwPHyAZ8k6LTeF/LQ0S3H84=
+	t=1749062192; cv=none; b=Uy8YBEI79RTAkc5Fs7LkzAFYbjsLOwRegyayAUuJKTv1tl4fuFs0Mho/n7PMlL0OMGxe8gnfMFxAY/5H6E/4YHAR3So9QZJpsHxbMWbM0cjyFiOa5sIExroFrm/Zttf3I6coPzUa89ONGU8Om6+oeaiTJpAYg95jMb7oIUcnu1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749062190; c=relaxed/simple;
-	bh=TyqQYBNnuuEH5ROuLOOzjdKoJcI91zCNgTTdsTCaHlE=;
+	s=arc-20240116; t=1749062192; c=relaxed/simple;
+	bh=XEGtCyvmquXdS5bC75ix4QdkCjWAk2zyh1M98jaQbxo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DZdKiKiQ40MPCiDuF9zjzjlNLxdFMv9+qfj7yevguKrv+9/UcjJQaM3SWyQk8vrXUdp7EQQCUGUccVxmHRxmfO/QNNYm8VXZm8WHhHMufr7vjC+3+izMOjPUE1HTvj7f191T/YOU6WCO20GnYoCXsNne5XSueB2Dv64wElMfhmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=usNegfJz; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=T9d3aY4guYgb9khV4K0RCweMJNCe+SluZkYLqSaUNL5+4knGlcaY1j6eWmx5sXWm+kyAoxXSTRPOATlAI/cUv4EY7DG6Y0tjdsPhvrJ4fzm0L0K2fP0ojKzyA3/4OL163c8An8CQDlyxfwdm8Bmf48xuJcNfSdxJToQAOEtcyLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YBPXMnZr; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-740270e168aso142912b3a.1
-        for <kvm@vger.kernel.org>; Wed, 04 Jun 2025 11:36:28 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-af59547f55bso50544a12.0
+        for <kvm@vger.kernel.org>; Wed, 04 Jun 2025 11:36:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749062188; x=1749666988; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749062190; x=1749666990; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=HpheW9+KAUFOS+tSmsqSJMYl2FYTGbJX+/h5ze9LZmw=;
-        b=usNegfJzbkFo0vO6MWHetk0pKRCQR40jBy1S+KDkXsIBahUAjmMzDF1JfR6bnE9mo9
-         yXhTntSRGlfMh3vxSHaaIxvFNZcVwNGD8feDcn0ZoZNiTm78gSBPvxdZLiaHhR9rVd3+
-         Y9VyNV9CYitIL+Rl0azNkhRAPC3Xh7bTN4567pzLgydOMZcuSGfO5CCbCp5KkpxwurpQ
-         OD2zrwMviot4j7ttnKGk9i5/YzT19V++4+enAT6M2qJuSlBeNc8PD7TbcdqlLix/FBPf
-         2L6gXxbWNZ42terApMZ5ScwZ/vc+SsdP36K6KeVo+hHsI5/K/tmj7oWOa61qUGbMIJgQ
-         VVOA==
+        bh=XDLE/0KvH+YekLdGRUHtCq36fTmI3p02zaN++At7L4k=;
+        b=YBPXMnZrQgh+vPq10cyEwEFkyUyYDXNSyn+HEPVPjkqVXXqtVMYDPXlUXo09CF4yVM
+         7iWnyclKfmb3sBODMZotAOzBCzb00JZE0c453gL3EiUm0rD6ZOd4g7dJYRw+0kTvInPE
+         oji9XsnFuFJMZTdqJyd70IyzimRPRrLpxs/98SmFX0OvUSTXYPGhr/LcJn6QJHte3BZs
+         l+IP5UNd5B5NyliskX7R30X1hHqyYT1gbdfnMXVAoagDdUDtMxSnXRD7tKHuRT3oIn4o
+         loJTPD+LNhbdOSVq3YCpmhdElV40uDH//kSsozX68ztqyoUYzKBan4LgSv76Bxc+fOiR
+         ChCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749062188; x=1749666988;
+        d=1e100.net; s=20230601; t=1749062190; x=1749666990;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HpheW9+KAUFOS+tSmsqSJMYl2FYTGbJX+/h5ze9LZmw=;
-        b=KqwXiej9OhHHe17ZYzN5G8nYHPHgHwy469Iu0jIK+AIo9hm24aNkDkiTARCjuJQijM
-         BSULZuIIvBadt/7DbOQIncnw/XEuzxvhkgz7uIa43xJXN77way19FQvROLwsfGkJljrK
-         jixcCbqaGDwLhmQM08I4a1EmbMJTtomvIxyH5grwO+aFCmEoZeIXQv6wKZvVbaqWjNdf
-         SFt9EV1Es0srVwrsd43hIAGq7fRbfzas3jihCybHyCL8d+J55vOx0p7NaTteZ2W6CkLV
-         39/fLMg08ANwE7YDllCSeX7Q02cpYpZKqDIxZqt0CqTdIeCOVTLv39Tx0Cg2nS7bjCkL
-         Iwbg==
-X-Gm-Message-State: AOJu0YwzjVTQSOqd2sRYP+f2sA75adjBk3JPbbazTLP90IX6G+dbaHAg
-	aV7k1JYu0mTLn5EXnb0Zd2SAkxwNFv7U4b774r4ywi4z6Nf1V1AtkzS9KdyLaHfN2eOz5SswJ60
-	77s6Znw==
-X-Google-Smtp-Source: AGHT+IHZL1uSi0UuPSSMR3ENWAt80uP+UQVjOARpM4c7p6YP30rCuMAm21DYvzJu3uUm5RCQg81rJUHNPn0=
-X-Received: from pfug9.prod.google.com ([2002:a05:6a00:789:b0:746:2414:11ef])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1a89:b0:742:4770:bfbb
- with SMTP id d2e1a72fcca58-7480b4b35a2mr6044579b3a.18.1749062188404; Wed, 04
- Jun 2025 11:36:28 -0700 (PDT)
+        bh=XDLE/0KvH+YekLdGRUHtCq36fTmI3p02zaN++At7L4k=;
+        b=oJU6LezeJ6FdwiTVvDFNpfGc6kEGtg8XjsP6Z/XmpsPssKgl+DxI1mE7nQWmWIXXyS
+         DovM6uJ5EcLlGjKteFs2n+wTIZTvC8vunxCftiN79lN11WEYEEj4WKhnNK4tEmXvPTm3
+         hrLPbEsXJQSVurRLwK98NeO4Esl/eSRbxrMgVQdw8rVbJO0q5g9JiMwq88dQGjpVB6Oh
+         Q0q7M35NX3RTEqL/kltq5WrKES7x7oxIvg7zmHppMZ+shucSWnI8NOwb6HokI+KokPli
+         gYWtA0yoXQb0M/r+DJ3q9w6kwKetYsodwBq3sj6eVBBHZ8O5XLCGl3GBeu3EJ7MsYZzZ
+         Lp5w==
+X-Gm-Message-State: AOJu0YwkG8gVoWCg7zhw9rikGbc/3DFTS3NDv7MoNGWK9xjkKdPgt3eD
+	T/jlcv/FKfBmWq+4xjQzj7W3a57jM6FZ4DsBpaxtyH2QoKiUAictL5DIRzDg2DLvbuIQ7XY69o5
+	IiVCiTA==
+X-Google-Smtp-Source: AGHT+IGYJD8VbS9lBYrbT2lkbkodVr8jhE4437lQfSKbvLsJdvnGnxiKEpcifYBOQn7sLwG13XXZ/He7HkU=
+X-Received: from pjvv11.prod.google.com ([2002:a17:90b:588b:b0:311:1a09:11ff])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:52cd:b0:312:e8ed:758
+ with SMTP id 98e67ed59e1d1-3130ccbf015mr5431414a91.13.1749062190135; Wed, 04
+ Jun 2025 11:36:30 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  4 Jun 2025 11:36:19 -0700
+Date: Wed,  4 Jun 2025 11:36:20 -0700
 In-Reply-To: <20250604183623.283300-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,45 +75,56 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250604183623.283300-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1266.g31b7d2e469-goog
-Message-ID: <20250604183623.283300-3-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 2/6] x86: Drop protection against setup_idt()
- being called multiple times
+Message-ID: <20250604183623.283300-4-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 3/6] x86: Move call to load_idt() out of
+ setup_tr_and_percpu macro
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>, 
 	Chenyi Qiang <chenyi.qiang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that setup_idt() is called exactly one for 32-bit, 64-bit, and EFI,
-drop the "do once" protection.
+Move the call to load_idt() out of setup_tr_and_percpu and into the two
+"callers" of the macro.  This will allow moving the BSP's invocation of
+load_idt() into setup_idt(), without creating a confusing scenario where
+load_idt() is called multiple times, e.g. so that it's clear the BSP is
+responsible for configuring the IDT.
 
-Long, long ago, setup_idt() was called by individual tests, and so the
-"do once" protection made a lot more sense.  Now that (most) core setup
-has been moved to the BSP's boot path, playing nice with calling
-setup_idt() multiple times doesn't make any sense.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/desc.c | 5 -----
- 1 file changed, 5 deletions(-)
+ x86/cstart.S | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-index acfada26..bf6c62bc 100644
---- a/lib/x86/desc.c
-+++ b/lib/x86/desc.c
-@@ -301,12 +301,7 @@ static void *idt_handlers[32] = {
- void setup_idt(void)
- {
- 	int i;
--	static bool idt_initialized = false;
+diff --git a/x86/cstart.S b/x86/cstart.S
+index ded6f91b..0229627a 100644
+--- a/x86/cstart.S
++++ b/x86/cstart.S
+@@ -36,7 +36,6 @@ mb_flags = 0x0
+ mb_cmdline = 16
  
--	if (idt_initialized)
--		return;
--
--	idt_initialized = true;
- 	for (i = 0; i < 32; i++) {
- 		if (!idt_handlers[i])
- 			continue;
+ .macro setup_tr_and_percpu
+-	call load_idt
+ 	push %esp
+ 	call setup_tss
+ 	addl $4, %esp
+@@ -97,6 +96,7 @@ ap_start32:
+ 	mov $-per_cpu_size, %esp
+ 	lock xaddl %esp, smp_stacktop
+ 	setup_tr_and_percpu
++	call load_idt
+ 	call prepare_32
+ 	call reset_apic
+ 	call save_id
+@@ -109,6 +109,7 @@ ap_start32:
+ 
+ start32:
+ 	setup_tr_and_percpu
++	call load_idt
+ 	call setup_idt
+ 	call reset_apic
+ 	call save_id
 -- 
 2.49.0.1266.g31b7d2e469-goog
 
