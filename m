@@ -1,277 +1,314 @@
-Return-Path: <kvm+bounces-48368-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48369-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59CB7ACD772
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 07:10:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0173FACD785
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 07:43:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2C3718984F1
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 05:11:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6DC6165A97
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 05:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2295266584;
-	Wed,  4 Jun 2025 05:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7C3262FC1;
+	Wed,  4 Jun 2025 05:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t1E5mJqh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VJv0+SZv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABC3264A7F
-	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 05:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749013756; cv=none; b=lgzd4UUZi6ZiUv37yeq+Cs0INTc/ruUtj97CrFTjGquTt6q04bv0bmaoFC1yLsYVryerld3ITQLLIMWwI6uSXNzDv8sUGCcgyDvCy02Ed3wVz3A6bTeQlclC/5jotIxVPh+zV33tF9auj1KAOR4zj6eDpX1pfVwOhkjRffZbCyY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749013756; c=relaxed/simple;
-	bh=0gfkpc4dNi2Ih4MnTfuUct9EpQso8+ggaMkVuPeWOTc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jm9EqSY344ofgP2Kan4x4uZnVAz2am8nrYc3gc8dUIhct6EOXdKekOAP7NWZl72dUVeRontySPYRFnx2FsQodZfHiFBe5wvkkue9IF7WkB33FBU6LiV4BtgEexjuaNWyAaLpy9SGx4ZVpDRGBczuJ8Vn/FonvP1a/QcAsg36elo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t1E5mJqh; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30a39fa0765so9145961a91.3
-        for <kvm@vger.kernel.org>; Tue, 03 Jun 2025 22:09:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749013753; x=1749618553; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f1C4xwS1oja4BGMpJEnpH51GbWTCvJSr7fg34G4M8Z0=;
-        b=t1E5mJqh4c0whgKHdU6foUxlAR874KIYhiRVwf85M4p3AJv03NwGLnpXVwdZKlBWSe
-         4ma2bQc9dj6S8FbA5kaWHlUUKY3rXgtQPQWAUo3GPGPEz8uCh77MgBnj4V3/w2BVvN2A
-         ILCeLFFlgybnbKKv5E/dGHIJC7C8ODJmbpIF430ZpBXcs9ox3o07yYVL1JtebAUsjHbn
-         Ef2p79Uc6YNZtUFXMYzM6JhHxUE4rRxOWwTt3n+95N7b3zP6sAy8yI7dkFMUv6xkCueA
-         Q/nIDSDhgm2j4bNkTdcdFx+W3yPolV1gG+0F+twlAi/pyvjZoV9fR6XFWoWZaRkTXbnt
-         MVow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749013753; x=1749618553;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f1C4xwS1oja4BGMpJEnpH51GbWTCvJSr7fg34G4M8Z0=;
-        b=wrl4m6laqddWpZu5doWTJCZexPHD9xDXmD3m8nKpnsT5+S4bVY5KAxlt4rADl9pk6A
-         4sCW4GMSBN0qzNtroGh3QsUW48kapXI/IHuT0iprYX0kaA8g8XugzY2XAsldugN2t0Fe
-         Xeskz4I5fG5vy/wrFsSuDOx6yay9VVpUDZvDehnlsO4562fcDE+mjVxZALan+STSm6vD
-         IVQOI2Lz3Yi0N7B6cGMYuwTl5g+OFSZcPQ0DJ3go+PJcFW3GjmiQHo03dL5GeQhfWw2d
-         JMg0Ll+tjdDzszdxja9Hv6N15c4PwpB28ojE+Bj9+bFElItY0TgWWiYMYBIhq7qX0T9H
-         RJeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXcSn/dPhvr+mfHcrRE76i8h7XkVB+ruFtfwlAAf0ZSjuKhzHKENWsugXzxxgLsho1QsYw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTkVmMk9jutDulU0dQHqEXwh8kp4V53EVAtR3n7twvd9OB9ySd
-	RSDC/Pz6npDS617jrJM17sGgJgNpomp61UdsfzSoFf6Laj2dNM1ygeQiXH6Wb8pAp/3WxYgRpXy
-	SjpwkWazz9kxwvg==
-X-Google-Smtp-Source: AGHT+IE37oF7FCdLRpvsoThAtQNnQsYjorBYGpuYCRvh2E+9sV6A3UsbG7Yq0ZEVRpNgSOSMEJKUi/G7O4PeZg==
-X-Received: from pjbpw6.prod.google.com ([2002:a17:90b:2786:b0:311:4201:4021])
- (user=jiaqiyan job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:35c6:b0:30e:ee4:3094 with SMTP id 98e67ed59e1d1-3130ccf5129mr2212286a91.1.1749013752906;
- Tue, 03 Jun 2025 22:09:12 -0700 (PDT)
-Date: Wed,  4 Jun 2025 05:09:01 +0000
-In-Reply-To: <20250604050902.3944054-1-jiaqiyan@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE229139B;
+	Wed,  4 Jun 2025 05:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749015802; cv=fail; b=LfCNl9K+jRWTr1HxNPFH68L75zzoWN6CJrlI1f6bGbMa9JciRN4yIb6w9NhU8wr/N+qwfCtwKrqzSqQVRYFCCBzEUg45z6j1b5wOytBTQOP4PWqF0U1uMNd6G++c7dK5qPj8lQChiSKAQ8NbidZ9+OjbgDoafWE554XvapU2al4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749015802; c=relaxed/simple;
+	bh=MPHw25y4DmUAgp23TMA8uwg+FMpH3wMAc7BegigXDlw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=OThQTSMBHvrhFNym6mpi4kWqQY5bR/AAB7vcIbB7XVRrm8AT4RR3FNb3RNSC8lTjAgBSQnvigEMohZ2VdILQbW8SZvYmCwnKFU33eCyXKP+cBnPvLJq0IGDp8jApq476wV/IdjjdOPcE4Dv6LwcupDI/a4RGPAtQ8L4FjTeKVRM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VJv0+SZv; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749015801; x=1780551801;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=MPHw25y4DmUAgp23TMA8uwg+FMpH3wMAc7BegigXDlw=;
+  b=VJv0+SZvq9AcnDA2ubNOA9dPkXzL7oNQ+HkTRYzCggqUk0cxF/KBMlQP
+   GjvWhmE+X1wWU3jHizLvXDdOY98yiVCNtt3WiIny/rTzIhsEh6VIOi7QG
+   VVtzhrQIWjIvTtUCSyfnzK10dtVTli3By5O5hxCQfgQ8CBnWbPbHmk8TH
+   NLNEhj/zaAAVHXe21dqB3i299Za0POiSbKVsaAtK0aepJxolDyT9NMOkn
+   MfKG4RfzDDjWgL7rsOcXiei34Hhuf4Pw/8bgykFSbJMw4FcVAYLYvZUGO
+   AUZ+YV4gj8L56jtOkrYPBUWD0lCqrP1fQ8kh7czm2KAuQHfwjr56b/IE9
+   Q==;
+X-CSE-ConnectionGUID: N4hZJ+oxRk2L+eQowAemuw==
+X-CSE-MsgGUID: e1NdSYTwRRComnzYsivWwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11453"; a="50774428"
+X-IronPort-AV: E=Sophos;i="6.16,208,1744095600"; 
+   d="scan'208";a="50774428"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 22:43:20 -0700
+X-CSE-ConnectionGUID: PC0XtmGuTdGLgJTvMz8ErA==
+X-CSE-MsgGUID: enmYR96eRwm5R7JGteSNmg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,208,1744095600"; 
+   d="scan'208";a="145045886"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2025 22:43:19 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 3 Jun 2025 22:43:18 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Tue, 3 Jun 2025 22:43:18 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.83)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.55; Tue, 3 Jun 2025 22:43:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BgiPgSp47NvlmSJb2vaYGEIcL5NKqEidoPuzKO02ps6ASgkCCzX2rl74KseQlbXSQ+j9dZBYDpSrGsu6LEVtXtRy8w7mx1OqZ7DX1nCpRcRm4GauQzHLcnvDH2Da741GER8UHZRS9UKO0SNCIqPucnEZ1orZ7Dt4CSiLD3vZ1b5ESK37/vU3OTbkzFX3n8I5uhZR1SbPBKkYouma6rkojvgh4ejyptRrPxmotqr3RFsEdmCFCXROeLbI49K8dqKLKZMAcT4nP6es1ttRO2FV9OoQiWrspilvDXLPsO6xNugj/+gOJejciZJizfCGiVJnXZHF8FBAY9pcV1XfydYi9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bsWqvCZ+PpdzGloWkeLf2h6E8QlNG43zHQO2bO6Tk8g=;
+ b=BKnTMeEjAHonb83scM3q3W+6sRV8Je/RXZ2ZCXwv7QTSVPE13IORsS/gwr0qRnln3OUNKnmqgdFzJAHALq1gFlKbOwbVpQHvkPge3S1gO42gghBBS8QGRnbINCLwjJgD0L0lHkWQdUZaDGfaMxQNCOy4xon3m38OYLnTYbs8HA0bm7xidTwURMn0wz94VhJju8BwvvsAEkBDcTivyS7lKBKlgSgBTF5J3AX3xBZfqkvYDjzHQ1Am0uzKBH0Nsyv/ykB8ZKlC3Z/hAVTVaBfImwbmNCLCJrIcnmW2Ah4siEaMYHyrZgEGtYwPwxhXmse5GWfaz5kytv8l24b2aARjaQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by PH0PR11MB5031.namprd11.prod.outlook.com (2603:10b6:510:33::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.32; Wed, 4 Jun
+ 2025 05:43:15 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.8769.031; Wed, 4 Jun 2025
+ 05:43:14 +0000
+Date: Wed, 4 Jun 2025 13:43:05 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, Xin Li
+	<xin@zytor.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
+Subject: Re: [PATCH 08/28] KVM: nSVM: Use dedicated array of MSRPM offsets to
+ merge L0 and L1 bitmaps
+Message-ID: <aD/c6RZvE7a1KSqk@intel.com>
+References: <20250529234013.3826933-1-seanjc@google.com>
+ <20250529234013.3826933-9-seanjc@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250529234013.3826933-9-seanjc@google.com>
+X-ClientProxiedBy: SG2P153CA0025.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c7::12)
+ To CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250604050902.3944054-1-jiaqiyan@google.com>
-X-Mailer: git-send-email 2.50.0.rc0.604.gd4ff7b7c86-goog
-Message-ID: <20250604050902.3944054-7-jiaqiyan@google.com>
-Subject: [PATCH v2 6/6] Documentation: kvm: new uAPI for handling SEA
-From: Jiaqi Yan <jiaqiyan@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev
-Cc: joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	shuah@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	duenwen@google.com, rananta@google.com, jthoughton@google.com, 
-	Jiaqi Yan <jiaqiyan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|PH0PR11MB5031:EE_
+X-MS-Office365-Filtering-Correlation-Id: a5d1875b-f743-4729-21a4-08dda32ab2ef
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?uq1PqCRHzysYKdHgsfr7qMaOndcS3apdDLwsFvAiSA//9Ebz6gypkfbOiw8h?=
+ =?us-ascii?Q?WLZsulzZ0gRM75qMrtD9olcHDsUy4BL9xuXimS1n6JJn/ttaRPT7Vz93cZaf?=
+ =?us-ascii?Q?ljTx+HqwycR2dbJ7UwPme/uvNjmDaoaciCSr7X5oWVSMA27kMjQWow3dZ7BK?=
+ =?us-ascii?Q?ilagS8vaTTXA9GvTy08Rrf+zMljXca2dm3ncGo2govH0efj8nz7qvGQ5kjgT?=
+ =?us-ascii?Q?8Ec6/s7EBrYh1Hj003w0DbBQYIwPJMPY0lftrUtGbV7VGwoJilWX8mLuR+vt?=
+ =?us-ascii?Q?i7pULxY2aoSh30kDjTQVRXnSnM0/q6ofTHbsTqZ7wmAe5cwsU8Z1cBPUJcHY?=
+ =?us-ascii?Q?e70wU3+LStoEKiOTb8paj+yIAf7Y4HQXNi+PWwI8VBMdbAfGiLhHGvJLXSVF?=
+ =?us-ascii?Q?k2RriatbhJVlJIo21QqWv/edcLGkLXJ+lUyQxTEPqmrq8OfY5OlUczFlX+fv?=
+ =?us-ascii?Q?+UA9cypSV38g3LvlKmMz5iw/vMTWgo2wIFsI/E9eFNaXlx6UOx68MF6w7bbz?=
+ =?us-ascii?Q?PlMtKbraLjIJbWOUdbmEqAPX0NPUcvqvK6UxukZ5PCjT+qnhlKr+9AOuwpEV?=
+ =?us-ascii?Q?pgtA4UUfEF3mGVn9R75rBqf+I8FWymCPd0zngFNtzlLN9gmYo0MZbDWog5rD?=
+ =?us-ascii?Q?f5ajru8nOKhjfo4DW5O98IY6hqP6a6PKzu5gfsjIgBFxLU04ztK0+JEThKIe?=
+ =?us-ascii?Q?UkhbjbE9Ht6YboUXrAf2sqV/AgcSxfIjoRaU3P+sawsw8vLAqEBeYv3O24pa?=
+ =?us-ascii?Q?9xx6Cml9U0olxih9qKNKUA47z+HLP7Yn3TtJ1w03mSjP1HQuVkYCvZTwvqrh?=
+ =?us-ascii?Q?eeLGCjVzchhjwcaJD8mnUypaL5Fo3Tdmg26WqlYPaAcG8hXpuBK7utlRO9rN?=
+ =?us-ascii?Q?h5Sk0ojeoirzw4eVulnqZ/Qslgt2R86Y2Sdh0JcoFKccdkv1xWA3ld+cTnUw?=
+ =?us-ascii?Q?NqyyORF7oBPGvv6X1La3VGbPkrgU5q4Px7ywl9indW1c6HMhj+BrPZ9iQOZ+?=
+ =?us-ascii?Q?dFsI6Gnch5nx7QAJiGbLlznIpnXous56Z5oXF1vEGYPRwaiP5+fwOgvKwC+O?=
+ =?us-ascii?Q?+uILbjqVBl8tPXyJk8NrLSf8xjpTpUD7UATrB2ehfEXN3C3kaLoxyo1qNy2G?=
+ =?us-ascii?Q?JgK6feDOz6MMStd8n93LUK2Z2Gh6aP0TOwGNR+qJDhFywsk2UgMy90LpDeR/?=
+ =?us-ascii?Q?ZAuuAM/LUYlIbdJB0IAiAGUtMAqaFtMAsyZS6MwvayYcviA6aVbKhUr5Wjct?=
+ =?us-ascii?Q?zvacU/AG+ooVAplFFYPqC1REQdC6L3fRTMcPWmhB3ouVjDhoSCkMaFi/gwMQ?=
+ =?us-ascii?Q?9cmU6vHlZIoaXJ9WXnFJULgJBj733iZOPxa5pU5t3fFKxU+BTeZS/o3+OLjE?=
+ =?us-ascii?Q?jd6O0h+mXIr0HMCYydm5q9fLzlcHpNl7pIcw5zlUzyOVPrPj65uo1NmLGLEh?=
+ =?us-ascii?Q?zDmr+NI9rb4=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qKRJQrdqNVcYZeIg7/yiLVHcs+qIiaOjDCClUyNHeUCJ9ZsHv+NdEY2Y+oHd?=
+ =?us-ascii?Q?ydVijiZKh7Wjc+w6KYj0t0pWUiX6sf48TmLcBSnb88azz1KP/QqFO/iXO4va?=
+ =?us-ascii?Q?8bgKtTkerSdCpmPwXyCmevFgdyn1iPhRSxfTvkRwW19Cwh90dGzsUXXx70Lr?=
+ =?us-ascii?Q?tjkFHO2BWRaY4hFKdX2rqSIPaekQoM5ZLKPkcoj7nE8jXfKMgpg35NMwE2dg?=
+ =?us-ascii?Q?+VB+dlhHfmZ2GxWR1glNw6XfvkvZiZirRTw50dNj7LKpslJMRDYaxcJqSwr0?=
+ =?us-ascii?Q?MEhX9NTARfaGRVLrJRUiHlMrypBl8MB1M6yX/JTMoqxAY5Upp9zGiLzWIzQc?=
+ =?us-ascii?Q?We+wHd5wXNlnjO++QOBYAH8ze2h6bqx6FCx5vOvSP1vaWqPnY5vp1MBtBvJb?=
+ =?us-ascii?Q?zxFHhMySCgPx5w6ZltmoTq2OPyvqQryFScrQOhFcFilPvCaHoxsY9AraeEQt?=
+ =?us-ascii?Q?3erdCpl0i4zvXkFBkNpHgflekX71nJyXA/qb1nYGlyumfmrtUiQzkAluPfZF?=
+ =?us-ascii?Q?EF4P/lPTHgaUyThk+DY0k55z5iWLf18767gRDNIsWvyXSAeqzfnHI3/m2Lki?=
+ =?us-ascii?Q?y05+tuNDHJ6JBW+LtYYIQRcOrIBgiSR/NK1OLJC42tKipxpuXZ9BjT/1qozB?=
+ =?us-ascii?Q?AGTHuye9zbOZCakGueSOL0gXptAom4qOkswfTdXN9A/o/F55gEiFicp8wFqL?=
+ =?us-ascii?Q?2r3ndu3HuJOmDnEpxhvJEXrAY6hGrqr4eHh35TqNmGC6+OLkgJb2beQqr4Zo?=
+ =?us-ascii?Q?+bYvD5cKX7q1GMMPAbMJ8PaZ/OX0V+VZ6/CK6VswxFxmS0386mt2111iRq1Q?=
+ =?us-ascii?Q?Uw4jaBGTsuZMnxQJm/homPzd4tx1IfG13t57iJ4MYG4jDWzVbAmG/4hiHWwv?=
+ =?us-ascii?Q?HVper2SWtMAYFPcmKgrQwf9d7s4Osw5YsjtRbBpx79aJVuSJPanlFav7RL/P?=
+ =?us-ascii?Q?WrAu9eXisq3TMXw42kvtwcaDfllYe/3q2zN7V+LPPhQFQ4K/gJ5eFuN4SNnk?=
+ =?us-ascii?Q?REyTx2ZQoL/ElGp3nV7Ofcf0WFn0hxqmL0S0TznLcD18i1jyjLJrC72wy0FY?=
+ =?us-ascii?Q?/uH5lGKlh3MUlyizKi9aGt4Vy/E0yRdFeaVURvyhv54uWD4FxV3oVcxkpCNQ?=
+ =?us-ascii?Q?z/B8DPPLlJch9UvBA9XBRxA7jrktRyJ3lRMkSK7GuoqdHP+hjChuaog4SFs4?=
+ =?us-ascii?Q?3wzhP6Oz7fpTMt9xYK3Ri0RSnDMwq1P6kZ4QaClIfjmNsh2Cz/mgarB+NY6N?=
+ =?us-ascii?Q?4mJkOMTpMX7IEIYz1utPv+5UCdBX1v95zaxVdS15IKuohnK9EMKxgY49lz/K?=
+ =?us-ascii?Q?wVjlxZoUiIfwPBw782wvU9OPEZxqvRx/qPlT0LyiCIUUcrGj7dCxIaOFDHO8?=
+ =?us-ascii?Q?L0X+hh1FiztHKp8VDdH0XzHrVsdpldVzCxoHDqAg+i3pazJxTO8phXNH7R9q?=
+ =?us-ascii?Q?61ODvpCzNWrqT4ZrWF/F7QC3YIbGzlsubHTXJ10RjX7jXvCNfge+2x54LPIp?=
+ =?us-ascii?Q?5uHktkYcFsJSlVIrUpy7AWFDCj9bQrFhbO9slIXBUi4RqrRqboYXcpOR4SDd?=
+ =?us-ascii?Q?NDJKZpmZvPejeQY/NUf2DWpUV7hlO8pPAJEj5OQN?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a5d1875b-f743-4729-21a4-08dda32ab2ef
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2025 05:43:14.5080
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NPZZlGcGN5blfBTRsnvK7fBrgG0fuS2E9QVrRJQDKzCBTq+c1tOKQHMOAqghpjcVQGD/WpTKZlcC6UnK79KkZg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5031
+X-OriginatorOrg: intel.com
 
-Document the new userspace-visible features and APIs for handling
-synchronous external abort (SEA)
-- KVM_CAP_ARM_SEA_TO_USER: How userspace enables the new feature.
-- KVM_EXIT_ARM_SEA: When userspace needs to handle SEA and what
-  userspace gets while taking the SEA.
-- KVM_CAP_ARM_INJECT_EXT_(D|I)ABT: How userspace injects SEA to
-  guest while taking the SEA.
+On Thu, May 29, 2025 at 04:39:53PM -0700, Sean Christopherson wrote:
+>Use a dedicated array of MSRPM offsets to merge L0 and L1 bitmaps, i.e. to
+>merge KVM's vmcb01 bitmap with L1's vmcb12 bitmap.  This will eventually
+>allow for the removal of direct_access_msrs, as the only path where
+>tracking the offsets is truly justified is the merge for nested SVM, where
+>merging in chunks is an easy way to batch uaccess reads/writes.
+>
+>Opportunistically omit the x2APIC MSRs from the merge-specific array
+>instead of filtering them out at runtime.
+>
+>Note, disabling interception of XSS, EFER, PAT, GHCB, and TSC_AUX is
+>mutually exclusive with nested virtualization, as KVM passes through the
+>MSRs only for SEV-ES guests, and KVM doesn't support nested virtualization
+>for SEV+ guests.  Defer removing those MSRs to a future cleanup in order
+>to make this refactoring as benign as possible.
+>
+>Signed-off-by: Sean Christopherson <seanjc@google.com>
+>---
+> arch/x86/kvm/svm/nested.c | 72 +++++++++++++++++++++++++++++++++------
+> arch/x86/kvm/svm/svm.c    |  4 +++
+> arch/x86/kvm/svm/svm.h    |  2 ++
+> 3 files changed, 67 insertions(+), 11 deletions(-)
+>
+>diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+>index 89a77f0f1cc8..e53020939e60 100644
+>--- a/arch/x86/kvm/svm/nested.c
+>+++ b/arch/x86/kvm/svm/nested.c
+>@@ -184,6 +184,64 @@ void recalc_intercepts(struct vcpu_svm *svm)
+> 	}
+> }
+> 
+>+static int nested_svm_msrpm_merge_offsets[9] __ro_after_init;
 
-Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
----
- Documentation/virt/kvm/api.rst | 128 +++++++++++++++++++++++++++++----
- 1 file changed, 115 insertions(+), 13 deletions(-)
+I understand how the array size (i.e., 9) was determined :). But, adding a
+comment explaining this would be quite helpful 
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index fe3d6b5d2acca..c58ecb72a4b4d 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1236,8 +1236,9 @@ directly to the virtual CPU).
- 		__u8 serror_pending;
- 		__u8 serror_has_esr;
- 		__u8 ext_dabt_pending;
-+		__u8 ext_iabt_pending;
- 		/* Align it to 8 bytes */
--		__u8 pad[5];
-+		__u8 pad[4];
- 		__u64 serror_esr;
- 	} exception;
- 	__u32 reserved[12];
-@@ -1292,20 +1293,57 @@ ARM64:
- 
- User space may need to inject several types of events to the guest.
- 
-+Inject SError
-+~~~~~~~~~~~~~
-+
- Set the pending SError exception state for this VCPU. It is not possible to
- 'cancel' an Serror that has been made pending.
- 
--If the guest performed an access to I/O memory which could not be handled by
--userspace, for example because of missing instruction syndrome decode
--information or because there is no device mapped at the accessed IPA, then
--userspace can ask the kernel to inject an external abort using the address
--from the exiting fault on the VCPU. It is a programming error to set
--ext_dabt_pending after an exit which was not either KVM_EXIT_MMIO or
--KVM_EXIT_ARM_NISV. This feature is only available if the system supports
--KVM_CAP_ARM_INJECT_EXT_DABT. This is a helper which provides commonality in
--how userspace reports accesses for the above cases to guests, across different
--userspace implementations. Nevertheless, userspace can still emulate all Arm
--exceptions by manipulating individual registers using the KVM_SET_ONE_REG API.
-+Inject SEA (synchronous external abort)
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+- If the guest performed an access to I/O memory which could not be handled by
-+  userspace, for example because of missing instruction syndrome decode
-+  information or because there is no device mapped at the accessed IPA.
-+
-+- If the guest consumed an uncorrected memory error, and RAS extension in the
-+  Trusted Firmware chooses to notify PE with SEA, KVM has to handle it when
-+  host APEI is unable to claim the SEA. For the following types of faults,
-+  if userspace has enabled KVM_CAP_ARM_SEA_TO_USER, KVM returns to userspace
-+  with KVM_EXIT_ARM_SEA:
-+
-+  - Synchronous external abort, not on translation table walk or hardware
-+    update of translation table.
-+
-+  - Synchronous external abort on stage-1 translation table walk or hardware
-+    update of stage-1 translation table, including all levels.
-+
-+  - Synchronous parity or ECC error on memory access, not on translation table
-+    walk.
-+
-+  - Synchronous parity or ECC error on memory access on stage-1 translation
-+    table walk or hardware update of stage-1 translation table, including
-+    all levels.
-+
-+Note that external abort or ECC error on memory access on stage-2 translation
-+table walk or hardware update of stage-2 translation table does not results in
-+KVM_EXIT_ARM_SEA, even if KVM_CAP_ARM_SEA_TO_USER is enabled.
-+
-+For the cases above, userspace can ask the kernel to replay either an external
-+data abort (by setting ext_dabt_pending) or an external instruction abort
-+(by setting ext_iabt_pending) into the faulting VCPU. KVM will use the address
-+from the existing fault on the VCPU. Setting both ext_dabt_pending and
-+ext_iabt_pending at the same time will return -EINVAL.
-+
-+It is a programming error to set ext_dabt_pending or ext_iabt_pending after an
-+exit which was not KVM_EXIT_MMIO, KVM_EXIT_ARM_NISV or KVM_EXIT_ARM_SEA.
-+Injecting SEA for data and instruction abort is only available if KVM supports
-+KVM_CAP_ARM_INJECT_EXT_DABT and KVM_CAP_ARM_INJECT_EXT_IABT respectively.
-+
-+This is a helper which provides commonality in how userspace reports accesses
-+for the above cases to guests, across different userspace implementations.
-+Nevertheless, userspace can still emulate all Arm exceptions by manipulating
-+individual registers using the KVM_SET_ONE_REG API.
- 
- See KVM_GET_VCPU_EVENTS for the data structure.
- 
-@@ -7163,6 +7201,58 @@ The valid value for 'flags' is:
-   - KVM_NOTIFY_CONTEXT_INVALID -- the VM context is corrupted and not valid
-     in VMCS. It would run into unknown result if resume the target VM.
- 
-+::
-+
-+    /* KVM_EXIT_ARM_SEA */
-+    struct {
-+      __u64 esr;
-+  #define KVM_EXIT_ARM_SEA_FLAG_GVA_VALID   (1ULL << 0)
-+  #define KVM_EXIT_ARM_SEA_FLAG_GPA_VALID   (1ULL << 1)
-+      __u64 flags;
-+      __u64 gva;
-+      __u64 gpa;
-+    } arm_sea;
-+
-+Used on arm64 systems. When the VM capability KVM_CAP_ARM_SEA_TO_USER is
-+enabled, a VM exit is generated if guest causes a synchronous external abort
-+(SEA) and the host APEI fails to handle the SEA.
-+
-+Historically KVM handles SEA by first delegating the SEA to host APEI as there
-+is high chance that the SEA is caused by consuming uncorrected memory error.
-+However, not all platforms support SEA handling in APEI, and KVM's fallback
-+handling is to inject an async SError into the guest, which usually panics
-+guest kernel unpleasantly. As an alternative, userspace can participate into
-+the SEA handling by enabling KVM_CAP_ARM_SEA_TO_USER at VM creation, after
-+querying the capability. Once enabled, when KVM has to handle the guest
-+caused SEA, it returns to userspace with KVM_EXIT_ARM_SEA, with details
-+about the SEA available in 'arm_sea'.
-+
-+The 'esr' field holds the value of the exception syndrome register (ESR) while
-+KVM taking the SEA, which tells userspace the character of the current SEA,
-+such as its Exception Class, Synchronous Error Type, Fault Specific Code and
-+so on. For more details on ESR, check the Arm Architecture Registers
-+documentation.
-+
-+The 'flags' field indicates if the faulting addresses are valid while taking
-+the SEA:
-+
-+  - KVM_EXIT_ARM_SEA_FLAG_GVA_VALID -- the faulting guest virtual address
-+    is valid and userspace can get its value in the 'gva' field.
-+  - KVM_EXIT_ARM_SEA_FLAG_GPA_VALID -- the faulting guest physical address
-+    is valid and userspace can get its value in the 'gpa' field.
-+
-+Userspace needs to take actions to handle guest SEA synchronously, namely in
-+the same thread that runs KVM_RUN and receives KVM_EXIT_ARM_SEA. One of the
-+encouraged approaches is to utilize the KVM_SET_VCPU_EVENTS to inject the SEA
-+to the faulting VCPU. This way, the guest has the opportunity to keep running
-+and limit the blast radius of the SEA to the particular guest application that
-+caused the SEA. If the Exception Class indicated by 'esr' field in 'arm_sea'
-+is data abort, userspace should inject data abort. If the Exception Class is
-+instruction abort, userspace should inject instruction abort. Userspace may
-+also emulate the SEA to VM by itself using the KVM_SET_ONE_REG API. In this
-+case, it can use the valid values from 'gva' and 'gpa' fields to manipulate
-+VCPU's registers (e.g. FAR_EL1, HPFAR_EL1).
-+
- ::
- 
- 		/* Fix the size of the union. */
-@@ -8490,7 +8580,7 @@ ENOSYS for the others.
- When enabled, KVM will exit to userspace with KVM_EXIT_SYSTEM_EVENT of
- type KVM_SYSTEM_EVENT_SUSPEND to process the guest suspend request.
- 
--7.37 KVM_CAP_ARM_WRITABLE_IMP_ID_REGS
-+7.42 KVM_CAP_ARM_WRITABLE_IMP_ID_REGS
- -------------------------------------
- 
- :Architectures: arm64
-@@ -8508,6 +8598,18 @@ aforementioned registers before the first KVM_RUN. These registers are VM
- scoped, meaning that the same set of values are presented on all vCPUs in a
- given VM.
- 
-+7.43 KVM_CAP_ARM_SEA_TO_USER
-+----------------------------
-+
-+:Architecture: arm64
-+:Target: VM
-+:Parameters: none
-+:Returns: 0 on success, -EINVAL if unsupported.
-+
-+This capability, if KVM_CHECK_EXTENSION indicates that it is available, means
-+that KVM has an implementation that allows userspace to participate in handling
-+synchronous external abort caused by VM, by an exit of KVM_EXIT_ARM_SEA.
-+
- 8. Other capabilities.
- ======================
- 
--- 
-2.49.0.1266.g31b7d2e469-goog
+>+static int nested_svm_nr_msrpm_merge_offsets __ro_after_init;
+>+
+>+int __init nested_svm_init_msrpm_merge_offsets(void)
+>+{
+>+	const u32 merge_msrs[] = {
+>+		MSR_STAR,
+>+		MSR_IA32_SYSENTER_CS,
+>+		MSR_IA32_SYSENTER_EIP,
+>+		MSR_IA32_SYSENTER_ESP,
+>+	#ifdef CONFIG_X86_64
+>+		MSR_GS_BASE,
+>+		MSR_FS_BASE,
+>+		MSR_KERNEL_GS_BASE,
+>+		MSR_LSTAR,
+>+		MSR_CSTAR,
+>+		MSR_SYSCALL_MASK,
+>+	#endif
+>+		MSR_IA32_SPEC_CTRL,
+>+		MSR_IA32_PRED_CMD,
+>+		MSR_IA32_FLUSH_CMD,
 
+MSR_IA32_DEBUGCTLMSR is missing, but it's benign since it shares the same
+offset as MSR_IA32_LAST* below.
+
+I'm a bit concerned that we might overlook adding new MSRs to this array in the
+future, which could lead to tricky bugs. But I have no idea how to avoid this.
+Removing this array and iterating over direct_access_msrs[] directly is an
+option but it contradicts this series as one of its purposes is to remove
+direct_access_msrs[].
+
+>+		MSR_IA32_LASTBRANCHFROMIP,
+>+		MSR_IA32_LASTBRANCHTOIP,
+>+		MSR_IA32_LASTINTFROMIP,
+>+		MSR_IA32_LASTINTTOIP,
+>+
+>+		MSR_IA32_XSS,
+>+		MSR_EFER,
+>+		MSR_IA32_CR_PAT,
+>+		MSR_AMD64_SEV_ES_GHCB,
+>+		MSR_TSC_AUX,
+>+	};
+
+
+> 
+> 		if (kvm_vcpu_read_guest(vcpu, offset, &value, 4))
+>diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>index 1c70293400bc..84dd1f220986 100644
+>--- a/arch/x86/kvm/svm/svm.c
+>+++ b/arch/x86/kvm/svm/svm.c
+>@@ -5689,6 +5689,10 @@ static int __init svm_init(void)
+> 	if (!kvm_is_svm_supported())
+> 		return -EOPNOTSUPP;
+> 
+>+	r = nested_svm_init_msrpm_merge_offsets();
+>+	if (r)
+>+		return r;
+>+
+
+If the offset array is used for nested virtualization only, how about guarding
+this with nested virtualization? For example, in svm_hardware_setup():
+
+	if (nested) {
+		r = nested_svm_init_msrpm_merge_offsets();
+		if (r)
+			goto err;
+
+		pr_info("Nested Virtualization enabled\n");
+		kvm_enable_efer_bits(EFER_SVME | EFER_LMSLE);
+	}
+
+
+> 	r = kvm_x86_vendor_init(&svm_init_ops);
+> 	if (r)
+> 		return r;
+>diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+>index 909b9af6b3c1..0a8041d70994 100644
+>--- a/arch/x86/kvm/svm/svm.h
+>+++ b/arch/x86/kvm/svm/svm.h
+>@@ -686,6 +686,8 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
+> 	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
+> }
+> 
+>+int __init nested_svm_init_msrpm_merge_offsets(void);
+>+
+> int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
+> 			 u64 vmcb_gpa, struct vmcb *vmcb12, bool from_vmrun);
+> void svm_leave_nested(struct kvm_vcpu *vcpu);
+>-- 
+>2.49.0.1204.g71687c7c1d-goog
+>
 
