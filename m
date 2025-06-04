@@ -1,247 +1,152 @@
-Return-Path: <kvm+bounces-48447-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48448-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6857ACE56B
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 22:03:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0587ACE59B
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 22:11:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 725DE3A8B83
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 20:02:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 502B53A8C21
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 20:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839FD212B28;
-	Wed,  4 Jun 2025 20:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D3923AE95;
+	Wed,  4 Jun 2025 20:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K9kWW8zC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I3Lpes4f"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-oa1-f74.google.com (mail-oa1-f74.google.com [209.85.160.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFFF7081F
-	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 20:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E508239090
+	for <kvm@vger.kernel.org>; Wed,  4 Jun 2025 20:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749067378; cv=none; b=n2Upuck22ygdGLVqmKS1zADv+aJg+BTXbREzB+Cff1QSIeaMboyWL0X42UaM1I6vrXbqnrT5tUDOobZVbZDcnrEGKk6s0gKPZc0fJqxWKEHhHkVrGi6MAOvVdp0oGXLTgF2x/6dTEiJJ+FHkiBY2hM1JOS5PV03E6xP8Kg3m6H4=
+	t=1749067819; cv=none; b=WRAag9aR3sgnemu0YNklH4FeWGclxdo4GM6jR9UyH+gEyudyYYTCOmAChAL1ah9t3OrWF2JBrfJAaPtnRfDskeX1V21unTkli2iylAEzV17kPeBz/sb2SXxzUvo06ClgD9WQ6LkfVS5Byu1UIZ7fEoA++BTpAVvO01nrhRNeK3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749067378; c=relaxed/simple;
-	bh=/oXjNoKaFi18wBBbxc9lgVKRoAl/TFTCl19ADf/MD9Y=;
+	s=arc-20240116; t=1749067819; c=relaxed/simple;
+	bh=+FLkUpcT3PESJgNscr3x/ohUzN/uoff55tujHNikLec=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=SXf1J0ToHrzXm0y+ocO7Rv+DiSk4qub69tjyfzpFD+HscvTtG9SHNdIVAdp75aYt4KluJzSQFY6BVTJecBKgeChV2GguNIdZSdKExiuzkOToALuHof8zNWDTVLcYKfUSb8Smq6kH6gbFCQYCuf4FoVDEUJ+Lweg8Bm2qo2KzuMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K9kWW8zC; arc=none smtp.client-ip=209.85.215.202
+	 Content-Type; b=UP5iLXIaSwpYfcjKmxDPhH7pfUkfbXVfPMOa4xIBfc5S3R5Uo4gjaplFQ7S6XEvtvSpLCWkJOpudj57uNBNDfttOVw3AV3GKO8jB1jLV1XSb79icWcTFldWlWnQSw2ZWyFUI1myXkNhqyXydgiblNJ0zVDDrNG2IyjR8GSNDNG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I3Lpes4f; arc=none smtp.client-ip=209.85.160.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b26cdc70befso108794a12.1
-        for <kvm@vger.kernel.org>; Wed, 04 Jun 2025 13:02:55 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-oa1-f74.google.com with SMTP id 586e51a60fabf-2d5723630a2so437070fac.2
+        for <kvm@vger.kernel.org>; Wed, 04 Jun 2025 13:10:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749067375; x=1749672175; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rAeDnAu1iVfkSNw+hN1Znk4oNapfaoWsxLiV+G+rVq0=;
-        b=K9kWW8zCeCT7temqWrVBOXV/ysZCklnHS2/pxFum+Kr501szPjvwbinJ4DiVbR99Sr
-         Z6D/DXMz29Q1k73RTZsK9oYyI/NvoJXm63OATf6NY/Jym/f/LhoN/9JclfucZpTTEyIr
-         QrCB5/5DEHlRM8C+oQIy4czumlw0qVN3V0yLbQja91u/DFV6yklsbeFwXfIEGWH9aVBP
-         3kK1dUB7rHESQf/5WIxR6w3OswRsGiNAip/ktKxAMvIYVr+dMeUjdBUL2GGnWEbmwAxl
-         PDw1QnCOxba0Li0HvgRzojDx2KcH7JA2Sj0TaYSuQMZzcgOk7ePMR2QRaCKwy63xMePm
-         n65w==
+        d=google.com; s=20230601; t=1749067817; x=1749672617; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lHzQy57VH5Dlm3eWN9P8hBycQlEQ3v1q3yM5kgGsFF0=;
+        b=I3Lpes4fMRWtbG2HncubAuVa4fBsxiLZuFn15RYH0bj5pqgX/iL9jnIlNdxEynTEn8
+         XSjLKO5dyO+yIJ1ZOntSlM/qsk+/Jb62Wg12g50gYqyLZQ9rh2WEgMm+GSnQvblSWdAg
+         OjM8389zVuuR9em/E0SHuhj3WdS8tpRgfChvfsfLxKG4p5NJDaKXxim6kKP5EgF7nTt9
+         K8Ne9r4JqF+LWK0FjHqYl8eT8JVwr/rX90/KXHUvCL+8xvmiMv25/JLePy5ZpShyRF7l
+         yp2QO0LepnDlPR2Uv6ue0SjcX4PZu+07/MHxhv4OhXLXN3Jy6XV7Io6rBIq9vLfrigIK
+         t6nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749067375; x=1749672175;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rAeDnAu1iVfkSNw+hN1Znk4oNapfaoWsxLiV+G+rVq0=;
-        b=N4Or45bWtKKJTZ7AYR+GFlVMqBDaMkgXMX/POO4OSJAGiBWoutbRKEYcSWKYN87VRx
-         FqrOFQ7JaDxLrn8ddkJgKHh1A/MrBqUQEDkVvm/GvSFZO4AFlST/hNPqDCw15PTU7r16
-         4iYgIsrEQtxL8A4IcZNqlfdECcCWBz7ZOALUAJaI5rrJJvvLp5YHYubewIZi7ewgVA/r
-         iZl2jBeR2Zkk7Mq+DQ4j5s6/Q67zt/39TyF8JeHl2xyd6uwC5bNSJVur7/Qfr+8F577o
-         6kxvxPFBaPHgP6RGJYeCjK41fHCiN+roBZkrqiU3tUx9tOezD4NgW5MBrF3ELPEwTr/o
-         fT3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVtvBRC2d30OGX2r8BnXhStM4T1EVFu1W5JNf7qiBvEek+HDCIQHqJ/yXPlAbEmywUjlCQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYGQxP5X1qKdcBR5HIYLIL0CEjBLXTf88Jdbq072Pd1zDcx5Y3
-	ClDsFMJRAtFaFonqVtdYdVwjvaVY9U+jluiLj7A9nrhxSzVdJyhX8K2kARk9LC22b3/JdVExvzk
-	Ms4U8PRixFG3kG1HlKVoxfjn/pA==
-X-Google-Smtp-Source: AGHT+IHvSBac0jCGR1FiacSK6OdMWzNXgSQTh3CUYf5rb2MhrPDIBfnu+6/ydort/RxPDaciSeVY0tnlh77F1rVwpQ==
-X-Received: from pfwp6.prod.google.com ([2002:a05:6a00:26c6:b0:747:b608:3d8e])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:9985:b0:215:eac9:1ab2 with SMTP id adf61e73a8af0-21d22d0ed2cmr6424202637.28.1749067375374;
- Wed, 04 Jun 2025 13:02:55 -0700 (PDT)
-Date: Wed, 04 Jun 2025 13:02:54 -0700
-In-Reply-To: <aCVZIuBHx51o7Pbl@yzhao56-desk.sh.intel.com> (message from Yan
- Zhao on Thu, 15 May 2025 11:01:54 +0800)
+        d=1e100.net; s=20230601; t=1749067817; x=1749672617;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lHzQy57VH5Dlm3eWN9P8hBycQlEQ3v1q3yM5kgGsFF0=;
+        b=BYqxT5zg2Y11K5EYe8LUHM3FgmYvwcrLTd4L39FYV2XsgwKSeXUo15OJlyZC+e1E4F
+         21s+ptmIlAH6hcGYOEbFfTopgoHZc5BEryeImQbtvOutvXpSRdAZIBu3yw7YBljeOagh
+         2CQ6IDjp9hzbaYWb1z0SEZ3ZPeBBizIq/lOcwHlPKJCkyZgQvwi9IAlPHA1+jOfuS19g
+         TCph7wydCRY++hM7Ql3iijeK6st9dX0Hxt89AliaMiLbgUoCge1wR1FL/ihTuXTLMTan
+         aHs9+7EUrJSEr69ShBu3w27/bT8vCqlufRfdPJUOkzY0hOgRSWLNTQJ54DXWEKhgzYqi
+         hjGg==
+X-Gm-Message-State: AOJu0Yx4AnbPdaLxtYuFGtp7jfPxAMvjblI7g0B8+muQ5eMjOaEG8Av5
+	UgVgMXZ27M9NRo6oaePaDyVeC7smx408AeUXlTo6Jrb48qM5cnOhMn5UBf4dLEztjUXyHZFF8Mp
+	nHchqFEY6xzt+l0K6s+R1ujlnTg==
+X-Google-Smtp-Source: AGHT+IGLogg78YRXI+ioMZ0+UVCCfd+jEelWcrdnbClXw8ZFThU177ehWe7bFnJXpvQmuVRW9orWyDUTziNbdD2zgw==
+X-Received: from oabgq6.prod.google.com ([2002:a05:6870:d906:b0:2b8:e735:4798])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6871:4387:b0:2b8:f595:2374 with SMTP id 586e51a60fabf-2e9bf502cc2mr2945734fac.36.1749067817128;
+ Wed, 04 Jun 2025 13:10:17 -0700 (PDT)
+Date: Wed, 04 Jun 2025 20:10:16 +0000
+In-Reply-To: <aD96rn78BSUDbEu1@linux.dev> (message from Oliver Upton on Tue, 3
+ Jun 2025 15:43:58 -0700)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <diqzfrgfp95d.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: vannapurve@google.com, pbonzini@redhat.com, seanjc@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
-	rick.p.edgecombe@intel.com, dave.hansen@intel.com, kirill.shutemov@intel.com, 
-	tabba@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
-	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
-	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
-	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
-	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <gsnttt4v1d5j.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 00/17] ARM64 PMU Partitioning
+From: Colton Lewis <coltonlewis@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
+	maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Yan Zhao <yan.y.zhao@intel.com> writes:
+Oliver Upton <oliver.upton@linux.dev> writes:
 
-> On Mon, May 12, 2025 at 09:53:43AM -0700, Vishal Annapurve wrote:
->> On Sun, May 11, 2025 at 7:18=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> =
-wrote:
->> > ...
->> > >
->> > > I might be wrongly throwing out some terminologies here then.
->> > > VM_PFNMAP flag can be set for memory backed by folios/page structs.
->> > > udmabuf seems to be working with pinned "folios" in the backend.
->> > >
->> > > The goal is to get to a stage where guest_memfd is backed by pfn
->> > > ranges unmanaged by kernel that guest_memfd owns and distributes to
->> > > userspace, KVM, IOMMU subject to shareability attributes. if the
->> > OK. So from point of the reset part of kernel, those pfns are not rega=
-rded as
->> > memory.
->> >
->> > > shareability changes, the users will get notified and will have to
->> > > invalidate their mappings. guest_memfd will allow mmaping such range=
-s
->> > > with VM_PFNMAP flag set by default in the VMAs to indicate the need =
-of
->> > > special handling/lack of page structs.
->> > My concern is a failable invalidation notifer may not be ideal.
->> > Instead of relying on ref counts (or other mechanisms) to determine wh=
-ether to
->> > start shareabilitiy changes, with a failable invalidation notifier, so=
-me users
->> > may fail the invalidation and the shareability change, even after othe=
-r users
->> > have successfully unmapped a range.
->>
->> Even if one user fails to invalidate its mappings, I don't see a
->> reason to go ahead with shareability change. Shareability should not
->> change unless all existing users let go of their soon-to-be-invalid
->> view of memory.
+> On Mon, Jun 02, 2025 at 07:26:45PM +0000, Colton Lewis wrote:
+>> Caveats:
 
-Hi Yan,
+>> Because the most consistent and performant thing to do was untrap
+>> PMCR_EL0, the number of counters visible to the guest via PMCR_EL0.N
+>> is always equal to the value KVM sets for MDCR_EL2.HPMN. Previously
+>> allowed writes to PMCR_EL0.N via {GET,SET}_ONE_REG no longer affect
+>> the guest.
 
-While working on the 1G (aka HugeTLB) page support for guest_memfd
-series [1], we took into account conversion failures too. The steps are
-in kvm_gmem_convert_range(). (It might be easier to pull the entire
-series from GitHub [2] because the steps for conversion changed in two
-separate patches.)
+>> These improvements come at a cost to 7-35 new registers that must be
+>> swapped at every vcpu_load and vcpu_put if the feature is enabled. I
+>> have been informed KVM would like to avoid paying this cost when
+>> possible.
 
-We do need to handle errors across ranges to be converted, possibly from
-different memslots. The goal is to either have the entire conversion
-happen (including page split/merge) or nothing at all when the ioctl
-returns.
+>> One solution is to make the trapping changes and context swapping lazy
+>> such that the trapping changes and context swapping only take place
+>> after the guest has actually accessed the PMU so guests that never
+>> access the PMU never pay the cost.
 
-We try to undo the restructuring (whether split or merge) and undo any
-shareability changes on error (barring ENOMEM, in which case we leave a
-WARNing).
+> You should try and model this similar to how we manage the debug
+> breakpoints/watchpoints. In that case the debug register context is
+> loaded if either:
 
-The part we don't restore is the presence of the pages in the host or
-guest page tables. For that, our idea is that if unmapped, the next
-access will just map it in, so there's no issue there.
+>   (1) Self-hosted debug is actively in use by the guest, or
 
-> My thinking is that:
->
-> 1. guest_memfd starts shared-to-private conversion
-> 2. guest_memfd sends invalidation notifications
->    2.1 invalidate notification --> A --> Unmap and return success
->    2.2 invalidate notification --> B --> Unmap and return success
->    2.3 invalidate notification --> C --> return failure
-> 3. guest_memfd finds 2.3 fails, fails shared-to-private conversion and ke=
-eps
->    shareability as shared
->
-> Though the GFN remains shared after 3, it's unmapped in user A and B in 2=
-.1 and
-> 2.2. Even if additional notifications could be sent to A and B to ask for
-> mapping the GFN back, the map operation might fail. Consequently, A and B=
- might
-> not be able to restore the mapped status of the GFN.
+>   (2) The guest has accessed a debug register since the last vcpu_load()
 
-For conversion we don't attempt to restore mappings anywhere (whether in
-guest or host page tables). What do you think of not restoring the
-mappings?
+Okay
 
-> For IOMMU mappings, this
-> could result in DMAR failure following a failed attempt to do shared-to-p=
-rivate
-> conversion.
+>> This is not done here because it is not crucial to the primary
+>> functionality and I thought review would be more productive as soon as
+>> I had something complete enough for reviewers to easily play with.
 
-I believe the current conversion setup guards against this because after
-unmapping from the host, we check for any unexpected refcounts.
+>> However, this or any better ideas are on the table for inclusion in
+>> future re-rolls.
 
-(This unmapping is not the unmapping we're concerned about, since this is
-shared memory, and unmapping doesn't go through TDX.)
+> One of the other things that I'd like to see is if we can pare down the
+> amount of CPU feature dependencies for a partitioned PMU. Annoyingly,
+> there aren't a lot of machines out there with FEAT_FGT yet, and you
+> should be able to make all of this work in VHE + FEAT_PMUv3p1.
 
-Coming back to the refcounts, if the IOMMU had mappings, these refcounts
-are "unexpected". The conversion ioctl will return to userspace with an
-error.
+> That "just" comes at the cost of extra traps (leaving TPM and
+> potentially TPMCR set). You can mitigate the cost of this by emulating
+> accesses in the fast path that don't need to go out to a kernel context
+> to be serviced. Same goes for requiring FEAT_HPMN0 to expose 0 event
+> counters, we can fall back to TPM traps if needed.
 
-IO can continue to happen, since the memory is still mapped in the
-IOMMU. The memory state is still shared. No issue there.
+> Taking perf out of the picture should still give you a significant
+> reduction vPMU overheads.
 
-In RFCv2 [1], we expect userspace to see the error, then try and remove
-the memory from the IOMMU, and then try conversion again.
+Okay
 
-The part in concern here is unmapping failures of private pages, for
-private-to-shared conversions, since that part goes through TDX and
-might fail.
+> Last thing, let's table guest support for FEAT_PMUv3_ICNTR for the time
+> being. Yes, it falls in the KVM-owned range, but we can just handle it
+> with a fine-grained undef for now. Once the core infrastructure has
+> landed upstream we can start layering new features into the partitioned
+> implementation.
 
-One other thing about taking refcounts is that in RFCv2,
-private-to-shared conversions assume that there are no refcounts on the
-private pages at all. (See filemap_remove_folio_for_restructuring() in
-[3])
+Sure
 
-Haven't had a chance to think about all the edge cases, but for now I
-think on unmapping failure, in addition to taking a refcount, we should
-return an error at least up to guest_memfd, so that guest_memfd could
-perhaps keep the refcount on that page, but drop the page from the
-filemap. Another option could be to track messed up addresses and always
-check that on conversion or something - not sure yet.
-
-Either way, guest_memfd must know. If guest_memfd is not informed, on a
-next conversion request, the conversion will just spin in
-filemap_remove_folio_for_restructuring().
-
-What do you think of this part about informing guest_memfd of the
-failure to unmap?
-
->
-> I noticed Ackerley has posted the series. Will check there later.
->
-
-[1] https://lore.kernel.org/all/cover.1747264138.git.ackerleytng@google.com=
-/T/
-[2] https://github.com/googleprodkernel/linux-cc/tree/gmem-1g-page-support-=
-rfc-v2
-[3] https://lore.kernel.org/all/7753dc66229663fecea2498cf442a768cb7191ba.17=
-47264138.git.ackerleytng@google.com/
-
->> >
->> > Auditing whether multiple users of shared memory correctly perform unm=
-apping is
->> > harder than auditing reference counts.
->> >
->> > > private memory backed by page structs and use a special "filemap" to
->> > > map file offsets to these private memory ranges. This step will also
->> > > need similar contract with users -
->> > >    1) memory is pinned by guest_memfd
->> > >    2) users will get invalidation notifiers on shareability changes
->> > >
->> > > I am sure there is a lot of work here and many quirks to be addresse=
-d,
->> > > let's discuss this more with better context around. A few related RF=
-C
->> > > series are planned to be posted in the near future.
->> > Ok. Thanks for your time and discussions :)
->> > ...
+> Thanks,
+> Oliver
 
