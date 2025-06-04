@@ -1,129 +1,193 @@
-Return-Path: <kvm+bounces-48406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37072ACDF57
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 15:37:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5923ACDFA1
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 15:53:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FADB165822
-	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 13:37:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB09918828B4
+	for <lists+kvm@lfdr.de>; Wed,  4 Jun 2025 13:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A3328FFE6;
-	Wed,  4 Jun 2025 13:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE7C28FAB9;
+	Wed,  4 Jun 2025 13:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mlAlwaCM"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Uje3IDdS"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66FB33DF;
-	Wed,  4 Jun 2025 13:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0DB42A87;
+	Wed,  4 Jun 2025 13:53:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749044251; cv=none; b=oNTXDvVdU3mrib6CF/WyynhnNc9om2xQvs3+/URPLnTyd22ZC2BIYmRkhcU2oa4MWad0/Tq+aogI/1heOCRfkKjYmbfCZWVXmqzAyU2kXdo6RPwEodvktSPi0lNxOdSwPRsh2k1m3jx8/lI50Uai8bavBKQTJTkB4k3JlBF6pB4=
+	t=1749045216; cv=none; b=tkExubze3aT58s8LnMaDpKmSl7/Xep4o8eRiN8cQdTn7HeFWjzLOnBtHS/pFUFaVBuPd3ooRa2fG8YXXU/xv/qF7JoBzrfx7NKUaIwOURBSShEORztJxP+x7kGtUFT6ghDFduZiooXjfZ9ZmGyn1U+hHpnL2u2oNh0t3bAWg+fU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749044251; c=relaxed/simple;
-	bh=LjylLgqkF7sXPvwM5QH3T3a2T3r7WcEDyImVKYKRfn0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=D/g6elXLS+XvDg2y4MXowBFBdFdFDIKmePkRi3+RlbMd/kCe51R230Odz8QrGzpPLG4lIlRg+YHRKV6Z7T3tIVKGvJP0o3iCc0Wgtu3RDoPz4jm/zyAk3+36jJBnh8qEa/yG9OOwDAiZUo9h8IwaSrT8L6FIKDde2h6clYUj7j8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mlAlwaCM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D6C5C4CEE7;
-	Wed,  4 Jun 2025 13:37:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749044251;
-	bh=LjylLgqkF7sXPvwM5QH3T3a2T3r7WcEDyImVKYKRfn0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=mlAlwaCMs9tHjv6nEt7U+Ibg65b3CKJlPhs4lgVIQ1VKcvjCSAYuvfpS6hBIjw3OV
-	 XQ8nvezt/8lN48FPFZnaaeJIhrV3+e2znePItViM9AaToBMfrO64NF1hBlaB1QvO6z
-	 7z7MBsz2PgK1NDMFfsSxgSmZA49I1drxjPSJm2OqbmDUcdp5q8e2z3fTc3QtLqzj60
-	 FMvKPAK09UXyZ9zGUdOOQOWfA/LvFF06aPr//yfBeeocNL+rWHokKBimR3tSr5zb+U
-	 n5Po3J89DI/7AuC4qrESmIyKo8Bw3bZzX2U3Uds/QpUkap7crcVwBjgXNvjtoiQHDZ
-	 UCS7+3qRu7fTw==
-X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: kvm@vger.kernel.org, sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	jgg@nvidia.com, dan.j.williams@intel.com, aik@amd.com,
-	linux-coco@lists.linux.dev, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	vivek.kasireddy@intel.com, yilun.xu@intel.com,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
-	zhenzhong.duan@intel.com, tao1.su@intel.com,
-	linux-pci@vger.kernel.org, zhiw@nvidia.com, simona.vetter@ffwll.ch,
-	shameerali.kolothum.thodi@huawei.com, iommu@lists.linux.dev,
-	kevin.tian@intel.com
-Subject: Re: [RFC PATCH 19/30] vfio/pci: Add TSM TDI bind/unbind IOCTLs for
- TEE-IO support
-In-Reply-To: <aD24r44v0g1NgeZs@yilunxu-OptiPlex-7050>
-References: <20250529053513.1592088-1-yilun.xu@linux.intel.com>
- <20250529053513.1592088-20-yilun.xu@linux.intel.com>
- <yq5aplfn210z.fsf@kernel.org> <aD24r44v0g1NgeZs@yilunxu-OptiPlex-7050>
-Date: Wed, 04 Jun 2025 19:07:18 +0530
-Message-ID: <yq5ajz5r8w6p.fsf@kernel.org>
+	s=arc-20240116; t=1749045216; c=relaxed/simple;
+	bh=gEaec+r6HaRvOWsI9UxPmbcF79etZ2qgODjTDrDOwyI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cT89hcU1kNR5rIZHMHrcde+L6qFBgTh7kwSLNYQAoh7V6E3MSzz64zcFS2z/mmTdBKSNDsbzelT2g4O72Gmk5ke6qLXrM3qmpGToZzbW5Kob5Bd3FPZ1i40zbggsAWGbC1s8i5GDk/yKpEIR+yPb0GbmQpHMR2oSXnV60ngU/JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Uje3IDdS; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 554Cr7Ys027917;
+	Wed, 4 Jun 2025 13:53:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=mTxob+
+	3AN6+5NNCmHiHdX7KGjxH7xfoNmONml4Cdnx0=; b=Uje3IDdSEkqrUrvRBdZcCt
+	nBT7CYFlz6nwIvCvEmjtNZkTuc/cRw3vxpTqErq1jV4om+g4MhCtNfxHrWswwyF5
+	12bRc+xV1VVnXHNvZs9Ed5BShuDXaJjFZ9I2qG5TDrLpuRvqZKaJ44HkQbvTr1DV
+	mCTWgJ3MpcXFYnNdjbhpNU4YjZfYp8IMkFjBtzZRPQJEkEj6xLPNrgpG7pB3rATz
+	aPx3QX+vZJi/vvxi0/5ia5t7rAL/GibOdihYA1Ikj3MMNaD7JoeOAyMAWTJ/Uifb
+	qFcNpPr9goZ1W/YqlqvjCkkhG2PLky7rTFJtn5zx8jQzbZAfpQG4phGB2t06Kd/w
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471geyb1gt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Jun 2025 13:53:29 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 554Bx5aw031700;
+	Wed, 4 Jun 2025 13:53:28 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470cg003u3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Jun 2025 13:53:28 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 554DrOR151511664
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 4 Jun 2025 13:53:24 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 68AE620043;
+	Wed,  4 Jun 2025 13:53:24 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D96A420040;
+	Wed,  4 Jun 2025 13:53:23 +0000 (GMT)
+Received: from [9.111.35.118] (unknown [9.111.35.118])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  4 Jun 2025 13:53:23 +0000 (GMT)
+Message-ID: <618a014d-5deb-4d66-b2d9-cea930f8f050@linux.ibm.com>
+Date: Wed, 4 Jun 2025 15:53:23 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5] KVM: s390: Use ESCA instead of BSCA at VM init
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+References: <20250603-rm-bsca-v5-1-f691288ada5c@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250603-rm-bsca-v5-1-f691288ada5c@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=ea09f6EH c=1 sm=1 tr=0 ts=68404fda cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=aytlwjwg4dCizeVP_UwA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: MVw8LoSiXmCwLMQF8LVry3anz_Ll0GlP
+X-Proofpoint-ORIG-GUID: MVw8LoSiXmCwLMQF8LVry3anz_Ll0GlP
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA0MDEwMyBTYWx0ZWRfX+6oTeaE2wR4S sXnShZdCtl42YiJbkVvsaTY09fbg+rV0VxsxuK4Ixnuu++KqYTFPdwQ4Up4JO6AgO34+ekzmQUq lCx4bvj9i7ScvquIk815zDpp5saJhDBmY6Z/7K+MH+8Bw5TU5rJUyvRrGVqmAt+5qCYq3Mczk+O
+ H2M34dMdjDwxFaEZugkdu2e4B7iPaaE7LhBmOl60GrhppMPPWWxV25q+sMeBW0COey6fD5t6Liu K6kU9oHrKGoInnB4tRUViH4lhG0BVPC/502djw3tZoTzbygs///w6FJG1gZcShC/yJNn9mxZ/IH lDUMMSaF/ugjASPmYxshO+LLT9nP7wKK+xH+ERQT1V7WBDZ08lyF91+2tayIO1uR5EL0v4ETFPE
+ k0jvwByJvzvFOzx+v5+oVSjiAUgiNda4g0ROYgycrJWXs6//P5Un2WOrSXFBWe9XqJs5wHok
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-04_03,2025-06-03_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=717 bulkscore=0
+ spamscore=0 suspectscore=0 lowpriorityscore=0 malwarescore=0
+ impostorscore=0 phishscore=0 mlxscore=0 adultscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506040103
 
-Xu Yilun <yilun.xu@linux.intel.com> writes:
+On 6/3/25 6:35 PM, Christoph Schlameuss wrote:
+> All modern IBM Z and Linux One machines do offer support for the
+> Extended System Control Area (ESCA). The ESCA is available since the
+> z114/z196 released in 2010.
+> KVM needs to allocate and manage the SCA for guest VMs. Prior to this
+> change the SCA was setup as Basic SCA only supporting a maximum of 64
+> vCPUs when initializing the VM. With addition of the 65th vCPU the SCA
+> was needed to be converted to a ESCA.
+> 
+> Instead of allocating a BSCA and upgrading it for PV or when adding the
+> 65th cpu we can always allocate the ESCA directly upon VM creation
+> simplifying the code in multiple places as well as completely removing
+> the need to convert an existing SCA.
+> 
+> In cases where the ESCA is not supported (z10 and earlier) the use of
+> the SCA entries and with that SIGP interpretation are disabled for VMs.
+> This increases the number of exits from the VM in multiprocessor
+> scenarios and thus decreases performance.
+> The same is true for VSIE where SIGP is currently disabled and thus no
+> SCA entries are used.
+> 
+> The only downside of the change is that we will always allocate 4 pages
+> for a 248 cpu ESCA instead of a single page for the BSCA per VM.
+> In return we can delete a bunch of checks and special handling depending
+> on the SCA type as well as the whole BSCA to ESCA conversion.
+> 
+> With that behavior change we are no longer referencing a bsca_block in
+> kvm->arch.sca. This will always be esca_block instead.
+> By specifying the type of the sca as esca_block we can simplify access
+> to the sca and get rid of some helpers while making the code clearer.
+> 
+> KVM_MAX_VCPUS is also moved to kvm_host_types to allow using this in
+> future type definitions.
+> 
 
-> On Sun, Jun 01, 2025 at 04:15:32PM +0530, Aneesh Kumar K.V wrote:
->> Xu Yilun <yilun.xu@linux.intel.com> writes:
->> 
->> > Add new IOCTLs to do TSM based TDI bind/unbind. These IOCTLs are
->> > expected to be called by userspace when CoCo VM issues TDI bind/unbind
->> > command to VMM. Specifically for TDX Connect, these commands are some
->> > secure Hypervisor call named GHCI (Guest-Hypervisor Communication
->> > Interface).
->> >
->> > The TSM TDI bind/unbind operations are expected to be initiated by a
->> > running CoCo VM, which already have the legacy assigned device in place.
->> > The TSM bind operation is to request VMM make all secure configurations
->> > to support device work as a TDI, and then issue TDISP messages to move
->> > the TDI to CONFIG_LOCKED or RUN state, waiting for guest's attestation.
->> >
->> > Do TSM Unbind before vfio_pci_core_disable(), otherwise will lead
->> > device to TDISP ERROR state.
->> >
->> 
->> Any reason these need to be a vfio ioctl instead of iommufd ioctl?
->> For ex: https://lore.kernel.org/all/20250529133757.462088-3-aneesh.kumar@kernel.org/
->
-> A general reason is, the device driver - VFIO should be aware of the
-> bound state, and some operations break the bound state. VFIO should also
-> know some operations on bound may crash kernel because of platform TSM
-> firmware's enforcement. E.g. zapping MMIO, because private MMIO mapping
-> in secure page tables cannot be unmapped before TDI STOP [1].
->
-> Specifically, for TDX Connect, the firmware enforces MMIO unmapping in
-> S-EPT would fail if TDI is bound. For AMD there seems also some
-> requirement about this but I need Alexey's confirmation.
->
-> [1] https://lore.kernel.org/all/aDnXxk46kwrOcl0i@yilunxu-OptiPlex-7050/
->
+Thanks for taking care of this, it makes the code a lot nicer to read.
 
-According to the TDISP specification (Section 11.2.6), clearing either
-the Bus Master Enable (BME) or Memory Space Enable (MSE) bits will cause
-the TDI to transition to an error state. To handle this gracefully, it
-seems necessary to unbind the TDI before modifying the BME or MSE bits.
-
-If I understand correctly, we also need to unmap the Stage-2 mapping due
-to the issue described in commit
-abafbc551fddede3e0a08dee1dcde08fc0eb8476. Are there any additional
-reasons we would want to unmap the Stage-2 mapping for the BAR (as done
-in vfio_pci_zap_and_down_write_memory_lock)?
-
-Additionally, with TDX, it appears that before unmapping the Stage-2
-mapping for the BAR, we should first unbind the TDI (ie, move it to the
-"unlock" state?) Is this step related Section 11.2.6 of the TDISP spec,
-or is it driven by a different requirement?
-
--aneesh
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
