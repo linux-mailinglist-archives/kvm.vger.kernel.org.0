@@ -1,683 +1,722 @@
-Return-Path: <kvm+bounces-48464-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48465-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55B9FACE868
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 04:45:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F284AACE870
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 04:47:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 021BE16CED4
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 02:45:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0C3A7A849B
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 02:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735C81F4736;
-	Thu,  5 Jun 2025 02:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59651F78F2;
+	Thu,  5 Jun 2025 02:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="errBmt2y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hl5oa5ft"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F904136348;
-	Thu,  5 Jun 2025 02:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749091515; cv=fail; b=S7OGtWoUr6QM5GwHm8O9owanKU4ds4ERIHlAwqXTlY5Io7zQXBfKsKZQSn0nyHgkzzgZtch9gC2iXC4dglhVePqupmnFAYxZAET3CeeHaNR81C7ZTxhIFh1vcBRnky9bY+d5GJNiNiZpBrzAmOmO4vyhnVxR5/xnFvIMvh3EIjs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749091515; c=relaxed/simple;
-	bh=JxWGABUB7mCXL3ILyaD0MRdTpE2lPTKMFCUpzcsXpoQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=fRklFZRgg+bQXJCU3KTzi8TS3cxQ97d4tR7xOjwn86pxk+ABGZDKjI89UxywKkcs0RmdR07hqT8mkgl0bxbjCqgv6yTyuAIm3Un9aetq+2ttK4wraoxz/o2rLMOXt3YwEEuwVfCHayQCoJ+ku0KieIUR9ybbN6EiaYaRF0RFX14=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=errBmt2y; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749091514; x=1780627514;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=JxWGABUB7mCXL3ILyaD0MRdTpE2lPTKMFCUpzcsXpoQ=;
-  b=errBmt2yDxGooNsBLJLwR5kEKA33Xls4OrTVNcTmqG3IuojtrShs1glv
-   Ywq23AiyXM4BimZyRIQAkvLSnWOMBApNbTJTWtrDHdzCixEQxU2GK++jE
-   YRkaacugJHSsLMoSFWZC/kydAysjwSNC1qr0lYWubgmnLXUjTqcrQijBZ
-   MbOz2VUg3ZK+9KUgyknEkSPTcDvqtb2gvcznRKj7nAg1PtmFWAEFWc73t
-   LTwHpB+8dXbtMbUa16862qYgoInExAjXk8QFDHle84Tpg8dyz1OH+uMUf
-   W4xV4SGPq4nIWtqFn17y8BIm2SoB/0SPZv7gAGyKaZxIolxDSpTLl3mpZ
-   g==;
-X-CSE-ConnectionGUID: d2Bf6/u/SUmKt3Mk83hJWw==
-X-CSE-MsgGUID: Gdh/8HixTViZl6zsa88t0A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11454"; a="50891275"
-X-IronPort-AV: E=Sophos;i="6.16,210,1744095600"; 
-   d="scan'208";a="50891275"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 19:45:13 -0700
-X-CSE-ConnectionGUID: kkgP75UBQ+qg+q82bTr0RA==
-X-CSE-MsgGUID: pVN+95yMQ7KpHu1PRgchGw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,210,1744095600"; 
-   d="scan'208";a="145257983"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 19:45:13 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 4 Jun 2025 19:45:11 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Wed, 4 Jun 2025 19:45:11 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.65)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 4 Jun 2025 19:45:11 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qoIP/Okx6Z1NSs2LLK8g9Np3scJrcksVHsuMzf9aX7ZjiPv/0RkHxWyOi2Tav2vYSK5L4ST71txdLjfIfNrkYtfu+Wjb7eYHGyxFHmHLHYbfOqV+l4r0OFmk5CYIyauNFEA7jWcMuNaNhX5Yi/NcXEhqaOca3j0HvB3OVVFgrf15mO/vpRNqElht17HnZwSTLh4ZM55/kiEmf0zkyzIP3oBL2DDAMTpOyGJI4/WjIA/Qrpdyip4RV99FSgow0mdjrxeFZ1YAAF8ckqVmupyQkYdqMZ7M7HEox6mjDLuvFBrzyN1rJHiMpKcZnDXm7phU5a22RnX/UXTCY2nleBTHUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f8yobr97dUaJ+MaBzRGCLFVjVCH6rvNZcmAhCAl77F0=;
- b=XYSB+yOjtpG6ic9eA0v3kZMZihOd0OLbON/RhrJEoLuCKV2LemCpkkXe3tfuWqoIvDjp3wW4HFwYgp7nTzIVMhypLe/+iq/ePP6FhYJDh3+ib4wVgxmFj/3M2rla84SI2lyZ+hYE1gWn8Uya4rqssYTqqqhTsWVITz2Dzk7vLuqZlWWr/QZn2QDZ/a4M+StWiNB+Q+U+oqDtA5roC/xD9tbZKtSxpmasefeiutx4X4n2EaaUNha29Ow3BSI299uMO902Y8g+10d3/DT1LcNh8hs65wuyFPSzxIL/pvtB6J/jQgmcBV6/vevQr9M+1k7yqh32utv6NtuW0mFt8WczjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- SN7PR11MB7994.namprd11.prod.outlook.com (2603:10b6:806:2e6::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.37; Thu, 5 Jun
- 2025 02:45:08 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%5]) with mapi id 15.20.8769.037; Thu, 5 Jun 2025
- 02:45:08 +0000
-Date: Thu, 5 Jun 2025 10:42:45 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Ackerley Tng <ackerleytng@google.com>
-CC: <vannapurve@google.com>, <pbonzini@redhat.com>, <seanjc@google.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <x86@kernel.org>,
-	<rick.p.edgecombe@intel.com>, <dave.hansen@intel.com>,
-	<kirill.shutemov@intel.com>, <tabba@google.com>, <quic_eberman@quicinc.com>,
-	<michael.roth@amd.com>, <david@redhat.com>, <vbabka@suse.cz>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <pgonda@google.com>,
-	<zhiquan1.li@intel.com>, <fan.du@intel.com>, <jun.miao@intel.com>,
-	<ira.weiny@intel.com>, <isaku.yamahata@intel.com>, <xiaoyao.li@intel.com>,
-	<binbin.wu@linux.intel.com>, <chao.p.peng@intel.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge
- pages
-Message-ID: <aEEEJbTzlncbRaRA@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <aCVZIuBHx51o7Pbl@yzhao56-desk.sh.intel.com>
- <diqzfrgfp95d.fsf@ackerleytng-ctop.c.googlers.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <diqzfrgfp95d.fsf@ackerleytng-ctop.c.googlers.com>
-X-ClientProxiedBy: SI2PR01CA0038.apcprd01.prod.exchangelabs.com
- (2603:1096:4:193::20) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EAA24A0C
+	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 02:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749091638; cv=none; b=uUpOE4D2AhAYtlrr4hnl4zB5ymm/oNmH3m+38RR2qeEOuGRi42mZrH0vKdPqB/PTagL+/IyDDo8uBTkNItgiUzfJjdw8P5gU3CY9g9s0T/3afvOjjHEqcIQS9CmFFjvZYuC5RlvNQxg5+q6TkPLP6xf4qaq4iuXjg7PXOQZIods=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749091638; c=relaxed/simple;
+	bh=omIp1mzOfpWW5NtnN0bnzoknDyuqi/3OPgFAYaUwxUc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AYz7V5UyJxZONvyWAN7yIgpuU+ehQqTPW/c9md88kUgpNstKjCIWFZNdRCC1QGjXI9EtTAWg4JVyMUtn+1xStxORg56IN+ywPh3J4picLJLQgvavhBtVbtaP/y2TZhYvvPD0GkXis2TNPXRffMDHdu1atkFqIn/4e6fUSvRweUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hl5oa5ft; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749091633;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dEp8EEq9IZLjoD7IXIoV5lnHN1rozAVzaIx61db4w7A=;
+	b=hl5oa5ftjhYbd/pnhkSJZzjVbvtLS/3/XN9L6Kilmzju2gExCxFDdiLFkqIMDacuPVa7dR
+	AlPjeL3QJrUhGdbO8WgXxK/k66XDryFskKnB6APQCrmeKDxErVdkW5LGei4YG+MOnT4/bk
+	KGVBiXFjkU7PmxzR4LO0SoT9o5CrdaI=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-249-86MES5QyNLaW98Ma5dGecg-1; Wed, 04 Jun 2025 22:47:12 -0400
+X-MC-Unique: 86MES5QyNLaW98Ma5dGecg-1
+X-Mimecast-MFC-AGG-ID: 86MES5QyNLaW98Ma5dGecg_1749091631
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-747a9ef52a4so720814b3a.2
+        for <kvm@vger.kernel.org>; Wed, 04 Jun 2025 19:47:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749091631; x=1749696431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dEp8EEq9IZLjoD7IXIoV5lnHN1rozAVzaIx61db4w7A=;
+        b=BblqS7VOndC4k5u9vN8OjHtyiqDo0SGIjt1X0ppiNPXiP9O/xthav4O6VHgrDPusft
+         Vh/ON8ni5fuKHgeroXOAMEMNE7/EgW7PsW2gGRIkf+qvtUrw7/8l/1SojaFpjyXIvBQ6
+         jj6d4DsaYm0FOiDbSDJGPFIgopg7qZsymkgXKaOAhbwUC2NOCkqpgJrpsiaYGQrhiaEo
+         bgRW9cb9F6zW5aXvBIrJjmdwQQUJieBi0muzMm5QA2dhXoO0JuutdGAVr8oM3FSKSUWk
+         AiYdsN9QVcQKKH2UYgc0Z/eEhLqrdpx9SNXZwX5JqgZjYuDZjCYnQtAOEhz6kubSytPV
+         bc/A==
+X-Forwarded-Encrypted: i=1; AJvYcCUkfirSsjXh2VgLeN9bOf06+ERwEzRRakQVlJPWxZZFyy1rkfHdknNU277SsmyFxpo8TGE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz478fII8z2E3uzjXo4hP3tW9TeMCmU1BX0cRNz1Z5MIegEZUpR
+	z5xOkkD6rnuKhjBR6Cpn90CuPVaUsaB6yCS68o2FCbFg+u7az6ErpGlQDEdwODZk2/QvHm1Wtq8
+	kCDTBcziiJr85g5Ooq7hUms8Q1iMQAOW8tzDPTGfXD4a3LmvnblWksQK3kyqDOk2eoESNfsze8U
+	pyHLfM5hRpcVtXJFRT8zqVz1l1u0DN
+X-Gm-Gg: ASbGncvphdIQq8XNFfr/HWvuSzGKoAYtP76uQeXtliHJee3URhUrhx1vutFr2TiwoTp
+	1LB9c7AZ5zs8xMkXTuFep4Kd3bJuj4TAjehd86a/97NXUnfHWk/kH9dBG3mBN5udaUkWH
+X-Received: by 2002:a05:6a00:1a8b:b0:736:53f2:87bc with SMTP id d2e1a72fcca58-7480b41c057mr7026763b3a.13.1749091631063;
+        Wed, 04 Jun 2025 19:47:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGMX0tDxTPzBlM7jNwDe8J2mmVQ4fZbrpXfmUzEnYWQZ8EbI55qxfCnLs650/Af6UAWCtrMOWVqFtn2/dUJOwU=
+X-Received: by 2002:a05:6a00:1a8b:b0:736:53f2:87bc with SMTP id
+ d2e1a72fcca58-7480b41c057mr7026705b3a.13.1749091630477; Wed, 04 Jun 2025
+ 19:47:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SN7PR11MB7994:EE_
-X-MS-Office365-Filtering-Correlation-Id: 21a5c58d-df81-4137-a76f-08dda3dafbf9
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?RlUxd0Q1bnFHUTlWQlBvZ0dPVEhoTTA0T3cwSEFBaWF6S0VOUXFJK25JbjdK?=
- =?utf-8?B?VG4xaCtDTWlONk85YUg4N3Irc1dqMDZ5VFpKOGRYOTR1S0cwOG44UzdHR3g1?=
- =?utf-8?B?Y3RGRWV4QmZDMGhxdXo2SVAxRXJoanZBSDhySGFkWGpMQm5hMU93T1A4NThY?=
- =?utf-8?B?bTJMMWZ1YjBkanJPWWFWN1lXdS9aV1RKbGcxWjlEaG9FODZjL004N0RibElL?=
- =?utf-8?B?TU4wQjdmMVF1L0RtMFBKa0JtS2RlSm1YWXRJYTdnOGRlMG1mWmtqR1FnZSs0?=
- =?utf-8?B?c3Z6VXh0L0FabFdlUzM3cjFmek9HZXpoR3FseW94QlF6L21HS1dUODMzaWVK?=
- =?utf-8?B?ejNUeUJqanI1NWJCNXJCc2ZIZzh6ZHZFYjQwVDlzZDNLazdGUXJNQU04Y0Qv?=
- =?utf-8?B?SmM2YURvSXJIUWNTSjFqSDJrWmZ4NmNxM045TEpGamRBREZkWWo1dVNWbjhD?=
- =?utf-8?B?c1l0UncvMnE3TGFKVnZ5QVJhWExKL0hwTUpRRndRMyt2MFZoMlV5QTc3WWp0?=
- =?utf-8?B?NFJIdVZqWWV5MHJ2c2w4Tjh2VWJRK2dlS1lUeHlFQTF1S1U3TGh2ckRBMGVO?=
- =?utf-8?B?UlpjTW1zd1lBS3lQdm1GczROK0crS3hqMDNJUDVQTHg1QkpwRThQK2loTnVF?=
- =?utf-8?B?eVo1K2dLOXA0N1ZFMVdwTVJhcXdMbzlOa3dDRlN2T1V0ZWEyTVFiMzZPYzBO?=
- =?utf-8?B?a0Q5V0xsZEtjWXFLNlU0Qm1sV2h4ZU1VbnBrcUpXWVdxTFozVEVnWUtVZkxZ?=
- =?utf-8?B?V1dnZFVuZ1I4aWlldllRUXgxcHA5TnIzTGMxcDhpVnJrUzhEWGMwRnZUemtI?=
- =?utf-8?B?TXJMTUR3bmg3dEdyenRUTklDbEF3UHUwcFBGV2NtWWVMQ0FpM3ZqdGNTZXhR?=
- =?utf-8?B?YjlWUlRjamQydko1aEJ6U3VST08xNE80MEdJMXcxU0JuQngvQmlZL1FCcUdV?=
- =?utf-8?B?ODREN2VVWE9XUGRSRWNxRFVRb1dYUnphZjRQQVptK0NwVytYdHlobkZhcENQ?=
- =?utf-8?B?Q3hhSzRQZDdIUWh1THhZRkM2U0tuVkdLQ3IyY1NnTml0WGdPRkcyYkNNOEhE?=
- =?utf-8?B?ckwxKzd4Tjc5cGdFbERkbk1UTCtwYWMvdWNDMSsxYWZtNG1RSm85MzM2ekN0?=
- =?utf-8?B?VW9EOFR3ZzRUTER1T0hJNFJQa05zUEJuazFCeCtFb1NFbkFkWWpXSSs3d2pl?=
- =?utf-8?B?ZHZGTXNJYVlHYVBDNGVmakZSTkZpMWlvVXdMQW5BdCt4YVRYTGh3UCtab0Ja?=
- =?utf-8?B?RnJEWGVvM1BRQXlManhpZDcyMlloTURqTmFKUEhHTlhCanZ0b243UDE5WlJK?=
- =?utf-8?B?M20zYTRSQ3Fyb1YwSFRJQWdEeFdyR3FKOXIxMUlScVJIZ1dnVUxxOWpuYyt2?=
- =?utf-8?B?REF2b3prSS8zUjFYTkxuMFV5WWxYTmlmVzMramNhS2pIWFN6MXIzRnI2K2p5?=
- =?utf-8?B?YjFFRkltQ1dJRy9uek8zRlJ4eUlabE9zS2wxZ1ZnWHljTzA4R1hod0srUEVK?=
- =?utf-8?B?MWVYUVI5NkRMalgvNEpRU09HcUJlUGh3Z0pvek9qbGw3bFhBaXZLamllT3VP?=
- =?utf-8?B?L1h0SWNCbEcybU84MjZjeVVzS0dJd3VmSlhVVS93TjhwQVFuVExLS3hEZHY4?=
- =?utf-8?B?dkxMbEhQVXEzN2lROThHQmxERkxHN0hCYkNjWlRHM3lsemFscWU1elBrNXZ6?=
- =?utf-8?B?ZjRrbXZ5anJRWFdPa0tRTU9tWnFkSlA3ZVhKRXY4UksvdTdhZklrc2dFYXQ3?=
- =?utf-8?B?TitHYkkrcnh6cmpWbGw5cVRtdW9NeW5ocmpBMnQzQ2M0cW5tTGQ4bUhwa2JN?=
- =?utf-8?B?OVF2TjJBRjlvVFFveHhtSXlpRUJwc0NyRzNEVXF2c1N0akV0N1RqRnltZ2Zo?=
- =?utf-8?B?elV3RnVIL3NUSk5ZT1ZEbFplaHYzSnlsZmNxQjQ0TEJRVnVnQ2FWT3hSaWhD?=
- =?utf-8?Q?4PoL2siABpw=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VGxuc2lscW9wQVgwS0R1VGIzTUxwZUxmMTdPeWgzaElPNnRseFU0RTBMbHo2?=
- =?utf-8?B?WlBaUUlTd3dGd0t2bmJxRmNqYUVmRmhvMVcxTzRyT2dqZUY2TTZXMkc5VHA4?=
- =?utf-8?B?Njhtdy9ldTJ3WTBFc2I0UStYdmZHdGNiWG1oTG5tK0xRSS93TTlGalN3anQv?=
- =?utf-8?B?UTUxeXdRN01HRngrcVhnVlF5K0dYQ2lTT1NKZW5wQU5BUTZrZHJ0SnVoYTJm?=
- =?utf-8?B?dkN5UDgyTy84QVdtandLL0tWVTZ1akxBWStwdVhIUWtzeFhxMnBTQnBVMGcw?=
- =?utf-8?B?VGJMb2xERjd5OXkrS05ISU5SL0FmT21sTkdNblp0aVMraHFHRVkwdkNXSVEx?=
- =?utf-8?B?ZFlIbkx4bmtVRVVaUEx6cFUvd0p5eUVIeFVsNENSdzk4bXJBd0x6anVGQ1Qy?=
- =?utf-8?B?OHphT0xqWG5sNVhIVU1XSkw2T1lPYVBTYzFnOVNlcmdvMlUvME96UEpCSStt?=
- =?utf-8?B?dEEvRnVPNUlKY0tZNnNoQ1h3L1RGeURDdHdaSnpVakZmcDdCNkF6OXF6cWI3?=
- =?utf-8?B?TllhRHFNTEkyejFTVGxMRDdCbWlQVmEzejBUV0FtM3YvZkNvREFoR3Fwem8w?=
- =?utf-8?B?QTRHNlFvbno4NjI4Q2QzbTBKRWNHYXo4am9NdkloanVNcXVmSTM1K0pES2g3?=
- =?utf-8?B?c0oyUU5BV3ZjMnVBRnJPRjlqeGY0R0J5TW5kL0ZsUmhRdG1MQTBFaFFkQUl3?=
- =?utf-8?B?RWVGRXh5TGlkUXFHMG11REJCV2owQ0k2ZWVtUTJYbldPWXhxL25rM1pvTmg1?=
- =?utf-8?B?N1FBcHdSUmNMTGl0d1hMS0dwNTgvZVdoeVV6OUljZFRoMDR5dDhJWXQvVVoz?=
- =?utf-8?B?NTl5U1pXRXFXNEE5TDBucGM4RXBKMWZJVDkrTTRnWldTS2c3dnpvaHZ6ZjhY?=
- =?utf-8?B?ckV6RGVSRlRoQTFUR0lPSnRHR3NheHF0cUc4UGJTeEh6a3g5YWV0dER3NHpT?=
- =?utf-8?B?WjVZZHl0eWY5UWJtbVdnMXZUb0UyUDYwcCtaL050N0laMEFST3F4bkZGbURn?=
- =?utf-8?B?cmJlejA2c0EyZDBvUVJrdjJPQVJ4R29yRjRvN29MMEhVWGlybUQ1emJtSENR?=
- =?utf-8?B?M3JnbUJOVkZVc3JPMktPbTRsb1pPRHdjcjNveGZLU1o4MEhXbk8vVloyNEds?=
- =?utf-8?B?NnVyM0lKWEFmS0VMcG9Nam1aV09PMWRDVHdNNXlOZFBOeVdxVHNtcXBPOVY5?=
- =?utf-8?B?b0dqTDRYTHFkWVZOdEtpTmNDZTlOOVIyejV4ZXZLZnd5aTBNakpHWi9zbHpN?=
- =?utf-8?B?aEpPMFJvaW0zNGlBbWNjbVhCZ2krR0hMSTQ3c0pvaGgvT0g1SmN6Q25sblVO?=
- =?utf-8?B?V1lHbDJydW44bDJBU1hEajYySXIzN0NSVEdQanVGRmptWjIyTkw2bWIydURv?=
- =?utf-8?B?aGhEV1U1UEN2WHl4TDl0RUFKM1I2M0dpTnZUaHRvOVhEcXBqN0RGdG9aZGE1?=
- =?utf-8?B?N3lLZTNoSTRVeUJRUUtFQk9BMzlzSUdDbnhwbU1HcGFNb3lsSUlncld0R2Zx?=
- =?utf-8?B?NXV5MEVyOTQ5Y2RJWkRhZ2hCcG55czV4aDM5S0xuRHRFN1R0Q3dFMlFvS1ZC?=
- =?utf-8?B?clRZbnFjOHNFbkpGd1daWjNkVy9GQkZyUkdBRXJRMG5TcEJpdUxrRGF5V2ZX?=
- =?utf-8?B?TG10c09pWVU2Qkp0ZEpweUdaQmtXSG1rbDBQKzhucGNkK0lNbFNXZDlDNUw3?=
- =?utf-8?B?REVvTU5CeHZVeXdEUWdtZ3N3S2dicmNXSXpVcmpIUDhuSVJvMjhld0FGTjRx?=
- =?utf-8?B?K3FzMTJ2YTdqQzF3SzZiaW5IcE0vQWNSMExocTlvM2NlWVpmUGhRdFRGelpI?=
- =?utf-8?B?R1hEdnBjU251TTFjWUdqTW9RK1gzMUczTlFJNWhmUllMQ3pPUjQ0bWpqNTJR?=
- =?utf-8?B?d2piaDlzTTFXZVp4M3p6WVgxeFpNMnAwcXVSeERydXRNY3lpU2c2T0RGZGhH?=
- =?utf-8?B?ajBwM3BLcUZYTHRNcUNqa3FRT1J1RzZJUTBCaWtUbVUweThsTXRJRllPV3Zz?=
- =?utf-8?B?Q3N4d0c1ZXd1ZENFYW1EQ1dWNklVWE95OWpFRXJ2M0RSWEJaR29aQnpFMkov?=
- =?utf-8?B?VTdLaEVjbFhoNC9qd0F2azBBbTBzKy8wWjdNcjVKR3FZZENZV0w1djhjWkFD?=
- =?utf-8?Q?XehYO4XJCzzi8VtfmpJg0kizk?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21a5c58d-df81-4137-a76f-08dda3dafbf9
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2025 02:45:08.5777
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MlEgjnQg5yo+H7dOucArg+aFPrlCe5m1mNUP70R9UlT+91rK8VrzDtSeCxbwBunkM8hwZ+mtQU6Aj8I+EIgpfQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7994
-X-OriginatorOrg: intel.com
+References: <20250530-rss-v12-0-95d8b348de91@daynix.com> <20250530-rss-v12-4-95d8b348de91@daynix.com>
+ <CACGkMEupCBFH2eLv_93uy9K=+s_jQPM12mvyhU=zGbwSUnyVaA@mail.gmail.com> <a3e21479-2967-4604-a684-9b9b9e115f37@daynix.com>
+In-Reply-To: <a3e21479-2967-4604-a684-9b9b9e115f37@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 5 Jun 2025 10:46:59 +0800
+X-Gm-Features: AX0GCFvNNqZbw1M6lohRaBSwqZGPEvNCPQEPehheBS7BVopMGkjYcNpaKD_-zV8
+Message-ID: <CACGkMEuBb6eB9w=HgYq7wy2vW-4PMGGQKk5dd=kCm3ednJ2WxQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 04/10] tun: Add common virtio-net hash
+ feature code
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 04, 2025 at 01:02:54PM -0700, Ackerley Tng wrote:
-> Yan Zhao <yan.y.zhao@intel.com> writes:
-> 
-> > On Mon, May 12, 2025 at 09:53:43AM -0700, Vishal Annapurve wrote:
-> >> On Sun, May 11, 2025 at 7:18 PM Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >> > ...
-> >> > >
-> >> > > I might be wrongly throwing out some terminologies here then.
-> >> > > VM_PFNMAP flag can be set for memory backed by folios/page structs.
-> >> > > udmabuf seems to be working with pinned "folios" in the backend.
-> >> > >
-> >> > > The goal is to get to a stage where guest_memfd is backed by pfn
-> >> > > ranges unmanaged by kernel that guest_memfd owns and distributes to
-> >> > > userspace, KVM, IOMMU subject to shareability attributes. if the
-> >> > OK. So from point of the reset part of kernel, those pfns are not regarded as
-> >> > memory.
-> >> >
-> >> > > shareability changes, the users will get notified and will have to
-> >> > > invalidate their mappings. guest_memfd will allow mmaping such ranges
-> >> > > with VM_PFNMAP flag set by default in the VMAs to indicate the need of
-> >> > > special handling/lack of page structs.
-> >> > My concern is a failable invalidation notifer may not be ideal.
-> >> > Instead of relying on ref counts (or other mechanisms) to determine whether to
-> >> > start shareabilitiy changes, with a failable invalidation notifier, some users
-> >> > may fail the invalidation and the shareability change, even after other users
-> >> > have successfully unmapped a range.
-> >>
-> >> Even if one user fails to invalidate its mappings, I don't see a
-> >> reason to go ahead with shareability change. Shareability should not
-> >> change unless all existing users let go of their soon-to-be-invalid
-> >> view of memory.
-> 
-> Hi Yan,
-> 
-> While working on the 1G (aka HugeTLB) page support for guest_memfd
-> series [1], we took into account conversion failures too. The steps are
-> in kvm_gmem_convert_range(). (It might be easier to pull the entire
-> series from GitHub [2] because the steps for conversion changed in two
-> separate patches.)
-> 
-> We do need to handle errors across ranges to be converted, possibly from
-> different memslots. The goal is to either have the entire conversion
-> happen (including page split/merge) or nothing at all when the ioctl
-> returns.
-> 
-> We try to undo the restructuring (whether split or merge) and undo any
-> shareability changes on error (barring ENOMEM, in which case we leave a
-> WARNing).
-As the undo can fail (as the case you leave a WARNing, in patch 38 in [1]), it
-can lead to WARNings in kernel with folios not being properly added to the
-filemap.
-
-> The part we don't restore is the presence of the pages in the host or
-> guest page tables. For that, our idea is that if unmapped, the next
-> access will just map it in, so there's no issue there.
-
-I don't think so.
-
-As in patch 38 in [1], on failure, it may fail to
-- restore the shareability
-- restore the folio's filemap status
-- restore the folio's hugetlb stash metadata
-- restore the folio's merged/split status
-
-Also, the host page table is not restored.
-
-
-> > My thinking is that:
-> >
-> > 1. guest_memfd starts shared-to-private conversion
-> > 2. guest_memfd sends invalidation notifications
-> >    2.1 invalidate notification --> A --> Unmap and return success
-> >    2.2 invalidate notification --> B --> Unmap and return success
-> >    2.3 invalidate notification --> C --> return failure
-> > 3. guest_memfd finds 2.3 fails, fails shared-to-private conversion and keeps
-> >    shareability as shared
-> >
-> > Though the GFN remains shared after 3, it's unmapped in user A and B in 2.1 and
-> > 2.2. Even if additional notifications could be sent to A and B to ask for
-> > mapping the GFN back, the map operation might fail. Consequently, A and B might
-> > not be able to restore the mapped status of the GFN.
-> 
-> For conversion we don't attempt to restore mappings anywhere (whether in
-> guest or host page tables). What do you think of not restoring the
-> mappings?
-It could cause problem if the mappings in S-EPT can't be restored.
-
-For TDX private-to-shared conversion, if kvm_gmem_convert_should_proceed() -->
-kvm_gmem_unmap_private() --> kvm_mmu_unmap_gfn_range() fails in the end, then
-the GFN shareability is restored to private. The next guest access to
-the partially unmapped private memory can meet a fatal error: "access before
-acceptance".
-
-It could occur in such a scenario:
-1. TD issues a TDVMCALL_MAP_GPA to convert a private GFN to shared
-2. Conversion fails in KVM.
-3. set_memory_decrypted() fails in TD.
-4. TD thinks the GFN is still accepted as private and accesses it.
-
-
-> > For IOMMU mappings, this
-> > could result in DMAR failure following a failed attempt to do shared-to-private
-> > conversion.
-> 
-> I believe the current conversion setup guards against this because after
-> unmapping from the host, we check for any unexpected refcounts.
-Right, it's fine if we check for any unexpected refcounts.
-
-
-> (This unmapping is not the unmapping we're concerned about, since this is
-> shared memory, and unmapping doesn't go through TDX.)
-> 
-> Coming back to the refcounts, if the IOMMU had mappings, these refcounts
-> are "unexpected". The conversion ioctl will return to userspace with an
-> error.
-> 
-> IO can continue to happen, since the memory is still mapped in the
-> IOMMU. The memory state is still shared. No issue there.
-> 
-> In RFCv2 [1], we expect userspace to see the error, then try and remove
-> the memory from the IOMMU, and then try conversion again.
-I don't think it's right to depend on that userspace could always perform in 
-kernel's expected way, i.e. trying conversion until it succeeds.
-
-We need to restore to the previous status (which includes the host page table)
-if conversion can't be done.
-That said, in my view, a better flow would be:
-
-1. guest_memfd sends a pre-invalidation request to users (users here means the
-   consumers in kernel of memory allocated from guest_memfd).
-
-2. Users (A, B, ..., X) perform pre-checks to determine if invalidation can
-   proceed. For example, in the case of TDX, this might involve memory
-   allocation and page splitting.
-
-3. Based on the pre-check results, guest_memfd either aborts the invalidation or
-   proceeds by sending the actual invalidation request.
-
-4. Users (A-X) perform the actual unmap operation, ensuring it cannot fail. For
-   TDX, the unmap must succeed unless there are bugs in the KVM or TDX module.
-   In such cases, TDX can callback guest_memfd to inform the poison-status of
-   the page or elevate the page reference count.
-
-5. guest_memfd completes the invalidation process. If the memory is marked as
-   "poison," guest_memfd can handle it accordingly. If the page has an elevated
-   reference count, guest_memfd may not need to take special action, as the
-   elevated count prevents the OS from reallocating the page.
-   (but from your reply below, seems a callback to guest_memfd is a better
-   approach).
-
-
-> The part in concern here is unmapping failures of private pages, for
-> private-to-shared conversions, since that part goes through TDX and
-> might fail.
-IMO, even for TDX, the real unmap must not fail unless there are bugs in the KVM
-or TDX module.
-So, for page splitting in S-EPT, I prefer to try splitting in the
-pre-invalidation phase before conducting any real unmap.
-
-
-> One other thing about taking refcounts is that in RFCv2,
-> private-to-shared conversions assume that there are no refcounts on the
-> private pages at all. (See filemap_remove_folio_for_restructuring() in
-> [3])
+On Wed, Jun 4, 2025 at 4:42=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
 >
-> Haven't had a chance to think about all the edge cases, but for now I
-> think on unmapping failure, in addition to taking a refcount, we should
-> return an error at least up to guest_memfd, so that guest_memfd could
-> perhaps keep the refcount on that page, but drop the page from the
-> filemap. Another option could be to track messed up addresses and always
-> check that on conversion or something - not sure yet.
+> On 2025/06/04 10:53, Jason Wang wrote:
+> > On Fri, May 30, 2025 at 12:50=E2=80=AFPM Akihiko Odaki <akihiko.odaki@d=
+aynix.com> wrote:
+> >>
+> >> Add common code required for the features being added to TUN and TAP.
+> >> They will be enabled for each of them in following patches.
+> >>
+> >> Added Features
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>
+> >> Hash reporting
+> >> --------------
+> >>
+> >> Allow the guest to reuse the hash value to make receive steering
+> >> consistent between the host and guest, and to save hash computation.
+> >>
+> >> Receive Side Scaling (RSS)
+> >> --------------------------
+> >>
+> >> RSS is a receive steering algorithm that can be negotiated to use with
+> >> virtio_net. Conventionally the hash calculation was done by the VMM.
+> >> However, computing the hash after the queue was chosen defeats the
+> >> purpose of RSS.
+> >>
+> >> Another approach is to use eBPF steering program. This approach has
+> >> another downside: it cannot report the calculated hash due to the
+> >> restrictive nature of eBPF steering program.
+> >>
+> >> Introduce the code to perform RSS to the kernel in order to overcome
+> >> thse challenges. An alternative solution is to extend the eBPF steerin=
+g
+> >> program so that it will be able to report to the userspace, but I didn=
+'t
+> >> opt for it because extending the current mechanism of eBPF steering
+> >> program as is because it relies on legacy context rewriting, and
+> >> introducing kfunc-based eBPF will result in non-UAPI dependency while
+> >> the other relevant virtualization APIs such as KVM and vhost_net are
+> >> UAPIs.
+> >>
+> >> Added ioctls
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>
+> >> They are designed to make extensibility and VM migration compatible.
+> >> This change only adds the implementation and does not expose them to
+> >> the userspace.
+> >>
+> >> TUNGETVNETHASHTYPES
+> >> -------------------
+> >>
+> >> This ioctl tells supported hash types. It is useful to check if a VM c=
+an
+> >> be migrated to the current host.
+> >>
+> >> TUNSETVNETREPORTINGAUTOMQ, TUNSETVNETREPORTINGRSS, and TUNSETVNETRSS
+> >> --------------------------------------------------------------------
+> >>
+> >> These ioctls configures a steering algorithm and, if needed, hash
+> >> reporting.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >> Tested-by: Lei Yang <leiyang@redhat.com>
+> >> ---
+> >>   drivers/net/tap.c           |  10 ++-
+> >>   drivers/net/tun.c           |  12 +++-
+> >>   drivers/net/tun_vnet.h      | 165 ++++++++++++++++++++++++++++++++++=
++++++++---
+> >>   include/uapi/linux/if_tun.h |  71 +++++++++++++++++++
+> >>   4 files changed, 244 insertions(+), 14 deletions(-)
+> >>
+> >> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> >> index d4ece538f1b2..25c60ff2d3f2 100644
+> >> --- a/drivers/net/tap.c
+> >> +++ b/drivers/net/tap.c
+> >> @@ -179,6 +179,11 @@ static void tap_put_queue(struct tap_queue *q)
+> >>          sock_put(&q->sk);
+> >>   }
+> >>
+> >> +static const struct virtio_net_hash *tap_find_hash(const struct sk_bu=
+ff *skb)
+> >> +{
+> >> +       return NULL;
+> >> +}
+> >> +
+> >>   /*
+> >>    * Select a queue based on the rxq of the device on which this packe=
+t
+> >>    * arrived. If the incoming device is not mq, calculate a flow hash
+> >> @@ -711,11 +716,12 @@ static ssize_t tap_put_user(struct tap_queue *q,
+> >>          int total;
+> >>
+> >>          if (q->flags & IFF_VNET_HDR) {
+> >> -               struct virtio_net_hdr vnet_hdr;
+> >> +               struct virtio_net_hdr_v1_hash vnet_hdr;
+> >>
+> >>                  vnet_hdr_len =3D READ_ONCE(q->vnet_hdr_sz);
+> >>
+> >> -               ret =3D tun_vnet_hdr_from_skb(q->flags, NULL, skb, &vn=
+et_hdr);
+> >> +               ret =3D tun_vnet_hdr_from_skb(vnet_hdr_len, q->flags, =
+NULL, skb,
+> >> +                                           tap_find_hash, &vnet_hdr);
+> >>                  if (ret)
+> >>                          return ret;
+> >>
+> >> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> >> index 9133ab9ed3f5..03d47799e9bd 100644
+> >> --- a/drivers/net/tun.c
+> >> +++ b/drivers/net/tun.c
+> >> @@ -451,6 +451,11 @@ static inline void tun_flow_save_rps_rxhash(struc=
+t tun_flow_entry *e, u32 hash)
+> >>                  e->rps_rxhash =3D hash;
+> >>   }
+> >>
+> >> +static const struct virtio_net_hash *tun_find_hash(const struct sk_bu=
+ff *skb)
+> >> +{
+> >> +       return NULL;
+> >> +}
+> >> +
+> >>   /* We try to identify a flow through its rxhash. The reason that
+> >>    * we do not check rxq no. is because some cards(e.g 82599), chooses
+> >>    * the rxq based on the txq where the last packet of the flow comes.=
+ As
+> >> @@ -1993,7 +1998,7 @@ static ssize_t tun_put_user_xdp(struct tun_struc=
+t *tun,
+> >>          ssize_t ret;
+> >>
+> >>          if (tun->flags & IFF_VNET_HDR) {
+> >> -               struct virtio_net_hdr gso =3D { 0 };
+> >> +               struct virtio_net_hdr_v1_hash gso =3D { 0 };
+> >>
+> >>                  vnet_hdr_sz =3D READ_ONCE(tun->vnet_hdr_sz);
+> >>                  ret =3D tun_vnet_hdr_put(vnet_hdr_sz, iter, &gso);
+> >> @@ -2046,9 +2051,10 @@ static ssize_t tun_put_user(struct tun_struct *=
+tun,
+> >>          }
+> >>
+> >>          if (vnet_hdr_sz) {
+> >> -               struct virtio_net_hdr gso;
+> >> +               struct virtio_net_hdr_v1_hash gso;
+> >>
+> >> -               ret =3D tun_vnet_hdr_from_skb(tun->flags, tun->dev, sk=
+b, &gso);
+> >> +               ret =3D tun_vnet_hdr_from_skb(vnet_hdr_sz, tun->flags,=
+ tun->dev,
+> >> +                                           skb, tun_find_hash, &gso);
+> >>                  if (ret)
+> >>                          return ret;
+> >>
+> >> diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
+> >> index 58b9ac7a5fc4..45d0533efc8d 100644
+> >> --- a/drivers/net/tun_vnet.h
+> >> +++ b/drivers/net/tun_vnet.h
+> >> @@ -6,6 +6,17 @@
+> >>   #define TUN_VNET_LE     0x80000000
+> >>   #define TUN_VNET_BE     0x40000000
+> >>
+> >> +typedef struct virtio_net_hash *(*tun_vnet_hash_add)(struct sk_buff *=
+);
+> >> +typedef const struct virtio_net_hash *(*tun_vnet_hash_find)(const str=
+uct sk_buff *);
+> >> +
+> >> +struct tun_vnet_hash {
+> >> +       bool report;
+> >> +       bool rss;
+> >> +       struct tun_vnet_rss common;
+> >> +       u32 rss_key[VIRTIO_NET_RSS_MAX_KEY_SIZE];
+> >> +       u16 rss_indirection_table[];
+> >> +};
+> >> +
+> >>   static inline bool tun_vnet_legacy_is_little_endian(unsigned int fla=
+gs)
+> >>   {
+> >>          bool be =3D IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) &&
+> >> @@ -107,6 +118,128 @@ static inline long tun_vnet_ioctl(int *vnet_hdr_=
+sz, unsigned int *flags,
+> >>          }
+> >>   }
+> >>
+> >> +static inline long tun_vnet_ioctl_gethashtypes(u32 __user *argp)
+> >> +{
+> >> +       return put_user(VIRTIO_NET_SUPPORTED_HASH_TYPES, argp) ? -EFAU=
+LT : 0;
+> >> +}
+> >> +
+> >> +static inline long tun_vnet_ioctl_sethash(struct tun_vnet_hash __rcu =
+**hashp,
+> >> +                                         unsigned int cmd,
+> >> +                                         void __user *argp)
+> >> +{
+> >> +       struct tun_vnet_rss common;
+> >> +       struct tun_vnet_hash *hash;
+> >> +       size_t indirection_table_size;
+> >> +       size_t key_size;
+> >> +       size_t size;
+> >> +
+> >> +       switch (cmd) {
+> >> +       case TUNSETVNETREPORTINGAUTOMQ:
+> >> +               if (get_user(common.hash_types, (u32 __user *)argp))
+> >> +                       return -EFAULT;
+> >> +
+> >> +               if (common.hash_types) {
+> >> +                       hash =3D kzalloc(sizeof(*hash), GFP_KERNEL);
+> >> +                       if (!hash)
+> >> +                               return -ENOMEM;
+> >> +
+> >> +                       hash->report =3D true;
+> >> +                       hash->common.hash_types =3D common.hash_types;
+> >> +               } else {
+> >> +                       hash =3D NULL;
+> >> +               }
+> >> +               break;
+> >> +
+> >> +       case TUNSETVNETREPORTINGRSS:
+> >> +       case TUNSETVNETRSS:
+> >
+> > So the above three shows unnecessary design redundancy as well as a
+> > burden for the future extension.  Why not simply have
+> >
+> > 1) TUNSETVNET_RSS
+> > 2) TUNSETVNET_HASH_REPORT
+> > ?
+> >
+> > Which maps to
+> >
+> >   #define VIRTIO_NET_CTRL_MQ_RSS_CONFIG          1 (for configurable
+> > receive steering)
+> >   #define VIRTIO_NET_CTRL_MQ_HASH_CONFIG         2 (for configurable
+> > hash calculation)
+> >
+> > It would be always easier to start with what spec had or at least we
+> > need to explain why we choose a different design here or in the
+> > changelog to ease our life.
+>
+> TUNSETVNETREPORTINGAUTOMQ maps to VIRTIO_NET_CTRL_MQ_HASH_CONFIG.
 
-It looks good to me. See the bullet 4 in my proposed flow above.
+It's not:
 
-> Either way, guest_memfd must know. If guest_memfd is not informed, on a
-> next conversion request, the conversion will just spin in
-> filemap_remove_folio_for_restructuring().
-It makes sense.
+VIRTIO_NET_CTRL_MQ_HASH_CONFIG uses:
 
+struct virtio_net_hash_config {
+    le32 hash_types;
+    le16 reserved[4];
+    u8 hash_key_length;
+    u8 hash_key_data[hash_key_length];
+};
 
-> What do you think of this part about informing guest_memfd of the
-> failure to unmap?
-So, do you want to add a guest_memfd callback to achieve this purpose?
+but TUNSETVNETREPORTINGAUTOMQ only accepts hash_types without others:
 
+>
+> TUNSETVNETREPORTINGRSS and TUNSETVNETRSS map to
+> VIRTIO_NET_CTRL_MQ_RSS_CONFIG.
 
-BTW, here's an analysis of why we can't let kvm_mmu_unmap_gfn_range()
-and mmu_notifier_invalidate_range_start() fail, based on the repo
-https://github.com/torvalds/linux.git, commit cd2e103d57e5 ("Merge tag
-'hardening-v6.16-rc1-fix1-take2' of
-git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux")
+I think we've already had a discussion about this.
 
-1. Status of mmu notifier
--------------------------------
-(1) There're 34 direct callers of mmu_notifier_invalidate_range_start().
-    1. clear_refs_write
-    2. do_pagemap_scan
-    3. uprobe_write_opcode
-    4. do_huge_zero_wp_pmd
-    5. __split_huge_pmd (N)
-    6. __split_huge_pud (N)
-    7. move_pages_huge_pmd
-    8. copy_hugetlb_page_range
-    9. hugetlb_unshare_pmds  (N)
-    10. hugetlb_change_protection
-    11. hugetlb_wp
-    12. unmap_hugepage_range (N)
-    13. move_hugetlb_page_tables
-    14. collapse_huge_page
-    15. retract_page_tables
-    16. collapse_pte_mapped_thp
-    17. write_protect_page
-    18. replace_page
-    19. madvise_free_single_vma
-    20. wp_clean_pre_vma
-    21. wp_page_copy 
-    22. zap_page_range_single_batched (N)
-    23. unmap_vmas (N)
-    24. copy_page_range 
-    25. remove_device_exclusive_entry
-    26. migrate_vma_collect
-    27. __migrate_device_pages
-    28. change_pud_range 
-    29. move_page_tables
-    30. page_vma_mkclean_one
-    31. try_to_unmap_one
-    32. try_to_migrate_one
-    33. make_device_exclusive
-    34. move_pages_pte
+Reusing virtio-net uAPI is much better instead of having a tun
+specific one considering tun may need to support more virtio commands
+in the future. Or maybe it's the time to introduce a transport for the
+virtio control virtqueue uAPI in tuntap to avoid inventing new uAPI
+endlessly.
 
-Of these 34 direct callers, those marked with (N) cannot tolerate
-mmu_notifier_invalidate_range_start() failing. I have not yet investigated all
-34 direct callers one by one, so the list of (N) is incomplete.
+What's more I see:
 
-For 5. __split_huge_pmd(), Documentation/mm/transhuge.rst says:
-"Note that split_huge_pmd() doesn't have any limitations on refcounting:
-pmd can be split at any point and never fails." This is because split_huge_pmd()
-serves as a graceful fallback design for code walking pagetables but unaware
-about huge pmds.
+struct tun_vnet_rss {
+        __u32 hash_types;
+        __u16 indirection_table_mask;
+        __u16 unclassified_queue;
+};
 
+struct tun_vnet_hash {
+        bool report;
+        bool rss;
+        struct tun_vnet_rss common;
+        u32 rss_key[VIRTIO_NET_RSS_MAX_KEY_SIZE];
+        u16 rss_indirection_table[];
+};
 
-(2) There's 1 direct caller of mmu_notifier_invalidate_range_start_nonblock(),
-__oom_reap_task_mm(), which only expects the error -EAGAIN.
+As I pointed out in the past, let's just decouple the rss from hash,
+everything would be much simpler, or you need to explain why you
+couple this somewhere.
 
-In mn_hlist_invalidate_range_start():
-"WARN_ON(mmu_notifier_range_blockable(range) || _ret != -EAGAIN);"
+For example:
 
+1) why is the tun_vnet_hash not part of the uAPI but tun_vnet_rss, or
+how could userspace know what kind of format it would use for
+TUNSETVNETREPORTINGRSS?
+2) what's the advantages of embedding rss specific stuff into hash
+report structure
+3) what's the advantages of not using virtio-net uAPI
 
-(3) For DMAs, drivers need to invoke pin_user_pages() to pin memory. In that
-case, they don't need to register mmu notifier.
+More issues:
 
-Or, device drivers can pin pages via get_user_pages*(), and register for mmu         
-notifier callbacks for the memory range. Then, upon receiving a notifier         
-"invalidate range" callback , stop the device from using the range, and unpin    
-the pages.
+1) max_tx_vq is ignored, so do you expect the userspace to intercept
+this and switch to using TUNSETQUEUE? This seems like a burden as TUN
+can simply accept it and do the attaching/detaching by itself
+2) the rx depends on the indirection table, so userspace need to
+intercept the indirection and change the rx queue numbers accordingly
+3) RSS allows a async TX/RX queue, this is not supported by TUN now,
+no matter if we decide to let userspace to intercept max_tx_vq or not,
+we need to implement it first
 
-See Documentation/core-api/pin_user_pages.rst.
+Things would be much more simpler, if kernel can do 1) and 2).
 
+> We have two ioctls here because
+> VIRTIO_NET_CTRL_MQ_RSS_CONFIG behaves differently depending on whether
+> VIRTIO_NET_F_HASH_REPORT is negotiated or not;
 
-2. Cases that cannot tolerate failure of mmu_notifier_invalidate_range_start()
--------------------------------
-(1) Error fallback cases.
+It wouldn't be a problem if you do 1:1 mapping between virtio commands
+and TUN uAPI, otherwise it should have a bug somewhere.
 
-    1. split_huge_pmd() as mentioned in Documentation/mm/transhuge.rst.
-       split_huge_pmd() is designed as a graceful fallback without failure.
+> it also enables hash
+> reporting if the feature is negotiated.
 
-       split_huge_pmd
-        |->__split_huge_pmd
-           |->mmu_notifier_range_init
-           |  mmu_notifier_invalidate_range_start
-           |  split_huge_pmd_locked
-           |  mmu_notifier_invalidate_range_end
+Again, starting from virtio-net command is easier, a strong
+justification is needed to explain why we choose another for tun/tap.
 
+>
+> >
+> > One day we would have tun_select_queue_algorithm_x() we don't have to
+> > duplicate the ioctls once again here like TUNSETVNETREPORTINGXYZ
+>
+> 5.1.6.5.6.4 Hash calculation says:
+> >  If VIRTIO_NET_F_HASH_REPORT was negotiated and the device uses
+> > automatic receive steering, the device MUST support a command to
+> > configure hash calculation parameters.
+> >
+> > The driver provides parameters for hash calculation as follows:
+> >
+> > class VIRTIO_NET_CTRL_MQ, command VIRTIO_NET_CTRL_MQ_HASH_CONFIG.
+>
+> VIRTIO_NET_CTRL_MQ_HASH_CONFIG is for automatic receive steering and not
+> for RSS (or other steering algorithms if the spec gets any in the future)=
+.
 
-    2. in fs/iomap/buffered-io.c, iomap_write_failed() itself is error handling.
-       iomap_write_failed
-         |->truncate_pagecache_range
-            |->unmap_mapping_range
-            |  |->unmap_mapping_pages
-            |     |->unmap_mapping_range_tree
-            |        |->unmap_mapping_range_vma
-            |           |->zap_page_range_single
-            |              |->zap_page_range_single_batched
-            |                       |->mmu_notifier_range_init
-            |                       |  mmu_notifier_invalidate_range_start
-            |                       |  unmap_single_vma
-            |                       |  mmu_notifier_invalidate_range_end
-            |->truncate_inode_pages_range
-               |->truncate_cleanup_folio
-                  |->if (folio_mapped(folio))
-                  |     unmap_mapping_folio(folio);
-                         |->unmap_mapping_range_tree
-                            |->unmap_mapping_range_vma
-                               |->zap_page_range_single
-                                  |->zap_page_range_single_batched
-                                     |->mmu_notifier_range_init
-                                     |  mmu_notifier_invalidate_range_start
-                                     |  unmap_single_vma
-                                     |  mmu_notifier_invalidate_range_end
+I'm not sure but the spec needs some tweaking. For example, I don't
+expect there would be a dedicated hash config command for flow filters
+in the future. I think the reason why spec says like this is that
+virtio-net only supports automatic receive steering.
 
-   3. in mm/memory.c, zap_page_range_single() is invoked to handle error.
-      remap_pfn_range_notrack
-        |->int error = remap_pfn_range_internal(vma, addr, pfn, size, prot);
-        |  if (!error)
-        |      return 0;
-	|  zap_page_range_single
-           |->zap_page_range_single_batched
-              |->mmu_notifier_range_init
-              |  mmu_notifier_invalidate_range_start
-              |  unmap_single_vma
-              |  mmu_notifier_invalidate_range_end
+Note that macvtap doesn't implement automatic receive steering.
 
-   4. in kernel/events/core.c, zap_page_range_single() is invoked to clear any
-      partial mappings on error.
+>
+> >
+> >> +               if (copy_from_user(&common, argp, sizeof(common)))
+> >> +                       return -EFAULT;
+> >> +               argp =3D (struct tun_vnet_rss __user *)argp + 1;
+> >> +
+> >> +               indirection_table_size =3D ((size_t)common.indirection=
+_table_mask + 1) * 2;
+> >> +               key_size =3D virtio_net_hash_key_length(common.hash_ty=
+pes);
+> >> +               size =3D struct_size(hash, rss_indirection_table,
+> >> +                                  (size_t)common.indirection_table_ma=
+sk + 1);
+> >> +
+> >> +               hash =3D kmalloc(size, GFP_KERNEL);
+> >> +               if (!hash)
+> >> +                       return -ENOMEM;
+> >> +
+> >> +               if (copy_from_user(hash->rss_indirection_table,
+> >> +                                  argp, indirection_table_size)) {
+> >> +                       kfree(hash);
+> >> +                       return -EFAULT;
+> >> +               }
+> >> +               argp =3D (u16 __user *)argp + common.indirection_table=
+_mask + 1;
+> >> +
+> >> +               if (copy_from_user(hash->rss_key, argp, key_size)) {
+> >> +                       kfree(hash);
+> >> +                       return -EFAULT;
+> >> +               }
+> >> +
+> >> +               virtio_net_toeplitz_convert_key(hash->rss_key, key_siz=
+e);
+> >> +               hash->report =3D cmd =3D=3D TUNSETVNETREPORTINGRSS;
+> >
+> > At least, if this is the only difference why not simply code this into
+> > the ioctl itself other than having a very similar command?
+>
+> It is what the previous version did. Either is fine I guess; the only
+> practical difference would be the size of the configuration struct is
+> smaller with this approach.
+>
+> >
+> >> +               hash->rss =3D true;
+> >> +               hash->common =3D common;
+> >> +               break;
+> >> +
+> >> +       default:
+> >> +               return -EINVAL;
+> >> +       }
+> >> +
+> >> +       kfree_rcu_mightsleep(rcu_replace_pointer_rtnl(*hashp, hash));
+> >> +       return 0;
+> >> +}
+> >> +
+> >> +static inline void tun_vnet_hash_report(const struct tun_vnet_hash *h=
+ash,
+> >> +                                       struct sk_buff *skb,
+> >> +                                       const struct flow_keys_basic *=
+keys,
+> >> +                                       u32 value,
+> >> +                                       tun_vnet_hash_add vnet_hash_ad=
+d)
+> >> +{
+> >> +       struct virtio_net_hash *report;
+> >> +
+> >> +       if (!hash || !hash->report)
+> >> +               return;
+> >> +
+> >> +       report =3D vnet_hash_add(skb);
+> >> +       if (!report)
+> >> +               return;
+> >> +
+> >> +       *report =3D (struct virtio_net_hash) {
+> >> +               .report =3D virtio_net_hash_report(hash->common.hash_t=
+ypes, keys),
+> >> +               .value =3D value
+> >> +       };
+> >> +}
+> >> +
+> >> +static inline u16 tun_vnet_rss_select_queue(u32 numqueues,
+> >> +                                           const struct tun_vnet_hash=
+ *hash,
+> >> +                                           struct sk_buff *skb,
+> >> +                                           tun_vnet_hash_add vnet_has=
+h_add)
+> >> +{
+> >> +       struct virtio_net_hash *report;
+> >> +       struct virtio_net_hash ret;
+> >> +       u16 index;
+> >> +
+> >> +       if (!numqueues)
+> >> +               return 0;
+> >> +
+> >> +       virtio_net_hash_rss(skb, hash->common.hash_types, hash->rss_ke=
+y, &ret);
+> >> +
+> >> +       if (!ret.report)
+> >> +               return hash->common.unclassified_queue % numqueues;
+> >> +
+> >> +       if (hash->report) {
+> >> +               report =3D vnet_hash_add(skb);
+> >> +               if (report)
+> >> +                       *report =3D ret;
+> >> +       }
+> >> +
+> >> +       index =3D ret.value & hash->common.indirection_table_mask;
+> >> +
+> >> +       return hash->rss_indirection_table[index] % numqueues;
+> >> +}
+> >> +
+> >>   static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
+> >>                                     struct iov_iter *from,
+> >>                                     struct virtio_net_hdr *hdr)
+> >> @@ -135,15 +268,17 @@ static inline int tun_vnet_hdr_get(int sz, unsig=
+ned int flags,
+> >>   }
+> >>
+> >>   static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
+> >> -                                  const struct virtio_net_hdr *hdr)
+> >> +                                  const struct virtio_net_hdr_v1_hash=
+ *hdr)
+> >>   {
+> >> +       int content_sz =3D MIN(sizeof(*hdr), sz);
+> >> +
+> >>          if (unlikely(iov_iter_count(iter) < sz))
+> >>                  return -EINVAL;
+> >>
+> >> -       if (unlikely(copy_to_iter(hdr, sizeof(*hdr), iter) !=3D sizeof=
+(*hdr)))
+> >> +       if (unlikely(copy_to_iter(hdr, content_sz, iter) !=3D content_=
+sz))
+> >>                  return -EFAULT;
+> >>
+> >> -       if (iov_iter_zero(sz - sizeof(*hdr), iter) !=3D sz - sizeof(*h=
+dr))
+> >> +       if (iov_iter_zero(sz - content_sz, iter) !=3D sz - content_sz)
+> >>                  return -EFAULT;
+> >>
+> >>          return 0;
+> >> @@ -155,26 +290,38 @@ static inline int tun_vnet_hdr_to_skb(unsigned i=
+nt flags, struct sk_buff *skb,
+> >>          return virtio_net_hdr_to_skb(skb, hdr, tun_vnet_is_little_end=
+ian(flags));
+> >>   }
+> >>
+> >> -static inline int tun_vnet_hdr_from_skb(unsigned int flags,
+> >> +static inline int tun_vnet_hdr_from_skb(int sz, unsigned int flags,
+> >>                                          const struct net_device *dev,
+> >>                                          const struct sk_buff *skb,
+> >> -                                       struct virtio_net_hdr *hdr)
+> >> +                                       tun_vnet_hash_find vnet_hash_f=
+ind,
+> >> +                                       struct virtio_net_hdr_v1_hash =
+*hdr)
+> >>   {
+> >>          int vlan_hlen =3D skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
+> >> +       const struct virtio_net_hash *report =3D sz < sizeof(struct vi=
+rtio_net_hdr_v1_hash) ?
+> >> +                                              NULL : vnet_hash_find(s=
+kb);
+> >> +
+> >> +       *hdr =3D (struct virtio_net_hdr_v1_hash) {
+> >> +               .hash_report =3D VIRTIO_NET_HASH_REPORT_NONE
+> >> +       };
+> >> +
+> >> +       if (report) {
+> >> +               hdr->hash_value =3D cpu_to_le32(report->value);
+> >> +               hdr->hash_report =3D cpu_to_le16(report->report);
+> >> +       }
+> >>
+> >> -       if (virtio_net_hdr_from_skb(skb, hdr,
+> >> +       if (virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)hdr,
+> >>                                      tun_vnet_is_little_endian(flags),=
+ true,
+> >>                                      vlan_hlen)) {
+> >>                  struct skb_shared_info *sinfo =3D skb_shinfo(skb);
+> >>
+> >>                  if (net_ratelimit()) {
+> >>                          netdev_err(dev, "unexpected GSO type: 0x%x, g=
+so_size %d, hdr_len %d\n",
+> >> -                                  sinfo->gso_type, tun_vnet16_to_cpu(=
+flags, hdr->gso_size),
+> >> -                                  tun_vnet16_to_cpu(flags, hdr->hdr_l=
+en));
+> >> +                                  sinfo->gso_type, tun_vnet16_to_cpu(=
+flags, hdr->hdr.gso_size),
+> >> +                                  tun_vnet16_to_cpu(flags, hdr->hdr.h=
+dr_len));
+> >>                          print_hex_dump(KERN_ERR, "tun: ",
+> >>                                         DUMP_PREFIX_NONE,
+> >>                                         16, 1, skb->head,
+> >> -                                      min(tun_vnet16_to_cpu(flags, hd=
+r->hdr_len), 64), true);
+> >> +                                      min(tun_vnet16_to_cpu(flags, hd=
+r->hdr.hdr_len), 64), true);
+> >>                  }
+> >>                  WARN_ON_ONCE(1);
+> >>                  return -EINVAL;
+> >> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+> >> index 980de74724fc..fe4b984d3bbb 100644
+> >> --- a/include/uapi/linux/if_tun.h
+> >> +++ b/include/uapi/linux/if_tun.h
+> >> @@ -62,6 +62,62 @@
+> >>   #define TUNSETCARRIER _IOW('T', 226, int)
+> >>   #define TUNGETDEVNETNS _IO('T', 227)
+> >>
+> >> +/**
+> >> + * define TUNGETVNETHASHTYPES - ioctl to get supported virtio_net has=
+hing types
+> >> + *
+> >> + * The argument is a pointer to __u32 which will store the supported =
+virtio_net
+> >> + * hashing types.
+> >> + */
+> >> +#define TUNGETVNETHASHTYPES _IOR('T', 228, __u32)
+> >> +
+> >> +/**
+> >> + * define TUNSETVNETREPORTINGAUTOMQ - ioctl to enable automq with has=
+h reporting
+> >> + *
+> >> + * Disable RSS and enable automatic receive steering with hash report=
+ing.
+> >> + *
+> >> + * The argument is a pointer to __u32 that contains a bitmask of hash=
+ types
+> >> + * allowed to be reported.
+> >> + *
+> >> + * This ioctl results in %EBADFD if the underlying device is deleted.=
+ It affects
+> >> + * all queues attached to the same device.
+> >> + *
+> >> + * This ioctl currently has no effect on XDP packets and packets with
+> >> + * queue_mapping set by TC.
+> >> + */
+> >> +#define TUNSETVNETREPORTINGAUTOMQ _IOR('T', 229, __u32)
+> >> +
+> >> +/**
+> >> + * define TUNSETVNETREPORTINGRSS - ioctl to enable RSS with hash repo=
+rting
+> >> + *
+> >> + * Disable automatic receive steering and enable RSS with hash report=
+ing.
+> >
+> > This is unnecessary, e.g one day will have select_queue_xyz(), we
+> > don't want to say "Disable automatic receive steering and xyz ..."
+>
+> It is still something better to be documented as its behavior is
+> somewhat complicated.
 
-      perf_mmap
-        |->ret = map_range(rb, vma);
-                 |  err = remap_pfn_range
-                 |->if (err) 
-                 |     zap_page_range_single
-                        |->zap_page_range_single_batched
-                           |->mmu_notifier_range_init
-                           |  mmu_notifier_invalidate_range_start
-                           |  unmap_single_vma
-                           |  mmu_notifier_invalidate_range_end
+This is a hint of uAPI design issue.
 
+>
+> Concretely, this ioctl disables automatic receive steering but doesn't
+> disable steering by eBPF, which is implied by TUN_STEERINGEBPF_FALLBACK.
 
-   5. in mm/memory.c, unmap_mapping_folio() is invoked to unmap posion page.
+It would be simpler:
 
-      __do_fault
-	|->if (unlikely(PageHWPoison(vmf->page))) { 
-	|	vm_fault_t poisonret = VM_FAULT_HWPOISON;
-	|	if (ret & VM_FAULT_LOCKED) {
-	|		if (page_mapped(vmf->page))
-	|			unmap_mapping_folio(folio);
-        |                       |->unmap_mapping_range_tree
-        |                          |->unmap_mapping_range_vma
-        |                             |->zap_page_range_single
-        |                                |->zap_page_range_single_batched
-        |                                   |->mmu_notifier_range_init
-        |                                   |  mmu_notifier_invalidate_range_start
-        |                                   |  unmap_single_vma
-        |                                   |  mmu_notifier_invalidate_range_end
-	|		if (mapping_evict_folio(folio->mapping, folio))
-	|			poisonret = VM_FAULT_NOPAGE; 
-	|		folio_unlock(folio);
-	|	}
-	|	folio_put(folio);
-	|	vmf->page = NULL;
-	|	return poisonret;
-	|  }
+1) not having TUN_STEERINGEBPF_FALLBACK
+2) the steering algorithm depends on the last uAPI call
 
-
-  6. in mm/vma.c, in __mmap_region(), unmap_region() is invoked to undo any
-     partial mapping done by a device driver.
-
-     __mmap_new_vma
-       |->__mmap_new_file_vma(map, vma);
-          |->error = mmap_file(vma->vm_file, vma);
-          |  if (error)
-          |     unmap_region
-                 |->unmap_vmas
-                    |->mmu_notifier_range_init
-                    |  mmu_notifier_invalidate_range_start
-                    |  unmap_single_vma
-                    |  mmu_notifier_invalidate_range_end
-
-
-(2) No-fail cases
--------------------------------
-1. iput() cannot fail. 
-
-iput
- |->iput_final
-    |->WRITE_ONCE(inode->i_state, state | I_FREEING);
-    |  inode_lru_list_del(inode);
-    |  evict(inode);
-       |->op->evict_inode(inode);
-          |->shmem_evict_inode
-             |->shmem_truncate_range
-                |->truncate_inode_pages_range
-                   |->truncate_cleanup_folio
-                      |->if (folio_mapped(folio))
-                      |     unmap_mapping_folio(folio);
-                            |->unmap_mapping_range_tree
-                               |->unmap_mapping_range_vma
-                                  |->zap_page_range_single
-                                     |->zap_page_range_single_batched
-                                        |->mmu_notifier_range_init
-                                        |  mmu_notifier_invalidate_range_start
-                                        |  unmap_single_vma
-                                        |  mmu_notifier_invalidate_range_end
-
-
-2. exit_mmap() cannot fail
-
-exit_mmap
-  |->mmu_notifier_release(mm);
-     |->unmap_vmas(&tlb, &vmi.mas, vma, 0, ULONG_MAX, ULONG_MAX, false);
-        |->mmu_notifier_range_init
-        |  mmu_notifier_invalidate_range_start
-        |  unmap_single_vma
-        |  mmu_notifier_invalidate_range_end
-
-
-3. KVM Cases That Cannot Tolerate Unmap Failure
--------------------------------
-Allowing unmap operations to fail in the following scenarios would make it very
-difficult or even impossible to handle the failure:
-
-(1) __kvm_mmu_get_shadow_page() is designed to reliably obtain a shadow page
-without expecting any failure.
-
-mmu_alloc_direct_roots
-  |->mmu_alloc_root
-     |->kvm_mmu_get_shadow_page
-        |->__kvm_mmu_get_shadow_page
-           |->kvm_mmu_alloc_shadow_page
-              |->account_shadowed
-                 |->kvm_mmu_slot_gfn_write_protect
-                    |->kvm_tdp_mmu_write_protect_gfn
-                       |->write_protect_gfn
-                          |->tdp_mmu_iter_set_spte
-
-
-(2) kvm_vfio_release() and kvm_vfio_file_del() cannot fail
-
-kvm_vfio_release/kvm_vfio_file_del
- |->kvm_vfio_update_coherency
-    |->kvm_arch_unregister_noncoherent_dma
-       |->kvm_noncoherent_dma_assignment_start_or_stop
-          |->kvm_zap_gfn_range
-             |->kvm_tdp_mmu_zap_leafs
-                |->tdp_mmu_zap_leafs
-                   |->tdp_mmu_iter_set_spte
-
-
-(3) There're lots of callers of __kvm_set_or_clear_apicv_inhibit() currently
-never expect failure of unmap.
-
-__kvm_set_or_clear_apicv_inhibit
-  |->kvm_zap_gfn_range
-     |->kvm_tdp_mmu_zap_leafs
-        |->tdp_mmu_zap_leafs
-           |->tdp_mmu_iter_set_spte
-
-
-
-4. Cases in KVM where it's hard to make tdp_mmu_set_spte() (update SPTE with
-write mmu_lock) failable.
-
-(1) kvm_vcpu_flush_tlb_guest()
-
-kvm_vcpu_flush_tlb_guest
-  |->kvm_mmu_sync_roots
-     |->mmu_sync_children
-        |->kvm_vcpu_write_protect_gfn
-           |->kvm_mmu_slot_gfn_write_protect
-              |->kvm_tdp_mmu_write_protect_gfn
-                 |->write_protect_gfn
-                    |->tdp_mmu_iter_set_spte
-                       |->tdp_mmu_set_spte
-
-
-(2) handle_removed_pt() and handle_changed_spte().
-
+>
+> Perhaps it may be rephrased to tell it disables "the other receive
+> steering mechanism except eBPF".
+>
+> Regards,
+> Akihiko Odaki
+>
+> >
 
 Thanks
-Yan
+
 
