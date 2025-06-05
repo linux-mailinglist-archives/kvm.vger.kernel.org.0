@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-48538-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48539-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58B36ACF337
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 17:39:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6EAACF335
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 17:39:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF37F1895232
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 15:39:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F02EE3AC945
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 15:38:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BEB321CC59;
-	Thu,  5 Jun 2025 15:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6767E24DD1D;
+	Thu,  5 Jun 2025 15:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lPlDbY/8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ntP3O165"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99381E1DEE
-	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 15:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0CBD2356BD
+	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 15:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749137898; cv=none; b=tN/dg3j9XvsgAKHEs88vE6tT6HUJb+Sz6Wk3s+a8S4sO05yDdZIvVOFZq278bIta+d77McD+PaMx6sogN7mOf9QKfAT6JdRstn6QOmqStI/NKwmnKkV7vp5RHC7F+lLpArnkojO1MdXqjy9ehIIPEbGGv7Ijt22ZJmiCnwjGR/E=
+	t=1749137901; cv=none; b=YECt0DMv91hcTxRPMFoIyN9I/KgW031wFOBab1GeKwcnrDb4ws5dNqBjPdUG8uWz22phQ/BtFrezf2ULKmZ6hFTm4pUVPqfH4t95bgpmFTFJsMm4MetVfS/PgUxUlb+fkAafG2hnNxzDD8voj/3H5X0Vm/3+2wXMngC9b+NWDfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749137898; c=relaxed/simple;
-	bh=x+fQBWn0/0ardBRy78HzYroQyc4L59a6RPCtPgDdFMw=;
+	s=arc-20240116; t=1749137901; c=relaxed/simple;
+	bh=h9y2PxHa3T/iR0irvc8EFzsEpKcI12tJbooS4AaFVxk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lKYNfztK6ZoyRS+iwGedhZRW70xSQ1S0k3zecOvP5bq5jgdKxd3xLFhtkDbpat0Bf4ytOOw0DzMmLWwzSYMVmH+9bauJOmJzsN3X4Y8ac9ykqdECFZH4Mb4Zshc5BbXDhvlt3lIMjMGUfO50Xnq58vBQewGryvh5D2D+Udui0gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lPlDbY/8; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=ISbTodZL2Dfu35elTM+ukDY+eM1FrQpOx3Jx+IZfBo8u0YX50i7iM1Zo5IzGDa+y8gwlkKQQaMl6B/JmbOAS/bg6E9aW1RdlBcP+s3wXnmXcInboQQguvFzQvOKfU2EtgZGiBPR9wBQV7frDp5X5K7xDhJxjH76yZB8jhzOfCzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ntP3O165; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3a4eec544c6so575879f8f.0
-        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 08:38:16 -0700 (PDT)
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-450d6768d4dso7161015e9.2
+        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 08:38:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749137895; x=1749742695; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749137897; x=1749742697; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bX7rVYDFpCzF6sNW2Lfy2882XEAhzLwmJkPHB1Upz9o=;
-        b=lPlDbY/8hqnrTZTe6gJmLH4hiHcH76n7mp2dKpbG2LLjIPMvPn1KqcD+sKDeg09h2R
-         cKXt/LXy0RS6u7jeCbJWh8AuNkhFK6DbehbistUC0DK7xhFqUpxExHRj81ust6siqx7r
-         erZBmn0tWx3FcGErXL3orhYVSDNXF1igvWAh0YJjE7T6PEOQLd9fxI7Wvh6Ra02OGW5Z
-         3gM3Rc4449oisAZWEj1ixfqB9qhgL+WW2ZfqXzRPONvPn8BjljwHFN3a1pe7WHPuSDPA
-         Gqi1UVhhUr23RbT10NiEUjUMEI1/Zywlmm3ZGks8WKvnzfTwFjnQFWeg+KPKM1qDrM7k
-         +Wkg==
+        bh=Ya9V8PlB1f9QKkO6N2m4/v94EO/9DMMarQp6ACk30eE=;
+        b=ntP3O165ePxDnjzBGo2ZhWatOLdxvgxVibREXBJE2AVGE2eHXHaP9KywfFe50IlWcH
+         gAiaUxpnppovltsscSKzdoEI9ZftyX3YBRYOQ+5ZRN/twZPMInSB2bTLgMukLlxqiZZF
+         /ddBn+pjNIieZTizkQCcinymoqrTyvOX8ASBryiaCrGtuEquOITyniIK53uB40Gx2Zr1
+         Nky+XC0kQhbnnlDBfI1K/exR2GCwrdaK0U502pqwnpz+VZk3KQB47ZGhBu2eLk5ULTXL
+         F398KZQf+Sr8zmrws1mG1btn3uv7s0+fZEBWRqQfMvQf8jqXN32E0ufUIyQ4BqnVcipz
+         sQHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749137895; x=1749742695;
+        d=1e100.net; s=20230601; t=1749137897; x=1749742697;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bX7rVYDFpCzF6sNW2Lfy2882XEAhzLwmJkPHB1Upz9o=;
-        b=cuUH1+7RhqRHK6rxE1/mU2XpKxSTjvzWzk9rNERTLwlxlFIxV8/AO7aB5xtcgmv0m4
-         62Am18oIQ5MPaUECQS2omjviW9lcMavV4Fmtb9ZFOGuyX0NEnyIjGH3DcKsxEMuAHs5U
-         7FiXukvRQvYP1qTXsfS0IgYWGGKx74fk8U5B6RZ8wwQxZq7eY3rA+BaEFhAn3pgL9D8f
-         W4lMN8pW6/Z3YxEyzDLHcxOp82CslajX9KJ/GHDBDQ+ezTcdZzLBej5YekwF43jNjKB8
-         g2HJxLoRy3SQpVjMMovt9rdDhgn+qCpDiiUApfRrJT+XWD2o8CDwEDf/UBHqMywP8PBB
-         f6Cg==
-X-Gm-Message-State: AOJu0Yy7NPVSKJHL/QIX2DeMT3wUdNJXR+okl3ElIcsDLCBDgWmjTuLm
-	Zezww0ekjk/CxzWJNPn95LTN6iHqQ/7Ok/1qRciML1oraYnmGN4jsmvHLKp0T+Xa6LwEUNdphgN
-	kmaoc1TOOim7ldoG//I1H7V3mpvI9TlyTTPDqsIyJfOiWF3B27nH9+fEFVNCJi1sU+kPSCJk/Dy
-	xXqigRoYEr11THRHzlSdvgOenJTVI=
-X-Google-Smtp-Source: AGHT+IGx/NxvkfS2OFg1baPqeoVFV4d0bcEnAR0ITEv4+pM80ouDhmtSHUvc8cTeZfEpmvTkRzfFHQzWbQ==
-X-Received: from wmbji6.prod.google.com ([2002:a05:600c:a346:b0:442:f4a3:b8f5])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:5f53:0:b0:3a4:e002:5f97
- with SMTP id ffacd0b85a97d-3a51d8ef871mr6732462f8f.1.1749137894915; Thu, 05
- Jun 2025 08:38:14 -0700 (PDT)
-Date: Thu,  5 Jun 2025 16:37:48 +0100
+        bh=Ya9V8PlB1f9QKkO6N2m4/v94EO/9DMMarQp6ACk30eE=;
+        b=L7gQ7EE0a7UwNCiMdDd56LuhTM6nwrNIvWhzfraw3tf4HzkAeOYRTeU+mHDP5rRTdN
+         Jf2/zdEvz3mGc59VtqIeif0wb7pAq1gYjbaa1ZdMFcLN4ouAe42G1C4P126tnBJMq34L
+         Ov+E/X/KfeHobqvCgKqHfFzleX3tWED2mL1bvCKioXrK8emOUmzfOQqmmqOIUxYqYFeD
+         ZaT5Ne8R877G29tNkcXkF8cW6AFWINdHKtQ8VmHXmH5FLFnL7K6K6zOG5i0iYv1ZCExK
+         fgM1ViPsbf4UbywB+eZR1wZgfetPqew3oN7lbnxsG0bpkIaDhtTgA8JQj9BjpFOq+ZH4
+         Io3A==
+X-Gm-Message-State: AOJu0YxrYJedTe56aylYs0zDId1gsVjuD6qElqZEkf1GMn3TAkNXvKBU
+	WDW4K9Mc3e+mspwk0JCew9vioPTDYC1+rvFaGlNulrjiRAzHfViYMg7Ewp+ADlOBoK3D3QvomZW
+	Wka0EYdr+AZrpoLyyz4+MlUKMetNdS03GZl196lD1Xo50nV6p+svcK3Ovr8E2RHwQ4tIoYW6TTw
+	u2Oaab2BeFhMLv8syvZknGhTwW0iU=
+X-Google-Smtp-Source: AGHT+IFhrDIh6gCXeF6nxFdv6Zput8Ia9sHzYK88p92EvJQS2AgWKQpdoJNqkVyvlyFiBZqhNRmwPvnK8A==
+X-Received: from wmbhc7.prod.google.com ([2002:a05:600c:8707:b0:442:f482:bba5])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3106:b0:441:b3eb:570a
+ with SMTP id 5b1f17b1804b1-451f0a6a94bmr72946715e9.2.1749137897069; Thu, 05
+ Jun 2025 08:38:17 -0700 (PDT)
+Date: Thu,  5 Jun 2025 16:37:49 +0100
 In-Reply-To: <20250605153800.557144-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250605153800.557144-1-tabba@google.com>
 X-Mailer: git-send-email 2.49.0.1266.g31b7d2e469-goog
-Message-ID: <20250605153800.557144-7-tabba@google.com>
-Subject: [PATCH v11 06/18] KVM: Fix comments that refer to slots_lock
+Message-ID: <20250605153800.557144-8-tabba@google.com>
+Subject: [PATCH v11 07/18] KVM: Fix comment that refers to kvm uapi header path
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	kvmarm@lists.linux.dev
@@ -101,46 +101,33 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	ira.weiny@intel.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Fix comments so that they refer to slots_lock instead of slots_locks
-(remove trailing s).
+The comment that points to the path where the user-visible memslot flags
+are refers to an outdated path and has a typo.
+
+Update the comment to refer to the correct path.
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Reviewed-by: Shivank Garg <shivankg@amd.com>
 Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
  include/linux/kvm_host.h | 2 +-
- virt/kvm/kvm_main.c      | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d9616ee6acc7..ae70e4e19700 100644
+index ae70e4e19700..80371475818f 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -859,7 +859,7 @@ struct kvm {
- 	struct notifier_block pm_notifier;
- #endif
- #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
--	/* Protected by slots_locks (for writes) and RCU (for reads) */
-+	/* Protected by slots_lock (for writes) and RCU (for reads) */
- 	struct xarray mem_attr_array;
- #endif
- 	char stats_id[KVM_STATS_NAME_SIZE];
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 2468d50a9ed4..6289ea1685dd 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -333,7 +333,7 @@ void kvm_flush_remote_tlbs_memslot(struct kvm *kvm,
- 	 * All current use cases for flushing the TLBs for a specific memslot
- 	 * are related to dirty logging, and many do the TLB flush out of
- 	 * mmu_lock. The interaction between the various operations on memslot
--	 * must be serialized by slots_locks to ensure the TLB flush from one
-+	 * must be serialized by slots_lock to ensure the TLB flush from one
- 	 * operation is observed by any other operation on the same memslot.
- 	 */
- 	lockdep_assert_held(&kvm->slots_lock);
+@@ -52,7 +52,7 @@
+ /*
+  * The bit 16 ~ bit 31 of kvm_userspace_memory_region::flags are internally
+  * used in kvm, other bits are visible for userspace which are defined in
+- * include/linux/kvm_h.
++ * include/uapi/linux/kvm.h.
+  */
+ #define KVM_MEMSLOT_INVALID	(1UL << 16)
+ 
 -- 
 2.49.0.1266.g31b7d2e469-goog
 
