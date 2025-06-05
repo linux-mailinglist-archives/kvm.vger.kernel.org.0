@@ -1,195 +1,185 @@
-Return-Path: <kvm+bounces-48570-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48571-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0571EACF53C
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 19:19:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE22ACF544
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 19:19:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 600263ACD1F
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 17:18:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B06AC18830FF
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 17:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D42327E7E6;
-	Thu,  5 Jun 2025 17:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE792777F1;
+	Thu,  5 Jun 2025 17:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HXhGNoaM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aud9rPAn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE5627E7C0
-	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 17:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3618E8633A;
+	Thu,  5 Jun 2025 17:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749143782; cv=none; b=paWEMSJO9oQQtPRrzw+6Q0IHTYigFuf3ga9Ls/ZPqLfOM4cmBHyNyqGLnxQEdi+HZGqjo5uquYBkoMJGXgkil/FpwV/bnaFiZV+QMCWxqPDPACleI8xZUFTJKNHTmWEVxBTNscXHeR6g/1sysxgrN9+gu098fQnbwtXKRs18ec0=
+	t=1749143985; cv=none; b=D6yyxXfALH4Fxe6feJf+eVee94B1OgeHFjdJlJ+TBJC/L7vqBzi3Op5Cr0yAb/O3zPvcb+fTRiZgmnIH9yPRC3n2LIlVse6JzmWLzeCsdbrN1tSNp+AvH5EI8eyqkEZdVqqnic/TzI4VG+u/qYTPK+hkUh/T5EvV2rDYazVZ6Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749143782; c=relaxed/simple;
-	bh=owWI8WAYAlFsjJvXIyvYSUNXCshP/5FGhM730a1ama8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=smXpoQTv4i3v0Kj59FeC8GFz7sRHdDRD07lAwJ1GXrmg5hBHOv/iomBXLBeSeiMWAHgxNFZp8UZFTZPdXJKKHNOPd784ftNhwq0r6N+3b6iQlJHLYozmQnQ6ks35Go8GjPQXdxGOpnIbZf/F8MdLVgENdzl3OqIbpIuwqAhGjOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HXhGNoaM; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74292762324so1300853b3a.0
-        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 10:16:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749143780; x=1749748580; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1BvVogHbLCy3WniKJnzNXayCUjBrxVyVRH9sGv66360=;
-        b=HXhGNoaMCx/06PTy7ZzJ94h1q3GbAMqkz3lxdB9Pz9xY08lx/J9fImFQiAfE2xC0g7
-         hTqJ41j3sYEEvTCTGhLxCfBhBvMKzZQmUSbfmH0xHwRTLCkznus6fAci8fe09zAZPmH2
-         wWTazphl7n115ZpmYrBaIHYJKgX9kBmF208OIVxxFKu0ifTNSNHL87EsNhkfWfy3hu2K
-         hDAaLI47s3ONRyXOQkmyID4AgNL8ntqfAz8p5nU/U+3TrcZZIigzMk1a/XW76QPwX1bM
-         b0tJIasRcmileJ56MFKPBoZ91h3KEApX4aUWew3eR0UYynEYAe6J7Rcae8M2/bvwQ9PW
-         m7JQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749143780; x=1749748580;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1BvVogHbLCy3WniKJnzNXayCUjBrxVyVRH9sGv66360=;
-        b=l7FpdA9WQMPDHtxI8A7gbKUnQ0icWPOhcvAeqLVZfbPDelSpStHy/xoOHl8clSH8Kx
-         vydF0v6f+cXSJ8RQH9JYbNKXY/FIzuqZPneLJPw2Wsy8CQTfC807PQFrYH1iCEHxh/Be
-         KDIJFRr/qu3Rw6cYKbmvDoxLew0hauN95uiiV+HBSm0b8NpSPv0UdaCaOSfOkQwJI/W3
-         /7NaYVesZRq3KIy/NgReEDwapXbvxFVAOYRN1twZmSqikrXJQdyxJUSOwFnOAyvbJtiG
-         w6h45Wp1yfhZhEEZIyXCvajBen9kmwwbHlvA+0u1eSeV0jr1vdHRVmoMdddHIiUyzKlB
-         w9Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCU8Ou/Za+skWIvFSPTRS1hqx0WEmogqOIfeRasifoSw7gdr8I7/MixyCX41cmGcThvtHyg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhkJ9LObY6aGyt1FlZ4iLvyJ9wwuT8K6XYmiJa4tSVYTEurs0a
-	/hmYBIraPTHbI0QUf65rskU5ogySx42zXDUgu3Tl7EzWPvEkEepN2mVe1879+o8bZvKE8Y8S4Nj
-	+llwLMK0Zm9yNr3edYJopvv3jyg==
-X-Google-Smtp-Source: AGHT+IHrHrufhfOgqsSZMYYGmnf8by8Ce09NkloD1+JcTL5IynPrkehej7WsZeM9qeq9p5D9AWLP4i2IXr0GIs1k+Q==
-X-Received: from pfko22.prod.google.com ([2002:a05:6a00:2156:b0:746:30f0:9b33])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:218e:b0:73e:30af:f479 with SMTP id d2e1a72fcca58-74828067b30mr550569b3a.19.1749143780316;
- Thu, 05 Jun 2025 10:16:20 -0700 (PDT)
-Date: Thu, 05 Jun 2025 10:16:18 -0700
-In-Reply-To: <85ae7dc691c86a1ae78d56d413a1b13b444b57cd.camel@intel.com>
+	s=arc-20240116; t=1749143985; c=relaxed/simple;
+	bh=ftjIODcJElgKCE4DU8BhMhWX2Y6yrqizED7saqK8bXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uwCGWzTVjjZMU3sa6Rumgv0xBxmISKFkGEJszTQapIEsbgjrj6csRcHy684ZJePZSw+4APAsG8xQUG83vO6m/2JrgQxiH6mbE2Id7Dg0S1Se7EycAB6Zj9wRLq4ASF/uXGnQcggINYvBpPUsTHXsZ5E3NDLaw4f7mfIqjPJkAs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aud9rPAn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39D0AC4CEE7;
+	Thu,  5 Jun 2025 17:19:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749143984;
+	bh=ftjIODcJElgKCE4DU8BhMhWX2Y6yrqizED7saqK8bXc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aud9rPAnhm+5tgBEVIxf/CkuHsaLbcHonC6VLFjKIMGWx0eVNruJ9yB5qBB3E+6cU
+	 dwIxG3BLYiCLdQKRU5CSjtLgz5SxzaIAUBLhCgYVxzHOorLuKTlVGY2QOuCIrIVNrS
+	 vHhSyThu6wSK7HuwcG1imc9Cw7VdnRBqvl646fCPCzY/Fk3PPq1p+PdQx4zwIO3ZbY
+	 wgeJCjyFJ3/Fa5DdI4NZZ0+AqqDqwCh0EzENmnApr694VvXGiWJG0xncKiSda33UuR
+	 ayBzsxgaXcdY/GSDlEL/P5DpbN0Pw16OJRtMY2e7t0KEBM41jl8gF/2UnFCfkxqCON
+	 A/6m/oA9iOGpQ==
+Date: Thu, 5 Jun 2025 10:19:41 -0700
+From: Josh Poimboeuf <jpoimboe@kernel.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Sean Christopherson <seanjc@google.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com, 
+	wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, pbonzini@redhat.com, 
+	ardb@kernel.org, kees@kernel.org, Arnd Bergmann <arnd@arndb.de>, 
+	gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-efi@vger.kernel.org, samitolvanen@google.com, 
+	ojeda@kernel.org, xin@zytor.com
+Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
+ in __nocfi functions
+Message-ID: <4z4fhaqesjlevwiugiqpnxdths5qkkj7vd4q3wgdosu4p24ppl@nb6c2gybuwe5>
+References: <p6mkebfvhxvtqyz6mtohm2ko3nqe2zdawkgbfi6h2rfv2gxbuz@ktixvjaj44en>
+ <20250506073100.GG4198@noisy.programming.kicks-ass.net>
+ <20250506133234.GH4356@noisy.programming.kicks-ass.net>
+ <vukrlmb4kbpcol6rtest3tsw4y6obopbrwi5hcb5iwzogsopgt@sokysuzxvehi>
+ <20250528074452.GU39944@noisy.programming.kicks-ass.net>
+ <20250528163035.GH31726@noisy.programming.kicks-ass.net>
+ <20250528163557.GI31726@noisy.programming.kicks-ass.net>
+ <20250529093017.GJ31726@noisy.programming.kicks-ass.net>
+ <fp5amaygv37wxr6bglagljr325rsagllbabb62ow44kl3mznb6@gzk6nuukjgwv>
+ <eegs5wq4eoqpu5yqlzug7icptiwzusracrp3nlmjkxwfywzvez@jngbkb3xqj6o>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1747264138.git.ackerleytng@google.com> <7753dc66229663fecea2498cf442a768cb7191ba.1747264138.git.ackerleytng@google.com>
- <85ae7dc691c86a1ae78d56d413a1b13b444b57cd.camel@intel.com>
-Message-ID: <diqz1pryjehp.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH v2 38/51] KVM: guest_memfd: Split allocator pages for
- guest_memfd use
-From: Ackerley Tng <ackerleytng@google.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>
-Cc: "palmer@dabbelt.com" <palmer@dabbelt.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "Miao, Jun" <jun.miao@intel.com>, 
-	"Shutemov, Kirill" <kirill.shutemov@intel.com>, "pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, 
-	"steven.price@arm.com" <steven.price@arm.com>, "peterx@redhat.com" <peterx@redhat.com>, 
-	"vbabka@suse.cz" <vbabka@suse.cz>, "jack@suse.cz" <jack@suse.cz>, 
-	"amoorthy@google.com" <amoorthy@google.com>, "maz@kernel.org" <maz@kernel.org>, 
-	"keirf@google.com" <keirf@google.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
-	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, 
-	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, "hughd@google.com" <hughd@google.com>, 
-	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, "Wang, Wei W" <wei.w.wang@intel.com>, 
-	"Du, Fan" <fan.du@intel.com>, 
-	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, 
-	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "Hansen, Dave" <dave.hansen@intel.com>, 
-	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, 
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, "nsaenz@amazon.es" <nsaenz@amazon.es>, "aik@amd.com" <aik@amd.com>, 
-	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, 
-	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "fvdl@google.com" <fvdl@google.com>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
-	"bfoster@redhat.com" <bfoster@redhat.com>, "willy@infradead.org" <willy@infradead.org>, 
-	"anup@brainfault.org" <anup@brainfault.org>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
-	"tabba@google.com" <tabba@google.com>, "mic@digikod.net" <mic@digikod.net>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
-	"Li, Zhiquan1" <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
-	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, "Aktas, Erdem" <erdemaktas@google.com>, 
-	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"Annapurve, Vishal" <vannapurve@google.com>, "Xu, Haibo1" <haibo1.xu@intel.com>, 
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
-	"jthoughton@google.com" <jthoughton@google.com>, "will@kernel.org" <will@kernel.org>, 
-	"steven.sistare@oracle.com" <steven.sistare@oracle.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
-	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
-	"Huang, Kai" <kai.huang@intel.com>, "shuah@kernel.org" <shuah@kernel.org>, 
-	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, 
-	"Peng, Chao P" <chao.p.peng@intel.com>, "nikunj@amd.com" <nikunj@amd.com>, 
-	"Graf, Alexander" <graf@amazon.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
-	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-	"jgowans@amazon.com" <jgowans@amazon.com>, "Xu, Yilun" <yilun.xu@intel.com>, 
-	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
-	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, 
-	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, "Weiny, Ira" <ira.weiny@intel.com>, 
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
-	"qperret@google.com" <qperret@google.com>, 
-	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "dmatlack@google.com" <dmatlack@google.com>, 
-	"james.morse@arm.com" <james.morse@arm.com>, "brauner@kernel.org" <brauner@kernel.org>, 
-	"pgonda@google.com" <pgonda@google.com>, "quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, 
-	"hch@infradead.org" <hch@infradead.org>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
-	"seanjc@google.com" <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <eegs5wq4eoqpu5yqlzug7icptiwzusracrp3nlmjkxwfywzvez@jngbkb3xqj6o>
 
-"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> writes:
+On Tue, Jun 03, 2025 at 09:29:45AM -0700, Josh Poimboeuf wrote:
+> On Mon, Jun 02, 2025 at 10:43:42PM -0700, Josh Poimboeuf wrote:
+> > On Thu, May 29, 2025 at 11:30:17AM +0200, Peter Zijlstra wrote:
+> > > > > So the sequence of fail is:
+> > > > > 
+> > > > > 	push %rbp
+> > > > > 	mov %rsp, %rbp	# cfa.base = BP
+> > > > > 
+> > > > > 	SAVE
+> > > 
+> > > 	sub    $0x40,%rsp
+> > > 	and    $0xffffffffffffffc0,%rsp
+> > > 
+> > > This hits the 'older GCC, drap with frame pointer' case in OP_SRC_AND.
+> > > Which means we then hard rely on the frame pointer to get things right.
+> > > 
+> > > However, per all the PUSH/POP_REGS nonsense, BP can get clobbered.
+> > > Specifically the code between the CALL and POP %rbp below are up in the
+> > > air. I don't think it can currently unwind properly there.
+> > 
+> > RBP is callee saved, so there's no need to pop it or any of the other
+> > callee-saved regs.  If they were to change, that would break C ABI
+> > pretty badly.  Maybe add a skip_callee=1 arg to POP_REGS?
+> 
+> This compiles for me:
 
-> On Wed, 2025-05-14 at 16:42 -0700, Ackerley Tng wrote:
->> +
->> +static pgoff_t kvm_gmem_compute_invalidate_bound(struct inode *inode,
->> +						 pgoff_t bound, bool start)
->> +{
->> +	size_t nr_pages;
->> +	void *priv;
->> +
->> +	if (!kvm_gmem_has_custom_allocator(inode))
->
-> General comment - It's a bit unfortunate how kvm_gmem_has_custom_allocator() is
-> checked all over the place across this series. There are only two allocators
-> after this, right? So one is implemented with callbacks presumably designed to
-> fit other allocators, and one has special case logic in guest_memfd.c.
->
-> Did you consider designing struct guestmem_allocator_operations so that it could
-> encapsulate the special logic for both the existing and new
-> allocators?
+That last patch had a pretty heinous bug: it didn't adjust the stack
+accordingly when it skipped the callee-saved pops.
 
-I did, yes. I believe it is definitely possible to make standard 4K
-pages become another allocator too.
+But actually there's no need to pop *any* regs there.
 
-I would love to clean this up. Not sure if that will be a new series
-after this one, or part of this one though.
+asm_fred_entry_from_kvm() uses C function ABI, so changes to
+callee-saved regs aren't allowed, and changes to caller-saved regs would
+have no effect.
 
-> If it
-> didn't work well, could we expect that a next allocator would actually fit
-> struct guestmem_allocator_operations?
->
+How about something like this?
 
-This was definitely designed to support allocators beyond
-guestmem_hugetlb, though I won't promise that it will be a perfect fit
-for future allocators. This is internal to the kernel and this interface
-can be updated for future allocators though.
-
->> +		return bound;
->> +
->> +	priv = kvm_gmem_allocator_private(inode);
->> +	nr_pages = kvm_gmem_allocator_ops(inode)->nr_pages_in_folio(priv);
->> +
->> +	if (start)
->> +		return round_down(bound, nr_pages);
->> +	else
->> +		return round_up(bound, nr_pages);
->> +}
->> +
->> +static pgoff_t kvm_gmem_compute_invalidate_start(struct inode *inode,
->> +						 pgoff_t bound)
->> +{
->> +	return kvm_gmem_compute_invalidate_bound(inode, bound, true);
->> +}
->> +
->> +static pgoff_t kvm_gmem_compute_invalidate_end(struct inode *inode,
->> +					       pgoff_t bound)
->> +{
->> +	return kvm_gmem_compute_invalidate_bound(inode, bound, false);
->> +}
->> +
+diff --git a/arch/x86/entry/calling.h b/arch/x86/entry/calling.h
+index d83236b96f22..e680afbf65b6 100644
+--- a/arch/x86/entry/calling.h
++++ b/arch/x86/entry/calling.h
+@@ -99,7 +99,7 @@ For 32-bit we have the following conventions - kernel is built with
+ 	.endif
+ .endm
+ 
+-.macro CLEAR_REGS clear_bp=1
++.macro CLEAR_REGS clear_callee=1
+ 	/*
+ 	 * Sanitize registers of values that a speculation attack might
+ 	 * otherwise want to exploit. The lower registers are likely clobbered
+@@ -113,20 +113,19 @@ For 32-bit we have the following conventions - kernel is built with
+ 	xorl	%r9d,  %r9d	/* nospec r9  */
+ 	xorl	%r10d, %r10d	/* nospec r10 */
+ 	xorl	%r11d, %r11d	/* nospec r11 */
++	.if \clear_callee
+ 	xorl	%ebx,  %ebx	/* nospec rbx */
+-	.if \clear_bp
+ 	xorl	%ebp,  %ebp	/* nospec rbp */
+-	.endif
+ 	xorl	%r12d, %r12d	/* nospec r12 */
+ 	xorl	%r13d, %r13d	/* nospec r13 */
+ 	xorl	%r14d, %r14d	/* nospec r14 */
+ 	xorl	%r15d, %r15d	/* nospec r15 */
+-
++	.endif
+ .endm
+ 
+-.macro PUSH_AND_CLEAR_REGS rdx=%rdx rcx=%rcx rax=%rax save_ret=0 clear_bp=1 unwind_hint=1
++.macro PUSH_AND_CLEAR_REGS rdx=%rdx rcx=%rcx rax=%rax save_ret=0 clear_callee=1 unwind_hint=1
+ 	PUSH_REGS rdx=\rdx, rcx=\rcx, rax=\rax, save_ret=\save_ret unwind_hint=\unwind_hint
+-	CLEAR_REGS clear_bp=\clear_bp
++	CLEAR_REGS clear_callee=\clear_callee
+ .endm
+ 
+ .macro POP_REGS pop_rdi=1
+diff --git a/arch/x86/entry/entry_64_fred.S b/arch/x86/entry/entry_64_fred.S
+index 29c5c32c16c3..5d1eef193b79 100644
+--- a/arch/x86/entry/entry_64_fred.S
++++ b/arch/x86/entry/entry_64_fred.S
+@@ -112,11 +112,12 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
+ 	push %rax				/* Return RIP */
+ 	push $0					/* Error code, 0 for IRQ/NMI */
+ 
+-	PUSH_AND_CLEAR_REGS clear_bp=0 unwind_hint=0
++	PUSH_AND_CLEAR_REGS clear_callee=0 unwind_hint=0
+ 	movq %rsp, %rdi				/* %rdi -> pt_regs */
+ 	call __fred_entry_from_kvm		/* Call the C entry point */
+-	POP_REGS
+-	ERETS
++	addq $C_PTREGS_SIZE, %rsp
++
++	ALTERNATIVE "mov %rbp, %rsp", __stringify(ERETS), X86_FEATURE_FRED
+ 1:
+ 	/*
+ 	 * Objtool doesn't understand what ERETS does, this hint tells it that
+diff --git a/arch/x86/kernel/asm-offsets.c b/arch/x86/kernel/asm-offsets.c
+index ad4ea6fb3b6c..d4f9bfdc24a7 100644
+--- a/arch/x86/kernel/asm-offsets.c
++++ b/arch/x86/kernel/asm-offsets.c
+@@ -94,6 +94,7 @@ static void __used common(void)
+ 
+ 	BLANK();
+ 	DEFINE(PTREGS_SIZE, sizeof(struct pt_regs));
++	OFFSET(C_PTREGS_SIZE, pt_regs, orig_ax);
+ 
+ 	/* TLB state for the entry code */
+ 	OFFSET(TLB_STATE_user_pcid_flush_mask, tlb_state, user_pcid_flush_mask);
 
