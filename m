@@ -1,702 +1,199 @@
-Return-Path: <kvm+bounces-48525-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48526-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E06AAACF27F
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 17:07:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B86ACF289
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 17:09:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42BE93ACC56
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 15:07:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 615767A74FE
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 15:08:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013611991B6;
-	Thu,  5 Jun 2025 15:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE701AF0C1;
+	Thu,  5 Jun 2025 15:09:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EsUn23Uq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="q5QzeIJr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2046.outbound.protection.outlook.com [40.107.244.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10487145355;
-	Thu,  5 Jun 2025 15:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749136053; cv=none; b=r4mcl0YuK7RSNwl++OueoozVoNf76bguV3rDXr+ucNyDsJkI2ebOk5c1thw5of3R6AJ/aLcvY4nnSgxcthvpDEOTZUZ5+Z9LwL11tMIBbPAPNHDNneG8l1Z71dktXoM78Tr8WZYo1IDl2sq/utEQXdMFJ6EFejz7qN30x1KEkbY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749136053; c=relaxed/simple;
-	bh=mIIlwEQWyyHElBz77fNuGMlK58gtqVEEy38tHFdcpNk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=fIu0j4g8N99ETfbqpXTdKWEMsN6l/r43zqx0HSezW2iZgrbShVkgA7jGhcpP6MgCxKQqjJOKG6eIA7y37P50+yWuivG42KYdhUSFpi88KQolgywxwQgeL50tP8o3v4fVQ6h8BAIIFJ3bArkl28dgFWOycO/ZoFFpluFhDAqNydY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EsUn23Uq; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 555CB3mx031696;
-	Thu, 5 Jun 2025 15:07:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pp1; bh=k215Pg4LVrzP77kjYMCGuxX7ifAv
-	Llp6YD6fFUOHq2Y=; b=EsUn23UqdvPya7hTbRmh956pL68dry42nRB/o2rpO+i9
-	NcYEt+/FHDn4U7MR8zHrAxoXflBTbHcHZeOSHJK8T9FCvpz8ejo3GRgfzlaRP2fa
-	Bnhzy9pfi5UGmvVhIIQvpyDUtuMpGHGGOxxskrUsvHObYkYcxraJSIh4g5s7eCS2
-	lPJOGhHhMFYv0F3XVOy0/V/NAcoXC6blXtOMMReAAOM9W/xSONvowWBr9gSBheon
-	xe+LyYh0ah4GipLMye7IIAjV+xxetRP2LYM6Wjvu77ctrmBo29HhwSpNNvDvB4W2
-	MBeZPPEvaPdVoqCg6uD9btrGNJQGYbvdUBpweiS/vQ==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471gf016yk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Jun 2025 15:07:28 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 555CrnwC028442;
-	Thu, 5 Jun 2025 15:07:27 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 470eakn0ny-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Jun 2025 15:07:27 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 555F7NSY44499364
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 5 Jun 2025 15:07:23 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9F71D20043;
-	Thu,  5 Jun 2025 15:07:23 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D8D422004D;
-	Thu,  5 Jun 2025 15:07:22 +0000 (GMT)
-Received: from [192.168.88.251] (unknown [9.111.94.88])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  5 Jun 2025 15:07:22 +0000 (GMT)
-From: Christoph Schlameuss <schlameuss@linux.ibm.com>
-Date: Thu, 05 Jun 2025 17:06:59 +0200
-Subject: [PATCH v6] KVM: s390: Use ESCA instead of BSCA at VM init
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AADB18C031;
+	Thu,  5 Jun 2025 15:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749136163; cv=fail; b=O4np4RRp4nEh6wFnovRec7obI1oqHNDdLWkpUBooFt+YUngFFYtEzYMF7GlhQkPVxeYVSm8XEgCJfsrWucNEsPcrYTuJBQXumOtxVr1EcTAcmN0GVY63kBD7cn5u/NeuFJyXSFEiI+8QNLJdBNbAzvb9vRCv0YiHWdy6vESBh4I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749136163; c=relaxed/simple;
+	bh=wFJYsXkXZ4eZEIZ4rQAAFyYLv9NX+hOpnQDs9umIvbU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=joc2r+l0k2N7A0eMXb3F7R/QQEZxpTAYvj1rOIFtYJgmLczdnHiSz0iO71sLC5KAjnfsm5fiYamixVvNsiTADkflWK+DnkbbEKyPa8XIRzPFWeuolnj2ufyONqSW4BFTKR9nLiX8Vpgdrn/JqlTOloY+4BVSnrjSYU4yvM8bROI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=q5QzeIJr; arc=fail smtp.client-ip=40.107.244.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pp4qdTmwg6mDEsBPgK7EPygW4OzLmasUMeG84RxjV9mTgHa2iW1IkCh0W2abn1tZ9rNKWw12Z1sh9brJFT8eGEbtHR/bSo8nl8s/SH4tGXv7yNrXQPgeQKukWF0csNM63Xq51DuGx6YqdKXt0TxNE0kB7J9xf1R6Iv79dHusv4f4wFSvOSGH90ZDlPJ4moJ7s4h38HnRppVoIK2DifdYgqVFp+vQha7JlwI9fLvRHaCNffL+hLBMFHJt4eS4gNHUhrVK4eGjutGs0lnwUl1SIIhYgI0MjKQ/1xUnNulRrjVgbJYRXAaTqc2wD2t2RUMMAw+PLAOCl80XB9m78w3vCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K9WafZfPOMuTk9JtExzfcLS+H/l2FXgp1KQLW57ZbnQ=;
+ b=FAVxzdYP1pjE5uhwx+I2F7Xw/HbIxz1sSUrNTdkHFsFE+jZLaEYfRpom/gux5WpIYAeMNtQkZWB1GZi2qibp70sosKW6qvq161EQ4Vsni6Ppj54qj9M/IC5F/Xr1NrS0TVgLsFqRoc9+Gpo2E889MbjciEt6Tu3IkasDEXO5LBFAbtGAUIhuMKa/7Hc5wG5zObPj8nCESD43tGAw2FcbnX7R86w9ffMnEwpvAVsm1OZqUogGxLAVC/ZaWAsZM6lsODrPJGFztLA1zhMNrQoBapP/t/CU0yA61V6PN0WPi/vHVGx5SmbKY2LDFT2BFuzNYu/8O7iPx6q8TwO4OJhNIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K9WafZfPOMuTk9JtExzfcLS+H/l2FXgp1KQLW57ZbnQ=;
+ b=q5QzeIJrcf2a4hKg429qxtlJ2ZFnzO6QtJcgKe1GbSzl2CLaUqgg24XaSFfT7ZNPdghqE4H/iPwP3W0t7rWQXgNfgDWZQC5kkYvXSakWVPlbnE2Ih7lu8wfhzyskkzG4hEMIz1is+IQ5i6zq2sLoh8pIB/e0Fnn0OhpboLyRd5YnGlsB+VebVDaivIhDjT/o7P4uPxl4Bj8HV8eloWM9MEgGG/1Laz8oM3XyZUPHGf+HyY5YhK4Bx95d9Oz1XJdMm5f809JQVHpiHxWAKq5zIaqSfMLoSUTVbUWUILQU8jWJFdyuW/VuBE2cREdBDFxAiffqAiXxUMGu0IugNA4G1g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by CH3PR12MB7690.namprd12.prod.outlook.com (2603:10b6:610:14e::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.34; Thu, 5 Jun
+ 2025 15:09:18 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%6]) with mapi id 15.20.8792.034; Thu, 5 Jun 2025
+ 15:09:18 +0000
+Date: Thu, 5 Jun 2025 12:09:16 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
+	sumit.semwal@linaro.org, christian.koenig@amd.com,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	dan.j.williams@intel.com, aik@amd.com, linux-coco@lists.linux.dev,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, vivek.kasireddy@intel.com,
+	yilun.xu@intel.com, linux-kernel@vger.kernel.org, lukas@wunner.de,
+	yan.y.zhao@intel.com, daniel.vetter@ffwll.ch, leon@kernel.org,
+	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com, linux-pci@vger.kernel.org, zhiw@nvidia.com,
+	simona.vetter@ffwll.ch, shameerali.kolothum.thodi@huawei.com,
+	iommu@lists.linux.dev, kevin.tian@intel.com
+Subject: Re: [RFC PATCH 19/30] vfio/pci: Add TSM TDI bind/unbind IOCTLs for
+ TEE-IO support
+Message-ID: <20250605150916.GB19710@nvidia.com>
+References: <20250529053513.1592088-1-yilun.xu@linux.intel.com>
+ <20250529053513.1592088-20-yilun.xu@linux.intel.com>
+ <yq5aplfn210z.fsf@kernel.org>
+ <aD24r44v0g1NgeZs@yilunxu-OptiPlex-7050>
+ <yq5ajz5r8w6p.fsf@kernel.org>
+ <aEFmPaYorqaYCKBY@yilunxu-OptiPlex-7050>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aEFmPaYorqaYCKBY@yilunxu-OptiPlex-7050>
+X-ClientProxiedBy: YT4PR01CA0496.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:10c::10) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250605-rm-bsca-v6-1-21902b8bd579@linux.ibm.com>
-X-B4-Tracking: v=1; b=H4sIAJKyQWgC/23RSW7DIBgF4KtYrEvEPGTVe0RZMPxukGo7BQeli
- nL3kkStrcrLB3xv8bihAjlBQfvuhjLUVNI0tqDeOhRObvwAnGLLiBEmiaQc5wH7Ehx2noJRwrr
- gNGqvzxn6dH02HY4tn1KZp/z9LK70cfrbIf46KsUEq8A8UdIZZcj7Zxov113ywy5MA3r0VLa2d
- rGsWeDgJI+RcCu2LF9ZxhbLm5U0UmU1N33ot6xYrCIrKzDFSgdiIwUwXG5ZubbLZlU22ytLmTE
- uOhn+2/tryAxfl/YT82tN5F0B3O6HNO87CFpTAcIKbRu4/wDIq1ZrwgEAAA==
-X-Change-ID: 20250513-rm-bsca-ab1e8649aca7
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-        Christoph Schlameuss <schlameuss@linux.ibm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=19953;
- i=schlameuss@linux.ibm.com; h=from:subject:message-id;
- bh=mIIlwEQWyyHElBz77fNuGMlK58gtqVEEy38tHFdcpNk=;
- b=owGbwMvMwCUmoqVx+bqN+mXG02pJDBmOm1Yp++aYPXPfYFYVXB/35cKuhZt5um9FFbgY/LGuc
- J+p9ed/RykLgxgXg6yYIku1uHVeVV/r0jkHLa/BzGFlAhnCwMUpABNhL2b4pzw5nFG44VPKYs3D
- 4jN6mspWbyoUqZY6n8pvXhu7fff1FIY/XC4u+tL3ZX14jy3V5fzUV7n+go3PhlTHbRkfTt5WnBH
- DAQA=
-X-Developer-Key: i=schlameuss@linux.ibm.com; a=openpgp;
- fpr=0E34A68642574B2253AF4D31EEED6AB388551EC3
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: lvQ2epFcFbVwXQi0WuX2B_5jBXggO_09
-X-Proofpoint-ORIG-GUID: lvQ2epFcFbVwXQi0WuX2B_5jBXggO_09
-X-Authority-Analysis: v=2.4 cv=X4dSKHTe c=1 sm=1 tr=0 ts=6841b2b0 cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=_Qd8iBTUVOWzVtMwVL0A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA1MDEzMCBTYWx0ZWRfX1j+oB0gnFcF5 Sco2s687Wew5KveBK6/xtmq0vCdG4wh17trAGEXCn7xSjAMfllOJJOBdxwMfWriFw5zkmRdvrtQ U1ZELSHx3M2sqJAAkIkp4z/QkDI9SpvBKvoor839bEqrjOeVWR7MzzKTwdacizGG0Iq0oidG7rX
- NjFdJ8fxYW0T6hRb9pe+nbDbx2FGh9g6DHcGuiwwXW+sjOefTtwikRLuWnLvIYCsVsnEV7ja2L3 ItWwEUYyXkQuW19jAloozO4R42xVzdhOyUFvBIhJHwjhabIF5JTF3qKoPwO4wRSPdYw7ucSRGt5 SPImubCn4pFKlks+iWEsuJXQP9FHobi6vVw1cTDHjogmTts/rkf5kbBjIznSBtKl23M4iZ7npSy
- JwGG4Smt8+NLez2s+EwllflDG4BcVvuHw68yK7yzdNYPN4DtbOu29Wyy6R5qH0VGjuCNUWo8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-05_03,2025-06-05_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 clxscore=1015 phishscore=0 bulkscore=0
- malwarescore=0 spamscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506050130
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|CH3PR12MB7690:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8248854e-4cf3-4b3b-56a1-08dda442f139
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?JK65WbaMWpD+/ntc+0jbhBWOwtYEQyDRrN5T91y0M7ag3mTYE9nLp2K5V/JM?=
+ =?us-ascii?Q?jVVkXlowDS6vlVCHqrZ+sP5KZyfbEWvzKuxDbX6DHQ8Vl7El2InEikmShAQV?=
+ =?us-ascii?Q?MtccP8O8gud38T6ErUNm4b7XzsY3I6oe0YayLDqXH2SNxRng9iTJYYtG9ONU?=
+ =?us-ascii?Q?WU9RAPxV4vKXYAy6zJXPLQOvRdTFDH62JdutF3yh20P+zldwoeqMfCD2qwds?=
+ =?us-ascii?Q?1ob1yDXDiHi8JiWNkzD+4GixwuzZvQofQByU9HgdYJgPmU+KKnygOr6FAncg?=
+ =?us-ascii?Q?N/5hnsbbMl2pLwV8wiEoAAXX+LXncig7Bfl/bYaaG2mtrWCSQSaN6U0dbHJ7?=
+ =?us-ascii?Q?B1GDBftY7YpFjRXaJqOa7ANZBIpP/ucPgMEqqCiZN9cBrclu7DOhjL6PcXVP?=
+ =?us-ascii?Q?luBe0EzLdhciDCf8V4XHNsdwvcU0OWgqeWFRMJEMaIBxeCtLRuzI0S1z420U?=
+ =?us-ascii?Q?sy2n3xpgoShNmV4iSaSVzMRQFMHp0o7Cj+CD/YomZ5k7zOKRqLGh1UkicNFd?=
+ =?us-ascii?Q?EC156WnVgaYFaM0JbMXVd9RNvz8SWyw7MHpXrfZxO6bkSPl0a8L/6X8O/bwo?=
+ =?us-ascii?Q?wUnZyR+SpG+dVaPysludeCE/7cFl8UDTcl3Y9kMUBoHuZzSSR2nfOauUaLbm?=
+ =?us-ascii?Q?iseDJL4xRm2AdcZxaspYftukILDY4SoltCRo+ALkK8NkAGyfyW26/NNIPan7?=
+ =?us-ascii?Q?7IM7z9RR7dZNN2naQeXw3wJwDTt+5CnhuTO4uKyXStl6PkoKhIxN7G2/oz4Q?=
+ =?us-ascii?Q?NyOSF5AnEkT2hhndyhadvGLg4Fb15ro0t9Wxc9FSfcrabfPYAA9O9T+Le9tm?=
+ =?us-ascii?Q?f3aw2/p6WXEj0GevtJYcmKtNJwmleyrTNPQDM/DhoUILFF3FMFU0FSx+R174?=
+ =?us-ascii?Q?zAziYZOpCsCmYzYG+ShNc+lgWXL6fw597zwswxR/F6SYRe4TDHrHVocX0HHs?=
+ =?us-ascii?Q?i0LKUQ4cebO5Xpd9qTCw21B4z1DcjStybTgArnClyA6qPGbf5pdgusxxpKXo?=
+ =?us-ascii?Q?HHJ3QhU7ZdvzQaeIBuL2vzjdmZLskVrMeZr1xzcYRRBxg+qfbbWqUTnbCfbL?=
+ =?us-ascii?Q?+4QcVTvwKKIE5GI8uGl0lh84bvejZiqLXfYxWtDqs2N+0ZB1lpLswrbaSeIo?=
+ =?us-ascii?Q?j67WBDTPF4g9KnRknQrb4vyiD8DFVLKb+Hr/lrgXyJor7X1GVZJKAI58TqPf?=
+ =?us-ascii?Q?PUO9geMRS3EJbM8Ixmk3Gt2jvMQXYx1EbOWeFjmZb3F9ukqeUI3JNiUbXsc+?=
+ =?us-ascii?Q?bBFkSvpYZWuVb6bznWrkZdgKJZVrScpcrDXxPUZes/a5AqcECZPP77xhB/ct?=
+ =?us-ascii?Q?NBBPMPNIPu3aSktRz8ppZR0Zjl5BUrrZXZkR7oA6YoObkZf7/wBql9D4PhJh?=
+ =?us-ascii?Q?XrLKV8sj0yqSKnqCLJpuevpW8zwIbSlsDbexuwxgjgHdLMSLxK7hx1Z6SGd4?=
+ =?us-ascii?Q?xBjJndPtGz0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?YnJL50NOObalofHyGLcX2sKoki78yzs8ES6ttr1wszqZFBxexjhBT1exyKZp?=
+ =?us-ascii?Q?Cw/+JIf7a322WMyqXY7DV0yMANUKxn+/Mfqqh1mCo6xXYB69sv4O9Z0bnrnp?=
+ =?us-ascii?Q?sNHAtuae5cfjAkv6eCNnKQ8dyVIJ3vaGhik2Q1EPSDJETlOnjI9Lj95hz8PI?=
+ =?us-ascii?Q?P4wBP7ZgfDVE/bbkDlhiBXkFmqENvaJiMyxVcMwLSZV1Nzh6AM7+AAuBxl2w?=
+ =?us-ascii?Q?AAgQrG+72rEYYIsiP6URLD7XoU506gVGcmzbeMygN8lIWz3EFTDW5XVaZTr1?=
+ =?us-ascii?Q?EUNkSnCPp8lvvwC6Iv4JbqK4ZuOEVXHsOpP4TxagMimhx2WGPy/1VOy+4MOC?=
+ =?us-ascii?Q?NrcWTd1jiPgg1VSm/prfIFNps43qH0yxdRV53Em0PE+Uz8CKd6GxBv7S3pV9?=
+ =?us-ascii?Q?zjLB383l76ggINSblZ36AqgP6C2Y9j7JBlPtJjW3/kDqA86IfmypI2fzQ8E9?=
+ =?us-ascii?Q?+ai1CJui5IIFm68Uqswl49lZVm7OdoGpHoiaqgkebfOeMHDmhYzuIRNEm4wC?=
+ =?us-ascii?Q?trhGnmivDAgbN5yjW74Gc2CATFTd5NtQLr6LWjCu2io4W8wpMsfvO97DtFpB?=
+ =?us-ascii?Q?qvkJ0sTsFdyhTPNsdakXHHWYpanHPVHXWvrGLXv6i6vbjkLuxklmdUhOs8It?=
+ =?us-ascii?Q?H28uq68fT7tc6rAuLdnifJPGPfGnLgTSncPR6/+u4P8KCE0nBpiJDmzerqUw?=
+ =?us-ascii?Q?AWKxfT/tqSnjQnWVPJGPoXaTjzvW15NrEolCaubVF+Dja4qJrJuWnqCwdzbQ?=
+ =?us-ascii?Q?H/qi4Z1DVM+snH2+tY9+hSsKd/8zhgl57B7uulzxnVPyd9C1ibnV2wcX6iWL?=
+ =?us-ascii?Q?dCDEi82D/XukgHn16txR+NKoxQvTY2INJrXd/r7Wgh4nPmZAvZe4PYXDxaw8?=
+ =?us-ascii?Q?JysjKNpZjNHCn5117MTYsGSDkNMovWcn/JvGPMv2Asnwp6zumZy1cUsMOXyD?=
+ =?us-ascii?Q?usLsjFMFu+SbQ1pbuOvYLZ37o8dn64dqT9zLrYaldl4tAWvDhQbxecCbDJoj?=
+ =?us-ascii?Q?7DKXhKKuSBZoQ9MrcCc2e9qgSU5GM9zoyT/3ufKVblfNO7+AUrWPUo90PJes?=
+ =?us-ascii?Q?kICL28sncojUZoqzjlYjHVD2EDRmtlUvZWoXLA4CU+e6aRbCJ6ywJ096tkJQ?=
+ =?us-ascii?Q?7NdZ7gNey6rchbiP4d+LaMOx9JoKuYiNjBD7clgAqHKgbHczlMNinknxB7v6?=
+ =?us-ascii?Q?/GYZEyQmhcq2OcRrn3HcSp136SdOsc7ZJqf01rDKdEFCSPOVQAl29W5tlpRi?=
+ =?us-ascii?Q?wX9PAvkmKy1imt0QLh4p5UD77+fl78HIN6T473dLG2m2TbDq1vUd16528xEA?=
+ =?us-ascii?Q?Oxj0706PH8mxgRWIAVG6gG3C1CUpfpGlDxcz1x0mQ01Ga0UWIE8MVYqwdZhG?=
+ =?us-ascii?Q?WhDJYAWtj1g6wuFdtKSHmM1HMr2zzimZLRaJ4SpZic/hhW32b3YyZI40KJ7A?=
+ =?us-ascii?Q?aLCDYXPaFsRa/4w9YVn6COi0W9FNCNSzw7v0mff/H3QtziFQnHbLdPZR+/3R?=
+ =?us-ascii?Q?l+2NoWho7HY9aU2MQEG8mD5uTVF3oXGP39fpGrRfyPYHP3EsiAhI7ZvyjDNu?=
+ =?us-ascii?Q?lmzZJ4a8QG6PqORRuMwsD1yO/Zl0u/6Uj48Rsst2?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8248854e-4cf3-4b3b-56a1-08dda442f139
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2025 15:09:17.9962
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UIaSuJJxDn3yncKQocK9PVLmm5OwsS+qgLXtIEsB70uaI8cOKICF+6jFG5osMo2Y
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7690
 
-All modern IBM Z and Linux One machines do offer support for the
-Extended System Control Area (ESCA). The ESCA is available since the
-z114/z196 released in 2010.
-KVM needs to allocate and manage the SCA for guest VMs. Prior to this
-change the SCA was setup as Basic SCA only supporting a maximum of 64
-vCPUs when initializing the VM. With addition of the 65th vCPU the SCA
-was needed to be converted to a ESCA.
+On Thu, Jun 05, 2025 at 05:41:17PM +0800, Xu Yilun wrote:
 
-Instead of allocating a BSCA and upgrading it for PV or when adding the
-65th cpu we can always allocate the ESCA directly upon VM creation
-simplifying the code in multiple places as well as completely removing
-the need to convert an existing SCA.
+> No, this is not device side TDISP requirement. It is host side
+> requirement to fix DMA silent drop issue. TDX enforces CPU S2 PT share
+> with IOMMU S2 PT (does ARM do the same?), so unmap CPU S2 PT in KVM equals
+> unmap IOMMU S2 PT.
+> 
+> If we allow IOMMU S2 PT unmapped when TDI is running, host could fool
+> guest by just unmap some PT entry and suppress the fault event. Guest
+> thought a DMA writting is successful but it is not and may cause
+> data integrity issue.
 
-In cases where the ESCA is not supported (z10 and earlier) the use of
-the SCA entries and with that SIGP interpretation are disabled for VMs.
-This increases the number of exits from the VM in multiprocessor
-scenarios and thus decreases performance.
-The same is true for VSIE where SIGP is currently disabled and thus no
-SCA entries are used.
+So, TDX prevents *any* unmap, even of normal memory, from the S2 while
+a guest is running?  Seems extreme?
 
-The only downside of the change is that we will always allocate 4 pages
-for a 248 cpu ESCA instead of a single page for the BSCA per VM.
-In return we can delete a bunch of checks and special handling depending
-on the SCA type as well as the whole BSCA to ESCA conversion.
+MMIO isn't special, if you have a rule like that for such a security
+reason it should cover all of the S2.
 
-With that behavior change we are no longer referencing a bsca_block in
-kvm->arch.sca. This will always be esca_block instead.
-By specifying the type of the sca as esca_block we can simplify access
-to the sca and get rid of some helpers while making the code clearer.
+> This is not a TDX specific problem, but different vendors has different
+> mechanisms for this. For TDX, firmware fails the MMIO unmap for S2. For
+> AMD, will trigger some HW protection called "ASID fence" [1]. Not sure
+> how ARM handles this?
 
-KVM_MAX_VCPUS is also moved to kvm_host_types to allow using this in
-future type definitions.
+This seems even more extreme, if the guest gets a bad DMA address into
+the device then the entire device gets killed? No chance to debug it?
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
----
-Changes in v6:
-- Move variable declarations to top of functions
-- Link to v5: https://lore.kernel.org/r/20250603-rm-bsca-v5-1-f691288ada5c@linux.ibm.com
-
-Changes in v5:
-- Revert changes to KVM_MAX_VCPUS
-- Correct comments
-- Link to v4: https://lore.kernel.org/r/20250602-rm-bsca-v4-1-67c09d1ee835@linux.ibm.com
-
-Changes in v4:
-- Squash patches into single patch
-- Revert KVM_CAP_MAX_VCPUS to return KVM_CAP_MAX_VCPU_ID (255) again
-- Link to v3: https://lore.kernel.org/r/20250522-rm-bsca-v3-0-51d169738fcf@linux.ibm.com
-
-Changes in v3:
-- do not enable sigp for guests when kvm_s390_use_sca_entries() is false
-  - consistently use kvm_s390_use_sca_entries() instead of sclp.has_sigpif
-- Link to v2: https://lore.kernel.org/r/20250519-rm-bsca-v2-0-e3ea53dd0394@linux.ibm.com
-
-Changes in v2:
-- properly apply checkpatch --strict (Thanks Claudio)
-- some small comment wording changes
-- rebased
-- Link to v1: https://lore.kernel.org/r/20250514-rm-bsca-v1-0-6c2b065a8680@linux.ibm.com
----
- arch/s390/include/asm/kvm_host.h |   5 +-
- arch/s390/kvm/gaccess.c          |  10 +--
- arch/s390/kvm/interrupt.c        |  78 ++++++------------
- arch/s390/kvm/kvm-s390.c         | 170 ++++++++-------------------------------
- arch/s390/kvm/kvm-s390.h         |   9 +--
- 5 files changed, 66 insertions(+), 206 deletions(-)
-
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index cb89e54ada257eb4fdfe840ff37b2ea639c2d1cb..4d651e6e8b12ecd7796070e9da659b0b2b94d302 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -631,9 +631,8 @@ struct kvm_s390_pv {
- 	struct mmu_notifier mmu_notifier;
- };
- 
--struct kvm_arch{
--	void *sca;
--	int use_esca;
-+struct kvm_arch {
-+	struct esca_block *sca;
- 	rwlock_t sca_lock;
- 	debug_info_t *dbf;
- 	struct kvm_s390_float_interrupt float_int;
-diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-index e23670e1949cfe3b2b3f54fe68c4c1b642f56e60..586c0c5ecf131c2298e662aa85d4c9ae127738d9 100644
---- a/arch/s390/kvm/gaccess.c
-+++ b/arch/s390/kvm/gaccess.c
-@@ -113,7 +113,7 @@ int ipte_lock_held(struct kvm *kvm)
- 		int rc;
- 
- 		read_lock(&kvm->arch.sca_lock);
--		rc = kvm_s390_get_ipte_control(kvm)->kh != 0;
-+		rc = kvm->arch.sca->ipte_control.kh != 0;
- 		read_unlock(&kvm->arch.sca_lock);
- 		return rc;
- 	}
-@@ -130,7 +130,7 @@ static void ipte_lock_simple(struct kvm *kvm)
- 		goto out;
- retry:
- 	read_lock(&kvm->arch.sca_lock);
--	ic = kvm_s390_get_ipte_control(kvm);
-+	ic = &kvm->arch.sca->ipte_control;
- 	old = READ_ONCE(*ic);
- 	do {
- 		if (old.k) {
-@@ -155,7 +155,7 @@ static void ipte_unlock_simple(struct kvm *kvm)
- 	if (kvm->arch.ipte_lock_count)
- 		goto out;
- 	read_lock(&kvm->arch.sca_lock);
--	ic = kvm_s390_get_ipte_control(kvm);
-+	ic = &kvm->arch.sca->ipte_control;
- 	old = READ_ONCE(*ic);
- 	do {
- 		new = old;
-@@ -173,7 +173,7 @@ static void ipte_lock_siif(struct kvm *kvm)
- 
- retry:
- 	read_lock(&kvm->arch.sca_lock);
--	ic = kvm_s390_get_ipte_control(kvm);
-+	ic = &kvm->arch.sca->ipte_control;
- 	old = READ_ONCE(*ic);
- 	do {
- 		if (old.kg) {
-@@ -193,7 +193,7 @@ static void ipte_unlock_siif(struct kvm *kvm)
- 	union ipte_control old, new, *ic;
- 
- 	read_lock(&kvm->arch.sca_lock);
--	ic = kvm_s390_get_ipte_control(kvm);
-+	ic = &kvm->arch.sca->ipte_control;
- 	old = READ_ONCE(*ic);
- 	do {
- 		new = old;
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index 60c360c18690f6b94e8483dab2c25f016451204b..f2d29c99253b6f2e804ebc9055ac5447efb9a427 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -44,6 +44,8 @@ static struct kvm_s390_gib *gib;
- /* handle external calls via sigp interpretation facility */
- static int sca_ext_call_pending(struct kvm_vcpu *vcpu, int *src_id)
- {
-+	union esca_sigp_ctrl sigp_ctrl;
-+	struct esca_block *sca;
- 	int c, scn;
- 
- 	if (!kvm_s390_test_cpuflags(vcpu, CPUSTAT_ECALL_PEND))
-@@ -51,21 +53,11 @@ static int sca_ext_call_pending(struct kvm_vcpu *vcpu, int *src_id)
- 
- 	BUG_ON(!kvm_s390_use_sca_entries());
- 	read_lock(&vcpu->kvm->arch.sca_lock);
--	if (vcpu->kvm->arch.use_esca) {
--		struct esca_block *sca = vcpu->kvm->arch.sca;
--		union esca_sigp_ctrl sigp_ctrl =
--			sca->cpu[vcpu->vcpu_id].sigp_ctrl;
-+	sca = vcpu->kvm->arch.sca;
-+	sigp_ctrl = sca->cpu[vcpu->vcpu_id].sigp_ctrl;
- 
--		c = sigp_ctrl.c;
--		scn = sigp_ctrl.scn;
--	} else {
--		struct bsca_block *sca = vcpu->kvm->arch.sca;
--		union bsca_sigp_ctrl sigp_ctrl =
--			sca->cpu[vcpu->vcpu_id].sigp_ctrl;
--
--		c = sigp_ctrl.c;
--		scn = sigp_ctrl.scn;
--	}
-+	c = sigp_ctrl.c;
-+	scn = sigp_ctrl.scn;
- 	read_unlock(&vcpu->kvm->arch.sca_lock);
- 
- 	if (src_id)
-@@ -76,37 +68,23 @@ static int sca_ext_call_pending(struct kvm_vcpu *vcpu, int *src_id)
- 
- static int sca_inject_ext_call(struct kvm_vcpu *vcpu, int src_id)
- {
-+	union esca_sigp_ctrl old_val, new_val = {0};
-+	union esca_sigp_ctrl *sigp_ctrl;
-+	struct esca_block *sca;
- 	int expect, rc;
- 
- 	BUG_ON(!kvm_s390_use_sca_entries());
- 	read_lock(&vcpu->kvm->arch.sca_lock);
--	if (vcpu->kvm->arch.use_esca) {
--		struct esca_block *sca = vcpu->kvm->arch.sca;
--		union esca_sigp_ctrl *sigp_ctrl =
--			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
--		union esca_sigp_ctrl new_val = {0}, old_val;
--
--		old_val = READ_ONCE(*sigp_ctrl);
--		new_val.scn = src_id;
--		new_val.c = 1;
--		old_val.c = 0;
--
--		expect = old_val.value;
--		rc = cmpxchg(&sigp_ctrl->value, old_val.value, new_val.value);
--	} else {
--		struct bsca_block *sca = vcpu->kvm->arch.sca;
--		union bsca_sigp_ctrl *sigp_ctrl =
--			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
--		union bsca_sigp_ctrl new_val = {0}, old_val;
-+	sca = vcpu->kvm->arch.sca;
-+	sigp_ctrl = &sca->cpu[vcpu->vcpu_id].sigp_ctrl;
- 
--		old_val = READ_ONCE(*sigp_ctrl);
--		new_val.scn = src_id;
--		new_val.c = 1;
--		old_val.c = 0;
-+	old_val = READ_ONCE(*sigp_ctrl);
-+	new_val.scn = src_id;
-+	new_val.c = 1;
-+	old_val.c = 0;
- 
--		expect = old_val.value;
--		rc = cmpxchg(&sigp_ctrl->value, old_val.value, new_val.value);
--	}
-+	expect = old_val.value;
-+	rc = cmpxchg(&sigp_ctrl->value, old_val.value, new_val.value);
- 	read_unlock(&vcpu->kvm->arch.sca_lock);
- 
- 	if (rc != expect) {
-@@ -119,23 +97,17 @@ static int sca_inject_ext_call(struct kvm_vcpu *vcpu, int src_id)
- 
- static void sca_clear_ext_call(struct kvm_vcpu *vcpu)
- {
-+	union esca_sigp_ctrl *sigp_ctrl;
-+	struct esca_block *sca;
-+
- 	if (!kvm_s390_use_sca_entries())
- 		return;
- 	kvm_s390_clear_cpuflags(vcpu, CPUSTAT_ECALL_PEND);
- 	read_lock(&vcpu->kvm->arch.sca_lock);
--	if (vcpu->kvm->arch.use_esca) {
--		struct esca_block *sca = vcpu->kvm->arch.sca;
--		union esca_sigp_ctrl *sigp_ctrl =
--			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
--
--		WRITE_ONCE(sigp_ctrl->value, 0);
--	} else {
--		struct bsca_block *sca = vcpu->kvm->arch.sca;
--		union bsca_sigp_ctrl *sigp_ctrl =
--			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
-+	sca = vcpu->kvm->arch.sca;
-+	sigp_ctrl = &sca->cpu[vcpu->vcpu_id].sigp_ctrl;
- 
--		WRITE_ONCE(sigp_ctrl->value, 0);
--	}
-+	WRITE_ONCE(sigp_ctrl->value, 0);
- 	read_unlock(&vcpu->kvm->arch.sca_lock);
- }
- 
-@@ -1223,7 +1195,7 @@ int kvm_s390_ext_call_pending(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
- 
--	if (!sclp.has_sigpif)
-+	if (!kvm_s390_use_sca_entries())
- 		return test_bit(IRQ_PEND_EXT_EXTERNAL, &li->pending_irqs);
- 
- 	return sca_ext_call_pending(vcpu, NULL);
-@@ -1547,7 +1519,7 @@ static int __inject_extcall(struct kvm_vcpu *vcpu, struct kvm_s390_irq *irq)
- 	if (kvm_get_vcpu_by_id(vcpu->kvm, src_id) == NULL)
- 		return -EINVAL;
- 
--	if (sclp.has_sigpif && !kvm_s390_pv_cpu_get_handle(vcpu))
-+	if (kvm_s390_use_sca_entries() && !kvm_s390_pv_cpu_get_handle(vcpu))
- 		return sca_inject_ext_call(vcpu, src_id);
- 
- 	if (test_and_set_bit(IRQ_PEND_EXT_EXTERNAL, &li->pending_irqs))
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index d5ad10791c25fa0939d61b3c4187a108b1ded1b1..cb64bdc8d21859b3ef866b8930be19ee0c8c8a93 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -271,7 +271,6 @@ debug_info_t *kvm_s390_dbf_uv;
- /* forward declarations */
- static void kvm_gmap_notifier(struct gmap *gmap, unsigned long start,
- 			      unsigned long end);
--static int sca_switch_to_extended(struct kvm *kvm);
- 
- static void kvm_clock_sync_scb(struct kvm_s390_sie_block *scb, u64 delta)
- {
-@@ -631,11 +630,13 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_NR_VCPUS:
- 	case KVM_CAP_MAX_VCPUS:
- 	case KVM_CAP_MAX_VCPU_ID:
--		r = KVM_S390_BSCA_CPU_SLOTS;
-+		/*
-+		 * Return the same value for KVM_CAP_MAX_VCPUS and
-+		 * KVM_CAP_MAX_VCPU_ID to conform with the KVM API.
-+		 */
-+		r = KVM_S390_ESCA_CPU_SLOTS;
- 		if (!kvm_s390_use_sca_entries())
- 			r = KVM_MAX_VCPUS;
--		else if (sclp.has_esca && sclp.has_64bscao)
--			r = KVM_S390_ESCA_CPU_SLOTS;
- 		if (ext == KVM_CAP_NR_VCPUS)
- 			r = min_t(unsigned int, num_online_cpus(), r);
- 		break;
-@@ -1930,13 +1931,11 @@ static int kvm_s390_get_cpu_model(struct kvm *kvm, struct kvm_device_attr *attr)
-  * Updates the Multiprocessor Topology-Change-Report bit to signal
-  * the guest with a topology change.
-  * This is only relevant if the topology facility is present.
-- *
-- * The SCA version, bsca or esca, doesn't matter as offset is the same.
-  */
- static void kvm_s390_update_topology_change_report(struct kvm *kvm, bool val)
- {
- 	union sca_utility new, old;
--	struct bsca_block *sca;
-+	struct esca_block *sca;
- 
- 	read_lock(&kvm->arch.sca_lock);
- 	sca = kvm->arch.sca;
-@@ -1967,7 +1966,7 @@ static int kvm_s390_get_topo_change_indication(struct kvm *kvm,
- 		return -ENXIO;
- 
- 	read_lock(&kvm->arch.sca_lock);
--	topo = ((struct bsca_block *)kvm->arch.sca)->utility.mtcr;
-+	topo = kvm->arch.sca->utility.mtcr;
- 	read_unlock(&kvm->arch.sca_lock);
- 
- 	return put_user(topo, (u8 __user *)attr->addr);
-@@ -2666,14 +2665,6 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
- 		if (kvm_s390_pv_is_protected(kvm))
- 			break;
- 
--		/*
--		 *  FMT 4 SIE needs esca. As we never switch back to bsca from
--		 *  esca, we need no cleanup in the error cases below
--		 */
--		r = sca_switch_to_extended(kvm);
--		if (r)
--			break;
--
- 		mmap_write_lock(kvm->mm);
- 		r = gmap_helper_disable_cow_sharing();
- 		mmap_write_unlock(kvm->mm);
-@@ -3316,10 +3307,7 @@ static void kvm_s390_crypto_init(struct kvm *kvm)
- 
- static void sca_dispose(struct kvm *kvm)
- {
--	if (kvm->arch.use_esca)
--		free_pages_exact(kvm->arch.sca, sizeof(struct esca_block));
--	else
--		free_page((unsigned long)(kvm->arch.sca));
-+	free_pages_exact(kvm->arch.sca, sizeof(*kvm->arch.sca));
- 	kvm->arch.sca = NULL;
- }
- 
-@@ -3333,10 +3321,9 @@ void kvm_arch_free_vm(struct kvm *kvm)
- 
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
--	gfp_t alloc_flags = GFP_KERNEL_ACCOUNT;
--	int i, rc;
-+	gfp_t alloc_flags = GFP_KERNEL_ACCOUNT | __GFP_ZERO;
- 	char debug_name[16];
--	static unsigned long sca_offset;
-+	int i, rc;
- 
- 	rc = -EINVAL;
- #ifdef CONFIG_KVM_S390_UCONTROL
-@@ -3358,17 +3345,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	if (!sclp.has_64bscao)
- 		alloc_flags |= GFP_DMA;
- 	rwlock_init(&kvm->arch.sca_lock);
--	/* start with basic SCA */
--	kvm->arch.sca = (struct bsca_block *) get_zeroed_page(alloc_flags);
--	if (!kvm->arch.sca)
--		goto out_err;
- 	mutex_lock(&kvm_lock);
--	sca_offset += 16;
--	if (sca_offset + sizeof(struct bsca_block) > PAGE_SIZE)
--		sca_offset = 0;
--	kvm->arch.sca = (struct bsca_block *)
--			((char *) kvm->arch.sca + sca_offset);
-+
-+	kvm->arch.sca = alloc_pages_exact(sizeof(*kvm->arch.sca), alloc_flags);
- 	mutex_unlock(&kvm_lock);
-+	if (!kvm->arch.sca)
-+		goto out_err;
- 
- 	sprintf(debug_name, "kvm-%u", current->pid);
- 
-@@ -3550,24 +3532,20 @@ static void sca_del_vcpu(struct kvm_vcpu *vcpu)
- 	if (!kvm_s390_use_sca_entries())
- 		return;
- 	read_lock(&vcpu->kvm->arch.sca_lock);
--	if (vcpu->kvm->arch.use_esca) {
--		struct esca_block *sca = vcpu->kvm->arch.sca;
-+	struct esca_block *sca = vcpu->kvm->arch.sca;
- 
--		clear_bit_inv(vcpu->vcpu_id, (unsigned long *) sca->mcn);
--		sca->cpu[vcpu->vcpu_id].sda = 0;
--	} else {
--		struct bsca_block *sca = vcpu->kvm->arch.sca;
--
--		clear_bit_inv(vcpu->vcpu_id, (unsigned long *) &sca->mcn);
--		sca->cpu[vcpu->vcpu_id].sda = 0;
--	}
-+	clear_bit_inv(vcpu->vcpu_id, (unsigned long *)sca->mcn);
-+	sca->cpu[vcpu->vcpu_id].sda = 0;
- 	read_unlock(&vcpu->kvm->arch.sca_lock);
- }
- 
- static void sca_add_vcpu(struct kvm_vcpu *vcpu)
- {
-+	struct esca_block *sca;
-+	phys_addr_t sca_phys;
-+
- 	if (!kvm_s390_use_sca_entries()) {
--		phys_addr_t sca_phys = virt_to_phys(vcpu->kvm->arch.sca);
-+		sca_phys = virt_to_phys(vcpu->kvm->arch.sca);
- 
- 		/* we still need the basic sca for the ipte control */
- 		vcpu->arch.sie_block->scaoh = sca_phys >> 32;
-@@ -3575,105 +3553,23 @@ static void sca_add_vcpu(struct kvm_vcpu *vcpu)
- 		return;
- 	}
- 	read_lock(&vcpu->kvm->arch.sca_lock);
--	if (vcpu->kvm->arch.use_esca) {
--		struct esca_block *sca = vcpu->kvm->arch.sca;
--		phys_addr_t sca_phys = virt_to_phys(sca);
--
--		sca->cpu[vcpu->vcpu_id].sda = virt_to_phys(vcpu->arch.sie_block);
--		vcpu->arch.sie_block->scaoh = sca_phys >> 32;
--		vcpu->arch.sie_block->scaol = sca_phys & ESCA_SCAOL_MASK;
--		vcpu->arch.sie_block->ecb2 |= ECB2_ESCA;
--		set_bit_inv(vcpu->vcpu_id, (unsigned long *) sca->mcn);
--	} else {
--		struct bsca_block *sca = vcpu->kvm->arch.sca;
--		phys_addr_t sca_phys = virt_to_phys(sca);
--
--		sca->cpu[vcpu->vcpu_id].sda = virt_to_phys(vcpu->arch.sie_block);
--		vcpu->arch.sie_block->scaoh = sca_phys >> 32;
--		vcpu->arch.sie_block->scaol = sca_phys;
--		set_bit_inv(vcpu->vcpu_id, (unsigned long *) &sca->mcn);
--	}
-+	sca = vcpu->kvm->arch.sca;
-+	sca_phys = virt_to_phys(sca);
-+
-+	sca->cpu[vcpu->vcpu_id].sda = virt_to_phys(vcpu->arch.sie_block);
-+	vcpu->arch.sie_block->scaoh = sca_phys >> 32;
-+	vcpu->arch.sie_block->scaol = sca_phys & ESCA_SCAOL_MASK;
-+	vcpu->arch.sie_block->ecb2 |= ECB2_ESCA;
-+	set_bit_inv(vcpu->vcpu_id, (unsigned long *)sca->mcn);
- 	read_unlock(&vcpu->kvm->arch.sca_lock);
- }
- 
--/* Basic SCA to Extended SCA data copy routines */
--static inline void sca_copy_entry(struct esca_entry *d, struct bsca_entry *s)
--{
--	d->sda = s->sda;
--	d->sigp_ctrl.c = s->sigp_ctrl.c;
--	d->sigp_ctrl.scn = s->sigp_ctrl.scn;
--}
--
--static void sca_copy_b_to_e(struct esca_block *d, struct bsca_block *s)
--{
--	int i;
--
--	d->ipte_control = s->ipte_control;
--	d->mcn[0] = s->mcn;
--	for (i = 0; i < KVM_S390_BSCA_CPU_SLOTS; i++)
--		sca_copy_entry(&d->cpu[i], &s->cpu[i]);
--}
--
--static int sca_switch_to_extended(struct kvm *kvm)
--{
--	struct bsca_block *old_sca = kvm->arch.sca;
--	struct esca_block *new_sca;
--	struct kvm_vcpu *vcpu;
--	unsigned long vcpu_idx;
--	u32 scaol, scaoh;
--	phys_addr_t new_sca_phys;
--
--	if (kvm->arch.use_esca)
--		return 0;
--
--	new_sca = alloc_pages_exact(sizeof(*new_sca), GFP_KERNEL_ACCOUNT | __GFP_ZERO);
--	if (!new_sca)
--		return -ENOMEM;
--
--	new_sca_phys = virt_to_phys(new_sca);
--	scaoh = new_sca_phys >> 32;
--	scaol = new_sca_phys & ESCA_SCAOL_MASK;
--
--	kvm_s390_vcpu_block_all(kvm);
--	write_lock(&kvm->arch.sca_lock);
--
--	sca_copy_b_to_e(new_sca, old_sca);
--
--	kvm_for_each_vcpu(vcpu_idx, vcpu, kvm) {
--		vcpu->arch.sie_block->scaoh = scaoh;
--		vcpu->arch.sie_block->scaol = scaol;
--		vcpu->arch.sie_block->ecb2 |= ECB2_ESCA;
--	}
--	kvm->arch.sca = new_sca;
--	kvm->arch.use_esca = 1;
--
--	write_unlock(&kvm->arch.sca_lock);
--	kvm_s390_vcpu_unblock_all(kvm);
--
--	free_page((unsigned long)old_sca);
--
--	VM_EVENT(kvm, 2, "Switched to ESCA (0x%p -> 0x%p)",
--		 old_sca, kvm->arch.sca);
--	return 0;
--}
--
- static int sca_can_add_vcpu(struct kvm *kvm, unsigned int id)
- {
--	int rc;
--
--	if (!kvm_s390_use_sca_entries()) {
--		if (id < KVM_MAX_VCPUS)
--			return true;
--		return false;
--	}
--	if (id < KVM_S390_BSCA_CPU_SLOTS)
--		return true;
--	if (!sclp.has_esca || !sclp.has_64bscao)
--		return false;
--
--	rc = kvm->arch.use_esca ? 0 : sca_switch_to_extended(kvm);
-+	if (!kvm_s390_use_sca_entries())
-+		return id < KVM_MAX_VCPUS;
- 
--	return rc == 0 && id < KVM_S390_ESCA_CPU_SLOTS;
-+	return id < KVM_S390_ESCA_CPU_SLOTS;
- }
- 
- /* needs disabled preemption to protect from TOD sync and vcpu_load/put */
-@@ -3919,7 +3815,7 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
- 		vcpu->arch.sie_block->eca |= ECA_IB;
- 	if (sclp.has_siif)
- 		vcpu->arch.sie_block->eca |= ECA_SII;
--	if (sclp.has_sigpif)
-+	if (kvm_s390_use_sca_entries())
- 		vcpu->arch.sie_block->eca |= ECA_SIGPI;
- 	if (test_kvm_facility(vcpu->kvm, 129)) {
- 		vcpu->arch.sie_block->eca |= ECA_VX;
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index c44fe0c3a097cf12af23fa2293411110d957e136..65c950760993467398b68f3763d6f81f52c52385 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -570,13 +570,6 @@ void kvm_s390_prepare_debug_exit(struct kvm_vcpu *vcpu);
- int kvm_s390_handle_per_ifetch_icpt(struct kvm_vcpu *vcpu);
- int kvm_s390_handle_per_event(struct kvm_vcpu *vcpu);
- 
--/* support for Basic/Extended SCA handling */
--static inline union ipte_control *kvm_s390_get_ipte_control(struct kvm *kvm)
--{
--	struct bsca_block *sca = kvm->arch.sca; /* SCA version doesn't matter */
--
--	return &sca->ipte_control;
--}
- static inline int kvm_s390_use_sca_entries(void)
- {
- 	/*
-@@ -584,7 +577,7 @@ static inline int kvm_s390_use_sca_entries(void)
- 	 * might use the entries. By not setting the entries and keeping them
- 	 * invalid, hardware will not access them but intercept.
- 	 */
--	return sclp.has_sigpif;
-+	return sclp.has_sigpif && sclp.has_esca;
- }
- void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
- 				     struct mcck_volatile_info *mcck_info);
-
----
-base-commit: ec7714e4947909190ffb3041a03311a975350fe0
-change-id: 20250513-rm-bsca-ab1e8649aca7
-
-Best regards,
--- 
-Christoph Schlameuss <schlameuss@linux.ibm.com>
+Jason
 
 
