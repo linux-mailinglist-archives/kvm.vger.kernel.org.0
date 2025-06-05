@@ -1,131 +1,195 @@
-Return-Path: <kvm+bounces-48565-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48566-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FEF6ACF47F
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 18:39:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1277CACF525
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 19:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0E961891EBC
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 16:39:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B48A188F53A
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 17:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE8A274FD4;
-	Thu,  5 Jun 2025 16:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B875727A44D;
+	Thu,  5 Jun 2025 17:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xMaBO2hv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3EKTus+i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B247274FC1
-	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 16:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E28B279915
+	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 17:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749141562; cv=none; b=s7xP9e6uJyyKbXbI7OlRUr8Nz/iY9xtdcXtVo6acOLioRYpMZXBgPyIOB73qW6DwHykZ8JXIdpUX8kQHAWRPa1JlFxwqiXX5T3jnov0KenxtQ+pTmr7Ih8olczjFNd+XlnnrvJKc5s8ktqv35usRJp/d5P6odoX6WUSR62Wk+eo=
+	t=1749143756; cv=none; b=P3s/HufyPiOXl3+QE0r7Z72gw37QsIoA0X9Q2/AwsurUvwqLvXbtgYH8kZsgZPkHh5/r/X1qYma3Iei+0knvaqOtxxar5/g/JPwEseZJbdXeczvDQCwedVa518H4egKHtIgsARXoTKoXZ4Lxz3/AZaXfz4PqzxtrrXF4DV6nk9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749141562; c=relaxed/simple;
-	bh=H1YPp6+o+p2q7dIafkj50JICd7zLoaIKYOyffRXuexQ=;
+	s=arc-20240116; t=1749143756; c=relaxed/simple;
+	bh=owWI8WAYAlFsjJvXIyvYSUNXCshP/5FGhM730a1ama8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ImoIfCWyjHrdOkyN8EwCqtolCi3R58mAeczBV/MKDNYLqjEQaWw2oZyg5AyhXmBl8nhY9D5+7PjYJ7s5shk/II9e94L+E9mKG4ZhC5qr6N/P7m3o2LRCSqhOQtP5x5IF2D0g6qNlKF7T3DvsdIVkoJ0EFvCd9sLIEQcK9LIxFVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xMaBO2hv; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=k1ztKct3FegC5HQ+hdUFZ2wVShjxejK6yHtKIs6EY7CL8tMBfvjWpIXF9WgLPXV2n076u6pUoZu/fzzkEAE37qbQn5yTxbdnRysyD2TzOah9itIHEGK4iv8V+eRleLRdQ6xL4C1Pfc/XHEUMqdTiBq6fUcqwbw0qcPrUTm0a8J4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3EKTus+i; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311fa374c2fso1938742a91.2
-        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 09:39:20 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2355651d204so11451405ad.2
+        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 10:15:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749141560; x=1749746360; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749143754; x=1749748554; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RLHLJ72ZskhzqHD5wQqoMHh6pl0NfS3wNoq8ri0R1wo=;
-        b=xMaBO2hv+9j/r5I4E+Sgxb4MvmXBE7t0MX8IjJiuC4Hd/Bh8Qniz0nFS7u0fjlp9pY
-         HoppUpb9NPJEjQH5M89QYLXHxbsrwLLQpbce0kUfiNSXLz1UEt2Kab1nlI0FyFrYODMz
-         EahrxdpEUnFF/L4+6HzSoZ92NNCieakk5YC+hWkE2ehrLOvXz53cFNL3r987HKoo274b
-         VF7nvmjhpognsEkDjLx7CnuYQ9QmgicHvGsetOYyJsO3SYsM2V4+69lSgF7qpfzk15K3
-         4lu7ciXiidf+baqAgzynEkvOND6a0CatG4T3MfpRsQkjXieu9YpBBsAOHHVbmchNFx9j
-         Up1Q==
+        bh=1BvVogHbLCy3WniKJnzNXayCUjBrxVyVRH9sGv66360=;
+        b=3EKTus+i1JnDucVaMhuTSgXD7YTZOibnmejXlIOOreTNijnvHMFMpLZ+QXQaKgmOlb
+         Aa1iZLcPCb9NYfLfPBS5n1j1kWSoNJeZ+YNqT2aQPyLMQWTMtdKSdSAxFZ69ikGqGwfO
+         QWmYh2jfBFZ8XHJI3l/kGLIrkanWDsGj3lcQHgqbBX6pygK1DlD7M7k6cEZNI3EylxkJ
+         1y8N14mzr4i2tZZ3S5uIjesIE5o53ivwxnNX5dFuVo/L44iM5qiPEIvIYA2poMjsYr0r
+         D81tlq6B+xcUmFB497C5RFSw7cC8sBNlvDo2tCqCGAT+cLT/jSSF6yRAgA2QAltRvq8h
+         4E7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749141560; x=1749746360;
+        d=1e100.net; s=20230601; t=1749143754; x=1749748554;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RLHLJ72ZskhzqHD5wQqoMHh6pl0NfS3wNoq8ri0R1wo=;
-        b=qmDGQI0HjxbmIbokIm+6QRPCnJ4NVOylBXxqHshj1MJLCKkNUPvLa5uguSOSHRyEv4
-         kPQzqqs7knSi5L3B8eMp3Il9+hXIFMAYRlF0y1UXEDD4hOwfUXIO9jcDfsMSOgmMPqq9
-         1EAyuR5Dsxg2G1kaQHJ4qpSx5LVW1RTTfpubG2qs2HkOb6C25pQbAo2j2wuUnTaB9RFf
-         RguKNIN0ZBf7CAXWVNVGLe8S97zQ0HNo4kSd/nJPg81ENcObRkMFkfSZ2oPX+QynUak7
-         l0ZW5Vv3gYCqnD0melDqWTQkzpFwI75Drc6kQw9jVPTdfykdIBg93lNQATbrkA0h8ez8
-         0m/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUT/uyxoQlkojTBiod1ZQGaxvMxzDD+Pyw2yXBDm9m8Hl7oWhqpbZ6+7GV9kH2JuBcltzg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxOFKdHaOYL4eUZQAigfex4uoiKatnKjvoEz7hfdOcyqQaHlXD
-	b4kUkXxVe/46TpF4XXUDkNOZD8RReW+vljfZJJEZ8czT/H32Eta5rHzwNVhes720yTfgZHz2/9v
-	06fKOSQ==
-X-Google-Smtp-Source: AGHT+IFvFrLqHR1ghrQGa/UNDi1qRfKtC9i6a3FVhMJPpt61M52gk1rUWTLvFny4IIdNm62PLyCcaiVBrlM=
-X-Received: from pjbqb9.prod.google.com ([2002:a17:90b:2809:b0:2ef:d283:5089])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f8c:b0:311:df4b:4b81
- with SMTP id 98e67ed59e1d1-313470578eamr495536a91.25.1749141559893; Thu, 05
- Jun 2025 09:39:19 -0700 (PDT)
-Date: Thu, 5 Jun 2025 09:39:18 -0700
-In-Reply-To: <aEE4BEHAHdhNTGoG@intel.com>
+        bh=1BvVogHbLCy3WniKJnzNXayCUjBrxVyVRH9sGv66360=;
+        b=RJOXWtuOpEpe2vwXQyLOjAfc9qFOBBnj98z9wzsh4JOr8myJu7Mr/giY3PGD7vLqk8
+         0ZbSBkrBJPh1eujk/Wp6OeHBJ89LUpOCVVJCdFvi9wHt7mA2EvBFZsCzFlKHOs4y8rcB
+         eHpg01QwnofUQFCjKRA+cc0NQzzMojkhzx/cgFS0WQbYvPLXMQje9S6Y/VtXGfNDTA9L
+         t5swRgde9VpusYvt8rYQZhwMkPTLcn6rpuvMsN1aeaJepfhY5WBRNLbfuFpjCU9fEGQF
+         4mUoq8bNbkmV7ZuXkvnN6ZAkSrN1iq9eTOOqeqMVGNoI8F8ZW33DRfqImWMLwELFfTjv
+         pCAw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/Ircccqy56+qk6pi/CLQ3rsSBBsucUb1TCFU5I3nZhuD/Go7dTELFDi6YjawZVXRJyEk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8O62W2XXmwzsMl0ax2zoMRUbm572rMB89Qjk+w2Rk7E+tG1JK
+	xE64kEP09SMR9/iIW7vArvfEYiShbNnlFdqaUYe8ysbMEVOQppJwQAx3U5v7FZ0QCIWuAFLUdGm
+	lY3ySgbYjFIXgvp8dwyL3l4NgXQ==
+X-Google-Smtp-Source: AGHT+IEW234xG8sWokLR9Rty6k1AIBgtp49T5P85K9mc9H7ZjXy7xEQDhgc08MioADyUz2CbmUlZakt/hY882gqV/g==
+X-Received: from plsh2.prod.google.com ([2002:a17:902:b942:b0:234:f137:75cf])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:902:dad0:b0:234:c5c1:9b73 with SMTP id d9443c01a7336-23601ec356fmr1418295ad.36.1749143754410;
+ Thu, 05 Jun 2025 10:15:54 -0700 (PDT)
+Date: Thu, 05 Jun 2025 10:15:53 -0700
+In-Reply-To: <85ae7dc691c86a1ae78d56d413a1b13b444b57cd.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250529234013.3826933-1-seanjc@google.com> <20250529234013.3826933-18-seanjc@google.com>
- <aEE4BEHAHdhNTGoG@intel.com>
-Message-ID: <aEHINux8hnYC6HC7@google.com>
-Subject: Re: [PATCH 17/28] KVM: SVM: Manually recalc all MSR intercepts on
- userspace MSR filter change
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Borislav Petkov <bp@alien8.de>, Xin Li <xin@zytor.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+References: <cover.1747264138.git.ackerleytng@google.com> <7753dc66229663fecea2498cf442a768cb7191ba.1747264138.git.ackerleytng@google.com>
+ <85ae7dc691c86a1ae78d56d413a1b13b444b57cd.camel@intel.com>
+Message-ID: <diqz7c1qjeie.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v2 38/51] KVM: guest_memfd: Split allocator pages for
+ guest_memfd use
+From: Ackerley Tng <ackerleytng@google.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>
+Cc: "palmer@dabbelt.com" <palmer@dabbelt.com>, "pvorel@suse.cz" <pvorel@suse.cz>, 
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "Miao, Jun" <jun.miao@intel.com>, 
+	"Shutemov, Kirill" <kirill.shutemov@intel.com>, "pdurrant@amazon.co.uk" <pdurrant@amazon.co.uk>, 
+	"steven.price@arm.com" <steven.price@arm.com>, "peterx@redhat.com" <peterx@redhat.com>, 
+	"vbabka@suse.cz" <vbabka@suse.cz>, "jack@suse.cz" <jack@suse.cz>, 
+	"amoorthy@google.com" <amoorthy@google.com>, "maz@kernel.org" <maz@kernel.org>, 
+	"keirf@google.com" <keirf@google.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
+	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, 
+	"mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>, "hughd@google.com" <hughd@google.com>, 
+	"anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>, "Wang, Wei W" <wei.w.wang@intel.com>, 
+	"Du, Fan" <fan.du@intel.com>, 
+	"Wieczor-Retman, Maciej" <maciej.wieczor-retman@intel.com>, 
+	"quic_svaddagi@quicinc.com" <quic_svaddagi@quicinc.com>, "Hansen, Dave" <dave.hansen@intel.com>, 
+	"ajones@ventanamicro.com" <ajones@ventanamicro.com>, 
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>, "nsaenz@amazon.es" <nsaenz@amazon.es>, "aik@amd.com" <aik@amd.com>, 
+	"usama.arif@bytedance.com" <usama.arif@bytedance.com>, 
+	"quic_mnalajal@quicinc.com" <quic_mnalajal@quicinc.com>, "fvdl@google.com" <fvdl@google.com>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "quic_cvanscha@quicinc.com" <quic_cvanscha@quicinc.com>, 
+	"bfoster@redhat.com" <bfoster@redhat.com>, "willy@infradead.org" <willy@infradead.org>, 
+	"anup@brainfault.org" <anup@brainfault.org>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
+	"tabba@google.com" <tabba@google.com>, "mic@digikod.net" <mic@digikod.net>, 
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "muchun.song@linux.dev" <muchun.song@linux.dev>, 
+	"Li, Zhiquan1" <zhiquan1.li@intel.com>, "rientjes@google.com" <rientjes@google.com>, 
+	"mpe@ellerman.id.au" <mpe@ellerman.id.au>, "Aktas, Erdem" <erdemaktas@google.com>, 
+	"david@redhat.com" <david@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"Annapurve, Vishal" <vannapurve@google.com>, "Xu, Haibo1" <haibo1.xu@intel.com>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
+	"jthoughton@google.com" <jthoughton@google.com>, "will@kernel.org" <will@kernel.org>, 
+	"steven.sistare@oracle.com" <steven.sistare@oracle.com>, "jarkko@kernel.org" <jarkko@kernel.org>, 
+	"quic_pheragu@quicinc.com" <quic_pheragu@quicinc.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
+	"Huang, Kai" <kai.huang@intel.com>, "shuah@kernel.org" <shuah@kernel.org>, 
+	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "pankaj.gupta@amd.com" <pankaj.gupta@amd.com>, 
+	"Peng, Chao P" <chao.p.peng@intel.com>, "nikunj@amd.com" <nikunj@amd.com>, 
+	"Graf, Alexander" <graf@amazon.com>, "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"jroedel@suse.de" <jroedel@suse.de>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"jgowans@amazon.com" <jgowans@amazon.com>, "Xu, Yilun" <yilun.xu@intel.com>, 
+	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	"quic_tsoni@quicinc.com" <quic_tsoni@quicinc.com>, 
+	"richard.weiyang@gmail.com" <richard.weiyang@gmail.com>, "Weiny, Ira" <ira.weiny@intel.com>, 
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
+	"qperret@google.com" <qperret@google.com>, 
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>, "dmatlack@google.com" <dmatlack@google.com>, 
+	"james.morse@arm.com" <james.morse@arm.com>, "brauner@kernel.org" <brauner@kernel.org>, 
+	"pgonda@google.com" <pgonda@google.com>, "quic_pderrin@quicinc.com" <quic_pderrin@quicinc.com>, 
+	"hch@infradead.org" <hch@infradead.org>, "roypat@amazon.co.uk" <roypat@amazon.co.uk>, 
+	"seanjc@google.com" <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 05, 2025, Chao Gao wrote:
-> >+static void svm_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
-> >+{
-> >+	struct vcpu_svm *svm = to_svm(vcpu);
-> >+
-> >+	svm_vcpu_init_msrpm(vcpu);
-> >+
-> >+	if (lbrv)
-> >+		svm_recalc_lbr_msr_intercepts(vcpu);
-> >+
-> >+	if (boot_cpu_has(X86_FEATURE_IBPB))
-> >+		svm_set_intercept_for_msr(vcpu, MSR_IA32_PRED_CMD, MSR_TYPE_W,
-> >+					  !guest_has_pred_cmd_msr(vcpu));
-> >+
-> >+	if (boot_cpu_has(X86_FEATURE_FLUSH_L1D))
-> >+		svm_set_intercept_for_msr(vcpu, MSR_IA32_FLUSH_CMD, MSR_TYPE_W,
-> >+					  !guest_cpu_cap_has(vcpu, X86_FEATURE_FLUSH_L1D));
-> >+
-> >+	/*
-> >+	 * Unconditionally disable interception of SPEC_CTRL if V_SPEC_CTRL is
-> >+	 * supported, i.e. if VMRUN/#VMEXIT context switch MSR_IA32_SPEC_CTRL.
-> >+	 */
+"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> writes:
 
-Tangentially related, the comment above isn't quite correct.  MSR_IA32_SPEC_CTRL
-isn't purely context switched, the CPU merges together host and guest values.
-Same end result though: KVM doesn't need to manually context switch the MSR.
+> On Wed, 2025-05-14 at 16:42 -0700, Ackerley Tng wrote:
+>> +
+>> +static pgoff_t kvm_gmem_compute_invalidate_bound(struct inode *inode,
+>> +						 pgoff_t bound, bool start)
+>> +{
+>> +	size_t nr_pages;
+>> +	void *priv;
+>> +
+>> +	if (!kvm_gmem_has_custom_allocator(inode))
+>
+> General comment - It's a bit unfortunate how kvm_gmem_has_custom_allocator() is
+> checked all over the place across this series. There are only two allocators
+> after this, right? So one is implemented with callbacks presumably designed to
+> fit other allocators, and one has special case logic in guest_memfd.c.
+>
+> Did you consider designing struct guestmem_allocator_operations so that it could
+> encapsulate the special logic for both the existing and new
+> allocators?
 
-> >+	if (boot_cpu_has(X86_FEATURE_V_SPEC_CTRL))
-> >+		svm_disable_intercept_for_msr(vcpu, MSR_IA32_SPEC_CTRL, MSR_TYPE_RW);
-> 
-> I think there is a bug in the original code. KVM should inject #GP when guests
-> try to access unsupported MSRs. Specifically, a guest w/o spec_ctrl support
-> should get #GP when it tries to access the MSR regardless of V_SPEC_CTRL
-> support on the host.
-> 
-> So, here should be 
-> 
-> 	if (boot_cpu_has(X86_FEATURE_V_SPEC_CTRL))
-> 		svm_set_intercept_for_msr(vcpu, MSR_IA32_SPEC_CTRL, MSR_TYPE_RW,
-> 					  !guest_has_spec_ctrl_msr(vcpu));
+I did, yes. I believe it is definitely possible to make standard 4K
+pages become another allocator too.
 
-Right you are!  I'll slot in a patch earlier in the series, and then it'll end up
-looking like this.
+I would love to clean this up. Not sure if that will be a new series
+after this one, or part of this one though.
 
-I'll also post a KUT testcase.
+> If it
+> didn't work well, could we expect that a next allocator would actually fit
+> struct guestmem_allocator_operations?
+>
+
+This was definitely designed to support allocators beyond
+guestmem_hugetlb, though I won't promise that it will be a perfect fit
+for future allocators. This is internal to the kernel and this interface
+can be updated for future allocators though.
+
+>> +		return bound;
+>> +
+>> +	priv = kvm_gmem_allocator_private(inode);
+>> +	nr_pages = kvm_gmem_allocator_ops(inode)->nr_pages_in_folio(priv);
+>> +
+>> +	if (start)
+>> +		return round_down(bound, nr_pages);
+>> +	else
+>> +		return round_up(bound, nr_pages);
+>> +}
+>> +
+>> +static pgoff_t kvm_gmem_compute_invalidate_start(struct inode *inode,
+>> +						 pgoff_t bound)
+>> +{
+>> +	return kvm_gmem_compute_invalidate_bound(inode, bound, true);
+>> +}
+>> +
+>> +static pgoff_t kvm_gmem_compute_invalidate_end(struct inode *inode,
+>> +					       pgoff_t bound)
+>> +{
+>> +	return kvm_gmem_compute_invalidate_bound(inode, bound, false);
+>> +}
+>> +
 
