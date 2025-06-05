@@ -1,249 +1,209 @@
-Return-Path: <kvm+bounces-48614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 624C3ACF9BA
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 00:36:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92C03ACF9CF
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 00:45:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA6C17A88D9
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 22:34:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE4613AD851
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 22:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2672A27FD43;
-	Thu,  5 Jun 2025 22:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86C427FB3F;
+	Thu,  5 Jun 2025 22:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MYBBilFv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HPfmmRSr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B985415747D
-	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 22:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F07027CCF3
+	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 22:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749162954; cv=none; b=OY0CVo1qU91QxD4+Bng6t1NocpR6/i8Cb9cfFuweLapX06aOYenyoC8eTvPVTyP07zseHAQnKVbRNIAm6t4sH32Lmjh2Im7SLJirjJMfAljkW+2Pr6uNZiSXurefveM/ytoB05k3xB4oVicStagKfwsEGixwwY7RsRkGj5Usu/U=
+	t=1749163529; cv=none; b=elpES4Rrs7fqhBs4L6DS/mnd6NhlNy2In+2EyRHe9rNmR89TBR+GlY7LTOsTd9QE4+CwVBygr0nV3XsHSdknZ43YYyXi2I4JHTV8Jlv5QaJbVqx4zItlG96BzoFTkqgEwmmGPxi+5Q3H/27Er0QDbDpTi5CCwWEavy7yBfKddRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749162954; c=relaxed/simple;
-	bh=ZvnpnSmG+oC7aGXomrAbDIbTgw/N5uw94jdE1VzTMQo=;
+	s=arc-20240116; t=1749163529; c=relaxed/simple;
+	bh=6YuAfwZQJjuClEHEe0uU4Jv+uNSJ56oYiKv6H3ihh0M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=giCOerxFUvQKb2qTZXkeDv8IjcgGI/LDjKzdDdg9vMCGFYo6H/eD23OhlWy28esKCkk3yF0UoKVMGVAmhYl1Z4T2AXZ92u8AuVmQP9fvMwWOfnHi5B7qL0+bECy2bzddDWrNrUM9X5iymwSVOmC7/GeuGsXhe+FeL9NFZvKbtSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MYBBilFv; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=BXcjiosEYc7iyS7yfeP4JOui3Wi7TkUcMakbP5w6LEg73T/4wkr6UdjGcsx5dOE59DDlX4Vt4yLVCTjJFh+8VVPXzl1WwB9zBNHx27CM1YyNHaqJprQENHjndWNa6HaNBu5mHon42PlJ8wzhjeWKBLdfhqA/DWD+QMRgMkBZEmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HPfmmRSr; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-234fedd3e51so13909635ad.1
-        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 15:35:52 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-234aceaf591so9779365ad.1
+        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 15:45:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749162952; x=1749767752; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749163527; x=1749768327; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9TxNW5dV0RBRL9s3nKbXzPx5whc6jarKAXvdKWRe0X0=;
-        b=MYBBilFvTa8Fu2nhzOQmRtpD3hU6MH1XYZ0+zuBmUcflbiZPObkpNzi7wcT+J87syp
-         kx80IH/vDWb/mEp6FcSDjRO4pbQXrapsKH+bOQicHElnqgacaNa1Evpk+lseOa3ufeJV
-         vaAekD/7MEYd6o3QJe5JhrHNpPG7DV2EhqQWS9UIk1JIE/mSuKS7lS7nAY5jMAnwKTVL
-         QhLmo/qLygGYZE/0AMH0LlzuvBKg088kFk7F7rpQvGleZJZr9JSr/H6/AEcX8hknKruC
-         SpaoVdJBnQ3jWW3tdRXrho1SaEpUJM1vzIKeV8WMwSM0WLHR+nDCiCEeKM5AhFPNHfwm
-         YrMA==
+        bh=ugvQvrQ0LdnzKH+hQvM3dsEHBtBiigm9XRnIEkv/Xbo=;
+        b=HPfmmRSrBV9p4Y+tg9QVvq2mOBBeEpgkErqlYEGQh6hBQouAjtmTRXbhPgUZNLDoPz
+         dI9Oc7AzSxVBHljlSfQL+XobIt7bPhp1/KMJFuhESEKYu2brIKAX7Iv+u3ouLNoKkPSd
+         CI0L/I7Cl24y/Obhi6XcN4DFwQ7yGuSCgoq9B+MZgCwmXosWi/MQS+3dNxij1PHd51HU
+         49+Q94dv8Lx0ewVzXipQbiIq2H3j5zBomWju6z0k2xkaLqQ22670T1NNQwb56DbcqNeM
+         VsucFXDNztFJ0ECbYyUFa6WA5wHnXMFqmmruO4FvGH/2PiSi9v3LXr2K4afRDHNv2v57
+         yygA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749162952; x=1749767752;
+        d=1e100.net; s=20230601; t=1749163527; x=1749768327;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9TxNW5dV0RBRL9s3nKbXzPx5whc6jarKAXvdKWRe0X0=;
-        b=ML0TmvYgMv+Hh9z5bJkHTPIVgf/am0FaV1OAJXk6Kg7+08fTel4kMnUk6BdtUeHZIf
-         80BDx3Qb5DRsO5NU7aWrvrG1KuoyJZrGfDT8KLTVpRYpXf0diujzYgEMTdM2wGthQIXG
-         Mt7vHl1pCv4I6uiMaEwdpZh3URTAGvb8F+rIgzjHyUqCRo1hlFLDl04xuV9jqJ8PWACh
-         nbTu6bD00tnEdzJRCKnRTdFfUxNhMxbfb1zsd6LAvtQPW55z3G8ZK7COKeYM0vhkaY7r
-         xwJj2EJujlmcmhe5isz24wxQBRRf+K0HaKOb/l2qmVdVVtikV4imRz3/sOS6Jyr6Ky/f
-         hJKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0CEKZeWcpFQQVMHE6hckx4gMgjcWaNDAKwTiU4BtShO2/qPKpBe98YfhQ2Xjwr2BOIY8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBZqUxSo1SQ08Pyt3mMY50VrN1d+TUO5ENUq68L6oaLWkp3e3Q
-	gAM2iWSsG2KdN2pQBWKd085N60j3uJeoBVCMSQjWtnNCzTZbTMVpL6RaeXK4EAfCuTztwAZrxZI
-	MBKUxPP3cvdHldVMtxn0/G4jUpg==
-X-Google-Smtp-Source: AGHT+IGlG5GJ1HWNqo+cjnvtR5V5f1+eVyk1XUgcOxIutpy7rwoGgHN0Md/IxRkLf4knx+Y7AQXHsdQ9oJBjT22yCg==
-X-Received: from plbba6.prod.google.com ([2002:a17:902:7206:b0:234:a0aa:5b34])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:228e:b0:235:1962:1c13 with SMTP id d9443c01a7336-23601d01c97mr14211395ad.14.1749162952062;
- Thu, 05 Jun 2025 15:35:52 -0700 (PDT)
-Date: Thu, 05 Jun 2025 15:35:50 -0700
-In-Reply-To: <aEEFRXF+HrZVh5He@yzhao56-desk.sh.intel.com>
+        bh=ugvQvrQ0LdnzKH+hQvM3dsEHBtBiigm9XRnIEkv/Xbo=;
+        b=OV1q86iv1EWFpwF2Of5BpMJM27fFWxn9dQn9CIQKF/ribO3QDSRCSTpdy1rx3Ig8cG
+         CJ1ydRopjnUR774Ir8U7q2e47bWTZulT+Sub2G+ILSXj8CWcO5x8rWjo7VfkSVt3VjuV
+         OOF89tzQm7BLJq9a6Of8kloI8rWxS+kQG0CNwGqZpq5f9e9e4UkoEBlZ338rqQEjFGyW
+         9IPCRNQ2eB0ojWCLPt/OmBo1WA9c5+yNYd+pOX/1ctU8YnooAFncXWPp3GZJMj+XyvTV
+         LnSF5Q7sV4rCBls1pBRvYUrxTk8QiyDPzpGakAieaGX1aapmc9Ob6xTBHr2K5DaKjtP+
+         yLfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWMzn1k5S57d13lS8kY7+FZLorrVAZp4jBJTKDGH/vBtcc0H8DAgOcR+4H+KdsxtGdhmtg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjhhBs73QM4LW1yv893GEXI927Ay3ImKYPJ04gNxKEsHMtGNXk
+	Oy3kXOaRxEqzDZPAe0ejLfX5/2Qnc+s3oCTy2hlvP1w1GHOWRZ7SlO3oxTQ/3rDpJFqUmOO5qCD
+	tD6xCGA==
+X-Google-Smtp-Source: AGHT+IF4XA/cekiM7zz30QoLBWk54GmCCOInuS1IOF6zdOMi/h4d856on0mJoA5XVDm65MtEqJtNKw45MiM=
+X-Received: from pjbqo14.prod.google.com ([2002:a17:90b:3dce:b0:2ff:84e6:b2bd])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce82:b0:234:bc4e:4eb4
+ with SMTP id d9443c01a7336-23601dec370mr11746275ad.51.1749163526816; Thu, 05
+ Jun 2025 15:45:26 -0700 (PDT)
+Date: Thu, 5 Jun 2025 15:45:25 -0700
+In-Reply-To: <20250401161106.790710-8-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <aCVZIuBHx51o7Pbl@yzhao56-desk.sh.intel.com> <diqzfrgfp95d.fsf@ackerleytng-ctop.c.googlers.com>
- <aEEFRXF+HrZVh5He@yzhao56-desk.sh.intel.com>
-Message-ID: <diqzecvxizp5.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: vannapurve@google.com, pbonzini@redhat.com, seanjc@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
-	rick.p.edgecombe@intel.com, dave.hansen@intel.com, kirill.shutemov@intel.com, 
-	tabba@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
-	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
-	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
-	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
-	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
+References: <20250401161106.790710-1-pbonzini@redhat.com> <20250401161106.790710-8-pbonzini@redhat.com>
+Message-ID: <aEIeBU72WBWnlZdZ@google.com>
+Subject: Re: [PATCH 07/29] KVM: do not use online_vcpus to test vCPU validity
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, roy.hopkins@suse.com, 
+	thomas.lendacky@amd.com, ashish.kalra@amd.com, michael.roth@amd.com, 
+	jroedel@suse.de, nsaenz@amazon.com, anelkz@amazon.de, 
+	James.Bottomley@hansenpartnership.com
+Content-Type: text/plain; charset="us-ascii"
 
-Yan Zhao <yan.y.zhao@intel.com> writes:
+On Tue, Apr 01, 2025, Paolo Bonzini wrote:
+> Different planes can initialize their vCPUs separately, therefore there is
+> no single online_vcpus value that can be used to test that a vCPU has
+> indeed been fully initialized.
+> 
+> Use the shiny new plane field instead, initializing it to an invalid value
+> (-1) while the vCPU is visible in the xarray but may still disappear if
+> the creation fails.
 
-> On Wed, Jun 04, 2025 at 01:02:54PM -0700, Ackerley Tng wrote:
->> Hi Yan,
->> 
->> While working on the 1G (aka HugeTLB) page support for guest_memfd
->> series [1], we took into account conversion failures too. The steps are
->> in kvm_gmem_convert_range(). (It might be easier to pull the entire
->> series from GitHub [2] because the steps for conversion changed in two
->> separate patches.)
-> ...
->> [2] https://github.com/googleprodkernel/linux-cc/tree/gmem-1g-page-support-rfc-v2
->
-> Hi Ackerley,
-> Thanks for providing this branch.
+Checking vcpu->plane _in addition_ to online_cpus seems way safer than checking
+vcpu->plane _instead_ of online_cpus.  Even if we end up checking only vcpu->plane,
+I think that should be a separate patch.
 
-Here's the WIP branch [1], which I initially wasn't intending to make
-super public since it's not even RFC standard yet and I didn't want to
-add to the many guest_memfd in-flight series, but since you referred to
-it, [2] is a v2 of the WIP branch :)
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/i8254.c     |  3 ++-
+>  include/linux/kvm_host.h | 23 ++++++-----------------
+>  virt/kvm/kvm_main.c      | 20 +++++++++++++-------
+>  3 files changed, 21 insertions(+), 25 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+> index d7ab8780ab9e..e3a3e7b90c26 100644
+> --- a/arch/x86/kvm/i8254.c
+> +++ b/arch/x86/kvm/i8254.c
+> @@ -260,9 +260,10 @@ static void pit_do_work(struct kthread_work *work)
+>  	 * VCPUs and only when LVT0 is in NMI mode.  The interrupt can
+>  	 * also be simultaneously delivered through PIC and IOAPIC.
+>  	 */
+> -	if (atomic_read(&kvm->arch.vapics_in_nmi_mode) > 0)
+> +	if (atomic_read(&kvm->arch.vapics_in_nmi_mode) > 0) {
 
-[1] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept
-[2] https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept-v2
+Spurious change (a good change, but noisy for this patch).
 
-This WIP branch has selftests that test 1G aka HugeTLB page support with
-TDX huge page EPT mappings [7]:
+>  		kvm_for_each_vcpu(i, vcpu, kvm)
+>  			kvm_apic_nmi_wd_deliver(vcpu);
+> +	}
+>  }
+>  
+>  static enum hrtimer_restart pit_timer_fn(struct hrtimer *data)
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 4d408d1d5ccc..0db27814294f 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -992,27 +992,16 @@ static inline struct kvm_io_bus *kvm_get_bus(struct kvm *kvm, enum kvm_bus idx)
+>  
+>  static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
+>  {
+> -	int num_vcpus = atomic_read(&kvm->online_vcpus);
+> -
+> -	/*
+> -	 * Explicitly verify the target vCPU is online, as the anti-speculation
+> -	 * logic only limits the CPU's ability to speculate, e.g. given a "bad"
+> -	 * index, clamping the index to 0 would return vCPU0, not NULL.
+> -	 */
+> -	if (i >= num_vcpus)
+> +	struct kvm_vcpu *vcpu = xa_load(&kvm->vcpu_array, i);
 
-1. "KVM: selftests: TDX: Test conversion to private at different
-   sizes". This uses the fact that TDX module will return error if the
-   page is faulted into the guest at a different level from the accept
-   level to check the level that the page was faulted in.
-2. "KVM: selftests: Test TDs in private_mem_conversions_test". Updates
-   private_mem_conversions_test for use with TDs. This test does
-   multi-vCPU conversions and we use this to check for issues to do with
-   conversion races.
-3. "KVM: selftests: TDX: Test conversions when guest_memfd used for
-   private and shared memory". Adds a selftest similar to/on top of
-   guest_memfd_conversions_test that does conversions via MapGPA.
+newline
 
-Full list of selftests I usually run from tools/testing/selftests/kvm:
+> +	if (vcpu && unlikely(vcpu->plane == -1))
+>  		return NULL;
+>  
+> -	i = array_index_nospec(i, num_vcpus);
 
-+ ./guest_memfd_test
-+ ./guest_memfd_conversions_test
-+ ./guest_memfd_provide_hugetlb_cgroup_mount.sh ./guest_memfd_wrap_test_check_hugetlb_reporting.sh ./guest_memfd_test
-+ ./guest_memfd_provide_hugetlb_cgroup_mount.sh ./guest_memfd_wrap_test_check_hugetlb_reporting.sh ./guest_memfd_conversions_test
-+ ./guest_memfd_provide_hugetlb_cgroup_mount.sh ./guest_memfd_wrap_test_check_hugetlb_reporting.sh ./guest_memfd_hugetlb_reporting_test
-+ ./x86/private_mem_conversions_test.sh
-+ ./set_memory_region_test
-+ ./x86/private_mem_kvm_exits_test
-+ ./x86/tdx_vm_test
-+ ./x86/tdx_upm_test
-+ ./x86/tdx_shared_mem_test
-+ ./x86/tdx_gmem_private_and_shared_test
+Don't we still need to prevent speculating into the xarray ?
 
-As an overview for anyone who might be interested in this WIP branch:
+> -
+> -	/* Pairs with smp_wmb() in kvm_vm_ioctl_create_vcpu.  */
+> -	smp_rmb();
+> -	return xa_load(&kvm->vcpu_array, i);
+> +	return vcpu;
+>  }
+>  
+> -#define kvm_for_each_vcpu(idx, vcpup, kvm)				\
+> -	if (atomic_read(&kvm->online_vcpus))				\
+> -		xa_for_each_range(&kvm->vcpu_array, idx, vcpup, 0,	\
+> -				  (atomic_read(&kvm->online_vcpus) - 1))
+> +#define kvm_for_each_vcpu(idx, vcpup, kvm)			\
+> +	xa_for_each(&kvm->vcpu_array, idx, vcpup)		\
+> +		if ((vcpup)->plane == -1) ; else		\
+>  
+>  static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
+>  {
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index e343905e46d8..eba02cb7cc57 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4186,6 +4186,11 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+>  		goto unlock_vcpu_destroy;
+>  	}
+>  
+> +	/*
+> +	 * Store an invalid plane number until fully initialized.  xa_insert() has
+> +	 * release semantics, which ensures the write is visible to kvm_get_vcpu().
+> +	 */
+> +	vcpu->plane = -1;
+>  	vcpu->vcpu_idx = atomic_read(&kvm->online_vcpus);
+>  	r = xa_insert(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, GFP_KERNEL_ACCOUNT);
+>  	WARN_ON_ONCE(r == -EBUSY);
+> @@ -4195,7 +4200,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+>  	/*
+>  	 * Now it's all set up, let userspace reach it.  Grab the vCPU's mutex
+>  	 * so that userspace can't invoke vCPU ioctl()s until the vCPU is fully
+> -	 * visible (per online_vcpus), e.g. so that KVM doesn't get tricked
+> +	 * visible (valid vcpu->plane), e.g. so that KVM doesn't get tricked
+>  	 * into a NULL-pointer dereference because KVM thinks the _current_
+>  	 * vCPU doesn't exist.  As a bonus, taking vcpu->mutex ensures lockdep
+>  	 * knows it's taken *inside* kvm->lock.
+> @@ -4206,12 +4211,13 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+>  	if (r < 0)
+>  		goto kvm_put_xa_erase;
+>  
+> -	/*
+> -	 * Pairs with smp_rmb() in kvm_get_vcpu.  Store the vcpu
+> -	 * pointer before kvm->online_vcpu's incremented value.
 
-1.  I started with upstream's kvm/next
-2.  Applied TDX selftests series [3]
-3.  Applied guest_memfd mmap series [4]
-4.  Applied conversions (sub)series and HugeTLB (sub)series [5]
-5.  Added some fixes for 2 of the earlier series (as labeled in commit
-    message)
-6.  Updated guest_memfd conversions selftests to work with TDX
-7.  Applied 2M EPT series [6] with some hacks
-8.  Some patches to make guest_memfd mmap return huge-page-aligned
-    userspace address
-9.  Selftests for guest_memfd conversion with TDX 2M EPT
+Bad me for not updating this comment, but kvm_vcpu_on_spin() also pairs with this
+barrier, and needs to be updated to be planes-aware, e.g. this looks like a NULL
+pointer deref waiting to happen:
 
-[3] https://lore.kernel.org/all/20250414214801.2693294-1-sagis@google.com/
-[4] https://lore.kernel.org/all/20250513163438.3942405-11-tabba@google.com/T/
-[5] https://lore.kernel.org/all/cover.1747264138.git.ackerleytng@google.com/T/
-[6] https://lore.kernel.org/all/Z%2FOMB7HNO%2FRQyljz@yzhao56-desk.sh.intel.com/
-[7] https://lore.kernel.org/all/20250424030033.32635-1-yan.y.zhao@intel.com/
-
->
-> I'm now trying to make TD huge pages working on this branch and would like to
-> report to you errors I encountered during this process early.
->
-> 1. symbol arch_get_align_mask() is not available when KVM is compiled as module.
->    I currently workaround it as follows:
->
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -102,8 +102,13 @@ static unsigned long kvm_gmem_get_align_mask(struct file *file,
->         void *priv;
->
->         inode = file_inode(file);
-> -       if (!kvm_gmem_has_custom_allocator(inode))
-> -             return arch_get_align_mask(file, flags);
-> +       if (!kvm_gmem_has_custom_allocator(inode)) {
-> +               page_size = 1 << PAGE_SHIFT;
-> +               return PAGE_MASK & (page_size - 1);
-> +       }
->
->
-
-Thanks, will fix in the next revision.
-
-> 2. Bug of Sleeping function called from invalid context 
->
-> [  193.523469] BUG: sleeping function called from invalid context at ./include/linux/sched/mm.h:325
-> [  193.539885] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 3332, name: guest_memfd_con
-> [  193.556235] preempt_count: 1, expected: 0
-> [  193.564518] RCU nest depth: 0, expected: 0
-> [  193.572866] 3 locks held by guest_memfd_con/3332:
-> [  193.581800]  #0: ff16f8ec217e4438 (sb_writers#14){.+.+}-{0:0}, at: __x64_sys_fallocate+0x46/0x80
-> [  193.598252]  #1: ff16f8fbd85c8310 (mapping.invalidate_lock#4){++++}-{4:4}, at: kvm_gmem_fallocate+0x9e/0x310 [kvm]
-> [  193.616706]  #2: ff3189b5e4f65018 (&(kvm)->mmu_lock){++++}-{3:3}, at: kvm_gmem_invalidate_begin_and_zap+0x17f/0x260 [kvm]
-> [  193.635790] Preemption disabled at:
-> [  193.635793] [<ffffffffc0850c6f>] kvm_gmem_invalidate_begin_and_zap+0x17f/0x260 [kvm]
->
-> This is because add_to_invalidated_kvms() invokes kzalloc() inside kvm->mmu_lock
-> which is a kind of spinlock.
->
-> I workarounded it as follows.
->
->  static int kvm_gmem_invalidate_begin_and_zap(struct kvm_gmem *gmem,
->                                              pgoff_t start, pgoff_t end,
-> @@ -1261,13 +1268,13 @@ static int kvm_gmem_invalidate_begin_and_zap(struct kvm_gmem *gmem,
->                         KVM_MMU_LOCK(kvm);
->                         kvm_mmu_invalidate_begin(kvm);
->
-> -                       if (invalidated_kvms) {
-> -                               ret = add_to_invalidated_kvms(invalidated_kvms, kvm);
-> -                               if (ret) {
-> -                                       kvm_mmu_invalidate_end(kvm);
-> -                                       goto out;
-> -                               }
-> -                       }
->                 }
->
->
-> @@ -1523,12 +1530,14 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
->         }
->
->  out:
-> -       list_for_each_entry_safe(entry, tmp, &invalidated_kvms, list) {
-> -               kvm_gmem_do_invalidate_end(entry->kvm);
-> -               list_del(&entry->list);
-> -               kfree(entry);
-> -       }
-> +       list_for_each_entry(gmem, gmem_list, entry)
-> +               kvm_gmem_do_invalidate_end(gmem->kvm);
->
->         filemap_invalidate_unlock(inode->i_mapping);
->
->
-
-I fixed this in WIP series v2 by grouping splitting with
-unmapping. Please see this commit [8], the commit message includes an
-explanation of what's done.
-
-[8] https://github.com/googleprodkernel/linux-cc/commit/fd27635e5209b5e45a628d7fcf42a17a2b3c7e78
-
-> Will let you know more findings later.
->
-> Thanks
-> Yan
+		vcpu = xa_load(&plane->vcpu_array, idx);
+		if (!READ_ONCE(vcpu->ready))
+			continue;
 
