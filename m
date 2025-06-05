@@ -1,38 +1,79 @@
-Return-Path: <kvm+bounces-48491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48492-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77243ACEAB6
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 09:12:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3260BACEB61
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 09:58:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FEBA175838
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 07:12:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B19C16EEF2
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 07:58:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46CB1F8BC6;
-	Thu,  5 Jun 2025 07:12:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7B81FCFFB;
+	Thu,  5 Jun 2025 07:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="NXt9gKdx"
 X-Original-To: kvm@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62DD1BD035;
-	Thu,  5 Jun 2025 07:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D8A1FECAD
+	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 07:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749107539; cv=none; b=UcXx5a0TWXT5/Pn5WSRi3MhXzNpLK4So3sVlvT+Idt/7rrWZp4T/EnfCnDtNW2MFdXBfHZ6e2fpFPKnWK0yEeSr7a6r8HaXGzlhkR1gl9teleUiSKMo+1Od0sEL46Q+iUjK0ZGFcoLRc3Pt5Uj5SK8wMK67dYErgifoxUh651hc=
+	t=1749110268; cv=none; b=JTEmszdV6Q1qaY2RYkdju+/XnLo7Rz3oNjT7hNbuKlxPrkv6ISWsGLRUIaYLAoBEpx4pz+f46e8KzOEZpKClVQfPKiWD/ssFLcqb2c3fuH9xRtjG/LDUh/hGOPqBD7SACGqGtY0St5HrIZOg4GpREQrBH7jplIu7pZz247NGK5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749107539; c=relaxed/simple;
-	bh=dqpOxE4mTWQ6JZcpUgFsCHFD5lbxyOFNMNRVeHiBoIg=;
+	s=arc-20240116; t=1749110268; c=relaxed/simple;
+	bh=lTA9zjNN3JRVFRXQw/iswVkI+O61SyCDwuvCfwwT6sA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TN4DaxuoaxiUX8t+7oLtdNBxCW4HZRVTRF08mCUZ9Jio8/kuIjwmsqWGrM0z85++pxJBRzK/qinGI0dk2XJb0Vvx+p0e3yv18XGzmTJdJsR5UH0WkaRCsgpCDnQtFogQE+J24XC+tTUltbY+vQwkZJ5TyHmASVJX+SwjIrC+yec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr; spf=pass smtp.mailfrom=ghiti.fr; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ghiti.fr
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E077E41DF4;
-	Thu,  5 Jun 2025 07:12:09 +0000 (UTC)
-Message-ID: <3a26b273-7014-448a-b12c-d8a48b7d8fc6@ghiti.fr>
-Date: Thu, 5 Jun 2025 09:12:09 +0200
+	 In-Reply-To:Content-Type; b=oNeTZJeLRBKjPJUCDNqfQi8jqzfG5SaVGwQUJntC7/e33sKUvs93tXpsgrRNB20uqYnZ3o1YhPtFOmMGCUneJ7TnGg8FBVXbj4b7wvCJgr2OFsad4Lhm3HYiCcVwOJvt2vNkEunT6c9Wnc1HhCLXP3XEXmA8JRc8gKiW7kZ6Smg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=NXt9gKdx; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7481600130eso872363b3a.3
+        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 00:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1749110265; x=1749715065; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+zZl2dXMX0VDVWJAsL+cjXNr7Ok2fg0ZVvzGEGrTbrE=;
+        b=NXt9gKdxkt0smYROeldepk+OBONg+wK+WS6irmFMbuM5Yh956ve7YzQQThj09ZtyLd
+         tC0ohv+QpIcX54RX+u4zxAzBcKY8SCyY+zIDBrh+ArwSMgsS01HIWxXHImNzbSN3MfnN
+         2dLcfDCQIeCETU3DCYbUZjF/0/NEgsTXk6TqYlZuNIxZ42b9lLUEpUnK4nWl9gqY67BC
+         w010AwWppj0xupGkvLBW6P2m4khin3x511BgNQlulo599MxmtuPR73Vwi2tUXeK0tvLF
+         rohAoI9wro61NXLBho8oHW6/Ypts8waiCScBfnfs8jG+TXWqFQSDU3RR1fUJkbaGXkTS
+         +xTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749110265; x=1749715065;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+zZl2dXMX0VDVWJAsL+cjXNr7Ok2fg0ZVvzGEGrTbrE=;
+        b=k79MLcIsJaAUQx9xs3UTo4lVQgNahkqkqmuHDoPzQ+QdYGKR14URm8i4pRFod4TW5u
+         ZqJLGKdQOu+AmzC6ZQFJoktly08QD5qnm+v+LbRTHnrzIlsr75IyoD87/3Zp4LJ+6bCk
+         Heg/un0eh/GaGqph1Eq0xzt7AEq39y0X/s31wIz9oBowkhkxez6550Ae21oB5EYBTFLV
+         L/0TV6yIsNJzUNsC7WckUiibZ7kDVQb/O/nIim1IZ60KAhBIhnR28DXQJUXQYfEcRI1j
+         6AJrMEpJ8dKZDg9t8ILVKqPjZxpcIeHdjx7Ien+ZHWyQNNfXLFy3QnZq9897uCGTFu5f
+         N/Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCUYR5GQ4nRrIy5KzCo/OfReygaAyqGNlnTF0zsVe8ffhdIiIPgIJmlkCUVAVEpDWhtJ2Pw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbbW2GwoSb0Hk5C0Mz7/G8BhpIDHaBDtgthq7y5NncSlVBzmB3
+	kK7EJ+sEgrNbsjOd2pvEV9Rd5fbSkQhjyBO6kzVAZoPoqb2smc0iENJ03pOvqu1wTdE=
+X-Gm-Gg: ASbGncu2gIFw3+ewvbgp6RxenASCt/KOFjw81bzOLC/dNs+nwcU9b1EqIAjnsy2xS5P
+	ARcG1TZUbndtYZGNSO9gKHUWLZ01DvJAkNTIbK84v2WSSgC4shEf7h9OVknnuTDZCuAzoufg0q1
+	LCwi5KAPOPQxp4PdqrU8gioJ1vRvusixOODpq0oLBQGEE4TB6QNaKCDSMC6/C0DoGP5UvtzRhGH
+	+DSkDlEaDPMtyi/gM+X76LTljoOfaidfs2smUhKdVXmJGhuYSBg9/LVdSAhIwrP3zVa3uqHcaE3
+	Z0gV+M68qpHEhR6DClV4ptJzQNvnarf0p9XAOsFVNVt8XjO2HWOhRT14U7d5Oy6j
+X-Google-Smtp-Source: AGHT+IFSoebIZPWJ4N4NNYcabgJf1nxLz3d3ke91Rf5CUCkTc2VJbpBBnWqg7beTFgdLDU7v3xdgJA==
+X-Received: by 2002:a05:6a00:3d13:b0:742:362c:d2e4 with SMTP id d2e1a72fcca58-7480b226180mr7583905b3a.5.1749110264898;
+        Thu, 05 Jun 2025 00:57:44 -0700 (PDT)
+Received: from [157.82.203.223] ([157.82.203.223])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-747affcf703sm12228046b3a.129.2025.06.05.00.57.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Jun 2025 00:57:44 -0700 (PDT)
+Message-ID: <75ef190e-49fc-48aa-abf2-579ea31e4d15@daynix.com>
+Date: Thu, 5 Jun 2025 16:57:39 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -40,301 +81,390 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 00/14] riscv: add SBI FWFT misaligned exception
- delegation support
-To: Charlie Jenkins <charlie@rivosinc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
-Cc: cleger@rivosinc.com, Paul Walmsley <paul.walmsley@sifive.com>,
- anup@brainfault.org, atishp@atishpatra.org, shuah@kernel.org,
- corbet@lwn.net, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org, samuel.holland@sifive.com,
- ajones@ventanamicro.com, debug@rivosinc.com
-References: <20250523101932.1594077-1-cleger@rivosinc.com>
- <mhng-C1CE13EE-C4E6-490D-ABF4-CE7BD84737C3@palmerdabbelt-mac>
- <aECfReNdxc1ERz6K@ghost>
+Subject: Re: [PATCH net-next v12 01/10] virtio_net: Add functions for hashing
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20250530-rss-v12-0-95d8b348de91@daynix.com>
+ <20250530-rss-v12-1-95d8b348de91@daynix.com>
+ <CACGkMEufffSj1GQMqwf598__-JgNtXRpyvsLtjSbr3angLmJXg@mail.gmail.com>
+ <95cb2640-570d-4f51-8775-af5248c6bc5a@daynix.com>
+ <CACGkMEu6fZaErFEu7_UFsykXRL7Z+CwmkcxmvJHC+eN_j0pQvg@mail.gmail.com>
+ <4eaa7aaa-f677-4a31-bcc2-badcb5e2b9f6@daynix.com>
+ <CACGkMEu3QH+VdHqQEePYz_z+_bNYswpA-KNxzz0edEOSSkJtWw@mail.gmail.com>
 Content-Language: en-US
-From: Alexandre Ghiti <alex@ghiti.fr>
-In-Reply-To: <aECfReNdxc1ERz6K@ghost>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEu3QH+VdHqQEePYz_z+_bNYswpA-KNxzz0edEOSSkJtWw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdeffedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthekredttddvjeenucfhrhhomheptehlvgigrghnughrvgcuifhhihhtihcuoegrlhgvgiesghhhihhtihdrfhhrqeenucggtffrrghtthgvrhhnpeefueejtdegkedvhefhudfhgeefieevheeugeehgedvgfejhfetjeeiudelvdefteenucffohhmrghinhepghhithhhuhgsrdgtohhmpdhkvghrnhgvlhdrohhrghdpihhnfhhrrgguvggrugdrohhrghenucfkphepudelfedrfeefrdehjedrudelleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduleefrdeffedrheejrdduleelpdhhvghloheplgduledvrdduieekrddvuddrvdeingdpmhgrihhlfhhrohhmpegrlhgvgiesghhhihhtihdrfhhrpdhnsggprhgtphhtthhopedujedprhgtphhtthhopegthhgrrhhlihgvsehrihhvohhsihhntgdrtghomhdprhgtphhtthhopehprghlmhgvrhesuggrsggsvghlthdrtghomhdprhgtphhtthhopegtlhgvghgvrhesrhhivhhoshhinhgtrdgtohhmpdhrtghpthhtohepphgruhhlrdifrghlmhhslhgvhiesshhifhhivhgvrdgtohhmpdhrtghpthhtoheprghnu
- hhpsegsrhgrihhnfhgruhhlthdrohhrghdprhgtphhtthhopegrthhishhhphesrghtihhshhhprghtrhgrrdhorhhgpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheptghorhgsvghtsehlfihnrdhnvght
-X-GND-Sasl: alex@ghiti.fr
 
-On 6/4/25 21:32, Charlie Jenkins wrote:
-> On Wed, Jun 04, 2025 at 11:02:35AM -0700, Palmer Dabbelt wrote:
->> On Fri, 23 May 2025 03:19:17 PDT (-0700), cleger@rivosinc.com wrote:
->>> The SBI Firmware Feature extension allows the S-mode to request some
->>> specific features (either hardware or software) to be enabled. This
->>> series uses this extension to request misaligned access exception
->>> delegation to S-mode in order to let the kernel handle it. It also adds
->>> support for the KVM FWFT SBI extension based on the misaligned access
->>> handling infrastructure.
+On 2025/06/05 10:53, Jason Wang wrote:
+> On Wed, Jun 4, 2025 at 3:20 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2025/06/04 10:18, Jason Wang wrote:
+>>> On Tue, Jun 3, 2025 at 1:31 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> On 2025/06/03 12:19, Jason Wang wrote:
+>>>>> On Fri, May 30, 2025 at 12:50 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>
+>>>>>> They are useful to implement VIRTIO_NET_F_RSS and
+>>>>>> VIRTIO_NET_F_HASH_REPORT.
+>>>>>>
+>>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>>>>> Tested-by: Lei Yang <leiyang@redhat.com>
+>>>>>> ---
+>>>>>>     include/linux/virtio_net.h | 188 +++++++++++++++++++++++++++++++++++++++++++++
+>>>>>>     1 file changed, 188 insertions(+)
+>>>>>>
+>>>>>> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+>>>>>> index 02a9f4dc594d..426f33b4b824 100644
+>>>>>> --- a/include/linux/virtio_net.h
+>>>>>> +++ b/include/linux/virtio_net.h
+>>>>>> @@ -9,6 +9,194 @@
+>>>>>>     #include <uapi/linux/tcp.h>
+>>>>>>     #include <uapi/linux/virtio_net.h>
+>>>>>>
+>>>>>> +struct virtio_net_hash {
+>>>>>> +       u32 value;
+>>>>>> +       u16 report;
+>>>>>> +};
+>>>>>> +
+>>>>>> +struct virtio_net_toeplitz_state {
+>>>>>> +       u32 hash;
+>>>>>> +       const u32 *key;
+>>>>>> +};
+>>>>>> +
+>>>>>> +#define VIRTIO_NET_SUPPORTED_HASH_TYPES (VIRTIO_NET_RSS_HASH_TYPE_IPv4 | \
+>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv4 | \
+>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv4 | \
+>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_IPv6 | \
+>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_TCPv6 | \
+>>>>>> +                                        VIRTIO_NET_RSS_HASH_TYPE_UDPv6)
+>>>>>> +
+>>>>>> +#define VIRTIO_NET_RSS_MAX_KEY_SIZE 40
+>>>>>> +
+>>>>>> +static inline void virtio_net_toeplitz_convert_key(u32 *input, size_t len)
+>>>>>> +{
+>>>>>> +       while (len >= sizeof(*input)) {
+>>>>>> +               *input = be32_to_cpu((__force __be32)*input);
+>>>>>> +               input++;
+>>>>>> +               len -= sizeof(*input);
+>>>>>> +       }
+>>>>>> +}
+>>>>>> +
+>>>>>> +static inline void virtio_net_toeplitz_calc(struct virtio_net_toeplitz_state *state,
+>>>>>> +                                           const __be32 *input, size_t len)
+>>>>>> +{
+>>>>>> +       while (len >= sizeof(*input)) {
+>>>>>> +               for (u32 map = be32_to_cpu(*input); map; map &= (map - 1)) {
+>>>>>> +                       u32 i = ffs(map);
+>>>>>> +
+>>>>>> +                       state->hash ^= state->key[0] << (32 - i) |
+>>>>>> +                                      (u32)((u64)state->key[1] >> i);
+>>>>>> +               }
+>>>>>> +
+>>>>>> +               state->key++;
+>>>>>> +               input++;
+>>>>>> +               len -= sizeof(*input);
+>>>>>> +       }
+>>>>>> +}
+>>>>>> +
+>>>>>> +static inline u8 virtio_net_hash_key_length(u32 types)
+>>>>>> +{
+>>>>>> +       size_t len = 0;
+>>>>>> +
+>>>>>> +       if (types & VIRTIO_NET_HASH_REPORT_IPv4)
+>>>>>> +               len = max(len,
+>>>>>> +                         sizeof(struct flow_dissector_key_ipv4_addrs));
+>>>>>> +
+>>>>>> +       if (types &
+>>>>>> +           (VIRTIO_NET_HASH_REPORT_TCPv4 | VIRTIO_NET_HASH_REPORT_UDPv4))
+>>>>>> +               len = max(len,
+>>>>>> +                         sizeof(struct flow_dissector_key_ipv4_addrs) +
+>>>>>> +                         sizeof(struct flow_dissector_key_ports));
+>>>>>> +
+>>>>>> +       if (types & VIRTIO_NET_HASH_REPORT_IPv6)
+>>>>>> +               len = max(len,
+>>>>>> +                         sizeof(struct flow_dissector_key_ipv6_addrs));
+>>>>>> +
+>>>>>> +       if (types &
+>>>>>> +           (VIRTIO_NET_HASH_REPORT_TCPv6 | VIRTIO_NET_HASH_REPORT_UDPv6))
+>>>>>> +               len = max(len,
+>>>>>> +                         sizeof(struct flow_dissector_key_ipv6_addrs) +
+>>>>>> +                         sizeof(struct flow_dissector_key_ports));
+>>>>>> +
+>>>>>> +       return len + sizeof(u32);
+>>>>>> +}
+>>>>>> +
+>>>>>> +static inline u32 virtio_net_hash_report(u32 types,
+>>>>>> +                                        const struct flow_keys_basic *keys)
+>>>>>> +{
+>>>>>> +       switch (keys->basic.n_proto) {
+>>>>>> +       case cpu_to_be16(ETH_P_IP):
+>>>>>> +               if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT)) {
+>>>>>> +                       if (keys->basic.ip_proto == IPPROTO_TCP &&
+>>>>>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv4))
+>>>>>> +                               return VIRTIO_NET_HASH_REPORT_TCPv4;
+>>>>>> +
+>>>>>> +                       if (keys->basic.ip_proto == IPPROTO_UDP &&
+>>>>>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv4))
+>>>>>> +                               return VIRTIO_NET_HASH_REPORT_UDPv4;
+>>>>>> +               }
+>>>>>> +
+>>>>>> +               if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv4)
+>>>>>> +                       return VIRTIO_NET_HASH_REPORT_IPv4;
+>>>>>> +
+>>>>>> +               return VIRTIO_NET_HASH_REPORT_NONE;
+>>>>>> +
+>>>>>> +       case cpu_to_be16(ETH_P_IPV6):
+>>>>>> +               if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT)) {
+>>>>>> +                       if (keys->basic.ip_proto == IPPROTO_TCP &&
+>>>>>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv6))
+>>>>>> +                               return VIRTIO_NET_HASH_REPORT_TCPv6;
+>>>>>> +
+>>>>>> +                       if (keys->basic.ip_proto == IPPROTO_UDP &&
+>>>>>> +                           (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv6))
+>>>>>> +                               return VIRTIO_NET_HASH_REPORT_UDPv6;
+>>>>>> +               }
+>>>>>> +
+>>>>>> +               if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv6)
+>>>>>> +                       return VIRTIO_NET_HASH_REPORT_IPv6;
+>>>>>> +
+>>>>>> +               return VIRTIO_NET_HASH_REPORT_NONE;
+>>>>>> +
+>>>>>> +       default:
+>>>>>> +               return VIRTIO_NET_HASH_REPORT_NONE;
+>>>>>> +       }
+>>>>>> +}
+>>>>>> +
+>>>>>> +static inline void virtio_net_hash_rss(const struct sk_buff *skb,
+>>>>>> +                                      u32 types, const u32 *key,
+>>>>>> +                                      struct virtio_net_hash *hash)
+>>>>>> +{
+>>>>>> +       struct virtio_net_toeplitz_state toeplitz_state = { .key = key };
+>>>>>> +       struct flow_keys flow;
+>>>>>> +       struct flow_keys_basic flow_basic;
+>>>>>> +       u16 report;
+>>>>>> +
+>>>>>> +       if (!skb_flow_dissect_flow_keys(skb, &flow, 0)) {
+>>>>>> +               hash->report = VIRTIO_NET_HASH_REPORT_NONE;
+>>>>>> +               return;
+>>>>>> +       }
+>>>>>> +
+>>>>>> +       flow_basic = (struct flow_keys_basic) {
+>>>>>> +               .control = flow.control,
+>>>>>> +               .basic = flow.basic
+>>>>>> +       };
+>>>>>> +
+>>>>>> +       report = virtio_net_hash_report(types, &flow_basic);
+>>>>>> +
+>>>>>> +       switch (report) {
+>>>>>> +       case VIRTIO_NET_HASH_REPORT_IPv4:
+>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>>>>>> +                                        (__be32 *)&flow.addrs.v4addrs,
+>>>>>> +                                        sizeof(flow.addrs.v4addrs));
+>>>>>> +               break;
+>>>>>> +
+>>>>>> +       case VIRTIO_NET_HASH_REPORT_TCPv4:
+>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>>>>>> +                                        (__be32 *)&flow.addrs.v4addrs,
+>>>>>> +                                        sizeof(flow.addrs.v4addrs));
+>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
+>>>>>> +                                        sizeof(flow.ports.ports));
+>>>>>> +               break;
+>>>>>> +
+>>>>>> +       case VIRTIO_NET_HASH_REPORT_UDPv4:
+>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>>>>>> +                                        (__be32 *)&flow.addrs.v4addrs,
+>>>>>> +                                        sizeof(flow.addrs.v4addrs));
+>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
+>>>>>> +                                        sizeof(flow.ports.ports));
+>>>>>> +               break;
+>>>>>> +
+>>>>>> +       case VIRTIO_NET_HASH_REPORT_IPv6:
+>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>>>>>> +                                        (__be32 *)&flow.addrs.v6addrs,
+>>>>>> +                                        sizeof(flow.addrs.v6addrs));
+>>>>>> +               break;
+>>>>>> +
+>>>>>> +       case VIRTIO_NET_HASH_REPORT_TCPv6:
+>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>>>>>> +                                        (__be32 *)&flow.addrs.v6addrs,
+>>>>>> +                                        sizeof(flow.addrs.v6addrs));
+>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
+>>>>>> +                                        sizeof(flow.ports.ports));
+>>>>>> +               break;
+>>>>>> +
+>>>>>> +       case VIRTIO_NET_HASH_REPORT_UDPv6:
+>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state,
+>>>>>> +                                        (__be32 *)&flow.addrs.v6addrs,
+>>>>>> +                                        sizeof(flow.addrs.v6addrs));
+>>>>>> +               virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
+>>>>>> +                                        sizeof(flow.ports.ports));
+>>>>>> +               break;
+>>>>>> +
+>>>>>> +       default:
+>>>>>> +               hash->report = VIRTIO_NET_HASH_REPORT_NONE;
+>>>>>> +               return;
+>>>>>
+>>>>> So I still think we need a comment here to explain why this is not an
+>>>>> issue if the device can report HASH_XXX_EX. Or we need to add the
+>>>>> support, since this is the code from the driver side, I don't think we
+>>>>> need to worry about the device implementation issues.
+>>>>
+>>>> This is on the device side, and don't report HASH_TYPE_XXX_EX.
+>>>>
+>>>>>
+>>>>> For the issue of the number of options, does the spec forbid fallback
+>>>>> to VIRTIO_NET_HASH_REPORT_NONE? If not, we can do that.
+>>>>
+>>>> 5.1.6.4.3.4 "IPv6 packets with extension header" says:
+>>>>    > If VIRTIO_NET_HASH_TYPE_TCP_EX is set and the packet has a TCPv6
+>>>>    > header, the hash is calculated over the following fields:
+>>>>    > - Home address from the home address option in the IPv6 destination
+>>>>    >   options header. If the extension header is not present, use the
+>>>>    >   Source IPv6 address.
+>>>>    > - IPv6 address that is contained in the Routing-Header-Type-2 from the
+>>>>    >   associated extension header. If the extension header is not present,
+>>>>    >   use the Destination IPv6 address.
+>>>>    > - Source TCP port
+>>>>    > - Destination TCP port
+>>>>
+>>>> Therefore, if VIRTIO_NET_HASH_TYPE_TCP_EX is set, the packet has a TCPv6
+>>>> and an home address option in the IPv6 destination options header is
+>>>> present, the hash is calculated over the home address. If the hash is
+>>>> not calculated over the home address in such a case, the device is
+>>>> contradicting with this section and violating the spec. The same goes
+>>>> for the other HASH_TYPE_XXX_EX types and Routing-Header-Type-2.
 >>>
->>> FWFT SBI extension is part of the SBI V3.0 specifications [1]. It can be
->>> tested using the qemu provided at [2] which contains the series from
->>> [3]. Upstream kvm-unit-tests can be used inside kvm to tests the correct
->>> delegation of misaligned exceptions. Upstream OpenSBI can be used.
+>>> Just to make sure we are one the same page. I meant:
 >>>
->>> Note: Since SBI V3.0 is not yet ratified, FWFT extension API is split
->>> between interface only and implementation, allowing to pick only the
->>> interface which do not have hard dependencies on SBI.
->>>
->>> The tests can be run using the kselftest from series [4].
->>>
->>> $ qemu-system-riscv64 \
->>> 	-cpu rv64,trap-misaligned-access=true,v=true \
->>> 	-M virt \
->>> 	-m 1024M \
->>> 	-bios fw_dynamic.bin \
->>> 	-kernel Image
->>>   ...
->>>
->>>   # ./misaligned
->>>   TAP version 13
->>>   1..23
->>>   # Starting 23 tests from 1 test cases.
->>>   #  RUN           global.gp_load_lh ...
->>>   #            OK  global.gp_load_lh
->>>   ok 1 global.gp_load_lh
->>>   #  RUN           global.gp_load_lhu ...
->>>   #            OK  global.gp_load_lhu
->>>   ok 2 global.gp_load_lhu
->>>   #  RUN           global.gp_load_lw ...
->>>   #            OK  global.gp_load_lw
->>>   ok 3 global.gp_load_lw
->>>   #  RUN           global.gp_load_lwu ...
->>>   #            OK  global.gp_load_lwu
->>>   ok 4 global.gp_load_lwu
->>>   #  RUN           global.gp_load_ld ...
->>>   #            OK  global.gp_load_ld
->>>   ok 5 global.gp_load_ld
->>>   #  RUN           global.gp_load_c_lw ...
->>>   #            OK  global.gp_load_c_lw
->>>   ok 6 global.gp_load_c_lw
->>>   #  RUN           global.gp_load_c_ld ...
->>>   #            OK  global.gp_load_c_ld
->>>   ok 7 global.gp_load_c_ld
->>>   #  RUN           global.gp_load_c_ldsp ...
->>>   #            OK  global.gp_load_c_ldsp
->>>   ok 8 global.gp_load_c_ldsp
->>>   #  RUN           global.gp_load_sh ...
->>>   #            OK  global.gp_load_sh
->>>   ok 9 global.gp_load_sh
->>>   #  RUN           global.gp_load_sw ...
->>>   #            OK  global.gp_load_sw
->>>   ok 10 global.gp_load_sw
->>>   #  RUN           global.gp_load_sd ...
->>>   #            OK  global.gp_load_sd
->>>   ok 11 global.gp_load_sd
->>>   #  RUN           global.gp_load_c_sw ...
->>>   #            OK  global.gp_load_c_sw
->>>   ok 12 global.gp_load_c_sw
->>>   #  RUN           global.gp_load_c_sd ...
->>>   #            OK  global.gp_load_c_sd
->>>   ok 13 global.gp_load_c_sd
->>>   #  RUN           global.gp_load_c_sdsp ...
->>>   #            OK  global.gp_load_c_sdsp
->>>   ok 14 global.gp_load_c_sdsp
->>>   #  RUN           global.fpu_load_flw ...
->>>   #            OK  global.fpu_load_flw
->>>   ok 15 global.fpu_load_flw
->>>   #  RUN           global.fpu_load_fld ...
->>>   #            OK  global.fpu_load_fld
->>>   ok 16 global.fpu_load_fld
->>>   #  RUN           global.fpu_load_c_fld ...
->>>   #            OK  global.fpu_load_c_fld
->>>   ok 17 global.fpu_load_c_fld
->>>   #  RUN           global.fpu_load_c_fldsp ...
->>>   #            OK  global.fpu_load_c_fldsp
->>>   ok 18 global.fpu_load_c_fldsp
->>>   #  RUN           global.fpu_store_fsw ...
->>>   #            OK  global.fpu_store_fsw
->>>   ok 19 global.fpu_store_fsw
->>>   #  RUN           global.fpu_store_fsd ...
->>>   #            OK  global.fpu_store_fsd
->>>   ok 20 global.fpu_store_fsd
->>>   #  RUN           global.fpu_store_c_fsd ...
->>>   #            OK  global.fpu_store_c_fsd
->>>   ok 21 global.fpu_store_c_fsd
->>>   #  RUN           global.fpu_store_c_fsdsp ...
->>>   #            OK  global.fpu_store_c_fsdsp
->>>   ok 22 global.fpu_store_c_fsdsp
->>>   #  RUN           global.gen_sigbus ...
->>>   [12797.988647] misaligned[618]: unhandled signal 7 code 0x1 at 0x0000000000014dc0 in misaligned[4dc0,10000+76000]
->>>   [12797.988990] CPU: 0 UID: 0 PID: 618 Comm: misaligned Not tainted 6.13.0-rc6-00008-g4ec4468967c9-dirty #51
->>>   [12797.989169] Hardware name: riscv-virtio,qemu (DT)
->>>   [12797.989264] epc : 0000000000014dc0 ra : 0000000000014d00 sp : 00007fffe165d100
->>>   [12797.989407]  gp : 000000000008f6e8 tp : 0000000000095760 t0 : 0000000000000008
->>>   [12797.989544]  t1 : 00000000000965d8 t2 : 000000000008e830 s0 : 00007fffe165d160
->>>   [12797.989692]  s1 : 000000000000001a a0 : 0000000000000000 a1 : 0000000000000002
->>>   [12797.989831]  a2 : 0000000000000000 a3 : 0000000000000000 a4 : ffffffffdeadbeef
->>>   [12797.989964]  a5 : 000000000008ef61 a6 : 626769735f6e0000 a7 : fffffffffffff000
->>>   [12797.990094]  s2 : 0000000000000001 s3 : 00007fffe165d838 s4 : 00007fffe165d848
->>>   [12797.990238]  s5 : 000000000000001a s6 : 0000000000010442 s7 : 0000000000010200
->>>   [12797.990391]  s8 : 000000000000003a s9 : 0000000000094508 s10: 0000000000000000
->>>   [12797.990526]  s11: 0000555567460668 t3 : 00007fffe165d070 t4 : 00000000000965d0
->>>   [12797.990656]  t5 : fefefefefefefeff t6 : 0000000000000073
->>>   [12797.990756] status: 0000000200004020 badaddr: 000000000008ef61 cause: 0000000000000006
->>>   [12797.990911] Code: 8793 8791 3423 fcf4 3783 fc84 c737 dead 0713 eef7 (c398) 0001
->>>   #            OK  global.gen_sigbus
->>>   ok 23 global.gen_sigbus
->>>   # PASSED: 23 / 23 tests passed.
->>>   # Totals: pass:23 fail:0 xfail:0 xpass:0 skip:0 error:0
->>>
->>> With kvm-tools:
->>>
->>>   # lkvm run -k sbi.flat -m 128
->>>    Info: # lkvm run -k sbi.flat -m 128 -c 1 --name guest-97
->>>    Info: Removed ghost socket file "/root/.lkvm//guest-97.sock".
->>>
->>>   ##########################################################################
->>>   #    kvm-unit-tests
->>>   ##########################################################################
->>>
->>>   ... [test messages elided]
->>>   PASS: sbi: fwft: FWFT extension probing no error
->>>   PASS: sbi: fwft: get/set reserved feature 0x6 error == SBI_ERR_DENIED
->>>   PASS: sbi: fwft: get/set reserved feature 0x3fffffff error == SBI_ERR_DENIED
->>>   PASS: sbi: fwft: get/set reserved feature 0x80000000 error == SBI_ERR_DENIED
->>>   PASS: sbi: fwft: get/set reserved feature 0xbfffffff error == SBI_ERR_DENIED
->>>   PASS: sbi: fwft: misaligned_deleg: Get misaligned deleg feature no error
->>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature invalid value error
->>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature invalid value error
->>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value no error
->>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value 0
->>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value no error
->>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value 1
->>>   PASS: sbi: fwft: misaligned_deleg: Verify misaligned load exception trap in supervisor
->>>   SUMMARY: 50 tests, 2 unexpected failures, 12 skipped
->>>
->>> This series is available at [5].
->>>
->>> Link: https://github.com/riscv-non-isa/riscv-sbi-doc/releases/download/vv3.0-rc2/riscv-sbi.pdf [1]
->>> Link: https://github.com/rivosinc/qemu/tree/dev/cleger/misaligned [2]
->>> Link: https://lore.kernel.org/all/20241211211933.198792-3-fkonrad@amd.com/T/ [3]
->>> Link: https://lore.kernel.org/linux-riscv/20250414123543.1615478-1-cleger@rivosinc.com [4]
->>> Link: https://github.com/rivosinc/linux/tree/dev/cleger/fwft [5]
->>> ---
->>>
->>> V8:
->>>   - Move misaligned_access_speed under CONFIG_RISCV_MISALIGNED and add a
->>>     separate commit for that.
->>>
->>> V7:
->>>   - Fix ifdefery build problems
->>>   - Move sbi_fwft_is_supported with fwft_set_req struct
->>>   - Added Atish Reviewed-by
->>>   - Updated KVM vcpu cfg hedeleg value in set_delegation
->>>   - Changed SBI ETIME error mapping to ETIMEDOUT
->>>   - Fixed a few typo reported by Alok
->>>
->>> V6:
->>>   - Rename FWFT interface to remove "_local"
->>>   - Fix test for MEDELEG values in KVM FWFT support
->>>   - Add __init for unaligned_access_init()
->>>   - Rebased on master
->>>
->>> V5:
->>>   - Return ERANGE as mapping for SBI_ERR_BAD_RANGE
->>>   - Removed unused sbi_fwft_get()
->>>   - Fix kernel for sbi_fwft_local_set_cpumask()
->>>   - Fix indentation for sbi_fwft_local_set()
->>>   - Remove spurious space in kvm_sbi_fwft_ops.
->>>   - Rebased on origin/master
->>>   - Remove fixes commits and sent them as a separate series [4]
->>>
->>> V4:
->>>   - Check SBI version 3.0 instead of 2.0 for FWFT presence
->>>   - Use long for kvm_sbi_fwft operation return value
->>>   - Init KVM sbi extension even if default_disabled
->>>   - Remove revert_on_fail parameter for sbi_fwft_feature_set().
->>>   - Fix comments for sbi_fwft_set/get()
->>>   - Only handle local features (there are no globals yet in the spec)
->>>   - Add new SBI errors to sbi_err_map_linux_errno()
->>>
->>> V3:
->>>   - Added comment about kvm sbi fwft supported/set/get callback
->>>     requirements
->>>   - Move struct kvm_sbi_fwft_feature in kvm_sbi_fwft.c
->>>   - Add a FWFT interface
->>>
->>> V2:
->>>   - Added Kselftest for misaligned testing
->>>   - Added get_user() usage instead of __get_user()
->>>   - Reenable interrupt when possible in misaligned access handling
->>>   - Document that riscv supports unaligned-traps
->>>   - Fix KVM extension state when an init function is present
->>>   - Rework SBI misaligned accesses trap delegation code
->>>   - Added support for CPU hotplugging
->>>   - Added KVM SBI reset callback
->>>   - Added reset for KVM SBI FWFT lock
->>>   - Return SBI_ERR_DENIED_LOCKED when LOCK flag is set
->>>
->>> Clément Léger (14):
->>>    riscv: sbi: add Firmware Feature (FWFT) SBI extensions definitions
->>>    riscv: sbi: remove useless parenthesis
->>>    riscv: sbi: add new SBI error mappings
->>>    riscv: sbi: add FWFT extension interface
->>>    riscv: sbi: add SBI FWFT extension calls
->>>    riscv: misaligned: request misaligned exception from SBI
->>>    riscv: misaligned: use on_each_cpu() for scalar misaligned access
->>>      probing
->>>    riscv: misaligned: declare misaligned_access_speed under
->>>      CONFIG_RISCV_MISALIGNED
->>>    riscv: misaligned: move emulated access uniformity check in a function
->>>    riscv: misaligned: add a function to check misalign trap delegability
->>>    RISC-V: KVM: add SBI extension init()/deinit() functions
->>>    RISC-V: KVM: add SBI extension reset callback
->>>    RISC-V: KVM: add support for FWFT SBI extension
->>>    RISC-V: KVM: add support for SBI_FWFT_MISALIGNED_DELEG
->>>
->>>   arch/riscv/include/asm/cpufeature.h        |  14 +-
->>>   arch/riscv/include/asm/kvm_host.h          |   5 +-
->>>   arch/riscv/include/asm/kvm_vcpu_sbi.h      |  12 +
->>>   arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |  29 +++
->>>   arch/riscv/include/asm/sbi.h               |  60 +++++
->>>   arch/riscv/include/uapi/asm/kvm.h          |   1 +
->>>   arch/riscv/kernel/sbi.c                    |  81 ++++++-
->>>   arch/riscv/kernel/traps_misaligned.c       | 112 ++++++++-
->>>   arch/riscv/kernel/unaligned_access_speed.c |   8 +-
->>>   arch/riscv/kvm/Makefile                    |   1 +
->>>   arch/riscv/kvm/vcpu.c                      |   4 +-
->>>   arch/riscv/kvm/vcpu_sbi.c                  |  54 +++++
->>>   arch/riscv/kvm/vcpu_sbi_fwft.c             | 257 +++++++++++++++++++++
->>>   arch/riscv/kvm/vcpu_sbi_sta.c              |   3 +-
->>>   14 files changed, 620 insertions(+), 21 deletions(-)
->>>   create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
->>>   create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
->> Sorry I'm still kind of out of it here, but I think Alex was saying this has
->> dependencies in the patchwork call this morning?
+>>> 1) If the hash is not calculated over the home address (in the case of
+>>> IPv6 destination destination), it can still report
+>>> VIRTIO_NET_RSS_HASH_TYPE_IPv6. This is what you implemented in your
+>>> series. So the device can simply fallback to e.g TCPv6 if it can't
+>>> understand all or part of the IPv6 options.
+>>
+>> The spec says it can fallback if "the extension header is not present",
+>> not if the device can't understand the extension header.
+> 
+> I don't think so,
+> 
+> 1) spec had a condition beforehand:
+> 
+> """
+> If VIRTIO_NET_HASH_TYPE_TCP_EX is set and the packet has a TCPv6
+> header, the hash is calculated over the following fields:
+> ...
+> If the extension header is not present ...
+> """
+> 
+> So the device can choose not to set VIRTIO_NET_HASH_TYPE_TCP_EX as
+> spec doesn't say device MUST set VIRTIO_NET_HASH_TYPE_TCP_EX if ...
+> 
+> 2) implementation wise, since device has limited resources, we can't
+> expect the device can parse arbitrary number of ipv6 options
+> 
+> 3) if 1) and 2) not the case, we need fix the spec otherwise implement
+> a spec compliant device is impractical
 
+The statement is preceded by the following:
+ >  The device calculates the hash on IPv4 packets according to
+ > ’Enabled hash types’ bitmask as follows:
 
-Yes, you need this patchset too: 
-https://lore.kernel.org/linux-riscv/20250602193918.868962-1-cleger@rivosinc.com/
+The 'Enabled hash types' bitmask is specified by the device.
 
-I prepared a PR that does not merge the KVM parts and I checked with 
-Anup, he will merge them in the next MW. My PR with FWFT passed the CI, 
-so I'll send it now anyway.
+I think the spec needs amendment.
 
-Thanks,
+I wonder if there are any people interested in the feature though. 
+Looking at virtnet_set_hashflow() in drivers/net/virtio_net.c, the 
+driver of Linux does not let users configure HASH_TYPE_XXX_EX. I suppose 
+Windows supports HASH_TYPE_XXX_EX, but those who care network 
+performance most would use Linux so HASH_TYPE_XXX_EX support without 
+Linux driver's support may not be useful.
 
-Alex
+> 
+>>
+>>> 2) the VIRTIO_NET_SUPPORTED_HASH_TYPES is not checked against the
+>>> tun_vnet_ioctl_sethash(), so userspace may set
+>>> VIRTIO_NET_HASH_TYPE_TCP_EX regardless of what has been returned by
+>>> tun_vnet_ioctl_gethashtypes(). In this case they won't get
+>>> VIRTIO_NET_HASH_TYPE_TCP_EX.
+>>
+>> That's right. It's the responsibility of the userspace to set only the
+>> supported hash types.
+> 
+> Well, the kernel should filter out the unsupported one to have a
+> robust uAPI. Otherwise, we give green light to the buggy userspace
+> which will have unexpected results.
 
+My reasoning was that it may be fine for some use cases other than VM 
+(e.g., DPDK); in such a use case, it is fine as long as the UAPI works 
+in the best-effort basis.
 
-> The "dependency" is that the kvm tree will not accept patches this late.
-> The KVM patches can be dropped and the riscv patches can be merged, but
-> it is pretty late now.
->
-> - Charlie
->
->
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
+For example, suppose a userspace program that processes TCP packets; the 
+program can enable: HASH_TYPE_IPv4, HASH_TYPE_TCPv4, HASH_TYPE_IPv6, and 
+HASH_TYPE_TCPv6. Ideally, the kernel should support all the hash types, 
+but, even if e.g., HASH_TYPE_TCPv6 is not available, it will fall back 
+to HASH_TYPE_IPv6, which still does something good and may be acceptable.
+
+That said, for a use case that involves VM and implements virtio-net 
+(e.g., QEMU), setting an unsupported hash type here is definitely a bug. 
+Catching the bug may outweigh the extra trouble for other use cases.
+
+> 
+>>
+>>> 3) implementing part of the hash types might complicate the migration
+>>> or at least we need to describe the expectations of libvirt or other
+>>> management in this case. For example, do we plan to have a dedicated
+>>> Qemu command line like:
+>>>
+>>> -device virtio-net-pci,hash_report=on,supported_hash_types=X,Y,Z?
+>>
+>> I posted a patch series to implement such a command line for vDPA[1].
+>> The patch series that wires this tuntap feature up[2] reuses the
+>> infrastructure so it doesn't bring additional complexity.
+>>
+>> [1]
+>> https://lore.kernel.org/qemu-devel/20250530-vdpa-v1-0-5af4109b1c19@daynix.com/
+>> [2]
+>> https://lore.kernel.org/qemu-devel/20250530-hash-v5-0-343d7d7a8200@daynix.com/
+> 
+> I meant, if we implement a full hash report feature, it means a single
+> hash cmdline option is more than sufficient and so compatibility code
+> can just turn it off when dealing with machine types. This is much
+> more simpler than
+> 
+> 1) having both hash as well as supported_hash_features
+> 2) dealing both hash as well as supported_hash_features in compatibility codes
+> 3) libvirt will be happy
+> 
+> For [1], it seems it introduces a per has type option, this seems to
+> be a burden to the management layer as it need to learn new option
+> everytime a new hash type is supported
+
+Even with the command line you proposed (supported_hash_types=X,Y,Z), it 
+is still necessary to know the values the supported_hash_types property 
+accepts (X.Y,Z), so I don't think it makes difference.
+
+The burden to the management layer is already present for features, so 
+it is an existing problem (or its mere extension).
+
+This problem was discussed in the following thread in the past, but no 
+solution is implemented yet, and probably solving it will be difficult.
+https://lore.kernel.org/qemu-devel/20230731223148.1002258-5-yuri.benditovich@daynix.com/
+
+Regards,
+Akihiko Odaki
 
