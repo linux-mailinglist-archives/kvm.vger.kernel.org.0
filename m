@@ -1,147 +1,139 @@
-Return-Path: <kvm+bounces-48506-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48507-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB7BDACEC45
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 10:45:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE428ACEC8B
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 11:04:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 606B43AB7BC
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 08:45:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1D0A174059
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 09:04:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B90205AB2;
-	Thu,  5 Jun 2025 08:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD25320969A;
+	Thu,  5 Jun 2025 09:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X4y+H1Kk"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="q/QDL6Iz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52031DE4CC
-	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 08:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E430566A;
+	Thu,  5 Jun 2025 09:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749113120; cv=none; b=OrdI8IfQb+SWpdXW15O6eNLtu1Zc+dFBQAdYFh+4NHdG5Ipe1SBOs/PH4Lw7bMh+IoD58FsFQmXVDbnJ4+qkcXbJc1lk3tfywl1hdxSYfVyvPzERkm4BsrIwLZz7vXjsxpdw1GpJiTSs1Q0FToYK9wfCPAH7/OQr5piYtpmr+Ts=
+	t=1749114284; cv=none; b=FQObA2MMZ/FFQSrE83GcAqaDE9CXtFEwanwfbROQ59im1/qH4H5CHLd5hN8aEmS1B8lntZZpSWAb7cWd6fAhkMP90GpE+eTD9p0rTdA5O6RJ/8reMiDsEcJ8vh1uVg7e2n3FHo6G2fpMnMgqdkJJOA/zBa9CqwV8pJzm70FL64k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749113120; c=relaxed/simple;
-	bh=lZjR6l58LPOXxIlWey2rFPrDe6qtvVUwJd6LixHUXmw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hQzoYOoE6rnb1p2JmhY9JjLHrL033wDOWFtsTA3L1OElT9Sz9rgeACYpCdsZACuZyfIG4xMTqwWX9GgsYcsIWPX4maskekk+zA20idCbSzzMgKoxmtwoe2VI1TisQD1zqIYhVoUh2iyBQmZXzHpeE0yTtqFegM09mGegWaosShE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X4y+H1Kk; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-47e9fea29easo934251cf.1
-        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 01:45:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749113117; x=1749717917; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=JnbBtZ4D2hBh9y3M0ZCCLMOg59INFuW1YRX08XTCyio=;
-        b=X4y+H1Kk0n9rCZeUngB5zxsK5u01kzmvnV8rfZzCP8687XWpfTP5NBx6QYBIKa8zYl
-         uK1gN1akKiFTlZNjfuBSMTUHFaofh6O2o2A6H9c7af73tISHTNxRqg3+ZbyoO35wUbe7
-         HE4YJ4/WasPZpa1BwM96+TugJziUMCjMQmqU/WTPSzadpDyBPR/bzglNZSrRxHrvarT9
-         I4P7DKgdU8uOnw/288o/RNCqeFyRJQzOMJ5y+oz11Y5tcuib/vLljyev51XPM3gOe+1E
-         Vc2bHeRATiJj5MGJUUUKiNRj2/M5DGvaccC2rMSaS1Ti0wB1DiewHz0QZLjk7BXtJj8o
-         f4Ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749113117; x=1749717917;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JnbBtZ4D2hBh9y3M0ZCCLMOg59INFuW1YRX08XTCyio=;
-        b=kDyQ0GoF2w4xGMTmpRQwp4bzfVdtHWQnnPTmD8MbiSXN9V3o2YD0EFb99R/RdMzo9r
-         zFMAMJWYNaya0ERVZpYHykuTMf65BsYs8P7GYiUoBUkDsjLC0JoOAaM+Oe/QRfMrUYOZ
-         Ru36F0MWkuVg+9en/H+xqrAcmr1vzB++tt9GLduVPdh4ZRUFJUU72z+UOM9MdGKGaFG7
-         pCWZujge6N9fj2eKynIBF3MsMG4i7KILkqlupiClSZFPjOSL4EXTub40hpQcMXQNkQp7
-         QhDBsLe2AvFA5Sfphj5Idn14GRm9JjT6xtTCDtaIBl/sSbu1DdtwBBHwFiOv3vbmuVLc
-         sXHA==
-X-Gm-Message-State: AOJu0YzyAzDVuGFJ5Eua33JaCocUMcMvYMUnAh61PExsaBBTC3EKfcBj
-	CmFcdNqi6Co4SPVARvGPwLB/56YhWJ5aT3LAjjAa9uW8/V6FmxrkVdFWaC3fDMepknGXlZRbVzy
-	lVfUHUtiOFUU3zkSFPI5ajAFf/wn8W2u1srp2d4t2
-X-Gm-Gg: ASbGncuIYdKJrlUI47dAoHP23dD6NRNZpjA3NCaft357hbz6Pz6ZOIMhnx2mmQflsIS
-	wWpvUgVauWREuQ7F7A++AYnBABvg7GlpjJdUBHr8ktLaBhS4bA3hsD8zfQJinliFM2c7qdrHqJ1
-	m1GKQV8ZOz+d55rhf9KvACPbmkiNpKYOjkfMii2Wyo2PIokYFwQZW9Ig==
-X-Google-Smtp-Source: AGHT+IHsByj8V2+IKDkWqLinrRR0R/u33USxHEReIJl4YsqveAQKYfVjMUv5hgFvz6GOyokpXtjWXSJq0G3sAdxhDJ0=
-X-Received: by 2002:a05:622a:1c0c:b0:497:75b6:e542 with SMTP id
- d75a77b69052e-4a5af46d35emr2910511cf.10.1749113117103; Thu, 05 Jun 2025
- 01:45:17 -0700 (PDT)
+	s=arc-20240116; t=1749114284; c=relaxed/simple;
+	bh=YI11l593vwOkuSip16nXaUZNh+flhKfSf7yp7XZlR6k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G6qK5UuGVKF373l3bd7jRV+8Qjq60tnOQMd81n6HuLCv5irf8n4/aghbWTok+Z7QUcxzJJlBBiVqD+HiHaFnREyuPCRyNOxwZ2QXXyhLXgYEJjCOK8HHBK5dKClqc2zieYHofhagKl2mKqGc+HV0BF2Xu/Pkv+TkDQ+Vk3DQLLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=q/QDL6Iz; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 554KkTR9023453;
+	Thu, 5 Jun 2025 09:04:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=z3HPjNQnRJ3Erro95jbXPBoQJdowTw
+	Ojxj9/vDvkGYI=; b=q/QDL6Iz5kZi0beWWsppSe1dMF2J1+dVuZGuwqUo/nczuI
+	drpCI0v8SnGFMVt9wAv86BGJpOmxN7uS9+dtYC1Ekzousp1i0SuODVcuGNzwXLP4
+	UDSxYpqjalOpslGBGOIT/LyGoXXePqN4usuSwWaDf3GiBYlbHwGDF7N7c23n/crL
+	59lLg/5BjLc+lJ5OGKyPieK9jraSxwbDxUaS5Kcs+L1Zn1qSqRb6MEJxcPYnszSD
+	CT/VFPtUPQlakPEVzXmcKxWlEU2zCfiZyakFdgdB6xe7H2oGNyof1SAv1HYBRTk8
+	H9DINNsyko1gMvEEbSsBEZmIEDE6UvrmU7lw7F/Q==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471geyyr6w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Jun 2025 09:04:40 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5558ciSt031650;
+	Thu, 5 Jun 2025 09:04:39 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 470cg044aa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Jun 2025 09:04:39 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55594Z5Z59507026
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 5 Jun 2025 09:04:35 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AE86B2004B;
+	Thu,  5 Jun 2025 09:04:35 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EFD2120043;
+	Thu,  5 Jun 2025 09:04:34 +0000 (GMT)
+Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.111.90.53])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu,  5 Jun 2025 09:04:34 +0000 (GMT)
+Date: Thu, 5 Jun 2025 11:04:33 +0200
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] s390/mm: Fix in_atomic() handling in
+ do_secure_storage_access()
+Message-ID: <aEFdoYSKqvqK572c@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20250603134936.1314139-1-hca@linux.ibm.com>
+ <aEB0BfLG9yM3Gb4u@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <20250604184855.44793208@p-imbrenda>
+ <aECCe9bIZORv+yef@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <20250604194043.0ab9535e@p-imbrenda>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250527180245.1413463-1-tabba@google.com> <20250527180245.1413463-9-tabba@google.com>
- <b2bef336-4ad3-4106-ace4-5d677afb9d3f@suse.cz>
-In-Reply-To: <b2bef336-4ad3-4106-ace4-5d677afb9d3f@suse.cz>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 5 Jun 2025 09:44:40 +0100
-X-Gm-Features: AX0GCFugMIh1YPooIeoODj-4bgJGXFKwzjZX0F6CPJdRrHBnuFlUmoXPsINMIGU
-Message-ID: <CA+EHjTwEyoU1KpHjJ++HJjmMaNtqzUU2PgR3kVa8ahzFTx8J=g@mail.gmail.com>
-Subject: Re: [PATCH v10 08/16] KVM: guest_memfd: Allow host to map guest_memfd pages
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vannapurve@google.com, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
-	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
-	hughd@google.com, jthoughton@google.com, peterx@redhat.com, 
-	pankaj.gupta@amd.com, ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250604194043.0ab9535e@p-imbrenda>
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=Pq2TbxM3 c=1 sm=1 tr=0 ts=68415da8 cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=Fm9yM4oSaJXo2cCsy8EA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA1MDA3OSBTYWx0ZWRfX5VX/EIq/Wknn /PPUECvV5FNfOsQmyN3pTHdIgH/PqJiZODtQSsw36PJ4IYw2JVYuO7p9bSV/87wmMeXr4iPGmoT mibici+jAgeGBfemOhJG1WOB3ZVjjRRNrnPb2Jh3ceFe8CJYLsw9guEerReHwJwh22D4us3iWPP
+ L3omzP5pZPv0YRSrlMt4Hs1ofVptryCpVV2YwQ5B2HdikGxT8o9PVcB+TAH59uGvps96/Zjoveo g2pn9kwQa2tenPCezagsJsW8Lp6cm+f/eM1tqqN5A9SlWfz8aTxjPK/nZvGpA7pDuH8DymJOnRg kQN8UUKq+ECr4pIB5j7Oc02pLEY59MG+p35GZ1Gs9NkGS4aUVkiE2T2RFVFDqgQ3G7bJ9IXFpry
+ UVfGkPl1RZifP7qpLopz3JDh+Dc+DmBzo4CXIa8TNVPHJGEDKouZv48GMTSzReec+baq38t1
+X-Proofpoint-GUID: oaqBNPAeAjmTTnS_dbzElVwk12h4lt-r
+X-Proofpoint-ORIG-GUID: oaqBNPAeAjmTTnS_dbzElVwk12h4lt-r
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-05_02,2025-06-03_02,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 mlxlogscore=499
+ phishscore=0 bulkscore=0 spamscore=0 suspectscore=0 priorityscore=1501
+ mlxscore=0 adultscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506050079
 
-Hi Vlastimil
+On Wed, Jun 04, 2025 at 07:40:43PM +0200, Claudio Imbrenda wrote:
+> > > > This could trigger WARN_ON_ONCE() in handle_fault_error_nolock():
+> > > > 
+> > > > 		if (WARN_ON_ONCE(!si_code))
+> > > > 			si_code = SEGV_MAPERR;
+> > > > 
+> > > > Would this warning be justified in this case (aka user_mode(regs) ==
+> > > > true)?  
+> > > 
+> > > I think so, because if we are in usermode, we should never trigger
+> > > faulthandler_disabled()  
+> > 
+> > I think I do not get you. We are in a system call and also in_atomic(),
+> > so faulthandler_disabled() is true and handle_fault_error_nolock(regs, 0)
+> > is called (above).
+> 
+> what is the psw in regs?
+> is it not the one that was being used when the exception was triggered?
 
-On Thu, 5 Jun 2025 at 09:28, Vlastimil Babka <vbabka@suse.cz> wrote:
->
-> On 5/27/25 20:02, Fuad Tabba wrote:
-> > This patch enables support for shared memory in guest_memfd, including
-> > mapping that memory at the host userspace. This support is gated by the
-> > configuration option KVM_GMEM_SHARED_MEM, and toggled by the guest_memfd
-> > flag GUEST_MEMFD_FLAG_SUPPORT_SHARED, which can be set when creating a
-> > guest_memfd instance.
-> >
-> > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
->
-> <snip>
->
-> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> > index 559c93ad90be..df225298ab10 100644
-> > --- a/virt/kvm/Kconfig
-> > +++ b/virt/kvm/Kconfig
-> > @@ -128,3 +128,8 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
-> >  config HAVE_KVM_ARCH_GMEM_INVALIDATE
-> >         bool
-> >         depends on KVM_GMEM
-> > +
-> > +config KVM_GMEM_SHARED_MEM
-> > +       select KVM_GMEM
-> > +       bool
-> > +       prompt "Enable support for non-private (shared) memory in guest_memfd"
->
-> Due to this "prompt" line, the toggle for this appears on the front page on
-> make menuconfig, or is asked during make oldconfig etc.
-> Seems not intended, no other options in this Kconfig have prompts, and the
-> later patch selects this option. So the prompt should be removed, otherwise
-> it's a Linus yelling hazard :)
+Hmm, right. I assume is_kernel_fault() returns false not because 
+user_mode(regs) is true, but because we access the secondary AS.
 
-Ack, and thanks for the reviews!
+Still, to me it feels wrong to trigger that warning due to a user
+process activity. But anyway:
 
-Cheers,
-/fuad
+Acked-by: Alexander Gordeev <agordeev@linux.ibm.com>
 
