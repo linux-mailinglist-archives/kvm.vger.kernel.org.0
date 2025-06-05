@@ -1,218 +1,340 @@
-Return-Path: <kvm+bounces-48490-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48491-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24456ACEA8D
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 08:59:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77243ACEAB6
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 09:12:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BE493AA2CD
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 06:59:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FEBA175838
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 07:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A371FAC4E;
-	Thu,  5 Jun 2025 06:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CG9Ad01p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46CB1F8BC6;
+	Thu,  5 Jun 2025 07:12:19 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0F91F4CAE;
-	Thu,  5 Jun 2025 06:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749106781; cv=fail; b=Py2lhZfscw3ENMad6hOidx2YwV/iZ/RuObsVMto2+OTRBCAEbhss6HAm35yVkfT5GCPEFztWBbLQdvrETmP7pGwmyXzttyU1xJHJIiXpiWkmpD9O9+UE8DoOoD9UQ+sz6VvPKk6/t4mz0O7tlC057cacBOobdHmPKQNWo4dTrkw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749106781; c=relaxed/simple;
-	bh=id1UVJCSqqlJtjHMxefHoSpFCitPRmI/dmjefPNL3EI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=fumTWg4jQJTUptxy2IA7/HQXWPJO4i6YI4eId9vYnGfIkpJrs3bszn6Rhw5Jh99epPo/ZhOrNHgRXpaaDhnbbanFwgJMTqC37rshzHdnZ7vBHhD+I755ii69QgAcx41yAWkPv4VvnYiZD31AYJBMZS9cWGrHr9n7sFaBUtip8So=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CG9Ad01p; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749106780; x=1780642780;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=id1UVJCSqqlJtjHMxefHoSpFCitPRmI/dmjefPNL3EI=;
-  b=CG9Ad01pTWuty1aUJRrB8gV0Q2jEGWTQIyxfLslqtq6DJG3g8KC1EZmM
-   zY0xNakg2uSsRWLaMF7c3mgtkn1Y1lspJxowvVmMYUCCOyA2ZDT3c/xD2
-   WNj05290sst3t9tiTR7v2l3FaYRNRgw3V0mE2r2IftSqr4nZM3vs7UNVr
-   67rlLRjLd7EsAgkCxVcNQHA7X48+N5VgqosJ/jfFNgdvTUitIfoYbLmbV
-   lV5GC9Vsj6485136yWgiPaSqwKZCyxV1TpreS2XZoVakKhpF7auSBwFgp
-   GItT3m9InFmb9jZJb094MhnFpui/zrc29wfQl/gf7UVCxcAWVD0bSFhKv
-   A==;
-X-CSE-ConnectionGUID: pz0+k2PXTjuPUne/pQ2Zsw==
-X-CSE-MsgGUID: z/sHP/4kQsiM+IMzwUrRhg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11454"; a="53840372"
-X-IronPort-AV: E=Sophos;i="6.16,211,1744095600"; 
-   d="scan'208";a="53840372"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 23:59:39 -0700
-X-CSE-ConnectionGUID: +HiCt2obQgqrovtVaVX83A==
-X-CSE-MsgGUID: zD5+33KkQJCmTyelGJUljw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,211,1744095600"; 
-   d="scan'208";a="146011018"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2025 23:59:39 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 4 Jun 2025 23:59:38 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Wed, 4 Jun 2025 23:59:38 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.73)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.55; Wed, 4 Jun 2025 23:59:37 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jBtNkRj6TdDYfWRrtyrmg2wnDUUL9j//bm7V2nrOVdmcKXQ0WZB35SIOvHa9cl/QpfvsdYAj2A6wm7kMEgOZ3p3wLSDmBd/sgXdl+xtIVuJ9fAwoSObaNeGeZMOn/qbz/YxBPeg2n7ZHWs4IWTIgI6jses5r7FEFuNgqSB6VWZFiq/N3uZaP+3VNgXSqbRk8uVkDUEeQ1djbkmqD/MA5VojatxIXcI25rIn2pESnXVXd1oV08PsXDdLNNA8Lyr5Az5TAXchzGqsD1wguIfVi0iD8G/BvzqVAdiD8ILsSLe0W5QDBWV99Ow69nvbfvZ+pr5KIheIL30LxGHIpyFBirg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6wlhPlQ0xvgWBZj3jit9F8CyYhkLC6UhcItBfdhIldQ=;
- b=KEHk1IbnqxU1kf4D7zvdUKJKQ8xz/+KRVtJ0ItXs/UFcMb4vItZnD/NtrU+u54uhpILTpuIlTWBWF7EpyL/rPjUCzXFUIMFgRvft+Wg9zRn2jxyYrM7X4rBitYHdPulblfWo4BXtJXt8rWJMI227EFwkI8pc4rtaAY9D2TIpkfChA/s7QigIpVQxChW+FgCOlu5/GG8hjIc8fPRCxPOxgGgQUZkxmOsa9jkUJuGI2R2XdeEx5cm6LsjIlsaqFP8+ip+VCIjFG6j2gULFoh5p8n0ws1Ylvs9k9jdv0Z5MTNDZc5Zocq4SKIIn82oqbJOu93FZc4ZjR+GsjnUgDDZLOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by IA3PR11MB9086.namprd11.prod.outlook.com (2603:10b6:208:57b::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.37; Thu, 5 Jun
- 2025 06:59:22 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%4]) with mapi id 15.20.8769.031; Thu, 5 Jun 2025
- 06:59:22 +0000
-Date: Thu, 5 Jun 2025 14:59:13 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, Xin Li
-	<xin@zytor.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: Re: [PATCH 16/28] KVM: VMX: Manually recalc all MSR intercepts on
- userspace MSR filter change
-Message-ID: <aEFAQW2HxUu0ynVr@intel.com>
-References: <20250529234013.3826933-1-seanjc@google.com>
- <20250529234013.3826933-17-seanjc@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250529234013.3826933-17-seanjc@google.com>
-X-ClientProxiedBy: SI2PR02CA0022.apcprd02.prod.outlook.com
- (2603:1096:4:195::23) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62DD1BD035;
+	Thu,  5 Jun 2025 07:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749107539; cv=none; b=UcXx5a0TWXT5/Pn5WSRi3MhXzNpLK4So3sVlvT+Idt/7rrWZp4T/EnfCnDtNW2MFdXBfHZ6e2fpFPKnWK0yEeSr7a6r8HaXGzlhkR1gl9teleUiSKMo+1Od0sEL46Q+iUjK0ZGFcoLRc3Pt5Uj5SK8wMK67dYErgifoxUh651hc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749107539; c=relaxed/simple;
+	bh=dqpOxE4mTWQ6JZcpUgFsCHFD5lbxyOFNMNRVeHiBoIg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TN4DaxuoaxiUX8t+7oLtdNBxCW4HZRVTRF08mCUZ9Jio8/kuIjwmsqWGrM0z85++pxJBRzK/qinGI0dk2XJb0Vvx+p0e3yv18XGzmTJdJsR5UH0WkaRCsgpCDnQtFogQE+J24XC+tTUltbY+vQwkZJ5TyHmASVJX+SwjIrC+yec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr; spf=pass smtp.mailfrom=ghiti.fr; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ghiti.fr
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E077E41DF4;
+	Thu,  5 Jun 2025 07:12:09 +0000 (UTC)
+Message-ID: <3a26b273-7014-448a-b12c-d8a48b7d8fc6@ghiti.fr>
+Date: Thu, 5 Jun 2025 09:12:09 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|IA3PR11MB9086:EE_
-X-MS-Office365-Filtering-Correlation-Id: 57fea47d-324f-43cb-5453-08dda3fe8026
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?3svIr0Fuy2QiGlw8DpidmMSlepiwrRhJ1Ko1xNhniumrGYrXsbWh9kM6d0za?=
- =?us-ascii?Q?y1f8NEUbdGMJv50YJdTZrRh6J8J7qN1OXqX1zw7mHtFDyzqCg3Ooy/xRVjms?=
- =?us-ascii?Q?jLFnvWq2fWPmaeMzWhllYNK+6un04J3nPlgQhFkfRNNHXLy2n5DQSHFAERBK?=
- =?us-ascii?Q?O5ypjtdF7LQNBR6hojYscvNFP1NY4npE/BmpHyx7QqCvJdUzq1SWKzaF9f4u?=
- =?us-ascii?Q?A6qRPkLe155LhmBtkm2kiqU3APt0SLC1ifp+Bqbp0Ws9vzLuRfhO42VoaP9V?=
- =?us-ascii?Q?Ebtcl4oaCoPXz7QvAd1vEj4DMZYWs1Fqi1DDtcvbU+nSgybHu66wgahPSAOR?=
- =?us-ascii?Q?N5LTzo9eMlhCW5u6Bb6aO3dP8XFs+P3IN1uCLZ19AayL1XoVGlkoUYocya1H?=
- =?us-ascii?Q?VCl1IDshVlBJPHOXgPOpcIKE8pLSQJOkZddp5HpXkkrMtuWODBgXF1wRRZlN?=
- =?us-ascii?Q?NCTaecBWF5bcR4qduYGEsstn6ixu/VVY/EPo9CFk2M47oUmDugQdStX0U+rt?=
- =?us-ascii?Q?BYSb7cc89zOg2rCXh8Wq5uInsbCKIY1wZ+VE6ma/FTbR+QRDazFp1qgucaSf?=
- =?us-ascii?Q?LzMxNTov0KwcNpF7ozEWenA/ck04SuZmEx0hlNMd8klnZaUy/dgCgvHUSfpF?=
- =?us-ascii?Q?kjr0yWCiG8MOTHEWiGAsTDCygiyqPRtJLzfDfRh2R6UuLzOMtqDI8o5Pj+UN?=
- =?us-ascii?Q?Q4PWobT3PPBJOSO8GYUlloD5R/lHkZJ5ujA+IFtqNLyEu6EUaBhWHp3bkqp8?=
- =?us-ascii?Q?7qI/KPytxr9cL5AdZ40D56GpPC0W3Bbk7XT4SHPfzn3h2RZuFtgaaMbjCaf/?=
- =?us-ascii?Q?eeJEggAMnuxSU+kcOlhi2V2b+D8pTvetDRCQcALpN/xNSiPf55rVg3r4TsWk?=
- =?us-ascii?Q?ZLhZC5NeYSV7rn1M8Bko03ABeKEYvgd6Izp2nzY8sxUFlSFmL7iOsHiJzg3F?=
- =?us-ascii?Q?DAopmwMqxRaAnpfaLro+cUabvL80lvcefA7Icaodbp/TEktyeLtWFoXfwe9t?=
- =?us-ascii?Q?3qsB0aE9nYiKI6BNXJ8+YRzQD2Xcn0jfURqoxSa3y2bUiOKL3zH/bOkv8c0f?=
- =?us-ascii?Q?7CCTfUBKg7m1J5XrWVi6I5T2b1d6DoNsecm2e5a9Unzj69ztJ7+foPFlbHgn?=
- =?us-ascii?Q?V6MX7GeL8diOD/gNagB01sWETTunRmp0FD4piWnN10KzRDyo19VT0vxFqBW3?=
- =?us-ascii?Q?EJmKD7Mvpwe2b8cZVgxvQpt5YR2yJ3uoI0G7klie/tY8Vj3/aCbFsb+fntEX?=
- =?us-ascii?Q?UzGHAeysbzlHW5TtqEHeoMJK5ZgYpM7xzxlUgXHfA/A17aJowrZKu43J5Q0E?=
- =?us-ascii?Q?0BoQvJz0ZY1Ue7PAGyLgbAdYdtrYQZ/OtdoWG3MzBH+MoYIOrydv7KdIwh3f?=
- =?us-ascii?Q?u0Fal0FBq8X3CmQFXeW5uEbmEkZ1?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?cnrDs/TuseVcsSpkLEONXV31WUBmth5uZ3w3OuZh0LvfVsSKv1wjNC3+ulzH?=
- =?us-ascii?Q?sp6TNSUGj4703P4F2olKzU3H1jdO0qGf+AME+/vsORER4pc8gSfDi0kHxL7j?=
- =?us-ascii?Q?SHv0wR3Fe9J+Bi8uevYESmKISOcyQovSpRW4pJT6yaP5/tYjkCVBDNo4RhUh?=
- =?us-ascii?Q?ixjHiG/R0f9x4nZ3aYifgRqNia2M1zcWoRMH97BN+6y6pDOiiIo3PS8nXnCX?=
- =?us-ascii?Q?NpgPJZnHvUArAQp2mH8k4LIgfsagJD7ZA7CziaXI29w4tXpR6s/pxBvbv8Hw?=
- =?us-ascii?Q?zIPtkscog8UVTDLwfwSquEGjX5T5D4L985dj7ekj/q7DYjomQ9iiSGCo60VZ?=
- =?us-ascii?Q?T1KjkTl5gOBwUqCzYOVzPXgGU88sqMd/9nR4vaY7VKTCKW6jqSa4VXETuuhQ?=
- =?us-ascii?Q?6GVYSU4jcmc+w0S5S6VzV5HblxMHc+p2M0ER27COWFS7TiOzdB0fjLO9X/dr?=
- =?us-ascii?Q?dnk2ZQZF8YY1ze7xIobAL8RDzUDFtSgck5brUIcFiE6Wp9fKX0+i6vZBtGHx?=
- =?us-ascii?Q?T80OmY1GjiP3Gw4/U3yLm3MzyL33xfmDUVeyo+zi5/NJGFpf3dspeQuEuBkh?=
- =?us-ascii?Q?thiCQfIMz4OsiVygpY/qYiCOUkRX7epWi7qv0GnHaw6z3l383VkYoSNVNCBb?=
- =?us-ascii?Q?UnNyfAXBNohxwpY9k7NwLYExk8DIQWkFVdGCYW/wg+/c3rAi96r9SR5rx9Iq?=
- =?us-ascii?Q?b4nLsnxwmKA4QUHvEdk5v2RcmXZpusLLeeyutZSTlNmCCpXEV+YkfS42oD6N?=
- =?us-ascii?Q?kFx1NEFNE7zBb6oqOb4iCZJjwJuOe6XZErTMwJ9GMqB73iBZOm1Zuu2rEVUW?=
- =?us-ascii?Q?e0vhgHdMCE1/hlGqU6Veue/v8G9agErM6O4/ugTwCa4IGSkUuslWMQrxDKP0?=
- =?us-ascii?Q?rbJk5F8kbVsvP3EyhCvVIIFBO0EAwMODjH/rfK1w6/jvMn7vtkSnZlkMgoR0?=
- =?us-ascii?Q?mGaPx6l97U/576X8mcnBE996xZAXfnNHH93omAEsvhGVYYStqjNQYTJxUlEU?=
- =?us-ascii?Q?projHeV2xKYxJOvBBGyMHPlWJyEldSwQmn1CqvIWpcYwLR8H/3Dbqjdj5i1w?=
- =?us-ascii?Q?c67IhuXIUJsl0QjnVmcH8Y4JRh+kL4kBDLNZoiRN96Hvcb/wyzw7CgoH82M0?=
- =?us-ascii?Q?aP72wmNRdpIzVaK+jUInSN/IhAMcdAmYjOlGImMW9TNXrjEsdl/71XryjJX7?=
- =?us-ascii?Q?JS+hUTtOV4BpglbmQYDbzFO17c+wzDGUKOWsxmaaDvR0AS9sibh6QdD6gsUV?=
- =?us-ascii?Q?SVDIVKix53ywnzF6tztiAQkvtx5khY3y0N9DP3lk8ft66FZ0OQNI7aFoIS4f?=
- =?us-ascii?Q?2EhfrxT3PHnf4oLX1qCPigms7rkFZQ7sFTnd0ydoyAufEGVH8bHRTFkWFOfp?=
- =?us-ascii?Q?Ghm09wlJBM20mKno4Mk6z6aGXT/yA8tT4uEZCK8lFEpbhagO0lTQUAI++yWe?=
- =?us-ascii?Q?UOkz4aADZ0T2Gc1pb8qlV968Hpa0+QlZYcxtgolsfb08YsFtBUN3FFJOsKz/?=
- =?us-ascii?Q?CzGyin3BSIXxvGFlWCcZMQnc4Vof4O2lstlj+iJf1XLk0OqK1oHdjv7b/vNR?=
- =?us-ascii?Q?bgql/NbsY8mbHDIEnEUkEWDNq5cZ8MsHgVFBux64?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 57fea47d-324f-43cb-5453-08dda3fe8026
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2025 06:59:22.4749
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YeuMZc6jvP1rlxWmtwAL2MLCvtr/OS2jPeWLLxaKSal3NOIS8PzQ4L2tN/Jw2BweD58guODS0mP0iW65XydOFQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB9086
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 00/14] riscv: add SBI FWFT misaligned exception
+ delegation support
+To: Charlie Jenkins <charlie@rivosinc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
+Cc: cleger@rivosinc.com, Paul Walmsley <paul.walmsley@sifive.com>,
+ anup@brainfault.org, atishp@atishpatra.org, shuah@kernel.org,
+ corbet@lwn.net, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-kselftest@vger.kernel.org, samuel.holland@sifive.com,
+ ajones@ventanamicro.com, debug@rivosinc.com
+References: <20250523101932.1594077-1-cleger@rivosinc.com>
+ <mhng-C1CE13EE-C4E6-490D-ABF4-CE7BD84737C3@palmerdabbelt-mac>
+ <aECfReNdxc1ERz6K@ghost>
+Content-Language: en-US
+From: Alexandre Ghiti <alex@ghiti.fr>
+In-Reply-To: <aECfReNdxc1ERz6K@ghost>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddugdeffedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthekredttddvjeenucfhrhhomheptehlvgigrghnughrvgcuifhhihhtihcuoegrlhgvgiesghhhihhtihdrfhhrqeenucggtffrrghtthgvrhhnpeefueejtdegkedvhefhudfhgeefieevheeugeehgedvgfejhfetjeeiudelvdefteenucffohhmrghinhepghhithhhuhgsrdgtohhmpdhkvghrnhgvlhdrohhrghdpihhnfhhrrgguvggrugdrohhrghenucfkphepudelfedrfeefrdehjedrudelleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduleefrdeffedrheejrdduleelpdhhvghloheplgduledvrdduieekrddvuddrvdeingdpmhgrihhlfhhrohhmpegrlhgvgiesghhhihhtihdrfhhrpdhnsggprhgtphhtthhopedujedprhgtphhtthhopegthhgrrhhlihgvsehrihhvohhsihhntgdrtghomhdprhgtphhtthhopehprghlmhgvrhesuggrsggsvghlthdrtghomhdprhgtphhtthhopegtlhgvghgvrhesrhhivhhoshhinhgtrdgtohhmpdhrtghpthhtohepphgruhhlrdifrghlmhhslhgvhiesshhifhhivhgvrdgtohhmpdhrtghpthhtoheprghnu
+ hhpsegsrhgrihhnfhgruhhlthdrohhrghdprhgtphhtthhopegrthhishhhphesrghtihhshhhprghtrhgrrdhorhhgpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheptghorhgsvghtsehlfihnrdhnvght
+X-GND-Sasl: alex@ghiti.fr
 
-On Thu, May 29, 2025 at 04:40:01PM -0700, Sean Christopherson wrote:
->On a userspace MSR filter change, recalculate all MSR intercepts using the
->filter-agnostic logic instead of maintaining a "shadow copy" of KVM's
->desired intercepts.  The shadow bitmaps add yet another point of failure,
->are confusing (e.g. what does "handled specially" mean!?!?), an eyesore,
->and a maintenance burden.
+On 6/4/25 21:32, Charlie Jenkins wrote:
+> On Wed, Jun 04, 2025 at 11:02:35AM -0700, Palmer Dabbelt wrote:
+>> On Fri, 23 May 2025 03:19:17 PDT (-0700), cleger@rivosinc.com wrote:
+>>> The SBI Firmware Feature extension allows the S-mode to request some
+>>> specific features (either hardware or software) to be enabled. This
+>>> series uses this extension to request misaligned access exception
+>>> delegation to S-mode in order to let the kernel handle it. It also adds
+>>> support for the KVM FWFT SBI extension based on the misaligned access
+>>> handling infrastructure.
+>>>
+>>> FWFT SBI extension is part of the SBI V3.0 specifications [1]. It can be
+>>> tested using the qemu provided at [2] which contains the series from
+>>> [3]. Upstream kvm-unit-tests can be used inside kvm to tests the correct
+>>> delegation of misaligned exceptions. Upstream OpenSBI can be used.
+>>>
+>>> Note: Since SBI V3.0 is not yet ratified, FWFT extension API is split
+>>> between interface only and implementation, allowing to pick only the
+>>> interface which do not have hard dependencies on SBI.
+>>>
+>>> The tests can be run using the kselftest from series [4].
+>>>
+>>> $ qemu-system-riscv64 \
+>>> 	-cpu rv64,trap-misaligned-access=true,v=true \
+>>> 	-M virt \
+>>> 	-m 1024M \
+>>> 	-bios fw_dynamic.bin \
+>>> 	-kernel Image
+>>>   ...
+>>>
+>>>   # ./misaligned
+>>>   TAP version 13
+>>>   1..23
+>>>   # Starting 23 tests from 1 test cases.
+>>>   #  RUN           global.gp_load_lh ...
+>>>   #            OK  global.gp_load_lh
+>>>   ok 1 global.gp_load_lh
+>>>   #  RUN           global.gp_load_lhu ...
+>>>   #            OK  global.gp_load_lhu
+>>>   ok 2 global.gp_load_lhu
+>>>   #  RUN           global.gp_load_lw ...
+>>>   #            OK  global.gp_load_lw
+>>>   ok 3 global.gp_load_lw
+>>>   #  RUN           global.gp_load_lwu ...
+>>>   #            OK  global.gp_load_lwu
+>>>   ok 4 global.gp_load_lwu
+>>>   #  RUN           global.gp_load_ld ...
+>>>   #            OK  global.gp_load_ld
+>>>   ok 5 global.gp_load_ld
+>>>   #  RUN           global.gp_load_c_lw ...
+>>>   #            OK  global.gp_load_c_lw
+>>>   ok 6 global.gp_load_c_lw
+>>>   #  RUN           global.gp_load_c_ld ...
+>>>   #            OK  global.gp_load_c_ld
+>>>   ok 7 global.gp_load_c_ld
+>>>   #  RUN           global.gp_load_c_ldsp ...
+>>>   #            OK  global.gp_load_c_ldsp
+>>>   ok 8 global.gp_load_c_ldsp
+>>>   #  RUN           global.gp_load_sh ...
+>>>   #            OK  global.gp_load_sh
+>>>   ok 9 global.gp_load_sh
+>>>   #  RUN           global.gp_load_sw ...
+>>>   #            OK  global.gp_load_sw
+>>>   ok 10 global.gp_load_sw
+>>>   #  RUN           global.gp_load_sd ...
+>>>   #            OK  global.gp_load_sd
+>>>   ok 11 global.gp_load_sd
+>>>   #  RUN           global.gp_load_c_sw ...
+>>>   #            OK  global.gp_load_c_sw
+>>>   ok 12 global.gp_load_c_sw
+>>>   #  RUN           global.gp_load_c_sd ...
+>>>   #            OK  global.gp_load_c_sd
+>>>   ok 13 global.gp_load_c_sd
+>>>   #  RUN           global.gp_load_c_sdsp ...
+>>>   #            OK  global.gp_load_c_sdsp
+>>>   ok 14 global.gp_load_c_sdsp
+>>>   #  RUN           global.fpu_load_flw ...
+>>>   #            OK  global.fpu_load_flw
+>>>   ok 15 global.fpu_load_flw
+>>>   #  RUN           global.fpu_load_fld ...
+>>>   #            OK  global.fpu_load_fld
+>>>   ok 16 global.fpu_load_fld
+>>>   #  RUN           global.fpu_load_c_fld ...
+>>>   #            OK  global.fpu_load_c_fld
+>>>   ok 17 global.fpu_load_c_fld
+>>>   #  RUN           global.fpu_load_c_fldsp ...
+>>>   #            OK  global.fpu_load_c_fldsp
+>>>   ok 18 global.fpu_load_c_fldsp
+>>>   #  RUN           global.fpu_store_fsw ...
+>>>   #            OK  global.fpu_store_fsw
+>>>   ok 19 global.fpu_store_fsw
+>>>   #  RUN           global.fpu_store_fsd ...
+>>>   #            OK  global.fpu_store_fsd
+>>>   ok 20 global.fpu_store_fsd
+>>>   #  RUN           global.fpu_store_c_fsd ...
+>>>   #            OK  global.fpu_store_c_fsd
+>>>   ok 21 global.fpu_store_c_fsd
+>>>   #  RUN           global.fpu_store_c_fsdsp ...
+>>>   #            OK  global.fpu_store_c_fsdsp
+>>>   ok 22 global.fpu_store_c_fsdsp
+>>>   #  RUN           global.gen_sigbus ...
+>>>   [12797.988647] misaligned[618]: unhandled signal 7 code 0x1 at 0x0000000000014dc0 in misaligned[4dc0,10000+76000]
+>>>   [12797.988990] CPU: 0 UID: 0 PID: 618 Comm: misaligned Not tainted 6.13.0-rc6-00008-g4ec4468967c9-dirty #51
+>>>   [12797.989169] Hardware name: riscv-virtio,qemu (DT)
+>>>   [12797.989264] epc : 0000000000014dc0 ra : 0000000000014d00 sp : 00007fffe165d100
+>>>   [12797.989407]  gp : 000000000008f6e8 tp : 0000000000095760 t0 : 0000000000000008
+>>>   [12797.989544]  t1 : 00000000000965d8 t2 : 000000000008e830 s0 : 00007fffe165d160
+>>>   [12797.989692]  s1 : 000000000000001a a0 : 0000000000000000 a1 : 0000000000000002
+>>>   [12797.989831]  a2 : 0000000000000000 a3 : 0000000000000000 a4 : ffffffffdeadbeef
+>>>   [12797.989964]  a5 : 000000000008ef61 a6 : 626769735f6e0000 a7 : fffffffffffff000
+>>>   [12797.990094]  s2 : 0000000000000001 s3 : 00007fffe165d838 s4 : 00007fffe165d848
+>>>   [12797.990238]  s5 : 000000000000001a s6 : 0000000000010442 s7 : 0000000000010200
+>>>   [12797.990391]  s8 : 000000000000003a s9 : 0000000000094508 s10: 0000000000000000
+>>>   [12797.990526]  s11: 0000555567460668 t3 : 00007fffe165d070 t4 : 00000000000965d0
+>>>   [12797.990656]  t5 : fefefefefefefeff t6 : 0000000000000073
+>>>   [12797.990756] status: 0000000200004020 badaddr: 000000000008ef61 cause: 0000000000000006
+>>>   [12797.990911] Code: 8793 8791 3423 fcf4 3783 fc84 c737 dead 0713 eef7 (c398) 0001
+>>>   #            OK  global.gen_sigbus
+>>>   ok 23 global.gen_sigbus
+>>>   # PASSED: 23 / 23 tests passed.
+>>>   # Totals: pass:23 fail:0 xfail:0 xpass:0 skip:0 error:0
+>>>
+>>> With kvm-tools:
+>>>
+>>>   # lkvm run -k sbi.flat -m 128
+>>>    Info: # lkvm run -k sbi.flat -m 128 -c 1 --name guest-97
+>>>    Info: Removed ghost socket file "/root/.lkvm//guest-97.sock".
+>>>
+>>>   ##########################################################################
+>>>   #    kvm-unit-tests
+>>>   ##########################################################################
+>>>
+>>>   ... [test messages elided]
+>>>   PASS: sbi: fwft: FWFT extension probing no error
+>>>   PASS: sbi: fwft: get/set reserved feature 0x6 error == SBI_ERR_DENIED
+>>>   PASS: sbi: fwft: get/set reserved feature 0x3fffffff error == SBI_ERR_DENIED
+>>>   PASS: sbi: fwft: get/set reserved feature 0x80000000 error == SBI_ERR_DENIED
+>>>   PASS: sbi: fwft: get/set reserved feature 0xbfffffff error == SBI_ERR_DENIED
+>>>   PASS: sbi: fwft: misaligned_deleg: Get misaligned deleg feature no error
+>>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature invalid value error
+>>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature invalid value error
+>>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value no error
+>>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value 0
+>>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value no error
+>>>   PASS: sbi: fwft: misaligned_deleg: Set misaligned deleg feature value 1
+>>>   PASS: sbi: fwft: misaligned_deleg: Verify misaligned load exception trap in supervisor
+>>>   SUMMARY: 50 tests, 2 unexpected failures, 12 skipped
+>>>
+>>> This series is available at [5].
+>>>
+>>> Link: https://github.com/riscv-non-isa/riscv-sbi-doc/releases/download/vv3.0-rc2/riscv-sbi.pdf [1]
+>>> Link: https://github.com/rivosinc/qemu/tree/dev/cleger/misaligned [2]
+>>> Link: https://lore.kernel.org/all/20241211211933.198792-3-fkonrad@amd.com/T/ [3]
+>>> Link: https://lore.kernel.org/linux-riscv/20250414123543.1615478-1-cleger@rivosinc.com [4]
+>>> Link: https://github.com/rivosinc/linux/tree/dev/cleger/fwft [5]
+>>> ---
+>>>
+>>> V8:
+>>>   - Move misaligned_access_speed under CONFIG_RISCV_MISALIGNED and add a
+>>>     separate commit for that.
+>>>
+>>> V7:
+>>>   - Fix ifdefery build problems
+>>>   - Move sbi_fwft_is_supported with fwft_set_req struct
+>>>   - Added Atish Reviewed-by
+>>>   - Updated KVM vcpu cfg hedeleg value in set_delegation
+>>>   - Changed SBI ETIME error mapping to ETIMEDOUT
+>>>   - Fixed a few typo reported by Alok
+>>>
+>>> V6:
+>>>   - Rename FWFT interface to remove "_local"
+>>>   - Fix test for MEDELEG values in KVM FWFT support
+>>>   - Add __init for unaligned_access_init()
+>>>   - Rebased on master
+>>>
+>>> V5:
+>>>   - Return ERANGE as mapping for SBI_ERR_BAD_RANGE
+>>>   - Removed unused sbi_fwft_get()
+>>>   - Fix kernel for sbi_fwft_local_set_cpumask()
+>>>   - Fix indentation for sbi_fwft_local_set()
+>>>   - Remove spurious space in kvm_sbi_fwft_ops.
+>>>   - Rebased on origin/master
+>>>   - Remove fixes commits and sent them as a separate series [4]
+>>>
+>>> V4:
+>>>   - Check SBI version 3.0 instead of 2.0 for FWFT presence
+>>>   - Use long for kvm_sbi_fwft operation return value
+>>>   - Init KVM sbi extension even if default_disabled
+>>>   - Remove revert_on_fail parameter for sbi_fwft_feature_set().
+>>>   - Fix comments for sbi_fwft_set/get()
+>>>   - Only handle local features (there are no globals yet in the spec)
+>>>   - Add new SBI errors to sbi_err_map_linux_errno()
+>>>
+>>> V3:
+>>>   - Added comment about kvm sbi fwft supported/set/get callback
+>>>     requirements
+>>>   - Move struct kvm_sbi_fwft_feature in kvm_sbi_fwft.c
+>>>   - Add a FWFT interface
+>>>
+>>> V2:
+>>>   - Added Kselftest for misaligned testing
+>>>   - Added get_user() usage instead of __get_user()
+>>>   - Reenable interrupt when possible in misaligned access handling
+>>>   - Document that riscv supports unaligned-traps
+>>>   - Fix KVM extension state when an init function is present
+>>>   - Rework SBI misaligned accesses trap delegation code
+>>>   - Added support for CPU hotplugging
+>>>   - Added KVM SBI reset callback
+>>>   - Added reset for KVM SBI FWFT lock
+>>>   - Return SBI_ERR_DENIED_LOCKED when LOCK flag is set
+>>>
+>>> Clément Léger (14):
+>>>    riscv: sbi: add Firmware Feature (FWFT) SBI extensions definitions
+>>>    riscv: sbi: remove useless parenthesis
+>>>    riscv: sbi: add new SBI error mappings
+>>>    riscv: sbi: add FWFT extension interface
+>>>    riscv: sbi: add SBI FWFT extension calls
+>>>    riscv: misaligned: request misaligned exception from SBI
+>>>    riscv: misaligned: use on_each_cpu() for scalar misaligned access
+>>>      probing
+>>>    riscv: misaligned: declare misaligned_access_speed under
+>>>      CONFIG_RISCV_MISALIGNED
+>>>    riscv: misaligned: move emulated access uniformity check in a function
+>>>    riscv: misaligned: add a function to check misalign trap delegability
+>>>    RISC-V: KVM: add SBI extension init()/deinit() functions
+>>>    RISC-V: KVM: add SBI extension reset callback
+>>>    RISC-V: KVM: add support for FWFT SBI extension
+>>>    RISC-V: KVM: add support for SBI_FWFT_MISALIGNED_DELEG
+>>>
+>>>   arch/riscv/include/asm/cpufeature.h        |  14 +-
+>>>   arch/riscv/include/asm/kvm_host.h          |   5 +-
+>>>   arch/riscv/include/asm/kvm_vcpu_sbi.h      |  12 +
+>>>   arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |  29 +++
+>>>   arch/riscv/include/asm/sbi.h               |  60 +++++
+>>>   arch/riscv/include/uapi/asm/kvm.h          |   1 +
+>>>   arch/riscv/kernel/sbi.c                    |  81 ++++++-
+>>>   arch/riscv/kernel/traps_misaligned.c       | 112 ++++++++-
+>>>   arch/riscv/kernel/unaligned_access_speed.c |   8 +-
+>>>   arch/riscv/kvm/Makefile                    |   1 +
+>>>   arch/riscv/kvm/vcpu.c                      |   4 +-
+>>>   arch/riscv/kvm/vcpu_sbi.c                  |  54 +++++
+>>>   arch/riscv/kvm/vcpu_sbi_fwft.c             | 257 +++++++++++++++++++++
+>>>   arch/riscv/kvm/vcpu_sbi_sta.c              |   3 +-
+>>>   14 files changed, 620 insertions(+), 21 deletions(-)
+>>>   create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+>>>   create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
+>> Sorry I'm still kind of out of it here, but I think Alex was saying this has
+>> dependencies in the patchwork call this morning?
+
+
+Yes, you need this patchset too: 
+https://lore.kernel.org/linux-riscv/20250602193918.868962-1-cleger@rivosinc.com/
+
+I prepared a PR that does not merge the KVM parts and I checked with 
+Anup, he will merge them in the next MW. My PR with FWFT passed the CI, 
+so I'll send it now anyway.
+
+Thanks,
+
+Alex
+
+
+> The "dependency" is that the kvm tree will not accept patches this late.
+> The KVM patches can be dropped and the riscv patches can be merged, but
+> it is pretty late now.
 >
->Given that KVM *must* be able to recalculate the correct intercepts at any
->given time, and that MSR filter updates are not hot paths, there is zero
->benefit to maintaining the shadow bitmaps.
+> - Charlie
 >
->Link: https://lore.kernel.org/all/aCdPbZiYmtni4Bjs@google.com
->Link: https://lore.kernel.org/all/20241126180253.GAZ0YNTdXH1UGeqsu6@fat_crate.local
->Cc: Borislav Petkov <bp@alien8.de>
->Cc: Xin Li <xin@zytor.com>
->Cc: Chao Gao <chao.gao@intel.com>
->Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>
->Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-
-one nit below,
-
->+
->+	if (vcpu->arch.xfd_no_write_intercept)
->+		vmx_disable_intercept_for_msr(vcpu, MSR_IA32_XFD, MSR_TYPE_RW);
->+
->+
-
-Remove one newline here.
+>
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
