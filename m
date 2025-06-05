@@ -1,195 +1,174 @@
-Return-Path: <kvm+bounces-48556-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48557-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C2B7ACF3CD
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 18:10:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C31D1ACF3DB
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 18:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 214C8166471
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 16:10:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3407189C892
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 16:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147002749FE;
-	Thu,  5 Jun 2025 16:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430EE20D4F9;
+	Thu,  5 Jun 2025 16:12:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DA6xyS7R"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W87IsDVL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644EB27465C
-	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 16:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA581E834B
+	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 16:12:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749139808; cv=none; b=R0t4RYtjmK2ord7SABBRUJ2goirp3egr9/rkiETIHhzeFnngzShJZVuTp8j8GxGKNXO9ncx9gCLM5PTbpVJzvoVwp+U5vTkOAAntUBmGerW4DCMmPHfDMOJkDl5ccIbSjd15kxmq7e4zX+nVdbeJP9q70cAOigOJwrKu8ZSIuXA=
+	t=1749139924; cv=none; b=fVUwADqZ6vtN9sNfdduZrgDiYVZYsA4LBTJw1/zbUMCLhoYr+IZgGdNyjpabIooijkNHCDzAlYWUT/rkixM+JLHogiBvVNMkO9eGze3ivwsOpQv0yXFKQyUXOh/OTJiVjtPqMWO6cJ+pTZIgZ+CzZlEeJs6ACNFqI/mr9ai7CmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749139808; c=relaxed/simple;
-	bh=o/Tlk9x1eSaxP1Eo8YyEvaZZuLAOeOGyA2Hs3yxwQXI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J+ZV3ZSNovKBRFZ5EDUHUZmYTfnsdwCA9Al/EmPNzkg7fOap9isW7DMnUjYkyVWZ8lP1AOKfDoNDkAYf02zeyfDIgmx4CFsVYNX0ytNFUe3Apfm8qoauGgPJMKTQEXshc/ywSYafXf2Ranws1qhXnvNCBG+p0gh7RWhCeLUgm40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DA6xyS7R; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749139805;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wDs1HzFrKoifF1hub98p0mc0v8p741xLPpTuV3UpURY=;
-	b=DA6xyS7Roo3yzLc7aOvKqSQxpjBtJBR5DmiiX6ZWGHcEBaNYM+Zk2Gabsr8fAztMhyDDNq
-	Za7Zt7QbtszofEJjf5fiD0/TTTOB8Ag1nXJLA0AwSWByiuDx7uDOmO+FImVm+ziTyYOeDE
-	uBQE6rWOFwaFHX3KAoE/jh6DLWiwMmk=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-12-VBDUHXGlOBOoq_1ga4Iv1w-1; Thu, 05 Jun 2025 12:10:04 -0400
-X-MC-Unique: VBDUHXGlOBOoq_1ga4Iv1w-1
-X-Mimecast-MFC-AGG-ID: VBDUHXGlOBOoq_1ga4Iv1w_1749139803
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ddc8cb7de6so1183555ab.0
-        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 09:10:03 -0700 (PDT)
+	s=arc-20240116; t=1749139924; c=relaxed/simple;
+	bh=6lOtFIHKrjKKY2yPe3PXFI2Tfr8nvEQlzUWoA9G5Tr4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WtOY8XibiKcyQTnuJVThNbC66iOoFKLnh+80geJkjFLYq+On4qis6X5lR8UmuB2/L1jCnTTV6er4B6vUTf4upiU7Z8d5pctRDId4pkUDfNuh1TAK3vjSQFlxUsh2fVBwwiu/HAlL8sAmWqO90l9ekgOtDtcYKp1FhA14FV7aj3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W87IsDVL; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4a5ac8fae12so745411cf.0
+        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 09:12:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749139922; x=1749744722; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=AVQTBJlbhCkTd304Z8LDEkMLDfW8IzBGu64gE9FirnM=;
+        b=W87IsDVLiSz3tkY8DX+o0s2VukksrL3OZZ6zDA9BTK+mjdu1zXx4TF3ZkU34ELr6f6
+         xzH7JHxq0829OXmn8Q6MLarC3D8EEHwRGt3W3fce8sHrcb/ewC/BnCpGaxt3r+JeBb0C
+         vzw+ewJmXh/nWjmuH4RCqGe0GXQJlNCdm4jL/f5twWtGjawqk1IV2S0TR7iVG5Pp/cun
+         cw0Dh2xiTFO093lvQW8jhiJqCnx3U/V27/m/Pd+jD6JZSgigogqMA+YTgQCw+EBsYGwp
+         iaF1B8dazSVVLI3uQTB9zi7qJaeQ4dsPbVFjy5majc31/zZP4/8i4Uu9PHy/lFsCbdPR
+         zgew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749139803; x=1749744603;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wDs1HzFrKoifF1hub98p0mc0v8p741xLPpTuV3UpURY=;
-        b=rximxLdEKj2GKz2FJkrXcGuLvsuhrpJFj9oIQsQ/Q/C7OKhJsIHpgJRbWYU0hjlv3B
-         hEHwM6eZ3VdSV/PLezTkaiy0bXt6QQehgC7RwVSIRdf4Il9FB6xtPMCXRfcE+xh2hpdO
-         3pfZO6+jKtxpppvRAeu9bbje/mzUmzKXF6rXA7t1WmpzlXb3KkO+wq5/lueRja34e49B
-         0E1c4vnbg92nVAiFGtOz0+QB0jjJOkXrPsO5qmc8N1cA+yK37RuwWOWgTaciIEk841bL
-         N5yH6DjTuT1zpTH+Y4zQiVrQEVEJ1H6yFrFrTkPe7mA2jbF0eKHJ3lx4GgBFUVKM21mc
-         DnHA==
-X-Gm-Message-State: AOJu0YywV0XhidkulPjkBYEru2aaywp5D46t4Hulw3PNfeYOU08rKi1y
-	QxYnJG+dkTXHduXwC81WG0X5A35GYwaCr0mYFdoNnuo3maPyGuMR+6p4z1HXCKKoEFQmoYdWj0B
-	/eNzqVJL2RC8GNcjD83KbWN0H8Lr2QTg1AIA5kN2ebKWfy112sj9Vkw==
-X-Gm-Gg: ASbGncuQ4hYGNgZuPb3MRusT/fN7hdyZXY60+WmLpHCPvk4jp4gQ0gSrMydVtbmKnAi
-	4xgRdBhVcbKgxQvK4A291tj6SXWLViQKgIPZ1XpY0zgCy5U7q9ByD47T+N6TJjY+QNXk3BHSXd/
-	olEaRez7a+IT8ratQbdpFeeeQc84Aubg9sHnEE1Xwec/TpRZkkqBsBhMzFsZBF1AOQoF0axO7yz
-	0DxUuEtoS5eNwhlY6t0Iy3tTiYkJqkdTkv9m3gOcZ7vhoWEWvb2/iU3WFIQT2kJ+MJpPhZURgkW
-	8Co1alextqZVtJMCandyluI7WQ==
-X-Received: by 2002:a05:6e02:2206:b0:3dd:b589:9da5 with SMTP id e9e14a558f8ab-3ddbece82afmr22588575ab.1.1749139803059;
-        Thu, 05 Jun 2025 09:10:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEBfaCbaCOLCMKp+VFVqNAc7n8GjDzBAgP6HF7JopaVxLiFSueJ4pIKVONeJY/lKn0BrZzv1A==
-X-Received: by 2002:a05:6e02:2206:b0:3dd:b589:9da5 with SMTP id e9e14a558f8ab-3ddbece82afmr22588485ab.1.1749139802661;
-        Thu, 05 Jun 2025 09:10:02 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4fdd7ed82fbsm3360220173.90.2025.06.05.09.10.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jun 2025 09:10:00 -0700 (PDT)
-Date: Thu, 5 Jun 2025 10:09:58 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: lizhe.67@bytedance.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC] vfio/type1: optimize vfio_unpin_pages_remote() for large
- folio
-Message-ID: <20250605100958.10c885d3.alex.williamson@redhat.com>
-In-Reply-To: <20250605124923.21896-1-lizhe.67@bytedance.com>
-References: <20250605124923.21896-1-lizhe.67@bytedance.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1749139922; x=1749744722;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AVQTBJlbhCkTd304Z8LDEkMLDfW8IzBGu64gE9FirnM=;
+        b=iz+T3Vyn5alo0wtXY32cPAclJZP5AcZKXi2j3ao8D0KMkOhBci/9on3YK7bNE15oG6
+         vliZojJIlhiCBGpBZHHTDH5T4pfqAftS7t45JCwiO06HQ0/O7RQgsH6JQphmk6NO8gs+
+         NQbE30V3m930omu3XcEnZ+L1qgdRcIwBj49fmhDX9f2YIzINF5jrXB4axI5IXROhPskv
+         PrPDwycCMTG4fFrg1nrP46SqaBFtxMF1TqhPwvJwIpZ+5Ix+Ubh0g2rI2YUei2tW5YI4
+         BeEt9/kLYfG/im7rp2i3EzQwxl9OPaudFPTjaxAR2EKE0R1RE/tTbRbeFgW14SqVxejq
+         bUgQ==
+X-Gm-Message-State: AOJu0YyhkXHMtuvb7+lrdgqPT8SV4qWZ1efxQ7o9+DsE+1/XuY8mSsfA
+	/T9H76+X5cZ0qIDqplq4XOk4+WdI3DpUFPpVvOCm5gZLoEA+DUpz12mDfC9PFkvYgcywAhTd3qW
+	opZcfQdihqqNogAcVtejfKaWj+wniUmnviGETICTE
+X-Gm-Gg: ASbGncsT8L/90R8OCuChCOTO78HQRSlixDGrqnVZE93INeWIj4lHLTi4Wfi6+ECYda7
+	2FdAL4LxlmgNt0wWTo/gx6RVYGBeLghhBXAfunFB0Syz3DC9VcIPpRdftSjTGDN0FTLksWBfrIM
+	LRqbPJ9seSwAGJWRmC6BgQSi5IUbW89kq5BFRNJsjVB+s=
+X-Google-Smtp-Source: AGHT+IGW1AVosxjNsFSIObbIwdEXbd942cmJ5pLbHiwd321kOxoWe+7++7JtO3HfWK1XkI6NzVd1UixGjAX3NzyuEHY=
+X-Received: by 2002:a05:622a:1e19:b0:486:a185:3136 with SMTP id
+ d75a77b69052e-4a5af3be5femr4553531cf.14.1749139911983; Thu, 05 Jun 2025
+ 09:11:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250605153800.557144-1-tabba@google.com> <20250605153800.557144-13-tabba@google.com>
+ <4909d6dc-09f5-4960-b8be-5150b2a03e45@redhat.com>
+In-Reply-To: <4909d6dc-09f5-4960-b8be-5150b2a03e45@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 5 Jun 2025 17:11:15 +0100
+X-Gm-Features: AX0GCFvM0cIQHeoKF8w2gaIC3qDuLSImbI5TRY95h3Mg5SfZMXcAsghCvn7NJBM
+Message-ID: <CA+EHjTwnAV=tu1eUjixyKAhE4bpNc3XV7EhnMME3+WJ-cu6PNA@mail.gmail.com>
+Subject: Re: [PATCH v11 12/18] KVM: x86: Enable guest_memfd shared memory for
+ SW-protected VMs
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu,  5 Jun 2025 20:49:23 +0800
-lizhe.67@bytedance.com wrote:
+On Thu, 5 Jun 2025 at 16:49, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 05.06.25 17:37, Fuad Tabba wrote:
+> > Define the architecture-specific macro to enable shared memory support
+> > in guest_memfd for relevant software-only VM types, specifically
+> > KVM_X86_DEFAULT_VM and KVM_X86_SW_PROTECTED_VM.
+> >
+> > Enable the KVM_GMEM_SHARED_MEM Kconfig option if KVM_SW_PROTECTED_VM is
+> > enabled.
+> >
+> > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >   arch/x86/include/asm/kvm_host.h | 10 ++++++++++
+> >   arch/x86/kvm/Kconfig            |  1 +
+> >   arch/x86/kvm/x86.c              |  3 ++-
+> >   3 files changed, 13 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 709cc2a7ba66..ce9ad4cd93c5 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -2255,8 +2255,18 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+> >
+> >   #ifdef CONFIG_KVM_GMEM
+> >   #define kvm_arch_supports_gmem(kvm) ((kvm)->arch.supports_gmem)
+> > +
+> > +/*
+> > + * CoCo VMs with hardware support that use guest_memfd only for backing private
+> > + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping enabled.
+> > + */
+> > +#define kvm_arch_supports_gmem_shared_mem(kvm)                       \
+> > +     (IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM) &&                      \
+> > +      ((kvm)->arch.vm_type == KVM_X86_SW_PROTECTED_VM ||             \
+> > +       (kvm)->arch.vm_type == KVM_X86_DEFAULT_VM))
+> >   #else
+> >   #define kvm_arch_supports_gmem(kvm) false
+> > +#define kvm_arch_supports_gmem_shared_mem(kvm) false
+> >   #endif
+> >
+> >   #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state)
+> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> > index b37258253543..fdf24b50af9d 100644
+> > --- a/arch/x86/kvm/Kconfig
+> > +++ b/arch/x86/kvm/Kconfig
+> > @@ -47,6 +47,7 @@ config KVM_X86
+> >       select KVM_GENERIC_HARDWARE_ENABLING
+> >       select KVM_GENERIC_PRE_FAULT_MEMORY
+> >       select KVM_GENERIC_GMEM_POPULATE if KVM_SW_PROTECTED_VM
+> > +     select KVM_GMEM_SHARED_MEM if KVM_SW_PROTECTED_VM
+> >       select KVM_WERROR if WERROR
+>
+> Is $subject and this still true, given that it's now also supported for
+> KVM_X86_DEFAULT_VM?
 
-> From: Li Zhe <lizhe.67@bytedance.com>
-> 
-> This patch is based on patch 'vfio/type1: optimize vfio_pin_pages_remote()
-> for large folios'[1].
-> 
-> When vfio_unpin_pages_remote() is called with a range of addresses that
-> includes large folios, the function currently performs individual
-> put_pfn() operations for each page. This can lead to significant
-> performance overheads, especially when dealing with large ranges of pages.
-> 
-> This patch optimize this process by batching the put_pfn() operations.
-> 
-> The performance test results, based on v6.15, for completing the 8G VFIO
-> IOMMU DMA unmapping, obtained through trace-cmd, are as follows. In this
-> case, the 8G virtual address space has been separately mapped to small
-> folio and physical memory using hugetlbfs with pagesize=2M. For large
-> folio, we achieve an approximate 66% performance improvement. However,
-> for small folios, there is an approximate 11% performance degradation.
-> 
-> Before this patch:
-> 
->     hugetlbfs with pagesize=2M:
->     funcgraph_entry:      # 94413.092 us |  vfio_unmap_unpin();
-> 
->     small folio:
->     funcgraph_entry:      # 118273.331 us |  vfio_unmap_unpin();
-> 
-> After this patch:
-> 
->     hugetlbfs with pagesize=2M:
->     funcgraph_entry:      # 31260.124 us |  vfio_unmap_unpin();
-> 
->     small folio:
->     funcgraph_entry:      # 131945.796 us |  vfio_unmap_unpin();
+True, just not the whole truth :)
 
-I was just playing with a unit test[1] to validate your previous patch
-and added this as well:
+I guess a better one would be, for Software VMs (remove protected)?
 
-Test options:
-
-	vfio-pci-mem-dma-map <ssss:bb:dd.f> <size GB> [hugetlb path]
-
-I'm running it once with device and size for the madvise and populate
-tests, then again adding /dev/hugepages (1G) for the remaining test:
-
-Base:
-# vfio-pci-mem-dma-map 0000:0b:00.0 16
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.294 s (54.4 GB/s)
-VFIO UNMAP DMA in 0.175 s (91.3 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.726 s (22.0 GB/s)
-VFIO UNMAP DMA in 0.169 s (94.5 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.071 s (224.0 GB/s)
-VFIO UNMAP DMA in 0.103 s (156.0 GB/s)
-
-Map patch:
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.296 s (54.0 GB/s)
-VFIO UNMAP DMA in 0.175 s (91.7 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.741 s (21.6 GB/s)
-VFIO UNMAP DMA in 0.184 s (86.7 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.010 s (1542.9 GB/s)
-VFIO UNMAP DMA in 0.109 s (146.1 GB/s)
-
-Map + Unmap patches:
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.301 s (53.2 GB/s)
-VFIO UNMAP DMA in 0.236 s (67.8 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.735 s (21.8 GB/s)
-VFIO UNMAP DMA in 0.234 s (68.4 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.011 s (1434.7 GB/s)
-VFIO UNMAP DMA in 0.023 s (686.5 GB/s)
-
-So overall the map optimization shows a nice improvement in hugetlbfs
-mapping performance.  I was hoping we'd see some improvement in THP,
-but that doesn't appear to be the case.  Will folio_nr_pages() ever be
-more than 1 for THP?  The degradation in non-hugetlbfs case is small,
-but notable.
-
-The unmap optimization shows a pretty substantial decline in the
-non-hugetlbfs cases.  I don't think that can be overlooked.  Thanks,
-
-Alex
-
-[1]https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
-
+/fuad
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
