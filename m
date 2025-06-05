@@ -1,143 +1,196 @@
-Return-Path: <kvm+bounces-48579-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48580-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA8F9ACF67A
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 20:23:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35838ACF695
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 20:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47DEF3AD6A5
-	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 18:23:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7ACE3189D99B
+	for <lists+kvm@lfdr.de>; Thu,  5 Jun 2025 18:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A08327A909;
-	Thu,  5 Jun 2025 18:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 992641F099A;
+	Thu,  5 Jun 2025 18:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="GmiPTg+S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="af2SaE7h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF5891EF37C
-	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 18:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315ED1DB546
+	for <kvm@vger.kernel.org>; Thu,  5 Jun 2025 18:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749147814; cv=none; b=rBVRrS0gorIWCQZmz9HjiXj3yZVt+O9D5kB5IhwqCHukjQXJwdtYoDiEd0qDl02V0jFB4PGSlaq3/Ib6lEGqbf1aE/j2PZEIgI79lvGxzhXQQAgEYojoAjpfBjYs9dNbISE4WazVQmLU51PU5YLMrRoTnwVxZM+Jq8FpOrM52jE=
+	t=1749148234; cv=none; b=R0p8qcZWaWxwn54rIq7DCzy8JTRvmadmIDg7DGa6f/6RYCMeTgEwyBxVFKNY6lvLAVYOvQyCg19CMT4l7ulMDO8IJlLSPhXOk+h/0otbkSxs+v2nAbWqTpEjJKwHqabsz6bEHdhyz0PaKJHz2rwslCdoal3xr8VLyRC2n22pphQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749147814; c=relaxed/simple;
-	bh=R9u39JEZmT18gJLnh4kUm01asal2sR177VJ3UQxdmQM=;
+	s=arc-20240116; t=1749148234; c=relaxed/simple;
+	bh=LnyQlmsP5i9Gpf9tYX7BjcukxJuRTi2gzqGvRKTWTn0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l4kAu2YeF6ccBOwrvnPitHUUNF5f6bDw6qING4RkVH6s3NPlPKNCQj1E2XLK343ikMzEMO4tjEOcSZldAW5XLxacmL+mU3TDXLQNb/sMIikNX3kuuUrM3OQ3H4qb6gDjOfVJrh07QptdSGQBIlaNNGHG6a791HAC0B8FZGS2EXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=GmiPTg+S; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e812fc35985so1303793276.0
-        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 11:23:32 -0700 (PDT)
+	 To:Cc:Content-Type; b=OlyjLdElE+wbHhKUuAXLns3DV1wBtDpWzikbeyqP4sCCoHtur0h2Kq16hGcLkyqAswSwbQ3WUgpbpEqiq2R1sLGm7ZSKhhVf5tMmkjgGTlFSihqMqtfem6Q+Ev8Dtod/0DaZvZtm3n6zRI5cZPNvarflKd21z51N0yYXYXZT3g8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=af2SaE7h; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4a5ac8fae12so64641cf.0
+        for <kvm@vger.kernel.org>; Thu, 05 Jun 2025 11:30:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1749147812; x=1749752612; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vo6V4Ppsn9eFIGNfpfF7fHNiUwnu2FfDlKV+ixE/pPE=;
-        b=GmiPTg+S9V/TuwngsVU3TwLZXGUCX9IP8XbwdfE98zQJZlku1hk2dWz8yApaeKxX9x
-         q9acXP6Ev/qFEz71ndH082ZSWUFx42SGeML/4CluZJg4GCMpZGOQPehWOnXSa3jo/Vvp
-         eS/kiX905O1jnqNajyM8CzRBX1812uLmuamDSGmgJ7rVv0OVONg0bM6fHG0/2G6mhmj5
-         B08W5FTZ8VoBZg6ntlSUb7BFclAwSxydKt7BeCVEXV8ONkuxHiLGK73F9Q+iQuil0ekm
-         IFDulSz6ZAcSARj87isu9b4cKvOfpZwQi8DPvBpAfz55vlatOdHdtlTsw6Biz3otyeRQ
-         3Upw==
+        d=google.com; s=20230601; t=1749148231; x=1749753031; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4HrdqA/k41LxSYTdKh0OWWXzlPloxAg6qTNcrag1JWY=;
+        b=af2SaE7hIFovqmOCgjMSqeULLS/l9OZP0jRIDDJeEUtNMvkYIHgfAMZrR39g/KFqHG
+         YJZRzgjVB1FN4e4EZYlNYFrZkoxdiHJjbkxTjwjNhRL7KkZ+Wrip7/ffwl324z6dIrPR
+         Fn97Kk2QWCVQVeQCaHec6ci8PFVo8RPX21qXWALnq/c0cv3lhe0GPvZgy37o38AZ8aie
+         AJwCvlCqr3AAulquP+wucKoptTJ4UkmY6eUpamWMA7AwDtg5hoSjcX1nUCxn+mySnXFP
+         qoVA2P7+03q85YE/p23qPayJtse6GNtA5OnJzamqzlP45TTvVZFMgKAXnJ7ZvC8yzQBf
+         UXcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749147812; x=1749752612;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vo6V4Ppsn9eFIGNfpfF7fHNiUwnu2FfDlKV+ixE/pPE=;
-        b=QmGeY4M23vIrDetWUWQ43Nn+D/glc2X3FBiA8O4ZBM48gfmQ6qPyCb1K/EXjDV6AbX
-         IWD/a3G43A038xy0PVAuqIo91ZcrNxWe9O75sC0I7Ikwjy2ruT1c3eoglH6fL7CN1HvV
-         jXmmXR3oMe7kpiNBqzTy4UmiVmZ6F8D5F8rvTZznIJD5VWzy4o8862Ks/P+HnSo2iPD+
-         fZVVdl7ARJ74Q1KRaLdwX67tBdN/uHATXzXOucw+zimcciJWYFQ2ysGgm3Zv7/ADhL8G
-         u1acshC1j5w4HPVo/AibUlKJg7P46jqRUlxq6ltXrOeKmH6DPRT8XHXgtpQJhM5PgbtE
-         u3Tg==
-X-Forwarded-Encrypted: i=1; AJvYcCVnILf8VxTnAQEP0i6JG8VD4akiMDXd2hlgqjbnqgzMji40TbObN1B5EOKTPmt3egkSYKw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxd+lM5SmOhOXXKkmlqCQvxa1ScLpRrJ7pJHVTipG2MA4qXhWg3
-	e0m0ltVKJqQNTI3k+x6/sakv6JK5HInVe3ni+zaLpLHHK6YicIhR9LINlYA4NdIGWwXRmFdvbOq
-	X7Z8pE04ZM+697EJW2vvntSk7Z0hwXfFVToHbBMlu
-X-Gm-Gg: ASbGnculBCv6aAsWREae1VahO/teceeOyu2SZg0SLdKrwvRk8kIkO1rCC9GILmD9mGP
-	E+6k2o3XyBC2AF3pVcdvLz8utWGTYFbRcwy9axfrylMvn2o8jDwW7kmCtgM87CX8wdAIYaOBYku
-	bV1Op7AunUlbT6gV1CQ2um4juZzEyg0t7u
-X-Google-Smtp-Source: AGHT+IFlZbkCKjkkUykBJ3kANNnDocnKVC3Jz2qHpf1mQeqFtAa91potV6f9YRNypDxAi3xWFBKbXGqceEKkdz1Ki5Y=
-X-Received: by 2002:a05:6902:2e0d:b0:e81:9a1c:1c0d with SMTP id
- 3f1490d57ef6-e81a22847e6mr978672276.7.1749147811619; Thu, 05 Jun 2025
- 11:23:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749148231; x=1749753031;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4HrdqA/k41LxSYTdKh0OWWXzlPloxAg6qTNcrag1JWY=;
+        b=ZFg3f7KwGrDDlOTwF+1Pr9tevZgqrTdDmDK+06VuJMXLMQHYCroYNaJfMj2k2gKykT
+         dg99JZQ3drDXFh3weBFB+IyI8JoUCLax7Nc432wdRVqFaycwnDg37iL6gkNU6laXNUwE
+         CwktfkTWpr+X5v/dW7o4L2DarSoDuLJC4oUBfuwONWGZR/CcwHumGcHoSPEf/OffyfCr
+         sxPXdevC7ERxvoETHgtLnoBqHl+eHsQHf7JfUSgy9P0uHKTyYHKT37PMryQmQ4XitgZQ
+         M2jNkkofOk3vtSdNIEALKCAzaTqQLeGvs46FUBHpQfLRJxxVR78Dj3vayCBp8z0KjrGg
+         JtWg==
+X-Gm-Message-State: AOJu0Ywr8fWOPNcQ08sPZccKeQ52RTLT0/mWlwzF9X68vCtPprdvpeK8
+	qhO9JF4KOw+W4UWWdhHPa9ET9YDlxSIqoVfcI0DvLI87HGvuyAnEPoernv/WGk+55IeJ5lR9bfK
+	u3PG0JUR1eXODo1J5+jNAk7fPMS5Um+aqxMTmkSJ+
+X-Gm-Gg: ASbGncuQH8jeCrVWg1OA+ySV3p/cmqdrupS3+9KRvoMJYiMGqyAhWacIpQq8T6ZeVCl
+	dWadz9LOoUCENGVVWEDCA2lMh2MtKB6WaAoI7qNx/4+XBv7eBCYDaqTS7OCfBQLices6F2ewx5m
+	h4IVOS+x4cc6LlKiQsRnm0vhPzhesk7kSRzPSVo3lZgmI=
+X-Google-Smtp-Source: AGHT+IH7FgESvCVozX/CiDB6ulbbev2isNZ+Soh9txr1mG6fDd4w52Z5DJcOcfE45agVq/Nr3QCWQsAjORWdDsJL18w=
+X-Received: by 2002:ac8:41c4:0:b0:48a:ba32:370 with SMTP id
+ d75a77b69052e-4a5baa649ccmr283761cf.10.1749148230605; Thu, 05 Jun 2025
+ 11:30:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1748890962.git.ackerleytng@google.com> <c03fbe18c3ae90fb3fa7c71dc0ee164e6cc12103.1748890962.git.ackerleytng@google.com>
- <aD_8z4pd7JcFkAwX@kernel.org> <CAHC9VhQczhrVx4YEGbXbAS8FLi0jaV1RB0kb8e4rPsUOXYLqtA@mail.gmail.com>
- <aEEv-A1ot_t8ePgv@kernel.org>
-In-Reply-To: <aEEv-A1ot_t8ePgv@kernel.org>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 5 Jun 2025 14:23:20 -0400
-X-Gm-Features: AX0GCFuxDKrPh9BVvZ5a1pei5w2LKJ7senFjfBy4ObZ7zkQcfpax-Jaemg5t1J8
-Message-ID: <CAHC9VhR3dKsXYAxY+1Ujr4weO=iBHMPHsJ3-8f=wM5q_oo81wA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] fs: Provide function that allocates a secure
- anonymous inode
-To: Mike Rapoport <rppt@kernel.org>
-Cc: Ackerley Tng <ackerleytng@google.com>, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, linux-fsdevel@vger.kernel.org, 
-	aik@amd.com, ajones@ventanamicro.com, akpm@linux-foundation.org, 
-	amoorthy@google.com, anthony.yznaga@oracle.com, anup@brainfault.org, 
-	aou@eecs.berkeley.edu, bfoster@redhat.com, binbin.wu@linux.intel.com, 
-	brauner@kernel.org, catalin.marinas@arm.com, chao.p.peng@intel.com, 
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com, 
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com, haibo1.xu@intel.com, 
-	hch@infradead.org, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, vannapurve@google.com, vbabka@suse.cz, 
-	viro@zeniv.linux.org.uk, vkuznets@redhat.com, wei.w.wang@intel.com, 
-	will@kernel.org, willy@infradead.org, xiaoyao.li@intel.com, 
-	yan.y.zhao@intel.com, yilun.xu@intel.com, yuzenghui@huawei.com, 
-	zhiquan1.li@intel.com
+References: <20250605153800.557144-1-tabba@google.com> <20250605153800.557144-13-tabba@google.com>
+ <4909d6dc-09f5-4960-b8be-5150b2a03e45@redhat.com> <CA+EHjTwnAV=tu1eUjixyKAhE4bpNc3XV7EhnMME3+WJ-cu6PNA@mail.gmail.com>
+ <8782284c-0ffc-489d-adfe-b25d5ccb77b3@redhat.com> <CA+EHjTw-dgn+QbHd5aCxjLXCGamx7eTr75qcFm+o16qyVydnBQ@mail.gmail.com>
+ <637ffae1-a61e-4d68-8332-9ec11a3a78d4@redhat.com>
+In-Reply-To: <637ffae1-a61e-4d68-8332-9ec11a3a78d4@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 5 Jun 2025 19:29:53 +0100
+X-Gm-Features: AX0GCFsQbfhZC_FlYPxk85rO768zb9vVPjsu-8YXphOrtD0BhntZritMMuHZreE
+Message-ID: <CA+EHjTyxJ3VKqPF_9oswYAcbrJM3_MiYoExe6-Dx8A+0bZa+nQ@mail.gmail.com>
+Subject: Re: [PATCH v11 12/18] KVM: x86: Enable guest_memfd shared memory for
+ SW-protected VMs
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 5, 2025 at 1:50=E2=80=AFAM Mike Rapoport <rppt@kernel.org> wrot=
-e:
+On Thu, 5 Jun 2025 at 18:45, David Hildenbrand <david@redhat.com> wrote:
 >
-> secretmem always had S_PRIVATE set because alloc_anon_inode() clears it
-> anyway and this patch does not change it.
+> On 05.06.25 19:43, Fuad Tabba wrote:
+> > On Thu, 5 Jun 2025 at 18:35, David Hildenbrand <david@redhat.com> wrote:
+> >>
+> >> On 05.06.25 18:11, Fuad Tabba wrote:
+> >>> On Thu, 5 Jun 2025 at 16:49, David Hildenbrand <david@redhat.com> wrote:
+> >>>>
+> >>>> On 05.06.25 17:37, Fuad Tabba wrote:
+> >>>>> Define the architecture-specific macro to enable shared memory support
+> >>>>> in guest_memfd for relevant software-only VM types, specifically
+> >>>>> KVM_X86_DEFAULT_VM and KVM_X86_SW_PROTECTED_VM.
+> >>>>>
+> >>>>> Enable the KVM_GMEM_SHARED_MEM Kconfig option if KVM_SW_PROTECTED_VM is
+> >>>>> enabled.
+> >>>>>
+> >>>>> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> >>>>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> >>>>> Signed-off-by: Fuad Tabba <tabba@google.com>
+> >>>>> ---
+> >>>>>     arch/x86/include/asm/kvm_host.h | 10 ++++++++++
+> >>>>>     arch/x86/kvm/Kconfig            |  1 +
+> >>>>>     arch/x86/kvm/x86.c              |  3 ++-
+> >>>>>     3 files changed, 13 insertions(+), 1 deletion(-)
+> >>>>>
+> >>>>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> >>>>> index 709cc2a7ba66..ce9ad4cd93c5 100644
+> >>>>> --- a/arch/x86/include/asm/kvm_host.h
+> >>>>> +++ b/arch/x86/include/asm/kvm_host.h
+> >>>>> @@ -2255,8 +2255,18 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+> >>>>>
+> >>>>>     #ifdef CONFIG_KVM_GMEM
+> >>>>>     #define kvm_arch_supports_gmem(kvm) ((kvm)->arch.supports_gmem)
+> >>>>> +
+> >>>>> +/*
+> >>>>> + * CoCo VMs with hardware support that use guest_memfd only for backing private
+> >>>>> + * memory, e.g., TDX, cannot use guest_memfd with userspace mapping enabled.
+> >>>>> + */
+> >>>>> +#define kvm_arch_supports_gmem_shared_mem(kvm)                       \
+> >>>>> +     (IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM) &&                      \
+> >>>>> +      ((kvm)->arch.vm_type == KVM_X86_SW_PROTECTED_VM ||             \
+> >>>>> +       (kvm)->arch.vm_type == KVM_X86_DEFAULT_VM))
+> >>>>>     #else
+> >>>>>     #define kvm_arch_supports_gmem(kvm) false
+> >>>>> +#define kvm_arch_supports_gmem_shared_mem(kvm) false
+> >>>>>     #endif
+> >>>>>
+> >>>>>     #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state)
+> >>>>> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> >>>>> index b37258253543..fdf24b50af9d 100644
+> >>>>> --- a/arch/x86/kvm/Kconfig
+> >>>>> +++ b/arch/x86/kvm/Kconfig
+> >>>>> @@ -47,6 +47,7 @@ config KVM_X86
+> >>>>>         select KVM_GENERIC_HARDWARE_ENABLING
+> >>>>>         select KVM_GENERIC_PRE_FAULT_MEMORY
+> >>>>>         select KVM_GENERIC_GMEM_POPULATE if KVM_SW_PROTECTED_VM
+> >>>>> +     select KVM_GMEM_SHARED_MEM if KVM_SW_PROTECTED_VM
+> >>>>>         select KVM_WERROR if WERROR
+> >>>>
+> >>>> Is $subject and this still true, given that it's now also supported for
+> >>>> KVM_X86_DEFAULT_VM?
+> >>>
+> >>> True, just not the whole truth :)
+> >>>
+> >>> I guess a better one would be, for Software VMs (remove protected)?
+> >>
+> >> Now I am curious, what is a Hardware VM? :)
+> >
+> > The opposite of a software one! ;) i.e., hardware-supported CoCo,
+> > e.g., TDX, CCA...
+>
+> So, you mean a sofware VM is ... just an ordinary VM? :P
+>
+> "KVM: x86: Enable guest_memfd shared memory for ordinary (non-CoCo) VMs" ?
+>
+> But, whatever you prefer :)
 
-Yes, my apologies, I didn't look closely enough at the code.
+This sounds better. I was thrown off by the KVM_SW_PROTECTED_VM type :)
 
-> I'm just thinking that it makes sense to actually allow LSM/SELinux
-> controls that S_PRIVATE bypasses for both secretmem and guest_memfd.
+/fuad
 
-It's been a while since we added the anon_inode hooks so I'd have to
-go dig through the old thread to understand the logic behind marking
-secretmem S_PRIVATE, especially when the
-anon_inode_make_secure_inode() function cleared it.  It's entirely
-possible it may have just been an oversight.
-
---=20
-paul-moore.com
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
