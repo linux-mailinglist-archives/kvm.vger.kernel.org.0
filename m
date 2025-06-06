@@ -1,236 +1,470 @@
-Return-Path: <kvm+bounces-48633-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48636-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED835ACFDE0
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 10:00:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBA4AACFE11
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 10:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5E95175C92
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 08:00:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44FB33AC817
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 08:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D509285419;
-	Fri,  6 Jun 2025 08:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34CA285411;
+	Fri,  6 Jun 2025 08:15:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pqhLkbKM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CoUgvKLv"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27733284B46;
-	Fri,  6 Jun 2025 08:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4046B284B53
+	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 08:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749196802; cv=none; b=hjqNXIAKG8fOrTBTzpGlgHAgeAcqRb5rAUt64uDNw0iSMtCNhN6Kl7mD+XH0sFXYhrZO1PLxzHkZ3ftXQckm9b5zsV431NRU67Ltx69Yq9dilAgc2Hyw2orMPNkrpNehXb5WDM6QNckk+tG7HBZzFwKoY5MkKiXYGIgxcAespF0=
+	t=1749197700; cv=none; b=q4IM4Yj5bXoYW0OBH3TVAVRVmZ4E+K2tN+kJgr2N0vPVgtpdqYXQ8DVnw4c8snANh/UnAeUuR50k8udVlCKQm3C0+d58Z+RE/VWad9JfZ56MqoQPKjzbFacw4pbEi6JvBXFzF4/RosKGoYRGeohzIFR2m1PHfUjy6IMDauzYt3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749196802; c=relaxed/simple;
-	bh=KfrhofsOFofV4Yxp9rI2KSMcovauU9GJjmAbXeaDSsg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=JjCUHq9Ft9kCyTE6GP08o4vpTeXJ3kalbhC9wID8v6sU/6TcunrDe7fSxqFNuazVhB+NHi9cr8XaYm/rkCNbJFBTCUllqsNiYlO+TRTOg+V0vFSE1fnRLT8eSF9r7rYlv7233Gie2iZoR2UsFqtEe9K8SjO5qbQRrHYX80fnh+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pqhLkbKM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA779C4CEEB;
-	Fri,  6 Jun 2025 07:59:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749196801;
-	bh=KfrhofsOFofV4Yxp9rI2KSMcovauU9GJjmAbXeaDSsg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=pqhLkbKMkWlh09VG2BUFsVfs6NK4OKZbNwioszl4dtm7v6FQc/Us4v9H8idPC/YAZ
-	 R9D+pS+mxBdOKoDLgqtqaLdXdLYDHR597Gg2BMYpada9SrbtQR4t7wJ6ImnWZzHOGF
-	 5gnEw5tKPIaK4Qhwzw0wHveRseXshANV2N2aXKDZSBLnFRNaJV0E6A9mAQ3TDfvhAW
-	 nq1UgqiGf25d7D2QCO1dYHLdR3DKyUk5gBrQSU/DXnxiQOQSAcqvdEmw/eUcLOA38h
-	 uMHfd3tmg5iZSInah3S9vB1cxcIVwyIczZWhxfCIK6FtpP8QL5Pdy+ytPlW1pxl4sd
-	 CpZ9A7pZeYAkw==
-X-Mailer: emacs 30.1 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org,
-	sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	dan.j.williams@intel.com, aik@amd.com, linux-coco@lists.linux.dev,
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, vivek.kasireddy@intel.com,
-	yilun.xu@intel.com, linux-kernel@vger.kernel.org, lukas@wunner.de,
-	yan.y.zhao@intel.com, daniel.vetter@ffwll.ch, leon@kernel.org,
-	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com, linux-pci@vger.kernel.org, zhiw@nvidia.com,
-	simona.vetter@ffwll.ch, shameerali.kolothum.thodi@huawei.com,
-	iommu@lists.linux.dev, kevin.tian@intel.com
-Subject: Re: [RFC PATCH 17/30] iommufd/device: Add TSM Bind/Unbind for TIO
- support
-In-Reply-To: <20250604132403.GJ5028@nvidia.com>
-References: <20250529053513.1592088-1-yilun.xu@linux.intel.com>
- <20250529053513.1592088-18-yilun.xu@linux.intel.com>
- <yq5awm9ujouz.fsf@kernel.org> <aD6UQy4KwKcdSvVE@yilunxu-OptiPlex-7050>
- <20250603122149.GH376789@nvidia.com> <yq5aplfj99x0.fsf@kernel.org>
- <20250604132403.GJ5028@nvidia.com>
-Date: Fri, 06 Jun 2025 13:29:46 +0530
-Message-ID: <yq5a4iwt8fm5.fsf@kernel.org>
+	s=arc-20240116; t=1749197700; c=relaxed/simple;
+	bh=Sx2kRoA6540IBjmVa8iRjeggrCjDOHKI0hKp9zXnYLs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DXflVOezDOEJ1KSK7CCGEWu1G71s3Ouhhblbwx9ExbG8C9slpPv2SrfxeVOtQrNdBL9Pk20c24myQeB3MMk2fMV64X0bgfL2VEz4oiGEi59SjqkyvH81A6C6QCyNaTCjxRilf13KC+l7m0S1R9zYc3tYBbJg2aI2nHRG6oZCNZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CoUgvKLv; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4a5ac8fae12so317451cf.0
+        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 01:14:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749197696; x=1749802496; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vZ2a17s14DiwVXH5n9E8Jz+5/4EfpoYvUq0sk56Onz0=;
+        b=CoUgvKLvaJDrid4hzcog15Inv6dR4KKgbchVav54QH5alXYY2JFP7QDbpoX0NG2CDC
+         Efe18gUfqagOo/09sz3XHIniWWPi+BXTv020NrMLwdMSG77ZKJwdnNZz0XN0Ys/PLrcU
+         kGD2zNsWMyDFYj9arGbVBLAO14b77YD/GfEL2lpDmfi56Jsqh/63dPyhqfEHnNEw+Qp1
+         yyFLDwvFBFWi5Vka8yRARIfd4udNaHlUGfaFNkyeHaGqzlrkhWSMg0ZQfymWC3hT2lru
+         dXbggYAu2wqcXnq28nOnfc3qlZSOxc+khHkJmXIebCvVQIZYLFGePK73cZ9Y36wIUjsh
+         e6IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749197696; x=1749802496;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vZ2a17s14DiwVXH5n9E8Jz+5/4EfpoYvUq0sk56Onz0=;
+        b=nI/axOW5uNrviKWhdvFLZUhfsefoT51k7/v7/EhcTaR1dthMPN+LGBJoMiUl6g2yQ3
+         FtfDuMHEGdxjoSelfFmN8p99TKTE+lsxxjo4ldFLS67g2ROxfxhdR4pE0e7EUevtnt/v
+         a0H7MC37SUG6+VQ988VBfR+1KjJt7EeSWCJqncXFAaGSYC8A/wDzgcQzreMz+ins3PQQ
+         dtcaXMMxTCHgTAW5S0zMwjfX04f48Liz98QnGR8bUO5OPoQOvDex86Exfxky1NVvRTJY
+         N8DR95Q9Jm0djIdXJLEFgxovOyft52TH3QsWU73aX7Mx4vrlu0H39AcFOgB527PloPV5
+         o14A==
+X-Gm-Message-State: AOJu0Yyi5a5ncg64uIXR7aRWImSCy7tJPgTsDbHKgpT3zJm7kzJ57Hrh
+	PNoDF6zX5xp5SZBtsMTCv4Tqot36/5LVbdREX8ljhkLhHF208lG7PzLQn0p2c2jnzQFm61Cmc5P
+	+DZLrBL4d7k2uYZ83C14VecnSbQJMRWe9GocC7erCyCpgZ0DmU8Bu0npXKzdn+g==
+X-Gm-Gg: ASbGnct6K++ocHmTEQMN58At7m98Ht9Oa5Ib6ljR4O/cXfzGXY7vu3wTjHN/PCQcytD
+	J6pJQkyCwisuyjYf9o3/fzdXQSfLEUe/Ti1qGVfUueV8evTl6N57FPTfG+ij1DG7IkCXy1pZG7r
+	zbv3moJlhdR3HYKwt1ZIyDZ60KfXtTvchIGHMWdPj2lB0=
+X-Google-Smtp-Source: AGHT+IHO3XbI99LEJ3DkrIqbK0UHqQBaguugDetIvvefVbiU0bjl6q1UARSnYMvGmv4Bofkpu6UiMgfxhbQchzD7XrI=
+X-Received: by 2002:a05:622a:4d4e:b0:480:1561:837f with SMTP id
+ d75a77b69052e-4a5baa64ae4mr3422191cf.8.1749197695571; Fri, 06 Jun 2025
+ 01:14:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20250605153800.557144-1-tabba@google.com> <20250605153800.557144-19-tabba@google.com>
+ <CADrL8HVn_qswsZgWwXcBa-oP61nbWExWSQAKeSSKn2ffMTNtcg@mail.gmail.com>
+In-Reply-To: <CADrL8HVn_qswsZgWwXcBa-oP61nbWExWSQAKeSSKn2ffMTNtcg@mail.gmail.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 6 Jun 2025 09:14:18 +0100
+X-Gm-Features: AX0GCFsF3bQ5ds5aybr1LYz7ilc6jmBKMPt-OX1Muc1KZq58VsL5O8r4L0rcIBQ
+Message-ID: <CA+EHjTwHgAoGos+ZBzEPdkNPzLpX9t8nJLQ89YALPUw4LK4QTA@mail.gmail.com>
+Subject: Re: [PATCH v11 18/18] KVM: selftests: guest_memfd mmap() test when
+ mapping is allowed
+To: James Houghton <jthoughton@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	peterx@redhat.com, pankaj.gupta@amd.com, ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Jason Gunthorpe <jgg@nvidia.com> writes:
+Hi James,
 
-....
-
->> tsm_unbind in vdevice_destroy:
->>=20
->> vdevice_destroy() ends up calling tsm_unbind() while holding only the
->> vdev_lock. At first glance, this seems unsafe. But in practice, it's
->> fine because the corresponding iommufd_device has already been destroyed
->> when the VFIO device file descriptor was closed=E2=80=94triggering
->> vfio_df_iommufd_unbind().
+On Thu, 5 Jun 2025 at 23:07, James Houghton <jthoughton@google.com> wrote:
 >
-> This needs some kind of fixing the idevice should destroy the vdevices
-> during idevice destruction so we don't get this out of order where the
-> idevice is destroyed before the vdevice.
+> On Thu, Jun 5, 2025 at 8:38=E2=80=AFAM Fuad Tabba <tabba@google.com> wrot=
+e:
+> >
+> > Expand the guest_memfd selftests to include testing mapping guest
+> > memory for VM types that support it.
+> >
+> > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
 >
-> This should be a separate patch as it is an immediate bug fix..
+> Feel free to add:
 >
+> Reviewed-by: James Houghton <jthoughton@google.com>
 
-Something like below?
+Thanks!
 
-diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
-index 86244403b532..a49b293bd516 100644
---- a/drivers/iommu/iommufd/device.c
-+++ b/drivers/iommu/iommufd/device.c
-@@ -221,6 +221,8 @@ struct iommufd_device *iommufd_device_bind(struct iommu=
-fd_ctx *ictx,
- 	refcount_inc(&idev->obj.users);
- 	/* igroup refcount moves into iommufd_device */
- 	idev->igroup =3D igroup;
-+	idev->vdev   =3D NULL;
-+	mutex_init(&idev->lock);
-=20
- 	/*
- 	 * If the caller fails after this success it must call
-@@ -282,6 +284,12 @@ EXPORT_SYMBOL_NS_GPL(iommufd_ctx_has_group, "IOMMUFD");
-  */
- void iommufd_device_unbind(struct iommufd_device *idev)
- {
-+	/* this will be unlocked while destroying the idev obj */
-+	mutex_lock(&idev->lock);
-+
-+	if (idev->vdev)
-+		/* extra refcount taken during vdevice alloc */
-+		iommufd_object_destroy_user(idev->ictx, &idev->vdev->obj);
- 	iommufd_object_destroy_user(idev->ictx, &idev->obj);
- }
- EXPORT_SYMBOL_NS_GPL(iommufd_device_unbind, "IOMMUFD");
-diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommuf=
-d/iommufd_private.h
-index 9ccc83341f32..d85bd8b38751 100644
---- a/drivers/iommu/iommufd/iommufd_private.h
-+++ b/drivers/iommu/iommufd/iommufd_private.h
-@@ -425,6 +425,10 @@ struct iommufd_device {
- 	/* always the physical device */
- 	struct device *dev;
- 	bool enforce_cache_coherency;
-+	/* to protect the following members*/
-+	struct mutex lock;
-+	/* if there is a vdevice mapping the idev */
-+	struct iommufd_vdevice *vdev;
- };
-=20
- static inline struct iommufd_device *
-@@ -606,6 +610,7 @@ struct iommufd_vdevice {
- 	struct iommufd_ctx *ictx;
- 	struct iommufd_viommu *viommu;
- 	struct device *dev;
-+	struct iommufd_device *idev;
- 	u64 id; /* per-vIOMMU virtual ID */
- };
-=20
-diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
-index 3df468f64e7d..c38303df536f 100644
---- a/drivers/iommu/iommufd/main.c
-+++ b/drivers/iommu/iommufd/main.c
-@@ -172,6 +172,11 @@ int iommufd_object_remove(struct iommufd_ctx *ictx,
- 		ictx->vfio_ioas =3D NULL;
- 	xa_unlock(&ictx->objects);
-=20
-+	if (obj->type =3D=3D IOMMUFD_OBJ_DEVICE) {
-+		/* idevice should be freed with lock held */
-+		struct iommufd_device *idev =3D container_of(obj, struct iommufd_device,=
- obj);
-+		mutex_unlock(&idev->lock);
-+	}
- 	/*
- 	 * Since users is zero any positive users_shortterm must be racing
- 	 * iommufd_put_object(), or we have a bug.
-diff --git a/drivers/iommu/iommufd/viommu.c b/drivers/iommu/iommufd/viommu.c
-index 01df2b985f02..17f189bc9e2c 100644
---- a/drivers/iommu/iommufd/viommu.c
-+++ b/drivers/iommu/iommufd/viommu.c
-@@ -84,15 +84,24 @@ int iommufd_viommu_alloc_ioctl(struct iommufd_ucmd *ucm=
-d)
- 	return rc;
- }
-=20
-+/* This will be called from iommufd_device_unbind  */
- void iommufd_vdevice_destroy(struct iommufd_object *obj)
- {
- 	struct iommufd_vdevice *vdev =3D
- 		container_of(obj, struct iommufd_vdevice, obj);
- 	struct iommufd_viommu *viommu =3D vdev->viommu;
-+	struct iommufd_device *idev =3D vdev->idev;
-+
-+	/*
-+	 * since we have an refcount on idev, it can't be freed.
-+	 */
-+	lockdep_assert_held(&idev->lock);
-=20
- 	/* xa_cmpxchg is okay to fail if alloc failed xa_cmpxchg previously */
- 	xa_cmpxchg(&viommu->vdevs, vdev->id, vdev, NULL, GFP_KERNEL);
- 	refcount_dec(&viommu->obj.users);
-+	idev->vdev =3D NULL;
-+	refcount_dec(&idev->obj.users);
- 	put_device(vdev->dev);
- }
-=20
-@@ -124,10 +133,15 @@ int iommufd_vdevice_alloc_ioctl(struct iommufd_ucmd *=
-ucmd)
- 		goto out_put_idev;
- 	}
-=20
-+	mutex_lock(&idev->lock);
-+	if (idev->vdev) {
-+		rc =3D -EINVAL;
-+		goto out_put_idev_unlock;
-+	}
- 	vdev =3D iommufd_object_alloc(ucmd->ictx, vdev, IOMMUFD_OBJ_VDEVICE);
- 	if (IS_ERR(vdev)) {
- 		rc =3D PTR_ERR(vdev);
--		goto out_put_idev;
-+		goto out_put_idev_unlock;
- 	}
-=20
- 	vdev->id =3D virt_id;
-@@ -147,10 +161,18 @@ int iommufd_vdevice_alloc_ioctl(struct iommufd_ucmd *=
-ucmd)
- 	if (rc)
- 		goto out_abort;
- 	iommufd_object_finalize(ucmd->ictx, &vdev->obj);
--	goto out_put_idev;
-+	/* don't allow idev free without vdev free */
-+	refcount_inc(&idev->obj.users);
-+	vdev->idev =3D idev;
-+	/* vdev lifecycle now managed by idev */
-+	idev->vdev =3D vdev;
-+	refcount_inc(&vdev->obj.users);
-+	goto out_put_idev_unlock;
-=20
- out_abort:
- 	iommufd_object_abort_and_destroy(ucmd->ictx, &vdev->obj);
-+out_put_idev_unlock:
-+	mutex_unlock(&idev->lock);
- out_put_idev:
- 	iommufd_put_object(ucmd->ictx, &idev->obj);
- out_put_viommu:
+> > ---
+> >  .../testing/selftests/kvm/guest_memfd_test.c  | 201 ++++++++++++++++--
+> >  1 file changed, 180 insertions(+), 21 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/tes=
+ting/selftests/kvm/guest_memfd_test.c
+> > index 341ba616cf55..1612d3adcd0d 100644
+> > --- a/tools/testing/selftests/kvm/guest_memfd_test.c
+> > +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+> > @@ -13,6 +13,8 @@
+> >
+> >  #include <linux/bitmap.h>
+> >  #include <linux/falloc.h>
+> > +#include <setjmp.h>
+> > +#include <signal.h>
+> >  #include <sys/mman.h>
+> >  #include <sys/types.h>
+> >  #include <sys/stat.h>
+> > @@ -34,12 +36,83 @@ static void test_file_read_write(int fd)
+> >                     "pwrite on a guest_mem fd should fail");
+> >  }
+> >
+> > -static void test_mmap(int fd, size_t page_size)
+> > +static void test_mmap_supported(int fd, size_t page_size, size_t total=
+_size)
+> > +{
+> > +       const char val =3D 0xaa;
+> > +       char *mem;
+>
+> This must be `volatile char *` to ensure that the compiler doesn't
+> elide the accesses you have written.
+>
+> > +       size_t i;
+> > +       int ret;
+> > +
+> > +       mem =3D mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIV=
+ATE, fd, 0);
+> > +       TEST_ASSERT(mem =3D=3D MAP_FAILED, "Copy-on-write not allowed b=
+y guest_memfd.");
+> > +
+> > +       mem =3D mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHAR=
+ED, fd, 0);
+> > +       TEST_ASSERT(mem !=3D MAP_FAILED, "mmap() for shared guest memor=
+y should succeed.");
+> > +
+> > +       memset(mem, val, total_size);
+>
+> Now unfortunately, `memset` and `munmap` will complain about the
+> volatile qualification. So...
+>
+> memset((char *)mem, val, total_size);
+>
+> Eh... wish they just wouldn't complain, but this is a small price to
+> pay for correctness. :)
+>
+> > +       for (i =3D 0; i < total_size; i++)
+> > +               TEST_ASSERT_EQ(mem[i], val);
+>
+> The compiler is allowed to[1] elide the read of `mem[i]` and just
+> assume that it is `val`.
+>
+> [1]: https://godbolt.org/z/Wora54bP6
+>
+> Feel free to add `volatile` to that snippet to see how the code changes.
+
+Having tried that and Sean's READ_ONCE() suggestion, I went with the
+latter. Like Sean said, they're not optimised out, and avoid the need
+to cast.
+
+> > +
+> > +       ret =3D fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOL=
+E, 0,
+> > +                       page_size);
+> > +       TEST_ASSERT(!ret, "fallocate the first page should succeed.");
+> > +
+> > +       for (i =3D 0; i < page_size; i++)
+> > +               TEST_ASSERT_EQ(mem[i], 0x00);
+> > +       for (; i < total_size; i++)
+> > +               TEST_ASSERT_EQ(mem[i], val);
+> > +
+> > +       memset(mem, val, page_size);
+> > +       for (i =3D 0; i < total_size; i++)
+> > +               TEST_ASSERT_EQ(mem[i], val);
+> > +
+> > +       ret =3D munmap(mem, total_size);
+> > +       TEST_ASSERT(!ret, "munmap() should succeed.");
+> > +}
+> > +
+> > +static sigjmp_buf jmpbuf;
+> > +void fault_sigbus_handler(int signum)
+> > +{
+> > +       siglongjmp(jmpbuf, 1);
+> > +}
+> > +
+> > +static void test_fault_overflow(int fd, size_t page_size, size_t total=
+_size)
+> > +{
+> > +       struct sigaction sa_old, sa_new =3D {
+> > +               .sa_handler =3D fault_sigbus_handler,
+> > +       };
+> > +       size_t map_size =3D total_size * 4;
+> > +       const char val =3D 0xaa;
+> > +       char *mem;
+>
+> `volatile` here as well.
+>
+> > +       size_t i;
+> > +       int ret;
+> > +
+> > +       mem =3D mmap(NULL, map_size, PROT_READ | PROT_WRITE, MAP_SHARED=
+, fd, 0);
+> > +       TEST_ASSERT(mem !=3D MAP_FAILED, "mmap() for shared guest memor=
+y should succeed.");
+> > +
+> > +       sigaction(SIGBUS, &sa_new, &sa_old);
+> > +       if (sigsetjmp(jmpbuf, 1) =3D=3D 0) {
+> > +               memset(mem, 0xaa, map_size);
+> > +               TEST_ASSERT(false, "memset() should have triggered SIGB=
+US.");
+> > +       }
+> > +       sigaction(SIGBUS, &sa_old, NULL);
+> > +
+> > +       for (i =3D 0; i < total_size; i++)
+> > +               TEST_ASSERT_EQ(mem[i], val);
+> > +
+> > +       ret =3D munmap(mem, map_size);
+> > +       TEST_ASSERT(!ret, "munmap() should succeed.");
+> > +}
+> > +
+> > +static void test_mmap_not_supported(int fd, size_t page_size, size_t t=
+otal_size)
+> >  {
+> >         char *mem;
+> >
+> >         mem =3D mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARE=
+D, fd, 0);
+> >         TEST_ASSERT_EQ(mem, MAP_FAILED);
+> > +
+> > +       mem =3D mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHAR=
+ED, fd, 0);
+> > +       TEST_ASSERT_EQ(mem, MAP_FAILED);
+> >  }
+> >
+> >  static void test_file_size(int fd, size_t page_size, size_t total_size=
+)
+> > @@ -120,26 +193,19 @@ static void test_invalid_punch_hole(int fd, size_=
+t page_size, size_t total_size)
+> >         }
+> >  }
+> >
+> > -static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
+> > +static void test_create_guest_memfd_invalid_sizes(struct kvm_vm *vm,
+> > +                                                 uint64_t guest_memfd_=
+flags,
+> > +                                                 size_t page_size)
+> >  {
+> > -       size_t page_size =3D getpagesize();
+> > -       uint64_t flag;
+> >         size_t size;
+> >         int fd;
+> >
+> >         for (size =3D 1; size < page_size; size++) {
+> > -               fd =3D __vm_create_guest_memfd(vm, size, 0);
+> > -               TEST_ASSERT(fd =3D=3D -1 && errno =3D=3D EINVAL,
+> > +               fd =3D __vm_create_guest_memfd(vm, size, guest_memfd_fl=
+ags);
+> > +               TEST_ASSERT(fd < 0 && errno =3D=3D EINVAL,
+> >                             "guest_memfd() with non-page-aligned page s=
+ize '0x%lx' should fail with EINVAL",
+> >                             size);
+> >         }
+> > -
+> > -       for (flag =3D BIT(0); flag; flag <<=3D 1) {
+> > -               fd =3D __vm_create_guest_memfd(vm, page_size, flag);
+> > -               TEST_ASSERT(fd =3D=3D -1 && errno =3D=3D EINVAL,
+> > -                           "guest_memfd() with flag '0x%lx' should fai=
+l with EINVAL",
+> > -                           flag);
+> > -       }
+> >  }
+> >
+> >  static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
+> > @@ -171,30 +237,123 @@ static void test_create_guest_memfd_multiple(str=
+uct kvm_vm *vm)
+> >         close(fd1);
+> >  }
+> >
+> > -int main(int argc, char *argv[])
+> > +static bool check_vm_type(unsigned long vm_type)
+> >  {
+> > -       size_t page_size;
+> > +       /*
+> > +        * Not all architectures support KVM_CAP_VM_TYPES. However, tho=
+se that
+> > +        * support guest_memfd have that support for the default VM typ=
+e.
+> > +        */
+> > +       if (vm_type =3D=3D VM_TYPE_DEFAULT)
+> > +               return true;
+> > +
+> > +       return kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(vm_type);
+> > +}
+> > +
+> > +static void test_with_type(unsigned long vm_type, uint64_t guest_memfd=
+_flags,
+> > +                          bool expect_mmap_allowed)
+> > +{
+> > +       struct kvm_vm *vm;
+> >         size_t total_size;
+> > +       size_t page_size;
+> >         int fd;
+> > -       struct kvm_vm *vm;
+> >
+> > -       TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
+> > +       if (!check_vm_type(vm_type))
+> > +               return;
+> >
+> >         page_size =3D getpagesize();
+> >         total_size =3D page_size * 4;
+> >
+> > -       vm =3D vm_create_barebones();
+> > +       vm =3D vm_create_barebones_type(vm_type);
+> >
+> > -       test_create_guest_memfd_invalid(vm);
+> >         test_create_guest_memfd_multiple(vm);
+> > +       test_create_guest_memfd_invalid_sizes(vm, guest_memfd_flags, pa=
+ge_size);
+> >
+> > -       fd =3D vm_create_guest_memfd(vm, total_size, 0);
+> > +       fd =3D vm_create_guest_memfd(vm, total_size, guest_memfd_flags)=
+;
+> >
+> >         test_file_read_write(fd);
+> > -       test_mmap(fd, page_size);
+> > +
+> > +       if (expect_mmap_allowed) {
+> > +               test_mmap_supported(fd, page_size, total_size);
+> > +               test_fault_overflow(fd, page_size, total_size);
+> > +
+> > +       } else {
+> > +               test_mmap_not_supported(fd, page_size, total_size);
+> > +       }
+> > +
+> >         test_file_size(fd, page_size, total_size);
+> >         test_fallocate(fd, page_size, total_size);
+> >         test_invalid_punch_hole(fd, page_size, total_size);
+> >
+> >         close(fd);
+> > +       kvm_vm_release(vm);
+>
+> I think kvm_vm_free() is probably more appropriate?
+
+Ack (for both).
+
+Cheers,
+/fuad
+
+> > +}
+> > +
+> > +static void test_vm_type_gmem_flag_validity(unsigned long vm_type,
+> > +                                           uint64_t expected_valid_fla=
+gs)
+> > +{
+> > +       size_t page_size =3D getpagesize();
+> > +       struct kvm_vm *vm;
+> > +       uint64_t flag =3D 0;
+> > +       int fd;
+> > +
+> > +       if (!check_vm_type(vm_type))
+> > +               return;
+> > +
+> > +       vm =3D vm_create_barebones_type(vm_type);
+> > +
+> > +       for (flag =3D BIT(0); flag; flag <<=3D 1) {
+> > +               fd =3D __vm_create_guest_memfd(vm, page_size, flag);
+> > +
+> > +               if (flag & expected_valid_flags) {
+> > +                       TEST_ASSERT(fd >=3D 0,
+> > +                                   "guest_memfd() with flag '0x%lx' sh=
+ould be valid",
+> > +                                   flag);
+> > +                       close(fd);
+> > +               } else {
+> > +                       TEST_ASSERT(fd < 0 && errno =3D=3D EINVAL,
+> > +                                   "guest_memfd() with flag '0x%lx' sh=
+ould fail with EINVAL",
+> > +                                   flag);
+> > +               }
+> > +       }
+> > +
+> > +       kvm_vm_release(vm);
+>
+> Same here.
+>
+> > +}
+> > +
+> > +static void test_gmem_flag_validity(void)
+> > +{
+> > +       uint64_t non_coco_vm_valid_flags =3D 0;
+> > +
+> > +       if (kvm_has_cap(KVM_CAP_GMEM_SHARED_MEM))
+> > +               non_coco_vm_valid_flags =3D GUEST_MEMFD_FLAG_SUPPORT_SH=
+ARED;
+> > +
+> > +       test_vm_type_gmem_flag_validity(VM_TYPE_DEFAULT, non_coco_vm_va=
+lid_flags);
+> > +
+> > +#ifdef __x86_64__
+> > +       test_vm_type_gmem_flag_validity(KVM_X86_SW_PROTECTED_VM, non_co=
+co_vm_valid_flags);
+> > +       test_vm_type_gmem_flag_validity(KVM_X86_SEV_VM, 0);
+> > +       test_vm_type_gmem_flag_validity(KVM_X86_SEV_ES_VM, 0);
+> > +       test_vm_type_gmem_flag_validity(KVM_X86_SNP_VM, 0);
+> > +       test_vm_type_gmem_flag_validity(KVM_X86_TDX_VM, 0);
+> > +#endif
+> > +}
+> > +
+> > +int main(int argc, char *argv[])
+> > +{
+> > +       TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
+> > +
+> > +       test_gmem_flag_validity();
+> > +
+> > +       test_with_type(VM_TYPE_DEFAULT, 0, false);
+> > +       if (kvm_has_cap(KVM_CAP_GMEM_SHARED_MEM)) {
+> > +               test_with_type(VM_TYPE_DEFAULT, GUEST_MEMFD_FLAG_SUPPOR=
+T_SHARED,
+> > +                              true);
+> > +       }
+> > +
+> > +#ifdef __x86_64__
+> > +       test_with_type(KVM_X86_SW_PROTECTED_VM, 0, false);
+> > +       if (kvm_has_cap(KVM_CAP_GMEM_SHARED_MEM)) {
+> > +               test_with_type(KVM_X86_SW_PROTECTED_VM,
+> > +                              GUEST_MEMFD_FLAG_SUPPORT_SHARED, true);
+> > +       }
+> > +#endif
+> >  }
+> > --
+> > 2.49.0.1266.g31b7d2e469-goog
+> >
 
