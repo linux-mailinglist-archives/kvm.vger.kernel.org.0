@@ -1,253 +1,232 @@
-Return-Path: <kvm+bounces-48655-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48656-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900ABAD0071
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 12:34:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C061DAD00C7
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 12:50:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50F23177A9C
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 10:34:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DB4B3A305E
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 10:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8D72853EB;
-	Fri,  6 Jun 2025 10:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74F6287500;
+	Fri,  6 Jun 2025 10:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XaEmbdan"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Torlej3I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D04194A67
-	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 10:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AC62C3242;
+	Fri,  6 Jun 2025 10:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749206041; cv=none; b=Wic0QalmHRLACr+hrI41ebsOTr2vM3YKMtuBtIH2eAKUT23gPIoh/K/FSKEwQUYa84MLd90GNIcKOGfR90g6TA2U+3xyCnFQmVdOvGiHo0683IfTLFxHc8ahcZPoVfY5D7jVpiOTudq3WNdhnPHKx5jMsdb0AN9nXpaVU6zDBUE=
+	t=1749207005; cv=none; b=DD4bDpOW8zw5AGm683hlNZTdrPVgbhXOBzuBH1QwtmGfpL03FZh90PH/0vADWIgpiH9sVGQqo9JhAwszk6ZmLP9zCscs2tP9X6Fcc3QpFGuzcGf4ctA7lSy718naAKxjo8r7jFTQ8Oj6rYCw3PNNuMqQfHXV8nXXj3ucpEnkpiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749206041; c=relaxed/simple;
-	bh=P8BWQX0eac2EiocmBjT+eabK9bdjkAT+CvP9MQzx+nA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tlvr+ar0YPUafQWZSvuDbs7QiFCUJx4kr82IQg3rzp4lWWQknPUr6Qs4TvrE8SsuBR/Jgtxi9RUWQUQH5A0iMzDimtomiXvS2VXcxYvBlUN9Tl7Y1rP9dOgFFHHOtlRnSIdm44L04Sk58CZCYQulysw8CRDtKy51wkBDqXyDKk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XaEmbdan; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-47e9fea29easo312161cf.1
-        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 03:33:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749206038; x=1749810838; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fAw4qUBOEhITQZ6BbLDNViptraoja2RZKd2zTaQIUtM=;
-        b=XaEmbdantMLYb/mbSBplpwL68NlYu8hEhpCuYCo6Lo3sdQ6Swhf1el4KZA60aaq4EH
-         QMXEXKQ4AhXfIsRIHWNHZ8OOx4hcI9Pw4cADJTjw9s95pdl9NvG/pdZvEKwWXJZqLffr
-         c4hokDZ1sB4c/tWbQS6mELSXldnef3o+//ybilAEpp19aadOZv1bcYVb0UqdWUkEz3Yd
-         MTL+bazGvpvV4b2cQS4JQPLxlFhwmc6Pi9F5sLBIe8vS/Bi9u1vlHp1vBvI0movJOnXG
-         QuUIQ6Z+B2N9H3GJPLao/UZ1LxvaSs2gGP3dYWBh87AFIOG2RY4r0+r+Op9ntk8wTGn2
-         vNbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749206038; x=1749810838;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fAw4qUBOEhITQZ6BbLDNViptraoja2RZKd2zTaQIUtM=;
-        b=RfWa6o/SdSC02dQzHtj0DCsSpZQgRz4chR60rEDGPY+B3SFKIgAViSMzH2ZwzPnHj2
-         pOq6EhE+NneBrEzfV16BleiOnG4HXhqGDUeu3wreFBa/zOPBlv17XGqEobZEseSajdy2
-         n0uEtKZzdDTrh5Ep0wxs+B4WgdC3qJt7WCmxeeFWndAjqhbeqCYBgI/P6ox3wBMBll6e
-         wDDLV7BEYI3k1M6w2fkWaOus1+/reT48XJ6xQc2Qdn8wpgtNoqEE7y7A7KagKFkJnvRu
-         E6IJKzt1/tvnrN3w2RCmXMGbJbF21iq11NM70PICwbtxCA1tXiXrhonwnULay6D+LQ/T
-         OhBQ==
-X-Gm-Message-State: AOJu0YyuAbtBV5gVep6+njo4sXzK5CezYVBXjN15u1btQklkHG3BOXHB
-	QAq33VPz6o5BsG+ome+4dJUab06W5ZuApJyHOs+7sjwdv/TgrE/cvVpWP9XcubsXgUxhEy8tUdg
-	KjcI0afaW/efb37Q4PQaz8n1wXVPAdjghlaY7VL2n
-X-Gm-Gg: ASbGncvs9mt3uooGTpq+yx+euxgkTfUEaYHwAjKH4UvqR2pyWPhIUJ/8E51JbdyZ0av
-	TPpw/ofeS1kksYO4nXen8rzbZtN/s0SuxJVzdg61NMdTkZ+g+egQKO+3HkqP2MedofLOREd14OG
-	lT/bUbd9nHca/x8m+OPETC32NeecB1QP+OjwrboOmYt5U=
-X-Google-Smtp-Source: AGHT+IEybTYvddL3yeh6SARztEENsK1RXfYm9brRfTxtTO2Kl9vo26csUL8xa8F7wu3xTgkSSmdtK6BhfPfymu5hxfQ=
-X-Received: by 2002:a05:622a:1a14:b0:477:9a4:d7ea with SMTP id
- d75a77b69052e-4a643bafd8emr2595461cf.13.1749206037998; Fri, 06 Jun 2025
- 03:33:57 -0700 (PDT)
+	s=arc-20240116; t=1749207005; c=relaxed/simple;
+	bh=oVChse1wLr1LatGOtuMGq5IMy2U8hxvfsamh2B8qz9E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=egNAsMWaGt+tkRvNT6XBKbJEFYDd7xZNFiqgtPD6wqaySV4/2waL5zi8d2pXUdlyZ+vF80Cpn2KlNDBJMZstraismxvxZnrV83y3QHjdtQv357iDZScVxgIm9oIeDcXwL+iVEBBDGO8O5ze/8zFPtkL4qgSNnqkwZ4l4UnHJ/Io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Torlej3I; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=RgB6+Le5gZuvkTyuy9hjeapQkiI3tD5aj0y4LFHCOn0=; b=Torlej3I0MsK1FluWphWjPqhsU
+	dYVV1Iq3HXQwbpZ4GJPpspOkLrHMdyGDEmocb19R4VBLitr0DShyV9gUU1KA0nO2o8qHQ4oj2+Mea
+	ZkYT8kN2mdJyfPOZoEcG1LqGibuuMfFVE8slw+g9N1tF9P4ndbI00fCWneAVBZjhgnSKacWOXwuVZ
+	dvHSKONQ7BrU9xHYFYpVaKe8XVMmWNFrs7Co/CWhtFD3jWbnSEaN8tJD6YfV8XfTLZbPZz8HGoADB
+	pz4Lo1m4tNt4yClsbpq3GMlZp8yEd2XAfRqjsD60qUBJfGi4UHjU6iCxBzPcPmt7PloO4J0n2f17N
+	9SpAdLhQ==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uNUdu-00000001GGo-2krp;
+	Fri, 06 Jun 2025 10:49:47 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 8F36B3005AF; Fri,  6 Jun 2025 12:49:45 +0200 (CEST)
+Date: Fri, 6 Jun 2025 12:49:45 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kys@microsoft.com,
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, pbonzini@redhat.com, ardb@kernel.org,
+	kees@kernel.org, Arnd Bergmann <arnd@arndb.de>,
+	gregkh@linuxfoundation.org, linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-efi@vger.kernel.org, samitolvanen@google.com,
+	ojeda@kernel.org, xin@zytor.com
+Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
+ in __nocfi functions
+Message-ID: <20250606104945.GY39944@noisy.programming.kicks-ass.net>
+References: <20250506073100.GG4198@noisy.programming.kicks-ass.net>
+ <20250506133234.GH4356@noisy.programming.kicks-ass.net>
+ <vukrlmb4kbpcol6rtest3tsw4y6obopbrwi5hcb5iwzogsopgt@sokysuzxvehi>
+ <20250528074452.GU39944@noisy.programming.kicks-ass.net>
+ <20250528163035.GH31726@noisy.programming.kicks-ass.net>
+ <20250528163557.GI31726@noisy.programming.kicks-ass.net>
+ <20250529093017.GJ31726@noisy.programming.kicks-ass.net>
+ <fp5amaygv37wxr6bglagljr325rsagllbabb62ow44kl3mznb6@gzk6nuukjgwv>
+ <eegs5wq4eoqpu5yqlzug7icptiwzusracrp3nlmjkxwfywzvez@jngbkb3xqj6o>
+ <4z4fhaqesjlevwiugiqpnxdths5qkkj7vd4q3wgdosu4p24ppl@nb6c2gybuwe5>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250605153800.557144-1-tabba@google.com> <20250605153800.557144-9-tabba@google.com>
- <ad4157a1-6e38-46df-ae24-76d036972fbc@redhat.com> <CA+EHjTziHb5kbY-aA1HPKYpg6iAPcQ19=51pLQ05JRJKeOZ8=A@mail.gmail.com>
- <6cf86edb-1e7e-4b44-93d0-f03f9523c24a@redhat.com>
-In-Reply-To: <6cf86edb-1e7e-4b44-93d0-f03f9523c24a@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 6 Jun 2025 11:33:21 +0100
-X-Gm-Features: AX0GCFuEdbWcKuv4eOpkPUf0dGJeJL5f_PxO8xkAnzeoLueKsdz0dynDzzOLB0Q
-Message-ID: <CA+EHjTz8Q+X5==ym-WCSveNkfHd0id03nY1OYtoMchc5AUWDqQ@mail.gmail.com>
-Subject: Re: [PATCH v11 08/18] KVM: guest_memfd: Allow host to map guest_memfd pages
-To: David Hildenbrand <david@redhat.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4z4fhaqesjlevwiugiqpnxdths5qkkj7vd4q3wgdosu4p24ppl@nb6c2gybuwe5>
 
-On Fri, 6 Jun 2025 at 10:55, David Hildenbrand <david@redhat.com> wrote:
->
-> On 06.06.25 11:30, Fuad Tabba wrote:
-> > Hi David,
-> >
-> > On Fri, 6 Jun 2025 at 10:12, David Hildenbrand <david@redhat.com> wrote:
-> >>
-> >> On 05.06.25 17:37, Fuad Tabba wrote:
-> >>> This patch enables support for shared memory in guest_memfd, including
-> >>> mapping that memory from host userspace.
-> >>>
-> >>> This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
-> >>> and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
-> >>> flag at creation time.
-> >>>
-> >>> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> >>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> >>> Signed-off-by: Fuad Tabba <tabba@google.com>
-> >>> ---
-> >>
-> >> [...]
-> >>
-> >>> +static bool kvm_gmem_supports_shared(struct inode *inode)
-> >>> +{
-> >>> +     u64 flags;
-> >>> +
-> >>> +     if (!IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM))
-> >>> +             return false;
-> >>> +
-> >>> +     flags = (u64)inode->i_private;
-> >>
-> >> Can probably do above
-> >>
-> >> const u64 flags = (u64)inode->i_private;
-> >>
-> >
-> > Ack.
-> >
-> >>> +
-> >>> +     return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
-> >>> +}
-> >>> +
-> >>> +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
-> >>> +{
-> >>> +     struct inode *inode = file_inode(vmf->vma->vm_file);
-> >>> +     struct folio *folio;
-> >>> +     vm_fault_t ret = VM_FAULT_LOCKED;
-> >>> +
-> >>> +     if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
-> >>> +             return VM_FAULT_SIGBUS;
-> >>> +
-> >>> +     folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-> >>> +     if (IS_ERR(folio)) {
-> >>> +             int err = PTR_ERR(folio);
-> >>> +
-> >>> +             if (err == -EAGAIN)
-> >>> +                     return VM_FAULT_RETRY;
-> >>> +
-> >>> +             return vmf_error(err);
-> >>> +     }
-> >>> +
-> >>> +     if (WARN_ON_ONCE(folio_test_large(folio))) {
-> >>> +             ret = VM_FAULT_SIGBUS;
-> >>> +             goto out_folio;
-> >>> +     }
-> >>> +
-> >>> +     if (!folio_test_uptodate(folio)) {
-> >>> +             clear_highpage(folio_page(folio, 0));
-> >>> +             kvm_gmem_mark_prepared(folio);
-> >>> +     }
-> >>> +
-> >>> +     vmf->page = folio_file_page(folio, vmf->pgoff);
-> >>> +
-> >>> +out_folio:
-> >>> +     if (ret != VM_FAULT_LOCKED) {
-> >>> +             folio_unlock(folio);
-> >>> +             folio_put(folio);
-> >>> +     }
-> >>> +
-> >>> +     return ret;
-> >>> +}
-> >>> +
-> >>> +static const struct vm_operations_struct kvm_gmem_vm_ops = {
-> >>> +     .fault = kvm_gmem_fault_shared,
-> >>> +};
-> >>> +
-> >>> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
-> >>> +{
-> >>> +     if (!kvm_gmem_supports_shared(file_inode(file)))
-> >>> +             return -ENODEV;
-> >>> +
-> >>> +     if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
-> >>> +         (VM_SHARED | VM_MAYSHARE)) {
-> >>> +             return -EINVAL;
-> >>> +     }
-> >>> +
-> >>> +     vma->vm_ops = &kvm_gmem_vm_ops;
-> >>> +
-> >>> +     return 0;
-> >>> +}
-> >>> +
-> >>>    static struct file_operations kvm_gmem_fops = {
-> >>> +     .mmap           = kvm_gmem_mmap,
-> >>>        .open           = generic_file_open,
-> >>>        .release        = kvm_gmem_release,
-> >>>        .fallocate      = kvm_gmem_fallocate,
-> >>> @@ -428,6 +500,7 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
-> >>>        }
-> >>>
-> >>>        file->f_flags |= O_LARGEFILE;
-> >>> +     allow_write_access(file);
-> >>
-> >> Why is that required?
-> >>
-> >> As the docs mention, it must be paired with a previous deny_write_access().
-> >>
-> >> ... and I don't find similar usage anywhere else.
-> >
-> > This is to address Gavin's concern [*] regarding MADV_COLLAPSE, which
-> > isn't an issue until hugepage support is enabled. Should we wait until
-> > we have hugepage support?
->
-> If we keep this, we *definitely* need a comment why we do something
-> nobody else does.
->
-> But I don't think allow_write_access() would ever be the way we want to
-> fence off MADV_COLLAPSE. :) Maybe AS_INACCESSIBLE or sth. like that
-> could fence it off in file_thp_enabled().
->
-> Fortunately, CONFIG_READ_ONLY_THP_FOR_FS might vanish at some point ...
-> so I've been told.
->
-> So if it's not done for secretmem for now or others, we also shouldn't
-> be doing it for now I think.
+On Thu, Jun 05, 2025 at 10:19:41AM -0700, Josh Poimboeuf wrote:
 
-I'll remove it.
+> diff --git a/arch/x86/entry/calling.h b/arch/x86/entry/calling.h
+> index d83236b96f22..e680afbf65b6 100644
+> --- a/arch/x86/entry/calling.h
+> +++ b/arch/x86/entry/calling.h
+> @@ -99,7 +99,7 @@ For 32-bit we have the following conventions - kernel is built with
+>  	.endif
+>  .endm
+>  
+> -.macro CLEAR_REGS clear_bp=1
+> +.macro CLEAR_REGS clear_callee=1
+>  	/*
+>  	 * Sanitize registers of values that a speculation attack might
+>  	 * otherwise want to exploit. The lower registers are likely clobbered
+> @@ -113,20 +113,19 @@ For 32-bit we have the following conventions - kernel is built with
+>  	xorl	%r9d,  %r9d	/* nospec r9  */
+>  	xorl	%r10d, %r10d	/* nospec r10 */
+>  	xorl	%r11d, %r11d	/* nospec r11 */
+> +	.if \clear_callee
+>  	xorl	%ebx,  %ebx	/* nospec rbx */
+> -	.if \clear_bp
+>  	xorl	%ebp,  %ebp	/* nospec rbp */
+> -	.endif
+>  	xorl	%r12d, %r12d	/* nospec r12 */
+>  	xorl	%r13d, %r13d	/* nospec r13 */
+>  	xorl	%r14d, %r14d	/* nospec r14 */
+>  	xorl	%r15d, %r15d	/* nospec r15 */
+> -
+> +	.endif
+>  .endm
+>  
+> -.macro PUSH_AND_CLEAR_REGS rdx=%rdx rcx=%rcx rax=%rax save_ret=0 clear_bp=1 unwind_hint=1
+> +.macro PUSH_AND_CLEAR_REGS rdx=%rdx rcx=%rcx rax=%rax save_ret=0 clear_callee=1 unwind_hint=1
+>  	PUSH_REGS rdx=\rdx, rcx=\rcx, rax=\rax, save_ret=\save_ret unwind_hint=\unwind_hint
+> -	CLEAR_REGS clear_bp=\clear_bp
+> +	CLEAR_REGS clear_callee=\clear_callee
+>  .endm
+>  
+>  .macro POP_REGS pop_rdi=1
 
-Thanks!
-/fuad
+Nice. So that leaves the callee-clobbered, extra caller-saved and return
+registers cleared, and preserves the callee-saved regs.
 
-> --
-> Cheers,
->
-> David / dhildenb
->
+> diff --git a/arch/x86/entry/entry_64_fred.S b/arch/x86/entry/entry_64_fred.S
+> index 29c5c32c16c3..5d1eef193b79 100644
+> --- a/arch/x86/entry/entry_64_fred.S
+> +++ b/arch/x86/entry/entry_64_fred.S
+> @@ -112,11 +112,12 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
+>  	push %rax				/* Return RIP */
+>  	push $0					/* Error code, 0 for IRQ/NMI */
+>  
+> -	PUSH_AND_CLEAR_REGS clear_bp=0 unwind_hint=0
+> +	PUSH_AND_CLEAR_REGS clear_callee=0 unwind_hint=0
+>  	movq %rsp, %rdi				/* %rdi -> pt_regs */
+>  	call __fred_entry_from_kvm		/* Call the C entry point */
+> -	POP_REGS
+> -	ERETS
+> +	addq $C_PTREGS_SIZE, %rsp
+> +
+> +	ALTERNATIVE "mov %rbp, %rsp", __stringify(ERETS), X86_FEATURE_FRED
+
+So... I was wondering.. do we actually ever need the ERETS? AFAICT this
+will only ever 'inject' external interrupts, and those are not supposed
+to change the exception frame, like ever. Only exceptions get to change
+the exception frame, but those are explicitly excluded in fred_extint().
+
+As such, it should always be correct to just do:
+
+	leave;
+	RET;
+
+at this point, and call it a day, no? Just completely forget about all
+this sillyness with alternatives and funky stack state.
+
+Only problem seems to be that if we do this, then
+has_modified_stack_frame() has a fit, because of the register state.
+
+The first to complain is bx, the push %rbx modifies the CFI state to
+track where on the stack its saved, and that's not what initial_func_cfi
+has.
+
+We can stomp on that with UNWIND_HINT_FUNC right before RET. It's all a
+bit magical, but should work, right?
+
+So keeping your CLEAR_REGS changes, I've ended up with the below:
+
+---
+diff --git a/arch/x86/entry/entry_64_fred.S b/arch/x86/entry/entry_64_fred.S
+index 29c5c32c16c3..8c03d04ea69d 100644
+--- a/arch/x86/entry/entry_64_fred.S
++++ b/arch/x86/entry/entry_64_fred.S
+@@ -62,8 +62,6 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
+ 	push %rbp
+ 	mov %rsp, %rbp
+ 
+-	UNWIND_HINT_SAVE
+-
+ 	/*
+ 	 * Both IRQ and NMI from VMX can be handled on current task stack
+ 	 * because there is no need to protect from reentrancy and the call
+@@ -112,19 +110,35 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
+ 	push %rax				/* Return RIP */
+ 	push $0					/* Error code, 0 for IRQ/NMI */
+ 
+-	PUSH_AND_CLEAR_REGS clear_bp=0 unwind_hint=0
++	PUSH_AND_CLEAR_REGS clear_callee=0 unwind_hint=0
+ 	movq %rsp, %rdi				/* %rdi -> pt_regs */
++
++	/*
++	 * At this point: {rdi, rsi, rdx, rcx, r8, r9}, {r10, r11}, {rax, rdx}
++	 * are clobbered, which corresponds to: arguments, extra caller-saved
++	 * and return. All registers a C function is allowed to clobber.
++	 *
++	 * Notably, the callee-saved registers: {rbx, r12, r13, r14, r15}
++	 * are untouched, with the exception of rbp, which carries the stack
++	 * frame and will be restored before exit.
++	 *
++	 * Further calling another C function will not alter this state.
++	 */
+ 	call __fred_entry_from_kvm		/* Call the C entry point */
+-	POP_REGS
+-	ERETS
+-1:
++
++1:	/*
++	 * Therefore, all that remains to be done at this point is restore the
++	 * stack and frame pointer register.
++	 */
++	leave
+ 	/*
+-	 * Objtool doesn't understand what ERETS does, this hint tells it that
+-	 * yes, we'll reach here and with what stack state. A save/restore pair
+-	 * isn't strictly needed, but it's the simplest form.
++	 * Objtool gets confused by the cfi register state; this doesn't match
++	 * initial_func_cfi because of PUSH_REGS, where it tracks where those
++	 * registers are on the stack.
++	 *
++	 * Forcefully make it forget this before returning.
+ 	 */
+-	UNWIND_HINT_RESTORE
+-	pop %rbp
++	UNWIND_HINT_FUNC
+ 	RET
+ 
+ SYM_FUNC_END(asm_fred_entry_from_kvm)
 
