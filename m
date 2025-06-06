@@ -1,305 +1,193 @@
-Return-Path: <kvm+bounces-48670-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48671-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09885AD06DB
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 18:43:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00AE8AD0837
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 20:47:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 957243B23D0
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 16:43:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CF87189CE92
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 18:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F164289E3A;
-	Fri,  6 Jun 2025 16:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE92C1EDA16;
+	Fri,  6 Jun 2025 18:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="cW8xEWO8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fk1cnpfN"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2059.outbound.protection.outlook.com [40.107.95.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A76E289E23;
-	Fri,  6 Jun 2025 16:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749228176; cv=fail; b=uBWDuvd27jMTcmjz2WKRFkwzH75qlLZpy3dIKC0Bmx+BVkzBMt38EWunmgr3g6E0tnz41/KtjLeM8kMRF1I86O+6kjSksogqBQJ7UegbIV1ctNnjjpWCZxzVsf3fy250LTwPOg/YunCJRsIdjzVn+G2jUXp+S8G/tp7qRkrIg6A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749228176; c=relaxed/simple;
-	bh=hBSvzWw02kN6qrkL4ejlOvZc5kzL/YwZT4OA4mPhS70=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=gauG18ZY0QorfVj6E98hIkoFxHmiqW7gs5h0Habri8t9i/XvpK0jCxa7XDwvboeE/USMfiP4Hf/tBNd4MpB4TQJ3pRw06YhqiX/0e48LWE8qfblY0p/1o1F3gje4AHMDFc0+H1srvRvu/8F6XIc46pbsyDwZG5UgmQBdVqE6Gzc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=cW8xEWO8; arc=fail smtp.client-ip=40.107.95.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ft2YS0ul/1YPTEfKUHH0CYB8IZaJMFbE02o6W9AR7P1L2lypIa98a8oujA1cUpIEpDFLBtD/IJr78vGM9mTt7KF4w7ZxSb/1r6WaxQaRMc/g5oGMiIOtKvxRfkIm0OOA4deca1tEJwob/BuGYam//GJIww0fHFywyS8/mI36Y30hfKqDUOtkB9FZNUBq1j8ah+4jqv5OW1qTqrWUOJWS/yIXZ0r5gloIw60a49TJia5qfSCcYZkBjxIwdR9e3mKmVJ8Lrkg0s/fsfrgSyFfla+aHfgSE9Kgu+IpzPIfTXUlBScmtK/23YD80OlR13DC8FrCFk4HcAlbWuJkly2Wx3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CBIiw5e9Gy+NLHnUC8CPOjdn5lfuxBFKDrvaPm5Ll9c=;
- b=pmTOw2EZFAPon+MAAFr7Kns5+36yvA+bgt+xmhK8ug+SJR9Onm1ktGM5tWjxJKgN1USqJbHNP50mdh5yE8jGSA0NQGrThZecvRq28q1N3n/jL0O5xx+mdReokmE0RSQseHdM14TGy3rBk1ZiNZNYEfr7KAPJ0F9OLqMRoJmEFmdab8qHJMYxUv9KYnOqbZr7XW1SqQ1UOLgOdvgfoxgW+REG4sTj1ShHpM/Ln0FxQ3w9sOJRDwYUVSq2C6r0n/xhGuOZHLRkgenfgujBGrvGMSy7DUDJiwJ51v7iyVah60XybyqX8DCU71bfPcpKQ6uMC96mSb26gHJzg3u5fnuEqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CBIiw5e9Gy+NLHnUC8CPOjdn5lfuxBFKDrvaPm5Ll9c=;
- b=cW8xEWO8IFEXLhrftUikJhorx94TMk45hmKGGpFWEHVBN4pP4cthLzSp5+ru5lWPcEzakGa9ODYTvRDcjv2f6CWwFV+qZN2g1xZsEQlYMkr0pjIpHOR4cNwdO5HPReYpg7fOBXoVDaDDl729Jy7jBy6k7O65q7qdvMvHGiKe8k0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by DM4PR12MB6373.namprd12.prod.outlook.com (2603:10b6:8:a4::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8769.34; Fri, 6 Jun 2025 16:42:51 +0000
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8792.034; Fri, 6 Jun 2025
- 16:42:51 +0000
-Message-ID: <4a7d3032-219e-c5fe-f230-78bc91eb70fe@amd.com>
-Date: Fri, 6 Jun 2025 11:42:48 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [RFC PATCH 00/29] KVM: VM planes
-Content-Language: en-US
-To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: roy.hopkins@suse.com, seanjc@google.com, ashish.kalra@amd.com,
- michael.roth@amd.com, jroedel@suse.de, nsaenz@amazon.com, anelkz@amazon.de,
- James.Bottomley@HansenPartnership.com
-References: <20250401161106.790710-1-pbonzini@redhat.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20250401161106.790710-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0183.namprd11.prod.outlook.com
- (2603:10b6:806:1bc::8) To DM4PR12MB5070.namprd12.prod.outlook.com
- (2603:10b6:5:389::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C20E1311AC
+	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 18:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749235632; cv=none; b=fFXWG/deZ6zWhr0Lx6oFUGkfB2i/nxG1ED3AghZims/mQ/aD6ifBotWCFLi7dImc1zgKMMsaXdWPG1K6uYPBlLJ9Xk5GWQ3msIXxnSNR6AzW6V/1+c/2Yb2NxppEuN+M5RFhnZaUVWWdW/fKGiVcs0B+LzsPzliOV3Lur13wV5A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749235632; c=relaxed/simple;
+	bh=VNprBbGInVwNB1dTCHUv4OWQx/EAaGLFCt+mwQEfaOE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=SqasTQJwrQ7AgxVBFQp/5W8p0DUo7xlxhj0c8rJk+mCYGpw8vIuR96WeYmVlXeFQd8+W/o9u99myzTvhgCbwSTbOqUQl8plCqqg3KcTP59VMKrqHphQInyRKL8UQNNdSDnHhJDhQH8+TGcriZ6CcsRjc4ACImr7xPfovCymanWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fk1cnpfN; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-747d143117eso1966340b3a.3
+        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 11:47:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749235630; x=1749840430; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v/ki/VhM37j6zMZpXzHfYjvUHV1vLuZ1aZ5fIvczRkI=;
+        b=Fk1cnpfNpT8MFk1+bMzMCR1J8Pe9WSNoQe4p0Z1+IeQvHC8TQtAVhTYGDvkWDZ5nd2
+         RrIVef2qzYtWT2loh5yQJG71SpntusRkcNl7KQ4cJjqiVdc5E8FomnbK4iverBjponi5
+         EBODWbL6eVJq7HSypWaMsnXRbcZ7C2143V7/kQkKB9A2uiIdFNt2bE8qG/NlBdVrUksN
+         MaDCGy4p2SDZy1vnZrVeqaAii+HrOmd+FCtkZNoJ8xbjxUsS6zOnPTQkLnziTSRE6riD
+         I5/V2DEWfqh0Xu7S8v/kzQ5DZMf4EHZ7osW4rOxW5n4DutkUriCN917HEwsfl/jnkedQ
+         NqRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749235630; x=1749840430;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=v/ki/VhM37j6zMZpXzHfYjvUHV1vLuZ1aZ5fIvczRkI=;
+        b=nF5vFGOPIbyydXxMB0/fgUQgsDuIS1taLKHZz2QJlYIgsRtl9oR/d34WEesFnHPeP/
+         aJX/3eLRZHH/rQYdyRoK21XF5FtCqNetZGqLDlBarshOspyiPO6h5cKZsUdUHwq6eY8n
+         P/nSakL7AzP3ZZrK2kHsvACJpTXu4JSb3GvRTmBnJXn4XWAf1a79bLuXftLZWAkbp0nE
+         WlhQjDJ4i0DuK8shyNXyGUPhTEUrAlBJjEpNheUoprw4RzslHm6rT3z/Kh2YX2Ke/MW7
+         FblAT/MYPUsdDZzPgwBWOxHyQ8t/6mRtlf/6einEDnhSet5s8nM0sRXZo4j5YXnrSopr
+         Sg+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWAMd/jTsj7r4s1cn9RPajzf1bet9EFHS3032J8jiINouO+cZp4Dg1GbzpDlnPNIncGze8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjdsCvXM07oZ6rq8iwMRDCHIoUOlWJGewKFJu7deH1jJeK/W2n
+	E2gu1vkKaQXk9FwM9ZQxCuJIeXrIswB9qSupF40y4x/+pobNg30kUWUc0trn04MKPtKxwjsQEZf
+	mMiPjsQ==
+X-Google-Smtp-Source: AGHT+IEZyYuLn2uNfZKIlYtfvQKzZHENqms43RXrZuwTzWFllEW6HqLwXyFTQrSxPPBQBCLq39nRCAnbAsU=
+X-Received: from pffk13.prod.google.com ([2002:aa7:88cd:0:b0:746:2acb:bba2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1882:b0:740:b5f8:ac15
+ with SMTP id d2e1a72fcca58-74827e7b394mr5618400b3a.10.1749235629913; Fri, 06
+ Jun 2025 11:47:09 -0700 (PDT)
+Date: Fri, 6 Jun 2025 11:47:08 -0700
+In-Reply-To: <4dd45ddb-5faf-4766-b829-d7e10d3d805f@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|DM4PR12MB6373:EE_
-X-MS-Office365-Filtering-Correlation-Id: 22a0eafc-649a-4cc8-0cbe-08dda5192d39
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?a2hDcW5CTHRJZUpjUFhDWlNrc0xjZVZEV2MzM0J0cldZbWY1cHdraE4yampk?=
- =?utf-8?B?VkZuRW9uTTI5TTlrK0dveUEva05IZm5NSlBya1l5a1FYOWhlc09uUlVJUWNv?=
- =?utf-8?B?SlRLV0ZvaFVxb0Rac2laM1k2eDMrYjBDU1hoWDJ2U0c0b1YrMVZNUG51bnk0?=
- =?utf-8?B?aHBDbzM4NVFQYjBZcDQ2TTRYT3NJcFlYcFpHSjA2SThGblF3dVVjTEMvczlh?=
- =?utf-8?B?Qjg4WG9Va1B6ZkpHVmVBUm03ZytQUEpsU2JKSC9Xamp6SU1yZTQxeEpucXpX?=
- =?utf-8?B?RklldlZCanJ6M3VtcjhOMSs3RHRmMGp0cXdxelFRU2IyeUlDTU50aS9YU3dV?=
- =?utf-8?B?VCtNQzNOZGswaWEvQ2pBcTliNzNTOVcxM0tFMjFFbXBwZjk1bkNadUk0SEl3?=
- =?utf-8?B?REdrZDFPQ3B6L1NkTWtyNnk4WHE3UHVETFhWUWQzOUFCY1J4MVZHYWpBRnZ4?=
- =?utf-8?B?dFFnVXB4SXJTYW1QS2dCakJRc01QUHN1RmpNS3VsajJEdSt0MnR4R0Q4L2ZB?=
- =?utf-8?B?eStLSjBUQ0xNbmJyalp1d0ZyNTV0S0cwaEVaMlIzbWtMbmhrU0w4dUtLcGI3?=
- =?utf-8?B?MTc0NE1ObHBRTmMxZDJXTXE5eDE2ejcyYXUvdGZEZmR0aGhxcW40MUc1dlBL?=
- =?utf-8?B?L1dUcEg5Sk1IbGtHbjE3Yml4R3MvdktaMy9ReFFwOHlMSUZPYXMvQjR0RTY3?=
- =?utf-8?B?aGtBNmc5dThzVWNNSnlUS0YyWEJZT21obXRtMVdMb01QclI0amNBZ3hjUUxT?=
- =?utf-8?B?RGUrUG9JR2JDeTc0c0xoTU9IRVZmM3kwN1QydEZDZXRhWkVQNDBUNStsdmNQ?=
- =?utf-8?B?eG9GeTFoMytGTm9GU09iblNSZkYrYmkwMzNDUzJBSVB3YTRjUmNnVlh0Z3Rz?=
- =?utf-8?B?R1Fwa25yYU91Y0FtWWQxeW5mSWZzYVBPQ1M1K1piM0NaMjJmQzV5NmM2aUR1?=
- =?utf-8?B?c0VGY29YcmNtWi9mL3YySmg4dGxLQ1FsQjJCNksyTzgzOHJyN3RWRDJUTTR4?=
- =?utf-8?B?RnlGV3hWNngxV1dPSXcyckZNeFMyTVEzOTQxKy9VbWlBdDVPSlVRaG41YmZX?=
- =?utf-8?B?ODdmcW96QkFqeCtkbmhBaVFyL3JvS01EdHk0eFFTUmIyWmd5SW5mb3VyemRT?=
- =?utf-8?B?a0NQTE9UUGRuY2ZLVVNHc2xHZDFTL2RxL3ZDRUhpSERwdlhlcG5maHc0YWNH?=
- =?utf-8?B?TDQxcXhVUkpITWF3OVhHNGx2VGVIcm1DVkJNbmZiK09vWE9KSmpHcFVkR3Fl?=
- =?utf-8?B?MlpvZVFzZ0xOY1pwSUttM3lKc1RBY1RDRFkrNVlvQ2laaVNYMGVyUGlackFs?=
- =?utf-8?B?cjB1a0xtZ0VzM2hoLzEwa0owRVFTTXRSeUJRQnhJbUQzTHhvZnRQUmJGamxJ?=
- =?utf-8?B?K3dGaCtEeVltQmNSczBvU1JERlJWSytVQVp2QjA0bUJwM3RpTlpYSzE2WjdH?=
- =?utf-8?B?TXYwTDY4cm1zSFRNSEl4SjZpaUlYU0RTMm9ZOVc3VnFGQ0xaWS8xZStqWUti?=
- =?utf-8?B?d2o3eFhjdWlJSVVEY2JEbVgvZ05sVVUrZ2hLdGY5VEpBZklvb0RHV0hGSFNl?=
- =?utf-8?B?Qll6TUxUVDlMNTZiYS9JNSticGdOY1hnckJLcGZuOUlueUJ6RE8xU1FZOSs0?=
- =?utf-8?B?TW9NdGExbGRFUVYvTU5tbmQ0c296SDU1bzdSU25WMC9sL3Nja1VrcFhwTG1i?=
- =?utf-8?B?QUpNd1A3ekt6SGFCVGpYbXNhcVluMnQveENtYmtqOVVZMDFwZTlQMnYwTTY3?=
- =?utf-8?B?UUZQZC8xQU5ycCs4c2FUVG1EcEs5eGM1WVVpd2J1Nm5nYXJoVUx2K25BcVdr?=
- =?utf-8?B?ampjc1NmTmhDMXd6aXI3emVNOXIwQnp1YUFNTjJTSlBrQjYvbFdodDZiMFZY?=
- =?utf-8?B?ZVVHVExvSzdFWkFQTlV2TG1kS05HNklmc3RRcTRKVjZKd1R4Z2V2N21LVUJ3?=
- =?utf-8?Q?YYS9OGu94IY=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eTFOd2FoTmZSWDU1TkVoU0xUSjBoalRjeWJEc2xqK25pUk56eHN3MkJjSlJl?=
- =?utf-8?B?RmQrMmNENEhKL051eEFCcU5iRmx1WDBlOFIzV3hkSzRLZUJqQlJuV0hQR1hM?=
- =?utf-8?B?U0trdHAzOHdKRytOaGROVnhtZUhXWkV0KzZBRDNLSGwwRGpKdHBCNjMvYjRH?=
- =?utf-8?B?Uy94YSt6enpqb3hpSlFnbmRUY2haenVHV1kvS1dHeEE1bnVPRFIvR241UzlG?=
- =?utf-8?B?MUVXUDAwZEZDK3hjNFNFbE8vcXBGYmhQNndScGhGRjdSOHhGTEFMUFBYQzZs?=
- =?utf-8?B?MTI0Z2RXeFkxM1FldVM4TmovelpvcFBqU2Q5R2RUUGVsK1FQQk40RlBpRFF5?=
- =?utf-8?B?am43aG9McklwYXJteWxiam1TL1Fxa1FlUjZmeEFFSE1iUmNHb3BvaTdGYlRG?=
- =?utf-8?B?NTlrVXRIWE1RSTQxZ0VTZ2haeWl6eWtvQ3RjWm1ScHpMdlE2aGNUYVdLZkxV?=
- =?utf-8?B?cEZrbzhHWUt0SnliZW9YMzVPZDExbWxMZm9hbmhwZDZXbDU5QnlOYnFnZmxB?=
- =?utf-8?B?MENPOFdiengxcXIrL1BVb2p1azlPc2lDcVdyaVJWWjJsbTZEWFQyWVg0ckpQ?=
- =?utf-8?B?blhyM2hLckpOUlZ5R0lvUEhyVDNHbnhOK2hXMlNDYm5FalNlb1hueDBUcTk0?=
- =?utf-8?B?TXBNaTVmTkdMRFdtdFRXdW01UVlxRGs2dXZqcDR5eXBuMmpla0dpRW9mN1hx?=
- =?utf-8?B?TmxJdHNZYVRGRFk1SWlIckJwYnJBZUthTzV3MTZXRzZwaGNCZ2ZNZlBYMDZz?=
- =?utf-8?B?d09FcHhZNzlBRUE5R0ordkZwdHR6UEVFem1NUTBTZGdZVjk2NEJIaHp5NlpO?=
- =?utf-8?B?ZU90bzFORGw0RWpINElFa3djNGZvMHFEN3R6WWJTYVNqNytRcGwrQ0pFNEg3?=
- =?utf-8?B?TjRIUkdsMDNPOXY0cHM3YlZQWHBrOFlPTFlmdER3cUpYNWNhNGJtWjFEd09t?=
- =?utf-8?B?NmdOK1NSNUNGVGR0NmdtUFAxaU1iRlRrVDRkYzAvMCtSZkR3L0N3VHJoYVk3?=
- =?utf-8?B?SzFCdTFUSTV6djlHVWU5b2VBdSs2RE5KekQyWkFFSGNyWTFVRFVXQVY5Y2dy?=
- =?utf-8?B?dll3V0ZibWc1Y0tsRjhUY3JzOGVWTlRtb0JPMVNrcE9CMVN6YndQRThVSXZu?=
- =?utf-8?B?U05hMjZ1bnpkR1YvSEJEQU84b2Q5TmNCS0Jpc2pLYVRHV1MweDV2U0ppWGdG?=
- =?utf-8?B?TGFNTk9YWjZRRXhKdVY4YmJGL1JLdUIvcDhUaHBNMWUvUUZxT1RzZDNPWjk0?=
- =?utf-8?B?ZU5kbWViOWxIdnVheXZ5WTFuajhZSGQ1R1htNklNS0hTQ0d5bHUwVjUyUzk5?=
- =?utf-8?B?ajMrQ0VOVFBBaWY2VjBmdkQzMlFBTTRTdkUrVkVXMkkvNEJCbFZFQWx5VG1K?=
- =?utf-8?B?aVh6OEJ6aWZyNEttekZJWjlHa2txbWh4MDU0R2hSM0JvRXhUclBnYkZua3Fu?=
- =?utf-8?B?eDZNTG5rRW5pNG9IRDNLbWZ5TWFwRGo4Y2dUWTFkMzFORGFGcXptN2NsMzZM?=
- =?utf-8?B?dDVYQldnUFl2NDBiUG9xd0Jxdm1XM1NhcE5tVStYUUM0RUJSTjFzWllxSnBm?=
- =?utf-8?B?eVBBVnQ2N3V1SnZoOGx3YjhLRWR2M1pLM2p3YlRUS3RlV2cvR2IxK3RnMlU5?=
- =?utf-8?B?K3pwZGdOUzVmTlZuRi82dFB1ZlVHNGxGMU9qdzJ0bS9ZRGswVjFUU3R0Ynps?=
- =?utf-8?B?TGtFZ1NIbTNWMXlpSUFUem9qRk1QTUw2RG0vZWd5RDdrYTNTQ0RVcWJyU254?=
- =?utf-8?B?Mjk1cElHa0l3RnBtZVBtMXBiSURORHNHQkRGa2xlTUhoL0dQU3hDbGNwMVIr?=
- =?utf-8?B?bWJYYlFzR21JVzZ6WUo5NjhkMG4zbkxicTZoR2pZbzdhOGgrSkx5bzBxVFRX?=
- =?utf-8?B?N3NCSTJuSUtEbjhsaE1UbndNS2VJeEo0SWRJWTRETUY3UGFBNkRWN202cjNZ?=
- =?utf-8?B?SXoxeHJZMFVZaDcydktyRVdSNjl6Z0FDVEI0eDNHam1iK2dObmpNSDlmajVM?=
- =?utf-8?B?UHB4Mis1WUtBSHBZdUtudUYwYmdzVWwycittQ2FCVkJxc1VvdDNiTWU0SmRQ?=
- =?utf-8?B?aDZXdFladUhMY1NVS0tFc09ncVJYWnFQOGdTeGJwUXMwY0NXWHR6OEtvMmJ6?=
- =?utf-8?Q?JwmWtN/N5Wz71jNQcJUSXCwNM?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22a0eafc-649a-4cc8-0cbe-08dda5192d39
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2025 16:42:51.0765
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qsVWF9Ns0Lef2K//ufATMyMaWqRQQ2Zv2gDdc012XsRpsll24zpfqBnPMMWJxbpnIkmDm5KXEEn5LBPhwd95oA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6373
+Mime-Version: 1.0
+References: <20250514071803.209166-1-Neeraj.Upadhyay@amd.com>
+ <20250514071803.209166-8-Neeraj.Upadhyay@amd.com> <20250524121241.GKaDG3uWICZGPubp-k@fat_crate.local>
+ <4dd45ddb-5faf-4766-b829-d7e10d3d805f@amd.com>
+Message-ID: <aEM3rBrlxHMk6Mct@google.com>
+Subject: Re: [RFC PATCH v6 07/32] KVM: x86: apic_test_vector() to common code
+From: Sean Christopherson <seanjc@google.com>
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org, tglx@linutronix.de, 
+	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, 
+	hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com, 
+	francescolavra.fl@gmail.com, tiala@microsoft.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 4/1/25 11:10, Paolo Bonzini wrote:
-> I guess April 1st is not the best date to send out such a large series
-> after months of radio silence, but here we are.
+On Mon, May 26, 2025, Neeraj Upadhyay wrote:
+> 
+> 
+> On 5/24/2025 5:42 PM, Borislav Petkov wrote: 
+> > 
+> > The previous patch is moving those *_POS() macros to arch/x86/kvm/lapic.c, now
+> > this patch is doing rename-during-move to the new macros.
+> > 
+> > Why can't you simply do the purely mechanical moves first and then do the
+> > renames? Didn't I explain it the last time? Or is it still unclear?
+> > 
+> 
+> I thought it was clear to me when you explained last time. However, I did this
+> rename-during-move because of below reason. Please correct me if I am wrong here.
+> 
+> VEC_POS, REG_POS are kvm-internal wrappers for APIC_VECTOR_TO_BIT_NUMBER/
+> APIC_VECTOR_TO_REG_OFFSET macros which got defined in patch 01/32. Prior to patch
+> 06/32, these macros were defined in kvm-internal header arch/x86/kvm/lapic.h. Using
+> VEC_POS, REG_POS kvm-internal macros in x86 common header file (arch/x86/include/asm/apic.h)
+> in this patch did not look correct to me and as APIC_VECTOR_TO_BIT_NUMBER/APIC_VECTOR_TO_REG_OFFSET
+> are already defined in arch/x86/include/asm/apic.h, I used them.
+> 
+> Is adding this information in commit log of this patch sufficient or do you have some
+> other suggestion for doing this?
 
-There were some miscellaneous fixes I had to apply to get the series to
-compile and start working properly. I didn't break them out by patch #,
-but here they are:
+I agree that moving VEC_POS/REG_POS to common code would be weird/undesirable,
+but I also agree with Boris' underlying point that doing renames as part of code
+movement is also undesirable.  And you're doing that all over this series.
+
+So, just one patch at the beginning of the series to replace VEC_POS/REG_POS with
+APIC_VECTOR_TO_BIT_NUMBER/APIC_VECTOR_TO_REG_OFFSET, but *only* in the functions
+you intended to move out of KVM.  That way you separate code movement and rename
+patches.
+
+Actually, looking at the end usage, just drop VEC_POS/REG_POS entirely.  IIRC, I
+suggested keeping the shorthand versions for KVM, but I didn't realize there would
+literally be two helpers left.  At that point, keeping VEC_POS and REG_POS is
+pure stubborness :-)
+
+ 1. Rename VEC_POS/REG_POS => APIC_VECTOR_TO_BIT_NUMBER/APIC_VECTOR_TO_REG_OFFSET
+ 2. Rename all of the KVM helpers you intend to move out of KVM.
+ 3. Move all of the helpers out of KVM.
+
+That way #1 and #2 are pure KVM changes, and the code review movement is easy to
+review because it'll be _just_ code movement.
+
+Actually (redux), we should probably kill off __apic_test_and_set_vector() and
+__apic_test_and_clear_vector(), because the _only_ register that's safe to modify
+with a non-atomic operation is ISR, because KVM isn't running the vCPU, i.e.
+hardware can't service an IRQ or process an EOI for the relevant (virtual) APIC.
+
+So this on top somewhere? (completely untested)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 21dbc539cbe7..9d078eb001b1 100644
+index 8ecc3e960121..95921e5c3eb2 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -1316,32 +1316,35 @@ static void kvm_lapic_deliver_interrupt(struct kvm_vcpu *vcpu, struct kvm_lapic
- {
- 	struct kvm_vcpu *plane0_vcpu = vcpu->plane0;
- 	struct kvm_plane *running_plane;
-+	int irr_pending_planes;
- 	u16 req_exit_planes;
- 
- 	kvm_x86_call(deliver_interrupt)(apic, delivery_mode, trig_mode, vector);
- 
- 	/*
--	 * test_and_set_bit implies a memory barrier, so IRR is written before
-+	 * atomic_fetch_or implies a memory barrier, so IRR is written before
- 	 * reading irr_pending_planes below...
- 	 */
--	if (!test_and_set_bit(vcpu->plane, &plane0_vcpu->arch.irr_pending_planes)) {
--		/*
--		 * ... and also running_plane and req_exit_planes are read after writing
--		 * irr_pending_planes.  Both barriers pair with kvm_arch_vcpu_ioctl_run().
--		 */
--		smp_mb__after_atomic();
-+	irr_pending_planes = atomic_fetch_or(BIT(vcpu->plane), &plane0_vcpu->arch.irr_pending_planes);
-+	if (irr_pending_planes & BIT(vcpu->plane))
-+		return;
- 
--		running_plane = READ_ONCE(plane0_vcpu->running_plane);
--		if (!running_plane)
--			return;
-+	/*
-+	 * ... and also running_plane and req_exit_planes are read after writing
-+	 * irr_pending_planes.  Both barriers pair with kvm_arch_vcpu_ioctl_run().
-+	 */
-+	smp_mb__after_atomic();
- 
--		req_exit_planes = READ_ONCE(plane0_vcpu->req_exit_planes);
--		if (!(req_exit_planes & BIT(vcpu->plane)))
--			return;
-+	running_plane = READ_ONCE(plane0_vcpu->running_plane);
-+	if (!running_plane)
-+		return;
- 
--		kvm_make_request(KVM_REQ_PLANE_INTERRUPT,
--				 kvm_get_plane_vcpu(running_plane, vcpu->vcpu_id));
--	}
-+	req_exit_planes = READ_ONCE(plane0_vcpu->req_exit_planes);
-+	if (!(req_exit_planes & BIT(vcpu->plane)))
-+		return;
-+
-+	kvm_make_request(KVM_REQ_PLANE_INTERRUPT,
-+			 kvm_get_plane_vcpu(running_plane, vcpu->vcpu_id));
+@@ -104,16 +104,6 @@ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector)
+                apic_test_vector(vector, apic->regs + APIC_IRR);
  }
  
- /*
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 9d4492862c11..130d895f1d95 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -458,7 +458,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
- 	INIT_LIST_HEAD(&sev->mirror_vms);
- 	sev->need_init = false;
+-static inline int __apic_test_and_set_vector(int vec, void *bitmap)
+-{
+-       return __test_and_set_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
+-}
+-
+-static inline int __apic_test_and_clear_vector(int vec, void *bitmap)
+-{
+-       return __test_and_clear_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
+-}
+-
+ __read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
+ EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
  
--	kvm_set_apicv_inhibit(kvm->planes[[0], APICV_INHIBIT_REASON_SEV);
-+	kvm_set_apicv_inhibit(kvm->planes[0], APICV_INHIBIT_REASON_SEV);
+@@ -706,9 +696,15 @@ void kvm_apic_clear_irr(struct kvm_vcpu *vcpu, int vec)
+ }
+ EXPORT_SYMBOL_GPL(kvm_apic_clear_irr);
  
- 	return 0;
++static void *apic_vector_to_isr(int vec, struct kvm_lapic *apic)
++{
++       return apic->regs + APIC_ISR + APIC_VECTOR_TO_REG_OFFSET(vec);
++}
++
+ static inline void apic_set_isr(int vec, struct kvm_lapic *apic)
+ {
+-       if (__apic_test_and_set_vector(vec, apic->regs + APIC_ISR))
++       if (__test_and_set_bit(APIC_VECTOR_TO_BIT_NUMBER(vec),
++                              apic_vector_to_isr(vec, apic)))
+                return;
  
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 917bfe8db101..656b69eabc59 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3252,7 +3252,7 @@ static int interrupt_window_interception(struct kvm_vcpu *vcpu)
- 	 * All vCPUs which run still run nested, will remain to have their
- 	 * AVIC still inhibited due to per-cpu AVIC inhibition.
- 	 */
--	kvm_clear_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_IRQWIN);
-+	kvm_clear_apicv_inhibit(vcpu->kvm->planes[vcpu->plane], APICV_INHIBIT_REASON_IRQWIN);
+        /*
+@@ -751,7 +747,8 @@ static inline int apic_find_highest_isr(struct kvm_lapic *apic)
  
- 	++vcpu->stat->irq_window_exits;
- 	return 1;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 65bc28e82140..704e8f80898f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11742,7 +11742,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 * the other side will certainly see the cleared bit irr_pending_planes
- 		 * and set it, and vice versa.
- 		 */
--		clear_bit(plane_id, &plane0_vcpu->arch.irr_pending_planes);
-+		atomic_and(~BIT(plane_id), &plane0_vcpu->arch.irr_pending_planes);
- 		smp_mb__after_atomic();
- 		if (kvm_lapic_find_highest_irr(vcpu))
- 			atomic_or(BIT(plane_id), &plane0_vcpu->arch.irr_pending_planes);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3a04fdf0865d..efd45e05fddf 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4224,7 +4224,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm_plane *plane, struct kvm_vcpu *pl
- 	 * release semantics, which ensures the write is visible to kvm_get_vcpu().
- 	 */
- 	vcpu->plane = -1;
--	if (plane->plane)
-+	if (!plane->plane)
- 		vcpu->vcpu_idx = atomic_read(&kvm->online_vcpus);
- 	else
- 		vcpu->vcpu_idx = plane0_vcpu->vcpu_idx;
-@@ -4249,7 +4249,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm_plane *plane, struct kvm_vcpu *pl
- 	if (r < 0)
- 		goto kvm_put_xa_erase;
+ static inline void apic_clear_isr(int vec, struct kvm_lapic *apic)
+ {
+-       if (!__apic_test_and_clear_vector(vec, apic->regs + APIC_ISR))
++       if (!__test_and_clear_bit(APIC_VECTOR_TO_BIT_NUMBER(vec),
++                                 apic_vector_to_isr(vec, apic)))
+                return;
  
--	if (!plane0_vcpu)
-+	if (!plane->plane)
- 		atomic_inc(&kvm->online_vcpus);
- 
- 	/*
+        /*
 
-Thanks,
-Tom
-
-> 
 
