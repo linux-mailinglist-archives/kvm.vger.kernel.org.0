@@ -1,165 +1,418 @@
-Return-Path: <kvm+bounces-48678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2205AD0A29
-	for <lists+kvm@lfdr.de>; Sat,  7 Jun 2025 01:06:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6E68AD0A78
+	for <lists+kvm@lfdr.de>; Sat,  7 Jun 2025 01:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72440175855
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 23:06:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 341143A11B1
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 23:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8E223D293;
-	Fri,  6 Jun 2025 23:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5659124113C;
+	Fri,  6 Jun 2025 23:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jstj1ls3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qEkC2XZd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6BC1624DD
-	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 23:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868601F098F
+	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 23:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749251154; cv=none; b=PsIX7nFbkDZm8zW8r/UBC1KmkBMyb6alhufUmwHjtQMsuoshrzx6n9wuHxXwe3qJIpBeoibykKhG39EAR4T53cprWpk7iy+fFphl4sHYGnLEB/u4FFtKxa0DLF/4XuqDW0cSxEc5BNZ9HP6TId+6RwDT6tRrV6NI8i0DyosAcVE=
+	t=1749254194; cv=none; b=DQpApRrUAHKLgkfm36a5RcGCPkXFzVDn6es1sFK8GMyFPMyvAoOxO+jfXvlmt8mb1nqJ1qF0NYIvG5grBS8rOcB+85+4KF0GAIv+9H4T4WTkxVE23CemBQfKn2+rwSVFr5Le5YuC8gs9ZXMuhekGQypVOZTxZrDmO7XQG7Ij3XY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749251154; c=relaxed/simple;
-	bh=MW2wNb43ypWSdufjoPAtH5Ju1OuPQquVw5NL7Ah2DOw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mu+cQ0+apoJ6lRC2Re/zxxQJ1eVfoGioBqWDweFrUoUc/ZLhjCFQUSmzjJHfdFX6o1tKHj4n/PNQIpKreIm8kOrMN4R8DffX3JFrNY4n1y0j0Pgm0BFfFJLInJXSyJ737bjdYX/wxr0jffBOaQ7wRsSDu+8++8Nf68yrfofUaRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jstj1ls3; arc=none smtp.client-ip=209.85.215.176
+	s=arc-20240116; t=1749254194; c=relaxed/simple;
+	bh=N7S2+CLCYjOjY2CmYJNFgAFhWoAxyxNsFSGqCabg1pM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mlVwKkfjxjeV/cyjM4+wajp1rofxleOzJNmYR7LZ5mOkhOXsINpn7QkDqs+G/dRMqZn9jjNlZfcZbUZ0HSvp1/ZFgmtvJj7pHK2BYeY9IQk/D9XQFLoHdIDjf2KcrvnZVsE6PxipNqaZIbVaiGrE92SNK63GcZRf+BFBpTE6slE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qEkC2XZd; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-af908bb32fdso1808995a12.1
-        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 16:05:52 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vipinsh.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7391d68617cso2752747b3a.0
+        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 16:56:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749251152; x=1749855952; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M0KcYnorcCYmwOfCT2vfZqpyW+O1lNC3ODlw57DQvoE=;
-        b=jstj1ls37+b0ljHgs1FVN8vUogS6+mRWa6UsUgac1qk0wDCF6HzBMEk40Fem+iJ0dZ
-         P4eucJdBHwisN1wEDDZ/XKz/BbbrgIKkEZ0WZVAS4OJuCMkr1y4IBhSBW/rzao4rfwqM
-         3v2bB+dq4ErzT5No65utgJd6HoRGkngfibJmLgldKUmajKWoLK2bOw5czOu8pWkLZXlS
-         JnyfWIj0M/2YcGbRyAywy/otv97MmykCO8f5x5MDCYRXSO8OnYz6YtLIG+OonSG2uME0
-         e1RZAvz+V2pUgZ0diP4GQkMNw9TEjI8noDO/2UOs8W0rSz3TsqEVMrxWlqY4Jv3VPjxb
-         TFpw==
+        d=google.com; s=20230601; t=1749254192; x=1749858992; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XN0VAsCT1CWdgagP9CPqT2NYJ16ltbDcNqmn3oGzFBA=;
+        b=qEkC2XZdsRXVIEHOoQfELrmu0lQNt8vHW1StrJGhefEhrcObRuqGVrFPeQ7CycQWzq
+         xGHzVLTlAplZNywE54rJfLSMLdqK20TY2GSU5+X1WrXeUD0qhou1Ew3Bkco1pammLHtX
+         vYihb5+z0IVDu12krijVOXdjyONZjiLVFW6aDD9sTyO1CTIuz1Iln4uia5wBlohbyRhn
+         PtV4xaBIi5dPdBP2nQ09XU55LloDB21utlXlwdJD9SFTsEIwXA9BnDuIe9DgCLQVMdWe
+         Ps7m8gA9q0dLsXHFE+H9JWqxzYP1IKAzn1OReADAV8rnVBDioWG/J+Jn3Jr7chd3d0IW
+         ezuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749251152; x=1749855952;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M0KcYnorcCYmwOfCT2vfZqpyW+O1lNC3ODlw57DQvoE=;
-        b=Z/NB1QcyCcN5dS88Ug/qWZtcvW0tdx63rvvq4CEmdukx4ddzERG2UdgtBQ0teY2enK
-         tOsY8nMhPsledeTf+5QMbhRYkVKaTwHVLYVc6cX8Cf9nk2Tjh+yqc91mBEuLsXXFYmFE
-         7QwFTzqw/u7S6DS7vV3CFKw4mej0o5NlUlRjciVMw9WcKxN3v+gSmoazGD1M7wB7cPiU
-         NDKAx1T/7s5KQkR7GqF4evn2K+evrXc9ADeb7mzTHODwfdXPomSORxg6ZOrgOgwqpbD5
-         67lly/Fbld2Q+kw5m5DKDcKbMoRHEyPaaRDjSR07D1aezqVp9EVzZyWN6nE93YAu1IoF
-         6lnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDN1v6kVsmNZbe+tLS5CcOcKEePdWn3nad+xIiGQhwrASgnjSpq9LvO0AenPx4eK6QOPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsUyAdUFUC1baaqnNU6GRbUER4Y7NWS7EmTPXWJq7jKJfrXoq5
-	Op8ZfO2xlI/JmPEfN3d/FgIblK4TemhDqvhc22a1DHVHOSdQ71aLvIQGNoqLLqP4tw==
-X-Gm-Gg: ASbGncvr8mifY5cD4qwXFNL+WHmEpLzRLkh9VHmUvq732vn8rSMFtqkL0bxSMJDtcqO
-	5uN6DmMLf5TQk/gGPiXKZpRjcTVm80zo4o7oYZO5cHTZDTi5Tp2xT3ouOa0ch8GwfiK6LcksZgZ
-	veof1CZAZFAe3lLa7yu5WrlTlMA7FFXLUS+AeTjwP2jHemqihVTQ9Lj9sFxjazRYOV7AvLeKEWm
-	L0XbHAfznn1BevkmI6e5d9Xym6/OTOfOouomb3zIK6xGoXNi6obWDdd/KeaLyzLlcESFcSsLNBw
-	D87F5eqhkYQ2vJVcEAyFozgdi9WM2ExqQIefZ3LSVhYcvhmRyI+yJTXabYesxHuoI5lekxrOot/
-	Ve9B6GLJ5JHEALtHnJAHZ674a
-X-Google-Smtp-Source: AGHT+IG7hO9GoY+lsjfIcKo8gdqn8/SJyMesPC+8pn55vRpHA2eE9UpdENnEjjBD2oj6HtS8wcJVKw==
-X-Received: by 2002:a17:903:22c5:b0:215:ba2b:cd55 with SMTP id d9443c01a7336-2360204d1c3mr66275695ad.2.1749251151608;
-        Fri, 06 Jun 2025 16:05:51 -0700 (PDT)
-Received: from google.com (111.67.145.34.bc.googleusercontent.com. [34.145.67.111])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-236030969ebsm17399595ad.72.2025.06.06.16.05.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Jun 2025 16:05:50 -0700 (PDT)
-Date: Fri, 6 Jun 2025 23:05:46 +0000
-From: David Matlack <dmatlack@google.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>, Fenghua Yu <fenghua.yu@intel.com>,
-	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>,
-	Adhemerval Zanella <adhemerval.zanella@linaro.org>,
-	Jiri Olsa <jolsa@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
-	Wei Yang <richard.weiyang@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, Takashi Iwai <tiwai@suse.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	WangYuli <wangyuli@uniontech.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Eric Auger <eric.auger@redhat.com>, Josh Hilke <jrhilke@google.com>,
-	linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-	Kevin Tian <kevin.tian@intel.com>,
-	Vipin Sharma <vipinsh@google.com>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Adithya Jayachandran <ajayachandra@nvidia.com>,
-	Parav Pandit <parav@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [RFC PATCH 07/33] vfio: selftests: Use command line to set
- hugepage size for DMA mapping test
-Message-ID: <aEN0Sr96nyJkN3fL@google.com>
-References: <20250523233018.1702151-1-dmatlack@google.com>
- <20250523233018.1702151-8-dmatlack@google.com>
- <20250526171501.GE61950@nvidia.com>
- <CALzav=fxvZNY=nBhDKZP=MGEDx5iGqCi-noDRo3q7eENJ5XBWw@mail.gmail.com>
- <20250530172559.GQ233377@nvidia.com>
+        d=1e100.net; s=20230601; t=1749254192; x=1749858992;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XN0VAsCT1CWdgagP9CPqT2NYJ16ltbDcNqmn3oGzFBA=;
+        b=uwnIwMJXxBFliqG33LntGAEpy2rWAS55ywdQr2aTVkeTGbfG7ZS5DWxfVxPgCXuirC
+         zwVmWL6CMrYbYfKtdodAk8VsJrwdI4lJeFHaUh/es5mvdBl9sORp8KXlpeW09jAUq3BF
+         Z58uy4JH7LCNNxSur5maf5gCob0k/iYoUWTiP4VHJMdtalHygKXth2emMvpNYSETWIJP
+         iu822/LTiVIopGSAYgnb5s6qOMAtk976kPOk+gZDstT3L7gb3Cx7Op5lPwqnd+3r5ngS
+         aeWsniUNqvvdL4TR1yc5n5uNWDor3ajNGnCvtadTvoOxTHJgaxQZDOE/rA+MXqP1U7nx
+         fdEg==
+X-Gm-Message-State: AOJu0Yxjz8sybq+WEuRBJxHiPXaX6ngUmt8+aIMeD19uAL3nnb56XgfN
+	x9FaMpswF2CkpIBEjr2TcKnKGVnF2LkqZw2HL5ZV/aorcAa2zAllmLXwuwiFssc/5eKXHGy3hzm
+	ao8envLiWkS/CzgNVU5jm+xMHoZP26PS5/nlLUxWuNs1KGzkjd2euYplAKIzLVflnXa9z+8Lc3I
+	UkC75Awk5mQJ2+i/JmweBU7jfdMr1lLHm2P8wnJQ==
+X-Google-Smtp-Source: AGHT+IHeEVfH9wv5FWIJzUeYXcQ/zi0u5Uf0vhP1yOhYLsqyKUu35wm23VvWwVGse0eCH5m6iscBFYWFXqXu
+X-Received: from pfgs41.prod.google.com ([2002:a05:6a00:17a9:b0:747:9faf:ed39])
+ (user=vipinsh job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6494:b0:215:d41d:9183
+ with SMTP id adf61e73a8af0-21ee2559addmr6535389637.1.1749254191550; Fri, 06
+ Jun 2025 16:56:31 -0700 (PDT)
+Date: Fri,  6 Jun 2025 16:56:04 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250530172559.GQ233377@nvidia.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.rc0.604.gd4ff7b7c86-goog
+Message-ID: <20250606235619.1841595-1-vipinsh@google.com>
+Subject: [PATCH v2 00/15] Add KVM Selftests runner
+From: Vipin Sharma <vipinsh@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org
+Cc: seanjc@google.com, pbonzini@redhat.com, anup@brainfault.org, 
+	borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, 
+	maz@kernel.org, oliver.upton@linux.dev, dmatlack@google.com, 
+	Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2025-05-30 02:25 PM, Jason Gunthorpe wrote:
-> On Fri, May 30, 2025 at 09:50:22AM -0700, David Matlack wrote:
-> > I'll explore doing this. For a single dimension this looks possible.
-> > But for multiple dimensions (e.g. cross product of iommu_mode and
-> > backing_src) I don't see a clear way to do it. But that's just after a
-> > cursory look.
-> 
-> Explicitly list all the combinations with macros?
-> 
-> Enhance the userspace tests allow code to generate the
-> variants? Kernel tests can do this:
+Hello,
 
-I got a chance to play around with generating fixture variants today and
-eneded up with this, which I think is pretty clean.
+Create KVM Selftest Runner which allows running KVM selftests with added
+features not present in default selftest runner provided by selftests
+framework.
 
-tools/testing/selftests/vfio/lib/include/vfio_util.h:
+This Runner has two broad goals:
+1. Make it easier for contributors and maintainers to run various
+   configuration of tests with features like preserving output,
+   controlling output verbosity, parallelism, different combinations of
+   command line arguments.
+2. Provide common place to write interesting and useful combinations of
+   tests command line arguments to improve KVM test coverage. Default
+   selftests runner provide little to no control over this.
 
-  #define ALL_IOMMU_MODES_VARIANT_ADD(...) \
-  __IOMMU_MODE_VARIANT_ADD(vfio_type1_iommu, ##__VA_ARGS__); \
-  __IOMMU_MODE_VARIANT_ADD(vfio_type1v2_iommu, ##__VA_ARGS__); \
-  __IOMMU_MODE_VARIANT_ADD(iommufd_compat_type1, ##__VA_ARGS__); \
-  __IOMMU_MODE_VARIANT_ADD(iommufd_compat_type1v2, ##__VA_ARGS__); \
-  __IOMMU_MODE_VARIANT_ADD(iommufd, ##__VA_ARGS__)
+Patch 1 adds a very basic sefltest runner.
+Patches 2-10 add various features to runner.
+Patch 11 provides a way to auto generate test files.
+Patch 12-15 commits the generated files for each architecture supported
+by KVM selftests.
 
-tools/testing/selftests/vfio/vfio_dma_mapping_test.c:
+This version doesn't have all of the features envisioned in RFC and v1.
+Future patches will add features like:
 
-  #define __IOMMU_MODE_VARIANT_ADD(_iommu_mode, _name, _size, _mmap_flags)	\
-  FIXTURE_VARIANT_ADD(vfio_dma_mapping_test, _iommu_mode ## _name)		\
-  {										\
-  	.iommu_mode = #_iommu_mode,						\
-  	.size = (_size),							\
-  	.mmap_flags = MAP_ANONYMOUS | MAP_PRIVATE | (_mmap_flags),		\
-  }
+- Print process id of the test in execution.
+- Skip other platform tests. Currently, runner expects test binary will
+  not be available and it marks that test as it didn't run in the
+  output. This can be handled by either hardcoding paths in runner or
+  extending *.test schema. I will work on it in the next version.
+- CTRL+C currently spits out lots of warning (depending on --job value).
+  This will be fixed in the next version.
+- Add more tests configurations.
+- Provide a way to set the environment in which runner will start tests. For
+  example, setting huge pages, stress testing based on resources
+  available on host.
 
-  ALL_IOMMU_MODES_VARIANT_ADD(anonymous, 0, 0);
-  ALL_IOMMU_MODES_VARIANT_ADD(anonymous_hugetlb_2mb, SZ_2M, MAP_HUGETLB | MAP_HUGE_2MB);
-  ALL_IOMMU_MODES_VARIANT_ADD(anonymous_hugetlb_1gb, SZ_1G, MAP_HUGETLB | MAP_HUGE_1GB);
 
-  #undef __IOMMU_MODE_VARIANT_ADD
+v2:
+- Automatic default test generation.
+- Command line flag to provide executables location
+- Dump output to filesystem with timestamp
+- Accept absolute path of *.test files/directory location
+- Sticky status at bottom for the current state of runner.
+- Knobs to control output verbosity
+- Colored output for terminals.
 
-Let me know if you think this looks reasonable.
+v1: https://lore.kernel.org/kvm/20250222005943.3348627-1-vipinsh@google.com/
+- Parallel test execution.
+- Dumping separate output for each test.
+- Timeout for test execution
+- Specify single test or a test directory.
+
+RFC: https://lore.kernel.org/kvm/20240821223012.3757828-1-vipinsh@google.com/
+
+Vipin Sharma (15):
+  KVM: selftest: Create KVM selftest runner
+  KVM: selftests: Enable selftests runner to find executables in
+    different path
+  KVM: selftests: Add timeout option in selftests runner
+  KVM: selftests: Add option to save selftest runner output to a
+    directory
+  KVM: selftests: Run tests concurrently in KVM selftests runner
+  KVM: selftests: Add a flag to print only test status in KVM Selftests
+    run
+  KVM: selftests: Add various print flags to KVM Selftest Runner
+  KVM: selftests: Print sticky KVM Selftests Runner status at bottom
+  KVM: selftests: Add a flag to print only sticky summary in the
+    selftests runner
+  KVM: selftests: Add flag to suppress all output from Selftest KVM
+    Runner
+  KVM: selftests: Auto generate default tests for KVM Selftests Runner
+  KVM: selftests: Add x86 auto generated test files for KVM Selftests
+    Runner
+  KVM: selftests: Add arm64 auto generated test files for KVM Selftests
+    Runner
+  KVM: selftests: Add s390 auto generated test files for KVM Selftests
+    Runner
+  KVM: selftests: Add riscv auto generated test files for KVM Selftests
+    Runner
+
+ tools/testing/selftests/kvm/.gitignore        |   4 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   8 +
+ .../testing/selftests/kvm/runner/__main__.py  | 271 ++++++++++++++++++
+ tools/testing/selftests/kvm/runner/command.py |  53 ++++
+ .../testing/selftests/kvm/runner/selftest.py  |  66 +++++
+ .../selftests/kvm/runner/test_runner.py       |  88 ++++++
+ .../access_tracking_perf_test/default.test    |   1 +
+ .../kvm/tests/arch_timer/default.test         |   1 +
+ .../tests/arm64/aarch32_id_regs/default.test  |   1 +
+ .../arm64/arch_timer_edge_cases/default.test  |   1 +
+ .../tests/arm64/debug-exceptions/default.test |   1 +
+ .../kvm/tests/arm64/hypercalls/default.test   |   1 +
+ .../kvm/tests/arm64/mmio_abort/default.test   |   1 +
+ .../kvm/tests/arm64/no-vgic-v3/default.test   |   1 +
+ .../tests/arm64/page_fault_test/default.test  |   1 +
+ .../kvm/tests/arm64/psci_test/default.test    |   1 +
+ .../kvm/tests/arm64/set_id_regs/default.test  |   1 +
+ .../kvm/tests/arm64/smccc_filter/default.test |   1 +
+ .../arm64/vcpu_width_config/default.test      |   1 +
+ .../kvm/tests/arm64/vgic_init/default.test    |   1 +
+ .../kvm/tests/arm64/vgic_irq/default.test     |   1 +
+ .../tests/arm64/vgic_lpi_stress/default.test  |   1 +
+ .../arm64/vpmu_counter_access/default.test    |   1 +
+ .../kvm/tests/coalesced_io_test/default.test  |   1 +
+ .../kvm/tests/demand_paging_test/default.test |   1 +
+ .../2slot_5vcpu_10iter.test                   |   1 +
+ .../tests/dirty_log_perf_test/default.test    |   1 +
+ .../no_dirty_log_protect.test                 |   1 +
+ .../kvm/tests/dirty_log_test/default.test     |   1 +
+ .../kvm/tests/get-reg-list/default.test       |   1 +
+ .../kvm/tests/guest_memfd_test/default.test   |   1 +
+ .../kvm/tests/guest_print_test/default.test   |   1 +
+ .../tests/hardware_disable_test/default.test  |   1 +
+ .../tests/kvm_binary_stats_test/default.test  |   1 +
+ .../tests/kvm_create_max_vcpus/default.test   |   1 +
+ .../tests/kvm_page_table_test/default.test    |   1 +
+ .../default.test                              |   1 +
+ .../kvm/tests/memslot_perf_test/default.test  |   1 +
+ .../kvm/tests/mmu_stress_test/default.test    |   1 +
+ .../tests/pre_fault_memory_test/default.test  |   1 +
+ .../kvm/tests/riscv/ebreak_test/default.test  |   1 +
+ .../kvm/tests/riscv/sbi_pmu_test/default.test |   1 +
+ .../kvm/tests/rseq_test/default.test          |   1 +
+ .../kvm/tests/s390/cmma_test/default.test     |   1 +
+ .../s390/cpumodel_subfuncs_test/default.test  |   1 +
+ .../kvm/tests/s390/debug_test/default.test    |   1 +
+ .../kvm/tests/s390/memop/default.test         |   1 +
+ .../kvm/tests/s390/resets/default.test        |   1 +
+ .../s390/shared_zeropage_test/default.test    |   1 +
+ .../tests/s390/sync_regs_test/default.test    |   1 +
+ .../kvm/tests/s390/tprot/default.test         |   1 +
+ .../kvm/tests/s390/ucontrol_test/default.test |   1 +
+ .../tests/set_memory_region_test/default.test |   1 +
+ .../kvm/tests/steal_time/default.test         |   1 +
+ .../system_counter_offset_test/default.test   |   1 +
+ .../kvm/tests/x86/amx_test/default.test       |   1 +
+ .../x86/apic_bus_clock_test/default.test      |   1 +
+ .../kvm/tests/x86/cpuid_test/default.test     |   1 +
+ .../x86/cr4_cpuid_sync_test/default.test      |   1 +
+ .../kvm/tests/x86/debug_regs/default.test     |   1 +
+ .../default.test                              |   1 +
+ .../default.test                              |   1 +
+ .../kvm/tests/x86/fastops_test/default.test   |   1 +
+ .../tests/x86/feature_msrs_test/default.test  |   1 +
+ .../tests/x86/fix_hypercall_test/default.test |   1 +
+ .../kvm/tests/x86/hwcr_msr_test/default.test  |   1 +
+ .../kvm/tests/x86/hyperv_clock/default.test   |   1 +
+ .../kvm/tests/x86/hyperv_cpuid/default.test   |   1 +
+ .../kvm/tests/x86/hyperv_evmcs/default.test   |   1 +
+ .../hyperv_extended_hypercalls/default.test   |   1 +
+ .../tests/x86/hyperv_features/default.test    |   1 +
+ .../kvm/tests/x86/hyperv_ipi/default.test     |   1 +
+ .../tests/x86/hyperv_svm_test/default.test    |   1 +
+ .../tests/x86/hyperv_tlb_flush/default.test   |   1 +
+ .../tests/x86/kvm_buslock_test/default.test   |   1 +
+ .../kvm/tests/x86/kvm_clock_test/default.test |   1 +
+ .../kvm/tests/x86/kvm_pv_test/default.test    |   1 +
+ .../x86/max_vcpuid_cap_test/default.test      |   1 +
+ .../tests/x86/monitor_mwait_test/default.test |   1 +
+ .../x86/nested_emulation_test/default.test    |   1 +
+ .../x86/nested_exceptions_test/default.test   |   1 +
+ .../tests/x86/nx_huge_pages_test/default.test |   1 +
+ .../tests/x86/platform_info_test/default.test |   1 +
+ .../tests/x86/pmu_counters_test/default.test  |   1 +
+ .../x86/pmu_event_filter_test/default.test    |   1 +
+ .../private_mem_conversions_test/default.test |   1 +
+ .../private_mem_kvm_exits_test/default.test   |   1 +
+ .../x86/recalc_apic_map_test/default.test     |   1 +
+ .../tests/x86/set_boot_cpu_id/default.test    |   1 +
+ .../kvm/tests/x86/set_sregs_test/default.test |   1 +
+ .../tests/x86/sev_init2_tests/default.test    |   1 +
+ .../tests/x86/sev_migrate_tests/default.test  |   1 +
+ .../kvm/tests/x86/sev_smoke_test/default.test |   1 +
+ .../default.test                              |   1 +
+ .../kvm/tests/x86/smm_test/default.test       |   1 +
+ .../kvm/tests/x86/state_test/default.test     |   1 +
+ .../tests/x86/svm_int_ctl_test/default.test   |   1 +
+ .../x86/svm_nested_shutdown_test/default.test |   1 +
+ .../svm_nested_soft_inject_test/default.test  |   1 +
+ .../tests/x86/svm_vmcall_test/default.test    |   1 +
+ .../kvm/tests/x86/sync_regs_test/default.test |   1 +
+ .../x86/triple_fault_event_test/default.test  |   1 +
+ .../kvm/tests/x86/tsc_msrs_test/default.test  |   1 +
+ .../tests/x86/tsc_scaling_sync/default.test   |   1 +
+ .../x86/ucna_injection_test/default.test      |   1 +
+ .../tests/x86/userspace_io_test/default.test  |   1 +
+ .../x86/userspace_msr_exit_test/default.test  |   1 +
+ .../x86/vmx_apic_access_test/default.test     |   1 +
+ .../vmx_close_while_nested_test/default.test  |   1 +
+ .../tests/x86/vmx_dirty_log_test/default.test |   1 +
+ .../default.test                              |   1 +
+ .../default.test                              |   1 +
+ .../kvm/tests/x86/vmx_msrs_test/default.test  |   1 +
+ .../vmx_nested_tsc_scaling_test/default.test  |   1 +
+ .../tests/x86/vmx_pmu_caps_test/default.test  |   1 +
+ .../vmx_preemption_timer_test/default.test    |   1 +
+ .../vmx_set_nested_state_test/default.test    |   1 +
+ .../x86/vmx_tsc_adjust_test/default.test      |   1 +
+ .../kvm/tests/x86/xapic_ipi_test/default.test |   1 +
+ .../tests/x86/xapic_state_test/default.test   |   1 +
+ .../tests/x86/xcr0_cpuid_test/default.test    |   1 +
+ .../tests/x86/xen_shinfo_test/default.test    |   1 +
+ .../tests/x86/xen_vmcall_test/default.test    |   1 +
+ .../kvm/tests/x86/xss_msr_test/default.test   |   1 +
+ 124 files changed, 607 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/runner/__main__.py
+ create mode 100644 tools/testing/selftests/kvm/runner/command.py
+ create mode 100644 tools/testing/selftests/kvm/runner/selftest.py
+ create mode 100644 tools/testing/selftests/kvm/runner/test_runner.py
+ create mode 100644 tools/testing/selftests/kvm/tests/access_tracking_perf_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arch_timer/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/aarch32_id_regs/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/arch_timer_edge_cases/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/debug-exceptions/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/hypercalls/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/mmio_abort/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/no-vgic-v3/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/page_fault_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/psci_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/set_id_regs/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/smccc_filter/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/vcpu_width_config/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/vgic_init/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/vgic_irq/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/vgic_lpi_stress/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/arm64/vpmu_counter_access/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/coalesced_io_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/demand_paging_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/dirty_log_perf_test/2slot_5vcpu_10iter.test
+ create mode 100644 tools/testing/selftests/kvm/tests/dirty_log_perf_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/dirty_log_perf_test/no_dirty_log_protect.test
+ create mode 100644 tools/testing/selftests/kvm/tests/dirty_log_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/get-reg-list/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/guest_memfd_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/guest_print_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/hardware_disable_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/kvm_binary_stats_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/kvm_create_max_vcpus/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/kvm_page_table_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/memslot_modification_stress_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/memslot_perf_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/mmu_stress_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/pre_fault_memory_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/riscv/ebreak_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/riscv/sbi_pmu_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/rseq_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/s390/cmma_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/s390/cpumodel_subfuncs_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/s390/debug_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/s390/memop/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/s390/resets/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/s390/shared_zeropage_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/s390/sync_regs_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/s390/tprot/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/s390/ucontrol_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/set_memory_region_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/steal_time/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/system_counter_offset_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/amx_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/apic_bus_clock_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/cpuid_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/cr4_cpuid_sync_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/debug_regs/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/dirty_log_page_splitting_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/exit_on_emulation_failure_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/fastops_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/feature_msrs_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/fix_hypercall_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/hwcr_msr_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/hyperv_clock/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/hyperv_cpuid/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/hyperv_evmcs/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/hyperv_extended_hypercalls/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/hyperv_features/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/hyperv_ipi/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/hyperv_svm_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/hyperv_tlb_flush/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/kvm_buslock_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/kvm_clock_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/kvm_pv_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/max_vcpuid_cap_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/monitor_mwait_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/nested_emulation_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/nested_exceptions_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/nx_huge_pages_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/platform_info_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/pmu_counters_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/pmu_event_filter_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/private_mem_conversions_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/private_mem_kvm_exits_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/recalc_apic_map_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/set_boot_cpu_id/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/set_sregs_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/sev_init2_tests/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/sev_migrate_tests/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/sev_smoke_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/smaller_maxphyaddr_emulation_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/smm_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/state_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/svm_int_ctl_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/svm_nested_shutdown_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/svm_nested_soft_inject_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/svm_vmcall_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/sync_regs_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/triple_fault_event_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/tsc_msrs_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/tsc_scaling_sync/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/ucna_injection_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/userspace_io_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/userspace_msr_exit_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_apic_access_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_close_while_nested_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_dirty_log_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_exception_with_invalid_guest_state/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_invalid_nested_guest_state/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_msrs_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_nested_tsc_scaling_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_pmu_caps_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_preemption_timer_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_set_nested_state_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/vmx_tsc_adjust_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/xapic_ipi_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/xapic_state_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/xcr0_cpuid_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/xen_shinfo_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/xen_vmcall_test/default.test
+ create mode 100644 tools/testing/selftests/kvm/tests/x86/xss_msr_test/default.test
+
+
+base-commit: 3f7b307757ecffc1c18ede9ee3cf9ce8101f3cc9
+-- 
+2.50.0.rc0.604.gd4ff7b7c86-goog
+
 
