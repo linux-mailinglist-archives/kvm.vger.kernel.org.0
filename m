@@ -1,139 +1,147 @@
-Return-Path: <kvm+bounces-48627-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48628-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B84ACACFBA9
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 05:32:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5D34ACFBE0
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 06:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED67B1899B37
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 03:32:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71CD9173968
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 04:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2FDB1E1C3A;
-	Fri,  6 Jun 2025 03:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341031DE3BB;
+	Fri,  6 Jun 2025 04:15:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bBtLj6+G"
+	dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b="tiKxe8Tl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-30.ptr.blmpb.com (sg-1-30.ptr.blmpb.com [118.26.132.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5334A0A;
-	Fri,  6 Jun 2025 03:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7514C9F
+	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 04:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749180745; cv=none; b=uw6R9gigfZb3Id+G03xegkJ+wUoKsSDM8w2O2Id3bq/SGgA2XSbw0NgaSmE0ZOI6V17+3p19BYiIoUW0ewayLGKKdPGkVPBVgce2z7Jmsada8CDH3RpdSp+UwWA3hRAqGtfW+0/yjXjjUiZJrLI5VCfxYoPB9qS1zH9V0Y8fC9M=
+	t=1749183300; cv=none; b=eDdzCMYbkoBj/NW4CFrNHs99sUDe/Bo1lwfHuGz6XaZ+YQasb0GiesgeFR0lgpc5O7mb9GAKSTCE2keKD7Buy1LSkJLu150KzANiHhHD4evwbBBZE4v6uzL7TIisVdCP6+jeV/hudxAGIJuZAMBsFIoI8ycrgLx+7Q2Gzx6WBZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749180745; c=relaxed/simple;
-	bh=Qcz12GY2obmAahfa+Hf4viUpaHRcvM1vkETwyIXnzVQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nJJPx/ePDTaa/iPJSumhTBiFvPd9Iq18PTaaJqhDDPaafHQOZ6d39pkZm12NOrp2deM9IdDzISSTMLuaqe8cRQvsftraLe95LvDywCz9KdmbMRkjG+THhdle/CCcOLUCKT9pk0DkC9VyZeD7g3llNPt1CYDCX0WSkMhuzVzaH/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bBtLj6+G; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749180745; x=1780716745;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Qcz12GY2obmAahfa+Hf4viUpaHRcvM1vkETwyIXnzVQ=;
-  b=bBtLj6+G+KM9WWIWbB4mblwVOVF2RI7eOOLMcid7FfbjRRZ/c+3ZSC/j
-   5ihXRnJmcECztOCISIH6FbBJoYYZ5U00f7fx3qLnEeefDQCpi6r3xdQeq
-   HS5hFQlkWYzPCIKM5+O3h/i5zvnC1MzvPQ61zskCV/QIgbPGBOW5r4tJI
-   9D3ZIYgXQr25NyEvQT6ZqG7ek9KBH48WM/Hsm0TjgdV9IZdfIvjZBFY5/
-   7KipzjZuYun3aYkWz45NsgLmkIBYjqbnwr6FnZLgtZlxymDEo7nt00hah
-   V0z5boK4nvvhhy7c8itbcTlY3O4kd4OWpJAA0MpBzHwBJI3TTd782lC66
-   A==;
-X-CSE-ConnectionGUID: 2e0jv3SURS20XdQUoSi38w==
-X-CSE-MsgGUID: 6ESo2b8AQe687K3fcEoJcA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11455"; a="51205003"
-X-IronPort-AV: E=Sophos;i="6.16,214,1744095600"; 
-   d="scan'208";a="51205003"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2025 20:32:24 -0700
-X-CSE-ConnectionGUID: +lkkTJKXTyuykVQI6XdC0g==
-X-CSE-MsgGUID: Fs5aCXcMTN+tx2jIxltA5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,214,1744095600"; 
-   d="scan'208";a="149541684"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa003.fm.intel.com with ESMTP; 05 Jun 2025 20:32:17 -0700
-Date: Fri, 6 Jun 2025 11:25:36 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, kvm@vger.kernel.org,
-	sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	dan.j.williams@intel.com, aik@amd.com, linux-coco@lists.linux.dev,
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, vivek.kasireddy@intel.com,
-	yilun.xu@intel.com, linux-kernel@vger.kernel.org, lukas@wunner.de,
-	yan.y.zhao@intel.com, daniel.vetter@ffwll.ch, leon@kernel.org,
-	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com, linux-pci@vger.kernel.org, zhiw@nvidia.com,
-	simona.vetter@ffwll.ch, shameerali.kolothum.thodi@huawei.com,
-	iommu@lists.linux.dev, kevin.tian@intel.com
-Subject: Re: [RFC PATCH 19/30] vfio/pci: Add TSM TDI bind/unbind IOCTLs for
- TEE-IO support
-Message-ID: <aEJfsFxVxXTDIucc@yilunxu-OptiPlex-7050>
-References: <20250529053513.1592088-1-yilun.xu@linux.intel.com>
- <20250529053513.1592088-20-yilun.xu@linux.intel.com>
- <yq5aplfn210z.fsf@kernel.org>
- <aD24r44v0g1NgeZs@yilunxu-OptiPlex-7050>
- <yq5ajz5r8w6p.fsf@kernel.org>
- <aEFmPaYorqaYCKBY@yilunxu-OptiPlex-7050>
- <20250605150916.GB19710@nvidia.com>
+	s=arc-20240116; t=1749183300; c=relaxed/simple;
+	bh=IdexLD3eLQvA1s6fHt6lYm6nLYATX2RacfQTFZ/sCXs=;
+	h=To:Content-Type:In-Reply-To:Cc:Message-Id:References:Date:From:
+	 Subject:Mime-Version; b=NT6wmLwD2u3QO8y2dKrvH5fdf19Ie0RkM/YhbPDDUeMdMorUIQgBJslhi1iZjU5/v5BKUcSfbtZOpPWErp17tpMEyK49+8nsIefYO9o2zMOGcgBVkYfTetcc7ZJQNr0Z+mApSUKwBt1WsnMsDJK6YA4Xix+cH5wEcGDFpeic5lU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com; spf=pass smtp.mailfrom=lanxincomputing.com; dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b=tiKxe8Tl; arc=none smtp.client-ip=118.26.132.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lanxincomputing.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=lanxincomputing-com.20200927.dkim.feishu.cn; t=1749183289;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=bxW97WAtWMI/gihYEj6Ht7PAyVXQrYH3mCMOcOfQ04s=;
+ b=tiKxe8TlLzaSpftlkKEpF8OWyyY6pKZ27yIdGyAK+Kbd6dB0QZNd5FxI6mAWs79O7n92/p
+ IYsmuk7woUc/zMnRRRaAsh6vISLeElv+E+ct5C0DbxK087f70FtCmY5YUPEl+IL1e8jpjh
+ 27r/sNpvVacdHzVbRvb6fduyZRP8OCe/2eadEC7muBnieLplfYDUpAQY0nZLL5WOv5B10L
+ lky+mWeHC2NzSpe0HxbSYQBia0v3fo2urov21PrA+IbZmlDZZM1Bez4q8gBgZXunYmbdVw
+ G+TE4jiIp9vVneN9+4wetUjpAXuuPQHeKRdKRg0cXNkhJ3AElqSLQkWAmTh5jA==
+To: "Anup Patel" <apatel@ventanamicro.com>, 
+	"Atish Patra" <atish.patra@linux.dev>
+User-Agent: Mozilla Thunderbird
+Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20250605061458.196003-5-apatel@ventanamicro.com>
+Cc: "Palmer Dabbelt" <palmer@dabbelt.com>, 
+	"Paul Walmsley" <paul.walmsley@sifive.com>, 
+	"Alexandre Ghiti" <alex@ghiti.fr>, 
+	"Andrew Jones" <ajones@ventanamicro.com>, 
+	"Anup Patel" <anup@brainfault.org>, <kvm@vger.kernel.org>, 
+	<kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>, 
+	<linux-kernel@vger.kernel.org>
+Message-Id: <670cf57f-775e-43e1-abc3-189f3e0dc35c@lanxincomputing.com>
+References: <20250605061458.196003-1-apatel@ventanamicro.com> <20250605061458.196003-5-apatel@ventanamicro.com>
+Date: Fri, 6 Jun 2025 12:14:43 +0800
+Content-Language: en-US
+Received: from [127.0.0.1] ([180.165.23.184]) by smtp.feishu.cn with ESMTPS; Fri, 06 Jun 2025 12:14:45 +0800
+Content-Transfer-Encoding: 7bit
+X-Lms-Return-Path: <lba+268426b37+26deb6+vger.kernel.org+liujingqi@lanxincomputing.com>
+X-Original-From: Nutty Liu <liujingqi@lanxincomputing.com>
+From: "Nutty Liu" <liujingqi@lanxincomputing.com>
+Subject: Re: [PATCH 04/13] RISC-V: KVM: Drop the return value of kvm_riscv_vcpu_aia_init()
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250605150916.GB19710@nvidia.com>
+Mime-Version: 1.0
 
-On Thu, Jun 05, 2025 at 12:09:16PM -0300, Jason Gunthorpe wrote:
-> On Thu, Jun 05, 2025 at 05:41:17PM +0800, Xu Yilun wrote:
-> 
-> > No, this is not device side TDISP requirement. It is host side
-> > requirement to fix DMA silent drop issue. TDX enforces CPU S2 PT share
-> > with IOMMU S2 PT (does ARM do the same?), so unmap CPU S2 PT in KVM equals
-> > unmap IOMMU S2 PT.
-> > 
-> > If we allow IOMMU S2 PT unmapped when TDI is running, host could fool
-> > guest by just unmap some PT entry and suppress the fault event. Guest
-> > thought a DMA writting is successful but it is not and may cause
-> > data integrity issue.
-> 
-> So, TDX prevents *any* unmap, even of normal memory, from the S2 while
-> a guest is running?  Seems extreme?
+On 6/5/2025 2:14 PM, Anup Patel wrote:
+> The kvm_riscv_vcpu_aia_init() does not return any failure so drop
+> the return value which is always zero.
+>
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>   arch/riscv/include/asm/kvm_aia.h | 2 +-
+>   arch/riscv/kvm/aia_device.c      | 6 ++----
+>   arch/riscv/kvm/vcpu.c            | 4 +---
+>   3 files changed, 4 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/kvm_aia.h b/arch/riscv/include/asm/kvm_aia.h
+> index 3b643b9efc07..0a0f12496f00 100644
+> --- a/arch/riscv/include/asm/kvm_aia.h
+> +++ b/arch/riscv/include/asm/kvm_aia.h
+> @@ -147,7 +147,7 @@ int kvm_riscv_vcpu_aia_rmw_ireg(struct kvm_vcpu *vcpu, unsigned int csr_num,
+>   
+>   int kvm_riscv_vcpu_aia_update(struct kvm_vcpu *vcpu);
+>   void kvm_riscv_vcpu_aia_reset(struct kvm_vcpu *vcpu);
+> -int kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu);
+> +void kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu);
+>   void kvm_riscv_vcpu_aia_deinit(struct kvm_vcpu *vcpu);
+>   
+>   int kvm_riscv_aia_inject_msi_by_id(struct kvm *kvm, u32 hart_index,
+> diff --git a/arch/riscv/kvm/aia_device.c b/arch/riscv/kvm/aia_device.c
+> index 43e472ff3e1a..5b7ed2d987db 100644
+> --- a/arch/riscv/kvm/aia_device.c
+> +++ b/arch/riscv/kvm/aia_device.c
+> @@ -539,12 +539,12 @@ void kvm_riscv_vcpu_aia_reset(struct kvm_vcpu *vcpu)
+>   	kvm_riscv_vcpu_aia_imsic_reset(vcpu);
+>   }
+>   
+> -int kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu)
+> +void kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu)
+>   {
+>   	struct kvm_vcpu_aia *vaia = &vcpu->arch.aia_context;
+>   
+>   	if (!kvm_riscv_aia_available())
+> -		return 0;
+> +		return;
+>   
+>   	/*
+>   	 * We don't do any memory allocations over here because these
+> @@ -556,8 +556,6 @@ int kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu)
+>   	/* Initialize default values in AIA vcpu context */
+>   	vaia->imsic_addr = KVM_RISCV_AIA_UNDEF_ADDR;
+>   	vaia->hart_index = vcpu->vcpu_idx;
+> -
+> -	return 0;
+>   }
+>   
+>   void kvm_riscv_vcpu_aia_deinit(struct kvm_vcpu *vcpu)
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 6a1914b21ec3..f98a1894d55b 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -160,9 +160,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>   	kvm_riscv_vcpu_pmu_init(vcpu);
+>   
+>   	/* Setup VCPU AIA */
+> -	rc = kvm_riscv_vcpu_aia_init(vcpu);
+> -	if (rc)
+> -		return rc;
+> +	kvm_riscv_vcpu_aia_init(vcpu);
+>   
 
-Prevents any unmap *not intended* by guest, even for normal memory.
+Reviewed-by: Nutty Liu<liujingqi@lanxincomputing.com>
 
-Guest could show its unmapping intention by issuing an "page release"
-firmware call then host is OK to unmap. This for normal memory.
-
-For MMIO, Guest implicitly hwo the intention by unbind the TDI first.
-
-> 
-> MMIO isn't special, if you have a rule like that for such a security
-> reason it should cover all of the S2.
-
-It does.
-
+This seems more reasonable.
 Thanks,
-Yilun
+Nutty
 
-> 
-> > This is not a TDX specific problem, but different vendors has different
-> > mechanisms for this. For TDX, firmware fails the MMIO unmap for S2. For
-> > AMD, will trigger some HW protection called "ASID fence" [1]. Not sure
-> > how ARM handles this?
-> 
-> This seems even more extreme, if the guest gets a bad DMA address into
-> the device then the entire device gets killed? No chance to debug it?
-> 
-> Jason
-> 
+>   	/*
+>   	 * Setup SBI extensions
 
