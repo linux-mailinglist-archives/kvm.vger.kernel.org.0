@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-48675-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48676-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA522AD0A04
-	for <lists+kvm@lfdr.de>; Sat,  7 Jun 2025 00:42:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F548AD0A0F
+	for <lists+kvm@lfdr.de>; Sat,  7 Jun 2025 00:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AD4C179F55
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 22:42:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A30F17ACAE
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 22:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4671D23A9BD;
-	Fri,  6 Jun 2025 22:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C0023D2A0;
+	Fri,  6 Jun 2025 22:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4HKdiKyb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1HylqXX4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC1E233156
-	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 22:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BEE023BD13
+	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 22:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749249717; cv=none; b=aSpPQx1szvfMoF+s9iqowX/waHJ43F3Fkxq3jqCHYRoo/J5Dg2vyaggE4iRybHGhByka+9gFwZ5x5TxNfvp3Ot3f9TTszyKYTJ9/JGenjfN7gUETtSJSUpQinNSGl0/xkob89EQ+D6ya/wE8szJX0MZVGovbS2+Thy8s6STx7jg=
+	t=1749250252; cv=none; b=PPbE20sTJnfkvPy7xxlWslleZJhrpsgZE232NlBsjK8hvUJocTAVOpTVkIhGCpOlPoq69H7wGPLPdzFvaDYzQzsMXoqHp8LY1F92T2tgryPGiu2+wBl+31aQPIDeU9uF/TpHfVbe36el8eDy2lhyCMFz+D98aCSCs9jhQqcVQ1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749249717; c=relaxed/simple;
-	bh=AfFvJzb4MQFPYprIsT1kp3eEJ8Mfo2gMrav1f09J9ik=;
+	s=arc-20240116; t=1749250252; c=relaxed/simple;
+	bh=9FBus/nnrcqkp3TJXG8U7uwI7fgPTt0YtA5BGlfV2DQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=awvYODynJUq+/vCfDxMDKXFem9J9UmFppQQSzhpZEEaunKAa6viCZQGGdW+xtaL6FIg91dxLR7ZSwRGYcxzzunOWqfB5gchGzL+LjPQaDDlGNJEAXH/yfHFnFrkK5oOQxFqUcpmvYJHl/I2hF0HZX7Kaw+b3Wuy4gbbuHTUa5p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4HKdiKyb; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=jMwCtpwyugZqddM6CqirdcAXlFGGL3nFkL5j7hvGciMcbzu9cnoGayx+H0bxj1GydKU08EXpT27YuZhgqnBYwF43MqtJ943iPWnJRVxhEYlyBA0YXweJ+tVVFker/MK2QYHhWRuuZ39qvSnCKaSCO/FL1mPtnPr6hYGfdHYwLeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1HylqXX4; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3132c1942a1so3251755a91.2
-        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 15:41:55 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30ea0e890ccso2551654a91.2
+        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 15:50:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749249715; x=1749854515; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749250250; x=1749855050; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bYoTu+bMCHUoVpZNp96TkhxLozCIXTPEx6r4fnUaXIg=;
-        b=4HKdiKyboPoVWF5v1OR06ngT8lv8GrqGq2GlKjS3KswHZ5FNMMjSYOGgM71LQHHFkS
-         kGjWApSgpXKz9afOB5Gy+ie1gfrbod9azd0yaY9wXobbbCzljrxEmh6q1SJTbvuz7YJZ
-         QrV2W0feGD1s5GH2NjDdUK/NeIuXgD543W4v4xZG9+9uS49c/c9Vs65EsNCBxzd+WkzF
-         Nde6Sq9nvsOfvq/Z3dUl3QeCzcbeZmXMti649hzXJEXOhw6Tk7Z0rz7U7VtXdwSUOJfU
-         mDzfA9U+c/JMTkoagXr3njuxW93umCh5LOBFl5Rrevq2PWqmGX1NBDXFGDZqPmTOLgeN
-         OCHQ==
+        bh=8gcR8HNVhw7S1UUII4jwvRqVvrX7swbwirtPPR2NdXI=;
+        b=1HylqXX4yiB2/orE9LI9qmGyi2MabIDyCS5+HW6sc2OkQhqRAydxlfHIj07tRDykRu
+         aeNV1pq3yZDg1rufsnlwbfMRCPxM2H+aM2zSfk7+yGGz6J5MZHKh/vnYZ4BaopVaKav2
+         BK2zvF61XUcPb/AkIMjRWYErkJ2LWkgS4TOfHRwnpTHHy/igHPlbyLFWP2+QRkoh6wpB
+         uZch11XBA0Q+yvFOsfaBb1wOWDBI2YqiMZ7CeJTUfNf3ahMARIxFjaLaZreWO270qwVC
+         GxDYxqgGKRCkESgFtB2/PuUzATRhd8xRfnu4JaWXlOPXgJD69qzcAdnS5uua+t4vlSgk
+         EHZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749249715; x=1749854515;
+        d=1e100.net; s=20230601; t=1749250250; x=1749855050;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bYoTu+bMCHUoVpZNp96TkhxLozCIXTPEx6r4fnUaXIg=;
-        b=a+bftw6jVnWjma83oK88Ej8r3CbcL9DZNM3l9hUAK60fCbXStrCux3jlo+A5wodNFB
-         n3iff/9Xwh6SVgX2I3Cz9Cm24C3pF+M64EdC7sGG5D6Um3fEJJPy++PbhWHi21AxLfZL
-         2OIFhGH8i8STDf5s9Hd0PhtWyknAqbBgjDJRYfJ6DmFa3jXRjuiKuyANkPuObbRy2ZCb
-         tE1C9SwG84VBcWZn3IZM9pt9jKBN+GmyXZ0TqmzqGBShOKnnu0UQ9iL8IjHfuntV9k2u
-         FzH3ruF77/p4/N1Yyu8IJrEDuZCw57nLxFsCTr3dCb9/rzGt6azkLtZ4mXafPGyNWE15
-         YKsw==
-X-Forwarded-Encrypted: i=1; AJvYcCXoiEAf5pRgnwXcBALzbqR4gQV/jxCtG948FpsDdEOnbVR0t1goTO4Fdzs8AghzSJwaZuI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4yLYzAGWkw1zwYuzPk0lL1epm1MycvkLp4GxR6xg58/zvcOCh
-	7giGDA5UcMPFKlUrl3css6ga2qxylXZ9ZvXW1HS5U9CpazmtvYHMDA99dJSQtV/vxBPpKW2t9Cj
-	iLVCmpw==
-X-Google-Smtp-Source: AGHT+IHypEL2f87RRyk8KcwnXrUV1xs9cPNm7T9Zs+gygo3vvDD6Q8p5T967Pdv+Sm6z+/JiXtJkkspYdKQ=
-X-Received: from pjbqo14.prod.google.com ([2002:a17:90b:3dce:b0:2ff:84e6:b2bd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:520a:b0:313:28f1:fc33
- with SMTP id 98e67ed59e1d1-313472fb0ddmr8343577a91.10.1749249715474; Fri, 06
- Jun 2025 15:41:55 -0700 (PDT)
-Date: Fri, 6 Jun 2025 15:41:54 -0700
-In-Reply-To: <20250401161106.790710-27-pbonzini@redhat.com>
+        bh=8gcR8HNVhw7S1UUII4jwvRqVvrX7swbwirtPPR2NdXI=;
+        b=PTdq7k3YdwcagLNY3tgiUxmZmkR7np80x3tT/NM5QZ9+uapFPgpZhlYciROVmt2rlQ
+         wcgEIY2AuoARjMAHkSiT38PmIXigE151LCHLdFEUfpZVloyF7xkvuQ27yODtdOzVApn+
+         W8VzhWU8ADJBBaRg8+3EOMo0r6szCDJiiYwmyr+u7n5MtjIHPuGq2kazafrS4T1TF/Ix
+         pPOht1yWmzPB3+fjHIzLmVEXq4eqBLp+t3HlJYYdzZBrTa4M98hNQvxSwX2q12cXdGUx
+         KrBd9zNOaTt3/N8oTdEGkJb45S9vWqKxoIf0+YWpK52MSzrpR3L7qdUtJWdv9bEy5SOT
+         OYQg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtiBGOabaH16W0XFkXYysdnBvD7ZJFhphjnviupafJFBNHQqAwEgthUNwsRHvz7aOWNAE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBBCX/Dht6S4+UqUmgXto+krIdQqgYyTjO3Fm5Kwyy/o6o650v
+	aSHHlkT3/v2QjgmN6Ukdf1Ngw3jPAbJRSR3N4g955QQWxcWPs/zBRRt3evm3WqBgqjN0DgY5U49
+	iPPZBbA==
+X-Google-Smtp-Source: AGHT+IFul6Ywu0HaZHphQDwEhl1qPeTTs97xLcKkRSWk3IxbD9Y9UJK3+wGAtrWLanrf6df0kDoQ8hBuIB8=
+X-Received: from pjq8.prod.google.com ([2002:a17:90b:5608:b0:312:f650:c7aa])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d88d:b0:311:b0ec:1360
+ with SMTP id 98e67ed59e1d1-3134706d56bmr7978630a91.29.1749250250354; Fri, 06
+ Jun 2025 15:50:50 -0700 (PDT)
+Date: Fri, 6 Jun 2025 15:50:48 -0700
+In-Reply-To: <20250401161106.790710-7-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250401161106.790710-1-pbonzini@redhat.com> <20250401161106.790710-27-pbonzini@redhat.com>
-Message-ID: <aENushMhwV_csfU_@google.com>
-Subject: Re: [PATCH 26/29] KVM: x86: enable up to 16 planes
+References: <20250401161106.790710-1-pbonzini@redhat.com> <20250401161106.790710-7-pbonzini@redhat.com>
+Message-ID: <aENwyCpSTV6niX8A@google.com>
+Subject: Re: [PATCH 06/29] KVM: move mem_attr_array to kvm_plane
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, roy.hopkins@suse.com, 
@@ -84,33 +84,44 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, roy.hopkins@suse.com,
 Content-Type: text/plain; charset="us-ascii"
 
 On Tue, Apr 01, 2025, Paolo Bonzini wrote:
-> Allow up to 16 VM planes, it's a nice round number.
-> 
-> FIXME: online_vcpus is used by x86 code that deals with TSC synchronization.
-> Maybe kvmclock should be moved to planex.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 3 +++
->  arch/x86/kvm/x86.c              | 6 ++++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 0344e8bed319..d0cb177b6f52 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2339,6 +2339,8 @@ enum {
->  # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, 0)
->  #endif
->  
-> +#define KVM_MAX_VCPU_PLANES	16
+> Another aspect of the VM that is now different for separate planes is
+> memory attributes, in order to support RWX permissions in the future.
+> The existing vm-level ioctls apply to plane 0 and the underlying
+> functionality operates on struct kvm_plane, which now hosts the
+> mem_attr_array xarray.
 
-I'm pretty sure x86 can't support 16 planes.  "union kvm_mmu_page_role" needs
-to incorporate the plane, otherwise per-plane memory attributes will won't work.
-And adding four bits to the plane would theoretically put us in danger of
-overflowing gfn_write_track (in practice, I highly, highly doubt that can happen).
+...
 
-Why not start with 4 planes?  Or even 2?  Expanding the number of planes should
-be much easier than contracting.  Based on the VTL and VMPL roadmaps, 4 planes
-will probably be enough for many years to come.
+> -bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+> +bool kvm_arch_post_set_memory_attributes(struct kvm_plane *plane,
+>  					 struct kvm_gfn_range *range)
+>  {
+> +	struct kvm *kvm = plane->kvm;
+>  	unsigned long attrs = range->arg.attributes;
+>  	struct kvm_memory_slot *slot = range->slot;
+>  	int level;
+> @@ -7767,7 +7770,7 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+>  			 */
+>  			if (gfn >= slot->base_gfn &&
+>  			    gfn + nr_pages <= slot->base_gfn + slot->npages) {
+> -				if (hugepage_has_attrs(kvm, slot, gfn, level, attrs))
+> +				if (hugepage_has_attrs(plane, slot, gfn, level, attrs))
+>  					hugepage_clear_mixed(slot, gfn, level);
+>  				else
+>  					hugepage_set_mixed(slot, gfn, level);
+
+I don't see how this can possibly work.  Memslots are still per-VM, and so
+setting/clearing KVM_LPAGE_MIXED_FLAG based on a givne plane's attributes will
+clobber the state of the previous plane.
+
+I think we could make this work by having a per-plane KVM_LPAGE_MIXED_FLAG?  I'm
+99% certain we can use disallow_lpage[31:28], and _probably_ bits 31:16?  But I'd
+rather
+
+Note, to handle shared/private, we could make planes mutually exclusive with
+tracking that state per-VM (see the many guest_memfd discussions), but unless I'm
+missing something, we'll need the same logic for mixed RWX attributes, so...
+
+Also, as mentioned in a later respone, planes need to be keyed in kvm_mmu_page_role
+for this to work.
 
