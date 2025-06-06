@@ -1,75 +1,88 @@
-Return-Path: <kvm+bounces-48635-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48637-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C238AACFE10
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 10:15:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21023ACFE14
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 10:16:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B44137A706D
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 08:13:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEEF21706D3
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 08:16:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DA92853F8;
-	Fri,  6 Jun 2025 08:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02612278E40;
+	Fri,  6 Jun 2025 08:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sdmhdwq1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dziyKMtZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E5A1DE4D2;
-	Fri,  6 Jun 2025 08:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92691C27
+	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 08:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749197690; cv=none; b=QPPZz14KRyjXvE4GSOtl9bXygPKR3G5/MS77TeLOH3XTdWmJxX30albQE2Ds1J9PmRXc/ZwBu5Hb1cV9cCnfpaRcIFUba0MxL6tzJmMZGTJsh+TBmdl4N3f4/eP93qgR5bDFDWw7iLtw4AshqxyyQc1FowDEx2KglzJE7MmKh4A=
+	t=1749197766; cv=none; b=B6FnPbcCDNsg372ME7PvAVDfaGzeegdXMuLe3467kWfVGVHksYdQqf874Ve7jzYVdXfq96B8mRFvpwVNK75birDgUubbdgyLFgw5geQWFtqRc/yiRlsRTw0MECtpU3C/Avn8oFWs2oY66ZlnqwZM/0NvPtAlOrarzee6aGucUjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749197690; c=relaxed/simple;
-	bh=CkicJVr3VcBEo4d33EQ624R7/K8eyQeLxSO15zo7U/4=;
+	s=arc-20240116; t=1749197766; c=relaxed/simple;
+	bh=FFp1aU2LrxnOlrpGpRG5JHgJo/n7WUh1yOPsh6NSGPM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q7Hc9w1pRR3XyMJMICU1rYAH4F4vvnKaV78X693SkmZWN9w9iefXe6JWGi08snN+5fAwAshIsKWK4XCrFBiPtAJcTt2F3iM5FAam33J+UlQPxv30eFAqGMCz32XIkhJFLfeQe5KZos6qZldXxXKi3KGy5D5thVyacgvqRFaTCPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sdmhdwq1; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5563ijVB022445;
-	Fri, 6 Jun 2025 08:14:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=NDxv8Q
-	4eajqGHzpsUjmoC1HVJbAFojGreCUjwFxAJVk=; b=sdmhdwq13mxHbLIfuVAVkM
-	rKeofhY9NeKBwPgI4o/fcpFMwN2iLrASmkxcKkD5aZ88YVOaYhI+4IIxM7/VfBUE
-	fKUK6D6no3EgUB/VwpBvgUYfOI/UMGqGBRo2lw05ODs5ZgD2KO0llXXYUCVol6wd
-	0U+4qyuuGwu3n5tl8SPWR/K/mfEJc4nt6YWYYfWay7XCcOauuaCrmUEJ4NMD/Be+
-	5VPoIz/kUDOnLZ0e3OJUcx0fqZCbKTo173Q3PWUAEOCCpf0vTyy2FXYeOlBrmzyv
-	t7WIv4LNjXf0TGU6wAcF4XwCt0aMqU59KlDkvqpkidQqn1g1ys/VbyqHW+caxnvg
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 471gf059ya-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Jun 2025 08:14:46 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55671BYM012569;
-	Fri, 6 Jun 2025 08:14:45 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 470et2r7hy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Jun 2025 08:14:45 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5568EeVK55640508
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 6 Jun 2025 08:14:41 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2F4AF2004D;
-	Fri,  6 Jun 2025 08:14:40 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8DE7620040;
-	Fri,  6 Jun 2025 08:14:39 +0000 (GMT)
-Received: from [9.111.36.233] (unknown [9.111.36.233])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  6 Jun 2025 08:14:39 +0000 (GMT)
-Message-ID: <c024e066-0565-4af3-ae61-bfb995eeea19@linux.ibm.com>
-Date: Fri, 6 Jun 2025 10:14:39 +0200
+	 In-Reply-To:Content-Type; b=urg+A4SFixoyZmihGQGibRHXbyhWPFbg9puVrUKqd2Hu7pNeLoVRjGCyGrAN1AbwLqrPctkxrCljWjJ2GUFB3yTlFT4CP7QKgH0JnkRz78qrDKMl1rq6pBwiNrVuhFIswKd1ZQvV7OMpAr98XczylPwlwb68m58MdvDM1ISz39M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dziyKMtZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749197763;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=KOWahLJx8LgCN5g4XRLg2n5g+DflRPZ/bKDmu+1DLGw=;
+	b=dziyKMtZ93ndeUDCwRB6csZnJwsKKdIcUWZi+vYOsK1T4T2q7nkPup20ZTuKx9vPCzzUit
+	ZHmRN9uQGcvML1mC0nG+Bc2Tj57u1YxSvF8CcSlQrQLaQEz9WlLwPSBirReuy8evjrVEMT
+	SsnUjks3VjoHq24DMEHaH79dJB3Mm3A=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-480-Q_-_N_D-Oh-gzheLkTJTmQ-1; Fri, 06 Jun 2025 04:16:02 -0400
+X-MC-Unique: Q_-_N_D-Oh-gzheLkTJTmQ-1
+X-Mimecast-MFC-AGG-ID: Q_-_N_D-Oh-gzheLkTJTmQ_1749197761
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-450cb902173so9991895e9.1
+        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 01:16:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749197761; x=1749802561;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=KOWahLJx8LgCN5g4XRLg2n5g+DflRPZ/bKDmu+1DLGw=;
+        b=t7l1ClL8EQCE3xg1KH/8mDHjZkC5LOHq8ewfCupZlnkqwiYmSay1jPmK3utYNowszc
+         mmw4sTkWma5rYmC1oZ5BxzgEsI4e8YhDzqG3d7F/+ihMoTXsv6o0Q/f/25ChbJ0kj3+u
+         RQywkavjj/mrqxjmLB+wKKM9TjVIgZIIVcQkHrwjwhcNqcv7hXOnaQi1U037cdXU8Q4F
+         Z6oApHmlP1KMkMWAZ4YEgAew9OpZkzYRhtor10WDdTiB19ft/IGqJlQq/OsjMQXF5QW9
+         5WmH8TsOjBlpLBa8j6J2jzTYnUyG2C1L6tgkCaJarYxOejGlfg2nAqpwDT2IFqOimwYv
+         TJbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFQzHoTZwTBq/RP7Exf57SInZty+H53D6o5t4D5qQWbqeyN7iIjf4lxA83ZD9O9CMw2b8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJVQ0tPRzsjJCRA0NNwy8feimx6aw7K89z4cFBWcYMRx7UJotV
+	2+G6GLO6K+dVb48/ixCwD7BzSJfcwrEqooUwMp+junQ0kRqlIphOs9SQJoIoAB/HqBcni+D6FSj
+	Dy8ZVBqfDYfRse91w+yltg8R7LqBGAnSEZgJf21Xd7EE7qiaFIExj/w==
+X-Gm-Gg: ASbGnctIqTxwIu3DdrbzCQoLzmCMdiHhpCPPpbQv0shQnObJPBE5XGyPJBRXicy3je+
+	PW+gFbAfOvhEVhmMUxpmThnLgrPkoUvL6UFrRkDiX+X1GClHjuF1utaaRc+Gs5M/hDq04AtRAiU
+	uH8L8GjmK7WQa8NyDyIub6G9Ne+7rsb7VyR2lwBrrEFK7mO+DzxsZJh8SDRC+4tT5Rsd6qg2+qA
+	AoYdGoYSIzurVp1/Pqig72FUvAzhxgTTX3B7A/wCIRz66LVe1rW9pvXj4IRoti908A+jd/xCky7
+	52XbWCFT4asNBHM/fQ8e3JWp0CR27GL73LrcZIWu9oDYsRcSzU6FHPtwCtfgI+GSN/BigjV63/I
+	dYewrSUAUhnFafMU1iKQQw+T1f+3I2PY=
+X-Received: by 2002:a05:600c:5306:b0:43d:fa5f:7d30 with SMTP id 5b1f17b1804b1-452015bb35amr25326605e9.16.1749197761106;
+        Fri, 06 Jun 2025 01:16:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGMHizucgFM/97RVmr0NXLsfd9+74bASSClWDaJL2o7ZMe7nJkQJ4gHbTI8CdoS9rkjpED4jg==
+X-Received: by 2002:a05:600c:5306:b0:43d:fa5f:7d30 with SMTP id 5b1f17b1804b1-452015bb35amr25326295e9.16.1749197760706;
+        Fri, 06 Jun 2025 01:16:00 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f19:9c00:568:7df7:e1:293d? (p200300d82f199c0005687df700e1293d.dip0.t-ipconnect.de. [2003:d8:2f19:9c00:568:7df7:e1:293d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a53229d9e9sm1190527f8f.13.2025.06.06.01.15.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Jun 2025 01:15:59 -0700 (PDT)
+Message-ID: <588a87bd-c54f-4c4a-98d3-25707d3ca404@redhat.com>
+Date: Fri, 6 Jun 2025 10:15:57 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,96 +90,99 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] KVM: S390: Remove sca_lock
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-References: <20250605-rm-sca-lock-v2-1-74922f4f946e@linux.ibm.com>
+Subject: Re: [PATCH v11 17/18] KVM: selftests: Don't use hardcoded page sizes
+ in guest_memfd test
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
+ roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250605153800.557144-1-tabba@google.com>
+ <20250605153800.557144-18-tabba@google.com>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20250605-rm-sca-lock-v2-1-74922f4f946e@linux.ibm.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250605153800.557144-18-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: _N-WemKHjXnHk4LbSXdp8ko24tDgUw8v
-X-Authority-Analysis: v=2.4 cv=DYMXqutW c=1 sm=1 tr=0 ts=6842a376 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=e5B2sN9BInOlokM3_1MA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: _N-WemKHjXnHk4LbSXdp8ko24tDgUw8v
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjA2MDA3NCBTYWx0ZWRfX2w5rEg+Mbw7F pFJqS7geJzObKbiI4VjTZ/5QvJ/XmtVex9dOmlL4c3vU+UFrXaTd6eYyZTPv2JRtWz4iUrncDBy bmRTll5HXoXf5nqFI/eYcfp4hH1u/1xj5FhlI7+1MLoloC7WLeKbsuAcf/QlcSk38gDguEb5QKN
- /qXqgm0tH7deDB5S5K7Sm7MfAZ9wwCKxIMUZZRIavKEG3ckWWW++g0ygBz0ZLPG6aIv3dSX0EiL 1HozDQ1NiHBuVKtL+JRAbQYunC2VMd96rEbTQtSqQBRCjNgO40FeS1Ky0pffJl3wbTUPBylCrrt wsjLt+OHCLfUZbnH91SthjG/i44/8BVzTFSpU4D+sJwbl2r7f+7GFG3UflKtWP08ld8MHKvGcQv
- kIb9dqzkRx1b6X1LnmNxb70aOQhY9CCHwG5A0Agx3uCKa1CtPnw47sKE0WG8etgLKXdTAx+3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-06_02,2025-06-05_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0
- priorityscore=1501 clxscore=1015 phishscore=0 mlxlogscore=833 adultscore=0
- malwarescore=0 bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506060074
 
-On 6/5/25 6:14 PM, Christoph Schlameuss wrote:
-> Since we are no longer switching from a BSCA to a ESCA we can completely
-> get rid of the sca_lock. The write lock was only taken for that
-> conversion.
+On 05.06.25 17:37, Fuad Tabba wrote:
+> Using hardcoded page size values could cause the test to fail on systems
+> that have larger pages, e.g., arm64 with 64kB pages. Use getpagesize()
+> instead.
 > 
-> After removal of the lock some local code cleanups are possible.
+> Also, build the guest_memfd selftest for arm64.
 > 
-> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> Suggested-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
-> The patch depends on "KVM: s390: Use ESCA instead of BSCA at VM init"
-> 
-> Link: https://lore.kernel.org/r/20250603-rm-bsca-v5-1-f691288ada5c@linux.ibm.com
 
-I'm throwing this into the CI.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-If people suggest something, *cough* me for instance *cough*, it doesn't 
-hurt to add a suggested-by tag.
+-- 
+Cheers,
+
+David / dhildenb
+
 
