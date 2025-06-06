@@ -1,111 +1,112 @@
-Return-Path: <kvm+bounces-48661-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48662-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40FD9AD0305
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 15:21:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD6EAD0375
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 15:49:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9243A3B1E25
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 13:20:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60E943ADD6A
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 13:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1778288C9A;
-	Fri,  6 Jun 2025 13:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F1F28936B;
+	Fri,  6 Jun 2025 13:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qq10DXT2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hbG6q4zG"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7479B20330;
-	Fri,  6 Jun 2025 13:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311942882C3
+	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 13:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749216062; cv=none; b=V09gYCegjAecAepjZhIgLl9IA/C2TYXNsNsIK1W5Aeq1QV2+gLrGHSncGS77YILZOE74gilfXmljcjTF9ZTyrG19LTDgnhGFrjv0Xmkf6KTdYONzOjmYS5p0L30UwvMn6Jk1fXbSHxclSW/KLvSlQAfmkCAJJVtV6/BSxN2cHYs=
+	t=1749217752; cv=none; b=fE2fzmtgMcd9PqCHugePGFE6f08s/GS2UVoioKH8rmX7B3Zkm0JF02GQLluLOUl/B/dRnP67h2ZQvDddEAkYJ9sOoohZLR+ShCUi06YzdALcrA5RRyNpb1wkJe7OlQ0jFb8Q5QeVHuFqNMMDsLxSLAuK1zPXySLMh56jimgP6TU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749216062; c=relaxed/simple;
-	bh=d5xSSZzjIO6YCeawzr4MdDA5aSt61eXqUJbb64Fk4Pk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M8ATWoagFE9dvp+Y6g7S+LmFowIV/JUS+qnokcWdI2D65TTJwq8vlly6rL+CFBo6kOXWKxcPlr4tMFbBTRC8zq/Zbdb5H7/KFsbvvMdKGM7sQwHlLDZyhENe8xSY+NW+MZ3pmiGFMc2XAlQx/Kc6zF3uVeiy3qmhE0XxXyiFFYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qq10DXT2; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=O9FE0uB61EEETNdTWzbNvrnPXytymt6dcwtvq6U/pJk=; b=qq10DXT2GTNSGudV/qtRDEQlfe
-	DhgZVYdDQH26c5BDbUntvNfTk0AMNNN5xGgDlZ9dH/Sx41XiJ1ieT7AYvnTTve4AU4oCBuQF9jyQd
-	q6XWBPwWxAk6Jp0Sp6PI4mM9ZPC+CieoW5igq/3W0LNZBKy6BUG+A95PNvHMSWHffELK0a978C+J/
-	nqtO1ZljIE6SBA8cZM81e+RZb8uENAekGG0Zys36cQxaH9UsaeADuo8flKbNPT55UcykrS1gQsE6q
-	gW+DpATLTNQ1/O3TuETXsIcemTUsKG2hwD0iDrQb0M1yBKIYVRgEX2rAJrMafi4dLeQ5fxbzmu+aG
-	UMnuo7UA==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uNX04-00000001HLz-0rSj;
-	Fri, 06 Jun 2025 13:20:48 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 20C8E3005AF; Fri,  6 Jun 2025 15:20:47 +0200 (CEST)
-Date: Fri, 6 Jun 2025 15:20:47 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Josh Poimboeuf <jpoimboe@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-	x86@kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
-	wei.liu@kernel.org, decui@microsoft.com, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	pbonzini@redhat.com, ardb@kernel.org, kees@kernel.org,
-	Arnd Bergmann <arnd@arndb.de>, gregkh@linuxfoundation.org,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-efi@vger.kernel.org,
-	samitolvanen@google.com, ojeda@kernel.org, xin@zytor.com
-Subject: Re: [PATCH v2 00/13] objtool: Detect and warn about indirect calls
- in __nocfi functions
-Message-ID: <20250606132047.GA39944@noisy.programming.kicks-ass.net>
-References: <vukrlmb4kbpcol6rtest3tsw4y6obopbrwi5hcb5iwzogsopgt@sokysuzxvehi>
- <20250528074452.GU39944@noisy.programming.kicks-ass.net>
- <20250528163035.GH31726@noisy.programming.kicks-ass.net>
- <20250528163557.GI31726@noisy.programming.kicks-ass.net>
- <20250529093017.GJ31726@noisy.programming.kicks-ass.net>
- <fp5amaygv37wxr6bglagljr325rsagllbabb62ow44kl3mznb6@gzk6nuukjgwv>
- <eegs5wq4eoqpu5yqlzug7icptiwzusracrp3nlmjkxwfywzvez@jngbkb3xqj6o>
- <4z4fhaqesjlevwiugiqpnxdths5qkkj7vd4q3wgdosu4p24ppl@nb6c2gybuwe5>
- <20250606104945.GY39944@noisy.programming.kicks-ass.net>
- <aELptV62mbTC3YA9@google.com>
+	s=arc-20240116; t=1749217752; c=relaxed/simple;
+	bh=eOrgybtFDd1McNbczIGE5aDNUmgzfN7eK5kKrNqNOWs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=S1lUh4PLPzV/f8BbeADr8FDQy3KTZI0dVrM0WWzRB9rqZaVrhqJU9bv29cql4avhYKNfJWXJTrk33cKhvRsRkyZPUJHKI/vw9C4/e7VXm7kjHPXSKoiTddlMGsioLDzDEy0IcI/s0A7iIjfbfO5Vs4TSR4UcyCAFNuYC+R88AIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hbG6q4zG; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-747ddba7c90so1797071b3a.0
+        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 06:49:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749217750; x=1749822550; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hzNM8F6NiHQrZckFu72OcpGDXikxNc9SHjTtjEP9BA4=;
+        b=hbG6q4zGu72nlfjztjZI0YfG3LrK3U5rqr49NBzYKxHpYmX7Q/QgeuqdEZTGrfz3u8
+         0baJ7R3HdwfNb3zphZbuA8nrau8lSUvmdN8hzpCzMWFE+Z/P/sEbmdkKuOyIBCJva1Fl
+         r/uvOXlwy9kwa3Etd27BwSyw7z3kvV6VAaq2waeAk2jD960y09ESm5DBx5J3zlHtck/q
+         Gd7VY7RUmKLmtjDzCOsgchwUcJFNusuMcLgIHDxC9klwfp+Izptiue85HfwBr/rMjsuo
+         9wrE0hN1NWhrrC66vOyy0ePwQBl6Ab/jFarAjBS0r3CNFABPhSpwYIEl2ABD0v9c69HD
+         ZH0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749217750; x=1749822550;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hzNM8F6NiHQrZckFu72OcpGDXikxNc9SHjTtjEP9BA4=;
+        b=MYJ1F7TMtbKqNdp/Zj4/aYVVNjUk4Fl3Mvcz4c+8DzMZ0+ujZrQFnpgHUvbE9wLMZx
+         CRyYMn0YAbCJ5sfMcqyUORSsGElvIWRg3dj7dXru4UKyfIFCT9X/jqip665THSnrPDW5
+         RozMeBvSfmSp6bnOygRaH+WMhoiwfdoVuWmEAi8XHllvLE4/jwzFRG5JZXnk11Y66ZWn
+         hVdqGe5SrTBUqYhxuFVgpsfFYxmIZEq0Z0ElZJvHa1Qa+neUDCui2qweNoeeTGemXr5J
+         Rfm6JnBWwOJimKQ2JQkR+Aum3mAymNqmJmfm4tzCBLh52bDUk29WvPms5tm2wupT/v5F
+         brFA==
+X-Forwarded-Encrypted: i=1; AJvYcCWehj45KbPVsZnCVtYQrHgVi8by1K0z4e6tUIMFmxX7CelGyw3P9nCP6mOAGVd38gKI9+k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwHBey6q1O75wb2JIIbETgnesvhBi0cGacJeTPaRtQWm+mkIKD
+	AMcW698AbQE54Ruis+QdQM/EeZlBZUMBgkC5hRTX7pjCeECM0HAgB12SVfwMzaJnoqPP685t5vU
+	N+bNQbw==
+X-Google-Smtp-Source: AGHT+IGvZHCQQyzNzpnMEJUc2ZlKMTphQYXkVqOMWSYOWdZh6uqcMIUnZOUB8iQqtYXwGJfi7xk18c0XRq8=
+X-Received: from pfbgr12.prod.google.com ([2002:a05:6a00:4d0c:b0:746:31ae:c7f7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4f8b:b0:742:8d52:62f1
+ with SMTP id d2e1a72fcca58-74827ff9ff0mr5353880b3a.8.1749217750454; Fri, 06
+ Jun 2025 06:49:10 -0700 (PDT)
+Date: Fri, 6 Jun 2025 06:49:09 -0700
+In-Reply-To: <aEIeBU72WBWnlZdZ@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aELptV62mbTC3YA9@google.com>
+Mime-Version: 1.0
+References: <20250401161106.790710-1-pbonzini@redhat.com> <20250401161106.790710-8-pbonzini@redhat.com>
+ <aEIeBU72WBWnlZdZ@google.com>
+Message-ID: <aELx1fPBfuyxTnJx@google.com>
+Subject: Re: [PATCH 07/29] KVM: do not use online_vcpus to test vCPU validity
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, roy.hopkins@suse.com, 
+	thomas.lendacky@amd.com, ashish.kalra@amd.com, michael.roth@amd.com, 
+	jroedel@suse.de, nsaenz@amazon.com, anelkz@amazon.de, 
+	James.Bottomley@hansenpartnership.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jun 06, 2025 at 06:15:19AM -0700, Sean Christopherson wrote:
-> On Fri, Jun 06, 2025, Peter Zijlstra wrote:
-> > On Thu, Jun 05, 2025 at 10:19:41AM -0700, Josh Poimboeuf wrote:
-> > > diff --git a/arch/x86/entry/entry_64_fred.S b/arch/x86/entry/entry_64_fred.S
-> > > index 29c5c32c16c3..5d1eef193b79 100644
-> > > --- a/arch/x86/entry/entry_64_fred.S
-> > > +++ b/arch/x86/entry/entry_64_fred.S
-> > > @@ -112,11 +112,12 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
-> > >  	push %rax				/* Return RIP */
-> > >  	push $0					/* Error code, 0 for IRQ/NMI */
-> > >  
-> > > -	PUSH_AND_CLEAR_REGS clear_bp=0 unwind_hint=0
-> > > +	PUSH_AND_CLEAR_REGS clear_callee=0 unwind_hint=0
-> > >  	movq %rsp, %rdi				/* %rdi -> pt_regs */
-> > >  	call __fred_entry_from_kvm		/* Call the C entry point */
-> > > -	POP_REGS
-> > > -	ERETS
-> > > +	addq $C_PTREGS_SIZE, %rsp
-> > > +
-> > > +	ALTERNATIVE "mov %rbp, %rsp", __stringify(ERETS), X86_FEATURE_FRED
+On Thu, Jun 05, 2025, Sean Christopherson wrote:
+> On Tue, Apr 01, 2025, Paolo Bonzini wrote:
+> > Different planes can initialize their vCPUs separately, therefore there is
+> > no single online_vcpus value that can be used to test that a vCPU has
+> > indeed been fully initialized.
 > > 
-> > So... I was wondering.. do we actually ever need the ERETS?
+> > Use the shiny new plane field instead, initializing it to an invalid value
+> > (-1) while the vCPU is visible in the xarray but may still disappear if
+> > the creation fails.
 > 
-> Yes, to unblock NMIs, because NMIs are blocked on VM-Exit due to NMI.
+> Checking vcpu->plane _in addition_ to online_cpus seems way safer than checking
+> vcpu->plane _instead_ of online_cpus.  Even if we end up checking only vcpu->plane,
+> I think that should be a separate patch.
 
-Ah, bah, indeed! Shame.
+Alternatively, why not do the somewhat more obvious thing if making online_vcpus
+per-plane?
+
+Oh!  Is it because vCPUs can be sparesly populated?  E.g. give a 4-vCPU VM, plane1
+could have vCPU0 and vCPU3, but not vCPU1 or or vCPU2?
+
+That's implicitly captured in the docs, but we should very explicitly call that
+out in the relevant changelogs (this one especially), so that the motivation for
+using vcpu->plane to detect validity is captured.  E.g. even if that detail were
+explicitly stated in the docs, it would be easy to overlook when doing `git blame`
+a few years from now.
 
