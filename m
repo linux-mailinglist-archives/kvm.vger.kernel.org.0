@@ -1,110 +1,163 @@
-Return-Path: <kvm+bounces-48672-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48673-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CD12AD0859
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 20:56:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7246AD088E
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 21:17:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2207417ADD3
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 18:56:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9F353B30E3
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 19:17:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DCB1F3B91;
-	Fri,  6 Jun 2025 18:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC7F20F077;
+	Fri,  6 Jun 2025 19:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WZhHRuzc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XT+vTros"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA501D432D
-	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 18:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884DF6A8D2
+	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 19:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749236186; cv=none; b=d5vL5DurTMS3z90jkHvZ7RXjP+hC7ck8hr1DkEafGwGkbk5z9z5IStOHm3sDiuQBGeVxLW2cmQtjPIvfavuUTA+D7FN9V8+uWagkzYBJZ11PZr+E8XeY4yZ2FS/gCn20C7Bi98sS0kjnKFL54N77HSZkvIkMbNZXJGbvACLflFM=
+	t=1749237441; cv=none; b=drf+DrhfZJVaw4lqz51Sb3KOA95VgkSP3mwmsC/ICzh2zhkxwLfgisxOWQePAIDy0TJSqGIQA0Ksl9oSyOzQmkQCHrPqwAKifJYUksgr1ByhQ+jCwMoBc+QUZujQ7ue9Zpl2EznyZ8oZaUprnS4Kol4SS91ZMjr2dX1+HNmhMq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749236186; c=relaxed/simple;
-	bh=Lv8M8SJfFr3b41JpFYH00ihI/lyselj4x1KfCSp2bLo=;
+	s=arc-20240116; t=1749237441; c=relaxed/simple;
+	bh=8/5I89rSig0E8WTLOcQ9dlmnlj1e18AB7yCe4+1P8I4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Y+GOjTIcaq+Ljz8CC1UXH5FegZNTkwGr2Ywes7J1fmlADkfBwVcmreN0sn7pGkHjlVJbsHNaYUsHu8hIbNfac7rTZGa8pSNjKjgCeF2Rnr3n0K7cPHkKd2hfwN1Ej6GZktlYSey2VCoo/iRJfTIti6ZTx0wGl0laxPw4MBKLMlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WZhHRuzc; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=s9Zq4mxDgTuN3WB9y17/BkT9pC3jZ/Xz5jM8T4G9piODZ1zk/e7r54l1y/Fq1v9EPLArPRlrOb2IIo2efW9jzXLZ2qU4jBKtr7uDA+ERdUmg1XpeeiDxN+tCSOxXDUlb2EDdO/6DkPEPYn3M5ayC5rnbWk5+tIppDmOgTUEdVqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XT+vTros; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b26e0fee53eso1579119a12.1
-        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 11:56:24 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7398d70abbfso3819343b3a.2
+        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 12:17:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749236184; x=1749840984; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749237439; x=1749842239; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HpZlxNfQQcVcyA2xJgYAPilmDs6fYmkhiO+1JW8Md0U=;
-        b=WZhHRuzcmufnrqzWGyNvaB018gA3rWUjZYjl0XMEVR74pzIvqjbxO8iEZMV0QILE5P
-         lRahLzeBSyR+S8Dn7lSYd/F2syZCsXFEburwjnJGi21xq2IrkUBKzsiHTVoEn2qdjM2Y
-         2Y7zF74aIi/fzTvDs5xOS7/6VYC4mfG0Fd7CKQJJ6vCY+BFNPNROibZvaQHp2pl+lndj
-         r+gtHWUpE9Ey908zzT/rsH9Kq8LP5Ow5MeRyHHbrdURbJdisggaE1FcbIfUrS+kCf7Kc
-         +fSoi241oHO31ti8PrJv5syvoswrr6GId2lcZI6Y8uO8Ar/ord43alKxCP3uHkv6++tr
-         Lehw==
+        bh=03M2l8uu7QPriOa9Y3qizZN45yubliiwCghn8obW280=;
+        b=XT+vTrosMHVhIQXE6hCwR0EqRp+5UDltBYJHNp5wXb29CbDmUso2DryIpzHpzx3j+n
+         6k04OkeS94o1s+0TteXaWB4PvUrMaM9JVKu269b7P9X1BT9e13De4B4RnYHrbvcHSSlm
+         51MrbCOZ6Bp67vsoHNN8sYte5rwIkrOr74mwEmcqkdPTnRFGZA8Hkjl7xQ+sJpr3xNc+
+         kBBo8YWDVmltbZ1AH8101MMQwtyp+UEp05lnNshthU8n5UKo/7TF1G5pf+UuZAP7qhh7
+         t3Pp7ZRE0Np41pplwpfQbc0ZrdEZqXk4TcGCJkjMOgHLtSSCxAH7IX+3KhNskp8PU+rd
+         fgmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749236184; x=1749840984;
+        d=1e100.net; s=20230601; t=1749237439; x=1749842239;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HpZlxNfQQcVcyA2xJgYAPilmDs6fYmkhiO+1JW8Md0U=;
-        b=tJ58Q8KAQscSkYjCpULNG1QMVtVFsJ3LZqzHjUgl3ibS0gFFOe5agYEQ3trM2Fsadl
-         FWxZWVo6Lk5x6lWwWphegSGrh+juno0RwVQ8wC3wLjdQV0HXREzbQZawFX5uYG1dDXCw
-         e9B1PP0Ib1MU61VPf9s/uICvVmVDpLKOc/85eXLyEo6Wuo8jQhuUpv3Q3/kMxQj7bkWg
-         IBqxRGWGbQeiU3hqyGBol9pHI5911NGVex135BSzYd+s2Mis5aSK6aVS/ARC0UgTbotI
-         I1InQkWhNNTGR5l5lLrGHaoHhpoI/VkpUYj1if+SF+ET7XId3mhgIAiWb9T+sb6wWVsA
-         GdXg==
-X-Forwarded-Encrypted: i=1; AJvYcCXslDUAZOE2pj0NMRE62tOAndOL7cckinBH5XAYyr0zyV9AWySEIbnQlGYYgZCfd9rfmAE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyuK4p5R3xzyIxQ/JWN7CbAKOCDyaAoZrCCvFOgS9+GGFDtKNQ
-	lIypLdPwCzU/o7S6ESgL7Mnm9YTegZtIAl01gY3kwnckoitt2XRiUTup3oWTwlzvtIhmXSQdfhk
-	PAv6Yxw==
-X-Google-Smtp-Source: AGHT+IGqcoPYRkSjOcLS22pMmTmd9oUCkEfjRM6IzDAHp9YG5cvIGYKKgJc8IWu1CzorqLJUH+Aa5cN/Dnw=
-X-Received: from pjd5.prod.google.com ([2002:a17:90b:54c5:b0:310:f76d:7b8d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c52:b0:312:1cd7:b337
- with SMTP id 98e67ed59e1d1-31346af99a1mr5984007a91.5.1749236184001; Fri, 06
- Jun 2025 11:56:24 -0700 (PDT)
-Date: Fri, 6 Jun 2025 11:56:21 -0700
-In-Reply-To: <aEM3rBrlxHMk6Mct@google.com>
+        bh=03M2l8uu7QPriOa9Y3qizZN45yubliiwCghn8obW280=;
+        b=pxh2GIQIf3Doyu0Dv6EQIdv1SlUtGT9SS3vtOSeOE/Fgey2THhE7D5bwyeXXg0EF+x
+         X+6cZ87snXmigHesq7xXH8yXUqvY0+iiNmNr0URhl1zeaIz22ZmGFr6fm4IHXZ1b2G/4
+         1/Vnc1j18VFvG7J23U0sg0KPEkSAdEkBTzQT2Jp5A34DPFC6aJerqQ3GZz6wSzYXO+9Q
+         lHLokE0PtrgIIpYEYggzEQGcnJaPOw0GC1mt6T0IFGcc6WL2k/b8klPEQZZ1SueJGzB5
+         4slU199Ppe8THFHXu/q2TXkPHS7rZYzva7SgCF+Yq4c7u02N+LhBMqAfOFqlCCrC8H/7
+         Ahkg==
+X-Forwarded-Encrypted: i=1; AJvYcCU4AvNK+J35Xb48A9FCTpjGwqyznT9u0vmZLU+7r+znsGDa8h60T66qpXyuVPQqopzfcGs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnBd2Gr3RwF5gzm3jAxCqO966wBaWstTL7Aa4s4EpU3fs9Efbt
+	UT6cArRFNhQUaYbCwSiQh7PW8u1KmkaXIdKcaFUVuPnVO8ig5jCbJsRnJaWQS5heZhVAcVE2CW+
+	DrPuC0A==
+X-Google-Smtp-Source: AGHT+IGnzJpQPPI2T40fvXyrBrNAEGci091ibTyB6lnhV/NjMJQ/KUj6MExXtocXmJ1DATt6S61Ld0KTGDw=
+X-Received: from pgbcs2.prod.google.com ([2002:a05:6a02:4182:b0:b2c:4bbc:1ed5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:9208:b0:21a:3d97:e93a
+ with SMTP id adf61e73a8af0-21ee2621861mr5318236637.42.1749237438729; Fri, 06
+ Jun 2025 12:17:18 -0700 (PDT)
+Date: Fri, 6 Jun 2025 12:17:17 -0700
+In-Reply-To: <20250425075756.14545-2-adrian.hunter@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250514071803.209166-1-Neeraj.Upadhyay@amd.com>
- <20250514071803.209166-8-Neeraj.Upadhyay@amd.com> <20250524121241.GKaDG3uWICZGPubp-k@fat_crate.local>
- <4dd45ddb-5faf-4766-b829-d7e10d3d805f@amd.com> <aEM3rBrlxHMk6Mct@google.com>
-Message-ID: <aEM51U1RnYC0Dh_j@google.com>
-Subject: Re: [RFC PATCH v6 07/32] KVM: x86: apic_test_vector() to common code
+References: <20250425075756.14545-1-adrian.hunter@intel.com> <20250425075756.14545-2-adrian.hunter@intel.com>
+Message-ID: <aEM-vQZd2LMrerjG@google.com>
+Subject: Re: [PATCH V3 1/1] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
 From: Sean Christopherson <seanjc@google.com>
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-Cc: Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org, tglx@linutronix.de, 
-	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
-	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
-	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, 
-	hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com, 
-	francescolavra.fl@gmail.com, tiala@microsoft.com
+To: Adrian Hunter <adrian.hunter@intel.com>
+Cc: pbonzini@redhat.com, mlevitsk@redhat.com, kvm@vger.kernel.org, 
+	rick.p.edgecombe@intel.com, kirill.shutemov@linux.intel.com, 
+	kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
+	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
+	isaku.yamahata@intel.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com, 
+	chao.gao@intel.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jun 06, 2025, Sean Christopherson wrote:
-> Actually, looking at the end usage, just drop VEC_POS/REG_POS entirely.  IIRC, I
-> suggested keeping the shorthand versions for KVM, but I didn't realize there would
-> literally be two helpers left.  At that point, keeping VEC_POS and REG_POS is
-> pure stubborness :-)
-> 
->  1. Rename VEC_POS/REG_POS => APIC_VECTOR_TO_BIT_NUMBER/APIC_VECTOR_TO_REG_OFFSET
->  2. Rename all of the KVM helpers you intend to move out of KVM.
+On Fri, Apr 25, 2025, Adrian Hunter wrote:
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index b952bc673271..5161f6f891d7 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -500,14 +500,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
+>  	 */
+>  	mutex_lock(&tdx_lock);
+>  
+> -	/*
+> -	 * Releasing HKID is in vm_destroy().
+> -	 * After the above flushing vps, there should be no more vCPU
+> -	 * associations, as all vCPU fds have been released at this stage.
+> -	 */
+>  	err = tdh_mng_vpflushdone(&kvm_tdx->td);
+> -	if (err == TDX_FLUSHVP_NOT_DONE)
+> -		goto out;
 
-Looking at the earlier patches again, I vote to add a 4th:
+This belongs in a separate patch, with a changelog explaining what's up.  Because
+my original "suggestion"[1] was simply a question :-)
 
-   2a. Replace all "char *" with "void *" in all affected helpers.
++	/* Uh, what's going on here? */
+ 	if (err == TDX_FLUSHVP_NOT_DONE)
 
-Pointer arithmetic for "void *" and "char *" operate identically, and AFAICT that's
-the only reason why e.g. __kvm_lapic_set_reg64() takes a "char *".  That way there
-is even less of a chance of doing the wrong thing, e.g. neglecting to cast and
-reading a byte instead of the desired size.
+You did all the hard work of tracking down the history, and as above, this
+definitely warrants its own changelog.
 
->  3. Move all of the helpers out of KVM.
+[1] https://lkml.kernel.org/r/Z-V0qyTn2bXdrPF7%40google.com
+[2] https://lore.kernel.org/all/d7e220ab-3000-408b-9dd6-0e7ee06d79ec@intel.com
+
+>  	if (KVM_BUG_ON(err, kvm)) {
+>  		pr_tdx_error(TDH_MNG_VPFLUSHDONE, err);
+>  		pr_err("tdh_mng_vpflushdone() failed. HKID %d is leaked.\n",
+> @@ -515,6 +508,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
+>  		goto out;
+>  	}
+>  
+> +	write_lock(&kvm->mmu_lock);
+>  	for_each_online_cpu(i) {
+>  		if (packages_allocated &&
+>  		    cpumask_test_and_set_cpu(topology_physical_package_id(i),
+> @@ -539,7 +533,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
+>  	} else {
+>  		tdx_hkid_free(kvm_tdx);
+>  	}
+> -
+> +	write_unlock(&kvm->mmu_lock);
+>  out:
+>  	mutex_unlock(&tdx_lock);
+>  	cpus_read_unlock();
+> @@ -1789,13 +1783,13 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+>  	struct page *page = pfn_to_page(pfn);
+>  	int ret;
+>  
+> -	/*
+> -	 * HKID is released after all private pages have been removed, and set
+> -	 * before any might be populated. Warn if zapping is attempted when
+> -	 * there can't be anything populated in the private EPT.
+> -	 */
+> -	if (KVM_BUG_ON(!is_hkid_assigned(to_kvm_tdx(kvm)), kvm))
+> -		return -EINVAL;
+> +	if (!is_hkid_assigned(to_kvm_tdx(kvm))) {
+> +		WARN_ON_ONCE(!kvm->vm_dead);
+
+Should this be a KVM_BUG_ON?  I.e. to kill the VM?  That'd set vm_dead, which is
+kinda neat, i.e. that it'd achieve what the warning is warning about :-)
+
+> +		ret = tdx_reclaim_page(page);
+> +		if (!ret)
+> +			tdx_unpin(kvm, page);
+> +		return ret;
+> +	}
+>  
+>  	ret = tdx_sept_zap_private_spte(kvm, gfn, level, page);
+>  	if (ret <= 0)
 
