@@ -1,170 +1,253 @@
-Return-Path: <kvm+bounces-48654-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48655-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0B6EAD004A
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 12:20:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 900ABAD0071
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 12:34:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4057117234C
-	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 10:20:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50F23177A9C
+	for <lists+kvm@lfdr.de>; Fri,  6 Jun 2025 10:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344392874F1;
-	Fri,  6 Jun 2025 10:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8D72853EB;
+	Fri,  6 Jun 2025 10:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O2TBQgm+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XaEmbdan"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4743234;
-	Fri,  6 Jun 2025 10:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D04194A67
+	for <kvm@vger.kernel.org>; Fri,  6 Jun 2025 10:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749205248; cv=none; b=VRb7yRkASCC2Xws7ep6rAdaRaDpM8CkZWNZkytGAoOvKNug4aaN652170IUudt6ASnQ8eG8BsY9fgn3lhAsOLjqfK5aq6hySjuZkTv3LUA5KE5if6bQ3KWRhTrgjBaR5AFHjrroJG2FCVXfBM4g3pGHAPJpgwqewqLS+GznQU9Y=
+	t=1749206041; cv=none; b=Wic0QalmHRLACr+hrI41ebsOTr2vM3YKMtuBtIH2eAKUT23gPIoh/K/FSKEwQUYa84MLd90GNIcKOGfR90g6TA2U+3xyCnFQmVdOvGiHo0683IfTLFxHc8ahcZPoVfY5D7jVpiOTudq3WNdhnPHKx5jMsdb0AN9nXpaVU6zDBUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749205248; c=relaxed/simple;
-	bh=epgRitmYmh+pCl0kPJqy/dP9YSMXKOFMFlSBPo7GER4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LbyNekxqDFr7TVaMzK7IpAePgfK4olv5+Sai4fFlT+ax3+riwXYyTS7waDpit1GHUyPS9sB3jSypcnC4EZ1bFc7APy2LpE3rev/OScebsA/4wmydGZKnMxGeGCqsQZNKt5tOR1GZ2/gg+jy5ICivPu+eiIxoyCruzugceYEGRtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O2TBQgm+; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749205245; x=1780741245;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=epgRitmYmh+pCl0kPJqy/dP9YSMXKOFMFlSBPo7GER4=;
-  b=O2TBQgm++oSOCd3h0ujKvAv3X3W9WGXwrkDhNSplE3bSoMHgaO3Kpptu
-   YhNFodgbszjxVuEZf8PO6GKXO/3TyTICyI8VAdo+q7Ve8ksE/5uQOwD9B
-   xC047ImBkGQT/QRYFBUg+CaJS3UTCFVdmvtvGyTcR3rgkQPvQ1mhdkRcR
-   HPmxSOLSRgwRABUJ7ui3mqiRzeUPhxin42uznFlyzj537iJJDX4CxykhA
-   7ZA2k3WFNo8H9+Fzdm7ILE3sn1YcM4hp1s65C2XJfxeubyhDq5YpAfKbp
-   j5EHZccL04GwpWJWVCgMM1FsyIAmVHcGLT41RhV26LRuLYllW1NRldn7Q
-   g==;
-X-CSE-ConnectionGUID: cZvd/jjjQW+nzCaRVOY8zg==
-X-CSE-MsgGUID: mVNE2ym8RNewz0vJ6MpeKQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11455"; a="61977245"
-X-IronPort-AV: E=Sophos;i="6.16,214,1744095600"; 
-   d="scan'208";a="61977245"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2025 03:20:44 -0700
-X-CSE-ConnectionGUID: +svysx1JSoyiYWiXgHUdlQ==
-X-CSE-MsgGUID: xJW5mPRoTdOZzOxwMKJj3g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,214,1744095600"; 
-   d="scan'208";a="146140174"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa008.fm.intel.com with ESMTP; 06 Jun 2025 03:20:42 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id 2415E1FE; Fri, 06 Jun 2025 13:20:40 +0300 (EEST)
-Date: Fri, 6 Jun 2025 13:20:40 +0300
-From: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, 
-	"seanjc@google.com" <seanjc@google.com>, "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "mingo@redhat.com" <mingo@redhat.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>
-Subject: Re: [RFC, PATCH 08/12] KVM: x86/tdp_mmu: Add phys_prepare() and
- phys_cleanup() to kvm_x86_ops
-Message-ID: <ukcotpjhkzs7mxrzp7u47skkljlxj26726wlefnq7gau6w6a7t@rzlqtq24jytf>
-References: <20250502130828.4071412-1-kirill.shutemov@linux.intel.com>
- <20250502130828.4071412-9-kirill.shutemov@linux.intel.com>
- <aBn4pfn4aMXcFHd7@yzhao56-desk.sh.intel.com>
- <t2im27kgcfsl2qltxbf3cear35szyoafczgvmmwootxthnbcdp@dasmg4bdfd6i>
- <aB1ZplDCPkDCkhQr@yzhao56-desk.sh.intel.com>
- <2bi4cz2ulrki62odprol253mhxkvjdu3xtq4p6dbndowsufnmu@7kzlzywmi22s>
- <8668efe87d6e538b5a49a3c7508ade612a6d766b.camel@intel.com>
- <mgu7at7d3qy4h55bchxfmxj6yzqyi7gh4ieds4ecdvlv243frl@bzou376shiak>
- <wwftow6boiueqbzrbfpedxs3e3ioelx3aqmsblzal6kxqdt3d5@dljyaozrfiry>
- <46e0a089ea78613be5f0287eeca449231731f824.camel@intel.com>
+	s=arc-20240116; t=1749206041; c=relaxed/simple;
+	bh=P8BWQX0eac2EiocmBjT+eabK9bdjkAT+CvP9MQzx+nA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tlvr+ar0YPUafQWZSvuDbs7QiFCUJx4kr82IQg3rzp4lWWQknPUr6Qs4TvrE8SsuBR/Jgtxi9RUWQUQH5A0iMzDimtomiXvS2VXcxYvBlUN9Tl7Y1rP9dOgFFHHOtlRnSIdm44L04Sk58CZCYQulysw8CRDtKy51wkBDqXyDKk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XaEmbdan; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-47e9fea29easo312161cf.1
+        for <kvm@vger.kernel.org>; Fri, 06 Jun 2025 03:33:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749206038; x=1749810838; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fAw4qUBOEhITQZ6BbLDNViptraoja2RZKd2zTaQIUtM=;
+        b=XaEmbdantMLYb/mbSBplpwL68NlYu8hEhpCuYCo6Lo3sdQ6Swhf1el4KZA60aaq4EH
+         QMXEXKQ4AhXfIsRIHWNHZ8OOx4hcI9Pw4cADJTjw9s95pdl9NvG/pdZvEKwWXJZqLffr
+         c4hokDZ1sB4c/tWbQS6mELSXldnef3o+//ybilAEpp19aadOZv1bcYVb0UqdWUkEz3Yd
+         MTL+bazGvpvV4b2cQS4JQPLxlFhwmc6Pi9F5sLBIe8vS/Bi9u1vlHp1vBvI0movJOnXG
+         QuUIQ6Z+B2N9H3GJPLao/UZ1LxvaSs2gGP3dYWBh87AFIOG2RY4r0+r+Op9ntk8wTGn2
+         vNbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749206038; x=1749810838;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fAw4qUBOEhITQZ6BbLDNViptraoja2RZKd2zTaQIUtM=;
+        b=RfWa6o/SdSC02dQzHtj0DCsSpZQgRz4chR60rEDGPY+B3SFKIgAViSMzH2ZwzPnHj2
+         pOq6EhE+NneBrEzfV16BleiOnG4HXhqGDUeu3wreFBa/zOPBlv17XGqEobZEseSajdy2
+         n0uEtKZzdDTrh5Ep0wxs+B4WgdC3qJt7WCmxeeFWndAjqhbeqCYBgI/P6ox3wBMBll6e
+         wDDLV7BEYI3k1M6w2fkWaOus1+/reT48XJ6xQc2Qdn8wpgtNoqEE7y7A7KagKFkJnvRu
+         E6IJKzt1/tvnrN3w2RCmXMGbJbF21iq11NM70PICwbtxCA1tXiXrhonwnULay6D+LQ/T
+         OhBQ==
+X-Gm-Message-State: AOJu0YyuAbtBV5gVep6+njo4sXzK5CezYVBXjN15u1btQklkHG3BOXHB
+	QAq33VPz6o5BsG+ome+4dJUab06W5ZuApJyHOs+7sjwdv/TgrE/cvVpWP9XcubsXgUxhEy8tUdg
+	KjcI0afaW/efb37Q4PQaz8n1wXVPAdjghlaY7VL2n
+X-Gm-Gg: ASbGncvs9mt3uooGTpq+yx+euxgkTfUEaYHwAjKH4UvqR2pyWPhIUJ/8E51JbdyZ0av
+	TPpw/ofeS1kksYO4nXen8rzbZtN/s0SuxJVzdg61NMdTkZ+g+egQKO+3HkqP2MedofLOREd14OG
+	lT/bUbd9nHca/x8m+OPETC32NeecB1QP+OjwrboOmYt5U=
+X-Google-Smtp-Source: AGHT+IEybTYvddL3yeh6SARztEENsK1RXfYm9brRfTxtTO2Kl9vo26csUL8xa8F7wu3xTgkSSmdtK6BhfPfymu5hxfQ=
+X-Received: by 2002:a05:622a:1a14:b0:477:9a4:d7ea with SMTP id
+ d75a77b69052e-4a643bafd8emr2595461cf.13.1749206037998; Fri, 06 Jun 2025
+ 03:33:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <46e0a089ea78613be5f0287eeca449231731f824.camel@intel.com>
+References: <20250605153800.557144-1-tabba@google.com> <20250605153800.557144-9-tabba@google.com>
+ <ad4157a1-6e38-46df-ae24-76d036972fbc@redhat.com> <CA+EHjTziHb5kbY-aA1HPKYpg6iAPcQ19=51pLQ05JRJKeOZ8=A@mail.gmail.com>
+ <6cf86edb-1e7e-4b44-93d0-f03f9523c24a@redhat.com>
+In-Reply-To: <6cf86edb-1e7e-4b44-93d0-f03f9523c24a@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 6 Jun 2025 11:33:21 +0100
+X-Gm-Features: AX0GCFuEdbWcKuv4eOpkPUf0dGJeJL5f_PxO8xkAnzeoLueKsdz0dynDzzOLB0Q
+Message-ID: <CA+EHjTz8Q+X5==ym-WCSveNkfHd0id03nY1OYtoMchc5AUWDqQ@mail.gmail.com>
+Subject: Re: [PATCH v11 08/18] KVM: guest_memfd: Allow host to map guest_memfd pages
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 05, 2025 at 10:21:46PM +0000, Huang, Kai wrote:
-> On Thu, 2025-06-05 at 16:01 +0300, kirill.shutemov@linux.intel.com wrote:
-> > On Fri, May 23, 2025 at 03:00:56PM +0300, kirill.shutemov@linux.intel.com wrote:
-> > > On Wed, May 14, 2025 at 12:00:17AM +0000, Huang, Kai wrote:
-> > > > On Mon, 2025-05-12 at 12:55 +0300, Kirill A. Shutemov wrote:
-> > > > > On Fri, May 09, 2025 at 09:25:58AM +0800, Yan Zhao wrote:
-> > > > > > On Thu, May 08, 2025 at 04:23:56PM +0300, Kirill A. Shutemov wrote:
-> > > > > > > On Tue, May 06, 2025 at 07:55:17PM +0800, Yan Zhao wrote:
-> > > > > > > > On Fri, May 02, 2025 at 04:08:24PM +0300, Kirill A. Shutemov wrote:
-> > > > > > > > > The functions kvm_x86_ops::link_external_spt() and
-> > > > > > > > > kvm_x86_ops::set_external_spte() are used to assign new memory to a VM.
-> > > > > > > > > When using TDX with Dynamic PAMT enabled, the assigned memory must be
-> > > > > > > > > covered by PAMT.
-> > > > > > > > > 
-> > > > > > > > > The new function kvm_x86_ops::phys_prepare() is called before
-> > > > > > > > > link_external_spt() and set_external_spte() to ensure that the memory is
-> > > > > > > > > ready to be assigned to the virtual machine. In the case of TDX, it
-> > > > > > > > > makes sure that the memory is covered by PAMT.
-> > > > > > > > > 
-> > > > > > > > > kvm_x86_ops::phys_prepare() is called in a context where struct kvm_vcpu
-> > > > > > > > > is available, allowing the implementation to allocate memory from a
-> > > > > > > > > per-VCPU pool.
-> > > > > > > > > 
-> > > > > > > > Why not invoke phys_prepare() and phys_cleanup() in set_external_spte_present()?
-> > > > > > > > Or in tdx_sept_set_private_spte()/tdx_sept_link_private_spt()?
-> > > > > > > 
-> > > > > > > Because the memory pool we allocated from is per-vcpu and we lost access
-> > > > > > > to vcpu by then. And not all callers provide vcpu.
-> > > > > > Maybe we can get vcpu via kvm_get_running_vcpu(), as in [1].
-> > > > > > Then for callers not providing vcpu (where vcpu is NULL), we can use per-KVM
-> > > > > > cache? 
-> > > > > 
-> > > > > Hm. I was not aware of kvm_get_running_vcpu(). Will play with it, thanks.
-> > > > 
-> > > > I am not sure why per-vcpu cache matters.
-> > > > 
-> > > > For non-leaf SEPT pages, AFAICT the "vcpu->arch.mmu_external_spt_cache" is just
-> > > > an empty cache, and eventually __get_free_page() is used to allocate in:
-> > > >                                                                                             
-> > > >   sp->external_spt = 
-> > > > 	kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_external_spt_cache);
-> > > > 
-> > > > So why not we actually create a kmem_cache for it with an actual 'ctor', and we
-> > > > can call tdx_alloc_page() in that.  This makes sure when the "external_spt" is
-> > > > allocated, the underneath PAMT entry is there.
-> > > 
-> > > I looked closer to this and while it is good idea, but ctor in kmem_cache
-> > > cannot fail which makes this approach not viable.
-> > > 
-> > > I guess we can a constructor directly into struct kvm_mmu_memory_cache.
-> > > Let me play with this.
-> > 
-> > I failed to make it work.
-> > 
-> > We need to have destructor paired with the constructor that would do
-> > PAMT-aware freeing. And redirect all free paths to it. It requires
-> > substantial rework. I don't think it worth the effort.
-> > 
-> > Will do manual PAMT management for SPT in TDX code.
-> 
-> Thanks for the effort.
-> 
-> Maybe something below?
+On Fri, 6 Jun 2025 at 10:55, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 06.06.25 11:30, Fuad Tabba wrote:
+> > Hi David,
+> >
+> > On Fri, 6 Jun 2025 at 10:12, David Hildenbrand <david@redhat.com> wrote:
+> >>
+> >> On 05.06.25 17:37, Fuad Tabba wrote:
+> >>> This patch enables support for shared memory in guest_memfd, including
+> >>> mapping that memory from host userspace.
+> >>>
+> >>> This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
+> >>> and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
+> >>> flag at creation time.
+> >>>
+> >>> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> >>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> >>> Signed-off-by: Fuad Tabba <tabba@google.com>
+> >>> ---
+> >>
+> >> [...]
+> >>
+> >>> +static bool kvm_gmem_supports_shared(struct inode *inode)
+> >>> +{
+> >>> +     u64 flags;
+> >>> +
+> >>> +     if (!IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM))
+> >>> +             return false;
+> >>> +
+> >>> +     flags = (u64)inode->i_private;
+> >>
+> >> Can probably do above
+> >>
+> >> const u64 flags = (u64)inode->i_private;
+> >>
+> >
+> > Ack.
+> >
+> >>> +
+> >>> +     return flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+> >>> +}
+> >>> +
+> >>> +static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+> >>> +{
+> >>> +     struct inode *inode = file_inode(vmf->vma->vm_file);
+> >>> +     struct folio *folio;
+> >>> +     vm_fault_t ret = VM_FAULT_LOCKED;
+> >>> +
+> >>> +     if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
+> >>> +             return VM_FAULT_SIGBUS;
+> >>> +
+> >>> +     folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> >>> +     if (IS_ERR(folio)) {
+> >>> +             int err = PTR_ERR(folio);
+> >>> +
+> >>> +             if (err == -EAGAIN)
+> >>> +                     return VM_FAULT_RETRY;
+> >>> +
+> >>> +             return vmf_error(err);
+> >>> +     }
+> >>> +
+> >>> +     if (WARN_ON_ONCE(folio_test_large(folio))) {
+> >>> +             ret = VM_FAULT_SIGBUS;
+> >>> +             goto out_folio;
+> >>> +     }
+> >>> +
+> >>> +     if (!folio_test_uptodate(folio)) {
+> >>> +             clear_highpage(folio_page(folio, 0));
+> >>> +             kvm_gmem_mark_prepared(folio);
+> >>> +     }
+> >>> +
+> >>> +     vmf->page = folio_file_page(folio, vmf->pgoff);
+> >>> +
+> >>> +out_folio:
+> >>> +     if (ret != VM_FAULT_LOCKED) {
+> >>> +             folio_unlock(folio);
+> >>> +             folio_put(folio);
+> >>> +     }
+> >>> +
+> >>> +     return ret;
+> >>> +}
+> >>> +
+> >>> +static const struct vm_operations_struct kvm_gmem_vm_ops = {
+> >>> +     .fault = kvm_gmem_fault_shared,
+> >>> +};
+> >>> +
+> >>> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+> >>> +{
+> >>> +     if (!kvm_gmem_supports_shared(file_inode(file)))
+> >>> +             return -ENODEV;
+> >>> +
+> >>> +     if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
+> >>> +         (VM_SHARED | VM_MAYSHARE)) {
+> >>> +             return -EINVAL;
+> >>> +     }
+> >>> +
+> >>> +     vma->vm_ops = &kvm_gmem_vm_ops;
+> >>> +
+> >>> +     return 0;
+> >>> +}
+> >>> +
+> >>>    static struct file_operations kvm_gmem_fops = {
+> >>> +     .mmap           = kvm_gmem_mmap,
+> >>>        .open           = generic_file_open,
+> >>>        .release        = kvm_gmem_release,
+> >>>        .fallocate      = kvm_gmem_fallocate,
+> >>> @@ -428,6 +500,7 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+> >>>        }
+> >>>
+> >>>        file->f_flags |= O_LARGEFILE;
+> >>> +     allow_write_access(file);
+> >>
+> >> Why is that required?
+> >>
+> >> As the docs mention, it must be paired with a previous deny_write_access().
+> >>
+> >> ... and I don't find similar usage anywhere else.
+> >
+> > This is to address Gavin's concern [*] regarding MADV_COLLAPSE, which
+> > isn't an issue until hugepage support is enabled. Should we wait until
+> > we have hugepage support?
+>
+> If we keep this, we *definitely* need a comment why we do something
+> nobody else does.
+>
+> But I don't think allow_write_access() would ever be the way we want to
+> fence off MADV_COLLAPSE. :) Maybe AS_INACCESSIBLE or sth. like that
+> could fence it off in file_thp_enabled().
+>
+> Fortunately, CONFIG_READ_ONLY_THP_FOR_FS might vanish at some point ...
+> so I've been told.
+>
+> So if it's not done for secretmem for now or others, we also shouldn't
+> be doing it for now I think.
 
-With help of kvm_get_running_vcpu(), I localized these manipulations to
-the internals of TDX code. No need to leak this to TDP.
+I'll remove it.
 
-phys_prepare/cleanup() is gone now.
+Thanks!
+/fuad
 
-https://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git/commit/?h=tdx/dpamt-huge&id=72394699b5454aac6c027accab6d94a52d88819b
-
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
