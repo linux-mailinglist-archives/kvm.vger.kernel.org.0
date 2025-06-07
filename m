@@ -1,75 +1,83 @@
-Return-Path: <kvm+bounces-48696-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48697-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AA65AD0B06
-	for <lists+kvm@lfdr.de>; Sat,  7 Jun 2025 04:52:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60EC4AD0CE1
+	for <lists+kvm@lfdr.de>; Sat,  7 Jun 2025 12:40:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6778F1891D95
-	for <lists+kvm@lfdr.de>; Sat,  7 Jun 2025 02:52:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E3263AFA44
+	for <lists+kvm@lfdr.de>; Sat,  7 Jun 2025 10:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1A6258CC2;
-	Sat,  7 Jun 2025 02:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83EA821CC71;
+	Sat,  7 Jun 2025 10:39:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TV8RzDJQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ImfyPyac"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B15FB67A;
-	Sat,  7 Jun 2025 02:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E1613AD38;
+	Sat,  7 Jun 2025 10:39:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749264744; cv=none; b=NOAINh0+zm3EqnNygeWFXpVoQ6Au0hhfo4OCBQxwMat9IX/z5fdW9HBTF/D8UoPodNmew9ESFjcPdcn2Iq8g0E2PSoezsobu7vquWQFLZEFdWm6AdrESrQqWZdZgW9xua4FOwphRX9x1kuUU9HMImj1PEOHU3VkwbEVwsMuPiY8=
+	t=1749292793; cv=none; b=QFKtwe/4ELy/pveYnlt7w4udpHzK23LsWyOR9UG0iztLRPwZFe9zRSyxfOKR3FLqAL3kJfmD3AtuYm4paESztOyGtspa8oVSdo5M1Bg1NdQ6eG8bcaLIxAFmo4pOYMpdadlGggDqpANnHE0ATASrDqwZlMapCncyoMvPQAT8RY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749264744; c=relaxed/simple;
-	bh=lQczlWJS0+1NAZxns2cnXt/wYRNUS+DRnMlnKt4NP/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CV4RDTEowBYEW3v11YZxsAFm2ltwj/YeCz7aVVdOygLz4ABwsZqWyUz+uM49bLpEI+SNFB+fSgZZ4gsaRxircMNtXiJDhBQ0tetNLINjrTQOU8SIYl4ROSwogOoOUCOnjgfhyE0YDdHr1ZGyOYTCycfgdk/cuRson5JMmCRpcTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TV8RzDJQ; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749264742; x=1780800742;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lQczlWJS0+1NAZxns2cnXt/wYRNUS+DRnMlnKt4NP/4=;
-  b=TV8RzDJQ340iPIoHV+hyNsEZHAjMxJWn3dGXX3vzWidRwG0mfoL1gBFj
-   DPp/LLLLB813U8af2WwTo8XOClFtyZz7n4yfuxXr3sbA16bzV0zDajRBy
-   43DGCAltBPDb41YAOMjZbdPnG/VwMCMO5srllky2N/zzoov5vQsBYBFk3
-   elCX6NdsUCmGV/eSSurUitfWKUCFUlVeqntfxXh8WIXKXuvy/6wpItqrb
-   e4D9LAGShqMbKo1eEC094WtILQCbZmI4k9UVxy22DkOUyR329499toDkZ
-   geTWeBJ3zRpmQvK9/+R+iLwPxVg75AJAcvGyzVEmxE0qlP5S9LPqVLRW3
-   A==;
-X-CSE-ConnectionGUID: /lrELgg6Sp6a+pdYU+UAwg==
-X-CSE-MsgGUID: fpuMhVQyRry/SuDzriOlxw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11456"; a="54048502"
-X-IronPort-AV: E=Sophos;i="6.16,216,1744095600"; 
-   d="scan'208";a="54048502"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2025 19:52:21 -0700
-X-CSE-ConnectionGUID: VSFEqLOzTAmgepYM6LBEAw==
-X-CSE-MsgGUID: 8ePsBAY2QteDMGxVdeglug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,216,1744095600"; 
-   d="scan'208";a="176933155"
-Received: from mmercado-mobl6.amr.corp.intel.com (HELO desk) ([10.125.146.40])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2025 19:52:21 -0700
-Date: Fri, 6 Jun 2025 19:52:13 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-	Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH 0/5] KVM: VMX: Fix MMIO Stale Data Mitigation
-Message-ID: <20250607025213.o226wig3qtt5spv2@desk>
-References: <20250523011756.3243624-1-seanjc@google.com>
- <20250529033546.dhf3ittxsc3qcysc@desk>
- <aD42rwMoJ0gh5VBy@google.com>
- <20250603012208.cadagk7rgwy24gkh@desk>
+	s=arc-20240116; t=1749292793; c=relaxed/simple;
+	bh=RE3tXUrM4bm7+iA5yAKQLpWH6JZaXZuYLqtW3Y+ttLA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=t9Q7bsCyLLo6AomutX+grnpAk8e6XRLV60SvwPNzN9fTrs7sTN44ctjcUJZLRQrUChO12QlHmEMRRQo3XZ61xxSpOG64Q0Vfquu7IvtjtEOer7EjmGuO3TSsPQKdo0OqiJNcw7r8YWZW+OxdTLUWZ4kbG1TfaEz/EC5yIbwdJcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ImfyPyac; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a4fd1ba177so2049546f8f.0;
+        Sat, 07 Jun 2025 03:39:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749292790; x=1749897590; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WPyo+f5u+pZwh1nTlph78auP3X9q253JZ2K1lN/sHWs=;
+        b=ImfyPyaceX/d/wSbXfKskXKuQXLJHyohT/vqp4ZlghInDqcGESeMU8L7h8JFIEgbZL
+         c6qWCH9tJLAC8kiq8EtTNOS3CMkGg45mdeWl4dlPW6vWHJu6dHzaIc6cNTCZ0wjidXhw
+         Zr7n4t505RbLuq+T+EBERgSlKGDZP3WZXwAF5WZB1nanpZdtzRrkoVLDPb2d6Ic/hDGi
+         yv9udSS3EnD600toQBEhTpXbczbsVV5gPY+G7+1PfhIoL09QuGwBLTL8qX/5Cykd+QCV
+         D1IxpQXa5VMZx8fecTsybrpcLM1Ux4WKNarMB8jz8M93zlkg3feq4ok0NTlEMek58jpJ
+         J6Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749292790; x=1749897590;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WPyo+f5u+pZwh1nTlph78auP3X9q253JZ2K1lN/sHWs=;
+        b=dvFvmx1R0Py6KrGdI2MT7SfjddxCTe2zkouphxr911an4cksEIFIN7M32IQ0epPPmi
+         qal0eEC2ARhw4g7qOKp2CKVN9Xkd5zOj9ORSmclnS4G6Bq33sv9JeSjh4WR4Wg6j+Neg
+         nImuVBKazO5aOQhTQIJES98BEENFFM6ENH8OtKmHrRXlQ6peOEWzgqAfy3dMhI5SSfdy
+         ZFKNJntZh9kiT1ssWo+rc5F9Uz6NANK+ZWzQpjN7MfF174zpGEvGo5OoQOBMgkwguKYd
+         7fWGwv6+1FK7eABjoSsUgGeVtYsgidAkWVHFBs0EzoTIG2S3Rfsr8/koFB63jhWYXeUJ
+         1ufA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCiChWayNzBnm5Fb56uGbmpFG7AUtrqHbsZzvcdhQPcle9nikCD3b6k4mOE5b0iJUvgYNYTmNPGL/MMOtf@vger.kernel.org, AJvYcCUiBL0qUtTIpjeMuv9ucqylHIczudqbb/CJDi67Yvd0LsZgbb3A9Rub22X061FCTYq22ys=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiUuwGdo94RGubEipvGtcYOTyLgbAz7ZyJCzvR8OVHBnf/pFkI
+	7vF0WWUNzlS5JzgI8U4TBheIAIvznvamE+4yHiLTFlNqt4rjPb0e7wLr
+X-Gm-Gg: ASbGncsD3usjggmFy5Ng69yM+T1loghYuRLIQw1B7egt2R7xcpIjbj8QnXMnwZl98oB
+	kIRPa2VqFmllwvMXV8O5jXVvdOcX8OxT11FDdovq6RGdWYQWRlAU9QBuYQBaQNJjxSBQo4ReYGr
+	rDgI0AdD7h2nMm5g+1iQtkors3lT2Cyj6MHLbFlMD/qONDP8uZoUCgABzIgBkY/VNSwbSsFdisl
+	xpg0bLveFp/gtTdCFNtHaG10mF0fzxC8UPVzS7Q7Z0pIGPQGZEM2nSkFZM4BSl8EXzkfGZDXLbI
+	uVNeleO7D/pDaymhqbIvHX9pOjo+JLFyzg3c4HXYqpjp78bUpo3E
+X-Google-Smtp-Source: AGHT+IEgr9eZctityaMoUBJwBvcE46VmtYvzipkVJHROPn3XPlopibChXb5SVwSHCBWrSPdIP/nhfA==
+X-Received: by 2002:a05:6000:2088:b0:3a4:dfbe:2b14 with SMTP id ffacd0b85a97d-3a531327dfcmr4560249f8f.16.1749292790064;
+        Sat, 07 Jun 2025 03:39:50 -0700 (PDT)
+Received: from pc ([196.235.97.142])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a532452d7esm4242508f8f.85.2025.06.07.03.39.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Jun 2025 03:39:49 -0700 (PDT)
+Date: Sat, 7 Jun 2025 11:39:47 +0100
+From: Salah Triki <salah.triki@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: salah.triki@gmail.com
+Subject: [PATCH] kvm: preemption must be disabled when calling
+ smp_call_function_many
+Message-ID: <aEQW81I9kO5-eyrg@pc>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,66 +86,31 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250603012208.cadagk7rgwy24gkh@desk>
 
-On Mon, Jun 02, 2025 at 06:22:08PM -0700, Pawan Gupta wrote:
-> On Mon, Jun 02, 2025 at 04:41:35PM -0700, Sean Christopherson wrote:
-> > > Regarding validating this, if VERW is executed at VMenter, mitigation was
-> > > found to be effective. This is similar to other bugs like MDS. I am not a
-> > > virtualization expert, but I will try to validate whatever I can.
-> > 
-> > If you can re-verify the mitigation works for VFIO devices, that's more than
-> > good enough for me.  The bar at this point is to not regress the existing mitigation,
-> > anything beyond that is gravy.
-> 
-> Ok sure. I'll verify that VERW is getting executed for VFIO devices.
+{Disable, Enable} preemption {before, after} calling
+smp_call_function_many().
 
-I have verified that with below patches CPU buffer clearing for MMIO Stale
-Data is working as expected for VFIO device.
+Signed-off-by: Salah Triki <salah.triki@gmail.com>
+---
+ virt/kvm/kvm_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-  KVM: VMX: Apply MMIO Stale Data mitigation if KVM maps MMIO into the guest
-  KVM: x86/mmu: Locally cache whether a PFN is host MMIO when making a SPTE
-  KVM: x86: Avoid calling kvm_is_mmio_pfn() when kvm_x86_ops.get_mt_mask is NULL
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index eec82775c5bf..ab9593943846 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -209,7 +209,10 @@ static inline bool kvm_kick_many_cpus(struct cpumask *cpus, bool wait)
+ 	if (cpumask_empty(cpus))
+ 		return false;
+ 
++	preempt_disable();
+ 	smp_call_function_many(cpus, ack_kick, NULL, wait);
++	preempt_enable();
++
+ 	return true;
+ }
+ 
+-- 
+2.43.0
 
-For the above patches:
-
-Tested-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-
-Below are excerpts from the logs with debug prints added:
-
-# virsh start ubuntu24.04                                                      <------ Guest launched
-[ 5737.281649] virbr0: port 1(vnet1) entered blocking state
-[ 5737.281659] virbr0: port 1(vnet1) entered disabled state
-[ 5737.281686] vnet1: entered allmulticast mode
-[ 5737.281775] vnet1: entered promiscuous mode
-[ 5737.282026] virbr0: port 1(vnet1) entered blocking state
-[ 5737.282032] virbr0: port 1(vnet1) entered listening state
-[ 5737.775162] vmx_vcpu_enter_exit: 13085 callbacks suppressed
-[ 5737.775169] kvm_intel: vmx_vcpu_enter_exit: CPU buffer NOT cleared for MMIO  <----- Buffers not cleared
-[ 5737.775192] kvm_intel: vmx_vcpu_enter_exit: CPU buffer NOT cleared for MMIO
-[ 5737.775203] kvm_intel: vmx_vcpu_enter_exit: CPU buffer NOT cleared for MMIO
-...
-Domain 'ubuntu24.04' started
-
-[ 5739.323529] virbr0: port 1(vnet1) entered learning state
-[ 5741.372527] virbr0: port 1(vnet1) entered forwarding state
-[ 5741.372540] virbr0: topology change detected, propagating
-[ 5742.906218] kvm_intel: vmx_vcpu_enter_exit: CPU buffer NOT cleared for MMIO
-[ 5742.906232] kvm_intel: vmx_vcpu_enter_exit: CPU buffer NOT cleared for MMIO
-[ 5742.906234] kvm_intel: vmx_vcpu_enter_exit: CPU buffer NOT cleared for MMIO
-[ 5747.906515] vmx_vcpu_enter_exit: 267825 callbacks suppressed
-...
-
-# virsh attach-device ubuntu24.04 vfio.xml  --live                            <----- Device attached
-
-[ 5749.913996] ioatdma 0000:00:01.1: Removing dma and dca services
-[ 5750.786112] vfio-pci 0000:00:01.1: resetting
-[ 5750.891646] vfio-pci 0000:00:01.1: reset done
-[ 5750.900521] vfio-pci 0000:00:01.1: resetting
-[ 5751.003645] vfio-pci 0000:00:01.1: reset done
-Device attached successfully
-[ 5751.074292] kvm_intel: vmx_vcpu_enter_exit: CPU buffer cleared for MMIO    <----- Buffers getting cleared
-[ 5751.074293] kvm_intel: vmx_vcpu_enter_exit: CPU buffer cleared for MMIO
-[ 5751.074294] kvm_intel: vmx_vcpu_enter_exit: CPU buffer cleared for MMIO
-[ 5756.076427] vmx_vcpu_enter_exit: 68991 callbacks suppressed
 
