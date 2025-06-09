@@ -1,122 +1,178 @@
-Return-Path: <kvm+bounces-48739-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48740-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DB97AD2033
-	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 15:55:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FA7EAD20C6
+	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 16:23:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 581071661CF
-	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 13:53:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3D12188BA15
+	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 14:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF24C263889;
-	Mon,  9 Jun 2025 13:49:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A45625C83C;
+	Mon,  9 Jun 2025 14:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e/NF97Gy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ix7v20EQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94527262D14
-	for <kvm@vger.kernel.org>; Mon,  9 Jun 2025 13:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0F9253944
+	for <kvm@vger.kernel.org>; Mon,  9 Jun 2025 14:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749476970; cv=none; b=FLbGqmh8GdUQFF6Gw0JvqstN8eoyCFZ3PkI5Y7daKn18FhMt+jcaFizV/CJUUqoX7Isk7Hzjjfb7Hyr+w4B3AjmHHTSqdyyX/wu/4e42O5FVCTwyCOn9YIiEAEz9acoPInmZ3apKHJKBwJjh93ZoeGz3YdyMd4Vs+YShUrT1Mqo=
+	t=1749478990; cv=none; b=jd+mQaNl4GqTiGnoLpwQb+7Zp3OmLSOcPSgItcr2dtbUnJj0t1uwfT62+ajO8b29X23urj5YRQIrktXJOXUyKOrSwMLJOhUkd9RqxSwpzQDuLHEOVzABD39gSkLAkx0t7sbuTP/MnRxzUn6pPFOBBdDSN3ybF4lxyk1U6gbwKwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749476970; c=relaxed/simple;
-	bh=iNoS61OEsbcdQlABb8O+pgwQJJ1cN1tEonuvj6R1tk8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dy97as6ZUyWG9B6b2uEAblcvTOXtEl969nTN809wfWbRSdII2TAuYn0k0vsz6owQp3XbFncOOu4nMdl/SHXSh92TfXgujMqkzo2cqdKflt+a6vwsPoSGlwObMWuqsyS3em4PXIedY57apy9SG509AP/+Lykn24vcDhDzCqBIuFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e/NF97Gy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749476967;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DhBsIpSQu/NKsYwFg9wGKiohX1VuHWd2Yx6z4NZMEoY=;
-	b=e/NF97Gy98IFgqMUPdIPcWM8EjNG367whbaI5vlUi8s0VR3vvk7IOyEdGRMSVQBgFczBX3
-	7dGLnelGze9ixaRfSYsAvfIk7cCooowqKVACAAWIGLuVTuOWv2Y8qUtA4jldhQmm20hFm2
-	EDRHtpxV+oE+a/ysbOdkoQ2ZN/OD5GM=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-542-vn1MlWajNxSzx8MNAREzTg-1; Mon,
- 09 Jun 2025 09:49:22 -0400
-X-MC-Unique: vn1MlWajNxSzx8MNAREzTg-1
-X-Mimecast-MFC-AGG-ID: vn1MlWajNxSzx8MNAREzTg_1749476955
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C72D3188EA6A;
-	Mon,  9 Jun 2025 13:49:08 +0000 (UTC)
-Received: from localhost (unknown [10.2.16.92])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 283EB19560B0;
-	Mon,  9 Jun 2025 13:49:06 +0000 (UTC)
-Date: Mon, 9 Jun 2025 09:49:05 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: mst@redhat.com, jasowang@redhat.com, michael.christie@oracle.com,
-	pbonzini@redhat.com, eperezma@redhat.com,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	darren.kenny@oracle.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost-scsi: Fix check for inline_sg_cnt exceeding
- preallocated limit
-Message-ID: <20250609134905.GC29452@fedora>
-References: <20250607194103.1770451-1-alok.a.tiwari@oracle.com>
+	s=arc-20240116; t=1749478990; c=relaxed/simple;
+	bh=Jj+Yt9zXtcRCfSDm7whUQ4ZIZ5JHddO5KlLP+fvfba4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=AQGNFcQJtpSdtPe+UMmKjVxBW4G6OCOgRZ5QRgZ+f9dixcuXUAIGz46HvFnDA7InHxKMKoFjUF23Fozl9vmEtlP2eeLVQUl/7kriEdDip1D4ncdZl0GetXz8ZYdewyMTNzI5XH+TmpaciPm0mipUKJwLj1lEySoLevGK5q2Tb8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ix7v20EQ; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2349fe994a9so31735955ad.1
+        for <kvm@vger.kernel.org>; Mon, 09 Jun 2025 07:23:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749478988; x=1750083788; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7lLdTQdrM0ytHOS+CAmb5K/o5KQV3Zi0TqZM7kL4ZL0=;
+        b=Ix7v20EQCfltUmRpI92FuSjgKVl5h/4BCa1w5LbO4E0rgxLmFWkosid6fR3GrVQNMw
+         RS63T+ia7uv8xbcGvqglfCT/B2llC0OodQhdhBRJ/M9w1M7QLg2JJ3HBw/XKZsNVLTkB
+         OpzQ37+0M4mX2jRiCe1COGqXnBjHIUJo/slqYGWZeiX4J4diRJ5TuhiX3YPTGnLApK78
+         Qvl/LA/RlE3lz7o/duivPunW3TtyZebIvHenfFGSdwvjhHifrjRcRXBkyCqDr4bZiZI+
+         BCwYn7DekeGjzLc9DVZRdopPgWtSdFyH6+bluN2AdSWy3tLeLFKmA5yZut4LV7KKu7KO
+         BuMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749478988; x=1750083788;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7lLdTQdrM0ytHOS+CAmb5K/o5KQV3Zi0TqZM7kL4ZL0=;
+        b=vC4bj1pibBz+fhDWnrVtHB0i6XAqU1jHu0B43J2qJrRka3tHHI3ediCGddkmu8NPMU
+         bxPvLPRAykYr3dspoaupAt5DoAscyWVq4oJ263VKwUCBM7ZCw+Kl6J14RCrh3MClEMI7
+         bt7n7lWbQKOJ8bGGm+Wa18YW+aURGOFV8dkZ06YmjY7BcaJM82Fl8rP6H+ukOK4bmHgk
+         XEMahElyUFK6gRTTnFGSiVnvXCGnQs3vdu0ZMt+6xP2ITYAEhhYbMk2J37VFR1WxSR3z
+         tXSavQmTmWOf4I7bvy2NGBJ+5yPABjGyMNgnGXnGiJwVy3kTvX8bWHQbAu7E75q35RUJ
+         wa+w==
+X-Forwarded-Encrypted: i=1; AJvYcCUOYX2rQ0MweZj6UiJS+RqD08XQwuGT269L0/ulIAW7RG6vCzNXTH5KhR/eAIKwYqRChMA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDtNhrzgVsIy8FJ57Dw7QgkYY1iM/2leEPo8vRxmXphi8WnQdz
+	b6oSXivRUQXhgTYVLFztMwUtMmE2l55LVYFVO/pat1VjYPIabPNkqlDl2AB3e14s7J69WYeMVYz
+	21fw4wA==
+X-Google-Smtp-Source: AGHT+IEXWjGA+7EHOmgVdxQCVZsaeyZ/Yk7vf9FpuYgFPmjBt1Dx/ah2+gxQKH2vNCJYIKyguPOQGlf/Vfs=
+X-Received: from pjuj14.prod.google.com ([2002:a17:90a:d00e:b0:311:485b:d057])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5345:b0:311:ffe8:20e9
+ with SMTP id 98e67ed59e1d1-31347308c79mr21849041a91.17.1749478988192; Mon, 09
+ Jun 2025 07:23:08 -0700 (PDT)
+Date: Mon, 9 Jun 2025 07:23:06 -0700
+In-Reply-To: <4a66adfa-fc10-4668-9986-55f6cf231988@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fKc30he2vAi3wglk"
-Content-Disposition: inline
-In-Reply-To: <20250607194103.1770451-1-alok.a.tiwari@oracle.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-
-
---fKc30he2vAi3wglk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+References: <20211207095230.53437-1-jiangshanlai@gmail.com>
+ <51bb6e75-4f0a-e544-d2e4-ff23c5aa2f49@redhat.com> <4a66adfa-fc10-4668-9986-55f6cf231988@zytor.com>
+Message-ID: <aEbuSmAf4aAHztwC@google.com>
+Subject: Re: [PATCH] KVM: X86: Raise #GP when clearing CR0_PG in 64 bit mode
+From: Sean Christopherson <seanjc@google.com>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Lai Jiangshan <laijs@linux.alibaba.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Wanpeng Li <wanpengli@tencent.com>, Jim Mattson <jmattson@google.com>, 
+	Joerg Roedel <joro@8bytes.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 07, 2025 at 12:40:29PM -0700, Alok Tiwari wrote:
-> The condition comparing ret to VHOST_SCSI_PREALLOC_SGLS was incorrect,
-> as ret holds the result of kstrtouint() (typically 0 on success),
-> not the parsed value. Update the check to use cnt, which contains the
-> actual user-provided value.
+On Fri, Jun 06, 2025, H. Peter Anvin wrote:
+> On 2021-12-09 09:55, Paolo Bonzini wrote:
+> > On 12/7/21 10:52, Lai Jiangshan wrote:
+> > > From: Lai Jiangshan <laijs@linux.alibaba.com>
+> > >=20
+> > > In the SDM:
+> > > If the logical processor is in 64-bit mode or if CR4.PCIDE =3D 1, an
+> > > attempt to clear CR0.PG causes a general-protection exception (#GP).
+> > > Software should transition to compatibility mode and clear CR4.PCIDE
+> > > before attempting to disable paging.
+> > >=20
+> > > Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> > > ---
+> > > =C2=A0 arch/x86/kvm/x86.c | 3 ++-
+> > > =C2=A0 1 file changed, 2 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index 00f5b2b82909..78c40ac3b197 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -906,7 +906,8 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned
+> > > long cr0)
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !load_pdptrs(v=
+cpu, kvm_read_cr3(vcpu)))
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 1;
+> > > -=C2=A0=C2=A0=C2=A0 if (!(cr0 & X86_CR0_PG) && kvm_read_cr4_bits(vcpu=
+, X86_CR4_PCIDE))
+> > > +=C2=A0=C2=A0=C2=A0 if (!(cr0 & X86_CR0_PG) &&
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (is_64_bit_mode(vcpu) || =
+kvm_read_cr4_bits(vcpu,
+> > > X86_CR4_PCIDE)))
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 1;
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 static_call(kvm_x86_set_cr0)(vcpu, cr0=
+);
+> > >=20
+> >=20
+> > Queued, thanks.
+> >=20
 >=20
-> prevents silently accepting values exceeding the maximum inline_sg_cnt.
->=20
-> Fixes: bca939d5bcd0 ("vhost-scsi: Dynamically allocate scatterlists")
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-> ---
->  drivers/vhost/scsi.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Have you actually checked to see what real CPUs do in this case?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+I have now, and EMR at least behaves as the SDM describes.  Why do you ask?
 
---fKc30he2vAi3wglk
-Content-Type: application/pgp-signature; name=signature.asc
 
------BEGIN PGP SIGNATURE-----
+kvm_intel: Clearing CR0.PG faulted (vector =3D 13)
 
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmhG5lEACgkQnKSrs4Gr
-c8h7EggAwgrah7g9s99SLzlFTYoWemYYpP3EqdHUzutA0bJbSpZTG7mLOsKvxs3M
-s0ZoQzikIgYVgHtIZwZSlrv1kq1DQnL61WlDWESMWCfB6oX7W7BjAKu+nDt56tP0
-p3qv2O/wsiMLQie8ES2criSD2tswseSmEMhCiBV8UWs+FA1IOXAG1BKyLhcGLqpo
-aFp/YsYRUBRFTty4WlRxzkN2+10V86DjUYEnpDjZn1FedfLtDL4OQ4MczJR6u3U2
-+cSQ2dJv/l2LHcVghYxrQJKDCEKUQoNzx20+UDd1Xg8/mt4FDO96G3G90mozLaZX
-rhn64IwB/wBz8DaLJJIrr7CM04c3Jw==
-=pLmm
------END PGP SIGNATURE-----
 
---fKc30he2vAi3wglk--
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f79604bc0127..f90ad464ab7e 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8637,6 +8637,23 @@ void vmx_exit(void)
+        kvm_x86_vendor_exit();
+ }
+=20
++static noinline void vmx_disable_paging(void)
++{
++       unsigned long cr0 =3D native_read_cr0();
++       long vector =3D -1;
++
++       asm volatile("1: mov %1, %%cr0\n\t"
++                    "   mov %2, %%cr0\n\t"
++                    "2:"
++                    _ASM_EXTABLE_FAULT(1b, 2b)
++                    : "+a" (vector)
++                    : "r" (cr0 & ~X86_CR0_PG), "r" (cr0)
++                    : "cc", "memory" );
++
++       pr_warn("Clearing CR0.PG %s (vector =3D %ld)\n",
++               vector < 0 ? "succeeded" : "faulted", vector);
++}
++
+ int __init vmx_init(void)
+ {
+        int r, cpu;
+@@ -8644,6 +8661,8 @@ int __init vmx_init(void)
+        if (!kvm_is_vmx_supported())
+                return -EOPNOTSUPP;
+=20
++       vmx_disable_paging();
++
+        /*
+         * Note, hv_init_evmcs() touches only VMX knobs, i.e. there's nothi=
+ng
+         * to unwind if a later step fails.
 
 
