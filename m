@@ -1,198 +1,378 @@
-Return-Path: <kvm+bounces-48728-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48729-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 645FFAD1A0E
-	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 10:52:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E9F5AD1A3D
+	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 11:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCEE716BAF8
-	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 08:52:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A707E166560
+	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 09:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0529C248F69;
-	Mon,  9 Jun 2025 08:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F3A250C07;
+	Mon,  9 Jun 2025 09:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="spXg+NuE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VG+yfeS8"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2079.outbound.protection.outlook.com [40.107.243.79])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E4F1FA178
-	for <kvm@vger.kernel.org>; Mon,  9 Jun 2025 08:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749459120; cv=fail; b=BI3B1Cv7f+eKMTHi5syAQSy3d424LnAgut3fXxercmDMNZtEGVaFMQ8ruB9G7A7l33BJU42q6oCB4liu5vM0jgYItCNkZdFzTG6rxFNK17W3PrbVDnssDJe7LjOiNWJ0wBoB15mkpuuBASkAbGOEjB8iO9L6uT2u8RQ+zzgOp9c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749459120; c=relaxed/simple;
-	bh=rPy7zTr+R1Q64JRLJlNJNLD4gM4wKBwU+q7PgUEhFOY=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tETKoVHeVuGwlEVpBMisnJsMlYI3ePrmqpf9490uxSG3JXX/a+31fO82TGZO9+2a2OYqpnoe7sUSijSkNUHMTaJzUBm4vQzVJ+Am9wctqXnOGNvDd5FhZDygVFoTR9YvndFbpitHKZsimHeawxWf2zOgNjrFDYkHAdswS6Ro4VU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=spXg+NuE; arc=fail smtp.client-ip=40.107.243.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xysnoy00Ybmdkm4ia+m1MLmdfQiX1Cv60jXwQ3xv6wDsTaqwRfo3XWtWaddnkXgAj9OMYXw4Hn2ymMxIOXfFa8W91fVgEF1WSxdmQSDdnqVr3I6iwz1VVsppP4uG1FLkneJeIDoQiL/yCYWvEvmIyzmVfN9vD95/VNAJouTHIU2Pb8wJqxUXHuuAl8fSRjJ8JXvzGkXaktbHy0UmZCg8YkZ6y76IksKrVY+4otfMO54rRVWCwXZhY5J932UeN39zARPLjtw6t7W/chiW9wjZH0UA+ANbAYiHMGMfryWvNu69ZQ0HoTWTdBmA3w2RHgfZZfNPF/UVOsRj0zApJlXe9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F2P9JeGJ6/tPft9v2Qyk6ekZimKooUTOPN4JWNxUZlM=;
- b=L9aLmX91dn3PhIFfUviSs6t14ay0d0DD+8IGGXDGFWVQc4TlYuJVxF1iwrv2QXLszcUfTBhAL3s5rxHEoA9YyaZ+2/YI3Sgff8QFXkS0I1gXDrm35jm+EKCE1k8GnGOJ/Q8u8GgmOaKUAjgh5rQgzK9SWPE1SCrw7Bzk3olcc/LIjPp7RtKrcc3UwTgLAHlbyUdLEt/qm+m27uiIVs08kramV+1WhU1LNSGr4F91Y41o897KtbtCqvauNnJ2voz0jm+mcz9WjMux0r/D2zCHWqucyYW+u2kxgeJlNM/aMjD/GKVzrVs2+WyOjiAJMSnvT65KpbZt1KeyQJbwtkItmg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F2P9JeGJ6/tPft9v2Qyk6ekZimKooUTOPN4JWNxUZlM=;
- b=spXg+NuEEes3u7IIIhNqdTBmZ3IJ+dP6AVZUuxKE69rSskL2L+wgAGLy2746NOnYc80ecq6i7YH67FV14aDpjTtehHMnIKLtmVppg7PTznXukCebmzwuycUgF/FtyCkwhsmcJba+sEhADXgwW98VqBp51Fv7CvvRqh5nlGpCfzg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN0PR12MB6317.namprd12.prod.outlook.com (2603:10b6:208:3c2::12)
- by SJ2PR12MB7943.namprd12.prod.outlook.com (2603:10b6:a03:4c8::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.32; Mon, 9 Jun
- 2025 08:51:56 +0000
-Received: from MN0PR12MB6317.namprd12.prod.outlook.com
- ([fe80::6946:6aa5:d057:ff4]) by MN0PR12MB6317.namprd12.prod.outlook.com
- ([fe80::6946:6aa5:d057:ff4%6]) with mapi id 15.20.8792.039; Mon, 9 Jun 2025
- 08:51:56 +0000
-Message-ID: <323192cf-dcdb-4676-96a1-c4155a0d70f4@amd.com>
-Date: Mon, 9 Jun 2025 14:21:48 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 0/4] Enable Secure TSC for SEV-SNP
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-To: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org
-Cc: thomas.lendacky@amd.com, santosh.shukla@amd.com, bp@alien8.de,
- isaku.yamahata@intel.com, vaishali.thakkar@suse.com
-References: <20250408093213.57962-1-nikunj@amd.com>
- <7dd702a3-e9c3-4213-b0b6-799976d4736a@amd.com>
- <4f6b6a8a-0f75-4123-b06f-a8bf7eb36f06@amd.com>
-Content-Language: en-US
-In-Reply-To: <4f6b6a8a-0f75-4123-b06f-a8bf7eb36f06@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN4P287CA0036.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:26f::6) To MN0PR12MB6317.namprd12.prod.outlook.com
- (2603:10b6:208:3c2::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B6F38385
+	for <kvm@vger.kernel.org>; Mon,  9 Jun 2025 09:02:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749459778; cv=none; b=jnxuq0cJvTrbC9zqgUTfBBBuRi1MgCzdHqU0BX554e9DvIGnhGxeKbJwuEEqPgdajSGy29CBlcmqUy0XQnXn/yLTvcZbW6uDfMhnKnwi6cy+6YEGjwJBn3akPpk2svAyBp8T3wKlE0YlhdtwxqH24qRwawnlOufChBsHhtNEi6c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749459778; c=relaxed/simple;
+	bh=hsya1/d6SbXJC5AtuOIjeqVmM1Y8wtOESbAKulWKQS0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GMWGXXFEKFJvTIekB9IuQ0uvkpMR+kfkxs1dKs4ISJH1cLcfi5GNUVb0LptLoOaXydfSncGB0IcwgzDkY5QoO3EvzqZyU0kcRVei2i2feWBIQUBlOg53v0KTUpUNEpu6jxkDFbfO1vF0JDRkHL266mG1K0JZE9iCdgRDw4r78n8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VG+yfeS8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749459774;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q2MrIEEzGhePPG36r/yxjnoCorBMafO55RLCX7Uoxso=;
+	b=VG+yfeS8n0sR1w3PaG+xJnznzdCQrtKEpZtBcj/iXCScBvO5wlPVkqqesBjx8TAreBpjH6
+	yi/B4A+8s0WMKeZ1JJYmYw7julvW5QPsFC20aOpPB1AJGod4xwq2NffaGadPcLKOLiYARB
+	Sz1vdvZNcZt79wFnu8XfkZedgEspuSg=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-684-oHrqFMi4PbOxqdzxdd2LIg-1; Mon, 09 Jun 2025 05:02:53 -0400
+X-MC-Unique: oHrqFMi4PbOxqdzxdd2LIg-1
+X-Mimecast-MFC-AGG-ID: oHrqFMi4PbOxqdzxdd2LIg_1749459772
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-742a091d290so2801986b3a.3
+        for <kvm@vger.kernel.org>; Mon, 09 Jun 2025 02:02:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749459772; x=1750064572;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q2MrIEEzGhePPG36r/yxjnoCorBMafO55RLCX7Uoxso=;
+        b=wnd4tQS1utabNa4CZNLkxDH148u5YNb9vIuvuc+G1TS1wyvUIvntADF1LWXvu+jG6p
+         YDSahcx4W38oUsz+Q7rV/qeK1OdGLrej1xUqVi5Cu5MlmYr5IpQlSprx3SuLR16gnqDt
+         CmXvhJYQwAD4jzifkZlWEH9BtHZ6dlVUb+5W9F/p89v1ZnJmLHIi/GVCohvpGK+NNnmZ
+         0BRYYupkRebHVIemuX0fsZjDzo8FWB5/uQp4xg1vTroL2avpuNVoGh0PBS0x/tq3XBYF
+         HQHhIeNA9NnzyGVFp6DOvvF5oP04Q5hwBm3cCxYFYux1a8Xy8DgWq/V85oTEPnyNI/0c
+         ho+A==
+X-Gm-Message-State: AOJu0Yx3slLpuhbMc5n2sd//u9QYIwaR9rdsWj4w6zvQ6ikAuIjT/Des
+	UzxS7j74WY96iT7efbuUViIbOl73t2jPZhXym4qihPxQIsGKqViRgXbjvUULcUP5N0hfkmXXatW
+	HCjtugtFcgnJ/3NaKNUsa5VO3B+alSjBjkbfqQ6u6EkdXDk2LOEPLHA==
+X-Gm-Gg: ASbGncvK6lv2x357oJY7IM+MoDq4zBoXy1uXV/178W5ramgdzw++SrH3FL8eqGdJkyb
+	5c9XpNJdG57K1o+EjO7kFyNLy2PWj3+K9nJhP69vtE+94usoJX7f4KT3wdYc5r0gq3zRUNxO3nn
+	6yTWNO79WAhfBOdvQGsIuuwlzcbELZqByuG/PEorWxWjANGuvq/C9fHpiOxpaYr+2l+8zT0X5C6
+	0fubMojYfrAYGBnPu+qh4Fs4WmV+swyd4UE9YDHUW55mQl1lqkqE6jxvKujYu4g1n8qyO2EpyKe
+	2XM6MKmIEQrLROASCKWzYsSz+X/8G25Yumvf5GFdrWmk5Ek8hpPmNRDtWjXoHw==
+X-Received: by 2002:aa7:88cb:0:b0:73d:fefb:325 with SMTP id d2e1a72fcca58-74827e52272mr13840335b3a.5.1749459771962;
+        Mon, 09 Jun 2025 02:02:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE9BfcZFPNQiK0Afi71TcjjNFbyWZ9HvqO0HtNN4+uHwiapdplxXW56T5eZnVVOh7eYx2uDcQ==
+X-Received: by 2002:aa7:88cb:0:b0:73d:fefb:325 with SMTP id d2e1a72fcca58-74827e52272mr13840291b3a.5.1749459771414;
+        Mon, 09 Jun 2025 02:02:51 -0700 (PDT)
+Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7482b0ea94csm5282712b3a.165.2025.06.09.02.02.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Jun 2025 02:02:50 -0700 (PDT)
+Message-ID: <7c2bea4b-7a89-4875-ac83-50960f90da8c@redhat.com>
+Date: Mon, 9 Jun 2025 19:02:29 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR12MB6317:EE_|SJ2PR12MB7943:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee475a8e-7a14-42e2-2294-08dda732e2b8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Mkp4MDVyZkdTVGpmWFprQ1ZnSEo4VTE0bnFQdVkxZmZ4NkZ3cExRVnVyRzNN?=
- =?utf-8?B?U0g3NFBJdis1anM3UE0reG0xZFl1eWZMeHdjVWIrMGRXQzJhNXNNZlpxQTBk?=
- =?utf-8?B?ZzFhek5PaUY0K0Z2WDhldEd3eGZjZCtieXFNN0V1cGE1Nm1UU2hDTkFxaDFs?=
- =?utf-8?B?cm1oVVJlUWxYVTI3VEVVRXB6VlVXRnFLM0lsNjJnUzlDR1VLdmxrbmZLVUZL?=
- =?utf-8?B?VngvclJUNXM1eUhoN2JrWERxd3RPb0lPcXZLbjdZQ01RVE9jaDBEK3VVaDg2?=
- =?utf-8?B?aXRITVVEcXQwNXB4U2xqYlJIZnJJRHAvSk5WOUlmNDc1aWcvVGJTTU1lY3lC?=
- =?utf-8?B?azZ5UE9MQXZiNVNmclk1Q2hQV1h2dktGbitSMzMxNlpCOWdvRUhHbW9NdmpI?=
- =?utf-8?B?VUptWjRVdTB3bFhmZU1CTXhhMVlndXdUbUdVYjhOVUl0WDExU2V1YnNyN3lz?=
- =?utf-8?B?dEhFQnZlWXptU0pGRlMzYXltbmtPbmk0bCtHZzl0V0FyVXhPaXlRV3p0ZG40?=
- =?utf-8?B?d2dYU2diSnpNMWJiM3lXS1dRbEdvVHNxZm9TQjB3VEZ2a1JVZ1ZXUzFFZllp?=
- =?utf-8?B?RmFFTVNsU2FTS0c3OUhMc1ZZUjVTRHhnbTY4a0c0OW4yZTM1WGtCYmZxNzFP?=
- =?utf-8?B?WlNqUk01M3oyak9wVHZkb0ZvVVJHWUlEOWljaDhXSHl3eGlmV1hTV1RFdUla?=
- =?utf-8?B?eEcxY1VpejdtQ0tPaUE3U2d4a3pqeHR2TmhBSEdlQ1J6VjFwdXFneEE0V1Zh?=
- =?utf-8?B?UHpydW8wU25IWWM1MVhEKzVER2JJUFVGMTEzOENtbnRLS0M3bXBIaURRaW9j?=
- =?utf-8?B?R2pvdzdjTEppWG45TU5SWkFRQjVucW92QlNNM2llR3QvRHYxOVhseit1Sm12?=
- =?utf-8?B?anVoWmxTUVhJcFk2aDlaZmlpV3dma0tEOExkSEg2WjdoL0lZM3lGZUh1d3cz?=
- =?utf-8?B?UWNjUitFSnRudnVLdG4ySC9MREhNeHpUVXhxbWJCUmR4QzRJVG1IaFc0alRU?=
- =?utf-8?B?NTltSzc0SjZCTzJXbkFWTkgxT1EyaDNKY3VJL3EwU29sbllycVR0dUpYOWZY?=
- =?utf-8?B?Rk4veVhIcVg3STZvRzJ5cHVHOXB5NjhBS3ZuYi85RVIxZTBkcTBtVWVEZlgx?=
- =?utf-8?B?MjlFYVpJSEJGcDN5TU1TbmxsUXhzZFVzc3F5WnpFd05zdG1RUkp4U0dGYndp?=
- =?utf-8?B?bXBNYmphUzEyUzMwSWVFRVFobDQ3Z3o5TVdzVmhmTnVmM0tEenJic3JCckRo?=
- =?utf-8?B?TGNHVUZDWVVGVjNqbnptQ3Q4d2duNnhUQSs1YXhkNXFQZUlMWFRYenM0RGQx?=
- =?utf-8?B?MFVoa2ZyWnFvRzBKSkdhWFRwckVLWUtLenhLTndxRHlOaDVUeFVJYm81Nmxp?=
- =?utf-8?B?K0t5VHhCZ2tZZ2taUVZGRUFjNzNveC9SMHBMN21jSlR0R0I1bTRNRW1STitm?=
- =?utf-8?B?eUV2czk0dTRxZ01reUx2Y2twWXdPTFhaK2JQbHNxOVZ5MFQvSUpKRjFOMHE3?=
- =?utf-8?B?U1hMUGQ0djJqZ21OMGg1Z2U2MThwbmZGYVZDaDBFdG84U2VwWVU0SGpEMzgx?=
- =?utf-8?B?SWpmbDZlZ2R6R2FmcUw4ZjJmYTNYWWpONXpBc1JMZGhTdkMyZ1ZxSzdMQ3VR?=
- =?utf-8?B?aDE0THdldVZ2S2RSK2xvYkpxL2NEbUp2ZjE2bjdhRVBBcjIvdDh4TEJyRU5I?=
- =?utf-8?B?bXc2R29zOFhpcExwVGVIUUlsMUxOTlZiZ2lGdzlUTVBqWDIyMHJDRXYvamtS?=
- =?utf-8?B?MnExbEY2NmhiZGxQVExMUDFqRmxEQzMvM0lqd3BvQmhITFhZRXozVXdLa0dm?=
- =?utf-8?B?S3ZURTlHYktwbXdwaXlxRDN3WkZvMVBKVlJvaHFNMTFaUGR4SmZUTzU3MUZE?=
- =?utf-8?B?b0xuOFAxeFdXMEtvdmhvc1B3eXhpb0FkZXkyWVdiajFEWkx1UGJ0YUdnNk5n?=
- =?utf-8?Q?9IbWtHTgapM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6317.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SGV0bGEveStjR2NkQVNyZjQxUUhmMXZaZ055N1BXS0IyZUM4d29lR0UxR1VY?=
- =?utf-8?B?Y1VHZkU5cnk3VkhTejRyZGpOSDUzUCtyVjRQM21xd2lCRVNMeERoelRtNE9x?=
- =?utf-8?B?ODh1NC85UEJoRTNXclg1QzIySk1TM1QyQWErc3p4U2VLaDJIUi9wOHN0cTd1?=
- =?utf-8?B?WjFqTkNncjk4ZXNTVXJrQThvaDQvNkZKbjRWSVZYcTlpcUQ1V1VCblZtZ0dq?=
- =?utf-8?B?SDN1MlVHZzVUZXdDS0JrSHVnZnBkY3RaOS9xV2FUTWJrYjVTNHViNzdmQnlw?=
- =?utf-8?B?a2xURSs3RTBTV0YwVnNFWFhkTGtvQUUvQ3Y5WDMvUjdtckNDNDU1Skc1MTlC?=
- =?utf-8?B?SloxSUlsSEk4dnNSSHUzYjJHbUVnQ2RNdmZmcjNEQmdDUkNTZjQxekE4NDJ5?=
- =?utf-8?B?aGFNaHdwdVpjQUFmejNUa0lMdnA0eFBMeWsrclk1VG5acmdlZ3FTdUhOcGlo?=
- =?utf-8?B?dXB3a1Y3SHV0OXpqQ3g3OWRmSFk2dGwwMnlxZFRSUHFmdHZXQzdPVkJhM0RU?=
- =?utf-8?B?R1ozQzU5Unlxa25FZVgxVEhwN1FJQkRzSVBleTBtZVpHb1BDaDQ1SVJaNHB3?=
- =?utf-8?B?RU4zRmR6SW5jT3BaMEg0T0hzUHpDRXlPS1lZQWMweWV4bFh4dzhwUEI3K1dl?=
- =?utf-8?B?SkZwRDNJWkFoNHBQbUl6YmhUcEZYUVlPdG1YNG94amd5NWtROTBRWXVGQkti?=
- =?utf-8?B?QjIvenhKSlZjMVJKMXh2cGd3N2JzanVHSENEWWNTZ1d2a21CK1NOUmIweEI4?=
- =?utf-8?B?T2w4blphOW1UTDNTSWRvaUhtakNBeDgra0Fxa29WaUFXT0F3NW83U0oxQjhP?=
- =?utf-8?B?RlN6Q2x0YTl2aTdlckdaTWdFdFUzd3J0TVZER2kxYW5nOGtzNDhNcFBIRUxn?=
- =?utf-8?B?blFpLzZPdDdKRmZMdUljbzgyQmdBRHlBTGJDNEtZQ2QwSmVZR1Mvc1YyUHRM?=
- =?utf-8?B?dHJRdzhDajFobWFzM2tPVGMvQ1NJMEIxN1IyTTlld3ByU2gyeVcyMklGbUc1?=
- =?utf-8?B?WWJhMnlXV2d6eW5iWFhvVDFPOVIxaDBYR0lNTkovdVRXQndyVklaODNjYmJQ?=
- =?utf-8?B?Z2RNQ2JpZTJQQ0x4M2R5czV5ZXQzcVlUeW5hUUpoc3VaSlZQL3JHR0RBOGxv?=
- =?utf-8?B?WHA0U3d6WUJCcmtoV0NKRmcwSVM2dFo2VlVyQmprTG5aakxMdVhVbS9QczEv?=
- =?utf-8?B?M1pkSS9WaHJlUWU4Y044NjkxRjNJZ1c0akJxNHNiOWM2VmpYRnc3eVExa29u?=
- =?utf-8?B?U0p4TDJWYW9GNm1RWTA1VXhaajBKUE9nV2tPd3VndVRJaXd0OGNuR056eEg2?=
- =?utf-8?B?UXFsSVZ6RGdBalY1NGYzclBJclhvY01UQmF6NVBXckFzK1JoZkw5Y01yVHpi?=
- =?utf-8?B?R21tbHBYMk9UamwvUFBYTm1BMkNoRDUzdnpYdkp1TXdSRGY5Sk0weThCYUFw?=
- =?utf-8?B?aEgycVJpT3RvOGtNRzdBbVkzVndxN0NudXg4Z094UkRRckdqVEZwamRkLzFW?=
- =?utf-8?B?V1lBMlJ2WU1BSERVSDRPaFJZUWFjY2hNMkpTMnlhV2ZKNFhFM25TU2ROMTlw?=
- =?utf-8?B?Qnp2YUNQZ2RyaVdwTVpnNm1LUit3MnlqY3RYNkkyZlIyWHYyaU1xSFVhbnNu?=
- =?utf-8?B?Vk1ob1lZU0ZVWXNSY09HM3d0dVljKzdSOEkrNENOVlYydi9DeDZDSE1FVi9m?=
- =?utf-8?B?TjlHcmJKZzEyUjRtUVJvcDJhb1daZnBmcGdTa1NEVnFYMTUrYnRzeUdyZUJN?=
- =?utf-8?B?K0FuMnp1NlRWNUlyRHFWOG5iVmNtcU1sNEhqRWZURWh2cDVkQURhbTBGN25Y?=
- =?utf-8?B?UGh6K3RRakNUTjNubzBUcU1rN3FXbVFTc0g3VEpYcGtDd2JwWDFib2IreFdK?=
- =?utf-8?B?SkhJVzI2K3I1M0YzVHFiR2JJdU1TdzRXelhCQ0xoWUh3eE9RSm9PdzhPSlR4?=
- =?utf-8?B?RUdYSHRqNWZnYjI5bzI1akVkVXhLeTkrRHlualFGZzMrNWVGNmM2enRiYWNV?=
- =?utf-8?B?R2VuVjBOOWdaNkJmTDhxUDVZcmFlTHlVS3JDWFNMMGlqUUtUdWg2MFJ5cDFG?=
- =?utf-8?B?QjJSYjJxN25CZVRhN21INkY5UEd4RS9hV1JXUWd5TllHTXU3ZUw3bmtvZXFa?=
- =?utf-8?Q?KB0IJq+s48LZp2509quz5oZyC?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee475a8e-7a14-42e2-2294-08dda732e2b8
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6317.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2025 08:51:55.8101
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DEB2ssTOcaymSe8sMsKCTmFMYDjL9es9nj1oHdS+4/EHdGTomVTxU0nLC3530Kfd6VtKhKFETK7sdV98SgBLaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7943
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 13/18] KVM: arm64: Refactor user_mem_abort()
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
+ mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com,
+ viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
+ akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+ chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+ dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
+ wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
+ ira.weiny@intel.com
+References: <20250605153800.557144-1-tabba@google.com>
+ <20250605153800.557144-14-tabba@google.com>
+ <a4e63374-8b4f-4800-a638-35ff343f78d2@redhat.com>
+ <CA+EHjTzYSZSQxh+97SSU7kg+S59CFMisF437wfAxnFRkfgUeFg@mail.gmail.com>
+Content-Language: en-US
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <CA+EHjTzYSZSQxh+97SSU7kg+S59CFMisF437wfAxnFRkfgUeFg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+Hi Fuad,
 
-
-On 5/5/2025 10:20 AM, Nikunj A. Dadhania wrote:
-> On 4/14/2025 11:20 AM, Nikunj A Dadhania wrote:
->> On 4/8/2025 3:02 PM, Nikunj A Dadhania wrote:
->>> Changelog:
->>> ----------
->>> v6:
->>> * Rebased on top of kvm/master
->>> * Collected Reviewed-by/Tested-by
->>> * s/svm->vcpu/vcpu/ in snp_launch_update_vmsa() as vcpu pointer is already available (Tom)
->>> * Simplify assignment of guest_protected_tsc (Tom)
+On 6/9/25 5:01 PM, Fuad Tabba wrote:
+> On Mon, 9 Jun 2025 at 01:27, Gavin Shan <gshan@redhat.com> wrote:
 >>
->> A gentle reminder, any other suggestions/improvement ?
+>> On 6/6/25 1:37 AM, Fuad Tabba wrote:
+>>> To simplify the code and to make the assumptions clearer,
+>>> refactor user_mem_abort() by immediately setting force_pte to
+>>> true if the conditions are met.
+>>>
+>>> Remove the comment about logging_active being guaranteed to never be
+>>> true for VM_PFNMAP memslots, since it's not actually correct.
+>>>
+>>> Move code that will be reused in the following patch into separate
+>>> functions.
+>>>
+>>> Other small instances of tidying up.
+>>>
+>>> No functional change intended.
+>>>
+>>> Signed-off-by: Fuad Tabba <tabba@google.com>
+>>> ---
+>>>    arch/arm64/kvm/mmu.c | 100 ++++++++++++++++++++++++-------------------
+>>>    1 file changed, 55 insertions(+), 45 deletions(-)
+>>>
+>>
+>> One nitpick below in case v12 is needed. In either way, it looks good to me:
+>>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>
+>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>> index eeda92330ade..ce80be116a30 100644
+>>> --- a/arch/arm64/kvm/mmu.c
+>>> +++ b/arch/arm64/kvm/mmu.c
+>>> @@ -1466,13 +1466,56 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+>>>        return vma->vm_flags & VM_MTE_ALLOWED;
+>>>    }
+>>>
+>>> +static int prepare_mmu_memcache(struct kvm_vcpu *vcpu, bool topup_memcache,
+>>> +                             void **memcache)
+>>> +{
+>>> +     int min_pages;
+>>> +
+>>> +     if (!is_protected_kvm_enabled())
+>>> +             *memcache = &vcpu->arch.mmu_page_cache;
+>>> +     else
+>>> +             *memcache = &vcpu->arch.pkvm_memcache;
+>>> +
+>>> +     if (!topup_memcache)
+>>> +             return 0;
+>>> +
+>>
+>> It's unnecessary to initialize 'memcache' when topup_memcache is false.
+> 
+> I thought about this before, and I _think_ you're right. However, I
+> couldn't completely convince myself that that's always the case for
+> the code to be functionally equivalent (looking at the condition for
+> kvm_pgtable_stage2_relax_perms() at the end of the function). Which is
+> why, if I were to do that, I'd do it as a separate patch.
+> 
+
+Thanks for the pointer, which I didn't notice. Yeah, it's something out
+of scope and can be fixed up in another separate patch after this series
+gets merged. Please leave it as of being and sorry for the noise.
+
+To follow up the discussion, I think it's safe to skip initializing 'memcache'
+when 'topup_memcache' is false. The current conditions to turn 'memcache' to
+true would have guranteed that kvm_pgtable_stage2_map() will be executed.
+It means kvm_pgtable_stage2_relax_perms() will be executed when 'topup_memcache'
+is false. Besides, it sounds meaningless to dereference 'vcpu->arch.mmu_page_cache'
+or 'vcpu->arch.pkvm_page_cache' without toping up it.
+
+There are comments explaining why 'topup_memcache' is set to true for
+permission faults.
+
+         /*
+          * Permission faults just need to update the existing leaf entry,
+          * and so normally don't require allocations from the memcache. The
+          * only exception to this is when dirty logging is enabled at runtime
+          * and a write fault needs to collapse a block entry into a table.
+          */
+         topup_memcache = !fault_is_perm || (logging_active && write_fault);
+
+	if (fault_is_perm && vma_pagesize == fault_granule)
+		kvm_pgtable_stage2_relax_perms(...);
+
+> Thanks,
+> /fuad
+> 
+
+Thanks,
+Gavin
+
+>>          if (!topup_memcache)
+>>                  return 0;
+>>
+>>          min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
+>>          if (!is_protected_kvm_enabled())
+>>                  *memcache = &vcpu->arch.mmu_page_cache;
+>>          else
+>>                  *memcache = &vcpu->arch.pkvm_memcache;
+>>
+>> Thanks,
+>> Gavin
+>>
+>>> +     min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
+>>> +
+>>> +     if (!is_protected_kvm_enabled())
+>>> +             return kvm_mmu_topup_memory_cache(*memcache, min_pages);
+>>> +
+>>> +     return topup_hyp_memcache(*memcache, min_pages);
+>>> +}
+>>> +
+>>> +/*
+>>> + * Potentially reduce shadow S2 permissions to match the guest's own S2. For
+>>> + * exec faults, we'd only reach this point if the guest actually allowed it (see
+>>> + * kvm_s2_handle_perm_fault).
+>>> + *
+>>> + * Also encode the level of the original translation in the SW bits of the leaf
+>>> + * entry as a proxy for the span of that translation. This will be retrieved on
+>>> + * TLB invalidation from the guest and used to limit the invalidation scope if a
+>>> + * TTL hint or a range isn't provided.
+>>> + */
+>>> +static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
+>>> +                                   enum kvm_pgtable_prot *prot,
+>>> +                                   bool *writable)
+>>> +{
+>>> +     *writable &= kvm_s2_trans_writable(nested);
+>>> +     if (!kvm_s2_trans_readable(nested))
+>>> +             *prot &= ~KVM_PGTABLE_PROT_R;
+>>> +
+>>> +     *prot |= kvm_encode_nested_level(nested);
+>>> +}
+>>> +
+>>>    static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>                          struct kvm_s2_trans *nested,
+>>>                          struct kvm_memory_slot *memslot, unsigned long hva,
+>>>                          bool fault_is_perm)
+>>>    {
+>>>        int ret = 0;
+>>> -     bool write_fault, writable, force_pte = false;
+>>> +     bool topup_memcache;
+>>> +     bool write_fault, writable;
+>>>        bool exec_fault, mte_allowed;
+>>>        bool device = false, vfio_allow_any_uc = false;
+>>>        unsigned long mmu_seq;
+>>> @@ -1484,6 +1527,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>        gfn_t gfn;
+>>>        kvm_pfn_t pfn;
+>>>        bool logging_active = memslot_is_logging(memslot);
+>>> +     bool force_pte = logging_active || is_protected_kvm_enabled();
+>>>        long vma_pagesize, fault_granule;
+>>>        enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+>>>        struct kvm_pgtable *pgt;
+>>> @@ -1501,28 +1545,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>                return -EFAULT;
+>>>        }
+>>>
+>>> -     if (!is_protected_kvm_enabled())
+>>> -             memcache = &vcpu->arch.mmu_page_cache;
+>>> -     else
+>>> -             memcache = &vcpu->arch.pkvm_memcache;
+>>> -
+>>>        /*
+>>>         * Permission faults just need to update the existing leaf entry,
+>>>         * and so normally don't require allocations from the memcache. The
+>>>         * only exception to this is when dirty logging is enabled at runtime
+>>>         * and a write fault needs to collapse a block entry into a table.
+>>>         */
+>>> -     if (!fault_is_perm || (logging_active && write_fault)) {
+>>> -             int min_pages = kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu);
+>>> -
+>>> -             if (!is_protected_kvm_enabled())
+>>> -                     ret = kvm_mmu_topup_memory_cache(memcache, min_pages);
+>>> -             else
+>>> -                     ret = topup_hyp_memcache(memcache, min_pages);
+>>> -
+>>> -             if (ret)
+>>> -                     return ret;
+>>> -     }
+>>> +     topup_memcache = !fault_is_perm || (logging_active && write_fault);
+>>> +     ret = prepare_mmu_memcache(vcpu, topup_memcache, &memcache);
+>>> +     if (ret)
+>>> +             return ret;
+>>>
+>>>        /*
+>>>         * Let's check if we will get back a huge page backed by hugetlbfs, or
+>>> @@ -1536,16 +1568,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>                return -EFAULT;
+>>>        }
+>>>
+>>> -     /*
+>>> -      * logging_active is guaranteed to never be true for VM_PFNMAP
+>>> -      * memslots.
+>>> -      */
+>>> -     if (logging_active || is_protected_kvm_enabled()) {
+>>> -             force_pte = true;
+>>> +     if (force_pte)
+>>>                vma_shift = PAGE_SHIFT;
+>>> -     } else {
+>>> +     else
+>>>                vma_shift = get_vma_page_shift(vma, hva);
+>>> -     }
+>>>
+>>>        switch (vma_shift) {
+>>>    #ifndef __PAGETABLE_PMD_FOLDED
+>>> @@ -1597,7 +1623,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>                        max_map_size = PAGE_SIZE;
+>>>
+>>>                force_pte = (max_map_size == PAGE_SIZE);
+>>> -             vma_pagesize = min(vma_pagesize, (long)max_map_size);
+>>> +             vma_pagesize = min_t(long, vma_pagesize, max_map_size);
+>>>        }
+>>>
+>>>        /*
+>>> @@ -1626,7 +1652,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>         * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
+>>>         * with the smp_wmb() in kvm_mmu_invalidate_end().
+>>>         */
+>>> -     mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+>>> +     mmu_seq = kvm->mmu_invalidate_seq;
+>>>        mmap_read_unlock(current->mm);
+>>>
+>>>        pfn = __kvm_faultin_pfn(memslot, gfn, write_fault ? FOLL_WRITE : 0,
+>>> @@ -1661,24 +1687,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>        if (exec_fault && device)
+>>>                return -ENOEXEC;
+>>>
+>>> -     /*
+>>> -      * Potentially reduce shadow S2 permissions to match the guest's own
+>>> -      * S2. For exec faults, we'd only reach this point if the guest
+>>> -      * actually allowed it (see kvm_s2_handle_perm_fault).
+>>> -      *
+>>> -      * Also encode the level of the original translation in the SW bits
+>>> -      * of the leaf entry as a proxy for the span of that translation.
+>>> -      * This will be retrieved on TLB invalidation from the guest and
+>>> -      * used to limit the invalidation scope if a TTL hint or a range
+>>> -      * isn't provided.
+>>> -      */
+>>> -     if (nested) {
+>>> -             writable &= kvm_s2_trans_writable(nested);
+>>> -             if (!kvm_s2_trans_readable(nested))
+>>> -                     prot &= ~KVM_PGTABLE_PROT_R;
+>>> -
+>>> -             prot |= kvm_encode_nested_level(nested);
+>>> -     }
+>>> +     if (nested)
+>>> +             adjust_nested_fault_perms(nested, &prot, &writable);
+>>>
+>>>        kvm_fault_lock(kvm);
+>>>        pgt = vcpu->arch.hw_mmu->pgt;
 >>
 > 
-> A gentle reminder.
->
 
-A gentle reminder.
-
-Regards,
-Nikunj
 
