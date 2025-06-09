@@ -1,194 +1,143 @@
-Return-Path: <kvm+bounces-48748-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48749-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81B5AAD2567
-	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 20:20:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF1FCAD2592
+	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 20:26:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 652E43A78E4
-	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 18:20:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99AC518915D5
+	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 18:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FEBD21D3E1;
-	Mon,  9 Jun 2025 18:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B65B21CC49;
+	Mon,  9 Jun 2025 18:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B1O2WMIa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LjxB/eb6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2011DB92C
-	for <kvm@vger.kernel.org>; Mon,  9 Jun 2025 18:20:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6AA18DB1E
+	for <kvm@vger.kernel.org>; Mon,  9 Jun 2025 18:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749493221; cv=none; b=IQ5T/tATkQlMDybEe+iZ8PprjTAt1Hfa95JVQsVam53lFMKSxdcag1W257H6uY7vP9SSqMCJAEuG2UtpdUXNIaLem4uSjcSVflajSYJ2wtHObEJD0Q8ZQtEnN8Qjyc8LogqIgjIRdS3eef2imzLnGw/lZtzuCzwYai8qPlwpNyQ=
+	t=1749493559; cv=none; b=PZLM6/hfdOYsm+qrzQDYHduo2E3rrHsZjgLJbSUd/QKlbKyOpu67TNmYDdcTUzYsT+vyWXf37OEfOsB/lx4yNO96Xuy7XQTie4aYAZxQxn99g4IiGEmyZCME5qfpCS+/p+MHmMJDOaX3kvI+0qNXPxR5AIOeLLZo8T9xqtJlIL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749493221; c=relaxed/simple;
-	bh=hXtDQVtzBt05LQPWiaTJRzc2pDfK+7mriXwEfggveQA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qy1DT4ODt5jP/IdQ8mgA0Wr4Y6XxEBH96J+1Q1ApWB4f+gXRb2hmuG2mpvVcPSldnuzjxNDQKNXNHi2Zf1TWCpxk5OQU4ytLYCLfJN5O7C4/6VXBlMeLDdx21rainjF5MrTVL7uNpk++FUulkC/+J0TFWYq3i6fae18uLvefTq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B1O2WMIa; arc=none smtp.client-ip=209.85.208.51
+	s=arc-20240116; t=1749493559; c=relaxed/simple;
+	bh=Ah0pHsQHnY1XGuWE/3SKFr3T7GQgAVkrfklDfLiassI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=mwvB7koTCHT0Ylvre5tagFKJ14YET6PvWiw28j8JjCbCCniXpHrYJjYacFtrNJPVT0SX0xBWtayAXoivzTPgvWpPaalZS0vEIXc8b/xJyVjHM46WSenIvUIAkmGkz5vYzBS12Hai75fpyrAkG3LyGPJigPFKcdKpifhiQ+J30rU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LjxB/eb6; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-601a67c6e61so1679a12.0
-        for <kvm@vger.kernel.org>; Mon, 09 Jun 2025 11:20:19 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311cc665661so3931524a91.2
+        for <kvm@vger.kernel.org>; Mon, 09 Jun 2025 11:25:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749493218; x=1750098018; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3blXDd8YInSQ/c19Uv1xImmNssJZC2qn40udTqZrJH8=;
-        b=B1O2WMIapby5lRLQKgUQ4yAugam9O1aL16OSFVqIpBHxzxsX6GTINPFme5ghCrZWOz
-         U7+FWzEmtj7iJydGnZKRSinDPA1BZXz/6uHqTHnKHUHTVK99rIDkN4er/fnE36yBudlY
-         yJ1oil+eQ81BFsr7BQL04QlPSUgz6WlEkAIM1/httl2bSrJJcpkxYYeij4iSOK+y+KOz
-         NqoKunezJ11MvGJPWfgve/jzAgd2LckW5/RPJ5AOesUQz5iPIJ7pc5WCU5cQXuzou/A+
-         VO4Yy5G83U1TwX4NjflYU7lNhAACeizMdWYVambze3c+nVDqMu5BXmD5W+pjOR/iuBuD
-         YdaQ==
+        d=google.com; s=20230601; t=1749493554; x=1750098354; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=z9qcsdHcsSJ5C6VTefgwjQ8viEabDJHufEh6SESIfaQ=;
+        b=LjxB/eb6bfEa7l5+elWXyU6aCNKlQcSP6yWsFhm/XJE2NScHUHHp0PMqH57VB+C+v/
+         rwV0eo3jD3H7OMNSVXobE5o8SqA+g2Thb8E9Z+Irk0viJ7ZNnW/CJtzss9qm4LZoISIp
+         4k6AbayZA8Ktg4URRdDobYk6pLJjBj7cs55KsFaf6M3AwMQi8CVxdRB/wM2WdFJYrDCV
+         CS/cR50x26zbpJGWewErnd5dQ+ApKHOlsITSfqtpI8U5IS0bTKLlbStbAQqpJvprzWZR
+         +dGCs4xISe6kYi10YyXa50sY7M3J3NSKcTJLIOz7YUF+XN5P1Pu0jphJvRMiqxHwEq0s
+         X1sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749493218; x=1750098018;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3blXDd8YInSQ/c19Uv1xImmNssJZC2qn40udTqZrJH8=;
-        b=APykHRBxGgqfveZg1qRGJgWsX5NXRIYdcW2pHzaHtwnZmEUmm9/PyOSBzNSx1k6hYL
-         XXCCpEoxk2fVm4rQDOt5NwCeEY27Y1d54X9JfdR2dUQWEjdijOEs2BKCGQKXsalhsZTV
-         HEOwbKMwftPwdwg9OBfoZ6VSlMyY8ejeKodwP8knovg63efRhF1K18O/jj+tuab97kWi
-         BspMmufxAo8QdsQoj2cVxwcYonssgmHlGt41K+emN25sZc1vOUKA4fc3GakvJz0+4U4G
-         ZmL0BXlKPohM548/kuWSR7B0Im1X62QRFYoAtYJscMQ6ESFOTpFTTZGhPww1950vV/7X
-         L9Iw==
-X-Forwarded-Encrypted: i=1; AJvYcCWpk7VJ0VVmyACxYUuH4FWv0lNeyavDSoiQ/eEDxhsIcVLFqdkTVmkyS9JwG63be+WOPJk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv8fcuaBeS64nxibPQT46G+AtZ5jO1ltyG+uhrkHjJdCDJ126O
-	tHnDWFQYW1mn9UXyGCl1EDCvdAbrRY+3mwdgFMEPivVS2ByV79MGmi1KUp1Qt9w+eJsRSrFNNC7
-	iHoQIyEJxHNLlINsxWT+VmbmnP7wcVmHiu9XhQgth
-X-Gm-Gg: ASbGncsUA0aokoEVI7IZm3ATCw4ssJyoEYImKjkTl1erpaVq+5Pbq9FClbJHo3YYRvW
-	DDBTjfd7hB0i+vEdW0W5RlraXNWm1Fr0K3vDuJY99RpQV0C9VOL8g3YDkkXtApe8CPnnCnpI9k5
-	9ixHpQpO3QgzwuQrueE93+yyHKMbQAegHyP5XVIA6KYaUrstWUqjnAXQ==
-X-Google-Smtp-Source: AGHT+IG9ztMok/aqL/yvVGIqj8nxbavXUaNllC13qZXPpar9TQggxm6DeKT3NAwmq8GRl8lwhJ95MohJ1nUbYJr/WL4=
-X-Received: by 2002:aa7:d286:0:b0:606:b6da:5028 with SMTP id
- 4fb4d7f45d1cf-607aad5dd84mr154060a12.0.1749493218088; Mon, 09 Jun 2025
- 11:20:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749493554; x=1750098354;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z9qcsdHcsSJ5C6VTefgwjQ8viEabDJHufEh6SESIfaQ=;
+        b=FykGzLiKkwQ03dMWQRR2wulYeJu66Gk4t6KbFpqITvPm+AflGUET7qBnVC8udx4lEb
+         ZcxrBU62hTD1c+zOo1lOG0IWiDY/GRYN3+w5MTtRlGxHgTo85FbeMcpuTPHMmcotWh9e
+         nqufqVHbnWZNYvHa0+3RcCKhl2oJBXFHoKcvUGXuCke+jTodaj703lhdBUW/OOGUbZMH
+         8jv11jO0AhJ6an/zmdwTKBuG7g2QJr9FLNB2pqojtBQNxeF1M1fIiXXTozG6142BbmGn
+         b6T2G7N3UqtSiXChAj+q5Rw0zFN8JGwhEc1M3J+9j3j5ojWTSa6LANvqTj4GyeEfdzWY
+         qysw==
+X-Forwarded-Encrypted: i=1; AJvYcCXQKVOcgb0Fkhbi18NllYN5Sj28oTsaG2XR9mYWkcGIOzcl5xK9TJQArifc2fhYGwhDgiE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcCnEhOxmZqjhSDbCP24hCu5DB7VdEBFshXJKsyAYbhj38GhJ5
+	jZarKvSV5nJWRQVO/k57A9kNeIDlx6EdIA9XEqRcbF4pysIJz3oJ27YhF/1RNQFQnAdObEp9T1R
+	4Kzmw9Q==
+X-Google-Smtp-Source: AGHT+IHwUDbgPx1C4OZ9+5MSRmLvBlj6RD8esNnLDwkHpfWEmmt9w7lnjOzBIl0+4tvkc8ZFnU35qEABdKU=
+X-Received: from pjbqn15.prod.google.com ([2002:a17:90b:3d4f:b0:311:ff0f:6962])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2252:b0:312:25dd:1c86
+ with SMTP id 98e67ed59e1d1-3134730af09mr22498660a91.18.1749493554444; Mon, 09
+ Jun 2025 11:25:54 -0700 (PDT)
+Date: Mon, 9 Jun 2025 11:25:52 -0700
+In-Reply-To: <203f24da-fce0-4646-abed-c6ca657828d1@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20211207095230.53437-1-jiangshanlai@gmail.com>
- <51bb6e75-4f0a-e544-d2e4-ff23c5aa2f49@redhat.com> <4a66adfa-fc10-4668-9986-55f6cf231988@zytor.com>
- <aEbuSmAf4aAHztwC@google.com> <CALMp9eSA0u5+_dPA7-M4oZgqt4sv-qez4fMuZ6S5X4rUp=33xQ@mail.gmail.com>
-In-Reply-To: <CALMp9eSA0u5+_dPA7-M4oZgqt4sv-qez4fMuZ6S5X4rUp=33xQ@mail.gmail.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 9 Jun 2025 11:20:05 -0700
-X-Gm-Features: AX0GCFuZIV6CD7DM3SYh0VfLc_yWYx6NF-Qt3paJZCJhW2qN5kiwzTX3YMaH12Y
-Message-ID: <CALMp9eQOCrUDKoLDokgJ2ZTJQGnhLchdPi=-GWdrOJH6ztEvsQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: X86: Raise #GP when clearing CR0_PG in 64 bit mode
-To: Sean Christopherson <seanjc@google.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Lai Jiangshan <jiangshanlai@gmail.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Lai Jiangshan <laijs@linux.alibaba.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Wanpeng Li <wanpengli@tencent.com>, Joerg Roedel <joro@8bytes.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20250609132347.3254285-2-andrey.zhadchenko@virtuozzo.com>
+ <7ce603ad-33c7-4dcd-9c63-1f724db9978e@redhat.com> <4f19c78f-a843-49c9-8d19-f1dc1e2c4468@virtuozzo.com>
+ <aEcOSd-KBjOW61Rt@google.com> <203f24da-fce0-4646-abed-c6ca657828d1@virtuozzo.com>
+Message-ID: <aEcnMFzh-X7Aofbl@google.com>
+Subject: Re: [PATCH] target/i386: KVM: add hack for Windows vCPU hotplug with SGX
+From: Sean Christopherson <seanjc@google.com>
+To: Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, zhao1.liu@intel.com, mtosatti@redhat.com, 
+	qemu-devel@nongnu.org, kvm@vger.kernel.org, andrey.drobyshev@virtuozzo.com, 
+	"Denis V. Lunev" <den@virtuozzo.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jun 9, 2025 at 11:16=E2=80=AFAM Jim Mattson <jmattson@google.com> w=
-rote:
->
-> On Mon, Jun 9, 2025 at 7:23=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > On Fri, Jun 06, 2025, H. Peter Anvin wrote:
-> > > On 2021-12-09 09:55, Paolo Bonzini wrote:
-> > > > On 12/7/21 10:52, Lai Jiangshan wrote:
-> > > > > From: Lai Jiangshan <laijs@linux.alibaba.com>
-> > > > >
-> > > > > In the SDM:
-> > > > > If the logical processor is in 64-bit mode or if CR4.PCIDE =3D 1,=
- an
-> > > > > attempt to clear CR0.PG causes a general-protection exception (#G=
-P).
-> > > > > Software should transition to compatibility mode and clear CR4.PC=
-IDE
-> > > > > before attempting to disable paging.
-> > > > >
-> > > > > Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> > > > > ---
-> > > > >   arch/x86/kvm/x86.c | 3 ++-
-> > > > >   1 file changed, 2 insertions(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > > index 00f5b2b82909..78c40ac3b197 100644
-> > > > > --- a/arch/x86/kvm/x86.c
-> > > > > +++ b/arch/x86/kvm/x86.c
-> > > > > @@ -906,7 +906,8 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsign=
-ed
-> > > > > long cr0)
-> > > > >           !load_pdptrs(vcpu, kvm_read_cr3(vcpu)))
-> > > > >           return 1;
-> > > > > -    if (!(cr0 & X86_CR0_PG) && kvm_read_cr4_bits(vcpu, X86_CR4_P=
-CIDE))
-> > > > > +    if (!(cr0 & X86_CR0_PG) &&
-> > > > > +        (is_64_bit_mode(vcpu) || kvm_read_cr4_bits(vcpu,
-> > > > > X86_CR4_PCIDE)))
-> > > > >           return 1;
-> > > > >       static_call(kvm_x86_set_cr0)(vcpu, cr0);
-> > > > >
->
-> Isn't this redundant with the "if (cs_l)" check above?
+On Mon, Jun 09, 2025, Andrey Zhadchenko wrote:
+> On 6/9/25 18:39, Sean Christopherson wrote:
+> > On Mon, Jun 09, 2025, Denis V. Lunev wrote:
+> > > > Does anything in edk2 run during the hotplug process (on real hardware
+> > > > it does, because the whole hotplug is managed via SMM)? If so maybe that
+> > > > could be a better place to write the value.
+> > 
+> > Yeah, I would expect firmware to write and lock IA32_FEATURE_CONTROL.
+> > 
+> > > > So many questions, but I'd really prefer to avoid this hack if the only
+> > > > reason for it is SGX...
+> > 
+> > Does your setup actually support SGX?  I.e. expose EPC sections to the guest?
+> > If not, can't you simply disable SGX in CPUID?
+> 
+> We do not have any TYPE_MEMORY_BACKEND_EPC objects in our default config,
+> but have the following:
+> sgx=on,sgx1=on,sgx-debug=on,sgx-mode64=on,sgx-provisionkey=on,sgx-tokenkey=on
+> We found this during testing, and it can be disabled on our testing setup
+> without any worries indeed.
+> I have no data whether someone actually sets it properly in the wild, which
+> may still be possible.
 
-Never mind. That's an attempt to set CR0.PG, not to clear it.
+The reason I ask is because on bare metal, I'm pretty sure SGX is incompatible
+with true CPU hotplug.  It can work for the virtualization case, but I wouldn't
+be all that surprised if the answer here is "don't do that".
 
-> > > > Queued, thanks.
-> > > >
-> > >
-> > > Have you actually checked to see what real CPUs do in this case?
-> >
-> > I have now, and EMR at least behaves as the SDM describes.  Why do you =
-ask?
-> >
-> >
-> > kvm_intel: Clearing CR0.PG faulted (vector =3D 13)
-> >
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index f79604bc0127..f90ad464ab7e 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -8637,6 +8637,23 @@ void vmx_exit(void)
-> >         kvm_x86_vendor_exit();
-> >  }
-> >
-> > +static noinline void vmx_disable_paging(void)
-> > +{
-> > +       unsigned long cr0 =3D native_read_cr0();
-> > +       long vector =3D -1;
-> > +
-> > +       asm volatile("1: mov %1, %%cr0\n\t"
-> > +                    "   mov %2, %%cr0\n\t"
-> > +                    "2:"
-> > +                    _ASM_EXTABLE_FAULT(1b, 2b)
-> > +                    : "+a" (vector)
-> > +                    : "r" (cr0 & ~X86_CR0_PG), "r" (cr0)
-> > +                    : "cc", "memory" );
-> > +
-> > +       pr_warn("Clearing CR0.PG %s (vector =3D %ld)\n",
-> > +               vector < 0 ? "succeeded" : "faulted", vector);
-> > +}
-> > +
-> >  int __init vmx_init(void)
-> >  {
-> >         int r, cpu;
-> > @@ -8644,6 +8661,8 @@ int __init vmx_init(void)
-> >         if (!kvm_is_vmx_supported())
-> >                 return -EOPNOTSUPP;
-> >
-> > +       vmx_disable_paging();
-> > +
-> >         /*
-> >          * Note, hv_init_evmcs() touches only VMX knobs, i.e. there's n=
-othing
-> >          * to unwind if a later step fails.
-> >
+> > > Linux by itself handles this well and assigns MSRs properly (we observe
+> > > corresponding set_msr on the hotplugged CPU).
+> 
+> I think Linux, at least old 4.4, does not write msr on hotplug.
+
+Yeah, it's a newer thing.  5.6+ should initialize IA32_FEATURE_CONTROL if it's
+left unlocked (commit 1db2a6e1e29f ("x86/intel: Initialize IA32_FEAT_CTL MSR at boot").
+
+> Anyway it hotplugs fine and tolerates different value unlike Windows
+
+Heh, probably only because the VM isn't actively using KVM at the time of hotplug.
+In pre-5.6 kernels, i.e. without the aforementioned handling, KVM (in the guest)
+would refuse to load (though the hotplug would still work).  But if the guest is
+actively running (nested) VMs at the time of hotplug, the hotplugged vCPUs would
+hit a #GP when attempting to do VMXON, and would likely crash the kernel.
+
+> > Linux is much more tolerant of oddities, and quite a bit of effort went into
+> > making sure that IA32_FEATURE_CONTROL was initialized if firmware left it unlocked.
+> 
+> Thanks everyone for the ideas. I focused on Windows too much and did not
+> investigate into firmware, so perhaps this is rather a firmware problem?
+> I think by default we are using seaBIOS, not ovmf/edk2. I will update after
+> some testing with different configurations.
+
+Generally speaking, firmware is expected to set and lock IA32_FEATURE_CONTROL.
+But of course firmware doesn't always behave as expected, hence the hardening that
+was added by commit 1db2a6e1e29f to avoid blowing up when running on weird/buggy
+firmware.
+
 
