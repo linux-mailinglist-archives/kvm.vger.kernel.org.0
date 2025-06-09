@@ -1,133 +1,113 @@
-Return-Path: <kvm+bounces-48723-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48724-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D9D2AD18D6
-	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 09:06:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E935BAD1926
+	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 09:41:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22904169C5E
-	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 07:06:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2191B188BF57
+	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 07:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DBD27FB38;
-	Mon,  9 Jun 2025 07:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC1F280CFC;
+	Mon,  9 Jun 2025 07:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hth+lJFS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mVi284ls"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E0011185
-	for <kvm@vger.kernel.org>; Mon,  9 Jun 2025 07:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4D4155342;
+	Mon,  9 Jun 2025 07:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749452800; cv=none; b=Lxz1gxaR+syFWxkbj6hhwRzVMAKLTg/LcgTftU5vApUefz4taMbCwqsJZif5DZJ2Dx2pZ20e9+j4szq+FCV9o5swwwEbZ4ECN7OB/s3X/64RuNEt65UPu6v90Fcvmy0uehgBSZ9aQk28zsGJavWhdetZ9EGJlvkQy3QYIcdNPVg=
+	t=1749454857; cv=none; b=UDOrlf8JzPeimxjfg0ai27/iOtSibJtWz3by/ZuHH8zd1TpuHUoRZ+vWldL7MFAOhG1s2JWewFRRKvu5GXjuT1roSjdq2nlycLlno97xx4VwzT490KE8q6/CZJTcGOM0nurNN8TvpCUnCkZOXrfncKoFOfu1WhaxWKugjBmbFm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749452800; c=relaxed/simple;
-	bh=/nYlTVFkGT0OGtHTSp/hNQUXe1GD1QSrgJLAsAVqlnE=;
+	s=arc-20240116; t=1749454857; c=relaxed/simple;
+	bh=KqiCwPI+FSPcNo01A6kecalaBBX0hvVlFdxywS3rLdU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CAbqMSWQO6hhtbbhVlvzVqfBTBIBm1CIUW+ni0vtLJ6nXdugOIJaaqTczH+pfq42KnrBOy05ZRnKmMTd4thDg6dOuORV1e2KTEIYd2FDz2EebO1riGAplCi5zUtwr7M77Eb8PhNRQ+Lr68DbEjK8/bAKITh8Vqyl3IHAmh6lUKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hth+lJFS; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-47e9fea29easo510491cf.1
-        for <kvm@vger.kernel.org>; Mon, 09 Jun 2025 00:06:39 -0700 (PDT)
+	 To:Cc:Content-Type; b=YXgskU+hu/2Bmbveh4x4MDQTN4D0MiiXEphmgZpG4MtmW9ZXzBRrYOZGwyM2zN3xCPFtRflp5hn/4ArcPGekIWvUtuHyN9E1hmbMkpPalpgvxOvkB29OWl6q0EONjak7kjfbUZ2E+DNtao2Zwhe7Ia8/ihGpt6O8ps7/sPPMTfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mVi284ls; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b26f7d2c1f1so3682165a12.0;
+        Mon, 09 Jun 2025 00:40:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749452798; x=1750057598; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=njmwY/aoE2EHkI0yhj8tKMubAoBenpVg25f6lK/8keo=;
-        b=hth+lJFSHydmbbi17hgU8iLqstIB/4OHC7dLwB6AGUcM3wqjbj2hplV6CBCGCUHg4j
-         24z1Li76yKFWoq+q6RSll0OtQWUJjT8UDXtxgRz28+/WCvBvYtjI51n66st9EXjb9pvM
-         bvxtW54Vff3hfoUVjWPyD5u4eZF5aVKaaeukPuJCxXl/220yBab6jKLC0klScLzN3YxN
-         c3E2WMXsovqxcwEsQA3Qo4AtVQaUsc/XoUyIBmA+5WJY1iD96ZiV+atoe6c1zn+u7GpM
-         wr9uN2iugDS9/jTMoL9KlzfAbNdHdMY1awtQ2YQIeV1EdHiqa6uUXqYSHatey6xcMte5
-         ByFA==
+        d=gmail.com; s=20230601; t=1749454855; x=1750059655; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KqiCwPI+FSPcNo01A6kecalaBBX0hvVlFdxywS3rLdU=;
+        b=mVi284lsoKwheGKBwMEyP/vwa/6SIQGl7nfQgPZD1KQjTmMuqjSylmFzkk96uTAfGc
+         paUHxjESqggW1HqXGzvmt/iip4SZBfa4cAR9ix+cZ/QtfPozUz77XJYVFfCcQuCV06WY
+         YujuQV3q2vvDi66hH2/V+jBVZ7p6f3PnPKUneQSQYpTnOMmTgWqab72mlmzAQ0FBHha6
+         EBbSmmydOtNns91UhTIsq59zalLkAco9DGGgtBhR6LZRBC+bf1gUuftSODybtyWY1m1a
+         hjNujy1jEZkjNj6U3c8X/hc0VWbmwpb4PK71vgbxNOGqN3y0UtTH+3xbAB4qiqxOY9Mq
+         b4XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749452798; x=1750057598;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=njmwY/aoE2EHkI0yhj8tKMubAoBenpVg25f6lK/8keo=;
-        b=O9gIJrZF3bgANYVziBBoFGIEUKi26v5Lu3x4i77zZyRXi9xI67y6pYf28317aoYIhG
-         /lQ0Uj6EaraeIJ/nk62MM9G43tZdRGNtIhwZUPyxS0cTvBeRn2OOyhLLGPhPtzruX32I
-         6GLBPvvA+hhfa70uh4s0KU2DmecAWwZISE32GbsxmHiI9h/ab2teVm7hw0TNXnbVxAHs
-         N4OHLVQQh60EDv6thROWxvpsnuswLbr4p/s0lq/TznRMKzUh0eKyo/iZA9NE75gIdUbr
-         38qJ+NEBZo0t0fgzTQwmzdOYo526QzfbINHRArdqx2lb0rQIXSCIgvp7b5za/k/TSFR7
-         9QmA==
-X-Gm-Message-State: AOJu0YxmiUzteh3KWsZ7anKoiWtIgxC7AiMgnBzIc9Wju42FyFNyJg00
-	Oom0No8FB2gHP8oyAYze5aYmg+lBh50+8JeiOTMOYAKkLmAMWqVkrd1Ej9QPdLcd5VG3G8d60B2
-	iRz+VEowXSiB/b10DAUXT1BHmOFpbzGNqTTPA7/6b
-X-Gm-Gg: ASbGncvYjFb7WMBL7PDC3YOQ57Fl8xKxGf5ptsd4XXXGFCtAeiMcZ4JIepV2TJ0WyFV
-	ufE7Qf7KF7rFgWoFFbAxXGdvWYTiroShfQi7czNmUzTNO7W66Un9Ms1v6C0NyKcs7sFUzGBCefb
-	ftwH2vxE7XLn63e7a2HL5f69o5w/+1LO1ITIX2t0lrjGcwheMyza5TKw==
-X-Google-Smtp-Source: AGHT+IGchZ7SLhMAZ8W5hxY3EegUp7fjwAy75x4g922pGqe4NGnjJFDVi+3Q9Wgft0rlGl/fT20Fa5nQRkS1NNQ9g2g=
-X-Received: by 2002:a05:622a:309:b0:494:b06f:7495 with SMTP id
- d75a77b69052e-4a6efa728a3mr5651671cf.24.1749452797818; Mon, 09 Jun 2025
- 00:06:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749454855; x=1750059655;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KqiCwPI+FSPcNo01A6kecalaBBX0hvVlFdxywS3rLdU=;
+        b=cYP8QG6wqh5HbeNBUzUYxelxmyzz6l8J+l38tBDlh+zbhN9vrbWY69eEjd/HbnFzcQ
+         tluf54KC+BZmxfCw7ToyrRadc7sdX40D2pmCbiekWUh7GymIwyzvAYDU+hjy48joqtMf
+         7wplasU3X6rBeL6DBXubNqfo6TKWPpIxThrfxbZHMaNd06lBtn+fU25gYmWqVpvGeU5e
+         gHO4lxZUtBYBRjDaUt5Tn8SH/OpyXsbo4jPxnquBkg1On8VwMpdie9mPQO2HCkGrBU1j
+         yio+J7P//rHZfyaykrwRTDireGb0kFiXv5vf8TXBgxU4tRylI4y2TmDtSawx6yM2rYDc
+         G5aA==
+X-Forwarded-Encrypted: i=1; AJvYcCXcA8wDGVnHdqJi2GXqeRGJZjnSX3m+o1ARYu1nK5YWo0YvvV5tHQuWRaYONQc12kYVR2Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP0gKPKrvzkHTTYr8v9V4SjyjwKkRSEkV9VrRSDXOusYa9n8wP
+	fUk/Wiv80MTeq2yz9wV9Ap5DnPXu2KB+KGT26DPDU8Em5/FpByy/HDu3+uF3Z9kazb/sOO9/C0y
+	hAHOlU1dd/rocu6WLkYrgL89CO9lubsk=
+X-Gm-Gg: ASbGncvTTVBKsphzFokg7PNlSWsi5aZv0d9IqP1Kli/didSZ0UeR+Bir1TaffpOo/ow
+	dqiJhQSUL8KQzaG/FSZ3HN+XOwMH2OkXz4v8UwQ8paKfXk8ykvhJIYgAuAj5PCslJ6lKiAKnWv2
+	hQxR6pp4pUHYCZ1BzHnCMOjivyQmxrRWRvwLPl+268TnUFBA8Oiqh73cumFqLIXQ==
+X-Google-Smtp-Source: AGHT+IGbFNXPkYqjZQqn09iVOchn6k5QUdAnNSlPs/XMUCroRdwdeP0hZZnbbuyNPdHKkr8WmeI3Qu5L264jB2MsXOA=
+X-Received: by 2002:a17:90b:2ecc:b0:311:e5b2:356b with SMTP id
+ 98e67ed59e1d1-313472e9005mr18838455a91.11.1749454855433; Mon, 09 Jun 2025
+ 00:40:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250605153800.557144-1-tabba@google.com> <20250605153800.557144-19-tabba@google.com>
- <df4bfc32-d395-4f0b-8664-5c65e05f5af0@redhat.com>
-In-Reply-To: <df4bfc32-d395-4f0b-8664-5c65e05f5af0@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 9 Jun 2025 08:06:01 +0100
-X-Gm-Features: AX0GCFtgC2aghzzNsqRBIEjFjyqySUxgD1FLhPdmCAmQ5m2-5RHKx5fP1W3VLwk
-Message-ID: <CA+EHjTxoBSpcLUVDhSq=0dmvP9znKqPRtN-mDZ2YTP+6un8NVA@mail.gmail.com>
-Subject: Re: [PATCH v11 18/18] KVM: selftests: guest_memfd mmap() test when
- mapping is allowed
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
+References: <20250514071803.209166-1-Neeraj.Upadhyay@amd.com> <20250514071803.209166-32-Neeraj.Upadhyay@amd.com>
+In-Reply-To: <20250514071803.209166-32-Neeraj.Upadhyay@amd.com>
+From: Tianyu Lan <ltykernel@gmail.com>
+Date: Mon, 9 Jun 2025 15:40:19 +0800
+X-Gm-Features: AX0GCFuisu29_xcex8CdM2Yk411ctfB6p7VWrMziyFkU93Q6Yrxgj1z1d3n-g9A
+Message-ID: <CAMvTesCSX1g8Ttzjn4PhfcWSYUdAcCUV9hfJd_TPQzek24K1LA@mail.gmail.com>
+Subject: Re: [RFC PATCH v6 31/32] x86/sev: Prevent SECURE_AVIC_CONTROL MSR
+ interception for Secure AVIC guests
+To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, 
+	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
+	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
+	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, 
+	hpa@zytor.com, peterz@infradead.org, seanjc@google.com, pbonzini@redhat.com, 
+	kvm@vger.kernel.org, kirill.shutemov@linux.intel.com, huibo.wang@amd.com, 
+	naveen.rao@amd.com, francescolavra.fl@gmail.com, tiala@microsoft.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 9 Jun 2025 at 00:44, Gavin Shan <gshan@redhat.com> wrote:
+On Wed, May 14, 2025 at 3:33=E2=80=AFPM Neeraj Upadhyay <Neeraj.Upadhyay@am=
+d.com> wrote:
 >
-> On 6/6/25 1:38 AM, Fuad Tabba wrote:
-> > Expand the guest_memfd selftests to include testing mapping guest
-> > memory for VM types that support it.
-> >
-> > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >   .../testing/selftests/kvm/guest_memfd_test.c  | 201 ++++++++++++++++--
-> >   1 file changed, 180 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-> > index 341ba616cf55..1612d3adcd0d 100644
-> > --- a/tools/testing/selftests/kvm/guest_memfd_test.c
-> > +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-> > @@ -13,6 +13,8 @@
-> >
+> The SECURE_AVIC_CONTROL MSR holds the GPA of the guest APIC backing
+> page and bitfields to control enablement of Secure AVIC and NMI by
+> guest vCPUs. This MSR is populated by the guest and the hypervisor
+> should not intercept it. A #VC exception will be generated otherwise.
+> If this occurs and Secure AVIC is enabled, terminate guest execution.
 >
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+> ---
 
+Reviewed-by: Tianyu Lan <tiala@microsoft.com>
 
-Thanks for the reviews!
-/fuad
+--=20
+Thanks
+Tianyu Lan
 
