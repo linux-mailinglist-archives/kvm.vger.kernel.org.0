@@ -1,64 +1,65 @@
-Return-Path: <kvm+bounces-48754-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48752-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5DEEAD2673
-	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 21:14:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83D4BAD266E
+	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 21:14:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A25CF16FA8C
-	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 19:14:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 084443B0B94
+	for <lists+kvm@lfdr.de>; Mon,  9 Jun 2025 19:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5E6221284;
-	Mon,  9 Jun 2025 19:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E6A21FF4C;
+	Mon,  9 Jun 2025 19:13:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a8kl45Jh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VeTNzltA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DEEB21FF28;
-	Mon,  9 Jun 2025 19:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44EEB21CC49;
+	Mon,  9 Jun 2025 19:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749496439; cv=none; b=qXPX5E4iHZ5QQTsm+Ih7Wo+kYkh0DHM8Ti46AZuYITiWEPru50bWH8ZQeKE5V7u+ABD+labXACpDEEM1DrWnDZcXUxzguKEyts/ZRw1JKt8UQJrRxx8oWVnvZqT3OV3ArmSmKuf89r1O/EbHmHBoW+fhXvB3d1+3LqJnWhCW/n0=
+	t=1749496437; cv=none; b=LzhABjXeffwUoi5GPL+tyP02Vf5hXERBR/3CjdCHixZY6LeiUpqWf2NZW5HaDc9mCyrEV6MLLCkkJkHiyZaBSNx6aeF0zM9JfxRKNKb0uVzS9NEATj+yC4abhk7ZxIHjDLXPW8lqiRmwncmhsG3AHatMOux6kFv4CM43pSbMwCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749496439; c=relaxed/simple;
-	bh=O1bp7xsLN/UiMI3ANXWRO48aEkLc2NgOL4Ewkr+3Pbk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xih4XfnRv44TsgR/WwWvAReLbQVb1oHL21bytqBRkbbPEIRKaXNYP7Fa3VMSYvy0CwfXoyFktxWWUW1npamcUoYG2crHqsMVBWM4CaTtqjx1hBPYU/TGmF3fDrMFWsQ37/7tUftY9NPjVd1L/8QU7/28LBQgyEb++q707+3ayqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.helo=mgamail.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a8kl45Jh; arc=none smtp.client-ip=192.198.163.14
+	s=arc-20240116; t=1749496437; c=relaxed/simple;
+	bh=nB6JOQr5Y06aT/tqLGB1sCtZdJ11IaKemE4Y42Ams54=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=iF5XaBWxX/KJQHWGPpxnGHHVJUNx6TvZ/FmITOBf226/gTCYLhqiLd5hXtsI+chFfZ9c0OVycQr3ava2evqmLM7mpNINWRNEs9+vxqDuyJ764JxWdBsRdmWnGduYDb5AhFMqvDy+HKl5bHYMhrGWtVeYbboXUESfuS0IIGRCJuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.helo=mgamail.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VeTNzltA; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.helo=mgamail.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749496437; x=1781032437;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=O1bp7xsLN/UiMI3ANXWRO48aEkLc2NgOL4Ewkr+3Pbk=;
-  b=a8kl45JhTB+8++Qjgdva8Jbq4SPokvdBACL0lws9OaSE3gVyUNXBj6zJ
-   N+xC9GnLsoVqH9H1eFA6j4Jr9MWwYuTlVuEtvgDzjAGvuJR9vm8idGksf
-   pyK2/jcLuuCZctgTALXHtMwWeIh+qE6xsRfMTcch4/w/LmJJ8hKo4B8+7
-   ws6zbtBwx0LbQHc1oWr+VzYwOTwbPQMAEdhm5yejOAmwmAUaBi3KH22q9
-   j9w8FXm5IC36fdFXj5dq8fvbsvjbVGKWWUJ/9nOAxmGcnchRDOj0hoK2j
-   XbYkJN6XIEKXVNO2/VH/Y3C/rw0gfUk7Ymm12Qzz8kToVSewDCybr5ifx
-   Q==;
-X-CSE-ConnectionGUID: qcoV/cKjQqGAUU/ZVlotuA==
-X-CSE-MsgGUID: VZPn9mGvSE2EkjKmWWZASg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="51681757"
+  t=1749496435; x=1781032435;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=nB6JOQr5Y06aT/tqLGB1sCtZdJ11IaKemE4Y42Ams54=;
+  b=VeTNzltAKVaUW95oMo9ku8JGDfAWXUgibLVnCwLkuBhNEWsEXr7QEv0r
+   fToWHwE4vRLewWxyX85yGSxpS1mb7WLkRkp5N1UOISFS1ep6iFMTTVxxq
+   kO1Kvyx3xzqUnrPE3MPM8WosQ2lQ9Agk7TOlSZaEmiGdTj9hjBixiii+q
+   vejxLCx6TYr7xCXrjAiuC0QjYkjDe9WNe5FUWyDt91m9lDugYlr/vI6lD
+   KAUSxvCLTcpfC6cLBtHUuKHDk4ctmvgYG/Pqx+RWGdn/47Bq5dnwW7cRk
+   gxiU5n0XWFsBhP8e+yE2sEoDciov2R9MLd70UOhzuAnNs8C3KdXkCWTmd
+   w==;
+X-CSE-ConnectionGUID: 7ep67eexRbmkQG7+kiVmYg==
+X-CSE-MsgGUID: LAY2nM/VTsGsgQNVLGvZoA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="51467248"
 X-IronPort-AV: E=Sophos;i="6.16,223,1744095600"; 
-   d="scan'208";a="51681757"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 12:13:55 -0700
-X-CSE-ConnectionGUID: /k77bWelTqejoOGl2klrTQ==
-X-CSE-MsgGUID: JG2hYnBuTWeq7PE0K6f9mg==
+   d="scan'208";a="51467248"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 12:13:55 -0700
+X-CSE-ConnectionGUID: KnXjtD1HTS61h5p+hpvigQ==
+X-CSE-MsgGUID: A1iYLt12TLKcjJbCzm3L5Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,223,1744095600"; 
-   d="scan'208";a="147174161"
+   d="scan'208";a="147562156"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa007.jf.intel.com with ESMTP; 09 Jun 2025 12:13:51 -0700
+  by orviesa008.jf.intel.com with ESMTP; 09 Jun 2025 12:13:51 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id E84151D2; Mon, 09 Jun 2025 22:13:48 +0300 (EEST)
+	id 01662168; Mon, 09 Jun 2025 22:13:48 +0300 (EEST)
 From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -76,10 +77,12 @@ Cc: rick.p.edgecombe@intel.com,
 	linux-coco@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCHv2 00/12] TDX: Enable Dynamic PAMT
-Date: Mon,  9 Jun 2025 22:13:28 +0300
-Message-ID: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
+Subject: [PATCHv2 01/12] x86/tdx: Consolidate TDX error handling
+Date: Mon,  9 Jun 2025 22:13:29 +0300
+Message-ID: <20250609191340.2051741-2-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
+References: <20250609191340.2051741-1-kirill.shutemov@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,191 +91,251 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset enables Dynamic PAMT in TDX. Please review.
+Move all (host, kvm, guest) code related to TDX error handling into
+<asm/tdx_errno.h>.
 
-Previously, we thought it can get upstreamed after huge page support, but
-huge pages require support on guestmemfd side which might take time to hit
-upstream. Dynamic PAMT doesn't have dependencies.
+Add inline functions to check errors.
 
-The patchset can be found here:
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ arch/x86/coco/tdx/tdx.c                       |  6 +-
+ arch/x86/include/asm/tdx.h                    | 21 +------
+ arch/x86/{kvm/vmx => include/asm}/tdx_errno.h | 60 +++++++++++++++++--
+ arch/x86/kvm/vmx/tdx.c                        | 18 ++----
+ arch/x86/kvm/vmx/tdx.h                        |  1 -
+ 5 files changed, 63 insertions(+), 43 deletions(-)
+ rename arch/x86/{kvm/vmx => include/asm}/tdx_errno.h (52%)
 
-git://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git tdx/dpamt
-
-==========================================================================
-
-The Physical Address Metadata Table (PAMT) holds TDX metadata for
-physical memory and must be allocated by the kernel during TDX module
-initialization.
-
-The exact size of the required PAMT memory is determined by the TDX
-module and may vary between TDX module versions, but currently it is
-approximately 0.4% of the system memory. This is a significant
-commitment, especially if it is not known upfront whether the machine
-will run any TDX guests.
-
-The Dynamic PAMT feature reduces static PAMT allocations. PAMT_1G and
-PAMT_2M levels are still allocated on TDX module initialization, but the
-PAMT_4K level is allocated dynamically, reducing static allocations to
-approximately 0.004% of the system memory.
-
-PAMT memory is dynamically allocated as pages gain TDX protections.
-It is reclaimed when TDX protections have been removed from all
-pages in a contiguous area.
-
-Dynamic PAMT support in TDX module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Dynamic PAMT is a TDX feature that allows VMM to allocate PAMT_4K as
-needed. PAMT_1G and PAMT_2M are still allocated statically at the time of
-TDX module initialization. At init stage allocation of PAMT_4K is replaced
-with PAMT_PAGE_BITMAP which currently requires one bit of memory per 4k.
-
-VMM is responsible for allocating and freeing PAMT_4K. There's a couple of
-new SEAMCALLs for this: TDH.PHYMEM.PAMT.ADD and TDH.PHYMEM.PAMT.REMOVE.
-They add/remove PAMT memory in form of page pair. There's no requirement
-for these pages to be contiguous.
-
-Page pair supplied via TDH.PHYMEM.PAMT.ADD will cover specified 2M region.
-It allows any 4K from the region to be usable by TDX module.
-
-With Dynamic PAMT, a number of SEAMCALLs can now fail due to missing PAMT
-memory (TDX_MISSING_PAMT_PAGE_PAIR):
-
- - TDH.MNG.CREATE
- - TDH.MNG.ADDCX
- - TDH.VP.ADDCX
- - TDH.VP.CREATE
- - TDH.MEM.PAGE.ADD
- - TDH.MEM.PAGE.AUG
- - TDH.MEM.PAGE.DEMOTE
- - TDH.MEM.PAGE.RELOCATE
-
-Basically, if you supply memory to a TD, this memory has to backed by PAMT
-memory.
-
-Once no TD uses the 2M range, the PAMT page pair can be reclaimed with
-TDH.PHYMEM.PAMT.REMOVE.
-
-TDX module track PAMT memory usage and can give VMM a hint that PAMT
-memory can be removed. Such hint is provided from all SEAMCALLs that
-removes memory from TD:
-
- - TDH.MEM.SEPT.REMOVE
- - TDH.MEM.PAGE.REMOVE
- - TDH.MEM.PAGE.PROMOTE
- - TDH.MEM.PAGE.RELOCATE
- - TDH.PHYMEM.PAGE.RECLAIM
-
-With Dynamic PAMT, TDH.MEM.PAGE.DEMOTE takes PAMT page pair as additional
-input to populate PAMT_4K on split. TDH.MEM.PAGE.PROMOTE returns no longer
-needed PAMT page pair.
-
-PAMT memory is global resource and not tied to a specific TD. TDX modules
-maintains PAMT memory in a radix tree addressed by physical address. Each
-entry in the tree can be locked with shared or exclusive lock. Any
-modification of the tree requires exclusive lock.
-
-Any SEAMCALL that takes explicit HPA as an argument will walk the tree
-taking shared lock on entries. It required to make sure that the page
-pointed by HPA is of compatible type for the usage.
-
-TDCALLs don't take PAMT locks as none of the take HPA as an argument.
-
-Dynamic PAMT enabling in kernel
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Kernel maintains refcounts for every 2M regions with two helpers
-tdx_pamt_get() and tdx_pamt_put().
-
-The refcount represents number of users for the PAMT memory in the region.
-Kernel calls TDH.PHYMEM.PAMT.ADD on 0->1 transition and
-TDH.PHYMEM.PAMT.REMOVE on transition 1->0.
-
-The function tdx_alloc_page() allocates a new page and ensures that it is
-backed by PAMT memory. Pages allocated in this manner are ready to be used
-for a TD. The function tdx_free_page() frees the page and releases the
-PAMT memory for the 2M region if it is no longer needed.
-
-PAMT memory gets allocated as part of TD init, VCPU init, on populating
-SEPT tree and adding guest memory (both during TD build and via AUG on
-accept). Splitting 2M page into 4K also requires PAMT memory.
-
-PAMT memory removed on reclaim of control pages and guest memory.
-
-Populating PAMT memory on fault and on split is tricky as kernel cannot
-allocate memory from the context where it is needed. These code paths use
-pre-allocated PAMT memory pools.
-
-Previous attempt on Dynamic PAMT enabling
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The initial attempt at kernel enabling was quite different. It was built
-around lazy PAMT allocation: only trying to add a PAMT page pair if a
-SEAMCALL fails due to a missing PAMT and reclaiming it based on hints
-provided by the TDX module.
-
-The motivation was to avoid duplicating the PAMT memory refcounting that
-the TDX module does on the kernel side.
-
-This approach is inherently more racy as there is no serialization of
-PAMT memory add/remove against SEAMCALLs that add/remove memory for a TD.
-Such serialization would require global locking, which is not feasible.
-
-This approach worked, but at some point it became clear that it could not
-be robust as long as the kernel avoids TDX_OPERAND_BUSY loops.
-TDX_OPERAND_BUSY will occur as a result of the races mentioned above.
-
-This approach was abandoned in favor of explicit refcounting.
-
-v2:
- - Drop phys_prepare/clenup. Use kvm_get_running_vcpu() to reach per-VCPU PAMT
-   memory pool from TDX code instead.
- - Move code that allocates/frees PAMT out of KVM;
- - Allocate refcounts per-memblock, not per-TDMR;
- - Fix free_pamt_metadata() for machines without Dynamic PAMT;
- - Fix refcounting in tdx_pamt_put() error path;
- - Export functions where they are used;
- - Consolidate TDX error handling code;
- - Add documentation for Dynamic PAMT;
- - Mark /proc/meminfo patch [NOT-FOR-UPSTREAM];
-Kirill A. Shutemov (12):
-  x86/tdx: Consolidate TDX error handling
-  x86/virt/tdx: Allocate page bitmap for Dynamic PAMT
-  x86/virt/tdx: Allocate reference counters for PAMT memory
-  x86/virt/tdx: Add tdx_alloc/free_page() helpers
-  KVM: TDX: Allocate PAMT memory in __tdx_td_init()
-  KVM: TDX: Allocate PAMT memory in tdx_td_vcpu_init()
-  KVM: TDX: Preallocate PAMT pages to be used in page fault path
-  KVM: TDX: Handle PAMT allocation in fault path
-  KVM: TDX: Reclaim PAMT memory
-  [NOT-FOR-UPSTREAM] x86/virt/tdx: Account PAMT memory and print it in
-    /proc/meminfo
-  x86/virt/tdx: Enable Dynamic PAMT
-  Documentation/x86: Add documentation for TDX's Dynamic PAMT
-
- Documentation/arch/x86/tdx.rst              | 108 ++++++
- arch/x86/coco/tdx/tdx.c                     |   6 +-
- arch/x86/include/asm/kvm_host.h             |   2 +
- arch/x86/include/asm/set_memory.h           |   3 +
- arch/x86/include/asm/tdx.h                  |  40 ++-
- arch/x86/include/asm/tdx_errno.h            |  96 +++++
- arch/x86/include/asm/tdx_global_metadata.h  |   1 +
- arch/x86/kvm/mmu/mmu.c                      |   7 +
- arch/x86/kvm/vmx/tdx.c                      | 102 ++++--
- arch/x86/kvm/vmx/tdx.h                      |   1 -
- arch/x86/kvm/vmx/tdx_errno.h                |  40 ---
- arch/x86/mm/Makefile                        |   2 +
- arch/x86/mm/meminfo.c                       |  11 +
- arch/x86/mm/pat/set_memory.c                |   2 +-
- arch/x86/virt/vmx/tdx/tdx.c                 | 380 +++++++++++++++++++-
- arch/x86/virt/vmx/tdx/tdx.h                 |   5 +-
- arch/x86/virt/vmx/tdx/tdx_global_metadata.c |   3 +
- virt/kvm/kvm_main.c                         |   1 +
- 18 files changed, 702 insertions(+), 108 deletions(-)
- create mode 100644 arch/x86/include/asm/tdx_errno.h
- delete mode 100644 arch/x86/kvm/vmx/tdx_errno.h
- create mode 100644 arch/x86/mm/meminfo.c
-
+diff --git a/arch/x86/coco/tdx/tdx.c b/arch/x86/coco/tdx/tdx.c
+index edab6d6049be..6505bfcd2a0d 100644
+--- a/arch/x86/coco/tdx/tdx.c
++++ b/arch/x86/coco/tdx/tdx.c
+@@ -33,10 +33,6 @@
+ #define VE_GET_PORT_NUM(e)	((e) >> 16)
+ #define VE_IS_IO_STRING(e)	((e) & BIT(4))
+ 
+-/* TDX Module call error codes */
+-#define TDCALL_RETURN_CODE(a)	((a) >> 32)
+-#define TDCALL_INVALID_OPERAND	0xc0000100
+-
+ #define TDREPORT_SUBTYPE_0	0
+ 
+ static atomic_long_t nr_shared;
+@@ -127,7 +123,7 @@ int tdx_mcall_get_report0(u8 *reportdata, u8 *tdreport)
+ 
+ 	ret = __tdcall(TDG_MR_REPORT, &args);
+ 	if (ret) {
+-		if (TDCALL_RETURN_CODE(ret) == TDCALL_INVALID_OPERAND)
++		if (tdx_operand_invalid(ret))
+ 			return -EINVAL;
+ 		return -EIO;
+ 	}
+diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+index 26ffc792e673..9649308bd9c0 100644
+--- a/arch/x86/include/asm/tdx.h
++++ b/arch/x86/include/asm/tdx.h
+@@ -10,28 +10,9 @@
+ #include <asm/errno.h>
+ #include <asm/ptrace.h>
+ #include <asm/trapnr.h>
++#include <asm/tdx_errno.h>
+ #include <asm/shared/tdx.h>
+ 
+-/*
+- * SW-defined error codes.
+- *
+- * Bits 47:40 == 0xFF indicate Reserved status code class that never used by
+- * TDX module.
+- */
+-#define TDX_ERROR			_BITUL(63)
+-#define TDX_NON_RECOVERABLE		_BITUL(62)
+-#define TDX_SW_ERROR			(TDX_ERROR | GENMASK_ULL(47, 40))
+-#define TDX_SEAMCALL_VMFAILINVALID	(TDX_SW_ERROR | _UL(0xFFFF0000))
+-
+-#define TDX_SEAMCALL_GP			(TDX_SW_ERROR | X86_TRAP_GP)
+-#define TDX_SEAMCALL_UD			(TDX_SW_ERROR | X86_TRAP_UD)
+-
+-/*
+- * TDX module SEAMCALL leaf function error codes
+- */
+-#define TDX_SUCCESS		0ULL
+-#define TDX_RND_NO_ENTROPY	0x8000020300000000ULL
+-
+ #ifndef __ASSEMBLER__
+ 
+ #include <uapi/asm/mce.h>
+diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/include/asm/tdx_errno.h
+similarity index 52%
+rename from arch/x86/kvm/vmx/tdx_errno.h
+rename to arch/x86/include/asm/tdx_errno.h
+index 6ff4672c4181..d418934176e2 100644
+--- a/arch/x86/kvm/vmx/tdx_errno.h
++++ b/arch/x86/include/asm/tdx_errno.h
+@@ -1,14 +1,13 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /* architectural status code for SEAMCALL */
+ 
+-#ifndef __KVM_X86_TDX_ERRNO_H
+-#define __KVM_X86_TDX_ERRNO_H
+-
+-#define TDX_SEAMCALL_STATUS_MASK		0xFFFFFFFF00000000ULL
++#ifndef _X86_TDX_ERRNO_H
++#define _X86_TDX_ERRNO_H
+ 
+ /*
+  * TDX SEAMCALL Status Codes (returned in RAX)
+  */
++#define TDX_SUCCESS				0ULL
+ #define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
+ #define TDX_NON_RECOVERABLE_TD			0x4000000200000000ULL
+ #define TDX_NON_RECOVERABLE_TD_NON_ACCESSIBLE	0x6000000500000000ULL
+@@ -17,6 +16,7 @@
+ #define TDX_OPERAND_INVALID			0xC000010000000000ULL
+ #define TDX_OPERAND_BUSY			0x8000020000000000ULL
+ #define TDX_PREVIOUS_TLB_EPOCH_BUSY		0x8000020100000000ULL
++#define TDX_RND_NO_ENTROPY			0x8000020300000000ULL
+ #define TDX_PAGE_METADATA_INCORRECT		0xC000030000000000ULL
+ #define TDX_VCPU_NOT_ASSOCIATED			0x8000070200000000ULL
+ #define TDX_KEY_GENERATION_FAILED		0x8000080000000000ULL
+@@ -37,4 +37,54 @@
+ #define TDX_OPERAND_ID_SEPT			0x92
+ #define TDX_OPERAND_ID_TD_EPOCH			0xa9
+ 
+-#endif /* __KVM_X86_TDX_ERRNO_H */
++#define TDX_STATUS_MASK				0xFFFFFFFF00000000ULL
++
++/*
++ * SW-defined error codes.
++ *
++ * Bits 47:40 == 0xFF indicate Reserved status code class that never used by
++ * TDX module.
++ */
++#define TDX_ERROR				_BITULL(63)
++#define TDX_NON_RECOVERABLE			_BITULL(62)
++#define TDX_SW_ERROR				(TDX_ERROR | GENMASK_ULL(47, 40))
++#define TDX_SEAMCALL_VMFAILINVALID		(TDX_SW_ERROR | _UL(0xFFFF0000))
++
++#define TDX_SEAMCALL_GP				(TDX_SW_ERROR | X86_TRAP_GP)
++#define TDX_SEAMCALL_UD				(TDX_SW_ERROR | X86_TRAP_UD)
++
++#ifndef __ASSEMBLER__
++#include <linux/bits.h>
++#include <linux/types.h>
++
++static inline u64 tdx_status(u64 err)
++{
++	return err & TDX_STATUS_MASK;
++}
++
++static inline bool tdx_sw_error(u64 err)
++{
++	return (err & TDX_SW_ERROR) == TDX_SW_ERROR;
++}
++
++static inline bool tdx_success(u64 err)
++{
++	return tdx_status(err) == TDX_SUCCESS;
++}
++
++static inline bool tdx_rnd_no_entropy(u64 err)
++{
++	return tdx_status(err) == TDX_RND_NO_ENTROPY;
++}
++
++static inline bool tdx_operand_invalid(u64 err)
++{
++	return tdx_status(err) == TDX_OPERAND_INVALID;
++}
++
++static inline bool tdx_operand_busy(u64 err)
++{
++	return tdx_status(err) == TDX_OPERAND_BUSY;
++}
++#endif /* __ASSEMBLER__ */
++#endif /* _X86_TDX_ERRNO_H */
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index b952bc673271..7a48bd901536 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -202,12 +202,6 @@ static DEFINE_MUTEX(tdx_lock);
+ 
+ static atomic_t nr_configured_hkid;
+ 
+-static bool tdx_operand_busy(u64 err)
+-{
+-	return (err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_BUSY;
+-}
+-
+-
+ /*
+  * A per-CPU list of TD vCPUs associated with a given CPU.
+  * Protected by interrupt mask. Only manipulated by the CPU owning this per-CPU
+@@ -895,7 +889,7 @@ static __always_inline u32 tdx_to_vmx_exit_reason(struct kvm_vcpu *vcpu)
+ 	struct vcpu_tdx *tdx = to_tdx(vcpu);
+ 	u32 exit_reason;
+ 
+-	switch (tdx->vp_enter_ret & TDX_SEAMCALL_STATUS_MASK) {
++	switch (tdx_status(tdx->vp_enter_ret)) {
+ 	case TDX_SUCCESS:
+ 	case TDX_NON_RECOVERABLE_VCPU:
+ 	case TDX_NON_RECOVERABLE_TD:
+@@ -1957,7 +1951,7 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+ 	 * Handle TDX SW errors, including TDX_SEAMCALL_UD, TDX_SEAMCALL_GP and
+ 	 * TDX_SEAMCALL_VMFAILINVALID.
+ 	 */
+-	if (unlikely((vp_enter_ret & TDX_SW_ERROR) == TDX_SW_ERROR)) {
++	if (tdx_sw_error(vp_enter_ret)) {
+ 		KVM_BUG_ON(!kvm_rebooting, vcpu->kvm);
+ 		goto unhandled_exit;
+ 	}
+@@ -1982,7 +1976,7 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+ 	}
+ 
+ 	WARN_ON_ONCE(exit_reason.basic != EXIT_REASON_TRIPLE_FAULT &&
+-		     (vp_enter_ret & TDX_SEAMCALL_STATUS_MASK) != TDX_SUCCESS);
++		     !tdx_success(vp_enter_ret));
+ 
+ 	switch (exit_reason.basic) {
+ 	case EXIT_REASON_TRIPLE_FAULT:
+@@ -2428,7 +2422,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+ 	err = tdh_mng_create(&kvm_tdx->td, kvm_tdx->hkid);
+ 	mutex_unlock(&tdx_lock);
+ 
+-	if (err == TDX_RND_NO_ENTROPY) {
++	if (tdx_rnd_no_entropy(err)) {
+ 		ret = -EAGAIN;
+ 		goto free_packages;
+ 	}
+@@ -2470,7 +2464,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+ 	kvm_tdx->td.tdcs_pages = tdcs_pages;
+ 	for (i = 0; i < kvm_tdx->td.tdcs_nr_pages; i++) {
+ 		err = tdh_mng_addcx(&kvm_tdx->td, tdcs_pages[i]);
+-		if (err == TDX_RND_NO_ENTROPY) {
++		if (tdx_rnd_no_entropy(err)) {
+ 			/* Here it's hard to allow userspace to retry. */
+ 			ret = -EAGAIN;
+ 			goto teardown;
+@@ -2483,7 +2477,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+ 	}
+ 
+ 	err = tdh_mng_init(&kvm_tdx->td, __pa(td_params), &rcx);
+-	if ((err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_INVALID) {
++	if (tdx_operand_invalid(err)) {
+ 		/*
+ 		 * Because a user gives operands, don't warn.
+ 		 * Return a hint to the user because it's sometimes hard for the
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index 51f98443e8a2..dba23f1d21cb 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -3,7 +3,6 @@
+ #define __KVM_X86_VMX_TDX_H
+ 
+ #include "tdx_arch.h"
+-#include "tdx_errno.h"
+ 
+ #ifdef CONFIG_KVM_INTEL_TDX
+ #include "common.h"
 -- 
 2.47.2
 
