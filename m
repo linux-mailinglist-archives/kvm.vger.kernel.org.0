@@ -1,112 +1,103 @@
-Return-Path: <kvm+bounces-48857-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48858-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A34D8AD430B
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:43:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E46B7AD430D
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:43:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 138E53A4365
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:42:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27277174B02
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1322E26463B;
-	Tue, 10 Jun 2025 19:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A716226463B;
+	Tue, 10 Jun 2025 19:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zOQqV61y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1yddMFPH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E129623183E
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAB123183E
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749584594; cv=none; b=XamHFQMoHVY7O2Pz7jwYRm0ez9a7mV8lrQBjAkiNsnCvRy9VzUbJsgUQz4dCZ5SMiLA/wFMczlI4OS09zsGyZNodQqB1G7L4TyXEMqM+0lSYTk5PIxf2nuo6IhSecIJyW1j8Mq2+YmZPdw48lWARGbY5pV37LH2v4rah7jIJpWM=
+	t=1749584600; cv=none; b=LsEo5FXgatbbFsA7nURLrxh4FMwYPMCxa+nXZQ5tEcTuGvZ8kTkv/Tdd6RScB2koYtvq0BnhB2AbANAyJhPpEh7hEtbfzG9XoV0eWAfDBI/8Blxfau+RuJwn8jyacHlv0SNRVOmmmLvFTnMN/lfFINMHPNHuJ1yT8v2LAHiqhjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749584594; c=relaxed/simple;
-	bh=0c4rPH09asJXG7YXXSkO2KJHIE0PX04aAx1QJP866XY=;
+	s=arc-20240116; t=1749584600; c=relaxed/simple;
+	bh=Iwy8NY58KQePrrWbHpjSW99wKuReIf2GvBm7+wChI50=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BT8rDGjAXgzzJj+VtqqISMH/445LZJ05thE45ydEW6xgJPkAB9mFwvDvNeJ7Kmj9Jslmqsh41cS5AUypdkEsrXyZ4HGoXhgGHlH9edUgF8vD5O5wJi8gDxwv5UyLs3/9q8yEAjqbFMTV3havm7O41M2h3LBffnDyyz9qsAYhbkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zOQqV61y; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=BuYcEqdpmQxs2vPySlDOedY92RQ+yw5ngTTWpxdpkXARNPUo1Df5QCJjvX+2qGv5q9QtilbE5dak7gF76C3bh/DK+motRA+E0hnZI7QxEQDjnzvBR04j3Ke4Q5UXGqfzY89vtqf3S3hJ4rOKT134xDNSFhIlrMdUbZyZc3V3PS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1yddMFPH; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-313b0a63c41so132050a91.0
-        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:43:12 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-742cf6f6a10so7972180b3a.1
+        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:43:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749584592; x=1750189392; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749584599; x=1750189399; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hmaECZdQgVpnbqKpacCwmV0F92qLsHmVnXr19AYpNOE=;
-        b=zOQqV61yWeKv1s+s+IGF9I+meMHKZCU3R/N1SLuTG3t0bS2r60J1EBQSMKayYzLsFe
-         syoF6gdFRMtzcne0CcsMm0VMt67dmdcpxrmnx0fdnuze+7VYBIx62g9U1HQGWveEUX/S
-         bTVyvDRS/d+h4nhkE7OjtV9lbZ8FURTgDBMRcWmMVeEp7LV8vVcfOFzSfuw9bVKohTvj
-         pSH1COjbMhbf9gppXcAGxacS4JKsZPHma335y8sY1HvPD9Dxl05/43B2KjbYqkRjpO8p
-         ch3jho3KgGIMs5WPd2qh/ox7ZJQojU1aypqykC5C0mnbf8W76t7fIOVuYQ/r7nP71qe6
-         SoRQ==
+        bh=VJejgViKNsZj7pWv49HUOX5soNzayp031qY6IfDd3CE=;
+        b=1yddMFPHZ5a8A/z/cm/2IsmiFEAkM9tjTXmtXq3B9yQWpxe2pPe4Slwa/1isi22kvm
+         VC0rorFdG8wPPGG2tQV4z25iqEhWiQOhwGlBHNeJcFeAEyfqRRoDUJzuNzvZpPQDmMC2
+         5rwRE2cS868TCyszq8xarIsOfpMSrzufH84IDgiDgIUy4eH2TjcM7gIpmAc8cku1WmAD
+         2Kenrt+LiMD8S+bjzheAB+CqJEZsqPOz6kxpr0V0uq5vVWm2hrE7pjDIqSjCWhE2IlEZ
+         ssRlBaubQW0bFGTDKdXsPLUbfl43XZTZe1GkbnBupcC5nOOxcFYb6PuN0KVkH0//+Jtk
+         shAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749584592; x=1750189392;
+        d=1e100.net; s=20230601; t=1749584599; x=1750189399;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hmaECZdQgVpnbqKpacCwmV0F92qLsHmVnXr19AYpNOE=;
-        b=GvoekaKFUb/gEpo5ckjBdYMVeLz0BvyPz3RuqlglmoMzdwJqQJxmNRiTahpTRb7b3L
-         sX0XL2ZU6CEzOm7KDKs/a+Ypd3Wfr1PMamjSMed7KZWOWSCQFdsH32ZGnyHOVN4DIoS4
-         SiRzAvDGlBWkaABFwGD4FUROH7rJAWMOgfuJIXzwJpaAtn+6EZr+P3OzUsD4uf/soB1K
-         ZFJQZk41clxEvHr+K5o1eRw35ZqOCg02gqWr9scuR1tBGaPTcKfGI7qLLk+Bo1pLFD18
-         Yeu0+AR3bIq2SYhpWLOTsKRw9VK6TQwBaHVpX51BNdGLSXHI9bVJEsShNzXhXUJT1wy0
-         oSVA==
-X-Gm-Message-State: AOJu0Yyx4b5OlX6bnWdhLmQKvFZ54P0Mqmh9HbWCwd1hX8/LLks5sAli
-	+kDNuXhObNYaH37XrdiEWaXdAMQmiQkRu+fV4tZkLsR0wk6kka8Dr6Ksde1IbW0pStWqK9bWaX9
-	ZIc/J4g==
-X-Google-Smtp-Source: AGHT+IGkSoBtHId5C5f6OhGUVmAogJdcd8gv7uyBw7/Kf0Q6iKTX2ZTseGMJj1yn1BC7RDPWdWv/6Cvyd5g=
-X-Received: from pjq4.prod.google.com ([2002:a17:90b:5604:b0:2ef:d283:5089])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3dc8:b0:312:db8f:9a09
- with SMTP id 98e67ed59e1d1-313af138589mr1116307a91.14.1749584592249; Tue, 10
- Jun 2025 12:43:12 -0700 (PDT)
-Date: Tue, 10 Jun 2025 12:42:22 -0700
-In-Reply-To: <20250604183623.283300-1-seanjc@google.com>
+        bh=VJejgViKNsZj7pWv49HUOX5soNzayp031qY6IfDd3CE=;
+        b=t2GY57tPVw2n4JskdzyXXJq6NDTNNRP1DFq5jII/wVBjcDruwzGvmBjxzBQZooge1s
+         ZxdYFFQ/trqojNluOv/cfOG0cyXfmH8TAsmFbJ3tvUujNGOfuCQdd0jiPf8u15r0GMpE
+         JVk4ywvvXUhNGe4UKglcoB3AhWv1XHWf5y5Gc9bOKPTcYOZ+cMmneHCA71nuYGbuMPnQ
+         ctFLx8/2zT7y0U3EpWazR8kQDavzSKrx09rH9+Ncz4gqk5hgAby3yg7Mw54thKr8IhH3
+         9x390I64pipuiUlrJ4AmpuxFQldaQHAKZDx4EJkjELDr5ZC84m8w/EYGSI44iWPzDSLm
+         Cugg==
+X-Gm-Message-State: AOJu0YxXbK33cRCjc+CBomIiGZInokYtUfQzo2w8pSp5m0mtjyNEjSIU
+	yGh1vtDhfEjWODf+8VzjZzM/9mE3LryH6XCpzBwsQrIQt/Cp/4cJRllMePssCFIqfIV+zDWQiKP
+	PLinzjg==
+X-Google-Smtp-Source: AGHT+IEcB+Nwfw3pSmScCOlLPfkMiQFz/m7TlS5HdfyyZ1cZDZ8Bc5ewUMSeyG1rrdg4MwItXmCTzzlfOiw=
+X-Received: from pfnj12.prod.google.com ([2002:aa7:83cc:0:b0:746:32ee:a305])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:988:b0:748:2ac2:f8c3
+ with SMTP id d2e1a72fcca58-7486ce5a4bcmr1005907b3a.24.1749584598737; Tue, 10
+ Jun 2025 12:43:18 -0700 (PDT)
+Date: Tue, 10 Jun 2025 12:42:24 -0700
+In-Reply-To: <20250529205820.3790330-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250604183623.283300-1-seanjc@google.com>
+References: <20250529205820.3790330-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
-Message-ID: <174958166537.103331.16507879982050606724.b4-ty@google.com>
-Subject: Re: [kvm-unit-tests PATCH 0/6] x86: FEP related cleanups and fix
+Message-ID: <174958165553.102948.14956267250709935254.b4-ty@google.com>
+Subject: Re: [kvm-unit-tests PATCH] runtime: Skip tests if the target "kernel"
+ file doesn't exist
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Chenyi Qiang <chenyi.qiang@intel.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Huth <thuth@redhat.com>, Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Wed, 04 Jun 2025 11:36:17 -0700, Sean Christopherson wrote:
-> The ultimate goal of this series is to be able to check for forced emulation
-> support in a nVMX test that runs with a garbage IDT (the test currently
-> assumed forced emulation is always available, which fails for obvious reasons).
+On Thu, 29 May 2025 13:58:20 -0700, Sean Christopherson wrote:
+> Skip the test if its target kernel/test file isn't available so that
+> skipping a test that isn't supported for a given config doesn't require
+> manually flagging the testcase in unittests.cfg.  This fixes "failures"
+> on x86 with CONFIG_EFI=y due to some tests not being built for EFI, but
+> not being annotated in x86/unittests.cfg.
 > 
-> Getting there is a bit annoying, mostly because the EFI path happens to load
-> the IDT after setup_idt().  I _could_ have just tweaked the EFI path, but opted
-> for a slightly bigger overhaul, e.g. so that it's easier to see that the BSP is
-> responsible for loading the IDT, and so that setup_idt() can _guarantee_ it can
-> handle a #UD without exploding.
+> Alternatively, testcases could be marked noefi (or efi-only), but that'd
+> require more manual effort, and there's no obvious advantage to doing so.
 > 
 > [...]
 
 Applied to kvm-x86 next, thanks!
 
-[1/6] x86: Call setup_idt() from start{32,64}(), not from smp_init()
-      https://github.com/kvm-x86/kvm-unit-tests/commit/588887078688
-[2/6] x86: Drop protection against setup_idt() being called multiple times
-      https://github.com/kvm-x86/kvm-unit-tests/commit/3fcc85172af3
-[3/6] x86: Move call to load_idt() out of setup_tr_and_percpu macro
-      https://github.com/kvm-x86/kvm-unit-tests/commit/27fe927996be
-[4/6] x86: Load IDT on BSP as part of setup_idt()
-      https://github.com/kvm-x86/kvm-unit-tests/commit/63f9b9871322
-[5/6] x86: Cache availability of forced emulation during setup_idt()
-      https://github.com/kvm-x86/kvm-unit-tests/commit/486a097c9842
-[6/6] nVMX: Force emulation of LGDT/LIDT in iff FEP is available
-      https://github.com/kvm-x86/kvm-unit-tests/commit/3d677db42e66
+[1/1] runtime: Skip tests if the target "kernel" file doesn't exist
+      https://github.com/kvm-x86/kvm-unit-tests/commit/7f528c1b474c
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
