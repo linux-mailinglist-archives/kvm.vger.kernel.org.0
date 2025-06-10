@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-48912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC76CAD4662
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 01:05:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29FCAAD4666
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 01:06:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7A123A8234
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 23:04:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4ED4A7AD0B4
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 23:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EDBB295DBD;
-	Tue, 10 Jun 2025 22:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B8E2D104B;
+	Tue, 10 Jun 2025 22:58:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BKo7RoIF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H08fBhPl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9984296147
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 22:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6222728EF
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 22:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749596310; cv=none; b=NSpIaEmJofRP9npMrtWMPP9o4uFGHAEiy+Hd9aGxhdoaEKLk9vE4qcKCbDMlXOtC9wfGyVI52nqb2t8+nXOBgqAB9JfpNY/c7bRgh/9HEnv5GWK8ebt2ij3lGzjPmZNmtPI3THDaaaMQ5aGEbvRkfMFZUuKiPHTc0+wkeCOwQug=
+	t=1749596311; cv=none; b=YYhtOxdHUPWQ58Jvhb3LK//Unh0nVArUbLr2IA1z6d28NOoWCpJ8tKT3h7gDyT2rH44zhji2e59Hjqi9omgye/SKgLQ8BX9ZrT3nNUSKKZsdw3uRy8fnL2w4/E2u4yiLEgHT79BPnA3TnBsilyTUMNN2sqOaBFvSImK3qmYpRVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749596310; c=relaxed/simple;
-	bh=3W8zBfO4us4fjeyfCjy2wBE++xyIbNCjBla8RMXLlM0=;
+	s=arc-20240116; t=1749596311; c=relaxed/simple;
+	bh=8NMBQOCUZTnUF9bMbeLcv+0oeOUiSq+zhN1NQGpaPdI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VS9keCyvpuSA4bzY3I5cLBSeL0YD47Wjp+AJcOdVomF+b3IQhPDqyYxP+3u9SA8XRAcrZIdHCQ70J9FZSLlTpQz3ZVAF7PMATdalnBHPT+J1mWhH9mGphi3G4UGWiyFlWSw87Rx3TgkYSfekwzw1x78haXmlDPlMZXACN4bsSS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BKo7RoIF; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=klwIVZXAtG3awhERErdPeyEwVdLmAEXdQXLwf9Fde4NbwULI1zPux5eVTQCA4GaCbYqt8BpFBoARtdnF2z2/eSjKu51b5BIDrxj6F/kw8cZJXwRh37NflJD8eQhFzWq5xXjyb9398N12VaIDk5lDVpiaWcADfIX+cAI6lkjTUYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H08fBhPl; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2323bd7f873so50431325ad.1
-        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 15:58:28 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-30a39fa0765so8614680a91.3
+        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 15:58:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749596308; x=1750201108; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749596310; x=1750201110; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZO7RReyW+IQoV593Vs023wxtAUsIe6zgC5GuAJ1RIgA=;
-        b=BKo7RoIFVtMtDO/60TnK4KznJ6iOAkd6Pbu7oFzMpjYN+EbuAslLHtxY5aMdbtCe8O
-         FQmU7kT6tZWNe04kiUlck3/Y8AM9hS9G+5Nwx0GmNaitvSUVtIYHqmkOvA3dP7iswdKU
-         x/4ve1GDENxLHWKbBZz4qGqz9COsC/lTS+YouD3dVS4JGekInIUMTVlY7tzL/PuJauSc
-         FVjx0zvyhji7qSTm8Q1YeHNvltsqRhe6h7VxGTMiB2d5/E3ek+ex5oKDepy5b3VFQzd5
-         weCQSXhpV3tolFji8joyx63CplhLwwsh5PoS5kLBJ5kGMsDlIFcbgjskxhVYwHvnQw58
-         Hxqg==
+        bh=ercvOy9gSaz/2KYqxyQat5mFHIbfugbgpQQnPekIEBg=;
+        b=H08fBhPlhd/gYyBg/27O+2e/reVllsvC/hx5HQGAM7yvx21igWobfKLzOMvbbMKeVd
+         5QSA6cXXZA1CYjl3bJjZStpDW4VC+ydHwdQDUwB+5VT54Fx4zs6TY3JkdDv0uckbt+IV
+         Y2Da7PYm0DPqR3+J6Zfw1qDDRcUFpqp0wQxYl/xXx/EOj5d0//HadkaX3yp9P67koGcq
+         0l1ItOcYE3MDaiVIOqZxERFJEyqeGlCCEihe5CHXWlp/PsLg5TitUF+nCl4ZvzQ1pl97
+         RWQoD1R0OWlibF4NduDh/ey0iebvBJlGCaAMj0bX4hyKkiB7tNaDZfkjLIL/Vcqsj5Nj
+         11fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749596308; x=1750201108;
+        d=1e100.net; s=20230601; t=1749596310; x=1750201110;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZO7RReyW+IQoV593Vs023wxtAUsIe6zgC5GuAJ1RIgA=;
-        b=w3546WxXIJIJohbNcda37rKC6gvWGJtrCgQ+IDoaH5mOlM4RraFJxiRxlXj2/ktycv
-         u+YwUTowoa/Qj3yfIpuLRycwJXmrFeZfpoepRFZST/cwbjsnKgpTUFWV5uqYuk7ouBkX
-         gfPBl4ISSGrRwVm02tyWd0WWoyJDUqtfwFJn+dH9pCWASGQWAGkc1tS4BHip3CKWYtVO
-         Q5gBwL89uNG4SU50zm/eAVdjFNp0fXxv9SThtK98RN30IwxSL+tCOfCS/UQRdy1dZuxm
-         d6vLAiQ864Psv8QgqeJG5XWuZgbAIKEkOkALFvvdaJdxMnh3Y8sNiLGwmFexdsMwSsWU
-         JIfQ==
-X-Gm-Message-State: AOJu0YyxFeI75+l0JYCCSxox4nkZwTEQM5Fjzne9E+byGlPA7zYPjZum
-	KgxE2FsK8atIUCZzSbFSwL5WhwLAkAFUlNve9vXaLqTgoiuSNOZ7kp6Oc555mKN1Tvvp6G/kl3+
-	b4zjvVg==
-X-Google-Smtp-Source: AGHT+IECfBJPvJrhVy9Guqg7jU3P/g39SPPVnfYnG0L9bVcS+Y2ydmzBHa3Br5U+Ll8/B2E54P8107oDqQU=
-X-Received: from plbb20.prod.google.com ([2002:a17:903:c14:b0:235:7e3:203])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ecc7:b0:235:e309:7dec
- with SMTP id d9443c01a7336-23641b19920mr12346965ad.26.1749596308098; Tue, 10
- Jun 2025 15:58:28 -0700 (PDT)
+        bh=ercvOy9gSaz/2KYqxyQat5mFHIbfugbgpQQnPekIEBg=;
+        b=FvCWhegXMbGj6fayoDqHIjH/X+fl0y8TWdh/t559UeP/4mqGuIqazlXm9WTa/wp4AN
+         5/bUdrGYv/B4qjL4d0CLsvFXSPP2/q+2Pgw0sf4+jazKtmIzqeB7C4Yg4lZNpR2HYMGZ
+         i/Zs9f7mz6Pfsp5PBVk5yczgoS2a/j/viC4DMfVPaONuJNeSluPBNeof3iPSz6kXFzWp
+         940bU3WZJH4iQjVgHLfi8+GU5efCS2iwssHviX9XiQ7FxouG+BTtNsEvjLkuis9h6gpj
+         SdalkLIMVlUdGOlmlRxa8yr/36KbCgCKM5FsEE54C2FSmb0QXZdWyUl7QVEosEc5GSgH
+         c0nw==
+X-Gm-Message-State: AOJu0Yx76lm6iZNLd0VifY+CYIIOyIxiXZ03H+/G/zpCNSPMoHdS0HTM
+	gV7bweaueiEayfCU/14fbIkPn1KGzfy570KlZ1i0MyfThaQ9uZGXYtn1mf24fOVCemjE6XAl50V
+	Xz5iOTw==
+X-Google-Smtp-Source: AGHT+IEmRs2SQrVc9GLzODa7Y2S+4DXyFTYFnYNrEP6EPnF+UanD+KwvLvf3wI3VyrpU1ZlG6ydbLvn4nsI=
+X-Received: from pjbos6.prod.google.com ([2002:a17:90b:1cc6:b0:313:245:8921])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2809:b0:311:fde5:e224
+ with SMTP id 98e67ed59e1d1-313af0fd089mr1614276a91.6.1749596309756; Tue, 10
+ Jun 2025 15:58:29 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 10 Jun 2025 15:57:33 -0700
+Date: Tue, 10 Jun 2025 15:57:34 -0700
 In-Reply-To: <20250610225737.156318-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250610225737.156318-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
-Message-ID: <20250610225737.156318-29-seanjc@google.com>
-Subject: [PATCH v2 28/32] KVM: SVM: Return -EINVAL instead of MSR_INVALID to
- signal out-of-range MSR
+Message-ID: <20250610225737.156318-30-seanjc@google.com>
+Subject: [PATCH v2 29/32] KVM: nSVM: Merge MSRPM in 64-bit chunks on 64-bit kernels
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -86,91 +85,77 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Manali Shukla <Manali.Shukla@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Return -EINVAL instead of MSR_INVALID from svm_msrpm_bit_nr() to indicate
-that the MSR isn't covered by one of the (currently) three MSRPM ranges,
-and delete the MSR_INVALID macro now that all users are gone.
+When merging L0 and L1 MSRPMs as part of nested VMRUN emulation, access
+the bitmaps using "unsigned long" chunks, i.e. use 8-byte access for
+64-bit kernels instead of arbitrarily working on 4-byte chunks.
+
+Opportunistically rename local variables in nested_svm_merge_msrpm() to
+more precisely/accurately reflect their purpose ("offset" in particular is
+extremely ambiguous).
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/nested.c | 10 +++++-----
- arch/x86/kvm/svm/svm.h    | 10 ++++------
- 2 files changed, 9 insertions(+), 11 deletions(-)
+ arch/x86/kvm/svm/nested.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index fb0ac87df00a..7ca45361ced3 100644
+index 7ca45361ced3..749f7b866ac8 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -223,10 +223,10 @@ int __init nested_svm_init_msrpm_merge_offsets(void)
- 	int i, j;
+@@ -196,6 +196,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
+  */
+ static int nested_svm_msrpm_merge_offsets[6] __ro_after_init;
+ static int nested_svm_nr_msrpm_merge_offsets __ro_after_init;
++typedef unsigned long nsvm_msrpm_merge_t;
  
- 	for (i = 0; i < ARRAY_SIZE(merge_msrs); i++) {
--		u32 bit_nr = svm_msrpm_bit_nr(merge_msrs[i]);
-+		int bit_nr = svm_msrpm_bit_nr(merge_msrs[i]);
- 		u32 offset;
- 
--		if (WARN_ON(bit_nr == MSR_INVALID))
-+		if (WARN_ON(bit_nr < 0))
+ int __init nested_svm_init_msrpm_merge_offsets(void)
+ {
+@@ -230,10 +231,10 @@ int __init nested_svm_init_msrpm_merge_offsets(void)
  			return -EIO;
  
  		/*
-@@ -1354,9 +1354,9 @@ void svm_leave_nested(struct kvm_vcpu *vcpu)
- static int nested_svm_exit_handled_msr(struct vcpu_svm *svm)
+-		 * Merging is done in 32-bit chunks to reduce the number of
+-		 * accesses to L1's bitmap.
++		 * Merging is done in chunks to reduce the number of accesses
++		 * to L1's bitmap.
+ 		 */
+-		offset = bit_nr / BITS_PER_BYTE / sizeof(u32);
++		offset = bit_nr / BITS_PER_BYTE / sizeof(nsvm_msrpm_merge_t);
+ 
+ 		for (j = 0; j < nested_svm_nr_msrpm_merge_offsets; j++) {
+ 			if (nested_svm_msrpm_merge_offsets[j] == offset)
+@@ -261,8 +262,8 @@ int __init nested_svm_init_msrpm_merge_offsets(void)
+ static bool nested_svm_merge_msrpm(struct kvm_vcpu *vcpu)
  {
- 	gpa_t base = svm->nested.ctl.msrpm_base_pa;
--	u32 msr, bit_nr;
-+	int write, bit_nr;
- 	u8 value, mask;
--	int write;
-+	u32 msr;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+-	u32 *msrpm02 = svm->nested.msrpm;
+-	u32 *msrpm01 = svm->msrpm;
++	nsvm_msrpm_merge_t *msrpm02 = svm->nested.msrpm;
++	nsvm_msrpm_merge_t *msrpm01 = svm->msrpm;
+ 	int i;
  
- 	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
- 		return NESTED_EXIT_HOST;
-@@ -1365,7 +1365,7 @@ static int nested_svm_exit_handled_msr(struct vcpu_svm *svm)
- 	bit_nr = svm_msrpm_bit_nr(msr);
- 	write  = svm->vmcb->control.exit_info_1 & 1;
+ 	/*
+@@ -289,15 +290,15 @@ static bool nested_svm_merge_msrpm(struct kvm_vcpu *vcpu)
  
--	if (bit_nr == MSR_INVALID)
-+	if (bit_nr < 0)
- 		return NESTED_EXIT_DONE;
+ 	for (i = 0; i < nested_svm_nr_msrpm_merge_offsets; i++) {
+ 		const int p = nested_svm_msrpm_merge_offsets[i];
+-		u32 value;
+-		u64 offset;
++		nsvm_msrpm_merge_t l1_val;
++		gpa_t gpa;
  
- 	if (kvm_vcpu_read_guest(&svm->vcpu, base + bit_nr / BITS_PER_BYTE,
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index e078df15f1d8..489adc2ca3f5 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -619,9 +619,7 @@ static inline void svm_vmgexit_no_action(struct vcpu_svm *svm, u64 data)
- static_assert(SVM_MSRS_PER_RANGE == 8192);
- #define SVM_MSRPM_OFFSET_MASK (SVM_MSRS_PER_RANGE - 1)
+-		offset = svm->nested.ctl.msrpm_base_pa + (p * 4);
++		gpa = svm->nested.ctl.msrpm_base_pa + (p * sizeof(l1_val));
  
--#define MSR_INVALID				0xffffffffU
--
--static __always_inline u32 svm_msrpm_bit_nr(u32 msr)
-+static __always_inline int svm_msrpm_bit_nr(u32 msr)
- {
- 	int range_nr;
+-		if (kvm_vcpu_read_guest(vcpu, offset, &value, 4))
++		if (kvm_vcpu_read_guest(vcpu, gpa, &l1_val, sizeof(l1_val)))
+ 			return false;
  
-@@ -636,7 +634,7 @@ static __always_inline u32 svm_msrpm_bit_nr(u32 msr)
- 		range_nr = 2;
- 		break;
- 	default:
--		return MSR_INVALID;
-+		return -EINVAL;
+-		msrpm02[p] = msrpm01[p] | value;
++		msrpm02[p] = msrpm01[p] | l1_val;
  	}
  
- 	return range_nr * SVM_MSRPM_BYTES_PER_RANGE * BITS_PER_BYTE +
-@@ -647,10 +645,10 @@ static __always_inline u32 svm_msrpm_bit_nr(u32 msr)
- static inline rtype svm_##action##_msr_bitmap_##access(unsigned long *bitmap,	\
- 						       u32 msr)			\
- {										\
--	u32 bit_nr;								\
-+	int bit_nr;								\
- 										\
- 	bit_nr = svm_msrpm_bit_nr(msr);						\
--	if (bit_nr == MSR_INVALID)								\
-+	if (bit_nr < 0)								\
- 		return (rtype)true;						\
- 										\
- 	return bitop##_bit(bit_nr + bit_rw, bitmap);				\
+ 	svm->nested.force_msr_bitmap_recalc = false;
 -- 
 2.50.0.rc0.642.g800a2b2222-goog
 
