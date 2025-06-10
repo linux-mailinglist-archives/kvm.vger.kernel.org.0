@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-48900-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48901-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60652AD4648
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 01:01:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4636AD464A
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 01:02:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10E65168438
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 23:01:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A7D11886807
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 23:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8DB52D8DCC;
-	Tue, 10 Jun 2025 22:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA2A2DCC06;
+	Tue, 10 Jun 2025 22:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O1YpCqGJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MMUVUEn/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6485F2D4B5B
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 22:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6952D8DA4
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 22:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749596290; cv=none; b=ll01ULK+2ZD1H8lxlzWrtxaiKjfInKgwtRnTyviDumFGi/rFFcfIC/cr3dY0V5b7F9JTdo8jk75IRY6UcUBUAZiQIysPwga8rrJaKmwPmNWmvRVr0kZrnLQuO5Xa5dXQmn9drSDHrGtehlJ5xt1IdOV8Ya+eVyhf+5Ij5pKQx14=
+	t=1749596291; cv=none; b=j3uEpAa6sNXS33su9FvC6OMugeSX+z5RXOIqiZzYQ3JZnCxP95BczhNHd2xRsQuMrHskDNEv9rl1gi5tvIX1+S/bobRtMRxTUsW0ft+TYRhlT1EeZo8SbLjBbjBKofiqE33ndQtUHK7VFmU8gXy2HoIMvaH5SpnV05Gf2UuUFe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749596290; c=relaxed/simple;
-	bh=wYLpwmDtesBuFCExIUc711ksu3V78L4qfQX7Br6OoLU=;
+	s=arc-20240116; t=1749596291; c=relaxed/simple;
+	bh=R4cTawn6FPBvedLrqxVNysJ0af/k1o1HGGxQjl1UZQ0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=I7fTXY75Q+gg3VkeIP4U3v5g9klLtotlZTooHx0j9AaDOav8IVhsJ3aepnXF2UVtVTa7rkFPNa7K7k9d8uHtK4QXXYCj4eg8ulvScj1AUULdyTRYYCvl2aduhyh7PTkH9uzECYyZT7Sjg08qtDZYiudh423nztk1hdCdTbO0JJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O1YpCqGJ; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=HksFnCITOIKyyVLPg+1WYQQ2VrwHaeZULlk8xkiRYxAtnCZEnOYHKpC3cBRmqv60Z8EN4tAgSabeZq1Pk2NjejN4epib+2UgI1Df5fJ4apTS0I2OKIxLRJPUkjFyAc8ldZ7lC8ZbdXayq52LqbKLwHC6FlzK9dEcIv3KQJTmsHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MMUVUEn/; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b26e73d375aso6679854a12.2
-        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 15:58:08 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-31215090074so8254997a91.0
+        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 15:58:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749596288; x=1750201088; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749596289; x=1750201089; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDL4hQFiK+ASur5aaDJFnTccNINaia2n1YWKrBZy1is=;
-        b=O1YpCqGJZF8U2kMl7qN3o8NCxfw2P7SK11mPObWiJu9Ydileuuutr7RoBoNZxMYqsV
-         SnnDxjhJRuqucoaZnmJ6xZhl8rEhhK4ZKBAdy1FA9HxW+IuO+X7xHPsDW85hHMC9Ei+A
-         KqXh0KBd+FAwY7TYKKLwniMQ0akCR0ZindIFGXCSDneU7dO1kMNb2F0lQJsdfbJfNrX7
-         uxyTCAGNfBIdGBYBcZ0XxFIdZFbeyUnsQfTjDiJdbdU8qNe3BFMseQkJarcWqBHrksHW
-         9KILVPhqV3XvZp12Y2s8N02k3kIWJ8hqywakAWzvSAGl9xD5qMKhXXOWqTJDImiQHk9m
-         edpg==
+        bh=cYslCc1aEse5AOWlTO9NEcAl50WRTRVtzpSVWqQhl98=;
+        b=MMUVUEn/TI4tfUlLXvBbvTyjZJvRZABrdnO7XCt2KoQK8vzfZnZ5RbadUnhhALGfry
+         T3lNyYQkCtHkOR/zC5uu8G7l1breg2JC8+PCF3iXIYJn0z3GsVJk9/XIpeh+G8gl8ygi
+         +K4uum1JAjxoWHQh9Lehys+snWenChgcuF98n9dT7Cl8+xvbrA6ud1x5FQwyw2B3MRKJ
+         WZUD2/RRK1HWmStvcJdIaLbPjYd11rOY5rs8wkJ2jaS+cJ94tMuHJJyC1e9tUoyH/jFM
+         Im5+Nw7hgiibpU9FDJ/cl1d/KE0liwhfqfysDXnp2oVXvBn22pEG76SHEX3hZNLKGcRc
+         Mnxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749596288; x=1750201088;
+        d=1e100.net; s=20230601; t=1749596289; x=1750201089;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RDL4hQFiK+ASur5aaDJFnTccNINaia2n1YWKrBZy1is=;
-        b=AMTVTYA2N3gU5FLXxWVlGCTMzlPkQ0ph/Ri8MclO1OerXukpXYWmmpLCiTjH1bniMA
-         GzR5boRxFemI0437IBv/OCYrZNre6OFJWdlTA6q3m6FCqAJPJsoKakLb0ZXGYn5LNzAY
-         hu9SULzf7KfVBPU6OiMDYT3T1uveu6c86PsBmEdoKWMc28ld4YPcctWzh7WsDFydpGzZ
-         iv2XGZaFYDyJbZ+Juq5phkvYAU06iqPYfFgJ2srz3PqbqcSVarBZ1vr8nLNAk7qM5W0H
-         odL5nCMCqWa6k+0uPwURCAegGn8z13zbERqHjayuHrevG3P00vs6tr4MZyeMpKnCOBYg
-         lsxQ==
-X-Gm-Message-State: AOJu0YziPojglgtOnqPI5izqGoKkE0ZP/l6H0d08gT+28hxp5sQGwgsV
-	+tnBAEBCHyt81FzO48KSi79zgpar6mMDtnYsXb02m3nk+oZOPV7AGviFlU+VYqHXbm+2NdPf8CZ
-	Lq2LmCg==
-X-Google-Smtp-Source: AGHT+IHZ/g6IkvQh+wtJNRTX/Z8bV3lPAyMKeTBSbjFw/87pPVIOdLl4wFCVuUsULL6TbhyNjR2oIf8cVRQ=
-X-Received: from pfsq11.prod.google.com ([2002:a05:6a00:2ab:b0:73b:bbec:17e9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:244b:b0:1f5:9175:2596
- with SMTP id adf61e73a8af0-21f88feb7camr766854637.13.1749596287890; Tue, 10
- Jun 2025 15:58:07 -0700 (PDT)
+        bh=cYslCc1aEse5AOWlTO9NEcAl50WRTRVtzpSVWqQhl98=;
+        b=Jw8dFogjBThQ2/Urn94vMx2DopD3vqRQc4mC4p74l/qlahKKjcvINkhOTAQy0l0tvU
+         WK3pVsvxTRR06i4unS30Zb4G7wx9VNHEdRLRFA45U34njBc8WqvDNdPFlZ/TNqgnea0l
+         vVQY0pHrqj8m+ycvJfjgsMAYonHhG5PqPEVX48rHnIY5Qnry7Dx6VG9K94ZY9wZyQbV5
+         /SWDQ90BEEdPm5Qh3QyulRgXkvUK0pF3ShoXm1oLGSSPy46Yq+qkgroWxpfV4JWc8L3s
+         X3FzQlN6dcG0wRpva6h6LyDyGJdzOsa/DPFemSrjOssjmjqf17L33+IJcsskEpxpVaOJ
+         2lWQ==
+X-Gm-Message-State: AOJu0YxalJr8kqh8E359h6je/hRUWUubhR8CoNIhPSzm4nxRbOQNTHnu
+	SXk226M95tJrGMbevaG6/svVKi7bn9LGqk3rEWCMeJoL7otTxtlLThqGp3+XrA/L3b0zg5FD8jB
+	dsbRIjg==
+X-Google-Smtp-Source: AGHT+IFMCxHrCFjA3fTBqnet51XeAQL96yY3myWBi4ZzqvgxQeZxtwfutpeMyQ4+ahm0ojHbTWI8frORyHw=
+X-Received: from pjee8.prod.google.com ([2002:a17:90b:5788:b0:313:285a:5547])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:584d:b0:311:c939:c859
+ with SMTP id 98e67ed59e1d1-313af28d147mr1646696a91.30.1749596289376; Tue, 10
+ Jun 2025 15:58:09 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 10 Jun 2025 15:57:21 -0700
+Date: Tue, 10 Jun 2025 15:57:22 -0700
 In-Reply-To: <20250610225737.156318-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250610225737.156318-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
-Message-ID: <20250610225737.156318-17-seanjc@google.com>
-Subject: [PATCH v2 16/32] KVM: SVM: Drop "always" flag from list of possible
- passthrough MSRs
+Message-ID: <20250610225737.156318-18-seanjc@google.com>
+Subject: [PATCH v2 17/32] KVM: x86: Move definition of X2APIC_MSR() to lapic.h
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -86,198 +85,57 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Manali Shukla <Manali.Shukla@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop the "always" flag from the array of possible passthrough MSRs, and
-instead manually initialize the permissions for the handful of MSRs that
-KVM passes through by default.  In addition to cutting down on boilerplate
-copy+paste code and eliminating a misleading flag (the MSRs aren't always
-passed through, e.g. thanks to MSR filters), this will allow for removing
-the direct_access_msrs array entirely.
+Dedup the definition of X2APIC_MSR and put it in the local APIC code
+where it belongs.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 124 ++++++++++++++++++++---------------------
- 1 file changed, 62 insertions(+), 62 deletions(-)
+ arch/x86/kvm/lapic.h   | 2 ++
+ arch/x86/kvm/svm/svm.c | 2 --
+ arch/x86/kvm/vmx/vmx.h | 2 --
+ 3 files changed, 2 insertions(+), 4 deletions(-)
 
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 4ce30db65828..4518b4e0552f 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -21,6 +21,8 @@
+ #define APIC_BROADCAST			0xFF
+ #define X2APIC_BROADCAST		0xFFFFFFFFul
+ 
++#define X2APIC_MSR(r) (APIC_BASE_MSR + ((r) >> 4))
++
+ enum lapic_mode {
+ 	LAPIC_MODE_DISABLED = 0,
+ 	LAPIC_MODE_INVALID = X2APIC_ENABLE,
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 7747f9bc3e9d..4ee92e444dde 100644
+index 4ee92e444dde..900a1303e0e7 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -83,51 +83,48 @@ static DEFINE_PER_CPU(u64, current_tsc_ratio);
+@@ -81,8 +81,6 @@ static uint64_t osvw_len = 4, osvw_status;
  
- #define X2APIC_MSR(x)	(APIC_BASE_MSR + (x >> 4))
+ static DEFINE_PER_CPU(u64, current_tsc_ratio);
  
--static const struct svm_direct_access_msrs {
--	u32 index;   /* Index of the MSR */
--	bool always; /* True if intercept is initially cleared */
--} direct_access_msrs[] = {
--	{ .index = MSR_STAR,				.always = true  },
--	{ .index = MSR_IA32_SYSENTER_CS,		.always = true  },
--	{ .index = MSR_IA32_SYSENTER_EIP,		.always = false },
--	{ .index = MSR_IA32_SYSENTER_ESP,		.always = false },
-+static const u32 direct_access_msrs[] = {
-+	MSR_STAR,
-+	MSR_IA32_SYSENTER_CS,
-+	MSR_IA32_SYSENTER_EIP,
-+	MSR_IA32_SYSENTER_ESP,
+-#define X2APIC_MSR(x)	(APIC_BASE_MSR + (x >> 4))
+-
+ static const u32 direct_access_msrs[] = {
+ 	MSR_STAR,
+ 	MSR_IA32_SYSENTER_CS,
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index b5758c33c60f..0afe97e3478f 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -19,8 +19,6 @@
+ #include "../mmu.h"
+ #include "common.h"
+ 
+-#define X2APIC_MSR(r) (APIC_BASE_MSR + ((r) >> 4))
+-
  #ifdef CONFIG_X86_64
--	{ .index = MSR_GS_BASE,				.always = true  },
--	{ .index = MSR_FS_BASE,				.always = true  },
--	{ .index = MSR_KERNEL_GS_BASE,			.always = true  },
--	{ .index = MSR_LSTAR,				.always = true  },
--	{ .index = MSR_CSTAR,				.always = true  },
--	{ .index = MSR_SYSCALL_MASK,			.always = true  },
-+	MSR_GS_BASE,
-+	MSR_FS_BASE,
-+	MSR_KERNEL_GS_BASE,
-+	MSR_LSTAR,
-+	MSR_CSTAR,
-+	MSR_SYSCALL_MASK,
- #endif
--	{ .index = MSR_IA32_SPEC_CTRL,			.always = false },
--	{ .index = MSR_IA32_PRED_CMD,			.always = false },
--	{ .index = MSR_IA32_FLUSH_CMD,			.always = false },
--	{ .index = MSR_IA32_DEBUGCTLMSR,		.always = false },
--	{ .index = MSR_IA32_LASTBRANCHFROMIP,		.always = false },
--	{ .index = MSR_IA32_LASTBRANCHTOIP,		.always = false },
--	{ .index = MSR_IA32_LASTINTFROMIP,		.always = false },
--	{ .index = MSR_IA32_LASTINTTOIP,		.always = false },
--	{ .index = MSR_IA32_XSS,			.always = false },
--	{ .index = MSR_EFER,				.always = false },
--	{ .index = MSR_IA32_CR_PAT,			.always = false },
--	{ .index = MSR_AMD64_SEV_ES_GHCB,		.always = false },
--	{ .index = MSR_TSC_AUX,				.always = false },
--	{ .index = X2APIC_MSR(APIC_ID),			.always = false },
--	{ .index = X2APIC_MSR(APIC_LVR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_TASKPRI),		.always = false },
--	{ .index = X2APIC_MSR(APIC_ARBPRI),		.always = false },
--	{ .index = X2APIC_MSR(APIC_PROCPRI),		.always = false },
--	{ .index = X2APIC_MSR(APIC_EOI),		.always = false },
--	{ .index = X2APIC_MSR(APIC_RRR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_LDR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_DFR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_SPIV),		.always = false },
--	{ .index = X2APIC_MSR(APIC_ISR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_TMR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_IRR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_ESR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_ICR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_ICR2),		.always = false },
-+	MSR_IA32_SPEC_CTRL,
-+	MSR_IA32_PRED_CMD,
-+	MSR_IA32_FLUSH_CMD,
-+	MSR_IA32_DEBUGCTLMSR,
-+	MSR_IA32_LASTBRANCHFROMIP,
-+	MSR_IA32_LASTBRANCHTOIP,
-+	MSR_IA32_LASTINTFROMIP,
-+	MSR_IA32_LASTINTTOIP,
-+	MSR_IA32_XSS,
-+	MSR_EFER,
-+	MSR_IA32_CR_PAT,
-+	MSR_AMD64_SEV_ES_GHCB,
-+	MSR_TSC_AUX,
-+	X2APIC_MSR(APIC_ID),
-+	X2APIC_MSR(APIC_LVR),
-+	X2APIC_MSR(APIC_TASKPRI),
-+	X2APIC_MSR(APIC_ARBPRI),
-+	X2APIC_MSR(APIC_PROCPRI),
-+	X2APIC_MSR(APIC_EOI),
-+	X2APIC_MSR(APIC_RRR),
-+	X2APIC_MSR(APIC_LDR),
-+	X2APIC_MSR(APIC_DFR),
-+	X2APIC_MSR(APIC_SPIV),
-+	X2APIC_MSR(APIC_ISR),
-+	X2APIC_MSR(APIC_TMR),
-+	X2APIC_MSR(APIC_IRR),
-+	X2APIC_MSR(APIC_ESR),
-+	X2APIC_MSR(APIC_ICR),
-+	X2APIC_MSR(APIC_ICR2),
- 
- 	/*
- 	 * Note:
-@@ -136,14 +133,14 @@ static const struct svm_direct_access_msrs {
- 	 * the AVIC hardware would generate GP fault. Therefore, always
- 	 * intercept the MSR 0x832, and do not setup direct_access_msr.
- 	 */
--	{ .index = X2APIC_MSR(APIC_LVTTHMR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_LVTPC),		.always = false },
--	{ .index = X2APIC_MSR(APIC_LVT0),		.always = false },
--	{ .index = X2APIC_MSR(APIC_LVT1),		.always = false },
--	{ .index = X2APIC_MSR(APIC_LVTERR),		.always = false },
--	{ .index = X2APIC_MSR(APIC_TMICT),		.always = false },
--	{ .index = X2APIC_MSR(APIC_TMCCT),		.always = false },
--	{ .index = X2APIC_MSR(APIC_TDCR),		.always = false },
-+	X2APIC_MSR(APIC_LVTTHMR),
-+	X2APIC_MSR(APIC_LVTPC),
-+	X2APIC_MSR(APIC_LVT0),
-+	X2APIC_MSR(APIC_LVT1),
-+	X2APIC_MSR(APIC_LVTERR),
-+	X2APIC_MSR(APIC_TMICT),
-+	X2APIC_MSR(APIC_TMCCT),
-+	X2APIC_MSR(APIC_TDCR),
- };
- 
- static_assert(ARRAY_SIZE(direct_access_msrs) ==
-@@ -767,7 +764,7 @@ static int direct_access_msr_slot(u32 msr)
- 	u32 i;
- 
- 	for (i = 0; i < ARRAY_SIZE(direct_access_msrs); i++) {
--		if (direct_access_msrs[i].index == msr)
-+		if (direct_access_msrs[i] == msr)
- 			return i;
- 	}
- 
-@@ -931,14 +928,17 @@ u32 *svm_vcpu_alloc_msrpm(void)
- 
- static void svm_vcpu_init_msrpm(struct kvm_vcpu *vcpu)
- {
--	int i;
-+	svm_disable_intercept_for_msr(vcpu, MSR_STAR, MSR_TYPE_RW);
-+	svm_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
- 
--	for (i = 0; i < ARRAY_SIZE(direct_access_msrs); i++) {
--		if (!direct_access_msrs[i].always)
--			continue;
--		svm_disable_intercept_for_msr(vcpu, direct_access_msrs[i].index,
--					      MSR_TYPE_RW);
--	}
-+#ifdef CONFIG_X86_64
-+	svm_disable_intercept_for_msr(vcpu, MSR_GS_BASE, MSR_TYPE_RW);
-+	svm_disable_intercept_for_msr(vcpu, MSR_FS_BASE, MSR_TYPE_RW);
-+	svm_disable_intercept_for_msr(vcpu, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
-+	svm_disable_intercept_for_msr(vcpu, MSR_LSTAR, MSR_TYPE_RW);
-+	svm_disable_intercept_for_msr(vcpu, MSR_CSTAR, MSR_TYPE_RW);
-+	svm_disable_intercept_for_msr(vcpu, MSR_SYSCALL_MASK, MSR_TYPE_RW);
-+#endif
- }
- 
- void svm_set_x2apic_msr_interception(struct vcpu_svm *svm, bool intercept)
-@@ -952,7 +952,7 @@ void svm_set_x2apic_msr_interception(struct vcpu_svm *svm, bool intercept)
- 		return;
- 
- 	for (i = 0; i < ARRAY_SIZE(direct_access_msrs); i++) {
--		int index = direct_access_msrs[i].index;
-+		int index = direct_access_msrs[i];
- 
- 		if ((index < APIC_BASE_MSR) ||
- 		    (index > APIC_BASE_MSR + 0xff))
-@@ -980,7 +980,7 @@ static void svm_msr_filter_changed(struct kvm_vcpu *vcpu)
- 	 * back in sync after this.
- 	 */
- 	for (i = 0; i < ARRAY_SIZE(direct_access_msrs); i++) {
--		u32 msr = direct_access_msrs[i].index;
-+		u32 msr = direct_access_msrs[i];
- 		u32 read = test_bit(i, svm->shadow_msr_intercept.read);
- 		u32 write = test_bit(i, svm->shadow_msr_intercept.write);
- 
-@@ -1020,7 +1020,7 @@ static __init int init_msrpm_offsets(void)
- 	for (i = 0; i < ARRAY_SIZE(direct_access_msrs); i++) {
- 		u32 offset;
- 
--		offset = svm_msrpm_offset(direct_access_msrs[i].index);
-+		offset = svm_msrpm_offset(direct_access_msrs[i]);
- 		if (WARN_ON(offset == MSR_INVALID))
- 			return -EIO;
- 
+ #define MAX_NR_USER_RETURN_MSRS	7
+ #else
 -- 
 2.50.0.rc0.642.g800a2b2222-goog
 
