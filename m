@@ -1,218 +1,242 @@
-Return-Path: <kvm+bounces-48794-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48795-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB4BEAD2E35
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 09:00:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FFB4AD2E64
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 09:10:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6819116F248
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 07:00:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E69333B2A34
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 07:10:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0127027A934;
-	Tue, 10 Jun 2025 07:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD9C27FB18;
+	Tue, 10 Jun 2025 07:09:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jk8cA5qi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WCWmOjcu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882C62EB11;
-	Tue, 10 Jun 2025 06:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CBC27A904;
+	Tue, 10 Jun 2025 07:09:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749538799; cv=none; b=cTV6z9A9M5nB59l2nJSky+AQNgmz1zTd+P8DgHsrOVzTQ+C2H5e5vCSxMqQRGV4tlLbaRHNdbhUW+pghrVWSre1bStGJ0qWDRrZLwUefF78wojEJ8DNPnvNho2qHeFkiS+6f0Ktjf5oHg2SilAO4GKcqi5OjPeQZwi6i1gaTkXI=
+	t=1749539362; cv=none; b=lQbz7Ic05cYcEqnQG4JH7pRzItw6qLJm3ElSjXl59EH9M6mqYpZwbi6EJagy6VuAALgNMOwCh1KlDZ0T9CH6ojIzq6oY6qEt1fKF7IlRH0py9N6EjBe448aE0y6z6IODa6XgV2q63On4dYRl8EiQdEmYWr9SLJkhUF8HYFn1PsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749538799; c=relaxed/simple;
-	bh=nQXu7/qHIbG/mZfLTshtxBAdZxbuaewWvV6VL9QWdqY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bt6Zm0e4y4gRBElaAkYbPMJgd1Q2/Gkbuoiz/CK98wfOfQQ4KGanLi58OvIUBu203qZDOujGQUbjNzTe7JMzJD/BlqeOTQ/be0IhZ3qkXd+WyEt2g+61TG3mOpFTIav6sNPvh6z0O9KjHfq0ZLlfwIJPu4YZqb1Ci7//6Dat7sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jk8cA5qi; arc=none smtp.client-ip=192.198.163.15
+	s=arc-20240116; t=1749539362; c=relaxed/simple;
+	bh=rBhGfRjbXGJT1L0cBkib0dMcBkiLujV0EA5TXcGUHJg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X3g8L34wUqDDsCO2UzE7xv/88+Y9tqx+fwGKWC8Y7E+kSaernUb+OnTsODDTNzT9eq2BLqmG4SDRJ94Z5S5hth0BbOAn5v7+mXHAbnj8CdHDF9y2ObhHkIcurYgb5haU0FjL/fqQBy5fobSditwJHHvrapQOPSCrzjf/B+FeeFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WCWmOjcu; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749538797; x=1781074797;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nQXu7/qHIbG/mZfLTshtxBAdZxbuaewWvV6VL9QWdqY=;
-  b=jk8cA5qi2xUI2Q1KVsW8L6/cz5u9am+AnM7+sii8GNs4uRnhnvSfVkUK
-   fCZeGiXJnZT4G8Alpe7eXShY3qZPyllg7Zh+5jvq17NcBhxskWxpEtGxY
-   bztLBVipsAuJtjJSDT+1G2yy1LHlVp+d7Qw35y0TUgNzSfwks/P4VODSB
-   i2vEXhplbAlOjBEcUo2hZ5Iq1q6E+spk+UxxI1mvkgK9/0TRtWznSJHrl
-   /URIvayqWrYqsSWEqU+cUPwoclTnaCgIJ/RZ71GTm0hQ6dr+5SJR5fqJe
-   BkB1IZnRNySaKr0EH14Ugem52vusBDpRfbgD5j9Zhg/LnjytKVZgn4pzD
-   g==;
-X-CSE-ConnectionGUID: MrSB17LyQaCtj7p1eRWCgA==
-X-CSE-MsgGUID: czrlcdYRQqmXWzP8sypG4Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="51778988"
+  t=1749539360; x=1781075360;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=rBhGfRjbXGJT1L0cBkib0dMcBkiLujV0EA5TXcGUHJg=;
+  b=WCWmOjcuMs4hjWJ9oy1Jdf0fFIA92km3U6hqRkcQe8/Jcg9x2zfzwiGc
+   kXxYqZL1s9Hxr24acQZdStHqZVlMjrzsw5OGUuJGXSKeAu2v4t3kn08t1
+   jAIyp1bV1f2fKK0j3Wic3r1cS61aOP4Anhhab9SVnUZwOkIrIC27QRSKy
+   8WKN6cPEjyXcl/tbfH7tDToxr+GJcQK1eSgZz9gftIHOCXWdPO8UrfkXO
+   1ijo6YDv0/6oEuyzmILUw3vhQRGSvgZEI2+Q0xy+6luiugHUL12Vhsmm/
+   pwdtheghzrGFcV1HF9QipWjbnOXUYKcldNaFNxpVhlU169uwEP19VrimO
+   A==;
+X-CSE-ConnectionGUID: m1JYpVqDSHSco6uLZCHCmQ==
+X-CSE-MsgGUID: 24DOZnKZSAWaVLEgGPOngA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="50742024"
 X-IronPort-AV: E=Sophos;i="6.16,224,1744095600"; 
-   d="scan'208";a="51778988"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 23:59:57 -0700
-X-CSE-ConnectionGUID: ZiXdYjsHRTe5w9XKMyrQaA==
-X-CSE-MsgGUID: pq2m0M7pTrWZ7k3/HXV1AQ==
+   d="scan'208";a="50742024"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 00:09:19 -0700
+X-CSE-ConnectionGUID: FTuat8K7SFevwHdRdynsCQ==
+X-CSE-MsgGUID: 9MkNzKruSzKyGhID0rxevQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,224,1744095600"; 
-   d="scan'208";a="169919096"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa002.fm.intel.com with ESMTP; 09 Jun 2025 23:59:52 -0700
-Date: Tue, 10 Jun 2025 14:53:00 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
-	christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
-	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
-	dan.j.williams@intel.com, yilun.xu@intel.com,
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	lukas@wunner.de, yan.y.zhao@intel.com, daniel.vetter@ffwll.ch,
-	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
-Message-ID: <aEfWTEaQv2HhldWX@yilunxu-OptiPlex-7050>
-References: <aCRAHRCKP1s0Oi0c@yilunxu-OptiPlex-7050>
- <20250514163339.GD382960@nvidia.com>
- <aCYQdDrYYZRAgsen@yilunxu-OptiPlex-7050>
- <9dea400f-a57b-43be-a2e4-24a9f51e6ba0@amd.com>
- <aDE5SPzOAU0sNIt+@yilunxu-OptiPlex-7050>
- <ae16db07-5fca-4369-aa67-cbe2e0fd60fd@amd.com>
- <aDhyC73r149syMpc@yilunxu-OptiPlex-7050>
- <79872224-4e81-446b-a451-28260f449ea9@amd.com>
- <aDnbgBbxF8IkH/cq@yilunxu-OptiPlex-7050>
- <bd0d8d69-78dd-44d8-9f32-d945bc6078c2@amd.com>
+   d="scan'208";a="147312166"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.144]) ([10.124.245.144])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 00:09:17 -0700
+Message-ID: <ffb5e853-dedc-45bb-acd8-c58ff2fc0b71@linux.intel.com>
+Date: Tue, 10 Jun 2025 15:09:13 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bd0d8d69-78dd-44d8-9f32-d945bc6078c2@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 07/16] x86/pmu: Rename
+ pmu_gp_counter_is_available() to pmu_arch_event_is_available()
+To: Sean Christopherson <seanjc@google.com>,
+ Andrew Jones <andrew.jones@linux.dev>, Janosch Frank
+ <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ =?UTF-8?Q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <20250529221929.3807680-1-seanjc@google.com>
+ <20250529221929.3807680-8-seanjc@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20250529221929.3807680-8-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 10, 2025 at 02:20:03PM +1000, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 31/5/25 02:23, Xu Yilun wrote:
-> > On Fri, May 30, 2025 at 12:29:30PM +1000, Alexey Kardashevskiy wrote:
-> > > 
-> > > 
-> > > On 30/5/25 00:41, Xu Yilun wrote:
-> > > > > > > > 
-> > > > > > > > FLR to a bound device is absolutely fine, just break the CC state.
-> > > > > > > > Sometimes it is exactly what host need to stop CC immediately.
-> > > > > > > > The problem is in VFIO's pre-FLR handling so we need to patch VFIO, not
-> > > > > > > > PCI core.
-> > > > > > > 
-> > > > > > > What is a problem here exactly?
-> > > > > > > FLR by the host which equals to any other PCI error? The guest may or may not be able to handle it, afaik it does not handle any errors now, QEMU just stops the guest.
-> > > > > > 
-> > > > > > It is about TDX Connect.
-> > > > > > 
-> > > > > > According to the dmabuf patchset, the dmabuf needs to be revoked before
-> > > > > > FLR. That means KVM unmaps MMIOs when the device is in LOCKED/RUN state.
-> > > > > > That is forbidden by TDX Module and will crash KVM.
-> > > > > 
-> > > > > 
-> > > > > FLR is something you tell the device to do, how/why would TDX know about it?
-> > > > 
-> > > > I'm talking about FLR in VFIO driver. The VFIO driver would zap bar
-> > > > before FLR. The zapping would trigger KVM unmap MMIOs. See
-> > > > vfio_pci_zap_bars() for legacy case, and see [1] for dmabuf case.
-> > > 
-> > > oh I did not know that we do this zapping, thanks for the pointer.
-> > > > [1] https://lore.kernel.org/kvm/20250307052248.405803-4-vivek.kasireddy@intel.com/
-> > > > 
-> > > > A pure FLR without zapping bar is absolutely OK.
-> > > > 
-> > > > > Or it check the TDI state on every map/unmap (unlikely)?
-> > > > 
-> > > > Yeah, TDX Module would check TDI state on every unmapping.
-> > > 
-> > > _every_? Reading the state from DOE mailbox is not cheap enough (imho) to do on every unmap.
-> > 
-> > Sorry for confusing. TDX firmware just checks if STOP TDI firmware call
-> > is executed, will not check the real device state via DOE. That means
-> > even if device has physically exited to UNLOCKED, TDX host should still
-> > call STOP TDI fwcall first, then MMIO unmap.
-> > 
-> > > 
-> > > > > 
-> > > > > > So the safer way is
-> > > > > > to unbind the TDI first, then revoke MMIOs, then do FLR.
-> > > > > > 
-> > > > > > I'm not sure when p2p dma is involved AMD will have the same issue.
-> > > > > 
-> > > > > On AMD, the host can "revoke" at any time, at worst it'll see RMP events from IOMMU. Thanks,
-> > > > 
-> > > > Is the RMP event firstly detected by host or guest? If by host,
-> > > 
-> > > Host.
-> > > 
-> > > > host could fool guest by just suppress the event. Guest thought the
-> > > > DMA writting is successful but it is not and may cause security issue.
-> > > 
-> > > An RMP event on the host is an indication that RMP check has failed and DMA to the guest did not complete so the guest won't see new data. Same as other PCI errors really. RMP acts like a firewall, things behind it do not need to know if something was dropped. Thanks,
-> > 
-> > Not really, guest thought the data is changed but it actually doesn't.
-> > I.e. data integrity is broken.
-> 
-> I am not following, sorry. Integrity is broken when something untrusted (== other than the SNP guest and the trusted device) manages to write to the guest encrypted memory successfully.
 
-Integrity is also broken when guest thought the content in some addr was
-written to A but it actually stays B.
+On 5/30/2025 6:19 AM, Sean Christopherson wrote:
+> Rename pmu_gp_counter_is_available() to pmu_arch_event_is_available() to
+> reflect what the field and helper actually track.  The availablity of
+> architectural events has nothing to do with the GP counters themselves.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  lib/x86/pmu.c | 4 ++--
+>  lib/x86/pmu.h | 6 +++---
+>  x86/pmu.c     | 6 +++---
+>  3 files changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
+> index d06e9455..599168ac 100644
+> --- a/lib/x86/pmu.c
+> +++ b/lib/x86/pmu.c
+> @@ -21,7 +21,7 @@ void pmu_init(void)
+>  		pmu.gp_counter_mask_length = (cpuid_10.a >> 24) & 0xff;
+>  
+>  		/* CPUID.0xA.EBX bit is '1' if a counter is NOT available. */
 
-> If nothing is written - the guest can easily see this and do... nothing?
+We need to modify the comment as well.
 
-The guest may not see this only by RMP event, or IOMMU fault, malicious
-host could surpress these events.  Yes, guest may later read the addr
-and see the trick, but this cannot be ensured. There is no general
-contract saying SW must read the addr to ensure DMA write successful.
 
-And DMA to MMIO is the worse case than DMA to memory. SW even cannot
-read back the content since MMIO registers may be Write Only.
+> -		pmu.gp_counter_available = ~cpuid_10.b;
+> +		pmu.arch_event_available = ~cpuid_10.b;
+>  
+>  		if (this_cpu_has(X86_FEATURE_PDCM))
+>  			pmu.perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
+> @@ -51,7 +51,7 @@ void pmu_init(void)
+>  		}
+>  		pmu.gp_counter_width = PMC_DEFAULT_WIDTH;
+>  		pmu.gp_counter_mask_length = pmu.nr_gp_counters;
+> -		pmu.gp_counter_available = (1u << pmu.nr_gp_counters) - 1;
+> +		pmu.arch_event_available = (1u << pmu.nr_gp_counters) - 1;
 
-So you need ASID fence to make guest easily see the DMA Silent Drop.
-Intel & ARM also have there own way.
+"available architectural events" and "available GP counters" are two
+different things. I know this would be changed in later patch 09/16, but
+it's really confusing. Could we merge the later patch 09/16 into this patch?
 
-The purpose here is to have a consensus that benigh VMM should avoid
-triggering these DMA Silent Drop protections, by "unbind TDI first,
-then invalidate MMIO".
 
-Thanks,
-Yilun
+>  
+>  		if (this_cpu_has_perf_global_status()) {
+>  			pmu.msr_global_status = MSR_AMD64_PERF_CNTR_GLOBAL_STATUS;
+> diff --git a/lib/x86/pmu.h b/lib/x86/pmu.h
+> index f07fbd93..d0ad280a 100644
+> --- a/lib/x86/pmu.h
+> +++ b/lib/x86/pmu.h
+> @@ -64,7 +64,7 @@ struct pmu_caps {
+>  	u8 nr_gp_counters;
+>  	u8 gp_counter_width;
+>  	u8 gp_counter_mask_length;
+> -	u32 gp_counter_available;
+> +	u32 arch_event_available;
+>  	u32 msr_gp_counter_base;
+>  	u32 msr_gp_event_select_base;
+>  
+> @@ -110,9 +110,9 @@ static inline bool this_cpu_has_perf_global_status(void)
+>  	return pmu.version > 1;
+>  }
+>  
+> -static inline bool pmu_gp_counter_is_available(int i)
+> +static inline bool pmu_arch_event_is_available(int i)
+>  {
+> -	return pmu.gp_counter_available & BIT(i);
+> +	return pmu.arch_event_available & BIT(i);
+>  }
+>  
+>  static inline u64 pmu_lbr_version(void)
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 8cf26b12..0ce34433 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -436,7 +436,7 @@ static void check_gp_counters(void)
+>  	int i;
+>  
+>  	for (i = 0; i < gp_events_size; i++)
+> -		if (pmu_gp_counter_is_available(i))
+> +		if (pmu_arch_event_is_available(i))
+>  			check_gp_counter(&gp_events[i]);
+>  		else
+>  			printf("GP event '%s' is disabled\n",
+> @@ -463,7 +463,7 @@ static void check_counters_many(void)
+>  	int i, n;
+>  
+>  	for (i = 0, n = 0; n < pmu.nr_gp_counters; i++) {
+> -		if (!pmu_gp_counter_is_available(i))
+> +		if (!pmu_arch_event_is_available(i))
+>  			continue;
 
-> Devices have bugs or spurious interrupts happen, the guest driver should be able to cope with that.
-> > Also please help check if the following relates to this issue:
-> > 
-> > SEV-TIO Firmware Interface SPEC, Section 2.11
-> > 
-> > If a bound TDI sends a request to the root complex, and the IOMMU detects a fault caused by host
-> > configuration, the root complex fences the ASID from all further I/O to or from that guest. A host
-> > fault is either a host page table fault or an RMP check violation. ASID fencing means that the
-> > IOMMU blocks all further I/O from the root complex to the guest that the TDI was bound, and the
-> > root complex blocks all MMIO accesses by the guest. When a guest writes to MMIO, the write is
-> > silently dropped. When a guest reads from MMIO, the guest reads 1s.
-> 
-> Right, this is about not letting bad data through, i.e. integrity. Thanks,
-> 
-> > 
-> > Thanks,
-> > Yilun
-> > 
-> > > 
-> > > > 
-> > > > Thanks,
-> > > > Yilun
-> > > 
-> > > -- 
-> > > Alexey
-> > > 
-> 
-> -- 
-> Alexey
-> 
+The intent of check_counters_many() is to verify all available GP and fixed
+counters can count correctly at the same time. So we should select another
+available event to verify the counter instead of skipping the counter if an
+event is not available.
+
+Maybe like this.
+
+diff --git a/x86/pmu.c b/x86/pmu.c
+index 63eae3db..013fdfce 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -457,18 +457,34 @@ static void check_fixed_counters(void)
+        }
+ }
+
++static struct pmu_event *get_one_event(int idx)
++{
++       int i;
++
++       if (pmu_arch_event_is_available(idx))
++               return &gp_events[idx % gp_events_size];
++
++       for (i = 0; i < gp_events_size; i++) {
++               if (pmu_arch_event_is_available(i))
++                       return &gp_events[i];
++       }
++
++       return NULL;
++}
++
+ static void check_counters_many(void)
+ {
++       struct pmu_event *evt;
+        pmu_counter_t cnt[48];
+        int i, n;
+
+        for (i = 0, n = 0; n < pmu.nr_gp_counters; i++) {
+-               if (!pmu_arch_event_is_available(i))
++               evt = get_one_event(i);
++               if (!evt)
+                        continue;
+
+                cnt[n].ctr = MSR_GP_COUNTERx(n);
+-               cnt[n].config = EVNTSEL_OS | EVNTSEL_USR |
+-                       gp_events[i % gp_events_size].unit_sel;
++               cnt[n].config = EVNTSEL_OS | EVNTSEL_USR | evt->unit_sel;
+                n++;
+        }
+        for (i = 0; i < fixed_counters_num; i++) {
+
+
+>  
+>  		cnt[n].ctr = MSR_GP_COUNTERx(n);
+> @@ -902,7 +902,7 @@ static void set_ref_cycle_expectations(void)
+>  	uint64_t t0, t1, t2, t3;
+>  
+>  	/* Bit 2 enumerates the availability of reference cycles events. */
+> -	if (!pmu.nr_gp_counters || !pmu_gp_counter_is_available(2))
+> +	if (!pmu.nr_gp_counters || !pmu_arch_event_is_available(2))
+>  		return;
+>  
+>  	if (this_cpu_has_perf_global_ctrl())
 
