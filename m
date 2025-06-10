@@ -1,231 +1,200 @@
-Return-Path: <kvm+bounces-48778-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48779-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 432DCAD2CED
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 06:58:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 452F5AD2D31
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 07:20:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD0491892282
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 04:58:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEC6116EB2F
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 05:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B624025E813;
-	Tue, 10 Jun 2025 04:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 432C625EF8F;
+	Tue, 10 Jun 2025 05:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="k4/pTVwY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VOtvCzaJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED85A22B5AC
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 04:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43801D9A5F;
+	Tue, 10 Jun 2025 05:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749531488; cv=none; b=Wb2z8vlZMt5uPgSMIj3Sqp1yPEe2HBJmQ3asNWLI+ufF/kYE+DogPJHDPse8Xci1hRlCD+a4kuPs0o87rvewx2Mgc2pveWQa3pj4WlWpPHrhiW4tP5qOEXyFtd9qwphIQbB3MSv7Oo4lpjY8kK/Zm70/THxv48W1GyJ4jQCi6KY=
+	t=1749532826; cv=none; b=dg4NB/MjJwYcVmKeE3K2kYybf52sfOQ+R4MOxp6iObHIhGmev4ThX8kk8ZBufomsDlke93oN95ZTMDrISFDiiFl6EyEF7+Xp6Jv6MmsU4tmIphBNBz62bo8fddjuKe1INUwn5wbkyJV5mvyd25H0I3l+L8m0OIG7olLBIeSxOqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749531488; c=relaxed/simple;
-	bh=01hdTf8O0DdEHladn6IEz6BWtaQbTZBfrj2t0P0Wg/s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J41zbqHsEsBV42Z4OfWX52KmsPs+Ek9SxV9KZbHtnqNWED42h3nh2BEDCerdfZELFU0o8oTsqLwXwIAartGh29yK7G5SnM3peP7gzq2KIf7g4BqyFzPfrlZD/AGmJ+Z4fSIe+LW8Q6elwAcb+6ei16SzZ/3IFsuae9eHqTn6ER0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=k4/pTVwY; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-234d366e5f2so57052115ad.1
-        for <kvm@vger.kernel.org>; Mon, 09 Jun 2025 21:58:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1749531486; x=1750136286; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HE/lloDxCFBh4QBDkfEJkgJnUlMqb+VAfBzAqcIIAtI=;
-        b=k4/pTVwY9YuynNHEGeIWzeLtmlkZWIOxyMqTjm0WcNWXYM6WeARVm5ZjCanERzG/QE
-         Q2ZskmfE2d7dm4kUsOfm1W8JGum0oKQ51mGKQRNUqHcEdurlXYCi9v66/Mrbl08RMvPB
-         NxMiqM9QTfffbBpSINEoEJ4Qixtw91jel6SgoOMjcd6CINMfRuQAwBHCnSpFhJyWHMTd
-         YsvkmW6gLwSK3J/mdGz+6FQAqdfLTj+m14T2vLKJzxEkgNAMZ8cM4paImMbLfpKlvSKe
-         fDC9LY/nniqCBHj8nE6RR+Nw81Wa5GABGQtk4MoiBFYE26rDG7HESXzuToqN+bd9JS+C
-         QuSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749531486; x=1750136286;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HE/lloDxCFBh4QBDkfEJkgJnUlMqb+VAfBzAqcIIAtI=;
-        b=h2DWNkZDd7TBmnxuozedh7OL4EVbYNtCzOeEgDeQ/v7HWK6XQ83z5tOusSxR/2D6fT
-         OLUwi8VMzloTjg7bIiuiw0nsNZV1CkYAu/5wnU/CXcHYVKNDbJR6zQ/i1NITNgOZAGp2
-         58GWIG4witcaQIbaipHu3tQLdI/jUKjHfetFKcNVOi8MhnPILXLr191J8usLd9kYTeg0
-         JtM+CHy0itjXCXt4F1GPaWUN3tty9f2dE/4vVmMLo61HTiAFqMYn+eicjh5Tj5lY3c0c
-         J8MkVpGygo+y/E8JnP6dwcTkUXDmNvHSKeNLIdTL59rGBT0LSDJ9LvY6LyORhP+iJXax
-         7H4w==
-X-Gm-Message-State: AOJu0YwY7crbA949gjYJua0Eu+UzBaPk5SpHOYLY52xsNu2Qx3g6BBcl
-	0mhOhzMtp8e5mJLCnx6H95ToL3p1zCL9H2DxftK5nh79nl23y6kGeeU9Eyx3thQiawE=
-X-Gm-Gg: ASbGncuzEVTV2oOyRjUV5nWwLc5V7Gdi6FLvgksAXdWJk3EcMgBKBz83inpyphyQW+T
-	7MTO5T5UeFBUbRyiLgA9Nj5LscUP8gToz1Gkj/3qiIw8DngzcJnbqjD9pkm/0ucyyiGt1GBzs2x
-	okyIBoTq4lqLlmqs/J/NI6oWV1x+PO+ga4i8DxKO6rlIYdc88qC1Lx/c4EBqvbzj7zZnqWlqUOU
-	gqwmDM55m8FLyjqgRpvVjJP5EpdVA/MFq3LL7E2CXGFcVHQ73URHboN1Wufc/uRocUqLyZ+IfbT
-	YjCfPBuVooa8PJltwB1XRG2LwuL6RtlK3VqRWc0dcBAR7EVumfoqZG21+WOqVWnUKkDWOg/jKvr
-	roajkrm4CAo5k
-X-Google-Smtp-Source: AGHT+IFivQkyqAO2dh5O2UoBGDcVLCQlm9QDKUwL52j1PsV1wYGm/l7MlPEMGV7J6kWpBVrpS1Nt/g==
-X-Received: by 2002:a17:903:1247:b0:22e:3c2:d477 with SMTP id d9443c01a7336-23601d25c36mr248229945ad.25.1749531486236;
-        Mon, 09 Jun 2025 21:58:06 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-236034059besm62721975ad.174.2025.06.09.21.58.03
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 09 Jun 2025 21:58:05 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: alex.williamson@redhat.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lizhe.67@bytedance.com
-Subject: [RFC v2] vfio/type1: optimize vfio_unpin_pages_remote() for large folio
-Date: Tue, 10 Jun 2025 12:57:53 +0800
-Message-ID: <20250610045753.6405-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1749532826; c=relaxed/simple;
+	bh=7UduM03vJniQZx0LIRBGRrRrB795yrEqhfwv6fFHnwg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QCXII6v9TNvuX2tMnSBI8ejXlqSkVIJSDNBsCKHEgiZAtY4fam7EWcfNjaA0xNAv/5xQqPbT8FJQX5WX02PWM8aZaS3Jw52ibn7YDFXL29Tp4UPCf96B0/tz2QRSRSeMZ4S5E4SRm96VMNKRiopF+lSNnx/jX/+aCcrMkvHelbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VOtvCzaJ; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749532825; x=1781068825;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=7UduM03vJniQZx0LIRBGRrRrB795yrEqhfwv6fFHnwg=;
+  b=VOtvCzaJXsyxuat/mlL4zguzfsDYyRFj8+gibqDeULN7Zli1tOVVolmi
+   zWLm9IcWvyKQoDTg6n4WA/jgIcPqt2GXynWxlqoySWCpq40GOTdbTxghc
+   EFkQFf94jFFpaXfbOTJWkm1BoJJqMJ/mFeMm5tt88jG1GEOkiE2M89hlW
+   M3G5YS1caixoI1uAFtPOHCl0JqwxaaB02s9j0WtwZtYpO1I5dLQjfaaeD
+   2vQVnsRLV2Qj5eckF6PwSfMrvQyr/YTueEQ2JQmZUtsTmcyO0/YCRmhE9
+   QX0voSa7A0HSNVDHfQeb+I3asC4XVbBLcqsTgUbrUf4ZFTfFqN7jsLi0o
+   g==;
+X-CSE-ConnectionGUID: /l/HURq7Rbu2qCi7jLGnew==
+X-CSE-MsgGUID: 3/pboYefRWOlQdQ7yh2dKg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="51717366"
+X-IronPort-AV: E=Sophos;i="6.16,224,1744095600"; 
+   d="scan'208";a="51717366"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 22:20:24 -0700
+X-CSE-ConnectionGUID: 11QiN1ZEQJmV5AHsUIjsrA==
+X-CSE-MsgGUID: zLDEvjNOR1SKdVeGzXzr1g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,224,1744095600"; 
+   d="scan'208";a="146701628"
+Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 22:20:18 -0700
+Message-ID: <c3fbf6ac-92b9-4a14-9505-ab9e8f30b06b@linux.intel.com>
+Date: Tue, 10 Jun 2025 13:19:29 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
+To: Alexey Kardashevskiy <aik@amd.com>, Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+ christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
+ alex.williamson@redhat.com, vivek.kasireddy@intel.com,
+ dan.j.williams@intel.com, yilun.xu@intel.com, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+ daniel.vetter@ffwll.ch, leon@kernel.org, zhenzhong.duan@intel.com,
+ tao1.su@intel.com
+References: <2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
+ <20250512140617.GA285583@nvidia.com> <aCRAHRCKP1s0Oi0c@yilunxu-OptiPlex-7050>
+ <20250514163339.GD382960@nvidia.com> <aCYQdDrYYZRAgsen@yilunxu-OptiPlex-7050>
+ <9dea400f-a57b-43be-a2e4-24a9f51e6ba0@amd.com>
+ <aDE5SPzOAU0sNIt+@yilunxu-OptiPlex-7050>
+ <ae16db07-5fca-4369-aa67-cbe2e0fd60fd@amd.com>
+ <aDhyC73r149syMpc@yilunxu-OptiPlex-7050>
+ <79872224-4e81-446b-a451-28260f449ea9@amd.com>
+ <aDnbgBbxF8IkH/cq@yilunxu-OptiPlex-7050>
+ <bd0d8d69-78dd-44d8-9f32-d945bc6078c2@amd.com>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <bd0d8d69-78dd-44d8-9f32-d945bc6078c2@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Li Zhe <lizhe.67@bytedance.com>
+On 6/10/25 12:20, Alexey Kardashevskiy wrote:
+> 
+> 
+> On 31/5/25 02:23, Xu Yilun wrote:
+>> On Fri, May 30, 2025 at 12:29:30PM +1000, Alexey Kardashevskiy wrote:
+>>>
+>>>
+>>> On 30/5/25 00:41, Xu Yilun wrote:
+>>>>>>>>
+>>>>>>>> FLR to a bound device is absolutely fine, just break the CC state.
+>>>>>>>> Sometimes it is exactly what host need to stop CC immediately.
+>>>>>>>> The problem is in VFIO's pre-FLR handling so we need to patch 
+>>>>>>>> VFIO, not
+>>>>>>>> PCI core.
+>>>>>>>
+>>>>>>> What is a problem here exactly?
+>>>>>>> FLR by the host which equals to any other PCI error? The guest 
+>>>>>>> may or may not be able to handle it, afaik it does not handle any 
+>>>>>>> errors now, QEMU just stops the guest.
+>>>>>>
+>>>>>> It is about TDX Connect.
+>>>>>>
+>>>>>> According to the dmabuf patchset, the dmabuf needs to be revoked 
+>>>>>> before
+>>>>>> FLR. That means KVM unmaps MMIOs when the device is in LOCKED/RUN 
+>>>>>> state.
+>>>>>> That is forbidden by TDX Module and will crash KVM.
+>>>>>
+>>>>>
+>>>>> FLR is something you tell the device to do, how/why would TDX know 
+>>>>> about it?
+>>>>
+>>>> I'm talking about FLR in VFIO driver. The VFIO driver would zap bar
+>>>> before FLR. The zapping would trigger KVM unmap MMIOs. See
+>>>> vfio_pci_zap_bars() for legacy case, and see [1] for dmabuf case.
+>>>
+>>> oh I did not know that we do this zapping, thanks for the pointer.
+>>>> [1] https://lore.kernel.org/kvm/20250307052248.405803-4- 
+>>>> vivek.kasireddy@intel.com/
+>>>>
+>>>> A pure FLR without zapping bar is absolutely OK.
+>>>>
+>>>>> Or it check the TDI state on every map/unmap (unlikely)?
+>>>>
+>>>> Yeah, TDX Module would check TDI state on every unmapping.
+>>>
+>>> _every_? Reading the state from DOE mailbox is not cheap enough 
+>>> (imho) to do on every unmap.
+>>
+>> Sorry for confusing. TDX firmware just checks if STOP TDI firmware call
+>> is executed, will not check the real device state via DOE. That means
+>> even if device has physically exited to UNLOCKED, TDX host should still
+>> call STOP TDI fwcall first, then MMIO unmap.
+>>
+>>>
+>>>>>
+>>>>>> So the safer way is
+>>>>>> to unbind the TDI first, then revoke MMIOs, then do FLR.
+>>>>>>
+>>>>>> I'm not sure when p2p dma is involved AMD will have the same issue.
+>>>>>
+>>>>> On AMD, the host can "revoke" at any time, at worst it'll see RMP 
+>>>>> events from IOMMU. Thanks,
+>>>>
+>>>> Is the RMP event firstly detected by host or guest? If by host,
+>>>
+>>> Host.
+>>>
+>>>> host could fool guest by just suppress the event. Guest thought the
+>>>> DMA writting is successful but it is not and may cause security issue.
+>>>
+>>> An RMP event on the host is an indication that RMP check has failed 
+>>> and DMA to the guest did not complete so the guest won't see new 
+>>> data. Same as other PCI errors really. RMP acts like a firewall, 
+>>> things behind it do not need to know if something was dropped. Thanks,
+>>
+>> Not really, guest thought the data is changed but it actually doesn't.
+>> I.e. data integrity is broken.
+> 
+> I am not following, sorry. Integrity is broken when something untrusted 
+> (== other than the SNP guest and the trusted device) manages to write to 
+> the guest encrypted memory successfully. If nothing is written - the 
+> guest can easily see this and do... nothing? Devices have bugs or 
+> spurious interrupts happen, the guest driver should be able to cope with 
+> that.
 
-This patch is based on patch 'vfio/type1: optimize vfio_pin_pages_remote()
-for large folios'[1].
+Data integrity might not be the most accurate way to describe the
+situation here. If I understand correctly, the MMIO mapping was
+destroyed before the device was unbound (meaning the guest still sees
+the device). When the guest issues a P2P write to the device's MMIO, it
+will definitely fail, but the guest won't be aware of this failure.
 
-When vfio_unpin_pages_remote() is called with a range of addresses that
-includes large folios, the function currently performs individual
-put_pfn() operations for each page. This can lead to significant
-performance overheads, especially when dealing with large ranges of pages.
+Imagine this on a bare-metal system: if a P2P access targets a device's
+MMIO but the device or platform considers it an illegal access, there
+should be a bus error or machine check exception. Alternatively, if the
+device supports out-of-band AER, the AER driver should then catch and
+process these errors.
 
-This patch optimize this process by batching the put_pfn() operations.
+Therefore, unbinding the device before MMIO invalidation could generally
+avoid this.
 
-The performance test results, based on v6.15, for completing the 16G VFIO
-IOMMU DMA unmapping, obtained through unit test[2] with slight
-modifications[3], are as follows.
-
-Base(v6.15):
-./vfio-pci-mem-dma-map 0000:03:00.0 16
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.048 s (331.3 GB/s)
-VFIO UNMAP DMA in 0.138 s (116.1 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.281 s (57.0 GB/s)
-VFIO UNMAP DMA in 0.313 s (51.1 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.053 s (301.2 GB/s)
-VFIO UNMAP DMA in 0.139 s (115.2 GB/s)
-
-Map[1] + This patches:
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.028 s (578.4 GB/s)
-VFIO UNMAP DMA in 0.049 s (324.8 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.293 s (54.6 GB/s)
-VFIO UNMAP DMA in 0.308 s (51.9 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.032 s (494.5 GB/s)
-VFIO UNMAP DMA in 0.050 s (322.8 GB/s)
-
-For large folio, we achieve an approximate 64% performance improvement
-in the VFIO UNMAP DMA item. For small folios, the performance test
-results appear to show no significant changes.
-
-[1]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
-[2]: https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
-[3]: https://lore.kernel.org/all/20250610031013.98556-1-lizhe.67@bytedance.com/
-
-Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
----
-Changelogs:
-
-v1->v2:
-- Refactor the implementation of the optimized code
-
-v1 patch: https://lore.kernel.org/all/20250605124923.21896-1-lizhe.67@bytedance.com/
-
- drivers/vfio/vfio_iommu_type1.c | 53 +++++++++++++++++++++++++--------
- 1 file changed, 41 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 28ee4b8d39ae..2f6c0074d7b3 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -469,17 +469,28 @@ static bool is_invalid_reserved_pfn(unsigned long pfn)
- 	return true;
- }
- 
--static int put_pfn(unsigned long pfn, int prot)
-+static inline void _put_pfns(struct page *page, int npages, int prot)
- {
--	if (!is_invalid_reserved_pfn(pfn)) {
--		struct page *page = pfn_to_page(pfn);
-+	unpin_user_page_range_dirty_lock(page, npages, prot & IOMMU_WRITE);
-+}
- 
--		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
--		return 1;
-+/*
-+ * The caller must ensure that these npages PFNs belong to the same folio.
-+ */
-+static inline int put_pfns(unsigned long pfn, int npages, int prot)
-+{
-+	if (!is_invalid_reserved_pfn(pfn)) {
-+		_put_pfns(pfn_to_page(pfn), npages, prot);
-+		return npages;
- 	}
- 	return 0;
- }
- 
-+static inline int put_pfn(unsigned long pfn, int prot)
-+{
-+	return put_pfns(pfn, 1, prot);
-+}
-+
- #define VFIO_BATCH_MAX_CAPACITY (PAGE_SIZE / sizeof(struct page *))
- 
- static void __vfio_batch_init(struct vfio_batch *batch, bool single)
-@@ -805,15 +816,33 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
- 				    unsigned long pfn, unsigned long npage,
- 				    bool do_accounting)
- {
--	long unlocked = 0, locked = 0;
--	long i;
-+	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
- 
--	for (i = 0; i < npage; i++, iova += PAGE_SIZE) {
--		if (put_pfn(pfn++, dma->prot)) {
--			unlocked++;
--			if (vfio_find_vpfn(dma, iova))
--				locked++;
-+	while (npage) {
-+		struct folio *folio;
-+		struct page *page;
-+		long step = 1;
-+
-+		if (is_invalid_reserved_pfn(pfn))
-+			goto next;
-+
-+		page = pfn_to_page(pfn);
-+		folio = page_folio(page);
-+
-+		if (!folio_test_large(folio)) {
-+			_put_pfns(page, 1, dma->prot);
-+		} else {
-+			step = min_t(long, npage,
-+				folio_nr_pages(folio) -
-+				folio_page_idx(folio, page));
-+			_put_pfns(page, step, dma->prot);
- 		}
-+
-+		unlocked += step;
-+next:
-+		pfn += step;
-+		iova += PAGE_SIZE * step;
-+		npage -= step;
- 	}
- 
- 	if (do_accounting)
--- 
-2.20.1
-
+Thanks,
+baolu
 
