@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-48874-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48875-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AF89AD4353
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:55:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 103C5AD4354
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:55:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 235F5189CAD5
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:55:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7792189CCFD
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B22926658A;
-	Tue, 10 Jun 2025 19:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE58C266B46;
+	Tue, 10 Jun 2025 19:54:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cfF5o8sU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JnsteRt1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C723F266571
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889A6265CDD
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749585274; cv=none; b=D3xuYAxKkZhKINXuh4YPsfnOW0i0yGP+uJmO5yHlSQp9/Djm26kjaFsRcxbD1LUBn8RD4siwpoG+pp53DdjMWOX3aHCmA57L6sNS7l0TdObdSqHFBNRgKBSBUIHPSlD6QqTDCxz5Ob2grK4oajWA1e4wdXOc42uLXbJ4phK0BcY=
+	t=1749585275; cv=none; b=lVWQFw3J3uuDLvjnM/PTX9VfH5O+z1Z64A7k8j16LSYOBlpXPPGEcxH20l+40NfA1FyFyId2xPvqbYQlD6oUqf/fXmwrUGY15TKBM55kCORZRnxGdZ6sMiyAc1tBomJulixSn8dy01KltcrH1nFyko1Z9lCzl9vlbbFF6QWqfcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749585274; c=relaxed/simple;
-	bh=lOJgZdyvxobsyrL2erVUsi4bAxihTHwXuzU0Tuf7duU=;
+	s=arc-20240116; t=1749585275; c=relaxed/simple;
+	bh=KXh8vfPV3YWVsB4F287wY2xc9Ink/ibeJW+EsFosOdw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LcX26Qc+LLpxLsJICmc/ypPaIG8m8Z8JaAe96cWE1Ajp5Q0nLKMcUqPxe1F1ZkVtjY7APbNRoIb/VRxROcgqSgBUwzq7JiTEKS6p8S2Oc5BVPNC2o9UJSbekErT5iA37sjyjIHNIRzgXY4R7ofr8E0Rz6Cw6QYMrVxyntUNTHwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cfF5o8sU; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=jCaDAlOpsPv07MgakXxIsNVLKL/2ZZttWbeeyYlg6vT/la502bowi3+TW9cn8J5V4bV9s6EBN/XyZKW+wuSQI1EIOFXwetyBSsS/+grVa64JGlYJg13VEWA8wSRFjILmyScy+Jas9pFA7xeXb5eKZFWDQmJrAUIG8kARRuIuzdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JnsteRt1; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-74841f2aee2so1513791b3a.2
-        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:54:32 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b1442e039eeso3693280a12.0
+        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749585272; x=1750190072; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749585274; x=1750190074; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=DgOi8bW4J0BL+9gSRv0FBVgmkTespc1rc8qyKO+GCeQ=;
-        b=cfF5o8sUgH7gFAxnln1jq0DcLU0XSOiquyOTVQygimgLsh/esetsYiaD7UOZFsDYap
-         SmmjTdqHGGt+nzFf5hu7G6NQy742ROK82Oto+Z6iBsSxS6qlnzo3C8bbjH8wb/8sbPGU
-         UrQNiz5fHdRJ7Qw+RSo5Fy7svkPtwzDj8rwO1VzUYh1esl/ulf5S8rjlGqruxBajBxVV
-         cbD9vY3FViAOiQi2KVfo9M8mwGRENLBmbP/eAabFukGjGzMxq4v3bpoLnsxjPQyfQAfP
-         3uYRvpaXKbkxpBmcRvtPbfvhhi24njZ3ErI3OFucpMniY85xiThhPckzfse5V/TtEiDY
-         O11A==
+        bh=SEiqUm8ULlhKUF+FhOx9GTPWli4OWcEJWWo4S1ZFfwY=;
+        b=JnsteRt1MNSoiQAJk72ke2SMYLx+LoQQ+qLZEbs2dwWHbFUa44UDlu6J/YnRjiW7G3
+         xq55oKUTVdzwKLrrLVjyEdnFYfpN/N2vRX6LvdcvluMsKYun+H2RDpwevLnaiSjtLt9a
+         dQIXrbsVvJ1uBOU/KTfArS0m3cNwEEUFfj8f63hN4SJJxJL8iGP0DVMubQi8kyrhSWq1
+         wMwyIuY5SFErw+yk6EYD6zwWx04YtiyxmTNYEqWeHhKakNHZCqMldUB7AfLeXbxniuRQ
+         KpF2l6m3Xi0I7EkceROGR+7boDGTbXlKF0GliaEION/DdxxD+g0wN4S51md83xnAFPvJ
+         mpcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749585272; x=1750190072;
+        d=1e100.net; s=20230601; t=1749585274; x=1750190074;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DgOi8bW4J0BL+9gSRv0FBVgmkTespc1rc8qyKO+GCeQ=;
-        b=ZBPDs25J3nCibs9vne0aIVIzuPoAMw8iJFTsb5ox5eM2CMoYhsVzxA1tGx5PZU4e9w
-         ZrPPfmQ78SOfp7HTOYO4eJKVrAyjwfaBsmjizxsJ2ZcldqnZAIG+VCEbrlzYNct9+Ybp
-         YR4xxv/DLhRMnPNrD2lUBMaQrCUsb4i8fxUFr+KSA/fOcD4EcRnDx8Up7Cn30v5geN32
-         fXbbL0y3h6Vp+bF/wV4620o+ZAhhwv3mnHgAQFiUsJQocXZ2X509QHJBzk6KMUTxIniM
-         sLzrtOtjC77D+pFgYs/Q7wuu7DVEvQs/3owqwqkodNiTI3lWpVMbuxE6i/0nDtsvog8o
-         a7RA==
-X-Gm-Message-State: AOJu0YzBrXP++JbHqK+Xt7TDCtx4Pj9mdf1J40lcvAriuHtcJLGfhBEw
-	MtZr+U99eynf6QeXRmfQWSwwXJp09PtTwyyb+9fdbRJxmZnOHfYXTmQ+TuiVjmk1+LI8MgxIAyG
-	ILTB1fQ==
-X-Google-Smtp-Source: AGHT+IHNBwA3q8bkqNviCDsL7dYvbTbH2tOlzp+6u2GdK5L3AQsramFvKn9nJKaM2vAJL4fvI8yBwMDYjqY=
-X-Received: from pgac17.prod.google.com ([2002:a05:6a02:2951:b0:b2c:41dc:da38])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:2d4b:b0:215:e1a0:805f
- with SMTP id adf61e73a8af0-21f867300e0mr1371116637.31.1749585272198; Tue, 10
- Jun 2025 12:54:32 -0700 (PDT)
+        bh=SEiqUm8ULlhKUF+FhOx9GTPWli4OWcEJWWo4S1ZFfwY=;
+        b=hk6MvnJfxV3qidVbInjKXIahZWsv6XOjcPGHg76VSQr6MUWODU83foJfYSAgiC3FoK
+         ykzYndPFSp5KoUNFmyKyLfUy2xLxvYqO/WLGy99gbW4hMA4Pv/xHEg/RqdAu4TALOU1P
+         bLop4BCUAZBmBACquu2kRcF1LdzffXQudLF0xwqDNgP85sHnsewZz+HJznfKkK6K8jih
+         yc4hzk9MCBcr9ZePXiHyqkImUFz65GXnx0gA7Axuz0ijXaHHdv2911bddwrvZ5v2vW7C
+         ZoK4tfJBb/M1XvVFmT6Seg7Zo7S9eNjEDNrE4v5k98+AAR6CtBPMReFR6Qny6Bm9pKS4
+         tGsA==
+X-Gm-Message-State: AOJu0YzSNyvPm07mQXIXzWoRch5kj6jKaXDcl2rzhMgf+N8DwLtQ4X5k
+	ubgiu36so7Y9zeMHidm6lNhbwb93R/87RpqU04xQZ9xyEVThpq1u+v1kKgXG6ZgYzcQae/kGaNP
+	UjYlSQA==
+X-Google-Smtp-Source: AGHT+IGVIcegpBmPYbY90bQ84zNVbfsyXngO/1PW5XVgH8Q5YhWY2YANB8C5/zgKRZA9Hw/NGUufWovgCwc=
+X-Received: from pjm3.prod.google.com ([2002:a17:90b:2fc3:b0:313:2213:1f54])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3dc3:b0:311:ae39:3dad
+ with SMTP id 98e67ed59e1d1-313af266d51mr953128a91.30.1749585273924; Tue, 10
+ Jun 2025 12:54:33 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 10 Jun 2025 12:54:09 -0700
+Date: Tue, 10 Jun 2025 12:54:10 -0700
 In-Reply-To: <20250610195415.115404-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,68 +75,59 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250610195415.115404-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
-Message-ID: <20250610195415.115404-9-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v2 08/14] x86/pmu: Use X86_PROPERTY_PMU_*
- macros to retrieve PMU information
+Message-ID: <20250610195415.115404-10-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v2 09/14] x86/sev: Use VC_VECTOR from processor.h
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
 	Sean Christopherson <seanjc@google.com>, Liam Merwick <liam.merwick@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use the recently introduced X86_PROPERTY_PMU_* macros to get PMU
-information instead of open coding equivalent functionality.
+Use VC_VECTOR (defined in processor.h along with all other known vectors)
+and drop the one-off SEV_ES_VC_HANDLER_VECTOR macro.
 
 No functional change intended.
 
 Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/pmu.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ lib/x86/amd_sev.c | 4 ++--
+ lib/x86/amd_sev.h | 6 ------
+ 2 files changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
-index 92707698..fb46b196 100644
---- a/lib/x86/pmu.c
-+++ b/lib/x86/pmu.c
-@@ -7,21 +7,19 @@ void pmu_init(void)
- 	pmu.is_intel = is_intel();
+diff --git a/lib/x86/amd_sev.c b/lib/x86/amd_sev.c
+index 66722141..6c0a66ac 100644
+--- a/lib/x86/amd_sev.c
++++ b/lib/x86/amd_sev.c
+@@ -111,9 +111,9 @@ efi_status_t setup_amd_sev_es(void)
+ 	 */
+ 	sidt(&idtr);
+ 	idt = (idt_entry_t *)idtr.base;
+-	vc_handler_idt = idt[SEV_ES_VC_HANDLER_VECTOR];
++	vc_handler_idt = idt[VC_VECTOR];
+ 	vc_handler_idt.selector = KERNEL_CS;
+-	boot_idt[SEV_ES_VC_HANDLER_VECTOR] = vc_handler_idt;
++	boot_idt[VC_VECTOR] = vc_handler_idt;
  
- 	if (pmu.is_intel) {
--		struct cpuid cpuid_10 = cpuid(10);
+ 	return EFI_SUCCESS;
+ }
+diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
+index ed6e3385..ca7216d4 100644
+--- a/lib/x86/amd_sev.h
++++ b/lib/x86/amd_sev.h
+@@ -39,12 +39,6 @@
+ bool amd_sev_enabled(void);
+ efi_status_t setup_amd_sev(void);
+ 
+-/*
+- * AMD Programmer's Manual Volume 2
+- *   - Section "#VC Exception"
+- */
+-#define SEV_ES_VC_HANDLER_VECTOR 29
 -
--		pmu.version = cpuid_10.a & 0xff;
-+		pmu.version = this_cpu_property(X86_PROPERTY_PMU_VERSION);
- 
- 		if (pmu.version > 1) {
--			pmu.nr_fixed_counters = cpuid_10.d & 0x1f;
--			pmu.fixed_counter_width = (cpuid_10.d >> 5) & 0xff;
-+			pmu.nr_fixed_counters = this_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
-+			pmu.fixed_counter_width = this_cpu_property(X86_PROPERTY_PMU_FIXED_COUNTERS_BIT_WIDTH);
- 		}
- 
--		pmu.nr_gp_counters = (cpuid_10.a >> 8) & 0xff;
--		pmu.gp_counter_width = (cpuid_10.a >> 16) & 0xff;
--		pmu.arch_event_mask_length = (cpuid_10.a >> 24) & 0xff;
-+		pmu.nr_gp_counters = this_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
-+		pmu.gp_counter_width = this_cpu_property(X86_PROPERTY_PMU_GP_COUNTERS_BIT_WIDTH);
-+		pmu.arch_event_mask_length = this_cpu_property(X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH);
- 
- 		/* CPUID.0xA.EBX bit is '1' if an arch event is NOT available. */
--		pmu.arch_event_available = ~cpuid_10.b &
-+		pmu.arch_event_available = ~this_cpu_property(X86_PROPERTY_PMU_EVENTS_MASK) &
- 					   (BIT(pmu.arch_event_mask_length) - 1);
- 
- 		if (this_cpu_has(X86_FEATURE_PDCM))
-@@ -39,7 +37,7 @@ void pmu_init(void)
- 			/* Performance Monitoring Version 2 Supported */
- 			if (this_cpu_has(X86_FEATURE_AMD_PMU_V2)) {
- 				pmu.version = 2;
--				pmu.nr_gp_counters = cpuid(0x80000022).b & 0xf;
-+				pmu.nr_gp_counters = this_cpu_property(X86_PROPERTY_NR_PERFCTR_CORE);
- 			} else {
- 				pmu.nr_gp_counters = AMD64_NUM_COUNTERS_CORE;
- 			}
+ /*
+  * AMD Programmer's Manual Volume 2
+  *   - Section "GHCB"
 -- 
 2.50.0.rc0.642.g800a2b2222-goog
 
