@@ -1,258 +1,285 @@
-Return-Path: <kvm+bounces-48773-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48774-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3E19AD2C18
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 05:10:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61E00AD2C88
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 06:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F33C16ED32
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 03:10:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 251BC3AC4E8
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 04:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0BB259CBF;
-	Tue, 10 Jun 2025 03:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A981425DB10;
+	Tue, 10 Jun 2025 04:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="f28ByPgh"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BuGXkh41"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2081.outbound.protection.outlook.com [40.107.96.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E729D9460
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 03:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749525021; cv=none; b=T/cQYOXMOinl3sXmapHwn0Bh+v2awr5t5d5gc73MG2p/UwHLQOoT62Bfh7Vq4CakT+SpOUNLiFKEytBvHAKpVrVYhPQ4BIXH/9zrKzqWsSFtXIPovCaICKShrsyhhSt+DSFFnrwslwy/MopbowmhPssSV/0nrTZSRWSqP9H0CCU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749525021; c=relaxed/simple;
-	bh=TLDsesR3FB85CcRPvN7xaybHG5IAe3goaTAopvfhqpI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oMgJJFFHTx/u7GK7LUJ5ZPYSRka4LLsLRH8MSzD+ZgpRXEAHj826Q2Pdk6gWPl12LUH+TTPVB7pBRruvw9g9lNdFWPu7l7Kc+7gRl+vaMPoeuryBOi1EAZN8toF2j4JT8VSsvAKgnDPJqft+A2LZFFQbO5wnFc+YWQrdn6izNAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=f28ByPgh; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-235ef62066eso61539315ad.3
-        for <kvm@vger.kernel.org>; Mon, 09 Jun 2025 20:10:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1749525019; x=1750129819; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dGSjBB1o7uoKjmCv6ULP4PpjQhWXvfAV8Yt/lfU7YU0=;
-        b=f28ByPghLYGl5fYxf0is8W5bkeD11SnwpndoQ1paQhPfuIF6uFdvSSoxwPaIyRobS9
-         vLHMTtwWXQ0hoOZSvLKE3+saAAUWpKd2hUpXw1MiJd2mZifqxRLdLxhIj5jIXRReT7cA
-         ZREvGEra+/2Hh72Ctp3x9k8EFo6vFoLQyyqVv0/SYm8DPzdb1xVwcO/Bt/QEP2rFTwPt
-         HdXhrWsjMjZv9hfYrwYqIWTqsdhFzrqPD80TVEzLS4NN7ffPkdq1R7ZH5BT6Awl7Jz2W
-         8LfdOdTEO6K3PJLTAdYdGhaH/6plcYvS7sfvh5/imfT3tI1ze1SrBoWy9xs36605yV9g
-         kOxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749525019; x=1750129819;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dGSjBB1o7uoKjmCv6ULP4PpjQhWXvfAV8Yt/lfU7YU0=;
-        b=lnx/bbBOP7lB+N2qVYPEl+EUcwL4KLkBQD88rDur53gimWfDhAq16JeC1h2Gwablgj
-         1OibQaooMxjH7LTOB69d4O7ZWgzWq7ZzE1Trzv4U5UGr2X4bTOZBQ4YwlWJZgSODy9uT
-         WZSiAN8nOYRxYkQBB/6xALhmBOczfUrpraDjH9133SVB1TGbvqKx9imz3T/711fZ/3qw
-         piRuoCdvIlwDd8LV0/XtDzcfAzNUZuxQ2VMpga5jdA72Df39nl4QgX2ATcgdRDXkeF0w
-         X7+ZPJS19+6cBiDQ7lMPBEzaxEk+BjBvroTzIZKE30ZgMDMCkOmNbVrpJkJhZx/htb0x
-         oN8Q==
-X-Gm-Message-State: AOJu0YxBahUa0HQZ3GbinuSX9jwnB5uNAIvRH+mz2hB0py0UNIImtypY
-	RaWnDcRAtB1VUfBkd9FqBcsHvaqE38t2WXZtGIHBRG9XOCvGvVC397Fzj3xKr+zQaPk=
-X-Gm-Gg: ASbGncvGEIXMyfCAOBMNNlsCcGLvcB09xm4POzUWYkqvw6m+uv9tf0IDt4Nz/lEBUj0
-	8qJ7wtplYiR565cZgsdnZuSWWUASAdqdMLA8KPyk865dHoQNIPFI/Tfee76xDkuLTmw1Cw/6oQk
-	e07rcthdQu1Hf9R7ovxoKgZrmaMzb9hDtulm93Ii/uO98YjHJycm+rHta65RRWOXzzz9KjC7M0Y
-	4UB9wWRugB6ciU8nS3vNjnJke52hBs1lskQiAF/XbVyXcXo8N5OB2BThV+PUDvL7UBWH8KsSicp
-	MV76eMG7l9/Uw0XkF6+T6JLVJH3TYqjPSzJg4SXcwU61xTqN8Zyj6TTufI23+j7qnSzSfZ34WCi
-	/qY/qY2FUHcJ5uA==
-X-Google-Smtp-Source: AGHT+IFpEJ4q9YgS64amgMJXFTU6cuDFvbWPHGRI/n1F0zZgpuiRp/i0Y01L+MJGgZel/MfyZz7maw==
-X-Received: by 2002:a17:903:110f:b0:234:e3b7:5ce0 with SMTP id d9443c01a7336-23638358859mr12501955ad.47.1749525019141;
-        Mon, 09 Jun 2025 20:10:19 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.10])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31349f34afesm6410725a91.19.2025.06.09.20.10.16
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 09 Jun 2025 20:10:18 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: alex.williamson@redhat.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lizhe.67@bytedance.com
-Subject: Re: [RFC] vfio/type1: optimize vfio_unpin_pages_remote() for large folio
-Date: Tue, 10 Jun 2025 11:10:13 +0800
-Message-ID: <20250610031013.98556-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250605100958.10c885d3.alex.williamson@redhat.com>
-References: <20250605100958.10c885d3.alex.williamson@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81C625CC70;
+	Tue, 10 Jun 2025 04:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749529217; cv=fail; b=ZuxRMLYLhwj24F8GgD3YIdD5VoVf6/pen7LTgxBfyd8Q+5WWhldeUFL4ggQK7ENnd8x0maMBm5m96jje/ckI46U2Z9RfVMTm0eYkSmZg5P1l86RL4N0mr3KecJAmhyOssVwdgaIfJdeNgAsHFiv19yqIJoqR1O7KGBiX8BdLVsw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749529217; c=relaxed/simple;
+	bh=hhnyDnswzcVjuHvu9Whhw/VqUBjhQoAp89ALh5eqLt8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ucDaAG2ZByNn29uvr49/eNI4r0Xp+6N0RN7yLcNX//ejCFgIeKsrw0C8RsGMsh8DpWS4RX5po676nZxu0eu8r3RiCHKkxcRQTc7VABg08Mstyx2rdtf3dL+qN9/JHIUPByUO+TaYoaagzryOlViRUxF7W78wVhg/3bptEsD/rlQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BuGXkh41; arc=fail smtp.client-ip=40.107.96.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PbWeQuvB7zsQ9U6zsQwbLjR1UV6xh48Nw7LoowNgB+1G8AajnjKfq3zhsVAVybjA+BidCA5qs1Zli181JNfmwCK03PcKRHWfm8Km/PRUOaVaITmdVHuqL/bVZRuvm+P+WxY507ucBljT3F/XNUAcNVqPf5qz2nWWbsQT6fxBWP4WeHgKNKqBn73IGpZL9K4eJmdfCgsFo0ssyHvNkohzHpnuZdD/R3t+MbViyt8FgmsTYLrWYD+x4/k4JH2G3GBCYcfh+KV5YBUxnvKODFY7zl057Bxm5MfiCTtwLoqZkRzJZ9NbgjYE7b4Mr0JvNCQRfuWJHp3XYRG6UQeUBxdX2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ilUn8SfmyVVrnjU2SGHxyDwdC7IFSXVgGhAtlG8PrSo=;
+ b=biEA7sFdoFIaPEpayDc5bjIef1FNEE97FNM1DpZwuw7P4y62UDOzTS8xBKyLU+bNLsOZcqAr4eHBdKE85zoyQRtp4rdguB5s7okoXepqb1zRbjyN33ljE55cm3e/UdnLnax2nwcL2jNMwvsKRkl3XyQLJSthC3T8KJBdYvOxZJ1f4pxbPhZ94j6BVeXWkPx2Hd3QD0H7zAyfiEoD+3oKW8/exacLohjs/5kWfgGdllHebSWFbUR5VyZ3C712UZ76qwJpZ9DEr0pjGA66KuXp4XnOaXsO+08clns7pHzpRgVv+igBIuTWuS2YPxs902FhmKKN7ScXtgLsYeUtrams8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ilUn8SfmyVVrnjU2SGHxyDwdC7IFSXVgGhAtlG8PrSo=;
+ b=BuGXkh410ZrlHHzHjeX2bWrIBqca2d0yoDVJZn/DDU2+Q7b4U+HmcTt3zRKFN9TgOdV7Xegvgnfphc1kJqsUTLKg2E7SJiui8dsVCXmGMr5vPZwSMcVE8AHSlTOowudvIhl59g2Z8+4vDopmkKvusTtMX70dn+pzA2t9anNJKF4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by BY5PR12MB4276.namprd12.prod.outlook.com (2603:10b6:a03:20f::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.41; Tue, 10 Jun
+ 2025 04:20:12 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f%5]) with mapi id 15.20.8792.038; Tue, 10 Jun 2025
+ 04:20:12 +0000
+Message-ID: <bd0d8d69-78dd-44d8-9f32-d945bc6078c2@amd.com>
+Date: Tue, 10 Jun 2025 14:20:03 +1000
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [RFC PATCH 00/12] Private MMIO support for private assigned dev
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+ christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
+ alex.williamson@redhat.com, vivek.kasireddy@intel.com,
+ dan.j.williams@intel.com, yilun.xu@intel.com, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+ daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
+ zhenzhong.duan@intel.com, tao1.su@intel.com
+References: <2c4713b0-3d6c-4705-841b-1cb58cd9a0f5@amd.com>
+ <20250512140617.GA285583@nvidia.com> <aCRAHRCKP1s0Oi0c@yilunxu-OptiPlex-7050>
+ <20250514163339.GD382960@nvidia.com> <aCYQdDrYYZRAgsen@yilunxu-OptiPlex-7050>
+ <9dea400f-a57b-43be-a2e4-24a9f51e6ba0@amd.com>
+ <aDE5SPzOAU0sNIt+@yilunxu-OptiPlex-7050>
+ <ae16db07-5fca-4369-aa67-cbe2e0fd60fd@amd.com>
+ <aDhyC73r149syMpc@yilunxu-OptiPlex-7050>
+ <79872224-4e81-446b-a451-28260f449ea9@amd.com>
+ <aDnbgBbxF8IkH/cq@yilunxu-OptiPlex-7050>
+Content-Language: en-US
+From: Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <aDnbgBbxF8IkH/cq@yilunxu-OptiPlex-7050>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MN2PR20CA0020.namprd20.prod.outlook.com
+ (2603:10b6:208:e8::33) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|BY5PR12MB4276:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52dbfe4b-9e65-433d-d592-08dda7d617be
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WGhPb3RYbFlZWFphOWFTWEo0SnQxRnNZd044dWpKbU5EczFuQ0xOeFhqN0lY?=
+ =?utf-8?B?WDJDa3cwRnBzSkdEdUh2QVlsV0JCMEhnN0p1SGZ3aDhOendqMUEwVldhc2hP?=
+ =?utf-8?B?TnliODdQQTJPODdCZkc0YzJzczdRVGNNSndmTmRVY2M0b2JnZmtZc0NjU1dn?=
+ =?utf-8?B?MkxjdVFlOFlPeEg0eEdsdEhZY3NFd1JIVnU3REw2andXOURBTDVUN0Z3K0l0?=
+ =?utf-8?B?dW92dkJSb0R3RTFuUDhXeGEzZUVDK3V1T01pd1ljTEpDaThDWTRxOUt4TUpa?=
+ =?utf-8?B?NVpNTUYvUUZRdzJPbmpkekFoQ1YvK3J0VEFqbGt1U3JDeUxnUExLSkoxdVRF?=
+ =?utf-8?B?NWRJSVF0M2J2YnJQZWh3eTZ5M2ZQdityS1RnUUhGNjZYOW9ta203MkQ4Z1Qr?=
+ =?utf-8?B?TkJXT2dIQWpTcC8zbkJVdE5oeUMrNEw1RWJZSEd1bTlpOEZJSExCNVJPY2Ro?=
+ =?utf-8?B?YzhhNm5nWTFFaXhaV2ZWU3gwd1d2cmIraXJVcHFObTBBU1JVcWRDMllRZGE0?=
+ =?utf-8?B?VGE3QTVndkdHY3JseFN1VGNCZVl2RlBTMTlpcSthTnowTFA4OTBCOUZ5VzFD?=
+ =?utf-8?B?RFhVK1o4Mjdvc043OFoyU2pVN1QyT2NxTEUzTVBGMC9rZkppUW12amJXZmJO?=
+ =?utf-8?B?dHRhbFFaelFWcE8yVXV2Q1ZTRnViYmEzR2NJck1xSTJNK1k0N0ExRGQzK0JW?=
+ =?utf-8?B?ekltRGZFQTJDMFFGb2ozTWlnVFJTMit4Y1JVRWFRa05aM2FkL3NBWnpqR3d3?=
+ =?utf-8?B?M1hFWk92YXlWZnJUUmdJdEFOcGIyRmVqQ0pkWjQyK1lsbXpERDF5RG5QbUR5?=
+ =?utf-8?B?ZDNibTVNZkFlTS9ZZm8yZTMvNUhQWUJpVFVPdDJmZTEwQ0doVTlqTWJ0cWZ1?=
+ =?utf-8?B?MjFzaVRsUlN0ZFFYVDQyTVRXOUpoZzYvcll4WDl1anNlWitWVVVyM25qRGs4?=
+ =?utf-8?B?UktqWnkzNE1jbnQ1WEVTSjJGWmdyd0hNMjJSZHNHWHNtRmFBaDhxSFRZSVMz?=
+ =?utf-8?B?U21LUzZGQmhlS1RKQ2tJempONWNrclVXOVNOZUNJMTlhMFdiWVd2SE9DUEFl?=
+ =?utf-8?B?cUFYTmFWNzQyYmI0azhxM2o5dlJBVUpFamdCY0RucC9yZVk2RW5wakJYbjFP?=
+ =?utf-8?B?SWNCYUFaYU9WV3Bibkd5RVZwVHBaZm9xQzNzS1JyVlppVHlZMk1QMVlhYU9J?=
+ =?utf-8?B?N0RKVVA3UXdXaVpOT2hTUFN5OW15MzBVUG5TbDRQMnczcGp1Z0dxeXc1cW0z?=
+ =?utf-8?B?TXJkRGs5MzV6VFhFZ1o3RjJjTk1jQlJWTlhNNnMxSGRQejVNRnpvVEZ2MWUv?=
+ =?utf-8?B?bEY5OUw1NUZxNW95LzBXdm1sdFMvM01OaUI2bHdBclBxYXlHK05scmhxaHpv?=
+ =?utf-8?B?bE9vK0NxRVQ2N042dHhiU0hRRlNqN0Q1RVZybllxUFh3L1ZtQmlBZEJkdmVm?=
+ =?utf-8?B?Q0VUazNqODBXREU0QWRNSUFvTCt6R3hNTU93Ujg2N2RpWVUzWmV3RGZ6UFhh?=
+ =?utf-8?B?OHNZczBVRDloYUNjcUZZelVtNjBXOTE5U1JxeUNBVWF1MGpxZ0d4TVhsNVhr?=
+ =?utf-8?B?akRVdUdXMlpjVUdDeWFVR1FJY2piNXdHTGFrdkhXL0tObGUxRVFZUVNGcEFw?=
+ =?utf-8?B?WVhVZlh6bGVQM25SZWl6RE96T1M1T3FFYTdzcTl3c25CT1ZnQVdDWXhPNitM?=
+ =?utf-8?B?blRTaXo5cmg4OGJHTHQydnhwNFF6ZitjbVE1RUcyemswY2NuUzA5UHdMWE8z?=
+ =?utf-8?B?MStqR0NURWVkUktodndVWU1nT0JaOCt0MTBpWXBadXFrMWtVZ0taZzRKVVo2?=
+ =?utf-8?B?RnZrTUZEUVRxcUY1bjhVKzYzMnVnTEhTNU9aZFhQNmhVVGMwQmMvZncyVG5H?=
+ =?utf-8?B?d0REcE1TTWxId05nQ3lWUklCSzlSSU55UkJXaWFKMnEvaWtEUWQ2bjgwd3g0?=
+ =?utf-8?Q?UE6aUb0pR8o=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TW1HS1RyZGFHb1B6dk1oeGt3NDNQYUZ6cHRhRmZLSlZoSytvcVN6Q09VTG0y?=
+ =?utf-8?B?WE5xMWo0NWhJTmZ1K3ZIOXlZUjlqMHpZZUlTT0ZtNmZpWlR2UUJkWHUyNEY2?=
+ =?utf-8?B?NzZia3dOaEtHbmY4bC9QTW41SG9YMnFoS3JkQnF0QkNKRTZhMFMydTBRbE9a?=
+ =?utf-8?B?OEY5N3ZPdzc3eEU1a1ZrbTBHbXN2L3VheXZISGJ6a2VkRk1kcFl4ODFCYmI3?=
+ =?utf-8?B?Q05MQ0x5SHQ1N2dOYUpmK050QTdFUmVkb2RoZE43ZmY5NnZnYkZVbmNQUXN5?=
+ =?utf-8?B?dUdjb2dSYlZOUVcxSVZ0VDhmRjhjZWRwY0huYit4N3JOMXI3bHQwMy82MU9N?=
+ =?utf-8?B?bFkyVDBCclpxK2pWZDRrMys0Yk1xQnZqSXdENzBTK0gwV0o4aFU5TU0yOVdU?=
+ =?utf-8?B?SCtUQUNnendQU2VoUng4NVhpeWsrUVJta1J5cTdUc1VkNUE2ZGNoQ2JzazNP?=
+ =?utf-8?B?bWRtdmpyWGVOQ0s0RWFKbjdiT08wb0JFTnJGRWF4SVEySUFQQ0M2TVBQQXo1?=
+ =?utf-8?B?Slh3Uk11aEhYWHM5TVpiMmRwYzE5ZzU2aEFIWTd6QklsU0Y0MG5zK0NWVC8y?=
+ =?utf-8?B?aGNLUVk2bE1IZlZPY0JzVzZPZ05URmZNb2FFa3VWOFQxcithaU5zUm92NXpI?=
+ =?utf-8?B?ekpaTnVIUkdUbktLOEg2bVV0dUdERi9mcWh3UnNLQ1hxQWs1K0FveS9RMita?=
+ =?utf-8?B?TS9wVjVjQk82a1d0Ynp5TGpHY1N1eW9qRWNEZjZRK3QyUzAzR3EwU2NLcHBr?=
+ =?utf-8?B?MUdwRlZtRlozNXFLa090dXBrSUNONzVoVDArcXI3L1FycGNpQ3VEemV2NkF0?=
+ =?utf-8?B?NWlFZ1ZtMVNtZTh1YmxSbXR1V21sYURLZkpqWEpuTC9kRGFhQko5S1hDZmZl?=
+ =?utf-8?B?MXduUzJnVWIzMmxTMzY4WVVOT2JCbk53L3BZd041cml0WWYyb1g4K1VLNUsx?=
+ =?utf-8?B?N25KdmZFaTdSUmFjbWd2NVpQeGJoY3U0K1o4QXEvVlhGM0p1d2h1cXc0QTBh?=
+ =?utf-8?B?cDdhVk5yWFk5ZndyNUNqZWlNN1NITlhOYUN4ZVdwZEgraEJBNjFGREZKSjJi?=
+ =?utf-8?B?TzNyTElhMWM3VUtXbnNoVnBDZERXbk5XdTcvK00vNzlzVjBnS3JMdVkvQjlz?=
+ =?utf-8?B?ZEhsL2h4WWp6dTJJbU9qR3U2dnVGTmtteUJFZTEzQ0RreFcvcVk2Y1NUOXF2?=
+ =?utf-8?B?SjRqS1VGVUthWEUvVldrMjJqT3prbmdqRVg4M2VJdmYvb216NU9EOHVHU1VZ?=
+ =?utf-8?B?WWxPM25EdUJqb3dYbWVIZ1BWL01EYUNRQllQVVVvZTMrV1NVV0NvZVR4U1Mw?=
+ =?utf-8?B?VmMvMXNsTStDelYwZ0YyU2kwZ0NUQ2pRbmpqeWZ4ZFNCYkFMaEg4cDdXZDYz?=
+ =?utf-8?B?Z3hVMG5sdFZOWloybVV2VDNqNDNGUlB2eEpydWRGVWV6MHM1b0NoaURsNmxD?=
+ =?utf-8?B?cUVNWXIzRk5vNi83eFlHVVFyaTk2alNjcFgzb2NEbUVTTDM5Zkx3TUlpZUxl?=
+ =?utf-8?B?cUtFazhCUExNcXdCMVlPS3hmaUNtWE1CSFVtYnJCOFlRWU9oQys5bDlLNDEy?=
+ =?utf-8?B?RmtmS1BCcUo3aDFmalB3dWY4dkJUb0pKL2toUS9uUzk5MXRRbkxSbzRoSVNt?=
+ =?utf-8?B?UHdwOXd5UEFuSS9LaTZ6cVZ5WHNGSkwxdW9xYlQ4enkxWUxHcTNaZ2dyY3pj?=
+ =?utf-8?B?bkUzOCtxUnlna2J5bXRqYk42VFZISU02MkZTNzNNcHRwVmhtaUlHNkk0MDdo?=
+ =?utf-8?B?dWkzajNiSlFUTU5PR2g4alFGaDg1N2RQZE13NUdTNnVLQ3BKQ0N3a2tVYm1a?=
+ =?utf-8?B?VGNVZmxIZlA0bGF5clhTYWp3KzFGQWZJZGFOSlRCWmVmeld2eTFQN1FBd0cz?=
+ =?utf-8?B?K2lNUTFDRlJXU1h1QUVsZTVkOTZEU3F6UURtZVFKUTZ6djdwQ0U2V2xFSUhF?=
+ =?utf-8?B?RGk2anUwQ3lIa3Y4cVI0U0tVZXJMZ0lYVmF3cTlzYU1Qck1ZTWRlSmlFMWEy?=
+ =?utf-8?B?RXllWDQ2QTJBMThkNGZNZ3hNaE5aa3RmcGZGNmUzTTBuRnBhdmdFZDRwdFBH?=
+ =?utf-8?B?YUpqNThGY1Y5c2hBdi9tNjE1d0xVQnBpamlMNGZvVlVETE4rOVhmOEpYc3Bw?=
+ =?utf-8?Q?ceclnonoXMThqK6CCsFvbRD7b?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52dbfe4b-9e65-433d-d592-08dda7d617be
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2025 04:20:12.1747
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 221JAJE1qtKfJrmrj+I1fVGSBgk8iPHvkbmTPEkcOlGxQjUzxztCQvgd92GRUcFRkjjgAjyJVL0sHxfV6Ajfuw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4276
 
-On Thu, 5 Jun 2025 10:09:58 -0600, alex.williamson@redhat.com wrote:
 
-> On Thu,  5 Jun 2025 20:49:23 +0800
-> lizhe.67@bytedance.com wrote:
+
+On 31/5/25 02:23, Xu Yilun wrote:
+> On Fri, May 30, 2025 at 12:29:30PM +1000, Alexey Kardashevskiy wrote:
+>>
+>>
+>> On 30/5/25 00:41, Xu Yilun wrote:
+>>>>>>>
+>>>>>>> FLR to a bound device is absolutely fine, just break the CC state.
+>>>>>>> Sometimes it is exactly what host need to stop CC immediately.
+>>>>>>> The problem is in VFIO's pre-FLR handling so we need to patch VFIO, not
+>>>>>>> PCI core.
+>>>>>>
+>>>>>> What is a problem here exactly?
+>>>>>> FLR by the host which equals to any other PCI error? The guest may or may not be able to handle it, afaik it does not handle any errors now, QEMU just stops the guest.
+>>>>>
+>>>>> It is about TDX Connect.
+>>>>>
+>>>>> According to the dmabuf patchset, the dmabuf needs to be revoked before
+>>>>> FLR. That means KVM unmaps MMIOs when the device is in LOCKED/RUN state.
+>>>>> That is forbidden by TDX Module and will crash KVM.
+>>>>
+>>>>
+>>>> FLR is something you tell the device to do, how/why would TDX know about it?
+>>>
+>>> I'm talking about FLR in VFIO driver. The VFIO driver would zap bar
+>>> before FLR. The zapping would trigger KVM unmap MMIOs. See
+>>> vfio_pci_zap_bars() for legacy case, and see [1] for dmabuf case.
+>>
+>> oh I did not know that we do this zapping, thanks for the pointer.
+>>> [1] https://lore.kernel.org/kvm/20250307052248.405803-4-vivek.kasireddy@intel.com/
+>>>
+>>> A pure FLR without zapping bar is absolutely OK.
+>>>
+>>>> Or it check the TDI state on every map/unmap (unlikely)?
+>>>
+>>> Yeah, TDX Module would check TDI state on every unmapping.
+>>
+>> _every_? Reading the state from DOE mailbox is not cheap enough (imho) to do on every unmap.
 > 
-> > From: Li Zhe <lizhe.67@bytedance.com>
-> > 
-> > This patch is based on patch 'vfio/type1: optimize vfio_pin_pages_remote()
-> > for large folios'[1].
-> > 
-> > When vfio_unpin_pages_remote() is called with a range of addresses that
-> > includes large folios, the function currently performs individual
-> > put_pfn() operations for each page. This can lead to significant
-> > performance overheads, especially when dealing with large ranges of pages.
-> > 
-> > This patch optimize this process by batching the put_pfn() operations.
-> > 
-> > The performance test results, based on v6.15, for completing the 8G VFIO
-> > IOMMU DMA unmapping, obtained through trace-cmd, are as follows. In this
-> > case, the 8G virtual address space has been separately mapped to small
-> > folio and physical memory using hugetlbfs with pagesize=2M. For large
-> > folio, we achieve an approximate 66% performance improvement. However,
-> > for small folios, there is an approximate 11% performance degradation.
-> > 
-> > Before this patch:
-> > 
-> >     hugetlbfs with pagesize=2M:
-> >     funcgraph_entry:      # 94413.092 us |  vfio_unmap_unpin();
-> > 
-> >     small folio:
-> >     funcgraph_entry:      # 118273.331 us |  vfio_unmap_unpin();
-> > 
-> > After this patch:
-> > 
-> >     hugetlbfs with pagesize=2M:
-> >     funcgraph_entry:      # 31260.124 us |  vfio_unmap_unpin();
-> > 
-> >     small folio:
-> >     funcgraph_entry:      # 131945.796 us |  vfio_unmap_unpin();
+> Sorry for confusing. TDX firmware just checks if STOP TDI firmware call
+> is executed, will not check the real device state via DOE. That means
+> even if device has physically exited to UNLOCKED, TDX host should still
+> call STOP TDI fwcall first, then MMIO unmap.
 > 
-> I was just playing with a unit test[1] to validate your previous patch
-> and added this as well:
+>>
+>>>>
+>>>>> So the safer way is
+>>>>> to unbind the TDI first, then revoke MMIOs, then do FLR.
+>>>>>
+>>>>> I'm not sure when p2p dma is involved AMD will have the same issue.
+>>>>
+>>>> On AMD, the host can "revoke" at any time, at worst it'll see RMP events from IOMMU. Thanks,
+>>>
+>>> Is the RMP event firstly detected by host or guest? If by host,
+>>
+>> Host.
+>>
+>>> host could fool guest by just suppress the event. Guest thought the
+>>> DMA writting is successful but it is not and may cause security issue.
+>>
+>> An RMP event on the host is an indication that RMP check has failed and DMA to the guest did not complete so the guest won't see new data. Same as other PCI errors really. RMP acts like a firewall, things behind it do not need to know if something was dropped. Thanks,
 > 
-> Test options:
+> Not really, guest thought the data is changed but it actually doesn't.
+> I.e. data integrity is broken.
+
+I am not following, sorry. Integrity is broken when something untrusted (== other than the SNP guest and the trusted device) manages to write to the guest encrypted memory successfully. If nothing is written - the guest can easily see this and do... nothing? Devices have bugs or spurious interrupts happen, the guest driver should be able to cope with that.
+   
+> Also please help check if the following relates to this issue:
 > 
-> 	vfio-pci-mem-dma-map <ssss:bb:dd.f> <size GB> [hugetlb path]
+> SEV-TIO Firmware Interface SPEC, Section 2.11
 > 
-> I'm running it once with device and size for the madvise and populate
-> tests, then again adding /dev/hugepages (1G) for the remaining test:
+> If a bound TDI sends a request to the root complex, and the IOMMU detects a fault caused by host
+> configuration, the root complex fences the ASID from all further I/O to or from that guest. A host
+> fault is either a host page table fault or an RMP check violation. ASID fencing means that the
+> IOMMU blocks all further I/O from the root complex to the guest that the TDI was bound, and the
+> root complex blocks all MMIO accesses by the guest. When a guest writes to MMIO, the write is
+> silently dropped. When a guest reads from MMIO, the guest reads 1s.
+
+Right, this is about not letting bad data through, i.e. integrity. Thanks,
+
 > 
-> Base:
-> # vfio-pci-mem-dma-map 0000:0b:00.0 16
-> ------- AVERAGE (MADV_HUGEPAGE) --------
-> VFIO MAP DMA in 0.294 s (54.4 GB/s)
-> VFIO UNMAP DMA in 0.175 s (91.3 GB/s)
-> ------- AVERAGE (MAP_POPULATE) --------
-> VFIO MAP DMA in 0.726 s (22.0 GB/s)
-> VFIO UNMAP DMA in 0.169 s (94.5 GB/s)
-> ------- AVERAGE (HUGETLBFS) --------
-> VFIO MAP DMA in 0.071 s (224.0 GB/s)
-> VFIO UNMAP DMA in 0.103 s (156.0 GB/s)
+> Thanks,
+> Yilun
 > 
-> Map patch:
-> ------- AVERAGE (MADV_HUGEPAGE) --------
-> VFIO MAP DMA in 0.296 s (54.0 GB/s)
-> VFIO UNMAP DMA in 0.175 s (91.7 GB/s)
-> ------- AVERAGE (MAP_POPULATE) --------
-> VFIO MAP DMA in 0.741 s (21.6 GB/s)
-> VFIO UNMAP DMA in 0.184 s (86.7 GB/s)
-> ------- AVERAGE (HUGETLBFS) --------
-> VFIO MAP DMA in 0.010 s (1542.9 GB/s)
-> VFIO UNMAP DMA in 0.109 s (146.1 GB/s)
-> 
-> Map + Unmap patches:
-> ------- AVERAGE (MADV_HUGEPAGE) --------
-> VFIO MAP DMA in 0.301 s (53.2 GB/s)
-> VFIO UNMAP DMA in 0.236 s (67.8 GB/s)
-> ------- AVERAGE (MAP_POPULATE) --------
-> VFIO MAP DMA in 0.735 s (21.8 GB/s)
-> VFIO UNMAP DMA in 0.234 s (68.4 GB/s)
-> ------- AVERAGE (HUGETLBFS) --------
-> VFIO MAP DMA in 0.011 s (1434.7 GB/s)
-> VFIO UNMAP DMA in 0.023 s (686.5 GB/s)
-> 
-> So overall the map optimization shows a nice improvement in hugetlbfs
-> mapping performance.  I was hoping we'd see some improvement in THP,
-> but that doesn't appear to be the case.  Will folio_nr_pages() ever be
-> more than 1 for THP?  The degradation in non-hugetlbfs case is small,
-> but notable.
+>>
+>>>
+>>> Thanks,
+>>> Yilun
+>>
+>> -- 
+>> Alexey
+>>
 
-After I made the following modifications to the unit test, the
-performance test results met the expectations.
+-- 
+Alexey
 
-diff --git a/vfio-pci-mem-dma-map.c b/vfio-pci-mem-dma-map.c
-index 6fd3e83..58ea363 100644
---- a/vfio-pci-mem-dma-map.c
-+++ b/vfio-pci-mem-dma-map.c
-@@ -40,7 +40,7 @@ int main(int argc, char **argv)
- {
-        int container, device, ret, huge_fd = -1, pgsize = getpagesize(), i;
-        int prot = PROT_READ | PROT_WRITE;
--       int flags = MAP_SHARED | MAP_ANONYMOUS;
-+       int flags = MAP_PRIVATE | MAP_ANONYMOUS;
-        char mempath[PATH_MAX] = "";
-        unsigned long size_gb, j, map_total, unmap_total, start, elapsed;
-        float secs;
-@@ -131,7 +131,7 @@ int main(int argc, char **argv)
-        
-                start = now_nsec();
-                for (j = 0, ptr = map; j < size_gb << 30; j += pgsize)
--                       (void)ptr[j];
-+                       ptr[j] = 1;
-                elapsed = now_nsec() - start;
-                secs = (float)elapsed / NSEC_PER_SEC;
-                fprintf(stderr, "%d: mmap populated in %.3fs\n", i, secs);
-
-It seems that we need to use MAP_PRIVATE in this unit test to utilize
-THP, rather than MAP_SHARED. My understanding is that for MAP_SHARED,
-we call the function shmem_zero_setup() to map anonymous pages with
-"dev/zero." In the case of MAP_PRIVATE, we directly call the function
-vma_set_anonymous() (as referenced in the function __mmap_new_vma()).
-Since the vm_ops for "dev/zero" does not implement the (*huge_fault)()
-callback, this effectively precludes the use of THP.
-
-In addition, the expression (void)ptr[j] might be ignored by the
-compiler. It seems like a better strategy to simply assign a value
-to it.
-
-After making this modification to the unit test, there is almost no
-difference in performance between the THP scenario and the hugetlbfs
-scenario.
-
-Base(v6.15):
-#./vfio-pci-mem-dma-map 0000:03:00.0 16
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.048 s (331.3 GB/s)
-VFIO UNMAP DMA in 0.138 s (116.1 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.281 s (57.0 GB/s)
-VFIO UNMAP DMA in 0.313 s (51.1 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.053 s (301.2 GB/s)
-VFIO UNMAP DMA in 0.139 s (115.2 GB/s)
-
-Map patch:
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.028 s (581.7 GB/s)
-VFIO UNMAP DMA in 0.138 s (115.5 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.288 s (55.5 GB/s)
-VFIO UNMAP DMA in 0.308 s (52.0 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.032 s (496.5 GB/s)
-VFIO UNMAP DMA in 0.140 s (114.4 GB/s)
-
-> The unmap optimization shows a pretty substantial decline in the
-> non-hugetlbfs cases.  I don't think that can be overlooked.  Thanks,
-
-Yes, the performance in the MAP_POPULATE scenario will experience
-a significant drop. I've recently come up with a better idea to
-address this performance issue. I will send the v2 patch later.
-
-Thanks,
-Zhe
 
