@@ -1,145 +1,162 @@
-Return-Path: <kvm+bounces-48798-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48799-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 109E4AD2EA9
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 09:29:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC708AD306F
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 10:32:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA4713A3B50
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 07:29:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9F601884145
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 08:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4071427EC99;
-	Tue, 10 Jun 2025 07:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C06F21E0BE;
+	Tue, 10 Jun 2025 08:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MJWWUo2U"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nov2F1o5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5D921D594;
-	Tue, 10 Jun 2025 07:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190C121CC4A
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 08:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749540582; cv=none; b=ECJrP7FNLDv8xoKJkQA2A7sIpb5qgWDUmpAtUbvw9Z5oLSZIBXA7nWBrZYLpMUdNIvJqIC27Fl1UT6TwWQmjRcMSAhx5UzJ0PJYls956L0+paPSafcJH2WeSQCptDKNqMvKehZ+NfYKketLeJ0ZBWwjUhHfWxQgK5miA2ZMyKcg=
+	t=1749544355; cv=none; b=PXq+zjGUt1r/QCNF4RaXjSlnW5KrwkeNZ1vY+bDG4xrWE86/wlYEA3VuWP6Pl98WSgVcXI+v6JNJNFyO75RybHNuA5o5U6tWUbOTCMhiMyVfft0kf8dOZzmKbbB55fnlbRWeytp7jMrpiUPOiJFA+vhVKNnzbW4xnCB4H4EzkRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749540582; c=relaxed/simple;
-	bh=lAAtMSan3afQSwOuXOhzP3QPjgP54f8sQlMRzRkaed8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hRPmJbMrzGxmTJKtob+tT21JMvPdjkc59KxWJ7R91Y9IQIpHW1/+TQ87POki1Xpig4mtvdfRlM8npS1Upaaf/kHZyvUjHVdaYtwSQNbdquU1GZ2mb5wZzwmDDypghJSDMltfLLazTIU5zLL3TG7YwTdj0qEppQGw2bltqTpfBPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MJWWUo2U; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749540580; x=1781076580;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=lAAtMSan3afQSwOuXOhzP3QPjgP54f8sQlMRzRkaed8=;
-  b=MJWWUo2UvhkSoHxRBguU6hLWPzArwXuAKwtO6sI9oDDmgLtKkDclh62Z
-   AhIAN7h4NBfJMD7qEoF0roR+pbf6v2FsDsdf8/RIr1Xd1/QYrnqBSVFe/
-   Y0YDapkgOR+/oD7CN24+4V/JrEW9eHuup3xGXhbnn9GgHP7llM8mvFOUd
-   MAbfsk/Eq0ApyHOcd746qCKhar7NBhzHs4gBuIs94iWCE/rEJamJD++ZB
-   nyFR6zQXaweAn4tsKaFmrdlP9DAhFZz9iboxzuMnTa5Y5FC6pVLPpvJLa
-   z+Qr7Gcpc9C84itytvcwCNFC7OMj+lw/lOsE35nbwcBQwrZNUPqbSEDGF
-   Q==;
-X-CSE-ConnectionGUID: iAX+Jv0rRFeMaAEsqKa3uw==
-X-CSE-MsgGUID: yK8+I5edS0OiOiYKY/U6pQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="63040637"
-X-IronPort-AV: E=Sophos;i="6.16,224,1744095600"; 
-   d="scan'208";a="63040637"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 00:29:39 -0700
-X-CSE-ConnectionGUID: YLgeloFCR52uw2jpg7GNVA==
-X-CSE-MsgGUID: GWVg24xgTO6ptJ1pznfgfg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,224,1744095600"; 
-   d="scan'208";a="147718065"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.144]) ([10.124.245.144])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 00:29:37 -0700
-Message-ID: <0072b2bd-5b3b-46b4-bd60-8b7579aba5c4@linux.intel.com>
-Date: Tue, 10 Jun 2025 15:29:34 +0800
+	s=arc-20240116; t=1749544355; c=relaxed/simple;
+	bh=l8Y4r9MGAhL+1QYrflRZpR2G0HHOcBdF6gCSjvgujs4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hi52Q5VM6TWt/bqpFBZ2qOOR1xiG/+u3/EqQgHhRUBqpm39wfguE/vB9I6uSpV6bLdiwrKxqRX5Ui7I9Z/3RE2Eq2TrR378X83FUTuBUgjEecjMym6zAA00DEqB5e0uv9E9909tR6ngED6//7DMHuQ5xMhrpfgq+xdcIgcF14M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nov2F1o5; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 10 Jun 2025 10:32:14 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1749544339;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bXQheftAQ39YV+WhThrh+6a/P9QjNT7PuajEJay5IMQ=;
+	b=nov2F1o5ZiG7xNJ6c3T5U9DOAfnyHrDeZWVGyGim4Z4GlUXYZH1tIzM8XmIOs41c3rT6p2
+	ivX9zAWa+0QOk9oMGkI9JztqKAdg7+3QFVQddmdDiuvyztJ0WQwpyMoj/l02V3tPJno1HE
+	kl3IlyvNigy8lG2VFF+ReKB0cRuC2bo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Jesse Taube <jesse@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-kselftest@vger.kernel.org, Atish Patra <atish.patra@linux.dev>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
+	Himanshu Chauhan <hchauhan@ventanamicro.com>, Anup Patel <anup@brainfault.org>, 
+	Charlie Jenkins <charlie@rivosinc.com>
+Subject: Re: [PATCH v4] riscv: sbi: Add SBI Debug Triggers Extension tests
+Message-ID: <20250610-c3dda7f117f889a8da55b092@orel>
+References: <20250606194503.2857119-1-jesse@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 10/16] x86/pmu: Use X86_PROPERTY_PMU_*
- macros to retrieve PMU information
-To: Sean Christopherson <seanjc@google.com>,
- Andrew Jones <andrew.jones@linux.dev>, Janosch Frank
- <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- =?UTF-8?Q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- kvm@vger.kernel.org
-References: <20250529221929.3807680-1-seanjc@google.com>
- <20250529221929.3807680-11-seanjc@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250529221929.3807680-11-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250606194503.2857119-1-jesse@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
-
-On 5/30/2025 6:19 AM, Sean Christopherson wrote:
-> Use the recently introduced X86_PROPERTY_PMU_* macros to get PMU
-> information instead of open coding equivalent functionality.
->
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Fri, Jun 06, 2025 at 12:45:03PM -0700, Jesse Taube wrote:
+> Add tests for the DBTR SBI extension.
+> 
+> Signed-off-by: Jesse Taube <jesse@rivosinc.com>
 > ---
->  lib/x86/pmu.c | 18 ++++++++----------
->  1 file changed, 8 insertions(+), 10 deletions(-)
->
-> diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
-> index 44449372..c7f7da14 100644
-> --- a/lib/x86/pmu.c
-> +++ b/lib/x86/pmu.c
-> @@ -7,21 +7,19 @@ void pmu_init(void)
->  	pmu.is_intel = is_intel();
+> V1 -> V2:
+>  - Call report_prefix_pop before returning
+>  - Disable compressed instructions in exec_call, update related comment
+>  - Remove extra "| 1" in dbtr_test_load
+>  - Remove extra newlines
+>  - Remove extra tabs in check_exec
+>  - Remove typedefs from enums
+>  - Return when dbtr_install_trigger fails
+>  - s/avalible/available/g
+>  - s/unistall/uninstall/g
+> V2 -> V3:
+>  - Change SBI_DBTR_SHMEM_INVALID_ADDR to -1UL
+>  - Move all dbtr functions to sbi-dbtr.c
+>  - Move INSN_LEN to processor.h
+>  - Update include list
+>  - Use C-style comments
+> V3 -> V4:
+>  - Include libcflat.h
+>  - Remove #define SBI_DBTR_SHMEM_INVALID_ADDR
+> ---
+>  lib/riscv/asm/sbi.h |   1 +
+>  riscv/Makefile      |   1 +
+>  riscv/sbi-dbtr.c    | 811 ++++++++++++++++++++++++++++++++++++++++++++
+>  riscv/sbi-tests.h   |   1 +
+>  riscv/sbi.c         |   1 +
+>  5 files changed, 815 insertions(+)
+>  create mode 100644 riscv/sbi-dbtr.c
+> 
+> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+> index a5738a5c..78fd6e2a 100644
+> --- a/lib/riscv/asm/sbi.h
+> +++ b/lib/riscv/asm/sbi.h
+> @@ -51,6 +51,7 @@ enum sbi_ext_id {
+>  	SBI_EXT_SUSP = 0x53555350,
+>  	SBI_EXT_FWFT = 0x46574654,
+>  	SBI_EXT_SSE = 0x535345,
+> +	SBI_EXT_DBTR = 0x44425452,
+>  };
 >  
->  	if (pmu.is_intel) {
-> -		struct cpuid cpuid_10 = cpuid(10);
-> -
-> -		pmu.version = cpuid_10.a & 0xff;
-> +		pmu.version = this_cpu_property(X86_PROPERTY_PMU_VERSION);
+>  enum sbi_ext_base_fid {
+> diff --git a/riscv/Makefile b/riscv/Makefile
+> index 11e68eae..55c7ac93 100644
+> --- a/riscv/Makefile
+> +++ b/riscv/Makefile
+> @@ -20,6 +20,7 @@ all: $(tests)
+>  $(TEST_DIR)/sbi-deps += $(TEST_DIR)/sbi-asm.o
+>  $(TEST_DIR)/sbi-deps += $(TEST_DIR)/sbi-fwft.o
+>  $(TEST_DIR)/sbi-deps += $(TEST_DIR)/sbi-sse.o
+> +$(TEST_DIR)/sbi-deps += $(TEST_DIR)/sbi-dbtr.o
 >  
->  		if (pmu.version > 1) {
-> -			pmu.nr_fixed_counters = cpuid_10.d & 0x1f;
-> -			pmu.fixed_counter_width = (cpuid_10.d >> 5) & 0xff;
-> +			pmu.nr_fixed_counters = this_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
-> +			pmu.fixed_counter_width = this_cpu_property(X86_PROPERTY_PMU_FIXED_COUNTERS_BIT_WIDTH);
->  		}
+>  all_deps += $($(TEST_DIR)/sbi-deps)
 >  
-> -		pmu.nr_gp_counters = (cpuid_10.a >> 8) & 0xff;
-> -		pmu.gp_counter_width = (cpuid_10.a >> 16) & 0xff;
-> -		pmu.arch_event_mask_length = (cpuid_10.a >> 24) & 0xff;
-> +		pmu.nr_gp_counters = this_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
-> +		pmu.gp_counter_width = this_cpu_property(X86_PROPERTY_PMU_GP_COUNTERS_BIT_WIDTH);
-> +		pmu.arch_event_mask_length = this_cpu_property(X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH);
->  
->  		/* CPUID.0xA.EBX bit is '1' if a counter is NOT available. */
-> -		pmu.arch_event_available = ~cpuid_10.b;
-> +		pmu.arch_event_available = ~this_cpu_property(X86_PROPERTY_PMU_EVENTS_MASK);
->  
->  		if (this_cpu_has(X86_FEATURE_PDCM))
->  			pmu.perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
-> @@ -38,7 +36,7 @@ void pmu_init(void)
->  			/* Performance Monitoring Version 2 Supported */
->  			if (this_cpu_has(X86_FEATURE_AMD_PMU_V2)) {
->  				pmu.version = 2;
-> -				pmu.nr_gp_counters = cpuid(0x80000022).b & 0xf;
-> +				pmu.nr_gp_counters = this_cpu_property(X86_PROPERTY_NR_PERFCTR_CORE);
->  			} else {
->  				pmu.nr_gp_counters = AMD64_NUM_COUNTERS_CORE;
->  			}
+> diff --git a/riscv/sbi-dbtr.c b/riscv/sbi-dbtr.c
+> new file mode 100644
+> index 00000000..b254f84e
+> --- /dev/null
+> +++ b/riscv/sbi-dbtr.c
+> @@ -0,0 +1,811 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * SBI DBTR testsuite
+> + *
+> + * Copyright (C) 2025, Rivos Inc., Jesse Taube <jesse@rivosinc.com>
+> + */
+> +
+> +#include <asm/io.h>
+> +#include <bitops.h>
+> +#include <asm/processor.h>
+> +#include <libcflat.h>
+> +
+> +#include "sbi-tests.h"
 
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+The includes should have the asm/ headers grouped separately below the
+non-asm, and we typically use alphabetic order because of OCD issues,
+except for libcflat.h, which typically comes first, since it's a mess of
+stuff, and the idea is to order from most general to most specific. So,
 
+ #include <libcflat.h>
+ #include <bitops.h>
 
+ #include <asm/io.h>
+ #include <asm/processor.h>
+
+ #include "sbi-tests.h"
+
+But don't respin for just this change. I'm still hoping we'll get more
+reviews of the tests wrt the spec (which I haven't yet done). If we don't
+get anymore reviews in a week or so then I'll find some time for it.
+
+Thanks,
+drew
 
