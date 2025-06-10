@@ -1,108 +1,104 @@
-Return-Path: <kvm+bounces-48855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48856-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52CA9AD4309
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:43:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1A7AD430A
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:43:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 740951897EC4
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:43:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E36B1897700
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 066AB264634;
-	Tue, 10 Jun 2025 19:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617F226462E;
+	Tue, 10 Jun 2025 19:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lm/HMCf7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yZJF3kE4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE46264630
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4004C238C20
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749584579; cv=none; b=WyHcevmtrgIl+FN7bBcXIqWkZ8a4D9FUjEGoe4akrO85E5wT88GOfemrD3/mM4AU9Nvcf9Pdpwn/+17LOwTJoxYUCSiSWMHtS1KwYKW7YA163dnm0vInkoaWZnDupRjypxOpekbt84IaDRBsAIasC2Ly/WkTa3HoMWa+ElFKGQg=
+	t=1749584586; cv=none; b=Rt+6c006owGd1CNVjnIsdUdRzW81XxwJHzMHsY2kOJVvF7t/A53snCuAFXcEZ2NlXQ6YWq0R07b+phjNI0Sl2V2Sqv0djQPFEi+/WoO2vl4eqEQThlTGiM26XsOewA8j+xIRgIr/SFxIdvKbLdT+QrgXqHZ/dXbd0WcZZVFNCgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749584579; c=relaxed/simple;
-	bh=9YkBVxUtVEzf2g1l+3bgcHOa0H7naeg11KxKDKi9ITM=;
+	s=arc-20240116; t=1749584586; c=relaxed/simple;
+	bh=zq0Qh8zkzo1jzdUbo873NBgvMAstydaf+vgfjP+EMUE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SMZ7eAuEYj4ht7R/vWx7TUGeX0v1sOwlIAB+2eY/Y+IAwPSJVclclBoqg8Q8YJGDfLo7TMSvmlQL0UdPjfnmnDirosReHJmRlxtWqc0l55gJjTgI8R7ru4BcngIEP1eovr58nhdxRxR+a8iHO86ZkXs5GEe26GU+zmdWelGbnrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lm/HMCf7; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=XMuPONko3/FeHqV6nKetXE6Sl5htckb7NPONLPVEAGor7ov2ZFMNtrmdU/EbSyIXms/qagl9VvDRbQl6i4VGMZUQOG5T84RN/DmyiIBvH/RYguoOYPf+t6pgj7158IqFM/8SIQozzgnH9vokzcAzgIcJY/G6/bTam54j67TNDSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yZJF3kE4; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b115383fcecso3374983a12.1
-        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:42:57 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74847a38e5eso1785432b3a.0
+        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:43:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749584577; x=1750189377; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749584584; x=1750189384; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oDALznD/3c9MVqTY3u+MwmZHInHphiU0CPL0RvaHEeA=;
-        b=Lm/HMCf78V4tnhNLad87rPhOl+vMHJIhrwdUz28m3EYTlCrvPz1FXt/BOVVB9W84ts
-         9kNfnLGj11T0y9LAYxY4TIYYWAsZFbVFy6olP4urmx6VPDvasI9vJjODZACraJT+OlrM
-         J1fWMjRLwyCd2B+6A5tk1/QVQoV+f8nWhn5nyu2k5iWfCd4dBpVx8haOFr3MfPFVTZPT
-         YxsxtN+g7JJhGkInAbXUYKl/k5G9XeZNlknKN/js4wZuDhkgg1Ciiv7oJEUFFcAh9CIs
-         2bCAnweAAXJirVH91jPKgE9DS0trw0zkfImkayyTM/ezp5cUb4c6V39hBXbk2Uo8DfVK
-         erHA==
+        bh=JN65pJvTnX9JvJJkYcaEVSosS7eRXOOBgHuJVpzpRAc=;
+        b=yZJF3kE4fClcZfgMwuVyBr3y/1fktJqEta4N9LwT6cw68lh/YeDQyqSSrEI5KSnQ9h
+         +6FCyuKcIXZbiLCdNXPwnWSDsnFiPqoHcfi7WK7/TdTm4C8EOSPvlqZu/UFrFnYAKV5B
+         WDOK3utzE+oQmM2cwbgenlDUBlppfdYitrTHnG03wnkh8aJLQwmg3mmmtsShguwy/JbU
+         l33oyJ3vmvD2hy/jmB8PBLrywdHZ1s1L8WpQYTfO+9bmHvbKJkf0z49rdvAADhzTC1A7
+         cVBD76O7wZPpQWG0hL5yBE81kdo+v9bzI4/5tRme/McqwKsy2ziP/52etD+p42X++Nxj
+         BV8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749584577; x=1750189377;
+        d=1e100.net; s=20230601; t=1749584584; x=1750189384;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oDALznD/3c9MVqTY3u+MwmZHInHphiU0CPL0RvaHEeA=;
-        b=gtcYf5qyYHBfvOe7Z71mlflFgUhTs5isixn+C/xuYE1vUUg2sRXwZ773LIzAuBQ/7U
-         W3jqV3bq71IbkvS/ghbFqA4VARfIsaIxfsLLkVBrwKvlmv+mknrDhVL0WHOfj8S6+1un
-         Wk3lC7LIoQLhPrVzt50d8dKnVfO2N4qIqMTebZp/skpg+DbgPld8u54VZn3C84BrVor5
-         BCsGjw6f52nVL96wpqp1Vn2blIjYq4z/BiCdUG3nfWVAtzAPz6+yGeB1AEz6YW59aI2y
-         0T66KbCNPduRAYZuglbOOPQbTK7DWrC0NqWcmEfk+ec6HEoXCSbQ0EVXnszywhE360lb
-         aw/g==
-X-Forwarded-Encrypted: i=1; AJvYcCVbBrgfFtgSoEAFCWvvG9Moqu7UEW6m1MnvtMQw7dhP6zO9Nul9T1DQMppDGxZy5v7oiHk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4QgzPZeXTdHiOFOk20gLnJ4/UQdJSx/cmKfY9P9WrGZvKjIgx
-	jjeuJmzxdyxNggah52oLOJcojiOet5mAVkQCkn+V4gJGqhGmJwYF7hVBl1jTjjPHKKN0hls510O
-	3aBvpug==
-X-Google-Smtp-Source: AGHT+IFcAOO3RSRtE5/jK1DkybZihifw/RBRr2CZFZLIL3K3lAfdD4oPG0LZgY/dzFkx0SmxXZyKAYsG10A=
-X-Received: from pfbhe19.prod.google.com ([2002:a05:6a00:6613:b0:746:19fc:f077])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1703:b0:736:6ecd:8e32
- with SMTP id d2e1a72fcca58-7486cdfcc3amr980353b3a.21.1749584576971; Tue, 10
- Jun 2025 12:42:56 -0700 (PDT)
-Date: Tue, 10 Jun 2025 12:42:18 -0700
-In-Reply-To: <20250529221929.3807680-1-seanjc@google.com>
+        bh=JN65pJvTnX9JvJJkYcaEVSosS7eRXOOBgHuJVpzpRAc=;
+        b=TBlLYGXskLghZgyZZ0qWL5Nlhmjh620K2Yxg8vb36d+HC74zwyvi3eeT6BSCRanMgT
+         9D/Fo9rgVNFwxgadgbAgiKyb80ZEIB1IL+4IARJ+7QlI2HLqVfi0ZH4h4/s8MZ+WkUTI
+         l4yNYQbl/vSxSDx2wcQy1A4AgDb82aqifEalQaV+r1wBJ/fSwdovfz3iMRR1MTrM5M7i
+         bcfxnwJ5mOS3EUAdSJNZINa0hmmymm2pA6lwvKSxJ0Na0RscHsHECA7qTIywk/al8PpL
+         0ojMFQrQgIsXW51bvYysPyTccIc9JfbQdluXTlSPT9EeVHnFH8/0dwgw+YM2AUjEwPuW
+         pVrA==
+X-Gm-Message-State: AOJu0YxtbLiM4oYinW1Azromn6JaeXjZ1ax9odSwczu9aSzg31kmDWlp
+	if/VqxQNGMlDXozCOQvUmNnQWitbngNmfz+j5RiAAarOVdWpRwPKSKWz6ZESyTTtMUDcHpCM2Dw
+	TkxWQOw==
+X-Google-Smtp-Source: AGHT+IGOLcUSoEyzPXF35NV+TzfJ5fe2Tp8Pah9JFc02XRJPvt1yHuG9VgA91gNcl4QyVBoF9otqfyN5/EU=
+X-Received: from pfsq11.prod.google.com ([2002:a05:6a00:2ab:b0:73b:bbec:17e9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:c88:b0:736:34a2:8a23
+ with SMTP id d2e1a72fcca58-7486ce334cbmr937532b3a.15.1749584584641; Tue, 10
+ Jun 2025 12:43:04 -0700 (PDT)
+Date: Tue, 10 Jun 2025 12:42:20 -0700
+In-Reply-To: <20250304211223.124321-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250529221929.3807680-1-seanjc@google.com>
+References: <20250304211223.124321-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
-Message-ID: <174958127087.101429.2266783610076724411.b4-ty@google.com>
-Subject: Re: [kvm-unit-tests PATCH 00/16] x86: Add CPUID properties, clean up
- related code
+Message-ID: <174958161204.102519.674416672614502229.b4-ty@google.com>
+Subject: Re: [kvm-unit-tests PATCH 0/2] x86: nSVM: Fix a bug with nNPT+x2AVIC
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Andrew Jones <andrew.jones@linux.dev>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	"=?UTF-8?q?Nico=20B=C3=B6hr?=" <nrb@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	kvm@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 29 May 2025 15:19:13 -0700, Sean Christopherson wrote:
-> Copy KVM selftests' X86_PROPERTY_* infrastructure (multi-bit CPUID
-> fields), and use the properties to clean up various warts.  The SEV code
-> is particular makes things much harder than they need to be (I went down
-> this rabbit hole purely because the stupid MSR_SEV_STATUS definition was
-> buried behind CONFIG_EFI=y, *sigh*).
+On Tue, 04 Mar 2025 13:12:21 -0800, Sean Christopherson wrote:
+> Fix a bug in the nNPT passthrough APIC (MMIO) test where it runs with
+> x2APIC enabled.  The test currently passes because KVM provides consistent
+> behavior when the APIC is accessed via MMIO in x2APIC mode (see
+> KVM_X86_QUIRK_LAPIC_MMIO_HOLE), and because it runs with an in-kernel PIT,
+> which inhibits x2AVIC.
 > 
-> The first patch is a common change to add static_assert() as a wrapper
-> to _Static_assert().  Forcing code to provide an error message just leads
-> to useless error messages.
+> But with a split IRQCHIP, i.e. no preconfigured PIT, x2AVIC gets enabled
+> and the test fails because hardware doesn't provide the exact same behavior
+> as KVM (returns 0s instead of FFs).
 > 
 > [...]
 
-To avoid spamming non-x86 folks with noise, applied patch 1 to kvm-x86 next.
-I'll send a v2 for the rest.
+Applied to kvm-x86 next, thanks!
 
-[01/16] lib: Add and use static_assert() convenience wrappers
-        https://github.com/kvm-x86/kvm-unit-tests/commit/863e0b90fb88
+[1/2] x86: apic: Move helpers for querying APIC state to library code
+      https://github.com/kvm-x86/kvm-unit-tests/commit/d427851a1e91
+[2/2] x86: nSVM: Ensure APIC MMIO tests run with APIC in xAPIC mode
+      https://github.com/kvm-x86/kvm-unit-tests/commit/63a180cba760
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
