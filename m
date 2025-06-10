@@ -1,114 +1,102 @@
-Return-Path: <kvm+bounces-48859-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48860-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 145D5AD430E
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:43:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78FBBAD4310
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:43:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF5013A4239
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:43:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 080941659EB
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD46264A65;
-	Tue, 10 Jun 2025 19:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEBD2264A60;
+	Tue, 10 Jun 2025 19:43:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iISNZh24"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wzdwIla2"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95573238C20
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9637242D7F
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749584609; cv=none; b=LwVCcDczEjrXN5msm3JD1th1wj08flcVu+aG7AHd+qwjI/jTROu8n1Adk8LeBMcYrQEGvthlK7lPGJ/mlwTZ1V7aKdLzbi0hdr482VlAsFes5rEPc1vNwe84A2D5vlI4+Wo0LSsYBEad0pjH8aGPf2ON63t2ec2oLMjCSoCIhsA=
+	t=1749584614; cv=none; b=Yhn0aVAUjbyu+62GU9IymaWjgeXmoKFH3fYCmOPEU/cMqa4JrCtajJHW1eg/6ftqdh+mW/Me2ss6T4tN1fCukx33pcNdIh9SaWeEQ3TRqdVKrxSf5RXj16pGCCvM73eHw25TNP1CvDb+6ZC9X53KhlFWqEX+NAC2/FTmWeNHkFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749584609; c=relaxed/simple;
-	bh=EDJBS9T152wNLom3DaUU0B084NyWDFLWux5PKe8FnHI=;
+	s=arc-20240116; t=1749584614; c=relaxed/simple;
+	bh=MkTuENY1wVP9or+KsTS12DhuzDMBgmYjk4Khd8QXHA0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z0f9/PQ/mmbIZfdRBNPOmb5s/fe86SSRht2KRG65j7Nnui7XAiJcyht7ZjbuePYiBfslkxvwwAnThxqo6o6QUZkLjpjzZLAaHe4kkrsCK8H9uQBWwv2DQyiF9HRYwpbc/SFPdfUmnIuNB6vRBslxDQcsPgqCUUDFEhe/h9SmLjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iISNZh24; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=HlKvvydiOJcOs46SWXWmn4+9xpe6QNW0lFoFuxd2505CPu9FRwWPYpwpYa49h7kIW7Cl7lTvNpBLUThuduE1y/JjZrmd+FJXNr5BpR2luSxrAvZbhTgCNxBwmCnuN+lZW50UTowSosTDEu3FG2xANWwCMCWITppWItYZ7+8/1rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wzdwIla2; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-740774348f6so5015608b3a.1
-        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:43:27 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74299055c3dso8303335b3a.0
+        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:43:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749584607; x=1750189407; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749584612; x=1750189412; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lqa3tWEOJqLNTjVF/tXgpu07+v6EAYg8U103GU74Ybk=;
-        b=iISNZh24aAJKMi/eV9Fq0OnX//6sk2O22yGcAdxB37v60S0AQItTdSe1QtNfqTVwBz
-         BtDijcR9l5SRMF0E9KFxAgGlcc3Vj925d55JYENBGThYYIcDJIm5727BNWxnb70xrO+9
-         nEXeBZzcJQrnBbQQf6gB+wRmm+RbGiX+wE39GYXFKqicyeOLjgTXpSvHewyOGyDzgjuo
-         MjLxKj3r+RU0+egJlCdvd+/L2RlkDMMTndchwveMJhIkJKteB2QhzKguJfM1/hj17QL/
-         AMLja4UebKf4fXzHZ/vSSQmjiFdIOPYgOET0xCCzB8giQUIhm/LFmvgP+jDK5AdH/ZSZ
-         DYlw==
+        bh=6CQorN76OIQj4osGntkYZy402/zfOfJf9GRPA4sgzY0=;
+        b=wzdwIla2kIc5BNGeUe+B84CFrTQGQE/TtjDUFq61SDeE4Ojs4e6cPinCmorGjuI5/d
+         G8rLW/SMr4pn4J6zHScDO4m7XpTm07aluAnJXhqggRkb+rsAEh4RjKmcJIP3rqOTqYOj
+         hORPOX7why5axS9Ntzc5ULrZ4pIAfeGA6UmHNiJPSkkj4KIGTOzKEfLjqJMdw+KZu5ub
+         uDfARS9cxBhlJ1UrfZf2WTx+fwDG3I/5fmZKICPkCvg7b7IeTbXo1wgYNrFj7TuMkGJn
+         piDaDP8Cp7V2hgIi1dOOB+D55NuwXtf00lYAf/tJ+Q5PrCH/JXg5959iTaEv6jrSE2d+
+         w35w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749584607; x=1750189407;
+        d=1e100.net; s=20230601; t=1749584612; x=1750189412;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lqa3tWEOJqLNTjVF/tXgpu07+v6EAYg8U103GU74Ybk=;
-        b=EyXA+yQ6amf+p35TrAa3YVVh4IISlVfzp4QgjxwNAku6fZMBB7OrqdvTujrs3q7iYB
-         rWvTk7npLa03n6GYMsFwl8t6wFnZxepvUw0Ny6jcxlcki88DA3oemWV0eEl0UNqF4brJ
-         ZdJCz3AGBVLP3ZfBB6oA+Y0aPTgk0AIUrP7x/NK3EY6bVXBC8TYCPZiCiNMjo0xHw62K
-         WkdAYWq31+M+vvzBaqggv9g4lHvAW3w0uQ0MHvipQf35FTprKwPbq8j8836Mp2yJUKW9
-         RNJSVsyeQioj4a43SvXZDdiQB0rM/IQDGYZPkoMFGoAlpFDVd3pShd0uU0pVYh0g3jp1
-         lVIA==
-X-Gm-Message-State: AOJu0Yxs8qMyRCfcSolXZZlhKKPuV0llH7IbtwHFFVbUlxY/TuYoO82V
-	gP7TtZ6jnqj5hwjkYKcVlHgKTDZuk0vH9ltg+PSHhcV3MZC0icsBRYU3QqMWG66r9FxPFA51BjZ
-	NBLBx0w==
-X-Google-Smtp-Source: AGHT+IHsW4KUy8wsZ8ekMGekB+UaecO1PLmiQibaIvX0Xtvzuj4YAoQd8g8zZSPah52npdwXtPzu0lD4iiE=
-X-Received: from pfbdw19.prod.google.com ([2002:a05:6a00:3693:b0:748:34d:6d4f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:9287:b0:748:33f3:8da3
- with SMTP id d2e1a72fcca58-7486fe7a2dfmr60173b3a.19.1749584606903; Tue, 10
- Jun 2025 12:43:26 -0700 (PDT)
-Date: Tue, 10 Jun 2025 12:42:26 -0700
-In-Reply-To: <20250605192226.532654-1-seanjc@google.com>
+        bh=6CQorN76OIQj4osGntkYZy402/zfOfJf9GRPA4sgzY0=;
+        b=UP/+JfBukl0+uJBWYzsaogegc87t717l6VujxK87NVg/M6Xf7tfzAIINSG6poliYtI
+         yfMi/fnnvbRe1RGyfnN9oyvyugHk78BXCsNS3Hf+s7bBe20VtPzYA72Lv/vQMPS9Mj/m
+         zuzI5UgPWWlmbfTZzUDpuY1cXr8NP69G9AFrnfTXTkoLOjcL6aK7WXvXe82yvBG9Fw/b
+         52pAou+yinPad/xq6OAk+auK/WJ6SiR1xKllPInVT57AupmFjeCCWMf2P9nCqClRSIgs
+         YUMaDDWdZjnJL6BRhz8vXWGBYysZVQWpYVhaONu9pMtp4r0fO+aVAtR2AXHvNuH+lXW4
+         gvDw==
+X-Gm-Message-State: AOJu0Yw3wT80KMHTRyX9DgQHLkO5YG5m6GbKxJyu3BThJli+WMPtqiPP
+	9c+ah7ni/R18RwzzYcwb7b0SwDid9CQ7X4UBJnmjNJMPoiMVEp7DtSwBwy9zAWGadw+d/C4J77C
+	g/uyPSQ==
+X-Google-Smtp-Source: AGHT+IGWnVTk3Ao0CDTpm9Z9sgV3XxvtAm+fdllv2SyvDzEnXTOeE4poONnlSmOWpcVz3So8+16nRYyomjQ=
+X-Received: from pfoo19.prod.google.com ([2002:a05:6a00:1a13:b0:748:4f7c:c605])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4f8b:b0:742:b3a6:db09
+ with SMTP id d2e1a72fcca58-7486ce16070mr849276b3a.16.1749584612030; Tue, 10
+ Jun 2025 12:43:32 -0700 (PDT)
+Date: Tue, 10 Jun 2025 12:42:28 -0700
+In-Reply-To: <20250604000812.199087-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250605192226.532654-1-seanjc@google.com>
+References: <20250604000812.199087-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
-Message-ID: <174958166664.103414.4678286267318991320.b4-ty@google.com>
-Subject: Re: [kvm-unit-tests PATCH v2 0/8] x86/svm: Make nSVM MSR test useful
+Message-ID: <174958176603.104273.16656461633654215133.b4-ty@google.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: Delete split IRQ chip variants of
+ apic and ioapic tests
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Naveen N Rao <naveen@kernel.org>
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 05 Jun 2025 12:22:18 -0700, Sean Christopherson wrote:
-> Fix the nSVM MSR interception test to actually detect failures, and expand
-> its coverage to test:
+On Tue, 03 Jun 2025 17:08:12 -0700, Sean Christopherson wrote:
+> Remove the dedicated {io,}apic-split testcases and instead rely on users
+> to run KVM-Unit-Tests with ACCEL="kvm,kernel_irqchip=split" to provide the
+> desired coverage.
 > 
->  - Out-of-range MSRs
->  - With all other bits in the MSPRM clear
->  - {RD,WR}MSR with interception *disabled*
->  - That L1 and L2 see the same value for RDMSR when interception is disabled
+> While providing more coverage by "default" is nice, the flip side of doing
+> so is that makes it annoying for an end user to do more, and gives the
+> false impression that the configurations in unittests.cfg are the only
+> configurations worth testing.
 > 
 > [...]
 
 Applied to kvm-x86 next, thanks!
 
-[1/8] x86: nSVM: Actually report missed MSR intercepts as failures
-      https://github.com/kvm-x86/kvm-unit-tests/commit/27eeac46fac1
-[2/8] x86: nSVM: Test MSRs just outside the ranges of the MSR Permissions Map
-      https://github.com/kvm-x86/kvm-unit-tests/commit/573d62c697fe
-[3/8] x86: nSVM: Clean up variable types and names in test_msr_intercept()
-      https://github.com/kvm-x86/kvm-unit-tests/commit/165c839cc035
-[4/8] x86: Expand the suite of bitops to cover all set/clear operations
-      https://github.com/kvm-x86/kvm-unit-tests/commit/9fb56fa18056
-[5/8] x86: nVMX: Use set_bit() instead of test_and_set_bit() when return is ignored
-      https://github.com/kvm-x86/kvm-unit-tests/commit/a594bc6120d5
-[6/8] x86: nSVM: Set MSRPM bit on-demand when testing interception
-      https://github.com/kvm-x86/kvm-unit-tests/commit/1c7e7d1c7b57
-[7/8] x86: nSVM: Verify disabling {RD,WR}MSR interception behaves as expected
-      https://github.com/kvm-x86/kvm-unit-tests/commit/1e2a6424a1d2
-[8/8] x86: nSVM: Verify L1 and L2 see same MSR value when interception is disabled
-      https://github.com/kvm-x86/kvm-unit-tests/commit/bbafc5776737
+[1/1] x86: Delete split IRQ chip variants of apic and ioapic tests
+      https://github.com/kvm-x86/kvm-unit-tests/commit/0293b912a7e7
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
