@@ -1,103 +1,114 @@
-Return-Path: <kvm+bounces-48858-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48859-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E46B7AD430D
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:43:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 145D5AD430E
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27277174B02
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:43:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF5013A4239
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A716226463B;
-	Tue, 10 Jun 2025 19:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD46264A65;
+	Tue, 10 Jun 2025 19:43:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1yddMFPH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iISNZh24"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAB123183E
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95573238C20
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749584600; cv=none; b=LsEo5FXgatbbFsA7nURLrxh4FMwYPMCxa+nXZQ5tEcTuGvZ8kTkv/Tdd6RScB2koYtvq0BnhB2AbANAyJhPpEh7hEtbfzG9XoV0eWAfDBI/8Blxfau+RuJwn8jyacHlv0SNRVOmmmLvFTnMN/lfFINMHPNHuJ1yT8v2LAHiqhjM=
+	t=1749584609; cv=none; b=LwVCcDczEjrXN5msm3JD1th1wj08flcVu+aG7AHd+qwjI/jTROu8n1Adk8LeBMcYrQEGvthlK7lPGJ/mlwTZ1V7aKdLzbi0hdr482VlAsFes5rEPc1vNwe84A2D5vlI4+Wo0LSsYBEad0pjH8aGPf2ON63t2ec2oLMjCSoCIhsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749584600; c=relaxed/simple;
-	bh=Iwy8NY58KQePrrWbHpjSW99wKuReIf2GvBm7+wChI50=;
+	s=arc-20240116; t=1749584609; c=relaxed/simple;
+	bh=EDJBS9T152wNLom3DaUU0B084NyWDFLWux5PKe8FnHI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BuYcEqdpmQxs2vPySlDOedY92RQ+yw5ngTTWpxdpkXARNPUo1Df5QCJjvX+2qGv5q9QtilbE5dak7gF76C3bh/DK+motRA+E0hnZI7QxEQDjnzvBR04j3Ke4Q5UXGqfzY89vtqf3S3hJ4rOKT134xDNSFhIlrMdUbZyZc3V3PS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1yddMFPH; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=Z0f9/PQ/mmbIZfdRBNPOmb5s/fe86SSRht2KRG65j7Nnui7XAiJcyht7ZjbuePYiBfslkxvwwAnThxqo6o6QUZkLjpjzZLAaHe4kkrsCK8H9uQBWwv2DQyiF9HRYwpbc/SFPdfUmnIuNB6vRBslxDQcsPgqCUUDFEhe/h9SmLjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iISNZh24; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-742cf6f6a10so7972180b3a.1
-        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:43:19 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-740774348f6so5015608b3a.1
+        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:43:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749584599; x=1750189399; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749584607; x=1750189407; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VJejgViKNsZj7pWv49HUOX5soNzayp031qY6IfDd3CE=;
-        b=1yddMFPHZ5a8A/z/cm/2IsmiFEAkM9tjTXmtXq3B9yQWpxe2pPe4Slwa/1isi22kvm
-         VC0rorFdG8wPPGG2tQV4z25iqEhWiQOhwGlBHNeJcFeAEyfqRRoDUJzuNzvZpPQDmMC2
-         5rwRE2cS868TCyszq8xarIsOfpMSrzufH84IDgiDgIUy4eH2TjcM7gIpmAc8cku1WmAD
-         2Kenrt+LiMD8S+bjzheAB+CqJEZsqPOz6kxpr0V0uq5vVWm2hrE7pjDIqSjCWhE2IlEZ
-         ssRlBaubQW0bFGTDKdXsPLUbfl43XZTZe1GkbnBupcC5nOOxcFYb6PuN0KVkH0//+Jtk
-         shAw==
+        bh=lqa3tWEOJqLNTjVF/tXgpu07+v6EAYg8U103GU74Ybk=;
+        b=iISNZh24aAJKMi/eV9Fq0OnX//6sk2O22yGcAdxB37v60S0AQItTdSe1QtNfqTVwBz
+         BtDijcR9l5SRMF0E9KFxAgGlcc3Vj925d55JYENBGThYYIcDJIm5727BNWxnb70xrO+9
+         nEXeBZzcJQrnBbQQf6gB+wRmm+RbGiX+wE39GYXFKqicyeOLjgTXpSvHewyOGyDzgjuo
+         MjLxKj3r+RU0+egJlCdvd+/L2RlkDMMTndchwveMJhIkJKteB2QhzKguJfM1/hj17QL/
+         AMLja4UebKf4fXzHZ/vSSQmjiFdIOPYgOET0xCCzB8giQUIhm/LFmvgP+jDK5AdH/ZSZ
+         DYlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749584599; x=1750189399;
+        d=1e100.net; s=20230601; t=1749584607; x=1750189407;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VJejgViKNsZj7pWv49HUOX5soNzayp031qY6IfDd3CE=;
-        b=t2GY57tPVw2n4JskdzyXXJq6NDTNNRP1DFq5jII/wVBjcDruwzGvmBjxzBQZooge1s
-         ZxdYFFQ/trqojNluOv/cfOG0cyXfmH8TAsmFbJ3tvUujNGOfuCQdd0jiPf8u15r0GMpE
-         JVk4ywvvXUhNGe4UKglcoB3AhWv1XHWf5y5Gc9bOKPTcYOZ+cMmneHCA71nuYGbuMPnQ
-         ctFLx8/2zT7y0U3EpWazR8kQDavzSKrx09rH9+Ncz4gqk5hgAby3yg7Mw54thKr8IhH3
-         9x390I64pipuiUlrJ4AmpuxFQldaQHAKZDx4EJkjELDr5ZC84m8w/EYGSI44iWPzDSLm
-         Cugg==
-X-Gm-Message-State: AOJu0YxXbK33cRCjc+CBomIiGZInokYtUfQzo2w8pSp5m0mtjyNEjSIU
-	yGh1vtDhfEjWODf+8VzjZzM/9mE3LryH6XCpzBwsQrIQt/Cp/4cJRllMePssCFIqfIV+zDWQiKP
-	PLinzjg==
-X-Google-Smtp-Source: AGHT+IEcB+Nwfw3pSmScCOlLPfkMiQFz/m7TlS5HdfyyZ1cZDZ8Bc5ewUMSeyG1rrdg4MwItXmCTzzlfOiw=
-X-Received: from pfnj12.prod.google.com ([2002:aa7:83cc:0:b0:746:32ee:a305])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:988:b0:748:2ac2:f8c3
- with SMTP id d2e1a72fcca58-7486ce5a4bcmr1005907b3a.24.1749584598737; Tue, 10
- Jun 2025 12:43:18 -0700 (PDT)
-Date: Tue, 10 Jun 2025 12:42:24 -0700
-In-Reply-To: <20250529205820.3790330-1-seanjc@google.com>
+        bh=lqa3tWEOJqLNTjVF/tXgpu07+v6EAYg8U103GU74Ybk=;
+        b=EyXA+yQ6amf+p35TrAa3YVVh4IISlVfzp4QgjxwNAku6fZMBB7OrqdvTujrs3q7iYB
+         rWvTk7npLa03n6GYMsFwl8t6wFnZxepvUw0Ny6jcxlcki88DA3oemWV0eEl0UNqF4brJ
+         ZdJCz3AGBVLP3ZfBB6oA+Y0aPTgk0AIUrP7x/NK3EY6bVXBC8TYCPZiCiNMjo0xHw62K
+         WkdAYWq31+M+vvzBaqggv9g4lHvAW3w0uQ0MHvipQf35FTprKwPbq8j8836Mp2yJUKW9
+         RNJSVsyeQioj4a43SvXZDdiQB0rM/IQDGYZPkoMFGoAlpFDVd3pShd0uU0pVYh0g3jp1
+         lVIA==
+X-Gm-Message-State: AOJu0Yxs8qMyRCfcSolXZZlhKKPuV0llH7IbtwHFFVbUlxY/TuYoO82V
+	gP7TtZ6jnqj5hwjkYKcVlHgKTDZuk0vH9ltg+PSHhcV3MZC0icsBRYU3QqMWG66r9FxPFA51BjZ
+	NBLBx0w==
+X-Google-Smtp-Source: AGHT+IHsW4KUy8wsZ8ekMGekB+UaecO1PLmiQibaIvX0Xtvzuj4YAoQd8g8zZSPah52npdwXtPzu0lD4iiE=
+X-Received: from pfbdw19.prod.google.com ([2002:a05:6a00:3693:b0:748:34d:6d4f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:9287:b0:748:33f3:8da3
+ with SMTP id d2e1a72fcca58-7486fe7a2dfmr60173b3a.19.1749584606903; Tue, 10
+ Jun 2025 12:43:26 -0700 (PDT)
+Date: Tue, 10 Jun 2025 12:42:26 -0700
+In-Reply-To: <20250605192226.532654-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250529205820.3790330-1-seanjc@google.com>
+References: <20250605192226.532654-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
-Message-ID: <174958165553.102948.14956267250709935254.b4-ty@google.com>
-Subject: Re: [kvm-unit-tests PATCH] runtime: Skip tests if the target "kernel"
- file doesn't exist
+Message-ID: <174958166664.103414.4678286267318991320.b4-ty@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 0/8] x86/svm: Make nSVM MSR test useful
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Huth <thuth@redhat.com>, Andrew Jones <andrew.jones@linux.dev>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 29 May 2025 13:58:20 -0700, Sean Christopherson wrote:
-> Skip the test if its target kernel/test file isn't available so that
-> skipping a test that isn't supported for a given config doesn't require
-> manually flagging the testcase in unittests.cfg.  This fixes "failures"
-> on x86 with CONFIG_EFI=y due to some tests not being built for EFI, but
-> not being annotated in x86/unittests.cfg.
+On Thu, 05 Jun 2025 12:22:18 -0700, Sean Christopherson wrote:
+> Fix the nSVM MSR interception test to actually detect failures, and expand
+> its coverage to test:
 > 
-> Alternatively, testcases could be marked noefi (or efi-only), but that'd
-> require more manual effort, and there's no obvious advantage to doing so.
+>  - Out-of-range MSRs
+>  - With all other bits in the MSPRM clear
+>  - {RD,WR}MSR with interception *disabled*
+>  - That L1 and L2 see the same value for RDMSR when interception is disabled
 > 
 > [...]
 
 Applied to kvm-x86 next, thanks!
 
-[1/1] runtime: Skip tests if the target "kernel" file doesn't exist
-      https://github.com/kvm-x86/kvm-unit-tests/commit/7f528c1b474c
+[1/8] x86: nSVM: Actually report missed MSR intercepts as failures
+      https://github.com/kvm-x86/kvm-unit-tests/commit/27eeac46fac1
+[2/8] x86: nSVM: Test MSRs just outside the ranges of the MSR Permissions Map
+      https://github.com/kvm-x86/kvm-unit-tests/commit/573d62c697fe
+[3/8] x86: nSVM: Clean up variable types and names in test_msr_intercept()
+      https://github.com/kvm-x86/kvm-unit-tests/commit/165c839cc035
+[4/8] x86: Expand the suite of bitops to cover all set/clear operations
+      https://github.com/kvm-x86/kvm-unit-tests/commit/9fb56fa18056
+[5/8] x86: nVMX: Use set_bit() instead of test_and_set_bit() when return is ignored
+      https://github.com/kvm-x86/kvm-unit-tests/commit/a594bc6120d5
+[6/8] x86: nSVM: Set MSRPM bit on-demand when testing interception
+      https://github.com/kvm-x86/kvm-unit-tests/commit/1c7e7d1c7b57
+[7/8] x86: nSVM: Verify disabling {RD,WR}MSR interception behaves as expected
+      https://github.com/kvm-x86/kvm-unit-tests/commit/1e2a6424a1d2
+[8/8] x86: nSVM: Verify L1 and L2 see same MSR value when interception is disabled
+      https://github.com/kvm-x86/kvm-unit-tests/commit/bbafc5776737
 
 --
 https://github.com/kvm-x86/kvm-unit-tests/tree/next
