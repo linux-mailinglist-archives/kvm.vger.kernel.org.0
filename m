@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-48770-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48771-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02EC5AD2BDD
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 04:14:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1D9CAD2BE1
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 04:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB1751711D8
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 02:14:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8CB81892502
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 02:15:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0C0242935;
-	Tue, 10 Jun 2025 02:13:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD09824293C;
+	Tue, 10 Jun 2025 02:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bh9gMIWC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gqrGUIBc"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F86242909;
-	Tue, 10 Jun 2025 02:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D8F24336D;
+	Tue, 10 Jun 2025 02:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749521627; cv=none; b=Cub3sn6tds54pBsM7qusL6pLFQ5/Urm86JKk4nHb9o+Oq3go+9jQqzkB0GLBY3m3XMErHkwZwvtIqFEhxHcjYARzL7T7kHI72K73bDSwupAwlwG99BHYyRfBebTMLg8oglPOynTg4EUMTtFV3TFS9bbqKD/XHsSSktkqj9I3KdA=
+	t=1749521629; cv=none; b=XeT8+WV+IkrnLdtg+yRwxA/sUR8JYfafJL5/msF/Aune4fr/pLQE+HHu7Y5WbqZN8hxTYVuWjmeRurBpCTof+rsXQzrOB+3Zr3D9Az1wdYJ952Wjqu0xfJ0MTPxLNTP+nqwrCgQEYfRUB17L3+POHHtoP9Sy51F8fzsxCA+GC2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749521627; c=relaxed/simple;
-	bh=qyS3Hw2HNbn8etjY4K2OSgsAtv5O5q2J4SVd6WFY+mE=;
+	s=arc-20240116; t=1749521629; c=relaxed/simple;
+	bh=FchX01MFxp5Y1PBJ6clFSa6v4H4hbzOl1iwsa5RQRm4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t9U21MYqF77ZFl0B8mB/Ltbfz2mgQyawiT8J2ySa2KVLBXOb9Hgk0uSXcxu1imn8UKIF6XF3rGOAobhNgtjMdNOnzw8fCojvM87QFCbJ5kV5ZxuFxcpH3FM+OJRPYO5nZFMsYnL6Yrj9JpkoJAprRtoGFdCoDoxnYinHkNFEHjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bh9gMIWC; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=PSlnie7rwwCIE8jzoxdVtAbppfDB9J2u78q6tPGZMZe5yUn/2f477g60EWlN4OfIhGrv2LWk7tQVOPrIeNaH1rYNgXsBECn9ebs5A+tLHtjpgwsvxF5jWFrMn5gC2NmN1yEcwVVDKUe9qPOmQDA4pEMGni5Dxo2GkAWlkgAx558=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gqrGUIBc; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749521625; x=1781057625;
+  t=1749521627; x=1781057627;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qyS3Hw2HNbn8etjY4K2OSgsAtv5O5q2J4SVd6WFY+mE=;
-  b=bh9gMIWCHeVjUwJ4ObFuw5qVCgE7JnYld3fqyRhhfW+Inzfp3cNLx+Fh
-   blUTB24TQkp2or6mOPVs5rXz+TQV1M/wppDHTIsKa24TaFt3XkxqtrYHe
-   XkpDvbKankYDkErmC3pZfOathwE6xSrunwi/iAo3qSVC7o6xn8NJHzKj4
-   OuHPmxCAnrqqriaKxbPt26VQ6WczVjPLxWBqxhLhLeB41sL1LXaG8jBHN
-   ZuEr5Rvpil8+QNYzimQQBzBkZN5XoivRl9exgAXxlNy9aeCxikKusdZvy
-   y3AXOdLzJnjeOPhfRlIlvowzQCbVMLExkPlSInJOr3rLhDzZxkRh3HU2I
+  bh=FchX01MFxp5Y1PBJ6clFSa6v4H4hbzOl1iwsa5RQRm4=;
+  b=gqrGUIBcTH07CTOdt8SUM5iWtrphWa3ism96jUsv6ZF3+O/J+p6zp4nX
+   RUSbzmvqe7DMx/AQ6CZa8VSUdKKuFOiK05NvTjSc5CN9IF/6Uwh73xfwC
+   nFH25RNr1V2OKee4SDzQoZWY40uGsY8EOnWX76LOSlks45eEWtlTjToVq
+   fo4baENtDrZAADv4lDHbVACh/K4HupOi2PCZm206gQob/RSR9A1bqLCLc
+   PcemrnkdtCo4iwEsQ8WAqmRHHweiRugb9BGqCrBU9gIowFMvV3XlebdGd
+   zfIrOVeyEqNQRST6fGO4pN+owsYpDloLUocsTQPMeadEYewnDRCyTUNTt
    w==;
-X-CSE-ConnectionGUID: txyOR1i6TPyAi6UZozeIiw==
-X-CSE-MsgGUID: zVv6fdP9TLitAO13mBQAEA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="50841194"
+X-CSE-ConnectionGUID: y99Ej/XDRsGWVyDCRv8GtQ==
+X-CSE-MsgGUID: dJ4JecCXThO3AJuOWHRkig==
+X-IronPort-AV: E=McAfee;i="6800,10657,11459"; a="50841203"
 X-IronPort-AV: E=Sophos;i="6.16,223,1744095600"; 
-   d="scan'208";a="50841194"
+   d="scan'208";a="50841203"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 19:13:42 -0700
-X-CSE-ConnectionGUID: PEaS6U6hQp203jiLLgnoQw==
-X-CSE-MsgGUID: IbSenGuBQbSLNYL7saY6ZA==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 19:13:45 -0700
+X-CSE-ConnectionGUID: zdOaYM4UTKu3aD2g8wXQLQ==
+X-CSE-MsgGUID: 0dsI/uksSh6+OV4Z3gmCDg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,223,1744095600"; 
-   d="scan'208";a="147253784"
+   d="scan'208";a="147253818"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 19:13:38 -0700
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2025 19:13:42 -0700
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -75,9 +75,9 @@ Cc: rick.p.edgecombe@intel.com,
 	kirill.shutemov@intel.com,
 	jiewen.yao@intel.com,
 	binbin.wu@linux.intel.com
-Subject: [RFC PATCH 3/4] KVM: TDX: Exit to userspace for GetTdVmCallInfo
-Date: Tue, 10 Jun 2025 10:14:21 +0800
-Message-ID: <20250610021422.1214715-4-binbin.wu@linux.intel.com>
+Subject: [RFC PATCH 4/4] KVM: TDX: Check KVM exit on KVM_HC_MAP_GPA_RANGE when TD finalize
+Date: Tue, 10 Jun 2025 10:14:22 +0800
+Message-ID: <20250610021422.1214715-5-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20250610021422.1214715-1-binbin.wu@linux.intel.com>
 References: <20250610021422.1214715-1-binbin.wu@linux.intel.com>
@@ -89,173 +89,74 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Exit to userspace for TDG.VP.VMCALL<GetTdVmCallInfo> via a new KVM exit
-reason to allow userspace to provide information about the support of
-TDVMCALLs when r12 is 1 for the TDVMCALLs beyond the GHCI base API.
+Check userspace has enabled KVM exit on KVM_HC_MAP_GPA_RANGE during
+KVM_TDX_FINALIZE_VM.
 
-GHCI spec defines the GHCI base TDVMCALLs: <GetTdVmCallInfo>, <MapGPA>,
-<ReportFatalError>, <Instruction.CPUID>, <#VE.RequestMMIO>,
-<Instruction.HLT>, <Instruction.IO>, <Instruction.RDMSR> and
-<Instruction.WRMSR>. They must be supported by VMM to support TDX guests.
+TDVMCALL_MAP_GPA is one of the GHCI base TDVMCALLs, so it must be
+implemented by VMM to support TDX guests. KVM converts TDVMCALL_MAP_GPA
+to KVM_HC_MAP_GPA_RANGE, which requires userspace to enable
+KVM_CAP_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE bit set. Check it when
+userspace requests KVM_TDX_FINALIZE_VM, so that there is no need to check
+it during TDX guests running.
 
-For GetTdVmCallInfo
-- When leaf (r12) to enumerate TDVMCALL functionality is set to 0,
-  successful execution indicates all GHCI base TDVMCALLs listed above are
-  supported.
-
-  Update the KVM TDX document with the set of the GHCI base APIs.
-
-- When leaf (r12) to enumerate TDVMCALL functionality is set to 1, it
-  indicates the TDX guest is querying the supported TDVMCALLs beyond
-  the GHCI base TDVMCALLs.
-  Exit to userspace to let userspace set the TDVMCALL sub-function bit(s)
-  accordingly to the leaf outputs.  KVM could set the TDVMCALL bit(s)
-  supported by itself when the TDVMCALLs don't need support from userspace
-  after returning from userspace and before entering guest. Currently, no
-  such TDVMCALLs implemented, KVM just sets the values returned from
-  userspace.
-
-  A new KVM exit reason KVM_EXIT_TDX_GET_TDVMCALL_INFO and its structure
-  are added. Userspace is required to handle the exit reason as the initial
-  support for TDX.
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
- Documentation/virt/kvm/api.rst           | 17 +++++++++++
- Documentation/virt/kvm/x86/intel-tdx.rst |  9 ++++++
- arch/x86/kvm/vmx/tdx.c                   | 36 +++++++++++++++++++++---
- include/uapi/linux/kvm.h                 |  7 +++++
- 4 files changed, 65 insertions(+), 4 deletions(-)
+ Documentation/virt/kvm/x86/intel-tdx.rst |  3 +++
+ arch/x86/kvm/vmx/tdx.c                   | 20 +++++++++-----------
+ 2 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 7c5bb6b5c2c2..4a729841e000 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7201,6 +7201,23 @@ generated Quote is returned via the same buffer. Userspace is required to handle
- the KVM exit reason as the initial support for TDX, however, userspace is
- allowed to set 'ret' filed to TDVMCALL_STATUS_SUBFUNC_UNSUPPORTED.
- 
-+::
-+
-+		/* KVM_EXIT_TDX_GET_TDVMCALL_INFO */
-+		struct tdx_get_tdvmcall_info {
-+			__u64 ret;
-+			__u64 leaf;
-+			__u64 leaf_output[4];
-+		};
-+
-+If the exit reason is KVM_EXIT_TDX_GET_TDVMCALL_INFO, then it indicates that a
-+TDX guest has requested to get the supporting status of TDVMCALLs. Currently,
-+KVM only exits to userspace when the leaf value is 1, i.e, the TDX guest is
-+querying the supporting status of TDVMCALLs beyond the GHCI base TDVMCALLs.
-+Userspace is expected to set leaf outputs according to the layout defined in
-+the GHCI spec if they are supported by userspace. Userspace is required to
-+handle the exit reason as the initial support for TDX.
-+
- ::
- 
- 		/* Fix the size of the union. */
 diff --git a/Documentation/virt/kvm/x86/intel-tdx.rst b/Documentation/virt/kvm/x86/intel-tdx.rst
-index 76bdd95334d6..69c64453e9ca 100644
+index 69c64453e9ca..41e38c38b034 100644
 --- a/Documentation/virt/kvm/x86/intel-tdx.rst
 +++ b/Documentation/virt/kvm/x86/intel-tdx.rst
-@@ -249,6 +249,15 @@ control flow is as follows:
+@@ -246,6 +246,9 @@ control flow is as follows:
+    * Prepare content of initial guest memory.
+    * KVM_TDX_INIT_MEM_REGION: Add initial guest memory.
+    * KVM_TDX_FINALIZE_VM: Finalize the measurement of the TDX guest.
++     Note: To support TDVMCALL_MAP_GPA, userspace must opt-in
++     KVM_CAP_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE before calling
++     KVM_TDX_FINALIZE_VM.
  
  #. Run VCPU
  
-+The GHCI base TDVMCALLs
-+=======================
-+The GHCI base TDVMCALLs are: <GetTdVmCallInfo>, <MapGPA>, <ReportFatalError>,
-+<Instruction.CPUID>, <#VE.RequestMMIO>, <Instruction.HLT>, <Instruction.IO>,
-+<Instruction.RDMSR> and <Instruction.WRMSR>. These base TDVMCALLs are mandatory
-+for VMMs to support TDX guests.
-+For the TDVMCALLs beyond the GHCI base TDVMCALLs, TDX guests can query the
-+support status via GetTdVmCallInfo with leaf set to 1.
-+
- References
- ==========
- 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 35428c6b5a67..a3cd68f44a9c 100644
+index a3cd68f44a9c..7fc6e6b9c131 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1449,18 +1449,46 @@ static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
- 	return 1;
- }
+@@ -1209,17 +1209,6 @@ static int tdx_map_gpa(struct kvm_vcpu *vcpu)
+ 	u64 size = tdx->vp_enter_args.r13;
+ 	u64 ret;
  
-+static int tdx_complete_get_tdcall_info(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+
-+	tdvmcall_set_return_code(vcpu, vcpu->run->tdx_get_tdvmcall_info.ret);
-+
-+	/*
-+	 * For now, there is no TDVMCALL beyond GHCI base API supported by KVM
-+	 * directly without the support from userspace, just set the value
-+	 * returned from userspace.
-+	 */
-+	tdx->vp_enter_args.r11 = vcpu->run->tdx_get_tdvmcall_info.leaf_output[0];
-+	tdx->vp_enter_args.r12 = vcpu->run->tdx_get_tdvmcall_info.leaf_output[1];
-+	tdx->vp_enter_args.r13 = vcpu->run->tdx_get_tdvmcall_info.leaf_output[2];
-+	tdx->vp_enter_args.r14 = vcpu->run->tdx_get_tdvmcall_info.leaf_output[3];
-+
-+	return 1;
-+}
-+
- static int tdx_get_td_vm_call_info(struct kvm_vcpu *vcpu)
+-	/*
+-	 * Converting TDVMCALL_MAP_GPA to KVM_HC_MAP_GPA_RANGE requires
+-	 * userspace to enable KVM_CAP_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE
+-	 * bit set.  If not, the error code is not defined in GHCI for TDX, use
+-	 * TDVMCALL_STATUS_INVALID_OPERAND for this case.
+-	 */
+-	if (!user_exit_on_hypercall(vcpu->kvm, KVM_HC_MAP_GPA_RANGE)) {
+-		ret = TDVMCALL_STATUS_INVALID_OPERAND;
+-		goto error;
+-	}
+-
+ 	if (gpa + size <= gpa || !kvm_vcpu_is_legal_gpa(vcpu, gpa) ||
+ 	    !kvm_vcpu_is_legal_gpa(vcpu, gpa + size - 1) ||
+ 	    (vt_is_tdx_private_gpa(vcpu->kvm, gpa) !=
+@@ -2821,6 +2810,15 @@ static int tdx_td_finalize(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
  {
- 	struct vcpu_tdx *tdx = to_tdx(vcpu);
+ 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
  
--	if (tdx->vp_enter_args.r12)
--		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
--	else {
-+	switch (tdx->vp_enter_args.r12) {
-+	case 0:
- 		tdx->vp_enter_args.r11 = 0;
- 		tdx->vp_enter_args.r13 = 0;
- 		tdx->vp_enter_args.r14 = 0;
-+		return 1;
-+	case 1:
-+		vcpu->run->tdx_get_tdvmcall_info.leaf = 1;
-+		vcpu->run->exit_reason = KVM_EXIT_TDX_GET_TDVMCALL_INFO;
-+		vcpu->arch.complete_userspace_io = tdx_complete_get_tdcall_info;
-+		memset(vcpu->run->tdx_get_tdvmcall_info.leaf_output, 0,
-+		       sizeof(vcpu->run->tdx_get_tdvmcall_info.leaf_output));
-+		return 0;
-+	default:
-+		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
-+		return 1;
- 	}
--	return 1;
- }
++	/*
++	 * TDVMCALL_MAP_GPA is one of the GHCI base TDVMCALLs, so it must be
++	 * implemented by VMM to support TDX guests. KVM converts
++	 * TDVMCALL_MAP_GPA to KVM_HC_MAP_GPA_RANGE, which requires userspace to
++	 * enable KVM_CAP_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE bit set.
++	 */
++	if (!user_exit_on_hypercall(kvm, KVM_HC_MAP_GPA_RANGE))
++		return -EINVAL;
++
+ 	guard(mutex)(&kvm->slots_lock);
  
- static int tdx_complete_get_quote(struct kvm_vcpu *vcpu)
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index e63e4df468b5..0729b37ac911 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -179,6 +179,7 @@ struct kvm_xen_exit {
- #define KVM_EXIT_LOONGARCH_IOCSR  38
- #define KVM_EXIT_MEMORY_FAULT     39
- #define KVM_EXIT_TDX_GET_QUOTE    40
-+#define KVM_EXIT_TDX_GET_TDVMCALL_INFO  41
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -454,6 +455,12 @@ struct kvm_run {
- 			__u64 gpa;
- 			__u64 size;
- 		} tdx_get_quote;
-+		/* KVM_EXIT_TDX_GET_TDVMCALL_INFO */
-+		struct {
-+			__u64 ret;
-+			__u64 leaf;
-+			__u64 leaf_output[4];
-+		} tdx_get_tdvmcall_info;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
+ 	if (!is_hkid_assigned(kvm_tdx) || kvm_tdx->state == TD_STATE_RUNNABLE)
 -- 
 2.46.0
 
