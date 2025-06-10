@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-48878-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48879-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0FAAAD4357
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:55:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B563CAD4358
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 21:55:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2DF23A506E
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:55:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B5F6176CD9
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 19:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE48266EEA;
-	Tue, 10 Jun 2025 19:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B72E92673AA;
+	Tue, 10 Jun 2025 19:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LyN3NoFS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G9yPsler"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A80266B72
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FB9264FA0
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 19:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749585281; cv=none; b=WY+ZIktH+TPnE1LRRF5HU/DePmaqnvkMLUWeVaw+pVbSv6tT9Lu8u4Yt8mAU7x3n0fQMNUIkP0J6GnCjKLHGTo9CU2bbqdaYD5SR6YDWejrS54AgEs0lXWb9xbLIF2n8JUnveYlGrqMqnkJZZz1D4iE+1LH58oQ+NKxLr9cMsJM=
+	t=1749585282; cv=none; b=ZtiDOqSPdcqKSxfhYCuY8seZmmWSWU0hHsXwdhj+ao3M+LtF7ySSBo5tKnG9SVMMgowV1lhC4UkoXyzdD3auuyCk/atpndzg8+/sBRbFqdneoTFXzjkGEMe7FCyjyCKzrvHltRA1cJzcucs+ObSXqsgsVQCcUqA0YCZNikCgl4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749585281; c=relaxed/simple;
-	bh=SpGutdmzHKQQW291FPBA6pFXLatmk5gn5cs6y320m4Y=;
+	s=arc-20240116; t=1749585282; c=relaxed/simple;
+	bh=8khWAmilG6i7CQJQs17Hw1ghwzvOjS5SeviDLVe3aKY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KVXVaA4HarKVpcxy752pI/9lHavcXugMjCO+bT6izUSWxN5qETQuniKQJ1G3ln9/gj3bfJOu6acnJPSrIDicPRpXy4aN0qkF7b1dK6RVJlVIFw8q91KkC2MwUPkIUI1zw4fyptCME+L4yEIJju5hU1oFkWXEVeZbkJM4K6pt0kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LyN3NoFS; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=bovaj2PvxPLNPcmtzdJosQxa4fiyS3hFcnj4Nn/Jql2rXfHLHUoXc0pSfd4dTIxrSpczALEgsuDdaZKUS/Txp/XaFMUt/2AmST+oN6Cjkx5plJuWYtDM0L/im4qM4VQ23cKSaRTSiMrUVUc7uPUOTfgQl/gKwWsThRvNr4NjL6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G9yPsler; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-23507382e64so56463305ad.2
-        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:54:39 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2fa1a84565so2010892a12.1
+        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 12:54:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749585279; x=1750190079; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749585281; x=1750190081; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=YPdv/KvzWw74fBe0CVq7ACg2uBJ3cXAyZPQhrh+QOes=;
-        b=LyN3NoFSLB7SBG4t0AvJuv3/NlYHo5LCQNPVcfS3DFPSFQx1+FsN3HmPKqFLEHrGy5
-         h5v6TLjGXT6Sdx4C5OagIqC0+zXyICp0sghH52bacw+tYXfSE+IaAEHjmREX4JKwaoJl
-         cDOIbhgfycoa39KvBHEhMLzud8drZHIjTwN51jkLI3FrhgH9nw5xldEdOc2JGiTnN/Gt
-         rNsyCim0QiDzepEEcbd5YbAS3leYWa6z+Gkq/IvxNDpNfivxXMe1etb+o1wr6YKsDfYv
-         dLFey2teNx3mWaAnHU4ZR05tFhIOovjwBw+3YrFA2fEvnU824KHsLWML+7nDwG7u5PV1
-         va1g==
+        bh=MF/Rl0NwZGttJnicH+8isp/X93B/iTvhATdre0+YfJM=;
+        b=G9yPslerczGSUGMCXQoxNXqNEZpscKafh4n+sZgKXW6Mz3k0+oVtxo4S4/8mnglcr6
+         3Sos0u4fPIlOrqHadj8w6kc7rmUyamzVOlvEE7Xas1pvGrSFaBB+LZ0XZtpHuUXIUEal
+         2fHVGw1p/1ZF8lI8dDaz+gwXr4qmp4NHf9VZjRJLZwvGqCnZgug93f99TWbRViKmGrzy
+         KA/wFMS3t7u6q4WNuP1kkoBv2SDcUPFzksk8jc1nQewaxTwvN+A4eQyWtsfFbyZejbnR
+         iWdhL11uJG+9iuvRYg7FlXc38IJQcJFAMBS/wJqGABdREnAH6xLoTxyBz75h9crsXe7M
+         5cRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749585279; x=1750190079;
+        d=1e100.net; s=20230601; t=1749585281; x=1750190081;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YPdv/KvzWw74fBe0CVq7ACg2uBJ3cXAyZPQhrh+QOes=;
-        b=R7Mcn069qqH0SUWHttxQMenC10h84LfOs3LMH68HMGM8AUBZn9U77tMvEvpZAykfwf
-         tNhijbhZT8InvNW6cbvLb2qjadEsT0ODNnneA8/vBpwJaPpZtrpXqZbwOLYSnzJmUlSy
-         R0wVheu5lGrv2IdEFbNAAkxYgKAWGgS+GmusWQT+Aj8L77fyCyc/bD64zkh5i61nlv6S
-         thKhAttVNCnel1zQQGygQ98yc25kXT+AE6YUGC0NE3n8n+ojjPL7Md0oI1mXUYH3wq05
-         oXdzwcAB6GlZpxhr4KZgiUqqAY04PWm+uoO6ADUald4TDmrNmv1a3KvvZxm0ltVqbehJ
-         gJaQ==
-X-Gm-Message-State: AOJu0Yy3oS9jWXgyDTdkRyZLcsb5CvQKLSx3BKY0/J2GTgS4Hr0e1iYn
-	7XYqae1a7KhYmhVbSsM2bUhP/1cnCluSkhKyUSwS46Xebmnx7b94B8KT2ib8w1CWFAqwW3JEzKc
-	jEqQhqg==
-X-Google-Smtp-Source: AGHT+IGIjNhhsg6s5O66gbjRRDP+6F38KTKyRf7jeZDRS1zBUc19y3f+VZvEC2AREojjBoU1VbXssNQ3Ds0=
-X-Received: from plhl7.prod.google.com ([2002:a17:903:1207:b0:21f:4f0a:c7e2])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1b47:b0:234:b735:dca8
- with SMTP id d9443c01a7336-23641a8ab7emr5563325ad.6.1749585279065; Tue, 10
- Jun 2025 12:54:39 -0700 (PDT)
+        bh=MF/Rl0NwZGttJnicH+8isp/X93B/iTvhATdre0+YfJM=;
+        b=Ud4IEmB5BWqXBE841/VzTu8wMlruUybBJXm8JDEaQbW8BZiChzk+UZQbLqgAjjBgsj
+         w0tfB631+P5SNTf9CbqWVrELeU0Ru7FJiHIs87pLmagkMvVLfGpdrek52FklRW5+75bI
+         t4Meab6JHut2+I1MPzCza80kvqHG5GCzgmPXkMc3YxuFgcQ5i4TRE3XTPElYW75G4VRS
+         ZtIsk9fJqA3+J/ATwAFHNjMHURXuRQrL78tDo/eW2GjlZO+lrOoJy55c/PZEWcIQolO+
+         l4kf2gF00/2T4i15WybM0M8dl2H7jMaUWk1a/ZvLKBHAzO/qs7l3iazjj9e4WjLX1Xwa
+         bi/g==
+X-Gm-Message-State: AOJu0YxFOxb4Iy81o95NHA4+/9s/CJ5Jm37Bzh22gen1lDJAN1HiQsBB
+	MTS5GWMusPRAptj93rSTMfvn2rq0FCiANOyOcAwkrqPu0bOqByG/S3s2Raberzruy2m8ZTI+HwJ
+	uP73L1g==
+X-Google-Smtp-Source: AGHT+IEkvJLr+rSoLhofW3RHJY0NjGFK8EP3LnZIlq8Z2Ub/p3semfYc0JYU9v83YbbRgk97MH1+TOePQAI=
+X-Received: from pfbiv12.prod.google.com ([2002:a05:6a00:66cc:b0:747:b0ae:799b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:9013:b0:20d:df67:4921
+ with SMTP id adf61e73a8af0-21f88f95f28mr116413637.4.1749585280845; Tue, 10
+ Jun 2025 12:54:40 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 10 Jun 2025 12:54:13 -0700
+Date: Tue, 10 Jun 2025 12:54:14 -0700
 In-Reply-To: <20250610195415.115404-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,66 +75,54 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250610195415.115404-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
-Message-ID: <20250610195415.115404-13-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v2 12/14] x86/sev: Use X86_PROPERTY_SEV_C_BIT
- to get the AMD SEV C-bit location
+Message-ID: <20250610195415.115404-14-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v2 13/14] x86/sev: Use amd_sev_es_enabled() to
+ detect if SEV-ES is enabled
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
 	Sean Christopherson <seanjc@google.com>, Liam Merwick <liam.merwick@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use X86_PROPERTY_SEV_C_BIT instead of open coding equivalent functionality,
-and delete the overly-verbose CPUID_FN_ENCRYPT_MEM_CAPAB macro.
+Use amd_sev_es_enabled() in the SEV string I/O test instead manually
+checking the SEV_STATUS MSR.
 
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/amd_sev.c | 10 +---------
- lib/x86/amd_sev.h |  6 ------
- 2 files changed, 1 insertion(+), 15 deletions(-)
+ x86/amd_sev.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/lib/x86/amd_sev.c b/lib/x86/amd_sev.c
-index b7cefd0f..da0e2077 100644
---- a/lib/x86/amd_sev.c
-+++ b/lib/x86/amd_sev.c
-@@ -33,19 +33,11 @@ bool amd_sev_enabled(void)
+diff --git a/x86/amd_sev.c b/x86/amd_sev.c
+index 4ec45543..3e80d28b 100644
+--- a/x86/amd_sev.c
++++ b/x86/amd_sev.c
+@@ -19,15 +19,6 @@
  
- efi_status_t setup_amd_sev(void)
- {
--	struct cpuid cpuid_out;
+ static char st1[] = "abcdefghijklmnop";
+ 
+-static void test_sev_es_activation(void)
+-{
+-	if (rdmsr(MSR_SEV_STATUS) & SEV_ES_ENABLED_MASK) {
+-		printf("SEV-ES is enabled.\n");
+-	} else {
+-		printf("SEV-ES is not enabled.\n");
+-	}
+-}
 -
- 	if (!amd_sev_enabled()) {
- 		return EFI_UNSUPPORTED;
+ static void test_stringio(void)
+ {
+ 	int st1_len = sizeof(st1) - 1;
+@@ -52,7 +43,8 @@ int main(void)
+ 		goto out;
  	}
  
--	/*
--	 * Extract C-Bit position from ebx[5:0]
--	 * AMD64 Architecture Programmer's Manual Volume 3
--	 *   - Section " Function 8000_001Fh - Encrypted Memory Capabilities"
--	 */
--	cpuid_out = cpuid(CPUID_FN_ENCRYPT_MEM_CAPAB);
--	amd_sev_c_bit_pos = (unsigned short)(cpuid_out.b & 0x3f);
-+	amd_sev_c_bit_pos = this_cpu_property(X86_PROPERTY_SEV_C_BIT);
+-	test_sev_es_activation();
++	printf("SEV-ES is %senabled.\n", amd_sev_es_enabled() ? "" : "not ");
++
+ 	test_stringio();
  
- 	return EFI_SUCCESS;
- }
-diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
-index defcda75..daa33a05 100644
---- a/lib/x86/amd_sev.h
-+++ b/lib/x86/amd_sev.h
-@@ -19,12 +19,6 @@
- #include "asm/page.h"
- #include "efi.h"
- 
--/*
-- * AMD Programmer's Manual Volume 3
-- *   - Section "Function 8000_001Fh - Encrypted Memory Capabilities"
-- */
--#define CPUID_FN_ENCRYPT_MEM_CAPAB    0x8000001f
--
- /*
-  * AMD Programmer's Manual Volume 2
-  *   - Section "SEV_STATUS MSR"
+ out:
 -- 
 2.50.0.rc0.642.g800a2b2222-goog
 
