@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-48838-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48839-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 778BAAD4185
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 20:03:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE516AD418B
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 20:04:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1F6C7AD2F9
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 18:01:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45F173A65E5
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 18:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6049E24679C;
-	Tue, 10 Jun 2025 18:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4320124635E;
+	Tue, 10 Jun 2025 18:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EAHs25iN"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="u27SxD+4"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2050.outbound.protection.outlook.com [40.107.243.50])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2065.outbound.protection.outlook.com [40.107.92.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063292459D0;
-	Tue, 10 Jun 2025 18:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCC215C0;
+	Tue, 10 Jun 2025 18:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749578576; cv=fail; b=WkbE/g1grMtrW4+YMZX6J84wcYKGQmbqWhs6C5t501aDXJkIidb9KHm1ZJULErMXqb5brxjNBUFCo046hW2176AiyvOxQ3ipRVikStSvUyeCGV+x8UyXHVZpFkurDU96iaOBGkHTdR7ZLGsDSiByVL9P65dg4RU9fPVjfyqA7r8=
+	t=1749578604; cv=fail; b=O3CGna3VPji5HngisPm5SWlA9ATio8ys4brvmMwajO2AXOIP0pwq9eqZYLSfuZ7AcGLBgs9JqMz8iHVNjtfHbWvy8lX2CfXlVcmgkKlVwiWUEWbFhOgE9DQJAP0tuW3HDFmp5GnB3HpeSvFVyxquBzve/L3RyKtzaNUrHuRDgfg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749578576; c=relaxed/simple;
-	bh=nuI9QZ61PYKMqFwqfJjt9B5BWwNb9eWiYE3gSSaWsYo=;
+	s=arc-20240116; t=1749578604; c=relaxed/simple;
+	bh=/BhFBCmzpunjHu9xfKM3KzgvX8Z0Etk6CXDnulgWh2s=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mgkq2V3j6jkZUVfMfASuHfDZosRpIAA35nxPIQwMWa7xq59qOBkyJfu29rVSac1fOoD3ZW4OQ0qdcnhvIbCRguZ6EaZgUuFXzt0/bNLtCIfOEZSgPSnRulcLIhI2wNy3GYaDv+wZDcIRPCFUKOYPISD0VL/IGa/gNgJXlYhaJsk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EAHs25iN; arc=fail smtp.client-ip=40.107.243.50
+	 MIME-Version:Content-Type; b=TVse7mBthqPzPzCA368+g9ojnJSGaDw/FA55loI92x6avB+wRzlF1VYg2MSSZ+izmliez7QnyyIhFeeWUs8MQX5eocgVwcXphAc1Rk41+wqxuP5jeVYmo+NbgpSrJIK0yB7muuRtKWG4LYKFoYUp9PxJ8Snrmm1ArY1HTWVcR9w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=u27SxD+4; arc=fail smtp.client-ip=40.107.92.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Gk9wnkxr3T287odN0vyDGO+1iEjFjt6JyjSpL6GxClFZH3JvMsozrwQBHQxJ0xbNZ/KRSG6UwgAxXTo+LCADQgL9jaN/uQ8NppSD1CgYTwRRCUiuuxU6c/i2cv98zMU408sUEJuX6GfNMuruwaUaj1SOxgNRbUkdyogzsVPG6RtkoAWI7ckhlN8Wsxj7kIbEjofee3NnIQmXxt4qLnXwm+C0UCtCvroXIrg14Bco+yVdT9ovp8QOD/BpzUBO31ivMLNcjDnmvyb55iTCZhZtbL1fdTSZjwdvscwkkXVA7bJpZLuToYCTsJH2fN1JVGGFa7pQtYhWhig5RyDlVXtg5g==
+ b=LZUBrRk0RNen07bIvLelVwEDHImxxs9tWU9GIdsnhrPV/R4hMxu3b82aIEecMAghIbQjsxC7MBpYVORL2kXSYnc/ZwkyjGDGpixSBZXUk9sUSLL8q/SDnL8cB8PjfiVHVfhmxuS5wybFSPYF3oSE2oFA/qmNvRGysxmdb21Kpxr4PB2gR+HbzSibFWOaQBAPOh9P4JtwIj7kCK+orhGAFCRvrA5J0orNCAKKcdHMO13O7hnoypNOzGnnVqZpBmLlVcg6mudradCRdj3Uz6gxOhkF00dK5vDiAmNxLxOWlVbtytA0CRxom48b9mxKoVVfzZeYrv9vKQTXwuFMv5RM5A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=57Jt/XlO7kLsZFK3JDRTa9Isu95SC4RvIHz/AWyCdZ8=;
- b=w77xRLmDW0GSNjEB9P4/Tby6AsMHAh0ap7VbdQjeJhZTT3prcziJTsH9CGrUmD3YzVrj6CzGqMMgrSUo7r5vRDUVr63bNp8WHqqvUFQG38JtNN6JxTSHF6rUC7L9WYjvF1Et0WUHNd/zHWMIYqP3VSHJn98TTdV3WwgciumePx+IE9Kg0QoJIjJxeEx7GB8GvpQTUAdmVJJtgFhHzuZ/biJ1OKTPQCSTmncm5vt4SbJeSZftXmjneyRogW/4sMOZOiYQcTEhxI2HLKHdPtJovN+DDJdnCRV4tRyelm7ZKrpQe5u4UrMXcW/bMeDj7z7/gIgpZs+lDuoKAi3haJYvNw==
+ bh=NAS8Zat9fB6MOirWPE42JG2oLf7lRRsGgYfbvQaF2YU=;
+ b=kcxcQ3NNMZ+C2UmZU9sGZ95bxOEtNvveUPdl+RZlaXAXUn5D9/YwO78dP5gJw+0nWV+udb4ScUa9Hk3snk/3QfYxqJVINB3b0MxgmaWjK65+tRZLVhfuHIYE4beRplQlYIJ399bCNGhe/vrPjzfMpANMafZ74jJZ/R7UC8M7yWoPMHp+QfITPmDN9bkr/RiTCC2o40qvLyxZ3hYCXuuwg900hmAzjNCwIPopCEoEchy/1ZXS61J2ZODesoHH/GU9cSIhFVqlwEtE3x/HQwOHqEZCmPOQd40maqPHpPCPUj2UUBrkqtzXrvy8Q/ugQ5MMh1+RLZlcfIEMunx/Mk0sxQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=57Jt/XlO7kLsZFK3JDRTa9Isu95SC4RvIHz/AWyCdZ8=;
- b=EAHs25iNZokxgg7vnJbbjMGh7EJGcFOfPYipWp19od7uIBdQ/jwAbi6DH1p0/0Z5lLCjY+oMw7MasDlGMSlezddXRGCSepdC8FRr5Xi9qM7Dz1vNCc+x8mGhoPJgszElPMFz4YvTDBMWvoHtvR+gAZMrA3WwgS86ivTeLTd5Y9c=
-Received: from BN9PR03CA0657.namprd03.prod.outlook.com (2603:10b6:408:13b::32)
- by BL3PR12MB6521.namprd12.prod.outlook.com (2603:10b6:208:3bd::16) with
+ bh=NAS8Zat9fB6MOirWPE42JG2oLf7lRRsGgYfbvQaF2YU=;
+ b=u27SxD+4zjJjsNu/3Y+l2UAvVqPb1buNt8Wot0yyRpQTXCQOW9jfFSwAnoEm4sl48fk6DxPaCkS9G64IrTPoSMUP/ytd5RQy4NaFk9mkICkcmlHc3mqKURm36PaBlK6B1wy4j0PcG/SRZ4D1OlmPa/Yt220MXwMXp1i2Hv9xey0=
+Received: from BL1PR13CA0391.namprd13.prod.outlook.com (2603:10b6:208:2c2::6)
+ by CYXPR12MB9337.namprd12.prod.outlook.com (2603:10b6:930:d8::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.18; Tue, 10 Jun
- 2025 18:02:51 +0000
-Received: from BL02EPF0002992C.namprd02.prod.outlook.com
- (2603:10b6:408:13b:cafe::30) by BN9PR03CA0657.outlook.office365.com
- (2603:10b6:408:13b::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.19 via Frontend Transport; Tue,
- 10 Jun 2025 18:02:51 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8813.31; Tue, 10 Jun
+ 2025 18:03:13 +0000
+Received: from BL02EPF0002992A.namprd02.prod.outlook.com
+ (2603:10b6:208:2c2:cafe::cb) by BL1PR13CA0391.outlook.office365.com
+ (2603:10b6:208:2c2::6) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.18 via Frontend Transport; Tue,
+ 10 Jun 2025 18:03:12 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF0002992C.mail.protection.outlook.com (10.167.249.57) with Microsoft
+ BL02EPF0002992A.mail.protection.outlook.com (10.167.249.55) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8835.15 via Frontend Transport; Tue, 10 Jun 2025 18:02:50 +0000
+ 15.20.8835.15 via Frontend Transport; Tue, 10 Jun 2025 18:03:12 +0000
 Received: from BLR-L-NUPADHYA.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 10 Jun
- 2025 13:02:42 -0500
+ 2025 13:03:04 -0500
 From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 To: <linux-kernel@vger.kernel.org>
 CC: <bp@alien8.de>, <tglx@linutronix.de>, <mingo@redhat.com>,
@@ -80,9 +80,9 @@ CC: <bp@alien8.de>, <tglx@linutronix.de>, <mingo@redhat.com>,
 	<pbonzini@redhat.com>, <kvm@vger.kernel.org>,
 	<kirill.shutemov@linux.intel.com>, <huibo.wang@amd.com>,
 	<naveen.rao@amd.com>, <francescolavra.fl@gmail.com>, <tiala@microsoft.com>
-Subject: [RFC PATCH v7 22/37] x86/apic: Populate .read()/.write() callbacks of Secure AVIC driver
-Date: Tue, 10 Jun 2025 23:24:09 +0530
-Message-ID: <20250610175424.209796-23-Neeraj.Upadhyay@amd.com>
+Subject: [RFC PATCH v7 23/37] x86/apic: Initialize APIC ID for Secure AVIC
+Date: Tue, 10 Jun 2025 23:24:10 +0530
+Message-ID: <20250610175424.209796-24-Neeraj.Upadhyay@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250610175424.209796-1-Neeraj.Upadhyay@amd.com>
 References: <20250610175424.209796-1-Neeraj.Upadhyay@amd.com>
@@ -98,235 +98,98 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0002992C:EE_|BL3PR12MB6521:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1d044946-5b75-493e-6227-08dda84903f1
+X-MS-TrafficTypeDiagnostic: BL02EPF0002992A:EE_|CYXPR12MB9337:EE_
+X-MS-Office365-Filtering-Correlation-Id: cc7e6275-b066-421a-b312-08dda8491100
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|36860700013|82310400026;
+	BCL:0;ARA:13230040|36860700013|82310400026|7416014|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?SxEIh0mj6sdLr7xsY8ouZy2tASw9EjC5+fj3hHVAb4vQvz0prV1GAD0SRpzR?=
- =?us-ascii?Q?RfpU1Dbg9LY8MMutn/r9SWwd4dvN0dZ8OXg3pDI31sLpLmjUR+/6CjZQOZYk?=
- =?us-ascii?Q?tbEOR3qqZ1Nmdn5wP6636LPDH4CGtuKlcEaO4Hs5jRcifGA8xklRErrHhTZy?=
- =?us-ascii?Q?e8RNFZE/IWMoUqBp28TtGBgCVt9/7peAowbMgl1axWGrbe+tVrd0W5kSc1mN?=
- =?us-ascii?Q?3/WbMGMwht25E+DB5HqG+JoU+B6uPpCiqO89BGI2xj10Y34h764bfHIPKXMv?=
- =?us-ascii?Q?qjViZHClqHgsBbRP1XGo2UoJ0F7IMwRSVDuTaknsQmRRtDcJ1qeROVkRiyWx?=
- =?us-ascii?Q?9ydO27C0hkNwzP5AFzYU2cOX5lUatQvOTCsxfOHAzuTHQlH+Vaerde/gFyGv?=
- =?us-ascii?Q?qy2y4buWlrMuw0kX9bEk4eeZnqWusIzlb1PzhfRzsTO9Q+oLRKMp1dLZreSm?=
- =?us-ascii?Q?N3cVemVz3aYIBzH/R4b717Aoa/ivOE7Gk8/dzCcmGGzuEhrLckb+so2g/Mqi?=
- =?us-ascii?Q?0QZ8jwFxw4tpDM0kp4dooe73WXIUbhphXuf61PP3EInbJeQDOUTKUykXkrqV?=
- =?us-ascii?Q?YxweI7OSTy3gIYFJOueabDtOe3BJRuSXLJHPVEkq0gkABp0T2NvbZRSmRBpt?=
- =?us-ascii?Q?y8C+484xmb6TkqtnQLlGJuYwDSOAqbp0XgRXUMKPr0HrQe8a7v0Wq2NwZeTI?=
- =?us-ascii?Q?n4Iv9IXWtb3Vqkwv5krng5jkccLkrffSRbfg2bkfnLjGKlHkQ/7DZD3Gc3sh?=
- =?us-ascii?Q?ZNDTCLrwu6xrt4NzDUmQHTK0MbCcYIL789RY22/CzdvwL1UsTh1lXGaTbrwG?=
- =?us-ascii?Q?UnFFsEA0Ar93lyn2PRL1VSXBOtgd45c4JdZqTMiFegJWq7amdmE2XVhAakWY?=
- =?us-ascii?Q?mEFAi5Shd2EDQJnb+XCOUtU8wXIPdMHr+l/W97znCrI6RDMKi8HywUHE+A2V?=
- =?us-ascii?Q?vLekRrzFZeMxygPPKXUJwxtGDwpbc5Qb7H756mRJpFxSL7rTKjc9E66rlqNE?=
- =?us-ascii?Q?228zAaA50TWvrBv2k2d8P08OJiNk2mAvcgo5W9Is5+Ngv3flHotx3Kie8CJi?=
- =?us-ascii?Q?CWau1qJTBRDcYRyFrmKhTBrT2T1NVTP6YYa8VMvy1kmajjTDVuFTjyU7GKSg?=
- =?us-ascii?Q?8qRVkGWRK1D3ztJdvMwUtwe5XRoCabXmcSCGiY52EoUyBHIDz+9Lriws2Wyy?=
- =?us-ascii?Q?Bhk2qH6k4McRBvImmtwK5vnODfFv9emzeSmfcflMUs7sUztXlKEH2wOKT40O?=
- =?us-ascii?Q?5paKdyucPVATkBhTkq3Rqc5ZV0yEsdGABojXnhbpLvcrJexgEGoSuCY3/qn3?=
- =?us-ascii?Q?0ZyUFvzYU5OwYl76+n5GmyAHdcv3eShkWKxEKGdVNm6bQgPh8I84s+o+93/H?=
- =?us-ascii?Q?VO+GQKvZ5D8XSd095ZvOFwGVgTCOwKf2ZizWYAkvN4CBus686Y2IG2nUnOZG?=
- =?us-ascii?Q?cnz6Ous06aYWAUxD35qApgVkRTPbI4hSrGQRahWDLVOEfqjmK7Lh14GAkbT7?=
- =?us-ascii?Q?i9XPkiqLrmsIPjRKVH8ld36FEx7M3pUx04F6?=
+	=?us-ascii?Q?ZrM7WQelCiObwLYzTMm8yubB7vPRNSIhj5wqSAVFP2+igJ7Ek4hV7r/R8Awp?=
+ =?us-ascii?Q?LKwH5Qys0qmFzo4KqR66hbeDhYVIVQau8hM5T0OGs5z/Ab/5q8usNZi7Yala?=
+ =?us-ascii?Q?jPLSKzW2c+hcwtO3olL7ojepfMNw/FJs8xuJ+5m69DhmBdaHeQIf6DJlmCdw?=
+ =?us-ascii?Q?XMF6M/2vOJ+XRpKpbHbzd95/d6YOk48VZ9gm9yXDIt4+Zvz8wyggQ4YwokyU?=
+ =?us-ascii?Q?Izjtl5RI4Tmnje/tklESDwe/gZE6hk+XdltHYJ37L/AdrAxEV0pGLR0YpO4N?=
+ =?us-ascii?Q?uNfUtKO6OlQBs32zla5w7Jsb5u1xKrUmW3bQyMHRfyWxLNfVooo8cJylenR4?=
+ =?us-ascii?Q?ftRtgXb7cHx7RdVVNvcgjMWzTu6XhqRsCVUbIa7VXAfvS+HOrggVw96Etb7k?=
+ =?us-ascii?Q?UpfNsuJ4NjVXNc4C5yGaEfRs/BaJpi3v4RY8o3UMggu0f0+43b//fFFgbtVX?=
+ =?us-ascii?Q?Iuiud3p/v3ZikpTGWTOu4Q2X5yNCpmocmtIlFjDgHukINsaQYSP0h/XoSemg?=
+ =?us-ascii?Q?AJWrFx1DRmbIqJSfxut8bvxH6+a8QhC5grmv+XL71iUZ1VXSD9sfz9WbbOHY?=
+ =?us-ascii?Q?AufLFJG/D5lKfIy6UM5qLPVfm4qfsGI4/Ey9q5xXrycM93o3UkoTzT2CMmTd?=
+ =?us-ascii?Q?doiHlPprNjnni+DfywDX0juLDkfc7QCCTmjeI888qeL/tvR/rh9p1Oy4vKBo?=
+ =?us-ascii?Q?UANdqtU9KVILMo7KKMWh4En85i1tePlUXjzRbrx8V4C7UMCf0DMRFmXjDcev?=
+ =?us-ascii?Q?ZBq6dN6K66W+m7F4GKoZRW8oxYvIAbBo7bbvx1q8wqDoEpxSAuFaxdUp7XV8?=
+ =?us-ascii?Q?uP4PG0U4JNEwkVN92gOPa+jv9qlnLyLLk2KL93T2f5Uu4AtJIk1d27hjE1M4?=
+ =?us-ascii?Q?ras/cUmKVKLSXaf3oo6xKjd5Bitgkp0VKuVlpzR+ngC7eVb1G3WRiUzGRCoZ?=
+ =?us-ascii?Q?T3PkihEXw6m7RM2IxzH32y8kglfICAkwiA7CYpU3dxrWh6/AhZ0HxvfjEpIh?=
+ =?us-ascii?Q?k5R37939fOGCaTpv/ZpiZRoJchLgIqeD3hNnsDVG6ddN3UlqTQtKyf+ybrVf?=
+ =?us-ascii?Q?SxL1hsc35qLmYO+3I5GvKD38/25taBYHwLOzAUCHIX9MLlDggan78FWvYLVf?=
+ =?us-ascii?Q?gJxEJCYeWj2y0iRyCHY6BhiXsBijv4mIVWd/2DsqON6nGOaUTBJ1kysndjKv?=
+ =?us-ascii?Q?pcRlxKXpTWO6CoBbGKLDHwEVpoPh4hSn3LJFYz4vf+h7+D4L6EimBklWB91j?=
+ =?us-ascii?Q?4AhQeblI5qLD5bJmqN0AN0mPrtyxBn675GRsRdjxqfJW9G5guGoazNy9yJ4e?=
+ =?us-ascii?Q?Czfo2RaIdmNpVCcQpp68o1/ieWXMBp9w2JmRodZ8cTmxTGkULtl7Mu+a5KOT?=
+ =?us-ascii?Q?3uBHO1HMIvM74SRmmLjlWDQZwdeGxRY48AbxyetiuC918c9fkqeEzFf6wJmD?=
+ =?us-ascii?Q?228q2o+rv66voLQLNlHFHAiMJ/2zDCIYL77WhdzWokGxmhzEoN5OzNiEpIR8?=
+ =?us-ascii?Q?lbFAIPFbGOjj8E87hLVqBoWha+jLYO8xvwdY?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2025 18:02:50.8274
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2025 18:03:12.7367
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d044946-5b75-493e-6227-08dda84903f1
+X-MS-Exchange-CrossTenant-Network-Message-Id: cc7e6275-b066-421a-b312-08dda8491100
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0002992C.namprd02.prod.outlook.com
+	BL02EPF0002992A.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6521
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9337
 
-Add read() and write() APIC callback functions to read and write x2APIC
-registers directly from the guest APIC backing page of a vCPU.
+Initialize the APIC ID in the Secure AVIC APIC backing page with
+the APIC_ID msr value read from Hypervisor. CPU topology evaluation
+later during boot would catch and report any duplicate APIC ID for
+two CPUs.
 
-The x2APIC registers are mapped at an offset within the guest APIC
-backing page which is same as their x2APIC MMIO offset. Secure AVIC
-adds new registers such as ALLOWED_IRRs (which are at 4-byte offset
-within the IRR register offset range) and NMI_REQ to the APIC register
-space.
-
-When Secure AVIC is enabled, guest's rdmsr/wrmsr of APIC registers
-result in VC exception (for non-accelerated register accesses) with
-error code VMEXIT_AVIC_NOACCEL. The VC exception handler can read/write
-the x2APIC register in the guest APIC backing page to complete the
-rdmsr/wrmsr. Since doing this would increase the latency of accessing
-x2APIC registers, instead of doing rdmsr/wrmsr based reg accesses
-and handling reads/writes in VC exception, directly read/write APIC
-registers from/to the guest APIC backing page of the vCPU in read()
-and write() callbacks of the Secure AVIC APIC driver.
-
-Co-developed-by: Kishon Vijay Abraham I <kvijayab@amd.com>
-Signed-off-by: Kishon Vijay Abraham I <kvijayab@amd.com>
 Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 ---
 Changes since v6:
 
  - No change.
 
- arch/x86/include/asm/apicdef.h      |   2 +
- arch/x86/kernel/apic/x2apic_savic.c | 113 +++++++++++++++++++++++++++-
- 2 files changed, 113 insertions(+), 2 deletions(-)
+ arch/x86/kernel/apic/x2apic_savic.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/arch/x86/include/asm/apicdef.h b/arch/x86/include/asm/apicdef.h
-index 094106b6a538..be39a543fbe5 100644
---- a/arch/x86/include/asm/apicdef.h
-+++ b/arch/x86/include/asm/apicdef.h
-@@ -135,6 +135,8 @@
- #define		APIC_TDR_DIV_128	0xA
- #define	APIC_EFEAT	0x400
- #define	APIC_ECTRL	0x410
-+#define APIC_SEOI	0x420
-+#define APIC_IER	0x480
- #define APIC_EILVTn(n)	(0x500 + 0x10 * n)
- #define		APIC_EILVT_NR_AMD_K8	1	/* # of extended interrupts */
- #define		APIC_EILVT_NR_AMD_10H	4
 diff --git a/arch/x86/kernel/apic/x2apic_savic.c b/arch/x86/kernel/apic/x2apic_savic.c
-index a2747ab9200a..186e69a5e169 100644
+index 186e69a5e169..618643e7242f 100644
 --- a/arch/x86/kernel/apic/x2apic_savic.c
 +++ b/arch/x86/kernel/apic/x2apic_savic.c
-@@ -9,6 +9,7 @@
- 
- #include <linux/cc_platform.h>
- #include <linux/percpu-defs.h>
-+#include <linux/align.h>
- 
- #include <asm/apic.h>
- #include <asm/sev.h>
-@@ -22,6 +23,114 @@ static int savic_acpi_madt_oem_check(char *oem_id, char *oem_table_id)
- 	return x2apic_enabled() && cc_platform_has(CC_ATTR_SNP_SECURE_AVIC);
+@@ -131,6 +131,18 @@ static void savic_write(u32 reg, u32 data)
+ 	}
  }
  
-+#define SAVIC_ALLOWED_IRR	0x204
-+
-+static u32 savic_read(u32 reg)
++static void init_apic_page(struct apic_page *ap)
 +{
-+	struct apic_page *ap = this_cpu_ptr(apic_page);
++	u32 apic_id;
 +
 +	/*
-+	 * When Secure AVIC is enabled, rdmsr/wrmsr of APIC registers
-+	 * result in VC exception (for non-accelerated register accesses)
-+	 * with VMEXIT_AVIC_NOACCEL error code. The VC exception handler
-+	 * can read/write the x2APIC register in the guest APIC backing page.
-+	 * Since doing this would increase the latency of accessing x2APIC
-+	 * registers, instead of doing rdmsr/wrmsr based accesses and
-+	 * handling apic register reads/writes in VC exception, the read()
-+	 * and write() callbacks directly read/write APIC register from/to
-+	 * the vCPU APIC backing page.
++	 * Before Secure AVIC is enabled, APIC msr reads are intercepted.
++	 * APIC_ID msr read returns the value from the Hypervisor.
 +	 */
-+	switch (reg) {
-+	case APIC_LVTT:
-+	case APIC_TMICT:
-+	case APIC_TMCCT:
-+	case APIC_TDCR:
-+	case APIC_ID:
-+	case APIC_LVR:
-+	case APIC_TASKPRI:
-+	case APIC_ARBPRI:
-+	case APIC_PROCPRI:
-+	case APIC_LDR:
-+	case APIC_SPIV:
-+	case APIC_ESR:
-+	case APIC_LVTTHMR:
-+	case APIC_LVTPC:
-+	case APIC_LVT0:
-+	case APIC_LVT1:
-+	case APIC_LVTERR:
-+	case APIC_EFEAT:
-+	case APIC_ECTRL:
-+	case APIC_SEOI:
-+	case APIC_IER:
-+	case APIC_EILVTn(0) ... APIC_EILVTn(3):
-+		return apic_get_reg(ap, reg);
-+	case APIC_ICR:
-+		return (u32) apic_get_reg64(ap, reg);
-+	case APIC_ISR ... APIC_ISR + 0x70:
-+	case APIC_TMR ... APIC_TMR + 0x70:
-+		if (WARN_ONCE(!IS_ALIGNED(reg, 16),
-+			      "APIC reg read offset 0x%x not aligned at 16 bytes", reg))
-+			return 0;
-+		return apic_get_reg(ap, reg);
-+	/* IRR and ALLOWED_IRR offset range */
-+	case APIC_IRR ... APIC_IRR + 0x74:
-+		/*
-+		 * Either aligned at 16 bytes for valid IRR reg offset or a
-+		 * valid Secure AVIC ALLOWED_IRR offset.
-+		 */
-+		if (WARN_ONCE(!(IS_ALIGNED(reg, 16) ||
-+				IS_ALIGNED(reg - SAVIC_ALLOWED_IRR, 16)),
-+			      "Misaligned IRR/ALLOWED_IRR APIC reg read offset 0x%x", reg))
-+			return 0;
-+		return apic_get_reg(ap, reg);
-+	default:
-+		pr_err("Permission denied: read of Secure AVIC reg offset 0x%x\n", reg);
-+		return 0;
-+	}
-+}
-+
-+#define SAVIC_NMI_REQ		0x278
-+
-+static void savic_write(u32 reg, u32 data)
-+{
-+	struct apic_page *ap = this_cpu_ptr(apic_page);
-+
-+	switch (reg) {
-+	case APIC_LVTT:
-+	case APIC_LVT0:
-+	case APIC_LVT1:
-+	case APIC_TMICT:
-+	case APIC_TDCR:
-+	case APIC_SELF_IPI:
-+	case APIC_TASKPRI:
-+	case APIC_EOI:
-+	case APIC_SPIV:
-+	case SAVIC_NMI_REQ:
-+	case APIC_ESR:
-+	case APIC_LVTTHMR:
-+	case APIC_LVTPC:
-+	case APIC_LVTERR:
-+	case APIC_ECTRL:
-+	case APIC_SEOI:
-+	case APIC_IER:
-+	case APIC_EILVTn(0) ... APIC_EILVTn(3):
-+		apic_set_reg(ap, reg, data);
-+		break;
-+	case APIC_ICR:
-+		apic_set_reg64(ap, reg, (u64) data);
-+		break;
-+	/* ALLOWED_IRR offsets are writable */
-+	case SAVIC_ALLOWED_IRR ... SAVIC_ALLOWED_IRR + 0x70:
-+		if (IS_ALIGNED(reg - SAVIC_ALLOWED_IRR, 16)) {
-+			apic_set_reg(ap, reg, data);
-+			break;
-+		}
-+		fallthrough;
-+	default:
-+		pr_err("Permission denied: write to Secure AVIC reg offset 0x%x\n", reg);
-+	}
++	apic_id = native_apic_msr_read(APIC_ID);
++	apic_set_reg(ap, APIC_ID, apic_id);
 +}
 +
  static void savic_setup(void)
  {
  	void *backing_page;
-@@ -85,8 +194,8 @@ static struct apic apic_x2apic_savic __ro_after_init = {
+@@ -138,6 +150,7 @@ static void savic_setup(void)
+ 	unsigned long gpa;
  
- 	.nmi_to_offline_cpu		= true,
+ 	backing_page = this_cpu_ptr(apic_page);
++	init_apic_page(backing_page);
+ 	gpa = __pa(backing_page);
  
--	.read				= native_apic_msr_read,
--	.write				= native_apic_msr_write,
-+	.read				= savic_read,
-+	.write				= savic_write,
- 	.eoi				= native_apic_msr_eoi,
- 	.icr_read			= native_x2apic_icr_read,
- 	.icr_write			= native_x2apic_icr_write,
+ 	/*
 -- 
 2.34.1
 
