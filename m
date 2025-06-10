@@ -1,145 +1,119 @@
-Return-Path: <kvm+bounces-48807-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48808-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8EC4AD3E92
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 18:13:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83E39AD3EA2
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 18:16:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB0367AB3E8
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 16:12:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D2593A21A7
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 16:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E5C24293F;
-	Tue, 10 Jun 2025 16:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC8623C4F5;
+	Tue, 10 Jun 2025 16:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VkYQlwcE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WoSkqB/Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BED241CA3
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 16:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A528BFF
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 16:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749571948; cv=none; b=R8Q8cEx2nPmvl278WN6vVb8Sn5IOoRJ+SDCAS14zVYTElj5NEV4DRsvuy8qZLIQMcO4GvzFq4ohrKOeBybOCmpDH56TviUXoNuGFPy7SgvJpiyJhNXqBvLDGRiwV8O4x4vE00ZUAc1w9deoiTEyB9K9yaiwXl53rynqmcLW80iA=
+	t=1749572164; cv=none; b=C8cdC5UWE6MNhUqzxJ185z4XqWwY8OXE+9SIexLuQsTGwt1COq41/ZZiAZqUIpXUHTEluQ+YSxvWwXaQOAdfTbqscZCk5WkVBVCUzVtYpHteRO80R2Q1xbO4xqLHElblmRZaXDNT7U/D3bQkNaRPwTrvOXo7Du2ciy/ap1yMx/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749571948; c=relaxed/simple;
-	bh=5WJNEkDIjQQz2okt4KOF8T62rDFTSGAdY4cYKkBLKAM=;
+	s=arc-20240116; t=1749572164; c=relaxed/simple;
+	bh=i1wysgW5zGZ4yIMcnwwg65sgoJiICB3in7hX8h58OOs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=P/PQAP9w6idSzxRdWckLGdDAS8otHkg5qgZC0NerovgCI+XPtBd4jU2FMTs8slOOjfW7BnEYMVGMyGZdajzQnmAzI752WZj6gN0K+f4eoabKxZ7dgPbU+rKJK6ogRZCEuG+qYGjL12q9A22krmciX1O4PsfUkV9O212njhLzu6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VkYQlwcE; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=Jx5xUK/8mqjEFU0cOWXaaUcHP3RCjGhrlnWkG4PZlxAYVj/95DBuDeK/oiHYbc0qnbpOtW4dwuDQBHmaE8F7Y5DT5o1Rt3BOYM6bx7D4PXKJc59NSDqq/5cx7HcD2QpLXZmG2xw/O2awYDdp5hhdQe1Y/WZXzscaAncvTB05jCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WoSkqB/Y; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3132c1942a1so8078982a91.2
-        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 09:12:26 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311ae2b6647so4309824a91.0
+        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 09:16:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749571946; x=1750176746; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749572162; x=1750176962; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tdst2AXEI4Imm1N+8aUcHMsoZp01dEp7fOzDZf0fTqo=;
-        b=VkYQlwcE6Gabdm0Q7BNy4Sel4WedZgCTG3pCAIRXdkA6O0GwFNVvtEK8iaDfIxwcXg
-         a5+6PWIHy0gUmcG8ljDl95pPZ/yQ2BxPskUxxla6hNVwau2tpkYZ+vEGsbaADSHv8KR/
-         h6pxSBtXFv5OdeMyYuQC1oc3z15OLzEZ+QOwC3yEtkKgOL7eFFkb3jw1vcPNRMU8+Jmt
-         m8SKqFeVit/Tj9pXGQ13MuFeXaO0djRyJFU5jgDmVclghlcGA4FR51z+PU0MiRUGKZ3e
-         MQ+V+u1nUaEQuQ7/CoiBUB1SlO9+UFCWmXuY4U+ciU9JHKp6soH1uxPtjZJ6Ox7AbCGG
-         Nv/w==
+        bh=cUiAnBaABBi8MmezG61ur8Gw02SUWXIVP1zr4GYN+eo=;
+        b=WoSkqB/YtB3i5+UxGLQqkpT5EmTOmLMJfo2UD0yxuDvN9CY0ZOQE1nlGImbfxxFuCq
+         cfitA5mFGzYltFmQfaY3S8+57TCuTj3zHkJKpL+05u+A1rTjBrpnfbJdxq1aFKFIDyG5
+         rpYZTnBsjWEk1XoBd71F+C/HSjbVmWGtizcX9UOTdGenPlKB98ayB021aJYLVZP0agOp
+         XLrtMlMKIOeEBeBbJc4hLy1dMzCFGeoVwiAszzB4zCwcubb/1enwaUTX68ryqbpUleCn
+         pJb+Gdh1PyhW8ettAFdMSkXY558+kvbYk3/g+s5+5UcbnyPXKHR3zGT1B4P96VAGZsKv
+         rbmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749571946; x=1750176746;
+        d=1e100.net; s=20230601; t=1749572162; x=1750176962;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tdst2AXEI4Imm1N+8aUcHMsoZp01dEp7fOzDZf0fTqo=;
-        b=L7xqZ7YxM5UU+xPZTGy5h6Z2knfElUa80M8PFHY8zYIdMje6VJZQ1K3m9YOaut9En+
-         ZGpxTmJegEnDaQDxXrA+wc8iTx0/cxgDJCrfqvKPx2bzz39AtZAbluzbs6EWOMtQnbc8
-         rH9LFs7XBVP9cs/2Z4vG5r6U0xcIrV2Weq7HkaLR5c06YXNtPxluzX+cNcImmak7izU4
-         vZdVliAPlkPmY6I1K/vY1xlqLrUjGujAq1VloKWV8Jn4C+dWg2k6204L3LaBnhbSadrm
-         f9wveAR2LgO43/3EUs36u5tXkLhoUJPqtitDc0hnYfGpejj7/ak5Njtim+K+uK1luWPW
-         G3QQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUlPy1I8VYT0a6Ubia73fw0vDI6OObuY5wX2xNOsOVgotYB2X47inoQk/sNZ2EENuKmc3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzBNC/POUfHv1FUT33aBWi50NB6LwlSuaf0hcLRE5Rdb+3e9A4
-	zVB2TTGj/SedNg/N7q47oWPu3ck6ZRguT1YpywxQyfdrydBKJI2NDCI7IyvWFcPMPBhcBbZFQtX
-	LUsTjtA==
-X-Google-Smtp-Source: AGHT+IE71Jz/QhQNRZ8OzEh0DWxt/XrMZMCp0tDfjSa8QU6g08JvolhGnuLJkEQj3Yvonq7nqSu9ReSpHFU=
-X-Received: from pjbrr16.prod.google.com ([2002:a17:90b:2b50:b0:311:f699:df0a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3887:b0:311:e9ac:f5ce
- with SMTP id 98e67ed59e1d1-313af23d84bmr171621a91.21.1749571946315; Tue, 10
- Jun 2025 09:12:26 -0700 (PDT)
-Date: Tue, 10 Jun 2025 09:12:24 -0700
-In-Reply-To: <cc3df866-9144-42f0-a24c-fbdcedd48315@amd.com>
+        bh=cUiAnBaABBi8MmezG61ur8Gw02SUWXIVP1zr4GYN+eo=;
+        b=s2fK/iNZacZhgfBYv/OShBAHjvYYArzF/JixCl0RMH4kr2i6b905Jzfki9sm/RigQZ
+         5C6gy74q3FAxpxZikGog+Spr2/QAbqTVy0++6b8iSCsb/ipgcWo5t3g0xjCcOADLkXws
+         5uV+lii+rBmBnBVpPesksYOp7T9opOcNoHGuP0BFKG9R0y5QT7OmQE9QeoRc80nzPrpu
+         CehZfNBErlKmzbZcLOVmAbPV5oAJ1Ll+bTwD30E3PHwvDy9xbbExJ1uEv14PQ+NF0QZW
+         8RSl6rAidVYYVdwehF1Bbt/rqYplSsy5n84TcOmFpvU3g7M6zT2QFF5w03ptopG7LnO3
+         TYsA==
+X-Forwarded-Encrypted: i=1; AJvYcCXEoKsksiQLRe4aHkDXDzUkpS/TI0cUQVSMkhQG/0u09s3c0XIP7fRxzpPDk241h2VOW/Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzF8rbLRvuf5rmsP/TmHO7iPBB9Icb4kKTTZFsqdx/ipRlEk+7e
+	a3e5fxc9FHkTcan0Ps/7sYQA1/iGw2K0jWUgqDBOpn+3JnLrdI6qltivYiKYhlr23dKumCrCNid
+	J/kbFdg==
+X-Google-Smtp-Source: AGHT+IFXepQ7WyapQC/S8+sadNNKa7dRlJl1xoZOq4ObQKiG309XNQlCV5UWTBLTlgr03UbH2Wtya4oGIg8=
+X-Received: from pjbst14.prod.google.com ([2002:a17:90b:1fce:b0:2ea:29de:af10])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3906:b0:311:ad7f:3281
+ with SMTP id 98e67ed59e1d1-313af10ad5dmr288344a91.12.1749572161888; Tue, 10
+ Jun 2025 09:16:01 -0700 (PDT)
+Date: Tue, 10 Jun 2025 09:16:00 -0700
+In-Reply-To: <ffb5e853-dedc-45bb-acd8-c58ff2fc0b71@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250429061004.205839-1-Neeraj.Upadhyay@amd.com>
- <20250429061004.205839-2-Neeraj.Upadhyay@amd.com> <aBDlVF4qXeUltuju@google.com>
- <cc3df866-9144-42f0-a24c-fbdcedd48315@amd.com>
-Message-ID: <aEhZaMuipi2qePHX@google.com>
-Subject: Re: [PATCH v5 01/20] KVM: x86: Move find_highest_vector() to a common header
+References: <20250529221929.3807680-1-seanjc@google.com> <20250529221929.3807680-8-seanjc@google.com>
+ <ffb5e853-dedc-45bb-acd8-c58ff2fc0b71@linux.intel.com>
+Message-ID: <aEhaQITromUV7lIO@google.com>
+Subject: Re: [kvm-unit-tests PATCH 07/16] x86/pmu: Rename pmu_gp_counter_is_available()
+ to pmu_arch_event_is_available()
 From: Sean Christopherson <seanjc@google.com>
-To: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
-Cc: linux-kernel@vger.kernel.org, bp@alien8.de, tglx@linutronix.de, 
-	mingo@redhat.com, dave.hansen@linux.intel.com, Thomas.Lendacky@amd.com, 
-	nikunj@amd.com, Santosh.Shukla@amd.com, Vasant.Hegde@amd.com, 
-	Suravee.Suthikulpanit@amd.com, David.Kaplan@amd.com, x86@kernel.org, 
-	hpa@zytor.com, peterz@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	kirill.shutemov@linux.intel.com, huibo.wang@amd.com, naveen.rao@amd.com, 
-	francescolavra.fl@gmail.com
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Andrew Jones <andrew.jones@linux.dev>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, "Nico =?utf-8?B?QsO2aHI=?=" <nrb@linux.ibm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, kvm-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jun 10, 2025, Neeraj Upadhyay wrote:
-> On 4/29/2025 8:12 PM, Sean Christopherson wrote:
-> > Please slot the below in.  And if there is any more code in this series that is
-> > duplicating existing functionality, try to figure out a clean way to share code
-> > instead of open coding yet another version.
-> > 
-> > --
-> > From: Sean Christopherson <seanjc@google.com>
-> > Date: Tue, 29 Apr 2025 07:30:47 -0700
-> > Subject: [PATCH] x86/apic: KVM: Deduplicate APIC vector => register+bit math
-> > 
-> > Consolidate KVM's {REG,VEC}_POS() macros and lapic_vector_set_in_irr()'s
-> > open coded equivalent logic in anticipation of the kernel gaining more
-> > usage of vector => reg+bit lookups.
-> > 
-> > Use lapic_vector_set_in_irr()'s math as using divides for both the bit
-> > number and register offset makes it easier to connect the dots, and for at
-> > least one user, fixup_irqs(), "/ 32 * 0x10" generates ever so slightly
-> > better code with gcc-14 (shaves a whole 3 bytes from the code stream):
-> > 
-> > ((v) >> 5) << 4:
-> >   c1 ef 05           shr    $0x5,%edi
-> >   c1 e7 04           shl    $0x4,%edi
-> >   81 c7 00 02 00 00  add    $0x200,%edi
-> > 
-> > (v) / 32 * 0x10:
-> >   c1 ef 05           shr    $0x5,%edi
-> >   83 c7 20           add    $0x20,%edi
-> >   c1 e7 04           shl    $0x4,%edi
-> > 
-> > Keep KVM's tersely named macros as "wrappers" to avoid unnecessary churn
-> > in KVM, and because the shorter names yield more readable code overall in
-> > KVM.
-> > 
-> > No functional change intended (clang-19 and gcc-14 generate bit-for-bit
-> > identical code for all of kvm.ko).
-> > 
+On Tue, Jun 10, 2025, Dapeng Mi wrote:
+> On 5/30/2025 6:19 AM, Sean Christopherson wrote:
+> > @@ -51,7 +51,7 @@ void pmu_init(void)
+> >  		}
+> >  		pmu.gp_counter_width = PMC_DEFAULT_WIDTH;
+> >  		pmu.gp_counter_mask_length = pmu.nr_gp_counters;
+> > -		pmu.gp_counter_available = (1u << pmu.nr_gp_counters) - 1;
+> > +		pmu.arch_event_available = (1u << pmu.nr_gp_counters) - 1;
 > 
-> With this change, I am observing difference in generated assembly for VEC_POS
-> and REG_POS, as KVM code passes vector param with type "int" to these macros.
-> Type casting "v" param of APIC_VECTOR_TO_BIT_NUMBER and APIC_VECTOR_TO_REG_OFFSET
-> to "unsigned int" in the macro definition restores the original assembly. Can
-> you have a look at this once? Below is the updated patch for this. Can you please
-> share your feedback on this?
+> "available architectural events" and "available GP counters" are two
+> different things. I know this would be changed in later patch 09/16, but
+> it's really confusing. Could we merge the later patch 09/16 into this patch?
 
-LGTM.
+Ya.  I was trying to not mix too many things in one patch, but looking at this
+again, I 100% agree that squashing 7-9 into one patch is better overall.
 
-Ideally, KVM would probably pass around an "unsigned int", but some higher level
-APIs in KVM use -1 to indicate an invalid vector (e.g. no IRQ pending), and mixing
-and matching types would get a little weird and would require a decent amount of
-churn.  So casting in the macro where it matters seems like the best option, at
-least for now.
+> > @@ -463,7 +463,7 @@ static void check_counters_many(void)
+> >  	int i, n;
+> >  
+> >  	for (i = 0, n = 0; n < pmu.nr_gp_counters; i++) {
+> > -		if (!pmu_gp_counter_is_available(i))
+> > +		if (!pmu_arch_event_is_available(i))
+> >  			continue;
+> 
+> The intent of check_counters_many() is to verify all available GP and fixed
+> counters can count correctly at the same time. So we should select another
+> available event to verify the counter instead of skipping the counter if an
+> event is not available.
 
-Thanks much for taking care of this!
+Agreed, but I'm going to defer that for now, this series already wanders in too
+many directions.  Definitely feel free to post a patch.
 
