@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-48886-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48887-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD270AD462F
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 00:58:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACDE6AD462D
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 00:58:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A55B16C1B5
-	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 22:58:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F96C3A6FFB
+	for <lists+kvm@lfdr.de>; Tue, 10 Jun 2025 22:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D67692874E8;
-	Tue, 10 Jun 2025 22:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80CBC298277;
+	Tue, 10 Jun 2025 22:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QsoJWD4K"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ziGyi8Ma"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8698328C2DD
-	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 22:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF9428D8E4
+	for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 22:57:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749596267; cv=none; b=ruT52T5hge0oj1ww7tRaJ6R7OWwWf+28kWKYfGO6aryHRw0uhwjtp7LpAufIIms6ELwVtAtCx6h0kvzUcujRIO0gMp2dWGksf8JFfMS5w8+sKhDoUMIY39+5Hgbo46iIXUep/vx9lYMoJPuPzV+q+ji8yvnluXGosQUbPmRiP2A=
+	t=1749596268; cv=none; b=VN06QogFQbRb9L5ycYY+b2H0mypSnrvfdCN2ECJmG8wHnwWlaZdK5c36ypYBr6n4eRLRwJBvTZbZgpK2+0ZGgMmRqiqz0CmpD5enH6VtRWCSKa7LNwWaACIh38uMp/UrczjzOt5c+Z1sIri2OAecIuyxjtAVTnOmEVmAvJ+C73U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749596267; c=relaxed/simple;
-	bh=Sl7RMVG1Smug1Zt7BIT/fBDHqqAV5fqrOgEX8eS3zlY=;
+	s=arc-20240116; t=1749596268; c=relaxed/simple;
+	bh=9VEAvtUsud2CGs9vlrwfusz06B+7ZsvAKB7oC960uWQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Rt8/mX4Zzk+IDDJAtYHvSL4K0uRqlQwQBYornn0k9BJ/NmemKVNnFl3QEiXQWMxnwNm1uzyoI6h3h+t73GiqHLz1UYSuDwH3NGgeIdv6Ki9X90xXGdCtO5AXFngUSSFqQtD+VTtGezy0R3/d2TG5uOByD2fqw37fGNYyr7pMa20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QsoJWD4K; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=OcRKl/bNFIHXq73IePPOn4G9yyplDkE2OsoQc1fFjPKb/GhrOBrRqcV56bySvwDVz+iTftB3o0s4FKiFpi8UAO/fNqqwqVPPCnli1JFHjuGQpea6ZFNV8VLjzwnAloN5Ok2w9Buha3gO4YHemRw1a9JVnptDVQib67aULG2liVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ziGyi8Ma; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-31327b2f8e4so5439079a91.1
-        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 15:57:45 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-740270e168aso4844268b3a.1
+        for <kvm@vger.kernel.org>; Tue, 10 Jun 2025 15:57:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749596265; x=1750201065; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749596266; x=1750201066; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=C2MqcAD9SEyvsvm0pt69BHrzaupG3Xug+UbyYJUQj98=;
-        b=QsoJWD4KOnJQssKXqxRQqNMyOHhIREOPqJcIiedoaJyrupjye8AmC6qrC/UpVaLu/g
-         NvQAFqwJGzXDqKRdiGz2ntog+MmVjOCiqaK7zv1TIAFgaOT8KyNv3bHYOct3PstoFckI
-         FGardfr5dKUuHnkGRqNe9kA40QbwLSyonWzPLEeu9c0Mt4AZ3mwpGNqW4a8rujiQmWm3
-         9sM5tM2yhNp+F7IDpsWX4shsYxXZhQwfdq4eoKDOkcIuPlL6Ks7jnV/uZIKfGQoE60kF
-         qa4GKd3EIfyrjdPC5PFPAJRYbFMMYS2vJFStVIAla66MrO0TW4xBgq5dVvmaRhevU6Ls
-         HohQ==
+        bh=sgbdhI3yd/wQ/3cQ73eXvLbLWKSkDV545uFxsAvOoCg=;
+        b=ziGyi8Mavn6a6PdpdzWGfFzc3CBeFRC3BGD2s3dVd9sJlC5ZiL9GRhM/S69ZWV655j
+         ormtFGCto370krwFDKu/iWosSmSyfoRdrDh/p188J77npgoe6EO66htmdNC7hNUgvNKF
+         gF3JomtT6WVwMiWTIBwtHu2J5a87LpsfqE50wsu3UcBBRLT+eqFPHLS1e03dUNOh3NBR
+         xU+1zW5iLQvFZHEPN5UOHgtykctpNvEwtiamJDPmGzO09nPt/LADrwEp6UxxgdXnY4El
+         XjL/Asu+IhBcj+bvH6xEV65QLReNca0W+r6cX4r36zIGBUb6/agntTRjXyWR638m8Zv4
+         1u9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749596265; x=1750201065;
+        d=1e100.net; s=20230601; t=1749596266; x=1750201066;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=C2MqcAD9SEyvsvm0pt69BHrzaupG3Xug+UbyYJUQj98=;
-        b=u5cPkmpyjyb3JKVWQspYInPXzaD2WPhdf/+H9RqmEcJg/O1dfimZA6TSeQTFmEWavu
-         6WY7yG+Ii9EVkCmwzmwYtI1q7Z2Gj2AZi4pJoVa2G+kylxjfaaUQzYc+4+VEupWJoso9
-         CDvH6rgEh+DW+NHe5np0IBUj6L+KnKJz17nLYy5DD+LSQKibVgwOkmPDvrqqaBO+9ZgH
-         F+xc8DExSVQiECbgGq0utKU6TTwygG2gzIt+Dql0aWyHwHZkdgfinXzaPZhleoD1mN6W
-         2pH1apx2p6hq2U7Js7gVYaO/wkfi+nzGgtkbVtvDFzmkEjoBGbbdq9HozyKz7fz7n+hA
-         5uWA==
-X-Gm-Message-State: AOJu0YzIWv5jwK13RMvjIOYp+W2dNQZVwBh1KrjojAsAcvZAAay2zPGK
-	xi0UPI+3MAMZMYp8g747a+CorF/Da76F0/iGWXsAZDfCYMX7EWi+9wWfFpPlUj6xV72YXD94UaR
-	gHcmuvw==
-X-Google-Smtp-Source: AGHT+IEsKlnetXx2xFWIoFZib3Nzc35PtGs1gAdAOfo2EicjORiTp+qxdwZfJwoZ740t92RDBf5DoDOkGCc=
-X-Received: from pjv13.prod.google.com ([2002:a17:90b:564d:b0:313:2ad9:17ec])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3ec4:b0:311:9c9a:58d7
- with SMTP id 98e67ed59e1d1-313b1fbe6admr572991a91.19.1749596264797; Tue, 10
- Jun 2025 15:57:44 -0700 (PDT)
+        bh=sgbdhI3yd/wQ/3cQ73eXvLbLWKSkDV545uFxsAvOoCg=;
+        b=v20npBWeWKHbNMdiUYQ6X0XNu02p4C+oyTPwxP9ONgKNEpZ0H08Pr29w9aWWjXNmKd
+         Gk7wECBRyMheYm9f4v9piiTz/jd8UCwZciIS8ZL0mbQcEOh1bQBs++3buSG6MisblLIM
+         IvfTFS/43OyuSCxQXPbG1Hcn4C/RVmsAPVaL5jsi7sbzszXB2wml5uV2X9vaaXZQa7QX
+         VT/+KSPusYrMmIHXJLPYtIaIaimmIj1tvdT6BT+6wPJAyD7d7E4gAQvgfXcP4s8fh5Ne
+         MaIsucdpMybBwbTxn7Af3tDnTvISb0hEtNIJ509ZIQQ8+bpjwIS4BwDjykRga9uvnWbI
+         B3kQ==
+X-Gm-Message-State: AOJu0YzM3QV8XMuVcw1bx5oyKXS2/TNYec+zHt/UqH9MkuLcZNC31Zgk
+	Tq408Qp86ypZwUnM/OwxK+vgTFlwpFgMtCvpHxnwFKn3BIGi5m87fvQ5Fm9PBE+5xlnM6RXKDNF
+	eyFfECw==
+X-Google-Smtp-Source: AGHT+IFoj6QRzLKrYLLSAJQ2LmKp+ObVPY/ahIVkPm5UND4Cxp0AWwCGUQGOuOLKDbn2xQa0z5KnVXCOFdg=
+X-Received: from pffv21.prod.google.com ([2002:aa7:8095:0:b0:746:2897:67f3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2d92:b0:748:32cc:eebc
+ with SMTP id d2e1a72fcca58-7486cbd9035mr1442926b3a.17.1749596266499; Tue, 10
+ Jun 2025 15:57:46 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 10 Jun 2025 15:57:07 -0700
+Date: Tue, 10 Jun 2025 15:57:08 -0700
 In-Reply-To: <20250610225737.156318-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250610225737.156318-1-seanjc@google.com>
 X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
-Message-ID: <20250610225737.156318-3-seanjc@google.com>
-Subject: [PATCH v2 02/32] KVM: SVM: Allocate IOPM pages after initial setup in svm_hardware_setup()
+Message-ID: <20250610225737.156318-4-seanjc@google.com>
+Subject: [PATCH v2 03/32] KVM: SVM: Don't BUG if setting up the MSR intercept
+ bitmaps fails
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,56 +86,85 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Manali Shukla <Manali.Shukla@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Allocate pages for the IOPM after initial setup has been completed in
-svm_hardware_setup(), so that sanity checks can be added in the setup flow
-without needing to free the IOPM pages.  The IOPM is only referenced (via
-iopm_base) in init_vmcb() and svm_hardware_unsetup(), so there's no need
-to allocate it early on.
-
-No functional change intended (beyond the obvious ordering differences,
-e.g. if the allocation fails).
+WARN and reject module loading if there is a problem with KVM's MSR
+interception bitmaps.  Panicking the host in this situation is inexcusable
+since it is trivially easy to propagate the error up the stack.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ arch/x86/kvm/svm/svm.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 21e745acebc3..262eae46a396 100644
+index 262eae46a396..f70211780880 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -5505,15 +5505,6 @@ static __init int svm_hardware_setup(void)
+@@ -945,7 +945,7 @@ static void svm_msr_filter_changed(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-static void add_msr_offset(u32 offset)
++static int add_msr_offset(u32 offset)
+ {
+ 	int i;
+ 
+@@ -953,7 +953,7 @@ static void add_msr_offset(u32 offset)
+ 
+ 		/* Offset already in list? */
+ 		if (msrpm_offsets[i] == offset)
+-			return;
++			return 0;
+ 
+ 		/* Slot used by another offset? */
+ 		if (msrpm_offsets[i] != MSR_INVALID)
+@@ -962,17 +962,13 @@ static void add_msr_offset(u32 offset)
+ 		/* Add offset to list */
+ 		msrpm_offsets[i] = offset;
+ 
+-		return;
++		return 0;
+ 	}
+ 
+-	/*
+-	 * If this BUG triggers the msrpm_offsets table has an overflow. Just
+-	 * increase MSRPM_OFFSETS in this case.
+-	 */
+-	BUG();
++	return -ENOSPC;
+ }
+ 
+-static void init_msrpm_offsets(void)
++static int init_msrpm_offsets(void)
+ {
+ 	int i;
+ 
+@@ -982,10 +978,13 @@ static void init_msrpm_offsets(void)
+ 		u32 offset;
+ 
+ 		offset = svm_msrpm_offset(direct_access_msrs[i].index);
+-		BUG_ON(offset == MSR_INVALID);
++		if (WARN_ON(offset == MSR_INVALID))
++			return -EIO;
+ 
+-		add_msr_offset(offset);
++		if (WARN_ON_ONCE(add_msr_offset(offset)))
++			return -EIO;
+ 	}
++	return 0;
+ }
+ 
+ void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
+@@ -5505,7 +5504,9 @@ static __init int svm_hardware_setup(void)
  	}
  	kvm_enable_efer_bits(EFER_NX);
  
--	iopm_pages = alloc_pages(GFP_KERNEL, order);
--
--	if (!iopm_pages)
--		return -ENOMEM;
--
--	iopm_va = page_address(iopm_pages);
--	memset(iopm_va, 0xff, PAGE_SIZE * (1 << order));
--	iopm_base = __sme_page_pa(iopm_pages);
--
- 	init_msrpm_offsets();
+-	init_msrpm_offsets();
++	r = init_msrpm_offsets();
++	if (r)
++		return r;
  
  	kvm_caps.supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS |
-@@ -5580,6 +5571,15 @@ static __init int svm_hardware_setup(void)
- 		else
- 			pr_info("LBR virtualization supported\n");
- 	}
-+
-+	iopm_pages = alloc_pages(GFP_KERNEL, order);
-+	if (!iopm_pages)
-+		return -ENOMEM;
-+
-+	iopm_va = page_address(iopm_pages);
-+	memset(iopm_va, 0xff, PAGE_SIZE * (1 << order));
-+	iopm_base = __sme_page_pa(iopm_pages);
-+
- 	/*
- 	 * Note, SEV setup consumes npt_enabled and enable_mmio_caching (which
- 	 * may be modified by svm_adjust_mmio_mask()), as well as nrips.
+ 				     XFEATURE_MASK_BNDCSR);
 -- 
 2.50.0.rc0.642.g800a2b2222-goog
 
