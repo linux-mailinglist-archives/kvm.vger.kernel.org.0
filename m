@@ -1,776 +1,233 @@
-Return-Path: <kvm+bounces-49141-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49142-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41018AD6199
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 23:40:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C475EAD61A6
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 23:42:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB183169A5A
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 21:40:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5FAC3AC301
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 21:41:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA7A526E6E7;
-	Wed, 11 Jun 2025 21:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD0D24DCE7;
+	Wed, 11 Jun 2025 21:39:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZQBCirEh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V5RmWnVh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42A225FA3B
-	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 21:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749677794; cv=none; b=qBE+A373I8D/SQ7cyni9F9zefmXhuUytj+q+i+gMEaJpN1V47544B0dX9tI5jTl6zjviwIpmRWJ4kwhSBy60ncDDLS0qCCSE5fl1UrCmWLTtowxmXvVqKoO86wEMkh6tyO12uf3O/23teMZj/MJ7J3OQ9PqDlaIScDvLiwlgAIw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749677794; c=relaxed/simple;
-	bh=PmbWC/TIlLCQzSKdxm1GVL9bgskn+dbrOnYa6rqBgWg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DQ92KE7+mCQTFe+6rvh4I0WSy3hyxZAwSzWyPbnD+jR7AUBW3xjBCfOsxsLpQ/gLed6itrGXjiuNpkiiHG1aZS85ZvrN0OtJaDPTSRbV/ZcGXMXAGabtgl1rTHZj7Na6Vpvi/IPwbA0ZVjOfFwgdqhJ8npe2ZTPvqiQocJ+U4/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZQBCirEh; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-745e89b0c32so504645b3a.3
-        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 14:36:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749677792; x=1750282592; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=vsgWR+xgtVyVwImlz4N8xQ42xaa1qcLxZh31sYTHKkU=;
-        b=ZQBCirEhbwb6PaKtnEB1N0kQqbCi1FS86iNR3pahqknFmH0WGb7LgxMiL3tpFQdqzm
-         kyoUk+oI0Imt5fCE1xCT0J+Mij4ug/kXcAeeyJs8C0N1KQwDmwzMjjQ6/6Oh/1sNKPjY
-         IXttyVEaGRH5NwxDZvnGocs5URXuyF2GUehvkxd3wN29iYb8XQlnl3GpMNoP0rg8kjiP
-         n6oZEzilzWZAoVtpJknFgbONei13EJTs8S7a/Jtr2CIbHKZBw1zL9q4ScoLUIHbtAg/x
-         ovovxe1UULct7Ohks4z0hG+gjTszopEUlDItgrUXhTwv1v74n7/x4F47MQGzlje3wVTH
-         BkDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749677792; x=1750282592;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vsgWR+xgtVyVwImlz4N8xQ42xaa1qcLxZh31sYTHKkU=;
-        b=wbA/8AAbhVkT4JNq9dQ0HPbHnMn6fq875MmFqKoGszVXXmxUlgbuRcVm+MLba+sEUS
-         j8qE16kgT2K9C7q/9bvtcjGtSfDRZhDX966wzV/ok9WFkLOXX8SmiWjlzKPHFtWCDuwm
-         n6hpv6uQGaOF820fTJSw/ftoo2T5LvGScwwJO/f5L2k8td+rHIIXqsz61Qb8LwabE5U0
-         tUM2JnSq2m1IGqP3qTEISytjGYZWlIvbG14sjE0AEBX2ZFRq6+KL06K2lusUCDtNdVVu
-         ODDB02seVa3m+d+nIdLLiETJes/Eonv6vkKqIBabLqqYE+I482jJ6rk11jxb2F9sSWNq
-         AGPQ==
-X-Gm-Message-State: AOJu0YzZvDHIGDkJau4xU/b1kQc9ZZVdgNpRIxjHAQTxKARctFORskX7
-	2aI3b7MvcLcTS2mRCUmbRIm80kfMzlVlbtc9bcCLzPhzkNeiqqfVkdhn98/I9lRTqEgHeoTnRBt
-	2/dPl7Q==
-X-Google-Smtp-Source: AGHT+IErRFT1YxlszZ8+Hn/lk6gYaxEVplONKqwV+JCUeXaN9V2hIH4Qm61XoRwm2x2oWrmpm9siqH0ZiFQ=
-X-Received: from pfax8.prod.google.com ([2002:aa7:9188:0:b0:746:fd4c:1fd0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3e29:b0:748:2ff7:5e22
- with SMTP id d2e1a72fcca58-7487c239e74mr1359444b3a.10.1749677792072; Wed, 11
- Jun 2025 14:36:32 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 11 Jun 2025 14:35:57 -0700
-In-Reply-To: <20250611213557.294358-1-seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEE024BD0C;
+	Wed, 11 Jun 2025 21:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749677952; cv=fail; b=FJNwueA5FvG5jny1bxFJqlHCmPfHAc0/pmIlfq8o2mIgB/0CTB6FiLIhKY3YJvrl+4ssQRnM+fsFYHDvo9OmJvDHTaiBD5IyPTy2kHpMvq0d/bKHXTrdsHVdPcm/E6iYf58E1NgpQCsUG6XXMw7DXzsjqJuuYI6ZQUxtdVa+EUc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749677952; c=relaxed/simple;
+	bh=JCdLOf9c2jdrqvNT+a5/WzzcKxbO8RF5t+a3lcJiRcg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=EIBeRu825lInjigNT9yZ+7b4rSgyRVbs4KS1hWfCVrXlVm9bwrRNFo27GLNECEntSyuPIGbPDYe/mWqqMdPyxe46Z1efCp3HPEjH6PljK+HUUniMVeRPcsconxSQHQk6pNkNnaudAkNfZjS8Eb/TusGTZcku7DnjYYCS+YMOGCs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V5RmWnVh; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749677951; x=1781213951;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JCdLOf9c2jdrqvNT+a5/WzzcKxbO8RF5t+a3lcJiRcg=;
+  b=V5RmWnVhVEAEOxwj+Vz45/IVcPzfqZfbVnpRaHEG1HAJRTZsGXtv/LlW
+   K1v7ZSVkVQ6zF6KLXO19IRnPwUAUjf6Fvz0ERYCdn31um+ofLoXWRGgPY
+   2OGhzL7Ak4/7Mey6fsZyOcA4skz/ZaxRsX2GCOYaJPUlkMErMpL5GaKYe
+   xYW5PXLXwaEvpewOa5MhgNp3Mq+eXNkKfNJOWayUXDsGbHCuCY41f8qI4
+   mTZr76KC/3Oh8aoQYFsIBeqEaxhAYcQoCu/bd+8Nck1PlByrlBkN5W9bc
+   X4ZMVxYmDJ/iH7DTYXjgHrUi1lPuJ5EhektybiQ/9RHouPz11OVaGR4tN
+   w==;
+X-CSE-ConnectionGUID: oC30ZyPGTCWwUL35KWZpSw==
+X-CSE-MsgGUID: UxfyAKUqSPKXpTh+eiXBug==
+X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="63244369"
+X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
+   d="scan'208";a="63244369"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 14:39:10 -0700
+X-CSE-ConnectionGUID: HSamITpwS56DKQI2tCrNGw==
+X-CSE-MsgGUID: EjlzY4CaSd+U+SaoOgDQZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
+   d="scan'208";a="152466550"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 14:39:09 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 14:39:07 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 11 Jun 2025 14:39:07 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (40.107.101.77)
+ by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 14:39:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nhv2fEOIgoeGcRopsHsjhdpPOOUeowm4dpDjpI/i2aoMgcS3FN4bndIuZFZhMeSrJ+C6+EVCrm9sX0wQ3HmG3VGUyKp1sX1cE8SCV8DqxMDWNtc4LviJnH31GBP6olhs1wP3YoBaf50R5LoDLOYD/ni42hCTi+LN7hje9k0y16MvBwGBgVbDKSziiWw8dYku7d0vPX8GS7dMqBokW/ZUSJP9TK4Q6bz/SD9mUpliCm1RfVUgM2fNhEpgjrkqkeZ2tZF2fqTevdNMtdJKQPd/D3wnKEUFMehE/fWT9MdSqHj3NYnXgr/NrKFcAXbMK/w3BO0LzEhS2M/scW4A2Bw1ZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JCdLOf9c2jdrqvNT+a5/WzzcKxbO8RF5t+a3lcJiRcg=;
+ b=QukFfdqOeQK6v4Crk1PQK1rBfN8S3kbV71cEqL8jIy5bxZRSetgPZwCn/I6Ax97kwkzNwAp3yX3Loz9ICMKiRrex0Q8K5JcmbXWN0+mJLiEqRPKHpK3S/YFqsHgkN5KM429LsBkzRUDdLKmRijfBpx3gad8ZEdmhgLXNB96fOfN+pPXHUeFZEtZw3hdBzBQLz6P1pvP9POKCYIYZd11CEkGBWvBiTKLzTg2BPFpNlxBp5w0/qyFNK0+Ut4UgsGy0MynDOvq3DYuq6J6AXzjZOT1rhTyU3TkWz43A34MFCh9XZsg6FUq60SLldnIGQw2k3o1yA1l5N4hIkuyeb/okHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BYAPR11MB3320.namprd11.prod.outlook.com (2603:10b6:a03:18::25)
+ by SJ5PPF183C9380E.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::815) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.19; Wed, 11 Jun
+ 2025 21:39:04 +0000
+Received: from BYAPR11MB3320.namprd11.prod.outlook.com
+ ([fe80::e8c4:59e3:f1d5:af3b]) by BYAPR11MB3320.namprd11.prod.outlook.com
+ ([fe80::e8c4:59e3:f1d5:af3b%4]) with mapi id 15.20.8813.024; Wed, 11 Jun 2025
+ 21:39:04 +0000
+Message-ID: <7abb2bf8-be36-41b1-bb6e-e23a984a4ab6@intel.com>
+Date: Wed, 11 Jun 2025 14:39:01 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 9/9] x86/nmi: Print source information with the unknown
+ NMI console message
+Content-Language: en-US
+To: "H. Peter Anvin" <hpa@zytor.com>, Xin Li <xin@zytor.com>,
+	<x86@kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, Peter Zijlstra <peterz@infradead.org>, "Sean
+ Christopherson" <seanjc@google.com>, Adrian Hunter <adrian.hunter@intel.com>,
+	Kan Liang <kan.liang@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
+	"Zhang Rui" <rui.zhang@intel.com>, Steven Rostedt <rostedt@goodmis.org>,
+	"Andrew Cooper" <andrew.cooper3@citrix.com>, "Kirill A . Shutemov"
+	<kirill.shutemov@linux.intel.com>, Jacob Pan <jacob.pan@linux.microsoft.com>,
+	Andi Kleen <ak@linux.intel.com>, Kai Huang <kai.huang@intel.com>, "Sandipan
+ Das" <sandipan.das@amd.com>, <linux-perf-users@vger.kernel.org>,
+	<linux-edac@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-pm@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>
+References: <20250513203803.2636561-1-sohil.mehta@intel.com>
+ <20250513203803.2636561-10-sohil.mehta@intel.com>
+ <31507dc8-b1dc-4df3-bc0c-6958b4218746@zytor.com>
+ <fa948d41-3f95-4385-86c1-5c115561b939@intel.com>
+ <8035D788-0F60-48B8-8B98-DC352EC9AE62@zytor.com>
+From: Sohil Mehta <sohil.mehta@intel.com>
+In-Reply-To: <8035D788-0F60-48B8-8B98-DC352EC9AE62@zytor.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR04CA0015.namprd04.prod.outlook.com
+ (2603:10b6:a03:1d0::25) To BYAPR11MB3320.namprd11.prod.outlook.com
+ (2603:10b6:a03:18::25)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250611213557.294358-1-seanjc@google.com>
-X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
-Message-ID: <20250611213557.294358-19-seanjc@google.com>
-Subject: [PATCH v2 18/18] KVM: x86: Fold irq_comm.c into irq.c
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR11MB3320:EE_|SJ5PPF183C9380E:EE_
+X-MS-Office365-Filtering-Correlation-Id: d07eb428-7ac0-45ee-9237-08dda93062fc
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?T2NQRGJER2JIYUQzOXRBRlhKRHlFYnJMaHBqc2RGOFI3NUF0Z25IWmlUY09G?=
+ =?utf-8?B?b2RaaVIvUnlTYUVrbkVqV3VrZDFSR2ZiMlFYeWJlQjBsVWVoSk80bFViUXpS?=
+ =?utf-8?B?RTVpNFhxdVpIUkdreGl2cW9wN3AwMVgvY0VoU1g2ZjFUelFFYUxqSHlUdVoy?=
+ =?utf-8?B?QjRtUFFPcHE5bDZQWFROMkF4WElyS1hDUFNLeTFiVGYySFE4Y2lMalRkcVNB?=
+ =?utf-8?B?UCs0YzNGQnFhVGVTLys1V3l6TWZqQlV5WFkwelpIV2F5dDBBSFdHLytTOUZ2?=
+ =?utf-8?B?MUY5ekEwWVh4eFNlczF5ZXFHNTI2UFBmcS9JWDFGNDIrRmpmUGxVdXo0ci82?=
+ =?utf-8?B?MGI4bXU1UW1JSEpFTGdYM0JzcUVOaDNaWThIOVlhSWJPZERBU2lrN09GZksv?=
+ =?utf-8?B?ZGhodXZUV3VPT3lQOURrbThQcEVTOUQzdG1BT3RWb1d3eS9vQzNwN1g4Zm9n?=
+ =?utf-8?B?c3ZDbGpha2ZvclBsUmZJbTJBS3R5QmlCQkFDcW40b05MK1I0clJ2MXVSUjd5?=
+ =?utf-8?B?R3B6bk83RXpsalJ6ZDBzZWttR0tLVE84NGlQaUJLWlNWYUs5MEtOVkdLczkz?=
+ =?utf-8?B?c2tFb0xxUzRBS3BERWVEQVgwYWlSSks4Zkw2ZDRzcmhCdjFEcFZhRlJxZ2NF?=
+ =?utf-8?B?ZEs2L1RIaVdpeUlOZ3dQZnh4Vm9vUUV2RUpNMG53UXZabUJSYlhETmpZTWh5?=
+ =?utf-8?B?UEVEdldPak1QZjE3TlkySGpycjc1eE5zdFdxa2hBM3NRQ3pOTEx2clBpS3NE?=
+ =?utf-8?B?TU5WR2hibW50akh6T0JtZkpwbmJ4UllHc2txTFZaendmYWpEenlkQVV3M1dC?=
+ =?utf-8?B?VHBjMGdzMGlPTWtyVlJObUI0MlZjTGxDL1h1aEhuV1Nmbjh3UVlmcDMvblEz?=
+ =?utf-8?B?Q0JSSFJqQkJseGxMM3dTM1BVZmlocUZpa2tNamlvYk5aU3Vjak9LdjBmQzlC?=
+ =?utf-8?B?NURWL29mbkFuS25EcEcwa2x0aUtvamVZRUtEOXdjRk1hNDNoZHpjTEF0WGFB?=
+ =?utf-8?B?OUEvYTJ5ZmQ0aDZUTGk0aHJDYlU5cFcyMFN6clVyREpsb3RVQUFnRE1sRXVu?=
+ =?utf-8?B?MmgzMWhuT3FyMys0ZzB5MW5VV2RoaGhuSWVNR3BWTS9SdzFhSFg0MmQ5Ynho?=
+ =?utf-8?B?dzlvOE1HREU3SkNUOVBRV1lnTFcrcHMwcnhSQTQ4NnNZUlUveTRKVlVwTWhx?=
+ =?utf-8?B?T2JhbFUxbkw0QkJuYUtrdnJoZXNvVWxxSzd0UC9Yc2JVUVNNTlUyMEtuN1lZ?=
+ =?utf-8?B?Vldwdjgzc001ZUh2dUZXc2tXdWtoSE1QTG8wZnJiSmxseXk3ZG9pMHhmczR5?=
+ =?utf-8?B?VVVKUWNLanBhbzFZTUlKT1F5cUxUeDVHNEQxRWFWRU9nSHZtNysrWmV2N0FM?=
+ =?utf-8?B?Q2ZINU9tY1VJSTR3OU8zZzNmQWdacE5xWGRGSk5TWW8wb0NvZGVJTWJJdjVT?=
+ =?utf-8?B?bVZrTEExaHNYVk05bENTVzJrd0ZvWXROQXJVR1JkSkF6UnJQbUdTN2NNeEwz?=
+ =?utf-8?B?RXA2Z0Jmd2dSblVWY3Bid3Q1Q0w0UzRla2hoc2VweE5vYVJ6MXNuNmY0K2RC?=
+ =?utf-8?B?clFnZzdHZWVpeXFLVXVGZDUraDNDYWNjamlScVgyQ2kvQ3QwVU5TZnRGNFFJ?=
+ =?utf-8?B?WDIxN0JRT2lrbTJrOWRCL3dodEk4WU53V2R0c29CczVaRDE3L284dVpGZk8y?=
+ =?utf-8?B?VHVCdjdMdzBRdGZDV2tSZWcvYUpnVi9xNUJmUlBYQmhzRmJ5eTc1cTB4aUlE?=
+ =?utf-8?B?Z2JOTGhEcXU1dHZSOUlxbTVXTlV2NWxmUnZmQjgySnlJbXJzaXltSTgrVzRy?=
+ =?utf-8?B?UThYaUsrRmsyUlkrcFdGUlV5aFBJNzdjSnNDNFFzOGtJaUtCaUdZRkl5aElm?=
+ =?utf-8?B?RkRraW9QN1hzdnRHbERWUmRuR1JtYmxZdkJBOG5lNXViRGtxT1Yxb1JRclJE?=
+ =?utf-8?Q?g8vRiQgtMrY=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3320.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDA3bE0vdzRqMDV2aDBnQVFNdmxNanlBRDBuVVJNL0pHSVVIcC9kSTdxYmJx?=
+ =?utf-8?B?emVKK2FzVXExRlJ2RWNIcmdYVkYydnQ2bEdhbTU2NkRqZTRnUVpLQkRCbVh0?=
+ =?utf-8?B?UGJsbktFa0dDd1p1VWlJWFZsYTI3V0NXSHFtT0JjalFUWFlTVXQvQWUzMEZK?=
+ =?utf-8?B?cE02TUNhd0lDQzAzY2IrU3V1Yk9sdVNLYUNGcTJJQXpPZ2JHbGVNZHlGV3FJ?=
+ =?utf-8?B?cVFRMSs2bysvV3Jlam5DZFNnU0FvV3hDbW9WN2ZHTGVYSUxPd1dyMVJ2cWFs?=
+ =?utf-8?B?ODBCMkVaNFhISEt1dWZnbC9mcWVtM3lZMGJxOTgvNll1NW8yazBqeWFMZUdk?=
+ =?utf-8?B?eVJxWFlQbDJrVEVaS0dmSGhvblp2K0t4TXdBcFlqbjJCSy9TYnNiTklwVHdt?=
+ =?utf-8?B?TVhNNzJHNVU5RE82TFNVOFV1MHZNc0ZBUkhNV3U5UDhxcEo0Nmlrc3lkckZR?=
+ =?utf-8?B?cWFITVFraDZRdmRoNEFIUkUzbzQ4ODM0TFhiRTU1QnNsdVpDcW92MDJxTVRj?=
+ =?utf-8?B?amgzYmVlUFpXdm1jWHEvTDdaaDdGL3c0a1dmNXdNSGRWMncxdjhUcDZoeW1Q?=
+ =?utf-8?B?bHBLcE9oYnlMM0VCeEd5WExOM0NBR0pXc0JONS8wanJEQUN0empYbDhNNHdZ?=
+ =?utf-8?B?bWVUYjlGNGZ4RkpmcVVHbm9TaDZaeWJVTDRPWmN3aXNmTzVqQVhtUzhwWktI?=
+ =?utf-8?B?WE1kL0xFcW5oM3Z1QktGL2pxejJpTkdhVUhqSnpLMGdRWDdvc3BXakFzbkRa?=
+ =?utf-8?B?bWNVVktTN3RUTllNZDZTKy9XNWJrVUdtRGgvSEdTWHZUc0FPTTRRdUlhU2ty?=
+ =?utf-8?B?Y1hoMloyWjlEenhTMDBHZmI3QWkxMXRuUGg0Z0tra0puZGIwNjdzaHYxWVhF?=
+ =?utf-8?B?Z1NBc1ZPck1WckZTNTFOdHRrbEpzZUpaWnZjMUdzdFljODRnakpLM0h0eFJC?=
+ =?utf-8?B?bWFSU1Jrd01XdzhnT0EyMk8zdEYybUovT0ROaU9hWEtqZnlXMVE5cldIcC81?=
+ =?utf-8?B?YllVQllmYyt3Vk1tbXgzczJ6TGtNQ0xwNWRiYjdLbGpJNFppS01rTE1UZXJ1?=
+ =?utf-8?B?eDJwZ1M0WG5GMTNiajJReGZ5dHhuNGhIRWwvNm40ckN1WjFsWXBreU9zOSs0?=
+ =?utf-8?B?QjVuNEEzV0ZMdG5NZEIxQlhhK3B6KzNoTUZ6djRNYWxEemRuM1BVTUNzaTBm?=
+ =?utf-8?B?bzhjRFZydVo4cEt4U1drOFBXb1NoNWNQWlRmOFhUck9OSUlGemxuM3ZoMUhj?=
+ =?utf-8?B?WGkycXNraXJVdEFkVXBXYlJXNUJ3WVZDM2RoUXg3M2k5a1l3MWVsa3FrSC9I?=
+ =?utf-8?B?elZyNDRvRS9ONjBmRzR3dDcxWGhNY0ZrbnF4RGJmWjBtdzViRFR3SUV6RkQ5?=
+ =?utf-8?B?U1JRVGhyR0E1b1k5OENScDkvV1o0dElZWitXQnNITlAvZWJNYWN6YmhRT2lq?=
+ =?utf-8?B?YTZSUlhWOFpqeHNWWlVmKzJoN0lYdXlNKzY4LzcvTGJCMENuRVZ6aXFvcEZC?=
+ =?utf-8?B?VDIzSWJWRFZOM1RqNjc0S09QMGlyZHpqUW9QaVZGTGJMbXROcDF5dkNYSkIy?=
+ =?utf-8?B?cFNOYkZKZDV5TUZUQlk5d1drY1pPRU96emVNbDQyaHhGWnBPdHBCa0NucFBk?=
+ =?utf-8?B?Y2JXQXhHWXF0aU52RHRNMVZuYm5wMU1FRHNrZ1lDUlU3TUl2YjkzVi9jZldv?=
+ =?utf-8?B?dERvWUZzeU1nZmlJVC80NzJoaVZRak01bUNjb3JCbWNyR0xncE4yUDRJNlJM?=
+ =?utf-8?B?ZlM0UGk2WUpzSFlqcUVhczlYeFZrY2hBeGhhdjlWRmQ2WlhZZ3lKSlpsYlNC?=
+ =?utf-8?B?eksvdFRhNTNKRzc3MzNJdWdXdTdnTFRldjcrSGZqMjQwQmZ0NkRsTnA2TllT?=
+ =?utf-8?B?MU1Ib2dOczVjSmNlRU1WUS81akU1eVViYW5BSW1WUkFiWVl3Yy9BT3dMd3FV?=
+ =?utf-8?B?VlBDR3cxZE1XSU5vUitFbHZ3QTdxVzNXTjJhSUoxT2NsYklFdFMwbnQwUjhH?=
+ =?utf-8?B?dkZBQ3BEelowcGx4VCtBT2t4MjZXNmZhbEdKMXNEVktKWCtwKzVuRXkvZGVw?=
+ =?utf-8?B?UTM2V0JBcDFoMU0xKzdNWXZzUldsUWREdzEybXNDVCtKVmNkR2RYNTc3UU02?=
+ =?utf-8?Q?i2WeAWDhFwYe9yHt9+0j0UnfX?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d07eb428-7ac0-45ee-9237-08dda93062fc
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3320.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2025 21:39:04.2146
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BceAS6U6F9dwyGCIXD6WA/rqbQ+UuFlytG5+LP2YWbxCn2oEZKh0Y9XudnX1PKcmSpbi2P8CdSucVeKUeQK7PQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF183C9380E
+X-OriginatorOrg: intel.com
 
-Drop irq_comm.c, a.k.a. common IRQ APIs, as there has been no non-x86 user
-since commit 003f7de62589 ("KVM: ia64: remove") (at the time, irq_comm.c
-lived in virt/kvm, not arch/x86/kvm).
+On 6/4/2025 8:41 AM, H. Peter Anvin wrote:
+> I think printing the bitmap is fine for unknown bits set... after
+> all, you might have surprise vectors. Maybe a list would be cleaner
+> by some definition, but we already print bitmaps all over the place.
+> It is not critical as long as the information necessary for
+> debugging is there. In fact, it is often better for the information
+> to be compact so users don't get tempted to abbreviate a bug report.
+Sure, will print the full bitmap here. Since this is the unknown NMI
+message, it may have unexpected bits set in the bitmap.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Acked-by: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/Makefile   |   6 +-
- arch/x86/kvm/irq.c      | 304 ++++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/irq_comm.c | 325 ----------------------------------------
- 3 files changed, 305 insertions(+), 330 deletions(-)
- delete mode 100644 arch/x86/kvm/irq_comm.c
-
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 92c737257789..c4b8950c7abe 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -5,10 +5,8 @@ ccflags-$(CONFIG_KVM_WERROR) += -Werror
- 
- include $(srctree)/virt/kvm/Makefile.kvm
- 
--kvm-y			+= x86.o emulate.o irq.o lapic.o \
--			   irq_comm.o cpuid.o pmu.o mtrr.o \
--			   debugfs.o mmu/mmu.o mmu/page_track.o \
--			   mmu/spte.o
-+kvm-y			+= x86.o emulate.o irq.o lapic.o cpuid.o pmu.o mtrr.o \
-+			   debugfs.o mmu/mmu.o mmu/page_track.o mmu/spte.o
- 
- kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
- kvm-$(CONFIG_KVM_IOAPIC) += i8259.o i8254.o ioapic.o
-diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
-index 4c219e9f52b0..a0b1499baf6e 100644
---- a/arch/x86/kvm/irq.c
-+++ b/arch/x86/kvm/irq.c
-@@ -12,9 +12,10 @@
- #include <linux/export.h>
- #include <linux/kvm_host.h>
- 
-+#include "hyperv.h"
- #include "ioapic.h"
- #include "irq.h"
--#include "i8254.h"
-+#include "trace.h"
- #include "x86.h"
- #include "xen.h"
- 
-@@ -193,6 +194,307 @@ bool kvm_arch_irqchip_in_kernel(struct kvm *kvm)
- 	return irqchip_in_kernel(kvm);
- }
- 
-+int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
-+			     struct kvm_lapic_irq *irq, struct dest_map *dest_map)
-+{
-+	int r = -1;
-+	struct kvm_vcpu *vcpu, *lowest = NULL;
-+	unsigned long i, dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
-+	unsigned int dest_vcpus = 0;
-+
-+	if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
-+		return r;
-+
-+	if (irq->dest_mode == APIC_DEST_PHYSICAL &&
-+	    irq->dest_id == 0xff && kvm_lowest_prio_delivery(irq)) {
-+		pr_info("apic: phys broadcast and lowest prio\n");
-+		irq->delivery_mode = APIC_DM_FIXED;
-+	}
-+
-+	memset(dest_vcpu_bitmap, 0, sizeof(dest_vcpu_bitmap));
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (!kvm_apic_present(vcpu))
-+			continue;
-+
-+		if (!kvm_apic_match_dest(vcpu, src, irq->shorthand,
-+					irq->dest_id, irq->dest_mode))
-+			continue;
-+
-+		if (!kvm_lowest_prio_delivery(irq)) {
-+			if (r < 0)
-+				r = 0;
-+			r += kvm_apic_set_irq(vcpu, irq, dest_map);
-+		} else if (kvm_apic_sw_enabled(vcpu->arch.apic)) {
-+			if (!kvm_vector_hashing_enabled()) {
-+				if (!lowest)
-+					lowest = vcpu;
-+				else if (kvm_apic_compare_prio(vcpu, lowest) < 0)
-+					lowest = vcpu;
-+			} else {
-+				__set_bit(i, dest_vcpu_bitmap);
-+				dest_vcpus++;
-+			}
-+		}
-+	}
-+
-+	if (dest_vcpus != 0) {
-+		int idx = kvm_vector_to_index(irq->vector, dest_vcpus,
-+					dest_vcpu_bitmap, KVM_MAX_VCPUS);
-+
-+		lowest = kvm_get_vcpu(kvm, idx);
-+	}
-+
-+	if (lowest)
-+		r = kvm_apic_set_irq(lowest, irq, dest_map);
-+
-+	return r;
-+}
-+
-+void kvm_set_msi_irq(struct kvm *kvm, struct kvm_kernel_irq_routing_entry *e,
-+		     struct kvm_lapic_irq *irq)
-+{
-+	struct msi_msg msg = { .address_lo = e->msi.address_lo,
-+			       .address_hi = e->msi.address_hi,
-+			       .data = e->msi.data };
-+
-+	trace_kvm_msi_set_irq(msg.address_lo | (kvm->arch.x2apic_format ?
-+			      (u64)msg.address_hi << 32 : 0), msg.data);
-+
-+	irq->dest_id = x86_msi_msg_get_destid(&msg, kvm->arch.x2apic_format);
-+	irq->vector = msg.arch_data.vector;
-+	irq->dest_mode = kvm_lapic_irq_dest_mode(msg.arch_addr_lo.dest_mode_logical);
-+	irq->trig_mode = msg.arch_data.is_level;
-+	irq->delivery_mode = msg.arch_data.delivery_mode << 8;
-+	irq->msi_redir_hint = msg.arch_addr_lo.redirect_hint;
-+	irq->level = 1;
-+	irq->shorthand = APIC_DEST_NOSHORT;
-+}
-+EXPORT_SYMBOL_GPL(kvm_set_msi_irq);
-+
-+static inline bool kvm_msi_route_invalid(struct kvm *kvm,
-+		struct kvm_kernel_irq_routing_entry *e)
-+{
-+	return kvm->arch.x2apic_format && (e->msi.address_hi & 0xff);
-+}
-+
-+int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
-+		struct kvm *kvm, int irq_source_id, int level, bool line_status)
-+{
-+	struct kvm_lapic_irq irq;
-+
-+	if (kvm_msi_route_invalid(kvm, e))
-+		return -EINVAL;
-+
-+	if (!level)
-+		return -1;
-+
-+	kvm_set_msi_irq(kvm, e, &irq);
-+
-+	return kvm_irq_delivery_to_apic(kvm, NULL, &irq, NULL);
-+}
-+
-+int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
-+			      struct kvm *kvm, int irq_source_id, int level,
-+			      bool line_status)
-+{
-+	struct kvm_lapic_irq irq;
-+	int r;
-+
-+	switch (e->type) {
-+#ifdef CONFIG_KVM_HYPERV
-+	case KVM_IRQ_ROUTING_HV_SINT:
-+		return kvm_hv_synic_set_irq(e, kvm, irq_source_id, level,
-+					    line_status);
-+#endif
-+
-+	case KVM_IRQ_ROUTING_MSI:
-+		if (kvm_msi_route_invalid(kvm, e))
-+			return -EINVAL;
-+
-+		kvm_set_msi_irq(kvm, e, &irq);
-+
-+		if (kvm_irq_delivery_to_apic_fast(kvm, NULL, &irq, &r, NULL))
-+			return r;
-+		break;
-+
-+#ifdef CONFIG_KVM_XEN
-+	case KVM_IRQ_ROUTING_XEN_EVTCHN:
-+		if (!level)
-+			return -1;
-+
-+		return kvm_xen_set_evtchn_fast(&e->xen_evtchn, kvm);
-+#endif
-+	default:
-+		break;
-+	}
-+
-+	return -EWOULDBLOCK;
-+}
-+
-+bool kvm_arch_can_set_irq_routing(struct kvm *kvm)
-+{
-+	return irqchip_in_kernel(kvm);
-+}
-+
-+int kvm_set_routing_entry(struct kvm *kvm,
-+			  struct kvm_kernel_irq_routing_entry *e,
-+			  const struct kvm_irq_routing_entry *ue)
-+{
-+	/* We can't check irqchip_in_kernel() here as some callers are
-+	 * currently initializing the irqchip. Other callers should therefore
-+	 * check kvm_arch_can_set_irq_routing() before calling this function.
-+	 */
-+	switch (ue->type) {
-+#ifdef CONFIG_KVM_IOAPIC
-+	case KVM_IRQ_ROUTING_IRQCHIP:
-+		if (irqchip_split(kvm))
-+			return -EINVAL;
-+		e->irqchip.pin = ue->u.irqchip.pin;
-+		switch (ue->u.irqchip.irqchip) {
-+		case KVM_IRQCHIP_PIC_SLAVE:
-+			e->irqchip.pin += PIC_NUM_PINS / 2;
-+			fallthrough;
-+		case KVM_IRQCHIP_PIC_MASTER:
-+			if (ue->u.irqchip.pin >= PIC_NUM_PINS / 2)
-+				return -EINVAL;
-+			e->set = kvm_pic_set_irq;
-+			break;
-+		case KVM_IRQCHIP_IOAPIC:
-+			if (ue->u.irqchip.pin >= KVM_IOAPIC_NUM_PINS)
-+				return -EINVAL;
-+			e->set = kvm_ioapic_set_irq;
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+		e->irqchip.irqchip = ue->u.irqchip.irqchip;
-+		break;
-+#endif
-+	case KVM_IRQ_ROUTING_MSI:
-+		e->set = kvm_set_msi;
-+		e->msi.address_lo = ue->u.msi.address_lo;
-+		e->msi.address_hi = ue->u.msi.address_hi;
-+		e->msi.data = ue->u.msi.data;
-+
-+		if (kvm_msi_route_invalid(kvm, e))
-+			return -EINVAL;
-+		break;
-+#ifdef CONFIG_KVM_HYPERV
-+	case KVM_IRQ_ROUTING_HV_SINT:
-+		e->set = kvm_hv_synic_set_irq;
-+		e->hv_sint.vcpu = ue->u.hv_sint.vcpu;
-+		e->hv_sint.sint = ue->u.hv_sint.sint;
-+		break;
-+#endif
-+#ifdef CONFIG_KVM_XEN
-+	case KVM_IRQ_ROUTING_XEN_EVTCHN:
-+		return kvm_xen_setup_evtchn(kvm, e, ue);
-+#endif
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+bool kvm_intr_is_single_vcpu(struct kvm *kvm, struct kvm_lapic_irq *irq,
-+			     struct kvm_vcpu **dest_vcpu)
-+{
-+	int r = 0;
-+	unsigned long i;
-+	struct kvm_vcpu *vcpu;
-+
-+	if (kvm_intr_is_single_vcpu_fast(kvm, irq, dest_vcpu))
-+		return true;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (!kvm_apic_present(vcpu))
-+			continue;
-+
-+		if (!kvm_apic_match_dest(vcpu, NULL, irq->shorthand,
-+					irq->dest_id, irq->dest_mode))
-+			continue;
-+
-+		if (++r == 2)
-+			return false;
-+
-+		*dest_vcpu = vcpu;
-+	}
-+
-+	return r == 1;
-+}
-+EXPORT_SYMBOL_GPL(kvm_intr_is_single_vcpu);
-+
-+void kvm_scan_ioapic_irq(struct kvm_vcpu *vcpu, u32 dest_id, u16 dest_mode,
-+			 u8 vector, unsigned long *ioapic_handled_vectors)
-+{
-+	/*
-+	 * Intercept EOI if the vCPU is the target of the new IRQ routing, or
-+	 * the vCPU has a pending IRQ from the old routing, i.e. if the vCPU
-+	 * may receive a level-triggered IRQ in the future, or already received
-+	 * level-triggered IRQ.  The EOI needs to be intercepted and forwarded
-+	 * to I/O APIC emulation so that the IRQ can be de-asserted.
-+	 */
-+	if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT, dest_id, dest_mode)) {
-+		__set_bit(vector, ioapic_handled_vectors);
-+	} else if (kvm_apic_pending_eoi(vcpu, vector)) {
-+		__set_bit(vector, ioapic_handled_vectors);
-+
-+		/*
-+		 * Track the highest pending EOI for which the vCPU is NOT the
-+		 * target in the new routing.  Only the EOI for the IRQ that is
-+		 * in-flight (for the old routing) needs to be intercepted, any
-+		 * future IRQs that arrive on this vCPU will be coincidental to
-+		 * the level-triggered routing and don't need to be intercepted.
-+		 */
-+		if ((int)vector > vcpu->arch.highest_stale_pending_ioapic_eoi)
-+			vcpu->arch.highest_stale_pending_ioapic_eoi = vector;
-+	}
-+}
-+
-+void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
-+			    ulong *ioapic_handled_vectors)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_kernel_irq_routing_entry *entry;
-+	struct kvm_irq_routing_table *table;
-+	u32 i, nr_ioapic_pins;
-+	int idx;
-+
-+	idx = srcu_read_lock(&kvm->irq_srcu);
-+	table = srcu_dereference(kvm->irq_routing, &kvm->irq_srcu);
-+	nr_ioapic_pins = min_t(u32, table->nr_rt_entries,
-+			       kvm->arch.nr_reserved_ioapic_pins);
-+	for (i = 0; i < nr_ioapic_pins; ++i) {
-+		hlist_for_each_entry(entry, &table->map[i], link) {
-+			struct kvm_lapic_irq irq;
-+
-+			if (entry->type != KVM_IRQ_ROUTING_MSI)
-+				continue;
-+
-+			kvm_set_msi_irq(vcpu->kvm, entry, &irq);
-+
-+			if (!irq.trig_mode)
-+				continue;
-+
-+			kvm_scan_ioapic_irq(vcpu, irq.dest_id, irq.dest_mode,
-+					    irq.vector, ioapic_handled_vectors);
-+		}
-+	}
-+	srcu_read_unlock(&kvm->irq_srcu, idx);
-+}
-+
-+void kvm_arch_irq_routing_update(struct kvm *kvm)
-+{
-+#ifdef CONFIG_KVM_HYPERV
-+	kvm_hv_irq_routing_update(kvm);
-+#endif
-+
-+	if (irqchip_split(kvm))
-+		kvm_make_scan_ioapic_request(kvm);
-+}
-+
- #ifdef CONFIG_KVM_IOAPIC
- #define IOAPIC_ROUTING_ENTRY(irq) \
- 	{ .gsi = irq, .type = KVM_IRQ_ROUTING_IRQCHIP,	\
-diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-deleted file mode 100644
-index 76d1c85a1011..000000000000
---- a/arch/x86/kvm/irq_comm.c
-+++ /dev/null
-@@ -1,325 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/*
-- * irq_comm.c: Common API for in kernel interrupt controller
-- * Copyright (c) 2007, Intel Corporation.
-- *
-- * Authors:
-- *   Yaozu (Eddie) Dong <Eddie.dong@intel.com>
-- *
-- * Copyright 2010 Red Hat, Inc. and/or its affiliates.
-- */
--#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
--
--#include <linux/kvm_host.h>
--#include <linux/slab.h>
--#include <linux/export.h>
--#include <linux/rculist.h>
--
--#include "hyperv.h"
--#include "ioapic.h"
--#include "irq.h"
--#include "lapic.h"
--#include "trace.h"
--#include "x86.h"
--#include "xen.h"
--
--int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
--		struct kvm_lapic_irq *irq, struct dest_map *dest_map)
--{
--	int r = -1;
--	struct kvm_vcpu *vcpu, *lowest = NULL;
--	unsigned long i, dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
--	unsigned int dest_vcpus = 0;
--
--	if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
--		return r;
--
--	if (irq->dest_mode == APIC_DEST_PHYSICAL &&
--	    irq->dest_id == 0xff && kvm_lowest_prio_delivery(irq)) {
--		pr_info("apic: phys broadcast and lowest prio\n");
--		irq->delivery_mode = APIC_DM_FIXED;
--	}
--
--	memset(dest_vcpu_bitmap, 0, sizeof(dest_vcpu_bitmap));
--
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (!kvm_apic_present(vcpu))
--			continue;
--
--		if (!kvm_apic_match_dest(vcpu, src, irq->shorthand,
--					irq->dest_id, irq->dest_mode))
--			continue;
--
--		if (!kvm_lowest_prio_delivery(irq)) {
--			if (r < 0)
--				r = 0;
--			r += kvm_apic_set_irq(vcpu, irq, dest_map);
--		} else if (kvm_apic_sw_enabled(vcpu->arch.apic)) {
--			if (!kvm_vector_hashing_enabled()) {
--				if (!lowest)
--					lowest = vcpu;
--				else if (kvm_apic_compare_prio(vcpu, lowest) < 0)
--					lowest = vcpu;
--			} else {
--				__set_bit(i, dest_vcpu_bitmap);
--				dest_vcpus++;
--			}
--		}
--	}
--
--	if (dest_vcpus != 0) {
--		int idx = kvm_vector_to_index(irq->vector, dest_vcpus,
--					dest_vcpu_bitmap, KVM_MAX_VCPUS);
--
--		lowest = kvm_get_vcpu(kvm, idx);
--	}
--
--	if (lowest)
--		r = kvm_apic_set_irq(lowest, irq, dest_map);
--
--	return r;
--}
--
--void kvm_set_msi_irq(struct kvm *kvm, struct kvm_kernel_irq_routing_entry *e,
--		     struct kvm_lapic_irq *irq)
--{
--	struct msi_msg msg = { .address_lo = e->msi.address_lo,
--			       .address_hi = e->msi.address_hi,
--			       .data = e->msi.data };
--
--	trace_kvm_msi_set_irq(msg.address_lo | (kvm->arch.x2apic_format ?
--			      (u64)msg.address_hi << 32 : 0), msg.data);
--
--	irq->dest_id = x86_msi_msg_get_destid(&msg, kvm->arch.x2apic_format);
--	irq->vector = msg.arch_data.vector;
--	irq->dest_mode = kvm_lapic_irq_dest_mode(msg.arch_addr_lo.dest_mode_logical);
--	irq->trig_mode = msg.arch_data.is_level;
--	irq->delivery_mode = msg.arch_data.delivery_mode << 8;
--	irq->msi_redir_hint = msg.arch_addr_lo.redirect_hint;
--	irq->level = 1;
--	irq->shorthand = APIC_DEST_NOSHORT;
--}
--EXPORT_SYMBOL_GPL(kvm_set_msi_irq);
--
--static inline bool kvm_msi_route_invalid(struct kvm *kvm,
--		struct kvm_kernel_irq_routing_entry *e)
--{
--	return kvm->arch.x2apic_format && (e->msi.address_hi & 0xff);
--}
--
--int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
--		struct kvm *kvm, int irq_source_id, int level, bool line_status)
--{
--	struct kvm_lapic_irq irq;
--
--	if (kvm_msi_route_invalid(kvm, e))
--		return -EINVAL;
--
--	if (!level)
--		return -1;
--
--	kvm_set_msi_irq(kvm, e, &irq);
--
--	return kvm_irq_delivery_to_apic(kvm, NULL, &irq, NULL);
--}
--
--int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
--			      struct kvm *kvm, int irq_source_id, int level,
--			      bool line_status)
--{
--	struct kvm_lapic_irq irq;
--	int r;
--
--	switch (e->type) {
--#ifdef CONFIG_KVM_HYPERV
--	case KVM_IRQ_ROUTING_HV_SINT:
--		return kvm_hv_synic_set_irq(e, kvm, irq_source_id, level,
--					    line_status);
--#endif
--
--	case KVM_IRQ_ROUTING_MSI:
--		if (kvm_msi_route_invalid(kvm, e))
--			return -EINVAL;
--
--		kvm_set_msi_irq(kvm, e, &irq);
--
--		if (kvm_irq_delivery_to_apic_fast(kvm, NULL, &irq, &r, NULL))
--			return r;
--		break;
--
--#ifdef CONFIG_KVM_XEN
--	case KVM_IRQ_ROUTING_XEN_EVTCHN:
--		if (!level)
--			return -1;
--
--		return kvm_xen_set_evtchn_fast(&e->xen_evtchn, kvm);
--#endif
--	default:
--		break;
--	}
--
--	return -EWOULDBLOCK;
--}
--
--bool kvm_arch_can_set_irq_routing(struct kvm *kvm)
--{
--	return irqchip_in_kernel(kvm);
--}
--
--int kvm_set_routing_entry(struct kvm *kvm,
--			  struct kvm_kernel_irq_routing_entry *e,
--			  const struct kvm_irq_routing_entry *ue)
--{
--	/* We can't check irqchip_in_kernel() here as some callers are
--	 * currently initializing the irqchip. Other callers should therefore
--	 * check kvm_arch_can_set_irq_routing() before calling this function.
--	 */
--	switch (ue->type) {
--#ifdef CONFIG_KVM_IOAPIC
--	case KVM_IRQ_ROUTING_IRQCHIP:
--		if (irqchip_split(kvm))
--			return -EINVAL;
--		e->irqchip.pin = ue->u.irqchip.pin;
--		switch (ue->u.irqchip.irqchip) {
--		case KVM_IRQCHIP_PIC_SLAVE:
--			e->irqchip.pin += PIC_NUM_PINS / 2;
--			fallthrough;
--		case KVM_IRQCHIP_PIC_MASTER:
--			if (ue->u.irqchip.pin >= PIC_NUM_PINS / 2)
--				return -EINVAL;
--			e->set = kvm_pic_set_irq;
--			break;
--		case KVM_IRQCHIP_IOAPIC:
--			if (ue->u.irqchip.pin >= KVM_IOAPIC_NUM_PINS)
--				return -EINVAL;
--			e->set = kvm_ioapic_set_irq;
--			break;
--		default:
--			return -EINVAL;
--		}
--		e->irqchip.irqchip = ue->u.irqchip.irqchip;
--		break;
--#endif
--	case KVM_IRQ_ROUTING_MSI:
--		e->set = kvm_set_msi;
--		e->msi.address_lo = ue->u.msi.address_lo;
--		e->msi.address_hi = ue->u.msi.address_hi;
--		e->msi.data = ue->u.msi.data;
--
--		if (kvm_msi_route_invalid(kvm, e))
--			return -EINVAL;
--		break;
--#ifdef CONFIG_KVM_HYPERV
--	case KVM_IRQ_ROUTING_HV_SINT:
--		e->set = kvm_hv_synic_set_irq;
--		e->hv_sint.vcpu = ue->u.hv_sint.vcpu;
--		e->hv_sint.sint = ue->u.hv_sint.sint;
--		break;
--#endif
--#ifdef CONFIG_KVM_XEN
--	case KVM_IRQ_ROUTING_XEN_EVTCHN:
--		return kvm_xen_setup_evtchn(kvm, e, ue);
--#endif
--	default:
--		return -EINVAL;
--	}
--
--	return 0;
--}
--
--bool kvm_intr_is_single_vcpu(struct kvm *kvm, struct kvm_lapic_irq *irq,
--			     struct kvm_vcpu **dest_vcpu)
--{
--	int r = 0;
--	unsigned long i;
--	struct kvm_vcpu *vcpu;
--
--	if (kvm_intr_is_single_vcpu_fast(kvm, irq, dest_vcpu))
--		return true;
--
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (!kvm_apic_present(vcpu))
--			continue;
--
--		if (!kvm_apic_match_dest(vcpu, NULL, irq->shorthand,
--					irq->dest_id, irq->dest_mode))
--			continue;
--
--		if (++r == 2)
--			return false;
--
--		*dest_vcpu = vcpu;
--	}
--
--	return r == 1;
--}
--EXPORT_SYMBOL_GPL(kvm_intr_is_single_vcpu);
--
--void kvm_scan_ioapic_irq(struct kvm_vcpu *vcpu, u32 dest_id, u16 dest_mode,
--			 u8 vector, unsigned long *ioapic_handled_vectors)
--{
--	/*
--	 * Intercept EOI if the vCPU is the target of the new IRQ routing, or
--	 * the vCPU has a pending IRQ from the old routing, i.e. if the vCPU
--	 * may receive a level-triggered IRQ in the future, or already received
--	 * level-triggered IRQ.  The EOI needs to be intercepted and forwarded
--	 * to I/O APIC emulation so that the IRQ can be de-asserted.
--	 */
--	if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT, dest_id, dest_mode)) {
--		__set_bit(vector, ioapic_handled_vectors);
--	} else if (kvm_apic_pending_eoi(vcpu, vector)) {
--		__set_bit(vector, ioapic_handled_vectors);
--
--		/*
--		 * Track the highest pending EOI for which the vCPU is NOT the
--		 * target in the new routing.  Only the EOI for the IRQ that is
--		 * in-flight (for the old routing) needs to be intercepted, any
--		 * future IRQs that arrive on this vCPU will be coincidental to
--		 * the level-triggered routing and don't need to be intercepted.
--		 */
--		if ((int)vector > vcpu->arch.highest_stale_pending_ioapic_eoi)
--			vcpu->arch.highest_stale_pending_ioapic_eoi = vector;
--	}
--}
--
--void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
--			    ulong *ioapic_handled_vectors)
--{
--	struct kvm *kvm = vcpu->kvm;
--	struct kvm_kernel_irq_routing_entry *entry;
--	struct kvm_irq_routing_table *table;
--	u32 i, nr_ioapic_pins;
--	int idx;
--
--	idx = srcu_read_lock(&kvm->irq_srcu);
--	table = srcu_dereference(kvm->irq_routing, &kvm->irq_srcu);
--	nr_ioapic_pins = min_t(u32, table->nr_rt_entries,
--			       kvm->arch.nr_reserved_ioapic_pins);
--	for (i = 0; i < nr_ioapic_pins; ++i) {
--		hlist_for_each_entry(entry, &table->map[i], link) {
--			struct kvm_lapic_irq irq;
--
--			if (entry->type != KVM_IRQ_ROUTING_MSI)
--				continue;
--
--			kvm_set_msi_irq(vcpu->kvm, entry, &irq);
--
--			if (!irq.trig_mode)
--				continue;
--
--			kvm_scan_ioapic_irq(vcpu, irq.dest_id, irq.dest_mode,
--					    irq.vector, ioapic_handled_vectors);
--		}
--	}
--	srcu_read_unlock(&kvm->irq_srcu, idx);
--}
--
--void kvm_arch_irq_routing_update(struct kvm *kvm)
--{
--#ifdef CONFIG_KVM_HYPERV
--	kvm_hv_irq_routing_update(kvm);
--#endif
--
--	if (irqchip_split(kvm))
--		kvm_make_scan_ioapic_request(kvm);
--}
--- 
-2.50.0.rc1.591.g9c95f17f64-goog
 
 
