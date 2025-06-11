@@ -1,384 +1,297 @@
-Return-Path: <kvm+bounces-49102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BA41AD5F23
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 21:38:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD453AD5F8E
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 21:56:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA595189ED2C
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 19:38:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AD931BC22E4
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 19:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A74289350;
-	Wed, 11 Jun 2025 19:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6CD2BD5A7;
+	Wed, 11 Jun 2025 19:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ObvP1Gpa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DQYYHQ81"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35202E6102
-	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 19:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E6228853E
+	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 19:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749670675; cv=none; b=vA1J0KxTdk6rXO9IM9DFdKdatL2ntmjGhfWJJF9ZSXp5EzlOyVPjVRMPFlMEEIRAAMHQydmWOPQL9Cwh2seSN7F281sYriVFMA/B5SlvawGdf2SBaS3xoKzEGK7VamA73aKh9Eskpy8s5PIZumABIOv+5e/ulH9llyUV9yy+POg=
+	t=1749671793; cv=none; b=pAS98TtM/0bBZM8XadccjsSYB3oGcjzfdn15bsADuYkZBB9IhEIVqo31eiEkPkj79RPmGiCVYENptFhcztjZO+LMKIZJXX1vmg89ii5gE/4wERYXVMCyropPLIPDAmBWD/EEQB++nQaWdG9zeh/lBxR2EPycXPfb3y2KKam2ANQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749670675; c=relaxed/simple;
-	bh=tMAoDht5z4t6rY2hzYFIF569a3Uqdm/sVnCxlCHgZBc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=i5fEZ0ndmsDl9NI6I/4bis+ub/HFm0BSITuVGjbRodqf/jGwI0Q87ve2fgvSbHhohGkiVXjGb8iHt2IriXfkv4Oc68mrjZ/DqbAIDeQELg+yEppouy3Q7TIJkZSeoOL9Yg7hgdnFHgOa/jyyxC/C4OO5bKejNiPP6OiEVl7VRO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ObvP1Gpa; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1749671793; c=relaxed/simple;
+	bh=K+B8CuXm/VmQ/C6kU8hO0Yo82Qfv+13GMs82YCd1Rfs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X4x9aAhzFp7WrTd6Ue9i/JXJwpdPGiM2fO6V8GLrvLjghw9qQDBo4obZCtZYpS0bHyyiHQPlTg220uN0LNSl6B/1JR4/htaPsGaHbOSnhOJ/aHttjq8cSdbtVtUgYZEn81aHZQ9co63rGXc8guprZxQ96IDWQkg3G9V2OkzVmso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DQYYHQ81; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-311d067b3faso294640a91.1
-        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 12:37:53 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4a5ac8fae12so97941cf.0
+        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 12:56:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749670673; x=1750275473; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XK9lqRMcWAUTITJdYLggpl8SfH/tOpT9RcjWLw+AB2Q=;
-        b=ObvP1GpaEi33odre/qgjefZnWCfwl7drY/e0Aoq9/jZqhUKISn7m7cye97xWuC8nZq
-         LrS5RkND1V8WFI5Sy8vU/yvdu2LkH6r37+ZjPJmbBl9LquOQChfmpDz/+bn/FpIAFSY1
-         qnGxd5KqXAZ3TxHkFX8dG9+KOMX+ZY8106Gxgcd3QT6xAFVlWEen2oVsRMGYRBeYehMm
-         z+3Gy80UAdH/udCeoZuYZlsMbobF3PMvFV6gej5LBHBhxZt4X/q5lWFJDSeq6lnwK6nf
-         KsUQo9NHiNTvjN+mDxM8lujnJfKaheoEqYL+5Klp6h/IHhzOeLjKtaBOyL3bBXP/P8p6
-         E0UQ==
+        d=google.com; s=20230601; t=1749671790; x=1750276590; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J3K+mcHKGGXBkrel0kGvelLSyBHoHEmSGPV+Mb/f88g=;
+        b=DQYYHQ81SJJElyE/5owBRXzxGNcFViJdyXbb6W8iBaozrteueY7/uA5Mg8pa92Sf+T
+         DLDfMSAuF1qV954noaBWDHq4gz8Eit4nnUvepOiYBPFhiDvpfhhEJb1PwN04XsuzZX0Q
+         X0y9Vy+mDp/2AaChh538cR1MnKasLFNDNJ86adqCZvltAX3NGHg1+w7VCP+LIjwoEuhl
+         pLcy7R1oO67t/Oz0DRVa3wIH6TGJP4DWVoar2CQiepX2ySw8WEBlZJkyAiN97sdIPobg
+         EUhIzLRfK+tM/oQJZDV85Un0ZUqkFXFfF3JJmyw24VUwOJWZxybr6iGo8m3kuubB3ONe
+         YKSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749670673; x=1750275473;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=XK9lqRMcWAUTITJdYLggpl8SfH/tOpT9RcjWLw+AB2Q=;
-        b=bFy5hdgA3uA0lb4Bgu7IrHCKwiTAjuCVgKFanxeGItTZ/s9tw5cJMkXAl8Wx2Ie5CW
-         /heCccJD04m7Dbvp9no66w4ena38DSrtDckbzPJo/6lu5pBUksc+3XShd7+ZLlYg4XCW
-         xUKyIgFeYtbEoFnMnN9oTQ7ny8SEDkovylhDDTMifa/IrqNSfpTniznZo/Yc5KviWR06
-         tADTSrEwbMzT5pKYQKqZP+doH/pPcpewkHCDwR36dLZGGDejfcvqy+cXo6JvlOBYl7mC
-         ZFOHujam0qAaXLlqlfZ+l5TjwJ7PWV6YDgtzp2kY9TfP89ETjYuj0fY9A8lk0riG0MER
-         1p6A==
-X-Forwarded-Encrypted: i=1; AJvYcCUeHsOf5dwSBFd644CjhP3XJN2WBuiWQiU3140vgB/Kkdt1yFmC9wT9rkNzciosTpvm1W4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPvvP6NuIZZd55YcT6vkkW58aAxZ7oCcLzlI7UwmyRaCqubE05
-	DXjAZFjjuRXAOya1n3DsHUTcknWQs+saSrj8RriIpx5qGSTpEXdyO+RJoUTKRUjspMfZSzGiiF0
-	ucklu+w==
-X-Google-Smtp-Source: AGHT+IFyOcDkrlCmf2wied79kN38rbCK3Hf3h7YdTs4dsyPIQs1bPUiiPwsRPA4+oQMF1pQQSH/rZhX1K6M=
-X-Received: from pjbeu6.prod.google.com ([2002:a17:90a:f946:b0:311:c20d:676d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d647:b0:311:ad7f:329f
- with SMTP id 98e67ed59e1d1-313af231f38mr5899772a91.31.1749670673167; Wed, 11
- Jun 2025 12:37:53 -0700 (PDT)
-Date: Wed, 11 Jun 2025 12:37:51 -0700
-In-Reply-To: <5fee2f3b-03de-442b-acaf-4591638c8bb5@redhat.com>
+        d=1e100.net; s=20230601; t=1749671790; x=1750276590;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J3K+mcHKGGXBkrel0kGvelLSyBHoHEmSGPV+Mb/f88g=;
+        b=uDc0W0V5ehiFbTduKaT3aVJefCbtsDrdbOGfucO8veZLDU8sKV94iE1iz7hcL2TL0m
+         /X0i8PskevHHgloP4oEPQt8BH1FEzJhzrZwV7TG0+MI7im9BnGzrGvh9DYHo8VfbLPd7
+         kRrYfFfA7uhcyT2DD+j7H4lqZvr4dWhacK/P3gPDdvyxBCzG2Ts1PlikNLwpoW75bTJu
+         x5sWVQiWyMAnKV5rKgwglzNVi6XxQSSevkLMdY9C9OxcHXfrMwgfLIvSVZaX/KEI9Tp2
+         piu/TqlxTrvz2vVIpaU4wRM8jjqhy1g30grcTpxT+wsQDV/EEsGplryr4ETwcMzqVl5V
+         W6vw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxfMn0HS/1oYx2fWSNnlV169gM/6hZ2ET56u3VnJWBHa3zm/jCPd7RmHGDqLGggSk/aL0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlkqaZwAxCbQBHlKNsGqir7Mf02CGWmazT6rCn0YhR8aZ+edJf
+	1Mx6d7i8wmuj2qlZKF+gDujgqvsgKGyZbafwoECT4RzmE+7OYYSSgwYJd0WAKQlBDBMhGpsGXn1
+	DqpdZA7SzihPGDC3EMPHabVsHvD9u3c/MUesxU8Mb
+X-Gm-Gg: ASbGncsyGiaQ1B5CuiqTPcfnttPt9WGjDnN6WwNRtAWGlphKuUvikEvlB7JvoQvg/A0
+	reiLiTVeUa/FvL7SHea6i2JTQvG0CFBgX6u99cmJ/3cDR+ndDYVcIKukDM4N6HI5DQpuTgJ7vCH
+	6LBRBL3bdS3CPrSHC8y1bZVZGfpvn1EhWeheU4vCZ4QlTXEVjD4++2pt12ED6LqVSyHcc0l7Trc
+	MQwhHmyw0IVzA==
+X-Google-Smtp-Source: AGHT+IHnw6Rim9zVk16rHZURinDBa6Etb/jZuDGiu5RYkmCwknCXOrl2MzqjpJZgvqAdKsXB34ec6Rn0119SwGKrC9w=
+X-Received: by 2002:a05:622a:204:b0:4a6:907e:61ca with SMTP id
+ d75a77b69052e-4a724289264mr321151cf.12.1749671789994; Wed, 11 Jun 2025
+ 12:56:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250611001018.2179964-1-xiaoyao.li@intel.com>
- <aEnGjQE3AmPB3wxk@google.com> <5fee2f3b-03de-442b-acaf-4591638c8bb5@redhat.com>
-Message-ID: <aEnbDya7OOXdO85q@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Embed direct bits into gpa for KVM_PRE_FAULT_MEMORY
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, rick.p.edgecombe@intel.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, yan.y.zhao@intel.com, reinette.chatre@intel.com, 
-	kai.huang@intel.com, adrian.hunter@intel.com, isaku.yamahata@intel.com, 
-	Binbin Wu <binbin.wu@linux.intel.com>, tony.lindgren@linux.intel.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20250523095322.88774-1-chao.gao@intel.com>
+In-Reply-To: <20250523095322.88774-1-chao.gao@intel.com>
+From: Sagi Shahar <sagis@google.com>
+Date: Wed, 11 Jun 2025 14:56:19 -0500
+X-Gm-Features: AX0GCFunCmVYS_s1OapPfIzQoyibyE9XgRJCoT6E6oUhPxQJfbCODoBK-DLB6po
+Message-ID: <CAAhR5DF2PhB-usQBzWuUZAd=y8tWursMOnBOzNiGEBAnkqxutA@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/20] TD-Preserving updates
+To: Chao Gao <chao.gao@intel.com>
+Cc: linux-coco@lists.linux.dev, x86@kernel.org, kvm@vger.kernel.org, 
+	seanjc@google.com, pbonzini@redhat.com, eddie.dong@intel.com, 
+	kirill.shutemov@intel.com, dave.hansen@intel.com, dan.j.williams@intel.com, 
+	kai.huang@intel.com, isaku.yamahata@intel.com, elena.reshetova@intel.com, 
+	rick.p.edgecombe@intel.com, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Ingo Molnar <mingo@redhat.com>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, 
+	linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 11, 2025, Paolo Bonzini wrote:
-> On Wed, Jun 11, 2025 at 8:10=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > > +     direct_bits =3D 0;
-> > >       if (kvm_arch_has_private_mem(vcpu->kvm) &&
-> > >           kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(range->gpa)))
-> > >               error_code |=3D PFERR_PRIVATE_ACCESS;
-> > > +     else
-> > > +             direct_bits =3D gfn_to_gpa(kvm_gfn_direct_bits(vcpu->kv=
-m));
-> >=20
-> > Eww.  It's bad enough that TDX bleeds it's mirror needs into common MMU=
- code,
-> > but stuffing vendor specific GPA bits in common code goes too far.  Act=
-ually,
-> > all of this goes too far.  There's zero reason any code outside of TDX =
-needs to
-> > *explicitly* care whether mirrors or "direct" MMUs have mandatory gfn b=
-its.
-> >=20
-> > Back to the main topic, KVM needs to have a single source of truth when=
- it comes
-> > to whether a fault is private and thus mirrored (or not).  Common KVM n=
-eeds to be
-> > aware of aliased GFN bits, but absolute nothing outside of TDX (includi=
-ng common
-> > VMX code) should be aware the mirror vs. "direct" (I hate that terminol=
-ogy; KVM
-> > has far, far too much history and baggage with "direct") is tied to the=
- existence
-> > and polarity of aliased GFN bits.
-> >=20
-> > To detect a mirror fault:
-> >=20
-> >   static inline bool kvm_is_mirror_fault(struct kvm *kvm, u64 error_cod=
-e)
-> >   {
-> >         return kvm_has_mirrored_tdp(kvm) &&
-> >                error_code & PFERR_PRIVATE_ACCESS;
-> >   }
-> >=20
-> > And for TDX, it should darn well explicitly track the shared GPA mask:
-> >=20
-> >   static bool tdx_is_private_gpa(struct kvm *kvm, gpa_t gpa)
-> >   {
-> >         /* For TDX the direct mask is the shared mask. */
-> >         return !(gpa & to_kvm_tdx(kvm)->shared_gpa_mask);
-> >   }
->=20
-> My fault - this is more similar, at least in spirit, to what
-> Yan and Xiaoyao had tested earlier:
->=20
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-> index 52acf99d40a0..209103bf0f30 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> @@ -48,7 +48,7 @@ static inline enum kvm_tdp_mmu_root_types
->  static inline struct kvm_mmu_page *tdp_mmu_get_root_for_fault(struct kvm=
-_vcpu *vcpu,
->  							      struct kvm_page_fault *fault)
->  {
-> -	if (unlikely(!kvm_is_addr_direct(vcpu->kvm, fault->addr)))
-> +	if (unlikely(fault->is_private))
->  		return root_to_sp(vcpu->arch.mmu->mirror_root_hpa);
->=20
-> and I instead proposed the version that you hate with such ardor.
->=20
-> My reasoning was that I preferred to have the pre-fault scenario "look li=
-ke"
-> what you get while the VM runs.
+On Fri, May 23, 2025 at 4:53=E2=80=AFAM Chao Gao <chao.gao@intel.com> wrote=
+:
+>
+> Hi Reviewers,
+>
+> This series adds support for runtime TDX module updates that preserve
+> running TDX guests (a.k.a, TD-Preserving updates). The goal is to gather
+> feedback on the feature design. Please pay attention to the following ite=
+ms:
+>
+> 1. TD-Preserving updates are done in stop_machine() context. it copy-past=
+es
+>    part of multi_cpu_stop() to guarantee step-locked progress on all CPUs=
+.
+>    But, there are a few differences between them. I am wondering whether
+>    these differences have reached a point where abstracting a common
+>    function might do more harm than good. See more details in patch 10.
+>
+> 2. P-SEAMLDR seamcalls (specificially SEAMRET from P-SEAMLDR) clear curre=
+nt
+>    VMCS pointers, which may disrupt KVM. To prevent VMX instructions in I=
+RQ
+>    context from encountering NULL current-VMCS pointers, P-SEAMLDR
+>    seamcalls are called with IRQ disabled. I'm uncertain if NMIs could
+>    cause a problem, but I believe they won't. See more information in pat=
+ch 3.
+>
+> 3. Two helpers, cpu_vmcs_load() and cpu_vmcs_store(), are added in patch =
+3
+>    to save and restore the current VMCS. KVM has a variant of cpu_vmcs_lo=
+ad(),
+>    i.e., vmcs_load(). Extracting KVM's version would cause a lot of code
+>    churn, and I don't think that can be justified for reducing ~16 LoC
+>    duplication. Please let me know if you disagree.
+>
+> =3D=3D Background =3D=3D
+>
+> Intel TDX isolates Trusted Domains (TDs), or confidential guests, from th=
+e
+> host. A key component of Intel TDX is the TDX module, which enforces
+> security policies to protect the memory and CPU states of TDs from the
+> host. However, the TDX module is software that require updates, it is not
+> device firmware in the typical sense.
+>
+> =3D=3D Problems =3D=3D
+>
+> Currently, the TDX module is loaded by the BIOS at boot time, and the onl=
+y
+> way to update it is through a reboot, which results in significant system
+> downtime. Users expect the TDX module to be updatable at runtime without
+> disrupting TDX guests.
+>
+> =3D=3D Solution =3D=3D
+>
+> On TDX platforms, P-SEAMLDR[1] is a component within the protected SEAM
+> range. It is loaded by the BIOS and provides the host with functions to
+> install a TDX module at runtime.
+>
+> Implement a TDX Module update facility via the fw_upload mechanism. Given
+> that there is variability in which module update to load based on feature=
+s,
+> fix levels, and potentially reloading the same version for error recovery
+> scenarios, the explicit userspace chosen payload flexibility of fw_upload
+> is attractive.
+>
+> This design allows the kernel to accept a bitstream instead of loading a
+> named file from the filesystem, as the module selection and policy
+> enforcement for TDX modules are quite complex (see more in patch 8). By
+> doing so, much of this complexity is shifted out of the kernel. The kerne=
+l
+> need to expose information, such as the TDX module version, to userspace.
+> The userspace tool must understand the TDX module versioning scheme and
+> update policy to select the appropriate TDX module (see "TDX Module
+> Versioning" below).
+>
+> In the unlikely event the update fails, for example userspace picks an
+> incompatible update image, or the image is otherwise corrupted, all TDs
+> will experience SEAMCALL failures and be killed. The recovery of TD
+> operation from that event requires a reboot.
+>
+> Given there is no mechanism to quiesce SEAMCALLs, the TDs themselves must
+> pause execution over an update. The most straightforward way to meet the
+> 'pause TDs while update executes' constraint is to run the update in
+> stop_machine() context. All other evaluated solutions export more
+> complexity to KVM, or exports more fragility to userspace.
+>
+> =3D=3D How to test this series =3D=3D
+>
+>  # git clone https://github.com/intel/tdx-module-binaries
+>  # cd tdx-module-binaries
+>  # python version_select_and_load.py --update
+>
+>
+> This series is based on Sean's kvm-x86/next branch
+>
+>   https://github.com/kvm-x86/linux.git next
+>
+>
+> =3D=3D Other information relevant to TD-Preserving updates =3D=3D
+>
+> =3D=3D=3D TDX module versioning =3D=3D=3D
+>
+> Each TDX module is assigned a version number x.y.z, where x represents th=
+e
+> "major" version, y the "minor" version, and z the "update" version.
+>
+> TD-Preserving updates are restricted to Z-stream releases.
+>
+> Note that Z-stream releases do not necessarily guarantee compatibility. A
+> new release may not be compatible with all previous versions. To address =
+this,
+> Intel provides a separate file containing compatibility information, whic=
+h
+> specifies the minimum module version required for a particular update. Th=
+is
+> information is referenced by the tool to determine if two modules are
+> compatible.
+>
+> =3D=3D=3D TCB Stability =3D=3D=3D
+>
+> Updates change the TCB as viewed by attestation reports. In TDX there is =
+a
+> distinction between launch-time version and current version where TD-pres=
+erving
+> updates cause that latter version number to change, subject to Z-stream
+> constraints. The need for runtime updates and the implications of that ve=
+rsion
+> change in the attestation was previously discussed in [3].
+>
+> =3D=3D=3D TDX Module Distribution Model =3D=3D=3D
+>
+> At a high level, Intel publishes all TDX modules on the github [2], along=
+ with
+> a mapping_file.json which documents the compatibility information about e=
+ach
+> TDX module and a script to install the TDX module. OS vendors can package
+> these modules and distribute them. Administrators install the package and
+> use the script to select the appropriate TDX module and install it via th=
+e
+> interfaces exposed by this series.
+>
+> [1]: https://cdrdv2.intel.com/v1/dl/getContent/733584
+> [2]: https://github.com/intel/tdx-module-binaries
+> [3]: https://lore.kernel.org/all/5d1da767-491b-4077-b472-2cc3d73246d6@ama=
+zon.com/
+>
+>
+> Chao Gao (20):
+>   x86/virt/tdx: Print SEAMCALL leaf numbers in decimal
+>   x86/virt/tdx: Prepare to support P-SEAMLDR SEAMCALLs
+>   x86/virt/seamldr: Introduce a wrapper for P-SEAMLDR SEAMCALLs
+>   x86/virt/tdx: Introduce a "tdx" subsystem and "tsm" device
+>   x86/virt/tdx: Export tdx module attributes via sysfs
+>   x86/virt/seamldr: Add a helper to read P-SEAMLDR information
+>   x86/virt/tdx: Expose SEAMLDR information via sysfs
+>   x86/virt/seamldr: Implement FW_UPLOAD sysfs ABI for TD-Preserving
+>     Updates
+>   x86/virt/seamldr: Allocate and populate a module update request
+>   x86/virt/seamldr: Introduce skeleton for TD-Preserving updates
+>   x86/virt/seamldr: Abort updates if errors occurred midway
+>   x86/virt/seamldr: Shut down the current TDX module
+>   x86/virt/tdx: Reset software states after TDX module shutdown
+>   x86/virt/seamldr: Install a new TDX module
+>   x86/virt/seamldr: Handle TD-Preserving update failures
+>   x86/virt/seamldr: Do TDX cpu init after updates
+>   x86/virt/tdx: Establish contexts for the new module
+>   x86/virt/tdx: Update tdx_sysinfo and check features post-update
+>   x86/virt/seamldr: Verify availability of slots for TD-Preserving
+>     updates
+>   x86/virt/seamldr: Enable TD-Preserving Updates
+>
+>  Documentation/ABI/testing/sysfs-devices-tdx |  32 ++
+>  MAINTAINERS                                 |   1 +
+>  arch/x86/Kconfig                            |  12 +
+>  arch/x86/include/asm/tdx.h                  |  20 +-
+>  arch/x86/include/asm/tdx_global_metadata.h  |  12 +
+>  arch/x86/virt/vmx/tdx/Makefile              |   1 +
+>  arch/x86/virt/vmx/tdx/seamldr.c             | 443 ++++++++++++++++++++
+>  arch/x86/virt/vmx/tdx/seamldr.h             |  16 +
+>  arch/x86/virt/vmx/tdx/tdx.c                 | 248 ++++++++++-
+>  arch/x86/virt/vmx/tdx/tdx.h                 |  12 +
+>  arch/x86/virt/vmx/tdx/tdx_global_metadata.c |  29 ++
+>  arch/x86/virt/vmx/vmx.h                     |  40 ++
+>  12 files changed, 862 insertions(+), 4 deletions(-)
+>  create mode 100644 Documentation/ABI/testing/sysfs-devices-tdx
+>  create mode 100644 arch/x86/virt/vmx/tdx/seamldr.c
+>  create mode 100644 arch/x86/virt/vmx/tdx/seamldr.h
+>  create mode 100644 arch/x86/virt/vmx/vmx.h
+>
+> --
+> 2.47.1
+>
+>
 
-Yes, 100% agreed.  I forgot fault->addr has the unmodified GPA, whereas fau=
-lt->gfn
-has the unaliased GFN. :-/
+Tested-by: Sagi Shahar <sagis@google.com>
 
-> > Outside of TDX, detecting mirrors, and anti-aliasing logic, the only us=
-e of
-> > kvm_gfn_direct_bits() is to constrain TDP MMU walks to the appropriate =
-gfn range.
-> > And for that, we can simply use kvm_mmu_page.gfn, with a kvm_x86_ops ho=
-ok to get
-> > the TDP MMU root GFN (root allocation is a slow path, the CALL+RET is a=
- non-issue).
-> >=20
-> > Compile tested only, and obviously needs to be split into multiple patc=
-hes.
->=20
-> Also obviously needs to be delayed to 6.17, since a working fix can be a
-> one line change. :)
-
-Ya, definitely.
-
-> (Plus your kvm_is_gfn_alias() test which should be
-> included anyway and independently).
->=20
-> What do you hate less between Yan's idea above and this patch? Just tell =
-me
-> and I'll handle posting v2.
-
-As much as it pains me, this version :-(
-
-There are other things that rely on the GPA being "correct", e.g. walking t=
-he
-SPTEs in fast_page_fault().  So for a 6.16 fix, this is the safer and more =
-complete
-option.
-
-Ugh, and the whole tdp_mmu_get_root_for_fault() handling is broken.
-is_page_fault_stale() only looks at mmu->root.hpa, i.e. could theoretically=
- blow
-up if the shared root is somehow valid but the mirror root is not.  Probabl=
-y can't
-happen in practice, but it's ugly.
-
-Oof, and I've no idea what kvm_tdp_mmu_fast_pf_get_last_sptep() is doing.  =
-It
-says:
-
-	/* Fast pf is not supported for mirrored roots  */
-
-but I don't see anything that actually enforces that.
-
-So tdp_mmu_get_root_for_fault() should be a generic kvm_mmu_get_root_for_fa=
-ult(),
-and tdp_mmu_get_root() simply shouldn't exist.
-
-As for stuffing the correct GPA, with kvm_mmu_get_root_for_fault() being ge=
-neric
-and the root holding its gfn modifier, kvm_tdp_map_page() can simply OR in =
-the
-appropriate gfn (and maybe WARN if there's overlap?).
-
-Something like so (on top of the other untested blob):
-
------
- arch/x86/kvm/mmu/mmu.c     |  8 ++++++--
- arch/x86/kvm/mmu/spte.h    | 15 +++++++++++++++
- arch/x86/kvm/mmu/tdp_mmu.c | 10 +++++-----
- arch/x86/kvm/mmu/tdp_mmu.h | 21 ++-------------------
- 4 files changed, 28 insertions(+), 26 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 0228d49ac363..3bcc8d4848bd 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3589,7 +3589,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, str=
-uct kvm_page_fault *fault)
- 		u64 new_spte;
-=20
- 		if (tdp_mmu_enabled)
--			sptep =3D kvm_tdp_mmu_fast_pf_get_last_sptep(vcpu, fault->gfn, &spte);
-+			sptep =3D kvm_tdp_mmu_fast_pf_get_last_sptep(vcpu, fault, &spte);
- 		else
- 			sptep =3D fast_pf_get_last_sptep(vcpu, fault->addr, &spte);
-=20
-@@ -4682,7 +4682,7 @@ static int kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
- static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
- 				struct kvm_page_fault *fault)
- {
--	struct kvm_mmu_page *sp =3D root_to_sp(vcpu->arch.mmu->root.hpa);
-+	struct kvm_mmu_page *sp =3D kvm_mmu_get_root_for_fault(vcpu, fault);
-=20
- 	/* Special roots, e.g. pae_root, are not backed by shadow pages. */
- 	if (sp && is_obsolete_sp(vcpu->kvm, sp))
-@@ -4849,6 +4849,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct =
-kvm_page_fault *fault)
-=20
- int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code, u8 =
-*level)
- {
-+	struct kvm_mmu_page *root =3D __kvm_mmu_get_root_for_fault(vcpu, error_co=
-de);
- 	int r;
-=20
- 	/*
-@@ -4858,6 +4859,9 @@ int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa=
-, u64 error_code, u8 *level
- 	if (vcpu->arch.mmu->page_fault !=3D kvm_tdp_page_fault)
- 		return -EOPNOTSUPP;
-=20
-+	/* Comment goes here. */
-+	gpa |=3D gfn_to_gpa(root->gfn);
-+
- 	do {
- 		if (signal_pending(current))
- 			return -EINTR;
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 1e94f081bdaf..68e7979ac1fe 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -280,6 +280,21 @@ static inline bool is_mirror_sptep(tdp_ptep_t sptep)
- 	return is_mirror_sp(sptep_to_sp(rcu_dereference(sptep)));
- }
-=20
-+static inline struct kvm_mmu_page *__kvm_mmu_get_root_for_fault(struct kvm=
-_vcpu *vcpu,
-+								u64 error_code)
-+{
-+	if (unlikely(kvm_is_mirror_fault(vcpu->kvm, error_code)))
-+		return root_to_sp(vcpu->arch.mmu->mirror_root_hpa);
-+
-+	return root_to_sp(vcpu->arch.mmu->root.hpa);
-+}
-+
-+static inline struct kvm_mmu_page *kvm_mmu_get_root_for_fault(struct kvm_v=
-cpu *vcpu,
-+							      struct kvm_page_fault *fault)
-+{
-+	return __kvm_mmu_get_root_for_fault(vcpu, fault->error_code);
-+}
-+
- static inline bool is_mmio_spte(struct kvm *kvm, u64 spte)
- {
- 	return (spte & shadow_mmio_mask) =3D=3D kvm->arch.shadow_mmio_value &&
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 15daf4353ccc..ecfffc6fbb73 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1240,7 +1240,7 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, s=
-truct tdp_iter *iter,
-  */
- int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- {
--	struct kvm_mmu_page *root =3D tdp_mmu_get_root_for_fault(vcpu, fault);
-+	struct kvm_mmu_page *root =3D kvm_mmu_get_root_for_fault(vcpu, fault);
- 	struct kvm *kvm =3D vcpu->kvm;
- 	struct tdp_iter iter;
- 	struct kvm_mmu_page *sp;
-@@ -1967,15 +1967,15 @@ EXPORT_SYMBOL_GPL(kvm_tdp_mmu_gpa_is_mapped);
-  *
-  * WARNING: This function is only intended to be called during fast_page_f=
-ault.
-  */
--u64 *kvm_tdp_mmu_fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, gfn_t gfn,
-+u64 *kvm_tdp_mmu_fast_pf_get_last_sptep(struct kvm_vcpu *vcpu,
-+					struct kvm_page_fault *fault,
- 					u64 *spte)
- {
--	/* Fast pf is not supported for mirrored roots  */
--	struct kvm_mmu_page *root =3D tdp_mmu_get_root(vcpu, KVM_DIRECT_ROOTS);
-+	struct kvm_mmu_page *root =3D kvm_mmu_get_root_for_fault(vcpu, fault);
- 	struct tdp_iter iter;
- 	tdp_ptep_t sptep =3D NULL;
-=20
--	for_each_tdp_pte(iter, vcpu->kvm, root, gfn, gfn + 1) {
-+	for_each_tdp_pte(iter, vcpu->kvm, root, fault->gfn, fault->gfn + 1) {
- 		*spte =3D iter.old_spte;
- 		sptep =3D iter.sptep;
- 	}
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 397309dfc73f..f75888474b73 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -45,24 +45,6 @@ static inline enum kvm_tdp_mmu_root_types kvm_gfn_range_=
-filter_to_root_types(str
- 	return ret;
- }
-=20
--static inline struct kvm_mmu_page *tdp_mmu_get_root_for_fault(struct kvm_v=
-cpu *vcpu,
--							      struct kvm_page_fault *fault)
--{
--	if (unlikely(kvm_is_mirror_fault(vcpu->kvm, fault->error_code)))
--		return root_to_sp(vcpu->arch.mmu->mirror_root_hpa);
--
--	return root_to_sp(vcpu->arch.mmu->root.hpa);
--}
--
--static inline struct kvm_mmu_page *tdp_mmu_get_root(struct kvm_vcpu *vcpu,
--						    enum kvm_tdp_mmu_root_types type)
--{
--	if (unlikely(type =3D=3D KVM_MIRROR_ROOTS))
--		return root_to_sp(vcpu->arch.mmu->mirror_root_hpa);
--
--	return root_to_sp(vcpu->arch.mmu->root.hpa);
--}
--
- bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end, bool f=
-lush);
- bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
- void kvm_tdp_mmu_zap_all(struct kvm *kvm);
-@@ -109,7 +91,8 @@ static inline void kvm_tdp_mmu_walk_lockless_end(void)
-=20
- int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
- 			 int *root_level);
--u64 *kvm_tdp_mmu_fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, gfn_t gfn,
-+u64 *kvm_tdp_mmu_fast_pf_get_last_sptep(struct kvm_vcpu *vcpu,
-+					struct kvm_page_fault *fault,
- 					u64 *spte);
-=20
- #ifdef CONFIG_X86_64
-
-base-commit: 1abe48190d919c44e69aae17beb9e55d83db2303
---=20
+I was able to update the module while several VMs were running on the
+machine using a modified version of the tdx selftests. Measuring the
+update time shows less than 10ms for update regardless of the number
+of VMs running.
 
