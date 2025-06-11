@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-48956-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48957-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87C76AD48C0
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 04:17:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1671CAD48C2
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 04:18:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8D413A2E32
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 02:17:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4348A189E6A7
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 02:18:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B407A183098;
-	Wed, 11 Jun 2025 02:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC98917A2EE;
+	Wed, 11 Jun 2025 02:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QWTckdSf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IvOBX4R1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C8733E7;
-	Wed, 11 Jun 2025 02:16:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B557EEA8;
+	Wed, 11 Jun 2025 02:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749608194; cv=none; b=f6vTNve6h9oHitwpZyvURMaWPAWbnPH8XpvlQ1ZCCKy33ob1AAPP1wnFa5WgSd7GpOVIcP/SmUoRd9daFzxfD257zCwbu7sByg+qzEw4WoMlhyx7tO/ZDzUsxTWNdhGSFPgq4QsF+2Sukf3TavjX6lzYCfapOvQg2GHLE7lTUAY=
+	t=1749608283; cv=none; b=klv+qylV3R8O3Emg3cUhEkGDcPrB/7s2bOlKxbPN+goFOTdptwsS4iIirK78RkjwKk+5hghq436JeOircshw7C/65cl5owAQxFUtzXb0rJUovFWMASfLyK2mT5e9FsQplH4m+qRex7ek3+Kg28abHFmOo7VcEXBJNITJTi0YzZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749608194; c=relaxed/simple;
-	bh=mTHqiAgZeMLtBCLvmwMu/fW5j0K8s3oC04d1lP7v9t0=;
+	s=arc-20240116; t=1749608283; c=relaxed/simple;
+	bh=nlsM+8sEbyXEDvl2JW+7GpNSPVkWeolTmnKE44gtbXQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u3qLv8oJT0i5Dca65psBq/a105jpuf1bTZ8Chia4/tCGxCO8RpMEZrRM0SSXpYvRRuDGMM3UghyiD/mWC2NR7iMETuHDPxONqq4LLqgC9EtrVk44hRaqzwUKoKMlJUxSqu88fuFGIQHSsVjscOr4E877+s9Vxyiu3cMrWKrsXYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QWTckdSf; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	 In-Reply-To:Content-Type; b=ud373nZLCFr3PH8I7f2OM28ckVJBuL1+ypuVOWoq9YZWf4T2yG9BhrJDWbXWm4cuPULlhBSIXBpaZgOgYDT5OnWK37oy9HByzDlIwj1FSO3JuZRhY+j7Vp1z81DmZoWXf3t1pgQoZ01e0k1OhxQvvNBMsa7B+KlvNHxFU/YTpEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IvOBX4R1; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749608194; x=1781144194;
+  t=1749608281; x=1781144281;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=mTHqiAgZeMLtBCLvmwMu/fW5j0K8s3oC04d1lP7v9t0=;
-  b=QWTckdSf0+zTpXSMoMDw4yCt5FYXUtYcnaFuHYMwmBvqgj/lJGxMUmio
-   jASq30uNtXczfZZJ4bAjz0QQqrq7VUETs4z0wVKaU74uOTCWkqeL9wRWa
-   eBDjiiadtpgVgI6EQ2RxjVkPhw9XFo7cHRRi74ViditLobbL9p4zDV/6g
-   JtxAmuhY9LzthwEQuGkQzFQtROGc+Y2zThgJJtxHXa4BMl2elU4v8G2KW
-   Y55KiFwqDQhHnLiSaz1yPfHBL9uaD+7/Wi2+2YkuXUCAcnDsoXEa3aH+k
-   oXI0I6uQ0E7kdNPg5hhCfeZvckBNni3ET+LVyMecyUS85Q24jZ742JrQv
-   w==;
-X-CSE-ConnectionGUID: HJ3hl2rVSAOIdjyrCVqoEg==
-X-CSE-MsgGUID: 7pSLSYHxT/inQLw2NBgb/Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="62354193"
+  bh=nlsM+8sEbyXEDvl2JW+7GpNSPVkWeolTmnKE44gtbXQ=;
+  b=IvOBX4R12QrrDPZpD9G3/GClgeuG6l4CCYsjluv55MssPwn0/5dxvGzW
+   of3YCPGTE0ZahM3udMaNTHD++tD633UiPebCOIr8nrt/FKnXCPWt0LB2s
+   T7PZCS6jrJcIngDJnlEoJENat/72w5mTLc5yhwobCeHuDQODu7KyeqTxB
+   9ILgK4nnCMb1NXbYxWvdBE2TdPcCnLGvDDX+MD1rfIXpWSyt8g5piRt0h
+   Z2uhVfAgdhICPpf0BDpGUjorsdwKBVFmwl4E1dVZQ9XEM932j6Jmrx2s+
+   uassgJq1XFaoo472VEpqr6htL7NqNJUfc+4D0VPvi96OkSpmfrF1ZIddy
+   A==;
+X-CSE-ConnectionGUID: NUAeLOo1Tual47QNu1qQBw==
+X-CSE-MsgGUID: 3Hs6Fq3ISXOu4Px8p1Kg1w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="51839487"
 X-IronPort-AV: E=Sophos;i="6.16,226,1744095600"; 
-   d="scan'208";a="62354193"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 19:16:33 -0700
-X-CSE-ConnectionGUID: /DF9WnH4SEqSye6N3INR8g==
-X-CSE-MsgGUID: GU6JoQ0mRr6Tmd9QnwaJ2g==
+   d="scan'208";a="51839487"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 19:18:01 -0700
+X-CSE-ConnectionGUID: hnr0ZpFLSQm18fH1hUjmiQ==
+X-CSE-MsgGUID: W+6kwMfGRomCDlSD+x5EcQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,226,1744095600"; 
-   d="scan'208";a="146940889"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.144]) ([10.124.245.144])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 19:16:30 -0700
-Message-ID: <b70b6803-b12b-420f-8a96-8cb0936773da@linux.intel.com>
-Date: Wed, 11 Jun 2025 10:16:28 +0800
+   d="scan'208";a="146921495"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2025 19:17:56 -0700
+Message-ID: <7f17ca58-5522-45de-9dae-6a11b1041317@intel.com>
+Date: Wed, 11 Jun 2025 10:17:53 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,76 +67,95 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 06/32] KVM: SVM: Kill the VM instead of the host if MSR
- interception is buggy
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Chao Gao <chao.gao@intel.com>, Borislav Petkov <bp@alien8.de>,
- Xin Li <xin@zytor.com>, Francesco Lavra <francescolavra.fl@gmail.com>,
- Manali Shukla <Manali.Shukla@amd.com>
-References: <20250610225737.156318-1-seanjc@google.com>
- <20250610225737.156318-7-seanjc@google.com>
+Subject: Re: [RFC PATCH 3/4] KVM: TDX: Exit to userspace for GetTdVmCallInfo
+To: Binbin Wu <binbin.wu@linux.intel.com>, rick.p.edgecombe@intel.com,
+ pbonzini@redhat.com, seanjc@google.com
+Cc: kvm@vger.kernel.org, kai.huang@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, tony.lindgren@intel.com,
+ isaku.yamahata@intel.com, yan.y.zhao@intel.com,
+ mikko.ylinen@linux.intel.com, linux-kernel@vger.kernel.org,
+ kirill.shutemov@intel.com, jiewen.yao@intel.com
+References: <20250610021422.1214715-1-binbin.wu@linux.intel.com>
+ <20250610021422.1214715-4-binbin.wu@linux.intel.com>
+ <ff5fd57a-9522-448c-9ab6-e0006cb6b2ee@intel.com>
+ <671f2439-1101-4729-b206-4f328dc2d319@linux.intel.com>
 Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250610225737.156318-7-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <671f2439-1101-4729-b206-4f328dc2d319@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+On 6/11/2025 9:37 AM, Binbin Wu wrote:
+> 
+> 
+> On 6/10/2025 5:16 PM, Xiaoyao Li wrote:
+>> On 6/10/2025 10:14 AM, Binbin Wu wrote:
+>>> Exit to userspace for TDG.VP.VMCALL<GetTdVmCallInfo> via a new KVM exit
+>>> reason to allow userspace to provide information about the support of
+>>> TDVMCALLs when r12 is 1 for the TDVMCALLs beyond the GHCI base API.
+>>>
+>>> GHCI spec defines the GHCI base TDVMCALLs: <GetTdVmCallInfo>, <MapGPA>,
+>>> <ReportFatalError>, <Instruction.CPUID>, <#VE.RequestMMIO>,
+>>> <Instruction.HLT>, <Instruction.IO>, <Instruction.RDMSR> and
+>>> <Instruction.WRMSR>. They must be supported by VMM to support TDX 
+>>> guests.
+>>>
+>>> For GetTdVmCallInfo
+>>> - When leaf (r12) to enumerate TDVMCALL functionality is set to 0,
+>>>    successful execution indicates all GHCI base TDVMCALLs listed 
+>>> above are
+>>>    supported.
+>>>
+>>>    Update the KVM TDX document with the set of the GHCI base APIs.
+>>>
+>>> - When leaf (r12) to enumerate TDVMCALL functionality is set to 1, it
+>>>    indicates the TDX guest is querying the supported TDVMCALLs beyond
+>>>    the GHCI base TDVMCALLs.
+>>>    Exit to userspace to let userspace set the TDVMCALL sub-function 
+>>> bit(s)
+>>>    accordingly to the leaf outputs.  KVM could set the TDVMCALL bit(s)
+>>>    supported by itself when the TDVMCALLs don't need support from 
+>>> userspace
+>>>    after returning from userspace and before entering guest. 
+>>> Currently, no
+>>>    such TDVMCALLs implemented, KVM just sets the values returned from
+>>>    userspace.
+>>>
+>>>    A new KVM exit reason KVM_EXIT_TDX_GET_TDVMCALL_INFO and its 
+>>> structure
+>>>    are added. Userspace is required to handle the exit reason as the 
+>>> initial
+>>>    support for TDX.
+>>
+>> It doesn't look like a good and correct design.
+>>
+>> Consider the case that userspace supports SetupEventNotifyInterrupt 
+>> and returns bit 1 of leaf_output[0] as 1 to KVM, and KVM returns it to 
+>> TD guest for TDVMCALL_GET_TD_VM_CALL_INFO. So TD guest treats it as 
+>> SetupEventNotifyInterrupt is support. But when TD guest issues this 
+>> TDVMCALL, KVM doesn't support the exit to userspace for this specific 
+>> leaf and userspace doesn't have chance to handle it.
+> Previously, I also had the idea of setting the information based on 
+> userspace's
+> opt-ins.
+> 
+> But for simplicity, this patch set doesn't adopt the opt-in mechanism 
+> for KVM
+> exit reasons due to TDVMCALLs.
+> 
+> To resolve the issue you mentions that userspace could set a bit that KVM
+> doesn't support the exit to userspace, KVM could mask off the bit(s) not
+> supported by KVM before returning back to guest.
 
-On 6/11/2025 6:57 AM, Sean Christopherson wrote:
-> WARN and kill the VM instead of panicking the host if KVM attempts to set
-> or query MSR interception for an unsupported MSR.  Accessing the MSR
-> interception bitmaps only meaningfully affects post-VMRUN behavior, and
-> KVM_BUG_ON() is guaranteed to prevent the current vCPU from doing VMRUN,
-> i.e. there is no need to panic the entire host.
->
-> Opportunistically move the sanity checks about their use to index into the
-> MSRPM, e.g. so that bugs only WARN and terminate the VM, as opposed to
-> doing that _and_ generating an out-of-bounds load.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index c75977ca600b..7e39b9df61f1 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -824,11 +824,12 @@ static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
->  				      to_svm(vcpu)->msrpm;
->  
->  	offset    = svm_msrpm_offset(msr);
-> +	if (KVM_BUG_ON(offset == MSR_INVALID, vcpu->kvm))
-> +		return false;
-> +
->  	bit_write = 2 * (msr & 0x0f) + 1;
->  	tmp       = msrpm[offset];
->  
-> -	BUG_ON(offset == MSR_INVALID);
-> -
->  	return test_bit(bit_write, &tmp);
->  }
->  
-> @@ -854,12 +855,13 @@ static void set_msr_interception_bitmap(struct kvm_vcpu *vcpu, u32 *msrpm,
->  		write = 0;
->  
->  	offset    = svm_msrpm_offset(msr);
-> +	if (KVM_BUG_ON(offset == MSR_INVALID, vcpu->kvm))
-> +		return;
-> +
->  	bit_read  = 2 * (msr & 0x0f);
->  	bit_write = 2 * (msr & 0x0f) + 1;
->  	tmp       = msrpm[offset];
->  
-> -	BUG_ON(offset == MSR_INVALID);
-> -
->  	read  ? clear_bit(bit_read,  &tmp) : set_bit(bit_read,  &tmp);
->  	write ? clear_bit(bit_write, &tmp) : set_bit(bit_write, &tmp);
->  
+silently mask off the value provided from userspace is not a stable ABI 
+from userspace perspective. A kvm cap to report what value is 
+allowed/supported is still helpful.
 
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> If we agree that it's the right time to have the opt-in, we could go the 
+> opt-in
+> way and KVM could set the information based on userspace's opt-ins without
+> exit to userspace for GetTdVmCallInfo.
 
+Let's see what Paolo and Sean will say.
 
 
