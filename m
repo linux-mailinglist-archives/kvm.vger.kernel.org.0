@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-49027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B83EAD5301
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 13:05:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5786CAD5314
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 13:06:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C2DA3AD2A1
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 11:02:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 080ED1884019
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 11:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1889277D75;
-	Wed, 11 Jun 2025 10:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E7E277D9A;
+	Wed, 11 Jun 2025 10:51:28 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74C0277D62;
-	Wed, 11 Jun 2025 10:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7CB277D64;
+	Wed, 11 Jun 2025 10:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749639083; cv=none; b=aA4l2TadHa6ASNpHGS4+1gN8PeXRC4idiXhANn6jAOMj0QaQ0naH7fdY5cD0zSJ3e/+OxbjK9V7KYUikgYBYaDt2Vxg9Z320m42FkBBY8h1PLtgzvXRzQHLmfA+tEG8ltNHfouzY2yxEfQjH8iiFa5WNY+AlW2juCKdBZYY3AGA=
+	t=1749639087; cv=none; b=Ce6S398eIjkGCM3oac0/OSJmdClpqlk92fxdJhN7v04Ic15wxK26kHVV1JOLytcS7fCdaIM7KkV5fFvK7Bizpjn/kobjPgH+3IQZhHDp+rrAwvYHfOLeVoElMgQBezb/odfL8GMK6Gsz1csOztvkXZxyLgkt9aqT0jnVXx06jWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749639083; c=relaxed/simple;
-	bh=jxK95agVpbNsaYGEvheLCKxMKcXrTt0TMvG2xKuJUgQ=;
+	s=arc-20240116; t=1749639087; c=relaxed/simple;
+	bh=q2UgluImt3LDCFWY6tKhZHlNDHMD5GSwA7MJ+iHv+m0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o6u2KUKGhfkozogDzGd89x/9ElQ/kyMRTnXV5g8YeCallR8tDP3eti9WfxMQ8U5+Z+y61lvCp4OKp5Lzte4nkH9ZpwCJMI5EqtNNjfCWj9vZBu2+KLmarFQvTyAIcyz7BcWF8yrHFCwwfpjWntUJ6b+wu91TveC0go/13kb23Zw=
+	 MIME-Version; b=iUrpJ1mo0QuxO7pDXhoRVwQq+5owoCnFq/scSnEBf2zQbOurKG5AFmHhJGLwXc0HMZD3J9YosFJ03E/lPYAOQ7+rR2282ziyHK3LhxJ7/MPnFZm2gO9pLgY+v0ccGI2U+8ZEiLf8NdtsK+H5b6o8brXDkdpv5aRiiY7Gm+x1UDY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B70BB2A6B;
-	Wed, 11 Jun 2025 03:51:01 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 254F92A9A;
+	Wed, 11 Jun 2025 03:51:06 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.67.107])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5593B3F673;
-	Wed, 11 Jun 2025 03:51:17 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ADD2E3F673;
+	Wed, 11 Jun 2025 03:51:21 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -58,9 +58,9 @@ Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v9 37/43] arm64: RME: Propagate max SVE vector length from RMM
-Date: Wed, 11 Jun 2025 11:48:34 +0100
-Message-ID: <20250611104844.245235-38-steven.price@arm.com>
+Subject: [PATCH v9 38/43] arm64: RME: Configure max SVE vector length for a Realm
+Date: Wed, 11 Jun 2025 11:48:35 +0100
+Message-ID: <20250611104844.245235-39-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250611104844.245235-1-steven.price@arm.com>
 References: <20250611104844.245235-1-steven.price@arm.com>
@@ -74,111 +74,106 @@ Content-Transfer-Encoding: 8bit
 
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-RMM provides the maximum vector length it supports for a guest in its
-feature register. Make it visible to the rest of KVM and to userspace
-via KVM_REG_ARM64_SVE_VLS.
+Obtain the max vector length configured by userspace on the vCPUs, and
+write it into the Realm parameters. By default the vCPU is configured
+with the max vector length reported by RMM, and userspace can reduce it
+with a write to KVM_REG_ARM64_SVE_VLS.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Signed-off-by: Steven Price <steven.price@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/include/asm/kvm_rme.h  |  1 +
- arch/arm64/kvm/guest.c            |  2 +-
- arch/arm64/kvm/reset.c            | 12 ++++++++++--
- arch/arm64/kvm/rme.c              |  6 ++++++
- 5 files changed, 19 insertions(+), 4 deletions(-)
+Changes since v6:
+ * Rename max_vl/realm_max_vl to vl/last_vl - there is nothing "maximum"
+   about them, we're just checking that all realms have the same vector
+   length
+---
+ arch/arm64/kvm/guest.c |  3 ++-
+ arch/arm64/kvm/rme.c   | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 58fe7b216126..a1857802db64 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -77,9 +77,9 @@ enum kvm_mode kvm_get_mode(void);
- static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
- #endif
- 
--extern unsigned int __ro_after_init kvm_sve_max_vl;
- extern unsigned int __ro_after_init kvm_host_sve_max_vl;
- int __init kvm_arm_init_sve(void);
-+unsigned int kvm_sve_get_max_vl(struct kvm *kvm);
- 
- u32 __attribute_const__ kvm_target_cpu(void);
- void kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-index ee10fc3c1f3d..e954bb95dc86 100644
---- a/arch/arm64/include/asm/kvm_rme.h
-+++ b/arch/arm64/include/asm/kvm_rme.h
-@@ -94,6 +94,7 @@ void kvm_init_rme(void);
- u32 kvm_realm_ipa_limit(void);
- u32 kvm_realm_vgic_nr_lr(void);
- u8 kvm_realm_max_pmu_counters(void);
-+unsigned int kvm_realm_sve_max_vl(void);
- 
- u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
- 
 diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 338c527021d2..559cf4375983 100644
+index 559cf4375983..35847ae03d2c 100644
 --- a/arch/arm64/kvm/guest.c
 +++ b/arch/arm64/kvm/guest.c
-@@ -375,7 +375,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 		if (vq_present(vqs, vq))
- 			max_vq = vq;
+@@ -361,7 +361,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	if (!vcpu_has_sve(vcpu))
+ 		return -ENOENT;
  
--	if (max_vq > sve_vq_from_vl(kvm_sve_max_vl))
-+	if (max_vq > sve_vq_from_vl(kvm_sve_get_max_vl(vcpu->kvm)))
- 		return -EINVAL;
+-	if (kvm_arm_vcpu_sve_finalized(vcpu))
++	if (kvm_arm_vcpu_sve_finalized(vcpu) || kvm_realm_is_created(vcpu->kvm))
+ 		return -EPERM; /* too late! */
  
- 	/*
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 2e9e855581d4..6396aaa36736 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -46,7 +46,7 @@ unsigned int __ro_after_init kvm_host_sve_max_vl;
- #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
- 				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
- 
--unsigned int __ro_after_init kvm_sve_max_vl;
-+static unsigned int __ro_after_init kvm_sve_max_vl;
- 
- int __init kvm_arm_init_sve(void)
- {
-@@ -76,9 +76,17 @@ int __init kvm_arm_init_sve(void)
- 	return 0;
- }
- 
-+unsigned int kvm_sve_get_max_vl(struct kvm *kvm)
-+{
-+	if (kvm_is_realm(kvm))
-+		return kvm_realm_sve_max_vl();
-+	else
-+		return kvm_sve_max_vl;
-+}
-+
- static void kvm_vcpu_enable_sve(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.sve_max_vl = kvm_sve_max_vl;
-+	vcpu->arch.sve_max_vl = kvm_sve_get_max_vl(vcpu->kvm);
- 
- 	/*
- 	 * Userspace can still customize the vector lengths by writing
+ 	if (WARN_ON(vcpu->arch.sve_state))
+@@ -823,6 +823,7 @@ static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
+ 		switch (reg->id) {
+ 		case KVM_REG_ARM_PMCR_EL0:
+ 		case KVM_REG_ARM_ID_AA64DFR0_EL1:
++		case KVM_REG_ARM64_SVE_VLS:
+ 			return true;
+ 		}
+ 	}
 diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index a31920e05cf7..b9cae0aff54e 100644
+index b9cae0aff54e..635d22825a70 100644
 --- a/arch/arm64/kvm/rme.c
 +++ b/arch/arm64/kvm/rme.c
-@@ -92,6 +92,12 @@ u8 kvm_realm_max_pmu_counters(void)
- 	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS);
+@@ -576,6 +576,44 @@ static void realm_unmap_shared_range(struct kvm *kvm,
+ 			     start, end);
  }
  
-+unsigned int kvm_realm_sve_max_vl(void)
++static int realm_init_sve_param(struct kvm *kvm, struct realm_params *params)
 +{
-+	return sve_vl_from_vq(u64_get_bits(rmm_feat_reg0,
-+					   RMI_FEATURE_REGISTER_0_SVE_VL) + 1);
++	int ret = 0;
++	unsigned long i;
++	struct kvm_vcpu *vcpu;
++	int vl, last_vl = -1;
++
++	/*
++	 * Get the preferred SVE configuration, set by userspace with the
++	 * KVM_ARM_VCPU_SVE feature and KVM_REG_ARM64_SVE_VLS pseudo-register.
++	 */
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		mutex_lock(&vcpu->mutex);
++		if (vcpu_has_sve(vcpu)) {
++			if (!kvm_arm_vcpu_sve_finalized(vcpu))
++				ret = -EINVAL;
++			vl = vcpu->arch.sve_max_vl;
++		} else {
++			vl = 0;
++		}
++		mutex_unlock(&vcpu->mutex);
++		if (ret)
++			return ret;
++
++		/* We need all vCPUs to have the same SVE config */
++		if (last_vl >= 0 && last_vl != vl)
++			return -EINVAL;
++
++		last_vl = vl;
++	}
++
++	if (last_vl > 0) {
++		params->sve_vl = sve_vq_from_vl(last_vl) - 1;
++		params->flags |= RMI_REALM_PARAM_FLAG_SVE;
++	}
++	return 0;
 +}
 +
- u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+ /* Calculate the number of s2 root rtts needed */
+ static int realm_num_root_rtts(struct realm *realm)
  {
- 	u32 bps = u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_NUM_BPS);
+@@ -642,6 +680,10 @@ static int realm_create_rd(struct kvm *kvm)
+ 		params->flags |= RMI_REALM_PARAM_FLAG_PMU;
+ 	}
+ 
++	r = realm_init_sve_param(kvm, params);
++	if (r)
++		goto out_undelegate_tables;
++
+ 	params_phys = virt_to_phys(params);
+ 
+ 	if (rmi_realm_create(rd_phys, params_phys)) {
 -- 
 2.43.0
 
