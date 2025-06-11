@@ -1,151 +1,199 @@
-Return-Path: <kvm+bounces-49046-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49047-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7689CAD563D
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 15:00:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E832FAD5720
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 15:33:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 284E0189019E
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 12:59:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2366172A94
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 13:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9F5273D6D;
-	Wed, 11 Jun 2025 12:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA1B28BA95;
+	Wed, 11 Jun 2025 13:33:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AR569d5I"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZTpQCxFE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0351C28313F
-	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 12:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EAE435897
+	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 13:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749646740; cv=none; b=eTwGwhS1UUDYlRtzy21M9Jb6SPlcj8L6reKn5WqM3IJxreuOnR14fIIYZuFsofirxRkYNkeRBuKEf+8nNJaHRBGWMULnQ1+C2PtwqIo8tI/UiDDCqUlbizAakihNgvFeMYfBIcaRhqeY2ZidRz2q1uiTrZgmkViuyR2o58JQkXI=
+	t=1749648817; cv=none; b=rWe8RkVzshYFnsRtisMjZQt3mSf51ttEITYTwT3ERrqFgm92WObUe0TAY+ZtgEhzah1o/tpXUD2xInCxzuEMfAfZL8HlH0VTOVvjSL2NNHLPV6e1HqNfmEDsSpVpQ3+LINaxG3v5F3toBlDynr4IVy8q8FDNZOJaUXbD3xdJQeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749646740; c=relaxed/simple;
-	bh=a2tnsV+oorpD96ckvy193k53s6Jk34v+Ogifp++7l3o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VSYurK/NeadLsyjxqXy2DBdg5Qu4mGlB6xXmnsfU9KcnyFJCNhAdOWPSBctiRXcGnObdykqljEztCb++FgWF1xvZTReTNVoKRLWzEZFF9aRelM0NeID/p9gUMJnoSfzJ+pctkmBZc31MBIEh4eWT+0LHy7+O87geF6Wy3kKXXPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AR569d5I; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1749648817; c=relaxed/simple;
+	bh=r+XqC7uGn13lAp3H+wBcGZnLyvGZSd2YBfaeiZv4mds=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UlgbZI2SKxAPS5/m/4EL7wG5C+Xy3ySakziY/9MGt56e4TtB3FVN8ZsZaeZAPLMHp26lQc9Z+pNsbeRjl8CD3gMC7FGTfd6Qmz9/JmDiC3ZU/HW+LVo8tp9rRZqvptolhnpAGuHw0+TMguW0k/JilDHOHC38UrXm0Bp2iuKsr40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZTpQCxFE; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311cc665661so5807703a91.2
-        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 05:58:58 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-3a4f3796779so4536944f8f.1
+        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 06:33:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749646738; x=1750251538; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=q7qyDxfambCUeuVJ579d13LTUju7h5fRgxZwQlTMLrA=;
-        b=AR569d5ILcR68f7Pxq+LwHL6RLFU05NqwYpOdaJ+Qe3OQXO+ptf3U/4rAxU3AN00o1
-         CO1NogIZTZJUC3zY+9FP7OHtWuWFe3Z3Z5a44yoSr19Ykjfuxlgn9wrvtH9uK5yxE8iB
-         dUQCSybEc1Q4m2JgIPQQiRQxqpmsXh1VQvlI127wfVbYjVoN6Gz/cxuhGk8oPeawHQZj
-         KGfj/ckfORUQQUiT4MjphLHHjexsBpzDuNOawuiWmjowG8sWlhgD6mX6zuyLYqArNDhm
-         dnkZS1xSKCxBd4UhDZyBYLVODaztffrV0Fzvvj+cix5CEEbGynwKCWljB3UZDItqmbj8
-         vi9w==
+        d=google.com; s=20230601; t=1749648813; x=1750253613; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rSsJgXVmQFLNXrSUPRm9zqOBDde8bKjGO9WdZWsvbm0=;
+        b=ZTpQCxFEWXTVkbgwBzGuHCTyJF8U2DGmLzsaRhKHjSS7bL8hdfFooGdsezTet54WnP
+         sIzrEgiVnB5rAA6SBslD/+W/JVFEPTRi5rt82dohkVXD6OSTzbh9Hvs8VFN9l4BxCuT1
+         36UMbSDi/OvjmEDTwwsWj9Kt/vB1e8jkCMsoP1rGyluZz6Ir5yWTDJ9pX4mYGbheRsWO
+         HIuX3YYzIV/9U5711k7uIAVAKgEbhaJjhQg7zYDODwQHKlwTiLYSnz2vorQ9UsXf9cpA
+         HyQDpQECwxtq3a5D9PuBSiIwfCvCAfI93Q4Hbu15YEQrifZaZKN2mlXdzF66yybzQZy1
+         lo6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749646738; x=1750251538;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q7qyDxfambCUeuVJ579d13LTUju7h5fRgxZwQlTMLrA=;
-        b=PVOR71YEQf7gfN5qHVlvO/NXWHZWqIXsx1d3iKzpxVjzxv76aa0voEHk9N5l0sR/eY
-         XaeDj/b2BXUwl+tXlRwAXLepU2GUlSOQQE6Jl3iNDg9nsRuNF7llQe5Qjy1tG+L/LjWd
-         FLQ4ag9Nt/4poFh8qEnIq/ZwpRtTthNsJslaf+vLexaKLvLrHIHBsOgkFxK29jtyTI9o
-         ZwsukNG9Oy2jfTQNH0bk5u8LFB3XaUbiLFlAQqyH0e3yWsSStCCBLx13hTzl9w12LNkk
-         70e3iLWXxfwT3CDFk6dCKBtKTPKNOAHSutHy0Osbp51TffyT2UBUmIZsGKCEs7nb8RrC
-         jBLw==
-X-Forwarded-Encrypted: i=1; AJvYcCUO9GlYhFgziniNlbev1JNSKM/Kq5/b+lL/4mJpW+3IDS0658y+ToJ/vAqnNxje8lj2Wvs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrWuD1rEYXw3u3FOSvCh0IVF4ztTdbucVZRdPogHlFV0jwOvo2
-	7SGzczJHQiYqsYkWrJyirbDKlEMLDM/cx9hMxOwFKvTuwRZZ2ULFqdtfK0RCdBOoS7XWhrgaKUW
-	fGFEwbA==
-X-Google-Smtp-Source: AGHT+IFdzlhprq4olNF24x13BTaUWLzAfJB7XPYxrgkrprbcAns4rzVG+UdGiB00+0oVMZb22058wK4h5o8=
-X-Received: from pjg4.prod.google.com ([2002:a17:90b:3f44:b0:311:2058:21e7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:540c:b0:311:df4b:4b93
- with SMTP id 98e67ed59e1d1-313b1ea41c8mr3910557a91.7.1749646738303; Wed, 11
- Jun 2025 05:58:58 -0700 (PDT)
-Date: Wed, 11 Jun 2025 05:58:56 -0700
-In-Reply-To: <20250611100459.92900-4-namjain@linux.microsoft.com>
+        d=1e100.net; s=20230601; t=1749648813; x=1750253613;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rSsJgXVmQFLNXrSUPRm9zqOBDde8bKjGO9WdZWsvbm0=;
+        b=WhnB5Xph4ydd/n89B3qyyrv7wticyLhDx/B2b3F6yvS/qFe96WU0lQPh92ALg+kA9Z
+         8Wd1wANUnP6lIMfWNAlnXwenaEykd6FkkIH+QMo8f+4md2o6nfqR8mIQQzVj0ulzj+wr
+         etwMm4wW6j707R9z99/dqtBWYxfrlZtaMJh5ZQl2W5EdUTpdod48yBD7s3IiXfyJw4H6
+         fXOw1GdSUPgmYuWkjR2fC2s7GFbepiK6Bz/J7EV09pjOHqqfD9pIyS7e3Uno+hUEcPiN
+         oUG6KJmAEQ20kppBZ5MhUErI/dBDSPhnG0Xt7hhT4d4XXDfIgQ4Zwg9E8qf7hGqq/cga
+         5OAQ==
+X-Gm-Message-State: AOJu0YzGfp57mnXp5XtehDnbOs5eK27itN+0KU+j64GJigjCWUwkZQjE
+	Mq8NvOqrCi8Uh36glQDE791GGn619r7moTgpVo/v4YhpWapBt9ne7k+TRS4N32qeKJogwIgsCf7
+	xXdy4WhYIzjlnd2S0QJpLaa5LHWnVZzjCq5qOhC0fLsMqh1qpYMWYPatFN6KB7LrTr3K0X/U73S
+	3kwKO15oNDu/dFccjN/cjGKoPMD98=
+X-Google-Smtp-Source: AGHT+IGEi4Njnn/PJTVKY9QV/QZh9cv9Pk+XkVMH4dPXzSBVTZZ2YPR7bte2KhD8R7o+Ouq1GEzt+pIysg==
+X-Received: from wrs3.prod.google.com ([2002:a05:6000:643:b0:3a5:271e:ad7d])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:24c8:b0:3a4:d83a:eb4c
+ with SMTP id ffacd0b85a97d-3a558a43cb0mr2865406f8f.57.1749648812045; Wed, 11
+ Jun 2025 06:33:32 -0700 (PDT)
+Date: Wed, 11 Jun 2025 14:33:12 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250611100459.92900-1-namjain@linux.microsoft.com> <20250611100459.92900-4-namjain@linux.microsoft.com>
-Message-ID: <aEl9kO81-kp0hhw0@google.com>
-Subject: Re: [PATCH 3/6] KVM: x86: hyper-v: Fix warnings for missing export.h
- header inclusion
-From: Sean Christopherson <seanjc@google.com>
-To: Naman Jain <namjain@linux.microsoft.com>
-Cc: "K . Y . Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H . Peter Anvin" <hpa@zytor.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Daniel Lezcano <daniel.lezcano@linaro.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, 
-	"Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=" <kwilczynski@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Konstantin Taranov <kotaranov@microsoft.com>, 
-	Leon Romanovsky <leon@kernel.org>, Long Li <longli@microsoft.com>, 
-	Shiraz Saleem <shirazsaleem@microsoft.com>, 
-	Shradha Gupta <shradhagupta@linux.microsoft.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Erni Sri Satya Vennela <ernis@linux.microsoft.com>, 
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>, linux-hyperv@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-pci@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.50.0.rc0.642.g800a2b2222-goog
+Message-ID: <20250611133330.1514028-1-tabba@google.com>
+Subject: [PATCH v12 00/18] KVM: Mapping guest_memfd backed memory at the host
+ for software protected VMs
+From: Fuad Tabba <tabba@google.com>
+To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jun 11, 2025, Naman Jain wrote:
-> Fix below warning in Hyper-V drivers
+Main changes since v11 [1]:
+- Addressed various points of feedback from the last revision.
+- Rebased on Linux 6.16-rc1.
 
-KVM is quite obviously not a Hyper-V driver.
+This patch series enables mapping of guest_memfd backed memory in the
+host. This is useful for VMMs like Firecracker that aim to run guests
+entirely backed by guest_memfd [2]. When combined with Patrick's series
+for direct map removal [3], this provides additional hardening against
+Spectre-like transient execution attacks.
 
-> that comes when kernel is compiled with W=1 option. Include export.h in
-> driver files to fix it.  * warning: EXPORT_SYMBOL() is used, but #include
-> <linux/export.h> is missing
+This series also lays the groundwork for restricted mmap() support for
+guest_memfd backed memory in the host for Confidential Computing
+platforms that permit in-place sharing of guest memory with the host
+[4].
 
-NAK.  I agree with Heiko[*], this is absurd.  And if the W=1 change isn't reverted
-for some reason, I'd rather "fix" all of KVM in one shot, not update random files
-just because of their name.
+Patch breakdown:
 
-Sorry.
+Patches 1-7: Primarily refactoring and renaming to decouple the concept
+of guest memory being "private" from it being backed by guest_memfd.
 
-[*] https://lore.kernel.org/all/20250611075533.8102A57-hca@linux.ibm.com
+Patches 8-9: Add support for in-place shared memory and the ability for
+the host to map it. This is gated by a new configuration option, toggled
+by a new flag, and advertised to userspace by a new capability
+(introduced in patch 16).
 
-> Signed-off-by: Naman Jain <namjain@linux.microsoft.com>
-> ---
->  arch/x86/kvm/hyperv.c       | 1 +
->  arch/x86/kvm/kvm_onhyperv.c | 1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 24f0318c50d7..09f9de4555dd 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -33,6 +33,7 @@
->  #include <linux/sched/cputime.h>
->  #include <linux/spinlock.h>
->  #include <linux/eventfd.h>
-> +#include <linux/export.h>
->  
->  #include <asm/apicdef.h>
->  #include <asm/mshyperv.h>
-> diff --git a/arch/x86/kvm/kvm_onhyperv.c b/arch/x86/kvm/kvm_onhyperv.c
-> index ded0bd688c65..ba45f8364187 100644
-> --- a/arch/x86/kvm/kvm_onhyperv.c
-> +++ b/arch/x86/kvm/kvm_onhyperv.c
-> @@ -5,6 +5,7 @@
->  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
->  
->  #include <linux/kvm_host.h>
-> +#include <linux/export.h>
->  #include <asm/mshyperv.h>
->  
->  #include "hyperv.h"
-> -- 
-> 2.34.1
-> 
+Patches 10-15: Implement the x86 and arm64 support for this feature.
+
+Patch 16: Introduces the new capability to advertise this support and
+updates the documentation.
+
+Patches 17-18: Add and fix selftests for the new functionality.
+
+For details on how to test this patch series, and on how to boot a guest
+that uses the new features, please refer to the instructions in v8 [5],
+but use the updated kvmtool for 6.16 (KVM_CAP_GMEM_SHARED_MEM number has
+changed) [6].
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20250605153800.557144-1-tabba@google.com/
+[2] https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
+[3] https://lore.kernel.org/all/20250221160728.1584559-1-roypat@amazon.co.uk/
+[4] https://lore.kernel.org/all/20250328153133.3504118-1-tabba@google.com/
+[5] https://lore.kernel.org/all/20250430165655.605595-1-tabba@google.com/
+[6] https://android-kvm.googlesource.com/kvmtool/+/refs/heads/tabba/guestmem-basic-6.16
+
+Ackerley Tng (2):
+  KVM: x86/mmu: Handle guest page faults for guest_memfd with shared
+    memory
+  KVM: x86: Consult guest_memfd when computing max_mapping_level
+
+Fuad Tabba (16):
+  KVM: Rename CONFIG_KVM_PRIVATE_MEM to CONFIG_KVM_GMEM
+  KVM: Rename CONFIG_KVM_GENERIC_PRIVATE_MEM to
+    CONFIG_KVM_GENERIC_GMEM_POPULATE
+  KVM: Rename kvm_arch_has_private_mem() to kvm_arch_supports_gmem()
+  KVM: x86: Rename kvm->arch.has_private_mem to kvm->arch.supports_gmem
+  KVM: Rename kvm_slot_can_be_private() to kvm_slot_has_gmem()
+  KVM: Fix comments that refer to slots_lock
+  KVM: Fix comment that refers to kvm uapi header path
+  KVM: guest_memfd: Allow host to map guest_memfd pages
+  KVM: guest_memfd: Track shared memory support in memslot
+  KVM: x86: Enable guest_memfd shared memory for non-CoCo VMs
+  KVM: arm64: Refactor user_mem_abort()
+  KVM: arm64: Handle guest_memfd-backed guest page faults
+  KVM: arm64: Enable host mapping of shared guest_memfd memory
+  KVM: Introduce the KVM capability KVM_CAP_GMEM_SHARED_MEM
+  KVM: selftests: Don't use hardcoded page sizes in guest_memfd test
+  KVM: selftests: guest_memfd mmap() test when mapping is allowed
+
+ Documentation/virt/kvm/api.rst                |   9 +
+ arch/arm64/include/asm/kvm_host.h             |   4 +
+ arch/arm64/kvm/Kconfig                        |   1 +
+ arch/arm64/kvm/mmu.c                          | 189 ++++++++++++----
+ arch/x86/include/asm/kvm_host.h               |  22 +-
+ arch/x86/kvm/Kconfig                          |   5 +-
+ arch/x86/kvm/mmu/mmu.c                        | 135 ++++++-----
+ arch/x86/kvm/svm/sev.c                        |   4 +-
+ arch/x86/kvm/svm/svm.c                        |   4 +-
+ arch/x86/kvm/x86.c                            |   4 +-
+ include/linux/kvm_host.h                      |  80 +++++--
+ include/uapi/linux/kvm.h                      |   2 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/guest_memfd_test.c  | 212 +++++++++++++++---
+ virt/kvm/Kconfig                              |  14 +-
+ virt/kvm/Makefile.kvm                         |   2 +-
+ virt/kvm/guest_memfd.c                        |  91 +++++++-
+ virt/kvm/kvm_main.c                           |  16 +-
+ virt/kvm/kvm_mm.h                             |   4 +-
+ 19 files changed, 630 insertions(+), 169 deletions(-)
+
+
+base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
+-- 
+2.50.0.rc0.642.g800a2b2222-goog
+
 
