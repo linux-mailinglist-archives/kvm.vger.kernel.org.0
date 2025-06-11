@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-48986-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48987-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A88DEAD51C5
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 12:27:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D867AD5165
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 12:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BB843A8429
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 10:26:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16FC01BC0455
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 10:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940C8269D15;
-	Wed, 11 Jun 2025 10:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0539127AC57;
+	Wed, 11 Jun 2025 10:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="gnphaAdm"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="pOxDx+hj"
 X-Original-To: kvm@vger.kernel.org
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A587262FD8;
-	Wed, 11 Jun 2025 10:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D744D7081D;
+	Wed, 11 Jun 2025 10:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749636350; cv=none; b=e78I1WxQTI3LxZUc+uRZ7bw8FKK1LQidlmWfiQihDczoQWqHH76iw0pinY8gR56Zq/tRiEPuEReVWQgY6nJJ71iFpcZT7VxlNm5b9imYHFVlP806e1IYpmjZvjg9Hq54zrrSAJC57VxDSG/Jy8YoTzZKKCRr45PDSzgscLxfX0w=
+	t=1749636360; cv=none; b=IvmlLFLnHV7RA73IHL5AyeQQydDmNwvulfKa3somjCM5ySLPDOIW5nmAmOxvGDpOvkH2Z8Ajm1IRaNXkQ+Bcu5ueKmy+xXl5t+F44/3fTeli6LDpIUWlghacrtD1GGqFP3xpKaLGYabzleSGsm5lOGnWbcS4kEuswV7/tDls9Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749636350; c=relaxed/simple;
-	bh=pGHUZ1n0HBaCxVNIYFnzW0xPci7Q7jOJnN75l5q16Vg=;
+	s=arc-20240116; t=1749636360; c=relaxed/simple;
+	bh=qjBcuPulRI2eyx47QShOtDhoswZ6VKlfodV0k4Fw79k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tJYVv0KJNsMGwsTlVTFlW++hNLKY5jzQAoOCZwO8yB590/CH9lyKDgC3GbWb24S/X1k9fwkSpIkdm1Py9jfI9OXla/yA63OIDPcvM6mzYGgtMwYE0DizPgRp0t8SYe+5eotbl62/CYacVT2MZmmQOllVbzmmRowe26En7VPGzXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=gnphaAdm; arc=none smtp.client-ip=13.77.154.182
+	 MIME-Version; b=tJ52J0EH0s10gKyMnJVDDBuXoayzH6Brn+DE/jBwcYbUSktjNtN2AHylIIs4M8QCAVHF89sUNaqwDrbhA2W/R3Oe+7+EtO71rfPneSC1uTvoCnBWwWx5iCg6xNTnSIuofXTNN99DyklOChVZgFj9k3QYeFlo/h6fL7X44pKgsQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=pOxDx+hj; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Received: from DESKTOP-RSFL4TU.corp.microsoft.com (unknown [167.220.238.139])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 278172115192;
-	Wed, 11 Jun 2025 03:05:39 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 278172115192
+	by linux.microsoft.com (Postfix) with ESMTPSA id AB33C2115194;
+	Wed, 11 Jun 2025 03:05:49 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AB33C2115194
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1749636349;
-	bh=xLsz86gnpqCtncCunTpTzLuVw47I0LwGtSW/SUX+e4Y=;
+	s=default; t=1749636358;
+	bh=gCVgGnsid8uO5iTmv2/yObucT4a844YKHQ1W6Pi0rcg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gnphaAdmveyeXneMXGgE4Cvo0T3LHyElB7SlL+MljUl5NRhfqYLgTY5rdRFYYkTyR
-	 nUm0v51rFeezZ5jWhcKjf6iMFDW9jOdF98mbg+Sa9s5U87BRTnYJJhoF7SZq2uHnbk
-	 rLfGFkqbJweNlZeeujSmFBHBSmD+LVHftd25p7Dg=
+	b=pOxDx+hjxAdbFLGyijxmC1yUnP9MdDxyHeYXmjh2VC8wM9V3URHQAr2WMDMCv3OZq
+	 FIQzRbq53tuHKbrxPXUFFSLDxVsZhFRa7nR/4Vk4UzFAcmUMLbZUZriNCDJBiOREyw
+	 O6SSIEmFq9Qc7QusWbu+3/KXzCsEa1znUJuA+ros=
 From: Naman Jain <namjain@linux.microsoft.com>
 To: "K . Y . Srinivasan" <kys@microsoft.com>,
 	Haiyang Zhang <haiyangz@microsoft.com>,
@@ -79,9 +79,9 @@ Cc: linux-hyperv@vger.kernel.org,
 	kvm@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-pci@vger.kernel.org
-Subject: [PATCH 4/6] clocksource: hyper-v: Fix warnings for missing export.h header inclusion
-Date: Wed, 11 Jun 2025 15:34:57 +0530
-Message-Id: <20250611100459.92900-5-namjain@linux.microsoft.com>
+Subject: [PATCH 5/6] PCI: hv: Fix warnings for missing export.h header inclusion
+Date: Wed, 11 Jun 2025 15:34:58 +0530
+Message-Id: <20250611100459.92900-6-namjain@linux.microsoft.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250611100459.92900-1-namjain@linux.microsoft.com>
 References: <20250611100459.92900-1-namjain@linux.microsoft.com>
@@ -93,28 +93,28 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix below warning in Hyper-V clocksource driver that comes when kernel
-is compiled with W=1 option. Include export.h in driver files to fix it.
+Fix below warning in Hyper-V PCI driver that comes when kernel is
+compiled with W=1 option. Include export.h in driver files to fix it.
 * warning: EXPORT_SYMBOL() is used, but #include <linux/export.h>
 is missing
 
 Signed-off-by: Naman Jain <namjain@linux.microsoft.com>
 ---
- drivers/clocksource/hyperv_timer.c | 1 +
+ drivers/pci/controller/pci-hyperv-intf.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/drivers/clocksource/hyperv_timer.c b/drivers/clocksource/hyperv_timer.c
-index 09549451dd51..2edc13ca184e 100644
---- a/drivers/clocksource/hyperv_timer.c
-+++ b/drivers/clocksource/hyperv_timer.c
-@@ -22,6 +22,7 @@
- #include <linux/irq.h>
- #include <linux/acpi.h>
+diff --git a/drivers/pci/controller/pci-hyperv-intf.c b/drivers/pci/controller/pci-hyperv-intf.c
+index cc96be450360..28b3e93d31c0 100644
+--- a/drivers/pci/controller/pci-hyperv-intf.c
++++ b/drivers/pci/controller/pci-hyperv-intf.c
+@@ -14,6 +14,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
  #include <linux/hyperv.h>
 +#include <linux/export.h>
- #include <clocksource/hyperv_timer.h>
- #include <hyperv/hvhdk.h>
- #include <asm/mshyperv.h>
+ 
+ struct hyperv_pci_block_ops hvpci_block_ops;
+ EXPORT_SYMBOL_GPL(hvpci_block_ops);
 -- 
 2.34.1
 
