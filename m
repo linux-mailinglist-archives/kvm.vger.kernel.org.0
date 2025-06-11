@@ -1,233 +1,481 @@
-Return-Path: <kvm+bounces-49142-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49143-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C475EAD61A6
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 23:42:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AABDBAD61EA
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 23:51:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5FAC3AC301
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 21:41:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D4831E24B6
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 21:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD0D24DCE7;
-	Wed, 11 Jun 2025 21:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35FE0246774;
+	Wed, 11 Jun 2025 21:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V5RmWnVh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jVZuacOo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEE024BD0C;
-	Wed, 11 Jun 2025 21:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749677952; cv=fail; b=FJNwueA5FvG5jny1bxFJqlHCmPfHAc0/pmIlfq8o2mIgB/0CTB6FiLIhKY3YJvrl+4ssQRnM+fsFYHDvo9OmJvDHTaiBD5IyPTy2kHpMvq0d/bKHXTrdsHVdPcm/E6iYf58E1NgpQCsUG6XXMw7DXzsjqJuuYI6ZQUxtdVa+EUc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749677952; c=relaxed/simple;
-	bh=JCdLOf9c2jdrqvNT+a5/WzzcKxbO8RF5t+a3lcJiRcg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=EIBeRu825lInjigNT9yZ+7b4rSgyRVbs4KS1hWfCVrXlVm9bwrRNFo27GLNECEntSyuPIGbPDYe/mWqqMdPyxe46Z1efCp3HPEjH6PljK+HUUniMVeRPcsconxSQHQk6pNkNnaudAkNfZjS8Eb/TusGTZcku7DnjYYCS+YMOGCs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V5RmWnVh; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749677951; x=1781213951;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=JCdLOf9c2jdrqvNT+a5/WzzcKxbO8RF5t+a3lcJiRcg=;
-  b=V5RmWnVhVEAEOxwj+Vz45/IVcPzfqZfbVnpRaHEG1HAJRTZsGXtv/LlW
-   K1v7ZSVkVQ6zF6KLXO19IRnPwUAUjf6Fvz0ERYCdn31um+ofLoXWRGgPY
-   2OGhzL7Ak4/7Mey6fsZyOcA4skz/ZaxRsX2GCOYaJPUlkMErMpL5GaKYe
-   xYW5PXLXwaEvpewOa5MhgNp3Mq+eXNkKfNJOWayUXDsGbHCuCY41f8qI4
-   mTZr76KC/3Oh8aoQYFsIBeqEaxhAYcQoCu/bd+8Nck1PlByrlBkN5W9bc
-   X4ZMVxYmDJ/iH7DTYXjgHrUi1lPuJ5EhektybiQ/9RHouPz11OVaGR4tN
-   w==;
-X-CSE-ConnectionGUID: oC30ZyPGTCWwUL35KWZpSw==
-X-CSE-MsgGUID: UxfyAKUqSPKXpTh+eiXBug==
-X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="63244369"
-X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
-   d="scan'208";a="63244369"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 14:39:10 -0700
-X-CSE-ConnectionGUID: HSamITpwS56DKQI2tCrNGw==
-X-CSE-MsgGUID: EjlzY4CaSd+U+SaoOgDQZw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
-   d="scan'208";a="152466550"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 14:39:09 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 11 Jun 2025 14:39:07 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Wed, 11 Jun 2025 14:39:07 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (40.107.101.77)
- by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 11 Jun 2025 14:39:07 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nhv2fEOIgoeGcRopsHsjhdpPOOUeowm4dpDjpI/i2aoMgcS3FN4bndIuZFZhMeSrJ+C6+EVCrm9sX0wQ3HmG3VGUyKp1sX1cE8SCV8DqxMDWNtc4LviJnH31GBP6olhs1wP3YoBaf50R5LoDLOYD/ni42hCTi+LN7hje9k0y16MvBwGBgVbDKSziiWw8dYku7d0vPX8GS7dMqBokW/ZUSJP9TK4Q6bz/SD9mUpliCm1RfVUgM2fNhEpgjrkqkeZ2tZF2fqTevdNMtdJKQPd/D3wnKEUFMehE/fWT9MdSqHj3NYnXgr/NrKFcAXbMK/w3BO0LzEhS2M/scW4A2Bw1ZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JCdLOf9c2jdrqvNT+a5/WzzcKxbO8RF5t+a3lcJiRcg=;
- b=QukFfdqOeQK6v4Crk1PQK1rBfN8S3kbV71cEqL8jIy5bxZRSetgPZwCn/I6Ax97kwkzNwAp3yX3Loz9ICMKiRrex0Q8K5JcmbXWN0+mJLiEqRPKHpK3S/YFqsHgkN5KM429LsBkzRUDdLKmRijfBpx3gad8ZEdmhgLXNB96fOfN+pPXHUeFZEtZw3hdBzBQLz6P1pvP9POKCYIYZd11CEkGBWvBiTKLzTg2BPFpNlxBp5w0/qyFNK0+Ut4UgsGy0MynDOvq3DYuq6J6AXzjZOT1rhTyU3TkWz43A34MFCh9XZsg6FUq60SLldnIGQw2k3o1yA1l5N4hIkuyeb/okHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3320.namprd11.prod.outlook.com (2603:10b6:a03:18::25)
- by SJ5PPF183C9380E.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::815) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.19; Wed, 11 Jun
- 2025 21:39:04 +0000
-Received: from BYAPR11MB3320.namprd11.prod.outlook.com
- ([fe80::e8c4:59e3:f1d5:af3b]) by BYAPR11MB3320.namprd11.prod.outlook.com
- ([fe80::e8c4:59e3:f1d5:af3b%4]) with mapi id 15.20.8813.024; Wed, 11 Jun 2025
- 21:39:04 +0000
-Message-ID: <7abb2bf8-be36-41b1-bb6e-e23a984a4ab6@intel.com>
-Date: Wed, 11 Jun 2025 14:39:01 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 9/9] x86/nmi: Print source information with the unknown
- NMI console message
-Content-Language: en-US
-To: "H. Peter Anvin" <hpa@zytor.com>, Xin Li <xin@zytor.com>,
-	<x86@kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, Peter Zijlstra <peterz@infradead.org>, "Sean
- Christopherson" <seanjc@google.com>, Adrian Hunter <adrian.hunter@intel.com>,
-	Kan Liang <kan.liang@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
-	"Zhang Rui" <rui.zhang@intel.com>, Steven Rostedt <rostedt@goodmis.org>,
-	"Andrew Cooper" <andrew.cooper3@citrix.com>, "Kirill A . Shutemov"
-	<kirill.shutemov@linux.intel.com>, Jacob Pan <jacob.pan@linux.microsoft.com>,
-	Andi Kleen <ak@linux.intel.com>, Kai Huang <kai.huang@intel.com>, "Sandipan
- Das" <sandipan.das@amd.com>, <linux-perf-users@vger.kernel.org>,
-	<linux-edac@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-pm@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>
-References: <20250513203803.2636561-1-sohil.mehta@intel.com>
- <20250513203803.2636561-10-sohil.mehta@intel.com>
- <31507dc8-b1dc-4df3-bc0c-6958b4218746@zytor.com>
- <fa948d41-3f95-4385-86c1-5c115561b939@intel.com>
- <8035D788-0F60-48B8-8B98-DC352EC9AE62@zytor.com>
-From: Sohil Mehta <sohil.mehta@intel.com>
-In-Reply-To: <8035D788-0F60-48B8-8B98-DC352EC9AE62@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY5PR04CA0015.namprd04.prod.outlook.com
- (2603:10b6:a03:1d0::25) To BYAPR11MB3320.namprd11.prod.outlook.com
- (2603:10b6:a03:18::25)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2C9213224
+	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 21:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749678702; cv=none; b=E5uE/bWzAeOXOtV/quVfFc1xnHhr9MQbw/+nZsc0bEW/Vs7bbcGRRiGc70QkN3/WHOdxA4HEGzwQDczSY6UOUdEQKjPWnNkmuQOZjDegXbgB62/LtJWZpA9fmdLca6N62ASrZRb3ykC4TSYz4TPfsLtG8NGBjZVXEFmFR4EqKgg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749678702; c=relaxed/simple;
+	bh=IFFauBa06Dp5AA6wuuBZFjGoEDH8goVFQ4+yVa0oHDw=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=odEGtyaBYFY1u6VDx/JRoxKhmkRwr/KSDHWzLFts7Anb5upTt1nqauAqsq0ENeHfULKkB9CNWUCAXl8Ukb46EmrYbwerEtV1eMI6H5lBeZbYKY/nkXfM+E/AUICJetik5eLcHUMeKu5UBfDtq1AkjtaDPSadsPFysM0EDA19xc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jVZuacOo; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-74880a02689so37774b3a.0
+        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 14:51:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749678700; x=1750283500; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=P74GB7QCjfO1/JUQfevXX891SWVXbSdMv9d1fQ1ZP9c=;
+        b=jVZuacOoRJNjoceCDknIw2tbCw37wzXTJuZiQXVIRc8Gj5e1oQzvibCAng0S1AaDKQ
+         ahhYYK6kzb1gKkgseEUE6+N5FjeIa5tJZapLP/UH4YW9fbaDRmcNWhCi5N9lDnzZT4jz
+         Ke0jtg+2R5Utn8jdVdYH/Y7t1b2bl08ZsgWYTozxTYqBWwBZZgEIeEljbufRxVwJSVK+
+         MnCCnUzIqRU7M+ibePm54VbK+AEasOeP4ZgAaQp4uBSNcDiNanxRamKpOFYVeVevWzLJ
+         Pf/JO5ngK9kHOmUUEroIGRjlao1NAOm8RvdQcvrmHLUSQ1hnXbkenEd3WZJkAeDDNcD7
+         nkQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749678700; x=1750283500;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P74GB7QCjfO1/JUQfevXX891SWVXbSdMv9d1fQ1ZP9c=;
+        b=AYnAWzIVFoaDtBljLUlyVxNUbZXQP8qTrLkwn6ydtu+ZfM+k9nvGZSXw+WdDovecEn
+         azMt2abFMusYcwb35zF+rDoOCbvBFa16xb1bsNSBw0KnCBnW9xpTScP/meSEuIsJEw+p
+         POsciGzLMj9+HHnuc/8HK4c+SfzeXzdvI+IpHLmH32G/bapR4M7o28JZRN/M0PMH6Fs+
+         7GNpCr+ghLJ4eUn/MWp7BoBr7hEj0jdioP75Goz5ONRA/Dep6OcqZf2tVJ0bR5jCsjin
+         LPaX3wwAAfmMDC5R2GjBas05/KEbgPJNEsgdJagVXnkgDTsOh3iO/v56+KgaskpTQrt3
+         scVw==
+X-Gm-Message-State: AOJu0Yy8eBfzSCYPqqsrCaQDfb8pGQRfavPYIP421jKA03yiK/tmhLEb
+	WzJ3XDeId8YfjNp9s/A4j458YZ3tbjeKbyD7oSG5zOE9mApDhHCDfBVnaLt45ByIQeyPF2wQ9sW
+	Qd8+cy7ECZE4elvh3VQpFC6wJHw==
+X-Google-Smtp-Source: AGHT+IGDTpLNIk1v6FYeKf7oNfAk8Qg6hqB3D47kkAOSUbTW/pul7qUFUR3OYyVFMKcQ9CcbKjzQTmU7clRREaS3tA==
+X-Received: from pfbhj8.prod.google.com ([2002:a05:6a00:8708:b0:746:2747:e782])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:98f:b0:742:a77b:8c3 with SMTP id d2e1a72fcca58-7486cb21e68mr6223581b3a.4.1749678699581;
+ Wed, 11 Jun 2025 14:51:39 -0700 (PDT)
+Date: Wed, 11 Jun 2025 14:51:38 -0700
+In-Reply-To: <20250529054227.hh2f4jmyqf6igd3i@amd.com> (message from Michael
+ Roth on Thu, 29 May 2025 00:42:27 -0500)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3320:EE_|SJ5PPF183C9380E:EE_
-X-MS-Office365-Filtering-Correlation-Id: d07eb428-7ac0-45ee-9237-08dda93062fc
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?T2NQRGJER2JIYUQzOXRBRlhKRHlFYnJMaHBqc2RGOFI3NUF0Z25IWmlUY09G?=
- =?utf-8?B?b2RaaVIvUnlTYUVrbkVqV3VrZDFSR2ZiMlFYeWJlQjBsVWVoSk80bFViUXpS?=
- =?utf-8?B?RTVpNFhxdVpIUkdreGl2cW9wN3AwMVgvY0VoU1g2ZjFUelFFYUxqSHlUdVoy?=
- =?utf-8?B?QjRtUFFPcHE5bDZQWFROMkF4WElyS1hDUFNLeTFiVGYySFE4Y2lMalRkcVNB?=
- =?utf-8?B?UCs0YzNGQnFhVGVTLys1V3l6TWZqQlV5WFkwelpIV2F5dDBBSFdHLytTOUZ2?=
- =?utf-8?B?MUY5ekEwWVh4eFNlczF5ZXFHNTI2UFBmcS9JWDFGNDIrRmpmUGxVdXo0ci82?=
- =?utf-8?B?MGI4bXU1UW1JSEpFTGdYM0JzcUVOaDNaWThIOVlhSWJPZERBU2lrN09GZksv?=
- =?utf-8?B?ZGhodXZUV3VPT3lQOURrbThQcEVTOUQzdG1BT3RWb1d3eS9vQzNwN1g4Zm9n?=
- =?utf-8?B?c3ZDbGpha2ZvclBsUmZJbTJBS3R5QmlCQkFDcW40b05MK1I0clJ2MXVSUjd5?=
- =?utf-8?B?R3B6bk83RXpsalJ6ZDBzZWttR0tLVE84NGlQaUJLWlNWYUs5MEtOVkdLczkz?=
- =?utf-8?B?c2tFb0xxUzRBS3BERWVEQVgwYWlSSks4Zkw2ZDRzcmhCdjFEcFZhRlJxZ2NF?=
- =?utf-8?B?ZEs2L1RIaVdpeUlOZ3dQZnh4Vm9vUUV2RUpNMG53UXZabUJSYlhETmpZTWh5?=
- =?utf-8?B?UEVEdldPak1QZjE3TlkySGpycjc1eE5zdFdxa2hBM3NRQ3pOTEx2clBpS3NE?=
- =?utf-8?B?TU5WR2hibW50akh6T0JtZkpwbmJ4UllHc2txTFZaendmYWpEenlkQVV3M1dC?=
- =?utf-8?B?VHBjMGdzMGlPTWtyVlJObUI0MlZjTGxDL1h1aEhuV1Nmbjh3UVlmcDMvblEz?=
- =?utf-8?B?Q0JSSFJqQkJseGxMM3dTM1BVZmlocUZpa2tNamlvYk5aU3Vjak9LdjBmQzlC?=
- =?utf-8?B?NURWL29mbkFuS25EcEcwa2x0aUtvamVZRUtEOXdjRk1hNDNoZHpjTEF0WGFB?=
- =?utf-8?B?OUEvYTJ5ZmQ0aDZUTGk0aHJDYlU5cFcyMFN6clVyREpsb3RVQUFnRE1sRXVu?=
- =?utf-8?B?MmgzMWhuT3FyMys0ZzB5MW5VV2RoaGhuSWVNR3BWTS9SdzFhSFg0MmQ5Ynho?=
- =?utf-8?B?dzlvOE1HREU3SkNUOVBRV1lnTFcrcHMwcnhSQTQ4NnNZUlUveTRKVlVwTWhx?=
- =?utf-8?B?T2JhbFUxbkw0QkJuYUtrdnJoZXNvVWxxSzd0UC9Yc2JVUVNNTlUyMEtuN1lZ?=
- =?utf-8?B?Vldwdjgzc001ZUh2dUZXc2tXdWtoSE1QTG8wZnJiSmxseXk3ZG9pMHhmczR5?=
- =?utf-8?B?VVVKUWNLanBhbzFZTUlKT1F5cUxUeDVHNEQxRWFWRU9nSHZtNysrWmV2N0FM?=
- =?utf-8?B?Q2ZINU9tY1VJSTR3OU8zZzNmQWdacE5xWGRGSk5TWW8wb0NvZGVJTWJJdjVT?=
- =?utf-8?B?bVZrTEExaHNYVk05bENTVzJrd0ZvWXROQXJVR1JkSkF6UnJQbUdTN2NNeEwz?=
- =?utf-8?B?RXA2Z0Jmd2dSblVWY3Bid3Q1Q0w0UzRla2hoc2VweE5vYVJ6MXNuNmY0K2RC?=
- =?utf-8?B?clFnZzdHZWVpeXFLVXVGZDUraDNDYWNjamlScVgyQ2kvQ3QwVU5TZnRGNFFJ?=
- =?utf-8?B?WDIxN0JRT2lrbTJrOWRCL3dodEk4WU53V2R0c29CczVaRDE3L284dVpGZk8y?=
- =?utf-8?B?VHVCdjdMdzBRdGZDV2tSZWcvYUpnVi9xNUJmUlBYQmhzRmJ5eTc1cTB4aUlE?=
- =?utf-8?B?Z2JOTGhEcXU1dHZSOUlxbTVXTlV2NWxmUnZmQjgySnlJbXJzaXltSTgrVzRy?=
- =?utf-8?B?UThYaUsrRmsyUlkrcFdGUlV5aFBJNzdjSnNDNFFzOGtJaUtCaUdZRkl5aElm?=
- =?utf-8?B?RkRraW9QN1hzdnRHbERWUmRuR1JtYmxZdkJBOG5lNXViRGtxT1Yxb1JRclJE?=
- =?utf-8?Q?g8vRiQgtMrY=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3320.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDA3bE0vdzRqMDV2aDBnQVFNdmxNanlBRDBuVVJNL0pHSVVIcC9kSTdxYmJx?=
- =?utf-8?B?emVKK2FzVXExRlJ2RWNIcmdYVkYydnQ2bEdhbTU2NkRqZTRnUVpLQkRCbVh0?=
- =?utf-8?B?UGJsbktFa0dDd1p1VWlJWFZsYTI3V0NXSHFtT0JjalFUWFlTVXQvQWUzMEZK?=
- =?utf-8?B?cE02TUNhd0lDQzAzY2IrU3V1Yk9sdVNLYUNGcTJJQXpPZ2JHbGVNZHlGV3FJ?=
- =?utf-8?B?cVFRMSs2bysvV3Jlam5DZFNnU0FvV3hDbW9WN2ZHTGVYSUxPd1dyMVJ2cWFs?=
- =?utf-8?B?ODBCMkVaNFhISEt1dWZnbC9mcWVtM3lZMGJxOTgvNll1NW8yazBqeWFMZUdk?=
- =?utf-8?B?eVJxWFlQbDJrVEVaS0dmSGhvblp2K0t4TXdBcFlqbjJCSy9TYnNiTklwVHdt?=
- =?utf-8?B?TVhNNzJHNVU5RE82TFNVOFV1MHZNc0ZBUkhNV3U5UDhxcEo0Nmlrc3lkckZR?=
- =?utf-8?B?cWFITVFraDZRdmRoNEFIUkUzbzQ4ODM0TFhiRTU1QnNsdVpDcW92MDJxTVRj?=
- =?utf-8?B?amgzYmVlUFpXdm1jWHEvTDdaaDdGL3c0a1dmNXdNSGRWMncxdjhUcDZoeW1Q?=
- =?utf-8?B?bHBLcE9oYnlMM0VCeEd5WExOM0NBR0pXc0JONS8wanJEQUN0empYbDhNNHdZ?=
- =?utf-8?B?bWVUYjlGNGZ4RkpmcVVHbm9TaDZaeWJVTDRPWmN3aXNmTzVqQVhtUzhwWktI?=
- =?utf-8?B?WE1kL0xFcW5oM3Z1QktGL2pxejJpTkdhVUhqSnpLMGdRWDdvc3BXakFzbkRa?=
- =?utf-8?B?bWNVVktTN3RUTllNZDZTKy9XNWJrVUdtRGgvSEdTWHZUc0FPTTRRdUlhU2ty?=
- =?utf-8?B?Y1hoMloyWjlEenhTMDBHZmI3QWkxMXRuUGg0Z0tra0puZGIwNjdzaHYxWVhF?=
- =?utf-8?B?Z1NBc1ZPck1WckZTNTFOdHRrbEpzZUpaWnZjMUdzdFljODRnakpLM0h0eFJC?=
- =?utf-8?B?bWFSU1Jrd01XdzhnT0EyMk8zdEYybUovT0ROaU9hWEtqZnlXMVE5cldIcC81?=
- =?utf-8?B?YllVQllmYyt3Vk1tbXgzczJ6TGtNQ0xwNWRiYjdLbGpJNFppS01rTE1UZXJ1?=
- =?utf-8?B?eDJwZ1M0WG5GMTNiajJReGZ5dHhuNGhIRWwvNm40ckN1WjFsWXBreU9zOSs0?=
- =?utf-8?B?QjVuNEEzV0ZMdG5NZEIxQlhhK3B6KzNoTUZ6djRNYWxEemRuM1BVTUNzaTBm?=
- =?utf-8?B?bzhjRFZydVo4cEt4U1drOFBXb1NoNWNQWlRmOFhUck9OSUlGemxuM3ZoMUhj?=
- =?utf-8?B?WGkycXNraXJVdEFkVXBXYlJXNUJ3WVZDM2RoUXg3M2k5a1l3MWVsa3FrSC9I?=
- =?utf-8?B?elZyNDRvRS9ONjBmRzR3dDcxWGhNY0ZrbnF4RGJmWjBtdzViRFR3SUV6RkQ5?=
- =?utf-8?B?U1JRVGhyR0E1b1k5OENScDkvV1o0dElZWitXQnNITlAvZWJNYWN6YmhRT2lq?=
- =?utf-8?B?YTZSUlhWOFpqeHNWWlVmKzJoN0lYdXlNKzY4LzcvTGJCMENuRVZ6aXFvcEZC?=
- =?utf-8?B?VDIzSWJWRFZOM1RqNjc0S09QMGlyZHpqUW9QaVZGTGJMbXROcDF5dkNYSkIy?=
- =?utf-8?B?cFNOYkZKZDV5TUZUQlk5d1drY1pPRU96emVNbDQyaHhGWnBPdHBCa0NucFBk?=
- =?utf-8?B?Y2JXQXhHWXF0aU52RHRNMVZuYm5wMU1FRHNrZ1lDUlU3TUl2YjkzVi9jZldv?=
- =?utf-8?B?dERvWUZzeU1nZmlJVC80NzJoaVZRak01bUNjb3JCbWNyR0xncE4yUDRJNlJM?=
- =?utf-8?B?ZlM0UGk2WUpzSFlqcUVhczlYeFZrY2hBeGhhdjlWRmQ2WlhZZ3lKSlpsYlNC?=
- =?utf-8?B?eksvdFRhNTNKRzc3MzNJdWdXdTdnTFRldjcrSGZqMjQwQmZ0NkRsTnA2TllT?=
- =?utf-8?B?MU1Ib2dOczVjSmNlRU1WUS81akU1eVViYW5BSW1WUkFiWVl3Yy9BT3dMd3FV?=
- =?utf-8?B?VlBDR3cxZE1XSU5vUitFbHZ3QTdxVzNXTjJhSUoxT2NsYklFdFMwbnQwUjhH?=
- =?utf-8?B?dkZBQ3BEelowcGx4VCtBT2t4MjZXNmZhbEdKMXNEVktKWCtwKzVuRXkvZGVw?=
- =?utf-8?B?UTM2V0JBcDFoMU0xKzdNWXZzUldsUWREdzEybXNDVCtKVmNkR2RYNTc3UU02?=
- =?utf-8?Q?i2WeAWDhFwYe9yHt9+0j0UnfX?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d07eb428-7ac0-45ee-9237-08dda93062fc
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3320.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2025 21:39:04.2146
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BceAS6U6F9dwyGCIXD6WA/rqbQ+UuFlytG5+LP2YWbxCn2oEZKh0Y9XudnX1PKcmSpbi2P8CdSucVeKUeQK7PQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF183C9380E
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+Message-ID: <diqz1prqvted.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v2 02/51] KVM: guest_memfd: Introduce and use
+ shareability to guard faulting
+From: Ackerley Tng <ackerleytng@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
+	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
+	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
+	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
+	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
+	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
+	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
+	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
+	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
+	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
+	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
+	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
+	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
+	mic@digikod.net, mpe@ellerman.id.au, muchun.song@linux.dev, nikunj@amd.com, 
+	nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
+	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	pdurrant@amazon.co.uk, peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, 
+	qperret@google.com, quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
+	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
+	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
+	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
+	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
+	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
+	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
+	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
+	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 6/4/2025 8:41 AM, H. Peter Anvin wrote:
-> I think printing the bitmap is fine for unknown bits set... after
-> all, you might have surprise vectors. Maybe a list would be cleaner
-> by some definition, but we already print bitmaps all over the place.
-> It is not critical as long as the information necessary for
-> debugging is there. In fact, it is often better for the information
-> to be compact so users don't get tempted to abbreviate a bug report.
-Sure, will print the full bitmap here. Since this is the unknown NMI
-message, it may have unexpected bits set in the bitmap.
+Michael Roth <michael.roth@amd.com> writes:
 
+> On Wed, May 14, 2025 at 04:41:41PM -0700, Ackerley Tng wrote:
+>> Track guest_memfd memory's shareability status within the inode as
+>> opposed to the file, since it is property of the guest_memfd's memory
+>> contents.
+>> 
+>> Shareability is a property of the memory and is indexed using the
+>> page's index in the inode. Because shareability is the memory's
+>> property, it is stored within guest_memfd instead of within KVM, like
+>> in kvm->mem_attr_array.
+>> 
+>> KVM_MEMORY_ATTRIBUTE_PRIVATE in kvm->mem_attr_array must still be
+>> retained to allow VMs to only use guest_memfd for private memory and
+>> some other memory for shared memory.
+>> 
+>> Not all use cases require guest_memfd() to be shared with the host
+>> when first created. Add a new flag, GUEST_MEMFD_FLAG_INIT_PRIVATE,
+>> which when set on KVM_CREATE_GUEST_MEMFD, initializes the memory as
+>> private to the guest, and therefore not mappable by the
+>> host. Otherwise, memory is shared until explicitly converted to
+>> private.
+>> 
+>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+>> Co-developed-by: Vishal Annapurve <vannapurve@google.com>
+>> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+>> Co-developed-by: Fuad Tabba <tabba@google.com>
+>> Signed-off-by: Fuad Tabba <tabba@google.com>
+>> Change-Id: If03609cbab3ad1564685c85bdba6dcbb6b240c0f
+>> ---
+>>  Documentation/virt/kvm/api.rst |   5 ++
+>>  include/uapi/linux/kvm.h       |   2 +
+>>  virt/kvm/guest_memfd.c         | 124 ++++++++++++++++++++++++++++++++-
+>>  3 files changed, 129 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> index 86f74ce7f12a..f609337ae1c2 100644
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -6408,6 +6408,11 @@ belonging to the slot via its userspace_addr.
+>>  The use of GUEST_MEMFD_FLAG_SUPPORT_SHARED will not be allowed for CoCo VMs.
+>>  This is validated when the guest_memfd instance is bound to the VM.
+>>  
+>> +If the capability KVM_CAP_GMEM_CONVERSIONS is supported, then the 'flags' field
+>> +supports GUEST_MEMFD_FLAG_INIT_PRIVATE.  Setting GUEST_MEMFD_FLAG_INIT_PRIVATE
+>> +will initialize the memory for the guest_memfd as guest-only and not faultable
+>> +by the host.
+>> +
+>
+> KVM_CAP_GMEM_CONVERSION doesn't get introduced until later, so it seems
+> like this flag should be deferred until that patch is in place. Is it
+> really needed at that point though? Userspace would be able to set the
+> initial state via KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls.
+>
 
+I can move this change to the later patch. Thanks! Will fix in the next
+revision.
+
+> The mtree contents seems to get stored in the same manner in either case so
+> performance-wise only the overhead of a few userspace<->kernel switches
+> would be saved. Are there any other reasons?
+>
+> Otherwise, maybe just settle on SHARED as a documented default (since at
+> least non-CoCo VMs would be able to reliably benefit) and let
+> CoCo/GUEST_MEMFD_FLAG_SUPPORT_SHARED VMs set PRIVATE at whatever
+> granularity makes sense for the architecture/guest configuration.
+>
+
+Because shared pages are split once any memory is allocated, having a
+way to INIT_PRIVATE could avoid the split and then merge on
+conversion. I feel that is enough value to have this config flag, what
+do you think?
+
+I guess we could also have userspace be careful not to do any allocation
+before converting.
+
+>>  See KVM_SET_USER_MEMORY_REGION2 for additional details.
+>>  
+>>  4.143 KVM_PRE_FAULT_MEMORY
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 4cc824a3a7c9..d7df312479aa 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1567,7 +1567,9 @@ struct kvm_memory_attributes {
+>>  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+>>  
+>>  #define KVM_CREATE_GUEST_MEMFD	_IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
+>> +
+>>  #define GUEST_MEMFD_FLAG_SUPPORT_SHARED	(1UL << 0)
+>> +#define GUEST_MEMFD_FLAG_INIT_PRIVATE	(1UL << 1)
+>>  
+>>  struct kvm_create_guest_memfd {
+>>  	__u64 size;
+>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> index 239d0f13dcc1..590932499eba 100644
+>> --- a/virt/kvm/guest_memfd.c
+>> +++ b/virt/kvm/guest_memfd.c
+>> @@ -4,6 +4,7 @@
+>>  #include <linux/falloc.h>
+>>  #include <linux/fs.h>
+>>  #include <linux/kvm_host.h>
+>> +#include <linux/maple_tree.h>
+>>  #include <linux/pseudo_fs.h>
+>>  #include <linux/pagemap.h>
+>>  
+>> @@ -17,6 +18,24 @@ struct kvm_gmem {
+>>  	struct list_head entry;
+>>  };
+>>  
+>> +struct kvm_gmem_inode_private {
+>> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>> +	struct maple_tree shareability;
+>> +#endif
+>> +};
+>> +
+>> +enum shareability {
+>> +	SHAREABILITY_GUEST = 1,	/* Only the guest can map (fault) folios in this range. */
+>> +	SHAREABILITY_ALL = 2,	/* Both guest and host can fault folios in this range. */
+>> +};
+>> +
+>> +static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index);
+>> +
+>> +static struct kvm_gmem_inode_private *kvm_gmem_private(struct inode *inode)
+>> +{
+>> +	return inode->i_mapping->i_private_data;
+>> +}
+>> +
+>>  /**
+>>   * folio_file_pfn - like folio_file_page, but return a pfn.
+>>   * @folio: The folio which contains this index.
+>> @@ -29,6 +48,58 @@ static inline kvm_pfn_t folio_file_pfn(struct folio *folio, pgoff_t index)
+>>  	return folio_pfn(folio) + (index & (folio_nr_pages(folio) - 1));
+>>  }
+>>  
+>> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>> +
+>> +static int kvm_gmem_shareability_setup(struct kvm_gmem_inode_private *private,
+>> +				      loff_t size, u64 flags)
+>> +{
+>> +	enum shareability m;
+>> +	pgoff_t last;
+>> +
+>> +	last = (size >> PAGE_SHIFT) - 1;
+>> +	m = flags & GUEST_MEMFD_FLAG_INIT_PRIVATE ? SHAREABILITY_GUEST :
+>> +						    SHAREABILITY_ALL;
+>> +	return mtree_store_range(&private->shareability, 0, last, xa_mk_value(m),
+>> +				 GFP_KERNEL);
+>
+> One really nice thing about using a maple tree is that it should get rid
+> of a fairly significant startup delay for SNP/TDX when the entire xarray gets
+> initialized with private attribute entries via KVM_SET_MEMORY_ATTRIBUTES
+> (which is the current QEMU default behavior).
+>
+> I'd originally advocated for sticking with the xarray implementation Fuad was
+> using until we'd determined we really need it for HugeTLB support, but I'm
+> sort of thinking it's already justified just based on the above.
+>
+> Maybe it would make sense for KVM memory attributes too?
+>
+>> +}
+>> +
+>> +static enum shareability kvm_gmem_shareability_get(struct inode *inode,
+>> +						 pgoff_t index)
+>> +{
+>> +	struct maple_tree *mt;
+>> +	void *entry;
+>> +
+>> +	mt = &kvm_gmem_private(inode)->shareability;
+>> +	entry = mtree_load(mt, index);
+>> +	WARN(!entry,
+>> +	     "Shareability should always be defined for all indices in inode.");
+>> +
+>> +	return xa_to_value(entry);
+>> +}
+>> +
+>> +static struct folio *kvm_gmem_get_shared_folio(struct inode *inode, pgoff_t index)
+>> +{
+>> +	if (kvm_gmem_shareability_get(inode, index) != SHAREABILITY_ALL)
+>> +		return ERR_PTR(-EACCES);
+>> +
+>> +	return kvm_gmem_get_folio(inode, index);
+>> +}
+>> +
+>> +#else
+>> +
+>> +static int kvm_gmem_shareability_setup(struct maple_tree *mt, loff_t size, u64 flags)
+>> +{
+>> +	return 0;
+>> +}
+>> +
+>> +static inline struct folio *kvm_gmem_get_shared_folio(struct inode *inode, pgoff_t index)
+>> +{
+>> +	WARN_ONCE("Unexpected call to get shared folio.")
+>> +	return NULL;
+>> +}
+>> +
+>> +#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+>> +
+>>  static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>>  				    pgoff_t index, struct folio *folio)
+>>  {
+>> @@ -333,7 +404,7 @@ static vm_fault_t kvm_gmem_fault_shared(struct vm_fault *vmf)
+>>  
+>>  	filemap_invalidate_lock_shared(inode->i_mapping);
+>>  
+>> -	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+>> +	folio = kvm_gmem_get_shared_folio(inode, vmf->pgoff);
+>>  	if (IS_ERR(folio)) {
+>>  		int err = PTR_ERR(folio);
+>>  
+>> @@ -420,8 +491,33 @@ static struct file_operations kvm_gmem_fops = {
+>>  	.fallocate	= kvm_gmem_fallocate,
+>>  };
+>>  
+>> +static void kvm_gmem_free_inode(struct inode *inode)
+>> +{
+>> +	struct kvm_gmem_inode_private *private = kvm_gmem_private(inode);
+>> +
+>> +	kfree(private);
+>> +
+>> +	free_inode_nonrcu(inode);
+>> +}
+>> +
+>> +static void kvm_gmem_destroy_inode(struct inode *inode)
+>> +{
+>> +	struct kvm_gmem_inode_private *private = kvm_gmem_private(inode);
+>> +
+>> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+>> +	/*
+>> +	 * mtree_destroy() can't be used within rcu callback, hence can't be
+>> +	 * done in ->free_inode().
+>> +	 */
+>> +	if (private)
+>> +		mtree_destroy(&private->shareability);
+>> +#endif
+>> +}
+>> +
+>>  static const struct super_operations kvm_gmem_super_operations = {
+>>  	.statfs		= simple_statfs,
+>> +	.destroy_inode	= kvm_gmem_destroy_inode,
+>> +	.free_inode	= kvm_gmem_free_inode,
+>>  };
+>>  
+>>  static int kvm_gmem_init_fs_context(struct fs_context *fc)
+>> @@ -549,12 +645,26 @@ static const struct inode_operations kvm_gmem_iops = {
+>>  static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>>  						      loff_t size, u64 flags)
+>>  {
+>> +	struct kvm_gmem_inode_private *private;
+>>  	struct inode *inode;
+>> +	int err;
+>>  
+>>  	inode = alloc_anon_secure_inode(kvm_gmem_mnt->mnt_sb, name);
+>>  	if (IS_ERR(inode))
+>>  		return inode;
+>>  
+>> +	err = -ENOMEM;
+>> +	private = kzalloc(sizeof(*private), GFP_KERNEL);
+>> +	if (!private)
+>> +		goto out;
+>> +
+>> +	mt_init(&private->shareability);
+>> +	inode->i_mapping->i_private_data = private;
+>> +
+>> +	err = kvm_gmem_shareability_setup(private, size, flags);
+>> +	if (err)
+>> +		goto out;
+>> +
+>>  	inode->i_private = (void *)(unsigned long)flags;
+>>  	inode->i_op = &kvm_gmem_iops;
+>>  	inode->i_mapping->a_ops = &kvm_gmem_aops;
+>> @@ -566,6 +676,11 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>>  	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+>>  
+>>  	return inode;
+>> +
+>> +out:
+>> +	iput(inode);
+>> +
+>> +	return ERR_PTR(err);
+>>  }
+>>  
+>>  static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
+>> @@ -654,6 +769,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+>>  	if (kvm_arch_vm_supports_gmem_shared_mem(kvm))
+>>  		valid_flags |= GUEST_MEMFD_FLAG_SUPPORT_SHARED;
+>>  
+>> +	if (flags & GUEST_MEMFD_FLAG_SUPPORT_SHARED)
+>> +		valid_flags |= GUEST_MEMFD_FLAG_INIT_PRIVATE;
+>> +
+>>  	if (flags & ~valid_flags)
+>>  		return -EINVAL;
+>>  
+>> @@ -842,6 +960,8 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+>>  	if (!file)
+>>  		return -EFAULT;
+>>  
+>> +	filemap_invalidate_lock_shared(file_inode(file)->i_mapping);
+>> +
+>
+> I like the idea of using a write-lock/read-lock to protect write/read access
+> to shareability state (though maybe not necessarily re-using filemap's
+> invalidate lock), it's simple and still allows concurrent faulting in of gmem
+> pages. One issue on the SNP side (which also came up in one of the gmem calls)
+> is if we introduce support for tracking preparedness as discussed (e.g. via a
+> new SHAREABILITY_GUEST_PREPARED state) the
+> SHAREABILITY_GUEST->SHAREABILITY_GUEST_PREPARED transition would occur at
+> fault-time, and so would need to take the write-lock and no longer allow for
+> concurrent fault-handling.
+>
+> I was originally planning on introducing a new rw_semaphore with similar
+> semantics to the rw_lock that Fuad previously had in his restricted mmap
+> series[1] (and simiar semantics to filemap invalidate lock here). The main
+> difference, to handle setting SHAREABILITY_GUEST_PREPARED within fault paths,
+> was that in the case of a folio being present for an index, the folio lock would
+> also need to be held in order to update the shareability state. Because
+> of that, fault paths (which will always either have or allocate folio
+> basically) can rely on the folio lock to guard shareability state in a more
+> granular way and so can avoid a global write lock.
+>
+> They would still need to hold the read lock to access the tree however.
+> Or more specifically, any paths that could allocate a folio need to take
+> a read lock so there isn't a TOCTOU situation where shareability is
+> being updated for an index for which a folio hasn't been allocated, but
+> then just afterward the folio gets faulted in/allocated while the
+> shareability state is already being updated which the understand that
+> there was no folio around that needed locking.
+>
+> I had a branch with in-place conversion support for SNP[2] that added this
+> lock reworking on top of Fuad's series along with preparation tracking,
+> but I'm now planning to rebase that on top of the patches from this
+> series that Sean mentioned[3] earlier:
+>
+>   KVM: guest_memfd: Add CAP KVM_CAP_GMEM_CONVERSION
+>   KVM: Query guest_memfd for private/shared status
+>   KVM: guest_memfd: Skip LRU for guest_memfd folios
+>   KVM: guest_memfd: Introduce KVM_GMEM_CONVERT_SHARED/PRIVATE ioctls
+>   KVM: guest_memfd: Introduce and use shareability to guard faulting
+>   KVM: guest_memfd: Make guest mem use guest mem inodes instead of anonymous inodes
+>
+> but figured I'd mention it here in case there are other things to consider on
+> the locking front.
+>
+> Definitely agree with Sean though that it would be nice to start identifying a
+> common base of patches for the in-place conversion enablement for SNP, TDX, and
+> pKVM so the APIs/interfaces for hugepages can be handled separately.
+>
+> -Mike
+>
+> [1] https://lore.kernel.org/kvm/20250328153133.3504118-1-tabba@google.com/
+> [2] https://github.com/mdroth/linux/commits/mmap-swprot-v10-snp0-wip2/
+> [3] https://lore.kernel.org/kvm/aC86OsU2HSFZkJP6@google.com/
+>
+>>  	folio = __kvm_gmem_get_pfn(file, slot, index, pfn, &is_prepared, max_order);
+>>  	if (IS_ERR(folio)) {
+>>  		r = PTR_ERR(folio);
+>> @@ -857,8 +977,8 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+>>  		*page = folio_file_page(folio, index);
+>>  	else
+>>  		folio_put(folio);
+>> -
+>>  out:
+>> +	filemap_invalidate_unlock_shared(file_inode(file)->i_mapping);
+>>  	fput(file);
+>>  	return r;
+>>  }
+>> -- 
+>> 2.49.0.1045.g170613ef41-goog
+>> 
 
