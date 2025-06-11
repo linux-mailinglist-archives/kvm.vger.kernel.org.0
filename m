@@ -1,134 +1,84 @@
-Return-Path: <kvm+bounces-49082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49084-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B4A6AD5AB4
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 17:38:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D792AD5A9C
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 17:35:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CA2F1886AE8
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 15:33:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F0433A7438
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 15:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2786D1CBA18;
-	Wed, 11 Jun 2025 15:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C421DF74F;
+	Wed, 11 Jun 2025 15:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BCqoz7zu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WRvKhwI6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A8B1A8404;
-	Wed, 11 Jun 2025 15:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08AF5156F45
+	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 15:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749656007; cv=none; b=pjGOcF60IW37meOVNec5jVeAWuKLQJllGb27yD3dyTnwV1ohpSj4XxkIVVvpcCE1stBZnKceyB+VGhHiZeCxzgXXf3v8kBlUKYPyHedOcDVCC1smEYk35YKCp/jy9JxLsdO7wr3Yw+cTzwB3H3HmnD8MhfLUAEktGcJV/s6JCMk=
+	t=1749656099; cv=none; b=gwRRCKHiaMnFXeDwmZocicjV+QaNkqwk9qRoBxudst8hhP4E9iertC3AyP/kTyJXufLbXoffrKxVeNBjRE6HSkJF/CPIC2D38zA1mjgRFTkDE3wWmqZH2xx/MpgApMuasco1HGABmNa+QsAxqsnPW8Z1qfqbjkyZaNnXZXgOV7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749656007; c=relaxed/simple;
-	bh=rHdWhg+1tRJ8pdNXFOs6DUEIeNHlwGzTwvSNZrMPbo0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X3WY5QrQXYKrXR0x+dZx/l+tKdEUsetI/Jxy/IgKX6WsRfFVseR8+c3Qt0g/4P1Av52yIoYUjOvrWJBmMbXrJ70y7sVINgXBPn2kOJMiGK4hzWZjKO7Kiqgo1UGfzAKnqGwe4wy87wsprZRm9Y0eJZnqLANFSJCr3V1Kyv2eSTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BCqoz7zu; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749656005; x=1781192005;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=rHdWhg+1tRJ8pdNXFOs6DUEIeNHlwGzTwvSNZrMPbo0=;
-  b=BCqoz7zu2POseJcFiWXxAfPBC2Vhj3tu8gQfgDdevHdtoQuoGsD36YQL
-   OYBTwVyj+OgiE8kolp5xwJQxb0bHBPOonpZlRYtvqq9R6QP2l/fGPDb28
-   WdvB+RhR3tirzIjZJdTapI3vIIOmGEyDgVUPoNwh/SiUPibMZSbYzZu/7
-   BaNQqVWCjL/bdcH+FVNCbbJVtK4a4AW0yFKyZnahzE1idPmNbm2qfREef
-   suYGl1azJh63F3sAMOKWyZ6RKGeQhCqTVZmxmbSQ3uwbQhml/+2C5LS8I
-   8lEE3McomItFcKuJcMkebbSXr3GqlNDETXq5IcJB8V+dQ6DQ9Y3kv4wYW
-   g==;
-X-CSE-ConnectionGUID: TNeozDW7QGKdn1HY8pP2Uw==
-X-CSE-MsgGUID: rZ4hxHaRQiOHNPOzFN/Fzg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="77205331"
-X-IronPort-AV: E=Sophos;i="6.16,228,1744095600"; 
-   d="scan'208";a="77205331"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 08:33:25 -0700
-X-CSE-ConnectionGUID: zTeiCBArR7qm9y0XLQQFLg==
-X-CSE-MsgGUID: YzgO8cNLQsS+jXVw2sVciw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,228,1744095600"; 
-   d="scan'208";a="178181372"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.241.118]) ([10.124.241.118])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 08:33:22 -0700
-Message-ID: <ba611f52-9817-46ff-b16b-a9ef7404a51d@linux.intel.com>
-Date: Wed, 11 Jun 2025 23:33:19 +0800
+	s=arc-20240116; t=1749656099; c=relaxed/simple;
+	bh=oBXwFVsvxKQvihRYD+E/ypPjhW6UchvHo0fLopX35uQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lbYFZ+hirzcDNGqGPviBslnSHRydSHyAiR4eCa0eQTBFJiE7x69pueDMLthxlN/BRUdEBVlZaab1u6Ol8tI5kP0Xhrvh/6tgi6LrPMY/D6u5o8ByKqsJ7Q8lHPA0yhRNMknhPxHN3CXqVhESQjMGT09uMApLrLo7IhS2Rw6V7AI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WRvKhwI6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1698AC4CEE3;
+	Wed, 11 Jun 2025 15:34:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1749656098;
+	bh=oBXwFVsvxKQvihRYD+E/ypPjhW6UchvHo0fLopX35uQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WRvKhwI6I48gXzxK9h+/KVI5tZy2oXezWEB/PPybMRKCG06rQ3Gg37iF+oUAgRM8+
+	 3k1/nx5niTaGThuWk7LywmnH836QbxypOBywzCa+3c2LvYREIhfivEBSxaDIbV6sCi
+	 R/4IKuCJ1ODo9Kh48yD0eH8poPQ8teov4jvIEAk5mP4yDzljhpBpNcpMGdAihJ/4xB
+	 Jv60RQhKmng8ihFuY55/WYg6t7AxWDs+0X6UbfKetwn5Ev56j5nyRYJVTobx5JDvx7
+	 1oGTd9IWAMCTTCa/xvk7EFU2csoGl0J4wdXLJ9UM/6DxHWD745MbMcEymXOlw2RI55
+	 qUDUfnPg60WLw==
+Date: Wed, 11 Jun 2025 21:04:10 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] x86: Disable PIT re-injection for all
+ tests to play nice with (x2)AVIC
+Message-ID: <mf25czbm6fyz7bdgbeecz7nizjmnhoahr3gvbzxyp2inutzeev@3xz54si5gbo6>
+References: <20250603235433.196211-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 4/4] KVM: TDX: Check KVM exit on KVM_HC_MAP_GPA_RANGE
- when TD finalize
-To: Sean Christopherson <seanjc@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "mikko.ylinen@linux.intel.com" <mikko.ylinen@linux.intel.com>,
- Kai Huang <kai.huang@intel.com>, Jiewen Yao <jiewen.yao@intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>, Tony Lindgren <tony.lindgren@intel.com>,
- Adrian Hunter <adrian.hunter@intel.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Yan Y Zhao <yan.y.zhao@intel.com>, Isaku Yamahata
- <isaku.yamahata@intel.com>, Kirill Shutemov <kirill.shutemov@intel.com>
-References: <20250610021422.1214715-1-binbin.wu@linux.intel.com>
- <20250610021422.1214715-5-binbin.wu@linux.intel.com>
- <936ccea77b474fbad1bde799ee92139356f91c5f.camel@intel.com>
- <aEh0oGeh96n9OvCT@google.com>
- <31c4ab96-55bf-4f80-a6fd-3478cc1d1117@linux.intel.com>
- <aEmGTZbMpZhtlkIh@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <aEmGTZbMpZhtlkIh@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250603235433.196211-1-seanjc@google.com>
 
+On Tue, Jun 03, 2025 at 04:54:33PM -0700, Sean Christopherson wrote:
+> Disable PIT re-injection via "-global kvm-pit.lost_tick_policy=discard"
+> for all x86 tests, as KVM inhibits (x2)AVIC when the PIT is in re-injection
+> mode (AVIC doesn't allow KVM to intercept EOIs to do re-injection).  Drop
+> the various unittests.cfg hacks which disable the PIT entirely to effect
+> the same outcome.
+> 
+> Disable re-injection instead of killing off the PIT entirely as the
+> realmode test uses the PIT (but doesn't rely on re-injection).
+> 
+> Cc: Naveen N Rao <naveen@kernel.org>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  x86/run           |  7 ++++++-
+>  x86/unittests.cfg | 10 +++-------
+>  2 files changed, 9 insertions(+), 8 deletions(-)
 
+This is indeed much better, thanks!
+Acked-by: Naveen N Rao (AMD) <naveen@kernel.org>
 
-On 6/11/2025 9:36 PM, Sean Christopherson wrote:
-> On Wed, Jun 11, 2025, Binbin Wu wrote:
->> On 6/11/2025 3:58 AM, Sean Christopherson wrote:
->>> On Tue, Jun 10, 2025, Rick P Edgecombe wrote:
->>>> It seems like the reasoning could be just to shrink the possible configurations
->>>> KVM has to think about, and that we only have the option to do this now before
->>>> the ABI becomes harder to change.
->>>>
->>>> Did you need any QEMU changes as a result of this patch?
->>>>
->>>> Wait, actually I think the patch is wrong, because KVM_CAP_EXIT_HYPERCALL could
->>>> be called again after KVM_TDX_FINALIZE_VM. In which case userspace could get an
->>>> exit unexpectedly. So should we drop this patch?
->>> Yes, drop it.
->>>
->> So, when the TDX guest calls MapGPA and KVM finds userspace doesn't opt-in
->> KVM_HC_MAP_GPA_RANGE, just return error to userspace?
-> Why can't KVM just do what it already does, and return an error to the guest?
->
-> 	if (!user_exit_on_hypercall(vcpu->kvm, KVM_HC_MAP_GPA_RANGE)) {
-> 		ret = TDVMCALL_STATUS_INVALID_OPERAND;
-> 		goto error;
-> 	}
->
-My previous thought was MapGpa is in base GHIC API.
-Userspace is required to opt-in KVM_HC_MAP_GPA_RANGE.
-If not, it's userspace's responsibility, so I thought exit to userspace with
-error may be better.
+- Naveen
 
-If return an error code is preferred, now it has a new status code
-TDVMCALL_STATUS_SUBFUNC_UNSUPPORTED to use.
-
-Basically, if the MapGpa is not support, either choice will stop VM from
-execution. But had a second thought, returning an error code to guest allows
-guest to choose to continue or not if MapGpa failed, though I can't
-imagine what case it is.
 
