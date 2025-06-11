@@ -1,134 +1,148 @@
-Return-Path: <kvm+bounces-49072-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49073-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59F9AD58B0
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 16:26:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FA88AD58C3
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 16:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19DF41649A3
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 14:26:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B482189C6C3
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 14:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CD12BCF51;
-	Wed, 11 Jun 2025 14:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 169E329B23D;
+	Wed, 11 Jun 2025 14:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IeXQ3vEl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HZaAIS6w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6889815B102;
-	Wed, 11 Jun 2025 14:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D898A189BB5
+	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 14:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749651989; cv=none; b=QX9HdZJ94XrV6VfvxM6UnYNE5pmL+3kikYYAQLNrIC0lxIFSra8a21D7x9/8naUG++Y7D31oLk4dlCs+J4MWPKn6mOCQLjVH68v8loTJoFosu+/8tQGIBgv7snTf5ivhOJySCAY1KXlOAigj+qTB9JNnp+5nCOxG893+hdBTCjI=
+	t=1749652225; cv=none; b=pe14JKver1o1VI+F4f6fWnanWb4fjfbJv01/3IvS+pz7gm7L4cbzlxudUk7hbge8jyH2KBWUoHDiCDIEj4H5T2NZrMzpzd0JbHISoN7aIqZu8Kog76R5VS+PSoQFF8wJj52v1G2GI9F3lSdHet3Ry4Kbd8hB23GJhbzlragbTzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749651989; c=relaxed/simple;
-	bh=2v0L3nIc6S0R6Cw8HMNJRjjjRiB2Ue8P/o1nFtAELTw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pRMfuU9vlRuUmWVLuApB9VU2HXYJEcxmJvN8Ks2r3w73yqhAhy92wbK+keslTNYJBqnmel6nklzvk/m5CqU98ox5TIyY5Z/pFKvD5deW6v4zUkYSTZz62YjHUIWaUQXnKvp1JrAF9O3jrdJEi0jtQ43UvWeKftE3iNS9vCS5GDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IeXQ3vEl; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749651989; x=1781187989;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2v0L3nIc6S0R6Cw8HMNJRjjjRiB2Ue8P/o1nFtAELTw=;
-  b=IeXQ3vElvfx/xALRULpm/Vx2lO86BX/ZFwn4k3voPoheTqqrJHE5MsuT
-   gc4r4BaAf2I39grn7v6K/yuE8gPfYBvFw5A4t8S6GWAfU0TCKxNVv5Lr9
-   m8ayoMGCObQ7DZbNX7Ff8qLB50LQw2PNRCO+dYlJbAgITY9frua8aGxIb
-   mx/CmYRzmSiiUk1fHhnNz442otN1CBa54ElmXLAOBZixffbMRKZuSeLFz
-   j6VmzVNWV8MQLyORro/opuwHZuYge+jPOcFJIBXCW5Qrsr4HU2zfK3KlC
-   3/112rcDb18lXWzFhnnMzcgOgOYV/HZkad1XU73t1YZIewNUE1DpIzmXI
-   Q==;
-X-CSE-ConnectionGUID: yK8edSzKRYebq7MFDLm2GA==
-X-CSE-MsgGUID: EZ0Jv/0ZQj2PsMFkipy+eQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="51882808"
-X-IronPort-AV: E=Sophos;i="6.16,228,1744095600"; 
-   d="scan'208";a="51882808"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 07:26:28 -0700
-X-CSE-ConnectionGUID: 9fU3IbJ6T92DkAvUOxVEgQ==
-X-CSE-MsgGUID: 9ygHyfExTwSGmKsPG1YP0g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,228,1744095600"; 
-   d="scan'208";a="184416951"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 07:26:24 -0700
-Message-ID: <a7929151-0a1f-4349-99b5-186c187710ff@intel.com>
-Date: Wed, 11 Jun 2025 22:26:20 +0800
+	s=arc-20240116; t=1749652225; c=relaxed/simple;
+	bh=rkm1anVyEvlv41ekO9EkqphK/tRo0dQ1qrXJJPYq8Gw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CinSnIAV4VZ/UECGHKovv0TJ2LrjUCr0WQvwlfpFZGiH8oCLmp24JVGwYI8anDsZGGvJtAFiVo5MfB6xxve8Te6BNjQDSNrLLr4/e//+YIUt5SGCzzEdjGHemu94HAka8OYIgVrnopQww5cnB1GYyPcmPS5b/z5B+fA1FmKBnb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HZaAIS6w; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2348ac8e0b4so163365ad.1
+        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 07:30:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749652223; x=1750257023; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bCrASjwvEXPxtyzltQ9FdaCz1lyWMA2UAOb6kJk+LMU=;
+        b=HZaAIS6wHnert5EPC18K609hN+G98vQ6VMbNNz/F2dEOuY78og5yxPdMJIvv0f97XF
+         RfLYN+lviGFRLyNeoUXHal/+NHJwoPSBMcVXZ6YNvLTokWl3EJUJrIEJL+8NBc3b+zcL
+         UeSeUhGJEb+Qi7NuDxvLb/ryL4IwCL0YRps1BYst9BuVSTE8Ab+xWtCJsvKiTPIsebm/
+         HcrX7VOTip5Lng1fFdRMNQwEXF6HPE7zQTW5FNywP5Cmrd6cCreZKDV6QuMCiKjh0Un5
+         yGthXeMcWLRzy3RymLLLbblCVEcW4It/NoDkNcpBnnqLzzx3oXwgPNtPIUGRxOHLGrM4
+         WjaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749652223; x=1750257023;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bCrASjwvEXPxtyzltQ9FdaCz1lyWMA2UAOb6kJk+LMU=;
+        b=Oao1pxaaGAOyX6JZA+uDrrisTfgvIOi+0JrEWlbbsZbwd6ww05b5vtonnn6yLrD3uS
+         Y/NSTsfyHsF34a8q9I4qEFmr0/k8MsXFG3bO5j8RcrrGebMWKoupyscb4s8AybPtoQYP
+         QJdHe0VxS5JPWpZDxJTni7iI/CZemCMEdTEaxrQJfGP6pRNt/GKG6xHw+eChCrFv+OkO
+         RhkNXtbwgDawvGpdc0pLKasTTxtcgx1704ANhnt74JPxJU2FV+fBgDSreGFGyHaDKe6u
+         Gf5oY+rpgDU63GT0tG3ugmQykV6GAeSFAM44MuZ9YvNX/WgYCOdLfrP+Jt+nimwXd8nD
+         UoFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUUtDTPEUCVoIqG27mADfYvD8+HlILdHGv59m7c56l04oKcAB33LOYmRXgCG+dR5Iuc2c4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbaptpU9YzUv/1qS30Fbg2lrgKGqyg6m6aiiXLOapt93AzZPq8
+	fUboWWpZxGhqvVJYGzs0bvPbUL6LpEzQI3SyF7Z/kFch6douHyW+U0ElGwfu4FdJ0ZdAbPh7tGS
+	sn5d8FgUyj7TEA4muOmKvBiaQXFJuWmpjZhdjLreT
+X-Gm-Gg: ASbGncu+OVl0VAz38dN4kQtjO6IDGZtV0UvCStlRriZMFWfestXgdIlDfro2P5030Ms
+	MaietR+SYqD4JACnOrCUMB7tL9oGA6yMlsaIkaXsNCQ9yJaO7QL3krmQO1+0H9yOo/xFYRvI/g4
+	/2eFABMD9H2A7wKX2nYeduYCSWkaQx0tn5LDZwTOU2xgEkBUmcFXkGTJt5sbEEjiMpjGw3xgqvY
+	Ls=
+X-Google-Smtp-Source: AGHT+IEhf4eflDYpBh6Otp+k6a5H201iTzzT4f+4id8dLRp3h7IKX6ii2/45YOqAnWuQZlEb6GrQ/WrSSH1VQKvceGs=
+X-Received: by 2002:a17:902:e846:b0:234:afcf:d9e9 with SMTP id
+ d9443c01a7336-23643336f38mr2411095ad.11.1749652222729; Wed, 11 Jun 2025
+ 07:30:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 4/4] KVM: TDX: Check KVM exit on KVM_HC_MAP_GPA_RANGE
- when TD finalize
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "seanjc@google.com" <seanjc@google.com>,
- "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
-Cc: "mikko.ylinen@linux.intel.com" <mikko.ylinen@linux.intel.com>,
- "Huang, Kai" <kai.huang@intel.com>, "Yao, Jiewen" <jiewen.yao@intel.com>,
- "Chatre, Reinette" <reinette.chatre@intel.com>,
- "Lindgren, Tony" <tony.lindgren@intel.com>,
- "Hunter, Adrian" <adrian.hunter@intel.com>,
- "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Shutemov, Kirill" <kirill.shutemov@intel.com>
-References: <20250610021422.1214715-1-binbin.wu@linux.intel.com>
- <20250610021422.1214715-5-binbin.wu@linux.intel.com>
- <936ccea77b474fbad1bde799ee92139356f91c5f.camel@intel.com>
- <aEh0oGeh96n9OvCT@google.com>
- <31c4ab96-55bf-4f80-a6fd-3478cc1d1117@linux.intel.com>
- <aEmGTZbMpZhtlkIh@google.com>
- <ac62541b-185a-47aa-86a7-d4425a98699d@intel.com>
- <f0d42c86e0b2fbad3fa3fdcdce214059b0581573.camel@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <f0d42c86e0b2fbad3fa3fdcdce214059b0581573.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <aCVZIuBHx51o7Pbl@yzhao56-desk.sh.intel.com> <diqzfrgfp95d.fsf@ackerleytng-ctop.c.googlers.com>
+ <aEEEJbTzlncbRaRA@yzhao56-desk.sh.intel.com>
+In-Reply-To: <aEEEJbTzlncbRaRA@yzhao56-desk.sh.intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Wed, 11 Jun 2025 07:30:10 -0700
+X-Gm-Features: AX0GCFvuClKJecOSDpZ2O2m8SBn0sgRnBvQCza0ISi3mFJAfiNvE0buiGQZUE1c
+Message-ID: <CAGtprH_Vj=KS0BmiX=P6nUTdYeAZhNEyjrRFXVK0sG=k4gbBMg@mail.gmail.com>
+Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, pbonzini@redhat.com, seanjc@google.com, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
+	rick.p.edgecombe@intel.com, dave.hansen@intel.com, kirill.shutemov@intel.com, 
+	tabba@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
+	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
+	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
+	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
+	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/11/2025 10:04 PM, Edgecombe, Rick P wrote:
-> On Wed, 2025-06-11 at 22:01 +0800, Xiaoyao Li wrote:
->>>> So, when the TDX guest calls MapGPA and KVM finds userspace doesn't opt-in
->>>> KVM_HC_MAP_GPA_RANGE, just return error to userspace?
->>>
->>> Why can't KVM just do what it already does, and return an error to the
->>> guest?
->>
->> Because GHCI requires it must be supported. No matter with the old GHCI
->> that only allows <GetTdVmCallInfo> to succeed and the success of
->> <GetTdVmCallInfo> means all the TDVMCALL leafs are support, or the
->> proposed updated GHCI that defines <MapGpa> as one of the base API/leaf,
->> and the base API must be supported by VMM.
->>
->> Binbin wants to honor it.
-> 
-> But KVM doesn't need to support all ways that userspace could meet the GHCI
-> spec. If userspace opts-in to the exit, they will meet the spec. If they
-> configure KVM differently then they wont, but this is their decision.
+On Wed, Jun 4, 2025 at 7:45=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wrot=
+e:
+>
+> We need to restore to the previous status (which includes the host page t=
+able)
+> if conversion can't be done.
+> That said, in my view, a better flow would be:
+>
+> 1. guest_memfd sends a pre-invalidation request to users (users here mean=
+s the
+>    consumers in kernel of memory allocated from guest_memfd).
+>
+> 2. Users (A, B, ..., X) perform pre-checks to determine if invalidation c=
+an
+>    proceed. For example, in the case of TDX, this might involve memory
+>    allocation and page splitting.
+>
+> 3. Based on the pre-check results, guest_memfd either aborts the invalida=
+tion or
+>    proceeds by sending the actual invalidation request.
+>
+> 4. Users (A-X) perform the actual unmap operation, ensuring it cannot fai=
+l. For
+>    TDX, the unmap must succeed unless there are bugs in the KVM or TDX mo=
+dule.
+>    In such cases, TDX can callback guest_memfd to inform the poison-statu=
+s of
+>    the page or elevate the page reference count.
 
-I agree with you and Sean. And I'm trying to answer Sean's question on 
-behalf of Binbin.
+Few questions here:
+1) It sounds like the failure to remove entries from SEPT could only
+be due to bugs in the KVM/TDX module, how reliable would it be to
+continue executing TDX VMs on the host once such bugs are hit?
+2) Is it reliable to continue executing the host kernel and other
+normal VMs once such bugs are hit?
+3) Can the memory be reclaimed reliably if the VM is marked as dead
+and cleaned up right away?
 
-Strictly speaking, KVM can be blamed for some reason. Because it is KVM 
-that returns success for <GetTdVmCallInfo> unconditionally when r12 == 0 
-  to report that all the (base) leafs are supported.
-
-But I totally agree with KVM cannot guarantee userspace will behave 
-correctly. Even with this patch that KVM mandates the userspace to 
-enable user exit of KVM_HC_MAP_GPA_RANGE, it's still possible for a 
-misbehaved userspace to error to TD guest on KVM_HC_MAP_GPA_RANGE and 
-breaks the semantics of successful <GetTdVmCallInfo>.
-
-So I'm with you and Sean.
+>
+> 5. guest_memfd completes the invalidation process. If the memory is marke=
+d as
+>    "poison," guest_memfd can handle it accordingly. If the page has an el=
+evated
+>    reference count, guest_memfd may not need to take special action, as t=
+he
+>    elevated count prevents the OS from reallocating the page.
+>    (but from your reply below, seems a callback to guest_memfd is a bette=
+r
+>    approach).
+>
 
