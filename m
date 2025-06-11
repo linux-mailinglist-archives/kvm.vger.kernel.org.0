@@ -1,269 +1,130 @@
-Return-Path: <kvm+bounces-48980-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48981-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 378A6AD5095
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 11:52:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF5DAD50B9
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 12:00:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC92817FD62
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 09:52:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32D9A1895762
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 09:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1E1262FC4;
-	Wed, 11 Jun 2025 09:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hDsllbdH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973DC261568;
+	Wed, 11 Jun 2025 09:59:14 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEB82AD2C;
-	Wed, 11 Jun 2025 09:52:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32C6239E72;
+	Wed, 11 Jun 2025 09:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749635541; cv=none; b=pP0VbBjuQbYYW0EJPoYJ56LDlcOjhfR2gsJTJ3SgbNPpRylTfH/ZaNO1WQau0tnup8qpq1KYTb9iISKkkWZ88EnT/RGRCsQv/qXd8izbo34YQHul7IZ8eAYtExDjpF3yB/KumynF3Q7k4GJyuFl66vJ6h5qcm0QyOd5nWEnjzk8=
+	t=1749635954; cv=none; b=PUa7ksOjmI9Hl6Ot77E+zLwzsfl8aydDihahUAkyilLT436Fml4gS8WbTmCFUFHDi9/ZxlYYu2+/Kq8FM6K44udr2Ld+8KdhIfofz8Zd7xv192ALjXAyGs4v/rsbDYFAYnQOvZ2k8vAXpJ9+utGmcOhGlMwSnL0GUy9uyuzsh80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749635541; c=relaxed/simple;
-	bh=GGizW/M7VQbzlo7DKDQvlGPhtn9EZ02EQGWQqnU9QTI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KoLeR+iD/6N9X/MaoaFjs/tUBpXfFbQtD65ubhf6DYYz/vUTv5bD56ldHnjDQI9Poox4x/sK0e6mxJeInDDw95kI7A7igc/NiFl4RkLEX5gkmJf9V46R/crGOkvpgWj7AhwnBGolbQ7fisWkf/oabzRamz0hcuoHB4W4xwH+4Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hDsllbdH; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749635539; x=1781171539;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=GGizW/M7VQbzlo7DKDQvlGPhtn9EZ02EQGWQqnU9QTI=;
-  b=hDsllbdHHhOHyh6p9+qtGaf+YlDrefKu+dfAW82yofoBbDU6dFViMJ5W
-   fHPxfEJ9onJTYT68vUCOQ7/8XAaOn6dRvX5um4y/jnwVudZqLmhZzz1IO
-   gf8rVfcoJuAiACvo+NvtWkYcnq8poPflLYFqYlJ+3pMOehqCHmgCDcO2S
-   SIvKpFTNupbHa3KqOKX+m4sBMH5joRWanp3mgVyLczLJGHnlmG8hrqZkM
-   SgI5BooIIrGSidegm8In8dXURZmjTYRtTOsYKuUN8r9aXvf3VNNM3L68N
-   QvPN+e2+UuagwmIrwWLmJHQjwi6cJC7WXk0FomD8TVHcPBXWO9BS8UMOT
-   w==;
-X-CSE-ConnectionGUID: DFQpk6sORJOJNmuYS9CJXA==
-X-CSE-MsgGUID: HeTDpOnwTJ6+v3L3TO+NNw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="51872629"
-X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
-   d="scan'208";a="51872629"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 02:52:19 -0700
-X-CSE-ConnectionGUID: rCnoe8qdTj6n8hxMLcD60Q==
-X-CSE-MsgGUID: 48/dVdZqSJKuHn08KvRaaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
-   d="scan'208";a="184350750"
-Received: from opintica-mobl1 (HELO localhost.localdomain) ([10.245.245.146])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 02:52:13 -0700
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com
-Cc: kvm@vger.kernel.org,
-	rick.p.edgecombe@intel.com,
-	kirill.shutemov@linux.intel.com,
-	kai.huang@intel.com,
-	reinette.chatre@intel.com,
-	xiaoyao.li@intel.com,
-	tony.lindgren@linux.intel.com,
-	binbin.wu@linux.intel.com,
-	isaku.yamahata@intel.com,
-	linux-kernel@vger.kernel.org,
-	yan.y.zhao@intel.com,
-	chao.gao@intel.com
-Subject: [PATCH V4 1/1] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
-Date: Wed, 11 Jun 2025 12:51:58 +0300
-Message-ID: <20250611095158.19398-2-adrian.hunter@intel.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250611095158.19398-1-adrian.hunter@intel.com>
-References: <20250611095158.19398-1-adrian.hunter@intel.com>
+	s=arc-20240116; t=1749635954; c=relaxed/simple;
+	bh=HwXs6qp3W7EZHA1+yzvKN6nMOhRAgv4bEYIrYnnhwjU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O/sXy8AsghOHelsubfvbgYGNIYYzqjcZerTFFGhhYHmFQhbx9S6OY2BJDzoYciZGYeqwIi/k7Nwqk33lMQBImJqTatD9R9kkCyY85JmLZe6/UxoLxj9AhmPPBmuWZ7Dm9y8CAEQcIWaD1+NvZ4BM6q42GH4N2ixR1TQl/dI3bl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7E2651596;
+	Wed, 11 Jun 2025 02:58:52 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 999603F673;
+	Wed, 11 Jun 2025 02:59:09 -0700 (PDT)
+Date: Wed, 11 Jun 2025 10:59:06 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Ada Couprie Diaz <ada.coupriediaz@arm.com>,
+	linux-kernel@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH V3 2/2] KVM: selftests: Change MDSCR_EL1 register holding
+ variables as uint64_t
+Message-ID: <aElTaqOqzAi17H2b@J2N7QTR9R3>
+References: <20250610053128.4118784-1-anshuman.khandual@arm.com>
+ <20250610053128.4118784-3-anshuman.khandual@arm.com>
+ <864iwnedjk.wl-maz@kernel.org>
+ <9b378582-44eb-4fbb-a03a-40eb317daebd@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9b378582-44eb-4fbb-a03a-40eb317daebd@arm.com>
 
-From: Sean Christopherson <seanjc@google.com>
+On Wed, Jun 11, 2025 at 09:15:10AM +0530, Anshuman Khandual wrote:
+> 
+> 
+> On 10/06/25 10:31 PM, Marc Zyngier wrote:
+> > On Tue, 10 Jun 2025 06:31:28 +0100,
+> > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+> >>
+> >> Change MDSCR_EL1 register holding local variables as uint64_t that reflects
+> >> its true register width as well.
+> >>
+> >> Cc: Marc Zyngier <maz@kernel.org>
+> >> Cc: Oliver Upton <oliver.upton@linux.dev>
+> >> Cc: Joey Gouly <joey.gouly@arm.com>
+> >> Cc: kvm@vger.kernel.org
+> >> Cc: kvmarm@lists.linux.dev
+> >> Cc: linux-kernel@vger.kernel.org
+> >> Cc: linux-kselftest@vger.kernel.org
+> >> Cc: linux-arm-kernel@lists.infradead.org
+> >> Reviewed-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
+> >> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> >> ---
+> >>  tools/testing/selftests/kvm/arm64/debug-exceptions.c | 4 ++--
+> >>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/tools/testing/selftests/kvm/arm64/debug-exceptions.c b/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> >> index c7fb55c9135b..e34963956fbc 100644
+> >> --- a/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> >> +++ b/tools/testing/selftests/kvm/arm64/debug-exceptions.c
+> >> @@ -140,7 +140,7 @@ static void enable_os_lock(void)
+> >>  
+> >>  static void enable_monitor_debug_exceptions(void)
+> >>  {
+> >> -	uint32_t mdscr;
+> >> +	uint64_t mdscr;
+> >>  
+> >>  	asm volatile("msr daifclr, #8");
+> >>  
+> >> @@ -223,7 +223,7 @@ void install_hw_bp_ctx(uint8_t addr_bp, uint8_t ctx_bp, uint64_t addr,
+> >>  
+> >>  static void install_ss(void)
+> >>  {
+> >> -	uint32_t mdscr;
+> >> +	uint64_t mdscr;
+> >>  
+> >>  	asm volatile("msr daifclr, #8");
+> >>  
+> > 
+> > Why change this in the place that matters *the least*?
+> > 
+> > arch/arm64/kernel/debug-monitors.c is full of 32bit manipulation of
+> > this register, and that's only one example of it. So if you are going
+> > to change this, please do it fully, not as a random change in a random
+> > file.
+> 
+> The first patch in this series changes mdscr system register to 64 bit
+> in the mentioned file (i.e arch/arm64/kernel/debug-monitors.c). 
 
-Add sub-ioctl KVM_TDX_TERMINATE_VM to release the HKID prior to shutdown,
-which enables more efficient reclaim of private memory.
+You did not Cc Marc on oatch 1 or the cover letter. KVM folk are only
+Cc'd on patch 2.
 
-Private memory is removed from MMU/TDP when guest_memfds are closed. If
-the HKID has not been released, the TDX VM is still in RUNNABLE state,
-so pages must be removed using "Dynamic Page Removal" procedure (refer
-TDX Module Base spec) which involves a number of steps:
-	Block further address translation
-	Exit each VCPU
-	Clear Secure EPT entry
-	Flush/write-back/invalidate relevant caches
+Marc, for context the series is:
 
-However, when the HKID is released, the TDX VM moves to TD_TEARDOWN state
-where all TDX VM pages are effectively unmapped, so pages can be reclaimed
-directly.
+  https://lore.kernel.org/linux-arm-kernel/20250610053128.4118784-1-anshuman.khandual@arm.com/
 
-Reclaiming TD Pages in TD_TEARDOWN State was seen to decrease the total
-reclaim time.  For example:
+... and I've asked Anshuman to better describe the rationale.
 
-	VCPUs	Size (GB)	Before (secs)	After (secs)
-	 4	 18		  72		 24
-	32	107		 517		134
-	64	400		5539		467
-
-Link: https://lore.kernel.org/r/Z-V0qyTn2bXdrPF7@google.com
-Link: https://lore.kernel.org/r/aAL4dT1pWG5dDDeo@google.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Co-developed-by: Adrian Hunter <adrian.hunter@intel.com>
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
-
-
-Changes in V4:
-
-	Drop TDX_FLUSHVP_NOT_DONE change.  It will be done separately.
-	Use KVM_BUG_ON() instead of WARN_ON().
-	Correct kvm_trylock_all_vcpus() return value.
-
-Changes in V3:
-
-	Remove KVM_BUG_ON() from tdx_mmu_release_hkid() because it would
-	trigger on the error path from __tdx_td_init()
-
-	Put cpus_read_lock() handling back into tdx_mmu_release_hkid()
-
-	Handle KVM_TDX_TERMINATE_VM in the switch statement, i.e. let
-	tdx_vm_ioctl() deal with kvm->lock
-
-
- Documentation/virt/kvm/x86/intel-tdx.rst | 16 +++++++++++
- arch/x86/include/uapi/asm/kvm.h          |  1 +
- arch/x86/kvm/vmx/tdx.c                   | 34 ++++++++++++++++++------
- 3 files changed, 43 insertions(+), 8 deletions(-)
-
-diff --git a/Documentation/virt/kvm/x86/intel-tdx.rst b/Documentation/virt/kvm/x86/intel-tdx.rst
-index de41d4c01e5c..e5d4d9cf4cf2 100644
---- a/Documentation/virt/kvm/x86/intel-tdx.rst
-+++ b/Documentation/virt/kvm/x86/intel-tdx.rst
-@@ -38,6 +38,7 @@ ioctl with TDX specific sub-ioctl() commands.
-           KVM_TDX_INIT_MEM_REGION,
-           KVM_TDX_FINALIZE_VM,
-           KVM_TDX_GET_CPUID,
-+          KVM_TDX_TERMINATE_VM,
- 
-           KVM_TDX_CMD_NR_MAX,
-   };
-@@ -214,6 +215,21 @@ struct kvm_cpuid2.
- 	  __u32 padding[3];
-   };
- 
-+KVM_TDX_TERMINATE_VM
-+-------------------
-+:Type: vm ioctl
-+:Returns: 0 on success, <0 on error
-+
-+Release Host Key ID (HKID) to allow more efficient reclaim of private memory.
-+After this, the TD is no longer in a runnable state.
-+
-+Using KVM_TDX_TERMINATE_VM is optional.
-+
-+- id: KVM_TDX_TERMINATE_VM
-+- flags: must be 0
-+- data: must be 0
-+- hw_error: must be 0
-+
- KVM TDX creation flow
- =====================
- In addition to the standard KVM flow, new TDX ioctls need to be called.  The
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 6f3499507c5e..697d396b2cc0 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -940,6 +940,7 @@ enum kvm_tdx_cmd_id {
- 	KVM_TDX_INIT_MEM_REGION,
- 	KVM_TDX_FINALIZE_VM,
- 	KVM_TDX_GET_CPUID,
-+	KVM_TDX_TERMINATE_VM,
- 
- 	KVM_TDX_CMD_NR_MAX,
- };
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index b952bc673271..457f91b95147 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -515,6 +515,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
- 		goto out;
- 	}
- 
-+	write_lock(&kvm->mmu_lock);
- 	for_each_online_cpu(i) {
- 		if (packages_allocated &&
- 		    cpumask_test_and_set_cpu(topology_physical_package_id(i),
-@@ -539,7 +540,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
- 	} else {
- 		tdx_hkid_free(kvm_tdx);
- 	}
--
-+	write_unlock(&kvm->mmu_lock);
- out:
- 	mutex_unlock(&tdx_lock);
- 	cpus_read_unlock();
-@@ -1789,13 +1790,13 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 	struct page *page = pfn_to_page(pfn);
- 	int ret;
- 
--	/*
--	 * HKID is released after all private pages have been removed, and set
--	 * before any might be populated. Warn if zapping is attempted when
--	 * there can't be anything populated in the private EPT.
--	 */
--	if (KVM_BUG_ON(!is_hkid_assigned(to_kvm_tdx(kvm)), kvm))
--		return -EINVAL;
-+	if (!is_hkid_assigned(to_kvm_tdx(kvm))) {
-+		KVM_BUG_ON(!kvm->vm_dead, kvm);
-+		ret = tdx_reclaim_page(page);
-+		if (!ret)
-+			tdx_unpin(kvm, page);
-+		return ret;
-+	}
- 
- 	ret = tdx_sept_zap_private_spte(kvm, gfn, level, page);
- 	if (ret <= 0)
-@@ -2790,6 +2791,20 @@ static int tdx_td_finalize(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- 	return 0;
- }
- 
-+static int tdx_terminate_vm(struct kvm *kvm)
-+{
-+	if (kvm_trylock_all_vcpus(kvm))
-+		return -EBUSY;
-+
-+	kvm_vm_dead(kvm);
-+
-+	kvm_unlock_all_vcpus(kvm);
-+
-+	tdx_mmu_release_hkid(kvm);
-+
-+	return 0;
-+}
-+
- int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
- {
- 	struct kvm_tdx_cmd tdx_cmd;
-@@ -2817,6 +2832,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
- 	case KVM_TDX_FINALIZE_VM:
- 		r = tdx_td_finalize(kvm, &tdx_cmd);
- 		break;
-+	case KVM_TDX_TERMINATE_VM:
-+		r = tdx_terminate_vm(kvm);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		goto out;
--- 
-2.48.1
-
+Mark.
 
