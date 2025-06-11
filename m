@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-49032-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49033-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1E3AD5313
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 13:06:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF45AD5305
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 13:05:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 341943B173A
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 11:03:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A57C1E30BC
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 11:04:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB48C271446;
-	Wed, 11 Jun 2025 10:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1F228313D;
+	Wed, 11 Jun 2025 10:51:48 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029022E58B9;
-	Wed, 11 Jun 2025 10:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DDA9283121;
+	Wed, 11 Jun 2025 10:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749639103; cv=none; b=rivz7trYnDDl89G2WHBegeGV/DEfH9X+/LajOO7I8MOfersBt7SFxHng+MKwpMytnWOwGOd+IGcnsa4X8KRm5TJFEcbk6JE1fTX0Ku2LlVzUHwYUxRF+k6jpNhpPfyMv/Flo76hpddcJcMvdYa1H0uF4JZtGWX5yq1ygCbdFP1s=
+	t=1749639107; cv=none; b=HU9e9TaVFFJOHF2W8hau+TYfvoEpgfovAj5rdqvBDxbrrazrOqxpvqkkgVtrqv1JtjNBNKm+mqykxNTGcIdvW3Ihl682xGGyFzHF/UU4ndAAFh71/jh/WAOMADTsd62AgAoKGqCrZ2TwuMShytBTaVd8bd0JYh+A+6cZPtG+MgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749639103; c=relaxed/simple;
-	bh=zoNX4sBTDp0zwte8yk215/K83SIoYWcajdpA/0WShoQ=;
+	s=arc-20240116; t=1749639107; c=relaxed/simple;
+	bh=Q6rKcvEK3JD2FRQ36VpTV1lBtdavkrHrxZ1+rXKEr7M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nAK7y2j4rZ2XiZoHGfyvj+qoP/posCh7EqmY81DfyV9n+TH7QcgcSExYhIP7YR/uKjOhUInJ3uLBzuJknGJUl/QyE8Y0tOltSLoDtLd3sGlxkMFbA7E7O5p5fN9GYmW8SFOMTMZwBZe7PxbLKBRyEhg3JsfeMaid1qwGIlGc9p4=
+	 MIME-Version; b=YxCcAqYIj6QvTboefV30Vvt0hxaBcIw7N8jX170F3KwKWW/pOXoFzS5AE7DXN1eefOBRJP7miPlNeZKxpIjEd/ejVUsiRn1/96Fc+IE+oFhBAjAe0beF82EmpvqaZdQ/lf/oxw5bR6rVPF6q9bIY75oXf8rSE6EVSZOSS2EUajg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0CAC92BC4;
-	Wed, 11 Jun 2025 03:51:22 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A5F92BC6;
+	Wed, 11 Jun 2025 03:51:26 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.67.107])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0D63C3F59E;
-	Wed, 11 Jun 2025 03:51:37 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EAEA93F59E;
+	Wed, 11 Jun 2025 03:51:41 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -57,9 +57,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Alper Gun <alpergun@google.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>
-Subject: [PATCH v9 42/43] KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
-Date: Wed, 11 Jun 2025 11:48:39 +0100
-Message-ID: <20250611104844.245235-43-steven.price@arm.com>
+Subject: [PATCH v9 43/43] KVM: arm64: Allow activating realms
+Date: Wed, 11 Jun 2025 11:48:40 +0100
+Message-ID: <20250611104844.245235-44-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250611104844.245235-1-steven.price@arm.com>
 References: <20250611104844.245235-1-steven.price@arm.com>
@@ -71,31 +71,58 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Increment KVM_VCPU_MAX_FEATURES to expose the new capability to user
-space.
+Add the ioctl to activate a realm and set the static branch to enable
+access to the realm functionality if the RMM is detected.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
-Changes since v8:
- * Since NV is now merged and enabled, this no longer conflicts with it.
----
- arch/arm64/include/asm/kvm_host.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/rme.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 9903b0e8ef3f..d16483f9d358 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -40,7 +40,7 @@
+diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+index 635d22825a70..a25f57387e3e 100644
+--- a/arch/arm64/kvm/rme.c
++++ b/arch/arm64/kvm/rme.c
+@@ -1250,6 +1250,20 @@ static int kvm_init_ipa_range_realm(struct kvm *kvm,
+ 	return realm_init_ipa_state(kvm, addr, end);
+ }
  
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
++static int kvm_activate_realm(struct kvm *kvm)
++{
++	struct realm *realm = &kvm->arch.realm;
++
++	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
++		return -EINVAL;
++
++	if (rmi_realm_activate(virt_to_phys(realm->rd)))
++		return -ENXIO;
++
++	WRITE_ONCE(realm->state, REALM_STATE_ACTIVE);
++	return 0;
++}
++
+ /* Protects access to rme_vmid_bitmap */
+ static DEFINE_SPINLOCK(rme_vmid_lock);
+ static unsigned long *rme_vmid_bitmap;
+@@ -1397,6 +1411,9 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+ 		r = kvm_populate_realm(kvm, &args);
+ 		break;
+ 	}
++	case KVM_CAP_ARM_RME_ACTIVATE_REALM:
++		r = kvm_activate_realm(kvm);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -1722,5 +1739,5 @@ void kvm_init_rme(void)
+ 	if (rme_vmid_init())
+ 		return;
  
--#define KVM_VCPU_MAX_FEATURES 9
-+#define KVM_VCPU_MAX_FEATURES 10
- #define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
- 
- #define KVM_REQ_SLEEP \
+-	/* Future patch will enable static branch kvm_rme_is_available */
++	static_branch_enable(&kvm_rme_is_available);
+ }
 -- 
 2.43.0
 
