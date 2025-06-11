@@ -1,238 +1,230 @@
-Return-Path: <kvm+bounces-48977-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48978-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2BF6AD4F05
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 10:59:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C477AD4FC9
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 11:31:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E053F1887188
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 08:59:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5D5C3A5D4F
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 09:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53DA024DCF2;
-	Wed, 11 Jun 2025 08:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A172F18DB34;
+	Wed, 11 Jun 2025 09:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Clg1arqZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z0tesly6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E9C2517AF;
-	Wed, 11 Jun 2025 08:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749632346; cv=none; b=G6XT8sT+hOLPHV/ov8ohkO6/+ebx6hUIA7U8piznxXS+FIWyJn8+roW9Im9xAiD8nSsWuTAMnXeUZ9o9FGJP32N61706ezwFnPNaIci+ad4T50fLAGBqcApFA64gOAlb3HhLv6pF2xlvKz6tSookL5MhlyoJSAlmVBPPNvyV+Z8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749632346; c=relaxed/simple;
-	bh=H1IHx/yRO5qZEp5ATIRAziVQv2P7VBMGrjmsGJ7dA4U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Od3e0dc6r+urB2tmB9Btpbl4mNwHkwGbDf7NEmZygc+4er4SshWIY1d/3yw1xsf2wy9uwj2dOayESt7ZJlwwJdUD8PIlGUNQTMfhJ9xMDP4/RNzCvrlnEeh12YWh7jOen83qH7FyiHUCkjQsBQ8hRYBd8p3DiLt+NaT/sOSiSpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Clg1arqZ; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1421A9B28;
+	Wed, 11 Jun 2025 09:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749634216; cv=fail; b=Mei7qIM0K1iBVwW+yJsHPo5RGzertB3tetBNQahMAoXMJwtHHUpbSLQJCF4I6glNF9NCXWRaLzQbb4UT0fv0QJoPuShA0ZMwqphcARhmhGM5pkGF1iaQKbZBFwps8EOjqyBBjW3lrh661VJfgNw16IfgaSovoOCn09z7K0CFk0A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749634216; c=relaxed/simple;
+	bh=QanWZLNe1GwOtK+HvYylfwBtb8cmiJeZjQ6lOnUIK/Q=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=GwsaMG6y1EvEwamWt/Le9WAs6Ls7UVMcOjqJPDiXSAi1iz+FL7aq7+QA0KZm8A+F5WZPhuAvzg1yHEq4F5H//rOLKadj+f+DerUbfNNuuWkHmXsKrhIAyfZqGh7yg6rLhnOTCKXQiwAkaciP9AmBE47WjawBeuD5DMRc2ckC54w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z0tesly6; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749632344; x=1781168344;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=H1IHx/yRO5qZEp5ATIRAziVQv2P7VBMGrjmsGJ7dA4U=;
-  b=Clg1arqZZXp95SgMxKRc0lhVgH56ZU8Z2hTBVH9joQRtwTzDAgJ48dgD
-   jSNI09BAO5A0ey+3cEOf1AhIByYlcluKoIGE09ztl8Us/f3LFuQc6tSdG
-   RQEm4m3/4pvRvS2iC9O0/qA8ZeVyf50ddPKkqHb7YveqSIl5IB888hKQv
-   nChsjH/Ex+ULddWi1ecjgw0m7bfNzOBzFx6KVkGayquj5mJKpF7b2Cicm
-   2q0ZeibowsDPtuwrg21mM4ufxUwMinegI2t+CxBFOHDujKUZWFVuPvS0S
-   HINLN7VqN11iS9q/V+TTszoCfJAGJLIMNbPuFAB1VWKWqOIAYvHNnTDXp
-   Q==;
-X-CSE-ConnectionGUID: g/k/3tjsSR+poFCiXRoOLw==
-X-CSE-MsgGUID: Tl6K0Tk8RAWpIT2Nxq8Ulg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="51682056"
+  t=1749634215; x=1781170215;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=QanWZLNe1GwOtK+HvYylfwBtb8cmiJeZjQ6lOnUIK/Q=;
+  b=Z0tesly6MF9D69YANvKKNl6wGnfpcltLBzWY40vYuT0CVqR9+1Hke5zX
+   ewm4y215NkadFz0kPgD+rL5UOpuw04wQfEPykfpJVH6fY/H+TTuDgUZJX
+   w7Ad57EeNt444OHmyeWVbFXyjcXDmWLsY2KwrqN9BQLX9H7+oklw50geK
+   r5UsOo53xhiaH9OkNtlZ6DMVvmDwtCWg3a0R9UypWmNVa5Ssl1lVEPle4
+   FXdU8rUV4BHPC5jsBgLyXmnlTIZm6bp/zARi8FzOnaKgmOMtUo/VZlaFO
+   FhS00MQi4OZVvg8HhJKkx4vSARMsV+VMQ57UfuRQxIdfCNsXFrE3Puxce
+   g==;
+X-CSE-ConnectionGUID: nr/fmGgMR22jSZH81fewkA==
+X-CSE-MsgGUID: jTREON8yQpuktC5Rj02B5w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="69332081"
 X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
-   d="scan'208";a="51682056"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 01:59:03 -0700
-X-CSE-ConnectionGUID: ZOFRd4v0RE6I3oTvgxfrEg==
-X-CSE-MsgGUID: A5t0RdlsQZufrveceCUMng==
+   d="scan'208";a="69332081"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 02:30:14 -0700
+X-CSE-ConnectionGUID: +3zsOZr9S/qoZ4QxH48QrA==
+X-CSE-MsgGUID: WJyC+mSqRZeubR8f8vG6PQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
-   d="scan'208";a="184339216"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.144]) ([10.124.245.144])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 01:59:01 -0700
-Message-ID: <b8fdbde0-f5d3-484e-877b-c59e8c39bdaa@linux.intel.com>
-Date: Wed, 11 Jun 2025 16:58:58 +0800
+   d="scan'208";a="148053381"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 02:30:13 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 02:30:12 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 11 Jun 2025 02:30:12 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (40.107.236.71)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 11 Jun 2025 02:30:12 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VEZIRipFwPfxE9H5mqY6iE2jtncfOgZCbdlw9Xb+IT5By+LvwJnG9PWw3MywwJztStJ1LfD5nHrRVDUZx8om9kBUow5DvIF8AnLvjrO1/2oUmedJhocx2/VcbNI+/5le6ZmBy7mm7NOYxQ/n9y2biYEysrhVjqsA/ORzVVv8rg8GpKPqUJ0KE4awZDHDTFfmqVBxbhL7SkYlHC58/hzJYWs/F62XGBPii0JisX4aBPLHqkWZ0k30ytGT0S8qwBDShOryDBAszNk8hYqDkUOWjz6nyoY5UKFm23+LeyPTvSe9YqRN+85IKKUQbfiV4GD49mTwXEELVg8MATTK9UQNgQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=a1aSfzCrXpD7cMo2uL3Q/XTKje9hBbPAWyD89JeUuv0=;
+ b=NHeFNfoO6/3k9pn/lpD9gdBnYNCOq+GNOUEPHaVEtVWto4sOF1zQXq6vCzNCruIXXLlx0XCefh3OUF4HuNAd2+c5WIdtTfX4PJq6SDvHSAm2OHais1Mr+2R7uSJh2kcy/YRiBiR59+l1RlVZfvuUa0QkeUIkJzrPO9cPSHrOYO0BseCONZSgfpFtKCO8zC3P+RjSnFGVsW7QTQ15nqI6ucMCyAPnlM3k1v2OHkfb8HNHqYVAleA2juRkqoUUkPM5REooqWBBCW6P4hY427HPS0/VijVPrXozNyqObNHcrxcgPalzCkCNbyzILP6l3EbVR71X8zi3rWkxZKk00Y3Mmw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN6PR11MB3214.namprd11.prod.outlook.com (2603:10b6:805:c7::12)
+ by DS7PR11MB7738.namprd11.prod.outlook.com (2603:10b6:8:e0::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8813.30; Wed, 11 Jun 2025 09:30:03 +0000
+Received: from SN6PR11MB3214.namprd11.prod.outlook.com
+ ([fe80::9507:5635:9ddf:a558]) by SN6PR11MB3214.namprd11.prod.outlook.com
+ ([fe80::9507:5635:9ddf:a558%3]) with mapi id 15.20.8813.018; Wed, 11 Jun 2025
+ 09:30:01 +0000
+Message-ID: <bde92ac8-6c6d-476f-9c9d-d057cc1a051c@intel.com>
+Date: Wed, 11 Jun 2025 12:29:56 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/8] KVM: TDX: Use kvm_arch_vcpu.host_debugctl to
+ restore the host's DEBUGCTL
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+	<pbonzini@redhat.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Maxim Levitsky
+	<mlevitsk@redhat.com>
+References: <20250610232010.162191-1-seanjc@google.com>
+ <20250610232010.162191-2-seanjc@google.com>
+Content-Language: en-US
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <20250610232010.162191-2-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL1PR13CA0278.namprd13.prod.outlook.com
+ (2603:10b6:208:2bc::13) To SN6PR11MB3214.namprd11.prod.outlook.com
+ (2603:10b6:805:c7::12)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 7/8] KVM: VMX: Wrap all accesses to IA32_DEBUGCTL with
- getter/setter APIs
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Adrian Hunter <adrian.hunter@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>
-References: <20250610232010.162191-1-seanjc@google.com>
- <20250610232010.162191-8-seanjc@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250610232010.162191-8-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR11MB3214:EE_|DS7PR11MB7738:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5acec388-807f-46ca-c1be-08dda8ca8a32
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?cmlEanlrQkhvbFVrRzZWS2daSTVsZ3ZkZlhFZ1haaFFQamFFdUtuK0FNSmZW?=
+ =?utf-8?B?TnJhYmVzWE5TSWtYZmdjWFB4WmRzS0hJU3hGZ0lmZmZCUVd5ZXp3NldTaUVX?=
+ =?utf-8?B?N2h5Tm1YWGg1WGJvNnhDR3NaWHlCRXZVeDJ6SWxpcStmcVE1bVE0QmdleUo2?=
+ =?utf-8?B?U2JSbU9MTVNuak0wMDdSNktwdzBmWUtTZHJ6TVlPN1V0NEVIbERZKzR5Wnhl?=
+ =?utf-8?B?TXIyT2oxUzRFTkhmWkxPQUwzQVhuZWtYTEkvdzlMaHZybllucWRONFlUL204?=
+ =?utf-8?B?czJwRTZBNm5iYlI2c1kzT2V3UkZ0QVkyVTB5N2cwcCswUlJZOTdsa05qSGpF?=
+ =?utf-8?B?dFdNeFBLN0dyTm5heGczV0VwcFJjdTR5Qkxud2xBRkw4eGJCRGM0aDExMzdl?=
+ =?utf-8?B?ZFRZSDJZQW0zQlFmdkM1bitKKzBJSmQ0bHpZOVdTQUd1REVOV1UxUXRpdHU1?=
+ =?utf-8?B?V1A5aTUwZVk3b2ltMDgyYWc5RWNNQ21mTnYrVGM1c2VYOVN4YmMyWjFoOFVZ?=
+ =?utf-8?B?WUs5R1FoTjNSVDRuUEVZWWN5cXNTWkNoNUx1NlFIMlpPYlhlN2Mzb2I1Uzd1?=
+ =?utf-8?B?M0Ztb0VvWVgyNFdOYnEvbTNrT2wrMENDVUZ1bVNGcFBtRkRjeTd0bEx4L0tn?=
+ =?utf-8?B?YUsrM3RibWE3Tk1tQTBxc3JCanpGS3VtMjB1UUVEMmNuaXJlQVZkbUM2K3Jj?=
+ =?utf-8?B?ZnVMd2UydkdmUGlwMG9hcXdFQ0pTWFpJSitTSU1yOU1BR0laUTkxem03eVI4?=
+ =?utf-8?B?UkxxelVYYWN2azYvYzJtOHNPT0djam5NWFRrWFVtSnRWOXhLVmJzOE9ySWJK?=
+ =?utf-8?B?K0VwWHF3YWYwZmdBekt6UEVzbGk2eFNPNS9laTJvcFRrOHYrNVkzWjRieSsx?=
+ =?utf-8?B?SEdmQmp5aTFwaW5oMy9OWWE1SElHb3Z2SDR6Y0JSUDBLY3lYbFIzRC9PMXFS?=
+ =?utf-8?B?TVZpalh4Q0x5dTJ5NjlPOCsxNEM5K3U1dVFWRjczcE92eUFuWjVRQSttZmVI?=
+ =?utf-8?B?WkxSRThkdTZYck1IZktrbWJjRHhST1RxUDA5N1BWMGs4OEtUTGVaZE5jRHVC?=
+ =?utf-8?B?UmkxWmZ5STdwZkRZTkNOVXRqdElaWlBHNnRkVkxITzllRzllRm9aOHJMeDdH?=
+ =?utf-8?B?cjhSUGF6Nm5WaUZETDZOUkhNVEM0SStXS0x1RkErcGpYSHVMaFlza2xiODU0?=
+ =?utf-8?B?VDlhTmlCODIxMS92bG1IS2lITzRSb3BPbEZnYmMyWE1aeWNmbTNpNVk3VkV4?=
+ =?utf-8?B?QXJubWlFekEzeUpQVTM3U2lVcWZHNHJoR3FITFlsRkxJWFlERS9xMS9ad1J3?=
+ =?utf-8?B?MW5lMDJlcStNZ3F0T0k3ZXliYUFkK0UzUUpPSlBtYkhkZFJtaFErKzd5OTBF?=
+ =?utf-8?B?cDVHYnd1NjlmekF5MlhLNEpFOEQwS1BwWDg3RW9mODdYLzdZcUxkV0F2R0Rk?=
+ =?utf-8?B?QklUNUNqVWIvYms4MmlVbG8reThQNm9zdWQ2dStDYitkUEtqZDVicEVBMWYx?=
+ =?utf-8?B?bGNJMGVNK2lWS0tjRUFoSms1bzNhb1ZwcndoRkN3UEFRc0s0YVBUWlRxUkxN?=
+ =?utf-8?B?bzNHem94YUtTVGppcHJuTUVzNTdUQms4Ynlucm1NbG0xYUxUTU1nby9iYVVp?=
+ =?utf-8?B?NDdxUXRiY0Q4T0dQenZEVjJxcGZKVGo3dlR5Q1lxRE4yM2VadFB1Mm9pVzND?=
+ =?utf-8?B?L2FrclZoT044V1JFT2RPOS9Hb21BSG1BZnBsTURNeTZzZmxnK2pvZVZmOS9k?=
+ =?utf-8?B?QjVPbUxxNnFaYzIzK3VsdlQvcE1qczJGdGxXZ1h6UlEvVUxZMG1PSmoweW1t?=
+ =?utf-8?B?dXVuNDdMNFVqME5FWXNkMGV5NisyUGlnaG81MHRlNU5DM3VaWGVDRmxjRElh?=
+ =?utf-8?B?cnQxdHU0aEpZSWpSemxuL3ZpUisrb1ZrUElLMUJmK1FUUHlmZG9scmxvdC9j?=
+ =?utf-8?Q?2fGyYz68kKY=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR11MB3214.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c1BOQjlsTFZ1NjhPRnVVUUMvUDZvb0kydkNQQXUrNFBDK3FZUlBiQ0tsOHZB?=
+ =?utf-8?B?L29KSUZuS0d1bmErdG1EbzN0Z2FvNGV3MGMvSXVNZHltQUZyNXdxdCt2Q2VK?=
+ =?utf-8?B?QnNmOVFIRFZHS3NqVnBJNGRSdEZFRFE1dXZnMUR0dlg4OWlVUWU4NXZEVEt5?=
+ =?utf-8?B?N255ZU9ETDh4TnRBS2NhWHdFSEMwNlQrR2J4NEpXcXpkemR0dUd4U29sUGh5?=
+ =?utf-8?B?bHJFdnhuWFdCT3RuNk11akZrVUVmOG95dStsZmpzNWEvclF6UjFPTythcnNV?=
+ =?utf-8?B?Z2djaHR6Ym0xKy84QktSL3I2VWgwK2dHUVBqNG0xRFhheEkxZytNZm92YWF4?=
+ =?utf-8?B?a2JKWnVLa3E1alJubWhobWI2UlhWcEtxc0RYTlBKSE1ydFJmbkRZN21qaDdB?=
+ =?utf-8?B?ZEdIUkZEeU9ORmVPeU5aelFBdXhQWTFzeDYwWVNaR0Z4enNwNmxUN2xLaksv?=
+ =?utf-8?B?Mm02NEpObmtwSjlkL01KaHFDck94dXZ3dkJ3WWJIRkdiQVZNemY5bFliVGNF?=
+ =?utf-8?B?RngycGFFemlBZTh5TjIrM0VUUWdJMW9JdWpDOXVSSkx0QWQ5YS9wdzc5akVh?=
+ =?utf-8?B?K3ZQVFgrL0ZFd3NnckF3aEJCYVBxeTR5OEE0UzhBSFZjK2oxMjR0WXprRTVp?=
+ =?utf-8?B?UEpoOStqNUtCbkJPR0UvcmdaMTduMy9LcVZjTHZ4TEcrMUNXeGNabmlJWGZ1?=
+ =?utf-8?B?blJpd3lwcnNxUUJzTXpkZmNNZ0lOTFZYVThPUWtHeVBmSEZBSTRTa3Vwandy?=
+ =?utf-8?B?NFRWdjVOMzk3a0JVcUNxMVc3NGdHS28xZnh5V0tPVnVuenFmU1h1azM4RHN5?=
+ =?utf-8?B?cUhHOFV2ZlVaT2Z0NlZneVNyTWJoSGJ3NkY0RGJCcFFUWnhuR2pOZGJ2UUQ1?=
+ =?utf-8?B?ZmdZQW14UzJ6OUJITElVS2RLck1ZUEszYkFrNE05anJ5S1lybmVCSGsyNWZy?=
+ =?utf-8?B?YWowQUJjVFRjMzhLNVZSMnQ4WXk1bmdKeGFOaVNsUGNKb01jY2ZrOUNlZnlH?=
+ =?utf-8?B?Y0UrM2VWdDNQY2hOTm1IRk5oNklmV1NCYlVMTWFtT25sRVJqT0h4YTBaY0Nh?=
+ =?utf-8?B?QmJ3alN6RXpBZGZ5eE56VURrZnBHTXE2NHR4bitjRVVvT0xZUmRZSFNNVHNs?=
+ =?utf-8?B?YXVDWFNMVW1TOEpTcDI1dWFzcHUxR0FmQ2VBTTVnZDFhMjZJRUZ5MHNmOVpk?=
+ =?utf-8?B?U0ZaRC9PL3Raak0zVU9RNERYL0FmRVdQRTV6aUJTZmEycXI5STd1WU02Skhz?=
+ =?utf-8?B?NGNCeGlnWVRDbXBtZUJWSmk4blBCUWxDNUcycVFTOEMvUHBscnVVcVFibkRO?=
+ =?utf-8?B?cmZsbVNEUUd0eklOSGZTYWgxYlgzS3hDaUNiTWp0OGJQK3hycXNJOVhsVzAv?=
+ =?utf-8?B?MEtxNVEwa2hhVm5vckFTcWt1Kytja09BNTZkZkhiSUhFV3BEQWg1ZUgybHVX?=
+ =?utf-8?B?aE1HaFRZaGtXSTNybEM3dW4vS1hPNUtva2JQN0lxSG8wZGxMaXZHSFc3RHFs?=
+ =?utf-8?B?UG85b0VlemMzY1VZM0ZDTGtwaDJGNzhLT0VpdTE4OWhHM2s1V3lwanBZYi9C?=
+ =?utf-8?B?MW9FYkQ3VGtZR2gyVnIwajhjRHlidGp4UjFXZlVoWHM0ZjlXNjFhc1FBNVFq?=
+ =?utf-8?B?YzBWRWxqUU9wcHVtVVVpam5ieE80bjcraW5JME51UnlTMVVRdUNnL1dLSXEz?=
+ =?utf-8?B?enRuYWNjdFhnV1RuWkpQZEF6bGQxZGlXOG9ja3ErZWNLWmJIK3hwUGNSVFVa?=
+ =?utf-8?B?Q1lOM0xLZVJZZUl6b2Q3Zkx5ZFNacGI0U0ZyOW1TdmVITE9oYksrK1pwOW92?=
+ =?utf-8?B?M0pTWkVqQm9sVW9MbWVUYm80OHAzTTlrd3kxUXNTL2pqT29abXVFZXNjWEJp?=
+ =?utf-8?B?aXNWZ3ZVSzA4ekRnY1JkWngrN0ZCRnlFQlRoZUlxeFNwYkhCSzhBNVVpVkNt?=
+ =?utf-8?B?OFYxWjg2NWNKZnUwK0pud1hvOVp2bTRLeDF2bW9MUmNkN2ozM05ycGt0ZWp0?=
+ =?utf-8?B?STkzdWRKNlZNczdaVTMrNEdSZis3T2hTZE83VWY1b1NHZDVIaU5MbCtOdUlI?=
+ =?utf-8?B?QXVLYzgyenhTUkd6KzcvUDlZVWc3WktwWmZOL2RCQlNFUTQ5VlFBaFBSemFx?=
+ =?utf-8?B?aDZyS3g0QUhTS1Jyd0ZlbG5VcjVVNzRiZ3ZEZzgyMzNIZDg3K2s0U2Z0dktP?=
+ =?utf-8?B?VGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5acec388-807f-46ca-c1be-08dda8ca8a32
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR11MB3214.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2025 09:30:01.6175
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: k7+IFV03/z+xnuf8rVhQ1P1lMsb/lbRv9HbW0tS3KAY2cBZHnJYXek+V4jgqZG0FLmjYWZdXyvAIOznDTyLN7Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7738
+X-OriginatorOrg: intel.com
 
-
-On 6/11/2025 7:20 AM, Sean Christopherson wrote:
-> From: Maxim Levitsky <mlevitsk@redhat.com>
->
-> Introduce vmx_guest_debugctl_{read,write}() to handle all accesses to
-> vmcs.GUEST_IA32_DEBUGCTL. This will allow stuffing FREEZE_IN_SMM into
-> GUEST_IA32_DEBUGCTL based on the host setting without bleeding the state
-> into the guest, and without needing to copy+paste the FREEZE_IN_SMM
-> logic into every patch that accesses GUEST_IA32_DEBUGCTL.
->
-> No functional change intended.
->
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> [sean: massage changelog, make inline, use in all prepare_vmcs02() cases]
+On 11/06/2025 02:20, Sean Christopherson wrote:
+> Use the kvm_arch_vcpu.host_debugctl snapshot to restore DEBUGCTL after
+> running a TD vCPU.  The final TDX series rebase was mishandled, likely due
+> to commit fb71c7959356 ("KVM: x86: Snapshot the host's DEBUGCTL in common
+> x86") deleting the same line of code from vmx.h, i.e. creating a semantic
+> conflict of sorts, but no syntactic conflict.
+> 
+> Using the version in kvm_vcpu_arch picks up the ulong => u64 fix (which
+> isn't relevant to TDX) as well as the IRQ fix from commit 189ecdb3e112
+> ("KVM: x86: Snapshot the host's DEBUGCTL after disabling IRQs").
+> 
+> Link: https://lore.kernel.org/all/20250307212053.2948340-10-pbonzini@redhat.com
+> Cc: Adrian Hunter <adrian.hunter@intel.com>
+> Fixes: 8af099037527 ("KVM: TDX: Save and restore IA32_DEBUGCTL")
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/vmx/nested.c    | 10 +++++-----
->  arch/x86/kvm/vmx/pmu_intel.c |  8 ++++----
->  arch/x86/kvm/vmx/vmx.c       |  8 +++++---
->  arch/x86/kvm/vmx/vmx.h       | 10 ++++++++++
->  4 files changed, 24 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 5a6c636954eb..9edce9f411a3 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2662,11 +2662,11 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->  	if (vmx->nested.nested_run_pending &&
->  	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS)) {
->  		kvm_set_dr(vcpu, 7, vmcs12->guest_dr7);
-> -		vmcs_write64(GUEST_IA32_DEBUGCTL, vmcs12->guest_ia32_debugctl &
-> -						  vmx_get_supported_debugctl(vcpu, false));
-> +		vmx_guest_debugctl_write(vcpu, vmcs12->guest_ia32_debugctl &
-> +					       vmx_get_supported_debugctl(vcpu, false));
->  	} else {
->  		kvm_set_dr(vcpu, 7, vcpu->arch.dr7);
-> -		vmcs_write64(GUEST_IA32_DEBUGCTL, vmx->nested.pre_vmenter_debugctl);
-> +		vmx_guest_debugctl_write(vcpu, vmx->nested.pre_vmenter_debugctl);
->  	}
->  	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
->  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
-> @@ -3531,7 +3531,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  
->  	if (!vmx->nested.nested_run_pending ||
->  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
-> -		vmx->nested.pre_vmenter_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> +		vmx->nested.pre_vmenter_debugctl = vmx_guest_debugctl_read();
->  	if (kvm_mpx_supported() &&
->  	    (!vmx->nested.nested_run_pending ||
->  	     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
-> @@ -4805,7 +4805,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
->  	__vmx_set_segment(vcpu, &seg, VCPU_SREG_LDTR);
->  
->  	kvm_set_dr(vcpu, 7, 0x400);
-> -	vmcs_write64(GUEST_IA32_DEBUGCTL, 0);
-> +	vmx_guest_debugctl_write(vcpu, 0);
->  
->  	if (nested_vmx_load_msr(vcpu, vmcs12->vm_exit_msr_load_addr,
->  				vmcs12->vm_exit_msr_load_count))
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 8a94b52c5731..578b4ef58260 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -652,11 +652,11 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
->   */
->  static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
->  {
-> -	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> +	u64 data = vmx_guest_debugctl_read();
->  
->  	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
->  		data &= ~DEBUGCTLMSR_LBR;
-> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
-> +		vmx_guest_debugctl_write(vcpu, data);
->  	}
->  }
->  
-> @@ -729,7 +729,7 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
->  
->  	if (!lbr_desc->event) {
->  		vmx_disable_lbr_msrs_passthrough(vcpu);
-> -		if (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)
-> +		if (vmx_guest_debugctl_read() & DEBUGCTLMSR_LBR)
->  			goto warn;
->  		if (test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use))
->  			goto warn;
-> @@ -751,7 +751,7 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
->  
->  static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
->  {
-> -	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
-> +	if (!(vmx_guest_debugctl_read() & DEBUGCTLMSR_LBR))
->  		intel_pmu_release_guest_lbr_event(vcpu);
->  }
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index b685e43de4e9..196f33d934d3 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2147,7 +2147,7 @@ int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
->  		break;
->  	case MSR_IA32_DEBUGCTLMSR:
-> -		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> +		msr_info->data = vmx_guest_debugctl_read();
->  		break;
->  	default:
->  	find_uret_msr:
-> @@ -2281,7 +2281,8 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  						VM_EXIT_SAVE_DEBUG_CONTROLS)
->  			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
->  
-> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
-> +		vmx_guest_debugctl_write(vcpu, data);
-> +
->  		if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
->  		    (data & DEBUGCTLMSR_LBR))
->  			intel_pmu_create_guest_lbr_event(vcpu);
-> @@ -4796,7 +4797,8 @@ static void init_vmcs(struct vcpu_vmx *vmx)
->  	vmcs_write32(GUEST_SYSENTER_CS, 0);
->  	vmcs_writel(GUEST_SYSENTER_ESP, 0);
->  	vmcs_writel(GUEST_SYSENTER_EIP, 0);
-> -	vmcs_write64(GUEST_IA32_DEBUGCTL, 0);
-> +
-> +	vmx_guest_debugctl_write(&vmx->vcpu, 0);
->  
->  	if (cpu_has_vmx_tpr_shadow()) {
->  		vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, 0);
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 392e66c7e5fe..c20a4185d10a 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -417,6 +417,16 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
->  u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated);
->  bool vmx_is_valid_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated);
->  
-> +static inline void vmx_guest_debugctl_write(struct kvm_vcpu *vcpu, u64 val)
-> +{
-> +	vmcs_write64(GUEST_IA32_DEBUGCTL, val);
-> +}
-> +
-> +static inline u64 vmx_guest_debugctl_read(void)
-> +{
-> +	return vmcs_read64(GUEST_IA32_DEBUGCTL);
-> +}
-> +
->  /*
->   * Note, early Intel manuals have the write-low and read-high bitmap offsets
->   * the wrong way round.  The bitmaps control MSRs 0x00000000-0x00001fff and
 
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Thanks for fixing this up!
 
+Reviewed-by: Adrian Hunter <adrian.hunter@intel.com>
 
 
