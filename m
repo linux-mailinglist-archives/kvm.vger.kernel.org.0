@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-48976-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-48977-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9564AD4EE9
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 10:55:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2BF6AD4F05
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 10:59:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91896173175
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 08:55:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E053F1887188
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 08:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E85242D84;
-	Wed, 11 Jun 2025 08:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53DA024DCF2;
+	Wed, 11 Jun 2025 08:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V0agl7UH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Clg1arqZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95592BD11;
-	Wed, 11 Jun 2025 08:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E9C2517AF;
+	Wed, 11 Jun 2025 08:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749632139; cv=none; b=GVOStwQ1MPgga4MqNB5LSUCUe50IBqDlJMxqDU5Hi4kSJ0jbCZhawmwAdzNtPyOD6WFFMkMVeuWnOh77/M7odxP1hjVxNyFARsEMrg9IqMoZeezjUNl2Cmxc0Q8O1SG7cB7Y0cP9B7XHEdn5+7SYV95yaReu1+Z15SrXLLKs6GA=
+	t=1749632346; cv=none; b=G6XT8sT+hOLPHV/ov8ohkO6/+ebx6hUIA7U8piznxXS+FIWyJn8+roW9Im9xAiD8nSsWuTAMnXeUZ9o9FGJP32N61706ezwFnPNaIci+ad4T50fLAGBqcApFA64gOAlb3HhLv6pF2xlvKz6tSookL5MhlyoJSAlmVBPPNvyV+Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749632139; c=relaxed/simple;
-	bh=0DZmRSZvljrpWkJwb291+ZV4LAGXR6iZSBRZw7lLpjs=;
+	s=arc-20240116; t=1749632346; c=relaxed/simple;
+	bh=H1IHx/yRO5qZEp5ATIRAziVQv2P7VBMGrjmsGJ7dA4U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mVGa7i9aDEQ0kEI0MIZms6UcYVp7+aFgudL63TS/Qk9VHB7MQ2qBCf8qvrS3S5GRRupO4fX9H2n/2auWUwtcGBlPAqkKpM3K+aTXgXtWZjhIANGFTozsDvG8r6u7lvORB7jqiHW1Qa070QVMb+1VwkjNG8tYZImMx5535Fyl2Xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V0agl7UH; arc=none smtp.client-ip=192.198.163.16
+	 In-Reply-To:Content-Type; b=Od3e0dc6r+urB2tmB9Btpbl4mNwHkwGbDf7NEmZygc+4er4SshWIY1d/3yw1xsf2wy9uwj2dOayESt7ZJlwwJdUD8PIlGUNQTMfhJ9xMDP4/RNzCvrlnEeh12YWh7jOen83qH7FyiHUCkjQsBQ8hRYBd8p3DiLt+NaT/sOSiSpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Clg1arqZ; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749632138; x=1781168138;
+  t=1749632344; x=1781168344;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=0DZmRSZvljrpWkJwb291+ZV4LAGXR6iZSBRZw7lLpjs=;
-  b=V0agl7UHVmI/1G7zc26vwk61n9LwM2/rK9GWKG53bfUU/LSo2FLKiFm+
-   VIRPN0OR4QvzcfrH/khOSBglRk0IgOXzNnqbgOuWU6x1lBKfLOLvrTkRF
-   cP8yhoCCmXh3yDdxDXbh2MtIYwYKdQgF10SbsgrP+L7BNMz6LrpG0YAq7
-   uUfqyHZqFNWdS/Ry+OW06LiL1fcz0rUGAx8KnAZUqK5K6+DkwcBTtuuF4
-   XlMemjlwU4MOg9+R2K3Ua6YeWs9Yc+qD4sn6kIMcxi8iprrS+T9LdK7Wy
-   dcaKA76ZmYKJaBVQKAS2kTeu2pB+1Kf2mKVVudp3I0wT53Gv8h3ENAl3D
-   g==;
-X-CSE-ConnectionGUID: zrp//KAdT8aFP62Azfpttg==
-X-CSE-MsgGUID: iPHEGwsyRSGU7sSAbge+Gw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="39385139"
+  bh=H1IHx/yRO5qZEp5ATIRAziVQv2P7VBMGrjmsGJ7dA4U=;
+  b=Clg1arqZZXp95SgMxKRc0lhVgH56ZU8Z2hTBVH9joQRtwTzDAgJ48dgD
+   jSNI09BAO5A0ey+3cEOf1AhIByYlcluKoIGE09ztl8Us/f3LFuQc6tSdG
+   RQEm4m3/4pvRvS2iC9O0/qA8ZeVyf50ddPKkqHb7YveqSIl5IB888hKQv
+   nChsjH/Ex+ULddWi1ecjgw0m7bfNzOBzFx6KVkGayquj5mJKpF7b2Cicm
+   2q0ZeibowsDPtuwrg21mM4ufxUwMinegI2t+CxBFOHDujKUZWFVuPvS0S
+   HINLN7VqN11iS9q/V+TTszoCfJAGJLIMNbPuFAB1VWKWqOIAYvHNnTDXp
+   Q==;
+X-CSE-ConnectionGUID: g/k/3tjsSR+poFCiXRoOLw==
+X-CSE-MsgGUID: Tl6K0Tk8RAWpIT2Nxq8Ulg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11460"; a="51682056"
 X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
-   d="scan'208";a="39385139"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 01:55:37 -0700
-X-CSE-ConnectionGUID: VmO353wCQ7qxFE7k2Oh1xA==
-X-CSE-MsgGUID: 9Lr0CUiUTA2HNgRQukFE0w==
+   d="scan'208";a="51682056"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 01:59:03 -0700
+X-CSE-ConnectionGUID: ZOFRd4v0RE6I3oTvgxfrEg==
+X-CSE-MsgGUID: A5t0RdlsQZufrveceCUMng==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,227,1744095600"; 
-   d="scan'208";a="147625598"
+   d="scan'208";a="184339216"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.144]) ([10.124.245.144])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 01:55:35 -0700
-Message-ID: <44de2c92-3969-471a-970c-fcc751a0415a@linux.intel.com>
-Date: Wed, 11 Jun 2025 16:55:33 +0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 01:59:01 -0700
+Message-ID: <b8fdbde0-f5d3-484e-877b-c59e8c39bdaa@linux.intel.com>
+Date: Wed, 11 Jun 2025 16:58:58 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,99 +67,172 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 5/8] KVM: VMX: Extract checking of guest's DEBUGCTL
- into helper
+Subject: Re: [PATCH v6 7/8] KVM: VMX: Wrap all accesses to IA32_DEBUGCTL with
+ getter/setter APIs
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Adrian Hunter <adrian.hunter@intel.com>, Maxim Levitsky <mlevitsk@redhat.com>
 References: <20250610232010.162191-1-seanjc@google.com>
- <20250610232010.162191-6-seanjc@google.com>
+ <20250610232010.162191-8-seanjc@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20250610232010.162191-6-seanjc@google.com>
+In-Reply-To: <20250610232010.162191-8-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 On 6/11/2025 7:20 AM, Sean Christopherson wrote:
-> Move VMX's logic to check DEBUGCTL values into a standalone helper so that
-> the code can be used by nested VM-Enter to apply the same logic to the
-> value being loaded from vmcs12.
+> From: Maxim Levitsky <mlevitsk@redhat.com>
 >
-> KVM needs to explicitly check vmcs12->guest_ia32_debugctl on nested
-> VM-Enter, as hardware may support features that KVM does not, i.e. relying
-> on hardware to detect invalid guest state will result in false negatives.
-> Unfortunately, that means applying KVM's funky suppression of BTF and LBR
-> to vmcs12 so as not to break existing guests.
+> Introduce vmx_guest_debugctl_{read,write}() to handle all accesses to
+> vmcs.GUEST_IA32_DEBUGCTL. This will allow stuffing FREEZE_IN_SMM into
+> GUEST_IA32_DEBUGCTL based on the host setting without bleeding the state
+> into the guest, and without needing to copy+paste the FREEZE_IN_SMM
+> logic into every patch that accesses GUEST_IA32_DEBUGCTL.
 >
 > No functional change intended.
 >
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> [sean: massage changelog, make inline, use in all prepare_vmcs02() cases]
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/vmx/vmx.c | 29 +++++++++++++++++------------
->  1 file changed, 17 insertions(+), 12 deletions(-)
+>  arch/x86/kvm/vmx/nested.c    | 10 +++++-----
+>  arch/x86/kvm/vmx/pmu_intel.c |  8 ++++----
+>  arch/x86/kvm/vmx/vmx.c       |  8 +++++---
+>  arch/x86/kvm/vmx/vmx.h       | 10 ++++++++++
+>  4 files changed, 24 insertions(+), 12 deletions(-)
 >
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index ab5c742db140..358c7036272a 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2191,6 +2191,19 @@ static u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated
->  	return debugctl;
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 5a6c636954eb..9edce9f411a3 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2662,11 +2662,11 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>  	if (vmx->nested.nested_run_pending &&
+>  	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS)) {
+>  		kvm_set_dr(vcpu, 7, vmcs12->guest_dr7);
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, vmcs12->guest_ia32_debugctl &
+> -						  vmx_get_supported_debugctl(vcpu, false));
+> +		vmx_guest_debugctl_write(vcpu, vmcs12->guest_ia32_debugctl &
+> +					       vmx_get_supported_debugctl(vcpu, false));
+>  	} else {
+>  		kvm_set_dr(vcpu, 7, vcpu->arch.dr7);
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, vmx->nested.pre_vmenter_debugctl);
+> +		vmx_guest_debugctl_write(vcpu, vmx->nested.pre_vmenter_debugctl);
+>  	}
+>  	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
+>  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+> @@ -3531,7 +3531,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+>  
+>  	if (!vmx->nested.nested_run_pending ||
+>  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
+> -		vmx->nested.pre_vmenter_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +		vmx->nested.pre_vmenter_debugctl = vmx_guest_debugctl_read();
+>  	if (kvm_mpx_supported() &&
+>  	    (!vmx->nested.nested_run_pending ||
+>  	     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+> @@ -4805,7 +4805,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+>  	__vmx_set_segment(vcpu, &seg, VCPU_SREG_LDTR);
+>  
+>  	kvm_set_dr(vcpu, 7, 0x400);
+> -	vmcs_write64(GUEST_IA32_DEBUGCTL, 0);
+> +	vmx_guest_debugctl_write(vcpu, 0);
+>  
+>  	if (nested_vmx_load_msr(vcpu, vmcs12->vm_exit_msr_load_addr,
+>  				vmcs12->vm_exit_msr_load_count))
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 8a94b52c5731..578b4ef58260 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -652,11 +652,11 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+>   */
+>  static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
+>  {
+> -	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +	u64 data = vmx_guest_debugctl_read();
+>  
+>  	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
+>  		data &= ~DEBUGCTLMSR_LBR;
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> +		vmx_guest_debugctl_write(vcpu, data);
+>  	}
 >  }
 >  
-> +static bool vmx_is_valid_debugctl(struct kvm_vcpu *vcpu, u64 data,
-> +				  bool host_initiated)
-> +{
-> +	u64 invalid;
+> @@ -729,7 +729,7 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>  
+>  	if (!lbr_desc->event) {
+>  		vmx_disable_lbr_msrs_passthrough(vcpu);
+> -		if (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)
+> +		if (vmx_guest_debugctl_read() & DEBUGCTLMSR_LBR)
+>  			goto warn;
+>  		if (test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use))
+>  			goto warn;
+> @@ -751,7 +751,7 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>  
+>  static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+>  {
+> -	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
+> +	if (!(vmx_guest_debugctl_read() & DEBUGCTLMSR_LBR))
+>  		intel_pmu_release_guest_lbr_event(vcpu);
+>  }
+>  
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index b685e43de4e9..196f33d934d3 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2147,7 +2147,7 @@ int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+>  		break;
+>  	case MSR_IA32_DEBUGCTLMSR:
+> -		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +		msr_info->data = vmx_guest_debugctl_read();
+>  		break;
+>  	default:
+>  	find_uret_msr:
+> @@ -2281,7 +2281,8 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  						VM_EXIT_SAVE_DEBUG_CONTROLS)
+>  			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
+>  
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> +		vmx_guest_debugctl_write(vcpu, data);
 > +
-> +	invalid = data & ~vmx_get_supported_debugctl(vcpu, host_initiated);
-> +	if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
-> +		kvm_pr_unimpl_wrmsr(vcpu, MSR_IA32_DEBUGCTLMSR, data);
-> +		invalid &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
-
-nit: add spaces around "|".
+>  		if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
+>  		    (data & DEBUGCTLMSR_LBR))
+>  			intel_pmu_create_guest_lbr_event(vcpu);
+> @@ -4796,7 +4797,8 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>  	vmcs_write32(GUEST_SYSENTER_CS, 0);
+>  	vmcs_writel(GUEST_SYSENTER_ESP, 0);
+>  	vmcs_writel(GUEST_SYSENTER_EIP, 0);
+> -	vmcs_write64(GUEST_IA32_DEBUGCTL, 0);
+> +
+> +	vmx_guest_debugctl_write(&vmx->vcpu, 0);
+>  
+>  	if (cpu_has_vmx_tpr_shadow()) {
+>  		vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, 0);
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 392e66c7e5fe..c20a4185d10a 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -417,6 +417,16 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
+>  u64 vmx_get_supported_debugctl(struct kvm_vcpu *vcpu, bool host_initiated);
+>  bool vmx_is_valid_debugctl(struct kvm_vcpu *vcpu, u64 data, bool host_initiated);
+>  
+> +static inline void vmx_guest_debugctl_write(struct kvm_vcpu *vcpu, u64 val)
+> +{
+> +	vmcs_write64(GUEST_IA32_DEBUGCTL, val);
+> +}
+> +
+> +static inline u64 vmx_guest_debugctl_read(void)
+> +{
+> +	return vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +}
+> +
+>  /*
+>   * Note, early Intel manuals have the write-low and read-high bitmap offsets
+>   * the wrong way round.  The bitmaps control MSRs 0x00000000-0x00001fff and
 
 Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
 
-> +	}
-> +	return !invalid;
-> +}
-> +
->  /*
->   * Writes msr value into the appropriate "register".
->   * Returns 0 on success, non-0 otherwise.
-> @@ -2259,19 +2272,12 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		}
->  		vmcs_writel(GUEST_SYSENTER_ESP, data);
->  		break;
-> -	case MSR_IA32_DEBUGCTLMSR: {
-> -		u64 invalid;
-> -
-> -		invalid = data & ~vmx_get_supported_debugctl(vcpu, msr_info->host_initiated);
-> -		if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
-> -			kvm_pr_unimpl_wrmsr(vcpu, msr_index, data);
-> -			data &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
-> -			invalid &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
-> -		}
-> -
-> -		if (invalid)
-> +	case MSR_IA32_DEBUGCTLMSR:
-> +		if (!vmx_is_valid_debugctl(vcpu, data, msr_info->host_initiated))
->  			return 1;
->  
-> +		data &= vmx_get_supported_debugctl(vcpu, msr_info->host_initiated);
-> +
->  		if (is_guest_mode(vcpu) && get_vmcs12(vcpu)->vm_exit_controls &
->  						VM_EXIT_SAVE_DEBUG_CONTROLS)
->  			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
-> @@ -2281,7 +2287,6 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		    (data & DEBUGCTLMSR_LBR))
->  			intel_pmu_create_guest_lbr_event(vcpu);
->  		return 0;
-> -	}
->  	case MSR_IA32_BNDCFGS:
->  		if (!kvm_mpx_supported() ||
->  		    (!msr_info->host_initiated &&
 
