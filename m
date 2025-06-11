@@ -1,129 +1,137 @@
-Return-Path: <kvm+bounces-49033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49034-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CF45AD5305
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 13:05:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E46ADAD539C
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 13:17:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A57C1E30BC
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 11:04:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB071887085
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 11:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1F228313D;
-	Wed, 11 Jun 2025 10:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF362E6134;
+	Wed, 11 Jun 2025 11:12:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="rlhglbRt"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DDA9283121;
-	Wed, 11 Jun 2025 10:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B992E6106;
+	Wed, 11 Jun 2025 11:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749639107; cv=none; b=HU9e9TaVFFJOHF2W8hau+TYfvoEpgfovAj5rdqvBDxbrrazrOqxpvqkkgVtrqv1JtjNBNKm+mqykxNTGcIdvW3Ihl682xGGyFzHF/UU4ndAAFh71/jh/WAOMADTsd62AgAoKGqCrZ2TwuMShytBTaVd8bd0JYh+A+6cZPtG+MgA=
+	t=1749640359; cv=none; b=A2xwUOwgHKSWRy+DGUPS3UwDl19IvL6Q5Zq9KPM2R2c6JCnS58qIvbGpazxERVSRktkIfMj6bvtIDI+zRRQgGRW4ewArulBdgKfIEW9lI381+WrBZHZ0Vn/6j4VHbjfZi22DGtgmxvFxpjpb5gBaiU6ceZtbKe8RmCI+OtbnML8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749639107; c=relaxed/simple;
-	bh=Q6rKcvEK3JD2FRQ36VpTV1lBtdavkrHrxZ1+rXKEr7M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YxCcAqYIj6QvTboefV30Vvt0hxaBcIw7N8jX170F3KwKWW/pOXoFzS5AE7DXN1eefOBRJP7miPlNeZKxpIjEd/ejVUsiRn1/96Fc+IE+oFhBAjAe0beF82EmpvqaZdQ/lf/oxw5bR6rVPF6q9bIY75oXf8rSE6EVSZOSS2EUajg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A5F92BC6;
-	Wed, 11 Jun 2025 03:51:26 -0700 (PDT)
-Received: from e122027.arm.com (unknown [10.57.67.107])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EAEA93F59E;
-	Wed, 11 Jun 2025 03:51:41 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>
-Subject: [PATCH v9 43/43] KVM: arm64: Allow activating realms
-Date: Wed, 11 Jun 2025 11:48:40 +0100
-Message-ID: <20250611104844.245235-44-steven.price@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250611104844.245235-1-steven.price@arm.com>
-References: <20250611104844.245235-1-steven.price@arm.com>
+	s=arc-20240116; t=1749640359; c=relaxed/simple;
+	bh=wOLHNC3mM1hvT6HYztFKZ2PDx4KcHzQ0D5Kk5tU14B4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QMrYtLGuqYL6Dh/wznWfwEwAqG55qOkyKSupuoh3REf9NAsaTWpCqBgOcPoO2xCjFGFIseHg2eARy5W1h5N9nnBFYKAMu6tfn7vlyuA+/mZSebiRI7WkovgD4KEclIDtlCzi4ljFJ0CGiYTbF9tvHrdn/3lzIZunSnGKR86qnbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=rlhglbRt; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1127)
+	id 9DA822115190; Wed, 11 Jun 2025 04:12:35 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9DA822115190
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1749640355;
+	bh=qWcwbrk1B9AwSLw+kibnueNoD1DZ6goIu7GiCM6Qlu0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rlhglbRtbt0Hbe+n51t1Jn72RUoWF3RpnwuZftUvtNku2mGleh3PsB7Ete2wnwVQX
+	 totONy0JEUXLVQ9Ik1KKGghpirw600tO8i8259mmKIVjMKnnA4WPgd/mExswV1pxYR
+	 18e7gfJe3yFADKmvYLOa41ksZ4zFzNef8IiwfWCA=
+Date: Wed, 11 Jun 2025 04:12:35 -0700
+From: Saurabh Singh Sengar <ssengar@linux.microsoft.com>
+To: Naman Jain <namjain@linux.microsoft.com>
+Cc: "K . Y . Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>, Long Li <longli@microsoft.com>,
+	Shiraz Saleem <shirazsaleem@microsoft.com>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org
+Subject: Re: [PATCH 0/6] Fix warning for missing export.h in Hyper-V drivers
+Message-ID: <20250611111235.GB31913@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20250611100459.92900-1-namjain@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611100459.92900-1-namjain@linux.microsoft.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Add the ioctl to activate a realm and set the static branch to enable
-access to the realm functionality if the RMM is detected.
+On Wed, Jun 11, 2025 at 03:34:53PM +0530, Naman Jain wrote:
+> When the kernel is compiled with W=1 option, a warning is reported
+> if a .c file exports a symbol but does not include export.h header
+> file. This warning was added in below patch, which merged recently:
+> commit a934a57a42f6 ("scripts/misc-check: check missing #include <linux/export.h> when W=1")
+> 
+> Fix this issue in Hyper-V drivers. This does not bring any
+> functional changes.
+> 
+> The one in drivers/hv/vmbus_drv.c is going to be fixed with 
+> https://lore.kernel.org/all/20250611072704.83199-2-namjain@linux.microsoft.com/
+> so it is not included in this series.
+> 
+> Naman Jain (6):
+>   Drivers: hv: Fix warnings for missing export.h header inclusion
+>   x86/hyperv: Fix warnings for missing export.h header inclusion
+>   KVM: x86: hyper-v: Fix warnings for missing export.h header inclusion
+>   clocksource: hyper-v: Fix warnings for missing export.h header
+>     inclusion
+>   PCI: hv: Fix warnings for missing export.h header inclusion
+>   net: mana: Fix warnings for missing export.h header inclusion
+> 
+>  arch/x86/hyperv/hv_init.c                       | 1 +
+>  arch/x86/hyperv/irqdomain.c                     | 1 +
+>  arch/x86/hyperv/ivm.c                           | 1 +
+>  arch/x86/hyperv/nested.c                        | 1 +
+>  arch/x86/kvm/hyperv.c                           | 1 +
+>  arch/x86/kvm/kvm_onhyperv.c                     | 1 +
+>  drivers/clocksource/hyperv_timer.c              | 1 +
+>  drivers/hv/channel.c                            | 1 +
+>  drivers/hv/channel_mgmt.c                       | 1 +
+>  drivers/hv/hv_proc.c                            | 1 +
+>  drivers/hv/mshv_common.c                        | 1 +
+>  drivers/hv/mshv_root_hv_call.c                  | 1 +
+>  drivers/hv/ring_buffer.c                        | 1 +
+>  drivers/net/ethernet/microsoft/mana/gdma_main.c | 1 +
+>  drivers/net/ethernet/microsoft/mana/mana_en.c   | 1 +
+>  drivers/pci/controller/pci-hyperv-intf.c        | 1 +
+>  16 files changed, 16 insertions(+)
+> 
+> 
+> base-commit: 475c850a7fdd0915b856173186d5922899d65686
+> -- 
+> 2.34.1
+>
 
-Signed-off-by: Steven Price <steven.price@arm.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/kvm/rme.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index 635d22825a70..a25f57387e3e 100644
---- a/arch/arm64/kvm/rme.c
-+++ b/arch/arm64/kvm/rme.c
-@@ -1250,6 +1250,20 @@ static int kvm_init_ipa_range_realm(struct kvm *kvm,
- 	return realm_init_ipa_state(kvm, addr, end);
- }
- 
-+static int kvm_activate_realm(struct kvm *kvm)
-+{
-+	struct realm *realm = &kvm->arch.realm;
-+
-+	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
-+		return -EINVAL;
-+
-+	if (rmi_realm_activate(virt_to_phys(realm->rd)))
-+		return -ENXIO;
-+
-+	WRITE_ONCE(realm->state, REALM_STATE_ACTIVE);
-+	return 0;
-+}
-+
- /* Protects access to rme_vmid_bitmap */
- static DEFINE_SPINLOCK(rme_vmid_lock);
- static unsigned long *rme_vmid_bitmap;
-@@ -1397,6 +1411,9 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		r = kvm_populate_realm(kvm, &args);
- 		break;
- 	}
-+	case KVM_CAP_ARM_RME_ACTIVATE_REALM:
-+		r = kvm_activate_realm(kvm);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -1722,5 +1739,5 @@ void kvm_init_rme(void)
- 	if (rme_vmid_init())
- 		return;
- 
--	/* Future patch will enable static branch kvm_rme_is_available */
-+	static_branch_enable(&kvm_rme_is_available);
- }
--- 
-2.43.0
-
+For the series,
+Reviewed-by: Saurabh Sengar <ssengar@linux.microsoft.com> 
 
