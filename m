@@ -1,250 +1,158 @@
-Return-Path: <kvm+bounces-49122-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49123-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FFAAAD6170
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 23:35:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A97BAD6175
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 23:36:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB13C1E1638
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 21:35:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0182616B127
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 21:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0A2B24502E;
-	Wed, 11 Jun 2025 21:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18BAE244691;
+	Wed, 11 Jun 2025 21:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LW4x+Wwq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J+gN7p+Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E897C380;
-	Wed, 11 Jun 2025 21:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749677700; cv=fail; b=GOwdTpyzm9rvb6ywP4DWmXdC0SRabNo2WwQ2fX+MXPyoVnfGIJfiw6IvQHawg6QehmBWst74nTyGUkDIa/M/lNMheKJj4JWdJvJoTtAtRFgeRGkOu4qUTS2qf1up+Di0mzZ9QTaE/DD7xCqawD3UZ2efQiXcrrTL4nS9qXVd4Rs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749677700; c=relaxed/simple;
-	bh=IN8/D3FC4wDSed760Z3hCjErOQ/PxYA2NEe8Wh3pICY=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=SCe+7Xq3yKW1JhgU7DYMlOb5BP+WCVtjNXSimmbCrsEScXoBLFTQ5HDGNR/E6IkKj93WwETApAPRxQfCBHyKyelC0GtGoz79Ia/JE0uvLMz6jlxG74Bds3ndslOtHOdFGhCClOhfgH/YlCa4ZaoEZJHwxFH9XE7QOnt431DULL8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LW4x+Wwq; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749677699; x=1781213699;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=IN8/D3FC4wDSed760Z3hCjErOQ/PxYA2NEe8Wh3pICY=;
-  b=LW4x+WwqUPq3IbJ4i9z0Q8pDpnEo18bdsQcKabnc5cVy6qCEoRXm8TmU
-   dPm/sh0AFpwq2wBMnXL9Em8lchBODm/n7bgimH+YUYNLlGY0Y9nVULnK4
-   hxDCfGUx4y6dNP82eBihNOS8xbcmUWK+ojLgoQ3O3bewzGL/k99g62p1b
-   LMqhu0T2BF7n6jHRAYkBi+QiRJn7DWCkZNq05ocCEdylBz3JgxEm7DLvd
-   VAffiJDMcGPVsFIr2os+wfOXxsCNXX7J6qGCZQyzh/Qr8TI6qUq+1g7MJ
-   I5qtEGNYlp4zcL2kbWL3jNUh4BPlupBW9Ru9LJhireCq6UsqHex9/fBS5
-   Q==;
-X-CSE-ConnectionGUID: RYFlG26GTMG0QPCQANxABg==
-X-CSE-MsgGUID: 4URszZ7JRryN31P8CME+3w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="50943045"
-X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
-   d="scan'208";a="50943045"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 14:34:58 -0700
-X-CSE-ConnectionGUID: +sn37uMTRjyUN2vtgSUNjg==
-X-CSE-MsgGUID: cRIL1joORjeO92yFAZ/g4A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,229,1744095600"; 
-   d="scan'208";a="148228457"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 14:34:57 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 11 Jun 2025 14:34:56 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Wed, 11 Jun 2025 14:34:56 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (40.107.237.88)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 11 Jun 2025 14:34:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QDzjnS4/Ue+RovSv9xWceWMXIJBvSGrB3CC+e/yIYL7ZpoYKeF6/sJSYis3BsC3DBCXVS70HLkER7b9GpvlJSPGcRoykRVSbMtCh6DH+tBmxSXzdbH4ulUrOJk21IgJX8T4AMxH/7EXbYqt6EjGuxtJzaLrQRP+7fA15brxEMzFVWtAziCVZI+DUQWmYxJJeaby6R7/4CkZP/6GXJLZhC2rAhC+DkezzpgxJhu8YESG3G2gPdbnIMd5/jbv1woCRhvMrB3IZw6pYs3IuNqUoOZszIXyaj8LzbL1ungToWDbIdo3LP3Z18ZE7L8rIiohUus5T6asTkFHwRq4UYz6v+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BIFULUN7XMnE/tEQRH7eMNNaXMvAkQsCn2sLnacbMqs=;
- b=C7pC2447HJhZQv+rIGQ9MMtu8CRMO5oscMr0j8Kwg1eDN5pOJfJ00fVgT8sdAtichGlFB/HWrmM56PyIRAIW+cwnaaTZ7JmzZeZTxJZUDx7yfZ62qpPE84GzIktWM9+fSdXLn+2h7cM5R02IB6jf48RTizvA9ph0W2xsC2PYORsEBHrrNXvc1h8EvS7ZcB8u3ne1vkuiDJ3QQbfxX4gHVTPn36PCvs6jDOz8j4JMCGIf0iJ8rxjDdrMOF/gpQIiUVylzIkjYguCdR/wAeANfyzuprNGa7vvWyFlSP4hJd7S/wQ4g602VuROG5QShzeEkWiKdet9O266J0lYSdjePOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3320.namprd11.prod.outlook.com (2603:10b6:a03:18::25)
- by MW4PR11MB7056.namprd11.prod.outlook.com (2603:10b6:303:21a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.31; Wed, 11 Jun
- 2025 21:34:53 +0000
-Received: from BYAPR11MB3320.namprd11.prod.outlook.com
- ([fe80::e8c4:59e3:f1d5:af3b]) by BYAPR11MB3320.namprd11.prod.outlook.com
- ([fe80::e8c4:59e3:f1d5:af3b%4]) with mapi id 15.20.8813.024; Wed, 11 Jun 2025
- 21:34:53 +0000
-Message-ID: <707b643e-a740-49a4-a549-7d63c5f4da76@intel.com>
-Date: Wed, 11 Jun 2025 14:34:51 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 4/9] x86/nmi: Assign and register NMI-source vectors
-Content-Language: en-US
-To: "H. Peter Anvin" <hpa@zytor.com>, Xin Li <xin@zytor.com>,
-	<x86@kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, Peter Zijlstra <peterz@infradead.org>, "Sean
- Christopherson" <seanjc@google.com>, Adrian Hunter <adrian.hunter@intel.com>,
-	Kan Liang <kan.liang@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
-	"Zhang Rui" <rui.zhang@intel.com>, Steven Rostedt <rostedt@goodmis.org>,
-	"Andrew Cooper" <andrew.cooper3@citrix.com>, "Kirill A . Shutemov"
-	<kirill.shutemov@linux.intel.com>, Jacob Pan <jacob.pan@linux.microsoft.com>,
-	Andi Kleen <ak@linux.intel.com>, Kai Huang <kai.huang@intel.com>, "Sandipan
- Das" <sandipan.das@amd.com>, <linux-perf-users@vger.kernel.org>,
-	<linux-edac@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-pm@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>
-References: <20250513203803.2636561-1-sohil.mehta@intel.com>
- <20250513203803.2636561-5-sohil.mehta@intel.com>
- <9950dc5a-05ab-4a7c-a4e8-34012ef98549@zytor.com>
- <FEE77392-D778-4412-B4B7-583EF58955EB@zytor.com>
-From: Sohil Mehta <sohil.mehta@intel.com>
-In-Reply-To: <FEE77392-D778-4412-B4B7-583EF58955EB@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0164.namprd03.prod.outlook.com
- (2603:10b6:a03:338::19) To BYAPR11MB3320.namprd11.prod.outlook.com
- (2603:10b6:a03:18::25)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC33C228CA9
+	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 21:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749677762; cv=none; b=keSJH1PT9W0iSvR285h40OzxDXbQ6fs/xEaMLu1ngA0e5kLIzbjcdvkjQqJN4nneaQmIOPjAzOQ3iNZft0b95g/yqs1vf2/QtwPi1botO56gheOafyAXUSRd4DG+CLCoCYs451p273eueHzE2H5J3BtbQARWmztew0zIErGv3OM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749677762; c=relaxed/simple;
+	bh=xrXCXEE5X80+3t6cu/KauRicKGyvW4P82JBR8PfJ/Ag=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=m942b9Osjl/vbGX9e8x7VPQ3o87z0pwqD7FNIcHaytmtsbo6Re5aESUl7Ov6JCukv3blCVPZrl7kL3gzMwTiPWh2i2S7uyeBuNYDsdfOHDDe9LxEAIvzpnsCER7I5oOd50TLLw3aHBBYgo/ks7NHDq7a8PMBmvRgQKCZnmtb4CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J+gN7p+Z; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-234a102faa3so1609195ad.0
+        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 14:36:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749677760; x=1750282560; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6IcmBd622WcHMOVHZB6OFu12SHal0z947c0kQ48vgFY=;
+        b=J+gN7p+Zf77DkzocliSxXY+AQNdLkm9WopOIf8nemyzW6mCbjsHPCJOQeudPTCTJYj
+         hSerAKY3mFIk9oddbCmSZj1yRLbB7YvcijvX37duIq6+o++DveP/r22EeFk6d4gOUi17
+         9iOlz0oOlEiZCXoO/a3Wq5tg4KcW+NRACnyFxrtVSnMZxqSqSIOlcv7LtHowjvMKykai
+         QJ420HBKOtmpGEtXzrFQfaSZNWgS3fbcZEQyCfi5YuNgZEg9TKSwNfMWjrdm+DeqXNDR
+         I5PX31MTe1q20M83eTxfm71dnLlB2Jk9PcquJfMpGk83DD8c90q1uxlZIjgjeby1Xi7P
+         FyOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749677760; x=1750282560;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6IcmBd622WcHMOVHZB6OFu12SHal0z947c0kQ48vgFY=;
+        b=MBJsv24FUQLzT8yqgBcLEOKr3xIhQl/c3SusF8tXfy+Q/MFOJaeAidoCDEIXH3ndA1
+         zuGcy9TGKT81hNU4zmMSpmttrCYc5vsiDwKDKXJmAXfy0n70Kqvzet1BbKv5G/CzBKkS
+         q2BqFEdqpTo010a/sjD3bQ+qyIAmY/LQsTLSG0IxYOWQiIXrM+y0LShhZn4bgecZr42Y
+         xTiXg2Qn1i/gWx3Q/YezOJCV6EhONNBf44B+DPw7Q9CgAt+chAxYnopi4XrxwmkRCMeR
+         96vFhkf1+akZ9OI8+w7OgcdnXLUgrzXIPresA5szhSEkUs/tgZUjWk7Es7sr6BgkyCxL
+         m0XA==
+X-Gm-Message-State: AOJu0YzIg0KBM49bwf2U3G8ZfytgNJ17Yj0SI6Peh3tWg0JQL4KOD9yK
+	eLnJul3OjoWhDJK1UQ26MlyMtnQQUYxSlE9M/7OreSJh73OBkoMtMSBbbHE0Co+rEwwHtu/xADQ
+	QoLnIew==
+X-Google-Smtp-Source: AGHT+IE4XH/OC2Iw8DaPJ4HTHpV5OX6/6vmmyrAmtCwBAR3UB6uVms1/MlWYcYS7wNtEgSk+3aV2UoD9HAM=
+X-Received: from pjtd16.prod.google.com ([2002:a17:90b:50:b0:312:dbc:f731])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d2c6:b0:234:c65f:6c0f
+ with SMTP id d9443c01a7336-23641aa245dmr57140055ad.8.1749677759907; Wed, 11
+ Jun 2025 14:35:59 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 11 Jun 2025 14:35:39 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3320:EE_|MW4PR11MB7056:EE_
-X-MS-Office365-Filtering-Correlation-Id: bd6e63b9-0281-4a4d-7c3a-08dda92fcd2c
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WStWLzBQMzN3eEUzTkxwUHEzN3l4R3liNDN0ckk5NEpnS203OUtQaWNwT2Vn?=
- =?utf-8?B?Sm1ZNmI1allKcGh1QURzM2llSGYxYWhrSURFY1RxV2NwYVpRYkVwUnNOL3JF?=
- =?utf-8?B?RXNjcFluZDNNSnVUYmZ4V3JUd0Z6ZThNQkdPWEttZHpiNTAwejhVdDVuZ1Ba?=
- =?utf-8?B?K3FZVG9hamNEVjgrMnYwbStOd3F5VVdmei92bGhMY3BqL0k1UUQrUElwV0NY?=
- =?utf-8?B?Z3JUMkUvZjNTNjRyVy9kTnIva2RnU1pJellpbURxWXdiVXNwUTYvaDFidHh4?=
- =?utf-8?B?Lzc5Q0ZoQ2hvVC9QMDV3M2FoWU5vTmo2N0thVHVaQ3JIUmhTY1ZkQmRYb21w?=
- =?utf-8?B?bEo3c0NXMnFhRC9xcDdOT2N1bDB0WDErRUpKVGJKeGk3R3BudU1NdnhvQjEr?=
- =?utf-8?B?QzZIc2VNYVQ5RHVaWlQxVm5XUnc3N1V1aGdSdDFLbjgvWnVlcTAwTjd6MkNh?=
- =?utf-8?B?WWhGV29laXh3anVWaXg4UzRiMnpmMkswczZkanRFYnF4MUdOVDRRUGF5dHdX?=
- =?utf-8?B?WEJON255RnM5dW9Lc0lzRmsvMlZ4bDVRYmt6U3Z0Nk9xSjJWbXl3OWVVUlF0?=
- =?utf-8?B?azFEbDJhelptSWdla0txZzRmNUlqZXlxbGNLdEtONFdrS2hGOWxobFE5TnB5?=
- =?utf-8?B?VzdyYmsyVEtoS1BFT1hIOUpWMnRMVVdxbEdycWtUU05LTHYwL0p6YUt4MEFD?=
- =?utf-8?B?MTljN3VHdGVYUTlON3prNXpIS0M0T3hjVWpQWm4vTUxDRy8zaTl3dzlHdVNZ?=
- =?utf-8?B?aklXRTJRSDRTczVuanhuMXdFUUYwU0lRRldkb2U1dkFVNThpaTM0SnBwcy9E?=
- =?utf-8?B?L3c1ODdyK09pei9HV2VUeEpweldpaDhxd3Jjeno5RWxUS254dnlvVGkrYUZp?=
- =?utf-8?B?YXJkWGxlWFUyS3FFb2Z6YU9EaElZSlMzSDZaQWNEK2dzZzIxWTgwRExnRlY0?=
- =?utf-8?B?ZCsvN2NWRS9KU3cyTXpQckFmWDg1L0RhTW1IYzJtdm5yQkUzWTZqZG9VR0tp?=
- =?utf-8?B?WmhzQmdmREhjcWdtOXBuWkE4akFOQWY3ZHg3NWZBZG1LZWRVUVlvcCttaVVR?=
- =?utf-8?B?NnhDaGVQYXBVM2xXK2FacVVPSnNEZ29hUEFFYWc3ZDFUZjNPd2pidklFc3l5?=
- =?utf-8?B?V1lIMnR0bEhmdmI1dEczcVkzR0IwcWNuVE5tci9ielVPL3Y0R2VTK3VER1RD?=
- =?utf-8?B?T1ZYcjB2bkVaNGIzbll4NzBZVS80Q3lTQ3BFZjllKzJ5eUJhU0NIdnY0ZG9E?=
- =?utf-8?B?VHF4OGhHZWFoVndxQ3l3S2lwZC9TeTg0TGVoWUhUTjRobzN6VVhTRHc4OG54?=
- =?utf-8?B?UjluSmtNNGJ5dFFUOFJKeTZ1Rlo5MGxCQ0xLNktCWUtQc2tRcE0xUGVFblRw?=
- =?utf-8?B?NjdLTjErTFFRc2lKdW5jaDV3WkVIQThRM0d0RXBieFk2c0FUWWxNd09Pbnp0?=
- =?utf-8?B?TlYwTGtKczNHVENLNFd3andQWmtUcm9sQktQSWUvTXA5dExKRUlRYkpzbC9N?=
- =?utf-8?B?bFcyS3BwQTdIYlMzNnNuVzBSK3A2bFE0Q2dNZS9ZMFFOUjlRaHAxZFJGeDRS?=
- =?utf-8?B?aXJiK0h4WFZVTkc1am0wYlY4bGtRM0JjMTZwMnNvc2tobmVta09BZFBqQ3NV?=
- =?utf-8?B?WFhvWFh5c3lobWZKZGhhRnJVZ2pEUWRXRFptUkZHcVpQTXByckNZREE3YklT?=
- =?utf-8?B?UG1QRlBCUXNZOEhDemRIbUp6eFcyc3JuQS9DZ0JVREZ1REdTdnM3Q28yNTFR?=
- =?utf-8?B?bGN6QjZLck9nL3ZPVkppaENRNkpKSEd3T2NtUk11M2Vzcjh0ellmUHIzdTly?=
- =?utf-8?B?V3pQZEFFcnZwb0NiR2RYYlVBYVBKR2pVdXpmRElGTVZ0SXFTUUEvNVVFV2FZ?=
- =?utf-8?B?MmduTUtkSGVoMUx4ajJQS1A3Q1kvUC9ZaGQ4cUNCUWlSWm1UQW1DeVRVYklh?=
- =?utf-8?Q?MX4XvErP6N8=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3320.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WHorQXROV3JicG1QWjBUNEtSZWlXM2VHbDVrVXhpS0F5Y0c4MmUyU1B2U0M5?=
- =?utf-8?B?OGx1WHJMQ2ZKSEhkZ2JPQ3ZUeUZsQWRSYXp6YkF2R0R6end1MWo1V1hBQTEr?=
- =?utf-8?B?SzVsNVcvKzVxRDVQaGFpVFM0YnFEcU9qelA3YzNaSXV2d3ZpWDNwSUV6V3Ro?=
- =?utf-8?B?Z2ZLc0Z4Z0hwT09NTkRydVkzUmdoK2RuSmRPYXUrSG9rbG5HSlZTeEY4cTVx?=
- =?utf-8?B?Mi9kdWdPeU14QWxGSzFDWlJoSEkrcndZMEdpTGVBZUpzV2d3UWE3cEdUYkVt?=
- =?utf-8?B?dExXcWd0ckdXaDc4b1Mvak1xWENiekx5UWo0YUJrV1I5RHN2aE81VjlyWlRv?=
- =?utf-8?B?ZlViWFI3bURXckptYWhFRnBhc3k5VnczYUNaNHdGNnNYNldKVGVqTzM2RnNK?=
- =?utf-8?B?bzNpcnVuVmhLLzRLOExoVEY4K3JnVFBJb1ZPWGNyWkljWVEwOHdybzJqc0lK?=
- =?utf-8?B?RHlXcWZxU1VXbW02QWtVbkozT0k4eHhVU1d6MHVOUFd1THVsY1huc3NJQzhS?=
- =?utf-8?B?dlF5MTlHeHFEVk9yUEtCUlhRcDRNam1CZ0FVOUVFeGo4MGxxak4vOWxEYVNn?=
- =?utf-8?B?eWozM3pUN2tRZmdBY3RPbDZGS1N0UzIwQnF1RTJMUldkdFZTYUNVbmpDYVEw?=
- =?utf-8?B?T2h6UUwyZ2FUYzdSWmVmSU45M1FZamNoUFZOQVc0clR5RE95V1BZOHhieVFG?=
- =?utf-8?B?NytTRU1XaVVTaEx1dDN1QnBmWWc3cU5HWjR0SCtSM0g0dC9ZU0Rjb1B3cm4w?=
- =?utf-8?B?NVpxeThQOElubFJweXhTWDhYV2NZTUpkSnhuWGJPSkRMVG5sa0JkRVorZGRm?=
- =?utf-8?B?V0J6dXhSWXBqZ2dtZFhPbXBycVA1b0dlWFRGNUhoMkdpS2Rad3NrUTR6OVBD?=
- =?utf-8?B?c3o2eW9VSXVJelNRbnlNUzk2R2paM3pHL3E2NXFtTFZxckdZUWNYM0tEcnJW?=
- =?utf-8?B?QUU4TzRYS0lVMjRMNlZUeXRjajhkb1NzendSTk1nVys5TldzTzA2cjhnWmRq?=
- =?utf-8?B?cDJnSmd1Uks2eFo0K2VWUysyWSt4UmtYQnhiUmV4MDhtU3RDblpZdmNTNUEy?=
- =?utf-8?B?YkVqOUJITWxwaUFJKzVTL0lJdVB0YzBoVUN5dWkrOUQ0bHhBbWJhMGVWSDFK?=
- =?utf-8?B?eS9TLytBdVNMSkJQZ3djbmpqb01GdEdIVXgzbTRVb2o0eGUrZjYxNmE3aGdG?=
- =?utf-8?B?dEtsVGk1SEMxZDByL1F3QXpsdHprSmNyM2tqMWJJMWFYVllSSlNlUmJjTk1N?=
- =?utf-8?B?cG01L0dRV09FWTJseXBTcC9aTmVSY0pybnN5VFR2WHlvWWZFQjhKK0tuMHFx?=
- =?utf-8?B?dVhzek1QLytnSkJXWlZ6L3pUeERad3lEMjhUVkM4SURSRCswd3pVbDlZaHFv?=
- =?utf-8?B?QnZFeFhnNUpOem4veU96UmRzYzdnRkpvdTB6VGZHNVVrWkFwK1VqQk9HdWU4?=
- =?utf-8?B?amZtZVRlTFdUbmpzN0F1K3k3M0VDV0JubE9SdTN0bUI1b1FQbGNsNkp1TjhJ?=
- =?utf-8?B?VUh4WXRaSnZwVWxuVDMwKzZYUXducUVha0MvVGMwUFllYVlvbUFoQ1JLdWlo?=
- =?utf-8?B?cXFEc1NNV0NkcTZOTVBnM3JnZTQvYm1rb3lxYkFCVkFLQTh0R3FKWDhrbHll?=
- =?utf-8?B?RDNua0N2V2RuWmRybVpZZHU2eEo2QlBkaUZSU3dnZnlGMVhhd0tBRGIrZUYr?=
- =?utf-8?B?eXdLN0VBTUdId3A2ZklNditJMHZBMWhRcDlJZlNQNVFyWUpZdFdUWFJ6T09T?=
- =?utf-8?B?dng5VEJubkZ2aW00ZnRIOFBmOHBnUlo0dFduYnlST3J2OTU0TmxVQ1dwREpu?=
- =?utf-8?B?NGJZS2tyOXhLTWF0MnJ1R3ZySVpXa1NyVHpsR3dwakhlOUZXZExiQkhablQ0?=
- =?utf-8?B?Q2p0SFFjK1RTc3VaT043YnN3OWxlUFdMNTg3UjVWYnBiaVY4K2kxdjZ2aDBK?=
- =?utf-8?B?QzRaZ2NpU24rbnAxWDFJVGhyVlBma1dDaWJpOU5OeE5BN2s1RWZLUExKV0kr?=
- =?utf-8?B?S1FVeDcyU2JHUUdnMDFnZGtpb0REVk1LOW53andWV042ckZjZmlYYlNhUU5k?=
- =?utf-8?B?VG04M241RFV6MGFBMi9VTjZCQ1hVQnZLbTBOOXJ4eUZRRkpKTERuazFoa2Ix?=
- =?utf-8?Q?fX8L8QP8Ip4lQkW7F8cH5Hujk?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd6e63b9-0281-4a4d-7c3a-08dda92fcd2c
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3320.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2025 21:34:52.9174
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eJ6UrX2ZaOskRXBeTrfhcC9NuSF4AXGnLn0IeSmUHvfJ+dV/ZDqOsWmeM9u47VvQMOV4NFl3QXvvOeKF/5VjqQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7056
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
+Message-ID: <20250611213557.294358-1-seanjc@google.com>
+Subject: [PATCH v2 00/18] KVM: x86: Add I/O APIC kconfig, delete irq_comm.c
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kai Huang <kai.huang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 6/4/2025 8:28 AM, H. Peter Anvin wrote:
-> 
-> The architectural maximum* is 63 sources (plus the error bit), 
-> although the current version only supports 1-15. If extended to be 
-> wider, we would presumably add a new cpuid bit.
-> 
-> However, we should make sure there is nothing in the implementation 
-> that limits us to 16 or 32 bits; when manipulating the bitmask we 
-> should use a 64 bit type.
-> 
+Add CONFIG_KVM_IOAPIC to allow disabling support for KVM's I/O APIC (and PIC
+and PIT) emulation, and delete irq_comm.c by moving its contents to other
+files.
 
-There isn't anything in the implementation that would limit it to less
-than 64 bits. However, (as suggested by Dave), I am planning to include:
+Vitaly and Kai, I didn't apply your review/ack to the Hyper-V patch, as I ended
+up keeping the helper as kvm_hv_synic_set_irq() to fix the tracepoint
+inconsistency and the bad changelog.
 
-	BUILD_BUG_ON(NMIS_VECTORS_MAX > 16);
+v2:
+ - Keep kvm_hv_synic_set_irq() instead of renaming it kvm_hv_set_sint() to
+   stay consistent with kvm_pic_set_irq() and kvm_ioapic_set_irq(), and with
+   its tracepoint. [Vitaly, Kai]
+ - Keep kvm_setup_default_irq_routine() instead of folding it into I/O APIC
+   allocation, but rename it to kvm_setup_default_ioapic_and_pic_routing().
+   [Paolo].
+ - Move a bit more code out of x86.c (this time into i8254.c).
+ - Guard more code with CONFIG_KVM_IOAPIC (e.g. struct kvm_pit).
+ - Fix a changelog typo. [Kai]
+ - Collect Kai's Acked-by. [Kai]
 
-If someone hits this compile issue while adding new vectors, it would
-help them realize the limitations of the existing hardware.
+v1: https://lore.kernel.org/all/20250519232808.2745331-1-seanjc@google.com
 
-We can recommend vector aliasing at that point or if there is hardware
-in the pipeline that extends this beyond 16, we can simply get rid of
-the BUILD_BUG_ON() along with the patches that add the new vectors.
+Sean Christopherson (18):
+  KVM: x86: Trigger I/O APIC route rescan in
+    kvm_arch_irq_routing_update()
+  KVM: x86: Drop superfluous kvm_set_pic_irq() => kvm_pic_set_irq()
+    wrapper
+  KVM: x86: Drop superfluous kvm_set_ioapic_irq() =>
+    kvm_ioapic_set_irq() wrapper
+  KVM: x86: Drop superfluous kvm_hv_set_sint() => kvm_hv_synic_set_irq()
+    wrapper
+  KVM: x86: Move PIT ioctl helpers to i8254.c
+  KVM: x86: Move KVM_{GET,SET}_IRQCHIP ioctl helpers to irq.c
+  KVM: x86: Rename irqchip_kernel() to irqchip_full()
+  KVM: x86: Move kvm_setup_default_irq_routing() into irq.c
+  KVM: x86: Move kvm_{request,free}_irq_source_id() to i8254.c (PIT)
+  KVM: x86: Hardcode the PIT IRQ source ID to '2'
+  KVM: x86: Don't clear PIT's IRQ line status when destroying PIT
+  KVM: x86: Explicitly check for in-kernel PIC when getting ExtINT
+  KVM: Move x86-only tracepoints to x86's trace.h
+  KVM: x86: Add CONFIG_KVM_IOAPIC to allow disabling in-kernel I/O APIC
+  KVM: Squash two CONFIG_HAVE_KVM_IRQCHIP #ifdefs into one
+  KVM: selftests: Fall back to split IRQ chip if full in-kernel chip is
+    unsupported
+  KVM: x86: Move IRQ mask notifier infrastructure to I/O APIC emulation
+  KVM: x86: Fold irq_comm.c into irq.c
 
-> -hpa
-> 
-> * If we were to use the additional error reporting fields in the 
-> FRED frame at some future point it could be extended as far as 207, 
-> but since we at this point don't have anyone clamouring for more 
-> than 15 this seems like a very remote possibility.
+ arch/x86/include/asm/kvm_host.h            |  22 +-
+ arch/x86/kvm/Kconfig                       |  10 +
+ arch/x86/kvm/Makefile                      |   7 +-
+ arch/x86/kvm/hyperv.c                      |  10 +-
+ arch/x86/kvm/hyperv.h                      |   3 +-
+ arch/x86/kvm/i8254.c                       |  90 +++-
+ arch/x86/kvm/i8254.h                       |  17 +-
+ arch/x86/kvm/i8259.c                       |  17 +-
+ arch/x86/kvm/ioapic.c                      |  55 ++-
+ arch/x86/kvm/ioapic.h                      |  24 +-
+ arch/x86/kvm/irq.c                         | 427 ++++++++++++++++++-
+ arch/x86/kvm/irq.h                         |  35 +-
+ arch/x86/kvm/irq_comm.c                    | 469 ---------------------
+ arch/x86/kvm/lapic.c                       |   7 +-
+ arch/x86/kvm/trace.h                       |  80 ++++
+ arch/x86/kvm/x86.c                         | 164 +------
+ include/linux/kvm_host.h                   |   9 +-
+ include/trace/events/kvm.h                 |  84 +---
+ tools/testing/selftests/kvm/lib/kvm_util.c |  13 +-
+ virt/kvm/irqchip.c                         |   2 -
+ 20 files changed, 746 insertions(+), 799 deletions(-)
+ delete mode 100644 arch/x86/kvm/irq_comm.c
+
+
+base-commit: 61374cc145f4a56377eaf87c7409a97ec7a34041
+-- 
+2.50.0.rc1.591.g9c95f17f64-goog
 
 
