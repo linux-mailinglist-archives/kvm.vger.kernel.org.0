@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-49114-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49115-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 914E7AD60F7
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 23:17:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38AE4AD60FA
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 23:18:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 608C61BC2A1C
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 21:18:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDDD73AB315
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 21:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5649248888;
-	Wed, 11 Jun 2025 21:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E7024A041;
+	Wed, 11 Jun 2025 21:17:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i/QZJ75Y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XtB1acE6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E578246BA9
-	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 21:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3542475E8
+	for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 21:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749676623; cv=none; b=pk5XUw60usGY8zDChDc44f7jdE22AYR6Rn/SPDalbZCrUlnf+Il9xO6yWIKD3d5LmCyXjy8OsFuGbudp60mfXLpnjcKYQ+/nHz8Qt2QnFlDoDhK/VAeUHQTHWCj0u94TBiv1a6l0Mz8IxQACiL2yBSvBbNb6gJApKpL3BfgDVws=
+	t=1749676624; cv=none; b=MCj/0GHWKGaQT3iMB1V7GvA6mnu7d03wYx7OkDLjFZjG0RpQfERPMFJmg/AU21hg38bzM8QoPmdMJBifGE/l3WvfWvVJz260k33KC6QwKw7n10FuLWKrX9rBhd1Yol0Wk3B4HWdqwDpadK2LDJQv40KIMXR/eMoo/JI2zeHxx0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749676623; c=relaxed/simple;
-	bh=EliRXJasvagyPsAst5/DK5fV9+Nz9GPWmMU52maUMAU=;
+	s=arc-20240116; t=1749676624; c=relaxed/simple;
+	bh=23eEzMfMOXF7V+bWkGGPvYl3Tz385egAD6gxjflsMOg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IEjAna9yKiblZspdoLIAwxhVihjJek2CjAVkspbPW9hy0KPCMY7G/CVu5EyJmTtmXflGSyuDs9RaKdDGE7LJnGdkzFPNlLVJ84w1hpPyAXianunC/AHDzjqnwJPI5hDvaudMEQbJjMqCDlK0te0F2ZoA9qHDGm8vx2epRU8eQgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i/QZJ75Y; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=XxCHLxCUI5NiZYWkOuF2XilotOeFKi9MW137Odvf1NyRdDFaLdOQxqwAJimAUCAE2rZBr6K+eQK9kG63PF5DYAaRhOm/lmnqBdI+zEDOcJtU5LPH51PEXO79rnAJNDtaYUDka+tyllPPnSnAR+AzXVSLr40v+U2wlIgGNbcXn5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XtB1acE6; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--afranji.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-747ddba7c90so234028b3a.0
-        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 14:17:01 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-23228c09e14so3251515ad.1
+        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 14:17:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749676621; x=1750281421; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749676622; x=1750281422; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sBfca3HTQRqrJJwA201rhl29YEXxOvfPcejKdAe4i9w=;
-        b=i/QZJ75YU7sDyeJjalqq3yuRaMm3b4FQmP1O++40343eakMCmchqzS5EaC+YFZyvU1
-         hBx29u09iWyP15oFO4aZEoJAT1YxIDxzUqwFoqOEnjcUNo1iUtQ4yt9ooap5SnbB4s0Z
-         JIfTRgCnRMIB5tbFW5VrdDq8P/70C6v7XwaBy208iHhjbB/AwC4EJmLFovio3FsuyX3X
-         1UezlhV40j4+0bHluY7p9OgHSPvfOhmxn59aebGipPDQKRY8OMxBQ8Y/ow9C36FjmbS+
-         PRNKSOq7tbn5lMsaZz+CBAx2JY8oeoaas6HGEU7qK/VIx1MyLDsFfqzz7R/nLrKRC6m7
-         lXsQ==
+        bh=eeeVbKpBN3tx4HaouiCrmDPq5kK6kn8OwuY8SLpOHLs=;
+        b=XtB1acE6yjL3I9NFyGCi6BYqW5VF0TzWICdBJCaWrTIweyMGIEavO6DhZQhBZkW8GN
+         786v4e9GuoOBRbsWWukwctYitSaiboVz/g9ey/7nvWZdUf9A73r1NzG0OuTsaWze0ci/
+         2uSGrvblLTyRME7FgeaE70AdV0c/+zbTK0ogfcXscUemWAkRubi0wEqZIu8Uw+Sd7rDJ
+         HhAxEe5kGoJD0ew12TqXBWIL3UNK9RJj+Bd4YRSFavUK/CClwPizZHgDeoEz9a59jur0
+         hbrwGNn7dJNWbzqe390gjZCLv8yuzvmcraRo5R12sd3BxZK6AGaOo/rcnIISN1D3RTAZ
+         H3fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749676621; x=1750281421;
+        d=1e100.net; s=20230601; t=1749676622; x=1750281422;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sBfca3HTQRqrJJwA201rhl29YEXxOvfPcejKdAe4i9w=;
-        b=RsSsXsHH6ObNgqzVoWzLQkZ75yYMCbuJtrhnAtB+ipkjaDUYy6TWABsgZg60u3m1A1
-         5P+Ua8e5Uy+HkrFobA4XepE+0XMlJ5u4JATjFDRyoxHjZVWGomfwOncqne5MAaIFMyLz
-         OEAWJKCV+5FWVlYTz4VjRh92msYI/N0/cumjk8/BPXXupeWd6r5nkcehaBB0XRYiaGB2
-         MgB9NQyhT/IZg5FF/PL1uEDELBa9kXpWFHQ1ER1KmRVjrMx3nf6KaRWCdN94g+0u7Wrh
-         JR4X1zPmUaytXvsTh5z8iLRlZcrPJYyWnvT3TMaPpq/n8pho5CcK0oaxxIegZzmBGXji
-         k4oA==
-X-Gm-Message-State: AOJu0YwPJ37Md/y1l5WoXOQKVtYICgZZ79QF76WqQ/OfBtQHWg7fc3v+
-	T4IpCUSu2ipQTjUcXFRhbecOegRwKol+afnda1eFYeyAAjlMVtL/Mex4AaTyDFyMwet+Wy9Cyfg
-	2ie5SnnVlQle6zJZxeHTtrOtlcNm/xMnitURaFdZ1MWskCBZJDmRdKcKXooW1ho/AlKMhhVJWQs
-	xvkFjDTaPaCPQnFPg0vcfdC4YfMYaIWeFFnrz4Tg==
-X-Google-Smtp-Source: AGHT+IEwt8NGYhwzS0nUmHsR7Wm0KUS2I53PheVpr9xT2i86QWOhPPHtzrsha444DVNmTlDTkv6MnyHBFveF
-X-Received: from pfblm9.prod.google.com ([2002:a05:6a00:3c89:b0:746:3244:f1e6])
- (user=afranji job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:194b:b0:748:3485:b99d
- with SMTP id d2e1a72fcca58-7487c338367mr1420302b3a.18.1749676620423; Wed, 11
- Jun 2025 14:17:00 -0700 (PDT)
-Date: Wed, 11 Jun 2025 21:16:30 +0000
+        bh=eeeVbKpBN3tx4HaouiCrmDPq5kK6kn8OwuY8SLpOHLs=;
+        b=GvwTCemhA+TIEi15GA22sSqoB5U9jvGrdRSGngq4pqwL8LB9wV9AKKr/tBab0PgLMh
+         EYhPT8jadkjw081u6V1hk647T8ymZ+XxMUTKlIBvzqmRnpYkynOs3LV/6T+fesQs3RK0
+         X08Bx/llc9ZZc349l9VQbSfVyLDNs45So6wCGOJ0aGjlaRKMx5uljKTQBeKc9rc2KPIr
+         Y6fOhHZDKmh3QLcSlH6RrDMZ6KqKyTzQ5Og+LnP47cniYQNmDyeUCc3jTitNChnbmJjB
+         CM3DqABGDRMAMKyPgv0Xs8OSm9NW8GmtBqAqhMoo6vd9qF4HanX7qJZF27RMS1t54FLl
+         /Hrg==
+X-Gm-Message-State: AOJu0YxrQohMUw93tBwwccqoC4Esw9IZgaHbNbPRTgcHqFvODLHdImk9
+	mw0KEeoXHC4GAyi3turlJXLAct7HvTHflqlstPR5+32WgTrxNMDCUCEIK1VGbjsZd1G0nukN2O2
+	0ZA+KWoNq50AEpGlqs7WcLNhNTD1Otv8dhMkFExcZfFEfpoMbYcVcF65edrAkrJsZWOKuqP1msH
+	c456KLEC1tPPucjkesgFEnQgdcXf7t0G5Leccdig==
+X-Google-Smtp-Source: AGHT+IE5WV553GbkZv8fO1P4XOmH7RTOhAm37uG1sjPoDpJHdYSQZ79D7+wj8i1Ji8ZCsjPC1Fa02a37Bbim
+X-Received: from pjbqo13.prod.google.com ([2002:a17:90b:3dcd:b0:311:a4ee:7c3d])
+ (user=afranji job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:46c5:b0:234:8ec1:4ad3
+ with SMTP id d9443c01a7336-23641b291acmr69887485ad.40.1749676622084; Wed, 11
+ Jun 2025 14:17:02 -0700 (PDT)
+Date: Wed, 11 Jun 2025 21:16:31 +0000
 In-Reply-To: <cover.1749672978.git.afranji@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1749672978.git.afranji@google.com>
 X-Mailer: git-send-email 2.50.0.rc1.591.g9c95f17f64-goog
-Message-ID: <c55644ec81c22e7239d52f97e744eb4bafeccac3.1749672978.git.afranji@google.com>
-Subject: [RFC PATCH v2 03/10] KVM: TDX: Add base implementation for tdx_vm_move_enc_context_from
+Message-ID: <c55c9b7099cbb646d63803110889ddeddf4c370f.1749672978.git.afranji@google.com>
+Subject: [RFC PATCH v2 04/10] KVM: TDX: Implement moving mirror pages between
+ 2 TDs
 From: Ryan Afranji <afranji@google.com>
 To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Cc: sagis@google.com, bp@alien8.de, chao.p.peng@linux.intel.com, 
@@ -91,97 +92,214 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Sagi Shahar <sagis@google.com>
 
-This should mostly match the logic in sev_vm_move_enc_context_from.
+Added functionality for moving the mirror EPT table from one TD to a new
+one.
+
+This function moves the root of the mirror EPT table and overwrites the
+root of the destination.
 
 Signed-off-by: Sagi Shahar <sagis@google.com>
 Signed-off-by: Ryan Afranji <afranji@google.com>
 ---
- arch/x86/kvm/vmx/main.c    | 12 +++++++++++-
- arch/x86/kvm/vmx/tdx.c     | 24 ++++++++++++++++++++++++
- arch/x86/kvm/vmx/x86_ops.h |  1 +
- 3 files changed, 36 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu.h         |  2 ++
+ arch/x86/kvm/mmu/mmu.c     | 66 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.c | 61 ++++++++++++++++++++++++++++++++---
+ arch/x86/kvm/mmu/tdp_mmu.h |  6 ++++
+ 4 files changed, 130 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index d1e02e567b57..125af25fd09a 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -879,6 +879,14 @@ static int vt_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
- 	return 0;
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index b4b6860ab971..b43d770daa05 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -102,6 +102,8 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu);
+ void kvm_mmu_sync_prev_roots(struct kvm_vcpu *vcpu);
+ void kvm_mmu_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+ 			 int bytes);
++int kvm_mmu_move_mirror_pages_from(struct kvm_vcpu *vcpu,
++				   struct kvm_vcpu *src_vcpu);
+ 
+ static inline int kvm_mmu_reload(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index cbc84c6abc2e..09c1892e0ac1 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3943,6 +3943,72 @@ static int mmu_first_shadow_root_alloc(struct kvm *kvm)
+ 	return r;
  }
  
-+static int vt_move_enc_context_from(struct kvm *kvm, struct kvm *source_kvm)
++int kvm_mmu_move_mirror_pages_from(struct kvm_vcpu *vcpu,
++				   struct kvm_vcpu *src_vcpu)
 +{
-+	if (!is_td(kvm))
-+		return -ENOTTY;
++	struct kvm_mmu *mmu = vcpu->arch.mmu;
++	struct kvm_mmu *src_mmu = src_vcpu->arch.mmu;
++	gfn_t gfn_shared = kvm_gfn_direct_bits(vcpu->kvm);
++	hpa_t mirror_root_hpa;
++	int r = -EINVAL;
 +
-+	return tdx_vm_move_enc_context_from(kvm, source_kvm);
++	if (!gfn_shared)
++		return r;
++
++	r = mmu_topup_memory_caches(vcpu, !vcpu->arch.mmu->root_role.direct);
++	if (r)
++		return r;
++
++	/* Hold locks for both src and dst. Always take the src lock first. */
++	read_lock(&src_vcpu->kvm->mmu_lock);
++	write_lock_nested(&vcpu->kvm->mmu_lock, SINGLE_DEPTH_NESTING);
++
++	WARN_ON_ONCE(!is_tdp_mmu_active(vcpu));
++	WARN_ON_ONCE(!is_tdp_mmu_active(src_vcpu));
++
++	/*
++	 * The mirror root is moved from the src to the dst and is marked as
++	 * invalid in the src.
++	 */
++	mirror_root_hpa = kvm_tdp_mmu_move_mirror_pages_from(vcpu, src_vcpu);
++	if (mirror_root_hpa == INVALID_PAGE) {
++		struct kvm_mmu_page *mirror_root;
++		union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
++
++		/*
++		 * This likely means that the mirror root was already moved by
++		 * another vCPU.
++		 */
++		role.is_mirror = true;
++		mirror_root = kvm_tdp_mmu_get_vcpu_root(vcpu, role);
++		if (!mirror_root) {
++			r = -EINVAL;
++			goto out_unlock;
++		}
++		mirror_root_hpa = __pa(mirror_root->spt);
++	}
++
++	mmu->mirror_root_hpa = mirror_root_hpa;
++	mmu_free_root_page(src_vcpu->kvm, &src_mmu->mirror_root_hpa, NULL);
++	write_unlock(&vcpu->kvm->mmu_lock);
++	read_unlock(&src_vcpu->kvm->mmu_lock);
++
++	/* The direct root is allocated normally and is not moved from src. */
++	kvm_tdp_mmu_alloc_root(vcpu, false);
++
++	kvm_mmu_load_pgd(vcpu);
++	kvm_x86_call(flush_tlb_current)(vcpu);
++
++	return r;
++
++out_unlock:
++	write_unlock(&vcpu->kvm->mmu_lock);
++	read_unlock(&src_vcpu->kvm->mmu_lock);
++
++	return r;
 +}
++EXPORT_SYMBOL(kvm_mmu_move_mirror_pages_from);
 +
- #define vt_op(name) vt_##name
- #define vt_op_tdx_only(name) vt_##name
- #else /* CONFIG_KVM_INTEL_TDX */
-@@ -1044,7 +1052,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.mem_enc_ioctl = vt_op_tdx_only(mem_enc_ioctl),
- 	.vcpu_mem_enc_ioctl = vt_op_tdx_only(vcpu_mem_enc_ioctl),
- 
--	.private_max_mapping_level = vt_op_tdx_only(gmem_private_max_mapping_level)
-+	.private_max_mapping_level = vt_op_tdx_only(gmem_private_max_mapping_level),
-+
-+	.vm_move_enc_context_from = vt_move_enc_context_from
- };
- 
- struct kvm_x86_init_ops vt_init_ops __initdata = {
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index b952bc673271..07583a11d6e3 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -626,6 +626,7 @@ int tdx_vm_init(struct kvm *kvm)
- 	kvm->arch.has_protected_state = true;
- 	kvm->arch.has_private_mem = true;
- 	kvm->arch.disabled_quirks |= KVM_X86_QUIRK_IGNORE_GUEST_PAT;
-+	kvm->arch.use_vm_enc_ctxt_op = true;
- 
- 	/*
- 	 * Because guest TD is protected, VMM can't parse the instruction in TD.
-@@ -3524,3 +3525,26 @@ int __init tdx_bringup(void)
- 	enable_tdx = 0;
- 	return 0;
+ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_mmu *mmu = vcpu->arch.mmu;
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 115af5e4c5ed..212716ab7e8b 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -251,6 +251,22 @@ static void tdp_mmu_init_child_sp(struct kvm_mmu_page *child_sp,
+ 	tdp_mmu_init_sp(child_sp, iter->sptep, iter->gfn, role);
  }
-+
-+static __always_inline bool tdx_finalized(struct kvm *kvm)
-+{
-+	struct kvm_tdx *tdx_kvm = to_kvm_tdx(kvm);
-+
-+	return tdx_kvm->state == TD_STATE_RUNNABLE;
-+}
-+
-+static int tdx_migrate_from(struct kvm *dst, struct kvm *src)
-+{
-+	return -EINVAL;
-+}
-+
-+int tdx_vm_move_enc_context_from(struct kvm *kvm, struct kvm *src_kvm)
-+{
-+	if (!is_td(kvm) || !is_td(src_kvm))
-+		return -EINVAL;
-+
-+	if (tdx_finalized(kvm) || !tdx_finalized(src_kvm))
-+		return -EINVAL;
-+
-+	return tdx_migrate_from(kvm, src_kvm);
-+}
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index b4596f651232..001f1540a560 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -164,6 +164,7 @@ void tdx_flush_tlb_current(struct kvm_vcpu *vcpu);
- void tdx_flush_tlb_all(struct kvm_vcpu *vcpu);
- void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
- int tdx_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
-+int tdx_vm_move_enc_context_from(struct kvm *kvm, struct kvm *source_kvm);
- #endif
  
- #endif /* __KVM_X86_VMX_X86_OPS_H */
++struct kvm_mmu_page *
++kvm_tdp_mmu_get_vcpu_root(struct kvm_vcpu *vcpu,
++			  union kvm_mmu_page_role role)
++{
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm_mmu_page *root;
++
++	lockdep_assert_held(&kvm->mmu_lock);
++	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
++		if (root->role.word == role.word &&
++		    !WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root)))
++			return root;
++	}
++	return NULL;
++}
++
+ void kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu, bool mirror)
+ {
+ 	struct kvm_mmu *mmu = vcpu->arch.mmu;
+@@ -285,11 +301,9 @@ void kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu, bool mirror)
+ 	 * fails, as the last reference to a root can only be put *after* the
+ 	 * root has been invalidated, which requires holding mmu_lock for write.
+ 	 */
+-	list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link) {
+-		if (root->role.word == role.word &&
+-		    !WARN_ON_ONCE(!kvm_tdp_mmu_get_root(root)))
+-			goto out_spin_unlock;
+-	}
++	root = kvm_tdp_mmu_get_vcpu_root(vcpu, role);
++	if (!!root)
++		goto out_spin_unlock;
+ 
+ 	root = tdp_mmu_alloc_sp(vcpu);
+ 	tdp_mmu_init_sp(root, NULL, 0, role);
+@@ -321,6 +335,43 @@ void kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu, bool mirror)
+ 	}
+ }
+ 
++hpa_t kvm_tdp_mmu_move_mirror_pages_from(struct kvm_vcpu *vcpu,
++					 struct kvm_vcpu *src_vcpu)
++{
++	union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm *src_kvm = src_vcpu->kvm;
++	struct kvm_mmu_page *mirror_root = NULL;
++	s64 num_mirror_pages, old;
++
++	lockdep_assert_held_read(&src_vcpu->kvm->mmu_lock);
++	lockdep_assert_held_write(&vcpu->kvm->mmu_lock);
++
++	/* Find the mirror root of the source. */
++	role.is_mirror = true;
++	mirror_root = kvm_tdp_mmu_get_vcpu_root(src_vcpu, role);
++	if (!mirror_root)
++		return INVALID_PAGE;
++
++	/* Remove the mirror root from the src kvm and add it to dst kvm. */
++	spin_lock(&src_vcpu->kvm->arch.tdp_mmu_pages_lock);
++	list_del_rcu(&mirror_root->link);
++	spin_unlock(&src_vcpu->kvm->arch.tdp_mmu_pages_lock);
++
++	/* The destination holds a write lock so no spin_lock required. */
++	list_add_rcu(&mirror_root->link, &kvm->arch.tdp_mmu_roots);
++
++#ifdef CONFIG_KVM_PROVE_MMU
++	num_mirror_pages = atomic64_read(&src_kvm->arch.tdp_mirror_mmu_pages);
++	old = atomic64_cmpxchg(&kvm->arch.tdp_mirror_mmu_pages, 0,
++			       num_mirror_pages);
++	/* The destination VM should have no mirror pages at this point. */
++	WARN_ON(old);
++	atomic64_set(&src_kvm->arch.tdp_mirror_mmu_pages, 0);
++#endif
++	return __pa(mirror_root->spt);
++}
++
+ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 				u64 old_spte, u64 new_spte, int level,
+ 				bool shared);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+index 52acf99d40a0..abb1a84d8b1c 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -63,6 +63,12 @@ static inline struct kvm_mmu_page *tdp_mmu_get_root(struct kvm_vcpu *vcpu,
+ 	return root_to_sp(vcpu->arch.mmu->root.hpa);
+ }
+ 
++struct kvm_mmu_page *
++kvm_tdp_mmu_get_vcpu_root(struct kvm_vcpu *vcpu,
++			  union kvm_mmu_page_role role);
++hpa_t kvm_tdp_mmu_move_mirror_pages_from(struct kvm_vcpu *vcpu,
++					  struct kvm_vcpu *src_vcpu);
++
+ bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end, bool flush);
+ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
+ void kvm_tdp_mmu_zap_all(struct kvm *kvm);
 -- 
 2.50.0.rc1.591.g9c95f17f64-goog
 
