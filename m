@@ -1,74 +1,78 @@
-Return-Path: <kvm+bounces-49076-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49077-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49051AD5913
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 16:41:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 858A8AD5914
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 16:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A5663A7ADD
-	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 14:39:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E85CA1BC3386
+	for <lists+kvm@lfdr.de>; Wed, 11 Jun 2025 14:40:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DB7E2BD5BB;
-	Wed, 11 Jun 2025 14:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10202BEC25;
+	Wed, 11 Jun 2025 14:39:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DINZXAat"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TQlEdrQd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DABD2690F4;
-	Wed, 11 Jun 2025 14:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAE02BD595;
+	Wed, 11 Jun 2025 14:39:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749652784; cv=none; b=HcfCmXh7m2f80j9aMfaPq0SJ/uguQ5nbz8aFBgQLeSCU5qClvFHQfwkVX71cXncV3DFNfUTMLDQvLGckBpMeNUIBefkkh/OrThcivCuUcQEDy9yy6p1WQhlsLw5lBxoZoTdIIiF8NTfXtDIoVh0oP/DvSn5o7RJZmYycjoK+wiI=
+	t=1749652785; cv=none; b=Qiw1p/yRLAiB8suDSUhUP3zf0r3G+uTy2Uyul3jM2lmeCgQVgaU3uRPtpxiwa29GlDGhmeWf0tmvpp1Vw2kIDgLSxbNp7DxFMHC0JmyOMrVq54CsneowIyNdOngyrZBmtoYrtQ4sI6udF9wEuUq12CMUNcA4w+/0Mv90h+EPojM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749652784; c=relaxed/simple;
-	bh=aqypGgqD5Z1GVJzaOtiUWHGS5FYKgTtrDXNfRtBkNVI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kdKJXPYMaLL3PQ7OQ329m9CHruzzhAhpNckr7qfh9oDIKVV+UcPosCUHqvAfn98lESJMltfo42CgxaIlnyNOBxHiYBbNhv5gA7Np7Y98hDlPtrITwEdlJUPmt0URhfRIkXic+nft8M+z/zIMDMlZ+Rv7A35IciBSJaRiC3xI9L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DINZXAat; arc=none smtp.client-ip=205.220.177.32
+	s=arc-20240116; t=1749652785; c=relaxed/simple;
+	bh=WsomdLm8ml4c1Y0hcqRTbu8J/+zZxMNWJvjLs5P7AGo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lhv0E+KOJ93AlhLBUrx6/f3oZX+7kDaSMzxBMLoSdI5B2xBiB1TwA58Z8vtbQ6x08Zk18Exv655LsvwksVv7uNVcRy4kj1dx3QDn6qt5GN4jHgFk19bDtMGM54fOC9ldk/fPbgB4xYE9JFHq8XWJP52KvHt2F/FUKVn9PiuhxA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=TQlEdrQd; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55BEdFdP010522;
-	Wed, 11 Jun 2025 14:39:37 GMT
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55BEdJmb000713;
+	Wed, 11 Jun 2025 14:39:39 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=+MbQXWPeLML3LfbjNcfAYDmrMVvqa
-	WCRa0dvaIisA3M=; b=DINZXAatO86U3hlxEdSrT/AP4kfGqwbv8Z1mx96Q+xSky
-	NUFxqnlhNeU/6oe8r5ac/21i04SUm9QKIYkjgWHF1Ob48GTI0oHECPLftLsLuNcl
-	9fAwju5rvZdy2//fWU4bwrB0yPywCSMnDvW7rYw4oEZePRXc0VKKq1BV2QE8oKW4
-	AVppmjRnHRYTAX7yCu6uGD7KXIbsfKBTYxjIpmEdjyNtKuCD6eT5sYTNi3Db4U4T
-	txhqfFGBAV80bIWiWiqLuIAXz6oNkLUqztPW2SN+IQrBsH3/B6rbzTDUZX76gHII
-	hxEk4eCthKZkHEH0L1nxqtkQfZlT6Rdi7dH+uo4Mw==
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=corp-2025-04-25; bh=Rihpw
+	Y/OGMU7/euHmDRplxdxNijcth8OxqlWoZF3aJ4=; b=TQlEdrQdTJF4W/d4la4BT
+	AwkaPLXoVP5tlVKkZeAGTUlh8PtHekmIgFleET3quZ9ZJg6y5X6coayTlv67AKFP
+	n353MClH1mXiqP5APaLbmJtIBIZcuv4AE42AxH3fvPJWK/ugtr3iLwNGe2rWcGQK
+	LqCE6K0URCV/2I2X+xxN+Ces0yKhgWTrpnv3C3lG3fj928OE4zRW3juKyGIunGjg
+	fDe7w2FbVkwYBKbv/+Qt0a1hk6HU6MahY7lhpvkbPgoyd0iNtlxwUThjAIMC129L
+	ZAT4W1Mft7H5vPHs9b+wwqabh3T1ZjFrHE9DSdSqAtvQfqxi44UATpTMjcJGPuUq
+	g==
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4752xjxyhj-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 474cbefggy-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Jun 2025 14:39:37 +0000 (GMT)
+	Wed, 11 Jun 2025 14:39:39 +0000 (GMT)
 Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55BE1llZ021378;
-	Wed, 11 Jun 2025 14:39:36 GMT
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55BEUBoO021511;
+	Wed, 11 Jun 2025 14:39:38 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 474bvb0crr-1
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 474bvb0csj-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Jun 2025 14:39:36 +0000
+	Wed, 11 Jun 2025 14:39:38 +0000
 Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55BEda1m013641;
-	Wed, 11 Jun 2025 14:39:36 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55BEda1o013641;
+	Wed, 11 Jun 2025 14:39:37 GMT
 Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 474bvb0cr1-1;
-	Wed, 11 Jun 2025 14:39:35 +0000
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 474bvb0cr1-2;
+	Wed, 11 Jun 2025 14:39:37 +0000
 From: Alok Tiwari <alok.a.tiwari@oracle.com>
 To: mst@redhat.com, jasowang@redhat.com, michael.christie@oracle.com,
         pbonzini@redhat.com, stefanha@redhat.com, eperezma@redhat.com,
         virtualization@lists.linux.dev, kvm@vger.kernel.org
 Cc: alok.a.tiwari@oracle.com, darren.kenny@oracle.com, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] vhost-scsi: Fix typos and formatting in comments and logs
-Date: Wed, 11 Jun 2025 07:39:21 -0700
-Message-ID: <20250611143932.2443796-1-alok.a.tiwari@oracle.com>
+Subject: [PATCH 2/2] vhost-scsi: Improve error handling in vhost_scsi_make_nexus and tpg
+Date: Wed, 11 Jun 2025 07:39:22 -0700
+Message-ID: <20250611143932.2443796-2-alok.a.tiwari@oracle.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250611143932.2443796-1-alok.a.tiwari@oracle.com>
+References: <20250611143932.2443796-1-alok.a.tiwari@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,115 +87,59 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlog
  malwarescore=0 suspectscore=0 spamscore=0 phishscore=0 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
  definitions=main-2506110122
-X-Authority-Analysis: v=2.4 cv=K4AiHzWI c=1 sm=1 tr=0 ts=68499529 b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=C3Wo5I0qEXIME_MCgsYA:9 cc=ntf awl=host:13206
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjExMDEyMyBTYWx0ZWRfX8QdIum7iYPdu YYxfQnC0Ddc5lXR1VFfIjnKFWFWa6IlT8vxweUYw9JAwjOqMVZXmRCoItNowjz7golvsFMwacEs 2f3DwTe2Pz42rKzoo3s6IYxD77lO/U+Vg5M3goHA+7ATb6tctCq8Ke9GpzVG8ZD94TeQhT1QcKF
- APa9uwP+i2SEyr+orNNVQMJoSyd54OSmt0qkvqoCxV8aNCA0o9CyPKCw3scIH77mOreRUG9EheD NQ6YDfwsLqzdf9XeJM7nji2DFqDKmuguQlu8Qy6e2mIC2GVbpTVhWHEKEM6MpHaHiBt3ZEfiva0 0qPI42IKTcjse3iL5qIOd9D+YRIsXaWgX4KSLP5mNxdax8kGH+zZSBa7VrLIosBzwskfhmVo2PK
- 3w4VLbWeCdIo8eTIYbeyUluhh33fQuc+DCIM7Ia+a2UR62vRK028V7gbCKWOX9/buTY2fyNU
-X-Proofpoint-ORIG-GUID: 72saJQB-Odq-BQtwRVcSZu6Kv3VxDEVK
-X-Proofpoint-GUID: 72saJQB-Odq-BQtwRVcSZu6Kv3VxDEVK
+X-Proofpoint-GUID: yg6_qu5f86vFTsxjJLCwC99HToIjMVN4
+X-Authority-Analysis: v=2.4 cv=BffY0qt2 c=1 sm=1 tr=0 ts=6849952b b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=FKRWl_rJgknQzDKIOPAA:9 cc=ntf awl=host:13206
+X-Proofpoint-ORIG-GUID: yg6_qu5f86vFTsxjJLCwC99HToIjMVN4
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjExMDEyMyBTYWx0ZWRfXwHWToEbyTeOs YQREjM88ZttM5vExwtMrszjbxwqO6Z8VC5W3orxWsvp+/dHbgyYwra5fbQkh28YxvW18xLBr+z9 zbE1DDLBcOws64lkVeA1WA/Pn7WdDtYcf0YUp9jVoLDUrC42ma59aTfHE8QzAdxFsHs1rwP6TuE
+ WIqwQDpXgghoPhEzxeF1CGGJ72/W4AFn/eF91yQkkV5VebQbDEN3RIOoim/7s9j3V8eTFzztNwm /JDIZw0Zz8GuOZnx5zbnJMRNHtpuWbk4yEadq4fOC8HbZFU7Cu09GG8YMTdbT0U1QiUIi5staeU 4LFelKxwMPOB0dWBq07E1D6yI9cSdHkBewb5VKa7pIGJu17Wuuu2HBF6OWxPa7TBbeGRjN3bnH1
+ LvBct9QUGMwEyPAtKSJfdCoMX9to/3vcaW0L4NAAqiIcIHTHw2unlp2EZcPblkdNi8kmGQZ1
 
-This patch corrects several minor typos and formatting issues.
-Changes include:
+Use PTR_ERR to return the actual error code when vhost_scsi_make_nexus
+fails to create a session, instead of returning -ENOMEM.
+This ensures more accurate error propagation.
 
-Fixing misspellings like in comments
-- "explict" -> "explicit"
-- "infight" -> "inflight",
-- "with generate" -> "will generate"
-
-formatting in logs
-- Correcting log formatting specifier from "%dd" to "%d"
-- Adding a missing space in the sysfs emit string to prevent
-  misinterpreted output like "X86_64on ". changing to "X86_64 on "
-- Cleaning up stray semicolons in struct definition endings
-
-These changes improve code readability and consistency.
-no functionality changes.
+Replace NULL with ERR_PTR(ret) in vhost_scsi_make_tpg to follow kernel
+conventions for pointer-returning functions, allowing callers to use
+IS_ERR and PTR_ERR for proper error handling.
 
 Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 ---
- drivers/vhost/scsi.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ drivers/vhost/scsi.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index c12a0d4e6386..508ff3b29f39 100644
+index 508ff3b29f39..fd9e435d28bf 100644
 --- a/drivers/vhost/scsi.c
 +++ b/drivers/vhost/scsi.c
-@@ -152,7 +152,7 @@ struct vhost_scsi_nexus {
- struct vhost_scsi_tpg {
- 	/* Vhost port target portal group tag for TCM */
- 	u16 tport_tpgt;
--	/* Used to track number of TPG Port/Lun Links wrt to explict I_T Nexus shutdown */
-+	/* Used to track number of TPG Port/Lun Links wrt to explicit I_T Nexus shutdown */
- 	int tv_tpg_port_count;
- 	/* Used for vhost_scsi device reference to tpg_nexus, protected by tv_tpg_mutex */
- 	int tv_tpg_vhost_count;
-@@ -311,12 +311,12 @@ static void vhost_scsi_init_inflight(struct vhost_scsi *vs,
+@@ -2594,6 +2594,7 @@ static int vhost_scsi_make_nexus(struct vhost_scsi_tpg *tpg,
+ 				const char *name)
+ {
+ 	struct vhost_scsi_nexus *tv_nexus;
++	int ret;
  
- 		mutex_lock(&vq->mutex);
- 
--		/* store old infight */
-+		/* store old inflight */
- 		idx = vs->vqs[i].inflight_idx;
- 		if (old_inflight)
- 			old_inflight[i] = &vs->vqs[i].inflights[idx];
- 
--		/* setup new infight */
-+		/* setup new inflight */
- 		vs->vqs[i].inflight_idx = idx ^ 1;
- 		new_inflight = &vs->vqs[i].inflights[idx ^ 1];
- 		kref_init(&new_inflight->kref);
-@@ -1249,7 +1249,7 @@ vhost_scsi_setup_resp_iovs(struct vhost_scsi_cmd *cmd, struct iovec *in_iovs,
- 	if (!in_iovs_cnt)
- 		return 0;
- 	/*
--	 * Initiator's normally just put the virtio_scsi_cmd_resp in the first
-+	 * Initiators normally just put the virtio_scsi_cmd_resp in the first
- 	 * iov, but just in case they wedged in some data with it we check for
- 	 * greater than or equal to the response struct.
- 	 */
-@@ -1457,7 +1457,7 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
- 		cmd = vhost_scsi_get_cmd(vq, tag);
- 		if (IS_ERR(cmd)) {
- 			ret = PTR_ERR(cmd);
--			vq_err(vq, "vhost_scsi_get_tag failed %dd\n", ret);
-+			vq_err(vq, "vhost_scsi_get_tag failed %d\n", ret);
- 			goto err;
- 		}
- 		cmd->tvc_vq = vq;
-@@ -2609,7 +2609,7 @@ static int vhost_scsi_make_nexus(struct vhost_scsi_tpg *tpg,
- 		return -ENOMEM;
+ 	mutex_lock(&tpg->tv_tpg_mutex);
+ 	if (tpg->tpg_nexus) {
+@@ -2617,9 +2618,10 @@ static int vhost_scsi_make_nexus(struct vhost_scsi_tpg *tpg,
+ 					TARGET_PROT_DIN_PASS | TARGET_PROT_DOUT_PASS,
+ 					(unsigned char *)name, tv_nexus, NULL);
+ 	if (IS_ERR(tv_nexus->tvn_se_sess)) {
++		ret = PTR_ERR(tv_nexus->tvn_se_sess);
+ 		mutex_unlock(&tpg->tv_tpg_mutex);
+ 		kfree(tv_nexus);
+-		return -ENOMEM;
++		return ret;
  	}
- 	/*
--	 * Since we are running in 'demo mode' this call with generate a
-+	 * Since we are running in 'demo mode' this call will generate a
- 	 * struct se_node_acl for the vhost_scsi struct se_portal_group with
- 	 * the SCSI Initiator port name of the passed configfs group 'name'.
- 	 */
-@@ -2915,7 +2915,7 @@ static ssize_t
- vhost_scsi_wwn_version_show(struct config_item *item, char *page)
- {
- 	return sysfs_emit(page, "TCM_VHOST fabric module %s on %s/%s"
--		"on "UTS_RELEASE"\n", VHOST_SCSI_VERSION, utsname()->sysname,
-+		" on "UTS_RELEASE"\n", VHOST_SCSI_VERSION, utsname()->sysname,
- 		utsname()->machine);
- }
+ 	tpg->tpg_nexus = tv_nexus;
  
-@@ -2983,13 +2983,13 @@ static int __init vhost_scsi_init(void)
- 	vhost_scsi_deregister();
- out:
- 	return ret;
--};
-+}
- 
- static void vhost_scsi_exit(void)
- {
- 	target_unregister_template(&vhost_scsi_ops);
- 	vhost_scsi_deregister();
--};
-+}
- 
- MODULE_DESCRIPTION("VHOST_SCSI series fabric driver");
- MODULE_ALIAS("tcm_vhost");
+@@ -2810,7 +2812,7 @@ vhost_scsi_make_tpg(struct se_wwn *wwn, const char *name)
+ 	ret = core_tpg_register(wwn, &tpg->se_tpg, tport->tport_proto_id);
+ 	if (ret < 0) {
+ 		kfree(tpg);
+-		return NULL;
++		return ERR_PTR(ret);
+ 	}
+ 	mutex_lock(&vhost_scsi_mutex);
+ 	list_add_tail(&tpg->tv_tpg_list, &vhost_scsi_list);
 -- 
 2.47.1
 
