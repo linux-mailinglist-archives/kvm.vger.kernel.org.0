@@ -1,158 +1,155 @@
-Return-Path: <kvm+bounces-49258-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49259-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BF3FAD6EA8
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 13:11:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F400AD6EF2
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 13:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D337C17E830
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 11:11:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 783201895A70
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 11:25:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D78123D295;
-	Thu, 12 Jun 2025 11:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A0523C8A1;
+	Thu, 12 Jun 2025 11:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q45cTnMW"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fBQDkjG9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E3E23C4E1;
-	Thu, 12 Jun 2025 11:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF041229B38
+	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 11:25:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749726655; cv=none; b=Do720y++mDgQKCZ20h1viCijBWY/f1oeuJ4NFTysjspgSHBhkoVnu8dQgUE5cTo9UGnzc9+kMPpQCzEvOOyAT2NCQ+H3RqC35/bAAmQyXBucsWfvsAC1pJPZAea4bu0s59JYryaagMfeqHTHK79LZqOvahC6MrMd5eGCe1ebv38=
+	t=1749727509; cv=none; b=ReSyyKQiX9+a8Rbl0nOhnHyQrxWcy9MwzCbUEHGkaX7fYArlCrHX9c5TrR+IsCarZHFH32bXB27so5PH8QaavWjs0Qa8GplcwHfuKfgNsCY4UPLLIsqjsJSp8XLLJRFtLilPjWc9DNyXWlTidvCkSVV6fXdCozEJqWSQjoEZckQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749726655; c=relaxed/simple;
-	bh=9nBrpMK9zZeZHFNOhk7Yg3FOCL/mJbGGTtA0TEp4ISs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mWipY7Gj1P0iBai63NVgsByk91TsHi3hYpXJZerApVI/slihpJZFoz8eyzwkllL4GDiw2YUau9gDhutn1otE/YQF+kpKFtK3NnGMsm4bxOAFE9FpAPkmxqhvkHt3vstTmu4XYoB1uDdPj1C1AyVnTghYMD1e+Gv5vNAa6gUZE3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q45cTnMW; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-acae7e7587dso124691366b.2;
-        Thu, 12 Jun 2025 04:10:53 -0700 (PDT)
+	s=arc-20240116; t=1749727509; c=relaxed/simple;
+	bh=RbS4ZKDnvE31XgDmp4nfObFBJ2jz3h0yh4h4K+Mw0kE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=afP+ufLRYzFOFUuV9lCUZknM2r6UYUa/q4r/p/MAcAI0Sr9SxUJ/E3wEykP0wr0dsQfTunrrSHiMreNeSfIaNtaN4CVU/6/6hY16wF4Hf3JuGmeQpEt+rbUcs6TpBEx0BV/kpHe/v4UCfX4GEp3ZIw5tyTbfR0yw+HeCjCwVj74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fBQDkjG9; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-607ec30df2bso1687140a12.1
+        for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 04:25:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749726652; x=1750331452; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9nBrpMK9zZeZHFNOhk7Yg3FOCL/mJbGGTtA0TEp4ISs=;
-        b=Q45cTnMW6M14BzyHymT7nYYg4t6x9BGdEF9ruN7/wgYyxXo4Tlylon5otQ4YZQ2Sc9
-         g/fsr0NtQvk/Etw0ossoeTHN5Cfeae/FY77K+/hghcbUHaHmOpEZQ0QfIC54ELk89me5
-         EBgOWoQq1e94sLb+w6ZhJiPIJqPQkeOe2ZawGAVkKUk0u4IwUvzbs9mvTc+zgI2EEhWV
-         PGOLGYDT83nHRbq8q1GqlAQnlaQHiOD0LpzhRwXdqYNIxtoKrSayGXBNK5OhJr55b+79
-         SORsFrLhL182smO44kfOdktCOFsoScdh5f38OKEwjH75O4ojvNwuU8hPnzj5H/SmbNCv
-         +Lzw==
+        d=suse.com; s=google; t=1749727505; x=1750332305; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=pIj8IHtKqXDoSV7RqqEU+hPFyfW0yTCMwK0/QeKPMsc=;
+        b=fBQDkjG9e+vG1QD2TehiZFaYs3gNXPfL/7qi46ZYvyfZNStsBdNyiPFb9n5kf+x8yG
+         h4nEyZULBwCALvFqikPXP+gYYb63uRg1iIb3h0pHI0O8CIDKDkJL8IKLG/CyGOCLrhgL
+         P2C/5t8214sgaMZXTfiHMMIguiFGDnzITnQLYOOLQ9tF8IBOR7sASSVzV/4MeZrhetlq
+         M9jYwJyG1Ej9a+ybutnOKGHYR0EkGUvZL1SoBmOKLJXvsLQdZEuIy7HI46AzWDzmZC1l
+         pz7+F8DRa970MLZn9l5H+QOFEwgnxYWABd9Q8zYvaQzRDSZ+zjxrv24a+mXn55hIfZUB
+         iRLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749726652; x=1750331452;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9nBrpMK9zZeZHFNOhk7Yg3FOCL/mJbGGTtA0TEp4ISs=;
-        b=bELuWToe0XVxZWlrcTkxavKMdL0MFQyUjScPQ1pg91aQZL3zKvLiKgFqlbm3+4a8As
-         WeWXlDIxcqIYIt7UIwIfJ4B+l4C7xmJfKkXq7/R9nUKU35ssrOtVuWMvppQr+Y7Kc2vl
-         LekwDtI4vlxtGg3GiOG6va7TloeGu0AdznSLOpwZmokfv75bkcaYqsyntWk/gLLmripo
-         jt7dx/p7akRQ0gtX32vSWTFgPxbc7n3pGyRA2WV16f3LOxczeMCBqQUucufUt+aImDS7
-         xzWa3bH/CDMc36uZQE0bHPB8bxlhhcTgOPAUl1lEVJH6d2NwPXMlAxtcU/OPL1lhVEN6
-         8PIg==
-X-Forwarded-Encrypted: i=1; AJvYcCUN2/qpgkwIG246rcWkdFL5deXpx4GCN5qxQHhk/07t20elpOKE8gUso5+yE9DhYTCPKi4BFhMq/DXHWPth@vger.kernel.org, AJvYcCV1GKG+kHsF4n5I2gK90GR6LiYWn39EDXUZekx03xJIV+baxXMprxX07VyobFgCznO7uig=@vger.kernel.org, AJvYcCWGXzs+dFV2GyY3E0yV4zOWR3G/TNaMtqKUrNIbBXAbtI9I4JaH2vctoLgJHUPJ8bJjDZQJjH1x+9vM@vger.kernel.org, AJvYcCXSYtdOMlxqqKl+ZVGHFrfEJMLiTQIJYazh/Sq3vNSVy3mWobMC1QYakv0t0nNK5FNRjpYI7/n4L3Stpw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YymOdIutmqtabbKfGQiOrdoLCxolZvrE2ld2Lu2LUmXMj4EJNnq
-	mgNOgbSXzNv39WSD4TMmcwQNCr/4XXJs6d+MkM/SpCFOi5QahQNg0UwKGPfawZ2NuQo4410N3Qs
-	e8tDPI9zf5RIqEf3d+DfzkPDQS3OFJNc=
-X-Gm-Gg: ASbGnctdy4c7+GN+CO8Gy5mG3BMWkNtkjy46cni4wnAOoGi24oqYfju6gBuEE8HP08p
-	F/ED+LuyHg4gSAu8nQCI+1QmdWBnbjUjg11kHRS55rvWoMR/lxcTYncc4W1IheVbCGoFt1ubotK
-	A/n6e3KmxH90wx0rffNSE2FztOtajAOHWPMTyR8bEwrtc=
-X-Google-Smtp-Source: AGHT+IFrX17XfYVkjVnepz8BihCrbdN9elHb1a1FwyoMbX0yLjH2EltV5lWsECJ7oLshTrIE21PMDORFUypei4zXNLs=
-X-Received: by 2002:a17:907:980f:b0:ad8:a515:767f with SMTP id
- a640c23a62f3a-adea9464061mr258576566b.51.1749726651742; Thu, 12 Jun 2025
- 04:10:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749727505; x=1750332305;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pIj8IHtKqXDoSV7RqqEU+hPFyfW0yTCMwK0/QeKPMsc=;
+        b=sM85CK9eJS+ZQLXcUI0zH6RSo5D1y5AnANDTQo075XdnLWDwt05lrhlCvKLjb2cy2e
+         c7SihWmR2BkhjH5AsKXVQdxz1pLjLpVuSI+iR3k1SpuwsiROlgDbd5xURO4M3852X/14
+         rBftCack6b35v4uwfxnqsRnmMxEQF6XQJT77WyPVi2dcBwJLGa218ub8ZGeqpXBhj4kN
+         cK3vv8pUr4xFCqzysHwDnAXr9DkPMARJgOg+hKOaa0/daRp5jYcU6plpoPEYAcio308m
+         mKgd1TMEXC37UtwwZmwGtrQA6cwc0wTDgG/3RvmL1+yzEX6hBM/f7ot6vuz7HLXkjdj9
+         USOg==
+X-Forwarded-Encrypted: i=1; AJvYcCVWRbpMPcds1zquDF3yppwaVZjFEg/mdbrQmJ7m1nT+CMHt1kS8C3x95Z0afm6G8lachn8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlM4KvC0zRDyABcV+X+aGAsy+QfQKeZGaAZRcs9H56ZKTU5A4J
+	Nq40FsBAIXW7WDv6tlDEF7oJQzBxVZGcpZCDHgsZELOZxpuKPVByWmHKmQf9TzKvFY8=
+X-Gm-Gg: ASbGncuySqZJx6lvo4oGHpbJEmJY/CRx6xTzyhy25dcthaB02T1DRwwYMA+XRRiqAxA
+	gP95J8hoQS37hm7hukIIh1ea/3MpaJsbYJGL95iblwAfpCnpuUSBxapxlLAVMHkWozVfS/lW3cC
+	DKNhXrZVJ29WVuYeTeptbvvKjiQgEKFsodgdXOCfljFwTOu/yq02xN9bgoAfgKZHCUOAYJLFIBM
+	b0HCPCVIgPoYEm6KlSwcYTDvRIiDwzGfTxUQ0hwfxF9NzoUsx30pn4Kc6l5McZU8yZTGxKgisPN
+	MkTsOHuYKEzvaMtO1recwX4/bkNXagOgahgpcVG08Cx0vsE7MsEYhiOJ95jeXRV85HnKqtKTYrJ
+	KY4LT6izTM5hh
+X-Google-Smtp-Source: AGHT+IF+vAVMBvtfci95n6Tv1oY41jgX0c/sjmQXnpnK+od2hyac12ir4pt5adwc3OXI4vX8N7E9Ig==
+X-Received: by 2002:a05:6402:2792:b0:607:20d0:4e99 with SMTP id 4fb4d7f45d1cf-60846b1fe4bmr5326317a12.21.1749727505368;
+        Thu, 12 Jun 2025 04:25:05 -0700 (PDT)
+Received: from [192.168.0.20] (nborisov.ddns.nbis.net. [109.121.142.22])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6086b22ab35sm1034244a12.60.2025.06.12.04.25.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Jun 2025 04:25:05 -0700 (PDT)
+Message-ID: <37aaaff2-2519-43b3-b388-eb0185e03c41@suse.com>
+Date: Thu, 12 Jun 2025 14:25:04 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250612093228.7655-1-chengzhenghan@uniontech.com> <84b14425-03e4-42be-8bd5-9bc010ebecda@suse.com>
-In-Reply-To: <84b14425-03e4-42be-8bd5-9bc010ebecda@suse.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Thu, 12 Jun 2025 14:10:15 +0300
-X-Gm-Features: AX0GCFubP_i495cQIkoSGfjK4G9pwjz7TYfQyvgZfj4JA8pwuaopIL7tecp4u7I
-Message-ID: <CAHp75Vc7AO_sRgB1Nj6CevbseMFyv5ku8ZS3PwzAuAgysKVxNg@mail.gmail.com>
-Subject: Re: [PATCH] x86: Fix build warnings about export.h
-To: Juergen Gross <jgross@suse.com>
-Cc: Zhenghan Cheng <chengzhenghan@uniontech.com>, tglx@linutronix.de, mingo@redhat.com, 
-	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	mario.limonciello@amd.com, yazen.ghannam@amd.com, jpoimboe@kernel.org, 
-	tony.luck@intel.com, jarkko@kernel.org, bhelgaas@google.com, 
-	pbonzini@redhat.com, oleg@redhat.com, jbaron@akamai.com, ning.sun@intel.com, 
-	seanjc@google.com, luto@kernel.org, andy@kernel.org, jim.cromie@gmail.com, 
-	kirill.shutemov@linux.intel.com, hpa@zytor.com, 
-	pawan.kumar.gupta@linux.intel.com, vkuznets@redhat.com, rostedt@goodmis.org, 
-	ardb@kernel.org, thomas.lendacky@amd.com, nikunj@amd.com, 
-	ashish.kalra@amd.com, kees@kernel.org, alexandre.chartre@oracle.com, 
-	rppt@kernel.org, steve.wahl@hpe.com, jirislaby@kernel.org, 
-	apatel@ventanamicro.com, bvanassche@acm.org, ptsm@linux.microsoft.com, 
-	Jonathan.Cameron@huawei.com, beata.michalska@arm.com, xin@zytor.com, 
-	davydov-max@yandex-team.ru, ravi.bangoria@amd.com, joel.granados@kernel.org, 
-	ffmancera@riseup.net, kprateek.nayak@amd.com, akpm@linux-foundation.org, 
-	bhe@redhat.com, brgerst@gmail.com, coxu@redhat.com, dmaluka@chromium.org, 
-	linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org, 
-	linux-sgx@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, tboot-devel@lists.sourceforge.net, 
-	nouveau@lists.freedesktop.org, linux-coco@lists.linux.dev, 
-	xen-devel@lists.xenproject.org, Huacai Chen <chenhuacai@loongson.cn>, 
-	Zhenghan Cheng <your_email@example.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jun 12, 2025 at 1:19=E2=80=AFPM Juergen Gross <jgross@suse.com> wro=
-te:
->
-> On 12.06.25 11:32, Zhenghan Cheng wrote:
-> > After commit a934a57a42f64a4 ("scripts/misc-check:
-> > check missing #include <linux/export.h> when W=3D1")
-> > and commit 7d95680d64ac8e836c ("scripts/misc-check:
-> > check unnecessary #include <linux/export.h> when W=3D1"),
-> > we get some build warnings with W=3D1,such as:
-> >
-> > arch/x86/coco/sev/core.c: warning: EXPORT_SYMBOL() is used, but #includ=
-e <linux/export.h> is missing
-> > arch/x86/crypto/aria_aesni_avx2_glue.c: warning: EXPORT_SYMBOL() is use=
-d, but #include <linux/export.h> is missing
-> > arch/x86/kernel/unwind_orc.c: warning: EXPORT_SYMBOL() is used, but #in=
-clude <linux/export.h> is missing
-> > arch/x86/kvm/hyperv.c: warning: EXPORT_SYMBOL() is used, but #include <=
-linux/export.h> is missing
-> > arch/x86/events/intel/core.c: warning: EXPORT_SYMBOL() is not used, but=
- #include <linux/export.h> is present
-> > arch/x86/events/zhaoxin/core.c: warning: EXPORT_SYMBOL() is not used, b=
-ut #include <linux/export.h> is present
-> > arch/x86/kernel/crash.c: warning: EXPORT_SYMBOL() is not used, but #inc=
-lude <linux/export.h> is present
-> > arch/x86/kernel/devicetree.c: warning: EXPORT_SYMBOL() is not used, but=
- #include <linux/export.h> is present
-> >
-> > so fix these build warnings for x86.
-> >
-> > Signed-off-by: "Zhenghan Cheng" <chengzhenghan@uniontech.com>
-> > Suggested-by: "Huacai Chen" <chenhuacai@loongson.cn>
->
-> For Xen and paravirt:
->
-> Acked-by: Juergen Gross <jgross@suse.com>
->
-> Your patch is looking a little bit strange, as the list of modified files
-> is located between the patch hunks, followed by another "Signed-off-by:".
-
-Indeed.
-And at bare minimum please split at least to two:
-1) adding export.h;
-2) removing export.h.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] KVM: x86: Deduplicate MSR interception enabling and
+ disabling
+To: Chao Gao <chao.gao@intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, dapeng1.mi@linux.intel.com
+References: <20250612081947.94081-1-chao.gao@intel.com>
+ <20250612081947.94081-2-chao.gao@intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+Content-Language: en-US
+Autocrypt: addr=nik.borisov@suse.com; keydata=
+ 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
+In-Reply-To: <20250612081947.94081-2-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---=20
-With Best Regards,
-Andy Shevchenko
+
+On 6/12/25 11:19, Chao Gao wrote:
+> Extract a common function from MSR interception disabling logic and create
+> disabling and enabling functions based on it. This removes most of the
+> duplicated code for MSR interception disabling/enabling.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+
+I believe similar change is already part of Sean's series on MSR 
+intercept overhaul.
 
