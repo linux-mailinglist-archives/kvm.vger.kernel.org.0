@@ -1,187 +1,172 @@
-Return-Path: <kvm+bounces-49271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C34EAD71EF
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 15:29:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05BA5AD73BB
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 16:25:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8F777A7B74
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 13:28:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 256D31888773
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 14:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D879824DD19;
-	Thu, 12 Jun 2025 13:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DE423C8A1;
+	Thu, 12 Jun 2025 14:17:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Uh9DXPNF"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="dOI4lOF1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF72F246BB4
-	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 13:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E672E149C4D
+	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 14:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749734808; cv=none; b=YuMg3plE17AOfUVDlFmJQ8+zWuaeWZ7DDPKM449iiG6lslXPq4iJ7+zD/jRQQLWGdGN2QeTBTsfqF5bA8s1T1fBv87gDNIraktvMwTsZKEGOZFK0rYqoj1CriS9xczZ6AXCiVtSsaiYvDRJ4p8SoOg/i4Oj5fy3zkd8NrBooj4c=
+	t=1749737822; cv=none; b=gIzvy3uBkffU1LsJegoPvENOdPi1vYeRY5Ztzh/sagjUuyLixfqsxWv8nR2U79upC5B0i+WULPtn6iDy0LiGRiqqRwDI76qp+MGE6kQ9gyHUGVBvOfTl27kCFGimtSQtdnY+pmyOT1qeCXi5n+mF2Kt2w7dec9oXO+cUdtggouw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749734808; c=relaxed/simple;
-	bh=CVQ9VovITFp4al3duc780000P3ZE3EpGg5M4UugODQo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EtimHL/YxQS6+6Fv+ld5Hj8UrNwTVYOaXVu2DSdyrr+Xw40k/Mc4fkkCiOLeDr3GwTPqCOqZsmD1mS+7X8IYTx8TjOqIH0qyuFUl0WH67+OFqvAvTnooJpPX6/YNQ7sm4vr21OlPeIFVriZUA4/gLO9RlrSamiCnG8zdjblFI/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=Uh9DXPNF; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3d6d6d82633so3389815ab.0
-        for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 06:26:46 -0700 (PDT)
+	s=arc-20240116; t=1749737822; c=relaxed/simple;
+	bh=d7VBfmhbDpsmKiOGX/ldN3DPv9ez9U3K2i2Ztppcl+M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fDG+kV3beUAFCzFwnRlF+Mp87mdssMbVGYOTbU/1eDbiEOImzGQXaRzmj/BaANI55m+YEnepq2BtFxhSYAJ/eRae+W1xZ2GoOPSvp4RbAWuHQUaWPbVGQssysseI0LKi/ntE3NsMBDNOJOw2qdy6hZZIiS8+XHpycjcjWxFH+Mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=dOI4lOF1; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a4f72cba73so1578248f8f.1
+        for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 07:17:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1749734806; x=1750339606; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2eN3swV8AIIuWWlJ3gYBwChYsvkIrC7SYyJzazn/BSI=;
-        b=Uh9DXPNF0rmS4hO/A2moRXrF7EqWLUsG33MFYRgsajNC+EyEIi15DBT6cUAcUeDr/O
-         Y8tdbyH4SurOAhZ9aKgO1Sqb3u9Ex091HtfWSLd0mVvWqHAWSQWk3ggvl8CDiiIvXbVs
-         SRot/VnAGpn4VMGeJXmjeTZ0jVYuiHX2VPtNolzSRajwi6zsNeCAcVz6nzmySNonBL07
-         A8FkhwUzuLrbDmp4cDs1WiQOGYqjYwNyVuD4UvlSA7cXIX7boYEr0vYecdHeFuYe8TYD
-         j0vUmpCPgi7C4ypudoQ4bupP6YKcrU7elqQDGfzJ/8kXZcV/20+dP4sw/alXG/LfIZA7
-         DUPQ==
+        d=grsecurity.net; s=grsec; t=1749737819; x=1750342619; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=C6E7EzF5woM+zQqsJQ3arM6v7PvlMDD/avhtrC6dK0A=;
+        b=dOI4lOF13uAx/fl2kCNUPCUwxmKWuiidk5NxYiyYWLHxHrfR8wA6NHmMYbDmoL7cBS
+         M5PSg4RvJOT4kTLDz+qUWSdb7nIO4jmp2uzxjhNd97VExwnAA/qpANOV47q7c0H4LTS2
+         udiLeaZ+uc291dQjIABIM+/uDLUug8I7Jo4VRDXdgsRn5EySiQuROeeS+yvJzQEJpv9p
+         r3dufSTbkTDT61jOXJrkk6tfiuzC09bReyfiRHHIsaO+eNn9ZW45/LkD52ivPc2Kdd3T
+         sbv6ZmieX7ct+g6AkC5NVLuIxe6E0E6mKkvqoIcLH5xy3DcAXijlPmkzlKmC79ybj8Mj
+         DpuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749734806; x=1750339606;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2eN3swV8AIIuWWlJ3gYBwChYsvkIrC7SYyJzazn/BSI=;
-        b=lAKtxkJf4jW10DwclZwoH4CjBNFfdPQa5m+BXCxwISavX0bbgiIijGfn8RmXqpuSeA
-         IQl0cNjkPFYzKmzi+xaZbyu+6i18cGwx/xEafElFvfu0rGp3Q014dXiZGbCIAr6zbscv
-         s5IrAWkXDdqc5PSkYVk3QKccf9qbLnHa9WhirrcftBoyUiJnUMe+e4HEIepOHeNd9S90
-         3CE0vUa3eFZZ20Sb8ucuwpcLhPMtARWfnV5Ivrt2cZ2hRrJ+bI17lfMvc/X7t0HZ8p/f
-         zO2dH4neBx+hhfvAQcl43U+xnQrw1/WWg7wpzz57O7/WnsbltcW4Ux4Ut5gbkFX4f9e4
-         ffcA==
-X-Forwarded-Encrypted: i=1; AJvYcCWDy9aKJDbgrNa3IHoIfMP8nG3LeRssnsCgqgu5ml6e1iJh96Kr57+ZV1ctmBZ01t+Gq7w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwITGxvqjsiC6NJDhtQKGByd2FhIP7NNREpd8RuF4U6fI8om5uU
-	ta1VW8FD7WZesMA+wluWmDZpXq4hm9UYBE0DH7x/2klN69nzLYSNc7uduS3ckfV+wH8ij/8ppVK
-	W8+X7c+9VEniIe/tubkAtFWK1VMEy44UW3SUmTtu1GQ==
-X-Gm-Gg: ASbGncuvVsop1gOb14AYrMzk5t/sYm5TLvvXCSkYsYr2sGTaKdQIvVJwXDgyHJQVmPA
-	Y6ZKgpBxCWCRqZ9kLLWNTpjaE1nWAD84jR39PDXPJJpIkTFtyUQQSfE3JHoK6ytxalr/cfzdM1k
-	7MlcMkUPPzGbOuwfWufxSQr/6bXVIxtrdEwF/D+9gz1eaD
-X-Google-Smtp-Source: AGHT+IG2iBZqXBZpblYqqV1CfizkbcXBVYuUqCYGloOAj0H2lvAJwOXwnS5XNnZkQ46BncD7OmhOhE+Hobvx1RtA1UQ=
-X-Received: by 2002:a05:6e02:1807:b0:3dd:8663:d182 with SMTP id
- e9e14a558f8ab-3ddf42c5b4dmr72461125ab.13.1749734805782; Thu, 12 Jun 2025
- 06:26:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1749737819; x=1750342619;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C6E7EzF5woM+zQqsJQ3arM6v7PvlMDD/avhtrC6dK0A=;
+        b=WAp9Xh68YzkojzM9zP4ZJs15jAxBMorpqCx59wrCxEJfMEUhvkYhbCsaXixN27BzE0
+         K1WXV51E98LHW08tdrnuNSNsjLadWJ6WS6pPm+fCaVfJAhDW7C39dgmULazXCbBLNMSO
+         OvXa5YemdBOiJMniCYZA1ZghW+jWKcOkxDVYDepsT66jBLmK9L6MSJfhg6medbEa+g+i
+         OQuxX1UBM8hJuupi+a+smgAN8xUdoC9OfeY8QJR9F4AwtaIfDuHU6VW7p5TgkO5IdrQC
+         aNz8dydMhgzq3S7RG/tfcf1YJpXfrf7oeKaY5NZQ4pAy+GgLjnZnyyF0kX/tZ5s4xUEJ
+         xFvQ==
+X-Gm-Message-State: AOJu0YzGpm90Ubybp2iWP9pnxTrVDn9Uks5PjZGJcKuOFlogNT0xgiZx
+	G5LgI05finTDD9Y2UWoV1xic2s2QbuV04IksiLH0C+PiD3PMYGbDzbNiruEsSADbY7M=
+X-Gm-Gg: ASbGncudBMuT28LfJRx02QXt6x16FwvnK1QHgdzqCVgZgE0r4ydupemfegbE0AxiTMq
+	Tj3F39rjSl+p9I3ARio8RKNKvKKhA6t6TJ8Inr0M2yHSe1jPQcs3NxEWmKfgEEcIp7t55svm7ag
+	CTJMWnfMS8KBxF9RWHdcSL0TmAcMw6Qm8bxwtzKsma8CiOtOCT9qrpYqJOOybSAQUXpnd2amJ+E
+	iLDL0fMZi2Pe7FPTQc6B7s5wHIirKf0htX4fM4hROnv6+uXWJ1VayFDezh2M73akM6S4uzQIvSD
+	qPA+skJ4V2dvAeixjyklEU7e1/9kkQzUDbUpk0CxlKblBnX0Tv/xWcoa13ikY+wG3yBJDi6ksm+
+	j9uqIzOdiz7vb1betw/iLa/U=
+X-Google-Smtp-Source: AGHT+IHz1Rk9owizgBNMpEzoUrOt7ttoKA9V1V1G94O/ZoRyTiXvcJnp8uvrhDtyDKYa+5j5tkdZBg==
+X-Received: by 2002:a05:6000:178d:b0:3a4:da0e:517a with SMTP id ffacd0b85a97d-3a5608135aemr3301284f8f.23.1749737819070;
+        Thu, 12 Jun 2025 07:16:59 -0700 (PDT)
+Received: from bell.fritz.box (pd95ed419.dip0.t-ipconnect.de. [217.94.212.25])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a561a3ce6bsm2104297f8f.49.2025.06.12.07.16.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jun 2025 07:16:58 -0700 (PDT)
+From: Mathias Krause <minipli@grsecurity.net>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org,
+	Mathias Krause <minipli@grsecurity.net>
+Subject: [kvm-unit-tests PATCH] x86/emulator64: Extend non-canonical memory access tests with CR2 coverage
+Date: Thu, 12 Jun 2025 16:16:37 +0200
+Message-Id: <20250612141637.131314-1-minipli@grsecurity.net>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250523101932.1594077-1-cleger@rivosinc.com> <20250523101932.1594077-15-cleger@rivosinc.com>
-In-Reply-To: <20250523101932.1594077-15-cleger@rivosinc.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 12 Jun 2025 18:56:33 +0530
-X-Gm-Features: AX0GCFtHBaD1dkadFboJHCaCDko1UoltJB37LuW30sdZ0j57mmaziXXBSUbao7Y
-Message-ID: <CAAhSdy1qnRYOh0ka4PeJDf5ybviMrf+bpYaOOka3BXVmwAPSoQ@mail.gmail.com>
-Subject: Re: [PATCH v8 14/14] RISC-V: KVM: add support for SBI_FWFT_MISALIGNED_DELEG
-To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	Samuel Holland <samuel.holland@sifive.com>, Andrew Jones <ajones@ventanamicro.com>, 
-	Deepak Gupta <debug@rivosinc.com>, Charlie Jenkins <charlie@rivosinc.com>, 
-	Atish Patra <atishp@rivosinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 23, 2025 at 3:53=E2=80=AFPM Cl=C3=A9ment L=C3=A9ger <cleger@riv=
-osinc.com> wrote:
->
-> SBI_FWFT_MISALIGNED_DELEG needs hedeleg to be modified to delegate
-> misaligned load/store exceptions. Save and restore it during CPU
-> load/put.
->
-> Signed-off-by: Cl=C3=A9ment L=C3=A9ger <cleger@rivosinc.com>
-> Reviewed-by: Deepak Gupta <debug@rivosinc.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> Reviewed-by: Atish Patra <atishp@rivosinc.com>
+Extend the non-canonical memory access tests to verify CR2 stays
+unchanged.
 
-Queued this patch for Linux-6.17
+There's currently a bug in QEMU/TCG that breaks that assumption.
 
-Thanks,
-Anup
+Link: https://gitlab.com/qemu-project/qemu/-/issues/928
+Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+---
+ x86/emulator64.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-> ---
->  arch/riscv/kvm/vcpu_sbi_fwft.c | 41 ++++++++++++++++++++++++++++++++++
->  1 file changed, 41 insertions(+)
->
-> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwf=
-t.c
-> index b0f66c7bf010..6770c043bbcb 100644
-> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
-> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> @@ -14,6 +14,8 @@
->  #include <asm/kvm_vcpu_sbi.h>
->  #include <asm/kvm_vcpu_sbi_fwft.h>
->
-> +#define MIS_DELEG (BIT_ULL(EXC_LOAD_MISALIGNED) | BIT_ULL(EXC_STORE_MISA=
-LIGNED))
-> +
->  struct kvm_sbi_fwft_feature {
->         /**
->          * @id: Feature ID
-> @@ -68,7 +70,46 @@ static bool kvm_fwft_is_defined_feature(enum sbi_fwft_=
-feature_t feature)
->         return false;
->  }
->
-> +static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu=
- *vcpu)
-> +{
-> +       return misaligned_traps_can_delegate();
-> +}
-> +
-> +static long kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu=
-,
-> +                                       struct kvm_sbi_fwft_config *conf,
-> +                                       unsigned long value)
-> +{
-> +       struct kvm_vcpu_config *cfg =3D &vcpu->arch.cfg;
-> +
-> +       if (value =3D=3D 1) {
-> +               cfg->hedeleg |=3D MIS_DELEG;
-> +               csr_set(CSR_HEDELEG, MIS_DELEG);
-> +       } else if (value =3D=3D 0) {
-> +               cfg->hedeleg &=3D ~MIS_DELEG;
-> +               csr_clear(CSR_HEDELEG, MIS_DELEG);
-> +       } else {
-> +               return SBI_ERR_INVALID_PARAM;
-> +       }
-> +
-> +       return SBI_SUCCESS;
-> +}
-> +
-> +static long kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu=
-,
-> +                                       struct kvm_sbi_fwft_config *conf,
-> +                                       unsigned long *value)
-> +{
-> +       *value =3D (csr_read(CSR_HEDELEG) & MIS_DELEG) =3D=3D MIS_DELEG;
-> +
-> +       return SBI_SUCCESS;
-> +}
-> +
->  static const struct kvm_sbi_fwft_feature features[] =3D {
-> +       {
-> +               .id =3D SBI_FWFT_MISALIGNED_EXC_DELEG,
-> +               .supported =3D kvm_sbi_fwft_misaligned_delegation_support=
-ed,
-> +               .set =3D kvm_sbi_fwft_set_misaligned_delegation,
-> +               .get =3D kvm_sbi_fwft_get_misaligned_delegation,
-> +       },
->  };
->
->  static struct kvm_sbi_fwft_config *
-> --
-> 2.49.0
->
+diff --git a/x86/emulator64.c b/x86/emulator64.c
+index 5d1bb0f06d4f..abef2bda29f1 100644
+--- a/x86/emulator64.c
++++ b/x86/emulator64.c
+@@ -325,16 +325,39 @@ static void test_mmx_movq_mf(uint64_t *mem)
+ 	report(exception_vector() == MF_VECTOR, "movq mmx generates #MF");
+ }
+ 
++#define CR2_REF_VALUE	0xdecafbadUL
++
++static void setup_cr2(void)
++{
++	write_cr2(CR2_REF_VALUE);
++}
++
++static void check_cr2(void)
++{
++	unsigned long cr2 = read_cr2();
++
++	if (cr2 == CR2_REF_VALUE) {
++		report(true, "CR2 unchanged");
++	} else {
++		report(false, "CR2 changed from %#lx to %#lx", CR2_REF_VALUE, cr2);
++		setup_cr2();
++	}
++}
++
+ static void test_jmp_noncanonical(uint64_t *mem)
+ {
++	setup_cr2();
+ 	*mem = NONCANONICAL;
+ 	asm volatile (ASM_TRY("1f") "jmp *%0; 1:" : : "m"(*mem));
+ 	report(exception_vector() == GP_VECTOR,
+ 	       "jump to non-canonical address");
++	check_cr2();
+ }
+ 
+ static void test_reg_noncanonical(void)
+ {
++	setup_cr2();
++
+ 	/* RAX based, should #GP(0) */
+ 	asm volatile(ASM_TRY("1f") "orq $0, (%[noncanonical]); 1:"
+ 		     : : [noncanonical]"a"(NONCANONICAL));
+@@ -342,6 +365,7 @@ static void test_reg_noncanonical(void)
+ 	       "non-canonical memory access, should %s(0), got %s(%u)",
+ 	       exception_mnemonic(GP_VECTOR),
+ 	       exception_mnemonic(exception_vector()), exception_error_code());
++	check_cr2();
+ 
+ 	/* RSP based, should #SS(0) */
+ 	asm volatile(ASM_TRY("1f") "orq $0, (%%rsp,%[noncanonical],1); 1:"
+@@ -350,6 +374,7 @@ static void test_reg_noncanonical(void)
+ 	       "non-canonical rsp-based access, should %s(0), got %s(%u)",
+ 	       exception_mnemonic(SS_VECTOR),
+ 	       exception_mnemonic(exception_vector()), exception_error_code());
++	check_cr2();
+ 
+ 	/* RBP based, should #SS(0) */
+ 	asm volatile(ASM_TRY("1f") "orq $0, (%%rbp,%[noncanonical],1); 1:"
+@@ -358,6 +383,7 @@ static void test_reg_noncanonical(void)
+ 	       "non-canonical rbp-based access, should %s(0), got %s(%u)",
+ 	       exception_mnemonic(SS_VECTOR),
+ 	       exception_mnemonic(exception_vector()), exception_error_code());
++	check_cr2();
+ }
+ 
+ static void test_movabs(uint64_t *mem)
+-- 
+2.30.2
+
 
