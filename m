@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-49326-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49328-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48CEEAD7DD3
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 23:51:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFA2AAD7DDB
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 23:52:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 044E93A1B3E
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 21:51:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 721A73A1B23
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 21:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689802E2F06;
-	Thu, 12 Jun 2025 21:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E6C2E62B3;
+	Thu, 12 Jun 2025 21:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i7iAanpO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U/+SALHr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CEF2DECCC;
-	Thu, 12 Jun 2025 21:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29E52E2EF7;
+	Thu, 12 Jun 2025 21:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749765032; cv=none; b=g6EW2EsfpH4vJacVLsHEp4ih39r5AUUJ1xru6G5R2pTsAue/eSZiYgpoM8+PsDGgK4/0Vwe6Hsl0Rx0m8H6RIMs+RlOGKgOjMaYpO6Zb1D2btoRAomWNVLQKx3ok9MOMwfxhZ7Pz/Q6jPKmirclT69lkU9g6gvdiAtESbSz3ug4=
+	t=1749765034; cv=none; b=tTlrTy5vIgfR6v4QHcDDJmaCwhbmF8WuS6HlPLhHKkM7xa+3gJqbev1X3j8FahRaHJ0knT0fA5GbReVec/K90ATbEphm67bjOClVl34h1wvH4jHh+V2NAZr6MPNh1g/dUcVK+P1o/klJxxVyC4HdYlzofZJZDc5jiMgI0cCWk3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749765032; c=relaxed/simple;
-	bh=2/xhG0RxEEkF6sBv0GVk6FTgsRwJBueY4hWmcwCEohw=;
+	s=arc-20240116; t=1749765034; c=relaxed/simple;
+	bh=X5AazRLPkD4qnl4y51OKxsRAvMNIQ2UGhe8CaDOK3k0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DBUTx7XeIL8+worowta0kdKptu677WHVLCFgedcedX5FGeNs/Ya3BDRuoyVmqwbe543ROx/UUzeqrRQh4QW4bx6XurWAZwmUqJK0wPVyAKc4MUaWmCxWSio3RVNlCL8NDTu6n0MLVA6JrBuExgfhE5MRhztzaLO6+cULm8qcrx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i7iAanpO; arc=none smtp.client-ip=192.198.163.14
+	 MIME-Version; b=IR/Jl09CGjCylqGmMpYHoq85YQNoPg+eXLXmEMmyWFRoJF6EZIH/vIwHYDUhv42Hr0Qb/f/1baytnID2dwC+l+ODaZQ5KbUW3MD3v2W+goOFv//PnnC0JT8tffHX5gXw9dfpWm4yC9akXci3CX1Ynt0bdGF95sI/gJ2FK64Qyl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U/+SALHr; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749765030; x=1781301030;
+  t=1749765033; x=1781301033;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2/xhG0RxEEkF6sBv0GVk6FTgsRwJBueY4hWmcwCEohw=;
-  b=i7iAanpOs4lEXXlOLQSODx41EBZZhF480ssfvxIf0CTBxnRdMdlZQfhC
-   2w8GOHtk66oREQRw/7fvutO+oKo4WnZyHdJLEC/Y9j/96UnxNSp+3hK7i
-   rOQDsAf42BXTT/EhSEzjNKP1rmPmTFTEm8UUYMz6yQ9IUHlzBZWdGLExG
-   77tfGO1tye7ghXFoodLyYsyBB7FBIv4s1hd6kAqWHvwipobMCY4jBwwGL
-   O5s3YEU98jBpHQoEK7R9rcKF72Isi1ThOQYqXKwE6TwHKCdXPLpQlNoiH
-   3ZfJEf6tawOkG0K3g+Aau69lGRVDbNRx2IejKIUNhIr4M6/hufHNndfiu
-   Q==;
-X-CSE-ConnectionGUID: JbntafMlRu2Pb1iZ3ofNcg==
-X-CSE-MsgGUID: SndOTVf0Rke80tYCAdHxDw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11462"; a="52065332"
+  bh=X5AazRLPkD4qnl4y51OKxsRAvMNIQ2UGhe8CaDOK3k0=;
+  b=U/+SALHr8S0F/3TC/RaiyQ/ILxn7nIm/IWES4ImDLCkpIiVsJDVw3rjK
+   1TK9TYzQlft89EPAG0d0sqSWMsUWMPVMrh0ZCborji7VRld0LfN/v/WBS
+   swR0ByX0RntPpgHDddStiiSnD8hmKRAyK+EndgO4ZKjknZHkc6wojrsAA
+   FXiAZofLOjJG9kV6kU62lf6hfl3bt0uxyY8sT39nwwwQKCN6YFvoMfYgI
+   C1fS40Jytnh4+TlwdcPDsnNL5mR/y+eWAGv+zMQuki7FLVJ9qmO7jgRLi
+   vmc6yiEHjU+6OwbIO86O7+DAX8ftChb+R4ev2rDKeRdAXUj8auE1IPxxT
+   A==;
+X-CSE-ConnectionGUID: ToIOmlPoSB6sg6KlBxfpxA==
+X-CSE-MsgGUID: UqmTrZXASPmHzut3obxeMw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11462"; a="52065345"
 X-IronPort-AV: E=Sophos;i="6.16,231,1744095600"; 
-   d="scan'208";a="52065332"
+   d="scan'208";a="52065345"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 14:50:29 -0700
-X-CSE-ConnectionGUID: WFypfaUVSA2ZX/aLhGqxDA==
-X-CSE-MsgGUID: YgV9Uhs1SoGU4Z0OHMaH4g==
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2025 14:50:30 -0700
+X-CSE-ConnectionGUID: fnbw2o0IQO6h44e7RuE5Kw==
+X-CSE-MsgGUID: 4sGjZK+ORt+IJPLUF4H1vw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,231,1744095600"; 
-   d="scan'208";a="184881957"
+   d="scan'208";a="184881966"
 Received: from sohilmeh.sc.intel.com ([172.25.103.65])
-  by orviesa001.jf.intel.com with ESMTP; 12 Jun 2025 14:50:29 -0700
+  by orviesa001.jf.intel.com with ESMTP; 12 Jun 2025 14:50:30 -0700
 From: Sohil Mehta <sohil.mehta@intel.com>
 To: x86@kernel.org,
 	linux-kernel@vger.kernel.org
@@ -87,9 +87,9 @@ Cc: Xin Li <xin@zytor.com>,
 	kvm@vger.kernel.org,
 	linux-pm@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH v7 04/10] x86/nmi: Extend the registration interface to include the NMI-source vector
-Date: Thu, 12 Jun 2025 14:48:43 -0700
-Message-ID: <20250612214849.3950094-5-sohil.mehta@intel.com>
+Subject: [PATCH v7 05/10] x86/nmi: Assign and register NMI-source vectors
+Date: Thu, 12 Jun 2025 14:48:44 -0700
+Message-ID: <20250612214849.3950094-6-sohil.mehta@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250612214849.3950094-1-sohil.mehta@intel.com>
 References: <20250612214849.3950094-1-sohil.mehta@intel.com>
@@ -101,304 +101,231 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To prepare for NMI-source reporting, add a source vector argument to the
-NMI handler registration interface. Later, this will be used to
-register NMI handlers with a unique source vector that can be used to
-identify the originator of the NMI.
+Prior to NMI-source support, the vector information was ignored by the
+hardware while delivering NMIs. With NMI-source reporting, the initial
+architecture supports a 16-bit source bitmap to identify the source of
+the NMI. Upon receiving an NMI, this bitmap is delivered to the kernel
+as part of the FRED event delivery mechanism.
 
-Vector 0 is reserved by the hardware for situations when a source vector
-is not used while generating an NMI or the originator could not be
-reliably identified. Registering an NMI handler with vector 0 is
-equivalent to not using NMI-source reporting.
+Assign a vector space of 1-15 that is specific to NMI-source and
+independent of the IDT vector space. Though unlikely, the hardware may
+extend the NMI-source bitmap in the future. Add a code comment to
+clarify how the kernel support can be easily extended.
 
-For now, just extend the interface with no source information (vector 0)
-for all the handlers. No functional change intended.
+Being a bitmap, the NMI-source vectors do not have any inherent priority
+associated with them. The order of executing the NMI handlers is up to
+the kernel. Existing NMI handling already has a priority mechanism for
+the NMI handlers, with CPU-specific (NMI_LOCAL) handlers executed first,
+followed by platform NMI handlers and unknown NMI (NMI_UNKNOWN) handlers
+being last. Within each of these NMI types, the handlers registered with
+NMI_FLAG_FIRST are given priority.
+
+NMI-source follows the same priority scheme to avoid unnecessary
+complexity. Therefore, the NMI-source vectors are assigned arbitrarily,
+except for vector 2.
+
+Vector 2 is reserved for external NMIs corresponding to the Local APIC -
+LINT1 pin. Some third-party chipsets may send NMI messages with a fixed
+vector value of 2. Using vector 2 for something else would lead to
+confusion about the exact source. Do not assign it to any handler.
+
+NMI-source vectors are only assigned for NMI_LOCAL type handlers.
+Platform NMI handlers have a single handler registered per type. They
+don't need additional source information to differentiate among them.
+
+Use the assigned vectors to register the respective NMI handlers. Warn
+if the vector values are unexpected.
+
+A couple of NMI handlers, such as the microcode rendezvous and the crash
+reboot, do not use the typical NMI registration interface. Leave them
+as-is for now.
 
 Originally-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Signed-off-by: Sohil Mehta <sohil.mehta@intel.com>
 Reviewed-by: Xin Li (Intel) <xin@zytor.com>
 ---
-v7: Use an enum for defining source vectors (DaveH).
-    Use NMIS_NO_SOURCE instead of zero (DaveH).
-    Add review tag (Xin).
+v7: Use an enum to define the NMI-source vectors. (DaveH)
+    Add a BUILD_BUG_ON to validate the allocated vector count. (DaveH)
+    Add review tag from Xin.
 
-v6: No change.
+v6: Store source vector unconditionally. (PeterZ)
+    Add a warning for unexpected source vector values. (PeterZ)
 
-v5: Split the patch into two parts. This one only extends the interface.
+v5: Move the vector defines to nmi.h.
+    Combine vector allocation and registration into one patch.
+    Simplify NMI vector names.
+    Describe usage of vector 2 for external NMIs.
+    Get rid of vector priorities.
 ---
- arch/x86/events/amd/ibs.c         |  2 +-
- arch/x86/events/core.c            |  2 +-
- arch/x86/include/asm/nmi.h        | 16 +++++++++++++++-
- arch/x86/kernel/apic/hw_nmi.c     |  3 +--
- arch/x86/kernel/cpu/mce/inject.c  |  2 +-
- arch/x86/kernel/cpu/mshyperv.c    |  2 +-
- arch/x86/kernel/kgdb.c            |  6 ++----
- arch/x86/kernel/nmi_selftest.c    |  6 +++---
- arch/x86/kernel/smp.c             |  4 ++--
- arch/x86/platform/uv/uv_nmi.c     |  4 ++--
- drivers/acpi/apei/ghes.c          |  2 +-
- drivers/char/ipmi/ipmi_watchdog.c |  3 +--
- drivers/edac/igen6_edac.c         |  3 +--
- drivers/watchdog/hpwdt.c          |  6 +++---
- 14 files changed, 35 insertions(+), 26 deletions(-)
+ arch/x86/events/core.c           |  2 +-
+ arch/x86/include/asm/nmi.h       | 46 ++++++++++++++++++++++++++++++++
+ arch/x86/kernel/apic/hw_nmi.c    |  2 +-
+ arch/x86/kernel/cpu/mce/inject.c |  2 +-
+ arch/x86/kernel/kgdb.c           |  2 +-
+ arch/x86/kernel/nmi.c            |  7 +++++
+ arch/x86/kernel/nmi_selftest.c   |  2 +-
+ arch/x86/kernel/smp.c            |  2 +-
+ 8 files changed, 59 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/events/amd/ibs.c b/arch/x86/events/amd/ibs.c
-index 112f43b23ebf..6f8f0d663f2f 100644
---- a/arch/x86/events/amd/ibs.c
-+++ b/arch/x86/events/amd/ibs.c
-@@ -1485,7 +1485,7 @@ static __init int perf_event_ibs_init(void)
- 	if (ret)
- 		goto err_op;
- 
--	ret = register_nmi_handler(NMI_LOCAL, perf_ibs_nmi_handler, 0, "perf_ibs");
-+	ret = register_nmi_handler(NMI_LOCAL, perf_ibs_nmi_handler, 0, "perf_ibs", NMIS_NO_SOURCE);
- 	if (ret)
- 		goto err_nmi;
- 
 diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index 7610f26dfbd9..ec59837d10d1 100644
+index ec59837d10d1..dd42fe7bce9c 100644
 --- a/arch/x86/events/core.c
 +++ b/arch/x86/events/core.c
 @@ -2129,7 +2129,7 @@ static int __init init_hw_perf_events(void)
  		x86_pmu.config_mask = X86_RAW_EVENT_MASK;
  
  	perf_events_lapic_init();
--	register_nmi_handler(NMI_LOCAL, perf_event_nmi_handler, 0, "PMI");
-+	register_nmi_handler(NMI_LOCAL, perf_event_nmi_handler, 0, "PMI", NMIS_NO_SOURCE);
+-	register_nmi_handler(NMI_LOCAL, perf_event_nmi_handler, 0, "PMI", NMIS_NO_SOURCE);
++	register_nmi_handler(NMI_LOCAL, perf_event_nmi_handler, 0, "PMI", NMIS_VECTOR_PMI);
  
  	unconstrained = (struct event_constraint)
  		__EVENT_CONSTRAINT(0, x86_pmu.cntr_mask64,
 diff --git a/arch/x86/include/asm/nmi.h b/arch/x86/include/asm/nmi.h
-index 79d88d12c8fb..42820c4f59b9 100644
+index 42820c4f59b9..a48958a236fd 100644
 --- a/arch/x86/include/asm/nmi.h
 +++ b/arch/x86/include/asm/nmi.h
-@@ -48,12 +48,24 @@ enum {
- 
- typedef int (*nmi_handler_t)(unsigned int, struct pt_regs *);
- 
-+/**
-+ * enum nmi_source_vectors - NMI-source vectors are used to identify the
-+ * origin of an NMI and to route the NMI directly to the appropriate
-+ * handler.
+@@ -53,12 +53,58 @@ typedef int (*nmi_handler_t)(unsigned int, struct pt_regs *);
+  * origin of an NMI and to route the NMI directly to the appropriate
+  * handler.
+  *
++ * On CPUs that support NMI-source reporting with FRED, receiving an NMI
++ * with a valid vector sets the corresponding bit in the NMI-source
++ * bitmap. The bitmap is delivered as FRED event data on the stack.
 + *
-+ * @NMIS_NO_SOURCE:        Reserved for undefined or unidentified sources.
++ * Multiple NMIs are coalesced in the NMI-source bitmap until the next
++ * NMI delivery. If an NMI is received without a vector or beyond the
++ * defined range, the CPU sets bit 0 of the NMI-source bitmap.
++ *
++ * Third-party chipsets may send NMI messages with a fixed vector of 2.
++ * Using vector 2 for some other purpose would cause confusion between
++ * those external NMI messages and the other purpose. Avoid using it.
++ *
++ * The vectors are in no particular priority order. Add new vector
++ * assignments sequentially in the list below before the COUNT.
++ *
+  * @NMIS_NO_SOURCE:        Reserved for undefined or unidentified sources.
++ * @NMIS_VECTOR_TEST:      NMI selftest.
++ * @NMIS_VECTOR_EXTERNAL:  Reserved to match external NMI vector 2.
++ * @NMIS_VECTOR_SMP_STOP:  Panic stop CPU.
++ * @NMIS_VECTOR_BT:        CPU backtrace.
++ * @NMIS_VECTOR_KGDB:      Kernel debugger.
++ * @NMIS_VECTOR_MCE:       MCE injection.
++ * @NMIS_VECTOR_PMI:       PerfMon counters.
++ *
++ * @NMIS_VECTOR_COUNT:     Count of the defined vectors.
+  */
+ enum nmi_source_vectors {
+ 	NMIS_NO_SOURCE		= 0,
++	NMIS_VECTOR_TEST,
++	NMIS_VECTOR_EXTERNAL	= 2,
++	NMIS_VECTOR_SMP_STOP,
++	NMIS_VECTOR_BT,
++	NMIS_VECTOR_KGDB,
++	NMIS_VECTOR_MCE,
++	NMIS_VECTOR_PMI,
++
++	NMIS_VECTOR_COUNT
+ };
+ 
++/*
++ * The early (and likely all future) hardware implementations of
++ * NMI-source reporting would only support a 16-bit source bitmap, with
++ * 1-15 being valid source vectors.
++ *
++ * If the hardware ever supports a larger bitmap, the kernel support can
++ * easily be extended to 64 bits by modifying the MAX below. However,
++ * care must be taken to reallocate the latency sensitive NMI sources
++ * within the first 15 vectors. Any source vector beyond the supported
++ * maximum on prior systems would set bit 0 in the NMI-source bitmap.
 + */
-+enum nmi_source_vectors {
-+	NMIS_NO_SOURCE		= 0,
-+};
++#define NMIS_VECTORS_MAX	16
 +
  struct nmiaction {
  	struct list_head	list;
  	nmi_handler_t		handler;
- 	u64			max_duration;
- 	unsigned long		flags;
- 	const char		*name;
-+	enum nmi_source_vectors	source_vector;
- };
- 
- /**
-@@ -62,6 +74,7 @@ struct nmiaction {
-  * @fn:   The NMI handler
-  * @fg:   Flags associated with the NMI handler
-  * @n:    Name of the NMI handler
-+ * @src:  NMI-source vector for the NMI handler
-  * @init: Optional __init* attributes for struct nmiaction
-  *
-  * Adds the provided handler to the list of handlers for the specified
-@@ -75,13 +88,14 @@ struct nmiaction {
-  *
-  * Return: 0 on success, or an error code on failure.
-  */
--#define register_nmi_handler(t, fn, fg, n, init...)	\
-+#define register_nmi_handler(t, fn, fg, n, src, init...)\
- ({							\
- 	static struct nmiaction init fn##_na = {	\
- 		.list = LIST_HEAD_INIT(fn##_na.list),	\
- 		.handler = (fn),			\
- 		.name = (n),				\
- 		.flags = (fg),				\
-+		.source_vector = (src),			\
- 	};						\
- 	__register_nmi_handler((t), &fn##_na);		\
- })
 diff --git a/arch/x86/kernel/apic/hw_nmi.c b/arch/x86/kernel/apic/hw_nmi.c
-index 45af535c44a0..d09e771723ed 100644
+index d09e771723ed..4e04f13d2de9 100644
 --- a/arch/x86/kernel/apic/hw_nmi.c
 +++ b/arch/x86/kernel/apic/hw_nmi.c
-@@ -53,8 +53,7 @@ NOKPROBE_SYMBOL(nmi_cpu_backtrace_handler);
+@@ -53,7 +53,7 @@ NOKPROBE_SYMBOL(nmi_cpu_backtrace_handler);
  
  static int __init register_nmi_cpu_backtrace_handler(void)
  {
--	register_nmi_handler(NMI_LOCAL, nmi_cpu_backtrace_handler,
--				0, "arch_bt");
-+	register_nmi_handler(NMI_LOCAL, nmi_cpu_backtrace_handler, 0, "arch_bt", NMIS_NO_SOURCE);
+-	register_nmi_handler(NMI_LOCAL, nmi_cpu_backtrace_handler, 0, "arch_bt", NMIS_NO_SOURCE);
++	register_nmi_handler(NMI_LOCAL, nmi_cpu_backtrace_handler, 0, "arch_bt", NMIS_VECTOR_BT);
  	return 0;
  }
  early_initcall(register_nmi_cpu_backtrace_handler);
 diff --git a/arch/x86/kernel/cpu/mce/inject.c b/arch/x86/kernel/cpu/mce/inject.c
-index d02c4f556cd0..ba70ef8a1964 100644
+index ba70ef8a1964..320068e01c22 100644
 --- a/arch/x86/kernel/cpu/mce/inject.c
 +++ b/arch/x86/kernel/cpu/mce/inject.c
 @@ -775,7 +775,7 @@ static int __init inject_init(void)
  
  	debugfs_init();
  
--	register_nmi_handler(NMI_LOCAL, mce_raise_notify, 0, "mce_notify");
-+	register_nmi_handler(NMI_LOCAL, mce_raise_notify, 0, "mce_notify", NMIS_NO_SOURCE);
+-	register_nmi_handler(NMI_LOCAL, mce_raise_notify, 0, "mce_notify", NMIS_NO_SOURCE);
++	register_nmi_handler(NMI_LOCAL, mce_raise_notify, 0, "mce_notify", NMIS_VECTOR_MCE);
  	mce_register_injector_chain(&inject_nb);
  
  	setup_inj_struct(&i_mce);
-diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
-index c78f860419d6..c093f7baab6a 100644
---- a/arch/x86/kernel/cpu/mshyperv.c
-+++ b/arch/x86/kernel/cpu/mshyperv.c
-@@ -550,7 +550,7 @@ static void __init ms_hyperv_init_platform(void)
- 	}
- 
- 	register_nmi_handler(NMI_UNKNOWN, hv_nmi_unknown, NMI_FLAG_FIRST,
--			     "hv_nmi_unknown");
-+			     "hv_nmi_unknown", NMIS_NO_SOURCE);
- #endif
- 
- #ifdef CONFIG_X86_IO_APIC
 diff --git a/arch/x86/kernel/kgdb.c b/arch/x86/kernel/kgdb.c
-index 102641fd2172..ae28fdeefc7f 100644
+index ae28fdeefc7f..dfde434d2992 100644
 --- a/arch/x86/kernel/kgdb.c
 +++ b/arch/x86/kernel/kgdb.c
-@@ -602,13 +602,11 @@ int kgdb_arch_init(void)
+@@ -602,7 +602,7 @@ int kgdb_arch_init(void)
  	if (retval)
  		goto out;
  
--	retval = register_nmi_handler(NMI_LOCAL, kgdb_nmi_handler,
--					0, "kgdb");
-+	retval = register_nmi_handler(NMI_LOCAL, kgdb_nmi_handler, 0, "kgdb", NMIS_NO_SOURCE);
+-	retval = register_nmi_handler(NMI_LOCAL, kgdb_nmi_handler, 0, "kgdb", NMIS_NO_SOURCE);
++	retval = register_nmi_handler(NMI_LOCAL, kgdb_nmi_handler, 0, "kgdb", NMIS_VECTOR_KGDB);
  	if (retval)
  		goto out1;
  
--	retval = register_nmi_handler(NMI_UNKNOWN, kgdb_nmi_handler,
--					0, "kgdb");
-+	retval = register_nmi_handler(NMI_UNKNOWN, kgdb_nmi_handler, 0, "kgdb", NMIS_NO_SOURCE);
+diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
+index be93ec7255bf..8071ad32aa11 100644
+--- a/arch/x86/kernel/nmi.c
++++ b/arch/x86/kernel/nmi.c
+@@ -182,6 +182,13 @@ int __register_nmi_handler(unsigned int type, struct nmiaction *action)
+ 	if (WARN_ON_ONCE(!action->handler || !list_empty(&action->list)))
+ 		return -EINVAL;
  
- 	if (retval)
- 		goto out2;
++	/* NMI-source reporting should only be used for NMI_LOCAL */
++	WARN_ON_ONCE((type != NMI_LOCAL) && (action->source_vector != NMIS_NO_SOURCE));
++
++	/* Check for valid vector values. See comment above NMIS_VECTORS_MAX */
++	BUILD_BUG_ON(NMIS_VECTOR_COUNT > NMIS_VECTORS_MAX);
++	WARN_ON_ONCE(action->source_vector >= NMIS_VECTOR_COUNT);
++
+ 	raw_spin_lock_irqsave(&desc->lock, flags);
+ 
+ 	/*
 diff --git a/arch/x86/kernel/nmi_selftest.c b/arch/x86/kernel/nmi_selftest.c
-index a010e9d062bf..c4fffa868160 100644
+index c4fffa868160..f3918888e494 100644
 --- a/arch/x86/kernel/nmi_selftest.c
 +++ b/arch/x86/kernel/nmi_selftest.c
-@@ -41,7 +41,7 @@ static void __init init_nmi_testsuite(void)
- {
- 	/* trap all the unknown NMIs we may generate */
- 	register_nmi_handler(NMI_UNKNOWN, nmi_unk_cb, 0, "nmi_selftest_unk",
--			__initdata);
-+			     NMIS_NO_SOURCE, __initdata);
- }
- 
- static void __init cleanup_nmi_testsuite(void)
-@@ -63,8 +63,8 @@ static void __init test_nmi_ipi(struct cpumask *mask)
- {
+@@ -64,7 +64,7 @@ static void __init test_nmi_ipi(struct cpumask *mask)
  	unsigned long timeout;
  
--	if (register_nmi_handler(NMI_LOCAL, test_nmi_ipi_callback,
--				 NMI_FLAG_FIRST, "nmi_selftest", __initdata)) {
-+	if (register_nmi_handler(NMI_LOCAL, test_nmi_ipi_callback, NMI_FLAG_FIRST,
-+				 "nmi_selftest", NMIS_NO_SOURCE, __initdata)) {
+ 	if (register_nmi_handler(NMI_LOCAL, test_nmi_ipi_callback, NMI_FLAG_FIRST,
+-				 "nmi_selftest", NMIS_NO_SOURCE, __initdata)) {
++				 "nmi_selftest", NMIS_VECTOR_TEST, __initdata)) {
  		nmi_fail = FAILURE;
  		return;
  	}
 diff --git a/arch/x86/kernel/smp.c b/arch/x86/kernel/smp.c
-index 18266cc3d98c..c9435730dfb0 100644
+index c9435730dfb0..1ed065b78467 100644
 --- a/arch/x86/kernel/smp.c
 +++ b/arch/x86/kernel/smp.c
-@@ -142,8 +142,8 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_reboot)
- 
+@@ -143,7 +143,7 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_reboot)
  static int register_stop_handler(void)
  {
--	return register_nmi_handler(NMI_LOCAL, smp_stop_nmi_callback,
--				    NMI_FLAG_FIRST, "smp_stop");
-+	return register_nmi_handler(NMI_LOCAL, smp_stop_nmi_callback, NMI_FLAG_FIRST,
-+				    "smp_stop", NMIS_NO_SOURCE);
+ 	return register_nmi_handler(NMI_LOCAL, smp_stop_nmi_callback, NMI_FLAG_FIRST,
+-				    "smp_stop", NMIS_NO_SOURCE);
++				    "smp_stop", NMIS_VECTOR_SMP_STOP);
  }
  
  static void native_stop_other_cpus(int wait)
-diff --git a/arch/x86/platform/uv/uv_nmi.c b/arch/x86/platform/uv/uv_nmi.c
-index 5c50e550ab63..5af368710f69 100644
---- a/arch/x86/platform/uv/uv_nmi.c
-+++ b/arch/x86/platform/uv/uv_nmi.c
-@@ -1029,10 +1029,10 @@ static int uv_handle_nmi_ping(unsigned int reason, struct pt_regs *regs)
- 
- static void uv_register_nmi_notifier(void)
- {
--	if (register_nmi_handler(NMI_UNKNOWN, uv_handle_nmi, 0, "uv"))
-+	if (register_nmi_handler(NMI_UNKNOWN, uv_handle_nmi, 0, "uv", NMIS_NO_SOURCE))
- 		pr_warn("UV: NMI handler failed to register\n");
- 
--	if (register_nmi_handler(NMI_LOCAL, uv_handle_nmi_ping, 0, "uvping"))
-+	if (register_nmi_handler(NMI_LOCAL, uv_handle_nmi_ping, 0, "uvping", NMIS_NO_SOURCE))
- 		pr_warn("UV: PING NMI handler failed to register\n");
- }
- 
-diff --git a/drivers/acpi/apei/ghes.c b/drivers/acpi/apei/ghes.c
-index f0584ccad451..5e8632f34769 100644
---- a/drivers/acpi/apei/ghes.c
-+++ b/drivers/acpi/apei/ghes.c
-@@ -1421,7 +1421,7 @@ static void ghes_nmi_add(struct ghes *ghes)
- {
- 	mutex_lock(&ghes_list_mutex);
- 	if (list_empty(&ghes_nmi))
--		register_nmi_handler(NMI_LOCAL, ghes_notify_nmi, 0, "ghes");
-+		register_nmi_handler(NMI_LOCAL, ghes_notify_nmi, 0, "ghes", NMIS_NO_SOURCE);
- 	list_add_rcu(&ghes->list, &ghes_nmi);
- 	mutex_unlock(&ghes_list_mutex);
- }
-diff --git a/drivers/char/ipmi/ipmi_watchdog.c b/drivers/char/ipmi/ipmi_watchdog.c
-index ab759b492fdd..944caef3dd31 100644
---- a/drivers/char/ipmi/ipmi_watchdog.c
-+++ b/drivers/char/ipmi/ipmi_watchdog.c
-@@ -1227,8 +1227,7 @@ static void check_parms(void)
- 		}
- 	}
- 	if (do_nmi && !nmi_handler_registered) {
--		rv = register_nmi_handler(NMI_UNKNOWN, ipmi_nmi, 0,
--						"ipmi");
-+		rv = register_nmi_handler(NMI_UNKNOWN, ipmi_nmi, 0, "ipmi", NMIS_NO_SOURCE);
- 		if (rv) {
- 			pr_warn("Can't register nmi handler\n");
- 			return;
-diff --git a/drivers/edac/igen6_edac.c b/drivers/edac/igen6_edac.c
-index 1930dc00c791..9c7913e5bd3e 100644
---- a/drivers/edac/igen6_edac.c
-+++ b/drivers/edac/igen6_edac.c
-@@ -1419,8 +1419,7 @@ static int register_err_handler(void)
- 		return 0;
- 	}
- 
--	rc = register_nmi_handler(NMI_SERR, ecclog_nmi_handler,
--				  0, IGEN6_NMI_NAME);
-+	rc = register_nmi_handler(NMI_SERR, ecclog_nmi_handler, 0, IGEN6_NMI_NAME, NMIS_NO_SOURCE);
- 	if (rc) {
- 		igen6_printk(KERN_ERR, "Failed to register NMI handler\n");
- 		return rc;
-diff --git a/drivers/watchdog/hpwdt.c b/drivers/watchdog/hpwdt.c
-index ae30e394d176..90ae59a09270 100644
---- a/drivers/watchdog/hpwdt.c
-+++ b/drivers/watchdog/hpwdt.c
-@@ -242,13 +242,13 @@ static int hpwdt_init_nmi_decoding(struct pci_dev *dev)
- 	/*
- 	 * Only one function can register for NMI_UNKNOWN
- 	 */
--	retval = register_nmi_handler(NMI_UNKNOWN, hpwdt_pretimeout, 0, "hpwdt");
-+	retval = register_nmi_handler(NMI_UNKNOWN, hpwdt_pretimeout, 0, "hpwdt", NMIS_NO_SOURCE);
- 	if (retval)
- 		goto error;
--	retval = register_nmi_handler(NMI_SERR, hpwdt_pretimeout, 0, "hpwdt");
-+	retval = register_nmi_handler(NMI_SERR, hpwdt_pretimeout, 0, "hpwdt", NMIS_NO_SOURCE);
- 	if (retval)
- 		goto error1;
--	retval = register_nmi_handler(NMI_IO_CHECK, hpwdt_pretimeout, 0, "hpwdt");
-+	retval = register_nmi_handler(NMI_IO_CHECK, hpwdt_pretimeout, 0, "hpwdt", NMIS_NO_SOURCE);
- 	if (retval)
- 		goto error2;
- 
 -- 
 2.43.0
 
