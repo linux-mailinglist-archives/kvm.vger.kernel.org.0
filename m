@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-49316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6860AD7CD0
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 22:59:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79BCEAD7CD1
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 23:00:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 290311895168
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 21:00:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CA9A3A2F4E
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 21:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034412D8786;
-	Thu, 12 Jun 2025 20:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D663E2D8799;
+	Thu, 12 Jun 2025 21:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AFD61orb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J5cEl65c"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE8C2D877C
-	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 20:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C7B2D877C
+	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 21:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749761983; cv=none; b=hHBTJlFURCO/ctu3++faj1mt4K8vvWOPDOZ8k499CIN9BJUtT7V3XiSpZ5nPNMa109z3EYHRtQmM/IWb3pi5VqSDISnq3sz8Ixt2tPREzWy9ASAGnqCTX5jeT++roG4j2mhDBOcI9s0VVUbh5Cabr7O7WWEpQG4AmVcwyExVz4A=
+	t=1749762013; cv=none; b=eT9gbIlCk9ax/FnOQEHaxOeQQFKoTWlWkzBnU6FAROF0SAXRTVEerJHFjhQmesGlH896L++eDSw+POnoOL/OWiHIoZVtZkMDJIvFHFUI/2XoIsp3z+yBZhDDqTaC08vmB1EgQ4SwQSUoMK9QkYwsQDln2l9leZt9s6I0o0aiMg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749761983; c=relaxed/simple;
-	bh=J9+s3hnPxathcRzOvVwRoVoYqjudx2bh+4RrCBFCi/Y=;
+	s=arc-20240116; t=1749762013; c=relaxed/simple;
+	bh=orDG+tM5dBYQPxmvFmUbXkgdLcK0uxufx+QC+uYLny8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=asVxYk3x7V1SP2HE7hcS2l9wBEgkRNjxiaCodWj7zuauudCzGrliDjSFl71wauSw3Xv/WdVMifZpjTZRc/c05cwOA9AdQewPL+Xu0xwJwitQMaXr/C7lNJnN3K0FPVWfx1Ga0xf/2qZyCn1AuCPC4i1Zh77X/rkrQpqi2nzoIoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AFD61orb; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=kNQeTHvYngNHJNqLkPt2XBWMndElODh9XPKviGqGDkmzOBLoK/FgK9TIJIayw7bnDytU+DfPN6pdA9Wi+zCLIFHE5SVC09pb41ZyHf8eNSjr8+aHnvI1BPannYhSF8VaQ8f56JBzKmKHYQGz8S6zU/CtSSYcTtflGDxfrQc6rqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J5cEl65c; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749761980;
+	s=mimecast20190719; t=1749762007;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jCIejFSQfcGoCjcsgn+YLuJOKRTgKy2BSecLZSTojbc=;
-	b=AFD61orbtm0s5RDCtK40YEoblyPsCxZ3FGqCGTRWxnhI9qtCBjHgThqbjhVxYhmDEIiGEE
-	X1iY4rohxH6RjApLlFPtI8H3JlRrKTw49egpwBM7J/huBNmeydoDkVLRkzYVWaE1XHNneQ
-	BK2000Npi/0D7YeQYvMx94RKmRCn3Sk=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=emNV1/voq8vLNxrXGL0MQiHgqI8v5/GVX6i/w8ik8zI=;
+	b=J5cEl65cGkUBZRo1L9GCXTkDf44w/dUiAmxi4XkMnMHAuWhtNHeOSdP7tjNNAJ5yaFGzoS
+	brzxqxv3rY2VIg6ushwmSLNidZtDs3v70DwWMYqmUutpfRNd5XGtiQULKbYzbibvtu7ucJ
+	XJ2TvP1cQ4JO+DhcapNGEOOTJ4YDw7Q=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-76--dlK-Bb-Pq2wXo9ih3MOiQ-1; Thu,
- 12 Jun 2025 16:59:31 -0400
-X-MC-Unique: -dlK-Bb-Pq2wXo9ih3MOiQ-1
-X-Mimecast-MFC-AGG-ID: -dlK-Bb-Pq2wXo9ih3MOiQ_1749761966
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-124-FMI1iKeyOf-ip1YEUJLvsQ-1; Thu,
+ 12 Jun 2025 17:00:00 -0400
+X-MC-Unique: FMI1iKeyOf-ip1YEUJLvsQ-1
+X-Mimecast-MFC-AGG-ID: FMI1iKeyOf-ip1YEUJLvsQ_1749761996
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 12AD919560B2;
-	Thu, 12 Jun 2025 20:59:26 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C0E471956095;
+	Thu, 12 Jun 2025 20:59:55 +0000 (UTC)
 Received: from jsnow-thinkpadp16vgen1.westford.csb (unknown [10.22.80.54])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B9E4B1956050;
-	Thu, 12 Jun 2025 20:58:57 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A265C1955F4A;
+	Thu, 12 Jun 2025 20:59:26 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: Joel Stanley <joel@jms.id.au>,
@@ -169,9 +169,9 @@ Cc: Joel Stanley <joel@jms.id.au>,
 	Huacai Chen <chenhuacai@kernel.org>,
 	Mahmoud Mandour <ma.mandourr@gmail.com>,
 	Harsh Prateek Bora <harshpb@linux.ibm.com>
-Subject: [PATCH v2 07/12] fixup
-Date: Thu, 12 Jun 2025 16:54:45 -0400
-Message-ID: <20250612205451.1177751-8-jsnow@redhat.com>
+Subject: [PATCH v2 08/12] python: further 3.9+ syntax upgrades
+Date: Thu, 12 Jun 2025 16:54:46 -0400
+Message-ID: <20250612205451.1177751-9-jsnow@redhat.com>
 In-Reply-To: <20250612205451.1177751-1-jsnow@redhat.com>
 References: <20250612205451.1177751-1-jsnow@redhat.com>
 Precedence: bulk
@@ -183,80 +183,189 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-These are manual fixes that ought be merged into the prior patch, but
-are here separated for clarity to separate the automated portions of
-this patch from the non-automated portions.
-
-These fixes are only the necessary portions to allow python static
-checks (and checkpatch.pl) to pass again, and don't perform any
-"optional" cleanups. (i.e. this patch strictly prevents regressions.)
+pyupgrade does not catch absolutely everything - there are still a few
+deprecated type aliases we need to shift away from using.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/qemu/utils/qom_fuse.py |  1 +
- scripts/qapi/common.py        | 28 ++++++++++++++--------------
- 2 files changed, 15 insertions(+), 14 deletions(-)
+ docs/sphinx/compat.py                 | 8 ++------
+ docs/sphinx/qapi_domain.py            | 6 +++---
+ python/qemu/machine/console_socket.py | 4 ++--
+ python/qemu/qmp/events.py             | 9 +++++++--
+ python/qemu/qmp/protocol.py           | 3 +--
+ python/qemu/utils/qemu_ga_client.py   | 4 ++--
+ tests/qemu-iotests/fat16.py           | 3 ++-
+ tests/qemu-iotests/iotests.py         | 8 ++++++--
+ 8 files changed, 25 insertions(+), 20 deletions(-)
 
-diff --git a/python/qemu/utils/qom_fuse.py b/python/qemu/utils/qom_fuse.py
-index c1f596e3273..e2ed70f9ded 100644
---- a/python/qemu/utils/qom_fuse.py
-+++ b/python/qemu/utils/qom_fuse.py
-@@ -41,6 +41,7 @@
+diff --git a/docs/sphinx/compat.py b/docs/sphinx/compat.py
+index 2a93687cb3e..1eb1a49d976 100644
+--- a/docs/sphinx/compat.py
++++ b/docs/sphinx/compat.py
+@@ -2,13 +2,9 @@
+ Sphinx cross-version compatibility goop
+ """
  
- import fuse
- from fuse import FUSE, FuseOSError, Operations
-+
- from qemu.qmp import ExecuteError
++from collections.abc import Callable
+ import re
+-from typing import (
+-    TYPE_CHECKING,
+-    Any,
+-    Callable,
+-    Optional,
+-)
++from typing import TYPE_CHECKING, Any, Optional
  
- from .qom_common import QOMCommand
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index d1fa5003c29..ecdac1dff85 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -91,29 +91,29 @@ def c_name(name: str, protect: bool = True) -> str:
-     """
-     # ANSI X3J11/88-090, 3.1.1
-     c89_words = {'auto', 'break', 'case', 'char', 'const', 'continue',
--                     'default', 'do', 'double', 'else', 'enum', 'extern',
--                     'float', 'for', 'goto', 'if', 'int', 'long', 'register',
--                     'return', 'short', 'signed', 'sizeof', 'static',
--                     'struct', 'switch', 'typedef', 'union', 'unsigned',
--                     'void', 'volatile', 'while'}
-+                 'default', 'do', 'double', 'else', 'enum', 'extern',
-+                 'float', 'for', 'goto', 'if', 'int', 'long', 'register',
-+                 'return', 'short', 'signed', 'sizeof', 'static',
-+                 'struct', 'switch', 'typedef', 'union', 'unsigned',
-+                 'void', 'volatile', 'while'}
-     # ISO/IEC 9899:1999, 6.4.1
-     c99_words = {'inline', 'restrict', '_Bool', '_Complex', '_Imaginary'}
-     # ISO/IEC 9899:2011, 6.4.1
-     c11_words = {'_Alignas', '_Alignof', '_Atomic', '_Generic',
--                     '_Noreturn', '_Static_assert', '_Thread_local'}
-+                 '_Noreturn', '_Static_assert', '_Thread_local'}
-     # GCC http://gcc.gnu.org/onlinedocs/gcc-4.7.1/gcc/C-Extensions.html
-     # excluding _.*
-     gcc_words = {'asm', 'typeof'}
-     # C++ ISO/IEC 14882:2003 2.11
-     cpp_words = {'bool', 'catch', 'class', 'const_cast', 'delete',
--                     'dynamic_cast', 'explicit', 'false', 'friend', 'mutable',
--                     'namespace', 'new', 'operator', 'private', 'protected',
--                     'public', 'reinterpret_cast', 'static_cast', 'template',
--                     'this', 'throw', 'true', 'try', 'typeid', 'typename',
--                     'using', 'virtual', 'wchar_t',
--                     # alternative representations
--                     'and', 'and_eq', 'bitand', 'bitor', 'compl', 'not',
--                     'not_eq', 'or', 'or_eq', 'xor', 'xor_eq'}
-+                 'dynamic_cast', 'explicit', 'false', 'friend', 'mutable',
-+                 'namespace', 'new', 'operator', 'private', 'protected',
-+                 'public', 'reinterpret_cast', 'static_cast', 'template',
-+                 'this', 'throw', 'true', 'try', 'typeid', 'typename',
-+                 'using', 'virtual', 'wchar_t',
-+                 # alternative representations
-+                 'and', 'and_eq', 'bitand', 'bitor', 'compl', 'not',
-+                 'not_eq', 'or', 'or_eq', 'xor', 'xor_eq'}
-     # namespace pollution:
-     polluted_words = {'unix', 'errno', 'mips', 'sparc', 'i386', 'linux'}
-     name = re.sub(r'[^A-Za-z0-9_]', '_', name)
+ from docutils import nodes
+ from docutils.nodes import Element, Node, Text
+diff --git a/docs/sphinx/qapi_domain.py b/docs/sphinx/qapi_domain.py
+index cb6104922b5..7673eaed6d5 100644
+--- a/docs/sphinx/qapi_domain.py
++++ b/docs/sphinx/qapi_domain.py
+@@ -39,8 +39,8 @@
+ 
+ 
+ if TYPE_CHECKING:
+-    from collections.abc import Iterable
+-    from typing import AbstractSet, Any
++    from collections.abc import Iterable, Set
++    from typing import Any
+ 
+     from docutils.nodes import Element, Node
+     from sphinx.addnodes import desc_signature, pending_xref
+@@ -825,7 +825,7 @@ def clear_doc(self, docname: str) -> None:
+                 del self.objects[fullname]
+ 
+     def merge_domaindata(
+-        self, docnames: AbstractSet[str], otherdata: dict[str, Any]
++        self, docnames: Set[str], otherdata: dict[str, Any]
+     ) -> None:
+         for fullname, obj in otherdata["objects"].items():
+             if obj.docname in docnames:
+diff --git a/python/qemu/machine/console_socket.py b/python/qemu/machine/console_socket.py
+index 0754f340310..bcd27017fc9 100644
+--- a/python/qemu/machine/console_socket.py
++++ b/python/qemu/machine/console_socket.py
+@@ -17,7 +17,7 @@
+ import socket
+ import threading
+ import time
+-from typing import Deque, Optional
++from typing import Optional
+ 
+ 
+ class ConsoleSocket(socket.socket):
+@@ -43,7 +43,7 @@ def __init__(self,
+ 
+         self._recv_timeout_sec = 300.0
+         self._sleep_time = 0.5
+-        self._buffer: Deque[int] = deque()
++        self._buffer: deque[int] = deque()
+         if address is not None:
+             socket.socket.__init__(self, socket.AF_UNIX, socket.SOCK_STREAM)
+             self.connect(address)
+diff --git a/python/qemu/qmp/events.py b/python/qemu/qmp/events.py
+index e444d9334ec..33a9317e4d4 100644
+--- a/python/qemu/qmp/events.py
++++ b/python/qemu/qmp/events.py
+@@ -448,10 +448,15 @@ def accept(self, event) -> bool:
+ """
+ 
+ import asyncio
+-from collections.abc import AsyncIterator, Iterable, Iterator
++from collections.abc import (
++    AsyncIterator,
++    Callable,
++    Iterable,
++    Iterator,
++)
+ from contextlib import contextmanager
+ import logging
+-from typing import Callable, Optional, Union
++from typing import Optional, Union
+ 
+ from .error import QMPError
+ from .message import Message
+diff --git a/python/qemu/qmp/protocol.py b/python/qemu/qmp/protocol.py
+index 4ec9564c4b3..683df61f55e 100644
+--- a/python/qemu/qmp/protocol.py
++++ b/python/qemu/qmp/protocol.py
+@@ -15,7 +15,7 @@
+ 
+ import asyncio
+ from asyncio import StreamReader, StreamWriter
+-from collections.abc import AsyncGenerator, Awaitable
++from collections.abc import AsyncGenerator, Awaitable, Callable
+ from contextlib import asynccontextmanager
+ from enum import Enum
+ from functools import wraps
+@@ -25,7 +25,6 @@
+ from ssl import SSLContext
+ from typing import (
+     Any,
+-    Callable,
+     Generic,
+     Optional,
+     TypeVar,
+diff --git a/python/qemu/utils/qemu_ga_client.py b/python/qemu/utils/qemu_ga_client.py
+index a653c234c4b..d15848667b1 100644
+--- a/python/qemu/utils/qemu_ga_client.py
++++ b/python/qemu/utils/qemu_ga_client.py
+@@ -39,11 +39,11 @@
+ import argparse
+ import asyncio
+ import base64
+-from collections.abc import Sequence
++from collections.abc import Callable, Sequence
+ import os
+ import random
+ import sys
+-from typing import Any, Callable, Optional
++from typing import Any, Optional
+ 
+ from qemu.qmp import ConnectError, SocketAddrT
+ from qemu.qmp.legacy import QEMUMonitorProtocol
+diff --git a/tests/qemu-iotests/fat16.py b/tests/qemu-iotests/fat16.py
+index 88c3d56c662..ec4bc980725 100644
+--- a/tests/qemu-iotests/fat16.py
++++ b/tests/qemu-iotests/fat16.py
+@@ -15,8 +15,9 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
++from collections.abc import Callable
+ import string
+-from typing import Callable, Optional, Protocol
++from typing import Optional, Protocol
+ 
+ 
+ SECTOR_SIZE = 512
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 104a61058fa..b69895cd117 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -20,7 +20,12 @@
+ import atexit
+ import bz2
+ from collections import OrderedDict
+-from collections.abc import Iterable, Iterator, Sequence
++from collections.abc import (
++    Callable,
++    Iterable,
++    Iterator,
++    Sequence,
++)
+ from contextlib import contextmanager
+ import faulthandler
+ import json
+@@ -35,7 +40,6 @@
+ import time
+ from typing import (
+     Any,
+-    Callable,
+     Optional,
+     TextIO,
+     TypeVar,
 -- 
 2.48.1
 
