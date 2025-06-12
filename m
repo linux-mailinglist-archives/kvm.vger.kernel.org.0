@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-49310-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49311-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD3D5AD7CB4
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 22:56:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BD32AD7CB9
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 22:57:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A7D33A2E48
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 20:56:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E27043A2DC3
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 20:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74D42D8780;
-	Thu, 12 Jun 2025 20:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05342D8DA1;
+	Thu, 12 Jun 2025 20:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKJVz/cE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="epNZp4EF"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DF62BE7D7
-	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 20:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D562D8798
+	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 20:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749761799; cv=none; b=fuYeQlt0Ml5urIihBPNCoJo1SRrdBq348yUytjkPafXhJhJi0yMdDGCn8Krooig89YBFgL9bwJ7W6Ivncl4blwIEphFOLOt2hDQL/ZV/q6An/4Vg8j6CVNI2p78Km1APIGKim5xWaCOV0GNznSt98CRWr3ZjGOXgmZZNG5fAaGg=
+	t=1749761814; cv=none; b=PLrU2qYirnufwmiULAWujK9ln1Xs5vD4fFkJaYBtt14dy3pkr65aSQ9ot9C1SMy8nn8BSIWbADdVsBt9oEUInCjtFgpdxE/KwxyPH17g8gepcTFPM0j6x2qrwR7zusto03Kj50wKe6rJsKUn3hoG9WyNQlXmoP56fwObUFepYvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749761799; c=relaxed/simple;
-	bh=v6aC7KAocl65D6CE/+oD2mpXOvwuUbR1owacMPKg1yQ=;
+	s=arc-20240116; t=1749761814; c=relaxed/simple;
+	bh=mcwT/bmu83tH6Ynd+feZw5cmPv4ks35jBf0pXUhbegE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GrtaWN9rczCZc4BEb7Iv+siufjqsUIoOfhNIp35i0LO+h2ZCPPRhG12i+pZT91yzXhQ6NfO6z4gnQjvWouThZdjMjZWJeGXoFgycnzdce425mO40PeFz4Fvxt6kn/ptpJebwc7ErXrqA8vqaZrfFeiaPQRaWAkEE7tVJpNH5bdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CKJVz/cE; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=GbuQDkro3WciKid+AwzkXuikHEcWyP+P5NUn1m6nvcldN59ec/IA3UkZ2Y0QTQOcJsfMGkoFxt3gKvkZZ6FkxE+tNF1T/qYRt4zLPLCIi6zkouB8QRgRBlMmHb4wqhS/nOPWjzDqfQvKd+wWUWCki/yk4CcMcipA3Obd/OUYGC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=epNZp4EF; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749761795;
+	s=mimecast20190719; t=1749761811;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=R+HVWn5ejM2NRJ2UzNsYUYT8arVp5yX8Fj0AdCrYiak=;
-	b=CKJVz/cEndWNMWavNDJpK2mDqH0T7OOO7wU4G7Hj2cgJvXmAp2IL5vhu88DbfVq2xGScKP
-	9fO0vOStxoiNqfvYccVtzi5Jl57JZcGsmR6OYw8GigbU6wacnNX6FgI8XdZDf7pBh3AiaJ
-	/vv8KC7nqT//Bc4YsPrBUejvkt2WdlA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=JPQI2hgsJD7vC72UdLStao/hkDc48A/BlwOX5s90trs=;
+	b=epNZp4EFmdRqCcHNdv7qAqilsPCC/7AVjkR82GEPzv66M24FPp3NLRgegDSOci/805eDmD
+	DwWk3mue4YFNKoMutllvo9iolCjjrQ+j3PNJUM/0reANKVnEWIUunTXq6cCdABrptti5rq
+	ZXRq1ci+p8KtGFhPG/i2yo3PdBH0wjA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-482-2izI2JldOwuIv7BGoZ4ZeA-1; Thu,
- 12 Jun 2025 16:56:18 -0400
-X-MC-Unique: 2izI2JldOwuIv7BGoZ4ZeA-1
-X-Mimecast-MFC-AGG-ID: 2izI2JldOwuIv7BGoZ4ZeA_1749761772
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-333-P8gKKj6MMp6uGIIIfOOhxQ-1; Thu,
+ 12 Jun 2025 16:56:49 -0400
+X-MC-Unique: P8gKKj6MMp6uGIIIfOOhxQ-1
+X-Mimecast-MFC-AGG-ID: P8gKKj6MMp6uGIIIfOOhxQ_1749761803
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 42FF11800366;
-	Thu, 12 Jun 2025 20:56:10 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E6A1180028D;
+	Thu, 12 Jun 2025 20:56:42 +0000 (UTC)
 Received: from jsnow-thinkpadp16vgen1.westford.csb (unknown [10.22.80.54])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7ADA61955F4A;
-	Thu, 12 Jun 2025 20:55:36 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 90D1C1956050;
+	Thu, 12 Jun 2025 20:56:10 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: Joel Stanley <joel@jms.id.au>,
@@ -169,9 +169,9 @@ Cc: Joel Stanley <joel@jms.id.au>,
 	Huacai Chen <chenhuacai@kernel.org>,
 	Mahmoud Mandour <ma.mandourr@gmail.com>,
 	Harsh Prateek Bora <harshpb@linux.ibm.com>
-Subject: [PATCH v2 01/12] python: convert packages to PEP517/pyproject.toml
-Date: Thu, 12 Jun 2025 16:54:39 -0400
-Message-ID: <20250612205451.1177751-2-jsnow@redhat.com>
+Subject: [PATCH v2 02/12] python: update pylint ignores
+Date: Thu, 12 Jun 2025 16:54:40 -0400
+Message-ID: <20250612205451.1177751-3-jsnow@redhat.com>
 In-Reply-To: <20250612205451.1177751-1-jsnow@redhat.com>
 References: <20250612205451.1177751-1-jsnow@redhat.com>
 Precedence: bulk
@@ -183,216 +183,34 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Newer versions of setuptools increasingly expect that packages are
-defined using the pyproject.toml/PEP517 packaging layout format. With
-3.9 as our minimum, I believe it's finally appropriate to make the shift
-away from the legacy packaging format.
-
-Update documentation and dependencies that change as a result of the
-different build/packaging/installation pathways.
-
-This change has the effect of fixing "make check-dev", which has been
-broken on newer versions of Fedora for a while, now.
+The next patch will synchronize the qemu.qmp library with the external,
+standalone version. That synchronization will require an extra ignore
+for pylint, so do that now.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/README.rst        | 33 ++++++++++++++++-----------------
- python/Makefile          | 18 +++++++++---------
- python/pyproject.toml    | 10 ++++++++++
- python/setup.py          | 40 ----------------------------------------
- python/tests/minreqs.txt |  2 +-
- 5 files changed, 36 insertions(+), 67 deletions(-)
- create mode 100644 python/pyproject.toml
- delete mode 100755 python/setup.py
+ python/setup.cfg | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/python/README.rst b/python/README.rst
-index d62e71528d2..befa84e3261 100644
---- a/python/README.rst
-+++ b/python/README.rst
-@@ -5,24 +5,23 @@ This directory houses Python tooling used by the QEMU project to build,
- configure, and test QEMU. It is organized by namespace (``qemu``), and
- then by package (e.g. ``qemu/machine``, ``qemu/qmp``, etc).
+diff --git a/python/setup.cfg b/python/setup.cfg
+index d7f5dc7bafe..02cc076eaea 100644
+--- a/python/setup.cfg
++++ b/python/setup.cfg
+@@ -140,11 +140,12 @@ ignore_missing_imports = True
+ # --disable=W".
+ disable=consider-using-f-string,
+         consider-using-with,
++        no-member,  # mypy also handles this better.
+         too-many-arguments,
+-        too-many-positional-arguments,
+         too-many-function-args,  # mypy handles this with less false positives.
+         too-many-instance-attributes,
+-        no-member,  # mypy also handles this better.
++        too-many-positional-arguments,
++        unknown-option-value,
  
--``setup.py`` is used by ``pip`` to install this tooling to the current
--environment. ``setup.cfg`` provides the packaging configuration used by
--``setup.py``. You will generally invoke it by doing one of the following:
-+``pyproject.toml`` and ``setup.cfg`` are used by ``pip`` to install this
-+tooling to the current environment. ``setup.cfg`` provides the packaging
-+configuration, while ``pyproject.toml`` describes the package build
-+system requirements.
- 
--1. ``pip3 install .`` will install these packages to your current
--   environment. If you are inside a virtual environment, they will
--   install there. If you are not, it will attempt to install to the
--   global environment, which is **not recommended**.
-+You will generally install these packages by invoking ``pip3 install
-+.``; which will install these packages to your current environment. If
-+you are inside a virtual environment, they will install there. If you
-+are not, modern versions of pip will attempt instead to install to your
-+local user environment. Older versions of pip will attempt to install to
-+the global environment, which is **not recommended**.
- 
--2. ``pip3 install --user .`` will install these packages to your user's
--   local python packages. If you are inside of a virtual environment,
--   this will fail; you want the first invocation above.
--
--If you append the ``--editable`` or ``-e`` argument to either invocation
--above, pip will install in "editable" mode. This installs the package as
--a forwarder ("qemu.egg-link") that points to the source tree. In so
--doing, the installed package always reflects the latest version in your
--source tree.
-+If you append the ``--editable`` or ``-e`` argument to the above
-+invocation, pip will install in "editable" mode. This installs the
-+package as a "forwarder" that points to the source tree, so that the
-+installed package always reflects the latest version in your source
-+tree.
- 
- Installing ".[devel]" instead of "." will additionally pull in required
- packages for testing this package. They are not runtime requirements,
-@@ -81,4 +80,4 @@ Files in this directory
- - ``VERSION`` contains the PEP-440 compliant version used to describe
-   this package; it is referenced by ``setup.cfg``.
- - ``setup.cfg`` houses setuptools package configuration.
--- ``setup.py`` is the setuptools installer used by pip; See above.
-+- ``pyproject.toml`` lists build system requirements for the Python packages.
-diff --git a/python/Makefile b/python/Makefile
-index 764b79ccb23..845fbb66cf4 100644
---- a/python/Makefile
-+++ b/python/Makefile
-@@ -15,8 +15,8 @@ help:
- 	@echo "make check-tox:"
- 	@echo "    Run tests against multiple python versions."
- 	@echo "    These tests use the newest dependencies."
--	@echo "    Requires: Python 3.9 - 3.11, and tox."
--	@echo "    Hint (Fedora): 'sudo dnf install python3-tox python3.11'"
-+	@echo "    Requires: Python 3.9 - 3.13, and tox."
-+	@echo "    Hint (Fedora): 'sudo dnf install python3-tox python3.13'"
- 	@echo "    The variable QEMU_TOX_EXTRA_ARGS can be use to pass extra"
- 	@echo "    arguments to tox".
- 	@echo ""
-@@ -63,12 +63,12 @@ $(QEMU_MINVENV_DIR) $(QEMU_MINVENV_DIR)/bin/activate: setup.cfg tests/minreqs.tx
- 	@(								\
- 		echo "ACTIVATE $(QEMU_MINVENV_DIR)";			\
- 		. $(QEMU_MINVENV_DIR)/bin/activate;			\
--		echo "INSTALL wheel $(QEMU_MINVENV_DIR)";               \
--		$(PIP_INSTALL) wheel 1>/dev/null;		               \
-+		echo "INSTALL wheel $(QEMU_MINVENV_DIR)";		\
-+		$(PIP_INSTALL) wheel 1>/dev/null;			\
- 		echo "INSTALL -r tests/minreqs.txt $(QEMU_MINVENV_DIR)";\
- 		$(PIP_INSTALL) -r tests/minreqs.txt 1>/dev/null;	\
- 		echo "INSTALL -e qemu $(QEMU_MINVENV_DIR)";		\
--		$(PIP_INSTALL) -e . 1>/dev/null;			\
-+		$(PIP_INSTALL) -e . --config-settings=editable_mode=compat 1>/dev/null;			\
- 	)
- 	@touch $(QEMU_MINVENV_DIR)
- 
-@@ -103,7 +103,7 @@ check-dev: dev-venv
- 
- .PHONY: develop
- develop:
--	$(PIP_INSTALL) -e .[devel]
-+	$(PIP_INSTALL) -e .[devel] --config-settings=editable_mode=compat
- 
- .PHONY: check
- check:
-@@ -122,12 +122,12 @@ check-coverage:
- 
- .PHONY: clean
- clean:
--	python3 setup.py clean --all
--	rm -f pyproject.toml
-+	rm -rf build/
- 
- .PHONY: distclean
- distclean: clean
--	rm -rf qemu.egg-info/ .eggs/ dist/
-+	rm -rf qemu.egg-info/
- 	rm -rf $(QEMU_VENV_DIR) $(QEMU_MINVENV_DIR) .tox/
-+	rm -rf .mypy_cache/
- 	rm -f .coverage .coverage.*
- 	rm -rf htmlcov/
-diff --git a/python/pyproject.toml b/python/pyproject.toml
-new file mode 100644
-index 00000000000..2de34bf4729
---- /dev/null
-+++ b/python/pyproject.toml
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+
-+[build-system]
-+requires = [
-+    "setuptools>=39.2",
-+    "wheel",
-+]
-+build-backend = "setuptools.build_meta"
-+
-+[tool.setuptools_scm]
-diff --git a/python/setup.py b/python/setup.py
-deleted file mode 100755
-index c5bc45919a4..00000000000
---- a/python/setup.py
-+++ /dev/null
-@@ -1,40 +0,0 @@
--#!/usr/bin/env python3
--"""
--QEMU tooling installer script
--Copyright (c) 2020-2021 John Snow for Red Hat, Inc.
--"""
--
--import setuptools
--from setuptools.command import bdist_egg
--import sys
--import pkg_resources
--
--
--class bdist_egg_guard(bdist_egg.bdist_egg):
--    """
--    Protect against bdist_egg from being executed
--
--    This prevents calling 'setup.py install' directly, as the 'install'
--    CLI option will invoke the deprecated bdist_egg hook. "pip install"
--    calls the more modern bdist_wheel hook, which is what we want.
--    """
--    def run(self):
--        sys.exit(
--            'Installation directly via setup.py is not supported.\n'
--            'Please use `pip install .` instead.'
--        )
--
--
--def main():
--    """
--    QEMU tooling installer
--    """
--
--    # https://medium.com/@daveshawley/safely-using-setup-cfg-for-metadata-1babbe54c108
--    pkg_resources.require('setuptools>=39.2')
--
--    setuptools.setup(cmdclass={'bdist_egg': bdist_egg_guard})
--
--
--if __name__ == '__main__':
--    main()
-diff --git a/python/tests/minreqs.txt b/python/tests/minreqs.txt
-index cd2e2a81c3d..e9edfa55eb7 100644
---- a/python/tests/minreqs.txt
-+++ b/python/tests/minreqs.txt
-@@ -15,6 +15,7 @@
- # also pin setuptools to version 70 or below. Otherwise, the
- # installation of the QEMU package itself fails, failing to find
- # setuptools.
-+# Avocado also appears to require an older setuptools.
- setuptools<=70
- 
- # Dependencies for qapidoc/qapi_domain et al
-@@ -55,7 +56,6 @@ astroid==2.15.4
- dill==0.2
- lazy-object-proxy==1.4.0
- platformdirs==2.2.0
--toml==0.10.0
- tomlkit==0.10.1
- wrapt==1.14.0
- 
+ [pylint.basic]
+ # Good variable names which should always be accepted, separated by a comma.
 -- 
 2.48.1
 
