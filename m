@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-49319-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49320-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B27D0AD7CD6
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 23:01:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44DCDAD7CD9
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 23:01:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E1A73A2FF0
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 21:01:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD6787AE983
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 21:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B972D877D;
-	Thu, 12 Jun 2025 21:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC3392D8DAE;
+	Thu, 12 Jun 2025 21:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VyO5ty7e"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZpXUEtiR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CA41531E3
-	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 21:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD9F1EDA2F
+	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 21:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749762071; cv=none; b=mUEK5TY8w/GdqwD5mN6EldJrgZqwGRNsGHeoatjUEYnDdpyqotFRylvagULC0yRUqXhBPcbiV6w+SePSqRNd7GG1HKTVOfVXXcxUMnJZuN8v5xW59xGUKFGWwcrtAdYlfx8coI2ha+EueU49Fj3rdyhhCixZqTxHwUNnfQ5At8I=
+	t=1749762098; cv=none; b=cV6OBx6WiWdV2bObI7VIBhp6zgyE0/hmtiDZU+HuzTstOco3ugYoWSSgvBsjxmfCNRLYDIwIAElFaX/niLClz+VPtBjHHKV1qfmrB8mDaG29Y/E5EJyyJbDv8keuuX6i7u237PwFzMk6kbhB4or+xBNJgtZl0P2KRX5jZK4kOKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749762071; c=relaxed/simple;
-	bh=5Eu489w64daqUM7vADF+ZyUH896B4fJsrlluihnStsc=;
+	s=arc-20240116; t=1749762098; c=relaxed/simple;
+	bh=+VmpFethL+d/ewwbiCJKMswAG+rp9qGbd5OEFCy62AI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QbtVctAKL+ONbFj12eI5SlweEXycU6mt2jEwuJfSGl9noKgDei4v8eGjSQZzS2tcfAVIV0Z1hiiApA4uuagaDY5Xxd6ILg4OgUoXU2CNCGsfMPtb8a5RPfEh1/3Gge67KjFVX18AsbYF9SXOd54Fw7QqXWsp+mWd1v90R+DAu0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VyO5ty7e; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=e/BMuo3NN6eqS4Vs4jsI+iUj5YQ/QPL/voLj02HgO3x0yNCPGt0pc8tWokjm/z3mAskLTDuCatqNKTuPjOe4azkaybKiJb4cSaU9NRnNZdAlCK+Ro5B/GGrhI9TZfxARUfGFGX7100+gaDKjWDDoL73I8dsLhOCFU+wV4H5Ger8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZpXUEtiR; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749762068;
+	s=mimecast20190719; t=1749762096;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=biVTVO6tTUZgXsk76i+pCkrq8Kzb2MvWdVTKKPUZZgI=;
-	b=VyO5ty7eysgFdrgiVFQJ+gr+Tx2oy15/GvMTbtSgLItJ555GXptmf2RyuloGtd/UMBHb4N
-	im1oyNO9vjDZPmy2qjOYNUx0xGABspictRUj8nxx+IEvBrFDgUJ6ZdPtMLYhxXRU02n2wr
-	yvzHSp7l2LSPYgVyRdLGL+Qa2wUCG04=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=aQL5AVZzjW1dNur0+zU036GgiAEpA8O2BMI4YkdQQVE=;
+	b=ZpXUEtiRV/x5wKYE4xRSXycO/Tpr67WnComjWSaqX60hQzNaBKlS/KCeGWJPNC1xKxqWtD
+	mUafolxwtu+T9Qx2J88xvLhZkllqlRMauGHzYnMD09cbGyueBTk+noKEKY0dMuqIa2sfkW
+	2rfJOdlxgs0LDisy/pR7S925u99xOKM=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-83-vnvS8YJfPauQ8Md4VPLwig-1; Thu,
- 12 Jun 2025 17:01:03 -0400
-X-MC-Unique: vnvS8YJfPauQ8Md4VPLwig-1
-X-Mimecast-MFC-AGG-ID: vnvS8YJfPauQ8Md4VPLwig_1749762058
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-376-QGzFUNx3NDGxQRHX_xpujg-1; Thu,
+ 12 Jun 2025 17:01:33 -0400
+X-MC-Unique: QGzFUNx3NDGxQRHX_xpujg-1
+X-Mimecast-MFC-AGG-ID: QGzFUNx3NDGxQRHX_xpujg_1749762089
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3E1CF195608F;
-	Thu, 12 Jun 2025 21:00:58 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2014D19560A2;
+	Thu, 12 Jun 2025 21:01:29 +0000 (UTC)
 Received: from jsnow-thinkpadp16vgen1.westford.csb (unknown [10.22.80.54])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8FB201955F57;
-	Thu, 12 Jun 2025 21:00:26 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B1FE11955F4A;
+	Thu, 12 Jun 2025 21:00:58 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: Joel Stanley <joel@jms.id.au>,
@@ -169,9 +169,9 @@ Cc: Joel Stanley <joel@jms.id.au>,
 	Huacai Chen <chenhuacai@kernel.org>,
 	Mahmoud Mandour <ma.mandourr@gmail.com>,
 	Harsh Prateek Bora <harshpb@linux.ibm.com>
-Subject: [PATCH v2 10/12] python: remove version restriction for mypy
-Date: Thu, 12 Jun 2025 16:54:48 -0400
-Message-ID: <20250612205451.1177751-11-jsnow@redhat.com>
+Subject: [PATCH v2 11/12] scripts/codeconverter: remove unused code
+Date: Thu, 12 Jun 2025 16:54:49 -0400
+Message-ID: <20250612205451.1177751-12-jsnow@redhat.com>
 In-Reply-To: <20250612205451.1177751-1-jsnow@redhat.com>
 References: <20250612205451.1177751-1-jsnow@redhat.com>
 Precedence: bulk
@@ -183,29 +183,48 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Removing this configuration line allows mypy to type check files from
-the context of whatever version of Python it happens to be running
-under, which is actually what we want here, so long as we do actually
-support running these scripts under multiple versions of Python, which
-we currently do.
+Remove (select) bits of unused code, as it is not typed correctly and
+appears to not be in use. The quickest solution is to remove it
+entirely.
+
+'Match' is not defined, and neither is 'TypeInfoReference'. What these
+bits of code were meant to do is unclear.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/setup.cfg | 1 -
- 1 file changed, 1 deletion(-)
+ scripts/codeconverter/codeconverter/patching.py      | 3 ---
+ scripts/codeconverter/codeconverter/qom_type_info.py | 4 ----
+ 2 files changed, 7 deletions(-)
 
-diff --git a/python/setup.cfg b/python/setup.cfg
-index 02cc076eaea..9b6dbc520aa 100644
---- a/python/setup.cfg
-+++ b/python/setup.cfg
-@@ -78,7 +78,6 @@ exclude = __pycache__,
+diff --git a/scripts/codeconverter/codeconverter/patching.py b/scripts/codeconverter/codeconverter/patching.py
+index 7c3135a3e27..0165085caed 100644
+--- a/scripts/codeconverter/codeconverter/patching.py
++++ b/scripts/codeconverter/codeconverter/patching.py
+@@ -418,9 +418,6 @@ def show_diff(self) -> None:
+             f.flush()
+             subprocess.call(['diff', '-u', self.filename, f.name])
  
- [mypy]
- strict = True
--python_version = 3.9
- namespace_packages = True
- warn_unused_ignores = False
+-    def ref(self):
+-        return TypeInfoReference
+-
+ class FileList(RegexpScanner):
+     def __init__(self):
+         super().__init__()
+diff --git a/scripts/codeconverter/codeconverter/qom_type_info.py b/scripts/codeconverter/codeconverter/qom_type_info.py
+index d4dd6267b76..4ecdd728890 100644
+--- a/scripts/codeconverter/codeconverter/qom_type_info.py
++++ b/scripts/codeconverter/codeconverter/qom_type_info.py
+@@ -29,10 +29,6 @@
  
+ ParsedArray = List[str]
+ ParsedInitializerValue = Union[str, ParsedArray]
+-class InitializerValue(NamedTuple):
+-    raw: str
+-    parsed: Optional[ParsedInitializerValue]
+-    match: Optional[Match]
+ 
+ class ArrayItem(FileMatch):
+     regexp = RE_ARRAY_ITEM
 -- 
 2.48.1
 
