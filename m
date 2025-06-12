@@ -1,187 +1,158 @@
-Return-Path: <kvm+bounces-49257-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49258-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 353E9AD6E87
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 13:04:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BF3FAD6EA8
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 13:11:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2E1170B92
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 11:04:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D337C17E830
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 11:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FD8239E99;
-	Thu, 12 Jun 2025 11:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D78123D295;
+	Thu, 12 Jun 2025 11:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="D+OBUddR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q45cTnMW"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2047.outbound.protection.outlook.com [40.107.102.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827291DFF7;
-	Thu, 12 Jun 2025 11:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749726249; cv=fail; b=jkrVi8RwxQs/yNNqF21QPjNDl8QSnJp0TBZrH+hMCNNASqG6tJ5bnO4K7DUZJgZ3PZxyJ9l28EWa69sn3Wx4+6UTT8LddjiHI+rTkRrBrSI0pKRBIPX34pw18mXibzGEhp5vTRlPOPKtWdCBE4+wGY1lOLmxlBqX0qkuMp99BY0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749726249; c=relaxed/simple;
-	bh=LfKBKl3dxErAfnT94z1U5sdNWxmjnVBrk+oxTHCdGeQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fgypzljrsb+iYwWSWhvLD5J1N/2dMsMeLzZSXqCizTeJDDB4NXFSbOgwaxbFuYeNvg3+0KlejKfLq5Le+HQsqLAdkaM34Ja64nF8EsIe2xR407bGbDi2y0Q3Gv6agTA80zMlFcZ0efnH5kVUmoUZi9FgNlnYNJ/DzZvbKA5z9Hk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=D+OBUddR; arc=fail smtp.client-ip=40.107.102.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cZKQWFshjO0E47nSrWx5x6QG2LdvZzOndhIg/QuDUv30YPOx30WtLXrknal2zvD4gM3MXHsMft+TDlpHqiaNo98TuRqurcXBn777iPJp58SwtLRFoyfuP+RNAs4iL8/UlymEQWjMCy3J5ViPwmzrc0EMlF9rUagHOW/Sx8ar7mGzmGzBP/sk79Bp7bsZIaXVT8xLguMMoGWO0qOQGvErSImfRLLVdylCQd2X2TATIB0czGlnw4X+cNhIFvtJhuKWeziZLSg171gp4U12VXtZa4bOxbSA5Dbu2JHotlTLs6WYNjHQUsEv6a3l1WYTo3AG2pZVZp+Z3Tw9sLbbWVNppQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JMHzS6LgiYW9Q7FQD8uqgNEKgwsC/1bJpQ/My1KNqcg=;
- b=C++xyDh1bwPrkRc0MhQBZcxIJ96OjBAricpxOrbu2IofxxERHInjqQqyKAudv8LDCp9tUWOBxVzVhFydqsom1D+eBQfJtQt1QSagOk62Sn1OFBVgCmXe8K6SWdUa848G3AiV/GzRKrJxoZ2ofLFza/ulAf2Xhk3tV9U+BCuDvTci4GZubUxjUOtxIinhCAleOhjUWoKjkCvqThudBA+wRaViOgTHEq0tTbG5II1opwW6xw7Kyn2KryJ9y16L6QCFthV7UZYYH9VnZgf9/vMyWmwkJfn2gMRam+3zhSYfElFMR3y3Mg1/myV8UNttwRvWbg2T9/w8AyFIBgtSHsFdpQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JMHzS6LgiYW9Q7FQD8uqgNEKgwsC/1bJpQ/My1KNqcg=;
- b=D+OBUddRGKyyQFBZ4tkcSZttBrZx9S7/4FzuyEmiqsHtV68KNf856iGEAce4piTli89/elCEF8XilNUGGi7IzTO7pVi4R8BIigo9x5LauJnJ6+KBFKccDm5h4xB5QA6aAt0+U4BRmHsyv/y33SRX4qHktn1hNb7SuA6tTsjSZCw=
-Received: from CH2PR07CA0002.namprd07.prod.outlook.com (2603:10b6:610:20::15)
- by CY8PR12MB7266.namprd12.prod.outlook.com (2603:10b6:930:56::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.39; Thu, 12 Jun
- 2025 11:04:03 +0000
-Received: from CH2PEPF0000009A.namprd02.prod.outlook.com
- (2603:10b6:610:20:cafe::20) by CH2PR07CA0002.outlook.office365.com
- (2603:10b6:610:20::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.22 via Frontend Transport; Thu,
- 12 Jun 2025 11:04:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH2PEPF0000009A.mail.protection.outlook.com (10.167.244.22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8835.15 via Frontend Transport; Thu, 12 Jun 2025 11:04:02 +0000
-Received: from [10.85.38.70] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 12 Jun
- 2025 06:03:59 -0500
-Message-ID: <55b5827b-6809-47a9-b5d9-57fa68736e9f@amd.com>
-Date: Thu, 12 Jun 2025 16:33:52 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E3E23C4E1;
+	Thu, 12 Jun 2025 11:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749726655; cv=none; b=Do720y++mDgQKCZ20h1viCijBWY/f1oeuJ4NFTysjspgSHBhkoVnu8dQgUE5cTo9UGnzc9+kMPpQCzEvOOyAT2NCQ+H3RqC35/bAAmQyXBucsWfvsAC1pJPZAea4bu0s59JYryaagMfeqHTHK79LZqOvahC6MrMd5eGCe1ebv38=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749726655; c=relaxed/simple;
+	bh=9nBrpMK9zZeZHFNOhk7Yg3FOCL/mJbGGTtA0TEp4ISs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mWipY7Gj1P0iBai63NVgsByk91TsHi3hYpXJZerApVI/slihpJZFoz8eyzwkllL4GDiw2YUau9gDhutn1otE/YQF+kpKFtK3NnGMsm4bxOAFE9FpAPkmxqhvkHt3vstTmu4XYoB1uDdPj1C1AyVnTghYMD1e+Gv5vNAa6gUZE3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q45cTnMW; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-acae7e7587dso124691366b.2;
+        Thu, 12 Jun 2025 04:10:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749726652; x=1750331452; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9nBrpMK9zZeZHFNOhk7Yg3FOCL/mJbGGTtA0TEp4ISs=;
+        b=Q45cTnMW6M14BzyHymT7nYYg4t6x9BGdEF9ruN7/wgYyxXo4Tlylon5otQ4YZQ2Sc9
+         g/fsr0NtQvk/Etw0ossoeTHN5Cfeae/FY77K+/hghcbUHaHmOpEZQ0QfIC54ELk89me5
+         EBgOWoQq1e94sLb+w6ZhJiPIJqPQkeOe2ZawGAVkKUk0u4IwUvzbs9mvTc+zgI2EEhWV
+         PGOLGYDT83nHRbq8q1GqlAQnlaQHiOD0LpzhRwXdqYNIxtoKrSayGXBNK5OhJr55b+79
+         SORsFrLhL182smO44kfOdktCOFsoScdh5f38OKEwjH75O4ojvNwuU8hPnzj5H/SmbNCv
+         +Lzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749726652; x=1750331452;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9nBrpMK9zZeZHFNOhk7Yg3FOCL/mJbGGTtA0TEp4ISs=;
+        b=bELuWToe0XVxZWlrcTkxavKMdL0MFQyUjScPQ1pg91aQZL3zKvLiKgFqlbm3+4a8As
+         WeWXlDIxcqIYIt7UIwIfJ4B+l4C7xmJfKkXq7/R9nUKU35ssrOtVuWMvppQr+Y7Kc2vl
+         LekwDtI4vlxtGg3GiOG6va7TloeGu0AdznSLOpwZmokfv75bkcaYqsyntWk/gLLmripo
+         jt7dx/p7akRQ0gtX32vSWTFgPxbc7n3pGyRA2WV16f3LOxczeMCBqQUucufUt+aImDS7
+         xzWa3bH/CDMc36uZQE0bHPB8bxlhhcTgOPAUl1lEVJH6d2NwPXMlAxtcU/OPL1lhVEN6
+         8PIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUN2/qpgkwIG246rcWkdFL5deXpx4GCN5qxQHhk/07t20elpOKE8gUso5+yE9DhYTCPKi4BFhMq/DXHWPth@vger.kernel.org, AJvYcCV1GKG+kHsF4n5I2gK90GR6LiYWn39EDXUZekx03xJIV+baxXMprxX07VyobFgCznO7uig=@vger.kernel.org, AJvYcCWGXzs+dFV2GyY3E0yV4zOWR3G/TNaMtqKUrNIbBXAbtI9I4JaH2vctoLgJHUPJ8bJjDZQJjH1x+9vM@vger.kernel.org, AJvYcCXSYtdOMlxqqKl+ZVGHFrfEJMLiTQIJYazh/Sq3vNSVy3mWobMC1QYakv0t0nNK5FNRjpYI7/n4L3Stpw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YymOdIutmqtabbKfGQiOrdoLCxolZvrE2ld2Lu2LUmXMj4EJNnq
+	mgNOgbSXzNv39WSD4TMmcwQNCr/4XXJs6d+MkM/SpCFOi5QahQNg0UwKGPfawZ2NuQo4410N3Qs
+	e8tDPI9zf5RIqEf3d+DfzkPDQS3OFJNc=
+X-Gm-Gg: ASbGnctdy4c7+GN+CO8Gy5mG3BMWkNtkjy46cni4wnAOoGi24oqYfju6gBuEE8HP08p
+	F/ED+LuyHg4gSAu8nQCI+1QmdWBnbjUjg11kHRS55rvWoMR/lxcTYncc4W1IheVbCGoFt1ubotK
+	A/n6e3KmxH90wx0rffNSE2FztOtajAOHWPMTyR8bEwrtc=
+X-Google-Smtp-Source: AGHT+IFrX17XfYVkjVnepz8BihCrbdN9elHb1a1FwyoMbX0yLjH2EltV5lWsECJ7oLshTrIE21PMDORFUypei4zXNLs=
+X-Received: by 2002:a17:907:980f:b0:ad8:a515:767f with SMTP id
+ a640c23a62f3a-adea9464061mr258576566b.51.1749726651742; Thu, 12 Jun 2025
+ 04:10:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/59] KVM: iommu: Overhaul device posted IRQs support
-To: Sean Christopherson <seanjc@google.com>
-CC: <baolu.lu@linux.intel.com>, <dmatlack@google.com>, <dwmw2@infradead.org>,
-	<francescolavra.fl@gmail.com>, <iommu@lists.linux.dev>,
-	<joao.m.martins@oracle.com>, <joro@8bytes.org>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <mlevitsk@redhat.com>, <pbonzini@redhat.com>,
-	<vasant.hegde@amd.com>
-References: <20250523010004.3240643-1-seanjc@google.com>
- <20250609122050.28499-1-sarunkod@amd.com> <aEbw2zBUQwJZ3D98@google.com>
-Content-Language: en-US
-From: Sairaj Kodilkar <sarunkod@amd.com>
-In-Reply-To: <aEbw2zBUQwJZ3D98@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000009A:EE_|CY8PR12MB7266:EE_
-X-MS-Office365-Filtering-Correlation-Id: b77c1179-bc76-43d7-b359-08dda9a0d749
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?akFHNElmZEZFY0t5U2ppdU9FQk00eTljZmFHa0YwUmpITU1rM0pRdFN3MFEr?=
- =?utf-8?B?WURDOFZHUHA1NnlTUVRzWXFydmFtR3ZqZ3pSd1AzNnAyaTZCbkl6Zm1iaENt?=
- =?utf-8?B?U1BSRlZoNFI2elZRUkFPVDFmSk91K0g5eFBIRDlQSnFCMlRHcnJLakxoN3NF?=
- =?utf-8?B?OUNXM2FIbXp5bUVtd3V6d1ExR1lnSzVqVUNlSWh2NHpBS3g4Ly94NkVVdTdJ?=
- =?utf-8?B?Y0lybEs3RDRiV0dMeVpRRW01YlJLWDl6UXAwVVBlQWxZY0tSQ2hFNDJ3dHJo?=
- =?utf-8?B?d0hsMHg0NytXRlhCUTk2Z25odG1FOFpQaTVUY21EZnZOejF5aXRiNHd4TStm?=
- =?utf-8?B?cFc4eFNJdjZFWG95dXpNZ1ZqSHBkeVl6OUgvS0YxN1AyZjF6U3dJMHdEUytL?=
- =?utf-8?B?cTMzRk5kWDdaTWkreHBrREpTenQxWGs2cEMrL2NIOVZ0dkd1cnY1d3RLTWhG?=
- =?utf-8?B?dDQxWVBqcndxZS90N1oyelNyNVVreFpYd24wOUwrcGtUVjJCRE40UmZWR1ZH?=
- =?utf-8?B?OWpDWFdHYnU2dkdNMTZuOXQ4R2MyRE5IM2ZaZTViWjNTVmpiMG1yNXBsdGgw?=
- =?utf-8?B?RXBsb2U2M0VlNUc3b3EwVHAyVHA3WU1sY2FRTnZRVk9FQzQ2ZlpmRW5MaU9X?=
- =?utf-8?B?UldvTlFQbTMvdFhvejEyRitaYy93Y2pTUEpqWEl2L01TTVd2dDFrS0NZSmRS?=
- =?utf-8?B?TXNBTWtXK09VOFMySGlXWktzZHhtTGo1TmtRb015aVlueFRMcjBoYUQwSDRm?=
- =?utf-8?B?d3U4SmhRZGxXZzdnczNJT2dxd0ttMUVrbm05bUppU0pFdjJqR3dpZVowVlZT?=
- =?utf-8?B?c1lMZEZHKy9pTTZxUWh2MmtXNkZOWXZtK3B2VlZCTDRSZHZab1lXVXpTQlZI?=
- =?utf-8?B?TlI1VHNXeWtTZHV1QkdyWm5kcGRPUFRlTXBrVHlkMWN6WWdJVSt4YnFTQXNv?=
- =?utf-8?B?N1RvRjRBRFZPMG0yM2gvRjRMdytiaGdubVYvSWJ6TVFXLzA0STFPTm5MMFFS?=
- =?utf-8?B?cFBjSFJCd1pnQ2VqcW5mRVdnQW9DNzQ2TXdWWWFIUktSSnM4YW55cmgzN0Jr?=
- =?utf-8?B?NHVqbmkyeVRVOXl5azdDdlRvSU5Zc3RiMjJMUUd4VzFXSjI4dUVrT3FOTEM0?=
- =?utf-8?B?cFpIdHpGeHp3Zkd1MUlBN1Q1ZlBxQ0xtZjNIM2ZaRGxXbXhRcmJTS2JuVkM3?=
- =?utf-8?B?YUhHZzAwMzB4QmJJREhRNGd4N3lNZmhPazcyTlJDSDZnK05ZY1FGUXlPR0t2?=
- =?utf-8?B?MG1DQ0tYbWRIU094K2F4WHJUc0JSVklwN2VVYTlPZGJTWVJUNm1ieFVvSEdH?=
- =?utf-8?B?aTk3azJQQTVXQnhoS2wyOWJNbzFXUWRDVU4rKy9FaWdYWTI3d2R4WFQ2RTNR?=
- =?utf-8?B?cHQ0UzN6bEdDUHJZaHAyUzZ2cGdYMzFOa2lyVHllbTlsSG41cVdVSjdDR0hh?=
- =?utf-8?B?cWJGeXZuQkszb0hOZEc2T2lGeHdCOTdDajhjVlNubEFlRVpsSU9YSjEybmtE?=
- =?utf-8?B?VXRUNlc1b3RBN2d0RXJjeW5vL1ZSRldEN1lqSEs3TWZVUVNmOWZIS21yeXlU?=
- =?utf-8?B?S2NPQmkxdkQ0S2R6TWliaDBkRWgyRkFEZFBUbmJsY0lGbmNGa2N1RVgvdXlE?=
- =?utf-8?B?c0ovK3gwVmdJbWVJZnBtN2Z0ekMrTDNTNUxtVDN5NUsyZWdES1FNSFREN3o5?=
- =?utf-8?B?MnRMZ0ZHcW9tNEFqRklFLzdJMXBIN1hkcCtoVEZIci8rbTRvUjJIOUFJVzNR?=
- =?utf-8?B?VklmQkp1amtDZVcyYlRKRWlvaU8zSmZjaGxEeG96N2YvOXFUKzdDK1d1cHZa?=
- =?utf-8?B?bWFOVDhoeGw0dDk2MUdQL2dGWVJOU0ZSazdtZ2dIZjdRT09JSE1hejVzK1Zi?=
- =?utf-8?B?c1pmbEsrakVSbkRJeTBGc213UVVIbGNGRlVicnNkRnJsZE1CWHlSdkdpTjBw?=
- =?utf-8?B?bXVLWXU0N3V4KzFBeCszY3djSjk0UTlDWTFuZGF4d0N2SkQ4bFRTTE5JM0xQ?=
- =?utf-8?B?QkY4K2N5U096ekxSOElXU1lHVGtpMGFQZUdCNlM2d0xyZWFYa2lrOUd3SW8r?=
- =?utf-8?Q?KpBb04?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2025 11:04:02.7708
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b77c1179-bc76-43d7-b359-08dda9a0d749
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000009A.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7266
+References: <20250612093228.7655-1-chengzhenghan@uniontech.com> <84b14425-03e4-42be-8bd5-9bc010ebecda@suse.com>
+In-Reply-To: <84b14425-03e4-42be-8bd5-9bc010ebecda@suse.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Thu, 12 Jun 2025 14:10:15 +0300
+X-Gm-Features: AX0GCFubP_i495cQIkoSGfjK4G9pwjz7TYfQyvgZfj4JA8pwuaopIL7tecp4u7I
+Message-ID: <CAHp75Vc7AO_sRgB1Nj6CevbseMFyv5ku8ZS3PwzAuAgysKVxNg@mail.gmail.com>
+Subject: Re: [PATCH] x86: Fix build warnings about export.h
+To: Juergen Gross <jgross@suse.com>
+Cc: Zhenghan Cheng <chengzhenghan@uniontech.com>, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	mario.limonciello@amd.com, yazen.ghannam@amd.com, jpoimboe@kernel.org, 
+	tony.luck@intel.com, jarkko@kernel.org, bhelgaas@google.com, 
+	pbonzini@redhat.com, oleg@redhat.com, jbaron@akamai.com, ning.sun@intel.com, 
+	seanjc@google.com, luto@kernel.org, andy@kernel.org, jim.cromie@gmail.com, 
+	kirill.shutemov@linux.intel.com, hpa@zytor.com, 
+	pawan.kumar.gupta@linux.intel.com, vkuznets@redhat.com, rostedt@goodmis.org, 
+	ardb@kernel.org, thomas.lendacky@amd.com, nikunj@amd.com, 
+	ashish.kalra@amd.com, kees@kernel.org, alexandre.chartre@oracle.com, 
+	rppt@kernel.org, steve.wahl@hpe.com, jirislaby@kernel.org, 
+	apatel@ventanamicro.com, bvanassche@acm.org, ptsm@linux.microsoft.com, 
+	Jonathan.Cameron@huawei.com, beata.michalska@arm.com, xin@zytor.com, 
+	davydov-max@yandex-team.ru, ravi.bangoria@amd.com, joel.granados@kernel.org, 
+	ffmancera@riseup.net, kprateek.nayak@amd.com, akpm@linux-foundation.org, 
+	bhe@redhat.com, brgerst@gmail.com, coxu@redhat.com, dmaluka@chromium.org, 
+	linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org, 
+	linux-sgx@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, tboot-devel@lists.sourceforge.net, 
+	nouveau@lists.freedesktop.org, linux-coco@lists.linux.dev, 
+	xen-devel@lists.xenproject.org, Huacai Chen <chenhuacai@loongson.cn>, 
+	Zhenghan Cheng <your_email@example.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 6/9/2025 8:04 PM, Sean Christopherson wrote:
-> On Mon, Jun 09, 2025, Sairaj Kodilkar wrote:
->> Hi Sean,
->>
->> Sorry for the delay in testing. All sanity tests are OK. I reran the performance
->> test on the V2 and noticed that V2 has significantly more GALOG entries than V1
->> for all three cases. I also noticed that the Guest Nvme interrupt rate has
->> dropped for the 192 VCPUS.
-> 
-> Hmm, I don't see any obvious bugs or differences (based on a code diffed between
-> v1 and v2).  I'll poke at the GALogIntr behavior just to double check, but my
-> guess is that the differences are due to exernal factors, e.g. guest behavior,
-> timing, scheduling, etc.
-> 
-> IOPS are all nearly identical, so I'm not terribly concerned.
->   
+On Thu, Jun 12, 2025 at 1:19=E2=80=AFPM Juergen Gross <jgross@suse.com> wro=
+te:
 >
+> On 12.06.25 11:32, Zhenghan Cheng wrote:
+> > After commit a934a57a42f64a4 ("scripts/misc-check:
+> > check missing #include <linux/export.h> when W=3D1")
+> > and commit 7d95680d64ac8e836c ("scripts/misc-check:
+> > check unnecessary #include <linux/export.h> when W=3D1"),
+> > we get some build warnings with W=3D1,such as:
+> >
+> > arch/x86/coco/sev/core.c: warning: EXPORT_SYMBOL() is used, but #includ=
+e <linux/export.h> is missing
+> > arch/x86/crypto/aria_aesni_avx2_glue.c: warning: EXPORT_SYMBOL() is use=
+d, but #include <linux/export.h> is missing
+> > arch/x86/kernel/unwind_orc.c: warning: EXPORT_SYMBOL() is used, but #in=
+clude <linux/export.h> is missing
+> > arch/x86/kvm/hyperv.c: warning: EXPORT_SYMBOL() is used, but #include <=
+linux/export.h> is missing
+> > arch/x86/events/intel/core.c: warning: EXPORT_SYMBOL() is not used, but=
+ #include <linux/export.h> is present
+> > arch/x86/events/zhaoxin/core.c: warning: EXPORT_SYMBOL() is not used, b=
+ut #include <linux/export.h> is present
+> > arch/x86/kernel/crash.c: warning: EXPORT_SYMBOL() is not used, but #inc=
+lude <linux/export.h> is present
+> > arch/x86/kernel/devicetree.c: warning: EXPORT_SYMBOL() is not used, but=
+ #include <linux/export.h> is present
+> >
+> > so fix these build warnings for x86.
+> >
+> > Signed-off-by: "Zhenghan Cheng" <chengzhenghan@uniontech.com>
+> > Suggested-by: "Huacai Chen" <chenhuacai@loongson.cn>
+>
+> For Xen and paravirt:
+>
+> Acked-by: Juergen Gross <jgross@suse.com>
+>
+> Your patch is looking a little bit strange, as the list of modified files
+> is located between the patch hunks, followed by another "Signed-off-by:".
 
-Yep you are right. I was indeed using different guest kernel to test V2.
-Keeping it same, I can produce almost identical results for both V1 and
-V2.
-
-Only one case that still stands out is with 32 vCPUS, where posted
-interrupt count has increased from 200 to 7000. But IOPS and NVME
-interrupt rate is identical hence I am not concerned about it as well.
+Indeed.
+And at bare minimum please split at least to two:
+1) adding export.h;
+2) removing export.h.
 
 
-Thanks
-Sairaj
+--=20
+With Best Regards,
+Andy Shevchenko
 
