@@ -1,334 +1,187 @@
-Return-Path: <kvm+bounces-49256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49257-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2CC5AD6E4C
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 12:52:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 353E9AD6E87
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 13:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 394EF1790F0
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 10:52:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2E1170B92
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 11:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D8C246774;
-	Thu, 12 Jun 2025 10:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FD8239E99;
+	Thu, 12 Jun 2025 11:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aO49gxay"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="D+OBUddR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2047.outbound.protection.outlook.com [40.107.102.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C4C23BCFA;
-	Thu, 12 Jun 2025 10:51:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749725499; cv=none; b=VDXZNrBqRj3/lqs4WCfZdZrrB/c7pqLABVImtm0YIOPCtDlM00mw6nSsBDYEIkKXuzSWH52T2YoNvSgAOrqg2IuVJphYbWcMxjKcgdU2rOj0+kAjG4L7p9zbDOqvsY+REAhGO7OdQpyiRe55RelNSa+Aohvto+6/GP+sufU/6AQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749725499; c=relaxed/simple;
-	bh=HKv+RczLAZ17iqylg22JlcAa16U8HVKbqtgbPN/3rrM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E+RGN6qPElqO4qZu9MANSmhjzQz3x76d171L3x/fcbzEpaRPjRbrWLijh+H0l4c6CS9AJTKNxbP3JuV+1pVl2xn6X+7syESGDQ0T8YnHiG+AUhdNVRNg0fztZcdk+t2rKQjxiMahXwVSM5iileMrzL2VLEiXGbL4BY569eDK/D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aO49gxay; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E41BC4CEEE;
-	Thu, 12 Jun 2025 10:51:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1749725498;
-	bh=HKv+RczLAZ17iqylg22JlcAa16U8HVKbqtgbPN/3rrM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aO49gxay9bAykPC0QZcmIl7XHKGGMrp1dwVKDmKPefGeezyBbVis/1s3ZqPtBkDN1
-	 ySK0Ocks5vOLZNXFVG45wYhjeEpDo74myMPibgFEjV20ISoa2cC0QItgO/tN1HOroV
-	 INN5vmR+CAnWaJpY1C3sNfIZvARifUgoOWV5ZGw3SZoNRHxgOAQu8E7O/TaAovQw7f
-	 A8DVpW269wF7sRO0VF5FYf3QtoGHUvCvw7H6bffEP0o8MTcWrjnq0kzNXS0ERCs8bI
-	 jDUVdQmAZ07fvUA8ADWHwMh1I7VqDllMzEeEyVhHtuWFt45kceBGgQwNuBBQREq++f
-	 CVE3bzopG+jRQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uPfWx-006DBO-DR;
-	Thu, 12 Jun 2025 11:51:35 +0100
-Date: Thu, 12 Jun 2025 11:51:34 +0100
-Message-ID: <86v7p1cjwp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ada Couprie Diaz <ada.coupriediaz@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH V4 1/2] arm64/debug: Drop redundant DBG_MDSCR_* macros
-In-Reply-To: <ddc006af-3084-4fef-b822-144fb404bc8d@arm.com>
-References: <20250612033547.480952-1-anshuman.khandual@arm.com>
-	<20250612033547.480952-2-anshuman.khandual@arm.com>
-	<86wm9hcr14.wl-maz@kernel.org>
-	<ddc006af-3084-4fef-b822-144fb404bc8d@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827291DFF7;
+	Thu, 12 Jun 2025 11:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1749726249; cv=fail; b=jkrVi8RwxQs/yNNqF21QPjNDl8QSnJp0TBZrH+hMCNNASqG6tJ5bnO4K7DUZJgZ3PZxyJ9l28EWa69sn3Wx4+6UTT8LddjiHI+rTkRrBrSI0pKRBIPX34pw18mXibzGEhp5vTRlPOPKtWdCBE4+wGY1lOLmxlBqX0qkuMp99BY0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1749726249; c=relaxed/simple;
+	bh=LfKBKl3dxErAfnT94z1U5sdNWxmjnVBrk+oxTHCdGeQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=fgypzljrsb+iYwWSWhvLD5J1N/2dMsMeLzZSXqCizTeJDDB4NXFSbOgwaxbFuYeNvg3+0KlejKfLq5Le+HQsqLAdkaM34Ja64nF8EsIe2xR407bGbDi2y0Q3Gv6agTA80zMlFcZ0efnH5kVUmoUZi9FgNlnYNJ/DzZvbKA5z9Hk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=D+OBUddR; arc=fail smtp.client-ip=40.107.102.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cZKQWFshjO0E47nSrWx5x6QG2LdvZzOndhIg/QuDUv30YPOx30WtLXrknal2zvD4gM3MXHsMft+TDlpHqiaNo98TuRqurcXBn777iPJp58SwtLRFoyfuP+RNAs4iL8/UlymEQWjMCy3J5ViPwmzrc0EMlF9rUagHOW/Sx8ar7mGzmGzBP/sk79Bp7bsZIaXVT8xLguMMoGWO0qOQGvErSImfRLLVdylCQd2X2TATIB0czGlnw4X+cNhIFvtJhuKWeziZLSg171gp4U12VXtZa4bOxbSA5Dbu2JHotlTLs6WYNjHQUsEv6a3l1WYTo3AG2pZVZp+Z3Tw9sLbbWVNppQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JMHzS6LgiYW9Q7FQD8uqgNEKgwsC/1bJpQ/My1KNqcg=;
+ b=C++xyDh1bwPrkRc0MhQBZcxIJ96OjBAricpxOrbu2IofxxERHInjqQqyKAudv8LDCp9tUWOBxVzVhFydqsom1D+eBQfJtQt1QSagOk62Sn1OFBVgCmXe8K6SWdUa848G3AiV/GzRKrJxoZ2ofLFza/ulAf2Xhk3tV9U+BCuDvTci4GZubUxjUOtxIinhCAleOhjUWoKjkCvqThudBA+wRaViOgTHEq0tTbG5II1opwW6xw7Kyn2KryJ9y16L6QCFthV7UZYYH9VnZgf9/vMyWmwkJfn2gMRam+3zhSYfElFMR3y3Mg1/myV8UNttwRvWbg2T9/w8AyFIBgtSHsFdpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JMHzS6LgiYW9Q7FQD8uqgNEKgwsC/1bJpQ/My1KNqcg=;
+ b=D+OBUddRGKyyQFBZ4tkcSZttBrZx9S7/4FzuyEmiqsHtV68KNf856iGEAce4piTli89/elCEF8XilNUGGi7IzTO7pVi4R8BIigo9x5LauJnJ6+KBFKccDm5h4xB5QA6aAt0+U4BRmHsyv/y33SRX4qHktn1hNb7SuA6tTsjSZCw=
+Received: from CH2PR07CA0002.namprd07.prod.outlook.com (2603:10b6:610:20::15)
+ by CY8PR12MB7266.namprd12.prod.outlook.com (2603:10b6:930:56::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8792.39; Thu, 12 Jun
+ 2025 11:04:03 +0000
+Received: from CH2PEPF0000009A.namprd02.prod.outlook.com
+ (2603:10b6:610:20:cafe::20) by CH2PR07CA0002.outlook.office365.com
+ (2603:10b6:610:20::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.22 via Frontend Transport; Thu,
+ 12 Jun 2025 11:04:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CH2PEPF0000009A.mail.protection.outlook.com (10.167.244.22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8835.15 via Frontend Transport; Thu, 12 Jun 2025 11:04:02 +0000
+Received: from [10.85.38.70] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 12 Jun
+ 2025 06:03:59 -0500
+Message-ID: <55b5827b-6809-47a9-b5d9-57fa68736e9f@amd.com>
+Date: Thu, 12 Jun 2025 16:33:52 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/59] KVM: iommu: Overhaul device posted IRQs support
+To: Sean Christopherson <seanjc@google.com>
+CC: <baolu.lu@linux.intel.com>, <dmatlack@google.com>, <dwmw2@infradead.org>,
+	<francescolavra.fl@gmail.com>, <iommu@lists.linux.dev>,
+	<joao.m.martins@oracle.com>, <joro@8bytes.org>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <mlevitsk@redhat.com>, <pbonzini@redhat.com>,
+	<vasant.hegde@amd.com>
+References: <20250523010004.3240643-1-seanjc@google.com>
+ <20250609122050.28499-1-sarunkod@amd.com> <aEbw2zBUQwJZ3D98@google.com>
+Content-Language: en-US
+From: Sairaj Kodilkar <sarunkod@amd.com>
+In-Reply-To: <aEbw2zBUQwJZ3D98@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000009A:EE_|CY8PR12MB7266:EE_
+X-MS-Office365-Filtering-Correlation-Id: b77c1179-bc76-43d7-b359-08dda9a0d749
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?akFHNElmZEZFY0t5U2ppdU9FQk00eTljZmFHa0YwUmpITU1rM0pRdFN3MFEr?=
+ =?utf-8?B?WURDOFZHUHA1NnlTUVRzWXFydmFtR3ZqZ3pSd1AzNnAyaTZCbkl6Zm1iaENt?=
+ =?utf-8?B?U1BSRlZoNFI2elZRUkFPVDFmSk91K0g5eFBIRDlQSnFCMlRHcnJLakxoN3NF?=
+ =?utf-8?B?OUNXM2FIbXp5bUVtd3V6d1ExR1lnSzVqVUNlSWh2NHpBS3g4Ly94NkVVdTdJ?=
+ =?utf-8?B?Y0lybEs3RDRiV0dMeVpRRW01YlJLWDl6UXAwVVBlQWxZY0tSQ2hFNDJ3dHJo?=
+ =?utf-8?B?d0hsMHg0NytXRlhCUTk2Z25odG1FOFpQaTVUY21EZnZOejF5aXRiNHd4TStm?=
+ =?utf-8?B?cFc4eFNJdjZFWG95dXpNZ1ZqSHBkeVl6OUgvS0YxN1AyZjF6U3dJMHdEUytL?=
+ =?utf-8?B?cTMzRk5kWDdaTWkreHBrREpTenQxWGs2cEMrL2NIOVZ0dkd1cnY1d3RLTWhG?=
+ =?utf-8?B?dDQxWVBqcndxZS90N1oyelNyNVVreFpYd24wOUwrcGtUVjJCRE40UmZWR1ZH?=
+ =?utf-8?B?OWpDWFdHYnU2dkdNMTZuOXQ4R2MyRE5IM2ZaZTViWjNTVmpiMG1yNXBsdGgw?=
+ =?utf-8?B?RXBsb2U2M0VlNUc3b3EwVHAyVHA3WU1sY2FRTnZRVk9FQzQ2ZlpmRW5MaU9X?=
+ =?utf-8?B?UldvTlFQbTMvdFhvejEyRitaYy93Y2pTUEpqWEl2L01TTVd2dDFrS0NZSmRS?=
+ =?utf-8?B?TXNBTWtXK09VOFMySGlXWktzZHhtTGo1TmtRb015aVlueFRMcjBoYUQwSDRm?=
+ =?utf-8?B?d3U4SmhRZGxXZzdnczNJT2dxd0ttMUVrbm05bUppU0pFdjJqR3dpZVowVlZT?=
+ =?utf-8?B?c1lMZEZHKy9pTTZxUWh2MmtXNkZOWXZtK3B2VlZCTDRSZHZab1lXVXpTQlZI?=
+ =?utf-8?B?TlI1VHNXeWtTZHV1QkdyWm5kcGRPUFRlTXBrVHlkMWN6WWdJVSt4YnFTQXNv?=
+ =?utf-8?B?N1RvRjRBRFZPMG0yM2gvRjRMdytiaGdubVYvSWJ6TVFXLzA0STFPTm5MMFFS?=
+ =?utf-8?B?cFBjSFJCd1pnQ2VqcW5mRVdnQW9DNzQ2TXdWWWFIUktSSnM4YW55cmgzN0Jr?=
+ =?utf-8?B?NHVqbmkyeVRVOXl5azdDdlRvSU5Zc3RiMjJMUUd4VzFXSjI4dUVrT3FOTEM0?=
+ =?utf-8?B?cFpIdHpGeHp3Zkd1MUlBN1Q1ZlBxQ0xtZjNIM2ZaRGxXbXhRcmJTS2JuVkM3?=
+ =?utf-8?B?YUhHZzAwMzB4QmJJREhRNGd4N3lNZmhPazcyTlJDSDZnK05ZY1FGUXlPR0t2?=
+ =?utf-8?B?MG1DQ0tYbWRIU094K2F4WHJUc0JSVklwN2VVYTlPZGJTWVJUNm1ieFVvSEdH?=
+ =?utf-8?B?aTk3azJQQTVXQnhoS2wyOWJNbzFXUWRDVU4rKy9FaWdYWTI3d2R4WFQ2RTNR?=
+ =?utf-8?B?cHQ0UzN6bEdDUHJZaHAyUzZ2cGdYMzFOa2lyVHllbTlsSG41cVdVSjdDR0hh?=
+ =?utf-8?B?cWJGeXZuQkszb0hOZEc2T2lGeHdCOTdDajhjVlNubEFlRVpsSU9YSjEybmtE?=
+ =?utf-8?B?VXRUNlc1b3RBN2d0RXJjeW5vL1ZSRldEN1lqSEs3TWZVUVNmOWZIS21yeXlU?=
+ =?utf-8?B?S2NPQmkxdkQ0S2R6TWliaDBkRWgyRkFEZFBUbmJsY0lGbmNGa2N1RVgvdXlE?=
+ =?utf-8?B?c0ovK3gwVmdJbWVJZnBtN2Z0ekMrTDNTNUxtVDN5NUsyZWdES1FNSFREN3o5?=
+ =?utf-8?B?MnRMZ0ZHcW9tNEFqRklFLzdJMXBIN1hkcCtoVEZIci8rbTRvUjJIOUFJVzNR?=
+ =?utf-8?B?VklmQkp1amtDZVcyYlRKRWlvaU8zSmZjaGxEeG96N2YvOXFUKzdDK1d1cHZa?=
+ =?utf-8?B?bWFOVDhoeGw0dDk2MUdQL2dGWVJOU0ZSazdtZ2dIZjdRT09JSE1hejVzK1Zi?=
+ =?utf-8?B?c1pmbEsrakVSbkRJeTBGc213UVVIbGNGRlVicnNkRnJsZE1CWHlSdkdpTjBw?=
+ =?utf-8?B?bXVLWXU0N3V4KzFBeCszY3djSjk0UTlDWTFuZGF4d0N2SkQ4bFRTTE5JM0xQ?=
+ =?utf-8?B?QkY4K2N5U096ekxSOElXU1lHVGtpMGFQZUdCNlM2d0xyZWFYa2lrOUd3SW8r?=
+ =?utf-8?Q?KpBb04?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014)(7416014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2025 11:04:02.7708
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b77c1179-bc76-43d7-b359-08dda9a0d749
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF0000009A.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7266
 
-On Thu, 12 Jun 2025 11:24:04 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
->=20
->=20
->=20
-> On 12/06/25 1:47 PM, Marc Zyngier wrote:
-> > On Thu, 12 Jun 2025 04:35:46 +0100,
-> > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> >>
-> >> MDSCR_EL1 has already been defined in tools sysreg format and hence ca=
-n be
-> >> used in all debug monitor related call paths. But using generated sysr=
-eg
-> >> definitions causes build warnings because there is a mismatch between =
-mdscr
-> >> variable (u32) and GENMASK() based masks (long unsigned int). Convert =
-all
-> >> variables handling MDSCR_EL1 register as u64 which also reflects its t=
-rue
-> >> width as well.
-> >>
-> >> ----------------------------------------------------------------------=
-----
-> >> arch/arm64/kernel/debug-monitors.c: In function =E2=80=98disable_debug=
-_monitors=E2=80=99:
-> >> arch/arm64/kernel/debug-monitors.c:108:13: warning: conversion from =
-=E2=80=98long
-> >> unsigned int=E2=80=99 to =E2=80=98u32=E2=80=99 {aka =E2=80=98unsigned =
-int=E2=80=99} changes value from
-> >> =E2=80=9818446744073709518847=E2=80=99 to =E2=80=984294934527=E2=80=99=
- [-Woverflow]
-> >>   108 |   disable =3D ~MDSCR_EL1_MDE;
-> >>       |             ^
-> >> ----------------------------------------------------------------------=
-----
-> >>
-> >> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> >> Cc: Will Deacon <will@kernel.org>
-> >> Cc: Mark Rutland <mark.rutland@arm.com>
-> >> Cc: linux-arm-kernel@lists.infradead.org
-> >> Cc: linux-kernel@vger.kernel.org
-> >> Reviewed-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
-> >> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> >> ---
-> >>  arch/arm64/include/asm/assembler.h      |  4 ++--
-> >>  arch/arm64/include/asm/debug-monitors.h |  6 ------
-> >>  arch/arm64/kernel/debug-monitors.c      | 22 +++++++++++-----------
-> >>  arch/arm64/kernel/entry-common.c        |  4 ++--
-> >>  4 files changed, 15 insertions(+), 21 deletions(-)
-> >>
-> >> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/a=
-sm/assembler.h
-> >> index ad63457a05c5..f229d96616e5 100644
-> >> --- a/arch/arm64/include/asm/assembler.h
-> >> +++ b/arch/arm64/include/asm/assembler.h
-> >> @@ -53,7 +53,7 @@
-> >>  	.macro	disable_step_tsk, flgs, tmp
-> >>  	tbz	\flgs, #TIF_SINGLESTEP, 9990f
-> >>  	mrs	\tmp, mdscr_el1
-> >> -	bic	\tmp, \tmp, #DBG_MDSCR_SS
-> >> +	bic	\tmp, \tmp, #MDSCR_EL1_SS
-> >>  	msr	mdscr_el1, \tmp
-> >>  	isb	// Take effect before a subsequent clear of DAIF.D
-> >>  9990:
-> >> @@ -63,7 +63,7 @@
-> >>  	.macro	enable_step_tsk, flgs, tmp
-> >>  	tbz	\flgs, #TIF_SINGLESTEP, 9990f
-> >>  	mrs	\tmp, mdscr_el1
-> >> -	orr	\tmp, \tmp, #DBG_MDSCR_SS
-> >> +	orr	\tmp, \tmp, #MDSCR_EL1_SS
-> >>  	msr	mdscr_el1, \tmp
-> >>  9990:
-> >>  	.endm
-> >> diff --git a/arch/arm64/include/asm/debug-monitors.h b/arch/arm64/incl=
-ude/asm/debug-monitors.h
-> >> index 8f6ba31b8658..1f37dd01482b 100644
-> >> --- a/arch/arm64/include/asm/debug-monitors.h
-> >> +++ b/arch/arm64/include/asm/debug-monitors.h
-> >> @@ -13,14 +13,8 @@
-> >>  #include <asm/ptrace.h>
-> >> =20
-> >>  /* Low-level stepping controls. */
-> >> -#define DBG_MDSCR_SS		(1 << 0)
-> >>  #define DBG_SPSR_SS		(1 << 21)
-> >> =20
-> >> -/* MDSCR_EL1 enabling bits */
-> >> -#define DBG_MDSCR_KDE		(1 << 13)
-> >> -#define DBG_MDSCR_MDE		(1 << 15)
-> >> -#define DBG_MDSCR_MASK		~(DBG_MDSCR_KDE | DBG_MDSCR_MDE)
-> >> -
-> >>  #define	DBG_ESR_EVT(x)		(((x) >> 27) & 0x7)
-> >> =20
-> >>  /* AArch64 */
-> >> diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/de=
-bug-monitors.c
-> >> index 58f047de3e1c..08f1d02507cd 100644
-> >> --- a/arch/arm64/kernel/debug-monitors.c
-> >> +++ b/arch/arm64/kernel/debug-monitors.c
-> >> @@ -34,7 +34,7 @@ u8 debug_monitors_arch(void)
-> >>  /*
-> >>   * MDSCR access routines.
-> >>   */
-> >> -static void mdscr_write(u32 mdscr)
-> >> +static void mdscr_write(u64 mdscr)
-> >>  {
-> >>  	unsigned long flags;
-> >>  	flags =3D local_daif_save();
-> >> @@ -43,7 +43,7 @@ static void mdscr_write(u32 mdscr)
-> >>  }
-> >>  NOKPROBE_SYMBOL(mdscr_write);
-> >> =20
-> >> -static u32 mdscr_read(void)
-> >> +static u64 mdscr_read(void)
-> >>  {
-> >>  	return read_sysreg(mdscr_el1);
-> >>  }
-> >> @@ -79,16 +79,16 @@ static DEFINE_PER_CPU(int, kde_ref_count);
-> >> =20
-> >>  void enable_debug_monitors(enum dbg_active_el el)
-> >>  {
-> >> -	u32 mdscr, enable =3D 0;
-> >> +	u64 mdscr, enable =3D 0;
-> >> =20
-> >>  	WARN_ON(preemptible());
-> >> =20
-> >>  	if (this_cpu_inc_return(mde_ref_count) =3D=3D 1)
-> >> -		enable =3D DBG_MDSCR_MDE;
-> >> +		enable =3D MDSCR_EL1_MDE;
-> >> =20
-> >>  	if (el =3D=3D DBG_ACTIVE_EL1 &&
-> >>  	    this_cpu_inc_return(kde_ref_count) =3D=3D 1)
-> >> -		enable |=3D DBG_MDSCR_KDE;
-> >> +		enable |=3D MDSCR_EL1_KDE;
-> >> =20
-> >>  	if (enable && debug_enabled) {
-> >>  		mdscr =3D mdscr_read();
-> >> @@ -100,16 +100,16 @@ NOKPROBE_SYMBOL(enable_debug_monitors);
-> >> =20
-> >>  void disable_debug_monitors(enum dbg_active_el el)
-> >>  {
-> >> -	u32 mdscr, disable =3D 0;
-> >> +	u64 mdscr, disable =3D 0;
-> >> =20
-> >>  	WARN_ON(preemptible());
-> >> =20
-> >>  	if (this_cpu_dec_return(mde_ref_count) =3D=3D 0)
-> >> -		disable =3D ~DBG_MDSCR_MDE;
-> >> +		disable =3D ~MDSCR_EL1_MDE;
-> >> =20
-> >>  	if (el =3D=3D DBG_ACTIVE_EL1 &&
-> >>  	    this_cpu_dec_return(kde_ref_count) =3D=3D 0)
-> >> -		disable &=3D ~DBG_MDSCR_KDE;
-> >> +		disable &=3D ~MDSCR_EL1_KDE;
-> >> =20
-> >>  	if (disable) {
-> >>  		mdscr =3D mdscr_read();
-> >> @@ -415,7 +415,7 @@ void kernel_enable_single_step(struct pt_regs *reg=
-s)
-> >>  {
-> >>  	WARN_ON(!irqs_disabled());
-> >>  	set_regs_spsr_ss(regs);
-> >> -	mdscr_write(mdscr_read() | DBG_MDSCR_SS);
-> >> +	mdscr_write(mdscr_read() | MDSCR_EL1_SS);
-> >>  	enable_debug_monitors(DBG_ACTIVE_EL1);
-> >>  }
-> >>  NOKPROBE_SYMBOL(kernel_enable_single_step);
-> >> @@ -423,7 +423,7 @@ NOKPROBE_SYMBOL(kernel_enable_single_step);
-> >>  void kernel_disable_single_step(void)
-> >>  {
-> >>  	WARN_ON(!irqs_disabled());
-> >> -	mdscr_write(mdscr_read() & ~DBG_MDSCR_SS);
-> >> +	mdscr_write(mdscr_read() & ~MDSCR_EL1_SS);
-> >>  	disable_debug_monitors(DBG_ACTIVE_EL1);
-> >>  }
-> >>  NOKPROBE_SYMBOL(kernel_disable_single_step);
-> >> @@ -431,7 +431,7 @@ NOKPROBE_SYMBOL(kernel_disable_single_step);
-> >>  int kernel_active_single_step(void)
-> >>  {
-> >>  	WARN_ON(!irqs_disabled());
-> >> -	return mdscr_read() & DBG_MDSCR_SS;
-> >> +	return mdscr_read() & MDSCR_EL1_SS;
-> >>  }
-> >>  NOKPROBE_SYMBOL(kernel_active_single_step);
-> >> =20
-> >> diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entr=
-y-common.c
-> >> index 7c1970b341b8..171f93f2494b 100644
-> >> --- a/arch/arm64/kernel/entry-common.c
-> >> +++ b/arch/arm64/kernel/entry-common.c
-> >> @@ -344,7 +344,7 @@ static DEFINE_PER_CPU(int, __in_cortex_a76_erratum=
-_1463225_wa);
-> >> =20
-> >>  static void cortex_a76_erratum_1463225_svc_handler(void)
-> >>  {
-> >> -	u32 reg, val;
-> >> +	u64 reg, val;
-> >> =20
-> >>  	if (!unlikely(test_thread_flag(TIF_SINGLESTEP)))
-> >>  		return;
-> >> @@ -354,7 +354,7 @@ static void cortex_a76_erratum_1463225_svc_handler=
-(void)
-> >> =20
-> >>  	__this_cpu_write(__in_cortex_a76_erratum_1463225_wa, 1);
-> >>  	reg =3D read_sysreg(mdscr_el1);
-> >> -	val =3D reg | DBG_MDSCR_SS | DBG_MDSCR_KDE;
-> >> +	val =3D reg | MDSCR_EL1_SS | MDSCR_EL1_KDE;
-> >>  	write_sysreg(val, mdscr_el1);
-> >>  	asm volatile("msr daifclr, #8");
-> >>  	isb();
-> >=20
-> > Whilst you're at it, please also change the open-coded constant in
-> > __cpu_setup to MDSCR_EL1_TDCC.
->=20
-> I believe you are suggesting about the following change, will fold
-> in the patch. But I guess 'mov' would still be preferred compared
-> to 'mov_q' as MDSCR_EL1_TDCC is a 32 bit constant (atleast the non
-> zero portion) ?
 
-Digression: I'm not sure why you'd ever consider using mov_q for a
-single-bit constant, irrespective of where that bit is set. The mov
-instruction (and all the logical operations taking an immediate as a
-parameter) can encode any contiguous stream of 1s with an arbitrary
-rotation. See C6.2.247 and co.
 
->=20
-> --- a/arch/arm64/mm/proc.S
-> +++ b/arch/arm64/mm/proc.S
-> @@ -454,7 +454,7 @@ SYM_FUNC_START(__cpu_setup)
->         dsb     nsh
->=20
->         msr     cpacr_el1, xzr                  // Reset cpacr_el1
-> -       mov     x1, #1 << 12                    // Reset mdscr_el1 and di=
-sable
-> +       mov     x1, MDSCR_EL1_TDCC              // Reset mdscr_el1 and di=
-sable
->         msr     mdscr_el1, x1                   // access to the DCC from=
- EL0
->         reset_pmuserenr_el0 x1                  // Disable PMU access fro=
-m EL0
->         reset_amuserenr_el0 x1                  // Disable AMU access fro=
-m EL0
+On 6/9/2025 8:04 PM, Sean Christopherson wrote:
+> On Mon, Jun 09, 2025, Sairaj Kodilkar wrote:
+>> Hi Sean,
+>>
+>> Sorry for the delay in testing. All sanity tests are OK. I reran the performance
+>> test on the V2 and noticed that V2 has significantly more GALOG entries than V1
+>> for all three cases. I also noticed that the Guest Nvme interrupt rate has
+>> dropped for the 192 VCPUS.
+> 
+> Hmm, I don't see any obvious bugs or differences (based on a code diffed between
+> v1 and v2).  I'll poke at the GALogIntr behavior just to double check, but my
+> guess is that the differences are due to exernal factors, e.g. guest behavior,
+> timing, scheduling, etc.
+> 
+> IOPS are all nearly identical, so I'm not terribly concerned.
+>   
+>
 
-Yes.
+Yep you are right. I was indeed using different guest kernel to test V2.
+Keeping it same, I can produce almost identical results for both V1 and
+V2.
 
-	M.
+Only one case that still stands out is with 32 vCPUS, where posted
+interrupt count has increased from 200 to 7000. But IOPS and NVME
+interrupt rate is identical hence I am not concerned about it as well.
 
---=20
-Without deviation from the norm, progress is not possible.
+
+Thanks
+Sairaj
 
