@@ -1,172 +1,288 @@
-Return-Path: <kvm+bounces-49272-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49273-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05BA5AD73BB
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 16:25:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F87AD741F
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 16:39:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 256D31888773
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 14:19:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07C8C18871F4
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 14:35:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DE423C8A1;
-	Thu, 12 Jun 2025 14:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69836248F63;
+	Thu, 12 Jun 2025 14:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="dOI4lOF1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fu6d35Db"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E672E149C4D
-	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 14:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E25246BC9
+	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 14:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749737822; cv=none; b=gIzvy3uBkffU1LsJegoPvENOdPi1vYeRY5Ztzh/sagjUuyLixfqsxWv8nR2U79upC5B0i+WULPtn6iDy0LiGRiqqRwDI76qp+MGE6kQ9gyHUGVBvOfTl27kCFGimtSQtdnY+pmyOT1qeCXi5n+mF2Kt2w7dec9oXO+cUdtggouw=
+	t=1749738880; cv=none; b=uvNwQ3NNQop3uUOEJtyEYf86XQwKpISfiVsRa1KnOdu97p7ZEtqROU5HHbUI0wHWGtAw/R0b+XuLZKBpX8qgFqvJzYvBjOgqlguWIWNjHF9/+GQahjQuGRYRx04JQKlIP9PIQWcX8kC2qg5FAfCoULv+uUysnoapO5V750BJ2to=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749737822; c=relaxed/simple;
-	bh=d7VBfmhbDpsmKiOGX/ldN3DPv9ez9U3K2i2Ztppcl+M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fDG+kV3beUAFCzFwnRlF+Mp87mdssMbVGYOTbU/1eDbiEOImzGQXaRzmj/BaANI55m+YEnepq2BtFxhSYAJ/eRae+W1xZ2GoOPSvp4RbAWuHQUaWPbVGQssysseI0LKi/ntE3NsMBDNOJOw2qdy6hZZIiS8+XHpycjcjWxFH+Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=dOI4lOF1; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a4f72cba73so1578248f8f.1
-        for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 07:17:00 -0700 (PDT)
+	s=arc-20240116; t=1749738880; c=relaxed/simple;
+	bh=C5qtus052bCsWzLSi4k2AO3g61EBMbo6+ArX0lL6UPo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Y5LgnNbPHVisgszs0I2fY95oqPKLi+q2VeCCnVljNrKVFDkCpbQNyrzvtV8nXBI26ypxkGXVLp86PP4CefYnEX/GmVZXR66oGH8bGTGoRgFuNKZIgjjdRtgyKjUmvl49OFvHVZKt4iC3eKqFPNqVH0DEQI176bB5VUgqR5SN0Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fu6d35Db; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311d670ad35so1051534a91.3
+        for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 07:34:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1749737819; x=1750342619; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=C6E7EzF5woM+zQqsJQ3arM6v7PvlMDD/avhtrC6dK0A=;
-        b=dOI4lOF13uAx/fl2kCNUPCUwxmKWuiidk5NxYiyYWLHxHrfR8wA6NHmMYbDmoL7cBS
-         M5PSg4RvJOT4kTLDz+qUWSdb7nIO4jmp2uzxjhNd97VExwnAA/qpANOV47q7c0H4LTS2
-         udiLeaZ+uc291dQjIABIM+/uDLUug8I7Jo4VRDXdgsRn5EySiQuROeeS+yvJzQEJpv9p
-         r3dufSTbkTDT61jOXJrkk6tfiuzC09bReyfiRHHIsaO+eNn9ZW45/LkD52ivPc2Kdd3T
-         sbv6ZmieX7ct+g6AkC5NVLuIxe6E0E6mKkvqoIcLH5xy3DcAXijlPmkzlKmC79ybj8Mj
-         DpuQ==
+        d=google.com; s=20230601; t=1749738877; x=1750343677; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bCkqRQ65xZAC1T38W5bWrrAPN4EJG3gT3DO5Cch9Ys0=;
+        b=fu6d35DbJ94xRMsYAuyfkeh7WzppWlTiJ9ZZv1hEw9OTE9+ycZ1aYQczGAQAuQdci6
+         9+8xi3XLDhu4yBI2LLSb8C0vebg3S6uIyrY+fJPKtsHY3/qsqV3NUSW/AvLuLfCaGfXF
+         F9/DKeYvLnLpOXFMh1F0K1gbXWzbtPF8YjoU2U3KqK03Wrv25XexJXewsgGLtkguLioz
+         KmDFHGwO7t5Pq5hM/u5feFFx2cMNcMN//GNXRnZxCxibe3FuVzOBgehpXp5oElwNR2oN
+         +Rq9GaUBDP4wFD3nU4dIB/ZqPCg3s0UfL6nW/uBTKUhjziBSy3x7jlaTcV7taAdWlemA
+         znIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749737819; x=1750342619;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C6E7EzF5woM+zQqsJQ3arM6v7PvlMDD/avhtrC6dK0A=;
-        b=WAp9Xh68YzkojzM9zP4ZJs15jAxBMorpqCx59wrCxEJfMEUhvkYhbCsaXixN27BzE0
-         K1WXV51E98LHW08tdrnuNSNsjLadWJ6WS6pPm+fCaVfJAhDW7C39dgmULazXCbBLNMSO
-         OvXa5YemdBOiJMniCYZA1ZghW+jWKcOkxDVYDepsT66jBLmK9L6MSJfhg6medbEa+g+i
-         OQuxX1UBM8hJuupi+a+smgAN8xUdoC9OfeY8QJR9F4AwtaIfDuHU6VW7p5TgkO5IdrQC
-         aNz8dydMhgzq3S7RG/tfcf1YJpXfrf7oeKaY5NZQ4pAy+GgLjnZnyyF0kX/tZ5s4xUEJ
-         xFvQ==
-X-Gm-Message-State: AOJu0YzGpm90Ubybp2iWP9pnxTrVDn9Uks5PjZGJcKuOFlogNT0xgiZx
-	G5LgI05finTDD9Y2UWoV1xic2s2QbuV04IksiLH0C+PiD3PMYGbDzbNiruEsSADbY7M=
-X-Gm-Gg: ASbGncudBMuT28LfJRx02QXt6x16FwvnK1QHgdzqCVgZgE0r4ydupemfegbE0AxiTMq
-	Tj3F39rjSl+p9I3ARio8RKNKvKKhA6t6TJ8Inr0M2yHSe1jPQcs3NxEWmKfgEEcIp7t55svm7ag
-	CTJMWnfMS8KBxF9RWHdcSL0TmAcMw6Qm8bxwtzKsma8CiOtOCT9qrpYqJOOybSAQUXpnd2amJ+E
-	iLDL0fMZi2Pe7FPTQc6B7s5wHIirKf0htX4fM4hROnv6+uXWJ1VayFDezh2M73akM6S4uzQIvSD
-	qPA+skJ4V2dvAeixjyklEU7e1/9kkQzUDbUpk0CxlKblBnX0Tv/xWcoa13ikY+wG3yBJDi6ksm+
-	j9uqIzOdiz7vb1betw/iLa/U=
-X-Google-Smtp-Source: AGHT+IHz1Rk9owizgBNMpEzoUrOt7ttoKA9V1V1G94O/ZoRyTiXvcJnp8uvrhDtyDKYa+5j5tkdZBg==
-X-Received: by 2002:a05:6000:178d:b0:3a4:da0e:517a with SMTP id ffacd0b85a97d-3a5608135aemr3301284f8f.23.1749737819070;
-        Thu, 12 Jun 2025 07:16:59 -0700 (PDT)
-Received: from bell.fritz.box (pd95ed419.dip0.t-ipconnect.de. [217.94.212.25])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a561a3ce6bsm2104297f8f.49.2025.06.12.07.16.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 07:16:58 -0700 (PDT)
-From: Mathias Krause <minipli@grsecurity.net>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org,
-	Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH] x86/emulator64: Extend non-canonical memory access tests with CR2 coverage
-Date: Thu, 12 Jun 2025 16:16:37 +0200
-Message-Id: <20250612141637.131314-1-minipli@grsecurity.net>
-X-Mailer: git-send-email 2.30.2
+        d=1e100.net; s=20230601; t=1749738877; x=1750343677;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bCkqRQ65xZAC1T38W5bWrrAPN4EJG3gT3DO5Cch9Ys0=;
+        b=nEs5ZzdFKeH9H9ZXZNzqMtfhntGg6ft3CnyKbxa7hrsyHabfTxYtRQ4rcYTJULh8Ei
+         aPYCRDdU056ad2EN20fLvcF/667/XkuNxJxZ7iBcCz8LklkkxhkslZpUIHJ6xCknl7gu
+         ZV6qFHS6g8dPyIUuHnikvTGxKQuofRZYr2oaCj+kiFf9Bjd+7UrKHG4g3LBAmlyWAVae
+         8R0xtQozPf9/TLSPJi1ZTZHett10aTolzlRRYqxoC9rG7wsJBJ0NoY5lHfvtsRRrg/rX
+         kWcMQf1bVracDF9DR6VEFtNG1Cn2yYNX4mun52odFW3qkLiMZRR9m4o7nRcQ0503La3N
+         Jp3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWZ73H8rbWFxf/D+K0DyyBYeYQGeQhJxBW2+zA3oyKwyNyDhG4cFU0SrVM7UY6/kem6ago=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgRCVZLj7LPdjPAwYojFaWhAiTXKGh1tXxcsAkM/jkXGPyO9aM
+	t5s7sHLfzNwUnlYgBNe//FDCqk9St7m4YFKkXMUHgpqkISjGbk/+5S84jrBm8Y9bG9Mj7aB4e76
+	ej5nPLA==
+X-Google-Smtp-Source: AGHT+IFvgFX45fAef1k8uZ/3DR+A7ppsnjKdR6QYSkMmUdo4ZfmyvklPkUSYEBb4bT/S6wp2Q15cPG3uYow=
+X-Received: from pjbof7.prod.google.com ([2002:a17:90b:39c7:b0:312:e5dd:9248])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:48c1:b0:311:ea13:2e63
+ with SMTP id 98e67ed59e1d1-313d7dda00fmr200540a91.13.1749738876902; Thu, 12
+ Jun 2025 07:34:36 -0700 (PDT)
+Date: Thu, 12 Jun 2025 07:34:35 -0700
+In-Reply-To: <86tt4lcgs3.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-4-seanjc@google.com>
+ <86tt4lcgs3.wl-maz@kernel.org>
+Message-ID: <aErlezuoFJ8u0ue-@google.com>
+Subject: Re: [PATCH v3 02/62] KVM: arm64: WARN if unmapping vLPI fails
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Joerg Roedel <joro@8bytes.org>, David Woodhouse <dwmw2@infradead.org>, 
+	Lu Baolu <baolu.lu@linux.intel.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Extend the non-canonical memory access tests to verify CR2 stays
-unchanged.
+On Thu, Jun 12, 2025, Marc Zyngier wrote:
+> On Wed, 11 Jun 2025 23:45:05 +0100,
+> Sean Christopherson <seanjc@google.com> wrote:
+> > 
+> > WARN if unmapping a vLPI in kvm_vgic_v4_unset_forwarding() fails, as
+> > failure means an IRTE has likely been left in a bad state, i.e. IRQs
+> > won't go where they should.
+> 
+> I have no idea what an IRTE is.
 
-There's currently a bug in QEMU/TCG that breaks that assumption.
+Sorry, x86 IOMMU terminology (Interrupt Remapping Table Entry).  I think the GIC
+terminology would be ITS entry?  Or maybe ITS mapping?
 
-Link: https://gitlab.com/qemu-project/qemu/-/issues/928
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
----
- x86/emulator64.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+> But not having an VLPI mapping for an interrupt at the point where we're
+> tearing down the forwarding is pretty benign. IRQs *still* go where they
+> should, and we don't lose anything.
 
-diff --git a/x86/emulator64.c b/x86/emulator64.c
-index 5d1bb0f06d4f..abef2bda29f1 100644
---- a/x86/emulator64.c
-+++ b/x86/emulator64.c
-@@ -325,16 +325,39 @@ static void test_mmx_movq_mf(uint64_t *mem)
- 	report(exception_vector() == MF_VECTOR, "movq mmx generates #MF");
+This is the code I'm trying to refer to:
+
+  static int its_vlpi_unmap(struct irq_data *d)
+  {
+	struct its_device *its_dev = irq_data_get_irq_chip_data(d);
+	u32 event = its_get_event_id(d);
+
+	if (!its_dev->event_map.vm || !irqd_is_forwarded_to_vcpu(d))  <=== this shouldn't happen?
+		return -EINVAL;
+
+	/* Drop the virtual mapping */
+	its_send_discard(its_dev, event);
+
+	/* and restore the physical one */
+	irqd_clr_forwarded_to_vcpu(d);
+	its_send_mapti(its_dev, d->hwirq, event);
+	lpi_update_config(d, 0xff, (lpi_prop_prio |
+				    LPI_PROP_ENABLED |
+				    LPI_PROP_GROUP1));
+
+	/* Potentially unmap the VM from this ITS */
+	its_unmap_vm(its_dev->its, its_dev->event_map.vm);
+
+	/*
+	 * Drop the refcount and make the device available again if
+	 * this was the last VLPI.
+	 */
+	if (!--its_dev->event_map.nr_vlpis) {
+		its_dev->event_map.vm = NULL;
+		kfree(its_dev->event_map.vlpi_maps);
+	}
+
+	return 0;
+  }
+
+When called from kvm_vgic_v4_unset_forwarding()
+
+	if (irq->hw) {
+		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
+		irq->hw = false;
+		ret = its_unmap_vlpi(host_irq);
+	}
+
+IIUC, irq->hw is set if and only if KVM has configured the IRQ to be fowarded
+directly to a vCPU.  Based on this comment in its_map_vlpi(): 
+
+	/*
+	 * The host will never see that interrupt firing again, so it
+	 * is vital that we don't do any lazy masking.
+	 */
+
+and this code in its_vlpi_map():
+
+
+		/* Drop the physical mapping */
+		its_send_discard(its_dev, event);
+
+my understanding is that the associated physical IRQ will not be delivered to the
+host while the IRQ is being forwarded to a vCPU.
+
+irq->hw should only become true for MSIs (I'm crossing my fingers that SGIs aren't
+in play here) if its_map_vlpi() succeeds:
+
+	ret = its_map_vlpi(virq, &map);
+	if (ret)
+		goto out_unlock_irq;
+
+	irq->hw		= true;
+	irq->host_irq	= virq;
+	atomic_inc(&map.vpe->vlpi_count);
+
+and so if its_unmap_vlpi() fails in kvm_vgic_v4_unset_forwarding(), then from KVM's
+perspective, the worst case scenario is that an IRQ has been left in a forwarded
+state, i.e. the physical mapping hasn't been reinstalled.
+
+KVM already WARNs if kvm_vgic_v4_unset_forwarding() fails when KVM is reacting to
+a routing change (this is the WARN I want to move into arch code so that
+kvm_arch_update_irqfd_routing() doesn't plumb a pointless error code up the stack):
+
+		if (irqfd->producer &&
+		    kvm_arch_irqfd_route_changed(&old, &irqfd->irq_entry)) {
+			int ret = kvm_arch_update_irqfd_routing(
+					irqfd->kvm, irqfd->producer->irq,
+					irqfd->gsi, 1);
+			WARN_ON(ret);
+		}
+
+It's only the kvm_arch_irq_bypass_del_producer() case where KVM doesn't WARN.  If
+that fails, then the IRQ has potentially been left in a forwarded state, despite
+whatever driver "owns" the physical IRQ having removed its producer.  E.g. if VFIO
+detaches its irqbypass producer and gives the device back to the host, then
+whatever is using the device in the host won't receive IRQs as expected.
+
+Looking at this again, its_free_ite() also WARNs on its_unmap_vlpi() failure, so
+wouldn't it make sense to have its_unmap_vlpi() WARN if irq_set_vcpu_affinity()
+fails?  The only possible failures are that the GIC doesn't have a v4 ITS (from
+its_irq_set_vcpu_affinity()):
+
+	/* Need a v4 ITS */
+	if (!is_v4(its_dev->its))
+		return -EINVAL;
+
+	guard(raw_spinlock)(&its_dev->event_map.vlpi_lock);
+
+	/* Unmap request? */
+	if (!info)
+		return its_vlpi_unmap(d);
+
+or that KVM has gotten out of sync with the GIC/ITS (from its_vlpi_unmap()):
+
+	if (!its_dev->event_map.vm || !irqd_is_forwarded_to_vcpu(d))
+		return -EINVAL;
+
+All of those failure scenario seem like warnable offences when KVM thinks it has
+configured the IRQ to be forwarded to a vCPU.
+
+E.g.
+
+--
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 534049c7c94b..98630dae910d 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -758,7 +758,7 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
+        if (irq) {
+                scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
+                        if (irq->hw)
+-                               WARN_ON(its_unmap_vlpi(ite->irq->host_irq));
++                               its_unmap_vlpi(ite->irq->host_irq);
+ 
+                        irq->hw = false;
+                }
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index 193946108192..911170d4a9c8 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -545,10 +545,10 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int host_irq)
+        if (irq->hw) {
+                atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
+                irq->hw = false;
+-               ret = its_unmap_vlpi(host_irq);
++               its_unmap_vlpi(host_irq);
+        }
+ 
+        raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+        vgic_put_irq(kvm, irq);
+-       return ret;
++       return 0;
+ }
+diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+index 58c28895f8c4..8455b4a5fbb0 100644
+--- a/drivers/irqchip/irq-gic-v4.c
++++ b/drivers/irqchip/irq-gic-v4.c
+@@ -342,10 +342,10 @@ int its_get_vlpi(int irq, struct its_vlpi_map *map)
+        return irq_set_vcpu_affinity(irq, &info);
  }
  
-+#define CR2_REF_VALUE	0xdecafbadUL
-+
-+static void setup_cr2(void)
-+{
-+	write_cr2(CR2_REF_VALUE);
-+}
-+
-+static void check_cr2(void)
-+{
-+	unsigned long cr2 = read_cr2();
-+
-+	if (cr2 == CR2_REF_VALUE) {
-+		report(true, "CR2 unchanged");
-+	} else {
-+		report(false, "CR2 changed from %#lx to %#lx", CR2_REF_VALUE, cr2);
-+		setup_cr2();
-+	}
-+}
-+
- static void test_jmp_noncanonical(uint64_t *mem)
+-int its_unmap_vlpi(int irq)
++void its_unmap_vlpi(int irq)
  {
-+	setup_cr2();
- 	*mem = NONCANONICAL;
- 	asm volatile (ASM_TRY("1f") "jmp *%0; 1:" : : "m"(*mem));
- 	report(exception_vector() == GP_VECTOR,
- 	       "jump to non-canonical address");
-+	check_cr2();
+        irq_clear_status_flags(irq, IRQ_DISABLE_UNLAZY);
+-       return irq_set_vcpu_affinity(irq, NULL);
++       WARN_ON_ONCE(irq_set_vcpu_affinity(irq, NULL));
  }
  
- static void test_reg_noncanonical(void)
- {
-+	setup_cr2();
-+
- 	/* RAX based, should #GP(0) */
- 	asm volatile(ASM_TRY("1f") "orq $0, (%[noncanonical]); 1:"
- 		     : : [noncanonical]"a"(NONCANONICAL));
-@@ -342,6 +365,7 @@ static void test_reg_noncanonical(void)
- 	       "non-canonical memory access, should %s(0), got %s(%u)",
- 	       exception_mnemonic(GP_VECTOR),
- 	       exception_mnemonic(exception_vector()), exception_error_code());
-+	check_cr2();
- 
- 	/* RSP based, should #SS(0) */
- 	asm volatile(ASM_TRY("1f") "orq $0, (%%rsp,%[noncanonical],1); 1:"
-@@ -350,6 +374,7 @@ static void test_reg_noncanonical(void)
- 	       "non-canonical rsp-based access, should %s(0), got %s(%u)",
- 	       exception_mnemonic(SS_VECTOR),
- 	       exception_mnemonic(exception_vector()), exception_error_code());
-+	check_cr2();
- 
- 	/* RBP based, should #SS(0) */
- 	asm volatile(ASM_TRY("1f") "orq $0, (%%rbp,%[noncanonical],1); 1:"
-@@ -358,6 +383,7 @@ static void test_reg_noncanonical(void)
- 	       "non-canonical rbp-based access, should %s(0), got %s(%u)",
- 	       exception_mnemonic(SS_VECTOR),
- 	       exception_mnemonic(exception_vector()), exception_error_code());
-+	check_cr2();
- }
- 
- static void test_movabs(uint64_t *mem)
--- 
-2.30.2
+ int its_prop_update_vlpi(int irq, u8 config, bool inv)
+diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+index 7f1f11a5e4e4..0b0887099fd7 100644
+--- a/include/linux/irqchip/arm-gic-v4.h
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -146,7 +146,7 @@ int its_commit_vpe(struct its_vpe *vpe);
+ int its_invall_vpe(struct its_vpe *vpe);
+ int its_map_vlpi(int irq, struct its_vlpi_map *map);
+ int its_get_vlpi(int irq, struct its_vlpi_map *map);
+-int its_unmap_vlpi(int irq);
++void its_unmap_vlpi(int irq);
+ int its_prop_update_vlpi(int irq, u8 config, bool inv);
+ int its_prop_update_vsgi(int irq, u8 priority, bool group);
+
 
 
