@@ -1,133 +1,119 @@
-Return-Path: <kvm+bounces-49227-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49228-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 457C0AD676C
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 07:41:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A34D9AD6810
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 08:34:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2039D3A33AF
-	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 05:41:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DC813AE109
+	for <lists+kvm@lfdr.de>; Thu, 12 Jun 2025 06:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A591E9B28;
-	Thu, 12 Jun 2025 05:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76EEC1F473A;
+	Thu, 12 Jun 2025 06:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l9CKBv36"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FG1YAw4d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0482F1798F;
-	Thu, 12 Jun 2025 05:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FE31F153A
+	for <kvm@vger.kernel.org>; Thu, 12 Jun 2025 06:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749706896; cv=none; b=KlWJkf0z5MGex4sF+Xhr9ILHiRlGGAqW/Guc5WdD466QE5VZqdZnBE+afEXR1uoc2DhvNJIRc1pT8qyDq2cJd3oVZ2OA+5b5imL03nbQJez1NqXCAooCZBd3PswZc3Rpg1F2R6+Io3bRLGSSZXhl2j5Z+UV5UGrCTrZkMAd4hfU=
+	t=1749710039; cv=none; b=FcBpeWAZ3LTASqNcpqtc815ajssWwpJ90UyLtIwNme3XkkeyvuUU51aNICR63JW4b2xiRK7ke5bTMdEHsKS+nnjp5CWpB2juIayw8Ff5M7gTF5gn6P7E9siqosVmEGInOzDZU5fsamD4Q20VvbXDKuMWn53G0HV10Ntz0z+ffNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749706896; c=relaxed/simple;
-	bh=MVwiMWOB+RZa3CMd6OW3EQuZjFNX92K9tTPczDmVAYM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jyW3SOOr43CslKAY2vGbQAul2eFae5LEsQUh4Hrfq8HRrj64qEUg51Iii3wQ7409zqZBqjvaStXsdx8q+NKKgyOZzUInA8CIAdpuc883jexmi0vX6EM7m8Qs+Qz2KHBlud8X7wtYMdyW2eX58mH3OkM6lzfgTC4gbbDd1fK3a2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l9CKBv36; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1749706895; x=1781242895;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=MVwiMWOB+RZa3CMd6OW3EQuZjFNX92K9tTPczDmVAYM=;
-  b=l9CKBv36GlirXtVzy3++/HbCYLb014CQeE/enEmB73XYPQL7SBG48q+H
-   q0YMyq1ZR2/QTdL/9ur3dcdckQigDD9N74dyohnsrP1x0Q1toXDMz6sj4
-   +dXhJRFGXs0yqvSJY+tpKBMk7+YR+C6h7kQD9vneLBz9G5KWyjGMxby/o
-   UcGGBSvH6t6kixe4JRbvjB6pLJxTljyPMst56CozXQ0F1FlrIjEHq6xLW
-   tAvXOoS293tSOlOzXtmrNVVIiA/Cz14e2HI7/u2oJ8iPJZ4RG+uLDX/wB
-   3WUoVpDNJg1S8fwUPXpcGLoj1EsczABufNqT9q9/I6ziUoOLI5cF2P90P
-   g==;
-X-CSE-ConnectionGUID: 8TuH7jsER3KaVQITx/hS2Q==
-X-CSE-MsgGUID: eof6/NbzTfG5qFMPYV0ypw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11461"; a="55669806"
-X-IronPort-AV: E=Sophos;i="6.16,230,1744095600"; 
-   d="scan'208";a="55669806"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 22:41:34 -0700
-X-CSE-ConnectionGUID: YiPn0AsZS4GnJnRX2ah+cQ==
-X-CSE-MsgGUID: aGRd18cHTaqjiib4PQLfng==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,230,1744095600"; 
-   d="scan'208";a="178375661"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2025 22:41:32 -0700
-Message-ID: <d5f528c2-3518-4251-a50b-2d1f36c1662e@intel.com>
-Date: Thu, 12 Jun 2025 13:41:30 +0800
+	s=arc-20240116; t=1749710039; c=relaxed/simple;
+	bh=0RFsYK4/bVTOu8PeXbzz5JHWzOqZR66/rgr6E+bl00g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dIoZ01UYLhMBN32nKITJBiS0+NRpno4tCJcZtjFVaFtvgZzwDQKFneNIFIJ2OT5pSbOASJCnDe/1dKiwS/7Sty3/UQUjtvM5FgTSBiJcdQLW5cO6a5zphtfaOmuheTIEc57KBcL1sTuL7FGsQx3C6lzA5su40f9EUN9MafDSF38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FG1YAw4d; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749710037;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Nm9TV6R7Y41QOfPJ6MP5oIIesRRVBP6gVfG7mX/j6mc=;
+	b=FG1YAw4d5dkWe3aoJEA7k7DHsnFyilE+sHssLrobtcImsqeN8yXlGpYSL8GTHTbqZVtcwp
+	0O8z1LOLDlxi4boGFzxM6Sg8g2H99Y5m5Z96AEz9AP7sJD87Riht5JMfic4YiS4c6F7AQ0
+	OepoAyps9JWEDcVbG9IWYoz5EiZXFxQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-540-Sym5lvlhMEymcj65m_zV1w-1; Thu, 12 Jun 2025 02:33:54 -0400
+X-MC-Unique: Sym5lvlhMEymcj65m_zV1w-1
+X-Mimecast-MFC-AGG-ID: Sym5lvlhMEymcj65m_zV1w_1749710034
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-450787c8626so2827185e9.1
+        for <kvm@vger.kernel.org>; Wed, 11 Jun 2025 23:33:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749710033; x=1750314833;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nm9TV6R7Y41QOfPJ6MP5oIIesRRVBP6gVfG7mX/j6mc=;
+        b=P7BzTm+P/lGe44IWum3vFQLU/gru9wF2JrrMxqIhhwS0a5iWcxmLuMTlHxwaY1oY5E
+         uLm550QT2bTY0Glw8hMOqHWmR5OShG+DeVh2DENxQqUVF9Ev37mBhAGlR646R9GNT0hw
+         Tu6FSwwZ6W5s7c5CmJpJYyNh7eMcAszMn423+Obs5UiuySUs5dhK7DXyQaRnycZi2hHh
+         fk+c8WcTl+NxcbsdOdhelNhHxyDwi+irONdcVs//vvCHjzIsiKajcbL6x7Dezkgl9Q9u
+         PMrYW5ibFPi1iN1QelC/JNiyg6oPn6yZQ6Q9EYXPYg1L7LdR4HX6bJZekzlgh13a4xbU
+         9mxA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0qFf/nHKiZY8VWXQD+t4q0UbgzRVHY+YkvxZDSFux7PLDbVV57T1CUSXXuuesUDxKHgM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yys0/MivjTIbBIjI/6kuFbDmW+1T2WhjQY31D+rM9+fQXifU3iD
+	zu3w6ys6duBKsY/OPL2F8DqM8mSuHuRF7+dpU80O0wE97VcHmsI1X/SI4L0t7YfIFGeVTUV1dBf
+	Vy0ZG0hVk/7S8cTQCsMU6+ys2jNS7uH09k4u5/qwozu9e1J3wJzYhzQ==
+X-Gm-Gg: ASbGncvbecLrDal9ZgFCZHxKP6WYUZJWcnL84h1CsWxXl5J7RIscxDY8wrNHC9TArY7
+	FawCV12XtgiwxXaQwTq1EfsLSHOEUfr+D2qV/CdYpDtcSiTHm92qP2O2M9Xur+PApoEBtX/o/pV
+	KZxeIc0yk6KrRm0AkMC+lqcjoUptqYpB6dKlFg/rG1qUANEQAqH8ld1EfQWa4sHOikGM777aIsj
+	6KuouBlla/Y2/T2l2HcBteRcQvHM3SW21/84ucHZ1tnWAmf6y6x0LntbKKiuIAFyUL40Vv5/Vf9
+	1ukRQndFwuyi4aSe
+X-Received: by 2002:a05:600c:c162:b0:43c:fffc:786c with SMTP id 5b1f17b1804b1-4532d2f7108mr14039565e9.19.1749710033352;
+        Wed, 11 Jun 2025 23:33:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEUPXH7B83FgsgIbWOCFa8wLAry7d4eNcJALWMalXCx0ZQ4ODVUAv9DRXGbLvxZDae4zuYiyw==
+X-Received: by 2002:a05:600c:c162:b0:43c:fffc:786c with SMTP id 5b1f17b1804b1-4532d2f7108mr14039215e9.19.1749710032990;
+        Wed, 11 Jun 2025 23:33:52 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4531fe8526bsm43377245e9.0.2025.06.11.23.33.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jun 2025 23:33:51 -0700 (PDT)
+Date: Thu, 12 Jun 2025 02:33:48 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuewei Niu <niuxuewei97@gmail.com>
+Cc: sgarzare@redhat.com, Oxffffaa@gmail.com, avkrasnov@salutedevices.com,
+	davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
+	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com, stefanha@redhat.com,
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
+	Xuewei Niu <niuxuewei.nxw@antgroup.com>
+Subject: Re: [PATCH net] vsock/virtio: fix `rx_bytes` accounting for stream
+ sockets
+Message-ID: <20250612023334-mutt-send-email-mst@kernel.org>
+References: <20250521121705.196379-1-sgarzare@redhat.com>
+ <20250612053201.959017-1-niuxuewei.nxw@antgroup.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86/mmu: Reject direct bits in gpa passed to
- KVM_PRE_FAULT_MEMORY
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com,
- yan.y.zhao@intel.com
-References: <20250612044943.151258-1-pbonzini@redhat.com>
- <cfd99e56-551b-49c5-b486-05c9f6d8cf11@intel.com>
- <CABgObfafukOFkeR09krA5GVb3itfpHNHjBM0aRZj5t4EKJv7Dw@mail.gmail.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <CABgObfafukOFkeR09krA5GVb3itfpHNHjBM0aRZj5t4EKJv7Dw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250612053201.959017-1-niuxuewei.nxw@antgroup.com>
 
-On 6/12/2025 1:34 PM, Paolo Bonzini wrote:
-> On Thu, Jun 12, 2025 at 7:29 AM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->>
->> On 6/12/2025 12:49 PM, Paolo Bonzini wrote:
->>> Only let userspace pass the same addresses that were used in KVM_SET_USER_MEMORY_REGION
->>> (or KVM_SET_USER_MEMORY_REGION2); gpas in the the upper half of the address space
->>> are an implementation detail of TDX and KVM.
->>>
->>> Extracted from a patch by Sean Christopherson <seanjc@google.com>.
->>>
->>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>> ---
->>>    arch/x86/kvm/mmu/mmu.c | 3 +++
->>>    1 file changed, 3 insertions(+)
->>>
->>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
->>> index a4040578b537..4e06e2e89a8f 100644
->>> --- a/arch/x86/kvm/mmu/mmu.c
->>> +++ b/arch/x86/kvm/mmu/mmu.c
->>> @@ -4903,6 +4903,9 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
->>>        if (!vcpu->kvm->arch.pre_fault_allowed)
->>>                return -EOPNOTSUPP;
->>>
->>> +     if (kvm_is_gfn_alias(vcpu->kvm, gpa_to_gfn(range->gpa)))
->>> +             return -EINVAL;
->>
->> Do we need to worry about the case (range->gpa + range->size) becomes alias?
+On Thu, Jun 12, 2025 at 01:32:01PM +0800, Xuewei Niu wrote:
+> No comments since last month.
 > 
-> No, because the function only processes a single page and everything
-> in the non-aliased part of the address space *can* be prefaulted.
+> The patch [1], which adds SIOCINQ ioctl support for vsock, depends on this
+> patch. Could I get more eyes on this one?
 > 
-> KVM's generic kvm_vcpu_pre_fault_memory() call will see the EINVAL on
-> a later invocation and will stop processing the part of the request
-> that is has the shared/direct bit set.
+> [1]: https://lore.kernel.org/lkml/bbn4lvdwh42m2zvi3rdyws66y5ulew32rchtz3kxirqlllkr63@7toa4tcepax3/#t
+> 
+> Thanks,
+> Xuewei
 
-reasonable..
-
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-
-> Paolo
-> 
->>
->>>        /*
->>>         * reload is efficient when called repeatedly, so we can do it on
->>>         * every iteration.
->>
-> 
-> 
+it's been in net for two weeks now, no?
 
 
