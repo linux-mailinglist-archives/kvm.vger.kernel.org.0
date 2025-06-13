@@ -1,66 +1,67 @@
-Return-Path: <kvm+bounces-49460-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49461-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFBD8AD9312
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 18:46:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEE93AD9316
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 18:46:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A313E178288
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 16:46:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9259E1783D7
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 16:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9FF2222BB;
-	Fri, 13 Jun 2025 16:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF87B224B10;
+	Fri, 13 Jun 2025 16:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZWd70HMP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VnREP7yZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38DC15A87C
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 16:46:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D9A1E8338
+	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 16:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749833164; cv=none; b=ewq4ya/OX4rIiYDEACv9spadaU8t8E42YkralHu6cd1BWQ+LNTeyKwFgOk4IAkMl/gwRBZZKn5dIcX0adL6ZdI+j7TpS29pZ2TAiUiWF6tBCnQAsqg5k5omioJ/F3rvwyYfMpMuq0IKYpFjTYvan30zo/VeEzB2FPYLgsJDE2xQ=
+	t=1749833172; cv=none; b=NlO70z7cqdSPJB5JryHwvw3iugNfWzIpXOlarfqw8tt9rk08ayjPRQ/ONLJLupJnVi52dZxoM2SSk8+SheNWQHnrPlehCKaNvSaudpuPQtxJLJ8q7nxQVv1JmGJabJemSwEMdgGTex0kHLVAo7tqkbMVK1rp+UPsy6PPvt7pWvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749833164; c=relaxed/simple;
+	s=arc-20240116; t=1749833172; c=relaxed/simple;
 	bh=i4hm9CHKm/3oJOWsJxscFqz/8Ylt/YD/hMzaFSn5rPs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=fEossj+xG3lTYeyfmhro2PxAVefnBsNmGlYH7tUuIsAnqpzANHWFVWyxVUr7UJeN2yqXneLhVj2F7mWhUCWiMbuz4UpSP8APCUhQzO3G9zA2nzu2/rhB5V7yuclSjOFVOc6+gpVqYg19oHwyWMs4qRiJN+ytv+VMg+DgtGCnS7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZWd70HMP; arc=none smtp.client-ip=170.10.133.124
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jVj0RHptfGrZs75nvEQ6UepXLTPEmZN0C8bvg0utkitQBOhDOR3NwR/Lc0SpcMZm4qzTzEg4JaaTJ84+qiG1X2lGWxvLngXuyIhy7ytTkUi4RfCfLe1B5kadZ9UPQYuYzwVxox5So0XrDLiQAGJqxAtJLQ5DdaX7His8h9aUe/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VnREP7yZ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749833160;
+	s=mimecast20190719; t=1749833167;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
 	bh=bbROYjb4mdQOqht6aHh/H9xfCrTcRr7mEK6Oc+kCnJc=;
-	b=ZWd70HMP2m6o6pomnCk3SzzY2KlryEUKxWbSQy5G57dNxX0/umJ3vSYMz70VRwzEZLfSXw
-	kFvuTVTjE873Qk+42LiLX4cHk930RnQLLiVp2sf2bIUgcFqSaQ/kY1/m/Wwml3ih3z06v2
-	iQcdvkR66C9gZ/HZ6PNTw5k/rz2EZ/4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	b=VnREP7yZI9d9E3/y4D3KLjCvH4c6qcsaenYRTaqc7y+t1GddyH3ctqsYIyAJMxpK/O+TED
+	0tlpBHjrWjCa7am8GwZixn5R0F+wh4eCfh8bZTu27CHkJzqjF+6KvltUPTk+f2xBTG8Un1
+	Twnacdp4nDa0mXyP+B8pOly/RmB3e0s=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-172-qBL8VcTUMKOyuYyy47NJxw-1; Fri,
- 13 Jun 2025 12:45:58 -0400
-X-MC-Unique: qBL8VcTUMKOyuYyy47NJxw-1
-X-Mimecast-MFC-AGG-ID: qBL8VcTUMKOyuYyy47NJxw_1749833157
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-553-7I_JWVqIOZirAbcsISAQpw-1; Fri,
+ 13 Jun 2025 12:46:06 -0400
+X-MC-Unique: 7I_JWVqIOZirAbcsISAQpw-1
+X-Mimecast-MFC-AGG-ID: 7I_JWVqIOZirAbcsISAQpw_1749833165
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9FFB519560AA;
-	Fri, 13 Jun 2025 16:45:57 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E088E1800343;
+	Fri, 13 Jun 2025 16:46:04 +0000 (UTC)
 Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1F1BB180035C;
-	Fri, 13 Jun 2025 16:45:56 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4D1491956050;
+	Fri, 13 Jun 2025 16:46:04 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
+To: torvalds@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
 Subject: [GIT PULL] KVM fixes for Linux 6.16-rc2
-Date: Fri, 13 Jun 2025 12:45:56 -0400
-Message-ID: <20250613164556.163306-1-pbonzini@redhat.com>
+Date: Fri, 13 Jun 2025 12:46:03 -0400
+Message-ID: <20250613164603.163319-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,7 +69,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
 Linus,
 
