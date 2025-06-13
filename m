@@ -1,148 +1,160 @@
-Return-Path: <kvm+bounces-49461-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49462-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEE93AD9316
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 18:46:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1795DAD9359
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 19:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9259E1783D7
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 16:46:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE72A3B12A7
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 17:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF87B224B10;
-	Fri, 13 Jun 2025 16:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 881E2222574;
+	Fri, 13 Jun 2025 17:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VnREP7yZ"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="u9aG/XAy";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ocT+pKRE";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="u9aG/XAy";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ocT+pKRE"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D9A1E8338
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 16:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7223354739
+	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 17:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749833172; cv=none; b=NlO70z7cqdSPJB5JryHwvw3iugNfWzIpXOlarfqw8tt9rk08ayjPRQ/ONLJLupJnVi52dZxoM2SSk8+SheNWQHnrPlehCKaNvSaudpuPQtxJLJ8q7nxQVv1JmGJabJemSwEMdgGTex0kHLVAo7tqkbMVK1rp+UPsy6PPvt7pWvo=
+	t=1749834031; cv=none; b=ahHQn0AbZvkFGsIJhJVRjO7D+zgSmqqM/FShJkK8ZCBcK550PYDpG5IV14L4nksF00dh+l+b0v6i+w7KOqo/L7a+KPli+udZ+K6dn9/pI5OYhjE+0p9vNdSDCjJwTY5ueS+qQiA+zv1GbC0EYt+s0MVWQdP4b2SYz9WpWEbKU4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749833172; c=relaxed/simple;
-	bh=i4hm9CHKm/3oJOWsJxscFqz/8Ylt/YD/hMzaFSn5rPs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jVj0RHptfGrZs75nvEQ6UepXLTPEmZN0C8bvg0utkitQBOhDOR3NwR/Lc0SpcMZm4qzTzEg4JaaTJ84+qiG1X2lGWxvLngXuyIhy7ytTkUi4RfCfLe1B5kadZ9UPQYuYzwVxox5So0XrDLiQAGJqxAtJLQ5DdaX7His8h9aUe/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VnREP7yZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749833167;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=bbROYjb4mdQOqht6aHh/H9xfCrTcRr7mEK6Oc+kCnJc=;
-	b=VnREP7yZI9d9E3/y4D3KLjCvH4c6qcsaenYRTaqc7y+t1GddyH3ctqsYIyAJMxpK/O+TED
-	0tlpBHjrWjCa7am8GwZixn5R0F+wh4eCfh8bZTu27CHkJzqjF+6KvltUPTk+f2xBTG8Un1
-	Twnacdp4nDa0mXyP+B8pOly/RmB3e0s=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-553-7I_JWVqIOZirAbcsISAQpw-1; Fri,
- 13 Jun 2025 12:46:06 -0400
-X-MC-Unique: 7I_JWVqIOZirAbcsISAQpw-1
-X-Mimecast-MFC-AGG-ID: 7I_JWVqIOZirAbcsISAQpw_1749833165
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	s=arc-20240116; t=1749834031; c=relaxed/simple;
+	bh=Ee23bSYewgw1pZtLKYfWhlq/qzuBs8kymYq9pjayqSE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ERZjsm3d0WMBHZyUlL0lYgL3R41YHw293nvb9k3PCtIuzQ1trvD8aHsUZQVk2PI3rMep8pyOx+DCmNo9U9JuDh5QY5dcEaS0hS68McAy+I9X+lX+lwPKfahKkEjFRLqb4yAwRzOqBe1WqBzmbqah9lnUr8aDvWk4C4E7uXvl+nI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=u9aG/XAy; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ocT+pKRE; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=u9aG/XAy; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ocT+pKRE; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E088E1800343;
-	Fri, 13 Jun 2025 16:46:04 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4D1491956050;
-	Fri, 13 Jun 2025 16:46:04 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 6.16-rc2
-Date: Fri, 13 Jun 2025 12:46:03 -0400
-Message-ID: <20250613164603.163319-1-pbonzini@redhat.com>
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 9339C1F892;
+	Fri, 13 Jun 2025 17:00:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1749834026; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UievMDUraOnDMl0JUSi8sCjrJFjc+fcUJjXG5uHY0QQ=;
+	b=u9aG/XAy248ET//vYRdstDzkp9e1gMhJ9a1HNBFgWBgkqQ+DzLQHTCdDuzdjJXNyc8sQsj
+	tJc3ghB024EctTUGHt0guaki0rPUDLxL5DFjJKiMw905+EiBJYUwcxBNeS8E/WWZh42zr6
+	W+MEoKdKBOaRPeamP6LjmhCF59/urCQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1749834026;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UievMDUraOnDMl0JUSi8sCjrJFjc+fcUJjXG5uHY0QQ=;
+	b=ocT+pKRE0yIBuDKH/NadiAPPUhisX2hRv3LVIi3nXKaMqJ6vwZH5DwuI1Zki5i8j1KTFCd
+	UVHFb9xm6+EPziCw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1749834026; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UievMDUraOnDMl0JUSi8sCjrJFjc+fcUJjXG5uHY0QQ=;
+	b=u9aG/XAy248ET//vYRdstDzkp9e1gMhJ9a1HNBFgWBgkqQ+DzLQHTCdDuzdjJXNyc8sQsj
+	tJc3ghB024EctTUGHt0guaki0rPUDLxL5DFjJKiMw905+EiBJYUwcxBNeS8E/WWZh42zr6
+	W+MEoKdKBOaRPeamP6LjmhCF59/urCQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1749834026;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UievMDUraOnDMl0JUSi8sCjrJFjc+fcUJjXG5uHY0QQ=;
+	b=ocT+pKRE0yIBuDKH/NadiAPPUhisX2hRv3LVIi3nXKaMqJ6vwZH5DwuI1Zki5i8j1KTFCd
+	UVHFb9xm6+EPziCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id ABD6713782;
+	Fri, 13 Jun 2025 17:00:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id LSjlJilZTGgwRAAAD6G6ig
+	(envelope-from <pfalcato@suse.de>); Fri, 13 Jun 2025 17:00:25 +0000
+Date: Fri, 13 Jun 2025 18:00:23 +0100
+From: Pedro Falcato <pfalcato@suse.de>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, 
+	Alex Williamson <alex.williamson@redhat.com>, Zi Yan <ziy@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, 
+	Alex Mastro <amastro@fb.com>, David Hildenbrand <david@redhat.com>, 
+	Nico Pache <npache@redhat.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Jann Horn <jannh@google.com>
+Subject: Re: [PATCH 1/5] mm: Deduplicate mm_get_unmapped_area()
+Message-ID: <koa6s4cdbnch45vr55td2okarbpyirnmqlvovvfsnu6rdagdu3@ofp2jkeryoa7>
+References: <20250613134111.469884-1-peterx@redhat.com>
+ <20250613134111.469884-2-peterx@redhat.com>
+ <1fa31b8c-4074-45c7-ad59-077b9f0ab8fb@lucifer.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1fa31b8c-4074-45c7-ad59-077b9f0ab8fb@lucifer.local>
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.990];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
 
-Linus,
+On Fri, Jun 13, 2025 at 04:57:12PM +0100, Lorenzo Stoakes wrote:
+> You've not cc'd maintainers/reviewers of mm/mmap.c, please make sure to do so.
+> 
+> +cc Liam
+> +cc Vlastimiil
+> +cc Jann
+> +cc Pedro
+> 
+> ...!
+> 
+> On Fri, Jun 13, 2025 at 09:41:07AM -0400, Peter Xu wrote:
+> > Essentially it sets vm_flags==0 for mm_get_unmapped_area_vmflags().  Use
+> > the helper instead to dedup the lines.
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> 
+> This looks fine though, so:
+> 
+> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-The following changes since commit 19272b37aa4f83ca52bdf9c16d5d81bdd1354494:
+Reviewed-by: Pedro Falcato <pfalcato@suse.de>
 
-  Linux 6.16-rc1 (2025-06-08 13:44:43 -0700)
+Looks good, thanks!
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 8046d29dde17002523f94d3e6e0ebe486ce52166:
-
-  KVM: x86/mmu: Reject direct bits in gpa passed to KVM_PRE_FAULT_MEMORY (2025-06-12 00:51:42 -0400)
-
-----------------------------------------------------------------
-ARM:
-
-- Rework of system register accessors for system registers that are
-  directly writen to memory, so that sanitisation of the in-memory
-  value happens at the correct time (after the read, or before the
-  write). For convenience, RMW-style accessors are also provided.
-
-- Multiple fixes for the so-called "arch-timer-edge-cases' selftest,
-  which was always broken.
-
-x86:
-
-- Make KVM_PRE_FAULT_MEMORY stricter for TDX, allowing userspace to pass
-  only the "untouched" addresses and flipping the shared/private bit
-  in the implementation.
-
-- Disable SEV-SNP support on initialization failure
-
-----------------------------------------------------------------
-Ashish Kalra (1):
-      KVM: SEV: Disable SEV-SNP support on initialization failure
-
-Marc Zyngier (4):
-      KVM: arm64: Add assignment-specific sysreg accessor
-      KVM: arm64: Add RMW specific sysreg accessor
-      KVM: arm64: Don't use __vcpu_sys_reg() to get the address of a sysreg
-      KVM: arm64: Make __vcpu_sys_reg() a pure rvalue operand
-
-Paolo Bonzini (3):
-      Merge tag 'kvmarm-fixes-6.16-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-      KVM: x86/mmu: Embed direct bits into gpa for KVM_PRE_FAULT_MEMORY
-      KVM: x86/mmu: Reject direct bits in gpa passed to KVM_PRE_FAULT_MEMORY
-
-Sebastian Ott (4):
-      KVM: arm64: selftests: Fix help text for arch_timer_edge_cases
-      KVM: arm64: selftests: Fix thread migration in arch_timer_edge_cases
-      KVM: arm64: selftests: Fix xVAL init in arch_timer_edge_cases
-      KVM: arm64: selftests: Determine effective counter width in arch_timer_edge_cases
-
- arch/arm64/include/asm/kvm_host.h                  | 34 +++++++++---
- arch/arm64/kvm/arch_timer.c                        | 18 +++----
- arch/arm64/kvm/debug.c                             |  4 +-
- arch/arm64/kvm/fpsimd.c                            |  4 +-
- arch/arm64/kvm/hyp/exception.c                     |  4 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h            |  4 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  6 +--
- arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |  4 +-
- arch/arm64/kvm/hyp/vhe/switch.c                    |  4 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c                 | 46 ++++++++---------
- arch/arm64/kvm/nested.c                            |  2 +-
- arch/arm64/kvm/pmu-emul.c                          | 24 ++++-----
- arch/arm64/kvm/sys_regs.c                          | 60 +++++++++++-----------
- arch/arm64/kvm/sys_regs.h                          |  4 +-
- arch/arm64/kvm/vgic/vgic-v3-nested.c               | 10 ++--
- arch/x86/kvm/mmu/mmu.c                             |  9 +++-
- arch/x86/kvm/svm/sev.c                             | 44 ++++++++++++----
- .../selftests/kvm/arm64/arch_timer_edge_cases.c    | 39 +++++++++-----
- 18 files changed, 194 insertions(+), 126 deletions(-)
-
+-- 
+Pedro
 
