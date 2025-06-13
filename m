@@ -1,54 +1,88 @@
-Return-Path: <kvm+bounces-49467-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49468-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39BC6AD940C
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 19:59:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CD2AD940E
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 20:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0BEF173FEC
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 17:59:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D27953B9F39
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 18:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203A522B8B5;
-	Fri, 13 Jun 2025 17:59:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF3922A4E4;
+	Fri, 13 Jun 2025 18:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="io4TU7/D"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H5Ha3C38"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7292315278E;
-	Fri, 13 Jun 2025 17:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99313D3B8
+	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 18:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749837554; cv=none; b=VfZd8IDnR2+7CBzeJ4y/W5JlUDn7f9nU+CwNvGyP18rUbx9wP7YNnfROAqwCRCyzVqn0wht2UiDm92/z/UrIC5VbijGqjvw9ZnseZ88zJ3jxTxSEkqg2oq7wjIUKoZiHdjDqv4nAQFpTYA2LMStqVzMQEvIHP1wmcdjblHgm9Ds=
+	t=1749837621; cv=none; b=G2WePp8wdzejhvIuuPwW2jQnhd0CbSbI71sBGWSV+RZ13wQ7nbrg2niZhiWxazwslsPlLCWoguphFKvRUFK/Jq6jNNSBCBxr3Z8REJ3h/choa9PP9pfpvq3MiopEjf644cP8PExgc5CSXhkCdvsK74nnjZ8Qx/X13+tEVxUyh18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749837554; c=relaxed/simple;
-	bh=wFwsG2FRP6Do8TYFgbHwzgecKIiezlLARp1LI18nxQM=;
+	s=arc-20240116; t=1749837621; c=relaxed/simple;
+	bh=d/oVTXsnKugsuOGjJtUGceEMllHBI7H44e+eSlRJBrw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y+shGO+vpi4glV6BNmJKPzba6iXZL4ww+EjWDlDFRG0gAl00JH5QZfCUbCoANTKysF/Tq23EA06IzP4pxL9MLseqbMMZw+zFRXQlewPPUV5KPNEBbGZCL2RwOZtjrYi+ybkhmhJvTT0T84MgH0bqwfrasnrcFh5TOrqV1XlFiqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=io4TU7/D; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55DHwYB63889496
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 13 Jun 2025 10:58:35 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55DHwYB63889496
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025052101; t=1749837518;
-	bh=GFZoBjYFia/S0Obvoi5LxFj2meewMT4KBd2863ZFFyM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=io4TU7/DsYQYsJUedIdRHszCi+5jp6aoPhmtlQdzCsDEgUbdY+tFyAgAO5UvP+ufY
-	 VaBrlt3u0qA0RHBNBTTsLzP7YUYuG+km+azhHMbaP7Z7J3emWSRVHD6aHwoHSkoGQM
-	 lhgQElrAln6e/U6oXeGtJqIxGDZhab4Li0avWXZTHbs97OpAEdLHKH0LCvrWwVS/Sm
-	 ZJvZjpdQPSChqv4FrWibkgPwePB8YrX7Dmu/jRH7HbAhqhs3HLXNaliH7zx2ouE7ei
-	 ZDUWZxJX0zPu3MlKWBbYvoh/JCnzGDuIRgAgRztFSFtwmkz10M6g+BBeGRDiZJaG0z
-	 kwx7S2OPtsLbw==
-Message-ID: <00358cf3-e59a-4a5f-8cfd-06a174da72b4@zytor.com>
-Date: Fri, 13 Jun 2025 10:58:34 -0700
+	 In-Reply-To:Content-Type; b=PfyBvAEXUBQZqCvgkke6Fc7YmFKRE0KWuU02o61EaGbQ8v4tZGjBGkTo71z7OoYG42xiUkXmQgwQ8MkEkSC+HWw8dFWjylV+1jqgocz3sKL0yerO5P/sf3lrMi5JH1xdviVgNSuejrr2z5kj9bVT2fYlK4vCoxqiSA6lP1aeE2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H5Ha3C38; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749837618;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2aIKNMIdIuo1UCAdxylRa1DqGXWwEsMVAaI0AuMZvVs=;
+	b=H5Ha3C38ExuvTGw2F7Y/6l1iDvCCgeOwCjS6PH+L5Ys7Y/TGKMTRFGTIAjcQAh+znANLZD
+	NbE5hnT+4wASRXv4vUn8WVf8Ixx3n+fC14mn1NnWKQmbwgR/5N4QRWlXyXbtn+/hlKWeh4
+	Fvrg1Q9vpVDmXupf3gmCbdu6Ab6ACgk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-688-PWNn0EDMN4-Dn15EL1Mt9A-1; Fri, 13 Jun 2025 14:00:17 -0400
+X-MC-Unique: PWNn0EDMN4-Dn15EL1Mt9A-1
+X-Mimecast-MFC-AGG-ID: PWNn0EDMN4-Dn15EL1Mt9A_1749837616
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-450787c8626so18092515e9.1
+        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 11:00:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749837616; x=1750442416;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2aIKNMIdIuo1UCAdxylRa1DqGXWwEsMVAaI0AuMZvVs=;
+        b=U5Wzay8M9SqbfugHg5N3qhvFJIfdGYrKlN9usdUpS+iUUgeCv3uIDKTTjF39NtFG2S
+         Ii//9bjpIf1Xr8kUPhBR5aHtn66D/XW+JqOEBJal4RiZ+7h77nI5G8Ue+F6k0V6dhQ4t
+         a+n7NqEkxpJSAvCC5x3M6+sWHuDiMpkAijipdxTR59MxzqjE6pUmK/csZCf6BBYrRBnO
+         5gzOKIEWMfllSHRTCoKheUEvLIIzFc4xE2hJhoJJRWE7ZSphzKeOvYbRtuJ0291I8Fot
+         zBtcyZoOMRl4WrsiHFXyWu39uvUXeQluLhn/0MOITQihav7tAVW5mWDGhye882VYxye1
+         ytJA==
+X-Forwarded-Encrypted: i=1; AJvYcCVYkgwXYapNSpYRrE9ndu3KrKwDg6D6O7T1s3ucPoshNwyNCztkWapHp9qDJkM9WnhbNiw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiXGt5R4cq/VTIvM6z2a1bQsyTOzzDktc0lduCLREeZz6Eghv0
+	mtGWYm6bPQ0z2b2j0UHJkNhnppNm2RoMdSnpDQkV/p/xuPHjCzWxPSFAGXypwF8GqpE5P2egYqD
+	HOILpBqkvktcGQGxSteNiP8hncEv1o4g8U/T7AdRCRorunCDANUV2sA==
+X-Gm-Gg: ASbGncsCOsgmWlf0vZMC856kefWZp1Y0TAbIjhr2Sf1NB8mXLnwOCKMJa3aNV4Qw/Oo
+	Cn2VUDE5W7AfnupYqcmM3GOQNrkTatBL4YhIW4j+a4nBL7FkjtTQ4UjQP+9ttOa2fGlr9pz34sM
+	bchRiX9W1zwF2nB8PU9eWoW8KCXst5H7ByG9QWurZ4iCp9rFLO3owZiwmuJX2If4yzwNTjsru8R
+	p4zQF2I5ph5/ifCOKApEwfLLbMUAp794Zyb0TLqBPF5ljqfqP31Z/DBWnynz/vtDM17ybezwuoh
+	Lj8vHzuF8x4i4/jN/Sa2lST3Ui3NanInq64ceaaP+TOn6T/0+oMdRv06rbeDsnk1rQvRFh5AtAM
+	WODEMwr+dkpc3+1kGoF47T8HOQcpw3X5T6v1mhYGHuNK2w0fTpA==
+X-Received: by 2002:a05:600c:3e17:b0:448:e8c0:c778 with SMTP id 5b1f17b1804b1-4533cb4948bmr4746265e9.22.1749837616023;
+        Fri, 13 Jun 2025 11:00:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGvbMEemipJF0MHDHTjrDKPJbj60ZNEib57qRrY66hYJiTMjPfY9MiRRAWvY1wgI/IveevRyg==
+X-Received: by 2002:a05:600c:3e17:b0:448:e8c0:c778 with SMTP id 5b1f17b1804b1-4533cb4948bmr4745995e9.22.1749837615611;
+        Fri, 13 Jun 2025 11:00:15 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f1a:3700:2982:b5f7:a04e:4cb4? (p200300d82f1a37002982b5f7a04e4cb4.dip0.t-ipconnect.de. [2003:d8:2f1a:3700:2982:b5f7:a04e:4cb4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568a73966sm3051956f8f.34.2025.06.13.11.00.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Jun 2025 11:00:15 -0700 (PDT)
+Message-ID: <a3860fb3-bd98-4e7f-b246-c92ecff1181b@redhat.com>
+Date: Fri, 13 Jun 2025 20:00:13 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,111 +90,77 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/3] x86/traps: Move DR7_RESET_VALUE to
- <uapi/asm/debugreg.h>
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
-        peterz@infradead.org, brgerst@gmail.com, tony.luck@intel.com,
-        fenghuay@nvidia.com
-References: <20250613070118.3694407-1-xin@zytor.com>
- <20250613070118.3694407-2-xin@zytor.com> <aEwzQ9vIcaZPtDsw@google.com>
+Subject: Re: [PATCH 1/5] mm: Deduplicate mm_get_unmapped_area()
+To: Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, kvm@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Alex Williamson <alex.williamson@redhat.com>, Zi Yan <ziy@nvidia.com>,
+ Jason Gunthorpe <jgg@nvidia.com>, Alex Mastro <amastro@fb.com>,
+ Nico Pache <npache@redhat.com>
+References: <20250613134111.469884-1-peterx@redhat.com>
+ <20250613134111.469884-2-peterx@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aEwzQ9vIcaZPtDsw@google.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250613134111.469884-2-peterx@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 6/13/2025 7:18 AM, Sean Christopherson wrote:
-> On Fri, Jun 13, 2025, Xin Li (Intel) wrote:
->> Move DR7_RESET_VALUE to <uapi/asm/debugreg.h> to prepare to write DR7
->> with DR7_RESET_VALUE at boot time.
+On 13.06.25 15:41, Peter Xu wrote:
+> Essentially it sets vm_flags==0 for mm_get_unmapped_area_vmflags().  Use
+> the helper instead to dedup the lines.
 > 
-> Alternatively, what about dropping DR7_RESET_VALUE,  moving KVM's DR6 and DR7
-> #defines out of arch/x86/include/asm/kvm_host.h, and then using DR7_FIXED_1?
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+Acked-by: David Hildenbrand <david@redhat.com>
 
-We definitely should do it, I see quite a few architectural definitions
-are in KVM only headers (the native FRED patches needed to reuse the 
-event types that were previously VMX-specific and moved them out of KVM
-headers).
+-- 
+Cheers,
 
-Because there is an UAPI header, we probably don't want to remove
-definitions from it?  Ofc there is a non-UAPI header we can move into.
-
-> 
-> Arguably, that'd be an improvement for 2 of the 3 uses of DR7_RESET_VALUE in SEV
-> code:
-> 
-> 	/* Early non-zero writes to DR7 are not supported */
-> 	if (!data && (val & ~DR7_RESET_VALUE))
-> 		return ES_UNSUPPORTED;
-> 
-> vs.
-> 
-> 	/* Early non-zero writes to DR7 are not supported */
-> 	if (!data && (val & ~DR7_FIXED_1))
-> 		return ES_UNSUPPORTED;
-> 
-> And in vc_handle_dr7_read():
-> 
-> 	if (data)
-> 		*reg = data->dr7;
-> 	else
-> 		*reg = DR7_RESET_VALUE;
-> 
-> vs.
-> 
-> 	if (data)
-> 		*reg = data->dr7;
-> 	else
-> 		*reg = DR7_FIXED_1;
-> 
-> In both of those cases, it isn't the RESET value that's interesting, it's that
-> architecturally bit 10 is fixed to '1'.
-> 
-> I haven't looked at the kernel code, but I suspect DR6_ACTIVE_LOW, DR6_VOLATILE,
-> and/or DR6_FIXED_1 could also come in handy.
-
-I can find time to take a look after the bug-fixing patches.
-
-Thanks!
-     Xin
-
-
+David / dhildenb
 
 
