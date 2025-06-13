@@ -1,211 +1,156 @@
-Return-Path: <kvm+bounces-49530-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49531-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F098DAD9746
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 23:18:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 229C5AD974D
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 23:25:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 996CD7A3C75
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 21:17:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCD4316A771
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 21:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB5728D85A;
-	Fri, 13 Jun 2025 21:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A839128D8CB;
+	Fri, 13 Jun 2025 21:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FnwFW4yq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I+P/i+yj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACD9239086
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 21:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4345A28D83F
+	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 21:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749849502; cv=none; b=BDg80T6NuHIF2l6n5ihCEaZDZoiIbWlAeIAdORsyc3bPH0jyKNwpYxCOmRrDQhCd/xWVe/giNS5oVaw40ZZ/FNH6H6PahgwCScl6hLjVCkZP/Hej7+hQUilNDx20e8Ps/FGm6qS3HYiqJcXtqKTGiKZk4lYRpja2kqYZ8T3H0UQ=
+	t=1749849941; cv=none; b=itnHM8udI5H1XgMNQzFYjTYtsveUUTYExaEMeqW0dg2YwO+2D0Foeu+8rFS0dCCMh54R1uE3dYoK8a/GiBpjvcu9a4XuvDeqap1PtXGlOSZgGM0c8x4XgrM0/7gNsVJs4GEba3N+EP8FMp5pL0CRpcp4wniQHNfQODtUt+krI+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749849502; c=relaxed/simple;
-	bh=cjS1R/h5yYqj8F/QZF4nccCyoFcjDNQc4ZKgUarS9ts=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ua7PkBjbMJJy2+RKcLt9OsiGgvSsWYLyCurB7Lm5WZHNrjkOzZDsrX9/WmeEyf6T9DvWhU4e5umA6ZTwl2AeNZcXnUYXfWr8FkN6BsInu7b8DAt0iQSTM8Nk9eAjhDlvbxN6cfd05iUFGSMpuHENJ6gcXMv2v2nXjXpLPmm+f6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FnwFW4yq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749849499;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ufscstiQHCbS9G1pdl0dbNIBD2ajGNOtHVKChNRSU3k=;
-	b=FnwFW4yqajHp9CCUEdq2M8QVguhLJtgcgUz205/E76fRSVE6Cbj8G87fMl1bUahldefFtn
-	vdMjjQJ9qwlobEAFf8KUHTYou59+QOgaOmtTLJbvDpzr8LdNNkG9dqeXWK36Wymi6qHGya
-	WUvnUnQ4zGc1hg9ZnItlqjyqP8iZSKU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-14-wrP1gAWgNGGxfxKjuztVLQ-1; Fri, 13 Jun 2025 17:18:18 -0400
-X-MC-Unique: wrP1gAWgNGGxfxKjuztVLQ-1
-X-Mimecast-MFC-AGG-ID: wrP1gAWgNGGxfxKjuztVLQ_1749849497
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-450de98b28eso20174305e9.0
-        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 14:18:18 -0700 (PDT)
+	s=arc-20240116; t=1749849941; c=relaxed/simple;
+	bh=sHV8yx62yol9Bk56YKbLE0IVF5sfS+vZdmV+r8o63x0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ILUgKQ6XbmLbF/MAS1ZpPTlO9cfKmugpnLQRZgSCDe+3kQHaQCEF40Osb4VyqCe3f25c02ZF9C/tLV6i6HZ3aKkvT/krkWt1x4377cNdXfqjdGyrhVAdUlXWDJRUjUolx0uG3fDHD3PUZ5Do8vKGpVoi+pmoJLfb7ZMfNCm1aiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I+P/i+yj; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a5ac8fae12so114081cf.0
+        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 14:25:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1749849939; x=1750454739; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TPUzIppHcu65DcXjx+xmQ4p2o7TM+1lbGXLpXn/D90M=;
+        b=I+P/i+yjFwiAoPxoTgsLZdfFg8675RXWd3N3Md6glKsbKl4lvRtve5J0ZIuEaau554
+         UKda9Hl/lIcu6s6TXwx1TSrSSrz0g6+2Q9Rs6DJ7S8teVdvnfdT9QMjW9CbtMEpHRRbd
+         j6g8yktMlwMwLf2fpmUKuIF0ivDJdJtw9WBdJZd6c0ZDo9BvPcrX5fONn3sA3pkO2dXQ
+         FXgdpCc1kXmxz5zi5fQYAinoBaY5s1lBxDO7OkrsWCO7jKHWvAljQyFmsI2dQFNLqofn
+         G9Xb2I8IhglbdKiaDaJxnWzG6ruENsoJERAej4g/XSf7628bPMJ3BMsqiOSUnksUbFvo
+         Wn7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749849497; x=1750454297;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ufscstiQHCbS9G1pdl0dbNIBD2ajGNOtHVKChNRSU3k=;
-        b=EcVzCvSKNk/N4kDesS+QzsckcamKQpNVTWC9X60y7by7djRIdoVzwOhawbVSY2QD7x
-         dz7jZVgRp0bzBCvEVR97AH620J2/aBk+bM1hEfV0A9TuCr5YPZeXp3MXyeh1S/NIpoox
-         ytLvWcwGsL2eQtsGYNr7kCIzgpylLNqUr/UMWMmNT2rSFhpAMYskLQGBVodjgVtJpvK7
-         SsAjaxEvt6c+/uSrO0FBxEepw85+ifolfRfEj3ZDH9yYAMERtdy606HTo1jrHvEa6H5o
-         1pbJ++6N9vAW5FdW6hkx46mAMt8NuFus0WJh/xplkDoCkmQHbXDe5i9Vzt7D0NibENva
-         OgSA==
-X-Gm-Message-State: AOJu0Yz9bAuQ2lXziosBZ3kD9xgV8lJspuUJ17ShN3xye8n/Lz98xPwK
-	t2WmFtDXPnDKKfEfBmcrLdH6rcX0B7UQpY9xepRELjLzToGnuGtaJK5OVqVBe9+gmUzOPc8F/jm
-	2w/7PrWEgvKNNYLArmVyGA+hQg5EzDb+nbVRqb0Z96us67cXmvvDggQ==
-X-Gm-Gg: ASbGnct8CA7dFELjlu8pNUd/6yIL9mTitHWUD1pCpW2sYXrhBuUpkS41so2ORbzY16p
-	Lig0lSUZ9H1IuZKX25xQmdNqcz1f2ty+KboIH94VoonrEoi3vTNsPJcTBRYdu50aOB++99WEHsA
-	tVl8poomeW7FG6X/Ibm9sxx5dhcyNX2UZEFDJHl/TH/a6LHzYrOV5rdO7v6Td+FurDISefqRnp6
-	Y19Tj8LFQqpH2QaEh6+ozGw/u6nkwFQnGFcJ57Sl7zueLNM9AoDtAuPG8rNdcOZQvs8E9ni5hVY
-	iglYolsiSne0IOjl66D3TzN0iOC8fo3a2ORBkyWsbEPVhJcIQeREClLnXOWAUzoqTruwbx7R0Um
-	rI6wNyMchmOYcwPCewspwik4m44xGYNBVgNhGInzM+VgoN1+lQw==
-X-Received: by 2002:a05:600c:8b45:b0:43b:c6a7:ac60 with SMTP id 5b1f17b1804b1-4533c92e57bmr12391105e9.10.1749849496939;
-        Fri, 13 Jun 2025 14:18:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEOB0FovDmJMWiAczOt+st9w/YGQAhqOEOsMFMcs9zkOeNn6NLpFPp2mWC5LMWJqaHx++tm7w==
-X-Received: by 2002:a05:600c:8b45:b0:43b:c6a7:ac60 with SMTP id 5b1f17b1804b1-4533c92e57bmr12390675e9.10.1749849496527;
-        Fri, 13 Jun 2025 14:18:16 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f1a:3700:2982:b5f7:a04e:4cb4? (p200300d82f1a37002982b5f7a04e4cb4.dip0.t-ipconnect.de. [2003:d8:2f1a:3700:2982:b5f7:a04e:4cb4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e172b03sm63129605e9.36.2025.06.13.14.18.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Jun 2025 14:18:15 -0700 (PDT)
-Message-ID: <09b66a3f-e7f9-43b2-be9a-bbf6310b3c43@redhat.com>
-Date: Fri, 13 Jun 2025 23:18:12 +0200
+        d=1e100.net; s=20230601; t=1749849939; x=1750454739;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TPUzIppHcu65DcXjx+xmQ4p2o7TM+1lbGXLpXn/D90M=;
+        b=PO2NZZv/w7UPk2cFFCfypYJCWqIxl1uLqRFxdJK+9siRQYdES3VaK1H6dO6oRUE5lN
+         5wcFsoOaWzQ4C4J0rgdY8B74uqJB6hYkwe3Nq1xdH9wfQj29D64eV9657jQ6dbyFMGoK
+         g6u2xDN/tHZjOkpswDrhs+PlNopcMHdVeuRCoXAi1Bx+6bHLGYVOo7vwTMCbZvurtCtj
+         +zmoP3ZXaa4euAczyVTP3YNIih6y8l31vbUxmGDUx/JAfCl71xUQ+1zJREKXZsAqM4z6
+         pyaPcxn7ihEtJTrrZwAf5b6kPKXczCQEfrr5kn7qhk2gFSl4XuA31FduQIl6LUoL94np
+         BuPA==
+X-Forwarded-Encrypted: i=1; AJvYcCXoRCddrQEWPN6lKb9S3veJ2C7TDtkRdbfr/ARS5GJchmaM94JAoxVBZyVjO1t5KKNL1sA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9oVOKc5137/6BE4IKu9XKrkYr+BThI8d8nks0xb7TL/XLr0Oj
+	cm2u0KFLHcMrOl3tfS5rVg2TL+KKx8SE+VpEPTK7ojTpHURB5n7KCrKRADMqv4XIWmu2UGmTxwp
+	mXNj3ako+M1oJ2WQlge3Z3g74qfz7rKmN48sQkjsWZ+GbujBCdkqJwkkz
+X-Gm-Gg: ASbGncumV5qebs5hsMRi/96XONofRUGG43FhgU5aAGuzM5hnpR8uIQuxlWELKHNBwwL
+	P8DYLn+0bSmITR4YiTxnacnw+ERikz8KkW717EnI2LqC6GvPkuZ2zMkEgsygEnQR1eu5vLbxEjz
+	gH0KfvHdfnWLq17/lgw8WPBg2yitMUJiwvIWVHAO2mxtMMHTM66ZkfXw==
+X-Google-Smtp-Source: AGHT+IHRTXKzQVq2KTm0RSt5qVgrnPAP0bkIbd607Uu6/KmOUX6+sJKqoHDdBmms0U0ufq7rNkEH/UqGIKX1Oa8Sr14=
+X-Received: by 2002:a05:622a:610d:b0:498:e884:7ca9 with SMTP id
+ d75a77b69052e-4a73da5803emr310651cf.13.1749849938737; Fri, 13 Jun 2025
+ 14:25:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd
- pages
-To: Sean Christopherson <seanjc@google.com>, Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
- kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
- mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
- isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
- suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
- quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
- roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
- rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
- jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com,
- ira.weiny@intel.com
-References: <20250611133330.1514028-1-tabba@google.com>
- <20250611133330.1514028-9-tabba@google.com> <aEySD5XoxKbkcuEZ@google.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
- 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
- rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
- wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
- 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
- pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
- KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
- BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
- 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
- 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
- M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
- AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
- boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
- 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
- XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
- a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
- Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
- 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
- kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
- th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
- jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <aEySD5XoxKbkcuEZ@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250613155239.2029059-1-rananta@google.com> <aEyPswyvfJ2-oC3l@linux.dev>
+In-Reply-To: <aEyPswyvfJ2-oC3l@linux.dev>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Fri, 13 Jun 2025 14:25:26 -0700
+X-Gm-Features: AX0GCFvCkuSdtDxaxbaw03np7924c6ya2dvq2vPeL3lenyiqTkrCE5acxgbNPCk
+Message-ID: <CAJHc60yacW7-1K3Uw9RT7a8qH9JyTXouiP=6VP3gifqzHgMaQQ@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] KVM: arm64: Add attribute to control GICD_TYPER2.nASSGIcap
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 13.06.25 23:03, Sean Christopherson wrote:
-> On Wed, Jun 11, 2025, Fuad Tabba wrote:
->> This patch enables support for shared memory in guest_memfd, including
-> 
-> Please don't lead with with "This patch", simply state what changes are being
-> made as a command.
+On Fri, Jun 13, 2025 at 1:53=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> On Fri, Jun 13, 2025 at 03:52:34PM +0000, Raghavendra Rao Ananta wrote:
+> > A shortcoming of the GIC architecture is that there's an absolute limit=
+ on
+> > the number of vPEs that can be tracked by the ITS. It is possible that
+> > an operator is running a mix of VMs on a system, only wanting to provid=
+e
+> > a specific class of VMs with hardware interrupt injection support.
+> >
+> > The series introduces KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap vGIC attribute=
+ to allow
+> > the userspace to control GICD_TYPER2.nASSGIcap (GICv4.1) on a per-VM ba=
+sis.
+> >
+> > v1: https://lore.kernel.org/kvmarm/20250514192159.1751538-1-rananta@goo=
+gle.com/
+> >
+> > v1 -> v2: https://lore.kernel.org/all/20250531012545.709887-1-oliver.up=
+ton@linux.dev/
+> >  - Drop all use of GICv4 in the UAPI and KVM-internal helpers in favor
+> >    of nASSGIcap. This changes things around to model a guest feature,
+> >    not a host feature.
+> >
+> >  - Consolidate UAPI into a single attribute and expect userspace to use
+> >    to read the attribute for discovery, much like we do with the ID
+> >    registers
+> >
+> >  - Squash documentation together with implementation
+> >
+> >  - Clean up maintenance IRQ attribute handling, which I ran into as par=
+t
+> >    of reviewing this series
+> >
+> > v2 -> v3:
+> >  - Update checks in vgic-v3.c and vgic-v4.c to also include nASSGIcap (=
+via
+> >    vgic_supports_direct_sgis()) that's configured by the userspace. (Ol=
+iver)
+> >
+> > Oliver Upton (2):
+> >   KVM: arm64: Disambiguate support for vSGIs v. vLPIs
+> >   KVM: arm64: vgic-v3: Consolidate MAINT_IRQ handling
+>
+> Make sure you run checkpatch next time before sending out, it should've
+> warned you about sending patches w/o including your SOB.
+>
+Hmm, I do run checkpatch before sending, but I don't see any warning as suc=
+h.
 
-Agrred.
+Example:
+$ ./scripts/checkpatch.pl
+v3-0001-KVM-arm64-Disambiguate-support-for-vSGIs-v.-vLPIs.patch
+total: 0 errors, 0 warnings, 107 lines checked
 
-> 
->> mapping that memory from host userspace.
-> 
->> This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
->> and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
->> flag at creation time.
-> 
-> Why?  I can see that from the patch.
-> 
-> This changelog is way, way, waaay too light on details.
+v3-0001-KVM-arm64-Disambiguate-support-for-vSGIs-v.-vLPIs.patch has no
+obvious style problems and is ready for submission.
 
-Agreed.
+I do see an option to tell the script to ignore the check:
+--no-signoff, so I'm guessing it should check by default? Or is there
+any other option?
 
-   Sorry for jumping in at
-> the 11th hour, but we've spent what, 2 years working on this?
-
-It's late in Germany on a Friday, so I am probably grumpy, but most of 
-what you raise (terminology ...) was been discussed plenty of times 
-before either during review here or during the upstream calls ... :(
-
-Anyhow, happy for your review feedback on this series at this point, but 
-this is just the perfect time to shutdown my computer on a Friday 
-evening, knowing we will need another 2 years until this is finally 
-upstream if we keep going like that.
-
-(again, sorry to be grumpy, but this is not the stuff I want to be 
-reading at the 11th hour)
-
--- 
-Cheers,
-
-David / dhildenb
-
+Thank you.
+Raghavendra
 
