@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-49394-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49395-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6E0BAD8502
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 09:53:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50011AD8507
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 09:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8973188A7FD
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 07:49:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A3D317C32C
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 07:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875E62DA77A;
-	Fri, 13 Jun 2025 07:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425E726B767;
+	Fri, 13 Jun 2025 07:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="xKz5uMPx"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="BBLuDsW4"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DF62DA75B;
-	Fri, 13 Jun 2025 07:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDEA1EA7E1;
+	Fri, 13 Jun 2025 07:52:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749800306; cv=none; b=D7Kw3bje2R1E6ueSfrewQQ3LGGxYU5vRrU2XmfnnT7Aw3ChRglC4CIOZWWuNSOioy3D52Qb4LNNG5PWz/MxgDtA7H++5YEdhU403WnPvf1CR2MNgAjRvh2T/JrSA1Bw8Fbg3y03oqinESB9v8W6CVfGCqh3UW7RnSi/HOtDOnw4=
+	t=1749801127; cv=none; b=Gz6MhArM/aeYa+Aht9sb6VUdMau0pgjoXVIsD++BsJAoktrs7/O9m+OVDhGctbpHi5dEiy8CExiHjO8V8sYmqQL1rddI0/7R6tc6+wc8MiMMkseLfwA+GFJpZsEGgwMlFjMXwiCtkj1t/uBmPRK9GJuLJfWqZdeoNm+pQ+iMx1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749800306; c=relaxed/simple;
-	bh=w6Iij3cwmrMQPwKKuH03Kpq1oTsbrkREQC03eBxFJiM=;
+	s=arc-20240116; t=1749801127; c=relaxed/simple;
+	bh=b0SVWHc3gp4FG6QvJ2KH53X69127OU4Pa6H6MdDkfZI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qxQOcFSroyGej/IzU9FWMkn34HmrWuCUb7R9VQ5QN4e9DbKEaXmZRYXTEFDpNhXsXT8Q+8LChriBHYfl1FDss/2NiAEx2Q9EBZHRc2T0SARFCDDxJfqnZ4ae2MoDgQj0CghknFLQ/XDwijLJO8yPCT6gr6gPCMP9ThTad2rvi8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=xKz5uMPx; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=Uap9VJKf6DkoZ+wCzAZje9n+M9frJD8zxY8ILqrqjRyElW0I+n8/MeIPYc2GG2lRoQKcr5uVEEDm+ABPrxuByelZZ9iKCHX4K0ojWnG3oo9tbDeSIEOEeQNW1ydIUreX5PLoyAaI6oWRaL9LLLnrBEP5j/q2InN6TKRRcJLCemg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=BBLuDsW4; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55D7bkNp3705775
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55D7pWaG3710577
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 13 Jun 2025 00:37:47 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55D7bkNp3705775
+	Fri, 13 Jun 2025 00:51:32 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55D7pWaG3710577
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025052101; t=1749800271;
-	bh=+/yyrSGfQwPBZ1V+CFmZ/PDgxnfgD/HUBTSSml50TD4=;
+	s=2025052101; t=1749801095;
+	bh=4SWPN+8oXgcV1HAgVGKjs+YrH7d2EdR4S72zfpGcrwI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=xKz5uMPx52/eNlp0eiFTnJZNJrFbMI/rlNNtNSXShO8zJiTp0mAET+JVcHP+Wv8nN
-	 tLVo5f7HPHpPCQxOUor6oY0TNdqYfo0co2TiUmqze5EeoTzjiv+kvwmSnlcSHkrfER
-	 xkTa1hkIJqJY5vMFMD7XhgvJjkO8ObTde9aqkp0wEzHBJVSiuHiUT2Fypr2n9eDIG4
-	 HRxa/+WRc9fZhBISxHTQ63MdtxTN/L8UNgM7lBE05kNgOTu9+vawYnqZoJbcXzfIB0
-	 S9A7w81/OW86oO01xsR+plnYwA5EAAfyX0jzmm+R9E/5yswUdJpEJaw/dLSx+o76v6
-	 xYFx81SS8BK7w==
-Message-ID: <457250dc-5e3f-498f-8b71-6ea4879f91af@zytor.com>
-Date: Fri, 13 Jun 2025 00:37:46 -0700
+	b=BBLuDsW4t/tW1vImHGKq55Y712FkNOhlN4Dn3VxtwCxVOTH+2PsO5Ebiusi3rpBDp
+	 aYjnqNGlcn2dsPvWJJkl73GT2zKbQsY+rC/Nx+IL+n4sX9lzBzFM05FRxJV7tj2d4I
+	 kLIfBeFOtbicivS56GfvxOYVq8SLbX4b/SMY/rFx872PEqM4jrf6T9CKKe/vSHV/+l
+	 owl9MZvhS61mdeKoceh0EtKqqfztLkD5U0YL2VG1jZ1qczVUqhT7RG7D3vpI68FL+J
+	 ymvjUqz6CeWTqIdqYFKAHOWanBAnvN0y2hJfyNmMQeCoUaEccd08VDbPwpNKJ99tNH
+	 9Kl20/jfEld+Q==
+Message-ID: <f5ceeceb-d134-4d51-99d1-d8c6cfd7134f@zytor.com>
+Date: Fri, 13 Jun 2025 00:51:31 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,14 +56,16 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/3] x86/traps: Fix DR6/DR7 inintialization
+Subject: Re: [PATCH v1 2/3] x86/traps: Initialize DR7 by writing its
+ architectural reset value
 To: Peter Zijlstra <peterz@infradead.org>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         x86@kernel.org, hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
         brgerst@gmail.com, tony.luck@intel.com, fenghuay@nvidia.com
 References: <20250613070118.3694407-1-xin@zytor.com>
- <20250613071842.GH2273038@noisy.programming.kicks-ass.net>
+ <20250613070118.3694407-3-xin@zytor.com>
+ <20250613071536.GG2273038@noisy.programming.kicks-ass.net>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -100,28 +102,57 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <20250613071842.GH2273038@noisy.programming.kicks-ass.net>
+In-Reply-To: <20250613071536.GG2273038@noisy.programming.kicks-ass.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 6/13/2025 12:18 AM, Peter Zijlstra wrote:
-> On Fri, Jun 13, 2025 at 12:01:14AM -0700, Xin Li (Intel) wrote:
->>
->> Since only BLD-induced #DB exceptions clear DR6.BLD and other debug
->> exceptions leave it unchanged, even if the first #DB is unrelated to
->> BLD, DR6.BLD is still cleared.  As a result, such a first #DB is
->> misinterpreted as a BLD #DB, and a false warning is triggerred.
->>
->>
->> Fix the bug by initializing DR6 by writing its architectural reset
->> value at boot time.
->>
->>
->> DR7 suffers from a similar issue.  We apply the same fix.
+On 6/13/2025 12:15 AM, Peter Zijlstra wrote:
+> On Fri, Jun 13, 2025 at 12:01:16AM -0700, Xin Li (Intel) wrote:
 > 
-> Bah, this DR6 polarity is a pain in the behind for sure. Patches look
-> good, except I'm really not a fan of using those 'names'. But I'll not
-> object too much of others like it.
+>> While at it, replace the hardcoded debug register number 7 with the
+>> existing DR_CONTROL macro for clarity.
+> 
+> Yeah, not really a fan of that... IMO that obfuscates the code more than
+> it helps, consider:
+> 
+>> -	get_debugreg(dr7, 7);
+>> +	get_debugreg(dr7, DR_CONTROL);
 
-Let's see if there will be more objections :)
+Actually I kind of agree with you that it may not help, because I had
+thought to rename DR7_RESET_VALUE to DR_CONTROL_RESET_VALUE.
+
+Yes, we should remember DR7 is the control register, however I also hate
+to decode it when looking at the code.
+
+
+> 
+> and:
+> 
+>> -	for (i = 0; i < 8; i++) {
+>> -		/* Ignore db4, db5 */
+>> -		if ((i == 4) || (i == 5))
+>> -			continue;
+>> +	/* Control register first */
+>> +	set_debugreg(DR7_RESET_VALUE, DR_CONTROL);
+>> +	set_debugreg(0, DR_STATUS);
+>>   
+>> +	/* Ignore db4, db5 */
+>> +	for (i = DR_FIRSTADDR; i <= DR_LASTADDR; i++)
+> 
+> I had to git-grep DR_{FIRST,LAST}ADDR to double check this was correct :(
+> 
+> Also, you now write them in the order:
+> 
+>    dr7, dr6, /* dr4, dr5 */, dr0, dr1, dr2, dr3
+> 
+> My OCD disagrees with this :-)
+> 
+
+The order of the other debug registers doesn't seem critical, however
+the control debug register should be the first, right?
+
+Here I prefer to use "control register" rather than "dr7" here :)
+
+Thanks!
+     Xin
 
