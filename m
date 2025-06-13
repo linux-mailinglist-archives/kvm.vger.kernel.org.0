@@ -1,156 +1,146 @@
-Return-Path: <kvm+bounces-49531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 229C5AD974D
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 23:25:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A9EBAD976B
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 23:39:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCD4316A771
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 21:25:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12382189DFC5
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 21:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A839128D8CB;
-	Fri, 13 Jun 2025 21:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46AC828D8EA;
+	Fri, 13 Jun 2025 21:39:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I+P/i+yj"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="b1GzwnCI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4345A28D83F
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 21:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C6E25393B;
+	Fri, 13 Jun 2025 21:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749849941; cv=none; b=itnHM8udI5H1XgMNQzFYjTYtsveUUTYExaEMeqW0dg2YwO+2D0Foeu+8rFS0dCCMh54R1uE3dYoK8a/GiBpjvcu9a4XuvDeqap1PtXGlOSZgGM0c8x4XgrM0/7gNsVJs4GEba3N+EP8FMp5pL0CRpcp4wniQHNfQODtUt+krI+w=
+	t=1749850766; cv=none; b=Z8RQJTAeNcWBazWhh8E/WskR1IVfKCfwIhT/npusx2gjWCX5PE6ZPxXUDJnuagmCiThJsEj8DXAsTxEj/PalmeGei5HkxYEHZYWUPi+n2zbKoq4r8y12+iSJGGgRtcw3H0l4FjUD4yv84VPF2VF0QHdPLDkuq07VQoiP2naeHOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749849941; c=relaxed/simple;
-	bh=sHV8yx62yol9Bk56YKbLE0IVF5sfS+vZdmV+r8o63x0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ILUgKQ6XbmLbF/MAS1ZpPTlO9cfKmugpnLQRZgSCDe+3kQHaQCEF40Osb4VyqCe3f25c02ZF9C/tLV6i6HZ3aKkvT/krkWt1x4377cNdXfqjdGyrhVAdUlXWDJRUjUolx0uG3fDHD3PUZ5Do8vKGpVoi+pmoJLfb7ZMfNCm1aiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I+P/i+yj; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a5ac8fae12so114081cf.0
-        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 14:25:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749849939; x=1750454739; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TPUzIppHcu65DcXjx+xmQ4p2o7TM+1lbGXLpXn/D90M=;
-        b=I+P/i+yjFwiAoPxoTgsLZdfFg8675RXWd3N3Md6glKsbKl4lvRtve5J0ZIuEaau554
-         UKda9Hl/lIcu6s6TXwx1TSrSSrz0g6+2Q9Rs6DJ7S8teVdvnfdT9QMjW9CbtMEpHRRbd
-         j6g8yktMlwMwLf2fpmUKuIF0ivDJdJtw9WBdJZd6c0ZDo9BvPcrX5fONn3sA3pkO2dXQ
-         FXgdpCc1kXmxz5zi5fQYAinoBaY5s1lBxDO7OkrsWCO7jKHWvAljQyFmsI2dQFNLqofn
-         G9Xb2I8IhglbdKiaDaJxnWzG6ruENsoJERAej4g/XSf7628bPMJ3BMsqiOSUnksUbFvo
-         Wn7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749849939; x=1750454739;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TPUzIppHcu65DcXjx+xmQ4p2o7TM+1lbGXLpXn/D90M=;
-        b=PO2NZZv/w7UPk2cFFCfypYJCWqIxl1uLqRFxdJK+9siRQYdES3VaK1H6dO6oRUE5lN
-         5wcFsoOaWzQ4C4J0rgdY8B74uqJB6hYkwe3Nq1xdH9wfQj29D64eV9657jQ6dbyFMGoK
-         g6u2xDN/tHZjOkpswDrhs+PlNopcMHdVeuRCoXAi1Bx+6bHLGYVOo7vwTMCbZvurtCtj
-         +zmoP3ZXaa4euAczyVTP3YNIih6y8l31vbUxmGDUx/JAfCl71xUQ+1zJREKXZsAqM4z6
-         pyaPcxn7ihEtJTrrZwAf5b6kPKXczCQEfrr5kn7qhk2gFSl4XuA31FduQIl6LUoL94np
-         BuPA==
-X-Forwarded-Encrypted: i=1; AJvYcCXoRCddrQEWPN6lKb9S3veJ2C7TDtkRdbfr/ARS5GJchmaM94JAoxVBZyVjO1t5KKNL1sA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9oVOKc5137/6BE4IKu9XKrkYr+BThI8d8nks0xb7TL/XLr0Oj
-	cm2u0KFLHcMrOl3tfS5rVg2TL+KKx8SE+VpEPTK7ojTpHURB5n7KCrKRADMqv4XIWmu2UGmTxwp
-	mXNj3ako+M1oJ2WQlge3Z3g74qfz7rKmN48sQkjsWZ+GbujBCdkqJwkkz
-X-Gm-Gg: ASbGncumV5qebs5hsMRi/96XONofRUGG43FhgU5aAGuzM5hnpR8uIQuxlWELKHNBwwL
-	P8DYLn+0bSmITR4YiTxnacnw+ERikz8KkW717EnI2LqC6GvPkuZ2zMkEgsygEnQR1eu5vLbxEjz
-	gH0KfvHdfnWLq17/lgw8WPBg2yitMUJiwvIWVHAO2mxtMMHTM66ZkfXw==
-X-Google-Smtp-Source: AGHT+IHRTXKzQVq2KTm0RSt5qVgrnPAP0bkIbd607Uu6/KmOUX6+sJKqoHDdBmms0U0ufq7rNkEH/UqGIKX1Oa8Sr14=
-X-Received: by 2002:a05:622a:610d:b0:498:e884:7ca9 with SMTP id
- d75a77b69052e-4a73da5803emr310651cf.13.1749849938737; Fri, 13 Jun 2025
- 14:25:38 -0700 (PDT)
+	s=arc-20240116; t=1749850766; c=relaxed/simple;
+	bh=dd5YllNw3LiDL+FK0LS1lk/yrXXaTOqxnyryj86SIKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V+5ER7GkWBeCBCoGLkqPVLCO0fOJd9vGc5cfMbVTWoGFjqng2gwQm6GGzR1TjnEny6hbLQv6V4SQYxm7lvWumBVf+Xittgd+FzvJJgk0nqoRdZ0zGkPfbL37QSZbL5KGTI07qm+ikNFUx6NHykqcBFQ6Tn5wgfKF7dwAV2ukqv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=b1GzwnCI; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55DLcahi3958308
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Fri, 13 Jun 2025 14:38:37 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55DLcahi3958308
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025052101; t=1749850720;
+	bh=wzkE3kgI5Av/aAIbr36C6n1BwVjfhYQH2jljupg13ag=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=b1GzwnCIgYQQs2+eR9/+9fjYiOWtIpDw6y8LuSnDjMIiLjQHdu5atNFwFgGCYIJ+j
+	 l5J+gBR5cA/nsADAwKWhgtXV7rOqgXHBlEjotdPLOeRX04XhLrqJyO/OtH/K20c/7F
+	 qZ8iJpiK1dbKyp1Ewus7a4mR2rE1+w9l+s0iLZJ/Xyyd9RjEFx2Uh0cZh406qhdUYJ
+	 kpSGIA2Ho56YA2gZAlBs1v8aIYQCnXshL60iUtmt3vzV3Btpc7SBuevH1LsxnrHG39
+	 auAMZ7UeqEmn8b0XVrwTqWr1KU7UT+9UcXUe+iCc9uSLX6SiHrEwvEHMWDIk4FkNr+
+	 9td15WLkLNxtw==
+Message-ID: <06d93a19-ebc1-418b-becd-225caac76baf@zytor.com>
+Date: Fri, 13 Jun 2025 14:38:35 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250613155239.2029059-1-rananta@google.com> <aEyPswyvfJ2-oC3l@linux.dev>
-In-Reply-To: <aEyPswyvfJ2-oC3l@linux.dev>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Fri, 13 Jun 2025 14:25:26 -0700
-X-Gm-Features: AX0GCFvCkuSdtDxaxbaw03np7924c6ya2dvq2vPeL3lenyiqTkrCE5acxgbNPCk
-Message-ID: <CAJHc60yacW7-1K3Uw9RT7a8qH9JyTXouiP=6VP3gifqzHgMaQQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] KVM: arm64: Add attribute to control GICD_TYPER2.nASSGIcap
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Mingwei Zhang <mizhang@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/3] x86/traps: Move DR7_RESET_VALUE to
+ <uapi/asm/debugreg.h>
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
+        peterz@infradead.org, brgerst@gmail.com, tony.luck@intel.com,
+        fenghuay@nvidia.com
+References: <20250613070118.3694407-1-xin@zytor.com>
+ <20250613070118.3694407-2-xin@zytor.com> <aEwzQ9vIcaZPtDsw@google.com>
+ <00358cf3-e59a-4a5f-8cfd-06a174da72b4@zytor.com>
+ <aEyEA6hXGeiN-0jp@google.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <aEyEA6hXGeiN-0jp@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 13, 2025 at 1:53=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Fri, Jun 13, 2025 at 03:52:34PM +0000, Raghavendra Rao Ananta wrote:
-> > A shortcoming of the GIC architecture is that there's an absolute limit=
- on
-> > the number of vPEs that can be tracked by the ITS. It is possible that
-> > an operator is running a mix of VMs on a system, only wanting to provid=
-e
-> > a specific class of VMs with hardware interrupt injection support.
-> >
-> > The series introduces KVM_DEV_ARM_VGIC_FEATURE_nASSGIcap vGIC attribute=
- to allow
-> > the userspace to control GICD_TYPER2.nASSGIcap (GICv4.1) on a per-VM ba=
-sis.
-> >
-> > v1: https://lore.kernel.org/kvmarm/20250514192159.1751538-1-rananta@goo=
-gle.com/
-> >
-> > v1 -> v2: https://lore.kernel.org/all/20250531012545.709887-1-oliver.up=
-ton@linux.dev/
-> >  - Drop all use of GICv4 in the UAPI and KVM-internal helpers in favor
-> >    of nASSGIcap. This changes things around to model a guest feature,
-> >    not a host feature.
-> >
-> >  - Consolidate UAPI into a single attribute and expect userspace to use
-> >    to read the attribute for discovery, much like we do with the ID
-> >    registers
-> >
-> >  - Squash documentation together with implementation
-> >
-> >  - Clean up maintenance IRQ attribute handling, which I ran into as par=
-t
-> >    of reviewing this series
-> >
-> > v2 -> v3:
-> >  - Update checks in vgic-v3.c and vgic-v4.c to also include nASSGIcap (=
-via
-> >    vgic_supports_direct_sgis()) that's configured by the userspace. (Ol=
-iver)
-> >
-> > Oliver Upton (2):
-> >   KVM: arm64: Disambiguate support for vSGIs v. vLPIs
-> >   KVM: arm64: vgic-v3: Consolidate MAINT_IRQ handling
->
-> Make sure you run checkpatch next time before sending out, it should've
-> warned you about sending patches w/o including your SOB.
->
-Hmm, I do run checkpatch before sending, but I don't see any warning as suc=
-h.
+On 6/13/2025 1:03 PM, Sean Christopherson wrote:
+> On Fri, Jun 13, 2025, Xin Li wrote:
+>> On 6/13/2025 7:18 AM, Sean Christopherson wrote:
+>>> On Fri, Jun 13, 2025, Xin Li (Intel) wrote:
+>>>> Move DR7_RESET_VALUE to <uapi/asm/debugreg.h> to prepare to write DR7
+>>>> with DR7_RESET_VALUE at boot time.
+>>>
+>>> Alternatively, what about dropping DR7_RESET_VALUE,  moving KVM's DR6 and DR7
+>>> #defines out of arch/x86/include/asm/kvm_host.h, and then using DR7_FIXED_1?
+>>
+>> We definitely should do it, I see quite a few architectural definitions
+>> are in KVM only headers (the native FRED patches needed to reuse the event
+>> types that were previously VMX-specific and moved them out of KVM
+>> headers).
+>>
+>> Because there is an UAPI header, we probably don't want to remove
+>> definitions from it?
+> 
+> What #defines are in which uapi header?
 
-Example:
-$ ./scripts/checkpatch.pl
-v3-0001-KVM-arm64-Disambiguate-support-for-vSGIs-v.-vLPIs.patch
-total: 0 errors, 0 warnings, 107 lines checked
+arch/x86/include/uapi/asm/debugreg.h has:
 
-v3-0001-KVM-arm64-Disambiguate-support-for-vSGIs-v.-vLPIs.patch has no
-obvious style problems and is ready for submission.
+#define DR_BUS_LOCK     (0x800)         /* bus_lock */
+#define DR_STEP         (0x4000)        /* single-step */
+#define DR_SWITCH       (0x8000)        /* task switch */
 
-I do see an option to tell the script to ignore the check:
---no-signoff, so I'm guessing it should check by default? Or is there
-any other option?
+And arch/x86/include/asm/kvm_host.h also has:
 
-Thank you.
-Raghavendra
+#define DR6_BUS_LOCK   (1 << 11)
+#define DR6_BD          (1 << 13)
+#define DR6_BS          (1 << 14)
+#define DR6_BT          (1 << 15)
+#define DR6_RTM         (1 << 16)
+
+Duplicated definitions for the same DR6 bits.
 
