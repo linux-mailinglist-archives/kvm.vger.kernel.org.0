@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-49364-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49365-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B6EAD8173
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 05:12:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E658AD8177
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 05:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7370E16891B
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 020FF3B1EE6
 	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 03:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FB126158D;
-	Fri, 13 Jun 2025 03:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08EE2265CBE;
+	Fri, 13 Jun 2025 03:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kanvOKyp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JUZ9fw1O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC9F25D1E2;
-	Fri, 13 Jun 2025 03:12:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACBAF2638B5;
+	Fri, 13 Jun 2025 03:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749784332; cv=none; b=u4kSNKcoSJdw9mk7rPNoMnROjzwKu5ortqWKN3puxpuvnERZMy0vCr4928GYQhHCjmbGEJ2EfODek2jQaeiOyt1T9RSbllFQsx68rJRIItV1p7KJJJM/7QGVHe4MuqeaSvwMbJBvtWNH6hxoVyL4li8K/bnA7LmlD/G4Ue8qza8=
+	t=1749784336; cv=none; b=ZTLpN+5RfgwTksO1LS+48jRzU45h/CkNCYbgHd+PULy8ozxWLJ0RJy7L7iTv5+3ICgCoPCVAidaOQ/UbhCcfACI8bep8wxkB05uWZ9bk5aIZD37c4IRGPP3EwIyELwy5xxvW2gw7YGLvH8/y8oteRVNSaYt0cDj5c3jWRdibYkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749784332; c=relaxed/simple;
-	bh=zTdqwv9Ssej6orvsbamVC5PHhURL+JyHsh7Gy+vvlK4=;
+	s=arc-20240116; t=1749784336; c=relaxed/simple;
+	bh=JpimrpV+MtzzCPBuM8z+T+yol8hWsqq4uAYSN7jCxp0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=B5QgbilpS+8ZFC/jzkmVQtjVy+CkulRptzkQh7CFOAUMYJX9d7xT1aCydyOI6Rz4qVXR7luZdkB0VlIGI5aK0d0X7vMEBh3VF+1feDBPpIqrKgzkfNZInYioLkp8tqYCliPmuOXjdpcg6XvIxR6t9arCnGSCVeCss2N6BnupjrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kanvOKyp; arc=none smtp.client-ip=209.85.215.174
+	 MIME-Version; b=Wem2nplCOEB6p50zpAvxds8IdJ+yn0T+UNi8Owkow1OdxzyuD0WJhDfm8giYkzayVKkrBjqZamQECpgD/4COZWXFe2L5eaP3es/cnpn5G0gR0BJCNq7O3Ib9vZ05zb2Dyh5zNFVvJF325m/TSy/tlGgGNC8fplgS5MI8meArdig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JUZ9fw1O; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b2c49373c15so1233686a12.3;
-        Thu, 12 Jun 2025 20:12:10 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2353a2bc210so15890955ad.2;
+        Thu, 12 Jun 2025 20:12:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749784330; x=1750389130; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1749784334; x=1750389134; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4JaBNyC5lfL5DwQH+KQYKj542RoCqVrJF6tcJtmbxpA=;
-        b=kanvOKypYcQh1zGFjbzRjor5jk8828yV1yYNliCBWZCLklkGlkS+6F7OmFdfzDEVMV
-         6Ncspr8MqrQlVaJzun61nxlXAWK4sWdoRSKRBlicKaRYsjLN4651vh5Roqpzq3Xp1zQH
-         My7xE+aooUpWyrGbzxrN21SUGa24UEuYEcQDVSrRp/NATrNSNmRUa2T2n4r3zbw5EvKl
-         6yHtGvWXA3Wn8gJ2fJgGPN2JmXQpBmnj39BoutJjVEf9FyPLUghPywNgKUzoXMzER0hl
-         hb5mDYHuWO4/L64YFKgTOt6/7iMjHMToevWlF4i3Lrrg3lqTiHe66GXVsLjj8xpZLoEk
-         YOZg==
+        bh=5pUMawIHS3ge9aNMrUwuQCI1wFUmsQ8BlgJBs2il1xQ=;
+        b=JUZ9fw1OH3kOFYfOQprWEt62/QyKbE+M+QKoRrGtXR+Vv9ry8w/IsUXyPSCqP7Hlf8
+         6fINDYpuSCTRGmHpu2nHiYsDZyAGejK0Q15EceX5r0e7r/PaWVK/Rk87KCPSFWKgzO5w
+         OLpB8v+FloqMhX+OCs6PPX9EpbOR0bl9F2ELPPwUK2xO66VOOjqOfwEW6/NqrttXsWxe
+         60cYralbr+t5wszJ0DkV2BEnBZ2CQkk68J5bcxB1fc+BJxeIz1Hvne0JQWA8CQCQusoM
+         rShWgBhXyR0Ognk102gqW0iHsOvH9K2J8kpO2Q059uVne3RvFs9ko/zYh9JG7o25aN1X
+         M8vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749784330; x=1750389130;
+        d=1e100.net; s=20230601; t=1749784334; x=1750389134;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4JaBNyC5lfL5DwQH+KQYKj542RoCqVrJF6tcJtmbxpA=;
-        b=UoB4ZzeuCpBoYy9IcXs+DcqUAUiZcVr2Mu1wuSUVxqBsNExrtHmRG1DY3Gah647CJ2
-         O7kJR9FFCmxQht16NooOtOLiH3dpGoTgd0EMycLwHtNRQWfAQEzCIinlQMoYHdGVcrwp
-         xZlF3wI0d6WvVvCCzhXOv3p+Qx4QWj+0TUALKyevnpq6fZQnil4+oFbUL6Qmh3AP0Cpc
-         /1o6ekFUEUBFEo+XLEhfLtYpca/tQwJzFPD7eZW+7eZ+BwKRr09FqCgExad64tUpJGa9
-         2puZ8iBpQa5e6++qa8V0w6EgnwzYHgUhNf+WJwOmHy/T8A/e+tZqLzaKKeLDv37rdN1K
-         tk2A==
-X-Forwarded-Encrypted: i=1; AJvYcCUV4jc1Na/6eFIZJ22esb8jEUSwsCgVDX5XWql2hqMkn8LB34aIHi/glYNTdSn2H4oVWuQ=@vger.kernel.org, AJvYcCVYOGIAlm5DRLKFZDwUdA8kYAY2T17htjiGuMEV9f+V4yymIIvXhP4oUBdxggyK1Xbs8KgGO6gO@vger.kernel.org, AJvYcCVzGGVVioRgiBRA6KZX+uw9tmPjr+WWj9087Ahz9eERdWA5pToRymFpnWNS5k5ZBuXdhfHwz9zodq/ol0go@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTvk8dsEDCg9UB0YP3DsMXtQOg0Z0ml5Cm4FIflVDzn+PPt8Ur
-	bAWzWrit1joirQd9EG0fg/zq5lJENsyAAyAN9IA/WVTCl/g3wFZek+QG
-X-Gm-Gg: ASbGncu6YgjNJ14Ap5VTM7pd1soYUyMYOFMvcLgMk6KiYbespFtY4VYE4imolWSQMHD
-	jicPtH21WZiAWjxwqFj4XCZLFekHCzTtc2n/SmrwizJXGukiECYvmtXLC76xhI3s/r4kozFnNbA
-	oe8Y7r9HXGOWympu76RfORC7QyVe4gOPcYk4p7HN6TxSCyo+KDZg9Kdmw2BItTrAVdukKPwO/EV
-	+FjdH1sZwgHBFGdQqnCmAXCCLN3QvrRktPEm1MZQ6C8t3dtppT+o8RtDdne2O1MnRoV2pAgVp5f
-	PF1TAzkdIRKauRSPye0kWZaUory8A+lNwkTeVmQAW2hx3OwcC2OfbENMZ5/aIefBpsMMWvJ/FQs
-	0k5iFaWf4
-X-Google-Smtp-Source: AGHT+IF6ZIGLNpqqBVYQhsnYee4rQdJFSL+hFV4nO+/toKNKtFhZK00+NJViwASyw5ZSKmQr/HD8ww==
-X-Received: by 2002:a17:90b:264e:b0:313:28e7:af14 with SMTP id 98e67ed59e1d1-313d9e93c27mr2245323a91.19.1749784330326;
-        Thu, 12 Jun 2025 20:12:10 -0700 (PDT)
+        bh=5pUMawIHS3ge9aNMrUwuQCI1wFUmsQ8BlgJBs2il1xQ=;
+        b=Tar8TPlkW7dF5X7RdTh5vMnHc1vjMXlmTxxdsaCn9DCp4ksIivQz+oLm//+3YS8MaH
+         aSalek3ftyPNC7hYiaAD2fcJDBZZcsVa2MN7GxHTJzHppX6jxyL4WiJQBN4KtJF9uK8A
+         snFUkMjSaek8jFJmFG3XirrVaZxLZbfcYKVKKmbrMLTpJyJTDhtr1Dgx3atZKSsCr5rx
+         jWXfEHmVxd9nDXTg5tGdt2UxFdf8nIFs+GekuPgp8dg2S86rUiv1BcuPNN8PYsp24Gri
+         3KbfpT0jr5aKgHX0uE34WJHVPVAxJ/PkcaE1f0gr8/LQRVya4sr375k71xOVD9A+ZA1J
+         dG5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUfPslA1nTgjxAqH229hn0lHw2yJ/7XILh6OAzb42UoPPipdPtUZqhQ2gHiuJNjor5fdfUGuWXmjPRkLgXJ@vger.kernel.org, AJvYcCXa4ozDpvidCEUGB8l0rAqvjyrPEfrfRHp7nO61pimPx5T8pPhbMU95NqrA+7VYakHBAZWgbAct@vger.kernel.org, AJvYcCXkOIK7wltxjB0lSvS5SxHRTRmkKwoN/3u+8Kfdmnam99vz6He09Ovem1HeOD8ig+YXs1w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+T4ZzZ1Lae1CsFnhjEf1NCIAZ9fniBK9eXONiLuo6FCpaAZyH
+	6hIwafbOQ5Bj/sadUY1TtEMI5r1IJUcAIodG0GqbdbGwtRwcdwgzAskM
+X-Gm-Gg: ASbGncsv7w5CjGABIBiWNLGYLQf/jAxoNZ9yqag3kzwdrE+lVoxK7bAVgg7GOOp2vH2
+	vtcl/rVI/+lhsso2SND0vWHdDcb8JT8/Cta3cjJz/0Yg599W2Jh/WZja6YGh74QZY5XxMe28/3y
+	pn+DGN6S4M28eIvS62TBRUEEJ/zWvmyhqZ4qEja3rSdRsvD+CVQo4vQoxaLznAz8e3PoWO8XNPk
+	A852/+D1Mz3BLpbGuk5fd0cRml8pqPVQT/DA9LmB2Ug4CYLoa7n0e7lIE4HXzUAbXYUgn3sZVfA
+	CAW5kCwhrwSop7e1BuTqtwKFxLYL+FRGhpITOkeVBaQscz4nfxbzsjPJPMdtcCuqCrDohyKG3sb
+	a3kgHFGZ8v9wZLUQmlTo=
+X-Google-Smtp-Source: AGHT+IE/WULKBGn+KiKpo+6kHWGrSlbQfCN38Xb5dm/8MIQWGayir5xKvllT8tXaon8W9A8tUHwuiQ==
+X-Received: by 2002:a17:903:1b2c:b0:235:ed02:288b with SMTP id d9443c01a7336-2365da0bb53mr17826825ad.30.1749784333984;
+        Thu, 12 Jun 2025 20:12:13 -0700 (PDT)
 Received: from devant.antgroup-inc.local ([47.89.83.0])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c1bcbb39sm2291801a91.8.2025.06.12.20.12.07
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c1bcbb39sm2291801a91.8.2025.06.12.20.12.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jun 2025 20:12:09 -0700 (PDT)
+        Thu, 12 Jun 2025 20:12:13 -0700 (PDT)
 From: Xuewei Niu <niuxuewei97@gmail.com>
 X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
 To: sgarzare@redhat.com,
@@ -88,9 +88,9 @@ Cc: virtualization@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	fupan.lfp@antgroup.com,
 	Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: [PATCH net-next v2 1/3] vsock: Add support for SIOCINQ ioctl
-Date: Fri, 13 Jun 2025 11:11:50 +0800
-Message-Id: <20250613031152.1076725-2-niuxuewei.nxw@antgroup.com>
+Subject: [PATCH net-next v2 2/3] vsock/virtio: Add SIOCINQ support for all virtio based transports
+Date: Fri, 13 Jun 2025 11:11:51 +0800
+Message-Id: <20250613031152.1076725-3-niuxuewei.nxw@antgroup.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250613031152.1076725-1-niuxuewei.nxw@antgroup.com>
 References: <20250613031152.1076725-1-niuxuewei.nxw@antgroup.com>
@@ -102,61 +102,91 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch adds support for SIOCINQ ioctl, which returns the number of
-bytes unread in the socket.
+The value of the SIOCINQ is obtained by `virtio_transport_unread_bytes()`,
+which is generic for all virtio transports. The function acquires the
+`rx_lock` and returns the value of `rx_bytes`.
 
 Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
 ---
- include/net/af_vsock.h   |  2 ++
- net/vmw_vsock/af_vsock.c | 22 ++++++++++++++++++++++
- 2 files changed, 24 insertions(+)
+ drivers/vhost/vsock.c                   |  1 +
+ include/linux/virtio_vsock.h            |  1 +
+ net/vmw_vsock/virtio_transport.c        |  1 +
+ net/vmw_vsock/virtio_transport_common.c | 13 +++++++++++++
+ net/vmw_vsock/vsock_loopback.c          |  1 +
+ 5 files changed, 17 insertions(+)
 
-diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-index d56e6e135158..723a886253ba 100644
---- a/include/net/af_vsock.h
-+++ b/include/net/af_vsock.h
-@@ -171,6 +171,8 @@ struct vsock_transport {
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 802153e23073..0f20af6e5036 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -452,6 +452,7 @@ static struct virtio_transport vhost_transport = {
+ 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
  
- 	/* SIOCOUTQ ioctl */
- 	ssize_t (*unsent_bytes)(struct vsock_sock *vsk);
-+	/* SIOCINQ ioctl */
-+	ssize_t (*unread_bytes)(struct vsock_sock *vsk);
+ 		.unsent_bytes             = virtio_transport_unsent_bytes,
++		.unread_bytes             = virtio_transport_unread_bytes,
  
- 	/* Shutdown. */
- 	int (*shutdown)(struct vsock_sock *, int);
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 2e7a3034e965..466b1ebadbbc 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -1389,6 +1389,28 @@ static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
- 	vsk = vsock_sk(sk);
+ 		.read_skb = virtio_transport_read_skb,
+ 	},
+diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+index 36fb3edfa403..74c50224431e 100644
+--- a/include/linux/virtio_vsock.h
++++ b/include/linux/virtio_vsock.h
+@@ -196,6 +196,7 @@ s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
+ u32 virtio_transport_seqpacket_has_data(struct vsock_sock *vsk);
  
- 	switch (cmd) {
-+	case SIOCINQ: {
-+		ssize_t n_bytes;
+ ssize_t virtio_transport_unsent_bytes(struct vsock_sock *vsk);
++ssize_t virtio_transport_unread_bytes(struct vsock_sock *vsk);
+ 
+ void virtio_transport_consume_skb_sent(struct sk_buff *skb,
+ 				       bool consume);
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index f0e48e6911fc..917881537b63 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -585,6 +585,7 @@ static struct virtio_transport virtio_transport = {
+ 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+ 
+ 		.unsent_bytes             = virtio_transport_unsent_bytes,
++		.unread_bytes             = virtio_transport_unread_bytes,
+ 
+ 		.read_skb = virtio_transport_read_skb,
+ 	},
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 1b5d9896edae..59e72d2dbd85 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -1135,6 +1135,19 @@ ssize_t virtio_transport_unsent_bytes(struct vsock_sock *vsk)
+ }
+ EXPORT_SYMBOL_GPL(virtio_transport_unsent_bytes);
+ 
++ssize_t virtio_transport_unread_bytes(struct vsock_sock *vsk)
++{
++	struct virtio_vsock_sock *vvs = vsk->trans;
++	size_t ret;
 +
-+		if (!vsk->transport || !vsk->transport->unread_bytes) {
-+			ret = -EOPNOTSUPP;
-+			break;
-+		}
++	spin_lock_bh(&vvs->rx_lock);
++	ret = vvs->rx_bytes;
++	spin_unlock_bh(&vvs->rx_lock);
 +
-+		if (sock_type_connectible(sk->sk_type) &&
-+		    sk->sk_state == TCP_LISTEN) {
-+			ret = -EINVAL;
-+			break;
-+		}
++	return ret;
++}
++EXPORT_SYMBOL_GPL(virtio_transport_unread_bytes);
 +
-+		n_bytes = vsk->transport->unread_bytes(vsk);
-+		if (n_bytes < 0) {
-+			ret = n_bytes;
-+			break;
-+		}
-+		ret = put_user(n_bytes, arg);
-+		break;
-+	}
- 	case SIOCOUTQ: {
- 		ssize_t n_bytes;
+ static int virtio_transport_reset(struct vsock_sock *vsk,
+ 				  struct sk_buff *skb)
+ {
+diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+index 6e78927a598e..13a77db2a76f 100644
+--- a/net/vmw_vsock/vsock_loopback.c
++++ b/net/vmw_vsock/vsock_loopback.c
+@@ -99,6 +99,7 @@ static struct virtio_transport loopback_transport = {
+ 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
  
+ 		.unsent_bytes             = virtio_transport_unsent_bytes,
++		.unread_bytes             = virtio_transport_unread_bytes,
+ 
+ 		.read_skb = virtio_transport_read_skb,
+ 	},
 -- 
 2.34.1
 
