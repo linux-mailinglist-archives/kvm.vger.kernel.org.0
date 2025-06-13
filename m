@@ -1,177 +1,226 @@
-Return-Path: <kvm+bounces-49508-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49509-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CB40AD9563
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 21:22:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2527CAD9569
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 21:23:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B1161BC361A
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 19:23:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E23A63AD6BB
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 19:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 226B6239E7A;
-	Fri, 13 Jun 2025 19:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0DD253B71;
+	Fri, 13 Jun 2025 19:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PWCKb+js"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jDB/Mqrf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935922E88BB
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 19:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1DA2E11A4
+	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 19:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749842099; cv=none; b=a56sSaQx+jh4bpqwCNaWn0MVCG1XP78tsvBkaRmkO7KG9qrem50rNOQyYycP8irFHRJkUDENC7a3rgIoVbnRBuLGKDMz106py4mf3JKZ+Hf3kYP+kcTzBbWMmmfVPsiTmxy2YDpN+FnQq2hfneJfUFWBAkNUo8sRSiLKL7oZaxw=
+	t=1749842128; cv=none; b=Pv73UUb4TN3U+A842CVvRBV/xGM5vPNxbX19CP1pg2gMIVmeGlgbf/PdiQ3lA0244Txf1wFpcC52+upnUvceD2BUL7ovq9WedpJeXEI/N/Z1aTQj6GBqlhRFjtc4no/kQWSLkYA3s1EtQeU9M3RxBFJTvLVufWNqOQ6300pgcKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749842099; c=relaxed/simple;
-	bh=RY9vOJOTnPoQGM71RK4CQ3oaie3GZfCxmMPWtcit47k=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=f78hoy/s1S5R3Bq+cJ4eon5tTdvd5RIb5krnWvPgEkhR/Y8jICsktoTyPm7FRk7RI49GYDlalMea7iNdI5pKPEFiN3puGdxwL9BFxwPswxEdmBLbnrIqTKTap/WI/amBkkY5oM5xMeU+fqWPRpvLciLPbdm6tus4tMkepaiCnvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PWCKb+js; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-312df02acf5so2728403a91.1
-        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 12:14:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749842097; x=1750446897; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yEGB1XBlJyFOc33mF8HkysHzlE2Wpy4+59tD02EfyJ4=;
-        b=PWCKb+js3f+k1T+cL+SeXTWAXJaJYEvyUOzF0edP/sQOdVA5DpO02easxFkGp8czLB
-         BfsFL4ZvW8soJz+z0kYNCYj3qGuKfFcHfOEvuF8E3v4/inN2I+gzEHRkUiyHWEm0GzF1
-         Nxc6RtvwYxGkwv0yua3bKg+tyatrmKcjiOXb23wPAAEFNcuQfW6Nh0FtcVdaOFUf4Vqg
-         WUsGESPPMq/HBq5tNbSoHNk8kBD4y6crALRPaefWzMtD6+1Lk+33ZhA33AHjxaz+cFFW
-         hq8o7GDBPYsXgXRBwbjX6qWHfRK1f2J6htuaU3mBGTmoMQozaW5xjQ//6zAwZsYuWTr4
-         BVcQ==
+	s=arc-20240116; t=1749842128; c=relaxed/simple;
+	bh=9SnSyYVg0kedc8JO1gYNGqXb9FJt5NkPMvIQXigRwus=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dx8jZqMi9LOsyOsfbv2LTiR6xQ7Md08kirOgxLe02EY1BNzV2DMJ+lz98SuJZ6qPf5O5vhZ0guq0OAGVtylZ13z6MkVJ8zfiEJ+8GcN8GjKDqLFpwKwOsY77Kaz6XLl0o3WGj+h1+PIbEKBXqCY2b4XRpC0DICu5AXaSKCpE7kA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jDB/Mqrf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749842125;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VJfPFlcDvR8fJBRiXniq1f1GzMtYJTiekQUbf2DHnUc=;
+	b=jDB/Mqrfw2O0iLp1WFKdfkrN7PNDFj7KoHKzOVcW03DGFJXbdVh2EgcoJSaJUOk49jRTUu
+	jFze//puEyj/fIHCWkkLoWbv6nNzqKZTR9sOcFGLGqMQbXSmFPp49htCaRkbobTL3KKtpw
+	iuOWp8rhPrkXWzS3iw9y07Qr0UuvUKA=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-677-7lWFqNdYPqaTSLysbyzL0Q-1; Fri, 13 Jun 2025 15:15:24 -0400
+X-MC-Unique: 7lWFqNdYPqaTSLysbyzL0Q-1
+X-Mimecast-MFC-AGG-ID: 7lWFqNdYPqaTSLysbyzL0Q_1749842124
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7d2107d6b30so374140985a.0
+        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 12:15:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749842097; x=1750446897;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yEGB1XBlJyFOc33mF8HkysHzlE2Wpy4+59tD02EfyJ4=;
-        b=KZ768FnQJyb1vT2QGpXCwfPZYptu74Oj7SIgBCAgW6WnhubCQkxyD0eGXApZjiCbyL
-         jNHMIom/OfiA96fC0IhB1dIEHPvXnfut5T+IboLtiV1nG5TsEU+N2ucy4GTH+0rQa14X
-         rv0HarJIxD+4UYTfUi8nCcXW/BfPOUt/nx7jnqIVbI33c8IVYdWspThXjxJv2Y9jYlgf
-         vEf0OAEw4TqpuunYzSofHrxGOVYjNNFheRyoYPddt5kGQC9gYhAlRDG+pI7PlIZHiwcv
-         AWp2L8nNWKUcu2NjFSDBlcU605naSFhv8fq7U95EDmXo7OaMaYR2Qf9A6OoZCSJikOvD
-         FMfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWajvzkwWhubcGxvmusgJ0vycJ2mc3Nq0QtR69Nsapx99jeFeOnYfsTAYCnptDoGpDFASU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlOd689FWj+FxP31yltNNvsmtjj+C7mKHYTRWviNaqJnXRu5aP
-	cxXqmY6EfnvHE0tDwha6TduKcmWH6tXqdGi8YCTHmqh1Pck3Gb3HIpNOZxUoJ3BGeBdF+8xqPG3
-	/oQ==
-X-Google-Smtp-Source: AGHT+IFFuR69PJDd7BsIpTM0aA+lzThoYubZQJbh5cEx7KYbBwGWGloMSfcPdi3XNIgGq89r5XPgiBtCPw==
-X-Received: from pjyp8.prod.google.com ([2002:a17:90a:e708:b0:311:ef56:7694])
- (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:17d0:b0:313:d7ec:b7b7
- with SMTP id 98e67ed59e1d1-313e90c5ce8mr2569833a91.13.1749842097051; Fri, 13
- Jun 2025 12:14:57 -0700 (PDT)
-Date: Fri, 13 Jun 2025 12:13:57 -0700
-In-Reply-To: <20250613191359.35078-1-sagis@google.com>
+        d=1e100.net; s=20230601; t=1749842124; x=1750446924;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VJfPFlcDvR8fJBRiXniq1f1GzMtYJTiekQUbf2DHnUc=;
+        b=mczLh9DBoPepuHDlnu53px5M+uQNKIC80lGv62BbYT/qrBz1zqsjbnDz+jr9dsnDuc
+         fgIulWkjWJsCKh5TsfcOtFKSICOEt102brMEMZz1Z1krrVjfeBVoSS52fPiSD8g37ZSx
+         NDPfSb+8WwD2teARGRzMZA74tIk89H6aP0x7vEYA5RziHl+ccX/ihNA6+0992dIyGd/y
+         O4iecBz+/IW98blsbEsFgU1mzcu2zqvxKwkU+aL+DbmFe99aPi8LzitxAgjHz4M3L+Es
+         FZF44/XZ+lFc1ksdiwnm1QsaTp7ezthdv9n3Du+7E3yEAA4NojBwG61owoNkS3xzGsAH
+         eXgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWL1HV0OTS4IvyT2HIv8rO6ETZNkYh/JmgT00wtT9fs0deqBQ1QjzScTGxgAHpno5G4azI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxklc73mRwTg+kwmDNM+daYTBxKhlR2EPh9tygiqCsC4+pweYBY
+	tDoFrCxUG1pwIQVApIeuf3yRmUAU++2cqr/5zja8oI8H4GygHxnY8KgSG2yn05HgRyp4usWu/Z8
+	1di7AhodN5OwBmxaTxzchk77NjipCZs8szerOGWUihA4szhwL200bOA==
+X-Gm-Gg: ASbGncvOm7aozEMB1tq8tXssyZAGTF9k65FGOhtgyP/uJiZ5WZ4d0gpKCUvAH4xMHvH
+	7ykBn6ls1lG2UzGddUl10ZWyhUcDkuaSo+RRFmH//D0HBTix5MVvMRpdnuZevg1sUDLp+y2W9f6
+	QOxjcyl+oSdkSgi5oxrsg5Lr0OqjMsYgd6j0uVKjx9MgGU5AYSnmOiC1L5pvM3ICL0xrQDRgjJC
+	4sN4i0pdBkdyuEXc+o2Zswizk0wlDXaQhMJ0hhXHI6zEmOO8m7Skw/V2wqNJjMiHQnYbMBPtxE9
+	FDlWrwL3rFTIew==
+X-Received: by 2002:a05:620a:4690:b0:7cd:3f01:7c83 with SMTP id af79cd13be357-7d3c6ced959mr86690085a.39.1749842123791;
+        Fri, 13 Jun 2025 12:15:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHHk+tLwiHsLDG8K2pZBbbo9MT0cMiJjdHUPCCmygz28zS6TQo7hCodBcEzueO0HEuES3dSRA==
+X-Received: by 2002:a05:620a:4690:b0:7cd:3f01:7c83 with SMTP id af79cd13be357-7d3c6ced959mr86685785a.39.1749842123343;
+        Fri, 13 Jun 2025 12:15:23 -0700 (PDT)
+Received: from x1.local ([85.131.185.92])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d3b8eac910sm208179585a.72.2025.06.13.12.15.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 12:15:22 -0700 (PDT)
+Date: Fri, 13 Jun 2025 15:15:19 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
+	David Hildenbrand <david@redhat.com>,
+	Nico Pache <npache@redhat.com>
+Subject: Re: [PATCH 5/5] vfio-pci: Best-effort huge pfnmaps with !MAP_FIXED
+ mappings
+Message-ID: <aEx4x_tvXzgrIanl@x1.local>
+References: <20250613134111.469884-1-peterx@redhat.com>
+ <20250613134111.469884-6-peterx@redhat.com>
+ <20250613142903.GL1174925@nvidia.com>
+ <aExDMO5fZ_VkSPqP@x1.local>
+ <20250613160956.GN1174925@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250613191359.35078-1-sagis@google.com>
-X-Mailer: git-send-email 2.50.0.rc2.692.g299adb8693-goog
-Message-ID: <20250613191359.35078-31-sagis@google.com>
-Subject: [PATCH v7 30/30] KVM: selftests: TDX: Test LOG_DIRTY_PAGES flag to a
- non-GUEST_MEMFD memslot
-From: Sagi Shahar <sagis@google.com>
-To: linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Ryan Afranji <afranji@google.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Erdem Aktas <erdemaktas@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Sagi Shahar <sagis@google.com>, Roger Wang <runanwang@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	"Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, Reinette Chatre <reinette.chatre@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Yan Zhao <yan.y.zhao@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250613160956.GN1174925@nvidia.com>
 
-From: Yan Zhao <yan.y.zhao@intel.com>
+On Fri, Jun 13, 2025 at 01:09:56PM -0300, Jason Gunthorpe wrote:
+> On Fri, Jun 13, 2025 at 11:26:40AM -0400, Peter Xu wrote:
+> > On Fri, Jun 13, 2025 at 11:29:03AM -0300, Jason Gunthorpe wrote:
+> > > On Fri, Jun 13, 2025 at 09:41:11AM -0400, Peter Xu wrote:
+> > > 
+> > > > +	/* Choose the alignment */
+> > > > +	if (IS_ENABLED(CONFIG_ARCH_SUPPORTS_PUD_PFNMAP) && phys_len >= PUD_SIZE) {
+> > > > +		ret = mm_get_unmapped_area_aligned(file, addr, len, phys_addr,
+> > > > +						   flags, PUD_SIZE, 0);
+> > > > +		if (ret)
+> > > > +			return ret;
+> > > > +	}
+> > > > +
+> > > > +	if (phys_len >= PMD_SIZE) {
+> > > > +		ret = mm_get_unmapped_area_aligned(file, addr, len, phys_addr,
+> > > > +						   flags, PMD_SIZE, 0);
+> > > > +		if (ret)
+> > > > +			return ret;
+> > > > +	}
+> > > 
+> > > Hurm, we have contiguous pages now, so PMD_SIZE is not so great, eg on
+> > > 4k ARM with we can have a 16*2M=32MB contiguity, and 16k ARM uses
+> > > contiguity to get a 32*16k=1GB option.
+> > > 
+> > > Forcing to only align to the PMD or PUD seems suboptimal..
+> > 
+> > Right, however the cont-pte / cont-pmd are still not supported in huge
+> > pfnmaps in general?  It'll definitely be nice if someone could look at that
+> > from ARM perspective, then provide support of both in one shot.
+> 
+> Maybe leave behind a comment about this. I've been poking around if
+> somone would do the ARM PFNMAP support but can't report any commitment.
 
-Add a selftest to verify that adding flag KVM_MEM_LOG_DIRTY_PAGES to a
-!KVM_MEM_GUEST_MEMFD memslot does not produce host errors in TDX.
+I didn't know what's the best part to take a note for the whole pfnmap
+effort, but I added a note into the commit message on this patch:
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-Signed-off-by: Sagi Shahar <sagis@google.com>
----
- tools/testing/selftests/kvm/x86/tdx_vm_test.c | 45 ++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+        Note 2: Currently continuous pgtable entries (for example, cont-pte) is not
+        yet supported for huge pfnmaps in general.  It also is not considered in
+        this patch so far.  Separate work will be needed to enable continuous
+        pgtable entries on archs that support it.
 
-diff --git a/tools/testing/selftests/kvm/x86/tdx_vm_test.c b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-index 82acc17a66ab..410d814dd39a 100644
---- a/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-+++ b/tools/testing/selftests/kvm/x86/tdx_vm_test.c
-@@ -1167,6 +1167,47 @@ void verify_tdcall_vp_info(void)
- 	printf("\t ... PASSED\n");
- }
- 
-+#define TDX_LOG_DIRTY_PAGES_FLAG_TEST_GPA (0xc0000000)
-+#define TDX_LOG_DIRTY_PAGES_FLAG_TEST_GVA_SHARED (0x90000000)
-+#define TDX_LOG_DIRTY_PAGES_FLAG_REGION_SLOT 10
-+#define TDX_LOG_DIRTY_PAGES_FLAG_REGION_NR_PAGES (0x1000 / getpagesize())
-+
-+void guest_code_log_dirty_flag(void)
-+{
-+	memset((void *)TDX_LOG_DIRTY_PAGES_FLAG_TEST_GVA_SHARED, 1, 8);
-+	tdx_test_success();
-+}
-+
-+/*
-+ * Verify adding flag KVM_MEM_LOG_DIRTY_PAGES to a !KVM_MEM_GUEST_MEMFD memslot
-+ * in a TD does not produce host errors.
-+ */
-+void verify_log_dirty_pages_flag_on_non_gmemfd_slot(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = td_create();
-+	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-+	vcpu = td_vcpu_add(vm, 0, guest_code_log_dirty_flag);
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    TDX_LOG_DIRTY_PAGES_FLAG_TEST_GPA,
-+				    TDX_LOG_DIRTY_PAGES_FLAG_REGION_SLOT,
-+				    TDX_LOG_DIRTY_PAGES_FLAG_REGION_NR_PAGES,
-+				    KVM_MEM_LOG_DIRTY_PAGES);
-+	virt_map_shared(vm, TDX_LOG_DIRTY_PAGES_FLAG_TEST_GVA_SHARED,
-+			(uint64_t)TDX_LOG_DIRTY_PAGES_FLAG_TEST_GPA,
-+			TDX_LOG_DIRTY_PAGES_FLAG_REGION_NR_PAGES);
-+	td_finalize(vm);
-+
-+	printf("Verifying Log dirty flag:\n");
-+	vcpu_run(vcpu);
-+	tdx_test_assert_success(vcpu);
-+	kvm_vm_free(vm);
-+	printf("\t ... PASSED\n");
-+}
-+
- int main(int argc, char **argv)
- {
- 	ksft_print_header();
-@@ -1174,7 +1215,7 @@ int main(int argc, char **argv)
- 	if (!is_tdx_enabled())
- 		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
- 
--	ksft_set_plan(15);
-+	ksft_set_plan(16);
- 	ksft_test_result(!run_in_new_process(&verify_td_lifecycle),
- 			 "verify_td_lifecycle\n");
- 	ksft_test_result(!run_in_new_process(&verify_report_fatal_error),
-@@ -1205,6 +1246,8 @@ int main(int argc, char **argv)
- 			 "verify_host_reading_private_mem\n");
- 	ksft_test_result(!run_in_new_process(&verify_tdcall_vp_info),
- 			 "verify_tdcall_vp_info\n");
-+	ksft_test_result(!run_in_new_process(&verify_log_dirty_pages_flag_on_non_gmemfd_slot),
-+			 "verify_log_dirty_pages_flag_on_non_gmemfd_slot\n");
- 
- 	ksft_finished();
- 	return 0;
+> 
+> > > > +fallback:
+> > > > +	return mm_get_unmapped_area(current->mm, file, addr, len, pgoff, flags);
+> > > 
+> > > Why not put this into mm_get_unmapped_area_vmflags() and get rid of
+> > > thp_get_unmapped_area_vmflags() too?
+> > > 
+> > > Is there any reason the caller should have to do a retry?
+> > 
+> > We would still need thp_get_unmapped_area_vmflags() because that encodes
+> > PMD_SIZE for THPs; we need the flexibility of providing any size alignment
+> > as a generic helper.
+> 
+> There is only one caller for thp_get_unmapped_area_vmflags(), just
+> open code PMD_SIZE there and thin this whole thing out. It reads
+> better like that anyhow:
+> 
+> 	} else if (IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE) && !file
+> 		   && !addr /* no hint */
+> 		   && IS_ALIGNED(len, PMD_SIZE)) {
+> 		/* Ensures that larger anonymous mappings are THP aligned. */
+> 		addr = mm_get_unmapped_area_aligned(file, 0, len, pgoff,
+> 						    flags, vm_flags, PMD_SIZE);
+> 
+> > That was ok, however that loses some flexibility when the caller wants to
+> > try with different alignments, exactly like above: currently, it was trying
+> > to do a first attempt of PUD mapping then fallback to PMD if that fails.
+> 
+> Oh, that's a good point, I didn't notice that subtle bit.
+> 
+> But then maybe that is showing the API is just wrong and the core code
+> should be trying to find the best alignment not the caller. Like we
+> can have those PUD/PMD size ifdefs inside the mm instead of in VFIO?
+> 
+> VFIO would just pass the BAR size, implying the best alignment, and
+> the core implementation will try to get the largest VMA alignment that
+> snaps to an arch supported page contiguity, testing each of the arches
+> page size possibilities in turn.
+> 
+> That sounds like a much better API than pushing this into drivers??
+
+Yes it would be nice if the core mm can evolve to make supporting such
+easier.  Though the question is how to pass information over to core mm.
+
+For example, currently a vfio device file represents the whole device, and
+it's also VFIO that defines what the MMIO region offsets means. So core mm
+has no simple idea which BAR VFIO is mapping if it only receives a mmap()
+request.  So even if we assume the core mm provides some vma flag showing
+that, it won't be per-vma, but need to be case by case of the mmap()
+request at least relevant to pgoff and len being mapped.
+
+And it's definitely the case that for one device its BAR sizes are
+different, hence it asks for different alignments when mmap() even if on
+the same device fd.
+
+It's similar to many other use cases of get_unmapped_area() users.  For
+example, see v4l2_m2m_get_unmapped_area() which has similar treatment on at
+least knowing which part of the file was being mapped:
+
+	if (offset < DST_QUEUE_OFF_BASE) {
+		vq = v4l2_m2m_get_src_vq(fh->m2m_ctx);
+	} else {
+		vq = v4l2_m2m_get_dst_vq(fh->m2m_ctx);
+		pgoff -= (DST_QUEUE_OFF_BASE >> PAGE_SHIFT);
+	}
+
+Such flexibility might still be needed for now until we know how to provide
+the abstraction.
+
+Meanwhile, there can be other constraints to existing get_unmapped_area()
+users that a decision might be done with any parameter passed into it
+besides the pgoff.. so even if we provide the whole pgoff info, it might
+not be enough.
+
 -- 
-2.50.0.rc2.692.g299adb8693-goog
+Peter Xu
 
 
