@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-49387-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49389-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BCC0AD838C
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 09:02:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F3B9AD8397
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 09:03:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D483F17B570
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 07:02:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EB3F7A28D8
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 07:02:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459BD25A645;
-	Fri, 13 Jun 2025 07:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E789925C81C;
+	Fri, 13 Jun 2025 07:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="wHz4K9b+"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="CIfInV0Q"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDD11EE7C6;
-	Fri, 13 Jun 2025 07:02:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF1C1F152D;
+	Fri, 13 Jun 2025 07:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749798155; cv=none; b=owE4/roc+05pXD9fQ7HIvThAzuQSQ1cb4eF3/sG+AobYLe52PJAjvNrh86DUsctDiIbWAndeX5HADXll7sbtbo/NtJdhoRE+ukiWKnEDYTMZ8QjTGliMjZf5TvjfpBklQX7sIDvGJAWFpp5Ea2SRPSAaQFqriSgGr0c0zYu5ONo=
+	t=1749798157; cv=none; b=QamHlgp3wDhKw8Sv17ymlV7xYMVl6Z5HY5dAP90Nba6YEfXIIoHgfQTIk2xReYW693BoN8BOFG3wA7jk+NRyKKdmC5mCQe63mrXx2PHOPpXZ+llpDfFRgHkBHzRqStPCwrLVPn93IQ+uvZhLVFsVLc2TOb5FPkUpGMDWc0mZmZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749798155; c=relaxed/simple;
-	bh=O7NEYvcqRsP442zVP1RJUi7y9UU+zLo1x88Gofl02Vc=;
+	s=arc-20240116; t=1749798157; c=relaxed/simple;
+	bh=2gbOykEfw8b0Skg7GZ9gS0aQ1S4WiRzL4kpoKT73o6k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=upf0KCwHpggqEP0qlvirvh5J1CLQ1gztYrYss7W/KcWq0toYtqb6cJF+nIwvSsAJEVrZPtBTeYYcPXcMvI1p7x0PsCkNo+zl2LtWZXkzxj/jgLUsz8GFJFQVzTlvZIZCOJs7HxyG2hQgRHxwcQ54hpwvtCh5OLA3vpcwnBgkSRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=wHz4K9b+; arc=none smtp.client-ip=198.137.202.136
+	 MIME-Version; b=L20ZFarzPcwLgHct3jqHaZRHjmAem3sOretSrpxceQLcQ/DsucOtwDecGjiMfhAM750sJvmWCjdpyIZ+6q5P6mx4VcYb9YzSYQOwk/M1LikVOo0ItcDzzEjFvHl6RDhryvSxQqaC/GCZOzMqVn6nENpRN1EVqiv63ZgsK+Ve6fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=CIfInV0Q; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55D71IfL3694425
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55D71IfM3694425
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Fri, 13 Jun 2025 00:01:28 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55D71IfL3694425
+	Fri, 13 Jun 2025 00:01:29 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55D71IfM3694425
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025052101; t=1749798089;
-	bh=vx4pQfjchlO1UPDPBXp/cPMaht6jv4yxEaB53+uFqBU=;
+	s=2025052101; t=1749798090;
+	bh=c56T8D2ZCMU1wWU13jvv/tk+j/ZEJRy0cc12msrPZsY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=wHz4K9b+z1X+h35UIPWb1bW2pcjOw89yj3tVk7zNuP+N/ADTzzrQsKCXAp3Bpo1mU
-	 fB5MsxxazzC/Abh5o2O4xstevdFPTCtbo0RrOngkCNT7TPmw2D0rpLnHfuW51Tobzj
-	 UT3sltdd/jsOvHd/NdSsJ9QfyCUpLkuqJmODVw4MQtfycQcJ/hCP+IcKre+H7ZkmXS
-	 h0f86IzgEwBSoUaZ2j5lTMB/OugXTMRpuK2vTvcEinnRvm1ef4Nl4YYRg/p9XO94No
-	 yo3JQFWwEJ1z4xYbzFX0wG+CXZf2tk7SSNVnxJBXpdK290jKdPNMfo2u5eaDda7n8G
-	 sC/ThFBOpo1xA==
+	b=CIfInV0QoUeYeKzmCKxbzua4kNlZuLua3q2+GExDA4HRqVSxokRIogfzkxxf2sC4J
+	 OpS87qxTsMsDwblt/dfEcDv115SsmCPFp4vXLHt9dz6GA2foZnlZ0pBImYaUBc8xCf
+	 ZzTxPo0SuNSBUuSo+DRZ6veTXogmj2iQdjy1JnyFH6ryYN2HoqmJuFR2MBJHmotEka
+	 A7SV8GYE0Wcs/JW1W5YlqWvSdbRSqfupwn0ZyNOXIbzwU/pCiNi7xotovbJaDIBlw0
+	 +TQ0jfArTDw7MXwUXVi1RO3J1d62Q3ssnQM4YnBSze3jAcHI+kjorie2dedGBi07ba
+	 TFXSfvVUirpFg==
 From: "Xin Li (Intel)" <xin@zytor.com>
 To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
         seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
         brgerst@gmail.com, tony.luck@intel.com, fenghuay@nvidia.com
-Subject: [PATCH v1 2/3] x86/traps: Initialize DR7 by writing its architectural reset value
-Date: Fri, 13 Jun 2025 00:01:16 -0700
-Message-ID: <20250613070118.3694407-3-xin@zytor.com>
+Subject: [PATCH v1 3/3] x86/traps: Initialize DR6 by writing its architectural reset value
+Date: Fri, 13 Jun 2025 00:01:17 -0700
+Message-ID: <20250613070118.3694407-4-xin@zytor.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250613070118.3694407-1-xin@zytor.com>
 References: <20250613070118.3694407-1-xin@zytor.com>
@@ -67,231 +67,232 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Initialize DR7 by writing its architectural reset value to ensure
-compliance with the specification.
+Initialize DR6 by writing its architectural reset value to ensure
+compliance with the specification.  This avoids incorrectly zeroing
+DR6 to clear DR6.BLD at boot time, which leads to a false bus lock
+detected warning.
 
-Since clear_all_debug_regs() no longer zeros all debug registers,
-rename it to initialize_debug_regs() to better reflect its current
-behavior.
+The Intel SDM says:
 
-While at it, replace the hardcoded debug register number 7 with the
-existing DR_CONTROL macro for clarity.
+  1) Certain debug exceptions may clear bits 0-3 of DR6.
 
+  2) BLD induced #DB clears DR6.BLD and any other debug exception
+     doesn't modify DR6.BLD.
+
+  3) RTM induced #DB clears DR6.RTM and any other debug exception
+     sets DR6.RTM.
+
+  To avoid confusion in identifying debug exceptions, debug handlers
+  should set DR6.BLD and DR6.RTM, and clear other DR6 bits before
+  returning.
+
+The DR6 architectural reset value 0xFFFF0FF0, already defined as
+macro DR6_RESERVED, satisfies these requirements, so just use it to
+reinitialize DR6 whenever needed.
+
+Since debug_read_clear_dr6() no longer clears DR6, rename it to
+debug_read_reset_dr6() to better reflect its current behavior.
+
+While at it, replace the hardcoded debug register number 6 with the
+existing DR_STATUS macro for clarity.
+
+Reported-by: Sohil Mehta <sohil.mehta@intel.com>
+Link: https://lore.kernel.org/lkml/06e68373-a92b-472e-8fd9-ba548119770c@intel.com/
+Fixes: ebb1064e7c2e9 ("x86/traps: Handle #DB for bus lock")
+Suggested-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Reviewed-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+Cc: stable@vger.kernel.org
 ---
- arch/x86/include/asm/debugreg.h | 12 ++++++------
- arch/x86/kernel/cpu/common.c    | 17 +++++++----------
- arch/x86/kernel/hw_breakpoint.c |  6 +++---
- arch/x86/kernel/kgdb.c          |  4 ++--
- arch/x86/kernel/process_32.c    |  4 ++--
- arch/x86/kernel/process_64.c    |  4 ++--
- arch/x86/kvm/vmx/nested.c       |  2 +-
- arch/x86/kvm/x86.c              |  4 ++--
- 8 files changed, 25 insertions(+), 28 deletions(-)
+ arch/x86/include/uapi/asm/debugreg.h |  7 +++++-
+ arch/x86/kernel/cpu/common.c         |  2 +-
+ arch/x86/kernel/hw_breakpoint.c      |  2 +-
+ arch/x86/kernel/process_32.c         |  2 +-
+ arch/x86/kernel/process_64.c         |  2 +-
+ arch/x86/kernel/traps.c              | 36 +++++++++++++++++-----------
+ arch/x86/kvm/vmx/vmx.c               |  6 ++---
+ 7 files changed, 35 insertions(+), 22 deletions(-)
 
-diff --git a/arch/x86/include/asm/debugreg.h b/arch/x86/include/asm/debugreg.h
-index 363110e6b2e3..bfa8cfcb9732 100644
---- a/arch/x86/include/asm/debugreg.h
-+++ b/arch/x86/include/asm/debugreg.h
-@@ -100,8 +100,8 @@ static __always_inline void native_set_debugreg(int regno, unsigned long value)
+diff --git a/arch/x86/include/uapi/asm/debugreg.h b/arch/x86/include/uapi/asm/debugreg.h
+index d16f53c3a9df..e407d84133a9 100644
+--- a/arch/x86/include/uapi/asm/debugreg.h
++++ b/arch/x86/include/uapi/asm/debugreg.h
+@@ -15,7 +15,12 @@
+    which debugging register was responsible for the trap.  The other bits
+    are either reserved or not of interest to us. */
  
- static inline void hw_breakpoint_disable(void)
- {
--	/* Zero the control register for HW Breakpoint */
--	set_debugreg(0UL, 7);
-+	/* Reset the control register for HW Breakpoint */
-+	set_debugreg(DR7_RESET_VALUE, DR_CONTROL);
+-/* Define reserved bits in DR6 which are always set to 1 */
++/*
++ * Define reserved bits in DR6 which are set to 1 by default.
++ *
++ * This is also the DR6 architectural value following Power-up, Reset or INIT.
++ * Some of these reserved bits can be set to 0 by hardware or software.
++ */
+ #define DR6_RESERVED	(0xFFFF0FF0)
  
- 	/* Zero-out the individual HW breakpoint address registers */
- 	set_debugreg(0UL, 0);
-@@ -124,10 +124,10 @@ static __always_inline unsigned long local_db_save(void)
- 	if (static_cpu_has(X86_FEATURE_HYPERVISOR) && !hw_breakpoint_active())
- 		return 0;
- 
--	get_debugreg(dr7, 7);
--	dr7 &= ~0x400; /* architecturally set bit */
-+	get_debugreg(dr7, DR_CONTROL);
-+	dr7 &= ~DR7_RESET_VALUE; /* architecturally set bit */
- 	if (dr7)
--		set_debugreg(0, 7);
-+		set_debugreg(DR7_RESET_VALUE, DR_CONTROL);
- 	/*
- 	 * Ensure the compiler doesn't lower the above statements into
- 	 * the critical section; disabling breakpoints late would not
-@@ -147,7 +147,7 @@ static __always_inline void local_db_restore(unsigned long dr7)
- 	 */
- 	barrier();
- 	if (dr7)
--		set_debugreg(dr7, 7);
-+		set_debugreg(dr7, DR_CONTROL);
- }
- 
- #ifdef CONFIG_CPU_SUP_AMD
+ #define DR_TRAP0	(0x1)		/* db0 */
 diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 8feb8fd2957a..628aa43acb41 100644
+index 628aa43acb41..459faad8dccc 100644
 --- a/arch/x86/kernel/cpu/common.c
 +++ b/arch/x86/kernel/cpu/common.c
-@@ -2243,20 +2243,17 @@ EXPORT_PER_CPU_SYMBOL(__stack_chk_guard);
- #endif
- #endif
+@@ -2249,7 +2249,7 @@ static void initialize_debug_regs(void)
  
--/*
-- * Clear all 6 debug registers:
-- */
--static void clear_all_debug_regs(void)
-+static void initialize_debug_regs(void)
- {
- 	int i;
+ 	/* Control register first */
+ 	set_debugreg(DR7_RESET_VALUE, DR_CONTROL);
+-	set_debugreg(0, DR_STATUS);
++	set_debugreg(DR6_RESERVED, DR_STATUS);
  
--	for (i = 0; i < 8; i++) {
--		/* Ignore db4, db5 */
--		if ((i == 4) || (i == 5))
--			continue;
-+	/* Control register first */
-+	set_debugreg(DR7_RESET_VALUE, DR_CONTROL);
-+	set_debugreg(0, DR_STATUS);
- 
-+	/* Ignore db4, db5 */
-+	for (i = DR_FIRSTADDR; i <= DR_LASTADDR; i++)
- 		set_debugreg(0, i);
--	}
- }
- 
- #ifdef CONFIG_KGDB
-@@ -2417,7 +2414,7 @@ void cpu_init(void)
- 
- 	load_mm_ldt(&init_mm);
- 
--	clear_all_debug_regs();
-+	initialize_debug_regs();
- 	dbg_restore_debug_regs();
- 
- 	doublefault_init_cpu_tss();
+ 	/* Ignore db4, db5 */
+ 	for (i = DR_FIRSTADDR; i <= DR_LASTADDR; i++)
 diff --git a/arch/x86/kernel/hw_breakpoint.c b/arch/x86/kernel/hw_breakpoint.c
-index b01644c949b2..29f4473817a1 100644
+index 29f4473817a1..05f333286eb8 100644
 --- a/arch/x86/kernel/hw_breakpoint.c
 +++ b/arch/x86/kernel/hw_breakpoint.c
-@@ -125,7 +125,7 @@ int arch_install_hw_breakpoint(struct perf_event *bp)
- 	 */
- 	barrier();
- 
--	set_debugreg(*dr7, 7);
-+	set_debugreg(*dr7, DR_CONTROL);
- 	if (info->mask)
- 		amd_set_dr_addr_mask(info->mask, i);
- 
-@@ -164,7 +164,7 @@ void arch_uninstall_hw_breakpoint(struct perf_event *bp)
- 	dr7 = this_cpu_read(cpu_dr7);
- 	dr7 &= ~__encode_dr7(i, info->len, info->type);
- 
--	set_debugreg(dr7, 7);
-+	set_debugreg(dr7, DR_CONTROL);
- 	if (info->mask)
- 		amd_set_dr_addr_mask(0, i);
- 
-@@ -487,7 +487,7 @@ void hw_breakpoint_restore(void)
+@@ -486,7 +486,7 @@ void hw_breakpoint_restore(void)
+ 	set_debugreg(__this_cpu_read(cpu_debugreg[1]), 1);
  	set_debugreg(__this_cpu_read(cpu_debugreg[2]), 2);
  	set_debugreg(__this_cpu_read(cpu_debugreg[3]), 3);
- 	set_debugreg(DR6_RESERVED, 6);
--	set_debugreg(__this_cpu_read(cpu_dr7), 7);
-+	set_debugreg(__this_cpu_read(cpu_dr7), DR_CONTROL);
+-	set_debugreg(DR6_RESERVED, 6);
++	set_debugreg(DR6_RESERVED, DR_STATUS);
+ 	set_debugreg(__this_cpu_read(cpu_dr7), DR_CONTROL);
  }
  EXPORT_SYMBOL_GPL(hw_breakpoint_restore);
- 
-diff --git a/arch/x86/kernel/kgdb.c b/arch/x86/kernel/kgdb.c
-index 102641fd2172..1b7a63f18c6d 100644
---- a/arch/x86/kernel/kgdb.c
-+++ b/arch/x86/kernel/kgdb.c
-@@ -202,7 +202,7 @@ static void kgdb_correct_hw_break(void)
- 			early_dr7 |= encode_dr7(breakno,
- 						breakinfo[breakno].len,
- 						breakinfo[breakno].type);
--			set_debugreg(early_dr7, 7);
-+			set_debugreg(early_dr7, DR_CONTROL);
- 			continue;
- 		}
- 		bp = *per_cpu_ptr(breakinfo[breakno].pev, cpu);
-@@ -385,7 +385,7 @@ static void kgdb_disable_hw_debug(struct pt_regs *regs)
- 	struct perf_event *bp;
- 
- 	/* Disable hardware debugging while we are in kgdb: */
--	set_debugreg(0UL, 7);
-+	set_debugreg(DR7_RESET_VALUE, DR_CONTROL);
- 	for (i = 0; i < HBP_NUM; i++) {
- 		if (!breakinfo[i].enabled)
- 			continue;
 diff --git a/arch/x86/kernel/process_32.c b/arch/x86/kernel/process_32.c
-index a10e180cbf23..f5f28a8fa44c 100644
+index f5f28a8fa44c..62d6e2def021 100644
 --- a/arch/x86/kernel/process_32.c
 +++ b/arch/x86/kernel/process_32.c
-@@ -89,11 +89,11 @@ void __show_regs(struct pt_regs *regs, enum show_regs_mode mode,
+@@ -88,7 +88,7 @@ void __show_regs(struct pt_regs *regs, enum show_regs_mode mode,
+ 	get_debugreg(d1, 1);
  	get_debugreg(d2, 2);
  	get_debugreg(d3, 3);
- 	get_debugreg(d6, 6);
--	get_debugreg(d7, 7);
-+	get_debugreg(d7, DR_CONTROL);
+-	get_debugreg(d6, 6);
++	get_debugreg(d6, DR_STATUS);
+ 	get_debugreg(d7, DR_CONTROL);
  
  	/* Only print out debug registers if they are in their non-default state. */
- 	if ((d0 == 0) && (d1 == 0) && (d2 == 0) && (d3 == 0) &&
--	    (d6 == DR6_RESERVED) && (d7 == 0x400))
-+	    (d6 == DR6_RESERVED) && (d7 == DR7_RESET_VALUE))
- 		return;
- 
- 	printk("%sDR0: %08lx DR1: %08lx DR2: %08lx DR3: %08lx\n",
 diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
-index 8d6cf25127aa..1eb1ac948878 100644
+index 1eb1ac948878..f8465bf8be0d 100644
 --- a/arch/x86/kernel/process_64.c
 +++ b/arch/x86/kernel/process_64.c
-@@ -129,11 +129,11 @@ void __show_regs(struct pt_regs *regs, enum show_regs_mode mode,
+@@ -128,7 +128,7 @@ void __show_regs(struct pt_regs *regs, enum show_regs_mode mode,
+ 	get_debugreg(d1, 1);
  	get_debugreg(d2, 2);
  	get_debugreg(d3, 3);
- 	get_debugreg(d6, 6);
--	get_debugreg(d7, 7);
-+	get_debugreg(d7, DR_CONTROL);
+-	get_debugreg(d6, 6);
++	get_debugreg(d6, DR_STATUS);
+ 	get_debugreg(d7, DR_CONTROL);
  
  	/* Only print out debug registers if they are in their non-default state. */
- 	if (!((d0 == 0) && (d1 == 0) && (d2 == 0) && (d3 == 0) &&
--	    (d6 == DR6_RESERVED) && (d7 == 0x400))) {
-+	    (d6 == DR6_RESERVED) && (d7 == DR7_RESET_VALUE))) {
- 		printk("%sDR0: %016lx DR1: %016lx DR2: %016lx\n",
- 		       log_lvl, d0, d1, d2);
- 		printk("%sDR3: %016lx DR6: %016lx DR7: %016lx\n",
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 7211c71d4241..6bad44db2168 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3270,7 +3270,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
- 	 * VMExit clears RFLAGS.IF and DR7, even on a consistency check.
+diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+index c5c897a86418..371a80ed97f8 100644
+--- a/arch/x86/kernel/traps.c
++++ b/arch/x86/kernel/traps.c
+@@ -1022,24 +1022,32 @@ static bool is_sysenter_singlestep(struct pt_regs *regs)
+ #endif
+ }
+ 
+-static __always_inline unsigned long debug_read_clear_dr6(void)
++static __always_inline unsigned long debug_read_reset_dr6(void)
+ {
+ 	unsigned long dr6;
+ 
++	get_debugreg(dr6, DR_STATUS);
++	dr6 ^= DR6_RESERVED; /* Flip to positive polarity */
++
+ 	/*
+ 	 * The Intel SDM says:
+ 	 *
+-	 *   Certain debug exceptions may clear bits 0-3. The remaining
+-	 *   contents of the DR6 register are never cleared by the
+-	 *   processor. To avoid confusion in identifying debug
+-	 *   exceptions, debug handlers should clear the register before
+-	 *   returning to the interrupted task.
++	 *   Certain debug exceptions may clear bits 0-3 of DR6.
++	 *
++	 *   BLD induced #DB clears DR6.BLD and any other debug
++	 *   exception doesn't modify DR6.BLD.
+ 	 *
+-	 * Keep it simple: clear DR6 immediately.
++	 *   RTM induced #DB clears DR6.RTM and any other debug
++	 *   exception sets DR6.RTM.
++	 *
++	 *   To avoid confusion in identifying debug exceptions,
++	 *   debug handlers should set DR6.BLD and DR6.RTM, and
++	 *   clear other DR6 bits before returning.
++	 *
++	 * Keep it simple: write DR6 with its architectural reset
++	 * value 0xFFFF0FF0, defined as DR6_RESERVED, immediately.
  	 */
- 	if (hw_breakpoint_active())
--		set_debugreg(__this_cpu_read(cpu_dr7), 7);
-+		set_debugreg(__this_cpu_read(cpu_dr7), DR_CONTROL);
- 	local_irq_enable();
- 	preempt_enable();
+-	get_debugreg(dr6, 6);
+-	set_debugreg(DR6_RESERVED, 6);
+-	dr6 ^= DR6_RESERVED; /* Flip to positive polarity */
++	set_debugreg(DR6_RESERVED, DR_STATUS);
  
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b58a74c1722d..20fa9733aed1 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11035,7 +11035,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	return dr6;
+ }
+@@ -1239,13 +1247,13 @@ static noinstr void exc_debug_user(struct pt_regs *regs, unsigned long dr6)
+ /* IST stack entry */
+ DEFINE_IDTENTRY_DEBUG(exc_debug)
+ {
+-	exc_debug_kernel(regs, debug_read_clear_dr6());
++	exc_debug_kernel(regs, debug_read_reset_dr6());
+ }
  
- 	if (unlikely(vcpu->arch.switch_db_regs &&
- 		     !(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH))) {
--		set_debugreg(0, 7);
-+		set_debugreg(DR7_RESET_VALUE, DR_CONTROL);
- 		set_debugreg(vcpu->arch.eff_db[0], 0);
- 		set_debugreg(vcpu->arch.eff_db[1], 1);
- 		set_debugreg(vcpu->arch.eff_db[2], 2);
-@@ -11044,7 +11044,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		if (unlikely(vcpu->arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT))
- 			kvm_x86_call(set_dr6)(vcpu, vcpu->arch.dr6);
- 	} else if (unlikely(hw_breakpoint_active())) {
--		set_debugreg(0, 7);
-+		set_debugreg(DR7_RESET_VALUE, DR_CONTROL);
- 	}
+ /* User entry, runs on regular task stack */
+ DEFINE_IDTENTRY_DEBUG_USER(exc_debug)
+ {
+-	exc_debug_user(regs, debug_read_clear_dr6());
++	exc_debug_user(regs, debug_read_reset_dr6());
+ }
  
- 	vcpu->arch.host_debugctl = get_debugctlmsr();
+ #ifdef CONFIG_X86_FRED
+@@ -1264,7 +1272,7 @@ DEFINE_FREDENTRY_DEBUG(exc_debug)
+ {
+ 	/*
+ 	 * FRED #DB stores DR6 on the stack in the format which
+-	 * debug_read_clear_dr6() returns for the IDT entry points.
++	 * debug_read_reset_dr6() returns for the IDT entry points.
+ 	 */
+ 	unsigned long dr6 = fred_event_data(regs);
+ 
+@@ -1279,7 +1287,7 @@ DEFINE_FREDENTRY_DEBUG(exc_debug)
+ /* 32 bit does not have separate entry points. */
+ DEFINE_IDTENTRY_RAW(exc_debug)
+ {
+-	unsigned long dr6 = debug_read_clear_dr6();
++	unsigned long dr6 = debug_read_reset_dr6();
+ 
+ 	if (user_mode(regs))
+ 		exc_debug_user(regs, dr6);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4953846cb30d..3d187995a174 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5593,7 +5593,7 @@ void vmx_sync_dirty_debug_regs(struct kvm_vcpu *vcpu)
+ 	get_debugreg(vcpu->arch.db[1], 1);
+ 	get_debugreg(vcpu->arch.db[2], 2);
+ 	get_debugreg(vcpu->arch.db[3], 3);
+-	get_debugreg(vcpu->arch.dr6, 6);
++	get_debugreg(vcpu->arch.dr6, DR_STATUS);
+ 	vcpu->arch.dr7 = vmcs_readl(GUEST_DR7);
+ 
+ 	vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_WONT_EXIT;
+@@ -5603,13 +5603,13 @@ void vmx_sync_dirty_debug_regs(struct kvm_vcpu *vcpu)
+ 	 * exc_debug expects dr6 to be cleared after it runs, avoid that it sees
+ 	 * a stale dr6 from the guest.
+ 	 */
+-	set_debugreg(DR6_RESERVED, 6);
++	set_debugreg(DR6_RESERVED, DR_STATUS);
+ }
+ 
+ void vmx_set_dr6(struct kvm_vcpu *vcpu, unsigned long val)
+ {
+ 	lockdep_assert_irqs_disabled();
+-	set_debugreg(vcpu->arch.dr6, 6);
++	set_debugreg(vcpu->arch.dr6, DR_STATUS);
+ }
+ 
+ void vmx_set_dr7(struct kvm_vcpu *vcpu, unsigned long val)
 -- 
 2.49.0
 
