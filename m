@@ -1,126 +1,96 @@
-Return-Path: <kvm+bounces-49406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7514AD8A6B
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 13:26:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8BFDAD8AA8
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 13:39:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4AE73A8F6B
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 11:25:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9216188990D
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 11:39:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FD42D8767;
-	Fri, 13 Jun 2025 11:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SMRbJ5k9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5834D2D8DD0;
+	Fri, 13 Jun 2025 11:38:51 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33FE26B745
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 11:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1CC18BC0C;
+	Fri, 13 Jun 2025 11:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749813959; cv=none; b=hynh0d3UPDU0wFgpIcpKwu2T7pZU5Df/r5MdZtBIZ8IOEMa9YzFrtkwfxSlEWTBJlljezpkMDA/0YsZo6qGOwiihvAEfgvm6tNadJVrI7LABZ8j3URcLns5Voga6QWHjib1Ped3g3a98UTCNegewdEhqiGuSEBitJ7Z6pwn+krE=
+	t=1749814730; cv=none; b=NZIaNLzLONf0t6FkXu76bXoYwqhU8LcHWCA+kL/OrcRUYNLGYb7H9cqPzLtHpTAT6g1FJSYY8mX2p+/ikE5oTWxH0gfXGELn8VvCS3R5TMFNMV8NxUS5ZTL1INSUof1gRizOjnUJ9+b5JzjLz6CpUZfpIxlBNV14zZmev8eUPQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749813959; c=relaxed/simple;
-	bh=pk9HppbaBEfEzasCa8/FcOZZbSVG39tJMmN6FNqxJZg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V5UXwjmulW4tNKmc0lzCq4NcKVZ1i1IKvWCb+KIrFcY2rV2Hij1Ut9prQNm21E5H7/4DaPD8G0VqwkUp3nMDOAyz5gh/KzdTQjyqGOfrkNP1fbh450Fn+V2FuqHToBkHCc2HiOS2PfwuV5tC9pwN1raPp4evoGYA3o5nBb/MEto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SMRbJ5k9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749813956;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OtTPCernLeO8trjul5Ba7rf8xkqDU8wN6cWgKdmxGDA=;
-	b=SMRbJ5k9gv2cAaHFvqzEMTj2J24LBF2D0bXgNkSHwLeGQUom2jNuPxdPd4MjUnQX0755cZ
-	xTV+9IIaYLsZt2kf+RngyLWlIGGA9l6NRqwOuYM+AhaBHGt9PLuRRz+j0KXrD3IZ1QVyYr
-	U2yNcWgcZcAYqJRK/q+ffkGAJEJHTi0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-368-yrr2wCCtPyC_v87Airc2jQ-1; Fri, 13 Jun 2025 07:25:55 -0400
-X-MC-Unique: yrr2wCCtPyC_v87Airc2jQ-1
-X-Mimecast-MFC-AGG-ID: yrr2wCCtPyC_v87Airc2jQ_1749813954
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4f7f1b932so1297371f8f.2
-        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 04:25:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749813954; x=1750418754;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OtTPCernLeO8trjul5Ba7rf8xkqDU8wN6cWgKdmxGDA=;
-        b=ctEnt2kue9/dKFwxLZDx33iPfz7PU2WnD7NVrFiyyUYqF8kYETr9ZrDvUtU+VSHvgn
-         bBzb2+znCeHSlFzGXOLI65Fv4TW5K5HkOiv0hf+I9WPXaQFNWmEPqCSHfsdPrlTOFQHS
-         cnNLx+MwoXfGTyDjDQxLgQgh0bSzoFy2NAJqviQos6arKpzzWMWyUZdkQRzGRJRYe4qT
-         Trd4iWuI/0liwTYDNc9JAMu41vj2Hqf4j6SlKkiaVYD0zooIbckDL9ToUi76uS9paJbZ
-         XN9thwvPIDq2OkxVRwSbXf7XTtgi97b1LzrHZO/mHTPMqjx1roUqM/nlz4hvj0CjiaK5
-         U5PQ==
-X-Gm-Message-State: AOJu0YxjHKgHPcjC1CNXQDErb9BF0MDIgbeg2pWYY66uLnShnI0nfFIg
-	k0SBJJrCMN/G77Rz3B9vZSn6LTPPoOJYxmEH85e01Pl2ZAlNlLGytx5PZRQHZLhUCEA9xydgmF0
-	zGWqQqlJIkkayvnUtvHPYi/Vt0aj0gXJYbFX1qCXLltI/nOZdKN3PRhbtT9Y0sTxDW5rEEmeW2F
-	HRXWvOabS0E7jqUpssobXgPXSgTGp/
-X-Gm-Gg: ASbGncv/2c4tVICcsp9I5v0lujm70XKMaZrixpMTzyV5csLLV70gL4kuUE/SxQecCNg
-	LHwDB72M732KZID1lqXNTJ2Vs26TZJ6p2G50/Khes5PNYVZwV6Br/JrizeFlKDOOsM0vmwqVXfE
-	ilBA==
-X-Received: by 2002:a05:6000:2088:b0:3a5:287b:da02 with SMTP id ffacd0b85a97d-3a56876b131mr2099558f8f.40.1749813953761;
-        Fri, 13 Jun 2025 04:25:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFMld/3x4YDwMh90w2NXyk+VWJ9yeQ982c+CE56+xJI0QCBv9oJAuu33eFBBEhkpIF8/oIrlYNLdizJLcDlXXg=
-X-Received: by 2002:a05:6000:2088:b0:3a5:287b:da02 with SMTP id
- ffacd0b85a97d-3a56876b131mr2099541f8f.40.1749813953402; Fri, 13 Jun 2025
- 04:25:53 -0700 (PDT)
+	s=arc-20240116; t=1749814730; c=relaxed/simple;
+	bh=LFiGEbOv0yEE6+gXbosvozR/D9umrkZb2ofxQGgFRMg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BEj02icceZUdoPhP+JZrV/wpfwr4jCuz8PpbCE/GVlsXXJmuHcWLOzp3roOQhlPw0gkRc5P3X2NE/PTzAjAaLMD1Nj+8jBCFMwE7QUVQ8LHVdPJmc7Nwx5iyQYtBM62fd86Zzos5xcEtAY2cHLbk7Jv+RUkXmYcS+L1qCkNNtoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from zq-Legion-Y7000.smartont.net (unknown [180.110.114.155])
+	by APP-03 (Coremail) with SMTP id rQCowAC3CFG2DUxo0Ak5Bg--.60443S2;
+	Fri, 13 Jun 2025 19:38:32 +0800 (CST)
+From: zhouquan@iscas.ac.cn
+To: anup@brainfault.org,
+	ajones@ventanamicro.com,
+	atishp@atishpatra.org,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com
+Cc: linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	Quan Zhou <zhouquan@iscas.ac.cn>
+Subject: [PATCH 0/2] RISC-V: KVM: Enable ring-based dirty memory tracking
+Date: Fri, 13 Jun 2025 19:29:48 +0800
+Message-Id: <cover.1749810735.git.zhouquan@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250613111023.786265-1-abinashsinghlalotra@gmail.com>
-In-Reply-To: <20250613111023.786265-1-abinashsinghlalotra@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 13 Jun 2025 13:25:35 +0200
-X-Gm-Features: AX0GCFsG0Z1jia4q1FPk20VzM1smi77t2aAcOYaXOXqRREflDaqyTL_Wz5tjY4E
-Message-ID: <CABgObfbGXpEWtfYNYsEhEANNaR+1to1U-O0s5h1bBsY-u2384g@mail.gmail.com>
-Subject: Re: [RFC PATCH] KVM: x86: Dynamically allocate bitmap to fix
- -Wframe-larger-than error
-To: avinashlalotra <abinashlalotra@gmail.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, vkuznets@redhat.com, 
-	seanjc@google.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	avinashlalotra <abinashsinghlalotra@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAC3CFG2DUxo0Ak5Bg--.60443S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw47ZryxGFWUZw18ArW3GFg_yoWxAFbEk3
+	y8J397JrWxZa18XFW7Xan5XFWDKayfK34DXF1YvF15Kr1Dur47Ga1kZr1qvrWUCrs8X3sI
+	yF4fZFySq347KjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbTAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
+	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
+	cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwAKzVCY07xG64k0F24lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
+	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoPEfDUUUU
+X-CM-SenderInfo: 52kr31xxdqqxpvfd2hldfou0/1tbiBg0MBmhL72JrpwAAsj
 
-On Fri, Jun 13, 2025 at 1:11=E2=80=AFPM avinashlalotra <abinashlalotra@gmai=
-l.com> wrote:
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 24f0318c50d7..78bb8d58fe94 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -2005,7 +2005,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, =
-struct kvm_hv_hcall *hc)
->         struct kvm *kvm =3D vcpu->kvm;
->         struct hv_tlb_flush_ex flush_ex;
->         struct hv_tlb_flush flush;
-> -       DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
-> +       unsigned long *vcpu_mask;
+From: Quan Zhou <zhouquan@iscas.ac.cn>
 
-The default KVM_MAX_VCPUS is 1024, which is not too bad; you're
-probably compiling with CONFIG_MAXSMP and accepting the default limit
-of 4096. Adding an allocation for every hypercall is not great, I'd
-rather add it to struct kvm_vcpu_arch* instead.
+Enable ring-based dirty memory tracking and add some
+common KVM tests for riscv.
 
-If instead we go for having the allocation, you can use this:
+Quan Zhou (2):
+  RISC-V: KVM: Enable ring-based dirty memory tracking
+  KVM: riscv: selftests: Add common supported test cases
 
-unsigned long *vcpu_mask __free(bitmap) =3D NULL;
+ Documentation/virt/kvm/api.rst                 |  2 +-
+ arch/riscv/include/uapi/asm/kvm.h              |  1 +
+ arch/riscv/kvm/Kconfig                         |  1 +
+ arch/riscv/kvm/vcpu.c                          | 18 ++++++++++++++++--
+ tools/testing/selftests/kvm/Makefile.kvm       | 12 ++++++++++++
+ .../selftests/kvm/include/riscv/processor.h    |  2 ++
+ tools/testing/selftests/rseq/rseq-riscv.h      |  3 +--
+ 7 files changed, 34 insertions(+), 5 deletions(-)
 
-and avoid changing the returns to gotos everywhere else.
-
-Paolo
+-- 
+2.34.1
 
 
