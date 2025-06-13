@@ -1,179 +1,411 @@
-Return-Path: <kvm+bounces-49464-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49465-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44762AD93D5
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 19:37:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A817AD93D7
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 19:38:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD013174853
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 17:37:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BBBD1BC2966
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 17:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D907D226D0D;
-	Fri, 13 Jun 2025 17:37:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42720227E95;
+	Fri, 13 Jun 2025 17:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="JKSfXSSb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jOv/eGhu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E913D2135DE;
-	Fri, 13 Jun 2025 17:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF1622068B
+	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 17:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749836259; cv=none; b=mxC/SpoKYjpGIG3ssbtx311Yf0Djm88s3jTL4dHxnvcDarw00NtGm4FvGF+O3vU6plfYU+3SObyBuWEGRUXfDnoFKOQ62iizKAASIXlPlbnB23MibsQxpWjTv/jcHohzddOkYixTRF/u2Tlv493wVDopOLbH2+CIqrJRSQTFR2U=
+	t=1749836307; cv=none; b=RlaMmVjdYHI5b5A7EIjhleZv1k/xKCelbPTiZOddWDZjmhFu8hcTE7zoeSNMdh7pjdsVm4UO7r4rlHDpQTaNz6nrSfHShK8XLHCW8w02fTe+4ucpQwJAPF2rJ/nLdxUEW3nsEgFGyVxiQw4n0h9ZaL87ULGCYbZCjf+tUZa7sZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749836259; c=relaxed/simple;
-	bh=RCHzA/w1RDDF7+L88gYrHyusz6EWsbz4ORoB6/zmq00=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NWjADukGCqcn+Kvs3Ogybr9nXAn23SRHvTS4d8T8kJkQBRUxGdFRe8wpynZ0GYw4aPTPIItfJ4SX3FMXJPgnvo0I/CT/KUx7qJVl7l9ySfoVzuvwLNqQ7ZfzmsYksk+iOzG8KxIxEN6rNIP6Rw9LAQspwFzLSeeIbCRfdJlE88U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=JKSfXSSb; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [192.168.7.202] ([71.202.166.45])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55DHaqHM3883025
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 13 Jun 2025 10:36:54 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55DHaqHM3883025
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025052101; t=1749836220;
-	bh=kPSMyvkHiVSMixJXEZQhsjiAeIt3rBCyb1wBlVTjgBw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JKSfXSSb47/SY2ZIbaNLIFq7kcFFnamgnNP9sthLAomRa1SP4bq8+T3ZAaTU/taT5
-	 qsETGYLFo3gpwg6f/xm9tdJzc81qap42U/jho+nQczfV0Z95LmBdRNrN+PgkOZwTnx
-	 gCTfaFCv1yLNGJRDlx776ZXDEH5hed6G4T8RjNzHNE5eZZLlhmtdTqKFw/dSgRgsBb
-	 zc1eNI2Y10yZth86fyBoD5DjcjKAfHWXemmitGLU+oxzUdIuJTORQCJ1zrMUdOXJBH
-	 oCOhjsJPpQyiMI+8Q4Z+KG4XI2WjofmAb6ye8NGziiQ3WETv6FfybnGE4VkdpuiNEC
-	 Zs4u1pE6vAlUA==
-Message-ID: <0d2e6039-943a-4b7a-ab8d-29049cb02a90@zytor.com>
-Date: Fri, 13 Jun 2025 10:36:52 -0700
+	s=arc-20240116; t=1749836307; c=relaxed/simple;
+	bh=GCsZBLLMeFDWpwrjFxnJA4jeQPHtN7xz5n0A14nqUpo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gJ1z33iljBB3uJZoaEbLXLiCkWdC2lfFfkQqlZpdxV+XfRig1QeUTiwZj9D1csCJvGQXs25fep7y7fSbStNs8XC8GFzB76KW4rQa6N1AMpjLy1fiy+J7x0Ha3Q8SLjPB2fGZfOhBeG2MwfU9uDl7eX0rd9VYa2QqJbCnO/jXzNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jOv/eGhu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749836304;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gd00oNRhCZA9bl4FEuwlqWv3NB9O4qFOmwNNS6VXqoc=;
+	b=jOv/eGhuYlRuhzy9c9HYfh8XDwbOliM3FFzSV+gC5yw9rpDp+5VR2B2hEYF3/ap1yOlXM6
+	8SXWNGnC9brOeAZNo6cnihgMW21hvuPp8G5i0nc6iW1NnfM72YdUG+XNg0VrJq70M7IH4k
+	gUai9cGYg3/fxXzXHOYriusEQL+2VFA=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-382-EQalP3DXMfi1avHMC6RtHg-1; Fri, 13 Jun 2025 13:38:22 -0400
+X-MC-Unique: EQalP3DXMfi1avHMC6RtHg-1
+X-Mimecast-MFC-AGG-ID: EQalP3DXMfi1avHMC6RtHg_1749836301
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-87373f99cd5so18904939f.3
+        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 10:38:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749836301; x=1750441101;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gd00oNRhCZA9bl4FEuwlqWv3NB9O4qFOmwNNS6VXqoc=;
+        b=xULjOBN2a+33+Ur5w5mHisHhCWjQfkVo2G0/FnSbQnxpVbr/c0GDGAF/e/u4gh5wWb
+         YtOtBMEwBk3Or2pGIx/eZ+h0RqV36lObaZhH5G5mXm3zCFVmZGZfPZY+HgBQnvX1CL8Q
+         OOaGhrsu+iWSgHuStejildWmqTtVhD3C/qnFxm8Mjqib/Bqx1rQr7pXbQ+dq3weF9RF4
+         6vgYRnVf50Ga4tlL1q2nt0z7QE1X8Ws1Mzub5K4gr8DQ7KRTB3dL3Y4HmeIRUOzTaoqq
+         ViYzmJ7z4jQfyRY9x/Ei+eKA+htZ65yblVMBOZaSeTzxuZ5ARj9ghARTUBYtO9EMvZss
+         xp7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUj26G/BhGOzzXuIq798idYNLbgU6TGD69VYlVlWiVjvKpaQGPOpEIZ2+Qix/2nlXSwcxQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKfXwsw+qBxlDmYHhPPJmV2OaGe28ZTp2raN8D+Sh/OdpZzO8w
+	BgV303mT/mgxJ8I2J3x8b7o3m/jRba3+83ROGdnrsP3EB14jjHpMNQMLymD4giX4f56i5m0LrZQ
+	7PCk3RYkhk8Sv2Cvw9snS5Opx5pddNepOulNYWhxN+ulwQ9OhDlCYtQ==
+X-Gm-Gg: ASbGnctir/cnrZUI1A9PNM4SZleP+gJFDzuhf8GPeGHp65FCPDic5bBdgO49jTP9xIx
+	UZbKRgMmOIorwEc5LUTQOpVjvrPr84BLINSXhtrJZ/vXso28yS67UCVtlV30XmbqWCYdI1vRWKY
+	KyjecSTgicUF1szEEqoXdLVYc8V6SvJwckE4lgTc5JvlvLMVO5irZTOl/BxJC2sPwxxl2iAaI8V
+	M5dppOKKyZ8DcbzLH4oXMpj+T7P7xCe0iusTHo9twm1e8eFBPRP+227t+yTP3SxYZgKvXw5rBik
+	LCLAb73qLbBmGzKT8RJ0MU5A8w==
+X-Received: by 2002:a05:6e02:1c25:b0:3db:72f7:d7c3 with SMTP id e9e14a558f8ab-3de07da97f8mr1669425ab.3.1749836301291;
+        Fri, 13 Jun 2025 10:38:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBOmEPkV4fSOvfJCBdCCdGSMnxwXbYmdpRxCmhRxQRYrTknNFKXlc/k+8Iqa3cISRD+98o9Q==
+X-Received: by 2002:a05:6e02:1c25:b0:3db:72f7:d7c3 with SMTP id e9e14a558f8ab-3de07da97f8mr1669265ab.3.1749836300739;
+        Fri, 13 Jun 2025 10:38:20 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3de01a45455sm4340865ab.45.2025.06.13.10.38.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 10:38:20 -0700 (PDT)
+Date: Fri, 13 Jun 2025 11:38:18 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: lizhe.67@bytedance.com
+Cc: david@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ peterx@redhat.com
+Subject: Re: [RFC v2] vfio/type1: optimize vfio_unpin_pages_remote() for
+ large folio
+Message-ID: <20250613113818.584bec0a.alex.williamson@redhat.com>
+In-Reply-To: <20250613062920.68801-1-lizhe.67@bytedance.com>
+References: <20250612163239.5e45afc6.alex.williamson@redhat.com>
+	<20250613062920.68801-1-lizhe.67@bytedance.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/3] x86/traps: Initialize DR7 by writing its
- architectural reset value
-To: Sean Christopherson <seanjc@google.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com, brgerst@gmail.com,
-        tony.luck@intel.com, fenghuay@nvidia.com
-References: <20250613070118.3694407-1-xin@zytor.com>
- <20250613070118.3694407-3-xin@zytor.com>
- <20250613071536.GG2273038@noisy.programming.kicks-ass.net>
- <aEwxcVzQubz3BmmJ@google.com>
-Content-Language: en-US
-From: Xin Li <xin@zytor.com>
-Autocrypt: addr=xin@zytor.com; keydata=
- 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
- l75w1xInsg==
-In-Reply-To: <aEwxcVzQubz3BmmJ@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 6/13/2025 7:10 AM, Sean Christopherson wrote:
-> On Fri, Jun 13, 2025, Peter Zijlstra wrote:
->> On Fri, Jun 13, 2025 at 12:01:16AM -0700, Xin Li (Intel) wrote:
->>
->>> While at it, replace the hardcoded debug register number 7 with the
->>> existing DR_CONTROL macro for clarity.
->>
->> Yeah, not really a fan of that... IMO that obfuscates the code more than
->> it helps, consider:
-> 
-> +1, and NAK to the KVM changes.
+On Fri, 13 Jun 2025 14:29:20 +0800
+lizhe.67@bytedance.com wrote:
 
-I guess I was too aggressive to make overkill changes in a bug-fixing
-patch, which will be back-ported.
+> On Thu, 12 Jun 2025 16:32:39 -0600, alex.williamson@redhat.com wrote:
+> 
+> > >  drivers/vfio/vfio_iommu_type1.c | 53 +++++++++++++++++++++++++--------
+> > >  1 file changed, 41 insertions(+), 12 deletions(-)
+> > > 
+> > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > > index 28ee4b8d39ae..2f6c0074d7b3 100644
+> > > --- a/drivers/vfio/vfio_iommu_type1.c
+> > > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > > @@ -469,17 +469,28 @@ static bool is_invalid_reserved_pfn(unsigned long pfn)
+> > >  	return true;
+> > >  }
+> > >  
+> > > -static int put_pfn(unsigned long pfn, int prot)
+> > > +static inline void _put_pfns(struct page *page, int npages, int prot)
+> > >  {
+> > > -	if (!is_invalid_reserved_pfn(pfn)) {
+> > > -		struct page *page = pfn_to_page(pfn);
+> > > +	unpin_user_page_range_dirty_lock(page, npages, prot & IOMMU_WRITE);
+> > > +}
+> > >  
+> > > -		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
+> > > -		return 1;
+> > > +/*
+> > > + * The caller must ensure that these npages PFNs belong to the same folio.
+> > > + */
+> > > +static inline int put_pfns(unsigned long pfn, int npages, int prot)
+> > > +{
+> > > +	if (!is_invalid_reserved_pfn(pfn)) {
+> > > +		_put_pfns(pfn_to_page(pfn), npages, prot);
+> > > +		return npages;
+> > >  	}
+> > >  	return 0;
+> > >  }
+> > >  
+> > > +static inline int put_pfn(unsigned long pfn, int prot)
+> > > +{
+> > > +	return put_pfns(pfn, 1, prot);
+> > > +}
+> > > +
+> > >  #define VFIO_BATCH_MAX_CAPACITY (PAGE_SIZE / sizeof(struct page *))
+> > >  
+> > >  static void __vfio_batch_init(struct vfio_batch *batch, bool single)
+> > > @@ -805,15 +816,33 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+> > >  				    unsigned long pfn, unsigned long npage,
+> > >  				    bool do_accounting)
+> > >  {
+> > > -	long unlocked = 0, locked = 0;
+> > > -	long i;
+> > > +	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+> > >  
+> > > -	for (i = 0; i < npage; i++, iova += PAGE_SIZE) {
+> > > -		if (put_pfn(pfn++, dma->prot)) {
+> > > -			unlocked++;
+> > > -			if (vfio_find_vpfn(dma, iova))
+> > > -				locked++;
+> > > +	while (npage) {
+> > > +		struct folio *folio;
+> > > +		struct page *page;
+> > > +		long step = 1;
+> > > +
+> > > +		if (is_invalid_reserved_pfn(pfn))
+> > > +			goto next;
+> > > +
+> > > +		page = pfn_to_page(pfn);
+> > > +		folio = page_folio(page);
+> > > +
+> > > +		if (!folio_test_large(folio)) {
+> > > +			_put_pfns(page, 1, dma->prot);
+> > > +		} else {
+> > > +			step = min_t(long, npage,
+> > > +				folio_nr_pages(folio) -
+> > > +				folio_page_idx(folio, page));
+> > > +			_put_pfns(page, step, dma->prot);
+> > >  		}
+> > > +
+> > > +		unlocked += step;
+> > > +next:  
+> > 
+> > Usage of @step is inconsistent, goto isn't really necessary either, how
+> > about:
+> > 
+> > 	while (npage) {
+> > 		unsigned long step = 1;
+> > 
+> > 		if (!is_invalid_reserved_pfn(pfn)) {
+> > 			struct page *page = pfn_to_page(pfn);
+> > 			struct folio *folio = page_folio(page);
+> > 			long nr_pages = folio_nr_pages(folio);
+> > 
+> > 			if (nr_pages > 1)
+> > 				step = min_t(long, npage,
+> > 					nr_pages -
+> > 					folio_page_idx(folio, page));
+> > 
+> > 			_put_pfns(page, step, dma->prot);
+> > 			unlocked += step;
+> > 		}
+> >   
+> 
+> That's great. This implementation is much better.
+> 
+> I'm a bit uncertain about the best type to use for the 'step'
+> variable here. I've been trying to keep things consistent with the
+> put_pfn() function, so I set the type of the second parameter in
+> _put_pfns() to 'int'(we pass 'step' as the second argument to
+> _put_pfns()).
+> 
+> Using unsigned long for 'step' should definitely work here, as the
+> number of pages in a large folio currently falls within the range
+> that can be represented by an int. However, there is still a
+> potential risk of truncation that we need to be mindful of.
+> 
+> > > +		pfn += step;
+> > > +		iova += PAGE_SIZE * step;
+> > > +		npage -= step;
+> > >  	}
+> > >  
+> > >  	if (do_accounting)  
+> > 
+> > AIUI, the idea is that we know we have npage contiguous pfns and we
+> > currently test invalid/reserved, call pfn_to_page(), call
+> > unpin_user_pages_dirty_lock(), and test vpfn for each individually.
+> >
+> > This instead wants to batch the vpfn accounted pfns using the range
+> > helper added for the mapping patch,  
+> 
+> Yes. We use vpfn_pages() just to track the locked pages.
+> 
+> > infer that continuous pfns have the
+> > same invalid/reserved state, the pages are sequential, and that we can
+> > use the end of the folio to mark any inflections in those assumptions
+> > otherwise.  Do I have that correct?  
+> 
+> Yes. I think we're definitely on the same page here.
+> 
+> > I think this could be split into two patches, one simply batching the
+> > vpfn accounting and the next introducing the folio dependency.  The
+> > contributions of each to the overall performance improvement would be
+> > interesting.  
+> 
+> I've made an initial attempt, and here are the two patches after
+> splitting them up.
+> 
+> 1. batch-vpfn-accounting-patch:
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 28ee4b8d39ae..c8ddcee5aa68 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -805,16 +805,12 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+>  				    unsigned long pfn, unsigned long npage,
+>  				    bool do_accounting)
+>  {
+> -	long unlocked = 0, locked = 0;
+> +	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+>  	long i;
+>  
+> -	for (i = 0; i < npage; i++, iova += PAGE_SIZE) {
+> -		if (put_pfn(pfn++, dma->prot)) {
+> +	for (i = 0; i < npage; i++, iova += PAGE_SIZE)
+> +		if (put_pfn(pfn++, dma->prot))
+>  			unlocked++;
+> -			if (vfio_find_vpfn(dma, iova))
+> -				locked++;
+> -		}
+> -	}
+>  
+>  	if (do_accounting)
+>  		vfio_lock_acct(dma, locked - unlocked, true);
+> -----------------
+> 
+> 2. large-folio-optimization-patch:
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index c8ddcee5aa68..48c2ba4ba4eb 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -469,17 +469,28 @@ static bool is_invalid_reserved_pfn(unsigned long pfn)
+>  	return true;
+>  }
+>  
+> -static int put_pfn(unsigned long pfn, int prot)
+> +static inline void _put_pfns(struct page *page, int npages, int prot)
+>  {
+> -	if (!is_invalid_reserved_pfn(pfn)) {
+> -		struct page *page = pfn_to_page(pfn);
+> +	unpin_user_page_range_dirty_lock(page, npages, prot & IOMMU_WRITE);
+> +}
+>  
+> -		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
+> -		return 1;
+> +/*
+> + * The caller must ensure that these npages PFNs belong to the same folio.
+> + */
+> +static inline int put_pfns(unsigned long pfn, int npages, int prot)
+> +{
+> +	if (!is_invalid_reserved_pfn(pfn)) {
+> +		_put_pfns(pfn_to_page(pfn), npages, prot);
+> +		return npages;
+>  	}
+>  	return 0;
+>  }
+>  
+> +static inline int put_pfn(unsigned long pfn, int prot)
+> +{
+> +	return put_pfns(pfn, 1, prot);
+> +}
+> +
+>  #define VFIO_BATCH_MAX_CAPACITY (PAGE_SIZE / sizeof(struct page *))
+>  
+>  static void __vfio_batch_init(struct vfio_batch *batch, bool single)
+> @@ -806,11 +817,28 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+>  				    bool do_accounting)
+>  {
+>  	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+> -	long i;
+>  
+> -	for (i = 0; i < npage; i++, iova += PAGE_SIZE)
+> -		if (put_pfn(pfn++, dma->prot))
+> -			unlocked++;
+> +	while (npage) {
+> +		long step = 1;
+> +
+> +		if (!is_invalid_reserved_pfn(pfn)) {
+> +			struct page *page = pfn_to_page(pfn);
+> +			struct folio *folio = page_folio(page);
+> +			long nr_pages = folio_nr_pages(folio);
+> +
+> +			if (nr_pages > 1)
+> +				step = min_t(long, npage,
+> +					nr_pages -
+> +					folio_page_idx(folio, page));
+> +
+> +			_put_pfns(page, step, dma->prot);
+> +			unlocked += step;
+> +		}
+> +
+> +		pfn += step;
+> +		iova += PAGE_SIZE * step;
+> +		npage -= step;
+> +	}
+>  
+>  	if (do_accounting)
+>  		vfio_lock_acct(dma, locked - unlocked, true);
+> -----------------
+> 
+> Here are the results of the performance tests.
+> 
+> Base(v6.15):
+> ./vfio-pci-mem-dma-map 0000:03:00.0 16
+> ------- AVERAGE (MADV_HUGEPAGE) --------
+> VFIO MAP DMA in 0.048 s (333.5 GB/s)
+> VFIO UNMAP DMA in 0.139 s (115.1 GB/s)
+> ------- AVERAGE (MAP_POPULATE) --------
+> VFIO MAP DMA in 0.273 s (58.6 GB/s)
+> VFIO UNMAP DMA in 0.302 s (52.9 GB/s)
+> ------- AVERAGE (HUGETLBFS) --------
+> VFIO MAP DMA in 0.052 s (305.3 GB/s)
+> VFIO UNMAP DMA in 0.141 s (113.8 GB/s)
+> 
+> Base + Map + batch-vpfn-accounting-patch:
+> ------- AVERAGE (MADV_HUGEPAGE) --------
+> VFIO MAP DMA in 0.027 s (591.1 GB/s)
+> VFIO UNMAP DMA in 0.138 s (115.7 GB/s)
+> ------- AVERAGE (MAP_POPULATE) --------
+> VFIO MAP DMA in 0.292 s (54.8 GB/s)
+> VFIO UNMAP DMA in 0.308 s (52.0 GB/s)
+> ------- AVERAGE (HUGETLBFS) --------
+> VFIO MAP DMA in 0.032 s (505.5 GB/s)
+> VFIO UNMAP DMA in 0.140 s (114.1 GB/s)
+> 
+> Base + Map + batch-vpfn-accounting-patch + large-folio-optimization-patch:
+> ------- AVERAGE (MADV_HUGEPAGE) --------
+> VFIO MAP DMA in 0.027 s (591.2 GB/s)
+> VFIO UNMAP DMA in 0.049 s (327.6 GB/s)
+> ------- AVERAGE (MAP_POPULATE) --------
+> VFIO MAP DMA in 0.291 s (55.0 GB/s)
+> VFIO UNMAP DMA in 0.306 s (52.3 GB/s)
+> ------- AVERAGE (HUGETLBFS) --------
+> VFIO MAP DMA in 0.032 s (498.3 GB/s)
+> VFIO UNMAP DMA in 0.049 s (326.2 GB/s)
+> 
+> It seems that batching the vpfn accounting doesn't seem to have much
+> of an impact in my environment. Perhaps this is because the rbtree
+> for vfpn is empty, allowing vfio_find_vpfn to execute quickly?
 
-I will revise the patch set to focus on bug fixing first.
+Right, the rbtree is generally empty, but I thought it might still have
+some benefit.  It might, but it's probably below the noise threshold of
+the test.  I think it still makes sense to split the patches, the first
+change is logically separate and the second patch builds on it.
 
-> Pretty much everything in KVM deals with the
-> "raw" names.  The use of dr6 and dr7 is pervasive throughout the VMX and SVM
-> architectures:
-> 
->   vmcs.GUEST_DR7
->   vmcb.save.dr6
->   vmcb.save.dr7
-> 
-> And is cemented in KVM's uAPI:
-> 
->   kvm_debug_exit_arch.dr6
->   kvm_debug_exit_arch.dr7
->   kvm_debugregs.dr6
->   kvm_debugregs.dr7
-> 
-> Using DR_STATUS and DR_CONTROL is not an improvement when everything else is using
-> '6' and '7'.  E.g. I skipped the changelog and was very confused by the '6' =>
-> DR_STATUS change in the next patch.
-> 
-> And don't even think about renaming the prefixes on these :-)
+long seems fine for the type of step.  Do note though that the previous
+patch on the mapping side used nr_pages as the increment size, it might
+make sense to be consistent and use something different for the folio
+nr_pages and replace "step" with "nr_pages".
 
-I did think about changing DR6_ to DR_STATUS_ and DR7_ to DR_CONTROL_ ;)
+Also please add a comment explaining the use of the folio as a basis
+for inferring that we won't have an inflection in invalid/reserved
+state for the remaining extent of the folio and that the folio has
+sequential pages and therefore reflects the contiguous pfn range.
+Thanks,
 
-However it seems that DR7_ and DR6_ are de facto prefixes in the kernel
-code, and everyone appears to recognize their intended use.  It's better
-for me to leave them as-is.
-
-> 
-> #define DR6_BUS_LOCK   (1 << 11)
-> #define DR6_BD		(1 << 13)
-> #define DR6_BS		(1 << 14)
-> #define DR6_BT		(1 << 15)
-> #define DR6_RTM		(1 << 16)
-> /*
->   * DR6_ACTIVE_LOW combines fixed-1 and active-low bits.
->   * We can regard all the bits in DR6_FIXED_1 as active_low bits;
->   * they will never be 0 for now, but when they are defined
->   * in the future it will require no code change.
->   *
->   * DR6_ACTIVE_LOW is also used as the init/reset value for DR6.
->   */
-> #define DR6_ACTIVE_LOW	0xffff0ff0
-> #define DR6_VOLATILE	0x0001e80f
-> #define DR6_FIXED_1	(DR6_ACTIVE_LOW & ~DR6_VOLATILE)
-> 
-> #define DR7_BP_EN_MASK	0x000000ff
-> #define DR7_GE		(1 << 9)
-> #define DR7_GD		(1 << 13)
-> #define DR7_FIXED_1	0x00000400
-> #define DR7_VOLATILE	0xffff2bff
+Alex
 
 
