@@ -1,170 +1,189 @@
-Return-Path: <kvm+bounces-49436-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49437-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 849B2AD909B
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 17:02:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B89A1AD90AC
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 17:03:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC48B188A54E
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 15:00:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EBFF18857E8
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 15:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0893F1D61BC;
-	Fri, 13 Jun 2025 14:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB7E41C84BB;
+	Fri, 13 Jun 2025 15:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DRB2lav7";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ebGAWNgc";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DRB2lav7";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ebGAWNgc"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="e2VHfg+K"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4DD15573F
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 14:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F4229CEB
+	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 15:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749826780; cv=none; b=I+anZx7jySX1rhsveDOD+m0wEDV2iVzn4FmV0d+f269xn+Trz97UqHl8g3jOT617RPwvLAT+nteHNdh7EDWC51KVkhzJ+pYYnstKBJZ7xqbt1p6k4FrFUFu5zxyfHv8BCh3jGwER0lXlXUY7AeyNhOJYL6MPDPcP/Y+CH4A/dVw=
+	t=1749827000; cv=none; b=NxS2zzid3jMFKYaxuDJlQ/sHol770t6qiac+9fsSXg7Lns4YzfOUdGexMMEYfcRSBmMrxhOWyAcmT23DI1gNh4TjC1qcTA1Kfc5NmgViFTm73i2wrRbtycHCtvAwB2hYpKYefL7vMT3g37ikOB+6buZ4bUiZO8W+Q2XLTFdq4FY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749826780; c=relaxed/simple;
-	bh=MmyLM8DJ6ZajYhJ1weJ4SzVz7NMfCQoekwqtAsHewcQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YNBa5BiPqOvkmGPC1MtES11L+AxuIe3KOVZxM8c21RO+0Es5Rm2XaX3+h/CB3nh6R/hF9IEU40La92oh9F7KbCgn963oT+T+xW96Ms4VKUP8O+5Kvh3RBZUDJgABjryl9uWc/CSnGf90XF/Z9kt5ncFqRlKFctlfSjgyXYrDhXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DRB2lav7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ebGAWNgc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=DRB2lav7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ebGAWNgc; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id A4CD921999;
-	Fri, 13 Jun 2025 14:59:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1749826776; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VGf26eMCz/kECkymDKLsChj1GeY6PzVVA9HrTn1uepM=;
-	b=DRB2lav7BsqeEMr0xFqL9bfCuFZHxJRmeHEl9trtQTXuvWrSXidRA4DyaXHASm7Id2Pp7x
-	aQ18I73kmGL5mgEsNvtTB3f+v5Rohy4SqQtfxgqxg0ZjgoukN2JSVQHKpECEfDbIkT0CmJ
-	vAwcPTcfi3OTna8OLRm1NBzm9onjUk8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1749826776;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VGf26eMCz/kECkymDKLsChj1GeY6PzVVA9HrTn1uepM=;
-	b=ebGAWNgcCHhecAr6NymFW7Mnf1tgU0FxGKMuwiFaJU1DYOxpixVUvbRahcRXWwIS+1DogX
-	0h9U4uJsmKIzFFAg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=DRB2lav7;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=ebGAWNgc
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1749826776; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VGf26eMCz/kECkymDKLsChj1GeY6PzVVA9HrTn1uepM=;
-	b=DRB2lav7BsqeEMr0xFqL9bfCuFZHxJRmeHEl9trtQTXuvWrSXidRA4DyaXHASm7Id2Pp7x
-	aQ18I73kmGL5mgEsNvtTB3f+v5Rohy4SqQtfxgqxg0ZjgoukN2JSVQHKpECEfDbIkT0CmJ
-	vAwcPTcfi3OTna8OLRm1NBzm9onjUk8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1749826776;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VGf26eMCz/kECkymDKLsChj1GeY6PzVVA9HrTn1uepM=;
-	b=ebGAWNgcCHhecAr6NymFW7Mnf1tgU0FxGKMuwiFaJU1DYOxpixVUvbRahcRXWwIS+1DogX
-	0h9U4uJsmKIzFFAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D76FF13782;
-	Fri, 13 Jun 2025 14:59:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id FbTyMdc8TGixIAAAD6G6ig
-	(envelope-from <osalvador@suse.de>); Fri, 13 Jun 2025 14:59:35 +0000
-Date: Fri, 13 Jun 2025 16:59:34 +0200
-From: Oscar Salvador <osalvador@suse.de>
-To: Peter Xu <peterx@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Zi Yan <ziy@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
-	Alex Mastro <amastro@fb.com>, David Hildenbrand <david@redhat.com>,
-	Nico Pache <npache@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Muchun Song <muchun.song@linux.dev>, loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org
-Subject: Re: [PATCH 2/5] mm/hugetlb: Remove prepare_hugepage_range()
-Message-ID: <aEw81libg2OQAiYc@localhost.localdomain>
-References: <20250613134111.469884-1-peterx@redhat.com>
- <20250613134111.469884-3-peterx@redhat.com>
+	s=arc-20240116; t=1749827000; c=relaxed/simple;
+	bh=xgyjLjLzANQIvCfCYeqlnHcrcmxbTm46uzPSV9liWBQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Smlv1rjUf6ea221RAzTzgHxDJahi3m0OyR1pfmP/iULxpx576w3w4/ztokWf8BGNNU1VsKwfI/czXG1a4J6ls8LJtyEIrW56lL6xHXS3+p3vub9a7v0zP2o8KNeB1PssDgyJtDBh1DTkLN9vlHTvDVv4uy+J8ujSzr3K1Q/Xhok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=e2VHfg+K; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-23508d30142so25560695ad.0
+        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 08:03:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1749826998; x=1750431798; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ByGbrP/BhXTu/tB+D/uo9uO7b8hyy6jujdxcKOmL7bw=;
+        b=e2VHfg+KVMUMAPNvNoRIdyh8jhOYhbqRB8pvb5eafAUuRx3b7hjAlvd88Xfg6QBFkj
+         HcAPXox9iitshHSIwEAuVwKtrmSH6Dpb+eKv+fsyyeqUMNaLcShGCTgcfPi6LgOGAruP
+         eODZxEpOpThKpoWd9nJXAWhHYZcbOwn+jcC8Yl22W1HP4YlYBDxP2SvW9B2LavkCpAPu
+         y5m7hEo72RECtANq5cdvlMRukr7Qzajtse3H7pJXKpnf2xaX9MzphlhM+X2PeunTpt7n
+         YFCFYf9mL16UZaDUzXde4hDZM145nzC+H3AgHAoeLfCMVEWVAF2K6MmEdnrVCHAiy0zM
+         7v7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1749826998; x=1750431798;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ByGbrP/BhXTu/tB+D/uo9uO7b8hyy6jujdxcKOmL7bw=;
+        b=VgduTUfnjS5FU+ehKKHJAE3fBfYQEw3K0Kh0T6k74cW5kMyOAutKy+hI1S5O358fPy
+         rGrJQp/OgvIJjr7vDnxdE5g+uNVaagK/2l2BkGVYtF7TqIMXGZE3tx8eHUbmwWSKdGKY
+         p4Xvu3MseclelAAgEjnOssa3lMvb0LKNvwOqXKCTv1uSbhhktcWGYLcLvXjC0fG0hSkx
+         uDJh5gGEhlT7uj52AJwP+ZQHnKYbDNoMVhWSVf1jHoenhOBD3Dn2x/RY0ETCS56XfE48
+         Phs9Q7P2yF0UMMR8UZhseP/tE8qW9mSMKR926f76q5wPUvDpXSHW6GKa/XhC1K/mY5Wa
+         9ROA==
+X-Gm-Message-State: AOJu0Yx/KwOyVOA5gaji2n11cDQisXjRbq6hiIomSmkWRJiSHVA17ePm
+	55ubECjUwQ5WKZoYHDiu9osDskjvD8oIgRxnduRX5Gpfrdj8owiN9680MZ8K28MwaDls1WpoU8M
+	3jqaS
+X-Gm-Gg: ASbGncssZ7U8441Qy0RjePv1ESqLol841RHidXtNgk+pCFtNwqXPWfrZLxpz0/80xAl
+	x7DsEoKds5TKfYcfGib8CHtEOvMaEGR5i5he5xRrVqbMVSiogit4RcaPgYRMNCWCGDmsb5I/FhP
+	CrjvsNFNZanAaeYIZqVRoB5LoJ12KnXRwj2+x2nt7rjxXAjPv/1gQZ4Sme2IxglcFURqVDbbI16
+	pUzPoNLce3I7r9mDFzS2tSHjdMrmQ+guPeQkcP5UEnw45OSWV2wy12mKFDEUbPbnD6gsANclZma
+	nrm2O2pSAAOgFylh6bMfUQ7OUhbm/DxRQJFp9D7LgJuatvSgCtHoZpsXQqvSUqqcs42qGLDglKM
+	huz/3
+X-Google-Smtp-Source: AGHT+IEkVhWzhAXI3tcZMCIrTOwssgtXLWKplMIQXljnP5TEt6Tv6Fn/ix1rs1omTiBAqTROVanQgg==
+X-Received: by 2002:a17:903:228b:b0:235:be0:db53 with SMTP id d9443c01a7336-2365de3fc55mr46130975ad.51.1749826998209;
+        Fri, 13 Jun 2025 08:03:18 -0700 (PDT)
+Received: from jesse-lt.ba.rivosinc.com ([2600:1000:b0a7:aa8d:70e3:1b4a:46b0:77bf])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de783a8sm15242055ad.99.2025.06.13.08.03.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 08:03:17 -0700 (PDT)
+From: Jesse Taube <jesse@rivosinc.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org
+Cc: Atish Patra <atish.patra@linux.dev>,
+	Anup Patel <anup@brainfault.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+	Himanshu Chauhan <hchauhan@ventanamicro.com>,
+	Charlie Jenkins <charlie@rivosinc.com>,
+	Jesse Taube <jesse@rivosinc.com>,
+	Andrew Jones <andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2] riscv: Allow SBI_CONSOLE with no uart in device tree
+Date: Fri, 13 Jun 2025 08:03:13 -0700
+Message-ID: <20250613150313.2042132-1-jesse@rivosinc.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250613134111.469884-3-peterx@redhat.com>
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: A4CD921999
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Score: -4.51
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 13, 2025 at 09:41:08AM -0400, Peter Xu wrote:
-> Only mips and loongarch implemented this API, however what it does was
-> checking against stack overflow for either len or addr.  That's already
-> done in arch's arch_get_unmapped_area*() functions, hence not needed.
-> 
-> It means the whole API is pretty much obsolete at least now, remove it
-> completely.
-> 
-> Cc: Huacai Chen <chenhuacai@kernel.org>
-> Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-> Cc: Muchun Song <muchun.song@linux.dev>
-> Cc: Oscar Salvador <osalvador@suse.de>
-> Cc: loongarch@lists.linux.dev
-> Cc: linux-mips@vger.kernel.org
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+When CONFIG_SBI_CONSOLE is enabled and there is no uart defined in the
+device tree kvm-unit-tests fails to start.
 
-I think I forgot to clean these up when I unified the unmapped_area for
-hugetlb.
+Only abort when uart is not found in device tree if SBI_CONSOLE is false
 
-Reviewed-by: Oscar Salvador <osalvador@suse.de>
+Signed-off-by: Jesse Taube <jesse@rivosinc.com>
+---
+ lib/riscv/io.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
-Thanks Peter!
+diff --git a/lib/riscv/io.c b/lib/riscv/io.c
+index fb40adb7..e64e9253 100644
+--- a/lib/riscv/io.c
++++ b/lib/riscv/io.c
+@@ -30,7 +30,6 @@ static u32 uart0_reg_width = 1;
+ static u32 uart0_reg_shift;
+ static struct spinlock uart_lock;
  
-
+-#ifndef CONFIG_SBI_CONSOLE
+ static u32 uart0_read(u32 num)
+ {
+ 	u32 offset = num << uart0_reg_shift;
+@@ -54,7 +53,6 @@ static void uart0_write(u32 num, u32 val)
+ 	else
+ 		writel(val, uart0_base + offset);
+ }
+-#endif
+ 
+ static void uart0_init_fdt(void)
+ {
+@@ -73,11 +71,16 @@ static void uart0_init_fdt(void)
+ 				break;
+ 		}
+ 
++#ifdef CONFIG_SBI_CONSOLE
++		uart0_base = NULL;
++		return;
++#else
+ 		if (ret) {
+ 			printf("%s: Compatible uart not found in the device tree, aborting...\n",
+ 			       __func__);
+ 			abort();
+ 		}
++#endif
+ 	} else {
+ 		const fdt32_t *val;
+ 		int len;
+@@ -116,8 +119,8 @@ void io_init(void)
+ 	}
+ }
+ 
+-#ifdef CONFIG_SBI_CONSOLE
+-void puts(const char *s)
++void sbi_puts(const char *s);
++void sbi_puts(const char *s)
+ {
+ 	phys_addr_t addr = virt_to_phys((void *)s);
+ 	unsigned long hi = upper_32_bits(addr);
+@@ -127,9 +130,11 @@ void puts(const char *s)
+ 	sbi_ecall(SBI_EXT_DBCN, SBI_EXT_DBCN_CONSOLE_WRITE, strlen(s), lo, hi, 0, 0, 0);
+ 	spin_unlock(&uart_lock);
+ }
+-#else
+-void puts(const char *s)
++
++void uart0_puts(const char *s);
++void uart0_puts(const char *s)
+ {
++	assert(uart0_base);
+ 	spin_lock(&uart_lock);
+ 	while (*s) {
+ 		while (!(uart0_read(UART_LSR_OFFSET) & UART_LSR_THRE))
+@@ -138,7 +143,15 @@ void puts(const char *s)
+ 	}
+ 	spin_unlock(&uart_lock);
+ }
++
++void puts(const char *s)
++{
++#ifdef CONFIG_SBI_CONSOLE
++	sbi_puts(s);
++#else
++	uart0_puts(s);
+ #endif
++}
+ 
+ /*
+  * Defining halt to take 'code' as an argument guarantees that it will
 -- 
-Oscar Salvador
-SUSE Labs
+2.43.0
+
 
