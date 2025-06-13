@@ -1,234 +1,245 @@
-Return-Path: <kvm+bounces-49404-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49405-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF23AAD89BB
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 12:42:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF3A9AD8A0A
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 13:11:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7767E189EBC4
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 10:42:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74C4E1755EB
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 11:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06CF12D5C9E;
-	Fri, 13 Jun 2025 10:41:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30E82D5C6E;
+	Fri, 13 Jun 2025 11:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UXtFZTh3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nUHC+ATL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67305225771
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 10:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3F822068B;
+	Fri, 13 Jun 2025 11:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749811299; cv=none; b=K8YrlFj1Zon1iderG2RvD/myb4gHrkqg9kkpd5qZrpV5JP+KREEFAiwm7ixsWKtuZmoGbr3nHXIskG6fapbY7lvm7OlqjgIDWl4glDZwqw/w0t58bp/zTk4H9hJcEQXo78ONm5ZjTcsbU/6UrwimLTijYl+6XLZKPsMJBYqakuw=
+	t=1749813057; cv=none; b=nzJCdK60zCIMLPkHy+m/ySV/xSg2IPFLRLIDQO044G61xL1Q69Bk6zjFm2TboHz4ZArb7vlwt8Ky2DnOm6/7Ck/0RGXRfx7s8zoooWkI4cdWEr4CWLGjLo6xG9t0QPQjkN8lHHv9khczX1HZHX7MTk1VGBP2o9RqMqMOCClYssg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749811299; c=relaxed/simple;
-	bh=jkr/qj5NC7v8iEBMMpBxOxxy9HCQHlfXcp87Z4sWXP0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sJkf7enlFqaqzSm2mkzkjkpjaZf8vmas3WN332lbTCuAgLSwA8+HatV1sBTMzfrKKXyETH/nVB+GAjokmqZTT0UcZJryg/+e9GdamVIzwlycIx18nRsrAfAxYsGFlnGLiJQBgdJvstfBULsSYj0JvXfX9vIy0fSseUApMnHGUIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UXtFZTh3; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749811295;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=figJZmNZUAIV8ivTAUr2WUKY/O33ofJJymTbtraOGVc=;
-	b=UXtFZTh3l+3u9W9BbmQTyJgcfu/CTEIxgAhfWsXqN2aYvgdPfyr3P2muYJpzHGzEsinCsX
-	qUhEIbvAVlmdFjFSKTdg9jyTn+ASr1QKXcju+vdl/e1tit0G3190aBlP5L2nDgGsouHHPw
-	5rxxbEi3TT4M01eOiyL6PiAid3XV/WE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-360-ZsBUp_pgP-Gc3XO6e5YOWQ-1; Fri, 13 Jun 2025 06:41:34 -0400
-X-MC-Unique: ZsBUp_pgP-Gc3XO6e5YOWQ-1
-X-Mimecast-MFC-AGG-ID: ZsBUp_pgP-Gc3XO6e5YOWQ_1749811293
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a523ce0bb2so1047519f8f.0
-        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 03:41:33 -0700 (PDT)
+	s=arc-20240116; t=1749813057; c=relaxed/simple;
+	bh=nqcNfAjez4t2LCKvoq5bpoXC7iX2OBaEBtNQOCotT0U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Aj4SSGv95enpq1badqgSveQhy6ovZZ6kVqx4h0RIDHpW9D5uDj945Vkxs3kFY9BwBxZgLQ5yoTqFjWkzrbVbMcMFySlFVMIAgwQ8/MIaaEkcIJMH1u4cX+7xRTELC1wTF1kgzTBaZPIdltNE2X03FNemHdys6cRPQ9W4S7kW8LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nUHC+ATL; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3109f106867so2811265a91.1;
+        Fri, 13 Jun 2025 04:10:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1749813055; x=1750417855; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pjq9+JX8WsaLdGnn1+7SfmKmSzLW5G0sJkt8ZHS3y44=;
+        b=nUHC+ATLAhyW3vqmXfaFbWwEwndPinTAXtKHpHW/0hc1FNCJle+zUvvWf6y8ZeF2yb
+         Ja21TnbP/6V4KB8WUAAdqSgVPtpDRrbNuXbZrT8sSQCTjwmnY8f6yqyV1i9ls/2GL7yJ
+         zPG1T5mMoP69Mcq6/yTVkw4L7MDiNRAKeVrdnK+EytIWTaBRr6LC/DCiI/4gEg48q0kO
+         ZoHhshsgQ1ADI2Hdw7CuBVvI1vya1+evJGgJ3HEC1W6WHugIrXHrh0n4rcu5/9XAk1hW
+         zWIgfHhMZSjfJxTxnyjWza5CA4ycGMpsbKRcbEE/EYCkfsl3huEjQUwmNT2TwpSjO9qx
+         yiCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749811293; x=1750416093;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1749813055; x=1750417855;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=figJZmNZUAIV8ivTAUr2WUKY/O33ofJJymTbtraOGVc=;
-        b=SAzbbRaTppouujYgOl/95j7wPEuOcQ/GIMQpoefh+pJQkmgAJOs4FElmTqAmSccj4o
-         QbL7BCxARvH8kqEmKdNWxRtfLHSmqA1cpKsAEUvKOOR6JjfBtp6/YzSf4v6WCcTZaWge
-         yQNmQbEQATcipkMWDgUlyr0YTbzWYZO+CLfclYKPbrR/LUq2YSzZxyiNyEB6UpH6eh8q
-         5tj4HcrWlU1LMwa+ERtMpGMlkkvjTSq+JZgMgvckqhGEJE4Yawot+Jnem7XZq3VJJevm
-         SfXiAl1XAq37Yd50uEXN7f7R8opQkuajGV0f5CDoqAO2o4mQWGSmD9JTTEBQJuaAAypy
-         34gQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU2FC50wkvSjv+HUXm264WYlvy0NklN65vJ77vU55ZzcLYGsUvY7nBlIwk6DovFQ+VxCDs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoL5JkVjUihEXTgGC9KHiDOfjElHpnBMDJ8sM/L2iRgMYJOBPF
-	/vnVdKKyxzdp2Vc99ee4se/tokkNqg54MW94xXhCeX79+plfOAbzaC9vGqf7Dzpfqf+Fjseu94E
-	iQjPavDp4a7YNYS9220YwzbOPrUoaH3fSeibJZI8DSKFZOvO5udaUjA==
-X-Gm-Gg: ASbGncsioyatY1Ma++L+ivOsTuk66o/teupjqUIxvi4rInH1Kztc9e6266KY+brp8sP
-	moFf0sRgFX+FSCAkPBX2j7W9ec7gTctdj9bIakC9RqLoiOWwdbkBAR/8I+9ouxTyOUoKFz1OrxL
-	Z6OkeuJ+8gj4pYB2eIxte2X6cOlgMorekgYKdQaPHbLIYhmdNgQPksaN+s8hgtk4NFNA68ulHJY
-	aAavHgbNW4b+IfOeghll6bRzgXZM+BRNa0/md7tX2+VwDuQVv0fb4XkcdQyLT6xCFOUlReBAunX
-	eOHWyd7Ag/fZ/DVJNZyCOOb7rkSR7CZhdelEzaHOgdjJbB3mqlleay/uBSyJfg==
-X-Received: by 2002:a05:6000:2312:b0:3a5:2599:4183 with SMTP id ffacd0b85a97d-3a568717a0bmr2102278f8f.25.1749811292813;
-        Fri, 13 Jun 2025 03:41:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHJlJNgrePZmATp2R205Kf4PA9FIhO0maj7nVLAo7B4qoXmvRW3bpUlsacbB7nyFhXz0AEztw==
-X-Received: by 2002:a05:6000:2312:b0:3a5:2599:4183 with SMTP id ffacd0b85a97d-3a568717a0bmr2102200f8f.25.1749811292158;
-        Fri, 13 Jun 2025 03:41:32 -0700 (PDT)
-Received: from [192.168.0.4] (ltea-047-064-114-027.pools.arcor-ip.net. [47.64.114.27])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e13c19esm48431355e9.25.2025.06.13.03.41.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Jun 2025 03:41:31 -0700 (PDT)
-Message-ID: <932ebe19-e581-499b-9294-022f3fb4d76a@redhat.com>
-Date: Fri, 13 Jun 2025 12:41:26 +0200
+        bh=pjq9+JX8WsaLdGnn1+7SfmKmSzLW5G0sJkt8ZHS3y44=;
+        b=Ldfq0MJc4d3MK0KZtfgTZ+Au8cF0mos9Sn2BmPoLAnzDswiwR1Bwr4yQYtVkPJ2lQL
+         KO1yN54L0XalKfGTUdfLb6CCq54ifH3gcYIqTGyuz6YhjKQzQGc3g207Nu0/bnA/50CI
+         c+mb+0F4x7nxiYM0r52mjN9jTeDWj3nhQ0lKtVKS/2nE4EKHonisuEa8a6+R7qniWSG1
+         NQGxKWP4y0R76Gdn3Ah4/QnIkrto7j3TBFg8KestfJ0UplPGFL0Fg+tzsYJIXp4vAw6Y
+         nHvzMYeV/I6kFSPBuB9z75ORV5Rh5PeZv7SuZ1JP2Ody3Fk3TDkwelu59zeNAmM0yg0R
+         wUyg==
+X-Gm-Message-State: AOJu0YzrvNjFRuXJsGqKIKig1trWBFk7ypiv4/4ro5Oo4bcmA60Tildk
+	0GW3DtwGrGfBHmENG0t3r8EESv91Fx/hXrlDJ55Qgue2DRWn2GPOWJFaR02Tpivy
+X-Gm-Gg: ASbGncuvRl1FT5J+CKVGoHRVRZhj0Jzfm21kk6K8YflC3OE26FhDs73QBVdvPraIsP7
+	Zieo0gL8Ld2obLFbryScRETg5etLXkZJDrVkTL27RCkTUBdZR/Y0ZegLwMurFh0xKEBIyNMbS+q
+	1+vjyNtgiYKL2qexxZQ+/21m7dBRH76ZesbYvt0a2skHJxKW13h7SbdsWKF6YUUFpPBSW0mhSCk
+	bCDLHFLaJMHkWvTZE+QUsLtMVezYzbxoFqSPP04oT5q4YqMXVe+tdC2dU/EKxWQYAkbORr0Xitg
+	Hk7j7jGyMhGDCLg+Cn3d7B7DUni3E0yGA4S1sOBNZvpZSrhZy0+daHos//JPn+6YqC4U6ifv1KY
+	gxWM+BpI3cQFY1Q71wlDSuOeW
+X-Google-Smtp-Source: AGHT+IHfRwox69GaH8QDbY14sRwksh/UEvMXYrDxlZ65hWPRfJClaBjLNOS90tBS4bM/aA0UQVLpPw==
+X-Received: by 2002:a17:90b:2e48:b0:311:ff18:b83e with SMTP id 98e67ed59e1d1-313d9c2eefamr4680540a91.9.1749813043460;
+        Fri, 13 Jun 2025 04:10:43 -0700 (PDT)
+Received: from avinash-INBOOK-Y2-PLUS.. ([27.63.22.176])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365de77610sm11809105ad.135.2025.06.13.04.10.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jun 2025 04:10:43 -0700 (PDT)
+From: avinashlalotra <abinashlalotra@gmail.com>
+X-Google-Original-From: avinashlalotra <abinashsinghlalotra@gmail.com>
+To: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	vkuznets@redhat.com,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	avinashlalotra <abinashsinghlalotra@gmail.com>
+Subject: [RFC PATCH] KVM: x86: Dynamically allocate bitmap to fix -Wframe-larger-than error
+Date: Fri, 13 Jun 2025 16:40:23 +0530
+Message-ID: <20250613111023.786265-1-abinashsinghlalotra@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 05/12] python: fix illegal escape sequences
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: Joel Stanley <joel@jms.id.au>, Yi Liu <yi.l.liu@intel.com>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Helge Deller <deller@gmx.de>, Fabiano Rosas <farosas@suse.de>,
- Alexander Bulekov <alxndr@bu.edu>, Darren Kenny <darren.kenny@oracle.com>,
- Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Ed Maste <emaste@freebsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Warner Losh <imp@bsdimp.com>, Kevin Wolf <kwolf@redhat.com>,
- Tyrone Ting <kfting@nuvoton.com>, Eric Blake <eblake@redhat.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Troy Lee <leetroy@gmail.com>,
- Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>,
- Michael Roth <michael.roth@amd.com>, Laurent Vivier <laurent@vivier.eu>,
- Ani Sinha <anisinha@redhat.com>, Weiwei Li <liwei1518@gmail.com>,
- Eric Farman <farman@linux.ibm.com>, Steven Lee <steven_lee@aspeedtech.com>,
- Brian Cain <brian.cain@oss.qualcomm.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
- Jamin Lin <jamin_lin@aspeedtech.com>, qemu-s390x@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
- qemu-block@nongnu.org, Bernhard Beschow <shentey@gmail.com>,
- =?UTF-8?Q?Cl=C3=A9ment_Mathieu--Drif?= <clement.mathieu--drif@eviden.com>,
- Maksim Davydov <davydov-max@yandex-team.ru>,
- Niek Linnenbank <nieklinnenbank@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Paul Durrant <paul@xen.org>, Jagannathan Raman <jag.raman@oracle.com>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Anton Johansson <anjo@rev.ng>,
- Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <crosa@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Yanan Wang <wangyanan55@huawei.com>,
- qemu-arm@nongnu.org, Hao Wu <wuhaotsh@google.com>,
- Mads Ynddal <mads@ynddal.dk>, qemu-riscv@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Nicholas Piggin <npiggin@gmail.com>, Michael Rolnik <mrolnik@gmail.com>,
- Zhao Liu <zhao1.liu@intel.com>, Alessandro Di Federico <ale@rev.ng>,
- Antony Pavlov <antonynpavlov@gmail.com>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Hanna Reitz <hreitz@redhat.com>,
- Qiuhao Li <Qiuhao.Li@outlook.com>, Hyman Huang <yong.huang@smartx.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Magnus Damm <magnus.damm@gmail.com>, qemu-rust@nongnu.org,
- Bandan Das <bsd@redhat.com>,
- Strahinja Jankovic <strahinja.p.jankovic@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- kvm@vger.kernel.org, Fam Zheng <fam@euphon.net>, Jia Liu <proljc@gmail.com>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>, Kyle Evans <kevans@freebsd.org>,
- Song Gao <gaosong@loongson.cn>, Alexandre Iooss <erdnaxe@crans.org>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, Peter Xu <peterx@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>,
- Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?B?RnLDqWTDqXJpYyBCYXJyYXQ=?= <fbarrat@linux.ibm.com>,
- qemu-ppc@nongnu.org, Radoslaw Biernacki <rad@semihalf.com>,
- Beniamino Galvani <b.galvani@gmail.com>, David Hildenbrand
- <david@redhat.com>, Richard Henderson <richard.henderson@linaro.org>,
- David Woodhouse <dwmw2@infradead.org>, Eduardo Habkost
- <eduardo@habkost.net>, Ahmed Karaman <ahmedkhaledkaraman@gmail.com>,
- Huacai Chen <chenhuacai@kernel.org>, Mahmoud Mandour
- <ma.mandourr@gmail.com>, Harsh Prateek Bora <harshpb@linux.ibm.com>
-References: <20250612205451.1177751-1-jsnow@redhat.com>
- <20250612205451.1177751-6-jsnow@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
- yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
- 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
- tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
- 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
- O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
- 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
- gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
- 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
- zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzR5UaG9tYXMgSHV0
- aCA8dGh1dGhAcmVkaGF0LmNvbT7CwXgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
- QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
- EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
- 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
- eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
- ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
- zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
- tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
- WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
- UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDzsFN
- BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
- 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
- +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
- 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
- gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
- WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
- VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
- knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
- cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
- X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABwsFfBBgBAgAJBQJR+3lM
- AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
- ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
- fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
- 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
- cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
- ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
- Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
- oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
- IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
- yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20250612205451.1177751-6-jsnow@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/06/2025 22.54, John Snow wrote:
-> \{ is an illegal escape sequence, to get a literal backslash we need to
-> use \\.
-> 
-> This is being fixed because of an issue spotted when attempting to use
-> the pyupgrade script.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   scripts/feature_to_c.py | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/feature_to_c.py b/scripts/feature_to_c.py
-> index 807af0e685c..5f8fa8ad5c6 100644
-> --- a/scripts/feature_to_c.py
-> +++ b/scripts/feature_to_c.py
-> @@ -25,7 +25,7 @@ def writeliteral(indent, bytes):
->           elif c >= 32 and c < 127:
->               sys.stdout.write(c.to_bytes(1, 'big').decode())
->           else:
-> -            sys.stdout.write(f'\{c:03o}')
-> +            sys.stdout.write(f'\\{c:03o}')
->   
->       if quoted:
->           sys.stdout.write('"')
+Building the kernel with LLVM fails due to
+a stack frame size overflow in `kvm_hv_flush_tlb()`:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+    arch/x86/kvm/hyperv.c:2001:12: error: stack frame size (1336) exceeds limit (1024) in 'kvm_hv_flush_tlb' [-Werror,-Wframe-larger-than]
+
+The issue is caused by a large bitmap allocated on the stack. To resolve
+this, dynamically allocate the bitmap using `bitmap_zalloc()` and free it with
+`bitmap_free()` after use. This reduces the function's stack usage and avoids
+the compiler error when `-Werror` is set.
+
+New variable 'ret' is introduced to return after freeing the allocated memory.
+"HV_STATUS_INSUFFICIENT_MEMORY" is returned when memory allocation fails .
+I checked the functions calling this functions and It seems this error code
+will not affect the existing system.
+
+Please provide me feedback about this patch . There were more warnings like that,
+So If this is the correct way to fic such issues then I will submit patches for
+them.
+
+This follows similar prior fixes, such as:
+https://lore.kernel.org/all/ab75a444-22a1-47f5-b3c0-253660395b5a@arm.com/
+where a large on-stack `struct device` was moved to heap memory in
+`arm_lpae_do_selftests()` for the same reason.
+
+Signed-off-by: avinashlalotra <abinashsinghlalotra@gmail.com>
+---
+ arch/x86/kvm/hyperv.c | 48 ++++++++++++++++++++++++++++++-------------
+ 1 file changed, 34 insertions(+), 14 deletions(-)
+
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 24f0318c50d7..78bb8d58fe94 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -2005,7 +2005,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct hv_tlb_flush_ex flush_ex;
+ 	struct hv_tlb_flush flush;
+-	DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
++	unsigned long *vcpu_mask;
+ 	struct kvm_vcpu_hv_tlb_flush_fifo *tlb_flush_fifo;
+ 	/*
+ 	 * Normally, there can be no more than 'KVM_HV_TLB_FLUSH_FIFO_SIZE'
+@@ -2019,6 +2019,11 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	struct kvm_vcpu *v;
+ 	unsigned long i;
+ 	bool all_cpus;
++	u64 ret;
++
++	vcpu_mask = bitmap_zalloc(KVM_MAX_VCPUS, GFP_KERNEL);
++	if (!vcpu_mask)
++		return HV_STATUS_INSUFFICIENT_MEMORY;
+ 
+ 	/*
+ 	 * The Hyper-V TLFS doesn't allow more than HV_MAX_SPARSE_VCPU_BANKS
+@@ -2036,8 +2041,10 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	 */
+ 	if (!hc->fast && is_guest_mode(vcpu)) {
+ 		hc->ingpa = translate_nested_gpa(vcpu, hc->ingpa, 0, NULL);
+-		if (unlikely(hc->ingpa == INVALID_GPA))
+-			return HV_STATUS_INVALID_HYPERCALL_INPUT;
++		if (unlikely(hc->ingpa == INVALID_GPA)){
++			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
++			goto out_free;
++		}
+ 	}
+ 
+ 	if (hc->code == HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST ||
+@@ -2049,8 +2056,10 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 			hc->consumed_xmm_halves = 1;
+ 		} else {
+ 			if (unlikely(kvm_read_guest(kvm, hc->ingpa,
+-						    &flush, sizeof(flush))))
+-				return HV_STATUS_INVALID_HYPERCALL_INPUT;
++						    &flush, sizeof(flush)))) {
++				ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
++				goto out_free;
++							}
+ 			hc->data_offset = sizeof(flush);
+ 		}
+ 
+@@ -2079,8 +2088,10 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 			hc->consumed_xmm_halves = 2;
+ 		} else {
+ 			if (unlikely(kvm_read_guest(kvm, hc->ingpa, &flush_ex,
+-						    sizeof(flush_ex))))
+-				return HV_STATUS_INVALID_HYPERCALL_INPUT;
++						    sizeof(flush_ex)))){
++				ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
++				goto out_free;
++							}
+ 			hc->data_offset = sizeof(flush_ex);
+ 		}
+ 
+@@ -2093,15 +2104,19 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 		all_cpus = flush_ex.hv_vp_set.format !=
+ 			HV_GENERIC_SET_SPARSE_4K;
+ 
+-		if (hc->var_cnt != hweight64(valid_bank_mask))
+-			return HV_STATUS_INVALID_HYPERCALL_INPUT;
++		if (hc->var_cnt != hweight64(valid_bank_mask)){
++			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
++			goto out_free;
++		}
+ 
+ 		if (!all_cpus) {
+ 			if (!hc->var_cnt)
+ 				goto ret_success;
+ 
+-			if (kvm_get_sparse_vp_set(kvm, hc, sparse_banks))
+-				return HV_STATUS_INVALID_HYPERCALL_INPUT;
++			if (kvm_get_sparse_vp_set(kvm, hc, sparse_banks)){
++				ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
++				goto out_free;
++			}
+ 		}
+ 
+ 		/*
+@@ -2122,8 +2137,10 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	    hc->rep_cnt > ARRAY_SIZE(__tlb_flush_entries)) {
+ 		tlb_flush_entries = NULL;
+ 	} else {
+-		if (kvm_hv_get_tlb_flush_entries(kvm, hc, __tlb_flush_entries))
+-			return HV_STATUS_INVALID_HYPERCALL_INPUT;
++		if (kvm_hv_get_tlb_flush_entries(kvm, hc, __tlb_flush_entries)){
++				ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
++				goto out_free;
++		}
+ 		tlb_flush_entries = __tlb_flush_entries;
+ 	}
+ 
+@@ -2189,8 +2206,11 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 
+ ret_success:
+ 	/* We always do full TLB flush, set 'Reps completed' = 'Rep Count' */
+-	return (u64)HV_STATUS_SUCCESS |
++	ret = (u64)HV_STATUS_SUCCESS |
+ 		((u64)hc->rep_cnt << HV_HYPERCALL_REP_COMP_OFFSET);
++out_free:
++	bitmap_free(vcpu_mask);
++	return ret;
+ }
+ 
+ static void kvm_hv_send_ipi_to_many(struct kvm *kvm, u32 vector,
+-- 
+2.43.0
 
 
