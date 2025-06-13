@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-49392-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D430AD83FA
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 09:21:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2061AD83F6
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 09:19:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7769F189AB52
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 07:21:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D86717E963
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 07:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBCED2C3271;
-	Fri, 13 Jun 2025 07:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949292C3269;
+	Fri, 13 Jun 2025 07:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MlqHmZpo"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FE9BNqw8"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E552C3253;
-	Fri, 13 Jun 2025 07:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2372C3250;
+	Fri, 13 Jun 2025 07:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749799256; cv=none; b=ADunU6U2SZZdov7HKL/e0uG+xAryw773HHoZ1uH7JICqQ37vz79cJQv8MRx6EvdjyDF4zrwgxZ1jcal5R6bJtdxXSlBxZ7slWqPjrm5JJhe03JOwpLaKks/0oAznkNKuolKRBwKKjkSdsqU6FuGKTF0u5Lw5qGfi/bDjJeEggM4=
+	t=1749799133; cv=none; b=eOMZUOGWkxRFPhUyp4c3H1bpjcng8P8/mw9i80jVcVDxFd4i/FMiNhye7jWbLrl+PnEg6uTewldcGWcgr8y+Y2JthDrLVEgaO+pLF4w8EEGOa6ig3UwkNjUawOlsxEUBfP8Ddv5WKJ6V/rDsWnrLO/5+6QdNA7wUIpnCpPTfLws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749799256; c=relaxed/simple;
-	bh=7oG7PdaLuoIzjD9feldhuWnbLoPMo98j5mUEc/aR7hQ=;
+	s=arc-20240116; t=1749799133; c=relaxed/simple;
+	bh=M7EkRO7IVX8UmYnG8NR5ldDY2OALH+ByUr7WbfjmLEg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H20nOZ3NFIbkPUdlZe5l3kjbIwr44gH6LknIMTZO1aDbHopv1DYqYhO7NtoBwHIl0jZ5WebvM/XxmPjJDt+WI8mIquxrhsknmLpWCNUHFjkTl/hcjxrY/SDZmau4v5fbv49FbK0jE3FIICnJ42uh2/3tjrb9bayKuOHdcLBpS68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MlqHmZpo; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:Content-Disposition:In-Reply-To; b=XfnkkXL5Vic/mjP/4N8Wf2CoEAyhwS7Qsv7Thc8bCvLoiVd+q9ba8ljhchfSK+OI5GXbQtyIxD1lZknxTGnsz/R+DqKlzfkH5sg9kMWAb/0Sxsd+jo6YTGOpVD23OB8SKUL+Qa7ljeIpJDANutZerUlV6JB44vaEEtztYlrnXd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FE9BNqw8; arc=none smtp.client-ip=90.155.92.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=JwBBviHmEevVyR2yj/WBOAB/USjZOit0uE7ec1Txdc0=; b=MlqHmZpomiTv3FPCm1DCY51m56
-	OYYRsGs7+U885FPv6c1qKomXmBCLuMhytGmdKXeuFS7WLrUdZPZ26v21Sp7IOeRkUg7qyafptJutm
-	MOvGEK21SHP7yYXfZMYIL+sBZY/snLgixEuyg1Hn7yGoGHycKPj8Oh1ZNvTrV0yrgwbmEtEte2ywI
-	WrmqiLE551VDECZmGdVUH97hbrk8qoEBOz3OXCY1wbTfUJ14qWitpF/+5bvwsnN3qdN/oXy4t7VYw
-	jY7A9VfnlHvn/bs9/MRKaDRyRVD5dhxZIVtiMdbCdxFOWpmXr1arhP2Ts/AAfiEIgULpel3VcDXTc
-	VtC8Dstw==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uPydV-0000000CgPh-27uq;
-	Fri, 13 Jun 2025 07:15:37 +0000
+	bh=V7JkxG9Vy1kJOBwLEP7Ot+HWce3fGBM19nyA8Vb3JDQ=; b=FE9BNqw8CyaElbDtdH5KyL32Ph
+	rBhR75TipRafHBAo5oPFRWkCMU5upIY+Ce9wsDDsnaWnYvlQBfg3j76zTksl8kPGJZuKqtzjXP0uM
+	XfwyLE2MyQzGOi9cIcpkWOm9e8oSEfO0bSnLv3QEwKXMk160uGy648pUInVZ+Bq5tkIQDLZrticpk
+	EVSjaNp/F54OcmmhLVW8exVmoMJxpJLs1fcKBV/QiFrwJdIKqkcryPHREmJxtqPcvoMHj6E+DleGn
+	v1xfwtzc5hckcwlJ89HKleZlKgvHoco8F58tcRddx8+/Th4BGfWmuLzu6ygfR/1CupuMlECbTUD/9
+	gI8My4pg==;
+Received: from 2001-1c00-8d82-d000-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d82:d000:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uPygX-00000002tHy-2jwr;
+	Fri, 13 Jun 2025 07:18:45 +0000
 Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 2857030BC59; Fri, 13 Jun 2025 09:15:36 +0200 (CEST)
-Date: Fri, 13 Jun 2025 09:15:36 +0200
+	id 087FE30BC46; Fri, 13 Jun 2025 09:18:43 +0200 (CEST)
+Date: Fri, 13 Jun 2025 09:18:42 +0200
 From: Peter Zijlstra <peterz@infradead.org>
 To: "Xin Li (Intel)" <xin@zytor.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
@@ -55,11 +55,9 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
 	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
 	pbonzini@redhat.com, brgerst@gmail.com, tony.luck@intel.com,
 	fenghuay@nvidia.com
-Subject: Re: [PATCH v1 2/3] x86/traps: Initialize DR7 by writing its
- architectural reset value
-Message-ID: <20250613071536.GG2273038@noisy.programming.kicks-ass.net>
+Subject: Re: [PATCH v1 0/3] x86/traps: Fix DR6/DR7 inintialization
+Message-ID: <20250613071842.GH2273038@noisy.programming.kicks-ass.net>
 References: <20250613070118.3694407-1-xin@zytor.com>
- <20250613070118.3694407-3-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,37 +66,48 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250613070118.3694407-3-xin@zytor.com>
+In-Reply-To: <20250613070118.3694407-1-xin@zytor.com>
 
-On Fri, Jun 13, 2025 at 12:01:16AM -0700, Xin Li (Intel) wrote:
+On Fri, Jun 13, 2025 at 12:01:14AM -0700, Xin Li (Intel) wrote:
+> Sohil reported seeing a split lock warning when running a test that
+> generates userspace #DB:
+> 
+>   x86/split lock detection: #DB: sigtrap_loop_64/4614 took a bus_lock trap at address: 0x4011ae
+> 
+> 
+> We investigated the issue and identified how the false bus lock detected
+> warning is generated under certain test conditions:
+> 
+>   1) The warning is a false positive.
+> 
+>   2) It is not caused by the test itself.
+> 
+>   3) It occurs even when Bus Lock Detection (BLD) is disabled.
+> 
+>   4) It only happens on the first #DB on a CPU.
+> 
+> 
+> And the root cause is, at boot time, Linux zeros DR6.  This leads to
+> different DR6 values depending on whether the CPU supports BLD:
+> 
+>   1) On CPUs with BLD support, DR6 becomes 0xFFFF07F0 (bit 11, DR6.BLD,
+>      is cleared).
+> 
+>   2) On CPUs without BLD, DR6 becomes 0xFFFF0FF0.
+> 
+> Since only BLD-induced #DB exceptions clear DR6.BLD and other debug
+> exceptions leave it unchanged, even if the first #DB is unrelated to
+> BLD, DR6.BLD is still cleared.  As a result, such a first #DB is
+> misinterpreted as a BLD #DB, and a false warning is triggerred.
+> 
+> 
+> Fix the bug by initializing DR6 by writing its architectural reset
+> value at boot time.
+> 
+> 
+> DR7 suffers from a similar issue.  We apply the same fix.
 
-> While at it, replace the hardcoded debug register number 7 with the
-> existing DR_CONTROL macro for clarity.
-
-Yeah, not really a fan of that... IMO that obfuscates the code more than
-it helps, consider:
-
-> -	get_debugreg(dr7, 7);
-> +	get_debugreg(dr7, DR_CONTROL);
-
-and:
-
-> -	for (i = 0; i < 8; i++) {
-> -		/* Ignore db4, db5 */
-> -		if ((i == 4) || (i == 5))
-> -			continue;
-> +	/* Control register first */
-> +	set_debugreg(DR7_RESET_VALUE, DR_CONTROL);
-> +	set_debugreg(0, DR_STATUS);
->  
-> +	/* Ignore db4, db5 */
-> +	for (i = DR_FIRSTADDR; i <= DR_LASTADDR; i++)
-
-I had to git-grep DR_{FIRST,LAST}ADDR to double check this was correct :(
-
-Also, you now write them in the order:
-
-  dr7, dr6, /* dr4, dr5 */, dr0, dr1, dr2, dr3
-
-My OCD disagrees with this :-)
+Bah, this DR6 polarity is a pain in the behind for sure. Patches look
+good, except I'm really not a fan of using those 'names'. But I'll not
+object too much of others like it.
 
