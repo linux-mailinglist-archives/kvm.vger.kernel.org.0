@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-49468-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49469-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68CD2AD940E
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 20:00:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51C79AD9418
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 20:01:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D27953B9F39
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 18:00:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1C813A3BD0
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 18:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF3922A4E4;
-	Fri, 13 Jun 2025 18:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52AD230D14;
+	Fri, 13 Jun 2025 18:01:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H5Ha3C38"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/4ksMYK"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99313D3B8
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 18:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574FA22A4E4
+	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 18:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749837621; cv=none; b=G2WePp8wdzejhvIuuPwW2jQnhd0CbSbI71sBGWSV+RZ13wQ7nbrg2niZhiWxazwslsPlLCWoguphFKvRUFK/Jq6jNNSBCBxr3Z8REJ3h/choa9PP9pfpvq3MiopEjf644cP8PExgc5CSXhkCdvsK74nnjZ8Qx/X13+tEVxUyh18=
+	t=1749837689; cv=none; b=iVQ0WpYoxmJuPxxAK1EtN0Y4WGO6mUeLZQEvVmmdKds9rlNt1Ey9H+bOF47q8PoZd/2i0BEpqWSDR2sNKa8G0Uu58vi6tUjTNZTM+SckvLLcwdNCgxPWLH9v4KJBh4FnxqE7cSELJIzm7yYuYLMRq+lSOmpiGhv1X9s8s4frkv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749837621; c=relaxed/simple;
-	bh=d/oVTXsnKugsuOGjJtUGceEMllHBI7H44e+eSlRJBrw=;
+	s=arc-20240116; t=1749837689; c=relaxed/simple;
+	bh=Esw6ov3l8A5CaAtmTWBwTU2PX3RZ3hr0DfdZzU8Tu9A=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PfyBvAEXUBQZqCvgkke6Fc7YmFKRE0KWuU02o61EaGbQ8v4tZGjBGkTo71z7OoYG42xiUkXmQgwQ8MkEkSC+HWw8dFWjylV+1jqgocz3sKL0yerO5P/sf3lrMi5JH1xdviVgNSuejrr2z5kj9bVT2fYlK4vCoxqiSA6lP1aeE2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H5Ha3C38; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=V4MKgdSvC32ixSiUVKGwgyAxqneSTxuqVfMD/kA0BOEk0/Ynk8FDxswkSEKlsfEK6teAm6/hAmLx6LFQf7KGW7XDuEhaZMt4tGT230UfFLzmpbh0Ra5NXZRolVHE8kYhOj4hSdft96IDIyA0mlRFTES8kwRh9jOlTbU1G/fyg+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y/4ksMYK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749837618;
+	s=mimecast20190719; t=1749837686;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2aIKNMIdIuo1UCAdxylRa1DqGXWwEsMVAaI0AuMZvVs=;
-	b=H5Ha3C38ExuvTGw2F7Y/6l1iDvCCgeOwCjS6PH+L5Ys7Y/TGKMTRFGTIAjcQAh+znANLZD
-	NbE5hnT+4wASRXv4vUn8WVf8Ixx3n+fC14mn1NnWKQmbwgR/5N4QRWlXyXbtn+/hlKWeh4
-	Fvrg1Q9vpVDmXupf3gmCbdu6Ab6ACgk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Bsu+Wcnjd7wtWlxV8RLC0OdC2mEBW/GepWDmRtxUl30=;
+	b=Y/4ksMYKP9Z9gZ6pPTdBzMoi+JaqM15DkLTjTTnMct4dxZMi+wO0p9oErW7KXK0ALwKLbs
+	7r2O6nCa0Xwcl2p/pbPQIx3B8C/cInA+Mmm0YpOGb/inAcBvyqi3CqFJWeBA7OMWG1Uw2j
+	1qYIVWvn773V1KA1h4wLIkgzIa6ytfs=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-PWNn0EDMN4-Dn15EL1Mt9A-1; Fri, 13 Jun 2025 14:00:17 -0400
-X-MC-Unique: PWNn0EDMN4-Dn15EL1Mt9A-1
-X-Mimecast-MFC-AGG-ID: PWNn0EDMN4-Dn15EL1Mt9A_1749837616
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-450787c8626so18092515e9.1
-        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 11:00:17 -0700 (PDT)
+ us-mta-342-portNK3EP8-ksdHZkSSdjw-1; Fri, 13 Jun 2025 14:01:22 -0400
+X-MC-Unique: portNK3EP8-ksdHZkSSdjw-1
+X-Mimecast-MFC-AGG-ID: portNK3EP8-ksdHZkSSdjw_1749837682
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4e713e05bso1323583f8f.3
+        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 11:01:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749837616; x=1750442416;
+        d=1e100.net; s=20230601; t=1749837681; x=1750442481;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=2aIKNMIdIuo1UCAdxylRa1DqGXWwEsMVAaI0AuMZvVs=;
-        b=U5Wzay8M9SqbfugHg5N3qhvFJIfdGYrKlN9usdUpS+iUUgeCv3uIDKTTjF39NtFG2S
-         Ii//9bjpIf1Xr8kUPhBR5aHtn66D/XW+JqOEBJal4RiZ+7h77nI5G8Ue+F6k0V6dhQ4t
-         a+n7NqEkxpJSAvCC5x3M6+sWHuDiMpkAijipdxTR59MxzqjE6pUmK/csZCf6BBYrRBnO
-         5gzOKIEWMfllSHRTCoKheUEvLIIzFc4xE2hJhoJJRWE7ZSphzKeOvYbRtuJ0291I8Fot
-         zBtcyZoOMRl4WrsiHFXyWu39uvUXeQluLhn/0MOITQihav7tAVW5mWDGhye882VYxye1
-         ytJA==
-X-Forwarded-Encrypted: i=1; AJvYcCVYkgwXYapNSpYRrE9ndu3KrKwDg6D6O7T1s3ucPoshNwyNCztkWapHp9qDJkM9WnhbNiw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiXGt5R4cq/VTIvM6z2a1bQsyTOzzDktc0lduCLREeZz6Eghv0
-	mtGWYm6bPQ0z2b2j0UHJkNhnppNm2RoMdSnpDQkV/p/xuPHjCzWxPSFAGXypwF8GqpE5P2egYqD
-	HOILpBqkvktcGQGxSteNiP8hncEv1o4g8U/T7AdRCRorunCDANUV2sA==
-X-Gm-Gg: ASbGncsCOsgmWlf0vZMC856kefWZp1Y0TAbIjhr2Sf1NB8mXLnwOCKMJa3aNV4Qw/Oo
-	Cn2VUDE5W7AfnupYqcmM3GOQNrkTatBL4YhIW4j+a4nBL7FkjtTQ4UjQP+9ttOa2fGlr9pz34sM
-	bchRiX9W1zwF2nB8PU9eWoW8KCXst5H7ByG9QWurZ4iCp9rFLO3owZiwmuJX2If4yzwNTjsru8R
-	p4zQF2I5ph5/ifCOKApEwfLLbMUAp794Zyb0TLqBPF5ljqfqP31Z/DBWnynz/vtDM17ybezwuoh
-	Lj8vHzuF8x4i4/jN/Sa2lST3Ui3NanInq64ceaaP+TOn6T/0+oMdRv06rbeDsnk1rQvRFh5AtAM
-	WODEMwr+dkpc3+1kGoF47T8HOQcpw3X5T6v1mhYGHuNK2w0fTpA==
-X-Received: by 2002:a05:600c:3e17:b0:448:e8c0:c778 with SMTP id 5b1f17b1804b1-4533cb4948bmr4746265e9.22.1749837616023;
-        Fri, 13 Jun 2025 11:00:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGvbMEemipJF0MHDHTjrDKPJbj60ZNEib57qRrY66hYJiTMjPfY9MiRRAWvY1wgI/IveevRyg==
-X-Received: by 2002:a05:600c:3e17:b0:448:e8c0:c778 with SMTP id 5b1f17b1804b1-4533cb4948bmr4745995e9.22.1749837615611;
-        Fri, 13 Jun 2025 11:00:15 -0700 (PDT)
+        bh=Bsu+Wcnjd7wtWlxV8RLC0OdC2mEBW/GepWDmRtxUl30=;
+        b=KNrLDZ46KR7I7ZOMAjRdu0YirikC1hVsHNMLVwRMuj/J73YTvcZxPOI3+jQ046+Ie0
+         87X1cCKom0Tvqxsy7CSqEleCaZJI4CtkNjwfdLr+Dhp+BptUXA0eyxLOlLoBXFZ5dWde
+         2/2fXD1EpYQNGAZqYvgBdwsW6KhNR97xtTF3NDVYuvxgb4KPg5hwF0B8LZ/ktj2I7FbS
+         DoQDyfW38SugeQ4nCCh0qtLSy7nASy1WAR77UPfXfsmhXaKUZQ7Qd4qEbbDhWrnJIQuu
+         flGn2DC48M6PC3iK/cboKI/jkr5y4DBkxldZ5sXsDHNxswX8l7N/bOqB9n68C5BPyZQH
+         TTnw==
+X-Forwarded-Encrypted: i=1; AJvYcCVvbu7be9DRyIkX03eHWXRxBmpHllUJ9AOBfNh5+wvF7lvrCSNBIAFIUXwFs/c/A1PgH6c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXGtBsyCAKa2ujWm74nDIvazrU74JpPHIxaxNOmT5vQHGhp4Zb
+	fal753VlK5fMP/rVw2Vs/HHjZNKG1ebNW2G+BfWhLsxA7Pja2FSUwyA4J2+3ulUKltp/rDpBqzw
+	0nFA03S2LpZ6L8UOjXdWy8pqSHjoDhbJ5MSthvw74Lda1aZ+ZbQJYJw==
+X-Gm-Gg: ASbGncvlSr3v1Pyqd3aCVd4oExLBZvclQbtS5aB7rz/l18XCa8dRzXFqRz/edawnybf
+	i7tlNyEvvf5pemX9wSOx3DrZMS5D1mCqDHg+KHdenieWc/WE5AHqf82TvEJ3yVvFXRyYLjBVhpa
+	OaEWPnujnesX8KY9cY3nH2zEVfmP8723CWyfzzx9exCv7m/Ld47lgmVSxZIos6K1+mJ53CSmI2q
+	R7PiJc/Bea0U/LUHVaTY5Iw3YaC12ZSG77cA6D/8fI3IIGME25agLP853AzyTLWSneehBDo+wD8
+	8XwJuPQHHDoALMukzSUK9b1nQu7WZ4sMcCbNJ0d5Kyll373vwXeEoyauO0GGLkLpfQ8vKaKQke4
+	BEeYioTZfaAC7XjauMFNyF8ocr7rTcNOQcuoQnm0VZxvTS8Nuow==
+X-Received: by 2002:a05:6000:2310:b0:3a4:eed9:755d with SMTP id ffacd0b85a97d-3a5723679c2mr776525f8f.3.1749837681560;
+        Fri, 13 Jun 2025 11:01:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEWRgs9/eOjv6Ni0Z0GgYf1+t6oOJ0Vg7B/D9l25oYMJ7KcIy5VjWpy1ryHHls/6YKXmWWXpA==
+X-Received: by 2002:a05:6000:2310:b0:3a4:eed9:755d with SMTP id ffacd0b85a97d-3a5723679c2mr776461f8f.3.1749837681034;
+        Fri, 13 Jun 2025 11:01:21 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f1a:3700:2982:b5f7:a04e:4cb4? (p200300d82f1a37002982b5f7a04e4cb4.dip0.t-ipconnect.de. [2003:d8:2f1a:3700:2982:b5f7:a04e:4cb4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568a73966sm3051956f8f.34.2025.06.13.11.00.14
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b089c2sm3004716f8f.59.2025.06.13.11.01.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Jun 2025 11:00:15 -0700 (PDT)
-Message-ID: <a3860fb3-bd98-4e7f-b246-c92ecff1181b@redhat.com>
-Date: Fri, 13 Jun 2025 20:00:13 +0200
+        Fri, 13 Jun 2025 11:01:20 -0700 (PDT)
+Message-ID: <e874aa09-0ab8-4d5e-80ed-515d53d794e1@redhat.com>
+Date: Fri, 13 Jun 2025 20:01:19 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,15 +90,19 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] mm: Deduplicate mm_get_unmapped_area()
-To: Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, kvm@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Alex Williamson <alex.williamson@redhat.com>, Zi Yan <ziy@nvidia.com>,
+Subject: Re: [PATCH 2/5] mm/hugetlb: Remove prepare_hugepage_range()
+To: Peter Xu <peterx@redhat.com>, Zi Yan <ziy@nvidia.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
  Jason Gunthorpe <jgg@nvidia.com>, Alex Mastro <amastro@fb.com>,
- Nico Pache <npache@redhat.com>
+ Nico Pache <npache@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
+ loongarch@lists.linux.dev, linux-mips@vger.kernel.org
 References: <20250613134111.469884-1-peterx@redhat.com>
- <20250613134111.469884-2-peterx@redhat.com>
+ <20250613134111.469884-3-peterx@redhat.com>
+ <050B65EF-6A1E-44A8-87D5-152FA9A60641@nvidia.com> <aExQy6xMDc9Igm5v@x1.local>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -146,16 +150,22 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250613134111.469884-2-peterx@redhat.com>
+In-Reply-To: <aExQy6xMDc9Igm5v@x1.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 13.06.25 15:41, Peter Xu wrote:
-> Essentially it sets vm_flags==0 for mm_get_unmapped_area_vmflags().  Use
-> the helper instead to dedup the lines.
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
+> But if we want to be super accurate, it's indeed different, in that the old
+> hugetlb code was checking stack top with STACK_TOP, which is
+> mips_stack_top() for MIPS: it's a value that might be slightly less than
+> TASK_SIZE..
+> 
+> So strictly speaking, there's indeed a trivial difference on the oddity of
+> defining stack top, but my guess is nothing will be affected.  I can add
+> some explanation into the commit message in that case.
+
+Yeah, that would be good.
+
 Acked-by: David Hildenbrand <david@redhat.com>
 
 -- 
