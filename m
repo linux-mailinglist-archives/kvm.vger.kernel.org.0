@@ -1,273 +1,320 @@
-Return-Path: <kvm+bounces-49535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49536-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07D10AD980A
-	for <lists+kvm@lfdr.de>; Sat, 14 Jun 2025 00:07:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A8DAD980E
+	for <lists+kvm@lfdr.de>; Sat, 14 Jun 2025 00:08:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BBBC3BD52F
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 22:07:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EAF516A524
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 22:08:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75FF428DEF9;
-	Fri, 13 Jun 2025 22:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E15828DB4F;
+	Fri, 13 Jun 2025 22:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0QSf5fzl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w/zGhW61"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C8A2853E0
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 22:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060AA244676
+	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 22:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749852457; cv=none; b=U647zbcreNgeXobbfm3pGJIqfG1dLep6NeTLVa6c84pICn/FPMTMTaDmdGUtqEDCYEfxUyE6anRFH6j0iUJW2nCf2Z7bq157pC1s9oQi57ZjlA8q/hsJpRfdttsacxLsYCGePvMBepEqb6TNz1H6aWWKyX278eDoRpESxAet6bg=
+	t=1749852523; cv=none; b=TlBTRtT/vpR2zu7iBkgSXw0hakElcZ6ZQZ8nw8DkkF5phE0ctTN1U1urc5S89d472rNSy5V5hqRWDVyO4690U87EJO9jmSpk1y9wvAGfUxT31bjh1YVjdc7Ma28oOCe7UVc5ufG+61Gsb3m3gCk3/PaLcyejcWtQsIupcY0apfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749852457; c=relaxed/simple;
-	bh=5LQDwgXZiTJZifCIskJfO8E5M68MeEmmWIMewJk/ejw=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=VkbqWVm20ry4PI0eYqLXliNGw/4hUhw4r3TToGgDsdHWn2AmXbRfuBVx/NHxfnQ2QHnCmhZKdrgGjf+xnycyR9+5uZRJNgORnC7Ki1jGce5IO+uNqgcxLG3mY+cRAOqJ/uXPiuV/LF9uBKbq5Zij8i1dU6g5OQ2WSjw9ub+F+dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0QSf5fzl; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1749852523; c=relaxed/simple;
+	bh=fkr4HJOJpy9exfwJGhkn9TQt7LDzat+z9jZTC9JW58k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=aF9sKTFwWF2m4EFsrZUt8HMTAknVSxkRwUjBmDAfUfh3iat1UDHqshsVpWWsKHpEHZWbORXA1VncMvXba2TvxBwBGJQU7M1B4PdG+9Uq+iPr6jcJ/SL01vVDSRroQ4JcLXNNs74Hi54ZbVsvVda/ESiGcLTE7+ybiu2ks6bQWyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w/zGhW61; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b1ffc678adfso1620320a12.0
-        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 15:07:35 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2eeff19115so3167038a12.0
+        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 15:08:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749852454; x=1750457254; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jHrVv2kDcovHNoP3EEC76tcx39dbcoagl8VnybVR6Q8=;
-        b=0QSf5fzlMGtX0Pn75NwkwkK0kZumjQz1FggRUy6UK32q5jjWMAC9zOTemgzXCGvSF+
-         pG/HZjYnhMT4m8LU2WIKVf2CPJ1NoMTtwuFym4u/uoX8vB/3s/9YJyjukGoPIB6IXx37
-         /sdYtGBaw5DJ3BPN40i3wQkhfFt/vSBh2Ttj2TB62g0s0oh/Gok5GamUetIDzAgEDKWE
-         g32ltwFtLAGqDZh+a9b/JZY35pxcuYtS3P1dzx7Qi8U2VNfeb9pYfTj1FMe6BELbd105
-         /ND3PKyanhmapwizsk0QC07VkkIp7IkqD/6BCSxFtPoETQxbFoDSWyHgTGMevk9LcJ6y
-         NEpQ==
+        d=google.com; s=20230601; t=1749852521; x=1750457321; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wb4jmnBC8sBuVz3+2UsGpTIRs7ejQyw5kumAZcoTVsA=;
+        b=w/zGhW612IneXYWqSauec6dm1JkmppkTq+tvPkjqI1dabh6Qj1kWY7NvngMmdTpvp1
+         KJ3ZI9816d8frQBROoTx2twtKLYGTSuvq6SjjMmZVUpn3izLquME2UtKHqvcGX32vaf3
+         Oe6x1PtWuXl77OmCU/1hFFOiWE5YyqEd3w4iSgAX9txMgxlXMUn8G4u794akQcguX2xA
+         +VOJLbp24eMr0T8zS2Csmnbe4Iyybkc6QNQfR4YeWCFbeLDOpBb9w5SIFxUcKu9kt0W8
+         ZJH4t92OR/wjR1Q71U3tReyjYqXVS1ceovZIsz7CstqzilKPw5xyDFrAn06bUV1aGNEE
+         /szw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749852454; x=1750457254;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jHrVv2kDcovHNoP3EEC76tcx39dbcoagl8VnybVR6Q8=;
-        b=YE+zdvYPmIgZQHKlNsOQEElrECtAkSPmO8a+OQ5zwnPgdNvvB8f6/JraQJaxxuXxfz
-         7loOf+6xg+MC1ff0iRERVSvXPVoDSzD+Abw7d+p/Ds2aFCPfrgtC6DPOz0Sin3RvV7JQ
-         9FJKCN+PafnscwMO0xj1lcyZOR+DbP/XPmD9VyzqdzP8Um8Bwtrz1rkN8CbtRThlG8xH
-         4miTWjNJkekondIl0Bsj7TEznW8tt/WACVNJroiTcp0JxMi1tpLcZPKual8+OFJZPkUD
-         /ujDzLaqAEhERk+kOQKa1u/odVC+ZO7mekL+h1bzW0527JzDPT6Y41v5LwZphULl4J+q
-         +kOA==
-X-Gm-Message-State: AOJu0YxxtWBl2yOuK7wg6aVMNsP6lmJ/H9uq5BwrS/AFEC1naDMEKQ02
-	JOJtNCosG344ORJA74OELDV21XNaZ60UnnNuJeagzZ/PYAYnevNmewcQEXBXTdLCRt0XlLpThTT
-	6A1UR74vuocoOiIw31vgQXwby4A==
-X-Google-Smtp-Source: AGHT+IFVHWXFz2fZtkBz3H5QkGTBOJiqvd4jqlHEGetNFDiMdeIl66etnmH5TFa6nz2Zwxoho7DNwLI7pEhSfm9NmQ==
-X-Received: from pgbfy15.prod.google.com ([2002:a05:6a02:2a8f:b0:b2e:c15e:3eb7])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:3943:b0:21f:97f3:d4c2 with SMTP id adf61e73a8af0-21fbd525cffmr1383658637.16.1749852454508;
- Fri, 13 Jun 2025 15:07:34 -0700 (PDT)
-Date: Fri, 13 Jun 2025 15:07:33 -0700
-In-Reply-To: <683ba0fe64dd5_13031529421@iweiny-mobl.notmuch> (message from Ira
- Weiny on Sat, 31 May 2025 19:38:22 -0500)
+        d=1e100.net; s=20230601; t=1749852521; x=1750457321;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wb4jmnBC8sBuVz3+2UsGpTIRs7ejQyw5kumAZcoTVsA=;
+        b=k1FRIxGYVlI1Sm+hETfj8wh0SyvOLVXx5vKlAUuup68rQPx+5tPhbDkTSbOC2u33Qd
+         Q6A8W05In4T3FJj0FUaFAo9315aGUNlyB7tg6IDNqqQDkczVCYsW+LXsqYmgzeT7wKs1
+         6XSKxw8Oj1MVrIXJs5Ha7Cd072VyjJB3mNPzUOaHcphe4D9M3S8iGvJp1aPy7vbnV+FP
+         osUIAy5SAuoxKjEnBoj2bomfoZesOnWkmye54Ff2JPUzM2/NvBbnAZrtKvUUE18D5Iwc
+         lEWezJZB5ANpxa+XvdxEhrhTkWQ5dLz2r3lhMFWsxhQGDOsZEoCLtZ76TZ7PLxVeuam/
+         CL0A==
+X-Gm-Message-State: AOJu0YyxuaoIbvg99+4ZkAB62Foh9Q8qhEnf+c9252YpzPBPhOlMHV3O
+	W2tPdfIJcIO4cPBwUTOLT2fSv99AcCHrcGE0wbqKeTrNirDu1RZhMjTLmqboUVO3cgkHW/rj/65
+	ICJlZPw==
+X-Google-Smtp-Source: AGHT+IGdSPExuUA1/ibuJO19NsPM4/rKLVlAf2LsB0b+mN/T6vNzkkutRovkAexiqJtYBe7+n13vgpVYIl8=
+X-Received: from pfm6.prod.google.com ([2002:a05:6a00:726:b0:746:19fc:f077])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:7316:b0:21f:8817:f695
+ with SMTP id adf61e73a8af0-21fbd5590a9mr1355927637.25.1749852521334; Fri, 13
+ Jun 2025 15:08:41 -0700 (PDT)
+Date: Fri, 13 Jun 2025 15:08:39 -0700
+In-Reply-To: <20250611133330.1514028-11-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <diqzsek3mh22.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH v2 23/51] mm: hugetlb: Refactor out hugetlb_alloc_folio()
-From: Ackerley Tng <ackerleytng@google.com>
-To: Ira Weiny <ira.weiny@intel.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, linux-fsdevel@vger.kernel.org, aik@amd.com, 
-	ajones@ventanamicro.com, akpm@linux-foundation.org, amoorthy@google.com, 
-	anthony.yznaga@oracle.com, anup@brainfault.org, aou@eecs.berkeley.edu, 
-	bfoster@redhat.com, binbin.wu@linux.intel.com, brauner@kernel.org, 
-	catalin.marinas@arm.com, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	dave.hansen@intel.com, david@redhat.com, dmatlack@google.com, 
-	dwmw@amazon.co.uk, erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, 
-	graf@amazon.com, haibo1.xu@intel.com, hch@infradead.org, hughd@google.com, 
-	ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz, 
-	james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, 
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, 
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, maz@kernel.org, 
-	mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, pdurrant@amazon.co.uk, 
-	peterx@redhat.com, pgonda@google.com, pvorel@suse.cz, qperret@google.com, 
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	thomas.lendacky@amd.com, usama.arif@bytedance.com, vannapurve@google.com, 
-	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
-	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
+References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-11-tabba@google.com>
+Message-ID: <aEyhHgwQXW4zbx-k@google.com>
+Subject: Re: [PATCH v12 10/18] KVM: x86/mmu: Handle guest page faults for
+ guest_memfd with shared memory
+From: Sean Christopherson <seanjc@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
+	ira.weiny@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-Ira Weiny <ira.weiny@intel.com> writes:
+On Wed, Jun 11, 2025, Fuad Tabba wrote:
+> From: Ackerley Tng <ackerleytng@google.com>
+> 
+> For memslots backed by guest_memfd with shared mem support, the KVM MMU
+> must always fault in pages from guest_memfd, and not from the host
+> userspace_addr. Update the fault handler to do so.
 
-> Ackerley Tng wrote:
->> Refactor out hugetlb_alloc_folio() from alloc_hugetlb_folio(), which
->> handles allocation of a folio and cgroup charging.
->>
->> Other than flags to control charging in the allocation process,
->> hugetlb_alloc_folio() also has parameters for memory policy.
->>
->> This refactoring as a whole decouples the hugetlb page allocation from
->> hugetlbfs, (1) where the subpool is stored at the fs mount, (2)
->> reservations are made during mmap and stored in the vma, and (3) mpol
->> must be stored at vma->vm_policy (4) a vma must be used for allocation
->> even if the pages are not meant to be used by host process.
->>
->> This decoupling will allow hugetlb_alloc_folio() to be used by
->> guest_memfd in later patches. In guest_memfd, (1) a subpool is created
->> per-fd and is stored on the inode, (2) no vma-related reservations are
->> used (3) mpol may not be associated with a vma since (4) for private
->> pages, the pages will not be mappable to userspace and hence have to
->> associated vmas.
->>
->> This could hopefully also open hugetlb up as a more generic source of
->> hugetlb pages that are not bound to hugetlbfs, with the complexities
->> of userspace/mmap/vma-related reservations contained just to
->> hugetlbfs.
->>
->> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->> Change-Id: I60528f246341268acbf0ed5de7752ae2cacbef93
->> ---
->>  include/linux/hugetlb.h |  12 +++
->>  mm/hugetlb.c            | 192 ++++++++++++++++++++++------------------
->>  2 files changed, 118 insertions(+), 86 deletions(-)
->>
->
-> [snip]
->
->>
->> +/**
->> + * hugetlb_alloc_folio() - Allocates a hugetlb folio.
->> + *
->> + * @h: struct hstate to allocate from.
->> + * @mpol: struct mempolicy to apply for this folio allocation.
->> + * @ilx: Interleave index for interpretation of @mpol.
->> + * @charge_cgroup_rsvd: Set to true to charge cgroup reservation.
->> + * @use_existing_reservation: Set to true if this allocation should use an
->> + *                            existing hstate reservation.
->> + *
->> + * This function handles cgroup and global hstate reservations. VMA-related
->> + * reservations and subpool debiting must be handled by the caller if necessary.
->> + *
->> + * Return: folio on success or negated error otherwise.
->> + */
->> +struct folio *hugetlb_alloc_folio(struct hstate *h, struct mempolicy *mpol,
->> +				  pgoff_t ilx, bool charge_cgroup_rsvd,
->> +				  bool use_existing_reservation)
->> +{
->> +	unsigned int nr_pages = pages_per_huge_page(h);
->> +	struct hugetlb_cgroup *h_cg = NULL;
->> +	struct folio *folio = NULL;
->> +	nodemask_t *nodemask;
->> +	gfp_t gfp_mask;
->> +	int nid;
->> +	int idx;
->> +	int ret;
->> +
->> +	idx = hstate_index(h);
->> +
->> +	if (charge_cgroup_rsvd) {
->> +		if (hugetlb_cgroup_charge_cgroup_rsvd(idx, nr_pages, &h_cg))
->> +			goto out;
->
-> Why not just return here?
-> 			return ERR_PTR(-ENOSPC);
->
+And with a KVM_MEMSLOT_GUEST_MEMFD_ONLY flag, this becomes super obvious.
 
-I wanted to consistently exit the function on errors at the same place,
-and also make this refactoring look like I just took the middle of
-alloc_hugetlb_folio() out as much as possible.
+> This patch also refactors related function names for accuracy:
 
->> +	}
->> +
->> +	if (hugetlb_cgroup_charge_cgroup(idx, nr_pages, &h_cg))
->> +		goto out_uncharge_cgroup_reservation;
->> +
->> +	gfp_mask = htlb_alloc_mask(h);
->> +	nid = policy_node_nodemask(mpol, gfp_mask, ilx, &nodemask);
->> +
->> +	spin_lock_irq(&hugetlb_lock);
->> +
->> +	if (use_existing_reservation || available_huge_pages(h))
->> +		folio = dequeue_hugetlb_folio(h, gfp_mask, mpol, nid, nodemask);
->> +
->> +	if (!folio) {
->> +		spin_unlock_irq(&hugetlb_lock);
->> +		folio = alloc_surplus_hugetlb_folio(h, gfp_mask, mpol, nid, nodemask);
->> +		if (!folio)
->> +			goto out_uncharge_cgroup;
->> +		spin_lock_irq(&hugetlb_lock);
->> +		list_add(&folio->lru, &h->hugepage_activelist);
->> +		folio_ref_unfreeze(folio, 1);
->> +		/* Fall through */
->> +	}
->> +
->> +	if (use_existing_reservation) {
->> +		folio_set_hugetlb_restore_reserve(folio);
->> +		h->resv_huge_pages--;
->> +	}
->> +
->> +	hugetlb_cgroup_commit_charge(idx, nr_pages, h_cg, folio);
->> +
->> +	if (charge_cgroup_rsvd)
->> +		hugetlb_cgroup_commit_charge_rsvd(idx, nr_pages, h_cg, folio);
->> +
->> +	spin_unlock_irq(&hugetlb_lock);
->> +
->> +	gfp_mask = htlb_alloc_mask(h) | __GFP_RETRY_MAYFAIL;
->> +	ret = mem_cgroup_charge_hugetlb(folio, gfp_mask);
->> +	/*
->> +	 * Unconditionally increment NR_HUGETLB here. If it turns out that
->> +	 * mem_cgroup_charge_hugetlb failed, then immediately free the page and
->> +	 * decrement NR_HUGETLB.
->> +	 */
->> +	lruvec_stat_mod_folio(folio, NR_HUGETLB, pages_per_huge_page(h));
->> +
->> +	if (ret == -ENOMEM) {
->> +		free_huge_folio(folio);
->> +		return ERR_PTR(-ENOMEM);
->> +	}
->> +
->> +	return folio;
->> +
->> +out_uncharge_cgroup:
->> +	hugetlb_cgroup_uncharge_cgroup(idx, nr_pages, h_cg);
->> +out_uncharge_cgroup_reservation:
->> +	if (charge_cgroup_rsvd)
->> +		hugetlb_cgroup_uncharge_cgroup_rsvd(idx, nr_pages, h_cg);
->
-> I find the direct copy of the unwind logic from alloc_hugetlb_folio()
-> cumbersome and it seems like a good opportunity to clean it up.
->
+This patch.  And phrase changelogs as commands.
 
-I really wanted to make this refactoring look like I just took the
-middle of alloc_hugetlb_folio() out as much as possible, to make it
-obvious and understandable. I think the cleanup can be a separate patch
-(series?)
+> kvm_mem_is_private() returns true only when the current private/shared
+> state (in the CoCo sense) of the memory is private, and returns false if
+> the current state is shared explicitly or impicitly, e.g., belongs to a
+> non-CoCo VM.
 
->> +out:
->> +	folio = ERR_PTR(-ENOSPC);
->> +	goto out;
->
-> Endless loop?
->
+Again, state changes as commands.  For the above, it's not obvious if you're
+talking about the existing code versus the state of things after "this patch".
 
-Thanks, this should have been
 
-return folio;
+> kvm_mmu_faultin_pfn_gmem() is updated to indicate that it can be used to
+> fault in not just private memory, but more generally, from guest_memfd.
 
-> Ira
->
-> [snip]
+> +static inline u8 kvm_max_level_for_order(int order)
+
+Do not use "inline" for functions that are visible only to the local compilation
+unit.  "inline" is just a hint, and modern compilers are smart enough to inline
+functions when appropriate without a hint.
+
+A longer explanation/rant here: https://lore.kernel.org/all/ZAdfX+S323JVWNZC@google.com
+
+> +static inline int kvm_gmem_max_mapping_level(const struct kvm_memory_slot *slot,
+> +					     gfn_t gfn, int max_level)
+> +{
+> +	int max_order;
+>  
+>  	if (max_level == PG_LEVEL_4K)
+>  		return PG_LEVEL_4K;
+
+This is dead code, the one and only caller has *just* checked for this condition.
+>  
+> -	host_level = host_pfn_mapping_level(kvm, gfn, slot);
+> -	return min(host_level, max_level);
+> +	max_order = kvm_gmem_mapping_order(slot, gfn);
+> +	return min(max_level, kvm_max_level_for_order(max_order));
+>  }
+
+...
+
+> -static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+> -					u8 max_level, int gmem_order)
+> +static u8 kvm_max_level_for_fault_and_order(struct kvm *kvm,
+
+This is comically verbose.  C ain't Java.  And having two separate helpers makes
+it *really* hard to (a) even see there are TWO helpers in the first place, and
+(b) understand how they differ.
+
+Gah, and not your bug, but completely ignoring the RMP in kvm_mmu_max_mapping_level()
+is wrong.  It "works" because guest_memfd doesn't (yet) support dirty logging,
+no one enables the NX hugepage mitigation on AMD hosts.
+
+We could plumb in the pfn and private info, but I don't really see the point,
+at least not at this time.
+
+> +					    struct kvm_page_fault *fault,
+> +					    int order)
+>  {
+> -	u8 req_max_level;
+> +	u8 max_level = fault->max_level;
+>  
+>  	if (max_level == PG_LEVEL_4K)
+>  		return PG_LEVEL_4K;
+>  
+> -	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
+> +	max_level = min(kvm_max_level_for_order(order), max_level);
+>  	if (max_level == PG_LEVEL_4K)
+>  		return PG_LEVEL_4K;
+>  
+> -	req_max_level = kvm_x86_call(private_max_mapping_level)(kvm, pfn);
+> -	if (req_max_level)
+> -		max_level = min(max_level, req_max_level);
+> +	if (fault->is_private) {
+> +		u8 level = kvm_x86_call(private_max_mapping_level)(kvm, fault->pfn);
+
+Hmm, so the interesting thing here is that (IIRC) the RMP restrictions aren't
+just on the private pages, they also apply to the HYPERVISOR/SHARED pages.  (Don't
+quote me on that).
+
+Regardless, I'm leaning toward dropping the "private" part, and making SNP deal
+with the intricacies of the RMP:
+
+	/* Some VM types have additional restrictions, e.g. SNP's RMP. */
+	req_max_level = kvm_x86_call(max_mapping_level)(kvm, fault);
+	if (req_max_level)
+		max_level = min(max_level, req_max_level);
+
+Then we can get to something like:
+
+static int kvm_gmem_max_mapping_level(struct kvm *kvm, int order,
+				      struct kvm_page_fault *fault)
+{
+	int max_level, req_max_level;
+
+	max_level = kvm_max_level_for_order(order);
+	if (max_level == PG_LEVEL_4K)
+		return PG_LEVEL_4K;
+
+	req_max_level = kvm_x86_call(max_mapping_level)(kvm, fault);
+	if (req_max_level)
+		max_level = min(max_level, req_max_level);
+
+	return max_level;
+}
+
+int kvm_mmu_max_mapping_level(struct kvm *kvm,
+			      const struct kvm_memory_slot *slot, gfn_t gfn)
+{
+	int max_level;
+
+	max_level = kvm_lpage_info_max_mapping_level(kvm, slot, gfn, PG_LEVEL_NUM);
+	if (max_level == PG_LEVEL_4K)
+		return PG_LEVEL_4K;
+
+	/* TODO: Comment goes here about KVM not supporting this path (yet). */
+	if (kvm_mem_is_private(kvm, gfn))
+		return PG_LEVEL_4K;
+
+	if (kvm_is_memslot_gmem_only(slot)) {
+		int order = kvm_gmem_mapping_order(slot, gfn);
+
+		return min(max_level, kvm_gmem_max_mapping_level(kvm, order, NULL));
+	}
+
+	return min(max_level, host_pfn_mapping_level(kvm, gfn, slot));
+}
+
+static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
+				    struct kvm_page_fault *fault)
+{
+	struct kvm *kvm = vcpu->kvm;
+	int order, r;
+
+	if (!kvm_slot_has_gmem(fault->slot)) {
+		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+		return -EFAULT;
+	}
+
+	r = kvm_gmem_get_pfn(kvm, fault->slot, fault->gfn, &fault->pfn,
+			     &fault->refcounted_page, &order);
+	if (r) {
+		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+		return r;
+	}
+
+	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+	fault->max_level = kvm_gmem_max_mapping_level(kvm, order, fault);
+
+	return RET_PF_CONTINUE;
+}
+
+int sev_max_mapping_level(struct kvm *kvm, struct kvm_page_fault *fault)
+{
+	int level, rc;
+	bool assigned;
+
+	if (!sev_snp_guest(kvm))
+		return 0;
+
+	if (WARN_ON_ONCE(!fault) || !fault->is_private)
+		return 0;
+
+	rc = snp_lookup_rmpentry(fault->pfn, &assigned, &level);
+	if (rc || !assigned)
+		return PG_LEVEL_4K;
+
+	return level;
+}
+> +/*
+> + * Returns true if the given gfn's private/shared status (in the CoCo sense) is
+> + * private.
+> + *
+> + * A return value of false indicates that the gfn is explicitly or implicitly
+> + * shared (i.e., non-CoCo VMs).
+> + */
+>  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>  {
+> -	return IS_ENABLED(CONFIG_KVM_GMEM) &&
+> -	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+> +	struct kvm_memory_slot *slot;
+> +
+> +	if (!IS_ENABLED(CONFIG_KVM_GMEM))
+> +		return false;
+> +
+> +	slot = gfn_to_memslot(kvm, gfn);
+> +	if (kvm_slot_has_gmem(slot) && kvm_gmem_memslot_supports_shared(slot)) {
+> +		/*
+> +		 * Without in-place conversion support, if a guest_memfd memslot
+> +		 * supports shared memory, then all the slot's memory is
+> +		 * considered not private, i.e., implicitly shared.
+> +		 */
+> +		return false;
+
+Why!?!?  Just make sure KVM_MEMORY_ATTRIBUTE_PRIVATE is mutually exclusive with
+mappable guest_memfd.  You need to do that no matter what.  Then you don't need
+to sprinkle special case code all over the place.
+
+> +	}
+> +
+> +	return kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+>  }
+>  #else
+>  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> -- 
+> 2.50.0.rc0.642.g800a2b2222-goog
+> 
 
