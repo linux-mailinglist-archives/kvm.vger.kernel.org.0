@@ -1,125 +1,110 @@
-Return-Path: <kvm+bounces-49427-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49429-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7322AAD8F63
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 16:23:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 259E3AD8F5C
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 16:22:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 107323B2CB9
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 14:18:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7E797A408C
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 14:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E711017A30A;
-	Fri, 13 Jun 2025 14:18:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D56188CC9;
+	Fri, 13 Jun 2025 14:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eYBzLmHA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iauW0YWn"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC342111BF
-	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 14:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933FF2E11CD
+	for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 14:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749824327; cv=none; b=eSJi2fufCDbMC6pPfTroJlIvIhSSHBegAwezhwKgRFkywjCxt06PaNUIF/FtwHazFmA5AkDuiG1jdE4VkorKkijXfQSGfoCLchbHw+/zFjWtEI3OfLzd01VqYxHr6ocaHxCBWNuN6ShLwnHT7lO/Ylafh29rCx0d4c4vYu9HcuM=
+	t=1749824551; cv=none; b=DPNsx1OE3954de7XJv8QjY2kmwi7WVGbIsowPk3PcZjG1bGYhEgSoHxi2cSEcFJIAOYNoEMq1crtGE61Szdqta81iLx13g2opNo0esRVKVzkA5RxekDxtw8Pl2br31FCa+E3IoCIVVXnh33+gH3vTcVSEPtEnBSQbfZz0s+2pOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749824327; c=relaxed/simple;
-	bh=KZCx30388jexSHnEs8GEE9SQPiUitBEN+gkUoK/zuJ0=;
+	s=arc-20240116; t=1749824551; c=relaxed/simple;
+	bh=v7g5X6oc6sVy67+yYbMpBvVyIQv+ZrVA9HpSzTrgX1E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=H55eRtswD1SBZoB0EnIHyIBOJotsamP6Yjpltrh54mJBg6xhwMMOcT3PD1XVEtukdD3AkRnXwd1+A4EuhPN/sVcJ0KXWUBzizaWL1f1Cq1taGD4m4AixRwQN4Y/UFST/ocSKnedZkrpifdGPvkyFfA1oHe4SmetXe6BTvoeoTvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eYBzLmHA; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=LyyUvCoVCHX105BIt3r8Y+EWv7MFt49+8TmdE28b2yPm1ioskVs3E3wzsjsP4FmHpSJC/u0gAPaguyXRgn2ioR7Ql7Lwp5U/m04ABhetYfZuhJXq6zd2MNujEtv1Cf30kKDSoRL5dcN3CMrrg81NO4zNu8FOMXdF3gpxQNTex6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iauW0YWn; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b26e33ae9d5so2307433a12.1
-        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 07:18:45 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b1fa2cad5c9so1491062a12.2
+        for <kvm@vger.kernel.org>; Fri, 13 Jun 2025 07:22:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1749824325; x=1750429125; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1749824550; x=1750429350; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yuln+M51ZqtA7GXdWLmA1eKBEgUSVLYqYN5wEG+nUNM=;
-        b=eYBzLmHAgqQ0wPA7GNypjAQb/+5K5uZ4ZqVR3955piHDYiau05dQwE4i240KMZ2UWb
-         AEKxEAaxjI8oykWZs9AOvCod5qAce4OtV0xFEy1BOnqXKH6C9Ka43HVG/f0Lsv3MXV5X
-         xv9DnfTHpQsDtbc7l7tLQnL2ifG5eDFgPZQl5/0IpWb29QGZZJyoD29h1Jr1P5r+gSwD
-         8V4JcS753r77yh9dFGhXd6qs+FzGGXdDKfbwZHEQGpCcexDUAhKXJHCFzav5/yYWj9+X
-         V9pTY9sDIwAp7yqgca1pkztL1YOw0MluVWxPWiMJDctor0iOgP4OXn4vrRHYKt0ho6LY
-         Hk5w==
+        bh=91W4ixZhFhNMAfYX3G8GscIMxxtY559BEv8MBNtGYAY=;
+        b=iauW0YWnQNigQAOill7vSTq2Y7djrgwbTi/EqXONjgN0zJMPplJ3NmV+tKBVG9gxMb
+         znTmFCyYvRRH0YHTiLKmoBaiG6r4xLc52/7uWy4dqmoLszB0JK0ZZJUUFeYaF7O+07BR
+         X0Gem67u1xWu1yNPeaJ3DA3Lj9wtoUHI3+ETkzK0ljarPt1LL2PRNrQd/oua1YLhs9f8
+         mJVPx4+aOqI1K7eEIG19Rnbjjf0Lk3RjF0sfmriZ5onkjPEOa4+zWzWaNo35kFpWTvx5
+         daBgApmzuVC7p6G5xz50cbEopgED+EXXQn0kyHceoVJMClxIMYwwZVZJe3XpfzG7OTff
+         fGNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749824325; x=1750429125;
+        d=1e100.net; s=20230601; t=1749824550; x=1750429350;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yuln+M51ZqtA7GXdWLmA1eKBEgUSVLYqYN5wEG+nUNM=;
-        b=DdqKD5oZY8Ao5ElUt2xYMAcYdhjmaiP65o7rFsT8g/ukdWY8p6CmsyUBWoWv3rRV/h
-         WevtBbYLU2Qh7oVIE23Yoa4tXJkBsLwYAMeZohcr2DQSonsNNlNMeqBi7RDJncEkjvju
-         eKpyEBKdzKFzIR3rjEwoI3WJr7dD6wYMdU91LKymwm0bpVZNV5DFCWxqzPAprzWSTfb5
-         FZlVolOM9dsDtDoooBV9MeJzXxsKxq9Rmsmc1Dkiw3RUYFiz4nVwo0EmntrBnGI8HFBH
-         oetbCFb4wlsS793xFl54faMr5W13VIhIqUd9zE4iK1wlYbOKB6NQxrHjozVe4zofonZc
-         JpCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVxZb2nSCflYfulYSoG1+gcYQkIehqPp3YL9nKV9u3Rv6W64HDRbLctB+Pxtrpd255jYiQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx34kxZb1CJY7ixFXsUaxARMDREjKDuu6IdrCVHNMSxVdUbsZ6A
-	D/gM6sA6dVGxymFdZpxYcbxq/jZXxMudDfmQFfDh8N+MOdd8vxg+K92qa2C5gMMyjELjA0X0LtW
-	SW7Gl6A==
-X-Google-Smtp-Source: AGHT+IGTmdWWhZ7LS8l723oDJ8C756m21ujYIzKHiZTqy0btcanVKUMN3Mr1M6X4Q2ZV1ZJJV9/F4bxywe8=
-X-Received: from pgbcu5.prod.google.com ([2002:a05:6a02:2185:b0:b2e:c00e:65f0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:43a1:b0:1f5:709d:e0c6
- with SMTP id adf61e73a8af0-21facf13519mr4722004637.42.1749824324957; Fri, 13
- Jun 2025 07:18:44 -0700 (PDT)
-Date: Fri, 13 Jun 2025 07:18:43 -0700
-In-Reply-To: <20250613070118.3694407-2-xin@zytor.com>
+        bh=91W4ixZhFhNMAfYX3G8GscIMxxtY559BEv8MBNtGYAY=;
+        b=iUt/+SANmt5GMV4VW1CbU2ORr2u2mrCnpOId6EF7fAagkMTSM5BKgm5c8aauoyDtxu
+         X0+vhledA51SeqbSmYUF13hFQm9VPcO4L8aWz4COx8Ah1DQ27BuW+fqe8s2vJsMR/eI9
+         UhaqV6vqv8SiwbX7gFhIhX6m3Mk+0Ev/UoVJKNUE6IeVcEuT5uZxKCnIDjlOj1rjRkIX
+         zn1MgS5aoLUzzcObtxNV1OWFt8E8qk76Lkxs2nvp8ixA7SicuCIUaj5538TT/RiDaFJo
+         SyZ1uhU1LaCZx8YXT7nCqyol73ypR8mq1eco/GL5mFG9kKUeTYMz0+5CBdgHlB+rmxYl
+         gh6g==
+X-Gm-Message-State: AOJu0YzSrtVAQlmBo9z4y1Uqzwqo0iXc+qnWhc0aukkR1qoEjcVJuPf0
+	iHaHNIeC4cZ148HI/zdAyjEQQhcl3v7LhUx6HKUtr1DGc71Cpy8gJSsr5LOawIhKXhe4QzrifY7
+	9vK/Vsg==
+X-Google-Smtp-Source: AGHT+IGpyPuJz3U+5aricbieZ1jJLQuCkfhwpHihQ66LxhmrkLx1ORImJi4+YWfYg5r/cDIEP9803prL9y8=
+X-Received: from pgbbo1.prod.google.com ([2002:a05:6a02:381:b0:b2f:1e78:bfa3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6a08:b0:1ee:e20f:f14e
+ with SMTP id adf61e73a8af0-21fad00e70emr4624067637.38.1749824549995; Fri, 13
+ Jun 2025 07:22:29 -0700 (PDT)
+Date: Fri, 13 Jun 2025 07:22:28 -0700
+In-Reply-To: <b73ef73a707faab870fa64f96af9e0c4de213043.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250613070118.3694407-1-xin@zytor.com> <20250613070118.3694407-2-xin@zytor.com>
-Message-ID: <aEwzQ9vIcaZPtDsw@google.com>
-Subject: Re: [PATCH v1 1/3] x86/traps: Move DR7_RESET_VALUE to <uapi/asm/debugreg.h>
+References: <20250611213557.294358-1-seanjc@google.com> <20250611213557.294358-5-seanjc@google.com>
+ <44cb77805d1d05f7a28a50fc16e4d2d73aca88f3.camel@intel.com>
+ <aEt1aXPhivCJZbyE@google.com> <b73ef73a707faab870fa64f96af9e0c4de213043.camel@intel.com>
+Message-ID: <aEw0JObSt0SLv_Rt@google.com>
+Subject: Re: [PATCH v2 04/18] KVM: x86: Drop superfluous kvm_hv_set_sint() =>
+ kvm_hv_synic_set_irq() wrapper
 From: Sean Christopherson <seanjc@google.com>
-To: "Xin Li (Intel)" <xin@zytor.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, pbonzini@redhat.com, peterz@infradead.org, brgerst@gmail.com, 
-	tony.luck@intel.com, fenghuay@nvidia.com
+To: Kai Huang <kai.huang@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "vkuznets@redhat.com" <vkuznets@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jun 13, 2025, Xin Li (Intel) wrote:
-> Move DR7_RESET_VALUE to <uapi/asm/debugreg.h> to prepare to write DR7
-> with DR7_RESET_VALUE at boot time.
+On Fri, Jun 13, 2025, Kai Huang wrote:
+> On Thu, 2025-06-12 at 17:48 -0700, Sean Christopherson wrote:
+> > On Thu, Jun 12, 2025, Kai Huang wrote:
+> > > On Wed, 2025-06-11 at 14:35 -0700, Sean Christopherson wrote:
+> > > > Drop the superfluous kvm_hv_set_sint() and instead wire up ->set() directly
+> > > > to its final destination, kvm_hv_synic_set_irq().  Keep hv_synic_set_irq()
+> > > > instead of kvm_hv_set_sint() to provide some amount of consistency in the
+> > > > ->set() helpers, e.g. to match kvm_pic_set_irq() and kvm_ioapic_set_irq().
+> > > > 
+> > > > kvm_set_msi() is arguably the oddball, e.g. kvm_set_msi_irq() should be
+> > > > something like kvm_msi_to_lapic_irq() so that kvm_set_msi() can instead be
+> > > > kvm_set_msi_irq(), but that's a future problem to solve.
+> > > 
+> > > Agreed on kvm_msi_to_lapic_irq(), but isn't kvm_msi_set_irq() a matter match
+> > > to kvm_{pic/ioapic/hv_synic}_set_irq()?  :-)
+> > 
+> > Yes, the problem is that kvm_set_msi() is used by common code, i.e. could actually
+> > be kvm_arch_set_msi_irq().  I'm not entirely sure churning _that_ much code is
+> > worth the marginal improvement in readability.
+> 
+> Ah didn't know that
 
-Alternatively, what about dropping DR7_RESET_VALUE,  moving KVM's DR6 and DR7
-#defines out of arch/x86/include/asm/kvm_host.h, and then using DR7_FIXED_1?
+Heh, I didn't know either, until I went to rename the darn thing :-)
 
-Arguably, that'd be an improvement for 2 of the 3 uses of DR7_RESET_VALUE in SEV
-code:
-
-	/* Early non-zero writes to DR7 are not supported */
-	if (!data && (val & ~DR7_RESET_VALUE))
-		return ES_UNSUPPORTED;
-
-vs.
-
-	/* Early non-zero writes to DR7 are not supported */
-	if (!data && (val & ~DR7_FIXED_1))
-		return ES_UNSUPPORTED;
-
-And in vc_handle_dr7_read():
-
-	if (data)
-		*reg = data->dr7;
-	else
-		*reg = DR7_RESET_VALUE;
-
-vs.
-
-	if (data)
-		*reg = data->dr7;
-	else
-		*reg = DR7_FIXED_1;
-
-In both of those cases, it isn't the RESET value that's interesting, it's that
-architecturally bit 10 is fixed to '1'.
-
-I haven't looked at the kernel code, but I suspect DR6_ACTIVE_LOW, DR6_VOLATILE,
-and/or DR6_FIXED_1 could also come in handy. 
 
