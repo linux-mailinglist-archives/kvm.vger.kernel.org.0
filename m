@@ -1,254 +1,433 @@
-Return-Path: <kvm+bounces-49440-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49441-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DB10AD9104
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 17:20:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00ECAAD9107
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 17:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 044891BC3691
-	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 15:20:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 683873BCC67
+	for <lists+kvm@lfdr.de>; Fri, 13 Jun 2025 15:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04EB1E1DE7;
-	Fri, 13 Jun 2025 15:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447991E8353;
+	Fri, 13 Jun 2025 15:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Fswzhq3q"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gTmle8mS"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2070.outbound.protection.outlook.com [40.107.212.70])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2089.outbound.protection.outlook.com [40.107.92.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC5D2B9A9;
-	Fri, 13 Jun 2025 15:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFC633E1;
+	Fri, 13 Jun 2025 15:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.89
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749827980; cv=fail; b=N6Hsa2XwZh9IPlCXnnnSeqAzLot4rHvnc+PchMnHR9AhTeTzq7JI0BT65a99q8VorsUa9gSUvE+EB/v6W1RAtMEeziYM2HouSd2bnVmoTENvPfWZ1egy2TnYleAn1SP7KuF4JMfCRmlTycEgkBIsVkOfxZspJQR1LKfRy5kYEvk=
+	t=1749828002; cv=fail; b=b/oehVlEISf9DBpmMknTDxaAKvDGjln4gwsXhEOb43n/MABaEHiv9mZjWXiZgnbW7wK8VnH6X18BeX8KMRqwXDWfilodjZ4GC4wCQ+csfnthhfnWa4wp0XkF7S1dWsmAyK8TRmf7sJuD8cdxJDYx7DsA685n7ePcdvu5WOT2mW0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749827980; c=relaxed/simple;
-	bh=AQJt3MlXzs0bHAfOwJ+2EBhm24uMX6Nu2plJfJd6Jjc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HA/Hwk+p9POWDHK6xlfCxPYO8IGmxRPS2Zz2eAid/Q7ucq1eQfBysf/qsQz6SRKnUKy/EQiUuJt7V+EA4xWGRGAYVRAnz1Do8H/7wq5wwzA4IDAsDC7O6S/tvlNcVoP+3OgRnoUv1iBenxuvxXBbt9Q189RFCQYrJmrja307xXQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Fswzhq3q; arc=fail smtp.client-ip=40.107.212.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1749828002; c=relaxed/simple;
+	bh=ICNhM6k6XGXC3ab+Ksj+BuY+Js0jqB3oyMq6/3ibCwo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fECWiwBmKQ8DTDebTpucyCe8L6gSnnpcTiud/AflNjxkB0D+aihgi3wQCU9jGyrC6QVo0cpEUbsSZB/YRFbkzHFZAJZ87ywZ8runqN1cpKcnMznkUJzlHeYS+rduiQ8SiXvnRcqDXw6/oNUo2Glm4pIj0yPesiSutInXTtTIyFs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gTmle8mS; arc=fail smtp.client-ip=40.107.92.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oLQztZ9bq6hLaO9EDq4+th7yNiOSL9QzHstz+DDrzXTAto6jd/0Dficc6KfLwG4jLXRr5M7Tuv+/7bKHEoZwMBZ5Skonr3zhXFaEkEACkkXwmnY1bvlLX3g2i6R9cHbObsmz4bEn418rwj20I3XyDLAJJmqGHpYJi8imTOR4QLovM3aU4k2o7lnhm1SB2X0mIZai5eO81j11KhuxSxfHQwwb/rQUThACtUHt4FM5SAnSbv4wHl3kfkPuB5Nc+LQBXPawvXBlWS6eaRQywrvyDq93EXlMkmskwEjMJc94CZN38/k4acAPZL/ClThwWgKouiGNTDeIrSnFaXofsZFa4w==
+ b=O5I3JUeMS7vjOATIjl70gbmF3kKmTb3kV2IHd6YfmJNWDoi3Xv38ZVW8MxBhismzPvgOVJ2zBdDOHstquajFxBDC1qpsnM2tHH/i6UOWHNDUwhSydHq4bmoRs1wTsBg1FtbPn+YWB20c9M84EYCYV8gd7dZkAmmdVXcXk1V13Wm5AJHSFblRNHAIkZvfXf7F+na0uLjiJiqkcMs0egztd01scKus9Gi0Bh6b4ouXmV0dqTPuidMxHR7bySQTSojWvRjyxXZz6aXS+8jvWDC8mafsRfpLVpn0uELkRsKSdOl9xtbLryWN7qYm+ICCLog5spADOxxx8N8UbUTM4dE9kQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KZ1zOfNTiJSSTiqa9Aq+QnutjUU5TURa2pzrPDnJGSs=;
- b=T+EEWYY7d40IyifSUiTIYLw/dgDSoLB/OT69HoPzcisAQCpv7D0vbR4aQWnF3ll7fiRYmHAdHriCtChFphHfK7F4jn6xCkGVWcHZpaW4f6zJ3sK4yUUcUDWnB3oyW6DJTjSzzs7dMm09CaNSu6gr01CPHmS4AfF+OaES8/Zr7nPkBOGooWRUKGtbCK2ibdGEVLF2XYBheVF9AFYetGrM3kxOXWcVnCTP8VjA355cYd7cNyex3RJ2+NheXdmVWQrGdcPYFHkhqNdRgg8oP638O5Ak7s7CGKAkdasJjoL8v28pjAvTgvBl18Bcp/mAXLjftHIO7ZKGgjDXUWJlJhIJtA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=yvDP22/KhmHZzaLFesYb3B6vjlX96/ryyvxUQEMijSo=;
+ b=vqOzXJnutwbm7OA7mHKgEe6o3aj6CJzp7uWxWDOqULD13xnVbhLJBHgcWNyOBlv6H0ATPmBDm/+ZwReVsNcYaOHvah+RK/9KfBmpsneskbMNNa7FkJYuE5qbZCmsjPBZNmubSHX+Mck/jTTFrDWvGMHQHFdCPGDuT0+OKIbVDsd86iHNMjvCNf8UW+IXf6Mr513Cz7TclEkhV6jbS0rYX6cz4fyimrwAVpid6CnRItEnkWOXxp3LKq27SvBjt9KC3GGd2FMRZTipHUFvK0WVv4NbpYX1PEZRRTRoeXkLeYHybRn6ehR46oDVlJoWsH7gF2rhXVoDtFhosUIjxgpx1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KZ1zOfNTiJSSTiqa9Aq+QnutjUU5TURa2pzrPDnJGSs=;
- b=Fswzhq3qukGPzBh9sZpN4Mk3mCRVPCHpXW2yzhVeiIyRQSXRd4o0rM08BFHLYt5brI6BBwq0yaFxvrld+FrocnFCzdSQSDEF/3/+8xWCK2cpdtXfKpIpEoyn8qfj03w6FAoRkiP19mbpnr4Zhih31GZnc2cTDzD+i7WNaMqUOMsvb/o9efTaemb9FpOjPKeH/zZnFy14Amb6xm/yOY6iWrjzs6nywh1O2R5N2UyTTWevrJVYStMwAW9K1CDCcDEvS55qnqqpOGL1x5kDld2dYrthJhiA60t+I3QnpVVlxBm58fGvBeRVVWs+2mAQZNWcR5F0zrMaZMZ2M+oD3eDOcg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- DS0PR12MB8272.namprd12.prod.outlook.com (2603:10b6:8:fc::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8835.19; Fri, 13 Jun 2025 15:19:34 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a%4]) with mapi id 15.20.8792.038; Fri, 13 Jun 2025
- 15:19:34 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: Peter Xu <peterx@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- Jason Gunthorpe <jgg@nvidia.com>, Alex Mastro <amastro@fb.com>,
- David Hildenbrand <david@redhat.com>, Nico Pache <npache@redhat.com>,
- Baolin Wang <baolin.wang@linux.alibaba.com>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>,
- Barry Song <baohua@kernel.org>
-Subject: Re: [PATCH 3/5] mm: Rename __thp_get_unmapped_area to
- mm_get_unmapped_area_aligned
-Date: Fri, 13 Jun 2025 11:19:30 -0400
-X-Mailer: MailMate (2.0r6263)
-Message-ID: <AC89F7C8-C6D5-46AF-BF2E-35D81A3F4928@nvidia.com>
-In-Reply-To: <20250613134111.469884-4-peterx@redhat.com>
-References: <20250613134111.469884-1-peterx@redhat.com>
- <20250613134111.469884-4-peterx@redhat.com>
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: BN9PR03CA0492.namprd03.prod.outlook.com
- (2603:10b6:408:130::17) To DS7PR12MB9473.namprd12.prod.outlook.com
- (2603:10b6:8:252::5)
+ bh=yvDP22/KhmHZzaLFesYb3B6vjlX96/ryyvxUQEMijSo=;
+ b=gTmle8mSwqM21W0yBxVByQHGRALIB+awm2AOrT9TgLARKF5eek8yEWqRJ20nYJlxmmk64xpOPkW+NLYrZ0Q+w1Mob1ML+PKpsCDcuWwlDM+dBlM/4+1HilG8MW5ZVQsDmIJt5OhvNPLR9efe8HYXrbXfcPm5RYBOVtXfwyAMinw=
+Received: from SA0PR13CA0006.namprd13.prod.outlook.com (2603:10b6:806:130::11)
+ by CH3PR12MB9453.namprd12.prod.outlook.com (2603:10b6:610:1c9::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.25; Fri, 13 Jun
+ 2025 15:19:56 +0000
+Received: from SA2PEPF00001507.namprd04.prod.outlook.com
+ (2603:10b6:806:130:cafe::76) by SA0PR13CA0006.outlook.office365.com
+ (2603:10b6:806:130::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8835.25 via Frontend Transport; Fri,
+ 13 Jun 2025 15:19:55 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SA2PEPF00001507.mail.protection.outlook.com (10.167.242.39) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8835.15 via Frontend Transport; Fri, 13 Jun 2025 15:19:55 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 13 Jun
+ 2025 10:19:55 -0500
+Date: Fri, 13 Jun 2025 10:19:39 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+CC: Vishal Annapurve <vannapurve@google.com>, Ackerley Tng
+	<ackerleytng@google.com>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-kernel@vger.kernel.org>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+	<pbonzini@redhat.com>, <seanjc@google.com>, <vbabka@suse.cz>,
+	<amit.shah@amd.com>, <pratikrajesh.sampat@amd.com>, <ashish.kalra@amd.com>,
+	<liam.merwick@oracle.com>, <david@redhat.com>, <quic_eberman@quicinc.com>
+Subject: Re: [PATCH 3/5] KVM: gmem: Hold filemap invalidate lock while
+ allocating/preparing folios
+Message-ID: <20250613151939.z5ztzrtibr6xatql@amd.com>
+References: <diqzjz7azkmf.fsf@ackerleytng-ctop.c.googlers.com>
+ <diqz8qmsfs5u.fsf@ackerleytng-ctop.c.googlers.com>
+ <aC1221wU6Mby3Lo3@yzhao56-desk.sh.intel.com>
+ <CAGtprH_chB5_D3ba=yqgg-ZGGE2ONpoMdB=4_O4S6k7jXcoHHw@mail.gmail.com>
+ <aD5QVdH0pJeAn3+r@yzhao56-desk.sh.intel.com>
+ <CAGtprH_XFpnBf_ZtEAs2MiZNJYhs4i+kJpmAj0QRVhcqWBqDsQ@mail.gmail.com>
+ <aErK25Oo5VJna40z@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aErK25Oo5VJna40z@yzhao56-desk.sh.intel.com>
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|DS0PR12MB8272:EE_
-X-MS-Office365-Filtering-Correlation-Id: c40ad728-8a7e-41c0-ce34-08ddaa8db3cb
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001507:EE_|CH3PR12MB9453:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0cdd485d-b094-4e84-392c-08ddaa8dc0d5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|7053199007;
+	BCL:0;ARA:13230040|36860700013|7416014|376014|82310400026|1800799024|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?qFirMqJ2xJEeLRLm6CMcy2GfzV/yqnSbcn7Yz8PeaiKRjbGQtSOr+/k0S4y4?=
- =?us-ascii?Q?NgHTWwRsurq+2R0ZOgD1Guv7I0AT8gMe652X7NYliw87cnUUdGjuPk4vQPVX?=
- =?us-ascii?Q?eOGJW/TJ9qo5j8wydibxsu12VZarp69PUaABJtbTm4cn1Yp/xwVhgXFjjzrM?=
- =?us-ascii?Q?gFxJ9x25DHnCIs37bc6dFa2Qfv2l/46P/RBESGre7IdgA91opdFIeAdTYcwn?=
- =?us-ascii?Q?nSqS5D0M8lfHeu/mp6wBOFJl8eJLAWZkYi+f4dS8KU9QnfA57EM2k/5qJNPb?=
- =?us-ascii?Q?tCriQL1CckqhuqQr+A6n02SnXR1buY7tUn/6Nb0LbHhQzCpQeUvYeJh3aKbd?=
- =?us-ascii?Q?oeX9Cm2us5MYI8RC8W7IftAYh2NkG5065SPVLVaU+cWIQYjmqKuH0Ew2HyIm?=
- =?us-ascii?Q?9D05IdwnXJ48ZH9MHmiFMFflw/wUoXoHItPPTPOQWjG6zFMENfb7K/6qHpuN?=
- =?us-ascii?Q?pj1D1rhvouZ1G1XsAY6UDbVGDBatwDSQnkDm9kmF0ZLAR/P36q995LgPhl1S?=
- =?us-ascii?Q?H7s2mdWMt/1uXLH4BknuY390H3zFgv6Y2BjWD7Wad6HyzW1qhUhd5X4V/jrM?=
- =?us-ascii?Q?ghUQzCZnmchz46GR+sNJFkhDRBgJMtCduxbCz97P4VoWyg4YjT+kmQjUkJcD?=
- =?us-ascii?Q?zgt6tF+tfaXTx2ogr07lwYAlkaS+uDd7bFIHqvdOYdw+zMdQ7tc2GfGCvta5?=
- =?us-ascii?Q?ROnX3kuLxjb+hZ+hq9UQJlBWjuRIIVmvrGC9Ve8a3Egulaiz09LBac951tKg?=
- =?us-ascii?Q?OEfcgec5wajifPu+junY8BtpUsmEdhgvn8Pk35FvkfWfcFcJcUr/UMNJgUGp?=
- =?us-ascii?Q?d77joHf18oIfw0k05NFkhrDCIldKqvNRw4HxzN+6Yc8/riRVCtxhkFwQum5g?=
- =?us-ascii?Q?c7hONa5TiE8Waqbv9Lsj0ssnSw2ubCf6zutBzuUvx3h+4VYiA5CdRvh4Segr?=
- =?us-ascii?Q?gtTrMoGsTouVhoYe7bQzujFOrMQrpoTlkMY35v0KLBgKU7+oDtMKvLFYchWl?=
- =?us-ascii?Q?NHvAkjm9xZi1aw5YVO8VATWyf8fXoqh2lbN/oVqFqUN2kDuJmcFdsZxL2zbT?=
- =?us-ascii?Q?ElnhCmmc86PoHA+Y65fsqna3Vo0C5NKjgU9Q6gx3a6njGrlx5GL88vuszVhr?=
- =?us-ascii?Q?jIboin6hzP2AYPsssm54mwoCcdZVB3cyE8AA5PDvIO2EnvstDuEtOAqoTy9i?=
- =?us-ascii?Q?I2mhqTsnRWV8DkPOYF/tC34SdkfglhGInobuHgbNmW+HlBhwhObuyZjytdK9?=
- =?us-ascii?Q?PWbpYlHUeWrtpjTQB0prgscvypHeFdNPXIKliy1GL9QbHbBG2nlKLqM4JALb?=
- =?us-ascii?Q?LATawjh+NTqUIa7nfzX3mlK8+pK2ksRidPjjbF0O1173MSxmNnNaz5nR2Ow5?=
- =?us-ascii?Q?QJxXKtAoM0uD6CDRK4RtvuTSkGE8M/ZAcejWD9GjsnYrWM0944+R0TziyQbZ?=
- =?us-ascii?Q?gstChxg9psc=3D?=
+	=?utf-8?B?eVJFeHQzMXp2VnNraVNBU2dUckJOMXNmR1V5eXFHNUJJcFBCekI0ZmhSY1FE?=
+ =?utf-8?B?ZUJDd0toMlZIckUxTVNtSWE3UjM5OTY2T3crNStSMVVHM1hOOE9CU0dVMDJl?=
+ =?utf-8?B?bkcraCtDeWNJbVcxODdiVHZYY3F5THUwelN1YVdiY2tQTDlGNmk2b2c4QWlL?=
+ =?utf-8?B?NTFXOEV1T0gzdkhVMXpIUjZ1QktzQlVZTFlqTkxuSmc4c0w2THVhUFZHanJl?=
+ =?utf-8?B?Qm5FSEdVMHV2cll0cDdEb2JNeEpMTVZGNWE2UTJsZFpsOVZPaDVGaFFEeThn?=
+ =?utf-8?B?L1ViczJNb0xHcjVnOHcySW90Z1NxcGZneEx3dEhLcGFuTjdJWW1ZZTI2SXh5?=
+ =?utf-8?B?UWgvYlo0ZHFkbGdmOUtSZkNaYS9CblFtMDRXcml1b2wydTg5THlQV2Q0aEpC?=
+ =?utf-8?B?R2E2cTZLUkJheG5WY1dvUzFXK1k3eG9JVXF3MTZwbm81T2FUbnJuUy96Y1JB?=
+ =?utf-8?B?UHZrcGpva2xCbGExczNvVjZjL0xOVmsvOW0zNzBySWxrenZrT3ExOW5vbjgw?=
+ =?utf-8?B?eUx3US9BVWQ4RXc5a2F1SEhoclB1K2tPZitQVElGN0duV3FIcW9CUkF1aytB?=
+ =?utf-8?B?Q280Zkhiak9BM2pTakx2ZnVrWndrSG5EV01RVVdnUXdCbFZuUUVpVkx1aVVQ?=
+ =?utf-8?B?TDFvMnRLNnBvYjA3SlU5SmRJd2NLbkJpN01OdXUrcE4xZnNjbXNtb0dYakp6?=
+ =?utf-8?B?eVFZeXh6V0FUMTZpeU55WGs0SnNjYTRObzU2OU9pZnVieU90UUkrNVhHMkk1?=
+ =?utf-8?B?S2gvSEY1eVdNYWRRRThZbGowb21oZGU5SWpmSFowVW1LL2NkNWlTRzVudENj?=
+ =?utf-8?B?V0VGWCtyYnovTkhjZkZRaWtzcWdLTktTS3M1Z2NROTEzSC9TR2V6cFhJRUNB?=
+ =?utf-8?B?WEdibnY5VC93dFF4WFJyc3A3d0dCLzlDMER5UUxqZEFCbENMWjFpdjNWZDRw?=
+ =?utf-8?B?NG43WjFEYThCUXIwOEdLdU5HTjhEam9GOHNZVlFvVmJyWHJCcWxSSlgvWXpY?=
+ =?utf-8?B?dFR1eG5hdjd0c2VleGtKdHBUdHBnN0doUnhJN2MyYzUyUVdXS1psNHVpdkZt?=
+ =?utf-8?B?ZS9GY1B6bG9PVHJLMmZIWFVLd1JLM2pwTWx0d29jZU9hRWEzS3hsZjY3R3Fr?=
+ =?utf-8?B?Y3RrVkJ1angzZEhPU1luMzg5dHdocnVYTHQzcHVJVUhQUmFQYmpaREJZbkcz?=
+ =?utf-8?B?aUR5WG5CZEtrdmVVUm5WSktJbW1GZVZFdi8wTFY4NzY5QjJ3bitQTlBCYVI3?=
+ =?utf-8?B?TFFHWENjaTVkU3BCREdUd0hNT2h2YzBTWFNLeTRkcjlCSzd5ajVyMXFBSEJ5?=
+ =?utf-8?B?cVdTclZpQm5WRlBFVTJWMjdXY3NnR0k4Vmw4OURKVFZqTGt4Z3pyQUNodUN6?=
+ =?utf-8?B?R0U1N2dpbnc3UWtLTUEyU3ZWbTVZNzZjV2doWERYRU5wOS90dStuaC94REls?=
+ =?utf-8?B?Q0NFUmI2TjNwK2NNK3BRenlEaFFOd29hMTRYTklTMTcyTGVCM29TTG5qNnE3?=
+ =?utf-8?B?azYyUjA3eEwvL0xBbWttWWxxR2p4NzdFTFR3alNvY3JzNE1UVVora0hXQXpX?=
+ =?utf-8?B?SVpKdHJUa2lPbkNHTm5TaVduNWNzQi9selpBcTdOblJIWDNRTlFZMlNuUjd5?=
+ =?utf-8?B?c1d2ZDlxak1ScU9EUDI1MWxiUldDamNoSUdLWlFPNVNjcnpJa09TT3dtdUlG?=
+ =?utf-8?B?azd1Vm5ZR2NNbTBxTHRwU1EvaFo2d1lZNk5VNzVPNzMzYTJlNnpTdFRaMDdq?=
+ =?utf-8?B?UC96ZWViemJnOXIrcVFiTVJSZzJhanlhMDRSREUxSCt4SnhOTG5iMll4MWhr?=
+ =?utf-8?B?Rk9TOXlIbHNXQ3d0eGFlNUVzTHo4Yjd3N0RIUDd6dmpSNDVtcWViV1RmbzZm?=
+ =?utf-8?B?MHNDeTdHSGFYL2xseS96UzBIbmtuZzJzRTNCRzJqR3F4QTJDVGRxbGhIb0Q3?=
+ =?utf-8?B?N3cyZG03SXVlcDVLVVVzMmhqNlAzY3RSU3dENDh5TzBJdWFlZVpzQjc2NVBh?=
+ =?utf-8?Q?3BX1USOVfloCtMgzsj8Ou3aPRBN1uk=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sPQkOVd9vQNZz14igch13d43PSsf4ed06N2tsOMw1LKG/mfpUxonNLb9sCUv?=
- =?us-ascii?Q?SWj+I41c5niMZsYVC5TSh92nGN0RCevT8FmKBVB16p5bDh6TyI7t5y0qDQ/y?=
- =?us-ascii?Q?56kOsV4TLfdJtjQlFWNxUC7iJM3+9pBJ6M1OQFvlbsbH1zSS5+qcJm0mAM8G?=
- =?us-ascii?Q?hjGoAErvkW57TOhoaTAqexVgI4a4eRwI2G+tDzB5s8EUtcH20+JjT3IJ164R?=
- =?us-ascii?Q?lyiZKsHy5QLyDdJJPHNkebR3krssXFPaI+6Hx059JIAz5l5Oxef0rJJVgKyc?=
- =?us-ascii?Q?4RWHgk+HpfeeLT0gXQDVyCQnb3C4xyawNqLSn19t8a1gxoT60KJu2KDLgR38?=
- =?us-ascii?Q?CxHKMskNaJ6rTiv2W4eJo19iREy0l25JGiUUP8tiPgR6wzRZUyf6VpiuRx3y?=
- =?us-ascii?Q?/toINe8lF4i3nRnicndS0iVYywWld+DY73h6bVAJVjL8iUApaIOSwglb32LQ?=
- =?us-ascii?Q?0pU/yWr/xLgJFhHsnd+UG7uoB3mfXdQTrOmGlGtXmDP3VIAkG7QwaN3ds8EJ?=
- =?us-ascii?Q?Q3WrDuJtc9gYSQ+HttRnvMcJjD38/jI4SuMIv3EMAX7MBb2oLLxT7+nig4y1?=
- =?us-ascii?Q?Tx5/FA4NP8BtrB9WJV/H4nJYACr6y52DI9DsaMQyatnNhfnQcmzvX+zKPRAF?=
- =?us-ascii?Q?H0lHLHMjNI/8oRnFLAIA/k15WMlFHd1uo1OSlRJrnfkX1leObzHrsbmGpwml?=
- =?us-ascii?Q?+pCbw+JfMWvUvj4CM6AlA+NtRyCkKDxT87lFOrtKgva9U1vJMRmvmCrOKTHs?=
- =?us-ascii?Q?Yu3M5Lu40Q63gdavd17/ins+igWPzu+iZqqBRgSOjL6ThnlAoVXMcRdIj6G4?=
- =?us-ascii?Q?prGpFRKMReGYUPoKi8ntq4IIBYJOuNuy8l6aob7vHyUI8X571BZAz+WnF9ka?=
- =?us-ascii?Q?tuiDd94E9vRkuQym1Nrzt1LzsHNUCuxs8kjJo4woxfQ3UXr8Tk/dkFZKoIGQ?=
- =?us-ascii?Q?3u24HE959Z7TCAnNuB9nq4fpKDrbhzQOqy3i7oRnjFsxKh4tw+k5VB9Jd2gV?=
- =?us-ascii?Q?yOy+igw4eg1wosbfDzo6msM58bFF08PKrmQCWMcWqJgeCl1izhTVhgHBTxyf?=
- =?us-ascii?Q?KDrvxHznR6IcU7KBZgm+l3sxRuKC33YgLLelrZwXjzYrQSFocJrFUCeKUhlI?=
- =?us-ascii?Q?kAzbR5YHdq2doMhzNESs+WG8Z/iQ2KkoZFGA9Ro9EZuNWWxpT5NETQD57ZcD?=
- =?us-ascii?Q?pytZlFJuEAEIYhpOGYmG2cb6IZieHqsT+mj/r6lz0jHmnV6eiqzNeIB1uHty?=
- =?us-ascii?Q?ExsjwYqgNJXydqxtIOgbYMNPMZLtl0lmQg4UIc8roDx+RhOfkC0U2V8DOD87?=
- =?us-ascii?Q?o916x93pLgOps5qh2svXSPHR34LxUfQzmLsJrjdmbq/F62mmJtpzyMLp9Veq?=
- =?us-ascii?Q?YO50mby8ru9oiuw7KMO5eOnHEeN/xjitveHPBZ5za/FFhjliNg5nXCE6VwTY?=
- =?us-ascii?Q?Cf03Rsr2427NaoEEYZ8hhkKyFjN7wYSOef2gwoE1IsuTBcBE75clrngrNBf5?=
- =?us-ascii?Q?SYAM0nd9PkY6Ufh5uFuH7tJKmCVHzuF5xZD9LVtFva8mHsLV4zn5Hu3ZQ8hI?=
- =?us-ascii?Q?0TK7nDE7Sc4L2a7z+Kt65POIp3WqsF9uk8M77eI4?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c40ad728-8a7e-41c0-ce34-08ddaa8db3cb
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2025 15:19:34.1077
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(82310400026)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2025 15:19:55.8053
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZhhbpQ8bOkz2+0abAl4eVVjp+HMS+nX+4J7ETzp8H0LPZUW8v/VJjQM/tGwdoN+W
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8272
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0cdd485d-b094-4e84-392c-08ddaa8dc0d5
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00001507.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9453
 
-On 13 Jun 2025, at 9:41, Peter Xu wrote:
+On Thu, Jun 12, 2025 at 08:40:59PM +0800, Yan Zhao wrote:
+> On Tue, Jun 03, 2025 at 11:28:35PM -0700, Vishal Annapurve wrote:
+> > On Mon, Jun 2, 2025 at 6:34 PM Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > >
+> > > On Mon, Jun 02, 2025 at 06:05:32PM -0700, Vishal Annapurve wrote:
+> > > > On Tue, May 20, 2025 at 11:49 PM Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > >
+> > > > > On Mon, May 19, 2025 at 10:04:45AM -0700, Ackerley Tng wrote:
+> > > > > > Ackerley Tng <ackerleytng@google.com> writes:
+> > > > > >
+> > > > > > > Yan Zhao <yan.y.zhao@intel.com> writes:
+> > > > > > >
+> > > > > > >> On Fri, Mar 14, 2025 at 05:20:21PM +0800, Yan Zhao wrote:
+> > > > > > >>> This patch would cause host deadlock when booting up a TDX VM even if huge page
+> > > > > > >>> is turned off. I currently reverted this patch. No further debug yet.
+> > > > > > >> This is because kvm_gmem_populate() takes filemap invalidation lock, and for
+> > > > > > >> TDX, kvm_gmem_populate() further invokes kvm_gmem_get_pfn(), causing deadlock.
+> > > > > > >>
+> > > > > > >> kvm_gmem_populate
+> > > > > > >>   filemap_invalidate_lock
+> > > > > > >>   post_populate
+> > > > > > >>     tdx_gmem_post_populate
+> > > > > > >>       kvm_tdp_map_page
+> > > > > > >>        kvm_mmu_do_page_fault
+> > > > > > >>          kvm_tdp_page_fault
+> > > > > > >>       kvm_tdp_mmu_page_fault
+> > > > > > >>         kvm_mmu_faultin_pfn
+> > > > > > >>           __kvm_mmu_faultin_pfn
+> > > > > > >>             kvm_mmu_faultin_pfn_private
+> > > > > > >>               kvm_gmem_get_pfn
+> > > > > > >>                 filemap_invalidate_lock_shared
+> > > > > > >>
+> > > > > > >> Though, kvm_gmem_populate() is able to take shared filemap invalidation lock,
+> > > > > > >> (then no deadlock), lockdep would still warn "Possible unsafe locking scenario:
+> > > > > > >> ...DEADLOCK" due to the recursive shared lock, since commit e918188611f0
+> > > > > > >> ("locking: More accurate annotations for read_lock()").
+> > > > > > >>
+> > > > > > >
+> > > > > > > Thank you for investigating. This should be fixed in the next revision.
+> > > > > > >
+> > > > > >
+> > > > > > This was not fixed in v2 [1], I misunderstood this locking issue.
+> > > > > >
+> > > > > > IIUC kvm_gmem_populate() gets a pfn via __kvm_gmem_get_pfn(), then calls
+> > > > > > part of the KVM fault handler to map the pfn into secure EPTs, then
+> > > > > > calls the TDX module for the copy+encrypt.
+> > > > > >
+> > > > > > Regarding this lock, seems like KVM'S MMU lock is already held while TDX
+> > > > > > does the copy+encrypt. Why must the filemap_invalidate_lock() also be
+> > > > > > held throughout the process?
+> > > > > If kvm_gmem_populate() does not hold filemap invalidate lock around all
+> > > > > requested pages, what value should it return after kvm_gmem_punch_hole() zaps a
+> > > > > mapping it just successfully installed?
+> > > > >
+> > > > > TDX currently only holds the read kvm->mmu_lock in tdx_gmem_post_populate() when
+> > > > > CONFIG_KVM_PROVE_MMU is enabled, due to both slots_lock and the filemap
+> > > > > invalidate lock being taken in kvm_gmem_populate().
+> > > >
+> > > > Does TDX need kvm_gmem_populate path just to ensure SEPT ranges are
+> > > > not zapped during tdh_mem_page_add and tdh_mr_extend operations? Would
+> > > > holding KVM MMU read lock during these operations sufficient to avoid
+> > > > having to do this back and forth between TDX and gmem layers?
+> > > I think the problem here is because in kvm_gmem_populate(),
+> > > "__kvm_gmem_get_pfn(), post_populate(), and kvm_gmem_mark_prepared()"
+> > > must be wrapped in filemap invalidate lock (shared or exclusive), right?
+> > >
+> > > Then, in TDX's post_populate() callback, the filemap invalidate lock is held
+> > > again by kvm_tdp_map_page() --> ... ->kvm_gmem_get_pfn().
+> > 
+> > I am contesting the need of kvm_gmem_populate path altogether for TDX.
+> > Can you help me understand what problem does kvm_gmem_populate path
+> > help with for TDX?
+> There is a long discussion on the list about this.
+> 
+> Basically TDX needs 3 steps for KVM_TDX_INIT_MEM_REGION.
+> 1. Get the PFN
+> 2. map the mirror page table
+> 3. invoking tdh_mem_page_add().
+> Holding filemap invalidation lock around the 3 steps helps ensure that the PFN
+> passed to tdh_mem_page_add() is a valid one.
+> 
+> Rather then revisit it, what about fixing the contention more simply like this?
+> Otherwise we can revisit the history.
+> (The code is based on Ackerley's branch
+> https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-conversions-hugetlb-2mept-v2, with patch "HACK: filemap_invalidate_lock() only for getting the pfn" reverted).
+> 
+> 
+> commit d71956718d061926e5d91e5ecf60b58a0c3b2bad
+> Author: Yan Zhao <yan.y.zhao@intel.com>
+> Date:   Wed Jun 11 18:17:26 2025 +0800
+> 
+>     KVM: guest_memfd: Use shared filemap invalidate lock in kvm_gmem_populate()
+> 
+>     Convert kvm_gmem_populate() to use shared filemap invalidate lock. This is
+>     to avoid deadlock caused by kvm_gmem_populate() further invoking
+>     tdx_gmem_post_populate() which internally acquires shared filemap
+>     invalidate lock in kvm_gmem_get_pfn().
+> 
+>     To avoid lockep warning by nested shared filemap invalidate lock,
+>     avoid holding shared filemap invalidate lock in kvm_gmem_get_pfn() when
+>     lockdep is enabled.
+> 
+>     Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> 
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 784fc1834c04..ccbb7ceb978a 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -2393,12 +2393,16 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+>         struct file *file = kvm_gmem_get_file(slot);
+>         struct folio *folio;
+>         bool is_prepared = false;
+> +       bool get_shared_lock;
+>         int r = 0;
+> 
+>         if (!file)
+>                 return -EFAULT;
+> 
+> -       filemap_invalidate_lock_shared(file_inode(file)->i_mapping);
+> +       get_shared_lock = !IS_ENABLED(CONFIG_LOCKDEP) ||
+> +                         !lockdep_is_held(&file_inode(file)->i_mapping->invalidate_lock);
+> +       if (get_shared_lock)
+> +               filemap_invalidate_lock_shared(file_inode(file)->i_mapping);
 
-> This function is pretty handy for any type of VMA to provide a size-ali=
-gned
-> VMA address when mmap().  Rename the function and export it.
->
-> About the rename:
->
->   - Dropping "THP" because it doesn't really have much to do with THP
->     internally.
->
->   - The suffix "_aligned" imply it is a helper to generate aligned virt=
-ual
->     address based on what is specified (which can be not PMD_SIZE).
->
-> Cc: Zi Yan <ziy@nvidia.com>
-> Cc: Baolin Wang <baolin.wang@linux.alibaba.com>
-> Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
-> Cc: Ryan Roberts <ryan.roberts@arm.com>
-> Cc: Dev Jain <dev.jain@arm.com>
-> Cc: Barry Song <baohua@kernel.org>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/linux/huge_mm.h | 14 +++++++++++++-
->  mm/huge_memory.c        |  6 ++++--
->  2 files changed, 17 insertions(+), 3 deletions(-)
->
-> diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
-> index 2f190c90192d..706488d92bb6 100644
-> --- a/include/linux/huge_mm.h
-> +++ b/include/linux/huge_mm.h
-> @@ -339,7 +339,10 @@ unsigned long thp_get_unmapped_area(struct file *f=
-ilp, unsigned long addr,
->  unsigned long thp_get_unmapped_area_vmflags(struct file *filp, unsigne=
-d long addr,
->  		unsigned long len, unsigned long pgoff, unsigned long flags,
->  		vm_flags_t vm_flags);
-> -
-> +unsigned long mm_get_unmapped_area_aligned(struct file *filp,
-> +		unsigned long addr, unsigned long len,
-> +		loff_t off, unsigned long flags, unsigned long size,
-> +		vm_flags_t vm_flags);
->  bool can_split_folio(struct folio *folio, int caller_pins, int *pextra=
-_pins);
->  int split_huge_page_to_list_to_order(struct page *page, struct list_he=
-ad *list,
->  		unsigned int new_order);
-> @@ -543,6 +546,15 @@ thp_get_unmapped_area_vmflags(struct file *filp, u=
-nsigned long addr,
->  	return 0;
+Hi Yan,
+
+I had been working on some kind of locking scheme that could account for some
+potential[1] changes needed to allowing concurrent updating of "preparedness"
+state while still allowing for concurrent fault handling. I posted a tree
+there in that link with an alternative scheme that's based on rw_semaphore
+like filemap invalidate lock, but with some changes to allow the folio
+lock to be taken to handle write-side updates to "preparedness" state
+instead of needing to take a write-lock.
+
+With that approach (or something similar), it is then possible to drop reliance
+on using the filemap invalidate lock in kvm_gmem_get_pfn(), and that I
+think would cleanly resolve this particular issue.
+
+However, it was also suggested during the guest_memfd call that we revisit
+the need to track preparedness in guest_memfd at all, and resulted in me
+posting this rfc[2] that removes preparedness tracking from gmem
+completely. That series is based on Ackerley's locking scheme from his
+HugeTLBFS series however, which re-uses filemap invalidate rw_semaphore
+to protect the shareability state, so you'd hit similar issues with
+kvm_gmem_populate().
+
+However, as above (and even more easily so since we don't need to do
+anything fancy for concurrent "preparedness" updates), it would be
+fairly trivial to replace the use of filemap invalidate lock with a
+rw_semaphore that's dedicated to protecting shareability state, which
+should make it possible to drop the use of
+filemap_invalidate_lock[_shared]() in kvm_gmem_get_pfn().
+
+But your above patch seems like it would at least get things working in
+the meantime if there's still some discussion that needs to happen
+before we can make a good call on:
+
+  1) whether to continue to use the filemap invalidate or use a dedicated one
+     (my 2 cents: use a dedicated lock to we don't have to deal with
+     inheriting unintended/unecessary locking dependencies)
+  2) whether or not is will be acceptable to drop preparedness-tracking
+     from guest_memfd or not
+     (my 2 cents: it will make all our lives much happier)
+  3) open-code what kvm_gmem_populate() handles currently if we need
+     extra flexibility WRT to locking
+     (my 2 cents: if it can be avoided it's still nice to gmem
+     handle/orchestrate this to some degree)
+
+Thanks,
+
+Mike
+
+[1] https://lore.kernel.org/lkml/20250529054227.hh2f4jmyqf6igd3i@amd.com/
+[2] https://lore.kernel.org/kvm/20250613005400.3694904-1-michael.roth@amd.com/
+
+> 
+>         folio = __kvm_gmem_get_pfn(file, slot, index, pfn, &is_prepared, max_order);
+>         if (IS_ERR(folio)) {
+> @@ -2423,7 +2427,8 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+>         else
+>                 folio_put(folio);
+>  out:
+> -       filemap_invalidate_unlock_shared(file_inode(file)->i_mapping);
+> +       if (get_shared_lock)
+> +               filemap_invalidate_unlock_shared(file_inode(file)->i_mapping);
+>         fput(file);
+>         return r;
 >  }
->
-> +static inline unsigned long
-> +mm_get_unmapped_area_aligned(struct file *filp,
-> +			     unsigned long addr, unsigned long len,
-> +			     loff_t off, unsigned long flags, unsigned long size,
-> +			     vm_flags_t vm_flags)
-> +{
-> +	return 0;
-> +}
+> @@ -2536,7 +2541,7 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
+>         if (!file)
+>                 return -EFAULT;
+> 
+> -       filemap_invalidate_lock(file->f_mapping);
+> +       filemap_invalidate_lock_shared(file->f_mapping);
+> 
+>         npages = min_t(ulong, slot->npages - (start_gfn - slot->base_gfn), npages);
+>         for (i = 0; i < npages; i += npages_to_populate) {
+> @@ -2587,7 +2592,7 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
+>                         break;
+>         }
+> 
+> -       filemap_invalidate_unlock(file->f_mapping);
+> +       filemap_invalidate_unlock_shared(file->f_mapping);
+> 
+>         fput(file);
+>         return ret && !i ? ret : i;
+> 
+> 
+> If it looks good to you, then for the in-place conversion version of
+> guest_memfd, there's one remaining issue left: an AB-BA lock issue between the
+> shared filemap invalidate lock and mm->mmap_lock, i.e.,
+> - In path kvm_gmem_fault_shared(),
+>   the lock sequence is mm->mmap_lock --> filemap_invalidate_lock_shared(),
+> - while in path kvm_gmem_populate(),
+>   the lock sequence is filemap_invalidate_lock_shared() -->mm->mmap_lock.
+> 
+> We can fix it with below patch. The downside of the this patch is that it
+> requires userspace to initialize all source pages passed to TDX, which I'm not
+> sure if everyone likes it. If it cannot land, we still have another option:
+> disallow the initial memory regions to be backed by the in-place conversion
+> version of guest_memfd. If this can be enforced, then we can resolve the issue
+> by annotating the lockdep, indicating that kvm_gmem_fault_shared() and
+> kvm_gmem_populate() cannot occur on the same guest_memfd, so the two shared
+> filemap invalidate locks in the two paths are not the same.
+> 
+> Author: Yan Zhao <yan.y.zhao@intel.com>
+> Date:   Wed Jun 11 18:23:00 2025 +0800
+> 
+>     KVM: TDX: Use get_user_pages_fast_only() in tdx_gmem_post_populate()
+> 
+>     Convert get_user_pages_fast() to get_user_pages_fast_only()
+>     in tdx_gmem_post_populate().
+> 
+>     Unlike get_user_pages_fast(), which will acquire mm->mmap_lock and fault in
+>     physical pages after it finds the pages have not already faulted in or have
+>     been zapped/swapped out, get_user_pages_fast_only() returns directly in
+>     such cases.
+> 
+>     Using get_user_pages_fast_only() can avoid tdx_gmem_post_populate()
+>     acquiring mm->mmap_lock, which may cause AB, BA lockdep warning with the
+>     shared filemap invalidate lock when guest_memfd in-place conversion is
+>     supported. (In path kvm_gmem_fault_shared(), the lock sequence is
+>     mm->mmap_lock --> filemap_invalidate_lock_shared(), while in path
+>     kvm_gmem_populate(), the lock sequence is filemap_invalidate_lock_shared()
+>     -->mm->mmap_lock).
+> 
+>     Besides, using get_user_pages_fast_only() and returning directly to
+>     userspace if a page is not present in the primary PTE can help detect a
+>     careless case that the source pages are not initialized by userspace.
+>     As initial memory region bypasses guest acceptance, copying an
+>     uninitialized source page to guest could be harmful and undermine the page
+>     measurement.
+> 
+>     Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> 
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 93c31eecfc60..462390dddf88 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -3190,9 +3190,10 @@ static int tdx_gmem_post_populate_4k(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+>          * Get the source page if it has been faulted in. Return failure if the
+>          * source page has been swapped out or unmapped in primary memory.
+>          */
+> -       ret = get_user_pages_fast((unsigned long)src, 1, 0, &src_page);
+> +       ret = get_user_pages_fast_only((unsigned long)src, 1, 0, &src_page);
+>         if (ret < 0)
+>                 return ret;
 > +
->  static inline bool
->  can_split_folio(struct folio *folio, int caller_pins, int *pextra_pins=
-)
->  {
-> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-> index 4734de1dc0ae..52f13a70562f 100644
-> --- a/mm/huge_memory.c
-> +++ b/mm/huge_memory.c
-> @@ -1088,7 +1088,7 @@ static inline bool is_transparent_hugepage(const =
-struct folio *folio)
->  		folio_test_large_rmappable(folio);
->  }
->
-> -static unsigned long __thp_get_unmapped_area(struct file *filp,
-> +unsigned long mm_get_unmapped_area_aligned(struct file *filp,
->  		unsigned long addr, unsigned long len,
->  		loff_t off, unsigned long flags, unsigned long size,
-
-Since you added aligned suffix, renaming size to alignment might
-help improve readability.
-
-Otherwise, Reviewed-by: Zi Yan <ziy@nvidia.com>
-
-
-Best Regards,
-Yan, Zi
+>         if (ret != 1)
+>                 return -ENOMEM;
+> 
 
