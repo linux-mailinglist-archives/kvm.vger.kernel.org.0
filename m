@@ -1,127 +1,149 @@
-Return-Path: <kvm+bounces-49552-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49553-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E847AD993B
-	for <lists+kvm@lfdr.de>; Sat, 14 Jun 2025 02:47:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25C1EAD997D
+	for <lists+kvm@lfdr.de>; Sat, 14 Jun 2025 03:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C496D3BBF5F
-	for <lists+kvm@lfdr.de>; Sat, 14 Jun 2025 00:47:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80A343A5DCC
+	for <lists+kvm@lfdr.de>; Sat, 14 Jun 2025 01:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F33175A5;
-	Sat, 14 Jun 2025 00:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A0673594E;
+	Sat, 14 Jun 2025 01:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s4zK3NXh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="js+/J+7W"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE45A933
-	for <kvm@vger.kernel.org>; Sat, 14 Jun 2025 00:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B354B12B93
+	for <kvm@vger.kernel.org>; Sat, 14 Jun 2025 01:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749862051; cv=none; b=QN2Nxz8XIkdu6cMn1K2eozvFfuXGy3m4ccaav32sx0TrA+sOp1wAuZSwZjuG2si/XfKZAoFIfwoKrhhxV859oPvyfzFvSLFHvtCBx8rrwGjCiv1C3BH4E3vzYe07bmDrxaInj7ny0wqvKjKN6rfKee9ixXd+u1EVBI08iN+3eT4=
+	t=1749865004; cv=none; b=rDSlqfrCwhyN4noZgasHbs/kO0wumUhupktyVAA4Roea0N5xaYHkuV0w/f+7UvGru091iZ71z7cxUEZEm9VqVVRH1I+0PFLkEiTzDTHfDQTqDuLXT6w2ZpwtNfImdpqSUuovqbuBSCvvGHifgT/vchzbdWLEtYHkY8xIw1I198s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749862051; c=relaxed/simple;
-	bh=la74RQV8h2p+IDkzPWQSufDLfZGwDtiQubsQvkiupD4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Sgs6FqaJdp/wx1kGx20kjW07gBfuBAqkrxk7knhoK/2LrNMF282m/G1CVeY8cehb6eImQMKN5n5WVj1vwGBQcfv8VRcLBBUExYQkMocs1RESHVJ3cZJrpTHKXpMcSrlcpBkxu+kvZkTHagoSTEDT5ZO4MXzFtDnIXr/TRrvl8oI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s4zK3NXh; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f60715b1-3d15-4929-95c6-f21b433c14c5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1749862047;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HzvEnJHeRWwDZLaUSOe8vqoCojm1nty38UfDyMGsc1I=;
-	b=s4zK3NXhh6sDB8D0PyKptlOn6KfFHjeJdB/DX+lfO4Rz7irNI0NmjoVF6SrrzuT54b2rPv
-	Oh5gUqaVEPt0xllkEaIWwsz5Yo9VbNdQlC8LgN2gMPEUnN6gLSawr352WGsZA7Yz375v4P
-	zeH3m6SRfoIEx/mXQ/O6/TFfYAAx5bM=
-Date: Fri, 13 Jun 2025 17:46:38 -0700
+	s=arc-20240116; t=1749865004; c=relaxed/simple;
+	bh=VO3kg1FEolUOhMe2kMHJwNm6Mnj3UC8tH/cDB49YqvQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=NVo1IMxu32xF1OrpV6mTovoNWOdXn8gxn3Ba4UQQM3mT7pr9c7OMc2MhSqgfc8I2tbVgJdMXiMwkSKrkO+NzJuk5/B8RDcz2dFnLRESuVsLp5tcvAVyy0/Dz25mQxECpou+s5vOPrV1EwyLcy+YZI9okpdx6jO6STUzbyTI5e9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=js+/J+7W; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1749865002; x=1781401002;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=VO3kg1FEolUOhMe2kMHJwNm6Mnj3UC8tH/cDB49YqvQ=;
+  b=js+/J+7WlUT7l6AtpxDBvz7zqWjn//h8JwCb1sgbl+oWgpguz31hGYBb
+   oRb5uKH/+okvgqs2+u3r/C9j3mPLD4qxJODvTufzZBuP1h76Rc8qdritb
+   wzYs/0nUr/NTWiD50QCj1EERiE/G0FqHCus5n//OLhSw2TtgsD0OO6pOW
+   kd7e8LpOeKVzoFikLSVMQHsm3LkZHmqAqMpA1G3AoKasHRSjFxtF2x5Di
+   UPe8n61xvoqW2QZlJih9WJC1Azfv01x7bk7fvM6eQFyB/iIl9Ui4c4IVX
+   4lhI6EEzAYQPOXfR3pr/da9R6hwJtY4Gqaa1QLhFMiUSzEgqzE1UXU+Iu
+   A==;
+X-CSE-ConnectionGUID: YuIDiinXRTqk6r4o3umyOQ==
+X-CSE-MsgGUID: Zt6dHt4MSJ+oLFNznlJtOw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11463"; a="63498597"
+X-IronPort-AV: E=Sophos;i="6.16,235,1744095600"; 
+   d="scan'208";a="63498597"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2025 18:36:41 -0700
+X-CSE-ConnectionGUID: g3AfTelIQ9aCDZ1DUdQhvA==
+X-CSE-MsgGUID: lyWgD0QORamsmcC6nEibZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,235,1744095600"; 
+   d="scan'208";a="178859156"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 13 Jun 2025 18:36:39 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uQFoz-000D9G-1N;
+	Sat, 14 Jun 2025 01:36:37 +0000
+Date: Sat, 14 Jun 2025 09:35:58 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	Farrah Chen <farrah.chen@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Fuad Tabba <tabba@google.com>
+Subject: [kvm:queue 23/30] include/linux/compiler_types.h:568:45: error: call
+ to '__compiletime_assert_421' declared with attribute error: BUILD_BUG
+ failed
+Message-ID: <202506140912.0npst1Ch-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 07/12] RISC-V: KVM: Use ncsr_xyz() in
- kvm_riscv_vcpu_trap_redirect()
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Alexandre Ghiti <alex@ghiti.fr>,
- Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250613065743.737102-1-apatel@ventanamicro.com>
- <20250613065743.737102-8-apatel@ventanamicro.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Atish Patra <atish.patra@linux.dev>
-In-Reply-To: <20250613065743.737102-8-apatel@ventanamicro.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   79150772457f4d45e38b842d786240c36bb1f97f
+commit: f562719cc02e3f85fee6daadc8c4bdb6a99132f5 [23/30] KVM: x86: Consult guest_memfd when computing max_mapping_level
+config: x86_64-buildonly-randconfig-003-20250614 (https://download.01.org/0day-ci/archive/20250614/202506140912.0npst1Ch-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250614/202506140912.0npst1Ch-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506140912.0npst1Ch-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from <command-line>:
+   In function 'kvm_gmem_mapping_order',
+       inlined from 'kvm_gmem_max_mapping_level' at arch/x86/kvm/mmu/mmu.c:3302:14,
+       inlined from 'kvm_mmu_max_mapping_level' at arch/x86/kvm/mmu/mmu.c:3318:10:
+>> include/linux/compiler_types.h:568:45: error: call to '__compiletime_assert_421' declared with attribute error: BUILD_BUG failed
+     568 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                                             ^
+   include/linux/compiler_types.h:549:25: note: in definition of macro '__compiletime_assert'
+     549 |                         prefix ## suffix();                             \
+         |                         ^~~~~~
+   include/linux/compiler_types.h:568:9: note: in expansion of macro '_compiletime_assert'
+     568 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
+      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+         |                                     ^~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:59:21: note: in expansion of macro 'BUILD_BUG_ON_MSG'
+      59 | #define BUILD_BUG() BUILD_BUG_ON_MSG(1, "BUILD_BUG failed")
+         |                     ^~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:2604:9: note: in expansion of macro 'BUILD_BUG'
+    2604 |         BUILD_BUG();
+         |         ^~~~~~~~~
 
 
-On 6/12/25 11:57 PM, Anup Patel wrote:
-> The H-extension CSRs accessed by kvm_riscv_vcpu_trap_redirect() will
-> trap when KVM RISC-V is running as Guest/VM hence remove these traps
-> by using ncsr_xyz() instead of csr_xyz().
->
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->   arch/riscv/kvm/vcpu_exit.c | 13 +++++++------
->   1 file changed, 7 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> index 6e0c18412795..85c43c83e3b9 100644
-> --- a/arch/riscv/kvm/vcpu_exit.c
-> +++ b/arch/riscv/kvm/vcpu_exit.c
-> @@ -9,6 +9,7 @@
->   #include <linux/kvm_host.h>
->   #include <asm/csr.h>
->   #include <asm/insn-def.h>
-> +#include <asm/kvm_nacl.h>
->   
->   static int gstage_page_fault(struct kvm_vcpu *vcpu, struct kvm_run *run,
->   			     struct kvm_cpu_trap *trap)
-> @@ -135,7 +136,7 @@ unsigned long kvm_riscv_vcpu_unpriv_read(struct kvm_vcpu *vcpu,
->   void kvm_riscv_vcpu_trap_redirect(struct kvm_vcpu *vcpu,
->   				  struct kvm_cpu_trap *trap)
->   {
-> -	unsigned long vsstatus = csr_read(CSR_VSSTATUS);
-> +	unsigned long vsstatus = ncsr_read(CSR_VSSTATUS);
->   
->   	/* Change Guest SSTATUS.SPP bit */
->   	vsstatus &= ~SR_SPP;
-> @@ -151,15 +152,15 @@ void kvm_riscv_vcpu_trap_redirect(struct kvm_vcpu *vcpu,
->   	vsstatus &= ~SR_SIE;
->   
->   	/* Update Guest SSTATUS */
-> -	csr_write(CSR_VSSTATUS, vsstatus);
-> +	ncsr_write(CSR_VSSTATUS, vsstatus);
->   
->   	/* Update Guest SCAUSE, STVAL, and SEPC */
-> -	csr_write(CSR_VSCAUSE, trap->scause);
-> -	csr_write(CSR_VSTVAL, trap->stval);
-> -	csr_write(CSR_VSEPC, trap->sepc);
-> +	ncsr_write(CSR_VSCAUSE, trap->scause);
-> +	ncsr_write(CSR_VSTVAL, trap->stval);
-> +	ncsr_write(CSR_VSEPC, trap->sepc);
->   
->   	/* Set Guest PC to Guest exception vector */
-> -	vcpu->arch.guest_context.sepc = csr_read(CSR_VSTVEC);
-> +	vcpu->arch.guest_context.sepc = ncsr_read(CSR_VSTVEC);
->   
->   	/* Set Guest privilege mode to supervisor */
->   	vcpu->arch.guest_context.sstatus |= SR_SPP;
+vim +/__compiletime_assert_421 +568 include/linux/compiler_types.h
 
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  554  
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  555  #define _compiletime_assert(condition, msg, prefix, suffix) \
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  556  	__compiletime_assert(condition, msg, prefix, suffix)
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  557  
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  558  /**
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  559   * compiletime_assert - break build and emit msg if condition is false
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  560   * @condition: a compile-time constant condition to check
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  561   * @msg:       a message to emit if condition is false
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  562   *
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  563   * In tradition of POSIX assert, this macro will break the build if the
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  564   * supplied condition is *false*, emitting the supplied error message if the
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  565   * compiler has support to do so.
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  566   */
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  567  #define compiletime_assert(condition, msg) \
+eb5c2d4b45e3d2 Will Deacon 2020-07-21 @568  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+eb5c2d4b45e3d2 Will Deacon 2020-07-21  569  
 
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
+:::::: The code at line 568 was first introduced by commit
+:::::: eb5c2d4b45e3d2d5d052ea6b8f1463976b1020d5 compiler.h: Move compiletime_assert() macros into compiler_types.h
 
+:::::: TO: Will Deacon <will@kernel.org>
+:::::: CC: Will Deacon <will@kernel.org>
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
