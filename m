@@ -1,88 +1,86 @@
-Return-Path: <kvm+bounces-49599-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49600-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55B90ADAE28
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 13:19:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B05CADAF3E
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 13:56:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBC1A16B934
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 11:19:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 024E9173381
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 11:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A172BDC37;
-	Mon, 16 Jun 2025 11:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 170122E92D2;
+	Mon, 16 Jun 2025 11:56:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H/T0kQLY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VtVAO2ZP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6662627FB10
-	for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 11:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9942C08A7
+	for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 11:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750072747; cv=none; b=El9JR0Bcbok83i+TUfgucGlD46O3d0sls+/DG03D9calDiB2VzsQoWyDyivxfACaZPG2OOimL6o7ECxQFjFiv9gHLjfM+tHNRIOs4eaIHaejRykkmpJZa3C19WMF8kBwxQ10AZ/wj2x1f6dCGFdVHUmSZXE5dszcPTnHTqtBhOg=
+	t=1750074959; cv=none; b=XkSgJZZUpMKKBDXpcfu3+94FTaCe058dkL5NAe0y4GWRLUGtdxiAIMEEmsiYOp72MM7jti1x/mvu9iWatYDYp2Od6p6tEOlkjaVqUt7jpcYi0Q30oPz/2sUy/nTqrK7zUOfWoVwkGb6xpL5xrcrwzoYA6yRck9aRthSoVq7rRIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750072747; c=relaxed/simple;
-	bh=lO+oSdtzjJoXT/Hiv71KLVRuw1AoWu2xGuyDXukpwoY=;
+	s=arc-20240116; t=1750074959; c=relaxed/simple;
+	bh=BIFd+6oh6dlqpYkuI/bWibgQdDxXaDLAnSklZ6vF2yA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EkCKxStxFKyp40tHXWbob7NymHsl45yfWd/vJpAALQgUhM4+ymCN/4l4OjbpBdAOcR1FkDfYoDqWcvGpKgzNRRrf0gGP2VN72Tssr3S71DkZOeATaVSTUVbFIE3XtkLd1nD2ycp+IIP1tKv2ivePztmlhG6AhYPFQ73EsjrKfrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H/T0kQLY; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=uJQlGd+bB1Xmz3C/X13KTJGXethlErg9oXXkrsAg+xUU7VGEI0eVbHvf/QeaCdSMbuZ60m1me5aWMX3rrtyumtJrCxifniMMD1FW6bpvIkaBp9rQUcHipa7WRJ3/SYzHAkcf2nf651QW3EbjHJvvzvQbB8yGs+PzsjdsLsnic7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VtVAO2ZP; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750072744;
+	s=mimecast20190719; t=1750074956;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=NoVmmxCcA77lmhKdryfGIR+1/dQgmY7Gw3ATY3zbYNo=;
-	b=H/T0kQLYxWY0+b+ZOd4K7bzor/r7zittqbdEVJFZCO4TOBsOusY3QlY+qCPGyaUc9YN4MR
-	Ug9H4PdXWchMnDBo9qA+uzB9ijRql7Zpdlnw508Z/1nAzoPc46TYs2U4d9otvGgOEMFjwl
-	tUf0jSDkXewLiDA+T3RExXeAooZjwTI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q/bdXjwJJqnT59AvXGlfQuOEaPnWXD3kQ9bjbSA1eBM=;
+	b=VtVAO2ZPcXVcY5M2eTZMCZJ7qBiDQI7pXSlVzfv8RmkXQCPakP8QkylDBeMdGP9Ax5VrBW
+	goC8Ygn7ddWFCmNovFl0N1+XDGjp/j5tjFQCxdDzQsmjBskT44g6DRJn9uU9TlhXIAY4wt
+	js3rXeJ/VbCrihElR9zH6b2xIlMWYDw=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-142-563Ij9NdNoGup1pDVrTpTQ-1; Mon, 16 Jun 2025 07:19:02 -0400
-X-MC-Unique: 563Ij9NdNoGup1pDVrTpTQ-1
-X-Mimecast-MFC-AGG-ID: 563Ij9NdNoGup1pDVrTpTQ_1750072742
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a54a8a0122so1686505f8f.2
-        for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 04:19:02 -0700 (PDT)
+ us-mta-619-gPIvzE9tNreONJxsL9ccLw-1; Mon, 16 Jun 2025 07:55:55 -0400
+X-MC-Unique: gPIvzE9tNreONJxsL9ccLw-1
+X-Mimecast-MFC-AGG-ID: gPIvzE9tNreONJxsL9ccLw_1750074954
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-311e98ee3fcso4635563a91.0
+        for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 04:55:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750072741; x=1750677541;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NoVmmxCcA77lmhKdryfGIR+1/dQgmY7Gw3ATY3zbYNo=;
-        b=nGCPzG72/fKbCTmk3aDhyn8+KmGmQnMbmQ3kn0GgF+oNrU5AO+zsfDo/1/x+gY25Lk
-         7xbIxwI2X6umzTPiBgSOVaHQKD9v1FrvvUo0gebMZ+8UFBcoqv/RM+CijCRnHMWglheN
-         pJ/SPioheU7MPny1f5vajPK84M39YveTXTOaq8HbsDmVyg4OSc7ejW+cnzZ3Dh74kHFj
-         bagx/8V0y73llJVQFNdzoCmvCULg2foPeDNgNCNL0jGbk1ESL1aiYcs9YlfzfbKywHVf
-         B6FJqi3xNXwdwyUTqNsa8fS7BGDwSqw9He8w7ePVuf9lGRPsDeX6H4USrtC4XhGZZZhL
-         dfOg==
-X-Forwarded-Encrypted: i=1; AJvYcCUwHDlaXEEkv5kOapW3CZ+Jj+GXbLTl9SRnR3zbAMWa+MIHdtib4Sjgntj6Z09pExhv+PA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziI7pl9XzOOXwbd1lniT8L8USEHmkRfU5KOFwM189As1SAM9Hy
-	ogjjMYYl0PwRInnFp4pLRug+J8AO7ZxhVP0Ndo2SjxYuZOnSyeiW3aivC0kWn5rxFXrsOaxP/xT
-	ZHlZgt34wgfp6/upcb0J6is8I+nEFHfWzTH9lbQpuyIZrMqCE4w9rkA==
-X-Gm-Gg: ASbGncuFNTH9aG6gxCiBw+RjR3R56tJ8z7UXTeCDOyxsJTES8wVVScvOiEkgrFPF8CO
-	vvq42FeOU6p9/cv/mNi7ZZiD5EDLgsl6dzq2V5cm9rbp6t6cWbB40TTzOXbU3XCutjdKtfIQJJi
-	6D5Fd0OggEr/ir0ix3g2opf+Aw6eFe7R6JFR7gUvQfwU1mX1XrhNgn0uY+hqb7fRlgQY20R3Ixo
-	G23+Jzl6to/ajN5BBpwsNvHaLGe7FOB1xqiyzDIZA5Wh/Z5slwZ8q1h/AlaNdFgNNwKXt5VWzqy
-	zlGBRlObYoow0VCIjQb0LLYLudFYm83R2l/jJOHt2kmEnceBUh6kKPtAajmHYMtG4a907jCkuHl
-	tZq5eg5aEjpPj5eo++2OIWNJnCRpB6ZgWS1oZEJjv1KrbW74=
-X-Received: by 2002:a05:6000:1acf:b0:3a5:39d7:3f17 with SMTP id ffacd0b85a97d-3a572e92329mr7492270f8f.47.1750072741462;
-        Mon, 16 Jun 2025 04:19:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFGDoesy1VAfhtKWcYhHC2stapPOyVLHQXCHGCMu9iwSLcFu1cYern443u4X7AyjoYNzTnLLw==
-X-Received: by 2002:a05:6000:1acf:b0:3a5:39d7:3f17 with SMTP id ffacd0b85a97d-3a572e92329mr7492243f8f.47.1750072741064;
-        Mon, 16 Jun 2025 04:19:01 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f25:bd00:949:b5a9:e02a:f265? (p200300d82f25bd000949b5a9e02af265.dip0.t-ipconnect.de. [2003:d8:2f25:bd00:949:b5a9:e02a:f265])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e2384cesm139576665e9.16.2025.06.16.04.18.59
+        d=1e100.net; s=20230601; t=1750074954; x=1750679754;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q/bdXjwJJqnT59AvXGlfQuOEaPnWXD3kQ9bjbSA1eBM=;
+        b=KyLPNH0Gt6Fh/AIuFGgqsWpI8FVmCtPdtFuDEc5zlFKaStgZ0SWHeySFPdbgERnePr
+         rj0HX9HaxOl1dtT67Mkz0FzyDFzSJHEmUl3Z5zwF904Av3iyeFP2C0NoELV+qkaig3Gw
+         VCbDPPyQdO0RSMCg8BKni+KMy475gVRAWhQrULPctCVdDRF1SaTrrSQWleE6Rtt9wP6A
+         b5gGJOzm6kWj7idvR22x6FEDG2j9t4puCJFyEY9nAeE/pRnGYUXBko5B2FSrl3XT8cOw
+         q/kOMz5rT5j+acgIk0arPqKS823JY1uhokY8/aXw7z8OIu97a4qhk0G0NywcJpJnoNbu
+         cKDA==
+X-Forwarded-Encrypted: i=1; AJvYcCUndzNRf5p2hRjps8+nKKVPSTDdNUHT/2oHY6EP50fJo7BSJzL6BKKHRBSN3mUv0y/kA5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRwWh3AVIMOxYU/1BgD63yj0Pqi+pGXm3J8mI1Z1aFlQSLOltY
+	8lZcBnazTdrfd0WeymAkMMTaV7ROPoZk8e/SsckKV/19Bwz90f2dxDjfhI4nWNbKZPbTUM4ORHj
+	B6Cf7XtsQlcgRKGmLZCSktK1ZDt0ATbrxYHpnIi5nI7F5cARhFlG/6Q==
+X-Gm-Gg: ASbGncsIh2nVG0H12jmSjCObocqzNyXrJ8hQzgY1/qKxBVv5XGf40Qakgd7eviySbk1
+	X3g8k4qLrgCTiiD1vVWTD8lhhVOIVL9C6V2uKtzib4bo1Ij5Jpj7GR0i7Cdr7m2MqgsJed6HDjI
+	N1gnJ+tMCtEShTX6oLEwg6MKRUL5bV2xO/lAYkKzeuMYaHXN5CH9+se+pOyX8ElCEBPc3e35S30
+	W3FdzMMSDUpnJepjgbXhAyeU8BqAjsHKaG1t4T1X8u/P65ViXXdeLUdgE04VKYjVDnRBUzIIX8f
+	cj3TNgm+XgSUMLvTTtWPAozLsx5uZQS8/DQEaKJoAv91RUJTo90JI+tA9sC7XQ==
+X-Received: by 2002:a17:90b:3c02:b0:311:ab20:1591 with SMTP id 98e67ed59e1d1-313f1cd69f3mr13757047a91.15.1750074954267;
+        Mon, 16 Jun 2025 04:55:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGuchxuxj8O5MpDvVakFeHHtf7J6zJLUbqb0Q+xynaID1xSy0YUrglk2QzDK6/NsQI8aZeFug==
+X-Received: by 2002:a17:90b:3c02:b0:311:ab20:1591 with SMTP id 98e67ed59e1d1-313f1cd69f3mr13757005a91.15.1750074953812;
+        Mon, 16 Jun 2025 04:55:53 -0700 (PDT)
+Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-313c1c6c978sm8460898a91.49.2025.06.16.04.55.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Jun 2025 04:18:59 -0700 (PDT)
-Message-ID: <8483b457-6044-4174-9190-161f29f2cda5@redhat.com>
-Date: Mon, 16 Jun 2025 13:18:58 +0200
+        Mon, 16 Jun 2025 04:55:52 -0700 (PDT)
+Message-ID: <e75dfc47-5b74-4898-91c0-fed9880f9727@redhat.com>
+Date: Mon, 16 Jun 2025 21:55:42 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,242 +88,111 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] vfio/type1: optimize vfio_unpin_pages_remote() for
- large folio
-To: lizhe.67@bytedance.com
-Cc: alex.williamson@redhat.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, peterx@redhat.com
-References: <753caff4-58d6-4d23-ae69-4b909a99aa16@redhat.com>
- <20250616111353.7964-1-lizhe.67@bytedance.com>
-From: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v9 20/43] arm64: RME: Runtime faulting of memory
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>
+References: <20250611104844.245235-1-steven.price@arm.com>
+ <20250611104844.245235-21-steven.price@arm.com>
 Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250616111353.7964-1-lizhe.67@bytedance.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20250611104844.245235-21-steven.price@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 16.06.25 13:13, lizhe.67@bytedance.com wrote:
-> On Mon, 16 Jun 2025 10:14:23 +0200, david@redhat.com wrote:
+Hi Steven,
+
+On 6/11/25 8:48 PM, Steven Price wrote:
+> At runtime if the realm guest accesses memory which hasn't yet been
+> mapped then KVM needs to either populate the region or fault the guest.
 > 
->>>    drivers/vfio/vfio_iommu_type1.c | 55 +++++++++++++++++++++++++++------
->>>    1 file changed, 46 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->>> index e952bf8bdfab..09ecc546ece8 100644
->>> --- a/drivers/vfio/vfio_iommu_type1.c
->>> +++ b/drivers/vfio/vfio_iommu_type1.c
->>> @@ -469,17 +469,28 @@ static bool is_invalid_reserved_pfn(unsigned long pfn)
->>>    	return true;
->>>    }
->>>    
->>> -static int put_pfn(unsigned long pfn, int prot)
->>> +static inline void _put_pfns(struct page *page, int npages, int prot)
->>>    {
->>> -	if (!is_invalid_reserved_pfn(pfn)) {
->>> -		struct page *page = pfn_to_page(pfn);
->>> +	unpin_user_page_range_dirty_lock(page, npages, prot & IOMMU_WRITE);
->>> +}
->>>    
->>> -		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
->>> -		return 1;
->>> +/*
->>> + * The caller must ensure that these npages PFNs belong to the same folio.
->>> + */
->>> +static inline int put_pfns(unsigned long pfn, int npages, int prot)
->>> +{
->>> +	if (!is_invalid_reserved_pfn(pfn)) {
->>> +		_put_pfns(pfn_to_page(pfn), npages, prot);
->>> +		return npages;
->>>    	}
->>>    	return 0;
->>>    }
->>>    
->>> +static inline int put_pfn(unsigned long pfn, int prot)
->>> +{
->>> +	return put_pfns(pfn, 1, prot);
->>> +}
->>> +
->>>    #define VFIO_BATCH_MAX_CAPACITY (PAGE_SIZE / sizeof(struct page *))
->>>    
->>>    static void __vfio_batch_init(struct vfio_batch *batch, bool single)
->>> @@ -806,11 +817,37 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
->>>    				    bool do_accounting)
->>>    {
->>>    	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
->>> -	long i;
->>>    
->>> -	for (i = 0; i < npage; i++)
->>> -		if (put_pfn(pfn++, dma->prot))
->>> -			unlocked++;
->>> +	while (npage) {
->>> +		long nr_pages = 1;
->>> +
->>> +		if (!is_invalid_reserved_pfn(pfn)) {
->>> +			struct page *page = pfn_to_page(pfn);
->>> +			struct folio *folio = page_folio(page);
->>> +			long folio_pages_num = folio_nr_pages(folio);
->>> +
->>> +			/*
->>> +			 * For a folio, it represents a physically
->>> +			 * contiguous set of bytes, and all of its pages
->>> +			 * share the same invalid/reserved state.
->>> +			 *
->>> +			 * Here, our PFNs are contiguous. Therefore, if we
->>> +			 * detect that the current PFN belongs to a large
->>> +			 * folio, we can batch the operations for the next
->>> +			 * nr_pages PFNs.
->>> +			 */
->>> +			if (folio_pages_num > 1)
->>> +				nr_pages = min_t(long, npage,
->>> +					folio_pages_num -
->>> +					folio_page_idx(folio, page));
->>> +
->>> +			_put_pfns(page, nr_pages, dma->prot);
->>
->>
->> This is sneaky. You interpret the page pointer a an actual page array,
->> assuming that it would give you the right values when advancing nr_pages
->> in that array.
->>
->> This is mostly true, but with !CONFIG_SPARSEMEM_VMEMMAP it is not
->> universally true for very large folios (e.g., in a 1 GiB hugetlb folio
->> when we cross the 128 MiB mark on x86).
->>
->> Not sure if that could already trigger here, but it is subtle.
+> For memory in the lower (protected) region of IPA a fresh page is
+> provided to the RMM which will zero the contents. For memory in the
+> upper (shared) region of IPA, the memory from the memslot is mapped
+> into the realm VM non secure.
 > 
-> As previously mentioned in the email, the code here functions
-> correctly.
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>   arch/arm64/include/asm/kvm_emulate.h |  10 ++
+>   arch/arm64/include/asm/kvm_rme.h     |  10 ++
+>   arch/arm64/kvm/mmu.c                 | 133 ++++++++++++++++++++-
+>   arch/arm64/kvm/rme.c                 | 165 +++++++++++++++++++++++++++
+>   4 files changed, 312 insertions(+), 6 deletions(-)
 > 
->>> +			unlocked += nr_pages;
->>
->> We could do slightly better here, as we already have the folio. We would
->> add a unpin_user_folio_dirty_locked() similar to unpin_user_folio().
->>
->> Instead of _put_pfns, we would be calling
->>
->> unpin_user_folio_dirty_locked(folio, nr_pages, dma->prot & IOMMU_WRITE);
-> 
-> Thank you so much for your suggestion. Does this implementation of
-> unpin_user_folio_dirty_locked() look viable to you?
-> 
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index fdda6b16263b..567c9dae9088 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -1689,6 +1689,8 @@ void unpin_user_page_range_dirty_lock(struct page *page, unsigned long npages,
->   				      bool make_dirty);
->   void unpin_user_pages(struct page **pages, unsigned long npages);
->   void unpin_user_folio(struct folio *folio, unsigned long npages);
-> +void unpin_user_folio_dirty_locked(struct folio *folio,
-> +		unsigned long npages, bool make_dirty);
->   void unpin_folios(struct folio **folios, unsigned long nfolios);
+
+[...]
+
+> @@ -1078,6 +1091,9 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>   	if (kvm_is_realm(kvm) &&
+>   	    (kvm_realm_state(kvm) != REALM_STATE_DEAD &&
+>   	     kvm_realm_state(kvm) != REALM_STATE_NONE)) {
+> +		struct realm *realm = &kvm->arch.realm;
+> +
+> +		kvm_stage2_unmap_range(mmu, 0, BIT(realm->ia_bits - 1), false);
+>   		write_unlock(&kvm->mmu_lock);
+>   		kvm_realm_destroy_rtts(kvm, pgt->ia_bits);
 >   
->   static inline bool is_cow_mapping(vm_flags_t flags)
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 84461d384ae2..2f1e14a79463 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -360,11 +360,8 @@ void unpin_user_page_range_dirty_lock(struct page *page, unsigned long npages,
->   
->   	for (i = 0; i < npages; i += nr) {
->   		folio = gup_folio_range_next(page, npages, i, &nr);
-> -		if (make_dirty && !folio_test_dirty(folio)) {
-> -			folio_lock(folio);
-> -			folio_mark_dirty(folio);
-> -			folio_unlock(folio);
-> -		}
-> +		if (make_dirty && !folio_test_dirty(folio))
-> +			folio_mark_dirty_lock(folio);
->   		gup_put_folio(folio, nr, FOLL_PIN);
 
-We can call unpin_user_folio_dirty_locked(). :)
+I'm giving it a try before taking time to review, @may_block needs to be true.
+I don't see there is anything why not to do so :)
 
->   	}
->   }
-> @@ -435,6 +432,26 @@ void unpin_user_folio(struct folio *folio, unsigned long npages)
->   }
->   EXPORT_SYMBOL(unpin_user_folio);
->   
-> +/**
-> + * unpin_user_folio_dirty_locked() - release pages of a folio and
-> + * optionally dirty
+   kvm_stage2_unmap_range(mmu, 0, BIT(realm->ia_bits - 1), true);
 
-"conditionally mark a folio dirty and unpin it"
+Otherwise, there is RCU stall when the VM is destroyed.
 
-Because that's the sequence in which it is done.
+[12730.399825] rcu: INFO: rcu_preempt self-detected stall on CPU
+[12730.401922] rcu:     5-....: (5165 ticks this GP) idle=3544/1/0x4000000000000000 softirq=41673/46605 fqs=2625
+[12730.404598] rcu:     (t=5251 jiffies g=61757 q=36 ncpus=8)
+[12730.406771] CPU: 5 UID: 0 PID: 170 Comm: qemu-system-aar Not tainted 6.16.0-rc1-gavin-gfbc56042a9cf #36 PREEMPT
+[12730.407918] Hardware name: QEMU QEMU Virtual Machine, BIOS unknown 02/02/2022
+[12730.408796] pstate: 61402009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+[12730.409515] pc : realm_unmap_private_range+0x1b4/0x310
+[12730.410825] lr : realm_unmap_private_range+0x98/0x310
+[12730.411377] sp : ffff8000808f3920
+[12730.411777] x29: ffff8000808f3920 x28: 0000000104d29000 x27: 000000004229b000
+[12730.413410] x26: 0000000000000000 x25: ffffb8c82d23f000 x24: 00007fffffffffff
+[12730.414292] x23: 000000004229c000 x22: 0001000000000000 x21: ffff80008019deb8
+[12730.415229] x20: 0000000101b3f000 x19: 000000004229b000 x18: ffff8000808f3bd0
+[12730.416119] x17: 0000000000000001 x16: ffffffffffffffff x15: 0000ffff91cc5000
+[12730.417004] x14: ffffb8c82cfccb48 x13: 0000ffff4b1fffff x12: 0000000000000000
+[12730.417876] x11: 0000000038e38e39 x10: 0000000000000004 x9 : ffffb8c82c39a030
+[12730.418863] x8 : ffff80008019deb8 x7 : 0000010000000000 x6 : 0000000000000000
+[12730.419738] x5 : 0000000038e38e39 x4 : ffff0000c0d80000 x3 : 0000000000000000
+[12730.420609] x2 : 000000004229c000 x1 : 0000000104d2a000 x0 : 0000000000000000
+[12730.421602] Call trace:
+[12730.422209]  realm_unmap_private_range+0x1b4/0x310 (P)
+[12730.423096]  kvm_realm_unmap_range+0xbc/0xe0
+[12730.423657]  __unmap_stage2_range+0x74/0xa8
+[12730.424198]  kvm_free_stage2_pgd+0xc8/0x120
+[12730.424746]  kvm_uninit_stage2_mmu+0x24/0x48
+[12730.425284]  kvm_arch_flush_shadow_all+0x74/0x98
+[12730.425849]  kvm_mmu_notifier_release+0x38/0xa0
+[12730.426409]  __mmu_notifier_release+0x80/0x1f0
+[12730.427031]  exit_mmap+0x3d8/0x438
+[12730.427526]  __mmput+0x38/0x160
+[12730.428000]  mmput+0x58/0x78
+[12730.428463]  do_exit+0x210/0x9d8
+[12730.428945]  do_group_exit+0x3c/0xa0
+[12730.429458]  get_signal+0x8d4/0x9c0
+[12730.429954]  do_signal+0x98/0x400
+[12730.430455]  do_notify_resume+0xec/0x1a0
+[12730.431030]  el0_svc+0xe8/0x130
+[12730.431536]  el0t_64_sync_handler+0x10c/0x138
+[12730.432085]  el0t_64_sync+0x1ac/0x1b0
 
-> + *
-> + * @folio:  pointer to folio to be released
-> + * @npages: number of pages of same folio
-
-Can we change that to "nrefs" or rather "npins"?
-
-> + * @make_dirty: whether to mark the folio dirty
-> + *
-> + * Mark the folio as being modified if @make_dirty is true. Then
-> + * release npages of the folio.
-
-Similarly, adjust the doc here.
-
-> + */
-> +void unpin_user_folio_dirty_locked(struct folio *folio,
-> +		unsigned long npages, bool make_dirty)
-> +{
-> +	if (make_dirty && !folio_test_dirty(folio))
-> +		folio_mark_dirty_lock(folio);
-> +	gup_put_folio(folio, npages, FOLL_PIN);
-> +}
-> +EXPORT_SYMBOL(unpin_user_folio_dirty_locked);
-
-Yes, should probably go into a separate cleanup patch.
-
--- 
-Cheers,
-
-David / dhildenb
+Thanks,
+Gavin
 
 
