@@ -1,407 +1,225 @@
-Return-Path: <kvm+bounces-49566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EBF5ADA575
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 03:15:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C927ADA628
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 04:07:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87CE0188DCDC
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 01:15:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DB347A6F21
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 02:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA14319D06A;
-	Mon, 16 Jun 2025 01:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D20CA28DEFF;
+	Mon, 16 Jun 2025 02:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GrqBT3rv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75241547C9;
-	Mon, 16 Jun 2025 01:15:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750036515; cv=none; b=nudtRxQPO9MJuyDOCr23AGFFXFCR1mc0VjRRRhBVaGLLmYohGDxXau9kBW/dDd0dT+Bkrwz/qIws+Ewgot3IfMVKXV+9OT2k6kH5ACXXM7xSq7/7u7bEM1ph4OFfWSLMu8KFjiunub+dxPUbHas8XMukxjY1Q5HJaslPVr/ukTw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750036515; c=relaxed/simple;
-	bh=dvTGtxAknQfEoc4zbDY1V7wwkCrQM97z3Atd+/H9l4g=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=faKtu9yOH/piR8rpkUAK7rD1cbUaFvRm+BxRUsk6cNwLwe4uF8rGPhpU6pTaROLqEadmGvAL9GE+OL0sdeeTorfHi29iqQYD0OS4oZkG13QmReKISXXPtSjO98wdje38fjOifOCHKWWl5cp+UJ7tr7olpOI9uSurw5wYpd0A6eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8AxnOIVcE9owWYXAQ--.19204S3;
-	Mon, 16 Jun 2025 09:15:01 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMDxH+UGcE9oJlYcAQ--.19628S3;
-	Mon, 16 Jun 2025 09:14:49 +0800 (CST)
-Subject: Re: [PATCH 4/8] KVM: Move include/kvm/iodev.h to include/linux as
- kvm_iodev.h
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- Anish Ghulati <aghulati@google.com>, Colton Lewis <coltonlewis@google.com>,
- Thomas Huth <thuth@redhat.com>
-References: <20250611001042.170501-1-seanjc@google.com>
- <20250611001042.170501-5-seanjc@google.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <50a32984-f2ed-249a-c055-81ad35e1fa51@loongson.cn>
-Date: Mon, 16 Jun 2025 09:13:23 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC573595D;
+	Mon, 16 Jun 2025 02:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750039615; cv=fail; b=K86NvgdJPPIHQ1OXb1O3whwdS5hGNcNGtFwg9AFBTMA7yvPz93ww6bkXebOuYomoW/e8CUdEOr76Dg4QVxWgjfOiIAs3lXRflU2ZOZdd03Sgd6d1wKfjnOsS8Eo3++99Dr74eFmsCIsGrBouBKIsEfG1XcsKGYeniab/g4PYNoY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750039615; c=relaxed/simple;
+	bh=23i51tV5PKBOJbIQHCdWqhWs5+KtkTlA4ig3raiY1XE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=D5JN2xv2ZPZ/OucEdRKB6375bcASz5k0Ch/HRRfhjdS55pn8ikaHMD+nr+8OqwU0PGrD6LMdxa0pgKTYpwYAvsFZLv3AD4mHT9klw8Kh1tyWgiWw2ly2yGSABodUFCPFFm6FRUx8BOKnzzJAg9/OUxCxdiThNfwiZ5LPrSDLF7s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GrqBT3rv; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750039613; x=1781575613;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=23i51tV5PKBOJbIQHCdWqhWs5+KtkTlA4ig3raiY1XE=;
+  b=GrqBT3rvIj6Glcj0ydjHpW1QX18yT8atdq0MwsSzVBQQJm5l6KNAcFgX
+   4e3D+bHCC/Nz9zCX90EN6I6lJm3ERPZGPyhpvkZL6FRawWHCm2sMxiflB
+   RpTc7uViM08Rru7fUCu58UZS8BKLHuGM2+fd3Ld7HgQCD1bFd4bmVdIII
+   cvDh/fnpZx7OV8hEJTBH7R3/Y1ZzErJMNyg8Y5EgiPH5DKIUh8WTOoLzf
+   JrcEo/IpUjzrzg+birKUeQrsrbPVq48nwS14jotvwRc/1Fe3lo6m7xven
+   WS0sI7RD8L28T4qCLfPiMwfPy0mQfMKSFvbzMFI478A75T8058TdAluIe
+   Q==;
+X-CSE-ConnectionGUID: MqdNFrqORnG4zYcbLbjjHg==
+X-CSE-MsgGUID: rZS7xNccTpy7XBs6y2ABXQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11465"; a="39783425"
+X-IronPort-AV: E=Sophos;i="6.16,240,1744095600"; 
+   d="scan'208";a="39783425"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2025 19:06:49 -0700
+X-CSE-ConnectionGUID: 34/X/9GZRf2NFrk6zHj0Iw==
+X-CSE-MsgGUID: nFxYMad+RmeDW/QHkJLIgg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,240,1744095600"; 
+   d="scan'208";a="148710592"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2025 19:06:46 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 15 Jun 2025 19:06:45 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Sun, 15 Jun 2025 19:06:45 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (40.107.212.54)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 15 Jun 2025 19:06:44 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=h0oxxBF23RQqZeGsmMZ9ZMkom97ndWFc3Dj8O6eCj4wYG72Bkf6NWfX89x1qbGPn3tsQyq1xPfm1J/Jz/toX1cg0NZx1yvihWtbIFmExO4aoFrR0Y18Mo0lptQNchFbVu+i+4EvlfSXso5cEjKER4NxRF3uGGSqNc2BJkIPcKXZWOUfjV8UDlocs7KIqMCePz62y6uEyNPH0wu3KED/3kD9jcwan5ZQxR2m+LC1JIjzMVRLL0rw5c6+i6Ymc5EhpO/y+4k4ivV6p2TzU3QPWxOKt2zqOXiZr0k4IwOB5XcGFTB4fcfxsJFlcH+trZx1tJSfE2gUTLnSATcZbCdNjgw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YFvVIU0v4/lpqltSS6WZXOAKAs5+NB7lxsnGE/nt6Vw=;
+ b=UdMQ/sL7SJ7DUYk3yR4sw1q/tI3mt7wZnb5fynyOEWnVKZmAFtx+W4JDrsFUCZ0AtlGEm2uWdTt8xbGuDGqevxbqU86SbmxMwddO1uLP8xP+Jb7ayJYL12ns4nOT8Zt9gkHdqgXbYA5m2olxr0eMaxE0sThchHUS0iqoLsLjv16upOUtMRqBelGKi1fvpJ+5m1zdZeBsY9T0BZWY7FEj3Gsp6mGyCDayel3Fv1nDBovJWvhQhQZTQ9DHJdIno/2Ta46+bXAfBlrlZjGzjxtW2CLkz1TrXx8VAetg+fwb9CAJofIE0YwPz4TV4El+FV4gYUvJXP3WH6407jsTtePImw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ MN2PR11MB4742.namprd11.prod.outlook.com (2603:10b6:208:26b::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.28; Mon, 16 Jun
+ 2025 02:06:27 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%5]) with mapi id 15.20.8835.018; Mon, 16 Jun 2025
+ 02:06:27 +0000
+Date: Mon, 16 Jun 2025 10:04:05 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <xiaoyao.li@intel.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Reject direct bits in gpa passed to
+ KVM_PRE_FAULT_MEMORY
+Message-ID: <aE97lRNOmJ3g4Xkk@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250612044943.151258-1-pbonzini@redhat.com>
+ <aEuURZ1sBmSYtX9P@yzhao56-desk.sh.intel.com>
+ <aEyHJuxo4aPUlmgV@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aEyHJuxo4aPUlmgV@google.com>
+X-ClientProxiedBy: OS0P286CA0157.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:604:16a::18) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250611001042.170501-5-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMDxH+UGcE9oJlYcAQ--.19628S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWfGr4rtr1fJrW8Cr1ktFW3XFc_yoWDAFWxpF
-	4DCF4kAr43Cr18JF9Fy3ZIvFyUXws5Kr1UKa4UuFWUAw1aqr1kXw4vkrn8tFn5Aayvqa10
-	gFWagF15Zw4UX3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUJ529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUShiSDU
-	UUU
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|MN2PR11MB4742:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5315b894-3279-49a9-7d06-08ddac7a6739
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?6HoRjTdZhMPgbvAlgLHi+Y6gpLZxRWz4xxzu2+/pcNL11eaTza8qWVVGVf7N?=
+ =?us-ascii?Q?oOKfZ0AfWEG2RWfkD5t69h86uNZ8dOxNp9q1eUflcb1a0K1WV6dSPoyHT76+?=
+ =?us-ascii?Q?oGfx5Uf6INb2lmkMlBC7CC4UdDfRCE9QWYKU3s/a+RozY46QSlcY+TUYPxqc?=
+ =?us-ascii?Q?K0uINQna9OwnMV24jgccZ5tzFFTXpD9rKVeyd8/TsFeDOgrxmRuTGflJRJ+x?=
+ =?us-ascii?Q?tNxi+LwbA/dPhvHKdEnZXAu6NNJVi9vhKseWH72abc3G30ufCOQ9AQ/TXZ/N?=
+ =?us-ascii?Q?QNjBSU21jvoFUMb+NAyWZmV6w5f0ychPtZtNm3Elk4X2UC39NWnqNE/irdmv?=
+ =?us-ascii?Q?V5ofgTDyd1H+GTkKMrNT0aQJCjXCpgpACmNSvpQTjK/jVinQ8rdV8hT3F7gi?=
+ =?us-ascii?Q?Jk1QobOWdkGUGuk2pUBPul4Qsk14EJcHcyAVS6BO5OC83uqp7LqdhUbzKlDg?=
+ =?us-ascii?Q?qxBYJzxcT1IaMg7MUPEfAcoXatGhTZfjYy1Gl47c/U705HsBYWWwqyX/X9Ra?=
+ =?us-ascii?Q?e34eRPrI0yMp8bD1HwbatVTEPaFRlO7xCT5vEViCJI8lo/8Wv0bVAg/4E59U?=
+ =?us-ascii?Q?MmAZ1Xv/OQKdziNAJSNqN/RRel/VS2cp9JDU3opd+pjwunUyylRk6VCjKLCC?=
+ =?us-ascii?Q?4BaOaVeNuj7nbccr02UUtZE33R5bTVjZyDmhpcGLt+yp5z29NzUoDwgBbgwF?=
+ =?us-ascii?Q?JYcRLgc9SMGhDw9owlRC90xOOQzU+RjNqeVnzU+wJ8zP/Ou3vC0tiatRCONn?=
+ =?us-ascii?Q?DNsxjFgSZP5MMI0sgrgE7OtQnL2ekJ4QQIlLTzSZZ2zwiKaQ6R50Mf4/k0IJ?=
+ =?us-ascii?Q?rwKvxNrTWhULTt0S/PCfmX97LkD/4m3hHF7AP+qS2Ivw9cxteRUhEb/l3h9k?=
+ =?us-ascii?Q?swTEDmHyirXL6LLPU5ovXlVqr+NalNqAO9/L8yeYxtXRfHjrDW07LT4qWy92?=
+ =?us-ascii?Q?WcltYKZvPPkejwzNL2+Bkl5eYoA4YL525tSyH9D0Z6rZA5zITzEViY3uAOpw?=
+ =?us-ascii?Q?gBE1u7a3GZ504Su9r32CX/pQjk53PaqU1ZsUay32b+wObuTDbAHHXdabkdAD?=
+ =?us-ascii?Q?Vo8jto/quIEXIS0d2TwWPc3b6OVmmKcP8W/2izNfdSaDsUvmcLHluvHuP+Ju?=
+ =?us-ascii?Q?+a/Dk06MRZqJvy3lQ0H0XCmj7ov7xheNNS4K8pxPjp6C22mKm/vX+iRJ93wA?=
+ =?us-ascii?Q?zK7lL9i0d14o8cAs1zIQ7Bizvrln2Z685MU1d6dznmYC7AynAtGMfNxLS7Pc?=
+ =?us-ascii?Q?/zxmbZOGErwyQsJpgWYgfLPSigewKs91StdDUhHH9qnmbPgMq6BcgYy5woEc?=
+ =?us-ascii?Q?64a5M2ZRreJTMfHq714ipbqNvmjyjrDwxuwqOj10teOlmpZU71jybW/xb3xV?=
+ =?us-ascii?Q?PQey6UEaSLQDBXxXRafP+MEMBaSrxx8j1dD3TXtlxzydgq7Wgjc75ADsQ9sq?=
+ =?us-ascii?Q?/ronq9MZIjQ=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?y2uD5F/+dozF2RO+9w0CCNSaHXYvDDJAf9+7U3yj0SzFEmWOBauziox7dxgM?=
+ =?us-ascii?Q?9+tgLxXYThG7bi8WNDM/SybT8pNS5lHCwS1X0NUVJ9pADOB95XcK7D36Cv6z?=
+ =?us-ascii?Q?i+/oVhreTMh0v+vLx5ims6/7qlY0Nr9+0+lFPanY0Q7/0xUGjk+8DwHRgL/4?=
+ =?us-ascii?Q?QccDeH3q74bejZ8++huS0+ugMl3g3yAUdvUdfNmP8yolZcpY1NcR+asWuFXm?=
+ =?us-ascii?Q?PQUv2lVSh2R0UniN8lX2tKz821t7n2ETL+1bQhwghobkZpFJqhcHFwPcXRDw?=
+ =?us-ascii?Q?gURZPKHnO3Dpb6+MlXU2Tl+eqJvWV8qUdhnf6XXBXoG9YAXeI8ODrJowKkAe?=
+ =?us-ascii?Q?JcOGBMMZV5Apfm+bMk7k8TRMNQcZEc5rzz4cbFCTmZ+Tc8unu4imX526Bpm4?=
+ =?us-ascii?Q?i4EG0MelGc4hkgI2/wncNv5NLT30Ued2/HYF/eXQ7ELjYi6Aj8ae2AkwpbL6?=
+ =?us-ascii?Q?qT+z50JDoHx/8SWmbGLJi314zRHS3PEL/szH8bsDlIK7xQY0/+4QV+LOPWbt?=
+ =?us-ascii?Q?7q8gFEa3BlvDPVy7SDA/yePgwW269bruidEqExao2AnzoZvrk4DbMxrfb6+u?=
+ =?us-ascii?Q?bJR/+jNN6G+Pj7jaOem2TptTCrpVCeAO66YpnrNnbH4beajDW/3V6AoKFOfN?=
+ =?us-ascii?Q?ybbNvYYUbbUeUl838cF020LhUojPKSrdmq96cQSc6b40+umBT+Fz6eCqHJQ5?=
+ =?us-ascii?Q?p3F2PBq1Ry/WD2fjQzZxoiPBI8rEMevWWGl3aUFVuB8GgDugNUppC6rYxuCO?=
+ =?us-ascii?Q?Zr1A6fz22yfyYx1gezFaqTgQ1HKbdkbz+DNwHeYscX7ArZ5eWqRzB6O+0LXg?=
+ =?us-ascii?Q?pSc+u45tpUTXLt81R1Sj1XpC5/BPg47aEPvWvBk+8J6clzx8k6OcX9wfg8D9?=
+ =?us-ascii?Q?GNm3jzvEHHep28SsCHfCv1DzLEgAelMaq/VmW7CPd7ewwAE94DyqMZ70Kuv2?=
+ =?us-ascii?Q?JROf59mqNpQfk5HNEHJOaPUDZhcInFUYEm6Owg0GQ0S22cOtLwi9a8fwNy9H?=
+ =?us-ascii?Q?cHbuxBm3almKjY6jhXJNxCowcuNq4M8Xf/QSIeUUMOV8znW0FsZ5y80v7apE?=
+ =?us-ascii?Q?RJfvlJ0LnuWqr8uTKTrz7ejY1NqiME8TUiF7ob1KexFuCsgErhXhGR8RTSLA?=
+ =?us-ascii?Q?m2viJ/6AbMD01yX+Tp+NQ3qtlMzEehcSsps5GiAa1KFGT33j+Mub3hov3Xe3?=
+ =?us-ascii?Q?6sQxd1OyeOuM6tWyIiLxHbR7YaM/b7rsZuxG0c+lwME3fP54WDy4X2Hcpf+R?=
+ =?us-ascii?Q?KGoRvvWz7+zn+XvivDvQ8QK0FZkVd6r+oqMo0U2/hQorXf4OVh2b4FokaEoY?=
+ =?us-ascii?Q?BfWH56Zk9K1q+hYtsIUxco8LYX5rYWn86zwyKkDjcCo6efAtBxpv9K/vFlVp?=
+ =?us-ascii?Q?f0UozESBOmb8Tg+fV03GSBF9LqBJQ0NAeHhlplbW4hT5xnra/sfAvNV7/ios?=
+ =?us-ascii?Q?/oS1CaCZscr6WM04NTRQhRJy9TObtzcReS+Jn3wJg9mG3SGSYAnwVhwAhzUz?=
+ =?us-ascii?Q?hh6w/KUKa0L2f0Wyj0Dx/FUxnCXknKaKXjM6Lhw8omJH+fkwh4+kxUAjZNdF?=
+ =?us-ascii?Q?k7l/liWOPZRFDRo1h+ffbIdnDOO7InmrjJceYNqE?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5315b894-3279-49a9-7d06-08ddac7a6739
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2025 02:06:27.5809
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oxg5STl9fFlvgWAQrBPtjaOADT0dVzJTlGAwBAb8ykCMTz+RNm50pxnsnm8naKvGFWN2KJoD/UL0Eb9JGGoopA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4742
+X-OriginatorOrg: intel.com
 
-
-
-On 2025/6/11 上午8:10, Sean Christopherson wrote:
-> Move iodev.h, the last remaining holdout in include/kvm, to the standard
-> include/linux directory as kvm_iodev.h and delete include/kvm.
+On Fri, Jun 13, 2025 at 01:16:38PM -0700, Sean Christopherson wrote:
+> On Fri, Jun 13, 2025, Yan Zhao wrote:
+> > On Thu, Jun 12, 2025 at 12:49:43AM -0400, Paolo Bonzini wrote:
+> > > Only let userspace pass the same addresses that were used in KVM_SET_USER_MEMORY_REGION
+> > > (or KVM_SET_USER_MEMORY_REGION2); gpas in the the upper half of the address space
+> > > are an implementation detail of TDX and KVM.
+> > > 
+> > > Extracted from a patch by Sean Christopherson <seanjc@google.com>.
+> > > 
+> > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > ---
+> > >  arch/x86/kvm/mmu/mmu.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index a4040578b537..4e06e2e89a8f 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -4903,6 +4903,9 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> > >  	if (!vcpu->kvm->arch.pre_fault_allowed)
+> > >  		return -EOPNOTSUPP;
+> > >  
+> > > +	if (kvm_is_gfn_alias(vcpu->kvm, gpa_to_gfn(range->gpa)))
+> > > +		return -EINVAL;
+> > > +
+> > Do we need the same check in kvm_vm_ioctl_set_mem_attributes()?
 > 
-> Acked-by: Anup Patel <anup@brainfault.org>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   MAINTAINERS                                | 1 -
->   arch/arm64/include/asm/kvm_vgic.h          | 2 +-
->   arch/arm64/kvm/vgic/vgic-mmio-v2.c         | 2 +-
->   arch/arm64/kvm/vgic/vgic-mmio-v3.c         | 2 +-
->   arch/arm64/kvm/vgic/vgic-mmio.c            | 2 +-
->   arch/loongarch/include/asm/kvm_eiointc.h   | 2 +-
->   arch/loongarch/include/asm/kvm_ipi.h       | 2 +-
->   arch/loongarch/include/asm/kvm_pch_pic.h   | 2 +-
->   arch/mips/include/asm/kvm_host.h           | 3 +--
->   arch/powerpc/kvm/mpic.c                    | 2 +-
->   arch/riscv/kvm/aia_aplic.c                 | 2 +-
->   arch/riscv/kvm/aia_imsic.c                 | 2 +-
->   arch/x86/kvm/i8254.h                       | 2 +-
->   arch/x86/kvm/ioapic.h                      | 2 +-
->   arch/x86/kvm/irq.h                         | 2 +-
->   arch/x86/kvm/lapic.h                       | 2 +-
->   include/{kvm/iodev.h => linux/kvm_iodev.h} | 0
->   virt/kvm/coalesced_mmio.c                  | 3 +--
->   virt/kvm/eventfd.c                         | 2 +-
->   virt/kvm/kvm_main.c                        | 3 +--
->   20 files changed, 18 insertions(+), 22 deletions(-)
->   rename include/{kvm/iodev.h => linux/kvm_iodev.h} (100%)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 10cf54c8f727..a2cd432273e5 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -13011,7 +13011,6 @@ W:	http://www.linux-kvm.org
->   T:	git git://git.kernel.org/pub/scm/virt/kvm/kvm.git
->   F:	Documentation/virt/kvm/
->   F:	include/asm-generic/kvm*
-> -F:	include/kvm/iodev.h
->   F:	include/linux/kvm*
->   F:	include/trace/events/kvm.h
->   F:	include/uapi/asm-generic/kvm*
-> diff --git a/arch/arm64/include/asm/kvm_vgic.h b/arch/arm64/include/asm/kvm_vgic.h
-> index 4a34f7f0a864..09d7f628fa3b 100644
-> --- a/arch/arm64/include/asm/kvm_vgic.h
-> +++ b/arch/arm64/include/asm/kvm_vgic.h
-> @@ -14,7 +14,7 @@
->   #include <linux/static_key.h>
->   #include <linux/types.h>
->   #include <linux/xarray.h>
-> -#include <kvm/iodev.h>
-> +#include <linux/kvm_iodev.h>
->   #include <linux/list.h>
->   #include <linux/jump_label.h>
->   
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> index d00c8a74fad6..889440a8b129 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> @@ -6,9 +6,9 @@
->   #include <linux/irqchip/arm-gic.h>
->   #include <linux/kvm.h>
->   #include <linux/kvm_host.h>
-> +#include <linux/kvm_iodev.h>
->   #include <linux/nospec.h>
->   
-> -#include <kvm/iodev.h>
->   #include <asm/kvm_vgic.h>
->   
->   #include "vgic.h"
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index 505d4e389885..db95d3ccbd14 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -7,8 +7,8 @@
->   #include <linux/irqchip/arm-gic-v3.h>
->   #include <linux/kvm.h>
->   #include <linux/kvm_host.h>
-> +#include <linux/kvm_iodev.h>
->   #include <linux/interrupt.h>
-> -#include <kvm/iodev.h>
->   
->   #include <asm/kvm_emulate.h>
->   #include <asm/kvm_arm.h>
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-> index ec1b13abc728..de689e0e881f 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-> @@ -9,7 +9,7 @@
->   #include <linux/irq.h>
->   #include <linux/kvm.h>
->   #include <linux/kvm_host.h>
-> -#include <kvm/iodev.h>
-> +#include <linux/kvm_iodev.h>
->   #include <asm/kvm_arch_timer.h>
->   #include <asm/kvm_vgic.h>
->   
-> diff --git a/arch/loongarch/include/asm/kvm_eiointc.h b/arch/loongarch/include/asm/kvm_eiointc.h
-> index a3a40aba8acf..0049b0b79477 100644
-> --- a/arch/loongarch/include/asm/kvm_eiointc.h
-> +++ b/arch/loongarch/include/asm/kvm_eiointc.h
-> @@ -6,7 +6,7 @@
->   #ifndef __ASM_KVM_EIOINTC_H
->   #define __ASM_KVM_EIOINTC_H
->   
-> -#include <kvm/iodev.h>
-> +#include <linux/kvm_iodev.h>
->   
->   #define EIOINTC_IRQS			256
->   #define EIOINTC_ROUTE_MAX_VCPUS		256
-> diff --git a/arch/loongarch/include/asm/kvm_ipi.h b/arch/loongarch/include/asm/kvm_ipi.h
-> index 060163dfb4a3..3956b230f087 100644
-> --- a/arch/loongarch/include/asm/kvm_ipi.h
-> +++ b/arch/loongarch/include/asm/kvm_ipi.h
-> @@ -6,7 +6,7 @@
->   #ifndef __ASM_KVM_IPI_H
->   #define __ASM_KVM_IPI_H
->   
-> -#include <kvm/iodev.h>
-> +#include <linux/kvm_iodev.h>
->   
->   #define LARCH_INT_IPI			12
->   
-> diff --git a/arch/loongarch/include/asm/kvm_pch_pic.h b/arch/loongarch/include/asm/kvm_pch_pic.h
-> index e6df6a4c1c70..4b37e3134e52 100644
-> --- a/arch/loongarch/include/asm/kvm_pch_pic.h
-> +++ b/arch/loongarch/include/asm/kvm_pch_pic.h
-> @@ -6,7 +6,7 @@
->   #ifndef __ASM_KVM_PCH_PIC_H
->   #define __ASM_KVM_PCH_PIC_H
->   
-> -#include <kvm/iodev.h>
-> +#include <linux/kvm_iodev.h>
->   
->   #define PCH_PIC_SIZE			0x3e8
->   
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-> index c14b10821817..0d7dd89ca5bf 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -16,6 +16,7 @@
->   #include <linux/interrupt.h>
->   #include <linux/types.h>
->   #include <linux/kvm.h>
-> +#include <linux/kvm_iodev.h>
->   #include <linux/kvm_types.h>
->   #include <linux/threads.h>
->   #include <linux/spinlock.h>
-> @@ -24,8 +25,6 @@
->   #include <asm/inst.h>
->   #include <asm/mipsregs.h>
->   
-> -#include <kvm/iodev.h>
-> -
->   /* MIPS KVM register ids */
->   #define MIPS_CP0_32(_R, _S)					\
->   	(KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
-> diff --git a/arch/powerpc/kvm/mpic.c b/arch/powerpc/kvm/mpic.c
-> index 23e9c2bd9f27..b25a03251544 100644
-> --- a/arch/powerpc/kvm/mpic.c
-> +++ b/arch/powerpc/kvm/mpic.c
-> @@ -26,6 +26,7 @@
->   #include <linux/slab.h>
->   #include <linux/mutex.h>
->   #include <linux/kvm_host.h>
-> +#include <linux/kvm_iodev.h>
->   #include <linux/errno.h>
->   #include <linux/fs.h>
->   #include <linux/anon_inodes.h>
-> @@ -33,7 +34,6 @@
->   #include <asm/mpic.h>
->   #include <asm/kvm_para.h>
->   #include <asm/kvm_ppc.h>
-> -#include <kvm/iodev.h>
->   
->   #define MAX_CPU     32
->   #define MAX_SRC     256
-> diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
-> index f59d1c0c8c43..bf163724aec5 100644
-> --- a/arch/riscv/kvm/aia_aplic.c
-> +++ b/arch/riscv/kvm/aia_aplic.c
-> @@ -9,10 +9,10 @@
->   
->   #include <linux/irqchip/riscv-aplic.h>
->   #include <linux/kvm_host.h>
-> +#include <linux/kvm_iodev.h>
->   #include <linux/math.h>
->   #include <linux/spinlock.h>
->   #include <linux/swab.h>
-> -#include <kvm/iodev.h>
->   
->   struct aplic_irq {
->   	raw_spinlock_t lock;
-> diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
-> index 29ef9c2133a9..ae3c0807baa9 100644
-> --- a/arch/riscv/kvm/aia_imsic.c
-> +++ b/arch/riscv/kvm/aia_imsic.c
-> @@ -11,10 +11,10 @@
->   #include <linux/bitmap.h>
->   #include <linux/irqchip/riscv-imsic.h>
->   #include <linux/kvm_host.h>
-> +#include <linux/kvm_iodev.h>
->   #include <linux/math.h>
->   #include <linux/spinlock.h>
->   #include <linux/swab.h>
-> -#include <kvm/iodev.h>
->   #include <asm/csr.h>
->   
->   #define IMSIC_MAX_EIX	(IMSIC_MAX_ID / BITS_PER_TYPE(u64))
-> diff --git a/arch/x86/kvm/i8254.h b/arch/x86/kvm/i8254.h
-> index a768212ba821..4de7a0b88e4f 100644
-> --- a/arch/x86/kvm/i8254.h
-> +++ b/arch/x86/kvm/i8254.h
-> @@ -4,7 +4,7 @@
->   
->   #include <linux/kthread.h>
->   
-> -#include <kvm/iodev.h>
-> +#include <linux/kvm_iodev.h>
->   
->   struct kvm_kpit_channel_state {
->   	u32 count; /* can be 65536 */
-> diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
-> index aa8cb4ac0479..cb36c36affd3 100644
-> --- a/arch/x86/kvm/ioapic.h
-> +++ b/arch/x86/kvm/ioapic.h
-> @@ -3,7 +3,7 @@
->   #define __KVM_IO_APIC_H
->   
->   #include <linux/kvm_host.h>
-> -#include <kvm/iodev.h>
-> +#include <linux/kvm_iodev.h>
->   #include "irq.h"
->   
->   struct kvm;
-> diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
-> index 76d46b2f41dd..b21b03aa2ee7 100644
-> --- a/arch/x86/kvm/irq.h
-> +++ b/arch/x86/kvm/irq.h
-> @@ -13,9 +13,9 @@
->   #include <linux/mm_types.h>
->   #include <linux/hrtimer.h>
->   #include <linux/kvm_host.h>
-> +#include <linux/kvm_iodev.h>
->   #include <linux/spinlock.h>
->   
-> -#include <kvm/iodev.h>
->   #include "lapic.h"
->   
->   #define PIC_NUM_PINS 16
-> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> index 4ce30db65828..43ffbded5f72 100644
-> --- a/arch/x86/kvm/lapic.h
-> +++ b/arch/x86/kvm/lapic.h
-> @@ -2,7 +2,7 @@
->   #ifndef __KVM_X86_LAPIC_H
->   #define __KVM_X86_LAPIC_H
->   
-> -#include <kvm/iodev.h>
-> +#include <linux/kvm_iodev.h>
->   
->   #include <linux/kvm_host.h>
->   
-> diff --git a/include/kvm/iodev.h b/include/linux/kvm_iodev.h
-> similarity index 100%
-> rename from include/kvm/iodev.h
-> rename to include/linux/kvm_iodev.h
-> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-> index 375d6285475e..d0f84e3611da 100644
-> --- a/virt/kvm/coalesced_mmio.c
-> +++ b/virt/kvm/coalesced_mmio.c
-> @@ -9,8 +9,7 @@
->    *
->    */
->   
-> -#include <kvm/iodev.h>
-> -
-> +#include <linux/kvm_iodev.h>
->   #include <linux/kvm_host.h>
->   #include <linux/slab.h>
->   #include <linux/kvm.h>
-> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-> index 11e5d1e3f12e..35786d59b233 100644
-> --- a/virt/kvm/eventfd.c
-> +++ b/virt/kvm/eventfd.c
-> @@ -26,7 +26,7 @@
->   #include <linux/irqbypass.h>
->   #include <trace/events/kvm.h>
->   
-> -#include <kvm/iodev.h>
-> +#include <linux/kvm_iodev.h>
->   
->   #ifdef CONFIG_HAVE_KVM_IRQCHIP
->   
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index eec82775c5bf..a401ba32ecaa 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -10,9 +10,8 @@
->    *   Yaniv Kamay  <yaniv@qumranet.com>
->    */
->   
-> -#include <kvm/iodev.h>
-> -
->   #include <linux/kvm_host.h>
-> +#include <linux/kvm_iodev.h>
->   #include <linux/kvm.h>
->   #include <linux/module.h>
->   #include <linux/errno.h>
-> 
-About modification with LoongArch specific.
-Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-
+> Yeah, we probably should disallow aliases there.  It should be benign?  Because
+> memslots disallow aliases, and so the aliased gfn entries in the xarray will never
+> actually be consumed.
+Yes, it's benign after this patch.
+Userspace may find that setting attribute for an aliased gfn has no effect.
+Though there's  a "kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(cr2_or_gpa)" in
+kvm_mmu_page_fault(), it's only for KVM_X86_SW_PROTECTED_VM. So it's benign,
+just odd :)
 
