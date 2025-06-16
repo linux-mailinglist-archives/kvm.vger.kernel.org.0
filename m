@@ -1,198 +1,129 @@
-Return-Path: <kvm+bounces-49574-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49575-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77D0AADA912
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 09:14:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61847ADA91B
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 09:16:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A32711892A04
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 07:14:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E48DF16F5E5
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 07:16:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440211F4CA9;
-	Mon, 16 Jun 2025 07:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB4C1E2307;
+	Mon, 16 Jun 2025 07:16:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YwN+Xszw"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qAY4VVpi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504611F0E53
-	for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 07:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE613208;
+	Mon, 16 Jun 2025 07:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750058058; cv=none; b=EUWyuaPVQTzdt8SGhKHr3pwarsrrsoJfa/jTUHW+mhbHGpnUqhZ3XagyCDItJJbgJUAW3e6uphyeLJPicnA7ex3vQgFv4avIJazdUG7HEZmyj9BhiKlW/C554tguTgM2Udi/T8I+KFthi/VOmp7ezlOvfeHZo9cPqBfcph6pFTA=
+	t=1750058208; cv=none; b=CKXYvY0oB8K/i5+3fRELydwvXsM2L01G6uHTOjq2OtPzi7Ealqa1n5kID+wAdhS2UrJ+7cfkLRhBMpb18Qnjk2P+znLbA2OB6q7So39hS8QBKw7UjPXA8PISK5Lj7gOzKZqjnNRN5O1WjNlky5PCxiD9WqO3SgXkqVo4zsqiz34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750058058; c=relaxed/simple;
-	bh=5B+m8LJRszE/eOQ7rN2wxVR0e0sQd7dvBxHZtcWiquo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cbT3DXiR0iGuhTw9tBsKYXP+6Gu2JIh72h9nBqJl4Dl22V73oIeOo1jQUrtxGScPM6snqutYsWCk5ROhsRGdWuUgYbR/99ZNEBlqyUVP+8zCSKZWUvENGYPI5f8Lu6VglZChPSrnYh0VHXv422PWun6XFC7DbQgoWG8xtcBhfGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YwN+Xszw; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-47e9fea29easo456491cf.1
-        for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 00:14:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750058054; x=1750662854; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G4dscraCi99Sxb2AdbSI/1exeAb4GQbHQ2olocOXtjo=;
-        b=YwN+Xszw0eW/yG5YhFbtK2PVtM0xbhj5ey4JrQhMEf+Ir1D9+AzvXRkunkpaY/TIHt
-         NAIgqQNLrZLZK/ITvgNgmZIOEzhZ2EXb6V63JHrKVQ6ZOexvfNO4oEGkv2KFxaxg5n2p
-         h6ok+Iw9hwMfbd1XHiyAG5qKusgnjRVejOdOI4Rb2lm1rEBqg/31cgovdFRYh0pHns+y
-         RfCmlPFsiiKaFBxsmaEHkoVeFsJPbeHE1Gd05k4H0XBHOEpGV+SCka1gwxyxZ24W9/AD
-         KxjmhV2HD7muI0JTORAezU3Q3DPIz47aZjB1kIFvpT1cO///LgfqlRRceGXWchPhH8dT
-         1q2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750058054; x=1750662854;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G4dscraCi99Sxb2AdbSI/1exeAb4GQbHQ2olocOXtjo=;
-        b=Cb8rq1HPyc0a4XNcNOTEBQD+iqk91kiCGDv3B8lOTNQ3nAqL4AHFGfGoMyo9iy6c/o
-         J6wC7kirpB+M4l8mebblQInlVID0zJmZL8oXQuucZCHcm4dWqy/HZyrxoRi9Y+VgA7L+
-         X3the491xnjEDeXWSNadKM0tz7JQlkcIIn4ujzz8l66gR0BnbjpULbVSg2BwcxnM/uC0
-         fVBMlgxPNNu+KqE2Q3zbMX4ZGFW5bh08dJED8GAqTlfr7axyHlJ4TGJzM/KAGYWQVqg+
-         V6bTXCUe6RixQEazeLXy/9GwYU9nSTgPvAehJYzeATOgjj0PjeAdaVM3weY3AT6BSq7A
-         xgcA==
-X-Gm-Message-State: AOJu0YwPQ3Pb53ry7QJ3FxIjlGoa1ef6iH9tglrZ2a1TjMza63H6CCSG
-	6DEbcXdactGdQdeOLLIP29hXJbIEFvb+tLjukFOF5X/IkSWpgzVJSQ7TsCg3nJ5piBWFb16jHBN
-	23OjN7OH+QG5vokhjfSF2mYQVpzOu1fd3oUe3+/PK
-X-Gm-Gg: ASbGncvctERM4/v+ZV6pleMKmwq8HisM9SO10cl4xXSbpaEU+YFR0UlMRmjXLwT+Sxg
-	CV0PGPLHfN8bLT/zGz6HPlxSvQshmNphOMMfxDfw7RT3JVyD1xINP1IYt4UijEdteVQRqWB9dCN
-	TFuJ9rsTw/1VdsYVi4WkIHY7SOvoEODp+B0sdog+Zq2qebrEzO2rVitw==
-X-Google-Smtp-Source: AGHT+IHRP1CpUCig8F7p0iqSMmnDgYVd+hSQrG9KB86uiC6pnZNQNaE6PPvaROhLDIFwY0y51UIij5JffUL2jbFDWys=
-X-Received: by 2002:ac8:58c8:0:b0:4a5:9b0f:a150 with SMTP id
- d75a77b69052e-4a73d63d978mr5025451cf.16.1750058053808; Mon, 16 Jun 2025
- 00:14:13 -0700 (PDT)
+	s=arc-20240116; t=1750058208; c=relaxed/simple;
+	bh=8oS9W40Kxi3jCDLjbplhmNHApFzpmxWBjEyHqggrd0A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mKrUH8VKJzYbc7rHTSK8qkSKCxa8bXD1BIKeZoHy1DNKK3RNagnca7zDpG3SshBwWEEk74HEUdPPbp3BtUY5fd0sUZ8enBcNTMFlxHW3u+5ycZFirDpDt975wp56TTlttNpOvQkzs/aPlbgSQtQIHKEcaIJyWxInHW96nAhVqFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qAY4VVpi; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55FLRHHr025161;
+	Mon, 16 Jun 2025 07:15:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=8oS9W40Kxi3jCDLjbplhmNHApFzpmx
+	WBjEyHqggrd0A=; b=qAY4VVpinI2Rbjtg6/cTxb0ByK9Dpzpf/aO3yY9XM5UF4d
+	fU78j65QpJ3TapkNS/xL3vWbPV5/pklD1FE7kjijxU/XLyukt6XZ3WfcR4gFH81+
+	UFdauXXxcaqtHqvoucUPRYWnY4bL4ogy5OumG75AWe2BeYdsMVMYJOpOVg665ANi
+	VWvgBCKH/JyZisb5vUa4CL8qgECUwjCm3TRR4ZUf58M9gln0exc5pR4IRrjSC6+f
+	ZkrajO9adrWRsa38pwUBB5r4ztMCHddjRWJusLpI5uP3qlP55wkLVB/N8+UcqUCc
+	LCE/mDDOWLEmLtUGpgpcmyaSwGoUdK3hRWsyQEfA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4790r1qypc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 16 Jun 2025 07:15:36 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 55G6uksv023490;
+	Mon, 16 Jun 2025 07:15:36 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4790r1qyp8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 16 Jun 2025 07:15:36 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55G3BxpK011236;
+	Mon, 16 Jun 2025 07:15:35 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 479kdt56ah-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 16 Jun 2025 07:15:35 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55G7FVZd43385168
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 16 Jun 2025 07:15:31 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EB3CA2004D;
+	Mon, 16 Jun 2025 07:15:30 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6B03A2004E;
+	Mon, 16 Jun 2025 07:15:26 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.204.206.66])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 16 Jun 2025 07:15:26 +0000 (GMT)
+Date: Mon, 16 Jun 2025 12:45:22 +0530
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+        Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Anish Ghulati <aghulati@google.com>,
+        Colton Lewis <coltonlewis@google.com>, Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 6/8] KVM: PPC: Stop adding virt/kvm to the arch include
+ path
+Message-ID: <etqfg3dvpr4tabk3lysnvelpb5k3pyuuhhkfxsd4oyxlmgwnit@rducsforanaj>
+References: <20250611001042.170501-1-seanjc@google.com>
+ <20250611001042.170501-7-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611133330.1514028-1-tabba@google.com> <20250611133330.1514028-5-tabba@google.com>
- <aEyLlbyMmNEBCAVj@google.com>
-In-Reply-To: <aEyLlbyMmNEBCAVj@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 16 Jun 2025 08:13:37 +0100
-X-Gm-Features: AX0GCFulb2IhkWValvX9vFqGHI2nVg_Dnrs5LCKRKWUrkMeevUaVx5iPDic8k40
-Message-ID: <CA+EHjTz=j==9evN7n1sGfTwxi5DKSr5k0yzXhDGzvwk7UawSGA@mail.gmail.com>
-Subject: Re: [PATCH v12 04/18] KVM: x86: Rename kvm->arch.has_private_mem to kvm->arch.supports_gmem
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com, 
-	ira.weiny@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250611001042.170501-7-seanjc@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: pA27UQdSoFi7fENYAbcClrvtInowwnUB
+X-Proofpoint-ORIG-GUID: TmHFGtZ04KPLB6esid1G6CYOB7tVt6Vr
+X-Authority-Analysis: v=2.4 cv=AqTu3P9P c=1 sm=1 tr=0 ts=684fc498 cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=90UzZmcSQ78tuVnzBuAA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE2MDA0NCBTYWx0ZWRfX7cOmaIrOSqpw SXLMPZuCWSZBCBLE3FL1xYcVW8X8KK0s74UvFuWZnCI71S5bsha1iy0u8LbyZa/+82oTUgv81jB 8/dlb4z7C/9S1qOfR7ocu1ICPZlI2cR3jyDHY3OeqfHz4UFQa3Rmzgnyh3GV1P+TxeqAcXYuNcf
+ QEN1U+QFmMf+lloYVcQjizKufdVGBS01u2hgxtp3bvDWMeYFm65yaoSob0KnI8NZ2r/UggduiwU ZI3aZ9HSz+pCtgy2G1LIxS18dF8Y3fx6iFj5NS4G1C1cP4XiHgt73JfFH9LrR8JcXlRfTcEju3e eeU8dw7b1BrKJERMYaXJKC8cF2yDollkevHHuOIz2ofPC4iO7YXWdRjLohoPeN5pLWHoOr65LX/
+ hSQl2MRrPAQ08Y2Uc3A15BdBi0qU/CKs2ILqAsxRoOrQErs71PyFk7tko/eh6IYJbN/lDZCI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-06-16_02,2025-06-13_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ lowpriorityscore=0 suspectscore=0 adultscore=0 impostorscore=0
+ priorityscore=1501 phishscore=0 mlxlogscore=478 mlxscore=0 spamscore=0
+ bulkscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506160044
 
-Hi Sean,
-
-On Fri, 13 Jun 2025 at 21:35, Sean Christopherson <seanjc@google.com> wrote=
-:
->
-> On Wed, Jun 11, 2025, Fuad Tabba wrote:
-> > The bool has_private_mem is used to indicate whether guest_memfd is
-> > supported.
->
-> No?  This is at best weird, and at worst flat out wrong:
->
->         if (kvm->arch.supports_gmem &&
->             fault->is_private !=3D kvm_mem_is_private(kvm, fault->gfn))
->                 return false;
->
-> ditto for this code:
->
->         if (kvm_arch_supports_gmem(vcpu->kvm) &&
->             kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(range->gpa)))i
->                 error_code |=3D PFERR_PRIVATE_ACCESS;
->
-> and for the memory_attributes code.  E.g. IIRC, with guest_memfd() mmap s=
-upport,
-> private vs. shared will become a property of the guest_memfd inode, i.e. =
-this will
-> become wrong:
->
-> static u64 kvm_supported_mem_attributes(struct kvm *kvm)
-> {
->         if (!kvm || kvm_arch_supports_gmem(kvm))
->                 return KVM_MEMORY_ATTRIBUTE_PRIVATE;
->
->         return 0;
-> }
->
-> Instead of renaming kvm_arch_has_private_mem() =3D> kvm_arch_supports_gme=
-m(), *add*
-> kvm_arch_supports_gmem() and then kill off kvm_arch_has_private_mem() onc=
-e non-x86
-> usage is gone (i.e. query kvm->arch.has_private_mem directly).
->
-> And then rather than rename has_private_mem, either add supports_gmem or =
-do what
-> you did for kvm_arch_supports_gmem_shared_mem() and explicitly check the =
-VM type.
-
-Will do.
-
-To make sure we're on the same page, we should add `supports_gmem` and
-keep `has_private_mem`, and continue using it for x86 code by querying
-it directly once the helpers are added.
-
-> > Rename it to supports_gmem to make its meaning clearer and to decouple =
-memory
-> > being private from guest_memfd.
-> >
-> > Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Reviewed-by: Shivank Garg <shivankg@amd.com>
-> > Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
-> > Co-developed-by: David Hildenbrand <david@redhat.com>
-> > Signed-off-by: David Hildenbrand <david@redhat.com>
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h | 4 ++--
-> >  arch/x86/kvm/mmu/mmu.c          | 2 +-
-> >  arch/x86/kvm/svm/svm.c          | 4 ++--
-> >  arch/x86/kvm/x86.c              | 3 +--
-> >  4 files changed, 6 insertions(+), 7 deletions(-)
->
-> This missed the usage in TDX (it's not a staleness problem, because this =
-series
-> was based on 6.16-rc1, which has the relevant code).
->
-> arch/x86/kvm/vmx/tdx.c: In function =E2=80=98tdx_vm_init=E2=80=99:
-> arch/x86/kvm/vmx/tdx.c:627:18: error: =E2=80=98struct kvm_arch=E2=80=99 h=
-as no member named =E2=80=98has_private_mem=E2=80=99
->   627 |         kvm->arch.has_private_mem =3D true;
->       |                  ^
-> make[5]: *** [scripts/Makefile.build:287: arch/x86/kvm/vmx/tdx.o] Error 1
-
-I did test and run this before submitting the series. Building it on
-x86 with x86_64_defconfig and with allmodconfig pass (I obviously
-missed TDX though, apologies for that). I should have grepped for
-has_private_mem. That said, if I understood your suggestion correctly,
-this problem wouldn't happen again.
-
-Cheers,
-/fuad
+Reviewed-by: Gautam Menghani <gautam@linux.ibm.com>
 
