@@ -1,164 +1,343 @@
-Return-Path: <kvm+bounces-49605-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49604-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1755ADAFF2
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 14:13:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEEE5ADAFD4
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 14:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87CEC1654F6
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 12:13:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8C911883BD9
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 12:07:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BD22E4266;
-	Mon, 16 Jun 2025 12:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9D42E4260;
+	Mon, 16 Jun 2025 12:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="ojXlCOq1"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="AhmjeuvA"
 X-Original-To: kvm@vger.kernel.org
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8994E2E4243
-	for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 12:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E081626281
+	for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 12:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750076023; cv=none; b=pEt5eI4OubQDbwxxtgmspNBgazOTFKssr4X0jxlylle2LcSi5LzZT/PBRM4gEJ1dsF3+kCOyHOk5NDtwG1+OwMb8i98n/6zCACagRLK8bU4xVL69vCZgDTT/gUBi5kHGjw/yBHkGsOQSEm9i/yZwWndc6PX7Yh6sj8n/Sk7Jfak=
+	t=1750075644; cv=none; b=FENCuXjXdWdg5LVRFjo04KgGInlg+ZmWfGoV81SupXuqrfe8jTDl3+omWrSn4xKAmqyJinJYH5KRLPXipmCcpJ4ahvW0CtGXxGuVOPi5QirKX6xWOh+iDcZU65+YXinfgXNJgG7hFnlvC/zmDcst8ItIcqOnqP62hwSuifKS4zM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750076023; c=relaxed/simple;
-	bh=czW2sUzQo6L5qIFxXDgaGZVTOTVxlROOS8oPkoUAngA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SugXERYfr7KUVjpQCWjzN7nGfHb2kD62FZymyFMbqywqWEU2yGP41jYmKHn9fvO5ETHYpGVh+lEJ58PV/1mPFxtKp56o+JEwDCWvgFtPWVKcd+SCmzk/EBwHL9TgV2etjbJyfewybeM5hUM9rP+fbitK4ArfOJUaBP1Et5VoGh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=ojXlCOq1 reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
-Received: from [133.11.54.205] (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 55GC5CYt045357
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 16 Jun 2025 21:05:12 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=ued+FNLco7H3M7eWjlnqd/mRkFKELch/S6J+7qUNeug=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=Message-ID:Date:Subject:To:From;
-        s=rs20250326; t=1750075514; v=1;
-        b=ojXlCOq1RciJ2fdqnbl0b58/xEt3z34Gtmypg6Zu3hIPBlB8cgvJk51vp0i1M5p7
-         n7dS8l2WWoU9OS/+C0h1nDsaD1kJzkeoB4JhUTy1ouT/QD8ef9e7ySK8GZhtrFpj
-         jRIIG+b83Qk6+gc8F9Lzj1F05D4RptL8UYEdQ0P/soe2JdZ4PcIteWfNR/I9WKMk
-         yKBqb/fTVIRiG7Z0upwN4l+sVhwD4ERg9azQp0uN9y5et8L8fA9ffXj8WdjVotie
-         3FM+JNaaEJnHXTPMss/XdAMtzqI6cGPVGl1XNA3FhL7cai2eNz3yLWndfYRgtnaG
-         MJWCImLpqoHqvMut4bISmQ==
-Message-ID: <a0652351-8443-492d-96dc-9772bf08341d@rsg.ci.i.u-tokyo.ac.jp>
-Date: Mon, 16 Jun 2025 21:05:11 +0900
+	s=arc-20240116; t=1750075644; c=relaxed/simple;
+	bh=jNlCkRXjRY3Bl+tK3pgG6V7kMO5jS9r7uxY6qRXJPto=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=q7elCwy8uQriF7nr8YWaOUPGuTLD9iIJXSbu8MdxX/NFtMYso/v9qH/LVy8Ho3F2ym9IZfnVzw7UWJUdOHcAzgbzSOU+fq0X6OOCSe2vX9SBvDghlLSRtSWTy/sVsE9FUKjwG6Jgq6ZxJKHh3OkexzE4zi0Df6JbsSFCpYXxXjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=AhmjeuvA; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-234fcadde3eso54652985ad.0
+        for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 05:07:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1750075641; x=1750680441; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kxuuo/qfgrhmPQ0t/hAmkZEHSbbtN0whe6oJrPLEQX4=;
+        b=AhmjeuvAtsUSUD7mlbvBJaVa13Fz+m6jRVzrVehBYRVAsQaLXeNgkTYpVDeeIF9lwj
+         Ok+mFuVoE5Ft9umYnmQ/yhC+CBBqsKcrLAZ/hJJaBnXEgYJlY13wuMKEDHCQJt9TWpb7
+         N2L0nHM3H3RrXi2pTG+sEAEzuRWxEvXw2Bp1Fq3jYUgCiwJFbhbqlJAcEeimcppmbsJs
+         vMzcVxDgjq8vQ23VYNt2bFfRxDSLJwC1y65RaQ1AuK61DDP7y3ScNNOCdwCT2KUSr0K6
+         Swv2I0fXthC9lO+emOR0+TeModWoJOlCIBIOaephk/oQn6VO3IrK3mS6cXVpVzXM6bfi
+         Yl5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750075641; x=1750680441;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kxuuo/qfgrhmPQ0t/hAmkZEHSbbtN0whe6oJrPLEQX4=;
+        b=maUupjAdHRKuFRPaW0cSKSiiVDG91Z+x/q9XQ5TJluPsEBLUg2vR8jgCLjWfQJ+yxi
+         6l5T4nq+GY3h9DImsiswNP/PI34v1WeLiJPz9NikG2eHDQuZ6KWqw0N6rG8hJgnAS7W+
+         6GvOI7pjY36+DnVojsMSld7jPCPOPVHgL8L/9gMmq9PhboJV6gdj5ZQWM05+7fN7uT12
+         QsUPNYe6q6Ju7VL7gzevVnuIFR4sZsK5vOzWkc7DWJ7UbVmyva3aVpBRiIX8n4TbZHak
+         H40bV/nsjl5oRGbdpGRq3OjS076mlf0MAYgUQo1CMTyXu8S8Dv8XQAf8OwRCC9qDeIG6
+         H6DQ==
+X-Gm-Message-State: AOJu0Yz8eXdl7Q00gtd7XECeAVkuoS+Y3cIRm2MAxI6qDg4ucyTRJZ+P
+	U0uYOpsaKcaWDailT0ThqUqNELFMsei/nbuu1348/Ku5asRP9aKT1qAC49iTeP2tfgs=
+X-Gm-Gg: ASbGncuLGMkmFTMvJ1jhYjkLLqLRRh2wZIC4ysNQyDUTfkuSYKTJ8vmcsFuhpZxwQa9
+	Fc9SvSUFD0hbVKLi67hhhlRUaN2uAZN3yAJB0/+ScMwUUe2ngrdmZJINy+FVWqejgEZPCVA5DXM
+	v/FEz18kpB8lAywlPK75/Ac2f176o4Z38McbFcKv2MiqL7fg+vWysUHO0xjhG3iamaF00YGoS2B
+	ru9xz0QxOfSCqWcGK/7nsHfCqCuMTTv3F/x2X/W+NsKSwZz9/hJ4YnfQep5WIIkr4BNU8fBxHgT
+	P9ahnWmsvajHJO88Vni/qaJ1C8yYn5wFmQo7X5HUz3GOcxNwMD3tspG0LG/SU4e6aa7VDYrX+QV
+	PwD/pHmy6buNC
+X-Google-Smtp-Source: AGHT+IH88+OLHvzx5WeFSL/EMKRPuhcV8i+Bn2LZzyPP5AxYcGanjzyXse+8iIxqwAkjniuVNXbTJA==
+X-Received: by 2002:a17:903:1905:b0:235:668:fb00 with SMTP id d9443c01a7336-2366b3df79emr143127135ad.46.1750075641098;
+        Mon, 16 Jun 2025 05:07:21 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.6])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d88bef8sm59811675ad.30.2025.06.16.05.07.18
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 16 Jun 2025 05:07:20 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: david@redhat.com,
+	alex.williamson@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lizhe.67@bytedance.com,
+	peterx@redhat.com
+Subject: Re: [PATCH v3 2/2] vfio/type1: optimize vfio_unpin_pages_remote() for large folio
+Date: Mon, 16 Jun 2025 20:07:15 +0800
+Message-ID: <20250616120715.12445-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <8483b457-6044-4174-9190-161f29f2cda5@redhat.com>
+References: <8483b457-6044-4174-9190-161f29f2cda5@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 02/12] python: update pylint ignores
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: Joel Stanley <joel@jms.id.au>, Yi Liu <yi.l.liu@intel.com>,
-        =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Helge Deller <deller@gmx.de>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Andrew Jeffery <andrew@codeconstruct.com.au>,
-        Fabiano Rosas
- <farosas@suse.de>, Alexander Bulekov <alxndr@bu.edu>,
-        Darren Kenny <darren.kenny@oracle.com>,
-        Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
-        Ed Maste <emaste@freebsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
-        Warner Losh <imp@bsdimp.com>, Kevin Wolf <kwolf@redhat.com>,
-        Tyrone Ting <kfting@nuvoton.com>, Eric Blake <eblake@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Troy Lee <leetroy@gmail.com>, Halil Pasic <pasic@linux.ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Laurent Vivier <laurent@vivier.eu>, Ani Sinha <anisinha@redhat.com>,
-        Weiwei Li <liwei1518@gmail.com>, Eric Farman <farman@linux.ibm.com>,
-        Steven Lee <steven_lee@aspeedtech.com>,
-        Brian Cain <brian.cain@oss.qualcomm.com>,
-        Li-Wen Hsu <lwhsu@freebsd.org>, Jamin Lin <jamin_lin@aspeedtech.com>,
-        qemu-s390x@nongnu.org,
-        Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
-        qemu-block@nongnu.org, Bernhard Beschow <shentey@gmail.com>,
-        =?UTF-8?Q?Cl=C3=A9ment_Mathieu--Drif?= <clement.mathieu--drif@eviden.com>,
-        Maksim Davydov <davydov-max@yandex-team.ru>,
-        Niek Linnenbank <nieklinnenbank@gmail.com>,
-        =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Paul Durrant <paul@xen.org>,
-        Manos Pitsidianakis <manos.pitsidianakis@linaro.org>,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Igor Mitsyanko <i.mitsyanko@gmail.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Pierrick Bouvier <pierrick.bouvier@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, Anton Johansson <anjo@rev.ng>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Cleber Rosa <crosa@redhat.com>, Eric Auger <eric.auger@redhat.com>,
-        Yanan Wang <wangyanan55@huawei.com>, qemu-arm@nongnu.org,
-        Hao Wu <wuhaotsh@google.com>, Mads Ynddal <mads@ynddal.dk>,
-        Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
-        qemu-riscv@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, Nicholas Piggin <npiggin@gmail.com>,
-        Michael Rolnik <mrolnik@gmail.com>, Zhao Liu <zhao1.liu@intel.com>,
-        Alessandro Di Federico <ale@rev.ng>, Thomas Huth <thuth@redhat.com>,
-        Antony Pavlov <antonynpavlov@gmail.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>, Hanna Reitz <hreitz@redhat.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Qiuhao Li <Qiuhao.Li@outlook.com>, Hyman Huang <yong.huang@smartx.com>,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        Magnus Damm <magnus.damm@gmail.com>, qemu-rust@nongnu.org,
-        Bandan Das <bsd@redhat.com>,
-        Strahinja Jankovic <strahinja.p.jankovic@gmail.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        kvm@vger.kernel.org, Fam Zheng <fam@euphon.net>,
-        Jia Liu <proljc@gmail.com>,
-        =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        Subbaraya Sundeep <sundeep.lkml@gmail.com>,
-        Kyle Evans <kevans@freebsd.org>, Song Gao <gaosong@loongson.cn>,
-        Alexandre Iooss <erdnaxe@crans.org>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-        Peter Xu <peterx@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-        BALATON Zoltan <balaton@eik.bme.hu>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        =?UTF-8?B?RnLDqWTDqXJpYyBCYXJyYXQ=?= <fbarrat@linux.ibm.com>,
-        qemu-ppc@nongnu.org, Radoslaw Biernacki <rad@semihalf.com>,
-        Beniamino Galvani <b.galvani@gmail.com>,
-        David Hildenbrand
- <david@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Eduardo Habkost
- <eduardo@habkost.net>,
-        Ahmed Karaman <ahmedkhaledkaraman@gmail.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Mahmoud Mandour
- <ma.mandourr@gmail.com>,
-        Harsh Prateek Bora <harshpb@linux.ibm.com>
-References: <20250612205451.1177751-1-jsnow@redhat.com>
- <20250612205451.1177751-3-jsnow@redhat.com>
-Content-Language: en-US
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <20250612205451.1177751-3-jsnow@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2025/06/13 5:54, John Snow wrote:
-> The next patch will synchronize the qemu.qmp library with the external,
-> standalone version. That synchronization will require an extra ignore
-> for pylint, so do that now.
+> On Mon, 16 Jun 2025 13:18:58 +0200, david@redhat.com wrote:
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+> On 16.06.25 13:13, lizhe.67@bytedance.com wrote:
+> > On Mon, 16 Jun 2025 10:14:23 +0200, david@redhat.com wrote:
+> > 
+> >>>    drivers/vfio/vfio_iommu_type1.c | 55 +++++++++++++++++++++++++++------
+> >>>    1 file changed, 46 insertions(+), 9 deletions(-)
+> >>>
+> >>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >>> index e952bf8bdfab..09ecc546ece8 100644
+> >>> --- a/drivers/vfio/vfio_iommu_type1.c
+> >>> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >>> @@ -469,17 +469,28 @@ static bool is_invalid_reserved_pfn(unsigned long pfn)
+> >>>    	return true;
+> >>>    }
+> >>>    
+> >>> -static int put_pfn(unsigned long pfn, int prot)
+> >>> +static inline void _put_pfns(struct page *page, int npages, int prot)
+> >>>    {
+> >>> -	if (!is_invalid_reserved_pfn(pfn)) {
+> >>> -		struct page *page = pfn_to_page(pfn);
+> >>> +	unpin_user_page_range_dirty_lock(page, npages, prot & IOMMU_WRITE);
+> >>> +}
+> >>>    
+> >>> -		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
+> >>> -		return 1;
+> >>> +/*
+> >>> + * The caller must ensure that these npages PFNs belong to the same folio.
+> >>> + */
+> >>> +static inline int put_pfns(unsigned long pfn, int npages, int prot)
+> >>> +{
+> >>> +	if (!is_invalid_reserved_pfn(pfn)) {
+> >>> +		_put_pfns(pfn_to_page(pfn), npages, prot);
+> >>> +		return npages;
+> >>>    	}
+> >>>    	return 0;
+> >>>    }
+> >>>    
+> >>> +static inline int put_pfn(unsigned long pfn, int prot)
+> >>> +{
+> >>> +	return put_pfns(pfn, 1, prot);
+> >>> +}
+> >>> +
+> >>>    #define VFIO_BATCH_MAX_CAPACITY (PAGE_SIZE / sizeof(struct page *))
+> >>>    
+> >>>    static void __vfio_batch_init(struct vfio_batch *batch, bool single)
+> >>> @@ -806,11 +817,37 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+> >>>    				    bool do_accounting)
+> >>>    {
+> >>>    	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+> >>> -	long i;
+> >>>    
+> >>> -	for (i = 0; i < npage; i++)
+> >>> -		if (put_pfn(pfn++, dma->prot))
+> >>> -			unlocked++;
+> >>> +	while (npage) {
+> >>> +		long nr_pages = 1;
+> >>> +
+> >>> +		if (!is_invalid_reserved_pfn(pfn)) {
+> >>> +			struct page *page = pfn_to_page(pfn);
+> >>> +			struct folio *folio = page_folio(page);
+> >>> +			long folio_pages_num = folio_nr_pages(folio);
+> >>> +
+> >>> +			/*
+> >>> +			 * For a folio, it represents a physically
+> >>> +			 * contiguous set of bytes, and all of its pages
+> >>> +			 * share the same invalid/reserved state.
+> >>> +			 *
+> >>> +			 * Here, our PFNs are contiguous. Therefore, if we
+> >>> +			 * detect that the current PFN belongs to a large
+> >>> +			 * folio, we can batch the operations for the next
+> >>> +			 * nr_pages PFNs.
+> >>> +			 */
+> >>> +			if (folio_pages_num > 1)
+> >>> +				nr_pages = min_t(long, npage,
+> >>> +					folio_pages_num -
+> >>> +					folio_page_idx(folio, page));
+> >>> +
+> >>> +			_put_pfns(page, nr_pages, dma->prot);
+> >>
+> >>
+> >> This is sneaky. You interpret the page pointer a an actual page array,
+> >> assuming that it would give you the right values when advancing nr_pages
+> >> in that array.
+> >>
+> >> This is mostly true, but with !CONFIG_SPARSEMEM_VMEMMAP it is not
+> >> universally true for very large folios (e.g., in a 1 GiB hugetlb folio
+> >> when we cross the 128 MiB mark on x86).
+> >>
+> >> Not sure if that could already trigger here, but it is subtle.
+> > 
+> > As previously mentioned in the email, the code here functions
+> > correctly.
+> > 
+> >>> +			unlocked += nr_pages;
+> >>
+> >> We could do slightly better here, as we already have the folio. We would
+> >> add a unpin_user_folio_dirty_locked() similar to unpin_user_folio().
+> >>
+> >> Instead of _put_pfns, we would be calling
+> >>
+> >> unpin_user_folio_dirty_locked(folio, nr_pages, dma->prot & IOMMU_WRITE);
+> > 
+> > Thank you so much for your suggestion. Does this implementation of
+> > unpin_user_folio_dirty_locked() look viable to you?
+> > 
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index fdda6b16263b..567c9dae9088 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -1689,6 +1689,8 @@ void unpin_user_page_range_dirty_lock(struct page *page, unsigned long npages,
+> >   				      bool make_dirty);
+> >   void unpin_user_pages(struct page **pages, unsigned long npages);
+> >   void unpin_user_folio(struct folio *folio, unsigned long npages);
+> > +void unpin_user_folio_dirty_locked(struct folio *folio,
+> > +		unsigned long npages, bool make_dirty);
+> >   void unpin_folios(struct folio **folios, unsigned long nfolios);
+> >   
+> >   static inline bool is_cow_mapping(vm_flags_t flags)
+> > diff --git a/mm/gup.c b/mm/gup.c
+> > index 84461d384ae2..2f1e14a79463 100644
+> > --- a/mm/gup.c
+> > +++ b/mm/gup.c
+> > @@ -360,11 +360,8 @@ void unpin_user_page_range_dirty_lock(struct page *page, unsigned long npages,
+> >   
+> >   	for (i = 0; i < npages; i += nr) {
+> >   		folio = gup_folio_range_next(page, npages, i, &nr);
+> > -		if (make_dirty && !folio_test_dirty(folio)) {
+> > -			folio_lock(folio);
+> > -			folio_mark_dirty(folio);
+> > -			folio_unlock(folio);
+> > -		}
+> > +		if (make_dirty && !folio_test_dirty(folio))
+> > +			folio_mark_dirty_lock(folio);
+> >   		gup_put_folio(folio, nr, FOLL_PIN);
+> 
+> We can call unpin_user_folio_dirty_locked(). :)
+> 
+> >   	}
+> >   }
+> > @@ -435,6 +432,26 @@ void unpin_user_folio(struct folio *folio, unsigned long npages)
+> >   }
+> >   EXPORT_SYMBOL(unpin_user_folio);
+> >   
+> > +/**
+> > + * unpin_user_folio_dirty_locked() - release pages of a folio and
+> > + * optionally dirty
+> 
+> "conditionally mark a folio dirty and unpin it"
+> 
+> Because that's the sequence in which it is done.
+> 
+> > + *
+> > + * @folio:  pointer to folio to be released
+> > + * @npages: number of pages of same folio
+> 
+> Can we change that to "nrefs" or rather "npins"?
+> 
+> > + * @make_dirty: whether to mark the folio dirty
+> > + *
+> > + * Mark the folio as being modified if @make_dirty is true. Then
+> > + * release npages of the folio.
+> 
+> Similarly, adjust the doc here.
+> 
+> > + */
+> > +void unpin_user_folio_dirty_locked(struct folio *folio,
+> > +		unsigned long npages, bool make_dirty)
+> > +{
+> > +	if (make_dirty && !folio_test_dirty(folio))
+> > +		folio_mark_dirty_lock(folio);
+> > +	gup_put_folio(folio, npages, FOLL_PIN);
+> > +}
+> > +EXPORT_SYMBOL(unpin_user_folio_dirty_locked);
+> 
+> Yes, should probably go into a separate cleanup patch.
 
-Reviewed-by: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Thank you very much for your suggestions. The revised implementation
+is as follows.
+
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index fdda6b16263b..567c9dae9088 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1689,6 +1689,8 @@ void unpin_user_page_range_dirty_lock(struct page *page, unsigned long npages,
+ 				      bool make_dirty);
+ void unpin_user_pages(struct page **pages, unsigned long npages);
+ void unpin_user_folio(struct folio *folio, unsigned long npages);
++void unpin_user_folio_dirty_locked(struct folio *folio,
++		unsigned long npages, bool make_dirty);
+ void unpin_folios(struct folio **folios, unsigned long nfolios);
+ 
+ static inline bool is_cow_mapping(vm_flags_t flags)
+diff --git a/mm/gup.c b/mm/gup.c
+index 84461d384ae2..3d25b2dcbe85 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -360,12 +360,7 @@ void unpin_user_page_range_dirty_lock(struct page *page, unsigned long npages,
+ 
+ 	for (i = 0; i < npages; i += nr) {
+ 		folio = gup_folio_range_next(page, npages, i, &nr);
+-		if (make_dirty && !folio_test_dirty(folio)) {
+-			folio_lock(folio);
+-			folio_mark_dirty(folio);
+-			folio_unlock(folio);
+-		}
+-		gup_put_folio(folio, nr, FOLL_PIN);
++		unpin_user_folio_dirty_locked(folio, nr, make_dirty);
+ 	}
+ }
+ EXPORT_SYMBOL(unpin_user_page_range_dirty_lock);
+@@ -435,6 +430,26 @@ void unpin_user_folio(struct folio *folio, unsigned long npages)
+ }
+ EXPORT_SYMBOL(unpin_user_folio);
+ 
++/**
++ * unpin_user_folio_dirty_locked() - conditionally mark a folio
++ * dirty and unpin it
++ *
++ * @folio:  pointer to folio to be released
++ * @nrefs:  number of pages of same folio
++ * @make_dirty: whether to mark the folio dirty
++ *
++ * Mark the folio as being modified if @make_dirty is true. Then
++ * release nrefs of the folio.
++ */
++void unpin_user_folio_dirty_locked(struct folio *folio,
++		unsigned long nrefs, bool make_dirty)
++{
++	if (make_dirty && !folio_test_dirty(folio))
++		folio_mark_dirty_lock(folio);
++	gup_put_folio(folio, nrefs, FOLL_PIN);
++}
++EXPORT_SYMBOL(unpin_user_folio_dirty_locked);
++
+ /**
+  * unpin_folios() - release an array of gup-pinned folios.
+  * @folios:  array of folios to be marked dirty and released.
+
+--
+
+Hi David, Alex, if there are no further issues, I will include this
+patch as the second separate patch in the v4 version, inserting it
+between the existing two patches. Thank you for your review!
+
+Thanks,
+Zhe
 
