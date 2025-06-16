@@ -1,330 +1,252 @@
-Return-Path: <kvm+bounces-49620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49621-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FB37ADB2E5
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 16:03:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5FF6ADB2F1
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 16:04:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B8607AA971
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 13:58:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0AD01886244
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 14:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8AA2980BF;
-	Mon, 16 Jun 2025 13:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6561C4A0A;
+	Mon, 16 Jun 2025 14:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GSfgzVfT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QPSB21jI"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4202877E3
-	for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 13:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E46DA31
+	for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 14:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750082353; cv=none; b=m4Q4CQCXrz3xAAGyfLIGUYqjTsJ8jL8W3wcVy9yVzlS2JE/oQw8ahJpnc0RXyewB1T2R8/LS6kgPu43w1WKVFlu/+DVVSwgDGFTguasQ11f8iALXLa9eTZj4t5x5q2oVjtnjsoSpHC6t1xHoFQLj6LjL6LHszHfgvo7nzOwb4V4=
+	t=1750082598; cv=none; b=o1w3ChtA8vwYeAmL2LqyrMU7Krq92Ke3J9iCMrSbI1ZK+ZePZllfRHedELo7HxxMaFhqu9Ko2E0G9Es733DgByq21oIf5NLVsczrGJ1H69BtdS/3mJCgeznQ3ySNyS2mE/F1RW1eYpQTAvceu3nNYPGnRKlSmWhMiaQfAIArKyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750082353; c=relaxed/simple;
-	bh=vqy7nH2TRHhiiSz/OGaQv55N1pBGXt8kziKc5Kqy/AY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=heFAH8DE+XYTjPs27wpgKKJwbDxpEks5ME3C72A7S5yI9p4iaz1eZARhLR6i+JLfIH3WSe3KYgK8NgAoznCW9ewpa45dtN9+JpAwf6qrcCO/xmFBzZy8RSpzZ0bumjKELBWzvIMFhQx77FXWuJE4BqxYCmcRLKo0NCRwQqX4ei4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GSfgzVfT; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1750082598; c=relaxed/simple;
+	bh=bMDMUwzmTP6X3VCRGfbe+JisOCB3Bv7nBVc08LfFDdc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sOr301x4qrP1T6UZasaXO7q3qOa5I1yRIAUyHRSi76RFr1aa5ehNyX//x8ANweukcJiwL+kSEZPEfzVHzQ3r09+ZE8liqyKE2gvbHkcfALoohe6LL7cYP4lbgL62g8hAa+fxCQqxJv7GO7X/9KkWq4Kw/MJ8dRKzFWx3UfeXruQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QPSB21jI; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750082350;
+	s=mimecast20190719; t=1750082596;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MDXOR2+9SFucAcceARHVMU6Tuqx3sff55HmAoDR3SqQ=;
-	b=GSfgzVfTTzMuhSiD6GlCQqbvoRmHKJ1bo3jZtM7DebOrZnCnaMLicGEPYI1+oi3Qm1prZC
-	keKUZ0sIY6q+yXjGZkiPSggg3iKD+namnCDL8rX0rM2J1AhsVV0Whku6OoKvJM3155DEum
-	ALJ5/+MptkZbIuvtYYiHs7NoEhKL5G8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=YYMGqbsE8xuxr6+j51x+v+1ZVm8RBXnD2cwLTgvX0ig=;
+	b=QPSB21jITtdFdUuosM2G5CwnkpToL0MPrGKNTNkH2RRck3fjULgOpyKwVvubXoCWYuIkI0
+	bQH7bUk1dYRHfJQYUlFNIihvUrZ2GhjkCwZl76BbqN3uNNbyLVCufPACmBseDpHlp8i4Co
+	vxPTXK4X+mvalK0jtjNwAS/kiW5elG0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-351-B5jWeBEaP4-2UQcbneRCEQ-1; Mon, 16 Jun 2025 09:59:08 -0400
-X-MC-Unique: B5jWeBEaP4-2UQcbneRCEQ-1
-X-Mimecast-MFC-AGG-ID: B5jWeBEaP4-2UQcbneRCEQ_1750082347
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4f7ebfd00so2117760f8f.2
-        for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 06:59:08 -0700 (PDT)
+ us-mta-607-uZhXOewUPeeoiRLyQeCQGQ-1; Mon, 16 Jun 2025 10:03:14 -0400
+X-MC-Unique: uZhXOewUPeeoiRLyQeCQGQ-1
+X-Mimecast-MFC-AGG-ID: uZhXOewUPeeoiRLyQeCQGQ_1750082593
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-450db029f2aso21510045e9.3
+        for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 07:03:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750082347; x=1750687147;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MDXOR2+9SFucAcceARHVMU6Tuqx3sff55HmAoDR3SqQ=;
-        b=piqAssoDSR/rOhb35axGrv2yus0LlzzQuaxfmRZrGJn0IVh6m1u7mcKFW3WR8MPtNe
-         V7AGBNLCV1iXuwWSkb6I7y5N1cHFbwGfDC75kZFGIE4TMNT/ALTlY29/1OHFc2G1+J29
-         d5/nOH6118ydLARA+F767xO9nShJBw3P3ZrH9ow5P33rv6Cz1AmOxiOLRSgMR3hjmlds
-         aVb3vpSHrhcMXPgPHm7gpyYjIqEg8hPCtMxo0r1FH4ijqpoU7fdtHUVwijcCYZj9xQOE
-         jt9BO13YBZlmfMsYbwqvRC2nu/J5ik3Hmfwppl2oFC2esjP/4Eyghxb69UDAyKEbKcud
-         f4Hg==
-X-Forwarded-Encrypted: i=1; AJvYcCViOtH5GI3dyV0tzeqCmVIPS8qaf5HI3Dka66Cu0Z0TAiBsgUNdL50dsPv3127HhyW+x94=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3rwXymoEjnIF8Z61Uzwzug7CsKSOyKEHpt7d6QEQJkLb1HXzq
-	GsUkHFlnpRQM9CeP+eYNLvTUdT4s4K9ERCAYhck01y0CWnQs+/2tMJYCp+6wYoaQFTxWrwhtjkA
-	NDsxUFodtyVra2yDppRcuUQRTlpfeZSn8tj5qs4BvOZVlIoj9V1wU2g==
-X-Gm-Gg: ASbGnctyDzSgzhV0FE+jmub9xacuKKMo36Nt4G7cDGfWFkCgV0gUsrgu1kj4NXH/AP6
-	LJ/Te3Refo03twehl/YR3lkGvkSvgwDhEViP3YqJZHbA9KgKVSPolFnPNImHcCCdM0CJTI00+fE
-	P17JvRF0ll/PratIrsVKnFKbFKNZRFYI8jV54Tlhx1H2v+/M/r8xTKLCyJjaekDkfPqpVl2SOKb
-	MkFCWL4lqWTAk1koiI+j7XAfYWAv3xQZbPTkmW19DKn9PnVvwlvt2um5N7U/CQ0qFiVgs4Ogsjq
-	UmLm+yKmG2ECZLvm5+WSm1sP9kE=
-X-Received: by 2002:a05:6000:2913:b0:3a4:c2e4:11b with SMTP id ffacd0b85a97d-3a572e5889amr7854242f8f.51.1750082346885;
-        Mon, 16 Jun 2025 06:59:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGRgV7a2zE81Cn4q+8HsPH4Efg/1Yo3ECeuGZsn/U6pXmXm9DovaRfGerUSfCxyx2uouMUMag==
-X-Received: by 2002:a05:6000:2913:b0:3a4:c2e4:11b with SMTP id ffacd0b85a97d-3a572e5889amr7854209f8f.51.1750082346294;
-        Mon, 16 Jun 2025 06:59:06 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.202.17])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e2354fbsm143617795e9.15.2025.06.16.06.59.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Jun 2025 06:59:05 -0700 (PDT)
-Date: Mon, 16 Jun 2025 15:59:01 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Xuewei Niu <niuxuewei97@gmail.com>
-Cc: mst@redhat.com, pabeni@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, davem@davemloft.net, netdev@vger.kernel.org, stefanha@redhat.com, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	fupan.lfp@antgroup.com, Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: Re: [PATCH net-next v2 3/3] test/vsock: Add ioctl SIOCINQ tests
-Message-ID: <2oxz7toygswngn7kfmsrbmpikk5qggwbvk3oxb5ucrbq3pcfff@azc54m4hwlfb>
-References: <20250613031152.1076725-1-niuxuewei.nxw@antgroup.com>
- <20250613031152.1076725-4-niuxuewei.nxw@antgroup.com>
+        d=1e100.net; s=20230601; t=1750082593; x=1750687393;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YYMGqbsE8xuxr6+j51x+v+1ZVm8RBXnD2cwLTgvX0ig=;
+        b=kErwtujPWPltlu4f30NIzZp/tNIYxqY6LMArdvBesTDJy8AM013HZ4hyFTcTzbE5EW
+         LeToyP4JIsauJ3PZFWdN4wBrE4OlgWwAnDIPPuv4UHT7pxdk3EzboF4RHrXwjQeUPy2C
+         p8JRjUk8t+UNFd51Wj/RHasbsBUGvYwEkR6mMO4+ALRaxJp/55SUYNjn0LB7MUgOIBeA
+         HfbNLJL1EjgBL0alk6UK42Z4N/pm9lvJnhlMhlOCMLCPb0l3Vfm2TwyAq3vglBYp4Yc0
+         uGV5yw6wOqDeVibEsQA7m2SAqy5wCO3/zN1Tg3jS5/pgCcvGpBIErppPORhJPX4f8zdv
+         wS2A==
+X-Gm-Message-State: AOJu0Ywa1Y051Q3iXqZ9Y5a1zGEPNXejdRYAtECyzfsROxMGTUvO5/EK
+	KPdPDpQXgSkHznK9fkIPL7+qJIAtYncUa8VI0J/y9Y6T69o5ANNO8D8Fa1EotdkdS52rBG5qQ0T
+	5QDsC8kc6Z1WDn/PLLtqDbLkbQe0lp0SQc6QWCtNUQELN4E/N5ESSjg==
+X-Gm-Gg: ASbGncuryofjDJgtRBEP6QG++o6kS+Kv+j3r/4Y1Grvcn/wyol1wj7x7qTqqLHgnyTh
+	LUBN1InJpYS71RszyFufNCAythvztLrRptIb2zTXJmdNztocx21Yeg7cOfLSClw8QiNqeDx4bPK
+	xq8fUP/0PZPjW2yLCuRYxc4ag2YI8bb7PueqtCUJ/G7x1IbSRZwfrvQwndm90HGiwYnSzu3Cryo
+	gfQghD+PhZdrzH7gPUDbRxQ6dTa7NPlqLnXJkjQIXkj11SOpkzKRBe2S6TW0Ez2n4YxVqNHfc6a
+	Dt6p3PI+IjBt0jIK0cRaMGXpyou1IkXLZrez/aqBYLrCovaEKnWIAWIb0MMPS0VvfizpMrHdfIu
+	prtdgVGvfn6iDbW60VD2x8iPEvjiRjaYlWvxzAME2dSJYAB8=
+X-Received: by 2002:a05:600c:6099:b0:43c:eeee:b70a with SMTP id 5b1f17b1804b1-4533cadb4femr70242675e9.22.1750082592855;
+        Mon, 16 Jun 2025 07:03:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEU7FGgcnPjUGGNJEehoPKJ/KEDmy26JrIQxnf6DDI7pUi8iBQVhJ8twwNg8wb4K6FBIpsl5w==
+X-Received: by 2002:a05:600c:6099:b0:43c:eeee:b70a with SMTP id 5b1f17b1804b1-4533cadb4femr70241455e9.22.1750082591911;
+        Mon, 16 Jun 2025 07:03:11 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f25:bd00:949:b5a9:e02a:f265? (p200300d82f25bd000949b5a9e02af265.dip0.t-ipconnect.de. [2003:d8:2f25:bd00:949:b5a9:e02a:f265])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568a547ecsm11376603f8f.17.2025.06.16.07.03.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Jun 2025 07:03:11 -0700 (PDT)
+Message-ID: <bbc213c3-bc3d-4f57-b357-a79a9e9290c5@redhat.com>
+Date: Mon, 16 Jun 2025 16:03:08 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250613031152.1076725-4-niuxuewei.nxw@antgroup.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd
+ pages
+To: Ira Weiny <ira.weiny@intel.com>, Sean Christopherson <seanjc@google.com>,
+ Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
+ mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
+ roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+ rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
+References: <20250611133330.1514028-1-tabba@google.com>
+ <20250611133330.1514028-9-tabba@google.com> <aEySD5XoxKbkcuEZ@google.com>
+ <68501fa5dce32_2376af294d1@iweiny-mobl.notmuch>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <68501fa5dce32_2376af294d1@iweiny-mobl.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 13, 2025 at 11:11:52AM +0800, Xuewei Niu wrote:
->This patch adds SIOCINQ ioctl tests for both SOCK_STREAM and
->SOCK_SEQPACKET.
->
->The client waits for the server to send data, and checks if the SIOCINQ
->ioctl value matches the data size. After consuming the data, the client
->checks if the SIOCINQ value is 0.
->
->Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
->---
-> tools/testing/vsock/util.c       | 36 ++++++++++----
-> tools/testing/vsock/util.h       |  2 +
-> tools/testing/vsock/vsock_test.c | 83 +++++++++++++++++++++++++++++++-
-> 3 files changed, 111 insertions(+), 10 deletions(-)
->
->diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->index 0c7e9cbcbc85..472246198966 100644
->--- a/tools/testing/vsock/util.c
->+++ b/tools/testing/vsock/util.c
->@@ -97,28 +97,46 @@ void vsock_wait_remote_close(int fd)
-> 	close(epollfd);
-> }
->
->-/* Wait until transport reports no data left to be sent.
->- * Return false if transport does not implement the unsent_bytes() callback.
->+/* Wait until ioctl gives an expected int value.
->+ * Return a negative value if the op is not supported.
->  */
->-bool vsock_wait_sent(int fd)
->+int ioctl_int(int fd, unsigned long op, int *actual, int expected)
-> {
->-	int ret, sock_bytes_unsent;
->+	int ret;
->+	char name[32];
->+
->+	if (!actual) {
->+		fprintf(stderr, "%s requires a non-null pointer\n", __func__);
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	snprintf(name, sizeof(name), "ioctl(%lu)", op);
->
-> 	timeout_begin(TIMEOUT);
-> 	do {
->-		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
->+		ret = ioctl(fd, op, actual);
-> 		if (ret < 0) {
-> 			if (errno == EOPNOTSUPP)
-> 				break;
->
->-			perror("ioctl(SIOCOUTQ)");
->+			perror(name);
-> 			exit(EXIT_FAILURE);
-> 		}
->-		timeout_check("SIOCOUTQ");
->-	} while (sock_bytes_unsent != 0);
->+		timeout_check(name);
->+	} while (*actual != expected);
-> 	timeout_end();
->
->-	return !ret;
->+	return ret;
->+}
->+
->+/* Wait until transport reports no data left to be sent.
->+ * Return false if transport does not implement the unsent_bytes() callback.
->+ */
->+bool vsock_wait_sent(int fd)
->+{
->+	int sock_bytes_unsent;
->+
->+	return !(ioctl_int(fd, SIOCOUTQ, &sock_bytes_unsent, 0));
-> }
+On 16.06.25 15:44, Ira Weiny wrote:
+> Sean Christopherson wrote:
+>> On Wed, Jun 11, 2025, Fuad Tabba wrote:
+>>> This patch enables support for shared memory in guest_memfd, including
+>>
+>> Please don't lead with with "This patch", simply state what changes are being
+>> made as a command.
+>>
+>>> mapping that memory from host userspace.
+>>
+>>> This functionality is gated by the KVM_GMEM_SHARED_MEM Kconfig option,
+>>> and enabled for a given instance by the GUEST_MEMFD_FLAG_SUPPORT_SHARED
+>>> flag at creation time.
+>>
+>> Why?  I can see that from the patch.
+>>
+>> This changelog is way, way, waaay too light on details.  Sorry for jumping in at
+>> the 11th hour, but we've spent what, 2 years working on this?
+>>
+>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>> Acked-by: David Hildenbrand <david@redhat.com>
+>>> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+>>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+>>> Signed-off-by: Fuad Tabba <tabba@google.com>
+>>> ---
+>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>>> index d00b85cb168c..cb19150fd595 100644
+>>> --- a/include/uapi/linux/kvm.h
+>>> +++ b/include/uapi/linux/kvm.h
+>>> @@ -1570,6 +1570,7 @@ struct kvm_memory_attributes {
+>>>   #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+>>>   
+>>>   #define KVM_CREATE_GUEST_MEMFD	_IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
+>>> +#define GUEST_MEMFD_FLAG_SUPPORT_SHARED	(1ULL << 0)
+>>
+>> I find the SUPPORT_SHARED terminology to be super confusing.  I had to dig quite
+>> deep to undesrtand that "support shared" actually mean "userspace explicitly
+>> enable sharing on _this_ guest_memfd instance".  E.g. I was surprised to see
+>>
+>> IMO, GUEST_MEMFD_FLAG_SHAREABLE would be more appropriate.  But even that is
+>> weird to me.  For non-CoCo VMs, there is no concept of shared vs. private.  What's
+>> novel and notable is that the memory is _mappable_.  Yeah, yeah, pKVM's use case
+>> is to share memory, but that's a _use case_, not the property of guest_memfd that
+>> is being controlled by userspace.
+>>
+>> And kvm_gmem_memslot_supports_shared() is even worse.  It's simply that the
+>> memslot is bound to a mappable guest_memfd instance, it's that the guest_memfd
+>> instance is the _only_ entry point to the memslot.
+>>
+>> So my vote would be "GUEST_MEMFD_FLAG_MAPPABLE", and then something like
+> 
+> If we are going to change this; FLAG_MAPPABLE is not clear to me either.
+> The guest can map private memory, right?  I see your point about shared
+> being overloaded with file shared but it would not be the first time a
+> term is overloaded.  kvm_slot_has_gmem() does makes a lot of sense.
+> 
+> If it is going to change; how about GUEST_MEMFD_FLAG_USER_MAPPABLE?
 
-Please split this patch in 2, one where you do the refactoring in 
-util.c/h and one for the new test.
+If "shared" is not good enough terminology ...
 
->
-> /* Create socket <type>, bind to <cid, port> and return the file descriptor. */
->diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index 5e2db67072d5..945c85ff8d22 100644
->--- a/tools/testing/vsock/util.h
->+++ b/tools/testing/vsock/util.h
->@@ -3,6 +3,7 @@
-> #define UTIL_H
->
-> #include <sys/socket.h>
->+#include <sys/ioctl.h>
+... can we please just find a way to name what this "non-private" memory 
+is called? That something is mappable into $whatever is not the right 
+way to look at this IMHO. As raised in the past, we can easily support 
+read()/write()/etc to this non-private memory.
 
-Why we need this in util.h?
 
-> #include <linux/vm_sockets.h>
->
-> /* Tests can either run as the client or the server */
->@@ -54,6 +55,7 @@ int vsock_stream_listen(unsigned int cid, unsigned int port);
-> int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
-> 			   struct sockaddr_vm *clientaddrp);
-> void vsock_wait_remote_close(int fd);
->+int ioctl_int(int fd, unsigned long op, int *actual, int expected);
-> bool vsock_wait_sent(int fd);
-> void send_buf(int fd, const void *buf, size_t len, int flags,
-> 	      ssize_t expected_ret);
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index f669baaa0dca..43996447f9a2 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -20,7 +20,6 @@
-> #include <sys/mman.h>
-> #include <poll.h>
-> #include <signal.h>
->-#include <sys/ioctl.h>
-> #include <linux/time64.h>
->
-> #include "vsock_test_zerocopy.h"
->@@ -1305,6 +1304,58 @@ static void test_unsent_bytes_client(const struct test_opts *opts, int type)
-> 	close(fd);
-> }
->
->+static void test_unread_bytes_server(const struct test_opts *opts, int type)
->+{
->+	unsigned char buf[MSG_BUF_IOCTL_LEN];
->+	int client_fd;
->+
->+	client_fd = vsock_accept(VMADDR_CID_ANY, opts->peer_port, NULL, type);
->+	if (client_fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	for (int i = 0; i < sizeof(buf); i++)
->+		buf[i] = rand() & 0xFF;
->+
->+	send_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
->+	control_writeln("SENT");
->+	control_expectln("RECEIVED");
->+
->+	close(client_fd);
->+}
->+
->+static void test_unread_bytes_client(const struct test_opts *opts, int type)
->+{
->+	unsigned char buf[MSG_BUF_IOCTL_LEN];
->+	int ret, fd;
->+	int sock_bytes_unread;
->+
->+	fd = vsock_connect(opts->peer_cid, opts->peer_port, type);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	control_expectln("SENT");
->+	/* The data has arrived but has not been read. The expected is
->+	 * MSG_BUF_IOCTL_LEN.
->+	 */
->+	ret = ioctl_int(fd, TIOCINQ, &sock_bytes_unread, MSG_BUF_IOCTL_LEN);
->+	if (ret) {
->+		fprintf(stderr, "Test skipped, TIOCINQ not supported.\n");
->+		goto out;
->+	}
->+
->+	recv_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
->+	// All date has been consumed, so the expected is 0.
->+	ioctl_int(fd, TIOCINQ, &sock_bytes_unread, 0);
->+	control_writeln("RECEIVED");
->+
->+out:
->+	close(fd);
->+}
->+
-> static void test_stream_unsent_bytes_client(const struct test_opts *opts)
-> {
-> 	test_unsent_bytes_client(opts, SOCK_STREAM);
->@@ -1325,6 +1376,26 @@ static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
-> 	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
-> }
->
->+static void test_stream_unread_bytes_client(const struct test_opts *opts)
->+{
->+	test_unread_bytes_client(opts, SOCK_STREAM);
->+}
->+
->+static void test_stream_unread_bytes_server(const struct test_opts *opts)
->+{
->+	test_unread_bytes_server(opts, SOCK_STREAM);
->+}
->+
->+static void test_seqpacket_unread_bytes_client(const struct test_opts *opts)
->+{
->+	test_unread_bytes_client(opts, SOCK_SEQPACKET);
->+}
->+
->+static void test_seqpacket_unread_bytes_server(const struct test_opts *opts)
->+{
->+	test_unread_bytes_server(opts, SOCK_SEQPACKET);
->+}
->+
-> #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-> /* This define is the same as in 'include/linux/virtio_vsock.h':
->  * it is used to decide when to send credit update message during
->@@ -2016,6 +2087,16 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_seqpacket_unsent_bytes_client,
-> 		.run_server = test_seqpacket_unsent_bytes_server,
-> 	},
->+	{
->+		.name = "SOCK_STREAM ioctl(SIOCINQ) functionality",
->+		.run_client = test_stream_unread_bytes_client,
->+		.run_server = test_stream_unread_bytes_server,
->+	},
->+	{
->+		.name = "SOCK_SEQPACKET ioctl(SIOCINQ) functionality",
->+		.run_client = test_seqpacket_unread_bytes_client,
->+		.run_server = test_seqpacket_unread_bytes_server,
->+	},
+I'll note, the "non-private" memory in guest-memfd behaves just like ... 
+the "shared" memory in shmem ... well, or like other memory in memfd. 
+(which is based on mm/shmem.c).
 
-I think I already mentioned in the previous version: please add new 
-tests at the end of the array, so we can preserve test IDs.
+"Private" is also not the best way to describe the "protected\encrypted" 
+memory, but that ship has sailed with KVM_MEMORY_ATTRIBUTE_PRIVATE.
 
-Thanks,
-Stefano
+I'll further note that in the doc of KVM_SET_USER_MEMORY_REGION2 we talk 
+about "private" vs "shared" memory ... so that would have to be improved 
+as well.
 
-> 	{
-> 		.name = "SOCK_STREAM leak accept queue",
-> 		.run_client = test_stream_leak_acceptq_client,
->-- 
->2.34.1
->
+-- 
+Cheers,
+
+David / dhildenb
 
 
