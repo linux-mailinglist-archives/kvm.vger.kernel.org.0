@@ -1,51 +1,86 @@
-Return-Path: <kvm+bounces-49578-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49579-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28C79ADA98B
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 09:36:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74269ADA9E5
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 09:53:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF6A91709A7
-	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 07:36:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D34B7A912D
+	for <lists+kvm@lfdr.de>; Mon, 16 Jun 2025 07:52:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A69D2045AD;
-	Mon, 16 Jun 2025 07:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB1720C48C;
+	Mon, 16 Jun 2025 07:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="OtqKMLOl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77CEC1F3BB5;
-	Mon, 16 Jun 2025 07:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B926F1DB34B
+	for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 07:53:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750059360; cv=none; b=enEK+QpZgmlWqOwjtX4eIaDbDqEft4y+9GvXfflvgsuMqiTD4hWHc67MW5m80vVn6OzhJxz19R4U8iqB+6zuQDuJzItjJnp2FjA0svpFZZSCWuNdgOpc1xdv6ZLej0hcTBId40Q0DkrMTgwvchHWC4vzimOa1hQZ6dQsnN06bCk=
+	t=1750060388; cv=none; b=uzmeMz3ci5QcwA3yFRF1uRBSLN+bn6003gQW/BEqPnlTh/SQYB7ppO/pZButdWZjdVt3IYgC6C2zfcE6/CsBzIw5vTn5GfW8NUmRrO3goZBme+QskqfkUwUESr3ovm34tFbwW0m3zQaDziKi5uvxy8daqKJvWWYiwHqkcww7Q0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750059360; c=relaxed/simple;
-	bh=UfhgvnXbrQAyNf1/lL9bn8vZlRy3tdLsBFdat30BWwo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PatJYiku4LHDqlgQ/KAR00i7h2LGhIzPZyuL46Hh7Frl3J5fR35+2o6eGzk5jF961tgF1AViQsJX2v7Yw/XLMORsyS5Jndzfbmvbyzix3XsNWurFrLylJFnKUGW/rNZ6gnJA5yeESRzJHsLLVd15HUOYe3AB19VDbT915QPjNLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8CxNHBayU9o040XAQ--.54243S3;
-	Mon, 16 Jun 2025 15:35:54 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by front1 (Coremail) with SMTP id qMiowMDxvhtLyU9okMEcAQ--.34084S4;
-	Mon, 16 Jun 2025 15:35:47 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Xianglai Li <lixianglai@loongson.cn>
+	s=arc-20240116; t=1750060388; c=relaxed/simple;
+	bh=nU3MVzPAz2W/MmUBLQRYb+KaRA8m268+ptAzhabPrCQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P+dak7Vxc448x/legAiUsll0qEhpLTNn6V6MEi425GTzEgkY+mLPBzNHHbF/+4e8JZrCxjm3Ol5eM4tEPHhgYKM/WF8l9R4o6VWTrbJKIRZ4tSybrXfLgroeRkf7QAI1lVIZkjjZt7I6mMvKweJvav6lva3pWquGz9/C5c2YmeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=OtqKMLOl; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-31332cff2d5so3542417a91.1
+        for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 00:53:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1750060386; x=1750665186; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BBQ+2bMvAOaABHXtNuxuVBu+Oc5HFaxNYNRCaBfbVBo=;
+        b=OtqKMLOlxP9ehGokSF/Q+AKz/N6L09aPqvowzph98QqYPSlDsjHODnG7cVUAVqlF4S
+         QeTmZoGu6qGg1Xlzf5BdFrMvIZxr5xO6sytiVuv16LMdWdaP+nkuxw8haVWHoveeByoU
+         sCPl7LGwqiAkyTkQmTT/WJjBDSI/dA6neN64K0mwtp/7q+uX1jkUC3sNWofk7Mg9b1wa
+         RqiccA3vaZHfhChG6mxYF3A439YYNwYhNhOAgL+zb0WqUCbwriXZ7kQuTxfxGsg/HIBX
+         B/QfqavD04L/nNZ8TUkLp8OF+xhSJvy5sJE1AYz78ZlqV71KlRo4pndymqlnR2Dj0JmK
+         wxpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750060386; x=1750665186;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BBQ+2bMvAOaABHXtNuxuVBu+Oc5HFaxNYNRCaBfbVBo=;
+        b=M4jGiHhbDqzBCZIJgMO8gW9xgc4nBW8bsbSw/m8TD9YmQgF0Qmrclo9iufm7R0Z23H
+         Lv79Vd05An/0VMKy3pdtspLxMwKYfGcqXNrqPai9UAy4y5iGWbI+rP6FgCU1r6JKI4w9
+         fPq07Ko5Puf+AcbgVJcZ2Z2LHvVtEBShcboxl3ZYETXB5euUmtcvsZi36c5yv1SOTiDH
+         DIE9wU5/4+mprBbXuaS7zcNMwK8ehELKmYXeKtD4HYs/ra0Nblad+vKFc/6c0mXh0KtN
+         CmvChpk+V+nJ6RPaKLAaRJroi9ptOVv8pU1Yfx6NHrTch39NVaV9BLIoEhVztIFmsDog
+         Kk7Q==
+X-Gm-Message-State: AOJu0Ywdj3TD8bVLAZg+NVwD79a+5STF5fA93VQUVpR7ncyLjXQdcXgB
+	gxRS1giLg5ovBsBex5qtV/gitqnDxBaBkovOUzvsjJpFQf6ZIs2EwLEmUC+QkP154Io=
+X-Gm-Gg: ASbGnctminFKS+6XohfvfzGX01otE6MQgrnQXN+x/7nh9G6aJv6dw3Betm7DExfxT/N
+	hqEjd7IqnGV5NdP3vc0K6ioT0bSFUfKH/eodjKXvBoRJpdBNU/RtVbzjtZ+XUJc1awPwyl1dnsJ
+	0WZjFgj4W9PqML+WuWTZYYbina3BuQIkwfWSSunURrwKKGbCj6gvY8i7mAIOsXsYPjhh6Im8wf8
+	kyMBLpyOFsitPeoT96Fi9dU1t6ybxrT/rJI8zg/lg5L2yVvImJC9rpfjHETNyJwGRqBw+ZxJaHx
+	KbzeKXybFbUHIlB2VcBbxwQeRMNz0YxM80JPbGv+kX16E5LujHhk9YINYvoQYny2ZRu3To+DdNY
+	Izlf5oVUn90a6qA==
+X-Google-Smtp-Source: AGHT+IE2b2wVBEzCLW4p0LTN9AxQbWpaHf9MTFJ34uDqSAIumyaW8XvtdoyxYcfKP/ch+23nwmdzgA==
+X-Received: by 2002:a17:90b:1dc4:b0:311:fde5:e225 with SMTP id 98e67ed59e1d1-313f1c01641mr15461579a91.14.1750060385867;
+        Mon, 16 Jun 2025 00:53:05 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.13])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d88be76sm55179045ad.32.2025.06.16.00.53.03
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 16 Jun 2025 00:53:05 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: alex.williamson@redhat.com
 Cc: kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] LoongArch: KVM: INTC: Add IOCSR MISC register emulation
-Date: Mon, 16 Jun 2025 15:35:39 +0800
-Message-Id: <20250616073539.129365-3-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20250616073539.129365-1-maobibo@loongson.cn>
-References: <20250616073539.129365-1-maobibo@loongson.cn>
+	linux-kernel@vger.kernel.org,
+	david@redhat.com,
+	peterx@redhat.com,
+	lizhe.67@bytedance.com
+Subject: [PATCH v3 0/2] vfio/type1: optimize vfio_unpin_pages_remote() for large folio
+Date: Mon, 16 Jun 2025 15:52:49 +0800
+Message-ID: <20250616075251.89067-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -53,220 +88,103 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMDxvhtLyU9okMEcAQ--.34084S4
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
 
-IOCSR MISC register 0x420 controlls some features of eiointc, such
-as BIT48 enables eiointc and BIT49 set interrupt encoding mode. Here
-add IOCSR MISC register emulation in eiointc driver.
+From: Li Zhe <lizhe.67@bytedance.com>
 
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
----
- arch/loongarch/include/asm/kvm_eiointc.h |   4 +
- arch/loongarch/include/asm/loongarch.h   |   1 +
- arch/loongarch/kvm/intc/eiointc.c        | 136 ++++++++++++++++++++++-
- 3 files changed, 140 insertions(+), 1 deletion(-)
+This patchset is based on patch 'vfio/type1: optimize
+vfio_pin_pages_remote() for large folios'[1].
 
-diff --git a/arch/loongarch/include/asm/kvm_eiointc.h b/arch/loongarch/include/asm/kvm_eiointc.h
-index a3a40aba8acf..77cd2b3a6f76 100644
---- a/arch/loongarch/include/asm/kvm_eiointc.h
-+++ b/arch/loongarch/include/asm/kvm_eiointc.h
-@@ -17,6 +17,9 @@
- /* map to ipnum per 32 irqs */
- #define EIOINTC_IRQS_NODETYPE_COUNT	16
- 
-+#define MISC_BASE			0x420
-+#define MISC_SIZE			0x8
-+
- #define EIOINTC_BASE			0x1400
- #define EIOINTC_SIZE			0x900
- 
-@@ -59,6 +62,7 @@ struct loongarch_eiointc {
- 	struct kvm *kvm;
- 	struct kvm_io_device device;
- 	struct kvm_io_device device_vext;
-+	struct kvm_io_device misc;
- 	uint32_t num_cpu;
- 	uint32_t features;
- 	uint32_t status;
-diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
-index d84dac88a584..e30d330d497e 100644
---- a/arch/loongarch/include/asm/loongarch.h
-+++ b/arch/loongarch/include/asm/loongarch.h
-@@ -1141,6 +1141,7 @@
- #define  IOCSR_MISC_FUNC_SOFT_INT	BIT_ULL(10)
- #define  IOCSR_MISC_FUNC_TIMER_RESET	BIT_ULL(21)
- #define  IOCSR_MISC_FUNC_EXT_IOI_EN	BIT_ULL(48)
-+#define  IOCSR_MISC_FUNC_INT_ENCODE	BIT_ULL(49)
- #define  IOCSR_MISC_FUNC_AVEC_EN	BIT_ULL(51)
- 
- #define LOONGARCH_IOCSR_CPUTEMP		0x428
-diff --git a/arch/loongarch/kvm/intc/eiointc.c b/arch/loongarch/kvm/intc/eiointc.c
-index d9c4fe93405d..26b8e52d74f1 100644
---- a/arch/loongarch/kvm/intc/eiointc.c
-+++ b/arch/loongarch/kvm/intc/eiointc.c
-@@ -781,6 +781,129 @@ static const struct kvm_io_device_ops kvm_eiointc_virt_ops = {
- 	.write	= kvm_eiointc_virt_write,
- };
- 
-+
-+static int kvm_misc_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
-+			gpa_t addr, int len, void *val)
-+{
-+	unsigned long flags, data, status;
-+	unsigned int shift;
-+	struct loongarch_eiointc *eiointc = vcpu->kvm->arch.eiointc;
-+
-+	if (!eiointc) {
-+		kvm_err("%s: eiointc irqchip not valid!\n", __func__);
-+		return -EINVAL;
-+	}
-+
-+	addr -= MISC_BASE;
-+	if (addr & (len - 1)) {
-+		kvm_err("%s: eiointc not aligned addr %llx len %d\n", __func__, addr, len);
-+		return -EINVAL;
-+	}
-+
-+	spin_lock_irqsave(&eiointc->lock, flags);
-+	status = eiointc->status;
-+	spin_unlock_irqrestore(&eiointc->lock, flags);
-+
-+	data = 0;
-+	if (status & BIT(EIOINTC_ENABLE))
-+		data |= IOCSR_MISC_FUNC_EXT_IOI_EN;
-+	if (status & BIT(EIOINTC_ENABLE_INT_ENCODE))
-+		data |= IOCSR_MISC_FUNC_INT_ENCODE;
-+
-+	shift = (addr & 7) * 8;
-+	data = data >> shift;
-+	switch (len) {
-+	case 1:
-+		*(unsigned char *)val = (unsigned char)data;
-+		break;
-+
-+	case 2:
-+		*(unsigned short *)val = (unsigned short)data;
-+		break;
-+
-+	case 4:
-+		*(unsigned int *)val = (unsigned int)data;
-+		break;
-+
-+	default:
-+		*(unsigned long *)val = data;
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+static int kvm_misc_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
-+			gpa_t addr, int len, const void *val)
-+{
-+	unsigned long flags, data, mask, old;
-+	unsigned int shift;
-+	struct loongarch_eiointc *eiointc = vcpu->kvm->arch.eiointc;
-+
-+	if (!eiointc) {
-+		kvm_err("%s: eiointc irqchip not valid!\n", __func__);
-+		return -EINVAL;
-+	}
-+
-+	addr -= MISC_BASE;
-+	if (addr & (len - 1)) {
-+		kvm_err("%s: eiointc not aligned addr %llx len %d\n", __func__, addr, len);
-+		return -EINVAL;
-+	}
-+
-+	shift = (addr & 7) * 8;
-+	switch (len) {
-+	case 1:
-+		data = *(unsigned char *)val;
-+		mask = 0xFF;
-+		mask = mask << shift;
-+		data = data << shift;
-+		break;
-+
-+	case 2:
-+		data = *(unsigned short *)val;
-+		mask = 0xFFFF;
-+		mask = mask << shift;
-+		data = data << shift;
-+		break;
-+
-+	case 4:
-+		data = *(unsigned int *)val;
-+		mask = UINT_MAX;
-+		mask = mask << shift;
-+		data = data << shift;
-+		break;
-+
-+	default:
-+		data = *(unsigned long *)val;
-+		mask = ULONG_MAX;
-+		mask = mask << shift;
-+		data = data << shift;
-+		break;
-+	}
-+
-+	spin_lock_irqsave(&eiointc->lock, flags);
-+	old = 0;
-+	if (eiointc->status & BIT(EIOINTC_ENABLE))
-+		old |= IOCSR_MISC_FUNC_EXT_IOI_EN;
-+	if (eiointc->status & BIT(EIOINTC_ENABLE_INT_ENCODE))
-+		old |= IOCSR_MISC_FUNC_INT_ENCODE;
-+
-+	data = (old & ~mask) | data;
-+	eiointc->status &= ~(BIT(EIOINTC_ENABLE_INT_ENCODE) | BIT(EIOINTC_ENABLE));
-+	if (data & IOCSR_MISC_FUNC_INT_ENCODE)
-+		eiointc->status |= BIT(EIOINTC_ENABLE_INT_ENCODE);
-+	if (data & IOCSR_MISC_FUNC_EXT_IOI_EN)
-+		eiointc->status |= BIT(EIOINTC_ENABLE);
-+	spin_unlock_irqrestore(&eiointc->lock, flags);
-+	return 0;
-+}
-+
-+static const struct kvm_io_device_ops kvm_misc_ops = {
-+	.read   = kvm_misc_read,
-+	.write  = kvm_misc_write,
-+};
-+
- static int kvm_eiointc_ctrl_access(struct kvm_device *dev,
- 					struct kvm_device_attr *attr)
- {
-@@ -993,8 +1116,18 @@ static int kvm_eiointc_create(struct kvm_device *dev, u32 type)
- 		kfree(s);
- 		return ret;
- 	}
--	kvm->arch.eiointc = s;
- 
-+	device = &s->misc;
-+	kvm_iodevice_init(device, &kvm_misc_ops);
-+	ret = kvm_io_bus_register_dev(kvm, KVM_IOCSR_BUS, MISC_BASE, MISC_SIZE, device);
-+	if (ret < 0) {
-+		kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &s->device);
-+		kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &s->device_vext);
-+		kfree(s);
-+		return ret;
-+	}
-+
-+	kvm->arch.eiointc = s;
- 	return 0;
- }
- 
-@@ -1010,6 +1143,7 @@ static void kvm_eiointc_destroy(struct kvm_device *dev)
- 	eiointc = kvm->arch.eiointc;
- 	kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &eiointc->device);
- 	kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &eiointc->device_vext);
-+	kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &eiointc->misc);
- 	kfree(eiointc);
- }
- 
+When vfio_unpin_pages_remote() is called with a range of addresses
+that includes large folios, the function currently performs individual
+put_pfn() operations for each page. This can lead to significant
+performance overheads, especially when dealing with large ranges of
+pages. We can optimize this process by batching the put_pfn()
+operations.
+
+The first patch batches the vfio_find_vpfn() calls in function
+vfio_unpin_pages_remote(). However, performance testing indicates that
+this patch does not seem to have a significant impact. The primary
+reason is that the vpfn rb tree is generally empty. Nevertheless, we
+believe it can still offer performance benefits in certain scenarios
+and also lays the groundwork for the second patch. The second patch,
+using the method described earlier, optimizes the performance of
+vfio_unpin_pages_remote() for large folio scenarios.
+
+The performance test results, based on v6.15, for completing the 16G VFIO
+IOMMU DMA unmapping, obtained through unit test[2] with slight
+modifications[3], are as follows.
+
+Base(v6.15):
+./vfio-pci-mem-dma-map 0000:03:00.0 16
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.047 s (338.6 GB/s)
+VFIO UNMAP DMA in 0.138 s (116.2 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.280 s (57.2 GB/s)
+VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.052 s (308.3 GB/s)
+VFIO UNMAP DMA in 0.139 s (115.1 GB/s)
+
+Map[1] + first patch:
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.027 s (596.1 GB/s)
+VFIO UNMAP DMA in 0.138 s (115.8 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.292 s (54.8 GB/s)
+VFIO UNMAP DMA in 0.310 s (51.6 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.032 s (506.5 GB/s)
+VFIO UNMAP DMA in 0.140 s (114.1 GB/s)
+
+Map[1] + first + sencond patch:
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.027 s (598.2 GB/s)
+VFIO UNMAP DMA in 0.049 s (328.7 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.289 s (55.3 GB/s)
+VFIO UNMAP DMA in 0.303 s (52.9 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.032 s (506.8 GB/s)
+VFIO UNMAP DMA in 0.049 s (326.7 GB/s)
+
+The first patch appears to have negligible impact on the performance
+of VFIO UNMAP DMA.
+
+With the second patch, we achieve an approximate 64% performance
+improvement in the VFIO UNMAP DMA item for large folios. For small
+folios, the performance test results appear to show no significant
+changes.
+
+[1]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
+[2]: https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
+[3]: https://lore.kernel.org/all/20250610031013.98556-1-lizhe.67@bytedance.com/
+
+Changelogs:
+
+v2->v3:
+- Split the original patch into two separate patches.
+- Add several comments specific to large folio scenarios.
+- Rename two variables.
+- The update to iova has been removed within the loop in
+  vfio_unpin_pages_remote().
+- Update the performance test results.
+
+v1->v2:
+- Refactor the implementation of the optimized code
+
+v2: https://lore.kernel.org/all/20250610045753.6405-1-lizhe.67@bytedance.com/
+v1: https://lore.kernel.org/all/20250605124923.21896-1-lizhe.67@bytedance.com/
+
+Li Zhe (2):
+  vfio/type1: batch vfio_find_vpfn() in function
+    vfio_unpin_pages_remote()
+  vfio/type1: optimize vfio_unpin_pages_remote() for large folio
+
+ drivers/vfio/vfio_iommu_type1.c | 57 ++++++++++++++++++++++++++-------
+ 1 file changed, 45 insertions(+), 12 deletions(-)
+
 -- 
-2.39.3
+2.20.1
 
 
