@@ -1,190 +1,215 @@
-Return-Path: <kvm+bounces-49778-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49779-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94CEEADDFC3
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 01:36:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F03AADDFDA
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 01:58:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3ABCB3B91FA
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 23:35:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E061C189C696
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 23:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7349C28EA52;
-	Tue, 17 Jun 2025 23:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2E52957CE;
+	Tue, 17 Jun 2025 23:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jbhz1kEp"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="aDeNDSM/"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66442F5329
-	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 23:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3E52F5312;
+	Tue, 17 Jun 2025 23:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750203376; cv=none; b=kGtlxpj+tbMH0j1M8MVZQpUj19QlEHSONSGH4L9Bf7SsQWqRlLEsPikbMr3NLd4pfcgDodrEBS114GOh0wEg2RRfo+z6TQO3pH63YjKRmlScW3bhZk6Ke9aNrQBA4sIdho5CsKS3eOs/uTRFszsOEeaaEJChzCN8Uj+x9U9dwlo=
+	t=1750204714; cv=none; b=eKEfuBe3fbm5Wz0FGtC+GVwMeXx0RMfDHY+i+P4cEP4sxsIN0/jLS2VZbCoi07+59rF5KMC96CxbO6gGcY333cG42YeTS0JqqS1JmASTiWQOUAE0VtF/i9Ip2mOqvhA/V2/uZseKwRSnl0sYMtJg2uSNqyNiA2MlkWHGqloQOIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750203376; c=relaxed/simple;
-	bh=VBIwT6QOQ4kvU/RSQ+F1tpm5P4QrQgCWJTwuuggqa8A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jclFqj8eiwy3kpA3NoalhJuqa15JWasYIxxJjWh44gc4lP/6Q75SMh9MniAfLAKSSWVj8dOKe1WdBsVB9pOjCmKpAx2igIHJvrVACD1notY5+4CMm2gT80ZHhebD1BwAD9/to7DFKSgmfNZxDX20prqiWtcao1Cn/FShX3NAycw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jbhz1kEp; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750203373;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KBSv6o9j7WYY/vKWRFs7+EFKW/WKi+ZVGi0l2xZHTJg=;
-	b=Jbhz1kEpmLEXC7vNXYLIlNrZRrn4g/yij80aHWywnWxBS2WoGsY7yhg4HGtqJuwNbGTlFx
-	eAr/G+AxVhL2z5j5YI9sJVref7QinFE/tMFp7L+F5nAmQwZnQn4/BzXJpsUQSs4VqALOWn
-	XfVpBqeCjydKML32V3GwGdfFTiAe9Uo=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-543-S0aXADdKNaehcd2IlJr4OQ-1; Tue, 17 Jun 2025 19:36:12 -0400
-X-MC-Unique: S0aXADdKNaehcd2IlJr4OQ-1
-X-Mimecast-MFC-AGG-ID: S0aXADdKNaehcd2IlJr4OQ_1750203371
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6faca0f2677so160411966d6.1
-        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 16:36:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750203371; x=1750808171;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KBSv6o9j7WYY/vKWRFs7+EFKW/WKi+ZVGi0l2xZHTJg=;
-        b=xKb4ZZB7ov7oDiOHSdVZCSoJ6xJ7Xdz8xbiN+VlEDJ7VRkCbH+Ao21OJl5oOpfIsm8
-         Qe5EkTAnKve4+FKZVNIH1rMFsZW+C5JIqZaJvtTzZRzYv57Lp41+U8t6SCocsDAvE/Uw
-         Yo0YcxbAE+lamBJItTvZSST4LGZTCFdcKD9Ce/4xmo0+4a9WByNy6aqOrzGMchWMblee
-         DtECpi01W1ThdAVGFZnegAx/ieVmaVMKnKkcMNlKqG4fwVxdvRn5+9h+IyUQFjOZM9dr
-         WLZKecvLddOSOTgxGHQNJtFHXfZGEfsajLYBGcApvxt0cZitj57XtxZ0ZzrF+at2rp8M
-         QgFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWE1RPJ0/UYG/tzd4KhYC4QcXofO7+6vxI+TnKf63Dh93+QRpMTfWkIQnCCF22U+/cNIyA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhYjnjCOqTz8Q2CYPrhZkm3xzr5Tbyu1lGbafloAH/lvjSdxhi
-	V41sSjsGGRCIAXnzpY+sv9uyfRqaO4tPEBeUTBBopxmCfx5DfcZG6UJU54+JFGaTQOv3/nAeeLC
-	6qjXV0EFX4q2P8L+QFPxTi2DzEkJfae86uMq5GABG39w2/j7Va8jMNQ==
-X-Gm-Gg: ASbGnctL14Uu77nyh4M/Y9tBImxGi1JNUK/Z8AQqLBNnMjlwOCal4NhMtoDAOvH2sy/
-	vXEcH6VPFU87Zv831urIdws7SJJPs8LuWBX1oL728TUj9ITFnjElDJn+TDKw7swKDlKRukyXOnc
-	+1tA2BKVNGGWqztZwPL3Xdz/1VvR5lqCF1KUvBdl5en/OpSCoAj/lDmUckRTgzjGiuNi3JYO+e3
-	IhLXmCyqZbJDybttNjYNiUULmM7K/MwyyU4hIYeELMPojq9SztVmhUaVF8NOe9sGVOGQASX/edy
-	7iczpmzcopk9Ww==
-X-Received: by 2002:a05:6214:5018:b0:6fa:fb25:e0f1 with SMTP id 6a1803df08f44-6fb477d99b7mr200740226d6.24.1750203371424;
-        Tue, 17 Jun 2025 16:36:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFKrTSuB1EI9cqt5G4JNRshFwKRQv2YtvABo07xYPeeJ2qDKgN205wNAbsTpAWIrLURyfvhgg==
-X-Received: by 2002:a05:6214:5018:b0:6fa:fb25:e0f1 with SMTP id 6a1803df08f44-6fb477d99b7mr200739946d6.24.1750203371054;
-        Tue, 17 Jun 2025 16:36:11 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fb4e432100sm37584916d6.116.2025.06.17.16.36.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 16:36:10 -0700 (PDT)
-Date: Tue, 17 Jun 2025 19:36:08 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kvm@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
-	David Hildenbrand <david@redhat.com>,
-	Nico Pache <npache@redhat.com>
-Subject: Re: [PATCH 5/5] vfio-pci: Best-effort huge pfnmaps with !MAP_FIXED
- mappings
-Message-ID: <aFH76GjnWfeHI5fA@x1.local>
-References: <20250613134111.469884-6-peterx@redhat.com>
- <20250613142903.GL1174925@nvidia.com>
- <aExDMO5fZ_VkSPqP@x1.local>
- <20250613160956.GN1174925@nvidia.com>
- <aEx4x_tvXzgrIanl@x1.local>
- <20250613231657.GO1174925@nvidia.com>
- <aFCVX6ubmyCxyrNF@x1.local>
- <20250616230011.GS1174925@nvidia.com>
- <aFHWbX_LTjcRveVm@x1.local>
- <20250617231807.GD1575786@nvidia.com>
+	s=arc-20240116; t=1750204714; c=relaxed/simple;
+	bh=HX7MRmvcueVaUvj7JXHNiLlhLnfO6RxJ38NDNr9sqP4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jocVM3TH/SDxx25OMSa1mxnVe0/YRbgoHq1LvnQO1qmTTUsQqO9KLlf/l+iu5sRR8kTd7Kp5bU56oZEzQ9g2H8Ot7bP2dSPqIwPsKxWuePcE3fYMGGfyG1q6rOQee0zjzdT4xfjU8cjXxW+/PexNlJYjXSasxjqCWOxz2TmklpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=aDeNDSM/; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55HNvpMa1322113
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 17 Jun 2025 16:57:52 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55HNvpMa1322113
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025052101; t=1750204673;
+	bh=p6620qyWPj8fispzJPyWEIIXAvYBb2yN8x8fXfVE1Zs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aDeNDSM/EmMYFj1+3TS9c+ylkfuq8Na6duujVkfhStdPdSPeY9MXE0iDTExzzGD2Y
+	 ix/IUEKvilyOHWcfZiSR+m2Uimt2s7owv1vk95BtjgLpKweQgkguPL9qQg4O0547FA
+	 WV+UFriHRGDlgSzxOptSsfaqjpvribFTeFkv1DqDibStUrKm5ivOVSs/9gUtNX6Bp7
+	 oIMnFR5IxqMtMJWB1qp9zF2dGuTjUXLcFS6vleOcfwJBbomLlR+u7prPhW3H/C3GB6
+	 2yAJVU4kExlA4cJXDCEvJHrDX5Fg7AXS+euaqIgvP6GbGhv+bqo+O7cMrWPvHgUdEv
+	 aw0FbRFgjQ1Zg==
+Message-ID: <25896236-de8d-4bd9-8a27-da407c0e5a38@zytor.com>
+Date: Tue, 17 Jun 2025 16:57:51 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250617231807.GD1575786@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] x86/traps: Initialize DR6 by writing its
+ architectural reset value
+To: Sean Christopherson <seanjc@google.com>,
+        Sohil Mehta <sohil.mehta@intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
+        peterz@infradead.org, brgerst@gmail.com, tony.luck@intel.com,
+        fenghuay@nvidia.com
+References: <20250617073234.1020644-1-xin@zytor.com>
+ <20250617073234.1020644-2-xin@zytor.com>
+ <fa32b6e9-b087-495a-acf1-a28cfed7e28a@intel.com>
+ <aFHUZh6koJyVi3p-@google.com>
+Content-Language: en-US
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <aFHUZh6koJyVi3p-@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 17, 2025 at 08:18:07PM -0300, Jason Gunthorpe wrote:
-> On Tue, Jun 17, 2025 at 04:56:13PM -0400, Peter Xu wrote:
-> > On Mon, Jun 16, 2025 at 08:00:11PM -0300, Jason Gunthorpe wrote:
-> > > On Mon, Jun 16, 2025 at 06:06:23PM -0400, Peter Xu wrote:
-> > > 
-> > > > Can I understand it as a suggestion to pass in a bitmask into the core mm
-> > > > API (e.g. keep the name of mm_get_unmapped_area_aligned()), instead of a
-> > > > constant "align", so that core mm would try to allocate from the largest
-> > > > size to smaller until it finds some working VA to use?
-> > > 
-> > > I don't think you need a bitmask.
-> > > 
-> > > Split the concerns, the caller knows what is inside it's FD. It only
-> > > needs to provide the highest pgoff aligned folio/pfn within the FD.
-> > 
-> > Ultimately I even dropped this hint.  I found that it's not really
-> > get_unmapped_area()'s job to detect over-sized pgoffs.  It's mmap()'s job.
-> > So I decided to avoid this parameter as of now.
+On 6/17/2025 1:47 PM, Sean Christopherson wrote:
+> On Tue, Jun 17, 2025, Sohil Mehta wrote:
+>> On 6/17/2025 12:32 AM, Xin Li (Intel) wrote:
+>>> diff --git a/arch/x86/include/uapi/asm/debugreg.h b/arch/x86/include/uapi/asm/debugreg.h
+>>> index 0007ba077c0c..8f335b9fa892 100644
+>>> --- a/arch/x86/include/uapi/asm/debugreg.h
+>>> +++ b/arch/x86/include/uapi/asm/debugreg.h
+>>> @@ -15,7 +15,12 @@
+>>>      which debugging register was responsible for the trap.  The other bits
+>>>      are either reserved or not of interest to us. */
+>>>   
+>>> -/* Define reserved bits in DR6 which are always set to 1 */
+>>> +/*
+>>> + * Define reserved bits in DR6 which are set to 1 by default.
+>>> + *
+>>> + * This is also the DR6 architectural value following Power-up, Reset or INIT.
+>>> + * Some of these reserved bits can be set to 0 by hardware or software.
+>>> + */
+>>>   #define DR6_RESERVED	(0xFFFF0FF0)
+>>>   
+>>
+>> Calling this "RESERVED" and saying some bits can be modified seems
+>> inconsistent. These bits may have been reserved in the past, but they
+>> are no longer so.
+>>
+>> Should this be renamed to DR6_INIT or DR6_RESET? Your commit log also
+>> says so in the beginning:
+>>
+>>     "Initialize DR6 by writing its architectural reset value to ensure
+>>      compliance with the specification."
+>>
+>> That way, it would also match the usage in code at
+>> initialize_debug_regs() and debug_read_reset_dr6().
+>>
+>> I can understand if you want to minimize changes and do this in a
+>> separate patch, since this would need to be backported.
 > 
-> Well, the point of the pgoff is only what you said earlier, to adjust
-> the starting alignment so the pgoff aligned high order folios/pfns
-> line up properly.
+> Yeah, the name is weird, but IMO DR6_INIT or DR6_RESET aren't great either.  I'm
+> admittedly very biased, but I think KVM's DR6_ACTIVE_LOW better captures the
+> behavior of the bits.  E.g. even if bits that are currently reserved become defined
+> in the future, they'll still need to be active low so as to be backwards compatible
+> with existing software.
 
-I meant "highest pgoff" that I dropped.
+"active low" seems to better indicate how the bits are or will be used.
 
-We definitely need the pgoff to make it work.  So here I dropped "highest
-pgoff" passed from the caller because I decided to leave such check to the
-mmap() hook later.
 
-> 
-> > > The mm knows what leaf page tables options exist. It should try to
-> > > align to the closest leaf page table size that is <= the FD's max
-> > > aligned folio.
-> > 
-> > So again IMHO this is also not per-FD information, but needs to be passed
-> > over from the driver for each call.
-> 
-> It is per-FD in the sense that each FD is unique and each range of
-> pgoff could have a unique maximum.
->  
-> > Likely the "order" parameter appeared in other discussions to imply a
-> > maximum supported size from the driver side (or, for a folio, but that is
-> > definitely another user after this series can land).
-> 
-> Yes, it is the only information the driver can actually provide and
-> comes directly from what it will install in the VMA.
-> 
-> > So far I didn't yet add the "order", because currently VFIO definitely
-> > supports all max orders the system supports.  Maybe we can add the order
-> > when there's a real need, but maybe it won't happen in the near
-> > future?
-> 
-> The purpose of the order is to prevent over alignment and waste of
-> VMA. Your technique to use the length to limit alignment instead is
-> good enough for VFIO but not very general.
+> Note, DR6_VOLATILE and DR6_FIXED_1 aren't necessarily aligned with the current
+> architectural definitions (I haven't actually checked),
 
-Yes that's also something I didn't like.  I think I'll just go ahead and
-add the order parameter, then use it in previous patch too.
+I'm not sure what do you mean by "architectural definitions" here.
 
-I'll wait for some more time though for others' input before a respin.
+However because zeroing DR6 leads to different DR6 values depending on
+whether the CPU supports BLD:
 
-Thanks,
+   1) On CPUs with BLD support, DR6 becomes 0xFFFF07F0 (bit 11, DR6.BLD,
+      is cleared).
+
+   2) On CPUs without BLD, DR6 becomes 0xFFFF0FF0.
+
+DR6_FIXED_1, if it is still defined to include all bits that can't be
+cleared, is a constant value only on a *specific* CPU architecture,
+i.e., it is not a constant value on all CPU implementations.
+
+
+> rather they are KVM's
+> view of the world, i.e. what KVM supports from a virtualization perspective.
+
+So KVM probably should expose the fixed 1s in DR6 to the guest depending 
+on which features, such as BLD or RTM, are enabled and visible to the
+guest or not?
+
+(Sorry I haven't looked into how the macro DR6_FIXED_1 is used in KVM,
+maybe it's already used in such a way)
 
 > 
-> The VFIO part looks pretty good, I still don't really understand why
-> you'd have CONFIG_ARCH_SUPPORTS_HUGE_PFNMAP though. The inline
-> fallback you have for it seems good enough and we don't care if things
-> are overaligned for ioremap.
-> 
-> Jason
-> 
+> Ah, and now I see that DR6_RESERVED is an existing #define in a uAPI header (Xin
+> said there were a few, but I somehow missed them earlier).  Maybe just leave that
+> thing alone, but update the comment to state that it's a historical wart?  And
+> then put DR6_ACTIVE_LOW and other macros in arch/x86/include/asm/debugreg.h?
 
--- 
-Peter Xu
+Yeah, kind of what I'm thinking too :)
+
+I want to replace all DR6_RESERVED uses in kernel with a better name,
+and DR6_ACTIVE_LOW is a good candidate.  (Ofc DR6_RESERVED will be kept
+in the uAPI header).
+
+BTW, I think you want to move DR macros to 
+arch/x86/include/asm/debugreg.h from arch/x86/include/asm/kvm_host.h.
+
+
+> 
+> /*
+>   * DR6_ACTIVE_LOW combines fixed-1 and active-low bits.
+>   * We can regard all the bits in DR6_FIXED_1 as active_low bits;
+>   * they will never be 0 for now, but when they are defined
+>   * in the future it will require no code change.
+>   *
+>   * DR6_ACTIVE_LOW is also used as the init/reset value for DR6.
+>   */
+> #define DR6_ACTIVE_LOW	0xffff0ff0
+> #define DR6_VOLATILE	0x0001e80f
+> #define DR6_FIXED_1	(DR6_ACTIVE_LOW & ~DR6_VOLATILE)
 
 
