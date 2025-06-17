@@ -1,281 +1,291 @@
-Return-Path: <kvm+bounces-49688-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49689-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3353ADC5ED
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 11:16:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6FD2ADC61F
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 11:21:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C15253B6722
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 09:16:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0243218993BB
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 09:22:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5E921B91F;
-	Tue, 17 Jun 2025 09:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02ACD293C7A;
+	Tue, 17 Jun 2025 09:21:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ynddal.dk header.i=@ynddal.dk header.b="t/ebtiKW"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="aVdt8hme"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.qs.icloud.com (p-east3-cluster4-host6-snip4-6.eps.apple.com [57.103.84.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F25701C7017
-	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 09:16:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.84.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29404293C5E
+	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 09:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750151781; cv=none; b=PyMGbvoFNI0OaX8SyhnqFWL57ggXMPRPI5CzzJRvlJV2vg0xKPlv/6UXL0uxtzAnEN957HViLtXdrsWqdk0jW4Y9Ji4ek5xmBskUCY70vPJa+LzhHyqxSQJI7sgDFYrLcTXLNRS1/KmrwJJf7t33OHiOhX3Umq4v9byG5fGSlNE=
+	t=1750152087; cv=none; b=txPFnEt6O7Cw/IJ18QJWe8S9LVbIjabiN1C3e1lfmLh3Xu1FxZOIaao5fcNKercyV9NMK/DPNWOJhQ5NF0ZU01v/BoXx+IdvA/1AjEZLrDagd5mvh9glu3SxL9Y3aqflk7cpFBMiPhsh5ai6g0v6HpvGl1ZcvPic7RdH07i7zI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750151781; c=relaxed/simple;
-	bh=rE/ubjQFdgiuI0vmZM0ZIJcs50rcoMqd4pS81/2JG/k=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=R8L4NYF9L04XU07j56pkENAcqGIeZ8Mc9Cqe35lZ1qHDWPCrXKyVZ71y+aygNy2LYUDp8pj22iIPhNgYy/e5m2obGvx0ZkbmJmBGXz2t88nOqVcm6e/qvdmd5JttuyIxp2rU1JrE1fGdhnCgHpHEh9i4mYB4/7qmygx9CmJKjgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ynddal.dk; spf=pass smtp.mailfrom=ynddal.dk; dkim=pass (2048-bit key) header.d=ynddal.dk header.i=@ynddal.dk header.b=t/ebtiKW; arc=none smtp.client-ip=57.103.84.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ynddal.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ynddal.dk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ynddal.dk; s=sig1;
-	bh=F2Lk87g/ffbwU6AtjA/WqgttL7/b0yIw5RLWx7pPGH8=;
-	h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To:x-icloud-hme;
-	b=t/ebtiKWDY2QkbdzHbQ8JHAQfW1irYE31MIXq5FeLuQBVi2srySC4AW71wet8gKuQ
-	 NlCtlcJtugl2N8OExL2XPUcYb01vz9cJeaP4XAHUNki1VR/W0mWuIgJx8RWVrvaWRH
-	 Byaa4t7oX7MCpWsgwXdEpyufTUl6xr1VGUemjO2LowKLdrX8vshUlah0LMXLG0/Otn
-	 DqAICXcAFc5hhPAYSdZkfGlEh+oBwZSg/5iGUd51B84db5dd/YZZ76xa8b442qkjH0
-	 ayL40utni9I3IDatF919KJrglGL7z8PuqtzAFeSjhXkTD/GNBcY1MXtOOq2jDTx/F/
-	 PhTKUTD3kuRQA==
-Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
-	by outbound.qs.icloud.com (Postfix) with ESMTPS id 45B861800400;
-	Tue, 17 Jun 2025 09:16:15 +0000 (UTC)
-Received: from smtpclient.apple (qs-asmtp-me-k8s.p00.prod.me.com [17.57.155.37])
-	by outbound.qs.icloud.com (Postfix) with ESMTPSA id 9338118011E4;
-	Tue, 17 Jun 2025 09:16:04 +0000 (UTC)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1750152087; c=relaxed/simple;
+	bh=Ow3AGhVqlqjnFCJ1JQEH8ceZfT2t+7tTzq/V/n123cs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AbXCFxTsIaIue8YPXRFUkSOkK39mqJ9axEW96hIC7rmhOAtrM0+vnajOfU9GsrezHFqw/LfxOYgp7NsJjDX6LxQb+ILIKNrqJ7VCefLQEtHp/Brt6dI8/ZR+XWixXN8+FT61LJNYS3MUxOUIEX3WR7BMW/XKrb60EEZEuqHBS2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=aVdt8hme; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-313b6625cf1so4111127a91.0
+        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 02:21:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1750152084; x=1750756884; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tQhHDdXRASPFShTEMtGhN37rSYP2mIQBC7ckn6Zfygs=;
+        b=aVdt8hmecBkj7Y8zeeB8Svdb1CvkJgAF38Fw4OTwoAYojYi6wa7h4zNcGdOyZLHJem
+         qvDFzLQI/uGX28zSCatiahp+mW0U2gk9cKAjFTyhhXWd6czaWsmlxfIqrO1gDlXSh1DU
+         /4SN/ujhlVA+560kv9/Sx2O8Np5T46j+quzEzKndpwauQDrCuVfHAOdHkkvTLetTzqDv
+         qZvGRL3DO+++u/eSRDFalcCoHCrdC81phkUHb9inDB2GJLflLu+Wv2gGkXGKCN1HDcXE
+         GSWyw7lupVkmEWdmCKANCLQz6JEOElIFrXOh2sBhs0ufa35vW4tTb3BeYLl6vzqecS3M
+         pd7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750152084; x=1750756884;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tQhHDdXRASPFShTEMtGhN37rSYP2mIQBC7ckn6Zfygs=;
+        b=Z2qv1CFLQe1hZUxXxS8XnDdMNBx0wuiKz/ik6+o8rLTHYn940Xw7n2mg5uQwz602fo
+         8g+Y2cXGvqa1jQVEr7nDALeGHI5509Q7635GKn+1hun6kue6szbNz3uQ2msHyoR4/gZV
+         8iCQX7Ba6Lg3EAJvxsQ4Hgm5EnimQnkdvOYhsTZ27ELFhPt+FXjQraNbVr3TNRJbBWNz
+         zSwZyWnA+CjpFuRKSs4fXXUl2nxXk/T2IfHgbqnnXpUo5dMzPnNj4fkk6kHE90pdGB0G
+         fO5NnJkBTWu/JjL1dbqG8N3DYRyWVCQx+R3K9N5l8obgqEY9cChA2GmaNEjk+pEwEAoV
+         pgpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWCrCpyepZOae44QuN8TDv8wqPphp28pkArmOis6o76s+SncRiqRX8aH/sHcFhg5xsk2nM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwigCm/RrR8NRXHR3gvEpb9Jm6nIl1PoiHjNnRLt2LWzDW+GwQ1
+	xggU+sVmaxZx+HoUmOmYjIf5MR1/H27FvAbyT/4FF1v4W0avDTPs5MpqfZziYwZtJbg=
+X-Gm-Gg: ASbGncv+4ftmxpQkwakFwvB1gWQyNZQBgO8P/uLY0gfO2xXTJAfXWNGcrzkMnHXtcAV
+	58LseZDlyg4Cw2lfnvRP9Mv4gm50qXeR4AtPTPvQjmyyUR7jY/gTMvGB9p/uHRZht9HvdnGbMD8
+	7orZYuyZuY7iaLBj3C7NlvP+/zzdTgeWt4jkU+Q+vpaUfxLfwenI/+5gl34Sxw6NViOChHOAUbm
+	kxBaHgta16vfHRR5K4gv6ql03/pGJMiOxOTOM/Iiq2UMfQJzv7EE5QPNYsP/zFpAcgNl9B30xdL
+	LeIj8PQ7gvc9KkpXA+ESBeJ3k9/duLj1vI0POIGCS05TwuJ0dvb1oUoZnTsZWsJhosDREIYkr2V
+	9XQquhm4oCAjiMA==
+X-Google-Smtp-Source: AGHT+IH4Lc/yHe2dEENhF5nwP1sRWFMN4XZjeIToef7j+ESUprmceHkDq6MxthbKbJpXxCtADv1M3g==
+X-Received: by 2002:a17:90b:180b:b0:311:1617:5bc4 with SMTP id 98e67ed59e1d1-31427e9f120mr2815486a91.12.1750152084194;
+        Tue, 17 Jun 2025 02:21:24 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.14])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d88e554sm75458145ad.16.2025.06.17.02.21.20
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 17 Jun 2025 02:21:23 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: david@redhat.com
+Cc: akpm@linux-foundation.org,
+	alex.williamson@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lizhe.67@bytedance.com,
+	peterx@redhat.com
+Subject: Re: [PATCH v4 2/3] gup: introduce unpin_user_folio_dirty_locked()
+Date: Tue, 17 Jun 2025 17:21:17 +0800
+Message-ID: <20250617092117.10772-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <34560ae6-c598-4474-a094-a657c973156b@redhat.com>
+References: <34560ae6-c598-4474-a094-a657c973156b@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [PATCH v2 06/12] python: upgrade to python3.9+ syntax
-From: Mads Ynddal <mads@ynddal.dk>
-In-Reply-To: <20250612205451.1177751-7-jsnow@redhat.com>
-Date: Tue, 17 Jun 2025 11:15:53 +0200
-Cc: qemu-devel@nongnu.org,
- Joel Stanley <joel@jms.id.au>,
- Yi Liu <yi.l.liu@intel.com>,
- =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Helge Deller <deller@gmx.de>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Andrew Jeffery <andrew@codeconstruct.com.au>,
- Fabiano Rosas <farosas@suse.de>,
- Alexander Bulekov <alxndr@bu.edu>,
- Darren Kenny <darren.kenny@oracle.com>,
- Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
- =?utf-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Ed Maste <emaste@freebsd.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Warner Losh <imp@bsdimp.com>,
- Kevin Wolf <kwolf@redhat.com>,
- Tyrone Ting <kfting@nuvoton.com>,
- Eric Blake <eblake@redhat.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Troy Lee <leetroy@gmail.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>,
- Michael Roth <michael.roth@amd.com>,
- Laurent Vivier <laurent@vivier.eu>,
- Ani Sinha <anisinha@redhat.com>,
- Weiwei Li <liwei1518@gmail.com>,
- Eric Farman <farman@linux.ibm.com>,
- Steven Lee <steven_lee@aspeedtech.com>,
- Brian Cain <brian.cain@oss.qualcomm.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>,
- Jamin Lin <jamin_lin@aspeedtech.com>,
- qemu-s390x@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
- qemu-block@nongnu.org,
- Bernhard Beschow <shentey@gmail.com>,
- =?utf-8?Q?Cl=C3=A9ment_Mathieu--Drif?= <clement.mathieu--drif@eviden.com>,
- Maksim Davydov <davydov-max@yandex-team.ru>,
- Niek Linnenbank <nieklinnenbank@gmail.com>,
- =?utf-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Paul Durrant <paul@xen.org>,
- Manos Pitsidianakis <manos.pitsidianakis@linaro.org>,
- Jagannathan Raman <jag.raman@oracle.com>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Max Filippov <jcmvbkbc@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Anton Johansson <anjo@rev.ng>,
- Peter Maydell <peter.maydell@linaro.org>,
- Cleber Rosa <crosa@redhat.com>,
- Eric Auger <eric.auger@redhat.com>,
- Yanan Wang <wangyanan55@huawei.com>,
- qemu-arm@nongnu.org,
- Hao Wu <wuhaotsh@google.com>,
- Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
- qemu-riscv@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Nicholas Piggin <npiggin@gmail.com>,
- Michael Rolnik <mrolnik@gmail.com>,
- Zhao Liu <zhao1.liu@intel.com>,
- Alessandro Di Federico <ale@rev.ng>,
- Thomas Huth <thuth@redhat.com>,
- Antony Pavlov <antonynpavlov@gmail.com>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Hanna Reitz <hreitz@redhat.com>,
- Ilya Leoshkevich <iii@linux.ibm.com>,
- Marcelo Tosatti <mtosatti@redhat.com>,
- Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Qiuhao Li <Qiuhao.Li@outlook.com>,
- Hyman Huang <yong.huang@smartx.com>,
- =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>,
- Magnus Damm <magnus.damm@gmail.com>,
- qemu-rust@nongnu.org,
- Bandan Das <bsd@redhat.com>,
- Strahinja Jankovic <strahinja.p.jankovic@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- kvm@vger.kernel.org,
- Fam Zheng <fam@euphon.net>,
- Jia Liu <proljc@gmail.com>,
- =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- Kyle Evans <kevans@freebsd.org>,
- Song Gao <gaosong@loongson.cn>,
- Alexandre Iooss <erdnaxe@crans.org>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
- Peter Xu <peterx@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- BALATON Zoltan <balaton@eik.bme.hu>,
- Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- =?utf-8?B?RnLDqWTDqXJpYyBCYXJyYXQ=?= <fbarrat@linux.ibm.com>,
- qemu-ppc@nongnu.org,
- Radoslaw Biernacki <rad@semihalf.com>,
- Beniamino Galvani <b.galvani@gmail.com>,
- David Hildenbrand <david@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- David Woodhouse <dwmw2@infradead.org>,
- Eduardo Habkost <eduardo@habkost.net>,
- Ahmed Karaman <ahmedkhaledkaraman@gmail.com>,
- Huacai Chen <chenhuacai@kernel.org>,
- Mahmoud Mandour <ma.mandourr@gmail.com>,
- Harsh Prateek Bora <harshpb@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <9C057F25-8BE4-45FC-9332-99F24440DB92@ynddal.dk>
-References: <20250612205451.1177751-1-jsnow@redhat.com>
- <20250612205451.1177751-7-jsnow@redhat.com>
-To: John Snow <jsnow@redhat.com>
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
-X-Proofpoint-GUID: cS2XhPuk0PL7nqO6eEaVM1REG4Ybtl7b
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE3MDA3NSBTYWx0ZWRfX08K7PivxpQIe
- JIe07Ty/NOGrx2MTXIvpSFeyomB4YbIOT4b6MYUQtfEB3ouMu+SNxxFs2tM+rrNQo47+9iSJurY
- P8VXJ6xuKUkf2f8BhJKMV4s70++CGINS7BXOh6rU+z1BzJ9XUk0c+hLcVt5onyRSDY7+ofXLOIX
- HuXVAq7dtrqHWF4XsUvjNncufvqMgc8sQE5C2XgUuo4IRNAuXlmhc9S1F5AIlYOcZSyxtGcjmHz
- 4/YONWYJ5eqltCUefecDWnZR/HJRs98UUeXAhcHBYv+8lAa1kmPrDDgnXBdLe8Yvp2MOQBEPA=
-X-Proofpoint-ORIG-GUID: cS2XhPuk0PL7nqO6eEaVM1REG4Ybtl7b
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-17_04,2025-06-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- adultscore=0 spamscore=0 bulkscore=0 mlxlogscore=714 phishscore=0
- clxscore=1030 suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.22.0-2506060001 definitions=main-2506170075
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
+On Tue, 17 Jun 2025 09:43:56 +0200, david@redhat.com wrote:
+ 
+> On 17.06.25 06:18, lizhe.67@bytedance.com wrote:
+> > From: Li Zhe <lizhe.67@bytedance.com>
+> > 
+> > When vfio_unpin_pages_remote() is called with a range of addresses that
+> > includes large folios, the function currently performs individual
+> > put_pfn() operations for each page. This can lead to significant
+> > performance overheads, especially when dealing with large ranges of pages.
+> > 
+> > This patch optimize this process by batching the put_pfn() operations.
+> > 
+> > The performance test results, based on v6.15, for completing the 16G VFIO
+> > IOMMU DMA unmapping, obtained through unit test[1] with slight
+> > modifications[2], are as follows.
+> > 
+> > Base(v6.15):
+> > ./vfio-pci-mem-dma-map 0000:03:00.0 16
+> > ------- AVERAGE (MADV_HUGEPAGE) --------
+> > VFIO MAP DMA in 0.047 s (338.6 GB/s)
+> > VFIO UNMAP DMA in 0.138 s (116.2 GB/s)
+> > ------- AVERAGE (MAP_POPULATE) --------
+> > VFIO MAP DMA in 0.280 s (57.2 GB/s)
+> > VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
+> > ------- AVERAGE (HUGETLBFS) --------
+> > VFIO MAP DMA in 0.052 s (308.3 GB/s)
+> > VFIO UNMAP DMA in 0.139 s (115.1 GB/s)
+> > 
+> > Map[3] + This patchset:
+> > ------- AVERAGE (MADV_HUGEPAGE) --------
+> > VFIO MAP DMA in 0.028 s (563.9 GB/s)
+> > VFIO UNMAP DMA in 0.049 s (325.1 GB/s)
+> > ------- AVERAGE (MAP_POPULATE) --------
+> > VFIO MAP DMA in 0.294 s (54.4 GB/s)
+> > VFIO UNMAP DMA in 0.296 s (54.1 GB/s)
+> > ------- AVERAGE (HUGETLBFS) --------
+> > VFIO MAP DMA in 0.033 s (485.1 GB/s)
+> > VFIO UNMAP DMA in 0.049 s (324.4 GB/s)
+> > 
+> > For large folio, we achieve an approximate 64% performance improvement
+> > in the VFIO UNMAP DMA item. For small folios, the performance test
+> > results appear to show no significant changes.
+> > 
+> > [1]: https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
+> > [2]: https://lore.kernel.org/all/20250610031013.98556-1-lizhe.67@bytedance.com/
+> > [3]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
+> > 
+> > Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
+> > ---
+> >   drivers/vfio/vfio_iommu_type1.c | 35 +++++++++++++++++++++++++++++----
+> >   1 file changed, 31 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > index e952bf8bdfab..159ba80082a8 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -806,11 +806,38 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+> >   				    bool do_accounting)
+> >   {
+> >   	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+> > -	long i;
+> >   
+> > -	for (i = 0; i < npage; i++)
+> > -		if (put_pfn(pfn++, dma->prot))
+> > -			unlocked++;
+> > +	while (npage) {
+> > +		long nr_pages = 1;
+> > +
+> > +		if (!is_invalid_reserved_pfn(pfn)) {
+> > +			struct page *page = pfn_to_page(pfn);
+> > +			struct folio *folio = page_folio(page);
+> > +			long folio_pages_num = folio_nr_pages(folio);
+> > +
+> > +			/*
+> > +			 * For a folio, it represents a physically
+> > +			 * contiguous set of bytes, and all of its pages
+> > +			 * share the same invalid/reserved state.
+> > +			 *
+> > +			 * Here, our PFNs are contiguous. Therefore, if we
+> > +			 * detect that the current PFN belongs to a large
+> > +			 * folio, we can batch the operations for the next
+> > +			 * nr_pages PFNs.
+> > +			 */
+> > +			if (folio_pages_num > 1)
+> > +				nr_pages = min_t(long, npage,
+> > +					folio_pages_num -
+> > +					folio_page_idx(folio, page));
+> > +
+> 
+> (I know I can be a pain :) )
 
-> diff --git a/scripts/simpletrace.py b/scripts/simpletrace.py
-> index cef81b0707f..a013e4402de 100755
-> --- a/scripts/simpletrace.py
-> +++ b/scripts/simpletrace.py
-> @@ -9,13 +9,15 @@
-> #
-> # For help see docs/devel/tracing.rst
->=20
-> -import sys
-> -import struct
-> import inspect
-> +import struct
-> +import sys
-> import warnings
-> -from tracetool import read_events, Event
-> +
-> +from tracetool import Event, read_events
-> from tracetool.backend.simple import is_string
->=20
-> +
-> __all__ =3D ['Analyzer', 'Analyzer2', 'process', 'run']
->=20
-> # This is the binary format that the QEMU "simple" trace backend
-> @@ -166,11 +168,9 @@ def runstate_set(self, timestamp, pid, =
-new_state):
->=20
->     def begin(self):
->         """Called at the start of the trace."""
-> -        pass
->=20
->     def catchall(self, event, rec):
->         """Called if no specific method for processing a trace event =
-has been found."""
-> -        pass
->=20
->     def _build_fn(self, event):
->         fn =3D getattr(self, event.name, None)
-> @@ -208,7 +208,6 @@ def _process_event(self, rec_args, *, event, =
-event_id, timestamp_ns, pid, **kwar
->=20
->     def end(self):
->         """Called at the end of the trace."""
-> -        pass
->=20
->     def __enter__(self):
->         self.begin()
-> @@ -263,7 +262,6 @@ def runstate_set(self, new_state, *, timestamp_ns, =
-pid, **kwargs):
->=20
->     def catchall(self, *rec_args, event, timestamp_ns, pid, event_id, =
-**kwargs):
->         """Called if no specific method for processing a trace event =
-has been found."""
-> -        pass
->=20
->     def _process_event(self, rec_args, *, event, **kwargs):
->         fn =3D getattr(self, event.name, self.catchall)
-> @@ -279,7 +277,7 @@ def process(events, log, analyzer, =
-read_header=3DTrue):
->     """
->=20
->     if isinstance(events, str):
-> -        with open(events, 'r') as f:
-> +        with open(events) as f:
->             events_list =3D read_events(f, events)
->     elif isinstance(events, list):
->         # Treat as a list of events already produced by =
-tracetool.read_events
-> @@ -332,7 +330,7 @@ def run(analyzer):
->     except (AssertionError, ValueError):
->         raise SimpleException(f'usage: {sys.argv[0]} [--no-header] =
-<trace-events> <trace-file>\n')
->=20
-> -    with open(trace_event_path, 'r') as events_fobj, =
-open(trace_file_path, 'rb') as log_fobj:
-> +    with open(trace_event_path) as events_fobj, open(trace_file_path, =
-'rb') as log_fobj:
->         process(events_fobj, log_fobj, analyzer, read_header=3Dnot =
-no_header)
->=20
-> if __name__ =3D=3D '__main__':
+No, not at all! I really appreciate you taking the time to review my
+patch.
 
-I'm not really a fan of the implicit default arguments, but I guess the =
-rest is fine. If this is the way everyone else wants to go, I won't =
-stand in the way.
+> But the long comment indicates that this is confusing.
+> 
+> 
+> That is essentially the logic in gup_folio_range_next().
+> 
+> What about factoring that out into a helper like
+> 
+> /*
+>   * TODO, returned number includes the provided current page.
+>   */
+> unsigned long folio_remaining_pages(struct folio *folio,
+> 	struct pages *pages, unsigned long max_pages)
+> {
+> 	if (!folio_test_large(folio))
+> 		return 1;
+> 	return min_t(unsigned long, max_pages,
+> 		     folio_nr_pages(folio) - folio_page_idx(folio, page));
+> }
+> 
+> 
+> Then here you would do
+> 
+> if (!is_invalid_reserved_pfn(pfn)) {
+> 	struct page *page = pfn_to_page(pfn);
+> 	struct folio *folio = page_folio(page);
+> 
+> 	/* We can batch-process pages belonging to the same folio. */
+> 	nr_pages = folio_remaining_pages(folio, page, npage);
+> 
+> 	unpin_user_folio_dirty_locked(folio, nr_pages,
+> 				      dma->prot & IOMMU_WRITE);
+> 	unlocked += nr_pages;
+> }
 
-=E2=80=94
-Mads Ynddal
+Yes, this indeed makes the code much more comprehensible. Do you think
+the implementation of the patch as follows look viable to you? I have
+added some brief comments on top of your work to explain why we can
+batch-process pages belonging to the same folio. This was suggested by
+Alex[1].
 
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index e952bf8bdfab..d7653f4c10d5 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -801,16 +801,43 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+        return pinned;
+ }
+ 
++/* Returned number includes the provided current page. */
++static inline unsigned long folio_remaining_pages(struct folio *folio,
++               struct page *page, unsigned long max_pages)
++{
++       if (!folio_test_large(folio))
++               return 1;
++       return min_t(unsigned long, max_pages,
++                    folio_nr_pages(folio) - folio_page_idx(folio, page));
++}
++
+ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+                                    unsigned long pfn, unsigned long npage,
+                                    bool do_accounting)
+ {
+        long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+-       long i;
+ 
+-       for (i = 0; i < npage; i++)
+-               if (put_pfn(pfn++, dma->prot))
+-                       unlocked++;
++       while (npage) {
++               unsigned long nr_pages = 1;
++
++               if (!is_invalid_reserved_pfn(pfn)) {
++                       struct page *page = pfn_to_page(pfn);
++                       struct folio *folio = page_folio(page);
++
++                       /*
++                        * We can batch-process pages belonging to the same
++                        * folio because all pages within a folio share the
++                        * same invalid/reserved state.
++                        * */
++                       nr_pages = folio_remaining_pages(folio, page, npage);
++                       unpin_user_folio_dirty_locked(folio, nr_pages,
++                                       dma->prot & IOMMU_WRITE);
++                       unlocked += nr_pages;
++               }
++
++               pfn += nr_pages;
++               npage -= nr_pages;
++       }
+ 
+        if (do_accounting)
+		vfio_lock_acct(dma, locked - unlocked, true);
+---
+
+Thanks,
+Zhe
+
+[1]: https://lore.kernel.org/all/20250613113818.584bec0a.alex.williamson@redhat.com/
 
