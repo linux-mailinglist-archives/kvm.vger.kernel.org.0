@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-49732-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49730-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B593DADD889
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 18:56:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41EB8ADD8E7
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 19:00:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E80C19E5189
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 16:40:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E4704A1B4B
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 16:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED90E2F94B7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFA52F949D;
 	Tue, 17 Jun 2025 16:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lMigVOHi"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zqn3qYIB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3592F9487
-	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 16:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5728B2F4314
+	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 16:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750178038; cv=none; b=rBgMxISHvh3tYYHjm2zflsF3ofxtce91jIGO/VlEfbOJgERyMUtCqylXQz/qi2HKhSqUmdBBj95zcrUuKWLJxYGa9H8OMh284Nnqbl2QYyJm2IsNqoD5BEh/csdvRfXe7H0JZEFAAJFpXDkOb+dJmix5UAAdPh7/6OsC9uDICsA=
+	t=1750178037; cv=none; b=P1A+U05ChOQ9vvhSxQtqOkleUqzIvQq1MBDZbQDslYOZtLbul02l4KmbuCHVfk9StBxPeN0MNL5MYEE4ZXaibSBEfEe2kiio9VKrCZmmSFiRuHctz1amPG9oUzpnWrGN4px2tMQvl4A4UbpmIRxC05FEOKDvTgYvjs5z/JQxk4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750178038; c=relaxed/simple;
-	bh=uMykn24cLloyAD6efYiyBzsaO8dGZRlbU9DkqTRgsY4=;
+	s=arc-20240116; t=1750178037; c=relaxed/simple;
+	bh=L4myMu/cWT9qX6vmTnTIkHeIJaC5LU9AHzzs8qFm7Ic=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VuLwinFkhtwhmPCWj2vYv4ZM/XtlLX80Y5iWStuCANHnM5jTmslyagQ+CiOfKAdZbUBA4sHSItwkwK51gAw/Y9qrb5muJI2JSRKmp1RsxWAAHxun2mcNmxtx9kITx9B6AH9PE/QaKexqOT9r7Ch8yUM2RYdpGH+qgTwQnZnS3nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lMigVOHi; arc=none smtp.client-ip=209.85.221.41
+	 MIME-Version:Content-Type; b=Lf+W62mN7iE61PC9lE9bEmPWO8alNaIUpZ25eXqXOM3GcV6GqYmnZX9nCNIEqQKv4Fgp3b3+ZRGQcAErpVeBINiT7SQA9Omn5xvgmn0zI4l6MHtkQBuONIns5Eoh6IqACrbVJWhr1qXMGS2Qwn22dd09CHqfkSC7MVbvpRHsVrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zqn3qYIB; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a4f379662cso5130700f8f.0
-        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 09:33:54 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-45305c280a3so25100105e9.3
+        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 09:33:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750178033; x=1750782833; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750178034; x=1750782834; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pBtlyJQHnn2XrK52w3tY8zONlrGnxASWOwYgRCPrevI=;
-        b=lMigVOHikdTI/pwPMVVrs/uuiA9KEuqaNPgAfr5t4uO+m7YUwOfbD21J1ncCt3CutZ
-         Y2Erf+2FeSWZqexxk7n4nDTik3GFAkv6pqF3BJqDgpk03zR7pON4NmsATxW5ih4yzYBn
-         kMSjpamN6RDcjsMxDuOGb0canU+7KD+bYu5rnAI6C+uT9u+rEPPVW231w8ChMreuq2rO
-         sXvy9rJyHWjEK2cFha91gdh8Em9tyl6Q+oSc5x7krDC/owI3ShNmyxjF2cJsTeo7N7by
-         zozZ4p4lm5drNj30AUZ8XZySAceMhijb+JdH+6RCW5CUaPdb4tukmVmjbav2FrEaOJer
-         K6cA==
+        bh=/pVLW980tQUeFMbPOSrmbCV35FWVqLGwZwmiSRkT/nc=;
+        b=zqn3qYIB2/KjIYX1Hrr1lxnjjVIv83ybuBZPpPapn2CPeLiV7Jq8TjEdqYVzgSVmVV
+         K2DI1xQ40odSwe0W7DOMusYIi9QpnulaMb3XednueQ1jbqr+fNL0zLZVFRXzhQ0D8Zf2
+         uZg+wAS4+1UpZsss58XeH3S2ybf9wKXq/x9G8uiK1saS4oIjevMKE7rKhY0m+oV/q9z7
+         wM8Sj3eNul8MVzNKZSbsFy4Q06Z1ko8hdw6MUoIucxgLwxG1uVDgo3BaWKYiBxGJRmfT
+         xhu1saNZ7ZdrUM+B6uP2wE0IIcp7VoT4ELohYHM9S4YG0s1ldrIpVCoFmRqsYVaEM/W6
+         v9VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750178033; x=1750782833;
+        d=1e100.net; s=20230601; t=1750178034; x=1750782834;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pBtlyJQHnn2XrK52w3tY8zONlrGnxASWOwYgRCPrevI=;
-        b=PFQlWSe07B2SZxtyDV/vVqx/3IthzVQdO2DYY2jFYOs6jfvXonRG3yzBhUdyAw4HUo
-         LI5IYYivw5z2OxjBDXsl+I3dPchVCaRFA0ykT4B4+7pwBwj3kqLfBaTtsM7ZOIRIAWuQ
-         ri0cj0bIvSG3V+5DqUJrB8ZxdaBhxSQuegZyn78FHtihn5ioCMzuZ+GXjmfwzyxElJ0l
-         6mIcgErrQLX+USyDNLxy7L9xeI2OxESorKNw/Ij/pGih72hi3fW25kXwor3r3zaWgdJ/
-         XXbS58lFsI+iVXkw6JAMX0VeX+MHJ/nwpNO72Kkik+L2UCHvBmerTEFkUR+tUeNmojW0
-         XsZw==
-X-Forwarded-Encrypted: i=1; AJvYcCUfslRV2/8grGipwyvLHVBFB8ToZvN5ttf/J7RYKcqZeY4dE3x79Jjd/djz3A1zGfucRqw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRUGFJ0DONXst6qArauMY26TliPNNetmW3ONyikBCKJCC21iWl
-	pKKjsXzG7J04BViTPM88yOopN59YA89BTdFxfo/cv3aucQLrgCYumfLdPJagASg4IkE=
-X-Gm-Gg: ASbGnct60mVX05is7UkJpD3+vM9cCBk4YDfyuLWSlvRx2fO3BlbdK/9EcaR3stix65J
-	QUhDnBCqLoafpCcw+Am6scXSE0rshrDcydHL2MpZNhFaqFstqu4bENjSadN9Axlc9ot31Xht9Dp
-	aRH52yxwg7wGANbZZeH0RMFHfNbIjP0AMK6a5DJJ8OCBGCOmywukIP8KmozWIJLPC5RdiM84ApT
-	pa71aBhEaFf4ZKroxA68q2UYJLlRgzVOBZwtCHJKuth3yLqbgB4qalaDYLQoKzf/pkej4HB7YKt
-	S35zpWgvvSHSzSD3ZI2r5NsRK2MReWmqxTmiNlaeCd8fTV29b6RBFJ+wxzR7NI0=
-X-Google-Smtp-Source: AGHT+IH+3wu/JYRt2Cb67tCwy6ldv4JyxCS38r3+XwSF93HDvkOHA/dvMd3/djG9W8UPOVQhwyydqQ==
-X-Received: by 2002:a05:6000:2582:b0:3a5:27ba:479c with SMTP id ffacd0b85a97d-3a5723af8b9mr11474110f8f.43.1750178033368;
+        bh=/pVLW980tQUeFMbPOSrmbCV35FWVqLGwZwmiSRkT/nc=;
+        b=M7i/CyQYWU7uiz74BqPK6tmafdCTc7Nz0B7ra6wY4fKLJARQj4rlyUwVLVjz2Oo8G0
+         Bgyb+9d7g7rKliWmnMumcylanWfkjpbGjaSzg9gUwe/sea+mSIv6sIAe8mHJ5cfoE2hs
+         LAZSCNj6WLPkUKwSli6mMeRnc0pjzmopSWR+1E3Hw3Uk+2DTBX02s7ls4ylKcR5+0sBU
+         VZbd9TWoZrVUXFGZOV/sv5DTKLJlvcTubRaM2VW61lUxkkuB1U50u+PO4kuw60pnWnRb
+         voDXySFAyTTgl9iWK2bX8LBJoSRWOHv7PmpDRMtBI5m4OYPDcBc0Y2fEzqluX0q+WT1r
+         txHg==
+X-Forwarded-Encrypted: i=1; AJvYcCWJuGUoTaDvtHOecbjcYJBLqbMS7dVk3utT/YdiMUhKehQ1CX3ajlwZf46P5Y1HRmU/Pls=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7rB9We/KuJevEBys0jUQaq0kRqn5i2/FGz6dEy7m+qr0jcEYA
+	8GRdU3OTGrE1BN8rcH09Bz3Ckpo/r9UKRm5MdjVh00MFjIr10e3sVpuePqk6fjBSZpY=
+X-Gm-Gg: ASbGncuCQLqfqGRi+M8KtroN3Lat1k395aDUTzmSrsMUDMSw4ixNS9532D3YOfwbUaT
+	heJYsPvM6lYLAI1GFeCLaFT4qGZScqe9+9UJz0n7VJp0jbWlA0Xy+Ijl+fS0znacFeN7B0JNUYI
+	evLyvaaHLgYlCGxER8McLOcv+JRxmpgSpWhXv3pfgPBK0/IUufXX96SYHnz+j0/g98GGbZVegs7
+	DGLR9QhLNJkYysprdMAvDnpoIsSv+5vyQchxMB724cHpS3g/gBT3WM3FmsDO5YCBzPWEa/UPO9l
+	3XsJIiVYQHo6+Wm1n1O2+bnf1PG4h/KVy75yIYaVo6vuIZh169/iWxqFeovqtNQ=
+X-Google-Smtp-Source: AGHT+IE8v8HeR2piaWlFX6bbvfHCxqXZXhONIJkvHNHlEOHHSq+0M0P/3+bbuJRt/SWwiA7WH7QLGg==
+X-Received: by 2002:a05:600c:8286:b0:450:cfe1:a827 with SMTP id 5b1f17b1804b1-4533cb1a7c4mr155107765e9.31.1750178033665;
         Tue, 17 Jun 2025 09:33:53 -0700 (PDT)
 Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b798d3sm14364723f8f.100.2025.06.17.09.33.52
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e268de2sm181468295e9.40.2025.06.17.09.33.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 17 Jun 2025 09:33:52 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id F3F655F845;
-	Tue, 17 Jun 2025 17:33:51 +0100 (BST)
+	by draig.lan (Postfix) with ESMTP id 15EEF5F873;
+	Tue, 17 Jun 2025 17:33:52 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Cornelia Huck <cohuck@redhat.com>,
@@ -87,9 +87,9 @@ Cc: Cornelia Huck <cohuck@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [RFC PATCH 01/11] target/arm: allow gdb to read ARM_CP_NORAW regs (!upstream)
-Date: Tue, 17 Jun 2025 17:33:41 +0100
-Message-ID: <20250617163351.2640572-2-alex.bennee@linaro.org>
+Subject: [RFC PATCH 02/11] target/arm: re-arrange debug_cp_reginfo
+Date: Tue, 17 Jun 2025 17:33:42 +0100
+Message-ID: <20250617163351.2640572-3-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250617163351.2640572-1-alex.bennee@linaro.org>
 References: <20250617163351.2640572-1-alex.bennee@linaro.org>
@@ -102,78 +102,47 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Before this we suppress all ARM_CP_NORAW registers being listed under
-GDB. This includes useful registers like CurrentEL which gets tagged
-as ARM_CP_NO_RAW because it is one of the ARM_CP_SPECIAL_MASK
-registers. These are registers TCG can directly compute because we
-have the information at compile time but until now with no readfn.
-
-Add a .readfn to return the CurrentEL and then loosen the restrictions
-in arm_register_sysreg_for_feature to allow ARM_CP_NORAW registers to
-be read if there is a readfn available.
+Although we are using structure initialisation the order of the
+op[012]/cr[nm] fields don't match the rest of the code base.
+Re-organise to be consistent and help the poor engineer who is
+grepping for system registers.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-ID: <20250507165840.401623-1-alex.bennee@linaro.org>
-
 ---
-vRFC
-  - this is a useful debugging aid but a bit haphazard for
-    up-streaming. See thread comments for details.
----
- target/arm/gdbstub.c |  6 +++++-
- target/arm/helper.c  | 15 ++++++++++++++-
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ target/arm/debug_helper.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
-index ce4497ad7c..029678ac9a 100644
---- a/target/arm/gdbstub.c
-+++ b/target/arm/gdbstub.c
-@@ -282,7 +282,11 @@ static void arm_register_sysreg_for_feature(gpointer key, gpointer value,
-     CPUARMState *env = &cpu->env;
-     DynamicGDBFeatureInfo *dyn_feature = &cpu->dyn_sysreg_feature;
- 
--    if (!(ri->type & (ARM_CP_NO_RAW | ARM_CP_NO_GDB))) {
-+    if (!(ri->type & ARM_CP_NO_GDB)) {
-+        /* skip ARM_CP_NO_RAW if there are no helper functions */
-+        if ((ri->type & ARM_CP_NO_RAW) && !ri->readfn) {
-+            return;
-+        }
-         if (arm_feature(env, ARM_FEATURE_AARCH64)) {
-             if (ri->state == ARM_CP_STATE_AA64) {
-                 arm_gen_one_feature_sysreg(&param->builder, dyn_feature,
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 7631210287..8501c06b93 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -4996,6 +4996,17 @@ static void ic_ivau_write(CPUARMState *env, const ARMCPRegInfo *ri,
- }
- #endif
- 
-+/*
-+ * Normally the current_el is known at translation time and we can
-+ * emit the result directly in TCG code. However this helper exists
-+ * only so we can also expose CURRENTEL to gdb.
-+ */
-+static uint64_t aa64_currentel_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    int el = arm_current_el(env);
-+    return el;
-+}
-+
- static const ARMCPRegInfo v8_cp_reginfo[] = {
-     /*
-      * Minimal set of EL0-visible registers. This will need to be expanded
-@@ -5034,7 +5045,9 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-     },
-     { .name = "CURRENTEL", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .opc2 = 2, .crn = 4, .crm = 2,
--      .access = PL1_R, .type = ARM_CP_CURRENTEL },
-+      .access = PL1_R, .type = ARM_CP_CURRENTEL,
-+      .readfn = aa64_currentel_read
-+    },
-     /*
-      * Instruction cache ops. All of these except `IC IVAU` NOP because we
-      * don't emulate caches.
+diff --git a/target/arm/debug_helper.c b/target/arm/debug_helper.c
+index 69fb1d0d9f..8130ff78de 100644
+--- a/target/arm/debug_helper.c
++++ b/target/arm/debug_helper.c
+@@ -948,19 +948,21 @@ static const ARMCPRegInfo debug_cp_reginfo[] = {
+      * DBGDSAR is deprecated and must RAZ from v8 anyway, so it has no AArch64
+      * accessor.
+      */
+-    { .name = "DBGDRAR", .cp = 14, .crn = 1, .crm = 0, .opc1 = 0, .opc2 = 0,
++    { .name = "DBGDRAR", .cp = 14,
++      .opc0 = 0, .crn = 1, .crm = 0, .opc1 = 0, .opc2 = 0,
+       .access = PL0_R, .accessfn = access_tdra,
+       .type = ARM_CP_CONST | ARM_CP_NO_GDB, .resetvalue = 0 },
+     { .name = "MDRAR_EL1", .state = ARM_CP_STATE_AA64,
+-      .opc0 = 2, .opc1 = 0, .crn = 1, .crm = 0, .opc2 = 0,
++      .opc0 = 2, .crn = 1, .crm = 0, .opc1 = 0, .opc2 = 0,
+       .access = PL1_R, .accessfn = access_tdra,
+       .type = ARM_CP_CONST, .resetvalue = 0 },
+-    { .name = "DBGDSAR", .cp = 14, .crn = 2, .crm = 0, .opc1 = 0, .opc2 = 0,
++    { .name = "DBGDSAR", .cp = 14,
++      .opc0 = 0, .opc1 = 0, .crn = 2, .crm = 0,.opc2 = 0,
+       .access = PL0_R, .accessfn = access_tdra,
+       .type = ARM_CP_CONST | ARM_CP_NO_GDB, .resetvalue = 0 },
+     /* Monitor debug system control register; the 32-bit alias is DBGDSCRext. */
+-    { .name = "MDSCR_EL1", .state = ARM_CP_STATE_BOTH,
+-      .cp = 14, .opc0 = 2, .opc1 = 0, .crn = 0, .crm = 2, .opc2 = 2,
++    { .name = "MDSCR_EL1", .state = ARM_CP_STATE_BOTH, .cp = 14,
++      .opc0 = 2, .opc1 = 0, .crn = 0, .crm = 2, .opc2 = 2,
+       .access = PL1_RW, .accessfn = access_tda,
+       .fgt = FGT_MDSCR_EL1,
+       .nv2_redirect_offset = 0x158,
 -- 
 2.47.2
 
