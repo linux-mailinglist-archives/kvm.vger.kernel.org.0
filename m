@@ -1,162 +1,136 @@
-Return-Path: <kvm+bounces-49713-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49714-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E71F5ADD002
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 16:35:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 857C7ADD01A
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 16:40:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85B00163581
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 14:30:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C23AE1887CE1
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 14:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44A52EF668;
-	Tue, 17 Jun 2025 14:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2A9202961;
+	Tue, 17 Jun 2025 14:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QDe3FgWK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sp6cQCew"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26842EF664;
-	Tue, 17 Jun 2025 14:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9CF1FAC42
+	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 14:36:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750170618; cv=none; b=CQY6n1YPYARtAGB2q9QQ2BLFMZldH3n9YjLDKtHTQgosdZMInxBpF2KO7SxKGyP0P2sfKK3VG/AyX1O5Nxm23FnljWyG4g2SJKAyd6MAdQvxyI7bQSDofwHc93nRHjhEiP2dcxP82Y4j2H86kz6MWwlJW6H/MBOfXKqxhP5JolY=
+	t=1750170986; cv=none; b=By3KfHSw3cagaPScmF2/Bp1za/WLx6uCS6gZwO4gsSrjUg0sf/LleMqRny0Mifi6vLcWY69plvgY/w88f+AFCJXfg8luX1/yx6M1w6MrMR+cflj2BTSPpGtRl8Ni+QLXARDiimoUe8VJkvtITBun//vJifyCdN3BS9s8kMEcv4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750170618; c=relaxed/simple;
-	bh=fr2XMAsOts3e2z91VRBihiSkUtLYOX60usFN8g0EWAQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S2+RdkCtpMA6XlGtruNHEVsWhzfbYMtTVstXkLHtbIFNmfL1q+QuHynAz3JviQw7yMz4gWkJqhavOB/vfQ6Re92STD3+o/i9iyOTRnFtXj70aJy+6ggPjizYnbGTA9LgD8vqPUSOsWTSIbph/y14LEZajEyvpn9qDHNEOMtJAVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QDe3FgWK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9838C4CEE7;
-	Tue, 17 Jun 2025 14:30:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750170618;
-	bh=fr2XMAsOts3e2z91VRBihiSkUtLYOX60usFN8g0EWAQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QDe3FgWKdRYt+BIzMKBQF3t5wcdsgovRo8kcvLAZPRvtxyXl1IvJ1uNlEJh8U4szk
-	 WfnBWWcVDZzqXI61sDtZK990vZVY38xyHXdM8ZsdmGlYrWlwx9hSAd5jzQh+JAMcXz
-	 4UEuHs04KEVpn53uSj9FF9SyIfJ2TnYQ0oGXkwZw7S2c7eR/8u3FrqK1UJ/EVyn7J2
-	 FFrE/9UrKWA1xYiEFfIF+1CF254i3hvfP53fi2s9JlXyyKs/yG9t+uET8HDMiY7EM9
-	 lWYelt+tdc7MIPGZhMbltC42Afg6OnmSi0RmZVMPObkuYfe1NmfQf1XhBBxdk4SbUw
-	 0Rrk2MzTfwCJA==
-Date: Tue, 17 Jun 2025 19:55:01 +0530
-From: Naveen N Rao <naveen@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
-	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
-	David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v3 12/62] KVM: SVM: Inhibit AVIC if ID is too big instead
- of rejecting vCPU creation
-Message-ID: <bmx43lru6mwdyun3ktcmoeezqw6baih7vgtykolsrmu5q2x7vu@xp5jrbbqwzej>
-References: <20250611224604.313496-2-seanjc@google.com>
- <20250611224604.313496-14-seanjc@google.com>
+	s=arc-20240116; t=1750170986; c=relaxed/simple;
+	bh=XascYBoc9NckCIIv+PQoeUxYqjNPXzZSnGc/V/kEwjs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Q3eMZYZKXKpa52ztfET87GhWeRIj9aesaUDBjeJkXg+2/CWMk0fcHvIrMOYuLKmhwQpiwQhjFte3w+1gWU7knbAE6Ej8/7W668fvOrmpjfc3pcFTecuvJPbEVQwHbPGPkQkiHLOyJa4cT4fd+JQsuouvzdt9W2y81ehIzDxDI80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sp6cQCew; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7391d68617cso5369870b3a.0
+        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 07:36:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750170984; x=1750775784; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uMwlSkCNIqJfHOH66+3JA30LqpAbnp8KrvmDSuhH/Ag=;
+        b=sp6cQCewnH92bNA3UZI8X8hP07fmWYuMOsZFn/8O65BPTv+z6ZCvPu/ojtyUV9SXvX
+         mBCG2EjVcEoFmAZCBOuDLT33Vd44Vh7RAEfY5L8JEhdB7+lCH4nlES0WGb7lKDB3hM9j
+         Yiskl6ZyWJsFjhGboi7+YTS22KwCkUwqKNBe3PZkQykFY/Dk8Azlp2Ey1oOdJydzLh4c
+         8ilxDWLLMRpUiug3LF64R1HDJUDQZaJaHd8Rv9TGhb2Z9MypVYwa6GIiFUwEeZA7Nuq9
+         6sKUgt/Km5ayiEjNHf5U3B36Uy42B0IQ9WmXSoZyPeb3iXT4kV4UHv39vqQ651MOr+u2
+         fTsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750170984; x=1750775784;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uMwlSkCNIqJfHOH66+3JA30LqpAbnp8KrvmDSuhH/Ag=;
+        b=PO+V5+07VJj6LyzZw5jehWUxgJgP9nVRf7nb6Nsbw1jkOjm7MEjd0tK9wklQooviOU
+         oNyntEnvzFQa9SE9TBi73ifT1F765CAUe1/qkSxhxvzHuBJ+lIsQQoZ3fUNuDJWBWzYW
+         OwkhDFkSn0hxq865sWSLmTbFATCUQgI4YRYdKDPvKPaCV4BeGojdgknSoJ3e6GgwhMu5
+         68j7qfnkyjUQoW84Q2PIkgSM9PmmomUCCJHjs1nmN1TFEVp067Fx/l0n6MOVsXX9baOx
+         UfRl9pkY1bDBmOTgA+1uZ0b3zj7TX+VeNLUun+1ixdm8TvJK3dhqupZ53i4adtNCZyBK
+         bIDw==
+X-Forwarded-Encrypted: i=1; AJvYcCU1DYwRP7k9oRBa7REWfiobE62WQ8UrTQ226kl4Wi4evZAFDH5jfwjEcKNK7tts8/Jk1WA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9vDZYkVAeaOYtGx+wORqCTGA0Pj+kehzJ0Ismd5GmqCMitMx1
+	HlppdR2u56VKeoslLICnCr4embZmSbi395uauviBZ+AFx1RO+6lfgiOR8gCfnp8+WjhUn5E9ZQF
+	FNGsSyA==
+X-Google-Smtp-Source: AGHT+IFdJLXMZEEu8DdlQZ+U+oQwIvzvdGgAICIJ+geqiAScmpG1InwG5WTe3wRE1wV8wV8tzAaYKmdEpJA=
+X-Received: from pfnw6.prod.google.com ([2002:aa7:8586:0:b0:747:a8e8:603e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:9181:b0:748:a0b9:f873
+ with SMTP id d2e1a72fcca58-748a0b9f8d2mr16220059b3a.9.1750170984466; Tue, 17
+ Jun 2025 07:36:24 -0700 (PDT)
+Date: Tue, 17 Jun 2025 07:36:22 -0700
+In-Reply-To: <CAK9=C2WFA+SDt4MCLj0reQnkkA2kxUmfWhT8HZxjT_DdW8W_rQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250611224604.313496-14-seanjc@google.com>
+Mime-Version: 1.0
+References: <50989f0a02790f9d7dc804c2ade6387c4e7fbdbc.1749634392.git.zhouquan@iscas.ac.cn>
+ <20250611-352bef23df9a4ec55fe5cb68@orel> <aEmsIOuz3bLwjBW_@google.com>
+ <20250612-70c2e573983d05c4fbc41102@orel> <aEymPwNM59fafP04@google.com> <CAK9=C2WFA+SDt4MCLj0reQnkkA2kxUmfWhT8HZxjT_DdW8W_rQ@mail.gmail.com>
+Message-ID: <aFF9ZqbvZZtbUnGt@google.com>
+Subject: Re: [PATCH] RISC-V: KVM: Avoid re-acquiring memslot in kvm_riscv_gstage_map()
+From: Sean Christopherson <seanjc@google.com>
+To: Anup Patel <apatel@ventanamicro.com>
+Cc: Andrew Jones <ajones@ventanamicro.com>, zhouquan@iscas.ac.cn, anup@brainfault.org, 
+	atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 11, 2025 at 03:45:15PM -0700, Sean Christopherson wrote:
-> Inhibit AVIC with a new "ID too big" flag if userspace creates a vCPU with
-> an ID that is too big, but otherwise allow vCPU creation to succeed.
-> Rejecting KVM_CREATE_VCPU with EINVAL violates KVM's ABI as KVM advertises
-> that the max vCPU ID is 4095, but disallows creating vCPUs with IDs bigger
-> than 254 (AVIC) or 511 (x2AVIC).
-> 
-> Alternatively, KVM could advertise an accurate value depending on which
-> AVIC mode is in use, but that wouldn't really solve the underlying problem,
-> e.g. would be a breaking change if KVM were to ever try and enable AVIC or
-> x2AVIC by default.
-> 
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Tested-by: Sairaj Kodilkar <sarunkod@amd.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  9 ++++++++-
->  arch/x86/kvm/svm/avic.c         | 14 ++++++++++++--
->  arch/x86/kvm/svm/svm.h          |  3 ++-
->  3 files changed, 22 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 2a6ef1398da7..a9b709db7c59 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1314,6 +1314,12 @@ enum kvm_apicv_inhibit {
->  	 */
->  	APICV_INHIBIT_REASON_LOGICAL_ID_ALIASED,
->  
-> +	/*
-> +	 * AVIC is disabled because the vCPU's APIC ID is beyond the max
-> +	 * supported by AVIC/x2AVIC, i.e. the vCPU is unaddressable.
-> +	 */
-> +	APICV_INHIBIT_REASON_PHYSICAL_ID_TOO_BIG,
-> +
->  	NR_APICV_INHIBIT_REASONS,
->  };
->  
-> @@ -1332,7 +1338,8 @@ enum kvm_apicv_inhibit {
->  	__APICV_INHIBIT_REASON(IRQWIN),			\
->  	__APICV_INHIBIT_REASON(PIT_REINJ),		\
->  	__APICV_INHIBIT_REASON(SEV),			\
-> -	__APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED)
-> +	__APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED),	\
-> +	__APICV_INHIBIT_REASON(PHYSICAL_ID_TOO_BIG)
->  
->  struct kvm_arch {
->  	unsigned long n_used_mmu_pages;
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index ab228872a19b..f0a74b102c57 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -277,9 +277,19 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
->  	int id = vcpu->vcpu_id;
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  
-> +	/*
-> +	 * Inhibit AVIC if the vCPU ID is bigger than what is supported by AVIC
-> +	 * hardware.  Immediately clear apicv_active, i.e. don't wait until the
-> +	 * KVM_REQ_APICV_UPDATE request is processed on the first KVM_RUN, as
-> +	 * avic_vcpu_load() expects to be called if and only if the vCPU has
-> +	 * fully initialized AVIC.
-> +	 */
->  	if ((!x2avic_enabled && id > AVIC_MAX_PHYSICAL_ID) ||
-> -	    (id > X2AVIC_MAX_PHYSICAL_ID))
-> -		return -EINVAL;
-> +	    (id > X2AVIC_MAX_PHYSICAL_ID)) {
-> +		kvm_set_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_PHYSICAL_ID_TOO_BIG);
-> +		vcpu->arch.apic->apicv_active = false;
+On Sun, Jun 15, 2025, Anup Patel wrote:
+> On Sat, Jun 14, 2025 at 3:59=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Thu, Jun 12, 2025, Andrew Jones wrote:
+> > > On Wed, Jun 11, 2025 at 09:17:36AM -0700, Sean Christopherson wrote:
+> > > > Looks like y'all also have a bug where an -EEXIST will be returned =
+to userspace,
+> > > > and will generate what's probably a spurious kvm_err() message.
+> > >
+> > > On 32-bit riscv, due to losing the upper bits of the physical address=
+? Or
+> > > is there yet another thing to fix?
+> >
+> > Another bug, I think.  gstage_set_pte() returns -EEXIST if a PTE exists=
+, and I
+> > _assume_ that's supposed to be benign?  But this code returns it blindl=
+y:
+>=20
+> gstage_set_pte() returns -EEXIST only when it was expecting a non-leaf
+> PTE at a particular level but got a leaf PTE=20
 
-This bothers me a bit. kvm_create_lapic() does this:
-          if (enable_apicv) {
-                  apic->apicv_active = true;
-                  kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
-	  }
+Right, but isn't returning -EEXIST all the way to userspace undesirable beh=
+avior?
 
-But, setting apic->apicv_active to false here means KVM_REQ_APICV_UPDATE 
-is going to be a no-op.
+E.g. in this sequence, KVM will return -EEXIST and incorrectly terminate th=
+e VM
+(assuming the VMM doesn't miraculously recover somehow):
 
-This does not look to be a big deal given that kvm_create_lapic() itself 
-is called just a bit before svm_vcpu_create() (which calls the above 
-function through avic_init_vcpu()) in kvm_arch_vcpu_create(), so there 
-isn't that much done before apicv_active is toggled.
+ 1. Back the VM with HugeTLBFS
+ 2. Fault-in memory, i.e. create hugepage mappings
+ 3. Enable KVM_MEM_LOG_DIRTY_PAGES
+ 4. Write-protection fault, kvm_riscv_gstage_map() tries to create a writab=
+le
+    non-huge mapping.
+ 5. gstage_set_pte() encounters the huge leaf PTE before reaching the targe=
+t
+    level, and returns -EEXIST.
 
-But, this made me wonder if introducing a kvm_x86_op to check and 
-enable/disable apic->apicv_active in kvm_create_lapic() might be cleaner 
-overall. Maybe even have it be the initialization point for APICv: 
-apicv_init(), so we can invoke avic_init_vcpu() right away?
+AFAICT, gstage_wp_memory_region() doesn't split/shatter/demote hugepages, i=
+t
+simply clears _PAGE_WRITE.
 
-
-- Naveen
-
+It's entirely possible I'm missing something that makes the above scenario
+impossible in practice, but at this point I'm genuinely curious :-)
 
