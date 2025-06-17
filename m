@@ -1,45 +1,46 @@
-Return-Path: <kvm+bounces-49744-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49745-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B85A6ADDB04
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 19:59:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FAD0ADDB0C
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 19:59:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29C9919417F9
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 17:59:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D1E0403EA2
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 17:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AADB277807;
-	Tue, 17 Jun 2025 17:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48B5277CAB;
+	Tue, 17 Jun 2025 17:59:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ET94/gYe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SMAx7yhu"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAEC277008;
-	Tue, 17 Jun 2025 17:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38A927703C;
+	Tue, 17 Jun 2025 17:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750183158; cv=none; b=P5Cxk6wLjPEeF52JLerZ7WCLHYJWvmh+Us/mt4xKDIdMNlHHpK8YFeyVGfhGmBYbygE0Jen5sXAM6MI0kpTkqFAIoLi5tKLonka0aJptPbdK60NX0gm3Xm+RJHjrd8nKhqB1PHv4eX1+BBow27GjNNOvPEaoye6lWYZhmANZ9iY=
+	t=1750183161; cv=none; b=SIufsVD4LKMhFyxuZKgnImowMb1we10VtFwMz2jhp60jqrGL2Tg1sQ1caCBFH55sDZAGI1LcBwlktzcDH42ynnoH0OEL+8nUduj2qxKjPbR9ORZPhCvpVd1PhIOGYp3HKHuT+MoSwt/48V07dIjHX3ZqCn++NEKaN+aV2Q0oNms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750183158; c=relaxed/simple;
-	bh=LdbdRFx+Ehl4OgY5CnLFfZ3GVdzi7sFfhRUzd9mJ/Fs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F1oldFlDdVZYYCsGD70thUAFFOpzXj3jLDuH63P0lm0K9Xb5AWVwTyUUBc3cQ0jvVVJDErgtfNeXYM+gpm5w3LVCYQCBdAfq9IUfP5K0PNSb9l1fLDEatiWzHO69goNMCqu/Qu0hwyMx8aZtG5WDGK12na2Yeel3vLy2PvkvvKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ET94/gYe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 224E6C4CEE3;
-	Tue, 17 Jun 2025 17:59:15 +0000 (UTC)
+	s=arc-20240116; t=1750183161; c=relaxed/simple;
+	bh=guzSVFa4kwHai9EZMK8+P7TeBT5zm7vwCIz/+uGdD5o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=d5gVOcIkLBnMAVe14zsR1/nXHy1wRoa4K1ZaGmM8S+VbTHzXudna+F30toXiac/M/y05JXrWgOPLVqJG3ZsU/Zyu0yZh0gH4mdx1q4G0rjbHNvXW8cKZ0Un01NKW0ThL/CZRpxGbRBKSDl5UTcHUqtyr0aVlvxXpL//bUs5Ng+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SMAx7yhu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F19ADC4CEF2;
+	Tue, 17 Jun 2025 17:59:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750183157;
-	bh=LdbdRFx+Ehl4OgY5CnLFfZ3GVdzi7sFfhRUzd9mJ/Fs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ET94/gYeHAvPpJUMomSJtv1Jzzzxo/p9LI5dMKgSOrLCx8AMCTFe2cc5kzsrZusVi
-	 pZA6m0yZ3eKaKXwi4r0JXeI6Ld3NTTtLsUrAiE3RdbKqkYZlNPqR3OnR3xLiKJRwKy
-	 mW6b2l4vPUooj0+mJXLEuoIO3CsiafjR6Rj+bKNJKIt/ZpHfPG0gxvksHHdpQK2cNz
-	 a8C4ACij0uQLfbWMq1/4M0HxNo0dv1d0RkLuGmHvorhRb/hoy6zuFMv+jGHVlO+3kS
-	 JhY2OiBuSsuGefP3WTgx6UINJgVBrfUUnuzb/0WSXg7BO3iZhSfkAW/JAVJk1cTYdD
-	 WpHOVpKa8Tjuw==
+	s=k20201202; t=1750183160;
+	bh=guzSVFa4kwHai9EZMK8+P7TeBT5zm7vwCIz/+uGdD5o=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=SMAx7yhuA28BYQvwArliGoV3yuWcx5cJN5pyKXWKNMXwxMZiLy8mnBJhPKqheazTl
+	 WaTD1JZpn4HgNmXP6xrXDqTQ8T2aZOgVG/y15CbZVYG5PpMBdpGy4VocI20M+H8dO7
+	 KFq5sMI7BkgJnwb2xyj8hKh5qAi1nGRLG5RpCouM6aJVvCZRUx2hymsiI9vO41Q8/N
+	 DpXuoO0qRis9A38gAAqG40bazMRa5RvuzO8dVGUelKGlwsZHcP+fF2aTkdt8hswZPo
+	 VXL0ibNhW+1WKJaqpnCxfk8E1JYsHUyWZ3zRgDMEQm43lQl80XCWfLGtaqUcvc9ZaU
+	 /BHuTK+gUkGnQ==
 From: Mario Limonciello <superm1@kernel.org>
 To: Bjorn Helgaas <bhelgaas@google.com>
 Cc: Alex Deucher <alexander.deucher@amd.com>,
@@ -66,10 +67,12 @@ Cc: Alex Deucher <alexander.deucher@amd.com>,
 	linux-sound@vger.kernel.org (open list:SOUND),
 	Daniel Dadap <ddadap@nvidia.com>,
 	Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH v2 0/6] PCI/VGA: Look at all PCI display devices in VGA arbiter
-Date: Tue, 17 Jun 2025 12:59:04 -0500
-Message-ID: <20250617175910.1640546-1-superm1@kernel.org>
+Subject: [PATCH v2 1/6] PCI: Add helper for checking if a PCI device is a display controller
+Date: Tue, 17 Jun 2025 12:59:05 -0500
+Message-ID: <20250617175910.1640546-2-superm1@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250617175910.1640546-1-superm1@kernel.org>
+References: <20250617175910.1640546-1-superm1@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,50 +83,41 @@ Content-Transfer-Encoding: 8bit
 
 From: Mario Limonciello <mario.limonciello@amd.com>
 
-On a mobile system with an AMD integrated GPU + NVIDIA discrete GPU the
-AMD GPU is not being selected by some desktop environments for any
-rendering tasks. This is because the neither GPU is being treated as
-"boot_vga" but that is what some environments use to select a GPU [1].
+Several places in the kernel do class shifting to match whether a
+PCI device is display class.  Introduce a helper for those places to
+use.
 
-The VGA arbiter driver only looks at devices that report as PCI display
-VGA class devices. Neither GPU on the system is a display VGA class
-device:
+Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+---
+ include/linux/pci.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-c5:00.0 3D controller: NVIDIA Corporation Device 2db9 (rev a1)
-c6:00.0 Display controller: Advanced Micro Devices, Inc. [AMD/ATI] Device 150e (rev d1)
-
-This series introduces a new helper to find PCI display class devices
-and adjusts various places in the kernel to use it.
-
-It also adjust the VGA arbiter code to consider all these devices as
-the VGA arbiter code does manage to select the correct device by looking
-at which device is using the firmware framebuffer.
-
-v1->v2:
- * Split helper to it's own patch
- * Add patches to use helper elsewhere in kernel
- * Simplify logic instead of making more passes
-
-Mario Limonciello (6):
-  PCI: Add helper for checking if a PCI device is a display controller
-  vfio/pci: Use pci_is_display()
-  vga_switcheroo: Use pci_is_display()
-  iommu/vt-d: Use pci_is_display()
-  ALSA: hda: Use pci_is_display()
-  vgaarb: Look at all PCI display devices in VGA arbiter
-
- drivers/gpu/vga/vga_switcheroo.c |  2 +-
- drivers/iommu/intel/iommu.c      |  2 +-
- drivers/pci/pci-sysfs.c          |  2 +-
- drivers/pci/vgaarb.c             |  8 ++++----
- drivers/vfio/pci/vfio_pci_igd.c  |  3 +--
- include/linux/pci.h              | 15 +++++++++++++++
- sound/hda/hdac_i915.c            |  2 +-
- sound/pci/hda/hda_intel.c        |  4 ++--
- 8 files changed, 26 insertions(+), 12 deletions(-)
-
-
-base-commit: e04c78d86a9699d136910cfc0bdcf01087e3267e
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index 05e68f35f3923..e77754e43c629 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -744,6 +744,21 @@ static inline bool pci_is_vga(struct pci_dev *pdev)
+ 	return false;
+ }
+ 
++/**
++ * pci_is_display - Check if a PCI device is a display controller
++ * @pdev: Pointer to the PCI device structure
++ *
++ * This function determines whether the given PCI device corresponds
++ * to a display controller. Display controllers are typically used
++ * for graphical output and are identified based on their class code.
++ *
++ * Return: true if the PCI device is a display controller, false otherwise.
++ */
++static inline bool pci_is_display(struct pci_dev *pdev)
++{
++	return (pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY;
++}
++
+ #define for_each_pci_bridge(dev, bus)				\
+ 	list_for_each_entry(dev, &bus->devices, bus_list)	\
+ 		if (!pci_is_bridge(dev)) {} else
 -- 
 2.43.0
 
