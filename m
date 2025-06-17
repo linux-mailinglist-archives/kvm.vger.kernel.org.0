@@ -1,197 +1,197 @@
-Return-Path: <kvm+bounces-49657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2961ADC031
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 06:19:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E1EDADC0A4
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 06:33:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1E5E3A22CF
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 04:19:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B85E57A263F
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 04:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972BE23BD06;
-	Tue, 17 Jun 2025 04:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CEB23A563;
+	Tue, 17 Jun 2025 04:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Q2gUkw3r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ad4LrThO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03E923B63E
-	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 04:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679931F192B;
+	Tue, 17 Jun 2025 04:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750133945; cv=none; b=t5f+XJwCqxln++hCqDXDuCT9pn1VsET1o3BrIdDicc0l/zhZuO/wcJWUkNCGHf9A2Yu35opNOQYFxkfNYcPTgfFvxXMVIB2rAIy/HDqYNRLB408Byzlrb1+yOTmhRqX/GyrAXg2jMyC3P64Q9r7h1/8v3PIDHvlyC8dMKaryPjw=
+	t=1750134774; cv=none; b=gOepq11HG8WQeshfBwnE6daP9yz9Xiv5yUiAsAASvRIdgLsg9STvPhAjT8paK15Mo7zQNatfMoffFnSmcTlRZQ8KVaWb5yoxe43FGfkPNjdNYXtQc9OsE/1n2UOhvRlk5DfQD/xylYqrK9PDjR0gryn55z5+2EjY3XwgBEpAnP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750133945; c=relaxed/simple;
-	bh=9yTwG677xHIKywB9F1vTvU6hKUvXiGxwJv/De0T4VnA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ezTNK+0qOb2iG9A8tcmUe/KwWHoyeIWFyKQYKlCUBdAIuoGwCAfX0flce3XH3oV5IA3P0qPNNP6hRtdQtlc9ro7DSpOGhKrEjwInnO57X2EIow6aiGz61v8LIWZiVq2Cl3tdeSVr9tVaOT+Tp409lVcs0sLyyKBJTAykr6KxVUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Q2gUkw3r; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2360ff7ac1bso36554105ad.3
-        for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 21:19:03 -0700 (PDT)
+	s=arc-20240116; t=1750134774; c=relaxed/simple;
+	bh=t+OjVad7eAvpDWlH56C4FprCkMtCNIHheW3QeGWnkVA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ExMA46QQYyjKE5awFCEQXDgxkRXUkjm0GqYJp3yBXJCX98Ek67dRpEEMkWfYzqyr4Gj4Z/FyzFofeENiIANkDpZA93+Hh9BUXgoLe1IYXMY2Dsu3T79WPsCm+J80mxE169P8Udve+825KWl7WNKpYpWUSqtwry9fTxiTuVJ5EiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ad4LrThO; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7399a2dc13fso5652824b3a.2;
+        Mon, 16 Jun 2025 21:32:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1750133943; x=1750738743; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tfXoidyywq4prG1qxFfXKWvZLzM8FnofZM+bLZ5UOeQ=;
-        b=Q2gUkw3rgxpnciNf37XKxzt6F7FBJMwtV0OiaIGWz1ZKyilFK+yIyk2KKpBvAdLwMd
-         Vk8xZD4yk4V4IPfRuaWja/av24697fyi7mM0qmlKTnvWTOHA6aRO2l6aIZu5z7YobYHk
-         zlt2gT0MFkcvTirnfLi20fJwVUo/CFNyjK8eKGwI5jwILVLgx+L+M15jgAvJ/EzQ3Njj
-         sqqZp6/NduKtRkyJXh6s0J6uurPDAD8xibaRyF533DwvIEdsDOFongdOnm3Pmq8MFavY
-         navNtjSbP1NhGFlpO8cXWyivLhBRuB6ICohEI0oa235K64IhyBqVwflVqqxFGWtbnUTw
-         7q0Q==
+        d=gmail.com; s=20230601; t=1750134772; x=1750739572; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wjGj1FKkr6lsKFldhLw4c9HweyQc+qlIKWu9cgdDyFY=;
+        b=ad4LrThOyO20UTUgkduMxyYK2ik0Njc3TGVD+WEQpLoZZM+qiDdMB4ohWXVnMN2O6U
+         wC54DbMZi06dGUdp47faQKdGvXG1Mabo1jJdctdhYLeAnYfHJrBpG/CUhncGpBY0iooN
+         gKiFJBA/clhKNqkttg7DmhD+wv7EMeqAnyJp1jEWi+EEP0YvsqD3g44aNUvA1UmXgpDa
+         tA33zEp7/Cvt3RQODQCNN1oMLx+48pBM3ZMEpd0wLCwYiv3GzPxfebE/cBSl+P7pd04T
+         N3ygQ2E7l4ZVrpEZj6BYoaUSepN26k9381fsJxraFLxg0PsHZQ0pZrf00+KAv6SU+bpY
+         YgRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750133943; x=1750738743;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tfXoidyywq4prG1qxFfXKWvZLzM8FnofZM+bLZ5UOeQ=;
-        b=sQ0Et292+gGFzTyOPC5orxBoCh28NLu3GOsoAw9zN/EyToAxoe95HS8ZemVYiv2n1Y
-         pnB/HfzhW4bRCxVvYT8m/3Fqg/Yz2WXzafzx45mA2jOPm/xPxB0Q/ozXKNXoutcsPpd8
-         CRjXT2eGdBuReVKPzaJIuBYYDGcnYAFG7kz1ZBUi12h6ls61+ev5AY6iBJ6ZRfStCSpz
-         Bm4aGJ+R8HDTsD54S4iUOOSh+H2u7dNYZpFM6xxukLMaQEniZtspLzBpqpXyBoG7cNG5
-         LlxXomz7CLf+TxBk8cya50sVVPsmuIpPQ5gmHMKviXihXc/LNG9qCibSfKQVbrWyliyQ
-         b1zg==
-X-Gm-Message-State: AOJu0Yyi+eBVdVTWFGIdTofr1wEzwuuy3dRvgmjujooblQZwYkjt94Ij
-	f17O/4R+Eszh06n5m3RWFHV4Z/UcIRFyQvgKQfqUwPDnTi/a2toNtJoSc84Hf/8DPFw=
-X-Gm-Gg: ASbGncsZsCyYrnm5AU75pPobf+3NBZ8c8s4DjF9d0AzU7safiTb4qjRPwpIsyVu3Nex
-	Ppdq4UXqBhEhfyQzrHUERcSaLxrjAVC9Vzx6V8EulkLQ5GcDOnusmQkk/wxGXkTD2L/U6amn3kv
-	/UG0KZnZeW4r8tJEthr9xat9pihAHXHGlz0E2jU1jIhOBdoMJWYlQR032ECBl6zOrKoY5rAhTF8
-	q50dWU/gYsfubnxWn+5frGB1Ojv44OrdYstLwWMbRS8v8eMC8oi7svaxfogRvaZyIgRnUalagQu
-	2Y7hcvugy0N0b8aYEi8K458axDWlI7g3FEKYL3kGelbgqYCdLoSDee/Ql3srRnC7K+ovPFEBwxO
-	+gEZ4rMSzjGh5vw==
-X-Google-Smtp-Source: AGHT+IHqTbrzP939yrSnByQC0rtnaJOgibU9Byk10ulJjvMNZlvHwikXDBV86s1p8bsCh5VpmAqFCw==
-X-Received: by 2002:a17:902:d481:b0:231:d0a8:5179 with SMTP id d9443c01a7336-2366b003c6cmr173603795ad.23.1750133943270;
-        Mon, 16 Jun 2025 21:19:03 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.10])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d88c029sm69798345ad.26.2025.06.16.21.18.59
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 16 Jun 2025 21:19:02 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: alex.williamson@redhat.com,
-	akpm@linux-foundation.org,
-	david@redhat.com,
-	peterx@redhat.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	lizhe.67@bytedance.com
-Subject: [PATCH v4 3/3] vfio/type1: optimize vfio_unpin_pages_remote() for large folio
-Date: Tue, 17 Jun 2025 12:18:21 +0800
-Message-ID: <20250617041821.85555-4-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250617041821.85555-1-lizhe.67@bytedance.com>
-References: <20250617041821.85555-1-lizhe.67@bytedance.com>
+        d=1e100.net; s=20230601; t=1750134772; x=1750739572;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wjGj1FKkr6lsKFldhLw4c9HweyQc+qlIKWu9cgdDyFY=;
+        b=AiI5Zf5pgAI6Stev2v5ovNvKwvnS9DoxDfG536mWncQ9ELX+32ax8F6uTxOXIvujb7
+         nhM0AXCnlq1pYBTchmqXdL1OBBAEHFZxt22G10IaKGyJhRVl3+To9iSEBIrLiTju+pgU
+         77GQM4ZVkjnIk5/7eDJB/EaRkSth2azUiHIiiHqkv5fAr+b/8BqBhqksRIXmXiDjctFb
+         eEXmSkkRDZN9PeZZizjpnevh6o5xEPcQvvsRCfEqsMUsaSPRC/zzYG5caZtNyjeb3Amo
+         X99O+0AlBb1ytGcKxrXB4O0CmnDLf4FZgq5G+R5fG6MxpYOyfAlPBwf5kY7Nr7geI6B+
+         re0A==
+X-Forwarded-Encrypted: i=1; AJvYcCWfiW7CH8P2St6oXnu+3jH1hww4JPLDSXlrnpq6nW6nhessWdgnFGRDIgVs4WVlAp4gMgS/RtpaCGVVjclQFfke@vger.kernel.org, AJvYcCXi8C2Qa7rickASebqwg64TYE27l9oG2qNfgEkrUUx2ZGbMfUHnIuCfFLtpmd7QBnqQN23sDmUq@vger.kernel.org, AJvYcCXnRxYk8QhTqz95HlG1ht0A/ANXnthaljOpdgt+685JPHIqyM2fzRPTJcrIyEhdxAHIEd8S895B4iSfOpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZdaokPQFFbTaybCMrPiuqyAJ8gGMPYffppM5XeQrZ5mwvpIXB
+	iFPub/K827q41krKKuJGtdIa+6Tzo+vtDiW1qXA0a9aGpaH5/It7fsIWRJ7l5rdX
+X-Gm-Gg: ASbGncvSXZzrhTb0E6GQ3Udhzu3yqv4zaKDMqwBxEs8SJtsrfMwv/vd+KDBDZn3WI7n
+	sKDcbUSPXXxZpCNi97HB8F/d+CRokgYZfzrD0nOEKtNYhrtAzVjTNlfeVPa8gyN8lV7iaLUGiLI
+	Mwu2bsm/xdhvK5OlMJVad/IlW+61kR8xdJ3YS4bVDtqlhNLFB+CoyCS6sjOVFlcZ/Y0DGHJt266
+	HERiGqkH9S6nRR2z4slx65q+85G+2GvdaugHo29IHNSwyFBOpyiK+uJTG7Jth0P7oLT/vDX0MHl
+	O147vb4j+8T9lUho9OsCSr+N8r2E94kXn0PDNMJrr6ejhZFhCHXZKZ1yIkk=
+X-Google-Smtp-Source: AGHT+IEdxWDRf6+EpAFbQvucM60jiX8FSyavtrFoElTFBWd+TnkBTMCafEWAnKHFvrRXNLg8GBPgPw==
+X-Received: by 2002:a05:6a00:2286:b0:736:2a73:6756 with SMTP id d2e1a72fcca58-7489d1999famr17590954b3a.21.1750134771888;
+        Mon, 16 Jun 2025 21:32:51 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:8::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7488fff68b7sm7739920b3a.7.2025.06.16.21.32.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jun 2025 21:32:51 -0700 (PDT)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH RFC net-next v4 00/11] vsock: add namespace support to
+ vhost-vsock
+Date: Mon, 16 Jun 2025 21:32:49 -0700
+Message-Id: <20250616-vsock-vmtest-v4-0-bdd1659c33fb@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPHvUGgC/13RwU7EIBAG4FfZcBbDzABtPZmY+ABejQdKp7tkb
+ WtKQ9Zs+u4iFyvHn8z3TybcReQ1cBRPp7tYOYUYljkH/XAS/uLmM8sw5CxQoVGERqa4+KtM08Z
+ xkz05hAFBoUeRydfKY7iVunfx9vry+zbzJme+beIjh0uI27J+l3UJylhp1qD+NyeQIEcyroXB9
+ V3rn8+TC5+PfplKUcIjbiqMGVOnwGFDBNzWmA4Y2wpTxtCCGy1YGolrrP+wUfVmnbFldF2DFv1
+ ga2wOGKjCJmPNjfHaaeO5r7E94uorks24cyN4rzDfro543/cfCn6TpOoBAAA=
+To: Stefano Garzarella <sgarzare@redhat.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Bobby Eshleman <bobbyeshleman@gmail.com>, 
+ Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.13.0
 
-From: Li Zhe <lizhe.67@bytedance.com>
+This series adds namespace support to vhost-vsock. It does not add
+namespaces to any of the guest transports (virtio-vsock, hyperv, or
+vmci).
 
-When vfio_unpin_pages_remote() is called with a range of addresses that
-includes large folios, the function currently performs individual
-put_pfn() operations for each page. This can lead to significant
-performance overheads, especially when dealing with large ranges of pages.
+The current revision only supports two modes: local or global. Local
+mode is complete isolation of namespaces, while global mode is complete
+sharing between namespaces of CIDs (the original behavior).
 
-This patch optimize this process by batching the put_pfn() operations.
+If it is deemed necessary to add mixed mode up front, it is doable but
+at the cost of more complexity than local and global modes. Mixed will
+require adding the notion of allocation to the socket lookup functions
+(like vhost_vsock_get()) and also more logic will be necessary for
+controlling or using lookups differently based on mixed-to-global or
+global-to-mixed scenarios.
 
-The performance test results, based on v6.15, for completing the 16G VFIO
-IOMMU DMA unmapping, obtained through unit test[1] with slight
-modifications[2], are as follows.
+The current implementation takes into consideration the future need for mixed
+mode and makes sure it is possible by making vsock_ns_mode per-namespace, as for
+mixed mode we need at least one "global" namespace and one "mixed"
+namespace for it to work. Is it feasible to support local and global
+modes only initially?
 
-Base(v6.15):
-./vfio-pci-mem-dma-map 0000:03:00.0 16
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.047 s (338.6 GB/s)
-VFIO UNMAP DMA in 0.138 s (116.2 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.280 s (57.2 GB/s)
-VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.052 s (308.3 GB/s)
-VFIO UNMAP DMA in 0.139 s (115.1 GB/s)
+I've demoted this series to RFC, as I haven't been able to re-run the
+tests after rebasing onto the upstreamed vmtest.sh, some of the code is
+still pretty messy, there are still some TODOs, stale comments, and
+other work to do. I thought reviewers might want to see the current
+state even though unfinished, since I'll be OoO until the second week of
+July and that just feels like a long time of silence given we've already
+all done work on this together.
 
-Map[3] + This patchset:
-------- AVERAGE (MADV_HUGEPAGE) --------
-VFIO MAP DMA in 0.028 s (563.9 GB/s)
-VFIO UNMAP DMA in 0.049 s (325.1 GB/s)
-------- AVERAGE (MAP_POPULATE) --------
-VFIO MAP DMA in 0.294 s (54.4 GB/s)
-VFIO UNMAP DMA in 0.296 s (54.1 GB/s)
-------- AVERAGE (HUGETLBFS) --------
-VFIO MAP DMA in 0.033 s (485.1 GB/s)
-VFIO UNMAP DMA in 0.049 s (324.4 GB/s)
+Thanks again for everyone's help and reviews!
 
-For large folio, we achieve an approximate 64% performance improvement
-in the VFIO UNMAP DMA item. For small folios, the performance test
-results appear to show no significant changes.
-
-[1]: https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
-[2]: https://lore.kernel.org/all/20250610031013.98556-1-lizhe.67@bytedance.com/
-[3]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
-
-Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
+Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 35 +++++++++++++++++++++++++++++----
- 1 file changed, 31 insertions(+), 4 deletions(-)
+Changes in v3:
+- add notion of "modes"
+- add procfs /proc/net/vsock_ns_mode
+- local and global modes only
+- no /dev/vhost-vsock-netns
+- vmtest.sh already merged, so new patch just adds new tests for NS
+- Link to v2:
+  https://lore.kernel.org/kvm/20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index e952bf8bdfab..159ba80082a8 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -806,11 +806,38 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
- 				    bool do_accounting)
- {
- 	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
--	long i;
- 
--	for (i = 0; i < npage; i++)
--		if (put_pfn(pfn++, dma->prot))
--			unlocked++;
-+	while (npage) {
-+		long nr_pages = 1;
-+
-+		if (!is_invalid_reserved_pfn(pfn)) {
-+			struct page *page = pfn_to_page(pfn);
-+			struct folio *folio = page_folio(page);
-+			long folio_pages_num = folio_nr_pages(folio);
-+
-+			/*
-+			 * For a folio, it represents a physically
-+			 * contiguous set of bytes, and all of its pages
-+			 * share the same invalid/reserved state.
-+			 *
-+			 * Here, our PFNs are contiguous. Therefore, if we
-+			 * detect that the current PFN belongs to a large
-+			 * folio, we can batch the operations for the next
-+			 * nr_pages PFNs.
-+			 */
-+			if (folio_pages_num > 1)
-+				nr_pages = min_t(long, npage,
-+					folio_pages_num -
-+					folio_page_idx(folio, page));
-+
-+			unpin_user_folio_dirty_locked(folio, nr_pages,
-+					dma->prot & IOMMU_WRITE);
-+			unlocked += nr_pages;
-+		}
-+
-+		pfn += nr_pages;
-+		npage -= nr_pages;
-+	}
- 
- 	if (do_accounting)
- 		vfio_lock_acct(dma, locked - unlocked, true);
+Changes in v2:
+- only support vhost-vsock namespaces
+- all g2h namespaces retain old behavior, only common API changes
+  impacted by vhost-vsock changes
+- add /dev/vhost-vsock-netns for "opt-in"
+- leave /dev/vhost-vsock to old behavior
+- removed netns module param
+- Link to v1:
+  https://lore.kernel.org/r/20200116172428.311437-1-sgarzare@redhat.com
+
+Changes in v1:
+- added 'netns' module param to vsock.ko to enable the
+  network namespace support (disabled by default)
+- added 'vsock_net_eq()' to check the "net" assigned to a socket
+  only when 'netns' support is enabled
+- Link to RFC: https://patchwork.ozlabs.org/cover/1202235/
+
+---
+Bobby Eshleman (11):
+      selftests/vsock: add NS tests to vmtest.sh
+      vsock: a per-net vsock NS mode state
+      vsock: add vsock net ns helpers
+      vsock: add net to vsock skb cb
+      vsock: add common code for vsock NS support
+      virtio-vsock: add netns to common code
+      vhost/vsock: add netns support
+      vsock/virtio: add netns hooks
+      hv_sock: add netns hooks
+      vsock/vmci: add netns hooks
+      vsock/loopback: add netns support
+
+ MAINTAINERS                             |   1 +
+ drivers/vhost/vsock.c                   |  48 ++-
+ include/linux/virtio_vsock.h            |  12 +
+ include/net/af_vsock.h                  |  53 ++-
+ include/net/net_namespace.h             |   4 +
+ include/net/netns/vsock.h               |  19 ++
+ net/vmw_vsock/af_vsock.c                | 203 +++++++++++-
+ net/vmw_vsock/hyperv_transport.c        |   2 +-
+ net/vmw_vsock/virtio_transport.c        |   5 +-
+ net/vmw_vsock/virtio_transport_common.c |  14 +-
+ net/vmw_vsock/vmci_transport.c          |   4 +-
+ net/vmw_vsock/vsock_loopback.c          |   4 +-
+ tools/testing/selftests/vsock/vmtest.sh | 555 +++++++++++++++++++++++++++++---
+ 13 files changed, 843 insertions(+), 81 deletions(-)
+---
+base-commit: 8909f5f4ecd551c2299b28e05254b77424c8c7dc
+change-id: 20250325-vsock-vmtest-b3a21d2102c2
+
+Best regards,
 -- 
-2.20.1
+Bobby Eshleman <bobbyeshleman@meta.com>
 
 
