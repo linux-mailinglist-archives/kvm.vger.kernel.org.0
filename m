@@ -1,119 +1,135 @@
-Return-Path: <kvm+bounces-49678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBF8DADC306
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 09:16:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF46ADC36C
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 09:34:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98580171A61
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 07:16:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 412591680A4
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 07:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3E4828C84A;
-	Tue, 17 Jun 2025 07:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFCE128F958;
+	Tue, 17 Jun 2025 07:33:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QcaClBhF"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="vi8K0/Rg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D2219047F
-	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 07:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77655288C06;
+	Tue, 17 Jun 2025 07:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750144613; cv=none; b=BcGLZEzHZo4gcoupeSZn+e47pzey2W2qZaTzI2EV3QebssfGLta/FBQsSb/1OQEBXA3THG/ejEdBRXDLxdzhwZJZtp32y9MIv5sDJvGz5APEFfF84KAzg2dfeqDqmz1K1P0JFGx3Fqha0q8g2fRhHuCBCbl5kTzpFTB9fE/FkGY=
+	t=1750145628; cv=none; b=GO+b0YuqA4MWYU/mPrqsM1Nn8lxrY4AXXplk3zsi9JLODTuePWl7QNALIOR/hkPpy08GiN0rE1Yf2Gg4jEecNehSgoKEgcCbCAD1ojCjKD9XAfwJ+hgZwrz4PJt7z3I1gn33GwreeXPts6S0rZoochFEFUU0LX5tdZy/HJMBWac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750144613; c=relaxed/simple;
-	bh=3IQYlv7LMykQ+N0DvD3Sy+dxLttmi+LIhyuIlXREmaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=haDCCRzYstkko9el5YGO5SJqqYDDFf3mVb7lXT+6XLxYmX6pLy9JxTCThRHhAhiwvOimpvFgCBXlSSJrVHV2W0JV0/6FmIA3ha1j4cPOnOz+xtFv8gGiKwsKEwoKbKsIH1Na3fcpezcQB5eTHMMwLj859hKjL7Y4dqgBq2D3C8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QcaClBhF; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55H31JdI009585;
-	Tue, 17 Jun 2025 07:16:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=3IQYlv7LMykQ+N0DvD3Sy+dxLttmi+
-	LIhyuIlXREmaI=; b=QcaClBhFWqQytd9668+ce6ZI6GHVnALSGQ9DTFAdveS3kc
-	kgTTMIvmoEexyTXVJp/Qj5jYEW/+7bYaqgaV4yBaTGBCb5c4Wc+U+ehMKFNvgPiF
-	sXjjn06nIKvj0w4NJISQJtOciHMx4ArSH1M6XGPtU+p4xo72HAU7FCh9Rw96m+dR
-	jW8RcIy74WfH/ml/vaKCY6MR0b03vfvllBkfvP11h7mcgqkofRxejNUzXt1QxVtg
-	V6O65rH7GAgQ2lN+JpdV+FDGy/pBZFfgGHq0mYFhd9wDcnrliZ1VFSXlsczXqkl3
-	b8VzRoDurJsL46aaYu8g9jZBF0GJ4sNlwb7bOGMA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4790r1x6hr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Jun 2025 07:16:42 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 55H7FYgb009553;
-	Tue, 17 Jun 2025 07:16:41 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4790r1x6hq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Jun 2025 07:16:41 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55H44IQ3027458;
-	Tue, 17 Jun 2025 07:16:41 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 479ksytar5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Jun 2025 07:16:41 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55H7GbxX50462998
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 17 Jun 2025 07:16:37 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 24EB720043;
-	Tue, 17 Jun 2025 07:16:37 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8C08820040;
-	Tue, 17 Jun 2025 07:16:35 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.204.206.66])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 17 Jun 2025 07:16:35 +0000 (GMT)
-Date: Tue, 17 Jun 2025 12:46:33 +0530
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: npiggin@gmail.com, danielhb413@gmail.com, harshpb@linux.ibm.com,
-        pbonzini@redhat.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        vaibhav@linux.ibm.com
-Subject: Re: [PATCH v2] hw/ppc/spapr_hcall: Return host mitigation
- characteristics in KVM mode
-Message-ID: <iqyt4ygn7g4hfcs7yaz4x45jqkcoe2qodf4fsiwrlyx23yegig@aunuigdhtx4c>
-References: <20250417111907.258723-1-gautam@linux.ibm.com>
+	s=arc-20240116; t=1750145628; c=relaxed/simple;
+	bh=xW1VUV8oxY/+eJvfTBIXObAU4Xts/nmDnxOFIFFOuas=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DiJef3kHmY91VJ5BMf5EAwmGQwLdUDFqS4rtjuvIt7O/WHx7adme9JjqGLNiS9ze7VzIR5Bw1S/ek0iANcOqRcbwzKb3g1VoSWtggarIgShiKnRUXAFbfKmGroI8vyvhDNASugw4KJb3DUl2NEsywa/VIs//um/iCJ6CynWDdxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=vi8K0/Rg; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55H7WY8w1020658
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
+	Tue, 17 Jun 2025 00:32:37 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55H7WY8w1020658
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025052101; t=1750145558;
+	bh=b1wnFPUhDY9iKxorOahzeOJ8uRrpy2/oLWDc7uprxlo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=vi8K0/Rg19FFPpdmvoUdsRjwt4k8IzzdSie1RDC3TZKZYovSE9lPCbtxWwkpfvD7I
+	 Ek6QZWWOpqGC3HxtqJU0WBpXg9zS8BSkevz6RJ9B9Amafp5V1HVgY08vgmIfDa6h3s
+	 kH1ZKQ7zQ15AH0Tl8ooe46OFX4e6w6ylE5V69IraXRd+3YJdVqT1lIeJgVr80QIWHe
+	 TNlnwGfJgfJUtheXc1sYaRTAyLlNAArp1qzSdLcw6vpzYYkB6IBbDxotrdS5j/x1SO
+	 gXbBk3lZqW0MVqQHpaUajQxoSyVXwp92IU7v3p1/j13hv+SXYIQAd9aUg+hbPm/BZS
+	 5A63bbLDYuHNw==
+From: "Xin Li (Intel)" <xin@zytor.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+        sohil.mehta@intel.com, brgerst@gmail.com, tony.luck@intel.com,
+        fenghuay@nvidia.com
+Subject: [PATCH v2 0/2] x86/traps: Fix DR6/DR7 initialization
+Date: Tue, 17 Jun 2025 00:32:32 -0700
+Message-ID: <20250617073234.1020644-1-xin@zytor.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250417111907.258723-1-gautam@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: NKMkqihTPb1b3itTg9CLjj24dX3sW887
-X-Proofpoint-ORIG-GUID: ASFoobqkqlTGUo7QYp20-1GF5UuiLhhe
-X-Authority-Analysis: v=2.4 cv=AqTu3P9P c=1 sm=1 tr=0 ts=6851165a cx=c_pps a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=b97EAFsRugTIa9utK9UA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjE3MDA1NCBTYWx0ZWRfX5Xc1SxsABDkw Nv3OEe0gwN6mBXrHl5Kin+68V8v1V/nW8daEJRf/0NPcTD/m3c6kp+AlQVVejcUiDIdsB7C7ZB1 oy92WBU2RGR9zqNXucvb2mq83n3ACoPZpoNndsd9CI4L64j4fP0qmxJ38PNs9bPcqhSrspjvC7w
- w64SbSwnb1aFC/AKtZ9oDtDTMiB5tINK36Dd2hBEjpOISNXXEvRw5aqGpyGn1V71SeLZqtb5B+F pfprWRNfjhk4U8gqvyg/Z2qyukvevkeXsElS610L9qaHntufrTyeeOvMzHDWLY5lQMCTZa0xRH/ 49MZDy+6hUQsvDiv6VkHQ+AgCRShREzS37TMdiDabdiAhpC1xhQHqusvZwxz7A7qY66BaWLy1VK
- pruvpqU2rK4WuGLmutxjUIpNW4hwhiDzue7zCGRO7hj0b6rSXH4vFRRd2z/f8ZTVCj0Edp4F
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-06-17_02,2025-06-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 adultscore=0 impostorscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=663 mlxscore=0 spamscore=0
- bulkscore=0 malwarescore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506170054
+Content-Transfer-Encoding: 8bit
 
-Hi Nick,
+Sohil reported seeing a split lock warning when running a test that
+generates userspace #DB:
 
-Any comments on this? Can this go in if it looks ok?
+  x86/split lock detection: #DB: sigtrap_loop_64/4614 took a bus_lock trap at address: 0x4011ae
 
-Thanks,
-Gautam
+
+We investigated the issue and figured out:
+
+  1) The warning is a false positive.
+
+  2) It is not caused by the test itself.
+
+  3) It occurs even when Bus Lock Detection (BLD) is disabled.
+
+  4) It only happens on the first #DB on a CPU.
+
+
+And the root cause is, at boot time, Linux zeros DR6.  This leads to
+different DR6 values depending on whether the CPU supports BLD:
+
+  1) On CPUs with BLD support, DR6 becomes 0xFFFF07F0 (bit 11, DR6.BLD,
+     is cleared).
+
+  2) On CPUs without BLD, DR6 becomes 0xFFFF0FF0.
+
+Since only BLD-induced #DB exceptions clear DR6.BLD and other debug
+exceptions leave it unchanged, even if the first #DB is unrelated to
+BLD, DR6.BLD is still cleared.  As a result, such a first #DB is
+misinterpreted as a BLD #DB, and a false warning is triggerred.
+
+
+Fix the bug by initializing DR6 by writing its architectural reset
+value at boot time.
+
+
+DR7 suffers from a similar issue.  We apply the same fix.
+
+
+This patch set is based on tip/x86/urgent branch as of today.
+
+
+Changes in v2:
+*) Use debug register indexes rather than DR_* macros (PeterZ and Sean).
+*) Use DR7_FIXED_1 as the architectural reset value of DR7 (Sean).
+*) Move the DR6 fix patch to the first of the patch set to ease backporting.
+
+
+Xin Li (Intel) (2):
+  x86/traps: Initialize DR6 by writing its architectural reset value
+  x86/traps: Initialize DR7 by writing its architectural reset value
+
+ arch/x86/include/asm/debugreg.h      | 14 ++++++++----
+ arch/x86/include/asm/kvm_host.h      |  2 +-
+ arch/x86/include/uapi/asm/debugreg.h |  7 +++++-
+ arch/x86/kernel/cpu/common.c         | 17 ++++++--------
+ arch/x86/kernel/kgdb.c               |  2 +-
+ arch/x86/kernel/process_32.c         |  2 +-
+ arch/x86/kernel/process_64.c         |  2 +-
+ arch/x86/kernel/traps.c              | 34 +++++++++++++++++-----------
+ arch/x86/kvm/x86.c                   |  4 ++--
+ 9 files changed, 50 insertions(+), 34 deletions(-)
+
+
+base-commit: 594902c986e269660302f09df9ec4bf1cf017b77
+-- 
+2.49.0
+
 
