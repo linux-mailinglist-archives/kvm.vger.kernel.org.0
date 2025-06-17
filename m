@@ -1,171 +1,144 @@
-Return-Path: <kvm+bounces-49741-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49742-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5982ADD873
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 18:55:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 990BAADD91A
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 19:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73B5F1945C1C
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 16:41:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C07A4A36EA
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 16:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F892FA63C;
-	Tue, 17 Jun 2025 16:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC0A2DFF06;
+	Tue, 17 Jun 2025 16:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RZ0i31DD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LTXPo+xd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19EBA2EA751
-	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 16:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F54B235067
+	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 16:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750178042; cv=none; b=QJBQnbXXHH2ZS3ezDTzmTpzcB2AuB2ublinGMEak1td/1LgjljX6YL+nxg5RRbG/BlBmWbcgNcTwfofbjtL6AI7RQ6VhoiyLAEhflCPid2OuG7SlAfTTMaAQ1qK1rjq9q6nEON+N2/mJQbPw5jOXMccNUWwdPt/Dlj6cW/HlieU=
+	t=1750178872; cv=none; b=B5PT6XqVVCRs/agyTq+OYAY4+l8THZAqJYeuYpBvZ6MHEspZw+ZI6pNvtQwXcANCpvB/E+ehxvdIz6X9tL4+NUpDC58v2WmMLwAWhskWC0i/ri7SoUB+7NSPAhMDu+CY0iE358R7jBlHnlYNgijNZ6cY557v62m9E7GRxFl7tBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750178042; c=relaxed/simple;
-	bh=KDxsVP69tGp7xtGYwPP0tQZjd1rakZ12nrPME0E9lgg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=boFiLasHNx1QxFrt8gYH0QfYUOOLkZ2JYYaXY7ivvUqaN33MnswYqbkMldz7iMKmRlEwgvemtJU/QtjGzx5m/bqsscsXDET/eTC94MD5+YtfBYEz4F8gxOvyfvhOFQBGhr80vdoevfoItIjgLE5MXlIUZ2KbqVgg38j6TOLZEKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RZ0i31DD; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a4ef2c2ef3so4913275f8f.2
-        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 09:34:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750178039; x=1750782839; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GncEdQO/d7gOZ9LM+QxKenzRx6813cX2TxyJIAl7x3Y=;
-        b=RZ0i31DDUNIv7/Rden3K7UUpskY3LIWNuOtNxl610XMIhsfoEZfL/jUqxSxQOIwJ4R
-         Gor0o6jNs/dIKIB1VHTUpVSUUBF/UvxRq2o7J8x0osdytGC5UGrUdtUnEe8p30eDSvIl
-         9UbpccyLar7BXH4xTimetj5VnKmCE5fUWvr+mx+eD4TfN6McE4rMzmpVQ0Csq1xSBoDX
-         pmEcxHzO3cKIjBPQ2U82/2jEUfwAd6lfoS0/4QWusFx7hbQ6QUkjxkPVP4pgRD50bGTc
-         9iOiDoNum/09kAD7+2dXRhr+rrLUmXqYJNbL7Dih8+XWYD4kbjg5jY+gKOlsbg0fxpFD
-         0wDQ==
+	s=arc-20240116; t=1750178872; c=relaxed/simple;
+	bh=Ng2+55cycp9Mq67N0F50gt8NmngHjK/xJ38hqLOcTTs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EN2TiFBg08wKYQolRwPQEhC8shZoCvT0TzR6qPfynSrZ+6tGg/aP3Yo5tqSgjgu4N06ts+1xc55u7dgQMkqgkEYGlgahcFilUsfBcseuBff/Ylw9Z2nwgkmi8AwiTj91bbK6LIJW7kAzFeagsWsbH6ZYDcCK4Es7u1gIVyfdar8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LTXPo+xd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750178869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9udXpXMKLqnXjPpw+ssHtlTIRsjM/WGu/+kStlwAoqo=;
+	b=LTXPo+xd6vQj7E9BKHOe1AR0GrbUYJxN6i5juYcM2QB5/rvrfGfnqDeEYReLwpFmjOM8XA
+	ThxHWuDMD0bS5yiAXHNh/EIG5mgGeRh5Weh0F4cQBtGY/LAtdA4XknnJliz8PXtlcKrzmB
+	J2qHxO2YpF1IQUykjtdt91sA9z+VBeo=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-567-oDLF-KvzOU6dy9V29eNTdQ-1; Tue, 17 Jun 2025 12:47:47 -0400
+X-MC-Unique: oDLF-KvzOU6dy9V29eNTdQ-1
+X-Mimecast-MFC-AGG-ID: oDLF-KvzOU6dy9V29eNTdQ_1750178866
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-311e98ee3fcso5918503a91.0
+        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 09:47:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750178039; x=1750782839;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GncEdQO/d7gOZ9LM+QxKenzRx6813cX2TxyJIAl7x3Y=;
-        b=XBI5sROYbh/F8GQGRTUh0cCgJB3Q9zfotCUFd/x2eSymuzmK493HL0CMSnP32tx0ZC
-         MsOPVIkzYxEs4oN/y2ddelAEA1bC3VqyO+O9wUVYMmusxvWN8R5LjvrekwdncDWcW0lX
-         95biYFl57/+aja9SeQ2QGKxNjDrt3twBQ0754M2aKBSVnk+Dx0vAxfneZb+uryAT5u8/
-         A9vYdsRv3s4cFmgK9QhysmvOAEtDf0marU/nLNxJb000m5d7INtUoTyRPRNli75M2ESx
-         g3/mgYz3+u6F6gKd19zj2sv5GdF7KPONLGWgbe4vuIr2ClPCsUF5wTnbEYh5xCTJEap6
-         xmrA==
-X-Forwarded-Encrypted: i=1; AJvYcCVT6tsVn9BYImDqcfy9jwjhZucta32MZjk98phSL09cABj9xe/TUybkT3dk/FGH4UnyieQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3+NgmDvA0QcASYzdiiIBZRMOW4PecorW+9rPmlUUX1RDb2frX
-	Z17G07/oM8cRA7O78tF3A6IOPjSN2YrdMxsY/eHX044ChnDWyRW8SZmNcZn98bKLvCw=
-X-Gm-Gg: ASbGncvgmpPASTY65fPLNKaqrqF1dRLA7mjG7lMbeMrZv2bR7pTQ0NqjtgqMq9Ha23l
-	GCrBccLMstnUaPm8+fo4ox4ZgfwAysFkoxipSPq+MnGwbi7xrzABlW191WdH0WJNU8HN+5NygX0
-	2GxUTaglVPK3jySeGPD987O670K/d+SQT6PUPCJAGevGLmpZTPY4gRL6vMQw6O73heneiQ6cMp4
-	XnygMRwPlUWpdkBAF46WZAytLMfF/Q748j8Tm2JftNYDAmVfOld2ika+CjYzIfv+/Zp+bI5y6OH
-	0Yl6EhFCo8fQsvZ4vU/2J8DWSWWcXC0+Wo7wyWwzRlaHM1B+WNfGNJhSVLDl9MY=
-X-Google-Smtp-Source: AGHT+IEzrNJfJxccfvZ1/Dv81sv9ibMeIsZbIicjBJbFPPlnMb0UfYqycjSiQbPuRMjeJfXuxbG2YQ==
-X-Received: by 2002:a05:6000:400b:b0:3a4:f2ed:217e with SMTP id ffacd0b85a97d-3a5723af786mr11907985f8f.42.1750178039291;
-        Tue, 17 Jun 2025 09:33:59 -0700 (PDT)
-Received: from draig.lan ([185.126.160.19])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b090b0sm14359958f8f.46.2025.06.17.09.33.55
+        d=1e100.net; s=20230601; t=1750178866; x=1750783666;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9udXpXMKLqnXjPpw+ssHtlTIRsjM/WGu/+kStlwAoqo=;
+        b=LjGLOIw+SVO532iJd3MG0QiPDauPZp4WhqI1kKD4rIExmODg1LHKeAVi8RC7FPwp4X
+         J3CV2nL7jS/e3hl5+hu6mS8OPihVvU1f7Jx9MPYbOI5/tXezFTHqV1Fg7LONflEvLz2S
+         1UF8VCmjkdV3XZ5Hfbcz2H/MlqglFSSznKJ0rZaUd+rq/mqCoS1Re3YSYBMhQMKaCr0b
+         ANlX34L02YVoj1ftp3raLXJFsrwFq2QtByZnDrfvWOfW+KeJWFqNgv1uqBmAU5WufKhw
+         d0INkCLiISxG65kSuybCsa1xh2ZOZYoGiciin3Tmmnsde9XU5KslaRUU05A+bIsvSbh3
+         Hekg==
+X-Forwarded-Encrypted: i=1; AJvYcCUaQm4gd8lD6OUE+nQTNhBdYiWOT3I5FN+JiRZjDi0jYLK/AxmyUIGZVj5A6VFDo0hcwNo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjDhDrpb/5MjrxqayFGuyPBK0VSgqC/7MMDlIYBwJqWgwgPrXY
+	mFehiuk/vWv6UWqNe2Qg7UZIuHH79RIhCzjKU0a/BiPmc9r7ZDNclUvzITD/Kp35ZXvLNtDq1II
+	/tO9QCfkEN5zPoZWcVEYXVbgYY9oS1TmWAcdu2WbUmfUMchuFpMsM/w==
+X-Gm-Gg: ASbGncs5be9DTrhtQNQwxgAOOWWXyiyV0ULn7BwDI4X+eMDQVdQeR3f66I7b4yfqXmk
+	0SN7mNw3cJh3x8Tadp8RdtI19u+tQATs8eExlnRwF+BPBTei4BOWFgAEwbT/6qHaV97qltTZp3O
+	QLwQVlpDXsH5EFe+4N+KkqYFvRrEYpZsydoIp5jZfgy8shHPvDxGiVo1Gpudet84oil7lTvBP6D
+	53LQ34zaHuSUMyS9yBcqzEyhIPaZfpxaxHt7UMk4rgwt6gklfFzfY14vYcqbDqs6GvAyMLJiX4B
+	yDY5kUabrpTW0A==
+X-Received: by 2002:a17:90b:2808:b0:30a:3e8e:ea30 with SMTP id 98e67ed59e1d1-31427e9f04cmr4387984a91.11.1750178866282;
+        Tue, 17 Jun 2025 09:47:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGZ5RZvlcb8QDXdYGv2rCtK+dVH8l+O3RgQMnCOn4WGgTIeBHCIqlbbuc04Tn+tkV7OjqZJXw==
+X-Received: by 2002:a17:90b:2808:b0:30a:3e8e:ea30 with SMTP id 98e67ed59e1d1-31427e9f04cmr4387954a91.11.1750178865920;
+        Tue, 17 Jun 2025 09:47:45 -0700 (PDT)
+Received: from x1.local ([85.131.185.92])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365decb947sm82211815ad.225.2025.06.17.09.47.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 09:33:58 -0700 (PDT)
-Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 01A2B5F929;
-	Tue, 17 Jun 2025 17:33:53 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>,
-	qemu-arm@nongnu.org,
-	Mark Burton <mburton@qti.qualcomm.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Alexander Graf <graf@amazon.com>,
-	kvm@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [RFC PATCH 11/11] kvm/arm: implement WFx traps for KVM
-Date: Tue, 17 Jun 2025 17:33:51 +0100
-Message-ID: <20250617163351.2640572-12-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250617163351.2640572-1-alex.bennee@linaro.org>
-References: <20250617163351.2640572-1-alex.bennee@linaro.org>
+        Tue, 17 Jun 2025 09:47:45 -0700 (PDT)
+Date: Tue, 17 Jun 2025 12:47:35 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: kernel test robot <lkp@intel.com>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kvm@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
+	David Hildenbrand <david@redhat.com>,
+	Nico Pache <npache@redhat.com>
+Subject: Re: [PATCH 4/5] vfio: Introduce vfio_device_ops.get_unmapped_area
+ hook
+Message-ID: <aFGcJ-mjhZ1yT7Je@x1.local>
+References: <20250613134111.469884-5-peterx@redhat.com>
+ <202506142215.koMEU2rT-lkp@intel.com>
+ <aFGMG3763eSv9l8b@x1.local>
+ <20250617154157.GY1174925@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250617154157.GY1174925@nvidia.com>
 
-This allows the vCPU guest core to go to sleep on a WFx instruction.
+On Tue, Jun 17, 2025 at 12:41:57PM -0300, Jason Gunthorpe wrote:
+> On Tue, Jun 17, 2025 at 11:39:07AM -0400, Peter Xu wrote:
+> >  
+> > +#ifdef CONFIG_ARCH_SUPPORTS_HUGE_PFNMAP
+> >  static unsigned long vfio_device_get_unmapped_area(struct file *file,
+> >                                                    unsigned long addr,
+> >                                                    unsigned long len,
+> > @@ -1370,6 +1371,7 @@ static unsigned long vfio_device_get_unmapped_area(struct file *file,
+> >         return device->ops->get_unmapped_area(device, file, addr, len,
+> >                                               pgoff, flags);
+> >  }
+> > +#endif
+> >  
+> >  const struct file_operations vfio_device_fops = {
+> >         .owner          = THIS_MODULE,
+> > @@ -1380,7 +1382,9 @@ const struct file_operations vfio_device_fops = {
+> >         .unlocked_ioctl = vfio_device_fops_unl_ioctl,
+> >         .compat_ioctl   = compat_ptr_ioctl,
+> >         .mmap           = vfio_device_fops_mmap,
+> > +#ifdef CONFIG_ARCH_SUPPORTS_HUGE_PFNMAP
+> >         .get_unmapped_area = vfio_device_get_unmapped_area,
+> > +#endif
+> >  };
+> 
+> IMHO this also seems like something the core code should be dealing
+> with and not putting weird ifdefs in drivers.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/arm/kvm.c        | 28 ++++++++++++++++++++++++++++
- target/arm/trace-events |  1 +
- 2 files changed, 29 insertions(+)
+It may depend on whether we want to still do the fallbacks to
+mm_get_unmapped_area().  I get your point in the other email but not yet
+get a chance to reply.  I'll try that out to see how it looks and reply
+there.
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 1280e2c1e8..63ba8573a2 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -1544,6 +1544,32 @@ static int kvm_arm_handle_hypercall(ARMCPU *cpu,
-     return 0;
- }
- 
-+/*
-+ * It would be perfectly fine to immediately return from any WFE/WFI
-+ * trap however that would mean we spend a lot of time bouncing
-+ * between the hypervisor and QEMU when things are idle.
-+ */
-+
-+static const char * wfx_insn[] = {
-+    "WFI",
-+    "WFE",
-+    "WFIT",
-+    "WFET"
-+};
-+
-+static int kvm_arm_handle_wfx(CPUState *cs, int esr_iss)
-+{
-+    int ti = extract32(esr_iss, 0, 2);
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
-+
-+    trace_kvm_wfx_trap(cs->cpu_index, wfx_insn[ti], env->pc);
-+
-+    /* stop the CPU, return to the top of the loop */
-+    cs->stop = true;
-+    return EXCP_YIELD;
-+}
-+
- /**
-  * kvm_arm_handle_hard_trap:
-  * @cpu: ARMCPU
-@@ -1582,6 +1608,8 @@ static int kvm_arm_handle_hard_trap(ARMCPU *cpu,
-     case EC_AA64_HVC:
-     case EC_AA64_SMC:
-         return kvm_arm_handle_hypercall(cpu, esr_ec);
-+    case EC_WFX_TRAP:
-+        return kvm_arm_handle_wfx(cs, esr_iss);
-     default:
-         qemu_log_mask(LOG_UNIMP, "%s: unhandled EC: %x/%x/%x/%d\n",
-                 __func__, esr_ec, esr_iss, esr_iss2, esr_il);
-diff --git a/target/arm/trace-events b/target/arm/trace-events
-index 10cdba92a3..bb02da12ab 100644
---- a/target/arm/trace-events
-+++ b/target/arm/trace-events
-@@ -16,3 +16,4 @@ kvm_arm_fixup_msi_route(uint64_t iova, uint64_t gpa) "MSI iova = 0x%"PRIx64" is
- kvm_sysreg_read(const char *name, uint64_t val) "%s => 0x%" PRIx64
- kvm_sysreg_write(const char *name, uint64_t val) "%s <=  0x%" PRIx64
- kvm_hypercall(int ec, uint64_t arg0) "%d: %"PRIx64
-+kvm_wfx_trap(int vcpu, const char *insn, uint64_t vaddr) "%d: %s @ 0x%" PRIx64
 -- 
-2.47.2
+Peter Xu
 
 
