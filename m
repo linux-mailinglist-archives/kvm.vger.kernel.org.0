@@ -1,153 +1,230 @@
-Return-Path: <kvm+bounces-49758-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49760-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86AB4ADDCD0
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 22:01:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41247ADDD10
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 22:15:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EB121883E33
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 20:01:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75107189F932
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 20:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7292EBB96;
-	Tue, 17 Jun 2025 20:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14B32DE213;
+	Tue, 17 Jun 2025 20:15:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M48bd1k2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SqxBtrMP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476802EF9A7
-	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 20:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4C32EFD94;
+	Tue, 17 Jun 2025 20:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750190482; cv=none; b=nL3a4OZJ2sdqvOjNA61s/O+nLGkI2QrUjnowtC9qbRHyfgWIqAUzl5X4dX/wHSUlSqKbZBWb7yLm3DOrr/UREVi6nZh4TNEp05ysI0jPSIa0D3XeJ495o1SYYqqZq8SI4cXnKl/JSGJIU4Qm1IBDe8OTwCXKZdNidSRPXlqHaPc=
+	t=1750191340; cv=none; b=gEyS7wAjozn/6+3ZQH1NeGxXDV5XXYqAm5MAitNH5BSpHIRAP7OLhn5h6FOkfyjG3NCkZXiD3wTnWIJNKPcazcnQeLQ0uAQKWgC6GsnMS1i1sYJTjOhpsWFgIUyC2APEH/waHhGAT1cmP8y63bF1y1ZMsA1rM7t4/vFEHuHpzeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750190482; c=relaxed/simple;
-	bh=9qlryhIHS0Cc2X2BC+ex+dW7dnay/Akl42iZ5dW4L3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DCVlb37HfuUdbtru2yvxYQFVdfng1UpJLKrX4VwfJPYvXAkQxtTfShJrvessMhVtMVwVPInFvyF/YPCuHUfG0OB4/Fqv7BlAf2QpkjPU+SFxU+Wc2Vzr/BJS3oAH2jLiYRJELdA9E7T9xlROUkZGdE7oKF2SBGGRNC18q1o0Wyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M48bd1k2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750190480;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0Dm/YTY2gnD+c/gsISARFM2WYB8H4Eho9ZAM8VM6ubM=;
-	b=M48bd1k2d7gqfSNZ0dcClnpM/ZHvdIrRWS3NzQY4m4QgFXPw+aH5o6Kwmus2SSY7pFqF0K
-	fsMRyuJBP8tAIRzDGT3uwv0VWI7Igf2fcz/ZYwCkzrl/qwLaR+Zt3J6S6eXAwgNOTRmiEW
-	OOuqpuj9jZd6oRl6Bc9N5gwBI6Cy7hU=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-170--w_dvJ8LNi6qqG4Sfehkvw-1; Tue, 17 Jun 2025 16:01:18 -0400
-X-MC-Unique: -w_dvJ8LNi6qqG4Sfehkvw-1
-X-Mimecast-MFC-AGG-ID: -w_dvJ8LNi6qqG4Sfehkvw_1750190478
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-31327b2f8e4so6191803a91.1
-        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 13:01:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750190477; x=1750795277;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Dm/YTY2gnD+c/gsISARFM2WYB8H4Eho9ZAM8VM6ubM=;
-        b=oKuz4ovfTWEnJC6tMFE7zk2d4jA6psIUGG5YmqMfU8h12tCfzzaSzN7tIArnkMdoDg
-         ttXEsuAXlCmrx0+KovhdcbWmRJWLNiAi79bK9EQGfp8mgbp2p+9XmA0blNmhc5gyhh5n
-         Z+cretdENQosSMrhXZA3pXEp9AS9OInmey9CNgmgoo4oTtB7VRcQkW0uSAj58yhB0K2N
-         FCHhud+87659JJ55cVawYzuj+LTr+gpje1gklfgItbCs+h9M3oc6Y0xWiD31FovtME9f
-         6fsFs1iEsjJEGBVP6//kKa/ciQxDMYAerX0dsosaNN4PpxVEK21Q7DBLTOE3QT3SV1HC
-         jTGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWir5XObR0Umyr+PkTgPXZOg5y/CQcmQyxT2fQ59RUMHTbaTjbf+b8PBhcXFI1hyvS/kVA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWk6xDey4CiiG3Knwh36PxLsMHbqO6r6bvIVSMqtVlG1gn15T0
-	ZiULD6Hmt8Jq+SELHC06IEKGbrq93sdlDiW/Rou0kxTQNojKwYlwxOFt9NFO3sUL3LBrvl1gudW
-	Xyz9Rbhcm5S738KTbx2Axgg50dUCXPdXzaCHVpEca73e1FX+l39n/+A==
-X-Gm-Gg: ASbGncuomEneFzg0Tly/oL3r7FnUiM5BJr+rhVZh7JywqKZYkC3Hq0ntSrTgQrCpTDj
-	q9UtYfQJU273wcClm7G0EdF/5PzccF5PcY80hYeC4p7/eR73/sPkoWJWCvwO3Xfp/no5IXoykBH
-	MfKTRy/UYS1WKZWYxaDZ7vy4c/PHSst7vv6IRiTjbUvkCPodmgQDje3br7IO/nntLI4rggljNCw
-	4fxcvttvuIkWr1KHuDqzMrL7L51rw4THMwDho2Of4YdhnKZVJFjnDvNzxYzKPX/U4OFSy7qO6lT
-	LKxe40T+5TdHMQ==
-X-Received: by 2002:a17:90b:39cb:b0:312:ec:412f with SMTP id 98e67ed59e1d1-313f1cc6475mr24162731a91.14.1750190477476;
-        Tue, 17 Jun 2025 13:01:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9mPY0K5+r6ESf4SrogrsmJ9SaqRUqc0sTfpN2AxqMlGxDMB0nD5J8Sn7aF0/Lb+05TfOe/g==
-X-Received: by 2002:a17:90b:39cb:b0:312:ec:412f with SMTP id 98e67ed59e1d1-313f1cc6475mr24162674a91.14.1750190477030;
-        Tue, 17 Jun 2025 13:01:17 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3142874a4f3sm2156795a91.22.2025.06.17.13.01.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jun 2025 13:01:16 -0700 (PDT)
-Date: Tue, 17 Jun 2025 16:01:11 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: kernel test robot <lkp@intel.com>, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kvm@vger.kernel.org,
-	oe-kbuild-all@lists.linux.dev,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
-	David Hildenbrand <david@redhat.com>,
-	Nico Pache <npache@redhat.com>
-Subject: Re: [PATCH 4/5] vfio: Introduce vfio_device_ops.get_unmapped_area
- hook
-Message-ID: <aFHJh7sKO9CBaLHV@x1.local>
-References: <20250613134111.469884-5-peterx@redhat.com>
- <202506142215.koMEU2rT-lkp@intel.com>
- <aFGMG3763eSv9l8b@x1.local>
- <20250617154157.GY1174925@nvidia.com>
- <aFGcJ-mjhZ1yT7Je@x1.local>
- <aFHEZw1ag6o0BkrS@x1.local>
- <20250617194621.GA1575786@nvidia.com>
+	s=arc-20240116; t=1750191340; c=relaxed/simple;
+	bh=BNmUk/sbpT2Q5E9Oblw1xlKKw3xh8sEe5PplgbpLbTg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rErCIj+ldPDgwqg6n3tIhxZIU+xyQPMZCyJWgld84L8lhIucdN/fbQmxYJlQpNGG11gcidpn5S/TBRYnWlcGlOBH1XutHO40LSy+Lf6VCjV+tdpXVw55Esu6SILIJ2yyTkXUeuWgRlmoqdPRTbMoJkGFHy1dhhtqDseM36V2oqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SqxBtrMP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E109C4CEE3;
+	Tue, 17 Jun 2025 20:15:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750191339;
+	bh=BNmUk/sbpT2Q5E9Oblw1xlKKw3xh8sEe5PplgbpLbTg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SqxBtrMPRLIKOxbCYb1xaHgCUukvdgMdXu4fowXJ1lglpg4sRhuJf0XGs17YWxogV
+	 dgeX/Hq36Cxoa6LbNaU8XmYkdIhvBvS3CR4K5vkENCnyvYUyrWuaVkK3f6IDQRbw03
+	 runwmunafiBWbZuXGxd0xuOdrp3t/PYUoPLn5Ln4TC/MFLZ36yTHqtVWaPgrqk8Ns8
+	 jFo/rmKNciAxyvl3JvQpjNP2j04xUXAzCC4Vh9/nxaZ1oFmZ1YXRIyFrDdLnS0sAMM
+	 GVqvtkUJlNkVFxcm3Bm8qGRKCA1NHpSiqu71h3yGnqYhTaGnzwVqrWsln3xqXe6XSC
+	 vL01ibke7ghUQ==
+Message-ID: <d40a585f-6eca-45dd-aa9f-7dcda065c80a@kernel.org>
+Date: Tue, 17 Jun 2025 15:15:35 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250617194621.GA1575786@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6/6] vgaarb: Look at all PCI display devices in VGA
+ arbiter
+To: Daniel Dadap <ddadap@nvidia.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Lukas Wunner <lukas@wunner.de>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+ Robin Murphy <robin.murphy@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
+ "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
+ "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
+ "open list:SOUND" <linux-sound@vger.kernel.org>,
+ Mario Limonciello <mario.limonciello@amd.com>
+References: <20250617175910.1640546-1-superm1@kernel.org>
+ <20250617175910.1640546-7-superm1@kernel.org>
+ <aFHABY5yTYrJ4OUw@ddadap-lakeline.nvidia.com>
+Content-Language: en-US
+From: Mario Limonciello <superm1@kernel.org>
+In-Reply-To: <aFHABY5yTYrJ4OUw@ddadap-lakeline.nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 17, 2025 at 04:46:21PM -0300, Jason Gunthorpe wrote:
-> > I just noticed this is unfortunate and special; I yet don't see a way to
-> > avoid the fallback here.
-> > 
-> > Note that this is the vfio_device's fallback, even if the new helper
-> > (whatever we name it..) could do fallback internally, vfio_device still
-> > would need to be accessible to mm_get_unmapped_area() to make this config
-> > build pass.
+
+
+On 6/17/25 2:20 PM, Daniel Dadap wrote:
+> On Tue, Jun 17, 2025 at 12:59:10PM -0500, Mario Limonciello wrote:
+>> From: Mario Limonciello <mario.limonciello@amd.com>
+>>
+>> On a mobile system with an AMD integrated GPU + NVIDIA discrete GPU the
+>> AMD GPU is not being selected by some desktop environments for any
+>> rendering tasks. This is because neither GPU is being treated as
+>> "boot_vga" but that is what some environments use to select a GPU [1].
+>>
+>> The VGA arbiter driver only looks at devices that report as PCI display
+>> VGA class devices. Neither GPU on the system is a PCI display VGA class
+>> device:
+>>
+>> c5:00.0 3D controller: NVIDIA Corporation Device 2db9 (rev a1)
+>> c6:00.0 Display controller: Advanced Micro Devices, Inc. [AMD/ATI] Device 150e (rev d1)
+>>
+>> If the GPUs were looked at the vga_is_firmware_default() function actually
+>> does do a good job at recognizing the case from the device used for the
+>> firmware framebuffer.
+>>
+>> Modify the VGA arbiter code and matching sysfs file entries to examine all
+>> PCI display class devices. The existing logic stays the same.
+>>
+>> This will cause all GPUs to gain a `boot_vga` file, but the correct device
+>> (AMD GPU in this case) will now show `1` and the incorrect device shows `0`.
+>> Userspace then picks the right device as well.
+>>
+>> Link: https://github.com/robherring/libpciaccess/commit/b2838fb61c3542f107014b285cbda097acae1e12 [1]
+>> Suggested-by: Daniel Dadap <ddadap@nvidia.com>
+>> Acked-by: Thomas Zimmermann <tzimmermann@suse.de>
+>> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+>> ---
+>>   drivers/pci/pci-sysfs.c | 2 +-
+>>   drivers/pci/vgaarb.c    | 8 ++++----
+>>   2 files changed, 5 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
+>> index 268c69daa4d57..c314ee1b3f9ac 100644
+>> --- a/drivers/pci/pci-sysfs.c
+>> +++ b/drivers/pci/pci-sysfs.c
+>> @@ -1707,7 +1707,7 @@ static umode_t pci_dev_attrs_are_visible(struct kobject *kobj,
+>>   	struct device *dev = kobj_to_dev(kobj);
+>>   	struct pci_dev *pdev = to_pci_dev(dev);
+>>   
+>> -	if (a == &dev_attr_boot_vga.attr && pci_is_vga(pdev))
+>> +	if (a == &dev_attr_boot_vga.attr && pci_is_display(pdev))
+>>   		return a->mode;
 > 
-> I don't understand this remark?
+> I can't help but worry about userspace clients that might be checking for
+> the presence of the boot_vga sysfs file but don't check its contents. 
+
+Wouldn't those clients "already" be broken by such an assumption?
+We know today that there are systems with two VGA devices in them too.
+
+I'd think those should have both GPUs exporting a file and one having a 
+0 the other 1.
+
+> I
+> understand that it's the intention to expose the file for non-VGA display
+> controllers in the case where none of the display controllers are of the
+> VGA subclass, but one of them is the boot console device and should be
+> considered "VGA" for the purposes of the overloaded meaning of "VGA", but
+> if it isn't too much trouble to minimize the change to UAPI here, I'd be
+> more comfortable with only exposing this file for devices that really are
+> VGA and/or the firmware default.
 > 
-> get_unmapped_area is not conditional on CONFIG_ARCH_SUPPORTS_HUGE_PFNMAP?
+> Maybe something like making the condition:
 > 
-> Some new mm_get_unmapped_area_aligned() should not be conditional on
-> CONFIG_ARCH_SUPPORTS_HUGE_PFNMAP? (This is Lorenzo's and Liam's remark)
-
-Yes, this will be addressed.
-
+> if (a == &dev_attr_boot_vga.attr) {
+> 	if (pci_is_vga(pdev) ||
+> 	    (pci_is_display(pdev) && vga_default_device() == pdev))
+> 		return a->mode;
+> }
 > 
-> So what is VFIO doing that requires CONFIG_ARCH_SUPPORTS_HUGE_PFNMAP?
+> (maybe we don't even need the pci_is_display() check at that point? I
+> feel more comfortable leaving it in, though)
 
-It's the fallback part for vfio device, not vfio_pci device.  vfio_pci
-device doesn't need this special treatment after moving to the new helper
-because that hides everything.  vfio_device still needs it.
+I suppose it depends upon call order whether the above works or not.
 
-So, we have two ops that need to be touched to support this:
+I'm not sure 'off hand' right now.
 
-        vfio_device_fops
-        vfio_pci_ops 
+ > > I'd expect that to do something like (assuming two-GPU hybrid system):
+> 
+> * Systems with one VGA controller and one 3D controller:
+>    * VGA controller gets boot_vga file, contents are "1"
+>    * 3D controller does not get boot_vga file
+> * Systems with no VGA controllers and two 3D controllers:
+>    * 3D controller driving the console gets boot_vga file: "1"
+>    * 3D controller not driving the console does not get boot_vga file
+> * Systems with two VGA controllers and no 3D controllers:
+>    * VGA controller driving the console gets boot_vga file: "1"
+>    * VGA controller not driving the console gets boot_vga file: "0"
+> 
+> i.e., the behavior would only be visibly different in the case with two
+> 3D controllers, like the one targeted by this patch. You and I have seen
+> the two VGA controller case in the wild, so we know it exists. 
 
-For the 1st one's vfio_device_fops.get_unmapped_area(), it'll need its own
-fallback which must be mm_get_unmapped_area() to keep the old behavior, and
-that was defined only if CONFIG_MMU.
+Yeah I wish we had some more data from that reporter right now to 
+potentially support a proposal that would help their system too.
 
-IOW, if one day file_operations.get_unmapped_area() would allow some other
-retval to be able to fallback to the default (mm_get_unmapped_area()), then
-we don't need this special ifdef.  But now it's not ready for that..
+This patch as it is today will only help case 1 and 2.
 
--- 
-Peter Xu
+> The one 3D
+> and one VGA controller case is what I'd expect to be the common one, and
+> hopefully this will have the same behavior before and after this change
+> regardless of whether a muxed system defaults to dGPU (like hybrid Mac
+> notebooks) or iGPU (like other hybrid systems I'm accustomed to).
+> 
+>>   
+>>   	return 0;
+>> diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
+>> index 78748e8d2dbae..63216e5787d73 100644
+>> --- a/drivers/pci/vgaarb.c
+>> +++ b/drivers/pci/vgaarb.c
+>> @@ -1499,8 +1499,8 @@ static int pci_notify(struct notifier_block *nb, unsigned long action,
+>>   
+>>   	vgaarb_dbg(dev, "%s\n", __func__);
+>>   
+>> -	/* Only deal with VGA class devices */
+>> -	if (!pci_is_vga(pdev))
+>> +	/* Only deal with PCI display class devices */
+>> +	if (!pci_is_display(pdev))
+>>   		return 0;
+>>   
+>>   	/*
+>> @@ -1546,12 +1546,12 @@ static int __init vga_arb_device_init(void)
+>>   
+>>   	bus_register_notifier(&pci_bus_type, &pci_notifier);
+>>   
+>> -	/* Add all VGA class PCI devices by default */
+>> +	/* Add all PCI display class devices by default */
+>>   	pdev = NULL;
+>>   	while ((pdev =
+>>   		pci_get_subsys(PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID,
+>>   			       PCI_ANY_ID, pdev)) != NULL) {
+>> -		if (pci_is_vga(pdev))
+>> +		if (pci_is_display(pdev))
+>>   			vga_arbiter_add_pci_device(pdev);
+>>   	}
+>>   
+>> -- 
+>> 2.43.0
+>>
 
 
