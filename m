@@ -1,213 +1,206 @@
-Return-Path: <kvm+bounces-49653-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49654-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 800D4ADC005
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 05:52:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41C3BADC025
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 06:18:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 679AF3AA0C5
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 03:51:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADD3D170405
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 04:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F412264A5;
-	Tue, 17 Jun 2025 03:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B2B218AB0;
+	Tue, 17 Jun 2025 04:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RswjPOxW"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="KB4DIKoX"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C6E1E48A
-	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 03:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273D92BEFF5
+	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 04:18:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750132316; cv=none; b=iwDrMbJOuPdyhMFjoK3R2uxIJtThRrTuFTyp4Eb55q0C9fb/7wFZLEXKdyHelLtEbBLiiCh7mGjV4b49gU0lsjT0i0/Ds7LJhGXSbWT5o+SXmAup4DtxrsUDi79+muLszPrWrs+HWDGkfbiGDgvD/KI62vJXjqCQS/MkHWs9Ulk=
+	t=1750133925; cv=none; b=pkskmNlwsGMlvIwtvR/Uut3Ry0Y0kr6hEWHcy/wEx7XHX/zTEIoQf1VUFEJ1rANfnPsrMtHPx9S8zl8cKvtZt0Jph0K/ZkKdI40WSD0Pt713/M3wzKAhHJpI+RMoYNO5V+Ss3Off+O9tNXr9sMjF6ZAB1KxyWv7trLNjRj6wKgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750132316; c=relaxed/simple;
-	bh=It5Jkl2DhkLk9e4Z14wkJwLNyTY7WsnFJ8NGb+MdGXk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e53Usabx9PV2xYz8YUIb6tEdZvQftLY2DaSxvEBCRhMb6FM6cXszSXwxFJQZdygzXFclutqfkbpHS/vOpRp8XU5e8zWEn/e574P36IYVtzCHwx8iYXIyK2J0ffQ4M46EkVuCVPPSFQEsCaEJBkoxPbbamnQ35rDmDpSVEJLsmcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RswjPOxW; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-235e389599fso114735ad.0
-        for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 20:51:54 -0700 (PDT)
+	s=arc-20240116; t=1750133925; c=relaxed/simple;
+	bh=UByxiJPFvwodGWaejg9FPqJnqrV99H6qPa2IES5O7Gw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FOkIEY4N3EDV6/nPjctydOKTNh6AHqol0EMT/1UxeQnxJ+xPAtu0oQgd8+gevbcKu5GBHn9AyuG31ldXH8i/YzP+zoUBeLzpv/zdLqeaWPgd9zguLWolPoxsHMY54HJP0s4Rty9Ou26oayDMtFShaADsHcz/Dve+MJHrz8C0kqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=KB4DIKoX; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2349f096605so69236465ad.3
+        for <kvm@vger.kernel.org>; Mon, 16 Jun 2025 21:18:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750132314; x=1750737114; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WJ3iqzQFJlROLguI4Y4SVFz3OWKkrwlPkiBQnhxgF7c=;
-        b=RswjPOxW6VqH4nGHDB6YV66zqNgeCqH2rZv97OVbluy6FrAHuTu+7+5Z+eoJRKZ2BP
-         +5rnKT+fe8tMKyShnHWUj8Hr3FNqhnw8hfrB2HhL1faWe/E1dp4VkWmX3EkCwncoCgCP
-         0v/Ihc+HrWATrj5vc48vHwYTuq5C7XDT80GWBlHBSSQEawwatyQPAeYZBDr5IMR8oCRC
-         NJ/bV7R8XS2Ko+X8NUH8M2bVClCcSnsbygi94thA08/6b3x5alIpopJ/J0JUKraLmWO0
-         YBQWwehdSwYiFhUt6lGwST1Qkfs4aYok70APLXzg4PgjUtV3A5HxucwQxoZtRHl16jR4
-         hk9A==
+        d=bytedance.com; s=google; t=1750133922; x=1750738722; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=igAZEPeaIEDiheZvfxf+oF+fwfb6UvykItlBM60MOcA=;
+        b=KB4DIKoXXVJFeb+6fp8rkp5KuJq66sMUQOHTtMaAHNhhOJfJ4Mvf7n96eKtrn9aw3w
+         LGXJcYT1vzci6AjlvwakFnLNkn5fMOPw6xaRkdz9ugOyqpm8lbMmE3k+kfMDGMjOB4+h
+         ksHGiIyVVLVdYHs+L6NO5uoNn8+Q4VWhHnNzLKBdDpZUcKnE7BX8HOH+4dO/Fnixpe6r
+         88bSo2qLAHv1e5Q9ZIc1m4ngvPUNqR52NkKMaAIuvISga1xgEmsrwn65B+M7Iq8SqDBW
+         hQ0f9x9yI5wZJ8PLIRihSkPy1PP5Qbjg1MwHkzr53EYghwPcL7wTt/LhMSpuJTTqbh95
+         nbdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750132314; x=1750737114;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WJ3iqzQFJlROLguI4Y4SVFz3OWKkrwlPkiBQnhxgF7c=;
-        b=Sk0yrIiyRrpQdhzLuZxon3vY4feQiU26M1Ep4aJLX4hFa3ukwgAhOCz6zXeVs02DTA
-         SX2E5OrRscXpNCOvPW449FLiQItQgYSQZCUiltKkyt+IXV+219zm31zWVC33OGBcX3eB
-         Xg52DNc98wPuv7HpuDEo77aMUK1gPmYkV6C5/POkIjwaU1wkh9pcu3iA5qc3sN0aLh92
-         EsqRSjvtntYBIBnBTr42FtEW3w/5KqHQOgRue6dHKfx+ZXW8ZjgjTm+zLU5tWfwoGp/p
-         u1rOLhBl92WCvSfzlCO8asosYhZFsa58mMSWn4wnk/LouNSR2hjLTfT5dvhekfHWhOWH
-         Hrig==
-X-Forwarded-Encrypted: i=1; AJvYcCV5N8d/6RX4bccQqI7WXME7VfSck/iIGaOr8BEWArrTbt2QX1X4aGbFU5FttKnMvQYhVg4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQ5tpeVBF8GhLHFSteOcN21Iu2YC4Zidf40ozGmHrWelnHH4A1
-	FeM0Al4xs4RN98jd5DzVFq4SRZHpLX/21ySyN+U9/9aYs7CrsYmBrUnHbKk5TDSSG+akxeAcSyV
-	koGyT1xQxn69uNnZ46ShSfQ2TIhe+GHrAoScb5Ttn
-X-Gm-Gg: ASbGnct6gshHuXNVXSm7/ueKLIwg99XKwkA2Rl4WRDhz50zOBI7hFQR+mzfLQBJdsS1
-	/EweRJnbbLOvMwONFofuU2JcYnw/K+poHaGmT06LS/D0mQ4rGZrGANG36IzSzsiyjv0uaA8Mfng
-	S3YJA+Panot9Awi/MkdwHXaDXPkdwg43EchHoMBo6N0A==
-X-Google-Smtp-Source: AGHT+IF6I4f5iiQ5fzVQ6StksAGey3pqHY9hgP6QpR2QVCZzkDbuFzrhUQc/6q20pbd2fp1FTi8gG11ObTJAiAbppPY=
-X-Received: by 2002:a17:902:f545:b0:234:13ad:7f9f with SMTP id
- d9443c01a7336-2366c814c14mr6424845ad.22.1750132313728; Mon, 16 Jun 2025
- 20:51:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750133922; x=1750738722;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=igAZEPeaIEDiheZvfxf+oF+fwfb6UvykItlBM60MOcA=;
+        b=p1hWJ3ekjTLYVsO+QNQu2P4u4pRFkGgM2y6fau93E8FPHhRncOOq2MCV/nvQLmvKCW
+         QbSO/ZhwrMZIvViM0mTMkncLG/y/Wulbm4NPraOsnasPfAzz4Xkxe6EzEoQz6Frw5MZF
+         t4D+NGemH0TOMtmhaRFuAJFRdaPkd/gLlYrDwZ+Om571I7aOmNKoXre3jHas4X1NSVCA
+         qmGKkGLUgLFN/80KZnXWbegatF0QW06WrWEKEW4+2jnakP7OC9l6a3wdPxGof1MXn0xi
+         xuzs6Z3taWFE+acwOTHyPqOkx0rd34eI2ja77hHl3aDpTXiGR8YA/2EKy7gD939+FKeA
+         Zoog==
+X-Gm-Message-State: AOJu0YxTTR4QwJxfZ0AM7GT5y0ilhlpi09ttqEUM10a/nDFSNRPmz1lX
+	2U+75uwF95xn4zj6BuYeR0gXdBLwqdC2ePMCxJZ/NuCMcodA5xcjcuIbzLjJXjjoDB0=
+X-Gm-Gg: ASbGnctykE0oYTH3C3vQOIRt9OVIdKaYBcI832DUtlDYXkC8a8gQ8W4RZavb4hi802o
+	DaFeYu6J9Q4Rxv9Cg0lZW5wdVtKc9ascDIZXyyg1SmwMq4atTHKna+c3R6Mqg3MpRJo/xDDUgut
+	62n7irWZYzBQ/tjp9izxZzHtrTSu00NNZQZPEBy4J61eP2Z9uFuJpy53iAeM9TSqnCslt8rosLR
+	1pUEu8NTNnZ5fVoUkk1IeuFa3fhxGw0kUnbUL+iJnErZ7S/7ysus4F1yyYUBRgCtSpGMMeo6hYZ
+	obwWvlP6tFvF811tqqBjwHTAF7gWgWwJQ+JptEZfhvNkKrHUzpmXA+coKOO4iP90l5wNfIzSuri
+	st14goCM9VqL1dQ==
+X-Google-Smtp-Source: AGHT+IFsY8746XIZ16bXJPVrgLyl93cy8mP7x1VEWMaLf/+bipVG7ov5clC26qJPWsPEVOqwRUn6mg==
+X-Received: by 2002:a17:902:d4c9:b0:235:f4f7:a633 with SMTP id d9443c01a7336-2366b3ac074mr204669445ad.28.1750133922275;
+        Mon, 16 Jun 2025 21:18:42 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.10])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d88c029sm69798345ad.26.2025.06.16.21.18.38
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 16 Jun 2025 21:18:41 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: alex.williamson@redhat.com,
+	akpm@linux-foundation.org,
+	david@redhat.com,
+	peterx@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lizhe.67@bytedance.com
+Subject: [PATCH v4 0/3] optimize vfio_unpin_pages_remote() for large folio
+Date: Tue, 17 Jun 2025 12:18:18 +0800
+Message-ID: <20250617041821.85555-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aCVZIuBHx51o7Pbl@yzhao56-desk.sh.intel.com> <diqzfrgfp95d.fsf@ackerleytng-ctop.c.googlers.com>
- <aEEEJbTzlncbRaRA@yzhao56-desk.sh.intel.com> <CAGtprH_Vj=KS0BmiX=P6nUTdYeAZhNEyjrRFXVK0sG=k4gbBMg@mail.gmail.com>
- <aE/q9VKkmaCcuwpU@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aE/q9VKkmaCcuwpU@yzhao56-desk.sh.intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 16 Jun 2025 20:51:41 -0700
-X-Gm-Features: AX0GCFvGoTkM9C7sT81A1eZyHy9h_SBPfr2pduLFizuDQpAMotZ_R-0H2nFKxa0
-Message-ID: <CAGtprH_SKJ4hbQ4aSxxybcsD=eSQraP7a4AkQ3SKuMm2=Oyp+A@mail.gmail.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, pbonzini@redhat.com, seanjc@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
-	rick.p.edgecombe@intel.com, dave.hansen@intel.com, kirill.shutemov@intel.com, 
-	tabba@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
-	david@redhat.com, vbabka@suse.cz, jroedel@suse.de, thomas.lendacky@amd.com, 
-	pgonda@google.com, zhiquan1.li@intel.com, fan.du@intel.com, 
-	jun.miao@intel.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
-	xiaoyao.li@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 16, 2025 at 3:02=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> wro=
-te:
->
-> On Wed, Jun 11, 2025 at 07:30:10AM -0700, Vishal Annapurve wrote:
-> > On Wed, Jun 4, 2025 at 7:45=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> =
-wrote:
-> > >
-> > > We need to restore to the previous status (which includes the host pa=
-ge table)
-> > > if conversion can't be done.
-> > > That said, in my view, a better flow would be:
-> > >
-> > > 1. guest_memfd sends a pre-invalidation request to users (users here =
-means the
-> > >    consumers in kernel of memory allocated from guest_memfd).
-> > >
-> > > 2. Users (A, B, ..., X) perform pre-checks to determine if invalidati=
-on can
-> > >    proceed. For example, in the case of TDX, this might involve memor=
-y
-> > >    allocation and page splitting.
-> > >
-> > > 3. Based on the pre-check results, guest_memfd either aborts the inva=
-lidation or
-> > >    proceeds by sending the actual invalidation request.
-> > >
-> > > 4. Users (A-X) perform the actual unmap operation, ensuring it cannot=
- fail. For
-> > >    TDX, the unmap must succeed unless there are bugs in the KVM or TD=
-X module.
-> > >    In such cases, TDX can callback guest_memfd to inform the poison-s=
-tatus of
-> > >    the page or elevate the page reference count.
-> >
-> > Few questions here:
-> > 1) It sounds like the failure to remove entries from SEPT could only
-> > be due to bugs in the KVM/TDX module,
-> Yes.
->
-> > how reliable would it be to
-> > continue executing TDX VMs on the host once such bugs are hit?
-> The TDX VMs will be killed. However, the private pages are still mapped i=
-n the
-> SEPT (after the unmapping failure).
-> The teardown flow for TDX VM is:
->
-> do_exit
->   |->exit_files
->      |->kvm_gmem_release =3D=3D> (1) Unmap guest pages
->      |->release kvmfd
->         |->kvm_destroy_vm  (2) Reclaiming resources
->            |->kvm_arch_pre_destroy_vm  =3D=3D> Release hkid
->            |->kvm_arch_destroy_vm  =3D=3D> Reclaim SEPT page table pages
->
-> Without holding page reference after (1) fails, the guest pages may have =
-been
-> re-assigned by the host OS while they are still still tracked in the TDX =
-module.
+From: Li Zhe <lizhe.67@bytedance.com>
 
-What happens to the pagetable memory holding the SEPT entry? Is that
-also supposed to be leaked?
+This patchset is based on patch 'vfio/type1: optimize
+vfio_pin_pages_remote() for large folios'[1].
 
->
->
-> > 2) Is it reliable to continue executing the host kernel and other
-> > normal VMs once such bugs are hit?
-> If with TDX holding the page ref count, the impact of unmapping failure o=
-f guest
-> pages is just to leak those pages.
->
-> > 3) Can the memory be reclaimed reliably if the VM is marked as dead
-> > and cleaned up right away?
-> As in the above flow, TDX needs to hold the page reference on unmapping f=
-ailure
-> until after reclaiming is successful. Well, reclaiming itself is possible=
- to
-> fail either.
->
-> So, below is my proposal. Showed in the simple POC code based on
-> https://github.com/googleprodkernel/linux-cc/commits/wip-tdx-gmem-convers=
-ions-hugetlb-2mept-v2.
->
-> Patch 1: TDX increases page ref count on unmap failure.
+When vfio_unpin_pages_remote() is called with a range of addresses
+that includes large folios, the function currently performs individual
+put_pfn() operations for each page. This can lead to significant
+performance overheads, especially when dealing with large ranges of
+pages. We can optimize this process by batching the put_pfn()
+operations.
 
-This will not work as Ackerley pointed out earlier [1], it will be
-impossible to differentiate between transient refcounts on private
-pages and extra refcounts of private memory due to TDX unmap failure.
+The first patch batches the vfio_find_vpfn() calls in function
+vfio_unpin_pages_remote(). However, performance testing indicates that
+this patch does not seem to have a significant impact. The primary
+reason is that the vpfn rb tree is generally empty. Nevertheless, we
+believe it can still offer performance benefits in certain scenarios
+and also lays the groundwork for the third patch. The second patch
+introduces a new interface, unpin_user_folio_dirty_locked(), to
+conditionally mark a folio as dirty and unpin it. This interface will
+be used by the third patch. The third patch, using the method described
+earlier, optimizes the performance of vfio_unpin_pages_remote() for
+large folio scenarios.
 
-[1] https://lore.kernel.org/lkml/diqzfrgfp95d.fsf@ackerleytng-ctop.c.google=
-rs.com/
+The performance test results, based on v6.15, for completing the 16G VFIO
+IOMMU DMA unmapping, obtained through unit test[2] with slight
+modifications[3], are as follows.
 
-> Patch 2: Bail out private-to-shared conversion if splitting fails.
-> Patch 3: Make kvm_gmem_zap() return void.
->
-> ...
->         /*
->
->
-> If the above changes are agreeable, we could consider a more ambitious ap=
-proach:
-> introducing an interface like:
->
-> int guest_memfd_add_page_ref_count(gfn_t gfn, int nr);
-> int guest_memfd_dec_page_ref_count(gfn_t gfn, int nr);
+Base(v6.15):
+./vfio-pci-mem-dma-map 0000:03:00.0 16
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.047 s (338.6 GB/s)
+VFIO UNMAP DMA in 0.138 s (116.2 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.280 s (57.2 GB/s)
+VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.052 s (308.3 GB/s)
+VFIO UNMAP DMA in 0.139 s (115.1 GB/s)
 
-I don't see any reason to introduce full tracking of gfn mapping
-status in SEPTs just to handle very rare scenarios which KVM/TDX are
-taking utmost care to avoid.
+Map[1] + First patch:
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.027 s (596.1 GB/s)
+VFIO UNMAP DMA in 0.138 s (115.8 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.292 s (54.8 GB/s)
+VFIO UNMAP DMA in 0.310 s (51.6 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.032 s (506.5 GB/s)
+VFIO UNMAP DMA in 0.140 s (114.1 GB/s)
 
-That being said, I see value in letting guest_memfd know exact ranges
-still being under use by the TDX module due to unmapping failures.
-guest_memfd can take the right action instead of relying on refcounts.
+Map[1] + This patchset:
+------- AVERAGE (MADV_HUGEPAGE) --------
+VFIO MAP DMA in 0.028 s (563.9 GB/s)
+VFIO UNMAP DMA in 0.049 s (325.1 GB/s)
+------- AVERAGE (MAP_POPULATE) --------
+VFIO MAP DMA in 0.294 s (54.4 GB/s)
+VFIO UNMAP DMA in 0.296 s (54.1 GB/s)
+------- AVERAGE (HUGETLBFS) --------
+VFIO MAP DMA in 0.033 s (485.1 GB/s)
+VFIO UNMAP DMA in 0.049 s (324.4 GB/s)
 
-Does KVM continue unmapping the full range even after TDX SEPT
-management fails to unmap a subrange?
+The first patch appears to have negligible impact on the performance
+of VFIO UNMAP DMA.
+
+With the second and the third patch, we achieve an approximate 64%
+performance improvement in the VFIO UNMAP DMA item for large folios.
+For small folios, the performance test results appear to show no
+significant changes.
+
+[1]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
+[2]: https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
+[3]: https://lore.kernel.org/all/20250610031013.98556-1-lizhe.67@bytedance.com/
+
+Changelogs:
+
+v3->v4:
+- Introduce a new interface unpin_user_folio_dirty_locked(). Its
+  purpose is to conditionally mark a folio as dirty and unpin it.
+  This interface will be called in the VFIO DMA unmap process.
+- Revert the related changes to put_pfn().
+- Update the performance test results.
+
+v2->v3:
+- Split the original patch into two separate patches.
+- Add several comments specific to large folio scenarios.
+- Rename two variables.
+- The update to iova has been removed within the loop in
+  vfio_unpin_pages_remote().
+- Update the performance test results.
+
+v1->v2:
+- Refactor the implementation of the optimized code
+
+v3: https://lore.kernel.org/all/20250616075251.89067-1-lizhe.67@bytedance.com/
+v2: https://lore.kernel.org/all/20250610045753.6405-1-lizhe.67@bytedance.com/
+v1: https://lore.kernel.org/all/20250605124923.21896-1-lizhe.67@bytedance.com/
+
+Li Zhe (3):
+  vfio/type1: batch vfio_find_vpfn() in function
+    vfio_unpin_pages_remote()
+  gup: introduce unpin_user_folio_dirty_locked()
+  vfio/type1: optimize vfio_unpin_pages_remote() for large folio
+
+ drivers/vfio/vfio_iommu_type1.c | 37 ++++++++++++++++++++++++++-------
+ include/linux/mm.h              |  2 ++
+ mm/gup.c                        | 27 ++++++++++++++++++------
+ 3 files changed, 53 insertions(+), 13 deletions(-)
+
+-- 
+2.20.1
+
 
