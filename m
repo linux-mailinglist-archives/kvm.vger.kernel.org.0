@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-49682-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49683-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3A93ADC373
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 09:35:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 348C1ADC39C
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 09:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A688F17147A
-	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 07:35:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6E621705B8
+	for <lists+kvm@lfdr.de>; Tue, 17 Jun 2025 07:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1038B28F514;
-	Tue, 17 Jun 2025 07:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE51028F508;
+	Tue, 17 Jun 2025 07:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UBI8ijCY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NBPD1NqV"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1954D28ECCB
-	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 07:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6564D289824
+	for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 07:44:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750145708; cv=none; b=XJXCLxKTetN7kQQXq6HQBWkZgtsd+emZCeQgn73gvtwCWvsaNjbV0xzhvPRbjh8KQSdUpp6cBrHgpk9+SlmPdK+rWLMno2prVL/9dol7pyWDn8svL1yKzfeGAA6wGnLzxDWpjZGfqYgC2ZpBayHw/XlDOnANwOo0MG6iV4dNN4w=
+	t=1750146245; cv=none; b=oXuqslGSPVbW1ICdg4ugEE57HR4soKk6Sc4bwSgE9IgvDEW61NBss4mg1hRMshF5tTgTx+7OL4Sg/NTj9G6qowqFKs69WYm6prOgg7bgAscwuALixs+4cPLrNPI+DNxSkn3duFzujBFhyDqCfe9tWpnPoDKIIKFU8K8xwkoW7cQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750145708; c=relaxed/simple;
-	bh=WTQn1jvIcuYuUMmkktU+F6VAMUzXWNxHnSm8UZakJ78=;
+	s=arc-20240116; t=1750146245; c=relaxed/simple;
+	bh=Y/gnwY3Z4+W+KboEp4V1AS07foP089p9Cu+udu+/pP4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yiibv36Zur/n3wU2V3FchxM0hnT4R+io0RQ6QWwUyB9jBl1fjBEpQud8rZBVxvxAs4CDO1rKLFbHpa4vo4F6l1FPYZyBu3y7YLq4Aw3i1euJ2NQWOuntSw5A9XG9dSLYm74sSBxOQFP2178NSWZSuSUAm30wQ1pfZTTaoTCKNgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UBI8ijCY; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=bG1hML7vHoR29D8+FagUorKjkFkYbyYj8f6TD67CjoCwptWbWxdpgVQzC2+BUAfud/dIZSlW7Go0EZe+k4COma/GXBfAmx8WhsvGWgpRGzii8k8XeCLnQQxLtWIXuNUjsDyVkJtBDe+Ee5/c4JWwi1oZ+0R2LnO8CSIY+kZQVLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NBPD1NqV; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750145705;
+	s=mimecast20190719; t=1750146241;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Qr7YDLYZeKL5nI6aE6TfY01hQ51/nxfWCDQx9DxnXBs=;
-	b=UBI8ijCYZKZJGAIGhdlq1aiJEuYWnbOiskq9US/BjwY5k6L3/v2BJv6W8zvCwt50wOVaRQ
-	Zy2S6zJvI8DhPP7D53xovho31CfNHFfE2+luo3dJAkokyZMdl01k1JVjXQGPvDzdFUcR1d
-	zJUzrQUCF7ktrE5o2aEqNMY9qZ77pys=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=fQE5kmoAVVBp5PE3yEpqJAK0vmDk7/V02D4PYM6CncQ=;
+	b=NBPD1NqVEg56T4UpA5znqGngIl7/h6OjDidl8CgcVOMRXt+pjE7tlX+2JPTmVUILtkw5hW
+	YfgSYZrMzWxV1iV6M+vVyTI1R8ZMqM+VU4e2vybLbgCwbIARdHo1wCTMpuyOp3Ka0vnA3Q
+	5+VgwgN+KeLGXj32RhgVTRdfhKiUSzA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-38-pla8H9n6Nf6UOZOZFrMNuQ-1; Tue, 17 Jun 2025 03:35:03 -0400
-X-MC-Unique: pla8H9n6Nf6UOZOZFrMNuQ-1
-X-Mimecast-MFC-AGG-ID: pla8H9n6Nf6UOZOZFrMNuQ_1750145702
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4e9252ba0so2679716f8f.0
-        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 00:35:03 -0700 (PDT)
+ us-mta-684-ULYGIVhYPRKkDSYDt5kJJA-1; Tue, 17 Jun 2025 03:43:59 -0400
+X-MC-Unique: ULYGIVhYPRKkDSYDt5kJJA-1
+X-Mimecast-MFC-AGG-ID: ULYGIVhYPRKkDSYDt5kJJA_1750146239
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-45311704d22so35267045e9.2
+        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 00:43:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750145702; x=1750750502;
+        d=1e100.net; s=20230601; t=1750146238; x=1750751038;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=Qr7YDLYZeKL5nI6aE6TfY01hQ51/nxfWCDQx9DxnXBs=;
-        b=ftHeoY8h4OdJJ/7fQjLGiwStUp4vxt512LGIH04HkrhhW9SC8jIUXuFWYrFhsGUzS5
-         83vcrxHXn3aAgQPwPUQdKWPij1Zz5ugvRTtqGSfq2ieeI38GGIvVXM8wRIXD0KZ8At3C
-         sllfo2mGzVoHgb2pTiF7urngYWvLdvP+u3YxERN2AF/+c+ZrXPmuFbdNd/oodXxkjNUG
-         Bgdhzei7O38lAgyGeD19BzIAIqiLg7UDB9bE59oGp9KJu4Lwc6RGa4kRrcl1+gNlk+EK
-         kPEfPzKgPHMYC/eRueP4HPbhdBCAMZX3qco+8XTTSnqD/8mdJXU9+ZN61iiaJfv86mG3
-         vbrQ==
-X-Gm-Message-State: AOJu0Yw/zcrTqj5ORpN9RxjE5u40ldSWL0vxJqW3yFc23sFxDMZTHa2D
-	B7I4lkjBoa2ikewSHK/TTEb4DqZq/s8O2lGPBqmy6YZLFrhWiyDfbN3yK2CYt7nXVH1BP60R+eH
-	BA7qAjpT3iagfmVhXSZv6fWnRKfGi2weConiXoQ5PgB5Av/rmEmBUKg==
-X-Gm-Gg: ASbGnctCa6dl3DYmxRQb0a+fpuMx11uu+d1s0vhgEsgRGva8MYeDudLREIyU3+cfjB5
-	/YAtANAA2caJvhszscMzGuqDKWBnmLdWaRdor3+UOcx8GJKEfMu7ymMP1Dh8m0GExL2+Mj+hE0N
-	jzmwTFqc91apmlECGhVGECxiFqHlWafYrGOtFl9237Uk5vhFuFT6ybHLFW3R4gscCYY7J5JbTNA
-	iqDWGkTHbrTpSEiOjtYrZ/WrIvxZXHabX8JSzfxeqpLOZ9Fv97xhyQ018bpBfum5wr3hHZeJZLo
-	drKqSBEFN1m/7OGtpPGFQ/GagOii4OcErwniroK5Agzscmej8/F4iduoO1t8p2ah9idu2lK6ppc
-	HOeQtJx+AgTlrP/eODth1s+GFzorVu5ToflluHWk8O9UKrsA=
-X-Received: by 2002:adf:b64d:0:b0:3a5:75a6:73b9 with SMTP id ffacd0b85a97d-3a575a6776bmr5519733f8f.11.1750145701974;
-        Tue, 17 Jun 2025 00:35:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHj5SVN8X/GgRvKQRhQLvWOYL4dcmdIN/phPnUQUy6L/lFKmUG1JqHAavYuw0IUsXgdRRaM+w==
-X-Received: by 2002:adf:b64d:0:b0:3a5:75a6:73b9 with SMTP id ffacd0b85a97d-3a575a6776bmr5519713f8f.11.1750145701594;
-        Tue, 17 Jun 2025 00:35:01 -0700 (PDT)
+        bh=fQE5kmoAVVBp5PE3yEpqJAK0vmDk7/V02D4PYM6CncQ=;
+        b=kJipnq6uTJtJJCX18HBp6gKm3qx6z3s/DRAI4rmPTPr9GzwjWbl1BS5Dq+Zq8P8IMC
+         AguUlRPi3TSGdii2b0O5tMWttW4j3yhFhFTAsR2scVxTl4dufP8kZZ5qfVxP2a+EaYn3
+         0EBcnrbKTLMALUiFkv6TUpl13MLutAY+m5EgERyjQqQu7xZ8L7WJHtkqgdLWbcenKRKb
+         V8Oa3AilbWYwQuGPcNxVUIf4e5kXUdm+CamiKRyT3ksGuCSpe5ZBpCwyJ+gqEd2HW5vU
+         0LiWr/L9XKdjRO2EwSsSAGHxZl6LKi+jVp7CHa7/32CEtXUbXe3IvAJiRXZSSnhMyf2s
+         smTg==
+X-Gm-Message-State: AOJu0YzeNEq+JK7WCvb8vsyNVtV6VCl5g9pODaHrGroVUo1OI1Ac8RHP
+	6ELlBHqKRsdy8VaCyS+pGFcxrOO1MYzSNT/14XpUQwtdS5W4Oc3q8OTQN/wW6T44f/HG7JmTBPt
+	eaugGpENTWnF+rFYKoPwza445EymFyuN+4Kwrz/GV9wTACC8S+36vwQ==
+X-Gm-Gg: ASbGncsdsH9uNcAfubh9JTztUoFlT1cPF5+sOYuhOZgn51lbVwVg8SHOxNWRmXn8rp1
+	X6W4+ZvmaOU9x42OQHRUn2Du1s0iIKn+J4g+0cyp5JT1Mlq40Zxd7frnMxyYHCfUBO/4b/tA4Sr
+	KV95m33on2dbZol+Mr3WsGEPzcgY9+8Ceq8lPKYMk6tWxhqO6iVT7zUFm/bmtltP/VpV6Xu5oe5
+	jGXTwJo1+kAbppRuya/OntpMxBPc8VbkSVUFWtivDpyyVhF/ZTzKx3FOAz/T+2hpaZs/tzA55xp
+	Eu6I+cJ2LfLiXD9nipGXloMsA2jhTCNWsUdDClBsEDCLl6rIGzOd4JPydf2dhYmWTkhCJoDDnGE
+	0vmsr8LTWCEbRrCbZ0kmplss6cCxSTZxaRTehnR9jNTerkmw=
+X-Received: by 2002:a05:600c:82c3:b0:442:f4a3:8c5c with SMTP id 5b1f17b1804b1-4533caf5922mr132749155e9.10.1750146238571;
+        Tue, 17 Jun 2025 00:43:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGVJqsb5x8WIO+53bIeG1hU7iYijv8uZm//ZPYLkKqsSMIyHju2/xGa5dLTk4XbYbpJwr4Lyw==
+X-Received: by 2002:a05:600c:82c3:b0:442:f4a3:8c5c with SMTP id 5b1f17b1804b1-4533caf5922mr132748845e9.10.1750146238101;
+        Tue, 17 Jun 2025 00:43:58 -0700 (PDT)
 Received: from ?IPV6:2003:d8:2f31:700:3851:c66a:b6b9:3490? (p200300d82f3107003851c66ab6b93490.dip0.t-ipconnect.de. [2003:d8:2f31:700:3851:c66a:b6b9:3490])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4532e241b70sm164337975e9.18.2025.06.17.00.35.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4534394c90fsm89474035e9.3.2025.06.17.00.43.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jun 2025 00:35:01 -0700 (PDT)
-Message-ID: <e09ed520-6b52-4b53-b6bb-dfee8f34be5b@redhat.com>
-Date: Tue, 17 Jun 2025 09:35:00 +0200
+        Tue, 17 Jun 2025 00:43:57 -0700 (PDT)
+Message-ID: <34560ae6-c598-4474-a094-a657c973156b@redhat.com>
+Date: Tue, 17 Jun 2025 09:43:56 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,12 +89,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/3] gup: introduce unpin_user_folio_dirty_locked()
+Subject: Re: [PATCH v4 3/3] vfio/type1: optimize vfio_unpin_pages_remote() for
+ large folio
 To: lizhe.67@bytedance.com, alex.williamson@redhat.com,
  akpm@linux-foundation.org, peterx@redhat.com
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
 References: <20250617041821.85555-1-lizhe.67@bytedance.com>
- <20250617041821.85555-3-lizhe.67@bytedance.com>
+ <20250617041821.85555-4-lizhe.67@bytedance.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -142,85 +143,132 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250617041821.85555-3-lizhe.67@bytedance.com>
+In-Reply-To: <20250617041821.85555-4-lizhe.67@bytedance.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 17.06.25 06:18, lizhe.67@bytedance.com wrote:
 > From: Li Zhe <lizhe.67@bytedance.com>
 > 
-> Introduce a new interface, unpin_user_folio_dirty_locked(). This
-> interface is similar to unpin_user_folio(), but it adds the
-> capability to conditionally mark a folio as dirty. VFIO will utilize
-> this interface to accelerate the VFIO DMA unmap process.
+> When vfio_unpin_pages_remote() is called with a range of addresses that
+> includes large folios, the function currently performs individual
+> put_pfn() operations for each page. This can lead to significant
+> performance overheads, especially when dealing with large ranges of pages.
 > 
-> Suggested-by: David Hildenbrand <david@redhat.com>
+> This patch optimize this process by batching the put_pfn() operations.
+> 
+> The performance test results, based on v6.15, for completing the 16G VFIO
+> IOMMU DMA unmapping, obtained through unit test[1] with slight
+> modifications[2], are as follows.
+> 
+> Base(v6.15):
+> ./vfio-pci-mem-dma-map 0000:03:00.0 16
+> ------- AVERAGE (MADV_HUGEPAGE) --------
+> VFIO MAP DMA in 0.047 s (338.6 GB/s)
+> VFIO UNMAP DMA in 0.138 s (116.2 GB/s)
+> ------- AVERAGE (MAP_POPULATE) --------
+> VFIO MAP DMA in 0.280 s (57.2 GB/s)
+> VFIO UNMAP DMA in 0.312 s (51.3 GB/s)
+> ------- AVERAGE (HUGETLBFS) --------
+> VFIO MAP DMA in 0.052 s (308.3 GB/s)
+> VFIO UNMAP DMA in 0.139 s (115.1 GB/s)
+> 
+> Map[3] + This patchset:
+> ------- AVERAGE (MADV_HUGEPAGE) --------
+> VFIO MAP DMA in 0.028 s (563.9 GB/s)
+> VFIO UNMAP DMA in 0.049 s (325.1 GB/s)
+> ------- AVERAGE (MAP_POPULATE) --------
+> VFIO MAP DMA in 0.294 s (54.4 GB/s)
+> VFIO UNMAP DMA in 0.296 s (54.1 GB/s)
+> ------- AVERAGE (HUGETLBFS) --------
+> VFIO MAP DMA in 0.033 s (485.1 GB/s)
+> VFIO UNMAP DMA in 0.049 s (324.4 GB/s)
+> 
+> For large folio, we achieve an approximate 64% performance improvement
+> in the VFIO UNMAP DMA item. For small folios, the performance test
+> results appear to show no significant changes.
+> 
+> [1]: https://github.com/awilliam/tests/blob/vfio-pci-mem-dma-map/vfio-pci-mem-dma-map.c
+> [2]: https://lore.kernel.org/all/20250610031013.98556-1-lizhe.67@bytedance.com/
+> [3]: https://lore.kernel.org/all/20250529064947.38433-1-lizhe.67@bytedance.com/
+> 
 > Signed-off-by: Li Zhe <lizhe.67@bytedance.com>
 > ---
->   include/linux/mm.h |  2 ++
->   mm/gup.c           | 27 +++++++++++++++++++++------
->   2 files changed, 23 insertions(+), 6 deletions(-)
+>   drivers/vfio/vfio_iommu_type1.c | 35 +++++++++++++++++++++++++++++----
+>   1 file changed, 31 insertions(+), 4 deletions(-)
 > 
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index fdda6b16263b..242b05671502 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -1689,6 +1689,8 @@ void unpin_user_page_range_dirty_lock(struct page *page, unsigned long npages,
->   				      bool make_dirty);
->   void unpin_user_pages(struct page **pages, unsigned long npages);
->   void unpin_user_folio(struct folio *folio, unsigned long npages);
-> +void unpin_user_folio_dirty_locked(struct folio *folio,
-> +		unsigned long npins, bool make_dirty);
->   void unpin_folios(struct folio **folios, unsigned long nfolios);
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index e952bf8bdfab..159ba80082a8 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -806,11 +806,38 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+>   				    bool do_accounting)
+>   {
+>   	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+> -	long i;
 >   
->   static inline bool is_cow_mapping(vm_flags_t flags)
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 84461d384ae2..15debead5f5b 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -360,12 +360,7 @@ void unpin_user_page_range_dirty_lock(struct page *page, unsigned long npages,
->   
->   	for (i = 0; i < npages; i += nr) {
->   		folio = gup_folio_range_next(page, npages, i, &nr);
-> -		if (make_dirty && !folio_test_dirty(folio)) {
-> -			folio_lock(folio);
-> -			folio_mark_dirty(folio);
-> -			folio_unlock(folio);
-> -		}
-> -		gup_put_folio(folio, nr, FOLL_PIN);
-> +		unpin_user_folio_dirty_locked(folio, nr, make_dirty);
->   	}
->   }
->   EXPORT_SYMBOL(unpin_user_page_range_dirty_lock);
-> @@ -435,6 +430,26 @@ void unpin_user_folio(struct folio *folio, unsigned long npages)
->   }
->   EXPORT_SYMBOL(unpin_user_folio);
->   
-> +/**
-> + * unpin_user_folio_dirty_locked() - conditionally mark a folio
-> + * dirty and unpin it
-> + *
-> + * @folio:  pointer to folio to be released
-> + * @npins:  number of pins
-> + * @make_dirty: whether to mark the folio dirty
-> + *
-> + * Mark the folio as being modified if @make_dirty is true. Then
-> + * release npins of the folio.
-> + */
-> +void unpin_user_folio_dirty_locked(struct folio *folio,
-> +		unsigned long npins, bool make_dirty)
-> +{
-> +	if (make_dirty && !folio_test_dirty(folio))
-> +		folio_mark_dirty_lock(folio);
-> +	gup_put_folio(folio, npins, FOLL_PIN);
-> +}
-> +EXPORT_SYMBOL_GPL(unpin_user_folio_dirty_locked);
+> -	for (i = 0; i < npage; i++)
+> -		if (put_pfn(pfn++, dma->prot))
+> -			unlocked++;
+> +	while (npage) {
+> +		long nr_pages = 1;
 > +
->   /**
->    * unpin_folios() - release an array of gup-pinned folios.
->    * @folios:  array of folios to be marked dirty and released.
+> +		if (!is_invalid_reserved_pfn(pfn)) {
+> +			struct page *page = pfn_to_page(pfn);
+> +			struct folio *folio = page_folio(page);
+> +			long folio_pages_num = folio_nr_pages(folio);
+> +
+> +			/*
+> +			 * For a folio, it represents a physically
+> +			 * contiguous set of bytes, and all of its pages
+> +			 * share the same invalid/reserved state.
+> +			 *
+> +			 * Here, our PFNs are contiguous. Therefore, if we
+> +			 * detect that the current PFN belongs to a large
+> +			 * folio, we can batch the operations for the next
+> +			 * nr_pages PFNs.
+> +			 */
+> +			if (folio_pages_num > 1)
+> +				nr_pages = min_t(long, npage,
+> +					folio_pages_num -
+> +					folio_page_idx(folio, page));
+> +
 
-Acked-by: David Hildenbrand <david@redhat.com>
+(I know I can be a pain :) )
+
+But the long comment indicates that this is confusing.
+
+
+That is essentially the logic in gup_folio_range_next().
+
+What about factoring that out into a helper like
+
+/*
+  * TODO, returned number includes the provided current page.
+  */
+unsigned long folio_remaining_pages(struct folio *folio,
+	struct pages *pages, unsigned long max_pages)
+{
+	if (!folio_test_large(folio))
+		return 1;
+	return min_t(unsigned long, max_pages,
+		     folio_nr_pages(folio) - folio_page_idx(folio, page));
+}
+
+
+Then here you would do
+
+if (!is_invalid_reserved_pfn(pfn)) {
+	struct page *page = pfn_to_page(pfn);
+	struct folio *folio = page_folio(page);
+
+	/* We can batch-process pages belonging to the same folio. */
+	nr_pages = folio_remaining_pages(folio, page, npage);
+
+	unpin_user_folio_dirty_locked(folio, nr_pages,
+				      dma->prot & IOMMU_WRITE);
+	unlocked += nr_pages;
+}
 
 -- 
 Cheers,
