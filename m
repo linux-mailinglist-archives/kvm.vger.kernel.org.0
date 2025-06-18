@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-49852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49853-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79E08ADEA63
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 13:39:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 291BEADEA65
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 13:39:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 219E5400140
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 11:37:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F5533BF608
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 11:37:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067292E425F;
-	Wed, 18 Jun 2025 11:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B68D2E54DD;
+	Wed, 18 Jun 2025 11:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="bgWbqVDr"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="bHDqBI3/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C6F2E3B03
-	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 11:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53502E54A2
+	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 11:36:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750246567; cv=none; b=e561nd6unTrWF8HTEIc1IETjhoJJ6w56b9lULgsiMjsrvfTqGVkgOuBmEE15SUtBPCIqEFYJY2ZCbtbQCzPrxNQP8kwOnJahERyvlLKVQ05tCKDu2DUU6zzAs65m3OvOPidScQuT6eliKPHoeVn/RDfR8nmGTROytmKSz7UVN2Q=
+	t=1750246573; cv=none; b=LcQVynhLLxmlkQ+xjya2/UvdSuizEY1zkt8s+n0b2r1lpHL4kzCz4ZQGxOgu+Jcf6oebmE6310naVo3apCYmCgR/EEeEyKRoHaQrQhKzOxz0ZI8PTkdR9Is1UpcRT9VJehc4jbmtvqw+uthFylN6P3ZBV6RzC6bdC3zvchSaGhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750246567; c=relaxed/simple;
-	bh=UNJDgyGRwKsBGAVSWW07IY+xb3iaC5t5L0oSJfwXEpY=;
+	s=arc-20240116; t=1750246573; c=relaxed/simple;
+	bh=Tt/vawDYZjRbm2u92sK4nUF168I+VRBgzlUXAX+PzHI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XUVTi0/QL88CgI2SL+7p21PiSe4+Xixmd/+kL/LjGzWWaVIlividVfTXJXkJwhRTVcVNZzHHUmlLfabafuCyknl5XkN/JfURukGsrLOQPkK2Be7JXkZ4Dwh+kXiJWcrbNW0wHcI8b4K5OyG9U0wy33vP19YrfTpUXdJjrN2yNc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=bgWbqVDr; arc=none smtp.client-ip=209.85.214.180
+	 MIME-Version; b=UpqOHeKhznTu5SRVYGTniESgoOTuAycfNB+bMCby6PnIilAqsSCd37y93jWwBG24kyUE8nz1E7Oq7BczG3iikQ6z67YW05DjWiUUMUcTCi2yVgkT3/d8Jyc7bTaAxRLxB2SUM7hxHBMu9z4h8o+kCBhcqlQGRh2qX8fiD+FgxNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=bHDqBI3/; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-234b9dfb842so62385575ad.1
-        for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 04:36:05 -0700 (PDT)
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3138e64b3fcso5960009a91.2
+        for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 04:36:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1750246565; x=1750851365; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1750246570; x=1750851370; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0APR23xoSpRoPrmHOoIW/fZKPHEwlO7VgBzBq3Nrcg8=;
-        b=bgWbqVDrTp7hXRpfiE6dz9Ppqhehpuu2FOuEAO4DM5Z7SHw319uT/XmZuhOgabyQXy
-         hDWkB6MVn9WDk+VDYA9FrEsOMcybASmW+dvYGBm3LFKLo7SuFylkHcl+E3+w+3nwnUch
-         ETrW7wNsPZWtEnQIQOHWBpA5u9yMKJjv67Lq3snb/9YW+0CXtCE9hsUMngaUUHzxTZZY
-         2sWSWl6fomLI3USzJRKh82hixJyZMEFimSSOfFBL5/aNGCgYAP3mSgj+M6LSpCHKbXGm
-         RkRBXSnDmSKIWOEUhHoIMKB9BiCNtpFfarDp3zWMQJW5u9+eAvn8iCRnQVUjmfF0/57w
-         P+Xw==
+        bh=ernJHGr8wUUltKH2OhtBcW3LIbI4jpB3xEJEU1yumiA=;
+        b=bHDqBI3/PWOj7OXSVPzXvwS7SPoaJQK5RH8Zse+fTrPR+8WqbemX+ffo5io9sz/fQT
+         ndWr3cT+1XY5wCXuI0zdIinvJ7Jrqkr/BUZgKZeJhThOf5G/ioTleTg37BSheTEMdrrY
+         f+sqYkYHnYSZyKo54BmSPIK/C2iZAgoPj152CPD1a0sKETReSO9ouwc5pz+S6BGYiJGB
+         rE4SC0XYyGOeqahW6T9eoWcmeGlLvAwUna23BwZQi6biKeJTB0IWEcrLyRT5aDSdybon
+         zj8cPZyJg3NIP89d1Hl0mrFBEM2/VvoUxOSr0P/Wfn4WM10CqjnpwRvx9q+qGnPzSUEG
+         UA2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750246565; x=1750851365;
+        d=1e100.net; s=20230601; t=1750246570; x=1750851370;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0APR23xoSpRoPrmHOoIW/fZKPHEwlO7VgBzBq3Nrcg8=;
-        b=a3ihsMRTVsIatRa/ABElHhBfvba5TvQ4EIr5OHYqjYSCKFLEF0ZygSqklUli+9Qmpe
-         ULkIaYfLyEeX+3Og7LjYeZ/OYYwKWZdTeGNZ+l7RZZ5/DLE75QLWehAiHU3iQd5+SEiL
-         qWJUiP9XUE1ji+hzDg+pAYVHJTpOfjFI0b6Ui2AzBRt0HtpDCBAAF8Z///St1G7CyyJV
-         M2sJ4DQDFNY5vCA1B7+s9RHtsGj3fPKHFayF+R8gawDBeIBYVWWtcx0FT63bn8z2YXtt
-         6LqudqrTHLKE1yupLVfOyO7N2WhtSuxkpomu4sxUVTuJ4ZtE+Wxnmk4MZrqIYvBWFUi0
-         hkuw==
-X-Forwarded-Encrypted: i=1; AJvYcCXZcEI0kjIOeHRKFriLVeP3LyCHWuiLRI1pwhJcmqhZTWSAv89l2ZyNeCJj47YPxmwawFE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPS9f8UyzQOfUtr5gLQS2Ak3z53Bw8tnkpPO3jKifCsN0s4sbn
-	0fQrMoxo9I4suSi8PBFEhxmB0YPA81mvPnBVGbIi6uZlDAqZPRn3+64pShOoHsWZjHA=
-X-Gm-Gg: ASbGnctp646rzyjB28giHcXhbQn4wx6dj3+GT0nIsg/DHhjwCmF+IRKXigplZHJl0BR
-	CDmQxx93fGtDNFz9fhaNTpOvbtkCdlbZ0o0SMvjOltg1ZLjGNlZ+TRGnu2+kB2hSoY68P4Wddks
-	75CoC6OfMDujpRyipBA/9TushMfhayoAE/N3h8OiMuuxp9Mh5BPdDn029FtiFmBQ8di2NfWWogj
-	zogVZfvpbcbgdsltrH9x1ojf8YoNL5frLbKF9zyBIVMBFpJseSsEhz3yslzhG0+PfHPTABCODex
-	7E85pLNE0Iww0qmFqJL0P83F69rorYxEmEnM+6d5uQLjMJf0YuRBrp7QzIuMfcaT85UUY4rZR0k
-	zPobbuHszQORa7fb5QAHp998lpUaO
-X-Google-Smtp-Source: AGHT+IEI/VNLAuRLYdIAweMxNEdH8gXS8v8LyQf6sVKwZcSZW1oY61MqIeM//ad3SI9TL8TSIJCUlw==
-X-Received: by 2002:a17:903:1ac5:b0:234:bc4e:4eb4 with SMTP id d9443c01a7336-2366b3e2ff9mr227196035ad.51.1750246564794;
-        Wed, 18 Jun 2025 04:36:04 -0700 (PDT)
+        bh=ernJHGr8wUUltKH2OhtBcW3LIbI4jpB3xEJEU1yumiA=;
+        b=qgaMD8+O+e6Tn331P4K6uqVXKNryA6q4SaasxUUSI7+oJNa8jjnOr1aVv0pyR4tObw
+         +N/edwjnt5J2qRosAMK9Lnd89bEgUPIz20HvdmjZ9etLYuAaTXs3kddnKMjPStIqrDvF
+         rQYLniqWrbfXkJsR5AVIXjUiu3BXR7+epP8IX4JERZ/JTYC8gogKepAxbcNJiZbcS4yV
+         Ezekqsq8cw7Nq8QgXupifbAsITyfxKgkrzeOq2s90zOrfc7SeXBOD5ZFXKIFxpoQ1Cg0
+         0RaeqUXyuYiAivJNdvkiKx7KD4YUMDr371PUebGDV1CqCoD51MlSWu0mmflCHH9J39/a
+         ydYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWxZO7E+TKcXY3xbEZVb42SLg86ErMTCKo6kzH7pTCP+G7Gi1LUnAlBaBvxFildt5reiKo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPmUYTDpCqytkfTcec44KJ1Xz1ZKF4Z8VKFeo5WysImx0VHfgY
+	5dTw6Eomw70a+aj4of5HR5JbKO+GQ3WcT5w8+cPJwMqqG05OeqmtKoXKK95B5u9YEHY=
+X-Gm-Gg: ASbGncs9pPyMUQG3BG2rEWcAtsDdyV3d22pf92El0dqSPsGzbg7BbaOBA3M8qgfULXy
+	f8qh/+BTRKH802EPc/n+SdYPL/QIbJch52NeWdPKPgCWBaWJzmrd8k/oRcRMssrS8E211ujV/Ut
+	BPhkQm/K28+/Uihf/1QDUWsmGojCHxsb8Otnbm8Y3zZs3ddeWgjJZmG//nAt+3FHOmASFUMs1tb
+	Aa41qVusHyUdKIHmSnEfDebb9Ntam1AT83Mfl0AZBxJGj5ZIcrB9t++3ItqwjK0LKxIx2pEcj9M
+	gV2BKqgaANyNNBPO5L+oadaTDlzL/+pdfiwr51RprWFjF6/D5fr/mrVvd93xWtYzvT09Qle/Qy3
+	lOd8QMJ2Erp2U25FuaPPXx6ux6i0y
+X-Google-Smtp-Source: AGHT+IED2oGexk/JFxqAVuWpL/++/t8pIqk6FimHQhJH+vt07+Mbc0bPBQs0X+EavqGGcAYnWQlaQw==
+X-Received: by 2002:a17:90b:1a87:b0:311:abba:53c0 with SMTP id 98e67ed59e1d1-313f1c03004mr26620231a91.9.1750246569846;
+        Wed, 18 Jun 2025 04:36:09 -0700 (PDT)
 Received: from localhost.localdomain ([122.171.23.44])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237c57c63efsm9112475ad.172.2025.06.18.04.36.00
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237c57c63efsm9112475ad.172.2025.06.18.04.36.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 04:36:04 -0700 (PDT)
+        Wed, 18 Jun 2025 04:36:08 -0700 (PDT)
 From: Anup Patel <apatel@ventanamicro.com>
 To: Atish Patra <atish.patra@linux.dev>
 Cc: Palmer Dabbelt <palmer@dabbelt.com>,
@@ -86,9 +86,9 @@ Cc: Palmer Dabbelt <palmer@dabbelt.com>,
 	linux-kernel@vger.kernel.org,
 	Anup Patel <apatel@ventanamicro.com>,
 	Atish Patra <atishp@rivosinc.com>
-Subject: [PATCH v3 04/12] RISC-V: KVM: Replace KVM_REQ_HFENCE_GVMA_VMID_ALL with KVM_REQ_TLB_FLUSH
-Date: Wed, 18 Jun 2025 17:05:24 +0530
-Message-ID: <20250618113532.471448-5-apatel@ventanamicro.com>
+Subject: [PATCH v3 05/12] RISC-V: KVM: Don't flush TLB when PTE is unchanged
+Date: Wed, 18 Jun 2025 17:05:25 +0530
+Message-ID: <20250618113532.471448-6-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250618113532.471448-1-apatel@ventanamicro.com>
 References: <20250618113532.471448-1-apatel@ventanamicro.com>
@@ -100,92 +100,58 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The KVM_REQ_HFENCE_GVMA_VMID_ALL is same as KVM_REQ_TLB_FLUSH so
-to avoid confusion let's replace KVM_REQ_HFENCE_GVMA_VMID_ALL with
-KVM_REQ_TLB_FLUSH. Also, rename kvm_riscv_hfence_gvma_vmid_all_process()
-to kvm_riscv_tlb_flush_process().
+The gstage_set_pte() and gstage_op_pte() should flush TLB only when
+a leaf PTE changes so that unnecessary TLB flushes can be avoided.
 
 Reviewed-by: Atish Patra <atishp@rivosinc.com>
 Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 ---
- arch/riscv/include/asm/kvm_host.h | 4 ++--
- arch/riscv/kvm/tlb.c              | 8 ++++----
- arch/riscv/kvm/vcpu.c             | 8 ++------
- 3 files changed, 8 insertions(+), 12 deletions(-)
+ arch/riscv/kvm/mmu.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 8aa705ac75a5..ff1f76d6f177 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -37,7 +37,6 @@
- #define KVM_REQ_UPDATE_HGATP		KVM_ARCH_REQ(2)
- #define KVM_REQ_FENCE_I			\
- 	KVM_ARCH_REQ_FLAGS(3, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
--#define KVM_REQ_HFENCE_GVMA_VMID_ALL	KVM_REQ_TLB_FLUSH
- #define KVM_REQ_HFENCE_VVMA_ALL		\
- 	KVM_ARCH_REQ_FLAGS(4, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_HFENCE			\
-@@ -331,8 +330,9 @@ void kvm_riscv_local_hfence_vvma_gva(unsigned long vmid,
- 				     unsigned long order);
- void kvm_riscv_local_hfence_vvma_all(unsigned long vmid);
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 1087ea74567b..29f1bd853a66 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -167,9 +167,11 @@ static int gstage_set_pte(struct kvm *kvm, u32 level,
+ 		ptep = &next_ptep[gstage_pte_index(addr, current_level)];
+ 	}
  
-+void kvm_riscv_tlb_flush_process(struct kvm_vcpu *vcpu);
-+
- void kvm_riscv_fence_i_process(struct kvm_vcpu *vcpu);
--void kvm_riscv_hfence_gvma_vmid_all_process(struct kvm_vcpu *vcpu);
- void kvm_riscv_hfence_vvma_all_process(struct kvm_vcpu *vcpu);
- void kvm_riscv_hfence_process(struct kvm_vcpu *vcpu);
+-	set_pte(ptep, *new_pte);
+-	if (gstage_pte_leaf(ptep))
+-		gstage_remote_tlb_flush(kvm, current_level, addr);
++	if (pte_val(*ptep) != pte_val(*new_pte)) {
++		set_pte(ptep, *new_pte);
++		if (gstage_pte_leaf(ptep))
++			gstage_remote_tlb_flush(kvm, current_level, addr);
++	}
  
-diff --git a/arch/riscv/kvm/tlb.c b/arch/riscv/kvm/tlb.c
-index b3461bfd9756..da98ca801d31 100644
---- a/arch/riscv/kvm/tlb.c
-+++ b/arch/riscv/kvm/tlb.c
-@@ -162,7 +162,7 @@ void kvm_riscv_fence_i_process(struct kvm_vcpu *vcpu)
- 	local_flush_icache_all();
+ 	return 0;
  }
- 
--void kvm_riscv_hfence_gvma_vmid_all_process(struct kvm_vcpu *vcpu)
-+void kvm_riscv_tlb_flush_process(struct kvm_vcpu *vcpu)
+@@ -229,7 +231,7 @@ static void gstage_op_pte(struct kvm *kvm, gpa_t addr,
+ 			  pte_t *ptep, u32 ptep_level, enum gstage_op op)
  {
- 	struct kvm_vmid *v = &vcpu->kvm->arch.vmid;
- 	unsigned long vmid = READ_ONCE(v->vmid);
-@@ -342,14 +342,14 @@ void kvm_riscv_hfence_gvma_vmid_gpa(struct kvm *kvm,
- 	data.size = gpsz;
- 	data.order = order;
- 	make_xfence_request(kvm, hbase, hmask, KVM_REQ_HFENCE,
--			    KVM_REQ_HFENCE_GVMA_VMID_ALL, &data);
-+			    KVM_REQ_TLB_FLUSH, &data);
+ 	int i, ret;
+-	pte_t *next_ptep;
++	pte_t old_pte, *next_ptep;
+ 	u32 next_ptep_level;
+ 	unsigned long next_page_size, page_size;
+ 
+@@ -258,11 +260,13 @@ static void gstage_op_pte(struct kvm *kvm, gpa_t addr,
+ 		if (op == GSTAGE_OP_CLEAR)
+ 			put_page(virt_to_page(next_ptep));
+ 	} else {
++		old_pte = *ptep;
+ 		if (op == GSTAGE_OP_CLEAR)
+ 			set_pte(ptep, __pte(0));
+ 		else if (op == GSTAGE_OP_WP)
+ 			set_pte(ptep, __pte(pte_val(ptep_get(ptep)) & ~_PAGE_WRITE));
+-		gstage_remote_tlb_flush(kvm, ptep_level, addr);
++		if (pte_val(*ptep) != pte_val(old_pte))
++			gstage_remote_tlb_flush(kvm, ptep_level, addr);
+ 	}
  }
  
- void kvm_riscv_hfence_gvma_vmid_all(struct kvm *kvm,
- 				    unsigned long hbase, unsigned long hmask)
- {
--	make_xfence_request(kvm, hbase, hmask, KVM_REQ_HFENCE_GVMA_VMID_ALL,
--			    KVM_REQ_HFENCE_GVMA_VMID_ALL, NULL);
-+	make_xfence_request(kvm, hbase, hmask, KVM_REQ_TLB_FLUSH,
-+			    KVM_REQ_TLB_FLUSH, NULL);
- }
- 
- void kvm_riscv_hfence_vvma_asid_gva(struct kvm *kvm,
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index a2dd4161e5a4..6eb11c913b13 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -721,12 +721,8 @@ static void kvm_riscv_check_vcpu_requests(struct kvm_vcpu *vcpu)
- 		if (kvm_check_request(KVM_REQ_FENCE_I, vcpu))
- 			kvm_riscv_fence_i_process(vcpu);
- 
--		/*
--		 * The generic KVM_REQ_TLB_FLUSH is same as
--		 * KVM_REQ_HFENCE_GVMA_VMID_ALL
--		 */
--		if (kvm_check_request(KVM_REQ_HFENCE_GVMA_VMID_ALL, vcpu))
--			kvm_riscv_hfence_gvma_vmid_all_process(vcpu);
-+		if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu))
-+			kvm_riscv_tlb_flush_process(vcpu);
- 
- 		if (kvm_check_request(KVM_REQ_HFENCE_VVMA_ALL, vcpu))
- 			kvm_riscv_hfence_vvma_all_process(vcpu);
 -- 
 2.43.0
 
