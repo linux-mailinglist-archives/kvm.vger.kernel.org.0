@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-49786-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49787-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE47AADE025
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 02:43:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87893ADE02D
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 02:45:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D021C3BD350
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 00:43:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5531A189B09C
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 00:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88EA8126C1E;
-	Wed, 18 Jun 2025 00:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C41B149C6F;
+	Wed, 18 Jun 2025 00:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="kIn06OAd"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="vSXfKdUj"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F592F5301;
-	Wed, 18 Jun 2025 00:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C09208A7;
+	Wed, 18 Jun 2025 00:45:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750207407; cv=none; b=HIaOIlNrHExbUoCENy97pgGLslIe7733XsnxO1arqifr6ZzjxBVlJwLT3BrQjojF+LIhx4YPI6hWeXavwB9i9hJG1w+/ky9XHkK8PHPWXT8tnLtSCBgHoQfseL/cah7O24q+EbYuMLhul+CE88f9VMYP6R3FgC/AKC26uVxFfvY=
+	t=1750207528; cv=none; b=ElW64ajKiKrH2h1fScRJRs/3DIP+E7nsz0MRTN4y/iQAoDH8eIGdQz7C3kdvONNeNDsZEThGX/Qq94T501grVRc3TYm/4nR6F8Fe64q0K6Go/XsFkXR7iYJEtXFPAflYrmfjBOfxRUTqGIg05OHozhTCTpKA10XJmMgORgDXTdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750207407; c=relaxed/simple;
-	bh=ZyP0kbMtcCQ83BQxcvLLk9BQpHXtlcVBp/dgcpPHwws=;
+	s=arc-20240116; t=1750207528; c=relaxed/simple;
+	bh=MjedBzl2LpiqalQv8fIgpbyF9Gc9Jql2Zp9aeIjqIEI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WZWo+SulSfnoLg+EqR2RNUvzBRqY4hRdQZovieWFG8r0fQ+ovWYQ7kMkTeJJ70kfqTo4eyi9t0c7p+bYPlu65HqHgwuzHySl9bNjDo0VeZ7hXKfCDSoqYS8I7v9zCfJYIw2dDyliJ0KIvImGX6PA4eXoC7d/hV/w4OxvonKv+1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=kIn06OAd; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=PFAqJs3UgP9oCmDKogwqG1R6+cs1E524rp3bCtX9Hj90LhzESMT26Fc3thtDzjXfs9zxl8c7U2Z4tDe/KVszCyKkdNvxJoxgowLEjKjMbcbej8m91C3AdOZYIEpCnWICG+2a4OM6q3l/M0zwID+n2RZCrg5P4Y7TYANE5HK0MTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=vSXfKdUj; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55I0gq8n1334945
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55I0iu001337091
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 17 Jun 2025 17:42:53 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55I0gq8n1334945
+	Tue, 17 Jun 2025 17:44:56 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55I0iu001337091
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025052101; t=1750207374;
-	bh=YZhMWwx+8vEbIhZuaC/OegAL3grAv6uLTi0kLIVJXY0=;
+	s=2025052101; t=1750207497;
+	bh=WAuDsFmy4veubOgHPnpiac5ncyqk60/EWoqBp3MAph4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kIn06OAdLFu/YMgz/MfjKZ5P6dUCfyFL6LpMBtYancCXkQvUYLmQIoucTmc9/jQhI
-	 uGpv6dgKe8MzOR2dVu9KI2tvfp1BFtHiV4hbYZ9wCF91zlweOtQy38e2PT2NvFtTQA
-	 YGvfzL86cgQIglc05axDOzfRC8acmp1dGm30MYRLx/d+Ke2gPtRwFrhbW9//v9wKtT
-	 QTWfej7CXam8ZK+y+nz7ripRlRh1R5Bk+nvXib+0pdF/zaio9sbsqzpZ3ewsVDNu4z
-	 igFIrfV+ib2/cMq+MXfnfsxsuxFfyOZqpe9xB7/Dh0sRT8CREIgEpSmCdmVckpJGHi
-	 AVC6pxH+9YkhA==
-Message-ID: <c8b0924e-4cbf-473b-99e2-eb212d8e99bf@zytor.com>
-Date: Tue, 17 Jun 2025 17:42:51 -0700
+	b=vSXfKdUjiBJJ1kAj3efOQTM0XZyzWJH4ktxdSc9GX+WcMV2622g1gKr+G6w2Q4QMH
+	 967AE4IG4V5Xn58Q1RTv70lEdjMnolIc5hJ4K6OgvOX5OpHk7gFpuwJOZjdE53pg6T
+	 34d3I79xTJ55BwMVoBeIejrIpbhON/C/UzjAQgZr3TVgLOlyz9At2umJNVVeCTBtm5
+	 cDebxHlZeP6pi482aMADpZBHqLJZ0mSzij7n34eCnFla0pqnsL+uB0PZMSshKXc/gr
+	 jypgxumYi+Nh4rQQhh62UiY8jGHZQEesIqQAQyb8TfePizMkjlUe2Uu3xUKhzA2/pB
+	 Grgz6StKFZaHw==
+Message-ID: <c5f99d62-79f3-447a-9280-febb2927f739@zytor.com>
+Date: Tue, 17 Jun 2025 17:44:55 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,20 +56,17 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] x86/traps: Initialize DR6 by writing its
+Subject: Re: [PATCH v2 2/2] x86/traps: Initialize DR7 by writing its
  architectural reset value
-To: Sohil Mehta <sohil.mehta@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
-        peterz@infradead.org, brgerst@gmail.com, tony.luck@intel.com,
-        fenghuay@nvidia.com
+To: Sohil Mehta <sohil.mehta@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+        brgerst@gmail.com, tony.luck@intel.com, fenghuay@nvidia.com
 References: <20250617073234.1020644-1-xin@zytor.com>
- <20250617073234.1020644-2-xin@zytor.com>
- <fa32b6e9-b087-495a-acf1-a28cfed7e28a@intel.com>
- <aFHUZh6koJyVi3p-@google.com>
- <276d66a1-dafe-4ed8-aefd-8f60e34ff575@intel.com>
+ <20250617073234.1020644-3-xin@zytor.com>
+ <7ae5c378-a81a-469f-a7eb-ddd855590a3b@intel.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -106,20 +103,19 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <276d66a1-dafe-4ed8-aefd-8f60e34ff575@intel.com>
+In-Reply-To: <7ae5c378-a81a-469f-a7eb-ddd855590a3b@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 6/17/2025 4:10 PM, Sohil Mehta wrote:
->> Ah, and now I see that DR6_RESERVED is an existing #define in a uAPI header (Xin
->> said there were a few, but I somehow missed them earlier).  Maybe just leave that
->> thing alone, but update the comment to state that it's a historical wart?  And
->> then put DR6_ACTIVE_LOW and other macros in arch/x86/include/asm/debugreg.h?
->>
-> Yeah, that's unfortunate. Updating the comment seems the best we do for now.
+>>   
+>> +/* DR7_FIXED_1 is also used as the init/reset value for DR7 */
+>> +#define DR7_FIXED_1	0x00000400
+>> +
+> Did you mean to describe what DR7_FIXED_1 is, and then say it is also
+> used as the init/reset value? Because the way the comment is framed
+> right now, it seems something is missing.
 
-It's a mess, and I don't think I can just remove DR6_RESERVED.
+I probably should add a short version of Sean's description here.
 
-But the value 0xFFFF0FF0 no longer makes sense on newer CPUs, so maybe 
-it won't cause any real problem?
 
