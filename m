@@ -1,193 +1,285 @@
-Return-Path: <kvm+bounces-49822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F996ADE473
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 09:22:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82A73ADE4A3
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 09:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEB1E1671DC
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 07:22:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF2611897E03
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 07:36:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6336B27E7F9;
-	Wed, 18 Jun 2025 07:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF3227E1C3;
+	Wed, 18 Jun 2025 07:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Zh+qr4gD"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qre4+a4d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09CDEACD
-	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 07:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF1F186294
+	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 07:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750231342; cv=none; b=tUUgDpGZQ0nVdF6JkPQzKVBHN/2/m9YE9B7nVfDTZ5E9KQ7/IW01+O4CrslMMbFkKn+pd7iuzrqkewWD5t0tP6bkyg4npUmbj/iz6H2uFKsSAoQb8OD9Twql6BQwJdS92plBmxFtrdNqFLnielebTtpwKyDtT2ZGPw6tjtE/AIQ=
+	t=1750232184; cv=none; b=F7A3Lh5No8E2Tne3wt9PynIU/RcFtfQEpcE4A+Lf1LTzpoDWXvPJqFRrkz3ZS6BwT5zx1vJJ7AbD47CLmcTHZ6CbeZDxBUhAiQd7Q0UZ0Zo3i/w3djPlU4tHDcxy0DUIH7JTZpjxjLkTUcjop8pZ3HbMeKmRfYh/8Vhc8Obw7r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750231342; c=relaxed/simple;
-	bh=FlYIp1GSWXgA47DrwMIkay6HroV1XLb7hc3gExSwoE4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fSGzaraGPnLSGvhQIFZaHNDPX6dRISpbPJPVkspWJO8XcxESeAia03KBsPd/xoKqk7RNh85dXytjSkuYdlFexK9vvuxtvAWXigfO/1dh+CQ20tYbe/HxODNcIACR/++LfL52eNRTa5/4+k2EYpF5dAL14o7zpVhPt0rOXpAAHcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Zh+qr4gD; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-af51596da56so5944503a12.0
-        for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 00:22:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1750231338; x=1750836138; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g90eoEwOIpMaTkn+dJ7Xpv9ylWdjlRNbMVrS8tF+CzE=;
-        b=Zh+qr4gDieiiDIq+0sFz5aljgNoxhu28li3qFs8ishAvrRVrzZmM7f/ebQlsHhvKe7
-         f1CEtJkOHnPqn0rAo6uc3Owqar2bIBBaWQb/IjKfN7W0YzuvIxGFp8JaP25g2e2kyziE
-         vzA4AkKjFFuKarY0aTbxjkcbmqNM/B7qEhxKAmzsTkJazARznFZhqObcObN6W4DvRwyC
-         jRfOZHavXYB5k3Jqeyumc4bqho+nk8t41Ynh5olFHzZTXmrbPeoi5UwxP5wpggHCZgyo
-         kj7TGsE3zXOy/cIxolHYug8FvhpurEvBgczf5V3gXh/ZQKJG5VzzdCi9WeWo80jkDDSI
-         bZCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750231338; x=1750836138;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g90eoEwOIpMaTkn+dJ7Xpv9ylWdjlRNbMVrS8tF+CzE=;
-        b=Iz3ThNkywUmsI/tqRyosPqAvUxARCyKisIvMK/cXWD732e3bcDFn68ylh8lxza2TQw
-         ILHu2B3SjOhLj+By/CuSMi9RBwwAu9SDLXE8fxSZBDJN2WRM656bdQ+8t35xvRfBjdWg
-         UeM+sBnyew/URdDQ9rmzxjnR0Hxc3iwVKbgQozK6VWv9awlKdVq4dOqxuG2doZCLLpDG
-         KLlR2WTs3lwEKrK+1Cg2FqxyX7QGJFm98YhMfqCgeQK2cChs7Yq98uVIC4RpyEV/e97j
-         4peRm9ddpRrUXcDX6u+dohopKYbSADlSiwtUYFJ5c2nJDXdmdsDaaWD9nQ4XrucF1fk9
-         1qvw==
-X-Forwarded-Encrypted: i=1; AJvYcCUHjYvE5zfYkbRd2QmrvA47PrtpdgE4Sv4GrgayRQZ7s2uQ9IpvRHTrGBh0qe8+DpYMbyk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzrOTSUE1PoZo9z7/xEPNiojrT25A4Vs8xmHwhxYT88i7AFyZx
-	+0uymbD4k/Ev5zugPAbylw09bCUAp6C5Qrxlv2kfVsoyDQN6GVt3m3NGiOTFjFOCi6g=
-X-Gm-Gg: ASbGnctuX6qeCUiZmnrCyLjYLfY2apYXnd3233x3d38lAePHt4srjNRzRsMy5VruG/Y
-	7tRc6o0BYhKXTuc5q7hFh1gXmxApaGzvxd6VRwkXhhhqOHm0FXv5JMV0PZKigLjPZl/1F6KO48k
-	m2aq6js69z8lw+ac/zekhOad58kQdK3NgGJ/tsJE8M1lKH+H/tVaF1HhiFtK6LThOpm8YmVTH3O
-	vBk2Vtq5c0X5DqEka6CkVwhZ5RiL4q7+60CJcKbQkeucrYc4til1iQQl2Qzk3UwUrGJN9p2zC9H
-	qtg5dDWnSX5RFbnQUkiiqxt03Ak49961IjhfPPOmHDPnwRPsk5qjkDU41s23WEUW67eE/i5vv7C
-	8A5h4QEn9xm56gA==
-X-Google-Smtp-Source: AGHT+IEIlF9MTo6BXhNVepXYf6WgSUfQhwoHcEgxpRuHCE9CuMWp3AFMHSQtgSDSihKLhGjH6gjAVQ==
-X-Received: by 2002:a17:90b:350c:b0:312:f0d0:bb0 with SMTP id 98e67ed59e1d1-313f1ca0fbfmr30726786a91.12.1750231338007;
-        Wed, 18 Jun 2025 00:22:18 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.12])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365dfc6990sm92909995ad.224.2025.06.18.00.22.14
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 18 Jun 2025 00:22:17 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: david@redhat.com
-Cc: akpm@linux-foundation.org,
-	alex.williamson@redhat.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	peterx@redhat.com,
-	lizhe.67@bytedance.com
-Subject: Re: [PATCH v4 3/3] vfio/type1: optimize vfio_unpin_pages_remote() for large folio
-Date: Wed, 18 Jun 2025 15:22:11 +0800
-Message-ID: <20250618072211.12867-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250618061143.6470-1-lizhe.67@bytedance.com>
-References: <20250618061143.6470-1-lizhe.67@bytedance.com>
+	s=arc-20240116; t=1750232184; c=relaxed/simple;
+	bh=fFFF4dxwGMNmW8OffYmfQMv312sXB2ojGR5vgt3qPPI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r5tyiImtOHKfQG4X/ACmtQNXWKNRTyWUXnO/coiCZgZvCZ1h/iPEv4nG8KaDp8kNEEEJwU0x5QDrrIFHNxWR0cMGijzduSQOit/R9wTJEcdliteWXgKcZ9XCUNdTjY7jnBSgYVdy2Hwzxf78FkBJgVOamMDiIJ9ULrARk1JeSGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qre4+a4d; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <77225fc9-845f-446a-9014-060b5cc73ba2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750232179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zdvl+pAO+bUqhZRChbu03wIqYl7v9j98HDmfPpTf/2g=;
+	b=Qre4+a4dbN6G6Iy3F6FbPzM/ia5gqX926MBxqQQCHJ6admzrUdUlTwZG0CBjOUuRy+T9oH
+	CVhP/OE1QFVMOTlZ7Ny6cXYYFAdsFcdvAL/9l0756dMgbj0Jyujm4NpLjKpuMZvYzFy8vT
+	EksZYi/NnYfwr7XxdlD0VWYuiUT4VNw=
+Date: Wed, 18 Jun 2025 00:36:11 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 09/12] RISC-V: KVM: Introduce struct kvm_gstage_mapping
+To: Anup Patel <apatel@ventanamicro.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Alexandre Ghiti <alex@ghiti.fr>,
+ Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250613065743.737102-1-apatel@ventanamicro.com>
+ <20250613065743.737102-10-apatel@ventanamicro.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Atish Patra <atish.patra@linux.dev>
+In-Reply-To: <20250613065743.737102-10-apatel@ventanamicro.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 18 Jun 2025 14:11:43 +0800, lizhe.67@bytedance.com wrote:
- 
-> > > How do you think of this implementation?
-> > > 
-> > > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > > index 242b05671502..eb91f99ea973 100644
-> > > --- a/include/linux/mm.h
-> > > +++ b/include/linux/mm.h
-> > > @@ -2165,6 +2165,23 @@ static inline long folio_nr_pages(const struct folio *folio)
-> > >          return folio_large_nr_pages(folio);
-> > >   }
-> > >   
-> > > +/*
-> > > + * folio_remaining_pages - Counts the number of pages from a given
-> > > + * start page to the end of the folio.
-> > > + *
-> > > + * @folio: Pointer to folio
-> > > + * @start_page: The starting page from which to begin counting.
-> > > + *
-> > > + * Returned number includes the provided start page.
-> > > + *
-> > > + * The caller must ensure that @start_page belongs to @folio.
-> > > + */
-> > > +static inline unsigned long folio_remaining_pages(struct folio *folio,
-> > > +               struct page *start_page)
-> > > +{
-> > > +       return folio_nr_pages(folio) - folio_page_idx(folio, start_page);
-> > > +}
-> > > +
-> > >   /* Only hugetlbfs can allocate folios larger than MAX_ORDER */
-> > >   #ifdef CONFIG_ARCH_HAS_GIGANTIC_PAGE
-> > >   #define MAX_FOLIO_NR_PAGES     (1UL << PUD_ORDER)
-> > > diff --git a/mm/gup.c b/mm/gup.c
-> > > index 15debead5f5b..14ae2e3088b4 100644
-> > > --- a/mm/gup.c
-> > > +++ b/mm/gup.c
-> > > @@ -242,7 +242,7 @@ static inline struct folio *gup_folio_range_next(struct page *start,
-> > >   
-> > >          if (folio_test_large(folio))
-> > >                  nr = min_t(unsigned int, npages - i,
-> > > -                          folio_nr_pages(folio) - folio_page_idx(folio, next));
-> > > +                          folio_remaining_pages(folio, next));
-> > >   
-> > >          *ntails = nr;
-> > >          return folio;
-> > > diff --git a/mm/page_isolation.c b/mm/page_isolation.c
-> > > index b2fc5266e3d2..34e85258060c 100644
-> > > --- a/mm/page_isolation.c
-> > > +++ b/mm/page_isolation.c
-> > > @@ -96,7 +96,7 @@ static struct page *has_unmovable_pages(unsigned long start_pfn, unsigned long e
-> > >                                  return page;
-> > >                          }
-> > >   
-> > > -                       skip_pages = folio_nr_pages(folio) - folio_page_idx(folio, page);
-> > > +                       skip_pages = folio_remaining_pages(folio, page);
-> > >                          pfn += skip_pages - 1;
-> > >                          continue;
-> > >                  }
-> > > ---
-> > 
-> > Guess I would have pulled the "min" in there, but passing something like 
-> > ULONG_MAX for the page_isolation case also looks rather ugly.
-> 
-> Yes, the page_isolation case does not require the 'min' logic. Since
-> there are already places in the current kernel code where
-> folio_remaining_pages() is used without needing min, we could simply
-> create a custom wrapper function based on folio_remaining_pages() only
-> in those specific scenarios where min is necessary.
-> 
-> Following this line of thinking, the wrapper function in vfio would
-> look something like this.
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -801,16 +801,40 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
->         return pinned;
->  }
->  
-> +static inline unsigned long vfio_folio_remaining_pages(
-> +               struct folio *folio, struct page *start_page,
-> +               unsigned long max_pages)
-> +{
-> +       if (!folio_test_large(folio))
-> +               return 1;
 
-The above two lines may no longer be necessary.
-
-> +       return min(max_pages,
-> +                  folio_remaining_pages(folio, start_page));
-> +}
-
-Thanks,
-Zhe
+On 6/12/25 11:57 PM, Anup Patel wrote:
+> Introduce struct kvm_gstage_mapping which represents a g-stage
+> mapping at a particular g-stage page table level. Also, update
+> the kvm_riscv_gstage_map() to return the g-stage mapping upon
+> success.
+>
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>   arch/riscv/include/asm/kvm_mmu.h |  9 ++++-
+>   arch/riscv/kvm/mmu.c             | 58 ++++++++++++++++++--------------
+>   arch/riscv/kvm/vcpu_exit.c       |  3 +-
+>   3 files changed, 43 insertions(+), 27 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/kvm_mmu.h b/arch/riscv/include/asm/kvm_mmu.h
+> index 4e1654282ee4..91c11e692dc7 100644
+> --- a/arch/riscv/include/asm/kvm_mmu.h
+> +++ b/arch/riscv/include/asm/kvm_mmu.h
+> @@ -8,6 +8,12 @@
+>   
+>   #include <linux/kvm_types.h>
+>   
+> +struct kvm_gstage_mapping {
+> +	gpa_t addr;
+> +	pte_t pte;
+> +	u32 level;
+> +};
+> +
+>   int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
+>   			     phys_addr_t hpa, unsigned long size,
+>   			     bool writable, bool in_atomic);
+> @@ -15,7 +21,8 @@ void kvm_riscv_gstage_iounmap(struct kvm *kvm, gpa_t gpa,
+>   			      unsigned long size);
+>   int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>   			 struct kvm_memory_slot *memslot,
+> -			 gpa_t gpa, unsigned long hva, bool is_write);
+> +			 gpa_t gpa, unsigned long hva, bool is_write,
+> +			 struct kvm_gstage_mapping *out_map);
+>   int kvm_riscv_gstage_alloc_pgd(struct kvm *kvm);
+>   void kvm_riscv_gstage_free_pgd(struct kvm *kvm);
+>   void kvm_riscv_gstage_update_hgatp(struct kvm_vcpu *vcpu);
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index c1a3eb076df3..806614b3e46d 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -135,18 +135,18 @@ static void gstage_remote_tlb_flush(struct kvm *kvm, u32 level, gpa_t addr)
+>   	kvm_riscv_hfence_gvma_vmid_gpa(kvm, -1UL, 0, addr, BIT(order), order);
+>   }
+>   
+> -static int gstage_set_pte(struct kvm *kvm, u32 level,
+> -			   struct kvm_mmu_memory_cache *pcache,
+> -			   gpa_t addr, const pte_t *new_pte)
+> +static int gstage_set_pte(struct kvm *kvm,
+> +			  struct kvm_mmu_memory_cache *pcache,
+> +			  const struct kvm_gstage_mapping *map)
+>   {
+>   	u32 current_level = gstage_pgd_levels - 1;
+>   	pte_t *next_ptep = (pte_t *)kvm->arch.pgd;
+> -	pte_t *ptep = &next_ptep[gstage_pte_index(addr, current_level)];
+> +	pte_t *ptep = &next_ptep[gstage_pte_index(map->addr, current_level)];
+>   
+> -	if (current_level < level)
+> +	if (current_level < map->level)
+>   		return -EINVAL;
+>   
+> -	while (current_level != level) {
+> +	while (current_level != map->level) {
+>   		if (gstage_pte_leaf(ptep))
+>   			return -EEXIST;
+>   
+> @@ -165,13 +165,13 @@ static int gstage_set_pte(struct kvm *kvm, u32 level,
+>   		}
+>   
+>   		current_level--;
+> -		ptep = &next_ptep[gstage_pte_index(addr, current_level)];
+> +		ptep = &next_ptep[gstage_pte_index(map->addr, current_level)];
+>   	}
+>   
+> -	if (pte_val(*ptep) != pte_val(*new_pte)) {
+> -		set_pte(ptep, *new_pte);
+> +	if (pte_val(*ptep) != pte_val(map->pte)) {
+> +		set_pte(ptep, map->pte);
+>   		if (gstage_pte_leaf(ptep))
+> -			gstage_remote_tlb_flush(kvm, current_level, addr);
+> +			gstage_remote_tlb_flush(kvm, current_level, map->addr);
+>   	}
+>   
+>   	return 0;
+> @@ -181,14 +181,16 @@ static int gstage_map_page(struct kvm *kvm,
+>   			   struct kvm_mmu_memory_cache *pcache,
+>   			   gpa_t gpa, phys_addr_t hpa,
+>   			   unsigned long page_size,
+> -			   bool page_rdonly, bool page_exec)
+> +			   bool page_rdonly, bool page_exec,
+> +			   struct kvm_gstage_mapping *out_map)
+>   {
+> -	int ret;
+> -	u32 level = 0;
+> -	pte_t new_pte;
+>   	pgprot_t prot;
+> +	int ret;
+>   
+> -	ret = gstage_page_size_to_level(page_size, &level);
+> +	out_map->addr = gpa;
+> +	out_map->level = 0;
+> +
+> +	ret = gstage_page_size_to_level(page_size, &out_map->level);
+>   	if (ret)
+>   		return ret;
+>   
+> @@ -216,10 +218,10 @@ static int gstage_map_page(struct kvm *kvm,
+>   		else
+>   			prot = PAGE_WRITE;
+>   	}
+> -	new_pte = pfn_pte(PFN_DOWN(hpa), prot);
+> -	new_pte = pte_mkdirty(new_pte);
+> +	out_map->pte = pfn_pte(PFN_DOWN(hpa), prot);
+> +	out_map->pte = pte_mkdirty(out_map->pte);
+>   
+> -	return gstage_set_pte(kvm, level, pcache, gpa, &new_pte);
+> +	return gstage_set_pte(kvm, pcache, out_map);
+>   }
+>   
+>   enum gstage_op {
+> @@ -352,7 +354,6 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
+>   			     phys_addr_t hpa, unsigned long size,
+>   			     bool writable, bool in_atomic)
+>   {
+> -	pte_t pte;
+>   	int ret = 0;
+>   	unsigned long pfn;
+>   	phys_addr_t addr, end;
+> @@ -360,22 +361,25 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
+>   		.gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0,
+>   		.gfp_zero = __GFP_ZERO,
+>   	};
+> +	struct kvm_gstage_mapping map;
+>   
+>   	end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+>   	pfn = __phys_to_pfn(hpa);
+>   
+>   	for (addr = gpa; addr < end; addr += PAGE_SIZE) {
+> -		pte = pfn_pte(pfn, PAGE_KERNEL_IO);
+> +		map.addr = addr;
+> +		map.pte = pfn_pte(pfn, PAGE_KERNEL_IO);
+> +		map.level = 0;
+>   
+>   		if (!writable)
+> -			pte = pte_wrprotect(pte);
+> +			map.pte = pte_wrprotect(map.pte);
+>   
+>   		ret = kvm_mmu_topup_memory_cache(&pcache, gstage_pgd_levels);
+>   		if (ret)
+>   			goto out;
+>   
+>   		spin_lock(&kvm->mmu_lock);
+> -		ret = gstage_set_pte(kvm, 0, &pcache, addr, &pte);
+> +		ret = gstage_set_pte(kvm, &pcache, &map);
+>   		spin_unlock(&kvm->mmu_lock);
+>   		if (ret)
+>   			goto out;
+> @@ -593,7 +597,8 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>   
+>   int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>   			 struct kvm_memory_slot *memslot,
+> -			 gpa_t gpa, unsigned long hva, bool is_write)
+> +			 gpa_t gpa, unsigned long hva, bool is_write,
+> +			 struct kvm_gstage_mapping *out_map)
+>   {
+>   	int ret;
+>   	kvm_pfn_t hfn;
+> @@ -608,6 +613,9 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>   	unsigned long vma_pagesize, mmu_seq;
+>   	struct page *page;
+>   
+> +	/* Setup initial state of output mapping */
+> +	memset(out_map, 0, sizeof(*out_map));
+> +
+>   	/* We need minimum second+third level pages */
+>   	ret = kvm_mmu_topup_memory_cache(pcache, gstage_pgd_levels);
+>   	if (ret) {
+> @@ -677,10 +685,10 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>   	if (writable) {
+>   		mark_page_dirty(kvm, gfn);
+>   		ret = gstage_map_page(kvm, pcache, gpa, hfn << PAGE_SHIFT,
+> -				      vma_pagesize, false, true);
+> +				      vma_pagesize, false, true, out_map);
+>   	} else {
+>   		ret = gstage_map_page(kvm, pcache, gpa, hfn << PAGE_SHIFT,
+> -				      vma_pagesize, true, true);
+> +				      vma_pagesize, true, true, out_map);
+>   	}
+>   
+>   	if (ret)
+> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> index 965df528de90..6b4694bc07ea 100644
+> --- a/arch/riscv/kvm/vcpu_exit.c
+> +++ b/arch/riscv/kvm/vcpu_exit.c
+> @@ -15,6 +15,7 @@
+>   static int gstage_page_fault(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>   			     struct kvm_cpu_trap *trap)
+>   {
+> +	struct kvm_gstage_mapping host_map;
+>   	struct kvm_memory_slot *memslot;
+>   	unsigned long hva, fault_addr;
+>   	bool writable;
+> @@ -43,7 +44,7 @@ static int gstage_page_fault(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>   	}
+>   
+>   	ret = kvm_riscv_gstage_map(vcpu, memslot, fault_addr, hva,
+> -		(trap->scause == EXC_STORE_GUEST_PAGE_FAULT) ? true : false);
+> +		(trap->scause == EXC_STORE_GUEST_PAGE_FAULT) ? true : false, &host_map);
+>   	if (ret < 0)
+>   		return ret;
+>   
+Reviewed-by: Atish Patra <atishp@rivosinc.com>
 
