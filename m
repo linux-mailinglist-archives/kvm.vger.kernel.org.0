@@ -1,127 +1,132 @@
-Return-Path: <kvm+bounces-49914-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49915-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C58DADF953
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 00:22:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06C90ADF987
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 00:43:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB4921BC2E1E
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 22:22:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7ED7E1BC1461
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 22:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A65627EFE2;
-	Wed, 18 Jun 2025 22:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCA227FD59;
+	Wed, 18 Jun 2025 22:43:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dcv/xr+k"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EpbLDF+7"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEEF21CFF7
-	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 22:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB0221B8F5
+	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 22:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750285339; cv=none; b=pwVkZ7yQF0IivtHKS2mMCvCKHyokex7GFdNnt65Pz4gLuG9MHr78Ab1KwaBV9wFRzbU1MMrU5GI/z4EpJbWxpAFrYidPML5ftqkensoTYMSju3IoTA9k6AcAunlomRK5PJjbnoAveb3/FKHqTguYk4dVJj8TG7cFsTXs82NWb4c=
+	t=1750286615; cv=none; b=qUvWzcY8U1OMSRNHjqQmTAVfNh2dqbjIx2NQSH7gAXh3ZG79QPt09pVO3j+GANf0Nq0U45WZfaEKyLJxrG9wo49u501XB2yav1O3xVO8c/5hKGTJDrLKBiYGuVcWAYjgYgielaxajlrxN4/F+1NVlPhiCWmSS4v15cn1v97PYnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750285339; c=relaxed/simple;
-	bh=nGyim/Xvt+UW87dgtJrHiJJN+OED1pdUQqSadl6Mv9U=;
+	s=arc-20240116; t=1750286615; c=relaxed/simple;
+	bh=Iy+Ox/bH+mj99voHVuFYFLezAqT1Ea3TUU/gpHbZh4M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dT0jk6//Bzj01wUqs1K0EEKi0yBc4J0bdDTkf//R9W9r0zK7aNmK0IyRH8Zcv9zGOcymiW6OLHj/MV82WsnAiSa/QsP5MTjgMDJF/fTog64VIli4ICfPIIqk9tGzYW7A43nBSYnG5TScPl19+PVMgomYO7Kax9vXydX3NyTExq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dcv/xr+k; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750285336;
+	 Content-Type:Content-Disposition:In-Reply-To; b=qVgdOrD+kbLLxsDuy4jBazKPgnVbZ9+GkFWhYun0yhgoqqCbdrFGubEHZ7xQG5GZf+GkwwHFM9i9uENtOkAU61Ok8DRYRuXDW3zQhL0YBVmBNB+iMFNZH4MrqTPulh6O24/anQy3yyjoAk+cb3XYAK/cziQvI2e/huiNkmt3fm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EpbLDF+7; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 18 Jun 2025 15:43:21 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750286611;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kvdbqMvmqccHbDYi1u6MCaoXXJjQgBtiZn30PfS8Ulc=;
-	b=dcv/xr+kLy8WLSeb/rMyBdoDBIeFZrSM4jwoX+77nPEkkwSYPFxAn7fgfOj9NA4nOmo49t
-	VPg3t4IW/l4VMZh9+wProuZ52jZlQjxY2MdOXGuZy89CnLhFRHYtDSFFTDm7EjRRbWFhyT
-	gI+ixElrqN/BsBThzyzrKsh8KRi3y0k=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-685--Sd8Xt-ZPSGYSaOsem0nXg-1; Wed, 18 Jun 2025 18:22:15 -0400
-X-MC-Unique: -Sd8Xt-ZPSGYSaOsem0nXg-1
-X-Mimecast-MFC-AGG-ID: -Sd8Xt-ZPSGYSaOsem0nXg_1750285334
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b2fcbd76b61so222742a12.3
-        for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 15:22:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750285334; x=1750890134;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kvdbqMvmqccHbDYi1u6MCaoXXJjQgBtiZn30PfS8Ulc=;
-        b=TRVl2qAuMESXOinLZSTOyWtj+YTD34lzRpEHRxS6QG6YYMldhUt50TyrA/O6Co8GYw
-         HrEcwKnxZ2qOJWeWUoTdXmFy+7y06/tuQLBM9fRPHrl9MT25tvMKVzXtiPQ/tUGAhbej
-         8fDcn5TcY0uKQ0yEtZf2aXGlCaj40Wat76PWs3O8eQy/mky29nPbr1XLddr4hFZ7O+kr
-         qcK27fZBIPGtOUgj6xhgVoAgxKa2398BzwhN4jBWpwb1IWf5EmJulA4z0tr1gIX56mLg
-         sqJ9Q9CekiGIKABP+ZEUdp5I344nZhQIG3bAlDnhMYdBUq6IOdmMQefZ8EIX3QfBMtpu
-         mPnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUD8rdp7sSvuYOLdAa1RgQCox8d3xYwHaiQxYIx2sR3deco/xgDnBLeG+H22vUBgWvngFw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywt3e7mjIu27ODrzQzNjQBvrdajQVnrpaiMdUhLZS0P+XoEqsh5
-	ySiIftzypRiQeLx8EFjbpBt4KITolwtXtGxCsZsYeUu/KuHhP9AVbry1tTBjLQtC90OWWLvax6g
-	KMg7jXkVBmEPECR4/LWOcnayB/YExCK5f7T0z6qGylydm0ESVr0igbw==
-X-Gm-Gg: ASbGnctxSgnW0W8TzAzF5+0CQTe+Fnk+UgQpv1KfxEswNsJEEk2cenXcY0gw9DrAZhb
-	1HQKuXJV3uq3q3GBE+Tz/hyEd/Ji/S7o45jxK6Y8u5VYAkwAR4CURtp8Rt+jkS3bY6AkrLo0GFZ
-	6znBCwUhexovmVn18ED66fB8ZWEIjsE5QNZ0J5/WeYCVtgOD3ahtuAxPliDzjqZEA4ASEH0d0m5
-	zmeG4300IxMWwxow+3L2TC/D9vFC+5t1OfuZ2VDC4Iq4zsqzE0LdQCHdta9MrD2/9pog0DJnD+9
-	Z8ws4nEnfzWD4g==
-X-Received: by 2002:a05:6a20:3ca7:b0:1f5:9024:324f with SMTP id adf61e73a8af0-21fbd690f1fmr30913419637.31.1750285334403;
-        Wed, 18 Jun 2025 15:22:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFVnjorF2p/TsyHRfQO+O89iwaSTCUkL5cFkuUmViiWGO926kqlUR1fIZpNOQWV8GOC1c5Wrw==
-X-Received: by 2002:a05:6a20:3ca7:b0:1f5:9024:324f with SMTP id adf61e73a8af0-21fbd690f1fmr30913389637.31.1750285334067;
-        Wed, 18 Jun 2025 15:22:14 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2fe1639eb8sm9832380a12.10.2025.06.18.15.22.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 15:22:13 -0700 (PDT)
-Date: Wed, 18 Jun 2025 18:22:07 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Chenyi Qiang <chenyi.qiang@intel.com>
-Cc: David Hildenbrand <david@redhat.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Gupta Pankaj <pankaj.gupta@amd.com>,
+	bh=iabUtXH2S5hgnNxipXhGWLLQltCqncktdrGikSQJGv8=;
+	b=EpbLDF+7NjqZog0McGJwo+5HvohOHNAQ8BaL7lZ03J7iJoDBrg8lFG2S6I9VFIMY3Gd8yJ
+	kTLle8vGIij2bB5f/LXeRE9tYV0K5nhLvNCmRGtvD2HcKQJ6cqzHDwB2+zkiC1Sgge9yZn
+	6Pp85WKy351lqpG6lvz+IzpntWkiNOc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: James Houghton <jthoughton@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>, Baolu Lu <baolu.lu@linux.intel.com>,
-	Gao Chao <chao.gao@intel.com>, Xu Yilun <yilun.xu@intel.com>,
-	Li Xiaoyao <xiaoyao.li@intel.com>,
-	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
-	Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v7 0/5] Enable shared device assignment
-Message-ID: <aFM8D7mE2PrVTcnl@x1.local>
-References: <20250612082747.51539-1-chenyi.qiang@intel.com>
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Yan Zhao <yan.y.zhao@intel.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Anish Moorthy <amoorthy@google.com>,
+	Peter Gonda <pgonda@google.com>, Peter Xu <peterx@redhat.com>,
+	David Matlack <dmatlack@google.com>, wei.w.wang@intel.com,
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 04/15] KVM: Add common infrastructure for KVM
+ Userfaults
+Message-ID: <aFNBCaLEdABfybmd@linux.dev>
+References: <20250618042424.330664-1-jthoughton@google.com>
+ <20250618042424.330664-5-jthoughton@google.com>
+ <aFMWQ5_zMXGTCE98@linux.dev>
+ <aFMh51vXbTNCf9mv@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250612082747.51539-1-chenyi.qiang@intel.com>
+In-Reply-To: <aFMh51vXbTNCf9mv@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jun 12, 2025 at 04:27:41PM +0800, Chenyi Qiang wrote:
-> This is the v7 series of the shared device assignment support.
+On Wed, Jun 18, 2025 at 01:33:17PM -0700, Sean Christopherson wrote:
+> On Wed, Jun 18, 2025, Oliver Upton wrote:
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> 
+> No need for my SoB.
+> 
+> > > +#ifdef CONFIG_KVM_GENERIC_PAGE_FAULT
+> > > +bool kvm_do_userfault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> > 
+> > The polarity of the return here feels weird. If we want a value of 0 to
+> > indicate success then int is a better return type.
+> 
+> The boolean is my fault/suggestion.  My thinking is that it would make the callers
+> more intuitive, e.g. so that this reads "if do userfault, then exit to userspace
+> with -EFAULT".
+> 
+> 	if (kvm_do_userfault(vcpu, fault))
+> 		return -EFAULT;
 
-Building doc fails, see:
+Agreed, this reads correctly. My only issue is that when I read the
+function signature, "bool" is usually wired the other way around.
 
-  https://gitlab.com/peterx/qemu/-/jobs/10396029551
+> > > +{
+> > > +	struct kvm_memory_slot *slot = fault->slot;
+> > > +	unsigned long __user *user_chunk;
+> > > +	unsigned long chunk;
+> > > +	gfn_t offset;
+> > > +
+> > > +	if (!kvm_is_userfault_memslot(slot))
+> > > +		return false;
+> > > +
+> > > +	offset = fault->gfn - slot->base_gfn;
+> > > +	user_chunk = slot->userfault_bitmap + (offset / BITS_PER_LONG);
+> > > +
+> > > +	if (__get_user(chunk, user_chunk))
+> > > +		return true;
+> 
+> And this path is other motiviation for returning a boolean.  To me, return "success"
+> when a uaccess fails looks all kinds of wrong:
+> 
+> 	if (__get_user(chunk, user_chunk))
+> 		return 0;
 
-You should be able to reproduce with --enable-docs.  I think you need to
-follow the rest with kernel-doc format.
+Yeah, that's gross. Although I would imagine we want to express
+"failure" here, game over, out to userspace for resolution. So maybe:
 
-If you want, you can provide "git --fixup" appended to the reply (one fixup
-for each patch that needs fixing) to avoid a full repost.
+	if (__get_user(chunk, user_chunk))
+		return -EFAULT;
+
+> That said, I don't have a super strong preference; normally I'm fanatical about
+> not returning booleans.  :-D
+
++1, it isn't _that_ big of a deal, just noticed it as part of review.
 
 Thanks,
-
--- 
-Peter Xu
-
+Oliver
 
