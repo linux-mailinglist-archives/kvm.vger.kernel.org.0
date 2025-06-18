@@ -1,241 +1,149 @@
-Return-Path: <kvm+bounces-49882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54C41ADF00D
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 16:47:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A4B36ADF082
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 16:58:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05D131887B0F
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 14:47:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F151B1BC1CC6
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 14:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B683E3B1AB;
-	Wed, 18 Jun 2025 14:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C262EE615;
+	Wed, 18 Jun 2025 14:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="X7ZHrxrP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YY6JSkMz"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2045.outbound.protection.outlook.com [40.107.92.45])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53734F9CB;
-	Wed, 18 Jun 2025 14:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750258008; cv=fail; b=qkD5i7jjPWchV92nxEMUn9BNM0UBEOyQ76jYQvH90VCU+rPbhM35nebkR1Lo+wCKaO47mn9QzJN5DamjVZlZz999w+no+iXoCFZriFumqf4+GXylVdnyR9iyfckOkC3Uzuk1YBx1J9IDBLJwoiVYafaMX40jzIDjHHYUOoZzek0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750258008; c=relaxed/simple;
-	bh=EDB70jokEyTJPUMM1+0EA2lecSV6bQVRi8wNhKoZ8+w=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AAJGFUbiomsOyYU1Ae4co17HKm0c7WiPUpojr2vnSLrO7H4KlOcAGNLSJxFBs8XRWy3XEAcFPCb5WP3f6yScION2dvZnFhqhQUmDB0WU7vv6zeQQYBbjSkDxRaSCofdrC7IreznTQjDvkB20G+T3PBQDmpLJ9j/aHOkGblqYmmA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=X7ZHrxrP; arc=fail smtp.client-ip=40.107.92.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZbudpYY9D8ikai6w8ge5v3I+yiiLBeEMOzmM8R3lpqlZp0fG5zBNNfK6EII4M8sMCgXfqZivsheJxRl7hQzlPpCO1NnnTCiu9ZwJu+zbjP6VOwhmftxbQ/ZzwDZ0nfk2LdpIFqUjuZKAaRWZY9Bg+IWX9l0FvV9KTVLDLMwLoN4pozRpcIOxkbtszGb+o1v4qYQNFeiJkgzhFWUBY4400QVJhkrEzn7MVwdyWkZDXCbXj6HP3/lZ7K7U407lBD7oI2nUVGS46qB5sbycAUbhp4hwEeLB4R6yQVI0voEiX4PRmxkMmUg8x+gH0WRmijvYNCy7jMZyhgyyMYOfe3Z5GA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NwSvsnNKLrW5de5000QFGLz22toQoXNueYjK8uKTfzU=;
- b=kMR9DpP7H33incic9rBpJ3+/c3KL+ZVewXEYBECd6RLbOsX2NSYzW1wjUu9yrWy6g0tXNSUH7FKnw67GUzi770zR74Zt36TqcWY2Gyi4KVtZ5CdyLzdH4kHy7d2CeiFTueypntFdsdVgTBu2cJNpFMxz+IPJ4+ZwKE1ETgSKINYehTT7Q2E5X8LB48ofyBNg78tIFYR2MpAlL9imx6Zb2w+ok+6HxU6r4tnz+z7fpYlazzpO712wYVZ6D+nMTy2qYw+SitlnyrVWY8JlwrHCLga1gQ1aBD4mgvxQzkeZXm2RcikUMTYHOFnkKeYq+A1xRplt6rW0SFACfs8pj+RwgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NwSvsnNKLrW5de5000QFGLz22toQoXNueYjK8uKTfzU=;
- b=X7ZHrxrP0n3HkEurD4OlZkYwc7AxShl0SPnRGXYIZUCrt9ccgIwgp1icBYOxN5vqcrqi0luVwXKfZ7lDcDzTOukJFCRfKH6GmpmKf2HdR/HWdKqn0ZPJCYo3qe10R+aUX9shdLFvc3Nj60cZlogQUoa9zfv1BkYhUqdiQfJpYes=
-Received: from MW4PR03CA0008.namprd03.prod.outlook.com (2603:10b6:303:8f::13)
- by MN2PR12MB4392.namprd12.prod.outlook.com (2603:10b6:208:264::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Wed, 18 Jun
- 2025 14:46:43 +0000
-Received: from CO1PEPF000075ED.namprd03.prod.outlook.com
- (2603:10b6:303:8f:cafe::e0) by MW4PR03CA0008.outlook.office365.com
- (2603:10b6:303:8f::13) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8792.35 via Frontend Transport; Wed,
- 18 Jun 2025 14:46:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000075ED.mail.protection.outlook.com (10.167.249.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8857.21 via Frontend Transport; Wed, 18 Jun 2025 14:46:42 +0000
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 18 Jun
- 2025 09:46:41 -0500
-Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Wed, 18 Jun 2025 09:45:11 -0500
-Date: Wed, 18 Jun 2025 20:09:57 +0530
-From: Naveen N Rao <naveen.rao@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, "David
- Woodhouse" <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <iommu@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, Sairaj Kodilkar <sarunkod@amd.com>, "Vasant
- Hegde" <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, "Joao
- Martins" <joao.m.martins@oracle.com>, Francesco Lavra
-	<francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v3 13/62] KVM: SVM: Drop redundant check in AVIC code on
- ID during vCPU creation
-Message-ID: <4f7d3pbe4s52twxaddjwlpca3mlb6htxi3ozze7n2sv4d3cafn@o3cyq3tmjhbx>
-References: <20250611224604.313496-2-seanjc@google.com>
- <20250611224604.313496-15-seanjc@google.com>
- <qusmkqqsvc7hyuemddv66mooach7mdq66mxbk7qbr6if6spguj@k57k5lqmvt5u>
- <aFGY0KVUksf1a6xB@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B52F2EE614;
+	Wed, 18 Jun 2025 14:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750258532; cv=none; b=VZ2IEPr4wjhpY0eFmja0cotLl3p25yWGkoUfI3e+9riyCZ7wCfJu1efwL/mV4833IyOQlNj//iEFmPpUV3btbwdLIr+SK6toIcYgqEwxOTwBvWutXu/Mn/N7RLAsgE9U2n9MK2d8b2tuVSBkWCNTqdKAvC0K/gyCRfkjqDf0HrA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750258532; c=relaxed/simple;
+	bh=ED5by2ByHFPp/MQF3lr30nB2JGF4dIpqJT+e8nL59JI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GYNF6p3BxDDFzBStnlr+6seMxik19PQRK+WD46LZgr1whwdA1gp48GpA3fvRmvUI/WQfu+6lVmKBKjD74lvBzLbvsz3J7edxPgADDz8T19dBJIHrZ7E2lqoAOFdPzPMZ9F6y9jvuUWS71VpPsArCTwNgztMr5IMFwxe5WnWGjGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YY6JSkMz; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750258532; x=1781794532;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ED5by2ByHFPp/MQF3lr30nB2JGF4dIpqJT+e8nL59JI=;
+  b=YY6JSkMzX+QOYTx6d7oXqrp0WVAVitm4v4APSNsUKH+mK38X/iHgNUNG
+   b4D/TM0WlkrAFtehS3tSaLe3LAN0FAQYXsXZ4lp44oau8t3Wjmna904w4
+   +fZ0/Wn4e74xHx37V/LMvJc8Ea0zlRxieZb8h8a9hLYd5fL6cXIFdI7VR
+   dLHWUHSdJsE0b+mxT4hjVQVm4hslOZv//vnMeAud0QSt4u2AXtS3HcrwD
+   /Ud71wzBp7/5W4AC9gps1pHMGvjMzmSH/XFIXngY4CrWihO2saSi4vE0a
+   4CVh5agOuMGjS68rA9aGnsDQsf6sDuOt9xgGXM2zscfhT/Kec51qyAd4R
+   A==;
+X-CSE-ConnectionGUID: BL5nTgq0Qouj1LVziBgcHA==
+X-CSE-MsgGUID: fMnkAgl1Rq2Q27SzL633yQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="62758165"
+X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
+   d="scan'208";a="62758165"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 07:55:31 -0700
+X-CSE-ConnectionGUID: Uo4ApLN3R/qwmkA9fXZd+g==
+X-CSE-MsgGUID: DZjak0fnSjyyxNVfIbIwFw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
+   d="scan'208";a="173261558"
+Received: from agladkov-desk.ger.corp.intel.com (HELO [10.125.108.97]) ([10.125.108.97])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 07:55:29 -0700
+Message-ID: <487c5e63-07d3-41ad-bfc0-bda14b3c435e@intel.com>
+Date: Wed, 18 Jun 2025 07:55:28 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aFGY0KVUksf1a6xB@google.com>
-Received-SPF: None (SATLEXMB04.amd.com: naveen.rao@amd.com does not designate
- permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075ED:EE_|MN2PR12MB4392:EE_
-X-MS-Office365-Filtering-Correlation-Id: bad62481-28a5-4a21-3ed6-08ddae76f106
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NGI0KzgxeE1GTnVxWDd3ajRrcUo5aytFZm8raStMZy9PM1NWNENOOG53aDdi?=
- =?utf-8?B?SDNMcmdScWlSTkliS0tNb0k5aFIwRXRQb0tsdVg2NWFFRHA2M0VHTkt1emhq?=
- =?utf-8?B?VGVCTy9vT09GdXNBRmJON09ibU1EYTI4bExBK0ZBYlp5NFJsbS8wN1FRb3FJ?=
- =?utf-8?B?ancyelkxcUlGRVlwM0FEd1pBZkQ2NUpPUkdpZlYwVVpocy9Rd3dObjNkY1pa?=
- =?utf-8?B?end0ZXREaWc1YS95U29WOEhxOWFiZ0taMGFyVkpBRlNXSTlCU1pxTlp0Mkd1?=
- =?utf-8?B?a2RrWEVoSG5Wa2dhVnNyQ0trcXQrUGQ1VEpJb0lSeHViRG9DaWNEVXM3dnRl?=
- =?utf-8?B?Zlp4MHh5RkxFbyt3U3FWcEZwUkRzbHNmMHpZcmJwL2ZGZ0lSNktGVGhEOEhN?=
- =?utf-8?B?WHNLWnltV0ZnaGFBK3pzejIvN2VUNHllaWVyMFJIc1IzdzMyU0ViMHBPcDk4?=
- =?utf-8?B?ZWhKK2ZqM1drVUxsTitidGFxeWMxZWVWdzRVRk9rUXcwQVpRcytBanpkaGtW?=
- =?utf-8?B?UUwyalZDc1duNDNYbTBUVXZab251M2VxdGFLaFZvSHJpLzFDVFRSVStCdG8v?=
- =?utf-8?B?aEU1VzJpWVRDYVNxeFRObTJlanFWSE5KNXlZS1hGOFN5VmV0eHJIS2dILzZx?=
- =?utf-8?B?SE5JVXRrZlRLYTZZRFZQeGhndlFXVVF2VmRCRFU2Si8vOTY1SGhDU0FZMWNq?=
- =?utf-8?B?RTRaMXZPTWRGQThBK2MrMjgxWWJyZGV5clNSNHVpcGM1WlFZWHJRZk1LK0ZO?=
- =?utf-8?B?amZOeHhJSmQyb0xKSmlFVmo0cVF3YStRWHR1V2NIblNLOHJaanhMdjVJbkJ2?=
- =?utf-8?B?WlYvTUFQMkR2SFNVWkhxYXVLNW1LQTUwSFcxZHRnUjJOdTBUVGNzU3hGYWVJ?=
- =?utf-8?B?Mnh6TVBFQUEzS2kvUUNGR1dSSmFYd3pVdkpRZDBZMzFURitNeXdGNXdxd05N?=
- =?utf-8?B?SG5MeHVSU0ZBUHhIYjlnWGxOdkRWc0VaamdmRmdxRnZyelZBbHVBWVdEU00v?=
- =?utf-8?B?cEpNZndaZXU2VWdKSFlJTjRCcDg4MGJET3pWUVVPU1c1Y2ROcm9oTzBoWFYz?=
- =?utf-8?B?bzkxWlBtRDc3WnM0SW16VytLQXVtWnRyTHFjWURNeXFsZ1pmbUZVaml6RnF0?=
- =?utf-8?B?dXZ5Q1N6ZllJc3U1cHhESlAyck42N3lJWExuSlpZbkxNeUtrTE9oRUlWN0ht?=
- =?utf-8?B?eDRWNDRGWjhEOWNhY3VTMFRoZTNESUNUajhDY0ZFd1NKMm04MkhvekhIaHpn?=
- =?utf-8?B?MUZoSDV3QVB1cXoyRDVaR2RCSnVHUFlMK01pNjNLVDhWdnBJM1BzVWFWeFNi?=
- =?utf-8?B?OEQ3ZFpHUjJFWnVscUk3eFVaamdoSFpNMDFqS0VITUh2V0xOVE43M1ZsbXl0?=
- =?utf-8?B?VzBydlRwMFBGR0hYek00bVpxcWlFVWpQY1R6djJLSUlZNkhRK0RsMzlhdUlI?=
- =?utf-8?B?YXFHWFJGT0FseHFWNVFzdHh1d0pFSXg2MmhpRXBGU3RMY1hOajFJd3B3Q3ZZ?=
- =?utf-8?B?T3IwV3BqRGg1TVdzZ3o1M1NpdWV5Zis4UGR6SDQyeFlOeE5JZ2RJUnNnelM3?=
- =?utf-8?B?U1ZlSncvbi8wVVlRTERKZTlnR1UxOHZ5KytuTnU2dGNhaUpSRm9rTkg3VXdu?=
- =?utf-8?B?dEFGRFVseHVoYkhIVmk3MG5zb2FlSkhBWTcyemRhUVYyV0xtbjRlRkxKbjRL?=
- =?utf-8?B?NUNzZy9rZWR1TEZBWHpYWlE1MFBQRkxRakJKcktCMHBFckFXZ1d1b0hPN2FM?=
- =?utf-8?B?Z3NzOVJLV3VkbFFVdnN0V0tlU2VWanIyOFlDbTBsQzgwa3F5VWdHUmNRbEU4?=
- =?utf-8?B?OXhpbFJET3VxeEpxRUpZcFJveGxHZGh0ZUpHOXBTektteDVyQWQyc0dlMk94?=
- =?utf-8?B?dkhyYjdUdEhybEdDL0lDUnFGNjhrRUFneVJLZE9jbThrZnBuZFNEOW8rdnEv?=
- =?utf-8?B?TlRUQmt2b1duL0xKcndaTWgraGcyUi9Tbk9FMW05RFRQSm1Vb2Yvb2JaUEVJ?=
- =?utf-8?B?T1U4czVjZEtTZUVSbmMrMjRDK0tFWnMraW5icG4rdXNGN0ZLQ3JZRmZGVlUv?=
- =?utf-8?Q?VdIZxa?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2025 14:46:42.8229
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bad62481-28a5-4a21-3ed6-08ddae76f106
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075ED.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4392
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] x86/mce: Fix missing address mask in recovery for
+ errors in TDX/SEAM non-root mode
+To: Adrian Hunter <adrian.hunter@intel.com>, Tony Luck <tony.luck@intel.com>,
+ pbonzini@redhat.com, seanjc@google.com
+Cc: vannapurve@google.com, Borislav Petkov <bp@alien8.de>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ H Peter Anvin <hpa@zytor.com>, linux-edac@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, kirill.shutemov@linux.intel.com,
+ kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
+ tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
+ isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com
+References: <20250618120806.113884-1-adrian.hunter@intel.com>
+ <20250618120806.113884-2-adrian.hunter@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20250618120806.113884-2-adrian.hunter@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 17, 2025 at 09:33:20AM -0700, Sean Christopherson wrote:
-> On Tue, Jun 17, 2025, Naveen N Rao wrote:
-> > On Wed, Jun 11, 2025 at 03:45:16PM -0700, Sean Christopherson wrote:
-> > >  static int avic_init_backing_page(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -	u64 *entry, new_entry;
-> > > -	int id = vcpu->vcpu_id;
-> > > +	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
-> > >  	struct vcpu_svm *svm = to_svm(vcpu);
-> > > +	u32 id = vcpu->vcpu_id;
-> > > +	u64 *table, new_entry;
-> > >  
-> > >  	/*
-> > >  	 * Inhibit AVIC if the vCPU ID is bigger than what is supported by AVIC
-> > > @@ -291,6 +277,9 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
-> > >  		return 0;
-> > >  	}
-> > >  
-> > > +	BUILD_BUG_ON((AVIC_MAX_PHYSICAL_ID + 1) * sizeof(*table) > PAGE_SIZE ||
-> > > +		     (X2AVIC_MAX_PHYSICAL_ID + 1) * sizeof(*table) > PAGE_SIZE);
-> > 						    ^^^^^^^^^^^^^^
-> > Renaming new_entry to just 'entry' and using sizeof(entry) makes this 
-> > more readable for me.
-> 
-> Good call, though I think it makes sense to do that on top so as to minimize the
-> churn in this patch.  I'll post a patch, unless you want the honors?
+On 6/18/25 05:08, Adrian Hunter wrote:
+> --- a/arch/x86/kernel/cpu/mce/core.c
+> +++ b/arch/x86/kernel/cpu/mce/core.c
+> @@ -1665,7 +1665,8 @@ noinstr void do_machine_check(struct pt_regs *regs)
+>  		 * be added to free list when the guest is terminated.
+>  		 */
+>  		if (mce_usable_address(m)) {
+> -			struct page *p = pfn_to_online_page(m->addr >> PAGE_SHIFT);
+> +			unsigned long pfn = (m->addr & MCI_ADDR_PHYSADDR) >> PAGE_SHIFT;
+> +			struct page *p = pfn_to_online_page(pfn);
 
-Not at all, please feel free to add a patch (or not, given that this 
-will be a trivial change).
+If ->addr isn't really an address that software can do much with,
+shouldn't we mask MCI_ADDR_PHYSADDR off up front, like in mce_read_aux()?
 
-> 
-> > Otherwise, for this patch:
-> > Reviewed-by: Naveen N Rao (AMD) <naveen@kernel.org>
-> > 
-> > As an aside, there are a few static asserts to validate some of the 
-> > related macros. Can this also be a static_assert(), or is there is 
-> > reason to prefer BUILD_BUG_ON()?
-> 
-> For this particular assertion, static_assert() would be fine.  That said,
-> BUILD_BUG_ON() is slightly preferred in this context.
-> 
-> The advantage of BUILD_BUG_ON() is that it works so long as the condition is
-> compile-time constant, whereas static_assert() requires the condition to an
-> integer constant expression.  E.g. BUILD_BUG_ON() can be used so long as the
-> condition is eventually resolved to a constant, whereas static_assert() has
-> stricter requirements.
-> 
-> E.g. the fls64() assert below is fully resolved at compile time, but isn't a
-> purely constant expression, i.e. that one *needs* to be BUILD_BUG_ON().
-> 
-> --
-> arch/x86/kvm/svm/avic.c: In function ‘avic_init_backing_page’:
-> arch/x86/kvm/svm/avic.c:293:45: error: expression in static assertion is not constant
->   293 |         static_assert(__PHYSICAL_MASK_SHIFT <=
-> include/linux/build_bug.h:78:56: note: in definition of macro ‘__static_assert’
->    78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
->       |                                                        ^~~~
-> arch/x86/kvm/svm/avic.c:293:9: note: in expansion of macro ‘static_assert’
->   293 |         static_assert(__PHYSICAL_MASK_SHIFT <=
->       |         ^~~~~~~~~~~~~
-> make[5]: *** [scripts/Makefile.build:203: arch/x86/kvm/svm/avic.o] Error 1
-> --
-> 
-> The downside of BUILD_BUG_ON() is that it can't be used at global scope, i.e.
-> needs to be called from a function.
-> 
-> As a result, when adding an assertion in a function, using BUILD_BUG_ON() is
-> slightly preferred, because it's less likely to break in the future.  E.g. if
-> X2AVIC_MAX_PHYSICAL_ID were changed to something that is a compile-time constant,
-> but for whatever reason isn't a pure integer constant.
-
-Understood, thanks for the explanation.
-
-
-- Naveen
-
+Maybe we should break it up into address and KeyID _there_.
 
