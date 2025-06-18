@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-49894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99275ADF6D5
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 21:27:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24EECADF6FD
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 21:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 014763BD5D0
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 19:26:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91B821BC09BC
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 19:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4168120F09C;
-	Wed, 18 Jun 2025 19:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433842192F5;
+	Wed, 18 Jun 2025 19:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vwAk49Nj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rkr7lOkw"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A673085D8
-	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 19:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB1F21767C
+	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 19:41:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750274821; cv=none; b=to5MZOS1OhA4NwwOsB72tBDOf37gWArRskkdnx2iKfeCZhU8GuFxBTj5iJZ+CEJ/h72ed9H06K56dNoS2Y5OSomu5XsYmr/Ag1u/1vyLpahvXadfnaFxTVmRiaoMjRAa7h0wG7x7MrzXdeMFlfZQlKK9DCrcjYot4AzA+boGdho=
+	t=1750275673; cv=none; b=HTyEP7kam6HYjal/PA0DCMss7Nz34xDyD6jrv9F5s/H44cAWf8Td0J3LO2gLVzDC30Gl2ISJMtGvOos+BU49J6jj6Jy5Mu4kD0qhSwLxUE4j4WhE92HG1wN39W0unXeD/2B7ts84B7tx4/HDpB3XYwz05eGjbvlbekF/TFtqKy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750274821; c=relaxed/simple;
-	bh=BmpaZojqlkp5CZbuaO4SWNRCWlhia+3MfHgMdSMsbXs=;
+	s=arc-20240116; t=1750275673; c=relaxed/simple;
+	bh=pUjBkPGAeywR5zxlE4sDl27rsxA0kyDlilz2o9WFtRM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YF5TQFLZvoKf3BzJ6AC8JfQkMzi6dMSuOxfcY/tMMQru7SCr0N1gpayPbPZJRQ/CagaThDRv9T0Lt+BHAun4Ns+Ogj7VGPDNgcQsi6MhbVA0pIe+5PQgY84SQfY77FYQeAMDJ+UpSNpJp/WRJRzq4Zqt7jbjj5rvDqF1JtTE9bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vwAk49Nj; arc=none smtp.client-ip=95.215.58.182
+	 Content-Type:Content-Disposition:In-Reply-To; b=AJH/16wt1Ng8tMbjgiX+5bjdC5P3v4DQEDuayGd5UEc9F3VI5Mqtpo8cKN/l2aeiRNkPYs75jlJOjTO3y9rqRlQsqissoc+yDOZsuItk/uw4940esIa8MVg/FqW+8sBQLz3/oJ1QmDiSykrxmLoQcELB4ZPApJcg3EN3QIl9GeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rkr7lOkw; arc=none smtp.client-ip=91.218.175.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 18 Jun 2025 12:26:24 -0700
+Date: Wed, 18 Jun 2025 12:40:51 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750274806;
+	t=1750275658;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gOwQ+Auu3tsNtr8PtwyJWf1qBPBbP0g86Uhe8F7OmW4=;
-	b=vwAk49NjoH5esinO7DkuB3fKptPSt0JKN4BgTnq97A9HXw7rW6Z24EpSOdFjjojn0CaJup
-	xH1HWIJdPjgd0DlKBGszFyJkTlLCN3pEhcUgJcztyVAXW1pdpnub4z+j8D73WRlw3BCZHE
-	ZuhB2mVxiTyH1dlKeU0g8gXQes0WsrM=
+	bh=kJ28BX1PGmEsOK66iRJR9ufuVy9us1fhYiSSQpunOdI=;
+	b=rkr7lOkw8dMr4j4t/vQfAQjKcKL1YrnIOUw/TNGMed4UVCLGOe2tByQPKXjqmKmSRGBCKX
+	Uo3l7kVm8ztcoaZdGh2Zr542A6B8QeL3//5VJoC6eb4GDCMyaXyop7Bo5wD9xH8emEMYnu
+	P2MDpIUYfbIHfUp9bpGvn+TU2rq9YbE=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: James Houghton <jthoughton@google.com>
@@ -55,11 +55,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 02/15] KVM: arm64: Add "struct kvm_page_fault" to
- gather common fault variables
-Message-ID: <aFMS4O2TkWN8nexY@linux.dev>
+Subject: Re: [PATCH v3 04/15] KVM: Add common infrastructure for KVM
+ Userfaults
+Message-ID: <aFMWQ5_zMXGTCE98@linux.dev>
 References: <20250618042424.330664-1-jthoughton@google.com>
- <20250618042424.330664-3-jthoughton@google.com>
+ <20250618042424.330664-5-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,48 +68,68 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250618042424.330664-3-jthoughton@google.com>
+In-Reply-To: <20250618042424.330664-5-jthoughton@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 18, 2025 at 04:24:11AM +0000, James Houghton wrote:
-> From: Sean Christopherson <seanjc@google.com>
+On Wed, Jun 18, 2025 at 04:24:13AM +0000, James Houghton wrote:
+> KVM Userfault consists of a bitmap in userspace that describes which
+> pages the user wants exits on (when KVM_MEM_USERFAULT is enabled). To
+> get those exits, the memslot where KVM_MEM_USERFAULT is being enabled
+> must drop (at least) all of the translations that the bitmap says should
+> generate faults. Today, simply drop all translations for the memslot. Do
+> so with a new arch interface, kvm_arch_userfault_enabled(), which can be
+> specialized in the future by any architecture for which optimizations
+> make sense.
 > 
-> Introduce "struct kvm_page_fault" and use it in user_mem_abort() in lieu
-> of a collection of local variables.  Providing "struct kvm_page_fault"
-> will allow common KVM to provide APIs to take in said structure, e.g. when
-> preparing memory fault exits.
+> Make some changes to kvm_set_memory_region() to support setting
+> KVM_MEM_USERFAULT on KVM_MEM_GUEST_MEMFD memslots, including relaxing
+> the retrictions on guest_memfd memslots from only deletion to no moving.
 > 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: James Houghton <jthoughton@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  9 +++++++++
->  arch/arm64/kvm/mmu.c              | 32 +++++++++++++++++--------------
->  2 files changed, 27 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 6ce2c51734820..ae83d95d11b74 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -413,6 +413,15 @@ struct kvm_vcpu_fault_info {
->  	u64 disr_el1;		/* Deferred [SError] Status Register */
->  };
->  
-> +struct kvm_page_fault {
-> +	const bool exec;
-> +	const bool write;
-> +	const bool is_private;
+
+> +#ifdef CONFIG_KVM_GENERIC_PAGE_FAULT
+> +bool kvm_do_userfault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+
+The polarity of the return here feels weird. If we want a value of 0 to
+indicate success then int is a better return type.
+
+> +{
+> +	struct kvm_memory_slot *slot = fault->slot;
+> +	unsigned long __user *user_chunk;
+> +	unsigned long chunk;
+> +	gfn_t offset;
 > +
-> +	gfn_t gfn;
-> +	struct kvm_memory_slot *slot;
-> +};
+> +	if (!kvm_is_userfault_memslot(slot))
+> +		return false;
+> +
+> +	offset = fault->gfn - slot->base_gfn;
+> +	user_chunk = slot->userfault_bitmap + (offset / BITS_PER_LONG);
+> +
+> +	if (__get_user(chunk, user_chunk))
+> +		return true;
 > +
 
-So this seems to cherry-pick "interesting" values into the structure but
-leaves the rest of the abort context scattered about in locals. If we're
-going to do something like this I'd rather have a wholesale refactoring
-than just the bits to intersect with x86 (more on that later...)
+I see that the documentation suggests userspace perform a store-release
+to update the bitmap. That's the right idea but we need a load-acquire
+on the consumer side for that to do something meaningful.
+
+> +	if (!test_bit(offset % BITS_PER_LONG, &chunk))
+> +		return false;
+> +
+> +	kvm_prepare_memory_fault_exit(vcpu, fault);
+> +	vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_USERFAULT;
+> +	return true;
+> +}
+> +#endif
+> +
+>  int __attribute__((weak)) kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  						  struct kvm_enable_cap *cap)
+>  {
+> -- 
+> 2.50.0.rc2.692.g299adb8693-goog
+>
 
 Thanks,
 Oliver
