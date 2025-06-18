@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-49853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 291BEADEA65
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 13:39:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6E70ADEA5A
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 13:38:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F5533BF608
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 11:37:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3110C162F4B
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 11:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B68D2E54DD;
-	Wed, 18 Jun 2025 11:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBC1296160;
+	Wed, 18 Jun 2025 11:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="bHDqBI3/"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="kIkLXFCL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53502E54A2
-	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 11:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16AD2E2645
+	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 11:36:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750246573; cv=none; b=LcQVynhLLxmlkQ+xjya2/UvdSuizEY1zkt8s+n0b2r1lpHL4kzCz4ZQGxOgu+Jcf6oebmE6310naVo3apCYmCgR/EEeEyKRoHaQrQhKzOxz0ZI8PTkdR9Is1UpcRT9VJehc4jbmtvqw+uthFylN6P3ZBV6RzC6bdC3zvchSaGhQ=
+	t=1750246577; cv=none; b=l1p9nVYkkhjtJG4K78bZzjJYJTQRlo0l0EHyWanq3mW8O5KaOAppGQq1GtcXaFFbw9PKoJUhxj51w7DzpSM3s45jTmalUOIHamQgv5ZRezJqxT/pWUGWfGYDdGFF+I+HNNCDcAsix7pRby6ETZPtBXNlolMfYQXf9hh1tSuCB1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750246573; c=relaxed/simple;
-	bh=Tt/vawDYZjRbm2u92sK4nUF168I+VRBgzlUXAX+PzHI=;
+	s=arc-20240116; t=1750246577; c=relaxed/simple;
+	bh=lA01uq6QDQodlRWmaVdLcLE/1/AUd0mQeIhxuBJzy3M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UpqOHeKhznTu5SRVYGTniESgoOTuAycfNB+bMCby6PnIilAqsSCd37y93jWwBG24kyUE8nz1E7Oq7BczG3iikQ6z67YW05DjWiUUMUcTCi2yVgkT3/d8Jyc7bTaAxRLxB2SUM7hxHBMu9z4h8o+kCBhcqlQGRh2qX8fiD+FgxNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=bHDqBI3/; arc=none smtp.client-ip=209.85.216.53
+	 MIME-Version; b=IIbXpOeqH9va+nKfcw8GjyZVi3zY3lUnZMmNN2dGy2OXZ5ZcXw6DddPrt4w7qCQUIMA7IS1YtJdKQPf++TvymyaMzcQjQekmKkuywq/TxRlDrOXmLKuQdiEYKWveMwLIzoa3aWpYL4/ovljXhOceLrXEE+eh8oXRhQr+hrztsOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=kIkLXFCL; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3138e64b3fcso5960009a91.2
-        for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 04:36:10 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-236192f8770so5214005ad.0
+        for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 04:36:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1750246570; x=1750851370; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1750246575; x=1750851375; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ernJHGr8wUUltKH2OhtBcW3LIbI4jpB3xEJEU1yumiA=;
-        b=bHDqBI3/PWOj7OXSVPzXvwS7SPoaJQK5RH8Zse+fTrPR+8WqbemX+ffo5io9sz/fQT
-         ndWr3cT+1XY5wCXuI0zdIinvJ7Jrqkr/BUZgKZeJhThOf5G/ioTleTg37BSheTEMdrrY
-         f+sqYkYHnYSZyKo54BmSPIK/C2iZAgoPj152CPD1a0sKETReSO9ouwc5pz+S6BGYiJGB
-         rE4SC0XYyGOeqahW6T9eoWcmeGlLvAwUna23BwZQi6biKeJTB0IWEcrLyRT5aDSdybon
-         zj8cPZyJg3NIP89d1Hl0mrFBEM2/VvoUxOSr0P/Wfn4WM10CqjnpwRvx9q+qGnPzSUEG
-         UA2w==
+        bh=4fsGDp/PENI7aB5HoDYrfk/XMREQKVS7VE/vtxv5oiE=;
+        b=kIkLXFCLh/ikEB6j9/X+C5gSZD7KkoqSlYvNceKhpUIA6RjZdZ2cjWRVrTOCba+Yj5
+         SG3oZz9C8Fhnzs06DTVL97Dizp3X+CNP5CUbPQaD8vXzSaOGZm6Smd80QnQd0Z+9E+lH
+         UeC4AwjbfTRhdK87Iydwl2spzQahBYYSQ/X9pIEb6rzmvVr1riFi01QH0W4RjTOYj+dI
+         wi+7lucLkZGfR6XP1sWU9rStpT+kZQFgAw0KZF1hDVLoyg2CeHLKAxLg/29Npct6Ee7Q
+         dOSyw7wRelJ2tH1KWYeWCX8hhRmZ89xO+Xw3hOYcA7Ex0FSwpgJeF7NW1u6cJjNH5wQJ
+         t0EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750246570; x=1750851370;
+        d=1e100.net; s=20230601; t=1750246575; x=1750851375;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ernJHGr8wUUltKH2OhtBcW3LIbI4jpB3xEJEU1yumiA=;
-        b=qgaMD8+O+e6Tn331P4K6uqVXKNryA6q4SaasxUUSI7+oJNa8jjnOr1aVv0pyR4tObw
-         +N/edwjnt5J2qRosAMK9Lnd89bEgUPIz20HvdmjZ9etLYuAaTXs3kddnKMjPStIqrDvF
-         rQYLniqWrbfXkJsR5AVIXjUiu3BXR7+epP8IX4JERZ/JTYC8gogKepAxbcNJiZbcS4yV
-         Ezekqsq8cw7Nq8QgXupifbAsITyfxKgkrzeOq2s90zOrfc7SeXBOD5ZFXKIFxpoQ1Cg0
-         0RaeqUXyuYiAivJNdvkiKx7KD4YUMDr371PUebGDV1CqCoD51MlSWu0mmflCHH9J39/a
-         ydYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxZO7E+TKcXY3xbEZVb42SLg86ErMTCKo6kzH7pTCP+G7Gi1LUnAlBaBvxFildt5reiKo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPmUYTDpCqytkfTcec44KJ1Xz1ZKF4Z8VKFeo5WysImx0VHfgY
-	5dTw6Eomw70a+aj4of5HR5JbKO+GQ3WcT5w8+cPJwMqqG05OeqmtKoXKK95B5u9YEHY=
-X-Gm-Gg: ASbGncs9pPyMUQG3BG2rEWcAtsDdyV3d22pf92El0dqSPsGzbg7BbaOBA3M8qgfULXy
-	f8qh/+BTRKH802EPc/n+SdYPL/QIbJch52NeWdPKPgCWBaWJzmrd8k/oRcRMssrS8E211ujV/Ut
-	BPhkQm/K28+/Uihf/1QDUWsmGojCHxsb8Otnbm8Y3zZs3ddeWgjJZmG//nAt+3FHOmASFUMs1tb
-	Aa41qVusHyUdKIHmSnEfDebb9Ntam1AT83Mfl0AZBxJGj5ZIcrB9t++3ItqwjK0LKxIx2pEcj9M
-	gV2BKqgaANyNNBPO5L+oadaTDlzL/+pdfiwr51RprWFjF6/D5fr/mrVvd93xWtYzvT09Qle/Qy3
-	lOd8QMJ2Erp2U25FuaPPXx6ux6i0y
-X-Google-Smtp-Source: AGHT+IED2oGexk/JFxqAVuWpL/++/t8pIqk6FimHQhJH+vt07+Mbc0bPBQs0X+EavqGGcAYnWQlaQw==
-X-Received: by 2002:a17:90b:1a87:b0:311:abba:53c0 with SMTP id 98e67ed59e1d1-313f1c03004mr26620231a91.9.1750246569846;
-        Wed, 18 Jun 2025 04:36:09 -0700 (PDT)
+        bh=4fsGDp/PENI7aB5HoDYrfk/XMREQKVS7VE/vtxv5oiE=;
+        b=S1wGTb7aDFKZNlxRh4M+s9tFuPyZ6LehzQajKmUoo9vRxys6dNvi80UtlokKLhIT3T
+         XshwjMCl2a3Orlgi7WD/35ZUghMlt+3pRQptCy6q+9W74dsGaFy2MJYshkpIXfDDLC9Z
+         YXy83Yr62lsLIAwpLZG1fHEfQX5IU4S2mvjRJAos238ydXPCMXcm6Gez0f65l58ADeKi
+         AwWpcOKmNwlUhJ6+HXO5ZCUjKOJwXlsFLd3QPnMq2cvvLStQWpP5idpc/44uYTCJtcez
+         Io93EdzajIHiWQpI5GfhHao5k0EeKWvlmjaTIXMqGS3fwxuPssK6jvEKM6Oh7eYo/6FY
+         D3tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXey4y+y4krti2XjIQLUbsDLQmhNu8p1QBqf/t2Dp/oybzKiQXgzE4MzLUIc5rSYaPg0a4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytGyCUakgGMmsT+sLCgaEwrzGJlV6yEydrOb4botdy2buCU8Va
+	wTYzDEVQ53odXpQyPf+N6PaXyQI7rKr9MHBhvrPZoy6EEcoicIAvsXn02cSsOeSP/o4=
+X-Gm-Gg: ASbGncsCd38v1wLv9X/tOsABEWgwmDr+g49R3W/qciXOQkyfqJuu5x7GHTW7B/8ZZk+
+	twiAH9fV09Kr0hHqucuF634nUVkod/KZEoDgFNG+wKwWD2l6dDxrLILO7pngfnW7YD2uAquR4Tv
+	zaDZX7p5W87/GLrXDevQKi+AoR9JXSbHF1yxoqVnZ65nN25R+qUoDwOFxmXt0VJ/6xUQhWNr98n
+	iOOHBJCnH2c2YifcR7I980fyTJhGRHLe+W06okPVG1aY0NzoOER0AozsOh3vAhLsgVwrdgyVRh9
+	SBuZvVQIoAO43zj721W0QMK7Ewgc58idz3Dhd+jZr6Wr5T4CPx8q92P5KzFaBOO8Ht4INkl/cb8
+	1Vv5SIVnjkmpSQ7I9mw==
+X-Google-Smtp-Source: AGHT+IGPdPYj0gZ7Vn94CMfnaQxwq36XrmsmDwGfdD+JAuyfQGtPOHOXGGbxG4KxhqzNEij1VvDbCA==
+X-Received: by 2002:a17:902:ec89:b0:22e:457d:3989 with SMTP id d9443c01a7336-237c1d2a8b3mr37447295ad.0.1750246574778;
+        Wed, 18 Jun 2025 04:36:14 -0700 (PDT)
 Received: from localhost.localdomain ([122.171.23.44])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237c57c63efsm9112475ad.172.2025.06.18.04.36.05
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237c57c63efsm9112475ad.172.2025.06.18.04.36.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 04:36:08 -0700 (PDT)
+        Wed, 18 Jun 2025 04:36:14 -0700 (PDT)
 From: Anup Patel <apatel@ventanamicro.com>
 To: Atish Patra <atish.patra@linux.dev>
 Cc: Palmer Dabbelt <palmer@dabbelt.com>,
@@ -86,9 +86,9 @@ Cc: Palmer Dabbelt <palmer@dabbelt.com>,
 	linux-kernel@vger.kernel.org,
 	Anup Patel <apatel@ventanamicro.com>,
 	Atish Patra <atishp@rivosinc.com>
-Subject: [PATCH v3 05/12] RISC-V: KVM: Don't flush TLB when PTE is unchanged
-Date: Wed, 18 Jun 2025 17:05:25 +0530
-Message-ID: <20250618113532.471448-6-apatel@ventanamicro.com>
+Subject: [PATCH v3 06/12] RISC-V: KVM: Implement kvm_arch_flush_remote_tlbs_range()
+Date: Wed, 18 Jun 2025 17:05:26 +0530
+Message-ID: <20250618113532.471448-7-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250618113532.471448-1-apatel@ventanamicro.com>
 References: <20250618113532.471448-1-apatel@ventanamicro.com>
@@ -100,58 +100,64 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The gstage_set_pte() and gstage_op_pte() should flush TLB only when
-a leaf PTE changes so that unnecessary TLB flushes can be avoided.
+The kvm_arch_flush_remote_tlbs_range() expected by KVM core can be
+easily implemented for RISC-V using kvm_riscv_hfence_gvma_vmid_gpa()
+hence provide it.
+
+Also with kvm_arch_flush_remote_tlbs_range() available for RISC-V, the
+mmu_wp_memory_region() can happily use kvm_flush_remote_tlbs_memslot()
+instead of kvm_flush_remote_tlbs().
 
 Reviewed-by: Atish Patra <atishp@rivosinc.com>
 Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 ---
- arch/riscv/kvm/mmu.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ arch/riscv/include/asm/kvm_host.h | 2 ++
+ arch/riscv/kvm/mmu.c              | 2 +-
+ arch/riscv/kvm/tlb.c              | 8 ++++++++
+ 3 files changed, 11 insertions(+), 1 deletion(-)
 
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index ff1f76d6f177..6162575e2177 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -43,6 +43,8 @@
+ 	KVM_ARCH_REQ_FLAGS(5, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(6)
+ 
++#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
++
+ #define KVM_HEDELEG_DEFAULT		(BIT(EXC_INST_MISALIGNED) | \
+ 					 BIT(EXC_BREAKPOINT)      | \
+ 					 BIT(EXC_SYSCALL)         | \
 diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index 1087ea74567b..29f1bd853a66 100644
+index 29f1bd853a66..a5387927a1c1 100644
 --- a/arch/riscv/kvm/mmu.c
 +++ b/arch/riscv/kvm/mmu.c
-@@ -167,9 +167,11 @@ static int gstage_set_pte(struct kvm *kvm, u32 level,
- 		ptep = &next_ptep[gstage_pte_index(addr, current_level)];
- 	}
- 
--	set_pte(ptep, *new_pte);
--	if (gstage_pte_leaf(ptep))
--		gstage_remote_tlb_flush(kvm, current_level, addr);
-+	if (pte_val(*ptep) != pte_val(*new_pte)) {
-+		set_pte(ptep, *new_pte);
-+		if (gstage_pte_leaf(ptep))
-+			gstage_remote_tlb_flush(kvm, current_level, addr);
-+	}
- 
- 	return 0;
- }
-@@ -229,7 +231,7 @@ static void gstage_op_pte(struct kvm *kvm, gpa_t addr,
- 			  pte_t *ptep, u32 ptep_level, enum gstage_op op)
- {
- 	int i, ret;
--	pte_t *next_ptep;
-+	pte_t old_pte, *next_ptep;
- 	u32 next_ptep_level;
- 	unsigned long next_page_size, page_size;
- 
-@@ -258,11 +260,13 @@ static void gstage_op_pte(struct kvm *kvm, gpa_t addr,
- 		if (op == GSTAGE_OP_CLEAR)
- 			put_page(virt_to_page(next_ptep));
- 	} else {
-+		old_pte = *ptep;
- 		if (op == GSTAGE_OP_CLEAR)
- 			set_pte(ptep, __pte(0));
- 		else if (op == GSTAGE_OP_WP)
- 			set_pte(ptep, __pte(pte_val(ptep_get(ptep)) & ~_PAGE_WRITE));
--		gstage_remote_tlb_flush(kvm, ptep_level, addr);
-+		if (pte_val(*ptep) != pte_val(old_pte))
-+			gstage_remote_tlb_flush(kvm, ptep_level, addr);
- 	}
+@@ -344,7 +344,7 @@ static void gstage_wp_memory_region(struct kvm *kvm, int slot)
+ 	spin_lock(&kvm->mmu_lock);
+ 	gstage_wp_range(kvm, start, end);
+ 	spin_unlock(&kvm->mmu_lock);
+-	kvm_flush_remote_tlbs(kvm);
++	kvm_flush_remote_tlbs_memslot(kvm, memslot);
  }
  
+ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
+diff --git a/arch/riscv/kvm/tlb.c b/arch/riscv/kvm/tlb.c
+index da98ca801d31..f46a27658c2e 100644
+--- a/arch/riscv/kvm/tlb.c
++++ b/arch/riscv/kvm/tlb.c
+@@ -403,3 +403,11 @@ void kvm_riscv_hfence_vvma_all(struct kvm *kvm,
+ 	make_xfence_request(kvm, hbase, hmask, KVM_REQ_HFENCE_VVMA_ALL,
+ 			    KVM_REQ_HFENCE_VVMA_ALL, NULL);
+ }
++
++int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pages)
++{
++	kvm_riscv_hfence_gvma_vmid_gpa(kvm, -1UL, 0,
++				       gfn << PAGE_SHIFT, nr_pages << PAGE_SHIFT,
++				       PAGE_SHIFT);
++	return 0;
++}
 -- 
 2.43.0
 
