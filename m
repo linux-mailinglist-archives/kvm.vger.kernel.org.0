@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-49883-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49884-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4B36ADF082
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 16:58:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E0A8ADF099
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 17:02:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F151B1BC1CC6
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 14:58:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25CD83AF411
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 14:59:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C262EE615;
-	Wed, 18 Jun 2025 14:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542A82EF65C;
+	Wed, 18 Jun 2025 14:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YY6JSkMz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DXiNBboK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B52F2EE614;
-	Wed, 18 Jun 2025 14:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863602EE29B;
+	Wed, 18 Jun 2025 14:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750258532; cv=none; b=VZ2IEPr4wjhpY0eFmja0cotLl3p25yWGkoUfI3e+9riyCZ7wCfJu1efwL/mV4833IyOQlNj//iEFmPpUV3btbwdLIr+SK6toIcYgqEwxOTwBvWutXu/Mn/N7RLAsgE9U2n9MK2d8b2tuVSBkWCNTqdKAvC0K/gyCRfkjqDf0HrA=
+	t=1750258703; cv=none; b=aUKrUFPAtPzMf/gw+5M7ccZzQ5YjVTEMhiMcj7ry0eTDwGBMWVGoSGo+B6SSQ+T8U610367H3tjgEm2Mi6QG2prcC/jtLZ+uogGRD2/MCynlnv7OBhMJjpno3KXcDFSnOnEUw9GkYj5zyUuH5dQko90JTh0y1LPujaE/JmmnajE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750258532; c=relaxed/simple;
-	bh=ED5by2ByHFPp/MQF3lr30nB2JGF4dIpqJT+e8nL59JI=;
+	s=arc-20240116; t=1750258703; c=relaxed/simple;
+	bh=ommGErbpAjgqiNvvyfyM1d8Yg7XXKXmLw8GLkxvcH9E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GYNF6p3BxDDFzBStnlr+6seMxik19PQRK+WD46LZgr1whwdA1gp48GpA3fvRmvUI/WQfu+6lVmKBKjD74lvBzLbvsz3J7edxPgADDz8T19dBJIHrZ7E2lqoAOFdPzPMZ9F6y9jvuUWS71VpPsArCTwNgztMr5IMFwxe5WnWGjGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YY6JSkMz; arc=none smtp.client-ip=198.175.65.11
+	 In-Reply-To:Content-Type; b=qf0vxMlkYNCDFtyELKw8W2iIWgVM68Ak1jKZmTK/O0W6FUpdaZo/HN5Eovlx7rtYvoj+KUhjABlbGnH+8CY9XNEk32x9+a5ayWuUBH5FxNlufPSCQikQnBjnoWnRY3GlTOhD4aZ/wpoQzGiprH3ozRSSQ8nYVl9RqSheLP19to8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DXiNBboK; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750258532; x=1781794532;
+  t=1750258702; x=1781794702;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=ED5by2ByHFPp/MQF3lr30nB2JGF4dIpqJT+e8nL59JI=;
-  b=YY6JSkMzX+QOYTx6d7oXqrp0WVAVitm4v4APSNsUKH+mK38X/iHgNUNG
-   b4D/TM0WlkrAFtehS3tSaLe3LAN0FAQYXsXZ4lp44oau8t3Wjmna904w4
-   +fZ0/Wn4e74xHx37V/LMvJc8Ea0zlRxieZb8h8a9hLYd5fL6cXIFdI7VR
-   dLHWUHSdJsE0b+mxT4hjVQVm4hslOZv//vnMeAud0QSt4u2AXtS3HcrwD
-   /Ud71wzBp7/5W4AC9gps1pHMGvjMzmSH/XFIXngY4CrWihO2saSi4vE0a
-   4CVh5agOuMGjS68rA9aGnsDQsf6sDuOt9xgGXM2zscfhT/Kec51qyAd4R
-   A==;
-X-CSE-ConnectionGUID: BL5nTgq0Qouj1LVziBgcHA==
-X-CSE-MsgGUID: fMnkAgl1Rq2Q27SzL633yQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="62758165"
+  bh=ommGErbpAjgqiNvvyfyM1d8Yg7XXKXmLw8GLkxvcH9E=;
+  b=DXiNBboKFkWwDx5n3yi4GDB8aVNLGlM6D/Rh45W1dgXy17nxvz9gBNhK
+   0nUIxYQPACnr9K2H+5KqmAc2v26si2aQGyhwoqcp1w7Teb5RCtrYC6mp1
+   m6c39DkXtn381STVKVvK3iMpyZEW8IfrD9RFW59XliTU2imzXfab6IznE
+   KbSQgDXCxZ4dzEM9A/pFcF9NnaTTyZO2dDtNOLubxFghUiyVzxDPCSYha
+   z2Dol4viRdrTHxPVfIxgREytl1eC6D8vGvGf634BSzCjs54/lHwnZ9/Pc
+   Bo5Cp7cCWQRinI+O2j10YUilE5w1xkDDMuSY1ccdHsBdK+phKk/tMRwaT
+   g==;
+X-CSE-ConnectionGUID: fd97MakGSO+E+U6FBS2GMw==
+X-CSE-MsgGUID: uawIRaErR/KjRZuPVs4Olg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="63088126"
 X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="62758165"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 07:55:31 -0700
-X-CSE-ConnectionGUID: Uo4ApLN3R/qwmkA9fXZd+g==
-X-CSE-MsgGUID: DZjak0fnSjyyxNVfIbIwFw==
+   d="scan'208";a="63088126"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 07:58:21 -0700
+X-CSE-ConnectionGUID: KzBtx/eNQRGPrA1Leg5Qew==
+X-CSE-MsgGUID: DhmJ8iDURIaOz2OiEXDsZw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="173261558"
+   d="scan'208";a="149438645"
 Received: from agladkov-desk.ger.corp.intel.com (HELO [10.125.108.97]) ([10.125.108.97])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 07:55:29 -0700
-Message-ID: <487c5e63-07d3-41ad-bfc0-bda14b3c435e@intel.com>
-Date: Wed, 18 Jun 2025 07:55:28 -0700
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 07:58:18 -0700
+Message-ID: <68938275-3f6a-46fc-9b38-2c916fdec3d6@intel.com>
+Date: Wed, 18 Jun 2025 07:58:17 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] x86/mce: Fix missing address mask in recovery for
- errors in TDX/SEAM non-root mode
+Subject: Re: [PATCH 2/2] KVM: TDX: Do not clear poisoned pages
 To: Adrian Hunter <adrian.hunter@intel.com>, Tony Luck <tony.luck@intel.com>,
  pbonzini@redhat.com, seanjc@google.com
 Cc: vannapurve@google.com, Borislav Petkov <bp@alien8.de>,
@@ -81,7 +80,7 @@ Cc: vannapurve@google.com, Borislav Petkov <bp@alien8.de>,
  tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
  isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com
 References: <20250618120806.113884-1-adrian.hunter@intel.com>
- <20250618120806.113884-2-adrian.hunter@intel.com>
+ <20250618120806.113884-3-adrian.hunter@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -127,23 +126,32 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250618120806.113884-2-adrian.hunter@intel.com>
+In-Reply-To: <20250618120806.113884-3-adrian.hunter@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 6/18/25 05:08, Adrian Hunter wrote:
-> --- a/arch/x86/kernel/cpu/mce/core.c
-> +++ b/arch/x86/kernel/cpu/mce/core.c
-> @@ -1665,7 +1665,8 @@ noinstr void do_machine_check(struct pt_regs *regs)
->  		 * be added to free list when the guest is terminated.
->  		 */
->  		if (mce_usable_address(m)) {
-> -			struct page *p = pfn_to_online_page(m->addr >> PAGE_SHIFT);
-> +			unsigned long pfn = (m->addr & MCI_ADDR_PHYSADDR) >> PAGE_SHIFT;
-> +			struct page *p = pfn_to_online_page(pfn);
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -282,10 +282,10 @@ static void tdx_clear_page(struct page *page)
+>  	void *dest = page_to_virt(page);
+>  	unsigned long i;
+>  
+> -	/*
+> -	 * The page could have been poisoned.  MOVDIR64B also clears
+> -	 * the poison bit so the kernel can safely use the page again.
+> -	 */
+> +	/* Machine check handler may have poisoned the page */
+> +	if (PageHWPoison(page))
+> +		return;
 
-If ->addr isn't really an address that software can do much with,
-shouldn't we mask MCI_ADDR_PHYSADDR off up front, like in mce_read_aux()?
+I think the old comment needs to stay in some form.
 
-Maybe we should break it up into address and KeyID _there_.
+There are two kinds of poisons here: One from an integrity mismatch and
+the other because the hardware decided the memory is bad. MOVDIR64B
+clears the integrity one, but not the hardware one obviously.
+
+Could we make that clear in the comment, please?
+
+
 
