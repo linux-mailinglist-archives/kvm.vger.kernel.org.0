@@ -1,148 +1,208 @@
-Return-Path: <kvm+bounces-49867-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E10C0ADEB60
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 14:09:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFF2EADEBFB
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 14:26:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F9B51887712
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 12:09:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C27494A5C7B
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 12:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6472DE1E2;
-	Wed, 18 Jun 2025 12:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73132DFF38;
+	Wed, 18 Jun 2025 12:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fdxKBZ1v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mm3Xhz2B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEDE3F9C5;
-	Wed, 18 Jun 2025 12:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A56528A1D8;
+	Wed, 18 Jun 2025 12:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750248529; cv=none; b=qIpEUoadphjd1X15yirXrReayVcpE7CJ+7RWRLtinmWfIJ2EL/CSLvV2GzqfIAjrs3zhRorVj6F7o7FOgP+E3THc2UNk/PYi4jK1yEXPrF/h4Z31W0oEeJgioev27alLouuwhjq9+N50o+x3tc1YVrwlXyBWtp0nzAF9sJJUiMg=
+	t=1750249165; cv=none; b=qNwuUur8IdbxRTw05d74FG/w3HCfX1xw3sAwh/4iPUjg3yrpFZaDfQi65j0gqpCKYsGTWuQMkfS8Lbld18/RsVPvdvToL3iUFz50wqmt27SUKWjzZVkF1x1gWGgjE8t3+ZTHC/83EvAfSBeaB2OHsHyw+teJ8UrR0zGVnCV0PuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750248529; c=relaxed/simple;
-	bh=9PvWQIN2DOiS+eGDpdKz3WgqnQceFcRO174Ih2hRwLI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uOvy3u1D6sdn6H4N9Xq6Fvo7x/kR03ngykLg9BV3luZfqgvf6Akn56TVC4qA4YTGB9pWFJ5vnu9sbFxtPRlHF1espGMiWTIRbs6oWS52OI11f3gkbPLDiM4cR2TiMttPBpwq6jiDhw+175Op0vlGcHNPIpqMsJeflZfr4r69ct4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fdxKBZ1v; arc=none smtp.client-ip=192.198.163.7
+	s=arc-20240116; t=1750249165; c=relaxed/simple;
+	bh=k+8qTSYcfkM1u4FWin0jAagfhW9z2r/NVtbj44YotsY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tUwJbClyVvylX8F1KmtG07560gN4usv+M71m1YmJUaTdU0+Z80XIUEONVYWCrohqJbAYPVdvy/ljsEh4tpAHHs3qSa/JVDyRShCShxg3E0rpRqaBxMHiGz+ULH81osdVdsJdZxASCYNkurvffeQXrNtO9W1fCGOhCQo6cXu7wGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mm3Xhz2B; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750248527; x=1781784527;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9PvWQIN2DOiS+eGDpdKz3WgqnQceFcRO174Ih2hRwLI=;
-  b=fdxKBZ1vEtPU149VgO+pr2p0Z20FozbKZ2v9uF4dvWkRxotbYsRIpc5M
-   WLaoZG2iLFiofj1VAwttblw5YMJeMmciGmJPcIPUvcqmjGFyZjckVBNFQ
-   gBSfyWAOhixKswoBMi24MBBEnU/Rkoem1PtRWg5MKVp8BVc9CVzP9Y5Ka
-   2/F0N63poVP3sZA+Q1wQzmFIuBV1sF6dhGxMflqXU3yuIQEaBEwkqFXVd
-   TMHc46rlUBmyrIEAG2J8t+xUjVCJu8230nZMIzkmMOgY1IrBMm65BDCQP
-   7W7z1LzdbT471+zasY+/OsBOhIUiNCNUbjhnUA1/vYBP/Pb17kY+oFCUm
+  t=1750249164; x=1781785164;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=k+8qTSYcfkM1u4FWin0jAagfhW9z2r/NVtbj44YotsY=;
+  b=mm3Xhz2Bu7P11kSxef2YP56jWRnDSSK0qMi9TEvJP5ys/gaZL7OFWuoA
+   qcSJp2siu/FimJ/NM/jmoZgoLkrTSH4oAX2rNuP80Us/6nRvsHv9fnFuJ
+   GGZ03jm9XCTn1petdbOmLWismA8vi7aFpmw8fo+MXb6BLIM6oufBqBd99
+   exqwrAykMZGm4NG+7eAV1ej2RxDxQqvSOCsTI345obAIsQH68WCuw+S6G
+   XodkF3n+L494pnUXQEN0CKIUewGUq7w1X6aNhgPtcMe3i8P+XaiwOUBhY
+   Wl/Vxcuvis/Z3nSPWjLFp4TGkUH2pJYom20icacT9fAvu89XM2Skz6SfC
    g==;
-X-CSE-ConnectionGUID: 51U2Xs1xSFawIURNWLH/Aw==
-X-CSE-MsgGUID: 13aPbU5ZRi2P5DrfRxJk7g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="77869043"
+X-CSE-ConnectionGUID: hewjvgD/S62tjhVdSQf1MA==
+X-CSE-MsgGUID: c0661op7SMOwqAvcm/1qsw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="52331202"
 X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="77869043"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 05:08:46 -0700
-X-CSE-ConnectionGUID: 8svx1IzZSXisrWdvIDRz7A==
-X-CSE-MsgGUID: HxAOmSDzQhC4iTG0+KT5Uw==
+   d="scan'208";a="52331202"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 05:18:15 -0700
+X-CSE-ConnectionGUID: 9r6V4U3FS1SpaQqBstaAOA==
+X-CSE-MsgGUID: F5hO37xQQqqSDpHTn4JSbQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="154213206"
-Received: from sschumil-mobl2.ger.corp.intel.com (HELO localhost.localdomain) ([10.245.245.234])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 05:08:39 -0700
-From: Adrian Hunter <adrian.hunter@intel.com>
-To: Tony Luck <tony.luck@intel.com>,
-	pbonzini@redhat.com,
-	seanjc@google.com
-Cc: vannapurve@google.com,
-	Borislav Petkov <bp@alien8.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	H Peter Anvin <hpa@zytor.com>,
-	linux-edac@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	rick.p.edgecombe@intel.com,
-	kirill.shutemov@linux.intel.com,
-	kai.huang@intel.com,
-	reinette.chatre@intel.com,
-	xiaoyao.li@intel.com,
-	tony.lindgren@linux.intel.com,
-	binbin.wu@linux.intel.com,
-	isaku.yamahata@intel.com,
-	yan.y.zhao@intel.com,
-	chao.gao@intel.com
-Subject: [PATCH 2/2] KVM: TDX: Do not clear poisoned pages
-Date: Wed, 18 Jun 2025 15:08:06 +0300
-Message-ID: <20250618120806.113884-3-adrian.hunter@intel.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250618120806.113884-1-adrian.hunter@intel.com>
-References: <20250618120806.113884-1-adrian.hunter@intel.com>
+   d="scan'208";a="153479359"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 05:18:01 -0700
+Message-ID: <3031b949-c42a-49bc-be0c-f95a62c792e2@intel.com>
+Date: Wed, 18 Jun 2025 20:17:58 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Finland Oy, Registered Address: c/o Alberga Business Park, 6 krs, Bertel Jungin Aukio 5, 02600 Espoo, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 08/18] KVM: guest_memfd: Allow host to map guest_memfd
+ pages
+To: David Hildenbrand <david@redhat.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Fuad Tabba <tabba@google.com>, Ira Weiny <ira.weiny@intel.com>,
+ kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
+ mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
+ amoorthy@google.com, dmatlack@google.com, isaku.yamahata@intel.com,
+ mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
+ ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com,
+ wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+ jthoughton@google.com, peterx@redhat.com, pankaj.gupta@amd.com
+References: <20250611133330.1514028-1-tabba@google.com>
+ <20250611133330.1514028-9-tabba@google.com> <aEySD5XoxKbkcuEZ@google.com>
+ <68501fa5dce32_2376af294d1@iweiny-mobl.notmuch>
+ <bbc213c3-bc3d-4f57-b357-a79a9e9290c5@redhat.com>
+ <CA+EHjTxvqDr1tavpx7d9OyC2VfUqAko864zH9Qn5+B0UQiM93g@mail.gmail.com>
+ <701c8716-dd69-4bf6-9d36-4f8847f96e18@redhat.com>
+ <aFIK9l6H7qOG0HYB@google.com>
+ <3fb0e82b-f4ef-402d-a33c-0b12e8aa990c@redhat.com>
+ <5ee9bbb8-d100-408c-ac07-ea9c5b603545@intel.com>
+ <5a55d95e-5e32-4239-a445-be13228ea80b@redhat.com>
+ <45af2c0d-a416-49bc-8011-4ec57a56d6f5@intel.com>
+ <40a5903b-f747-4eab-8959-06ddd6e88f82@redhat.com>
+ <fa3cea2a-d005-44fd-8a2f-2bcea1dc9042@intel.com>
+ <38101158-4475-4885-83e7-654045ca0f9b@redhat.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <38101158-4475-4885-83e7-654045ca0f9b@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Skip clearing a private page if it is marked as poisoned.
+On 6/18/2025 7:14 PM, David Hildenbrand wrote:
+> On 18.06.25 12:42, Xiaoyao Li wrote:
+>> On 6/18/2025 5:59 PM, David Hildenbrand wrote:
+>>> On 18.06.25 11:44, Xiaoyao Li wrote:
+>>>> On 6/18/2025 5:27 PM, David Hildenbrand wrote:
+>>>>> On 18.06.25 11:20, Xiaoyao Li wrote:
+>>>>>> On 6/18/2025 4:15 PM, David Hildenbrand wrote:
+>>>>>>>> If we are really dead set on having SHARED in the name, it could be
+>>>>>>>> GUEST_MEMFD_FLAG_USER_MAPPABLE_SHARED or
+>>>>>>>> GUEST_MEMFD_FLAG_USER_MAP_SHARED?  But
+>>>>>>>> to me that's _too_ specific and again somewhat confusing given the
+>>>>>>>> unfortunate
+>>>>>>>> private vs. shared usage in CoCo-land.  And just playing the odds,
+>>>>>>>> I'm
+>>>>>>>> fine taking
+>>>>>>>> a risk of ending up with GUEST_MEMFD_FLAG_USER_MAPPABLE_PRIVATE or
+>>>>>>>> whatever,
+>>>>>>>> because I think that is comically unlikely to happen.
+>>>>>>>
+>>>>>>> I think in addition to GUEST_MEMFD_FLAG_MMAP we want something to
+>>>>>>> express "this is not your old guest_memfd that only supports private
+>>>>>>> memory". And that's what I am struggling with.
+>>>>>>
+>>>>>> Sorry for chiming in.
+>>>>>>
+>>>>>> Per my understanding, (old) guest memfd only means it's the memory 
+>>>>>> that
+>>>>>> cannot be accessed by userspace. There should be no shared/private
+>>>>>> concept on it.
+>>>>>>
+>>>>>> And "private" is the concept of KVM. Guest memfd can serve as private
+>>>>>> memory, is just due to the character of it cannot be accessed from
+>>>>>> userspace.
+>>>>>>
+>>>>>> So if the guest memfd can be mmap'ed, then it become userspace
+>>>>>> accessable and cannot serve as private memory.
+>>>>>>
+>>>>>>> Now, if you argue "support for mmap() implies support for non- 
+>>>>>>> private
+>>>>>>> memory", I'm probably okay for that.
+>>>>>>
+>>>>>> I would say, support for mmap() implies cannot be used as private
+>>>>>> memory.
+>>>>>
+>>>>> That's not where we're heading with in-place conversion support: you
+>>>>> will have private (ianccessible) and non-private (accessible) 
+>>>>> parts, and
+>>>>> while guest_memfd will support mmap() only the accessible parts can
+>>>>> actually be accessed (faulted in etc).
+>>>>
+>>>> That's OK. The guestmemfd can be fine-grained, i.e., different
+>>>> range/part of it can have different access property. But one rule never
+>>>> change: only the sub-range is not accessible by userspace can it be
+>>>> serve as private memory.
+>>>
+>>> I'm sorry, I don't understand what you are getting at.
+>>>
+>>> You said "So if the guest memfd can be mmap'ed, then it become userspace
+>>> accessable and cannot serve as private memory." and I say, with in-place
+>>> conversion support you are wrong.
+>>>
+>>> The whole file can be mmaped(), that does not tell us anything about
+>>> which parts can be private or not.
+>>
+>> So there is nothing prevent userspace from accessing it after a range is
+>> converted to private via KVM_GMEM_CONVERT_PRIVATE since the whole file
+>> can be mmaped()?
+>>
+>> If so, then for TDX case, userspace can change the TD-owner bit of the
+>> private part by accessing it and later guest access will poison it and
+>> trigger #MC. If the #MC is only delivered to the PCPU that triggers it,
+>> it just leads to the TD guest being killed. If the #MC is broadcasted,
+>> it affects other in the system.
+>>
+>> I just give it a try on real TDX system with in-place conversion. The TD
+>> is killed due to SIGBUS (host kernel handles the #MC and sends the
+>> SIGBUS). It seems OK if only the TD guest being affected due to
+>> userspace accesses the private memory. But I'm not sure if there is any
+>> corner case that will affect the host.
+> 
+> I suggest you go ahead and read all about in-place conversion support, 
+> and how it all relates to the #MC problem you mention here.
+> 
+> Long story short: SIGBUS is triggered by the fault handler, not by the 
+> #MC, because private pages cannot be faulted in and accessed.
+>
 
-The machine check architecture may have the capability to recover from
-memory corruption in SEAM non-root (i.e. TDX VM guest) mode.  In that
-case the page is marked as poisoned, and the TDX Module puts the TDX VM
-into a FATAL error state where the only operation permitted is to tear it
-down.
+Sorry for the wrong information and thanks for your patience!
 
-During tear down, reclaimed pages are cleared which, in some cases,  helps
-to avoid integrity violation or TD bit mismatch detection when later being
-read using a shared HKID.
-
-However a poisoned page will never be allocated again, so clearing is not
-necessary, and in any case poisoned pages should not be touched.
-
-Note that while it is possible that memory corruption arises from integrity
-violation which could be cleared by MOVDIR64B, that is not necessarily the
-cause of the machine check.
-
-Suggested-by: Kai Huang <kai.huang@intel.com>
-Fixes: 8d032b683c299 ("KVM: TDX: create/destroy VM structure")
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
----
- arch/x86/kvm/vmx/tdx.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 457f91b95147..f4263f7a3924 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -282,10 +282,10 @@ static void tdx_clear_page(struct page *page)
- 	void *dest = page_to_virt(page);
- 	unsigned long i;
- 
--	/*
--	 * The page could have been poisoned.  MOVDIR64B also clears
--	 * the poison bit so the kernel can safely use the page again.
--	 */
-+	/* Machine check handler may have poisoned the page */
-+	if (PageHWPoison(page))
-+		return;
-+
- 	for (i = 0; i < PAGE_SIZE; i += 64)
- 		movdir64b(dest + i, zero_page);
- 	/*
--- 
-2.48.1
-
+I'm clearer now that this series and the in-place conversion try to make 
+shared/private the property of guest memfd. If under this big picture, 
+it looks reasonable to name the flag with "shared'. While just looking 
+at this patch alone, Sean's concern makes more sense.
 
