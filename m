@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-49869-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70C8BADEB7F
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 14:14:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10C0ADEB60
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 14:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 492B540122D
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 12:09:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F9B51887712
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 12:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3024E2DFF3E;
-	Wed, 18 Jun 2025 12:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6472DE1E2;
+	Wed, 18 Jun 2025 12:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="beVw8WfY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fdxKBZ1v"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90092DBF45;
-	Wed, 18 Jun 2025 12:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEDE3F9C5;
+	Wed, 18 Jun 2025 12:08:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750248587; cv=none; b=F8NkscKF1e1glcsoO+SDuEjbWunJgxhL4x6rRgh1FgbTF4COuU7hgQTJs5srjIrS4+3XIYAx03nfvpl8hBZOGDsQvAUkbOJHtM6W1Xs3pLPHK+2FHLOdNHzL5ER/yADSTBqLtgVpFxISAqgYwJrNAvd+fRMerTVRL89Ut4tjvQM=
+	t=1750248529; cv=none; b=qIpEUoadphjd1X15yirXrReayVcpE7CJ+7RWRLtinmWfIJ2EL/CSLvV2GzqfIAjrs3zhRorVj6F7o7FOgP+E3THc2UNk/PYi4jK1yEXPrF/h4Z31W0oEeJgioev27alLouuwhjq9+N50o+x3tc1YVrwlXyBWtp0nzAF9sJJUiMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750248587; c=relaxed/simple;
-	bh=xOXdFzt/cGAT7EXDjHSOYuUckW3uOERT1XUKP0JE6is=;
+	s=arc-20240116; t=1750248529; c=relaxed/simple;
+	bh=9PvWQIN2DOiS+eGDpdKz3WgqnQceFcRO174Ih2hRwLI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iyWXeT2t5NTYrlTSoigdGQcPG7P2jpNJHCcrE0RnD4rW4SGiI3oiOak1SioCDf6GxM3lQ3UwYB9WShdZy4dWF2SlkzY3nC5n8jhOLOjOdaPbom393US4/S5iMApN7l7dmAucwv93EOaNP8+HGTPpKXjQgwTITeelfDim10sA800=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=beVw8WfY; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=uOvy3u1D6sdn6H4N9Xq6Fvo7x/kR03ngykLg9BV3luZfqgvf6Akn56TVC4qA4YTGB9pWFJ5vnu9sbFxtPRlHF1espGMiWTIRbs6oWS52OI11f3gkbPLDiM4cR2TiMttPBpwq6jiDhw+175Op0vlGcHNPIpqMsJeflZfr4r69ct4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fdxKBZ1v; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750248586; x=1781784586;
+  t=1750248527; x=1781784527;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=xOXdFzt/cGAT7EXDjHSOYuUckW3uOERT1XUKP0JE6is=;
-  b=beVw8WfYa8QJ/8jTkiz40MEdLDBXhZEKmQ5YMxYXN+oN64zYFoybP8r1
-   Xb8m5nZXT7PSzdFGq68P0bWu3VZptkjHHXMlWsr6oMmJak27S9YliUZwW
-   w8chi3AWKHRXsEejf5/sESyCwzaNaziHh45FMwrJgRMkmasXVtL6gJQ4o
-   aRCS3cDOgTgNQzupbslx/EBc//WlbnNryaojGDl9CoOIpgkC4fT2oo9ZX
-   AwMHUUqBY2ZR6OE7HaFTsntWK80UeV41OyEcn9Q09Vvp11FQkxIF9gjqe
-   +CqjrMkEfmIysQxcFsn2VPwUVMFb0Q/601+ZVeM8fCch/HveLL0OjJzlU
-   A==;
-X-CSE-ConnectionGUID: 5xodWU7WQfi7/b1xLA7Pxg==
-X-CSE-MsgGUID: Hiqle2aLSpazXXjpZg/lkg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="77869036"
+  bh=9PvWQIN2DOiS+eGDpdKz3WgqnQceFcRO174Ih2hRwLI=;
+  b=fdxKBZ1vEtPU149VgO+pr2p0Z20FozbKZ2v9uF4dvWkRxotbYsRIpc5M
+   WLaoZG2iLFiofj1VAwttblw5YMJeMmciGmJPcIPUvcqmjGFyZjckVBNFQ
+   gBSfyWAOhixKswoBMi24MBBEnU/Rkoem1PtRWg5MKVp8BVc9CVzP9Y5Ka
+   2/F0N63poVP3sZA+Q1wQzmFIuBV1sF6dhGxMflqXU3yuIQEaBEwkqFXVd
+   TMHc46rlUBmyrIEAG2J8t+xUjVCJu8230nZMIzkmMOgY1IrBMm65BDCQP
+   7W7z1LzdbT471+zasY+/OsBOhIUiNCNUbjhnUA1/vYBP/Pb17kY+oFCUm
+   g==;
+X-CSE-ConnectionGUID: 51U2Xs1xSFawIURNWLH/Aw==
+X-CSE-MsgGUID: 13aPbU5ZRi2P5DrfRxJk7g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="77869043"
 X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="77869036"
+   d="scan'208";a="77869043"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 05:08:40 -0700
-X-CSE-ConnectionGUID: fxVCo2r8T4yCHA//tSlYFQ==
-X-CSE-MsgGUID: /+InbJlTT3G0GDvnBDVyrQ==
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 05:08:46 -0700
+X-CSE-ConnectionGUID: 8svx1IzZSXisrWdvIDRz7A==
+X-CSE-MsgGUID: HxAOmSDzQhC4iTG0+KT5Uw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,246,1744095600"; 
-   d="scan'208";a="154213127"
+   d="scan'208";a="154213206"
 Received: from sschumil-mobl2.ger.corp.intel.com (HELO localhost.localdomain) ([10.245.245.234])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 05:08:33 -0700
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2025 05:08:39 -0700
 From: Adrian Hunter <adrian.hunter@intel.com>
 To: Tony Luck <tony.luck@intel.com>,
 	pbonzini@redhat.com,
@@ -82,9 +82,9 @@ Cc: vannapurve@google.com,
 	isaku.yamahata@intel.com,
 	yan.y.zhao@intel.com,
 	chao.gao@intel.com
-Subject: [PATCH 1/2] x86/mce: Fix missing address mask in recovery for errors in TDX/SEAM non-root mode
-Date: Wed, 18 Jun 2025 15:08:05 +0300
-Message-ID: <20250618120806.113884-2-adrian.hunter@intel.com>
+Subject: [PATCH 2/2] KVM: TDX: Do not clear poisoned pages
+Date: Wed, 18 Jun 2025 15:08:06 +0300
+Message-ID: <20250618120806.113884-3-adrian.hunter@intel.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250618120806.113884-1-adrian.hunter@intel.com>
 References: <20250618120806.113884-1-adrian.hunter@intel.com>
@@ -97,41 +97,51 @@ MIME-Version: 1.0
 Organization: Intel Finland Oy, Registered Address: c/o Alberga Business Park, 6 krs, Bertel Jungin Aukio 5, 02600 Espoo, Business Identity Code: 0357606 - 4, Domiciled in Helsinki
 Content-Transfer-Encoding: 8bit
 
-Commit 8a01ec97dc066 ("x86/mce: Mask out non-address bits from machine
-check bank") introduced a new #define MCI_ADDR_PHYSADDR for the mask of
-valid physical address bits within the machine check bank address register.
+Skip clearing a private page if it is marked as poisoned.
 
-This is particularly needed in the case of errors in TDX/SEAM non-root mode
-because the reported address contains the TDX KeyID.  Refer to TDX and
-TME-MK documentation for more information about KeyIDs.
+The machine check architecture may have the capability to recover from
+memory corruption in SEAM non-root (i.e. TDX VM guest) mode.  In that
+case the page is marked as poisoned, and the TDX Module puts the TDX VM
+into a FATAL error state where the only operation permitted is to tear it
+down.
 
-Commit 7911f145de5fe ("x86/mce: Implement recovery for errors in TDX/SEAM
-non-root mode") uses the address to mark the affected page as poisoned, but
-omits to use the aforementioned mask.
+During tear down, reclaimed pages are cleared which, in some cases,  helps
+to avoid integrity violation or TD bit mismatch detection when later being
+read using a shared HKID.
 
-Mask the address with MCI_ADDR_PHYSADDR so that the page can be found.
+However a poisoned page will never be allocated again, so clearing is not
+necessary, and in any case poisoned pages should not be touched.
 
-Fixes: 7911f145de5fe ("x86/mce: Implement recovery for errors in TDX/SEAM non-root mode")
-Cc: stable@vger.kernel.org
+Note that while it is possible that memory corruption arises from integrity
+violation which could be cleared by MOVDIR64B, that is not necessarily the
+cause of the machine check.
+
+Suggested-by: Kai Huang <kai.huang@intel.com>
+Fixes: 8d032b683c299 ("KVM: TDX: create/destroy VM structure")
 Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
 ---
- arch/x86/kernel/cpu/mce/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/tdx.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kernel/cpu/mce/core.c b/arch/x86/kernel/cpu/mce/core.c
-index e9b3c5d4a52e..76c4634c6a5f 100644
---- a/arch/x86/kernel/cpu/mce/core.c
-+++ b/arch/x86/kernel/cpu/mce/core.c
-@@ -1665,7 +1665,8 @@ noinstr void do_machine_check(struct pt_regs *regs)
- 		 * be added to free list when the guest is terminated.
- 		 */
- 		if (mce_usable_address(m)) {
--			struct page *p = pfn_to_online_page(m->addr >> PAGE_SHIFT);
-+			unsigned long pfn = (m->addr & MCI_ADDR_PHYSADDR) >> PAGE_SHIFT;
-+			struct page *p = pfn_to_online_page(pfn);
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 457f91b95147..f4263f7a3924 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -282,10 +282,10 @@ static void tdx_clear_page(struct page *page)
+ 	void *dest = page_to_virt(page);
+ 	unsigned long i;
  
- 			if (p)
- 				SetPageHWPoison(p);
+-	/*
+-	 * The page could have been poisoned.  MOVDIR64B also clears
+-	 * the poison bit so the kernel can safely use the page again.
+-	 */
++	/* Machine check handler may have poisoned the page */
++	if (PageHWPoison(page))
++		return;
++
+ 	for (i = 0; i < PAGE_SIZE; i += 64)
+ 		movdir64b(dest + i, zero_page);
+ 	/*
 -- 
 2.48.1
 
