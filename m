@@ -1,156 +1,195 @@
-Return-Path: <kvm+bounces-49812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79F2BADE354
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 08:01:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61343ADE36D
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 08:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A8ED3B7BEB
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 06:00:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 261613A3CDA
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 06:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CA31E0B86;
-	Wed, 18 Jun 2025 06:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F3E1FF60A;
+	Wed, 18 Jun 2025 06:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dCXpX43u"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="T6denvIw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6705415D1
-	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 06:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9657F1A2630
+	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 06:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750226456; cv=none; b=flJTXMJHbs27oR3GVVNiGDr3T/gnl1tbkCe9WCPavN+moYI4s4StWNs7/2ARIZn+2nkwmpy4Q9vqAW65u1DZkrH/i9wxqTDAlaFbjNg/4Y8o2dT6yvff40Bn8kc1O0kQKjBJNcq6gErBv4ww77v+NPJpZmxLJCjO83JY2x+kb8I=
+	t=1750227113; cv=none; b=VS0lPF+1cMdxuKJQeMNYvV8/WcII3CB0PpC4zUkYmOU/4ZumdUSS9LAU7B7abjSDEyxz4k4sBvys6BXvnUy60T2TpTZLzKEDZlmXyLXCvrG3qt66eojrYKs7gf85fpfHwb3XOMJMaQdWa9Ae4QoZMbxUoemho7QMXak6LIrp9hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750226456; c=relaxed/simple;
-	bh=4Zgjd6gnF9v/99etOHsRMTSTYjNQAZRLnd05tXZTvdI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LFdjAGR0vmAL6WcCsVUZYfp/CfyZD3kyP977izQrWXbA/saOPflUpNVOXPd9Ztl31662Yf5i5SGmu9mXssC9ppavXbTW9PHL0MtKIGIkT2JLKjirgBsLZJ2SNDNsrmRwK4A7p0xbSNxdRsRi6AtyEGlb5QGUW99Yp1vi+zNeA2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dCXpX43u; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2348ac8e0b4so70005ad.1
-        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 23:00:55 -0700 (PDT)
+	s=arc-20240116; t=1750227113; c=relaxed/simple;
+	bh=PV3RfHpZjCKWdH+IzxbEBNpRgM9p9sr1JimZBDuNOZk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dLin8zczhRg12rWttJW1iBopmccdOQsSQqqLHrhv8bnoKOsNZzPradDkbiVHDyO/WW0La3ks6qETgqTSaREnXhH+ZFZnZ5Iumn4yh2TBKilrv72y/PWR+e/wWA79MTokejgGON9fG9sHFHjB+HlRTwM6SoT1pFyP8cBWps3JZKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=T6denvIw; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-235f9ea8d08so64097185ad.1
+        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 23:11:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750226454; x=1750831254; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=bytedance.com; s=google; t=1750227111; x=1750831911; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4Lwi91r3JxBJupBaG+2UOIImxjmJDsRx7zkdQ0Qkg/s=;
-        b=dCXpX43u/TTs5WyCUXG0jFrCv+dP93LaHur5UXUzpdKf2i+uOjxr7K74gQuNv7lf8i
-         2XXPwSoZDSYRqjPVWcaLkcO0U7bUQN5+uBVwbLDrNeZo8DbuSJ6qSw3S5TFkbm3Y8s64
-         ROqTYn7dUCPZvoBVwMD7VFTSro5IDd6npKT1cm7OR2F5H0JAPrBrGh0DpyTxIKEakva4
-         5+7Y7yqQL33O82esz92EPZYk6g8oB2P0phkbng759CtAU883QekgLpZRpgclZwRLmQwa
-         dsFDJdDMTMMvvGHXMF/7mpOnxOU79nq66/pX+sYpZiDeFYJfQss8cPLIisOsU3Qqkz4r
-         4J6w==
+        bh=xn7q+LZ4zA2xL1SK3J/9rIfQd9cYihtR+w0HeyZNGvc=;
+        b=T6denvIwaeieRz615Z90emzHCojhU5ZGPTOZOCYbeTIX3Cnwej8X7GLaVbt8CTg32S
+         K+cbnnoirDrMk0eCao/ON58dYAdfu7s+VMA7NovymV8hJB/Rh5+vb1xOKhHle7Stm0NX
+         6YvBLvlzZdYbzoFFOSArNB3wDiDKKvTyR7Z0eipMNnCM5MltYTzJl7Fhx/eJXoDZzaWW
+         CuwhifO5PWm85OdhgBLfCY82waT4dpOetze/f5KpEuNjtRxnAkLDcGjfFkAPtbs+oOB9
+         tq13UyDs5gdkElaIGc3qOSCp+b5nnhuyRV6TsgLgiGRLaBUjkKXb5zIdIUdyL+ixSjiu
+         6/5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750226454; x=1750831254;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1750227111; x=1750831911;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4Lwi91r3JxBJupBaG+2UOIImxjmJDsRx7zkdQ0Qkg/s=;
-        b=wozZ9yuRJUB/jiyyGzhN14lza5dfJ3wv1rtxPex8GLQsn7kV14DkISqQBdSGYUXiKn
-         U2YdzJNm3OvtCDCyBLpa5aZDRJUfOHi55k46afJMXgu38QbMHBUcJfWr7oH0j7rLlxcg
-         lMxzIsy4JYGPe7LaWmaZgkuUvRvpaN81zGaZxjOvmZ5hMu84sAOH8u2UE+9YeNmGPjQd
-         QgFSW2xacwgGWLCF9nngdggJ5ohDNrH48iJHCpzpqgEKEHaMTWpzUq6Cbbgvczl0lsBS
-         0XmA6HKlOJrJF6R53AN8wliQH65VcCcilGSQtUmReWvlvw7SZaFUrOpO1IuWDnXSxcIy
-         45WA==
-X-Forwarded-Encrypted: i=1; AJvYcCXLez8nw/UiimvFT06J76fm4dLpTFTc9TtNero/X1/eADgS5cHAHW602TvKzYCWIDbvp+I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr9vT1OELiQzm4/CO2owET6rCd0rJ0YUk2qqGjRY9BWmf+SVu2
-	cOmYEbgUBE1ZZexEEw3RIsTt2IPzDF1bCU3G0as9D+GROSDyW97qHmNskkv14w6qTHSowbwZ1CG
-	fnm8kRRVveuYwwXRhzS13V7bljIHfRTAygnxwTDB/
-X-Gm-Gg: ASbGncua2wzzDy+57qiQLrzUmdrZofcUANRqBtSvcxmTKbUW4FCaAGZ1moVmYvkbiMC
-	6C1HWyyqSq9Bpntak/jNmSzTxFNEx9EGahBILkEHGW4ML50o6OxP6ErlB1y03Hlj15A3on/5WWb
-	PkzN2GIsRVy5BHEWVFfK6yafoy7ZxzJMfF9PfcZxgsiA==
-X-Google-Smtp-Source: AGHT+IGd3Cmn404YHuokOrwbSXvVwvjTp57tOUkPzGLs8N+Gdkvo1lOIsdRLB/cl+CQsh3MVqtp3oQixIjk7CTl9D7Q=
-X-Received: by 2002:a17:903:19e4:b0:235:e1fa:1fbc with SMTP id
- d9443c01a7336-2366c4c2c44mr12285535ad.0.1750226453922; Tue, 17 Jun 2025
- 23:00:53 -0700 (PDT)
+        bh=xn7q+LZ4zA2xL1SK3J/9rIfQd9cYihtR+w0HeyZNGvc=;
+        b=lfiObzcdzRV1LDy/5YsNMxT/c6qSheKiNzn+kQpY3ISBHfTl2GMO96Ab7aPTOszDcJ
+         1SQ4iq2H1aUiENM7xXw3gdYImx3e68v5sNGrnIf/jPW+yA9RcdFsdQRiL2SdcmNwUvMT
+         EXfA8k1nBabQony5Ca/jeHKSiPfagZ+Thkyk53xEEAppbEyZCP99Y34P0F+pi+h9otnl
+         UJwszftXB9KEld54RhCjGQtLZTIrc68SZA1MXSUpG2dsUj/+dPzHPm03DPy2uWIE5KKN
+         AOGExV1/0nrwjFOEip1DEeMmDKtOUhIhUWt5UDLcjwxtgj70dGn+jQKJVMR+sFRaU9uz
+         Oj5g==
+X-Forwarded-Encrypted: i=1; AJvYcCW1H09YD8nr+km88fhbmutxfsTcEnWJiflVcno0oDNxvjAFgVL3sf90p9zD3I7exAhfAWM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5iVCi72REtKI45toKrM2Oip/IVWxJlxiydlySMeBl7V7pNXQT
+	XUicMHiCJAw2jb2yPVQS0lc55qjASrcEogEmFEXv6+Wmtrr9mGxtVLSNzCYVrlKVsHM=
+X-Gm-Gg: ASbGncsAduML/sWuU4vPGi54jhhfR1YVz/j3XkZXoE+TUi/u48ZJZiC/G+PniVCkaPC
+	5jvptePpvP+LJzGaYoV7PU6SfY/S5dCkvsxGhJmHF0V6BmTe4nRuf1HDWW/bHTynMBaGjd6pJG2
+	bRjO8QKevQh8mYVHOvbLy0inhTo45mnOfrflmD8abluDz8k9TgNCtWclgcAv4DVi39fsocY+RdH
+	QiXHkz/WkGY9jGB8SP7OR7q8DA/ljcdi+bmm75me0DZreuRebnI1JZw0QRaeyDFcDjPHrjLx2Ow
+	AGd67FSeBgISKNXMNR9H5m+i4QNE1TpsJsjr9JT2+rNc8yZQtFdD8uG08Kga+GbaUoLR+OLppNU
+	+Pz4GH5EuvophOA==
+X-Google-Smtp-Source: AGHT+IE6QHqF5cRG4JjJmwec3MCxJQBktPbBLGT04dKoF50/oeGUlWRe2hxM1IPr9OMe35BOwAM1yw==
+X-Received: by 2002:a17:903:24f:b0:234:bca7:292e with SMTP id d9443c01a7336-2366afe6223mr256773915ad.14.1750227110691;
+        Tue, 17 Jun 2025 23:11:50 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.13])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d8a4d3fsm91393555ad.64.2025.06.17.23.11.47
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 17 Jun 2025 23:11:50 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: david@redhat.com
+Cc: akpm@linux-foundation.org,
+	alex.williamson@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lizhe.67@bytedance.com,
+	peterx@redhat.com
+Subject: Re: [PATCH v4 3/3] vfio/type1: optimize vfio_unpin_pages_remote() for large folio
+Date: Wed, 18 Jun 2025 14:11:43 +0800
+Message-ID: <20250618061143.6470-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <ce2af146-499b-4fce-8095-6c5471fdf288@redhat.com>
+References: <ce2af146-499b-4fce-8095-6c5471fdf288@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250611095158.19398-1-adrian.hunter@intel.com>
- <20250611095158.19398-2-adrian.hunter@intel.com> <CAGtprH_cpbPLvW2rSc2o7BsYWYZKNR6QAEsA4X-X77=2A7s=yg@mail.gmail.com>
- <e86aa631-bedd-44b4-b95a-9e941d14b059@intel.com>
-In-Reply-To: <e86aa631-bedd-44b4-b95a-9e941d14b059@intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 17 Jun 2025 23:00:41 -0700
-X-Gm-Features: AX0GCFvXti2XDNJCtYz-gj21OeTGM_aopJJEoqDhfHGJIJMSIis82dKBQDZiWy8
-Message-ID: <CAGtprH_PwNkZUUx5+SoZcCmXAqcgfFkzprfNRH8HY3wcOm+1eg@mail.gmail.com>
-Subject: Re: [PATCH V4 1/1] KVM: TDX: Add sub-ioctl KVM_TDX_TERMINATE_VM
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org, 
-	rick.p.edgecombe@intel.com, kirill.shutemov@linux.intel.com, 
-	kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
-	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, 
-	isaku.yamahata@intel.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com, 
-	chao.gao@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 17, 2025 at 10:50=E2=80=AFPM Adrian Hunter <adrian.hunter@intel=
-.com> wrote:
-> ...
-> >>
-> >> Changes in V4:
-> >>
-> >>         Drop TDX_FLUSHVP_NOT_DONE change.  It will be done separately.
-> >>         Use KVM_BUG_ON() instead of WARN_ON().
-> >>         Correct kvm_trylock_all_vcpus() return value.
-> >>
-> >> Changes in V3:
-> >>
-> >>         Remove KVM_BUG_ON() from tdx_mmu_release_hkid() because it wou=
-ld
-> >>         trigger on the error path from __tdx_td_init()
-> >>
-> >>         Put cpus_read_lock() handling back into tdx_mmu_release_hkid()
-> >>
-> >>         Handle KVM_TDX_TERMINATE_VM in the switch statement, i.e. let
-> >>         tdx_vm_ioctl() deal with kvm->lock
-> >> ....
-> >>
-> >> +static int tdx_terminate_vm(struct kvm *kvm)
-> >> +{
-> >> +       if (kvm_trylock_all_vcpus(kvm))
-> >> +               return -EBUSY;
-> >> +
-> >> +       kvm_vm_dead(kvm);
-> >
-> > With this no more VM ioctls can be issued on this instance. How would
-> > userspace VMM clean up the memslots? Is the expectation that
-> > guest_memfd and VM fds are closed to actually reclaim the memory?
->
-> Yes
->
-> >
-> > Ability to clean up memslots from userspace without closing
-> > VM/guest_memfd handles is useful to keep reusing the same guest_memfds
-> > for the next boot iteration of the VM in case of reboot.
->
-> TD lifecycle does not include reboot.  In other words, reboot is
-> done by shutting down the TD and then starting again with a new TD.
->
-> AFAIK it is not currently possible to shut down without closing
-> guest_memfds since the guest_memfd holds a reference (users_count)
-> to struct kvm, and destruction begins when users_count hits zero.
->
+On Tue, 17 Jun 2025 15:47:09 +0200, david@redhat.com wrote:
+ 
+> > How do you think of this implementation?
+> > 
+> > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > index 242b05671502..eb91f99ea973 100644
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -2165,6 +2165,23 @@ static inline long folio_nr_pages(const struct folio *folio)
+> >          return folio_large_nr_pages(folio);
+> >   }
+> >   
+> > +/*
+> > + * folio_remaining_pages - Counts the number of pages from a given
+> > + * start page to the end of the folio.
+> > + *
+> > + * @folio: Pointer to folio
+> > + * @start_page: The starting page from which to begin counting.
+> > + *
+> > + * Returned number includes the provided start page.
+> > + *
+> > + * The caller must ensure that @start_page belongs to @folio.
+> > + */
+> > +static inline unsigned long folio_remaining_pages(struct folio *folio,
+> > +               struct page *start_page)
+> > +{
+> > +       return folio_nr_pages(folio) - folio_page_idx(folio, start_page);
+> > +}
+> > +
+> >   /* Only hugetlbfs can allocate folios larger than MAX_ORDER */
+> >   #ifdef CONFIG_ARCH_HAS_GIGANTIC_PAGE
+> >   #define MAX_FOLIO_NR_PAGES     (1UL << PUD_ORDER)
+> > diff --git a/mm/gup.c b/mm/gup.c
+> > index 15debead5f5b..14ae2e3088b4 100644
+> > --- a/mm/gup.c
+> > +++ b/mm/gup.c
+> > @@ -242,7 +242,7 @@ static inline struct folio *gup_folio_range_next(struct page *start,
+> >   
+> >          if (folio_test_large(folio))
+> >                  nr = min_t(unsigned int, npages - i,
+> > -                          folio_nr_pages(folio) - folio_page_idx(folio, next));
+> > +                          folio_remaining_pages(folio, next));
+> >   
+> >          *ntails = nr;
+> >          return folio;
+> > diff --git a/mm/page_isolation.c b/mm/page_isolation.c
+> > index b2fc5266e3d2..34e85258060c 100644
+> > --- a/mm/page_isolation.c
+> > +++ b/mm/page_isolation.c
+> > @@ -96,7 +96,7 @@ static struct page *has_unmovable_pages(unsigned long start_pfn, unsigned long e
+> >                                  return page;
+> >                          }
+> >   
+> > -                       skip_pages = folio_nr_pages(folio) - folio_page_idx(folio, page);
+> > +                       skip_pages = folio_remaining_pages(folio, page);
+> >                          pfn += skip_pages - 1;
+> >                          continue;
+> >                  }
+> > ---
+> 
+> Guess I would have pulled the "min" in there, but passing something like 
+> ULONG_MAX for the page_isolation case also looks rather ugly.
 
-gmem link support[1] allows associating existing guest_memfds with new
-VM instances.
+Yes, the page_isolation case does not require the 'min' logic. Since
+there are already places in the current kernel code where
+folio_remaining_pages() is used without needing min, we could simply
+create a custom wrapper function based on folio_remaining_pages() only
+in those specific scenarios where min is necessary.
 
-Breakdown of the userspace VMM flow:
-1) Create a new VM instance before closing guest_memfd files.
-2) Link existing guest_memfd files with the new VM instance. -> This
-creates new set of files backed by the same inode but associated with
-the new VM instance.
-3) Close the older guest memfd handles -> results in older VM instance clea=
-nup.
+Following this line of thinking, the wrapper function in vfio would
+look something like this.
 
-[1] https://lore.kernel.org/lkml/cover.1747368092.git.afranji@google.com/#t
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -801,16 +801,40 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+        return pinned;
+ }
+ 
++static inline unsigned long vfio_folio_remaining_pages(
++               struct folio *folio, struct page *start_page,
++               unsigned long max_pages)
++{
++       if (!folio_test_large(folio))
++               return 1;
++       return min(max_pages,
++                  folio_remaining_pages(folio, start_page));
++}
++
+
+---
+
+Does this approach seem acceptable to you?
+
+Thanks,
+Zhe
 
