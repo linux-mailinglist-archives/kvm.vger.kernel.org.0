@@ -1,158 +1,222 @@
-Return-Path: <kvm+bounces-49864-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49865-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 348A3ADEA9D
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 13:46:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5845ADEAF6
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 13:57:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3139160BEA
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 11:46:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 123564028FF
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 11:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DFAD284B27;
-	Wed, 18 Jun 2025 11:46:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635412DF3D4;
+	Wed, 18 Jun 2025 11:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="QGUzTAdI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Br/h2jzX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0383E2F5328
-	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 11:46:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1261136A
+	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 11:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750247193; cv=none; b=kyqy+Ynwn2WQD5I6Wz6Dlcai7WXZ/DbFaFdhQkFjpeWD6SMm/lkcZJqG9OZgFY1FhfFnlLE4aJVxwBO7hjMOF6hR9DXtrrRFPWcIwqC+RAd+l4W0O+/HA2jDiStq4kyWREtfRiaKp8ijmxY2D40crpxdYQ6C2KhN19LQ7oSrmEs=
+	t=1750247564; cv=none; b=uD3+I5Xiz5mv/lHcxk5ndyFdRlsJ2F/xlTNzTEFm5fWczmtxCxMZc3m3IVgF9nI3FgwYvttaEbrD2oiOfvC53Afi66Vxx86acYVPgNsAohbvUBtjSPWiZr8BVr91NXEuVAelL96Xs/fNei8hTMI7sRSbOcp0ew3XysaoliQPAo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750247193; c=relaxed/simple;
-	bh=BQPuT5fv8iLkb6eIPg3WGtds6HKhuEhOQB+fBvWc7VM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L9Evvy9MHplE1glAnku9MD6VkJUxek5jkyIzXJ6UVhHv+p5DD3ZEp19XFl/0KUcYBmK+Q6iiv1CG4lG30CdPF0xk1KAyGZX3df4nopB2BNPtB7pf3X/xfWBIvZcC/p92R7xuKrRnV29acCF4OEfRY6gR7qH5C98Z4U6WZJWYxF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=QGUzTAdI; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4a58d95ea53so6470401cf.0
-        for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 04:46:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1750247191; x=1750851991; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+wxDAXtg4Qo50atD2TXEt4R3fx9+/jlU++z8cat2peU=;
-        b=QGUzTAdI694LBdh1Ms/xu3bgW4MI3f7zx6lpx09zu5EcDpyR3HZdQvGe8E1W5Q5or+
-         IrIrH8Q8C6llD4p+LeNNmm3iDa74WtKHwNq1hFNo/EL1Z+gH7EiZn9mTsWtjcBgtFhl7
-         5MTdrD+WQ1nczjRs2CzRxM6CIG3w3xZ+igJHuRkYFgSlZsqnzTOGUSLZ0fTy8KiWQzdM
-         81SLxaha1fYT9i2Fz95sO/EK2oYncpT4mqKiRzWeI6RiItHq7+0T9XDA0HsBVG8VPZ/d
-         Fb9UjrwAJ1WwNF8ypcfLFfgld7sf53s3MEldKOtk+qziOeOxk+xkMHUWd4144FrRR74b
-         C1VA==
+	s=arc-20240116; t=1750247564; c=relaxed/simple;
+	bh=/LLPH+A8vAe7oov7g+qQGZnQO+y9OMWaiWO8p5B3c7I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TWDDuZkkdBsK4XBTog1Ia88RK9wck1Ll4wZU4eEv8YeqYLZcacT0fWf5hsIfD7fOvHNcLRBrT7s1WeVHdWVFTTPUxBXpTQTmfIzOm24jJ3e+/7ITJNZuYfeSo+aJ+bkojBEkhoLYEmF04T9YcKh79mXGFPX5FEw/teWiZt4gkzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Br/h2jzX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750247561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=oPPoWZCcWRwUF819SYaXsiBVPEFt9ywvAF4/WUhA2HY=;
+	b=Br/h2jzXskZHnydcnwPeDlor0owB5Ba/ixGrNTlJE8s+brY0dvTsZJa8y42OO4yTlwiOVw
+	JIyNnrW9fuwZ9S+l1qAVJYTaulQCKdUCg5BFNKSBz7ZucN8SEdeKzzzRJmjBGnbcxmYKvk
+	gMTkXZESmzm8KeL2X9g3bPuckcFkvm0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-178-dGCDM90pNKy0iryTZVhsxQ-1; Wed, 18 Jun 2025 07:52:40 -0400
+X-MC-Unique: dGCDM90pNKy0iryTZVhsxQ-1
+X-Mimecast-MFC-AGG-ID: dGCDM90pNKy0iryTZVhsxQ_1750247559
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a58939191eso770624f8f.0
+        for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 04:52:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750247191; x=1750851991;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+wxDAXtg4Qo50atD2TXEt4R3fx9+/jlU++z8cat2peU=;
-        b=BfSCPyTmbGvoixTWSwoARE1p3co019ALDX/3eoUHH1Q8IiQypWrBxIICTjRY0xRXWl
-         Poj2fLqsWbANHfNRLQWnFQQFDkip/1e/CHRtJftK/3ZSSbC4YkjkDHGbzKqtgda31NGo
-         kEOs4w3oeErkS0ZfB7hhSQnCiqsQ4YDMHxxbVseupX3eS9Bg94WUnGLgmri6UseyJiae
-         0s6ZD0cWfdwg83FDXXwwhK1g9cEOocfgGVWKN1s9Bh5Fx9K/b599ENaovnCDpzDB9cZX
-         wPWqelk0FWMcxmGc/YftvpD9HTTMhKUNDLjre97ClVfPyqSRbQ/w8yl/qEAdMwDrgVG8
-         tlQw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/+t4RUZ9zLyanfzNtCziwzlND7MojlMBwCao5w2pCUpu3oC0J0wmTzyT9vFRoHF8nqh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgQSuO7meOK7RpqQpasaYWFxD4EeTwWqpvpL8ZwnwtW5OQco0V
-	Ojm2VIIySMvbXSbFI/c++nqD9+M8DZWzPNic8Uie6jJ2Wr7F9rIcVE2Cao8uvWRhCzc=
-X-Gm-Gg: ASbGncstcmrzLU2MnQOkbjqjvDRy7c3aE8yDko2VAXAxFwKoz16DlMO4yg2quX5DBui
-	lDmVLemQWL5NzrHsUi1AMBlYm4m/C0muhdhUdRK521IH4PLxecX64qD6ti0eu/ySze7NqRALfGY
-	5vYa/PslXOomOW99sT4iXR1fAwKhU38rRtx/4eXuJwPGB9ySrhzMRmR2PvGsso6gqlnOaIczdzQ
-	XqRLNMX8QhUAruDcqB+Q8+qiuzppTUZPjWRmAZE0JwKHzImd6RLcEN4/PV+aNQHILKKUm5DbNN0
-	I/oxMWEKvvmiYFXKcYhWXizZ7SrzfOniXiSItPtOHt0JO466tj5wNORK3hmL7mE7gzqbpPIgB8U
-	tQ7uqskXlPvUZbBhtV8r0OYQseMW86MBkLj0GRA==
-X-Google-Smtp-Source: AGHT+IH9ampaEvML5kl4q5XP1ejBHxic8pQJ9EplcrH4aE8+2qiZ3Q+h0D+ADETOd0AZ5S0xxE/VJQ==
-X-Received: by 2002:ac8:7d4f:0:b0:4a6:f6e6:7696 with SMTP id d75a77b69052e-4a7645dd6bamr37752941cf.26.1750247190820;
-        Wed, 18 Jun 2025 04:46:30 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-167-56-70.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.56.70])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a72a4b148esm72211971cf.40.2025.06.18.04.46.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jun 2025 04:46:30 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1uRrFN-00000006l9d-25JO;
-	Wed, 18 Jun 2025 08:46:29 -0300
-Date: Wed, 18 Jun 2025 08:46:29 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: David Hildenbrand <david@redhat.com>
-Cc: lizhe.67@bytedance.com, akpm@linux-foundation.org,
-	alex.williamson@redhat.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, peterx@redhat.com
-Subject: Re: [PATCH v4 2/3] gup: introduce unpin_user_folio_dirty_locked()
-Message-ID: <20250618114629.GL1376515@ziepe.ca>
-References: <20250617152210.GA1552699@ziepe.ca>
- <20250618062820.8477-1-lizhe.67@bytedance.com>
- <20250618113626.GK1376515@ziepe.ca>
- <9c31da33-8579-414a-9b2a-21d7d8049050@redhat.com>
- <a1d62bf1-59e5-4dd5-926a-d6cdddf3deb5@redhat.com>
+        d=1e100.net; s=20230601; t=1750247559; x=1750852359;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oPPoWZCcWRwUF819SYaXsiBVPEFt9ywvAF4/WUhA2HY=;
+        b=u5Ib28cg97GDzeTZjbD+gLpPmfkt61dOmp2FwD+9FlL7Fwl5dgC8ZjfqG/B83ayA2g
+         tSSLYWep8muMpR+rX7gAcrUeAD+0tzCoFST1nY96he0DBGcUym2dK+e4W1KHI4Pm22Xz
+         48W0fWO199EKBa3Zv7gogSFiO8Dxg20wxNytJmEcZKFtCI0CIcv5d6Z7biYbZIjnnzYp
+         FKQMrdm5mEuJHD0uuLu35/LyQZoPyJbNhBxV8LGk8FtQWIrScqkxtE1d6ABK0BbPdMK2
+         BcGxfY8XEZKZPF6CNyUFSH3Ss3SMxbihMcsOb/55M0RphbJ68+1wkDK4BtHwJDzlvQBj
+         GKUg==
+X-Forwarded-Encrypted: i=1; AJvYcCWL8PMAvWbK1k0DWednnnI5KQhAJejETv5c+QjqMY2n6ePgTb5Qs3ROsnv1sfrKG7DAHYM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCY3Y8taeL38Vvq/3vu0iqBTfsWnMx6IifJpy0/XLDgxZFq1Ni
+	Jq1j0HS/4EAToYiZaQ7OAjkKbiB9LrVfAKIJSgvcBp5aZseHVqxL3YtCY6HXyXTTQ3jpD0Y7j6U
+	UTAvx+7ArtawMz/R+Dg5KxiKa7NElTEEWuWA8Ysp9JsttHNe0L0eY6Q==
+X-Gm-Gg: ASbGncvJ6+lcz6dMJCFC6woXvwKwRThuZ5w3xbVej1on0IpVVfAxQiY3ytxt7c0VpVk
+	AY3YdeCkytnNIMXgItqhBjeoK5W0yzC9V+f8+L+38b5wDOB4LWJMKyxYYiMAVosSgwTTsJLDAre
+	vvTqzxnpON5KNx6Sxem+tCbyAT6/MHnNSy9qf5av2qFzGetUTBP6OHcdqSGZ4fwbSGWDxA6PQDG
+	rUyRx1z6RM6LqmdEkdLjkgkS3lXRZElMrOxUfgU7laYu3FRp+E6KMwVEKfWz69ky2Dn/0ffQ0yO
+	j2DP2wIKOivmT/LC2VjxJdUpknlTlaipz3cSA3pw1vPU9wfQbLnErcxzhoFA09jyTpEosiB6cqE
+	R+pu33i846vQZbyvW/fCng7JXQDN1QKypf6uwuukD568orNE=
+X-Received: by 2002:a05:6000:4618:b0:3a5:3b93:be4b with SMTP id ffacd0b85a97d-3a5723aebd7mr13614985f8f.25.1750247559062;
+        Wed, 18 Jun 2025 04:52:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFHA3iQr6Mkqge8qCrokSRLO4JkSqk8c0s6IDMXiHbXRzG5SxxtTAHjHvomBBWjhnRDOE6jzQ==
+X-Received: by 2002:a05:6000:4618:b0:3a5:3b93:be4b with SMTP id ffacd0b85a97d-3a5723aebd7mr13614968f8f.25.1750247558692;
+        Wed, 18 Jun 2025 04:52:38 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f2d:2400:4052:3b5:fff9:4ed0? (p200300d82f2d2400405203b5fff94ed0.dip0.t-ipconnect.de. [2003:d8:2f2d:2400:4052:3b5:fff9:4ed0])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a568b087a9sm17020666f8f.55.2025.06.18.04.52.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Jun 2025 04:52:38 -0700 (PDT)
+Message-ID: <cb926401-6bfd-44cc-b126-28204225b820@redhat.com>
+Date: Wed, 18 Jun 2025 13:52:37 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a1d62bf1-59e5-4dd5-926a-d6cdddf3deb5@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/3] gup: introduce unpin_user_folio_dirty_locked()
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: lizhe.67@bytedance.com, akpm@linux-foundation.org,
+ alex.williamson@redhat.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, peterx@redhat.com
+References: <20250617152210.GA1552699@ziepe.ca>
+ <20250618062820.8477-1-lizhe.67@bytedance.com>
+ <20250618113626.GK1376515@ziepe.ca>
+ <9c31da33-8579-414a-9b2a-21d7d8049050@redhat.com>
+ <a1d62bf1-59e5-4dd5-926a-d6cdddf3deb5@redhat.com>
+ <20250618114629.GL1376515@ziepe.ca>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250618114629.GL1376515@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 18, 2025 at 01:42:09PM +0200, David Hildenbrand wrote:
-> On 18.06.25 13:40, David Hildenbrand wrote:
-> > On 18.06.25 13:36, Jason Gunthorpe wrote:
-> > > On Wed, Jun 18, 2025 at 02:28:20PM +0800, lizhe.67@bytedance.com wrote:
-> > > > On Tue, 17 Jun 2025 12:22:10 -0300, jgg@ziepe.ca wrote:
-> > > > > +	while (npage) {
-> > > > > +		long nr_pages = 1;
-> > > > > +
-> > > > > +		if (!is_invalid_reserved_pfn(pfn)) {
-> > > > > +			struct page *page = pfn_to_page(pfn);
-> > > > > +			struct folio *folio = page_folio(page);
-> > > > > +			long folio_pages_num = folio_nr_pages(folio);
-> > > > > +
-> > > > > +			/*
-> > > > > +			 * For a folio, it represents a physically
-> > > > > +			 * contiguous set of bytes, and all of its pages
-> > > > > +			 * share the same invalid/reserved state.
-> > > > > +			 *
-> > > > > +			 * Here, our PFNs are contiguous. Therefore, if we
-> > > > > +			 * detect that the current PFN belongs to a large
-> > > > > +			 * folio, we can batch the operations for the next
-> > > > > +			 * nr_pages PFNs.
-> > > > > +			 */
-> > > > > +			if (folio_pages_num > 1)
-> > > > > +				nr_pages = min_t(long, npage,
-> > > > > +					folio_pages_num -
-> > > > > +					folio_page_idx(folio, page));
-> > > > > +
-> > > > > +			unpin_user_folio_dirty_locked(folio, nr_pages,
-> > > > > +					dma->prot & IOMMU_WRITE);
-> > > > 
-> > > > Are you suggesting that we should directly call
-> > > > unpin_user_page_range_dirty_lock() here (patch 3/3) instead?
-> > > 
-> > > I'm saying you should not have the word 'folio' inside the VFIO. You
-> > > accumulate a contiguous range of pfns, by only checking the pfn, and
-> > > then call
-> > > 
-> > > unpin_user_page_range_dirty_lock(pfn_to_page(first_pfn)...);
-> > > 
-> > > No need for any of this. vfio should never look at the struct page
-> > > except as the last moment to pass the range.
-> > 
-> > Hah, agreed, that's actually simpler and there is no need to factor
-> > anything out.
+On 18.06.25 13:46, Jason Gunthorpe wrote:
+> On Wed, Jun 18, 2025 at 01:42:09PM +0200, David Hildenbrand wrote:
+>> On 18.06.25 13:40, David Hildenbrand wrote:
+>>> On 18.06.25 13:36, Jason Gunthorpe wrote:
+>>>> On Wed, Jun 18, 2025 at 02:28:20PM +0800, lizhe.67@bytedance.com wrote:
+>>>>> On Tue, 17 Jun 2025 12:22:10 -0300, jgg@ziepe.ca wrote:
+>>>>>> +	while (npage) {
+>>>>>> +		long nr_pages = 1;
+>>>>>> +
+>>>>>> +		if (!is_invalid_reserved_pfn(pfn)) {
+>>>>>> +			struct page *page = pfn_to_page(pfn);
+>>>>>> +			struct folio *folio = page_folio(page);
+>>>>>> +			long folio_pages_num = folio_nr_pages(folio);
+>>>>>> +
+>>>>>> +			/*
+>>>>>> +			 * For a folio, it represents a physically
+>>>>>> +			 * contiguous set of bytes, and all of its pages
+>>>>>> +			 * share the same invalid/reserved state.
+>>>>>> +			 *
+>>>>>> +			 * Here, our PFNs are contiguous. Therefore, if we
+>>>>>> +			 * detect that the current PFN belongs to a large
+>>>>>> +			 * folio, we can batch the operations for the next
+>>>>>> +			 * nr_pages PFNs.
+>>>>>> +			 */
+>>>>>> +			if (folio_pages_num > 1)
+>>>>>> +				nr_pages = min_t(long, npage,
+>>>>>> +					folio_pages_num -
+>>>>>> +					folio_page_idx(folio, page));
+>>>>>> +
+>>>>>> +			unpin_user_folio_dirty_locked(folio, nr_pages,
+>>>>>> +					dma->prot & IOMMU_WRITE);
+>>>>>
+>>>>> Are you suggesting that we should directly call
+>>>>> unpin_user_page_range_dirty_lock() here (patch 3/3) instead?
+>>>>
+>>>> I'm saying you should not have the word 'folio' inside the VFIO. You
+>>>> accumulate a contiguous range of pfns, by only checking the pfn, and
+>>>> then call
+>>>>
+>>>> unpin_user_page_range_dirty_lock(pfn_to_page(first_pfn)...);
+>>>>
+>>>> No need for any of this. vfio should never look at the struct page
+>>>> except as the last moment to pass the range.
+>>>
+>>> Hah, agreed, that's actually simpler and there is no need to factor
+>>> anything out.
+>>
+>> Ah, no, wait, the problem is that we don't know how many pages we can
+>> supply, because there might be is_invalid_reserved_pfn() in the range ...
 > 
-> Ah, no, wait, the problem is that we don't know how many pages we can
-> supply, because there might be is_invalid_reserved_pfn() in the range ...
+> You stop batching when you hit any invalid_reserved_pfn and flush it.
+> 
+> It still has to check read back and check every PFN to make sure it is
+> contiguous, checking reserved too is not a problemm.
 
-You stop batching when you hit any invalid_reserved_pfn and flush it.
+I thought we also wanted to optimize out the is_invalid_reserved_pfn() 
+check for each subpage of a folio.
 
-It still has to check read back and check every PFN to make sure it is
-contiguous, checking reserved too is not a problemm.
+pfn_valid() + pfn_to_page() are not super cheap in some relevant configs 
+IIRC.
 
-Jason 
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
