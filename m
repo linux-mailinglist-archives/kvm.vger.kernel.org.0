@@ -1,203 +1,171 @@
-Return-Path: <kvm+bounces-49815-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49816-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD17CADE392
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 08:22:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F5A6ADE3AB
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 08:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4AB1189C925
-	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 06:22:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD1AB1898977
+	for <lists+kvm@lfdr.de>; Wed, 18 Jun 2025 06:28:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C3A1E3769;
-	Wed, 18 Jun 2025 06:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78914207A32;
+	Wed, 18 Jun 2025 06:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WbmbxAFn"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="SKxtc28g"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB771B0437
-	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 06:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB8F170A11
+	for <kvm@vger.kernel.org>; Wed, 18 Jun 2025 06:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750227717; cv=none; b=exdxKDC2iimO0OYJ9RJJjKCcmR/rhJkoNVsBMgtfg19GFJbPxTMM+5n13BvZpJtrf1tcxXC91Jp0UfoMS96jkgWRCfgt8S/PCYQ5komVjooowHS+ZzBPw/Y8k41SZtBa/y2vdRpp5zXip/HMM3249jEDXwg8PZlz/00VWsK5qAc=
+	t=1750228109; cv=none; b=TfX+U9iKtNFFLUVO/FHBW3aLwS9FCZz2jcMHoQubCLDytw5uoGEE6zVMp3QO8JS8r3/sKU/XziJ8ii52jv7HUopRdCaCnVLeHOmLXfYUmYcKrczi52gw1Cl6ITwFb24A6wBJM2g3Y7OFpKjAodOH+yZGR3ZkAvsYM5F9Uh7YTgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750227717; c=relaxed/simple;
-	bh=M2oZbg2GUqircKqpExFuqTy9suxAPOctTofRORlY2no=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AARyfzR4Wil3OW4REf8zw8kKNy3f7/y9DpSlhmXeDG0LqnpdJ8EMNEXEMID6FWHAAc+yrRp5p8oQ3npfG4V61bDPva4F92SCJQ3y8cn4xSxdUKAHAj+Vh19WrhQaI8fzck7vsAR+gxzOPOU35MfGdKxu4yvGMJaBcGTh86LwY/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WbmbxAFn; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2357c61cda7so63095ad.1
-        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 23:21:55 -0700 (PDT)
+	s=arc-20240116; t=1750228109; c=relaxed/simple;
+	bh=W1l7UdPX58azGa/bEcJUEXuiZ0Q01OETBuhRIHPsOFM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=L28Z5SsuNZu7mhBlZVBS5CYIv5Ok8YIfjrUKz3AQqs1IAP+VZIQUWUrTNjaMIpssB37nMWVGOAI3SalidNYvdheDvL8szP91xI4jAO4AYvh5K/k+xByuj5qkF2Xp8Wxl34BvrwNw3HQx5MHDSRL8s4I+4IFOGP2pOVipvKP7Ri4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=SKxtc28g; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b31cd61b2a9so168470a12.3
+        for <kvm@vger.kernel.org>; Tue, 17 Jun 2025 23:28:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750227715; x=1750832515; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=bytedance.com; s=google; t=1750228107; x=1750832907; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M2oZbg2GUqircKqpExFuqTy9suxAPOctTofRORlY2no=;
-        b=WbmbxAFnUszRB9668QKNZa24uxOAmtSnVnY+ori1fjN12tMrUbTzKB3470WDMZpvxw
-         FEIac+31NN1pHXh82SaJA1+QtmWNvfp9OoUlpZu7UXXuUHDIqPewWFb+k0iB6HKJ8sNP
-         RapAeoer261Um1DhJE9j2tjT8n6D6xar2d1fuV4p9GHWreIKCrlROZiw+LI25+apQ9Lt
-         dHb8AIVk7h9jdAKvMycTpXNXEG9g5gTPBKsPLKumLPJlQqWaVQXHJyufI6vi9EnLRWl9
-         AWFZT3RgMcJRNZOEhtW2tB0FQA+uKL7UjeHVNlDaD7p4zn/AKGmtDJXkMh6VSsBiCZuI
-         BTLA==
+        bh=mI57uaSGABNj0PlhCXhnWj7DOQSN5+fWjT4KpZNdSHY=;
+        b=SKxtc28grEnzVD1GPFFKu3HtBjYJNVNByptNoifLJ51sPeSlkRGll+VF2u0HyJN2lQ
+         qER4xCFByWm6Bn7XroeFwHFyCc644QJhWIR8U6J7CseqqElDsUpCoeuDZtOQ7bK7deCA
+         4pEysTk0GM75BoGjajB102XhI8/927y7sygGvJNaY56XbUSGa5X6ItyRtr9ZFkBSOtD/
+         GkXDh2O/aBqjZoOEGRtmkGwR6PvphMVwd0OrUJD53qCOdkC3k/sP+ipANINseW7LA8rb
+         9B0cFQexcWUCrKoO9RTax0rHQN/lWWEMGjtz8nMPWAa2fCyCRGOnOTXBGjw/CrfA8M+l
+         z1sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750227715; x=1750832515;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1750228107; x=1750832907;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=M2oZbg2GUqircKqpExFuqTy9suxAPOctTofRORlY2no=;
-        b=dlBHRFe0IFdP9vh1cJ/O1NI+eM6UPC9dY/dnwaLqdNx4Qko1riVMftQj8k2zZ1oZNv
-         N1hd8dya4qJsYspOjeuXtzw2QIEsF5R0lxGlpANY3jW829BFe2wCnR2ktN6Pa+MoC716
-         5+HalEYT88aGBDL4vLHqD0KUj3jJTkW0KkkZpU+wb+y9l/7TxBimGvpWX/284GQPHkTd
-         WnkX51swEZPCZlaGq1FAYLL6yBRFnxlOk8YuhvHbL1H4azexmGLSdGVfIp+SGYDjL0LQ
-         /UQyHnFpeDs0XLH2rlJq+VDHO1JUB3DRyUcfeYX70qxCCGpgrb/YJTBNg8rNpnkNEXmA
-         C8zg==
-X-Forwarded-Encrypted: i=1; AJvYcCUiS6TUelHnNvafFrkUquFzSYL1z8YpZSsUtLv8x57BxRc6EtvOdcktU3DA6xO7qspWI7A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywx24Y/Kyw28GdJcLAerocOpGAFFq+g/wyHJnlt4V0rqqx0LnDh
-	RR++bbOJD2T7/OWlTrO/jxBtq7XgHFQuQ/vtgwnpyb5lJxfTpEot5Qa1ShFdt9IF8alJY0sj74T
-	vNkyLGuZUYI7Ulfx1Q7hPoSSXUO9hB3Ni+/XvkXei
-X-Gm-Gg: ASbGncv5dZ0C6WV0Ernn/RPehJlqdOAGfj8DZU722/1dfZy3Pl4yI8lyHCqF9NizsBs
-	pFsq+LCfB65yllD/lsgQc4yv9tZWwZJ0ZF1q5OV4CLqfZuItC1cbjnY0JNZkDjh3+hmvbFlT3Tf
-	wh1i87ABcGf3JuaGWhf5L47X689B8JigvkYCfQ6cltYQ==
-X-Google-Smtp-Source: AGHT+IGK3ol8JP93u/VaNeY9EDNrNJpQd59v5T6XZJjNKDTOkjHCqtBfGffmbF0fyH/4vlRnqrmwub7qfl3mnN7UET0=
-X-Received: by 2002:a17:903:22d1:b0:215:7152:36e4 with SMTP id
- d9443c01a7336-2366f00e2damr10103495ad.27.1750227714423; Tue, 17 Jun 2025
- 23:21:54 -0700 (PDT)
+        bh=mI57uaSGABNj0PlhCXhnWj7DOQSN5+fWjT4KpZNdSHY=;
+        b=dkUYn/ynzXtsalrhtdi4rUlPApRe/KrM3jTHKXKngV+jllIvWlUI85QCWP7v9h6vx1
+         lb+xUoAFfhUAg64luk5Dic3J8FPHaYin2iauau37KgyFm8+OQAIlwEFlk5BxR8y89Smb
+         UllQVosq3Homf3jv2QQNXsJZNfLISE43aapMHRMIlrZ6xiIcuE5FKvlUZstCvFHPYJo7
+         7WgqDQp2GWc1hYXpGluoFo12H/YrCcNtoNdwlQ80UdhbW03U9FNU4IxPAAsTXOKF5BSw
+         zuCDhUafDKfwiPEn+NaUNIGaO6GNG7v75a7kEy9too4dkSSIQi/gYXLQBY/CiESnKN0G
+         2gig==
+X-Forwarded-Encrypted: i=1; AJvYcCW9Eml3o47L6ZJQrFfdEbRoeh81h5ve0A+hMcHQCfPnbhRdSZ+aoSl2qTn0482VJtAwBVk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXBOiJxF9ELcKm7z03T9A0AVTELXnlZurC+x58fLFFz7nKVRmV
+	2zBQ0oFLsGH0G0QCbwV3QoTp1cLK4ObcgHDcU7B8B6YlhQuF/j0N7cb4V4VL2hCtb/c=
+X-Gm-Gg: ASbGnctsCeV51WPuucYCgXt6ywcR7djzbfBdxoYOIZVTfnW0qc9WGA/7F81WqerQbXL
+	YV/GKnIlvEQcuEL0O0xcs0TVe7rD6wdE/M6woDvvAwDktB5PdVLBe0xhYro+l7yuey73F3vaxZE
+	hqQbQ9CqnQc8ejn4/Ym5xzzMjyRCVwkuTDL2r2MNXeZe7HIdUQxm/8EWt/1yq47vWzaKuhp5stY
+	Sltjp4+wpCmycP0kyam1BtTX/T2ozFw16H6aOE+SxM4voErN5KKevz3yGOa3hOQRT4LEFEwm3Xm
+	A0jIU/miXSmZ6lwx4wHI7yuxsL5APgtiBLaD5cCi/gBxmS7C+UmsL17ylmrSfoiTveXNfcmmW6V
+	KrLcgwIsA4WI9
+X-Google-Smtp-Source: AGHT+IE+2M9MkPtRgZNvLkNSyl6vr4XBqYCNAnKxfe0Vg46VcdclkjFTQaKK865r2eMg2Tgra0VrYw==
+X-Received: by 2002:a05:6a21:1512:b0:21e:eb3a:dc04 with SMTP id adf61e73a8af0-21fbd495d28mr24231233637.3.1750228106695;
+        Tue, 17 Jun 2025 23:28:26 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.5])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b2fe168b971sm10044933a12.58.2025.06.17.23.28.23
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 17 Jun 2025 23:28:26 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: jgg@ziepe.ca,
+	david@redhat.com
+Cc: akpm@linux-foundation.org,
+	alex.williamson@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	lizhe.67@bytedance.com,
+	peterx@redhat.com
+Subject: Re: [PATCH v4 2/3] gup: introduce unpin_user_folio_dirty_locked()
+Date: Wed, 18 Jun 2025 14:28:20 +0800
+Message-ID: <20250618062820.8477-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250617152210.GA1552699@ziepe.ca>
+References: <20250617152210.GA1552699@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <diqzfrgfp95d.fsf@ackerleytng-ctop.c.googlers.com>
- <aEEEJbTzlncbRaRA@yzhao56-desk.sh.intel.com> <CAGtprH_Vj=KS0BmiX=P6nUTdYeAZhNEyjrRFXVK0sG=k4gbBMg@mail.gmail.com>
- <aE/q9VKkmaCcuwpU@yzhao56-desk.sh.intel.com> <CAGtprH_SKJ4hbQ4aSxxybcsD=eSQraP7a4AkQ3SKuMm2=Oyp+A@mail.gmail.com>
- <aFEQy4g4Y2Rod5GV@yzhao56-desk.sh.intel.com> <CAGtprH_ypohFy9TOJ8Emm_roT4XbQUtLKZNFcM6Fr+fhTFkE0Q@mail.gmail.com>
- <8f686932b23ccdf34888db3dc5a8874666f1f89f.camel@intel.com>
- <aFIMbt7ZwrJmPs4y@yzhao56-desk.sh.intel.com> <CAGtprH9Wj7YW-_sfGQfwKHRXL-7fFStXiHn2O32ptXAFbFB8Tw@mail.gmail.com>
- <aFJY/b0QijjzC10a@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aFJY/b0QijjzC10a@yzhao56-desk.sh.intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 17 Jun 2025 23:21:41 -0700
-X-Gm-Features: AX0GCFtRUP-5cnFBemiZhlLVBMxziNxOYphJQzh7iBKSZHxolwfAovcV1sgbry8
-Message-ID: <CAGtprH9WLRNcXWr1tK6MmatoSun9fdSg5QUj1q=gETPmRX_rsQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 08/21] KVM: TDX: Increase/decrease folio ref for huge pages
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"quic_eberman@quicinc.com" <quic_eberman@quicinc.com>, "Li, Xiaoyao" <xiaoyao.li@intel.com>, 
-	"Shutemov, Kirill" <kirill.shutemov@intel.com>, "Hansen, Dave" <dave.hansen@intel.com>, 
-	"david@redhat.com" <david@redhat.com>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
-	"tabba@google.com" <tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, "Du, Fan" <fan.du@intel.com>, 
-	"michael.roth@amd.com" <michael.roth@amd.com>, "seanjc@google.com" <seanjc@google.com>, 
-	"Weiny, Ira" <ira.weiny@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>, 
-	"Li, Zhiquan1" <zhiquan1.li@intel.com>, "jroedel@suse.de" <jroedel@suse.de>, 
-	"Miao, Jun" <jun.miao@intel.com>, "pgonda@google.com" <pgonda@google.com>, 
-	"x86@kernel.org" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 17, 2025 at 11:15=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wr=
-ote:
->
-> On Tue, Jun 17, 2025 at 09:33:02PM -0700, Vishal Annapurve wrote:
-> > On Tue, Jun 17, 2025 at 5:49=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com>=
- wrote:
-> > >
-> > > On Wed, Jun 18, 2025 at 08:34:24AM +0800, Edgecombe, Rick P wrote:
-> > > > On Tue, 2025-06-17 at 01:09 -0700, Vishal Annapurve wrote:
-> > > > > Sorry I quoted Ackerley's response wrongly. Here is the correct r=
-eference [1].
-> > > >
-> > > > I'm confused...
-> > > >
-> > > > >
-> > > > > Speculative/transient refcounts came up a few times In the contex=
-t of
-> > > > > guest_memfd discussions, some examples include: pagetable walkers=
-,
-> > > > > page migration, speculative pagecache lookups, GUP-fast etc. Davi=
-d H
-> > > > > can provide more context here as needed.
-> > > > >
-> > > > > Effectively some core-mm features that are present today or might=
- land
-> > > > > in the future can cause folio refcounts to be grabbed for short
-> > > > > durations without actual access to underlying physical memory. Th=
-ese
-> > > > > scenarios are unlikely to happen for private memory but can't be
-> > > > > discounted completely.
-> > > >
-> > > > This means the refcount could be increased for other reasons, and s=
-o guestmemfd
-> > > > shouldn't rely on refcounts for it's purposes? So, it is not a prob=
-lem for other
-> > > > components handling the page elevate the refcount?
-> > > Besides that, in [3], when kvm_gmem_convert_should_proceed() determin=
-es whether
-> > > to convert to private, why is it allowed to just invoke
-> > > kvm_gmem_has_safe_refcount() without taking speculative/transient ref=
-counts into
-> > > account? Isn't it more easier for shared pages to have speculative/tr=
-ansient
-> > > refcounts?
-> >
-> > These speculative refcounts are taken into account, in case of unsafe
-> > refcounts, conversion operation immediately exits to userspace with
-> > EAGAIN and userspace is supposed to retry conversion.
-> Hmm, so why can't private-to-shared conversion also exit to userspace wit=
-h
-> EAGAIN?
+On Tue, 17 Jun 2025 12:22:10 -0300, jgg@ziepe.ca wrote:
+ 
+> Weird, but I would not expect this as a general rule, not sure we
+> should rely on it.
+> 
+> I would say exported function should not get automatically
+> inlined. That throws all the kprobes into chaos :\
+> 
+> BTW, why can't the other patches in this series just use
+> unpin_user_page_range_dirty_lock? The way this stuff is supposed to
+> work is to combine adjacent physical addresses and then invoke
+> unpin_user_page_range_dirty_lock() on the start page of the physical
+> range. This is why we have the gup_folio_range_next() which does the
+> segmentation in an efficient way.
+> 
+> Combining adjacent physical is basically free math.
+> 
+> Segmenting to folios in the vfio side doesn't make a lot of sense,
+> IMHO.
+> 
+>  drivers/vfio/vfio_iommu_type1.c | 35 +++++++++++++++++++++++++++++----
+>  1 file changed, 31 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index e952bf8bdfab..159ba80082a8 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -806,11 +806,38 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+>  				    bool do_accounting)
+>  {
+>  	long unlocked = 0, locked = vpfn_pages(dma, iova, npage);
+> -	long i;
+>  
+> -	for (i = 0; i < npage; i++)
+> -		if (put_pfn(pfn++, dma->prot))
+> -			unlocked++;
+> +	while (npage) {
+> +		long nr_pages = 1;
+> +
+> +		if (!is_invalid_reserved_pfn(pfn)) {
+> +			struct page *page = pfn_to_page(pfn);
+> +			struct folio *folio = page_folio(page);
+> +			long folio_pages_num = folio_nr_pages(folio);
+> +
+> +			/*
+> +			 * For a folio, it represents a physically
+> +			 * contiguous set of bytes, and all of its pages
+> +			 * share the same invalid/reserved state.
+> +			 *
+> +			 * Here, our PFNs are contiguous. Therefore, if we
+> +			 * detect that the current PFN belongs to a large
+> +			 * folio, we can batch the operations for the next
+> +			 * nr_pages PFNs.
+> +			 */
+> +			if (folio_pages_num > 1)
+> +				nr_pages = min_t(long, npage,
+> +					folio_pages_num -
+> +					folio_page_idx(folio, page));
+> +
+> +			unpin_user_folio_dirty_locked(folio, nr_pages,
+> +					dma->prot & IOMMU_WRITE);
 
-How would userspace/guest_memfd differentiate between
-speculative/transient refcounts and extra refcounts due to TDX unmap
-failures?
+Are you suggesting that we should directly call
+unpin_user_page_range_dirty_lock() here (patch 3/3) instead?
 
->
-> In the POC
-> https://lore.kernel.org/lkml/aE%2Fq9VKkmaCcuwpU@yzhao56-desk.sh.intel.com=
-,
-> kvm_gmem_convert_should_proceed() just returns EFAULT (can be modified to
-> EAGAIN) to userspace instead.
->
-> >
-> > Yes, it's more easier for shared pages to have speculative/transient re=
-fcounts.
-> >
-> > >
-> > > [3] https://lore.kernel.org/lkml/d3832fd95a03aad562705872cbda5b3d248c=
-a321.1747264138.git.ackerleytng@google.com/
-> > >
-> > > > >
-> > > > > Another reason to avoid relying on refcounts is to not block usag=
-e of
-> > > > > raw physical memory unmanaged by kernel (without page structs) to=
- back
-> > > > > guest private memory as we had discussed previously. This will he=
-lp
-> > > > > simplify merge/split operations during conversions and help useca=
-ses
-> > > > > like guest memory persistence [2] and non-confidential VMs.
-> > > >
-> > > > If this becomes a thing for private memory (which it isn't yet), th=
-en couldn't
-> > > > we just change things at that point?
-> > > >
-> > > > Is the only issue with TDX taking refcounts that it won't work with=
- future code
-> > > > changes?
-> > > >
-> > > > >
-> > > > > [1] https://lore.kernel.org/lkml/diqz7c2lr6wg.fsf@ackerleytng-cto=
-p.c.googlers.com/
-> > > > > [2] https://lore.kernel.org/lkml/20240805093245.889357-1-jgowans@=
-amazon.com/
-> > > >
+BTW, it appears that implementing unpin_user_folio_dirty_locked()
+as an inline function may not be viable for vfio, given that
+gup_put_folio() is not exported.
+
+Thanks,
+Zhe
 
