@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-49933-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49934-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C5CADFCA5
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 07:03:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3136ADFCB9
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 07:07:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A9D63B2152
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 05:02:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D94BC3B2682
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 05:06:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 290FC241665;
-	Thu, 19 Jun 2025 05:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C72241691;
+	Thu, 19 Jun 2025 05:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="nJlMFyh+"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="KTLPxhBb"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325D821A452;
-	Thu, 19 Jun 2025 05:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444B786323;
+	Thu, 19 Jun 2025 05:06:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750309374; cv=none; b=kOlNdhEzV7orx1V/TVOgdpdeAHG3/UsCReBJMvlYTusANW+oPz2/mvkvOhtVsnVGd4bRf+WoVBzabtXCwan3wVe1mQ8qMIAa4dh1QU2ptxWbwCSKOyzrmcJLhPBWu6KuAiiwrVGbMdUmdf2r/wXBqYUpeuh13+I3IU5KtQ6H9Ng=
+	t=1750309620; cv=none; b=A9DxtNkpEHv7Y0AZymF0bDTOkEZxuY7fVoY+v6LRckyA8Jq0RdS611oHSaYk+/WNwvQHFnOSOde9U3p0/RAaqSpqYWIkRH07OwZVGLm9zLi67cN6pNZzdms0cbBZ2PZ4AeRGK9ktlnOmM/z652zptcB5xUGN/bl+AmY2mTGHJW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750309374; c=relaxed/simple;
-	bh=cC1gNkglobCCgQWoLRRzm+tji0YRzCCMskKW7Rup5es=;
+	s=arc-20240116; t=1750309620; c=relaxed/simple;
+	bh=dJB1u2JWXJozGiv0+Ln9kYquCHssXXPauDnjpd/ISRU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GWvMkHKNOe1w9mTA/SOxeEWIySM2JmMWyTl7CkNOj87yBRIk4jNMh9+Xw9g3yaBOrpw6DY1C439j3QbgsONWQxGzx5H4FmgVfzeABUjwqfbgBGHV1WFcHsj4JChudcZhTePhMywneyByZhLa0dhzmBIUyeMZkbTC6tuL5RgjzQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=nJlMFyh+; arc=none smtp.client-ip=198.137.202.136
+	 In-Reply-To:Content-Type; b=j4wclwFn3KNtRSo0FDM91V39J7faqjGHRNDuN9Yt7vvLyZ62OS+xcZ8wmIHL4WnhZ8KJg1xOnOvELEr7kA2p5ax13Hs4BHhacGX/xeCOVqi5ZN9/bMKdbT3J6jHHZ8JdyGaK0KwNVJ8tMVC6BEZeKhLOrNVzwtAnzU7locVdk0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=KTLPxhBb; arc=none smtp.client-ip=198.137.202.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Received: from [192.168.7.202] ([71.202.166.45])
 	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55J529FG1854570
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55J56LL21857640
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 18 Jun 2025 22:02:10 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55J529FG1854570
+	Wed, 18 Jun 2025 22:06:22 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55J56LL21857640
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025052101; t=1750309332;
-	bh=nz8+KCii5aZfAsUnyh008znZgZhwquPROyRzQoxFqeU=;
+	s=2025052101; t=1750309586;
+	bh=HzspTY7etithet9qj7wLSiiMq1a1X3plMfTADysUVaQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nJlMFyh+ggWVGqIlASPvwYh5Mktn0GpAWRc4Ez52VsMr9JJFOsr68py3bAlMqCyVa
-	 iPTFNYYN9v3AZnZMbNUzpMZrF5c5KPFwyH2FOvTO/JiF4XLBMbXxRdolhMLtWb3GQ4
-	 g6U5VKe+4x9fa3SvV3nyYsYgYselIur7BeF1j8HsmaYBDzk0IiHaYi591QoRNziaPP
-	 phFigHu1V45uCzhqSqmglaZrWJNDAdwpN7T+4/+WAoRKpwykXs/PrZ5TlpJ0/bEWs8
-	 MaGPZRCuIqr7QzmC0G9Buu4oLjgHl6Xs4ww37cGZ9QI6ps7VibWf6LNW/2QiAqLtra
-	 /X+rG0AtsNaNw==
-Message-ID: <7525af7f-a817-47d5-91f7-d7702380c85f@zytor.com>
-Date: Wed, 18 Jun 2025 22:02:08 -0700
+	b=KTLPxhBbxYbGq8LPVWajgRuSruQppRTI7wbW/Xq6jbZPE2Z+rrHjlMTtILupnw+qw
+	 gC8jE0TCS7W/4gd7GSjfmrtRkqhQtXO6CeggDsiqZ6r0A/8JkQSaOgughEc5RYOuu8
+	 1LcQqYRiFjveyE2gDu/6XhJ562WxoHMQOn9y9XK6gQb9sm2MumVM+/6pxpi8eDc90Q
+	 6oWze0rZxkApGuTTy0A/wWjdpijz3keTVCUDUWfdQ/D3MjhapGXeMVz07WvBE0KUej
+	 0+0pjOwEp+72Zg3pILRPKqbf5C4ONvD3m5KNJ/zFxqVYK6PRyW7FPb4MHoA5mDJI3C
+	 CIYNt2zsyYeQw==
+Message-ID: <70b7f6ba-1f13-4af0-b27e-064d6aaa5334@zytor.com>
+Date: Wed, 18 Jun 2025 22:06:20 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,8 +56,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 02/10] x86/fred: Pass event data to the NMI entry point
- from KVM
+Subject: Re: [PATCH v7 03/10] x86/cpufeatures: Add the CPUID feature bit for
+ NMI-source reporting
 To: Sohil Mehta <sohil.mehta@intel.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org
 Cc: "H . Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
@@ -77,7 +77,7 @@ Cc: "H . Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
         linux-edac@vger.kernel.org, kvm@vger.kernel.org,
         linux-pm@vger.kernel.org, linux-trace-kernel@vger.kernel.org
 References: <20250612214849.3950094-1-sohil.mehta@intel.com>
- <20250612214849.3950094-3-sohil.mehta@intel.com>
+ <20250612214849.3950094-4-sohil.mehta@intel.com>
 Content-Language: en-US
 From: Xin Li <xin@zytor.com>
 Autocrypt: addr=xin@zytor.com; keydata=
@@ -114,99 +114,28 @@ Autocrypt: addr=xin@zytor.com; keydata=
  PYbAkjBbm+tuJ/Sm+5Yp5T/BnKz21FoCS8uvTiziHj2H7Cuekn6F8EYhegONm+RVg3vikOpn
  gao85i4HwQTK9/D1wgJIQkdwWXVMZ6q/OALaBp82vQ2U9sjTyFXgDjglgh00VRAHP7u1Rcu4
  l75w1xInsg==
-In-Reply-To: <20250612214849.3950094-3-sohil.mehta@intel.com>
+In-Reply-To: <20250612214849.3950094-4-sohil.mehta@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 6/12/2025 2:48 PM, Sohil Mehta wrote:
-> Extend the FRED NMI entry point from KVM to take an extra argument to
-> allow KVM to invoke the FRED event dispatch framework with event data.
+> NMI-source reporting is introduced to report the sources of NMIs with
+> FRED event delivery based on vectors in NMI interrupt messages or the
+> local APIC. This enables the kernel to avoid the latency incurred by
+> going over the entire NMI handler list and reduces ambiguity about the
+> source of an NMI.
 > 
-> This API is used to pass the NMI-source bitmap for NMI-induced VM exits.
-> Read the VMCS exit qualification field to get the NMI-source information
-> and store it as event data precisely in the format expected by the FRED
-> event framework.
+> Enumerate NMI-source reporting in cpufeatures.h. Also, since NMI-source
+> reporting uses the FRED event dispatch framework, make it dependent on
+> FRED in the CPUID dependency table. This ensures that NMI-source
+> reporting gets disabled when FRED is disabled.
 > 
-> Read the VMCS exit qualification unconditionally since almost all
-> upcoming CPUs are expected to enable FRED and NMI-source together. In
-> the rare case that NMI-source isn't enabled, the extra VMREAD would be
-> harmless since the exit qualification is expected to be zero.
+> NMI-source reporting is intended as a kernel feature and does not need
+> userspace enumeration or configuration. There is no need to expose it to
+> userspace through /proc/cpuinfo.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Originally-by: Zeng Guang <guang.zeng@intel.com>
-> Signed-off-by: Sohil Mehta <sohil.mehta@intel.com>
-
-A couple of nits below, otherwise:
+> Originally-by: Jacob Pan<jacob.jun.pan@linux.intel.com>
+> Signed-off-by: Sohil Mehta<sohil.mehta@intel.com>
 
 Reviewed-by: Xin Li (Intel) <xin@zytor.com>
-
-> ---
-> v7: Pass the event data from KVM only for NMI. (Sean)
-> 
-> v6: No change
-> 
-> v5: Read the VMCS exit qualification unconditionally. (Sean)
->      Combine related patches into one.
-> ---
->   arch/x86/entry/entry_64_fred.S |  2 +-
->   arch/x86/include/asm/fred.h    | 11 ++++++-----
->   arch/x86/kvm/vmx/vmx.c         |  2 +-
->   3 files changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/entry/entry_64_fred.S b/arch/x86/entry/entry_64_fred.S
-> index 29c5c32c16c3..1c9c6e036233 100644
-> --- a/arch/x86/entry/entry_64_fred.S
-> +++ b/arch/x86/entry/entry_64_fred.S
-> @@ -93,7 +93,7 @@ SYM_FUNC_START(asm_fred_entry_from_kvm)
->   	 * +--------+-----------------+
->   	 */
->   	push $0				/* Reserved, must be 0 */
-> -	push $0				/* Event data, 0 for IRQ/NMI */
-> +	push %rsi			/* Event data for NMI */
-
-Maybe a bit more accurate?
-
-/* Event data, NMI-source bitmap only so far */
-
->   	push %rdi			/* fred_ss handed in by the caller */
->   	push %rbp
->   	pushf
-> diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
-> index 552332ca060c..bccf4a3c06b8 100644
-> --- a/arch/x86/include/asm/fred.h
-> +++ b/arch/x86/include/asm/fred.h
-> @@ -66,14 +66,14 @@ static __always_inline unsigned long fred_event_data(struct pt_regs *regs)
->   
->   void asm_fred_entrypoint_user(void);
->   void asm_fred_entrypoint_kernel(void);
-> -void asm_fred_entry_from_kvm(struct fred_ss);
-> +void asm_fred_entry_from_kvm(struct fred_ss ss, unsigned long edata);
->   
->   __visible void fred_entry_from_user(struct pt_regs *regs);
->   __visible void fred_entry_from_kernel(struct pt_regs *regs);
->   __visible void __fred_entry_from_kvm(struct pt_regs *regs);
->   
->   /* Must be called from noinstr code, thus __always_inline */
-> -static __always_inline void fred_nmi_from_kvm(void)
-> +static __always_inline void fred_nmi_from_kvm(unsigned long edata)
->   {
->   	struct fred_ss ss = {
->   		.ss	= __KERNEL_DS,
-> @@ -83,7 +83,7 @@ static __always_inline void fred_nmi_from_kvm(void)
->   		.lm	= 1,
->   	};
->   
-> -	asm_fred_entry_from_kvm(ss);
-> +	asm_fred_entry_from_kvm(ss, edata);
->   }
->   
->   static inline void fred_irq_from_kvm(unsigned int vector)
-> @@ -95,7 +95,8 @@ static inline void fred_irq_from_kvm(unsigned int vector)
->   		.lm	= 1,
->   	};
->   
-> -	asm_fred_entry_from_kvm(ss);
-> +	/* Event data is always zero for IRQ */
-
-/* Event data not used for IRQ thus 0 */
 
