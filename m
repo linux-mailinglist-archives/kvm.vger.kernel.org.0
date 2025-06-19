@@ -1,200 +1,198 @@
-Return-Path: <kvm+bounces-49966-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49965-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83A06AE0438
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 13:47:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A2AAE03D6
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 13:35:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41DF21897C9C
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 11:46:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0D5016A632
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 11:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D4922DFA5;
-	Thu, 19 Jun 2025 11:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sAQ/3Twk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8382253B73;
+	Thu, 19 Jun 2025 11:32:00 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4864921FF31;
-	Thu, 19 Jun 2025 11:45:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5574924DD06
+	for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 11:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750333548; cv=none; b=LugsCo/TaVVqrPCS8kIAtJM2oD4vQpxwkonrZd4MXxGxGHoPK5ENYE/cAjWLd6aJ3D3cvElht2LopNfF80/X+5UpZwDrFNLBdmaPOXthuAf+CTApOZg7MdAMUdzXPVK0NU7ouogzuKgVVNWbMvTPqZhFFjVDiAOMJqB2s7FhgEU=
+	t=1750332720; cv=none; b=Tp8mfBCc1s+1BscIz1WpuElbkmdSFGxccDrmndzAwXcXhJNGaUfGifh1F2bklypX7zu54Yzyvy0a7jiowQMkPdCu1HmIZlFfXtAVshRNVTBiPL8WMxehX2fANj16b1bGcEJzMsQQcgUhSLUqbGWqyW2vfdonVoUrWCTn01V8dEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750333548; c=relaxed/simple;
-	bh=vHD3lkaGKBaHMp6CdM1wZKNCsSPyM5DrFzrbeCyGBAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b3iZUGqImRA0KJyG2SPO7VB8uEahqGHe+ABRKjzyCMpr1lcyT/Sbh52gSvrS1VmGuErtcc8nUkvgdjjqrL0xgIDIr8OVjEj6LsVAACR9zXDzSuc8vqZgKfS+VngqZH8L4m8E6n2gsmg8exQvT+k4+ebGFroKhY7KiMqB1zjdmpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sAQ/3Twk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1D00C4CEEA;
-	Thu, 19 Jun 2025 11:45:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750333547;
-	bh=vHD3lkaGKBaHMp6CdM1wZKNCsSPyM5DrFzrbeCyGBAY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sAQ/3TwkHh4tQny7cI0HaO5x3reXpZGwght1TNFGLHkVqT2VcLfQwYoafTXZdKJ8E
-	 pkEwQMfdQXLe9JopRJuwqPlDxDGVzpMStLRBs+PzCYRKs2iR7Tg48zGsuYtVaR1XMK
-	 P/U2Rohl3rmIQPiwEa70bQ3kqvJIz9Xbg8QHgFWkwfXfP1N8Cutc0AHM/HrVFk2qYD
-	 LQ5UZeix+K8IGaOplmtbU8EyaB2TDRexl+WovO2T/vvpbwxuxsvsESbp5bDJSesFrT
-	 9RgAJDhuRJxatju67tTg932hwF/eHBvcS+QL/D3qKE0lA7w1iyk458gB3R9tpDEqNn
-	 HwWiUp9bNwWyg==
-Date: Thu, 19 Jun 2025 17:01:30 +0530
-From: Naveen N Rao <naveen@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, 
-	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
-	Joao Martins <joao.m.martins@oracle.com>, Francesco Lavra <francescolavra.fl@gmail.com>, 
-	David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v3 17/62] KVM: SVM: Add enable_ipiv param, never set
- IsRunning if disabled
-Message-ID: <2eqjnjnszlmhlnvw6kcve4exjnpy7skguypwtmxutb2gecs3an@gcou53thsqww>
-References: <20250611224604.313496-2-seanjc@google.com>
- <20250611224604.313496-19-seanjc@google.com>
+	s=arc-20240116; t=1750332720; c=relaxed/simple;
+	bh=3MPrInjo3388gIKmhUGr9uGPORntDZqz8a3nFubP/rA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B0iydBKVf7Bm90rESnkpcb0eqvJJGvQ8xte3Vqwug8evLxlkKY0e8zeXR9G6LRVuFSDQ9z/aWuWExchp3Gbh/JTeksKcwC2ZsaRSDLwV6+mO4EbfQxx7BupDReqplIgu6dloDeiNNa/Gs2r7iu21wU6VisQvL3JAObWLwlFtkcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0C0761F38D;
+	Thu, 19 Jun 2025 11:31:51 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8F9E913721;
+	Thu, 19 Jun 2025 11:31:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id SfepIib1U2htbAAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Thu, 19 Jun 2025 11:31:50 +0000
+Message-ID: <fad65354-804e-447f-9779-2c69a87f3e4d@suse.cz>
+Date: Thu, 19 Jun 2025 13:31:50 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250611224604.313496-19-seanjc@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] mm: change vm_get_page_prot() to accept vm_flags_t
+ argument
+Content-Language: en-US
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Russell King <linux@armlinux.org.uk>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ "David S . Miller" <davem@davemloft.net>,
+ Andreas Larsson <andreas@gaisler.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>,
+ Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Kees Cook <kees@kernel.org>, Peter Xu <peterx@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Zi Yan <ziy@nvidia.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Nico Pache
+ <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+ Xu Xin <xu.xin16@zte.com.cn>, Chengming Zhou <chengming.zhou@linux.dev>,
+ Hugh Dickins <hughd@google.com>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Rik van Riel <riel@surriel.com>, Harry Yoo <harry.yoo@oracle.com>,
+ Dan Williams <dan.j.williams@intel.com>, Matthew Wilcox
+ <willy@infradead.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, John Hubbard <jhubbard@nvidia.com>,
+ Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
+ Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>,
+ Johannes Weiner <hannes@cmpxchg.org>, Qi Zheng <zhengqi.arch@bytedance.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, sparclinux@vger.kernel.org, linux-sgx@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, nvdimm@lists.linux.dev,
+ linux-trace-kernel@vger.kernel.org
+References: <cover.1750274467.git.lorenzo.stoakes@oracle.com>
+ <a12769720a2743f235643b158c4f4f0a9911daf0.1750274467.git.lorenzo.stoakes@oracle.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <a12769720a2743f235643b158c4f4f0a9911daf0.1750274467.git.lorenzo.stoakes@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
+X-Rspamd-Queue-Id: 0C0761F38D
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Action: no action
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Score: -4.00
 
-On Wed, Jun 11, 2025 at 03:45:20PM -0700, Sean Christopherson wrote:
-> From: Maxim Levitsky <mlevitsk@redhat.com>
+On 6/18/25 21:42, Lorenzo Stoakes wrote:
+> We abstract the type of the VMA flags to vm_flags_t, however in may places
+> it is simply assumed this is unsigned long, which is simply incorrect.
 > 
-> Let userspace "disable" IPI virtualization for AVIC via the enable_ipiv
-> module param, by never setting IsRunning.  SVM doesn't provide a way to
-> disable IPI virtualization in hardware, but by ensuring CPUs never see
-> IsRunning=1, every IPI in the guest (except for self-IPIs) will generate a
-> VM-Exit.
+> At the moment this is simply an incongruity, however in future we plan to
+> change this type and therefore this change is a critical requirement for
+> doing so.
+> 
+> Overall, this patch does not introduce any functional change.
+> 
+> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-I think this is good to have regardless of the erratum. Not sure about VMX,
-but does it make sense to intercept writes to the self-ipi MSR as well?
+> diff --git a/arch/powerpc/include/asm/book3s/64/pkeys.h b/arch/powerpc/include/asm/book3s/64/pkeys.h
+> index 5b178139f3c0..6f2075636591 100644
+> --- a/arch/powerpc/include/asm/book3s/64/pkeys.h
+> +++ b/arch/powerpc/include/asm/book3s/64/pkeys.h
+> @@ -4,8 +4,9 @@
+>  #define _ASM_POWERPC_BOOK3S_64_PKEYS_H
+>  
+>  #include <asm/book3s/64/hash-pkey.h>
+> +#include <linux/mm_types.h>
 
-> 
-> To avoid setting the real IsRunning bit, while still allowing KVM to use
-> each vCPU's entry to update GA log entries, simply maintain a shadow of
-> the entry, without propagating IsRunning updates to the real table when
-> IPI virtualization is disabled.
-> 
-> Providing a way to effectively disable IPI virtualization will allow KVM
-> to safely enable AVIC on hardware that is susceptible to erratum #1235,
-> which causes hardware to sometimes fail to detect that the IsRunning bit
-> has been cleared by software.
-> 
-> Note, the table _must_ be fully populated, as broadcast IPIs skip invalid
-> entries, i.e. won't generate VM-Exit if every entry is invalid, and so
-> simply pointing the VMCB at a common dummy table won't work.
-> 
-> Alternatively, KVM could allocate a shadow of the entire table, but that'd
-> be a waste of 4KiB since the per-vCPU entry doesn't actually consume an
-> additional 8 bytes of memory (vCPU structures are large enough that they
-> are backed by order-N pages).
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> [sean: keep "entry" variables, reuse enable_ipiv, split from erratum]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 32 ++++++++++++++++++++++++++------
->  arch/x86/kvm/svm/svm.c  |  2 ++
->  arch/x86/kvm/svm/svm.h  |  8 ++++++++
->  3 files changed, 36 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 0c0be274d29e..48c737e1200a 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -292,6 +292,13 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
->  	/* Setting AVIC backing page address in the phy APIC ID table */
->  	new_entry = avic_get_backing_page_address(svm) |
->  		    AVIC_PHYSICAL_ID_ENTRY_VALID_MASK;
-> +	svm->avic_physical_id_entry = new_entry;
-> +
-> +	/*
-> +	 * Initialize the real table, as vCPUs must have a valid entry in order
-> +	 * for broadcast IPIs to function correctly (broadcast IPIs ignore
-> +	 * invalid entries, i.e. aren't guaranteed to generate a VM-Exit).
-> +	 */
->  	WRITE_ONCE(kvm_svm->avic_physical_id_table[id], new_entry);
->  
->  	return 0;
-> @@ -769,8 +776,6 @@ static int svm_ir_list_add(struct vcpu_svm *svm,
->  			   struct amd_iommu_pi_data *pi)
->  {
->  	struct kvm_vcpu *vcpu = &svm->vcpu;
-> -	struct kvm *kvm = vcpu->kvm;
-> -	struct kvm_svm *kvm_svm = to_kvm_svm(kvm);
->  	unsigned long flags;
->  	u64 entry;
->  
-> @@ -788,7 +793,7 @@ static int svm_ir_list_add(struct vcpu_svm *svm,
->  	 * will update the pCPU info when the vCPU awkened and/or scheduled in.
->  	 * See also avic_vcpu_load().
->  	 */
-> -	entry = READ_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id]);
-> +	entry = svm->avic_physical_id_entry;
->  	if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK)
->  		amd_iommu_update_ga(entry & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK,
->  				    true, pi->ir_data);
-> @@ -998,14 +1003,26 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	 */
->  	spin_lock_irqsave(&svm->ir_list_lock, flags);
->  
-> -	entry = READ_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id]);
-> +	entry = svm->avic_physical_id_entry;
->  	WARN_ON_ONCE(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
->  
->  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
->  	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
->  	entry |= AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
->  
-> +	svm->avic_physical_id_entry = entry;
-> +
-> +	/*
-> +	 * If IPI virtualization is disabled, clear IsRunning when updating the
-> +	 * actual Physical ID table, so that the CPU never sees IsRunning=1.
-> +	 * Keep the APIC ID up-to-date in the entry to minimize the chances of
-> +	 * things going sideways if hardware peeks at the ID.
-> +	 */
-> +	if (!enable_ipiv)
-> +		entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
-> +
->  	WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
-> +
->  	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, true);
->  
->  	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
-> @@ -1030,7 +1047,7 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
->  	 * can't be scheduled out and thus avic_vcpu_{put,load}() can't run
->  	 * recursively.
->  	 */
-> -	entry = READ_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id]);
-> +	entry = svm->avic_physical_id_entry;
->  
->  	/* Nothing to do if IsRunning == '0' due to vCPU blocking. */
->  	if (!(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK))
-> @@ -1049,7 +1066,10 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
->  	avic_update_iommu_vcpu_affinity(vcpu, -1, 0);
->  
->  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
-> -	WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
-> +	svm->avic_physical_id_entry = entry;
-> +
-> +	if (enable_ipiv)
-> +		WRITE_ONCE(kvm_svm->avic_physical_id_table[vcpu->vcpu_id], entry);
+Hopefully not causing a circular header include.
 
-If enable_ipiv is false, then isRunning bit will never be set and we 
-would have bailed out earlier. So, the check for enable_ipiv can be 
-dropped here (or converted into an assert).
+> -static inline u64 vmflag_to_pte_pkey_bits(u64 vm_flags)
+> +static inline u64 vmflag_to_pte_pkey_bits(vm_flags_t vm_flags)
 
-- Naveen
+Is this change rather for patch 3? It's not changing vm_get_page_prot().
+OTOH git grep shows me you missed:
 
+arch/powerpc/mm/book3s64/pgtable.c:pgprot_t vm_get_page_prot(unsigned long
+vm_flags)
+
+With that sorted out, feel free to add:
+
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+
+Thanks!
 
