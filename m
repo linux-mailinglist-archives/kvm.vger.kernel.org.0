@@ -1,2223 +1,407 @@
-Return-Path: <kvm+bounces-49942-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49943-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 663EAADFF09
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 09:45:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD843ADFF48
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 10:00:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52B42163D6A
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 07:45:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73DDC1889378
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 08:00:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 520D8229B02;
-	Thu, 19 Jun 2025 07:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B4A255240;
+	Thu, 19 Jun 2025 07:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="MXFSV8GR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E8C25A631
-	for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 07:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1620321C9E3
+	for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 07:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750319094; cv=none; b=b6d6UxLN8zVgAQprUl9dQlI17qyf8TJu46jDtubQvKOwJIx6x7vdcI6xrdDiEvJYY/qndnsiehp1Up9v8Eakb8M2XPfNL2VXCz2gUBHbRGZyxjWMPdqvfG7aEe//nFjohQTE+pLfpZqH7TR5tFEiuMl3dMaoVND9p1uhvlAgZ+s=
+	t=1750319993; cv=none; b=iDai/uXi0789FDXXripe0fE1QB8WKO1oMcjH1041+WzubqqLzv2gVICp2o4VHqQjo4jCaEVCpYwD1/gsjTcfMRYWv0bqtDZ6RXfIqQpRlDSQTHo83yRBsbW3Kb0e+B5XyUihQ0yr2UGCA1JYSB1WfVdJiYdZkQ3RaNd8rrXN+fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750319094; c=relaxed/simple;
-	bh=rTrgeDT0ivLMNmzDytZl6PCLJCZXYgOE+4d1sKrYK/Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BKCMB0Gx7rXX9KvHumnRGe6LSkP0tbagTgpFp3ZcFFbQu93mJ9YBFJNkavX9b1nobcgA7Y3fUU2CjQRkBAbokYRnIZ5Wvq7+Pi930Lfj7ee5VLMfe+kdRQJSnhe9Fn53vlZLQNBfjLwMEgmSE8aahY6EVQh/eb2leFLcuecgjG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 9612D1F397;
-	Thu, 19 Jun 2025 07:44:46 +0000 (UTC)
-Authentication-Results: smtp-out2.suse.de;
-	none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6BC9E139CE;
-	Thu, 19 Jun 2025 07:44:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id IsgFGu6/U2gZKAAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 19 Jun 2025 07:44:46 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id EE7A1A29F1; Thu, 19 Jun 2025 09:44:41 +0200 (CEST)
-Date: Thu, 19 Jun 2025 09:44:41 +0200
-From: Jan Kara <jack@suse.cz>
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, "David S . Miller" <davem@davemloft.net>, 
-	Andreas Larsson <andreas@gaisler.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	"H . Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Kees Cook <kees@kernel.org>, 
-	Peter Xu <peterx@redhat.com>, David Hildenbrand <david@redhat.com>, Zi Yan <ziy@nvidia.com>, 
-	Baolin Wang <baolin.wang@linux.alibaba.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
-	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, 
-	Barry Song <baohua@kernel.org>, Xu Xin <xu.xin16@zte.com.cn>, 
-	Chengming Zhou <chengming.zhou@linux.dev>, Hugh Dickins <hughd@google.com>, 
-	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Rik van Riel <riel@surriel.com>, 
-	Harry Yoo <harry.yoo@oracle.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Matthew Wilcox <willy@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, John Hubbard <jhubbard@nvidia.com>, 
-	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, Jann Horn <jannh@google.com>, 
-	Pedro Falcato <pfalcato@suse.de>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Qi Zheng <zhengqi.arch@bytedance.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, sparclinux@vger.kernel.org, linux-sgx@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, nvdimm@lists.linux.dev, 
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] mm: update core kernel code to use vm_flags_t
- consistently
-Message-ID: <724ic62n45lkadtmocu5ahhlvyide6k7c4bvmikwshxrkgbehd@rktuv5rt5p6v>
-References: <cover.1750274467.git.lorenzo.stoakes@oracle.com>
- <d1588e7bb96d1ea3fe7b9df2c699d5b4592d901d.1750274467.git.lorenzo.stoakes@oracle.com>
+	s=arc-20240116; t=1750319993; c=relaxed/simple;
+	bh=LmVuGHGZTTVvuxqyS31fen9hFrtU/InvjW9N0G1Xa0c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l5+CPUNHrWKCdtLogEnHG2vvSJWOPmhJPqHd/Xv8CCjtydIVLew3d1RDfLcKEx7XfwDYZWFQeJ537eRgI+Jr1O/JHUNRu+ppumsBkyyMyXEEhtJkTQ0K/7n9ESJIq0UFTuqfGOE0zhjkViv4+AmobJz7Ya4DN1a+ANhBtDhWk5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=MXFSV8GR; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3a531fcaa05so238784f8f.3
+        for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 00:59:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1750319989; x=1750924789; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2bm1O0NfFEJF+EJknaPoI3+zzjdhFdeOs78hfw18tXk=;
+        b=MXFSV8GRCyAwnsCS8zQCvgLrYGJVCKf85ndObrPbghbmHWXDMJbVDrgPvcCp5qDmgP
+         O/3VY9hJihQO2wpTXxmCpjhKq1aU0zlQHUgDfov9CfFz8bvai7veinI9Y48Nu25gQ7MN
+         HPbSDimSvPF3qQNiIo6qTxD2gp2H4m0uL1Yw+UY6+ocKI2jWXG9PgnAgiMtU7+FeIJF5
+         QdGUlCHF1Lbtx1OmX4FlAojInpgnOvo3HdevfXhU7xJjEjdUPZreX8lMimuMg5BLRKrQ
+         RFVjX2hBy1c1zLk/uzTfuygmbeCvPLIo6PAExzZny2GMzbaO+Q7Dcwcogj9xmv5PL5Hs
+         qDLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750319989; x=1750924789;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2bm1O0NfFEJF+EJknaPoI3+zzjdhFdeOs78hfw18tXk=;
+        b=VvioalYzLvwRo5tHSWhAAxOc3pxw524f7lGfZgEq02LwqCv+7XsqVy2SymZ4Fxaum/
+         LOsxiYpgMv6QB+QQtJENHF6nG9s9XzLzV4sq7356h+9IeIVsHoLvZ8j6rUb1inOOlIA3
+         3lVtyS+jJXpteWYRh0r5vRnZuKlHL5k5SbDmbAstjIruaaa6yQJ4lpfZj3o5DfQ05VRH
+         ukurxIcsopgOABAPPGRMg/OFQcEl3JFQBhPF2Xq3AUkpYct0B9H88f6wJ2Bzi+v38/3u
+         eJY1En0hkhs1tnVcoP52ngdQt7DhTp2Oi1MM7rta01QwA9HuRDlycaFnnf/+OfjNkeLU
+         vFNQ==
+X-Gm-Message-State: AOJu0YzK5+mOT/sXLgeWkIOlyS18wXe25tbMH8HSN8djyLaTwtkGopVV
+	47SnYTp43NDo89gzCHAtnsv3QUTPR2bsOHkT+CqcarT/xN7ap4T2apNKyoZ9E4LY3SNlr2OA70+
+	webAqrGo=
+X-Gm-Gg: ASbGnctbqoc6W/Fr7VLD33ylWLoRIVB4qn3aXp8ss9qJSFX9Al78RCTX9uk+mQFE9QT
+	jDncV5JuGKcwStzhoRZhTCJQO9i+WYk20ncuvPJHrrFLeb3zfgrQMFn3exsLB2Dd5FSRbl4Tyhy
+	toJwsaoisBUk+pTjGS5yeoItNPACb+JJFdMqaUeCBS3q7uTqlaw9LyA2oO//e1ODZk5b1il0VII
+	Su8CnsPm9Ltq40j01jAlXOzCjNVReWItVAoi+U2r3CwTndD9a4SoL1Aiexigltkch/3rPkAtyUl
+	qOkd8cNyGfJfFkojSnMTGC3UEQUKyj+WBbY1KF14YCuJD5RSU8S2fzEKkWgSoTsJf0XhT2xOKam
+	WlhZ2Q+oxlCzkcKDtu68Cc+De9Lk1NF0=
+X-Google-Smtp-Source: AGHT+IHV+Lyc6Szl7dOdXnq+r8pZ2c41MN3fM7G6AqoYawq06qv3uqoIj1VvcX/trsXUrwdu4gvT2w==
+X-Received: by 2002:a05:6000:65a:b0:3a5:88e9:a54f with SMTP id ffacd0b85a97d-3a588e9a99bmr7674380f8f.1.1750319988916;
+        Thu, 19 Jun 2025 00:59:48 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535ead2339sm20684075e9.28.2025.06.19.00.59.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Jun 2025 00:59:48 -0700 (PDT)
+Message-ID: <73e94306-91e4-4fd3-bc43-79872efc1b52@rivosinc.com>
+Date: Thu, 19 Jun 2025 09:59:47 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d1588e7bb96d1ea3fe7b9df2c699d5b4592d901d.1750274467.git.lorenzo.stoakes@oracle.com>
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
-X-Rspamd-Queue-Id: 9612D1F397
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Action: no action
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Score: -4.00
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests v3 2/2] riscv: Add ISA double trap extension
+ testing
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Cc: Andrew Jones <ajones@ventanamicro.com>
+References: <20250616115900.957266-1-cleger@rivosinc.com>
+ <20250616115900.957266-3-cleger@rivosinc.com>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20250616115900.957266-3-cleger@rivosinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed 18-06-25 20:42:53, Lorenzo Stoakes wrote:
-> The core kernel code is currently very inconsistent in its use of
-> vm_flags_t vs. unsigned long. This prevents us from changing the type of
-> vm_flags_t in the future and is simply not correct, so correct this.
-> 
-> While this results in rather a lot of churn, it is a critical pre-requisite
-> for a future planned change to VMA flag type.
-> 
-> Additionally, update VMA userland tests to account for the changes.
-> 
-> To make review easier and to break things into smaller parts, driver and
-> architecture-specific changes is left for a subsequent commit.
-> 
-> The code has been adjusted to cascade the changes across all calling code
-> as far as is needed.
-> 
-> We will adjust architecture-specific and driver code in a subsequent patch.
-> 
-> Overall, this patch does not introduce any functional change.
-> 
-> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-Looks good to me. Feel free to add:
 
-Acked-by: Jan Kara <jack@suse.cz>
-
-								Honza
+On 16/06/2025 13:59, Clément Léger wrote:
+> This test allows to test the double trap implementation of hardware as
+> well as the SBI FWFT and SSE support for double trap. The tests will try
+> to trigger double trap using various sequences and will test to receive
+> the SSE double trap event if supported.
+> 
+> It is provided as a separate test from the SBI one for two reasons:
+> - It isn't specifically testing SBI "per se".
+> - It ends up by trying to crash into in M-mode.
+> 
+> Currently, the test uses a page fault to raise a trap programatically.
+> Some concern was raised by a github user on the original branch [1]
+> saying that the spec doesn't mandate any trap to be delegatable and that
+> we would need a way to detect which ones are delegatable. I think we can
+> safely assume that PAGE FAULT is delegatable and if a hardware that does
+> not have support comes up then it will probably be the vendor
+> responsibility to provide a way to do so.
+> 
+> Link: https://github.com/clementleger/kvm-unit-tests/issues/1 [1]
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
 > ---
->  fs/exec.c                        |   2 +-
->  fs/userfaultfd.c                 |   2 +-
->  include/linux/coredump.h         |   2 +-
->  include/linux/huge_mm.h          |  12 +-
->  include/linux/khugepaged.h       |   4 +-
->  include/linux/ksm.h              |   4 +-
->  include/linux/memfd.h            |   4 +-
->  include/linux/mm.h               |   6 +-
->  include/linux/mm_types.h         |   2 +-
->  include/linux/mman.h             |   4 +-
->  include/linux/rmap.h             |   4 +-
->  include/linux/userfaultfd_k.h    |   4 +-
->  include/trace/events/fs_dax.h    |   6 +-
->  mm/debug.c                       |   2 +-
->  mm/execmem.c                     |   8 +-
->  mm/filemap.c                     |   2 +-
->  mm/gup.c                         |   2 +-
->  mm/huge_memory.c                 |   2 +-
->  mm/hugetlb.c                     |   4 +-
->  mm/internal.h                    |   4 +-
->  mm/khugepaged.c                  |   4 +-
->  mm/ksm.c                         |   2 +-
->  mm/madvise.c                     |   4 +-
->  mm/mapping_dirty_helpers.c       |   2 +-
->  mm/memfd.c                       |   8 +-
->  mm/memory.c                      |   4 +-
->  mm/mmap.c                        |  16 +-
->  mm/mprotect.c                    |   8 +-
->  mm/mremap.c                      |   2 +-
->  mm/nommu.c                       |  12 +-
->  mm/rmap.c                        |   4 +-
->  mm/shmem.c                       |   6 +-
->  mm/userfaultfd.c                 |  14 +-
->  mm/vma.c                         |  78 ++++-----
->  mm/vma.h                         |  16 +-
->  mm/vmscan.c                      |   4 +-
->  tools/testing/vma/vma.c          | 266 +++++++++++++++----------------
->  tools/testing/vma/vma_internal.h |   8 +-
->  38 files changed, 269 insertions(+), 269 deletions(-)
+>  riscv/Makefile            |   1 +
+>  lib/riscv/asm/csr.h       |   1 +
+>  lib/riscv/asm/processor.h |  10 ++
+>  riscv/isa-dbltrp.c        | 210 ++++++++++++++++++++++++++++++++++++++
+>  riscv/unittests.cfg       |   4 +
+>  5 files changed, 226 insertions(+)
+>  create mode 100644 riscv/isa-dbltrp.c
 > 
-> diff --git a/fs/exec.c b/fs/exec.c
-> index 1f5fdd2e096e..d7aaf78c2a8f 100644
-> --- a/fs/exec.c
-> +++ b/fs/exec.c
-> @@ -601,7 +601,7 @@ int setup_arg_pages(struct linux_binprm *bprm,
->  	struct mm_struct *mm = current->mm;
->  	struct vm_area_struct *vma = bprm->vma;
->  	struct vm_area_struct *prev = NULL;
-> -	unsigned long vm_flags;
-> +	vm_flags_t vm_flags;
->  	unsigned long stack_base;
->  	unsigned long stack_size;
->  	unsigned long stack_expand;
-> diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> index a8867508bef6..d8b2692a5072 100644
-> --- a/fs/userfaultfd.c
-> +++ b/fs/userfaultfd.c
-> @@ -1242,7 +1242,7 @@ static int userfaultfd_register(struct userfaultfd_ctx *ctx,
->  	int ret;
->  	struct uffdio_register uffdio_register;
->  	struct uffdio_register __user *user_uffdio_register;
-> -	unsigned long vm_flags;
-> +	vm_flags_t vm_flags;
->  	bool found;
->  	bool basic_ioctls;
->  	unsigned long start, end;
-> diff --git a/include/linux/coredump.h b/include/linux/coredump.h
-> index 76e41805b92d..c504b0faecc2 100644
-> --- a/include/linux/coredump.h
-> +++ b/include/linux/coredump.h
-> @@ -10,7 +10,7 @@
->  #ifdef CONFIG_COREDUMP
->  struct core_vma_metadata {
->  	unsigned long start, end;
-> -	unsigned long flags;
-> +	vm_flags_t flags;
->  	unsigned long dump_size;
->  	unsigned long pgoff;
->  	struct file   *file;
-> diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
-> index 35e34e6a98a2..8f1b15213f61 100644
-> --- a/include/linux/huge_mm.h
-> +++ b/include/linux/huge_mm.h
-> @@ -263,7 +263,7 @@ static inline unsigned long thp_vma_suitable_orders(struct vm_area_struct *vma,
+> diff --git a/riscv/Makefile b/riscv/Makefile
+> index 11e68eae..d71c9d2e 100644
+> --- a/riscv/Makefile
+> +++ b/riscv/Makefile
+> @@ -14,6 +14,7 @@ tests =
+>  tests += $(TEST_DIR)/sbi.$(exe)
+>  tests += $(TEST_DIR)/selftest.$(exe)
+>  tests += $(TEST_DIR)/sieve.$(exe)
+> +tests += $(TEST_DIR)/isa-dbltrp.$(exe)
+>  
+>  all: $(tests)
+>  
+> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+> index 3e4b5fca..6a8e0578 100644
+> --- a/lib/riscv/asm/csr.h
+> +++ b/lib/riscv/asm/csr.h
+> @@ -18,6 +18,7 @@
+>  
+>  #define SR_SIE			_AC(0x00000002, UL)
+>  #define SR_SPP			_AC(0x00000100, UL)
+> +#define SR_SDT			_AC(0x01000000, UL) /* Supervisor Double Trap */
+>  
+>  /* Exception cause high bit - is an interrupt if set */
+>  #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
+> diff --git a/lib/riscv/asm/processor.h b/lib/riscv/asm/processor.h
+> index 631ce226..a3dab064 100644
+> --- a/lib/riscv/asm/processor.h
+> +++ b/lib/riscv/asm/processor.h
+> @@ -50,6 +50,16 @@ static inline void ipi_ack(void)
+>  	csr_clear(CSR_SIP, IE_SSIE);
 >  }
 >  
->  unsigned long __thp_vma_allowable_orders(struct vm_area_struct *vma,
-> -					 unsigned long vm_flags,
-> +					 vm_flags_t vm_flags,
->  					 unsigned long tva_flags,
->  					 unsigned long orders);
->  
-> @@ -284,7 +284,7 @@ unsigned long __thp_vma_allowable_orders(struct vm_area_struct *vma,
->   */
->  static inline
->  unsigned long thp_vma_allowable_orders(struct vm_area_struct *vma,
-> -				       unsigned long vm_flags,
-> +				       vm_flags_t vm_flags,
->  				       unsigned long tva_flags,
->  				       unsigned long orders)
->  {
-> @@ -319,7 +319,7 @@ struct thpsize {
->  	 (1<<TRANSPARENT_HUGEPAGE_USE_ZERO_PAGE_FLAG))
->  
->  static inline bool vma_thp_disabled(struct vm_area_struct *vma,
-> -		unsigned long vm_flags)
-> +		vm_flags_t vm_flags)
->  {
->  	/*
->  	 * Explicitly disabled through madvise or prctl, or some
-> @@ -431,7 +431,7 @@ change_huge_pud(struct mmu_gather *tlb, struct vm_area_struct *vma,
->  			__split_huge_pud(__vma, __pud, __address);	\
->  	}  while (0)
->  
-> -int hugepage_madvise(struct vm_area_struct *vma, unsigned long *vm_flags,
-> +int hugepage_madvise(struct vm_area_struct *vma, vm_flags_t *vm_flags,
->  		     int advice);
->  int madvise_collapse(struct vm_area_struct *vma,
->  		     struct vm_area_struct **prev,
-> @@ -521,7 +521,7 @@ static inline unsigned long thp_vma_suitable_orders(struct vm_area_struct *vma,
->  }
->  
->  static inline unsigned long thp_vma_allowable_orders(struct vm_area_struct *vma,
-> -					unsigned long vm_flags,
-> +					vm_flags_t vm_flags,
->  					unsigned long tva_flags,
->  					unsigned long orders)
->  {
-> @@ -590,7 +590,7 @@ static inline bool unmap_huge_pmd_locked(struct vm_area_struct *vma,
->  	do { } while (0)
->  
->  static inline int hugepage_madvise(struct vm_area_struct *vma,
-> -				   unsigned long *vm_flags, int advice)
-> +				   vm_flags_t *vm_flags, int advice)
->  {
->  	return -EINVAL;
->  }
-> diff --git a/include/linux/khugepaged.h b/include/linux/khugepaged.h
-> index b8d69cfbb58b..ff6120463745 100644
-> --- a/include/linux/khugepaged.h
-> +++ b/include/linux/khugepaged.h
-> @@ -12,7 +12,7 @@ extern int start_stop_khugepaged(void);
->  extern void __khugepaged_enter(struct mm_struct *mm);
->  extern void __khugepaged_exit(struct mm_struct *mm);
->  extern void khugepaged_enter_vma(struct vm_area_struct *vma,
-> -				 unsigned long vm_flags);
-> +				 vm_flags_t vm_flags);
->  extern void khugepaged_min_free_kbytes_update(void);
->  extern bool current_is_khugepaged(void);
->  extern int collapse_pte_mapped_thp(struct mm_struct *mm, unsigned long addr,
-> @@ -37,7 +37,7 @@ static inline void khugepaged_exit(struct mm_struct *mm)
->  {
->  }
->  static inline void khugepaged_enter_vma(struct vm_area_struct *vma,
-> -					unsigned long vm_flags)
-> +					vm_flags_t vm_flags)
->  {
->  }
->  static inline int collapse_pte_mapped_thp(struct mm_struct *mm,
-> diff --git a/include/linux/ksm.h b/include/linux/ksm.h
-> index 51787f0b0208..c17b955e7b0b 100644
-> --- a/include/linux/ksm.h
-> +++ b/include/linux/ksm.h
-> @@ -16,7 +16,7 @@
->  
->  #ifdef CONFIG_KSM
->  int ksm_madvise(struct vm_area_struct *vma, unsigned long start,
-> -		unsigned long end, int advice, unsigned long *vm_flags);
-> +		unsigned long end, int advice, vm_flags_t *vm_flags);
->  vm_flags_t ksm_vma_flags(const struct mm_struct *mm, const struct file *file,
->  			 vm_flags_t vm_flags);
->  int ksm_enable_merge_any(struct mm_struct *mm);
-> @@ -133,7 +133,7 @@ static inline void collect_procs_ksm(const struct folio *folio,
->  
->  #ifdef CONFIG_MMU
->  static inline int ksm_madvise(struct vm_area_struct *vma, unsigned long start,
-> -		unsigned long end, int advice, unsigned long *vm_flags)
-> +		unsigned long end, int advice, vm_flags_t *vm_flags)
->  {
->  	return 0;
->  }
-> diff --git a/include/linux/memfd.h b/include/linux/memfd.h
-> index 246daadbfde8..6f606d9573c3 100644
-> --- a/include/linux/memfd.h
-> +++ b/include/linux/memfd.h
-> @@ -14,7 +14,7 @@ struct folio *memfd_alloc_folio(struct file *memfd, pgoff_t idx);
->   * We also update VMA flags if appropriate by manipulating the VMA flags pointed
->   * to by vm_flags_ptr.
->   */
-> -int memfd_check_seals_mmap(struct file *file, unsigned long *vm_flags_ptr);
-> +int memfd_check_seals_mmap(struct file *file, vm_flags_t *vm_flags_ptr);
->  #else
->  static inline long memfd_fcntl(struct file *f, unsigned int c, unsigned int a)
->  {
-> @@ -25,7 +25,7 @@ static inline struct folio *memfd_alloc_folio(struct file *memfd, pgoff_t idx)
->  	return ERR_PTR(-EINVAL);
->  }
->  static inline int memfd_check_seals_mmap(struct file *file,
-> -					 unsigned long *vm_flags_ptr)
-> +					 vm_flags_t *vm_flags_ptr)
->  {
->  	return 0;
->  }
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 7a7cd2e1b2af..0e0549f3d681 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -2564,7 +2564,7 @@ extern long change_protection(struct mmu_gather *tlb,
->  			      unsigned long end, unsigned long cp_flags);
->  extern int mprotect_fixup(struct vma_iterator *vmi, struct mmu_gather *tlb,
->  	  struct vm_area_struct *vma, struct vm_area_struct **pprev,
-> -	  unsigned long start, unsigned long end, unsigned long newflags);
-> +	  unsigned long start, unsigned long end, vm_flags_t newflags);
->  
->  /*
->   * doesn't attempt to fault and will return short.
-> @@ -3321,9 +3321,9 @@ extern void vm_stat_account(struct mm_struct *, vm_flags_t, long npages);
->  
->  extern bool vma_is_special_mapping(const struct vm_area_struct *vma,
->  				   const struct vm_special_mapping *sm);
-> -extern struct vm_area_struct *_install_special_mapping(struct mm_struct *mm,
-> +struct vm_area_struct *_install_special_mapping(struct mm_struct *mm,
->  				   unsigned long addr, unsigned long len,
-> -				   unsigned long flags,
-> +				   vm_flags_t vm_flags,
->  				   const struct vm_special_mapping *spec);
->  
->  unsigned long randomize_stack_top(unsigned long stack_top);
-> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-> index d6b91e8a66d6..804d269a4f5e 100644
-> --- a/include/linux/mm_types.h
-> +++ b/include/linux/mm_types.h
-> @@ -1081,7 +1081,7 @@ struct mm_struct {
->  		unsigned long data_vm;	   /* VM_WRITE & ~VM_SHARED & ~VM_STACK */
->  		unsigned long exec_vm;	   /* VM_EXEC & ~VM_WRITE & ~VM_STACK */
->  		unsigned long stack_vm;	   /* VM_STACK */
-> -		unsigned long def_flags;
-> +		vm_flags_t def_flags;
->  
->  		/**
->  		 * @write_protect_seq: Locked when any thread is write
-> diff --git a/include/linux/mman.h b/include/linux/mman.h
-> index f4c6346a8fcd..de9e8e6229a4 100644
-> --- a/include/linux/mman.h
-> +++ b/include/linux/mman.h
-> @@ -137,7 +137,7 @@ static inline bool arch_validate_flags(unsigned long flags)
->  /*
->   * Combine the mmap "prot" argument into "vm_flags" used internally.
->   */
-> -static inline unsigned long
-> +static inline vm_flags_t
->  calc_vm_prot_bits(unsigned long prot, unsigned long pkey)
->  {
->  	return _calc_vm_trans(prot, PROT_READ,  VM_READ ) |
-> @@ -149,7 +149,7 @@ calc_vm_prot_bits(unsigned long prot, unsigned long pkey)
->  /*
->   * Combine the mmap "flags" argument into "vm_flags" used internally.
->   */
-> -static inline unsigned long
-> +static inline vm_flags_t
->  calc_vm_flag_bits(struct file *file, unsigned long flags)
->  {
->  	return _calc_vm_trans(flags, MAP_GROWSDOWN,  VM_GROWSDOWN ) |
-> diff --git a/include/linux/rmap.h b/include/linux/rmap.h
-> index 6d2b3fbe2df0..45904ff413ab 100644
-> --- a/include/linux/rmap.h
-> +++ b/include/linux/rmap.h
-> @@ -897,7 +897,7 @@ static inline int folio_try_share_anon_rmap_pmd(struct folio *folio,
->   * Called from mm/vmscan.c to handle paging out
->   */
->  int folio_referenced(struct folio *, int is_locked,
-> -			struct mem_cgroup *memcg, unsigned long *vm_flags);
-> +			struct mem_cgroup *memcg, vm_flags_t *vm_flags);
->  
->  void try_to_migrate(struct folio *folio, enum ttu_flags flags);
->  void try_to_unmap(struct folio *, enum ttu_flags flags);
-> @@ -1029,7 +1029,7 @@ struct anon_vma *folio_lock_anon_vma_read(const struct folio *folio,
->  
->  static inline int folio_referenced(struct folio *folio, int is_locked,
->  				  struct mem_cgroup *memcg,
-> -				  unsigned long *vm_flags)
-> +				  vm_flags_t *vm_flags)
->  {
->  	*vm_flags = 0;
->  	return 0;
-> diff --git a/include/linux/userfaultfd_k.h b/include/linux/userfaultfd_k.h
-> index ccad58602846..df85330bcfa6 100644
-> --- a/include/linux/userfaultfd_k.h
-> +++ b/include/linux/userfaultfd_k.h
-> @@ -209,7 +209,7 @@ static inline bool userfaultfd_armed(struct vm_area_struct *vma)
->  }
->  
->  static inline bool vma_can_userfault(struct vm_area_struct *vma,
-> -				     unsigned long vm_flags,
-> +				     vm_flags_t vm_flags,
->  				     bool wp_async)
->  {
->  	vm_flags &= __VM_UFFD_FLAGS;
-> @@ -281,7 +281,7 @@ struct vm_area_struct *userfaultfd_clear_vma(struct vma_iterator *vmi,
->  
->  int userfaultfd_register_range(struct userfaultfd_ctx *ctx,
->  			       struct vm_area_struct *vma,
-> -			       unsigned long vm_flags,
-> +			       vm_flags_t vm_flags,
->  			       unsigned long start, unsigned long end,
->  			       bool wp_async);
->  
-> diff --git a/include/trace/events/fs_dax.h b/include/trace/events/fs_dax.h
-> index 76b56f78abb0..50ebc1290ab0 100644
-> --- a/include/trace/events/fs_dax.h
-> +++ b/include/trace/events/fs_dax.h
-> @@ -15,7 +15,7 @@ DECLARE_EVENT_CLASS(dax_pmd_fault_class,
->  		__field(unsigned long, ino)
->  		__field(unsigned long, vm_start)
->  		__field(unsigned long, vm_end)
-> -		__field(unsigned long, vm_flags)
-> +		__field(vm_flags_t, vm_flags)
->  		__field(unsigned long, address)
->  		__field(pgoff_t, pgoff)
->  		__field(pgoff_t, max_pgoff)
-> @@ -67,7 +67,7 @@ DECLARE_EVENT_CLASS(dax_pmd_load_hole_class,
->  	TP_ARGS(inode, vmf, zero_folio, radix_entry),
->  	TP_STRUCT__entry(
->  		__field(unsigned long, ino)
-> -		__field(unsigned long, vm_flags)
-> +		__field(vm_flags_t, vm_flags)
->  		__field(unsigned long, address)
->  		__field(struct folio *, zero_folio)
->  		__field(void *, radix_entry)
-> @@ -107,7 +107,7 @@ DECLARE_EVENT_CLASS(dax_pte_fault_class,
->  	TP_ARGS(inode, vmf, result),
->  	TP_STRUCT__entry(
->  		__field(unsigned long, ino)
-> -		__field(unsigned long, vm_flags)
-> +		__field(vm_flags_t, vm_flags)
->  		__field(unsigned long, address)
->  		__field(pgoff_t, pgoff)
->  		__field(dev_t, dev)
-> diff --git a/mm/debug.c b/mm/debug.c
-> index 907382257062..e2973e1b3812 100644
-> --- a/mm/debug.c
-> +++ b/mm/debug.c
-> @@ -290,7 +290,7 @@ void dump_vmg(const struct vma_merge_struct *vmg, const char *reason)
->  		vmg->vmi, vmg->vmi ? vma_iter_addr(vmg->vmi) : 0,
->  		vmg->vmi ? vma_iter_end(vmg->vmi) : 0,
->  		vmg->prev, vmg->middle, vmg->next, vmg->target,
-> -		vmg->start, vmg->end, vmg->flags,
-> +		vmg->start, vmg->end, vmg->vm_flags,
->  		vmg->file, vmg->anon_vma, vmg->policy,
->  #ifdef CONFIG_USERFAULTFD
->  		vmg->uffd_ctx.ctx,
-> diff --git a/mm/execmem.c b/mm/execmem.c
-> index 9720ac2dfa41..bd95ff6a1d03 100644
-> --- a/mm/execmem.c
-> +++ b/mm/execmem.c
-> @@ -26,7 +26,7 @@ static struct execmem_info default_execmem_info __ro_after_init;
->  
->  #ifdef CONFIG_MMU
->  static void *execmem_vmalloc(struct execmem_range *range, size_t size,
-> -			     pgprot_t pgprot, unsigned long vm_flags)
-> +			     pgprot_t pgprot, vm_flags_t vm_flags)
->  {
->  	bool kasan = range->flags & EXECMEM_KASAN_SHADOW;
->  	gfp_t gfp_flags = GFP_KERNEL | __GFP_NOWARN;
-> @@ -82,7 +82,7 @@ struct vm_struct *execmem_vmap(size_t size)
->  }
->  #else
->  static void *execmem_vmalloc(struct execmem_range *range, size_t size,
-> -			     pgprot_t pgprot, unsigned long vm_flags)
-> +			     pgprot_t pgprot, vm_flags_t vm_flags)
->  {
->  	return vmalloc(size);
->  }
-> @@ -284,7 +284,7 @@ void execmem_cache_make_ro(void)
->  
->  static int execmem_cache_populate(struct execmem_range *range, size_t size)
->  {
-> -	unsigned long vm_flags = VM_ALLOW_HUGE_VMAP;
-> +	vm_flags_t vm_flags = VM_ALLOW_HUGE_VMAP;
->  	struct vm_struct *vm;
->  	size_t alloc_size;
->  	int err = -ENOMEM;
-> @@ -407,7 +407,7 @@ void *execmem_alloc(enum execmem_type type, size_t size)
->  {
->  	struct execmem_range *range = &execmem_info->ranges[type];
->  	bool use_cache = range->flags & EXECMEM_ROX_CACHE;
-> -	unsigned long vm_flags = VM_FLUSH_RESET_PERMS;
-> +	vm_flags_t vm_flags = VM_FLUSH_RESET_PERMS;
->  	pgprot_t pgprot = range->pgprot;
->  	void *p;
->  
-> diff --git a/mm/filemap.c b/mm/filemap.c
-> index 93fbc2ef232a..ccbfc3cef426 100644
-> --- a/mm/filemap.c
-> +++ b/mm/filemap.c
-> @@ -3216,7 +3216,7 @@ static struct file *do_sync_mmap_readahead(struct vm_fault *vmf)
->  	struct address_space *mapping = file->f_mapping;
->  	DEFINE_READAHEAD(ractl, file, ra, mapping, vmf->pgoff);
->  	struct file *fpin = NULL;
-> -	unsigned long vm_flags = vmf->vma->vm_flags;
-> +	vm_flags_t vm_flags = vmf->vma->vm_flags;
->  	unsigned short mmap_miss;
->  
->  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 6888e871a74a..30d320719fa2 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -2002,7 +2002,7 @@ static long __get_user_pages_locked(struct mm_struct *mm, unsigned long start,
->  {
->  	struct vm_area_struct *vma;
->  	bool must_unlock = false;
-> -	unsigned long vm_flags;
-> +	vm_flags_t vm_flags;
->  	long i;
->  
->  	if (!nr_pages)
-> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-> index 8e0e3cfd9f22..ce130225a8e5 100644
-> --- a/mm/huge_memory.c
-> +++ b/mm/huge_memory.c
-> @@ -98,7 +98,7 @@ static inline bool file_thp_enabled(struct vm_area_struct *vma)
->  }
->  
->  unsigned long __thp_vma_allowable_orders(struct vm_area_struct *vma,
-> -					 unsigned long vm_flags,
-> +					 vm_flags_t vm_flags,
->  					 unsigned long tva_flags,
->  					 unsigned long orders)
->  {
-> diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-> index 3d61ec17c15a..ff768a170d0e 100644
-> --- a/mm/hugetlb.c
-> +++ b/mm/hugetlb.c
-> @@ -7465,8 +7465,8 @@ static unsigned long page_table_shareable(struct vm_area_struct *svma,
->  	unsigned long s_end = sbase + PUD_SIZE;
->  
->  	/* Allow segments to share if only one is marked locked */
-> -	unsigned long vm_flags = vma->vm_flags & ~VM_LOCKED_MASK;
-> -	unsigned long svm_flags = svma->vm_flags & ~VM_LOCKED_MASK;
-> +	vm_flags_t vm_flags = vma->vm_flags & ~VM_LOCKED_MASK;
-> +	vm_flags_t svm_flags = svma->vm_flags & ~VM_LOCKED_MASK;
->  
->  	/*
->  	 * match the virtual addresses, permission and the alignment of the
-> diff --git a/mm/internal.h b/mm/internal.h
-> index feda91c9b3f4..506c6fc8b6dc 100644
-> --- a/mm/internal.h
-> +++ b/mm/internal.h
-> @@ -930,7 +930,7 @@ extern long populate_vma_page_range(struct vm_area_struct *vma,
->  		unsigned long start, unsigned long end, int *locked);
->  extern long faultin_page_range(struct mm_struct *mm, unsigned long start,
->  		unsigned long end, bool write, int *locked);
-> -extern bool mlock_future_ok(struct mm_struct *mm, unsigned long flags,
-> +extern bool mlock_future_ok(struct mm_struct *mm, vm_flags_t vm_flags,
->  			       unsigned long bytes);
->  
->  /*
-> @@ -1360,7 +1360,7 @@ int migrate_device_coherent_folio(struct folio *folio);
->  
->  struct vm_struct *__get_vm_area_node(unsigned long size,
->  				     unsigned long align, unsigned long shift,
-> -				     unsigned long flags, unsigned long start,
-> +				     vm_flags_t vm_flags, unsigned long start,
->  				     unsigned long end, int node, gfp_t gfp_mask,
->  				     const void *caller);
->  
-> diff --git a/mm/khugepaged.c b/mm/khugepaged.c
-> index d45d08b521f6..3495a20cef5e 100644
-> --- a/mm/khugepaged.c
-> +++ b/mm/khugepaged.c
-> @@ -347,7 +347,7 @@ struct attribute_group khugepaged_attr_group = {
->  #endif /* CONFIG_SYSFS */
->  
->  int hugepage_madvise(struct vm_area_struct *vma,
-> -		     unsigned long *vm_flags, int advice)
-> +		     vm_flags_t *vm_flags, int advice)
->  {
->  	switch (advice) {
->  	case MADV_HUGEPAGE:
-> @@ -470,7 +470,7 @@ void __khugepaged_enter(struct mm_struct *mm)
->  }
->  
->  void khugepaged_enter_vma(struct vm_area_struct *vma,
-> -			  unsigned long vm_flags)
-> +			  vm_flags_t vm_flags)
->  {
->  	if (!test_bit(MMF_VM_HUGEPAGE, &vma->vm_mm->flags) &&
->  	    hugepage_pmd_enabled()) {
-> diff --git a/mm/ksm.c b/mm/ksm.c
-> index 18b3690bb69a..ef73b25fd65a 100644
-> --- a/mm/ksm.c
-> +++ b/mm/ksm.c
-> @@ -2840,7 +2840,7 @@ int ksm_disable(struct mm_struct *mm)
->  }
->  
->  int ksm_madvise(struct vm_area_struct *vma, unsigned long start,
-> -		unsigned long end, int advice, unsigned long *vm_flags)
-> +		unsigned long end, int advice, vm_flags_t *vm_flags)
->  {
->  	struct mm_struct *mm = vma->vm_mm;
->  	int err;
-> diff --git a/mm/madvise.c b/mm/madvise.c
-> index 0970623a0e98..070132f9842b 100644
-> --- a/mm/madvise.c
-> +++ b/mm/madvise.c
-> @@ -130,7 +130,7 @@ static int replace_anon_vma_name(struct vm_area_struct *vma,
->   */
->  static int madvise_update_vma(struct vm_area_struct *vma,
->  			      struct vm_area_struct **prev, unsigned long start,
-> -			      unsigned long end, unsigned long new_flags,
-> +			      unsigned long end, vm_flags_t new_flags,
->  			      struct anon_vma_name *anon_name)
->  {
->  	struct mm_struct *mm = vma->vm_mm;
-> @@ -1258,7 +1258,7 @@ static int madvise_vma_behavior(struct vm_area_struct *vma,
->  	int behavior = arg->behavior;
->  	int error;
->  	struct anon_vma_name *anon_name;
-> -	unsigned long new_flags = vma->vm_flags;
-> +	vm_flags_t new_flags = vma->vm_flags;
->  
->  	if (unlikely(!can_modify_vma_madv(vma, behavior)))
->  		return -EPERM;
-> diff --git a/mm/mapping_dirty_helpers.c b/mm/mapping_dirty_helpers.c
-> index 208b428d29da..c193de6cb23a 100644
-> --- a/mm/mapping_dirty_helpers.c
-> +++ b/mm/mapping_dirty_helpers.c
-> @@ -218,7 +218,7 @@ static void wp_clean_post_vma(struct mm_walk *walk)
->  static int wp_clean_test_walk(unsigned long start, unsigned long end,
->  			      struct mm_walk *walk)
->  {
-> -	unsigned long vm_flags = READ_ONCE(walk->vma->vm_flags);
-> +	vm_flags_t vm_flags = READ_ONCE(walk->vma->vm_flags);
->  
->  	/* Skip non-applicable VMAs */
->  	if ((vm_flags & (VM_SHARED | VM_MAYWRITE | VM_HUGETLB)) !=
-> diff --git a/mm/memfd.c b/mm/memfd.c
-> index 65a107f72e39..b558c4c3bd27 100644
-> --- a/mm/memfd.c
-> +++ b/mm/memfd.c
-> @@ -332,10 +332,10 @@ static inline bool is_write_sealed(unsigned int seals)
->  	return seals & (F_SEAL_WRITE | F_SEAL_FUTURE_WRITE);
->  }
->  
-> -static int check_write_seal(unsigned long *vm_flags_ptr)
-> +static int check_write_seal(vm_flags_t *vm_flags_ptr)
->  {
-> -	unsigned long vm_flags = *vm_flags_ptr;
-> -	unsigned long mask = vm_flags & (VM_SHARED | VM_WRITE);
-> +	vm_flags_t vm_flags = *vm_flags_ptr;
-> +	vm_flags_t mask = vm_flags & (VM_SHARED | VM_WRITE);
->  
->  	/* If a private mapping then writability is irrelevant. */
->  	if (!(mask & VM_SHARED))
-> @@ -357,7 +357,7 @@ static int check_write_seal(unsigned long *vm_flags_ptr)
->  	return 0;
->  }
->  
-> -int memfd_check_seals_mmap(struct file *file, unsigned long *vm_flags_ptr)
-> +int memfd_check_seals_mmap(struct file *file, vm_flags_t *vm_flags_ptr)
->  {
->  	int err = 0;
->  	unsigned int *seals_ptr = memfd_file_seals_ptr(file);
-> diff --git a/mm/memory.c b/mm/memory.c
-> index 0163d127cece..0f9b32a20e5b 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -784,7 +784,7 @@ copy_nonpresent_pte(struct mm_struct *dst_mm, struct mm_struct *src_mm,
->  		pte_t *dst_pte, pte_t *src_pte, struct vm_area_struct *dst_vma,
->  		struct vm_area_struct *src_vma, unsigned long addr, int *rss)
->  {
-> -	unsigned long vm_flags = dst_vma->vm_flags;
-> +	vm_flags_t vm_flags = dst_vma->vm_flags;
->  	pte_t orig_pte = ptep_get(src_pte);
->  	pte_t pte = orig_pte;
->  	struct folio *folio;
-> @@ -6106,7 +6106,7 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
->  		.gfp_mask = __get_fault_gfp_mask(vma),
->  	};
->  	struct mm_struct *mm = vma->vm_mm;
-> -	unsigned long vm_flags = vma->vm_flags;
-> +	vm_flags_t vm_flags = vma->vm_flags;
->  	pgd_t *pgd;
->  	p4d_t *p4d;
->  	vm_fault_t ret;
-> diff --git a/mm/mmap.c b/mm/mmap.c
-> index 09c563c95112..8f92cf10b656 100644
-> --- a/mm/mmap.c
-> +++ b/mm/mmap.c
-> @@ -80,7 +80,7 @@ core_param(ignore_rlimit_data, ignore_rlimit_data, bool, 0644);
->  /* Update vma->vm_page_prot to reflect vma->vm_flags. */
->  void vma_set_page_prot(struct vm_area_struct *vma)
->  {
-> -	unsigned long vm_flags = vma->vm_flags;
-> +	vm_flags_t vm_flags = vma->vm_flags;
->  	pgprot_t vm_page_prot;
->  
->  	vm_page_prot = vm_pgprot_modify(vma->vm_page_prot, vm_flags);
-> @@ -228,12 +228,12 @@ static inline unsigned long round_hint_to_min(unsigned long hint)
->  	return hint;
->  }
->  
-> -bool mlock_future_ok(struct mm_struct *mm, unsigned long flags,
-> +bool mlock_future_ok(struct mm_struct *mm, vm_flags_t vm_flags,
->  			unsigned long bytes)
->  {
->  	unsigned long locked_pages, limit_pages;
->  
-> -	if (!(flags & VM_LOCKED) || capable(CAP_IPC_LOCK))
-> +	if (!(vm_flags & VM_LOCKED) || capable(CAP_IPC_LOCK))
->  		return true;
->  
->  	locked_pages = bytes >> PAGE_SHIFT;
-> @@ -1207,7 +1207,7 @@ SYSCALL_DEFINE5(remap_file_pages, unsigned long, start, unsigned long, size,
->  	return ret;
->  }
->  
-> -int vm_brk_flags(unsigned long addr, unsigned long request, unsigned long flags)
-> +int vm_brk_flags(unsigned long addr, unsigned long request, vm_flags_t vm_flags)
->  {
->  	struct mm_struct *mm = current->mm;
->  	struct vm_area_struct *vma = NULL;
-> @@ -1224,7 +1224,7 @@ int vm_brk_flags(unsigned long addr, unsigned long request, unsigned long flags)
->  		return 0;
->  
->  	/* Until we need other flags, refuse anything except VM_EXEC. */
-> -	if ((flags & (~VM_EXEC)) != 0)
-> +	if ((vm_flags & (~VM_EXEC)) != 0)
->  		return -EINVAL;
->  
->  	if (mmap_write_lock_killable(mm))
-> @@ -1239,7 +1239,7 @@ int vm_brk_flags(unsigned long addr, unsigned long request, unsigned long flags)
->  		goto munmap_failed;
->  
->  	vma = vma_prev(&vmi);
-> -	ret = do_brk_flags(&vmi, vma, addr, len, flags);
-> +	ret = do_brk_flags(&vmi, vma, addr, len, vm_flags);
->  	populate = ((mm->def_flags & VM_LOCKED) != 0);
->  	mmap_write_unlock(mm);
->  	userfaultfd_unmap_complete(mm, &uf);
-> @@ -1444,7 +1444,7 @@ static vm_fault_t special_mapping_fault(struct vm_fault *vmf)
->  static struct vm_area_struct *__install_special_mapping(
->  	struct mm_struct *mm,
->  	unsigned long addr, unsigned long len,
-> -	unsigned long vm_flags, void *priv,
-> +	vm_flags_t vm_flags, void *priv,
->  	const struct vm_operations_struct *ops)
->  {
->  	int ret;
-> @@ -1496,7 +1496,7 @@ bool vma_is_special_mapping(const struct vm_area_struct *vma,
->  struct vm_area_struct *_install_special_mapping(
->  	struct mm_struct *mm,
->  	unsigned long addr, unsigned long len,
-> -	unsigned long vm_flags, const struct vm_special_mapping *spec)
-> +	vm_flags_t vm_flags, const struct vm_special_mapping *spec)
->  {
->  	return __install_special_mapping(mm, addr, len, vm_flags, (void *)spec,
->  					&special_mapping_vmops);
-> diff --git a/mm/mprotect.c b/mm/mprotect.c
-> index 00d598942771..88709c01177b 100644
-> --- a/mm/mprotect.c
-> +++ b/mm/mprotect.c
-> @@ -596,10 +596,10 @@ static const struct mm_walk_ops prot_none_walk_ops = {
->  int
->  mprotect_fixup(struct vma_iterator *vmi, struct mmu_gather *tlb,
->  	       struct vm_area_struct *vma, struct vm_area_struct **pprev,
-> -	       unsigned long start, unsigned long end, unsigned long newflags)
-> +	       unsigned long start, unsigned long end, vm_flags_t newflags)
->  {
->  	struct mm_struct *mm = vma->vm_mm;
-> -	unsigned long oldflags = READ_ONCE(vma->vm_flags);
-> +	vm_flags_t oldflags = READ_ONCE(vma->vm_flags);
->  	long nrpages = (end - start) >> PAGE_SHIFT;
->  	unsigned int mm_cp_flags = 0;
->  	unsigned long charged = 0;
-> @@ -774,8 +774,8 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
->  	nstart = start;
->  	tmp = vma->vm_start;
->  	for_each_vma_range(vmi, vma, end) {
-> -		unsigned long mask_off_old_flags;
-> -		unsigned long newflags;
-> +		vm_flags_t mask_off_old_flags;
-> +		vm_flags_t newflags;
->  		int new_vma_pkey;
->  
->  		if (vma->vm_start != tmp) {
-> diff --git a/mm/mremap.c b/mm/mremap.c
-> index 81b9383c1ba2..b31740f77b84 100644
-> --- a/mm/mremap.c
-> +++ b/mm/mremap.c
-> @@ -1536,7 +1536,7 @@ static unsigned long prep_move_vma(struct vma_remap_struct *vrm)
->  	struct vm_area_struct *vma = vrm->vma;
->  	unsigned long old_addr = vrm->addr;
->  	unsigned long old_len = vrm->old_len;
-> -	unsigned long dummy = vma->vm_flags;
-> +	vm_flags_t dummy = vma->vm_flags;
->  
->  	/*
->  	 * We'd prefer to avoid failure later on in do_munmap:
-> diff --git a/mm/nommu.c b/mm/nommu.c
-> index b624acec6d2e..87e1acab0d64 100644
-> --- a/mm/nommu.c
-> +++ b/mm/nommu.c
-> @@ -126,7 +126,7 @@ void *vrealloc_noprof(const void *p, size_t size, gfp_t flags)
->  
->  void *__vmalloc_node_range_noprof(unsigned long size, unsigned long align,
->  		unsigned long start, unsigned long end, gfp_t gfp_mask,
-> -		pgprot_t prot, unsigned long vm_flags, int node,
-> +		pgprot_t prot, vm_flags_t vm_flags, int node,
->  		const void *caller)
->  {
->  	return __vmalloc_noprof(size, gfp_mask);
-> @@ -844,12 +844,12 @@ static int validate_mmap_request(struct file *file,
->   * we've determined that we can make the mapping, now translate what we
->   * now know into VMA flags
->   */
-> -static unsigned long determine_vm_flags(struct file *file,
-> -					unsigned long prot,
-> -					unsigned long flags,
-> -					unsigned long capabilities)
-> +static vm_flags_t determine_vm_flags(struct file *file,
-> +		unsigned long prot,
-> +		unsigned long flags,
-> +		unsigned long capabilities)
->  {
-> -	unsigned long vm_flags;
-> +	vm_flags_t vm_flags;
->  
->  	vm_flags = calc_vm_prot_bits(prot, 0) | calc_vm_flag_bits(file, flags);
->  
-> diff --git a/mm/rmap.c b/mm/rmap.c
-> index fd160ddaa980..3b74bb19c11d 100644
-> --- a/mm/rmap.c
-> +++ b/mm/rmap.c
-> @@ -839,7 +839,7 @@ pmd_t *mm_find_pmd(struct mm_struct *mm, unsigned long address)
->  struct folio_referenced_arg {
->  	int mapcount;
->  	int referenced;
-> -	unsigned long vm_flags;
-> +	vm_flags_t vm_flags;
->  	struct mem_cgroup *memcg;
->  };
->  
-> @@ -984,7 +984,7 @@ static bool invalid_folio_referenced_vma(struct vm_area_struct *vma, void *arg)
->   * the function bailed out due to rmap lock contention.
->   */
->  int folio_referenced(struct folio *folio, int is_locked,
-> -		     struct mem_cgroup *memcg, unsigned long *vm_flags)
-> +		     struct mem_cgroup *memcg, vm_flags_t *vm_flags)
->  {
->  	bool we_locked = false;
->  	struct folio_referenced_arg pra = {
-> diff --git a/mm/shmem.c b/mm/shmem.c
-> index 0bc30dafad90..41af8aa959c8 100644
-> --- a/mm/shmem.c
-> +++ b/mm/shmem.c
-> @@ -627,7 +627,7 @@ static unsigned int shmem_get_orders_within_size(struct inode *inode,
->  static unsigned int shmem_huge_global_enabled(struct inode *inode, pgoff_t index,
->  					      loff_t write_end, bool shmem_huge_force,
->  					      struct vm_area_struct *vma,
-> -					      unsigned long vm_flags)
-> +					      vm_flags_t vm_flags)
->  {
->  	unsigned int maybe_pmd_order = HPAGE_PMD_ORDER > MAX_PAGECACHE_ORDER ?
->  		0 : BIT(HPAGE_PMD_ORDER);
-> @@ -874,7 +874,7 @@ static unsigned long shmem_unused_huge_shrink(struct shmem_sb_info *sbinfo,
->  static unsigned int shmem_huge_global_enabled(struct inode *inode, pgoff_t index,
->  					      loff_t write_end, bool shmem_huge_force,
->  					      struct vm_area_struct *vma,
-> -					      unsigned long vm_flags)
-> +					      vm_flags_t vm_flags)
->  {
->  	return 0;
->  }
-> @@ -1777,7 +1777,7 @@ unsigned long shmem_allowable_huge_orders(struct inode *inode,
->  {
->  	unsigned long mask = READ_ONCE(huge_shmem_orders_always);
->  	unsigned long within_size_orders = READ_ONCE(huge_shmem_orders_within_size);
-> -	unsigned long vm_flags = vma ? vma->vm_flags : 0;
-> +	vm_flags_t vm_flags = vma ? vma->vm_flags : 0;
->  	unsigned int global_orders;
->  
->  	if (thp_disabled_by_hw() || (vma && vma_thp_disabled(vma, vm_flags)))
-> diff --git a/mm/userfaultfd.c b/mm/userfaultfd.c
-> index 879505c6996f..83c122c5a97b 100644
-> --- a/mm/userfaultfd.c
-> +++ b/mm/userfaultfd.c
-> @@ -1895,11 +1895,11 @@ ssize_t move_pages(struct userfaultfd_ctx *ctx, unsigned long dst_start,
->  }
->  
->  static void userfaultfd_set_vm_flags(struct vm_area_struct *vma,
-> -				     vm_flags_t flags)
-> +				     vm_flags_t vm_flags)
->  {
-> -	const bool uffd_wp_changed = (vma->vm_flags ^ flags) & VM_UFFD_WP;
-> +	const bool uffd_wp_changed = (vma->vm_flags ^ vm_flags) & VM_UFFD_WP;
->  
-> -	vm_flags_reset(vma, flags);
-> +	vm_flags_reset(vma, vm_flags);
->  	/*
->  	 * For shared mappings, we want to enable writenotify while
->  	 * userfaultfd-wp is enabled (see vma_wants_writenotify()). We'll simply
-> @@ -1911,12 +1911,12 @@ static void userfaultfd_set_vm_flags(struct vm_area_struct *vma,
->  
->  static void userfaultfd_set_ctx(struct vm_area_struct *vma,
->  				struct userfaultfd_ctx *ctx,
-> -				unsigned long flags)
-> +				vm_flags_t vm_flags)
->  {
->  	vma_start_write(vma);
->  	vma->vm_userfaultfd_ctx = (struct vm_userfaultfd_ctx){ctx};
->  	userfaultfd_set_vm_flags(vma,
-> -				 (vma->vm_flags & ~__VM_UFFD_FLAGS) | flags);
-> +				 (vma->vm_flags & ~__VM_UFFD_FLAGS) | vm_flags);
->  }
->  
->  void userfaultfd_reset_ctx(struct vm_area_struct *vma)
-> @@ -1962,14 +1962,14 @@ struct vm_area_struct *userfaultfd_clear_vma(struct vma_iterator *vmi,
->  /* Assumes mmap write lock taken, and mm_struct pinned. */
->  int userfaultfd_register_range(struct userfaultfd_ctx *ctx,
->  			       struct vm_area_struct *vma,
-> -			       unsigned long vm_flags,
-> +			       vm_flags_t vm_flags,
->  			       unsigned long start, unsigned long end,
->  			       bool wp_async)
->  {
->  	VMA_ITERATOR(vmi, ctx->mm, start);
->  	struct vm_area_struct *prev = vma_prev(&vmi);
->  	unsigned long vma_end;
-> -	unsigned long new_flags;
-> +	vm_flags_t new_flags;
->  
->  	if (vma->vm_start < start)
->  		prev = vma;
-> diff --git a/mm/vma.c b/mm/vma.c
-> index 5d35adadf2b5..13794a0ac5fe 100644
-> --- a/mm/vma.c
-> +++ b/mm/vma.c
-> @@ -15,7 +15,7 @@ struct mmap_state {
->  	unsigned long end;
->  	pgoff_t pgoff;
->  	unsigned long pglen;
-> -	unsigned long flags;
-> +	vm_flags_t vm_flags;
->  	struct file *file;
->  	pgprot_t page_prot;
->  
-> @@ -34,7 +34,7 @@ struct mmap_state {
->  	struct maple_tree mt_detach;
->  };
->  
-> -#define MMAP_STATE(name, mm_, vmi_, addr_, len_, pgoff_, flags_, file_) \
-> +#define MMAP_STATE(name, mm_, vmi_, addr_, len_, pgoff_, vm_flags_, file_) \
->  	struct mmap_state name = {					\
->  		.mm = mm_,						\
->  		.vmi = vmi_,						\
-> @@ -42,9 +42,9 @@ struct mmap_state {
->  		.end = (addr_) + (len_),				\
->  		.pgoff = pgoff_,					\
->  		.pglen = PHYS_PFN(len_),				\
-> -		.flags = flags_,					\
-> +		.vm_flags = vm_flags_,					\
->  		.file = file_,						\
-> -		.page_prot = vm_get_page_prot(flags_),			\
-> +		.page_prot = vm_get_page_prot(vm_flags_),		\
->  	}
->  
->  #define VMG_MMAP_STATE(name, map_, vma_)				\
-> @@ -53,7 +53,7 @@ struct mmap_state {
->  		.vmi = (map_)->vmi,					\
->  		.start = (map_)->addr,					\
->  		.end = (map_)->end,					\
-> -		.flags = (map_)->flags,					\
-> +		.vm_flags = (map_)->vm_flags,				\
->  		.pgoff = (map_)->pgoff,					\
->  		.file = (map_)->file,					\
->  		.prev = (map_)->prev,					\
-> @@ -76,7 +76,7 @@ static inline bool is_mergeable_vma(struct vma_merge_struct *vmg, bool merge_nex
->  	 * the kernel to generate new VMAs when old one could be
->  	 * extended instead.
->  	 */
-> -	if ((vma->vm_flags ^ vmg->flags) & ~VM_SOFTDIRTY)
-> +	if ((vma->vm_flags ^ vmg->vm_flags) & ~VM_SOFTDIRTY)
->  		return false;
->  	if (vma->vm_file != vmg->file)
->  		return false;
-> @@ -823,7 +823,7 @@ struct vm_area_struct *vma_merge_existing_range(struct vma_merge_struct *vmg)
->  	 * furthermost left or right side of the VMA, then we have no chance of
->  	 * merging and should abort.
->  	 */
-> -	if (vmg->flags & VM_SPECIAL || (!left_side && !right_side))
-> +	if (vmg->vm_flags & VM_SPECIAL || (!left_side && !right_side))
->  		return NULL;
->  
->  	if (left_side)
-> @@ -953,7 +953,7 @@ struct vm_area_struct *vma_merge_existing_range(struct vma_merge_struct *vmg)
->  	if (err || commit_merge(vmg))
->  		goto abort;
->  
-> -	khugepaged_enter_vma(vmg->target, vmg->flags);
-> +	khugepaged_enter_vma(vmg->target, vmg->vm_flags);
->  	vmg->state = VMA_MERGE_SUCCESS;
->  	return vmg->target;
->  
-> @@ -1035,7 +1035,7 @@ struct vm_area_struct *vma_merge_new_range(struct vma_merge_struct *vmg)
->  	vmg->state = VMA_MERGE_NOMERGE;
->  
->  	/* Special VMAs are unmergeable, also if no prev/next. */
-> -	if ((vmg->flags & VM_SPECIAL) || (!prev && !next))
-> +	if ((vmg->vm_flags & VM_SPECIAL) || (!prev && !next))
->  		return NULL;
->  
->  	can_merge_left = can_vma_merge_left(vmg);
-> @@ -1073,7 +1073,7 @@ struct vm_area_struct *vma_merge_new_range(struct vma_merge_struct *vmg)
->  	 * following VMA if we have VMAs on both sides.
->  	 */
->  	if (vmg->target && !vma_expand(vmg)) {
-> -		khugepaged_enter_vma(vmg->target, vmg->flags);
-> +		khugepaged_enter_vma(vmg->target, vmg->vm_flags);
->  		vmg->state = VMA_MERGE_SUCCESS;
->  		return vmg->target;
->  	}
-> @@ -1620,11 +1620,11 @@ static struct vm_area_struct *vma_modify(struct vma_merge_struct *vmg)
->  struct vm_area_struct *vma_modify_flags(
->  	struct vma_iterator *vmi, struct vm_area_struct *prev,
->  	struct vm_area_struct *vma, unsigned long start, unsigned long end,
-> -	unsigned long new_flags)
-> +	vm_flags_t vm_flags)
->  {
->  	VMG_VMA_STATE(vmg, vmi, prev, vma, start, end);
->  
-> -	vmg.flags = new_flags;
-> +	vmg.vm_flags = vm_flags;
->  
->  	return vma_modify(&vmg);
->  }
-> @@ -1635,12 +1635,12 @@ struct vm_area_struct
->  		       struct vm_area_struct *vma,
->  		       unsigned long start,
->  		       unsigned long end,
-> -		       unsigned long new_flags,
-> +		       vm_flags_t vm_flags,
->  		       struct anon_vma_name *new_name)
->  {
->  	VMG_VMA_STATE(vmg, vmi, prev, vma, start, end);
->  
-> -	vmg.flags = new_flags;
-> +	vmg.vm_flags = vm_flags;
->  	vmg.anon_name = new_name;
->  
->  	return vma_modify(&vmg);
-> @@ -1665,13 +1665,13 @@ struct vm_area_struct
->  		       struct vm_area_struct *prev,
->  		       struct vm_area_struct *vma,
->  		       unsigned long start, unsigned long end,
-> -		       unsigned long new_flags,
-> +		       vm_flags_t vm_flags,
->  		       struct vm_userfaultfd_ctx new_ctx,
->  		       bool give_up_on_oom)
->  {
->  	VMG_VMA_STATE(vmg, vmi, prev, vma, start, end);
->  
-> -	vmg.flags = new_flags;
-> +	vmg.vm_flags = vm_flags;
->  	vmg.uffd_ctx = new_ctx;
->  	if (give_up_on_oom)
->  		vmg.give_up_on_oom = true;
-> @@ -2376,11 +2376,11 @@ static int __mmap_prepare(struct mmap_state *map, struct list_head *uf)
->  	}
->  
->  	/* Check against address space limit. */
-> -	if (!may_expand_vm(map->mm, map->flags, map->pglen - vms->nr_pages))
-> +	if (!may_expand_vm(map->mm, map->vm_flags, map->pglen - vms->nr_pages))
->  		return -ENOMEM;
->  
->  	/* Private writable mapping: check memory availability. */
-> -	if (accountable_mapping(map->file, map->flags)) {
-> +	if (accountable_mapping(map->file, map->vm_flags)) {
->  		map->charged = map->pglen;
->  		map->charged -= vms->nr_accounted;
->  		if (map->charged) {
-> @@ -2390,7 +2390,7 @@ static int __mmap_prepare(struct mmap_state *map, struct list_head *uf)
->  		}
->  
->  		vms->nr_accounted = 0;
-> -		map->flags |= VM_ACCOUNT;
-> +		map->vm_flags |= VM_ACCOUNT;
->  	}
->  
->  	/*
-> @@ -2434,11 +2434,11 @@ static int __mmap_new_file_vma(struct mmap_state *map,
->  	 * Drivers should not permit writability when previously it was
->  	 * disallowed.
->  	 */
-> -	VM_WARN_ON_ONCE(map->flags != vma->vm_flags &&
-> -			!(map->flags & VM_MAYWRITE) &&
-> +	VM_WARN_ON_ONCE(map->vm_flags != vma->vm_flags &&
-> +			!(map->vm_flags & VM_MAYWRITE) &&
->  			(vma->vm_flags & VM_MAYWRITE));
->  
-> -	map->flags = vma->vm_flags;
-> +	map->vm_flags = vma->vm_flags;
->  
->  	return 0;
->  }
-> @@ -2469,7 +2469,7 @@ static int __mmap_new_vma(struct mmap_state *map, struct vm_area_struct **vmap)
->  
->  	vma_iter_config(vmi, map->addr, map->end);
->  	vma_set_range(vma, map->addr, map->end, map->pgoff);
-> -	vm_flags_init(vma, map->flags);
-> +	vm_flags_init(vma, map->vm_flags);
->  	vma->vm_page_prot = map->page_prot;
->  
->  	if (vma_iter_prealloc(vmi, vma)) {
-> @@ -2479,7 +2479,7 @@ static int __mmap_new_vma(struct mmap_state *map, struct vm_area_struct **vmap)
->  
->  	if (map->file)
->  		error = __mmap_new_file_vma(map, vma);
-> -	else if (map->flags & VM_SHARED)
-> +	else if (map->vm_flags & VM_SHARED)
->  		error = shmem_zero_setup(vma);
->  	else
->  		vma_set_anonymous(vma);
-> @@ -2489,7 +2489,7 @@ static int __mmap_new_vma(struct mmap_state *map, struct vm_area_struct **vmap)
->  
->  #ifdef CONFIG_SPARC64
->  	/* TODO: Fix SPARC ADI! */
-> -	WARN_ON_ONCE(!arch_validate_flags(map->flags));
-> +	WARN_ON_ONCE(!arch_validate_flags(map->vm_flags));
->  #endif
->  
->  	/* Lock the VMA since it is modified after insertion into VMA tree */
-> @@ -2503,7 +2503,7 @@ static int __mmap_new_vma(struct mmap_state *map, struct vm_area_struct **vmap)
->  	 * call covers the non-merge case.
->  	 */
->  	if (!vma_is_anonymous(vma))
-> -		khugepaged_enter_vma(vma, map->flags);
-> +		khugepaged_enter_vma(vma, map->vm_flags);
->  	*vmap = vma;
->  	return 0;
->  
-> @@ -2524,7 +2524,7 @@ static int __mmap_new_vma(struct mmap_state *map, struct vm_area_struct **vmap)
->  static void __mmap_complete(struct mmap_state *map, struct vm_area_struct *vma)
->  {
->  	struct mm_struct *mm = map->mm;
-> -	unsigned long vm_flags = vma->vm_flags;
-> +	vm_flags_t vm_flags = vma->vm_flags;
->  
->  	perf_event_mmap(vma);
->  
-> @@ -2577,7 +2577,7 @@ static int call_mmap_prepare(struct mmap_state *map)
->  
->  		.pgoff = map->pgoff,
->  		.file = map->file,
-> -		.vm_flags = map->flags,
-> +		.vm_flags = map->vm_flags,
->  		.page_prot = map->page_prot,
->  	};
->  
-> @@ -2589,7 +2589,7 @@ static int call_mmap_prepare(struct mmap_state *map)
->  	/* Update fields permitted to be changed. */
->  	map->pgoff = desc.pgoff;
->  	map->file = desc.file;
-> -	map->flags = desc.vm_flags;
-> +	map->vm_flags = desc.vm_flags;
->  	map->page_prot = desc.page_prot;
->  	/* User-defined fields. */
->  	map->vm_ops = desc.vm_ops;
-> @@ -2608,7 +2608,7 @@ static void set_vma_user_defined_fields(struct vm_area_struct *vma,
->  
->  static void update_ksm_flags(struct mmap_state *map)
->  {
-> -	map->flags = ksm_vma_flags(map->mm, map->file, map->flags);
-> +	map->vm_flags = ksm_vma_flags(map->mm, map->file, map->vm_flags);
->  }
->  
->  /*
-> @@ -2759,14 +2759,14 @@ unsigned long mmap_region(struct file *file, unsigned long addr,
->   * @addr: The start address
->   * @len: The length of the increase
->   * @vma: The vma,
-> - * @flags: The VMA Flags
-> + * @vm_flags: The VMA Flags
->   *
->   * Extend the brk VMA from addr to addr + len.  If the VMA is NULL or the flags
->   * do not match then create a new anonymous VMA.  Eventually we may be able to
->   * do some brk-specific accounting here.
->   */
->  int do_brk_flags(struct vma_iterator *vmi, struct vm_area_struct *vma,
-> -		 unsigned long addr, unsigned long len, unsigned long flags)
-> +		 unsigned long addr, unsigned long len, vm_flags_t vm_flags)
->  {
->  	struct mm_struct *mm = current->mm;
->  
-> @@ -2774,9 +2774,9 @@ int do_brk_flags(struct vma_iterator *vmi, struct vm_area_struct *vma,
->  	 * Check against address space limits by the changed size
->  	 * Note: This happens *after* clearing old mappings in some code paths.
->  	 */
-> -	flags |= VM_DATA_DEFAULT_FLAGS | VM_ACCOUNT | mm->def_flags;
-> -	flags = ksm_vma_flags(mm, NULL, flags);
-> -	if (!may_expand_vm(mm, flags, len >> PAGE_SHIFT))
-> +	vm_flags |= VM_DATA_DEFAULT_FLAGS | VM_ACCOUNT | mm->def_flags;
-> +	vm_flags = ksm_vma_flags(mm, NULL, vm_flags);
-> +	if (!may_expand_vm(mm, vm_flags, len >> PAGE_SHIFT))
->  		return -ENOMEM;
->  
->  	if (mm->map_count > sysctl_max_map_count)
-> @@ -2790,7 +2790,7 @@ int do_brk_flags(struct vma_iterator *vmi, struct vm_area_struct *vma,
->  	 * occur after forking, so the expand will only happen on new VMAs.
->  	 */
->  	if (vma && vma->vm_end == addr) {
-> -		VMG_STATE(vmg, mm, vmi, addr, addr + len, flags, PHYS_PFN(addr));
-> +		VMG_STATE(vmg, mm, vmi, addr, addr + len, vm_flags, PHYS_PFN(addr));
->  
->  		vmg.prev = vma;
->  		/* vmi is positioned at prev, which this mode expects. */
-> @@ -2811,8 +2811,8 @@ int do_brk_flags(struct vma_iterator *vmi, struct vm_area_struct *vma,
->  
->  	vma_set_anonymous(vma);
->  	vma_set_range(vma, addr, addr + len, addr >> PAGE_SHIFT);
-> -	vm_flags_init(vma, flags);
-> -	vma->vm_page_prot = vm_get_page_prot(flags);
-> +	vm_flags_init(vma, vm_flags);
-> +	vma->vm_page_prot = vm_get_page_prot(vm_flags);
->  	vma_start_write(vma);
->  	if (vma_iter_store_gfp(vmi, vma, GFP_KERNEL))
->  		goto mas_store_fail;
-> @@ -2823,7 +2823,7 @@ int do_brk_flags(struct vma_iterator *vmi, struct vm_area_struct *vma,
->  	perf_event_mmap(vma);
->  	mm->total_vm += len >> PAGE_SHIFT;
->  	mm->data_vm += len >> PAGE_SHIFT;
-> -	if (flags & VM_LOCKED)
-> +	if (vm_flags & VM_LOCKED)
->  		mm->locked_vm += (len >> PAGE_SHIFT);
->  	vm_flags_set(vma, VM_SOFTDIRTY);
->  	return 0;
-> diff --git a/mm/vma.h b/mm/vma.h
-> index 392548ccfb96..269bfba36557 100644
-> --- a/mm/vma.h
-> +++ b/mm/vma.h
-> @@ -98,7 +98,7 @@ struct vma_merge_struct {
->  	unsigned long end;
->  	pgoff_t pgoff;
->  
-> -	unsigned long flags;
-> +	vm_flags_t vm_flags;
->  	struct file *file;
->  	struct anon_vma *anon_vma;
->  	struct mempolicy *policy;
-> @@ -164,13 +164,13 @@ static inline pgoff_t vma_pgoff_offset(struct vm_area_struct *vma,
->  	return vma->vm_pgoff + PHYS_PFN(addr - vma->vm_start);
->  }
->  
-> -#define VMG_STATE(name, mm_, vmi_, start_, end_, flags_, pgoff_)	\
-> +#define VMG_STATE(name, mm_, vmi_, start_, end_, vm_flags_, pgoff_)	\
->  	struct vma_merge_struct name = {				\
->  		.mm = mm_,						\
->  		.vmi = vmi_,						\
->  		.start = start_,					\
->  		.end = end_,						\
-> -		.flags = flags_,					\
-> +		.vm_flags = vm_flags_,					\
->  		.pgoff = pgoff_,					\
->  		.state = VMA_MERGE_START,				\
->  	}
-> @@ -184,7 +184,7 @@ static inline pgoff_t vma_pgoff_offset(struct vm_area_struct *vma,
->  		.next = NULL,					\
->  		.start = start_,				\
->  		.end = end_,					\
-> -		.flags = vma_->vm_flags,			\
-> +		.vm_flags = vma_->vm_flags,			\
->  		.pgoff = vma_pgoff_offset(vma_, start_),	\
->  		.file = vma_->vm_file,				\
->  		.anon_vma = vma_->anon_vma,			\
-> @@ -288,7 +288,7 @@ __must_check struct vm_area_struct
->  *vma_modify_flags(struct vma_iterator *vmi,
->  		struct vm_area_struct *prev, struct vm_area_struct *vma,
->  		unsigned long start, unsigned long end,
-> -		unsigned long new_flags);
-> +		vm_flags_t vm_flags);
->  
->  /* We are about to modify the VMA's flags and/or anon_name. */
->  __must_check struct vm_area_struct
-> @@ -297,7 +297,7 @@ __must_check struct vm_area_struct
->  		       struct vm_area_struct *vma,
->  		       unsigned long start,
->  		       unsigned long end,
-> -		       unsigned long new_flags,
-> +		       vm_flags_t vm_flags,
->  		       struct anon_vma_name *new_name);
->  
->  /* We are about to modify the VMA's memory policy. */
-> @@ -314,7 +314,7 @@ __must_check struct vm_area_struct
->  		       struct vm_area_struct *prev,
->  		       struct vm_area_struct *vma,
->  		       unsigned long start, unsigned long end,
-> -		       unsigned long new_flags,
-> +		       vm_flags_t vm_flags,
->  		       struct vm_userfaultfd_ctx new_ctx,
->  		       bool give_up_on_oom);
->  
-> @@ -378,7 +378,7 @@ static inline bool vma_wants_manual_pte_write_upgrade(struct vm_area_struct *vma
->  }
->  
->  #ifdef CONFIG_MMU
-> -static inline pgprot_t vm_pgprot_modify(pgprot_t oldprot, unsigned long vm_flags)
-> +static inline pgprot_t vm_pgprot_modify(pgprot_t oldprot, vm_flags_t vm_flags)
->  {
->  	return pgprot_modify(oldprot, vm_get_page_prot(vm_flags));
->  }
-> diff --git a/mm/vmscan.c b/mm/vmscan.c
-> index efc818a0bbec..c86a2495138a 100644
-> --- a/mm/vmscan.c
-> +++ b/mm/vmscan.c
-> @@ -907,7 +907,7 @@ static enum folio_references folio_check_references(struct folio *folio,
->  						  struct scan_control *sc)
->  {
->  	int referenced_ptes, referenced_folio;
-> -	unsigned long vm_flags;
-> +	vm_flags_t vm_flags;
->  
->  	referenced_ptes = folio_referenced(folio, 1, sc->target_mem_cgroup,
->  					   &vm_flags);
-> @@ -2120,7 +2120,7 @@ static void shrink_active_list(unsigned long nr_to_scan,
->  {
->  	unsigned long nr_taken;
->  	unsigned long nr_scanned;
-> -	unsigned long vm_flags;
-> +	vm_flags_t vm_flags;
->  	LIST_HEAD(l_hold);	/* The folios which were snipped off */
->  	LIST_HEAD(l_active);
->  	LIST_HEAD(l_inactive);
-> diff --git a/tools/testing/vma/vma.c b/tools/testing/vma/vma.c
-> index 61a67aa6977c..645ee841f43d 100644
-> --- a/tools/testing/vma/vma.c
-> +++ b/tools/testing/vma/vma.c
-> @@ -65,7 +65,7 @@ static struct vm_area_struct *alloc_vma(struct mm_struct *mm,
->  					unsigned long start,
->  					unsigned long end,
->  					pgoff_t pgoff,
-> -					vm_flags_t flags)
-> +					vm_flags_t vm_flags)
->  {
->  	struct vm_area_struct *ret = vm_area_alloc(mm);
->  
-> @@ -75,7 +75,7 @@ static struct vm_area_struct *alloc_vma(struct mm_struct *mm,
->  	ret->vm_start = start;
->  	ret->vm_end = end;
->  	ret->vm_pgoff = pgoff;
-> -	ret->__vm_flags = flags;
-> +	ret->__vm_flags = vm_flags;
->  	vma_assert_detached(ret);
->  
->  	return ret;
-> @@ -103,9 +103,9 @@ static struct vm_area_struct *alloc_and_link_vma(struct mm_struct *mm,
->  						 unsigned long start,
->  						 unsigned long end,
->  						 pgoff_t pgoff,
-> -						 vm_flags_t flags)
-> +						 vm_flags_t vm_flags)
->  {
-> -	struct vm_area_struct *vma = alloc_vma(mm, start, end, pgoff, flags);
-> +	struct vm_area_struct *vma = alloc_vma(mm, start, end, pgoff, vm_flags);
->  
->  	if (vma == NULL)
->  		return NULL;
-> @@ -172,7 +172,7 @@ static int expand_existing(struct vma_merge_struct *vmg)
->   * specified new range.
->   */
->  static void vmg_set_range(struct vma_merge_struct *vmg, unsigned long start,
-> -			  unsigned long end, pgoff_t pgoff, vm_flags_t flags)
-> +			  unsigned long end, pgoff_t pgoff, vm_flags_t vm_flags)
->  {
->  	vma_iter_set(vmg->vmi, start);
->  
-> @@ -184,7 +184,7 @@ static void vmg_set_range(struct vma_merge_struct *vmg, unsigned long start,
->  	vmg->start = start;
->  	vmg->end = end;
->  	vmg->pgoff = pgoff;
-> -	vmg->flags = flags;
-> +	vmg->vm_flags = vm_flags;
->  
->  	vmg->just_expand = false;
->  	vmg->__remove_middle = false;
-> @@ -195,10 +195,10 @@ static void vmg_set_range(struct vma_merge_struct *vmg, unsigned long start,
->  
->  /* Helper function to set both the VMG range and its anon_vma. */
->  static void vmg_set_range_anon_vma(struct vma_merge_struct *vmg, unsigned long start,
-> -				   unsigned long end, pgoff_t pgoff, vm_flags_t flags,
-> +				   unsigned long end, pgoff_t pgoff, vm_flags_t vm_flags,
->  				   struct anon_vma *anon_vma)
->  {
-> -	vmg_set_range(vmg, start, end, pgoff, flags);
-> +	vmg_set_range(vmg, start, end, pgoff, vm_flags);
->  	vmg->anon_vma = anon_vma;
->  }
->  
-> @@ -211,12 +211,12 @@ static void vmg_set_range_anon_vma(struct vma_merge_struct *vmg, unsigned long s
->  static struct vm_area_struct *try_merge_new_vma(struct mm_struct *mm,
->  						struct vma_merge_struct *vmg,
->  						unsigned long start, unsigned long end,
-> -						pgoff_t pgoff, vm_flags_t flags,
-> +						pgoff_t pgoff, vm_flags_t vm_flags,
->  						bool *was_merged)
->  {
->  	struct vm_area_struct *merged;
->  
-> -	vmg_set_range(vmg, start, end, pgoff, flags);
-> +	vmg_set_range(vmg, start, end, pgoff, vm_flags);
->  
->  	merged = merge_new(vmg);
->  	if (merged) {
-> @@ -229,7 +229,7 @@ static struct vm_area_struct *try_merge_new_vma(struct mm_struct *mm,
->  
->  	ASSERT_EQ(vmg->state, VMA_MERGE_NOMERGE);
->  
-> -	return alloc_and_link_vma(mm, start, end, pgoff, flags);
-> +	return alloc_and_link_vma(mm, start, end, pgoff, vm_flags);
->  }
->  
->  /*
-> @@ -301,17 +301,17 @@ static void vma_set_dummy_anon_vma(struct vm_area_struct *vma,
->  static bool test_simple_merge(void)
->  {
->  	struct vm_area_struct *vma;
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
-> -	struct vm_area_struct *vma_left = alloc_vma(&mm, 0, 0x1000, 0, flags);
-> -	struct vm_area_struct *vma_right = alloc_vma(&mm, 0x2000, 0x3000, 2, flags);
-> +	struct vm_area_struct *vma_left = alloc_vma(&mm, 0, 0x1000, 0, vm_flags);
-> +	struct vm_area_struct *vma_right = alloc_vma(&mm, 0x2000, 0x3000, 2, vm_flags);
->  	VMA_ITERATOR(vmi, &mm, 0x1000);
->  	struct vma_merge_struct vmg = {
->  		.mm = &mm,
->  		.vmi = &vmi,
->  		.start = 0x1000,
->  		.end = 0x2000,
-> -		.flags = flags,
-> +		.vm_flags = vm_flags,
->  		.pgoff = 1,
->  	};
->  
-> @@ -324,7 +324,7 @@ static bool test_simple_merge(void)
->  	ASSERT_EQ(vma->vm_start, 0);
->  	ASSERT_EQ(vma->vm_end, 0x3000);
->  	ASSERT_EQ(vma->vm_pgoff, 0);
-> -	ASSERT_EQ(vma->vm_flags, flags);
-> +	ASSERT_EQ(vma->vm_flags, vm_flags);
->  
->  	detach_free_vma(vma);
->  	mtree_destroy(&mm.mm_mt);
-> @@ -335,9 +335,9 @@ static bool test_simple_merge(void)
->  static bool test_simple_modify(void)
->  {
->  	struct vm_area_struct *vma;
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
-> -	struct vm_area_struct *init_vma = alloc_vma(&mm, 0, 0x3000, 0, flags);
-> +	struct vm_area_struct *init_vma = alloc_vma(&mm, 0, 0x3000, 0, vm_flags);
->  	VMA_ITERATOR(vmi, &mm, 0x1000);
->  
->  	ASSERT_FALSE(attach_vma(&mm, init_vma));
-> @@ -394,9 +394,9 @@ static bool test_simple_modify(void)
->  
->  static bool test_simple_expand(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
-> -	struct vm_area_struct *vma = alloc_vma(&mm, 0, 0x1000, 0, flags);
-> +	struct vm_area_struct *vma = alloc_vma(&mm, 0, 0x1000, 0, vm_flags);
->  	VMA_ITERATOR(vmi, &mm, 0);
->  	struct vma_merge_struct vmg = {
->  		.vmi = &vmi,
-> @@ -422,9 +422,9 @@ static bool test_simple_expand(void)
->  
->  static bool test_simple_shrink(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
-> -	struct vm_area_struct *vma = alloc_vma(&mm, 0, 0x3000, 0, flags);
-> +	struct vm_area_struct *vma = alloc_vma(&mm, 0, 0x3000, 0, vm_flags);
->  	VMA_ITERATOR(vmi, &mm, 0);
->  
->  	ASSERT_FALSE(attach_vma(&mm, vma));
-> @@ -443,7 +443,7 @@ static bool test_simple_shrink(void)
->  
->  static bool test_merge_new(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	VMA_ITERATOR(vmi, &mm, 0);
->  	struct vma_merge_struct vmg = {
-> @@ -473,18 +473,18 @@ static bool test_merge_new(void)
->  	 * 0123456789abc
->  	 * AA B       CC
->  	 */
-> -	vma_a = alloc_and_link_vma(&mm, 0, 0x2000, 0, flags);
-> +	vma_a = alloc_and_link_vma(&mm, 0, 0x2000, 0, vm_flags);
->  	ASSERT_NE(vma_a, NULL);
->  	/* We give each VMA a single avc so we can test anon_vma duplication. */
->  	INIT_LIST_HEAD(&vma_a->anon_vma_chain);
->  	list_add(&dummy_anon_vma_chain_a.same_vma, &vma_a->anon_vma_chain);
->  
-> -	vma_b = alloc_and_link_vma(&mm, 0x3000, 0x4000, 3, flags);
-> +	vma_b = alloc_and_link_vma(&mm, 0x3000, 0x4000, 3, vm_flags);
->  	ASSERT_NE(vma_b, NULL);
->  	INIT_LIST_HEAD(&vma_b->anon_vma_chain);
->  	list_add(&dummy_anon_vma_chain_b.same_vma, &vma_b->anon_vma_chain);
->  
-> -	vma_c = alloc_and_link_vma(&mm, 0xb000, 0xc000, 0xb, flags);
-> +	vma_c = alloc_and_link_vma(&mm, 0xb000, 0xc000, 0xb, vm_flags);
->  	ASSERT_NE(vma_c, NULL);
->  	INIT_LIST_HEAD(&vma_c->anon_vma_chain);
->  	list_add(&dummy_anon_vma_chain_c.same_vma, &vma_c->anon_vma_chain);
-> @@ -495,7 +495,7 @@ static bool test_merge_new(void)
->  	 * 0123456789abc
->  	 * AA B   **  CC
->  	 */
-> -	vma_d = try_merge_new_vma(&mm, &vmg, 0x7000, 0x9000, 7, flags, &merged);
-> +	vma_d = try_merge_new_vma(&mm, &vmg, 0x7000, 0x9000, 7, vm_flags, &merged);
->  	ASSERT_NE(vma_d, NULL);
->  	INIT_LIST_HEAD(&vma_d->anon_vma_chain);
->  	list_add(&dummy_anon_vma_chain_d.same_vma, &vma_d->anon_vma_chain);
-> @@ -510,7 +510,7 @@ static bool test_merge_new(void)
->  	 */
->  	vma_a->vm_ops = &vm_ops; /* This should have no impact. */
->  	vma_b->anon_vma = &dummy_anon_vma;
-> -	vma = try_merge_new_vma(&mm, &vmg, 0x2000, 0x3000, 2, flags, &merged);
-> +	vma = try_merge_new_vma(&mm, &vmg, 0x2000, 0x3000, 2, vm_flags, &merged);
->  	ASSERT_EQ(vma, vma_a);
->  	/* Merge with A, delete B. */
->  	ASSERT_TRUE(merged);
-> @@ -527,7 +527,7 @@ static bool test_merge_new(void)
->  	 * 0123456789abc
->  	 * AAAA*  DD  CC
->  	 */
-> -	vma = try_merge_new_vma(&mm, &vmg, 0x4000, 0x5000, 4, flags, &merged);
-> +	vma = try_merge_new_vma(&mm, &vmg, 0x4000, 0x5000, 4, vm_flags, &merged);
->  	ASSERT_EQ(vma, vma_a);
->  	/* Extend A. */
->  	ASSERT_TRUE(merged);
-> @@ -546,7 +546,7 @@ static bool test_merge_new(void)
->  	 */
->  	vma_d->anon_vma = &dummy_anon_vma;
->  	vma_d->vm_ops = &vm_ops; /* This should have no impact. */
-> -	vma = try_merge_new_vma(&mm, &vmg, 0x6000, 0x7000, 6, flags, &merged);
-> +	vma = try_merge_new_vma(&mm, &vmg, 0x6000, 0x7000, 6, vm_flags, &merged);
->  	ASSERT_EQ(vma, vma_d);
->  	/* Prepend. */
->  	ASSERT_TRUE(merged);
-> @@ -564,7 +564,7 @@ static bool test_merge_new(void)
->  	 * AAAAA*DDD  CC
->  	 */
->  	vma_d->vm_ops = NULL; /* This would otherwise degrade the merge. */
-> -	vma = try_merge_new_vma(&mm, &vmg, 0x5000, 0x6000, 5, flags, &merged);
-> +	vma = try_merge_new_vma(&mm, &vmg, 0x5000, 0x6000, 5, vm_flags, &merged);
->  	ASSERT_EQ(vma, vma_a);
->  	/* Merge with A, delete D. */
->  	ASSERT_TRUE(merged);
-> @@ -582,7 +582,7 @@ static bool test_merge_new(void)
->  	 * AAAAAAAAA *CC
->  	 */
->  	vma_c->anon_vma = &dummy_anon_vma;
-> -	vma = try_merge_new_vma(&mm, &vmg, 0xa000, 0xb000, 0xa, flags, &merged);
-> +	vma = try_merge_new_vma(&mm, &vmg, 0xa000, 0xb000, 0xa, vm_flags, &merged);
->  	ASSERT_EQ(vma, vma_c);
->  	/* Prepend C. */
->  	ASSERT_TRUE(merged);
-> @@ -599,7 +599,7 @@ static bool test_merge_new(void)
->  	 * 0123456789abc
->  	 * AAAAAAAAA*CCC
->  	 */
-> -	vma = try_merge_new_vma(&mm, &vmg, 0x9000, 0xa000, 0x9, flags, &merged);
-> +	vma = try_merge_new_vma(&mm, &vmg, 0x9000, 0xa000, 0x9, vm_flags, &merged);
->  	ASSERT_EQ(vma, vma_a);
->  	/* Extend A and delete C. */
->  	ASSERT_TRUE(merged);
-> @@ -639,7 +639,7 @@ static bool test_merge_new(void)
->  
->  static bool test_vma_merge_special_flags(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	VMA_ITERATOR(vmi, &mm, 0);
->  	struct vma_merge_struct vmg = {
-> @@ -661,7 +661,7 @@ static bool test_vma_merge_special_flags(void)
->  	 * 01234
->  	 * AAA
->  	 */
-> -	vma_left = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> +	vma_left = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
->  	ASSERT_NE(vma_left, NULL);
->  
->  	/* 1. Set up new VMA with special flag that would otherwise merge. */
-> @@ -672,12 +672,12 @@ static bool test_vma_merge_special_flags(void)
->  	 *
->  	 * This should merge if not for the VM_SPECIAL flag.
->  	 */
-> -	vmg_set_range(&vmg, 0x3000, 0x4000, 3, flags);
-> +	vmg_set_range(&vmg, 0x3000, 0x4000, 3, vm_flags);
->  	for (i = 0; i < ARRAY_SIZE(special_flags); i++) {
->  		vm_flags_t special_flag = special_flags[i];
->  
-> -		vma_left->__vm_flags = flags | special_flag;
-> -		vmg.flags = flags | special_flag;
-> +		vma_left->__vm_flags = vm_flags | special_flag;
-> +		vmg.vm_flags = vm_flags | special_flag;
->  		vma = merge_new(&vmg);
->  		ASSERT_EQ(vma, NULL);
->  		ASSERT_EQ(vmg.state, VMA_MERGE_NOMERGE);
-> @@ -691,15 +691,15 @@ static bool test_vma_merge_special_flags(void)
->  	 *
->  	 * Create a VMA to modify.
->  	 */
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x4000, 3, flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x4000, 3, vm_flags);
->  	ASSERT_NE(vma, NULL);
->  	vmg.middle = vma;
->  
->  	for (i = 0; i < ARRAY_SIZE(special_flags); i++) {
->  		vm_flags_t special_flag = special_flags[i];
->  
-> -		vma_left->__vm_flags = flags | special_flag;
-> -		vmg.flags = flags | special_flag;
-> +		vma_left->__vm_flags = vm_flags | special_flag;
-> +		vmg.vm_flags = vm_flags | special_flag;
->  		vma = merge_existing(&vmg);
->  		ASSERT_EQ(vma, NULL);
->  		ASSERT_EQ(vmg.state, VMA_MERGE_NOMERGE);
-> @@ -711,7 +711,7 @@ static bool test_vma_merge_special_flags(void)
->  
->  static bool test_vma_merge_with_close(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	VMA_ITERATOR(vmi, &mm, 0);
->  	struct vma_merge_struct vmg = {
-> @@ -791,11 +791,11 @@ static bool test_vma_merge_with_close(void)
->  	 * PPPPPPNNN
->  	 */
->  
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x9000, 5, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x9000, 5, vm_flags);
->  	vma_next->vm_ops = &vm_ops;
->  
-> -	vmg_set_range(&vmg, 0x3000, 0x5000, 3, flags);
-> +	vmg_set_range(&vmg, 0x3000, 0x5000, 3, vm_flags);
->  	ASSERT_EQ(merge_new(&vmg), vma_prev);
->  	ASSERT_EQ(vmg.state, VMA_MERGE_SUCCESS);
->  	ASSERT_EQ(vma_prev->vm_start, 0);
-> @@ -816,11 +816,11 @@ static bool test_vma_merge_with_close(void)
->  	 * proceed.
->  	 */
->  
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
->  	vma->vm_ops = &vm_ops;
->  
-> -	vmg_set_range(&vmg, 0x3000, 0x5000, 3, flags);
-> +	vmg_set_range(&vmg, 0x3000, 0x5000, 3, vm_flags);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  
-> @@ -844,11 +844,11 @@ static bool test_vma_merge_with_close(void)
->  	 * proceed.
->  	 */
->  
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x9000, 5, flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x9000, 5, vm_flags);
->  	vma->vm_ops = &vm_ops;
->  
-> -	vmg_set_range(&vmg, 0x3000, 0x5000, 3, flags);
-> +	vmg_set_range(&vmg, 0x3000, 0x5000, 3, vm_flags);
->  	vmg.middle = vma;
->  	ASSERT_EQ(merge_existing(&vmg), NULL);
->  	/*
-> @@ -872,12 +872,12 @@ static bool test_vma_merge_with_close(void)
->  	 * PPPVVNNNN
->  	 */
->  
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x9000, 5, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x9000, 5, vm_flags);
->  	vma->vm_ops = &vm_ops;
->  
-> -	vmg_set_range(&vmg, 0x3000, 0x5000, 3, flags);
-> +	vmg_set_range(&vmg, 0x3000, 0x5000, 3, vm_flags);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  
-> @@ -898,12 +898,12 @@ static bool test_vma_merge_with_close(void)
->  	 * PPPPPNNNN
->  	 */
->  
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x9000, 5, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x9000, 5, vm_flags);
->  	vma_next->vm_ops = &vm_ops;
->  
-> -	vmg_set_range(&vmg, 0x3000, 0x5000, 3, flags);
-> +	vmg_set_range(&vmg, 0x3000, 0x5000, 3, vm_flags);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  
-> @@ -920,15 +920,15 @@ static bool test_vma_merge_with_close(void)
->  
->  static bool test_vma_merge_new_with_close(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	VMA_ITERATOR(vmi, &mm, 0);
->  	struct vma_merge_struct vmg = {
->  		.mm = &mm,
->  		.vmi = &vmi,
->  	};
-> -	struct vm_area_struct *vma_prev = alloc_and_link_vma(&mm, 0, 0x2000, 0, flags);
-> -	struct vm_area_struct *vma_next = alloc_and_link_vma(&mm, 0x5000, 0x7000, 5, flags);
-> +	struct vm_area_struct *vma_prev = alloc_and_link_vma(&mm, 0, 0x2000, 0, vm_flags);
-> +	struct vm_area_struct *vma_next = alloc_and_link_vma(&mm, 0x5000, 0x7000, 5, vm_flags);
->  	const struct vm_operations_struct vm_ops = {
->  		.close = dummy_close,
->  	};
-> @@ -958,7 +958,7 @@ static bool test_vma_merge_new_with_close(void)
->  	vma_prev->vm_ops = &vm_ops;
->  	vma_next->vm_ops = &vm_ops;
->  
-> -	vmg_set_range(&vmg, 0x2000, 0x5000, 2, flags);
-> +	vmg_set_range(&vmg, 0x2000, 0x5000, 2, vm_flags);
->  	vma = merge_new(&vmg);
->  	ASSERT_NE(vma, NULL);
->  	ASSERT_EQ(vmg.state, VMA_MERGE_SUCCESS);
-> @@ -975,7 +975,7 @@ static bool test_vma_merge_new_with_close(void)
->  
->  static bool test_merge_existing(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	VMA_ITERATOR(vmi, &mm, 0);
->  	struct vm_area_struct *vma, *vma_prev, *vma_next;
-> @@ -998,11 +998,11 @@ static bool test_merge_existing(void)
->  	 * 0123456789
->  	 *   VNNNNNN
->  	 */
-> -	vma = alloc_and_link_vma(&mm, 0x2000, 0x6000, 2, flags);
-> +	vma = alloc_and_link_vma(&mm, 0x2000, 0x6000, 2, vm_flags);
->  	vma->vm_ops = &vm_ops; /* This should have no impact. */
-> -	vma_next = alloc_and_link_vma(&mm, 0x6000, 0x9000, 6, flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x6000, 0x9000, 6, vm_flags);
->  	vma_next->vm_ops = &vm_ops; /* This should have no impact. */
-> -	vmg_set_range_anon_vma(&vmg, 0x3000, 0x6000, 3, flags, &dummy_anon_vma);
-> +	vmg_set_range_anon_vma(&vmg, 0x3000, 0x6000, 3, vm_flags, &dummy_anon_vma);
->  	vmg.middle = vma;
->  	vmg.prev = vma;
->  	vma_set_dummy_anon_vma(vma, &avc);
-> @@ -1032,10 +1032,10 @@ static bool test_merge_existing(void)
->  	 * 0123456789
->  	 *   NNNNNNN
->  	 */
-> -	vma = alloc_and_link_vma(&mm, 0x2000, 0x6000, 2, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x6000, 0x9000, 6, flags);
-> +	vma = alloc_and_link_vma(&mm, 0x2000, 0x6000, 2, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x6000, 0x9000, 6, vm_flags);
->  	vma_next->vm_ops = &vm_ops; /* This should have no impact. */
-> -	vmg_set_range_anon_vma(&vmg, 0x2000, 0x6000, 2, flags, &dummy_anon_vma);
-> +	vmg_set_range_anon_vma(&vmg, 0x2000, 0x6000, 2, vm_flags, &dummy_anon_vma);
->  	vmg.middle = vma;
->  	vma_set_dummy_anon_vma(vma, &avc);
->  	ASSERT_EQ(merge_existing(&vmg), vma_next);
-> @@ -1060,11 +1060,11 @@ static bool test_merge_existing(void)
->  	 * 0123456789
->  	 * PPPPPPV
->  	 */
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
->  	vma_prev->vm_ops = &vm_ops; /* This should have no impact. */
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x7000, 3, flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x7000, 3, vm_flags);
->  	vma->vm_ops = &vm_ops; /* This should have no impact. */
-> -	vmg_set_range_anon_vma(&vmg, 0x3000, 0x6000, 3, flags, &dummy_anon_vma);
-> +	vmg_set_range_anon_vma(&vmg, 0x3000, 0x6000, 3, vm_flags, &dummy_anon_vma);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  	vma_set_dummy_anon_vma(vma, &avc);
-> @@ -1094,10 +1094,10 @@ static bool test_merge_existing(void)
->  	 * 0123456789
->  	 * PPPPPPP
->  	 */
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
->  	vma_prev->vm_ops = &vm_ops; /* This should have no impact. */
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x7000, 3, flags);
-> -	vmg_set_range_anon_vma(&vmg, 0x3000, 0x7000, 3, flags, &dummy_anon_vma);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x7000, 3, vm_flags);
-> +	vmg_set_range_anon_vma(&vmg, 0x3000, 0x7000, 3, vm_flags, &dummy_anon_vma);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  	vma_set_dummy_anon_vma(vma, &avc);
-> @@ -1123,11 +1123,11 @@ static bool test_merge_existing(void)
->  	 * 0123456789
->  	 * PPPPPPPPPP
->  	 */
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
->  	vma_prev->vm_ops = &vm_ops; /* This should have no impact. */
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x7000, 3, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x7000, 0x9000, 7, flags);
-> -	vmg_set_range_anon_vma(&vmg, 0x3000, 0x7000, 3, flags, &dummy_anon_vma);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x7000, 3, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x7000, 0x9000, 7, vm_flags);
-> +	vmg_set_range_anon_vma(&vmg, 0x3000, 0x7000, 3, vm_flags, &dummy_anon_vma);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  	vma_set_dummy_anon_vma(vma, &avc);
-> @@ -1158,41 +1158,41 @@ static bool test_merge_existing(void)
->  	 * PPPVVVVVNNN
->  	 */
->  
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x8000, 3, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x8000, 0xa000, 8, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x8000, 3, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x8000, 0xa000, 8, vm_flags);
->  
-> -	vmg_set_range(&vmg, 0x4000, 0x5000, 4, flags);
-> +	vmg_set_range(&vmg, 0x4000, 0x5000, 4, vm_flags);
->  	vmg.prev = vma;
->  	vmg.middle = vma;
->  	ASSERT_EQ(merge_existing(&vmg), NULL);
->  	ASSERT_EQ(vmg.state, VMA_MERGE_NOMERGE);
->  
-> -	vmg_set_range(&vmg, 0x5000, 0x6000, 5, flags);
-> +	vmg_set_range(&vmg, 0x5000, 0x6000, 5, vm_flags);
->  	vmg.prev = vma;
->  	vmg.middle = vma;
->  	ASSERT_EQ(merge_existing(&vmg), NULL);
->  	ASSERT_EQ(vmg.state, VMA_MERGE_NOMERGE);
->  
-> -	vmg_set_range(&vmg, 0x6000, 0x7000, 6, flags);
-> +	vmg_set_range(&vmg, 0x6000, 0x7000, 6, vm_flags);
->  	vmg.prev = vma;
->  	vmg.middle = vma;
->  	ASSERT_EQ(merge_existing(&vmg), NULL);
->  	ASSERT_EQ(vmg.state, VMA_MERGE_NOMERGE);
->  
-> -	vmg_set_range(&vmg, 0x4000, 0x7000, 4, flags);
-> +	vmg_set_range(&vmg, 0x4000, 0x7000, 4, vm_flags);
->  	vmg.prev = vma;
->  	vmg.middle = vma;
->  	ASSERT_EQ(merge_existing(&vmg), NULL);
->  	ASSERT_EQ(vmg.state, VMA_MERGE_NOMERGE);
->  
-> -	vmg_set_range(&vmg, 0x4000, 0x6000, 4, flags);
-> +	vmg_set_range(&vmg, 0x4000, 0x6000, 4, vm_flags);
->  	vmg.prev = vma;
->  	vmg.middle = vma;
->  	ASSERT_EQ(merge_existing(&vmg), NULL);
->  	ASSERT_EQ(vmg.state, VMA_MERGE_NOMERGE);
->  
-> -	vmg_set_range(&vmg, 0x5000, 0x6000, 5, flags);
-> +	vmg_set_range(&vmg, 0x5000, 0x6000, 5, vm_flags);
->  	vmg.prev = vma;
->  	vmg.middle = vma;
->  	ASSERT_EQ(merge_existing(&vmg), NULL);
-> @@ -1205,7 +1205,7 @@ static bool test_merge_existing(void)
->  
->  static bool test_anon_vma_non_mergeable(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	VMA_ITERATOR(vmi, &mm, 0);
->  	struct vm_area_struct *vma, *vma_prev, *vma_next;
-> @@ -1229,9 +1229,9 @@ static bool test_anon_vma_non_mergeable(void)
->  	 * 0123456789
->  	 * PPPPPPPNNN
->  	 */
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x7000, 3, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x7000, 0x9000, 7, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x7000, 3, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x7000, 0x9000, 7, vm_flags);
->  
->  	/*
->  	 * Give both prev and next single anon_vma_chain fields, so they will
-> @@ -1239,7 +1239,7 @@ static bool test_anon_vma_non_mergeable(void)
->  	 *
->  	 * However, when prev is compared to next, the merge should fail.
->  	 */
-> -	vmg_set_range_anon_vma(&vmg, 0x3000, 0x7000, 3, flags, NULL);
-> +	vmg_set_range_anon_vma(&vmg, 0x3000, 0x7000, 3, vm_flags, NULL);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  	vma_set_dummy_anon_vma(vma_prev, &dummy_anon_vma_chain_1);
-> @@ -1267,10 +1267,10 @@ static bool test_anon_vma_non_mergeable(void)
->  	 * 0123456789
->  	 * PPPPPPPNNN
->  	 */
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x7000, 0x9000, 7, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x7000, 0x9000, 7, vm_flags);
->  
-> -	vmg_set_range_anon_vma(&vmg, 0x3000, 0x7000, 3, flags, NULL);
-> +	vmg_set_range_anon_vma(&vmg, 0x3000, 0x7000, 3, vm_flags, NULL);
->  	vmg.prev = vma_prev;
->  	vma_set_dummy_anon_vma(vma_prev, &dummy_anon_vma_chain_1);
->  	__vma_set_dummy_anon_vma(vma_next, &dummy_anon_vma_chain_2, &dummy_anon_vma_2);
-> @@ -1292,7 +1292,7 @@ static bool test_anon_vma_non_mergeable(void)
->  
->  static bool test_dup_anon_vma(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	VMA_ITERATOR(vmi, &mm, 0);
->  	struct vma_merge_struct vmg = {
-> @@ -1313,11 +1313,11 @@ static bool test_dup_anon_vma(void)
->  	 * This covers new VMA merging, as these operations amount to a VMA
->  	 * expand.
->  	 */
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
->  	vma_next->anon_vma = &dummy_anon_vma;
->  
-> -	vmg_set_range(&vmg, 0, 0x5000, 0, flags);
-> +	vmg_set_range(&vmg, 0, 0x5000, 0, vm_flags);
->  	vmg.target = vma_prev;
->  	vmg.next = vma_next;
->  
-> @@ -1339,16 +1339,16 @@ static bool test_dup_anon_vma(void)
->  	 *  extend   delete  delete
->  	 */
->  
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x8000, 5, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x8000, 5, vm_flags);
->  
->  	/* Initialise avc so mergeability check passes. */
->  	INIT_LIST_HEAD(&vma_next->anon_vma_chain);
->  	list_add(&dummy_anon_vma_chain.same_vma, &vma_next->anon_vma_chain);
->  
->  	vma_next->anon_vma = &dummy_anon_vma;
-> -	vmg_set_range(&vmg, 0x3000, 0x5000, 3, flags);
-> +	vmg_set_range(&vmg, 0x3000, 0x5000, 3, vm_flags);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  
-> @@ -1372,12 +1372,12 @@ static bool test_dup_anon_vma(void)
->  	 *  extend   delete  delete
->  	 */
->  
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x8000, 5, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x8000, 5, vm_flags);
->  	vmg.anon_vma = &dummy_anon_vma;
->  	vma_set_dummy_anon_vma(vma, &dummy_anon_vma_chain);
-> -	vmg_set_range(&vmg, 0x3000, 0x5000, 3, flags);
-> +	vmg_set_range(&vmg, 0x3000, 0x5000, 3, vm_flags);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  
-> @@ -1401,11 +1401,11 @@ static bool test_dup_anon_vma(void)
->  	 *  extend shrink/delete
->  	 */
->  
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x8000, 3, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x8000, 3, vm_flags);
->  
->  	vma_set_dummy_anon_vma(vma, &dummy_anon_vma_chain);
-> -	vmg_set_range(&vmg, 0x3000, 0x5000, 3, flags);
-> +	vmg_set_range(&vmg, 0x3000, 0x5000, 3, vm_flags);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  
-> @@ -1429,11 +1429,11 @@ static bool test_dup_anon_vma(void)
->  	 * shrink/delete extend
->  	 */
->  
-> -	vma = alloc_and_link_vma(&mm, 0, 0x5000, 0, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x8000, 5, flags);
-> +	vma = alloc_and_link_vma(&mm, 0, 0x5000, 0, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x5000, 0x8000, 5, vm_flags);
->  
->  	vma_set_dummy_anon_vma(vma, &dummy_anon_vma_chain);
-> -	vmg_set_range(&vmg, 0x3000, 0x5000, 3, flags);
-> +	vmg_set_range(&vmg, 0x3000, 0x5000, 3, vm_flags);
->  	vmg.prev = vma;
->  	vmg.middle = vma;
->  
-> @@ -1452,7 +1452,7 @@ static bool test_dup_anon_vma(void)
->  
->  static bool test_vmi_prealloc_fail(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	VMA_ITERATOR(vmi, &mm, 0);
->  	struct vma_merge_struct vmg = {
-> @@ -1468,11 +1468,11 @@ static bool test_vmi_prealloc_fail(void)
->  	 * the duplicated anon_vma is unlinked.
->  	 */
->  
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
->  	vma->anon_vma = &dummy_anon_vma;
->  
-> -	vmg_set_range_anon_vma(&vmg, 0x3000, 0x5000, 3, flags, &dummy_anon_vma);
-> +	vmg_set_range_anon_vma(&vmg, 0x3000, 0x5000, 3, vm_flags, &dummy_anon_vma);
->  	vmg.prev = vma_prev;
->  	vmg.middle = vma;
->  	vma_set_dummy_anon_vma(vma, &avc);
-> @@ -1496,11 +1496,11 @@ static bool test_vmi_prealloc_fail(void)
->  	 * performed in this case too.
->  	 */
->  
-> -	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, flags);
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
->  	vma->anon_vma = &dummy_anon_vma;
->  
-> -	vmg_set_range(&vmg, 0, 0x5000, 3, flags);
-> +	vmg_set_range(&vmg, 0, 0x5000, 3, vm_flags);
->  	vmg.target = vma_prev;
->  	vmg.next = vma;
->  
-> @@ -1518,13 +1518,13 @@ static bool test_vmi_prealloc_fail(void)
->  
->  static bool test_merge_extend(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	VMA_ITERATOR(vmi, &mm, 0x1000);
->  	struct vm_area_struct *vma;
->  
-> -	vma = alloc_and_link_vma(&mm, 0, 0x1000, 0, flags);
-> -	alloc_and_link_vma(&mm, 0x3000, 0x4000, 3, flags);
-> +	vma = alloc_and_link_vma(&mm, 0, 0x1000, 0, vm_flags);
-> +	alloc_and_link_vma(&mm, 0x3000, 0x4000, 3, vm_flags);
->  
->  	/*
->  	 * Extend a VMA into the gap between itself and the following VMA.
-> @@ -1548,7 +1548,7 @@ static bool test_merge_extend(void)
->  
->  static bool test_copy_vma(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	bool need_locks = false;
->  	bool relocate_anon = false;
-> @@ -1557,7 +1557,7 @@ static bool test_copy_vma(void)
->  
->  	/* Move backwards and do not merge. */
->  
-> -	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> +	vma = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
->  	vma_new = copy_vma(&vma, 0, 0x2000, 0, &need_locks, &relocate_anon);
->  	ASSERT_NE(vma_new, vma);
->  	ASSERT_EQ(vma_new->vm_start, 0);
-> @@ -1569,8 +1569,8 @@ static bool test_copy_vma(void)
->  
->  	/* Move a VMA into position next to another and merge the two. */
->  
-> -	vma = alloc_and_link_vma(&mm, 0, 0x2000, 0, flags);
-> -	vma_next = alloc_and_link_vma(&mm, 0x6000, 0x8000, 6, flags);
-> +	vma = alloc_and_link_vma(&mm, 0, 0x2000, 0, vm_flags);
-> +	vma_next = alloc_and_link_vma(&mm, 0x6000, 0x8000, 6, vm_flags);
->  	vma_new = copy_vma(&vma, 0x4000, 0x2000, 4, &need_locks, &relocate_anon);
->  	vma_assert_attached(vma_new);
->  
-> @@ -1582,11 +1582,11 @@ static bool test_copy_vma(void)
->  
->  static bool test_expand_only_mode(void)
->  {
-> -	unsigned long flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
-> +	vm_flags_t vm_flags = VM_READ | VM_WRITE | VM_MAYREAD | VM_MAYWRITE;
->  	struct mm_struct mm = {};
->  	VMA_ITERATOR(vmi, &mm, 0);
->  	struct vm_area_struct *vma_prev, *vma;
-> -	VMG_STATE(vmg, &mm, &vmi, 0x5000, 0x9000, flags, 5);
-> +	VMG_STATE(vmg, &mm, &vmi, 0x5000, 0x9000, vm_flags, 5);
->  
->  	/*
->  	 * Place a VMA prior to the one we're expanding so we assert that we do
-> @@ -1594,14 +1594,14 @@ static bool test_expand_only_mode(void)
->  	 * have, through the use of the just_expand flag, indicated we do not
->  	 * need to do so.
->  	 */
-> -	alloc_and_link_vma(&mm, 0, 0x2000, 0, flags);
-> +	alloc_and_link_vma(&mm, 0, 0x2000, 0, vm_flags);
->  
->  	/*
->  	 * We will be positioned at the prev VMA, but looking to expand to
->  	 * 0x9000.
->  	 */
->  	vma_iter_set(&vmi, 0x3000);
-> -	vma_prev = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, flags);
-> +	vma_prev = alloc_and_link_vma(&mm, 0x3000, 0x5000, 3, vm_flags);
->  	vmg.prev = vma_prev;
->  	vmg.just_expand = true;
->  
-> diff --git a/tools/testing/vma/vma_internal.h b/tools/testing/vma/vma_internal.h
-> index 4e3a2f1ac09e..7919d7141537 100644
-> --- a/tools/testing/vma/vma_internal.h
-> +++ b/tools/testing/vma/vma_internal.h
-> @@ -1089,7 +1089,7 @@ static inline bool mpol_equal(struct mempolicy *, struct mempolicy *)
->  }
->  
->  static inline void khugepaged_enter_vma(struct vm_area_struct *vma,
-> -			  unsigned long vm_flags)
-> +			  vm_flags_t vm_flags)
->  {
->  	(void)vma;
->  	(void)vm_flags;
-> @@ -1205,7 +1205,7 @@ bool vma_wants_writenotify(struct vm_area_struct *vma, pgprot_t vm_page_prot);
->  /* Update vma->vm_page_prot to reflect vma->vm_flags. */
->  static inline void vma_set_page_prot(struct vm_area_struct *vma)
->  {
-> -	unsigned long vm_flags = vma->vm_flags;
-> +	vm_flags_t vm_flags = vma->vm_flags;
->  	pgprot_t vm_page_prot;
->  
->  	/* testing: we inline vm_pgprot_modify() to avoid clash with vma.h. */
-> @@ -1285,12 +1285,12 @@ static inline bool capable(int cap)
->  	return true;
->  }
->  
-> -static inline bool mlock_future_ok(struct mm_struct *mm, unsigned long flags,
-> +static inline bool mlock_future_ok(struct mm_struct *mm, vm_flags_t vm_flags,
->  			unsigned long bytes)
->  {
->  	unsigned long locked_pages, limit_pages;
->  
-> -	if (!(flags & VM_LOCKED) || capable(CAP_IPC_LOCK))
-> +	if (!(vm_flags & VM_LOCKED) || capable(CAP_IPC_LOCK))
->  		return true;
->  
->  	locked_pages = bytes >> PAGE_SHIFT;
-> -- 
-> 2.49.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> +static inline void local_dlbtrp_enable(void)
+> +{
+> +	csr_set(CSR_SSTATUS, SR_SDT);
+> +}
+> +
+> +static inline void local_dlbtrp_disable(void)
+> +{
+> +	csr_clear(CSR_SSTATUS, SR_SDT);
+> +}
+> +
+>  void install_exception_handler(unsigned long cause, void (*handler)(struct pt_regs *));
+>  void install_irq_handler(unsigned long cause, void (*handler)(struct pt_regs *));
+>  void do_handle_exception(struct pt_regs *regs);
+> diff --git a/riscv/isa-dbltrp.c b/riscv/isa-dbltrp.c
+> new file mode 100644
+> index 00000000..dcfa66da
+> --- /dev/null
+> +++ b/riscv/isa-dbltrp.c
+> @@ -0,0 +1,210 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * SBI verification
+> + *
+> + * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
+> + */
+> +#include <alloc.h>
+> +#include <alloc_page.h>
+> +#include <libcflat.h>
+> +#include <stdlib.h>
+> +
+> +#include <asm/csr.h>
+> +#include <asm/page.h>
+> +#include <asm/processor.h>
+> +#include <asm/ptrace.h>
+> +#include <asm/sbi.h>
+> +
+> +#include <sbi-tests.h>
+> +
+> +static bool double_trap;
+> +static bool clear_sdt;
+> +
+> +#define INSN_LEN(insn)			((((insn) & 0x3) < 0x3) ? 2 : 4)
+
+This macro should be removed since it was merged in another file.
+
+Clément
+
+> +
+> +#define GEN_TRAP()								\
+> +do {										\
+> +	void *ptr = NULL;							\
+> +	unsigned long value = 0;						\
+> +	asm volatile(								\
+> +	"	.option push\n"							\
+> +	"	.option arch,-c\n"						\
+> +	"	sw %0, 0(%1)\n"							\
+> +	"	.option pop\n"							\
+> +	: : "r" (value), "r" (ptr) : "memory");					\
+> +} while (0)
+> +
+> +static void pagefault_trap_handler(struct pt_regs *regs)
+> +{
+> +	if (READ_ONCE(clear_sdt))
+> +		local_dlbtrp_disable();
+> +
+> +	if (READ_ONCE(double_trap)) {
+> +		WRITE_ONCE(double_trap, false);
+> +		GEN_TRAP();
+> +	}
+> +
+> +	/* Skip trapping instruction */
+> +	regs->epc += 4;
+> +
+> +	local_dlbtrp_enable();
+> +}
+> +
+> +static bool sse_dbltrp_called;
+> +
+> +static void sse_dbltrp_handler(void *data, struct pt_regs *regs, unsigned int hartid)
+> +{
+> +	struct sbiret ret;
+> +	unsigned long flags;
+> +	unsigned long expected_flags = SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP |
+> +				       SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SDT;
+> +
+> +	ret = sbi_sse_read_attrs(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP, SBI_SSE_ATTR_INTERRUPTED_FLAGS, 1,
+> +				 &flags);
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "Get double trap event flags");
+> +	report(flags == expected_flags, "SSE flags == 0x%lx", expected_flags);
+> +
+> +	WRITE_ONCE(sse_dbltrp_called, true);
+> +
+> +	/* Skip trapping instruction */
+> +	regs->epc += 4;
+> +}
+> +
+> +static int sse_double_trap(void)
+> +{
+> +	struct sbiret ret;
+> +	int err = 0;
+> +
+> +	struct sbi_sse_handler_arg handler_arg = {
+> +		.handler = sse_dbltrp_handler,
+> +		.stack = alloc_page() + PAGE_SIZE,
+> +	};
+> +
+> +	report_prefix_push("sse");
+> +
+> +	ret = sbi_sse_hart_unmask();
+> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE hart unmask ok")) {
+> +		report_skip("Failed to unmask SSE events, skipping test");
+> +		goto out_free_page;
+> +	}
+> +
+> +	ret = sbi_sse_register(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP, &handler_arg);
+> +	if (ret.error == SBI_ERR_NOT_SUPPORTED) {
+> +		report_skip("SSE double trap event is not supported");
+> +		goto out_mask_sse;
+> +	}
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap register");
+> +
+> +	ret = sbi_sse_enable(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
+> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap enable"))
+> +		goto out_unregister;
+> +
+> +	/*
+> +	 * Generate a double crash so that an SSE event should be generated. The SPEC (ISA nor SBI)
+> +	 * does not explicitly tell that if supported it should generate an SSE event but that's
+> +	 * a reasonable assumption to do so if both FWFT and SSE are supported.
+> +	 */
+> +	WRITE_ONCE(clear_sdt, false);
+> +	WRITE_ONCE(double_trap, true);
+> +	GEN_TRAP();
+> +
+> +	report(READ_ONCE(sse_dbltrp_called), "SSE double trap event generated");
+> +
+> +	ret = sbi_sse_disable(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap disable");
+> +
+> +out_unregister:
+> +	ret = sbi_sse_unregister(SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP);
+> +	if (!sbiret_report_error(&ret, SBI_SUCCESS, "SSE double trap unregister"))
+> +		err = ret.error;
+> +
+> +out_mask_sse:
+> +	sbi_sse_hart_mask();
+> +
+> +out_free_page:
+> +	free_page(handler_arg.stack - PAGE_SIZE);
+> +	report_prefix_pop();
+> +
+> +	return err;
+> +}
+> +
+> +static void check_double_trap(void)
+> +{
+> +	struct sbiret ret;
+> +
+> +	/* Disable double trap */
+> +	ret = sbi_fwft_set(SBI_FWFT_DOUBLE_TRAP, 0, 0);
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "Set double trap enable feature value == 0");
+> +	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
+> +	sbiret_report(&ret, SBI_SUCCESS, 0, "Get double trap enable feature value == 0");
+> +
+> +	install_exception_handler(EXC_STORE_PAGE_FAULT, pagefault_trap_handler);
+> +
+> +	WRITE_ONCE(clear_sdt, true);
+> +	WRITE_ONCE(double_trap, true);
+> +	GEN_TRAP();
+> +	report_pass("Double trap disabled, trap first time ok");
+> +
+> +	/* Enable double trap */
+> +	ret = sbi_fwft_set(SBI_FWFT_DOUBLE_TRAP, 1, 0);
+> +	sbiret_report_error(&ret, SBI_SUCCESS, "Set double trap enable feature value == 1");
+> +	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
+> +	if (!sbiret_report(&ret, SBI_SUCCESS, 1, "Get double trap enable feature value == 1"))
+> +		return;
+> +
+> +	/* First time, clear the double trap flag (SDT) so that it doesn't generate a double trap */
+> +	WRITE_ONCE(clear_sdt, true);
+> +	WRITE_ONCE(double_trap, true);
+> +
+> +	GEN_TRAP();
+> +	report_pass("Trapped twice allowed ok");
+> +
+> +	if (sbi_probe(SBI_EXT_SSE)) {
+> +		if (sse_double_trap()) {
+> +			report_skip("Could not correctly unregister SSE event, skipping last test");
+> +			return;
+> +		}
+> +	} else {
+> +		report_skip("SSE double trap event will not be tested, extension is not available");
+> +	}
+> +
+> +	if (!env_or_skip("DOUBLE_TRAP_TEST_CRASH"))
+> +		return;
+> +
+> +	/*
+> +	 * Third time, keep the double trap flag (SDT) and generate another trap, this should
+> +	 * generate a double trap. Since there is no SSE handler registered, it should crash to
+> +	 * M-mode.
+> +	 */
+> +	WRITE_ONCE(clear_sdt, false);
+> +	WRITE_ONCE(double_trap, true);
+> +	report_info("Should generate a double trap and crash!");
+> +	GEN_TRAP();
+> +	report_fail("Should have crashed!");
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	struct sbiret ret;
+> +
+> +	report_prefix_push("dbltrp");
+> +
+> +	if (!sbi_probe(SBI_EXT_FWFT)) {
+> +		report_skip("FWFT extension is not available, can not enable double traps");
+> +		goto out;
+> +	}
+> +
+> +	ret = sbi_fwft_get(SBI_FWFT_DOUBLE_TRAP);
+> +	if (ret.error == SBI_ERR_NOT_SUPPORTED) {
+> +		report_skip("SBI_FWFT_DOUBLE_TRAP is not supported!");
+> +		goto out;
+> +	}
+> +
+> +	if (sbiret_report_error(&ret, SBI_SUCCESS, "SBI_FWFT_DOUBLE_TRAP get value"))
+> +		check_double_trap();
+> +
+> +out:
+> +	report_prefix_pop();
+> +
+> +	return report_summary();
+> +}
+> diff --git a/riscv/unittests.cfg b/riscv/unittests.cfg
+> index 2eb760ec..286e1cc7 100644
+> --- a/riscv/unittests.cfg
+> +++ b/riscv/unittests.cfg
+> @@ -18,3 +18,7 @@ groups = selftest
+>  file = sbi.flat
+>  smp = $MAX_SMP
+>  groups = sbi
+> +
+> +[dbltrp]
+> +file = isa-dbltrp.flat
+> +groups = isa sbi
+
 
