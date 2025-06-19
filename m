@@ -1,174 +1,198 @@
-Return-Path: <kvm+bounces-49959-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49960-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6E36AE0205
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 11:49:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67C51AE020D
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 11:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64DC83AAFB9
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 09:48:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0610D4A0039
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 09:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC72822127B;
-	Thu, 19 Jun 2025 09:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA8822127B;
+	Thu, 19 Jun 2025 09:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MUlOBaun"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D33F21C161;
-	Thu, 19 Jun 2025 09:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA34220F5C;
+	Thu, 19 Jun 2025 09:50:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750326539; cv=none; b=akyi6YgP/KYHKEXWFnKx7ke2/E1uV/BVJJx+hq16XGIr57mHalVnYiFsPUpu0ptTzctbCEUprBhiep+ScjzeDlDC7TSoOJuret2XF4yGHwx6C51BrQNf56MNifKqiQ+A43Oq8CMF3oCzqon0ZI3f9hciY+XCuwq+H/0s+plet/U=
+	t=1750326606; cv=none; b=S7LX+AOxs3IfBq99K/VVA+Fm75II8vbd8d4/YqQyObyU3i9C2G0V5rZ7ugTwY5NuILZ7u3ih5eYEB/7slW/qO0XhAYO7TjGcvi3/JyV0wjQx2aG8elQBG7GCzzvYIM+Ba9fQkORnbximt37Mc2bL8FsKq8f/z0DdWfkReo/EVGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750326539; c=relaxed/simple;
-	bh=pQaQfvfkymPyxbo/McQRSxkUjty96tFS2NmlDh7MURs=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=DcRK7kMwZOmchl8qvJHZ0gNaNPWT/LYYzJnxYP40Ru8DWLRdCRYi/E/iSZPVqha+NMV9tzl01qaR67mhtIMsCzqS0kF7uiQvxo4XID4oJbST/qHmXDxjUlnN17N2IkOF56zeH1pIra5OpabkYa4fSosz1GQ2o2pPbYlSBlUE57M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8AxnOL93FNoCr4ZAQ--.23424S3;
-	Thu, 19 Jun 2025 17:48:45 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMBxLsf33FNoCe8gAQ--.38807S3;
-	Thu, 19 Jun 2025 17:48:41 +0800 (CST)
-Subject: Re: [PATCH v3 9/9] LoongArch: KVM: INTC: Add address alignment check
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
- Xianglai Li <lixianglai@loongson.cn>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20250611014651.3042734-1-maobibo@loongson.cn>
- <20250611015145.3042884-1-maobibo@loongson.cn>
- <CAAhV-H6Eru5e6+_i+4DY9qwshibY43hjbS-QC-fhLD04-4mOGw@mail.gmail.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <189ff8c8-2a34-770c-9a0f-8d99b46884dc@loongson.cn>
-Date: Thu, 19 Jun 2025 17:47:14 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1750326606; c=relaxed/simple;
+	bh=0vDuxYtZQxMHLMyV7Fv6kyC0eDbvjTX2Uthi/5EmmbE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=IUi5QXvPuF/t5RtRdS6mv9ecYlyMM3QwbVdzX98f9VCiKXg29YZ4bSVHE5mwuBQptNf9qNGbmOKnAbotRlKr+xTyyY8BZV7fIb7ttP0yjbS4WKNKpRx1fJwRhkx5O8ZPtpd4MoehzwoArm03i1GpKdE4KZ1wQ/tMbAeZo9wqQTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MUlOBaun; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750326604; x=1781862604;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=0vDuxYtZQxMHLMyV7Fv6kyC0eDbvjTX2Uthi/5EmmbE=;
+  b=MUlOBaunB2DJEmV/ISEyG72okwgQZqYnyd0MXbyjxlRjJoRXs9LTdG5m
+   P8v4rvwW25icPhF5cXl8kgkZ54TzdeEtHgVunf0ecvnIpPMGCGebRtTQS
+   humMEPBFK1zI4vbo0jDmmMR5p/AzYyLQ2qtZWhnreqZnPT6zTUq/FUYAA
+   lm+FY9OaMF2T6e+Xm2nxSHrxMvp3q81O8YQ5rhLTTOzFw5a+mM2ZRvyK9
+   slcfZ3e//X9qwoqXQm7aTyTVwxvKxf2815PzeEkgtBWrdCDUMciz3/r4s
+   n71e5+OvJvY8qrM3G4BlXQG0fvNj4PmiV9n1Xyx/kpwaGBpWTmiHBaT+Y
+   A==;
+X-CSE-ConnectionGUID: yspTpFoXRu2EqWvWP4V1rw==
+X-CSE-MsgGUID: qEmKo79QSt+cA7OyArWlvA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11468"; a="62845794"
+X-IronPort-AV: E=Sophos;i="6.16,248,1744095600"; 
+   d="scan'208";a="62845794"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 02:50:04 -0700
+X-CSE-ConnectionGUID: 5YNH3rbDRX+bpMvim0FPzw==
+X-CSE-MsgGUID: 0ElUZ+sbQVuiATdt8kiskQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,248,1744095600"; 
+   d="scan'208";a="150153819"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 02:49:43 -0700
+Message-ID: <df01a89c-2510-4301-9841-de51c9062d7d@intel.com>
+Date: Thu, 19 Jun 2025 17:49:40 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H6Eru5e6+_i+4DY9qwshibY43hjbS-QC-fhLD04-4mOGw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 00/51] 1G page support for guest_memfd
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+ linux-fsdevel@vger.kernel.org, aik@amd.com, ajones@ventanamicro.com,
+ akpm@linux-foundation.org, amoorthy@google.com, anthony.yznaga@oracle.com,
+ anup@brainfault.org, aou@eecs.berkeley.edu, bfoster@redhat.com,
+ binbin.wu@linux.intel.com, brauner@kernel.org, catalin.marinas@arm.com,
+ chao.p.peng@intel.com, chenhuacai@kernel.org, dave.hansen@intel.com,
+ david@redhat.com, dmatlack@google.com, dwmw@amazon.co.uk,
+ erdemaktas@google.com, fan.du@intel.com, fvdl@google.com, graf@amazon.com,
+ haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
+ ira.weiny@intel.com, isaku.yamahata@intel.com, jack@suse.cz,
+ james.morse@arm.com, jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com,
+ jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
+ jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
+ kent.overstreet@linux.dev, kirill.shutemov@intel.com,
+ liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
+ mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
+ michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
+ nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
+ palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
+ pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
+ pgonda@google.com, pvorel@suse.cz, qperret@google.com,
+ quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
+ quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com, quic_tsoni@quicinc.com,
+ richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com,
+ roypat@amazon.co.uk, rppt@kernel.org, seanjc@google.com, shuah@kernel.org,
+ steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com,
+ tabba@google.com, thomas.lendacky@amd.com, usama.arif@bytedance.com,
+ vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
+ vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
+ willy@infradead.org, yilun.xu@intel.com, yuzenghui@huawei.com,
+ zhiquan1.li@intel.com
+References: <cover.1747264138.git.ackerleytng@google.com>
+ <aFPGlAGEPzxlxM5g@yzhao56-desk.sh.intel.com>
+ <d15bfdc8-e309-4041-b4c7-e8c3cdf78b26@intel.com>
+ <9b55acfa-688e-49da-9599-f35aee351e3d@intel.com>
+ <aFPYLM8U7GhCKkRC@yzhao56-desk.sh.intel.com>
+ <30965147-24af-4dc8-aec4-781ea401a3a9@intel.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMBxLsf33FNoCe8gAQ--.38807S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxXr43Wry7uw43Kr1DXFy3Jrc_yoW5Ww48pr
-	WUAFs8ua1rZry7X3sxtwn0g3WjqwsYgF1UZry7tFWS9F4rZF17JryrC3yYvFyjka4ftF40
-	qF4Yqrn3uF45t3cCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27wAqx4
-	xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v2
-	6r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67
-	vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc4
-	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
-	xVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-	1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU24SoDUUU
-	U
+In-Reply-To: <30965147-24af-4dc8-aec4-781ea401a3a9@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 6/19/2025 5:45 PM, Xiaoyao Li wrote:
+> On 6/19/2025 5:28 PM, Yan Zhao wrote:
+>> On Thu, Jun 19, 2025 at 05:18:44PM +0800, Xiaoyao Li wrote:
+>>> On 6/19/2025 4:59 PM, Xiaoyao Li wrote:
+>>>> On 6/19/2025 4:13 PM, Yan Zhao wrote:
+>>>>> On Wed, May 14, 2025 at 04:41:39PM -0700, Ackerley Tng wrote:
+>>>>>> Hello,
+>>>>>>
+>>>>>> This patchset builds upon discussion at LPC 2024 and many guest_memfd
+>>>>>> upstream calls to provide 1G page support for guest_memfd by taking
+>>>>>> pages from HugeTLB.
+>>>>>>
+>>>>>> This patchset is based on Linux v6.15-rc6, and requires the mmap 
+>>>>>> support
+>>>>>> for guest_memfd patchset (Thanks Fuad!) [1].
+>>>>>>
+>>>>>> For ease of testing, this series is also available, stitched 
+>>>>>> together,
+>>>>>> at
+>>>>>> https://github.com/googleprodkernel/linux-cc/tree/gmem-1g-page-
+>>>>>> support-rfc-v2
+>>>>> Just to record a found issue -- not one that must be fixed.
+>>>>>
+>>>>> In TDX, the initial memory region is added as private memory during
+>>>>> TD's build
+>>>>> time, with its initial content copied from source pages in shared 
+>>>>> memory.
+>>>>> The copy operation requires simultaneous access to both shared
+>>>>> source memory
+>>>>> and private target memory.
+>>>>>
+>>>>> Therefore, userspace cannot store the initial content in shared
+>>>>> memory at the
+>>>>> mmap-ed VA of a guest_memfd that performs in-place conversion
+>>>>> between shared and
+>>>>> private memory. This is because the guest_memfd will first unmap a
+>>>>> PFN in shared
+>>>>> page tables and then check for any extra refcount held for the
+>>>>> shared PFN before
+>>>>> converting it to private.
+>>>>
+>>>> I have an idea.
+>>>>
+>>>> If I understand correctly, the KVM_GMEM_CONVERT_PRIVATE of in-place
+>>>> conversion unmap the PFN in shared page tables while keeping the 
+>>>> content
+>>>> of the page unchanged, right?
+>> However, whenever there's a GUP in TDX to get the source page, there 
+>> will be an
+>> extra page refcount.
+> 
+> The GUP in TDX happens after the gmem converts the page to private.
 
+May it's not GUP since the page has been unmapped from userspace? (Sorry 
+that I'm not familiar with the terminology)
 
-On 2025/6/19 下午4:47, Huacai Chen wrote:
-> Hi, Bibo,
+> In the view of TDX, the physical page is converted to private already 
+> and it contains the initial content. But the content is not usable for 
+> TDX until TDX calls in-place PAGE.ADD
 > 
-> On Wed, Jun 11, 2025 at 9:51 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>> So KVM_GMEM_CONVERT_PRIVATE can be used to initialize the private 
+>>>> memory
+>>>> actually for non-CoCo case actually, that userspace first mmap() it and
+>>>> ensure it's shared and writes the initial content to it, after it
+>>>> userspace convert it to private with KVM_GMEM_CONVERT_PRIVATE.
+>> The conversion request here will be declined therefore.
 >>
->> IOCSR instruction supports 1/2/4/8 bytes access, the address should
->> be naturally aligned with its access size. Here address alignment
->> check is added in eiointc kernel emulation.
 >>
->> At the same time len must be 1/2/4/8 bytes from iocsr exit emulation
->> function kvm_emu_iocsr(), remove the default case in switch case
->> statements.
-> Robust code doesn't depend its callers do things right, so I suggest
-> keeping the default case, which means we just add the alignment check
-> here.
-ok, will keep the default case.
+>>>> For CoCo case, like TDX, it can hook to KVM_GMEM_CONVERT_PRIVATE if it
+>>>> wants the private memory to be initialized with initial content, and
+>>>> just do in-place TDH.PAGE.ADD in the hook.
+>>>
+>>> And maybe a new flag for KVM_GMEM_CONVERT_PRIVATE for user space to
+>>> explicitly request that the page range is converted to private and the
+>>> content needs to be retained. So that TDX can identify which case 
+>>> needs to
+>>> call in-place TDH.PAGE.ADD.
+>>>
 > 
-> And I think this patch should also Cc stable and add a Fixes tag.
-ok, will add Cc stabe and Fixes tag.
-
-Regards
-Bibo Mao
 > 
-> 
-> Huacai
-> 
->>
->> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->> ---
->>   arch/loongarch/kvm/intc/eiointc.c | 21 +++++++++++++--------
->>   1 file changed, 13 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/loongarch/kvm/intc/eiointc.c b/arch/loongarch/kvm/intc/eiointc.c
->> index 8b0d9376eb54..4e9d12300cc4 100644
->> --- a/arch/loongarch/kvm/intc/eiointc.c
->> +++ b/arch/loongarch/kvm/intc/eiointc.c
->> @@ -311,6 +311,12 @@ static int kvm_eiointc_read(struct kvm_vcpu *vcpu,
->>                  return -EINVAL;
->>          }
->>
->> +       /* len must be 1/2/4/8 from function kvm_emu_iocsr() */
->> +       if (addr & (len - 1)) {
->> +               kvm_err("%s: eiointc not aligned addr %llx len %d\n", __func__, addr, len);
->> +               return -EINVAL;
->> +       }
->> +
->>          vcpu->stat.eiointc_read_exits++;
->>          spin_lock_irqsave(&eiointc->lock, flags);
->>          switch (len) {
->> @@ -323,12 +329,9 @@ static int kvm_eiointc_read(struct kvm_vcpu *vcpu,
->>          case 4:
->>                  ret = loongarch_eiointc_readl(vcpu, eiointc, addr, val);
->>                  break;
->> -       case 8:
->> +       default:
->>                  ret = loongarch_eiointc_readq(vcpu, eiointc, addr, val);
->>                  break;
->> -       default:
->> -               WARN_ONCE(1, "%s: Abnormal address access: addr 0x%llx, size %d\n",
->> -                                               __func__, addr, len);
->>          }
->>          spin_unlock_irqrestore(&eiointc->lock, flags);
->>
->> @@ -682,6 +685,11 @@ static int kvm_eiointc_write(struct kvm_vcpu *vcpu,
->>                  return -EINVAL;
->>          }
->>
->> +       if (addr & (len - 1)) {
->> +               kvm_err("%s: eiointc not aligned addr %llx len %d\n", __func__, addr, len);
->> +               return -EINVAL;
->> +       }
->> +
->>          vcpu->stat.eiointc_write_exits++;
->>          spin_lock_irqsave(&eiointc->lock, flags);
->>          switch (len) {
->> @@ -694,12 +702,9 @@ static int kvm_eiointc_write(struct kvm_vcpu *vcpu,
->>          case 4:
->>                  ret = loongarch_eiointc_writel(vcpu, eiointc, addr, val);
->>                  break;
->> -       case 8:
->> +       default:
->>                  ret = loongarch_eiointc_writeq(vcpu, eiointc, addr, val);
->>                  break;
->> -       default:
->> -               WARN_ONCE(1, "%s: Abnormal address access: addr 0x%llx, size %d\n",
->> -                                               __func__, addr, len);
->>          }
->>          spin_unlock_irqrestore(&eiointc->lock, flags);
->>
->> --
->> 2.39.3
->>
 
 
