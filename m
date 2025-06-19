@@ -1,223 +1,255 @@
-Return-Path: <kvm+bounces-49984-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49985-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA2AFAE09D5
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 17:10:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8648FAE0AE2
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 17:50:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A892D177E0F
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 15:10:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 259E53AFB42
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 15:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664FE28BA8D;
-	Thu, 19 Jun 2025 15:08:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369A5286D47;
+	Thu, 19 Jun 2025 15:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="k3XeU4OP";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="VThi5RVb";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="k3XeU4OP";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="VThi5RVb"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Bw9meWho"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEF528B7DF
-	for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 15:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E57C11712;
+	Thu, 19 Jun 2025 15:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750345716; cv=none; b=De0KuzNvCdZZyciImksRxBWe6Z6soT7ke65yVmge9ZfvVk7/DrBiNKpdbf5k2DNNQDl4UeRLOxw49jWds1L4OoqY6LJYmRp+0kzxMBsFVLQmQJ1xZzMdJQ/JHt++c4YZQnvJIlx8cWLqRK4buSs3nI5SolB1kTRzHmd2k+YC4rg=
+	t=1750348238; cv=none; b=iWZtD/OdWeumqlWR0mft6fF6IdHutxaap7ZrIjUZlXzXfJ+9tmNDkMPakXo7C4CMCkEtsC8Hp+J/UNKKtUvJZKI9KHK4IokmMFtoIJ26QvyG26O3cxeonsZNVGCrct69jr2JhsePnaskP8d44Q3ljjTq2zIYGq4dzGVvmRtSkoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750345716; c=relaxed/simple;
-	bh=LH1skCzN1FBjrg7tuf36knFIeVgnK6zDMLpGrFaW+eA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fJUlG18IqNlRiElxlPa2u/kkYHWDP8sxoO3EyWgfzuqjA6kpf7/rf9F7wQykvgUrR5jIxz24SE5ocvhnmbNFsq3Ro/9nHIU/5kXL0DYsJoJbgiSyTHU2lsQKSbjxefHV+mNDQICzmBl/0ybxKe5KiEqduN9gApBe8XXe+xj7Vlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=k3XeU4OP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=VThi5RVb; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=k3XeU4OP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=VThi5RVb; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 103BB1F7BE;
-	Thu, 19 Jun 2025 15:08:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750345713; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=X9caHoEImhQ4X+R73f52ETtWf6t/yscAmRC4hn8PReQ=;
-	b=k3XeU4OPjQR8ZyZOhlQTJkJ6ve5ye9NZ4UT+MHIBaqez6y44P6spQFvIFKFbUbtW/cYKsj
-	LFWMrYOt5QdP+s+FIL5VZQUwb8wmkql+RChQhcqJwczsRucNnb596kBRw/Z2JoQPFUZz6V
-	z0dTKPwuMhuVRCUJ48o8GjJOJip8P3Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750345713;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=X9caHoEImhQ4X+R73f52ETtWf6t/yscAmRC4hn8PReQ=;
-	b=VThi5RVbENw5YtUJij9MY6T3JP1P71xKAcL6A0gSdXVQ1L+VpR7JpEoFKBCeQoq23Bi5SS
-	4o6iCCDQECFp2zDQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1750345713; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=X9caHoEImhQ4X+R73f52ETtWf6t/yscAmRC4hn8PReQ=;
-	b=k3XeU4OPjQR8ZyZOhlQTJkJ6ve5ye9NZ4UT+MHIBaqez6y44P6spQFvIFKFbUbtW/cYKsj
-	LFWMrYOt5QdP+s+FIL5VZQUwb8wmkql+RChQhcqJwczsRucNnb596kBRw/Z2JoQPFUZz6V
-	z0dTKPwuMhuVRCUJ48o8GjJOJip8P3Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1750345713;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=X9caHoEImhQ4X+R73f52ETtWf6t/yscAmRC4hn8PReQ=;
-	b=VThi5RVbENw5YtUJij9MY6T3JP1P71xKAcL6A0gSdXVQ1L+VpR7JpEoFKBCeQoq23Bi5SS
-	4o6iCCDQECFp2zDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9E12913721;
-	Thu, 19 Jun 2025 15:08:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id NWRDJvAnVGjmLQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Thu, 19 Jun 2025 15:08:32 +0000
-Message-ID: <7f917d34-5724-41ff-b904-0ad4598db3b3@suse.cz>
-Date: Thu, 19 Jun 2025 17:08:32 +0200
+	s=arc-20240116; t=1750348238; c=relaxed/simple;
+	bh=OKsVibEkSv+hfR4J2CvdJJEcDJm0d1G4pRgyEnSM5co=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jl7Lg0aSc3Hn76/ad1gysn6TqUz78OB+LvHeJRH2jdv4ZaIBPt4e7FC99MT+CKHF0IZtvdxiAOE9lf2sCfDURdByTBAnPkss0cYRkqSKAcT7qJcrJe+jAt+kOJ/P9FtZpUvWBR2aWQCzLiUosRs93rirtEsln/qw7UDxHlHZZi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Bw9meWho; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=OKsVibEkSv+hfR4J2CvdJJEcDJm0d1G4pRgyEnSM5co=; b=Bw9meWhos1tgAIc+K/544bWYY7
+	TSrs4qSCCLwK/G59yXQbgmv2lmkCuMkvZxk0hrTtkOpznc9r9pAlYHynY14uNOPuXmJB9OwLNvUcI
+	elmJR9YNWGf2mKdlNASMm/a1xOeU4qwTD53xc4HCErLoupHHCLNV6sLfS/JKHukPTXn8u0Ne2c922
+	zlvIs92esqPKGhjpXeteV0mf8YVWXMzWxaR7TBu4Qc6iFEwFrNIuSf9SW1Pvh6LVrFCB9HWPqvWkI
+	NBuMIBtV0y3/yxRkY0iNJMEu8uJCBtlNxR6m78RVbQ/tXU7Yly1mqDneI+6opUUl0VPDw/pix9OXz
+	zQZno7uA==;
+Received: from [2001:8b0:10b:5:748f:d833:d81c:4c8f] (helo=u09cd745991455d.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uSHX4-00000009LhR-2ep8;
+	Thu, 19 Jun 2025 15:50:30 +0000
+Message-ID: <b1db820e965996b4d236caf15736162f161223e6.camel@infradead.org>
+Subject: Re: [RFC PATCH 00/34] Running Qualcomm's Gunyah Guests via KVM in
+ EL1
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marc Zyngier <maz@kernel.org>, Karim Manaouil
+ <karim.manaouil@linaro.org>,  Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, Alexander Graf <graf@amazon.com>, Alex Elder
+ <elder@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba
+ <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>, Jonathan Corbet
+ <corbet@lwn.net>, Mark Brown <broonie@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Prakruthi
+ Deepak Heragu <quic_pheragu@quicinc.com>, Quentin Perret
+ <qperret@google.com>, Rob Herring <robh@kernel.org>,  Srinivas Kandagatla
+ <srini@kernel.org>, Srivatsa Vaddagiri <quic_svaddagi@quicinc.com>, Will
+ Deacon <will@kernel.org>, Haripranesh S <haripran@qti.qualcomm.com>, Carl
+ van Schaik <cvanscha@qti.qualcomm.com>, Murali Nalajala
+ <mnalajal@quicinc.com>,  Sreenivasulu Chalamcharla
+ <sreeniva@qti.qualcomm.com>, Trilok Soni <tsoni@quicinc.com>, Stefan
+ Schmidt <stefan.schmidt@linaro.org>
+Date: Thu, 19 Jun 2025 16:50:29 +0100
+In-Reply-To: <86ikmtjy51.wl-maz@kernel.org>
+References: <20250424141341.841734-1-karim.manaouil@linaro.org>
+	 <aApaGnFPhsWBZoQ2@linux.dev> <86ikmtjy51.wl-maz@kernel.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-8oYh6WC82njjqP/La6PW"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v8 3/7] mm/filemap: Add mempolicy support to the
- filemap layer
-Content-Language: en-US
-To: Shivank Garg <shivankg@amd.com>, seanjc@google.com, david@redhat.com,
- willy@infradead.org, akpm@linux-foundation.org, shuah@kernel.org,
- pbonzini@redhat.com, brauner@kernel.org, viro@zeniv.linux.org.uk
-Cc: ackerleytng@google.com, paul@paul-moore.com, jmorris@namei.org,
- serge@hallyn.com, pvorel@suse.cz, bfoster@redhat.com, tabba@google.com,
- vannapurve@google.com, chao.gao@intel.com, bharata@amd.com, nikunj@amd.com,
- michael.day@amd.com, yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com,
- thomas.lendacky@amd.com, michael.roth@amd.com, aik@amd.com, jgg@nvidia.com,
- kalyazin@amazon.com, peterx@redhat.com, jack@suse.cz, rppt@kernel.org,
- hch@infradead.org, cgzones@googlemail.com, ira.weiny@intel.com,
- rientjes@google.com, roypat@amazon.co.uk, ziy@nvidia.com,
- matthew.brost@intel.com, joshua.hahnjy@gmail.com, rakie.kim@sk.com,
- byungchul@sk.com, gourry@gourry.net, kent.overstreet@linux.dev,
- ying.huang@linux.alibaba.com, apopple@nvidia.com, chao.p.peng@intel.com,
- amit@infradead.org, ddutile@redhat.com, dan.j.williams@intel.com,
- ashish.kalra@amd.com, gshan@redhat.com, jgowans@amazon.com,
- pankaj.gupta@amd.com, papaluri@amd.com, yuzhao@google.com,
- suzuki.poulose@arm.com, quic_eberman@quicinc.com,
- aneeshkumar.kizhakeveetil@arm.com, linux-fsdevel@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- linux-security-module@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-coco@lists.linux.dev
-References: <20250618112935.7629-1-shivankg@amd.com>
- <20250618112935.7629-4-shivankg@amd.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- m6M14QORSWTLRg==
-In-Reply-To: <20250618112935.7629-4-shivankg@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCPT_COUNT_GT_50(0.00)[65];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,paul-moore.com,namei.org,hallyn.com,suse.cz,redhat.com,intel.com,amd.com,nvidia.com,amazon.com,kernel.org,infradead.org,googlemail.com,amazon.co.uk,gmail.com,sk.com,gourry.net,linux.dev,linux.alibaba.com,arm.com,quicinc.com,vger.kernel.org,kvack.org,lists.linux.dev];
-	MIME_TRACE(0.00)[0:+];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On 6/18/25 13:29, Shivank Garg wrote:
-> From: Shivansh Dhiman <shivansh.dhiman@amd.com>
-> 
-> Add NUMA mempolicy support to the filemap allocation path by introducing
-> new APIs that take a mempolicy argument:
-> - filemap_grab_folio_mpol()
-> - filemap_alloc_folio_mpol()
-> - __filemap_get_folio_mpol()
-> 
-> These APIs allow callers to specify a NUMA policy during page cache
-> allocations, enabling fine-grained control over memory placement. This is
-> particularly needed by KVM when using guest-memfd memory backends, where
-> the guest memory needs to be allocated according to the NUMA policy
-> specified by VMM.
-> 
-> The existing non-mempolicy APIs remain unchanged and continue to use the
-> default allocation behavior.
-> 
-> Signed-off-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
-> Co-developed-by: Shivank Garg <shivankg@amd.com>
-> Signed-off-by: Shivank Garg <shivankg@amd.com>
 
-I think __filemap_get_folio() could become a static inline wrapper for
-__filemap_get_folio_mpol in pagemap.h.
-Otherwise,
+--=-8oYh6WC82njjqP/La6PW
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
+On Thu, 2025-04-24 at 17:57 +0100, Marc Zyngier wrote:
+> On Thu, 24 Apr 2025 16:34:50 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> >=20
+> > On Thu, Apr 24, 2025 at 03:13:07PM +0100, Karim Manaouil wrote:
+> > > This series introduces the capability of running Gunyah guests via KV=
+M on
+> > > Qualcomm SoCs shipped with Gunyah hypervisor [1] (e.g. RB3 Gen2).
+> > >=20
+> > > The goal of this work is to port the existing Gunyah hypervisor suppo=
+rt from a
+> > > standalone driver interface [2] to KVM, with the aim of leveraging as=
+ much of the
+> > > existing KVM infrastructure as possible to reduce duplication of effo=
+rt around
+> > > memory management (e.g. guest_memfd), irqfd, and other core component=
+s.
+> > >=20
+> > > In short, Gunyah is a Type-1 hypervisor, meaning that it runs indepen=
+dently of any
+> > > high-level OS kernel such as Linux and runs in a higher CPU privilege=
+ level than VMs.
+> > > Gunyah is shipped as firmware and guests typically talk with Gunyah v=
+ia hypercalls.
+> > > KVM is designed to run as Type-2 hypervisor. This port allows KVM to =
+run in EL1 and
+> > > serve as the interface for VM lifecycle management,while offloading v=
+irtualization
+> > > to Gunyah.
+> >=20
+> > If you're keen on running your own hypervisor then I'm sorry, you get t=
+o
+> > deal with it soup to nuts. Other hypervisors (e.g. mshv) have their own
+> > kernel drivers for managing the host / UAPI parts of driving VMs.
+> >=20
+> > The KVM arch interface is *internal* to KVM, not something to be
+> > (ab)used for cramming in a non-KVM hypervisor. KVM and other hypervisor=
+s
+> > can still share other bits of truly common infrastructure, like
+> > guest_memfd.
+> >=20
+> > I understand the value in what you're trying to do, but if you want it
+> > to smell like KVM you may as well just let the user run it at EL2.
+>=20
+> +1. KVM is not a generic interface for random third party hypervisors.
 
+I don't think that should be true in the general case. At least, it
+depends on whether you mean the literal implementation in
+arch/arm64/kvm/ vs. the userspace API and set of ioctls on /dev/kvm.
+
+The kernel exists to provide a coherent userspace API for all kinds of
+hardware. That's what it's *for*. It provides users with a consistent
+interface to all kinds of network cards, serial ports, etc. =E2=80=94 and t=
+hat
+includes firmware/platform features too.=20
+
+There's no reason that shouldn't be the same for virtualisation. If the
+kernel cannot provide an API which supports *all* kinds of
+virtualization, then it seems like we've done something wrong.
+
+On x86 we have /dev/kvm backed by different vendor-specific support for
+Intel vs. AMD. And in recent years we've retrofitted confidential
+compute to it too, with SEV-SNP, TDX, etc.
+
+We haven't resorted to saying "no, sorry, KVM doesn't support that".
+
+We shouldn't say that for Arm either.
+
+
+--=-8oYh6WC82njjqP/La6PW
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDYxOTE1NTAy
+OVowLwYJKoZIhvcNAQkEMSIEII/fZn4RSpkWjs+K1CouaBN+lFLTetGT/HGblcvfb9w1MGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAZF3UeKEp1fX1
+qb4qMwFxPp240pSrWPJnjtAd+C45wLNgy0rvxM4a/SoZW03xflK6K8Fl2sIaPepLERERF9k/SLN+
+sGKrsSCE0JHDTjq9lRalv1UHVEgnrQe9JaVa/2Jcu33rllcOv0y0v+h8xuhyEY4JoqwCwsfh2RS/
+USZn9vxQnGeHPMJrQf/+avyLlRhzalNkQKst0yavMILRv7dtNS3yZifd0zWKDbka2nLfGRASnDks
+dYRXre7Ya2jJ2HT330wE+IzCUaFxW9jVr9Cs0+ODC5NreKR7ZIfmx+/9nak7UDPY2mcArLtOEjE4
+xr0q0POAiRD76lBIZxaUir34RsV+JesrNyvTOA5Ev0X2uGiSSgcJdESLKwdePjEWbUJL+ypcCHGY
+hr7pzpHQ11iGqk8P3pX2y/kMGk1Q2RTScOpGUB0kZsR3KpH5Dlfwi8e9oikKP4dDYgq86D5lXQlr
+yNT/iOP4fEtLYBDYePqZkgXLuECgWM6R1/91np3XXQKMa0YBiRMsbm4YUcpBQFExMtSyWVLXF7dS
+pdWKfJqV3UFbFsXf7UKtLLcxmnxSaDA69q4aJG+2zoYgTz07rJT2+KKi1DWTIeezUQIVoeegb+Ln
+gxTTxHkByue0WwZXarUb40fMbnMLt3JKR42IXHV74n6fslQNv5kwC9rDvP/Kj/gAAAAAAAA=
+
+
+--=-8oYh6WC82njjqP/La6PW--
 
