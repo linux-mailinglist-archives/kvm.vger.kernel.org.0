@@ -1,109 +1,132 @@
-Return-Path: <kvm+bounces-49978-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35788AE060F
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 14:37:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C86ACAE0631
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 14:49:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC57B189958D
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 12:36:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7402617F8E1
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 12:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1F2242D63;
-	Thu, 19 Jun 2025 12:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440E8241CB2;
+	Thu, 19 Jun 2025 12:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c1Y/hTGy"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="jzF6xH9v"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E21023E33D;
-	Thu, 19 Jun 2025 12:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DB222F75B
+	for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 12:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750336569; cv=none; b=mGTMSG3BuA2psz81howi1myt+3/ZGiCxuIKCgeiqakQ6b4ML5Z9Trs/RFwuzwdnhs6iuSYVBcHpvroHceRRNIab1Kysl3PLMv3/ICw86JGagQdn9S1soV773tPahiH7lGIA2swbRleIM68pETmvQnBc1MDHwMw4ng4VDwyqq0zg=
+	t=1750337355; cv=none; b=MHAkGw2paxhlnVPasDcSORfzX/LCBEPBPxGTZaU8i2fu+RXGhrt00o8kn214v4x8b3yn1NER8/UQe6KU2DcAb1+1ZoL0zMyvv55mIz/k+3VErRwRLprYx346LzC3eLS5KuCmj53IRxbLXh69bwN100L5AAWN8CQQ7T6LMJ5Tkdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750336569; c=relaxed/simple;
-	bh=/VJpImzxCawSJoEGcFeP8vUU7BIQ4dI0KhLFtoTx7bc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IXrzHpB/P8PIjbN/a4UWqyAzgBdHRBAGVz/Yic35gb1cIpiOPrXDKhVP8MKpT1Zo9EVSUE9jvhu+RdvT0lbwJSvnWGgHp2zgtAR6MD62YZpjbsSPNtKwflb62tzby6A4Cx9ameXzr2L7lVBsqw/Qe+Kov+raQG4rnaTEVdjz9/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c1Y/hTGy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E63BAC4CEEF;
-	Thu, 19 Jun 2025 12:36:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750336568;
-	bh=/VJpImzxCawSJoEGcFeP8vUU7BIQ4dI0KhLFtoTx7bc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c1Y/hTGyqUZJGUEUZUgtVqR3Lm17+BC5/oGuq7U0MY9mRxFOpx8TksxBQFWzwj+wt
-	 jEy76Nl7yxYCsizm6p1ACyoakPYuXbaHyea8vjawdVUwUEXB67cLo2mywRNSRPnZZR
-	 jLvvtZc3noD9GTNNvl/P2i9D4sEs9Glcc1Hos1IRliawpbMyMzUncJM2dRGOg1R+wi
-	 WDyRAmJPSXOpjxL5i1hijcLxC1hQjvyrbcSxVaD0s8v3p9iR2sytHkUnZOi7d/HRBt
-	 0JzkIRCsINQ33XXUgJXpOXUCnrVVnQMN3OBk33vSIgVcw/c7e0wtYxln1z+nKqk7J2
-	 Hp79FJ1Q3IldQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1uSEUw-008Fdk-8C;
-	Thu, 19 Jun 2025 13:36:06 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+	s=arc-20240116; t=1750337355; c=relaxed/simple;
+	bh=CQ1Ynby7HjlrMEtuy9V+AUygvAtb7qYcvRXtArHF/QU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aw4Vj795gmcgjzUoG+C4xVU0rl+Q1CXAnRgJ7oIJhJfcat0DcINwA9zrqz+v+IevXHHOOdWBevTTRnKoSzHUujlYbjk29VzghLyho8qG9i96GYkBQRF0ZPAI418iVi9HK5yZUBOtNSMLkvsMBuSTYLAF5t2Y5Yh14RiffUOcRVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=jzF6xH9v; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-235ea292956so8360855ad.1
+        for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 05:49:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1750337353; x=1750942153; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6Q/lJ+JUjVVRbd58/OtFVRAYdVLmgcDw+VEZqa5SvKA=;
+        b=jzF6xH9vCWfwFKWOtxVQdhTOu+g3pZR1iqe5t5kR0vHkDbJSSQJYcoSbEBqBHruEjP
+         a7DBA0/MBpqPzLdEmDGe9+C9gYq1c7UIQv3iZ/wiSxNNA7COg6/J82p1GzGDhDK3LU6N
+         Kl0CGfabEuH0PjtDzhXg2eH06M9J8LqMb+c7FOfoRpQQ9DAg2eROuj028soRdZTZf2z4
+         MPVIfc1Y7qCwj2wFxIjimjnBQzZlFalzBrbKzsIhLMLSusPNT4bnyCYRxE4ncMUsNZ9+
+         IaF3YFGevQkKsVu+naUS+AjcM6UgpriTM5beTFK2+g5xd7oe17l7q+4Qxa77sNinob2s
+         4hrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750337353; x=1750942153;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6Q/lJ+JUjVVRbd58/OtFVRAYdVLmgcDw+VEZqa5SvKA=;
+        b=r/Cg5+cNuINoiVDXUcG6yajalOFmISGS+lD7A96l+/oyA+OV5Taz6z7hzDc0PVZeyJ
+         +Me4bzukd0DjEKjMUHY0BwhEWlucYVJeGZHb6WMFH2z87EDtnrQKbFXafGhmJ+4bUdw7
+         oc7eB9ppOBviwtQDhdfbcTlTB6Td9SIzJA8t8wHW+INE0JvLdCtDQ5zE1cRn5w3xfSHY
+         WUgWWDxdhi11TF57nPKGbTju5mIhVmXm6P4bncoY7QgbFNCQDJufVwldg4nQ/T7b99Iq
+         R/pbyvSk1R+Ft+ajb82wb4Pbdsnc3USx+m1o9GeH9T2VXSKXBRuLr5jZi90OV8DYQCtT
+         hU+A==
+X-Forwarded-Encrypted: i=1; AJvYcCUBQ9g6OQVxBxUzFvrjVwcECwtKh48gZRUURlSE63e2ThmM+Ky/WWgUfxO6heSbeR/SMxw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzM9TlMphhRqRbCAcDfyX3dFkrU1ji/vZ0Yo6XFaHpAd/LkRodN
+	+SbI3LXl6taAXJt+s/3/QuwMZ+PRUO85MXLMX9CJTytyCh718BZp/fNQmUQxFJSlzK0b8G7OtCA
+	PvV9m
+X-Gm-Gg: ASbGncsPX9AstG8ePaF9fc5gLCsD54FE+gtpuHdiSjqLPzLrAV4sVBkNStsJGWBJIEg
+	Ip4tvtSFOMu9wLUgm3/R9FBKuo768/T5bpUhLOCBTss+mm+ers7LGys6u4mvnM8U+AiZOGxQ9Zd
+	rhGob0CI5fdt617cSQTRyRvRxhROi5TKjTSN7N8kY0y0JX0ZX2hlL5phQT0xu6uS03kIgQAzEtu
+	Y6oReL5vmqoz9MDjEsQcmzyBtbdnsLDy2rPgTRVLooxERUQ3Rg2O4LYbD8VD35as1es/7EgBV89
+	bK5nrEnO/Hg1hCqmo4+M43JYXpjGnkIu+5t2hfax73y/ipLDMxFpm1Ll16Giy27GY3JxMVWoAM/
+	9w3FK+ytpDLdY7w==
+X-Google-Smtp-Source: AGHT+IH69LtPDdAgrBovWhMgrSjTEeMKCzKN63Bmw3qGTAGNPNoBSMtG8u3ZPMyzGP1TzYebG5OJzw==
+X-Received: by 2002:a17:902:d50e:b0:235:1706:2002 with SMTP id d9443c01a7336-2366aeff7a1mr337959005ad.0.1750337353103;
+        Thu, 19 Jun 2025 05:49:13 -0700 (PDT)
+Received: from localhost.localdomain ([203.208.189.11])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d8a5b4bsm119579195ad.54.2025.06.19.05.49.09
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 19 Jun 2025 05:49:12 -0700 (PDT)
+From: lizhe.67@bytedance.com
+To: jgg@ziepe.ca
+Cc: akpm@linux-foundation.org,
+	alex.williamson@redhat.com,
+	david@redhat.com,
 	kvm@vger.kernel.org,
-	iommu@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
-	Sairaj Kodilkar <sarunkod@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Francesco Lavra <francescolavra.fl@gmail.com>,
-	David Matlack <dmatlack@google.com>
-Subject: Re: (subset) [PATCH v3 01/62] KVM: arm64: Explicitly treat routing entry type changes as changes
-Date: Thu, 19 Jun 2025 13:36:02 +0100
-Message-Id: <175033652435.3069576.5168060744496766238.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250611224604.313496-3-seanjc@google.com>
-References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-3-seanjc@google.com>
+	linux-mm@kvack.org,
+	lizhe.67@bytedance.com,
+	peterx@redhat.com
+Subject: Re: [PATCH v4 2/3] gup: introduce unpin_user_folio_dirty_locked()
+Date: Thu, 19 Jun 2025 20:49:04 +0800
+Message-ID: <20250619124906.47505-1-lizhe.67@bytedance.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250619123504.GA1643390@ziepe.ca>
+References: <20250619123504.GA1643390@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, pbonzini@redhat.com, joro@8bytes.org, dwmw2@infradead.org, baolu.lu@linux.intel.com, seanjc@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, sarunkod@amd.com, vasant.hegde@amd.com, mlevitsk@redhat.com, joao.m.martins@oracle.com, francescolavra.fl@gmail.com, dmatlack@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 11 Jun 2025 15:45:04 -0700, Sean Christopherson wrote:
-> Explicitly treat type differences as GSI routing changes, as comparing MSI
-> data between two entries could get a false negative, e.g. if userspace
-> changed the type but left the type-specific data as-
+On Thu, 19 Jun 2025 09:35:04 -0300, jgg@ziepe.ca wrote:
+ 
+> On Thu, Jun 19, 2025 at 05:05:42PM +0800, lizhe.67@bytedance.com wrote:
 > 
-> Note, the same bug was fixed in x86 by commit bcda70c56f3e ("KVM: x86:
-> Explicitly treat routing entry type changes as changes").
+> > As I understand it, there seem to be some issues with this
+> > implementation. How can we obtain the value of dma->has_reserved
+> > (acquiring it within vfio_pin_pages_remote() might be a good option)
 > 
-> [...]
+> Yes, you record it during vfio_pin_pages operations. If VFIO call
+> iommu_map on something that went down the non-GUP path then it sets
+> the flag.
+> 
+> > and ensure that this value remains unchanged from the time of
+> > assignment until we perform the unpin operation? 
+> 
+> Map/unmap are paired and not allowed to race so that isn't an issue.
+> 
+> > I've searched through the code and it appears that there are
+> > instances where SetPageReserved() is called outside of the
+> > initialization phase.  Please correct me if I am wrong.
+> 
+> It should not be relevant here, pages under use by VFIO are not
+> permitted to change it will break things.
 
-Applied to fixes, thanks!
+Then this approach appears to be no problem, and there’s no need to
+introduce any new interfaces. All modifications remain internal to
+vfio. I’ll send out a v5 patch based on this approach.
 
-[01/62] KVM: arm64: Explicitly treat routing entry type changes as changes
-        commit: 1fbe6861a6d9a942fb8ab8677ddf1ecb86b1af60
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Thanks,
+Zhe
 
