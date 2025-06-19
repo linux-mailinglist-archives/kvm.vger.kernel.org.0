@@ -1,132 +1,152 @@
-Return-Path: <kvm+bounces-49979-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49980-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C86ACAE0631
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 14:49:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 171E9AE066B
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 15:01:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7402617F8E1
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 12:49:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F0B2189163B
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 13:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440E8241CB2;
-	Thu, 19 Jun 2025 12:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBF323E35B;
+	Thu, 19 Jun 2025 13:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="jzF6xH9v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMa7OvsJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DB222F75B
-	for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 12:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E66012B94;
+	Thu, 19 Jun 2025 13:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750337355; cv=none; b=MHAkGw2paxhlnVPasDcSORfzX/LCBEPBPxGTZaU8i2fu+RXGhrt00o8kn214v4x8b3yn1NER8/UQe6KU2DcAb1+1ZoL0zMyvv55mIz/k+3VErRwRLprYx346LzC3eLS5KuCmj53IRxbLXh69bwN100L5AAWN8CQQ7T6LMJ5Tkdo=
+	t=1750338073; cv=none; b=EG1EVvSP7Hyjo6cYRqs8aH0XM83LkRnuIz0x7vwZAFdPcUC5T1AKZyNvDbcipBiXIO0XMWL9Pv3SMyRCtR1TgZpv2TSZ4Ft0Fp6t2m/7e6uw/zZnkidQoHXPgiy1T7DFJ+D2ZE5Rmfh9eLVya948DwJG5YOO3+7Sqihi8FgMpD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750337355; c=relaxed/simple;
-	bh=CQ1Ynby7HjlrMEtuy9V+AUygvAtb7qYcvRXtArHF/QU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aw4Vj795gmcgjzUoG+C4xVU0rl+Q1CXAnRgJ7oIJhJfcat0DcINwA9zrqz+v+IevXHHOOdWBevTTRnKoSzHUujlYbjk29VzghLyho8qG9i96GYkBQRF0ZPAI418iVi9HK5yZUBOtNSMLkvsMBuSTYLAF5t2Y5Yh14RiffUOcRVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=jzF6xH9v; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-235ea292956so8360855ad.1
-        for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 05:49:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1750337353; x=1750942153; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6Q/lJ+JUjVVRbd58/OtFVRAYdVLmgcDw+VEZqa5SvKA=;
-        b=jzF6xH9vCWfwFKWOtxVQdhTOu+g3pZR1iqe5t5kR0vHkDbJSSQJYcoSbEBqBHruEjP
-         a7DBA0/MBpqPzLdEmDGe9+C9gYq1c7UIQv3iZ/wiSxNNA7COg6/J82p1GzGDhDK3LU6N
-         Kl0CGfabEuH0PjtDzhXg2eH06M9J8LqMb+c7FOfoRpQQ9DAg2eROuj028soRdZTZf2z4
-         MPVIfc1Y7qCwj2wFxIjimjnBQzZlFalzBrbKzsIhLMLSusPNT4bnyCYRxE4ncMUsNZ9+
-         IaF3YFGevQkKsVu+naUS+AjcM6UgpriTM5beTFK2+g5xd7oe17l7q+4Qxa77sNinob2s
-         4hrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750337353; x=1750942153;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6Q/lJ+JUjVVRbd58/OtFVRAYdVLmgcDw+VEZqa5SvKA=;
-        b=r/Cg5+cNuINoiVDXUcG6yajalOFmISGS+lD7A96l+/oyA+OV5Taz6z7hzDc0PVZeyJ
-         +Me4bzukd0DjEKjMUHY0BwhEWlucYVJeGZHb6WMFH2z87EDtnrQKbFXafGhmJ+4bUdw7
-         oc7eB9ppOBviwtQDhdfbcTlTB6Td9SIzJA8t8wHW+INE0JvLdCtDQ5zE1cRn5w3xfSHY
-         WUgWWDxdhi11TF57nPKGbTju5mIhVmXm6P4bncoY7QgbFNCQDJufVwldg4nQ/T7b99Iq
-         R/pbyvSk1R+Ft+ajb82wb4Pbdsnc3USx+m1o9GeH9T2VXSKXBRuLr5jZi90OV8DYQCtT
-         hU+A==
-X-Forwarded-Encrypted: i=1; AJvYcCUBQ9g6OQVxBxUzFvrjVwcECwtKh48gZRUURlSE63e2ThmM+Ky/WWgUfxO6heSbeR/SMxw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzM9TlMphhRqRbCAcDfyX3dFkrU1ji/vZ0Yo6XFaHpAd/LkRodN
-	+SbI3LXl6taAXJt+s/3/QuwMZ+PRUO85MXLMX9CJTytyCh718BZp/fNQmUQxFJSlzK0b8G7OtCA
-	PvV9m
-X-Gm-Gg: ASbGncsPX9AstG8ePaF9fc5gLCsD54FE+gtpuHdiSjqLPzLrAV4sVBkNStsJGWBJIEg
-	Ip4tvtSFOMu9wLUgm3/R9FBKuo768/T5bpUhLOCBTss+mm+ers7LGys6u4mvnM8U+AiZOGxQ9Zd
-	rhGob0CI5fdt617cSQTRyRvRxhROi5TKjTSN7N8kY0y0JX0ZX2hlL5phQT0xu6uS03kIgQAzEtu
-	Y6oReL5vmqoz9MDjEsQcmzyBtbdnsLDy2rPgTRVLooxERUQ3Rg2O4LYbD8VD35as1es/7EgBV89
-	bK5nrEnO/Hg1hCqmo4+M43JYXpjGnkIu+5t2hfax73y/ipLDMxFpm1Ll16Giy27GY3JxMVWoAM/
-	9w3FK+ytpDLdY7w==
-X-Google-Smtp-Source: AGHT+IH69LtPDdAgrBovWhMgrSjTEeMKCzKN63Bmw3qGTAGNPNoBSMtG8u3ZPMyzGP1TzYebG5OJzw==
-X-Received: by 2002:a17:902:d50e:b0:235:1706:2002 with SMTP id d9443c01a7336-2366aeff7a1mr337959005ad.0.1750337353103;
-        Thu, 19 Jun 2025 05:49:13 -0700 (PDT)
-Received: from localhost.localdomain ([203.208.189.11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2365d8a5b4bsm119579195ad.54.2025.06.19.05.49.09
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 19 Jun 2025 05:49:12 -0700 (PDT)
-From: lizhe.67@bytedance.com
-To: jgg@ziepe.ca
-Cc: akpm@linux-foundation.org,
-	alex.williamson@redhat.com,
-	david@redhat.com,
+	s=arc-20240116; t=1750338073; c=relaxed/simple;
+	bh=/kE+YFpl0J9ThQUvmELPjh8cJ/+9gC716KmHUlheWRU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mpUpJxwad5EzhDUQSW5iGnMzx0L22LhjluxGrSNByKClAp0VIfW2mbg3OdjpzsnN8ZEBl3S7bP1b4Xx1eK3bFIlnzIgjS7dKF8Fzp2IFJecEEXL4kFEZImvm5xvnvpxkfc3Q3+tPKwkJyRLN52QFSE4IlH+CcCAHyRU9z6hndd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kMa7OvsJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DAF3C4CEEA;
+	Thu, 19 Jun 2025 13:01:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750338072;
+	bh=/kE+YFpl0J9ThQUvmELPjh8cJ/+9gC716KmHUlheWRU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=kMa7OvsJYPpiI18LMM7gfqrPAVBmJ9s4dXxtORIasVECRmDh6RULdsK+Bwc2oVQWG
+	 t6i1DTJFn+6CD7ktY4HGc9rOHW05ih3ofAYbuCZEe1GdPOmqASK4AX1FDVNjDMI4k+
+	 0BV+Rc7hIYgmCH3F7Cq2LcSxphJz5J2uJ443Pa6qxIxVlL6nDO8/73/Cp+fk6Dvfm3
+	 VcLVWoT5g9ZRQ3rBeeKkkB8zAb3iK9V6Qx5Qp3/uJ2yF4cUxsJ88JxZYOhMJ9q7sOj
+	 leVn0OeIhztcC77Itmtl8qnOELWcEoaM07yV8ZMRsh2vJPoFmIvOf1BTsAwJq7oVJa
+	 c0DkbXPTXdBdw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1uSEtC-008G3W-Dh;
+	Thu, 19 Jun 2025 14:01:10 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Sean Christopherson <seanjc@google.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	lizhe.67@bytedance.com,
-	peterx@redhat.com
-Subject: Re: [PATCH v4 2/3] gup: introduce unpin_user_folio_dirty_locked()
-Date: Thu, 19 Jun 2025 20:49:04 +0800
-Message-ID: <20250619124906.47505-1-lizhe.67@bytedance.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250619123504.GA1643390@ziepe.ca>
-References: <20250619123504.GA1643390@ziepe.ca>
+	linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes, take #3
+Date: Thu, 19 Jun 2025 14:00:49 +0100
+Message-Id: <20250619130049.3133524-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, catalin.marinas@arm.com, tabba@google.com, broonie@kernel.org, mark.rutland@arm.com, miguel.luis@oracle.com, oliver.upton@linux.dev, seanjc@google.com, sebott@redhat.com, r09922117@csie.ntu.edu.tw, will@kernel.org, yuzenghui@huawei.com, joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 19 Jun 2025 09:35:04 -0300, jgg@ziepe.ca wrote:
- 
-> On Thu, Jun 19, 2025 at 05:05:42PM +0800, lizhe.67@bytedance.com wrote:
-> 
-> > As I understand it, there seem to be some issues with this
-> > implementation. How can we obtain the value of dma->has_reserved
-> > (acquiring it within vfio_pin_pages_remote() might be a good option)
-> 
-> Yes, you record it during vfio_pin_pages operations. If VFIO call
-> iommu_map on something that went down the non-GUP path then it sets
-> the flag.
-> 
-> > and ensure that this value remains unchanged from the time of
-> > assignment until we perform the unpin operation? 
-> 
-> Map/unmap are paired and not allowed to race so that isn't an issue.
-> 
-> > I've searched through the code and it appears that there are
-> > instances where SetPageReserved() is called outside of the
-> > initialization phase.  Please correct me if I am wrong.
-> 
-> It should not be relevant here, pages under use by VFIO are not
-> permitted to change it will break things.
+Paolo,
 
-Then this approach appears to be no problem, and there’s no need to
-introduce any new interfaces. All modifications remain internal to
-vfio. I’ll send out a v5 patch based on this approach.
+Here's the third set of KVM/arm64 fixes for 6.16. The most notable
+thing is yet another batch of FP/SVE fixes from Mark, this time
+addressing NV, and additionally plugging some missing synchronisation.
+The rest is a mix of interrupt stuff (routing change, mishandling of
+shadow LRs) and selftest fixes.
 
-Thanks,
-Zhe
+Please pull,
+
+	M.
+
+The following changes since commit e04c78d86a9699d136910cfc0bdcf01087e3267e:
+
+  Linux 6.16-rc2 (2025-06-15 13:49:41 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.16-3
+
+for you to fetch changes up to 04c5355b2a94ff3191ce63ab035fb7f04d036869:
+
+  KVM: arm64: VHE: Centralize ISBs when returning to host (2025-06-19 13:34:59 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.16, take #3
+
+- Fix another set of FP/SIMD/SVE bugs affecting NV, and plugging some
+  missing synchronisation
+
+- A small fix for the irqbypass hook fixes, tightening the check and
+  ensuring that we only deal with MSI for both the old and the new
+  route entry
+
+- Rework the way the shadow LRs are addressed in a nesting
+  configuration, plugging an embarrassing bug as well as simplifying
+  the whole process
+
+- Add yet another fix for the dreaded arch_timer_edge_cases selftest
+
+----------------------------------------------------------------
+Marc Zyngier (1):
+      KVM: arm64: nv: Fix tracking of shadow list registers
+
+Mark Rutland (7):
+      KVM: arm64: VHE: Synchronize restore of host debug registers
+      KVM: arm64: VHE: Synchronize CPTR trap deactivation
+      KVM: arm64: Reorganise CPTR trap manipulation
+      KVM: arm64: Remove ad-hoc CPTR manipulation from fpsimd_sve_sync()
+      KVM: arm64: Remove ad-hoc CPTR manipulation from kvm_hyp_handle_fpsimd()
+      KVM: arm64: Remove cpacr_clear_set()
+      KVM: arm64: VHE: Centralize ISBs when returning to host
+
+Sean Christopherson (1):
+      KVM: arm64: Explicitly treat routing entry type changes as changes
+
+Zenghui Yu (1):
+      KVM: arm64: selftests: Close the GIC FD in arch_timer_edge_cases
+
+ arch/arm64/include/asm/kvm_emulate.h               |  62 ---------
+ arch/arm64/include/asm/kvm_host.h                  |   6 +-
+ arch/arm64/kvm/arm.c                               |   3 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h            | 147 +++++++++++++++++++--
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |   5 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c                   |  59 ---------
+ arch/arm64/kvm/hyp/vhe/switch.c                    | 107 ++-------------
+ arch/arm64/kvm/vgic/vgic-v3-nested.c               |  81 ++++++------
+ .../selftests/kvm/arm64/arch_timer_edge_cases.c    |  16 ++-
+ 9 files changed, 215 insertions(+), 271 deletions(-)
 
