@@ -1,175 +1,200 @@
-Return-Path: <kvm+bounces-49936-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49937-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D44FADFD0C
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 07:37:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0A78ADFD37
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 07:49:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AF9F3B30EF
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 05:37:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8711F5A0DCA
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 05:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F81242D70;
-	Thu, 19 Jun 2025 05:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1656624466F;
+	Thu, 19 Jun 2025 05:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OR4cAjwN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IjXP7rVJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF7B23A9A0;
-	Thu, 19 Jun 2025 05:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3271D555;
+	Thu, 19 Jun 2025 05:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750311442; cv=none; b=fXF8fCht2AjwwYcAwmoet3Nsai7kPz8r/65NbwkutmXrv6ZKUN5DQnTTaoC0LtpPjJqvPKmG/Mb0lEUdAFdN0xa/+AphjpAyPagpFWNjTHExNMpcYyCU/o6/CuItWGNycZVy9Aznk1bF8OZDs2vPGzyu4O+MabNmpJOUl9abwtc=
+	t=1750312089; cv=none; b=oq0JgNzCGIZ/fMUtE8amNhkEGH3zcm3D+SyVDr9ghaNBRCNH5OjIqCnSH1VprF/v/HNLZlx/Kc6PLafUeJFsoF/IvjhHGuMbmJ2NFTspv1k+cfgEw3HE5jfR2ua/ahkYK/juegqkzXiHzun9j4KOIgRf5Iqmf0W2/sQcI6xYyxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750311442; c=relaxed/simple;
-	bh=CGFYslQlYW28b83jtPiXInTX2NXpIKy71b9x3BZGqSo=;
+	s=arc-20240116; t=1750312089; c=relaxed/simple;
+	bh=naO5r0xMIhdjbn0oOa+SVmj9KjDZ5worxHK7bSVntUk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cl73Or3TKF5pQ5jqJohW5YDN/2spIyeAlhP4C8nizWtC8gjP5bQizJ/2TI173XD1ZQoknQmcd0CSrftRq0X1pKLNK77pYJAlhkn4jiO9air1oVPKkLf0hKb8Tf0MZ6sppE/hihSzukB4AYPTBBhT7PfmgQpAxNiB2R+7lDszRpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OR4cAjwN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6FBCC4CEEA;
-	Thu, 19 Jun 2025 05:36:52 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QxtyFKOdauKgdqpLWbLmvxuGG6gOxa+SqNfWe2mTDxq9zpJBL4YO8FiO4obmJYPPiUVp135wH5/xxar2Mrh92sZ0byZn9WDG86+D8SwpudeQOGYSEuZHTCxIuU4SSuTORp3sP9qlMhQM9eXAeAGmjJfChkN7b+4I7fxmpK8Nxsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IjXP7rVJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DCB9C4CEEA;
+	Thu, 19 Jun 2025 05:47:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750311441;
-	bh=CGFYslQlYW28b83jtPiXInTX2NXpIKy71b9x3BZGqSo=;
+	s=k20201202; t=1750312088;
+	bh=naO5r0xMIhdjbn0oOa+SVmj9KjDZ5worxHK7bSVntUk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OR4cAjwNo5wTYjgFpDC06vgMwWeVUlDkFt6P/PrdIsZc5cizAUV5QN+ZwbHohDycZ
-	 HH2zoU0ftohWLkRwMQPyWPT2yndJWQXBzxp/1gZr7g030cH8ZxL0HQ1JHMRBxp6ZjE
-	 SQPIypgESqrDheTs8P8q9DJn3McibdDMY2/uUr1gUkLHGsU0FougmgKnk3EfFahcMf
-	 8p7SPvWyq3QrtydLEZxp4Oxsj1UW5n40m7AwrSCbw5w75WS8tfHRMoihWOSxlptPA+
-	 vM9CP6m8PKGUQJqIrLZaK5IzpuhToHZ1dJIGPZLoV6QiyX8K01e1OVQOqDSOb5AXkr
-	 GQmKqnw4EifCw==
-Date: Thu, 19 Jun 2025 08:36:48 +0300
+	b=IjXP7rVJ7AZnRuppJyLrpp5E8Fh+t+2oljLVnWBBBSn/d1vR0eGIWRYGA9tuTPZxk
+	 1WjJMU7H0LqXwDq8R0BlorxkYnEHHHlDMoVIzC4TN0b7sC1cULh3G+MWJHwVH7xkz9
+	 tCPMfdyKM5V0i4bvNc7Nmlusq60gK1you1vNrbR0OMNiLtHUI3nfQN0juBAxkHM6/o
+	 ts+aKMfmoW7KUXQXeNQG3kObJpnfs/6SAEy+ZvEIdSUbOESxfPgslyESbzwTawbWW0
+	 0p+BbIlpITQh6XRqByB/6dGMmYRgJ3In9Qc8ufkd7ZoKCLwjJIVuYBHy37Sjo6Og4z
+	 FW+uh64HrHsSA==
+Date: Thu, 19 Jun 2025 08:47:46 +0300
 From: Mike Rapoport <rppt@kernel.org>
-To: Shivank Garg <shivankg@amd.com>
-Cc: Ira Weiny <ira.weiny@intel.com>, Paul Moore <paul@paul-moore.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-fsdevel@vger.kernel.org, aik@amd.com, ajones@ventanamicro.com,
-	akpm@linux-foundation.org, amoorthy@google.com,
-	anthony.yznaga@oracle.com, anup@brainfault.org,
-	aou@eecs.berkeley.edu, bfoster@redhat.com,
-	binbin.wu@linux.intel.com, brauner@kernel.org,
-	catalin.marinas@arm.com, chao.p.peng@intel.com,
-	chenhuacai@kernel.org, dave.hansen@intel.com, david@redhat.com,
-	dmatlack@google.com, dwmw@amazon.co.uk, erdemaktas@google.com,
-	fan.du@intel.com, fvdl@google.com, graf@amazon.com,
-	haibo1.xu@intel.com, hch@infradead.org, hughd@google.com,
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com,
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com,
-	jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com,
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com,
-	kent.overstreet@linux.dev, kirill.shutemov@intel.com,
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
-	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net,
-	michael.roth@amd.com, mpe@ellerman.id.au, muchun.song@linux.dev,
-	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev,
-	palmer@dabbelt.com, pankaj.gupta@amd.com, paul.walmsley@sifive.com,
-	pbonzini@redhat.com, pdurrant@amazon.co.uk, peterx@redhat.com,
-	pgonda@google.com, pvorel@suse.cz, qperret@google.com,
-	quic_cvanscha@quicinc.com, quic_eberman@quicinc.com,
-	quic_mnalajal@quicinc.com, quic_pderrin@quicinc.com,
-	quic_pheragu@quicinc.com, quic_svaddagi@quicinc.com,
-	quic_tsoni@quicinc.com, richard.weiyang@gmail.com,
-	rick.p.edgecombe@intel.com, rientjes@google.com,
-	roypat@amazon.co.uk, seanjc@google.com, shuah@kernel.org,
-	steven.price@arm.com, steven.sistare@oracle.com,
-	suzuki.poulose@arm.com, tabba@google.com, thomas.lendacky@amd.com,
-	vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org,
-	willy@infradead.org, xiaoyao.li@intel.com, yan.y.zhao@intel.com,
-	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
-Subject: Re: [PATCH 1/2] fs: Provide function that allocates a secure
- anonymous inode
-Message-ID: <aFOh8N_rRdSi_Fbc@kernel.org>
-References: <cover.1748890962.git.ackerleytng@google.com>
- <c03fbe18c3ae90fb3fa7c71dc0ee164e6cc12103.1748890962.git.ackerleytng@google.com>
- <aD_8z4pd7JcFkAwX@kernel.org>
- <CAHC9VhQczhrVx4YEGbXbAS8FLi0jaV1RB0kb8e4rPsUOXYLqtA@mail.gmail.com>
- <aEEv-A1ot_t8ePgv@kernel.org>
- <CAHC9VhR3dKsXYAxY+1Ujr4weO=iBHMPHsJ3-8f=wM5q_oo81wA@mail.gmail.com>
- <68430497a6fbf_19ff672943@iweiny-mobl.notmuch>
- <647ab7a4-790f-4858-acf2-0f6bae5b7f99@amd.com>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S . Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Kees Cook <kees@kernel.org>, Peter Xu <peterx@redhat.com>,
+	David Hildenbrand <david@redhat.com>, Zi Yan <ziy@nvidia.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+	Xu Xin <xu.xin16@zte.com.cn>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Hugh Dickins <hughd@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>, Rik van Riel <riel@surriel.com>,
+	Harry Yoo <harry.yoo@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, John Hubbard <jhubbard@nvidia.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>, Jann Horn <jannh@google.com>,
+	Pedro Falcato <pfalcato@suse.de>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Qi Zheng <zhengqi.arch@bytedance.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-sgx@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	nvdimm@lists.linux.dev, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] use vm_flags_t consistently
+Message-ID: <aFOkguMF3QJpr4VA@kernel.org>
+References: <cover.1750274467.git.lorenzo.stoakes@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <647ab7a4-790f-4858-acf2-0f6bae5b7f99@amd.com>
+In-Reply-To: <cover.1750274467.git.lorenzo.stoakes@oracle.com>
 
-On Mon, Jun 16, 2025 at 06:30:09PM +0530, Shivank Garg wrote:
+On Wed, Jun 18, 2025 at 08:42:51PM +0100, Lorenzo Stoakes wrote:
+> The VMA flags field vma->vm_flags is of type vm_flags_t. Right now this is
+> exactly equivalent to unsigned long, but it should not be assumed to be.
 > 
+> Much code that references vma->vm_flags already correctly uses vm_flags_t,
+> but a fairly large chunk of code simply uses unsigned long and assumes that
+> the two are equivalent.
 > 
-> On 6/6/2025 8:39 PM, Ira Weiny wrote:
-> > Paul Moore wrote:
-> >> On Thu, Jun 5, 2025 at 1:50 AM Mike Rapoport <rppt@kernel.org> wrote:
-> >>>
-> >>> secretmem always had S_PRIVATE set because alloc_anon_inode() clears it
-> >>> anyway and this patch does not change it.
-> >>
-> >> Yes, my apologies, I didn't look closely enough at the code.
-> >>
-> >>> I'm just thinking that it makes sense to actually allow LSM/SELinux
-> >>> controls that S_PRIVATE bypasses for both secretmem and guest_memfd.
-> >>
-> >> It's been a while since we added the anon_inode hooks so I'd have to
-> >> go dig through the old thread to understand the logic behind marking
-> >> secretmem S_PRIVATE, especially when the
-> >> anon_inode_make_secure_inode() function cleared it.  It's entirely
-> >> possible it may have just been an oversight.
+> This series corrects that and has us use vm_flags_t consistently.
+> 
+> This series is motivated by the desire to, in a future series, adjust
+> vm_flags_t to be a u64 regardless of whether the kernel is 32-bit or 64-bit
+> in order to deal with the VMA flag exhaustion issue and avoid all the
+> various problems that arise from it (being unable to use certain features
+> in 32-bit, being unable to add new flags except for 64-bit, etc.)
+> 
+> This is therefore a critical first step towards that goal. At any rate,
+> using the correct type is of value regardless.
+> 
+> We additionally take the opportunity to refer to VMA flags as vm_flags
+> where possible to make clear what we're referring to.
+> 
+> Overall, this series does not introduce any functional change.
+> 
+> Lorenzo Stoakes (3):
+>   mm: change vm_get_page_prot() to accept vm_flags_t argument
+>   mm: update core kernel code to use vm_flags_t consistently
+>   mm: update architecture and driver code to use vm_flags_t
 
-anon_inode_make_secure_inode() was introduced when more than 10 versions of
-secretmem already were posted so it didn't jump at me to replace
-alloc_anon_inode() with anon_inode_make_secure_inode().
+For the series
+
+Acked-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
  
-> > I'm jumping in where I don't know what I'm talking about...
-> > 
-> > But my reading of the S_PRIVATE flag is that the memory can't be mapped by
-> > user space.  So for guest_memfd() we need !S_PRIVATE because it is
-> > intended to be mapped by user space.  So we want the secure checks.
-> > 
-> > I think secretmem is the same.
-
-Agree.
-
-> > Do I have that right?
+>  arch/arm/mm/fault.c                        |   2 +-
+>  arch/arm64/include/asm/mman.h              |  10 +-
+>  arch/arm64/mm/fault.c                      |   2 +-
+>  arch/arm64/mm/mmap.c                       |   2 +-
+>  arch/arm64/mm/mmu.c                        |   2 +-
+>  arch/powerpc/include/asm/book3s/64/pkeys.h |   3 +-
+>  arch/powerpc/include/asm/mman.h            |   2 +-
+>  arch/powerpc/include/asm/pkeys.h           |   4 +-
+>  arch/powerpc/kvm/book3s_hv_uvmem.c         |   2 +-
+>  arch/sparc/include/asm/mman.h              |   4 +-
+>  arch/sparc/mm/init_64.c                    |   2 +-
+>  arch/x86/kernel/cpu/sgx/encl.c             |   8 +-
+>  arch/x86/kernel/cpu/sgx/encl.h             |   2 +-
+>  arch/x86/mm/pgprot.c                       |   2 +-
+>  fs/exec.c                                  |   2 +-
+>  fs/userfaultfd.c                           |   2 +-
+>  include/linux/coredump.h                   |   2 +-
+>  include/linux/huge_mm.h                    |  12 +-
+>  include/linux/khugepaged.h                 |   4 +-
+>  include/linux/ksm.h                        |   4 +-
+>  include/linux/memfd.h                      |   4 +-
+>  include/linux/mm.h                         |  10 +-
+>  include/linux/mm_types.h                   |   2 +-
+>  include/linux/mman.h                       |   4 +-
+>  include/linux/pgtable.h                    |   2 +-
+>  include/linux/rmap.h                       |   4 +-
+>  include/linux/userfaultfd_k.h              |   4 +-
+>  include/trace/events/fs_dax.h              |   6 +-
+>  mm/debug.c                                 |   2 +-
+>  mm/execmem.c                               |   8 +-
+>  mm/filemap.c                               |   2 +-
+>  mm/gup.c                                   |   2 +-
+>  mm/huge_memory.c                           |   2 +-
+>  mm/hugetlb.c                               |   4 +-
+>  mm/internal.h                              |   4 +-
+>  mm/khugepaged.c                            |   4 +-
+>  mm/ksm.c                                   |   2 +-
+>  mm/madvise.c                               |   4 +-
+>  mm/mapping_dirty_helpers.c                 |   2 +-
+>  mm/memfd.c                                 |   8 +-
+>  mm/memory.c                                |   4 +-
+>  mm/mmap.c                                  |  16 +-
+>  mm/mprotect.c                              |   8 +-
+>  mm/mremap.c                                |   2 +-
+>  mm/nommu.c                                 |  12 +-
+>  mm/rmap.c                                  |   4 +-
+>  mm/shmem.c                                 |   6 +-
+>  mm/userfaultfd.c                           |  14 +-
+>  mm/vma.c                                   |  78 +++---
+>  mm/vma.h                                   |  16 +-
+>  mm/vmscan.c                                |   4 +-
+>  tools/testing/vma/vma.c                    | 266 ++++++++++-----------
+>  tools/testing/vma/vma_internal.h           |  12 +-
+>  53 files changed, 298 insertions(+), 297 deletions(-)
 > 
-> 
-> Hi Mike, Paul,
-> 
-> If I understand correctly,
-> we need to clear the S_PRIVATE flag for all secure inodes. The S_PRIVATE flag was previously
-> set for  secretmem (via alloc_anon_inode()), which caused security checks to be 
-> bypassed - this was unintentional since the original anon_inode_make_secure_inode() 
-> was already clearing it.
-> 
-> Both secretmem and guest_memfd create file descriptors
-> (memfd_create/kvm_create_guest_memfd)
-> so they should be subject to LSM/SELinux security policies rather than bypassing them with S_PRIVATE?
-> 
-> static struct inode *anon_inode_make_secure_inode(struct super_block *s,
-> 		const char *name, const struct inode *context_inode)
-> {
-> ...
-> 	/* Clear S_PRIVATE for all inodes*/
-> 	inode->i_flags &= ~S_PRIVATE;
-> ...
-> }
-> 
-> Please let me know if this conclusion makes sense?
-
-Yes, makes sense to me.
- 
-> Thanks,
-> Shivank
+> --
+> 2.49.0
 
 -- 
 Sincerely yours,
