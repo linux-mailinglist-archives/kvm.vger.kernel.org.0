@@ -1,168 +1,223 @@
-Return-Path: <kvm+bounces-49983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-49984-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 300C4AE0949
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 16:55:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA2AFAE09D5
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 17:10:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EF4716377C
-	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 14:55:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A892D177E0F
+	for <lists+kvm@lfdr.de>; Thu, 19 Jun 2025 15:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40E4F26F47D;
-	Thu, 19 Jun 2025 14:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664FE28BA8D;
+	Thu, 19 Jun 2025 15:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WexCz7SK"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="k3XeU4OP";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="VThi5RVb";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="k3XeU4OP";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="VThi5RVb"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1792923FC54
-	for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 14:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEF528B7DF
+	for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 15:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750344917; cv=none; b=hNWddERgqrJhvZowPYgH/SQMAZUUogirja3ARHLwrMisNYN3qoauNs1XFBtMcYz6S6H+OBsyaCBojPPBkrpi0oBYZhPfS+C/zeyQ0W3EMttoEvUhnmhFJM5OHu7StohMt3eBN5sctCbfb4bZt4976GJGXHfDtlzFV5lBTIRSCtc=
+	t=1750345716; cv=none; b=De0KuzNvCdZZyciImksRxBWe6Z6soT7ke65yVmge9ZfvVk7/DrBiNKpdbf5k2DNNQDl4UeRLOxw49jWds1L4OoqY6LJYmRp+0kzxMBsFVLQmQJ1xZzMdJQ/JHt++c4YZQnvJIlx8cWLqRK4buSs3nI5SolB1kTRzHmd2k+YC4rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750344917; c=relaxed/simple;
-	bh=lSpTfIEsz9+Pa1rTiqnA01KZPNUjGiqXdkwSBDLfJFY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RA2tveBP57gNE9JsJB2sDLD4wBi3hfWB0g4ehe/NBkkFitm9UrT5CbC5mFPrLa2uyBD0f3NceNb7vEGZ7MjCE5DFyWHfLnnX7TFvRgy/w2GKm4xKw6JznO7ALty8pi0htZRMzM+AcEWwE9jKAS9Bnxm1wskw+0bHEdgTA190CBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WexCz7SK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750344910;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+nIR3s6WyChuWWIwaj4SIlo+aTHkYFJ52GIb7pLAwAo=;
-	b=WexCz7SKhON+PQAsghwU36Bvq3uS+y/DvykHR0o89/vawugxx0D1oOPLQHjYMfR2PR4mG/
-	r6oulGBqZECBmFDuzj72UDMwvUw+SjzjZCg30ajv7YolCXRPDMcRvPKhiRllCCbJ5hw+TK
-	RD0ep771lP7mg/1Odu2YctpuyEPTWus=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-328-edzOMZcjNiyN8OyJE5jxfQ-1; Thu, 19 Jun 2025 10:55:06 -0400
-X-MC-Unique: edzOMZcjNiyN8OyJE5jxfQ-1
-X-Mimecast-MFC-AGG-ID: edzOMZcjNiyN8OyJE5jxfQ_1750344906
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7c760637fe5so133859985a.0
-        for <kvm@vger.kernel.org>; Thu, 19 Jun 2025 07:55:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750344906; x=1750949706;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+nIR3s6WyChuWWIwaj4SIlo+aTHkYFJ52GIb7pLAwAo=;
-        b=oOZzji6jLYIdKQRDuCTdp3uobpgn/NiNlQRZKhVbkp0aM4rvlamVfCXNIPxpyTMzrG
-         3t3ArwSIGyRmyXPepdeblm/K2CzRPf67VhBEwKX10UZg7M4LpqtAExPt4Ao01aeaOfVm
-         6YAcQe2PoeKSNtJQT54R7QJWrS5Qry9Tfa18v9GZhKDCNWwwwjHURFClU5mx8yEAm5M3
-         tTpE8mxbu1XS4SCH1X+Zp6uNYDMMxRGMTcXsTkCTKVEfIuSF8R8D6EyiMDhAziwl5pSw
-         hiMHxHdshOMv4kGPNc/K7Mo/w+L4iEC2ks2GkF1ToVZVfGIWYFKsAIEJWM1+TAhzyAQy
-         Oljg==
-X-Forwarded-Encrypted: i=1; AJvYcCUGGN8AcIK8dtE83++Pygsf+d6M2jwQJrzpk2eYH91xowXm4iGZsVfB8ndGcEYramt2QPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlGEoeSKsfZXRh//z9h1JeS9d44zYbAqTz7GuCxT/kBGGXDh2H
-	cTnBx4lVtw7QOG/dtC/XMqusX0IXK4p36nXuQA5KV3AOuUdriWtxgArPIemhNRLc+PPPobG47Jw
-	ihlz0hT59V0rRK1O7OE2/mZHKS1yncOXfCNHDul8X93GTLJdvuZlsAw==
-X-Gm-Gg: ASbGnctMjmO3G1a9dR/PnmZSGGhAjzjnWYbWQYb2DxQxZKeL+bzQ79QhclVroQcBwHn
-	vlCyBDxk1XqU+OauMcTUe3vcR0ruPC71UidtZd3YJYTBlqgFPqSEX5epNeYWkaVBRodbK5evk8U
-	BfnAW6cbr/YnK9BoSquMzSn3jeeHEld9weqC9fjwWnxD9AvaPd0ywvf97DtgCRrJEsjmoUWmLCI
-	0gQsOQB/PvvwgvFAKrDiZ5RiBOFwXLKzD66Hs79pp+21MTBXpo73b+e5aikP49XIjvw3gDLLXzB
-	RFZZ3kkBwvFamw==
-X-Received: by 2002:a05:620a:40cb:b0:7d0:97b1:bfa with SMTP id af79cd13be357-7d3c6c0d376mr3689365685a.8.1750344905706;
-        Thu, 19 Jun 2025 07:55:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHFzfYtvhWciWVVF5GyT6JlUpid1yuToLPfDm2d7WEu2TrPd8D0c+sMxu0V7+LQLYejLfKHqA==
-X-Received: by 2002:a05:620a:40cb:b0:7d0:97b1:bfa with SMTP id af79cd13be357-7d3c6c0d376mr3689362885a.8.1750344905302;
-        Thu, 19 Jun 2025 07:55:05 -0700 (PDT)
-Received: from x1.local ([85.131.185.92])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d3f8e5ac5esm4759385a.79.2025.06.19.07.55.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jun 2025 07:55:04 -0700 (PDT)
-Date: Thu, 19 Jun 2025 10:55:02 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kvm@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Zi Yan <ziy@nvidia.com>, Alex Mastro <amastro@fb.com>,
-	David Hildenbrand <david@redhat.com>,
-	Nico Pache <npache@redhat.com>
-Subject: Re: [PATCH 5/5] vfio-pci: Best-effort huge pfnmaps with !MAP_FIXED
- mappings
-Message-ID: <aFQkxg08fs7jwXnJ@x1.local>
-References: <20250613231657.GO1174925@nvidia.com>
- <aFCVX6ubmyCxyrNF@x1.local>
- <20250616230011.GS1174925@nvidia.com>
- <aFHWbX_LTjcRveVm@x1.local>
- <20250617231807.GD1575786@nvidia.com>
- <aFH76GjnWfeHI5fA@x1.local>
- <aFLvodROFN9QwvPp@x1.local>
- <20250618174641.GB1629589@nvidia.com>
- <aFMQZru7l2aKVsZm@x1.local>
- <20250619135852.GC1643312@nvidia.com>
+	s=arc-20240116; t=1750345716; c=relaxed/simple;
+	bh=LH1skCzN1FBjrg7tuf36knFIeVgnK6zDMLpGrFaW+eA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fJUlG18IqNlRiElxlPa2u/kkYHWDP8sxoO3EyWgfzuqjA6kpf7/rf9F7wQykvgUrR5jIxz24SE5ocvhnmbNFsq3Ro/9nHIU/5kXL0DYsJoJbgiSyTHU2lsQKSbjxefHV+mNDQICzmBl/0ybxKe5KiEqduN9gApBe8XXe+xj7Vlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=k3XeU4OP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=VThi5RVb; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=k3XeU4OP; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=VThi5RVb; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 103BB1F7BE;
+	Thu, 19 Jun 2025 15:08:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1750345713; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=X9caHoEImhQ4X+R73f52ETtWf6t/yscAmRC4hn8PReQ=;
+	b=k3XeU4OPjQR8ZyZOhlQTJkJ6ve5ye9NZ4UT+MHIBaqez6y44P6spQFvIFKFbUbtW/cYKsj
+	LFWMrYOt5QdP+s+FIL5VZQUwb8wmkql+RChQhcqJwczsRucNnb596kBRw/Z2JoQPFUZz6V
+	z0dTKPwuMhuVRCUJ48o8GjJOJip8P3Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1750345713;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=X9caHoEImhQ4X+R73f52ETtWf6t/yscAmRC4hn8PReQ=;
+	b=VThi5RVbENw5YtUJij9MY6T3JP1P71xKAcL6A0gSdXVQ1L+VpR7JpEoFKBCeQoq23Bi5SS
+	4o6iCCDQECFp2zDQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1750345713; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=X9caHoEImhQ4X+R73f52ETtWf6t/yscAmRC4hn8PReQ=;
+	b=k3XeU4OPjQR8ZyZOhlQTJkJ6ve5ye9NZ4UT+MHIBaqez6y44P6spQFvIFKFbUbtW/cYKsj
+	LFWMrYOt5QdP+s+FIL5VZQUwb8wmkql+RChQhcqJwczsRucNnb596kBRw/Z2JoQPFUZz6V
+	z0dTKPwuMhuVRCUJ48o8GjJOJip8P3Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1750345713;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=X9caHoEImhQ4X+R73f52ETtWf6t/yscAmRC4hn8PReQ=;
+	b=VThi5RVbENw5YtUJij9MY6T3JP1P71xKAcL6A0gSdXVQ1L+VpR7JpEoFKBCeQoq23Bi5SS
+	4o6iCCDQECFp2zDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9E12913721;
+	Thu, 19 Jun 2025 15:08:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id NWRDJvAnVGjmLQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Thu, 19 Jun 2025 15:08:32 +0000
+Message-ID: <7f917d34-5724-41ff-b904-0ad4598db3b3@suse.cz>
+Date: Thu, 19 Jun 2025 17:08:32 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250619135852.GC1643312@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v8 3/7] mm/filemap: Add mempolicy support to the
+ filemap layer
+Content-Language: en-US
+To: Shivank Garg <shivankg@amd.com>, seanjc@google.com, david@redhat.com,
+ willy@infradead.org, akpm@linux-foundation.org, shuah@kernel.org,
+ pbonzini@redhat.com, brauner@kernel.org, viro@zeniv.linux.org.uk
+Cc: ackerleytng@google.com, paul@paul-moore.com, jmorris@namei.org,
+ serge@hallyn.com, pvorel@suse.cz, bfoster@redhat.com, tabba@google.com,
+ vannapurve@google.com, chao.gao@intel.com, bharata@amd.com, nikunj@amd.com,
+ michael.day@amd.com, yan.y.zhao@intel.com, Neeraj.Upadhyay@amd.com,
+ thomas.lendacky@amd.com, michael.roth@amd.com, aik@amd.com, jgg@nvidia.com,
+ kalyazin@amazon.com, peterx@redhat.com, jack@suse.cz, rppt@kernel.org,
+ hch@infradead.org, cgzones@googlemail.com, ira.weiny@intel.com,
+ rientjes@google.com, roypat@amazon.co.uk, ziy@nvidia.com,
+ matthew.brost@intel.com, joshua.hahnjy@gmail.com, rakie.kim@sk.com,
+ byungchul@sk.com, gourry@gourry.net, kent.overstreet@linux.dev,
+ ying.huang@linux.alibaba.com, apopple@nvidia.com, chao.p.peng@intel.com,
+ amit@infradead.org, ddutile@redhat.com, dan.j.williams@intel.com,
+ ashish.kalra@amd.com, gshan@redhat.com, jgowans@amazon.com,
+ pankaj.gupta@amd.com, papaluri@amd.com, yuzhao@google.com,
+ suzuki.poulose@arm.com, quic_eberman@quicinc.com,
+ aneeshkumar.kizhakeveetil@arm.com, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ linux-security-module@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-coco@lists.linux.dev
+References: <20250618112935.7629-1-shivankg@amd.com>
+ <20250618112935.7629-4-shivankg@amd.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <20250618112935.7629-4-shivankg@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCPT_COUNT_GT_50(0.00)[65];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,paul-moore.com,namei.org,hallyn.com,suse.cz,redhat.com,intel.com,amd.com,nvidia.com,amazon.com,kernel.org,infradead.org,googlemail.com,amazon.co.uk,gmail.com,sk.com,gourry.net,linux.dev,linux.alibaba.com,arm.com,quicinc.com,vger.kernel.org,kvack.org,lists.linux.dev];
+	MIME_TRACE(0.00)[0:+];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
 
-On Thu, Jun 19, 2025 at 10:58:52AM -0300, Jason Gunthorpe wrote:
-> On Wed, Jun 18, 2025 at 03:15:50PM -0400, Peter Xu wrote:
-> > > > So I changed my mind, slightly.  I can still have the "order" parameter to
-> > > > make the API cleaner (even if it'll be a pure overhead.. because all
-> > > > existing caller will pass in PUD_SIZE as of now), 
-> > > 
-> > > That doesn't seem right, the callers should report the real value not
-> > > artifically cap it.. Like ARM does have page sizes greater than PUD
-> > > that might be interesting to enable someday for PFN users.
-> > 
-> > It needs to pass in PUD_SIZE to match what vfio-pci currently supports in
-> > its huge_fault().
+On 6/18/25 13:29, Shivank Garg wrote:
+> From: Shivansh Dhiman <shivansh.dhiman@amd.com>
 > 
-> Hm, OK that does make sense. I would add a small comment though as it
-> is not so intuitive and may not apply to something using ioremap..
-
-Sure, I'll remember to add some comment if I'll go back to the old
-interface.  I hope it won't happen..
-
+> Add NUMA mempolicy support to the filemap allocation path by introducing
+> new APIs that take a mempolicy argument:
+> - filemap_grab_folio_mpol()
+> - filemap_alloc_folio_mpol()
+> - __filemap_get_folio_mpol()
 > 
-> > So this will introduce a new file operation that will only be used so far
-> > in VFIO, playing similar role until we start to convert many
-> > get_unmapped_area() to this one.
+> These APIs allow callers to specify a NUMA policy during page cache
+> allocations, enabling fine-grained control over memory placement. This is
+> particularly needed by KVM when using guest-memfd memory backends, where
+> the guest memory needs to be allocated according to the NUMA policy
+> specified by VMM.
 > 
-> Yes, if someone wants to do a project here you can markup
-> memfds/shmem/hugetlbfs/etc/etc to define their internal folio orders
-> and hopefully ultimately remove some of that alignment logic from the
-> arch code.
+> The existing non-mempolicy APIs remain unchanged and continue to use the
+> default allocation behavior.
+> 
+> Signed-off-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
+> Co-developed-by: Shivank Garg <shivankg@amd.com>
+> Signed-off-by: Shivank Garg <shivankg@amd.com>
 
-I'm a bit refrained to touch all of the files just for this, but I can
-definitely add very verbose explanation into the commit log when I'll
-introduce the new API, on not only the relationship of that and the old
-APIs, also possible future works.
+I think __filemap_get_folio() could become a static inline wrapper for
+__filemap_get_folio_mpol in pagemap.h.
+Otherwise,
 
-Besides the get_unmapped_area() -> NEW API conversions which is arch
-independent in most cases, indeed if it would be great to reduce per-arch
-alignment requirement as much as possible.  At least that should apply for
-hugetlbfs that it shouldn't be arch-dependent.  I am not sure about the
-rest, though.  For example, I see archs may treat PF_RANDOMIZE differently.
-There might be a lot of trivial details to look at.
-
-OTOH, one other thought (which may not need to monitor all archs) is it
-does look confusing to have two layers of alignment operation, which is at
-least the case of THP right now.  So it might be good to at least punch it
-through to use vm_unmapped_area_info.align_mask / etc. if possible, to
-avoid double-padding: after all, unmapped_area() also did align paddings.
-It smells like something we overlooked when initially support THP.
-
-Thanks,
-
--- 
-Peter Xu
+Acked-by: Vlastimil Babka <vbabka@suse.cz>
 
 
