@@ -1,153 +1,196 @@
-Return-Path: <kvm+bounces-50115-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF8DBAE1F83
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 17:55:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 708BEAE1FA9
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 18:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4B806A6249
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:50:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3A713AE191
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92672DFF13;
-	Fri, 20 Jun 2025 15:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA01028B3E2;
+	Fri, 20 Jun 2025 15:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="2UMQDN77"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dMluZ3go"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DB12D5410
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 15:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28952DA74B;
+	Fri, 20 Jun 2025 15:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750434657; cv=none; b=uXBRgsN+17nG8LQz2z9P0xYpL64gDomsfrxDOabhc/OUIo7gq636zh0G24rN0/b7azcR7oV1vFCcy7PRsDDBS9MdNGx0x4jcDXLmUtmTXfsB272lWh7oztxi3mdCshO/aN8ZpVBcGqOWgHtEtvC2Uljm8cu9dfC7gRFK3V0ozIY=
+	t=1750435016; cv=none; b=qZ5QJritlJMBkVd60c+Ja387NGt7/PcHRLid7pLMwfyhiryJr3exjOnNQCJGce0MyAq1wTaC3MF079NfA17vgd+AicsFAsUkgS0HbW5bYDPlXPfMxqF0F7W/ugDL499AwlHeRoFzcqoZO5GrgtX3bhA6wHhdAK9xQVWl4adzb7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750434657; c=relaxed/simple;
-	bh=gCSRjdYqG3EEUY1fJd8dcZBC+dlFimBQ3bHa5DO8oTA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qFnFZF38BNVWc/n6EiYyNqWjl5PAo/TxkObUTcBbmVOgBzhyRUYlwEA8JHlMw8rp024upR2q+U28nfdIxEfjdiQToucn5TB1wklPuTEpQ7XLp+VnhWIppPpO8Akl1iCgwrSoEyr8lQOnYukQ7HYCrT747oqdiAs91zhwmllQGjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=2UMQDN77; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6fad4a1dc33so21405296d6.1
-        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 08:50:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1750434653; x=1751039453; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lb0bY/htYmIjhjl7e6qeommZ2woeWEYXNTEbvyaBVDI=;
-        b=2UMQDN7768OqyERSRvGPilqJ002j+DhWB4IRULjbhRWhMhjCbi9QHyFXcoqr9u8gFy
-         2vZ3Bb26eaWQUCblm5KxO1srNyCtNsZqZJ0CF/9Z9I71JywcxTYmPLPFwUu1UccGtLtL
-         QYhVpdgMWGEAKkvF//eI09yLlcSN4TouxKyo1fDtU+fXgqIBd23W0HpXN5p6TEZGhg3p
-         5mTRDpjeCvWuL4ZKMMWC4VPCKOgOZLYoU9QXYkvOtPar9thvJ9qzYbi5Ae5NcHUMCM1a
-         qB2xkdG+r2k9oZco7WR+Vkx97qM6y5BItpXLLhedA3ToL7P2Rdqo9wg8Z2qPJX9AEfIO
-         fiSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750434653; x=1751039453;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lb0bY/htYmIjhjl7e6qeommZ2woeWEYXNTEbvyaBVDI=;
-        b=rwGa/JEcW9I4QiF0nOu8MqrE3GB7s63emfkoszGGOoRFq0cPcvLlUF9xHrXS3Id1e6
-         ntOhJ/MCvaCDLSIhP1N+I4jKi5AJ+/3IQ7/e3xtHiiLIKDJtQNb6JLr6dsiF+bhu/LHv
-         gw2aQWN3egpBjFA23TLN+tU7/yvzRcUGI6VEr5lDtzoLV6+WrDGnQuGgAL/wmxuvYKU4
-         +j1Hm+vlWFA/vzp8U1cDmC1gv8RglukDGYtiMJ3dpQGU9zST8N6NaI503LhVZsJUEfYG
-         S+67DEu9jlu4d10R7PtxYcFgzeGikhWr90zTkQG/ku6lI0urdVRTzj3ddaoEv2F4kdCt
-         JfpA==
-X-Gm-Message-State: AOJu0YyfmRkRwnpvur6EvxPCH7c/+wPCqi4RIFq/keKhU67Y2lCCnObz
-	l0WytlstmOs8lEYjj0KJ+QJtTBM+fCd757/guCqVvdqHwlhQxYza3JKwMqjQc5bvrf3B6AywkNq
-	ARGA7
-X-Gm-Gg: ASbGncsN/KXOeL7rOoVxJ347m14mlGDvLvotI57WtkjZ0l2/CXi3MK0iVlIfjpegnMx
-	BgW0iHlnD4Dcet5Gp0woEsHZ8RiAT7yANohW0rZWAx8LHdgn8MyGD2TlYTsB4IVcQFVc8G00OuD
-	cNO7Q1VD2rmHLjCT/yGKweSW7+UOP5mAXYwUC5guIP1hFyEdMwFT+0GXEAdJ3dNDS7ySAQxBv2Z
-	TVM0GkUyoT5nMZzg4mkacteeuXT8oxeMku8/xD63Z2bpaYVO4VOYlGtpDMoeeM9ieCGPzP77egc
-	GVvEpUk4UmVbA3XgIg0bj7NULD40Ufn/YS7ZxFZay+Y9mp0TT178xhpxe483oviBInrGpmCMHa9
-	upRti9bAPal4MBIyPIex6+AzIwV+z4iLJHU6a+qDcxLHBTiw9O9U=
-X-Google-Smtp-Source: AGHT+IETUJGmBTkpbC46zTXbh4bGWkFtIlbC6e1CPw3xSSEKzKZ4d32RaY3VpeK/E5rx0MhnNTQd5A==
-X-Received: by 2002:ad4:5c66:0:b0:6fa:faf9:aabb with SMTP id 6a1803df08f44-6fd0a59692bmr61494516d6.38.1750434652753;
-        Fri, 20 Jun 2025 08:50:52 -0700 (PDT)
-Received: from jesse-lt.ba.rivosinc.com (pool-108-26-215-125.bstnma.fios.verizon.net. [108.26.215.125])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd095c8ccbsm13317606d6.122.2025.06.20.08.50.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 08:50:52 -0700 (PDT)
-From: Jesse Taube <jesse@rivosinc.com>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-kselftest@vger.kernel.org
-Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
-	Charlie Jenkins <charlie@rivosinc.com>,
-	Jesse Taube <jesse@rivosinc.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	James Raphael Tiovalen <jamestiotio@gmail.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Cade Richard <cade.richard@gmail.com>
-Subject: [kvm-unit-tests PATCH] riscv: lib: sbi_shutdown add exit code.
-Date: Fri, 20 Jun 2025 08:50:51 -0700
-Message-ID: <20250620155051.68377-1-jesse@rivosinc.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1750435016; c=relaxed/simple;
+	bh=0/Yq00Po9hqFh21kg/bqFD/QAGJ5CVo5hl9dHMq0V5o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aTxu2mhVP/FtnbE8PM0ldkBPXTi0basPeGUYcvL3N6XYLvfYc8cDpOI+CGYMAWiQG9xmygM/arUMWH1g7ePHOXLpmNQH8WxTBqR3Fq7NpgGKuFgSKqev4Bz7poTJ7JlsS7SCcXkUx6eQ4iNEJypP5SknjjSiZEW6b0e/bJn8M/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dMluZ3go; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DFB9C4CEEF;
+	Fri, 20 Jun 2025 15:56:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750435016;
+	bh=0/Yq00Po9hqFh21kg/bqFD/QAGJ5CVo5hl9dHMq0V5o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dMluZ3goj5wb11sMDmc3+xCKL1yqf1bsRZI3DxM7uG1KXtXt6C7MAqktYANFHHSuf
+	 Frgwrq+4RZBVltnb5P6MkMmrn1V8fD0OxVdrVTSfZT+rQG2Imxj5XevWyFkdZCmiY+
+	 ch/RwVduOAGedgkwB7gIRW0jutMz12GvWKhtnHqQF7Q273p3a1Mxw09XmodM6IdZWf
+	 mBLzMLbaMt7KS9Qt1zJoyPXRZH7OYcp3YYF2sL4h+l/1t5V4l2yjFI0QsyU9eIPJGS
+	 URhtkW63RC9+TxOytsaLyDgSj5zAc1DJw6+22JfmondzKh0LMan4WBUMSolFC4+7NY
+	 9S8CfRC6cet/w==
+Message-ID: <b3462e88-e24a-43d9-8437-b6d378a3b5d3@kernel.org>
+Date: Fri, 20 Jun 2025 10:56:53 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 7/7] fbcon: Make a symlink to the device selected as
+ primary
+To: Thomas Zimmermann <tzimmermann@suse.de>,
+ Bjorn Helgaas <bhelgaas@google.com>
+Cc: Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Lukas Wunner <lukas@wunner.de>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, David Woodhouse <dwmw2@infradead.org>,
+ Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
+ "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
+ "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
+ "open list:SOUND" <linux-sound@vger.kernel.org>,
+ Daniel Dadap <ddadap@nvidia.com>,
+ Mario Limonciello <mario.limonciello@amd.com>
+References: <20250620024943.3415685-1-superm1@kernel.org>
+ <20250620024943.3415685-8-superm1@kernel.org>
+ <a22ecd33-460d-41bf-920c-529645d173e3@suse.de>
+Content-Language: en-US
+From: Mario Limonciello <superm1@kernel.org>
+In-Reply-To: <a22ecd33-460d-41bf-920c-529645d173e3@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-When exiting it may be useful for the sbi implementation to know the
-exit code.
-Add exit code to sbi_shutdown, and use it in exit().
+On 6/20/25 3:47 AM, Thomas Zimmermann wrote:
+> Hi
+> 
+> Am 20.06.25 um 04:49 schrieb Mario Limonciello:
+>> From: Mario Limonciello <mario.limonciello@amd.com>
+>>
+>> Knowing which device is the primary device can be useful for userspace
+>> to make decisions on which device to start a display server.
+>>
+>> Create a link to that device called 'primary_device'.
+>>
+>> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+>> ---
+>>   drivers/video/fbdev/core/fbcon.c | 10 +++++++++-
+>>   1 file changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/video/fbdev/core/fbcon.c b/drivers/video/fbdev/ 
+>> core/fbcon.c
+>> index 2df48037688d1..46f21570723e5 100644
+>> --- a/drivers/video/fbdev/core/fbcon.c
+>> +++ b/drivers/video/fbdev/core/fbcon.c
+> 
+> You cannot rely on this, as fbcon might be disabled entirely.
 
-Signed-off-by: Jesse Taube <jesse@rivosinc.com>
----
- lib/riscv/asm/sbi.h | 2 +-
- lib/riscv/io.c      | 2 +-
- lib/riscv/sbi.c     | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+So the other idea I had was to have a new file boot_console.
 
-diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-index a5738a5c..de11c109 100644
---- a/lib/riscv/asm/sbi.h
-+++ b/lib/riscv/asm/sbi.h
-@@ -250,7 +250,7 @@ struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
- 			unsigned long arg3, unsigned long arg4,
- 			unsigned long arg5);
- 
--void sbi_shutdown(void);
-+void sbi_shutdown(unsigned int code);
- struct sbiret sbi_hart_start(unsigned long hartid, unsigned long entry, unsigned long sp);
- struct sbiret sbi_hart_stop(void);
- struct sbiret sbi_hart_get_status(unsigned long hartid);
-diff --git a/lib/riscv/io.c b/lib/riscv/io.c
-index fb40adb7..02231268 100644
---- a/lib/riscv/io.c
-+++ b/lib/riscv/io.c
-@@ -150,7 +150,7 @@ void halt(int code);
- void exit(int code)
- {
- 	printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
--	sbi_shutdown();
-+	sbi_shutdown(code & 1);
- 	halt(code);
- 	__builtin_unreachable();
- }
-diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
-index 2959378f..9dd11e9d 100644
---- a/lib/riscv/sbi.c
-+++ b/lib/riscv/sbi.c
-@@ -107,9 +107,9 @@ struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id)
- 	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_INJECT, event_id, hart_id, 0, 0, 0, 0);
- }
- 
--void sbi_shutdown(void)
-+void sbi_shutdown(unsigned int code)
- {
--	sbi_ecall(SBI_EXT_SRST, 0, 0, 0, 0, 0, 0, 0);
-+	sbi_ecall(SBI_EXT_SRST, 0, 0, code, 0, 0, 0, 0);
- 	puts("SBI shutdown failed!\n");
- }
- 
--- 
-2.43.0
+How would you feel about this instead (or even in addition to the symlink)?
+
+diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
+index 268c69daa4d5..8535950b4c0f 100644
+--- a/drivers/pci/pci-sysfs.c
++++ b/drivers/pci/pci-sysfs.c
+@@ -30,6 +30,7 @@
+  #include <linux/msi.h>
+  #include <linux/of.h>
+  #include <linux/aperture.h>
++#include <asm/video.h>
+  #include "pci.h"
+
+  #ifndef ARCH_PCI_DEV_GROUPS
+@@ -679,6 +680,13 @@ const struct attribute_group *pcibus_groups[] = {
+         NULL,
+  };
+
++static ssize_t boot_console_show(struct device *dev, struct 
+device_attribute *attr,
++                                char *buf)
++{
++       return sysfs_emit(buf, "%u\n", video_is_primary_device(dev));
++}
++static DEVICE_ATTR_RO(boot_console);
++
+  static ssize_t boot_vga_show(struct device *dev, struct 
+device_attribute *attr,
+                              char *buf)
+  {
+@@ -1698,6 +1706,7 @@ late_initcall(pci_sysfs_init);
+
+  static struct attribute *pci_dev_dev_attrs[] = {
+         &dev_attr_boot_vga.attr,
++       &dev_attr_boot_console.attr,
+         NULL,
+  };
+
+@@ -1710,6 +1719,9 @@ static umode_t pci_dev_attrs_are_visible(struct 
+kobject *kobj,
+         if (a == &dev_attr_boot_vga.attr && pci_is_vga(pdev))
+                 return a->mode;
+
++       if (a == &dev_attr_boot_console.attr && pci_is_display(pdev))
++               return a->mode;
++
+         return 0;
+  }
+
+
+> 
+> Best regards
+> Thomas
+> 
+>> @@ -2934,7 +2934,7 @@ static void fbcon_select_primary(struct fb_info 
+>> *info)
+>>   {
+>>       if (!map_override && primary_device == -1 &&
+>>           video_is_primary_device(info->device)) {
+>> -        int i;
+>> +        int i, r;
+>>           printk(KERN_INFO "fbcon: %s (fb%i) is primary device\n",
+>>                  info->fix.id, info->node);
+>> @@ -2949,6 +2949,10 @@ static void fbcon_select_primary(struct fb_info 
+>> *info)
+>>                      first_fb_vc + 1, last_fb_vc + 1);
+>>               info_idx = primary_device;
+>>           }
+>> +        r = sysfs_create_link(&fbcon_device->kobj, &info->device->kobj,
+>> +                      "primary_device");
+>> +        if (r)
+>> +            pr_err("fbcon: Failed to link to primary device: %d\n", r);
+>>       }
+>>   }
+>> @@ -3376,6 +3380,10 @@ void __init fb_console_init(void)
+>>   void __exit fb_console_exit(void)
+>>   {
+>> +#ifdef CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY
+>> +    if (primary_device != -1)
+>> +        sysfs_remove_link(&fbcon_device->kobj, "primary_device");
+>> +#endif
+>>   #ifdef CONFIG_FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER
+>>       console_lock();
+>>       if (deferred_takeover)
+> 
 
 
