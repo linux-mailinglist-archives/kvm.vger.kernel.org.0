@@ -1,135 +1,125 @@
-Return-Path: <kvm+bounces-50004-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 667B7AE10EF
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 04:10:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 900DEAE113E
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 04:50:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26754189FDFA
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 02:11:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D5F13BE47B
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 02:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A3A136996;
-	Fri, 20 Jun 2025 02:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471941C862D;
+	Fri, 20 Jun 2025 02:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TQeEgBwb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BLmH3ddh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCBB1B960;
-	Fri, 20 Jun 2025 02:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59EB323CE;
+	Fri, 20 Jun 2025 02:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750385448; cv=none; b=bpQHydcRUIA8JgMvs7eviQbhq0nyZFmxwDXEbYOwgVBkKlcE5rM3ofJhP1nIoZ2dEs5qWY8/pC+PoOPfw6T/KyhdGrXoM1UB4CTzJxyMt5AES4Qk6tBx7AIEQZZf1hli4Ezntdc/d49PEaNNcIz+BBR29B4lz9W9irW3mpARt4c=
+	t=1750387800; cv=none; b=TFLMvXOJ2vqPWUdiE24VTt4OitjwxLg+zxBMgVEVo11o32nT4TWREKvCRu6dQQG6z7Ut7UVjg2ktvlXa6HAeh/9VACBX+kWss/aWpZQbngBJ9026JVXjfJkp+87RASKn9klMvSWt1FFgKDZQ3U96q+z+lwAYeC27smQYYQ+ChBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750385448; c=relaxed/simple;
-	bh=rpzwXgI/wdC7PukYCLNNXUJc379rvolsooYpGoXrrOY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ce6KIabed3YY5BOhjrzf02W+ZatNYEfCy1xJYdP9OKSOOB+M4WWONvwxoHY/tJEQNyF6gymNDu/UIdvJXUbN1xXtxJil4SXA3wNzcD8p3bJX/XVeYrMqJLpSPilMEya9IRgejZMjKkuFLNjnJkMQ7dlvC4slSWn54wzffmTRADU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TQeEgBwb; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750385446; x=1781921446;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=rpzwXgI/wdC7PukYCLNNXUJc379rvolsooYpGoXrrOY=;
-  b=TQeEgBwbop3+wL3nC8o+qxZuuYGnxOviqJSXzBWCtT0qEWpT29hIQ1OZ
-   8VAC10q84Hru2dwSbJzlFXMhKryMTKYn8Xi6xSfHzTtZsmaLOKSxUWU+B
-   UPeRBDcDZxNN51v731Jya0myGaZislXOSW+dkAvSIXHy/2f+f5KEZQKPH
-   wmDVOqV7XeL3V80toAGfqoZEdUyWDODU2zsSLLBCM4v2NpIung+QUaWmN
-   XO+0VB9wYPtDvvX5OV2r3uE+d1hlLJpBlkRQn66WcyNjpCj30BoLYk2F7
-   LhWuybnodv48kGoKuG0qyv9GS4VH8VFzChFwhq+lr4PYL7ksD5rSI3Trm
-   A==;
-X-CSE-ConnectionGUID: gKKL4bELSouQHZHrbFuY5Q==
-X-CSE-MsgGUID: KUw4jjH7QyeRoTy2KnAoUA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="70206496"
-X-IronPort-AV: E=Sophos;i="6.16,250,1744095600"; 
-   d="scan'208";a="70206496"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 19:10:45 -0700
-X-CSE-ConnectionGUID: AvN2NqDvTuGjkDIam9sXCA==
-X-CSE-MsgGUID: jXyP6gc6RP2Bo7n7WapLvA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,250,1744095600"; 
-   d="scan'208";a="151321290"
-Received: from unknown (HELO [10.238.0.239]) ([10.238.0.239])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 19:10:43 -0700
-Message-ID: <e6cbc907-92bd-4101-8eca-190bcfadb69f@linux.intel.com>
-Date: Fri, 20 Jun 2025 10:10:40 +0800
+	s=arc-20240116; t=1750387800; c=relaxed/simple;
+	bh=tVUGmwudnPHtt0FAp/eQCsy7CQzmylV7GVpKzRyrQJg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AmSq+mLt5iYf2EbwGXwSxgE8BYHjbrJpclKMNlRp4yfGzufYXOLo/FAJ4aYxFwBeGXYkiy6m9HgEEbeLWXaL/GlMzEWg0Fok06dCM5tnnm/XFwCIR7h0+xBzn3ROnJ5ykaJzuaipLjegZh16NargQ7OarsZzdRPO4SmSfRhxFhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BLmH3ddh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 861FDC4CEEA;
+	Fri, 20 Jun 2025 02:49:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750387799;
+	bh=tVUGmwudnPHtt0FAp/eQCsy7CQzmylV7GVpKzRyrQJg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BLmH3ddh0nPQLvGOwLBQLZwrJOUsaYpuI2kEgbnH6ZtRch276fXQS0xPY1H078mDm
+	 q75Z4C04WDgTyP1KGLfar17f6fBNXrT497v7S4FPlgdvAmNsogPoRUccHYChCLpSFc
+	 zsrOSeP7SpX+TkYqydvB1fbqsVg+LzB+zyq+5wZg2JukriPj2bZnHTzfd8/R/ebW3p
+	 g09B6O/OGGIK8RgoSGW2v1j5Gg5tygKyW2WgSAxafqPYKhj41htmBRl+/C+jugkKu2
+	 RTVD85tVhod62FJ8SV/hYDq5LcDRbRQDnPiMwOhdM4Mdb98e6J3hVd6aSgXoKPOdaA
+	 DN9o3rXnyvNrA==
+From: Mario Limonciello <superm1@kernel.org>
+To: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Alex Deucher <alexander.deucher@amd.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Lukas Wunner <lukas@wunner.de>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
+	linux-kernel@vger.kernel.org (open list),
+	iommu@lists.linux.dev (open list:INTEL IOMMU (VT-d)),
+	linux-pci@vger.kernel.org (open list:PCI SUBSYSTEM),
+	kvm@vger.kernel.org (open list:VFIO DRIVER),
+	linux-sound@vger.kernel.org (open list:SOUND),
+	Daniel Dadap <ddadap@nvidia.com>,
+	Mario Limonciello <mario.limonciello@amd.com>
+Subject: [PATCH v3 0/7] Adjust fbcon console device detection
+Date: Thu, 19 Jun 2025 21:49:36 -0500
+Message-ID: <20250620024943.3415685-1-superm1@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] TDX attestation support and GHCI fixup
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com
-Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
- reinette.chatre@intel.com, tony.lindgren@intel.com,
- isaku.yamahata@intel.com, yan.y.zhao@intel.com,
- mikko.ylinen@linux.intel.com, kirill.shutemov@intel.com, jiewen.yao@intel.com
-References: <20250619180159.187358-1-pbonzini@redhat.com>
- <3133d5e9-18d3-499a-a24d-170be7fb8357@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <3133d5e9-18d3-499a-a24d-170be7fb8357@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+From: Mario Limonciello <mario.limonciello@amd.com>
 
+This series started out as changes to VGA arbiter to try to handle a case
+of a system with 2 GPUs that are not VGA devices [1].  This was discussed
+but decided not to overload the VGA arbiter for non VGA devices.
 
-On 6/20/2025 9:30 AM, Xiaoyao Li wrote:
-> On 6/20/2025 2:01 AM, Paolo Bonzini wrote:
->> This is a refresh of Binbin's patches with a change to the userspace
->> API.  I am consolidating everything into a single KVM_EXIT_TDX and
->> adding to the contract that userspace is free to ignore it *except*
->> for having to reenter the guest with KVM_RUN.
->>
->> If in the future this does not work, it should be possible to introduce
->> an opt-in interface.  Hopefully that will not be necessary.
->
-> For <GetTdVmCallInfo> exit, I think KVM still needs to report which TDVMCALL leaf will exit to userspace, to differentiate between different KVMs.
+Instead move the x86 specific detection of framebuffer resources into x86
+specific code that the fbcon can use to properly identify the primary
+device. This code is still called from the VGA arbiter, and the logic does
+not change there. To avoid regression to fbcon, fall back to VGA arbiter.
 
-Yes, I planned a v2 to expose the bitmap of TDVMCALLs that KVM will exit to
-userspace VMM for handling via KVM_TDX_CAPABILITIES.
+In order for userspace to also be able to discover which device was the
+primary framebuffer create a link to that device from fbcon.
 
->
-> But it's not a must for current <GetQuote> since it exits to userspace from day 0. So that we can leave the report interface until KVM needs to support user exit of another TDVMCALL leaf.
+v2->v3:
+ * Pick up tags
+ * Drop old patch 6
+ * Add 2 new patches for fbcon
 
-Agree. This report interface can be added later when needed.
+Link: https://lore.kernel.org/linux-pci/20250617175910.1640546-1-superm1@kernel.org/ [1]
 
-About the compatibility:
-Since <GetQuote> is the only optional TDVMCALL for now and KVM always exit to
-userspace for <GetQuote>, a userspace VMM can always set the bit for <GetQuote>
-if it's supported in userspace.
-Then
-- First KVM release + new userspace VMM release with report interface.
-   Userspace will see nothing reported by the interface, and it always sets
-   <GetQuote> , which is expected.
-- New KVM release with report interface + first userspace VMM release
-   Userspace doesn't know the report interface and it only sets <GetQuote>, which
-   is expected.
+Mario Limonciello (7):
+  PCI: Add helper for checking if a PCI device is a display controller
+  vfio/pci: Use pci_is_display()
+  vga_switcheroo: Use pci_is_display()
+  iommu/vt-d: Use pci_is_display()
+  ALSA: hda: Use pci_is_display()
+  PCI/VGA: Move check for firmware default out of VGA arbiter
+  fbcon: Make a symlink to the device selected as primary
 
->
->> Paolo
->>
->> Binbin Wu (3):
->>    KVM: TDX: Add new TDVMCALL status code for unsupported subfuncs
->>    KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
->>    KVM: TDX: Exit to userspace for GetTdVmCallInfo
->>
->>   Documentation/virt/kvm/api.rst    | 62 ++++++++++++++++++++++++-
->>   arch/x86/include/asm/shared/tdx.h |  1 +
->>   arch/x86/kvm/vmx/tdx.c            | 77 ++++++++++++++++++++++++++++---
->>   include/uapi/linux/kvm.h          | 22 +++++++++
->>   4 files changed, 154 insertions(+), 8 deletions(-)
->>
->
+ arch/x86/video/video-common.c    | 28 +++++++++++++++++++++++++
+ drivers/gpu/vga/vga_switcheroo.c |  2 +-
+ drivers/iommu/intel/iommu.c      |  2 +-
+ drivers/pci/vgaarb.c             | 36 ++------------------------------
+ drivers/vfio/pci/vfio_pci_igd.c  |  3 +--
+ drivers/video/fbdev/core/fbcon.c | 10 ++++++++-
+ include/linux/pci.h              | 15 +++++++++++++
+ sound/hda/hdac_i915.c            |  2 +-
+ sound/pci/hda/hda_intel.c        |  4 ++--
+ 9 files changed, 60 insertions(+), 42 deletions(-)
+
+-- 
+2.43.0
 
 
