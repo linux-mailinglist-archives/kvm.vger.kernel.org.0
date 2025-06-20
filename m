@@ -1,48 +1,54 @@
-Return-Path: <kvm+bounces-50171-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50198-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89709AE24EE
-	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 00:18:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61B59AE25D7
+	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 00:53:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02E1E1BC5BF0
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 22:18:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33C9E1C2130E
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 22:53:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E2B23C8A4;
-	Fri, 20 Jun 2025 22:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CEA4241116;
+	Fri, 20 Jun 2025 22:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCGTkk84"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="QYAqO6y6"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218A419E98C;
-	Fri, 20 Jun 2025 22:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0BA210FB;
+	Fri, 20 Jun 2025 22:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750457870; cv=none; b=CSv/JsI7JTv9rcKiOvNmS9m/RSy9rsB6xMm+jeR+rF9LsO3l8ldTqFiYWC0UEO0etGfL373REtyvrnAsyDdQMO3tL72ejIkKIMwmt0FnzblTvOCb8of5bTTxoaZ6fgAx7sPsOXm6Z8UXR8dVR4J4BR4AvxwwHuJdDk1JCA5gHNQ=
+	t=1750459999; cv=none; b=UDrAgdmgxieV/GphvxLZn48rxJE13NiJzbUGqT8hyJEgbiq4YlWh0QBDdL8msKY2B/jQNOkeXqaPxb3Xb7pDbColoIUlyhxTD09jyX9oSv87CWSGLWHAFXdwQHT1VtTxCm9bbYbD5iFYROcLZswxt4ILWSiDYi59aIlSiMnOMHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750457870; c=relaxed/simple;
-	bh=snYopvsiCq4b2vwnac6pmoTUyZPOxpsdJWVhg5Rc8Tw=;
+	s=arc-20240116; t=1750459999; c=relaxed/simple;
+	bh=qfpCzB4wclc404l7tLJPX7+oneYlSYtlNEt/tGrUK3c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iFjTPISKnvp6pewmmtaD2sVn9D19jWr8GzDm4MkFyJtIY+DQ9OoMYVw+NcocZlbWlNEIEd4ACrhkfS1ETrqAkmn5uxxT4MAKSquCddC/dNaJsL+XpTcslfbuUIHMo0q8utKuf/qJa0HziQ2POVPXtX2twOsU0fs/Cbz8yIhXZ+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCGTkk84; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F5DBC4CEE3;
-	Fri, 20 Jun 2025 22:17:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750457869;
-	bh=snYopvsiCq4b2vwnac6pmoTUyZPOxpsdJWVhg5Rc8Tw=;
+	 In-Reply-To:Content-Type; b=q6D1RFgrdMe7OEwYk/C0CPgtr7y6khJ5gT4GhYh/ZkYVI4qnM5gwo47Mw7H23JHSYAPFcftyVhLuqFHVPSrteJxvaW70xTWhquYCS+gevbfKkuuqpbLTe+bhH10E50FZkDeyxra0Zd0Q3BLaVLISPy9v+9n5hhj5+N7xq+MKzy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=QYAqO6y6; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [IPV6:2601:646:8081:9482:8e69:eb66:369f:ca04] ([IPv6:2601:646:8081:9482:8e69:eb66:369f:ca04])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55KMpi3J2670267
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Fri, 20 Jun 2025 15:51:44 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55KMpi3J2670267
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025052101; t=1750459906;
+	bh=dHs5e5KPRTLFRZrGk/aD2kqq/TN2P0Xy+dRkjImcTFE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DCGTkk844k/dx7H3Y4wFJdO37+twNnnSN1ap6pg1rC6bsnuygUGQizkn5BibpxKX/
-	 uy5rok7SzMTt5PHXkZMxiMZKI0lpakipXWmvMdiko31m9U2WjpkGktBoOxyC3KFABv
-	 eb9ABKwjUTrGE0a7oJn6xub7jSi43BJniBFpKuTEoLb1th3N0b4AlLx3sEKOQhZ7vQ
-	 6Di4vmZtPdY5nkD6FUgJ7Pq//aFdCHsrSFUgbg5kDu2IVRTv893lVsJucWj54+rO0n
-	 DLpc74Z+u6fLGkq0Qgk+AD07zXUBnHkrip2fnDykkYEuVWP7Ll3Jo1L5oc1zIg0L3N
-	 dDCiABPSBa9IQ==
-Message-ID: <fa3bfed9-8a6f-4001-bd4a-d4d237b001d3@kernel.org>
-Date: Fri, 20 Jun 2025 17:17:44 -0500
+	b=QYAqO6y6FGlEpC2XyzCDh3BoPOBHGwVPtkK5zpOUU7N+eppGdBi7v/I5Lxhdu8C4v
+	 RC+FM7W/vF/DaeY4RJvr4SW2D84Gj2X7BgiVqP5PLU3rk4mBFEMmMVOfWUL1NAE4nk
+	 8HAd7qiejrsoP/0Gd73iRKMD9aZyVVNmvMlzztWl4wBD5JyCp5TBvAJNvigy65wghe
+	 Kf3pA4Ua2Mh+PStAxCtK2AEUfCT1j9cvB9sWLL7F341iJhl2iyTT9UPpyYFP/6dNvW
+	 rbBjZCMjhdqiBOTUQYRpupwqGFVBJtHQzLYPHQ9DpvzpGND4grxSQ8LwPsstBoxyr+
+	 iBY+X4ocXC0BA==
+Message-ID: <7acedeba-9c90-403c-8985-0247981bf2b5@zytor.com>
+Date: Fri, 20 Jun 2025 15:51:38 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -50,302 +56,61 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 6/7] PCI/VGA: Move check for firmware default out of
- VGA arbiter
-To: Thomas Zimmermann <tzimmermann@suse.de>,
- Bjorn Helgaas <bhelgaas@google.com>
-Cc: Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Lukas Wunner <lukas@wunner.de>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, David Woodhouse <dwmw2@infradead.org>,
- Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- "open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:INTEL IOMMU (VT-d)" <iommu@lists.linux.dev>,
- "open list:PCI SUBSYSTEM" <linux-pci@vger.kernel.org>,
- "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
- "open list:SOUND" <linux-sound@vger.kernel.org>,
- Daniel Dadap <ddadap@nvidia.com>,
- Mario Limonciello <mario.limonciello@amd.com>
-References: <20250620024943.3415685-1-superm1@kernel.org>
- <20250620024943.3415685-7-superm1@kernel.org>
- <704d2a80-79bb-4247-a2aa-25bd3eb9a7e5@suse.de>
+Subject: Re: [PATCH v7 02/10] x86/fred: Pass event data to the NMI entry point
+ from KVM
+To: Sohil Mehta <sohil.mehta@intel.com>, Xin Li <xin@zytor.com>,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Cc: Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
+        Zhang Rui <rui.zhang@intel.com>, Steven Rostedt <rostedt@goodmis.org>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Jacob Pan <jacob.pan@linux.microsoft.com>,
+        Andi Kleen <ak@linux.intel.com>, Kai Huang <kai.huang@intel.com>,
+        Sandipan Das <sandipan.das@amd.com>, linux-perf-users@vger.kernel.org,
+        linux-edac@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+References: <20250612214849.3950094-1-sohil.mehta@intel.com>
+ <20250612214849.3950094-3-sohil.mehta@intel.com>
+ <7525af7f-a817-47d5-91f7-d7702380c85f@zytor.com>
+ <3281866f-2593-464d-a77e-5893b5e7014f@intel.com>
+ <36374100-0587-47f1-9319-6333f6dfe4db@zytor.com>
+ <39987c98-1f63-4a47-b15e-8c78f632da4e@intel.com>
 Content-Language: en-US
-From: Mario Limonciello <superm1@kernel.org>
-In-Reply-To: <704d2a80-79bb-4247-a2aa-25bd3eb9a7e5@suse.de>
+From: "H. Peter Anvin" <hpa@zytor.com>
+In-Reply-To: <39987c98-1f63-4a47-b15e-8c78f632da4e@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 6/20/2025 3:45 AM, Thomas Zimmermann wrote:
-> Hi
-> 
-> Am 20.06.25 um 04:49 schrieb Mario Limonciello:
->> From: Mario Limonciello <mario.limonciello@amd.com>
+On 2025-06-19 15:57, Sohil Mehta wrote:
+> On 6/19/2025 3:45 PM, Xin Li wrote:
+>> On 6/19/2025 3:15 PM, Sohil Mehta wrote:
+>>>
+>>> I want to say that the event data for IRQ has to be zero until the
+>>> architecture changes — Similar to the /* Reserved, must be 0 */ comment
+>>> in asm_fred_entry_from_kvm().
+>>>
 >>
->> The x86 specific check for whether a framebuffer belongs to a device
->> works for display devices as well as VGA devices.  Callers to
->> video_is_primary_device() can benefit from checking non-VGA display
->> devices.
+>> FRED spec says:
 >>
->> Move the x86 specific check into x86 specific code, and adjust VGA
->> arbiter to call that code as well. This allows fbcon to find the
->> right PCI device on systems that don't have VGA devices.
+>> For any other event, the event data are not currently defined and will
+>> be zero until they are.
 >>
->> Suggested-by: Thomas Zimmermann <tzimmermann@suse.de>
->> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
->> ---
->>   arch/x86/video/video-common.c | 28 +++++++++++++++++++++++++++
->>   drivers/pci/vgaarb.c          | 36 ++---------------------------------
->>   2 files changed, 30 insertions(+), 34 deletions(-)
->>
->> diff --git a/arch/x86/video/video-common.c b/arch/x86/video/video- 
->> common.c
->> index 81fc97a2a837a..718116e35e450 100644
->> --- a/arch/x86/video/video-common.c
->> +++ b/arch/x86/video/video-common.c
->> @@ -9,6 +9,7 @@
->>   #include <linux/module.h>
->>   #include <linux/pci.h>
->> +#include <linux/screen_info.h>
->>   #include <linux/vgaarb.h>
->>   #include <asm/video.h>
->> @@ -27,13 +28,40 @@ EXPORT_SYMBOL(pgprot_framebuffer);
->>   bool video_is_primary_device(struct device *dev)
+>> So "Event data not defined for IRQ thus 0."
 > 
-> I'm not sure I understand this patch. video_is_primary_device() already 
-> exists for 3 architectures, including x86. [1] Adding it here should 
-> produce an error. (?)
-
-I wasn't adding a new implementation of it, I was augmenting the x86 
-implementation.
-
-But I guess based on your below point it just needs to call 
-screen_info_pci_dev().
-
-> 
-> [1] https://elixir.bootlin.com/linux/v6.15.2/A/ident/ 
-> video_is_primary_device
-> 
-> The code on x86 is
-> 
-> bool <https://elixir.bootlin.com/linux/v6.15.2/C/ident/ 
-> bool>video_is_primary_device <https://elixir.bootlin.com/linux/v6.15.2/ 
-> C/ident/video_is_primary_device>(structdevice <https:// 
-> elixir.bootlin.com/linux/v6.15.2/C/ident/device>*dev) { structpci_dev 
-> <https://elixir.bootlin.com/linux/v6.15.2/C/ident/pci_dev>*pdev; if(! 
-> dev_is_pci <https://elixir.bootlin.com/linux/v6.15.2/C/ident/ 
-> dev_is_pci>(dev)) returnfalse <https://elixir.bootlin.com/linux/v6.15.2/ 
-> C/ident/false>; pdev=to_pci_dev <https://elixir.bootlin.com/linux/ 
-> v6.15.2/C/ident/to_pci_dev>(dev); return(pdev==vga_default_device 
-> <https://elixir.bootlin.com/linux/v6.15.2/C/ident/vga_default_device>()); }
-> 
-> I was thinking about extending it to test for additional properties, 
-> like this
-> 
-> bool <https://elixir.bootlin.com/linux/v6.15.2/C/ident/ 
-> bool>video_is_primary_device <https://elixir.bootlin.com/linux/v6.15.2/ 
-> C/ident/video_is_primary_device>(structdevice <https:// 
-> elixir.bootlin.com/linux/v6.15.2/C/ident/device>*dev) { structpci_dev 
-> <https://elixir.bootlin.com/linux/v6.15.2/C/ident/pci_dev>*pdev; if(! 
-> dev_is_pci <https://elixir.bootlin.com/linux/v6.15.2/C/ident/ 
-> dev_is_pci>(dev)) returnfalse <https://elixir.bootlin.com/linux/v6.15.2/ 
-> C/ident/false>; pdev=to_pci_dev <https://elixir.bootlin.com/linux/ 
-> v6.15.2/C/ident/to_pci_dev>(dev); if(pdev==vga_default_device <https:// 
-> elixir.bootlin.com/linux/v6.15.2/C/ident/vga_default_device>()) return 
-> true for_each_pci_dev() { // test if display and could be primary. } 
-> return false; // nothing found }
+> I am fine with this. Not *defined* removes the ambiguity.
 > 
 
-The above looks like some bad copy / paste.  Could you clarify?
+So I was thinking about this, and wonder: how expensive is it to get the 
+event data exit information out of VMX? If it is not very expensive, it 
+would arguably be a good thing to future-proof by fetching that 
+information, even if it is currently always zero.
 
-> 
-> This would then be called from per-device sysfs code that export a 
-> property similar to boot_vga (such as boot_display).
-
-Here's the other idea I had in mind.
-
-diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
-index 268c69daa4d57..8535950b4c0f3 100644
---- a/drivers/pci/pci-sysfs.c
-+++ b/drivers/pci/pci-sysfs.c
-@@ -30,6 +30,7 @@
-  #include <linux/msi.h>
-  #include <linux/of.h>
-  #include <linux/aperture.h>
-+#include <asm/video.h>
-  #include "pci.h"
-
-  #ifndef ARCH_PCI_DEV_GROUPS
-@@ -679,6 +680,13 @@ const struct attribute_group *pcibus_groups[] = {
-         NULL,
-  };
-
-+static ssize_t boot_console_show(struct device *dev, struct 
-device_attribute *attr,
-+                                char *buf)
-+{
-+       return sysfs_emit(buf, "%u\n", video_is_primary_device(dev));
-+}
-+static DEVICE_ATTR_RO(boot_console);
-+
-  static ssize_t boot_vga_show(struct device *dev, struct 
-device_attribute *attr,
-                              char *buf)
-  {
-@@ -1698,6 +1706,7 @@ late_initcall(pci_sysfs_init);
-
-  static struct attribute *pci_dev_dev_attrs[] = {
-         &dev_attr_boot_vga.attr,
-+       &dev_attr_boot_console.attr,
-         NULL,
-  };
-
-@@ -1710,6 +1719,9 @@ static umode_t pci_dev_attrs_are_visible(struct 
-kobject *kobj,
-         if (a == &dev_attr_boot_vga.attr && pci_is_vga(pdev))
-                 return a->mode;
-
-+       if (a == &dev_attr_boot_console.attr && pci_is_display(pdev))
-+               return a->mode;
-+
-         return 0;
-  }
-
-
-> 
-> 
-> The issue is currently just an x86 problem, but I can imagine something 
-> similar happening on ARM. There we'd have to go through the DT tree to 
-> figure out the primary device. That's a problem for a later patch set, 
-> but we should keep this in mind.
-
-I think that the sysfs file idea above would work for any arch.
-
-> 
->>   {
->> +    u64 base = screen_info.lfb_base;
->> +    u64 size = screen_info.lfb_size;
->>       struct pci_dev *pdev;
->> +    struct resource *r;
->> +    u64 limit;
->>       if (!dev_is_pci(dev))
->>           return false;
->>       pdev = to_pci_dev(dev);
->> +    if (!pci_is_display(pdev))
->> +        return false;
->> +
->> +    /* Select the device owning the boot framebuffer if there is one */
->> +    if (screen_info.capabilities & VIDEO_CAPABILITY_64BIT_BASE)
->> +        base |= (u64)screen_info.ext_lfb_base << 32;
->> +
->> +    limit = base + size;
->> +
->> +    /* Does firmware framebuffer belong to us? */
->> +    pci_dev_for_each_resource(pdev, r) {
->> +        if (resource_type(r) != IORESOURCE_MEM)
->> +            continue;
->> +
->> +        if (!r->start || !r->end)
->> +            continue;
->> +
->> +        if (base < r->start || limit >= r->end)
->> +            continue;
->> +
->> +        return true;
->> +    }
->> +
-> 
-> You can drop all this code and call screen_info_pci_dev() instead. I 
-> simply never got to update vgaarb to use it.
-
-👍
-
-> 
-> [2] https://elixir.bootlin.com/linux/v6.15.2/source/drivers/video/ 
-> screen_info_pci.c#L109
-> 
->>       return (pdev == vga_default_device());
->>   }
->>   EXPORT_SYMBOL(video_is_primary_device);
->> diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
->> index 78748e8d2dbae..15ab58c70b016 100644
->> --- a/drivers/pci/vgaarb.c
->> +++ b/drivers/pci/vgaarb.c
->> @@ -26,12 +26,12 @@
->>   #include <linux/poll.h>
->>   #include <linux/miscdevice.h>
->>   #include <linux/slab.h>
->> -#include <linux/screen_info.h>
->>   #include <linux/vt.h>
->>   #include <linux/console.h>
->>   #include <linux/acpi.h>
->>   #include <linux/uaccess.h>
->>   #include <linux/vgaarb.h>
->> +#include <asm/video.h>
->>   static void vga_arbiter_notify_clients(void);
->> @@ -554,38 +554,6 @@ void vga_put(struct pci_dev *pdev, unsigned int 
->> rsrc)
->>   }
->>   EXPORT_SYMBOL(vga_put);
->> -static bool vga_is_firmware_default(struct pci_dev *pdev)
->> -{
->> -#if defined(CONFIG_X86)
->> -    u64 base = screen_info.lfb_base;
->> -    u64 size = screen_info.lfb_size;
->> -    struct resource *r;
->> -    u64 limit;
->> -
->> -    /* Select the device owning the boot framebuffer if there is one */
->> -
->> -    if (screen_info.capabilities & VIDEO_CAPABILITY_64BIT_BASE)
->> -        base |= (u64)screen_info.ext_lfb_base << 32;
->> -
->> -    limit = base + size;
->> -
->> -    /* Does firmware framebuffer belong to us? */
->> -    pci_dev_for_each_resource(pdev, r) {
->> -        if (resource_type(r) != IORESOURCE_MEM)
->> -            continue;
->> -
->> -        if (!r->start || !r->end)
->> -            continue;
->> -
->> -        if (base < r->start || limit >= r->end)
->> -            continue;
->> -
->> -        return true;
->> -    }
->> -#endif
->> -    return false;
->> -}
->> -
->>   static bool vga_arb_integrated_gpu(struct device *dev)
->>   {
->>   #if defined(CONFIG_ACPI)
->> @@ -623,7 +591,7 @@ static bool vga_is_boot_device(struct vga_device 
->> *vgadev)
->>       if (boot_vga && boot_vga->is_firmware_default)
->>           return false;
->> -    if (vga_is_firmware_default(pdev)) {
->> +    if (video_is_primary_device(&pdev->dev)) {
-> 
-> Maybe not change this because you don't want to end up with non-VGA 
-> devices here.
-
-👍
-
-> 
-> Best regards
-> Thomas
-> 
->>           vgadev->is_firmware_default = true;
->>           return true;
->>       }
-> 
+	-hpa
 
 
