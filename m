@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-50082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50083-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F6BFAE1B97
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:10:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6DC0AE1B9A
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:10:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E90F1BC59FA
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 13:10:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E50471C2013D
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 13:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CA1295513;
-	Fri, 20 Jun 2025 13:08:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05BEC296140;
+	Fri, 20 Jun 2025 13:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j1K1zlOW"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DN5ijwxU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A45228D8F3
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 13:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A9428CF6C
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 13:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750424920; cv=none; b=QeRi0+p8dK8lUVIem1+XuDV0sCEt49P64ZKHiUhT5uW3q/E0pLru/rRc4jcx7NaNQNKA8+s2LWZvABxtudLKLP9rkNwB54aw4CABqf7lu3C7aDHHSXFVhH7Wx4Av6nulHJnOFK0e1TAjtOwQZJYZZPTr07bJ1FYN6WAQ4Z7GjE8=
+	t=1750424927; cv=none; b=gVWQooXbEAKww5KFZT4dT7Qg5ZmUoXmqZEq0d9t0YV8P8vqdExKETTjmrGCi5m5yDafiAiF2SWDEIOHi8KP/RvGQo7eiGZaMYrBuM/3BrvQ6IogPZa445soow/9fJ8DsWgGR59tEwwnGKKat0BQylBGKmvOrjTsChdnuNnnnDTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750424920; c=relaxed/simple;
-	bh=aDy22dOEdB7EFHqB7OoQ+yrfI8SpOEtk9T+tr457Vic=;
+	s=arc-20240116; t=1750424927; c=relaxed/simple;
+	bh=yFTq2Gitn6SefGsXiazBl/v47RuK0/hVhZ47YteIbhg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f389tV+LDqYU86Y4jl9P2l42YzA+yqMtKtiLguHrIbHzx3YB4sDIKjcF3jP/9z8iVRYws1V0Dr3FA3rLhHUa3n1qN7Ote8V4HnHarLodP/ml3+spF3PKYD9vOyXjXSYtbCnbLzLX7T+/o/0M4Sg0shMy/2iTeOD+2V5OlS1AivM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=j1K1zlOW; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version:Content-Type; b=sQhISYB66eXmpEKe5T2j9Ye5b1s7nKDQagDbNeVyT2Kl1xRrmfqD3Adl5nZj/hHw85cyxMusg+1wJHgTBtSlp0RpGmHh0bmc4DRPJPtL4OtnQpgRVKiVuzTD179bAMZMoqfbNCpVp13eRivIjHtsWvFYBZ6FY4xhzGs645VTUSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DN5ijwxU; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-450ce671a08so11780915e9.3
-        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 06:08:37 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4531e146a24so11630915e9.0
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 06:08:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750424916; x=1751029716; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750424922; x=1751029722; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Fteu42QoSrS1hfDvjcW70gOANYEhePCaBpCVcvmvL2M=;
-        b=j1K1zlOW0Sm18cnPfWvvtwT/Tl0RBMfkuUVezc3+V45AaLxblU5ZfhSe2b/0hiQm1m
-         2xS4WNLYfhWazJRZOkNQI7YZeK22NtIvPubGZlbGbhkceVIBcrRBbbhm6hGtD2QEP8i9
-         MPclqzMukk1z1oH9B4Dnf5+T3kxktP4RtfZJlVwG+D2Jz/bd4YM5Ndw3O4Z0ti92FIqC
-         Qx0t991EQwB136P4P6gQBVpewH8pLSZPdD6mt+HgnAj6iDi3Dx77nnmqKOD607YFae1e
-         zDddzBgV/rYfvNehaCKNXdncYt6Xz5HFcVgG5plxO0VfMkUAwGTLE9urp+pLU8d4rL3U
-         2xVA==
+        bh=2kLq7ybqs3cS0L36YzYXj0nQxUzd1xncr8lPWgttp7A=;
+        b=DN5ijwxUGqHRjlKryjyvQz22lXwB1yMSwgQdJlguFH7Ro0lkIUinc8W1Brsr71lR7l
+         FuCc9Jkayn9F4Y6PwktmeHl2s/pynzrrkSYEMBSB73RVSKL/Xj2Hv+m5Y+mUDPeZtv6k
+         kIfyd40hJTS975w8e6LkOePnrjmsjvWZiEGDcjxibUyEzHwQoYf3YdhqpBiDrY7Z0eGZ
+         W5n25rFM7iaUTO2eJkPMg5tZosF2bEa3WR/wWrEG73uS5BH/8IZunx+50K1TBH+8w21X
+         zjcJW0aM3Cjiw6VuGyY4lmsd+LrGSzJ4xJXov4bTQbIu62gMucb6LeZ2+8XQCJI8xrDw
+         I32Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750424916; x=1751029716;
+        d=1e100.net; s=20230601; t=1750424922; x=1751029722;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Fteu42QoSrS1hfDvjcW70gOANYEhePCaBpCVcvmvL2M=;
-        b=LbqtfW3AunlvVqSnt0mbfjDt70Ee1f9AG1eXSFh9CGkARIAt2NosA1ngrfMrAtptm0
-         CWvZxaaMcv/+b/solxRY/UawKSL+kdnZhv2y9dsLBP/SyQndwywwfU/Eda2Opgl8uZgd
-         F0tsdgxetI3wyt9jRB7kdhI/klHhftfT2kagrVplg1vLdzY/BWwwS43YkHTkXcJ4U9ES
-         BxmixHJyG+NgXQhHYY55KyDsfefjc+fhldBOTBc38zTKIi7N7B4Y3dGl2nZ+3kYJPY9Z
-         MzEPoWwkIIfRtTHURFi/l05cuwymcMEQwRwLf3Kb68T3HTWAZU+cgenWUsFmRb9pie46
-         cD7g==
-X-Forwarded-Encrypted: i=1; AJvYcCW/ekdb2+uWTgWKhMcpzDA2ZriUHdPv322jyJQIP2oh7dHVNbxpMozW+l3RASqnPZZdKBQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzklt3u+Gb7OwDItxj/gSWlA8799EGcpueO+4dNWLOPjRi4GB5G
-	4HribtPXFOJ3ZGYPwA9XmwoPm+L8Yet34+PK6jn1mYeU51K7VWE08j0foHGxuSyL3xU=
-X-Gm-Gg: ASbGnctgar0IuWs7mWUPLJkag9jxi02duGtLlY5Sz55WcyJWcMbMsyQrpbKBHsxfxRd
-	0ciJo0tAW2dF1TM10hZZBXXdw5nLtmLnTqwOcfiH8KmTW4qscQ8lOtRQoOXsLxUH+x/lj1l49WB
-	fddwK7KzIAbaO34G8BF5RiBiRjJJc3oa61Mnzx0S1K8O8RqhVLWgpnkvFEyWzwDtJ3SZabyWHw+
-	VNa4rFDV/Uo18xguqt/l7SM9oRtHCWVBNBI8566fThxtqGAg5hTUmm1mbE7ZSaJmK0CCjJwsx+n
-	KvHU46PEvQAAUZMy9gELRPi0sfN0lf6Nukjf9Owo9V62KK659VGn+6MJ/WIQYSmd/fW0cCcTzLf
-	iHWQ269ClX5nSH6L8zH7Sdf8r8jIvTCu42CY7
-X-Google-Smtp-Source: AGHT+IF+npPw/Fpnff5lnMY4tzVA5zu1lieKqW+klOIEesBk3BkWi62GERyChD7PyAo9RXNQgBmPoQ==
-X-Received: by 2002:a05:600c:8b70:b0:445:1984:247d with SMTP id 5b1f17b1804b1-453653aa3afmr23498795e9.7.1750424916439;
-        Fri, 20 Jun 2025 06:08:36 -0700 (PDT)
+        bh=2kLq7ybqs3cS0L36YzYXj0nQxUzd1xncr8lPWgttp7A=;
+        b=dnO1rp9jme0qzn25OqXv1zdFmDkJueBH3zqCCYH9wwGtsKSxxWuKqlSZwiAlqzpZfo
+         T4SKygXlMyzYy+eYxOr9HbEUqPR7knakvuwVYsiMRvMUfePg2tdfqX8lf04UXd/qoowp
+         /odvzQbrN6F2ja0KbKtoMJ49ZuaFZcaSDUXG4DSVeVbBdXquUaJSAFASuPOkuPD4f3Md
+         BuwMyIIYI/QdXVWjPqSW/KNSudbAgf1HHoLPflEFd5MYrnaqtA+IZIgFIJHt9cVTWPM9
+         Nkxr757wAHbbAGZUy6qdiNCheEKO6YpDBQKJLw5LTbn3La6wkz3KGaol/dSH/+sBUIaa
+         GRfg==
+X-Forwarded-Encrypted: i=1; AJvYcCVGuP3fJXxRFvdEnuGCzwnpcXCOX+afgn/oD1aO3GUoJoYcjju677a7vHA3ZOotMv1bd2U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/r2I5zWXfnfnB3pbVSjqm7GPTJ1VJDRfBR0wC/nRuDtbGyYfE
+	GofV/ZrrXdKF6qv5E2KCbpiS5JhC9V/VWMAuijwumJP32xpI5T1i01ul/rR9hgATWso=
+X-Gm-Gg: ASbGncsa4cCtxqFCFapnbhqFsRIKtpmnDCk9JcBBfp+rhAQw5jS5QbNbh/rTL0q+yEH
+	jK9WlXDaLEomN7Yd8SpB/Nd+kAs+zyYEccPzv7ypXL+Il8K1LgXCBJionHzZ3JZEaE8BAY86QK1
+	7ITlcnne0PIf+6dGUbr7Frv+5D1QPNefe9NWLa/pDXl72Qw9JvUPCucZrMHhVUJDP+rDqQLtKyC
+	s+MI2lusXOdLeCAq+GfeV1Hf0BR40m+E/PY/cCz57zsrYHlbUvecipNgykNU3J1d9f7Y5sCG0cS
+	t1pHt4iRmzAVBbvJw0eelr26qb79gyz1VdKG0dttChQUCwNR5bdx6SDP3rCfN/S5xSH9mJSnp4R
+	14YQuQ7nPlIjo6WV+9lFkO+xSdcME+Icvo/oV
+X-Google-Smtp-Source: AGHT+IHx17Q3o0n4ExJMDEX9nhiRFuD9m/DDwUW/YxBilyeTC3sNUKgmjYDttzl1RvFGqYhxbO7bhQ==
+X-Received: by 2002:a05:600c:c4ac:b0:442:dc75:5625 with SMTP id 5b1f17b1804b1-453659be428mr24945485e9.5.1750424922099;
+        Fri, 20 Jun 2025 06:08:42 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d11909f4sm2016944f8f.88.2025.06.20.06.08.35
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646fd74asm24979395e9.22.2025.06.20.06.08.40
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 20 Jun 2025 06:08:36 -0700 (PDT)
+        Fri, 20 Jun 2025 06:08:41 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -95,9 +95,9 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Thomas Huth <thuth@redhat.com>,
 	Roman Bolshakov <rbolshakov@ddn.com>,
 	John Snow <jsnow@redhat.com>
-Subject: [PATCH v2 15/26] accel: Introduce AccelOpsClass::cpu_target_realize() hook
-Date: Fri, 20 Jun 2025 15:06:58 +0200
-Message-ID: <20250620130709.31073-16-philmd@linaro.org>
+Subject: [PATCH v2 16/26] accel/hvf: Add hvf_arch_cpu_realize() stubs
+Date: Fri, 20 Jun 2025 15:06:59 +0200
+Message-ID: <20250620130709.31073-17-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250620130709.31073-1-philmd@linaro.org>
 References: <20250620130709.31073-1-philmd@linaro.org>
@@ -110,40 +110,76 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Allow accelerators to set vCPU properties before its realization.
+Implement HVF AccelOpsClass::cpu_target_realize() hook as
+empty stubs. Target implementations will come separately.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/system/accel-ops.h | 1 +
- accel/accel-common.c       | 3 +++
- 2 files changed, 4 insertions(+)
+ include/system/hvf.h      | 3 +++
+ accel/hvf/hvf-accel-ops.c | 2 ++
+ target/arm/hvf/hvf.c      | 5 +++++
+ target/i386/hvf/hvf.c     | 5 +++++
+ 4 files changed, 15 insertions(+)
 
-diff --git a/include/system/accel-ops.h b/include/system/accel-ops.h
-index 44b37592d02..a863fe59388 100644
---- a/include/system/accel-ops.h
-+++ b/include/system/accel-ops.h
-@@ -35,6 +35,7 @@ struct AccelOpsClass {
-     void (*ops_init)(AccelClass *ac);
+diff --git a/include/system/hvf.h b/include/system/hvf.h
+index a9a502f0c8f..8c4409a13f1 100644
+--- a/include/system/hvf.h
++++ b/include/system/hvf.h
+@@ -72,6 +72,9 @@ void hvf_arch_update_guest_debug(CPUState *cpu);
+  * Return whether the guest supports debugging.
+  */
+ bool hvf_arch_supports_guest_debug(void);
++
++bool hvf_arch_cpu_realize(CPUState *cpu, Error **errp);
++
+ #endif /* COMPILING_PER_TARGET */
  
-     bool (*cpus_are_resettable)(void);
-+    bool (*cpu_target_realize)(CPUState *cpu, Error **errp);
-     void (*cpu_reset_hold)(CPUState *cpu);
+ #endif
+diff --git a/accel/hvf/hvf-accel-ops.c b/accel/hvf/hvf-accel-ops.c
+index b38977207d2..b9511103a75 100644
+--- a/accel/hvf/hvf-accel-ops.c
++++ b/accel/hvf/hvf-accel-ops.c
+@@ -588,6 +588,8 @@ static void hvf_accel_ops_class_init(ObjectClass *oc, const void *data)
+ {
+     AccelOpsClass *ops = ACCEL_OPS_CLASS(oc);
  
-     void (*create_vcpu_thread)(CPUState *cpu); /* MANDATORY NON-NULL */
-diff --git a/accel/accel-common.c b/accel/accel-common.c
-index 56d88940f92..55d21b63a48 100644
---- a/accel/accel-common.c
-+++ b/accel/accel-common.c
-@@ -105,6 +105,9 @@ bool accel_cpu_common_realize(CPUState *cpu, Error **errp)
-     if (acc->cpu_common_realize && !acc->cpu_common_realize(cpu, errp)) {
-         return false;
-     }
-+    if (acc->ops->cpu_target_realize && !acc->ops->cpu_target_realize(cpu, errp)) {
-+        return false;
-+    }
++    ops->cpu_target_realize = hvf_arch_cpu_realize;
++
+     ops->create_vcpu_thread = hvf_start_vcpu_thread;
+     ops->kick_vcpu_thread = hvf_kick_vcpu_thread;
  
-     return true;
+diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
+index b932134a833..fd493f45af1 100644
+--- a/target/arm/hvf/hvf.c
++++ b/target/arm/hvf/hvf.c
+@@ -1082,6 +1082,11 @@ int hvf_arch_init_vcpu(CPUState *cpu)
+     return 0;
  }
+ 
++bool hvf_arch_cpu_realize(CPUState *cs, Error **errp)
++{
++    return true;
++}
++
+ void hvf_kick_vcpu_thread(CPUState *cpu)
+ {
+     cpus_kick_thread(cpu);
+diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+index 99e37a33e50..28484496710 100644
+--- a/target/i386/hvf/hvf.c
++++ b/target/i386/hvf/hvf.c
+@@ -367,6 +367,11 @@ int hvf_arch_init_vcpu(CPUState *cpu)
+     return 0;
+ }
+ 
++bool hvf_arch_cpu_realize(CPUState *cs, Error **errp)
++{
++    return true;
++}
++
+ static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_info)
+ {
+     X86CPU *x86_cpu = X86_CPU(cpu);
 -- 
 2.49.0
 
