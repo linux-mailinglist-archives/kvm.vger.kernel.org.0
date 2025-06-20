@@ -1,113 +1,122 @@
-Return-Path: <kvm+bounces-50063-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50064-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1A50AE1A73
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 14:05:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0588AE1AD6
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 14:18:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A67EF1BC801E
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 12:05:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFA6B3A7ED6
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 12:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3997828AAFC;
-	Fri, 20 Jun 2025 12:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7952199947;
+	Fri, 20 Jun 2025 12:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="AFP35sF1"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="e85L+wvK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6CD27FD56
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 12:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DA5221557
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 12:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750421074; cv=none; b=EkRsXzACUmEAIMc3/I2+iQvmYkaocLgrVRyrIbvyvnGDWY5T+b6u8kSgCWWYgL1sAmjgNHzXxwCRvf0iKr6twAC5G6W7PN6SYJLb5/FCoFjxsFmQPY8zZ7fnoQ5pJnocl/DGoA+fxwJHn9TUPyZE9V5AZgoebxYlbYEId+r3kok=
+	t=1750421892; cv=none; b=W3lwxkt531efMBZel8DxFsixQHkEpLsWQ9CIcdFzk3OV5zy3yGHMiyYim/bJT2lTksq1GK/2N19Q1WMGJoNkzgoY2X9HJLRqCOe1j1ckV1l4fB/bF8Df9YZYOQVaZcXlIa0+9d/DQdt+ucfhRIAr6GUehcVVvDiENi6GGySsSi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750421074; c=relaxed/simple;
-	bh=D4CLahTcm02K4MIrgNUooEK1xt6s6SBPZH2zMP2SJFU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=Fn238s38TivKED8Zp/MC9PRV2NsJKnOYVH0hwvaX3OSvDX5snqScqMS9Al5anxOoKYq34TV+iOlqQ5u0hl5joq5/fSDIEz/IPjZt5AaKv61/prROSdyx3W/xDrPIuXqSUboUWO3kBpipYtPw8PICjnxBWB2eniDpG0Rv3NEN3T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=AFP35sF1; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a4eb4dfd8eso262404f8f.2
-        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 05:04:32 -0700 (PDT)
+	s=arc-20240116; t=1750421892; c=relaxed/simple;
+	bh=U35tqQXhV1ZmiBtNlZQ10q7aVIhJBB6vIZfBILdU7Ts=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=XX4sOOC2SUsQ0YPgUszHQdi9/+cLPVWQn/JrK4uGdeLYR+M2I05q5bkFWePWhmqubpDPoqFEgNvAvSoWZZFMVgbcF5uCufGdqiaBB59a1c0B7R8eoTqr/Zg+RXki3M3G0tZoIxVxRzbn9PabAhu5Mkk9MCOQEW3bi0N3ndhHDRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=e85L+wvK; arc=none smtp.client-ip=209.85.166.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3de18fde9cfso7728035ab.3
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 05:18:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1750421071; x=1751025871; darn=vger.kernel.org;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+XeTD7cN51Pn2KJSTE1mvF0ehQNPT1Jdjz2pWXS0RPo=;
-        b=AFP35sF1RK2x7kFTHo1q0Dvw4GvfVfyJkbsHwj5mndAJMshYV0g5q4C6m0sbQtvgI5
-         OToN8Vubm/Tqa2+USeVj39CC+ECIclY6y+oagdLGt3b1JM7GJ8cpUW1NcXFYADCrYKfU
-         2Rg+I5nOgEg4JYtqWg6vJaPX/WJKTXkt+bQMvUukceYEmcPChnisO9uC8d9Nuv8UAP0c
-         TAOUNitHYNRXCZQ2bbMWkTwINNlXJyySCeBDo2mI4yspsivg9Gv3QAaO0SwBjPigrLvE
-         jYRbJemVu4zJDGxxq/hUpeCFswp68EoZzOV9kyOoTdGlc7mrMqKVfKkmTeoGklN2WeVm
-         bNww==
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1750421890; x=1751026690; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4hugVmrBISDi3akfpzZfvuXIoYg3pJdh83x0txrI/9s=;
+        b=e85L+wvKuL+4lK1tm02DeLHxFOZ1KJn0wb3wtZDuiZmRp9Cw3R/6Ziukqqo4eLXFxC
+         IXAio5I8fraSHS6i0t1HhwlJ2I34aEVgTW+lJ7tvpl6AbickH5fbgMUTXiSVefWG3rbL
+         EM9YM5/JiCtQtZT9j/0JkwUuPZZWYEph3hPvwd5QC2SyTTxP90jJni7N5zn46LJKvLLV
+         xS2zUUEOd7gzQEvK56KFVCaAaxd+eP89VFQZw35u6lRkA4SLha49eeysfnTQrEyp4nEQ
+         +iccmx63ekLykhUw8NdKv0Py51XcgmUHFYIzCT5obK161VQoTBgp7d83NYvlz5dfBx6Z
+         tczw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750421071; x=1751025871;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+XeTD7cN51Pn2KJSTE1mvF0ehQNPT1Jdjz2pWXS0RPo=;
-        b=Pm799aGZqqpiYIBVigLsu59/sZFKotV/mqnKH2pF9GnmLVbv7mPF15Ateq506XyO55
-         j8xUy2FbACLlUG8POQGnDt+QWz9NzG7Rz1oFZlPWToVHrn2v9plcVTk6T3KFDsB3dYj5
-         vtT/KJ1z97Sn3GGX0YGgUH/DuOzDgsAGbyLknjRH/cPnq1shOc5IRyhFpkM0mNTGMg7x
-         0SATxBbco+g3PhLp8zPgVSfx30GDPem9hQrv+zZlFGwIJO1jFgWJHc7WueWNBig5Cvg/
-         N9lbXZ7EgW5Lx4V0DPULzA1fSuenePnGlCdGlf2x7QumGNwzXBP4VK/I1+09KitBfrcy
-         bTKw==
-X-Gm-Message-State: AOJu0Yy+6C3OVHcxUQ6/Z+3n39j2Mi1VtRjlcE93EGmRq/uq++A2waSO
-	FLdWw/CTR5+q7k+9ZlqDV7yFi8K+BhkH1pxhQCpDp3/5ahKwLhS7Y0q54Zk5PNOhIV4=
-X-Gm-Gg: ASbGncv/xIa0qmcQMNREJ+N5neiih3wYUcvjmS+SByddUIcAZXBgMLYL2VNn69tc1BL
-	+NKyGjD9qFH20GtB+ReDNIf1N2rs8TnUW8evhf+bIn2AIOqpEttx8hlDU/YWjMh9q4IvLk0x/rq
-	Jw+ktHMeU4DfTCsjgGE/y7s6rnDYHE1t8OKd8ZFB+fUrY6tUAk5JQgFrqmomROyNKpAzSjKxtUw
-	Vy0KQ8bt9dUaCitpXflhM62gxrrOzjJ4Q+mNuzfZuQtd4SN0KNVTQ9z7xYwjXrSVVmzgwHOp3UR
-	q5NJ76bWuL74/Db1RVvpprjKMxkebNfcShoe9u2jKKqxm+Pid6cnKoqpv1X1RLLdatdN
-X-Google-Smtp-Source: AGHT+IE5Nwx55CYVDH94kaBUPm5U9VYUEHy18TPg0VqIF2/T7Ln2PcZvxS2VOj8pKTt4zB2/NGi+iQ==
-X-Received: by 2002:a05:600c:c087:b0:441:c1ae:3340 with SMTP id 5b1f17b1804b1-453657bf6camr6628245e9.1.1750421069056;
-        Fri, 20 Jun 2025 05:04:29 -0700 (PDT)
-Received: from localhost ([2a02:8308:a00c:e200:81c5:fb37:d08e:99a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535ead2a5fsm57299655e9.34.2025.06.20.05.04.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 05:04:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750421890; x=1751026690;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4hugVmrBISDi3akfpzZfvuXIoYg3pJdh83x0txrI/9s=;
+        b=eY8tQjdzvBlYQ2qBPqntwvzaOXLgRpmNyfIkEqzFc1ZqfV5Lt7fqJ+leFCNK+ArbPn
+         4S+fXl6xgJv4E5Un7he9my0ELnN4eML8jDdE4rZcCGQQ9T7KXiB3WFV6pTGdcJpoCJk8
+         xPFsxUMg29YP3ANWRAmtfng5CxnLAIWeJPJJILXCICaWOHrpKGNZxPkxfCQ1rl5CsYPG
+         qyhOJWvo249LGn6g/t5WxbWUbyfe6UkdeAmGhJq6mNp8SHhLRjd7GgXjKvjA3QSrR9A7
+         2UliFhYWtJi1nfAeJafiOAmizwCh6paG6a7xNizl90+6y0sxCdZTCn6RfINe/seGb0rK
+         1ooA==
+X-Forwarded-Encrypted: i=1; AJvYcCUbULfTaEsYvzh2nKzqg2R4Ou5N50Wyc/kOM4DWfJxvvZSwXsO6JSSt4Rcj0/kUMpdfnzc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxX6YTnMYGoRxpJ0Chq/Q0SVde+RChwTfbWxL0nNLvJa66Lvrz2
+	Efb8RrNvLdNFnW5OD+FxnXDoXHfnadZf+7XcHGcRAjVXEynZlnQtgmqQI6i9mBy27DifMWH+D0g
+	pxXNR1YdzYE6eY+lGgbtbmoC5VbtcSwr9O5HGNnAq/85TErk6cWU2+E4=
+X-Gm-Gg: ASbGncuFiML69VQEXOa8RH9waJTdAO9An5aBCv1cGFLS+e9fDDMJIdV/bLxaNMMQiTn
+	6k4jLkBG/zpw5vWIRLpsBtUW152wyFB5A+uIlft3i9Cvo9AdhUPddWGStLoNwnS7gJNYJTjEcoJ
+	wnVN97QRpVvluH8Bl55O2W0fC579sZg3TfqX46ifmPETY=
+X-Google-Smtp-Source: AGHT+IGUKckbOdUcs/PEHFCfX8DaHeChlsAcllC9njuzBBFlcoE/j6rYlhRl0odIphq/zEklEHqkQQcRHcRFp0HVE3A=
+X-Received: by 2002:a05:6e02:156e:b0:3dd:d7ea:ae4c with SMTP id
+ e9e14a558f8ab-3de38cc75abmr25819005ab.21.1750421890334; Fri, 20 Jun 2025
+ 05:18:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 20 Jun 2025 14:04:28 +0200
-Message-Id: <DARCHDIZG7IP.2VTEVNMVX8R1E@ventanamicro.com>
-Subject: Re: [PATCH] RISC-V: KVM: Delegate illegal instruction fault
-Cc: <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
- <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
- "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
-To: "Xu Lu" <luxu.kernel@bytedance.com>, <anup@brainfault.org>,
- <atish.patra@linux.dev>, <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
- <aou@eecs.berkeley.edu>, <alex@ghiti.fr>
-From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
-References: <20250620091720.85633-1-luxu.kernel@bytedance.com>
-In-Reply-To: <20250620091720.85633-1-luxu.kernel@bytedance.com>
+MIME-Version: 1.0
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 20 Jun 2025 17:47:59 +0530
+X-Gm-Features: AX0GCFv5QmR6EhpuKEA0i5hObjxmRietKMEidwx9nwYmXTwXtzi8ut3dN43QQcg
+Message-ID: <CAAhSdy2ZTWpx82buvGmcTp+0bXJCncQ8TCdmW7tCMC_P69GBeA@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv fixes for 6.16 take #1
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Atish Patra <atishp@rivosinc.com>, 
+	Atish Patra <atish.patra@linux.dev>, Andrew Jones <ajones@ventanamicro.com>, 
+	KVM General <kvm@vger.kernel.org>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 
-2025-06-20T17:17:20+08:00, Xu Lu <luxu.kernel@bytedance.com>:
-> Delegate illegal instruction fault to VS mode in default to avoid such
-> exceptions being trapped to HS and redirected back to VS.
->
-> Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
-> ---
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
-vm_host.h
-> @@ -48,6 +48,7 @@
-> +					 BIT(EXC_INST_ILLEGAL)    | \
+Hi Paolo,
 
-You should also remove the dead code in kvm_riscv_vcpu_exit.
+We have two SBI related fixes for the 6.16 kernel which focus
+on aligning the SBI RFENCE implementation with the SBI spec.
 
-And why not delegate the others as well?
-(EXC_LOAD_MISALIGNED, EXC_STORE_MISALIGNED, EXC_LOAD_ACCESS,
- EXC_STORE_ACCESS, and EXC_INST_ACCESS.)
+Please pull.
 
-Thanks.
+Regards,
+Anup
+
+The following changes since commit e04c78d86a9699d136910cfc0bdcf01087e3267e:
+
+  Linux 6.16-rc2 (2025-06-15 13:49:41 -0700)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-6.16-1
+
+for you to fetch changes up to 2e7be162996640bbe3b6da694cc064c511b8a5d9:
+
+  RISC-V: KVM: Don't treat SBI HFENCE calls as NOPs (2025-06-17 10:18:40 +0530)
+
+----------------------------------------------------------------
+KVM/riscv fixes for 6.16, take #1
+
+- Fix the size parameter check in SBI SFENCE calls
+- Don't treat SBI HFENCE calls as NOPs
+
+----------------------------------------------------------------
+Anup Patel (2):
+      RISC-V: KVM: Fix the size parameter check in SBI SFENCE calls
+      RISC-V: KVM: Don't treat SBI HFENCE calls as NOPs
+
+ arch/riscv/kvm/vcpu_sbi_replace.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
