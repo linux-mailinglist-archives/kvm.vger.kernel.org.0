@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-50175-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50176-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBBD8AE2505
-	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 00:20:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82179AE2504
+	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 00:19:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0119188D3AC
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 22:19:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 063535A2E97
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 22:19:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BA32459F7;
-	Fri, 20 Jun 2025 22:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F630247280;
+	Fri, 20 Jun 2025 22:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aHCn46JH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BJpAyO/B"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF2A23F412
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 22:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3533241671
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 22:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750457921; cv=none; b=T5qqB22IKvcqlPBL8OWYu7JKYJ08WCoSj4q80MXpQs3OJ0Qr7gbB1JaJAGbJKfam8l4NNoMHXj/61H+fVslkvEsbwDWbia6xxjXI5fT2g0Y84T8SpOJ2eMbQHDT1pnJ07mrL9KhrARm9JNKYJLkKS+7zRkykPj6uhSrhZzlX9Vs=
+	t=1750457922; cv=none; b=pbebpS+nj8OIEAI0OGMNGBOt8sjWcOyCNE9tCiOJCo4ZaKK0op+jjs2auKID35JT4ApTpT58rViTKanYuIs5eNzA3EOC+iwGYh7rOeOfMWUCHbXlw0j+SO7P8D9ZiXJA84TpvPfmMTArGtNPXOlrS7puWWL5oJZxHCrwfqGLbQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750457921; c=relaxed/simple;
-	bh=YIYZtYXjjIDG79viwi+LeCOmjCYAMmr9a5RXDPHvUQE=;
+	s=arc-20240116; t=1750457922; c=relaxed/simple;
+	bh=hEI+Ws5Ed4T0XYMyDeyGmT0ZhHqtHUDKeUxZmkH++E0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DYThnqHNDxT74+vbj7t6eBNafBm5yfgFyUpsMFIgbQc9MuhsXvRD4VqVP87Qlj+2pG6mFCj60XmWJqpJ9J1YQMK4N8um+kllQJZ++qSbnCSqjvtAKG5jZOTZuttyhZd2rp9mruMQQNiBNLjQw6QvUEA9bRG7NgsN3ULe3e+ZE1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aHCn46JH; arc=none smtp.client-ip=209.85.166.201
+	 To:Cc:Content-Type; b=AY/YFlDzIqOBhd+l/DYG9wVLJ/ANCL3IOLCbIvZxOmPyuz07UQxrYeOfljvjhWNRHSfJzpXta5P99UfvGA+4y+feT8MpE3CifPAKOZggeUwiyOVOF057cLHIVgE2rd71p1+Xmwe2eh2glbUXcoFgmnum15+BhS0fWdK8N4iEdEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BJpAyO/B; arc=none smtp.client-ip=209.85.166.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3ddd90ca184so18052915ab.0
-        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 15:18:39 -0700 (PDT)
+Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3ddb4dcebfaso56714545ab.1
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 15:18:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20230601; t=1750457919; x=1751062719; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fp13SX1Zh+VZLmNtKrEzp/HCcjo4sCQKHBsJF62MnBU=;
-        b=aHCn46JHfXsAqDl847ItrCxJPstp8TmNfe8t9PridE3GUcukpZ5flqpGgdAC46nTRQ
-         81OVXEi6Q+WzaujLcYAhuK+5tB/1gTb38YGfUp/9UwCTQ7v48VxjRqO7kD6yxUt86gXR
-         4ojD7u5Xr6AxLl2zf1TrCgPuXi+yE5jRPS5/lugjK42hCSPKG8qgcZVzmw/jTGEn7jf5
-         1SWhN8cMLnbcLUL5zhKRu+jY7X0UNqmYospW6nrxqcY1Q98P1u0R142QTszPuzRORBsG
-         IRGEBiMw/aRsW1y3dNuV4+hYpf9/MBOo/b8lHVTV1W+FzUdZBV9152/GT+oOH3E2/6la
-         Uvhg==
+        bh=tzpL3Ld7f3Wg7N4Mr5qllGNQ06XKr05fHXYYgZEl88s=;
+        b=BJpAyO/BtidrS4k3gtcxF0or8fzizr8Vz9hZeEeiJYHA55yAh419X4bhab/XKH/5mB
+         nUB83IBqajn29noD1PY/k3oLa2fORyHziD2wlBBQjAM8ob9lrGdGjIYoSUQlI23gDJj1
+         wDY16PKaPpH7PQYTUikCzVi8Wl6JcqON+9frJ6AOtNZMkDbg4Ll30xG1kelIWdOWwXiK
+         +dNDtVVuWJaf3vPQkPKv7bwLEmB+TxlPew538h06TuxYXDZo8BdFI8YFOenanmnGbZJB
+         1NGElBTA2caOAkGifvt/qQQFeR5NIL+pa6FlXBLLTwKuz1iOXN2PNGRufnKY8SuB88jy
+         pFHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1750457919; x=1751062719;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fp13SX1Zh+VZLmNtKrEzp/HCcjo4sCQKHBsJF62MnBU=;
-        b=BS9MJfBZwVdJYqbcMF+kkML5/uhvByJ0lkDaQ0P6qmozU+EhmTbblWzm/LN0Q8YCLF
-         SVmzJ/g5WoL3MEqvkJ4EmZfaMR/F+fW8n/3cW3sPBluohOj9viAjlgoS2s1/iTXu18Pm
-         Q4JK8c0czW1vFAUNGnwlqR9S5A7oCevojTz0x8zMZxCeBaQWJ5K5I3b7C0APic3Yjy6x
-         o/z/HA31ScY4/SI9g0hEM+N3TfIx/TfWAI8j5RJPdu4elFM01quaEYCydDfhMGXqLHTZ
-         N8bxCYQH1RIR9l+v3dvxFOsWFW4OKWcYDR0h0PCMkIHc8ADqCLv18cA4ovHTVCxSLR+b
-         CTCA==
-X-Gm-Message-State: AOJu0YwFFUiMAUX0D2kx4IzAY8jX7uJLluDfAUo56P87PVSywW7tdEqC
-	t4pgoJnmABuMkmQ+xkLPg484MZb6IqYP+ScVv6IVFdkIRg/TfOuLPeSvqmpaG6BbHG9KjAP/wtw
-	pSNrWcLDw7gT9vLUrxG2ITS5sFZfW3yx/3qwD37aKQwthNnu1F7Iz3KHcDrY7u6sEFnalkP30Nn
-	C8t+TzLig35IMLgkLnmI+df3AFCow/feCc86rlFn/cRiPUT4nQrPGnq1RGeh8=
-X-Google-Smtp-Source: AGHT+IFEidHFMEbKk2OynEjRQvMLrVqFymZV1Kh1vRLY6IT0l2lygB4TWhQMZfNIZL6xIAJ9fHhQZ3Bjc4iSkEbXjw==
-X-Received: from ilbcp10.prod.google.com ([2002:a05:6e02:398a:b0:3dc:756a:e520])
+        bh=tzpL3Ld7f3Wg7N4Mr5qllGNQ06XKr05fHXYYgZEl88s=;
+        b=ZwYAo6ObChvheJBZsUE3H2I4JX2kQn72c6bhuFLjnbA1gqGH7eQ+a3w3mJTsBSg0yi
+         iGrVoWptUYFA2l+1l4Op9sPmTLpgTPUBFYzVZ82aZnKs5rzubeQEv4sG41mRcJ51XKTE
+         emIEgOeh7lMRKewo3YEwofhFizSrHgVlYOftSrSEkE4M/qldv6XTjvITA53hcwyjBIve
+         HVSERK0R4uh4FYE9ykPOHNUSqzy2lEv+IhLgUdC9ltrYxQDu2sQaH5nJzHh+o5LcrgF4
+         Ux4w3KD+d+1S0APX6HO4Tw1w3MbjE02FyYSdxcUibZe+afcjk1PrksCOX4lYkmMzqr3z
+         OjSA==
+X-Gm-Message-State: AOJu0YxmduDuyGWg4ulDb3IzCoQjFukcd5NII6a69lmI1G8tNiBhdR5U
+	BqsvEpB0ACyRk3H+KJ7itgzWtJWbrq2NiZ8R+BeNVJ02etxcdKcyK7eUUgZIlyikv4637+oWmBV
+	77IdYQ9NSNnaqHY16KQeiOyg7B0DezAhBAtOLmpI8nR3R8bqdLw2D5xS1E+nDUwnYw1WErrs5Ux
+	u5vDl9sTQ0cH5jO5Ov3VuV9Y2grTRKBEnqv7XHOuXMK3yNpvUERFpxAHYgaqs=
+X-Google-Smtp-Source: AGHT+IGe+i459NmOZi236cX8Bur8HwnWegO6n5YG8V2oQ3pdTXQJfj8y4MrKY8v3FuSI+vF/XixyV2nwOspzfQufmQ==
+X-Received: from ilbea3.prod.google.com ([2002:a05:6e02:4503:b0:3dd:d24f:26bc])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:3782:b0:3dc:7fa4:834 with SMTP id e9e14a558f8ab-3de38cb06a0mr47968995ab.15.1750457918713;
- Fri, 20 Jun 2025 15:18:38 -0700 (PDT)
-Date: Fri, 20 Jun 2025 22:13:03 +0000
+ 2002:a92:cd83:0:b0:3dd:cdea:8f85 with SMTP id e9e14a558f8ab-3de38cc7adbmr52345645ab.20.1750457919574;
+ Fri, 20 Jun 2025 15:18:39 -0700 (PDT)
+Date: Fri, 20 Jun 2025 22:13:04 +0000
 In-Reply-To: <20250620221326.1261128-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250620221326.1261128-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.50.0.714.g196bf9f422-goog
-Message-ID: <20250620221326.1261128-4-coltonlewis@google.com>
-Subject: [PATCH v2 03/23] arm64: cpufeature: Add cpucap for PMICNTR
+Message-ID: <20250620221326.1261128-5-coltonlewis@google.com>
+Subject: [PATCH v2 04/23] arm64: Define PMI{CNTR,FILTR}_EL0 as undef_access
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -89,45 +89,28 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a cpucap for FEAT_PMUv3_PMICNTR, meaning there is a dedicated
-instruction counter as well as the cycle counter.
+Because KVM isn't fully prepared to support these yet even though the
+host PMUv3 driver does, define them as undef_access for now.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/kernel/cpufeature.c | 7 +++++++
- arch/arm64/tools/cpucaps       | 1 +
- 2 files changed, 8 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 278294fdc97d..85dea9714928 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2904,6 +2904,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_cpuid_feature,
- 		ARM64_CPUID_FIELDS(ID_AA64DFR0_EL1, HPMN0, IMP)
- 	},
-+	{
-+		.desc = "PMU Dedicated Instruction Counter",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_HAS_PMICNTR,
-+		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS(ID_AA64DFR1_EL1, PMICNTR, IMP)
-+	},
- #ifdef CONFIG_ARM64_SME
- 	{
- 		.desc = "Scalable Matrix Extension",
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 5b196ba21629..6dd72fcdd612 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -47,6 +47,7 @@ HAS_LSE_ATOMICS
- HAS_MOPS
- HAS_NESTED_VIRT
- HAS_PAN
-+HAS_PMICNTR
- HAS_PMUV3
- HAS_S1PIE
- HAS_S1POE
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 76c2f0da821f..99fdbe174202 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3092,6 +3092,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
+ 	{ SYS_DESC(SYS_FPMR), undef_access, reset_val, FPMR, 0, .visibility = fp8_visibility },
+ 
++	{ SYS_DESC(SYS_PMICNTR_EL0), undef_access },
++	{ SYS_DESC(SYS_PMICFILTR_EL0), undef_access },
++
+ 	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
+ 	  .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
+ 	{ PMU_SYS_REG(PMCNTENSET_EL0),
 -- 
 2.50.0.714.g196bf9f422-goog
 
