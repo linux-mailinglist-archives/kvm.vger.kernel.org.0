@@ -1,250 +1,134 @@
-Return-Path: <kvm+bounces-50203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 095E9AE25FC
-	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 01:16:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75C37AE2600
+	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 01:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF7AF7B09B4
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 23:15:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7F3F3BF264
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 23:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C46D246774;
-	Fri, 20 Jun 2025 23:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6170242D90;
+	Fri, 20 Jun 2025 23:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="CnTJDQQw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jh0NsVmU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C8823C8A4;
-	Fri, 20 Jun 2025 23:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D71323F43C
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 23:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750461349; cv=none; b=E8guPkws+YNydXajcJKHTXclHtcuvuPJZm3UcN1gqzXY2VVQbBHOp/IpNKKxqCBJB7TfKXdJ0s77Zsg9OyGD3XEVRiBHCRp/OgTXq1szjQ142geovDcZ07OGFxssuiv+lazcuJYLnHYW7q7ygnZyA5L36ixNuoQ+eMUbJcmb3ws=
+	t=1750461505; cv=none; b=R8vnaBRQH2lOJfs5XOQpNgo50x/GbFmSn45ek2EYbMbhvjdCBX4LZVh2BwkJASJr0ipX/Eca0OX6S9ZJykJudj/oLpbIJLMJaY8tmNZtYWB4WY3t8eg9DrdkQerMo9TgCgllREtV7uEUCVdB8VWRvBs1BvxgbMasSlxqz02dML0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750461349; c=relaxed/simple;
-	bh=WxBeAhvEJzqApAg8k2lfiHZOWnO+hOXKRTJ0MaX0A54=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D2sZE5Kf8rUtddqnBwvA8wraImV+c2JGWQULeTU0SDGJY1bCf+0dK1HPQYM2NMcPXyDFvvsAnqKmg215i23ZzuTr214BIi4MCUFC+OjpGMnehFGTmT0oqT0vz3RaiQMica+ZjBSdjUcgwCpHmpOrsZ7ZEKDryiPfGx5MN5ub+3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=CnTJDQQw; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from terminus.zytor.com (terminus.zytor.com [IPv6:2607:7c80:54:3:0:0:0:136])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 55KNF5V82676916
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Fri, 20 Jun 2025 16:15:10 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 55KNF5V82676916
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025052101; t=1750461310;
-	bh=yoVWlCUSshrYo8Ah5bULITDewE8xGWH+A44LYoq/KtI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CnTJDQQwh4n1acGStIr4GzWGsEcUNbg3t3j2E98DZ27xkzhQbuUTbLOBOAj/GVgrf
-	 gqibiZqBY34cZHbYLFdxLQzhHaHDHzMbS/em4SHr6C/w3z2XpcB9BhS4yniKsRiPhv
-	 qJihqmcykd5iljGKxUZ32IiWcVLpx+P/o6tPJL/QeCb7B2nNQxhOFMVWihzNawv35L
-	 W+VF0tssL+QE1FBzf62qy3PnU5SFCKq19JfRwPWohEIPeLADV4RjK0AC3P3G81zg8v
-	 Bw1FOb2oSP/QMoD9DD/bbvVValrfBLmJFq6qvC7HKyjQ1+2wLh0Q1KVI0NREnTEaXF
-	 Cc05N0iEdLu9Q==
-From: "Xin Li (Intel)" <xin@zytor.com>
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, stable@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
-        sohil.mehta@intel.com, brgerst@gmail.com, tony.luck@intel.com,
-        fenghuay@nvidia.com
-Subject: [PATCH v4 2/2] x86/traps: Initialize DR7 by writing its architectural reset value
-Date: Fri, 20 Jun 2025 16:15:04 -0700
-Message-ID: <20250620231504.2676902-3-xin@zytor.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250620231504.2676902-1-xin@zytor.com>
-References: <20250620231504.2676902-1-xin@zytor.com>
+	s=arc-20240116; t=1750461505; c=relaxed/simple;
+	bh=cJ5hZsPH7NDmBvT6ASMgxpAnAccRQKVdWnl0tO0A/YQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YW3YyykeYBbnJ1Lhtix3h4WRCjUVOWc9dZv9PEbL72Ix1BumU4xj2dT7OGav8mGunGLnVmP9IZxc5EdSOEUoy41XYdCHNCjb1AaNpMqi2P4sP1xvHn32vnBwNfFg01wRcE0vpSi1T2IEl0/FxCGOxOTgPlcnoJFryw5Ih6wFCYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jh0NsVmU; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-311d670ad35so2056065a91.3
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 16:18:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750461503; x=1751066303; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bSZq6ddE7mNucAzAya10S33mWQ/Wp8htlhyW4f0AToQ=;
+        b=jh0NsVmUCKPkJN/5NcLIgPyrdcHrdOZjBQ1dbZ8lIqXIgCuwY1UOmLhkkr6Duk68gz
+         tGBvRziXWNTXYIWjlgj/cuciQ1ykw+18J13j2itp8ohS9kW7jIZJw7ZgCfAJkj+POgsz
+         YfFvVRk+S0PYSMaXlE3hBvE5w5gQgr+yduyktiZcWEmwBVP8yNlqie5+G2EoEUufHZD7
+         zp4dcyShxqLZmhqSfzl2RnpsCfXpbHvuqJUJIG3l+Vr4zwCI4HbC0YvlSDUTfWc0FLbt
+         FyvScPerRgx3lP6IFWiIkkR14Ow2GelvzAbIPLQDCcmxwB54on5YaRfel4a8OwCYgf7q
+         uy6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750461503; x=1751066303;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bSZq6ddE7mNucAzAya10S33mWQ/Wp8htlhyW4f0AToQ=;
+        b=EtOceLScvKDCRxhe9/UK9VQ2O0KFcaClrW4Kq3CVX7kO5x+BCN7iYkU3ndEMsrZ8c8
+         bcaFwjeCLBw5d571e5XUpoQrWgZAvi3TjlexY49AIvQRu8G/lKQRA7ZA1GwyFkH25XJs
+         m1GlFGJ8ulDkRo+eu4W7Vkr916JThq8RxBJXbvysWpdf8o2W/X5m0CPXUh7djRIZf3aW
+         uqBqWmMU/YCHl9TErdsnc1/x3K/FHhsYPCObAlVOnuvP5ypBJAYBvUkWL5Ismcuqo1X4
+         Z9iJQh3DfZoEojDD1TG/nxNOALeEREP+fDXdoFc7wCqIKa77tglVL0Ol4ndiVopjTvrw
+         PXQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWu1C+CtApLiWJw9KPgIGckUN4sDANcSnAhGMG0KfwTCERSelu8naHq3BJakKX8ilmAcCM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywgit+BV8q3DYPp+wlByCqcMUju2mZo/tCgCrqzfSiJZOlZwKt/
+	lEseBqG3mkWfR0rQ9qCXK8fjOSGR1cWo0/qnqlYU2W1bkqmJkL4esedHezUJ15dhrFq6ls6xKe3
+	D2pCwFQ==
+X-Google-Smtp-Source: AGHT+IHKltIi0JMRBvpdhKHOFBvjdjaZcxVKi/npJ75GZzdSdCdBTLTS5ifTyl+QncNm67zNvNizSCphOrA=
+X-Received: from pjbsc5.prod.google.com ([2002:a17:90b:5105:b0:2fc:3022:36b8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c4f:b0:313:1e9d:404b
+ with SMTP id 98e67ed59e1d1-3159d62ac81mr7486543a91.2.1750461502772; Fri, 20
+ Jun 2025 16:18:22 -0700 (PDT)
+Date: Fri, 20 Jun 2025 16:18:21 -0700
+In-Reply-To: <7acedeba-9c90-403c-8985-0247981bf2b5@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250612214849.3950094-1-sohil.mehta@intel.com>
+ <20250612214849.3950094-3-sohil.mehta@intel.com> <7525af7f-a817-47d5-91f7-d7702380c85f@zytor.com>
+ <3281866f-2593-464d-a77e-5893b5e7014f@intel.com> <36374100-0587-47f1-9319-6333f6dfe4db@zytor.com>
+ <39987c98-1f63-4a47-b15e-8c78f632da4e@intel.com> <7acedeba-9c90-403c-8985-0247981bf2b5@zytor.com>
+Message-ID: <aFXsPVIKi6wFUB6x@google.com>
+Subject: Re: [PATCH v7 02/10] x86/fred: Pass event data to the NMI entry point
+ from KVM
+From: Sean Christopherson <seanjc@google.com>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Sohil Mehta <sohil.mehta@intel.com>, Xin Li <xin@zytor.com>, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, Andy Lutomirski <luto@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Adrian Hunter <adrian.hunter@intel.com>, Kan Liang <kan.liang@linux.intel.com>, 
+	Tony Luck <tony.luck@intel.com>, Zhang Rui <rui.zhang@intel.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Andrew Cooper <andrew.cooper3@citrix.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, Jacob Pan <jacob.pan@linux.microsoft.com>, 
+	Andi Kleen <ak@linux.intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Sandipan Das <sandipan.das@amd.com>, linux-perf-users@vger.kernel.org, 
+	linux-edac@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Initialize DR7 by writing its architectural reset value to always set
-bit 10, which is reserved to '1', when "clearing" DR7 so as not to
-trigger unanticipated behavior if said bit is ever unreserved, e.g. as
-a feature enabling flag with inverted polarity.
+On Fri, Jun 20, 2025, H. Peter Anvin wrote:
+> On 2025-06-19 15:57, Sohil Mehta wrote:
+> > On 6/19/2025 3:45 PM, Xin Li wrote:
+> > > On 6/19/2025 3:15 PM, Sohil Mehta wrote:
+> > > >=20
+> > > > I want to say that the event data for IRQ has to be zero until the
+> > > > architecture changes =E2=80=94 Similar to the /* Reserved, must be =
+0 */ comment
+> > > > in asm_fred_entry_from_kvm().
+> > > >=20
+> > >=20
+> > > FRED spec says:
+> > >=20
+> > > For any other event, the event data are not currently defined and wil=
+l
+> > > be zero until they are.
+> > >=20
+> > > So "Event data not defined for IRQ thus 0."
+> >=20
+> > I am fine with this. Not *defined* removes the ambiguity.
+> >=20
+>=20
+> So I was thinking about this, and wonder: how expensive is it to get the
+> event data exit information out of VMX? If it is not very expensive, it
+> would arguably be a good thing to future-proof by fetching that informati=
+on,
+> even if it is currently always zero.
 
-Tested-by: Sohil Mehta <sohil.mehta@intel.com>
-Reviewed-by: H. Peter Anvin (Intel) <hpa@zytor.com>
-Reviewed-by: Sohil Mehta <sohil.mehta@intel.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Acked-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Xin Li (Intel) <xin@zytor.com>
-Cc: stable@vger.kernel.org
----
-
-Change in v4:
-*) Cc stable for backporting, just in case bit 10 of DR7 has become
-   unreserved on new hardware, even though clearing it doesn't
-   currently cause any real issues (Dave Hansen).
-
-Changes in v3:
-*) Reword the changelog using Sean's description.
-*) Explain the definition of DR7_FIXED_1 (Sohil).
-*) Collect TB, RB, AB (PeterZ, Sohil and Sean).
-
-Changes in v2:
-*) Use debug register index 7 rather than DR_CONTROL (PeterZ and Sean).
-*) Use DR7_FIXED_1 as the architectural reset value of DR7 (Sean).
----
- arch/x86/include/asm/debugreg.h | 19 +++++++++++++++----
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kernel/cpu/common.c    |  2 +-
- arch/x86/kernel/kgdb.c          |  2 +-
- arch/x86/kernel/process_32.c    |  2 +-
- arch/x86/kernel/process_64.c    |  2 +-
- arch/x86/kvm/x86.c              |  4 ++--
- 7 files changed, 22 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/include/asm/debugreg.h b/arch/x86/include/asm/debugreg.h
-index 363110e6b2e3..a2c1f2d24b64 100644
---- a/arch/x86/include/asm/debugreg.h
-+++ b/arch/x86/include/asm/debugreg.h
-@@ -9,6 +9,14 @@
- #include <asm/cpufeature.h>
- #include <asm/msr.h>
- 
-+/*
-+ * Define bits that are always set to 1 in DR7, only bit 10 is
-+ * architecturally reserved to '1'.
-+ *
-+ * This is also the init/reset value for DR7.
-+ */
-+#define DR7_FIXED_1	0x00000400
-+
- DECLARE_PER_CPU(unsigned long, cpu_dr7);
- 
- #ifndef CONFIG_PARAVIRT_XXL
-@@ -100,8 +108,8 @@ static __always_inline void native_set_debugreg(int regno, unsigned long value)
- 
- static inline void hw_breakpoint_disable(void)
- {
--	/* Zero the control register for HW Breakpoint */
--	set_debugreg(0UL, 7);
-+	/* Reset the control register for HW Breakpoint */
-+	set_debugreg(DR7_FIXED_1, 7);
- 
- 	/* Zero-out the individual HW breakpoint address registers */
- 	set_debugreg(0UL, 0);
-@@ -125,9 +133,12 @@ static __always_inline unsigned long local_db_save(void)
- 		return 0;
- 
- 	get_debugreg(dr7, 7);
--	dr7 &= ~0x400; /* architecturally set bit */
-+
-+	/* Architecturally set bit */
-+	dr7 &= ~DR7_FIXED_1;
- 	if (dr7)
--		set_debugreg(0, 7);
-+		set_debugreg(DR7_FIXED_1, 7);
-+
- 	/*
- 	 * Ensure the compiler doesn't lower the above statements into
- 	 * the critical section; disabling breakpoints late would not
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index b4a391929cdb..639d9bcee842 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -31,6 +31,7 @@
- 
- #include <asm/apic.h>
- #include <asm/pvclock-abi.h>
-+#include <asm/debugreg.h>
- #include <asm/desc.h>
- #include <asm/mtrr.h>
- #include <asm/msr-index.h>
-@@ -249,7 +250,6 @@ enum x86_intercept_stage;
- #define DR7_BP_EN_MASK	0x000000ff
- #define DR7_GE		(1 << 9)
- #define DR7_GD		(1 << 13)
--#define DR7_FIXED_1	0x00000400
- #define DR7_VOLATILE	0xffff2bff
- 
- #define KVM_GUESTDBG_VALID_MASK \
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 0f6c280a94f0..27125e009847 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -2246,7 +2246,7 @@ EXPORT_PER_CPU_SYMBOL(__stack_chk_guard);
- static void initialize_debug_regs(void)
- {
- 	/* Control register first -- to make sure everything is disabled. */
--	set_debugreg(0, 7);
-+	set_debugreg(DR7_FIXED_1, 7);
- 	set_debugreg(DR6_RESERVED, 6);
- 	/* dr5 and dr4 don't exist */
- 	set_debugreg(0, 3);
-diff --git a/arch/x86/kernel/kgdb.c b/arch/x86/kernel/kgdb.c
-index 102641fd2172..8b1a9733d13e 100644
---- a/arch/x86/kernel/kgdb.c
-+++ b/arch/x86/kernel/kgdb.c
-@@ -385,7 +385,7 @@ static void kgdb_disable_hw_debug(struct pt_regs *regs)
- 	struct perf_event *bp;
- 
- 	/* Disable hardware debugging while we are in kgdb: */
--	set_debugreg(0UL, 7);
-+	set_debugreg(DR7_FIXED_1, 7);
- 	for (i = 0; i < HBP_NUM; i++) {
- 		if (!breakinfo[i].enabled)
- 			continue;
-diff --git a/arch/x86/kernel/process_32.c b/arch/x86/kernel/process_32.c
-index a10e180cbf23..3ef15c2f152f 100644
---- a/arch/x86/kernel/process_32.c
-+++ b/arch/x86/kernel/process_32.c
-@@ -93,7 +93,7 @@ void __show_regs(struct pt_regs *regs, enum show_regs_mode mode,
- 
- 	/* Only print out debug registers if they are in their non-default state. */
- 	if ((d0 == 0) && (d1 == 0) && (d2 == 0) && (d3 == 0) &&
--	    (d6 == DR6_RESERVED) && (d7 == 0x400))
-+	    (d6 == DR6_RESERVED) && (d7 == DR7_FIXED_1))
- 		return;
- 
- 	printk("%sDR0: %08lx DR1: %08lx DR2: %08lx DR3: %08lx\n",
-diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
-index 8d6cf25127aa..b972bf72fb8b 100644
---- a/arch/x86/kernel/process_64.c
-+++ b/arch/x86/kernel/process_64.c
-@@ -133,7 +133,7 @@ void __show_regs(struct pt_regs *regs, enum show_regs_mode mode,
- 
- 	/* Only print out debug registers if they are in their non-default state. */
- 	if (!((d0 == 0) && (d1 == 0) && (d2 == 0) && (d3 == 0) &&
--	    (d6 == DR6_RESERVED) && (d7 == 0x400))) {
-+	    (d6 == DR6_RESERVED) && (d7 == DR7_FIXED_1))) {
- 		printk("%sDR0: %016lx DR1: %016lx DR2: %016lx\n",
- 		       log_lvl, d0, d1, d2);
- 		printk("%sDR3: %016lx DR6: %016lx DR7: %016lx\n",
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b58a74c1722d..a9d992d5652f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11035,7 +11035,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 
- 	if (unlikely(vcpu->arch.switch_db_regs &&
- 		     !(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH))) {
--		set_debugreg(0, 7);
-+		set_debugreg(DR7_FIXED_1, 7);
- 		set_debugreg(vcpu->arch.eff_db[0], 0);
- 		set_debugreg(vcpu->arch.eff_db[1], 1);
- 		set_debugreg(vcpu->arch.eff_db[2], 2);
-@@ -11044,7 +11044,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		if (unlikely(vcpu->arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT))
- 			kvm_x86_call(set_dr6)(vcpu, vcpu->arch.dr6);
- 	} else if (unlikely(hw_breakpoint_active())) {
--		set_debugreg(0, 7);
-+		set_debugreg(DR7_FIXED_1, 7);
- 	}
- 
- 	vcpu->arch.host_debugctl = get_debugctlmsr();
--- 
-2.49.0
-
+It's trivially easy to do in KVM, and the cost of the VMREAD should be less=
+ than
+20 cycles.  So quite cheap in the grand scheme.  If VMREAD is more costly t=
+han
+that, then we have bigger problems :-)
 
