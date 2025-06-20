@@ -1,69 +1,126 @@
-Return-Path: <kvm+bounces-50156-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50157-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97548AE2282
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 20:49:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33249AE2286
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 20:50:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 529883A7CE7
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 18:49:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F3657B1C59
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 18:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009162EAB93;
-	Fri, 20 Jun 2025 18:49:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929E42EB5D5;
+	Fri, 20 Jun 2025 18:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Uv+9F3kf"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="iTRbb3x/";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="cFGjpwls";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="F4PkB7qi";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="eaXfd8nK"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C5028F528
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 18:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BA22DF3F2
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 18:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750445369; cv=none; b=mn8wvCuBiTGaPyAIRGqPKCKv8kE8JldHMHhsDRLmy0b9G9xthe+R93vSLYxFgfauOZaGOJOikbmqMG2g37lAC0OOVOy+y4YcaArmbqN+lIJipvxP++7+PaymGRdvJVv4/xgzleJ5KBPe+WFinEv2oDuvzg6biMoQdWCc9ZU/Gr0=
+	t=1750445388; cv=none; b=ibFS5nXS1r6SPjLCGkvLg5dbjtp3ajgtJiVoYaDZQzAiPX7tlODiInaw3QSQv58UIZB5G1mjK8b0p8syH4Uhg7yqBisfnyBkfxUXnsq3WzYiWphm9V/ZHoSVyzugbTIJAln3r78vZQXjwDxiU/rS6LbDRWwOKjXgOhowUAcVsb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750445369; c=relaxed/simple;
-	bh=+pHGxwbyLZaUIRCP3poa1QzCgDmZnXzfvoY65I7GZPI=;
+	s=arc-20240116; t=1750445388; c=relaxed/simple;
+	bh=moJYz9KTOVCIx14VqQgsxvkkDcTyQFefHhQk8HOQd28=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qc3btgepz/C92TGlGT87hRvVp+si1JvnMHF4DOzGf8A8lUPf4/WJyN99/erZghKrsRXKbW8UpcneOthQOyvnBvWsMctg0yx15+1jdHoWhiMwfrdBtyBk90QrNyhTEJ+560UYtxSHVqEw3xOcNuLRYdKChzIiiG8XjlTXQb66Nho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Uv+9F3kf; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 20 Jun 2025 11:48:39 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750445349;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pmQpYzkf6cX1extlTaUi3plYgiED+mQkAHY60xNqJNPpURVnlYKhmfkdNUKyl1oA5Sx6CBZAJ7ZDfXsYObZjz+zqSpHUIxWIiiOJH9B+sinn0Ml30R8dfUISLloF7IMs5KM2iXW7NBrURr65SMhzpR9Wsya0ulFs9/FtooZmpwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iTRbb3x/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=cFGjpwls; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=F4PkB7qi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=eaXfd8nK; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 1E8701F399;
+	Fri, 20 Jun 2025 18:49:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750445385; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SCWfCfaZ3u6KNLTf3q+pHDxfcJpIR3G2GwUv6btP+Lc=;
-	b=Uv+9F3kf+uawsW/hRSt0qY1C/WI5g9xdumI1n+LnBI60VZNdEmkQYEaHL5g5ZExXcc+as6
-	QUhbhNdcxCDNrcOlA8K+d1EC2hpMHuNMfm0G1BQgs59RGSbjCYzL7dpN5580FwA4iPVAYB
-	rU+Gk24NczndMIpU5aNVPd4GUJSYLx0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Francesco Lavra <francescolavra.fl@gmail.com>,
-	David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v3 02/62] KVM: arm64: WARN if unmapping vLPI fails
-Message-ID: <aFWtB6Vmn9MnfkEi@linux.dev>
-References: <20250611224604.313496-2-seanjc@google.com>
- <20250611224604.313496-4-seanjc@google.com>
- <86tt4lcgs3.wl-maz@kernel.org>
- <aErlezuoFJ8u0ue-@google.com>
- <aEyOcJJsys9mm_Xs@linux.dev>
- <aFWY2LTVIxz5rfhh@google.com>
+	bh=HsDMuMlCrsQpPWi7dij7vagoFn+Y8urO2hbzs//mY48=;
+	b=iTRbb3x/V1lVM3Mhyi3s5ejBxmiyemjZIafhwxsD7XY0G8Fvztr4+/yfaUzFWpQCaQ7he6
+	spU/wDU/PzMd9+ousiGxEHLQ3DpIVToKWVEWXTwNAIbUXpEqRNSCY/pzq8MyFkucXbpV93
+	q0BXor/aYRH1TRvouGM+8/j5O8/w8Fo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750445385;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HsDMuMlCrsQpPWi7dij7vagoFn+Y8urO2hbzs//mY48=;
+	b=cFGjpwlseUMli0Zg2Ce4CyNJDuOhKI+G5tWZwV5jo/wU5Nt0SX+31D2YMcdTSAAFCvpr5+
+	XSzChU7TKqXeQvAQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=F4PkB7qi;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=eaXfd8nK
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1750445384; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HsDMuMlCrsQpPWi7dij7vagoFn+Y8urO2hbzs//mY48=;
+	b=F4PkB7qiZM4gc+sXtq6YRdReJEQZw4WnaMkSZdRdQt3fRvVcXw8FK8qGmycDIzZS2pxKEj
+	fWRXHgJ6+k1yDfeVw22ZBkA3IhqB562G2GBWEJNKImRrDXcChCx3Rk81WR8XJdaORwPea5
+	kWLbkp+ZbM+hPBuD92qSfQIglZT7Xh8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1750445384;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HsDMuMlCrsQpPWi7dij7vagoFn+Y8urO2hbzs//mY48=;
+	b=eaXfd8nKvkgKNmVYQhlW4y9ZpoM3hIUyaifM1lv4LIbZrxVxmDr4VyWiPqwYfVI2ytnB4P
+	/LKoanusS1MW6vDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9A00E136BA;
+	Fri, 20 Jun 2025 18:49:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id QRKIIkStVWinFwAAD6G6ig
+	(envelope-from <pfalcato@suse.de>); Fri, 20 Jun 2025 18:49:40 +0000
+Date: Fri, 20 Jun 2025 19:49:34 +0100
+From: Pedro Falcato <pfalcato@suse.de>
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, "David S . Miller" <davem@davemloft.net>, 
+	Andreas Larsson <andreas@gaisler.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Kees Cook <kees@kernel.org>, 
+	Peter Xu <peterx@redhat.com>, David Hildenbrand <david@redhat.com>, Zi Yan <ziy@nvidia.com>, 
+	Baolin Wang <baolin.wang@linux.alibaba.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>, 
+	Nico Pache <npache@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>, Dev Jain <dev.jain@arm.com>, 
+	Barry Song <baohua@kernel.org>, Xu Xin <xu.xin16@zte.com.cn>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Hugh Dickins <hughd@google.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Rik van Riel <riel@surriel.com>, 
+	Harry Yoo <harry.yoo@oracle.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Matthew Wilcox <willy@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, John Hubbard <jhubbard@nvidia.com>, 
+	Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>, Jann Horn <jannh@google.com>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Qi Zheng <zhengqi.arch@bytedance.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-sgx@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-mm@kvack.org, nvdimm@lists.linux.dev, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] mm: update core kernel code to use vm_flags_t
+ consistently
+Message-ID: <oevjoalbpopfydsazxa4fh4tjyy3zxgpdb3jttyryxyo5x5rmo@nezt4ycsaf7x>
+References: <cover.1750274467.git.lorenzo.stoakes@oracle.com>
+ <d1588e7bb96d1ea3fe7b9df2c699d5b4592d901d.1750274467.git.lorenzo.stoakes@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,155 +129,63 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aFWY2LTVIxz5rfhh@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <d1588e7bb96d1ea3fe7b9df2c699d5b4592d901d.1750274467.git.lorenzo.stoakes@oracle.com>
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_DN_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:email,oracle.com:email];
+	RCVD_TLS_ALL(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linux-foundation.org,armlinux.org.uk,arm.com,kernel.org,linux.ibm.com,ellerman.id.au,gmail.com,csgroup.eu,davemloft.net,gaisler.com,linux.intel.com,linutronix.de,redhat.com,alien8.de,zytor.com,infradead.org,zeniv.linux.org.uk,suse.cz,nvidia.com,linux.alibaba.com,oracle.com,zte.com.cn,linux.dev,google.com,suse.com,surriel.com,intel.com,goodmis.org,efficios.com,ziepe.ca,suse.de,cmpxchg.org,bytedance.com,lists.infradead.org,vger.kernel.org,lists.ozlabs.org,kvack.org,lists.linux.dev];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_GT_50(0.00)[64];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 1E8701F399
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Score: -4.01
 
-On Fri, Jun 20, 2025 at 10:22:32AM -0700, Sean Christopherson wrote:
-> On Fri, Jun 13, 2025, Oliver Upton wrote:
-> > On Thu, Jun 12, 2025 at 07:34:35AM -0700, Sean Christopherson wrote:
-> > > On Thu, Jun 12, 2025, Marc Zyngier wrote:
-> > > > But not having an VLPI mapping for an interrupt at the point where we're
-> > > > tearing down the forwarding is pretty benign. IRQs *still* go where they
-> > > > should, and we don't lose anything.
-> > 
-> > The VM may not actually be getting torn down, though. The series of
-> > fixes [*] we took for 6.16 addressed games that VMMs might be playing on
-> > irqbypass for a live VM.
-> > 
-> > [*] https://lore.kernel.org/kvmarm/20250523194722.4066715-1-oliver.upton@linux.dev/
-> > 
-> > > All of those failure scenario seem like warnable offences when KVM thinks it has
-> > > configured the IRQ to be forwarded to a vCPU.
-> > 
-> > I tend to agree here, especially considering how horribly fragile GICv4
-> > has been in some systems. I know of a couple implementations where ITS
-> > command failures and/or unmapped MSIs are fatal for the entire machine.
-> > Debugging them has been a genuine pain in the ass.
-> > 
-> > WARN'ing when state tracking for vLPIs is out of whack would've made it
-> > a little easier.
+On Wed, Jun 18, 2025 at 08:42:53PM +0100, Lorenzo Stoakes wrote:
+> The core kernel code is currently very inconsistent in its use of
+> vm_flags_t vs. unsigned long. This prevents us from changing the type of
+> vm_flags_t in the future and is simply not correct, so correct this.
 > 
-> Marc, does this look and read better?
+> While this results in rather a lot of churn, it is a critical pre-requisite
+> for a future planned change to VMA flag type.
 > 
-> I'd really, really like to get this sorted out asap, as it's the only thing
-> blocking the series, and I want to get the series into linux-next early next
-> week, before I go OOO for ~10 days.
+> Additionally, update VMA userland tests to account for the changes.
+> 
+> To make review easier and to break things into smaller parts, driver and
+> architecture-specific changes is left for a subsequent commit.
+> 
+> The code has been adjusted to cascade the changes across all calling code
+> as far as is needed.
+> 
+> We will adjust architecture-specific and driver code in a subsequent patch.
+> 
+> Overall, this patch does not introduce any functional change.
+> 
+> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-Can you just send it out as a standalone patch? It's only tangientally
-related to the truckload of x86 stuff that I'd rather not pull in the
-event of conflict resolution.
+Reviewed-by: Pedro Falcato <pfalcato@suse.de>
 
-Thanks,
-Oliver
-
-> --
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Thu, 12 Jun 2025 16:51:47 -0700
-> Subject: [PATCH] KVM: arm64: WARN if unmapping a vLPI fails in any path
-> 
-> When unmapping a vLPI, WARN if nullifying vCPU affinity fails, not just if
-> failure occurs when freeing an ITE.  If undoing vCPU affinity fails, then
-> odds are very good that vLPI state tracking has has gotten out of whack,
-> i.e. that KVM and the GIC disagree on the state of an IRQ/vLPI.  At best,
-> inconsistent state means there is a lurking bug/flaw somewhere.  At worst,
-> the inconsistency could eventually be fatal to the host, e.g. if an ITS
-> command fails because KVM's view of things doesn't match reality/hardware.
-> 
-> Note, only the call from kvm_arch_irq_bypass_del_producer() by way of
-> kvm_vgic_v4_unset_forwarding() doesn't already WARN.  Common KVM's
-> kvm_irq_routing_update() WARNs if kvm_arch_update_irqfd_routing() fails.
-> For that path, if its_unmap_vlpi() fails in kvm_vgic_v4_unset_forwarding(),
-> the only possible causes are that the GIC doesn't have a v4 ITS (from
-> its_irq_set_vcpu_affinity()):
-> 
->         /* Need a v4 ITS */
->         if (!is_v4(its_dev->its))
->                 return -EINVAL;
-> 
->         guard(raw_spinlock)(&its_dev->event_map.vlpi_lock);
-> 
->         /* Unmap request? */
->         if (!info)
->                 return its_vlpi_unmap(d);
-> 
-> or that KVM has gotten out of sync with the GIC/ITS (from its_vlpi_unmap()):
-> 
->         if (!its_dev->event_map.vm || !irqd_is_forwarded_to_vcpu(d))
->                 return -EINVAL;
-> 
-> All of the above failure scenarios are warnable offences, as they should
-> never occur absent a kernel/KVM bug.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c     | 2 +-
->  arch/arm64/kvm/vgic/vgic-v4.c      | 4 ++--
->  drivers/irqchip/irq-gic-v4.c       | 4 ++--
->  include/linux/irqchip/arm-gic-v4.h | 2 +-
->  4 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 534049c7c94b..98630dae910d 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -758,7 +758,7 @@ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
->  	if (irq) {
->  		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
->  			if (irq->hw)
-> -				WARN_ON(its_unmap_vlpi(ite->irq->host_irq));
-> +				its_unmap_vlpi(ite->irq->host_irq);
->  
->  			irq->hw = false;
->  		}
-> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-> index 193946108192..911170d4a9c8 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v4.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
-> @@ -545,10 +545,10 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int host_irq)
->  	if (irq->hw) {
->  		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
->  		irq->hw = false;
-> -		ret = its_unmap_vlpi(host_irq);
-> +		its_unmap_vlpi(host_irq);
->  	}
->  
->  	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
->  	vgic_put_irq(kvm, irq);
-> -	return ret;
-> +	return 0;
->  }
-> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
-> index 58c28895f8c4..8455b4a5fbb0 100644
-> --- a/drivers/irqchip/irq-gic-v4.c
-> +++ b/drivers/irqchip/irq-gic-v4.c
-> @@ -342,10 +342,10 @@ int its_get_vlpi(int irq, struct its_vlpi_map *map)
->  	return irq_set_vcpu_affinity(irq, &info);
->  }
->  
-> -int its_unmap_vlpi(int irq)
-> +void its_unmap_vlpi(int irq)
->  {
->  	irq_clear_status_flags(irq, IRQ_DISABLE_UNLAZY);
-> -	return irq_set_vcpu_affinity(irq, NULL);
-> +	WARN_ON_ONCE(irq_set_vcpu_affinity(irq, NULL));
->  }
->  
->  int its_prop_update_vlpi(int irq, u8 config, bool inv)
-> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-> index 7f1f11a5e4e4..0b0887099fd7 100644
-> --- a/include/linux/irqchip/arm-gic-v4.h
-> +++ b/include/linux/irqchip/arm-gic-v4.h
-> @@ -146,7 +146,7 @@ int its_commit_vpe(struct its_vpe *vpe);
->  int its_invall_vpe(struct its_vpe *vpe);
->  int its_map_vlpi(int irq, struct its_vlpi_map *map);
->  int its_get_vlpi(int irq, struct its_vlpi_map *map);
-> -int its_unmap_vlpi(int irq);
-> +void its_unmap_vlpi(int irq);
->  int its_prop_update_vlpi(int irq, u8 config, bool inv);
->  int its_prop_update_vsgi(int irq, u8 priority, bool group);
->  
-> 
-> base-commit: 4fc39a165c70a49991b7cc29be3a19eddcd9e5b9
-> --
-> 
+-- 
+Pedro
 
