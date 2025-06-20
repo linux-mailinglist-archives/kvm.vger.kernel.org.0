@@ -1,157 +1,190 @@
-Return-Path: <kvm+bounces-50066-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50067-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B59AE1B2F
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 14:48:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96223AE1B6D
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:07:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A32A93BD31E
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 12:48:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A68DA7AD28B
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 13:06:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D84028B4F0;
-	Fri, 20 Jun 2025 12:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80AD28AB11;
+	Fri, 20 Jun 2025 13:07:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XGU28bMd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TEfMhbpH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D4728368A;
-	Fri, 20 Jun 2025 12:48:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABF2236442
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 13:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750423727; cv=none; b=YgeObSjTQ5CKokacYB0bdRMjzrPZF+VaX/qgLk29CDJJCxnYSmgGNSj1iQgyr2SjYLGYOHup5C6avNN7ZrOv9Mg8RptKq682EH1qs2dt5FR4p20wFZK0k/S9B3IS7ByquUKvy8MfdUMlbEq0NMZoNEm3iV47x1i4AHw1scB0Nr8=
+	t=1750424835; cv=none; b=PP4dKaQ58ruBQ4yJzAChcpbwzMp6mRZviYyGBUWmbKIj2iATMKAsoiCGrjTi2woAUat/lDonlPEL0qn3+zH6Z78ovn1yWxRZBaK0ExDDbFW4mLe1RMJDz3Q02OMPy8S8MtHUBbylegbyKxm4j8yPLu9xSdwZLmwIZz8EDHqWqWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750423727; c=relaxed/simple;
-	bh=yVaxpPeFFP3rnQCIorHxvbBAoiiYM3mlDcF3kA5KISI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A81cWTxvH1YPDFdwyTa7ASDiXAq6BPWZq4bolQp/EDMEUmnLWdLYhy2+AWIb0AGgR+xlKQ3g+Jv+FS2/cGJW56nXu8vwtywlm11LvRUTHP6xEP6TfaLRkcoqZRUwU1lEajufF6Ow+8EWP2GUtIpnNyo8jxYmh0ChqDZlFOEp2Bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XGU28bMd; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750423726; x=1781959726;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=yVaxpPeFFP3rnQCIorHxvbBAoiiYM3mlDcF3kA5KISI=;
-  b=XGU28bMdhwZA2zwJF+8tgZ7kDn2eei16QzafYMPBxpaERO/XNWa3KNOa
-   mOX2UiMxwTlDKi1qD0XRUIaSz1pew9E4YRGcX2sNWupCoOHdQwhPHAnxw
-   JWaZt9QJ69B8VN48QjcRjOuYAcvbncCSK4xfkMaonrtOsks9NGhXHsocC
-   R0SDfjkaouHzQdxibocvhxjmU+UMm1I50Cf7Gu201Hmiw4r6TUuoN0KGe
-   XX6/N5cMvTCgKyvfajmKMWjYor5xNuxlKfPtT8CNNLNoafvCEbOFswn1I
-   hFvlDzf6ja/HdFi1omOBZMY5RgNTiWaLF7tK8cE2RTmacTfJjZI8Av13T
-   w==;
-X-CSE-ConnectionGUID: e7rT/RTjTTuVo4xi/uNUfA==
-X-CSE-MsgGUID: OkciWRStTyWQ0V81T3LQTw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="75216094"
-X-IronPort-AV: E=Sophos;i="6.16,251,1744095600"; 
-   d="scan'208";a="75216094"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2025 05:48:46 -0700
-X-CSE-ConnectionGUID: GqSOpAUeQdGVI6bfIkq+Dg==
-X-CSE-MsgGUID: IXp2ib+DRKaj7ZWXPIsPmw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,251,1744095600"; 
-   d="scan'208";a="155195275"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2025 05:48:42 -0700
-Message-ID: <b003b2c8-66fc-4600-9873-aa5201415b94@intel.com>
-Date: Fri, 20 Jun 2025 20:48:39 +0800
+	s=arc-20240116; t=1750424835; c=relaxed/simple;
+	bh=oVl2R6BlJ00aSL/yhNoEtUFUDYCiuIxGl+HmN/K7ayM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fJqUn+GsQnO2Z/UkwDMbuvq3PgxriHsD89cp6jkrhK7ltQNGF0lTu2nLIkUCRHCBNoALPyo2KgOSVHT0ywjOAaOVmR59eWBZZtQnobM5n9b7uG8pmHSOr9lP6aLUIawECJOCjTv/Sc+3gIQ5SWdl82X4h8g7BAfz935MYeF6++E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TEfMhbpH; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3a5257748e1so1243602f8f.2
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 06:07:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1750424832; x=1751029632; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+QJmU5PBg2tZeWfZeXKYOSoau8zVaAF0qlZsb030HdQ=;
+        b=TEfMhbpHt7524cmdfxCrVbKI9I76RcdkwOB3Hn0Cfx+D7EJh+b5EbtZfp0hfbTI8Qc
+         4M2Xe9O8BMxRsESbXv1u7tvx8fXgWaensnFRdTzGEaFBzZtRVkNacOn6fvlxcZakYGL4
+         5lkvLVJPhrg11u6w0AP1lbolRSaGK7+K7R5vy1bCIL13pdKvRq8fSWx02Nq/HBCcT6tR
+         FIpRSMRrsARYfDSQmhivlYFv+G+Z6lDas3pOER0/ffvx99Fc8Vs2Ekd1RxnRb+cz8uuZ
+         2pkxbfiKJZnBTk5qEw9CX1EUTka2SvW0GbWt+isv9LNB9cGIFBe194YyMfb+xPbar3Xe
+         y9iA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750424832; x=1751029632;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+QJmU5PBg2tZeWfZeXKYOSoau8zVaAF0qlZsb030HdQ=;
+        b=jcb5T21j+INZsBv1k0J4PkPEMaunD5yFzcvYffBQPlLTgKZiNcEVrqQ/db25QuDdfQ
+         qNhtjsxyu8B8Cgn6OzHu6SEjGAhEXkMRWpQGZTs2qHQ7Fu2dOKcphplzwfXMgNpvUwCv
+         zE7G5YN+9ExQ9RZlO/wX5i3TBDUsXbCA4GFxs4hzid8BhwwTWSt2VvWzYvki0X+jRheb
+         qccD1wiv4kHhw4gNO/UKADNsMrZK3VjTyOeLLGmJDBFRDGkAf2eFMf3vZ5tBxrhvwWEt
+         hBXT3Z3hMijugNsmXYeUpKuCtZ2H+VXHzdxBVzjwXgxTi7qJuM3/t9hkpkEEwEDvD7pL
+         Jq2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWKJzPSBXIghp24lnvR0F7Vz4CgwNj8bACK3urmyTn5PRajfr6EzeV/oXMbU6t9/5tuMng=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqteV2MKy8Jlt1kVPsoo41fjp5x5qLnR7w/uI30FrGCmLmg6SK
+	b4eeeAzW3Uq6JWvtn2cPj9e+TSuCBLXeDQ79Z+BBCYjwz6/PXp5kbicNXrfTr4b9Z4I=
+X-Gm-Gg: ASbGnctPx89Ub087sFwCe2yvK12qZSAT7JrpGS8tFM/CV/0ZEDkXex1XdXKscYKZYMx
+	IvbkQ4LnrlibMmwhSjwbjm6Bs4H5Ixm0zjpSOvNuHo5QHRuApB8HBTczj5ZDU1LVcw+C1E705W2
+	74yZNTBiHmq7Bj/Sf6nlVCnDUWQ2qn8CsswdLTU4zW4GiYLu4tPPxy9J+VIYR8aEg+6FGnlDtXj
+	s7ZtGLid6pJG0Xa8ThoANpOCIw6dxMTte3T5GZYjqgL/qDSQ7gaESUpZRjq3uDye0gM9PbRb3pl
+	3ERtZhOlDFouPwDs1joiQ+SQqA3Y+IUQhK75IMrnEYixcC+K82VIyNsF5SkZmpyYMvu/xEtiDVr
+	Rcf/UABH6bsPKgL2zvpWcUZxHy8RVIcoh+iBA
+X-Google-Smtp-Source: AGHT+IEJ9h5ss6DQ9nbsYss8UAzQAQ33xR7PMaeHXiIi1steBknP4WF0eD2p4PDUPBMV6vbuu4kWIQ==
+X-Received: by 2002:a05:6000:23c3:b0:3a4:f744:e00c with SMTP id ffacd0b85a97d-3a6d130452fmr1797673f8f.29.1750424831952;
+        Fri, 20 Jun 2025 06:07:11 -0700 (PDT)
+Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453646dc66fsm24751975e9.18.2025.06.20.06.07.10
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 20 Jun 2025 06:07:11 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Radoslaw Biernacki <rad@semihalf.com>,
+	Alexander Graf <agraf@csgraf.de>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	Phil Dennis-Jordan <phil@philjordan.eu>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Bernhard Beschow <shentey@gmail.com>,
+	Cleber Rosa <crosa@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Cameron Esfahani <dirty@apple.com>,
+	kvm@vger.kernel.org,
+	qemu-arm@nongnu.org,
+	Eric Auger <eric.auger@redhat.com>,
+	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	John Snow <jsnow@redhat.com>
+Subject: [PATCH v2 00/26] arm: Fixes and preparatory cleanups for split-accel
+Date: Fri, 20 Jun 2025 15:06:43 +0200
+Message-ID: <20250620130709.31073-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] TDX attestation support and GHCI fixup
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
- kvm <kvm@vger.kernel.org>, Sean Christopherson <seanjc@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>, "Huang, Kai"
- <kai.huang@intel.com>, Adrian Hunter <adrian.hunter@intel.com>,
- reinette.chatre@intel.com, "Lindgren, Tony" <tony.lindgren@intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>, Yan Zhao
- <yan.y.zhao@intel.com>, mikko.ylinen@linux.intel.com,
- "Shutemov, Kirill" <kirill.shutemov@intel.com>,
- "Yao, Jiewen" <jiewen.yao@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>
-References: <20250619180159.187358-1-pbonzini@redhat.com>
- <3133d5e9-18d3-499a-a24d-170be7fb8357@intel.com>
- <CABgObfaN=tcx=_38HnnPfE0_a+jRdk_UPdZT6rVgCTSNLEuLUw@mail.gmail.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <CABgObfaN=tcx=_38HnnPfE0_a+jRdk_UPdZT6rVgCTSNLEuLUw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On 6/20/2025 8:03 PM, Paolo Bonzini wrote:
-> Il ven 20 giu 2025, 03:30 Xiaoyao Li <xiaoyao.li@intel.com> ha scritto:
->>
->> On 6/20/2025 2:01 AM, Paolo Bonzini wrote:
->>> This is a refresh of Binbin's patches with a change to the userspace
->>> API.  I am consolidating everything into a single KVM_EXIT_TDX and
->>> adding to the contract that userspace is free to ignore it *except*
->>> for having to reenter the guest with KVM_RUN.
->>>
->>> If in the future this does not work, it should be possible to introduce
->>> an opt-in interface.  Hopefully that will not be necessary.
->>
->> For <GetTdVmCallInfo> exit, I think KVM still needs to report which
->> TDVMCALL leaf will exit to userspace, to differentiate between different
->> KVMs.
-> 
-> 
-> The interface I chose is that KVM always exits, but it initializes the
-> output values such that userspace can leave them untouched for unknown
-> TDVMCALLs or unknown leaves. So there is no need for this.
-> 
-> Querying kernel support of other services can be added later, but
-> unless the GHCI adds more input or output fields to TdVmCallInfo there
-> is no need to limit the userspace exit to leaf 1.
+Since v1:
+- Addressed rth's review comments
 
-I meant the case where KVM is going to support another optional TDVMCALL 
-leaf in the future, e.g., SetEventNotifyInterrupt. At that time, 
-userspace needs to differentiate between old KVM which only supports 
-<GetQuote> and new KVM which supports both <GetQuote> and 
-<SetEventNotifyInterrupt>.
+Omnibus series of ARM-related patches (noticed during the
+"split accel" PoC work).
 
-- If it's old KVM, userspace should only set <GetQuote> bit in 
-GetTdVmCallInfo exit. If userspace sets <SetEventNotifyInterrupt> in 
-GetTdVmCallInfo exit and enumerate to TD guest, but it's wrong info 
-since the KVM doesn't support <SetEventNotifyInterrupt> and userspace 
-won't get any chance to handle the guest call of <SetEventNotifyInterrupt>
+- Usual prototypes cleanups
+- Check TCG for EL2/EL3 features (and not !KVM or !HVF)
+- Improve HVF debugging
+- Correct HVF 'dtb_compatible' value for Linux
+- Fix HVF GTimer frequency (My M1 hardware has 24 MHz)
+  (this implies accel/ rework w.r.t. QDev vCPU REALIZE)
+- Expand functional tests w.r.t. HVF
 
-- But if it's new KVM, userspace can <SetEventNotifyInterrupt> bit in 
-GetTdVmCallInfo exit and enumerate to TD guest.
+Regards,
 
-Anyway, its the future problem, there should be various options to 
-handle it in the future. This series works for the current need.
+Phil.
 
-> 
-> Paolo
-> 
->>
->> But it's not a must for current <GetQuote> since it exits to userspace
->> from day 0. So that we can leave the report interface until KVM needs to
->> support user exit of another TDVMCALL leaf.
->>
->>> Paolo
->>>
->>> Binbin Wu (3):
->>>     KVM: TDX: Add new TDVMCALL status code for unsupported subfuncs
->>>     KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
->>>     KVM: TDX: Exit to userspace for GetTdVmCallInfo
->>>
->>>    Documentation/virt/kvm/api.rst    | 62 ++++++++++++++++++++++++-
->>>    arch/x86/include/asm/shared/tdx.h |  1 +
->>>    arch/x86/kvm/vmx/tdx.c            | 77 ++++++++++++++++++++++++++++---
->>>    include/uapi/linux/kvm.h          | 22 +++++++++
->>>    4 files changed, 154 insertions(+), 8 deletions(-)
->>>
->>
-> 
+Philippe Mathieu-Daudé (26):
+  target/arm: Remove arm_handle_psci_call() stub
+  target/arm: Reduce arm_cpu_post_init() declaration scope
+  target/arm: Unify gen_exception_internal()
+  target/arm/hvf: Simplify GIC hvf_arch_init_vcpu()
+  target/arm/hvf: Directly re-lock BQL after hv_vcpu_run()
+  target/arm/hvf: Trace hv_vcpu_run() failures
+  accel/hvf: Trace VM memory mapping
+  target/arm/hvf: Log $pc in hvf_unknown_hvc() trace event
+  target/arm: Correct KVM & HVF dtb_compatible value
+  accel/hvf: Model PhysTimer register
+  target/arm/hvf: Pass @target_el argument to hvf_raise_exception()
+  target/arm: Restrict system register properties to system binary
+  target/arm: Create GTimers *after* features finalized / accel realized
+  accel: Keep reference to AccelOpsClass in AccelClass
+  accel: Introduce AccelOpsClass::cpu_target_realize() hook
+  accel/hvf: Add hvf_arch_cpu_realize() stubs
+  target/arm/hvf: Really set Generic Timer counter frequency
+  target/arm/hvf: Trace host processor features
+  hw/arm/virt: Only require TCG || QTest to use TrustZone
+  hw/arm/virt: Only require TCG || QTest to use virtualization extension
+  hw/arm/virt: Rename cpu_post_init() -> post_cpus_gic_realized()
+  hw/arm/sbsa-ref: Tidy up use of RAMLIMIT_GB definition
+  tests/functional: Restrict nexted Aarch64 Xen test to TCG
+  tests/functional: Require TCG to run Aarch64 imx8mp-evk test
+  tests/functional: Add hvf_available() helper
+  tests/functional: Expand Aarch64 SMMU tests to run on HVF accelerator
+
+ meson.build                                 |   1 +
+ accel/hvf/trace.h                           |   2 +
+ include/qemu/accel.h                        |   3 +
+ include/system/accel-ops.h                  |   4 +-
+ include/system/hvf.h                        |   3 +
+ target/arm/cpu.h                            |   2 -
+ target/arm/internals.h                      |   6 +-
+ target/arm/tcg/translate.h                  |   1 +
+ accel/accel-common.c                        |   4 +
+ accel/accel-system.c                        |   3 +-
+ accel/hvf/hvf-accel-ops.c                   |   8 ++
+ accel/tcg/tcg-accel-ops.c                   |   4 +-
+ hw/arm/sbsa-ref.c                           |   8 +-
+ hw/arm/virt.c                               |   9 +-
+ target/arm/cpu.c                            |  78 ++++++------
+ target/arm/hvf/hvf.c                        | 129 +++++++++++++++-----
+ target/arm/kvm.c                            |   2 +-
+ target/arm/tcg/translate-a64.c              |   6 -
+ target/arm/tcg/translate.c                  |   2 +-
+ target/i386/hvf/hvf.c                       |   5 +
+ accel/hvf/trace-events                      |   7 ++
+ python/qemu/utils/__init__.py               |   2 +-
+ python/qemu/utils/accel.py                  |   8 ++
+ target/arm/hvf/trace-events                 |   6 +-
+ tests/functional/qemu_test/testcase.py      |   6 +-
+ tests/functional/test_aarch64_imx8mp_evk.py |   1 +
+ tests/functional/test_aarch64_smmu.py       |   9 +-
+ tests/functional/test_aarch64_xen.py        |   1 +
+ 28 files changed, 221 insertions(+), 99 deletions(-)
+ create mode 100644 accel/hvf/trace.h
+ create mode 100644 accel/hvf/trace-events
+
+-- 
+2.49.0
 
 
