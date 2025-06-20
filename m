@@ -1,413 +1,147 @@
-Return-Path: <kvm+bounces-50060-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50061-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F360AE1A62
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 14:00:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3997AE1A6E
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 14:04:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7185A1BC301B
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 12:01:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EACD1BC549B
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 12:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E9E28A735;
-	Fri, 20 Jun 2025 12:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541A428A40F;
+	Fri, 20 Jun 2025 12:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="eqS1biAM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ujt8Qewu"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D448317E;
-	Fri, 20 Jun 2025 12:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FAE28AB03
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 12:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750420835; cv=none; b=f4g9O76dl8qNInHPK/8hbXr8BDo4ERoUQAo9PPqzO4cjoHz+muN36CFGB3o1aRvQXa8R/6BM9isXymffbct7VljCxlAWjeLZEQerljib8zFRA8pOylvIIE513bgF5z/99ltoBUPxgP4YmFeaEtlQTRYm80yKAJl8OuwG+H4mePo=
+	t=1750421038; cv=none; b=gFHUqQdOmo/aQnJaDr2WB0r7O+OPJLi3lpIeeGZ1MOYS3AEBmW9ZsOvf/P4LVHF5HuuOCTtw/DU4iFhz8vBs+nUvaz8QOemm4k0E4nBX9Os0AYSEust+7RLx42ymCR/dtgKPm/w2R83AiryAMKhZKFvHFRkgbnIm/7wM5PUfI14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750420835; c=relaxed/simple;
-	bh=tptUqBswmrrA83eEPdA+o1+EZ6nxsbeRtan2snqTm10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MTBQOI3nGepMgg7apfKjYopEt1TwRGn3xiRx/r0bwXeTr/G+bJ3mU0pPXBLO7Evn8gm/kJ4rvU1y31YWuSewLIMvnPCk1JVuk8S7KV4WBE2Z6fOrNHVBVcaRmY09TFlOYGkPgiPVHIM2re2Myav38CKgSi3VKWUaAyndoOmQj7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=eqS1biAM; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1750420834; x=1781956834;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=w/25pdsb7c2UBnYp18+Oc232d/2gPhKJ+C4vXgNX6LQ=;
-  b=eqS1biAM/PY6VTrj0XDrvAx117GPWEHbKk2uOQiSD23NcT62sJlYI4Kd
-   3DbkAKYdicbtvjMbnC4GRyZe5gb9jKZhMgpsS2TmjZUnvf6+PAmHGqFsz
-   kTkiCP9w2vXH78/0oDvIH9hPfxzXVSALdy3SAb4h3IkbubtCEQexaIKAA
-   +Wo1HmIPNBSDQuxivxRdkMdj4+4XniyHDDKGTO12AJWDW9KozlHEqX4bw
-   +5NdE9A/HlXdMdG0fuEDXGs8evHO6Qc3i1Xids8+/5aZPvXAWmgLc+Dsf
-   fsmq7JewrUpj/VAyHpEZtAUQFDImxuCOe99G8mtXvU3f7A3/ZzRPkO/6T
-   A==;
-X-IronPort-AV: E=Sophos;i="6.16,251,1744070400"; 
-   d="scan'208";a="837455426"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2025 12:00:29 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:56193]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.15.147:2525] with esmtp (Farcaster)
- id f39858af-1d74-433e-8bd7-937764bedc3b; Fri, 20 Jun 2025 12:00:27 +0000 (UTC)
-X-Farcaster-Flow-ID: f39858af-1d74-433e-8bd7-937764bedc3b
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 20 Jun 2025 12:00:27 +0000
-Received: from [10.95.102.166] (10.95.102.166) by
- EX19D022EUC002.ant.amazon.com (10.252.51.137) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 20 Jun 2025 12:00:25 +0000
-Message-ID: <2097f155-c459-40e1-93e8-3d501ae66b42@amazon.com>
-Date: Fri, 20 Jun 2025 13:00:24 +0100
+	s=arc-20240116; t=1750421038; c=relaxed/simple;
+	bh=FAqGh+Ap3WVTnB3giMA2j55BTztyBeGG/4uN29HFZ7c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iQkZdko45CKQB9jyjRduV5qAj5bKt7AzcAv8C7YOqY3uM618G7mHGJrb1vDTbsFROC2OyBY2aKO6PtR1mt88dsFz61EZUoq8SAFAVmEDrYJdJ7oLlhMQJW8QvT6IDJwKPaPuIQFP67uKgjKlsgOi1rlfjV8ojr2+IlxWXfdgTMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ujt8Qewu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750421035;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hRiX5hP6eSsbI68Jfq5YDPv8YMSSHRs8HbY7Wk8t+xQ=;
+	b=Ujt8QewusR5fNh9opkVqJtAvJJQBCF8Ktr2QxeO5ehgsFhtkt6ir/7aa2Z+NlvcyUGT+38
+	bsXxldvqygnISK4Yl/u7l9o8lRHkehZhLUsb7R8jSe28LFnEboa+d5bMJk/npEfdrH0s+h
+	TWGczfxXnN9fA1kKuNPFCOFE4y3V1GM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-279-qXXqihO1NTec5N7QxN_YaQ-1; Fri, 20 Jun 2025 08:03:54 -0400
+X-MC-Unique: qXXqihO1NTec5N7QxN_YaQ-1
+X-Mimecast-MFC-AGG-ID: qXXqihO1NTec5N7QxN_YaQ_1750421034
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a37a0d1005so1069919f8f.3
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 05:03:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750421033; x=1751025833;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hRiX5hP6eSsbI68Jfq5YDPv8YMSSHRs8HbY7Wk8t+xQ=;
+        b=aRVlmzIs0HxCsCTEU/KubXW7mCmrNBt69fBY1DvK6ePeWzRPCMger91t3Bp0GGEKf2
+         Cy9t5PLkhSmdCXwM0vwNKrU+4E8I/uNQ2uUVVFFlHAf8S+osIx2ttoh0bvdk62XZ+acb
+         mZZKlLIfFd10ktyMC9NHgPCNZ08+uJB7GohOqR185WOOXAOVG7VsJL0AKJo1Y60DAC7z
+         LidiSa1uWRHeSlqZDw9YTZB3emCTn0C9ev+D5cnstoDIsjyECL2LJRWJ1+5FLwd7Tf8z
+         Om4IYrz9UGVH/5JInCexob60sZlQwYKncBLg9bf4/2l8nmiM6mo3vqIqJQtYVc1fXlhG
+         6TbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUv2e4RBKCkTDHx0cw/WeGXfgNfamosPeViVt1hZLcorPEATpcDeZHdExU79tFeURkDcII=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBLkgDHp3uanI6Q+c/XdTwNQVeB3EyIAR4xs0FAWOx5BUzEdNH
+	56BXpEnQS3hwdahDKIQisvZWKW9jUGaN5BChgIPolJC1tKK0ru3z18Hie7I3UxJj5tsz2Glsqkv
+	wP4AsgyyhPincl8s5vqPBdFtHICN/YhnzmP91Q99QGhcyYVR5cf99bAdOvlL+jeXDVnCVxrXDWs
+	466MAcwYczDw0zA757tOsC1HGrbdiE
+X-Gm-Gg: ASbGncu91HRwMi1inSmuMdAgBwigGKcHb8sB88yN0lvtplYbtnzWVAeqylAIy5c8awD
+	sTTNm0unng83mNlHgOGkPcdVgJ8+FqrlcUZvRieDSo8r7U0JmgvfwUbTHp/FVWTxTYrapbtb2vJ
+	LJZKY=
+X-Received: by 2002:a05:6000:2282:b0:3a4:d79a:35a6 with SMTP id ffacd0b85a97d-3a6d12e34b9mr2465542f8f.14.1750421028901;
+        Fri, 20 Jun 2025 05:03:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGEtw8HSbD5c31bjPnNG3AKWy62fuJMXkjNiI7W5B8OEByPQc05lu178uJKqVYi+04d45VIy1BAwLE5B8oF7v8=
+X-Received: by 2002:a05:6000:2282:b0:3a4:d79a:35a6 with SMTP id
+ ffacd0b85a97d-3a6d12e34b9mr2465273f8f.14.1750421025914; Fri, 20 Jun 2025
+ 05:03:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v3 1/6] mm: userfaultfd: generic continue for non
- hugetlbfs
-To: Peter Xu <peterx@redhat.com>
-CC: <akpm@linux-foundation.org>, <pbonzini@redhat.com>, <shuah@kernel.org>,
-	<viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <muchun.song@linux.dev>,
-	<hughd@google.com>, <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-fsdevel@vger.kernel.org>, <jack@suse.cz>,
-	<lorenzo.stoakes@oracle.com>, <Liam.Howlett@oracle.com>, <jannh@google.com>,
-	<ryan.roberts@arm.com>, <david@redhat.com>, <jthoughton@google.com>,
-	<graf@amazon.de>, <jgowans@amazon.com>, <roypat@amazon.co.uk>,
-	<derekmn@amazon.com>, <nsaenz@amazon.es>, <xmarcalx@amazon.com>
-References: <20250404154352.23078-1-kalyazin@amazon.com>
- <20250404154352.23078-2-kalyazin@amazon.com> <aEiwHjl4tsUt98sh@x1.local>
- <36d96316-fd9b-4755-bb35-d1a2cea7bb7e@amazon.com> <aEl9CNGLY0Sil7nq@x1.local>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <aEl9CNGLY0Sil7nq@x1.local>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D015EUB002.ant.amazon.com (10.252.51.123) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
+References: <20250619180159.187358-1-pbonzini@redhat.com> <3133d5e9-18d3-499a-a24d-170be7fb8357@intel.com>
+In-Reply-To: <3133d5e9-18d3-499a-a24d-170be7fb8357@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 20 Jun 2025 14:03:30 +0200
+X-Gm-Features: Ac12FXwlP3mB0d4H_A3QTPM4diBtAL8jRHpn6HbJoT9oX8REYeRb2oG13FSy0CE
+Message-ID: <CABgObfaN=tcx=_38HnnPfE0_a+jRdk_UPdZT6rVgCTSNLEuLUw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] TDX attestation support and GHCI fixup
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	"Huang, Kai" <kai.huang@intel.com>, Adrian Hunter <adrian.hunter@intel.com>, reinette.chatre@intel.com, 
+	"Lindgren, Tony" <tony.lindgren@intel.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
+	Yan Zhao <yan.y.zhao@intel.com>, mikko.ylinen@linux.intel.com, 
+	"Shutemov, Kirill" <kirill.shutemov@intel.com>, "Yao, Jiewen" <jiewen.yao@intel.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/06/2025 13:56, Peter Xu wrote:
-> On Wed, Jun 11, 2025 at 01:09:32PM +0100, Nikita Kalyazin wrote:
->>
->>
->> On 10/06/2025 23:22, Peter Xu wrote:
->>> On Fri, Apr 04, 2025 at 03:43:47PM +0000, Nikita Kalyazin wrote:
->>>> Remove shmem-specific code from UFFDIO_CONTINUE implementation for
->>>> non-huge pages by calling vm_ops->fault().  A new VMF flag,
->>>> FAULT_FLAG_USERFAULT_CONTINUE, is introduced to avoid recursive call to
->>>> handle_userfault().
->>>
->>> It's not clear yet on why this is needed to be generalized out of the blue.
->>>
->>> Some mentioning of guest_memfd use case might help for other reviewers, or
->>> some mention of the need to introduce userfaultfd support in kernel
->>> modules.
->>
->> Hi Peter,
->>
->> Sounds fair, thank you.
->>
->>>>
->>>> Suggested-by: James Houghton <jthoughton@google.com>
->>>> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
->>>> ---
->>>>    include/linux/mm_types.h |  4 ++++
->>>>    mm/hugetlb.c             |  2 +-
->>>>    mm/shmem.c               |  9 ++++++---
->>>>    mm/userfaultfd.c         | 37 +++++++++++++++++++++++++++----------
->>>>    4 files changed, 38 insertions(+), 14 deletions(-)
->>>>
->>>> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
->>>> index 0234f14f2aa6..2f26ee9742bf 100644
->>>> --- a/include/linux/mm_types.h
->>>> +++ b/include/linux/mm_types.h
->>>> @@ -1429,6 +1429,9 @@ enum tlb_flush_reason {
->>>>     * @FAULT_FLAG_ORIG_PTE_VALID: whether the fault has vmf->orig_pte cached.
->>>>     *                        We should only access orig_pte if this flag set.
->>>>     * @FAULT_FLAG_VMA_LOCK: The fault is handled under VMA lock.
->>>> + * @FAULT_FLAG_USERFAULT_CONTINUE: The fault handler must not call userfaultfd
->>>> + *                                 minor handler as it is being called by the
->>>> + *                                 userfaultfd code itself.
->>>
->>> We probably shouldn't leak the "CONTINUE" concept to mm core if possible,
->>> as it's not easy to follow when without userfault minor context.  It might
->>> be better to use generic terms like NO_USERFAULT.
->>
->> Yes, I agree, can name it more generically.
->>
->>> Said that, I wonder if we'll need to add a vm_ops anyway in the latter
->>> patch, whether we can also avoid reusing fault() but instead resolve the
->>> page faults using the vm_ops hook too.  That might be helpful because then
->>> we can avoid this new FAULT_FLAG_* that is totally not useful to
->>> non-userfault users, meanwhile we also don't need to hand-cook the vm_fault
->>> struct below just to suite the current fault() interfacing.
->>
->> I'm not sure I fully understand that.  Calling fault() op helps us reuse the
->> FS specifics when resolving the fault.  I get that the new op can imply the
->> userfault flag so the flag doesn't need to be exposed to mm, but doing so
->> will bring duplication of the logic within FSes between this new op and the
->> fault(), unless we attempt to factor common parts out.  For example, for
->> shmem_get_folio_gfp(), we would still need to find a way to suppress the
->> call to handle_userfault() when shmem_get_folio_gfp() is called from the new
->> op.  Is that what you're proposing?
-> 
-> Yes it is what I was proposing.  shmem_get_folio_gfp() always has that
-> handling when vmf==NULL, then vma==NULL and userfault will be skipped.
-> 
-> So what I was thinking is one vm_ops.userfaultfd_request(req), where req
-> can be:
-> 
->    (1) UFFD_REQ_GET_SUPPORTED: this should, for existing RAM-FSes return
->        both MISSING/WP/MINOR.  Here WP should mean sync-wp tracking, async
->        was so far by default almost supported everywhere except
->        VM_DROPPABLE. For guest-memfd in the future, we can return MINOR only
->        as of now (even if I think it shouldn't be hard to support the rest
->        two..).
-> 
->    (2) UFFD_REQ_FAULT_RESOLVE: this should play the fault() role but well
->        defined to suite userfault's need on fault resolutions.  It likely
->        doesn't need vmf as the parameter, but likely (when anon isn't taking
->        into account, after all anon have vm_ops==NULL..) the inode and
->        offsets, perhaps some flag would be needed to identify MISSING or
->        MINOR faults, for example.
-> 
-> Maybe some more.
-> 
-> I was even thinking whether we could merge hugetlb into the picture too on
-> generalize its fault resolutions.  Hugetlb was always special, maye this is
-> a chance too to make it generalized, but it doesn't need to happen in one
-> shot even if it could work.  We could start with shmem.
-> 
-> So this does sound like slightly involved, and I'm not yet 100% sure this
-> will work, but likely.  If you want, I can take a stab at this this week or
-> next just to see whether it'll work in general.  I also don't expect this
-> to depend on guest-memfd at all - it can be alone a refactoring making
-> userfault module-ready.
+Il ven 20 giu 2025, 03:30 Xiaoyao Li <xiaoyao.li@intel.com> ha scritto:
+>
+> On 6/20/2025 2:01 AM, Paolo Bonzini wrote:
+> > This is a refresh of Binbin's patches with a change to the userspace
+> > API.  I am consolidating everything into a single KVM_EXIT_TDX and
+> > adding to the contract that userspace is free to ignore it *except*
+> > for having to reenter the guest with KVM_RUN.
+> >
+> > If in the future this does not work, it should be possible to introduce
+> > an opt-in interface.  Hopefully that will not be necessary.
+>
+> For <GetTdVmCallInfo> exit, I think KVM still needs to report which
+> TDVMCALL leaf will exit to userspace, to differentiate between different
+> KVMs.
 
-Thanks for explaining that.  I played a bit with it myself and it 
-appears to be working for the MISSING mode for both shmem and 
-guest_memfd.  Attaching my sketch below.  Please let me know if this is 
-how you see it.
 
-I found that arguments and return values are significantly different 
-between the two request types, which may be a bit confusing, although we 
-do not expect many callers of those.
+The interface I chose is that KVM always exits, but it initializes the
+output values such that userspace can leave them untouched for unknown
+TDVMCALLs or unknown leaves. So there is no need for this.
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 8483e09aeb2c..eb30b23b24d3 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -603,6 +603,16 @@ struct vm_fault {
-  					 */
-  };
+Querying kernel support of other services can be added later, but
+unless the GHCI adds more input or output fields to TdVmCallInfo there
+is no need to limit the userspace exit to leaf 1.
 
-+#ifdef CONFIG_USERFAULTFD
-+/*
-+ * Used by userfaultfd_request().
-+ */
-+enum uffd_req {
-+	UFFD_REQ_GET_SUPPORTED, /* query supported userfaulfd modes */
-+	UFFD_REQ_FAULT_RESOLVE, /* request fault resolution */
-+};
-+#endif
-+
-  /*
-   * These are the virtual MM functions - opening of an area, closing and
-   * unmapping it (needed to keep files on disk up-to-date etc), pointer
-@@ -680,6 +690,22 @@ struct vm_operations_struct {
-  	 */
-  	struct page *(*find_special_page)(struct vm_area_struct *vma,
-  					  unsigned long addr);
-+
-+#ifdef CONFIG_USERFAULTFD
-+	/*
-+	 * Called by the userfaultfd code to query supported modes or request
-+	 * fault resolution.
-+	 * If called with req UFFD_REQ_GET_SUPPORTED, it returns a bitmask
-+	 * of modes as in struct uffdio_register.  No other arguments are
-+	 * used.
-+	 * If called with req UFFD_REQ_FAULT_RESOLVE, it resolves the fault
-+	 * using the mode specified in the mode argument. The inode, pgoff and
-+	 * foliop arguments must be set accordingly.
-+	 */
-+	int (*userfaultfd_request)(enum uffd_req req, int mode,
-+				   struct inode *inode, pgoff_t pgoff,
-+				   struct folio **foliop);
-+#endif
-  };
 
-  #ifdef CONFIG_NUMA_BALANCING
-diff --git a/include/linux/userfaultfd_k.h b/include/linux/userfaultfd_k.h
-index 75342022d144..1cabb925da0e 100644
---- a/include/linux/userfaultfd_k.h
-+++ b/include/linux/userfaultfd_k.h
-@@ -222,7 +222,11 @@ static inline bool vma_can_userfault(struct 
-vm_area_struct *vma,
-  		return false;
+Paolo
 
-  	if ((vm_flags & VM_UFFD_MINOR) &&
--	    (!is_vm_hugetlb_page(vma) && !vma_is_shmem(vma)))
-+	    (!is_vm_hugetlb_page(vma) &&
-+	     !vma->vm_ops->userfaultfd_request &&
-+	     !(vma->vm_ops->userfaultfd_request(UFFD_REQ_GET_SUPPORTED, 0,
-+						NULL, 0, NULL) &
-+	           UFFDIO_REGISTER_MODE_MINOR)))
-  		return false;
-
-  	/*
-@@ -243,8 +247,11 @@ static inline bool vma_can_userfault(struct 
-vm_area_struct *vma,
-  #endif
-
-  	/* By default, allow any of anon|shmem|hugetlb */
--	return vma_is_anonymous(vma) || is_vm_hugetlb_page(vma) ||
--	    vma_is_shmem(vma);
-+	return vma_is_anonymous(vma) ||
-+	    is_vm_hugetlb_page(vma) ||
-+	    (vma->vm_ops->userfaultfd_request &&
-+	     vma->vm_ops->userfaultfd_request(UFFD_REQ_GET_SUPPORTED, 0, NULL,
-+					      0, NULL));
-  }
-
-  static inline bool vma_has_uffd_without_event_remap(struct 
-vm_area_struct *vma)
-diff --git a/mm/shmem.c b/mm/shmem.c
-index 1ede0800e846..a5b5c4131dcf 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -5203,6 +5203,40 @@ static int shmem_error_remove_folio(struct 
-address_space *mapping,
-  	return 0;
-  }
-
-+#ifdef CONFIG_USERFAULTFD
-+static int shmem_userfaultfd_request(enum uffd_req req, int mode,
-+				     struct inode *inode, pgoff_t pgoff,
-+				     struct folio **foliop)
-+{
-+	int ret;
-+
-+	switch (req) {
-+	case UFFD_REQ_GET_SUPPORTED:
-+		ret =
-+		    UFFDIO_REGISTER_MODE_MISSING |
-+		    UFFDIO_REGISTER_MODE_WP |
-+		    UFFDIO_REGISTER_MODE_MINOR;
-+		break;
-+	case UFFD_REQ_FAULT_RESOLVE:
-+		ret = shmem_get_folio(inode, pgoff, 0, foliop, SGP_NOALLOC);
-+		if (ret == -ENOENT)
-+			ret = -EFAULT;
-+		if (ret)
-+			break;
-+		if (!*foliop) {
-+			ret = -EFAULT;
-+			break;
-+		}
-+		break;
-+	default:
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+#endif
-+
-  static const struct address_space_operations shmem_aops = {
-  	.writepage	= shmem_writepage,
-  	.dirty_folio	= noop_dirty_folio,
-@@ -5306,6 +5340,9 @@ static const struct vm_operations_struct 
-shmem_vm_ops = {
-  	.set_policy     = shmem_set_policy,
-  	.get_policy     = shmem_get_policy,
-  #endif
-+#ifdef CONFIG_USERFAULTFD
-+	.userfaultfd_request = shmem_userfaultfd_request,
-+#endif
-  };
-
-  static const struct vm_operations_struct shmem_anon_vm_ops = {
-@@ -5315,6 +5352,9 @@ static const struct vm_operations_struct 
-shmem_anon_vm_ops = {
-  	.set_policy     = shmem_set_policy,
-  	.get_policy     = shmem_get_policy,
-  #endif
-+#ifdef CONFIG_USERFAULTFD
-+	.userfaultfd_request = shmem_userfaultfd_request,
-+#endif
-  };
-
-  int shmem_init_fs_context(struct fs_context *fc)
-diff --git a/mm/userfaultfd.c b/mm/userfaultfd.c
-index d06453fa8aba..efc150bf5691 100644
---- a/mm/userfaultfd.c
-+++ b/mm/userfaultfd.c
-@@ -392,16 +392,18 @@ static int mfill_atomic_pte_continue(pmd_t *dst_pmd,
-  	struct page *page;
-  	int ret;
-
--	ret = shmem_get_folio(inode, pgoff, 0, &folio, SGP_NOALLOC);
--	/* Our caller expects us to return -EFAULT if we failed to find folio */
--	if (ret == -ENOENT)
--		ret = -EFAULT;
-+	if (!dst_vma->vm_ops->userfaultfd_request ||
-+	    !(dst_vma->vm_ops->userfaultfd_request(UFFD_REQ_GET_SUPPORTED, 0,
-+						   NULL, 0, NULL) &
-+	      UFFDIO_REGISTER_MODE_MINOR)) {
-+		return -EFAULT;
-+	}
-+
-+	ret = dst_vma->vm_ops->userfaultfd_request(UFFD_REQ_FAULT_RESOLVE,
-+						   UFFDIO_REGISTER_MODE_MINOR,
-+						   inode, pgoff, &folio);
-  	if (ret)
-  		goto out;
--	if (!folio) {
--		ret = -EFAULT;
--		goto out;
--	}
-
-  	page = folio_file_page(folio, pgoff);
-  	if (PageHWPoison(page)) {
-@@ -770,10 +772,10 @@ static __always_inline ssize_t mfill_atomic(struct 
-userfaultfd_ctx *ctx,
-  		return  mfill_atomic_hugetlb(ctx, dst_vma, dst_start,
-  					     src_start, len, flags);
-
--	if (!vma_is_anonymous(dst_vma) && !vma_is_shmem(dst_vma))
--		goto out_unlock;
--	if (!vma_is_shmem(dst_vma) &&
--	    uffd_flags_mode_is(flags, MFILL_ATOMIC_CONTINUE))
-+	if (!vma_is_anonymous(dst_vma) &&
-+            (!dst_vma->vm_ops->userfaultfd_request ||
-+	     (!dst_vma->vm_ops->userfaultfd_request(UFFD_REQ_GET_SUPPORTED, 0,
-+						    NULL, 0, NULL))))
-  		goto out_unlock;
-
-  	while (src_addr < src_start + len) {
-
-> 
-> Thanks,
-> 
-> --
-> Peter Xu
-> 
+>
+> But it's not a must for current <GetQuote> since it exits to userspace
+> from day 0. So that we can leave the report interface until KVM needs to
+> support user exit of another TDVMCALL leaf.
+>
+> > Paolo
+> >
+> > Binbin Wu (3):
+> >    KVM: TDX: Add new TDVMCALL status code for unsupported subfuncs
+> >    KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
+> >    KVM: TDX: Exit to userspace for GetTdVmCallInfo
+> >
+> >   Documentation/virt/kvm/api.rst    | 62 ++++++++++++++++++++++++-
+> >   arch/x86/include/asm/shared/tdx.h |  1 +
+> >   arch/x86/kvm/vmx/tdx.c            | 77 ++++++++++++++++++++++++++++---
+> >   include/uapi/linux/kvm.h          | 22 +++++++++
+> >   4 files changed, 154 insertions(+), 8 deletions(-)
+> >
+>
 
 
