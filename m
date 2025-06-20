@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-50070-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50071-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C76AE1B75
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:08:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DBA5AE1B71
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:08:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5DF7167332
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 13:07:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 513637ADA70
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 13:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B8728C2A2;
-	Fri, 20 Jun 2025 13:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32A228C2DE;
+	Fri, 20 Jun 2025 13:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nWFxam2d"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HyI+z0DE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5A928BA9B
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 13:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CDB28BA9B
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 13:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750424852; cv=none; b=WlcPYBngQh8YgqteQbuPHiHnyJEGA8tzIhDQ8Vqx2OH/OWft4VTLNekqF0R4/2YJgNPtYUq1k6qCP/1ay6sqmH1AvwzfIlWMo0gsO9/mUKQyEAYx84gelDT5jjCTTO3Hjuiu6nq/pA07mbHKof7oejJx6HP79tnD5Hb6Kl5rS3w=
+	t=1750424860; cv=none; b=oJpadqJA+5s9vhTHZ9gGSPljSN3i7AAltWy2eKFhrXXrl43rPgGtk+j++15mf2nwUSw3oehnpxFEv7vj14viAr+yOcBHgcIfcSqZvKGT9IHxBV1hhVUBiWZKOGt5N6aq75edTemkYyH/7fxth5uPSRvL3sF3k4/5BA1PlAdGpFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750424852; c=relaxed/simple;
-	bh=ZO/i7m17/UWggquSZiea8ez2n78wL0tYYfUv3t3wbak=;
+	s=arc-20240116; t=1750424860; c=relaxed/simple;
+	bh=qmkEE/P1MRtY9fRUShXplI4bvffjLYW5Q5GOXihouNA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MXGdHJKYI1vEje9bLPF2/4qxBhu5vMXJxOv6Ck7bXZA9MAPBSV0QUKVsAkdYVSheEL68yOyQDQB0S8ifUmkp3xMIoD1eegHLawTMEjIqClkPS19k2JL4D/LcmmhB3AwPVYz1nsU2lnW9D3hrlF0xjDXNC1ZFxMkOb63kbuQng3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nWFxam2d; arc=none smtp.client-ip=209.85.128.44
+	 MIME-Version:Content-Type; b=ZKTq6IyHApNsOY0wbbgxZ4oP4X8hf+LdTAoIXGnKk0IYSRgxdYt1Gp9tzIn860lcpU4ucWPrEwmYxSFbNsjxabXf51DZW/Qy7ObnPmHoHksLDb9quOsZHfFGH/jqNW1rwDxrhJPG5aKTmwvpWNokzCIN4eRQMLi26G3eGQsRFms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HyI+z0DE; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-441ab63a415so19971625e9.3
-        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 06:07:30 -0700 (PDT)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a375e72473so862887f8f.0
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 06:07:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750424849; x=1751029649; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750424854; x=1751029654; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g4jpPoIjWAnN20gltB2a/vOsrmaIk3+mmplMj5/YsrY=;
-        b=nWFxam2dhcV705TVfQaOeFo2fP9wRndDaEjKVnQS61V8jr0oKi1te+HfbfGIs3BboO
-         wpw1q5dEHK7tEatp3Wpuph3yY/j8uX9S+R34C/X9pmi/MfyPic8fdhgokrkYlQfMXMeT
-         oLyxAfTKLniRQ4tWdb+nTWe2uWtSCwnqoPOvG4nDEn4xLIPnx+yNp74muaOPAHHZM4Ca
-         QZT+7gbb1AJNOM59oXSHRGlrRFsG4+mIioD+DixxgfsxJLs56/suj9I3tIeoNnFIsi9x
-         kjgycRNRVaZZqnr3mc9LCBMF7qQYHiBItWIEO9RKb5/1e7tpJIi1oUOP0oS+eboxxNc1
-         dSTQ==
+        bh=i7X9qE0A0zkH5gg9YDfRhHn13dFLj9D3tYtyAnJR94U=;
+        b=HyI+z0DEZrDjo54IS1cN5aKjwXfm/R/FtHrChtR7XB4YWXd1PB6GTQdQfDt6Z5xekq
+         e8+OC4Po7nUuV89j3EZ6WUzDTOHcrYn3+jO9QMpNsU3OsWRDk2ssaCKRT9DD/7F8ZZ/z
+         d9+NsA1+ciZtSaRr+G7z/cEtaNOYBWvAcu88l025VMYorCazwvHPY5St0/uloN7rOZaX
+         u/OnFiy5wITTzQI+v63VNZRTxNca+U5iPVtLsnphA2j/qvthljFfPu/e0ARwRqaIZXhw
+         xfGEex+l4a36hObi4oHorp5O/Ffwm/rFIk3HkprhyADjbjP4u/V0luyhar7iGmaSh8Mf
+         ycVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750424849; x=1751029649;
+        d=1e100.net; s=20230601; t=1750424854; x=1751029654;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=g4jpPoIjWAnN20gltB2a/vOsrmaIk3+mmplMj5/YsrY=;
-        b=ChbZYiIl/wrQz9EYs2/fyy1TyEhT3Ue2JdxLPFyRkW0SqSrUlxBZPDugPmTnIX+Q0Z
-         0LStN3vMquN3UaPmtFDddB0fZi1otg+3kxjUoda++daDc3CJ6xs/Xta3jV9q7s6wl4R9
-         xikumACMM3WW3jO/g2NsUHPEerd+YF7RqIq27YOmrufFDG0x0k3F1wgvJt+5KaGT71F3
-         0b1RijBwZEnknhacfQ9SH48ueIjm0CN8DxZ5h+/4GoxFowIRTIPzqjU3TeiRKt5qDhgq
-         mG+pxrII2ySDnI/LM07bQse2NNeFJLEVJAcfcUtzZEsmDL+cTRTwwtHcpdMlHAG3BJPf
-         Zhsw==
-X-Forwarded-Encrypted: i=1; AJvYcCXiJqok8n+zICkq8VWJhCV0oQJIQoAt1pCyM4njjupYMMPgj3ZCfXdxXEtZWDLRH2yEzNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5GKpMfOeGWMElT2XAyXMU2AwjciC7qNDYwtIhmgrgyehXEdnv
-	ZxRRKMiheOr0PYdtzy5Rb2RJTwocRG7Ccf73JKAq2bOgTJXPP+7/I8bLFJ4gH5IbogU=
-X-Gm-Gg: ASbGnctkTQthDlYysTkc5kTOCbVhSlu1uqSprPcb8V12B9mbDW3xgAs4LYVge66uDqW
-	mE67JgWKnTV4fw5ebZp0Y2hKrDhnLwy/xV3eQcja8tlcN+SZOPiIgiC+fWv9TvRZrr+Ng1fDkh+
-	VA9UbM7EEmI5n6lDmKQthFx3MUL5q0LYiSsS5kyEg9HXN23J/fegQGTG412H8G+PyP0P00RUSGY
-	szjX5H2JLs/sCzpsGiFI84Dq9WOuvBJGJaD9OLFtyo+xjN58+fiWyhbpAfsWIA2VUCDbAT6LvvA
-	0vgBl+Jc/J/x8mpvTAUT1XEKugfr5A7CHnYrXv50loAOOfLllZqI0lQMR/A/gqNkAttHV8z6mH4
-	eWGrRNyrbfHg0vPAJ/TlvzVNVUb0MMZHmBcOO
-X-Google-Smtp-Source: AGHT+IHvqyAxctyWiDO7wt3FaACda4gkUZk2ECgfjgeswwsSXX3ba2fXpQZsZ/3OnTwR/gx0VWlMzw==
-X-Received: by 2002:a05:600c:154b:b0:43d:40b0:5b with SMTP id 5b1f17b1804b1-453659b885emr24539615e9.25.1750424848387;
-        Fri, 20 Jun 2025 06:07:28 -0700 (PDT)
+        bh=i7X9qE0A0zkH5gg9YDfRhHn13dFLj9D3tYtyAnJR94U=;
+        b=d0hR6MyaeSGmyHxMjNvLH7uXOMlIClVEAZEIaIzBptz621DA1ijNWJkGDPRAMZ55qs
+         /XpDmf2Ido444tJg7ANhzQvpjgmE5q+gpqbqfDlZVhWyf4Tfl59+LRHKg0h94psFArKj
+         /D6gAxFaELJpHYkFjY4TWKcFUMS8Lt2yX2JK4YMP2RbCT+a5Yml3BPPnhFLmK+0wDi3O
+         QBx/rgYbECePC0qKF0sdlY8YWsokpXnfX7kHWqrrYQiAoGeFgAPtYM0hfWxpNRxFho9P
+         gi9SIgOIyoxWtsVgURz7wEMj5n5xzkz2+A11ZPZf+k7iAIKAnW83J++dgOSNw7zU5ebe
+         p7aA==
+X-Forwarded-Encrypted: i=1; AJvYcCXgEbd2MEIerFYN4a5I8rIov8bSU2L/X5S5Bb82gNfcJHaueOU3OQuT15rIDduQ1q7FDKI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxn+D9phP2YHI3Lc5hT0MkYVQJYeeOWTNcf8hLdVgNikFjOyT9Z
+	bHDnbBsuVu8Pix1/yB14fLeBchkOVMyyj4E+/iYt6eWaBgpwzFmIBuTA7Ob/Biww238=
+X-Gm-Gg: ASbGncvJXK8xs4pD57dDwNpdJw7AOmwyBcvDEJatxIHh8hb/OHYFfNx75BcvEXR3yZU
+	hwhvsTlso79oZY3l/BcHKy/4LHB1nytkA1l1S177QZT5AY03c4vZfHlRzA7Wr3BSneQ/+/eRPHj
+	pAL91XDfKLHyq/Yvl14dt3xryuMvo6AbQ2+WieHgi4gwpsEB8xoZWG8SfWratvOYpK2q95R/HtV
+	5pM2IwpC035bFm4Ia2xPWaauhen1yvWzJL62+B+dXm8U7A+XomW7m7H79WR8YR1L+XXwq9ZRUJk
+	50KTgEXcBKSeb2AbfcpZGMm1lD08FmsjjsWgyuPYvaInbYp4sQcX/TMnUIw0EqNrGgB6UVd8vp+
+	LPNv7YJRc8e+J4JTTfrNm8hHpMdrJIf7dWqnPJGKVVxR95Y0=
+X-Google-Smtp-Source: AGHT+IG8MOa1mgx5GRJT2pi7G8sTIbJ7uQF1KFg+Pl8xxcjdSw3j34E0kQi1ej0Od+hgqLrB/UqKrg==
+X-Received: by 2002:a05:6000:4715:b0:3a5:2923:7ffa with SMTP id ffacd0b85a97d-3a6d1193fd2mr2532616f8f.7.1750424854370;
+        Fri, 20 Jun 2025 06:07:34 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4535e983a4bsm59724925e9.13.2025.06.20.06.07.27
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45364703f1esm25142395e9.32.2025.06.20.06.07.32
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 20 Jun 2025 06:07:27 -0700 (PDT)
+        Fri, 20 Jun 2025 06:07:33 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -95,9 +95,9 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Thomas Huth <thuth@redhat.com>,
 	Roman Bolshakov <rbolshakov@ddn.com>,
 	John Snow <jsnow@redhat.com>
-Subject: [PATCH v2 03/26] target/arm: Unify gen_exception_internal()
-Date: Fri, 20 Jun 2025 15:06:46 +0200
-Message-ID: <20250620130709.31073-4-philmd@linaro.org>
+Subject: [PATCH v2 04/26] target/arm/hvf: Simplify GIC hvf_arch_init_vcpu()
+Date: Fri, 20 Jun 2025 15:06:47 +0200
+Message-ID: <20250620130709.31073-5-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250620130709.31073-1-philmd@linaro.org>
 References: <20250620130709.31073-1-philmd@linaro.org>
@@ -110,58 +110,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Same code, use the generic variant.
+Only update the ID_AA64PFR0_EL1 register when a GIC is provided.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/tcg/translate.h     | 1 +
- target/arm/tcg/translate-a64.c | 6 ------
- target/arm/tcg/translate.c     | 2 +-
- 3 files changed, 2 insertions(+), 7 deletions(-)
+ target/arm/hvf/hvf.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/tcg/translate.h b/target/arm/tcg/translate.h
-index 1bfdb0fb9bb..0004a97219b 100644
---- a/target/arm/tcg/translate.h
-+++ b/target/arm/tcg/translate.h
-@@ -347,6 +347,7 @@ void arm_jump_cc(DisasCompare *cmp, TCGLabel *label);
- void arm_gen_test_cc(int cc, TCGLabel *label);
- MemOp pow2_align(unsigned i);
- void unallocated_encoding(DisasContext *s);
-+void gen_exception_internal(int excp);
- void gen_exception_insn_el(DisasContext *s, target_long pc_diff, int excp,
-                            uint32_t syn, uint32_t target_el);
- void gen_exception_insn(DisasContext *s, target_long pc_diff,
-diff --git a/target/arm/tcg/translate-a64.c b/target/arm/tcg/translate-a64.c
-index ac80f572a2d..7c79b8c4401 100644
---- a/target/arm/tcg/translate-a64.c
-+++ b/target/arm/tcg/translate-a64.c
-@@ -433,12 +433,6 @@ static void gen_rebuild_hflags(DisasContext *s)
-     gen_helper_rebuild_hflags_a64(tcg_env, tcg_constant_i32(s->current_el));
- }
+diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
+index 42258cc2d88..c1ed8b510db 100644
+--- a/target/arm/hvf/hvf.c
++++ b/target/arm/hvf/hvf.c
+@@ -1057,11 +1057,15 @@ int hvf_arch_init_vcpu(CPUState *cpu)
+                               arm_cpu->mp_affinity);
+     assert_hvf_ok(ret);
  
--static void gen_exception_internal(int excp)
--{
--    assert(excp_is_internal(excp));
--    gen_helper_exception_internal(tcg_env, tcg_constant_i32(excp));
--}
--
- static void gen_exception_internal_insn(DisasContext *s, int excp)
- {
-     gen_a64_update_pc(s, 0);
-diff --git a/target/arm/tcg/translate.c b/target/arm/tcg/translate.c
-index 9962f43b1d0..f7d6d8ce196 100644
---- a/target/arm/tcg/translate.c
-+++ b/target/arm/tcg/translate.c
-@@ -372,7 +372,7 @@ static void gen_rebuild_hflags(DisasContext *s, bool new_el)
-     }
- }
+-    ret = hv_vcpu_get_sys_reg(cpu->accel->fd, HV_SYS_REG_ID_AA64PFR0_EL1, &pfr);
+-    assert_hvf_ok(ret);
+-    pfr |= env->gicv3state ? (1 << 24) : 0;
+-    ret = hv_vcpu_set_sys_reg(cpu->accel->fd, HV_SYS_REG_ID_AA64PFR0_EL1, pfr);
+-    assert_hvf_ok(ret);
++    if (env->gicv3state) {
++        ret = hv_vcpu_get_sys_reg(cpu->accel->fd,
++                                  HV_SYS_REG_ID_AA64PFR0_EL1, &pfr);
++        assert_hvf_ok(ret);
++        pfr = FIELD_DP64(pfr, ID_AA64PFR0, GIC, 1);
++        ret = hv_vcpu_set_sys_reg(cpu->accel->fd,
++                                  HV_SYS_REG_ID_AA64PFR0_EL1, pfr);
++        assert_hvf_ok(ret);
++    }
  
--static void gen_exception_internal(int excp)
-+void gen_exception_internal(int excp)
- {
-     assert(excp_is_internal(excp));
-     gen_helper_exception_internal(tcg_env, tcg_constant_i32(excp));
+     /* We're limited to underlying hardware caps, override internal versions */
+     ret = hv_vcpu_get_sys_reg(cpu->accel->fd, HV_SYS_REG_ID_AA64MMFR0_EL1,
 -- 
 2.49.0
 
