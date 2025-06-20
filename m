@@ -1,63 +1,66 @@
-Return-Path: <kvm+bounces-50058-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50059-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A0CAE19C1
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 13:14:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A7CFAE1A42
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 13:52:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D3195A5E5C
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 11:13:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 534F03AA2F0
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 11:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B773428A41B;
-	Fri, 20 Jun 2025 11:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4664128A1C5;
+	Fri, 20 Jun 2025 11:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pMastnj+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X/VEVYX8"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAD128A40D;
-	Fri, 20 Jun 2025 11:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5190925E83C;
+	Fri, 20 Jun 2025 11:52:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750417995; cv=none; b=qUcX+YDAvMIixFsT/mSX8b2J/yJKME6qa2zRUbNsxEcb5quDK8j/QBuAC1Mu5gCU3NMd2g3D5wTlz/btNal6E/dRV5PggYBSvIx7qNU0OCIzhqRp6L0R5juQ5j1pKDwi/P13XHJV8n8CbGOgUcQOnqXT10ompySSWY/pqjDlXQI=
+	t=1750420333; cv=none; b=hRN/IXW7M8heEoQelLsO/kFsLyjvC+2fF4W9twi7/H4LuKe1zDn2P6b/tv5YS88jLHvCoDPOFJbdONHn51kPPR0anEGwn6GcvNMhCKCdRBXuE1AcKx2m9/cdepq6wip4Zq+tN46H99WDMwOPBCmwY4Rh+iBJwqVMrmP36wXcJ5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750417995; c=relaxed/simple;
-	bh=ErTcedXjkMUpCPpdOZLnqSb5fYN4n0bh2a7ddFrfZBQ=;
+	s=arc-20240116; t=1750420333; c=relaxed/simple;
+	bh=a2kXmfRYhfHsg1B/+jNgwJYC8EaQFtK19/hEZabrmJs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pixBh9tYjHZVIiSY7+sFvoq9BnVj3H4IMX/lE/xaWdzmPqH9vR0WbWbdy9A0qI+a0brn7lYps7J3Q6wSAldw2OMLXoioceWC7/MQ+j9jCQxts9ZvEzXEd3ZUdUxfcS+BUcSb7D7GOjsV7FLQRXUHcv54OxtLLQhQE10aqPU8H7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pMastnj+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B094C4CEE3;
-	Fri, 20 Jun 2025 11:13:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=YrtHp74l4y0CJJlY3nAKyBDmBl1E9FJazbuDyuPmrixf4Mr/Wj8nfTQvdbqMQ6Zqi9HZYVRVQ0V7XhYAi6nfc+6yq029tKZmwzBbnET8KvUbK6hoRa15E226rjDgrX0Jaq+ziS4fqfYLFoxvyrIyIDcqugQjGYdoMgNn4q5O0Gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X/VEVYX8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B896FC4CEEE;
+	Fri, 20 Jun 2025 11:52:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750417995;
-	bh=ErTcedXjkMUpCPpdOZLnqSb5fYN4n0bh2a7ddFrfZBQ=;
+	s=k20201202; t=1750420332;
+	bh=a2kXmfRYhfHsg1B/+jNgwJYC8EaQFtK19/hEZabrmJs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pMastnj+G0WkUMW+DQ9ufVmL0ThlYGqk0MMgIgaROEad34UvetisFsemW7kQzsb70
-	 h3aIXFb0emEE1DfX8A+ybpHfMF/xu0E1snYX2PoZs1ZywfnhKWbyvkkvcnXaL0DtYB
-	 k4QWh/XFHGi1wBfvO5HCdJd8Tn9hR8nkAGGZUILNMWRMv85mlLr4mrCUkOYLck2jL2
-	 azDuKujuhjZIuiVb2Dz/E0n3WzGQ9XGqUFic9c1vbs+6KWVTADSXd07p3Zse4W1M6x
-	 Swkcsg5Im/gNPO9yT+AQB+mMpG6IcBnKXhGjg1vRI7IwtJTCgDrgMjWbhl0uvkCM5T
-	 hVd4M4yyusZGw==
+	b=X/VEVYX8aPDUQ//yRIoaTsoR8MiF6Bdbr5aElLqkZNonUtIkc4QBupwvFXkltIZ7r
+	 K8l3TV/2q4nli23LrW3f7YBBhsXG7NNvtWtH2o9pQnToUKy9DNKym1b1imEsLFS8T8
+	 ltwgGTlDS3OLoFsBAo6AephRJzTyq2Tc4z2f/jVyOgJmVgM52US46xX4RrNDNmFSz2
+	 s55zZwCDd9200gdnoT7qPpFg8/5pkCUhKKIL81eKeeRne04dgZTf70IlB1GnZTO9+m
+	 MJQOjXgcXuGGpXfM6FQIu9HYcGBif+pxPCr8+S8l8QJz51L5ci09oahqHn6xkHXUUj
+	 8/JW3cl325iEw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1uSZgH-008XJI-0P;
-	Fri, 20 Jun 2025 12:13:13 +0100
-Date: Fri, 20 Jun 2025 12:13:12 +0100
-Message-ID: <86ikkqd5tj.wl-maz@kernel.org>
+	id 1uSaHy-008Xs6-El;
+	Fri, 20 Jun 2025 12:52:10 +0100
+Date: Fri, 20 Jun 2025 12:52:08 +0100
+Message-ID: <86h60ad40n.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Will Deacon <will@kernel.org>,
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>,
+	Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH kvmtool 0/3] arm64: Nested virtualization support
-In-Reply-To: <20250620104454.1384132-1-andre.przywara@arm.com>
+Subject: Re: [PATCH kvmtool 2/3] arm64: Initial nested virt support
+In-Reply-To: <aFVBckcGYQgF+UXO@arm.com>
 References: <20250620104454.1384132-1-andre.przywara@arm.com>
+	<20250620104454.1384132-3-andre.przywara@arm.com>
+	<aFVBckcGYQgF+UXO@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,52 +72,59 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, andre.przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Andre,
-
-On Fri, 20 Jun 2025 11:44:51 +0100,
-Andre Przywara <andre.przywara@arm.com> wrote:
+On Fri, 20 Jun 2025 12:09:38 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Thanks to the imperturbable efforts from Marc, arm64 support for nested
-> virtualization has now reached the mainline kernel, which means the
-> respective kvmtool support should now be ready as well.
-
-Thanks for pushing this stuff out.
-
+> Hi Andre,
 > 
-> Patch 1 updates the kernel headers, to get the new EL2 capability, and
-> the VGIC device control to setup the maintenance IRQ.
-> Patch 2 introduces the new "--nested" command line option, to let the
-> VCPUs start in EL2. To allow KVM guests running in such a guest, we also
-> need VGIC support, which patch 3 allows by setting the maintenance IRQ.
+> Thanks for doing this, it was needed. Haven't given this a proper look (I'm
+> planning to do that though!), but something jumped at me, below.
 > 
-> Tested on the FVP (with some good deal of patience), and some commercial
-> (non-fruity) hardware, down to a guest's guest's guest.
+> On Fri, Jun 20, 2025 at 11:44:53AM +0100, Andre Przywara wrote:
+> > The ARMv8.3 architecture update includes support for nested
+> > virtualization. Allow the user to specify "--nested" to start a guest in
 > 
-> Cheers,
-> Andre
+> './vm help run' shows:
 > 
-> P.S.: Marc: I saw the other patches in your kernel.org repo, do we need any
-> of them - HYP timer IRQ, E2H0, counter offset?
+> --pmu             Create PMUv3 device
+> --disable-mte     Disable Memory Tagging Extension
+> --no-pvtime       Disable stolen time
+> 
+> Where:
+> 
+> --pmu checks for KVM_CAP_ARM_PMU_V3.
+> --disable-mte is there because MTE is enabled automatically for a guest when
+> KVM_CAP_ARM_MTE is present.
+> --no-pvtime is there because pvtime is enabled automatically; no capability
+> check is needed, but the control group for pvtime is called
+> KVM_ARM_VCPU_PVTIME_CTRL.
+> 
+> What I'm trying to get at is that the name for the kvmtool command line option
+> matches KVM's name for the capability. What do you think about naming the
+> parameter --el2 to match KVM_CAP_ARM_EL2 instead of --nested?
+> 
+>  Also, I seem to remember that the command line option for enabling
+>  KVM_CAP_ARM_EL2_E2H0 in Marc's repo is --e2h0, so having --el2 instead of
+>  --nested looks somewhat more consistent to me.
+> 
+>  Thoughts?
 
-Yes, please. They are very much necessary, and should serve as a
-template for other VMMs (exposing all the interrupts is required, the
-counter offset is necessary to test things resembling live migration,
-and the e2h0 selection to run nVHE.
+I think --el2 describes the wrong thing. We don't only expose EL2 to a
+guest, but we also expose FEAT_NV2 by default. So "nested" is IMO
+closer to the effects of the capability. If anything, it is
+KVM_CAP_ARM_EL2 that is badly named (yes, there is some history here,
+but I'm not going to entertain changing the #define after 8 years).
 
-You can probably ignore the virtio patch for now, as this needs to be
-properly debugged,
+Similarly, QEMU has "virtualization=on" as an indication that it
+should engage NV, and not "el2=on".
 
-> I guess E2H0 for fruity hardware, what about the others?
-
-The other way around. The '--e2h0' option forces the use of
-HCR_EL2.NV1. Rotten fruits can't use NV1 (they actually can, but the
-EL2 S1 PTW is fscked, so we hide it from KVM). However, other
-implementations do have proper NV1 support, and that option is
-extremely useful to boot a nVHE hypervisor.
+If you wanted a pure --el2 flag, then it should engage NV just like
+--nested does, but disable FEAT_NV2 in the idregs. This would give you
+EL2 without recursive NV and HCR_EL2.E2H RES1.
 
 Thanks,
 
