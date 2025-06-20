@@ -1,89 +1,65 @@
-Return-Path: <kvm+bounces-50112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D557AE1EDF
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 17:40:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BCBAAE1F0B
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 17:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06CB77AF45D
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:38:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D2F21BC166C
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4422E610B;
-	Fri, 20 Jun 2025 15:39:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06482D5431;
+	Fri, 20 Jun 2025 15:39:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="tdJJm49g"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="TNV/ff+m"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F85C2D323D
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 15:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3323C28B3E2;
+	Fri, 20 Jun 2025 15:39:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750433966; cv=none; b=q1x23MA1nlLP0jxYTYc233+IxcigBEJMVCfefXC2GwKovTz+Jydknrb39Iy8LwzPWpSSTuZZAdGG6RCUzW9/uvru7BqfBKsm9JyouYntupt1C5ENQmBb3EnXgGtSRc9f1V0RpPE9Y+daS1xzGz25607WqCJqbGQLKtT39MkxAWI=
+	t=1750433994; cv=none; b=nrWgveYnYYcLYwYhVlsQ1C8pytO0VuUsZvB9iqf9T0lQEBgENVgVyO36P9uccDHJZnK3I2l2E4czQbge/PbcL7gj8R2Jqt15J1n67AI1W5jsPFtiOuo0hQZO3BpnVGoa/1whBdH8Xp1P9Ieeel02xu5b43gaTM7xVJRf+5Uh5Wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750433966; c=relaxed/simple;
-	bh=1GVf6pPYxskn+oaBnxWiK8fBKw+PhSrkx5pHcSQ2Baw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=loggCSUSBgOgP9QvRzn8RJ+eMK8EJ3AU9iWe9fISP4n6RL81pGxtcNPt0GNTRfvvYw0QgnJuIZhCPN4iDgbGYYmOYc+uy2BUhrL2ZvtbNA2zSmGGTLhRj4yqbNWz35XrxUcAydTIM6HD/Lpt3aUfJ5eisvbjTUNQFXNuMl2KXx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=tdJJm49g; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-45363645a8eso9571415e9.1
-        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 08:39:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1750433963; x=1751038763; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Mawr7WKFCGQ8tWFa19Mt3NRHVX8USqBo3jUJVELODqw=;
-        b=tdJJm49gWLQUytiXOnQCBk/gwskEfghCs6QuZ2A5IGjz+R50hg6BL+ryiu6LndJNXb
-         QRkloPW0aEpfLwygZoee8KtvteY7hE5Xt05MmrSRUWT4ja7Yaea5OHdYKr3mXLa3jyG3
-         OWoy1DFIy3IyL0DMnAIIzRqWOQyJiK7BqaFDFFwvXurvb0+Bsj1NwVOM/OenLRGn8inA
-         tzzGby47HgQE8jQMCaX6EVmCnMaU/41KTWN3pRT3S49YwpYVy0RsRDDxTWEq62FIz8k+
-         /vx5pdobeq/Gh7LfO066dJb8kOLskD8zPMXckFC3tdVhNZ/rcnynN+rTIPahc+/p2JMR
-         iXnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750433963; x=1751038763;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Mawr7WKFCGQ8tWFa19Mt3NRHVX8USqBo3jUJVELODqw=;
-        b=iTKPwBFXqiZeoWcUnhh+Ety62gemeFNLoL2ljgqMzLODaiUzzLPYmmi6ykAxVjk2dw
-         FmVPvCLBandK7rBthqclQSudd4imiK8xJ4/vLqGCV/6qS3ESMIdKNSZvFDucThJMrB8D
-         Acodhjwhrx0rpz6tX6EV7ffY3F3Vm0jbVIiq4tsc/u54XMx12esa6D3tpq0sqy11MNpx
-         V/g2JW9wtpW58x/iSUgAE8ZNU8tkpFIV+xUsM3WnDRhFI/Ad+eoZ39f5p4KEMvdgt4nL
-         krs4/lyufoJAb9M9mpYIhsRzOFXkRskVT0oLWUjIoiFVFzP3EeGMGz2ccISr04+WDv+K
-         UhTw==
-X-Forwarded-Encrypted: i=1; AJvYcCXURqP0hOzQUL9bcK0bR4kRS1TcbnINPHscMUEFJgXVZMjBBmPoSBkaJf806is5nSysDn8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwABEfx4dKNk0U8mvi7ciewXbMtZuLkiXfXkIqCmM7qVjjoUSRU
-	HBdfJ7lQbj+gXsEimEuj0Ugq1L3T8RCV5koaZksYySAmhEK71tnq10mpLk9x9EhxSQ0=
-X-Gm-Gg: ASbGncsjFO6g+f7Ij0f+tNWL30Zs74hu/uFJ138GqwiqdMlVBDAwTAWQ6+YsBGtMYNZ
-	qAyg59sammdaPV/v7aCK9/joCDx+0UhzAuck/RFRrxngk/0DVMFNK28ZMAny6CMaHxabCUGLuPJ
-	WR3d53OM6mdU79GP3WIjxQ49ORce4kod7sKSLkachQwbhQVAyLIC3kGSiYAsSfJt7hjgcEN1KJD
-	uCEZDOgsnaWlc07AN+WPedQ7+KsEXRsq/d8/YZ5F42CgwmDiXtFg1ypLReOoMXf94YYOogPMPZu
-	ZZOF+AeISiR6j2cmmVFcLGh+v+7XJ4UiQ3vV61RPBv/bNl1Ff6hB12SYWs38wy7y4CVK/ndAF0w
-	q1wrU1qENwSUZY7VnWMUdIpwZx5QCn7N4AKz+8v05WYCUbpylMEiNOSY=
-X-Google-Smtp-Source: AGHT+IHKVTrkYBc7IB7BrOKtMI3wzs1IHS19aOQAqZcphf4iGPlxDgGIvKwGYBMR4g877UlKlwfLPQ==
-X-Received: by 2002:a05:600c:c4ac:b0:43c:fd27:a216 with SMTP id 5b1f17b1804b1-453659ba4d5mr29882945e9.23.1750433963308;
-        Fri, 20 Jun 2025 08:39:23 -0700 (PDT)
-Received: from nuc.fritz.box (p200300faaf22cf00fd30bd6f0b166cc4.dip0.t-ipconnect.de. [2003:fa:af22:cf00:fd30:bd6f:b16:6cc4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d118a1f2sm2323815f8f.83.2025.06.20.08.39.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 08:39:22 -0700 (PDT)
-From: Mathias Krause <minipli@grsecurity.net>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	kvm@vger.kernel.org,
-	Mathias Krause <minipli@grsecurity.net>
-Subject: [kvm-unit-tests PATCH 8/8] x86/cet: Test far returns too
-Date: Fri, 20 Jun 2025 17:39:12 +0200
-Message-ID: <20250620153912.214600-9-minipli@grsecurity.net>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250620153912.214600-1-minipli@grsecurity.net>
-References: <20250620153912.214600-1-minipli@grsecurity.net>
+	s=arc-20240116; t=1750433994; c=relaxed/simple;
+	bh=VfsPGuEjqXcBsg9RvSh06ru5pxcJQVGthExdWYPZvBo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PJm0G82Tc5HSAbE2P/S89iexO2Wf4Gczh2tRWwZpm2V3C+14HT0P2dLCltm4sFxWSuUv9HY+l8GvvAxtl0E3SOCvFVabpf+jjcgxelmLzwOMBx12GPr1os0+kbKHHdx48vV0a4H6OldiVPgYWRoG06p8RyO8PQseZ6PcxTNZGb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=TNV/ff+m; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from LAPTOP-I1KNRUTF.home (unknown [40.68.205.236])
+	by linux.microsoft.com (Postfix) with ESMTPSA id CF07E2117589;
+	Fri, 20 Jun 2025 08:39:49 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CF07E2117589
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1750433992;
+	bh=i4K0lmrsYGvyT8FPcTPS32aag7itn+Eq0ksyOKJ7odQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TNV/ff+mXTEzVQxOpBmqtPVUa8ny7aK1sKVTSlUACRqVMrfa+iDelQ8//5D8fXAQi
+	 q7s1iYZ86nJESzPx/9Ny0fA6XaSteBuoJWGJesE7v+GqkuQhlnYLM0wji6F1OFlp4w
+	 UpjafgTXICwm4v5PZ7kPbDarpCw+0hwNDzoAxGE4=
+From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+To: "Sean Christopherson" <seanjc@google.com>,
+	"Vitaly Kuznetsov" <vkuznets@redhat.com>,
+	"Paolo Bonzini" <pbonzini@redhat.com>,
+	kvm@vger.kernel.org
+Cc: "Dave Hansen" <dave.hansen@linux.intel.com>,
+	linux-kernel@vger.kernel.org,
+	alanjiang@microsoft.com,
+	chinang.ma@microsoft.com,
+	andrea.pellegrini@microsoft.com,
+	"Kevin Tian" <kevin.tian@intel.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	"Haiyang Zhang" <haiyangz@microsoft.com>,
+	"Wei Liu" <wei.liu@kernel.org>,
+	"Dexuan Cui" <decui@microsoft.com>,
+	linux-hyperv@vger.kernel.org,
+	Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Subject: [RFC PATCH 0/1] Tweak TLB flushing when VMX is running on Hyper-V
+Date: Fri, 20 Jun 2025 17:39:13 +0200
+Message-Id: <cover.1750432368.git.jpiotrowski@linux.microsoft.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,65 +68,75 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a test for far returns which has a dedicated error code.
+Hi Sean/Parolo/Vitaly,
 
-Signed-off-by: Mathias Krause <minipli@grsecurity.net>
----
- x86/cet.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+Wanted to get your opinion on this change. Let me first introduce the scenario:
 
-diff --git a/x86/cet.c b/x86/cet.c
-index c99458af2eab..0f7046580778 100644
---- a/x86/cet.c
-+++ b/x86/cet.c
-@@ -35,6 +35,34 @@ static uint64_t cet_shstk_func(void)
- 	return 0;
- }
- 
-+static uint64_t cet_shstk_far_ret(void)
-+{
-+	struct far_pointer32 fp = {
-+		.offset = (uintptr_t)&&far_func,
-+		.selector = USER_CS,
-+	};
-+
-+	if (fp.offset != (uintptr_t)&&far_func) {
-+		printf("Code address too high.\n");
-+		return -1;
-+	}
-+
-+	printf("Try to temper the return-address of far-called function...\n");
-+
-+	/* The NOP isn't superfluous, the called function tries to skip it. */
-+	asm goto ("lcall *%0; nop" : : "m" (fp) : : far_func);
-+
-+	printf("Uhm... how did we get here?! This should have #CP'ed!\n");
-+
-+	return 0;
-+far_func:
-+	asm volatile (/* mess with the ret addr, make it point past the NOP */
-+		      "incq (%rsp)\n\t"
-+		      /* 32-bit return, just as we have been called */
-+		      "lret");
-+	__builtin_unreachable();
-+}
-+
- static uint64_t cet_ibt_func(void)
- {
- 	unsigned long tmp;
-@@ -125,6 +153,11 @@ int main(int ac, char **av)
- 	       "NEAR RET shadow-stack protection test");
- 	cp_count = 0;
- 
-+	run_in_user(cet_shstk_far_ret, GP_VECTOR, 0, 0, 0, 0, &rvc);
-+	report(cp_count == 1 && cp_err == CP_ERR_FAR_RET,
-+	       "FAR RET shadow-stack protection test");
-+	cp_count = 0;
-+
- 	/* Enable indirect-branch tracking */
- 	wrmsr(MSR_IA32_U_CET, ENABLE_IBT_BIT);
- 
+We have been testing kata containers (containers wrapped in VM) in Azure, and
+found some significant issues with TLB flushing. This is a popular workload and
+requires launching many nested VMs quickly. When testing on a 64 core Intel VM
+(D64s_v5 in case someone is wondering), spinning up some 150-ish nested VMs in
+parallel, performance starts getting worse the more nested VMs are already
+running, CPU usage spikes to 100% on all cores and doesn't settle even when all
+nested VMs boot up. On an idle system a single nested VMs boots within seconds,
+but once we have a couple dozen running or so (doing nothing inside), boot time
+gets longer and longer for each new nested VM, they start hitting startup
+timeout etc. In some cases we never reach the point where all nested VMs are
+up and running.
+
+Investigating the issue we found that this can't be reproduced on AMD and on
+Intel when EPT is disabled. In both these cases the scenario completes within
+20s or so. TPD_MMU or not doesn't make a difference. With EPT=Y the case takes
+minutes.Out of curiousity I also ran the test case on an n4-standard-64 VM on
+GCP and found that EPT=Y runs in ~30s, while EPT=N runs in ~20s (which I found
+slightly interesting).
+
+So that's when we starting looking at the TLB flushing code and found that
+INVEPT.global is used on every CPU migration and that it's an expensive
+function on Hyper-V. It also has an impact on every running nested VM, so we
+end up with lots of INVEPT.global calls - we reach 2000 calls/s before we're
+essentially stuck in 100% guest ttime.  That's why I'm looking at tweaking the
+TLB flushing behavior to avoid it. I came across past discussions on this topic
+([^1]) and after some thinking see two options:
+
+1. Do you see a way to optimize this generically to avoid KVM_REQ_TLB_FLUSH on
+migration in current KVM? In nested (as in: KVM running nested) I think we
+rarely see CPU pinning used the way we it is on baremetal so it's not a rare of
+an operation. Much has also changed since [^1] and with kvm_mmu_reset_context()
+still being called in many paths we might be over flushing. Perhaps a loop
+flushing individual roots with roles that do not have a post_set_xxx hook that
+does flushing?
+
+2. We can approach this in a Hyper-V specific way, using the dedicated flush
+hypercall, which is what the following RFC patch does. This hypercall acts as a
+broadcast INVEPT.single. I believe that using the flush hypercall in
+flush_tlb_current() is sufficient to ensure the right semantics and correctness.
+The one thing I haven't made up my mind about yet is whether we could still use
+a flush of the current root on migration or not - I can imagine at most an
+INVEPT.single, I also haven't yet figured out how that could be plumbed in if
+it's really necessary (can't put it in KVM_REQ_TLB_FLUSH because that would
+break the assumption that it is stronger than KVM_REQ_TLB_FLUSH_CURRENT).
+
+With 2. the performance is comparable to EPT=N on Intel, roughly 20s for the
+test scenario.
+
+Let me know what you think about this and if you have any suggestions.
+
+Best wishes,
+Jeremi
+
+[^1]: https://lore.kernel.org/kvm/YQljNBBp%2FEousNBk@google.com/
+
+Jeremi Piotrowski (1):
+  KVM: VMX: Use Hyper-V EPT flush for local TLB flushes
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/vmx/vmx.c          | 20 +++++++++++++++++---
+ arch/x86/kvm/vmx/vmx_onhyperv.h |  6 ++++++
+ arch/x86/kvm/x86.c              |  3 +++
+ 4 files changed, 27 insertions(+), 3 deletions(-)
+
 -- 
-2.47.2
+2.39.5
 
 
