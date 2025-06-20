@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-50163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED194AE2376
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 22:22:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ACBCAE2377
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 22:22:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1976C5A3492
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 20:22:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E75ED1C22910
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 20:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF482E9EB4;
-	Fri, 20 Jun 2025 20:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191162EAD02;
+	Fri, 20 Jun 2025 20:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="wz6jXaMt"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="IJcGlLKN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49A7233721
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 20:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E37D2EA142
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 20:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750450935; cv=none; b=jerIOm3OMpMYkveInJl3yZeKY3LstShm8WPsbRdvZB4XTzV8eSvTHjHsrmT1AkVdK6lqhxDnKG/9shp74Sm1MY+ZoJBLPuK+ILWFswo9ZORymdYv8ZXTF7F3/yS4SK58svsuXZ2dEl0kpK2vKrocy0IBndpsUOsIlvAfcuh7S5A=
+	t=1750450938; cv=none; b=f/HaOqZ6wdx3XK1OIjGuzGa34UKUdoyz7733rkW3ZAmiyY9QoFpax/kGxXmeZckODPyBkIFIYEaZWgSEu4Y/fS1U2lQEYrV/i4vwY4u1DvIzG4ZtIu7TJh7WVESdqp6qWqcv2IeG6GZeGHCeliwHELeWOpK/PRvMr/uNloepJFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750450935; c=relaxed/simple;
-	bh=zNnEbdShfnt7dg6Wnhs4FrAsA8snzs7PQOci4sCR+Cw=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=MVxyt3vIcrewcsP3tm7dtUumggkxmADsV9jWwdl8AK7rITSRvTcRc1jlELpUXQFmFPtDzGXlaEkW+gQ2UnyBMP5wtmL6bAMpHDr+ZKffu1TOx0iQ5B7L6N4lvPCA6P3+sViIKyK1B0n+al/cEEVACpOYEBKbVGm/B9sk3fJ7t9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=wz6jXaMt; arc=none smtp.client-ip=209.85.214.172
+	s=arc-20240116; t=1750450938; c=relaxed/simple;
+	bh=A1P6kxgEJNmX9GHIO3H26K7yk2m8/f23Gd0ZQ/RNXe8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=IdrCAUT73f8ViNipjiTELk2oo6csKDSOBntGqc8UPwbWTNYWYDkpoq2OLMdiJT7qY6I169rfDURsl2lah3/y1OTa8WCvmKD1U2w+cC0s2l0eSiY4vADcIio1G/fb1f1STpPWUR+Zr12ADgrPOei561anrbxitwnGlrJvLNFHmvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=IJcGlLKN; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2353a2bc210so20501355ad.2
-        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 13:22:12 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2349f096605so34422725ad.3
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 13:22:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1750450932; x=1751055732; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zR93x1w6dXrRMkMadRB1UTNlrKc0W0v3FGDIv1ERUx4=;
-        b=wz6jXaMtkTctUGKPZhVGymmCUm9FRFeXkZf1glEuZ4AlRHUMZ/HtTiAcdjkrlOZ2MC
-         stN59+AYKHwHqnlXUKkhcIwICHuuahgGus//GX+wfD8UXF/dd8kSwEN3vkQXUk77E5ix
-         QjHxQNcwFC7tCERxKm7uAWvAwhw+fAPhp5Ivb3P10AqONPatlZNL9Fms6lszoSDe81DV
-         ef69Qm5ONZys8rMg1IOGbgsWb31bX+DOn/k/u4iWkXrKjTQGJz3UkF3xS0xGMcUpWEMi
-         JLPdzPGdir6VU0IEV2aWVBV27+WnHB1uwqcIEutH4KsgYvfc79tsw/29MybrFYkm8GRO
-         boWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750450932; x=1751055732;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1750450936; x=1751055736; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zR93x1w6dXrRMkMadRB1UTNlrKc0W0v3FGDIv1ERUx4=;
-        b=Q+6HsDLI7H3x6iKqhHHJjGaP9S5JJdjYAE+2TsMBScgoSH4ntx9cvC2CbSSv2tj/FL
-         79wW+xRktJELQXETgKZNEmUFqwZEx7mIr3wE0AXEId4JUZtO7j/fBaMt1KuSRPHbC496
-         NNHCqFjGLA848a9UitLfy3ecW3m4JxewYtF/2ekHJXKMmeFl79eTW1JW4izLvYYozqV+
-         8AzBiA3v/XkG3/EQEdCfE89s+F2Jxw/UE0cd4lWn/v79bWU97A3tbd+lGQtJhlMzOZgA
-         D69WmxRNqlSZZ6/SIUpIiSzheL9w0vmofDMRJR0bMtSFtRy/Ngpi/B+h7KYXebTUuDwq
-         flRw==
-X-Forwarded-Encrypted: i=1; AJvYcCWwh9+QVWZgO1XsYyVQVkqJ3bO2cSh5h8B6n2HxXH121/iiSjEndx5l/qM5KNv/aRMeP2o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMlQhkCCWouR41MI5Iq/Zjes/fZTsLgYmIWNuaCko2fv5npYwS
-	iLl9yPSxGjwZra+WaLLSkM5X/fEPIlwEn6PsQyvzqMmnu/iPbqJIxxzf+IPMmWJuqPM=
-X-Gm-Gg: ASbGncs9DuX3LXeLLpjWb37/mVgZVWvjkNblTOEE9x3YKWlfDuVIoyFiGyoWFmPUBHX
-	i/H0l2OQR+IHbgFM0Wgu0l/Qw4ni2ANdVjrITojLxk+Uw05b+UPykoGFHXtlb9sWJ+HPChIES98
-	nx7REGseCgFkFFgdmr1Rs9nk0Z4eJmkCEzu6+F2vEBqBemPcRpho7Vb7SxH8nKIutihEcsvkkbE
-	+AF60U47cLyAMieLpCArQ+AO7yu1Iw6xfrLJghjMwDdogBierAPtWosVc0YzWe9dpvPtVCSm08o
-	LFCIlz6KapRjgwVYXuHn3XbDP85EHeZJQssLP7/QZnemsTTDNHYN7EEj056Yt7F2XczlMOLfujq
-	4qfNFGij0lY6sCwm0VRK9FDctSbcm9Bf84A==
-X-Google-Smtp-Source: AGHT+IGMjAKS+ZR6xDwRzLnhzjJTUfYEfrwovg8rbA1ebQN5xfuztY8xY8dqTmR5sIFHBMzmyc1fcA==
-X-Received: by 2002:a17:903:3bc4:b0:224:10a2:cae7 with SMTP id d9443c01a7336-237d9981dc9mr67398695ad.40.1750450932143;
-        Fri, 20 Jun 2025 13:22:12 -0700 (PDT)
+        bh=9+zRP05sT2nYVu63jmc+xv4tV8ecuFPHchJnn/1sRt8=;
+        b=IJcGlLKNpZDUo0nQZZSsi2+ser5BqKkICIQ4V+FqrPFOs4ZxdGqZIP0jIDSw2m7W27
+         ewio/yG/bddPnzcQRSKwj/7Wmaq16X7Lhw0ODBpI9Ur7HuYCbcuwPnz2xjF+mCqpOy6i
+         T7ttqtrijIrTi77j7b3rxIxJYO3MOyDPf0zwCt3mVipd2ID6pEFLNeDkT8bZ8SveCDPq
+         ZU/JtBxjzjNI03d3AH2V9IABwY4TkTc5M8slfpLgA1kqmCXNCEvHGRR1Pc2Why7BGzlR
+         nHGO15dM6uzCHsYJF6ribSD+xhZgfw2TftBg6ou34+VUnLqCwPHkKaQCOSgNppRsmpdw
+         VUwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750450936; x=1751055736;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9+zRP05sT2nYVu63jmc+xv4tV8ecuFPHchJnn/1sRt8=;
+        b=SDQ/ltMTkJgYJTJ/SLa1iy9GYJnsbysHqlWYh9I/tULCeZO6jMulzA5HS0Xeaj1IpJ
+         6mb+10Q9FhMdT+gn7Ntqo5kWWbWrR6mZ5m/MWJfn7hZstZt7c96EYpr6phdG3m7JdVk6
+         +tRhVHxeWu2ASo+6J5Q8tnEBmkOLXMFV9qdthpKZZxnSATQyCyv279YN6yCTqCFb3Ub4
+         3OkdMwTwRwY5G/CeIgKHM4WLdt32OCOXmV0/gjpqTjNSnmOQCfokrwT9rrQVSP+KdeQA
+         q5Ma4itoV0Zv3v8KxdNnbqBcPlwvsVcBwkO6+INUmi85+acZ9ls65R8RgIArJ23Zg5Vf
+         1DNw==
+X-Forwarded-Encrypted: i=1; AJvYcCWX7BNCEyIeZGrttIDdEvp0XjFfEPkVjLYe4SM+N85pRIL8beg9ZQe8SQVRaLlz9doAgJw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yya9o67Coou8yLSsUKUIgLfLCD3KOECzKjAmQqaHjBZgmeQxJm8
+	CpFxIMqFcgc+rvj2jQpsvUe6ztcGUW64K/xsBs079i690Hy1PLsu9ZvCkSLC1bwhd/I=
+X-Gm-Gg: ASbGncuGyBZsz980iTHAx7krvjXV14tA0iRuQmt9EvrIhXmdbFtYK7hydIlKsU3hedv
+	WhXvRj9MiLIVcl4npCJW/WDTHNnx3+nkHHO2CK9v9aqUU+MP0I7OwpQLHeVeP9Ugoxz5CVgfAQ0
+	eqKzI8BlKSdoh/bh0HVhUbcSfNK0bExFPkqDn3ZcC503r3rCo1A3y4pnEVle9LrO1hHC2QALnGa
+	YzNPn3Fw/AqXlap9Vzh4uDVd6pWdaFNmSfm7Z2JjOljv3XDT28dkJSepuNGjipwYw7wdeQvylP7
+	iNySzIND4agc8BgVZMbzEbp/6tHp9U6qKKZAZqED4CcAeoZAAHzVWX7kMnwzQEDDvquRdoy9VIz
+	2Cn4b5LLhNy8WceEc1em3D7zl12RMGy2eHw==
+X-Google-Smtp-Source: AGHT+IGxF3Y7GuTw7cF2rLjoHJi9Q+J10U0wcLkyab0NxUAfAKaXxRxyLreJ/M4k337d4xGl2V1n6g==
+X-Received: by 2002:a17:903:40ca:b0:235:f4f7:a633 with SMTP id d9443c01a7336-237d9917e38mr65455185ad.28.1750450935857;
+        Fri, 20 Jun 2025 13:22:15 -0700 (PDT)
 Received: from alexghiti.eu.rivosinc.com (alexghiti.eu.rivosinc.com. [141.95.202.232])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d860fb58sm24239005ad.99.2025.06.20.13.22.08
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d860fb58sm24239005ad.99.2025.06.20.13.22.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jun 2025 13:22:11 -0700 (PDT)
+        Fri, 20 Jun 2025 13:22:15 -0700 (PDT)
 From: Alexandre Ghiti <alexghiti@rivosinc.com>
-Subject: [PATCH v5 0/3] Move duplicated instructions macros into asm/insn.h
-Date: Fri, 20 Jun 2025 20:21:56 +0000
-Message-Id: <20250620-dev-alex-insn_duplicate_v5_manual-v5-0-d865dc9ad180@rivosinc.com>
+Date: Fri, 20 Jun 2025 20:21:57 +0000
+Subject: [PATCH v5 1/3] riscv: Fix typo EXRACT -> EXTRACT
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,10 +84,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAOTCVWgC/x3N0QrCMAxA0V8ZeTbQZVTQXxEpsc00UONoXRmM/
- bvFx/Ny7w5VikqF67BDkaZVP9bhTwPEF9tTUFM3kCPvzuQwSUPOsqFatZDWJWvkr4Tmw5tt5Yw
- UaRovY5zc/IDeWYrMuv0ft/tx/ADolUImcwAAAA==
-X-Change-ID: 20250620-dev-alex-insn_duplicate_v5_manual-2c23191c30fb
+Message-Id: <20250620-dev-alex-insn_duplicate_v5_manual-v5-1-d865dc9ad180@rivosinc.com>
+References: <20250620-dev-alex-insn_duplicate_v5_manual-v5-0-d865dc9ad180@rivosinc.com>
+In-Reply-To: <20250620-dev-alex-insn_duplicate_v5_manual-v5-0-d865dc9ad180@rivosinc.com>
 To: Paul Walmsley <paul.walmsley@sifive.com>, 
  Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
  Alexandre Ghiti <alex@ghiti.fr>, Anup Patel <anup@brainfault.org>, 
@@ -97,62 +97,54 @@ Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
  =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>, 
  Andrew Jones <ajones@ventanamicro.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1777;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1555;
  i=alexghiti@rivosinc.com; h=from:subject:message-id;
- bh=zNnEbdShfnt7dg6Wnhs4FrAsA8snzs7PQOci4sCR+Cw=;
- b=owGbwMvMwCGWYr9pz6TW912Mp9WSGDJCD72P8Dn9w+tB9qn6mgksQSULDE+I5Uh+Cv1r/Vl9V
- zyHwHKNjlIWBjEOBlkxRRYF84SuFvuz9bP/XHoPM4eVCWQIAxenAExEO4Lhn2L99duffV9+4rU4
- c++cq1De1m3/N17SqX9TLrJw5+2jH7wYGZYK1y25xpz/NbrjiP2VGt+AsASb1/PY1jKVBUxeHRu
- TyA4A
+ bh=A1P6kxgEJNmX9GHIO3H26K7yk2m8/f23Gd0ZQ/RNXe8=;
+ b=owGbwMvMwCGWYr9pz6TW912Mp9WSGDJCD71PWD2XoWjx0cuV9YUOOycnx6/eWvbgZ/k7Y6ZNB
+ YnVb641dJSyMIhxMMiKKbIomCd0tdifrZ/959J7mDmsTCBDGLg4BWAiYtsZ/nBOqzx68FDIy/8S
+ 7cybFgRz7FzHYt7dzGNquHxz0tw38vMYGa66Znaku/smceTExJS7u2zin8rvVLfAPthwZhZPqLc
+ mCwA=
 X-Developer-Key: i=alexghiti@rivosinc.com; a=openpgp;
  fpr=DC049C97114ED82152FE79A783E4BA75438E93E3
 
-The instructions parsing macros were duplicated and one of them had different
-implementations, which is error prone.
+Simply fix a typo.
 
-So let's consolidate those macros in asm/insn.h.
-
-v1: https://lore.kernel.org/linux-riscv/20250422082545.450453-1-alexghiti@rivosinc.com/
-v2: https://lore.kernel.org/linux-riscv/20250508082215.88658-1-alexghiti@rivosinc.com/
-v3: https://lore.kernel.org/linux-riscv/20250508125202.108613-1-alexghiti@rivosinc.com/
-v4: https://lore.kernel.org/linux-riscv/20250516140805.282770-1-alexghiti@rivosinc.com/
-
-Changes in v5:
-- Rebase on top of 6.16-rc1
-
-Changes in v4:
-- Rebase on top of for-next (on top of 6.15-rc6)
-
-Changes in v3:
-- Fix patch 2 which caused build failures (linux riscv bot), but the
-  patchset is exactly the same as v2
-
-Changes in v2:
-- Rebase on top of 6.15-rc5
-- Add RB tags
-- Define RV_X() using RV_X_mask() (Clément)
-- Remove unused defines (Clément)
-- Fix tabulations (Drew)
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
 ---
-Alexandre Ghiti (3):
-      riscv: Fix typo EXRACT -> EXTRACT
-      riscv: Strengthen duplicate and inconsistent definition of RV_X()
-      riscv: Move all duplicate insn parsing macros into asm/insn.h
+ arch/riscv/include/asm/insn.h | 2 +-
+ arch/riscv/kernel/vector.c    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
- arch/riscv/include/asm/insn.h          | 206 +++++++++++++++++++++++++++++----
- arch/riscv/kernel/machine_kexec_file.c |   2 +-
- arch/riscv/kernel/traps_misaligned.c   | 144 +----------------------
- arch/riscv/kernel/vector.c             |   2 +-
- arch/riscv/kvm/vcpu_insn.c             | 128 +-------------------
- 5 files changed, 188 insertions(+), 294 deletions(-)
----
-base-commit: 731e998c429974cb141a049c1347a9cab444e44c
-change-id: 20250620-dev-alex-insn_duplicate_v5_manual-2c23191c30fb
+diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.h
+index 09fde95a5e8f75ac6ee741ded7c6beaa57677d13..2a589a58b2917d67efcb18792b05f5e640bda37f 100644
+--- a/arch/riscv/include/asm/insn.h
++++ b/arch/riscv/include/asm/insn.h
+@@ -352,7 +352,7 @@ static __always_inline bool riscv_insn_is_c_jalr(u32 code)
+ 	({typeof(x) x_ = (x); RV_X(x_, RVFDQ_FL_FS_WIDTH_OFF, \
+ 				   RVFDQ_FL_FS_WIDTH_MASK); })
+ 
+-#define RVV_EXRACT_VL_VS_WIDTH(x) RVFDQ_EXTRACT_FL_FS_WIDTH(x)
++#define RVV_EXTRACT_VL_VS_WIDTH(x) RVFDQ_EXTRACT_FL_FS_WIDTH(x)
+ 
+ /*
+  * Get the immediate from a J-type instruction.
+diff --git a/arch/riscv/kernel/vector.c b/arch/riscv/kernel/vector.c
+index 184f780c932d443d81eecac7a6fb8070ee7a5824..901e67adf57608385e6815be1518e70216236eda 100644
+--- a/arch/riscv/kernel/vector.c
++++ b/arch/riscv/kernel/vector.c
+@@ -93,7 +93,7 @@ bool insn_is_vector(u32 insn_buf)
+ 		return true;
+ 	case RVV_OPCODE_VL:
+ 	case RVV_OPCODE_VS:
+-		width = RVV_EXRACT_VL_VS_WIDTH(insn_buf);
++		width = RVV_EXTRACT_VL_VS_WIDTH(insn_buf);
+ 		if (width == RVV_VL_VS_WIDTH_8 || width == RVV_VL_VS_WIDTH_16 ||
+ 		    width == RVV_VL_VS_WIDTH_32 || width == RVV_VL_VS_WIDTH_64)
+ 			return true;
 
-Best regards,
 -- 
-Alexandre Ghiti <alexghiti@rivosinc.com>
+2.34.1
 
 
