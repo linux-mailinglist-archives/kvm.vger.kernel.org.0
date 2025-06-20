@@ -1,151 +1,108 @@
-Return-Path: <kvm+bounces-50167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50168-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06B38AE2385
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 22:25:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28D7AAE238C
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 22:32:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E5E616532B
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 20:25:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBE061C22E90
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 20:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8619328CF41;
-	Fri, 20 Jun 2025 20:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE572E7172;
+	Fri, 20 Jun 2025 20:32:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WNCqy5yC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ScZahKNR"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBECF17A2FC
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 20:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C496722171E
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 20:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750451118; cv=none; b=RcTUE9ljGRHg+x/7iTi3nFqDD3APb2kcS7mA1xiYQD4HN4Nk0D6jltmyiKoDilUtksDG6jixK07wePQXjAlPpsrJYHQpUfsJq4CNwC5jA9qBc7tgqBaLM3wiHsqJHko4OpuZTQ/5ssR8OhNDaORTVuzMjdsURNmNS9k19wWxCYw=
+	t=1750451519; cv=none; b=gHYEABGSVO3r8fgDkUfnv5Fxr0IAriD3piCP5/KvfK/00TaKmVIHfMQixQoCUo8tcJGuDDiQyvgA9K/g42c+o2kzzBbLlRW8b3Hj7xfsrL5pZBIHM7/HBL8ruEzQkbWqqJlzb1I6LIJdNguwxAzPsxNrqrzdo/Kn95wzl0oA7Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750451118; c=relaxed/simple;
-	bh=HwN6CYiF0rZePsTxb/2sKbBfHY3pCsWVzYsRSiKV5hE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ky9IO+Vce58SdC3AR5VX2cq9GftED/ABo28YL9QP4IMf9QfozCSLYh46AlR+HswnXOGHRww5HDFjUTm63Mi7EURtVG0h65YkZTR2oG51Vi+/HB797t8/oZ7Ms94kcuJP1ntzlbTy38Ymf8kSpPECu0yDtKGB/4jbPo4+A59hZ+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WNCqy5yC; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 20 Jun 2025 13:25:05 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750451114;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gzFkdvKaxH4Hel5gdQlPGogDXbokx4DTWEowJWNszls=;
-	b=WNCqy5yC5MX/HewEIIsCqlmZEpdwRBR7Eu9ebrC5gbzo0wO891VjXDboDIhMH/JvlSc97B
-	HbOotk0k+L9BOaQZfdEbVCIgUE3YI5dKoAxwqSeQVk1x/sRb9+g4/qKO4G3tmcCve82DXF
-	pkT8e0KeLMe843FhbKYPHU9TMSzzPFk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>, Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 5/5] KVM: arm64: gic-v5: Probe for GICv5
-Message-ID: <aFXDobZ2GXPC4wOJ@linux.dev>
-References: <20250620160741.3513940-1-sascha.bischoff@arm.com>
- <20250620160741.3513940-6-sascha.bischoff@arm.com>
+	s=arc-20240116; t=1750451519; c=relaxed/simple;
+	bh=gPYvpazE5IHW++4+swnhzOjII5AZCwNMAl3KBQt/agU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=h4LxANSDENm9wcuHNV4uwEDkdpBbNdnJVNHZw2crCM/iRFqd5MANAyPmeOJvc0A02vvF7+wdyNouD4HIWuAPs6bruZatZfdsEbjiVu4DZd7oVzOnkg/B+qyZsdgVUjZvtCXMzKSSz4C/VFBQQ/ShvWhCXZTjNrQInaN8LVc2eFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ScZahKNR; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b2eea1c2e97so1738396a12.2
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 13:31:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750451517; x=1751056317; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bt/+aWwyrkpIimxSl5BUL+43sm1rEuMKKgBDpLCw3jg=;
+        b=ScZahKNRPcbzzJICOWTLZpjHpya8kSku/xDBr+HXBeH/o7fqOqo3oMe8jCLrHjBQab
+         IdHPit9XbvOlXWsA4QANIE3PZxu6C0bfz0yb0HqA94jMVtaNqTuLpzSY+rNnfqxSfocd
+         eXrgsps1JDZtucwr2yHMgc/RIaTNln0ijQoL8R8Ev9IwOQAUBwqSoWL7poaUsZDCwV6X
+         XKUejW9UEYfwUckzB+/CL4PsOldfEpZfjcpNfOmc4bEggdcUCRKKNxXRObWqS3k16y1B
+         ExRBjMqu32ARjR2wqihCYs1UiYx9L7mL9vAsFZ1eqNHQeBdnlgsu+N+mIrvUW6L9QCwY
+         o1zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750451517; x=1751056317;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bt/+aWwyrkpIimxSl5BUL+43sm1rEuMKKgBDpLCw3jg=;
+        b=nbiHMCqapwToDW4E/f6yLry0GqMxsEiFb7nEcjIFz0cjfSaqEVMb85M8x90g6cpxKi
+         SDLZySRjz3+eKRh/7Rw5NMAXdvbs1tAweLsh8xcAU3hEa9zWRahrtxESSYCD3eGb71lA
+         1eFXuoC7wd2HT+vgNHcLyF4ZdRwvF26fD16mEJ78bM/T4FXwMm6m0y+FXG0WkaujkSUo
+         cRjADDo47yt/+bL/ipCKVi5OObtWAwBZOaXC1vGc/UAblXq1cx96EMp2rZF1JgNUuwOf
+         ukF3E/VT9MnMKe+kBpJ873VFI2yD/WV/o4VLgIBCw4NgbgRc2zC6k33eAlw/umuBKoUS
+         x+aw==
+X-Forwarded-Encrypted: i=1; AJvYcCW8XOW5eDSjJhhasyPDnp0kgyF3EUBtPLPIz2qFOSX4dEhL2ry9q59Io7dg6yssLHKhJns=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9VOts1QNfYr1FfPXJnWh6aeGenNnAZOFLQvj6+3sDBVV7kZ6F
+	uklwPlfCf0AR/owsj1533WndFNwprY+kkTnL5jW3GdRw52a0GvsMYsEjXTbKlx/VNdCJLDEinQU
+	jht8nvQ==
+X-Google-Smtp-Source: AGHT+IENxgy3xkU/bYFGboojnHAxZAT6iEP2BT2EbQa3Q20JReS/EV7Fji9LhO0E/EbM/UcH2Oi/Nx+lNZo=
+X-Received: from pjb7.prod.google.com ([2002:a17:90b:2f07:b0:312:f650:c7aa])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5212:b0:311:b3e7:fb3c
+ with SMTP id 98e67ed59e1d1-3159d8fef6dmr5375179a91.31.1750451517093; Fri, 20
+ Jun 2025 13:31:57 -0700 (PDT)
+Date: Fri, 20 Jun 2025 13:31:55 -0700
+In-Reply-To: <aFW2NISX0q11sop1@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250620160741.3513940-6-sascha.bischoff@arm.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-4-seanjc@google.com>
+ <86tt4lcgs3.wl-maz@kernel.org> <aErlezuoFJ8u0ue-@google.com>
+ <aEyOcJJsys9mm_Xs@linux.dev> <aFWY2LTVIxz5rfhh@google.com>
+ <aFWtB6Vmn9MnfkEi@linux.dev> <aFWws7h3L-iN52sF@google.com> <aFW2NISX0q11sop1@linux.dev>
+Message-ID: <aFXFO6_lVV5PpGW-@google.com>
+Subject: Re: [PATCH v3 02/62] KVM: arm64: WARN if unmapping vLPI fails
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
+	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jun 20, 2025 at 04:07:52PM +0000, Sascha Bischoff wrote:
-> +/**
-> + * vgic_v5_probe - probe for a VGICv5 compatible interrupt controller
-> + * @info:	pointer to the GIC description
-> + *
-> + * Returns 0 if the VGICv5 has been probed successfully, returns an error code
-> + * otherwise.
-> + */
+On Fri, Jun 20, 2025, Oliver Upton wrote:
+> On Fri, Jun 20, 2025 at 12:04:19PM -0700, Sean Christopherson wrote:
+> > If I post it as a standalone patch, could you/Marc put it into a stable topic
+> > branch based on kvm/master? (kvm/master now has patch 1, yay!)  Then I can create
+> > a topic branch for this mountain of stuff based on the arm64 topic branch.
+> 
+> Ok, how about making the arm64 piece patch 1 in your series and you take
+> the whole pile. If we need it, I'll bug you for a ref that only has the
+> first change.
 
-nit: avoid kerneldoc style
+Any preference as to whether I formally post the last version, or if I apply it
+directly from this thread?
 
-This actually generates documentation as well as build warnings when we
-screw up the format. I'd only do this sort of thing for sufficiently
-public functions.
+> That ok?
 
-Thanks,
-Oliver
-
-> +int vgic_v5_probe(const struct gic_kvm_info *info)
-> +{
-> +	u64 ich_vtr_el2;
-> +	int ret;
-> +
-> +	if (!info->has_gcie_v3_compat)
-> +		return -ENODEV;
-> +
-> +	kvm_vgic_global_state.type = VGIC_V5;
-> +	kvm_vgic_global_state.has_gcie_v3_compat = true;
-> +	static_branch_enable(&kvm_vgic_global_state.gicv5_cpuif);
-> +
-> +	/* We only support v3 compat mode - use vGICv3 limits */
-> +	kvm_vgic_global_state.max_gic_vcpus = VGIC_V3_MAX_CPUS;
-> +
-> +	kvm_vgic_global_state.vcpu_base = 0;
-> +	kvm_vgic_global_state.vctrl_base = NULL;
-> +	kvm_vgic_global_state.can_emulate_gicv2 = false;
-> +	kvm_vgic_global_state.has_gicv4 = false;
-> +	kvm_vgic_global_state.has_gicv4_1 = false;
-> +
-> +	ich_vtr_el2 =  kvm_call_hyp_ret(__vgic_v3_get_gic_config);
-> +	kvm_vgic_global_state.ich_vtr_el2 = (u32)ich_vtr_el2;
-> +
-> +	/*
-> +	 * The ListRegs field is 5 bits, but there is an architectural
-> +	 * maximum of 16 list registers. Just ignore bit 4...
-> +	 */
-> +	kvm_vgic_global_state.nr_lr = (ich_vtr_el2 & 0xf) + 1;
-> +
-> +	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V3);
-> +	if (ret) {
-> +		kvm_err("Cannot register GICv3-legacy KVM device.\n");
-> +		return ret;
-> +	}
-> +
-> +	static_branch_enable(&kvm_vgic_global_state.gicv3_cpuif);
-> +	kvm_info("GCIE legacy system register CPU interface\n");
-> +
-> +	return 0;
-> +}
-> +
->  inline bool kvm_vgic_in_v3_compat_mode(void)
->  {
->  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv5_cpuif) &&
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index 5c78eb915a22..a5292cad60ff 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -308,6 +308,8 @@ int vgic_init(struct kvm *kvm);
->  void vgic_debug_init(struct kvm *kvm);
->  void vgic_debug_destroy(struct kvm *kvm);
->  
-> +int vgic_v5_probe(const struct gic_kvm_info *info);
-> +
->  static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_cpu *cpu_if = &vcpu->arch.vgic_cpu;
-> -- 
-> 2.34.1
+Ya, works for me.  What's the going bribe rate for an ack these days?  :-D
 
