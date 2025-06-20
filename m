@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-50217-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50218-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A025AE262C
-	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 01:22:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13BB0AE262E
+	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 01:22:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4425189F1E9
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 23:23:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 870055A0A22
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 23:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A17FF24DCFB;
-	Fri, 20 Jun 2025 23:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1471B248F61;
+	Fri, 20 Jun 2025 23:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3gqYClI4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wfisIqAR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688582494F0
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 23:21:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFCB224C669
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 23:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750461682; cv=none; b=k08f6/WiOmTQ4y/7q+3nYDXs9dHx3qt/SPsuZjx7j3ep9aTcm2e/XTwxhGHC5jxPnbIrFcLqd+4Y148Lm37Lt9hWF+ioYOjDyptAjtzA6/Bt8IdaIYanMfkxyr+2kiWm4IkYr1xwlr2jBdTDgwiF0RkJuaDoIiZWvwyp5kBbsd4=
+	t=1750461684; cv=none; b=W8a6exhHSN6fDBnjrIBYwL/umgRXkwDuuV90ifn4pgY7EiX001vbN94l0RT13XLzzovHSLfEh6/A5Lc13ls6G98DoH7sMCt1vrZWFtDoR7OwHIQL4oWjY7a2HK14aIa+OWDldKOCAIs6McCeIZWtb6vZiKpX/y06/uHKj9YauNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750461682; c=relaxed/simple;
-	bh=/gFFNVd7bwLeoJYgrwOu6qpw9rprLNcNtUCRwUJjaIQ=;
+	s=arc-20240116; t=1750461684; c=relaxed/simple;
+	bh=jUQ6fblZyP5yrrrhW782/ks/4TQNFKMKqxLplCvvRtc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YTVLdt1VEC5SJP5F+lI4cXviTBqvkJF0K0X3MzeVrneUDoca+UNZztYs280GqaMo7WPhlHya8NDCw0XHrH15et5LrqrzXlezvblCd+7Y6WI6uic97b8zQOhdg9q040C4s8zyzhP5L2KkV948yRewseCb7LVCYn47TuVSCWix8jE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3gqYClI4; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=YzP20JBD0CWfOLlXIwOnfwUNYE3XL9dUpUZDg9OWiZts6y62lljA/AR4N6CExXFLoMYh+6GoR9YRgOwE0V0TIg5EWJ7dNYcODWB+ihPujogkOoFxr9/zoUejGIBR546Aez5cK4qbLpp0ZYsPbITwTgq5FRN5dguUl0PRSy0Ekq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wfisIqAR; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b31e1ef8890so1443564a12.2
-        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 16:21:21 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-236445722f9so14178845ad.1
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 16:21:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750461681; x=1751066481; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750461682; x=1751066482; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jNvLu7QFuLSzgFfb+o1cFiGO1Lra6YWueQxkEfGnMNs=;
-        b=3gqYClI4srGQYD5yG9JQZw1fJvUkTcDzGbmDzEvZ7iWVgLvsqGBOueKqe6v1WA/gtB
-         dD/53nLwZtX8vvozOrl4vYpKBA+LU1xynPljodicXV1voCtqXSp1VK9RSzrNqdfwcb+m
-         2ECmsvc/tG0pe2k1boGsnMm9cOSIUMF29EAUOYp6LaofVKN1C97Dr7ix2StLZpGvKY0Y
-         kBtv9vhu1ylxU4n+f4j24ChTR9GiGcbJz0KlCebGBv+BpbsswJuAoHECUv11cQtD8C5P
-         GDauveoR9JSbU672N3iMNVCupZGUh6vb2rM85cTHU7CuVxIyyegByGyXB3tFpvEBuqzX
-         yZgw==
+        bh=flq+a2mRznxpGsau0vYK6FlLjSN1oZpPrKPuy1/kqkI=;
+        b=wfisIqARdneSAKP+JLeV4IEBVNEzkMLzFUTUn076zrFk4hZIW3gAGjhrCLjnuVfftA
+         3K5I28RRROLisqRzIEWI+E21hXLKZAkjratNxoIGSragOfQFWv1scyTktsHpNV1EkQBy
+         wIv0UYEAe4u1Ajm71W4sRzpkgO9FWbW3CcNxjkYqZnJ97oYsCXOG1M71cRLX3Mqgf8LX
+         ccuzamGQ8rrcN2QAREzOQ4CWldYT8qahYq8DKxTHTKkU4c5J1uit5YdiCp9TpI61yd/I
+         l4Z6darsmw2Be4CMQiqQDtFDQ/Znw5qPAAbNgd5pDGFfypl6uI5WlB5Ky4NJthp9aazk
+         ylQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750461681; x=1751066481;
+        d=1e100.net; s=20230601; t=1750461682; x=1751066482;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jNvLu7QFuLSzgFfb+o1cFiGO1Lra6YWueQxkEfGnMNs=;
-        b=JJfoa9W+18behTn+gpX4QaZETCeBdfeOJRsfrD803sZMKKnj9nqTEi2TzmyUvNrAl8
-         /uFwnYadvutxoCyXqhNNQotfXFm0opXS0ZaVOdypHHrTZE9Pcj+gkSYC4DPCSLEOaiy3
-         rCghzVmXTns27WxWI4BCLjBWkdYEEbimMS/fDHJ475F6iGYPdQnYnyS8TpfG2urv/HYI
-         1+67EkJnbNN6FplP2jweR2P10KPvpg5cjwZaGUGHp2oCvwxxI0IOLgcZpMdVT+/eiIP0
-         HiMy5Nnxc5Uj1aTRTT0VrTYyq7OWVURedXBT7y5LH1/JUTjPLC/WWiKbpmqpynFMs6Iw
-         UpAA==
-X-Forwarded-Encrypted: i=1; AJvYcCXgNpHDir/OkrEThUU2Xxr3pwil6uVLnaSIXXKkIjZY2xfHTLQuVOc9uu/JEyVomr46fCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxn7U5ZBfZKkgMMWzUp5Ubnxbx2gBu0JTq3IJDP+hCBQTs3GSGL
-	C+S729G0RC601eF5p5xLqEQZcMxNCBIFif7Ma02QkMARsqv+QcKAE8/G5d4Llg40bRihehaWFqf
-	VR7+Fjzqz56hfgg==
-X-Google-Smtp-Source: AGHT+IE5U13pCesAd3SJBRAIp4RiZ7MjGkyuGqvxaCmz6abdXRn4Yx5dm8NsY5+C+uRgn5qVoevhE/+QEM0c8A==
-X-Received: from pjbov4.prod.google.com ([2002:a17:90b:2584:b0:30e:6bb2:6855])
+        bh=flq+a2mRznxpGsau0vYK6FlLjSN1oZpPrKPuy1/kqkI=;
+        b=FU9swoxYJRxLWs4H1guY+Pkg5tAWXClfWsHv6ChoBwWQEbzTSAYpfPBHQujUXyfsit
+         xuKfo5QgDgLDraEYtSdAGrmxJ3Vt3dAYt2S59RAZvKpxCRGTDqrwIQuxwkOhu4dOh7Kc
+         1HhW7ccggBOSCdmZUL58BEixypkj7IWsWKiNovY7/FjZAizB5CJ32CxABzhg4HfE3rGR
+         2igpv+gD0IYb2vLWB74v9glt3WwsaaX1PHJ8P4zPbYxm6Jaj+25SiXkfbfzdPjUDn6YT
+         pThvVnOfQn9DrdyUwwqY3WWpnbmid0Xq7tNkZb/ZMOI+hZdG3Fs+5WuNkC+3TPcdojir
+         khfw==
+X-Forwarded-Encrypted: i=1; AJvYcCXfvltiAMEjrBIpUYHXQClUYEZY2lcN4Vi5iuB2AdTehs3c/OzQmjS7R92EjA6E/wexAZc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCO4xnv0i5PHi0h9o0xKLC/GVQA8AuPAp0UJEhSzT9zucQlshK
+	k8tT7fvevyENTnyGN6CqC4k1GHqVKBEJ2gVzsfStDohU2tMC4u8YuJS35CJdBQ77f+VCDL7M4yx
+	cjNyzamL4eZ0/VA==
+X-Google-Smtp-Source: AGHT+IHOLjlrK7lX9N2K1i718IX2QfCKQsbF5mBCFBku2Lgi1zmJpXeBMuXAfM3LxPN/gVHQwaFLDnwR20MVhw==
+X-Received: from pjbpv1.prod.google.com ([2002:a17:90b:3c81:b0:313:2d44:397b])
  (user=dmatlack job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:5647:b0:311:fc8b:31b5 with SMTP id 98e67ed59e1d1-3159d64820emr7798200a91.14.1750461680722;
- Fri, 20 Jun 2025 16:21:20 -0700 (PDT)
-Date: Fri, 20 Jun 2025 23:20:10 +0000
+ 2002:a17:903:22d2:b0:235:e309:7dec with SMTP id d9443c01a7336-237d9991770mr73767115ad.26.1750461682303;
+ Fri, 20 Jun 2025 16:21:22 -0700 (PDT)
+Date: Fri, 20 Jun 2025 23:20:11 +0000
 In-Reply-To: <20250620232031.2705638-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250620232031.2705638-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.50.0.rc2.701.gf1e915cc24-goog
-Message-ID: <20250620232031.2705638-13-dmatlack@google.com>
-Subject: [PATCH 12/33] tools headers: Import iosubmit_cmds512()
+Message-ID: <20250620232031.2705638-14-dmatlack@google.com>
+Subject: [PATCH 13/33] tools headers: Add symlink to linux/pci_ids.h
 From: David Matlack <dmatlack@google.com>
 To: Alex Williamson <alex.williamson@redhat.com>
 Cc: Aaron Lewis <aaronlewis@google.com>, 
@@ -95,96 +95,24 @@ Cc: Aaron Lewis <aaronlewis@google.com>,
 	Wei Yang <richard.weiyang@gmail.com>, "Yury Norov [NVIDIA]" <yury.norov@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Import iosubmit_cmds512() from arch/x86/include/asm/io.h into tools/ so
-it can be used by VFIO selftests to interact with Intel DSA devices.
-
-Also pull in movdir64b() from arch/x86/include/asm/special_insns.h into
-tools/, which is the underlying instruction used by iosubmit_cmds512().
-
-Changes made when importing: None
+Add a symlink to include/linux/pci_ids.h to tools/include/. This will be
+used by VFIO selftests in subsequent commits to match device and vendor
+IDs.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- tools/arch/x86/include/asm/io.h            | 26 +++++++++++++++++++++
- tools/arch/x86/include/asm/special_insns.h | 27 ++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
- create mode 100644 tools/arch/x86/include/asm/special_insns.h
+ tools/include/linux/pci_ids.h | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 120000 tools/include/linux/pci_ids.h
 
-diff --git a/tools/arch/x86/include/asm/io.h b/tools/arch/x86/include/asm/io.h
-index 4c787a2363de..ecad61a3ea52 100644
---- a/tools/arch/x86/include/asm/io.h
-+++ b/tools/arch/x86/include/asm/io.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/compiler.h>
- #include <linux/types.h>
-+#include "special_insns.h"
- 
- #define build_mmio_read(name, size, type, reg, barrier) \
- static inline type name(const volatile void __iomem *addr) \
-@@ -72,4 +73,29 @@ build_mmio_write(__writeq, "q", u64, "r", )
- 
- #include <asm-generic/io.h>
- 
-+/**
-+ * iosubmit_cmds512 - copy data to single MMIO location, in 512-bit units
-+ * @dst: destination, in MMIO space (must be 512-bit aligned)
-+ * @src: source
-+ * @count: number of 512 bits quantities to submit
-+ *
-+ * Submit data from kernel space to MMIO space, in units of 512 bits at a
-+ * time.  Order of access is not guaranteed, nor is a memory barrier
-+ * performed afterwards.
-+ *
-+ * Warning: Do not use this helper unless your driver has checked that the CPU
-+ * instruction is supported on the platform.
-+ */
-+static inline void iosubmit_cmds512(void __iomem *dst, const void *src,
-+				    size_t count)
-+{
-+	const u8 *from = src;
-+	const u8 *end = from + count * 64;
-+
-+	while (from < end) {
-+		movdir64b(dst, from);
-+		from += 64;
-+	}
-+}
-+
- #endif /* _TOOLS_ASM_X86_IO_H */
-diff --git a/tools/arch/x86/include/asm/special_insns.h b/tools/arch/x86/include/asm/special_insns.h
-new file mode 100644
-index 000000000000..04af42a99c38
+diff --git a/tools/include/linux/pci_ids.h b/tools/include/linux/pci_ids.h
+new file mode 120000
+index 000000000000..1c9e88f41261
 --- /dev/null
-+++ b/tools/arch/x86/include/asm/special_insns.h
-@@ -0,0 +1,27 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _TOOLS_ASM_X86_SPECIAL_INSNS_H
-+#define _TOOLS_ASM_X86_SPECIAL_INSNS_H
-+
-+/* The dst parameter must be 64-bytes aligned */
-+static inline void movdir64b(void *dst, const void *src)
-+{
-+	const struct { char _[64]; } *__src = src;
-+	struct { char _[64]; } *__dst = dst;
-+
-+	/*
-+	 * MOVDIR64B %(rdx), rax.
-+	 *
-+	 * Both __src and __dst must be memory constraints in order to tell the
-+	 * compiler that no other memory accesses should be reordered around
-+	 * this one.
-+	 *
-+	 * Also, both must be supplied as lvalues because this tells
-+	 * the compiler what the object is (its size) the instruction accesses.
-+	 * I.e., not the pointers but what they point to, thus the deref'ing '*'.
-+	 */
-+	asm volatile(".byte 0x66, 0x0f, 0x38, 0xf8, 0x02"
-+		     : "+m" (*__dst)
-+		     :  "m" (*__src), "a" (__dst), "d" (__src));
-+}
-+
-+#endif /* _TOOLS_ASM_X86_SPECIAL_INSNS_H */
++++ b/tools/include/linux/pci_ids.h
+@@ -0,0 +1 @@
++../../../include/linux/pci_ids.h
+\ No newline at end of file
 -- 
 2.50.0.rc2.701.gf1e915cc24-goog
 
