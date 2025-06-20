@@ -1,202 +1,125 @@
-Return-Path: <kvm+bounces-50097-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50099-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22280AE1D84
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 16:36:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99C4AAE1D99
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 16:39:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE29F1C2237A
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 14:35:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1CB87AAFC6
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 14:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A5B2949E3;
-	Fri, 20 Jun 2025 14:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A0D28FAA5;
+	Fri, 20 Jun 2025 14:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BGgl4Ywg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="prQ6WZeM"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF63288525;
-	Fri, 20 Jun 2025 14:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3E22951D5
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 14:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750430124; cv=none; b=e2TUWwFhY7+4L/+bU7WnyVHr4a19/gIs4YuGv7wT8f6arnEF0AD2UytcqZRR8mTHq2N7C5qFr2T9Yh8OhQj3VT4LROM6CMSmfmk2VGpHjo3yjugIQ+/Zadvq30DpINvYR3RGq0TKUMUra6FbQqbMNZ6L+r5dTqhmhhFF1uzHWsA=
+	t=1750430360; cv=none; b=U6rk2/n7PY5lI0E2dVlWlscsoJTqIEoGaI+c9U+ZRuJinfG/I/5Rikb8dh872DqRgmmGk8E0CwUCwPTh3ti+oVGV4icgXfxkjIvPVGkH6RSRJ5w0rUwJ5797SVC/qm5kHPA4efBhArMzm41VPGpbR1EHWFXpZ95f5cYJUK5TYvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750430124; c=relaxed/simple;
-	bh=RtkWVneWxxFISg2NArFo0KlUHpDus0XfHjoC434GXpw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NPtliYKoZ7dt/eAeRo6CeNMT3jX8h9L2ZaLZsKC77ffIRv8H1ZX0hLGD9bwKDedyhQk14RO79vXCxbFhX+sGSfZRFIaBDpOIVRZKUn0m8+TXaUi+1IJM22mqlLqm7ECa3FUOum72Bk11ENmvBj98L/2kcGyD7cOfHqornKo257g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=BGgl4Ywg; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description;
-	bh=lZQBciVA5OeuYh81fOodmLtcu/a9Fi/yqGjigdSt1Mo=; b=BGgl4YwgEEN+I8ASQH7sJo/B2c
-	/XhsGsO3TF72+OIV0HR9tNfAZ+ljUT6Jcgtb9mEOGFzb96ZTz2u03RVtT2HXWKzRzgU7NClpipVOP
-	/SGN3ap6410IbUhuzW0THqudwb6uvcoe1bikju6ejzIKmKfxG2CfptYyMOPRpxrCGmiH9Y1W6GfpY
-	Md5fd5CxKkwOxqVBLNvuzGQrG4sqSjL1++nZBAJqtMUKwp07ru0QCV0KLRazLakI9rOBW153ul9iT
-	/k3tvfKxxkKuUw+7bKgro5jtbJutMi8W1J+ekn+kGM7f0aglk6IbwCbguJDV8O6cJqDXd1LgJz9Hj
-	CmZo4iXw==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uScpf-0000000Cp24-1qme;
-	Fri, 20 Jun 2025 14:35:07 +0000
-From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To: Shivank Garg <shivankg@amd.com>,
-	seanjc@google.com,
-	david@redhat.com,
-	vbabka@suse.cz,
-	willy@infradead.org,
-	akpm@linux-foundation.org,
-	shuah@kernel.org,
-	pbonzini@redhat.com,
-	brauner@kernel.org,
-	viro@zeniv.linux.org.uk
-Cc: ackerleytng@google.com,
-	paul@paul-moore.com,
-	jmorris@namei.org,
-	serge@hallyn.com,
-	pvorel@suse.cz,
-	bfoster@redhat.com,
-	tabba@google.com,
-	vannapurve@google.com,
-	chao.gao@intel.com,
-	bharata@amd.com,
-	nikunj@amd.com,
-	michael.day@amd.com,
-	yan.y.zhao@intel.com,
-	Neeraj.Upadhyay@amd.com,
-	thomas.lendacky@amd.com,
-	michael.roth@amd.com,
-	aik@amd.com,
-	jgg@nvidia.com,
-	kalyazin@amazon.com,
-	peterx@redhat.com,
-	jack@suse.cz,
-	rppt@kernel.org,
-	hch@infradead.org,
-	cgzones@googlemail.com,
-	ira.weiny@intel.com,
-	rientjes@google.com,
-	roypat@amazon.co.uk,
-	ziy@nvidia.com,
-	matthew.brost@intel.com,
-	joshua.hahnjy@gmail.com,
-	rakie.kim@sk.com,
-	byungchul@sk.com,
-	gourry@gourry.net,
-	kent.overstreet@linux.dev,
-	ying.huang@linux.alibaba.com,
-	apopple@nvidia.com,
-	chao.p.peng@intel.com,
-	amit@infradead.org,
-	ddutile@redhat.com,
-	dan.j.williams@intel.com,
-	ashish.kalra@amd.com,
-	gshan@redhat.com,
-	jgowans@amazon.com,
-	pankaj.gupta@amd.com,
-	papaluri@amd.com,
-	yuzhao@google.com,
-	suzuki.poulose@arm.com,
-	quic_eberman@quicinc.com,
-	aneeshkumar.kizhakeveetil@arm.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-coco@lists.linux.dev
-Subject: [PATCH 2/2] filemap: Add __filemap_get_folio_mpol()
-Date: Fri, 20 Jun 2025 15:34:47 +0100
-Message-ID: <20250620143502.3055777-2-willy@infradead.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250618112935.7629-4-shivankg@amd.com>
-References: <20250618112935.7629-4-shivankg@amd.com>
+	s=arc-20240116; t=1750430360; c=relaxed/simple;
+	bh=f0ERDdgXgTFaM2bAnZ1S200y/0WNSgNRatRYt7yg6uI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dcOO5pSRpOun7Dg+KQ2y3Ddsnx4y3qo7z3uPcaB70nJGgSU7fVPUeMN3PkSrp63EiWUpPQbOf8k27yLrIJXV40FopInfCv0/DAAZ6VlWomedpv8rs505dDP6Fm8vFYoB+lKCaoxEr0x6ceI9/j25RDLLJELXBAkGLLesqhG3MeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=prQ6WZeM; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3138c50d2a0so2643109a91.2
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 07:39:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750430358; x=1751035158; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9hYeG/lN/dobWu+WOAuHe6WhQ/AJqqM1f1NumulS6iw=;
+        b=prQ6WZeM43BAwpR9FC90IHzjncCnp6YhwukGsupN30bc+kL1HWYuCbMQM3a1oqsaN5
+         z11t9avcrlAINPKbWyeZi8HosYfkJnskirPNingt5EAbMnk5OdCQvoY8H6OtvYJrM+N5
+         HsReVGPJzD7fSRzB+/F5gCI6x0QUV4SOL1vaC/vwEMU23TbOzgNLOwtkU8VwnKmAYIxv
+         ibqbooNpJBa3MzsF5HL7Ie0IzdH/cyjYSBlPopVArDP/QM1tmsyyrvxZaxuvLnoN+FYT
+         2g1iRK/D3+75Z5BaH9O0386RwYVnT7RaAap7KTG+5MMpcG3LBB7N4WPm1qoOjwPKUJx3
+         NY9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750430358; x=1751035158;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9hYeG/lN/dobWu+WOAuHe6WhQ/AJqqM1f1NumulS6iw=;
+        b=mFw80YTEXBPWJpNreViYBqnwDASJ9eVX8193pKhhAuyLWYHJpU8BCBTpcDDnAJ3Sou
+         wO3F1qr5CqzbVci1seenLt2bpItyVhz9xwpYChOqclkmQD2Smq5wIKpQBMOdQYKcKFSA
+         4trTfzaKuo6hLbFt7FiTOauqOaH0jSMbYo2NnJxXOXjnrHuQ2oOzuRO5rhkaPGJiD02K
+         f0m1uHqhd5Z/UpP7XNae2JuWZO/Bzu4cL2uNGXnIjoNWDpV8aTvt1nUioOK4eEh5itRF
+         vN+fzdjdxDWX9LBYmzUFyL3VFR3/di0FRYTwJFVNGkdpeJZNJgMbN0noSlmFqfNsCyIu
+         Llfw==
+X-Forwarded-Encrypted: i=1; AJvYcCVBtONyTsgu0UaboHqwNC1GnqjlG/CHGM7NVW+p1hFOnB3IiV02GwFK/EL9NHNGozG/5m4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6dPpaNRrMRGpMRK4xqnnkJGoruz9NQbTPfMkOKHZ08L6TiQwD
+	J3EGlGKmT+Xcveca2xE26dj6l2+0wVl0aEYaX5M0Ym4cgYw0DKuZodPofx0WnFfQcEfp9bOb4Ac
+	ZI1g3Xw==
+X-Google-Smtp-Source: AGHT+IEu/kAyF65SAfQsKleZ41Vg0owDojNFVAMM/0F6gElDwFbB1sj7AbPvBVKqQ3YY8zBgnoMiSm1QDmM=
+X-Received: from pjbee15.prod.google.com ([2002:a17:90a:fc4f:b0:314:d44:4108])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e87:b0:312:51a9:5d44
+ with SMTP id 98e67ed59e1d1-3159d61a5c5mr5175181a91.5.1750430358355; Fri, 20
+ Jun 2025 07:39:18 -0700 (PDT)
+Date: Fri, 20 Jun 2025 07:39:16 -0700
+In-Reply-To: <2eqjnjnszlmhlnvw6kcve4exjnpy7skguypwtmxutb2gecs3an@gcou53thsqww>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-19-seanjc@google.com>
+ <2eqjnjnszlmhlnvw6kcve4exjnpy7skguypwtmxutb2gecs3an@gcou53thsqww>
+Message-ID: <aFVylP1XzMoqocOx@google.com>
+Subject: Re: [PATCH v3 17/62] KVM: SVM: Add enable_ipiv param, never set
+ IsRunning if disabled
+From: Sean Christopherson <seanjc@google.com>
+To: Naveen N Rao <naveen@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
+	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-This allows guest_memfd to pass in a memory policy.
+On Thu, Jun 19, 2025, Naveen N Rao wrote:
+> On Wed, Jun 11, 2025 at 03:45:20PM -0700, Sean Christopherson wrote:
+> > From: Maxim Levitsky <mlevitsk@redhat.com>
+> >=20
+> > Let userspace "disable" IPI virtualization for AVIC via the enable_ipiv
+> > module param, by never setting IsRunning.  SVM doesn't provide a way to
+> > disable IPI virtualization in hardware, but by ensuring CPUs never see
+> > IsRunning=3D1, every IPI in the guest (except for self-IPIs) will gener=
+ate a
+> > VM-Exit.
+>=20
+> I think this is good to have regardless of the erratum. Not sure about VM=
+X,
+> but does it make sense to intercept writes to the self-ipi MSR as well?
 
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- include/linux/pagemap.h | 10 ++++++++--
- mm/filemap.c            | 10 ++++++----
- 2 files changed, 14 insertions(+), 6 deletions(-)
+That doesn't work for AVIC, i.e. if the guest is MMIO to access the virtual=
+ APIC.
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index c176aeeb38db..1cfbf7b8f573 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -745,11 +745,17 @@ static inline fgf_t fgf_set_order(size_t size)
- }
- 
- void *filemap_get_entry(struct address_space *mapping, pgoff_t index);
--struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
--		fgf_t fgp_flags, gfp_t gfp);
-+struct folio *__filemap_get_folio_mpol(struct address_space *mapping,
-+		pgoff_t index, fgf_t fgf_flags, gfp_t gfp, struct mempolicy *);
- struct page *pagecache_get_page(struct address_space *mapping, pgoff_t index,
- 		fgf_t fgp_flags, gfp_t gfp);
- 
-+static inline struct folio *__filemap_get_folio(struct address_space *mapping,
-+		pgoff_t index, fgf_t fgf_flags, gfp_t gfp)
-+{
-+	return __filemap_get_folio_mpol(mapping, index, fgf_flags, gfp, NULL);
-+}
-+
- /**
-  * filemap_get_folio - Find and get a folio.
-  * @mapping: The address_space to search.
-diff --git a/mm/filemap.c b/mm/filemap.c
-index a26df313207d..597d146cbb3a 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1896,11 +1896,12 @@ void *filemap_get_entry(struct address_space *mapping, pgoff_t index)
- }
- 
- /**
-- * __filemap_get_folio - Find and get a reference to a folio.
-+ * __filemap_get_folio_mpol - Find and get a reference to a folio.
-  * @mapping: The address_space to search.
-  * @index: The page index.
-  * @fgp_flags: %FGP flags modify how the folio is returned.
-  * @gfp: Memory allocation flags to use if %FGP_CREAT is specified.
-+ * @policy: NUMA memory allocation policy to follow.
-  *
-  * Looks up the page cache entry at @mapping & @index.
-  *
-@@ -1911,8 +1912,9 @@ void *filemap_get_entry(struct address_space *mapping, pgoff_t index)
-  *
-  * Return: The found folio or an ERR_PTR() otherwise.
-  */
--struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
--		fgf_t fgp_flags, gfp_t gfp)
-+struct folio *__filemap_get_folio_mpol(struct address_space *mapping,
-+		pgoff_t index, fgf_t fgp_flags, gfp_t gfp,
-+		struct mempolicy *policy)
- {
- 	struct folio *folio;
- 
-@@ -1982,7 +1984,7 @@ struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
- 			err = -ENOMEM;
- 			if (order > min_order)
- 				alloc_gfp |= __GFP_NORETRY | __GFP_NOWARN;
--			folio = filemap_alloc_folio(alloc_gfp, order, NULL);
-+			folio = filemap_alloc_folio(alloc_gfp, order, policy);
- 			if (!folio)
- 				continue;
- 
--- 
-2.47.2
+Regardless, I don't see any reason to manually intercept self-IPIs when IPI
+virtualization is disabled.  AFAIK, there's no need to do so for correctnes=
+s,
+and Intel's self-IPI virtualization isn't tied to IPI virtualization either=
+.
+Self-IPI virtualization is enabled by virtual interrupt delivery, which in =
+turn
+is enabled by KVM when enable_apicv is true:
 
+  Self-IPI virtualization occurs only if the =E2=80=9Cvirtual-interrupt del=
+ivery=E2=80=9D
+  VM-execution control is 1.
 
