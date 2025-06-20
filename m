@@ -1,368 +1,202 @@
-Return-Path: <kvm+bounces-50199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51A5CAE25E6
-	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 01:04:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4DEFAE25EF
+	for <lists+kvm@lfdr.de>; Sat, 21 Jun 2025 01:13:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F14C23B389D
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 23:03:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3810317C6EC
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 23:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A8924167D;
-	Fri, 20 Jun 2025 23:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73520242D9F;
+	Fri, 20 Jun 2025 23:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cBDZqcN5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KEXAd2A2"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F4823B637
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 23:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A126E23D282
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 23:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750460593; cv=none; b=asrRB59tzswkkD8e+rKSx7mq94bHKijJlnpR1z/C9y8xsvCImqcVyPSut0AEXvSuh6IeEHy9QIJukB0acKyxIKUG7fu8TZGOeG3tnUUx5mvqrn0bdiMABHYCf61toIfqbuSs5oa7ptpw1iSaRSvJCJdlIEmS+UNPsMWAo2KJHkM=
+	t=1750461209; cv=none; b=RVHoXnmormL4MiyngltvDb6gu04M2sw7YhyxN+4sLzMrm0DXe7zB6FWv9xu2yOZ+InhiLVNXdzKDHH54VsBLaFxlWJO/SlErIHou4qf5XhZ7YLOPeMBzGy2hWbsG8yQex6D7u08w9aS4meeRiRlhp4eK/UN8G0fIcaGhvqK/4F0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750460593; c=relaxed/simple;
-	bh=EBrJcSUnn0tjaoqzsso4+ZBe6J/hEnxNrY1vkz+KcA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B17griNPIvtysXUUVG6YuWDs8PlyPFVe13CEn+6vyfOfiMwWwS0rdW1yAsnevWtARJhQbycLdyTJikIOJ6EK9E4ak0e8Vex/sinWoVi0Z9HAAW3wSksSLJ3Uew43+SdZ+hfQZkXl6SydO1P3hyNZ0mjmhQQxdrtOYXvp8R0wnew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cBDZqcN5; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 20 Jun 2025 16:02:49 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1750460578;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5tAZQ0spVVEZZIHmVQBC+dOaNCyVxTOIQXkIyXzUO5k=;
-	b=cBDZqcN5mHkTBb2IiWeX4Taf2j8l+UDr1mn+oTK+j21w/qkbzBLq/ddDQiIC1Y2SpIDFIK
-	h/4mxwtGV8jZX4pZyLpJHcY3/dARAsFd3pgXrbwYwsBxhc6g4m1d0okpnBlbRPqdRhW8LT
-	Co/XYkCK6dhGd4zgDHcMmcKGGsR7xo0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>, Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 4/5] KVM: arm64: gic-v5: Support GICv3 compat
-Message-ID: <aFXomXKBk1V9iYSa@linux.dev>
-References: <20250620160741.3513940-1-sascha.bischoff@arm.com>
- <20250620160741.3513940-5-sascha.bischoff@arm.com>
- <aFXClKQRG3KNAD2y@linux.dev>
+	s=arc-20240116; t=1750461209; c=relaxed/simple;
+	bh=ejHsLwAI1iRBNNL/r378fhaYBbN+C4pKbNfS8unnfJQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NoYC4sn7NSWZ+qJ/W4tYaOh2vYKvHRqL3b6EaWUNs3tpgqwzUOUYsnEfW4xQoHqKIEQ8wWREIK/15TGtxfg0F/CqRmtcLOS8eLMQ48K5BPn2A673jsK5nKJpfYibQXhxDQ/d6KzdXbtvk3pBqCjxzZ8VzUI9BQ7VqOSwwfREiPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KEXAd2A2; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-234b133b428so17636035ad.3
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 16:13:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750461206; x=1751066006; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EJmLTmvvg0E7izo+/RvoiskKc3ULA4/sxq8y6FuVrPg=;
+        b=KEXAd2A2sODuHx7sG9Wwy3BI+9Utmu6d63EiVGpqPcoiB2kGyvTVQkFzXqo8Xd8x9w
+         yCKL/Hk3CiM4OoQFG4aofv33cgnEAAHSIkyO3KP0CpUXEvy5+550ZQ6rLVUfvAnfCtq/
+         ShcAYEG/j4zWhCeKv9sS5zEdHGrrOgs78m7iuPc7nbG1vr3o69dq6rZyUe3QMpVx7W2n
+         3K1i72cU/SM3LLr8WLMP/5PfnxUW6YWM69gVUeS7CsZI8Us+0HEQD+iPyRNUDW2k+Sd1
+         PwiqlMDz9ARogGs4e8YALGsZQ27FCghGheWQednVVslxvBtebsR/RvwguQap8o/0KLhf
+         sSEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750461206; x=1751066006;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EJmLTmvvg0E7izo+/RvoiskKc3ULA4/sxq8y6FuVrPg=;
+        b=Nkvv5wJZ1Kp/nGQHKQqyll5bjR+oQBKTmKNH+cAnHn0d6x2g5EEiTeQcGHmG9sVF4d
+         jjKcPMPFrXlpRd17fGGBTmwtDhW7TGL4qIMej5jGe1EitdZ1uE7Bjf/zFyCxK+xS6JYf
+         fO7S2h4tu5VbyrZic4Ya54vUhVxyJpThq7F21/HQZX3P1m33llyQCniPvREgqfKZefM6
+         paqiFQHigxiQsa1QxckGICsYSQjWnGXm4Ff/ddF565YC0SStgd3jok6o125eIob4oO/6
+         Fe34dNznV8aLZd8kO9qYgSSRsRGRukrkWCN+JwmP22Iw3g39PmlrTjC5S997IK65IkEw
+         X2zQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUSnH/2hNX4bm7LKqcYb6CTLBqGfPvvC8CpG2EqiIU+/q+ZttYvP4sSriZktrH3/jf7CG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxiulMwQfwVRBWmU2mbckylb89KZLNwJMWX1JIWpIUYNTHdXaZ
+	s+k1YDSk4Cr0NMwEJf/Kpi8mo80FwtLQGb+vkHtLxseOFM1iNt7Mn7pVAhb25XKpctoJqspSXhL
+	1JwrqQw==
+X-Google-Smtp-Source: AGHT+IGpU0wSWZv0e+j+oZwhTfTGLz89dqX4GbiY2Zh4+crAkClvle5QmNlBgbXfUiTTYto+Kj/e9VYps/E=
+X-Received: from pjboe18.prod.google.com ([2002:a17:90b:3952:b0:312:f88d:25f6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3c43:b0:234:a139:1206
+ with SMTP id d9443c01a7336-237d9accb06mr73650445ad.40.1750461206033; Fri, 20
+ Jun 2025 16:13:26 -0700 (PDT)
+Date: Fri, 20 Jun 2025 16:13:24 -0700
+In-Reply-To: <20250326193619.3714986-7-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aFXClKQRG3KNAD2y@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20250326193619.3714986-1-yosry.ahmed@linux.dev> <20250326193619.3714986-7-yosry.ahmed@linux.dev>
+Message-ID: <aFXrFKvZcJ3dN4k_@google.com>
+Subject: Re: [RFC PATCH 06/24] KVM: SEV: Track ASID->vCPU instead of ASID->VMCB
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Rik van Riel <riel@surriel.com>, Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jun 20, 2025 at 01:20:36PM -0700, Oliver Upton wrote:
-> Hi Sascha,
+On Wed, Mar 26, 2025, Yosry Ahmed wrote:
+> SEV currently tracks the ASID to VMCB mapping for each physical CPU.
+> This is required to flush the ASID when a new VMCB using the same ASID
+> is run on the same CPU. Practically, there is a single VMCB for each
+> vCPU using SEV. Furthermore, TLB flushes on nested transitions between
+> VMCB01 and VMCB02 are handled separately (see
+> nested_svm_transition_tlb_flush()).
 > 
-> Thank you for posting this. Very excited to see the GICv5 enablement get
-> started.
+> In preparation for generalizing the tracking and making the tracking
+> more expensive, start tracking the ASID to vCPU mapping instead. This
+> will allow for the tracking to be moved to a cheaper code path when
+> vCPUs are switched.
 > 
-> On Fri, Jun 20, 2025 at 04:07:51PM +0000, Sascha Bischoff wrote:
-> > Add support for GICv3 compat mode (FEAT_GCIE_LEGACY) which allows a
-> > GICv5 host to run GICv3-based VMs. This change enables the
-> > VHE/nVHE/hVHE/protected modes, but does not support nested
-> > virtualization.
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> ---
+>  arch/x86/kvm/svm/sev.c | 12 ++++++------
+>  arch/x86/kvm/svm/svm.c |  2 +-
+>  arch/x86/kvm/svm/svm.h |  4 ++--
+>  3 files changed, 9 insertions(+), 9 deletions(-)
 > 
-> Can't we just load the shadow state into the compat VGICv3? I'm worried
-> this has sharp edges on the UAPI side as well as users wanting to
-> migrate VMs to new hardware.
-> 
-> The guest hypervisor should only see GICv3-only or GICv5-only, we can
-> pretend FEAT_GCIE_LEGACY never existed :)
-> 
-> > Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> > Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
-> > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_asm.h   |  2 ++
-> >  arch/arm64/include/asm/kvm_hyp.h   |  2 ++
-> >  arch/arm64/kvm/Makefile            |  3 +-
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 12 +++++++
-> >  arch/arm64/kvm/hyp/vgic-v3-sr.c    | 51 +++++++++++++++++++++++++-----
-> >  arch/arm64/kvm/sys_regs.c          | 10 +++++-
-> >  arch/arm64/kvm/vgic/vgic-init.c    |  6 ++--
-> >  arch/arm64/kvm/vgic/vgic-v3.c      |  6 ++++
-> >  arch/arm64/kvm/vgic/vgic-v5.c      | 14 ++++++++
-> >  arch/arm64/kvm/vgic/vgic.h         |  2 ++
-> >  include/kvm/arm_vgic.h             |  9 +++++-
-> >  11 files changed, 104 insertions(+), 13 deletions(-)
-> >  create mode 100644 arch/arm64/kvm/vgic/vgic-v5.c
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > index bec227f9500a..ad1ef0460fd6 100644
-> > --- a/arch/arm64/include/asm/kvm_asm.h
-> > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > @@ -81,6 +81,8 @@ enum __kvm_host_smccc_func {
-> >  	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
-> >  	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_vmcr_aprs,
-> >  	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
-> > +	__KVM_HOST_SMCCC_FUNC___vgic_v3_compat_mode_enable,
-> > +	__KVM_HOST_SMCCC_FUNC___vgic_v3_compat_mode_disable,
-> >  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
-> >  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
-> >  	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
-> > diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> > index e6be1f5d0967..9c8adc5186ec 100644
-> > --- a/arch/arm64/include/asm/kvm_hyp.h
-> > +++ b/arch/arm64/include/asm/kvm_hyp.h
-> > @@ -85,6 +85,8 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if);
-> >  void __vgic_v3_save_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
-> >  void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
-> >  int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
-> > +void __vgic_v3_compat_mode_enable(void);
-> > +void __vgic_v3_compat_mode_disable(void);
-> >  
-> >  #ifdef __KVM_NVHE_HYPERVISOR__
-> >  void __timer_enable_traps(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> > index 7c329e01c557..3ebc0570345c 100644
-> > --- a/arch/arm64/kvm/Makefile
-> > +++ b/arch/arm64/kvm/Makefile
-> > @@ -23,7 +23,8 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
-> >  	 vgic/vgic-v3.o vgic/vgic-v4.o \
-> >  	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
-> >  	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
-> > -	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o
-> > +	 vgic/vgic-its.o vgic/vgic-debug.o vgic/vgic-v3-nested.o \
-> > +	 vgic/vgic-v5.o
-> >  
-> >  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
-> >  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > index e9198e56e784..61af55df60a9 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -475,6 +475,16 @@ static void handle___vgic_v3_restore_vmcr_aprs(struct kvm_cpu_context *host_ctxt
-> >  	__vgic_v3_restore_vmcr_aprs(kern_hyp_va(cpu_if));
-> >  }
-> >  
-> > +static void handle___vgic_v3_compat_mode_enable(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +	__vgic_v3_compat_mode_enable();
-> > +}
-> > +
-> > +static void handle___vgic_v3_compat_mode_disable(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +	__vgic_v3_compat_mode_disable();
-> > +}
-> > +
-> >  static void handle___pkvm_init(struct kvm_cpu_context *host_ctxt)
-> >  {
-> >  	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
-> > @@ -603,6 +613,8 @@ static const hcall_t host_hcall[] = {
-> >  	HANDLE_FUNC(__kvm_timer_set_cntvoff),
-> >  	HANDLE_FUNC(__vgic_v3_save_vmcr_aprs),
-> >  	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
-> > +	HANDLE_FUNC(__vgic_v3_compat_mode_enable),
-> > +	HANDLE_FUNC(__vgic_v3_compat_mode_disable),
-> >  	HANDLE_FUNC(__pkvm_init_vm),
-> >  	HANDLE_FUNC(__pkvm_init_vcpu),
-> >  	HANDLE_FUNC(__pkvm_teardown_vm),
-> > diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > index f162b0df5cae..b03b5f012226 100644
-> > --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > @@ -257,6 +257,18 @@ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
-> >  	}
-> >  }
-> >  
-> > +void __vgic_v3_compat_mode_enable(void)
-> > +{
-> > +	sysreg_clear_set_s(SYS_ICH_VCTLR_EL2, 0, ICH_VCTLR_EL2_V3);
-> > +	isb();
-> > +}
-> > +
-> > +void __vgic_v3_compat_mode_disable(void)
-> > +{
-> > +	sysreg_clear_set_s(SYS_ICH_VCTLR_EL2, ICH_VCTLR_EL2_V3, 0);
-> > +	isb();
-> > +}
-> > +
-> 
-> It isn't clear to me what these ISBs are synchonizing against. AFAICT,
-> the whole compat thing is always visible and we can restore the rest of
-> the VGICv3 context before guaranteeing the enable bit has been observed.
-> 
-> Can we consolidate this into a single hyp call along with
-> __vgic_v3_*_vmcr_aprs()?
-> 
-> Last bit as an FYI, kvm_call_hyp() has an implied context synchronization upon
-> return, either because of ERET in nVHE or an explicit ISB on VHE.
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index d613f81addf1c..ddb4d5b211ed7 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -240,7 +240,7 @@ static void sev_asid_free(struct kvm_sev_info *sev)
+>  
+>  	for_each_possible_cpu(cpu) {
+>  		sd = per_cpu_ptr(&svm_data, cpu);
+> -		sd->sev_vmcbs[sev->asid] = NULL;
+> +		sd->sev_vcpus[sev->asid] = NULL;
+>  	}
+>  
+>  	mutex_unlock(&sev_bitmap_lock);
+> @@ -3081,8 +3081,8 @@ int sev_cpu_init(struct svm_cpu_data *sd)
+>  	if (!sev_enabled)
+>  		return 0;
+>  
+> -	sd->sev_vmcbs = kcalloc(nr_asids, sizeof(void *), GFP_KERNEL);
+> -	if (!sd->sev_vmcbs)
+> +	sd->sev_vcpus = kcalloc(nr_asids, sizeof(void *), GFP_KERNEL);
+> +	if (!sd->sev_vcpus)
+>  		return -ENOMEM;
+>  
+>  	return 0;
+> @@ -3471,14 +3471,14 @@ int pre_sev_run(struct vcpu_svm *svm, int cpu)
+>  	/*
+>  	 * Flush guest TLB:
+>  	 *
+> -	 * 1) when different VMCB for the same ASID is to be run on the same host CPU.
+> +	 * 1) when different vCPU for the same ASID is to be run on the same host CPU.
 
-Ah, reading the spec was a useful exercise. ICH_VMCR_EL2 is a modal
-register... I hear implementation folks *love* those :)
+Tom, can you clarity what an ASID actually tags when NPT is in use?
 
-Please do the aforementioned consolidation, at which point the purpose
-of the ISB should be apparent.
+The more I think about all of this, the less it makes sense.  The *entire* point
+of an ASID is to tag TLB entries so that a flush isn't required when running code
+for the same address space.
 
-> >  void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
-> >  {
-> >  	/*
-> > @@ -296,12 +308,19 @@ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if)
-> >  	}
-> >  
-> >  	/*
-> > -	 * Prevent the guest from touching the ICC_SRE_EL1 system
-> > -	 * register. Note that this may not have any effect, as
-> > -	 * ICC_SRE_EL2.Enable being RAO/WI is a valid implementation.
-> > +	 * GICv5 BET0 FEAT_GCIE_LEGACY doesn't include ICC_SRE_EL2. This is due
-> > +	 * to be relaxed in a future spec release, likely BET1, at which point
-> > +	 * this in condition can be dropped again.
-> >  	 */
-> > -	write_gicreg(read_gicreg(ICC_SRE_EL2) & ~ICC_SRE_EL2_ENABLE,
-> > -		     ICC_SRE_EL2);
-> > +	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv5_cpuif)) {
-> > +		/*
-> > +		 * Prevent the guest from touching the ICC_SRE_EL1 system
-> > +		 * register. Note that this may not have any effect, as
-> > +		 * ICC_SRE_EL2.Enable being RAO/WI is a valid implementation.
-> > +		 */
-> > +		write_gicreg(read_gicreg(ICC_SRE_EL2) & ~ICC_SRE_EL2_ENABLE,
-> > +			     ICC_SRE_EL2);
-> > +	}
-> >  
-> >  	/*
-> >  	 * If we need to trap system registers, we must write
-> > @@ -322,8 +341,14 @@ void __vgic_v3_deactivate_traps(struct vgic_v3_cpu_if *cpu_if)
-> >  		cpu_if->vgic_vmcr = read_gicreg(ICH_VMCR_EL2);
-> >  	}
-> >  
-> > -	val = read_gicreg(ICC_SRE_EL2);
-> > -	write_gicreg(val | ICC_SRE_EL2_ENABLE, ICC_SRE_EL2);
-> > +	/*
-> > +	 * Can be dropped in the future when GICv5 BET1 is released. See
-> > +	 * comment above.
-> > +	 */
-> > +	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv5_cpuif)) {
-> 
-> Can we use the GCIE cpucap instead, possibly via a shared helper with
-> the driver?
-> 
-> > -	if (kvm_vgic_global_state.type == VGIC_V3) {
-> > +	if (kvm_vgic_global_state.type == VGIC_V3 || kvm_vgic_in_v3_compat_mode()) {
-> 
-> Can we do a helper for this too?
-> 
-> >  		val &= ~ID_AA64PFR0_EL1_GIC_MASK;
-> >  		val |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
-> >  	}
-> > @@ -1953,6 +1953,14 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> >  	    (vcpu_has_nv(vcpu) && !FIELD_GET(ID_AA64PFR0_EL1_EL2, user_val)))
-> >  		return -EINVAL;
-> >  
-> > +	/*
-> > +	 * If we are running on a GICv5 host and support FEAT_GCIE_LEGACY, then
-> > +	 * we support GICv3. Fail attempts to do anything but set that to IMP.
-> > +	 */
-> > +	if (kvm_vgic_in_v3_compat_mode() &&
-> > +	    FIELD_GET(ID_AA64PFR0_EL1_GIC_MASK, user_val) != ID_AA64PFR0_EL1_GIC_IMP)
-> > +		return -EINVAL;
-> > +
-> 
-> 
-> 
-> >  	return set_id_reg(vcpu, rd, user_val);
-> >  }
-> >  
-> > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > index eb1205654ac8..5f6506e297c1 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > @@ -674,10 +674,12 @@ void kvm_vgic_init_cpu_hardware(void)
-> >  	 * We want to make sure the list registers start out clear so that we
-> >  	 * only have the program the used registers.
-> >  	 */
-> > -	if (kvm_vgic_global_state.type == VGIC_V2)
-> > +	if (kvm_vgic_global_state.type == VGIC_V2) {
-> >  		vgic_v2_init_lrs();
-> > -	else
-> > +	} else if (kvm_vgic_global_state.type == VGIC_V3 ||
-> > +		   kvm_vgic_in_v3_compat_mode()) {
-> >  		kvm_call_hyp(__vgic_v3_init_lrs);
-> > +	}
-> >  }
-> >  
-> >  /**
-> > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> > index b9ad7c42c5b0..b5df4d36821d 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> > @@ -734,6 +734,9 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
-> >  {
-> >  	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-> >  
-> > +	if (static_branch_unlikely(&kvm_vgic_global_state.gicv5_cpuif))
-> > +		kvm_call_hyp(__vgic_v3_compat_mode_enable);
-> > +
-> >  	/* If the vgic is nested, perform the full state loading */
-> >  	if (vgic_state_is_nested(vcpu)) {
-> >  		vgic_v3_load_nested(vcpu);
-> > @@ -764,4 +767,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
-> >  
-> >  	if (has_vhe())
-> >  		__vgic_v3_deactivate_traps(cpu_if);
-> > +
-> > +	if (static_branch_unlikely(&kvm_vgic_global_state.gicv5_cpuif))
-> > +		kvm_call_hyp(__vgic_v3_compat_mode_disable);
+The main problem I'm struggling with is that, as usual, the APM doesn't properly
+document anything, and just gives "suggestions" for the VMM.  *sigh*
 
-Do we need to eagerly disable compat mode or can we just configure the
-VGIC correctly for the intended vCPU at load()?
+As I read it, these snippets from the APM are saying ASIDs tag only GPA=>PA entries
+when NPT is in use.
 
-> >  }
-> > diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> > new file mode 100644
-> > index 000000000000..57199449ca0f
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> > @@ -0,0 +1,14 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +
-> > +#include <kvm/arm_vgic.h>
-> > +
-> > +#include "vgic.h"
-> > +
-> > +inline bool kvm_vgic_in_v3_compat_mode(void)a
-> 
-> nit: we're generally trusting of the compiler to 'do the right thing'
-> and avoid explicit inline specifiers unless necessary.
-> 
-> > +{
-> > +	if (static_branch_unlikely(&kvm_vgic_global_state.gicv5_cpuif) &&
-> > +	    kvm_vgic_global_state.has_gcie_v3_compat)
-> > +		return true;
-> > +
-> > +	return false;
-> > +}
-> 
-> This should be a per-VM thing once KVM support for GICv5 lands. Can you
-> get ahead of that and take a KVM pointer that goes unused. Maybe rename
-> it:
-> 
-> bool vgic_is_v3_compat(struct kvm *kvm)
-> 
-> Or something similar.
-> 
-> Thanks,
-> Oliver
-> 
+  TLB entries are tagged with Address Space Identifier (ASID) bits to distinguish
+  different guest virtual address spaces when shadow page tables are used, or
+  different guest physical address spaces when nested page tables are used. The
+  VMM can choose a software strategy in which it keeps multiple shadow page tables,
+  and/or multiple nested page tables in processors that support nested paging,
+  up-to-date; the VMM can allocate a different ASID for each shadow or nested
+  page table. This allows switching to a new process in a guest under shadow
+  paging (changing CR3 contents), or to a new guest under nested paging (changing
+  nCR3 contents), without flushing the TLBs.
+
+  Note that because an ASID is associated with the guest's physical address
+  space, it is common across all of the guest's virtual address spaces within a
+  processor. This differs from shadow page tables where ASIDs tag individual
+  guest virtual address spaces. Note also that the same ASID may or may not be
+  associated with the same address space across all processors in a
+  multiprocessor system, for either nested tables or shadow tables; this depends
+  on how the VMM manages ASID assignment.
+
+But then the "15.16.1 TLB Flush" section says this, without any qualification
+whatsoever that it applies only to shadow paging.
+
+  A MOV-to-CR3, a task switch that changes CR3, or clearing or setting CR0.PG or
+  bits PGE, PAE, PSE of CR4 affects only the TLB entries belonging to the current
+  ASID, regardless of whether the operation occurred in host or guest mode. The
+  current ASID is 0 when the CPU is not inside a guest context.
+
+And honestly, tagging only GPA=>PA entries doesn't make any sense, because
+GVA=>GPA needs to be tagged with *something*.  And the APM doesn't say anything
+about caching GPA=>PA translations, only about caching VA=>PA.
+
+The thing that doesn't fit is that SEV+ uses ASIDs on a per-VM basis.  I suggested
+per-VM ASIDs for all VM types based solely on that fact, but now I'm wondering if
+it's SEV+ that crazy and broken.  Because if ASIDs also tag GVA=>GPA, then SEV has
+a massive architectural security hole, e.g. a malicious hypervisor can coerce the
+CPU into using a stale GVA=>GPA TLB entry by switching vCPUs and letting guest
+process with CR3=x access memory for guest process with CR3=y.  But again, if
+ASIDs don't tag GVA=>GPA, then what provides isolation between vCPUs!?!?!
+
+Assuming ASIDs tag VA=>PA (i.e. the combined GVA=>GPA=>PA translation), then I
+take back my suggestion to use per-VM ASIDs, and instead propose we treat ASIDs
+like VPIDs, i.e. use per-vCPU ASIDs (well, technically per-VMCB, because nested).
+All server SKUs I've checked (Rome, Milan, Genoa, and Turin) support 0x8000 ASIDs.
+That makes the ~512 ASIDs reserved for SEV+ a drop in the bucket, i.e. still leaves
+~32k ASIDs up for grabs, which means KVM can concurrently run ~16k vCPUs *with*
+nested VMs without having to fallback to flushing when scheduling in a new vCPU.
+
+That way we don't need the complexity of the xarray ASID=>vCPU tracking for common
+code.  And as a bonus, the logic for VMX vs. SVM is very, very similar.
+
+Given the SEV+ uses the ASID as the handle for the guest's encryption key,
+changing that behavior isn't an option.  Though I still don't see how that isn't
+a security flaw.  Regardless, I definitely don't think it's something we should
+follow.
 
