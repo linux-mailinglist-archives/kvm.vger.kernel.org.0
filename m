@@ -1,44 +1,45 @@
-Return-Path: <kvm+bounces-50113-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50114-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BCBAAE1F0B
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 17:44:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4AF4AE1EE4
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 17:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D2F21BC166C
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:40:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 044237AFFCE
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:39:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06482D5431;
-	Fri, 20 Jun 2025 15:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D892DFF2E;
+	Fri, 20 Jun 2025 15:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="TNV/ff+m"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="P2BCdBaY"
 X-Original-To: kvm@vger.kernel.org
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3323C28B3E2;
-	Fri, 20 Jun 2025 15:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98AB82DF3CC;
+	Fri, 20 Jun 2025 15:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750433994; cv=none; b=nrWgveYnYYcLYwYhVlsQ1C8pytO0VuUsZvB9iqf9T0lQEBgENVgVyO36P9uccDHJZnK3I2l2E4czQbge/PbcL7gj8R2Jqt15J1n67AI1W5jsPFtiOuo0hQZO3BpnVGoa/1whBdH8Xp1P9Ieeel02xu5b43gaTM7xVJRf+5Uh5Wg=
+	t=1750433999; cv=none; b=NquXTnnhbudWW/P+pJSYLMLdbw/38F0m4mT5ea/Ip7Gp32q/T3X8Bk1A9kjlXFmSm+bOLmim+4JEUme2UxX0LNTE7/pBHPyNziP3eIxsNJc+uu3en4G7d4slsOFFETQHOWy4IrCVtzwLtZYr+rqxgBB9Hvh+MEWYh2uzjbCdZbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750433994; c=relaxed/simple;
-	bh=VfsPGuEjqXcBsg9RvSh06ru5pxcJQVGthExdWYPZvBo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PJm0G82Tc5HSAbE2P/S89iexO2Wf4Gczh2tRWwZpm2V3C+14HT0P2dLCltm4sFxWSuUv9HY+l8GvvAxtl0E3SOCvFVabpf+jjcgxelmLzwOMBx12GPr1os0+kbKHHdx48vV0a4H6OldiVPgYWRoG06p8RyO8PQseZ6PcxTNZGb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=TNV/ff+m; arc=none smtp.client-ip=13.77.154.182
+	s=arc-20240116; t=1750433999; c=relaxed/simple;
+	bh=3TCjJNEsevipq/wYQO0d3KSail06dLDqwHLc+Sc/vuQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=jJzCu1LmUYmGiP251sHmu77jI4s5RuiyUmq6NDL0Gyywc7ZplFNNMKbgxo4KnxJujxSeasYPedaB2YpwPPaqaZ7ggvhkqtTNt+SxR0XnnW018zrLtNKqG308wJcyjZ4H4O77QV5zKEHCAvB86xN2QFgf6UgjPf0J8U6+u9+9fO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=P2BCdBaY; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Received: from LAPTOP-I1KNRUTF.home (unknown [40.68.205.236])
-	by linux.microsoft.com (Postfix) with ESMTPSA id CF07E2117589;
-	Fri, 20 Jun 2025 08:39:49 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CF07E2117589
+	by linux.microsoft.com (Postfix) with ESMTPSA id 53AA721176CB;
+	Fri, 20 Jun 2025 08:39:54 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 53AA721176CB
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1750433992;
-	bh=i4K0lmrsYGvyT8FPcTPS32aag7itn+Eq0ksyOKJ7odQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=TNV/ff+mXTEzVQxOpBmqtPVUa8ny7aK1sKVTSlUACRqVMrfa+iDelQ8//5D8fXAQi
-	 q7s1iYZ86nJESzPx/9Ny0fA6XaSteBuoJWGJesE7v+GqkuQhlnYLM0wji6F1OFlp4w
-	 UpjafgTXICwm4v5PZ7kPbDarpCw+0hwNDzoAxGE4=
+	s=default; t=1750433997;
+	bh=8MFrkxQlcB5ZBCN4SMkrO/wa5QDMvzRY6icXFN3sfTE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=P2BCdBaYvGi3WFsyzj4DeUqVte/ozZyq1SBFOykIU69NZCRH0LIrw1rJHsugTIDXQ
+	 mw/gQFTdmnkiIkiis5JesmIPJhLzrZQNpOhJJcHIBxtw6taVkoKhtEanY/hybmn8he
+	 dWqXIegMaP6vsoz9rZCWV5LkklFE4Fcj1KCMlu14=
 From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
 To: "Sean Christopherson" <seanjc@google.com>,
 	"Vitaly Kuznetsov" <vkuznets@redhat.com>,
@@ -56,10 +57,12 @@ Cc: "Dave Hansen" <dave.hansen@linux.intel.com>,
 	"Dexuan Cui" <decui@microsoft.com>,
 	linux-hyperv@vger.kernel.org,
 	Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Subject: [RFC PATCH 0/1] Tweak TLB flushing when VMX is running on Hyper-V
-Date: Fri, 20 Jun 2025 17:39:13 +0200
-Message-Id: <cover.1750432368.git.jpiotrowski@linux.microsoft.com>
+Subject: [RFC PATCH 1/1] KVM: VMX: Use Hyper-V EPT flush for local TLB flushes
+Date: Fri, 20 Jun 2025 17:39:14 +0200
+Message-Id: <4266fc8f76c152a3ffcbb2d2ebafd608aa0fb949.1750432368.git.jpiotrowski@linux.microsoft.com>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <cover.1750432368.git.jpiotrowski@linux.microsoft.com>
+References: <cover.1750432368.git.jpiotrowski@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,74 +71,137 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi Sean/Parolo/Vitaly,
+Use Hyper-V's HvCallFlushGuestPhysicalAddressSpace for local TLB flushes.
+This makes any KVM_REQ_TLB_FLUSH_CURRENT (such as on root alloc) visible to
+all CPUs which means we no longer need to do a KVM_REQ_TLB_FLUSH on CPU
+migration.
 
-Wanted to get your opinion on this change. Let me first introduce the scenario:
+The goal is to avoid invept-global in KVM_REQ_TLB_FLUSH. Hyper-V uses a
+shadow page table for the nested hypervisor (KVM) and has to invalidate all
+EPT roots when invept-global is issued. This has a performance impact on
+all nested VMs.  KVM issues KVM_REQ_TLB_FLUSH on CPU migration, and under
+load the performance hit causes vCPUs to use up more of their slice of CPU
+time, leading to more CPU migrations. This has a snowball effect and causes
+CPU usage spikes.
 
-We have been testing kata containers (containers wrapped in VM) in Azure, and
-found some significant issues with TLB flushing. This is a popular workload and
-requires launching many nested VMs quickly. When testing on a 64 core Intel VM
-(D64s_v5 in case someone is wondering), spinning up some 150-ish nested VMs in
-parallel, performance starts getting worse the more nested VMs are already
-running, CPU usage spikes to 100% on all cores and doesn't settle even when all
-nested VMs boot up. On an idle system a single nested VMs boots within seconds,
-but once we have a couple dozen running or so (doing nothing inside), boot time
-gets longer and longer for each new nested VM, they start hitting startup
-timeout etc. In some cases we never reach the point where all nested VMs are
-up and running.
+By issuing the hypercall we are now guaranteed that any root modification
+that requires a local TLB flush becomes visible to all CPUs. The same
+hypercall is already used in kvm_arch_flush_remote_tlbs and
+kvm_arch_flush_remote_tlbs_range.  The KVM expectation is that roots are
+flushed locally on alloc and we achieve consistency on migration by
+flushing all roots - the new behavior of achieving consistency on alloc on
+Hyper-V is a superset of the expected guarantees. This makes the
+KVM_REQ_TLB_FLUSH on CPU migration no longer necessary on Hyper-V.
 
-Investigating the issue we found that this can't be reproduced on AMD and on
-Intel when EPT is disabled. In both these cases the scenario completes within
-20s or so. TPD_MMU or not doesn't make a difference. With EPT=Y the case takes
-minutes.Out of curiousity I also ran the test case on an n4-standard-64 VM on
-GCP and found that EPT=Y runs in ~30s, while EPT=N runs in ~20s (which I found
-slightly interesting).
+Coincidentally - we now match the behavior of SVM on Hyper-V.
 
-So that's when we starting looking at the TLB flushing code and found that
-INVEPT.global is used on every CPU migration and that it's an expensive
-function on Hyper-V. It also has an impact on every running nested VM, so we
-end up with lots of INVEPT.global calls - we reach 2000 calls/s before we're
-essentially stuck in 100% guest ttime.  That's why I'm looking at tweaking the
-TLB flushing behavior to avoid it. I came across past discussions on this topic
-([^1]) and after some thinking see two options:
-
-1. Do you see a way to optimize this generically to avoid KVM_REQ_TLB_FLUSH on
-migration in current KVM? In nested (as in: KVM running nested) I think we
-rarely see CPU pinning used the way we it is on baremetal so it's not a rare of
-an operation. Much has also changed since [^1] and with kvm_mmu_reset_context()
-still being called in many paths we might be over flushing. Perhaps a loop
-flushing individual roots with roles that do not have a post_set_xxx hook that
-does flushing?
-
-2. We can approach this in a Hyper-V specific way, using the dedicated flush
-hypercall, which is what the following RFC patch does. This hypercall acts as a
-broadcast INVEPT.single. I believe that using the flush hypercall in
-flush_tlb_current() is sufficient to ensure the right semantics and correctness.
-The one thing I haven't made up my mind about yet is whether we could still use
-a flush of the current root on migration or not - I can imagine at most an
-INVEPT.single, I also haven't yet figured out how that could be plumbed in if
-it's really necessary (can't put it in KVM_REQ_TLB_FLUSH because that would
-break the assumption that it is stronger than KVM_REQ_TLB_FLUSH_CURRENT).
-
-With 2. the performance is comparable to EPT=N on Intel, roughly 20s for the
-test scenario.
-
-Let me know what you think about this and if you have any suggestions.
-
-Best wishes,
-Jeremi
-
-[^1]: https://lore.kernel.org/kvm/YQljNBBp%2FEousNBk@google.com/
-
-Jeremi Piotrowski (1):
-  KVM: VMX: Use Hyper-V EPT flush for local TLB flushes
-
+Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+---
  arch/x86/include/asm/kvm_host.h |  1 +
  arch/x86/kvm/vmx/vmx.c          | 20 +++++++++++++++++---
  arch/x86/kvm/vmx/vmx_onhyperv.h |  6 ++++++
  arch/x86/kvm/x86.c              |  3 +++
  4 files changed, 27 insertions(+), 3 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index b4a391929cdb..d3acab19f425 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1077,6 +1077,7 @@ struct kvm_vcpu_arch {
+ 
+ #if IS_ENABLED(CONFIG_HYPERV)
+ 	hpa_t hv_root_tdp;
++	bool hv_vmx_use_flush_guest_mapping;
+ #endif
+ };
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4953846cb30d..f537e0df56fc 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1485,8 +1485,12 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
+ 		/*
+ 		 * Flush all EPTP/VPID contexts, the new pCPU may have stale
+ 		 * TLB entries from its previous association with the vCPU.
++		 * Unless we are running on Hyper-V where we promotes local TLB
++		 * flushes to be visible across all CPUs so no need to do again
++		 * on migration.
+ 		 */
+-		kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
++		if (!vmx_hv_use_flush_guest_mapping(vcpu))
++			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+ 
+ 		/*
+ 		 * Linux uses per-cpu TSS and GDT, so set these when switching
+@@ -3243,11 +3247,21 @@ void vmx_flush_tlb_current(struct kvm_vcpu *vcpu)
+ 	if (!VALID_PAGE(root_hpa))
+ 		return;
+ 
+-	if (enable_ept)
++	if (enable_ept) {
++		/*
++		 * hyperv_flush_guest_mapping() has the semantics of
++		 * invept-single across all pCPUs. This makes root
++		 * modifications consistent across pCPUs, so an invept-global
++		 * on migration is no longer required.
++		 */
++		if (vmx_hv_use_flush_guest_mapping(vcpu))
++			return (void)WARN_ON_ONCE(hyperv_flush_guest_mapping(root_hpa));
++
+ 		ept_sync_context(construct_eptp(vcpu, root_hpa,
+ 						mmu->root_role.level));
+-	else
++	} else {
+ 		vpid_sync_context(vmx_get_current_vpid(vcpu));
++	}
+ }
+ 
+ void vmx_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
+diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
+index cdf8cbb69209..a5c64c90e49e 100644
+--- a/arch/x86/kvm/vmx/vmx_onhyperv.h
++++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
+@@ -119,6 +119,11 @@ static inline void evmcs_load(u64 phys_addr)
+ }
+ 
+ void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf);
++
++static inline bool vmx_hv_use_flush_guest_mapping(struct kvm_vcpu *vcpu)
++{
++	return vcpu->arch.hv_vmx_use_flush_guest_mapping;
++}
+ #else /* !IS_ENABLED(CONFIG_HYPERV) */
+ static __always_inline bool kvm_is_using_evmcs(void) { return false; }
+ static __always_inline void evmcs_write64(unsigned long field, u64 value) {}
+@@ -128,6 +133,7 @@ static __always_inline u64 evmcs_read64(unsigned long field) { return 0; }
+ static __always_inline u32 evmcs_read32(unsigned long field) { return 0; }
+ static __always_inline u16 evmcs_read16(unsigned long field) { return 0; }
+ static inline void evmcs_load(u64 phys_addr) {}
++static inline bool vmx_hv_use_flush_guest_mapping(struct kvm_vcpu *vcpu) { return false; }
+ #endif /* IS_ENABLED(CONFIG_HYPERV) */
+ 
+ #endif /* __ARCH_X86_KVM_VMX_ONHYPERV_H__ */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b58a74c1722d..cbde795096a6 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -25,6 +25,7 @@
+ #include "tss.h"
+ #include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
++#include "kvm_onhyperv.h"
+ #include "mmu/page_track.h"
+ #include "x86.h"
+ #include "cpuid.h"
+@@ -12390,6 +12391,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 
+ #if IS_ENABLED(CONFIG_HYPERV)
+ 	vcpu->arch.hv_root_tdp = INVALID_PAGE;
++	vcpu->arch.hv_vmx_use_flush_guest_mapping =
++		(kvm_x86_ops.flush_remote_tlbs == hv_flush_remote_tlbs);
+ #endif
+ 
+ 	r = kvm_x86_call(vcpu_create)(vcpu);
 -- 
 2.39.5
 
