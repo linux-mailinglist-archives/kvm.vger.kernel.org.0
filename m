@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-50092-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50093-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E26DAE1BB1
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:12:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 498B2AE1BB0
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 15:12:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0595E189B551
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 13:12:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0C7C1787F3
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 13:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D165E29B22C;
-	Fri, 20 Jun 2025 13:09:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA39529187E;
+	Fri, 20 Jun 2025 13:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mza8UgB9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rMtF4Jhj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BC028D844
-	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 13:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CF1291880
+	for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 13:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750424978; cv=none; b=CPJ1uIsB+BMNH0FADTHbkXwBKkA4ehh5E/pG/IIougFbSx225qGKeDujZzLjjInECmtuRmbCNL3r1Ya6QP/cMpPQcDL17fo2NbVaQbLQZV0W964NenbdqUOVDkhoIdStAb79BBTTRZqJ8LRuG7mYLYV/aRTNgRU+YPM0JrI4cHQ=
+	t=1750424982; cv=none; b=SWgkSVEm8uSVP5RfL0AhD2SIs2nD2Z/G94w/l3MtACIlw8SLSypS2KBpHV7txftaBJxugcw0ug8DBIf8+xbYDteqaGh8YbZp9e4DRtIDQCCdKzxYZ7uBXfOWOOP8aBtoMMlbs1Otm35o6ME5pUSdEBz868bCbM/EUu8cHGr7N1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750424978; c=relaxed/simple;
-	bh=2J0ny7pzMdBIiTOpM8kF28R3bRiLrAoy3JNqdOhbdEc=;
+	s=arc-20240116; t=1750424982; c=relaxed/simple;
+	bh=4GaVKajVYypw9MuibPTrlwQsMIE6PdjmlY0G5wy8d74=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V0j+/B/Bh2gazYHnEEm0d42kSBlUQ9KxybEQSvACIZmbRj8OGiBEvRg8UgioTKHp/gmGHRACckkw7aMmjTYJhLyfBDo3WTi/yqnkYG3e+QSw5pfw7vaOH4rqD0cpNhfBYEGNhqlLoKsoTYiLzYiW1c3PUK9TzvwvedA3TpCWuTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Mza8UgB9; arc=none smtp.client-ip=209.85.128.42
+	 MIME-Version:Content-Type; b=GTkqsK21RkH+KGVOOByM/63wAUs/U4lYuvgpPP1ENAtrtFhhyEKKiOGJWlP2uncbZww8A60WRB2SPOy5JxEcsvxWL/R7WY9QyfPxm9rHB+g0EfPbr/SKhAW89mtsChH4chjxNFKp4uLectuoodBwrFwh/V0q1f7f2Zjj1qk8ZtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rMtF4Jhj; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4531e146a24so11638925e9.0
-        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 06:09:35 -0700 (PDT)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a4e742dc97so1830201f8f.0
+        for <kvm@vger.kernel.org>; Fri, 20 Jun 2025 06:09:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750424974; x=1751029774; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1750424980; x=1751029780; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ML487RZEtX6RDPbX3JUchrWHyom2/STG3MUfjQAASi4=;
-        b=Mza8UgB9w/Xf3fncCxDobRLRsl6pgjOiMqHVh4uki1O32TphivWPgQ46GPMFDrGkqW
-         Nja0D+V1uA8B8ToFxWbQq0F4JokJCgn8BGYHEL8znzicajksRou+I+XS+4seZuqwf1XZ
-         a/9Sn7z7386l+xdxqlHUaubODz/US+93SimNTqdBOTjzLTvMPyV5dWOhAy9Wx/NmSP/Y
-         VQDVaBhKVkGKFI3EV0+AGqquY+VMk3D8d1qZIqy+5NeLjYXQHUVm364d6lvE3KZFWKuC
-         QCorOVL1pzsuXQHQPDH9fT05KeYpHL3LwjHvQ0KYUi0Z+2ki+YM3+Be3AMVlBjtG/Cdh
-         BMBA==
+        bh=w6n2BSSxRh+KStXe1TUl7/blQoxrrxglxVgcpHIzilA=;
+        b=rMtF4JhjzITbk9UJvK8xjDzaC7za1Q4oZoUFcU+vhCceqjV2XpleRS9iWnmXtC9zL0
+         l8+hEelCRCMNXQrW3Er0MQgUZTMI0/3OhEV/v/IP6ye2+lM7hM1yr93l/n4zxSI0mez0
+         yU40aSOiGORuJWmH0Sz8u71UUhbu99fgTC2z5mwlhwadNiae4d3VA/1dedXvoZLyrU3K
+         e9PDcPU66GQetwtZJRfYCoqEJ0OB03jeNXgOssODFxdhfrEsBrUto9NYWrd5N3LD5Vg4
+         eBNUvDsP12Du6GHb5btzeR0cobBvaJxHG2Z4PCuwnlCXZADcj9e/txSNpdtcRwlqxTow
+         abaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750424974; x=1751029774;
+        d=1e100.net; s=20230601; t=1750424980; x=1751029780;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ML487RZEtX6RDPbX3JUchrWHyom2/STG3MUfjQAASi4=;
-        b=v/T0PyePae38EIWTEVcFzyj8yabeDuLztSRY6hvlLMn+4D8qjLOLhd+R4b2GWzCqSo
-         hjuqEZlvDwQsVJQKwmWbSY70RkBXaajDmQvXtskEPG1Ro0OkqK9exnI1sLr2OZM+iqzB
-         QQjXP9HcQcWmOLrwy8q/onsirnLStnxZKmEv103aE3oUgHZZw+oM+9mT3QmuJPdXDLYX
-         y0wKsjnF0O6PGjWAqXDkEkcTa6R2ixDwYsJ+fwwPk6TyUbkVLhnI4eZizHvwk5Vpo7ht
-         aTuKZKnnhzVclOmeQMRdGGGykGOgLzoo2qbe8gtIZSmRQgV3Xre36aNs8iWRtf6DYb93
-         sIGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWY3M4N3qSNkewDT26HGcNeJ1Nkx+nQVqmgavTqY/Lst0NWXs+sLZdtLbj28dVQdekX/Cc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMmjl8k83U+klTtV+eS0oAgni7ojIEU7c1Q4aVGutlbAt+cjfC
-	PF10DCgfpcFbq4+VrYxfXEAyZsZIrLDQT4RMiQGwZwCLaWXPcuOfIPyxZonw8725UE8=
-X-Gm-Gg: ASbGncvo6ZNfAgNQEve8U7kAW1iERl/5maGzWqKEcmyh/SYzGHw430uzniyXMJ3hQV4
-	5ILwMMFWBlLWV9esLc6xEjGsxTaN5jnfjdpUCFbwAlc8BW9O241g74L7v2Q1GcGGABYjXQxIVEM
-	ovhfAaNQ2+3iGBbQHsYmztBMT3MhsLZw9lUV4ympWRQYw0QUJ19oJwf3T+0OQ62ftbIz1LPPDRz
-	4ctLO/nRI6fpxnXBOr232/LiIotJMbxNLLUYGfalAUCNlwVhYoJHrlWiu+hLX6DtGfZjTufCBQk
-	sxkzU2ojlErw4mLrUGxhEAX/jhvHNFbEozcYibb4QnxW/xk0w/9FVaktWkNqDnYUxK+LBfCNbre
-	HQl1UBf2WXeGFKdJefqDMeTR5fac5MKEXyMbv
-X-Google-Smtp-Source: AGHT+IFoaiSq8p/vZ15JMywutihLdhiyx/4+KTYgXl1gSeqr94tnRyEi672b3w+H0TV5kZSUiEuYRg==
-X-Received: by 2002:a05:600c:3542:b0:451:e394:8920 with SMTP id 5b1f17b1804b1-453659edd18mr24577215e9.27.1750424974566;
-        Fri, 20 Jun 2025 06:09:34 -0700 (PDT)
+        bh=w6n2BSSxRh+KStXe1TUl7/blQoxrrxglxVgcpHIzilA=;
+        b=gSjONb6uLd1nfCHeTbhRX9oVgFJ9FCbxP+zQV4/icyXq5LAruKGJXBvcxGX1vUwR4B
+         zq+DOgdnqgUp8NOrbLUS4bZLCjtL3pvNV4subv6RdNbhFUUVMGytWoBuASOBcsIH7ZaX
+         dU5SM2s7KzuPo4O4uGYlG/lH+BLQgU/Iea9Yb0g7maXVDjt4ryiTdWYz6rinLtR7Qp3F
+         BJOJJL0Ik9ZfR09ARf3mrh8nt9T/sB9O1z8p6F2uXnim5gWk+87OUrOUd3D7Vn7hMlTc
+         DNlcO35YloLC8DHKP5ctnoFag7LQbAqmqQ7cfUnTGO9DGBsO3TAbI7hGyBJE3FQMZvbE
+         zT6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX4JrVtXpkj/iIR0kuTIhsJPLTIXNRrBBt/Q84DlijT96GVERPYZvw21OJ9sz4fplHhgyA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhM66k7Rp1Ue/ZGZ08JlftAxj0SgZB96bJn3eLYYobH08yhqjI
+	vz1RYWiz294ym/+AJ/9+Fjyq9y9UqHQolW/AcQleVrjgLejHXqFrvcpJEVTde5GapK0=
+X-Gm-Gg: ASbGnct2LHQj6tszdFbgHPm4CHNecASY2oEtmxIFFYylh3hcKUigMFEqlZzN0yjsem+
+	r1xQLpAFlgfC3WYzIz3XuUBIVjgAP3DVI/porTAtpwvkNzObUbVbBQrFQGUxgybJIIfVR+P3sau
+	38WXLp7RdxZhObV2fkWdEft66/utzYmtl3Ad7LjSBCiZHPAgcrp0b4y8oxE8XwmcmWZZDuxSLLf
+	EJ1LKToq+/u/gAkdVHQLKUFY6kt/uiD7aqhvqLWWfRYf9yy1M8iiNnB7nuEsB/8r43ntx43YAVf
+	1VX9TpXFwc9AjIVTkYYx8J7a+lmtuY2KqWu3a9HiAQc4Rbq0zHx7Yqmw2qLPeKOMf5gLylliWVb
+	3kt55Pmzm/4xTl7WBHwftB52caA7FpYqQ8aII
+X-Google-Smtp-Source: AGHT+IGXwFQFfwW7rAMovUtfDAuB9Dz2J3aZxTUZqf2DF7gPQ8T5LAmGCEyFfgo/pTiyQMieyUC1PQ==
+X-Received: by 2002:a05:6000:26c8:b0:3a5:8977:e0f8 with SMTP id ffacd0b85a97d-3a6d27e16f5mr2027646f8f.19.1750424979716;
+        Fri, 20 Jun 2025 06:09:39 -0700 (PDT)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45359a09ee6sm38434125e9.1.2025.06.20.06.09.33
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6d1188804sm2015800f8f.79.2025.06.20.06.09.38
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 20 Jun 2025 06:09:34 -0700 (PDT)
+        Fri, 20 Jun 2025 06:09:39 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
@@ -95,9 +95,9 @@ Cc: Leif Lindholm <leif.lindholm@oss.qualcomm.com>,
 	Thomas Huth <thuth@redhat.com>,
 	Roman Bolshakov <rbolshakov@ddn.com>,
 	John Snow <jsnow@redhat.com>
-Subject: [PATCH v2 25/26] tests/functional: Add hvf_available() helper
-Date: Fri, 20 Jun 2025 15:07:08 +0200
-Message-ID: <20250620130709.31073-26-philmd@linaro.org>
+Subject: [PATCH v2 26/26] tests/functional: Expand Aarch64 SMMU tests to run on HVF accelerator
+Date: Fri, 20 Jun 2025 15:07:09 +0200
+Message-ID: <20250620130709.31073-27-philmd@linaro.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250620130709.31073-1-philmd@linaro.org>
 References: <20250620130709.31073-1-philmd@linaro.org>
@@ -112,64 +112,45 @@ Content-Transfer-Encoding: 8bit
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- python/qemu/utils/__init__.py          | 2 +-
- python/qemu/utils/accel.py             | 8 ++++++++
- tests/functional/qemu_test/testcase.py | 6 ++++--
- 3 files changed, 13 insertions(+), 3 deletions(-)
+ tests/functional/test_aarch64_smmu.py | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/python/qemu/utils/__init__.py b/python/qemu/utils/__init__.py
-index 017cfdcda75..d2fe5db223c 100644
---- a/python/qemu/utils/__init__.py
-+++ b/python/qemu/utils/__init__.py
-@@ -23,7 +23,7 @@
- from typing import Optional
+diff --git a/tests/functional/test_aarch64_smmu.py b/tests/functional/test_aarch64_smmu.py
+index c65d0f28178..59b62a55a9e 100755
+--- a/tests/functional/test_aarch64_smmu.py
++++ b/tests/functional/test_aarch64_smmu.py
+@@ -22,6 +22,7 @@
  
- # pylint: disable=import-error
--from .accel import kvm_available, list_accel, tcg_available
-+from .accel import hvf_available, kvm_available, list_accel, tcg_available
+ class SMMU(LinuxKernelTest):
+ 
++    accel = 'kvm'
+     default_kernel_params = ('earlyprintk=pl011,0x9000000 no_timer_check '
+                              'printk.time=1 rd_NO_PLYMOUTH net.ifnames=0 '
+                              'console=ttyAMA0 rd.rescue')
+@@ -45,11 +46,11 @@ def set_up_boot(self, path):
+         self.vm.add_args('-device', 'virtio-net,netdev=n1' + self.IOMMU_ADDON)
+ 
+     def common_vm_setup(self, kernel, initrd, disk):
+-        self.require_accelerator("kvm")
++        self.require_accelerator(self.accel)
+         self.require_netdev('user')
+         self.set_machine("virt")
+         self.vm.add_args('-m', '1G')
+-        self.vm.add_args("-accel", "kvm")
++        self.vm.add_args("-accel", self.accel)
+         self.vm.add_args("-cpu", "host")
+         self.vm.add_args("-machine", "iommu=smmuv3")
+         self.vm.add_args("-d", "guest_errors")
+@@ -201,5 +202,9 @@ def test_smmu_ril_nostrict(self):
+         self.run_and_check(self.F33_FILENAME, self.F33_HSUM)
  
  
- __all__ = (
-diff --git a/python/qemu/utils/accel.py b/python/qemu/utils/accel.py
-index 386ff640ca8..376d1e30005 100644
---- a/python/qemu/utils/accel.py
-+++ b/python/qemu/utils/accel.py
-@@ -82,3 +82,11 @@ def tcg_available(qemu_bin: str) -> bool:
-     @param qemu_bin (str): path to the QEMU binary
-     """
-     return 'tcg' in list_accel(qemu_bin)
++class SMMU_HVF(SMMU):
++    accel = 'hvf'
 +
-+def hvf_available(qemu_bin: str) -> bool:
-+    """
-+    Check if HVF is available.
 +
-+    @param qemu_bin (str): path to the QEMU binary
-+    """
-+    return 'hvf' in list_accel(qemu_bin)
-diff --git a/tests/functional/qemu_test/testcase.py b/tests/functional/qemu_test/testcase.py
-index 50c401b8c3c..2082c6fce43 100644
---- a/tests/functional/qemu_test/testcase.py
-+++ b/tests/functional/qemu_test/testcase.py
-@@ -23,7 +23,7 @@
- import uuid
- 
- from qemu.machine import QEMUMachine
--from qemu.utils import kvm_available, tcg_available
-+from qemu.utils import hvf_available, kvm_available, tcg_available
- 
- from .archive import archive_extract
- from .asset import Asset
-@@ -317,7 +317,9 @@ def require_accelerator(self, accelerator):
-         :type accelerator: str
-         """
-         checker = {'tcg': tcg_available,
--                   'kvm': kvm_available}.get(accelerator)
-+                   'kvm': kvm_available,
-+                   'hvf': hvf_available,
-+                  }.get(accelerator)
-         if checker is None:
-             self.skipTest("Don't know how to check for the presence "
-                           "of accelerator %s" % accelerator)
+ if __name__ == '__main__':
+     LinuxKernelTest.main()
 -- 
 2.49.0
 
