@@ -1,116 +1,177 @@
-Return-Path: <kvm+bounces-50002-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-50003-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D59E8AE10C0
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 03:30:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D90FCAE10CD
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 03:43:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5397A7AD9AF
-	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 01:29:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED98419E1BA2
+	for <lists+kvm@lfdr.de>; Fri, 20 Jun 2025 01:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7EA482F2;
-	Fri, 20 Jun 2025 01:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="defGWc5l"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC3B128816;
+	Fri, 20 Jun 2025 01:43:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2171030E820;
-	Fri, 20 Jun 2025 01:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C427D098;
+	Fri, 20 Jun 2025 01:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750383040; cv=none; b=HO24zPjpXROQjrJpAWIVA9S7MRdNiMMsLd/vizQw8ZwaOVak8mJmY61hvW8PjNM0bvnLvpztwmHf9Su3TBKvGd0LepoH9wEVvrQpmhULRsDxRmyV8LcHEM9+Q5InRWFGCROxYsKRWGgBDKft/b/gVyW+h1QD1Ag2Tcc1Yq0oUFE=
+	t=1750383813; cv=none; b=Q9rjj18R7D8KEr95XJneHWm/JS7yuPoIlPEURDlX6K3D33nYFPfFDm2FqaLLFVQx8hR8sCGk+ta8wXJpbmfYEXSZ2AnFESrHZBzIoG6QHh0Ox8wU3YpFZt0GfVxC73xGdoj8bEQl3wyW60+RGAqlJCshnpBcJ0Zm+g+x5vkVdx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750383040; c=relaxed/simple;
-	bh=ySgRnI6zQBvmEVFM6GiaIrkiwvfvdT9BZ3dD9QwjPRE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GxWsCaTynXbsRCEmT4q2o4a0v/t2ktmVSbopOcv7pkBmFBkjC0wNA9bzlLR7prN55tZTkK8ajUw8Lwa9BWj+1Q4ZzarnDAB5ZZkkAweFND4esUfbgiufav8qNXeCmhAedhhwCYwv1D978qkoeD77Dt3vGvJ7OKhA0etqc+QJuKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=defGWc5l; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750383039; x=1781919039;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ySgRnI6zQBvmEVFM6GiaIrkiwvfvdT9BZ3dD9QwjPRE=;
-  b=defGWc5l+M+0pxljs6HnPoyO736p7N9PsmARVSom/F0AbsP19RdPQ0wc
-   azmTNgyXpVOuUoDwrrrMZM61SZFD8MXOZKyFbcEMEa+nJhuED4CW3BlRD
-   +amWkR8moUVQTMiCUnNFHXDEv/wouwLWPHTiyWfD04dz7wuaQj4SPQfAn
-   TNgna29Dh895M+AmJ3pBSizPuz9c79RdO4PqopUXV7G85zhEzbCVCRyCi
-   pA7FfbMoEBhDluGt26EXXZZNt0hZg0mcDtjYXJzlym9/9HRRycjcKqQnj
-   tx3Dt9nR9+tZOgf7jIyKBDz7HKcJq+hAMyMmWAQjRMr6dIAqdFUvNa+dY
-   g==;
-X-CSE-ConnectionGUID: u6GFlxepR2+DdVMil/xgjQ==
-X-CSE-MsgGUID: WwDFMw4QQ7StUOqq2UBwmw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11469"; a="52508574"
-X-IronPort-AV: E=Sophos;i="6.16,250,1744095600"; 
-   d="scan'208";a="52508574"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 18:30:37 -0700
-X-CSE-ConnectionGUID: 6VYokZolTyKhAXXm5tVRog==
-X-CSE-MsgGUID: Jfga7mUpQEut13tpMjmdeA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,250,1744095600"; 
-   d="scan'208";a="181800456"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2025 18:30:33 -0700
-Message-ID: <3133d5e9-18d3-499a-a24d-170be7fb8357@intel.com>
-Date: Fri, 20 Jun 2025 09:30:30 +0800
+	s=arc-20240116; t=1750383813; c=relaxed/simple;
+	bh=zOswJx4rDMm0i1hayjKroOfpk7Su2D1HHPjfiTqZxQY=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=TUtuuwif7V9DbMTS07pHLNzU+2hYViP56s5FI34DmEgayTbiZp8zsZCvE5bfT5iXYeZKOSy9TY9s4VxYbHezwCLG0HNjF14XdgwC7nowZk5myAt8hRPuUxjeEB1oscLpM/ahabT+QRDAkQ1cK1EAQ1KJ2OVVClJsiXtRPP1EEWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8AxHHK_vFRoqiEaAQ--.59488S3;
+	Fri, 20 Jun 2025 09:43:27 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMCxPse9vFRoic0hAQ--.40170S3;
+	Fri, 20 Jun 2025 09:43:27 +0800 (CST)
+Subject: Re: [PATCH v3 4/9] LoongArch: KVM: INTC: Check validation of num_cpu
+ from user space
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
+ Xianglai Li <lixianglai@loongson.cn>, kvm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20250611014651.3042734-1-maobibo@loongson.cn>
+ <20250611014651.3042734-5-maobibo@loongson.cn>
+ <CAAhV-H7ehdkKwzsFNAaX+r5eXLknvskyXLPDKei2A55LoSiJMA@mail.gmail.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <5f1b9068-2d3d-2f89-4f72-85b021537f58@loongson.cn>
+Date: Fri, 20 Jun 2025 09:42:00 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] TDX attestation support and GHCI fixup
-To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, seanjc@google.com
-Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
- reinette.chatre@intel.com, tony.lindgren@intel.com,
- isaku.yamahata@intel.com, yan.y.zhao@intel.com,
- mikko.ylinen@linux.intel.com, kirill.shutemov@intel.com,
- jiewen.yao@intel.com, binbin.wu@linux.intel.com
-References: <20250619180159.187358-1-pbonzini@redhat.com>
+In-Reply-To: <CAAhV-H7ehdkKwzsFNAaX+r5eXLknvskyXLPDKei2A55LoSiJMA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250619180159.187358-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMCxPse9vFRoic0hAQ--.40170S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxur4fCw47GryrCrWUAFW3CFX_yoW5ur4Upr
+	W8Aa98KFWFqryxWw1vqw1DGFyrKrn7WrySyry7KFya9rZ0qwn5CFyvkrZ0kFyak34rAF1I
+	vF4ay3W3uw1DtacCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
+	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAF
+	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4
+	CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
+	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMI
+	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
+	14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
+	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jUsqXU
+	UUUU=
 
-On 6/20/2025 2:01 AM, Paolo Bonzini wrote:
-> This is a refresh of Binbin's patches with a change to the userspace
-> API.  I am consolidating everything into a single KVM_EXIT_TDX and
-> adding to the contract that userspace is free to ignore it *except*
-> for having to reenter the guest with KVM_RUN.
-> 
-> If in the future this does not work, it should be possible to introduce
-> an opt-in interface.  Hopefully that will not be necessary.
 
-For <GetTdVmCallInfo> exit, I think KVM still needs to report which 
-TDVMCALL leaf will exit to userspace, to differentiate between different 
-KVMs.
 
-But it's not a must for current <GetQuote> since it exits to userspace 
-from day 0. So that we can leave the report interface until KVM needs to 
-support user exit of another TDVMCALL leaf.
+On 2025/6/19 下午4:46, Huacai Chen wrote:
+> Hi, Bibo,
+> 
+> On Wed, Jun 11, 2025 at 9:47 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>
+>> The maximum supported cpu number is EIOINTC_ROUTE_MAX_VCPUS about
+>> irqchip eiointc, here add validation about cpu number to avoid array
+>> pointer overflow.
+>>
+>> Cc: stable@vger.kernel.org
+>> Fixes: 1ad7efa552fd ("LoongArch: KVM: Add EIOINTC user mode read and write functions")
+>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>> ---
+>>   arch/loongarch/kvm/intc/eiointc.c | 18 +++++++++++++-----
+>>   1 file changed, 13 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arch/loongarch/kvm/intc/eiointc.c b/arch/loongarch/kvm/intc/eiointc.c
+>> index b48511f903b5..ed80bf290755 100644
+>> --- a/arch/loongarch/kvm/intc/eiointc.c
+>> +++ b/arch/loongarch/kvm/intc/eiointc.c
+>> @@ -798,7 +798,7 @@ static int kvm_eiointc_ctrl_access(struct kvm_device *dev,
+>>          int ret = 0;
+>>          unsigned long flags;
+>>          unsigned long type = (unsigned long)attr->attr;
+>> -       u32 i, start_irq;
+>> +       u32 i, start_irq, val;
+>>          void __user *data;
+>>          struct loongarch_eiointc *s = dev->kvm->arch.eiointc;
+>>
+>> @@ -806,7 +806,12 @@ static int kvm_eiointc_ctrl_access(struct kvm_device *dev,
+>>          spin_lock_irqsave(&s->lock, flags);
+>>          switch (type) {
+>>          case KVM_DEV_LOONGARCH_EXTIOI_CTRL_INIT_NUM_CPU:
+>> -               if (copy_from_user(&s->num_cpu, data, 4))
+>> +               if (copy_from_user(&val, data, 4) == 0) {
+>> +                       if (val < EIOINTC_ROUTE_MAX_VCPUS)
+>> +                               s->num_cpu = val;
+>> +                       else
+>> +                               ret = -EINVAL;
+> Maybe it is better to set s->num_cpu to EIOINTC_ROUTE_MAX_VCPUS (or
+> other value) rather than keep it uninitialized. Because in other
+> places we need to check s->num_cpu and an uninitialized value may
+> cause undefined behavior.
+There is error return value -EINVAL, VMM should stop running and exit 
+immediately if there is error return value with the ioctl command.
 
-> Paolo
+num_cpu is not uninitialized and it is zero by default. If VMM does not 
+care about the return value, VMM will fail to get coreisr information in 
+future.
+
+Regards
+Bibo Mao
 > 
-> Binbin Wu (3):
->    KVM: TDX: Add new TDVMCALL status code for unsupported subfuncs
->    KVM: TDX: Handle TDG.VP.VMCALL<GetQuote>
->    KVM: TDX: Exit to userspace for GetTdVmCallInfo
 > 
->   Documentation/virt/kvm/api.rst    | 62 ++++++++++++++++++++++++-
->   arch/x86/include/asm/shared/tdx.h |  1 +
->   arch/x86/kvm/vmx/tdx.c            | 77 ++++++++++++++++++++++++++++---
->   include/uapi/linux/kvm.h          | 22 +++++++++
->   4 files changed, 154 insertions(+), 8 deletions(-)
-> 
+> Huacai
+>> +               } else
+>>                          ret = -EFAULT;
+>>                  break;
+>>          case KVM_DEV_LOONGARCH_EXTIOI_CTRL_INIT_FEATURE:
+>> @@ -835,7 +840,7 @@ static int kvm_eiointc_regs_access(struct kvm_device *dev,
+>>                                          struct kvm_device_attr *attr,
+>>                                          bool is_write)
+>>   {
+>> -       int addr, cpuid, offset, ret = 0;
+>> +       int addr, cpu, offset, ret = 0;
+>>          unsigned long flags;
+>>          void *p = NULL;
+>>          void __user *data;
+>> @@ -843,7 +848,7 @@ static int kvm_eiointc_regs_access(struct kvm_device *dev,
+>>
+>>          s = dev->kvm->arch.eiointc;
+>>          addr = attr->attr;
+>> -       cpuid = addr >> 16;
+>> +       cpu = addr >> 16;
+>>          addr &= 0xffff;
+>>          data = (void __user *)attr->addr;
+>>          switch (addr) {
+>> @@ -868,8 +873,11 @@ static int kvm_eiointc_regs_access(struct kvm_device *dev,
+>>                  p = &s->isr.reg_u32[offset];
+>>                  break;
+>>          case EIOINTC_COREISR_START ... EIOINTC_COREISR_END:
+>> +               if (cpu >= s->num_cpu)
+>> +                       return -EINVAL;
+>> +
+>>                  offset = (addr - EIOINTC_COREISR_START) / 4;
+>> -               p = &s->coreisr.reg_u32[cpuid][offset];
+>> +               p = &s->coreisr.reg_u32[cpu][offset];
+>>                  break;
+>>          case EIOINTC_COREMAP_START ... EIOINTC_COREMAP_END:
+>>                  offset = (addr - EIOINTC_COREMAP_START) / 4;
+>> --
+>> 2.39.3
+>>
 
 
